@@ -75,6 +75,8 @@ private:
     QString cardSourceUrl;
     QString cardSourceVersion;
 
+    void migrateOracleSettings();
+
 protected:
     void changeEvent(QEvent *event) override;
 };

@@ -12,7 +12,10 @@
 #include <QThreadPool>
 
 // Card back returned by gatherer when card is not found
-static const QStringList MD5_BLACKLIST = {"db0c48db407a907c16ade38de048a441"};
+static const QStringList MD5_BLACKLIST = {
+    "db0c48db407a907c16ade38de048a441", // Old card back hash. Keep around just in case
+    "fbc7d763c08771c260b39e2115414eeb"  // Current card back hash
+};
 
 CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(const CardPictureLoaderWorker *worker, const ExactCard &toLoad)
     : QObject(nullptr), cardToDownload(CardPictureToLoad(toLoad)),
@@ -70,16 +73,22 @@ void CardPictureLoaderWorkerWork::picDownloadFailed()
 void CardPictureLoaderWorkerWork::handleNetworkReply(QNetworkReply *reply)
 {
     QVariant redirectTarget = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+    bool redirectFailure = false;
     if (redirectTarget.isValid()) {
         QUrl url = reply->request().url();
         QUrl redirectUrl = redirectTarget.toUrl();
         if (redirectUrl.isRelative()) {
             redirectUrl = url.resolved(redirectUrl);
         }
-        emit urlRedirected(url, redirectUrl);
+        if (url == redirectUrl) {
+            qCWarning(CardPictureLoaderWorkerWorkLog) << "recursive redirect detected!";
+            redirectFailure = true;
+        } else {
+            emit urlRedirected(url, redirectUrl);
+        }
     }
 
-    if (reply->error()) {
+    if (redirectFailure || reply->error()) {
         handleFailedReply(reply);
     } else {
         handleSuccessfulReply(reply);

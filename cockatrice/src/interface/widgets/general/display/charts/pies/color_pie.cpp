@@ -1,18 +1,21 @@
 #include "color_pie.h"
 
+#include "libcockatrice/utility/color.h"
+
 #include <QMouseEvent>
 #include <QPainter>
 #include <QToolTip>
 #include <QtMath>
 
-ColorPie::ColorPie(const QMap<QString, int> &_colors, QWidget *parent) : QWidget(parent), colors(_colors)
+ColorPie::ColorPie(const QMap<QString, int> &_colors, QWidget *parent)
+    : QWidget(parent), colors(GameSpecificColors::MTG::sortManaMapWUBRGCFirst(_colors))
 {
     setMouseTracking(true);
 }
 
 void ColorPie::setColors(const QMap<QString, int> &_colors)
 {
-    colors = _colors;
+    colors = GameSpecificColors::MTG::sortManaMapWUBRGCFirst(_colors);
     update();
 }
 
@@ -28,8 +31,8 @@ void ColorPie::paintEvent(QPaintEvent *)
     }
 
     int total = 0;
-    for (int v : colors.values()) {
-        total += v;
+    for (const auto &pair : colors) {
+        total += pair.second;
     }
 
     if (total == 0) {
@@ -41,24 +44,18 @@ void ColorPie::paintEvent(QPaintEvent *)
 
     int w = width();
     int h = height();
-    int size = qMin(w, h) - 40; // leave space for labels
+    int size = qMin(w, h) - 40;
     QRectF rect((w - size) / 2.0, (h - size) / 2.0, size, size);
 
-    // Draw border
+    // Border
     p.setPen(QPen(Qt::black, 1));
     p.setBrush(Qt::NoBrush);
     p.drawEllipse(rect);
 
-    // Sorted keys for predictable order
-    QList<QString> sortedKeys = colors.keys();
-    std::sort(sortedKeys.begin(), sortedKeys.end());
-
     double startAngle = 0.0;
 
-    for (const QString &key : sortedKeys) {
-        int value = colors[key];
+    for (const auto &[key, value] : colors) {
         double ratio = double(value) / total;
-
         if (ratio <= minRatioThreshold) {
             continue;
         }
@@ -67,20 +64,18 @@ void ColorPie::paintEvent(QPaintEvent *)
 
         QColor base = colorFromName(key);
 
-        // Gradient
         QRadialGradient grad(rect.center(), size / 2);
         grad.setColorAt(0, base.lighter(130));
         grad.setColorAt(1, base.darker(130));
+
         p.setBrush(grad);
         p.setPen(Qt::NoPen);
-
-        // Draw slice
         p.drawPie(rect, int(startAngle * 16), int(spanAngle * 16));
 
-        // Draw percent label
-        double midAngle = startAngle + spanAngle / 2;
+        // Percent label
+        double midAngle = startAngle + spanAngle / 2.0;
         double rad = qDegreesToRadians(midAngle);
-        double labelRadius = size / 2 + 15; // slightly outside the pie
+        double labelRadius = size / 2 + 15;
         QPointF center = rect.center();
         QPointF labelPos(center.x() + labelRadius * qCos(rad), center.y() - labelRadius * qSin(rad));
 
@@ -147,10 +142,13 @@ QString ColorPie::tooltipForPoint(const QPoint &pt) const
     }
 
     int total = 0;
-    for (int v : colors.values())
-        total += v;
-    if (total == 0)
+    for (const auto &pair : colors) {
+        total += pair.second;
+    }
+
+    if (total == 0) {
         return {};
+    }
 
     int w = width();
     int h = height();
@@ -158,9 +156,9 @@ QString ColorPie::tooltipForPoint(const QPoint &pt) const
     QPointF center(w / 2.0, h / 2.0);
 
     QPointF v = pt - center;
-    double distance = std::sqrt(v.x() * v.x() + v.y() * v.y());
+    double distance = std::hypot(v.x(), v.y());
     if (distance > size / 2.0)
-        return {}; // outside pie
+        return {};
 
     double angle = std::atan2(-v.y(), v.x()) * 180.0 / M_PI;
     if (angle < 0) {
@@ -169,16 +167,19 @@ QString ColorPie::tooltipForPoint(const QPoint &pt) const
 
     double acc = 0.0;
 
-    QList<QString> keys = colors.keys();
-    std::sort(keys.begin(), keys.end());
+    for (const auto &[key, value] : colors) {
+        double ratio = double(value) / total;
+        if (ratio <= minRatioThreshold) {
+            continue;
+        }
 
-    for (const QString &key : keys) {
-        double span = (double(colors[key]) / total) * 360.0;
+        double span = ratio * 360.0;
 
         if (angle >= acc && angle < acc + span) {
-            double percent = (100.0 * colors[key]) / total;
-            return QString("%1: %2 cards (%3%)").arg(key).arg(colors[key]).arg(QString::number(percent, 'f', 1));
+            double percent = (100.0 * value) / total;
+            return QString("%1: %2 cards (%3%)").arg(key).arg(value).arg(QString::number(percent, 'f', 1));
         }
+
         acc += span;
     }
 

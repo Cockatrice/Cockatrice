@@ -7,6 +7,8 @@
 VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent) : QWidget(parent)
 {
     groupAndSortLayout = new QHBoxLayout(this);
+    groupAndSortLayout->setContentsMargins(0, 0, 0, 0);
+    groupAndSortLayout->setSpacing(3);
     groupAndSortLayout->setAlignment(Qt::AlignLeft);
     this->setLayout(groupAndSortLayout);
 
@@ -45,6 +47,7 @@ VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent) 
     sortByLabel = new QLabel(this);
 
     sortCriteriaButton = new SettingsButtonWidget(this);
+    sortCriteriaButton->setButtonIcon(QPixmap("theme:icons/sort_arrow_down"));
 
     sortLabel = new QLabel(sortCriteriaButton);
     sortLabel->setWordWrap(true);

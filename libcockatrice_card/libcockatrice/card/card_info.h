@@ -292,6 +292,14 @@ public:
     [[nodiscard]] QString getCorrectedName() const;
 
     /**
+     * @brief Gets the card's legality value for the given format.
+     * The legality prop for a format is stored in the property map under the key "format-<name>"
+     * @param format The format's name.
+     * @return The card's legality value for the format. Empty if not found.
+     */
+    [[nodiscard]] QString getLegalityProp(const QString &format) const;
+
+    /**
      * @brief Checks if the card is legal in the given format.
      * A card is considered legal in a format if its properties map contains an entry for "format-<name>", with value
      * "legal" or "restricted".

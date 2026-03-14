@@ -85,6 +85,8 @@ private:
 private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();
+    void adjustColorsToPalette();
+    void refreshBlockColors();
 
 public:
     ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _showTimestamps, QWidget *parent = nullptr);

@@ -12,7 +12,9 @@
 
 #include <QDockWidget>
 
+class PrintingDisabledInfoWidget;
 class TabDeckEditor;
+
 class DeckEditorPrintingSelectorDockWidget : public QDockWidget
 {
     Q_OBJECT
@@ -20,10 +22,16 @@ public:
     explicit DeckEditorPrintingSelectorDockWidget(AbstractTabDeckEditor *parent);
     void createPrintingSelectorDock();
     void retranslateUi();
+
     PrintingSelector *printingSelector;
 
 private:
     AbstractTabDeckEditor *deckEditor;
+    QWidget *printingSelectorDockContents;
+    PrintingDisabledInfoWidget *printingDisabledInfoWidget;
+
+private slots:
+    void setVisibleWidget(bool overridePrintings);
 };
 
 #endif // DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H

@@ -84,22 +84,6 @@ protected slots:
      */
     bool eventFilter(QObject *o, QEvent *e) override;
 
-    /**
-     * @brief Triggered when a dock visibility menu item is clicked.
-     */
-    void dockVisibleTriggered() override;
-
-    /**
-     * @brief Triggered when a dock floating menu item is clicked.
-     */
-    void dockFloatingTriggered() override;
-
-    /**
-     * @brief Triggered when a dock top-level state changes.
-     * @param topLevel True if the dock became floating.
-     */
-    void dockTopLevelChanged(bool topLevel) override;
-
 protected:
     TabDeckEditorVisualTabWidget *tabContainer; ///< Tab container holding different visual widgets.
 

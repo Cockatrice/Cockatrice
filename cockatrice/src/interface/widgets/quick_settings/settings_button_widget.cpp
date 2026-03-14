@@ -8,7 +8,6 @@
 SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
     : QWidget(parent), button(new QToolButton(this)), popup(new SettingsPopupWidget(nullptr))
 {
-
     button->setIcon(QPixmap("theme:icons/cogwheel"));
     button->setCheckable(true);
     button->setFixedSize(32, 32);
@@ -34,6 +33,21 @@ void SettingsButtonWidget::removeSettingsWidget(QWidget *toRemove) const
 void SettingsButtonWidget::setButtonIcon(QPixmap iconMap)
 {
     button->setIcon(iconMap);
+}
+
+void SettingsButtonWidget::setButtonText(const QString &buttonText)
+{
+    // 🔓 unlock size constraints
+    button->setMinimumSize(QSize(0, 0));
+    button->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
+
+    button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    button->setText(buttonText);
+
+    button->setFixedHeight(32);
+    button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
+    button->setMinimumWidth(button->sizeHint().width());
 }
 
 void SettingsButtonWidget::togglePopup()

@@ -22,6 +22,7 @@ DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatistics
 {
     controls = new QWidget(this);
     controlLayout = new QHBoxLayout(controls);
+    controlLayout->setContentsMargins(11, 0, 11, 0);
 
     labelPrefix = new QLabel(this);
     controlLayout->addWidget(labelPrefix);
@@ -65,6 +66,7 @@ DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatistics
     resultTable = new QTableWidget(this);
     resultTable->setColumnCount(3);
     resultTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    resultTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     layout->addWidget(resultTable);
 
     // Connections
@@ -168,9 +170,9 @@ void DrawProbabilityWidget::updateFilterOptions()
     QMap<QString, int> categoryCounts;
     int totalDeckCards = 0;
 
-    const auto nodes = analyzer->getModel()->getDeckList()->getCardNodes();
+    const auto nodes = analyzer->getModel()->getCardNodes();
     for (auto *node : nodes) {
-        CardInfoPtr info = CardDatabaseManager::query()->getCard({node->getName()}).getCardPtr();
+        CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(node->getName());
         if (!info) {
             continue;
         }

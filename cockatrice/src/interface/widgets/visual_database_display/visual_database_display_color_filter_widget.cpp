@@ -31,12 +31,12 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
                 &VisualDatabaseDisplayColorFilterWidget::handleColorToggled);
     }
 
-    toggleButton = new QPushButton(this);
-    toggleButton->setCheckable(true);
-    layout->addWidget(toggleButton);
+    modeComboBox = new QComboBox(this);
+    layout->addWidget(modeComboBox);
 
-    // Connect the button's toggled signal
-    connect(toggleButton, &QPushButton::toggled, this, &VisualDatabaseDisplayColorFilterWidget::updateFilterMode);
+    connect(modeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            &VisualDatabaseDisplayColorFilterWidget::updateFilterMode);
+
     connect(filterModel, &FilterTreeModel::layoutChanged, this,
             [this]() { QTimer::singleShot(100, this, &VisualDatabaseDisplayColorFilterWidget::syncWithFilterModel); });
 
@@ -46,19 +46,22 @@ VisualDatabaseDisplayColorFilterWidget::VisualDatabaseDisplayColorFilterWidget(Q
 
 void VisualDatabaseDisplayColorFilterWidget::retranslateUi()
 {
-    switch (currentMode) {
-        case FilterMode::ExactMatch:
-            toggleButton->setText(tr("Mode: Exact Match"));
-            break;
-        case FilterMode::Includes:
-            toggleButton->setText(tr("Mode: Includes"));
-            break;
-        case FilterMode::IncludeExclude:
-            toggleButton->setText(tr("Mode: Include/Exclude"));
-            break;
+    modeComboBox->blockSignals(true);
+    modeComboBox->clear();
+
+    modeComboBox->addItem(tr("Exact match"), QVariant::fromValue(FilterMode::ExactMatch));
+    modeComboBox->addItem(tr("Includes"), QVariant::fromValue(FilterMode::Includes));
+    modeComboBox->addItem(tr("Include / Exclude"), QVariant::fromValue(FilterMode::IncludeExclude));
+
+    modeComboBox->setToolTip(tr("How selected and unselected colors are combined in the filter"));
+
+    // Restore current mode
+    const int index = modeComboBox->findData(QVariant::fromValue(currentMode));
+    if (index >= 0) {
+        modeComboBox->setCurrentIndex(index);
     }
 
-    toggleButton->setToolTip(tr("Filter mode (AND/OR/NOT conjunctions of filters)"));
+    modeComboBox->blockSignals(false);
 }
 
 void VisualDatabaseDisplayColorFilterWidget::handleColorToggled(QChar color, bool active)
@@ -145,24 +148,19 @@ void VisualDatabaseDisplayColorFilterWidget::removeFilter(QChar color)
 
 void VisualDatabaseDisplayColorFilterWidget::updateFilterMode()
 {
-    switch (currentMode) {
-        case FilterMode::ExactMatch:
-            currentMode = FilterMode::Includes; // Switch to Includes
-            break;
-        case FilterMode::Includes:
-            currentMode = FilterMode::IncludeExclude; // Switch to Include/Exclude
-            break;
-        case FilterMode::IncludeExclude:
-            currentMode = FilterMode::ExactMatch; // Switch to Exact Match
-            break;
+    const QVariant data = modeComboBox->currentData();
+    if (!data.isValid()) {
+        return;
     }
+
+    currentMode = data.value<FilterMode>();
 
     filterModel->blockSignals(true);
     filterModel->filterTree()->blockSignals(true);
 
     filterModel->clearFiltersOfType(CardFilter::Attr::AttrColor);
 
-    QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
+    const QList<ManaSymbolWidget *> manaSymbolWidgets = findChildren<ManaSymbolWidget *>();
 
     for (ManaSymbolWidget *manaSymbolWidget : manaSymbolWidgets) {
         handleColorToggled(manaSymbolWidget->getSymbolChar(), manaSymbolWidget->isColorActive());
@@ -173,9 +171,7 @@ void VisualDatabaseDisplayColorFilterWidget::updateFilterMode()
 
     emit filterModel->filterTree()->changed();
     emit filterModel->layoutChanged();
-
-    retranslateUi();                     // Update button text based on the mode
-    emit filterModeChanged(currentMode); // Signal mode change
+    emit filterModeChanged(currentMode);
 }
 
 void VisualDatabaseDisplayColorFilterWidget::setManaSymbolActive(QChar color, bool active)

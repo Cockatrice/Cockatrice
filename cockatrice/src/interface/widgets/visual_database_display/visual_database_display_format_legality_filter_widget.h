@@ -4,6 +4,7 @@
 #include "../../../filters/filter_tree_model.h"
 #include "../general/layout_containers/flow_widget.h"
 
+#include <QLabel>
 #include <QMap>
 #include <QPushButton>
 #include <QSpinBox>
@@ -23,21 +24,23 @@ public:
 
     void handleFormatToggled(const QString &format, bool active);
     void updateFormatFilter();
-    void updateFilterMode(bool checked);
+    void updateFilterMode();
     void syncWithFilterModel();
 
 private:
     FilterTreeModel *filterModel;
     QMap<QString, int> allFormatsWithCount;
-    QSpinBox *spinBox;
-    QHBoxLayout *layout;
+
+    QVBoxLayout *layout;
     FlowWidget *flowWidget;
+    QLabel *thresholdLabel;
+    QSpinBox *spinBox;
     QPushButton *toggleButton; // Mode switch button
 
     QMap<QString, bool> activeFormats;          // Track active filters
     QMap<QString, QPushButton *> formatButtons; // Store toggle buttons
 
-    bool exactMatchMode = false; // Toggle between "Exact Match" and "Includes"
+    bool exactMatchMode = true; // Toggle between "Exact Match" and "Includes"
 };
 
 #endif // COCKATRICE_VISUAL_DATABASE_DISPLAY_FORMAT_LEGALITY_FILTER_WIDGET_H

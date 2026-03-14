@@ -21,7 +21,7 @@ class DeckPreviewDeckTagsDisplayWidget : public QWidget
     FlowWidget *flowWidget;
 
 public:
-    explicit DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, const QStringList &_tags);
+    explicit DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, const QStringList &_tags = {});
     void setTags(const QStringList &_tags);
     void refreshTags();
 

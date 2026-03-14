@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          submodules: recursive
 
       - name: Install Graphviz
         run: |
@@ -29,7 +31,7 @@ jobs:
           dot -V
 
       - name: Install Doxygen
-        uses: ssciwr/doxygen-install@v1
+        uses: ssciwr/doxygen-install@v2
         with:
           version: "1.14.0"
 

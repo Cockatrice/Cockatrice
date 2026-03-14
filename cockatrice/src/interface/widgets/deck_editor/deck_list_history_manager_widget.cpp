@@ -36,6 +36,7 @@ DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckStateManager *_de
     historyLabel = new QLabel(this);
 
     historyList = new QListWidget(this);
+    historyList->setAlternatingRowColors(true);
 
     historyButton->addSettingsWidget(historyLabel);
     historyButton->addSettingsWidget(historyList);

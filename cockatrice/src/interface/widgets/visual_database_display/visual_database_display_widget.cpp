@@ -74,74 +74,36 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     searchKeySignals.setObjectName("searchKeySignals");
     connect(searchEdit, &SearchLineEdit::textChanged, this, &VisualDatabaseDisplayWidget::updateSearch);
-    connect(&searchKeySignals, &KeySignals::onEnter, deckEditor->databaseDisplayDockWidget,
+
+    DeckEditorDatabaseDisplayWidget *databaseDisplayWidget = deckEditor->cardDatabaseDockWidget->databaseDisplayWidget;
+    connect(&searchKeySignals, &KeySignals::onEnter, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltEqual, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlAltEqual, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltRBracket, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlAltRBracket, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltMinus, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlAltMinus, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actDecrementCardFromMainDeck);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltLBracket, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlAltLBracket, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actDecrementCardFromSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltEnter, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlAltEnter, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlEnter, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlEnter, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlC, deckEditor->databaseDisplayDockWidget,
+    connect(&searchKeySignals, &KeySignals::onCtrlC, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents);
     connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
 
-    databaseView = deckEditor->databaseDisplayDockWidget->getDatabaseView();
+    databaseView = databaseDisplayWidget->getDatabaseView();
     databaseView->setFocusProxy(searchEdit);
     databaseView->setItemDelegate(nullptr);
     databaseView->setVisible(false);
 
     searchEdit->setTreeView(databaseView);
 
-    sortByLabel = new QLabel(this);
-    sortColumnCombo = new QComboBox(this);
-    sortColumnCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
-    sortOrderCombo = new QComboBox(this);
-    sortOrderCombo->setSizeAdjustPolicy(QComboBox::SizeAdjustPolicy::AdjustToContents);
-
-    sortOrderCombo->addItem("Ascending", Qt::AscendingOrder);
-    sortOrderCombo->addItem("Descending", Qt::DescendingOrder);
-    sortOrderCombo->view()->setMinimumWidth(sortOrderCombo->view()->sizeHintForColumn(0));
-    sortOrderCombo->adjustSize();
-
-    // Populate columns dynamically from the model
-    for (int i = 0; i < databaseDisplayModel->columnCount(); ++i) {
-        QString header = databaseDisplayModel->headerData(i, Qt::Horizontal).toString();
-        sortColumnCombo->addItem(header, i);
-    }
-
-    sortColumnCombo->view()->setMinimumWidth(sortColumnCombo->view()->sizeHintForColumn(0));
-    sortColumnCombo->adjustSize();
-
-    connect(sortColumnCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
-        int column = sortColumnCombo->currentData().toInt();
-        Qt::SortOrder order = static_cast<Qt::SortOrder>(sortOrderCombo->currentData().toInt());
-        databaseView->sortByColumn(column, order);
-
-        searchModelChanged();
-    });
-
-    connect(sortOrderCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
-        int column = sortColumnCombo->currentData().toInt();
-        Qt::SortOrder order = static_cast<Qt::SortOrder>(sortOrderCombo->currentData().toInt());
-        databaseView->sortByColumn(column, order);
-
-        searchModelChanged();
-    });
-
     colorFilterWidget = new VisualDatabaseDisplayColorFilterWidget(this, filterModel);
 
-    filterContainer = new QWidget(this);
-    filterContainerLayout = new QHBoxLayout(filterContainer);
-    filterContainer->setLayout(filterContainerLayout);
-
-    filterByLabel = new QLabel(this);
+    filterContainer = new VisualDatabaseDisplayFilterToolbarWidget(this);
 
     clearFilterWidget = new QToolButton();
     clearFilterWidget->setFixedSize(32, 32);
@@ -156,20 +118,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
         emit filterModel->layoutChanged();
     });
 
-    quickFilterSaveLoadWidget = new SettingsButtonWidget(this);
-    quickFilterSaveLoadWidget->setButtonIcon(QPixmap("theme:icons/lock"));
-
-    quickFilterNameWidget = new SettingsButtonWidget(this);
-    quickFilterNameWidget->setButtonIcon(QPixmap("theme:icons/rename"));
-
-    quickFilterSubTypeWidget = new SettingsButtonWidget(this);
-    quickFilterSubTypeWidget->setButtonIcon(QPixmap("theme:icons/player"));
-
-    quickFilterSetWidget = new SettingsButtonWidget(this);
-    quickFilterSetWidget->setButtonIcon(QPixmap("theme:icons/scales"));
-
-    filterContainer->setMaximumHeight(80);
-
     databaseLoadIndicator = new QLabel(this);
     databaseLoadIndicator->setAlignment(Qt::AlignCenter);
 
@@ -178,12 +126,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     if (CardDatabaseManager::getInstance()->getLoadStatus() != LoadStatus::Ok) {
         connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
                 &VisualDatabaseDisplayWidget::initialize);
-        sortByLabel->setVisible(false);
-        filterByLabel->setVisible(false);
-        quickFilterSaveLoadWidget->setVisible(false);
-        quickFilterNameWidget->setVisible(false);
-        quickFilterSubTypeWidget->setVisible(false);
-        quickFilterSetWidget->setVisible(false);
+        filterContainer->setVisible(false);
     } else {
         initialize();
         databaseLoadIndicator->setVisible(false);
@@ -196,35 +139,7 @@ void VisualDatabaseDisplayWidget::initialize()
 {
     databaseLoadIndicator->setVisible(false);
 
-    sortByLabel->setVisible(true);
-    filterByLabel->setVisible(true);
-    quickFilterSaveLoadWidget->setVisible(true);
-    quickFilterNameWidget->setVisible(true);
-    quickFilterSubTypeWidget->setVisible(true);
-    quickFilterSetWidget->setVisible(true);
-
-    saveLoadWidget = new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel);
-    nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, deckEditor, filterModel);
-    mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
-    formatLegalityWidget = new VisualDatabaseDisplayFormatLegalityFilterWidget(this, filterModel);
-    subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
-    setFilterWidget = new VisualDatabaseDisplaySetFilterWidget(this, filterModel);
-
-    quickFilterSaveLoadWidget->addSettingsWidget(saveLoadWidget);
-    quickFilterNameWidget->addSettingsWidget(nameFilterWidget);
-    quickFilterSubTypeWidget->addSettingsWidget(subTypeFilterWidget);
-    quickFilterSetWidget->addSettingsWidget(setFilterWidget);
-
-    filterContainerLayout->addWidget(sortByLabel);
-    filterContainerLayout->addWidget(sortColumnCombo);
-    filterContainerLayout->addWidget(sortOrderCombo);
-    filterContainerLayout->addWidget(filterByLabel);
-    filterContainerLayout->addWidget(quickFilterSaveLoadWidget);
-    filterContainerLayout->addWidget(quickFilterNameWidget);
-    filterContainerLayout->addWidget(quickFilterSubTypeWidget);
-    filterContainerLayout->addWidget(quickFilterSetWidget);
-    filterContainerLayout->addWidget(mainTypeFilterWidget);
-    filterContainerLayout->addWidget(formatLegalityWidget);
+    filterContainer->initialize();
 
     searchLayout->addWidget(colorFilterWidget);
     searchLayout->addWidget(clearFilterWidget);
@@ -244,11 +159,11 @@ void VisualDatabaseDisplayWidget::initialize()
     debounceTimer = new QTimer(this);
     debounceTimer->setSingleShot(true); // Ensure it only fires once after the timeout
 
-    connect(debounceTimer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::searchModelChanged);
+    connect(debounceTimer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::onSearchModelChanged);
 
     databaseDisplayModel->setFilterTree(filterModel->filterTree());
 
-    connect(filterModel, &FilterTreeModel::layoutChanged, this, &VisualDatabaseDisplayWidget::searchModelChanged);
+    connect(filterModel, &FilterTreeModel::layoutChanged, this, &VisualDatabaseDisplayWidget::onSearchModelChanged);
 
     loadCardsTimer = new QTimer(this);
     loadCardsTimer->setSingleShot(true); // Ensure it only fires once after the timeout
@@ -262,16 +177,7 @@ void VisualDatabaseDisplayWidget::initialize()
 void VisualDatabaseDisplayWidget::retranslateUi()
 {
     databaseLoadIndicator->setText(tr("Loading database ..."));
-
     clearFilterWidget->setToolTip(tr("Clear all filters"));
-
-    sortByLabel->setText(tr("Sort by:"));
-    filterByLabel->setText(tr("Filter by:"));
-
-    quickFilterSaveLoadWidget->setToolTip(tr("Save and load filters"));
-    quickFilterNameWidget->setToolTip(tr("Filter by exact card name"));
-    quickFilterSubTypeWidget->setToolTip(tr("Filter by card sub-type"));
-    quickFilterSetWidget->setToolTip(tr("Filter by set"));
 }
 
 void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
@@ -330,7 +236,7 @@ void VisualDatabaseDisplayWidget::updateSearch(const QString &search) const
                                                         QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
 }
 
-void VisualDatabaseDisplayWidget::searchModelChanged()
+void VisualDatabaseDisplayWidget::onSearchModelChanged()
 {
     if (flowWidget->isVisible()) {
         // Clear the current page and prepare for new data

@@ -100,7 +100,7 @@ private slots:
     void writeComments();
     void writeBannerCard(int);
     void applyActiveGroupCriteria();
-    void setSelectedIndex(const QModelIndex &newCardIndex);
+    void setSelectedIndex(const QModelIndex &newCardIndex, bool preserveWidgetFocus);
     void updateHash();
     void refreshShortcuts();
     void updateShowBannerCardComboBox(bool visible);

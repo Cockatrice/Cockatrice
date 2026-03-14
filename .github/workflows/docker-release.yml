@@ -41,10 +41,10 @@ jobs:
             org.opencontainers.image.description=Server for Cockatrice, a cross-platform virtual tabletop for multiplayer card games  
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to GitHub Container Registry
         if: github.ref_type == 'tag'
@@ -62,5 +62,6 @@ jobs:
           push: ${{ github.ref_type == 'tag' }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          annotations: ${{ steps.metadata.outputs.annotations }}
+          cache-from: type=gha,scope=servatrice
+          cache-to: type=gha,mode=max,scope=servatrice

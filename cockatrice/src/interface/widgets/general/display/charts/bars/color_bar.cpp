@@ -1,18 +1,21 @@
 #include "color_bar.h"
 
+#include "libcockatrice/utility/color.h"
+
 #include <QLinearGradient>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QToolTip>
 
-ColorBar::ColorBar(const QMap<QString, int> &_colors, QWidget *parent) : QWidget(parent), colors(_colors)
+ColorBar::ColorBar(const QMap<QString, int> &_colors, QWidget *parent)
+    : QWidget(parent), colors(GameSpecificColors::MTG::sortManaMapWUBRGCFirst(_colors))
 {
     setMouseTracking(true);
 }
 
 void ColorBar::setColors(const QMap<QString, int> &_colors)
 {
-    colors = _colors;
+    colors = GameSpecificColors::MTG::sortManaMapWUBRGCFirst(_colors);
     update();
 }
 
@@ -27,8 +30,8 @@ void ColorBar::paintEvent(QPaintEvent *)
         return;
 
     int total = 0;
-    for (int v : colors.values())
-        total += v;
+    for (const auto &pair : colors)
+        total += pair.second;
 
     // Prevent divide-by-zero
     if (total == 0)
@@ -50,15 +53,9 @@ void ColorBar::paintEvent(QPaintEvent *)
     // Clip to inside the border
     p.setClipRect(bounds.adjusted(2, 2, -2, -2));
 
-    // Ensure predictable order
-    QList<QString> sortedKeys = colors.keys();
-    std::sort(sortedKeys.begin(), sortedKeys.end()); // Sort alphabetically
-
-    // Draw each color segment in the sorted order
-    for (const QString &key : sortedKeys) {
-        int value = colors[key];
-        double ratio = double(value) / total;
-
+    // Draw segments IN ORDER
+    for (const auto &[key, value] : colors) {
+        const double ratio = double(value) / total;
         if (ratio <= minRatioThreshold) {
             continue;
         }
@@ -122,20 +119,21 @@ void ColorBar::mouseMoveEvent(QMouseEvent *event)
 QString ColorBar::tooltipForPosition(int x) const
 {
     int total = 0;
-    for (int v : colors.values())
-        total += v;
+    for (const auto &pair : colors)
+        total += pair.second;
 
     if (total == 0)
         return {};
 
     int pos = 0;
-    for (auto it = colors.cbegin(); it != colors.cend(); ++it) {
-        const double ratio = double(it.value()) / total;
+
+    for (const auto &[key, value] : colors) {
+        const double ratio = double(value) / total;
         const int segmentWidth = int(ratio * width());
 
         if (x >= pos && x < pos + segmentWidth) {
-            const double percent = (100.0 * it.value()) / total;
-            return QString("%1: %2 cards (%3%)").arg(it.key()).arg(it.value()).arg(QString::number(percent, 'f', 1));
+            const double percent = (100.0 * value) / total;
+            return QString("%1: %2 cards (%3%)").arg(key).arg(value).arg(QString::number(percent, 'f', 1));
         }
 
         pos += segmentWidth;

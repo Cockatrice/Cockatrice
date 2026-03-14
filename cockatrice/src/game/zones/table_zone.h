@@ -41,12 +41,12 @@ private:
     /*
     Minimum width of the table zone including margins.
     */
-    static const int MIN_WIDTH = MARGIN_LEFT + (5 * CARD_WIDTH) + MARGIN_RIGHT;
+    static const int MIN_WIDTH = MARGIN_LEFT + (5 * CardDimensions::WIDTH) + MARGIN_RIGHT;
 
     /*
     Offset sizes when cards are stacked on each other in the grid
     */
-    static const int STACKED_CARD_OFFSET_X = CARD_WIDTH / 3;
+    static const int STACKED_CARD_OFFSET_X = CardDimensions::WIDTH / 3;
     static const int STACKED_CARD_OFFSET_Y = PADDING_Y / 3;
 
     /*

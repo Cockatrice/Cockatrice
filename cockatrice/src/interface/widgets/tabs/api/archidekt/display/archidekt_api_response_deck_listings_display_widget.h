@@ -69,6 +69,7 @@ public:
     explicit ArchidektApiResponseDeckListingsDisplayWidget(QWidget *parent,
                                                            ArchidektDeckListingApiResponse response,
                                                            CardSizeWidget *cardSizeSlider);
+    void append(const ArchidektDeckListingApiResponse &data);
 
     /**
      * @brief Ensures FlowWidget layout properly recomputes on resize.

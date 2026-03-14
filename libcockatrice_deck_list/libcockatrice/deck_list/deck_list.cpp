@@ -182,7 +182,7 @@ bool DeckList::loadFromFile_Native(QIODevice *device)
     return loadFromXml(&xml);
 }
 
-bool DeckList::saveToFile_Native(QIODevice *device)
+bool DeckList::saveToFile_Native(QIODevice *device) const
 {
     QXmlStreamWriter xml(device);
     xml.setAutoFormatting(true);
@@ -199,9 +199,12 @@ bool DeckList::saveToFile_Native(QIODevice *device)
  *
  * @param in The text to load
  * @param preserveMetadata If true, don't clear the existing metadata
+ * @param cardNameNormalizer Function that takes the parsed card name string in the text and
  * @return False if the input was empty, true otherwise.
  */
-bool DeckList::loadFromStream_Plain(QTextStream &in, bool preserveMetadata)
+bool DeckList::loadFromStream_Plain(QTextStream &in,
+                                    bool preserveMetadata,
+                                    const std::function<QString(const QString &)> &cardNameNormalizer)
 {
     const QRegularExpression reCardLine(R"(^\s*[\w\[\(\{].*$)", QRegularExpression::UseUnicodePropertiesOption);
     const QRegularExpression reEmpty("^\\s*$");
@@ -213,22 +216,10 @@ bool DeckList::loadFromStream_Plain(QTextStream &in, bool preserveMetadata)
 
     // Regex for advanced card parsing
     const QRegularExpression reMultiplier(R"(^[xX\(\[]*(\d+)[xX\*\)\]]* ?(.+))");
-    const QRegularExpression reSplitCard(R"( ?\/\/ ?)");
-    const QRegularExpression reBrace(R"( ?[\[\{][^\]\}]*[\]\}] ?)"); // not nested
-    const QRegularExpression reRoundBrace(R"(^\([^\)]*\) ?)");       // () are only matched at start of string
-    const QRegularExpression reDigitBrace(R"( ?\(\d*\) ?)");         // () are matched if containing digits
-    const QRegularExpression reBraceDigit(
-        R"( ?\([\dA-Z]+\) *\d+$)"); // () are matched if containing setcode then a number
-    const QRegularExpression reDoubleFacedMarker(R"( ?\(Transform\) ?)");
 
     // Regex for extracting set code and collector number with attached symbols
     const QRegularExpression reHyphenFormat(R"(\((\w{3,})\)\s+(\w{3,})-(\d+[^\w\s]*))");
     const QRegularExpression reRegularFormat(R"(\((\w{3,})\)\s+(\d+[^\w\s]*))");
-
-    const QHash<QRegularExpression, QString> differences{{QRegularExpression("’"), QString("'")},
-                                                         {QRegularExpression("Æ"), QString("Ae")},
-                                                         {QRegularExpression("æ"), QString("ae")},
-                                                         {QRegularExpression(" ?[|/]+ ?"), QString(" // ")}};
 
     cleanList(preserveMetadata);
 
@@ -355,26 +346,8 @@ bool DeckList::loadFromStream_Plain(QTextStream &in, bool preserveMetadata)
             cardName = match.captured(2);
         }
 
-        // Handle advanced card types
-        if (cardName.contains(reSplitCard)) {
-            cardName = cardName.split(reSplitCard).join(" // ");
-        }
-
-        if (cardName.contains(reDoubleFacedMarker)) {
-            QStringList faces = cardName.split(reDoubleFacedMarker);
-            cardName = faces.first().trimmed();
-        }
-
-        // Remove unnecessary characters
-        cardName.remove(reBrace);
-        cardName.remove(reRoundBrace); // I'll be entirely honest here, these are split to accommodate just three cards
-        cardName.remove(reDigitBrace); // from un-sets that have a word in between round braces at the end
-        cardName.remove(reBraceDigit); // very specific format with the set code in () and collectors number after
-
-        // Normalize names
-        for (auto diff = differences.constBegin(); diff != differences.constEnd(); ++diff) {
-            cardName.replace(diff.key(), diff.value());
-        }
+        // Normalize the card name
+        cardName = cardNameNormalizer(cardName);
 
         // Determine the zone (mainboard/sideboard)
         QString zoneName = sideboard ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
@@ -387,13 +360,13 @@ bool DeckList::loadFromStream_Plain(QTextStream &in, bool preserveMetadata)
     return true;
 }
 
-bool DeckList::loadFromFile_Plain(QIODevice *device)
+bool DeckList::loadFromFile_Plain(QIODevice *device, const std::function<QString(const QString &)> &cardNameNormalizer)
 {
     QTextStream in(device);
-    return loadFromStream_Plain(in, false);
+    return loadFromStream_Plain(in, false, cardNameNormalizer);
 }
 
-bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards)
+bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards) const
 {
     auto writeToStream = [&stream, prefixSideboardCards, slashTappedOutSplitCards](const auto node, const auto card) {
         if (prefixSideboardCards && node->getName() == DECK_ZONE_SIDE) {
@@ -410,13 +383,13 @@ bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards
     return true;
 }
 
-bool DeckList::saveToFile_Plain(QIODevice *device, bool prefixSideboardCards, bool slashTappedOutSplitCards)
+bool DeckList::saveToFile_Plain(QIODevice *device, bool prefixSideboardCards, bool slashTappedOutSplitCards) const
 {
     QTextStream out(device);
     return saveToStream_Plain(out, prefixSideboardCards, slashTappedOutSplitCards);
 }
 
-QString DeckList::writeToString_Plain(bool prefixSideboardCards, bool slashTappedOutSplitCards)
+QString DeckList::writeToString_Plain(bool prefixSideboardCards, bool slashTappedOutSplitCards) const
 {
     QString result;
     QTextStream out(&result);
@@ -438,9 +411,9 @@ void DeckList::cleanList(bool preserveMetadata)
     refreshDeckHash();
 }
 
-QStringList DeckList::getCardList() const
+QStringList DeckList::getCardList(const QSet<QString> &restrictToZones) const
 {
-    auto nodes = tree.getCardNodes();
+    auto nodes = tree.getCardNodes(restrictToZones);
 
     QStringList result;
     std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(result), [](auto node) { return node->getName(); });
@@ -448,9 +421,9 @@ QStringList DeckList::getCardList() const
     return result;
 }
 
-QList<CardRef> DeckList::getCardRefList() const
+QList<CardRef> DeckList::getCardRefList(const QSet<QString> &restrictToZones) const
 {
-    auto nodes = tree.getCardNodes();
+    auto nodes = tree.getCardNodes(restrictToZones);
 
     QList<CardRef> result;
     std::transform(nodes.cbegin(), nodes.cend(), std::back_inserter(result),
@@ -464,9 +437,9 @@ QList<const DecklistCardNode *> DeckList::getCardNodes(const QSet<QString> &rest
     return tree.getCardNodes(restrictToZones);
 }
 
-QList<const InnerDecklistNode *> DeckList::getZoneNodes() const
+QList<const InnerDecklistNode *> DeckList::getZoneNodes(const QSet<QString> &restrictToZones) const
 {
-    return tree.getZoneNodes();
+    return tree.getZoneNodes(restrictToZones);
 }
 
 int DeckList::getSideboardSize() const

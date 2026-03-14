@@ -213,7 +213,7 @@ void ArchidektApiResponseDeckEntryDisplayWidget::updateScaledPreview()
     int textMaxWidth = int(newWidth * 0.7); // allow 70% of width for text
     QFontMetrics fm(previewWidget->topLeftLabel->font());
     QString elided = fm.elidedText(response.getName(), Qt::ElideRight, textMaxWidth);
-    previewWidget->topLeftLabel->setText(elided);
+    previewWidget->topLeftLabel->setLabelText(elided);
     previewWidget->topLeftLabel->setToolTip(response.getName());
 
     setFixedWidth(newWidth);

@@ -52,7 +52,7 @@ Latest <kbd>beta</kbd> version:
 
 # Community Resources [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
 
-Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other projet contributors (`#dev` channel) or fellow users of the app. Come here to talk about the application, features, or just to hang out.
+Join our [Discord community](https://discord.gg/3Z9yzmA) to connect with other project contributors (`#dev` channel) or fellow users of the app. Come here to talk about the application, features, or just to hang out.
 - [Official Website](https://cockatrice.github.io)
 - [Official Wiki](https://github.com/Cockatrice/Cockatrice/wiki)
 - [Official Discord](https://discord.gg/3Z9yzmA)
@@ -109,7 +109,7 @@ Cockatrice tries to use the [Google Developer Documentation Style Guide](https:/
 
 Cockatrice uses Transifex to manage translations. You can help us bring <kbd>Cockatrice</kbd>, <kbd>Oracle</kbd> and <kbd>Webatrice</kbd> to your language and just adjust single wordings right from within your browser by visiting our [Transifex project page](https://explore.transifex.com/cockatrice/cockatrice/).<br>
 
-Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about getting invovled, and join a group of hundreds of others!<br>
+Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about getting involved, and join a group of hundreds of others!<br>
 
 
 # Build [![CI Desktop](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml?query=branch%3Amaster+event%3Apush) [![CI Docker](https://github.com/Cockatrice/Cockatrice/actions/workflows/docker-release.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/docker-release.yml?query=branch%3Amaster+event%3Apush) [![CI Web](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml?query=branch%3Amaster+event%3Apush)

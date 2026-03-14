@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QNetworkReply>
+#include <libcockatrice/card/import/card_name_normalizer.h>
 #include <version_string.h>
 
 DlgLoadDeckFromWebsite::DlgLoadDeckFromWebsite(QWidget *parent) : QDialog(parent)
@@ -99,7 +100,7 @@ void DlgLoadDeckFromWebsite::accept()
             // Parse the plain text deck here
             DeckList deckList;
             QTextStream stream(&deckText);
-            deckList.loadFromStream_Plain(stream, false);
+            deckList.loadFromStream_Plain(stream, false, CardNameNormalizer());
             deckList.forEachCard(CardNodeFunction::ResolveProviderId());
             deck = deckList;
 

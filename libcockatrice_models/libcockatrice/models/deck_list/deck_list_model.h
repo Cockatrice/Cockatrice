@@ -197,6 +197,12 @@ public:
  * InnerDecklistNode containers and supports grouping, sorting, adding/removing
  * cards, and printing decklists.
  *
+ * Outside code should refrain from modifying the model with methods inherited from QAbstractItemModel, such as with
+ * `setData` or `removeRow`.
+ * Instead, use the custom methods on this class to modify the model, such as `addCard`, `offsetCountAtIndex`, or
+ * `removeCardAtIndex`.
+ * This ensures the custom signals for this class are correctly emitted.
+ *
  * Signals:
  * - deckHashChanged(): emitted when the deck contents change in a way that
  *   affects its hash.
@@ -232,11 +238,38 @@ signals:
     void deckHashChanged();
 
     /**
+     * @brief Emitted whenever the cards in the deck changes. This includes when the deck is replaced.
+     */
+    void cardsChanged();
+
+    /**
      * @brief Emitted whenever a card is added to the deck, regardless of whether it's an entirely new card or an
      * existing card that got incremented.
      * @param index The index of the card that got added.
      */
     void cardAddedAt(const QModelIndex &index);
+
+    /**
+     * @brief Emitted whenever a card is removed from the deck, regardless of whether a card node was removed or an
+     * existing card got decremented.
+     */
+    void cardRemoved();
+
+    /**
+     * @brief Emitted whenever a card node is added or removed. This includes when the deck is replaced.
+     */
+    void cardNodesChanged();
+
+    /**
+     * @brief Emitted whenever a new card node is added.
+     * @param index The index of the card node that got added.
+     */
+    void cardNodeAddedAt(const QModelIndex &index);
+
+    /**
+     * @brief Emitted whenever a card node is removed.
+     */
+    void cardNodeRemoved();
 
     /**
      * @brief Emitted whenever the deck in the model has been replaced with a new one
@@ -312,6 +345,13 @@ public:
     bool offsetCountAtIndex(const QModelIndex &idx, int offset);
 
     /**
+     * @brief Removes the card node at the index
+     * @param idx The index of a card node. No-ops if the index is invalid or not a card node.
+     * @return Whether the node was removed.
+     */
+    bool removeCardAtIndex(const QModelIndex &idx);
+
+    /**
      * @brief Removes all cards and resets the model.
      */
     void cleanList();
@@ -330,14 +370,10 @@ public:
     void forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func);
 
     /**
-     * @brief Creates a list consisting of the entries of the model mapped into ExactCards (with each entry looked up
-     * in the card database).
-     * If a card node has number > 1, it will be added that many times to the list.
-     * If an entry's card is not found in the card database, that entry will be left out of the list.
-     * @return An ordered list of ExactCards
+     * @brief Gets a list of all card nodes in the deck.
      */
-    [[nodiscard]] QList<ExactCard> getCards() const;
-    [[nodiscard]] QList<ExactCard> getCardsForZone(const QString &zoneName) const;
+    [[nodiscard]] QList<const DecklistCardNode *> getCardNodes() const;
+    [[nodiscard]] QList<const DecklistCardNode *> getCardNodesForZone(const QString &zoneName) const;
 
     /**
      * @brief Gets a deduplicated list of all card names that appear in the model

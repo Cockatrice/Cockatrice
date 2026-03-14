@@ -6,6 +6,7 @@
 #include "../deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.h"
 #include "../deck_analytics/deck_list_statistics_analyzer.h"
 
+#include <QSplitter>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <random>
 
@@ -15,10 +16,16 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     : QWidget(parent), deckListModel(_deckListModel), statsAnalyzer(_statsAnalyzer)
 {
     layout = new QVBoxLayout(this);
+    layout->setSpacing(0);
     setLayout(layout);
+
+    auto upperLayout = new QVBoxLayout();
+    upperLayout->setContentsMargins(0, 0, 0, 0);
+    upperLayout->setSpacing(0);
 
     resetAndHandSizeContainerWidget = new QWidget(this);
     resetAndHandSizeLayout = new QHBoxLayout(resetAndHandSizeContainerWidget);
+    resetAndHandSizeLayout->setContentsMargins(11, 0, 11, 0);
     resetAndHandSizeContainerWidget->setLayout(resetAndHandSizeLayout);
 
     resetButton = new QPushButton(this);
@@ -34,23 +41,27 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
             &VisualDeckEditorSampleHandWidget::updateDisplay);
     resetAndHandSizeLayout->addWidget(handSizeSpinBox);
 
-    layout->addWidget(resetAndHandSizeContainerWidget);
+    upperLayout->addWidget(resetAndHandSizeContainerWidget);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
-    layout->addWidget(flowWidget);
-
-    drawProbabilityWidget = new DrawProbabilityWidget(this, statsAnalyzer);
-    layout->addWidget(drawProbabilityWidget);
+    upperLayout->addWidget(flowWidget);
 
     cardSizeWidget = new CardSizeWidget(this, flowWidget);
-    layout->addWidget(cardSizeWidget);
+    upperLayout->addWidget(cardSizeWidget);
 
-    for (const ExactCard &card : getRandomCards(handSizeSpinBox->value())) {
-        auto displayWidget = new CardInfoPictureWidget(this);
-        displayWidget->setCard(card);
-        displayWidget->setScaleFactor(cardSizeWidget->getSlider()->value());
-        flowWidget->addWidget(displayWidget);
-    }
+    auto upperLayoutWidget = new QWidget(this);
+    upperLayoutWidget->setLayout(upperLayout);
+
+    drawProbabilityWidget = new DrawProbabilityWidget(this, statsAnalyzer);
+
+    auto *splitter = new QSplitter(this);
+    splitter->setObjectName("splitter");
+    splitter->setOrientation(Qt::Vertical);
+
+    splitter->addWidget(upperLayoutWidget);
+    splitter->addWidget(drawProbabilityWidget);
+
+    layout->addWidget(splitter);
 
     retranslateUi();
 }
@@ -81,13 +92,30 @@ void VisualDeckEditorSampleHandWidget::updateDisplay()
     }
 }
 
+static QList<ExactCard> cardNodesToExactCards(QList<const DecklistCardNode *> nodes)
+{
+    QList<ExactCard> cards;
+    for (auto node : nodes) {
+        ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
+        if (card) {
+            for (int k = 0; k < node->getNumber(); ++k) {
+                cards.append(card);
+            }
+        } else {
+            qDebug() << "Card not found in database!";
+        }
+    }
+
+    return cards;
+}
+
 QList<ExactCard> VisualDeckEditorSampleHandWidget::getRandomCards(int amountToGet)
 {
     QList<ExactCard> randomCards;
     if (!deckListModel)
         return randomCards;
 
-    QList<ExactCard> mainDeckCards = deckListModel->getCardsForZone(DECK_ZONE_MAIN);
+    QList<ExactCard> mainDeckCards = cardNodesToExactCards(deckListModel->getCardNodesForZone(DECK_ZONE_MAIN));
 
     if (mainDeckCards.isEmpty())
         return randomCards;

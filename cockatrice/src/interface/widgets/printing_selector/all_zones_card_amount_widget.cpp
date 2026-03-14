@@ -72,6 +72,12 @@ void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
     repaint();
 }
 
+void AllZonesCardAmountWidget::setAmounts(int mainboardAmount, int sideboardAmount)
+{
+    buttonBoxMainboard->setAmount(mainboardAmount);
+    buttonBoxSideboard->setAmount(sideboardAmount);
+}
+
 /**
  * @brief Gets the card count in the mainboard zone.
  *
@@ -79,7 +85,7 @@ void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
  */
 int AllZonesCardAmountWidget::getMainboardAmount()
 {
-    return buttonBoxMainboard->countCardsInZone(DECK_ZONE_MAIN);
+    return buttonBoxMainboard->getAmount();
 }
 
 /**
@@ -89,7 +95,15 @@ int AllZonesCardAmountWidget::getMainboardAmount()
  */
 int AllZonesCardAmountWidget::getSideboardAmount()
 {
-    return buttonBoxSideboard->countCardsInZone(DECK_ZONE_SIDE);
+    return buttonBoxSideboard->getAmount();
+}
+
+/**
+ * @brief Checks if the amount is at least one in either the mainboard or sideboard.
+ */
+bool AllZonesCardAmountWidget::isNonZero()
+{
+    return getMainboardAmount() > 0 || getSideboardAmount() > 0;
 }
 
 /**

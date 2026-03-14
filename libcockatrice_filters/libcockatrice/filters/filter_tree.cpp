@@ -275,7 +275,7 @@ bool FilterItem::acceptCmc(const CardInfoPtr info) const
 
 bool FilterItem::acceptFormat(const CardInfoPtr info) const
 {
-    return info->getProperty(QString("format-%1").arg(term.toLower())) == "legal";
+    return info->getLegalityProp(term.toLower()) == "legal";
 }
 
 bool FilterItem::acceptLoyalty(const CardInfoPtr info) const

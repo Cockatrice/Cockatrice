@@ -13,7 +13,7 @@ QueryPartList <- ComplexQueryPart ( ws ("AND" ws)? ComplexQueryPart)* ws*
 ComplexQueryPart <- SomewhatComplexQueryPart ws "OR" ws ComplexQueryPart / SomewhatComplexQueryPart
 SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 
-QueryPart <- NotQuery / DeckContentQuery / DeckNameQuery / FileNameQuery / PathQuery / FormatQuery / GenericQuery
+QueryPart <- NotQuery / DeckContentQuery / DeckNameQuery / FileNameQuery / PathQuery / FormatQuery / CommentQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
 
@@ -25,12 +25,13 @@ DeckNameQuery <- ([Dd] 'eck')? [Nn] 'ame'? [:] String
 FileNameQuery <- [Ff] ([Nn] / 'ile' ([Nn] 'ame')?) [:] String
 PathQuery <- [Pp] 'ath'? [:] String
 FormatQuery <- [Ff] 'ormat'? [:] String
+CommentQuery <- [Cc] ('omment' 's'?)? [:] String
 
 GenericQuery <- String
 
 NonDoubleQuoteUnlessEscaped <- '\\\"'. / !["].
 NonSingleQuoteUnlessEscaped <- "\\\'". / !['].
-UnescapedStringListPart <- !['":<>=! ].
+UnescapedStringListPart <- !['":<>()=! ].
 SingleApostropheString <- (UnescapedStringListPart+ ws*)* ['] (UnescapedStringListPart+ ws*)*
 
 String <- SingleApostropheString / UnescapedStringListPart+ / ["] <NonDoubleQuoteUnlessEscaped*> ["] / ['] <NonSingleQuoteUnlessEscaped*> [']
@@ -163,6 +164,14 @@ static void setupParserRules()
         return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
             auto gameFormat = deck->deckLoader->getDeck().deckList.getGameFormat();
             return QString::compare(format, gameFormat, Qt::CaseInsensitive) == 0;
+        };
+    };
+
+    search["CommentQuery"] = [](const peg::SemanticValues &sv) -> DeckFilter {
+        auto value = std::any_cast<QString>(sv[0]);
+        return [=](const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &) {
+            auto comments = deck->deckLoader->getDeck().deckList.getComments();
+            return comments.contains(value, Qt::CaseInsensitive);
         };
     };
 

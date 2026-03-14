@@ -45,9 +45,6 @@ private:
     QHBoxLayout *filterBox;
     int sortIndex;
     Qt::SortOrder sortOrder;
-    void closeEvent(QCloseEvent *ev) override;
-    void saveHeaderState();
-    void rebuildMainLayout(int actionToTake);
     bool setOrderIsSorted;
     bool includeRebalancedCards;
     enum
@@ -55,6 +52,11 @@ private:
         NO_SETS_SELECTED,
         SOME_SETS_SELECTED
     };
+
+    void closeEvent(QCloseEvent *ev) override;
+    void saveHeaderState();
+    void rebuildMainLayout(int actionToTake);
+    void resetSort();
 
 public:
     explicit WndSets(QWidget *parent = nullptr);

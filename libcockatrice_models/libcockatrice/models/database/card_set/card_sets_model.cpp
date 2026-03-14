@@ -45,7 +45,7 @@ QVariant SetsModel::data(const QModelIndex &index, int role) const
 
     switch (index.column()) {
         case SortKeyCol:
-            return QString("%1").arg(set->getSortKey(), 8, 10, QChar('0'));
+            return QString("%1").arg(index.row(), 8, 10, QChar('0'));
         case IsKnownCol:
             return set->getIsKnown();
         case SetTypeCol:

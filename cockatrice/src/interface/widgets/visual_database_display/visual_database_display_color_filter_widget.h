@@ -9,8 +9,8 @@
 
 #include "../../../filters/filter_tree_model.h"
 
+#include <QComboBox>
 #include <QHBoxLayout>
-#include <QPushButton>
 #include <QWidget>
 
 class VisualDatabaseDisplayColorFilterCircleWidget : public QWidget
@@ -39,6 +39,8 @@ enum class FilterMode
     IncludeExclude // Include selected colors (OR) and exclude unselected colors (AND NOT).
 };
 
+Q_DECLARE_METATYPE(FilterMode)
+
 class VisualDatabaseDisplayColorFilterWidget : public QWidget
 {
     Q_OBJECT
@@ -62,7 +64,7 @@ private slots:
 private:
     FilterTreeModel *filterModel;
     QHBoxLayout *layout;
-    QPushButton *toggleButton;
+    QComboBox *modeComboBox;
     FilterMode currentMode = FilterMode::Includes; // Default mode
 };
 

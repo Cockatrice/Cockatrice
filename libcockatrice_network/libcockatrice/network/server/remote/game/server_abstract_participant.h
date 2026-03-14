@@ -89,11 +89,11 @@ public:
     {
         return playerId;
     }
-    bool getSpectator() const
+    bool isSpectator() const
     {
         return spectator;
     }
-    bool getJudge() const
+    bool isJudge() const
     {
         return judge;
     }

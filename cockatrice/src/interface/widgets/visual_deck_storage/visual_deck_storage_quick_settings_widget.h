@@ -22,6 +22,7 @@ class VisualDeckStorageQuickSettingsWidget : public SettingsButtonWidget
     Q_OBJECT
 
     QCheckBox *showFoldersCheckBox;
+    QCheckBox *showColorIdentityCheckBox;
     QCheckBox *drawUnusedColorIdentitiesCheckBox;
     QCheckBox *showBannerCardComboBoxCheckBox;
     QCheckBox *showTagFilterCheckBox;
@@ -49,6 +50,7 @@ public:
 
     [[nodiscard]] bool getShowFolders() const;
     [[nodiscard]] bool getDrawUnusedColorIdentities() const;
+    [[nodiscard]] bool getShowColorIdentity() const;
     [[nodiscard]] bool getShowBannerCardComboBox() const;
     [[nodiscard]] bool getShowTagFilter() const;
     [[nodiscard]] bool getShowTagsOnDeckPreviews() const;
@@ -59,6 +61,7 @@ public:
 signals:
     void showFoldersChanged(bool enabled);
     void drawUnusedColorIdentitiesChanged(bool enabled);
+    void showColorIdentityChanged(bool enabled);
     void showBannerCardComboBoxChanged(bool enabled);
     void showTagFilterChanged(bool enabled);
     void showTagsOnDeckPreviewsChanged(bool enabled);

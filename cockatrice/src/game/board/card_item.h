@@ -21,8 +21,6 @@ class QAction;
 class QColor;
 
 const int MAX_COUNTERS_ON_CARD = 999;
-const float CARD_WIDTH_HALF = CARD_WIDTH / 2;
-const float CARD_HEIGHT_HALF = CARD_HEIGHT / 2;
 const int ROTATION_DEGREES_PER_FRAME = 10;
 
 class CardItem : public AbstractCardItem
@@ -142,7 +140,7 @@ public:
     void processCardInfo(const ServerInfo_Card &_info);
 
     bool animationEvent();
-    CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool faceDown);
+    CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool forceFaceDown);
     void deleteDragItem();
     void drawArrow(const QColor &arrowColor);
     void drawAttachArrow();

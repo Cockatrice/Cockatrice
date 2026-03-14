@@ -31,7 +31,6 @@ void DeckEditorCardInfoDockWidget::createCardInfoDock()
     setWidget(cardInfoDockContents);
 
     installEventFilter(deckEditor);
-    connect(this, &QDockWidget::topLevelChanged, deckEditor, &AbstractTabDeckEditor::dockTopLevelChanged);
 }
 
 void DeckEditorCardInfoDockWidget::updateCard(const ExactCard &_card)

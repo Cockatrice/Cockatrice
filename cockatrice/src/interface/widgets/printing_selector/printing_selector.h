@@ -10,6 +10,7 @@
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "../quick_settings/settings_button_widget.h"
+#include "printing_selector_placeholder_widget.h"
 
 #include <QCheckBox>
 #include <QLabel>
@@ -44,6 +45,7 @@ public slots:
 
 private slots:
     void printingsInDeckChanged();
+    void updateCardAmounts();
 
 signals:
     /**
@@ -55,6 +57,12 @@ signals:
      */
     void nextCardRequested();
 
+    /**
+     * The amounts of the printings in the deck has changed
+     * @param uuidToAmounts Map of uuids to the amounts (maindeck, sideboard) in the deck
+     */
+    void cardAmountsChanged(const QMap<QString, QPair<int, int>> &uuidToAmounts);
+
 private:
     QVBoxLayout *layout;
     SettingsButtonWidget *displayOptionsWidget;
@@ -63,6 +71,7 @@ private:
     QCheckBox *navigationCheckBox;
     PrintingSelectorCardSortingWidget *sortToolBar;
     PrintingSelectorCardSearchWidget *searchBar;
+    PrintingSelectorPlaceholderWidget *placeholderWidget;
     FlowWidget *flowWidget;
     CardSizeWidget *cardSizeWidget;
     PrintingSelectorCardSelectionWidget *cardSelectionBar;

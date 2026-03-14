@@ -70,9 +70,6 @@ protected slots:
 
     /** @brief Handles dock visibility, floating, and top-level changes. */
     bool eventFilter(QObject *o, QEvent *e) override;
-    void dockVisibleTriggered() override;
-    void dockFloatingTriggered() override;
-    void dockTopLevelChanged(bool topLevel) override;
 
 public:
     /**

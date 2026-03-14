@@ -35,6 +35,20 @@ ArchidektApiResponseDeckListingsDisplayWidget::ArchidektApiResponseDeckListingsD
     layout->addWidget(flowWidget);
 }
 
+void ArchidektApiResponseDeckListingsDisplayWidget::append(const ArchidektDeckListingApiResponse &data)
+{
+    for (const auto &deckListing : data.results) {
+        auto cardListDisplayWidget =
+            new ArchidektApiResponseDeckEntryDisplayWidget(this, deckListing, imageNetworkManager);
+        cardListDisplayWidget->setScaleFactor(cardSizeSlider->getSlider()->value());
+        connect(cardListDisplayWidget, &ArchidektApiResponseDeckEntryDisplayWidget::requestNavigation, this,
+                &ArchidektApiResponseDeckListingsDisplayWidget::requestNavigation);
+        connect(cardSizeSlider->getSlider(), &QSlider::valueChanged, cardListDisplayWidget,
+                &ArchidektApiResponseDeckEntryDisplayWidget::setScaleFactor);
+        flowWidget->addWidget(cardListDisplayWidget);
+    }
+}
+
 void ArchidektApiResponseDeckListingsDisplayWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);

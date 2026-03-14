@@ -152,7 +152,7 @@ static bool swapPrinting(DeckListModel *model, const QString &modifiedSet, const
         return false;
     }
     int amount = model->data(idx.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT), Qt::DisplayRole).toInt();
-    model->removeRow(idx.row(), idx.parent());
+    model->removeCardAtIndex(idx);
     CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(cardName);
     PrintingInfo printing = CardDatabaseManager::query()->getSpecificPrinting(cardName, modifiedSet, "");
     for (int i = 0; i < amount; i++) {

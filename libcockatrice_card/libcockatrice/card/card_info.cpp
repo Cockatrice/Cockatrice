@@ -75,13 +75,18 @@ QString CardInfo::getCorrectedName() const
     return result.remove(rmrx).replace(spacerx, space);
 }
 
+QString CardInfo::getLegalityProp(const QString &format) const
+{
+    return getProperty("format-" + format);
+}
+
 bool CardInfo::isLegalInFormat(const QString &format) const
 {
     if (format.isEmpty()) {
         return true;
     }
 
-    QString formatLegality = getProperty("format-" + format);
+    QString formatLegality = getLegalityProp(format);
     return formatLegality == "legal" || formatLegality == "restricted";
 }
 

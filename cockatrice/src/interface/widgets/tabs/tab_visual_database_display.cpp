@@ -6,9 +6,9 @@ TabVisualDatabaseDisplay::TabVisualDatabaseDisplay(TabSupervisor *_tabSupervisor
 {
     deckEditor = new TabDeckEditor(_tabSupervisor);
     deckEditor->setHidden(true);
-    visualDatabaseDisplayWidget =
-        new VisualDatabaseDisplayWidget(this, deckEditor, deckEditor->databaseDisplayDockWidget->databaseModel,
-                                        deckEditor->databaseDisplayDockWidget->databaseDisplayModel);
+    visualDatabaseDisplayWidget = new VisualDatabaseDisplayWidget(
+        this, deckEditor, deckEditor->cardDatabaseDockWidget->databaseDisplayWidget->databaseModel,
+        deckEditor->cardDatabaseDockWidget->databaseDisplayWidget->databaseDisplayModel);
 
     setCentralWidget(visualDatabaseDisplayWidget);
 

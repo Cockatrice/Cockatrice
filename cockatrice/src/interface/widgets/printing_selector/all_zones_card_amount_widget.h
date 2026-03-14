@@ -23,6 +23,8 @@ public:
                                       const ExactCard &rootCard);
     int getMainboardAmount();
     int getSideboardAmount();
+    bool isNonZero();
+
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     void enterEvent(QEnterEvent *event) override;
 #else
@@ -31,6 +33,7 @@ public:
 
 public slots:
     void adjustFontSize(int scalePercentage);
+    void setAmounts(int mainboardAmount, int sideboardAmount);
 
 private:
     QVBoxLayout *layout;

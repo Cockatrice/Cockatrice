@@ -6,6 +6,7 @@
 
 #include <QAction>
 #include <QMenu>
+#include <libcockatrice/utility/zone_names.h>
 
 GraveyardMenu::GraveyardMenu(Player *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
@@ -39,16 +40,16 @@ void GraveyardMenu::createMoveActions()
 
     if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
         aMoveGraveToTopLibrary = new QAction(this);
-        aMoveGraveToTopLibrary->setData(QList<QVariant>() << "deck" << 0);
+        aMoveGraveToTopLibrary->setData(QList<QVariant>() << ZoneNames::DECK << 0);
 
         aMoveGraveToBottomLibrary = new QAction(this);
-        aMoveGraveToBottomLibrary->setData(QList<QVariant>() << "deck" << -1);
+        aMoveGraveToBottomLibrary->setData(QList<QVariant>() << ZoneNames::DECK << -1);
 
         aMoveGraveToHand = new QAction(this);
-        aMoveGraveToHand->setData(QList<QVariant>() << "hand" << 0);
+        aMoveGraveToHand->setData(QList<QVariant>() << ZoneNames::HAND << 0);
 
         aMoveGraveToRfg = new QAction(this);
-        aMoveGraveToRfg->setData(QList<QVariant>() << "rfg" << 0);
+        aMoveGraveToRfg->setData(QList<QVariant>() << ZoneNames::EXILE << 0);
 
         connect(aMoveGraveToTopLibrary, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);
         connect(aMoveGraveToBottomLibrary, &QAction::triggered, grave, &PileZoneLogic::moveAllToZone);

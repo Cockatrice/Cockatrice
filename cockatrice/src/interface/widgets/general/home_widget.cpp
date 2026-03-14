@@ -44,6 +44,10 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
             &HomeWidget::initializeBackgroundFromSource);
     connect(&SettingsCache::instance(), &SettingsCache::homeTabBackgroundShuffleFrequencyChanged, this,
             &HomeWidget::onBackgroundShuffleFrequencyChanged);
+    // Lambda is cleaner to read than overloading this
+    connect(&SettingsCache::instance(), &SettingsCache::homeTabDisplayCardNameChanged, this, [this] { repaint(); });
+    connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
+            &HomeWidget::updateButtonsToBackgroundColor);
 }
 
 void HomeWidget::initializeBackgroundFromSource()
@@ -56,30 +60,47 @@ void HomeWidget::initializeBackgroundFromSource()
 
     auto backgroundSourceType = BackgroundSources::fromId(SettingsCache::instance().getHomeTabBackgroundSource());
 
-    cardChangeTimer->stop();
-
     switch (backgroundSourceType) {
         case BackgroundSources::Theme:
+            cardChangeTimer->stop();
             background = QPixmap("theme:backgrounds/home");
+            backgroundSourceDeck = DeckList();
+            backgroundSourceCard->setCard(ExactCard());
             updateButtonsToBackgroundColor();
             update();
             break;
         case BackgroundSources::RandomCardArt:
-            cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
+            backgroundSourceDeck = DeckList();
+            updateRandomCard();
+            onBackgroundShuffleFrequencyChanged();
             break;
         case BackgroundSources::DeckFileArt:
             loadBackgroundSourceDeck();
-            cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
+            updateRandomCard();
+            onBackgroundShuffleFrequencyChanged();
             break;
     }
 }
 
 void HomeWidget::loadBackgroundSourceDeck()
 {
-    DeckLoader deckLoader = DeckLoader(this);
-    deckLoader.loadFromFile(SettingsCache::instance().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice,
-                            false);
-    backgroundSourceDeck = deckLoader.getDeck().deckList;
+    std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(
+        SettingsCache::instance().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice, false);
+    backgroundSourceDeck = deckOpt.has_value() ? deckOpt.value().deckList : DeckList();
+}
+
+void HomeWidget::setRandomCard(ExactCard &newCard)
+{
+    static constexpr int ATTEMPTS = 10;
+    for (int i = 0; i < ATTEMPTS; ++i) {
+        ExactCard tmpCard = CardDatabaseManager::query()->getRandomCard();
+        if (tmpCard != backgroundSourceCard->getCard() && tmpCard.getCardPtr()->getProperty("layout") == "normal" &&
+            tmpCard.getPrinting().getSet() != nullptr) {
+            newCard = tmpCard;
+            return;
+        }
+    }
+    qWarning() << "failed to set random card image after" << ATTEMPTS << "attempts";
 }
 
 void HomeWidget::updateRandomCard()
@@ -92,10 +113,7 @@ void HomeWidget::updateRandomCard()
         case BackgroundSources::Theme:
             break;
         case BackgroundSources::RandomCardArt:
-            do {
-                newCard = CardDatabaseManager::query()->getRandomCard();
-            } while (newCard == backgroundSourceCard->getCard() &&
-                     newCard.getCardPtr()->getProperty("layout") != "normal");
+            setRandomCard(newCard);
             break;
         case BackgroundSources::DeckFileArt:
             QList<CardRef> cardRefs = backgroundSourceDeck.getCardRefList();
@@ -123,25 +141,20 @@ void HomeWidget::updateRandomCard()
 
     connect(newCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &HomeWidget::updateBackgroundProperties);
     backgroundSourceCard->setCard(newCard);
-    background = backgroundSourceCard->getProcessedBackground(size());
-
-    if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() <= 0) {
-        cardChangeTimer->stop();
-    }
+    background = backgroundSourceCard->getBackground();
 }
 
 void HomeWidget::onBackgroundShuffleFrequencyChanged()
 {
     cardChangeTimer->stop();
-    if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() <= 0) {
-        return;
+    if (SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() > 0) {
+        cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
     }
-    cardChangeTimer->start(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency() * 1000);
 }
 
 void HomeWidget::updateBackgroundProperties()
 {
-    background = backgroundSourceCard->getProcessedBackground(size());
+    background = backgroundSourceCard->getBackground();
     updateButtonsToBackgroundColor();
     update(); // Triggers repaint
 }
@@ -297,24 +310,65 @@ QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)
 void HomeWidget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
 
-    background = background.scaled(size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    if (!background.isNull()) {
+        QSize widgetSize = size() * devicePixelRatio();
+        QPixmap toDraw = background.scaled(widgetSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
 
-    // Draw already-scaled background centered
-    QSize widgetSize = size();
-    QSize bgSize = background.size();
-    QPoint topLeft((widgetSize.width() - bgSize.width()) / 2, (widgetSize.height() - bgSize.height()) / 2);
+        // Draw scaled background centered
+        QSize bgSize = toDraw.size();
+        QPoint topLeft((widgetSize.width() - bgSize.width()) / (devicePixelRatio() * 2), // undo scaling for painter
+                       (widgetSize.height() - bgSize.height()) / (devicePixelRatio() * 2));
 
-    painter.drawPixmap(topLeft, background);
+        painter.drawPixmap(topLeft, toDraw);
+    }
 
     // Draw translucent black overlay with rounded corners
-    QRectF overlayRect(5, 5, width() - 10, height() - 10); // 5px inset
+    QRectF overlayRect(5, 5, width() - 10, height() - 10);
     QPainterPath roundedRectPath;
-    roundedRectPath.addRoundedRect(overlayRect, 20, 20); // 20px corner radius
+    roundedRectPath.addRoundedRect(overlayRect, 20, 20);
 
-    QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33)); // 33% opacity
-    painter.setRenderHint(QPainter::Antialiasing);
+    QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33));
     painter.fillPath(roundedRectPath, semiTransparentBlack);
+
+    // Card name overlay (bottom-right)
+    QString cardName;
+    ExactCard card = backgroundSourceCard->getCard();
+    if (card) {
+        cardName = card.getCardPtr()->getName();
+        if (card.getPrinting().getSet() != nullptr) {
+            cardName += " (" + card.getPrinting().getSet()->getCorrectedShortName() + ") " +
+                        card.getPrinting().getProperty("num");
+        }
+    }
+
+    if (!cardName.isEmpty() && SettingsCache::instance().getHomeTabDisplayCardName()) {
+        QFont font = painter.font();
+        font.setPointSize(14);
+        font.setBold(true);
+        painter.setFont(font);
+
+        QFontMetrics fm(font);
+        constexpr int padding = 10;
+        constexpr int margin = 15;
+
+        QRect textRect = fm.boundingRect(cardName);
+
+        QRect bgRect(width() - textRect.width() - padding * 2 - margin,
+                     height() - textRect.height() - padding * 2 - margin, textRect.width() + padding * 2,
+                     textRect.height() + padding * 2);
+
+        // Background bubble
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QColor(0, 0, 0, 160));
+        painter.drawRoundedRect(bgRect, 8, 8);
+
+        // Text
+        painter.setPen(Qt::white);
+        painter.drawText(bgRect.adjusted(padding, padding, -padding, -padding), Qt::AlignRight | Qt::AlignVCenter,
+                         cardName);
+    }
 
     QWidget::paintEvent(event);
 }

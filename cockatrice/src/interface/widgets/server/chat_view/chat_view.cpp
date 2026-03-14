@@ -28,21 +28,9 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _sho
       userListProxy(_tabSupervisor->getUserListManager()), evenNumber(true), showTimestamps(_showTimestamps),
       hoveredItemType(HoveredNothing)
 {
-    if (palette().windowText().color().lightness() > 200) {
-        document()->setDefaultStyleSheet(R"(
-           a { text-decoration: none; color: rgb(71,158,252); }
-           .blue { color: rgb(71,158,252); }
-        )");
-        serverMessageColor = QColor(0xFF, 0x73, 0x83);
-        otherUserColor = otherUserColor.lighter(150);
-        linkColor = QColor(71, 158, 252);
-    } else {
-        document()->setDefaultStyleSheet(R"(
-            a { text-decoration: none; color: blue; }
-            .blue { color: blue }
-        )");
-        linkColor = palette().link().color();
-    }
+    adjustColorsToPalette();
+
+    connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, &ChatView::adjustColorsToPalette);
 
     userContextMenu = new UserContextMenu(tabSupervisor, this, game);
     connect(userContextMenu, SIGNAL(openMessageDialog(QString, bool)), this, SIGNAL(openMessageDialog(QString, bool)));
@@ -63,6 +51,59 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _sho
     connect(this, &ChatView::anchorClicked, this, &ChatView::openLink);
 }
 
+void ChatView::adjustColorsToPalette()
+{
+    if (palette().windowText().color().lightness() > 200) {
+        document()->setDefaultStyleSheet(R"(
+           a { text-decoration: none; color: rgb(71,158,252); }
+           .blue { color: rgb(71,158,252); }
+        )");
+        serverMessageColor = QColor(0xFF, 0x73, 0x83);
+        otherUserColor = otherUserColor.lighter(150);
+        linkColor = QColor(71, 158, 252);
+    } else {
+        document()->setDefaultStyleSheet(R"(
+            a { text-decoration: none; color: blue; }
+            .blue { color: blue }
+        )");
+        linkColor = palette().link().color();
+    }
+
+    QTimer::singleShot(0, this, &ChatView::refreshBlockColors);
+}
+
+void ChatView::refreshBlockColors()
+{
+    QTextDocument *doc = document();
+
+    // Empty QTextDocuments still have 1 block, so we need handle this edge case
+    if (doc->isEmpty()) {
+        evenNumber = true;
+        return;
+    }
+
+    QTextCursor cursor(doc);
+    bool even = true; // start fresh
+
+    for (QTextBlock block = doc->begin(); block.isValid(); block = block.next()) {
+        QTextBlockFormat fmt = block.blockFormat();
+
+        if (even)
+            fmt.setBackground(palette().base());
+        else
+            fmt.setBackground(palette().window());
+
+        fmt.setForeground(palette().text());
+
+        cursor.setPosition(block.position());
+        cursor.setBlockFormat(fmt);
+
+        even = !even;
+    }
+
+    evenNumber = even; // keep future rows consistent
+}
+
 void ChatView::retranslateUi()
 {
     userContextMenu->retranslateUi();
@@ -72,20 +113,28 @@ QTextCursor ChatView::prepareBlock(bool same)
 {
     lastSender.clear();
 
-    QTextCursor cursor(document());
+    QTextDocument *doc = document();
+    QTextCursor cursor(doc);
+
     cursor.movePosition(QTextCursor::End);
     if (same) {
         cursor.insertHtml("<br>");
     } else {
         QTextBlockFormat blockFormat;
-        if ((evenNumber = !evenNumber))
-            blockFormat.setBackground(palette().window());
-        else
+        if (evenNumber)
             blockFormat.setBackground(palette().base());
+        else
+            blockFormat.setBackground(palette().window());
+
+        evenNumber = !evenNumber;
 
         blockFormat.setForeground(palette().text());
         blockFormat.setBottomMargin(4);
-        cursor.insertBlock(blockFormat);
+
+        // Empty QTextDocuments still have 1 block. Just write to that block instead of inserting a new one
+        if (!doc->isEmpty()) {
+            cursor.insertBlock(blockFormat);
+        }
     }
 
     return cursor;

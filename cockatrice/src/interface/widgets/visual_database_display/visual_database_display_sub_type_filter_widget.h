@@ -10,6 +10,7 @@
 #include "../../../filters/filter_tree_model.h"
 #include "../general/layout_containers/flow_widget.h"
 
+#include <QLabel>
 #include <QMap>
 #include <QPushButton>
 #include <QSpinBox>
@@ -27,22 +28,24 @@ public:
 
     void handleSubTypeToggled(const QString &mainType, bool active);
     void updateSubTypeFilter();
-    void updateFilterMode(bool checked);
+    void updateFilterMode();
     void syncWithFilterModel();
 
 private:
     FilterTreeModel *filterModel;
     QMap<QString, int> allSubCardTypesWithCount;
-    QSpinBox *spinBox;
+
     QVBoxLayout *layout;
     QLineEdit *searchBox;
     FlowWidget *flowWidget;
+    QLabel *thresholdLabel;
+    QSpinBox *spinBox;
     QPushButton *toggleButton; // Mode switch button
 
     QMap<QString, bool> activeSubTypes;       // Track active filters
     QMap<QString, QPushButton *> typeButtons; // Store toggle buttons
 
-    bool exactMatchMode = false; // Toggle between "Exact Match" and "Includes"
+    bool exactMatchMode = true; // Toggle between "Exact Match" and "Includes"
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_SUB_TYPE_FILTER_WIDGET_H

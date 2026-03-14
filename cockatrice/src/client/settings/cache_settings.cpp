@@ -239,6 +239,7 @@ SettingsCache::SettingsCache()
 
     homeTabBackgroundSource = settings->value("home/background", "themed").toString();
     homeTabBackgroundShuffleFrequency = settings->value("home/background/shuffleTimer", 0).toInt();
+    homeTabDisplayCardName = settings->value("home/background/displayCardName", true).toBool();
 
     tabVisualDeckStorageOpen = settings->value("tabs/visualDeckStorage", true).toBool();
     tabServerOpen = settings->value("tabs/server", true).toBool();
@@ -267,9 +268,6 @@ SettingsCache::SettingsCache()
     picDownload = settings->value("personal/picturedownload", true).toBool();
     showStatusBar = settings->value("personal/showStatusBar", false).toBool();
 
-    mainWindowGeometry = settings->value("interface/main_window_geometry").toByteArray();
-    tokenDialogGeometry = settings->value("interface/token_dialog_geometry").toByteArray();
-    setsDialogGeometry = settings->value("interface/sets_dialog_geometry").toByteArray();
     notificationsEnabled = settings->value("interface/notificationsenabled", true).toBool();
     spectatorNotificationsEnabled = settings->value("interface/specnotificationsenabled", false).toBool();
     buddyConnectNotificationsEnabled = settings->value("interface/buddyconnectnotificationsenabled", true).toBool();
@@ -279,7 +277,6 @@ SettingsCache::SettingsCache()
     doNotDeleteArrowsInSubPhases = settings->value("interface/doNotDeleteArrowsInSubPhases", true).toBool();
     startingHandSize = settings->value("interface/startinghandsize", 7).toInt();
     annotateTokens = settings->value("interface/annotatetokens", false).toBool();
-    tabGameSplitterSizes = settings->value("interface/tabgame_splittersizes").toByteArray();
     knownMissingFeatures = settings->value("interface/knownmissingfeatures", "").toString();
     useTearOffMenus = settings->value("interface/usetearoffmenus", true).toBool();
     cardViewInitialRowsMax = settings->value("interface/cardViewInitialRowsMax", 14).toInt();
@@ -309,6 +306,7 @@ SettingsCache::SettingsCache()
     visualDeckStorageDefaultTagsList =
         settings->value("interface/visualdeckstoragedefaulttagslist", defaultTags).toStringList();
     visualDeckStorageSearchFolderNames = settings->value("interface/visualdeckstoragesearchfoldernames", true).toBool();
+    visualDeckStorageShowColorIdentity = settings->value("interface/visualdeckstorageshowcoloridentity", true).toBool();
     visualDeckStorageShowBannerCardComboBox =
         settings->value("interface/visualdeckstorageshowbannercardcombobox", true).toBool();
     visualDeckStorageShowTagsOnDeckPreviews =
@@ -387,6 +385,13 @@ SettingsCache::SettingsCache()
     defaultStartingLifeTotal = settings->value("game/defaultstartinglifetotal", 20).toInt();
     shareDecklistsOnLoad = settings->value("game/sharedecklistsonload", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
+
+    // Local game settings use "localgameoptions/" prefix to keep them separate
+    // from server game settings which use "game/" prefix
+    localGameRememberSettings = settings->value("localgameoptions/remembersettings", false).toBool();
+    localGameMaxPlayers = settings->value("localgameoptions/maxplayers", 1).toInt();
+    localGameStartingLifeTotal = settings->value("localgameoptions/startinglifetotal", 20).toInt();
+
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
 }
@@ -594,6 +599,13 @@ void SettingsCache::setHomeTabBackgroundShuffleFrequency(int _frequency)
     emit homeTabBackgroundShuffleFrequencyChanged();
 }
 
+void SettingsCache::setHomeTabDisplayCardName(QT_STATE_CHANGED_T _displayCardName)
+{
+    homeTabDisplayCardName = static_cast<bool>(_displayCardName);
+    settings->setValue("home/background/displayCardName", homeTabDisplayCardName);
+    emit homeTabDisplayCardNameChanged();
+}
+
 void SettingsCache::setTabVisualDeckStorageOpen(bool value)
 {
     tabVisualDeckStorageOpen = value;
@@ -702,12 +714,6 @@ void SettingsCache::setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens)
 {
     annotateTokens = static_cast<bool>(_annotateTokens);
     settings->setValue("interface/annotatetokens", annotateTokens);
-}
-
-void SettingsCache::setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes)
-{
-    tabGameSplitterSizes = _tabGameSplitterSizes;
-    settings->setValue("interface/tabgame_splittersizes", tabGameSplitterSizes);
 }
 
 void SettingsCache::setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts)
@@ -819,6 +825,13 @@ void SettingsCache::setVisualDeckStorageSearchFolderNames(QT_STATE_CHANGED_T val
 {
     visualDeckStorageSearchFolderNames = value;
     settings->setValue("interface/visualdeckstoragesearchfoldernames", visualDeckStorageSearchFolderNames);
+}
+
+void SettingsCache::setVisualDeckStorageShowColorIdentity(QT_STATE_CHANGED_T value)
+{
+    visualDeckStorageShowColorIdentity = value;
+    settings->setValue("interface/visualdeckstorageshowcoloridentity", visualDeckStorageShowColorIdentity);
+    emit visualDeckStorageShowColorIdentityChanged(visualDeckStorageShowColorIdentity);
 }
 
 void SettingsCache::setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T _showBannerCardComboBox)
@@ -1074,24 +1087,6 @@ void SettingsCache::setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignore
     settings->setValue("chat/ignore_unregistered_messages", ignoreUnregisteredUserMessages);
 }
 
-void SettingsCache::setMainWindowGeometry(const QByteArray &_mainWindowGeometry)
-{
-    mainWindowGeometry = _mainWindowGeometry;
-    settings->setValue("interface/main_window_geometry", mainWindowGeometry);
-}
-
-void SettingsCache::setTokenDialogGeometry(const QByteArray &_tokenDialogGeometry)
-{
-    tokenDialogGeometry = _tokenDialogGeometry;
-    settings->setValue("interface/token_dialog_geometry", tokenDialogGeometry);
-}
-
-void SettingsCache::setSetsDialogGeometry(const QByteArray &_setsDialogGeometry)
-{
-    setsDialogGeometry = _setsDialogGeometry;
-    settings->setValue("interface/sets_dialog_geometry", setsDialogGeometry);
-}
-
 void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
 {
     pixmapCacheSize = _pixmapCacheSize;
@@ -1127,257 +1122,21 @@ void SettingsCache::setClientVersion(const QString &_clientVersion)
 
 QStringList SettingsCache::getCountries() const
 {
-    static QStringList countries = QStringList() << "ad"
-                                                 << "ae"
-                                                 << "af"
-                                                 << "ag"
-                                                 << "ai"
-                                                 << "al"
-                                                 << "am"
-                                                 << "ao"
-                                                 << "aq"
-                                                 << "ar"
-                                                 << "as"
-                                                 << "at"
-                                                 << "au"
-                                                 << "aw"
-                                                 << "ax"
-                                                 << "az"
-                                                 << "ba"
-                                                 << "bb"
-                                                 << "bd"
-                                                 << "be"
-                                                 << "bf"
-                                                 << "bg"
-                                                 << "bh"
-                                                 << "bi"
-                                                 << "bj"
-                                                 << "bl"
-                                                 << "bm"
-                                                 << "bn"
-                                                 << "bo"
-                                                 << "bq"
-                                                 << "br"
-                                                 << "bs"
-                                                 << "bt"
-                                                 << "bv"
-                                                 << "bw"
-                                                 << "by"
-                                                 << "bz"
-                                                 << "ca"
-                                                 << "cc"
-                                                 << "cd"
-                                                 << "cf"
-                                                 << "cg"
-                                                 << "ch"
-                                                 << "ci"
-                                                 << "ck"
-                                                 << "cl"
-                                                 << "cm"
-                                                 << "cn"
-                                                 << "co"
-                                                 << "cr"
-                                                 << "cu"
-                                                 << "cv"
-                                                 << "cw"
-                                                 << "cx"
-                                                 << "cy"
-                                                 << "cz"
-                                                 << "de"
-                                                 << "dj"
-                                                 << "dk"
-                                                 << "dm"
-                                                 << "do"
-                                                 << "dz"
-                                                 << "ec"
-                                                 << "ee"
-                                                 << "eg"
-                                                 << "eh"
-                                                 << "er"
-                                                 << "es"
-                                                 << "et"
-                                                 << "eu"
-                                                 << "fi"
-                                                 << "fj"
-                                                 << "fk"
-                                                 << "fm"
-                                                 << "fo"
-                                                 << "fr"
-                                                 << "ga"
-                                                 << "gb"
-                                                 << "gd"
-                                                 << "ge"
-                                                 << "gf"
-                                                 << "gg"
-                                                 << "gh"
-                                                 << "gi"
-                                                 << "gl"
-                                                 << "gm"
-                                                 << "gn"
-                                                 << "gp"
-                                                 << "gq"
-                                                 << "gr"
-                                                 << "gs"
-                                                 << "gt"
-                                                 << "gu"
-                                                 << "gw"
-                                                 << "gy"
-                                                 << "hk"
-                                                 << "hm"
-                                                 << "hn"
-                                                 << "hr"
-                                                 << "ht"
-                                                 << "hu"
-                                                 << "id"
-                                                 << "ie"
-                                                 << "il"
-                                                 << "im"
-                                                 << "in"
-                                                 << "io"
-                                                 << "iq"
-                                                 << "ir"
-                                                 << "is"
-                                                 << "it"
-                                                 << "je"
-                                                 << "jm"
-                                                 << "jo"
-                                                 << "jp"
-                                                 << "ke"
-                                                 << "kg"
-                                                 << "kh"
-                                                 << "ki"
-                                                 << "km"
-                                                 << "kn"
-                                                 << "kp"
-                                                 << "kr"
-                                                 << "kw"
-                                                 << "ky"
-                                                 << "kz"
-                                                 << "la"
-                                                 << "lb"
-                                                 << "lc"
-                                                 << "li"
-                                                 << "lk"
-                                                 << "lr"
-                                                 << "ls"
-                                                 << "lt"
-                                                 << "lu"
-                                                 << "lv"
-                                                 << "ly"
-                                                 << "ma"
-                                                 << "mc"
-                                                 << "md"
-                                                 << "me"
-                                                 << "mf"
-                                                 << "mg"
-                                                 << "mh"
-                                                 << "mk"
-                                                 << "ml"
-                                                 << "mm"
-                                                 << "mn"
-                                                 << "mo"
-                                                 << "mp"
-                                                 << "mq"
-                                                 << "mr"
-                                                 << "ms"
-                                                 << "mt"
-                                                 << "mu"
-                                                 << "mv"
-                                                 << "mw"
-                                                 << "mx"
-                                                 << "my"
-                                                 << "mz"
-                                                 << "na"
-                                                 << "nc"
-                                                 << "ne"
-                                                 << "nf"
-                                                 << "ng"
-                                                 << "ni"
-                                                 << "nl"
-                                                 << "no"
-                                                 << "np"
-                                                 << "nr"
-                                                 << "nu"
-                                                 << "nz"
-                                                 << "om"
-                                                 << "pa"
-                                                 << "pe"
-                                                 << "pf"
-                                                 << "pg"
-                                                 << "ph"
-                                                 << "pk"
-                                                 << "pl"
-                                                 << "pm"
-                                                 << "pn"
-                                                 << "pr"
-                                                 << "ps"
-                                                 << "pt"
-                                                 << "pw"
-                                                 << "py"
-                                                 << "qa"
-                                                 << "re"
-                                                 << "ro"
-                                                 << "rs"
-                                                 << "ru"
-                                                 << "rw"
-                                                 << "sa"
-                                                 << "sb"
-                                                 << "sc"
-                                                 << "sd"
-                                                 << "se"
-                                                 << "sg"
-                                                 << "sh"
-                                                 << "si"
-                                                 << "sj"
-                                                 << "sk"
-                                                 << "sl"
-                                                 << "sm"
-                                                 << "sn"
-                                                 << "so"
-                                                 << "sr"
-                                                 << "ss"
-                                                 << "st"
-                                                 << "sv"
-                                                 << "sx"
-                                                 << "sy"
-                                                 << "sz"
-                                                 << "tc"
-                                                 << "td"
-                                                 << "tf"
-                                                 << "tg"
-                                                 << "th"
-                                                 << "tj"
-                                                 << "tk"
-                                                 << "tl"
-                                                 << "tm"
-                                                 << "tn"
-                                                 << "to"
-                                                 << "tr"
-                                                 << "tt"
-                                                 << "tv"
-                                                 << "tw"
-                                                 << "tz"
-                                                 << "ua"
-                                                 << "ug"
-                                                 << "um"
-                                                 << "us"
-                                                 << "uy"
-                                                 << "uz"
-                                                 << "va"
-                                                 << "vc"
-                                                 << "ve"
-                                                 << "vg"
-                                                 << "vi"
-                                                 << "vn"
-                                                 << "vu"
-                                                 << "wf"
-                                                 << "ws"
-                                                 << "xk"
-                                                 << "ye"
-                                                 << "yt"
-                                                 << "za"
-                                                 << "zm"
-                                                 << "zw";
+    static const QStringList countries = {
+        "ad", "ae", "af", "ag", "ai", "al", "am", "ao", "aq", "ar", "as", "at", "au", "aw", "ax", "az", "ba", "bb",
+        "bd", "be", "bf", "bg", "bh", "bi", "bj", "bl", "bm", "bn", "bo", "bq", "br", "bs", "bt", "bv", "bw", "by",
+        "bz", "ca", "cc", "cd", "cf", "cg", "ch", "ci", "ck", "cl", "cm", "cn", "co", "cr", "cu", "cv", "cw", "cx",
+        "cy", "cz", "de", "dj", "dk", "dm", "do", "dz", "ec", "ee", "eg", "eh", "er", "es", "et", "eu", "fi", "fj",
+        "fk", "fm", "fo", "fr", "ga", "gb", "gd", "ge", "gf", "gg", "gh", "gi", "gl", "gm", "gn", "gp", "gq", "gr",
+        "gs", "gt", "gu", "gw", "gy", "hk", "hm", "hn", "hr", "ht", "hu", "id", "ie", "il", "im", "in", "io", "iq",
+        "ir", "is", "it", "je", "jm", "jo", "jp", "ke", "kg", "kh", "ki", "km", "kn", "kp", "kr", "kw", "ky", "kz",
+        "la", "lb", "lc", "li", "lk", "lr", "ls", "lt", "lu", "lv", "ly", "ma", "mc", "md", "me", "mf", "mg", "mh",
+        "mk", "ml", "mm", "mn", "mo", "mp", "mq", "mr", "ms", "mt", "mu", "mv", "mw", "mx", "my", "mz", "na", "nc",
+        "ne", "nf", "ng", "ni", "nl", "no", "np", "nr", "nu", "nz", "om", "pa", "pe", "pf", "pg", "ph", "pk", "pl",
+        "pm", "pn", "pr", "ps", "pt", "pw", "py", "qa", "re", "ro", "rs", "ru", "rw", "sa", "sb", "sc", "sd", "se",
+        "sg", "sh", "si", "sj", "sk", "sl", "sm", "sn", "so", "sr", "ss", "st", "sv", "sx", "sy", "sz", "tc", "td",
+        "tf", "tg", "th", "tj", "tk", "tl", "tm", "tn", "to", "tr", "tt", "tv", "tw", "tz", "ua", "ug", "um", "us",
+        "uy", "uz", "va", "vc", "ve", "vg", "vi", "vn", "vu", "wf", "ws", "xk", "ye", "yt", "za", "zm", "zw"};
 
     return countries;
 }
@@ -1488,6 +1247,24 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 {
     rememberGameSettings = _rememberGameSettings;
     settings->setValue("game/remembergamesettings", rememberGameSettings);
+}
+
+void SettingsCache::setLocalGameRememberSettings(bool value)
+{
+    localGameRememberSettings = value;
+    settings->setValue("localgameoptions/remembersettings", value);
+}
+
+void SettingsCache::setLocalGameMaxPlayers(int value)
+{
+    localGameMaxPlayers = value;
+    settings->setValue("localgameoptions/maxplayers", value);
+}
+
+void SettingsCache::setLocalGameStartingLifeTotal(int value)
+{
+    localGameStartingLifeTotal = value;
+    settings->setValue("localgameoptions/startinglifetotal", value);
 }
 
 void SettingsCache::setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate)

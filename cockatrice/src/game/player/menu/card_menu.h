@@ -18,10 +18,11 @@ class CardMenu : public QMenu
 public:
     explicit CardMenu(Player *player, const CardItem *card, bool shortcutsActive);
     void removePlayer(Player *playerToRemove);
-    void createTableMenu();
-    void createStackMenu();
-    void createGraveyardOrExileMenu();
-    void createHandOrCustomZoneMenu();
+    void createTableMenu(bool canModifyCard);
+    void createStackMenu(bool canModifyCard);
+    void createGraveyardOrExileMenu(bool canModifyCard);
+    void createHandOrCustomZoneMenu(bool canModifyCard);
+    void createZonelessMenu(bool canModifyCard);
 
     QMenu *mCardCounters;
 

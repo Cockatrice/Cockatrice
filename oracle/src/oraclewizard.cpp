@@ -21,7 +21,14 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
     // define a dummy context that will be used where needed
     QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
 
-    settings = new QSettings(SettingsCache::instance().getSettingsPath() + "global.ini", QSettings::IniFormat, this);
+    QString oracleSettingsFile = SettingsCache::instance().getSettingsPath() + "oracle.ini";
+    settings = new QSettings(oracleSettingsFile, QSettings::IniFormat, this);
+
+    // We moved the oracle-specific settings from global.ini to a separate oracle.ini after 2.10
+    if (!QFile::exists(oracleSettingsFile)) {
+        migrateOracleSettings();
+    }
+
     connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &OracleWizard::updateLanguage);
 
     importer = new OracleImporter(this);
@@ -48,6 +55,26 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
     }
 
     retranslateUi();
+}
+
+/**
+ * Migrates the oracle-specific settings from global.ini to oracle.ini
+ */
+void OracleWizard::migrateOracleSettings()
+{
+    QString filePath = SettingsCache::instance().getSettingsPath() + "global.ini";
+    auto globalSettings = QSettings(filePath, QSettings::IniFormat, this);
+
+    auto tryMigrateValue = [this, &globalSettings](const QString &name) {
+        QVariant variant = globalSettings.value(name);
+        if (variant.isValid()) {
+            settings->setValue(name, variant.toString());
+        }
+    };
+
+    tryMigrateValue("allsetsurl");
+    tryMigrateValue("tokensurl");
+    tryMigrateValue("spoilersurl");
 }
 
 void OracleWizard::updateLanguage()

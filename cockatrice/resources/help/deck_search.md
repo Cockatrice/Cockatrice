@@ -29,6 +29,11 @@ searches are case insensitive.
 <dt><u>F</u>ormat:</dt>
 <dd>[f:standard](#f:standard) <small>(Any deck with format set to standard)</small></dd>
 
+<dt><u>C</u>omments:</dt>
+<dd>[c:good](#c:good) <small>(Any deck with comments containing the word good)</small></dd>
+<dd>[c:good c:deck](#c:good c:deck) <small>(Any deck with comments containing the words good and deck)</small></dd>
+<dd>[c:"good deck"](#c:%22good deck%22) <small>(Any deck with comments containing the exact phrase "good deck")</small></dd>
+
 <dt>Deck Contents (Uses [card search expressions](#cardSearchSyntaxHelp)):</dt>
 <dd><a href="#[[plains]]">[[plains]]</a> <small>(Any deck that contains at least one card with "plains" in its name)</small></dd>
 <dd><a href="#[[t:legendary]]">[[t:legendary]]</a> <small>(Any deck that contains at least one legendary)</small></dd>
@@ -42,6 +47,6 @@ searches are case insensitive.
 <dd>[t:aggro OR o:control](#t:aggro OR o:control) <small>(Any deck filename that contains either aggro or control)</small></dd>
 
 <dt>Grouping:</dt>
-<dd><a href="#red -([[]]:100 or aggro)">red -([[]]:100 or aggro)</a> <small>(Any deck that has red in its filename but is not 100 cards or has aggro in its filename)</small></dd>
+<dd><a href="#red -([[]]:100 OR aggro)">red -([[]]:100 OR aggro)</a> <small>(Any deck that has red in its filename but is not 100 cards or has aggro in its filename)</small></dd>
 
 </dl>

@@ -23,7 +23,7 @@ class DeckEditorDatabaseDisplayWidget : public QWidget
 
     Q_OBJECT
 public:
-    explicit DeckEditorDatabaseDisplayWidget(AbstractTabDeckEditor *parent);
+    explicit DeckEditorDatabaseDisplayWidget(QWidget *parent, AbstractTabDeckEditor *deckEditor);
     AbstractTabDeckEditor *deckEditor;
     SearchLineEdit *searchEdit;
     CardDatabaseModel *databaseModel;

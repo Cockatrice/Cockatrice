@@ -260,16 +260,15 @@ void DeckViewContainer::loadLocalDeck()
 void DeckViewContainer::loadDeckFromFile(const QString &filePath)
 {
     DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(filePath);
-    DeckLoader deck(this);
 
-    bool success = deck.loadFromFile(filePath, fmt, true);
+    std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(filePath, fmt, true);
 
-    if (!success) {
+    if (!deckOpt) {
         QMessageBox::critical(this, tr("Error"), tr("The selected file could not be loaded."));
         return;
     }
 
-    loadDeckFromDeckList(deck.getDeck().deckList);
+    loadDeckFromDeckList(deckOpt.value().deckList);
 }
 
 void DeckViewContainer::loadDeckFromDeckList(const DeckList &deck)

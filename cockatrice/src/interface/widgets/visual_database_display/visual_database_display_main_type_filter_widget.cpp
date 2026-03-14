@@ -2,6 +2,7 @@
 
 #include "../../../filters/filter_tree_model.h"
 
+#include <QLabel>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QTimer>
@@ -12,13 +13,12 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
                                                                                      FilterTreeModel *_filterModel)
     : QWidget(parent), filterModel(_filterModel)
 {
-    allMainCardTypesWithCount = CardDatabaseManager::query()->getAllMainCardTypesWithCount();
     // Get all main card types with their count
+    allMainCardTypesWithCount = CardDatabaseManager::query()->getAllMainCardTypesWithCount();
+    setMinimumWidth(300);
+    setMaximumHeight(200);
 
-    setMaximumHeight(75);
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
-
-    layout = new QHBoxLayout(this);
+    layout = new QVBoxLayout(this);
     setLayout(layout);
     layout->setContentsMargins(0, 1, 0, 1);
     layout->setSpacing(1);
@@ -27,32 +27,44 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAsNeeded);
     layout->addWidget(flowWidget);
 
+    // Create a container for the threshold control
+    auto *thresholdLayout = new QHBoxLayout();
+    thresholdLayout->setContentsMargins(0, 0, 0, 0);
+
+    thresholdLabel = new QLabel(this);
+    thresholdLayout->addWidget(thresholdLabel);
+
     // Create the spinbox
     spinBox = new QSpinBox(this);
     spinBox->setMinimum(1);
-    spinBox->setMaximum(getMaxMainTypeCount()); // Set the max value dynamically
+    spinBox->setMaximum(getMaxMainTypeCount());
     spinBox->setValue(150);
-    layout->addWidget(spinBox);
+    thresholdLayout->addWidget(spinBox);
+    thresholdLayout->addStretch();
+
+    layout->addLayout(thresholdLayout);
+
     connect(spinBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeButtonsVisibility);
 
     // Create the toggle button for Exact Match/Includes mode
     toggleButton = new QPushButton(this);
-    toggleButton->setCheckable(true);
     layout->addWidget(toggleButton);
-    connect(toggleButton, &QPushButton::toggled, this, &VisualDatabaseDisplayMainTypeFilterWidget::updateFilterMode);
+    connect(toggleButton, &QPushButton::clicked, this, &VisualDatabaseDisplayMainTypeFilterWidget::updateFilterMode);
     connect(filterModel, &FilterTreeModel::layoutChanged, this, [this]() {
         QTimer::singleShot(100, this, &VisualDatabaseDisplayMainTypeFilterWidget::syncWithFilterModel);
     });
 
     createMainTypeButtons(); // Populate buttons initially
-    updateFilterMode(false); // Initialize toggle button text
+    updateFilterMode();      // Initialize toggle button text
 
     retranslateUi();
 }
 
 void VisualDatabaseDisplayMainTypeFilterWidget::retranslateUi()
 {
+    thresholdLabel->setText(tr("Show main types with at least:"));
+    spinBox->setSuffix(tr(" cards"));
     spinBox->setToolTip(tr("Do not display card main-types with less than this amount of cards in the database"));
     toggleButton->setToolTip(tr("Filter mode (AND/OR/NOT conjunctions of filters)"));
 }
@@ -159,9 +171,9 @@ void VisualDatabaseDisplayMainTypeFilterWidget::updateMainTypeFilter()
     emit filterModel->layoutChanged();
 }
 
-void VisualDatabaseDisplayMainTypeFilterWidget::updateFilterMode(bool checked)
+void VisualDatabaseDisplayMainTypeFilterWidget::updateFilterMode()
 {
-    exactMatchMode = checked;
+    exactMatchMode = !exactMatchMode;
     toggleButton->setText(exactMatchMode ? tr("Mode: Exact Match") : tr("Mode: Includes"));
     updateMainTypeFilter();
 }

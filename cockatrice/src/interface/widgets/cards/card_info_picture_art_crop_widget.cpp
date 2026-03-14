@@ -8,7 +8,7 @@ CardInfoPictureArtCropWidget::CardInfoPictureArtCropWidget(QWidget *parent)
     hide();
 }
 
-QPixmap CardInfoPictureArtCropWidget::getProcessedBackground(const QSize &targetSize)
+QPixmap CardInfoPictureArtCropWidget::getBackground()
 {
     // Load the full-resolution card image, not a pre-scaled one
     QPixmap fullResPixmap;
@@ -17,10 +17,8 @@ QPixmap CardInfoPictureArtCropWidget::getProcessedBackground(const QSize &target
     } else {
         CardPictureLoader::getCardBackPixmap(fullResPixmap, QSize(745, 1040));
     }
-
-    // Fail-safe if loading failed
     if (fullResPixmap.isNull()) {
-        return QPixmap(targetSize);
+        return QPixmap(); // return null qpixmap
     }
 
     const QSize sz = fullResPixmap.size();
@@ -33,9 +31,7 @@ QPixmap CardInfoPictureArtCropWidget::getProcessedBackground(const QSize &target
 
     foilRect = foilRect.intersected(fullResPixmap.rect()); // always clamp to source bounds
 
-    // Crop first, then scale for best quality
+    // return full resolution image crop
     QPixmap cropped = fullResPixmap.copy(foilRect);
-    QPixmap scaled = cropped.scaled(targetSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
-
-    return scaled;
+    return cropped;
 }

@@ -116,7 +116,9 @@ void ServerLogger::rotateLogs()
     flushBuffer();
 
     logFile->close();
-    logFile->open(QIODevice::Append);
+    if (!logFile->open(QIODevice::Append)) {
+        std::cerr << "ERROR: Failed to open log file for writing!" << std::endl;
+    }
 }
 
 QFile *ServerLogger::logFile;

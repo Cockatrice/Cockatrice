@@ -49,6 +49,7 @@ signals:
      * @param url URL of the deck on Archidekt.
      */
     void requestNavigation(QString url);
+    void requestSearch();
 
     /**
      * @brief Emitted when the deck should be opened in the deck editor.
@@ -102,9 +103,12 @@ private slots:
     void onGroupCriteriaChange(const QString &activeGroupCriteria);
 
 private:
-    ArchidektApiResponseDeck response;                        ///< API deck data container
-    CardSizeWidget *cardSizeSlider;                           ///< Slider for adjusting card sizes
-    QVBoxLayout *layout;                                      ///< Main vertical layout
+    ArchidektApiResponseDeck response; ///< API deck data container
+    CardSizeWidget *cardSizeSlider;    ///< Slider for adjusting card sizes
+    QVBoxLayout *layout;               ///< Main vertical layout
+    QWidget *navigationContainer;
+    QHBoxLayout *navigationContainerLayout;
+    QPushButton *homeButton;
     QPushButton *openInEditorButton;                          ///< Button to open deck in editor
     VisualDeckDisplayOptionsWidget *displayOptionsWidget;     ///< Controls grouping/sorting/display
     QScrollArea *scrollArea;                                  ///< Scrollable area for deck zones

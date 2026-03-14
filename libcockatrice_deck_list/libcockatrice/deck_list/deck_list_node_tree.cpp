@@ -41,10 +41,7 @@ QList<const DecklistCardNode *> DecklistNodeTree::getCardNodes(const QSet<QStrin
 {
     QList<const DecklistCardNode *> result;
 
-    for (auto *zoneNode : getZoneNodes()) {
-        if (!restrictToZones.isEmpty() && !restrictToZones.contains(zoneNode->getName())) {
-            continue;
-        }
+    for (auto *zoneNode : getZoneNodes(restrictToZones)) {
         for (auto *cardNode : *zoneNode) {
             auto *cardCardNode = dynamic_cast<DecklistCardNode *>(cardNode);
             if (cardCardNode) {
@@ -56,13 +53,16 @@ QList<const DecklistCardNode *> DecklistNodeTree::getCardNodes(const QSet<QStrin
     return result;
 }
 
-QList<const InnerDecklistNode *> DecklistNodeTree::getZoneNodes() const
+QList<const InnerDecklistNode *> DecklistNodeTree::getZoneNodes(const QSet<QString> &restrictToZones) const
 {
     QList<const InnerDecklistNode *> zones;
     for (auto *node : *root) {
         InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(node);
         if (!currentZone)
             continue;
+        if (!restrictToZones.isEmpty() && !restrictToZones.contains(currentZone->getName())) {
+            continue;
+        }
         zones.append(currentZone);
     }
 

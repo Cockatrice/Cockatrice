@@ -290,8 +290,9 @@ signals:
     /**
      * The selected card on any views connected to this deck should be changed to this index.
      * @param index The model index
+     * @param preserveWidgetFocus Whether to keep the widget focus unchanged
      */
-    void focusIndexChanged(QModelIndex index);
+    void focusIndexChanged(QModelIndex index, bool preserveWidgetFocus);
 };
 
 #endif // COCKATRICE_DECK_STATE_MANAGER_H

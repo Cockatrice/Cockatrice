@@ -20,8 +20,6 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_set/card_sets_model.h>
 
-#define SORT_RESET -1
-
 WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 {
     setOrderIsSorted = false;
@@ -97,7 +95,6 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     view->setDropIndicatorShown(true);
     view->setDragDropMode(QAbstractItemView::InternalMove);
 
-    view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
     view->setColumnHidden(SetsModel::SortKeyCol, true);
     view->setColumnHidden(SetsModel::IsKnownCol, true);
     view->setColumnHidden(SetsModel::PriorityCol, true);
@@ -189,17 +186,17 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 
     setWindowTitle(tr("Manage sets"));
     setMinimumSize(800, 500);
-    auto &geometry = SettingsCache::instance().getSetsDialogGeometry();
+    auto geometry = SettingsCache::instance().layouts().getSetsDialogGeometry();
     if (!geometry.isEmpty()) {
         restoreGeometry(geometry);
     }
-    auto &headerState = SettingsCache::instance().layouts().getSetsDialogHeaderState();
+    auto headerState = SettingsCache::instance().layouts().getSetsDialogHeaderState();
     if (!headerState.isEmpty()) {
         view->header()->restoreState(headerState);
-        view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
     } else {
         view->header()->resizeSections(QHeaderView::ResizeToContents);
     }
+    resetSort();
     connect(view->header(), &QHeaderView::geometriesChanged, this, &WndSets::saveHeaderState);
 }
 
@@ -209,7 +206,7 @@ WndSets::~WndSets()
 
 void WndSets::closeEvent(QCloseEvent * /*ev*/)
 {
-    SettingsCache::instance().setSetsDialogGeometry(saveGeometry());
+    SettingsCache::instance().layouts().setSetsDialogGeometry(saveGeometry());
 }
 
 void WndSets::saveHeaderState()
@@ -239,6 +236,13 @@ void WndSets::rebuildMainLayout(int actionToTake)
     }
 }
 
+void WndSets::resetSort()
+{
+    view->sortByColumn(SetsModel::SortKeyCol, Qt::AscendingOrder);
+    sortIndex = -1;
+    sortWarning->setVisible(false);
+}
+
 void WndSets::includeRebalancedCardsChanged(bool _includeRebalancedCards)
 {
     includeRebalancedCards = _includeRebalancedCards;
@@ -260,9 +264,9 @@ void WndSets::actRestore()
 
 void WndSets::actRestoreOriginalOrder()
 {
-    view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
     model->restoreOriginalOrder();
-    sortWarning->setVisible(false);
+    view->selectionModel()->reset();
+    resetSort();
 }
 
 void WndSets::actDisableResetButton(const QString &filterString)
@@ -288,10 +292,11 @@ void WndSets::actSort(int index)
             sortIndex = index;
             sortWarning->setVisible(true);
         } else {
-            view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
-            sortIndex = -1;
-            sortWarning->setVisible(false);
+            resetSort();
         }
+    }
+    if (!view->selectionModel()->selection().empty()) {
+        view->scrollTo(view->selectionModel()->selectedRows().first());
     }
 }
 
@@ -301,22 +306,17 @@ void WndSets::actIgnoreWarning()
         return;
     }
     model->sort(sortIndex, sortOrder);
-    view->header()->setSortIndicator(SORT_RESET, Qt::DescendingOrder);
-    sortIndex = -1;
-    sortWarning->setVisible(false);
+    resetSort();
 }
 
 void WndSets::actDisableSortButtons(int index)
 {
-    if (index != SORT_RESET) {
+    if (index != SetsModel::SortKeyCol) {
         view->setDragEnabled(false);
         setOrderIsSorted = true;
     } else {
         setOrderIsSorted = false;
         view->setDragEnabled(true);
-    }
-    if (!view->selectionModel()->selection().empty()) {
-        view->scrollTo(view->selectionModel()->selectedRows().first());
     }
     actToggleButtons(view->selectionModel()->selection(), QItemSelection());
 }

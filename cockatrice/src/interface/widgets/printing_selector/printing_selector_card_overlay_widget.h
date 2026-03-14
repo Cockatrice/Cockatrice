@@ -38,7 +38,11 @@ protected:
 signals:
     void cardPreferenceChanged();
 
+public slots:
+    void updateCardAmounts(int mainboardAmount, int sideboardAmount);
+
 private slots:
+    void updateVisibility();
     void updatePinBadgeVisibility();
 
 private:

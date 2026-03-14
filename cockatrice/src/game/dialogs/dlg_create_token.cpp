@@ -146,13 +146,13 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     setWindowTitle(tr("Create token"));
 
     resize(600, 500);
-    restoreGeometry(SettingsCache::instance().getTokenDialogGeometry());
+    restoreGeometry(SettingsCache::instance().layouts().getTokenDialogGeometry());
 }
 
 void DlgCreateToken::closeEvent(QCloseEvent *event)
 {
     event->accept();
-    SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
+    SettingsCache::instance().layouts().setTokenDialogGeometry(saveGeometry());
 }
 
 void DlgCreateToken::faceDownCheckBoxToggled(bool checked)
@@ -225,13 +225,13 @@ void DlgCreateToken::actChooseTokenFromDeck(bool checked)
 
 void DlgCreateToken::actOk()
 {
-    SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
+    SettingsCache::instance().layouts().setTokenDialogGeometry(saveGeometry());
     accept();
 }
 
 void DlgCreateToken::actReject()
 {
-    SettingsCache::instance().setTokenDialogGeometry(saveGeometry());
+    SettingsCache::instance().layouts().setTokenDialogGeometry(saveGeometry());
     reject();
 }
 

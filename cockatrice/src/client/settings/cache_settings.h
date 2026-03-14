@@ -143,6 +143,7 @@ signals:
     void themeChanged();
     void homeTabBackgroundSourceChanged();
     void homeTabBackgroundShuffleFrequencyChanged();
+    void homeTabDisplayCardNameChanged();
     void picDownloadChanged();
     void showStatusBarChanged(bool state);
     void showGameSelectorFilterToolbarChanged(bool state);
@@ -157,6 +158,7 @@ signals:
     void deckEditorTagsWidgetVisibleChanged(bool _visible);
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageDefaultTagsListChanged();
+    void visualDeckStorageShowColorIdentityChanged(bool _visible);
     void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
     void visualDeckStorageCardSizeChanged();
@@ -203,9 +205,6 @@ private:
     DebugSettings *debugSettings;
     CardCounterSettings *cardCounterSettings;
 
-    QByteArray mainWindowGeometry;
-    QByteArray tokenDialogGeometry;
-    QByteArray setsDialogGeometry;
     QString lang;
     QString deckPath, filtersPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
         customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName, homeTabBackgroundSource;
@@ -222,6 +221,7 @@ private:
     bool showTipsOnStartup;
     QList<int> seenTips;
     int homeTabBackgroundShuffleFrequency;
+    bool homeTabDisplayCardName;
     bool mbDownloadSpoilers;
     int updateReleaseChannel;
     int maxFontSize;
@@ -235,7 +235,6 @@ private:
     bool doNotDeleteArrowsInSubPhases;
     int startingHandSize;
     bool annotateTokens;
-    QByteArray tabGameSplitterSizes;
     bool showShortcuts;
     bool showGameSelectorFilterToolbar;
     bool displayCardNames;
@@ -249,6 +248,7 @@ private:
     bool deckEditorTagsWidgetVisible;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
+    bool visualDeckStorageShowColorIdentity;
     bool visualDeckStorageShowBannerCardComboBox;
     bool visualDeckStorageShowTagsOnDeckPreviews;
     bool visualDeckStorageShowTagFilter;
@@ -330,6 +330,12 @@ private:
     [[nodiscard]] QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
     void loadPaths();
     bool rememberGameSettings;
+
+    // Local game settings (separate from server game settings in game/*)
+    bool localGameRememberSettings;
+    int localGameMaxPlayers;
+    int localGameStartingLifeTotal;
+
     QList<ReleaseChannel *> releaseChannels;
     bool isPortableBuild;
     bool roundCardCorners;
@@ -341,18 +347,6 @@ public:
     QString getSettingsPath();
     [[nodiscard]] QString getCachePath() const;
     [[nodiscard]] QString getNetworkCachePath() const;
-    [[nodiscard]] const QByteArray &getMainWindowGeometry() const
-    {
-        return mainWindowGeometry;
-    }
-    [[nodiscard]] const QByteArray &getTokenDialogGeometry() const
-    {
-        return tokenDialogGeometry;
-    }
-    [[nodiscard]] const QByteArray &getSetsDialogGeometry() const
-    {
-        return setsDialogGeometry;
-    }
     [[nodiscard]] QString getLang() const
     {
         return lang;
@@ -412,6 +406,10 @@ public:
     [[nodiscard]] int getHomeTabBackgroundShuffleFrequency() const
     {
         return homeTabBackgroundShuffleFrequency;
+    }
+    [[nodiscard]] bool getHomeTabDisplayCardName() const
+    {
+        return homeTabDisplayCardName;
     }
     [[nodiscard]] bool getTabVisualDeckStorageOpen() const
     {
@@ -547,10 +545,6 @@ public:
     {
         return annotateTokens;
     }
-    [[nodiscard]] QByteArray getTabGameSplitterSizes() const
-    {
-        return tabGameSplitterSizes;
-    }
     [[nodiscard]] bool getShowShortcuts() const
     {
         return showShortcuts;
@@ -614,6 +608,10 @@ public:
     [[nodiscard]] bool getVisualDeckStorageSearchFolderNames() const
     {
         return visualDeckStorageSearchFolderNames;
+    }
+    [[nodiscard]] bool getVisualDeckStorageShowColorIdentity() const
+    {
+        return visualDeckStorageShowColorIdentity;
     }
     [[nodiscard]] bool getVisualDeckStorageShowBannerCardComboBox() const
     {
@@ -870,6 +868,18 @@ public:
     {
         return rememberGameSettings;
     }
+    [[nodiscard]] bool getLocalGameRememberSettings() const
+    {
+        return localGameRememberSettings;
+    }
+    [[nodiscard]] int getLocalGameMaxPlayers() const
+    {
+        return localGameMaxPlayers;
+    }
+    [[nodiscard]] int getLocalGameStartingLifeTotal() const
+    {
+        return localGameStartingLifeTotal;
+    }
     [[nodiscard]] int getKeepAlive() const override
     {
         return keepalive;
@@ -983,9 +993,6 @@ public:
 public slots:
     void setDownloadSpoilerStatus(bool _spoilerStatus);
 
-    void setMainWindowGeometry(const QByteArray &_mainWindowGeometry);
-    void setTokenDialogGeometry(const QByteArray &_tokenDialog);
-    void setSetsDialogGeometry(const QByteArray &_setsDialog);
     void setLang(const QString &_lang);
     void setShowTipsOnStartup(bool _showTipsOnStartup);
     void setSeenTips(const QList<int> &_seenTips);
@@ -1001,6 +1008,7 @@ public slots:
     void setThemeName(const QString &_themeName);
     void setHomeTabBackgroundSource(const QString &_backgroundSource);
     void setHomeTabBackgroundShuffleFrequency(int _frequency);
+    void setHomeTabDisplayCardName(QT_STATE_CHANGED_T _displayCardName);
     void setTabVisualDeckStorageOpen(bool value);
     void setTabServerOpen(bool value);
     void setTabAccountOpen(bool value);
@@ -1021,7 +1029,6 @@ public slots:
     void setDoNotDeleteArrowsInSubPhases(QT_STATE_CHANGED_T _doNotDeleteArrowsInSubPhases);
     void setStartingHandSize(int _startingHandSize);
     void setAnnotateTokens(QT_STATE_CHANGED_T _annotateTokens);
-    void setTabGameSplitterSizes(const QByteArray &_tabGameSplitterSizes);
     void setShowShortcuts(QT_STATE_CHANGED_T _showShortcuts);
     void setShowGameSelectorFilterToolbar(QT_STATE_CHANGED_T _showGameSelectorFilterToolbar);
     void setDisplayCardNames(QT_STATE_CHANGED_T _displayCardNames);
@@ -1038,6 +1045,7 @@ public slots:
     void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);
     void setVisualDeckStorageDefaultTagsList(QStringList _defaultTagsList);
     void setVisualDeckStorageSearchFolderNames(QT_STATE_CHANGED_T value);
+    void setVisualDeckStorageShowColorIdentity(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowBannerCardComboBox(QT_STATE_CHANGED_T _showBannerCardComboBox);
     void setVisualDeckStorageShowTagsOnDeckPreviews(QT_STATE_CHANGED_T _showTags);
     void setVisualDeckStorageCardSize(int _visualDeckStorageCardSize);
@@ -1099,6 +1107,9 @@ public slots:
     void setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal);
     void setShareDecklistsOnLoad(const bool _shareDecklistsOnLoad);
     void setRememberGameSettings(const bool _rememberGameSettings);
+    void setLocalGameRememberSettings(bool value);
+    void setLocalGameMaxPlayers(int value);
+    void setLocalGameStartingLifeTotal(int value);
     void setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value);
     void setStartupCardUpdateCheckPromptForUpdate(bool value);
     void setStartupCardUpdateCheckAlwaysUpdate(bool value);
@@ -1110,5 +1121,4 @@ public slots:
     void setMaxFontSize(int _max);
     void setRoundCardCorners(bool _roundCardCorners);
 };
-
 #endif
