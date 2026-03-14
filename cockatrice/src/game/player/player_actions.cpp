@@ -75,7 +75,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
         cmd.set_y(0);
     } else {
         tableRow = faceDown ? 2 : info.getUiAttributes().tableRow;
-        QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
+        QPoint gridPoint = QPoint(-1, TableZone::tableRowToGridY(tableRow));
         cardToMove->set_face_down(faceDown);
         if (!faceDown) {
             cardToMove->set_pt(info.getPowTough().toStdString());
@@ -114,12 +114,7 @@ void PlayerActions::playCardToTable(const CardItem *card, bool faceDown)
     const CardInfo &info = exactCard.getInfo();
 
     int tableRow = faceDown ? 2 : info.getUiAttributes().tableRow;
-    // default instant/sorcery cards to the noncreatures row
-    if (tableRow > 2) {
-        tableRow = 1;
-    }
-
-    QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
+    QPoint gridPoint = QPoint(-1, TableZone::tableRowToGridY(tableRow));
     cardToMove->set_face_down(faceDown);
     if (!faceDown) {
         cardToMove->set_pt(info.getPowTough().toStdString());
@@ -869,7 +864,7 @@ void PlayerActions::actCreateToken()
     ExactCard correctedCard = CardDatabaseManager::query()->guessCard({lastTokenInfo.name, lastTokenInfo.providerId});
     if (correctedCard) {
         lastTokenInfo.name = correctedCard.getName();
-        lastTokenTableRow = TableZone::clampValidTableRow(2 - correctedCard.getInfo().getUiAttributes().tableRow);
+        lastTokenTableRow = TableZone::tableRowToGridY(correctedCard.getInfo().getUiAttributes().tableRow);
         if (lastTokenInfo.pt.isEmpty()) {
             lastTokenInfo.pt = correctedCard.getInfo().getPowTough();
         }
@@ -920,7 +915,7 @@ void PlayerActions::setLastToken(CardInfoPtr cardInfo)
                      .providerId =
                          SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName())};
 
-    lastTokenTableRow = TableZone::clampValidTableRow(2 - cardInfo->getUiAttributes().tableRow);
+    lastTokenTableRow = TableZone::tableRowToGridY(cardInfo->getUiAttributes().tableRow);
 
     utilityMenu->setAndEnableCreateAnotherTokenAction(tr("C&reate another %1 token").arg(lastTokenInfo.name));
 }
@@ -1088,9 +1083,7 @@ void PlayerActions::createCard(const CardItem *sourceCard,
         return;
     }
 
-    // get the target token's location
-    // TODO: Define this QPoint into its own function along with the one below
-    QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - cardInfo->getUiAttributes().tableRow));
+    QPoint gridPoint = QPoint(-1, TableZone::tableRowToGridY(cardInfo->getUiAttributes().tableRow));
 
     // create the token for the related card
     Command_CreateToken cmd;
