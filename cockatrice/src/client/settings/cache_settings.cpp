@@ -285,6 +285,7 @@ SettingsCache::SettingsCache()
     focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
 
     showDragSelectionCount = settings->value("interface/showlassoselectioncount", true).toBool();
+    showTotalSelectionCount = settings->value("interface/showpersistentselectioncount", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     showGameSelectorFilterToolbar = settings->value("menu/showgameselectorfiltertoolbar", true).toBool();
@@ -1314,6 +1315,12 @@ void SettingsCache::setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelect
 {
     showDragSelectionCount = static_cast<bool>(_showDragSelectionCount);
     settings->setValue("interface/showlassoselectioncount", showDragSelectionCount);
+}
+
+void SettingsCache::setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSelectionCount)
+{
+    showTotalSelectionCount = static_cast<bool>(_showTotalSelectionCount);
+    settings->setValue("interface/showpersistentselectioncount", showTotalSelectionCount);
 }
 
 void SettingsCache::loadPaths()

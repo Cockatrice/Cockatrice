@@ -20,6 +20,7 @@ private:
     QAction *aCloseMostRecentZoneView;
     QRubberBand *rubberBand;
     QLabel *dragCountLabel;
+    QLabel *totalCountLabel;
     QPointF selectionOrigin;
 
 protected:
@@ -29,6 +30,7 @@ private slots:
     void resizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void stopRubberBand();
     void refreshShortcuts();
+    void updateTotalSelectionCount(const QSize &viewSize = QSize());
 public slots:
     void updateSceneRect(const QRectF &rect);
 

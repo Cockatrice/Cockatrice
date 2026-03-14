@@ -42,6 +42,7 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     connect(scene, &GameScene::sigStartRubberBand, this, &GameView::startRubberBand);
     connect(scene, &GameScene::sigResizeRubberBand, this, &GameView::resizeRubberBand);
     connect(scene, &GameScene::sigStopRubberBand, this, &GameView::stopRubberBand);
+    connect(scene, &QGraphicsScene::selectionChanged, this, [this]() { updateTotalSelectionCount(); });
 
     aCloseMostRecentZoneView = new QAction(this);
 
@@ -63,6 +64,10 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     dragCountLabel->setStyleSheet(countLabelStyle);
     dragCountLabel->hide();
     dragCountLabel->raise();
+
+    totalCountLabel = new QLabel(this);
+    totalCountLabel->setStyleSheet(countLabelStyle);
+    totalCountLabel->hide();
 }
 
 void GameView::resizeEvent(QResizeEvent *event)
@@ -74,6 +79,7 @@ void GameView::resizeEvent(QResizeEvent *event)
         s->processViewSizeChange(event->size());
 
     updateSceneRect(scene()->sceneRect());
+    updateTotalSelectionCount(event->size());
 }
 
 void GameView::updateSceneRect(const QRectF &rect)
@@ -150,4 +156,29 @@ void GameView::refreshShortcuts()
 {
     aCloseMostRecentZoneView->setShortcuts(
         SettingsCache::instance().shortcuts().getShortcut("Player/aCloseMostRecentZoneView"));
+}
+
+void GameView::updateTotalSelectionCount(const QSize &viewSize)
+{
+    if (!SettingsCache::instance().getShowTotalSelectionCount()) {
+        totalCountLabel->hide();
+        return;
+    }
+
+    int count = scene()->selectedItems().count();
+
+    if (count > 1) {
+        totalCountLabel->setText(QString::number(count));
+        totalCountLabel->adjustSize();
+
+        constexpr int kMarginInPixels = 10;
+        int availableWidth = viewSize.isValid() ? viewSize.width() : viewport()->width();
+        int availableHeight = viewSize.isValid() ? viewSize.height() : viewport()->height();
+        int x = availableWidth - totalCountLabel->width() - kMarginInPixels;
+        int y = availableHeight - totalCountLabel->height() - kMarginInPixels;
+        totalCountLabel->move(x, y);
+        totalCountLabel->show();
+    } else {
+        totalCountLabel->hide();
+    }
 }

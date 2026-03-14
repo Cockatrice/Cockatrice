@@ -341,6 +341,7 @@ private:
     bool roundCardCorners;
     bool showStatusBar;
     bool showDragSelectionCount;
+    bool showTotalSelectionCount;
 
 public:
     SettingsCache();
@@ -459,6 +460,10 @@ public:
     [[nodiscard]] bool getShowDragSelectionCount() const
     {
         return showDragSelectionCount;
+    }
+    [[nodiscard]] bool getShowTotalSelectionCount() const
+    {
+        return showTotalSelectionCount;
     }
     [[nodiscard]] bool getNotificationsEnabled() const
     {
@@ -1126,5 +1131,6 @@ public slots:
     void setMaxFontSize(int _max);
     void setRoundCardCorners(bool _roundCardCorners);
     void setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount);
+    void setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSelectionCount);
 };
 #endif

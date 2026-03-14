@@ -825,6 +825,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&showDragSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setShowDragSelectionCount);
 
+    showTotalSelectionCountCheckBox.setChecked(SettingsCache::instance().getShowTotalSelectionCount());
+    connect(&showTotalSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setShowTotalSelectionCount);
+
     useTearOffMenusCheckBox.setChecked(SettingsCache::instance().getUseTearOffMenus());
     connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             [](const QT_STATE_CHANGED_T state) { SettingsCache::instance().setUseTearOffMenus(state == Qt::Checked); });
@@ -838,7 +842,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&focusCardViewSearchBarCheckBox, 5, 0);
     generalGrid->addWidget(&annotateTokensCheckBox, 6, 0);
     generalGrid->addWidget(&showDragSelectionCountCheckBox, 7, 0);
-    generalGrid->addWidget(&useTearOffMenusCheckBox, 8, 0);
+    generalGrid->addWidget(&showTotalSelectionCountCheckBox, 8, 0);
+    generalGrid->addWidget(&useTearOffMenusCheckBox, 9, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -961,6 +966,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     focusCardViewSearchBarCheckBox.setText(tr("Auto focus search bar when card view window is opened"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     showDragSelectionCountCheckBox.setText(tr("Show selection counter during drag selection"));
+    showTotalSelectionCountCheckBox.setText(tr("Show total selection counter"));
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
     notificationsGroupBox->setTitle(tr("Notifications settings"));
     notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
