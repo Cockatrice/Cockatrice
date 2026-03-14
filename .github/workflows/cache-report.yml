@@ -27,5 +27,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          ./.ci/gh_buildkit_cache_usage.sh | tee report.txt
-          { echo '```'; cat report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          ./.ci/gh_buildkit_cache_usage.sh --markdown | tee report.txt
+          cat report.txt >> "$GITHUB_STEP_SUMMARY"
