@@ -299,7 +299,7 @@ fi
 
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
-  cmake --build . --verbose --target package --config "$BUILDTYPE"
+  cmake --build . --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 
   if [[ $PACKAGE_SUFFIX ]]; then
