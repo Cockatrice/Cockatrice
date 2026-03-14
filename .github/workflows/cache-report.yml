@@ -1,0 +1,33 @@
+# Reports total GitHub Actions cache usage for BuildKit blob caches (used by docker-release).
+# Run locally: .ci/gh_buildkit_cache_usage.sh
+
+name: Cache usage report
+
+on:
+  schedule:
+    # Mondays 09:00 UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  report:
+    name: buildkit-blob cache usage
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Report cache usage
+        id: cache_report
+        run: |
+          ./.ci/gh_buildkit_cache_usage.sh buildkit-blob | tee report.txt
+          echo "summary<<EOF" >> "$GITHUB_STEP_SUMMARY"
+          cat report.txt >> "$GITHUB_STEP_SUMMARY"
+          echo "EOF" >> "$GITHUB_STEP_SUMMARY"
