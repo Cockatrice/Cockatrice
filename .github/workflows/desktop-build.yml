@@ -315,6 +315,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
+            use_sccache: 1
 
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
@@ -324,6 +325,7 @@ jobs:
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 500M
+      SCCACHE_GHA_ENABLED: on
 
     steps:
       - name: Checkout
@@ -338,12 +340,16 @@ jobs:
         with:
           msbuild-architecture: x64
 
-      - name: Setup ccache
+      - name: Run sccache-cache (Windows, sccache)
+        if:  matrix.use_sccache == 1 && matrix.os == 'Windows'
+        uses: mozilla-actions/sccache-action@v0.0.9
+
+      - name: Setup ccache (macOS)
         if: matrix.use_ccache == 1 && matrix.os == 'macOS'
         run: brew install ccache
 
-      - name: Restore compiler cache (ccache)
-        if: matrix.use_ccache == 1
+      - name: Restore compiler cache (macOS, ccache)
+        if: matrix.use_ccache == 1 && matrix.os == 'macOS'
         id: ccache_restore
         uses: actions/cache/restore@v5
         env:
@@ -427,6 +433,7 @@ jobs:
           CMAKE_GENERATOR: ${{matrix.cmake_generator}}
           CMAKE_GENERATOR_PLATFORM: ${{matrix.cmake_generator_platform}}
           USE_CCACHE: ${{matrix.use_ccache}}
+          USE_SCCACHE: ${{matrix.use_sccache}}
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           # macOS-specific environment variables, will be ignored on Windows
@@ -438,8 +445,8 @@ jobs:
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --vcpkg
 
-      - name: Save compiler cache (ccache)
-        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1
+      - name: Save compiler cache (macOS, ccache)
+        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1 && matrix.os == 'macOS'
         uses: actions/cache/save@v5
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}

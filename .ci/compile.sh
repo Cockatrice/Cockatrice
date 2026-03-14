@@ -134,6 +134,10 @@ if [[ $USE_CCACHE ]]; then
     ccache --max-size "$CCACHE_SIZE"
   fi
 fi
+if [[ $USE_SCCACHE ]]; then
+  flags+=("-DCMAKE_C_COMPILER_LAUNCHER=sccache")
+  flags+=("-DCMAKE_CXX_COMPILER_LAUNCHER=sccache")
+fi
 if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
