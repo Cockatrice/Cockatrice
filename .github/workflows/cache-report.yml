@@ -24,6 +24,8 @@ jobs:
 
       - name: Report cache usage
         id: cache_report
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           ./.ci/gh_buildkit_cache_usage.sh | tee report.txt
           echo "summary<<EOF" >> "$GITHUB_STEP_SUMMARY"
