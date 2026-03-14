@@ -28,6 +28,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           ./.ci/gh_buildkit_cache_usage.sh | tee report.txt
-          echo "summary<<EOF" >> "$GITHUB_STEP_SUMMARY"
-          cat report.txt >> "$GITHUB_STEP_SUMMARY"
-          echo "EOF" >> "$GITHUB_STEP_SUMMARY"
+          { echo '```'; cat report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
