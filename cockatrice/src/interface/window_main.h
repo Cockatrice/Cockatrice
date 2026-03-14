@@ -25,6 +25,8 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "widgets/dialogs/dlg_local_game_options.h"
+
 #include <QList>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -137,7 +139,7 @@ private:
     void createCardUpdateProcess(bool background = false);
     void exitCardDatabaseUpdate();
 
-    void startLocalGame(int numberPlayers);
+    void startLocalGame(const LocalGameOptions &options);
 
     QList<QMenu *> tabMenus;
     QMenu *cockatriceMenu, *dbMenu, *tabsMenu, *helpMenu, *trayIconMenu;

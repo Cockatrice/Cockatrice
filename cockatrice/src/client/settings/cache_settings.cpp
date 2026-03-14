@@ -385,6 +385,13 @@ SettingsCache::SettingsCache()
     defaultStartingLifeTotal = settings->value("game/defaultstartinglifetotal", 20).toInt();
     shareDecklistsOnLoad = settings->value("game/sharedecklistsonload", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
+
+    // Local game settings use "localgameoptions/" prefix to keep them separate
+    // from server game settings which use "game/" prefix
+    localGameRememberSettings = settings->value("localgameoptions/remembersettings", false).toBool();
+    localGameMaxPlayers = settings->value("localgameoptions/maxplayers", 1).toInt();
+    localGameStartingLifeTotal = settings->value("localgameoptions/startinglifetotal", 20).toInt();
+
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
 }
@@ -1240,6 +1247,24 @@ void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)
 {
     rememberGameSettings = _rememberGameSettings;
     settings->setValue("game/remembergamesettings", rememberGameSettings);
+}
+
+void SettingsCache::setLocalGameRememberSettings(bool value)
+{
+    localGameRememberSettings = value;
+    settings->setValue("localgameoptions/remembersettings", value);
+}
+
+void SettingsCache::setLocalGameMaxPlayers(int value)
+{
+    localGameMaxPlayers = value;
+    settings->setValue("localgameoptions/maxplayers", value);
+}
+
+void SettingsCache::setLocalGameStartingLifeTotal(int value)
+{
+    localGameStartingLifeTotal = value;
+    settings->setValue("localgameoptions/startinglifetotal", value);
 }
 
 void SettingsCache::setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate)

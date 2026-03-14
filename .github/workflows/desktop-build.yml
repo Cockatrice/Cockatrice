@@ -204,12 +204,12 @@ jobs:
                   --ccache "$CCACHE_SIZE" $NO_CLIENT
           .ci/name_build.sh
 
-      - name: Delete stale ccache
-        if: github.ref == 'refs/heads/master'
+      # Delete used cache to emulate a cache update. See https://github.com/actions/cache/issues/342.
+      - name: Delete old compiler cache (ccache)
+        if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit && steps.build.outcome == 'success'
         env:
-          GH_TOKEN: ${{github.token}}
-        run: |
-          gh cache delete "${{ steps.ccache_restore.outputs.cache-primary-key }}" || true
+          GH_TOKEN: ${{ github.token }}
+        run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
@@ -446,13 +446,12 @@ jobs:
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --vcpkg
 
-      # github does not overwrite GHA cache entries when the key is the same, so we need to delete the stale ones before saving
-      - name: Delete stale ccache
-        if: github.ref == 'refs/heads/master'
+      # Delete used cache to emulate a cache update. See https://github.com/actions/cache/issues/342.
+      - name: Delete old compiler cache (ccache)
+        if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit && steps.build.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh cache delete "${{ steps.ccache_restore.outputs.cache-primary-key }}" || true
+        run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Save compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && steps.build.outcome == 'success'
