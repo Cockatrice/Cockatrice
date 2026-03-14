@@ -1,6 +1,10 @@
 #!/bin/bash
-# Fix code signing for unsigned macOS app bundles (mainly used to test packages from PRs on CI).
+# Fixes code signing for unsigned macOS app bundles. Use after installing an unsigned build (e.g. from a PR artifact) to `/Applications` so the apps can be opened without Gatekeeper blocking them.
 # Run from project root: ./utils/macos_fix_codesign.sh [path/to/app.app ...]
+#
+# Example usage:
+# ./utils/macos_fix_codesign.sh # fixes cockatrice, oracle, and servatrice in /Applications
+# ./utils/macos_fix_codesign.sh /Applications/cockatrice.app # fixes only cockatrice
 #
 # Steps:
 #   1. Remove quarantine extended attribute
