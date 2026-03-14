@@ -171,6 +171,7 @@ private:
     QCheckBox closeEmptyCardViewCheckBox;
     QCheckBox focusCardViewSearchBarCheckBox;
     QCheckBox annotateTokensCheckBox;
+    QCheckBox showDragSelectionCountCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;

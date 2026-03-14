@@ -10,6 +10,7 @@
 #include <QGraphicsView>
 
 class GameScene;
+class QLabel;
 class QRubberBand;
 
 class GameView : public QGraphicsView
@@ -18,13 +19,14 @@ class GameView : public QGraphicsView
 private:
     QAction *aCloseMostRecentZoneView;
     QRubberBand *rubberBand;
+    QLabel *dragCountLabel;
     QPointF selectionOrigin;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
 private slots:
     void startRubberBand(const QPointF &selectionOrigin);
-    void resizeRubberBand(const QPointF &cursorPoint);
+    void resizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void stopRubberBand();
     void refreshShortcuts();
 public slots:

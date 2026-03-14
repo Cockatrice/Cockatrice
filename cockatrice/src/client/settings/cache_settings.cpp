@@ -284,6 +284,8 @@ SettingsCache::SettingsCache()
     closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
     focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
 
+    showDragSelectionCount = settings->value("interface/showlassoselectioncount", true).toBool();
+
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     showGameSelectorFilterToolbar = settings->value("menu/showgameselectorfiltertoolbar", true).toBool();
     displayCardNames = settings->value("cards/displaycardnames", true).toBool();
@@ -1306,6 +1308,12 @@ void SettingsCache::setRoundCardCorners(bool _roundCardCorners)
     roundCardCorners = _roundCardCorners;
     settings->setValue("cards/roundcardcorners", _roundCardCorners);
     emit roundCardCornersChanged(roundCardCorners);
+}
+
+void SettingsCache::setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount)
+{
+    showDragSelectionCount = static_cast<bool>(_showDragSelectionCount);
+    settings->setValue("interface/showlassoselectioncount", showDragSelectionCount);
 }
 
 void SettingsCache::loadPaths()

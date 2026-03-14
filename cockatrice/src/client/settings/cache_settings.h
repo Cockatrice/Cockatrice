@@ -340,6 +340,7 @@ private:
     bool isPortableBuild;
     bool roundCardCorners;
     bool showStatusBar;
+    bool showDragSelectionCount;
 
 public:
     SettingsCache();
@@ -454,6 +455,10 @@ public:
     [[nodiscard]] bool getShowStatusBar() const
     {
         return showStatusBar;
+    }
+    [[nodiscard]] bool getShowDragSelectionCount() const
+    {
+        return showDragSelectionCount;
     }
     [[nodiscard]] bool getNotificationsEnabled() const
     {
@@ -1120,5 +1125,6 @@ public slots:
     void setUpdateReleaseChannelIndex(int value);
     void setMaxFontSize(int _max);
     void setRoundCardCorners(bool _roundCardCorners);
+    void setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount);
 };
 #endif
