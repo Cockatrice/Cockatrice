@@ -1926,6 +1926,33 @@ void PlayerActions::cardMenuAction()
                 commandList.append(cmd);
                 break;
             }
+            case cmMoveToTable: {
+                for (const auto &card : cardList) {
+                    auto *cmd = new Command_MoveCard;
+                    cmd->set_start_player_id(startPlayerId);
+                    cmd->set_start_zone(startZone.toStdString());
+                    cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                    cmd->set_target_zone(ZoneNames::TABLE);
+                    cmd->set_x(-1);
+
+                    CardToMove *ctm = cmd->mutable_cards_to_move()->add_card();
+                    ctm->set_card_id(card->getId());
+                    ctm->set_face_down(false);
+
+                    int tableRow = 0;
+                    ExactCard exactCard = card->getCard();
+                    if (exactCard) {
+                        const CardInfo &info = exactCard.getInfo();
+                        tableRow = info.getUiAttributes().tableRow;
+                        ctm->set_pt(info.getPowTough().toStdString());
+                        ctm->set_tapped(info.getUiAttributes().cipt);
+                    }
+
+                    cmd->set_y(TableZone::tableRowToGridY(tableRow));
+                    commandList.append(cmd);
+                }
+                break;
+            }
             default:
                 break;
         }
