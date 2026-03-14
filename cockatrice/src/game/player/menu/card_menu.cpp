@@ -113,32 +113,20 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
         addAction(aSelectAll);
         addAction(aSelectColumn);
         addRelatedCardView();
-    } else if (writeableCard) {
-
+    } else {
         if (card->getZone()) {
             if (card->getZone()->getName() == ZoneNames::TABLE) {
-                createTableMenu();
+                createTableMenu(writeableCard);
             } else if (card->getZone()->getName() == ZoneNames::STACK) {
-                createStackMenu();
+                createStackMenu(writeableCard);
             } else if (card->getZone()->getName() == ZoneNames::EXILE ||
                        card->getZone()->getName() == ZoneNames::GRAVE) {
-                createGraveyardOrExileMenu();
+                createGraveyardOrExileMenu(writeableCard);
             } else {
-                createHandOrCustomZoneMenu();
+                createHandOrCustomZoneMenu(writeableCard);
             }
         } else {
-            addMenu(new MoveMenu(player));
-        }
-    } else {
-        if (card->getZone() && card->getZone()->getName() != ZoneNames::HAND) {
-            addAction(aDrawArrow);
-            addSeparator();
-            addRelatedCardView();
-            addRelatedCardActions();
-            addSeparator();
-            addAction(aClone);
-            addSeparator();
-            addAction(aSelectAll);
+            createZonelessMenu(writeableCard);
         }
     }
 }
@@ -154,11 +142,9 @@ void CardMenu::removePlayer(Player *playerToRemove)
     }
 }
 
-void CardMenu::createTableMenu()
+void CardMenu::createTableMenu(bool canModifyCard)
 {
     // Card is on the battlefield
-    bool canModifyCard = player->getPlayerInfo()->judge || card->getOwner() == player;
-
     if (!canModifyCard) {
         addRelatedCardView();
         addRelatedCardActions();
@@ -213,10 +199,8 @@ void CardMenu::createTableMenu()
     addMenu(mCardCounters);
 }
 
-void CardMenu::createStackMenu()
+void CardMenu::createStackMenu(bool canModifyCard)
 {
-    bool canModifyCard = player->getPlayerInfo()->judge || card->getOwner() == player;
-
     // Card is on the stack
     if (canModifyCard) {
         addAction(aAttach);
@@ -238,10 +222,8 @@ void CardMenu::createStackMenu()
     addRelatedCardActions();
 }
 
-void CardMenu::createGraveyardOrExileMenu()
+void CardMenu::createGraveyardOrExileMenu(bool canModifyCard)
 {
-    bool canModifyCard = player->getPlayerInfo()->judge || card->getOwner() == player;
-
     // Card is in the graveyard or exile
     if (canModifyCard) {
         addAction(aPlay);
@@ -270,8 +252,20 @@ void CardMenu::createGraveyardOrExileMenu()
     addRelatedCardActions();
 }
 
-void CardMenu::createHandOrCustomZoneMenu()
+void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
 {
+    if (!canModifyCard) {
+        addAction(aDrawArrow);
+        addSeparator();
+        addRelatedCardView();
+        addRelatedCardActions();
+        addSeparator();
+        addAction(aClone);
+        addSeparator();
+        addAction(aSelectAll);
+        return;
+    }
+
     // Card is in hand or a custom zone specified by server
     addAction(aPlay);
     addAction(aPlayFacedown);
@@ -302,6 +296,13 @@ void CardMenu::createHandOrCustomZoneMenu()
     addRelatedCardView();
     if (card->getZone()->getName() == ZoneNames::HAND) {
         addRelatedCardActions();
+    }
+}
+
+void CardMenu::createZonelessMenu(bool canModifyCard)
+{
+    if (canModifyCard) {
+        addMenu(new MoveMenu(player));
     }
 }
 
