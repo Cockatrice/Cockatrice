@@ -322,7 +322,19 @@ jobs:
             cmake_generator: Ninja
             ccache_variant: sccache
 
-    name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
+          - os: Windows
+            target: 10
+            runner: windows-2025
+            type: Release
+            make_package: 1
+            package_suffix: "-Win10"
+            qt_version: 6.10.*
+            qt_arch: win64_msvc2022_64
+            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            cmake_generator: "Visual Studio 17 2022"
+            ccache_variant: sccache
+
+    name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}${{ 'Windows' && ' matrix.cmake_generator' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
     env:
