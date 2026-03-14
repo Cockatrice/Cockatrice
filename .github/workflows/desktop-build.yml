@@ -315,6 +315,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
+            use_sccache: 1
 
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
@@ -344,7 +345,7 @@ jobs:
         run: brew install ccache
 
       - name: Run sccache-cache (Windows)
-        if: matrix.os == 'Windows'
+        if:  matrix.use_sccache == 1 && matrix.os == 'Windows'
         uses: mozilla-actions/sccache-action@v0.0.9
 
       - name: Restore compiler cache (ccache)
@@ -432,6 +433,7 @@ jobs:
           CMAKE_GENERATOR: ${{matrix.cmake_generator}}
           CMAKE_GENERATOR_PLATFORM: ${{matrix.cmake_generator_platform}}
           USE_CCACHE: ${{matrix.use_ccache}}
+          USE_SCCACHE: ${{matrix.use_sccache}}
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           # macOS-specific environment variables, will be ignored on Windows
