@@ -344,6 +344,11 @@ jobs:
         if:  matrix.use_sccache == 1 && matrix.os == 'Windows'
         uses: mozilla-actions/sccache-action@v0.0.9
 
+      # workaround, see https://github.com/Mozilla-Actions/sccache-action/issues/177
+      - name: Ensure sccache is using GHA cache (Windows)
+        if: matrix.use_sccache == 1 && matrix.os == 'Windows'
+        run: Add-Content -Path $env:GITHUB_ENV -Value "SCCACHE_GHA_ENABLED=true"
+
       - name: Setup ccache (macOS)
         if: matrix.use_ccache == 1 && matrix.os == 'macOS'
         run: brew install ccache
