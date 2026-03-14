@@ -361,10 +361,9 @@ jobs:
           restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-
 
       - name: Install aqtinstall
-        if: matrix.os == 'macOS'
         run: pipx install aqtinstall
 
-      # Checking if there's a newer, uncached version of Qt available to install via aqtinstall
+      # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version via aqtinstall to avoid stale caches on new releases
       - name: Resolve latest Qt patch version
         id: resolve_qt_version
         shell: bash
