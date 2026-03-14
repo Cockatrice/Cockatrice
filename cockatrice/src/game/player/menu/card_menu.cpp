@@ -203,6 +203,9 @@ void CardMenu::createStackMenu(bool canModifyCard)
 {
     // Card is on the stack
     if (canModifyCard) {
+        addAction(aPlay);
+        addSeparator();
+
         addAction(aAttach);
         addAction(aDrawArrow);
         addSeparator();
