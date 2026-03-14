@@ -27,7 +27,16 @@ if ! hash aqt; then
 fi
 
 # Resolve latest patch
-if ! qt_resolved=$(aqt list-qt mac desktop --spec "$qt_spec" --latest-version); then
+if [[ $RUNNER_OS == macOS ]]; then
+  if ! qt_resolved=$(aqt list-qt mac desktop --spec "$qt_spec" --latest-version); then
+    exit 1
+  fi
+elif [[ $RUNNER_OS == Windows ]]; then
+  if ! qt_resolved=$(aqt list-qt windows desktop --spec "$qt_spec" --latest-version); then
+    exit 1
+  fi
+else
+  echo "aqt command for $RUNNER_OS not defined."
   exit 1
 fi
 
