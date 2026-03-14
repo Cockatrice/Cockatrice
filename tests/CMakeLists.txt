@@ -60,6 +60,7 @@ target_link_libraries(
   ${TEST_QT_MODULES}
 )
 
+add_subdirectory(add_card_algorithm)
 add_subdirectory(carddatabase)
 add_subdirectory(loading_from_clipboard)
 add_subdirectory(oracle)

@@ -1,6 +1,7 @@
 #include "hand_zone_logic.h"
 
 #include "../../board/card_item.h"
+#include "add_card_algorithm.h"
 
 HandZoneLogic::HandZoneLogic(Player *_player,
                              const QString &_name,
@@ -14,16 +15,5 @@ HandZoneLogic::HandZoneLogic(Player *_player,
 
 void HandZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
 {
-    // if x is negative set it to add at end
-    if (x < 0 || x >= cards.size()) {
-        x = cards.size();
-    }
-    cards.insert(x, card);
-
-    if (!cards.getContentsKnown()) {
-        card->setId(-1);
-        card->setCardRef({});
-    }
-    card->resetState();
-    card->setVisible(true);
+    CardZoneAlgorithms::addCardToList(cards, card, x, false);
 }
