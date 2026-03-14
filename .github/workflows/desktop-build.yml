@@ -156,7 +156,7 @@ jobs:
       CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CCACHE_SIZE: 500M
+      CCACHE_SIZE: 550M
       CMAKE_GENERATOR: 'Ninja'
 
     steps:
@@ -330,7 +330,7 @@ jobs:
       CCACHE_DIR: ${{github.workspace}}/.cache/
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CCACHE_SIZE: 500M
+      CCACHE_SIZE: 550M
 
     steps:
       - name: Checkout
