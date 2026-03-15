@@ -62,9 +62,6 @@ protected slots:
     /** @brief Resets the layout to default positions and dock states. */
     void restartLayout() override;
 
-    /** @brief Frees the dock sizes for resizing flexibility. */
-    void freeDocksSize() override;
-
     /** @brief Refreshes shortcuts for this tab from settings. */
     void refreshShortcuts() override;
 

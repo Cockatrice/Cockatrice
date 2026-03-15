@@ -48,17 +48,6 @@ void LayoutsSettings::setDeckEditorGeometry(const QByteArray &value)
     setValue(value, GEOMETRY_PROP, GROUP_DECK_EDITOR);
 }
 
-void LayoutsSettings::setDeckEditorWidgetSize(const QString &widgetName, const QSize &value)
-{
-    setValue(value, widgetName, GROUP_DECK_EDITOR, SIZE_PROP);
-}
-
-QSize LayoutsSettings::getDeckEditorWidgetSize(const QString &widgetName, const QSize &defaultValue)
-{
-    QVariant previous = getValue(widgetName, GROUP_DECK_EDITOR, SIZE_PROP);
-    return previous == QVariant() ? defaultValue : previous.toSize();
-}
-
 QByteArray LayoutsSettings::getVisualDeckEditorLayoutState()
 {
     return getValue(STATE_PROP, GROUP_VISUAL_DECK_EDITOR).toByteArray();
@@ -77,17 +66,6 @@ QByteArray LayoutsSettings::getVisualDeckEditorGeometry()
 void LayoutsSettings::setVisualDeckEditorGeometry(const QByteArray &value)
 {
     setValue(value, GEOMETRY_PROP, GROUP_VISUAL_DECK_EDITOR);
-}
-
-void LayoutsSettings::setVisualDeckEditorWidgetSize(const QString &widgetName, const QSize &value)
-{
-    setValue(value, widgetName, GROUP_VISUAL_DECK_EDITOR, SIZE_PROP);
-}
-
-QSize LayoutsSettings::getVisualDeckEditorWidgetSize(const QString &widgetName, const QSize &defaultValue)
-{
-    QVariant previous = getValue(widgetName, GROUP_VISUAL_DECK_EDITOR, SIZE_PROP);
-    return previous == QVariant() ? defaultValue : previous.toSize();
 }
 
 QByteArray LayoutsSettings::getDeckEditorDbHeaderState()
@@ -150,17 +128,6 @@ QByteArray LayoutsSettings::getGamePlayAreaGeometry()
     return getValue(GEOMETRY_PROP, GROUP_GAME_PLAY_AREA).toByteArray();
 }
 
-void LayoutsSettings::setGamePlayAreaWidgetSize(const QString &widgetName, const QSize &value)
-{
-    setValue(value, widgetName, GROUP_GAME_PLAY_AREA, SIZE_PROP);
-}
-
-QSize LayoutsSettings::getGamePlayAreaWidgetSize(const QString &widgetName, const QSize &defaultValue)
-{
-    QVariant previous = getValue(widgetName, GROUP_GAME_PLAY_AREA, SIZE_PROP);
-    return previous == QVariant() ? defaultValue : previous.toSize();
-}
-
 void LayoutsSettings::setReplayPlayAreaGeometry(const QByteArray &value)
 {
     setValue(value, GEOMETRY_PROP, GROUP_REPLAY_PLAY_AREA);
@@ -179,15 +146,4 @@ QByteArray LayoutsSettings::getReplayPlayAreaLayoutState()
 QByteArray LayoutsSettings::getReplayPlayAreaGeometry()
 {
     return getValue(GEOMETRY_PROP, GROUP_REPLAY_PLAY_AREA).toByteArray();
-}
-
-void LayoutsSettings::setReplayPlayAreaWidgetSize(const QString &widgetName, const QSize &value)
-{
-    setValue(value, widgetName, GROUP_REPLAY_PLAY_AREA, SIZE_PROP);
-}
-
-QSize LayoutsSettings::getReplayPlayAreaWidgetSize(const QString &widgetName, const QSize &defaultValue)
-{
-    QVariant previous = getValue(widgetName, GROUP_REPLAY_PLAY_AREA, SIZE_PROP);
-    return previous == QVariant() ? defaultValue : previous.toSize();
 }

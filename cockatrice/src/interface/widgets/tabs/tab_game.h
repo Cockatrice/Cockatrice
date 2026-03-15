@@ -165,7 +165,6 @@ private slots:
     void notifyPlayerKicked();
     void processPlayerLeave(Player *leavingPlayer);
     void actResetLayout();
-    void freeDocksSize();
 
     void hideEvent(QHideEvent *event) override;
 

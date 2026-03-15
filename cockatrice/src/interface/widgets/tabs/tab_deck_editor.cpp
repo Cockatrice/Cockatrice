@@ -143,17 +143,6 @@ void TabDeckEditor::loadLayout()
         restoreState(layoutState);
         restoreGeometry(layouts.getDeckEditorGeometry());
     }
-
-    for (auto it = dockToActions.constKeyValueBegin(); it != dockToActions.constKeyValueEnd(); ++it) {
-        auto dockWidget = it->first;
-        auto actions = it->second;
-
-        QSize size = layouts.getDeckEditorWidgetSize(dockWidget->objectName(), actions.defaultSize);
-        dockWidget->setMinimumSize(size);
-        dockWidget->setMaximumSize(size);
-    }
-
-    QTimer::singleShot(100, this, &TabDeckEditor::freeDocksSize);
 }
 
 /**
@@ -177,17 +166,6 @@ void TabDeckEditor::restartLayout()
     splitDockWidget(printingSelectorDockWidget, deckDockWidget, Qt::Horizontal);
     splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Horizontal);
     splitDockWidget(cardInfoDockWidget, filterDockWidget, Qt::Vertical);
-
-    QTimer::singleShot(100, this, &TabDeckEditor::freeDocksSize);
-}
-
-/** @brief Frees dock sizes to allow flexible resizing. */
-void TabDeckEditor::freeDocksSize()
-{
-    for (auto dockWidget : dockToActions.keys()) {
-        dockWidget->setMinimumSize(100, 100);
-        dockWidget->setMaximumSize(5000, 5000);
-    }
 }
 
 /**
@@ -202,10 +180,6 @@ bool TabDeckEditor::eventFilter(QObject *o, QEvent *e)
         LayoutsSettings &layouts = SettingsCache::instance().layouts();
         layouts.setDeckEditorLayoutState(saveState());
         layouts.setDeckEditorGeometry(saveGeometry());
-
-        for (auto dockWidget : dockToActions.keys()) {
-            layouts.setDeckEditorWidgetSize(dockWidget->objectName(), dockWidget->size());
-        }
     }
     return false;
 }
