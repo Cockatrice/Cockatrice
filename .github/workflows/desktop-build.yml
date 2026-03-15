@@ -349,8 +349,8 @@ jobs:
       - name: Setup ${{ matrix.ccache_variant }}
         uses: hendrikmuhs/ccache-action@v1.2.20
         with:
-          key: ${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master
-          restore-keys: ${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master-
+          key: ${{ matrix.ccache_variant}}-${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master
+          restore-keys: ${{ matrix.ccache_variant}}-${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master-
           max-size: 500M
           variant: ${{ matrix.ccache_variant }}
           save: false
