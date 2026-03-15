@@ -68,7 +68,8 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             }
         }
         static_cast<GameScene *>(scene())->resizeRubberBand(
-            deviceTransform(static_cast<GameScene *>(scene())->getViewportTransform()).map(pos));
+            deviceTransform(static_cast<GameScene *>(scene())->getViewportTransform()).map(pos),
+            cardsInSelectionRect.size());
         event->accept();
     }
 }

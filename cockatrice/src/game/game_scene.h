@@ -163,7 +163,7 @@ public:
     /** Unregisters a card from animation updates. */
     void unregisterAnimationItem(AbstractCardItem *card);
     void startRubberBand(const QPointF &selectionOrigin);
-    void resizeRubberBand(const QPointF &cursorPoint);
+    void resizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void stopRubberBand();
 
 public slots:
@@ -196,7 +196,7 @@ protected:
 
 signals:
     void sigStartRubberBand(const QPointF &selectionOrigin);
-    void sigResizeRubberBand(const QPointF &cursorPoint);
+    void sigResizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void sigStopRubberBand();
 };
 
