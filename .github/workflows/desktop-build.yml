@@ -462,7 +462,7 @@ jobs:
           key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
 
       - name: Sign app bundle
-        if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
+        if: matrix.os == 'macOS' && matrix.make_package
         id: sign_macos
         env:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
@@ -475,7 +475,7 @@ jobs:
           fi
 
       - name: Notarize app bundle
-        if: steps.sign_macos.outcome == 'success'
+        if: steps.sign_macos.outcome == 'success' && needs.configure.outputs.tag != null
         env:
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
