@@ -1,7 +1,7 @@
 #!/bin/bash
 # Reports GitHub Actions cache usage, grouped by key prefix (first segment before "-" or "/") or for one prefix.
 #
-# Usage: .ci/gh_buildkit_cache_usage.sh [-m|--markdown] [key-prefix]
+# Usage: .ci/gha_cache_usage.sh [-m|--markdown] [key-prefix]
 #   -m, --markdown  output as a markdown table
 #   No key-prefix:  all caches grouped by prefix.
 #   One arg:        caches with that key prefix (default buildkit-blob).
