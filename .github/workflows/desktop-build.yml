@@ -153,7 +153,7 @@ jobs:
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
     env:
       NAME: ${{matrix.distro}}${{matrix.version}}
-      CACHE_DIR: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
+      CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 550M
@@ -169,7 +169,7 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{env.CACHE_DIR}}
+          path: ${{env.CACHE}}
           key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
           restore-keys: ccache-${{matrix.distro}}${{matrix.version}}-
 
@@ -213,7 +213,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@v5
         with:
-          path: ${{env.CACHE_DIR}}
+          path: ${{env.CACHE}}
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Upload artifact
