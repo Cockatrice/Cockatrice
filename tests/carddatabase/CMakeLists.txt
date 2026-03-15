@@ -7,13 +7,6 @@ project(CardDatabaseTests VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MI
 add_definitions("-DCARDDB_DATADIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"")
 
 # ------------------------
-# Qt modules
-# ------------------------
-set(TEST_QT_MODULES ${COCKATRICE_QT_VERSION_NAME}::Concurrent ${COCKATRICE_QT_VERSION_NAME}::Network
-                    ${COCKATRICE_QT_VERSION_NAME}::Widgets ${COCKATRICE_QT_VERSION_NAME}::Svg
-)
-
-# ------------------------
 # Card Database Test
 # ------------------------
 add_executable(carddatabase_test ${MOCKS_SOURCES} ${VERSION_STRING_CPP} carddatabase_test.cpp mocks.cpp)
