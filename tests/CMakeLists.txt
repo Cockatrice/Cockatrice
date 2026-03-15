@@ -1,3 +1,5 @@
+# NOTE: Qt modules for tests are defined centrally in cmake/FindQtRuntime.cmake (the _TEST_NEEDED variable).
+# If a new test needs additional Qt modules, add them there — not in individual test CMakeLists.txt files.
 enable_testing()
 
 add_test(NAME dummy_test COMMAND dummy_test)
