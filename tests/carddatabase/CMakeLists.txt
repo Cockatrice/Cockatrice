@@ -30,23 +30,29 @@ add_test(NAME carddatabase_test COMMAND carddatabase_test)
 
 # ------------------------
 # Filter String Test
+# (guard must match the condition for libcockatrice_filters in the root CMakeLists.txt)
 # ------------------------
-add_executable(filter_string_test ${MOCKS_SOURCES} ${VERSION_STRING_CPP} filter_string_test.cpp mocks.cpp)
+if(WITH_ORACLE OR WITH_CLIENT)
+  add_executable(filter_string_test ${MOCKS_SOURCES} ${VERSION_STRING_CPP} filter_string_test.cpp mocks.cpp)
 
-target_link_libraries(
-  filter_string_test
-  PRIVATE libcockatrice_filters
-  PRIVATE Threads::Threads
-  PRIVATE ${GTEST_BOTH_LIBRARIES}
-  PRIVATE ${TEST_QT_MODULES}
-)
+  target_link_libraries(
+    filter_string_test
+    PRIVATE libcockatrice_filters
+    PRIVATE Threads::Threads
+    PRIVATE ${GTEST_BOTH_LIBRARIES}
+    PRIVATE ${TEST_QT_MODULES}
+  )
 
-add_test(NAME filter_string_test COMMAND filter_string_test)
+  add_test(NAME filter_string_test COMMAND filter_string_test)
+
+  if(NOT GTEST_FOUND)
+    add_dependencies(filter_string_test gtest)
+  endif()
+endif()
 
 # ------------------------
 # Dependencies on gtest
 # ------------------------
 if(NOT GTEST_FOUND)
   add_dependencies(carddatabase_test gtest)
-  add_dependencies(filter_string_test gtest)
 endif()
