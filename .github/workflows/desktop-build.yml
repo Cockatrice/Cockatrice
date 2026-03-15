@@ -166,12 +166,11 @@ jobs:
       - name: Restore compiler cache (ccache)
         id: ccache_restore
         uses: actions/cache/restore@v5
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           path: ${{env.CACHE}}
-          key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.distro}}${{matrix.version}}-
+          key: ccache-${{matrix.distro}}${{matrix.version}}-master
+          restore-keys: |
+            ccache-${{matrix.distro}}${{matrix.version}}-master-
 
       - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
         shell: bash
@@ -269,7 +268,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            use_ccache: 1
+            ccache_variant: ccache
 
           - os: macOS
             target: 14
@@ -283,7 +282,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            use_ccache: 1
+            ccache_variant: ccache
 
           - os: macOS
             target: 15
@@ -297,7 +296,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            use_ccache: 1
+            ccache_variant: ccache
 
           - os: macOS
             target: 15
@@ -309,7 +308,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            use_ccache: 1
+            ccache_variant: ccache
 
           - os: Windows
             target: 10
@@ -322,14 +321,14 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: "Visual Studio 17 2022"
             cmake_generator_platform: x64
+            ccache_variant: sccache
 
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
     env:
-      CCACHE_DIR: ${{github.workspace}}/.cache/
-      # Cache size over the entire repo is 10Gi:
-      # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
+      CCACHE_DIR: ${{ github.workspace }}/.cache/
+      SCCACHE_DIR: ${{ github.workspace }}/.cache/
       CCACHE_SIZE: 500M
 
     steps:
@@ -338,27 +337,27 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Add msbuild to PATH
-        if: matrix.os == 'Windows'
-        id: add-msbuild
-        uses: microsoft/setup-msbuild@v2
-        with:
-          msbuild-architecture: x64
-
-      - name: Setup ccache
-        if: matrix.use_ccache == 1 && matrix.os == 'macOS'
-        run: brew install ccache
-
       - name: Restore compiler cache (ccache)
-        if: matrix.use_ccache == 1
         id: ccache_restore
         uses: actions/cache/restore@v5
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{env.CCACHE_DIR}}
-          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-
+          path: ${{ github.workspace }}/.cache/
+          key: ${{ matrix.ccache_variant }}-${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master
+          restore-keys: |
+            ${{ matrix.ccache_variant }}-${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master-
+
+      - name: Setup ${{ matrix.ccache_variant }}
+        uses: hendrikmuhs/ccache-action@v1.2.20
+        with:
+          key: ${{ matrix.ccache_variant}}-${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master
+          restore-keys: ${{ matrix.ccache_variant}}-${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master-
+          max-size: 500M
+          variant: ${{ matrix.ccache_variant }}
+          save: false
+
+      - name: Setup MSVC (Windows)
+        if: matrix.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1.13.0
 
       - name: Install aqtinstall
         if: matrix.os == 'macOS'
@@ -432,11 +431,11 @@ jobs:
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '${{matrix.package_suffix}}'
           CMAKE_GENERATOR: ${{matrix.cmake_generator}}
-          CMAKE_GENERATOR_PLATFORM: ${{matrix.cmake_generator_platform}}
-          USE_CCACHE: ${{matrix.use_ccache}}
+          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform || '' }}
+          USE_CCACHE: 1
+          CCACHE_VARIANT: ${{ matrix.ccache_variant }}
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-          # macOS-specific environment variables, will be ignored on Windows
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
@@ -447,19 +446,17 @@ jobs:
 
       # Delete used cache to emulate a cache update. See https://github.com/actions/cache/issues/342.
       - name: Delete old compiler cache (ccache)
-        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1 && steps.ccache_restore.outputs.cache-hit && steps.build.outcome == 'success'
+        if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit && steps.build.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Save compiler cache (ccache)
-        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1
+        if: github.ref == 'refs/heads/master' && steps.build.outcome == 'success'
         uses: actions/cache/save@v5
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{env.CCACHE_DIR}}
-          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+          path: ${{ github.workspace }}/.cache/
+          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Sign app bundle
         if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
@@ -521,9 +518,9 @@ jobs:
         with:
           name: ${{steps.build.outputs.name}}-PDBs
           path: |
-            build/cockatrice/Release/*.pdb
-            build/oracle/Release/*.pdb
-            build/servatrice/Release/*.pdb
+            build/cockatrice/**/*.pdb
+            build/oracle/**/*.pdb
+            build/servatrice/**/*.pdb
           if-no-files-found: error
 
       - name: Upload to release
