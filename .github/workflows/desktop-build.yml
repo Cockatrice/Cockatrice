@@ -471,9 +471,33 @@ jobs:
         run: |
           if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
             security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-            /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose ${{steps.build.outputs.path}}
-            echo ""
+            codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose ${{steps.build.outputs.path}}
+            
+            echo "Inspect/Verify app signature"
             codesign -dv --verbose=4 ${{steps.build.outputs.path}}
+
+            codesign -dv --verbose=3 ${{steps.build.outputs.path}}
+
+            codesign -dv --verbose=2 ${{steps.build.outputs.path}}
+
+            codesign -dv --verbose=1 ${{steps.build.outputs.path}}
+
+            codesign -dv --verbose ${{steps.build.outputs.path}}
+
+            codesign --verify ${{steps.build.outputs.path}}
+
+            codesign --verify --deep ${{steps.build.outputs.path}}
+
+            codesign --verify --deep --verbose ${{steps.build.outputs.path}}
+
+            echo "Assess the application"
+            spctl --assess --type execute --verbose ${{steps.build.outputs.path}}
+
+            echo "Checking Gatekeepr conformance of the app"
+            codesign --verify --deep --strict --verbose=2 ${{steps.build.outputs.path}}
+
+            echo "Checking Gatekeepr conformance of the app 2"
+            spctl -a -t exec -vv ${{steps.build.outputs.path}}
           fi
 
       - name: Notarize app bundle
