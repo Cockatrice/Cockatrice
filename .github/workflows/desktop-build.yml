@@ -268,7 +268,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            ccache_variant: ccache
+            use_ccache: 1
 
           - os: macOS
             target: 14
@@ -282,7 +282,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            ccache_variant: ccache
+            use_ccache: 1
 
           - os: macOS
             target: 15
@@ -296,7 +296,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            ccache_variant: ccache
+            use_ccache: 1
 
           - os: macOS
             target: 15
@@ -308,7 +308,7 @@ jobs:
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            ccache_variant: ccache
+            use_ccache: 1
 
           - os: Windows
             target: 10
@@ -320,14 +320,14 @@ jobs:
             qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
-            ccache_variant: sccache
 
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
-      SCCACHE_DIR: ${{ github.workspace }}/.cache/
+      # Cache size over the entire repo is 10Gi:
+      # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 500M
 
     steps:
@@ -336,23 +336,20 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setup ccache
+        if: matrix.use_ccache == 1 && matrix.os == 'macOS'
+        run: brew install ccache
+
       - name: Restore compiler cache (ccache)
+        if: matrix.use_ccache == 1
         id: ccache_restore
         uses: actions/cache/restore@v5
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{ github.workspace }}/.cache/
-          key: ${{ matrix.ccache_variant }}-${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master
-          restore-keys: |
-            ${{ matrix.ccache_variant }}-${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master-
-
-      - name: Setup ${{ matrix.ccache_variant }}
-        uses: hendrikmuhs/ccache-action@v1.2.20
-        with:
-          key: ${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master
-          restore-keys: ${{ matrix.runner }}-${{ matrix.soc || 'Windows' }}-${{ matrix.type }}-master-
-          max-size: 500M
-          variant: ${{ matrix.ccache_variant }}
-          save: false
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
+          restore-keys: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-
 
       - name: Setup MSVC (Windows)
         if: matrix.os == 'Windows'
@@ -431,8 +428,7 @@ jobs:
           PACKAGE_SUFFIX: '${{matrix.package_suffix}}'
           CMAKE_GENERATOR: ${{matrix.cmake_generator}}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform || '' }}
-          USE_CCACHE: 1
-          CCACHE_VARIANT: ${{ matrix.ccache_variant }}
+          USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
@@ -445,17 +441,19 @@ jobs:
 
       # Delete used cache to emulate a cache update. See https://github.com/actions/cache/issues/342.
       - name: Delete old compiler cache (ccache)
-        if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit && steps.build.outcome == 'success'
+        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1 && steps.ccache_restore.outputs.cache-hit && steps.build.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Save compiler cache (ccache)
-        if: github.ref == 'refs/heads/master' && steps.build.outcome == 'success'
+        if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1
         uses: actions/cache/save@v5
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{ github.workspace }}/.cache/
-          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
 
       - name: Sign app bundle
         if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null

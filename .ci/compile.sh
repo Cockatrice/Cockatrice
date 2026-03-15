@@ -12,7 +12,7 @@
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --dir <dir> sets the name of the build dir, default is "build"
 # --target-macos-version <version> sets the min os version - only used for macOS builds
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_VARIANT BUILD_DIR CMAKE_GENERATOR CMAKE_GENERATOR_PLATFORM TARGET_MACOS_VERSION
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR CMAKE_GENERATOR CMAKE_GENERATOR_PLATFORM TARGET_MACOS_VERSION
 # (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
 # exitcode: 1 for failure, 3 for invalid arguments
 
@@ -128,15 +128,10 @@ if [[ $MAKE_TEST ]]; then
   flags+=("-DTEST=1")
 fi
 if [[ $USE_CCACHE ]]; then
-  if [[ $CCACHE_VARIANT ]]; then
-    # COMPILER_LAUNCHER only; USE_CCACHE=OFF prevents RULE_LAUNCH_COMPILE (avoids Strawberry ccache on Windows)
-    flags+=("-DUSE_CCACHE=OFF" "-DCMAKE_C_COMPILER_LAUNCHER=$CCACHE_VARIANT" "-DCMAKE_CXX_COMPILER_LAUNCHER=$CCACHE_VARIANT")
-  else
-    flags+=("-DUSE_CCACHE=1")
-  fi
-  if [[ $CCACHE_SIZE && "$CCACHE_VARIANT" != "sccache" ]]; then
+  flags+=("-DUSE_CCACHE=1")
+  if [[ $CCACHE_SIZE ]]; then
     # note, this setting persists after running the script
-    "${CCACHE_VARIANT:-ccache}" --max-size "$CCACHE_SIZE"
+    ccache --max-size "$CCACHE_SIZE"
   fi
 fi
 if [[ $PACKAGE_TYPE ]]; then
@@ -158,16 +153,12 @@ fi
 buildflags=(--config "$BUILDTYPE")
 
 function ccachestatsverbose() {
-  local launcher="${CCACHE_VARIANT:-ccache}"
-  if [[ $launcher == "sccache" ]]; then
-    sccache -s
+  # note, verbose only works on newer ccache, discard the error
+  local got
+  if got="$(ccache --show-stats --verbose 2>/dev/null)"; then
+    echo "$got"
   else
-    local got
-    if got="$("$launcher" --show-stats --verbose 2>/dev/null)"; then
-      echo "$got"
-    else
-      "$launcher" --show-stats
-    fi
+    ccache --show-stats
   fi
 }
 
