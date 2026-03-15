@@ -135,13 +135,14 @@ if(UNIX)
     endif()
   endif()
 elseif(WIN32)
-  set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
+  set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
 endif()
 
 # Define proper compilation flags
 if(MSVC)
   # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
-  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi")
+  # /Zi /FS for Ninja + /MP parallel builds (FS allows multiple cl.exe to write PDB)
+  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi /FS")
   # Visual Studio: Maximum Optimization, Multi-threaded DLL
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
   # Visual Studio: No Optimization, Multi-threaded Debug DLL
@@ -254,7 +255,9 @@ endif()
 set(CPACK_PACKAGE_CONTACT "Zach Halpern <zach@cockatrice.us>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
-set(CPACK_PACKAGE_DESCRIPTION "Cockatrice is an open-source, multiplatform application for playing tabletop card games over a network. The program's server design prevents users from manipulating the game for unfair advantage. The client also provides a single-player mode, which allows users to brew while offline.")
+set(CPACK_PACKAGE_DESCRIPTION
+    "Cockatrice is an open-source, multiplatform application for playing tabletop card games over a network. The program's server design prevents users from manipulating the game for unfair advantage. The client also provides a single-player mode, which allows users to brew while offline."
+)
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
@@ -309,7 +312,7 @@ if(UNIX)
   endif()
 elseif(WIN32)
   set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
-  if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "(x64)")
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(TRICE_IS_64_BIT 1)
   else()
     set(TRICE_IS_64_BIT 0)

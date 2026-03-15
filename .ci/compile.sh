@@ -12,7 +12,7 @@
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
 # --dir <dir> sets the name of the build dir, default is "build"
 # --target-macos-version <version> sets the min os version - only used for macOS builds
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR CMAKE_GENERATOR CMAKE_GENERATOR_PLATFORM TARGET_MACOS_VERSION
 # (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
 # exitcode: 1 for failure, 3 for invalid arguments
 
@@ -141,6 +141,14 @@ if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
 fi
 
+cmake_args=()
+if [[ $CMAKE_GENERATOR ]]; then
+  cmake_args+=(-G "$CMAKE_GENERATOR")
+  if [[ $CMAKE_GENERATOR_PLATFORM ]]; then
+    cmake_args+=(-A "$CMAKE_GENERATOR_PLATFORM")
+  fi
+fi
+
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")
 
@@ -227,9 +235,8 @@ if [[ $RUNNER_OS == macOS ]]; then
     flags+=(-DCPACK_COMMAND_HDIUTIL="$hdiutil_script")
   fi
 
-elif [[ $RUNNER_OS == Windows ]]; then
+elif [[ $RUNNER_OS == Windows ]] && [[ "$CMAKE_GENERATOR" != *Ninja* ]]; then
   # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
-  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
   buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
 fi
 
@@ -242,7 +249,7 @@ fi
 echo "::group::Configure cmake"
 cmake --version
 echo "Running cmake with flags: ${flags[*]}"
-cmake .. "${flags[@]}"
+cmake "${cmake_args[@]}" .. "${flags[@]}"
 echo "::endgroup::"
 
 echo "::group::Build project"

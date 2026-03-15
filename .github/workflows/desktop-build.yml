@@ -166,12 +166,11 @@ jobs:
       - name: Restore compiler cache (ccache)
         id: ccache_restore
         uses: actions/cache/restore@v5
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           path: ${{env.CACHE}}
-          key: ccache-${{matrix.distro}}${{matrix.version}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.distro}}${{matrix.version}}-
+          key: ccache-${{matrix.distro}}${{matrix.version}}-master
+          restore-keys: |
+            ccache-${{matrix.distro}}${{matrix.version}}-master-
 
       - name: Build ${{matrix.distro}} ${{matrix.version}} Docker image
         shell: bash
@@ -320,14 +319,13 @@ jobs:
             qt_version: 6.10.*
             qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cmake_generator: "Visual Studio 17 2022"
-            cmake_generator_platform: x64
+            cmake_generator: Ninja
 
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
     env:
-      CCACHE_DIR: ${{github.workspace}}/.cache/
+      CCACHE_DIR: ${{ github.workspace }}/.cache/
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 500M
@@ -337,13 +335,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           submodules: recursive
-
-      - name: Add msbuild to PATH
-        if: matrix.os == 'Windows'
-        id: add-msbuild
-        uses: microsoft/setup-msbuild@v2
-        with:
-          msbuild-architecture: x64
 
       - name: Setup ccache
         if: matrix.use_ccache == 1 && matrix.os == 'macOS'
@@ -356,9 +347,13 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{env.CCACHE_DIR}}
-          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
+          restore-keys: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-
+
+      - name: Setup MSVC (Windows)
+        if: matrix.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1.13.0
 
       - name: Install aqtinstall
         if: matrix.os == 'macOS'
@@ -432,11 +427,10 @@ jobs:
           MAKE_PACKAGE: '${{matrix.make_package}}'
           PACKAGE_SUFFIX: '${{matrix.package_suffix}}'
           CMAKE_GENERATOR: ${{matrix.cmake_generator}}
-          CMAKE_GENERATOR_PLATFORM: ${{matrix.cmake_generator_platform}}
-          USE_CCACHE: ${{matrix.use_ccache}}
+          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform || '' }}
+          USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-          # macOS-specific environment variables, will be ignored on Windows
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
@@ -458,8 +452,8 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{env.CCACHE_DIR}}
-          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
 
       - name: Sign app bundle
         if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
@@ -521,9 +515,9 @@ jobs:
         with:
           name: ${{steps.build.outputs.name}}-PDBs
           path: |
-            build/cockatrice/Release/*.pdb
-            build/oracle/Release/*.pdb
-            build/servatrice/Release/*.pdb
+            build/cockatrice/**/*.pdb
+            build/oracle/**/*.pdb
+            build/servatrice/**/*.pdb
           if-no-files-found: error
 
       - name: Upload to release
