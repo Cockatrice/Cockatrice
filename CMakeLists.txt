@@ -140,15 +140,20 @@ endif()
 
 # Define proper compilation flags
 if(MSVC)
-  # /Z7 when using compiler launcher (sccache): avoids C1041 PDB lock with parallel cached compiles
-  # /Zi /FS otherwise for Ninja + /MP parallel builds
-  if(CMAKE_CXX_COMPILER_LAUNCHER)
+  # /Z7 when using compiler launcher (sccache/ccache): avoids C1041 PDB lock with parallel cached compiles
+  # /Zi /FS otherwise for Ninja + /MP parallel builds. Check both launchers since CI sets C and CXX.
+  if(CMAKE_C_COMPILER_LAUNCHER OR CMAKE_CXX_COMPILER_LAUNCHER)
     set(_msvc_debug_format " /Z7")
   else()
     set(_msvc_debug_format " /Zi /FS")
   endif()
   # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
   set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc${_msvc_debug_format}")
+  # Apply same debug format to C (e.g. libcockatrice_rng SFMT.c) so launcher builds avoid PDB lock
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}${_msvc_debug_format}")
+  if(CMAKE_C_COMPILER_LAUNCHER OR CMAKE_CXX_COMPILER_LAUNCHER)
+    string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
+  endif()
   # Visual Studio: Maximum Optimization, Multi-threaded DLL
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
   # Visual Studio: No Optimization, Multi-threaded Debug DLL
