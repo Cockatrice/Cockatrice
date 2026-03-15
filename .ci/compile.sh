@@ -244,7 +244,7 @@ if [[ $RUNNER_OS == macOS ]]; then
     flags+=(-DCPACK_COMMAND_HDIUTIL="$hdiutil_script")
   fi
 
-elif [[ $RUNNER_OS == Windows ]] && [[ "$CMAKE_GENERATOR" != *Ninja* ]]; then
+elif [[ $RUNNER_OS == Windows ]]; then
   # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
   buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
 fi
