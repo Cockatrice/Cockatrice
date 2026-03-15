@@ -361,15 +361,12 @@ jobs:
           restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-
 
       - name: Install aqtinstall
-        if: matrix.os == 'macOS'
         run: pipx install aqtinstall
 
-      # Checking if there's a newer, uncached version of Qt available to install via aqtinstall
+      # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version via aqtinstall to avoid stale caches on new releases
       - name: Resolve latest Qt patch version
-        if: matrix.os == 'macOS'
         id: resolve_qt_version
         shell: bash
-        # Ouputs the version of Qt to install via aqtinstall
         run: .ci/resolve_latest_aqt_qt_version.sh "${{matrix.qt_version}}"
 
       - name: Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries (${{ matrix.soc }} macOS)
@@ -386,10 +383,10 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
-          cache: false
           version: ${{ steps.resolve_qt_version.outputs.version }}
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
+          cache: false
           dir: ${{github.workspace}}
 
       - name: Thin Qt libraries (${{ matrix.soc }} macOS)
@@ -407,7 +404,7 @@ jobs:
         if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
-          version: ${{matrix.qt_version}}
+          version: ${{ steps.resolve_qt_version.outputs.version }}
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
           cache: true
