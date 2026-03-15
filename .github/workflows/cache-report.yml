@@ -1,0 +1,31 @@
+# Reports GitHub Actions cache usage grouped by key prefix (e.g. buildkit, ccache, vcpkg).
+# Run locally: .ci/gha_cache_usage.sh
+
+name: Cache usage report
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  report:
+    name: GHA cache usage
+    runs-on: ubuntu-slim
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Report cache usage
+        id: cache_report
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ./.ci/gha_cache_usage.sh --markdown | tee report.txt
+          cat report.txt >> "$GITHUB_STEP_SUMMARY"
