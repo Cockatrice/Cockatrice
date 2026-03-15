@@ -117,6 +117,7 @@ public slots:
      * @param image Loaded QImage.
      */
     void imageLoaded(const ExactCard &card, const QImage &image);
+    void saveCardImageToLocalStorage(const ExactCard &card, const QPixmap &pixmap);
 
 private slots:
     /**
