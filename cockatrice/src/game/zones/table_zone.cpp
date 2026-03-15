@@ -382,3 +382,11 @@ int TableZone::clampValidTableRow(const int row)
         return TABLEROWS - 1;
     return row;
 }
+
+int TableZone::tableRowToGridY(int tableRow)
+{
+    if (tableRow > 2) {
+        tableRow = 1;
+    }
+    return clampValidTableRow(2 - tableRow);
+}
