@@ -67,11 +67,6 @@ protected slots:
     void restartLayout() override;
 
     /**
-     * @brief Set size restrictions for free floating dock widgets.
-     */
-    void freeDocksSize() override;
-
-    /**
      * @brief Refresh keyboard shortcuts for this tab.
      */
     void refreshShortcuts() override;

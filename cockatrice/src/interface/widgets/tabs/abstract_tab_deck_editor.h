@@ -237,7 +237,6 @@ protected slots:
     // UI Layout Management
     virtual void loadLayout() = 0;
     virtual void restartLayout() = 0;
-    virtual void freeDocksSize() = 0;
     virtual void refreshShortcuts() = 0;
 
     /** @brief Handles dock close events. */

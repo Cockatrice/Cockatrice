@@ -246,15 +246,6 @@ void TabDeckEditorVisual::showPrintingSelector()
     printingSelectorDockWidget->setVisible(true);
 }
 
-/** @brief Set size restrictions for free floating dock widgets. */
-void TabDeckEditorVisual::freeDocksSize()
-{
-    for (auto dockWidget : dockToActions.keys()) {
-        dockWidget->setMinimumSize(100, 100);
-        dockWidget->setMaximumSize(5000, 5000);
-    }
-}
-
 /** @brief Refreshes keyboard shortcuts for this tab from settings. */
 void TabDeckEditorVisual::refreshShortcuts()
 {
@@ -273,17 +264,6 @@ void TabDeckEditorVisual::loadLayout()
         restoreState(layoutState);
         restoreGeometry(layouts.getVisualDeckEditorGeometry());
     }
-
-    for (auto it = dockToActions.constKeyValueBegin(); it != dockToActions.constKeyValueEnd(); ++it) {
-        auto dockWidget = it->first;
-        auto actions = it->second;
-
-        QSize size = layouts.getVisualDeckEditorWidgetSize(dockWidget->objectName(), actions.defaultSize);
-        dockWidget->setMinimumSize(size);
-        dockWidget->setMaximumSize(size);
-    }
-
-    QTimer::singleShot(100, this, &TabDeckEditorVisual::freeDocksSize);
 }
 
 /** @brief Resets the layout to default positions and dock states. */
@@ -346,10 +326,6 @@ bool TabDeckEditorVisual::eventFilter(QObject *o, QEvent *e)
         LayoutsSettings &layouts = SettingsCache::instance().layouts();
         layouts.setVisualDeckEditorLayoutState(saveState());
         layouts.setVisualDeckEditorGeometry(saveGeometry());
-
-        for (auto dockWidget : dockToActions.keys()) {
-            layouts.setVisualDeckEditorWidgetSize(dockWidget->objectName(), dockWidget->size());
-        }
     }
     return false;
 }
