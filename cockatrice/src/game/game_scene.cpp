@@ -521,9 +521,9 @@ void GameScene::startRubberBand(const QPointF &selectionOrigin)
     emit sigStartRubberBand(selectionOrigin);
 }
 
-void GameScene::resizeRubberBand(const QPointF &cursorPoint)
+void GameScene::resizeRubberBand(const QPointF &cursorPoint, int selectedCount)
 {
-    emit sigResizeRubberBand(cursorPoint);
+    emit sigResizeRubberBand(cursorPoint, selectedCount);
 }
 
 void GameScene::stopRubberBand()
