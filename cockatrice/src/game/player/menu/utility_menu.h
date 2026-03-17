@@ -7,17 +7,19 @@
 #ifndef COCKATRICE_UTILITY_MENU_H
 #define COCKATRICE_UTILITY_MENU_H
 
+#include "abstract_player_component.h"
+
 #include <QMenu>
 
 class Player;
-class UtilityMenu : public QMenu
+class UtilityMenu : public QMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
 public slots:
     void populatePredefinedTokensMenu();
-    void retranslateUi();
-    void setShortcutsActive();
-    void setShortcutsInactive();
+    void retranslateUi() override;
+    void setShortcutsActive() override;
+    void setShortcutsInactive() override;
 
 public:
     explicit UtilityMenu(Player *player, QMenu *playerMenu);
