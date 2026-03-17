@@ -513,7 +513,7 @@ private:
         {"Player/aPlay", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Play Card"),
                                      parseSequenceString(""),
                                      ShortcutGroup::Playing_Area)},
-        {"Player/aPlayFacedown", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Battlefield, Face Down"),
+        {"Player/aPlayFacedown", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Play Card, Face Down"),
                                              parseSequenceString(""),
                                              ShortcutGroup::Playing_Area)},
         {"Player/aAttach", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Attach Card..."),
