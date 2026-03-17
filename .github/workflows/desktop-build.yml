@@ -475,19 +475,16 @@ jobs:
             
             echo "Inspect/Verify app signature"
             codesign -dv --verbose=4 ${{steps.build.outputs.path}}
-
-            codesign -dv --verbose=3 ${{steps.build.outputs.path}}
-
-            codesign -dv --verbose=2 ${{steps.build.outputs.path}}
-
+            echo "."
             codesign -dv --verbose=1 ${{steps.build.outputs.path}}
-
+            echo "."
             codesign -dv --verbose ${{steps.build.outputs.path}}
 
+            echo "..."
             codesign --verify ${{steps.build.outputs.path}}
-
+            echo "."
             codesign --verify --deep ${{steps.build.outputs.path}}
-
+            echo "."
             codesign --verify --deep --verbose ${{steps.build.outputs.path}}
 
             echo "Assess the application"
