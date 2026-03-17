@@ -146,11 +146,10 @@ void CardMenu::createTableMenu(bool canModifyCard)
 {
     // Card is on the battlefield
     if (!canModifyCard) {
+        addAction(aDrawArrow);
+        addSeparator();
         addRelatedCardView();
         addRelatedCardActions();
-
-        addSeparator();
-        addAction(aDrawArrow);
         addSeparator();
         addAction(aClone);
         addSeparator();
@@ -165,10 +164,9 @@ void CardMenu::createTableMenu(bool canModifyCard)
     if (card->getFaceDown()) {
         addAction(aPeek);
     }
-
-    addRelatedCardView();
-    addRelatedCardActions();
-
+    addSeparator();
+    addAction(aClone);
+    addMenu(new MoveMenu(player));
     addSeparator();
     addAction(aAttach);
     if (card->getAttachedTo()) {
@@ -178,9 +176,6 @@ void CardMenu::createTableMenu(bool canModifyCard)
     addSeparator();
     addMenu(new PtMenu(player));
     addAction(aSetAnnotation);
-    addSeparator();
-    addAction(aClone);
-    addMenu(new MoveMenu(player));
     addSeparator();
     addAction(aSelectAll);
     addAction(aSelectRow);
@@ -197,30 +192,35 @@ void CardMenu::createTableMenu(bool canModifyCard)
     }
     addSeparator();
     addMenu(mCardCounters);
+    addRelatedCardView();
+    addRelatedCardActions();
 }
 
 void CardMenu::createStackMenu(bool canModifyCard)
 {
     // Card is on the stack
-    if (canModifyCard) {
-        addAction(aPlay);
-        addSeparator();
-
-        addAction(aAttach);
+    if (!canModifyCard) {
         addAction(aDrawArrow);
         addSeparator();
-        addAction(aClone);
-        addMenu(new MoveMenu(player));
-        addSeparator();
-        addAction(aSelectAll);
-    } else {
-        addAction(aDrawArrow);
+        addRelatedCardView();
+        addRelatedCardActions();
         addSeparator();
         addAction(aClone);
         addSeparator();
         addAction(aSelectAll);
+        return;
     }
 
+    addAction(aPlay);
+    addAction(aPlayFacedown);
+    addSeparator();
+    addAction(aClone);
+    addMenu(new MoveMenu(player));
+    addSeparator();
+    addAction(aAttach);
+    addAction(aDrawArrow);
+    addSeparator();
+    addAction(aSelectAll);
     addRelatedCardView();
     addRelatedCardActions();
 }
@@ -228,29 +228,30 @@ void CardMenu::createStackMenu(bool canModifyCard)
 void CardMenu::createGraveyardOrExileMenu(bool canModifyCard)
 {
     // Card is in the graveyard or exile
-    if (canModifyCard) {
-        addAction(aPlay);
-        addAction(aPlayFacedown);
-
-        addSeparator();
-        addAction(aClone);
-        addMenu(new MoveMenu(player));
-        addSeparator();
-        addAction(aSelectAll);
-        addAction(aSelectColumn);
-
-        addSeparator();
-        addAction(aAttach);
+    if (!canModifyCard) {
         addAction(aDrawArrow);
-    } else {
+        addSeparator();
+        addRelatedCardView();
+        addRelatedCardActions();
+        addSeparator();
         addAction(aClone);
         addSeparator();
         addAction(aSelectAll);
         addAction(aSelectColumn);
-        addSeparator();
-        addAction(aDrawArrow);
+        return;
     }
 
+    addAction(aPlay);
+    addAction(aPlayFacedown);
+    addSeparator();
+    addAction(aClone);
+    addMenu(new MoveMenu(player));
+    addSeparator();
+    addAction(aAttach);
+    addAction(aDrawArrow);
+    addSeparator();
+    addAction(aSelectAll);
+    addAction(aSelectColumn);
     addRelatedCardView();
     addRelatedCardActions();
 }

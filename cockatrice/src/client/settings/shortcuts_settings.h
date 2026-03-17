@@ -562,7 +562,7 @@ private:
                                                  ShortcutGroup::Move_selected)},
         {"Player/aPlayFacedown", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Battlefield, Face Down"),
                                              parseSequenceString(""),
-                                             ShortcutGroup::Move_selected)},
+                                             ShortcutGroup::Playing_Area)},
         {"Player/aMoveToTable", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Battlefield"),
                                             parseSequenceString(""),
                                             ShortcutGroup::Move_selected)},
