@@ -17,6 +17,7 @@ Available pre-compiled binaries for installation:
    • <kbd>macOS 13+</kbd> <sub><i>Ventura</i></sub> <sub>Intel</sub>
 
   <b>Linux</b>
+   • <kbd>Ubuntu 26.04 LTS</kbd> <sub><i>Resolute Racoon</i></sub>
    • <kbd>Ubuntu 24.04 LTS</kbd> <sub><i>Noble Numbat</i></sub>
    • <kbd>Ubuntu 22.04 LTS</kbd> <sub><i>Jammy Jellyfish</i></sub>
    • <kbd>Debian 13</kbd> <sub><i>Trixie</i></sub>
