@@ -12,8 +12,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_string.h>
 
-DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QStringList exprs, uint _numberOfHits, bool autoPlay)
-    : QDialog(parent)
+DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, const MoveTopCardsUntilOptions &options) : QDialog(parent)
 {
     exprLabel = new QLabel(tr("Card name (or search expressions):"));
 
@@ -21,13 +20,13 @@ DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QStringList exprs, u
     exprComboBox->setFocus();
     exprComboBox->setEditable(true);
     exprComboBox->setInsertPolicy(QComboBox::InsertAtTop);
-    exprComboBox->insertItems(0, exprs);
+    exprComboBox->insertItems(0, options.exprs);
     exprLabel->setBuddy(exprComboBox);
 
     numberOfHitsLabel = new QLabel(tr("Number of hits:"));
     numberOfHitsEdit = new QSpinBox(this);
     numberOfHitsEdit->setRange(1, 99);
-    numberOfHitsEdit->setValue(_numberOfHits);
+    numberOfHitsEdit->setValue(options.numberOfHits);
     numberOfHitsLabel->setBuddy(numberOfHitsEdit);
 
     auto *grid = new QGridLayout;
@@ -35,7 +34,7 @@ DlgMoveTopCardsUntil::DlgMoveTopCardsUntil(QWidget *parent, QStringList exprs, u
     grid->addWidget(numberOfHitsEdit, 0, 1);
 
     autoPlayCheckBox = new QCheckBox(tr("Auto play hits"));
-    autoPlayCheckBox->setChecked(autoPlay);
+    autoPlayCheckBox->setChecked(options.autoPlay);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgMoveTopCardsUntil::validateAndAccept);
@@ -118,6 +117,13 @@ QString DlgMoveTopCardsUntil::getExpr() const
     return exprComboBox->currentText();
 }
 
+MoveTopCardsUntilOptions DlgMoveTopCardsUntil::getOptions() const
+{
+    return {.exprs = getExprs(),
+            .numberOfHits = numberOfHitsEdit->text().toInt(),
+            .autoPlay = autoPlayCheckBox->isChecked()};
+}
+
 QStringList DlgMoveTopCardsUntil::getExprs() const
 {
     QStringList exprs;
@@ -125,14 +131,4 @@ QStringList DlgMoveTopCardsUntil::getExprs() const
         exprs.append(exprComboBox->itemText(i));
     }
     return exprs;
-}
-
-uint DlgMoveTopCardsUntil::getNumberOfHits() const
-{
-    return numberOfHitsEdit->text().toUInt();
-}
-
-bool DlgMoveTopCardsUntil::isAutoPlay() const
-{
-    return autoPlayCheckBox->isChecked();
 }
