@@ -20,6 +20,7 @@ DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
     numberPlayersLabel->setBuddy(numberPlayersEdit);
 
     auto *generalGrid = new QGridLayout;
+    generalGrid->setContentsMargins(5, 5, 5, 5);
     generalGrid->addWidget(numberPlayersLabel, 0, 0);
     generalGrid->addWidget(numberPlayersEdit, 0, 1);
     generalGroupBox = new QGroupBox(tr("General"), this);
@@ -33,6 +34,7 @@ DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
     startingLifeTotalLabel->setBuddy(startingLifeTotalEdit);
 
     auto *gameSetupGrid = new QGridLayout;
+    gameSetupGrid->setContentsMargins(5, 5, 5, 5);
     gameSetupGrid->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupGrid->addWidget(startingLifeTotalEdit, 0, 1);
     gameSetupOptionsGroupBox = new QGroupBox(tr("Game setup options"), this);
