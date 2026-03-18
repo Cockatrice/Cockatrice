@@ -9,6 +9,7 @@
 #define COCKATRICE_PLAYER_ACTIONS_H
 #include "../dialogs/dlg_create_token.h"
 #include "../dialogs/dlg_move_top_cards_until.h"
+#include "../dialogs/dlg_select_all_matching.h"
 #include "event_processing_options.h"
 #include "player.h"
 
@@ -119,6 +120,7 @@ public slots:
     void actSelectAll();
     void actSelectRow();
     void actSelectColumn();
+    void actSelectAllMatching();
 
     void actViewLibrary();
     void actViewHand();
@@ -182,6 +184,8 @@ private:
     FilterString movingCardsUntilFilter;
     int movingCardsUntilCounter = 0;
     MoveTopCardsUntilOptions movingCardsUntilOptions;
+
+    SelectAllMatchingOptions lastSelectAllMatchingOptions;
 
     void moveTopCardsTo(const QString &targetZone, const QString &zoneDisplayName, bool faceDown);
     void moveBottomCardsTo(const QString &targetZone, const QString &zoneDisplayName, bool faceDown);
