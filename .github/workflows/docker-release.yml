@@ -64,4 +64,4 @@ jobs:
           labels: ${{ steps.metadata.outputs.labels }}
           annotations: ${{ steps.metadata.outputs.annotations }}
           cache-from: type=gha,scope=servatrice
-          cache-to: type=gha,mode=max,scope=servatrice
+          cache-to: ${{ github.ref == 'refs/heads/master' && 'type=gha,mode=max,scope=servatrice' || '' }}
