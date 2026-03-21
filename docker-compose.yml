@@ -13,6 +13,9 @@ services:
       - $PWD/servatrice/servatrice.sql:/docker-entrypoint-initdb.d/servatrice.sql
 
   servatrice:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: ghcr.io/cockatrice/servatrice:latest
     depends_on:
       - mysql
