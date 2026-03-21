@@ -375,10 +375,10 @@ jobs:
         uses: actions/cache/restore@v5
         with:
           path: ${{ github.workspace }}/Qt
-          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-thin-${{matrix.os}}${{matrix.soc == 'Intel' && '_Intel' || '_Apple'}}
+          key: qt-${{matrix.os}}${{matrix.soc == 'Intel' && '_Intel' || '_Apple'}}-${{ steps.resolve_qt_version.outputs.version }}-thin
 
       # Using jurplel/install-qt-action to install Qt without using brew
-      # qt build using vcpkg either just fails or takes too long to build
+      # Qt build using vcpkg either just fails or takes too long to build
       - name: Install fat Qt ${{ steps.resolve_qt_version.outputs.version }} (macOS${{matrix.soc == 'Intel' && ', Intel' || ''}})
         if: matrix.os == 'macOS' && steps.qt_restore.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
@@ -408,6 +408,7 @@ jobs:
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
           cache: true
+          cache-key-prefix: qt
 
       - name: Install NSIS
         if: matrix.os == 'Windows'
