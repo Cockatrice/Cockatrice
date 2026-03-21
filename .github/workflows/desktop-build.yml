@@ -394,7 +394,7 @@ jobs:
         run: .ci/thin_macos_qtlib.sh
 
       - name: Cache thin Qt libraries (macOS${{matrix.soc == 'Intel' && ', Intel' || ''}})
-        if: matrix.os == 'macOS' && steps.qt_restore.outputs.cache-hit != 'true'
+        if: matrix.os == 'macOS' && steps.qt_restore.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v5
         with:
           path: ${{ github.workspace }}/Qt
@@ -407,7 +407,7 @@ jobs:
           version: ${{ steps.resolve_qt_version.outputs.version }}
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
-          cache: true
+          cache: ${{ github.ref == 'refs/heads/master' }}
           cache-key-prefix: qt
 
       - name: Install NSIS
