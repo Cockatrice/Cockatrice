@@ -420,6 +420,7 @@ jobs:
         uses: TAServers/vcpkg-cache@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          prefix: vcpkg-
 
       # uses environment variables, see compile.sh for more details
       - name: Build Cockatrice
