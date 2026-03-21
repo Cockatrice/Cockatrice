@@ -357,8 +357,8 @@ jobs:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           path: ${{env.CCACHE_DIR}}
-          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-
+          key: ccache-${{matrix.os}}${{matrix.target}}${{matrix.soc == 'Intel' && '_Intel' || ''}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+          restore-keys: ccache-${{matrix.os}}${{matrix.target}}${{matrix.soc == 'Intel' && '_Intel' || ''}}-${{matrix.type}}-
 
       - name: Install aqtinstall
         run: pipx install aqtinstall
