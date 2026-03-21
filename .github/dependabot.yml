@@ -2,11 +2,10 @@
 
 version: 2
 updates:
- # # Enable version updates for git submodules
- # Not yet possible to bump only on tags or releases, see:
+ # Enable version updates for git submodules
+ # If SemVer is used, updates will happen to new releases only (not HEAD)
  # https://github.com/dependabot/dependabot-core/issues/1639
  # https://github.com/dependabot/dependabot-core/issues/2192
- # Alternative: Action that updates submodule and can be manually run on demand (workflow_dispatch)
   - package-ecosystem: "gitsubmodule"
     # Look for `.gitmodules` in the `root` directory
     directory: "/"
