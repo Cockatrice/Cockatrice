@@ -13,10 +13,7 @@ services:
       - ./servatrice/mysql-storage:/var/lib/mysql
 
   servatrice:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: servatrice
+    image: ghcr.io/cockatrice/servatrice:latest
     depends_on:
       - mysql
     ports:
