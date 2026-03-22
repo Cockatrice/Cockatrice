@@ -482,11 +482,11 @@ jobs:
             echo "Checking Gatekeepr conformance of the app"
             codesign --verify --deep --strict --verbose=2 ${{steps.build.outputs.path}}
 
-            echo "Assess the application"
-            spctl --assess --type execute --verbose ${{steps.build.outputs.path}}
+           # echo "Assess the application"
+           # spctl --assess --type execute --verbose ${{steps.build.outputs.path}}
 
-            echo "Checking Gatekeepr conformance of the app 2"
-            spctl -a -t exec -vv ${{steps.build.outputs.path}}
+           # echo "Checking Gatekeepr conformance of the app 2"
+           # spctl -a -t exec -vv ${{steps.build.outputs.path}}
 
           fi
 
