@@ -427,20 +427,21 @@ jobs:
         id: build
         shell: bash
         env:
-          BUILDTYPE: '${{matrix.type}}'
-          MAKE_PACKAGE: '${{matrix.make_package}}'
-          PACKAGE_SUFFIX: '${{matrix.package_suffix}}'
-          CMAKE_GENERATOR: ${{matrix.cmake_generator}}
-          CMAKE_GENERATOR_PLATFORM: ${{matrix.cmake_generator_platform}}
-          USE_CCACHE: ${{matrix.use_ccache}}
-          VCPKG_DISABLE_METRICS: 1
-          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
+          BUILDTYPE: ${{ matrix.type }}
+          MAKE_PACKAGE: ${{ matrix.make_package }}
+          PACKAGE_SUFFIX: ${{ matrix.package_suffix }}
+          CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
+          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
+          USE_CCACHE: ${{ matrix.use_ccache }}
+          VCPKG_DISABLE_METRICS: true
+          VCPKG_FEATURE_FLAGS: "binarycaching"
+          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ github.ref == 'refs/heads/master' && 'readwrite' || 'read' }}"
           # macOS-specific environment variables, will be ignored on Windows
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
-          DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
+          DEVELOPER_DIR: "/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer"
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --vcpkg
 
