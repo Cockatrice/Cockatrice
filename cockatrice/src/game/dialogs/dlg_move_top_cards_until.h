@@ -16,6 +16,13 @@
 
 class FilterString;
 
+struct MoveTopCardsUntilOptions
+{
+    QStringList exprs = {};
+    int numberOfHits = 1;
+    bool autoPlay = false;
+};
+
 class DlgMoveTopCardsUntil : public QDialog
 {
     Q_OBJECT
@@ -29,15 +36,12 @@ class DlgMoveTopCardsUntil : public QDialog
     void validateAndAccept();
     bool validateMatchExists(const FilterString &filterString);
 
-public:
-    explicit DlgMoveTopCardsUntil(QWidget *parent = nullptr,
-                                  QStringList exprs = QStringList(),
-                                  uint numberOfHits = 1,
-                                  bool autoPlay = false);
-    [[nodiscard]] QString getExpr() const;
     [[nodiscard]] QStringList getExprs() const;
-    [[nodiscard]] uint getNumberOfHits() const;
-    [[nodiscard]] bool isAutoPlay() const;
+
+public:
+    explicit DlgMoveTopCardsUntil(QWidget *parent = nullptr, const MoveTopCardsUntilOptions &options = {});
+    [[nodiscard]] QString getExpr() const;
+    [[nodiscard]] MoveTopCardsUntilOptions getOptions() const;
 };
 
 #endif // DLG_MOVE_TOP_CARDS_UNTIL_H

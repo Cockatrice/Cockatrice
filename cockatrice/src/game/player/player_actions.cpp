@@ -485,22 +485,19 @@ void PlayerActions::actMoveTopCardsUntil()
 {
     stopMoveTopCardsUntil();
 
-    DlgMoveTopCardsUntil dlg(player->getGame()->getTab(), movingCardsUntilExprs, movingCardsUntilNumberOfHits,
-                             movingCardsUntilAutoPlay);
+    DlgMoveTopCardsUntil dlg(player->getGame()->getTab(), movingCardsUntilOptions);
     if (!dlg.exec()) {
         return;
     }
 
     auto expr = dlg.getExpr();
-    movingCardsUntilExprs = dlg.getExprs();
-    movingCardsUntilNumberOfHits = dlg.getNumberOfHits();
-    movingCardsUntilAutoPlay = dlg.isAutoPlay();
+    movingCardsUntilOptions = dlg.getOptions();
 
     if (player->getDeckZone()->getCards().empty()) {
         stopMoveTopCardsUntil();
     } else {
         movingCardsUntilFilter = FilterString(expr);
-        movingCardsUntilCounter = movingCardsUntilNumberOfHits;
+        movingCardsUntilCounter = movingCardsUntilOptions.numberOfHits;
         movingCardsUntil = true;
         actMoveTopCardToPlay();
     }
@@ -512,7 +509,7 @@ void PlayerActions::moveOneCardUntil(CardItem *card)
 
     const bool isMatch = card && movingCardsUntilFilter.check(card->getCard().getCardPtr());
 
-    if (isMatch && movingCardsUntilAutoPlay) {
+    if (isMatch && movingCardsUntilOptions.autoPlay) {
         // Directly calling playCard will deadlock, since we are already in the middle of processing an event.
         // Use QTimer::singleShot to queue up the playCard on the event loop.
         QTimer::singleShot(0, this, [card, this] { playCard(card, false); });
