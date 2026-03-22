@@ -16,7 +16,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: servatrice
+    image: ghcr.io/cockatrice/servatrice:latest
     depends_on:
       - mysql
     ports:
