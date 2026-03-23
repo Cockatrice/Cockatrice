@@ -337,13 +337,6 @@ jobs:
         with:
           submodules: recursive
 
-      # Set relevant environment variables for MSVC, used to ensure ninja + MSVC build correctly together
-      - name: Setup MSVC (Windows)
-        if: matrix.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1.13.0
-        with:
-          arch: x64
-
       - name: Setup ccache
         if: matrix.use_ccache == 1 && matrix.os == 'macOS'
         run: brew install ccache

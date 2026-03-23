@@ -72,6 +72,18 @@ if(WIN32 OR USE_VCPKG)
   endif()
 endif()
 
+if(WIN32
+   AND USE_VCPKG
+   AND CMAKE_GENERATOR STREQUAL "Ninja"
+)
+  # vcpkg.cmake must be the primary toolchain; MSVC+Ninja toolchain is chainloaded
+  # See https://github.com/MarkSchofield/WindowsToolchain#windowstoolchain-and-vcpkg
+  set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE
+      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/WindowsToolchain/Windows.MSVC.toolchain.cmake"
+      CACHE FILEPATH "Chainloaded MSVC toolchain file for Ninja generator"
+  )
+endif()
+
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
 project("Cockatrice" VERSION 2.11.0)
