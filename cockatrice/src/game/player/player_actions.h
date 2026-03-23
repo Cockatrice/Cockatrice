@@ -8,6 +8,7 @@
 #ifndef COCKATRICE_PLAYER_ACTIONS_H
 #define COCKATRICE_PLAYER_ACTIONS_H
 #include "../dialogs/dlg_create_token.h"
+#include "../dialogs/dlg_move_top_cards_until.h"
 #include "event_processing_options.h"
 #include "player.h"
 
@@ -178,11 +179,9 @@ private:
 
     bool movingCardsUntil;
     QTimer *moveTopCardTimer;
-    QStringList movingCardsUntilExprs = {};
-    int movingCardsUntilNumberOfHits = 1;
-    bool movingCardsUntilAutoPlay = false;
     FilterString movingCardsUntilFilter;
     int movingCardsUntilCounter = 0;
+    MoveTopCardsUntilOptions movingCardsUntilOptions;
 
     void moveTopCardsTo(const QString &targetZone, const QString &zoneDisplayName, bool faceDown);
     void moveBottomCardsTo(const QString &targetZone, const QString &zoneDisplayName, bool faceDown);
