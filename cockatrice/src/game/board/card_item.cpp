@@ -460,6 +460,9 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 bool CardItem::animationEvent()
 {
+    if (owner == nullptr) {
+        return false;
+    }
     int rotation = ROTATION_DEGREES_PER_FRAME;
     bool animationIncomplete = true;
     if (!tapped)
