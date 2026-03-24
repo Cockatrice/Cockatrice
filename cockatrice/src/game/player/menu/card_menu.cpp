@@ -35,6 +35,8 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
     connect(aTap, &QAction::triggered, playerActions, &PlayerActions::cardMenuAction);
     aDoesntUntap = new QAction(this);
     aDoesntUntap->setData(cmDoesntUntap);
+    aDoesntUntap->setCheckable(true);
+    aDoesntUntap->setChecked(card != nullptr && card->getDoesntUntap());
     connect(aDoesntUntap, &QAction::triggered, playerActions, &PlayerActions::cardMenuAction);
     aAttach = new QAction(this);
     connect(aAttach, &QAction::triggered, playerActions, &PlayerActions::actAttach);
