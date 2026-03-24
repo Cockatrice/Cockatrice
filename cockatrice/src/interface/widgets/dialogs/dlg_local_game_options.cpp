@@ -28,8 +28,8 @@ DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
 
     startingLifeTotalLabel = new QLabel(tr("Starting life total:"), this);
     startingLifeTotalEdit = new QSpinBox(this);
-    startingLifeTotalEdit->setMinimum(1);
-    startingLifeTotalEdit->setMaximum(99999);
+    startingLifeTotalEdit->setMinimum(-999999999);
+    startingLifeTotalEdit->setMaximum(999999999);
     startingLifeTotalEdit->setValue(20);
     startingLifeTotalLabel->setBuddy(startingLifeTotalEdit);
 
