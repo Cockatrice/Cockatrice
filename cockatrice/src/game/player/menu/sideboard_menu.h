@@ -7,18 +7,20 @@
 #ifndef COCKATRICE_SIDEBOARD_MENU_H
 #define COCKATRICE_SIDEBOARD_MENU_H
 
+#include "abstract_player_component.h"
+
 #include <QMenu>
 
 class Player;
-class SideboardMenu : public QMenu
+class SideboardMenu : public QMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
 
 public:
     explicit SideboardMenu(Player *player, QMenu *playerMenu);
-    void retranslateUi();
-    void setShortcutsActive();
-    void setShortcutsInactive();
+    void retranslateUi() override;
+    void setShortcutsActive() override;
+    void setShortcutsInactive() override;
 
 private:
     Player *player;

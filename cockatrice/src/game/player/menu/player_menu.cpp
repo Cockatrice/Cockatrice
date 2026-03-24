@@ -15,33 +15,24 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     playerMenu = new TearOffMenu();
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
-        handMenu = new HandMenu(player, player->getPlayerActions(), playerMenu);
-        playerMenu->addMenu(handMenu);
-
-        libraryMenu = new LibraryMenu(player, playerMenu);
-        playerMenu->addMenu(libraryMenu);
+        handMenu = addManagedMenu<HandMenu>(player, player->getPlayerActions(), playerMenu);
+        libraryMenu = addManagedMenu<LibraryMenu>(player, playerMenu);
     } else {
         handMenu = nullptr;
         libraryMenu = nullptr;
     }
 
-    graveMenu = new GraveyardMenu(player, playerMenu);
-    playerMenu->addMenu(graveMenu);
-
-    rfgMenu = new RfgMenu(player, playerMenu);
-    playerMenu->addMenu(rfgMenu);
+    graveMenu = addManagedMenu<GraveyardMenu>(player, playerMenu);
+    rfgMenu = addManagedMenu<RfgMenu>(player, playerMenu);
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
-        sideboardMenu = new SideboardMenu(player, playerMenu);
-        playerMenu->addMenu(sideboardMenu);
-
-        customZonesMenu = new CustomZoneMenu(player);
-        playerMenu->addMenu(customZonesMenu);
+        sideboardMenu = addManagedMenu<SideboardMenu>(player, playerMenu);
+        customZonesMenu = addManagedMenu<CustomZoneMenu>(player);
         playerMenu->addSeparator();
 
         countersMenu = playerMenu->addMenu(QString());
 
-        utilityMenu = new UtilityMenu(player, playerMenu);
+        utilityMenu = createManagedComponent<UtilityMenu>(player, playerMenu);
     } else {
         sideboardMenu = nullptr;
         customZonesMenu = nullptr;
@@ -50,8 +41,7 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
     }
 
     if (player->getPlayerInfo()->getLocal()) {
-        sayMenu = new SayMenu(player);
-        playerMenu->addMenu(sayMenu);
+        sayMenu = addManagedMenu<SayMenu>(player);
     } else {
         sayMenu = nullptr;
     }
@@ -99,39 +89,17 @@ void PlayerMenu::retranslateUi()
 {
     playerMenu->setTitle(tr("Player \"%1\"").arg(player->getPlayerInfo()->getName()));
 
-    if (handMenu) {
-        handMenu->retranslateUi();
-    }
-    if (libraryMenu) {
-        libraryMenu->retranslateUi();
-    }
-
-    graveMenu->retranslateUi();
-    rfgMenu->retranslateUi();
-
-    if (sideboardMenu) {
-        sideboardMenu->retranslateUi();
+    for (auto *component : managedComponents) {
+        component->retranslateUi();
     }
 
     if (countersMenu) {
         countersMenu->setTitle(tr("&Counters"));
     }
 
-    if (customZonesMenu) {
-        customZonesMenu->retranslateUi();
-    }
-
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->retranslateUi();
-    }
-
-    if (utilityMenu) {
-        utilityMenu->retranslateUi();
-    }
-
-    if (sayMenu) {
-        sayMenu->setTitle(tr("S&ay"));
     }
 }
 
@@ -153,26 +121,16 @@ void PlayerMenu::setShortcutsActive()
 {
     shortcutsActive = true;
 
-    if (handMenu) {
-        handMenu->setShortcutsActive();
-    }
-    if (libraryMenu) {
-        libraryMenu->setShortcutsActive();
-    }
-    graveMenu->setShortcutsActive();
-    // No shortcuts for RfgMenu yet
-
-    if (sideboardMenu) {
-        sideboardMenu->setShortcutsActive();
+    for (auto *component : managedComponents) {
+        component->setShortcutsActive();
     }
 
+    // Counters implement AbstractPlayerComponent but are iterated via Player::counters
+    // (the authoritative source) rather than managedComponents to avoid a redundant
+    // list that must stay in sync with the map.
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsActive();
-    }
-
-    if (utilityMenu) {
-        utilityMenu->setShortcutsActive();
     }
 }
 
@@ -180,25 +138,12 @@ void PlayerMenu::setShortcutsInactive()
 {
     shortcutsActive = false;
 
-    if (handMenu) {
-        handMenu->setShortcutsInactive();
-    }
-    if (libraryMenu) {
-        libraryMenu->setShortcutsInactive();
-    }
-    graveMenu->setShortcutsInactive();
-    // No shortcuts for RfgMenu yet
-
-    if (sideboardMenu) {
-        sideboardMenu->setShortcutsInactive();
+    for (auto *component : managedComponents) {
+        component->setShortcutsInactive();
     }
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next().value()->setShortcutsInactive();
-    }
-
-    if (utilityMenu) {
-        utilityMenu->setShortcutsInactive();
     }
 }

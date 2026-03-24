@@ -8,6 +8,31 @@ SayMenu::SayMenu(Player *_player) : player(_player)
 {
     connect(&SettingsCache::instance().messages(), &MessageSettings::messageMacrosChanged, this, &SayMenu::initSayMenu);
     initSayMenu();
+    retranslateUi();
+}
+
+void SayMenu::retranslateUi()
+{
+    setTitle(tr("S&ay"));
+}
+
+void SayMenu::setShortcutsActive()
+{
+    shortcutsActive = true;
+
+    const auto menuActions = actions();
+    for (int i = 0; i < menuActions.size() && i < 10; ++i) {
+        menuActions[i]->setShortcut(QKeySequence("Ctrl+" + QString::number((i + 1) % 10)));
+    }
+}
+
+void SayMenu::setShortcutsInactive()
+{
+    shortcutsActive = false;
+
+    for (auto *action : actions()) {
+        action->setShortcut(QKeySequence());
+    }
 }
 
 void SayMenu::initSayMenu()
@@ -19,10 +44,11 @@ void SayMenu::initSayMenu()
 
     for (int i = 0; i < count; ++i) {
         auto *newAction = new QAction(SettingsCache::instance().messages().getMessageAt(i), this);
-        if (i < 10) {
-            newAction->setShortcut(QKeySequence("Ctrl+" + QString::number((i + 1) % 10)));
-        }
         connect(newAction, &QAction::triggered, player->getPlayerActions(), &PlayerActions::actSayMessage);
         addAction(newAction);
+    }
+
+    if (shortcutsActive) {
+        setShortcutsActive();
     }
 }

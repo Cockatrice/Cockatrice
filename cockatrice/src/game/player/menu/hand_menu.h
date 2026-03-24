@@ -8,6 +8,7 @@
 #define COCKATRICE_HAND_MENU_H
 
 #include "../../../interface/widgets/menus/tearoff_menu.h"
+#include "abstract_player_component.h"
 
 #include <QAction>
 #include <QMenu>
@@ -15,7 +16,7 @@
 class Player;
 class PlayerActions;
 
-class HandMenu : public TearOffMenu
+class HandMenu : public TearOffMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
 
@@ -31,9 +32,9 @@ public:
         return mRevealRandomHandCard;
     }
 
-    void retranslateUi();
-    void setShortcutsActive();
-    void setShortcutsInactive();
+    void retranslateUi() override;
+    void setShortcutsActive() override;
+    void setShortcutsInactive() override;
 
 private slots:
     void populateRevealHandMenuWithActivePlayers();

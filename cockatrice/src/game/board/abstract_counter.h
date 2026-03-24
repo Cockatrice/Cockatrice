@@ -8,6 +8,7 @@
 #define COUNTER_H
 
 #include "../../interface/widgets/menus/tearoff_menu.h"
+#include "../player/menu/abstract_player_component.h"
 
 #include <QGraphicsItem>
 #include <QInputDialog>
@@ -18,7 +19,7 @@ class QKeyEvent;
 class QMenu;
 class QString;
 
-class AbstractCounter : public QObject, public QGraphicsItem
+class AbstractCounter : public QObject, public QGraphicsItem, public AbstractPlayerComponent
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
@@ -56,10 +57,10 @@ public:
                     QGraphicsItem *parent = nullptr);
     ~AbstractCounter() override;
 
-    void retranslateUi();
+    void retranslateUi() override;
     void setValue(int _value);
-    void setShortcutsActive();
-    void setShortcutsInactive();
+    void setShortcutsActive() override;
+    void setShortcutsInactive() override;
     void delCounter();
 
     QMenu *getMenu() const
