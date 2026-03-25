@@ -64,7 +64,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
     int tableRow = info.getUiAttributes().tableRow;
     bool playToStack = SettingsCache::instance().getPlayToStack();
     QString currentZone = card->getZone()->getName();
-    if (currentZone == ZoneNames::STACK && tableRow == 3) {
+    if (!faceDown && currentZone == ZoneNames::STACK && tableRow == 3) {
         cmd.set_target_zone(ZoneNames::GRAVE);
         cmd.set_x(0);
         cmd.set_y(0);
