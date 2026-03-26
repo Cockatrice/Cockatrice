@@ -23,6 +23,7 @@ public slots:
 
 public:
     explicit UtilityMenu(Player *player, QMenu *playerMenu);
+    void setLobbyShortcutsActive();
 
     [[nodiscard]] bool createAnotherTokenActionExists() const
     {

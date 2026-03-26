@@ -2,6 +2,7 @@
 
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
+#include "../../game_meta_info.h"
 #include "../../zones/hand_zone.h"
 #include "../../zones/pile_zone.h"
 #include "../../zones/table_zone.h"
@@ -48,6 +49,13 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &PlayerMenu::refreshShortcuts);
+    
+    // Monitor game state to re-evaluate shortcuts when game starts/stops
+    if (player->getGame() && player->getGame()->getGameMetaInfo()) {
+        connect(player->getGame()->getGameMetaInfo(), &GameMetaInfo::startedChanged, this,
+                &PlayerMenu::onGameStartedChanged);
+    }
+    
     refreshShortcuts();
 
     retranslateUi();
@@ -117,9 +125,39 @@ void PlayerMenu::refreshShortcuts()
     }
 }
 
+void PlayerMenu::onGameStartedChanged(bool started)
+{
+    Q_UNUSED(started);
+    // Re-evaluate shortcuts when game state transitions
+    if (shortcutsActive) {
+        setShortcutsActive();
+    }
+}
+
 void PlayerMenu::setShortcutsActive()
 {
     shortcutsActive = true;
+
+    // Null-safety checks
+    if (!player->getGame() || !player->getGame()->getGameMetaInfo()) {
+        return;
+    }
+
+    if (!player->getGame()->getGameMetaInfo()->started()) {
+        for (auto *component : managedComponents) {
+            component->setShortcutsInactive();
+        }
+
+        QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
+        while (counterIterator.hasNext()) {
+            counterIterator.next().value()->setShortcutsInactive();
+        }
+
+        if (utilityMenu) {
+            utilityMenu->setLobbyShortcutsActive();
+        }
+        return;
+    }
 
     for (auto *component : managedComponents) {
         component->setShortcutsActive();
