@@ -29,7 +29,6 @@ class CardDatabase : public QObject
 {
     Q_OBJECT
 
-protected:
     /// Controller to determine set priority when choosing preferred printings.
     ICardSetPriorityController *setPriorityController;
 
@@ -51,9 +50,8 @@ protected:
     LoadStatus loadStatus;
 
     /// Querier for higher-level card lookups
-    CardDatabaseQuerier *querier;
+    CardDatabaseQuerier querier;
 
-private:
     /**
      * @brief Check for sets that are unknown and emit signals if needed.
      */
@@ -116,7 +114,7 @@ public:
     }
 
     /** @brief Returns the querier for performing card lookups. */
-    [[nodiscard]] CardDatabaseQuerier *query() const
+    [[nodiscard]] CardDatabaseQuerier const &query() const
     {
         return querier;
     }
