@@ -27,7 +27,8 @@ CardDatabase::CardDatabase(QObject *parent,
                            ICardPreferenceProvider *prefs,
                            ICardDatabasePathProvider *pathProvider,
                            ICardSetPriorityController *_setPriorityController)
-    : QObject(parent), setPriorityController(_setPriorityController), loadStatus(NotLoaded)
+    : QObject(parent), setPriorityController(_setPriorityController), loadStatus(NotLoaded),
+      querier(this, prefs)
 {
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");
     qRegisterMetaType<CardInfoPtr>("CardSetPtr");
@@ -44,8 +45,6 @@ CardDatabase::CardDatabase(QObject *parent,
     // that cross-thread loads are delivered via the event loop while same-thread/
     // synchronous callers get the swap immediately.
     connect(loader, &CardDatabaseLoader::databaseDataReady, this, &CardDatabase::swapInDatabaseData);
-
-    querier = new CardDatabaseQuerier(this, this, prefs);
 }
 
 CardDatabase::~CardDatabase()

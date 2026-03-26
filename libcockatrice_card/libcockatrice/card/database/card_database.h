@@ -60,9 +60,8 @@ protected:
     LoadStatus loadStatus;
 
     /** @brief Querier for higher-level card lookups. */
-    CardDatabaseQuerier *querier;
+    CardDatabaseQuerier querier;
 
-private:
     /**
      * @brief Refreshes the cached reverse-related cards for all cards.
      */
@@ -143,7 +142,7 @@ public:
     }
 
     /** @brief Returns the querier for performing card lookups. */
-    [[nodiscard]] CardDatabaseQuerier *query() const
+    [[nodiscard]] CardDatabaseQuerier const &query() const
     {
         return querier;
     }

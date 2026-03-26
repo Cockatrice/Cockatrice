@@ -15,10 +15,8 @@
 #include <iterator>
 #include <qnamespace.h>
 
-CardDatabaseQuerier::CardDatabaseQuerier(QObject *_parent,
-                                         const CardDatabase *_db,
-                                         const ICardPreferenceProvider *prefs)
-    : QObject(_parent), db(_db), prefs(prefs)
+CardDatabaseQuerier::CardDatabaseQuerier(const CardDatabase *_db, const ICardPreferenceProvider *prefs)
+    : db(_db), prefs(prefs)
 {
     // Invalidate the cached count maps whenever the database contents change.
     connect(db, &CardDatabase::cardAdded, this, &CardDatabaseQuerier::invalidateCaches);
