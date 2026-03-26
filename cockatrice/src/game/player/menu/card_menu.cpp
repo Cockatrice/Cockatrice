@@ -35,6 +35,8 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
     connect(aTap, &QAction::triggered, playerActions, &PlayerActions::cardMenuAction);
     aDoesntUntap = new QAction(this);
     aDoesntUntap->setData(cmDoesntUntap);
+    aDoesntUntap->setCheckable(true);
+    aDoesntUntap->setChecked(card != nullptr && card->getDoesntUntap());
     connect(aDoesntUntap, &QAction::triggered, playerActions, &PlayerActions::cardMenuAction);
     aAttach = new QAction(this);
     connect(aAttach, &QAction::triggered, playerActions, &PlayerActions::actAttach);
@@ -108,6 +110,7 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
 
     if (revealedCard) {
         addAction(aHide);
+        addSeparator();
         addAction(aClone);
         addSeparator();
         addAction(aSelectAll);
@@ -146,16 +149,14 @@ void CardMenu::createTableMenu(bool canModifyCard)
 {
     // Card is on the battlefield
     if (!canModifyCard) {
-        addRelatedCardView();
-        addRelatedCardActions();
-
-        addSeparator();
         addAction(aDrawArrow);
         addSeparator();
         addAction(aClone);
         addSeparator();
         addAction(aSelectAll);
         addAction(aSelectRow);
+        addRelatedCardView();
+        addRelatedCardActions();
         return;
     }
 
@@ -165,10 +166,9 @@ void CardMenu::createTableMenu(bool canModifyCard)
     if (card->getFaceDown()) {
         addAction(aPeek);
     }
-
-    addRelatedCardView();
-    addRelatedCardActions();
-
+    addSeparator();
+    addAction(aClone);
+    addMenu(new MoveMenu(player));
     addSeparator();
     addAction(aAttach);
     if (card->getAttachedTo()) {
@@ -178,9 +178,6 @@ void CardMenu::createTableMenu(bool canModifyCard)
     addSeparator();
     addMenu(new PtMenu(player));
     addAction(aSetAnnotation);
-    addSeparator();
-    addAction(aClone);
-    addMenu(new MoveMenu(player));
     addSeparator();
     addAction(aSelectAll);
     addAction(aSelectRow);
@@ -197,27 +194,34 @@ void CardMenu::createTableMenu(bool canModifyCard)
     }
     addSeparator();
     addMenu(mCardCounters);
+    addRelatedCardView();
+    addRelatedCardActions();
 }
 
 void CardMenu::createStackMenu(bool canModifyCard)
 {
     // Card is on the stack
-    if (canModifyCard) {
-        addAction(aAttach);
-        addAction(aDrawArrow);
-        addSeparator();
-        addAction(aClone);
-        addMenu(new MoveMenu(player));
-        addSeparator();
-        addAction(aSelectAll);
-    } else {
+    if (!canModifyCard) {
         addAction(aDrawArrow);
         addSeparator();
         addAction(aClone);
         addSeparator();
         addAction(aSelectAll);
+        addRelatedCardView();
+        addRelatedCardActions();
+        return;
     }
 
+    addAction(aPlay);
+    addAction(aPlayFacedown);
+    addSeparator();
+    addAction(aClone);
+    addMenu(new MoveMenu(player));
+    addSeparator();
+    addAction(aAttach);
+    addAction(aDrawArrow);
+    addSeparator();
+    addAction(aSelectAll);
     addRelatedCardView();
     addRelatedCardActions();
 }
@@ -225,29 +229,29 @@ void CardMenu::createStackMenu(bool canModifyCard)
 void CardMenu::createGraveyardOrExileMenu(bool canModifyCard)
 {
     // Card is in the graveyard or exile
-    if (canModifyCard) {
-        addAction(aPlay);
-        addAction(aPlayFacedown);
-
-        addSeparator();
-        addAction(aClone);
-        addMenu(new MoveMenu(player));
-        addSeparator();
-        addAction(aSelectAll);
-        addAction(aSelectColumn);
-
-        addSeparator();
-        addAction(aAttach);
+    if (!canModifyCard) {
         addAction(aDrawArrow);
-    } else {
+        addSeparator();
         addAction(aClone);
         addSeparator();
         addAction(aSelectAll);
         addAction(aSelectColumn);
-        addSeparator();
-        addAction(aDrawArrow);
+        addRelatedCardView();
+        addRelatedCardActions();
+        return;
     }
 
+    addAction(aPlay);
+    addAction(aPlayFacedown);
+    addSeparator();
+    addAction(aClone);
+    addMenu(new MoveMenu(player));
+    addSeparator();
+    addAction(aAttach);
+    addAction(aDrawArrow);
+    addSeparator();
+    addAction(aSelectAll);
+    addAction(aSelectColumn);
     addRelatedCardView();
     addRelatedCardActions();
 }
@@ -257,12 +261,11 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
     if (!canModifyCard) {
         addAction(aDrawArrow);
         addSeparator();
-        addRelatedCardView();
-        addRelatedCardActions();
-        addSeparator();
         addAction(aClone);
         addSeparator();
         addAction(aSelectAll);
+        addRelatedCardView();
+        addRelatedCardActions();
         return;
     }
 
@@ -449,7 +452,7 @@ void CardMenu::retranslateUi()
     aRevealToAll->setText(tr("&All players"));
     //: Turn sideways or back again
     aTap->setText(tr("&Tap / Untap"));
-    aDoesntUntap->setText(tr("Toggle &normal untapping"));
+    aDoesntUntap->setText(tr("Skip &untapping"));
     //: Turn face up/face down
     aFlip->setText(tr("T&urn Over")); // Only the user facing names in client got renamed to "turn over"
     // All code and proto bits are still unchanged (flip) for compatibility reasons

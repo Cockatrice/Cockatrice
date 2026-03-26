@@ -8,19 +8,26 @@
 #define COCKATRICE_RFG_MENU_H
 
 #include "../../../interface/widgets/menus/tearoff_menu.h"
+#include "abstract_player_component.h"
 
 #include <QAction>
 #include <QMenu>
 
 class Player;
-class RfgMenu : public TearOffMenu
+class RfgMenu : public TearOffMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
 public:
     explicit RfgMenu(Player *player, QWidget *parent = nullptr);
     void createMoveActions();
     void createViewActions();
-    void retranslateUi();
+    void retranslateUi() override;
+    void setShortcutsActive() override
+    {
+    }
+    void setShortcutsInactive() override
+    {
+    }
 
     QMenu *moveRfgMenu = nullptr;
 

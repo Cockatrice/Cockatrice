@@ -23,6 +23,7 @@ public:
     QAction *aMoveToBottomLibrary = nullptr;
 
     QAction *aMoveToHand = nullptr;
+    QAction *aMoveToTable = nullptr;
     QAction *aMoveToGraveyard = nullptr;
     QAction *aMoveToExile = nullptr;
 };

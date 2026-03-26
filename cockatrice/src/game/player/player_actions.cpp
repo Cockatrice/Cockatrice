@@ -64,7 +64,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
     int tableRow = info.getUiAttributes().tableRow;
     bool playToStack = SettingsCache::instance().getPlayToStack();
     QString currentZone = card->getZone()->getName();
-    if (currentZone == ZoneNames::STACK && tableRow == 3) {
+    if (!faceDown && currentZone == ZoneNames::STACK && tableRow == 3) {
         cmd.set_target_zone(ZoneNames::GRAVE);
         cmd.set_x(0);
         cmd.set_y(0);
@@ -75,7 +75,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
         cmd.set_y(0);
     } else {
         tableRow = faceDown ? 2 : info.getUiAttributes().tableRow;
-        QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
+        QPoint gridPoint = QPoint(-1, TableZone::tableRowToGridY(tableRow));
         cardToMove->set_face_down(faceDown);
         if (!faceDown) {
             cardToMove->set_pt(info.getPowTough().toStdString());
@@ -114,12 +114,7 @@ void PlayerActions::playCardToTable(const CardItem *card, bool faceDown)
     const CardInfo &info = exactCard.getInfo();
 
     int tableRow = faceDown ? 2 : info.getUiAttributes().tableRow;
-    // default instant/sorcery cards to the noncreatures row
-    if (tableRow > 2) {
-        tableRow = 1;
-    }
-
-    QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - tableRow));
+    QPoint gridPoint = QPoint(-1, TableZone::tableRowToGridY(tableRow));
     cardToMove->set_face_down(faceDown);
     if (!faceDown) {
         cardToMove->set_pt(info.getPowTough().toStdString());
@@ -866,7 +861,7 @@ void PlayerActions::actCreateToken()
     ExactCard correctedCard = CardDatabaseManager::query()->guessCard({lastTokenInfo.name, lastTokenInfo.providerId});
     if (correctedCard) {
         lastTokenInfo.name = correctedCard.getName();
-        lastTokenTableRow = TableZone::clampValidTableRow(2 - correctedCard.getInfo().getUiAttributes().tableRow);
+        lastTokenTableRow = TableZone::tableRowToGridY(correctedCard.getInfo().getUiAttributes().tableRow);
         if (lastTokenInfo.pt.isEmpty()) {
             lastTokenInfo.pt = correctedCard.getInfo().getPowTough();
         }
@@ -917,7 +912,7 @@ void PlayerActions::setLastToken(CardInfoPtr cardInfo)
                      .providerId =
                          SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName())};
 
-    lastTokenTableRow = TableZone::clampValidTableRow(2 - cardInfo->getUiAttributes().tableRow);
+    lastTokenTableRow = TableZone::tableRowToGridY(cardInfo->getUiAttributes().tableRow);
 
     utilityMenu->setAndEnableCreateAnotherTokenAction(tr("C&reate another %1 token").arg(lastTokenInfo.name));
 }
@@ -1085,9 +1080,7 @@ void PlayerActions::createCard(const CardItem *sourceCard,
         return;
     }
 
-    // get the target token's location
-    // TODO: Define this QPoint into its own function along with the one below
-    QPoint gridPoint = QPoint(-1, TableZone::clampValidTableRow(2 - cardInfo->getUiAttributes().tableRow));
+    QPoint gridPoint = QPoint(-1, TableZone::tableRowToGridY(cardInfo->getUiAttributes().tableRow));
 
     // create the token for the related card
     Command_CreateToken cmd;
@@ -1928,6 +1921,34 @@ void PlayerActions::cardMenuAction()
                 cmd->set_x(0);
                 cmd->set_y(0);
                 commandList.append(cmd);
+                break;
+            }
+            case cmMoveToTable: {
+                // Each card needs its own command because table row, pt, and cipt vary per card
+                for (const auto &card : cardList) {
+                    auto *cmd = new Command_MoveCard;
+                    cmd->set_start_player_id(startPlayerId);
+                    cmd->set_start_zone(startZone.toStdString());
+                    cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                    cmd->set_target_zone(ZoneNames::TABLE);
+                    cmd->set_x(-1);
+
+                    CardToMove *ctm = cmd->mutable_cards_to_move()->add_card();
+                    ctm->set_card_id(card->getId());
+                    ctm->set_face_down(false);
+
+                    int tableRow = 0;
+                    ExactCard exactCard = card->getCard();
+                    if (exactCard) {
+                        const CardInfo &info = exactCard.getInfo();
+                        tableRow = info.getUiAttributes().tableRow;
+                        ctm->set_pt(info.getPowTough().toStdString());
+                        ctm->set_tapped(info.getUiAttributes().cipt);
+                    }
+
+                    cmd->set_y(TableZone::tableRowToGridY(tableRow));
+                    commandList.append(cmd);
+                }
                 break;
             }
             default:
