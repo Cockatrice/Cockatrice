@@ -56,8 +56,6 @@ public:
 private:
     explicit GameFiltersSettings(const QString &settingPath, QObject *parent = nullptr);
     GameFiltersSettings(const GameFiltersSettings & /*other*/);
-
-    [[nodiscard]] static QString hashGameType(const QString &gameType);
 };
 
 #endif // GAMEFILTERSSETTINGS_H

@@ -8,11 +8,11 @@ GameFiltersSettings::GameFiltersSettings(const QString &settingPath, QObject *pa
 {
 }
 
-/*
+/**
  * The game type might contain special characters, so to use it in
  * QSettings we just hash it.
  */
-QString GameFiltersSettings::hashGameType(const QString &gameType)
+static QString hashGameType(const QString &gameType)
 {
     return QCryptographicHash::hash(gameType.toUtf8(), QCryptographicHash::Md5).toHex();
 }
