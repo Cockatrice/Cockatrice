@@ -15,8 +15,8 @@ class MessageSettings : public SettingsManager
     friend class SettingsCache;
 
 public:
-    int getCount();
-    QString getMessageAt(int index);
+    int getCount() const;
+    QString getMessageAt(int index) const;
 
     void setCount(int count);
     void setMessageAt(int index, QString message);

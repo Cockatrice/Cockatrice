@@ -23,12 +23,12 @@ void LayoutsSettings::setMainWindowGeometry(const QByteArray &value)
     setValue(value, GEOMETRY_PROP, GROUP_MAIN_WINDOW);
 }
 
-QByteArray LayoutsSettings::getMainWindowGeometry()
+QByteArray LayoutsSettings::getMainWindowGeometry() const
 {
     return getValue(GEOMETRY_PROP, GROUP_MAIN_WINDOW).toByteArray();
 }
 
-QByteArray LayoutsSettings::getDeckEditorLayoutState()
+QByteArray LayoutsSettings::getDeckEditorLayoutState() const
 {
     return getValue(STATE_PROP, GROUP_DECK_EDITOR).toByteArray();
 }
@@ -38,7 +38,7 @@ void LayoutsSettings::setDeckEditorLayoutState(const QByteArray &value)
     setValue(value, STATE_PROP, GROUP_DECK_EDITOR);
 }
 
-QByteArray LayoutsSettings::getDeckEditorGeometry()
+QByteArray LayoutsSettings::getDeckEditorGeometry() const
 {
     return getValue(GEOMETRY_PROP, GROUP_DECK_EDITOR).toByteArray();
 }
@@ -48,7 +48,7 @@ void LayoutsSettings::setDeckEditorGeometry(const QByteArray &value)
     setValue(value, GEOMETRY_PROP, GROUP_DECK_EDITOR);
 }
 
-QByteArray LayoutsSettings::getVisualDeckEditorLayoutState()
+QByteArray LayoutsSettings::getVisualDeckEditorLayoutState() const
 {
     return getValue(STATE_PROP, GROUP_VISUAL_DECK_EDITOR).toByteArray();
 }
@@ -58,7 +58,7 @@ void LayoutsSettings::setVisualDeckEditorLayoutState(const QByteArray &value)
     setValue(value, STATE_PROP, GROUP_VISUAL_DECK_EDITOR);
 }
 
-QByteArray LayoutsSettings::getVisualDeckEditorGeometry()
+QByteArray LayoutsSettings::getVisualDeckEditorGeometry() const
 {
     return getValue(GEOMETRY_PROP, GROUP_VISUAL_DECK_EDITOR).toByteArray();
 }
@@ -68,7 +68,7 @@ void LayoutsSettings::setVisualDeckEditorGeometry(const QByteArray &value)
     setValue(value, GEOMETRY_PROP, GROUP_VISUAL_DECK_EDITOR);
 }
 
-QByteArray LayoutsSettings::getDeckEditorDbHeaderState()
+QByteArray LayoutsSettings::getDeckEditorDbHeaderState() const
 {
     return getValue(STATE_PROP, GROUP_DECK_EDITOR_DB, "header").toByteArray();
 }
@@ -78,7 +78,7 @@ void LayoutsSettings::setDeckEditorDbHeaderState(const QByteArray &value)
     setValue(value, STATE_PROP, GROUP_DECK_EDITOR_DB, "header");
 }
 
-QByteArray LayoutsSettings::getSetsDialogHeaderState()
+QByteArray LayoutsSettings::getSetsDialogHeaderState() const
 {
     return getValue(STATE_PROP, GROUP_SETS_DIALOG, "header").toByteArray();
 }
@@ -93,7 +93,7 @@ void LayoutsSettings::setSetsDialogGeometry(const QByteArray &value)
     setValue(value, GEOMETRY_PROP, GROUP_SETS_DIALOG);
 }
 
-QByteArray LayoutsSettings::getSetsDialogGeometry()
+QByteArray LayoutsSettings::getSetsDialogGeometry() const
 {
     return getValue(GEOMETRY_PROP, GROUP_SETS_DIALOG).toByteArray();
 }
@@ -103,7 +103,7 @@ void LayoutsSettings::setTokenDialogGeometry(const QByteArray &value)
     setValue(value, GEOMETRY_PROP, GROUP_TOKEN_DIALOG);
 }
 
-QByteArray LayoutsSettings::getTokenDialogGeometry()
+QByteArray LayoutsSettings::getTokenDialogGeometry() const
 {
     return getValue(GEOMETRY_PROP, GROUP_TOKEN_DIALOG).toByteArray();
 }
@@ -118,12 +118,12 @@ void LayoutsSettings::setGamePlayAreaState(const QByteArray &value)
     setValue(value, STATE_PROP, GROUP_GAME_PLAY_AREA);
 }
 
-QByteArray LayoutsSettings::getGamePlayAreaLayoutState()
+QByteArray LayoutsSettings::getGamePlayAreaLayoutState() const
 {
     return getValue(STATE_PROP, GROUP_GAME_PLAY_AREA).toByteArray();
 }
 
-QByteArray LayoutsSettings::getGamePlayAreaGeometry()
+QByteArray LayoutsSettings::getGamePlayAreaGeometry() const
 {
     return getValue(GEOMETRY_PROP, GROUP_GAME_PLAY_AREA).toByteArray();
 }
@@ -138,12 +138,12 @@ void LayoutsSettings::setReplayPlayAreaState(const QByteArray &value)
     setValue(value, STATE_PROP, GROUP_REPLAY_PLAY_AREA);
 }
 
-QByteArray LayoutsSettings::getReplayPlayAreaLayoutState()
+QByteArray LayoutsSettings::getReplayPlayAreaLayoutState() const
 {
     return getValue(STATE_PROP, GROUP_REPLAY_PLAY_AREA).toByteArray();
 }
 
-QByteArray LayoutsSettings::getReplayPlayAreaGeometry()
+QByteArray LayoutsSettings::getReplayPlayAreaGeometry() const
 {
     return getValue(GEOMETRY_PROP, GROUP_REPLAY_PLAY_AREA).toByteArray();
 }

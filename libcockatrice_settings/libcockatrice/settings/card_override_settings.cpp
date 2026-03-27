@@ -15,7 +15,7 @@ void CardOverrideSettings::deleteCardPreferenceOverride(const QString &cardName)
     deleteValue(cardName);
 }
 
-QString CardOverrideSettings::getCardPreferenceOverride(const QString &cardName)
+QString CardOverrideSettings::getCardPreferenceOverride(const QString &cardName) const
 {
     return getValue(cardName).toString();
 }

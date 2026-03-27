@@ -22,9 +22,9 @@ public:
     void setEnabled(QString shortName, bool enabled) override;
     void setIsKnown(QString shortName, bool isknown) override;
 
-    unsigned int getSortKey(QString shortName) override;
-    bool isEnabled(QString shortName) override;
-    bool isKnown(QString shortName) override;
+    unsigned int getSortKey(QString shortName) const override;
+    bool isEnabled(QString shortName) const override;
+    bool isKnown(QString shortName) const override;
 
 private:
     explicit CardDatabaseSettings(const QString &settingPath, QObject *parent = nullptr);

@@ -7,7 +7,7 @@ RecentsSettings::RecentsSettings(const QString &settingPath, QObject *parent)
 {
 }
 
-QStringList RecentsSettings::getRecentlyOpenedDeckPaths()
+QStringList RecentsSettings::getRecentlyOpenedDeckPaths() const
 {
     return getValue("deckpaths").toStringList();
 }
@@ -31,7 +31,7 @@ void RecentsSettings::updateRecentlyOpenedDeckPaths(const QString &deckPath)
     emit recentlyOpenedDeckPathsChanged();
 }
 
-QString RecentsSettings::getLatestDeckDirPath()
+QString RecentsSettings::getLatestDeckDirPath() const
 {
     return getValue("latestDeckDir", "dirs").toString();
 }

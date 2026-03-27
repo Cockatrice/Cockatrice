@@ -36,24 +36,24 @@ public:
     void setReplayPlayAreaGeometry(const QByteArray &value);
     void setReplayPlayAreaState(const QByteArray &value);
 
-    QByteArray getMainWindowGeometry();
+    QByteArray getMainWindowGeometry() const;
 
-    QByteArray getDeckEditorLayoutState();
-    QByteArray getDeckEditorGeometry();
+    QByteArray getDeckEditorLayoutState() const;
+    QByteArray getDeckEditorGeometry() const;
 
-    QByteArray getVisualDeckEditorLayoutState();
-    QByteArray getVisualDeckEditorGeometry();
+    QByteArray getVisualDeckEditorLayoutState() const;
+    QByteArray getVisualDeckEditorGeometry() const;
 
-    QByteArray getDeckEditorDbHeaderState();
-    QByteArray getSetsDialogHeaderState();
-    QByteArray getSetsDialogGeometry();
-    QByteArray getTokenDialogGeometry();
+    QByteArray getDeckEditorDbHeaderState() const;
+    QByteArray getSetsDialogHeaderState() const;
+    QByteArray getSetsDialogGeometry() const;
+    QByteArray getTokenDialogGeometry() const;
 
-    QByteArray getGamePlayAreaLayoutState();
-    QByteArray getGamePlayAreaGeometry();
+    QByteArray getGamePlayAreaLayoutState() const;
+    QByteArray getGamePlayAreaGeometry() const;
 
-    QByteArray getReplayPlayAreaLayoutState();
-    QByteArray getReplayPlayAreaGeometry();
+    QByteArray getReplayPlayAreaLayoutState() const;
+    QByteArray getReplayPlayAreaGeometry() const;
 signals:
 
 public slots:

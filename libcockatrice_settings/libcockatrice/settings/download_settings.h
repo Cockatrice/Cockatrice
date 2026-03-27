@@ -19,7 +19,7 @@ class DownloadSettings : public SettingsManager
 public:
     explicit DownloadSettings(const QString &, QObject *);
 
-    QStringList getAllURLs();
+    QStringList getAllURLs() const;
     void setDownloadUrls(const QStringList &downloadURLs);
     void resetToDefaultURLs();
 };

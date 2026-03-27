@@ -20,17 +20,17 @@ void CardDatabaseSettings::setIsKnown(QString shortName, bool isknown)
     setValue(isknown, "isknown", "sets", std::move(shortName));
 }
 
-unsigned int CardDatabaseSettings::getSortKey(QString shortName)
+unsigned int CardDatabaseSettings::getSortKey(QString shortName) const
 {
     return getValue("sortkey", "sets", std::move(shortName)).toUInt();
 }
 
-bool CardDatabaseSettings::isEnabled(QString shortName)
+bool CardDatabaseSettings::isEnabled(QString shortName) const
 {
     return getValue("enabled", "sets", std::move(shortName)).toBool();
 }
 
-bool CardDatabaseSettings::isKnown(QString shortName)
+bool CardDatabaseSettings::isKnown(QString shortName) const
 {
     return getValue("isknown", "sets", std::move(shortName)).toBool();
 }

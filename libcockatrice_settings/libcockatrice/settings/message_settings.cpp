@@ -5,12 +5,12 @@ MessageSettings::MessageSettings(const QString &settingPath, QObject *parent)
 {
 }
 
-QString MessageSettings::getMessageAt(int index)
+QString MessageSettings::getMessageAt(int index) const
 {
     return getValue(QString("msg%1").arg(index)).toString();
 }
 
-int MessageSettings::getCount()
+int MessageSettings::getCount() const
 {
     return getValue("count").toInt();
 }
