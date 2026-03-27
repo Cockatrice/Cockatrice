@@ -24,9 +24,12 @@ public:
     void sync();
 
 protected:
-    QSettings settings;
+    QString settingPath;
     QString defaultGroup;
     QString defaultSubGroup;
+
+    QSettings getSettings() const;
+
     void setValue(const QVariant &value, const QString &name);
     void
     setValue(const QVariant &value, const QString &name, const QString &group, const QString &subGroup = QString());

@@ -1,16 +1,22 @@
 #include "settings_manager.h"
 
-SettingsManager::SettingsManager(const QString &settingPath,
+SettingsManager::SettingsManager(const QString &_settingPath,
                                  const QString &_defaultGroup,
                                  const QString &_defaultSubGroup,
                                  QObject *parent)
-    : QObject(parent), settings(settingPath, QSettings::IniFormat), defaultGroup(_defaultGroup),
-      defaultSubGroup(_defaultSubGroup)
+    : QObject(parent), settingPath(_settingPath), defaultGroup(_defaultGroup), defaultSubGroup(_defaultSubGroup)
 {
+}
+
+QSettings SettingsManager::getSettings() const
+{
+    return QSettings(settingPath, QSettings::IniFormat);
 }
 
 void SettingsManager::setValue(const QVariant &value, const QString &name)
 {
+    auto settings = getSettings();
+
     if (!defaultGroup.isEmpty()) {
         settings.beginGroup(defaultGroup);
     }
@@ -35,6 +41,8 @@ void SettingsManager::setValue(const QVariant &value,
                                const QString &group,
                                const QString &subGroup)
 {
+    auto settings = getSettings();
+
     if (!group.isEmpty()) {
         settings.beginGroup(group);
     }
@@ -56,6 +64,8 @@ void SettingsManager::setValue(const QVariant &value,
 
 void SettingsManager::deleteValue(const QString &name)
 {
+    auto settings = getSettings();
+
     if (!defaultGroup.isEmpty()) {
         settings.beginGroup(defaultGroup);
     }
@@ -77,6 +87,8 @@ void SettingsManager::deleteValue(const QString &name)
 
 void SettingsManager::deleteValue(const QString &name, const QString &group, const QString &subGroup)
 {
+    auto settings = getSettings();
+
     if (!group.isEmpty()) {
         settings.beginGroup(group);
     }
@@ -98,6 +110,8 @@ void SettingsManager::deleteValue(const QString &name, const QString &group, con
 
 QVariant SettingsManager::getValue(const QString &name)
 {
+    auto settings = getSettings();
+
     if (!defaultGroup.isEmpty()) {
         settings.beginGroup(defaultGroup);
     }
@@ -121,6 +135,8 @@ QVariant SettingsManager::getValue(const QString &name)
 
 QVariant SettingsManager::getValue(const QString &name, const QString &group, const QString &subGroup)
 {
+    auto settings = getSettings();
+
     if (!group.isEmpty()) {
         settings.beginGroup(group);
     }
@@ -147,5 +163,7 @@ QVariant SettingsManager::getValue(const QString &name, const QString &group, co
  */
 void SettingsManager::sync()
 {
+    auto settings = getSettings();
+
     settings.sync();
 }
