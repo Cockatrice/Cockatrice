@@ -145,7 +145,7 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     zoneHBox->addItem(scrollBarProxy);
 
     vbox->addItem(zoneHBox);
-    
+
     if (_isReversed && showLibraryLabel(_origZone, numberCards)) {
         cardLocationLabel.setText(tr("Bottom of Library"));
         vbox->addItem(cardLocationLabelProxy);

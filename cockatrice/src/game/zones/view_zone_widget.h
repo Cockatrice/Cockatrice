@@ -12,8 +12,8 @@
 #include <QComboBox>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
-#include <QLineEdit>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPointer>
 #include <libcockatrice/utility/macros.h>
 
