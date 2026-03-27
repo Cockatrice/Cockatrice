@@ -7,8 +7,8 @@
 #include <QPainter>
 #include <QVBoxLayout>
 
-BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation orientation, int transparency)
-    : QWidget(parent), gradientOrientation(orientation), transparency(qBound(0, transparency, 100))
+BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation orientation, int transparency_)
+    : QWidget(parent), gradientOrientation(orientation), transparency(qBound(0, transparency_, 100))
 {
     auto layout = new QHBoxLayout(this);
 
@@ -18,7 +18,12 @@ BannerWidget::BannerWidget(QWidget *parent, const QString &text, Qt::Orientation
     // Create the banner label and set properties
     bannerLabel = new QLabel(text, this);
     bannerLabel->setAlignment(Qt::AlignCenter);
-    bannerLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: white;");
+
+    QString textColor;
+    if (transparency > 50) {
+        textColor = " color: white;";
+    }
+    bannerLabel->setStyleSheet("font-size: 24px; font-weight: bold;" + textColor);
 
     layout->addWidget(iconLabel);
     layout->addWidget(bannerLabel);
