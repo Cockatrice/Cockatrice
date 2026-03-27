@@ -13,6 +13,7 @@
 #include <QGraphicsProxyWidget>
 #include <QGraphicsWidget>
 #include <QLineEdit>
+#include <QLabel>
 #include <QPointer>
 #include <libcockatrice/utility/macros.h>
 
@@ -62,6 +63,7 @@ private:
     QComboBox sortBySelector;
     QCheckBox shuffleCheckBox;
     QCheckBox pileViewCheckBox;
+    QLabel cardLocationLabel;
 
     bool canBeShuffled;
     int extraHeight;
@@ -74,6 +76,7 @@ private:
 
     void stopWindowDrag();
     void startWindowDrag(QGraphicsSceneMouseEvent *event);
+    bool showLibraryLabel(CardZoneLogic *zone, int numberOfCards);
     QRectF closeButtonRect(QWidget *styleWidget) const;
     /**
      * @brief Resolves the QGraphicsView to use for drag coordinate mapping

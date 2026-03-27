@@ -121,6 +121,13 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
 
     extraHeight = vbox->sizeHint(Qt::PreferredSize).height();
 
+    QGraphicsProxyWidget *cardLocationLabelProxy = new QGraphicsProxyWidget;
+    cardLocationLabelProxy->setWidget(&cardLocationLabel);
+    if (!_isReversed && showLibraryLabel(_origZone, numberCards)) {
+        cardLocationLabel.setText(tr("Top of Library"));
+        vbox->addItem(cardLocationLabelProxy);
+    }
+
     QGraphicsLinearLayout *zoneHBox = new QGraphicsLinearLayout(Qt::Horizontal);
 
     zoneContainer = new QGraphicsWidget(this);
@@ -138,6 +145,11 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
     zoneHBox->addItem(scrollBarProxy);
 
     vbox->addItem(zoneHBox);
+    
+    if (_isReversed && showLibraryLabel(_origZone, numberCards)) {
+        cardLocationLabel.setText(tr("Bottom of Library"));
+        vbox->addItem(cardLocationLabelProxy);
+    }
 
     zone = new ZoneViewZone(new ZoneViewZoneLogic(player, _origZone, numberCards, _revealZone, _writeableRevealZone,
                                                   _isReversed, zoneContainer),
@@ -574,4 +586,12 @@ void ZoneViewWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     if (event->pos().y() <= 0) {
         expandWindow();
     }
+}
+
+bool ZoneViewWidget::showLibraryLabel(CardZoneLogic *zone, int numberOfCards)
+{
+    if (zone == nullptr || numberOfCards < 0) {
+        return false;
+    }
+    return zone->getName() == ZoneNames::DECK;
 }
