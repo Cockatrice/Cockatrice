@@ -303,6 +303,7 @@ jobs:
             target: 26
             runner: macos-26
             soc: Apple
+            xcode: "26.4"
             type: Release
             make_package: 1
             package_suffix: "-macOS26"
