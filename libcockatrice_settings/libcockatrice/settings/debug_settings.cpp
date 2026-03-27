@@ -11,22 +11,22 @@ DebugSettings::DebugSettings(const QString &settingPath, QObject *parent)
     }
 }
 
-bool DebugSettings::getShowCardId()
+bool DebugSettings::getShowCardId() const
 {
     return getValue("showCardId").toBool();
 }
 
-bool DebugSettings::getLocalGameOnStartup()
+bool DebugSettings::getLocalGameOnStartup() const
 {
     return getValue("onStartup", "localgame").toBool();
 }
 
-int DebugSettings::getLocalGamePlayerCount()
+int DebugSettings::getLocalGamePlayerCount() const
 {
     return getValue("playerCount", "localgame").toInt();
 }
 
-QString DebugSettings::getDeckPathForPlayer(const QString &playerName)
+QString DebugSettings::getDeckPathForPlayer(const QString &playerName) const
 {
     return getValue(playerName, "localgame", "deck").toString();
 }

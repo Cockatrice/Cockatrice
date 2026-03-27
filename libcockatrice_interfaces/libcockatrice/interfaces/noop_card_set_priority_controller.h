@@ -16,15 +16,15 @@ public:
     {
     }
 
-    unsigned int getSortKey(QString /* shortName */) override
+    unsigned int getSortKey(QString /* shortName */) const override
     {
         return 0;
     }
-    bool isEnabled(QString /* shortName */) override
+    bool isEnabled(QString /* shortName */) const override
     {
         return true;
     }
-    bool isKnown(QString /* shortName */) override
+    bool isKnown(QString /* shortName */) const override
     {
         return true;
     }

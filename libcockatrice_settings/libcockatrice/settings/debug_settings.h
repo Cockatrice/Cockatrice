@@ -17,12 +17,12 @@ class DebugSettings : public SettingsManager
     DebugSettings(const DebugSettings & /*other*/);
 
 public:
-    bool getShowCardId();
+    bool getShowCardId() const;
 
-    bool getLocalGameOnStartup();
-    int getLocalGamePlayerCount();
+    bool getLocalGameOnStartup() const;
+    int getLocalGamePlayerCount() const;
 
-    QString getDeckPathForPlayer(const QString &playerName);
+    QString getDeckPathForPlayer(const QString &playerName) const;
 };
 
 #endif // DEBUG_SETTINGS_H

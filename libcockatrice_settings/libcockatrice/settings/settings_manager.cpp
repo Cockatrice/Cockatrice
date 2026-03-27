@@ -108,7 +108,7 @@ void SettingsManager::deleteValue(const QString &name, const QString &group, con
     }
 }
 
-QVariant SettingsManager::getValue(const QString &name)
+QVariant SettingsManager::getValue(const QString &name) const
 {
     auto settings = getSettings();
 
@@ -133,7 +133,7 @@ QVariant SettingsManager::getValue(const QString &name)
     return value;
 }
 
-QVariant SettingsManager::getValue(const QString &name, const QString &group, const QString &subGroup)
+QVariant SettingsManager::getValue(const QString &name, const QString &group, const QString &subGroup) const
 {
     auto settings = getSettings();
 

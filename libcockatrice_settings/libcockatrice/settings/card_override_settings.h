@@ -22,7 +22,7 @@ public:
 
     void deleteCardPreferenceOverride(const QString &cardName);
 
-    QString getCardPreferenceOverride(const QString &cardName);
+    QString getCardPreferenceOverride(const QString &cardName) const;
 
 private:
     explicit CardOverrideSettings(const QString &settingPath, QObject *parent = nullptr);

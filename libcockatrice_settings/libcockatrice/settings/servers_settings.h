@@ -22,21 +22,21 @@ class ServersSettings : public SettingsManager
     friend class SettingsCache;
 
 public:
-    int getPreviousHostLogin();
-    int getPrevioushostindex(const QString &);
-    QStringList getPreviousHostList();
-    QString getPrevioushostName();
-    QString getHostname(QString defaultHost = SERVERSETTINGS_DEFAULT_HOST);
-    QString getPort(QString defaultPort = SERVERSETTINGS_DEFAULT_PORT);
-    QString getPlayerName(QString defaultName = "");
-    QString getFPHostname(QString defaultHost = SERVERSETTINGS_DEFAULT_HOST);
-    QString getFPPort(QString defaultPort = SERVERSETTINGS_DEFAULT_PORT);
-    QString getFPPlayerName(QString defaultName = "");
+    int getPreviousHostLogin() const;
+    int getPrevioushostindex(const QString &) const;
+    QStringList getPreviousHostList() const;
+    QString getPrevioushostName() const;
+    QString getHostname(QString defaultHost = SERVERSETTINGS_DEFAULT_HOST) const;
+    QString getPort(QString defaultPort = SERVERSETTINGS_DEFAULT_PORT) const;
+    QString getPlayerName(QString defaultName = "") const;
+    QString getFPHostname(QString defaultHost = SERVERSETTINGS_DEFAULT_HOST) const;
+    QString getFPPort(QString defaultPort = SERVERSETTINGS_DEFAULT_PORT) const;
+    QString getFPPlayerName(QString defaultName = "") const;
     QString getPassword();
     QString getSaveName(QString defaultname = "");
     QString getSite(QString defaultName = "");
-    bool getSavePassword();
-    int getAutoConnect();
+    bool getSavePassword() const;
+    int getAutoConnect() const;
 
     void setPreviousHostLogin(int previous);
     void setPrevioushostName(const QString &);
@@ -67,7 +67,7 @@ public:
                                          QString port = QString(),
                                          QString site = QString());
     void setClearDebugLogStatus(bool abIsChecked);
-    bool getClearDebugLogStatus(bool abDefaultValue);
+    bool getClearDebugLogStatus(bool abDefaultValue) const;
 
 private:
     explicit ServersSettings(const QString &settingPath, QObject *parent = nullptr);
