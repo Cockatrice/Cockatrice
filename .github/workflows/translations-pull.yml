@@ -38,7 +38,6 @@ jobs:
           add-paths: |
             cockatrice/translations/*.ts
             oracle/translations/*.ts
-            webclient/public/locales/*/translation.json
           commit-message: Update translation files
           # author is the owner of the commit
           author: github-actions <github-actions@github.com>

@@ -16,11 +16,3 @@ source_file = oracle/oracle_en@source.ts
 file_filter = oracle/translations/oracle_<lang>.ts
 type = QT
 minimum_perc = 10
-
-[o:cockatrice:p:cockatrice:r:webclient-src-i18n-default-json--master]
-resource_name = Webclient
-source_lang = en
-source_file = webclient/src/i18n-default.json
-file_filter = webclient/public/locales/<lang>/translation.json
-type = KEYVALUEJSON
-minimum_perc = 10
