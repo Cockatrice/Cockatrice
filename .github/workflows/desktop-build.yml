@@ -162,8 +162,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          submodules: recursive
+
+      - name: Checkout thirdparty submodules
+        run: |
+          git submodule init thirdparty
+          git submodule update thirdparty
 
       - name: Restore compiler cache (ccache)
         id: ccache_restore
