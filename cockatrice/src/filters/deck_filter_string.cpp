@@ -3,7 +3,7 @@
 #include <QFileInfo>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_string.h>
-#include <libcockatrice/utility/cpp-peglib/peglib.h>
+#include <peglib.h>
 
 static peg::parser search(R"(
 Start <- QueryPartList

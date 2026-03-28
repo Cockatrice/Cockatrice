@@ -5,5 +5,5 @@
 	path = doc/doxygen/theme
 	url = https://github.com/jothepro/doxygen-awesome-css.git
 [submodule "libcockatrice_utility/libcockatrice/utility/cpp-peglib"]
-	path = libcockatrice_utility/libcockatrice/utility/cpp-peglib
+	path = thirdparty/cpp-peglib
 	url = https://github.com/yhirose/cpp-peglib

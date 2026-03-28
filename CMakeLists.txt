@@ -232,6 +232,8 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0" AND NOT EXISTS "${Protobuf_PROTOC
   message(FATAL_ERROR "No protoc command found!")
 endif()
 
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/cpp-peglib)
+
 #Find OpenSSL
 if(WIN32)
   find_package(OpenSSL REQUIRED)
