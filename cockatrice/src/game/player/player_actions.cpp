@@ -9,6 +9,8 @@
 #include "../zones/logic/view_zone_logic.h"
 #include "../zones/table_zone.h"
 #include "card_menu_action_type.h"
+#include "libcockatrice/utility/expression.h"
+#include "../client/settings/card_counter_settings.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
@@ -1572,23 +1574,35 @@ void PlayerActions::actCardCounterTrigger()
             break;
         }
         case 11: { // set counter with dialog
-            bool ok;
             player->setDialogSemaphore(true);
 
             int oldValue = 0;
-            if (player->getGameScene()->selectedItems().size() == 1) {
-                auto *card = static_cast<CardItem *>(player->getGameScene()->selectedItems().first());
+            QString counterName = "";
+
+            if (auto selectedItems = player->getGameScene()->selectedItems(); selectedItems.size() == 1) {
+                const auto *card = dynamic_cast<CardItem *>(selectedItems.first());
+                const auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+                counterName = cardCounterSettings.displayName(counterId);
                 oldValue = card->getCounters().value(counterId, 0);
             }
-            int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Set counters"), tr("Number:"), oldValue,
-                                              0, MAX_COUNTERS_ON_CARD, 1, &ok);
+
+            AbstractCounterDialog dialog(counterName, QString::number(oldValue), player->getGame()->getTab());
+            const int ok = dialog.exec();
+
+            if (!ok) {
+                return;
+            }
+
+            Expression exp(oldValue);
+            const auto number = static_cast<int>(exp.parse(dialog.textValue()));
+
             player->setDialogSemaphore(false);
             if (player->clearCardsToDelete() || !ok) {
                 return;
             }
 
             for (const auto &item : player->getGameScene()->selectedItems()) {
-                auto *card = static_cast<CardItem *>(item);
+                const auto *card = dynamic_cast<CardItem *>(item);
                 auto *cmd = new Command_SetCardCounter;
                 cmd->set_zone(card->getZone()->getName().toStdString());
                 cmd->set_card_id(card->getId());
