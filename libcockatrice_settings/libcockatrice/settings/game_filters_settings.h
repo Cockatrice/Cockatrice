@@ -16,23 +16,23 @@ class GameFiltersSettings : public SettingsManager
     friend class SettingsCache;
 
 public:
-    bool isHideBuddiesOnlyGames();
-    bool isHideFullGames();
-    bool isHideGamesThatStarted();
-    bool isHidePasswordProtectedGames();
-    bool isHideIgnoredUserGames();
-    bool isHideNotBuddyCreatedGames();
-    bool isHideOpenDecklistGames();
-    QString getGameNameFilter();
-    QStringList getCreatorNameFilters();
-    int getMinPlayers();
-    int getMaxPlayers();
-    QTime getMaxGameAge();
-    bool isGameTypeEnabled(QString gametype);
-    bool isShowOnlyIfSpectatorsCanWatch();
-    bool isShowSpectatorPasswordProtected();
-    bool isShowOnlyIfSpectatorsCanChat();
-    bool isShowOnlyIfSpectatorsCanSeeHands();
+    bool isHideBuddiesOnlyGames() const;
+    bool isHideFullGames() const;
+    bool isHideGamesThatStarted() const;
+    bool isHidePasswordProtectedGames() const;
+    bool isHideIgnoredUserGames() const;
+    bool isHideNotBuddyCreatedGames() const;
+    bool isHideOpenDecklistGames() const;
+    QString getGameNameFilter() const;
+    QStringList getCreatorNameFilters() const;
+    int getMinPlayers() const;
+    int getMaxPlayers() const;
+    QTime getMaxGameAge() const;
+    bool isGameTypeEnabled(QString gametype) const;
+    bool isShowOnlyIfSpectatorsCanWatch() const;
+    bool isShowSpectatorPasswordProtected() const;
+    bool isShowOnlyIfSpectatorsCanChat() const;
+    bool isShowOnlyIfSpectatorsCanSeeHands() const;
 
     void setHideBuddiesOnlyGames(bool hide);
     void setHideIgnoredUserGames(bool hide);
@@ -56,8 +56,6 @@ public:
 private:
     explicit GameFiltersSettings(const QString &settingPath, QObject *parent = nullptr);
     GameFiltersSettings(const GameFiltersSettings & /*other*/);
-
-    [[nodiscard]] QString hashGameType(const QString &gameType) const;
 };
 
 #endif // GAMEFILTERSSETTINGS_H

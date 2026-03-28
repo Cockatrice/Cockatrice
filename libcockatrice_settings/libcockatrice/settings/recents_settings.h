@@ -18,11 +18,11 @@ class RecentsSettings : public SettingsManager
     RecentsSettings(const RecentsSettings & /*other*/);
 
 public:
-    QStringList getRecentlyOpenedDeckPaths();
+    QStringList getRecentlyOpenedDeckPaths() const;
     void clearRecentlyOpenedDeckPaths();
     void updateRecentlyOpenedDeckPaths(const QString &deckPath);
 
-    QString getLatestDeckDirPath();
+    QString getLatestDeckDirPath() const;
     void setLatestDeckDirPath(const QString &dirPath);
 
 signals:

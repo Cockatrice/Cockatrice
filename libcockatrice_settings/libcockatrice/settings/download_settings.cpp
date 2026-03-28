@@ -18,7 +18,7 @@ void DownloadSettings::setDownloadUrls(const QStringList &downloadURLs)
     setValue(QVariant::fromValue(downloadURLs), "urls");
 }
 
-QStringList DownloadSettings::getAllURLs()
+QStringList DownloadSettings::getAllURLs() const
 {
     return getValue("urls").toStringList();
 }

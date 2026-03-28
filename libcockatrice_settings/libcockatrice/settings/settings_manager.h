@@ -19,14 +19,17 @@ public:
                              const QString &defaultGroup = QString(),
                              const QString &defaultSubGroup = QString(),
                              QObject *parent = nullptr);
-    QVariant getValue(const QString &name);
-    QVariant getValue(const QString &name, const QString &group, const QString &subGroup = QString());
+    QVariant getValue(const QString &name) const;
+    QVariant getValue(const QString &name, const QString &group, const QString &subGroup = QString()) const;
     void sync();
 
 protected:
-    QSettings settings;
+    QString settingPath;
     QString defaultGroup;
     QString defaultSubGroup;
+
+    QSettings getSettings() const;
+
     void setValue(const QVariant &value, const QString &name);
     void
     setValue(const QVariant &value, const QString &name, const QString &group, const QString &subGroup = QString());
