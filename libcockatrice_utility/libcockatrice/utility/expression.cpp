@@ -1,6 +1,6 @@
 #include "expression.h"
 
-#include "peglib.h"
+#include "cpp-peglib/peglib.h"
 
 #include <QByteArray>
 #include <QString>
