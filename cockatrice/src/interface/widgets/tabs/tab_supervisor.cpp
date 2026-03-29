@@ -112,12 +112,6 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     setMovable(true);
     setIconSize(QSize(15, 15));
 
-#if defined(Q_OS_MAC)
-    // This is necessary to fix an issue on macOS with qt5.10,
-    // where tabs with icons and buttons get drawn incorrectly
-    tabBar()->setStyle(new MacOSTabFixStyle);
-#endif
-
     userListManager = new UserListManager(client, this);
 
     // connect tab changes

@@ -81,11 +81,6 @@ protected:
      * @brief Handles mouse hover entering (Qt6 version).
      */
     void enterEvent(QEnterEvent *event) override;
-#else
-    /**
-     * @brief Handles mouse hover entering (Qt5 version).
-     */
-    void enterEvent(QEvent *event) override;
 #endif
 
     /**
