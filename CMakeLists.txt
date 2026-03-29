@@ -5,8 +5,7 @@
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-# cmake 3.16 is required if using qt6
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 # Early detect ccache
 option(USE_CCACHE "Cache the build results with ccache" ON)
@@ -57,7 +56,6 @@ if(WIN32 OR USE_VCPKG)
   # Qt path set by user or env var
   if(QTDIR
      OR DEFINED ENV{QTDIR}
-     OR DEFINED ENV{QTDIR32}
      OR DEFINED ENV{QTDIR64}
   )
 
@@ -281,8 +279,6 @@ if(UNIX)
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
       if(Qt6_FOUND)
         set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
-      elseif(Qt5_FOUND)
-        set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt5-qttools, qt5-qtsvg, qt5-qtmultimedia")
       endif()
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
       set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
@@ -304,8 +300,6 @@ if(UNIX)
       if(Qt6_FOUND)
         set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
         set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
-      elseif(Qt5_FOUND)
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
       endif()
     endif()
   endif()
