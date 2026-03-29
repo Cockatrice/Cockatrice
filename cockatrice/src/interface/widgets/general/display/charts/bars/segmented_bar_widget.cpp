@@ -132,9 +132,5 @@ void SegmentedBarWidget::mouseMoveEvent(QMouseEvent *e)
     const Segment &s = segments[idx];
     QString text = QString("%1: %2 cards\n%3").arg(s.category).arg(s.value).arg(s.cards.join(", "));
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QToolTip::showText(e->globalPosition().toPoint(), text, this);
-#else
-    QToolTip::showText(e->globalPos(), text, this);
-#endif
 }
