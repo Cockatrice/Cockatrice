@@ -64,11 +64,7 @@ QSize CloseButton::sizeHint() const
     return {width, height};
 }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 void CloseButton::enterEvent(QEnterEvent *event)
-#else
-void CloseButton::enterEvent(QEvent *event)
-#endif
 {
     update();
     QAbstractButton::enterEvent(event);

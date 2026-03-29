@@ -76,17 +76,10 @@ protected:
      */
     void paintEvent(QPaintEvent *event) override;
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     /**
-     * @brief Handles mouse hover entering (Qt6 version).
+     * @brief Handles mouse hover entering.
      */
     void enterEvent(QEnterEvent *event) override;
-#endif
-
-    /**
-     * @brief Handles mouse hover leaving.
-     */
-    void leaveEvent(QEvent *event) override;
 
     /**
      * @brief Handles mouse movement to update contextual tooltips.

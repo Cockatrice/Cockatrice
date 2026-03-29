@@ -131,11 +131,7 @@ void ArchidektApiResponseDeckEntryDisplayWidget::mousePressEvent(QMouseEvent *ev
     actRequestNavigationToDeck();
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void ArchidektApiResponseDeckEntryDisplayWidget::enterEvent(QEnterEvent *event)
-#else
-void ArchidektApiResponseDeckEntryDisplayWidget::enterEvent(QEvent *event)
-#endif
 {
     QWidget::enterEvent(event);
     backgroundPlateWidget->setFocused(true);
