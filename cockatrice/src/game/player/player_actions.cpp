@@ -1577,9 +1577,9 @@ void PlayerActions::actCardCounterTrigger()
             player->setDialogSemaphore(true);
 
             const auto &cardCounterSettings = SettingsCache::instance().cardCounters();
-            const auto counterName = cardCounterSettings.displayName(counterId);
+            const auto &counterName = cardCounterSettings.displayName(counterId);
 
-            auto selectedItems = player->getGameScene()->selectedItems();
+            const auto &selectedItems = player->getGameScene()->selectedItems();
 
             const QString oldValueForDlg = [&selectedItems, &counterId] {
                 // If a single card is selected, we show the old value in the dialog. Otherwise, we show "x"
