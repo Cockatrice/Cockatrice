@@ -1576,38 +1576,44 @@ void PlayerActions::actCardCounterTrigger()
         case 11: { // set counter with dialog
             player->setDialogSemaphore(true);
 
-            int oldValue = 0;
-            QString counterName = "";
+            const auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+            const auto counterName = cardCounterSettings.displayName(counterId);
 
-            if (auto selectedItems = player->getGameScene()->selectedItems(); selectedItems.size() == 1) {
-                const auto *card = dynamic_cast<CardItem *>(selectedItems.first());
-                const auto &cardCounterSettings = SettingsCache::instance().cardCounters();
-                counterName = cardCounterSettings.displayName(counterId);
-                oldValue = card->getCounters().value(counterId, 0);
-            }
+            auto selectedItems = player->getGameScene()->selectedItems();
 
-            AbstractCounterDialog dialog(counterName, QString::number(oldValue), player->getGame()->getTab());
+            const QString oldValueForDlg = [&selectedItems, &counterId] {
+                // If a single card is selected, we show the old value in the dialog. Otherwise, we show "x"
+                if (selectedItems.size() == 1) {
+                    const auto *card = dynamic_cast<CardItem *>(selectedItems.first());
+                    return QString::number(card->getCounters().value(counterId, 0));
+                }
+                return QString{"x"};
+            }();
+
+            AbstractCounterDialog dialog(counterName, oldValueForDlg, player->getGame()->getTab());
             const int ok = dialog.exec();
 
             if (!ok) {
                 return;
             }
 
-            Expression exp(oldValue);
-            const auto number = static_cast<int>(exp.parse(dialog.textValue()));
-
             player->setDialogSemaphore(false);
             if (player->clearCardsToDelete() || !ok) {
                 return;
             }
 
-            for (const auto &item : player->getGameScene()->selectedItems()) {
+            for (const auto &item : selectedItems) {
                 const auto *card = dynamic_cast<CardItem *>(item);
+
+                const auto oldValue = QString::number(card->getCounters().value(counterId, 0));
+                Expression exp(oldValue.toDouble());
+                const auto newValue = static_cast<int>(exp.parse(dialog.textValue()));
+
                 auto *cmd = new Command_SetCardCounter;
                 cmd->set_zone(card->getZone()->getName().toStdString());
                 cmd->set_card_id(card->getId());
                 cmd->set_counter_id(counterId);
-                cmd->set_counter_value(number);
+                cmd->set_counter_value(newValue);
                 commandList.append(cmd);
             }
             break;
