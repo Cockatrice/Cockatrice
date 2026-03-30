@@ -158,7 +158,6 @@ The following flags (with their non-default values) can be passed to `cmake`:
 | `-DWARNING_AS_ERROR=0` | Don't treat compilation warnings as errors in debug mode |
 | `-DUPDATE_TRANSLATIONS=1` |  Configure `make` to update the translation .ts files for new strings in the source code<br> **Note:** `make clean` will remove the .ts files |
 | `-DTEST=1` | Enable regression tests<br> **Note:** `make test` to run tests, *googletest* will be downloaded if not available |
-| `-DFORCE_USE_QT5=1` | Skip looking for Qt6 before trying to find Qt5 |
 
 
 # Run
