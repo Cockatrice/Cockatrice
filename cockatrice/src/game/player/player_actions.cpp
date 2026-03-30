@@ -1605,8 +1605,8 @@ void PlayerActions::actCardCounterTrigger()
             for (const auto &item : selectedItems) {
                 const auto *card = dynamic_cast<CardItem *>(item);
 
-                const auto oldValue = QString::number(card->getCounters().value(counterId, 0));
-                Expression exp(oldValue.toDouble());
+                const auto oldValue = card->getCounters().value(counterId, 0);
+                Expression exp(oldValue);
                 const auto newValue = static_cast<int>(exp.parse(dialog.textValue()));
 
                 auto *cmd = new Command_SetCardCounter;
