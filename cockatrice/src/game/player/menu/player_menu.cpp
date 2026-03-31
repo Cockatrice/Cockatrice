@@ -49,13 +49,13 @@ PlayerMenu::PlayerMenu(Player *_player) : player(_player)
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &PlayerMenu::refreshShortcuts);
-    
+
     // Monitor game state to re-evaluate shortcuts when game starts/stops
     if (player->getGame() && player->getGame()->getGameMetaInfo()) {
         connect(player->getGame()->getGameMetaInfo(), &GameMetaInfo::startedChanged, this,
                 &PlayerMenu::onGameStartedChanged);
     }
-    
+
     refreshShortcuts();
 
     retranslateUi();
