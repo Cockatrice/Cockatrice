@@ -237,8 +237,7 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
                                                        int yCoord,
                                                        bool fixFreeSpaces,
                                                        bool undoingDraw,
-                                                       bool isReversed,
-                                                       bool isFromBottom)
+                                                       bool isReversed)
 {
     // Disallow controller change to other zones than the table.
     if (((targetzone->getType() != ServerInfo_Zone::PublicZone) || !targetzone->hasCoords()) &&
@@ -290,7 +289,23 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
     bool revealTopStart = false;
     bool revealTopTarget = false;
 
-    // If the cards are to be taken from the bottom of the deck, reverse the order in which they are taken.
+    bool isFromBottom = false;
+    if (startzone->getName() == ZoneNames::DECK) {
+        int movedCount = static_cast<int>(cardsToMove.size());
+        int tailStart = startzone->getCards().size() - movedCount;
+        if (tailStart >= 0) {
+            isFromBottom = true;
+            int expectedPosition = tailStart;
+            for (const auto &card : cardsToMove) {
+                if (card.position != expectedPosition) {
+                    isFromBottom = false;
+                    break;
+                }
+                ++expectedPosition;
+            }
+        }
+    }
+
     if (isFromBottom) {
         std::ranges::reverse_view reversedCardsToMove{cardsToMove};
         for (auto card : reversedCardsToMove) {
@@ -772,8 +787,7 @@ Server_AbstractPlayer::cmdMoveCard(const Command_MoveCard &cmd, ResponseContaine
         cardsToMove.append(&cmd.cards_to_move().card(i));
     }
 
-    return moveCard(ges, startZone, cardsToMove, targetZone, cmd.x(), cmd.y(), true, false, cmd.is_reversed(),
-                    cmd.is_from_bottom());
+    return moveCard(ges, startZone, cardsToMove, targetZone, cmd.x(), cmd.y(), true, false, cmd.is_reversed());
 }
 
 Response::ResponseCode

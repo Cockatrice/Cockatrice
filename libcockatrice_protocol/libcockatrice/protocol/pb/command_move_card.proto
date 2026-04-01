@@ -52,7 +52,4 @@ message Command_MoveCard {
 
     // Inverts the x coordinate to apply from the end of the target zone instead of the start
     optional bool is_reversed = 8 [default = false];
-
-    // Inverts the order in which cards are moved (if false, from top to bottom)
-    optional bool is_from_bottom = 9 [default = false];
 }

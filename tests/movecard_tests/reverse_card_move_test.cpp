@@ -57,7 +57,7 @@ TEST(ReverseCardMoveTest, MoveCardFromBottomTest)
     QList<const CardToMove *> cardsToMove = {&moveA, &moveB, &moveC, &moveD};
     GameEventStorage ges;
 
-    const auto response = player.moveCard(ges, &deckZone, cardsToMove, &exileZone, 0, 0, false, false, false, true);
+    const auto response = player.moveCard(ges, &deckZone, cardsToMove, &exileZone, 0, 0, false, false, false);
 
     EXPECT_EQ(response, Response::RespOk);
 

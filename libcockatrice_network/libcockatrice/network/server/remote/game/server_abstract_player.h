@@ -92,8 +92,7 @@ public:
                                     int yCoord,
                                     bool fixFreeSpaces = true,
                                     bool undoingDraw = false,
-                                    bool isReversed = false,
-                                    bool isFromBottom = false);
+                                    bool isReversed = false);
 
     void processMoveCard(GameEventStorage &ges,
                          Server_CardZone *startzone,

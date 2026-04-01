@@ -664,7 +664,6 @@ void PlayerActions::moveBottomCardsTo(const QString &targetZone, const QString &
     cmd.set_target_zone(targetZone.toStdString());
     cmd.set_x(0);
     cmd.set_y(0);
-    cmd.set_is_from_bottom(true);
 
     for (int i = maxCards - number; i < maxCards; ++i) {
         auto card = cmd.mutable_cards_to_move()->add_card();
@@ -786,7 +785,6 @@ void PlayerActions::actDrawBottomCards()
     cmd.set_target_zone(ZoneNames::HAND);
     cmd.set_x(0);
     cmd.set_y(0);
-    cmd.set_is_from_bottom(true);
 
     for (int i = maxCards - number; i < maxCards; ++i) {
         cmd.mutable_cards_to_move()->add_card()->set_card_id(i);
