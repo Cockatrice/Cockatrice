@@ -19,7 +19,7 @@ TEST(ReverseCardMoveTest, MoveCardFromBottomTest)
     ServerInfo_User user;
     user.set_name("test-user");
 
-	// instatiate necessary dependencies of the library
+    // instatiate necessary dependencies of the library
     FakeServer server;
     Server_Room room(0, 0, "", "", "", "", false, "", {}, &server);
     Server_Game game(user, 1, "", "", 2, QList<int>(), false, false, false, false, false, false, 20, false, &room);
