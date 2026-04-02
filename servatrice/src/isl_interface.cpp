@@ -242,11 +242,15 @@ void IslInterface::readClient()
             return;
 
         IslMessage newMessage;
-        newMessage.ParseFromArray(inputBuffer.data(), messageLength);
+        bool ok = newMessage.ParseFromArray(inputBuffer.data(), messageLength);
         inputBuffer.remove(0, messageLength);
         messageInProgress = false;
 
-        processMessage(newMessage);
+        if (ok) {
+            processMessage(newMessage);
+        } else {
+            qDebug() << "[ISL] parsing error!";
+        }
     } while (!inputBuffer.isEmpty());
 }
 
@@ -270,7 +274,10 @@ void IslInterface::transmitMessage(const IslMessage &item)
     unsigned int size = static_cast<unsigned int>(item.ByteSize());
 #endif
     buf.resize(size + 4);
-    item.SerializeToArray(buf.data() + 4, size);
+    if (!item.SerializeToArray(buf.data() + 4, size)) {
+        qDebug() << "[ISL] transmit error!";
+        return;
+    }
     buf.data()[3] = (unsigned char)size;
     buf.data()[2] = (unsigned char)(size >> 8);
     buf.data()[1] = (unsigned char)(size >> 16);

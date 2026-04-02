@@ -277,9 +277,11 @@ void MainWindow::actWatchReplay()
     file.close();
 
     replay = new GameReplay;
-    replay->ParseFromArray(buf.data(), buf.size());
-
-    tabSupervisor->openReplay(replay);
+    if (replay->ParseFromArray(buf.data(), buf.size())) {
+        tabSupervisor->openReplay(replay);
+    } else {
+        qDebug() << "[MainWindow] failed to parse replay!";
+    }
 }
 
 void MainWindow::localGameEnded()

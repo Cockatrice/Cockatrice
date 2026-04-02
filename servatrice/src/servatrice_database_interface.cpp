@@ -865,12 +865,16 @@ void Servatrice_DatabaseInterface::storeGameInformation(const QString &roomName,
         const unsigned int size = static_cast<unsigned int>(replayList[i]->ByteSize());
 #endif
         blob.resize(size);
-        replayList[i]->SerializeToArray(blob.data(), size);
+        qulonglong replayId = replayList[i]->replay_id();
+        if (replayList[i]->SerializeToArray(blob.data(), size)) {
 
-        replayIds.append(QVariant((qulonglong)replayList[i]->replay_id()));
-        replayGameIds.append(gameInfo.game_id());
-        replayDurations.append(replayList[i]->duration_seconds());
-        replayBlobs.append(blob);
+            replayIds.append(QVariant(replayId));
+            replayGameIds.append(gameInfo.game_id());
+            replayDurations.append(replayList[i]->duration_seconds());
+            replayBlobs.append(blob);
+        } else {
+            qDebug() << "failed to serialise replay, id:" << replayId << "game:" << gameInfo.game_id();
+        }
     }
 
     {

@@ -265,9 +265,11 @@ void TabReplays::actOpenLocalReplay()
         f.close();
 
         GameReplay *replay = new GameReplay;
-        replay->ParseFromArray(_data.data(), _data.size());
-
-        emit openReplay(replay);
+        if (replay->ParseFromArray(_data.data(), _data.size())) {
+            emit openReplay(replay);
+        } else {
+            qDebug() << "could not parse replay!";
+        }
     }
 }
 
@@ -379,9 +381,12 @@ void TabReplays::openRemoteReplayFinished(const Response &r)
 
     const Response_ReplayDownload &resp = r.GetExtension(Response_ReplayDownload::ext);
     GameReplay *replay = new GameReplay;
-    replay->ParseFromString(resp.replay_data());
+    if (replay->ParseFromString(resp.replay_data())) {
 
-    emit openReplay(replay);
+        emit openReplay(replay);
+    } else {
+        qDebug() << "could not parse replay!";
+    }
 }
 
 void TabReplays::actDownload()

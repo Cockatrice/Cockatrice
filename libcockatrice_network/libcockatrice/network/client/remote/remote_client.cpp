@@ -390,14 +390,18 @@ void RemoteClient::readData()
             return;
 
         ServerMessage newServerMessage;
-        newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
-
-        qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
+        bool ok = newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
 
         inputBuffer.remove(0, messageLength);
         messageInProgress = false;
 
-        processProtocolItem(newServerMessage);
+        if (ok) {
+            qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
+
+            processProtocolItem(newServerMessage);
+        } else {
+            qCDebug(RemoteClientLog) << "parsing error!";
+        }
 
         if (getStatus() == StatusDisconnecting) // use thread-safe getter
             doDisconnectFromServer();
@@ -408,11 +412,13 @@ void RemoteClient::websocketMessageReceived(const QByteArray &message)
 {
     lastDataReceived = timeRunning;
     ServerMessage newServerMessage;
-    newServerMessage.ParseFromArray(message.data(), message.length());
+    if (newServerMessage.ParseFromArray(message.data(), message.length())) {
+        qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
 
-    qCDebug(RemoteClientLog).noquote() << "IN" << getSafeDebugString(newServerMessage);
-
-    processProtocolItem(newServerMessage);
+        processProtocolItem(newServerMessage);
+    } else {
+        qCDebug(RemoteClientLog) << "parsing error!";
+    }
 }
 
 void RemoteClient::sendCommandContainer(const CommandContainer &cont)
@@ -426,19 +432,27 @@ void RemoteClient::sendCommandContainer(const CommandContainer &cont)
     qCDebug(RemoteClientLog).noquote() << "OUT" << getSafeDebugString(cont);
 
     QByteArray buf;
+    bool ok;
     if (usingWebSocket) {
         buf.resize(size);
-        cont.SerializeToArray(buf.data(), size);
-        websocket->sendBinaryMessage(buf);
+        ok = cont.SerializeToArray(buf.data(), size);
+        if (ok) {
+            websocket->sendBinaryMessage(buf);
+        }
     } else {
         buf.resize(size + 4);
-        cont.SerializeToArray(buf.data() + 4, size);
-        buf.data()[3] = (unsigned char)size;
-        buf.data()[2] = (unsigned char)(size >> 8);
-        buf.data()[1] = (unsigned char)(size >> 16);
-        buf.data()[0] = (unsigned char)(size >> 24);
+        ok = cont.SerializeToArray(buf.data() + 4, size);
+        if (ok) {
+            buf.data()[3] = (unsigned char)size;
+            buf.data()[2] = (unsigned char)(size >> 8);
+            buf.data()[1] = (unsigned char)(size >> 16);
+            buf.data()[0] = (unsigned char)(size >> 24);
 
-        socket->write(buf);
+            socket->write(buf);
+        }
+    }
+    if (!ok) {
+        qCDebug(RemoteClientLog) << "transmit error!";
     }
 }
 
