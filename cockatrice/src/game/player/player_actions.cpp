@@ -1576,44 +1576,37 @@ void PlayerActions::actCardCounterTrigger()
         case 11: { // set counter with dialog
             player->setDialogSemaphore(true);
 
-            const auto &cardCounterSettings = SettingsCache::instance().cardCounters();
-            const auto &counterName = cardCounterSettings.displayName(counterId);
+            // If a single card is selected, we show the old value in the dialog. Otherwise, we show "x"
+            QList<QGraphicsItem *> sel = player->getGameScene()->selectedItems();
+            QString oldValueForDlg = "x";
+            if (sel.size() == 1) {
+                auto *card = dynamic_cast<CardItem *>(sel.first());
+                oldValueForDlg = QString::number(card->getCounters().value(counterId, 0));
+            }
 
-            const auto &selectedItems = player->getGameScene()->selectedItems();
-
-            const QString oldValueForDlg = [&selectedItems, &counterId] {
-                // If a single card is selected, we show the old value in the dialog. Otherwise, we show "x"
-                if (selectedItems.size() == 1) {
-                    const auto *card = dynamic_cast<CardItem *>(selectedItems.first());
-                    return QString::number(card->getCounters().value(counterId, 0));
-                }
-                return QString{"x"};
-            }();
+            auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+            QString counterName = cardCounterSettings.displayName(counterId);
 
             AbstractCounterDialog dialog(counterName, oldValueForDlg, player->getGame()->getTab());
-            const int ok = dialog.exec();
-
-            if (!ok) {
-                return;
-            }
+            int ok = dialog.exec();
 
             player->setDialogSemaphore(false);
             if (player->clearCardsToDelete() || !ok) {
                 return;
             }
 
-            for (const auto &item : selectedItems) {
-                const auto *card = dynamic_cast<CardItem *>(item);
+            for (const auto &item : sel) {
+                auto *card = dynamic_cast<CardItem *>(item);
 
-                const auto oldValue = card->getCounters().value(counterId, 0);
+                int oldValue = card->getCounters().value(counterId, 0);
                 Expression exp(oldValue);
-                const auto newValue = static_cast<int>(exp.parse(dialog.textValue()));
+                int number = static_cast<int>(exp.parse(dialog.textValue()));
 
                 auto *cmd = new Command_SetCardCounter;
                 cmd->set_zone(card->getZone()->getName().toStdString());
                 cmd->set_card_id(card->getId());
                 cmd->set_counter_id(counterId);
-                cmd->set_counter_value(newValue);
+                cmd->set_counter_value(number);
                 commandList.append(cmd);
             }
             break;
