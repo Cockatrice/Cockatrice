@@ -23,14 +23,14 @@ fi
 
 # create title
 if [[ $TAG =~ $beta_regex ]]; then
-  echo "is_beta=yes" >>"$GITHUB_OUTPUT"
+  echo "is_beta=true" >>"$GITHUB_OUTPUT"
   title="$TAG"
   echo "creating beta release '$title'"
 elif [[ ! $(cat CMakeLists.txt) =~ $name_regex ]]; then
   echo "::error file=$0::could not find releasename in CMakeLists.txt"
   exit 1
 else
-  echo "is_beta=no" >>"$GITHUB_OUTPUT"
+  echo "is_beta=false" >>"$GITHUB_OUTPUT"
   name="${BASH_REMATCH[1]}"
   version="${TAG##*-}"
   title="Cockatrice $version: $name"
