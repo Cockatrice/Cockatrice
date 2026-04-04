@@ -325,6 +325,10 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
+    src/client/network/integrations/discord_social_manager.cpp
+    src/client/network/integrations/discord_social_manager.h
+    src/client/network/integrations/discord_social_client.cpp
+    src/client/network/integrations/discord_social_client.h
     src/single_instance_manager.cpp
     src/single_instance_manager.h
 )
@@ -336,6 +340,12 @@ configure_file(
 )
 
 set(cockatrice_RESOURCES cockatrice.qrc)
+
+# Define some handy Discord Social SDK variables
+set(DISCORD_SDK_ROOT "${CMAKE_SOURCE_DIR}/external/discord_social_sdk")
+set(DISCORD_SDK_LIB_DIR "${DISCORD_SDK_ROOT}/lib/release")
+set(DISCORD_SDK_BIN_DIR "${DISCORD_SDK_ROOT}/bin/release")
+set(DISCORD_SDK_INCLUDE_DIR "${DISCORD_SDK_ROOT}/include")
 
 if(UPDATE_TRANSLATIONS)
   # Cockatrice main sources
@@ -427,6 +437,19 @@ elseif(Qt5_FOUND)
   endif()
 endif()
 
+target_include_directories(cockatrice PRIVATE ${DISCORD_SDK_INCLUDE_DIR})
+
+if(WIN32)
+  set(DISCORD_LIB_PATH "${DISCORD_SDK_LIB_DIR}/discord_partner_sdk.lib")
+  set(DISCORD_SHARED_LIB "${DISCORD_SDK_BIN_DIR}/discord_partner_sdk.dll")
+elseif(APPLE)
+  set(DISCORD_LIB_PATH "${DISCORD_SDK_LIB_DIR}/libdiscord_partner_sdk.dylib")
+  set(DISCORD_SHARED_LIB "${DISCORD_SDK_LIB_DIR}/libdiscord_partner_sdk.dylib")
+else() # Linux
+  set(DISCORD_LIB_PATH "${DISCORD_SDK_LIB_DIR}/libdiscord_partner_sdk.so")
+  set(DISCORD_SHARED_LIB "${DISCORD_SDK_LIB_DIR}/libdiscord_partner_sdk.so")
+endif()
+
 if(Qt5_FOUND)
   target_link_libraries(
     cockatrice
@@ -439,6 +462,7 @@ if(Qt5_FOUND)
     libcockatrice_rng
     libcockatrice_settings
     ${COCKATRICE_QT_MODULES}
+    ${DISCORD_LIB_PATH}
   )
 else()
   target_link_libraries(
@@ -452,8 +476,26 @@ else()
            libcockatrice_rng
            libcockatrice_settings
            ${COCKATRICE_QT_MODULES}
+           ${DISCORD_LIB_PATH}
   )
 endif()
+
+if(UNIX)
+  # Use RPATH when building
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+  # Set the RPATH to use the lib directory relative to the executable
+  set(CMAKE_INSTALL_RPATH "$ORIGIN")
+  if(APPLE)
+    set(CMAKE_INSTALL_RPATH "@executable_path")
+  endif()
+endif()
+
+# Copy Social SDK shared library to output directory, so it's available at runtime.
+add_custom_command(
+  TARGET cockatrice
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different "${DISCORD_SHARED_LIB}" $<TARGET_FILE_DIR:cockatrice>
+)
 
 if(UNIX)
   if(APPLE)

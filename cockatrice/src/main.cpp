@@ -24,6 +24,7 @@
 #include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
 #include "database/interface/settings_card_preference_provider.h"
+#include "integrations/discord_social_manager.h"
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
@@ -258,6 +259,8 @@ int main(int argc, char *argv[])
     CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance());
     CardDatabaseManager::setCardSetPriorityController(SettingsCache::instance().cardDatabase());
 
+    DiscordSocialManager::getInstance();
+
     qCInfo(MainLog) << "Starting main program";
 
     MainWindow ui;
@@ -348,5 +351,5 @@ int main(int argc, char *argv[])
     CountryPixmapGenerator::clear();
     UserLevelPixmapGenerator::clear();
 
-    return 0;
+    return ret;
 }
