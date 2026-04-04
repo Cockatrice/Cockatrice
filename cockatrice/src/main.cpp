@@ -28,7 +28,9 @@
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
 #include "interface/widgets/dialogs/dlg_settings.h"
+#include "interface/widgets/tabs/tab_supervisor.h"
 #include "interface/window_main.h"
+#include "single_instance_manager.h"
 #include "version_string.h"
 
 #include <QApplication>
@@ -172,6 +174,7 @@ int main(int argc, char *argv[])
     SetUnhandledExceptionFilter(CockatriceUnhandledExceptionFilter);
 #endif
 
+    // Logging setup
 #ifdef Q_OS_APPLE
     // <build>/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
     const QByteArray configPath = "../../../qtlogging.ini";
@@ -189,6 +192,7 @@ int main(int argc, char *argv[])
         // Set the QT_LOGGING_CONF environment variable
         qputenv("QT_LOGGING_CONF", configPath);
     }
+
     qSetMessagePattern(
         "\033[0m[%{time yyyy-MM-dd h:mm:ss.zzz} "
         "%{if-debug}\033[36mD%{endif}%{if-info}\033[32mI%{endif}%{if-warning}\033[33mW%{endif}%{if-critical}\033[31mC%{"
@@ -198,6 +202,7 @@ int main(int argc, char *argv[])
     QObject::connect(&app, &QApplication::lastWindowClosed, &app, &QApplication::quit);
 
     qInstallMessageHandler(CockatriceLogger);
+
 #ifdef Q_OS_WIN
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
@@ -213,6 +218,7 @@ int main(int argc, char *argv[])
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
+    // Translations
 #ifdef Q_OS_MAC
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
 #elif defined(Q_OS_WIN)
@@ -221,6 +227,7 @@ int main(int argc, char *argv[])
     translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
 #endif
 
+    // Command-line parser
     QCommandLineParser parser;
     parser.setApplicationDescription("Cockatrice");
     parser.addHelpOption();
@@ -269,6 +276,21 @@ int main(int argc, char *argv[])
     // then reload the DB. otherwise just reload the DB
     SpoilerBackgroundUpdater spoilerBackgroundUpdater;
 
+    // --- Handle files or URLs passed at startup ---
+    SingleInstanceManager instance;
+    QStringList startupFiles;
+
+    // Collect command-line files/URLs
+    for (int i = 1; i < argc; ++i) {
+        QString arg = QString::fromLocal8Bit(argv[i]);
+        startupFiles.append(arg);
+    }
+
+    if (!instance.tryRun(startupFiles)) {
+        // Another instance received our files, exit
+        return 0;
+    }
+
     ui.show();
     qCInfo(MainLog) << "ui.show() finished";
 
@@ -278,7 +300,47 @@ int main(int argc, char *argv[])
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
-    app.exec();
+
+    for (const QString &file : startupFiles) {
+        if (file.startsWith("cockatrice://")) {
+            // ui.openUrl(QUrl(file));
+        } else if (QFileInfo(file).exists()) {
+            std::optional<LoadedDeck> deckOpt =
+                DeckLoader::loadFromFile(file, DeckFileFormat::getFormatFromName(file), true);
+            if (deckOpt) {
+                ui.getTabSupervisor()->openDeckInNewTab(deckOpt.value());
+            }
+        }
+    }
+
+    // Connect to future file/URL events from other instances
+    QObject::connect(&instance, &SingleInstanceManager::filesReceived, [&ui](const QStringList &files) {
+        for (const QString &file : files) {
+            if (file.startsWith("cockatrice://")) {
+                // ui.openUrl(QUrl(file));
+            } else if (QFileInfo(file).exists()) {
+                std::optional<LoadedDeck> deckOpt =
+                    DeckLoader::loadFromFile(file, DeckFileFormat::getFormatFromName(file), true);
+                if (deckOpt) {
+                    ui.getTabSupervisor()->openDeckInNewTab(deckOpt.value());
+                }
+            }
+        }
+    });
+
+#ifdef Q_OS_MAC
+    // macOS: handle files opened via Finder after startup
+    QObject::connect(&app, &QApplication::fileOpen, [&ui](const QString &filePath) {
+        qDebug() << "macOS opened file:" << filePath;
+        std::optional<LoadedDeck> deckOpt =
+            DeckLoader::loadFromFile(filePath, DeckFileFormat::getFormatFromName(filePath), true);
+        if (deckOpt) {
+            ui.getTabSupervisor()->openDeckInNewTab(deckOpt.value());
+        }
+    });
+#endif
+
+    int ret = app.exec();
 
     qCInfo(MainLog) << "Event loop finished, terminating...";
     delete rng;
