@@ -7,12 +7,11 @@
 #ifndef VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_COLOR_FILTER_WIDGET_H
 
-#include "../../../filters/filter_tree_model.h"
-
-#include <QComboBox>
-#include <QHBoxLayout>
 #include <QWidget>
 
+class FilterTreeModel;
+class QComboBox;
+class QHBoxLayout;
 class VisualDatabaseDisplayColorFilterCircleWidget : public QWidget
 {
     Q_OBJECT

@@ -1,7 +1,11 @@
 #include "printing_selector_card_overlay_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../cards/card_info_picture_widget.h"
+#include "all_zones_card_amount_widget.h"
 #include "printing_selector_card_display_widget.h"
+#include "set_name_and_collectors_number_display_widget.h"
 
 #include <QImageReader>
 #include <QLabel>
@@ -11,6 +15,7 @@
 #include <QtMath>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <utility>
 
 /**

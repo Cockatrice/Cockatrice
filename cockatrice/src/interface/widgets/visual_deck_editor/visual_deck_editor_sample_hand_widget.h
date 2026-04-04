@@ -7,16 +7,18 @@
 #ifndef VISUAL_DECK_EDITOR_SAMPLE_HAND_WIDGET_H
 #define VISUAL_DECK_EDITOR_SAMPLE_HAND_WIDGET_H
 
-#include "../cards/card_size_widget.h"
-#include "../deck_analytics/deck_list_statistics_analyzer.h"
-#include "../general/layout_containers/flow_widget.h"
-
-#include <QPushButton>
-#include <QSpinBox>
 #include <QWidget>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
 
+class DeckListModel;
+class DeckListStatisticsAnalyzer;
+class ExactCard;
 class DrawProbabilityWidget;
+class QVBoxLayout;
+class QHBoxLayout;
+class QPushButton;
+class QSpinBox;
+class FlowWidget;
+class CardSizeWidget;
 class VisualDeckEditorSampleHandWidget : public QWidget
 {
     Q_OBJECT

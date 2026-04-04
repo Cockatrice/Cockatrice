@@ -1,16 +1,27 @@
 #include "deck_editor_deck_dock_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../interface/widgets/quick_settings/settings_button_widget.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../utility/custom_line_edit.h"
+#include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
+#include "deck_list_history_manager_widget.h"
 #include "deck_list_style_proxy.h"
 #include "deck_state_manager.h"
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDockWidget>
+#include <QGridLayout>
 #include <QHeaderView>
 #include <QLabel>
 #include <QSplitter>
 #include <QTextEdit>
+#include <QTimer>
+#include <QToolButton>
+#include <QTreeView>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 static int findRestoreIndex(const CardRef &wanted, const QComboBox *combo)

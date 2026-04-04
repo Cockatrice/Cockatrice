@@ -3,11 +3,16 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
 #include "../cards/card_info_picture_widget.h"
+#include "../cards/card_size_widget.h"
 #include "../deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.h"
 #include "../deck_analytics/deck_list_statistics_analyzer.h"
+#include "../general/layout_containers/flow_widget.h"
 
+#include <QPushButton>
+#include <QSpinBox>
 #include <QSplitter>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <random>
 
 VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *parent,

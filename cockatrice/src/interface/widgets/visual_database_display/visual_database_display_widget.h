@@ -7,27 +7,33 @@
 #ifndef VISUAL_DATABASE_DISPLAY_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_WIDGET_H
 
-#include "../../../filters/filter_tree_model.h"
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../key_signals.h"
-#include "../cards/card_info_picture_with_text_overlay_widget.h"
-#include "../cards/card_size_widget.h"
-#include "../general/layout_containers/flow_widget.h"
-#include "../general/layout_containers/overlap_control_widget.h"
-#include "../utility/custom_line_edit.h"
-#include "visual_database_display_color_filter_widget.h"
-#include "visual_database_display_filter_toolbar_widget.h"
 
 #include <QLoggingCategory>
-#include <QVBoxLayout>
-#include <QWheelEvent>
 #include <QWidget>
-#include <libcockatrice/models/database/card_database_model.h>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <qscrollarea.h>
 
 inline Q_LOGGING_CATEGORY(VisualDatabaseDisplayLog, "visual_database_display");
 
+class AbstractTabDeckEditor;
+class CardDatabaseModel;
+class CardDatabaseDisplayModel;
+class DeckList;
+class QTreeView;
+class QHBoxLayout;
+class SearchLineEdit;
+class QPushButton;
+class FilterTreeModel;
+class VisualDatabaseDisplayColorFilterWidget;
+class CardInfoPictureWithTextOverlayWidget;
+class ExactCard;
+class QLabel;
+class QToolButton;
+class VisualDatabaseDisplayFilterToolbarWidget;
+class QVBoxLayout;
+class QScrollArea;
+class FlowWidget;
+class OverlapControlWidget;
+class CardSizeWidget;
 class VisualDatabaseDisplayWidget : public QWidget
 {
     Q_OBJECT

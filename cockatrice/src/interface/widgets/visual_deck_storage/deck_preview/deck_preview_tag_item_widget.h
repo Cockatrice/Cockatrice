@@ -7,10 +7,9 @@
 #ifndef DECK_PREVIEW_TAG_ITEM_WIDGET_H
 #define DECK_PREVIEW_TAG_ITEM_WIDGET_H
 
-#include <QCheckBox>
-#include <QHBoxLayout>
 #include <QWidget>
 
+class QCheckBox;
 class DeckPreviewTagItemWidget : public QWidget
 {
     Q_OBJECT

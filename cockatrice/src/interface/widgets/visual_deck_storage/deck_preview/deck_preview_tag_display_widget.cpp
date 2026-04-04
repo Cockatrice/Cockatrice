@@ -2,8 +2,11 @@
 
 #include <QFontMetrics>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPushButton>
+#include <QString>
 
 DeckPreviewTagDisplayWidget::DeckPreviewTagDisplayWidget(QWidget *parent, const QString &_tagName)
     : QWidget(parent), tagName(_tagName), state(TagState::NotSelected)

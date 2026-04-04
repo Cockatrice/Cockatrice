@@ -1,10 +1,10 @@
 #ifndef COCKATRICE_PRINTING_SELECTOR_PLACEHOLDER_WIDGET_H
 #define COCKATRICE_PRINTING_SELECTOR_PLACEHOLDER_WIDGET_H
 
-#include <QLabel>
-#include <QVBoxLayout>
 #include <QWidget>
 
+class QVBoxLayout;
+class QLabel;
 class PrintingSelectorPlaceholderWidget : public QWidget
 {
     Q_OBJECT

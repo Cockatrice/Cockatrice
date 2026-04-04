@@ -1,5 +1,11 @@
 #include "deck_editor_card_database_dock_widget.h"
 
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../../../interface/widgets/utility/custom_line_edit.h"
+
+#include <QVBoxLayout>
+#include <libcockatrice/models/database/card_database_model.h>
+
 DeckEditorCardDatabaseDockWidget::DeckEditorCardDatabaseDockWidget(AbstractTabDeckEditor *parent) : QDockWidget(parent)
 {
     setObjectName("databaseDisplayDock");

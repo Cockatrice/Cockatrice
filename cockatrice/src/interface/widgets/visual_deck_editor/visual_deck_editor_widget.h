@@ -7,31 +7,29 @@
 #ifndef VISUAL_DECK_EDITOR_H
 #define VISUAL_DECK_EDITOR_H
 
-#include "../cards/card_info_picture_with_text_overlay_widget.h"
-#include "../cards/card_size_widget.h"
-#include "../general/layout_containers/overlap_control_widget.h"
-#include "../quick_settings/settings_button_widget.h"
-#include "visual_deck_editor_placeholder_widget.h"
+#include "visual_deck_editor_display_type.h"
 
-#include <QCheckBox>
-#include <QListWidget>
-#include <QPushButton>
 #include <QWidget>
-#include <libcockatrice/card/database/card_database.h>
-#include <libcockatrice/models/database/card/card_completer_proxy_model.h>
-#include <libcockatrice/models/database/card_database_display_model.h>
-#include <libcockatrice/models/database/card_database_model.h>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <qscrollarea.h>
 
+class DeckListModel;
+class QItemSelectionModel;
+class DeckList;
+class QItemSelection;
+class QLineEdit;
+class CardSizeWidget;
+class CardInfoPictureWithTextOverlayWidget;
+class ExactCard;
+class QPushButton;
+class QCompleter;
+class CardDatabaseModel;
+class CardDatabaseDisplayModel;
+class CardCompleterProxyModel;
+class QVBoxLayout;
+class QHBoxLayout;
+class QScrollArea;
 class VisualDeckDisplayOptionsWidget;
+class VisualDeckEditorPlaceholderWidget;
 class DeckCardZoneDisplayWidget;
-enum class DisplayType
-{
-    Flat,
-    Overlap
-};
-
 class VisualDeckEditorWidget : public QWidget
 {
     Q_OBJECT

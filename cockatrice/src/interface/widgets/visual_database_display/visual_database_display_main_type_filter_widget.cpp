@@ -1,11 +1,14 @@
 #include "visual_database_display_main_type_filter_widget.h"
 
 #include "../../../filters/filter_tree_model.h"
+#include "../general/layout_containers/flow_widget.h"
 
 #include <QLabel>
+#include <QMap>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QTimer>
+#include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>
 

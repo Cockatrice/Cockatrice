@@ -8,6 +8,7 @@
 #ifndef TAB_GENERIC_DECK_EDITOR_H
 #define TAB_GENERIC_DECK_EDITOR_H
 
+#include "../interface/deck_loader/deck_loader.h"
 #include "../interface/widgets/deck_editor/deck_editor_card_database_dock_widget.h"
 #include "../interface/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
 #include "../interface/widgets/deck_editor/deck_editor_database_display_widget.h"

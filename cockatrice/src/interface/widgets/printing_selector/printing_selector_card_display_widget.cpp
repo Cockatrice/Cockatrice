@@ -1,10 +1,12 @@
 #include "printing_selector_card_display_widget.h"
 
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "printing_selector_card_overlay_widget.h"
 #include "set_name_and_collectors_number_display_widget.h"
 
 #include <QGraphicsEffect>
 #include <QVBoxLayout>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <utility>
 
 /**

@@ -7,7 +7,7 @@
 #ifndef DECK_PREVIEW_TAG_ADDITION_WIDGET_H
 #define DECK_PREVIEW_TAG_ADDITION_WIDGET_H
 
-#include "deck_preview_deck_tags_display_widget.h"
+#include <QWidget>
 
 class DeckPreviewTagAdditionWidget : public QWidget
 {

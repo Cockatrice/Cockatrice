@@ -1,15 +1,20 @@
 #ifndef COCKATRICE_VISUAL_DATABASE_DISPLAY_FILTER_TOOLBAR_WIDGET_H
 #define COCKATRICE_VISUAL_DATABASE_DISPLAY_FILTER_TOOLBAR_WIDGET_H
 
-#include "visual_database_display_filter_save_load_widget.h"
-#include "visual_database_display_format_legality_filter_widget.h"
-#include "visual_database_display_main_type_filter_widget.h"
-#include "visual_database_display_name_filter_widget.h"
-#include "visual_database_display_set_filter_widget.h"
-#include "visual_database_display_sub_type_filter_widget.h"
+#include <QWidget>
 
 class VisualDatabaseDisplayWidget;
-
+class QGroupBox;
+class QComboBox;
+class QHBoxLayout;
+class QLabel;
+class SettingsButtonWidget;
+class VisualDatabaseDisplayFilterSaveLoadWidget;
+class VisualDatabaseDisplayMainTypeFilterWidget;
+class VisualDatabaseDisplayNameFilterWidget;
+class VisualDatabaseDisplaySubTypeFilterWidget;
+class VisualDatabaseDisplaySetFilterWidget;
+class VisualDatabaseDisplayFormatLegalityFilterWidget;
 class VisualDatabaseDisplayFilterToolbarWidget : public QWidget
 {
     Q_OBJECT

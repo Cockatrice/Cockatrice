@@ -10,6 +10,9 @@
 #include "../interface/widgets/visual_database_display/visual_database_display_widget.h"
 #include "tab.h"
 
+#include <QPushButton>
+
+class TabDeckEditor;
 class TabVisualDatabaseDisplay : public Tab
 {
     Q_OBJECT

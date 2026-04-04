@@ -1,8 +1,13 @@
 #include "printing_selector_card_sorting_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "printing_selector.h"
 
+#include <QComboBox>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <libcockatrice/card/set/card_set_comparator.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_ALPHABETICAL = tr("Alphabetical");
 const QString PrintingSelectorCardSortingWidget::SORT_OPTIONS_PREFERENCE = tr("Preference");

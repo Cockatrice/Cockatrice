@@ -7,21 +7,18 @@
 #ifndef PRINTING_SELECTOR_H
 #define PRINTING_SELECTOR_H
 
-#include "../cards/card_size_widget.h"
-#include "../general/layout_containers/flow_widget.h"
-#include "../quick_settings/settings_button_widget.h"
-#include "printing_selector_placeholder_widget.h"
-
-#include <QCheckBox>
-#include <QLabel>
-#include <QTreeView>
-#include <QVBoxLayout>
 #include <QWidget>
 #include <libcockatrice/card/card_info.h>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 #define BATCH_SIZE 10
 
+class QVBoxLayout;
+class QHBoxLayout;
+class QCheckBox;
+class SettingsButtonWidget;
+class PrintingSelectorPlaceholderWidget;
+class FlowWidget;
+class CardSizeWidget;
 class DeckStateManager;
 class PrintingSelectorCardSearchWidget;
 class PrintingSelectorCardSelectionWidget;

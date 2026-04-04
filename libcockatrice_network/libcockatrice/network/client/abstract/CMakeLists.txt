@@ -4,7 +4,7 @@ set(CMAKE_AUTORCC ON)
 
 set(HEADERS abstract_client.h)
 
-set(SOURCES abstract_client.cpp)
+set(SOURCES abstract_client.cpp client_status.h)
 
 if(Qt6_FOUND)
   qt6_wrap_cpp(MOC_SOURCES ${HEADERS})

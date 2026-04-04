@@ -3,15 +3,19 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../window_main.h"
+#include "../cards/card_info_picture_art_crop_widget.h"
 #include "background_sources.h"
 #include "home_styled_button.h"
 
+#include <QGridLayout>
 #include <QGroupBox>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/network/client/abstract/client_status.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)

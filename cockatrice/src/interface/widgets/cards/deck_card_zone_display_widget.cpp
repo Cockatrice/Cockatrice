@@ -5,6 +5,7 @@
 #include "libcockatrice/card/database/card_database_manager.h"
 
 #include <QResizeEvent>
+#include <QSortFilterProxyModel>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
 DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,

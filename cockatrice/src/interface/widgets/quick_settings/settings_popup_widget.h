@@ -8,11 +8,10 @@
 #ifndef SETTINGS_POPUP_WIDGET_H
 #define SETTINGS_POPUP_WIDGET_H
 
-#include <QLabel>
-#include <QScrollArea>
-#include <QVBoxLayout>
 #include <QWidget>
 
+class QVBoxLayout;
+class QScrollArea;
 class SettingsPopupWidget : public QWidget
 {
     Q_OBJECT

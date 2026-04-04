@@ -7,9 +7,10 @@
 #ifndef DECKSTATS_INTERFACE_H
 #define DECKSTATS_INTERFACE_H
 
-#include <libcockatrice/card/database/card_database.h>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QObject>
 
+class CardDatabase;
+class DeckList;
 class QByteArray;
 class QNetworkAccessManager;
 class QNetworkReply;

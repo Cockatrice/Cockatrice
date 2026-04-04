@@ -1,11 +1,20 @@
 #include "visual_database_display_filter_save_load_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../filters/filter_tree_model.h"
+#include "../general/layout_containers/flow_widget.h"
 #include "visual_database_filter_display_widget.h"
 
+#include <QFile>
+#include <QFileDialog>
 #include <QHBoxLayout>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonObject>
+#include <QLineEdit>
+#include <QMap>
+#include <QPushButton>
+#include <QVBoxLayout>
 #include <libcockatrice/filters/filter_tree.h>
 
 VisualDatabaseDisplayFilterSaveLoadWidget::VisualDatabaseDisplayFilterSaveLoadWidget(QWidget *parent,

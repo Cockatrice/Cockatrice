@@ -7,17 +7,16 @@
 #ifndef VISUAL_DATABASE_DISPLAY_SET_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_SET_FILTER_WIDGET_H
 
-#include "../../../filters/filter_tree_model.h"
-#include "../general/layout_containers/flow_widget.h"
-
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QMap>
-#include <QPushButton>
-#include <QSpinBox>
-#include <QVBoxLayout>
 #include <QWidget>
 
+class QHBoxLayout;
+class QCheckBox;
+class QSpinBox;
+class FilterTreeModel;
+class QVBoxLayout;
+class QPushButton;
+class QLineEdit;
+class FlowWidget;
 class VisualDatabaseDisplayRecentSetFilterSettingsWidget : public QWidget
 {
     Q_OBJECT

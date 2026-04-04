@@ -7,10 +7,9 @@
 #ifndef OVERLAP_WIDGET_H
 #define OVERLAP_WIDGET_H
 
-#include "../../../layouts/overlap_layout.h"
-
 #include <QWidget>
 
+class OverlapLayout;
 class OverlapWidget final : public QWidget
 {
     Q_OBJECT

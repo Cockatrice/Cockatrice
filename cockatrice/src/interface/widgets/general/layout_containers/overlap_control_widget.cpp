@@ -1,6 +1,10 @@
 #include "overlap_control_widget.h"
 
+#include "../display/labeled_input.h"
 #include "overlap_widget.h"
+
+#include <QHBoxLayout>
+#include <QSlider>
 
 OverlapControlWidget::OverlapControlWidget(int overlapPercentage,
                                            int maxColumns,

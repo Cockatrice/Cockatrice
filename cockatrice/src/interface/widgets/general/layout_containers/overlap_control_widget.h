@@ -6,13 +6,13 @@
 
 #ifndef OVERLAP_CONTROL_WIDGET_H
 #define OVERLAP_CONTROL_WIDGET_H
-#include "../display/labeled_input.h"
-#include "overlap_widget.h"
 
-#include <QHBoxLayout>
-#include <QSlider>
 #include <QWidget>
 
+class OverlapWidget;
+class QHBoxLayout;
+class LabeledInput;
+class QSlider;
 class OverlapControlWidget final : public QWidget
 {
     Q_OBJECT

@@ -7,11 +7,10 @@
 #ifndef DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H
 #define DECK_EDITOR_PRINTING_SELECTOR_DOCK_WIDGET_H
 
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "../printing_selector/printing_selector.h"
-
 #include <QDockWidget>
 
+class AbstractTabDeckEditor;
+class PrintingSelector;
 class PrintingDisabledInfoWidget;
 class TabDeckEditor;
 
