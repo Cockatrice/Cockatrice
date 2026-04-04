@@ -204,6 +204,20 @@ Section "Application" SecApplication
 SetShellVarContext all
 SetOutPath "$INSTDIR"
 
+${If} $PortableMode = 0
+
+    ; --- Register .cod file type ---
+    WriteRegStr HKCR ".cod" "" "Cockatrice"
+    WriteRegStr HKCR "Cockatrice" "" "Cockatrice Deck File"
+    WriteRegStr HKCR "Cockatrice\shell\open\command" "" '"$INSTDIR\cockatrice.exe" "%1"'
+
+    ; --- Register custom URI protocol ---
+    WriteRegStr HKCR "cockatrice" "" "URL: Cockatrice Protocol"
+    WriteRegStr HKCR "cockatrice" "URL Protocol" ""
+    WriteRegStr HKCR "cockatrice\shell\open\command" "" '"$INSTDIR\cockatrice.exe" "%1"'
+
+${EndIf}
+
 ${If} $PortableMode = 1
 ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	; upgrade portable mode
@@ -306,6 +320,9 @@ Section "un.Application" UnSecApplication
 	RMDir "$SMPROGRAMS\Cockatrice"
 
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
+	DeleteRegKey HKCR ".cod"
+    DeleteRegKey HKCR "Cockatrice"
+    DeleteRegKey HKCR "cockatrice"
 SectionEnd
 
 ; unselected because it is /o
