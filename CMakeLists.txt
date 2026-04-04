@@ -195,6 +195,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   add_definitions("-DSFMT_MEXP=19937")
 endif()
 
+find_package(Qt6 6.4 REQUIRED)
+
 find_package(Threads REQUIRED)
 
 # Determine 32 or 64 bit build
@@ -360,7 +362,6 @@ if(TEST)
   add_subdirectory(tests)
 endif()
 
-if(Qt6_FOUND AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
-  # Qt6.3+ requires project finalization to support translations
+if(Qt6_FOUND)
   qt6_finalize_project()
 endif()

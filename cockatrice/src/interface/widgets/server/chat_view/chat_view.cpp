@@ -517,23 +517,13 @@ void ChatView::showSystemPopup(const QString &userName)
 
 QColor ChatView::getCustomMentionColor()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
     QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
-#else
-    QColor customColor;
-    customColor.setNamedColor("#" + SettingsCache::instance().getChatMentionColor());
-#endif
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
 
 QColor ChatView::getCustomHighlightColor()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
     QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
-#else
-    QColor customColor;
-    customColor.setNamedColor("#" + SettingsCache::instance().getChatMentionColor());
-#endif
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
 

@@ -168,6 +168,8 @@ if [[ $RUNNER_OS == macOS ]]; then
   # we use find to get the first subfolder with the name "macos"
   # this works independent of the qt version as there should be only one version installed on the runner at a time
   export QTDIR
+  # Add QTDIR to CMAKE_PREFIX_PATH so CMake can find Qt6
+  export CMAKE_PREFIX_PATH="$QTDIR:$CMAKE_PREFIX_PATH"
 
   if [[ $TARGET_MACOS_VERSION ]]; then
     # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla cmake flag needed to compile to target macOS version
