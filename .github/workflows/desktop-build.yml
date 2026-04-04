@@ -94,7 +94,7 @@ jobs:
           body_path: ${{steps.prepare.outputs.body_path}}
           prerelease: ${{steps.prepare.outputs.is_beta}}
         run: |
-          if [[ $prerelease == yes ]]; then
+          if [[ $prerelease == true ]]; then
             args="--prerelease"
           fi
           gh release create "$tag_name" --draft --verify-tag $args \
