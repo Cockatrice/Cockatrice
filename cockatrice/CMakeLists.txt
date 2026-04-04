@@ -283,6 +283,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
     src/main.cpp
+    src/single_instance_manager.cpp
     src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
     src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp
     src/interface/widgets/tabs/api/archidekt/api_response/archidekt_deck_listing_api_response.cpp
@@ -406,6 +407,11 @@ set(DESKTOPDIR
     CACHE STRING "desktop file destination"
 )
 
+set(MIMEDIR
+    share/mime/packages
+    CACHE STRING "mime file destination"
+)
+
 set(COCKATRICE_MAC_QM_INSTALL_DIR "cockatrice.app/Contents/Resources/translations")
 set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/cockatrice/translations")
 set(COCKATRICE_WIN32_QM_INSTALL_DIR "translations")
@@ -490,6 +496,7 @@ if(UNIX)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION ${DESKTOPDIR})
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice-cod.xml DESTINATION ${MIMEDIR})
   endif()
 elseif(WIN32)
   install(TARGETS cockatrice RUNTIME DESTINATION ./)

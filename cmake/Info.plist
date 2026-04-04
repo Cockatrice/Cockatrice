@@ -34,5 +34,31 @@
     <string>${MACOSX_BUNDLE_COPYRIGHT}</string>
     <key>NSHighResolutionCapable</key>
     <true/>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>cod</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>Cockatrice</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Default</string>
+        </dict>
+    </array>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>Cockatrice</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>cockatrice</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>
