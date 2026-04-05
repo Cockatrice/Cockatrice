@@ -8,12 +8,13 @@ import FeatureDetection from './FeatureDetection';
 
 import './AppShell.css';
 
-import { ToastProvider } from 'components/Toast'
+import { ToastProvider } from 'components/Toast';
+import { RefreshGuardProvider } from 'components';
 
 class AppShell extends Component {
   componentDidMount() {
-    // @TODO (1)
-    window.onbeforeunload = () => true;
+    // RefreshGuardProvider now handles beforeunload events
+    // Removed basic window.onbeforeunload handler
   }
 
   handleContextMenu(event) {
@@ -28,8 +29,10 @@ class AppShell extends Component {
           <ToastProvider>
             <div className="AppShell" onContextMenu={this.handleContextMenu}>
               <Router>
-                <FeatureDetection />
-                <Routes />
+                <RefreshGuardProvider>
+                  <FeatureDetection />
+                  <Routes />
+                </RefreshGuardProvider>
               </Router>
             </div>
           </ToastProvider>
