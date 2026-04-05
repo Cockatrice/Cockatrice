@@ -21,6 +21,7 @@
 #include "visual_database_display_set_filter_widget.h"
 #include "visual_database_display_sub_type_filter_widget.h"
 
+#include <QAction>
 #include <QHeaderView>
 #include <QPushButton>
 #include <QScrollArea>

@@ -7,6 +7,7 @@
 #ifndef DECK_PREVIEW_COLOR_IDENTITY_FILTER_WIDGET_H
 #define DECK_PREVIEW_COLOR_IDENTITY_FILTER_WIDGET_H
 
+#include <QMap>
 #include <QWidget>
 
 class DeckPreviewWidget;
