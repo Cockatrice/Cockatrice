@@ -1146,61 +1146,6 @@ void PlayerActions::actSayMessage()
     sendGameCommand(cmd);
 }
 
-void PlayerActions::setCardAttrHelper(const GameEventContext &context,
-                                      CardItem *card,
-                                      CardAttribute attribute,
-                                      const QString &avalue,
-                                      bool allCards,
-                                      EventProcessingOptions options)
-{
-    if (card == nullptr) {
-        return;
-    }
-
-    bool moveCardContext = context.HasExtension(Context_MoveCard::ext);
-    switch (attribute) {
-        case AttrTapped: {
-            bool tapped = avalue == "1";
-            if (!(!tapped && card->getDoesntUntap() && allCards)) {
-                if (!allCards) {
-                    emit logSetTapped(player, card, tapped);
-                }
-                bool canAnimate = !options.testFlag(SKIP_TAP_ANIMATION) && !moveCardContext;
-                card->setTapped(tapped, canAnimate);
-            }
-            break;
-        }
-        case AttrAttacking: {
-            card->setAttacking(avalue == "1");
-            break;
-        }
-        case AttrFaceDown: {
-            card->setFaceDown(avalue == "1");
-            break;
-        }
-        case AttrColor: {
-            card->setColor(avalue);
-            break;
-        }
-        case AttrAnnotation: {
-            emit logSetAnnotation(player, card, avalue);
-            card->setAnnotation(avalue);
-            break;
-        }
-        case AttrDoesntUntap: {
-            bool value = (avalue == "1");
-            emit logSetDoesntUntap(player, card, value);
-            card->setDoesntUntap(value);
-            break;
-        }
-        case AttrPT: {
-            emit logSetPT(player, card, avalue);
-            card->setPT(avalue);
-            break;
-        }
-    }
-}
-
 void PlayerActions::actMoveCardXCardsFromTop()
 {
     int deckSize = player->getDeckZone()->getCards().size() + 1; // add the card to move to the deck

@@ -16,7 +16,6 @@
 #include <QObject>
 #include <libcockatrice/card/relation/card_relation_type.h>
 #include <libcockatrice/filters/filter_string.h>
-#include <libcockatrice/protocol/pb/card_attributes.pb.h>
 
 namespace google
 {
@@ -35,12 +34,6 @@ class PlayerActions : public QObject
 {
     Q_OBJECT
 
-signals:
-    void logSetTapped(Player *player, CardItem *card, bool tapped);
-    void logSetAnnotation(Player *player, CardItem *card, QString newAnnotation);
-    void logSetDoesntUntap(Player *player, CardItem *card, bool doesntUntap);
-    void logSetPT(Player *player, CardItem *card, QString newPT);
-
 public:
     enum CardsToReveal
     {
@@ -54,13 +47,6 @@ public:
 
     PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
     PendingCommand *prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList);
-
-    void setCardAttrHelper(const GameEventContext &context,
-                           CardItem *card,
-                           CardAttribute attribute,
-                           const QString &avalue,
-                           bool allCards,
-                           EventProcessingOptions options);
 
     void moveOneCardUntil(CardItem *card);
     void stopMoveTopCardsUntil();
