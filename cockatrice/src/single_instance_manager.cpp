@@ -4,35 +4,35 @@ SingleInstanceManager::SingleInstanceManager(QObject *parent) : QObject(parent)
 {
 }
 
-bool SingleInstanceManager::tryRun(const QStringList &initialFiles)
+bool SingleInstanceManager::tryRun(const QStringList &filesToSend)
 {
     serverName = "CockatriceSingleInstance";
 
-    QLocalSocket socket;
-    socket.connectToServer(serverName);
+    // Attempt to connect only if we have files to send
+    if (!filesToSend.isEmpty()) {
+        QLocalSocket socket;
+        socket.connectToServer(serverName);
+        if (socket.waitForConnected(200)) {
+            // Serialize payload with length prefix
+            QByteArray payload;
+            QDataStream out(&payload, QIODevice::WriteOnly);
+            out << filesToSend;
 
-    if (socket.waitForConnected(200)) {
-        // Serialize into buffer first
-        QByteArray payload;
-        QDataStream out(&payload, QIODevice::WriteOnly);
-        out << initialFiles;
+            QByteArray message;
+            QDataStream msgStream(&message, QIODevice::WriteOnly);
+            msgStream << quint32(payload.size());
+            message.append(payload);
 
-        // Prefix with size
-        QByteArray message;
-        QDataStream msgStream(&message, QIODevice::WriteOnly);
-        msgStream << quint32(payload.size());
-        message.append(payload);
+            socket.write(message);
+            socket.flush();
+            socket.waitForBytesWritten(1000);
 
-        socket.write(message);
-        socket.flush();
-        socket.waitForBytesWritten(1000);
-
-        return false; // Another instance is running
+            return false; // Sent successfully → exit
+        }
     }
 
-    // No other instance → start server
+    // Otherwise, start server
     server = new QLocalServer(this);
-
     connect(server, &QLocalServer::newConnection, this, &SingleInstanceManager::handleNewConnection);
 
     if (!server->listen(serverName)) {
@@ -40,8 +40,9 @@ bool SingleInstanceManager::tryRun(const QStringList &initialFiles)
         server->listen(serverName);
     }
 
-    return true;
+    return true; // This process is now primary server
 }
+
 void SingleInstanceManager::handleNewConnection()
 {
     QLocalSocket *socket = server->nextPendingConnection();

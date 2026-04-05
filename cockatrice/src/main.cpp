@@ -277,18 +277,31 @@ int main(int argc, char *argv[])
     SpoilerBackgroundUpdater spoilerBackgroundUpdater;
 
     // --- Handle files or URLs passed at startup ---
-    SingleInstanceManager instance;
     QStringList startupFiles;
-
-    // Collect command-line files/URLs
     for (int i = 1; i < argc; ++i) {
-        QString arg = QString::fromLocal8Bit(argv[i]);
-        startupFiles.append(arg);
+        startupFiles.append(QString::fromLocal8Bit(argv[i]));
     }
 
-    if (!instance.tryRun(startupFiles)) {
-        // Another instance received our files, exit
-        return 0;
+    bool hasActivationFiles = !startupFiles.isEmpty();
+
+    SingleInstanceManager instance;
+
+    if (hasActivationFiles) {
+        // Activation launch: try to forward
+        if (!instance.tryRun(startupFiles)) {
+            // Sent successfully → exit
+            return 0;
+        }
+        // No primary instance → become server
+        qInfo() << "No existing instance found, becoming primary instance";
+    } else {
+        // Plain launch: try to start server, but do not connect to any existing
+        if (!instance.tryRun(QStringList())) {
+            // Server already exists → just run independently
+            qInfo() << "Another instance exists, running independently";
+        } else {
+            qInfo() << "No existing instance found, starting server";
+        }
     }
 
     ui.show();
@@ -327,18 +340,6 @@ int main(int argc, char *argv[])
             }
         }
     });
-
-#ifdef Q_OS_MAC
-    // macOS: handle files opened via Finder after startup
-    QObject::connect(&app, &QApplication::fileOpen, [&ui](const QString &filePath) {
-        qDebug() << "macOS opened file:" << filePath;
-        std::optional<LoadedDeck> deckOpt =
-            DeckLoader::loadFromFile(filePath, DeckFileFormat::getFormatFromName(filePath), true);
-        if (deckOpt) {
-            ui.getTabSupervisor()->openDeckInNewTab(deckOpt.value());
-        }
-    });
-#endif
 
     int ret = app.exec();
 
