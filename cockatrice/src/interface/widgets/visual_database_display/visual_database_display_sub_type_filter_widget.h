@@ -7,6 +7,7 @@
 #ifndef VISUAL_DATABASE_DISPLAY_SUB_TYPE_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_SUB_TYPE_FILTER_WIDGET_H
 
+#include <QMap>
 #include <QWidget>
 
 class FilterTreeModel;
