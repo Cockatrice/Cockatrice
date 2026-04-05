@@ -350,5 +350,5 @@ int main(int argc, char *argv[])
     CountryPixmapGenerator::clear();
     UserLevelPixmapGenerator::clear();
 
-    return 0;
+    return ret;
 }
