@@ -4,7 +4,6 @@
 #include "../general/layout_containers/flow_widget.h"
 
 #include <QLabel>
-#include <QMap>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QTimer>
