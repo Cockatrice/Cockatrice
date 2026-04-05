@@ -1,6 +1,8 @@
 #include "tab_edhrec_main.h"
 
 #include "../../../../../client/settings/cache_settings.h"
+#include "../../interface/widgets/cards/card_size_widget.h"
+#include "../../interface/widgets/quick_settings/settings_button_widget.h"
 #include "../../tab_supervisor.h"
 #include "api_response/average_deck/edhrec_average_deck_api_response.h"
 #include "api_response/commander/edhrec_commander_api_response.h"
@@ -18,13 +20,16 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLineEdit>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QPushButton>
 #include <QRegularExpression>
+#include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
+#include <libcockatrice/models/database/card_database_model.h>
 #include <version_string.h>
 
 static bool canBeCommander(const CardInfoPtr &cardInfo)

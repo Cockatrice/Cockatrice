@@ -1,8 +1,15 @@
 #include "visual_deck_storage_sort_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/deck_loader.h"
+#include "../interface/widgets/general/layout_containers/flow_widget.h"
+#include "deck_preview/deck_preview_widget.h"
+#include "visual_deck_storage_folder_display_widget.h"
+#include "visual_deck_storage_widget.h"
 
+#include <QComboBox>
 #include <QFileInfo>
+#include <QHBoxLayout>
 
 /**
  * @brief Constructs a PrintingSelectorCardSortWidget for searching cards by set name or set code.

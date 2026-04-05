@@ -1,11 +1,17 @@
 #include "visual_deck_storage_folder_display_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/deck_loader.h"
+#include "../../widgets/cards/deck_preview_card_picture_widget.h"
+#include "../general/display/banner_widget.h"
+#include "../general/layout_containers/flow_widget.h"
 #include "deck_preview/deck_preview_widget.h"
+#include "visual_deck_storage_quick_settings_widget.h"
 #include "visual_deck_storage_widget.h"
 
 #include <QDirIterator>
 #include <QMouseEvent>
+#include <QVBoxLayout>
 
 VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     QWidget *parent,

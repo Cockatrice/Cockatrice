@@ -2,7 +2,6 @@
 #define WINDOW_DECKEDITOR_H
 
 #include "../../key_signals.h"
-#include "../interface/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "abstract_tab_deck_editor.h"
 
 #include <libcockatrice/card/card_info.h>

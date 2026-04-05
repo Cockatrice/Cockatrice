@@ -1,7 +1,10 @@
 #include "visual_database_display_color_filter_widget.h"
 
+#include "../../../filters/filter_tree_model.h"
 #include "../cards/additional_info/mana_symbol_widget.h"
 
+#include <QComboBox>
+#include <QHBoxLayout>
 #include <QTimer>
 #include <libcockatrice/filters/filter_tree.h>
 

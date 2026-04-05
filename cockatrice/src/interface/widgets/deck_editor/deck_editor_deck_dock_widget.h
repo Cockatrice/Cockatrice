@@ -8,21 +8,25 @@
 #ifndef DECK_EDITOR_DECK_DOCK_WIDGET_H
 #define DECK_EDITOR_DECK_DOCK_WIDGET_H
 
-#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../key_signals.h"
-#include "../utility/custom_line_edit.h"
-#include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
-#include "deck_list_history_manager_widget.h"
-#include "deck_list_style_proxy.h"
 
 #include <QDockWidget>
-#include <QLabel>
-#include <QTextEdit>
 #include <QTreeView>
-#include <libcockatrice/card/card_info.h>
 
 class DeckListModel;
+class DeckListStyleProxy;
+class QComboBox;
+class ExactCard;
+class QItemSelectionModel;
 class AbstractTabDeckEditor;
+class DeckStateManager;
+class DeckListHistoryManagerWidget;
+class QLabel;
+class LineEditUnfocusable;
+class SettingsButtonWidget;
+class QCheckBox;
+class QTextEdit;
+class DeckPreviewDeckTagsDisplayWidget;
 class DeckEditorDeckDockWidget : public QDockWidget
 {
     Q_OBJECT

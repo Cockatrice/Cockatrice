@@ -2,6 +2,8 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../deck_editor/deck_editor_deck_dock_widget.h"
+#include "../printing_selector/printing_selector.h"
 #include "printing_disabled_info_widget.h"
 
 #include <QVBoxLayout>

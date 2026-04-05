@@ -8,11 +8,12 @@
 #define TAB_EDHREC_H
 
 #include "../../tab.h"
-#include "display/commander/edhrec_commander_api_response_display_widget.h"
 
-#include <QNetworkAccessManager>
 #include <libcockatrice/card/card_info.h>
 
+class QNetworkAccessManager;
+class QNetworkReply;
+class EdhrecCommanderApiResponseDisplayWidget;
 class TabEdhRec : public Tab
 {
     Q_OBJECT

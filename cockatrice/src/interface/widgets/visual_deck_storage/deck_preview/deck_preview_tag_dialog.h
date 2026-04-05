@@ -9,11 +9,12 @@
 #define DECK_PREVIEW_TAG_DIALOG_H
 
 #include <QDialog>
-#include <QLabel>
-#include <QLineEdit>
-#include <QListWidget>
-#include <QVBoxLayout>
 
+class QVBoxLayout;
+class QLabel;
+class QListWidget;
+class QLineEdit;
+class QHBoxLayout;
 class DeckPreviewTagDialog : public QDialog
 {
     Q_OBJECT

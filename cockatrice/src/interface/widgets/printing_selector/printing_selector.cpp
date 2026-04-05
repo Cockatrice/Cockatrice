@@ -3,7 +3,11 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../../interface/widgets/dialogs/dlg_select_set_for_cards.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
+#include "../cards/card_size_widget.h"
 #include "../deck_editor/deck_state_manager.h"
+#include "../general/layout_containers/flow_widget.h"
+#include "../quick_settings/settings_button_widget.h"
 #include "printing_selector_card_display_widget.h"
 #include "printing_selector_card_search_widget.h"
 #include "printing_selector_card_selection_widget.h"
@@ -11,7 +15,13 @@
 #include "printing_selector_placeholder_widget.h"
 
 #include <QBoxLayout>
+#include <QCheckBox>
+#include <QLabel>
 #include <QScrollBar>
+#include <QTreeView>
+#include <QVBoxLayout>
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 /**
  * @brief Constructs a PrintingSelector widget to display and manage card printings.

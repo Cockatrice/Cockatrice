@@ -8,6 +8,8 @@
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_website.h"
 #include "../../interface/widgets/dialogs/dlg_load_remote_deck.h"
 #include "../../interface/widgets/tabs/tab_game.h"
+#include "../../interface/widgets/visual_deck_storage/visual_deck_storage_widget.h"
+#include "../game/abstract_game.h"
 #include "deck_view.h"
 
 #include <QMessageBox>

@@ -9,8 +9,6 @@
 
 #include "tab.h"
 
-#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-
 class AbstractClient;
 class Event_AddToList;
 class Event_ListRooms;

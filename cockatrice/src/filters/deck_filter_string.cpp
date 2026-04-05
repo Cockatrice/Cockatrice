@@ -1,5 +1,7 @@
 #include "deck_filter_string.h"
 
+#include "../interface/deck_loader/deck_loader.h"
+
 #include <QFileInfo>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_string.h>

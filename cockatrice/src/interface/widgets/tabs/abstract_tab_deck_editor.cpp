@@ -15,9 +15,17 @@
 #include "../deck_editor/deck_state_manager.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/pixel_map_generator.h"
+#include "../interface/widgets/deck_editor/deck_editor_card_database_dock_widget.h"
+#include "../interface/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
+#include "../interface/widgets/deck_editor/deck_editor_database_display_widget.h"
+#include "../interface/widgets/deck_editor/deck_editor_deck_dock_widget.h"
+#include "../interface/widgets/deck_editor/deck_editor_filter_dock_widget.h"
+#include "../interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.h"
 #include "../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_website.h"
+#include "../interface/widgets/menus/deck_editor_menu.h"
+#include "../interface/widgets/printing_selector/printing_selector.h"
 #include "../utility/visibility_change_listener.h"
 #include "tab_supervisor.h"
 
@@ -27,15 +35,11 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QHeaderView>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QPrintPreviewDialog>
 #include <QPrinter>
 #include <QProcessEnvironment>
 #include <QPushButton>
-#include <QRegularExpression>
-#include <QSplitter>
-#include <QTreeView>
 #include <QUrl>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_database_model.h>

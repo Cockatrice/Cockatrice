@@ -1,7 +1,9 @@
 #include "visual_deck_storage_tag_filter_widget.h"
 
+#include "../../deck_loader/deck_loader.h"
 #include "../general/layout_containers/flow_widget.h"
 #include "deck_preview/deck_preview_tag_display_widget.h"
+#include "deck_preview/deck_preview_widget.h"
 #include "visual_deck_storage_widget.h"
 
 #include <QHBoxLayout>

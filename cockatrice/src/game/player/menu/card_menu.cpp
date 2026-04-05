@@ -3,6 +3,7 @@
 #include "../../../client/settings/card_counter_settings.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
+#include "../../game/abstract_game.h"
 #include "../../zones/logic/view_zone_logic.h"
 #include "../card_menu_action_type.h"
 #include "../player.h"

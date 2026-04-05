@@ -1,5 +1,6 @@
 #include "deck_editor_card_info_dock_widget.h"
 
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../cards/card_info_frame_widget.h"
 
 #include <QVBoxLayout>

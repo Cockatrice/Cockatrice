@@ -3,6 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../game/board/card_item.h"
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../window_main.h"
 

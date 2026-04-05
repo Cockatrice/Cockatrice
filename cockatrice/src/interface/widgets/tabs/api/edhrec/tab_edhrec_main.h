@@ -7,17 +7,19 @@
 #ifndef TAB_EDHREC_MAIN_H
 #define TAB_EDHREC_MAIN_H
 
-#include "../../interface/widgets/cards/card_size_widget.h"
-#include "../../interface/widgets/quick_settings/settings_button_widget.h"
 #include "../../tab.h"
-#include "display/commander/edhrec_commander_api_response_display_widget.h"
 
-#include <QHBoxLayout>
-#include <QLineEdit>
-#include <QNetworkAccessManager>
-#include <QPushButton>
-#include <libcockatrice/card/database/card_database.h>
+#include <libcockatrice/card/card_info.h>
 
+class CardSizeWidget;
+class QNetworkAccessManager;
+class QNetworkReply;
+class QVBoxLayout;
+class QHBoxLayout;
+class QPushButton;
+class QLineEdit;
+class SettingsButtonWidget;
+class EdhrecCommanderApiResponseDisplayWidget;
 class TabEdhRecMain : public Tab
 {
     Q_OBJECT

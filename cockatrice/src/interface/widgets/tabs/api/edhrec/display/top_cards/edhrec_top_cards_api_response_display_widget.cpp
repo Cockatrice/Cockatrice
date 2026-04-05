@@ -3,6 +3,10 @@
 #include "../../api_response/top_cards/edhrec_top_cards_api_response.h"
 #include "../cards/edhrec_api_response_card_list_display_widget.h"
 
+#include <QResizeEvent>
+#include <QScrollArea>
+#include <QVBoxLayout>
+
 EdhrecTopCardsApiResponseDisplayWidget::EdhrecTopCardsApiResponseDisplayWidget(QWidget *parent,
                                                                                EdhrecTopCardsApiResponse response)
     : QWidget(parent)

@@ -7,18 +7,17 @@
 #ifndef VISUAL_DATABASE_DISPLAY_FILTER_SAVE_LOAD_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_FILTER_SAVE_LOAD_WIDGET_H
 
-#include "../../../filters/filter_tree_model.h"
-#include "../general/layout_containers/flow_widget.h"
-
-#include <QFile>
-#include <QFileDialog>
-#include <QJsonObject>
-#include <QLineEdit>
 #include <QMap>
-#include <QPushButton>
-#include <QVBoxLayout>
 #include <QWidget>
 
+class FilterTreeModel;
+class FlowWidget;
+class QFile;
+class QFileDialog;
+class QJsonObject;
+class QLineEdit;
+class QPushButton;
+class QVBoxLayout;
 class VisualDatabaseDisplayFilterSaveLoadWidget : public QWidget
 {
     Q_OBJECT

@@ -1,5 +1,10 @@
 #include "edhrec_api_response_card_inclusion_display_widget.h"
 
+#include "../../../../../general/display/charts/bars/percent_bar_widget.h"
+
+#include <QLabel>
+#include <QVBoxLayout>
+
 EdhrecApiResponseCardInclusionDisplayWidget::EdhrecApiResponseCardInclusionDisplayWidget(
     QWidget *parent,
     const EdhrecApiResponseCardDetails &_toDisplay)

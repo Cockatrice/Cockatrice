@@ -2,7 +2,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(HEADERS abstract_client.h)
+set(HEADERS abstract_client.h client_status.h)
 
 set(SOURCES abstract_client.cpp)
 

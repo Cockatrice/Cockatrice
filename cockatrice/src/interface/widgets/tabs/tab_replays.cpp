@@ -14,6 +14,7 @@
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QToolBar>
 #include <QTreeView>
 #include <QUrl>

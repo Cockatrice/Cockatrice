@@ -7,7 +7,9 @@
 #include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QPushButton>
+#include <QString>
 
 FilterDisplayWidget::FilterDisplayWidget(QWidget *parent, const QString &filename, FilterTreeModel *_filterModel)
     : QWidget(parent), filterFilename(filename), filterModel(_filterModel)

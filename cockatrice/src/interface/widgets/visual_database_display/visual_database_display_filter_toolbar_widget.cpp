@@ -1,8 +1,21 @@
 #include "visual_database_display_filter_toolbar_widget.h"
 
+#include "../quick_settings/settings_button_widget.h"
+#include "visual_database_display_filter_save_load_widget.h"
+#include "visual_database_display_format_legality_filter_widget.h"
+#include "visual_database_display_main_type_filter_widget.h"
+#include "visual_database_display_name_filter_widget.h"
+#include "visual_database_display_set_filter_widget.h"
+#include "visual_database_display_sub_type_filter_widget.h"
 #include "visual_database_display_widget.h"
 
+#include <QAbstractItemView>
+#include <QComboBox>
 #include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QTreeView>
+#include <libcockatrice/models/database/card_database_display_model.h>
 
 VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidget(VisualDatabaseDisplayWidget *_parent)
     : QWidget(_parent), visualDatabaseDisplay(_parent)

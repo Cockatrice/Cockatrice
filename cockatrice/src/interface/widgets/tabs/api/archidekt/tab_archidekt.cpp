@@ -27,6 +27,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
+#include <libcockatrice/models/database/card_database_model.h>
 #include <version_string.h>
 
 TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor)

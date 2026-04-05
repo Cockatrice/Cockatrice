@@ -4,6 +4,7 @@
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/card_item.h"
 #include "../board/translate_counter_name.h"
+#include "../game/abstract_game.h"
 #include "../phase.h"
 #include "../player/player.h"
 

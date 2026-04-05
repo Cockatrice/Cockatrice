@@ -7,10 +7,12 @@
 #ifndef VISUAL_DECK_STORAGE_FOLDER_DISPLAY_WIDGET_H
 #define VISUAL_DECK_STORAGE_FOLDER_DISPLAY_WIDGET_H
 
-#include "../general/display/banner_widget.h"
-#include "../general/layout_containers/flow_widget.h"
+#include <QWidget>
 
 class VisualDeckStorageWidget;
+class QVBoxLayout;
+class FlowWidget;
+class BannerWidget;
 class VisualDeckStorageFolderDisplayWidget : public QWidget
 {
     Q_OBJECT

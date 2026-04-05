@@ -2,6 +2,7 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/widgets/tabs/tab_game.h"
+#include "../game/abstract_game.h"
 #include "../player/player.h"
 #include "../player/player_actions.h"
 #include "translate_counter_name.h"

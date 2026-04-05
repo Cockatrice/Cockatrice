@@ -6,6 +6,7 @@
 #include "../interface/widgets/server/game_selector.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
+#include "../interface/widgets/utility/line_edit_completer.h"
 #include "../main.h"
 #include "tab_account.h"
 #include "tab_supervisor.h"

@@ -1,5 +1,6 @@
 #include "user_context_menu.h"
 
+#include "../../game/abstract_game.h"
 #include "../../interface/widgets/tabs/tab_account.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"

@@ -1,9 +1,13 @@
 #include "visual_deck_storage_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/deck_loader.h"
+#include "../cards/card_size_widget.h"
 #include "../quick_settings/settings_button_widget.h"
+#include "deck_preview/deck_preview_color_identity_filter_widget.h"
 #include "deck_preview/deck_preview_widget.h"
 #include "visual_deck_storage_folder_display_widget.h"
+#include "visual_deck_storage_quick_settings_widget.h"
 #include "visual_deck_storage_search_widget.h"
 #include "visual_deck_storage_sort_widget.h"
 #include "visual_deck_storage_tag_filter_widget.h"
@@ -11,8 +15,12 @@
 #include <QComboBox>
 #include <QDirIterator>
 #include <QMouseEvent>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), folderWidget(nullptr)
 {

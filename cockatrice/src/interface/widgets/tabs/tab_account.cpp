@@ -15,6 +15,7 @@
 #include <libcockatrice/protocol/pb/event_user_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_user_left.pb.h>
 #include <libcockatrice/protocol/pb/response_list_users.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/trice_limits.h>

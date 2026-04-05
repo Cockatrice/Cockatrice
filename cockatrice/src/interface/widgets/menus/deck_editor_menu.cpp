@@ -1,7 +1,8 @@
-#include "../../../interface/widgets/menus/deck_editor_menu.h"
+#include "deck_editor_menu.h"
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../deck_editor/deck_editor_filter_dock_widget.h"
 #include "../tabs/abstract_tab_deck_editor.h"
 
 DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), deckEditor(parent)

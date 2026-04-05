@@ -7,15 +7,14 @@
 #ifndef EDHREC_COMMANDER_API_RESPONSE_NAVIGATION_WIDGET_H
 #define EDHREC_COMMANDER_API_RESPONSE_NAVIGATION_WIDGET_H
 
-#include "edhrec_api_response_commander_details_display_widget.h"
-#include "edhrec_commander_api_response_bracket_navigation_widget.h"
-#include "edhrec_commander_api_response_budget_navigation_widget.h"
+#include "../../api_response/cards/edhrec_commander_api_response_commander_details.h"
 
-#include <QGridLayout>
-#include <QLabel>
-#include <QPushButton>
 #include <QWidget>
 
+class QPushButton;
+class EdhrecCommanderApiResponseBudgetNavigationWidget;
+class EdhrecCommanderApiResponseBracketNavigationWidget;
+class QGridLayout;
 class EdhrecCommanderApiResponseNavigationWidget : public QWidget
 {
     Q_OBJECT

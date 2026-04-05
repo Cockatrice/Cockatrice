@@ -1,5 +1,8 @@
 #include "edhrec_api_response_card_prices_display_widget.h"
 
+#include <QGridLayout>
+#include <QLabel>
+
 EdhrecApiResponseCardPricesDisplayWidget::EdhrecApiResponseCardPricesDisplayWidget(QWidget *parent,
                                                                                    const CardPrices &_cardPrices)
     : QWidget(parent), cardPrices(_cardPrices)

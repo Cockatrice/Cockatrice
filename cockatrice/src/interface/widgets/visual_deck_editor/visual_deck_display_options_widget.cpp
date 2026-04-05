@@ -1,7 +1,16 @@
 #include "visual_deck_display_options_widget.h"
 
+#include "../interface/widgets/deck_editor/deck_editor_deck_dock_widget.h"
+#include "../interface/widgets/quick_settings/settings_button_widget.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
+#include "deck_list_model.h"
+#include "visual_deck_editor_widget.h"
 
+#include <QComboBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QListWidget>
+#include <QPushButton>
 #include <libcockatrice/utility/qt_utils.h>
 
 VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent) : QWidget(parent)

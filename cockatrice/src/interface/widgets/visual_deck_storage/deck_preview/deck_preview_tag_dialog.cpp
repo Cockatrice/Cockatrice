@@ -8,9 +8,11 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QListWidget>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTimer>
+#include <QVBoxLayout>
 
 DeckPreviewTagDialog::DeckPreviewTagDialog(const QStringList &knownTags,
                                            const QStringList &_activeTags,

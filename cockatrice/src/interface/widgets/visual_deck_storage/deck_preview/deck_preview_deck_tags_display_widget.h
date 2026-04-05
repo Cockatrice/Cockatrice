@@ -7,12 +7,10 @@
 #ifndef DECK_PREVIEW_DECK_TAGS_DISPLAY_WIDGET_H
 #define DECK_PREVIEW_DECK_TAGS_DISPLAY_WIDGET_H
 
-#include "../../../deck_loader/deck_loader.h"
-#include "deck_preview_widget.h"
-
 #include <QWidget>
 
 class DeckPreviewWidget;
+class FlowWidget;
 class DeckPreviewDeckTagsDisplayWidget : public QWidget
 {
     Q_OBJECT

@@ -20,6 +20,7 @@
 #include <libcockatrice/network/server/remote/user_level.h>
 
 class AbstractGame;
+class CardRef;
 class QTextTable;
 class QMouseEvent;
 class UserContextMenu;

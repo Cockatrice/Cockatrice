@@ -1,5 +1,6 @@
 #include "card_picture_loader_status_bar.h"
 
+#include "../widgets/quick_settings/settings_popup_widget.h"
 #include "card_picture_loader_request_status_display_widget.h"
 
 CardPictureLoaderStatusBar::CardPictureLoaderStatusBar(QWidget *parent) : QWidget(parent)
