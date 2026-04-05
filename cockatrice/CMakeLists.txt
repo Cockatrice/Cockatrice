@@ -109,6 +109,8 @@ set(cockatrice_SOURCES
     src/game/replay.cpp
     src/game/tally/tally_manager.cpp
     src/game/tally/tally_manager.h
+    src/game/tally/tally_widget.cpp
+    src/game/tally/tally_widget.h
     src/game/zones/card_zone_logic.cpp
     src/game/zones/hand_zone_logic.cpp
     src/game/zones/pile_zone_logic.cpp

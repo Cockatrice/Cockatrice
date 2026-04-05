@@ -20,6 +20,8 @@
 #include <QLoggingCategory>
 #include <QMap>
 
+class TallyManager;
+class TallyWidget;
 class ServerInfo_PlayerProperties;
 class TabbedDeckViewContainer;
 inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
@@ -66,6 +68,7 @@ private:
 
     CardInfoFrameWidget *cardInfoFrameWidget;
     PlayerListWidget *playerListWidget;
+    TallyWidget *tallyWidget;
     QLabel *timeElapsedLabel;
     MessageLogWidget *messageLog;
     QLabel *sayLabel;
@@ -73,10 +76,11 @@ private:
     PhasesToolbar *phasesToolbar;
     GameScene *scene;
     GameView *gameView;
+    TallyManager *tallyManager;
     QMap<int, TabbedDeckViewContainer *> deckViewContainers;
     QVBoxLayout *deckViewContainerLayout;
     QWidget *gamePlayAreaWidget, *deckViewContainerWidget;
-    QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *replayDock;
+    QDockWidget *cardInfoDock, *messageLayoutDock, *playerListDock, *tallyDock, *replayDock;
     QAction *playersSeparator;
     QMenu *gameMenu, *viewMenu;
     TearOffMenu *phasesMenu;
@@ -121,6 +125,7 @@ private:
     void registerDockWidget(QMenu *_viewMenu, QDockWidget *widget, const QSize &defaultSize);
     void createCardInfoDock(bool bReplay = false);
     void createPlayerListDock(bool bReplay = false);
+    void createTallyDock(bool bReplay = false);
     void createMessageDock(bool bReplay = false);
     void createPlayAreaWidget(bool bReplay = false);
     void createDeckViewContainerWidget(bool bReplay = false);
