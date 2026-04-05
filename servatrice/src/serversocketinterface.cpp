@@ -31,6 +31,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QHostAddress>
+#include <QLoggingCategory>
 #include <QRegularExpression>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -83,6 +84,10 @@
 #include <server_room.h>
 #include <string>
 
+inline Q_LOGGING_CATEGORY(AbstractServerSocketInterfaceLog, "abstract_server_socket_interface");
+inline Q_LOGGING_CATEGORY(TcpServerSocketInterfaceLog, "tcp_server_socket_interface");
+inline Q_LOGGING_CATEGORY(WebsocketServerSocketInterfaceLog, "websocket_server_socket_interface");
+
 static const int protocolVersion = 14;
 
 AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server,
@@ -130,7 +135,7 @@ bool AbstractServerSocketInterface::initSession()
 
 void AbstractServerSocketInterface::catchSocketError(QAbstractSocket::SocketError socketError)
 {
-    qDebug() << "Socket error:" << socketError;
+    qCWarning(AbstractServerSocketInterfaceLog) << "Socket error:" << socketError;
 
     prepareDestroy();
 }
@@ -1100,7 +1105,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdBanFromServer(const Com
         clientIdQuery->bindValue(":client_id", nameFromStdString(cmd.clientid()));
         sqlInterface->execSqlQuery(clientIdQuery);
         if (!sqlInterface->execSqlQuery(clientIdQuery)) {
-            qDebug("ClientID username ban lookup failed: SQL Error");
+            qCWarning(AbstractServerSocketInterfaceLog) << "ClientID username ban lookup failed: SQL Error";
         } else {
             while (clientIdQuery->next()) {
                 userName = clientIdQuery->value(0).toString();
@@ -1152,7 +1157,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
 {
     QString userName = nameFromStdString(cmd.user_name());
     QString clientId = nameFromStdString(cmd.clientid());
-    qDebug() << "Got register command for user:" << userName;
+    qCDebug(AbstractServerSocketInterfaceLog) << "Got register command for user:" << userName;
 
     bool registrationEnabled = settingsCache->value("registration/enabled", false).toBool();
     if (!registrationEnabled) {
@@ -1289,7 +1294,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
                                                    country, !requireEmailActivation);
 
     if (regSucceeded) {
-        qDebug() << "Accepted register command for user:" << userName;
+        qCDebug(AbstractServerSocketInterfaceLog) << "Accepted register command for user:" << userName;
         if (requireEmailActivation) {
             QSqlQuery *query =
                 sqlInterface->prepareQuery("insert into {prefix}_activation_emails (name) values(:name)");
@@ -1337,7 +1342,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const C
         clientId = "UNKNOWN";
 
     if (sqlInterface->activateUser(userName, token)) {
-        qDebug() << "Accepted activation for user" << userName;
+        qCDebug(AbstractServerSocketInterfaceLog) << "Accepted activation for user" << userName;
 
         if (servatrice->getEnableRegistrationAudit())
             sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
@@ -1345,7 +1350,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const C
 
         return Response::RespActivationAccepted;
     } else {
-        qDebug() << "Failed activation for user" << userName;
+        qCDebug(AbstractServerSocketInterfaceLog) << "Failed activation for user" << userName;
 
         if (servatrice->getEnableRegistrationAudit())
             sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
@@ -1493,7 +1498,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordRequest(c
     const QString userName = nameFromStdString(cmd.user_name());
     const QString clientId = nameFromStdString(cmd.clientid());
 
-    qDebug() << "Received reset password request from user:" << userName;
+    qCDebug(AbstractServerSocketInterfaceLog) << "Received reset password request from user:" << userName;
 
     if (!servatrice->getEnableForgotPassword()) {
         if (servatrice->getEnableForgotPasswordAudit())
@@ -1575,7 +1580,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
     Q_UNUSED(rc);
     QString userName = nameFromStdString(cmd.user_name());
     QString clientId = nameFromStdString(cmd.clientid());
-    qDebug() << "Received reset password reset from user:" << userName;
+    qCDebug(AbstractServerSocketInterfaceLog) << "Received reset password reset from user:" << userName;
 
     if (!sqlInterface->doesForgotPasswordExist(userName)) {
         if (servatrice->getEnableForgotPasswordAudit())
@@ -1626,7 +1631,7 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
     const QString userName = nameFromStdString(cmd.user_name());
     const QString clientId = nameFromStdString(cmd.clientid());
 
-    qDebug() << "Received reset password challenge from user:" << userName;
+    qCDebug(AbstractServerSocketInterfaceLog) << "Received reset password challenge from user:" << userName;
 
     if (!servatrice->getEnableForgotPasswordChallenge()) {
         if (servatrice->getEnableForgotPasswordAudit()) {
@@ -1979,7 +1984,7 @@ void TcpServerSocketInterface::flushOutputQueue()
             // In case socket->write() calls catchSocketError(), the mutex must not be locked during this call.
             writeToSocket(buf);
         } else {
-            qDebug() << "[TcpServerSocketInterface] serialisation error!";
+            qCWarning(TcpServerSocketInterfaceLog) << "serialisation error!";
         }
 
         totalBytes += size + 4;
@@ -2017,24 +2022,26 @@ void TcpServerSocketInterface::readClient()
         try {
             ok = newCommandContainer.ParseFromArray(inputBuffer.data(), messageLength);
         } catch (std::exception &e) {
-            qDebug() << "Caught std::exception in" << __FILE__ << __LINE__ <<
+            qCWarning(TcpServerSocketInterfaceLog) << "Caught std::exception in" << __FILE__ << __LINE__ <<
 #ifdef _MSC_VER // Visual Studio
-                __FUNCTION__;
+                __FUNCTION__
 #else
-                __PRETTY_FUNCTION__;
+                __PRETTY_FUNCTION__
 #endif
-            qDebug() << "Exception:" << e.what();
-            qDebug() << "Message coming from:" << getAddress();
-            qDebug() << "Message length:" << messageLength;
-            qDebug() << "Message content:" << inputBuffer.toHex();
+                                                   << Qt::endl
+                                                   << "Exception:" << e.what() << Qt::endl
+                                                   << "Message coming from:" << getAddress() << Qt::endl
+                                                   << "Message length:" << messageLength << Qt::endl
+                                                   << "Message content:" << inputBuffer.toHex();
         } catch (...) {
-            qDebug() << "Unhandled exception in" << __FILE__ << __LINE__ <<
+            qCWarning(TcpServerSocketInterfaceLog) << "Unhandled exception in" << __FILE__ << __LINE__ <<
 #ifdef _MSC_VER // Visual Studio
-                __FUNCTION__;
+                __FUNCTION__
 #else
-                __PRETTY_FUNCTION__;
+                __PRETTY_FUNCTION__
 #endif
-            qDebug() << "Message coming from:" << getAddress();
+                                                   << Qt::endl
+                                                   << "Message coming from:" << getAddress();
         }
         inputBuffer.remove(0, messageLength);
         messageInProgress = false;
@@ -2050,7 +2057,7 @@ void TcpServerSocketInterface::readClient()
             }
             // end of hack
         } else {
-            qDebug() << "[TcpServerSocketInterface] parsing error!";
+            qCWarning(TcpServerSocketInterfaceLog) << "parsing error!";
         }
 
     } while (!inputBuffer.isEmpty());
@@ -2184,7 +2191,7 @@ void WebsocketServerSocketInterface::flushOutputQueue()
             // In case socket->write() calls catchSocketError(), the mutex must not be locked during this call.
             writeToSocket(buf);
         } else {
-            qDebug() << "[TcpServerSocketInterface] serialisation error!";
+            qCWarning(TcpServerSocketInterfaceLog) << "serialisation error!";
         }
 
         totalBytes += size;
@@ -2205,30 +2212,32 @@ void WebsocketServerSocketInterface::binaryMessageReceived(const QByteArray &mes
     try {
         ok = newCommandContainer.ParseFromArray(message.data(), message.size());
     } catch (std::exception &e) {
-        qDebug() << "Caught std::exception in" << __FILE__ << __LINE__ <<
+        qCWarning(WebsocketServerSocketInterfaceLog) << "Caught std::exception in" << __FILE__ << __LINE__ <<
 #ifdef _MSC_VER // Visual Studio
-            __FUNCTION__;
+            __FUNCTION__
 #else
-            __PRETTY_FUNCTION__;
+            __PRETTY_FUNCTION__
 #endif
-        qDebug() << "Exception:" << e.what();
-        qDebug() << "Message coming from:" << getAddress();
-        qDebug() << "Message length:" << message.size();
-        qDebug() << "Message content:" << message.toHex();
+                                                     << Qt::endl
+                                                     << "Exception:" << e.what() << Qt::endl
+                                                     << "Message coming from:" << getAddress() << Qt::endl
+                                                     << "Message length:" << message.size() << Qt::endl
+                                                     << "Message content:" << message.toHex();
     } catch (...) {
-        qDebug() << "Unhandled exception in" << __FILE__ << __LINE__ <<
+        qCWarning(WebsocketServerSocketInterfaceLog) << "Unhandled exception in" << __FILE__ << __LINE__ <<
 #ifdef _MSC_VER // Visual Studio
-            __FUNCTION__;
+            __FUNCTION__
 #else
-            __PRETTY_FUNCTION__;
+            __PRETTY_FUNCTION__
 #endif
-        qDebug() << "Message coming from:" << getAddress();
+                                                     << Qt::endl
+                                                     << "Message coming from:" << getAddress();
     }
 
     if (ok) {
         processCommandContainer(newCommandContainer);
     } else {
-        qDebug() << "[WebsocketServerSocketInterface] parsing error!";
+        qCWarning(WebsocketServerSocketInterfaceLog) << "parsing error!";
     }
 }
 

@@ -105,6 +105,6 @@ QString getSafeDebugString(const ::google::protobuf::Message &message)
     if (ok) {
         return QString::number(size) + " bytes " + QString::fromStdString(debug_string);
     } else {
-        return "could not convert message to string";
+        return "[could not convert message to string]";
     }
 }

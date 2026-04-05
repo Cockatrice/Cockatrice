@@ -3,6 +3,7 @@
 #include "main.h"
 #include "server_logger.h"
 
+#include <QLoggingCategory>
 #include <QSslSocket>
 #include <google/protobuf/descriptor.h>
 #include <libcockatrice/protocol/debug_pb_message.h>
@@ -20,6 +21,8 @@
 #include <libcockatrice/protocol/pb/isl_message.pb.h>
 #include <server_protocolhandler.h>
 #include <server_room.h>
+
+inline Q_LOGGING_CATEGORY(IslInterfaceLog, "isl_interface");
 
 void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)
 {
@@ -113,10 +116,11 @@ void IslInterface::initServer()
     socket->startServerEncryption();
     if (!socket->waitForEncrypted(5000)) {
         QList<QSslError> sslErrors(socket->sslHandshakeErrors());
-        if (sslErrors.isEmpty())
-            qDebug() << "[ISL] SSL handshake timeout, terminating connection";
-        else
-            qDebug() << "[ISL] SSL errors:" << sslErrors;
+        if (sslErrors.isEmpty()) {
+            qCDebug(IslInterfaceLog) << "SSL handshake timeout, terminating connection";
+        } else {
+            qCWarning(IslInterfaceLog) << "SSL errors:" << sslErrors;
+        }
         deleteLater();
         return;
     }
@@ -157,7 +161,7 @@ void IslInterface::initServer()
 
     server->islLock.lockForWrite();
     if (server->islConnectionExists(serverId)) {
-        qDebug() << "[ISL] Duplicate connection to #" << serverId << "terminating connection";
+        qCDebug(IslInterfaceLog) << "Duplicate connection to #" << serverId << "terminating connection";
         deleteLater();
     } else {
         transmitMessage(message);
@@ -180,27 +184,28 @@ void IslInterface::initClient()
     expectedErrors.append(QSslError(QSslError::SelfSignedCertificate, peerCert));
     socket->ignoreSslErrors(expectedErrors);
 
-    qDebug() << "[ISL] Connecting to #" << serverId << ":" << peerAddress << ":" << peerPort;
+    qCDebug(IslInterfaceLog) << "Connecting to #" << serverId << ":" << peerAddress << ":" << peerPort;
 
     socket->connectToHostEncrypted(peerAddress, peerPort, peerHostName);
     if (!socket->waitForConnected(5000)) {
-        qDebug() << "[ISL] Socket error:" << socket->errorString();
+        qCDebug(IslInterfaceLog) << "Socket error:" << socket->errorString();
         deleteLater();
         return;
     }
     if (!socket->waitForEncrypted(5000)) {
         QList<QSslError> sslErrors(socket->sslHandshakeErrors());
-        if (sslErrors.isEmpty())
-            qDebug() << "[ISL] SSL handshake timeout, terminating connection";
-        else
-            qDebug() << "[ISL] SSL errors:" << sslErrors;
+        if (sslErrors.isEmpty()) {
+            qCDebug(IslInterfaceLog) << "SSL handshake timeout, terminating connection";
+        } else {
+            qCWarning(IslInterfaceLog) << "SSL errors:" << sslErrors;
+        }
         deleteLater();
         return;
     }
 
     server->islLock.lockForWrite();
     if (server->islConnectionExists(serverId)) {
-        qDebug() << "[ISL] Duplicate connection to #" << serverId << "terminating connection";
+        qCDebug(IslInterfaceLog) << "Duplicate connection to #" << serverId << "terminating connection";
         deleteLater();
         return;
     }
@@ -249,14 +254,14 @@ void IslInterface::readClient()
         if (ok) {
             processMessage(newMessage);
         } else {
-            qDebug() << "[ISL] parsing error!";
+            qCWarning(IslInterfaceLog) << "parsing error!";
         }
     } while (!inputBuffer.isEmpty());
 }
 
 void IslInterface::catchSocketError(QAbstractSocket::SocketError socketError)
 {
-    qDebug() << "[ISL] Socket error:" << socketError;
+    qCWarning(IslInterfaceLog) << "Socket error:" << socketError;
 
     server->islLock.lockForWrite();
     server->removeIslInterface(serverId);
@@ -275,7 +280,7 @@ void IslInterface::transmitMessage(const IslMessage &item)
 #endif
     buf.resize(size + 4);
     if (!item.SerializeToArray(buf.data() + 4, size)) {
-        qDebug() << "[ISL] transmit error!";
+        qCWarning(IslInterfaceLog) << "transmit error!";
         return;
     }
     buf.data()[3] = (unsigned char)size;
@@ -375,7 +380,7 @@ void IslInterface::processSessionEvent(const SessionEvent &event, qint64 session
             QReadLocker clientsLocker(&server->clientsLock);
             Server_AbstractUserInterface *client = server->getUsersBySessionId().value(sessionId);
             if (!client) {
-                qDebug() << "IslInterface::processSessionEvent: session id" << sessionId << "not found";
+                qCDebug(IslInterfaceLog) << "IslInterface::processSessionEvent: session id" << sessionId << "not found";
                 break;
             }
             const Event_GameJoined &gameJoined = event.GetExtension(Event_GameJoined::ext);
@@ -389,7 +394,8 @@ void IslInterface::processSessionEvent(const SessionEvent &event, qint64 session
             QReadLocker clientsLocker(&server->clientsLock);
             Server_AbstractUserInterface *client = server->getUsersBySessionId().value(sessionId);
             if (!client) {
-                qDebug() << "IslInterface::processSessionEvent: session id" << sessionId << "not found";
+                qCWarning(IslInterfaceLog)
+                    << "IslInterface::processSessionEvent: session id" << sessionId << "not found";
                 break;
             }
 
@@ -437,7 +443,7 @@ void IslInterface::processRoomCommand(const CommandContainer &cont, qint64 sessi
 
 void IslInterface::processMessage(const IslMessage &item)
 {
-    qDebug() << getSafeDebugString(item);
+    qCDebug(IslInterfaceLog) << getSafeDebugString(item);
 
     switch (item.message_type()) {
         case IslMessage::ROOM_COMMAND_CONTAINER: {

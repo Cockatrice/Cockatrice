@@ -84,6 +84,7 @@
 const QString MainWindow::appName = "Cockatrice";
 const QStringList MainWindow::fileNameFilters = QStringList() << QObject::tr("Cockatrice card database (*.xml)")
                                                               << QObject::tr("All files (*.*)");
+inline Q_LOGGING_CATEGORY(MainWindowLog, "main_window");
 
 /**
  * Replaces the tab-specific menus that are shown in the menuBar.
@@ -280,7 +281,7 @@ void MainWindow::actWatchReplay()
     if (replay->ParseFromArray(buf.data(), buf.size())) {
         tabSupervisor->openReplay(replay);
     } else {
-        qDebug() << "[MainWindow] failed to parse replay!";
+        qCWarning(MainWindowLog) << "failed to parse replay!";
     }
 }
 

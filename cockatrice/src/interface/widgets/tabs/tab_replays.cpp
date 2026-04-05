@@ -30,6 +30,8 @@
 #include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 
+inline Q_LOGGING_CATEGORY(TabReplaysLog, "replays_tab");
+
 TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User *currentUserInfo)
     : Tab(_tabSupervisor), client(_client)
 {
@@ -268,7 +270,7 @@ void TabReplays::actOpenLocalReplay()
         if (replay->ParseFromArray(_data.data(), _data.size())) {
             emit openReplay(replay);
         } else {
-            qDebug() << "could not parse replay!";
+            qCWarning(TabReplaysLog) << "could not parse replay!";
         }
     }
 }
@@ -385,7 +387,7 @@ void TabReplays::openRemoteReplayFinished(const Response &r)
 
         emit openReplay(replay);
     } else {
-        qDebug() << "could not parse replay!";
+        qCWarning(TabReplaysLog) << "could not parse remote replay!";
     }
 }
 
