@@ -4,6 +4,7 @@
 #include "../game/abstract_game.h"
 #include "../interface/widgets/tabs/tab_game.h"
 
+#include <QAction>
 #include <QHBoxLayout>
 #include <QToolButton>
 

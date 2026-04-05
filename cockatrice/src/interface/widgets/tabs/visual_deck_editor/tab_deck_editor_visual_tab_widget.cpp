@@ -1,5 +1,6 @@
 #include "tab_deck_editor_visual_tab_widget.h"
 
+#include "../../interface/widgets/cards/card_info_picture_with_text_overlay_widget.h"
 #include "../../interface/widgets/deck_analytics/deck_analytics_widget.h"
 #include "../../interface/widgets/deck_editor/deck_editor_deck_dock_widget.h"
 #include "../../interface/widgets/visual_database_display/visual_database_display_widget.h"

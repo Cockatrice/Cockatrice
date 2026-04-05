@@ -10,7 +10,7 @@
 #include <QWidget>
 
 class VisualDeckStorageQuickSettingsWidget;
-class LoadedDeck;
+struct LoadedDeck;
 class QSpinBox;
 class QVBoxLayout;
 class QHBoxLayout;

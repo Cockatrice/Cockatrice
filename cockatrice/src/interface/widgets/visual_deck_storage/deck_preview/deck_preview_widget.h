@@ -21,7 +21,7 @@ class DeckPreviewCardPictureWidget;
 class ColorIdentityWidget;
 class QLabel;
 class QMenu;
-class LoadedDeck;
+struct LoadedDeck;
 class VisualDeckStorageWidget;
 class DeckPreviewDeckTagsDisplayWidget;
 

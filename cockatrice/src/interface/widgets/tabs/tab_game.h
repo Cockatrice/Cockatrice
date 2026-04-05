@@ -52,7 +52,7 @@ class TearOffMenu;
 class Player;
 class ServerInfo_Player;
 class GameEventContext;
-class LoadedDeck;
+struct LoadedDeck;
 class Event_GameJoined;
 class ServerInfo_User;
 

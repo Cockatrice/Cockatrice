@@ -39,7 +39,7 @@ class TabMessage;
 class TabAccount;
 class TabDeckEditor;
 class TabLog;
-class LoadedDeck;
+struct LoadedDeck;
 class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;
