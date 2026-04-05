@@ -5,6 +5,7 @@
 #include "phases_toolbar.h"
 #include "player/player.h"
 #include "player/player_graphics_item.h"
+#include "zones/select_zone.h"
 #include "zones/view_zone.h"
 #include "zones/view_zone_widget.h"
 
@@ -344,10 +345,24 @@ void GameScene::updateHover(const QPointF &scenePos)
 void GameScene::updateHoveredCard(CardItem *newCard)
 {
     if (hoveredCard && (newCard != hoveredCard))
-        hoveredCard->setHovered(false);
+        endCardHover(hoveredCard);
     if (newCard && (newCard != hoveredCard))
-        newCard->setHovered(true);
+        beginCardHover(newCard);
     hoveredCard = newCard;
+}
+
+void GameScene::beginCardHover(CardItem *card)
+{
+    card->setHovered(true);
+    if (auto *zone = SelectZone::findOwningSelectZone(card))
+        zone->escapeClipForHover(card);
+}
+
+void GameScene::endCardHover(CardItem *card)
+{
+    if (auto *zone = SelectZone::findOwningSelectZone(card))
+        zone->restoreClipAfterHover(card);
+    card->setHovered(false);
 }
 
 CardZone *GameScene::findTopmostZone(const QList<QGraphicsItem *> &items)
@@ -484,6 +499,8 @@ bool GameScene::event(QEvent *event)
 {
     if (event->type() == QEvent::GraphicsSceneMouseMove)
         updateHover(static_cast<QGraphicsSceneMouseEvent *>(event)->scenePos());
+    else if (event->type() == QEvent::Leave)
+        updateHoveredCard(nullptr);
 
     return QGraphicsScene::event(event);
 }

@@ -1,10 +1,9 @@
 #include "stack_zone.h"
 
-#include "../../client/settings/cache_settings.h"
 #include "../../interface/theme_manager.h"
-#include "../board/arrow_item.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
+#include "../card_dimensions.h"
 #include "../player/player.h"
 #include "../player/player_actions.h"
 #include "logic/stack_zone_logic.h"
@@ -27,7 +26,7 @@ void StackZone::updateBg()
 
 QRectF StackZone::boundingRect() const
 {
-    return {0, 0, 100, zoneHeight};
+    return {0, 0, CardDimensions::WIDTH_F * 1.5, zoneHeight};
 }
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -40,7 +39,15 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
                                 CardZoneLogic *startZone,
                                 const QPoint &dropPoint)
 {
-    if (startZone == nullptr || startZone->getPlayer() == nullptr) {
+    if (startZone == nullptr || startZone->getPlayer() == nullptr || dragItems.isEmpty()) {
+        return;
+    }
+
+    int index = calcDropIndexFromY(dropPoint.y(), MIN_CARD_VISIBLE);
+
+    // Same-zone no-op: don't move a card onto itself
+    const auto &cards = getLogic()->getCards();
+    if (!cards.isEmpty() && startZone == getLogic() && cards.at(index)->getId() == dragItems.at(0)->getId()) {
         return;
     }
 
@@ -49,36 +56,12 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     cmd.set_start_zone(startZone->getName().toStdString());
     cmd.set_target_player_id(getLogic()->getPlayer()->getPlayerInfo()->getId());
     cmd.set_target_zone(getLogic()->getName().toStdString());
-
-    int index = 0;
-
-    if (!getLogic()->getCards().isEmpty()) {
-        const auto cardCount = static_cast<int>(getLogic()->getCards().size());
-        const auto &card = getLogic()->getCards().at(0);
-
-        index = qRound(divideCardSpaceInZone(dropPoint.y(), cardCount, boundingRect().height(),
-                                             card->boundingRect().height(), true));
-
-        // divideCardSpaceInZone is not guaranteed to return a valid index
-        // currently, so clamp it to avoid crashes.
-        index = qBound(0, index, cardCount - 1);
-
-        if (startZone == getLogic()) {
-            const auto &dragItem = dragItems.at(0);
-            const auto &card = getLogic()->getCards().at(index);
-
-            if (card->getId() == dragItem->getId()) {
-                return;
-            }
-        }
-    }
-
     cmd.set_x(index);
     cmd.set_y(0);
 
-    for (CardDragItem *item : dragItems) {
+    for (const CardDragItem *item : dragItems) {
         if (item) {
-            auto cardToMove = cmd.mutable_cards_to_move()->add_card();
+            auto *cardToMove = cmd.mutable_cards_to_move()->add_card();
             cardToMove->set_card_id(item->getId());
             if (item->isForceFaceDown()) {
                 cardToMove->set_face_down(true);
@@ -89,24 +72,22 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(cmd);
 }
 
+void StackZone::setHeight(qreal newHeight)
+{
+    if (qFuzzyCompare(1.0 + zoneHeight, 1.0 + newHeight)) {
+        return;
+    }
+    prepareGeometryChange();
+    zoneHeight = newHeight;
+    reorganizeCards();
+    update();
+}
+
 void StackZone::reorganizeCards()
 {
     if (!getLogic()->getCards().isEmpty()) {
-        const auto cardCount = static_cast<int>(getLogic()->getCards().size());
-        qreal totalWidth = boundingRect().width();
-        qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
-        qreal xspace = 5;
-        qreal x1 = xspace;
-        qreal x2 = totalWidth - xspace - cardWidth;
-
-        for (int i = 0; i < cardCount; i++) {
-            CardItem *card = getLogic()->getCards().at(i);
-            qreal x = (i % 2) ? x2 : x1;
-            qreal y = divideCardSpaceInZone(i, cardCount, boundingRect().height(),
-                                            getLogic()->getCards().at(0)->boundingRect().height());
-            card->setPos(x, y);
-            card->setRealZValue(i);
-        }
+        const auto params = buildStackParams(MIN_CARD_VISIBLE);
+        layoutCardsVertically(params);
     }
     update();
 }
