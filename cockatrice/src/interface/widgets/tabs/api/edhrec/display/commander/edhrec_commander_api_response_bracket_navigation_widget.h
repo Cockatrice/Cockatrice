@@ -2,6 +2,7 @@
 #define COCKATRICE_EDHREC_COMMANDER_API_RESPONSE_BRACKET_NAVIGATION_WIDGET_H
 
 #include <QWidget>
+#include <QMap>
 
 class QGridLayout;
 class QLabel;
