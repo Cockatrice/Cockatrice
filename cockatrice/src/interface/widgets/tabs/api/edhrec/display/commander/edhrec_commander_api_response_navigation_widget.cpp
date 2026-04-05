@@ -7,6 +7,7 @@
 
 #include <QGridLayout>
 #include <QLabel>
+#include <QMap>
 #include <QPushButton>
 
 EdhrecCommanderApiResponseNavigationWidget::EdhrecCommanderApiResponseNavigationWidget(
