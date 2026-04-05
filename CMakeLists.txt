@@ -5,7 +5,7 @@
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.25)
 
 # Early detect ccache
 option(USE_CCACHE "Cache the build results with ccache" ON)
@@ -149,7 +149,7 @@ if(MSVC)
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 
   add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
-elseif(CMAKE_COMPILER_IS_GNUCXX)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   # linux/gcc, bsd/gcc, windows/mingw
   include(CheckCXXCompilerFlag)
 
@@ -199,13 +199,6 @@ find_package(Qt6 6.4 REQUIRED)
 
 find_package(Threads REQUIRED)
 
-# Determine 32 or 64 bit build
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  set(_lib_suffix 64)
-else()
-  set(_lib_suffix 32)
-endif()
-
 if(DEFINED QTDIR${_lib_suffix})
   list(APPEND CMAKE_PREFIX_PATH "${QTDIR${_lib_suffix}}")
 elseif(DEFINED QTDIR)
@@ -222,7 +215,8 @@ include(FindQtRuntime)
 
 set(CMAKE_AUTOMOC TRUE)
 
-# Find other needed libraries
+## Find other needed libraries
+# Find Protobuf
 find_package(Protobuf CONFIG)
 if(NOT Protobuf_FOUND)
   find_package(Protobuf REQUIRED)
@@ -232,7 +226,7 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0" AND NOT EXISTS "${Protobuf_PROTOC
   message(FATAL_ERROR "No protoc command found!")
 endif()
 
-#Find OpenSSL
+# Find OpenSSL
 if(WIN32)
   find_package(OpenSSL REQUIRED)
   if(OPENSSL_FOUND)
@@ -245,7 +239,7 @@ if(WIN32)
   endif()
 endif()
 
-#Find VCredist
+# Find VCredist
 if(MSVC)
   find_package(VCredistRuntime)
 endif()
