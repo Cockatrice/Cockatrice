@@ -9,6 +9,7 @@
 
 #include "visual_deck_editor_display_type.h"
 
+#include <QHash>
 #include <QWidget>
 
 class DeckListModel;
