@@ -56,6 +56,12 @@ private:
      */
     void updateHover(const QPointF &scenePos);
 
+    /// Activates hover state and escapes the card from its clip container so hover scaling is visible beyond zone
+    /// bounds.
+    void beginCardHover(CardItem *card);
+    /// Deactivates hover state and restores the card to its clip container.
+    void endCardHover(CardItem *card);
+
 public:
     /**
      * @brief Constructs the GameScene.

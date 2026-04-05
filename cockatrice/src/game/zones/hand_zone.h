@@ -1,7 +1,7 @@
 /**
  * @file hand_zone.h
  * @ingroup GameGraphicsZones
- * @brief TODO: Document this.
+ * @brief Graphical zone for the player's hand, supporting horizontal and vertical layouts.
  */
 
 #ifndef HANDZONE_H
@@ -14,7 +14,8 @@ class HandZone : public SelectZone
 {
     Q_OBJECT
 private:
-    qreal width, zoneHeight;
+    qreal width = 0.0;
+    qreal zoneHeight;
 private slots:
     void updateBg();
 public slots:

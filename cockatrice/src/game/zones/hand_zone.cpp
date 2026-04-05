@@ -27,6 +27,10 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
                                CardZoneLogic *startZone,
                                const QPoint &dropPoint)
 {
+    if (startZone == nullptr || startZone->getPlayer() == nullptr || dragItems.isEmpty()) {
+        return;
+    }
+
     QPoint point = dropPoint + scenePos().toPoint();
     int x = -1;
     if (SettingsCache::instance().getHorizontalHand()) {
@@ -34,9 +38,7 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
             if (point.x() < static_cast<CardItem *>(getLogic()->getCards().at(x))->scenePos().x())
                 break;
     } else {
-        for (x = 0; x < getLogic()->getCards().size(); x++)
-            if (point.y() < static_cast<CardItem *>(getLogic()->getCards().at(x))->scenePos().y())
-                break;
+        x = calcDropIndexFromY(dropPoint.y());
     }
 
     Command_MoveCard cmd;
@@ -58,7 +60,7 @@ QRectF HandZone::boundingRect() const
     if (SettingsCache::instance().getHorizontalHand())
         return QRectF(0, 0, width, CardDimensions::HEIGHT_F + 10);
     else
-        return QRectF(0, 0, 100, zoneHeight);
+        return QRectF(0, 0, CardDimensions::WIDTH_F * 1.5, zoneHeight);
 }
 
 void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -78,35 +80,31 @@ void HandZone::reorganizeCards()
             qreal totalWidth =
                 leftJustified ? boundingRect().width() - (1 * xPadding) - 5 : boundingRect().width() - 2 * xPadding;
 
-            for (int i = 0; i < cardCount; i++) {
-                CardItem *c = getLogic()->getCards().at(i);
-                // If the total width of the cards is smaller than the available width,
-                // the cards do not need to overlap and are displayed in the center of the area.
-                if (cardWidth * cardCount > totalWidth)
-                    c->setPos(xPadding + ((qreal)i) * (totalWidth - cardWidth) / (cardCount - 1), 5);
-                else {
-                    qreal xPosition =
-                        leftJustified ? xPadding + ((qreal)i) * cardWidth
-                                      : xPadding + ((qreal)i) * cardWidth + (totalWidth - cardCount * cardWidth) / 2;
-                    c->setPos(xPosition, 5);
+            if (cardCount == 1) {
+                CardItem *c = getLogic()->getCards().at(0);
+                qreal xPosition = leftJustified ? xPadding : xPadding + (totalWidth - cardWidth) / 2;
+                c->setPos(xPosition, 5);
+                c->setRealZValue(0);
+            } else {
+                for (int i = 0; i < cardCount; i++) {
+                    CardItem *c = getLogic()->getCards().at(i);
+                    // If the total width of the cards is smaller than the available width,
+                    // the cards do not need to overlap and are displayed in the center of the area.
+                    if (cardWidth * cardCount > totalWidth)
+                        c->setPos(xPadding + ((qreal)i) * (totalWidth - cardWidth) / (cardCount - 1), 5);
+                    else {
+                        qreal xPosition = leftJustified ? xPadding + ((qreal)i) * cardWidth
+                                                        : xPadding + ((qreal)i) * cardWidth +
+                                                              (totalWidth - cardCount * cardWidth) / 2;
+                        c->setPos(xPosition, 5);
+                    }
+                    c->setRealZValue(i);
                 }
-                c->setRealZValue(i);
             }
         } else {
-            qreal totalWidth = boundingRect().width();
-            qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
-            qreal xspace = 5;
-            qreal x1 = xspace;
-            qreal x2 = totalWidth - xspace - cardWidth;
-
-            for (int i = 0; i < cardCount; i++) {
-                CardItem *card = getLogic()->getCards().at(i);
-                qreal x = (i % 2) ? x2 : x1;
-                qreal y = divideCardSpaceInZone(i, cardCount, boundingRect().height(),
-                                                getLogic()->getCards().at(0)->boundingRect().height());
-                card->setPos(x, y);
-                card->setRealZValue(i);
-            }
+            // No clip container: hand cards should always be visible to the player.
+            const auto params = buildStackParams();
+            layoutCardsVertically(params);
         }
     }
     update();

@@ -19,6 +19,7 @@ CardZone::CardZone(CardZoneLogic *_logic, QGraphicsItem *parent)
 void CardZone::onCardAdded(CardItem *addedCard)
 {
     addedCard->setParentItem(this);
+    addedCard->setVisible(true);
     addedCard->update();
 }
 
