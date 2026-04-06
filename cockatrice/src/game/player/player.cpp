@@ -309,19 +309,10 @@ void Player::clearCounters()
 
 void Player::incrementAllCardCounters()
 {
-    QList<CardItem *> cardsToUpdate;
-
-    auto selectedItems = getGameScene()->selectedItems();
-    if (!selectedItems.isEmpty()) {
-        // If cards are selected, only update those
-        for (const auto &item : selectedItems) {
-            auto *card = static_cast<CardItem *>(item);
-            cardsToUpdate.append(card);
-        }
-    } else {
+    auto cardsToUpdate = getGameScene()->selectedCards();
+    if (cardsToUpdate.isEmpty()) {
         // If no cards selected, update all cards on table
-        const CardList &tableCards = getTableZone()->getCards();
-        cardsToUpdate = tableCards;
+        cardsToUpdate = static_cast<QList<CardItem *>>(getTableZone()->getCards());
     }
 
     QList<const ::google::protobuf::Message *> commandList;

@@ -58,6 +58,18 @@ void GameScene::retranslateUi()
         view->retranslateUi();
 }
 
+QList<CardItem *> GameScene::selectedCards() const
+{
+    QList<CardItem *> selectedCards;
+    for (auto item : selectedItems()) {
+        if (auto card = qgraphicsitem_cast<CardItem *>(item)) {
+            selectedCards.append(card);
+        }
+    }
+
+    return selectedCards;
+}
+
 /**
  * @brief Adds a player to the scene and stores their graphics item.
  * @param player Player to add.
