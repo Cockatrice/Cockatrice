@@ -347,8 +347,8 @@ void ThemeManager::themeChangedSlot()
     } else if (themeName == FUSION_THEME_NAME_DARK) {
         qApp->setStyle(QStyleFactory::create("Fusion"));
         qApp->setPalette(createDarkGreenFusionPalette());
-    } else if (themeName == NONE_THEME_NAME) {
-        qApp->setStyle(nullptr); // setting the style also sets the palette
+    } else {
+        qApp->setStyle(defaultStyleName); // setting the style also sets the palette
 #ifdef Q_OS_WIN
         QStringList preferred = {"windows11", "windowsmodern", "windowsvista", "windowsxp", "windows"};
 
@@ -362,8 +362,6 @@ void ThemeManager::themeChangedSlot()
         }
 #endif
         qApp->setPalette(QPalette());
-    } else {
-        qApp->setStyle(defaultStyleName);
     }
 
     if (dirPath.isEmpty()) {
