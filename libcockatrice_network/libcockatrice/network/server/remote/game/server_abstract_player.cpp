@@ -229,6 +229,36 @@ shouldBeFaceDown(const MoveCardStruct &cardStruct, const Server_CardZone *startZ
     return false;
 }
 
+/**
+ * @brief Determines whether a set of moved cards is from the bottom of the deck
+ */
+static bool shouldBeFromTheBottom(const Server_CardZone *startZone, const std::set<MoveCardStruct> &cardsToMove)
+{
+    if (!startZone) {
+        return false;
+    }
+
+    if (startZone->getName() != ZoneNames::DECK) {
+        return false;
+    }
+
+    int movedCount = static_cast<int>(cardsToMove.size());
+    int tailStart = startZone->getCards().size() - movedCount;
+    if (tailStart <= 0) { // if the move includes the start of the deck, it should not be considered from the bottom
+        return false;
+    }
+
+    int expectedPosition = tailStart;
+    for (const auto &card : cardsToMove) {
+        if (card.position != expectedPosition) {
+            return false;
+        }
+        ++expectedPosition;
+    }
+
+    return true;
+}
+
 Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
                                                        Server_CardZone *startzone,
                                                        const QList<const CardToMove *> &_cards,
@@ -289,22 +319,7 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
     bool revealTopStart = false;
     bool revealTopTarget = false;
 
-    bool isFromBottom = false;
-    if (startzone->getName() == ZoneNames::DECK) {
-        int movedCount = static_cast<int>(cardsToMove.size());
-        int tailStart = startzone->getCards().size() - movedCount;
-        if (tailStart >= 0) {
-            isFromBottom = true;
-            int expectedPosition = tailStart;
-            for (const auto &card : cardsToMove) {
-                if (card.position != expectedPosition) {
-                    isFromBottom = false;
-                    break;
-                }
-                ++expectedPosition;
-            }
-        }
-    }
+    bool isFromBottom = shouldBeFromTheBottom(startzone, cardsToMove);
 
     if (isFromBottom) {
         std::ranges::reverse_view reversedCardsToMove{cardsToMove};
