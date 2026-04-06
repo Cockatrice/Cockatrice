@@ -347,8 +347,11 @@ void ThemeManager::themeChangedSlot()
     } else if (themeName == FUSION_THEME_NAME_DARK) {
         qApp->setStyle(QStyleFactory::create("Fusion"));
         qApp->setPalette(createDarkGreenFusionPalette());
+    } else if (themeName == NONE_THEME_NAME) {
+        qApp->setStyle(nullptr); // setting the style also sets the palette
+        qApp->setPalette(QPalette());
     } else {
-        qApp->setStyle(defaultStyleName); // setting the style also sets the palette
+        qApp->setStyle(defaultStyleName);
     }
 
     if (dirPath.isEmpty()) {
