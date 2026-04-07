@@ -93,7 +93,7 @@ void HomeWidget::setRandomCard(ExactCard &newCard)
 {
     static constexpr int ATTEMPTS = 10;
     for (int i = 0; i < ATTEMPTS; ++i) {
-        ExactCard tmpCard = CardDatabaseManager::query()->getRandomCard();
+        ExactCard tmpCard = CardDatabaseManager::query().getRandomCard();
         if (tmpCard != backgroundSourceCard->getCard() && tmpCard.getCardPtr()->getProperty("layout") == "normal" &&
             tmpCard.getPrinting().getSet() != nullptr) {
             newCard = tmpCard;
@@ -121,17 +121,17 @@ void HomeWidget::updateRandomCard()
 
             if (!cardRefs.empty()) {
                 if (cardRefs.size() == 1) {
-                    newCard = CardDatabaseManager::query()->getCard(cardRefs.first());
+                    newCard = CardDatabaseManager::query().getCard(cardRefs.first());
                 } else {
                     // Keep picking until different
                     do {
                         int idx = QRandomGenerator::global()->bounded(cardRefs.size());
-                        newCard = CardDatabaseManager::query()->getCard(cardRefs.at(idx));
+                        newCard = CardDatabaseManager::query().getCard(cardRefs.at(idx));
                     } while (newCard == oldCard);
                 }
             } else {
                 do {
-                    newCard = CardDatabaseManager::query()->getRandomCard();
+                    newCard = CardDatabaseManager::query().getRandomCard();
                 } while (newCard == oldCard);
             }
             break;

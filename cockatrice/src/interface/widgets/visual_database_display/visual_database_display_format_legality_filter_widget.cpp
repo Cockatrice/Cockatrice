@@ -14,7 +14,7 @@ VisualDatabaseDisplayFormatLegalityFilterWidget::VisualDatabaseDisplayFormatLega
     FilterTreeModel *_filterModel)
     : QWidget(parent), filterModel(_filterModel)
 {
-    allFormatsWithCount = CardDatabaseManager::query()->getAllFormatsWithCount();
+    allFormatsWithCount = CardDatabaseManager::query().getAllFormatsWithCount();
     int maxValue = std::numeric_limits<int>::min();
     for (int value : allFormatsWithCount) {
         maxValue = std::max(maxValue, value);

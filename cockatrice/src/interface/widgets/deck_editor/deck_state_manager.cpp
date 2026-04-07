@@ -229,7 +229,7 @@ static bool doSwapCard(DeckListModel *model,
         return false;
     }
 
-    if (ExactCard card = CardDatabaseManager::query()->getCard({cardName, providerId})) {
+    if (ExactCard card = CardDatabaseManager::query().getCard({cardName, providerId})) {
         model->addCard(card, otherZone);
     } else {
         // Third argument (true) says create the card no matter what, even if not in DB

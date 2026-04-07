@@ -297,7 +297,7 @@ void VisualDatabaseDisplayWidget::loadPage(int start, int end)
         QVariant name = databaseDisplayModel->data(index, Qt::DisplayRole);
         qCDebug(VisualDatabaseDisplayLog) << name.toString();
 
-        if (CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(name.toString())) {
+        if (CardInfoPtr info = CardDatabaseManager::query().getCardInfo(name.toString())) {
             if (!setFilters.empty()) {
                 SetToPrintingsMap setMap = info->getSets();
                 for (const CardFilter *setFilter : setFilters) {
@@ -308,7 +308,7 @@ void VisualDatabaseDisplayWidget::loadPage(int start, int end)
                     }
                 }
             } else {
-                addCard(CardDatabaseManager::query()->getPreferredCard(info));
+                addCard(CardDatabaseManager::query().getPreferredCard(info));
             }
         } else {
             qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";

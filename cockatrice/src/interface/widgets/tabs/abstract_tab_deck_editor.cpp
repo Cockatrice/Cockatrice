@@ -193,7 +193,7 @@ void AbstractTabDeckEditor::openDeck(const LoadedDeck &deck)
 void AbstractTabDeckEditor::setDeck(const LoadedDeck &_deck)
 {
     deckStateManager->replaceDeck(_deck);
-    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(_deck.deckList.getCardRefList()));
+    CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query().getCards(_deck.deckList.getCardRefList()));
 
     dockToActions.value(deckDockWidget).aVisible->setChecked(true);
     deckDockWidget->setVisible(dockToActions.value(deckDockWidget).aVisible->isChecked());

@@ -122,7 +122,7 @@ static void setupParserRules()
             int count = 0;
             auto cardNodes = deck->deckLoader->getDeck().deckList.getCardNodes();
             for (auto node : cardNodes) {
-                auto cardInfoPtr = CardDatabaseManager::query()->getCardInfo(node->getName());
+                auto cardInfoPtr = CardDatabaseManager::query().getCardInfo(node->getName());
                 if (!cardInfoPtr.isNull() && cardFilter.check(cardInfoPtr)) {
                     count += node->getNumber();
                 }

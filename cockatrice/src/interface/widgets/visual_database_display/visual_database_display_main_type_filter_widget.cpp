@@ -14,7 +14,7 @@ VisualDatabaseDisplayMainTypeFilterWidget::VisualDatabaseDisplayMainTypeFilterWi
     : QWidget(parent), filterModel(_filterModel)
 {
     // Get all main card types with their count
-    allMainCardTypesWithCount = CardDatabaseManager::query()->getAllMainCardTypesWithCount();
+    allMainCardTypesWithCount = CardDatabaseManager::query().getAllMainCardTypesWithCount();
     setMinimumWidth(300);
     setMaximumHeight(200);
 

@@ -96,7 +96,7 @@ static QList<ExactCard> cardNodesToExactCards(QList<const DecklistCardNode *> no
 {
     QList<ExactCard> cards;
     for (auto node : nodes) {
-        ExactCard card = CardDatabaseManager::query()->getCard(node->toCardRef());
+        ExactCard card = CardDatabaseManager::query().getCard(node->toCardRef());
         if (card) {
             for (int k = 0; k < node->getNumber(); ++k) {
                 cards.append(card);

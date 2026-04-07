@@ -141,7 +141,7 @@ void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, con
     const QString cardName = current.siblingAtColumn(CardDatabaseModel::NameColumn).data().toString();
 
     if (!current.model()->hasChildren(current.siblingAtColumn(CardDatabaseModel::NameColumn))) {
-        emit cardChanged(CardDatabaseManager::query()->getPreferredCard(cardName));
+        emit cardChanged(CardDatabaseManager::query().getPreferredCard(cardName));
     }
 }
 
@@ -174,7 +174,7 @@ ExactCard DeckEditorDatabaseDisplayWidget::currentCard() const
 
     const QString cardName = currentIndex.siblingAtColumn(CardDatabaseModel::NameColumn).data().toString();
 
-    return CardDatabaseManager::query()->getPreferredCard(cardName);
+    return CardDatabaseManager::query().getPreferredCard(cardName);
 }
 
 void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
