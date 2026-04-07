@@ -349,9 +349,6 @@ void ThemeManager::themeChangedSlot()
         qApp->setPalette(createDarkGreenFusionPalette());
     } else {
         qApp->setStyle(defaultStyleName); // setting the style also sets the palette
-        qInfo() << "Available styles:" << QStyleFactory::keys();
-        qInfo() << "Plugin paths:" << QCoreApplication::libraryPaths();
-        qApp->setPalette(QPalette());
     }
 
     if (dirPath.isEmpty()) {
