@@ -21,7 +21,9 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
     // define a dummy context that will be used where needed
     QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
 
+#ifdef Q_OS_WIN
     setWizardStyle(QWizard::ModernStyle);
+#endif
 
     QString oracleSettingsFile = SettingsCache::instance().getSettingsPath() + "oracle.ini";
     settings = new QSettings(oracleSettingsFile, QSettings::IniFormat, this);
