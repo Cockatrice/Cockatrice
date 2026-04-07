@@ -348,19 +348,7 @@ void ThemeManager::themeChangedSlot()
         qApp->setStyle(QStyleFactory::create("Fusion"));
         qApp->setPalette(createDarkGreenFusionPalette());
     } else {
-        qApp->setStyle(nullptr); // setting the style also sets the palette
-#ifdef Q_OS_WIN
-        QStringList preferred = {"windows11", "windowsmodern", "windowsvista", "windowsxp", "Windows"};
-
-        QStringList available = QStyleFactory::keys();
-
-        for (const QString &styleName : preferred) {
-            if (available.contains(styleName, Qt::CaseInsensitive)) {
-                qApp->setStyle(QStyleFactory::create(styleName));
-                break;
-            }
-        }
-#endif
+        qApp->setStyle(defaultStyleName); // setting the style also sets the palette
         qInfo() << "Available styles:" << QStyleFactory::keys();
         qInfo() << "Plugin paths:" << QCoreApplication::libraryPaths();
         qApp->setPalette(QPalette());
