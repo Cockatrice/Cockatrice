@@ -350,7 +350,7 @@ void ThemeManager::themeChangedSlot()
         qApp->setStyle(QStyleFactory::create("Fusion"));
         qApp->setPalette(createDarkGreenFusionPalette());
     } else {
-        qApp->setStyle(QStyleFactory::create(defaultStyleName)); // setting the style also sets the palette
+        qApp->setStyle(nullptr); // setting the style also sets the palette
     }
 
     if (dirPath.isEmpty()) {
