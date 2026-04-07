@@ -179,7 +179,7 @@ QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 
 static inline QPalette createDarkGreenFusionPalette()
 {
-    QPalette p;
+    QPalette p = QStyleFactory::create("Fusion")->standardPalette();
 
     // ---------- Core backgrounds ----------
     p.setColor(QPalette::Window, QColor(30, 30, 30));        // #ff1e1e1e
@@ -248,7 +248,7 @@ static inline QPalette createDarkGreenFusionPalette()
 
 static inline QPalette createLightGreenFusionPalette()
 {
-    QPalette p;
+    QPalette p = QStyleFactory::create("Fusion")->standardPalette();
 
     // ---------- Core backgrounds ----------
     p.setColor(QPalette::Window, QColor(240, 240, 240));        // #fff0f0f0
@@ -350,7 +350,7 @@ void ThemeManager::themeChangedSlot()
         qApp->setStyle(QStyleFactory::create("Fusion"));
         qApp->setPalette(createDarkGreenFusionPalette());
     } else {
-        qApp->setStyle(defaultStyleName); // setting the style also sets the palette
+        qApp->setStyle(QStyleFactory::create(defaultStyleName)); // setting the style also sets the palette
     }
 
     if (dirPath.isEmpty()) {
