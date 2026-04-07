@@ -332,13 +332,15 @@ void ThemeManager::themeChangedSlot()
     }
 
     if (themeName == FUSION_THEME_NAME) {
-        qApp->setStyle(QStyleFactory::create("Fusion"));
+        QStyle *fusionStyle = QStyleFactory::create("Fusion");
+        qApp->setStyle(fusionStyle);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
-        QPalette palette;
+        // Start from Fusion's own palette so dark mode is handled correctly,
+        // then apply any tweaks on top of it.
+        QPalette palette = fusionStyle->standardPalette();
         if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
             palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
         }
-
         qApp->setPalette(palette);
 #endif
     } else if (themeName == FUSION_THEME_NAME_LIGHT) {
