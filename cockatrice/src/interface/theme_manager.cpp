@@ -353,6 +353,7 @@ void ThemeManager::themeChangedSlot()
         qApp->setStyle(nullptr); // setting the style also sets the palette
     }
 
+    qInfo() << "Default style name: " << defaultStyleName;
     qInfo() << "Available styles:" << QStyleFactory::keys();
     qInfo() << "Plugin paths:" << QCoreApplication::libraryPaths();
 
