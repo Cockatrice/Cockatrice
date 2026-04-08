@@ -133,6 +133,14 @@ bool ThemeManager::isDarkMode()
     return false;
 }
 
+bool ThemeManager::isBuiltInTheme()
+{
+    const auto themeName = SettingsCache::instance().getThemeName();
+
+    return themeName == NONE_THEME_NAME || themeName == FUSION_THEME_NAME || themeName == FUSION_THEME_NAME_LIGHT ||
+           themeName == FUSION_THEME_NAME_DARK;
+}
+
 QStringMap &ThemeManager::getAvailableThemes()
 {
     QDir dir;
