@@ -50,6 +50,7 @@ private:
 
 protected:
     void ensureThemeDirectoryExists();
+    bool isDarkMode();
     QBrush loadBrush(QString fileName, QColor fallbackColor);
     QBrush loadExtraBrush(QString fileName, QBrush &fallbackBrush);
 
