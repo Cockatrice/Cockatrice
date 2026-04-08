@@ -353,6 +353,9 @@ void ThemeManager::themeChangedSlot()
         qApp->setStyle(nullptr); // setting the style also sets the palette
     }
 
+    qInfo() << "Available styles:" << QStyleFactory::keys();
+    qInfo() << "Plugin paths:" << QCoreApplication::libraryPaths();
+
     if (dirPath.isEmpty()) {
         // set default values
         QDir::setSearchPaths("theme", DEFAULT_RESOURCE_PATHS);
