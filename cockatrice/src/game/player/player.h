@@ -199,6 +199,11 @@ public:
         return counters;
     }
 
+    /**
+     * Gets the counter that represents the life total. Shouldn't return null
+     */
+    AbstractCounter *getLifeCounter() const;
+
     ArrowItem *addArrow(const ServerInfo_Arrow &arrow);
     ArrowItem *addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color);
     void delArrow(int arrowId);

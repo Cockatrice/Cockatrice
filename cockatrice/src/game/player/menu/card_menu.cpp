@@ -62,6 +62,9 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
     aSelectColumn = new QAction(this);
     connect(aSelectColumn, &QAction::triggered, playerActions, &PlayerActions::actSelectColumn);
 
+    aReduceLifeByPower = new QAction(this);
+    connect(aReduceLifeByPower, &QAction::triggered, playerActions, &PlayerActions::actReduceLifeByPower);
+
     aPlay = new QAction(this);
     connect(aPlay, &QAction::triggered, playerActions, &PlayerActions::actPlay);
     aHide = new QAction(this);
@@ -153,6 +156,8 @@ void CardMenu::createTableMenu(bool canModifyCard)
         addSeparator();
         addAction(aClone);
         addSeparator();
+        addAction(aReduceLifeByPower);
+        addSeparator();
         addAction(aSelectAll);
         addAction(aSelectRow);
         addRelatedCardView();
@@ -178,6 +183,8 @@ void CardMenu::createTableMenu(bool canModifyCard)
     addSeparator();
     addMenu(new PtMenu(player));
     addAction(aSetAnnotation);
+    addSeparator();
+    addAction(aReduceLifeByPower);
     addSeparator();
     addAction(aSelectAll);
     addAction(aSelectRow);
@@ -463,6 +470,7 @@ void CardMenu::retranslateUi()
     aUnattach->setText(tr("Unattac&h"));
     aDrawArrow->setText(tr("&Draw arrow..."));
     aSetAnnotation->setText(tr("&Set annotation..."));
+    aReduceLifeByPower->setText(tr("Reduce life by power"));
 
     mCardCounters->setTitle(tr("Ca&rd counters"));
 
@@ -497,6 +505,7 @@ void CardMenu::setShortcutsActive()
     aUnattach->setShortcuts(shortcuts.getShortcut("Player/aUnattach"));
     aDrawArrow->setShortcuts(shortcuts.getShortcut("Player/aDrawArrow"));
     aSetAnnotation->setShortcuts(shortcuts.getShortcut("Player/aSetAnnotation"));
+    aReduceLifeByPower->setShortcuts(shortcuts.getShortcut("Player/aReduceLifeByPower"));
 
     aSelectAll->setShortcuts(shortcuts.getShortcut("Player/aSelectAll"));
     aSelectRow->setShortcuts(shortcuts.getShortcut("Player/aSelectRow"));
