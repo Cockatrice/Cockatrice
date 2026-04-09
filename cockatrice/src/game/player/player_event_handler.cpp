@@ -32,7 +32,7 @@
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 
-PlayerEventHandler::PlayerEventHandler(Player *_player) : player(_player)
+PlayerEventHandler::PlayerEventHandler(Player *_player) : QObject(_player), player(_player)
 {
 }
 
