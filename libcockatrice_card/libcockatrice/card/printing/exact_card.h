@@ -114,5 +114,6 @@ public:
      */
     void emitPixmapUpdated() const;
 };
+Q_DECLARE_METATYPE(ExactCard)
 
 #endif // EXACT_CARD_H
