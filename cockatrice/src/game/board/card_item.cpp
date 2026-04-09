@@ -285,6 +285,12 @@ void CardItem::drawArrow(const QColor &arrowColor)
         int currentPhase = game->getGameState()->getCurrentPhase();
         phase = Phases::getLastSubphase(currentPhase) + 1;
     }
+    for (ArrowItem *arrowItem : getArrowsFrom()) {
+        if (arrowItem->getTargetItem() == nullptr) {
+            arrowItem->ungrabMouse();
+            arrowItem->delArrow();
+        }
+    }
     ArrowDragItem *arrow = new ArrowDragItem(arrowOwner, this, arrowColor, phase);
     scene()->addItem(arrow);
     arrow->grabMouse();
