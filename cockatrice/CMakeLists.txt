@@ -325,6 +325,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
+    src/client/network/connection_controller/remote_connection_controller.cpp
 )
 
 add_subdirectory(sounds)
