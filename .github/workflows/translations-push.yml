@@ -16,7 +16,7 @@ jobs:
     if: github.event_name != 'schedule' || github.repository_owner == 'Cockatrice'
 
     name: Push strings
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
 
     steps:
       - name: Checkout repo
