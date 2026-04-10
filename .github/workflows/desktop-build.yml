@@ -270,7 +270,7 @@ jobs:
             override_target: 13
             make_package: 1
             package_suffix: "-macOS13_Intel"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -284,7 +284,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS14"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -298,7 +298,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS15"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -310,7 +310,7 @@ jobs:
             soc: Apple
             xcode: "16.4"
             type: Debug
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -322,7 +322,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-Win10"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: "Visual Studio 17 2022"
@@ -409,6 +409,8 @@ jobs:
         if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
+          # qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
+          aqtsource: git+https://github.com/miurahr/aqtinstall.git
           version: ${{ steps.resolve_qt_version.outputs.version }}
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
