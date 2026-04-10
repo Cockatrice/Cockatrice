@@ -283,7 +283,6 @@ elif [[ $CCACHE_EVICTION_AGE ]]; then
   echo "::error file=$0::ccache eviction is enabled while ccache is disabled!"
 fi
 
-
 if [[ $RUNNER_OS == macOS ]]; then
   echo "::group::Inspect Mach-O binaries"
   for app in cockatrice oracle servatrice; do
