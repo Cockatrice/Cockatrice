@@ -38,10 +38,10 @@ on:
       - 'vcpkg.json'
       - 'vcpkg'
 
-# Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
+# Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
   group: "${{ github.workflow }} @ ${{ github.ref_name }}"
-  cancel-in-progress: ${{ github.ref_name != 'master' }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 jobs:
   configure:
