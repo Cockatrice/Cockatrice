@@ -281,6 +281,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: macOS
             target: 14
@@ -295,6 +296,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: macOS
             target: 15
@@ -309,6 +311,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: macOS
             target: 15
@@ -321,6 +324,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: Windows
             target: 10
@@ -451,6 +455,7 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
+          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
         run: .ci/compile.sh --server --test --vcpkg
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342.
