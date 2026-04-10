@@ -196,7 +196,6 @@ jobs:
         if: matrix.package != 'skip'
         shell: bash
         env:
-          BUILD_DIR: '${{github.workspace}}/build'
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
           package: '${{matrix.package}}'
           server_only: '${{matrix.server_only}}'
@@ -211,9 +210,8 @@ jobs:
           fi
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
-          args+=(--dir "$BUILD_DIR")
+          args+=(--suffix "$SUFFIX")
           RUN --server --release --package "$package" "${args[@]}"
-          .ci/name_build.sh
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342.
       - name: Delete remote compiler cache (ccache)

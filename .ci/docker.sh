@@ -165,6 +165,10 @@ function RUN ()
       args+=(--mount "type=bind,source=$CCACHE_DIR,target=/.ccache")
       args+=(--env "CCACHE_DIR=/.ccache")
     fi
+    if [[ $GITHUB_OUTPUT ]]; then
+      args+=(--mount "type=bind,source=$GITHUB_OUTPUT,target=/gh_output")
+      args+=(--env "GITHUB_OUTPUT=/gh_output")
+    fi
     # shellcheck disable=2086
     docker run "${args[@]}" $RUN_ARGS "$IMAGE_NAME" bash "$BUILD_SCRIPT" $RUN_OPTS "$@"
     return $?
