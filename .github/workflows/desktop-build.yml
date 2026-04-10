@@ -156,6 +156,7 @@ jobs:
     needs: configure
     runs-on: ubuntu-latest
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
+    timeout-minutes: 70
     env:
       NAME: ${{matrix.distro}}${{matrix.version}}
       CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
@@ -331,6 +332,7 @@ jobs:
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
+    timeout-minutes: 100
     env:
       CCACHE_DIR: ${{github.workspace}}/.cache/
       # Cache size over the entire repo is 10Gi:
