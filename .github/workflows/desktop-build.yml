@@ -162,6 +162,7 @@ jobs:
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 550M
+      CCACHE_EVICTION_AGE: 7d
       CMAKE_GENERATOR: 'Ninja'
 
     steps:
@@ -185,26 +186,33 @@ jobs:
       - name: Build debug and test
         if: matrix.test != 'skip'
         shell: bash
-        env:
-          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE"
+          RUN --server --debug --test --ccache "$CCACHE_SIZE" \
+                  --cmake-generator "$CMAKE_GENERATOR"
 
       - name: Build release package
         id: build
         if: matrix.package != 'skip'
         shell: bash
         env:
-          BUILD_DIR: build
+          BUILD_DIR: '${{github.workspace}}/build'
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
           package: '${{matrix.package}}'
-          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-          NO_CLIENT: ${{matrix.server_only == 'yes' && '--no-client' || '' }}
+          server_only: '${{matrix.server_only}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package "$package" --dir "$BUILD_DIR" \
-                  --ccache "$CCACHE_SIZE" $NO_CLIENT
+          args=()
+          if [[ $server_only == yes ]]; then
+            args+=(--no-client)
+          fi
+          if [[ $GITHUB_REF == "refs/heads/master" ]]; then
+            args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
+          fi
+          args+=(--ccache "$CCACHE_SIZE")
+          args+=(--cmake-generator "$CMAKE_GENERATOR")
+          args+=(--dir "$BUILD_DIR")
+          RUN --server --release --package "$package" "${args[@]}"
           .ci/name_build.sh
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342.
