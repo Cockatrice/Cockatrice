@@ -3,17 +3,28 @@
 # This script is to be used by the ci environment from the project root directory, do not use it from somewhere else.
 
 # Creates or loads docker images to use in compilation, creates RUN function to start compilation on the docker image.
-# <arg> sets the name of the docker image, these correspond to directories in .ci
+#
+# usage: source <script> <name> [--get] [--build] [--save] [--interactive] [--set-cache <location>]
+# <name> sets the name of the docker image, these correspond to directories in .ci
 # --get loads the image from a previously saved image cache, will build if no image is found
 # --build builds the image from the Dockerfile in .ci/$NAME
 # --save stores the image, if an image was loaded it will not be stored
 # --interactive immediately starts the image interactively for debugging
 # --set-cache <location> sets the location to cache the image or for ccache
+#
 # requires: docker
 # uses env: NAME CACHE BUILD GET SAVE INTERACTIVE
 # (correspond to args: <name> --set-cache <cache> --build --get --save --interactive)
 # sets env: RUN CCACHE_DIR IMAGE_NAME RUN_ARGS RUN_OPTS BUILD_SCRIPT
 # exitcode: 1 for failure, 2 for missing dockerfile, 3 for invalid arguments
+#
+# exported RUN function will run the BUILD_SCRIPT inside of the docker container.
+# note that the docker container will not inherit any environment variables!
+#
+# usage: RUN [arguments for build script]
+# roughly equivalent to `docker run $IMAGE_NAME bash $BUILD_SCRIPT $@`
+# uses env: CCACHE_DIR IMAGE_NAME RUN_ARGS RUN_OPTS BUILD_SCRIPT
+# exitcode: 3 for invalid arguments, returns the returncode of docker run
 export BUILD_SCRIPT=".ci/compile.sh"
 
 project_name="cockatrice"
@@ -41,12 +52,17 @@ while [[ $# != 0 ]]; do
       shift
       ;;
     '--set-cache')
-      CACHE=$2
+      shift
+      if [[ $# == 0 ]]; then
+        echo "--set-cache expects an argument" >&2
+        exit 3
+      fi
+      CACHE=$1
+      shift
       if ! [[ -d $CACHE ]]; then
         echo "could not find cache path: $CACHE" >&2
         return 3
       fi
-      shift 2
       ;;
     *)
       if [[ ${1:0:1} == - ]]; then
@@ -149,10 +165,11 @@ function RUN ()
       args+=(--mount "type=bind,source=$CCACHE_DIR,target=/.ccache")
       args+=(--env "CCACHE_DIR=/.ccache")
     fi
-    if [[ -n "$CMAKE_GENERATOR" ]]; then
-      args+=(--env "CMAKE_GENERATOR=$CMAKE_GENERATOR")
+    if [[ $GITHUB_OUTPUT ]]; then
+      args+=(--mount "type=bind,source=$GITHUB_OUTPUT,target=/gh_output")
+      args+=(--env "GITHUB_OUTPUT=/gh_output")
     fi
-  # shellcheck disable=2086
+    # shellcheck disable=2086
     docker run "${args[@]}" $RUN_ARGS "$IMAGE_NAME" bash "$BUILD_SCRIPT" $RUN_OPTS "$@"
     return $?
   else

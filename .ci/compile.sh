@@ -10,9 +10,11 @@
 # --test runs tests
 # --debug or --release sets the build type ie CMAKE_BUILD_TYPE
 # --ccache [<size>] uses ccache and shows stats, optionally provide size
+# --evict-ccache <age> runs ccache eviction based on given age after build
 # --dir <dir> sets the name of the build dir, default is "build"
+# --cmake-generator <generator> sets CMAKE_GENERATOR as used by cmake
 # --target-macos-version <version> sets the min os version - only used for macOS builds
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION
 # (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
 # exitcode: 1 for failure, 3 for invalid arguments
 
@@ -71,6 +73,15 @@ while [[ $# != 0 ]]; do
         shift
       fi
       ;;
+    '--evict-ccache')
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--evict-ccache expects an argument"
+        exit 3
+      fi
+      CCACHE_EVICTION_AGE=$1
+      shift
+      ;;
     '--vcpkg')
       USE_VCPKG=1
       shift
@@ -82,6 +93,15 @@ while [[ $# != 0 ]]; do
         exit 3
       fi
       BUILD_DIR="$1"
+      shift
+      ;;
+    '--cmake-generator')
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--cmake-generator expects an argument"
+        exit 3
+      fi
+      export CMAKE_GENERATOR=$1
       shift
       ;;
     '--target-macos-version')
@@ -251,9 +271,16 @@ cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
 if [[ $USE_CCACHE ]]; then
+  if [[ $CCACHE_EVICTION_AGE ]]; then
+    echo "::group::evict ccache files older than $CCACHE_EVICTION_AGE"
+    ccache --evict-older-than "$CCACHE_EVICTION_AGE"
+    echo "::endgroup::"
+  fi
   echo "::group::Show ccache stats again"
   ccachestatsverbose
   echo "::endgroup::"
+elif [[ $CCACHE_EVICTION_AGE ]]; then
+  echo "::error file=$0::ccache eviction is enabled while ccache is disabled!"
 fi
 
 if [[ $RUNNER_OS == macOS ]]; then
