@@ -208,11 +208,12 @@ jobs:
           .ci/name_build.sh
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342.
+      # If the deletion is failing we want to proceed nontheless and not error the job
       - name: Delete remote compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
+        run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }} || true
 
       - name: Save updated compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
@@ -450,11 +451,12 @@ jobs:
         run: .ci/compile.sh --server --test --vcpkg
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342.
+      # If the deletion is failing we want to proceed nontheless and not error the job
       - name: Delete remote compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1 && steps.ccache_restore.outputs.cache-hit
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
+        run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }} || true
 
       - name: Save updated compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1
