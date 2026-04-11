@@ -19,6 +19,7 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QStyle>
+#include <QStyleFactory>
 #include <QStyleOption>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 
@@ -46,6 +47,11 @@ ZoneViewWidget::ZoneViewWidget(Player *_player,
                                bool _isReversed)
     : QGraphicsWidget(0, Qt::Window), canBeShuffled(_origZone->getIsShufflable()), player(_player)
 {
+    // workaround for windows11 theme completely breaking on our zonewidgets
+    if (style()->name() == "windows11") {
+        setStyle(QStyleFactory::create("Fusion"));
+    }
+
     setAcceptHoverEvents(true);
     setAttribute(Qt::WA_DeleteOnClose);
     setZValue(ZValues::ZONE_VIEW_WIDGET);
