@@ -38,10 +38,10 @@ on:
       - 'vcpkg.json'
       - 'vcpkg'
 
-# Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
+# Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
   group: "${{ github.workflow }} @ ${{ github.ref_name }}"
-  cancel-in-progress: ${{ github.ref_name != 'master' }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 jobs:
   configure:
@@ -163,6 +163,7 @@ jobs:
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 550M
+      CCACHE_EVICTION_AGE: 7d
       CMAKE_GENERATOR: 'Ninja'
 
     steps:
@@ -186,27 +187,32 @@ jobs:
       - name: Build debug and test
         if: matrix.test != 'skip'
         shell: bash
-        env:
-          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE"
+          RUN --server --debug --test --ccache "$CCACHE_SIZE" \
+                  --cmake-generator "$CMAKE_GENERATOR"
 
       - name: Build release package
         id: build
         if: matrix.package != 'skip'
         shell: bash
         env:
-          BUILD_DIR: build
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
           package: '${{matrix.package}}'
-          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-          NO_CLIENT: ${{matrix.server_only == 'yes' && '--no-client' || '' }}
+          server_only: '${{matrix.server_only}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package "$package" --dir "$BUILD_DIR" \
-                  --ccache "$CCACHE_SIZE" $NO_CLIENT
-          .ci/name_build.sh
+          args=()
+          if [[ $server_only == yes ]]; then
+            args+=(--no-client)
+          fi
+          if [[ $GITHUB_REF == "refs/heads/master" ]]; then
+            args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
+          fi
+          args+=(--ccache "$CCACHE_SIZE")
+          args+=(--cmake-generator "$CMAKE_GENERATOR")
+          args+=(--suffix "$SUFFIX")
+          RUN --server --release --package "$package" "${args[@]}"
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: Delete remote compiler cache (ccache)
@@ -277,6 +283,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: macOS
             target: 14
@@ -291,6 +298,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: macOS
             target: 15
@@ -305,6 +313,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: macOS
             target: 15
@@ -317,6 +326,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: Windows
             target: 10
@@ -450,6 +460,7 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
+          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
         run: .ci/compile.sh --server --test --vcpkg
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342

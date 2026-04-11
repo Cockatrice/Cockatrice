@@ -13,6 +13,11 @@ on:
       - '.github/workflows/docker-release.yml'
       - 'Dockerfile'
 
+# Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
+
 jobs:
   docker:
     name: amd64 & arm64
