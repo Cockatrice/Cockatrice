@@ -27,7 +27,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends qt6-tools-dev
-          which lupdate
           lupdate -version
 
       - name: Update Cockatrice translation source
