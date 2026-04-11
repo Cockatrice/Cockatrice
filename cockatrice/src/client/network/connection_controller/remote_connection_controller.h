@@ -1,8 +1,6 @@
 #ifndef COCKATRICE_REMOTE_CONNECTION_CONTROLLER_H
 #define COCKATRICE_REMOTE_CONNECTION_CONTROLLER_H
 
-#pragma once
-
 #include "abstract_client.h"
 
 #include <QMessageBox>
