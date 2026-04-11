@@ -26,7 +26,8 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends qt6-tools-dev
+          sudo apt-get install -y --no-install-recommends qt6-tools-dev-tools
+          which lupdate
           lupdate -version
 
       - name: Update Cockatrice translation source
