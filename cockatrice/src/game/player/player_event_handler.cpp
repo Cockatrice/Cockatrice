@@ -60,7 +60,6 @@ void PlayerEventHandler::eventShuffle(const Event_Shuffle &event)
             // we want to close empty views as well
             if (length == 0 || length > absStart) { // note this assumes views always start at the top of the library
                 view->close();
-                break;
             }
         } else {
             qWarning() << zone->getName() << "of" << player->getPlayerInfo()->getName() << "holds empty zoneview!";
