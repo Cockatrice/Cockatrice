@@ -142,15 +142,21 @@ jobs:
           - distro: Ubuntu
             version: 22.04
             package: DEB
+            test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 24.04
+            package: DEB
+
+          - distro: Ubuntu
+            version: 26.04
             package: DEB
 
     name: ${{matrix.distro}} ${{matrix.version}}
     needs: configure
     runs-on: ubuntu-latest
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
+    timeout-minutes: 70
     env:
       NAME: ${{matrix.distro}}${{matrix.version}}
       CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
@@ -202,9 +208,10 @@ jobs:
                   --ccache "$CCACHE_SIZE" $NO_CLIENT
           .ci/name_build.sh
 
-      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342.
+      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: Delete remote compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
@@ -265,7 +272,7 @@ jobs:
             override_target: 13
             make_package: 1
             package_suffix: "-macOS13_Intel"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -279,7 +286,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS14"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -293,7 +300,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS15"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -305,7 +312,7 @@ jobs:
             soc: Apple
             xcode: "16.4"
             type: Debug
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -317,7 +324,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-Win10"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -325,6 +332,7 @@ jobs:
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
+    timeout-minutes: 100
     env:
       CCACHE_DIR: ${{github.workspace}}/.cache/
       # Cache size over the entire repo is 10Gi:
@@ -396,6 +404,8 @@ jobs:
         if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
+          # qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
+          aqtsource: git+https://github.com/miurahr/aqtinstall.git
           version: ${{ steps.resolve_qt_version.outputs.version }}
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
@@ -433,9 +443,10 @@ jobs:
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --vcpkg
 
-      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342.
+      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: Delete remote compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1 && steps.ccache_restore.outputs.cache-hit
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}

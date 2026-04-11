@@ -179,7 +179,7 @@ QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 
 static inline QPalette createDarkGreenFusionPalette()
 {
-    QPalette p;
+    QPalette p = QStyleFactory::create("Fusion")->standardPalette();
 
     // ---------- Core backgrounds ----------
     p.setColor(QPalette::Window, QColor(30, 30, 30));        // #ff1e1e1e
@@ -248,7 +248,7 @@ static inline QPalette createDarkGreenFusionPalette()
 
 static inline QPalette createLightGreenFusionPalette()
 {
-    QPalette p;
+    QPalette p = QStyleFactory::create("Fusion")->standardPalette();
 
     // ---------- Core backgrounds ----------
     p.setColor(QPalette::Window, QColor(240, 240, 240));        // #fff0f0f0
@@ -332,13 +332,15 @@ void ThemeManager::themeChangedSlot()
     }
 
     if (themeName == FUSION_THEME_NAME) {
-        qApp->setStyle(QStyleFactory::create("Fusion"));
+        QStyle *fusionStyle = QStyleFactory::create("Fusion");
+        qApp->setStyle(fusionStyle);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
-        QPalette palette;
+        // Start from Fusion's own palette so dark mode is handled correctly,
+        // then apply any tweaks on top of it.
+        QPalette palette = fusionStyle->standardPalette();
         if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
             palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
         }
-
         qApp->setPalette(palette);
 #endif
     } else if (themeName == FUSION_THEME_NAME_LIGHT) {
@@ -348,7 +350,7 @@ void ThemeManager::themeChangedSlot()
         qApp->setStyle(QStyleFactory::create("Fusion"));
         qApp->setPalette(createDarkGreenFusionPalette());
     } else {
-        qApp->setStyle(defaultStyleName); // setting the style also sets the palette
+        qApp->setStyle(QStyleFactory::create(defaultStyleName)); // setting the style also sets the palette
     }
 
     if (dirPath.isEmpty()) {
