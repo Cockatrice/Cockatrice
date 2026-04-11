@@ -220,7 +220,10 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
+        run: |
+          if gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}; then
+            echo "Cache deleted successfully"
+          fi
 
       - name: Save updated compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
@@ -469,7 +472,10 @@ jobs:
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
+        run: |
+          if gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}; then
+            echo "Cache deleted successfully"
+          fi
 
       - name: Save updated compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1
