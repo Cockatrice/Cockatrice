@@ -208,9 +208,10 @@ jobs:
                   --ccache "$CCACHE_SIZE" $NO_CLIENT
           .ci/name_build.sh
 
-      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342.
+      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: Delete remote compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
@@ -451,9 +452,10 @@ jobs:
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
         run: .ci/compile.sh --server --test --vcpkg
 
-      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342.
+      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: Delete remote compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1 && steps.ccache_restore.outputs.cache-hit
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
