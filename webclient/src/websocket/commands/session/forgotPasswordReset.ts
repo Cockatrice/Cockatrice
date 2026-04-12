@@ -8,8 +8,8 @@ import { hashPassword } from '../../utils';
 
 import { disconnect, updateStatus } from '.';
 
-export function forgotPasswordReset(options: WebSocketConnectOptions, passwordSalt?: string): void {
-  const { userName, token, newPassword } = options as unknown as ForgotPasswordResetParams;
+export function forgotPasswordReset(options: WebSocketConnectOptions, newPassword?: string, passwordSalt?: string): void {
+  const { userName, token } = options as unknown as ForgotPasswordResetParams;
 
   const params: any = {
     ...webClient.clientConfig,

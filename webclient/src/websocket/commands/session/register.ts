@@ -9,8 +9,8 @@ import { hashPassword } from '../../utils';
 
 import { login, disconnect, updateStatus } from './';
 
-export function register(options: WebSocketConnectOptions, passwordSalt?: string): void {
-  const { userName, password, email, country, realName } = options as ServerRegisterParams;
+export function register(options: WebSocketConnectOptions, password?: string, passwordSalt?: string): void {
+  const { userName, email, country, realName } = options as ServerRegisterParams;
 
   const params: any = {
     ...webClient.clientConfig,
@@ -37,12 +37,13 @@ export function register(options: WebSocketConnectOptions, passwordSalt?: string
   BackendService.sendSessionCommand('Command_Register', params, {
     onResponseCode: {
       [ResponseCode.RespRegistrationAccepted]: () => {
-        login(options, passwordSalt);
+        login(options, password, passwordSalt);
         SessionPersistence.registrationSuccess();
       },
       [ResponseCode.RespRegistrationAcceptedNeedsActivation]: () => {
         updateStatus(StatusEnum.DISCONNECTED, 'Registration accepted, awaiting activation');
-        SessionPersistence.accountAwaitingActivation(options);
+        const { password: _p, newPassword: _np, ...safeOptions } = options;
+        SessionPersistence.accountAwaitingActivation(safeOptions);
         disconnect();
       },
       [ResponseCode.RespUserAlreadyExists]: () => onRegistrationError(

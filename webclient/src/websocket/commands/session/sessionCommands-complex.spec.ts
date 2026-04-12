@@ -124,7 +124,7 @@ describe('login', () => {
   const { login } = jest.requireActual('./login');
 
   it('sends Command_Login with plain password when no salt', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+    login({ userName: 'alice' } as any, 'pw');
     expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
       'Command_Login',
       expect.objectContaining({ userName: 'alice', password: 'pw' }),
@@ -133,7 +133,7 @@ describe('login', () => {
   });
 
   it('sends Command_Login with hashedPassword when salt is given', () => {
-    login({ userName: 'alice', password: 'pw' } as any, 'salt');
+    login({ userName: 'alice' } as any, 'pw', 'salt');
     expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
       'Command_Login',
       expect.objectContaining({ hashedPassword: 'hashed_pw' }),
@@ -142,7 +142,7 @@ describe('login', () => {
   });
 
   it('uses options.hashedPassword if provided', () => {
-    login({ userName: 'alice', password: 'pw', hashedPassword: 'pre_hashed' } as any, 'salt');
+    login({ userName: 'alice', hashedPassword: 'pre_hashed' } as any, 'pw', 'salt');
     expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
       'Command_Login',
       expect.objectContaining({ hashedPassword: 'pre_hashed' }),
@@ -151,7 +151,7 @@ describe('login', () => {
   });
 
   it('onSuccess dispatches buddy/ignore/user and calls listUsers/listRooms', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+    login({ userName: 'alice' } as any, 'pw');
     const loginResp = { buddyList: [], ignoreList: [], userInfo: { name: 'alice' } };
     invokeOnSuccess(loginResp, { responseCode: 0, '.Response_Login.ext': loginResp });
     expect(SessionPersistence.updateBuddyList).toHaveBeenCalledWith([]);
@@ -164,7 +164,7 @@ describe('login', () => {
   });
 
   it('onSuccess does NOT pass plaintext password to loginSuccessful', () => {
-    login({ userName: 'alice', password: 'secret' } as any);
+    login({ userName: 'alice' } as any, 'secret');
     const loginResp = { buddyList: [], ignoreList: [], userInfo: { name: 'alice' } };
     invokeOnSuccess(loginResp, { responseCode: 0, '.Response_Login.ext': loginResp });
     const calledWith = (SessionPersistence.loginSuccessful as jest.Mock).mock.calls[0][0];
@@ -172,7 +172,7 @@ describe('login', () => {
   });
 
   it('onSuccess passes hashedPassword to loginSuccessful when salt is used', () => {
-    login({ userName: 'alice', password: 'pw' } as any, 'salt');
+    login({ userName: 'alice' } as any, 'pw', 'salt');
     const loginResp = { buddyList: [], ignoreList: [], userInfo: { name: 'alice' } };
     invokeOnSuccess(loginResp, { responseCode: 0, '.Response_Login.ext': loginResp });
     const calledWith = (SessionPersistence.loginSuccessful as jest.Mock).mock.calls[0][0];
@@ -180,63 +180,65 @@ describe('login', () => {
   });
 
   it('onResponseCode RespClientUpdateRequired calls onLoginError', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+    login({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(1);
     expect(SessionPersistence.loginFailed).toHaveBeenCalled();
     expect(SessionIndexMocks.disconnect).toHaveBeenCalled();
   });
 
   it('onResponseCode RespWrongPassword', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+    login({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(2);
     expect(SessionPersistence.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespUsernameInvalid', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+    login({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(3);
     expect(SessionPersistence.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespWouldOverwriteOldSession', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+    login({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(4);
     expect(SessionPersistence.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespUserIsBanned', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+    login({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(5);
     expect(SessionPersistence.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespRegistrationRequired', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+    login({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(6);
     expect(SessionPersistence.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespClientIdRequired', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+    login({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(7);
     expect(SessionPersistence.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespContextError', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+    login({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(8);
     expect(SessionPersistence.loginFailed).toHaveBeenCalled();
   });
 
-  it('onResponseCode RespAccountNotActivated calls accountAwaitingActivation', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+  it('onResponseCode RespAccountNotActivated calls accountAwaitingActivation without password in options', () => {
+    login({ userName: 'alice', password: 'leaked' } as any, 'pw');
     invokeResponseCode(9);
-    expect(SessionPersistence.accountAwaitingActivation).toHaveBeenCalled();
+    expect(SessionPersistence.accountAwaitingActivation).toHaveBeenCalledWith(
+      expect.not.objectContaining({ password: expect.anything() })
+    );
     expect(SessionPersistence.loginFailed).toHaveBeenCalled();
   });
 
   it('onError calls onLoginError with unknown error message', () => {
-    login({ userName: 'alice', password: 'pw' } as any);
+    login({ userName: 'alice' } as any, 'pw');
     invokeOnError(999);
     expect(SessionPersistence.loginFailed).toHaveBeenCalled();
   });
@@ -249,7 +251,7 @@ describe('register', () => {
   const { register } = jest.requireActual('./register');
 
   it('sends Command_Register with plain password when no salt', () => {
-    register({ userName: 'alice', password: 'pw', email: 'a@b.com', country: 'US', realName: 'Al' } as any);
+    register({ userName: 'alice', email: 'a@b.com', country: 'US', realName: 'Al' } as any, 'pw');
     expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
       'Command_Register',
       expect.objectContaining({ userName: 'alice', password: 'pw' }),
@@ -258,7 +260,7 @@ describe('register', () => {
   });
 
   it('uses hashedPassword when salt is provided', () => {
-    register({ userName: 'alice', password: 'pw' } as any, 'salt');
+    register({ userName: 'alice' } as any, 'pw', 'salt');
     expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
       'Command_Register',
       expect.objectContaining({ hashedPassword: 'hashed_pw' }),
@@ -267,76 +269,78 @@ describe('register', () => {
   });
 
   it('RespRegistrationAccepted calls login without salt and registrationSuccess', () => {
-    register({ userName: 'alice', password: 'pw' } as any);
+    register({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(10);
-    expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), undefined);
+    expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), 'pw', undefined);
     expect(SessionPersistence.registrationSuccess).toHaveBeenCalled();
   });
 
   it('RespRegistrationAccepted forwards salt to login', () => {
-    register({ userName: 'alice', password: 'pw' } as any, 'mySalt');
+    register({ userName: 'alice' } as any, 'pw', 'mySalt');
     invokeResponseCode(10);
-    expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), 'mySalt');
+    expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), 'pw', 'mySalt');
     expect(SessionPersistence.registrationSuccess).toHaveBeenCalled();
   });
 
-  it('RespRegistrationAcceptedNeedsActivation calls accountAwaitingActivation', () => {
-    register({ userName: 'alice', password: 'pw' } as any);
+  it('RespRegistrationAcceptedNeedsActivation calls accountAwaitingActivation without password in options', () => {
+    register({ userName: 'alice', password: 'leaked' } as any, 'pw');
     invokeResponseCode(11);
-    expect(SessionPersistence.accountAwaitingActivation).toHaveBeenCalled();
+    expect(SessionPersistence.accountAwaitingActivation).toHaveBeenCalledWith(
+      expect.not.objectContaining({ password: expect.anything() })
+    );
     expect(SessionIndexMocks.disconnect).toHaveBeenCalled();
   });
 
   it('RespUserAlreadyExists calls registrationUserNameError', () => {
-    register({ userName: 'alice', password: 'pw' } as any);
+    register({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(12);
     expect(SessionPersistence.registrationUserNameError).toHaveBeenCalled();
   });
 
   it('RespUsernameInvalid calls registrationUserNameError', () => {
-    register({ userName: 'alice', password: 'pw' } as any);
+    register({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(3);
     expect(SessionPersistence.registrationUserNameError).toHaveBeenCalled();
   });
 
   it('RespPasswordTooShort calls registrationPasswordError', () => {
-    register({ userName: 'alice', password: 'pw' } as any);
+    register({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(13);
     expect(SessionPersistence.registrationPasswordError).toHaveBeenCalled();
   });
 
   it('RespEmailRequiredToRegister calls registrationRequiresEmail', () => {
-    register({ userName: 'alice', password: 'pw' } as any);
+    register({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(14);
     expect(SessionPersistence.registrationRequiresEmail).toHaveBeenCalled();
   });
 
   it('RespEmailBlackListed calls registrationEmailError', () => {
-    register({ userName: 'alice', password: 'pw' } as any);
+    register({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(15);
     expect(SessionPersistence.registrationEmailError).toHaveBeenCalled();
   });
 
   it('RespTooManyRequests calls registrationEmailError', () => {
-    register({ userName: 'alice', password: 'pw' } as any);
+    register({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(16);
     expect(SessionPersistence.registrationEmailError).toHaveBeenCalled();
   });
 
   it('RespRegistrationDisabled calls registrationFailed', () => {
-    register({ userName: 'alice', password: 'pw' } as any);
+    register({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(17);
     expect(SessionPersistence.registrationFailed).toHaveBeenCalled();
   });
 
   it('RespUserIsBanned calls registrationFailed with raw.reasonStr and raw.endTime', () => {
-    register({ userName: 'alice', password: 'pw' } as any);
+    register({ userName: 'alice' } as any, 'pw');
     invokeResponseCode(5, { reasonStr: 'bad user', endTime: 9999 });
     expect(SessionPersistence.registrationFailed).toHaveBeenCalledWith('bad user', 9999);
   });
 
   it('onError calls registrationFailed', () => {
-    register({ userName: 'alice', password: 'pw' } as any);
+    register({ userName: 'alice' } as any, 'pw');
     invokeOnError();
     expect(SessionPersistence.registrationFailed).toHaveBeenCalled();
   });
@@ -348,16 +352,25 @@ describe('register', () => {
 describe('activate', () => {
   const { activate } = jest.requireActual('./activate');
 
-  it('sends Command_Activate', () => {
-    activate({ userName: 'alice', token: 'tok' } as any);
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith('Command_Activate', expect.any(Object), expect.any(Object));
+  it('sends Command_Activate with userName and token, not password', () => {
+    activate({ userName: 'alice', token: 'tok' } as any, 'pw');
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_Activate',
+      expect.objectContaining({ userName: 'alice', token: 'tok' }),
+      expect.any(Object)
+    );
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_Activate',
+      expect.not.objectContaining({ password: expect.anything() }),
+      expect.any(Object)
+    );
   });
 
-  it('RespActivationAccepted calls accountActivationSuccess and login with salt', () => {
-    activate({ userName: 'alice', token: 'tok' } as any, 'salt');
+  it('RespActivationAccepted calls accountActivationSuccess and forwards password+salt to login', () => {
+    activate({ userName: 'alice', token: 'tok' } as any, 'pw', 'salt');
     invokeResponseCode(18);
     expect(SessionPersistence.accountActivationSuccess).toHaveBeenCalled();
-    expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), 'salt');
+    expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), 'pw', 'salt');
   });
 
   it('onError calls accountActivationFailed and disconnect', () => {
@@ -438,7 +451,7 @@ describe('forgotPasswordReset', () => {
   const { forgotPasswordReset } = jest.requireActual('./forgotPasswordReset');
 
   it('sends Command_ForgotPasswordReset with plain newPassword when no salt', () => {
-    forgotPasswordReset({ userName: 'alice', token: 'tok', newPassword: 'newpw' } as any);
+    forgotPasswordReset({ userName: 'alice', token: 'tok' } as any, 'newpw');
     expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
       'Command_ForgotPasswordReset',
       expect.objectContaining({ newPassword: 'newpw' }),
@@ -447,7 +460,7 @@ describe('forgotPasswordReset', () => {
   });
 
   it('sends hashed new password when salt provided', () => {
-    forgotPasswordReset({ userName: 'alice', token: 'tok', newPassword: 'newpw' } as any, 'salt');
+    forgotPasswordReset({ userName: 'alice', token: 'tok' } as any, 'newpw', 'salt');
     expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
       'Command_ForgotPasswordReset',
       expect.objectContaining({ hashedNewPassword: 'hashed_pw' }),
@@ -456,14 +469,14 @@ describe('forgotPasswordReset', () => {
   });
 
   it('onSuccess calls resetPasswordSuccess and disconnect', () => {
-    forgotPasswordReset({ userName: 'alice', token: 'tok', newPassword: 'newpw' } as any);
+    forgotPasswordReset({ userName: 'alice', token: 'tok' } as any, 'newpw');
     invokeOnSuccess();
     expect(SessionPersistence.resetPasswordSuccess).toHaveBeenCalled();
     expect(SessionIndexMocks.disconnect).toHaveBeenCalled();
   });
 
   it('onError calls resetPasswordFailed and disconnect', () => {
-    forgotPasswordReset({ userName: 'alice', token: 'tok', newPassword: 'newpw' } as any);
+    forgotPasswordReset({ userName: 'alice', token: 'tok' } as any, 'newpw');
     invokeOnError();
     expect(SessionPersistence.resetPasswordFailed).toHaveBeenCalled();
     expect(SessionIndexMocks.disconnect).toHaveBeenCalled();
@@ -477,53 +490,53 @@ describe('requestPasswordSalt', () => {
   const { requestPasswordSalt } = jest.requireActual('./requestPasswordSalt');
 
   it('sends Command_RequestPasswordSalt', () => {
-    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.LOGIN } as any);
+    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.LOGIN } as any, 'pw');
     expect(BackendService.sendSessionCommand).toHaveBeenCalledWith('Command_RequestPasswordSalt', expect.any(Object), expect.any(Object));
   });
 
-  it('onSuccess with LOGIN reason calls login', () => {
-    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.LOGIN } as any);
+  it('onSuccess with LOGIN reason forwards password+salt to login', () => {
+    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.LOGIN } as any, 'pw');
     const resp = { passwordSalt: 'salt123' };
     invokeOnSuccess(resp, { responseCode: 0, '.Response_PasswordSalt.ext': resp });
-    expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), 'salt123');
+    expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), 'pw', 'salt123');
   });
 
-  it('onSuccess with ACTIVATE_ACCOUNT reason calls activate', () => {
-    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.ACTIVATE_ACCOUNT } as any);
+  it('onSuccess with ACTIVATE_ACCOUNT reason forwards password+salt to activate', () => {
+    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.ACTIVATE_ACCOUNT } as any, 'pw');
     const resp = { passwordSalt: 'salt123' };
     invokeOnSuccess(resp, { responseCode: 0, '.Response_PasswordSalt.ext': resp });
-    expect(SessionIndexMocks.activate).toHaveBeenCalledWith(expect.any(Object), 'salt123');
+    expect(SessionIndexMocks.activate).toHaveBeenCalledWith(expect.any(Object), 'pw', 'salt123');
   });
 
-  it('onSuccess with PASSWORD_RESET reason calls forgotPasswordReset', () => {
-    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.PASSWORD_RESET } as any);
+  it('onSuccess with PASSWORD_RESET reason forwards newPassword+salt to forgotPasswordReset', () => {
+    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.PASSWORD_RESET } as any, undefined, 'newpw');
     const resp = { passwordSalt: 'salt123' };
     invokeOnSuccess(resp, { responseCode: 0, '.Response_PasswordSalt.ext': resp });
-    expect(SessionIndexMocks.forgotPasswordReset).toHaveBeenCalled();
+    expect(SessionIndexMocks.forgotPasswordReset).toHaveBeenCalledWith(expect.any(Object), 'newpw', 'salt123');
   });
 
   it('onResponseCode RespRegistrationRequired calls updateStatus and disconnect', () => {
-    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.LOGIN } as any);
+    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.LOGIN } as any, 'pw');
     invokeResponseCode(6);
     expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, expect.any(String));
     expect(SessionIndexMocks.disconnect).toHaveBeenCalled();
   });
 
   it('onResponseCode RespRegistrationRequired with ACTIVATE_ACCOUNT calls accountActivationFailed', () => {
-    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.ACTIVATE_ACCOUNT } as any);
+    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.ACTIVATE_ACCOUNT } as any, 'pw');
     invokeResponseCode(6);
     expect(SessionPersistence.accountActivationFailed).toHaveBeenCalled();
   });
 
   it('onError calls updateStatus DISCONNECTED and disconnect', () => {
-    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.LOGIN } as any);
+    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.LOGIN } as any, 'pw');
     invokeOnError();
     expect(SessionIndexMocks.updateStatus).toHaveBeenCalled();
     expect(SessionIndexMocks.disconnect).toHaveBeenCalled();
   });
 
   it('onError with PASSWORD_RESET reason calls resetPasswordFailed', () => {
-    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.PASSWORD_RESET } as any);
+    requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.PASSWORD_RESET } as any, undefined, 'newpw');
     invokeOnError();
     expect(SessionPersistence.resetPasswordFailed).toHaveBeenCalled();
   });

@@ -14,7 +14,7 @@ import {
   updateStatus
 } from './';
 
-export function requestPasswordSalt(options: WebSocketConnectOptions): void {
+export function requestPasswordSalt(options: WebSocketConnectOptions, password?: string, newPassword?: string): void {
   const { userName } = options as RequestPasswordSaltParams;
 
   const onFailure = () => {
@@ -41,13 +41,13 @@ export function requestPasswordSalt(options: WebSocketConnectOptions): void {
 
       switch (options.reason) {
         case WebSocketConnectReason.ACTIVATE_ACCOUNT:
-          activate(options, passwordSalt);
+          activate(options, password, passwordSalt);
           break;
         case WebSocketConnectReason.PASSWORD_RESET:
-          forgotPasswordReset(options, passwordSalt);
+          forgotPasswordReset(options, newPassword, passwordSalt);
           break;
         default:
-          login(options, passwordSalt);
+          login(options, password, passwordSalt);
       }
     },
     onResponseCode: {

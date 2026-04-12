@@ -25,26 +25,26 @@ export function serverIdentification(info: ServerIdentificationData): void {
   }
 
   const getPasswordSalt = passwordSaltSupported(serverOptions);
-  const connectOptions = { ...webClient.options };
+  const { password, newPassword, ...connectOptions } = webClient.options;
 
   switch (connectOptions.reason) {
     case WebSocketConnectReason.LOGIN:
       updateStatus(StatusEnum.LOGGING_IN, 'Logging In...');
       if (getPasswordSalt) {
-        requestPasswordSalt(connectOptions);
+        requestPasswordSalt(connectOptions, password);
       } else {
-        login(connectOptions);
+        login(connectOptions, password);
       }
       break;
     case WebSocketConnectReason.REGISTER:
       const passwordSalt = getPasswordSalt ? generateSalt() : null;
-      register(connectOptions, passwordSalt);
+      register(connectOptions, password, passwordSalt);
       break;
     case WebSocketConnectReason.ACTIVATE_ACCOUNT:
       if (getPasswordSalt) {
-        requestPasswordSalt(connectOptions);
+        requestPasswordSalt(connectOptions, password);
       } else {
-        activate(connectOptions);
+        activate(connectOptions, password);
       }
       break;
     case WebSocketConnectReason.PASSWORD_RESET_REQUEST:
@@ -55,9 +55,9 @@ export function serverIdentification(info: ServerIdentificationData): void {
       break;
     case WebSocketConnectReason.PASSWORD_RESET:
       if (getPasswordSalt) {
-        requestPasswordSalt(connectOptions);
+        requestPasswordSalt(connectOptions, undefined, newPassword);
       } else {
-        forgotPasswordReset(connectOptions);
+        forgotPasswordReset(connectOptions, newPassword);
       }
       break;
     default:

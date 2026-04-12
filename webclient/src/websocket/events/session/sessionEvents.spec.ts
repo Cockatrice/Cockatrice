@@ -374,46 +374,66 @@ describe('serverIdentification', () => {
     expect(SessionCmds.disconnect).toHaveBeenCalled();
   });
 
-  it('LOGIN reason without salt → calls login', () => {
-    (webClient as any).options = { reason: WebSocketConnectReason.LOGIN };
+  it('LOGIN reason without salt → calls login with password as separate param', () => {
+    (webClient as any).options = { reason: WebSocketConnectReason.LOGIN, password: 'secret' };
     (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(0);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 } as any);
-    expect(SessionCmds.login).toHaveBeenCalled();
+    expect(SessionCmds.login).toHaveBeenCalledWith(
+      expect.not.objectContaining({ password: expect.anything() }),
+      'secret'
+    );
   });
 
-  it('LOGIN reason with salt → calls requestPasswordSalt', () => {
-    (webClient as any).options = { reason: WebSocketConnectReason.LOGIN };
+  it('LOGIN reason with salt → calls requestPasswordSalt with password as separate param', () => {
+    (webClient as any).options = { reason: WebSocketConnectReason.LOGIN, password: 'secret' };
     (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(1);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 1 } as any);
-    expect(SessionCmds.requestPasswordSalt).toHaveBeenCalled();
+    expect(SessionCmds.requestPasswordSalt).toHaveBeenCalledWith(
+      expect.not.objectContaining({ password: expect.anything() }),
+      'secret'
+    );
   });
 
-  it('REGISTER reason without salt → calls register with null salt', () => {
-    (webClient as any).options = { reason: WebSocketConnectReason.REGISTER };
+  it('REGISTER reason without salt → calls register with password and null salt', () => {
+    (webClient as any).options = { reason: WebSocketConnectReason.REGISTER, password: 'secret' };
     (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(0);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 } as any);
-    expect(SessionCmds.register).toHaveBeenCalledWith(expect.any(Object), null);
+    expect(SessionCmds.register).toHaveBeenCalledWith(
+      expect.not.objectContaining({ password: expect.anything() }),
+      'secret',
+      null
+    );
   });
 
-  it('REGISTER reason with salt → calls register with generated salt', () => {
-    (webClient as any).options = { reason: WebSocketConnectReason.REGISTER };
+  it('REGISTER reason with salt → calls register with password and generated salt', () => {
+    (webClient as any).options = { reason: WebSocketConnectReason.REGISTER, password: 'secret' };
     (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(1);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 1 } as any);
-    expect(SessionCmds.register).toHaveBeenCalledWith(expect.any(Object), 'newSalt');
+    expect(SessionCmds.register).toHaveBeenCalledWith(
+      expect.not.objectContaining({ password: expect.anything() }),
+      'secret',
+      'newSalt'
+    );
   });
 
-  it('ACTIVATE_ACCOUNT reason without salt → calls activate', () => {
-    (webClient as any).options = { reason: WebSocketConnectReason.ACTIVATE_ACCOUNT };
+  it('ACTIVATE_ACCOUNT reason without salt → calls activate with password as separate param', () => {
+    (webClient as any).options = { reason: WebSocketConnectReason.ACTIVATE_ACCOUNT, password: 'secret' };
     (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(0);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 } as any);
-    expect(SessionCmds.activate).toHaveBeenCalled();
+    expect(SessionCmds.activate).toHaveBeenCalledWith(
+      expect.not.objectContaining({ password: expect.anything() }),
+      'secret'
+    );
   });
 
-  it('ACTIVATE_ACCOUNT reason with salt → calls requestPasswordSalt', () => {
-    (webClient as any).options = { reason: WebSocketConnectReason.ACTIVATE_ACCOUNT };
+  it('ACTIVATE_ACCOUNT reason with salt → calls requestPasswordSalt with password as separate param', () => {
+    (webClient as any).options = { reason: WebSocketConnectReason.ACTIVATE_ACCOUNT, password: 'secret' };
     (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(1);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 1 } as any);
-    expect(SessionCmds.requestPasswordSalt).toHaveBeenCalled();
+    expect(SessionCmds.requestPasswordSalt).toHaveBeenCalledWith(
+      expect.not.objectContaining({ password: expect.anything() }),
+      'secret'
+    );
   });
 
   it('PASSWORD_RESET_REQUEST reason → calls forgotPasswordRequest', () => {
@@ -428,18 +448,25 @@ describe('serverIdentification', () => {
     expect(SessionCmds.forgotPasswordChallenge).toHaveBeenCalled();
   });
 
-  it('PASSWORD_RESET reason without salt → calls forgotPasswordReset', () => {
-    (webClient as any).options = { reason: WebSocketConnectReason.PASSWORD_RESET };
+  it('PASSWORD_RESET reason without salt → calls forgotPasswordReset with newPassword as separate param', () => {
+    (webClient as any).options = { reason: WebSocketConnectReason.PASSWORD_RESET, newPassword: 'newpw' };
     (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(0);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 } as any);
-    expect(SessionCmds.forgotPasswordReset).toHaveBeenCalled();
+    expect(SessionCmds.forgotPasswordReset).toHaveBeenCalledWith(
+      expect.not.objectContaining({ newPassword: expect.anything() }),
+      'newpw'
+    );
   });
 
-  it('PASSWORD_RESET reason with salt → calls requestPasswordSalt', () => {
-    (webClient as any).options = { reason: WebSocketConnectReason.PASSWORD_RESET };
+  it('PASSWORD_RESET reason with salt → calls requestPasswordSalt with newPassword as separate param', () => {
+    (webClient as any).options = { reason: WebSocketConnectReason.PASSWORD_RESET, newPassword: 'newpw' };
     (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(1);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 1 } as any);
-    expect(SessionCmds.requestPasswordSalt).toHaveBeenCalled();
+    expect(SessionCmds.requestPasswordSalt).toHaveBeenCalledWith(
+      expect.not.objectContaining({ newPassword: expect.anything() }),
+      undefined,
+      'newpw'
+    );
   });
 
   it('unknown reason → updateStatus DISCONNECTED and disconnect', () => {

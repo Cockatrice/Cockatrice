@@ -12,8 +12,8 @@ import {
   updateStatus,
 } from './';
 
-export function login(options: WebSocketConnectOptions, passwordSalt?: string): void {
-  const { userName, password, hashedPassword } = options;
+export function login(options: WebSocketConnectOptions, password?: string, passwordSalt?: string): void {
+  const { userName, hashedPassword } = options;
 
   const loginConfig: any = {
     ...webClient.clientConfig,
@@ -71,7 +71,10 @@ export function login(options: WebSocketConnectOptions, passwordSalt?: string): 
         onLoginError('Login failed: server error'),
       [ResponseCode.RespAccountNotActivated]: () =>
         onLoginError('Login failed: account not activated',
-          () => SessionPersistence.accountAwaitingActivation(options)
+          () => {
+            const { password: _p, newPassword: _np, ...safeOptions } = options;
+            SessionPersistence.accountAwaitingActivation(safeOptions);
+          }
         ),
     },
     onError: (responseCode) =>
