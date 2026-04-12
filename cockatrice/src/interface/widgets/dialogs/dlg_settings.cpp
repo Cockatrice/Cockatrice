@@ -1181,37 +1181,13 @@ void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
 {
     CardPictureLoader::clearNetworkCache();
 
-    // These are not used anymore, but we don't delete them automatically, so
-    // we should do it here lest we leave pictures hanging around on users'
-    // machines.
-    QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics/";
-    QStringList dirs = QDir(picsPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
-    bool outerSuccessRemove = true;
-    for (const auto &dir : dirs) {
-        QString currentPath = picsPath + dir + "/";
-        QStringList files = QDir(currentPath).entryList(QDir::Files);
-        bool innerSuccessRemove = true;
-        for (int j = 0; j < files.length(); j++) {
-            if (!QDir(currentPath).remove(files.at(j))) {
-                qInfo() << "Failed to remove " + currentPath.toUtf8() + files.at(j).toUtf8();
-                outerSuccessRemove = false;
-                innerSuccessRemove = false;
-            }
-            qInfo() << "Removed " << currentPath << files.at(j);
-        }
+    QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics";
 
-        if (innerSuccessRemove) {
-            bool success = QDir(picsPath).rmdir(dir);
-            if (!success) {
-                qInfo() << "Failed to remove inner directory" << picsPath;
-            } else {
-                qInfo() << "Removed" << currentPath;
-            }
-        }
-    }
-    if (outerSuccessRemove) {
+    QDir dir(picsPath);
+    bool success = dir.removeRecursively();
+
+    if (success) {
         QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
-        QDir(SettingsCache::instance().getPicsPath()).rmdir("downloadedPics");
     } else {
         QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card pictures could not be cleared."));
     }
