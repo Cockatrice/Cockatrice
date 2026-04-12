@@ -12,6 +12,7 @@
 #include <QMap>
 #include <QPixmap>
 #include <libcockatrice/network/server/remote/user_level.h>
+#include <optional>
 
 inline Q_LOGGING_CATEGORY(PixelMapGeneratorLog, "pixel_map_generator");
 
