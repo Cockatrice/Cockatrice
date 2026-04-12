@@ -187,10 +187,17 @@ jobs:
       - name: Build debug and test
         if: matrix.test != 'skip'
         shell: bash
+        env:
+          package: '${{matrix.package}}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE" \
-                  --cmake-generator "$CMAKE_GENERATOR"
+          args=()
+          if [[ $GITHUB_REF == "refs/heads/master" && $package == "skip" ]]; then
+            args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
+          fi
+          args+=(--ccache "$CCACHE_SIZE")
+          args+=(--cmake-generator "$CMAKE_GENERATOR")
+          RUN --server --debug --test "${args[@]}"
 
       - name: Build release package
         id: build
