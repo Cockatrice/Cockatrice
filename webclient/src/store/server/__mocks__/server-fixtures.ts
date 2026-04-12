@@ -136,7 +136,6 @@ export function makeServerState(overrides: Partial<ServerState> = {}): ServerSta
       field: UserSortField.NAME,
       order: SortDirection.ASC,
     },
-    connectOptions: {},
     messages: {},
     userInfo: {},
     notifications: [],

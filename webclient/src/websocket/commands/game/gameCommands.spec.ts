@@ -30,6 +30,8 @@ import { setSideboardLock } from './setSideboardLock';
 import { setSideboardPlan } from './setSideboardPlan';
 import { shuffle } from './shuffle';
 import { undoDraw } from './undoDraw';
+import { unconcede } from './unconcede';
+import { judge } from './judge';
 
 jest.mock('../../services/BackendService', () => ({
   BackendService: { sendGameCommand: jest.fn() },
@@ -196,5 +198,20 @@ describe('Game commands — delegate to BackendService.sendGameCommand', () => {
   it('undoDraw sends Command_UndoDraw with empty object', () => {
     undoDraw(gameId);
     expect(BackendService.sendGameCommand).toHaveBeenCalledWith(gameId, 'Command_UndoDraw', {});
+  });
+
+  it('unconcede sends Command_Unconcede with empty object', () => {
+    unconcede(gameId);
+    expect(BackendService.sendGameCommand).toHaveBeenCalledWith(gameId, 'Command_Unconcede', {});
+  });
+
+  it('judge sends Command_Judge with targetId and wrapped gameCommand array', () => {
+    const targetId = 3;
+    const innerGameCommand = { '.Command_DrawCards.ext': { numberOfCards: 2 } };
+    judge(gameId, targetId, innerGameCommand);
+    expect(BackendService.sendGameCommand).toHaveBeenCalledWith(gameId, 'Command_Judge', {
+      targetId,
+      gameCommand: [innerGameCommand],
+    });
   });
 });

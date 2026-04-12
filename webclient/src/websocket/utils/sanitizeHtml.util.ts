@@ -5,6 +5,7 @@ export function sanitizeHtml(msg: string): string {
     allowedTags: ['br', 'a', 'img', 'center', 'b', 'font'],
     allowedAttributes: {
       '*': ['href', 'color', 'rel', 'target'],
+      'img': ['src', 'alt'],
     },
     allowedSchemes: ['http', 'https', 'ftp'],
     transformTags: {

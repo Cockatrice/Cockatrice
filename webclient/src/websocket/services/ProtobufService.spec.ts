@@ -258,6 +258,25 @@ describe('ProtobufService', () => {
       expect((service as any).pendingCommands[1]).toBeUndefined();
     });
 
+    it('resolves pending command when response cmdId is a protobufjs Long object', () => {
+      const service = new ProtobufService(mockWebClient);
+      const cb = jest.fn();
+      (service as any).cmdId = 1;
+      (service as any).pendingCommands[1] = cb;
+
+      // Simulate protobufjs decoding cmdId as a Long object (low=1, high=0)
+      const longCmdId = { low: 1, high: 0, unsigned: false, toString: () => '1' };
+      const response = { cmdId: longCmdId };
+      ProtoController.root.ServerMessage.decode = jest.fn().mockReturnValue({
+        messageType: ProtoController.root.ServerMessage.MessageType.RESPONSE,
+        response,
+      });
+
+      service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent);
+      expect(cb).toHaveBeenCalledWith(response);
+      expect((service as any).pendingCommands[1]).toBeUndefined();
+    });
+
     it('routes ROOM_EVENT message', () => {
       const service = new ProtobufService(mockWebClient);
       const processRoomEvent = jest.spyOn(service as any, 'processRoomEvent');

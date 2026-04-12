@@ -305,11 +305,24 @@ export interface ReverseTurnData {
  * Contains per-container metadata from GameEventContainer.
  * Not stored in Redux — transient routing metadata only.
  */
+export interface GameEventContext {
+  '.Context_ReadyStart.ext'?: {};
+  '.Context_Concede.ext'?: {};
+  '.Context_DeckSelect.ext'?: {};
+  '.Context_UndoDraw.ext'?: {};
+  '.Context_MoveCard.ext'?: {};
+  '.Context_Mulligan.ext'?: {};
+  '.Context_PingChanged.ext'?: {};
+  '.Context_ConnectionStateChanged.ext'?: {};
+  '.Context_SetSideboardLock.ext'?: {};
+  '.Context_Unconcede.ext'?: {};
+}
+
 export interface GameEventMeta {
   gameId: number;
   playerId: number;
   /** Raw protobuf GameEventContext object. Not stored in Redux. */
-  context: any;
+  context: GameEventContext | null;
   secondsElapsed: number;
   /** Proto type is uint32. Non-zero means the action was forced by a judge. */
   forcedByJudge: number;

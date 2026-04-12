@@ -64,10 +64,12 @@ const Root = styled('div')(({ theme }) => ({
   }
 }));
 
-const Login = ({ state, description, connectOptions }: LoginProps) => {
+const Login = ({ state, description }: LoginProps) => {
   const { t } = useTranslation();
 
   const isConnected = AuthenticationService.isConnected(state);
+
+  const [pendingActivationOptions, setPendingActivationOptions] = useState<WebSocketConnectOptions | null>(null);
 
   const [rememberLogin, setRememberLogin] = useState(null);
   const [dialogState, setDialogState] = useState({
@@ -97,9 +99,11 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
   useReduxEffect(() => {
     accountActivatedToast.openToast()
     closeActivateAccountDialog();
+    setPendingActivationOptions(null);
   }, ServerTypes.ACCOUNT_ACTIVATION_SUCCESS, []);
 
-  useReduxEffect(() => {
+  useReduxEffect(({ options }) => {
+    setPendingActivationOptions(options);
     closeRegistrationDialog();
     openActivateAccountDialog();
   }, ServerTypes.ACCOUNT_AWAITING_ACTIVATION, []);
@@ -161,7 +165,7 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
 
   const handleAccountActivationDialogSubmit = ({ token }) => {
     AuthenticationService.activateAccount({
-      ...connectOptions,
+      ...pendingActivationOptions,
       token,
     });
   };
@@ -348,13 +352,11 @@ const Login = ({ state, description, connectOptions }: LoginProps) => {
 interface LoginProps {
   state: number;
   description: string;
-  connectOptions: WebSocketConnectOptions;
 }
 
 const mapStateToProps = state => ({
   state: ServerSelectors.getState(state),
   description: ServerSelectors.getDescription(state),
-  connectOptions: ServerSelectors.getConnectOptions(state),
 });
 
 export default connect(mapStateToProps)(Login);

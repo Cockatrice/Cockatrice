@@ -52,4 +52,21 @@ describe('sanitizeHtml', () => {
     const result = sanitizeHtml('<a href="javascript:alert(1)">xss</a>');
     expect(result).not.toContain('javascript:');
   });
+
+  it('preserves src and alt on img tags', () => {
+    const result = sanitizeHtml('<img src="http://example.com/img.png" alt="test" />');
+    expect(result).toContain('src="http://example.com/img.png"');
+    expect(result).toContain('alt="test"');
+  });
+
+  it('strips javascript: scheme from img src', () => {
+    const result = sanitizeHtml('<img src="javascript:alert(1)" />');
+    expect(result).not.toContain('src="javascript:');
+  });
+
+  it('strips onerror from img while keeping safe src', () => {
+    const result = sanitizeHtml('<img src="http://example.com/img.png" onerror="alert(1)" />');
+    expect(result).not.toContain('onerror');
+    expect(result).toContain('src="http://example.com/img.png"');
+  });
 });

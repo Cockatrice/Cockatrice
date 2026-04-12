@@ -44,7 +44,8 @@ export function login(options: WebSocketConnectOptions, passwordSalt?: string): 
       SessionPersistence.updateBuddyList(buddyList);
       SessionPersistence.updateIgnoreList(ignoreList);
       SessionPersistence.updateUser(userInfo);
-      SessionPersistence.loginSuccessful(loginConfig);
+      const { password: _password, ...safeConfig } = loginConfig;
+      SessionPersistence.loginSuccessful(safeConfig);
 
       listUsers();
       listRooms();

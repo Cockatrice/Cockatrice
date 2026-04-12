@@ -51,23 +51,23 @@ describe('Initialisation', () => {
 // ── Account & Connection ─────────────────────────────────────────────────────
 
 describe('Account & Connection', () => {
-  it('ACCOUNT_AWAITING_ACTIVATION → sets connectOptions from action.options', () => {
+  it('ACCOUNT_AWAITING_ACTIVATION → returns state unchanged', () => {
     const options = makeConnectOptions();
     const state = makeServerState();
     const result = serverReducer(state, { type: Types.ACCOUNT_AWAITING_ACTIVATION, options });
-    expect(result.connectOptions).toEqual(options);
+    expect(result).toBe(state);
   });
 
-  it('ACCOUNT_ACTIVATION_SUCCESS → clears connectOptions to {}', () => {
-    const state = makeServerState({ connectOptions: makeConnectOptions() });
+  it('ACCOUNT_ACTIVATION_SUCCESS → returns state unchanged', () => {
+    const state = makeServerState();
     const result = serverReducer(state, { type: Types.ACCOUNT_ACTIVATION_SUCCESS });
-    expect(result.connectOptions).toEqual({});
+    expect(result).toBe(state);
   });
 
-  it('ACCOUNT_ACTIVATION_FAILED → clears connectOptions to {}', () => {
-    const state = makeServerState({ connectOptions: makeConnectOptions() });
+  it('ACCOUNT_ACTIVATION_FAILED → returns state unchanged', () => {
+    const state = makeServerState();
     const result = serverReducer(state, { type: Types.ACCOUNT_ACTIVATION_FAILED });
-    expect(result.connectOptions).toEqual({});
+    expect(result).toBe(state);
   });
 });
 

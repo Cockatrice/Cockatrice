@@ -163,6 +163,22 @@ describe('login', () => {
     expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGED_IN, 'Logged in.');
   });
 
+  it('onSuccess does NOT pass plaintext password to loginSuccessful', () => {
+    login({ userName: 'alice', password: 'secret' } as any);
+    const loginResp = { buddyList: [], ignoreList: [], userInfo: { name: 'alice' } };
+    invokeOnSuccess(loginResp, { responseCode: 0, '.Response_Login.ext': loginResp });
+    const calledWith = (SessionPersistence.loginSuccessful as jest.Mock).mock.calls[0][0];
+    expect(calledWith).not.toHaveProperty('password');
+  });
+
+  it('onSuccess passes hashedPassword to loginSuccessful when salt is used', () => {
+    login({ userName: 'alice', password: 'pw' } as any, 'salt');
+    const loginResp = { buddyList: [], ignoreList: [], userInfo: { name: 'alice' } };
+    invokeOnSuccess(loginResp, { responseCode: 0, '.Response_Login.ext': loginResp });
+    const calledWith = (SessionPersistence.loginSuccessful as jest.Mock).mock.calls[0][0];
+    expect(calledWith).toHaveProperty('hashedPassword', 'hashed_pw');
+  });
+
   it('onResponseCode RespClientUpdateRequired calls onLoginError', () => {
     login({ userName: 'alice', password: 'pw' } as any);
     invokeResponseCode(1);

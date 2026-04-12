@@ -18,12 +18,6 @@ describe('Selectors', () => {
     expect(Selectors.getInitialized(rootState(state))).toBe(true);
   });
 
-  it('getConnectOptions → returns connectOptions', () => {
-    const connectOptions = { host: 'localhost', port: '4747' };
-    const state = makeServerState({ connectOptions });
-    expect(Selectors.getConnectOptions(rootState(state))).toBe(connectOptions);
-  });
-
   it('getMessage → returns info.message', () => {
     const state = makeServerState({ info: { message: 'Welcome!', name: null, version: null } });
     expect(Selectors.getMessage(rootState(state))).toBe('Welcome!');

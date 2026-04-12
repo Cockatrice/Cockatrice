@@ -322,6 +322,39 @@ describe('connectionClosed', () => {
     connectionClosed({ reason: 7 } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'Unknown reason');
   });
+
+  it('BANNED with valid positive endTime → shows formatted date', () => {
+    connectionClosed({ reason: 2, endTime: 1700000000 } as any);
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining('You are banned until')
+    );
+  });
+
+  it('BANNED with endTime = 0 → shows generic banned message', () => {
+    connectionClosed({ reason: 2, endTime: 0 } as any);
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
+  });
+
+  it('BANNED with endTime = -1 → shows generic banned message', () => {
+    connectionClosed({ reason: 2, endTime: -1 } as any);
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
+  });
+
+  it('BANNED with endTime = NaN → shows generic banned message', () => {
+    connectionClosed({ reason: 2, endTime: NaN } as any);
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
+  });
+
+  it('BANNED with endTime = Infinity → shows generic banned message', () => {
+    connectionClosed({ reason: 2, endTime: Infinity } as any);
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
+  });
+
+  it('BANNED with reasonStr → uses reasonStr regardless of endTime', () => {
+    connectionClosed({ reason: 2, endTime: 0, reasonStr: 'custom ban reason' } as any);
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'custom ban reason');
+  });
 });
 
 // ----------------------------------------------------------------

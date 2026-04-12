@@ -3,6 +3,8 @@ export { kickFromGame } from './kickFromGame';
 export { gameSay } from './gameSay';
 export { readyStart } from './readyStart';
 export { concede } from './concede';
+export { unconcede } from './unconcede';
+export { judge } from './judge';
 export { nextTurn } from './nextTurn';
 export { setActivePhase } from './setActivePhase';
 export { reverseTurn } from './reverseTurn';

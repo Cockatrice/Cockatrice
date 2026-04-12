@@ -423,3 +423,52 @@ describe('removeFromList / removeFromBuddyList / removeFromIgnoreList', () => {
     expect(SessionPersistence.removeFromList).toHaveBeenCalledWith('buddy', 'alice');
   });
 });
+
+describe('replayGetCode', () => {
+  const { replayGetCode } = jest.requireActual('./replayGetCode');
+  beforeEach(() => jest.clearAllMocks());
+
+  it('sends Command_ReplayGetCode with gameId and responseName', () => {
+    replayGetCode(42, jest.fn());
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_ReplayGetCode',
+      { gameId: 42 },
+      expect.objectContaining({ responseName: 'Response_ReplayGetCode' })
+    );
+  });
+
+  it('calls onCodeReceived with replayCode on success', () => {
+    const onCodeReceived = jest.fn();
+    replayGetCode(42, onCodeReceived);
+    invokeOnSuccess({ replayCode: 'abc123-xyz' });
+    expect(onCodeReceived).toHaveBeenCalledWith('abc123-xyz');
+  });
+});
+
+describe('replaySubmitCode', () => {
+  const { replaySubmitCode } = jest.requireActual('./replaySubmitCode');
+  beforeEach(() => jest.clearAllMocks());
+
+  it('sends Command_ReplaySubmitCode with replayCode', () => {
+    replaySubmitCode('42-abc123');
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_ReplaySubmitCode',
+      { replayCode: '42-abc123' },
+      expect.any(Object)
+    );
+  });
+
+  it('forwards onSuccess callback', () => {
+    const onSuccess = jest.fn();
+    replaySubmitCode('42-abc123', onSuccess);
+    invokeOnSuccess();
+    expect(onSuccess).toHaveBeenCalled();
+  });
+
+  it('forwards onError callback', () => {
+    const onError = jest.fn();
+    replaySubmitCode('42-abc123', undefined, onError);
+    invokeCallback('onError', 404);
+    expect(onError).toHaveBeenCalledWith(404);
+  });
+});

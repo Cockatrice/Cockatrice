@@ -1,5 +1,5 @@
 import {
-  WarnHistoryItem, BanHistoryItem, DeckList, Game, LogItem, ReplayMatch, SortBy, User, UserSortField, WebSocketConnectOptions, WarnListItem
+  WarnHistoryItem, BanHistoryItem, DeckList, Game, LogItem, ReplayMatch, SortBy, User, UserSortField, WarnListItem
 } from 'types';
 import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
 
@@ -51,7 +51,6 @@ export interface ServerState {
   user: User;
   users: User[];
   sortUsersBy: ServerStateSortUsersBy;
-  connectOptions: WebSocketConnectOptions;
   messages: {
     [userName: string]: UserMessageData[];
   }

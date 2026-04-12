@@ -21,6 +21,10 @@ export class RoomPersistence {
   }
 
   static updateGames(roomId: number, gameList: Game[]) {
+    if (!gameList?.length) {
+      return;
+    }
+
     const game = gameList[0];
 
     if (!game.gameType) {

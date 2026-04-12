@@ -80,7 +80,6 @@ const initialState: ServerState = {
     field: UserSortField.NAME,
     order: SortDirection.ASC
   },
-  connectOptions: {},
   messages: {},
   userInfo: {},
   notifications: [],
@@ -105,19 +104,11 @@ export const serverReducer = (state = initialState, action: any) => {
       }
     }
     case Types.ACCOUNT_AWAITING_ACTIVATION: {
-      return {
-        ...state,
-        connectOptions: {
-          ...action.options
-        }
-      }
+      return state;
     }
     case Types.ACCOUNT_ACTIVATION_FAILED:
     case Types.ACCOUNT_ACTIVATION_SUCCESS: {
-      return {
-        ...state,
-        connectOptions: {}
-      }
+      return state;
     }
     case Types.CLEAR_STORE: {
       return {

@@ -19,7 +19,7 @@ export function connectionClosed({ reason, reasonStr, endTime }: ConnectionClose
         message = 'There are too many concurrent connections from your address';
         break;
       case CloseReason.BANNED:
-        message = endTime > 0
+        message = typeof endTime === 'number' && endTime > 0 && Number.isFinite(endTime)
           ? `You are banned until ${new Date(endTime * 1000).toLocaleString()}`
           : 'You are banned';
         break;

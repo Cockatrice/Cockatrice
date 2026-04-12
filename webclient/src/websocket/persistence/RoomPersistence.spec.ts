@@ -80,6 +80,16 @@ describe('RoomPersistence', () => {
       RoomPersistence.updateGames(1, [game]);
       expect(NormalizeService.normalizeGameObject).not.toHaveBeenCalled();
     });
+
+    it('returns without error when gameList is empty', () => {
+      expect(() => RoomPersistence.updateGames(1, [])).not.toThrow();
+      expect(RoomsDispatch.updateGames).not.toHaveBeenCalled();
+    });
+
+    it('returns without error when gameList is null', () => {
+      expect(() => RoomPersistence.updateGames(1, null as any)).not.toThrow();
+      expect(RoomsDispatch.updateGames).not.toHaveBeenCalled();
+    });
   });
 
   it('addMessage normalizes message and dispatches', () => {
