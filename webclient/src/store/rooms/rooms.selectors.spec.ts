@@ -1,0 +1,107 @@
+import { Selectors } from './rooms.selectors';
+import { RoomsState } from './rooms.interfaces';
+import { makeGame, makeMessage, makeRoom, makeRoomsState, makeUser } from './__mocks__/rooms-fixtures';
+
+function rootState(rooms: RoomsState) {
+  return { rooms };
+}
+
+describe('Selectors', () => {
+  it('getRooms → returns rooms map', () => {
+    const state = makeRoomsState();
+    expect(Selectors.getRooms(rootState(state))).toBe(state.rooms);
+  });
+
+  it('getGames → returns games map', () => {
+    const state = makeRoomsState({ games: { 1: { 1: makeGame() } } });
+    expect(Selectors.getGames(rootState(state))).toBe(state.games);
+  });
+
+  it('getRoom → returns room matching roomId', () => {
+    const room = makeRoom({ roomId: 1 });
+    const state = makeRoomsState({ rooms: { 1: room } });
+    expect(Selectors.getRoom(rootState(state), 1)).toBe(room);
+  });
+
+  it('getRoom → returns undefined for unknown roomId', () => {
+    const state = makeRoomsState({ rooms: {} });
+    expect(Selectors.getRoom(rootState(state), 999)).toBeUndefined();
+  });
+
+  it('getJoinedRoomIds → returns joinedRoomIds', () => {
+    const joinedRoomIds = { 1: true };
+    const state = makeRoomsState({ joinedRoomIds });
+    expect(Selectors.getJoinedRoomIds(rootState(state))).toBe(joinedRoomIds);
+  });
+
+  it('getJoinedGameIds → returns joinedGameIds', () => {
+    const joinedGameIds = { 1: { 5: true } };
+    const state = makeRoomsState({ joinedGameIds });
+    expect(Selectors.getJoinedGameIds(rootState(state))).toBe(joinedGameIds);
+  });
+
+  it('getMessages → returns messages map', () => {
+    const messages = { 1: [makeMessage()] };
+    const state = makeRoomsState({ messages });
+    expect(Selectors.getMessages(rootState(state))).toBe(messages);
+  });
+
+  it('getSortGamesBy → returns sortGamesBy', () => {
+    const state = makeRoomsState();
+    expect(Selectors.getSortGamesBy(rootState(state))).toBe(state.sortGamesBy);
+  });
+
+  it('getSortUsersBy → returns sortUsersBy', () => {
+    const state = makeRoomsState();
+    expect(Selectors.getSortUsersBy(rootState(state))).toBe(state.sortUsersBy);
+  });
+
+  it('getJoinedRooms → returns only rooms whose roomId is in joinedRoomIds', () => {
+    const room1 = makeRoom({ roomId: 1 });
+    const room2 = makeRoom({ roomId: 2 });
+    const state = makeRoomsState({
+      rooms: { 1: room1, 2: room2 },
+      joinedRoomIds: { 1: true },
+    });
+    const result = Selectors.getJoinedRooms(rootState(state));
+    expect(result).toHaveLength(1);
+    expect(result[0]).toBe(room1);
+  });
+
+  it('getJoinedRooms → returns empty array when none joined', () => {
+    const state = makeRoomsState({ rooms: { 1: makeRoom({ roomId: 1 }) }, joinedRoomIds: {} });
+    expect(Selectors.getJoinedRooms(rootState(state))).toHaveLength(0);
+  });
+
+  it('getJoinedGames → returns only games whose gameId is in joinedGameIds for that room', () => {
+    const game1 = makeGame({ gameId: 1 });
+    const game2 = makeGame({ gameId: 2 });
+    const state = makeRoomsState({
+      games: { 1: { 1: game1, 2: game2 } },
+      joinedGameIds: { 1: { 1: true } },
+    });
+    const result = Selectors.getJoinedGames(rootState(state), 1);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toBe(game1);
+  });
+
+  it('getRoomMessages → returns messages array for roomId', () => {
+    const messages = [makeMessage()];
+    const state = makeRoomsState({ messages: { 1: messages } });
+    expect(Selectors.getRoomMessages(rootState(state), 1)).toBe(messages);
+  });
+
+  it('getRoomGames → returns gameList for roomId', () => {
+    const games = [makeGame()];
+    const room = makeRoom({ roomId: 1, gameList: games });
+    const state = makeRoomsState({ rooms: { 1: room } });
+    expect(Selectors.getRoomGames(rootState(state), 1)).toBe(games);
+  });
+
+  it('getRoomUsers → returns userList for roomId', () => {
+    const users = [makeUser()];
+    const room = makeRoom({ roomId: 1, userList: users });
+    const state = makeRoomsState({ rooms: { 1: room } });
+    expect(Selectors.getRoomUsers(rootState(state), 1)).toBe(users);
+  });
+});

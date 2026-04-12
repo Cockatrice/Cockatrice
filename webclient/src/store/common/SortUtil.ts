@@ -35,17 +35,15 @@ export default class SortUtil {
             if (result) {
               return result;
             }
-          }
-
-          if (fieldType === 'number') {
+          } else if (fieldType === 'number') {
             const result = SortUtil.numberComparator(a, b, sortBy);
 
             if (result) {
               return result;
             }
+          } else {
+            throw new Error('SortField must resolve to either a string or number');
           }
-
-          throw new Error('SortField must resolve to either a string or number');
         }
 
         return 0;

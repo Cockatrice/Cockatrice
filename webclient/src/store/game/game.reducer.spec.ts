@@ -383,6 +383,31 @@ describe('2C: CARD_MOVED', () => {
     expect(moved.name).toBe('New Name');
     expect(moved.providerId).toBe('new-prov');
   });
+
+  it('CARD_MOVED → returns newState (card removed from source) when targetZone does not exist on player', () => {
+    const { state } = stateWithCard();
+    const result = gamesReducer(state, {
+      type: Types.CARD_MOVED,
+      gameId: 1,
+      playerId: 1,
+      data: {
+        cardId: 10,
+        cardName: '',
+        startPlayerId: 1,
+        startZone: 'hand',
+        position: -1,
+        targetPlayerId: 1,
+        targetZone: 'nonexistent',
+        x: 0,
+        y: 0,
+        newCardId: -1,
+        faceDown: false,
+        newCardProviderId: '',
+      },
+    });
+    expect(result.games[1].players[1].zones['hand'].cards).toHaveLength(0);
+    expect(result.games[1].players[1].zones['nonexistent']).toBeUndefined();
+  });
 });
 
 // ── 2D: Card mutations ────────────────────────────────────────────────────────
