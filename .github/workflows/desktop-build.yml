@@ -410,7 +410,7 @@ jobs:
           path: ${{ github.workspace }}/Qt
           key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
 
-      - name: Install Qt ${{ env.QT_VERSION }} (Windows)
+      - name: Install Qt ${{ steps.resolve_qt_version.outputs.version }} (Windows)
         if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
