@@ -1,19 +1,7 @@
-jest.mock('../../persistence', () => ({
-  SessionPersistence: {
-    playerPropertiesChanged: jest.fn(),
-  },
-}));
+import { CommonEvents } from './index';
 
-import { SessionPersistence } from '../../persistence';
-
-beforeEach(() => jest.clearAllMocks());
-
-describe('playerPropertiesChanged', () => {
-  const { playerPropertiesChanged } = jest.requireActual('./playerPropertiesChanged');
-
-  it('delegates to SessionPersistence.playerPropertiesChanged', () => {
-    const payload = { gameId: 1, player: { playerId: 2 } } as any;
-    playerPropertiesChanged(payload);
-    expect(SessionPersistence.playerPropertiesChanged).toHaveBeenCalledWith(payload);
+describe('CommonEvents', () => {
+  it('is an empty event map (all common events were moved to game/session events)', () => {
+    expect(CommonEvents).toEqual({});
   });
 });

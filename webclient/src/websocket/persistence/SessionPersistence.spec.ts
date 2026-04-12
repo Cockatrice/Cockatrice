@@ -309,11 +309,10 @@ describe('SessionPersistence', () => {
     spy.mockRestore();
   });
 
-  it('gameJoined logs to console', () => {
-    const spy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    SessionPersistence.gameJoined({ gameInfo: {} } as any);
-    expect(spy).toHaveBeenCalled();
-    spy.mockRestore();
+  it('gameJoined dispatches via GameDispatch.gameJoined', () => {
+    const gameInfo = { gameId: 10, roomId: 2, description: 'test', started: false };
+    SessionPersistence.gameJoined({ gameInfo, hostId: 3, playerId: 4, spectator: false, judge: false } as any);
+    expect(GameDispatch.gameJoined).toHaveBeenCalledWith(10, expect.objectContaining({ gameId: 10, hostId: 3, localPlayerId: 4 }));
   });
 
   it('notifyUser passes notification', () => {

@@ -6,6 +6,7 @@ jest.mock('./ProtoController', () => ({
 
 jest.mock('../WebClient', () => {
   const mockProtobuf = {
+    sendGameCommand: jest.fn(),
     sendSessionCommand: jest.fn(),
     sendRoomCommand: jest.fn(),
     sendModeratorCommand: jest.fn(),
@@ -21,6 +22,8 @@ import webClient from '../WebClient';
 beforeEach(() => {
   jest.clearAllMocks();
   ProtoController.root = makeMockProtoRoot();
+  ProtoController.root.GameCommand = { create: jest.fn(args => ({ ...args })) };
+  ProtoController.root['Command_Game'] = { create: jest.fn(p => ({ ...p })) };
   ProtoController.root['Command_Test'] = { create: jest.fn(p => ({ ...p })) };
   ProtoController.root['Command_Room'] = { create: jest.fn(p => ({ ...p })) };
   ProtoController.root['Command_Mod'] = { create: jest.fn(p => ({ ...p })) };
@@ -35,6 +38,7 @@ function captureCallback(sendFn: jest.Mock) {
 describe('BackendService', () => {
   describe('send commands', () => {
     it.each([
+      ['sendGameCommand', () => BackendService.sendGameCommand(7, 'Command_Game', { g: 1 })],
       ['sendSessionCommand', () => BackendService.sendSessionCommand('Command_Test', { x: 1 }, {})],
       ['sendRoomCommand', () => BackendService.sendRoomCommand(5, 'Command_Room', { y: 2 }, {})],
       ['sendModeratorCommand', () => BackendService.sendModeratorCommand('Command_Mod', { z: 3 }, {})],
@@ -46,6 +50,14 @@ describe('BackendService', () => {
   });
 
   describe('handleResponse via non-session command callbacks', () => {
+    it('sendGameCommand callback invokes handleResponse', () => {
+      const onSuccess = jest.fn();
+      BackendService.sendGameCommand(7, 'Command_Game', {}, { onSuccess });
+      const cb = (webClient.protobuf as any).sendGameCommand.mock.calls[0][2];
+      cb({ responseCode: 0 });
+      expect(onSuccess).toHaveBeenCalled();
+    });
+
     it('sendRoomCommand callback invokes handleResponse', () => {
       const onSuccess = jest.fn();
       BackendService.sendRoomCommand(5, 'Command_Room', {}, { onSuccess });

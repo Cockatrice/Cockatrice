@@ -10,7 +10,7 @@ jest.mock('../commands/session', () => ({
 }));
 
 jest.mock('../events', () => ({
-  CommonEvents: {},
+  CommonEvents: { '.Event_Common.ext': jest.fn() },
   GameEvents: { '.Event_Game.ext': jest.fn() },
   RoomEvents: { '.Event_Room.ext': jest.fn() },
   SessionEvents: { '.Event_Session.ext': jest.fn() },
@@ -21,6 +21,7 @@ jest.mock('../WebClient');
 import { ProtobufService } from './ProtobufService';
 import { ProtoController } from './ProtoController';
 import { ping as sessionPing } from '../commands/session';
+import { GameEvents, CommonEvents } from '../events';
 
 let mockSocket: any;
 let mockWebClient: any;
@@ -137,6 +138,35 @@ describe('ProtobufService', () => {
     it('does not throw when no callback is provided and pending command is triggered', () => {
       const service = new ProtobufService(mockWebClient);
       service.sendRoomCommand(42, { roomCmdType: 'test' });
+
+      const storedCb = (service as any).pendingCommands[1];
+      expect(() => storedCb({ responseData: true })).not.toThrow();
+    });
+  });
+
+  describe('sendGameCommand', () => {
+    it('creates a CommandContainer with gameId and gameCommand', () => {
+      const service = new ProtobufService(mockWebClient);
+      service.sendGameCommand(7, { gameCmdType: 'test' }, jest.fn());
+      expect(ProtoController.root.CommandContainer.create).toHaveBeenCalledWith(
+        expect.objectContaining({ gameId: 7, gameCommand: expect.anything() })
+      );
+    });
+
+    it('invokes callback with raw response when the pending command is triggered', () => {
+      const service = new ProtobufService(mockWebClient);
+      const cb = jest.fn();
+      service.sendGameCommand(7, { gameCmdType: 'test' }, cb);
+
+      const storedCb = (service as any).pendingCommands[1];
+      storedCb({ responseData: true });
+
+      expect(cb).toHaveBeenCalledWith({ responseData: true });
+    });
+
+    it('does not throw when no callback is provided and pending command is triggered', () => {
+      const service = new ProtobufService(mockWebClient);
+      service.sendGameCommand(7, { gameCmdType: 'test' });
 
       const storedCb = (service as any).pendingCommands[1];
       expect(() => storedCb({ responseData: true })).not.toThrow();
@@ -288,6 +318,54 @@ describe('ProtobufService', () => {
       expect(() => service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent)).not.toThrow();
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe('processCommonEvent', () => {
+    it('delegates to processEvent with CommonEvents', () => {
+      const service = new ProtobufService(mockWebClient);
+      const processEvent = jest.spyOn(service as any, 'processEvent');
+      const response = { '.Event_Common.ext': { data: 1 } };
+      const raw = { extra: true };
+      (service as any).processCommonEvent(response, raw);
+      expect(processEvent).toHaveBeenCalledWith(response, CommonEvents, raw);
+    });
+  });
+
+  describe('processGameEvent', () => {
+    it('returns early when container has no eventList', () => {
+      const service = new ProtobufService(mockWebClient);
+      const gameEventHandler = (GameEvents as any)['.Event_Game.ext'] as jest.Mock;
+      (service as any).processGameEvent(null, {});
+      expect(gameEventHandler).not.toHaveBeenCalled();
+    });
+
+    it('dispatches to a GameEvents handler when event key matches', () => {
+      const service = new ProtobufService(mockWebClient);
+      const gameEventHandler = (GameEvents as any)['.Event_Game.ext'] as jest.Mock;
+      const payload = { someData: 1 };
+      (service as any).processGameEvent({
+        gameId: 42,
+        context: null,
+        secondsElapsed: 10,
+        forcedByJudge: 0,
+        eventList: [{ '.Event_Game.ext': payload, playerId: 5 }],
+      }, {});
+      expect(gameEventHandler).toHaveBeenCalledWith(payload, expect.objectContaining({ gameId: 42, playerId: 5 }));
+    });
+
+    it('falls back to CommonEvents handler when no GameEvents key matches', () => {
+      const service = new ProtobufService(mockWebClient);
+      const commonEventHandler = (CommonEvents as any)['.Event_Common.ext'] as jest.Mock;
+      const payload = { commonData: 2 };
+      (service as any).processGameEvent({
+        gameId: 7,
+        context: null,
+        secondsElapsed: 0,
+        forcedByJudge: 0,
+        eventList: [{ '.Event_Common.ext': payload, playerId: 3 }],
+      }, {});
+      expect(commonEventHandler).toHaveBeenCalledWith(payload, expect.objectContaining({ gameId: 7, playerId: 3 }));
     });
   });
 
