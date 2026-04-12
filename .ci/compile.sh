@@ -272,7 +272,7 @@ echo "::endgroup::"
 
 if [[ $USE_CCACHE ]]; then
   if [[ $CCACHE_EVICTION_AGE ]]; then
-    echo "::group::evict ccache files older than $CCACHE_EVICTION_AGE"
+    echo "::group::Evict ccache files older than $CCACHE_EVICTION_AGE"
     ccache --evict-older-than "$CCACHE_EVICTION_AGE"
     echo "::endgroup::"
   fi
