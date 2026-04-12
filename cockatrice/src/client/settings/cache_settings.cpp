@@ -1,5 +1,6 @@
 #include "cache_settings.h"
 
+#include "../../interface/card_picture_loader/card_picture_loader_local_schemes.h"
 #include "../network/update/client/release_channel.h"
 #include "card_counter_settings.h"
 #include "version_string.h"
@@ -266,7 +267,10 @@ SettingsCache::SettingsCache()
     redirectCacheTtl = settings->value("personal/redirectCacheTtl", NETWORK_REDIRECT_CACHE_TTL_DEFAULT).toInt();
     saveCardImagesToLocalStorage = settings->value("personal/saveCardImagesToLocalStorage", true).toBool();
     localCardImageStorageNamingScheme =
-        settings->value("personal/localCardImageStorageNamingScheme", "{set}/{name}_{collector}_{uuid}.png").toString();
+        settings
+            ->value("personal/localCardImageStorageNamingScheme",
+                    static_cast<int>(CardPictureLoaderLocalSchemes::NamingScheme::Set_Folder_Name_ProviderId))
+            .toInt();
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
     showStatusBar = settings->value("personal/showStatusBar", false).toBool();
@@ -1121,9 +1125,10 @@ void SettingsCache::setSaveCardImagesToLocalStorage(QT_STATE_CHANGED_T _saveCard
     emit saveCardImagesToLocalStorageChanged(saveCardImagesToLocalStorage);
 }
 
-void SettingsCache::setLocalCardImageStorageNamingScheme(const QString _localCardImageStorageNamingScheme)
+void SettingsCache::setLocalCardImageStorageNamingScheme(
+    const CardPictureLoaderLocalSchemes::NamingScheme _localCardImageStorageNamingScheme)
 {
-    localCardImageStorageNamingScheme = _localCardImageStorageNamingScheme;
+    localCardImageStorageNamingScheme = static_cast<int>(_localCardImageStorageNamingScheme);
     settings->setValue("personal/localCardImageStorageNamingScheme", localCardImageStorageNamingScheme);
     emit localCardImageStorageNamingSchemeChanged(localCardImageStorageNamingScheme);
 }

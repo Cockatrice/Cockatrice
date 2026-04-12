@@ -1,6 +1,7 @@
 #include "card_picture_loader_local.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "card_picture_loader_local_schemes.h"
 #include "card_picture_to_load.h"
 
 #include <QDirIterator>
@@ -77,26 +78,8 @@ QImage CardPictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
     imgReader.setDecideFormatFromContent(true);
 
     // Most-to-least specific, these will fall through in order.
-    QStringList nameVariants;
-
-    // cardName_providerId
-    if (!providerId.isEmpty()) {
-        nameVariants << QString("%1-%2").arg(correctedCardName, providerId)
-                     << QString("%1_%2").arg(correctedCardName, providerId);
-    }
-    // cardName_setName_collectorNumber & setName-collectorNumber-cardName
-    if (!setName.isEmpty() && !collectorNumber.isEmpty()) {
-        nameVariants << QString("%1_%2_%3").arg(correctedCardName, setName, collectorNumber)
-                     << QString("%1-%2-%3").arg(setName, collectorNumber, correctedCardName);
-    }
-    // cardName_setName
-    if (!setName.isEmpty()) {
-        nameVariants << QString("%1_%2").arg(correctedCardName, setName)
-                     << QString("%1-%2").arg(setName, correctedCardName);
-    }
-
-    // cardName
-    nameVariants << correctedCardName;
+    QStringList nameVariants =
+        CardPictureLoaderLocalSchemes::generateImportVariants(correctedCardName, setName, collectorNumber, providerId);
 
     for (const QString &nameVariant : nameVariants) {
         if (nameVariant.isEmpty()) {

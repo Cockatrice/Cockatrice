@@ -189,9 +189,19 @@ void CardPictureLoader::saveCardImageToLocalStorage(const ExactCard &card, const
     }
 
     const QString picsRoot = SettingsCache::instance().getPicsPath();
-    const QString scheme = SettingsCache::instance().getLocalCardImageStorageNamingScheme();
+    CardPictureLoaderLocalSchemes::NamingScheme scheme =
+        SettingsCache::instance().getLocalCardImageStorageNamingScheme();
 
-    if (picsRoot.isEmpty() || scheme.isEmpty()) {
+    QString pattern;
+
+    for (const auto &s : CardPictureLoaderLocalSchemes::exportSchemes()) {
+        if (s.id == scheme) {
+            pattern = s.pattern;
+            break;
+        }
+    }
+
+    if (picsRoot.isEmpty() || pattern.isEmpty()) {
         return;
     }
 
@@ -217,18 +227,26 @@ void CardPictureLoader::saveCardImageToLocalStorage(const ExactCard &card, const
     }
 
     // Build path from scheme
-    QString relativePath = scheme;
+    QString relativePath =
+        CardPictureLoaderLocalSchemes::expandPattern(pattern, cardName, setName, collectorNumber, uuid);
 
-    relativePath.replace("{name}", cardName);
-    relativePath.replace("{set}", setName);
-    relativePath.replace("{collector}", collectorNumber);
-    relativePath.replace("{uuid}", uuid);
-    relativePath.replace("{ext}", "png");
+    if (relativePath.isEmpty()) {
+        return;
+    }
+
+    // append extension
+    relativePath += ".png";
 
     // Normalize slashes
     relativePath = QDir::cleanPath(relativePath);
 
     QFileInfo outInfo(baseDir.filePath(relativePath));
+
+    // Do not overwrite existing files
+    if (outInfo.exists()) {
+        return;
+    }
+
     QDir outDir = outInfo.dir();
 
     // Ensure directory exists
@@ -237,11 +255,6 @@ void CardPictureLoader::saveCardImageToLocalStorage(const ExactCard &card, const
             qCWarning(CardPictureLoaderLog) << "Failed to create directory for downloaded card image:" << outDir.path();
             return;
         }
-    }
-
-    // Do not overwrite existing files
-    if (outInfo.exists()) {
-        return;
     }
 
     // Save image

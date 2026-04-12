@@ -242,7 +242,7 @@ private:
     QCheckBox saveCardImagesToLocalStorageCheckBox;
     QLabel saveCardImagesToLocalStorageLabel;
     QLabel localCardImageStorageNamingSchemeLabel;
-    QLineEdit *localCardImageStorageNamingSchemeLineEdit;
+    QComboBox *localCardImageStorageNamingSchemeComboBox;
 };
 
 class MessagesSettingsPage : public AbstractSettingsPage
