@@ -10,6 +10,16 @@ export interface CommandOptions {
 }
 
 export class BackendService {
+  static sendGameCommand(gameId: number, commandName: string, params: any, options: CommandOptions = {}): void {
+    const command = ProtoController.root[commandName].create(params || {});
+    const gc = ProtoController.root.GameCommand.create({
+      [`.${commandName}.ext`]: command,
+    });
+    webClient.protobuf.sendGameCommand(gameId, gc, (raw: any) => {
+      BackendService.handleResponse(commandName, raw, options);
+    });
+  }
+
   static sendSessionCommand(commandName: string, params: any, options: CommandOptions): void {
     const command = ProtoController.root[commandName].create(params || {});
     const sc = ProtoController.root.SessionCommand.create({

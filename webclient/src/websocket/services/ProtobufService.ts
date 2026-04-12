@@ -2,6 +2,7 @@ import { CommonEvents, GameEvents, RoomEvents, SessionEvents } from '../events';
 import { WebClient } from '../WebClient';
 import { SessionCommands } from 'websocket';
 import { ProtoController } from './ProtoController';
+import { GameEventMeta } from 'types';
 
 export interface ProtobufEvents {
   [event: string]: Function;
@@ -21,6 +22,15 @@ export class ProtobufService {
   public resetCommands() {
     this.cmdId = 0;
     this.pendingCommands = {};
+  }
+
+  public sendGameCommand(gameId: number, gameCmd: any, callback?: Function) {
+    const cmd = ProtoController.root.CommandContainer.create({
+      gameId,
+      gameCommand: [gameCmd],
+    });
+
+    this.sendCommand(cmd, (raw: any) => callback && callback(raw));
   }
 
   public sendRoomCommand(roomId: number, roomCmd: any, callback?: Function) {
@@ -88,7 +98,7 @@ export class ProtobufService {
             this.processSessionEvent(msg.sessionEvent, msg);
             break;
           case ProtoController.root.ServerMessage.MessageType.GAME_EVENT_CONTAINER:
-            this.processGameEvent(msg.gameEvent, msg);
+            this.processGameEvent(msg.gameEventContainer, msg);
             break;
           default:
             console.log(msg);
@@ -121,8 +131,42 @@ export class ProtobufService {
     this.processEvent(response, SessionEvents, raw);
   }
 
-  private processGameEvent(response: any, raw: any): void {
-    this.processEvent(response, GameEvents, raw);
+  private processGameEvent(container: any, raw: any): void {
+    if (!container?.eventList?.length) {
+      return;
+    }
+
+    const { gameId, context, secondsElapsed, forcedByJudge } = container;
+
+    for (const event of container.eventList) {
+      const meta: GameEventMeta = {
+        gameId: gameId ?? -1,
+        playerId: event.playerId ?? -1,
+        context,
+        secondsElapsed: secondsElapsed ?? 0,
+        forcedByJudge: forcedByJudge ?? 0,
+      };
+
+      // Try registered game event handlers first, then common event handlers
+      let handled = false;
+      for (const key of Object.keys(GameEvents)) {
+        const payload = event[key];
+        if (payload !== undefined && payload !== null) {
+          (GameEvents[key] as Function)(payload, meta);
+          handled = true;
+          break;
+        }
+      }
+      if (!handled) {
+        for (const key of Object.keys(CommonEvents)) {
+          const payload = event[key];
+          if (payload !== undefined && payload !== null) {
+            (CommonEvents[key] as Function)(payload, meta);
+            break;
+          }
+        }
+      }
+    }
   }
 
   private processEvent(response: any, events: ProtobufEvents, raw: any) {

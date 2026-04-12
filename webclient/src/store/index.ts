@@ -3,8 +3,15 @@ export { store } from './store';
 // Common
 export { SortUtil } from './common';
 
-// Server
+// Games
+export {
+  Types as GameTypes,
+  Selectors as GameSelectors,
+  Dispatch as GameDispatch } from './game';
 
+export * from 'store/game/game.interfaces';
+
+// Server
 export {
   Types as ServerTypes,
   Selectors as ServerSelectors,

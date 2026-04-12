@@ -1,36 +1,62 @@
 import { ProtobufEvents } from '../../services/ProtobufService';
+import { attachCard } from './attachCard';
+import { changeZoneProperties } from './changeZoneProperties';
+import { createArrow } from './createArrow';
+import { createCounter } from './createCounter';
+import { createToken } from './createToken';
+import { delCounter } from './delCounter';
+import { deleteArrow } from './deleteArrow';
+import { destroyCard } from './destroyCard';
+import { drawCards } from './drawCards';
+import { dumpZone } from './dumpZone';
+import { flipCard } from './flipCard';
+import { gameClosed } from './gameClosed';
+import { gameHostChanged } from './gameHostChanged';
+import { gameSay } from './gameSay';
+import { gameStateChanged } from './gameStateChanged';
 import { joinGame } from './joinGame';
+import { kicked } from './kicked';
 import { leaveGame } from './leaveGame';
-
+import { moveCard } from './moveCard';
+import { playerPropertiesChanged } from './playerPropertiesChanged';
+import { revealCards } from './revealCards';
+import { reverseTurn } from './reverseTurn';
+import { rollDie } from './rollDie';
+import { setActivePhase } from './setActivePhase';
+import { setActivePlayer } from './setActivePlayer';
+import { setCardAttr } from './setCardAttr';
+import { setCardCounter } from './setCardCounter';
+import { setCounter } from './setCounter';
+import { shuffle } from './shuffle';
 
 export const GameEvents: ProtobufEvents = {
   '.Event_Join.ext': joinGame,
   '.Event_Leave.ext': leaveGame,
-  '.Event_GameClosed.ext': () => console.log('Event_GameClosed.ext'),
-  '.Event_GameHostChanged.ext': () => console.log('Event_GameHostChanged.ext'),
-  '.Event_Kicked.ext': () => console.log('Event_Kicked.ext'),
-  '.Event_GameStateChanged.ext': () => console.log('Event_GameStateChanged.ext'),
-  // '.Event_PlayerPropertiesChanged.ext': () => console.log("Event_PlayerProperties.ext"),
-  '.Event_GameSay.ext': () => console.log('Event_GameSay.ext'),
-  '.Event_CreateArrow.ext': () => console.log('Event_CreateArrow.ext'),
-  '.Event_DeleteArrow.ext': () => console.log('Event_DeleteArrow.ext'),
-  '.Event_CreateCounter.ext': () => console.log('Event_CreateCounter.ext'),
-  '.Event_SetCounter.ext': () => console.log('Event_SetCounter.ext'),
-  '.Event_DelCounter.ext': () => console.log('Event_DelCounter.ext'),
-  '.Event_DrawCards.ext': () => console.log('Event_DrawCards.ext'),
-  '.Event_RevealCards.ext': () => console.log('Event_RevealCards.ext'),
-  '.Event_Shuffle.ext': () => console.log('Event_Shuffle.ext'),
-  '.Event_RollDie.ext': () => console.log('Event_Roll.ext'),
-  '.Event_MoveCard.ext': () => console.log('Event_MoveCard.ext'),
-  '.Event_FlipCard.ext': () => console.log('Event_FlipCard.ext'),
-  '.Event_DestroyCard.ext': () => console.log('Event_DestroyCard.ext'),
-  '.Event_AttachCard.ext': () => console.log('Event_AttachCard.ext'),
-  '.Event_CreateToken.ext': () => console.log('Event_CreateToken.ext'),
-  '.Event_SetCardAttribute.ext': () => console.log('Event_SetCardAttribute.ext'),
-  '.Event_SetCardCounter.ext': () => console.log('Event_SetCardCounter.ext'),
-  '.Event_SetActivePlayer.ext': () => console.log('Event_SetActivePlayer.ext'),
-  '.Event_SetActivePhase.ext': () => console.log('Event_SetActivePhase.ext'),
-  '.Event_DumpZone.ext': () => console.log('Event_DumpZone.ext'),
-  '.Event_ChangeZoneProperties.ext': () => console.log('Event_ChangeZoneProperties.ext'),
-  '.Event_ReverseTurn.ext': () => console.log('Event_ReverseTurn.ext'),
+  '.Event_GameClosed.ext': gameClosed,
+  '.Event_GameHostChanged.ext': gameHostChanged,
+  '.Event_Kicked.ext': kicked,
+  '.Event_GameStateChanged.ext': gameStateChanged,
+  '.Event_PlayerPropertiesChanged.ext': playerPropertiesChanged,
+  '.Event_GameSay.ext': gameSay,
+  '.Event_CreateArrow.ext': createArrow,
+  '.Event_DeleteArrow.ext': deleteArrow,
+  '.Event_CreateCounter.ext': createCounter,
+  '.Event_SetCounter.ext': setCounter,
+  '.Event_DelCounter.ext': delCounter,
+  '.Event_DrawCards.ext': drawCards,
+  '.Event_RevealCards.ext': revealCards,
+  '.Event_Shuffle.ext': shuffle,
+  '.Event_RollDie.ext': rollDie,
+  '.Event_MoveCard.ext': moveCard,
+  '.Event_FlipCard.ext': flipCard,
+  '.Event_DestroyCard.ext': destroyCard,
+  '.Event_AttachCard.ext': attachCard,
+  '.Event_CreateToken.ext': createToken,
+  '.Event_SetCardAttr.ext': setCardAttr,
+  '.Event_SetCardCounter.ext': setCardCounter,
+  '.Event_SetActivePlayer.ext': setActivePlayer,
+  '.Event_SetActivePhase.ext': setActivePhase,
+  '.Event_DumpZone.ext': dumpZone,
+  '.Event_ChangeZoneProperties.ext': changeZoneProperties,
+  '.Event_ReverseTurn.ext': reverseTurn,
 };

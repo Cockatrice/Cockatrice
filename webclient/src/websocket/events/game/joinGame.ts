@@ -1,6 +1,6 @@
 import { GamePersistence } from '../../persistence';
-import { PlayerGamePropertiesData } from '../session/interfaces';
+import { GameEventMeta, PlayerProperties } from 'types';
 
-export function joinGame(playerGamePropertiesData: PlayerGamePropertiesData): void {
-  GamePersistence.joinGame(playerGamePropertiesData);
+export function joinGame(data: { playerProperties: PlayerProperties }, meta: GameEventMeta): void {
+  GamePersistence.playerJoined(meta.gameId, data.playerProperties);
 }

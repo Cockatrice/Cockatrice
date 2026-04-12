@@ -1,5 +1,6 @@
-import { ServerDispatch } from 'store';
+import { GameDispatch, ServerDispatch } from 'store';
 import { DeckList, DeckStorageTreeItem, ReplayMatch, StatusEnum, User, WebSocketConnectOptions } from 'types';
+import { GameEntry } from 'store/game/game.interfaces';
 
 import { sanitizeHtml } from 'websocket/utils';
 import {
@@ -180,15 +181,32 @@ export class SessionPersistence {
   }
 
   static gameJoined(gameJoinedData: GameJoinedData): void {
-    console.log('gameJoined', gameJoinedData);
+    const { gameInfo, hostId, playerId, spectator, judge } = gameJoinedData;
+    const gameEntry: GameEntry = {
+      gameId: gameInfo.gameId,
+      roomId: gameInfo.roomId,
+      description: gameInfo.description,
+      hostId,
+      localPlayerId: playerId,
+      spectator,
+      judge,
+      started: gameInfo.started,
+      activePlayerId: -1,
+      activePhase: -1,
+      secondsElapsed: 0,
+      reversed: false,
+      players: {},
+      messages: [],
+    };
+    GameDispatch.gameJoined(gameInfo.gameId, gameEntry);
   }
 
   static notifyUser(notification: NotifyUserData): void {
     ServerDispatch.notifyUser(notification);
   }
 
-  static playerPropertiesChanged(payload: PlayerGamePropertiesData): void {
-    console.log('playerPropertiesChanged', payload);
+  static playerPropertiesChanged(gameId: number, playerId: number, payload: PlayerGamePropertiesData): void {
+    GameDispatch.playerPropertiesChanged(gameId, playerId, payload);
   }
 
   static serverShutdown(data: ServerShutdownData): void {

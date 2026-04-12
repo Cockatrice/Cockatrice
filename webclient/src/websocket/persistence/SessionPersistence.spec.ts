@@ -54,6 +54,10 @@ jest.mock('store', () => ({
     replayModifyMatch: jest.fn(),
     replayDeleteMatch: jest.fn(),
   },
+  GameDispatch: {
+    gameJoined: jest.fn(),
+    playerPropertiesChanged: jest.fn(),
+  },
 }));
 
 jest.mock('websocket/utils', () => ({
@@ -68,7 +72,7 @@ jest.mock('../utils/NormalizeService', () => ({
 }));
 
 import { SessionPersistence } from './SessionPersistence';
-import { ServerDispatch } from 'store';
+import { ServerDispatch, GameDispatch } from 'store';
 import { sanitizeHtml } from 'websocket/utils';
 import NormalizeService from '../utils/NormalizeService';
 import { StatusEnum } from 'types';
@@ -318,11 +322,9 @@ describe('SessionPersistence', () => {
     expect(ServerDispatch.notifyUser).toHaveBeenCalledWith(notif);
   });
 
-  it('playerPropertiesChanged logs to console', () => {
-    const spy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    SessionPersistence.playerPropertiesChanged({} as any);
-    expect(spy).toHaveBeenCalled();
-    spy.mockRestore();
+  it('playerPropertiesChanged dispatches via GameDispatch', () => {
+    SessionPersistence.playerPropertiesChanged(5, 1, {} as any);
+    expect(GameDispatch.playerPropertiesChanged).toHaveBeenCalledWith(5, 1, {});
   });
 
   it('serverShutdown passes data', () => {

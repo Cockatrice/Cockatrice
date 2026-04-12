@@ -1,29 +1,31 @@
 jest.mock('../../persistence', () => ({
   GamePersistence: {
-    joinGame: jest.fn(),
-    leaveGame: jest.fn(),
+    playerJoined: jest.fn(),
+    playerLeft: jest.fn(),
   },
 }));
 
 import { GamePersistence } from '../../persistence';
+import { joinGame } from './joinGame';
+import { leaveGame } from './leaveGame';
 
 beforeEach(() => jest.clearAllMocks());
 
 describe('joinGame event', () => {
-  const { joinGame } = jest.requireActual('./joinGame');
-
-  it('delegates to GamePersistence.joinGame', () => {
-    const data = { gameId: 5, player: { playerId: 1 } } as any;
-    joinGame(data);
-    expect(GamePersistence.joinGame).toHaveBeenCalledWith(data);
+  it('delegates to GamePersistence.playerJoined with gameId from meta', () => {
+    const playerProperties = { playerId: 1 };
+    const data = { playerProperties } as any;
+    const meta = { gameId: 5, playerId: 1, context: null, secondsElapsed: 0, forcedByJudge: 0 };
+    joinGame(data, meta);
+    expect(GamePersistence.playerJoined).toHaveBeenCalledWith(5, playerProperties);
   });
 });
 
 describe('leaveGame event', () => {
-  const { leaveGame } = jest.requireActual('./leaveGame');
-
-  it('delegates to GamePersistence.leaveGame', () => {
-    leaveGame(42 as any);
-    expect(GamePersistence.leaveGame).toHaveBeenCalledWith(42);
+  it('delegates to GamePersistence.playerLeft with gameId/playerId from meta', () => {
+    const data = { reason: 3 };
+    const meta = { gameId: 5, playerId: 2, context: null, secondsElapsed: 0, forcedByJudge: 0 };
+    leaveGame(data, meta);
+    expect(GamePersistence.playerLeft).toHaveBeenCalledWith(5, 2, 3);
   });
 });
