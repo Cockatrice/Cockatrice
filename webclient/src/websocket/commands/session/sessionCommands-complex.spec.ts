@@ -1,38 +1,38 @@
 // Tests for complex session commands that call webClient directly
 // or have multiple branching callbacks.
 
-jest.mock('../../services/BackendService', () => ({
+vi.mock('../../services/BackendService', () => ({
   BackendService: {
-    sendSessionCommand: jest.fn(),
+    sendSessionCommand: vi.fn(),
   },
 }));
 
-jest.mock('../../persistence', () => {
-  const { makeSessionPersistenceMock } = require('../../__mocks__/sessionCommandMocks');
+vi.mock('../../persistence', async () => {
+  const { makeSessionPersistenceMock } = await import('../../__mocks__/sessionCommandMocks');
   return {
     SessionPersistence: makeSessionPersistenceMock(),
     RoomPersistence: {},
   };
 });
 
-jest.mock('../../WebClient', () => {
-  const { makeWebClientMock } = require('../../__mocks__/sessionCommandMocks');
+vi.mock('../../WebClient', async () => {
+  const { makeWebClientMock } = await import('../../__mocks__/sessionCommandMocks');
   return { __esModule: true, default: makeWebClientMock() };
 });
 
-jest.mock('../../services/ProtoController', () => {
-  const { makeProtoControllerRootMock } = require('../../__mocks__/sessionCommandMocks');
+vi.mock('../../services/ProtoController', async () => {
+  const { makeProtoControllerRootMock } = await import('../../__mocks__/sessionCommandMocks');
   return { ProtoController: { root: makeProtoControllerRootMock() } };
 });
 
-jest.mock('../../utils', () => {
-  const { makeUtilsMock } = require('../../__mocks__/sessionCommandMocks');
+vi.mock('../../utils', async () => {
+  const { makeUtilsMock } = await import('../../__mocks__/sessionCommandMocks');
   return makeUtilsMock();
 });
 
 // Intercept all re-exported commands to avoid recursive real invocations
-jest.mock('./', () => {
-  const { makeSessionBarrelMock } = require('../../__mocks__/sessionCommandMocks');
+vi.mock('./', async () => {
+  const { makeSessionBarrelMock } = await import('../../__mocks__/sessionCommandMocks');
   return makeSessionBarrelMock();
 });
 
@@ -43,23 +43,31 @@ import webClient from '../../WebClient';
 import * as SessionIndexMocks from './';
 import { StatusEnum, WebSocketConnectReason } from 'types';
 import { hashPassword, generateSalt, passwordSaltSupported } from '../../utils';
+import { connect } from './connect';
+import { updateStatus } from './updateStatus';
+import { login } from './login';
+import { register } from './register';
+import { activate } from './activate';
+import { forgotPasswordChallenge } from './forgotPasswordChallenge';
+import { forgotPasswordRequest } from './forgotPasswordRequest';
+import { forgotPasswordReset } from './forgotPasswordReset';
+import { requestPasswordSalt } from './requestPasswordSalt';
 
 const { getLastSendOpts, invokeOnSuccess, invokeResponseCode, invokeOnError } = makeCallbackHelpers(
-  BackendService.sendSessionCommand as jest.Mock
+  BackendService.sendSessionCommand as vi.Mock
 );
 
 beforeEach(() => {
-  jest.clearAllMocks();
-  (hashPassword as jest.Mock).mockReturnValue('hashed_pw');
-  (generateSalt as jest.Mock).mockReturnValue('randSalt');
-  (passwordSaltSupported as jest.Mock).mockReturnValue(0);
+  vi.clearAllMocks();
+  (hashPassword as vi.Mock).mockReturnValue('hashed_pw');
+  (generateSalt as vi.Mock).mockReturnValue('randSalt');
+  (passwordSaltSupported as vi.Mock).mockReturnValue(0);
 });
 
 // ----------------------------------------------------------------
 // connect.ts
 // ----------------------------------------------------------------
 describe('connect', () => {
-  const { connect } = jest.requireActual('./connect');
 
   it('calls updateStatus CONNECTING for LOGIN reason', () => {
     connect({ host: 'h', port: 1 } as any, WebSocketConnectReason.LOGIN);
@@ -108,7 +116,6 @@ describe('connect', () => {
 // updateStatus.ts
 // ----------------------------------------------------------------
 describe('updateStatus', () => {
-  const { updateStatus } = jest.requireActual('./updateStatus');
 
   it('calls SessionPersistence.updateStatus and webClient.updateStatus', () => {
     updateStatus(StatusEnum.CONNECTED, 'OK');
@@ -121,7 +128,6 @@ describe('updateStatus', () => {
 // login.ts
 // ----------------------------------------------------------------
 describe('login', () => {
-  const { login } = jest.requireActual('./login');
 
   it('sends Command_Login with plain password when no salt', () => {
     login({ userName: 'alice' } as any, 'pw');
@@ -167,7 +173,7 @@ describe('login', () => {
     login({ userName: 'alice' } as any, 'secret');
     const loginResp = { buddyList: [], ignoreList: [], userInfo: { name: 'alice' } };
     invokeOnSuccess(loginResp, { responseCode: 0, '.Response_Login.ext': loginResp });
-    const calledWith = (SessionPersistence.loginSuccessful as jest.Mock).mock.calls[0][0];
+    const calledWith = (SessionPersistence.loginSuccessful as vi.Mock).mock.calls[0][0];
     expect(calledWith).not.toHaveProperty('password');
   });
 
@@ -175,7 +181,7 @@ describe('login', () => {
     login({ userName: 'alice' } as any, 'pw', 'salt');
     const loginResp = { buddyList: [], ignoreList: [], userInfo: { name: 'alice' } };
     invokeOnSuccess(loginResp, { responseCode: 0, '.Response_Login.ext': loginResp });
-    const calledWith = (SessionPersistence.loginSuccessful as jest.Mock).mock.calls[0][0];
+    const calledWith = (SessionPersistence.loginSuccessful as vi.Mock).mock.calls[0][0];
     expect(calledWith).toHaveProperty('hashedPassword', 'hashed_pw');
   });
 
@@ -248,7 +254,6 @@ describe('login', () => {
 // register.ts
 // ----------------------------------------------------------------
 describe('register', () => {
-  const { register } = jest.requireActual('./register');
 
   it('sends Command_Register with plain password when no salt', () => {
     register({ userName: 'alice', email: 'a@b.com', country: 'US', realName: 'Al' } as any, 'pw');
@@ -350,7 +355,6 @@ describe('register', () => {
 // activate.ts
 // ----------------------------------------------------------------
 describe('activate', () => {
-  const { activate } = jest.requireActual('./activate');
 
   it('sends Command_Activate with userName and token, not password', () => {
     activate({ userName: 'alice', token: 'tok' } as any, 'pw');
@@ -385,7 +389,6 @@ describe('activate', () => {
 // forgotPasswordChallenge.ts
 // ----------------------------------------------------------------
 describe('forgotPasswordChallenge', () => {
-  const { forgotPasswordChallenge } = jest.requireActual('./forgotPasswordChallenge');
 
   it('sends Command_ForgotPasswordChallenge', () => {
     forgotPasswordChallenge({ userName: 'alice', email: 'a@b.com' } as any);
@@ -413,7 +416,6 @@ describe('forgotPasswordChallenge', () => {
 // forgotPasswordRequest.ts
 // ----------------------------------------------------------------
 describe('forgotPasswordRequest', () => {
-  const { forgotPasswordRequest } = jest.requireActual('./forgotPasswordRequest');
 
   it('sends Command_ForgotPasswordRequest', () => {
     forgotPasswordRequest({ userName: 'alice' } as any);
@@ -448,7 +450,6 @@ describe('forgotPasswordRequest', () => {
 // forgotPasswordReset.ts
 // ----------------------------------------------------------------
 describe('forgotPasswordReset', () => {
-  const { forgotPasswordReset } = jest.requireActual('./forgotPasswordReset');
 
   it('sends Command_ForgotPasswordReset with plain newPassword when no salt', () => {
     forgotPasswordReset({ userName: 'alice', token: 'tok' } as any, 'newpw');
@@ -487,7 +488,6 @@ describe('forgotPasswordReset', () => {
 // requestPasswordSalt.ts
 // ----------------------------------------------------------------
 describe('requestPasswordSalt', () => {
-  const { requestPasswordSalt } = jest.requireActual('./requestPasswordSalt');
 
   it('sends Command_RequestPasswordSalt', () => {
     requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.LOGIN } as any, 'pw');

@@ -10,7 +10,7 @@ import { useFireOnce } from './useFireOnce';
 describe('useFireOnce hook', () => {
   test('it only fires once when button is clicked twice', async () => {
     // Mock a promise with a delay
-    const onClickWithPromise = jest.fn((e) => {
+    const onClickWithPromise = vi.fn((e) => {
       e.preventDefault()
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -54,7 +54,7 @@ describe('useFireOnce hook', () => {
 
   test('it only fires once when form is submitted twice', async () => {
     // Mock a promise with a delay
-    const onClickWithPromise = jest.fn((e) => {
+    const onClickWithPromise = vi.fn((e) => {
       e.preventDefault()
       return new Promise((resolve) => {
         setTimeout(() => {

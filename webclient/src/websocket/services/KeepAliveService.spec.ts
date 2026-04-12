@@ -6,7 +6,7 @@ describe('KeepAliveService', () => {
   let service: KeepAliveService;
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
     service = new KeepAliveService(webClient.socket);
   });
@@ -27,11 +27,11 @@ describe('KeepAliveService', () => {
       promise = new Promise(resolve => resolvePing = resolve);
       ping = (done) => promise.then(done);
 
-      checkReadyStateSpy = jest.spyOn(webClient.socket, 'checkReadyState');
+      checkReadyStateSpy = vi.spyOn(webClient.socket, 'checkReadyState');
       checkReadyStateSpy.mockImplementation(() => true);
 
       service.startPingLoop(interval, ping);
-      jest.advanceTimersByTime(interval);
+      vi.advanceTimersByTime(interval);
     });
 
     it('should start ping loop', () => {
@@ -39,28 +39,27 @@ describe('KeepAliveService', () => {
       expect((service as any).lastPingPending).toBeTruthy();
     });
 
-    it('should call ping callback when done', (done: jest.DoneCallback) => {
+    it('should call ping callback when done', () => {
       resolvePing();
 
-      promise.then(() => {
+      return promise.then(() => {
         expect((service as any).lastPingPending).toBeFalsy();
-        done();
       });
     });
 
     it('should fire disconnected$ if lastPingPending is still true', () => {
-      jest.spyOn(service.disconnected$, 'next').mockImplementation(() => {});
-      jest.advanceTimersByTime(interval);
+      vi.spyOn(service.disconnected$, 'next').mockImplementation(() => {});
+      vi.advanceTimersByTime(interval);
 
       expect(service.disconnected$.next).toHaveBeenCalled();
     });
 
     it('should endPingLoop if socket is not open', () => {
-      jest.spyOn(service, 'endPingLoop').mockImplementation(() => {});
+      vi.spyOn(service, 'endPingLoop').mockImplementation(() => {});
       checkReadyStateSpy.mockImplementation(() => false);
 
       resolvePing();
-      jest.advanceTimersByTime(interval);
+      vi.advanceTimersByTime(interval);
 
       expect(service.endPingLoop).toHaveBeenCalled();
     });

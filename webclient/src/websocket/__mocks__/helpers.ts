@@ -6,18 +6,18 @@
 
 /** Builds a minimal mock of ProtoController.root */
 export function makeMockProtoRoot() {
-  const encode = { finish: jest.fn().mockReturnValue(new Uint8Array()) };
+  const encode = { finish: vi.fn().mockReturnValue(new Uint8Array()) };
   return {
     CommandContainer: {
-      create: jest.fn(args => ({ ...args })),
-      encode: jest.fn().mockReturnValue(encode),
+      create: vi.fn(args => ({ ...args })),
+      encode: vi.fn().mockReturnValue(encode),
     },
-    SessionCommand: { create: jest.fn(args => ({ ...args })) },
-    RoomCommand: { create: jest.fn(args => ({ ...args })) },
-    ModeratorCommand: { create: jest.fn(args => ({ ...args })) },
-    AdminCommand: { create: jest.fn(args => ({ ...args })) },
+    SessionCommand: { create: vi.fn(args => ({ ...args })) },
+    RoomCommand: { create: vi.fn(args => ({ ...args })) },
+    ModeratorCommand: { create: vi.fn(args => ({ ...args })) },
+    AdminCommand: { create: vi.fn(args => ({ ...args })) },
     ServerMessage: {
-      decode: jest.fn(),
+      decode: vi.fn(),
       MessageType: {
         RESPONSE: 'RESPONSE',
         ROOM_EVENT: 'ROOM_EVENT',
@@ -52,8 +52,8 @@ export function makeMockProtoRoot() {
 /** Builds a mock WebSocket instance */
 export function makeMockWebSocketInstance() {
   return {
-    send: jest.fn(),
-    close: jest.fn(),
+    send: vi.fn(),
+    close: vi.fn(),
     readyState: WebSocket.OPEN,
     binaryType: '' as BinaryType,
     onopen: null as any,
@@ -66,7 +66,7 @@ export function makeMockWebSocketInstance() {
 /** Installs a mock WebSocket constructor on global. Returns the mock instance. */
 export function installMockWebSocket() {
   const mockInstance = makeMockWebSocketInstance();
-  const MockWS = jest.fn(() => mockInstance) as any;
+  const MockWS = vi.fn(() => mockInstance) as any;
   MockWS.OPEN = 1;
   MockWS.CLOSED = 3;
   (global as any).WebSocket = MockWS;

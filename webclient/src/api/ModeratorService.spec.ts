@@ -1,11 +1,11 @@
-jest.mock('websocket', () => ({
+vi.mock('websocket', () => ({
   ModeratorCommands: {
-    banFromServer: jest.fn(),
-    getBanHistory: jest.fn(),
-    getWarnHistory: jest.fn(),
-    getWarnList: jest.fn(),
-    viewLogHistory: jest.fn(),
-    warnUser: jest.fn(),
+    banFromServer: vi.fn(),
+    getBanHistory: vi.fn(),
+    getWarnHistory: vi.fn(),
+    getWarnList: vi.fn(),
+    viewLogHistory: vi.fn(),
+    warnUser: vi.fn(),
   },
 }));
 
@@ -13,7 +13,7 @@ import { ModeratorService } from './ModeratorService';
 import { ModeratorCommands } from 'websocket';
 import { LogFilters } from 'types';
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 describe('ModeratorService', () => {
   describe('banFromServer', () => {

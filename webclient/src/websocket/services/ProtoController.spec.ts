@@ -1,17 +1,16 @@
-jest.mock('../persistence', () => ({
-  SessionPersistence: { initialized: jest.fn() },
+vi.mock('../persistence', () => ({
+  SessionPersistence: { initialized: vi.fn() },
 }));
 
-jest.mock('../../proto-files.json', () => ['test.proto'], { virtual: true });
+vi.mock('../../proto-files.json', () => ({ default: ['test.proto'] }));
 
 import { ProtoController } from './ProtoController';
 import { SessionPersistence } from '../persistence';
 import protobuf from 'protobufjs';
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   ProtoController.root = null;
-  (process.env as any).PUBLIC_URL = '';
 });
 
 describe('ProtoController', () => {
@@ -22,7 +21,7 @@ describe('ProtoController', () => {
     });
 
     it('calls initialized when callback succeeds', () => {
-      const loadSpy = jest.spyOn(protobuf.Root.prototype, 'load').mockImplementation(
+      const loadSpy = vi.spyOn(protobuf.Root.prototype, 'load').mockImplementation(
         ((_files: any, _opts: any, cb: any) => cb(null)) as any
       );
       ProtoController.load();
@@ -31,7 +30,7 @@ describe('ProtoController', () => {
     });
 
     it('throws when callback receives an error', () => {
-      const loadSpy = jest.spyOn(protobuf.Root.prototype, 'load').mockImplementation(
+      const loadSpy = vi.spyOn(protobuf.Root.prototype, 'load').mockImplementation(
         ((_files: any, _opts: any, cb: any) => cb(new Error('load failed'))) as any
       );
       expect(() => ProtoController.load()).toThrow('load failed');

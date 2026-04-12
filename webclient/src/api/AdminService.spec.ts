@@ -1,16 +1,16 @@
-jest.mock('websocket', () => ({
+vi.mock('websocket', () => ({
   AdminCommands: {
-    adjustMod: jest.fn(),
-    reloadConfig: jest.fn(),
-    shutdownServer: jest.fn(),
-    updateServerMessage: jest.fn(),
+    adjustMod: vi.fn(),
+    reloadConfig: vi.fn(),
+    shutdownServer: vi.fn(),
+    updateServerMessage: vi.fn(),
   },
 }));
 
 import { AdminService } from './AdminService';
 import { AdminCommands } from 'websocket';
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 describe('AdminService', () => {
   describe('adjustMod', () => {

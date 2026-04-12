@@ -11,7 +11,7 @@ describe('guid', () => {
   });
 
   it('returns deterministic value when Math.random is mocked', () => {
-    const spy = jest.spyOn(Math, 'random').mockReturnValue(0.5);
+    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const result = guid();
     expect(result).toBe(guid());
     spy.mockRestore();

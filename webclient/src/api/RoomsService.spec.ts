@@ -1,17 +1,17 @@
-jest.mock('websocket', () => ({
+vi.mock('websocket', () => ({
   SessionCommands: {
-    joinRoom: jest.fn(),
+    joinRoom: vi.fn(),
   },
   RoomCommands: {
-    leaveRoom: jest.fn(),
-    roomSay: jest.fn(),
+    leaveRoom: vi.fn(),
+    roomSay: vi.fn(),
   },
 }));
 
 import { RoomsService } from './RoomsService';
 import { RoomCommands, SessionCommands } from 'websocket';
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 describe('RoomsService', () => {
   describe('joinRoom', () => {

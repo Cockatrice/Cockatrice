@@ -1,33 +1,36 @@
-jest.mock('../../services/BackendService', () => ({
+vi.mock('../../services/BackendService', () => ({
   BackendService: {
-    sendAdminCommand: jest.fn(),
+    sendAdminCommand: vi.fn(),
   },
 }));
 
-jest.mock('../../persistence', () => ({
+vi.mock('../../persistence', () => ({
   AdminPersistence: {
-    adjustMod: jest.fn(),
-    reloadConfig: jest.fn(),
-    shutdownServer: jest.fn(),
-    updateServerMessage: jest.fn(),
+    adjustMod: vi.fn(),
+    reloadConfig: vi.fn(),
+    shutdownServer: vi.fn(),
+    updateServerMessage: vi.fn(),
   },
 }));
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
 import { BackendService } from '../../services/BackendService';
 import { AdminPersistence } from '../../persistence';
+import { adjustMod } from './adjustMod';
+import { reloadConfig } from './reloadConfig';
+import { shutdownServer } from './shutdownServer';
+import { updateServerMessage } from './updateServerMessage';
 
 const { getLastSendOpts, invokeOnSuccess } = makeCallbackHelpers(
-  BackendService.sendAdminCommand as jest.Mock
+  BackendService.sendAdminCommand as vi.Mock
 );
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 // ----------------------------------------------------------------
 // adjustMod
 // ----------------------------------------------------------------
 describe('adjustMod', () => {
-  const { adjustMod } = jest.requireActual('./adjustMod');
 
   it('calls sendAdminCommand with Command_AdjustMod', () => {
     adjustMod('alice', true, false);
@@ -49,7 +52,6 @@ describe('adjustMod', () => {
 // reloadConfig
 // ----------------------------------------------------------------
 describe('reloadConfig', () => {
-  const { reloadConfig } = jest.requireActual('./reloadConfig');
 
   it('calls sendAdminCommand with Command_ReloadConfig', () => {
     reloadConfig();
@@ -67,7 +69,6 @@ describe('reloadConfig', () => {
 // shutdownServer
 // ----------------------------------------------------------------
 describe('shutdownServer', () => {
-  const { shutdownServer } = jest.requireActual('./shutdownServer');
 
   it('calls sendAdminCommand with Command_ShutdownServer', () => {
     shutdownServer('maintenance', 10);
@@ -89,7 +90,6 @@ describe('shutdownServer', () => {
 // updateServerMessage
 // ----------------------------------------------------------------
 describe('updateServerMessage', () => {
-  const { updateServerMessage } = jest.requireActual('./updateServerMessage');
 
   it('calls sendAdminCommand with Command_UpdateServerMessage', () => {
     updateServerMessage();

@@ -1,34 +1,37 @@
-jest.mock('../../services/BackendService', () => ({
+vi.mock('../../services/BackendService', () => ({
   BackendService: {
-    sendRoomCommand: jest.fn(),
+    sendRoomCommand: vi.fn(),
   },
 }));
 
-jest.mock('../../persistence', () => ({
+vi.mock('../../persistence', () => ({
   RoomPersistence: {
-    gameCreated: jest.fn(),
-    joinedGame: jest.fn(),
-    leaveRoom: jest.fn(),
+    gameCreated: vi.fn(),
+    joinedGame: vi.fn(),
+    leaveRoom: vi.fn(),
   },
 }));
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
 import { BackendService } from '../../services/BackendService';
 import { RoomPersistence } from '../../persistence';
+import { createGame } from './createGame';
+import { joinGame } from './joinGame';
+import { leaveRoom } from './leaveRoom';
+import { roomSay } from './roomSay';
 
 const { getLastSendOpts, invokeOnSuccess } = makeCallbackHelpers(
-  BackendService.sendRoomCommand as jest.Mock,
+  BackendService.sendRoomCommand as vi.Mock,
   // sendRoomCommand(roomId, commandName, params, options) — options at index 3
   3
 );
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 // ----------------------------------------------------------------
 // createGame
 // ----------------------------------------------------------------
 describe('createGame', () => {
-  const { createGame } = jest.requireActual('./createGame');
 
   it('calls sendRoomCommand with Command_CreateGame', () => {
     createGame(5, { maxPlayers: 4 } as any);
@@ -46,7 +49,6 @@ describe('createGame', () => {
 // joinGame
 // ----------------------------------------------------------------
 describe('joinGame', () => {
-  const { joinGame } = jest.requireActual('./joinGame');
 
   it('calls sendRoomCommand with Command_JoinGame', () => {
     joinGame(7, { gameId: 42, password: '' } as any);
@@ -64,7 +66,6 @@ describe('joinGame', () => {
 // leaveRoom
 // ----------------------------------------------------------------
 describe('leaveRoom', () => {
-  const { leaveRoom } = jest.requireActual('./leaveRoom');
 
   it('calls sendRoomCommand with Command_LeaveRoom', () => {
     leaveRoom(3);
@@ -82,7 +83,6 @@ describe('leaveRoom', () => {
 // roomSay
 // ----------------------------------------------------------------
 describe('roomSay', () => {
-  const { roomSay } = jest.requireActual('./roomSay');
 
   it('calls sendRoomCommand with trimmed message', () => {
     roomSay(2, '  hello  ');

@@ -1,22 +1,22 @@
-jest.mock('websocket', () => ({
+vi.mock('websocket', () => ({
   SessionCommands: {
-    addToBuddyList: jest.fn(),
-    removeFromBuddyList: jest.fn(),
-    addToIgnoreList: jest.fn(),
-    removeFromIgnoreList: jest.fn(),
-    accountPassword: jest.fn(),
-    accountEdit: jest.fn(),
-    accountImage: jest.fn(),
-    message: jest.fn(),
-    getUserInfo: jest.fn(),
-    getGamesOfUser: jest.fn(),
+    addToBuddyList: vi.fn(),
+    removeFromBuddyList: vi.fn(),
+    addToIgnoreList: vi.fn(),
+    removeFromIgnoreList: vi.fn(),
+    accountPassword: vi.fn(),
+    accountEdit: vi.fn(),
+    accountImage: vi.fn(),
+    message: vi.fn(),
+    getUserInfo: vi.fn(),
+    getGamesOfUser: vi.fn(),
   },
 }));
 
 import { SessionService } from './SessionService';
 import { SessionCommands } from 'websocket';
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 describe('SessionService', () => {
   describe('addToBuddyList', () => {

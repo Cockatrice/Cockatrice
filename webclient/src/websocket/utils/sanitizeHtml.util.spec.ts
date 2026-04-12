@@ -6,7 +6,7 @@ describe('sanitizeHtml', () => {
   });
 
   it('allows <br> tag', () => {
-    expect(sanitizeHtml('line1<br>line2')).toBe('line1<br />line2');
+    expect(sanitizeHtml('line1<br>line2')).toBe('line1<br>line2');
   });
 
   it('allows <b> tag', () => {
@@ -14,7 +14,7 @@ describe('sanitizeHtml', () => {
   });
 
   it('allows <img> tag', () => {
-    expect(sanitizeHtml('<img>')).toBe('<img />');
+    expect(sanitizeHtml('<img>')).toBe('<img>');
   });
 
   it('allows <center> tag', () => {

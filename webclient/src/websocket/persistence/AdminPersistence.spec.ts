@@ -1,9 +1,9 @@
-jest.mock('store', () => ({
+vi.mock('store', () => ({
   ServerDispatch: {
-    adjustMod: jest.fn(),
-    reloadConfig: jest.fn(),
-    shutdownServer: jest.fn(),
-    updateServerMessage: jest.fn(),
+    adjustMod: vi.fn(),
+    reloadConfig: vi.fn(),
+    shutdownServer: vi.fn(),
+    updateServerMessage: vi.fn(),
   },
 }));
 
@@ -11,7 +11,7 @@ import { AdminPersistence } from './AdminPersistence';
 import { ServerDispatch } from 'store';
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 describe('AdminPersistence', () => {

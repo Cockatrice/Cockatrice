@@ -1,39 +1,39 @@
 // Shared mock setup for session command tests
 
-jest.mock('../../services/BackendService', () => ({
+vi.mock('../../services/BackendService', () => ({
   BackendService: {
-    sendSessionCommand: jest.fn(),
+    sendSessionCommand: vi.fn(),
   },
 }));
 
-jest.mock('../../persistence', () => {
-  const { makeSessionPersistenceMock } = require('../../__mocks__/sessionCommandMocks');
+vi.mock('../../persistence', async () => {
+  const { makeSessionPersistenceMock } = await import('../../__mocks__/sessionCommandMocks');
   return {
     SessionPersistence: makeSessionPersistenceMock(),
-    RoomPersistence: { joinRoom: jest.fn() },
+    RoomPersistence: { joinRoom: vi.fn() },
   };
 });
 
-jest.mock('../../WebClient', () => {
-  const { makeWebClientMock } = require('../../__mocks__/sessionCommandMocks');
+vi.mock('../../WebClient', async () => {
+  const { makeWebClientMock } = await import('../../__mocks__/sessionCommandMocks');
   return { __esModule: true, default: makeWebClientMock() };
 });
 
-jest.mock('../../services/ProtoController', () => {
-  const { makeProtoControllerRootMock } = require('../../__mocks__/sessionCommandMocks');
+vi.mock('../../services/ProtoController', async () => {
+  const { makeProtoControllerRootMock } = await import('../../__mocks__/sessionCommandMocks');
   return { ProtoController: { root: makeProtoControllerRootMock() } };
 });
 
-jest.mock('../../utils', () => {
-  const { makeUtilsMock } = require('../../__mocks__/sessionCommandMocks');
+vi.mock('../../utils', async () => {
+  const { makeUtilsMock } = await import('../../__mocks__/sessionCommandMocks');
   return makeUtilsMock();
 });
 
 // Mock session commands barrel to allow cross-command calls while keeping real implementations
-jest.mock('./', () => {
-  const actual = jest.requireActual('./');
-  const { makeSessionBarrelMock } = require('../../__mocks__/sessionCommandMocks');
-  return { ...actual, ...makeSessionBarrelMock() };
+vi.mock('./', async () => {
+  const actual = await vi.importActual('./');
+  const { makeSessionBarrelMock } = await import('../../__mocks__/sessionCommandMocks');
+  return { ...(actual as any), ...makeSessionBarrelMock() };
 });
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
@@ -43,23 +43,45 @@ import { RoomPersistence } from '../../persistence';
 import webClient from '../../WebClient';
 import * as SessionCommands from './';
 import { hashPassword, generateSalt, passwordSaltSupported } from '../../utils';
+import { accountEdit } from './accountEdit';
+import { accountImage } from './accountImage';
+import { accountPassword } from './accountPassword';
+import { deckDel } from './deckDel';
+import { deckDelDir } from './deckDelDir';
+import { deckList } from './deckList';
+import { deckNewDir } from './deckNewDir';
+import { deckUpload } from './deckUpload';
+import { disconnect } from './disconnect';
+import { getGamesOfUser } from './getGamesOfUser';
+import { getUserInfo } from './getUserInfo';
+import { joinRoom } from './joinRoom';
+import { listRooms } from './listRooms';
+import { listUsers } from './listUsers';
+import { message } from './message';
+import { ping } from './ping';
+import { replayDeleteMatch } from './replayDeleteMatch';
+import { replayList } from './replayList';
+import { replayModifyMatch } from './replayModifyMatch';
+import { addToList, addToBuddyList, addToIgnoreList } from './addToList';
+import { removeFromList, removeFromBuddyList, removeFromIgnoreList } from './removeFromList';
+import { replayGetCode } from './replayGetCode';
+import { replaySubmitCode } from './replaySubmitCode';
 
 const { invokeOnSuccess, invokeCallback } = makeCallbackHelpers(
-  BackendService.sendSessionCommand as jest.Mock
+  BackendService.sendSessionCommand as vi.Mock
 );
 
 beforeEach(() => {
-  jest.clearAllMocks();
-  (hashPassword as jest.Mock).mockReturnValue('hashed_pw');
-  (generateSalt as jest.Mock).mockReturnValue('randSalt');
-  (passwordSaltSupported as jest.Mock).mockReturnValue(0);
+  vi.clearAllMocks();
+  (hashPassword as vi.Mock).mockReturnValue('hashed_pw');
+  (generateSalt as vi.Mock).mockReturnValue('randSalt');
+  (passwordSaltSupported as vi.Mock).mockReturnValue(0);
 });
 
 // ----------------------------------------------------------------
 
 describe('accountEdit', () => {
-  const { accountEdit } = jest.requireActual('./accountEdit');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_AccountEdit with correct params', () => {
     accountEdit('pw', 'Alice', 'a@b.com', 'US');
@@ -78,8 +100,7 @@ describe('accountEdit', () => {
 });
 
 describe('accountImage', () => {
-  const { accountImage } = jest.requireActual('./accountImage');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_AccountImage', () => {
     const img = new Uint8Array([1, 2]);
@@ -96,8 +117,7 @@ describe('accountImage', () => {
 });
 
 describe('accountPassword', () => {
-  const { accountPassword } = jest.requireActual('./accountPassword');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_AccountPassword', () => {
     accountPassword('old', 'new', 'hashed');
@@ -116,8 +136,7 @@ describe('accountPassword', () => {
 });
 
 describe('deckDel', () => {
-  const { deckDel } = jest.requireActual('./deckDel');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_DeckDel', () => {
     deckDel(42);
@@ -132,8 +151,7 @@ describe('deckDel', () => {
 });
 
 describe('deckDelDir', () => {
-  const { deckDelDir } = jest.requireActual('./deckDelDir');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_DeckDelDir', () => {
     deckDelDir('/path');
@@ -148,8 +166,7 @@ describe('deckDelDir', () => {
 });
 
 describe('deckList', () => {
-  const { deckList } = jest.requireActual('./deckList');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_DeckList', () => {
     deckList();
@@ -165,8 +182,7 @@ describe('deckList', () => {
 });
 
 describe('deckNewDir', () => {
-  const { deckNewDir } = jest.requireActual('./deckNewDir');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_DeckNewDir', () => {
     deckNewDir('/path', 'dir');
@@ -183,8 +199,7 @@ describe('deckNewDir', () => {
 });
 
 describe('deckUpload', () => {
-  const { deckUpload } = jest.requireActual('./deckUpload');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_DeckUpload', () => {
     deckUpload('/path', 1, 'content');
@@ -204,8 +219,7 @@ describe('deckUpload', () => {
 });
 
 describe('disconnect', () => {
-  const { disconnect } = jest.requireActual('./disconnect');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('calls webClient.disconnect', () => {
     disconnect();
@@ -214,8 +228,7 @@ describe('disconnect', () => {
 });
 
 describe('getGamesOfUser', () => {
-  const { getGamesOfUser } = jest.requireActual('./getGamesOfUser');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_GetGamesOfUser', () => {
     getGamesOfUser('alice');
@@ -231,8 +244,7 @@ describe('getGamesOfUser', () => {
 });
 
 describe('getUserInfo', () => {
-  const { getUserInfo } = jest.requireActual('./getUserInfo');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_GetUserInfo', () => {
     getUserInfo('alice');
@@ -248,8 +260,7 @@ describe('getUserInfo', () => {
 });
 
 describe('joinRoom', () => {
-  const { joinRoom } = jest.requireActual('./joinRoom');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_JoinRoom', () => {
     joinRoom(5);
@@ -265,8 +276,7 @@ describe('joinRoom', () => {
 });
 
 describe('listRooms (command)', () => {
-  const { listRooms } = jest.requireActual('./listRooms');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_ListRooms', () => {
     listRooms();
@@ -275,8 +285,7 @@ describe('listRooms (command)', () => {
 });
 
 describe('listUsers', () => {
-  const { listUsers } = jest.requireActual('./listUsers');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_ListUsers', () => {
     listUsers();
@@ -292,8 +301,7 @@ describe('listUsers', () => {
 });
 
 describe('message', () => {
-  const { message } = jest.requireActual('./message');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_Message', () => {
     message('bob', 'hi');
@@ -305,17 +313,16 @@ describe('message', () => {
 });
 
 describe('ping', () => {
-  const { ping } = jest.requireActual('./ping');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_Ping', () => {
-    const pingReceived = jest.fn();
+    const pingReceived = vi.fn();
     ping(pingReceived);
     expect(BackendService.sendSessionCommand).toHaveBeenCalledWith('Command_Ping', {}, expect.any(Object));
   });
 
   it('calls pingReceived via onResponse', () => {
-    const pingReceived = jest.fn();
+    const pingReceived = vi.fn();
     ping(pingReceived);
     const raw = {};
     invokeCallback('onResponse', raw);
@@ -324,8 +331,7 @@ describe('ping', () => {
 });
 
 describe('replayDeleteMatch', () => {
-  const { replayDeleteMatch } = jest.requireActual('./replayDeleteMatch');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_ReplayDeleteMatch', () => {
     replayDeleteMatch(7);
@@ -340,8 +346,7 @@ describe('replayDeleteMatch', () => {
 });
 
 describe('replayList', () => {
-  const { replayList } = jest.requireActual('./replayList');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_ReplayList', () => {
     replayList();
@@ -357,8 +362,7 @@ describe('replayList', () => {
 });
 
 describe('replayModifyMatch', () => {
-  const { replayModifyMatch } = jest.requireActual('./replayModifyMatch');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_ReplayModifyMatch', () => {
     replayModifyMatch(7, true);
@@ -375,8 +379,7 @@ describe('replayModifyMatch', () => {
 });
 
 describe('addToList / addToBuddyList / addToIgnoreList', () => {
-  const { addToList, addToBuddyList, addToIgnoreList } = jest.requireActual('./addToList');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('addToBuddyList sends Command_AddToList with list=buddy', () => {
     addToBuddyList('alice');
@@ -400,8 +403,7 @@ describe('addToList / addToBuddyList / addToIgnoreList', () => {
 });
 
 describe('removeFromList / removeFromBuddyList / removeFromIgnoreList', () => {
-  const { removeFromList, removeFromBuddyList, removeFromIgnoreList } = jest.requireActual('./removeFromList');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('removeFromBuddyList sends Command_RemoveFromList with list=buddy', () => {
     removeFromBuddyList('alice');
@@ -425,11 +427,10 @@ describe('removeFromList / removeFromBuddyList / removeFromIgnoreList', () => {
 });
 
 describe('replayGetCode', () => {
-  const { replayGetCode } = jest.requireActual('./replayGetCode');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_ReplayGetCode with gameId and responseName', () => {
-    replayGetCode(42, jest.fn());
+    replayGetCode(42, vi.fn());
     expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
       'Command_ReplayGetCode',
       { gameId: 42 },
@@ -438,7 +439,7 @@ describe('replayGetCode', () => {
   });
 
   it('calls onCodeReceived with replayCode on success', () => {
-    const onCodeReceived = jest.fn();
+    const onCodeReceived = vi.fn();
     replayGetCode(42, onCodeReceived);
     invokeOnSuccess({ replayCode: 'abc123-xyz' });
     expect(onCodeReceived).toHaveBeenCalledWith('abc123-xyz');
@@ -446,8 +447,7 @@ describe('replayGetCode', () => {
 });
 
 describe('replaySubmitCode', () => {
-  const { replaySubmitCode } = jest.requireActual('./replaySubmitCode');
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => vi.clearAllMocks());
 
   it('sends Command_ReplaySubmitCode with replayCode', () => {
     replaySubmitCode('42-abc123');
@@ -459,14 +459,14 @@ describe('replaySubmitCode', () => {
   });
 
   it('forwards onSuccess callback', () => {
-    const onSuccess = jest.fn();
+    const onSuccess = vi.fn();
     replaySubmitCode('42-abc123', onSuccess);
     invokeOnSuccess();
     expect(onSuccess).toHaveBeenCalled();
   });
 
   it('forwards onError callback', () => {
-    const onError = jest.fn();
+    const onError = vi.fn();
     replaySubmitCode('42-abc123', undefined, onError);
     invokeCallback('onError', 404);
     expect(onError).toHaveBeenCalledWith(404);

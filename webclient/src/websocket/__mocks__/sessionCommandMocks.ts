@@ -1,10 +1,10 @@
 /**
  * Shared mock shape factories for session command specs.
  *
- * Usage inside jest.mock() factory callbacks (require is used because
- * jest.mock() is hoisted above imports):
+ * Usage inside vi.mock() factory callbacks (require is used because
+ * vi.mock() is hoisted above imports):
  *
- *   jest.mock('../../WebClient', () => {
+ *   vi.mock('../../WebClient', () => {
  *     const { makeWebClientMock } = require('../../__mocks__/sessionCommandMocks');
  *     return { __esModule: true, default: makeWebClientMock() };
  *   });
@@ -13,10 +13,10 @@
 /** Superset WebClient mock — covers all properties used across both session spec files. */
 export function makeWebClientMock() {
   return {
-    connect: jest.fn(),
-    testConnect: jest.fn(),
-    disconnect: jest.fn(),
-    updateStatus: jest.fn(),
+    connect: vi.fn(),
+    testConnect: vi.fn(),
+    disconnect: vi.fn(),
+    updateStatus: vi.fn(),
     clientConfig: { clientid: 'webatrice', clientver: '1.0', clientfeatures: [] },
     options: {},
     protocolVersion: 14,
@@ -60,72 +60,72 @@ export function makeProtoControllerRootMock() {
 /** Utils mock with unified return values. */
 export function makeUtilsMock() {
   return {
-    hashPassword: jest.fn().mockReturnValue('hashed_pw'),
-    generateSalt: jest.fn().mockReturnValue('randSalt'),
-    passwordSaltSupported: jest.fn().mockReturnValue(0),
+    hashPassword: vi.fn().mockReturnValue('hashed_pw'),
+    generateSalt: vi.fn().mockReturnValue('randSalt'),
+    passwordSaltSupported: vi.fn().mockReturnValue(0),
   };
 }
 
 /** Superset SessionPersistence mock — covers all methods used across both session spec files. */
 export function makeSessionPersistenceMock() {
   return {
-    loginSuccessful: jest.fn(),
-    loginFailed: jest.fn(),
-    updateBuddyList: jest.fn(),
-    updateIgnoreList: jest.fn(),
-    updateUser: jest.fn(),
-    updateUsers: jest.fn(),
-    accountAwaitingActivation: jest.fn(),
-    accountActivationSuccess: jest.fn(),
-    accountActivationFailed: jest.fn(),
-    updateStatus: jest.fn(),
-    addToList: jest.fn(),
-    removeFromList: jest.fn(),
-    deleteServerDeck: jest.fn(),
-    deleteServerDeckDir: jest.fn(),
-    updateServerDecks: jest.fn(),
-    uploadServerDeck: jest.fn(),
-    createServerDeckDir: jest.fn(),
-    getGamesOfUser: jest.fn(),
-    getUserInfo: jest.fn(),
-    accountPasswordChange: jest.fn(),
-    accountEditChanged: jest.fn(),
-    accountImageChanged: jest.fn(),
-    replayList: jest.fn(),
-    replayAdded: jest.fn(),
-    replayModifyMatch: jest.fn(),
-    replayDeleteMatch: jest.fn(),
-    resetPasswordChallenge: jest.fn(),
-    resetPassword: jest.fn(),
-    resetPasswordFailed: jest.fn(),
-    resetPasswordSuccess: jest.fn(),
-    registrationFailed: jest.fn(),
-    registrationSuccess: jest.fn(),
-    registrationUserNameError: jest.fn(),
-    registrationPasswordError: jest.fn(),
-    registrationEmailError: jest.fn(),
-    registrationRequiresEmail: jest.fn(),
+    loginSuccessful: vi.fn(),
+    loginFailed: vi.fn(),
+    updateBuddyList: vi.fn(),
+    updateIgnoreList: vi.fn(),
+    updateUser: vi.fn(),
+    updateUsers: vi.fn(),
+    accountAwaitingActivation: vi.fn(),
+    accountActivationSuccess: vi.fn(),
+    accountActivationFailed: vi.fn(),
+    updateStatus: vi.fn(),
+    addToList: vi.fn(),
+    removeFromList: vi.fn(),
+    deleteServerDeck: vi.fn(),
+    deleteServerDeckDir: vi.fn(),
+    updateServerDecks: vi.fn(),
+    uploadServerDeck: vi.fn(),
+    createServerDeckDir: vi.fn(),
+    getGamesOfUser: vi.fn(),
+    getUserInfo: vi.fn(),
+    accountPasswordChange: vi.fn(),
+    accountEditChanged: vi.fn(),
+    accountImageChanged: vi.fn(),
+    replayList: vi.fn(),
+    replayAdded: vi.fn(),
+    replayModifyMatch: vi.fn(),
+    replayDeleteMatch: vi.fn(),
+    resetPasswordChallenge: vi.fn(),
+    resetPassword: vi.fn(),
+    resetPasswordFailed: vi.fn(),
+    resetPasswordSuccess: vi.fn(),
+    registrationFailed: vi.fn(),
+    registrationSuccess: vi.fn(),
+    registrationUserNameError: vi.fn(),
+    registrationPasswordError: vi.fn(),
+    registrationEmailError: vi.fn(),
+    registrationRequiresEmail: vi.fn(),
   };
 }
 
 /**
- * Session barrel mock — pure jest.fn() map for all cross-command calls.
+ * Session barrel mock — pure vi.fn() map for all cross-command calls.
  * Used as-is by sessionCommands-complex.spec.ts, or spread over jest.requireActual
  * by sessionCommands-simple.spec.ts to preserve real implementations for
  * the commands under test.
  */
 export function makeSessionBarrelMock() {
   return {
-    login: jest.fn(),
-    register: jest.fn(),
-    activate: jest.fn(),
-    forgotPasswordReset: jest.fn(),
-    forgotPasswordRequest: jest.fn(),
-    forgotPasswordChallenge: jest.fn(),
-    requestPasswordSalt: jest.fn(),
-    listUsers: jest.fn(),
-    listRooms: jest.fn(),
-    updateStatus: jest.fn(),
-    disconnect: jest.fn(),
+    login: vi.fn(),
+    register: vi.fn(),
+    activate: vi.fn(),
+    forgotPasswordReset: vi.fn(),
+    forgotPasswordRequest: vi.fn(),
+    forgotPasswordChallenge: vi.fn(),
+    requestPasswordSalt: vi.fn(),
+    listUsers: vi.fn(),
+    listRooms: vi.fn(),
+    updateStatus: vi.fn(),
+    disconnect: vi.fn(),
   };
 }

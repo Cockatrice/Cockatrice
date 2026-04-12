@@ -1,14 +1,14 @@
 import { installMockWebSocket } from '../__mocks__/helpers';
 
-jest.mock('../commands/session', () => ({
-  updateStatus: jest.fn(),
+vi.mock('../commands/session', () => ({
+  updateStatus: vi.fn(),
 }));
 
-jest.mock('../persistence', () => ({
+vi.mock('../persistence', () => ({
   SessionPersistence: {
-    connectionFailed: jest.fn(),
-    testConnectionSuccessful: jest.fn(),
-    testConnectionFailed: jest.fn(),
+    connectionFailed: vi.fn(),
+    testConnectionSuccessful: vi.fn(),
+    testConnectionFailed: vi.fn(),
   },
 }));
 
@@ -17,13 +17,13 @@ import { SessionPersistence } from '../persistence';
 import { updateStatus } from '../commands/session';
 import { StatusEnum } from 'types';
 
-let MockWS: jest.Mock;
+let MockWS: vi.Mock;
 let mockInstance: ReturnType<typeof installMockWebSocket>['mockInstance'];
 let mockWebClient: any;
 
 beforeEach(() => {
-  jest.useFakeTimers();
-  jest.clearAllMocks();
+  vi.useFakeTimers();
+  vi.clearAllMocks();
 
   const installed = installMockWebSocket();
   MockWS = installed.MockWS;
@@ -32,12 +32,12 @@ beforeEach(() => {
   mockWebClient = {
     status: StatusEnum.CONNECTED,
     clientOptions: { keepalive: 1000 },
-    keepAlive: jest.fn(),
+    keepAlive: vi.fn(),
   };
 });
 
 afterEach(() => {
-  jest.useRealTimers();
+  vi.useRealTimers();
 });
 
 describe('WebSocketService', () => {
@@ -99,14 +99,14 @@ describe('WebSocketService', () => {
 
     it('fires socket.close after keepalive timeout', () => {
       createConnectedService();
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(mockInstance.close).toHaveBeenCalled();
     });
   });
 
   describe('socket event handlers (onopen)', () => {
     it('clears the connection timeout when socket opens', () => {
-      const clearSpy = jest.spyOn(global, 'clearTimeout');
+      const clearSpy = vi.spyOn(global, 'clearTimeout');
       createConnectedService();
       mockInstance.onopen();
       expect(clearSpy).toHaveBeenCalled();
@@ -120,7 +120,7 @@ describe('WebSocketService', () => {
 
     it('starts the ping loop with the keepalive interval', () => {
       const service = new WebSocketService(mockWebClient);
-      const startSpy = jest.spyOn((service as any).keepAliveService, 'startPingLoop');
+      const startSpy = vi.spyOn((service as any).keepAliveService, 'startPingLoop');
       service.connect({ host: 'h', port: 1 } as any, 'ws');
       mockInstance.onopen();
       expect(startSpy).toHaveBeenCalledWith(1000, expect.any(Function));
@@ -128,11 +128,11 @@ describe('WebSocketService', () => {
 
     it('ping loop callback calls webClient.keepAlive', () => {
       const service = new WebSocketService(mockWebClient);
-      const startSpy = jest.spyOn((service as any).keepAliveService, 'startPingLoop');
+      const startSpy = vi.spyOn((service as any).keepAliveService, 'startPingLoop');
       service.connect({ host: 'h', port: 1 } as any, 'ws');
       mockInstance.onopen();
       const pingCb = startSpy.mock.calls[0][1] as (done: Function) => void;
-      const done = jest.fn();
+      const done = vi.fn();
       pingCb(done);
       expect(mockWebClient.keepAlive).toHaveBeenCalledWith(done);
     });
@@ -154,7 +154,7 @@ describe('WebSocketService', () => {
 
     it('ends the ping loop on close', () => {
       const service = new WebSocketService(mockWebClient);
-      const endSpy = jest.spyOn((service as any).keepAliveService, 'endPingLoop');
+      const endSpy = vi.spyOn((service as any).keepAliveService, 'endPingLoop');
       service.connect({ host: 'h', port: 1 } as any, 'ws');
       mockInstance.onclose();
       expect(endSpy).toHaveBeenCalled();
@@ -178,7 +178,7 @@ describe('WebSocketService', () => {
   describe('socket event handlers (onmessage)', () => {
     it('emits on message$ subject', () => {
       const service = createConnectedService();
-      const handler = jest.fn();
+      const handler = vi.fn();
       service.message$.subscribe(handler);
       const event = { data: new ArrayBuffer(4) } as MessageEvent;
       mockInstance.onmessage(event);
@@ -262,7 +262,7 @@ describe('WebSocketService', () => {
 
     it('calls SessionPersistence.testConnectionSuccessful on open', () => {
       createTestConnectedService();
-      const timer = jest.spyOn(global, 'clearTimeout');
+      const timer = vi.spyOn(global, 'clearTimeout');
       mockInstance.onopen();
       expect(SessionPersistence.testConnectionSuccessful).toHaveBeenCalled();
       expect(mockInstance.close).toHaveBeenCalled();
@@ -270,7 +270,7 @@ describe('WebSocketService', () => {
 
     it('fires socket.close after keepalive timeout for testConnect', () => {
       createTestConnectedService();
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(mockInstance.close).toHaveBeenCalled();
     });
 

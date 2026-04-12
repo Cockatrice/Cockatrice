@@ -1,6 +1,6 @@
-jest.mock('store/store', () => ({ store: { dispatch: jest.fn() } }));
-jest.mock('redux-form', () => ({
-  reset: jest.fn((form) => ({ type: '@@redux-form/RESET', meta: { form } })),
+vi.mock('store/store', () => ({ store: { dispatch: vi.fn() } }));
+vi.mock('redux-form', () => ({
+  reset: vi.fn((form) => ({ type: '@@redux-form/RESET', meta: { form } })),
 }));
 
 import { store } from 'store/store';
@@ -10,7 +10,7 @@ import { Dispatch } from './rooms.dispatch';
 import { makeGame, makeMessage, makeRoom, makeUser } from './__mocks__/rooms-fixtures';
 import { GameSortField, SortDirection } from 'types';
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 describe('Dispatch', () => {
   it('clearStore dispatches Actions.clearStore()', () => {
@@ -45,7 +45,7 @@ describe('Dispatch', () => {
   it('addMessage with message.name truthy → dispatches reset("sayMessage") then Actions.addMessage()', () => {
     const message = { ...makeMessage(), name: 'Alice' };
     Dispatch.addMessage(1, message);
-    expect(store.dispatch).toHaveBeenNthCalledWith(1, (reset as jest.Mock)('sayMessage'));
+    expect(store.dispatch).toHaveBeenNthCalledWith(1, (reset as vi.Mock)('sayMessage'));
     expect(store.dispatch).toHaveBeenNthCalledWith(2, Actions.addMessage(1, message));
   });
 

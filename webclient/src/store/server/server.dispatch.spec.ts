@@ -1,6 +1,6 @@
-jest.mock('store/store', () => ({ store: { dispatch: jest.fn() } }));
-jest.mock('redux-form', () => ({
-  reset: jest.fn((form) => ({ type: '@@redux-form/RESET', meta: { form } })),
+vi.mock('store/store', () => ({ store: { dispatch: vi.fn() } }));
+vi.mock('redux-form', () => ({
+  reset: vi.fn((form) => ({ type: '@@redux-form/RESET', meta: { form } })),
 }));
 
 import { store } from 'store/store';
@@ -18,7 +18,7 @@ import {
   makeWarnListItem,
 } from './__mocks__/server-fixtures';
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 describe('Dispatch', () => {
   it('initialized dispatches Actions.initialized()', () => {
@@ -71,7 +71,7 @@ describe('Dispatch', () => {
   it('addToBuddyList dispatches reset("addToBuddies") then Actions.addToBuddyList()', () => {
     const user = makeUser();
     Dispatch.addToBuddyList(user);
-    expect(store.dispatch).toHaveBeenNthCalledWith(1, (reset as jest.Mock)('addToBuddies'));
+    expect(store.dispatch).toHaveBeenNthCalledWith(1, (reset as vi.Mock)('addToBuddies'));
     expect(store.dispatch).toHaveBeenNthCalledWith(2, Actions.addToBuddyList(user));
   });
 
@@ -89,7 +89,7 @@ describe('Dispatch', () => {
   it('addToIgnoreList dispatches reset("addToIgnore") then Actions.addToIgnoreList()', () => {
     const user = makeUser();
     Dispatch.addToIgnoreList(user);
-    expect(store.dispatch).toHaveBeenNthCalledWith(1, (reset as jest.Mock)('addToIgnore'));
+    expect(store.dispatch).toHaveBeenNthCalledWith(1, (reset as vi.Mock)('addToIgnore'));
     expect(store.dispatch).toHaveBeenNthCalledWith(2, Actions.addToIgnoreList(user));
   });
 

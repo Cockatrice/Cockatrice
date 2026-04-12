@@ -3,7 +3,7 @@ import protobuf from 'protobufjs';
 import { SessionPersistence } from '../persistence';
 import ProtoFiles from '../../proto-files.json';
 
-const PB_FILE_DIR = `${process.env.PUBLIC_URL}/pb`;
+const PB_FILE_DIR = `${import.meta.env.BASE_URL}pb`;
 
 // Leaf module — no imports from the websocket layer other than persistence.
 // Both BackendService and ProtobufService import this; neither should import

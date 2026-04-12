@@ -1,34 +1,34 @@
-jest.mock('../../persistence', () => ({
+vi.mock('../../persistence', () => ({
   GamePersistence: {
-    gameStateChanged: jest.fn(),
-    playerJoined: jest.fn(),
-    playerLeft: jest.fn(),
-    playerPropertiesChanged: jest.fn(),
-    gameClosed: jest.fn(),
-    gameHostChanged: jest.fn(),
-    kicked: jest.fn(),
-    gameSay: jest.fn(),
-    cardMoved: jest.fn(),
-    cardFlipped: jest.fn(),
-    cardDestroyed: jest.fn(),
-    cardAttached: jest.fn(),
-    tokenCreated: jest.fn(),
-    cardAttrChanged: jest.fn(),
-    cardCounterChanged: jest.fn(),
-    arrowCreated: jest.fn(),
-    arrowDeleted: jest.fn(),
-    counterCreated: jest.fn(),
-    counterSet: jest.fn(),
-    counterDeleted: jest.fn(),
-    cardsDrawn: jest.fn(),
-    cardsRevealed: jest.fn(),
-    zoneShuffled: jest.fn(),
-    dieRolled: jest.fn(),
-    activePlayerSet: jest.fn(),
-    activePhaseSet: jest.fn(),
-    turnReversed: jest.fn(),
-    zoneDumped: jest.fn(),
-    zonePropertiesChanged: jest.fn(),
+    gameStateChanged: vi.fn(),
+    playerJoined: vi.fn(),
+    playerLeft: vi.fn(),
+    playerPropertiesChanged: vi.fn(),
+    gameClosed: vi.fn(),
+    gameHostChanged: vi.fn(),
+    kicked: vi.fn(),
+    gameSay: vi.fn(),
+    cardMoved: vi.fn(),
+    cardFlipped: vi.fn(),
+    cardDestroyed: vi.fn(),
+    cardAttached: vi.fn(),
+    tokenCreated: vi.fn(),
+    cardAttrChanged: vi.fn(),
+    cardCounterChanged: vi.fn(),
+    arrowCreated: vi.fn(),
+    arrowDeleted: vi.fn(),
+    counterCreated: vi.fn(),
+    counterSet: vi.fn(),
+    counterDeleted: vi.fn(),
+    cardsDrawn: vi.fn(),
+    cardsRevealed: vi.fn(),
+    zoneShuffled: vi.fn(),
+    dieRolled: vi.fn(),
+    activePlayerSet: vi.fn(),
+    activePhaseSet: vi.fn(),
+    turnReversed: vi.fn(),
+    zoneDumped: vi.fn(),
+    zonePropertiesChanged: vi.fn(),
   },
 }));
 
@@ -63,7 +63,7 @@ import { setCardCounter } from './setCardCounter';
 import { setCounter } from './setCounter';
 import { shuffle } from './shuffle';
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 const meta = { gameId: 5, playerId: 2, context: null, secondsElapsed: 0, forcedByJudge: 0 };
 

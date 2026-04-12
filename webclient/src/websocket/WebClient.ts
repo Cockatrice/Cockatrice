@@ -47,7 +47,7 @@ export class WebClient {
       this.protobuf.handleMessageEvent(message);
     });
 
-    if (process.env.NODE_ENV !== 'test') {
+    if (import.meta.env.MODE !== 'test') {
       console.log(this);
     }
   }

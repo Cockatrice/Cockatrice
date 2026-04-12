@@ -4,7 +4,7 @@ import { Language } from 'types';
 
 class I18nBackend {
   static type: ModuleType = 'backend';
-  static BASE_URL = `${process.env.PUBLIC_URL}/locales`;
+  static BASE_URL = `${import.meta.env.BASE_URL}locales`;
 
   read(language, namespace, callback) {
     if (!Language[language]) {

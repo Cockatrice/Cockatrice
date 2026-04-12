@@ -1,29 +1,29 @@
-jest.mock('store', () => ({
-  store: { getState: jest.fn().mockReturnValue({}) },
+vi.mock('store', () => ({
+  store: { getState: vi.fn().mockReturnValue({}) },
   RoomsDispatch: {
-    clearStore: jest.fn(),
-    joinRoom: jest.fn(),
-    leaveRoom: jest.fn(),
-    updateRooms: jest.fn(),
-    updateGames: jest.fn(),
-    addMessage: jest.fn(),
-    userJoined: jest.fn(),
-    userLeft: jest.fn(),
-    removeMessages: jest.fn(),
-    gameCreated: jest.fn(),
-    joinedGame: jest.fn(),
+    clearStore: vi.fn(),
+    joinRoom: vi.fn(),
+    leaveRoom: vi.fn(),
+    updateRooms: vi.fn(),
+    updateGames: vi.fn(),
+    addMessage: vi.fn(),
+    userJoined: vi.fn(),
+    userLeft: vi.fn(),
+    removeMessages: vi.fn(),
+    gameCreated: vi.fn(),
+    joinedGame: vi.fn(),
   },
   RoomsSelectors: {
-    getRoom: jest.fn(),
+    getRoom: vi.fn(),
   },
 }));
 
-jest.mock('../utils/NormalizeService', () => ({
+vi.mock('../utils/NormalizeService', () => ({
   __esModule: true,
   default: {
-    normalizeRoomInfo: jest.fn(),
-    normalizeGameObject: jest.fn(),
-    normalizeUserMessage: jest.fn(),
+    normalizeRoomInfo: vi.fn(),
+    normalizeGameObject: vi.fn(),
+    normalizeUserMessage: vi.fn(),
   },
 }));
 
@@ -32,7 +32,7 @@ import { store, RoomsDispatch, RoomsSelectors } from 'store';
 import NormalizeService from '../utils/NormalizeService';
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 describe('RoomPersistence', () => {
@@ -62,7 +62,7 @@ describe('RoomPersistence', () => {
     it('normalizes game when gameType is missing and room exists', () => {
       const game = { gameType: null, gameTypes: [1] } as any;
       const room = { gametypeMap: { 1: 'Standard' } } as any;
-      (RoomsSelectors.getRoom as jest.Mock).mockReturnValue(room);
+      (RoomsSelectors.getRoom as vi.Mock).mockReturnValue(room);
       RoomPersistence.updateGames(1, [game]);
       expect(NormalizeService.normalizeGameObject).toHaveBeenCalledWith(game, room.gametypeMap);
       expect(RoomsDispatch.updateGames).toHaveBeenCalledWith(1, [game]);
@@ -76,7 +76,7 @@ describe('RoomPersistence', () => {
 
     it('does not normalize when room is not found', () => {
       const game = { gameType: null } as any;
-      (RoomsSelectors.getRoom as jest.Mock).mockReturnValue(null);
+      (RoomsSelectors.getRoom as vi.Mock).mockReturnValue(null);
       RoomPersistence.updateGames(1, [game]);
       expect(NormalizeService.normalizeGameObject).not.toHaveBeenCalled();
     });

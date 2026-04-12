@@ -1,4 +1,4 @@
-jest.mock('store/store', () => ({ store: { dispatch: jest.fn() } }));
+vi.mock('store/store', () => ({ store: { dispatch: vi.fn() } }));
 
 import { store } from 'store/store';
 import { Actions } from './game.actions';
@@ -11,7 +11,7 @@ import {
   makePlayerProperties,
 } from './__mocks__/fixtures';
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 describe('Dispatch', () => {
   it('clearStore dispatches Actions.clearStore()', () => {

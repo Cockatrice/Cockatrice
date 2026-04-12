@@ -1,13 +1,13 @@
 /**
  * Factory for invoking BackendService command callbacks in unit tests.
  *
- * @param mockFn       - The jest.Mock for the BackendService send method
- *                       (e.g. BackendService.sendSessionCommand as jest.Mock).
+ * @param mockFn       - The vi.Mock for the BackendService send method
+ *                       (e.g. BackendService.sendSessionCommand as vi.Mock).
  * @param optsArgIndex - Index of the options argument in the mock call.
  *                       Defaults to 2 (commandName, params, options).
  *                       Use 3 for sendRoomCommand (roomId, commandName, params, options).
  */
-export function makeCallbackHelpers(mockFn: jest.Mock, optsArgIndex = 2) {
+export function makeCallbackHelpers(mockFn: vi.Mock, optsArgIndex = 2) {
   function getLastSendOpts() {
     const calls = mockFn.mock.calls;
     return calls[calls.length - 1]?.[optsArgIndex];

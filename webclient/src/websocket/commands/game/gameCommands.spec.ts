@@ -33,15 +33,15 @@ import { undoDraw } from './undoDraw';
 import { unconcede } from './unconcede';
 import { judge } from './judge';
 
-jest.mock('../../services/BackendService', () => ({
-  BackendService: { sendGameCommand: jest.fn() },
+vi.mock('../../services/BackendService', () => ({
+  BackendService: { sendGameCommand: vi.fn() },
 }));
 
 const gameId = 1;
 const params = {} as any;
 
 beforeEach(() => {
-  (BackendService.sendGameCommand as jest.Mock).mockClear();
+  (BackendService.sendGameCommand as vi.Mock).mockClear();
 });
 
 describe('Game commands — delegate to BackendService.sendGameCommand', () => {

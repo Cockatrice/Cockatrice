@@ -1,21 +1,25 @@
-jest.mock('../../persistence', () => ({
+vi.mock('../../persistence', () => ({
   RoomPersistence: {
-    userJoined: jest.fn(),
-    userLeft: jest.fn(),
-    updateGames: jest.fn(),
-    removeMessages: jest.fn(),
-    addMessage: jest.fn(),
+    userJoined: vi.fn(),
+    userLeft: vi.fn(),
+    updateGames: vi.fn(),
+    removeMessages: vi.fn(),
+    addMessage: vi.fn(),
   },
 }));
 
 import { RoomPersistence } from '../../persistence';
+import { joinRoom } from './joinRoom';
+import { leaveRoom } from './leaveRoom';
+import { listGames } from './listGames';
+import { removeMessages } from './removeMessages';
+import { roomSay } from './roomSay';
 
 const makeRoomEvent = (roomId: number) => ({ roomEvent: { roomId } });
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 describe('joinRoom room event', () => {
-  const { joinRoom } = jest.requireActual('./joinRoom');
 
   it('calls RoomPersistence.userJoined with roomId and userInfo', () => {
     const userInfo = { name: 'alice' } as any;
@@ -25,7 +29,6 @@ describe('joinRoom room event', () => {
 });
 
 describe('leaveRoom room event', () => {
-  const { leaveRoom } = jest.requireActual('./leaveRoom');
 
   it('calls RoomPersistence.userLeft with roomId and name', () => {
     leaveRoom({ name: 'alice' }, makeRoomEvent(4));
@@ -34,7 +37,6 @@ describe('leaveRoom room event', () => {
 });
 
 describe('listGames room event', () => {
-  const { listGames } = jest.requireActual('./listGames');
 
   it('calls RoomPersistence.updateGames with roomId and gameList', () => {
     const gameList = [{ gameId: 1 }] as any;
@@ -44,7 +46,6 @@ describe('listGames room event', () => {
 });
 
 describe('removeMessages room event', () => {
-  const { removeMessages } = jest.requireActual('./removeMessages');
 
   it('calls RoomPersistence.removeMessages with roomId, name, amount', () => {
     removeMessages({ name: 'bob', amount: 10 }, makeRoomEvent(6));
@@ -53,7 +54,6 @@ describe('removeMessages room event', () => {
 });
 
 describe('roomSay room event', () => {
-  const { roomSay } = jest.requireActual('./roomSay');
 
   it('calls RoomPersistence.addMessage with roomId and message', () => {
     const msg = { text: 'hello' } as any;

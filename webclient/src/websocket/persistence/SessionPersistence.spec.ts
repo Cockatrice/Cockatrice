@@ -1,74 +1,74 @@
-jest.mock('store', () => ({
+vi.mock('store', () => ({
   ServerDispatch: {
-    initialized: jest.fn(),
-    clearStore: jest.fn(),
-    loginSuccessful: jest.fn(),
-    loginFailed: jest.fn(),
-    connectionClosed: jest.fn(),
-    connectionFailed: jest.fn(),
-    testConnectionSuccessful: jest.fn(),
-    testConnectionFailed: jest.fn(),
-    updateBuddyList: jest.fn(),
-    addToBuddyList: jest.fn(),
-    removeFromBuddyList: jest.fn(),
-    updateIgnoreList: jest.fn(),
-    addToIgnoreList: jest.fn(),
-    removeFromIgnoreList: jest.fn(),
-    updateInfo: jest.fn(),
-    updateStatus: jest.fn(),
-    updateUser: jest.fn(),
-    updateUsers: jest.fn(),
-    userJoined: jest.fn(),
-    userLeft: jest.fn(),
-    serverMessage: jest.fn(),
-    accountAwaitingActivation: jest.fn(),
-    accountActivationSuccess: jest.fn(),
-    accountActivationFailed: jest.fn(),
-    registrationRequiresEmail: jest.fn(),
-    registrationSuccess: jest.fn(),
-    registrationFailed: jest.fn(),
-    registrationEmailError: jest.fn(),
-    registrationPasswordError: jest.fn(),
-    registrationUserNameError: jest.fn(),
-    resetPasswordChallenge: jest.fn(),
-    resetPassword: jest.fn(),
-    resetPasswordSuccess: jest.fn(),
-    resetPasswordFailed: jest.fn(),
-    accountPasswordChange: jest.fn(),
-    accountEditChanged: jest.fn(),
-    accountImageChanged: jest.fn(),
-    getUserInfo: jest.fn(),
-    notifyUser: jest.fn(),
-    serverShutdown: jest.fn(),
-    userMessage: jest.fn(),
-    addToList: jest.fn(),
-    removeFromList: jest.fn(),
-    deckDelete: jest.fn(),
-    backendDecks: jest.fn(),
-    deckUpload: jest.fn(),
-    deckNewDir: jest.fn(),
-    deckDelDir: jest.fn(),
-    replayList: jest.fn(),
-    replayAdded: jest.fn(),
-    replayModifyMatch: jest.fn(),
-    replayDeleteMatch: jest.fn(),
-    gamesOfUser: jest.fn(),
+    initialized: vi.fn(),
+    clearStore: vi.fn(),
+    loginSuccessful: vi.fn(),
+    loginFailed: vi.fn(),
+    connectionClosed: vi.fn(),
+    connectionFailed: vi.fn(),
+    testConnectionSuccessful: vi.fn(),
+    testConnectionFailed: vi.fn(),
+    updateBuddyList: vi.fn(),
+    addToBuddyList: vi.fn(),
+    removeFromBuddyList: vi.fn(),
+    updateIgnoreList: vi.fn(),
+    addToIgnoreList: vi.fn(),
+    removeFromIgnoreList: vi.fn(),
+    updateInfo: vi.fn(),
+    updateStatus: vi.fn(),
+    updateUser: vi.fn(),
+    updateUsers: vi.fn(),
+    userJoined: vi.fn(),
+    userLeft: vi.fn(),
+    serverMessage: vi.fn(),
+    accountAwaitingActivation: vi.fn(),
+    accountActivationSuccess: vi.fn(),
+    accountActivationFailed: vi.fn(),
+    registrationRequiresEmail: vi.fn(),
+    registrationSuccess: vi.fn(),
+    registrationFailed: vi.fn(),
+    registrationEmailError: vi.fn(),
+    registrationPasswordError: vi.fn(),
+    registrationUserNameError: vi.fn(),
+    resetPasswordChallenge: vi.fn(),
+    resetPassword: vi.fn(),
+    resetPasswordSuccess: vi.fn(),
+    resetPasswordFailed: vi.fn(),
+    accountPasswordChange: vi.fn(),
+    accountEditChanged: vi.fn(),
+    accountImageChanged: vi.fn(),
+    getUserInfo: vi.fn(),
+    notifyUser: vi.fn(),
+    serverShutdown: vi.fn(),
+    userMessage: vi.fn(),
+    addToList: vi.fn(),
+    removeFromList: vi.fn(),
+    deckDelete: vi.fn(),
+    backendDecks: vi.fn(),
+    deckUpload: vi.fn(),
+    deckNewDir: vi.fn(),
+    deckDelDir: vi.fn(),
+    replayList: vi.fn(),
+    replayAdded: vi.fn(),
+    replayModifyMatch: vi.fn(),
+    replayDeleteMatch: vi.fn(),
+    gamesOfUser: vi.fn(),
   },
   GameDispatch: {
-    gameJoined: jest.fn(),
-    playerPropertiesChanged: jest.fn(),
+    gameJoined: vi.fn(),
+    playerPropertiesChanged: vi.fn(),
   },
 }));
 
-jest.mock('websocket/utils', () => ({
-  sanitizeHtml: jest.fn((msg: string) => `sanitized:${msg}`),
+vi.mock('websocket/utils', () => ({
+  sanitizeHtml: vi.fn((msg: string) => `sanitized:${msg}`),
 }));
 
-jest.mock('../utils/NormalizeService', () => ({
+vi.mock('../utils/NormalizeService', () => ({
   __esModule: true,
   default: {
-    normalizeBannedUserError: jest.fn((r: string, t: number) => `banned:${r}:${t}`),
-    normalizeGameObject: jest.fn(),
+    normalizeBannedUserError: vi.fn((r: string, t: number) => `banned:${r}:${t}`),
+    normalizeGameObject: vi.fn(),
   },
 }));
 
@@ -79,9 +79,9 @@ import NormalizeService from '../utils/NormalizeService';
 import { StatusEnum } from 'types';
 
 beforeEach(() => {
-  jest.clearAllMocks();
-  (sanitizeHtml as jest.Mock).mockImplementation((msg: string) => `sanitized:${msg}`);
-  (NormalizeService.normalizeBannedUserError as jest.Mock).mockImplementation(
+  vi.clearAllMocks();
+  (sanitizeHtml as vi.Mock).mockImplementation((msg: string) => `sanitized:${msg}`);
+  (NormalizeService.normalizeBannedUserError as vi.Mock).mockImplementation(
     (r: string, t: number) => `banned:${r}:${t}`
   );
 });

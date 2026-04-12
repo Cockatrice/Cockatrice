@@ -1,14 +1,14 @@
-jest.mock('websocket', () => ({
+vi.mock('websocket', () => ({
   SessionCommands: {
-    connect: jest.fn(),
-    disconnect: jest.fn(),
+    connect: vi.fn(),
+    disconnect: vi.fn(),
   },
   webClient: {
     connectionAttemptMade: false,
   },
 }));
 
-jest.mock('websocket/services/ProtoController', () => ({
+vi.mock('websocket/services/ProtoController', () => ({
   ProtoController: {
     root: {
       ServerInfo_User: {
@@ -26,7 +26,7 @@ import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'typ
 
 const testOptions: WebSocketConnectOptions = { host: 'localhost', port: '4748', userName: 'user', password: 'pw' };
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 describe('AuthenticationService', () => {
   describe('login', () => {

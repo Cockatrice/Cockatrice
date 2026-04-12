@@ -1,6 +1,6 @@
 import { makeMockProtoRoot } from '../__mocks__/helpers';
 
-jest.mock('../services/ProtoController', () => ({
+vi.mock('../services/ProtoController', () => ({
   ProtoController: { root: null },
 }));
 

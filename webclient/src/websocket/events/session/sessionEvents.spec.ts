@@ -1,30 +1,30 @@
 // Tests for simple session events that delegate 1:1 to SessionPersistence
 // or RoomPersistence with minimal logic.
 
-jest.mock('../../persistence', () => ({
+vi.mock('../../persistence', () => ({
   SessionPersistence: {
-    gameJoined: jest.fn(),
-    notifyUser: jest.fn(),
-    replayAdded: jest.fn(),
-    serverMessage: jest.fn(),
-    serverShutdown: jest.fn(),
-    updateUsers: jest.fn(),
-    updateInfo: jest.fn(),
-    userJoined: jest.fn(),
-    userLeft: jest.fn(),
-    userMessage: jest.fn(),
-    addToBuddyList: jest.fn(),
-    addToIgnoreList: jest.fn(),
-    removeFromBuddyList: jest.fn(),
-    removeFromIgnoreList: jest.fn(),
-    playerPropertiesChanged: jest.fn(),
+    gameJoined: vi.fn(),
+    notifyUser: vi.fn(),
+    replayAdded: vi.fn(),
+    serverMessage: vi.fn(),
+    serverShutdown: vi.fn(),
+    updateUsers: vi.fn(),
+    updateInfo: vi.fn(),
+    userJoined: vi.fn(),
+    userLeft: vi.fn(),
+    userMessage: vi.fn(),
+    addToBuddyList: vi.fn(),
+    addToIgnoreList: vi.fn(),
+    removeFromBuddyList: vi.fn(),
+    removeFromIgnoreList: vi.fn(),
+    playerPropertiesChanged: vi.fn(),
   },
   RoomPersistence: {
-    updateRooms: jest.fn(),
+    updateRooms: vi.fn(),
   },
 }));
 
-jest.mock('../../WebClient', () => ({
+vi.mock('../../WebClient', () => ({
   __esModule: true,
   default: {
     clientOptions: { autojoinrooms: false },
@@ -33,25 +33,25 @@ jest.mock('../../WebClient', () => ({
   },
 }));
 
-jest.mock('../../commands/session', () => ({
-  joinRoom: jest.fn(),
-  updateStatus: jest.fn(),
-  disconnect: jest.fn(),
-  login: jest.fn(),
-  register: jest.fn(),
-  activate: jest.fn(),
-  requestPasswordSalt: jest.fn(),
-  forgotPasswordRequest: jest.fn(),
-  forgotPasswordChallenge: jest.fn(),
-  forgotPasswordReset: jest.fn(),
+vi.mock('../../commands/session', () => ({
+  joinRoom: vi.fn(),
+  updateStatus: vi.fn(),
+  disconnect: vi.fn(),
+  login: vi.fn(),
+  register: vi.fn(),
+  activate: vi.fn(),
+  requestPasswordSalt: vi.fn(),
+  forgotPasswordRequest: vi.fn(),
+  forgotPasswordChallenge: vi.fn(),
+  forgotPasswordReset: vi.fn(),
 }));
 
-jest.mock('../../utils', () => ({
-  generateSalt: jest.fn().mockReturnValue('newSalt'),
-  passwordSaltSupported: jest.fn().mockReturnValue(0),
+vi.mock('../../utils', () => ({
+  generateSalt: vi.fn().mockReturnValue('newSalt'),
+  passwordSaltSupported: vi.fn().mockReturnValue(0),
 }));
 
-jest.mock('../../services/ProtoController', () => ({
+vi.mock('../../services/ProtoController', () => ({
   ProtoController: {
     root: {
       Event_ConnectionClosed: {
@@ -76,18 +76,31 @@ import { SessionPersistence, RoomPersistence } from '../../persistence';
 import webClient from '../../WebClient';
 import * as SessionCmds from '../../commands/session';
 import * as Utils from '../../utils';
+import { gameJoined } from './gameJoined';
+import { notifyUser } from './notifyUser';
+import { replayAdded } from './replayAdded';
+import { serverCompleteList } from './serverCompleteList';
+import { serverMessage } from './serverMessage';
+import { serverShutdown } from './serverShutdown';
+import { userJoined } from './userJoined';
+import { userLeft } from './userLeft';
+import { userMessage } from './userMessage';
+import { addToList } from './addToList';
+import { removeFromList } from './removeFromList';
+import { listRooms } from './listRooms';
+import { connectionClosed } from './connectionClosed';
+import { serverIdentification } from './serverIdentification';
 
 beforeEach(() => {
-  jest.clearAllMocks();
-  (Utils.generateSalt as jest.Mock).mockReturnValue('newSalt');
-  (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(0);
+  vi.clearAllMocks();
+  (Utils.generateSalt as vi.Mock).mockReturnValue('newSalt');
+  (Utils.passwordSaltSupported as vi.Mock).mockReturnValue(0);
 });
 
 // ----------------------------------------------------------------
 // gameJoined
 // ----------------------------------------------------------------
 describe('gameJoined', () => {
-  const { gameJoined } = jest.requireActual('./gameJoined');
 
   it('calls SessionPersistence.gameJoined', () => {
     const data = { gameId: 1 } as any;
@@ -100,7 +113,6 @@ describe('gameJoined', () => {
 // notifyUser
 // ----------------------------------------------------------------
 describe('notifyUser', () => {
-  const { notifyUser } = jest.requireActual('./notifyUser');
 
   it('calls SessionPersistence.notifyUser', () => {
     const data = { message: 'yo' } as any;
@@ -113,7 +125,6 @@ describe('notifyUser', () => {
 // replayAdded
 // ----------------------------------------------------------------
 describe('replayAdded', () => {
-  const { replayAdded } = jest.requireActual('./replayAdded');
 
   it('calls SessionPersistence.replayAdded with matchInfo', () => {
     replayAdded({ matchInfo: { id: 42 } } as any);
@@ -125,7 +136,6 @@ describe('replayAdded', () => {
 // serverCompleteList
 // ----------------------------------------------------------------
 describe('serverCompleteList', () => {
-  const { serverCompleteList } = jest.requireActual('./serverCompleteList');
 
   it('calls SessionPersistence.updateUsers and RoomPersistence.updateRooms', () => {
     serverCompleteList({ userList: ['u'], roomList: ['r'] } as any);
@@ -138,7 +148,6 @@ describe('serverCompleteList', () => {
 // serverMessage
 // ----------------------------------------------------------------
 describe('serverMessage', () => {
-  const { serverMessage } = jest.requireActual('./serverMessage');
 
   it('calls SessionPersistence.serverMessage with message', () => {
     serverMessage({ message: 'hello server' });
@@ -150,7 +159,6 @@ describe('serverMessage', () => {
 // serverShutdown
 // ----------------------------------------------------------------
 describe('serverShutdown', () => {
-  const { serverShutdown } = jest.requireActual('./serverShutdown');
 
   it('calls SessionPersistence.serverShutdown', () => {
     const payload = { reason: 'maintenance' } as any;
@@ -163,7 +171,6 @@ describe('serverShutdown', () => {
 // userJoined
 // ----------------------------------------------------------------
 describe('userJoined', () => {
-  const { userJoined } = jest.requireActual('./userJoined');
 
   it('calls SessionPersistence.userJoined with userInfo', () => {
     userJoined({ userInfo: { name: 'alice' } } as any);
@@ -175,7 +182,6 @@ describe('userJoined', () => {
 // userLeft
 // ----------------------------------------------------------------
 describe('userLeft', () => {
-  const { userLeft } = jest.requireActual('./userLeft');
 
   it('calls SessionPersistence.userLeft with name', () => {
     userLeft({ name: 'bob' });
@@ -187,7 +193,6 @@ describe('userLeft', () => {
 // userMessage
 // ----------------------------------------------------------------
 describe('userMessage', () => {
-  const { userMessage } = jest.requireActual('./userMessage');
 
   it('calls SessionPersistence.userMessage', () => {
     const payload = { userName: 'alice', message: 'hi' } as any;
@@ -200,8 +205,7 @@ describe('userMessage', () => {
 // addToList
 // ----------------------------------------------------------------
 describe('addToList', () => {
-  const { addToList } = jest.requireActual('./addToList');
-  const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+  const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   afterAll(() => logSpy.mockRestore());
 
   it('buddy list → addToBuddyList', () => {
@@ -224,7 +228,6 @@ describe('addToList', () => {
 // removeFromList
 // ----------------------------------------------------------------
 describe('removeFromList', () => {
-  const { removeFromList } = jest.requireActual('./removeFromList');
 
   it('buddy list → removeFromBuddyList', () => {
     removeFromList({ listName: 'buddy', userName: 'alice' } as any);
@@ -237,7 +240,7 @@ describe('removeFromList', () => {
   });
 
   it('unknown list → console.log', () => {
-    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     removeFromList({ listName: 'other', userName: 'x' } as any);
     expect(logSpy).toHaveBeenCalled();
     logSpy.mockRestore();
@@ -248,7 +251,6 @@ describe('removeFromList', () => {
 // listRooms
 // ----------------------------------------------------------------
 describe('listRooms', () => {
-  const { listRooms } = jest.requireActual('./listRooms');
 
   it('calls RoomPersistence.updateRooms', () => {
     listRooms({ roomList: [] });
@@ -273,7 +275,6 @@ describe('listRooms', () => {
 // connectionClosed
 // ----------------------------------------------------------------
 describe('connectionClosed', () => {
-  const { connectionClosed } = jest.requireActual('./connectionClosed');
 
   it('uses reasonStr when provided', () => {
     connectionClosed({ reason: 0, reasonStr: 'custom' } as any);
@@ -361,7 +362,6 @@ describe('connectionClosed', () => {
 // serverIdentification
 // ----------------------------------------------------------------
 describe('serverIdentification', () => {
-  const { serverIdentification } = jest.requireActual('./serverIdentification');
 
   beforeEach(() => {
     (webClient as any).protocolVersion = 14;
@@ -376,7 +376,7 @@ describe('serverIdentification', () => {
 
   it('LOGIN reason without salt → calls login with password as separate param', () => {
     (webClient as any).options = { reason: WebSocketConnectReason.LOGIN, password: 'secret' };
-    (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(0);
+    (Utils.passwordSaltSupported as vi.Mock).mockReturnValue(0);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 } as any);
     expect(SessionCmds.login).toHaveBeenCalledWith(
       expect.not.objectContaining({ password: expect.anything() }),
@@ -386,7 +386,7 @@ describe('serverIdentification', () => {
 
   it('LOGIN reason with salt → calls requestPasswordSalt with password as separate param', () => {
     (webClient as any).options = { reason: WebSocketConnectReason.LOGIN, password: 'secret' };
-    (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(1);
+    (Utils.passwordSaltSupported as vi.Mock).mockReturnValue(1);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 1 } as any);
     expect(SessionCmds.requestPasswordSalt).toHaveBeenCalledWith(
       expect.not.objectContaining({ password: expect.anything() }),
@@ -396,7 +396,7 @@ describe('serverIdentification', () => {
 
   it('REGISTER reason without salt → calls register with password and null salt', () => {
     (webClient as any).options = { reason: WebSocketConnectReason.REGISTER, password: 'secret' };
-    (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(0);
+    (Utils.passwordSaltSupported as vi.Mock).mockReturnValue(0);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 } as any);
     expect(SessionCmds.register).toHaveBeenCalledWith(
       expect.not.objectContaining({ password: expect.anything() }),
@@ -407,7 +407,7 @@ describe('serverIdentification', () => {
 
   it('REGISTER reason with salt → calls register with password and generated salt', () => {
     (webClient as any).options = { reason: WebSocketConnectReason.REGISTER, password: 'secret' };
-    (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(1);
+    (Utils.passwordSaltSupported as vi.Mock).mockReturnValue(1);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 1 } as any);
     expect(SessionCmds.register).toHaveBeenCalledWith(
       expect.not.objectContaining({ password: expect.anything() }),
@@ -418,7 +418,7 @@ describe('serverIdentification', () => {
 
   it('ACTIVATE_ACCOUNT reason without salt → calls activate with password as separate param', () => {
     (webClient as any).options = { reason: WebSocketConnectReason.ACTIVATE_ACCOUNT, password: 'secret' };
-    (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(0);
+    (Utils.passwordSaltSupported as vi.Mock).mockReturnValue(0);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 } as any);
     expect(SessionCmds.activate).toHaveBeenCalledWith(
       expect.not.objectContaining({ password: expect.anything() }),
@@ -428,7 +428,7 @@ describe('serverIdentification', () => {
 
   it('ACTIVATE_ACCOUNT reason with salt → calls requestPasswordSalt with password as separate param', () => {
     (webClient as any).options = { reason: WebSocketConnectReason.ACTIVATE_ACCOUNT, password: 'secret' };
-    (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(1);
+    (Utils.passwordSaltSupported as vi.Mock).mockReturnValue(1);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 1 } as any);
     expect(SessionCmds.requestPasswordSalt).toHaveBeenCalledWith(
       expect.not.objectContaining({ password: expect.anything() }),
@@ -450,7 +450,7 @@ describe('serverIdentification', () => {
 
   it('PASSWORD_RESET reason without salt → calls forgotPasswordReset with newPassword as separate param', () => {
     (webClient as any).options = { reason: WebSocketConnectReason.PASSWORD_RESET, newPassword: 'newpw' };
-    (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(0);
+    (Utils.passwordSaltSupported as vi.Mock).mockReturnValue(0);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 } as any);
     expect(SessionCmds.forgotPasswordReset).toHaveBeenCalledWith(
       expect.not.objectContaining({ newPassword: expect.anything() }),
@@ -460,7 +460,7 @@ describe('serverIdentification', () => {
 
   it('PASSWORD_RESET reason with salt → calls requestPasswordSalt with newPassword as separate param', () => {
     (webClient as any).options = { reason: WebSocketConnectReason.PASSWORD_RESET, newPassword: 'newpw' };
-    (Utils.passwordSaltSupported as jest.Mock).mockReturnValue(1);
+    (Utils.passwordSaltSupported as vi.Mock).mockReturnValue(1);
     serverIdentification({ serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 1 } as any);
     expect(SessionCmds.requestPasswordSalt).toHaveBeenCalledWith(
       expect.not.objectContaining({ newPassword: expect.anything() }),

@@ -1,21 +1,24 @@
 import { makeMockProtoRoot } from '../__mocks__/helpers';
 
-jest.mock('./ProtoController', () => ({
-  ProtoController: { root: null, load: jest.fn() },
+vi.mock('./ProtoController', () => ({
+  ProtoController: { root: null, load: vi.fn() },
 }));
 
-jest.mock('../commands/session', () => ({
-  SessionCommands: { ping: jest.fn() },
-  ping: jest.fn(),
+vi.mock('../commands/session', () => ({
+  SessionCommands: { ping: vi.fn() },
+  ping: vi.fn(),
 }));
 
-jest.mock('../events', () => ({
-  GameEvents: { '.Event_Game.ext': jest.fn() },
-  RoomEvents: { '.Event_Room.ext': jest.fn() },
-  SessionEvents: { '.Event_Session.ext': jest.fn() },
+vi.mock('../events', () => ({
+  GameEvents: { '.Event_Game.ext': vi.fn() },
+  RoomEvents: { '.Event_Room.ext': vi.fn() },
+  SessionEvents: { '.Event_Session.ext': vi.fn() },
 }));
 
-jest.mock('../WebClient');
+vi.mock('../WebClient', () => ({
+  __esModule: true,
+  default: {},
+}));
 
 import { ProtobufService } from './ProtobufService';
 import { ProtoController } from './ProtoController';
@@ -26,15 +29,15 @@ let mockSocket: any;
 let mockWebClient: any;
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 
   ProtoController.root = makeMockProtoRoot();
-  const encodeResult = { finish: jest.fn().mockReturnValue(new Uint8Array([1, 2])) };
-  ProtoController.root.CommandContainer.encode = jest.fn().mockReturnValue(encodeResult);
+  const encodeResult = { finish: vi.fn().mockReturnValue(new Uint8Array([1, 2])) };
+  ProtoController.root.CommandContainer.encode = vi.fn().mockReturnValue(encodeResult);
 
   mockSocket = {
-    checkReadyState: jest.fn().mockReturnValue(true),
-    send: jest.fn(),
+    checkReadyState: vi.fn().mockReturnValue(true),
+    send: vi.fn(),
   };
 
   mockWebClient = {
@@ -52,7 +55,7 @@ describe('ProtobufService', () => {
     it('resets cmdId and pendingCommands', () => {
       const service = new ProtobufService(mockWebClient);
       // add a pending command
-      service.sendSessionCommand({}, jest.fn());
+      service.sendSessionCommand({}, vi.fn());
       expect((service as any).cmdId).toBe(1);
       service.resetCommands();
       expect((service as any).cmdId).toBe(0);
@@ -63,7 +66,7 @@ describe('ProtobufService', () => {
   describe('sendCommand', () => {
     it('increments cmdId and stores callback', () => {
       const service = new ProtobufService(mockWebClient);
-      const cb = jest.fn();
+      const cb = vi.fn();
       service.sendCommand({}, cb);
       expect((service as any).cmdId).toBe(1);
       expect((service as any).pendingCommands[1]).toBe(cb);
@@ -72,14 +75,14 @@ describe('ProtobufService', () => {
     it('sends encoded data when socket is OPEN', () => {
       const service = new ProtobufService(mockWebClient);
       mockSocket.checkReadyState.mockReturnValue(true);
-      service.sendCommand({}, jest.fn());
+      service.sendCommand({}, vi.fn());
       expect(mockSocket.send).toHaveBeenCalled();
     });
 
     it('does not send when socket is not OPEN', () => {
       const service = new ProtobufService(mockWebClient);
       mockSocket.checkReadyState.mockReturnValue(false);
-      service.sendCommand({}, jest.fn());
+      service.sendCommand({}, vi.fn());
       expect(mockSocket.send).not.toHaveBeenCalled();
     });
   });
@@ -87,7 +90,7 @@ describe('ProtobufService', () => {
   describe('sendSessionCommand', () => {
     it('creates a CommandContainer and calls sendCommand', () => {
       const service = new ProtobufService(mockWebClient);
-      const cb = jest.fn();
+      const cb = vi.fn();
       service.sendSessionCommand({ cmdType: 'test' }, cb);
       expect(ProtoController.root.CommandContainer.create).toHaveBeenCalledWith(
         expect.objectContaining({ sessionCommand: expect.anything() })
@@ -96,7 +99,7 @@ describe('ProtobufService', () => {
 
     it('invokes callback with raw response when the pending command is triggered', () => {
       const service = new ProtobufService(mockWebClient);
-      const cb = jest.fn();
+      const cb = vi.fn();
       service.sendSessionCommand({ cmdType: 'test' }, cb);
 
       const storedCb = (service as any).pendingCommands[1];
@@ -117,7 +120,7 @@ describe('ProtobufService', () => {
   describe('sendRoomCommand', () => {
     it('creates a CommandContainer with roomId and calls sendCommand', () => {
       const service = new ProtobufService(mockWebClient);
-      service.sendRoomCommand(42, { roomCmdType: 'test' }, jest.fn());
+      service.sendRoomCommand(42, { roomCmdType: 'test' }, vi.fn());
       expect(ProtoController.root.CommandContainer.create).toHaveBeenCalledWith(
         expect.objectContaining({ roomId: 42 })
       );
@@ -125,7 +128,7 @@ describe('ProtobufService', () => {
 
     it('invokes callback with raw response when the pending command is triggered', () => {
       const service = new ProtobufService(mockWebClient);
-      const cb = jest.fn();
+      const cb = vi.fn();
       service.sendRoomCommand(42, { roomCmdType: 'test' }, cb);
 
       const storedCb = (service as any).pendingCommands[1];
@@ -146,7 +149,7 @@ describe('ProtobufService', () => {
   describe('sendGameCommand', () => {
     it('creates a CommandContainer with gameId and gameCommand', () => {
       const service = new ProtobufService(mockWebClient);
-      service.sendGameCommand(7, { gameCmdType: 'test' }, jest.fn());
+      service.sendGameCommand(7, { gameCmdType: 'test' }, vi.fn());
       expect(ProtoController.root.CommandContainer.create).toHaveBeenCalledWith(
         expect.objectContaining({ gameId: 7, gameCommand: expect.anything() })
       );
@@ -154,7 +157,7 @@ describe('ProtobufService', () => {
 
     it('invokes callback with raw response when the pending command is triggered', () => {
       const service = new ProtobufService(mockWebClient);
-      const cb = jest.fn();
+      const cb = vi.fn();
       service.sendGameCommand(7, { gameCmdType: 'test' }, cb);
 
       const storedCb = (service as any).pendingCommands[1];
@@ -175,7 +178,7 @@ describe('ProtobufService', () => {
   describe('sendModeratorCommand', () => {
     it('creates a CommandContainer with moderatorCommand', () => {
       const service = new ProtobufService(mockWebClient);
-      service.sendModeratorCommand({ modCmdType: 'test' }, jest.fn());
+      service.sendModeratorCommand({ modCmdType: 'test' }, vi.fn());
       expect(ProtoController.root.CommandContainer.create).toHaveBeenCalledWith(
         expect.objectContaining({ moderatorCommand: expect.anything() })
       );
@@ -183,7 +186,7 @@ describe('ProtobufService', () => {
 
     it('invokes callback with raw response when the pending command is triggered', () => {
       const service = new ProtobufService(mockWebClient);
-      const cb = jest.fn();
+      const cb = vi.fn();
       service.sendModeratorCommand({ modCmdType: 'test' }, cb);
 
       const storedCb = (service as any).pendingCommands[1];
@@ -204,7 +207,7 @@ describe('ProtobufService', () => {
   describe('sendAdminCommand', () => {
     it('creates a CommandContainer with adminCommand', () => {
       const service = new ProtobufService(mockWebClient);
-      service.sendAdminCommand({ adminCmdType: 'test' }, jest.fn());
+      service.sendAdminCommand({ adminCmdType: 'test' }, vi.fn());
       expect(ProtoController.root.CommandContainer.create).toHaveBeenCalledWith(
         expect.objectContaining({ adminCommand: expect.anything() })
       );
@@ -212,7 +215,7 @@ describe('ProtobufService', () => {
 
     it('invokes callback with raw response when the pending command is triggered', () => {
       const service = new ProtobufService(mockWebClient);
-      const cb = jest.fn();
+      const cb = vi.fn();
       service.sendAdminCommand({ adminCmdType: 'test' }, cb);
 
       const storedCb = (service as any).pendingCommands[1];
@@ -233,7 +236,7 @@ describe('ProtobufService', () => {
   describe('sendKeepAliveCommand', () => {
     it('delegates to SessionCommands.ping', () => {
       const service = new ProtobufService(mockWebClient);
-      const pingReceived = jest.fn();
+      const pingReceived = vi.fn();
       service.sendKeepAliveCommand(pingReceived);
       expect(sessionPing).toHaveBeenCalledWith(pingReceived);
     });
@@ -242,13 +245,13 @@ describe('ProtobufService', () => {
   describe('handleMessageEvent', () => {
     it('routes RESPONSE message to processServerResponse', () => {
       const service = new ProtobufService(mockWebClient);
-      const cb = jest.fn();
+      const cb = vi.fn();
       // store a callback for cmdId 1
       (service as any).cmdId = 1;
       (service as any).pendingCommands[1] = cb;
 
       const response = { cmdId: 1 };
-      ProtoController.root.ServerMessage.decode = jest.fn().mockReturnValue({
+      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
         messageType: ProtoController.root.ServerMessage.MessageType.RESPONSE,
         response,
       });
@@ -260,14 +263,14 @@ describe('ProtobufService', () => {
 
     it('resolves pending command when response cmdId is a protobufjs Long object', () => {
       const service = new ProtobufService(mockWebClient);
-      const cb = jest.fn();
+      const cb = vi.fn();
       (service as any).cmdId = 1;
       (service as any).pendingCommands[1] = cb;
 
       // Simulate protobufjs decoding cmdId as a Long object (low=1, high=0)
       const longCmdId = { low: 1, high: 0, unsigned: false, toString: () => '1' };
       const response = { cmdId: longCmdId };
-      ProtoController.root.ServerMessage.decode = jest.fn().mockReturnValue({
+      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
         messageType: ProtoController.root.ServerMessage.MessageType.RESPONSE,
         response,
       });
@@ -279,8 +282,8 @@ describe('ProtobufService', () => {
 
     it('routes ROOM_EVENT message', () => {
       const service = new ProtobufService(mockWebClient);
-      const processRoomEvent = jest.spyOn(service as any, 'processRoomEvent');
-      ProtoController.root.ServerMessage.decode = jest.fn().mockReturnValue({
+      const processRoomEvent = vi.spyOn(service as any, 'processRoomEvent');
+      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
         messageType: ProtoController.root.ServerMessage.MessageType.ROOM_EVENT,
         roomEvent: { '.Event_Room.ext': {} },
       });
@@ -290,8 +293,8 @@ describe('ProtobufService', () => {
 
     it('routes SESSION_EVENT message', () => {
       const service = new ProtobufService(mockWebClient);
-      const processSessionEvent = jest.spyOn(service as any, 'processSessionEvent');
-      ProtoController.root.ServerMessage.decode = jest.fn().mockReturnValue({
+      const processSessionEvent = vi.spyOn(service as any, 'processSessionEvent');
+      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
         messageType: ProtoController.root.ServerMessage.MessageType.SESSION_EVENT,
         sessionEvent: { '.Event_Session.ext': {} },
       });
@@ -301,8 +304,8 @@ describe('ProtobufService', () => {
 
     it('routes GAME_EVENT_CONTAINER message', () => {
       const service = new ProtobufService(mockWebClient);
-      const processGameEvent = jest.spyOn(service as any, 'processGameEvent');
-      ProtoController.root.ServerMessage.decode = jest.fn().mockReturnValue({
+      const processGameEvent = vi.spyOn(service as any, 'processGameEvent');
+      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
         messageType: ProtoController.root.ServerMessage.MessageType.GAME_EVENT_CONTAINER,
         gameEvent: { '.Event_Game.ext': {} },
       });
@@ -312,8 +315,8 @@ describe('ProtobufService', () => {
 
     it('logs unknown message types (default case)', () => {
       const service = new ProtobufService(mockWebClient);
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-      ProtoController.root.ServerMessage.decode = jest.fn().mockReturnValue({
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
         messageType: 'UNKNOWN_TYPE',
       });
       service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent);
@@ -323,14 +326,14 @@ describe('ProtobufService', () => {
 
     it('does nothing when decoded message is null', () => {
       const service = new ProtobufService(mockWebClient);
-      ProtoController.root.ServerMessage.decode = jest.fn().mockReturnValue(null);
+      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue(null);
       expect(() => service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent)).not.toThrow();
     });
 
     it('catches and logs decode errors', () => {
       const service = new ProtobufService(mockWebClient);
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      ProtoController.root.ServerMessage.decode = jest.fn().mockImplementation(() => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      ProtoController.root.ServerMessage.decode = vi.fn().mockImplementation(() => {
         throw new Error('decode error');
       });
       expect(() => service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent)).not.toThrow();
@@ -342,14 +345,14 @@ describe('ProtobufService', () => {
   describe('processGameEvent', () => {
     it('returns early when container has no eventList', () => {
       const service = new ProtobufService(mockWebClient);
-      const gameEventHandler = (GameEvents as any)['.Event_Game.ext'] as jest.Mock;
+      const gameEventHandler = (GameEvents as any)['.Event_Game.ext'] as vi.Mock;
       (service as any).processGameEvent(null, {});
       expect(gameEventHandler).not.toHaveBeenCalled();
     });
 
     it('dispatches to a GameEvents handler when event key matches', () => {
       const service = new ProtobufService(mockWebClient);
-      const gameEventHandler = (GameEvents as any)['.Event_Game.ext'] as jest.Mock;
+      const gameEventHandler = (GameEvents as any)['.Event_Game.ext'] as vi.Mock;
       const payload = { someData: 1 };
       (service as any).processGameEvent({
         gameId: 42,
@@ -366,7 +369,7 @@ describe('ProtobufService', () => {
   describe('processEvent', () => {
     it('calls matching event handler with payload and raw', () => {
       const service = new ProtobufService(mockWebClient);
-      const handler = jest.fn();
+      const handler = vi.fn();
       const events = { '.Event_Test.ext': handler };
       const payload = { someData: 1 };
       const response = { '.Event_Test.ext': payload };
@@ -379,8 +382,8 @@ describe('ProtobufService', () => {
 
     it('stops after first matching event', () => {
       const service = new ProtobufService(mockWebClient);
-      const handler1 = jest.fn();
-      const handler2 = jest.fn();
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
       const events = { '.Event_A.ext': handler1, '.Event_B.ext': handler2 };
       const response = { '.Event_A.ext': { x: 1 } };
 

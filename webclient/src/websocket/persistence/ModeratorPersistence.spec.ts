@@ -1,22 +1,22 @@
-jest.mock('store', () => ({
+vi.mock('store', () => ({
   ServerDispatch: {
-    banFromServer: jest.fn(),
-    banHistory: jest.fn(),
-    viewLogs: jest.fn(),
-    warnHistory: jest.fn(),
-    warnListOptions: jest.fn(),
-    warnUser: jest.fn(),
-    grantReplayAccess: jest.fn(),
-    forceActivateUser: jest.fn(),
-    getAdminNotes: jest.fn(),
-    updateAdminNotes: jest.fn(),
+    banFromServer: vi.fn(),
+    banHistory: vi.fn(),
+    viewLogs: vi.fn(),
+    warnHistory: vi.fn(),
+    warnListOptions: vi.fn(),
+    warnUser: vi.fn(),
+    grantReplayAccess: vi.fn(),
+    forceActivateUser: vi.fn(),
+    getAdminNotes: vi.fn(),
+    updateAdminNotes: vi.fn(),
   },
 }));
 
-jest.mock('../utils/NormalizeService', () => ({
+vi.mock('../utils/NormalizeService', () => ({
   __esModule: true,
   default: {
-    normalizeLogs: jest.fn((logs: any) => ({ normalized: logs })),
+    normalizeLogs: vi.fn((logs: any) => ({ normalized: logs })),
   },
 }));
 
@@ -25,8 +25,8 @@ import { ServerDispatch } from 'store';
 import NormalizeService from '../utils/NormalizeService';
 
 beforeEach(() => {
-  jest.clearAllMocks();
-  (NormalizeService.normalizeLogs as jest.Mock).mockImplementation((logs: any) => ({ normalized: logs }));
+  vi.clearAllMocks();
+  (NormalizeService.normalizeLogs as vi.Mock).mockImplementation((logs: any) => ({ normalized: logs }));
 });
 
 describe('ModeratorPersistence', () => {

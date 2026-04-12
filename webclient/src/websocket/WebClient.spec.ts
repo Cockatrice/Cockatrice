@@ -1,26 +1,28 @@
-jest.mock('./services/WebSocketService', () => ({
-  WebSocketService: jest.fn().mockImplementation(() => ({
-    message$: { subscribe: jest.fn() },
-    connect: jest.fn(),
-    testConnect: jest.fn(),
-    disconnect: jest.fn(),
+vi.mock('./services/WebSocketService', () => ({
+  WebSocketService: vi.fn().mockImplementation(() => ({
+    message$: { subscribe: vi.fn() },
+    connect: vi.fn(),
+    testConnect: vi.fn(),
+    disconnect: vi.fn(),
   })),
 }));
 
-jest.mock('./services/ProtobufService', () => ({
-  ProtobufService: jest.fn().mockImplementation(() => ({
-    handleMessageEvent: jest.fn(),
-    sendKeepAliveCommand: jest.fn(),
-    resetCommands: jest.fn(),
+vi.mock('./services/ProtobufService', () => ({
+  ProtobufService: vi.fn().mockImplementation(() => ({
+    handleMessageEvent: vi.fn(),
+    sendKeepAliveCommand: vi.fn(),
+    resetCommands: vi.fn(),
   })),
 }));
 
-jest.mock('./persistence', () => ({
-  RoomPersistence: { clearStore: jest.fn() },
-  SessionPersistence: { clearStore: jest.fn() },
+vi.mock('./persistence', () => ({
+  RoomPersistence: { clearStore: vi.fn() },
+  SessionPersistence: { clearStore: vi.fn() },
 }));
 
 import { WebClient } from './WebClient';
+import { WebSocketService } from './services/WebSocketService';
+import { ProtobufService } from './services/ProtobufService';
 import { RoomPersistence, SessionPersistence } from './persistence';
 import { StatusEnum } from 'types';
 import { Subject } from 'rxjs';
@@ -30,28 +32,26 @@ describe('WebClient', () => {
   let messageSubject: Subject<MessageEvent>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    const { ProtobufService } = require('./services/ProtobufService');
-    ProtobufService.mockImplementation(() => ({
-      handleMessageEvent: jest.fn(),
-      sendKeepAliveCommand: jest.fn(),
-      resetCommands: jest.fn(),
+    vi.clearAllMocks();
+    (ProtobufService as vi.Mock).mockImplementation(() => ({
+      handleMessageEvent: vi.fn(),
+      sendKeepAliveCommand: vi.fn(),
+      resetCommands: vi.fn(),
     }));
     messageSubject = new Subject<MessageEvent>();
-    const { WebSocketService } = require('./services/WebSocketService');
-    WebSocketService.mockImplementation(() => ({
+    (WebSocketService as vi.Mock).mockImplementation(() => ({
       message$: messageSubject,
-      connect: jest.fn(),
-      testConnect: jest.fn(),
-      disconnect: jest.fn(),
+      connect: vi.fn(),
+      testConnect: vi.fn(),
+      disconnect: vi.fn(),
     }));
     // suppress console.log from constructor in non-test-env check
-    jest.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => {});
     client = new WebClient();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('constructor', () => {
@@ -94,7 +94,7 @@ describe('WebClient', () => {
 
   describe('keepAlive', () => {
     it('delegates to protobuf.sendKeepAliveCommand', () => {
-      const pingCb = jest.fn();
+      const pingCb = vi.fn();
       client.keepAlive(pingCb);
       expect(client.protobuf.sendKeepAliveCommand).toHaveBeenCalledWith(pingCb);
     });

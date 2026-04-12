@@ -1,39 +1,48 @@
-jest.mock('../../services/BackendService', () => ({
+vi.mock('../../services/BackendService', () => ({
   BackendService: {
-    sendModeratorCommand: jest.fn(),
+    sendModeratorCommand: vi.fn(),
   },
 }));
 
-jest.mock('../../persistence', () => ({
+vi.mock('../../persistence', () => ({
   ModeratorPersistence: {
-    banFromServer: jest.fn(),
-    forceActivateUser: jest.fn(),
-    getAdminNotes: jest.fn(),
-    banHistory: jest.fn(),
-    warnHistory: jest.fn(),
-    warnListOptions: jest.fn(),
-    grantReplayAccess: jest.fn(),
-    updateAdminNotes: jest.fn(),
-    viewLogs: jest.fn(),
-    warnUser: jest.fn(),
+    banFromServer: vi.fn(),
+    forceActivateUser: vi.fn(),
+    getAdminNotes: vi.fn(),
+    banHistory: vi.fn(),
+    warnHistory: vi.fn(),
+    warnListOptions: vi.fn(),
+    grantReplayAccess: vi.fn(),
+    updateAdminNotes: vi.fn(),
+    viewLogs: vi.fn(),
+    warnUser: vi.fn(),
   },
 }));
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
 import { BackendService } from '../../services/BackendService';
 import { ModeratorPersistence } from '../../persistence';
+import { banFromServer } from './banFromServer';
+import { forceActivateUser } from './forceActivateUser';
+import { getAdminNotes } from './getAdminNotes';
+import { getBanHistory } from './getBanHistory';
+import { getWarnHistory } from './getWarnHistory';
+import { getWarnList } from './getWarnList';
+import { grantReplayAccess } from './grantReplayAccess';
+import { updateAdminNotes } from './updateAdminNotes';
+import { viewLogHistory } from './viewLogHistory';
+import { warnUser } from './warnUser';
 
 const { getLastSendOpts, invokeOnSuccess } = makeCallbackHelpers(
-  BackendService.sendModeratorCommand as jest.Mock
+  BackendService.sendModeratorCommand as vi.Mock
 );
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => vi.clearAllMocks());
 
 // ----------------------------------------------------------------
 // banFromServer
 // ----------------------------------------------------------------
 describe('banFromServer', () => {
-  const { banFromServer } = jest.requireActual('./banFromServer');
 
   it('calls sendModeratorCommand with Command_BanFromServer', () => {
     banFromServer(30, 'alice', '1.2.3.4', 'reason', 'visible', 'cid', 1);
@@ -55,7 +64,6 @@ describe('banFromServer', () => {
 // forceActivateUser
 // ----------------------------------------------------------------
 describe('forceActivateUser', () => {
-  const { forceActivateUser } = jest.requireActual('./forceActivateUser');
 
   it('calls sendModeratorCommand with Command_ForceActivateUser', () => {
     forceActivateUser('alice', 'mod1');
@@ -73,7 +81,6 @@ describe('forceActivateUser', () => {
 // getAdminNotes
 // ----------------------------------------------------------------
 describe('getAdminNotes', () => {
-  const { getAdminNotes } = jest.requireActual('./getAdminNotes');
 
   it('calls sendModeratorCommand with Command_GetAdminNotes', () => {
     getAdminNotes('alice');
@@ -96,7 +103,6 @@ describe('getAdminNotes', () => {
 // getBanHistory
 // ----------------------------------------------------------------
 describe('getBanHistory', () => {
-  const { getBanHistory } = jest.requireActual('./getBanHistory');
 
   it('calls sendModeratorCommand with Command_GetBanHistory', () => {
     getBanHistory('alice');
@@ -119,7 +125,6 @@ describe('getBanHistory', () => {
 // getWarnHistory
 // ----------------------------------------------------------------
 describe('getWarnHistory', () => {
-  const { getWarnHistory } = jest.requireActual('./getWarnHistory');
 
   it('calls sendModeratorCommand with Command_GetWarnHistory', () => {
     getWarnHistory('alice');
@@ -142,7 +147,6 @@ describe('getWarnHistory', () => {
 // getWarnList
 // ----------------------------------------------------------------
 describe('getWarnList', () => {
-  const { getWarnList } = jest.requireActual('./getWarnList');
 
   it('calls sendModeratorCommand with Command_GetWarnList', () => {
     getWarnList('mod1', 'alice', 'US');
@@ -165,7 +169,6 @@ describe('getWarnList', () => {
 // grantReplayAccess
 // ----------------------------------------------------------------
 describe('grantReplayAccess', () => {
-  const { grantReplayAccess } = jest.requireActual('./grantReplayAccess');
 
   it('calls sendModeratorCommand with Command_GrantReplayAccess', () => {
     grantReplayAccess(10, 'mod1');
@@ -183,7 +186,6 @@ describe('grantReplayAccess', () => {
 // updateAdminNotes
 // ----------------------------------------------------------------
 describe('updateAdminNotes', () => {
-  const { updateAdminNotes } = jest.requireActual('./updateAdminNotes');
 
   it('calls sendModeratorCommand with Command_UpdateAdminNotes', () => {
     updateAdminNotes('alice', 'new notes');
@@ -201,7 +203,6 @@ describe('updateAdminNotes', () => {
 // viewLogHistory
 // ----------------------------------------------------------------
 describe('viewLogHistory', () => {
-  const { viewLogHistory } = jest.requireActual('./viewLogHistory');
 
   it('calls sendModeratorCommand with Command_ViewLogHistory', () => {
     viewLogHistory({ filters: 'all' } as any);
@@ -224,7 +225,6 @@ describe('viewLogHistory', () => {
 // warnUser
 // ----------------------------------------------------------------
 describe('warnUser', () => {
-  const { warnUser } = jest.requireActual('./warnUser');
 
   it('calls sendModeratorCommand with Command_WarnUser', () => {
     warnUser('alice', 'bad behavior', 'cid');
