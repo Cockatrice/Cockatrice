@@ -1,8 +1,5 @@
-import webClient from '../../WebClient';
+import { BackendService } from '../../services/BackendService';
 
 export function listRooms(): void {
-  const command = webClient.protobuf.controller.Command_ListRooms.create();
-  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_ListRooms.ext': command });
-
-  webClient.protobuf.sendSessionCommand(sc);
+  BackendService.sendSessionCommand('Command_ListRooms', {}, {});
 }

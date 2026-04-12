@@ -6,12 +6,11 @@ export * from './addToList';
 export * from './connect';
 export * from './deckDel';
 export * from './deckDelDir';
-export * from './deckDownload';
 export * from './deckList';
 export * from './deckNewDir';
 export * from './deckUpload';
 export * from './disconnect';
-export * from './forgotPasswordChallenge'
+export * from './forgotPasswordChallenge';
 export * from './forgotPasswordRequest';
 export * from './forgotPasswordReset';
 export * from './getGamesOfUser';
@@ -24,12 +23,8 @@ export * from './message';
 export * from './ping';
 export * from './register';
 export * from './removeFromList';
+export * from './replayDeleteMatch';
+export * from './replayList';
+export * from './replayModifyMatch';
 export * from './requestPasswordSalt';
 export * from './updateStatus';
-
-/** TODO
- * REPLAY_DELETE_MATCH
- * REPLAY_DOWNLOAD
- * REPLAY_LIST
- * REPLAY_MODIFY_MATCH
- */

@@ -2,6 +2,8 @@ import { RequestPasswordSaltParams } from 'store';
 import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
 
 import webClient from '../../WebClient';
+import { BackendService } from '../../services/BackendService';
+import { ProtoController } from '../../services/ProtoController';
 import { SessionPersistence } from '../../persistence';
 
 import {
@@ -15,64 +17,48 @@ import {
 export function requestPasswordSalt(options: WebSocketConnectOptions): void {
   const { userName } = options as RequestPasswordSaltParams;
 
-  const registerConfig = {
-    ...webClient.clientConfig,
-    userName,
-  };
-
-  const command = webClient.protobuf.controller.Command_RequestPasswordSalt.create(registerConfig);
-  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_RequestPasswordSalt.ext': command });
-
-  webClient.protobuf.sendSessionCommand(sc, raw => {
-    switch (raw.responseCode) {
-      case webClient.protobuf.controller.Response.ResponseCode.RespOk: {
-        const passwordSalt = raw['.Response_PasswordSalt.ext']?.passwordSalt;
-
-        switch (options.reason) {
-          case WebSocketConnectReason.ACTIVATE_ACCOUNT: {
-            activate(options, passwordSalt);
-            break;
-          }
-
-          case WebSocketConnectReason.PASSWORD_RESET: {
-            forgotPasswordReset(options, passwordSalt);
-            break;
-          }
-
-          case WebSocketConnectReason.LOGIN:
-          default: {
-            login(options, passwordSalt);
-          }
-        }
-
-        return;
-      }
-      case webClient.protobuf.controller.Response.ResponseCode.RespRegistrationRequired: {
-        updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
-        break;
-      }
-      default: {
-        updateStatus(StatusEnum.DISCONNECTED, 'Login failed: Unknown Reason');
-      }
-    }
-
+  const onFailure = () => {
     switch (options.reason) {
-      case WebSocketConnectReason.ACTIVATE_ACCOUNT: {
+      case WebSocketConnectReason.ACTIVATE_ACCOUNT:
         SessionPersistence.accountActivationFailed();
         break;
-      }
-
-      case WebSocketConnectReason.PASSWORD_RESET: {
+      case WebSocketConnectReason.PASSWORD_RESET:
         SessionPersistence.resetPasswordFailed();
         break;
-      }
-
-      case WebSocketConnectReason.LOGIN:
-      default: {
+      default:
         SessionPersistence.loginFailed();
-      }
     }
-
     disconnect();
+  };
+
+  BackendService.sendSessionCommand('Command_RequestPasswordSalt', {
+    ...webClient.clientConfig,
+    userName,
+  }, {
+    responseName: 'Response_PasswordSalt',
+    onSuccess: (resp) => {
+      const passwordSalt = resp?.passwordSalt;
+
+      switch (options.reason) {
+        case WebSocketConnectReason.ACTIVATE_ACCOUNT:
+          activate(options, passwordSalt);
+          break;
+        case WebSocketConnectReason.PASSWORD_RESET:
+          forgotPasswordReset(options, passwordSalt);
+          break;
+        default:
+          login(options, passwordSalt);
+      }
+    },
+    onResponseCode: {
+      [ProtoController.root.Response.ResponseCode.RespRegistrationRequired]: () => {
+        updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
+        onFailure();
+      },
+    },
+    onError: () => {
+      updateStatus(StatusEnum.DISCONNECTED, 'Login failed: Unknown Reason');
+      onFailure();
+    },
   });
 }
