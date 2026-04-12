@@ -350,7 +350,6 @@ jobs:
 
       - name: Add msbuild to PATH
         if: matrix.os == 'Windows'
-        id: add-msbuild
         uses: microsoft/setup-msbuild@v3
         with:
           msbuild-architecture: x64
