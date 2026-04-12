@@ -34,11 +34,11 @@ function captureCallback(sendFn: jest.Mock) {
 
 describe('BackendService', () => {
   describe('send commands', () => {
-    it.each<[string, () => void]>([
+    it.each([
       ['sendSessionCommand', () => BackendService.sendSessionCommand('Command_Test', { x: 1 }, {})],
-      ['sendRoomCommand',    () => BackendService.sendRoomCommand(5, 'Command_Room', { y: 2 }, {})],
+      ['sendRoomCommand', () => BackendService.sendRoomCommand(5, 'Command_Room', { y: 2 }, {})],
       ['sendModeratorCommand', () => BackendService.sendModeratorCommand('Command_Mod', { z: 3 }, {})],
-      ['sendAdminCommand',  () => BackendService.sendAdminCommand('Command_Admin', {}, {})],
+      ['sendAdminCommand', () => BackendService.sendAdminCommand('Command_Admin', {}, {})],
     ])('%s creates the command and delegates to protobuf', (methodName, invoke) => {
       invoke();
       expect((webClient.protobuf as any)[methodName]).toHaveBeenCalled();

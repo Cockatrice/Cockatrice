@@ -13,9 +13,9 @@ export function makeMockProtoRoot() {
       encode: jest.fn().mockReturnValue(encode),
     },
     SessionCommand: { create: jest.fn(args => ({ ...args })) },
-    RoomCommand:      { create: jest.fn(args => ({ ...args })) },
+    RoomCommand: { create: jest.fn(args => ({ ...args })) },
     ModeratorCommand: { create: jest.fn(args => ({ ...args })) },
-    AdminCommand:     { create: jest.fn(args => ({ ...args })) },
+    AdminCommand: { create: jest.fn(args => ({ ...args })) },
     ServerMessage: {
       decode: jest.fn(),
       MessageType: {

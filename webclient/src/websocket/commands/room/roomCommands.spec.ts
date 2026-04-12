@@ -18,7 +18,8 @@ import { RoomPersistence } from '../../persistence';
 
 const { getLastSendOpts, invokeOnSuccess } = makeCallbackHelpers(
   BackendService.sendRoomCommand as jest.Mock,
-  3  // sendRoomCommand(roomId, commandName, params, options) — options at index 3
+  // sendRoomCommand(roomId, commandName, params, options) — options at index 3
+  3
 );
 
 beforeEach(() => jest.clearAllMocks());

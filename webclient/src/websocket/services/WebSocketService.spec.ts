@@ -131,7 +131,7 @@ describe('WebSocketService', () => {
       const startSpy = jest.spyOn((service as any).keepAliveService, 'startPingLoop');
       service.connect({ host: 'h', port: 1 } as any, 'ws');
       mockInstance.onopen();
-      const pingCb = startSpy.mock.calls[0][1];
+      const pingCb = startSpy.mock.calls[0][1] as (done: Function) => void;
       const done = jest.fn();
       pingCb(done);
       expect(mockWebClient.keepAlive).toHaveBeenCalledWith(done);
@@ -212,7 +212,8 @@ describe('WebSocketService', () => {
 
     it('returns false when readyState does not match', () => {
       const service = createConnectedService();
-      mockInstance.readyState = 3; // CLOSED
+      // CLOSED
+      mockInstance.readyState = 3;
       expect(service.checkReadyState(WebSocket.OPEN)).toBe(false);
     });
 

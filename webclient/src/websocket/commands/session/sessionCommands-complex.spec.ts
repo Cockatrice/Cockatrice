@@ -360,7 +360,9 @@ describe('forgotPasswordChallenge', () => {
 
   it('sends Command_ForgotPasswordChallenge', () => {
     forgotPasswordChallenge({ userName: 'alice', email: 'a@b.com' } as any);
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith('Command_ForgotPasswordChallenge', expect.any(Object), expect.any(Object));
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_ForgotPasswordChallenge', expect.any(Object), expect.any(Object)
+    );
   });
 
   it('onSuccess calls resetPassword and disconnect', () => {

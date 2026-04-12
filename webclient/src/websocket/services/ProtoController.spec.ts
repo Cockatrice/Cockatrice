@@ -23,7 +23,7 @@ describe('ProtoController', () => {
 
     it('calls initialized when callback succeeds', () => {
       const loadSpy = jest.spyOn(protobuf.Root.prototype, 'load').mockImplementation(
-        (_files: any, _opts: any, cb: any) => cb(null)
+        ((_files: any, _opts: any, cb: any) => cb(null)) as any
       );
       ProtoController.load();
       expect(SessionPersistence.initialized).toHaveBeenCalled();
@@ -32,7 +32,7 @@ describe('ProtoController', () => {
 
     it('throws when callback receives an error', () => {
       const loadSpy = jest.spyOn(protobuf.Root.prototype, 'load').mockImplementation(
-        (_files: any, _opts: any, cb: any) => cb(new Error('load failed'))
+        ((_files: any, _opts: any, cb: any) => cb(new Error('load failed'))) as any
       );
       expect(() => ProtoController.load()).toThrow('load failed');
       loadSpy.mockRestore();

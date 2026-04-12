@@ -170,7 +170,9 @@ describe('deckNewDir', () => {
 
   it('sends Command_DeckNewDir', () => {
     deckNewDir('/path', 'dir');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith('Command_DeckNewDir', { path: '/path', dirName: 'dir' }, expect.any(Object));
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_DeckNewDir', { path: '/path', dirName: 'dir' }, expect.any(Object)
+    );
   });
 
   it('calls createServerDeckDir on success', () => {
@@ -295,7 +297,9 @@ describe('message', () => {
 
   it('sends Command_Message', () => {
     message('bob', 'hi');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith('Command_Message', { userName: 'bob', message: 'hi' }, expect.any(Object));
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_Message', { userName: 'bob', message: 'hi' }, expect.any(Object)
+    );
   });
 
   it('calls directMessageSent on success', () => {
@@ -363,7 +367,9 @@ describe('replayModifyMatch', () => {
 
   it('sends Command_ReplayModifyMatch', () => {
     replayModifyMatch(7, true);
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith('Command_ReplayModifyMatch', { gameId: 7, doNotHide: true }, expect.any(Object));
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_ReplayModifyMatch', { gameId: 7, doNotHide: true }, expect.any(Object)
+    );
   });
 
   it('calls replayModifyMatch on success', () => {
@@ -379,12 +385,16 @@ describe('addToList / addToBuddyList / addToIgnoreList', () => {
 
   it('addToBuddyList sends Command_AddToList with list=buddy', () => {
     addToBuddyList('alice');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith('Command_AddToList', { list: 'buddy', userName: 'alice' }, expect.any(Object));
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_AddToList', { list: 'buddy', userName: 'alice' }, expect.any(Object)
+    );
   });
 
   it('addToIgnoreList sends Command_AddToList with list=ignore', () => {
     addToIgnoreList('bob');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith('Command_AddToList', { list: 'ignore', userName: 'bob' }, expect.any(Object));
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_AddToList', { list: 'ignore', userName: 'bob' }, expect.any(Object)
+    );
   });
 
   it('onSuccess calls SessionPersistence.addToList', () => {
@@ -400,12 +410,16 @@ describe('removeFromList / removeFromBuddyList / removeFromIgnoreList', () => {
 
   it('removeFromBuddyList sends Command_RemoveFromList with list=buddy', () => {
     removeFromBuddyList('alice');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith('Command_RemoveFromList', { list: 'buddy', userName: 'alice' }, expect.any(Object));
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_RemoveFromList', { list: 'buddy', userName: 'alice' }, expect.any(Object)
+    );
   });
 
   it('removeFromIgnoreList sends Command_RemoveFromList with list=ignore', () => {
     removeFromIgnoreList('bob');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith('Command_RemoveFromList', { list: 'ignore', userName: 'bob' }, expect.any(Object));
+    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+      'Command_RemoveFromList', { list: 'ignore', userName: 'bob' }, expect.any(Object)
+    );
   });
 
   it('onSuccess calls SessionPersistence.removeFromList', () => {

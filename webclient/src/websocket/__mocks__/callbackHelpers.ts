@@ -19,7 +19,9 @@ export function makeCallbackHelpers(mockFn: jest.Mock, optsArgIndex = 2) {
 
   function invokeResponseCode(code: number, raw: any = { responseCode: code }) {
     const opts = getLastSendOpts();
-    if (opts?.onResponseCode?.[code]) opts.onResponseCode[code](raw);
+    if (opts?.onResponseCode?.[code]) {
+      opts.onResponseCode[code](raw);
+    }
   }
 
   function invokeOnError(code: number = 99, raw: any = {}) {
@@ -28,7 +30,9 @@ export function makeCallbackHelpers(mockFn: jest.Mock, optsArgIndex = 2) {
 
   function invokeCallback(callbackName: string, ...args: any[]) {
     const opts = getLastSendOpts();
-    if (opts?.[callbackName]) opts[callbackName](...args);
+    if (opts?.[callbackName]) {
+      opts[callbackName](...args);
+    }
   }
 
   return { getLastSendOpts, invokeOnSuccess, invokeResponseCode, invokeOnError, invokeCallback };
