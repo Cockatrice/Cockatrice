@@ -349,7 +349,7 @@ jobs:
           submodules: recursive
 
       - name: Add msbuild to PATH
-        if: matrix.os == 'Windows'
+        if: runner.os == 'Windows'
         uses: microsoft/setup-msbuild@v3
         with:
           msbuild-architecture: x64
@@ -379,7 +379,7 @@ jobs:
         run: .ci/resolve_latest_aqt_qt_version.sh "${{ env.QT_VERSION }}"
 
       - name: Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries (${{ matrix.soc }} macOS)
-        if: matrix.os == 'macOS'
+        if: runner.os == 'macOS'
         id: restore_qt
         uses: actions/cache/restore@v5
         with:
@@ -389,7 +389,7 @@ jobs:
       # Using jurplel/install-qt-action to install Qt without using brew
       # qt build using vcpkg either just fails or takes too long to build
       - name: Install fat Qt ${{ steps.resolve_qt_version.outputs.version }} (${{ matrix.soc }} macOS)
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        if: runner.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ steps.resolve_qt_version.outputs.version }}
@@ -399,18 +399,18 @@ jobs:
           dir: ${{github.workspace}}
 
       - name: Thin Qt libraries (${{ matrix.soc }} macOS)
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        if: runner.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         run: .ci/thin_macos_qtlib.sh
 
       - name: Cache thin Qt libraries (${{ matrix.soc }} macOS)
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        if: runner.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: actions/cache/save@v5
         with:
           path: ${{ github.workspace }}/Qt
           key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
 
       - name: Install Qt ${{ steps.resolve_qt_version.outputs.version }} (Windows)
-        if: matrix.os == 'Windows'
+        if: runner.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
@@ -421,7 +421,7 @@ jobs:
           cache: true
 
       - name: Install NSIS
-        if: matrix.os == 'Windows'
+        if: runner.os == 'Windows'
         shell: bash
         run: choco install nsis
 
@@ -472,7 +472,7 @@ jobs:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Sign app bundle
-        if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
+        if: runner.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
         id: sign_macos
         env:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
@@ -526,7 +526,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload PDBs (Program Databases)
-        if: matrix.os == 'Windows' && github.ref_type != 'tag'
+        if: runner.os == 'Windows' && github.ref_type != 'tag'
         uses: actions/upload-artifact@v7
         with:
           name: ${{steps.build.outputs.name}}-PDBs
