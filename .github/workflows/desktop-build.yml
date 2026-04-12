@@ -355,7 +355,7 @@ jobs:
           msbuild-architecture: x64
 
       - name: Setup ccache
-        if: matrix.use_ccache == 1 && matrix.os == 'macOS'
+        if: matrix.use_ccache == 1 && runner.os == 'macOS'
         run: brew install ccache
 
       - name: Restore compiler cache (ccache)
