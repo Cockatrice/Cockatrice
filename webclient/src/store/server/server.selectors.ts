@@ -16,5 +16,7 @@ export const Selectors = {
   getUsers: ({ server }: State) => server.users,
   getLogs: ({ server }: State) => server.logs,
   getBuddyList: ({ server }: State) => server.buddyList,
-  getIgnoreList: ({ server }: State) => server.ignoreList
+  getIgnoreList: ({ server }: State) => server.ignoreList,
+  getReplays: ({ server }: State) => server.replays,
+  getBackendDecks: ({ server }: State) => server.backendDecks,
 }

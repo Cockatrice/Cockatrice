@@ -23,7 +23,7 @@ export class ModeratorService {
     ModeratorCommands.viewLogHistory(filters);
   }
 
-  static warnUser(userName: string, reason: string, clientid?: string, removeMessage?: boolean): void {
-    ModeratorCommands.warnUser(userName, reason, clientid, removeMessage);
+  static warnUser(userName: string, reason: string, clientid?: string, removeMessages?: number): void {
+    ModeratorCommands.warnUser(userName, reason, clientid, removeMessages);
   }
 }

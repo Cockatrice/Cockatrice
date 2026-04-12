@@ -1,4 +1,4 @@
-import { Game, NotificationType, Room, User } from 'types';
+import { Game, NotificationType, ReplayMatch, Room, User } from 'types';
 
 export interface AddToListData {
   listName: string;
@@ -13,6 +13,8 @@ export interface ConnectionClosedData {
 
 export interface GameJoinedData {
   gameInfo: Game;
+  gameTypes: any[];
+  hostId: number;
   playerId: number;
   spectator: boolean;
   resuming: boolean;
@@ -75,4 +77,14 @@ export interface UserMessageData {
   senderName: string;
   receiverName: string;
   message: string;
+}
+
+export interface ReplayAddedData {
+  matchInfo: ReplayMatch;
+}
+
+export interface ServerCompleteListData {
+  serverId: number;
+  userList: User[];
+  roomList: Room[];
 }

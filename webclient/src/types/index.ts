@@ -16,3 +16,4 @@ export * from './logs';
 export * from './session';
 export * from './deckList';
 export * from './moderator';
+export * from './replay';
