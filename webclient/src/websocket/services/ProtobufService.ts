@@ -1,4 +1,4 @@
-import { CommonEvents, GameEvents, RoomEvents, SessionEvents } from '../events';
+import { GameEvents, RoomEvents, SessionEvents } from '../events';
 import { WebClient } from '../WebClient';
 import { SessionCommands } from 'websocket';
 import { ProtoController } from './ProtoController';
@@ -119,10 +119,6 @@ export class ProtobufService {
     }
   }
 
-  private processCommonEvent(response: any, raw: any) {
-    this.processEvent(response, CommonEvents, raw);
-  }
-
   private processRoomEvent(response: any, raw: any) {
     this.processEvent(response, RoomEvents, raw);
   }
@@ -147,23 +143,11 @@ export class ProtobufService {
         forcedByJudge: forcedByJudge ?? 0,
       };
 
-      // Try registered game event handlers first, then common event handlers
-      let handled = false;
       for (const key of Object.keys(GameEvents)) {
         const payload = event[key];
         if (payload !== undefined && payload !== null) {
           (GameEvents[key] as Function)(payload, meta);
-          handled = true;
           break;
-        }
-      }
-      if (!handled) {
-        for (const key of Object.keys(CommonEvents)) {
-          const payload = event[key];
-          if (payload !== undefined && payload !== null) {
-            (CommonEvents[key] as Function)(payload, meta);
-            break;
-          }
         }
       }
     }
@@ -173,7 +157,7 @@ export class ProtobufService {
     for (const event in events) {
       const payload = response[event];
 
-      if (payload) {
+      if (payload !== undefined && payload !== null) {
         events[event](payload, raw);
         return;
       }

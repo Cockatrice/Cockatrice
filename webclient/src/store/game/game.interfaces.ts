@@ -17,6 +17,7 @@ export interface GameEntry {
   localPlayerId: number;
   spectator: boolean;
   judge: boolean;
+  resuming: boolean;
   started: boolean;
   activePlayerId: number;
   activePhase: number;

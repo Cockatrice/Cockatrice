@@ -3,6 +3,7 @@ import { StatusEnum, WebSocketConnectOptions } from 'types';
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
 
+import { GameDispatch } from 'store';
 import { RoomPersistence, SessionPersistence } from './persistence';
 
 export class WebClient {
@@ -79,6 +80,7 @@ export class WebClient {
   }
 
   private clearStores() {
+    GameDispatch.clearStore();
     RoomPersistence.clearStore();
     SessionPersistence.clearStore();
   }

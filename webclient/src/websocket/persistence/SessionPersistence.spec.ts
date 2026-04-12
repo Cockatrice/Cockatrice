@@ -37,7 +37,6 @@ jest.mock('store', () => ({
     accountPasswordChange: jest.fn(),
     accountEditChanged: jest.fn(),
     accountImageChanged: jest.fn(),
-    directMessageSent: jest.fn(),
     getUserInfo: jest.fn(),
     notifyUser: jest.fn(),
     serverShutdown: jest.fn(),
@@ -53,6 +52,7 @@ jest.mock('store', () => ({
     replayAdded: jest.fn(),
     replayModifyMatch: jest.fn(),
     replayDeleteMatch: jest.fn(),
+    gamesOfUser: jest.fn(),
   },
   GameDispatch: {
     gameJoined: jest.fn(),
@@ -68,6 +68,7 @@ jest.mock('../utils/NormalizeService', () => ({
   __esModule: true,
   default: {
     normalizeBannedUserError: jest.fn((r: string, t: number) => `banned:${r}:${t}`),
+    normalizeGameObject: jest.fn(),
   },
 }));
 
@@ -291,28 +292,33 @@ describe('SessionPersistence', () => {
     expect(ServerDispatch.accountImageChanged).toHaveBeenCalledWith({ avatarBmp: buf });
   });
 
-  it('directMessageSent passes userName and message', () => {
-    SessionPersistence.directMessageSent('bob', 'hi');
-    expect(ServerDispatch.directMessageSent).toHaveBeenCalledWith('bob', 'hi');
-  });
-
   it('getUserInfo passes userInfo', () => {
     const user = { name: 'u' } as any;
     SessionPersistence.getUserInfo(user);
     expect(ServerDispatch.getUserInfo).toHaveBeenCalledWith(user);
   });
 
-  it('getGamesOfUser logs to console', () => {
-    const spy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    SessionPersistence.getGamesOfUser('user1', {});
-    expect(spy).toHaveBeenCalled();
-    spy.mockRestore();
+  it('getGamesOfUser normalizes game list and dispatches gamesOfUser', () => {
+    const gt = { gameTypeId: 1, description: 'Standard' };
+    const room = { gametypeList: [gt] };
+    const game = { gameId: 5, roomId: 1, gameTypes: [1], description: 'My Game', started: false };
+    SessionPersistence.getGamesOfUser('alice', { roomList: [room], gameList: [game] });
+    expect(NormalizeService.normalizeGameObject).toHaveBeenCalledWith(game, { 1: 'Standard' });
+    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', [game]);
+  });
+
+  it('getGamesOfUser handles empty response', () => {
+    SessionPersistence.getGamesOfUser('alice', {});
+    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', []);
   });
 
   it('gameJoined dispatches via GameDispatch.gameJoined', () => {
     const gameInfo = { gameId: 10, roomId: 2, description: 'test', started: false };
-    SessionPersistence.gameJoined({ gameInfo, hostId: 3, playerId: 4, spectator: false, judge: false } as any);
-    expect(GameDispatch.gameJoined).toHaveBeenCalledWith(10, expect.objectContaining({ gameId: 10, hostId: 3, localPlayerId: 4 }));
+    SessionPersistence.gameJoined({ gameInfo, hostId: 3, playerId: 4, spectator: false, judge: false, resuming: true } as any);
+    expect(GameDispatch.gameJoined).toHaveBeenCalledWith(
+      10,
+      expect.objectContaining({ gameId: 10, hostId: 3, localPlayerId: 4, resuming: true })
+    );
   });
 
   it('notifyUser passes notification', () => {

@@ -167,21 +167,26 @@ export class SessionPersistence {
     ServerDispatch.accountImageChanged({ avatarBmp });
   }
 
-  static directMessageSent(userName: string, message: string): void {
-    ServerDispatch.directMessageSent(userName, message);
-  }
-
   static getUserInfo(userInfo: User) {
     ServerDispatch.getUserInfo(userInfo);
   }
 
   static getGamesOfUser(userName: string, response: any): void {
-    // Response_GetGamesOfUser contains a gameList field — log for now until game layer is complete
-    console.log('getGamesOfUser', userName, response);
+    const gametypeMap: Record<number, string> = {};
+    (response.roomList || []).forEach((room: any) => {
+      (room.gametypeList || []).forEach((gt: any) => {
+        gametypeMap[gt.gameTypeId] = gt.description;
+      });
+    });
+    const games = (response.gameList || []).map((game: any) => {
+      NormalizeService.normalizeGameObject(game, gametypeMap);
+      return game;
+    });
+    ServerDispatch.gamesOfUser(userName, games);
   }
 
   static gameJoined(gameJoinedData: GameJoinedData): void {
-    const { gameInfo, hostId, playerId, spectator, judge } = gameJoinedData;
+    const { gameInfo, hostId, playerId, spectator, judge, resuming } = gameJoinedData;
     const gameEntry: GameEntry = {
       gameId: gameInfo.gameId,
       roomId: gameInfo.roomId,
@@ -190,6 +195,7 @@ export class SessionPersistence {
       localPlayerId: playerId,
       spectator,
       judge,
+      resuming,
       started: gameInfo.started,
       activePlayerId: -1,
       activePhase: -1,

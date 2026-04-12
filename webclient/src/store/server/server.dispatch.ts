@@ -1,7 +1,7 @@
 import { reset } from 'redux-form';
 import { Actions } from './server.actions';
 import { store } from 'store';
-import { DeckList, DeckStorageTreeItem, ReplayMatch, WebSocketConnectOptions } from 'types';
+import { DeckList, DeckStorageTreeItem, Game, ReplayMatch, WebSocketConnectOptions } from 'types';
 
 export const Dispatch = {
   initialized: () => {
@@ -141,9 +141,6 @@ export const Dispatch = {
   accountImageChanged: (user) => {
     store.dispatch(Actions.accountImageChanged(user));
   },
-  directMessageSent: (userName, message) => {
-    store.dispatch(Actions.directMessageSent(userName, message));
-  },
   getUserInfo: (userInfo) => {
     store.dispatch(Actions.getUserInfo(userInfo));
   },
@@ -215,5 +212,8 @@ export const Dispatch = {
   },
   deckDelete: (deckId: number) => {
     store.dispatch(Actions.deckDelete(deckId));
+  },
+  gamesOfUser: (userName: string, games: Game[]) => {
+    store.dispatch(Actions.gamesOfUser(userName, games));
   },
 }

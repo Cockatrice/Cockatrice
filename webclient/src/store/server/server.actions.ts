@@ -1,4 +1,4 @@
-import { DeckList, DeckStorageTreeItem, ReplayMatch, WebSocketConnectOptions } from 'types';
+import { DeckList, DeckStorageTreeItem, Game, ReplayMatch, WebSocketConnectOptions } from 'types';
 import { Types } from './server.types';
 
 export const Actions = {
@@ -91,7 +91,7 @@ export const Actions = {
     type: Types.REGISTRATION_REQUIRES_EMAIL,
   }),
   registrationSuccess: () => ({
-    type: Types.REGISTRATION_SUCCES,
+    type: Types.REGISTRATION_SUCCESS,
   }),
   registrationFailed: (error) => ({
     type: Types.REGISTRATION_FAILED,
@@ -156,11 +156,6 @@ export const Actions = {
   accountImageChanged: (user) => ({
     type: Types.ACCOUNT_IMAGE_CHANGED,
     user,
-  }),
-  directMessageSent: (userName, message) => ({
-    type: Types.DIRECT_MESSAGE_SENT,
-    userName,
-    message,
   }),
   getUserInfo: (userInfo) => ({
     type: Types.GET_USER_INFO,
@@ -239,4 +234,5 @@ export const Actions = {
   deckDelDir: (path: string) => ({ type: Types.DECK_DEL_DIR, path }),
   deckUpload: (path: string, treeItem: DeckStorageTreeItem) => ({ type: Types.DECK_UPLOAD, path, treeItem }),
   deckDelete: (deckId: number) => ({ type: Types.DECK_DELETE, deckId }),
+  gamesOfUser: (userName: string, games: Game[]) => ({ type: Types.GAMES_OF_USER, userName, games }),
 }

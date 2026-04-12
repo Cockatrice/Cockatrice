@@ -100,6 +100,7 @@ export function makeGameEntry(overrides: Partial<GameEntry> = {}): GameEntry {
     localPlayerId: 1,
     spectator: false,
     judge: false,
+    resuming: false,
     started: false,
     activePlayerId: 0,
     activePhase: 0,

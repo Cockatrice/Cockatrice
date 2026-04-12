@@ -149,6 +149,7 @@ export function makeServerState(overrides: Partial<ServerState> = {}): ServerSta
     adminNotes: {},
     replays: [],
     backendDecks: null,
+    gamesOfUser: {},
     ...overrides,
   };
 }

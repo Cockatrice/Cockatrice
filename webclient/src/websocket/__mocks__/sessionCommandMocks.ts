@@ -79,7 +79,6 @@ export function makeSessionPersistenceMock() {
     accountActivationSuccess: jest.fn(),
     accountActivationFailed: jest.fn(),
     updateStatus: jest.fn(),
-    directMessageSent: jest.fn(),
     addToList: jest.fn(),
     removeFromList: jest.fn(),
     deleteServerDeck: jest.fn(),

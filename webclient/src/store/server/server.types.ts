@@ -23,7 +23,7 @@ export const Types = {
   VIEW_LOGS: '[Server] View Logs',
   CLEAR_LOGS: '[Server] Clear Logs',
   REGISTRATION_REQUIRES_EMAIL: '[Server] Registration Requires Email',
-  REGISTRATION_SUCCES: '[Server] Registration Success',
+  REGISTRATION_SUCCESS: '[Server] Registration Success',
   REGISTRATION_FAILED: '[Server] Registration Failed',
   REGISTRATION_EMAIL_ERROR: '[Server] Registration Email Error',
   REGISTRATION_PASSWORD_ERROR: '[Server] Registration Password Error',
@@ -42,7 +42,6 @@ export const Types = {
   ACCOUNT_PASSWORD_CHANGE: '[Server] Account Password Change',
   ACCOUNT_EDIT_CHANGED: '[Server] Account Edit Changed',
   ACCOUNT_IMAGE_CHANGED: '[Server] Account Image Changed',
-  DIRECT_MESSAGE_SENT: '[Server] Direct Message Sent',
   GET_USER_INFO: '[Server] Get User Info',
   NOTIFY_USER: '[Server] Notify User',
   SERVER_SHUTDOWN: '[Server] Server Shutdown',
@@ -69,4 +68,6 @@ export const Types = {
   DECK_DEL_DIR: '[Server] Deck Del Dir',
   DECK_UPLOAD: '[Server] Deck Upload',
   DECK_DELETE: '[Server] Deck Delete',
+  // User games
+  GAMES_OF_USER: '[Server] Games Of User',
 };

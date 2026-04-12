@@ -1,5 +1,5 @@
 import {
-  WarnHistoryItem, BanHistoryItem, DeckList, LogItem, ReplayMatch, SortBy, User, UserSortField, WebSocketConnectOptions, WarnListItem
+  WarnHistoryItem, BanHistoryItem, DeckList, Game, LogItem, ReplayMatch, SortBy, User, UserSortField, WebSocketConnectOptions, WarnListItem
 } from 'types';
 import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
 
@@ -72,6 +72,7 @@ export interface ServerState {
   adminNotes: { [userName: string]: string };
   replays: ReplayMatch[];
   backendDecks: DeckList | null;
+  gamesOfUser: { [userName: string]: Game[] };
 }
 
 export interface ServerStateStatus {

@@ -302,11 +302,6 @@ describe('message', () => {
     );
   });
 
-  it('calls directMessageSent on success', () => {
-    message('bob', 'hi');
-    invokeOnSuccess();
-    expect(SessionPersistence.directMessageSent).toHaveBeenCalledWith('bob', 'hi');
-  });
 });
 
 describe('ping', () => {

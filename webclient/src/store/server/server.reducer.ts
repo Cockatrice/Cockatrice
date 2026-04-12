@@ -93,6 +93,7 @@ const initialState: ServerState = {
   adminNotes: {},
   replays: [],
   backendDecks: null,
+  gamesOfUser: {},
 };
 
 export const serverReducer = (state = initialState, action: any) => {
@@ -401,11 +402,12 @@ export const serverReducer = (state = initialState, action: any) => {
           if (user.name !== userName) {
             return user;
           }
-          const judgeFlag = shouldBeJudge ? UserLevelFlag.IsJudge : UserLevelFlag.IsNothing;
-          const modFlag = shouldBeMod ? UserLevelFlag.IsModerator : UserLevelFlag.IsNothing;
+          let newLevel = user.userLevel;
+          newLevel = shouldBeMod ? (newLevel | UserLevelFlag.IsModerator) : (newLevel & ~UserLevelFlag.IsModerator);
+          newLevel = shouldBeJudge ? (newLevel | UserLevelFlag.IsJudge) : (newLevel & ~UserLevelFlag.IsJudge);
           return {
             ...user,
-            userLevel: user.userLevel & (judgeFlag | modFlag)
+            userLevel: newLevel,
           }
         })
       };
@@ -472,6 +474,16 @@ export const serverReducer = (state = initialState, action: any) => {
         ...state,
         backendDecks: {
           root: removeByPath(state.backendDecks.root, splitPath(action.path)),
+        },
+      };
+    }
+    case Types.GAMES_OF_USER: {
+      const { userName, games } = action;
+      return {
+        ...state,
+        gamesOfUser: {
+          ...state.gamesOfUser,
+          [userName]: games,
         },
       };
     }

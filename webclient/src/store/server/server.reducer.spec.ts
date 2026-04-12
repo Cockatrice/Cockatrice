@@ -332,31 +332,39 @@ describe('Moderation', () => {
 describe('ADJUST_MOD', () => {
   const baseUserLevel = UserLevelFlag.IsUser | UserLevelFlag.IsRegistered | UserLevelFlag.IsModerator | UserLevelFlag.IsJudge;
 
-  it('shouldBeMod=true, shouldBeJudge=true → keeps IsModerator and IsJudge bits', () => {
+  it('shouldBeMod=true, shouldBeJudge=true → sets both bits, preserves IsUser|IsRegistered', () => {
     const state = makeServerState({ users: [makeUser({ name: 'Dan', userLevel: baseUserLevel })] });
     const result = serverReducer(state, { type: Types.ADJUST_MOD, userName: 'Dan', shouldBeMod: true, shouldBeJudge: true });
-    // IsModerator(4) | IsJudge(16)
-    expect(result.users[0].userLevel).toBe(20);
+    // IsUser(1) | IsRegistered(2) | IsModerator(4) | IsJudge(16) = 23
+    expect(result.users[0].userLevel).toBe(23);
   });
 
-  it('shouldBeMod=true, shouldBeJudge=false → keeps only IsModerator bit', () => {
+  it('shouldBeMod=true, shouldBeJudge=false → sets IsModerator, clears IsJudge, preserves others', () => {
     const state = makeServerState({ users: [makeUser({ name: 'Dan', userLevel: baseUserLevel })] });
     const result = serverReducer(state, { type: Types.ADJUST_MOD, userName: 'Dan', shouldBeMod: true, shouldBeJudge: false });
-    // IsModerator(4)
-    expect(result.users[0].userLevel).toBe(4);
+    // IsUser(1) | IsRegistered(2) | IsModerator(4) = 7
+    expect(result.users[0].userLevel).toBe(7);
   });
 
-  it('shouldBeMod=false, shouldBeJudge=true → keeps only IsJudge bit', () => {
+  it('shouldBeMod=false, shouldBeJudge=true → clears IsModerator, sets IsJudge, preserves others', () => {
     const state = makeServerState({ users: [makeUser({ name: 'Dan', userLevel: baseUserLevel })] });
     const result = serverReducer(state, { type: Types.ADJUST_MOD, userName: 'Dan', shouldBeMod: false, shouldBeJudge: true });
-    // IsJudge(16)
-    expect(result.users[0].userLevel).toBe(16);
+    // IsUser(1) | IsRegistered(2) | IsJudge(16) = 19
+    expect(result.users[0].userLevel).toBe(19);
   });
 
-  it('shouldBeMod=false, shouldBeJudge=false → clears both bits', () => {
+  it('shouldBeMod=false, shouldBeJudge=false → clears both bits, preserves IsUser|IsRegistered', () => {
     const state = makeServerState({ users: [makeUser({ name: 'Dan', userLevel: baseUserLevel })] });
     const result = serverReducer(state, { type: Types.ADJUST_MOD, userName: 'Dan', shouldBeMod: false, shouldBeJudge: false });
-    expect(result.users[0].userLevel).toBe(0);
+    // IsUser(1) | IsRegistered(2) = 3
+    expect(result.users[0].userLevel).toBe(3);
+  });
+
+  it('shouldBeMod=true on IsUser|IsRegistered only → produces 7, not 4', () => {
+    const state = makeServerState({ users: [makeUser({ name: 'Dan', userLevel: UserLevelFlag.IsUser | UserLevelFlag.IsRegistered })] });
+    const result = serverReducer(state, { type: Types.ADJUST_MOD, userName: 'Dan', shouldBeMod: true, shouldBeJudge: false });
+    // IsUser(1) | IsRegistered(2) | IsModerator(4) = 7
+    expect(result.users[0].userLevel).toBe(7);
   });
 
   it('non-matching users are left unchanged', () => {
@@ -522,5 +530,31 @@ describe('Deck Storage', () => {
     const state = makeServerState({ backendDecks: { root: { items: [parent] } } });
     const result = serverReducer(state, { type: Types.DECK_DEL_DIR, path: 'parent/child' });
     expect(result.backendDecks.root.items[0].folder.items).toHaveLength(0);
+  });
+});
+
+// ── GAMES_OF_USER ─────────────────────────────────────────────────────────────
+
+describe('GAMES_OF_USER', () => {
+  it('stores games keyed by userName', () => {
+    const games = [{ gameId: 5, roomId: 1 }] as any;
+    const state = makeServerState();
+    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games });
+    expect(result.gamesOfUser['alice']).toBe(games);
+  });
+
+  it('overwrites previous games for same user', () => {
+    const old = [{ gameId: 1 }] as any;
+    const fresh = [{ gameId: 2 }] as any;
+    const state = makeServerState({ gamesOfUser: { alice: old } });
+    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games: fresh });
+    expect(result.gamesOfUser['alice']).toBe(fresh);
+  });
+
+  it('does not affect other users\' entries', () => {
+    const bobGames = [{ gameId: 3 }] as any;
+    const state = makeServerState({ gamesOfUser: { bob: bobGames } });
+    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games: [] });
+    expect(result.gamesOfUser['bob']).toBe(bobGames);
   });
 });

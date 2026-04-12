@@ -10,7 +10,6 @@ jest.mock('../commands/session', () => ({
 }));
 
 jest.mock('../events', () => ({
-  CommonEvents: { '.Event_Common.ext': jest.fn() },
   GameEvents: { '.Event_Game.ext': jest.fn() },
   RoomEvents: { '.Event_Room.ext': jest.fn() },
   SessionEvents: { '.Event_Session.ext': jest.fn() },
@@ -21,7 +20,7 @@ jest.mock('../WebClient');
 import { ProtobufService } from './ProtobufService';
 import { ProtoController } from './ProtoController';
 import { ping as sessionPing } from '../commands/session';
-import { GameEvents, CommonEvents } from '../events';
+import { GameEvents } from '../events';
 
 let mockSocket: any;
 let mockWebClient: any;
@@ -321,17 +320,6 @@ describe('ProtobufService', () => {
     });
   });
 
-  describe('processCommonEvent', () => {
-    it('delegates to processEvent with CommonEvents', () => {
-      const service = new ProtobufService(mockWebClient);
-      const processEvent = jest.spyOn(service as any, 'processEvent');
-      const response = { '.Event_Common.ext': { data: 1 } };
-      const raw = { extra: true };
-      (service as any).processCommonEvent(response, raw);
-      expect(processEvent).toHaveBeenCalledWith(response, CommonEvents, raw);
-    });
-  });
-
   describe('processGameEvent', () => {
     it('returns early when container has no eventList', () => {
       const service = new ProtobufService(mockWebClient);
@@ -354,19 +342,6 @@ describe('ProtobufService', () => {
       expect(gameEventHandler).toHaveBeenCalledWith(payload, expect.objectContaining({ gameId: 42, playerId: 5 }));
     });
 
-    it('falls back to CommonEvents handler when no GameEvents key matches', () => {
-      const service = new ProtobufService(mockWebClient);
-      const commonEventHandler = (CommonEvents as any)['.Event_Common.ext'] as jest.Mock;
-      const payload = { commonData: 2 };
-      (service as any).processGameEvent({
-        gameId: 7,
-        context: null,
-        secondsElapsed: 0,
-        forcedByJudge: 0,
-        eventList: [{ '.Event_Common.ext': payload, playerId: 3 }],
-      }, {});
-      expect(commonEventHandler).toHaveBeenCalledWith(payload, expect.objectContaining({ gameId: 7, playerId: 3 }));
-    });
   });
 
   describe('processEvent', () => {

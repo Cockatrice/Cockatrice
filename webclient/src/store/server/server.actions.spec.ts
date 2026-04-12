@@ -120,7 +120,7 @@ describe('Actions', () => {
   });
 
   it('registrationSuccess', () => {
-    expect(Actions.registrationSuccess()).toEqual({ type: Types.REGISTRATION_SUCCES });
+    expect(Actions.registrationSuccess()).toEqual({ type: Types.REGISTRATION_SUCCESS });
   });
 
   it('registrationFailed', () => {
@@ -201,14 +201,6 @@ describe('Actions', () => {
   it('accountImageChanged', () => {
     const user = makeUser();
     expect(Actions.accountImageChanged(user)).toEqual({ type: Types.ACCOUNT_IMAGE_CHANGED, user });
-  });
-
-  it('directMessageSent', () => {
-    expect(Actions.directMessageSent('Eve', 'hi')).toEqual({
-      type: Types.DIRECT_MESSAGE_SENT,
-      userName: 'Eve',
-      message: 'hi',
-    });
   });
 
   it('getUserInfo', () => {
@@ -352,5 +344,10 @@ describe('Actions', () => {
 
   it('deckDelete', () => {
     expect(Actions.deckDelete(42)).toEqual({ type: Types.DECK_DELETE, deckId: 42 });
+  });
+
+  it('gamesOfUser', () => {
+    const games = [{ gameId: 1 }] as any;
+    expect(Actions.gamesOfUser('alice', games)).toEqual({ type: Types.GAMES_OF_USER, userName: 'alice', games });
   });
 });

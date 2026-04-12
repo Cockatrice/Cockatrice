@@ -3,7 +3,7 @@ import { ProtoController } from '../../services/ProtoController';
 import { updateStatus } from '../../commands/session';
 import { ConnectionClosedData } from './interfaces';
 
-export function connectionClosed({ reason, reasonStr }: ConnectionClosedData): void {
+export function connectionClosed({ reason, reasonStr, endTime }: ConnectionClosedData): void {
   let message: string;
 
   // @TODO (5)
@@ -19,7 +19,9 @@ export function connectionClosed({ reason, reasonStr }: ConnectionClosedData): v
         message = 'There are too many concurrent connections from your address';
         break;
       case CloseReason.BANNED:
-        message = 'You are banned';
+        message = endTime > 0
+          ? `You are banned until ${new Date(endTime * 1000).toLocaleString()}`
+          : 'You are banned';
         break;
       case CloseReason.DEMOTED:
         message = 'You were demoted';

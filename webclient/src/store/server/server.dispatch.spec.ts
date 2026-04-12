@@ -250,11 +250,6 @@ describe('Dispatch', () => {
     expect(store.dispatch).toHaveBeenCalledWith(Actions.accountImageChanged(user));
   });
 
-  it('directMessageSent dispatches correctly', () => {
-    Dispatch.directMessageSent('Eve', 'hi');
-    expect(store.dispatch).toHaveBeenCalledWith(Actions.directMessageSent('Eve', 'hi'));
-  });
-
   it('getUserInfo dispatches correctly', () => {
     const userInfo = makeUser({ name: 'Frank' });
     Dispatch.getUserInfo(userInfo);
@@ -384,5 +379,11 @@ describe('Dispatch', () => {
   it('deckDelete dispatches correctly', () => {
     Dispatch.deckDelete(42);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.deckDelete(42));
+  });
+
+  it('gamesOfUser dispatches correctly', () => {
+    const games = [{ gameId: 1 }] as any;
+    Dispatch.gamesOfUser('alice', games);
+    expect(store.dispatch).toHaveBeenCalledWith(Actions.gamesOfUser('alice', games));
   });
 });
