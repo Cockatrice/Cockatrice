@@ -461,6 +461,7 @@ jobs:
           CMAKE_GENERATOR: ${{matrix.cmake_generator}}
           CMAKE_GENERATOR_PLATFORM: ${{matrix.cmake_generator_platform}}
           USE_CCACHE: ${{matrix.use_ccache}}
+          CCACHE_EVICTION_AGE: ${{github.ref == 'refs/heads/master' && matrix.ccache_eviction_age || ''}}
           VCPKG_DISABLE_METRICS: 1
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           # macOS-specific environment variables, will be ignored on Windows
@@ -470,7 +471,6 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
-          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
         run: .ci/compile.sh --server --test --vcpkg
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
