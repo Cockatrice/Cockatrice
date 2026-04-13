@@ -1009,6 +1009,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     auto *lpGeneralGrid = new QGridLayout;
     auto *lpSpoilerGrid = new QGridLayout;
+    auto *lpImageBackupGrid = new QGridLayout;
 
     mcDownloadSpoilersCheckBox.setChecked(SettingsCache::instance().getDownloadSpoilersStatus());
 
@@ -1075,6 +1076,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     networkRedirectCacheTtlEdit.setSingleStep(1);
     networkRedirectCacheTtlEdit.setValue(SettingsCache::instance().getRedirectCacheTtl());
 
+    // Image Backup
     saveCardImagesToLocalStorageCheckBox.setChecked(SettingsCache::instance().getSaveCardImagesToLocalStorage());
     connect(&saveCardImagesToLocalStorageCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setSaveCardImagesToLocalStorage);
@@ -1098,6 +1100,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
                 SettingsCache::instance().setLocalCardImageStorageNamingScheme(scheme);
             });
 
+    connect(&clearBackupsButton, &QPushButton::clicked, this, &DeckEditorSettingsPage::clearImageBackupsButtonClicked);
+
     auto networkCacheLayout = new QHBoxLayout;
     networkCacheLayout->addStretch();
     networkCacheLayout->addWidget(&networkCacheLabel);
@@ -1113,14 +1117,6 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     pixmapCacheLayout->addWidget(&pixmapCacheLabel);
     pixmapCacheLayout->addWidget(&pixmapCacheEdit);
 
-    auto saveCardImagesToLocalStorageLayout = new QHBoxLayout;
-    saveCardImagesToLocalStorageLayout->addWidget(&saveCardImagesToLocalStorageLabel);
-    saveCardImagesToLocalStorageLayout->addWidget(&saveCardImagesToLocalStorageCheckBox);
-
-    auto localCardImageStorageNamingSchemeLayout = new QHBoxLayout;
-    localCardImageStorageNamingSchemeLayout->addWidget(&localCardImageStorageNamingSchemeLabel);
-    localCardImageStorageNamingSchemeLayout->addWidget(localCardImageStorageNamingSchemeComboBox);
-
     // Top Layout
     lpGeneralGrid->addWidget(&picDownloadCheckBox, 0, 0);
     lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
@@ -1128,10 +1124,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpGeneralGrid->addLayout(networkCacheLayout, 2, 1);
     lpGeneralGrid->addLayout(networkRedirectCacheLayout, 3, 0);
     lpGeneralGrid->addLayout(pixmapCacheLayout, 3, 1);
-    lpGeneralGrid->addLayout(saveCardImagesToLocalStorageLayout, 4, 0, 1, 2);
-    lpGeneralGrid->addLayout(localCardImageStorageNamingSchemeLayout, 5, 0, 1, 2);
-    lpGeneralGrid->addWidget(&urlLinkLabel, 7, 0);
-    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 7, 1);
+    lpGeneralGrid->addWidget(&urlLinkLabel, 4, 0);
+    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 4, 1);
 
     // Spoiler Layout
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
@@ -1141,6 +1135,12 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(&lastUpdatedLabel, 2, 0);
     lpSpoilerGrid->addWidget(updateNowButton, 2, 1);
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
+
+    // Image Backup Layout
+    lpImageBackupGrid->addWidget(&saveCardImagesToLocalStorageCheckBox, 0, 0, 1, 2);
+    lpImageBackupGrid->addWidget(&localCardImageStorageNamingSchemeLabel, 1, 0);
+    lpImageBackupGrid->addWidget(localCardImageStorageNamingSchemeComboBox, 1, 1);
+    lpImageBackupGrid->addWidget(&clearBackupsButton, 3, 1);
 
     // On a change to the checkbox, hide/un-hide the other fields
     connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, &SettingsCache::instance(),
@@ -1159,9 +1159,13 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     mpSpoilerGroupBox = new QGroupBox;
     mpSpoilerGroupBox->setLayout(lpSpoilerGrid);
 
+    mpImageBackupGroupBox = new QGroupBox;
+    mpImageBackupGroupBox->setLayout(lpImageBackupGrid);
+
     auto *lpMainLayout = new QVBoxLayout;
     lpMainLayout->addWidget(mpGeneralGroupBox);
     lpMainLayout->addWidget(mpSpoilerGroupBox);
+    lpMainLayout->addWidget(mpImageBackupGroupBox);
 
     setLayout(lpMainLayout);
 
@@ -1180,7 +1184,11 @@ void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
 void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
 {
     CardPictureLoader::clearNetworkCache();
+    QMessageBox::information(this, tr("Success"), tr("Cached card pictures have been reset."));
+}
 
+void DeckEditorSettingsPage::clearImageBackupsButtonClicked()
+{
     QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics";
 
     QDir dir(picsPath);
@@ -1303,6 +1311,7 @@ void DeckEditorSettingsPage::retranslateUi()
 {
     mpGeneralGroupBox->setTitle(tr("URL Download Priority"));
     mpSpoilerGroupBox->setTitle(tr("Spoilers"));
+    mpImageBackupGroupBox->setTitle(tr("Image Backup"));
     mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
     lastUpdatedLabel.setText(tr("Last Change") + ": " + getLastUpdateTime());
@@ -1311,7 +1320,8 @@ void DeckEditorSettingsPage::retranslateUi()
                                 tr("Do not close settings until manual update is complete"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
-    clearDownloadedPicsButton.setText(tr("Delete Downloaded Images"));
+    clearDownloadedPicsButton.setText(tr("Delete Cached Images"));
+    clearBackupsButton.setText(tr("Delete Saved Images"));
     resetDownloadURLs.setText(tr("Reset Download URLs"));
     networkCacheLabel.setText(tr("Network Cache Size:"));
     networkCacheEdit.setToolTip(tr("On-disk cache for downloaded pictures"));
@@ -1319,8 +1329,8 @@ void DeckEditorSettingsPage::retranslateUi()
     networkRedirectCacheTtlEdit.setToolTip(tr("How long cached redirects for urls are valid for."));
     pixmapCacheLabel.setText(tr("Picture Cache Size:"));
     pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));
-    saveCardImagesToLocalStorageLabel.setText(tr("Save downloaded images to local storage"));
-    localCardImageStorageNamingSchemeLabel.setText(tr("Save downloaded images using this naming scheme:"));
+    saveCardImagesToLocalStorageCheckBox.setText(tr("Back up downloaded images to local storage"));
+    localCardImageStorageNamingSchemeLabel.setText(tr("Naming scheme:"));
     updateNowButton->setText(tr("Update Spoilers"));
     aAdd->setText(tr("Add New URL"));
     aEdit->setText(tr("Edit URL"));

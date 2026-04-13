@@ -215,9 +215,11 @@ private slots:
     void actEditURL();
     void clearDownloadedPicsButtonClicked();
     void resetDownloadedURLsButtonClicked();
+    void clearImageBackupsButtonClicked();
 
 private:
     QPushButton clearDownloadedPicsButton;
+    QPushButton clearBackupsButton;
     QPushButton resetDownloadURLs;
     QLabel urlLinkLabel;
     QCheckBox picDownloadCheckBox;
@@ -227,6 +229,8 @@ private:
     QLabel msDownloadSpoilersLabel;
     QGroupBox *mpGeneralGroupBox;
     QGroupBox *mpSpoilerGroupBox;
+    QGroupBox *mpImageBackupGroupBox;
+
     QLineEdit *mpSpoilerSavePathLineEdit;
     QLabel mcSpoilerSaveLabel;
     QLabel lastUpdatedLabel;
@@ -240,7 +244,6 @@ private:
     QSpinBox pixmapCacheEdit;
     QLabel pixmapCacheLabel;
     QCheckBox saveCardImagesToLocalStorageCheckBox;
-    QLabel saveCardImagesToLocalStorageLabel;
     QLabel localCardImageStorageNamingSchemeLabel;
     QComboBox *localCardImageStorageNamingSchemeComboBox;
 };
