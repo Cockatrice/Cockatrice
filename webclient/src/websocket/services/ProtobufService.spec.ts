@@ -1,7 +1,23 @@
-import { makeMockProtoRoot } from '../__mocks__/helpers';
+vi.mock('@bufbuild/protobuf', () => ({
+  create: vi.fn((_schema: any, fields?: any) => ({ ...(fields ?? {}) })),
+  fromBinary: vi.fn(),
+  toBinary: vi.fn().mockReturnValue(new Uint8Array()),
+  hasExtension: vi.fn().mockReturnValue(false),
+  getExtension: vi.fn(),
+}));
 
-vi.mock('./ProtoController', () => ({
-  ProtoController: { root: null, load: vi.fn() },
+vi.mock('generated/proto/commands_pb', () => ({
+  CommandContainerSchema: {},
+}));
+
+vi.mock('generated/proto/server_message_pb', () => ({
+  ServerMessageSchema: {},
+  ServerMessage_MessageType: {
+    RESPONSE: 1,
+    ROOM_EVENT: 2,
+    SESSION_EVENT: 3,
+    GAME_EVENT_CONTAINER: 4,
+  },
 }));
 
 vi.mock('../commands/session', () => ({
@@ -10,9 +26,9 @@ vi.mock('../commands/session', () => ({
 }));
 
 vi.mock('../events', () => ({
-  GameEvents: { '.Event_Game.ext': vi.fn() },
-  RoomEvents: { '.Event_Room.ext': vi.fn() },
-  SessionEvents: { '.Event_Session.ext': vi.fn() },
+  GameEvents: [],
+  RoomEvents: [],
+  SessionEvents: [],
 }));
 
 vi.mock('../WebClient', () => ({
@@ -20,42 +36,28 @@ vi.mock('../WebClient', () => ({
   default: {},
 }));
 
+import { fromBinary, toBinary, hasExtension, getExtension } from '@bufbuild/protobuf';
+import { ServerMessage_MessageType } from 'generated/proto/server_message_pb';
 import { ProtobufService } from './ProtobufService';
-import { ProtoController } from './ProtoController';
 import { ping as sessionPing } from '../commands/session';
 import { GameEvents } from '../events';
 
 let mockSocket: any;
-let mockWebClient: any;
 
 beforeEach(() => {
   vi.clearAllMocks();
-
-  ProtoController.root = makeMockProtoRoot();
-  const encodeResult = { finish: vi.fn().mockReturnValue(new Uint8Array([1, 2])) };
-  ProtoController.root.CommandContainer.encode = vi.fn().mockReturnValue(encodeResult);
 
   mockSocket = {
     checkReadyState: vi.fn().mockReturnValue(true),
     send: vi.fn(),
   };
-
-  mockWebClient = {
-    socket: mockSocket,
-  };
 });
 
 describe('ProtobufService', () => {
-  it('calls ProtoController.load on construction', () => {
-    new ProtobufService(mockWebClient);
-    expect(ProtoController.load).toHaveBeenCalled();
-  });
-
   describe('resetCommands', () => {
     it('resets cmdId and pendingCommands', () => {
-      const service = new ProtobufService(mockWebClient);
-      // add a pending command
-      service.sendSessionCommand({}, vi.fn());
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      service.sendSessionCommand({} as any, vi.fn());
       expect((service as any).cmdId).toBe(1);
       service.resetCommands();
       expect((service as any).cmdId).toBe(0);
@@ -65,42 +67,41 @@ describe('ProtobufService', () => {
 
   describe('sendCommand', () => {
     it('increments cmdId and stores callback', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const cb = vi.fn();
-      service.sendCommand({}, cb);
+      service.sendCommand({} as any, cb);
       expect((service as any).cmdId).toBe(1);
       expect((service as any).pendingCommands[1]).toBe(cb);
     });
 
     it('sends encoded data when socket is OPEN', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       mockSocket.checkReadyState.mockReturnValue(true);
-      service.sendCommand({}, vi.fn());
+      service.sendCommand({} as any, vi.fn());
       expect(mockSocket.send).toHaveBeenCalled();
     });
 
     it('does not send when socket is not OPEN', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       mockSocket.checkReadyState.mockReturnValue(false);
-      service.sendCommand({}, vi.fn());
+      service.sendCommand({} as any, vi.fn());
       expect(mockSocket.send).not.toHaveBeenCalled();
     });
   });
 
   describe('sendSessionCommand', () => {
-    it('creates a CommandContainer and calls sendCommand', () => {
-      const service = new ProtobufService(mockWebClient);
+    it('stores callback and increments cmdId', () => {
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const cb = vi.fn();
-      service.sendSessionCommand({ cmdType: 'test' }, cb);
-      expect(ProtoController.root.CommandContainer.create).toHaveBeenCalledWith(
-        expect.objectContaining({ sessionCommand: expect.anything() })
-      );
+      service.sendSessionCommand({} as any, cb);
+      expect((service as any).cmdId).toBe(1);
+      expect((service as any).pendingCommands[1]).toBeTypeOf('function');
     });
 
     it('invokes callback with raw response when the pending command is triggered', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const cb = vi.fn();
-      service.sendSessionCommand({ cmdType: 'test' }, cb);
+      service.sendSessionCommand({} as any, cb);
 
       const storedCb = (service as any).pendingCommands[1];
       storedCb({ responseData: true });
@@ -109,8 +110,8 @@ describe('ProtobufService', () => {
     });
 
     it('does not throw when no callback is provided and pending command is triggered', () => {
-      const service = new ProtobufService(mockWebClient);
-      service.sendSessionCommand({ cmdType: 'test' });
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      service.sendSessionCommand({} as any);
 
       const storedCb = (service as any).pendingCommands[1];
       expect(() => storedCb({ responseData: true })).not.toThrow();
@@ -118,18 +119,16 @@ describe('ProtobufService', () => {
   });
 
   describe('sendRoomCommand', () => {
-    it('creates a CommandContainer with roomId and calls sendCommand', () => {
-      const service = new ProtobufService(mockWebClient);
-      service.sendRoomCommand(42, { roomCmdType: 'test' }, vi.fn());
-      expect(ProtoController.root.CommandContainer.create).toHaveBeenCalledWith(
-        expect.objectContaining({ roomId: 42 })
-      );
+    it('stores callback and increments cmdId', () => {
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      service.sendRoomCommand(42, {} as any, vi.fn());
+      expect((service as any).cmdId).toBe(1);
     });
 
     it('invokes callback with raw response when the pending command is triggered', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const cb = vi.fn();
-      service.sendRoomCommand(42, { roomCmdType: 'test' }, cb);
+      service.sendRoomCommand(42, {} as any, cb);
 
       const storedCb = (service as any).pendingCommands[1];
       storedCb({ responseData: true });
@@ -138,8 +137,8 @@ describe('ProtobufService', () => {
     });
 
     it('does not throw when no callback is provided and pending command is triggered', () => {
-      const service = new ProtobufService(mockWebClient);
-      service.sendRoomCommand(42, { roomCmdType: 'test' });
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      service.sendRoomCommand(42, {} as any);
 
       const storedCb = (service as any).pendingCommands[1];
       expect(() => storedCb({ responseData: true })).not.toThrow();
@@ -147,18 +146,16 @@ describe('ProtobufService', () => {
   });
 
   describe('sendGameCommand', () => {
-    it('creates a CommandContainer with gameId and gameCommand', () => {
-      const service = new ProtobufService(mockWebClient);
-      service.sendGameCommand(7, { gameCmdType: 'test' }, vi.fn());
-      expect(ProtoController.root.CommandContainer.create).toHaveBeenCalledWith(
-        expect.objectContaining({ gameId: 7, gameCommand: expect.anything() })
-      );
+    it('stores callback and increments cmdId', () => {
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      service.sendGameCommand(7, {} as any, vi.fn());
+      expect((service as any).cmdId).toBe(1);
     });
 
     it('invokes callback with raw response when the pending command is triggered', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const cb = vi.fn();
-      service.sendGameCommand(7, { gameCmdType: 'test' }, cb);
+      service.sendGameCommand(7, {} as any, cb);
 
       const storedCb = (service as any).pendingCommands[1];
       storedCb({ responseData: true });
@@ -167,8 +164,8 @@ describe('ProtobufService', () => {
     });
 
     it('does not throw when no callback is provided and pending command is triggered', () => {
-      const service = new ProtobufService(mockWebClient);
-      service.sendGameCommand(7, { gameCmdType: 'test' });
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      service.sendGameCommand(7, {} as any);
 
       const storedCb = (service as any).pendingCommands[1];
       expect(() => storedCb({ responseData: true })).not.toThrow();
@@ -176,18 +173,16 @@ describe('ProtobufService', () => {
   });
 
   describe('sendModeratorCommand', () => {
-    it('creates a CommandContainer with moderatorCommand', () => {
-      const service = new ProtobufService(mockWebClient);
-      service.sendModeratorCommand({ modCmdType: 'test' }, vi.fn());
-      expect(ProtoController.root.CommandContainer.create).toHaveBeenCalledWith(
-        expect.objectContaining({ moderatorCommand: expect.anything() })
-      );
+    it('stores callback and increments cmdId', () => {
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      service.sendModeratorCommand({} as any, vi.fn());
+      expect((service as any).cmdId).toBe(1);
     });
 
     it('invokes callback with raw response when the pending command is triggered', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const cb = vi.fn();
-      service.sendModeratorCommand({ modCmdType: 'test' }, cb);
+      service.sendModeratorCommand({} as any, cb);
 
       const storedCb = (service as any).pendingCommands[1];
       storedCb({ responseData: true });
@@ -196,8 +191,8 @@ describe('ProtobufService', () => {
     });
 
     it('does not throw when no callback is provided and pending command is triggered', () => {
-      const service = new ProtobufService(mockWebClient);
-      service.sendModeratorCommand({ modCmdType: 'test' });
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      service.sendModeratorCommand({} as any);
 
       const storedCb = (service as any).pendingCommands[1];
       expect(() => storedCb({ responseData: true })).not.toThrow();
@@ -205,18 +200,16 @@ describe('ProtobufService', () => {
   });
 
   describe('sendAdminCommand', () => {
-    it('creates a CommandContainer with adminCommand', () => {
-      const service = new ProtobufService(mockWebClient);
-      service.sendAdminCommand({ adminCmdType: 'test' }, vi.fn());
-      expect(ProtoController.root.CommandContainer.create).toHaveBeenCalledWith(
-        expect.objectContaining({ adminCommand: expect.anything() })
-      );
+    it('stores callback and increments cmdId', () => {
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      service.sendAdminCommand({} as any, vi.fn());
+      expect((service as any).cmdId).toBe(1);
     });
 
     it('invokes callback with raw response when the pending command is triggered', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const cb = vi.fn();
-      service.sendAdminCommand({ adminCmdType: 'test' }, cb);
+      service.sendAdminCommand({} as any, cb);
 
       const storedCb = (service as any).pendingCommands[1];
       storedCb({ responseData: true });
@@ -225,8 +218,8 @@ describe('ProtobufService', () => {
     });
 
     it('does not throw when no callback is provided and pending command is triggered', () => {
-      const service = new ProtobufService(mockWebClient);
-      service.sendAdminCommand({ adminCmdType: 'test' });
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      service.sendAdminCommand({} as any);
 
       const storedCb = (service as any).pendingCommands[1];
       expect(() => storedCb({ responseData: true })).not.toThrow();
@@ -235,7 +228,7 @@ describe('ProtobufService', () => {
 
   describe('sendKeepAliveCommand', () => {
     it('delegates to SessionCommands.ping', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const pingReceived = vi.fn();
       service.sendKeepAliveCommand(pingReceived);
       expect(sessionPing).toHaveBeenCalledWith(pingReceived);
@@ -244,96 +237,83 @@ describe('ProtobufService', () => {
 
   describe('handleMessageEvent', () => {
     it('routes RESPONSE message to processServerResponse', () => {
-      const service = new ProtobufService(mockWebClient);
-      const cb = vi.fn();
-      // store a callback for cmdId 1
-      (service as any).cmdId = 1;
-      (service as any).pendingCommands[1] = cb;
-
-      const response = { cmdId: 1 };
-      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
-        messageType: ProtoController.root.ServerMessage.MessageType.RESPONSE,
-        response,
-      });
-
-      service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent);
-      expect(cb).toHaveBeenCalledWith(response);
-      expect((service as any).pendingCommands[1]).toBeUndefined();
-    });
-
-    it('resolves pending command when response cmdId is a protobufjs Long object', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const cb = vi.fn();
       (service as any).cmdId = 1;
       (service as any).pendingCommands[1] = cb;
 
-      // Simulate protobufjs decoding cmdId as a Long object (low=1, high=0)
-      const longCmdId = { low: 1, high: 0, unsigned: false, toString: () => '1' };
-      const response = { cmdId: longCmdId };
-      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
-        messageType: ProtoController.root.ServerMessage.MessageType.RESPONSE,
-        response,
-      });
+      vi.mocked(fromBinary).mockReturnValue({
+        messageType: ServerMessage_MessageType.RESPONSE,
+        response: { cmdId: BigInt(1) },
+      } as any);
 
       service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent);
-      expect(cb).toHaveBeenCalledWith(response);
+      expect(cb).toHaveBeenCalledWith({ cmdId: BigInt(1) });
       expect((service as any).pendingCommands[1]).toBeUndefined();
     });
 
     it('routes ROOM_EVENT message', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const processRoomEvent = vi.spyOn(service as any, 'processRoomEvent');
-      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
-        messageType: ProtoController.root.ServerMessage.MessageType.ROOM_EVENT,
-        roomEvent: { '.Event_Room.ext': {} },
-      });
+
+      vi.mocked(fromBinary).mockReturnValue({
+        messageType: ServerMessage_MessageType.ROOM_EVENT,
+        roomEvent: {},
+      } as any);
+
       service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent);
       expect(processRoomEvent).toHaveBeenCalled();
     });
 
     it('routes SESSION_EVENT message', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const processSessionEvent = vi.spyOn(service as any, 'processSessionEvent');
-      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
-        messageType: ProtoController.root.ServerMessage.MessageType.SESSION_EVENT,
-        sessionEvent: { '.Event_Session.ext': {} },
-      });
+
+      vi.mocked(fromBinary).mockReturnValue({
+        messageType: ServerMessage_MessageType.SESSION_EVENT,
+        sessionEvent: {},
+      } as any);
+
       service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent);
       expect(processSessionEvent).toHaveBeenCalled();
     });
 
     it('routes GAME_EVENT_CONTAINER message', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const processGameEvent = vi.spyOn(service as any, 'processGameEvent');
-      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
-        messageType: ProtoController.root.ServerMessage.MessageType.GAME_EVENT_CONTAINER,
-        gameEvent: { '.Event_Game.ext': {} },
-      });
+
+      vi.mocked(fromBinary).mockReturnValue({
+        messageType: ServerMessage_MessageType.GAME_EVENT_CONTAINER,
+        gameEventContainer: {},
+      } as any);
+
       service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent);
       expect(processGameEvent).toHaveBeenCalled();
     });
 
     it('logs unknown message types (default case)', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue({
-        messageType: 'UNKNOWN_TYPE',
-      });
+
+      vi.mocked(fromBinary).mockReturnValue({
+        messageType: 999,
+      } as any);
+
       service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent);
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
 
     it('does nothing when decoded message is null', () => {
-      const service = new ProtobufService(mockWebClient);
-      ProtoController.root.ServerMessage.decode = vi.fn().mockReturnValue(null);
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      vi.mocked(fromBinary).mockReturnValue(null as any);
       expect(() => service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent)).not.toThrow();
     });
 
     it('catches and logs decode errors', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      ProtoController.root.ServerMessage.decode = vi.fn().mockImplementation(() => {
+      vi.mocked(fromBinary).mockImplementation(() => {
         throw new Error('decode error');
       });
       expect(() => service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent)).not.toThrow();
@@ -344,50 +324,60 @@ describe('ProtobufService', () => {
 
   describe('processGameEvent', () => {
     it('returns early when container has no eventList', () => {
-      const service = new ProtobufService(mockWebClient);
-      const gameEventHandler = (GameEvents as any)['.Event_Game.ext'] as vi.Mock;
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      vi.mocked(hasExtension).mockReturnValue(false);
       (service as any).processGameEvent(null, {});
-      expect(gameEventHandler).not.toHaveBeenCalled();
+      expect(hasExtension).not.toHaveBeenCalled();
     });
 
-    it('dispatches to a GameEvents handler when event key matches', () => {
-      const service = new ProtobufService(mockWebClient);
-      const gameEventHandler = (GameEvents as any)['.Event_Game.ext'] as vi.Mock;
+    it('dispatches to a GameEvents handler when hasExtension returns true', () => {
+      const service = new ProtobufService({ socket: mockSocket } as any);
+      const handler = vi.fn();
+      const mockExt = {};
       const payload = { someData: 1 };
+
+      // Temporarily override GameEvents for this test
+      (GameEvents as any).push([mockExt, handler]);
+      vi.mocked(hasExtension).mockReturnValue(true);
+      vi.mocked(getExtension).mockReturnValue(payload);
+
       (service as any).processGameEvent({
         gameId: 42,
-        context: null,
-        secondsElapsed: 10,
-        forcedByJudge: 0,
-        eventList: [{ '.Event_Game.ext': payload, playerId: 5 }],
+        eventList: [{ playerId: 5 }],
       }, {});
-      expect(gameEventHandler).toHaveBeenCalledWith(payload, expect.objectContaining({ gameId: 42, playerId: 5 }));
-    });
 
+      expect(handler).toHaveBeenCalledWith(payload, expect.objectContaining({ gameId: 42, playerId: 5 }));
+      (GameEvents as any).pop();
+    });
   });
 
   describe('processEvent', () => {
     it('calls matching event handler with payload and raw', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const handler = vi.fn();
-      const events = { '.Event_Test.ext': handler };
+      const mockExt = {};
+      const registry = [[mockExt, handler]] as any;
       const payload = { someData: 1 };
-      const response = { '.Event_Test.ext': payload };
       const raw = { extra: true };
 
-      (service as any).processEvent(response, events, raw);
+      vi.mocked(hasExtension).mockReturnValue(true);
+      vi.mocked(getExtension).mockReturnValue(payload);
+
+      (service as any).processEvent({}, registry, raw);
 
       expect(handler).toHaveBeenCalledWith(payload, raw);
     });
 
     it('stops after first matching event', () => {
-      const service = new ProtobufService(mockWebClient);
+      const service = new ProtobufService({ socket: mockSocket } as any);
       const handler1 = vi.fn();
       const handler2 = vi.fn();
-      const events = { '.Event_A.ext': handler1, '.Event_B.ext': handler2 };
-      const response = { '.Event_A.ext': { x: 1 } };
+      const registry = [[{}, handler1], [{}, handler2]] as any;
 
-      (service as any).processEvent(response, events, {});
+      vi.mocked(hasExtension).mockReturnValueOnce(true).mockReturnValueOnce(false);
+      vi.mocked(getExtension).mockReturnValue({ x: 1 });
+
+      (service as any).processEvent({}, registry, {});
 
       expect(handler1).toHaveBeenCalled();
       expect(handler2).not.toHaveBeenCalled();

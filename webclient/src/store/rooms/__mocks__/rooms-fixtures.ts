@@ -4,7 +4,6 @@ import {
   Room,
   SortDirection,
   User,
-  UserPrivLevel,
   UserSortField,
 } from 'types';
 import { Message, RoomsState } from '../rooms.interfaces';
@@ -12,8 +11,8 @@ import { Message, RoomsState } from '../rooms.interfaces';
 export function makeUser(overrides: Partial<User> = {}): User {
   return {
     name: 'TestUser',
-    accountageSecs: 0,
-    privlevel: UserPrivLevel.NONE,
+    accountageSecs: 0n,
+    privlevel: '',
     userLevel: 0,
     ...overrides,
   };

@@ -7,7 +7,6 @@ import {
   SortDirection,
   StatusEnum,
   User,
-  UserPrivLevel,
   UserSortField,
   WebSocketConnectOptions,
   WarnHistoryItem,
@@ -18,8 +17,8 @@ import { ServerState } from '../server.interfaces';
 export function makeUser(overrides: Partial<User> = {}): User {
   return {
     name: 'TestUser',
-    accountageSecs: 0,
-    privlevel: UserPrivLevel.NONE,
+    accountageSecs: 0n,
+    privlevel: '',
     userLevel: 0,
     ...overrides,
   };

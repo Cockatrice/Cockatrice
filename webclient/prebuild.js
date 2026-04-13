@@ -6,13 +6,10 @@ const exec = util.promisify(require('child_process').exec);
 const ROOT_DIR = './src';
 const PUBLIC_DIR = './public';
 
-const protoFilesDir = `${PUBLIC_DIR}/pb`;
 const i18nDefaultFile = `${ROOT_DIR}/i18n-default.json`;
 const serverPropsFile = `${ROOT_DIR}/server-props.json`;
-const masterProtoFile = `${ROOT_DIR}/proto-files.json`;
 
 const sharedFiles = [
-  ['../libcockatrice_protocol/libcockatrice/protocol/pb', protoFilesDir],
   ['../cockatrice/resources/countries', `${ROOT_DIR}/images/countries`],
 ];
 
@@ -26,10 +23,8 @@ const i18nOnly = process.argv.indexOf('-i18nOnly') > -1;
     return;
   }
 
-  // make sure these files finish copying before master file is created
   await copySharedFiles();
 
-  await createMasterProtoFile();
   await createServerProps();
   await createI18NDefault();
 })();
@@ -37,19 +32,6 @@ const i18nOnly = process.argv.indexOf('-i18nOnly') > -1;
 async function copySharedFiles() {
   try {
     return await Promise.all(sharedFiles.map(([src, dest]) => fse.copy(src, dest, { overwrite: true })));
-  } catch (e) {
-    console.error(e);
-    process.exitCode = 1;
-  }
-}
-
-async function createMasterProtoFile() {
-  try {
-    fse.readdir(protoFilesDir, (err, files) => {
-      if (err) throw err;
-
-      fse.outputFile(masterProtoFile, JSON.stringify(files.filter(file => /\.proto$/.test(file))));
-    });
   } catch (e) {
     console.error(e);
     process.exitCode = 1;

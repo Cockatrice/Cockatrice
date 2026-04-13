@@ -1,5 +1,5 @@
 import { StatusEnum } from 'types';
-import { ProtoController } from '../../services/ProtoController';
+import { Event_ConnectionClosed_CloseReason } from 'generated/proto/event_connection_closed_pb';
 import { updateStatus } from '../../commands/session';
 import { ConnectionClosedData } from './interfaces';
 
@@ -10,32 +10,31 @@ export function connectionClosed({ reason, reasonStr, endTime }: ConnectionClose
   if (reasonStr) {
     message = reasonStr;
   } else {
-    const { CloseReason } = ProtoController.root.Event_ConnectionClosed;
     switch (reason) {
-      case CloseReason.USER_LIMIT_REACHED:
+      case Event_ConnectionClosed_CloseReason.USER_LIMIT_REACHED:
         message = 'The server has reached its maximum user capacity';
         break;
-      case CloseReason.TOO_MANY_CONNECTIONS:
+      case Event_ConnectionClosed_CloseReason.TOO_MANY_CONNECTIONS:
         message = 'There are too many concurrent connections from your address';
         break;
-      case CloseReason.BANNED:
+      case Event_ConnectionClosed_CloseReason.BANNED:
         message = typeof endTime === 'number' && endTime > 0 && Number.isFinite(endTime)
           ? `You are banned until ${new Date(endTime * 1000).toLocaleString()}`
           : 'You are banned';
         break;
-      case CloseReason.DEMOTED:
+      case Event_ConnectionClosed_CloseReason.DEMOTED:
         message = 'You were demoted';
         break;
-      case CloseReason.SERVER_SHUTDOWN:
+      case Event_ConnectionClosed_CloseReason.SERVER_SHUTDOWN:
         message = 'Scheduled server shutdown';
         break;
-      case CloseReason.USERNAMEINVALID:
+      case Event_ConnectionClosed_CloseReason.USERNAMEINVALID:
         message = 'Invalid username';
         break;
-      case CloseReason.LOGGEDINELSEWERE:
+      case Event_ConnectionClosed_CloseReason.LOGGEDINELSEWERE:
         message = 'You have been logged out due to logging in at another location';
         break;
-      case CloseReason.OTHER:
+      case Event_ConnectionClosed_CloseReason.OTHER:
       default:
         message = 'Unknown reason';
         break;

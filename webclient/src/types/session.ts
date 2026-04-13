@@ -1,7 +1,1 @@
-export enum NotificationType {
-    UNKNOWN = 0,
-    PROMOTED = 1,
-    WARNING = 2,
-    IDLEWARNING = 3,
-    CUSTOM = 4,
-};
+export { Event_NotifyUser_NotificationType as NotificationType } from 'generated/proto/event_notify_user_pb';

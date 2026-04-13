@@ -22,6 +22,23 @@ vi.mock('../../persistence', () => ({
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
 import { BackendService } from '../../services/BackendService';
 import { ModeratorPersistence } from '../../persistence';
+import {
+  Command_BanFromServer_ext,
+  Command_ForceActivateUser_ext,
+  Command_GetAdminNotes_ext,
+  Command_GetBanHistory_ext,
+  Command_GetWarnHistory_ext,
+  Command_GetWarnList_ext,
+  Command_GrantReplayAccess_ext,
+  Command_UpdateAdminNotes_ext,
+  Command_ViewLogHistory_ext,
+  Command_WarnUser_ext,
+} from 'generated/proto/moderator_commands_pb';
+import { Response_GetAdminNotes_ext } from 'generated/proto/response_get_admin_notes_pb';
+import { Response_BanHistory_ext } from 'generated/proto/response_ban_history_pb';
+import { Response_WarnHistory_ext } from 'generated/proto/response_warn_history_pb';
+import { Response_WarnList_ext } from 'generated/proto/response_warn_list_pb';
+import { Response_ViewLogHistory_ext } from 'generated/proto/response_viewlog_history_pb';
 import { banFromServer } from './banFromServer';
 import { forceActivateUser } from './forceActivateUser';
 import { getAdminNotes } from './getAdminNotes';
@@ -34,7 +51,8 @@ import { viewLogHistory } from './viewLogHistory';
 import { warnUser } from './warnUser';
 
 const { getLastSendOpts, invokeOnSuccess } = makeCallbackHelpers(
-  BackendService.sendModeratorCommand as vi.Mock
+  BackendService.sendModeratorCommand as vi.Mock,
+  2
 );
 
 beforeEach(() => vi.clearAllMocks());
@@ -47,7 +65,7 @@ describe('banFromServer', () => {
   it('calls sendModeratorCommand with Command_BanFromServer', () => {
     banFromServer(30, 'alice', '1.2.3.4', 'reason', 'visible', 'cid', 1);
     expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
-      'Command_BanFromServer',
+      Command_BanFromServer_ext,
       expect.objectContaining({ minutes: 30, userName: 'alice' }),
       expect.any(Object)
     );
@@ -67,7 +85,7 @@ describe('forceActivateUser', () => {
 
   it('calls sendModeratorCommand with Command_ForceActivateUser', () => {
     forceActivateUser('alice', 'mod1');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith('Command_ForceActivateUser', expect.any(Object), expect.any(Object));
+    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(Command_ForceActivateUser_ext, expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls ModeratorPersistence.forceActivateUser', () => {
@@ -85,16 +103,16 @@ describe('getAdminNotes', () => {
   it('calls sendModeratorCommand with Command_GetAdminNotes', () => {
     getAdminNotes('alice');
     expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
-      'Command_GetAdminNotes',
+      Command_GetAdminNotes_ext,
       expect.any(Object),
-      expect.objectContaining({ responseName: 'Response_GetAdminNotes' })
+      expect.objectContaining({ responseExt: Response_GetAdminNotes_ext })
     );
   });
 
   it('onSuccess calls ModeratorPersistence.getAdminNotes with notes', () => {
     getAdminNotes('alice');
     const resp = { notes: 'some notes' };
-    invokeOnSuccess(resp, { responseCode: 0, '.Response_GetAdminNotes.ext': resp });
+    invokeOnSuccess(resp, { responseCode: 0 });
     expect(ModeratorPersistence.getAdminNotes).toHaveBeenCalledWith('alice', 'some notes');
   });
 });
@@ -107,16 +125,16 @@ describe('getBanHistory', () => {
   it('calls sendModeratorCommand with Command_GetBanHistory', () => {
     getBanHistory('alice');
     expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
-      'Command_GetBanHistory',
+      Command_GetBanHistory_ext,
       expect.any(Object),
-      expect.objectContaining({ responseName: 'Response_BanHistory' })
+      expect.objectContaining({ responseExt: Response_BanHistory_ext })
     );
   });
 
   it('onSuccess calls ModeratorPersistence.banHistory with banList', () => {
     getBanHistory('alice');
     const resp = { banList: [{ id: 1 }] };
-    invokeOnSuccess(resp, { responseCode: 0, '.Response_BanHistory.ext': resp });
+    invokeOnSuccess(resp, { responseCode: 0 });
     expect(ModeratorPersistence.banHistory).toHaveBeenCalledWith('alice', [{ id: 1 }]);
   });
 });
@@ -129,16 +147,16 @@ describe('getWarnHistory', () => {
   it('calls sendModeratorCommand with Command_GetWarnHistory', () => {
     getWarnHistory('alice');
     expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
-      'Command_GetWarnHistory',
+      Command_GetWarnHistory_ext,
       expect.any(Object),
-      expect.objectContaining({ responseName: 'Response_WarnHistory' })
+      expect.objectContaining({ responseExt: Response_WarnHistory_ext })
     );
   });
 
   it('onSuccess calls ModeratorPersistence.warnHistory with warnList', () => {
     getWarnHistory('alice');
     const resp = { warnList: [{ id: 2 }] };
-    invokeOnSuccess(resp, { responseCode: 0, '.Response_WarnHistory.ext': resp });
+    invokeOnSuccess(resp, { responseCode: 0 });
     expect(ModeratorPersistence.warnHistory).toHaveBeenCalledWith('alice', [{ id: 2 }]);
   });
 });
@@ -151,16 +169,16 @@ describe('getWarnList', () => {
   it('calls sendModeratorCommand with Command_GetWarnList', () => {
     getWarnList('mod1', 'alice', 'US');
     expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
-      'Command_GetWarnList',
+      Command_GetWarnList_ext,
       expect.any(Object),
-      expect.objectContaining({ responseName: 'Response_WarnList' })
+      expect.objectContaining({ responseExt: Response_WarnList_ext })
     );
   });
 
   it('onSuccess calls ModeratorPersistence.warnListOptions with warning', () => {
     getWarnList('mod1', 'alice', 'US');
     const resp = { warning: ['w1', 'w2'] };
-    invokeOnSuccess(resp, { responseCode: 0, '.Response_WarnList.ext': resp });
+    invokeOnSuccess(resp, { responseCode: 0 });
     expect(ModeratorPersistence.warnListOptions).toHaveBeenCalledWith(['w1', 'w2']);
   });
 });
@@ -172,7 +190,7 @@ describe('grantReplayAccess', () => {
 
   it('calls sendModeratorCommand with Command_GrantReplayAccess', () => {
     grantReplayAccess(10, 'mod1');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith('Command_GrantReplayAccess', expect.any(Object), expect.any(Object));
+    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(Command_GrantReplayAccess_ext, expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls ModeratorPersistence.grantReplayAccess', () => {
@@ -189,7 +207,7 @@ describe('updateAdminNotes', () => {
 
   it('calls sendModeratorCommand with Command_UpdateAdminNotes', () => {
     updateAdminNotes('alice', 'new notes');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith('Command_UpdateAdminNotes', expect.any(Object), expect.any(Object));
+    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(Command_UpdateAdminNotes_ext, expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls ModeratorPersistence.updateAdminNotes', () => {
@@ -205,18 +223,18 @@ describe('updateAdminNotes', () => {
 describe('viewLogHistory', () => {
 
   it('calls sendModeratorCommand with Command_ViewLogHistory', () => {
-    viewLogHistory({ filters: 'all' } as any);
+    viewLogHistory({ dateRange: 7 } as any);
     expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
-      'Command_ViewLogHistory',
+      Command_ViewLogHistory_ext,
       expect.any(Object),
-      expect.objectContaining({ responseName: 'Response_ViewLogHistory' })
+      expect.objectContaining({ responseExt: Response_ViewLogHistory_ext })
     );
   });
 
   it('onSuccess calls ModeratorPersistence.viewLogs with logMessage', () => {
-    viewLogHistory({ filters: 'all' } as any);
+    viewLogHistory({ dateRange: 7 } as any);
     const resp = { logMessage: ['log1'] };
-    invokeOnSuccess(resp, { responseCode: 0, '.Response_ViewLogHistory.ext': resp });
+    invokeOnSuccess(resp, { responseCode: 0 });
     expect(ModeratorPersistence.viewLogs).toHaveBeenCalledWith(['log1']);
   });
 });
@@ -228,7 +246,7 @@ describe('warnUser', () => {
 
   it('calls sendModeratorCommand with Command_WarnUser', () => {
     warnUser('alice', 'bad behavior', 'cid');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith('Command_WarnUser', expect.any(Object), expect.any(Object));
+    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(Command_WarnUser_ext, expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls ModeratorPersistence.warnUser', () => {

@@ -1,4 +1,4 @@
-import { ProtobufEvents } from '../../services/ProtobufService';
+import { ExtensionRegistry } from '../../services/ProtobufService';
 import { attachCard } from './attachCard';
 import { changeZoneProperties } from './changeZoneProperties';
 import { createArrow } from './createArrow';
@@ -29,34 +29,65 @@ import { setCardCounter } from './setCardCounter';
 import { setCounter } from './setCounter';
 import { shuffle } from './shuffle';
 
-export const GameEvents: ProtobufEvents = {
-  '.Event_Join.ext': joinGame,
-  '.Event_Leave.ext': leaveGame,
-  '.Event_GameClosed.ext': gameClosed,
-  '.Event_GameHostChanged.ext': gameHostChanged,
-  '.Event_Kicked.ext': kicked,
-  '.Event_GameStateChanged.ext': gameStateChanged,
-  '.Event_PlayerPropertiesChanged.ext': playerPropertiesChanged,
-  '.Event_GameSay.ext': gameSay,
-  '.Event_CreateArrow.ext': createArrow,
-  '.Event_DeleteArrow.ext': deleteArrow,
-  '.Event_CreateCounter.ext': createCounter,
-  '.Event_SetCounter.ext': setCounter,
-  '.Event_DelCounter.ext': delCounter,
-  '.Event_DrawCards.ext': drawCards,
-  '.Event_RevealCards.ext': revealCards,
-  '.Event_Shuffle.ext': shuffle,
-  '.Event_RollDie.ext': rollDie,
-  '.Event_MoveCard.ext': moveCard,
-  '.Event_FlipCard.ext': flipCard,
-  '.Event_DestroyCard.ext': destroyCard,
-  '.Event_AttachCard.ext': attachCard,
-  '.Event_CreateToken.ext': createToken,
-  '.Event_SetCardAttr.ext': setCardAttr,
-  '.Event_SetCardCounter.ext': setCardCounter,
-  '.Event_SetActivePlayer.ext': setActivePlayer,
-  '.Event_SetActivePhase.ext': setActivePhase,
-  '.Event_DumpZone.ext': dumpZone,
-  '.Event_ChangeZoneProperties.ext': changeZoneProperties,
-  '.Event_ReverseTurn.ext': reverseTurn,
-};
+import { Event_Join_ext } from 'generated/proto/event_join_pb';
+import { Event_Leave_ext } from 'generated/proto/event_leave_pb';
+import { Event_GameClosed_ext } from 'generated/proto/event_game_closed_pb';
+import { Event_GameHostChanged_ext } from 'generated/proto/event_game_host_changed_pb';
+import { Event_Kicked_ext } from 'generated/proto/event_kicked_pb';
+import { Event_GameStateChanged_ext } from 'generated/proto/event_game_state_changed_pb';
+import { Event_PlayerPropertiesChanged_ext } from 'generated/proto/event_player_properties_changed_pb';
+import { Event_GameSay_ext } from 'generated/proto/event_game_say_pb';
+import { Event_CreateArrow_ext } from 'generated/proto/event_create_arrow_pb';
+import { Event_DeleteArrow_ext } from 'generated/proto/event_delete_arrow_pb';
+import { Event_CreateCounter_ext } from 'generated/proto/event_create_counter_pb';
+import { Event_SetCounter_ext } from 'generated/proto/event_set_counter_pb';
+import { Event_DelCounter_ext } from 'generated/proto/event_del_counter_pb';
+import { Event_DrawCards_ext } from 'generated/proto/event_draw_cards_pb';
+import { Event_RevealCards_ext } from 'generated/proto/event_reveal_cards_pb';
+import { Event_Shuffle_ext } from 'generated/proto/event_shuffle_pb';
+import { Event_RollDie_ext } from 'generated/proto/event_roll_die_pb';
+import { Event_MoveCard_ext } from 'generated/proto/event_move_card_pb';
+import { Event_FlipCard_ext } from 'generated/proto/event_flip_card_pb';
+import { Event_DestroyCard_ext } from 'generated/proto/event_destroy_card_pb';
+import { Event_AttachCard_ext } from 'generated/proto/event_attach_card_pb';
+import { Event_CreateToken_ext } from 'generated/proto/event_create_token_pb';
+import { Event_SetCardAttr_ext } from 'generated/proto/event_set_card_attr_pb';
+import { Event_SetCardCounter_ext } from 'generated/proto/event_set_card_counter_pb';
+import { Event_SetActivePlayer_ext } from 'generated/proto/event_set_active_player_pb';
+import { Event_SetActivePhase_ext } from 'generated/proto/event_set_active_phase_pb';
+import { Event_DumpZone_ext } from 'generated/proto/event_dump_zone_pb';
+import { Event_ChangeZoneProperties_ext } from 'generated/proto/event_change_zone_properties_pb';
+import { Event_ReverseTurn_ext } from 'generated/proto/event_reverse_turn_pb';
+
+export const GameEvents: ExtensionRegistry = [
+  [Event_Join_ext, joinGame],
+  [Event_Leave_ext, leaveGame],
+  [Event_GameClosed_ext, gameClosed],
+  [Event_GameHostChanged_ext, gameHostChanged],
+  [Event_Kicked_ext, kicked],
+  [Event_GameStateChanged_ext, gameStateChanged],
+  [Event_PlayerPropertiesChanged_ext, playerPropertiesChanged],
+  [Event_GameSay_ext, gameSay],
+  [Event_CreateArrow_ext, createArrow],
+  [Event_DeleteArrow_ext, deleteArrow],
+  [Event_CreateCounter_ext, createCounter],
+  [Event_SetCounter_ext, setCounter],
+  [Event_DelCounter_ext, delCounter],
+  [Event_DrawCards_ext, drawCards],
+  [Event_RevealCards_ext, revealCards],
+  [Event_Shuffle_ext, shuffle],
+  [Event_RollDie_ext, rollDie],
+  [Event_MoveCard_ext, moveCard],
+  [Event_FlipCard_ext, flipCard],
+  [Event_DestroyCard_ext, destroyCard],
+  [Event_AttachCard_ext, attachCard],
+  [Event_CreateToken_ext, createToken],
+  [Event_SetCardAttr_ext, setCardAttr],
+  [Event_SetCardCounter_ext, setCardCounter],
+  [Event_SetActivePlayer_ext, setActivePlayer],
+  [Event_SetActivePhase_ext, setActivePhase],
+  [Event_DumpZone_ext, dumpZone],
+  [Event_ChangeZoneProperties_ext, changeZoneProperties],
+  [Event_ReverseTurn_ext, reverseTurn],
+];
+

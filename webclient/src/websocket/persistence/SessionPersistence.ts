@@ -11,6 +11,10 @@ import {
   UserMessageData
 } from '../events/session/interfaces';
 import NormalizeService from '../utils/NormalizeService';
+import type { Response_GetGamesOfUser } from 'generated/proto/response_get_games_of_user_pb';
+import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
+import type { ServerInfo_GameType } from 'generated/proto/serverinfo_gametype_pb';
+import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
 
 export class SessionPersistence {
   static initialized() {
@@ -171,14 +175,14 @@ export class SessionPersistence {
     ServerDispatch.getUserInfo(userInfo);
   }
 
-  static getGamesOfUser(userName: string, response: any): void {
+  static getGamesOfUser(userName: string, response: Response_GetGamesOfUser): void {
     const gametypeMap: Record<number, string> = {};
-    (response.roomList || []).forEach((room: any) => {
-      (room.gametypeList || []).forEach((gt: any) => {
+    (response.roomList || []).forEach((room: ServerInfo_Room) => {
+      (room.gametypeList || []).forEach((gt: ServerInfo_GameType) => {
         gametypeMap[gt.gameTypeId] = gt.description;
       });
     });
-    const games = (response.gameList || []).map((game: any) => {
+    const games = (response.gameList || []).map((game: ServerInfo_Game) => {
       NormalizeService.normalizeGameObject(game, gametypeMap);
       return game;
     });

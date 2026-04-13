@@ -1,4 +1,4 @@
-import { ProtobufEvents } from '../../services/ProtobufService';
+import { ExtensionRegistry } from '../../services/ProtobufService';
 import { addToList } from './addToList';
 import { connectionClosed } from './connectionClosed';
 import { listRooms } from './listRooms';
@@ -14,19 +14,35 @@ import { userLeft } from './userLeft';
 import { userMessage } from './userMessage';
 import { gameJoined } from './gameJoined';
 
-export const SessionEvents: ProtobufEvents = {
-  '.Event_AddToList.ext': addToList,
-  '.Event_ConnectionClosed.ext': connectionClosed,
-  '.Event_GameJoined.ext': gameJoined,
-  '.Event_ListRooms.ext': listRooms,
-  '.Event_NotifyUser.ext': notifyUser,
-  '.Event_RemoveFromList.ext': removeFromList,
-  '.Event_ReplayAdded.ext': replayAdded,
-  '.Event_ServerCompleteList.ext': serverCompleteList,
-  '.Event_ServerIdentification.ext': serverIdentification,
-  '.Event_ServerMessage.ext': serverMessage,
-  '.Event_ServerShutdown.ext': serverShutdown,
-  '.Event_UserJoined.ext': userJoined,
-  '.Event_UserLeft.ext': userLeft,
-  '.Event_UserMessage.ext': userMessage,
-}
+import { Event_AddToList_ext } from 'generated/proto/event_add_to_list_pb';
+import { Event_ConnectionClosed_ext } from 'generated/proto/event_connection_closed_pb';
+import { Event_GameJoined_ext } from 'generated/proto/event_game_joined_pb';
+import { Event_ListRooms_ext } from 'generated/proto/event_list_rooms_pb';
+import { Event_NotifyUser_ext } from 'generated/proto/event_notify_user_pb';
+import { Event_RemoveFromList_ext } from 'generated/proto/event_remove_from_list_pb';
+import { Event_ReplayAdded_ext } from 'generated/proto/event_replay_added_pb';
+import { Event_ServerCompleteList_ext } from 'generated/proto/event_server_complete_list_pb';
+import { Event_ServerIdentification_ext } from 'generated/proto/event_server_identification_pb';
+import { Event_ServerMessage_ext } from 'generated/proto/event_server_message_pb';
+import { Event_ServerShutdown_ext } from 'generated/proto/event_server_shutdown_pb';
+import { Event_UserJoined_ext } from 'generated/proto/event_user_joined_pb';
+import { Event_UserLeft_ext } from 'generated/proto/event_user_left_pb';
+import { Event_UserMessage_ext } from 'generated/proto/event_user_message_pb';
+
+export const SessionEvents: ExtensionRegistry = [
+  [Event_AddToList_ext, addToList],
+  [Event_ConnectionClosed_ext, connectionClosed],
+  [Event_GameJoined_ext, gameJoined],
+  [Event_ListRooms_ext, listRooms],
+  [Event_NotifyUser_ext, notifyUser],
+  [Event_RemoveFromList_ext, removeFromList],
+  [Event_ReplayAdded_ext, replayAdded],
+  [Event_ServerCompleteList_ext, serverCompleteList],
+  [Event_ServerIdentification_ext, serverIdentification],
+  [Event_ServerMessage_ext, serverMessage],
+  [Event_ServerShutdown_ext, serverShutdown],
+  [Event_UserJoined_ext, userJoined],
+  [Event_UserLeft_ext, userLeft],
+  [Event_UserMessage_ext, userMessage],
+];
+

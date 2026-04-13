@@ -1,53 +1,8 @@
 /**
  * Shared mock factories for websocket layer unit tests.
  * Import the helpers you need in each spec file via:
- *   import { makeMockProtoRoot, makeMockWebSocket } from '../__mocks__/helpers';
+ *   import { makeMockWebSocket } from '../__mocks__/helpers';
  */
-
-/** Builds a minimal mock of ProtoController.root */
-export function makeMockProtoRoot() {
-  const encode = { finish: vi.fn().mockReturnValue(new Uint8Array()) };
-  return {
-    CommandContainer: {
-      create: vi.fn(args => ({ ...args })),
-      encode: vi.fn().mockReturnValue(encode),
-    },
-    SessionCommand: { create: vi.fn(args => ({ ...args })) },
-    RoomCommand: { create: vi.fn(args => ({ ...args })) },
-    ModeratorCommand: { create: vi.fn(args => ({ ...args })) },
-    AdminCommand: { create: vi.fn(args => ({ ...args })) },
-    ServerMessage: {
-      decode: vi.fn(),
-      MessageType: {
-        RESPONSE: 'RESPONSE',
-        ROOM_EVENT: 'ROOM_EVENT',
-        SESSION_EVENT: 'SESSION_EVENT',
-        GAME_EVENT_CONTAINER: 'GAME_EVENT_CONTAINER',
-      },
-    },
-    Response: {
-      ResponseCode: {
-        RespOk: 0,
-        RespRegistrationRequired: 1,
-      },
-    },
-    Event_ServerIdentification: {
-      ServerOptions: { SupportsPasswordHash: 2 },
-    },
-    Event_ConnectionClosed: {
-      CloseReason: {
-        USER_LIMIT_REACHED: 1,
-        TOO_MANY_CONNECTIONS: 2,
-        BANNED: 3,
-        DEMOTED: 4,
-        SERVER_SHUTDOWN: 5,
-        USERNAMEINVALID: 6,
-        LOGGEDINELSEWERE: 7,
-        OTHER: 8,
-      },
-    },
-  };
-}
 
 /** Builds a mock WebSocket instance */
 export function makeMockWebSocketInstance() {

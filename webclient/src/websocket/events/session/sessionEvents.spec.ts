@@ -51,26 +51,8 @@ vi.mock('../../utils', () => ({
   passwordSaltSupported: vi.fn().mockReturnValue(0),
 }));
 
-vi.mock('../../services/ProtoController', () => ({
-  ProtoController: {
-    root: {
-      Event_ConnectionClosed: {
-        CloseReason: {
-          USER_LIMIT_REACHED: 0,
-          TOO_MANY_CONNECTIONS: 1,
-          BANNED: 2,
-          DEMOTED: 3,
-          SERVER_SHUTDOWN: 4,
-          USERNAMEINVALID: 5,
-          LOGGEDINELSEWERE: 6,
-          OTHER: 7,
-        },
-      },
-    },
-  },
-}));
-
 import { WebSocketConnectReason } from 'types';
+import { Event_ConnectionClosed_CloseReason } from 'generated/proto/event_connection_closed_pb';
 
 import { SessionPersistence, RoomPersistence } from '../../persistence';
 import webClient from '../../WebClient';
@@ -282,7 +264,7 @@ describe('connectionClosed', () => {
   });
 
   it('USER_LIMIT_REACHED → specific message', () => {
-    connectionClosed({ reason: 0 } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.USER_LIMIT_REACHED } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(
       expect.anything(),
       expect.stringContaining('maximum user capacity')
@@ -290,42 +272,42 @@ describe('connectionClosed', () => {
   });
 
   it('TOO_MANY_CONNECTIONS → specific message', () => {
-    connectionClosed({ reason: 1 } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.TOO_MANY_CONNECTIONS } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('too many concurrent'));
   });
 
   it('BANNED → specific message', () => {
-    connectionClosed({ reason: 2 } as any);
-    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('banned'));
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.BANNED } as any);
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
   });
 
   it('DEMOTED → specific message', () => {
-    connectionClosed({ reason: 3 } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.DEMOTED } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('demoted'));
   });
 
   it('SERVER_SHUTDOWN → specific message', () => {
-    connectionClosed({ reason: 4 } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.SERVER_SHUTDOWN } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('shutdown'));
   });
 
   it('USERNAMEINVALID → specific message', () => {
-    connectionClosed({ reason: 5 } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.USERNAMEINVALID } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('username'));
   });
 
   it('LOGGEDINELSEWERE → specific message', () => {
-    connectionClosed({ reason: 6 } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.LOGGEDINELSEWERE } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('logged out'));
   });
 
   it('OTHER → "Unknown reason"', () => {
-    connectionClosed({ reason: 7 } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.OTHER } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'Unknown reason');
   });
 
   it('BANNED with valid positive endTime → shows formatted date', () => {
-    connectionClosed({ reason: 2, endTime: 1700000000 } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: 1700000000 } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(
       expect.anything(),
       expect.stringContaining('You are banned until')
@@ -333,27 +315,27 @@ describe('connectionClosed', () => {
   });
 
   it('BANNED with endTime = 0 → shows generic banned message', () => {
-    connectionClosed({ reason: 2, endTime: 0 } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: 0 } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
   });
 
   it('BANNED with endTime = -1 → shows generic banned message', () => {
-    connectionClosed({ reason: 2, endTime: -1 } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: -1 } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
   });
 
   it('BANNED with endTime = NaN → shows generic banned message', () => {
-    connectionClosed({ reason: 2, endTime: NaN } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: NaN } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
   });
 
   it('BANNED with endTime = Infinity → shows generic banned message', () => {
-    connectionClosed({ reason: 2, endTime: Infinity } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: Infinity } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
   });
 
   it('BANNED with reasonStr → uses reasonStr regardless of endTime', () => {
-    connectionClosed({ reason: 2, endTime: 0, reasonStr: 'custom ban reason' } as any);
+    connectionClosed({ reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: 0, reasonStr: 'custom ban reason' } as any);
     expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'custom ban reason');
   });
 });

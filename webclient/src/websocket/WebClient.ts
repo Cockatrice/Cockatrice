@@ -47,6 +47,8 @@ export class WebClient {
       this.protobuf.handleMessageEvent(message);
     });
 
+    SessionPersistence.initialized();
+
     if (import.meta.env.MODE !== 'test') {
       console.log(this);
     }

@@ -1,16 +1,5 @@
-export interface Replay {
-  replayId: number;
-  replayName: string;
-  duration: number;
-}
+import type { ServerInfo_Replay } from 'generated/proto/serverinfo_replay_pb';
+import type { ServerInfo_ReplayMatch } from 'generated/proto/serverinfo_replay_match_pb';
 
-export interface ReplayMatch {
-  replayList: Replay[];
-  gameId: number;
-  roomName: string;
-  timeStarted: number;
-  length: number;
-  gameName: string;
-  playerNames: string[];
-  doNotHide: boolean;
-}
+export type Replay = ServerInfo_Replay;
+export type ReplayMatch = ServerInfo_ReplayMatch;

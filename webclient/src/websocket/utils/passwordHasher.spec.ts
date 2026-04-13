@@ -1,15 +1,8 @@
-import { makeMockProtoRoot } from '../__mocks__/helpers';
-
-vi.mock('../services/ProtoController', () => ({
-  ProtoController: { root: null },
+vi.mock('generated/proto/event_server_identification_pb', () => ({
+  Event_ServerIdentification_ServerOptions: { SupportsPasswordHash: 2 },
 }));
 
-import { ProtoController } from '../services/ProtoController';
 import { hashPassword, generateSalt, passwordSaltSupported } from './passwordHasher';
-
-beforeEach(() => {
-  ProtoController.root = makeMockProtoRoot();
-});
 
 describe('hashPassword', () => {
   it('returns a string starting with the salt', () => {

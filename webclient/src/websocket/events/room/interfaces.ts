@@ -1,24 +1,11 @@
-import { Game, User } from 'types';
+import type { Event_JoinRoom } from 'generated/proto/event_join_room_pb';
+import type { Event_LeaveRoom } from 'generated/proto/event_leave_room_pb';
+import type { Event_ListGames } from 'generated/proto/event_list_games_pb';
+import type { Event_RemoveMessages } from 'generated/proto/event_remove_messages_pb';
+import type { RoomEvent as GeneratedRoomEvent } from 'generated/proto/room_event_pb';
 
-export interface JoinRoomData {
-  userInfo: User;
-}
-
-export interface LeaveRoomData {
-  name: string;
-}
-
-export interface ListGamesData {
-  gameList: Game[];
-}
-
-export interface RemoveMessagesData {
-  name: string;
-  amount: number;
-}
-
-export interface RoomEvent {
-  roomEvent: {
-    roomId: number;
-  }
-}
+export type JoinRoomData = Event_JoinRoom;
+export type LeaveRoomData = Event_LeaveRoom;
+export type ListGamesData = Event_ListGames;
+export type RemoveMessagesData = Event_RemoveMessages;
+export type RoomEvent = GeneratedRoomEvent;

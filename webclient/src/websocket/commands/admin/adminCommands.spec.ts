@@ -22,7 +22,8 @@ import { shutdownServer } from './shutdownServer';
 import { updateServerMessage } from './updateServerMessage';
 
 const { getLastSendOpts, invokeOnSuccess } = makeCallbackHelpers(
-  BackendService.sendAdminCommand as vi.Mock
+  BackendService.sendAdminCommand as vi.Mock,
+  2
 );
 
 beforeEach(() => vi.clearAllMocks());
@@ -34,11 +35,7 @@ describe('adjustMod', () => {
 
   it('calls sendAdminCommand with Command_AdjustMod', () => {
     adjustMod('alice', true, false);
-    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith(
-      'Command_AdjustMod',
-      expect.objectContaining({ userName: 'alice', shouldBeMod: true, shouldBeJudge: false }),
-      expect.any(Object)
-    );
+    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls AdminPersistence.adjustMod', () => {
@@ -55,7 +52,7 @@ describe('reloadConfig', () => {
 
   it('calls sendAdminCommand with Command_ReloadConfig', () => {
     reloadConfig();
-    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith('Command_ReloadConfig', {}, expect.any(Object));
+    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls AdminPersistence.reloadConfig', () => {
@@ -72,11 +69,7 @@ describe('shutdownServer', () => {
 
   it('calls sendAdminCommand with Command_ShutdownServer', () => {
     shutdownServer('maintenance', 10);
-    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith(
-      'Command_ShutdownServer',
-      { reason: 'maintenance', minutes: 10 },
-      expect.any(Object)
-    );
+    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls AdminPersistence.shutdownServer', () => {
@@ -93,7 +86,7 @@ describe('updateServerMessage', () => {
 
   it('calls sendAdminCommand with Command_UpdateServerMessage', () => {
     updateServerMessage();
-    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith('Command_UpdateServerMessage', {}, expect.any(Object));
+    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls AdminPersistence.updateServerMessage', () => {

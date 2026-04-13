@@ -118,9 +118,9 @@ describe('sortByFields', () => {
 describe('sortUsersByField', () => {
   it('sorts by userLevel DESC first, then name ASC', () => {
     const users = [
-      { name: 'Alice', userLevel: 1, accountageSecs: 0, privlevel: 0 },
-      { name: 'Bob', userLevel: 8, accountageSecs: 0, privlevel: 0 },
-      { name: 'Carol', userLevel: 1, accountageSecs: 0, privlevel: 0 },
+      { name: 'Alice', userLevel: 1, accountageSecs: 0n, privlevel: '' },
+      { name: 'Bob', userLevel: 8, accountageSecs: 0n, privlevel: '' },
+      { name: 'Carol', userLevel: 1, accountageSecs: 0n, privlevel: '' },
     ];
     SortUtil.sortUsersByField(users as any, { field: 'name', order: SortDirection.ASC });
     expect(users[0].name).toBe('Bob');
@@ -136,8 +136,8 @@ describe('sortUsersByField', () => {
 
   it('returns 0 (stable) when two users tie on both userLevel and name', () => {
     const users = [
-      { name: 'Alice', userLevel: 1, accountageSecs: 0, privlevel: 0 },
-      { name: 'Alice', userLevel: 1, accountageSecs: 0, privlevel: 0 },
+      { name: 'Alice', userLevel: 1, accountageSecs: 0n, privlevel: '' },
+      { name: 'Alice', userLevel: 1, accountageSecs: 0n, privlevel: '' },
     ];
     expect(() =>
       SortUtil.sortUsersByField(users as any, { field: 'name', order: SortDirection.ASC })

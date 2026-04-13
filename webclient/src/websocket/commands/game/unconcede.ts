@@ -1,5 +1,7 @@
+import { create } from '@bufbuild/protobuf';
 import { BackendService } from '../../services/BackendService';
+import { Command_UnconcedeSchema, Command_Unconcede_ext } from 'generated/proto/command_concede_pb';
 
 export function unconcede(gameId: number): void {
-  BackendService.sendGameCommand(gameId, 'Command_Unconcede', {});
+  BackendService.sendGameCommand(gameId, Command_Unconcede_ext, create(Command_UnconcedeSchema));
 }

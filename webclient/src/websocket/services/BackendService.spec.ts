@@ -1,7 +1,11 @@
-import { makeMockProtoRoot } from '../__mocks__/helpers';
+vi.mock('@bufbuild/protobuf', () => ({
+  create: vi.fn().mockReturnValue({}),
+  setExtension: vi.fn(),
+  getExtension: vi.fn(),
+}));
 
-vi.mock('./ProtoController', () => ({
-  ProtoController: { root: null },
+vi.mock('generated/proto/response_pb', () => ({
+  Response_ResponseCode: { RespOk: 1 },
 }));
 
 vi.mock('../WebClient', () => {
@@ -15,35 +19,29 @@ vi.mock('../WebClient', () => {
   return { __esModule: true, default: { protobuf: mockProtobuf } };
 });
 
+import { getExtension } from '@bufbuild/protobuf';
 import { BackendService } from './BackendService';
-import { ProtoController } from './ProtoController';
 import webClient from '../WebClient';
 
 beforeEach(() => {
   vi.clearAllMocks();
-  ProtoController.root = makeMockProtoRoot();
-  ProtoController.root.GameCommand = { create: vi.fn(args => ({ ...args })) };
-  ProtoController.root['Command_Game'] = { create: vi.fn(p => ({ ...p })) };
-  ProtoController.root['Command_Test'] = { create: vi.fn(p => ({ ...p })) };
-  ProtoController.root['Command_Room'] = { create: vi.fn(p => ({ ...p })) };
-  ProtoController.root['Command_Mod'] = { create: vi.fn(p => ({ ...p })) };
-  ProtoController.root['Command_Admin'] = { create: vi.fn(p => ({ ...p })) };
-  ProtoController.root['Response_Test'] = {};
 });
 
-function captureCallback(sendFn: vi.Mock) {
-  return sendFn.mock.calls[0][sendFn === (webClient.protobuf as any).sendRoomCommand ? 2 : 1];
+function captureCallback(sendFn: ReturnType<typeof vi.fn>) {
+  const protobuf = webClient.protobuf as any;
+  const usesIndex2 = sendFn === protobuf.sendRoomCommand || sendFn === protobuf.sendGameCommand;
+  return sendFn.mock.calls[0][usesIndex2 ? 2 : 1];
 }
 
 describe('BackendService', () => {
   describe('send commands', () => {
     it.each([
-      ['sendGameCommand', () => BackendService.sendGameCommand(7, 'Command_Game', { g: 1 })],
-      ['sendSessionCommand', () => BackendService.sendSessionCommand('Command_Test', { x: 1 }, {})],
-      ['sendRoomCommand', () => BackendService.sendRoomCommand(5, 'Command_Room', { y: 2 }, {})],
-      ['sendModeratorCommand', () => BackendService.sendModeratorCommand('Command_Mod', { z: 3 }, {})],
-      ['sendAdminCommand', () => BackendService.sendAdminCommand('Command_Admin', {}, {})],
-    ])('%s creates the command and delegates to protobuf', (methodName, invoke) => {
+      ['sendGameCommand', () => BackendService.sendGameCommand(7, {} as any, {} as any)],
+      ['sendSessionCommand', () => BackendService.sendSessionCommand({} as any, {} as any)],
+      ['sendRoomCommand', () => BackendService.sendRoomCommand(5, {} as any, {} as any)],
+      ['sendModeratorCommand', () => BackendService.sendModeratorCommand({} as any, {} as any)],
+      ['sendAdminCommand', () => BackendService.sendAdminCommand({} as any, {} as any)],
+    ])('%s delegates to protobuf', (methodName, invoke) => {
       invoke();
       expect((webClient.protobuf as any)[methodName]).toHaveBeenCalled();
     });
@@ -52,37 +50,37 @@ describe('BackendService', () => {
   describe('handleResponse via non-session command callbacks', () => {
     it('sendGameCommand callback invokes handleResponse', () => {
       const onSuccess = vi.fn();
-      BackendService.sendGameCommand(7, 'Command_Game', {}, { onSuccess });
+      BackendService.sendGameCommand(7, {} as any, {} as any, { onSuccess });
       const cb = (webClient.protobuf as any).sendGameCommand.mock.calls[0][2];
-      cb({ responseCode: 0 });
+      cb({ responseCode: 1 });
       expect(onSuccess).toHaveBeenCalled();
     });
 
     it('sendRoomCommand callback invokes handleResponse', () => {
       const onSuccess = vi.fn();
-      BackendService.sendRoomCommand(5, 'Command_Room', {}, { onSuccess });
-      captureCallback((webClient.protobuf as any).sendRoomCommand)({ responseCode: 0 });
+      BackendService.sendRoomCommand(5, {} as any, {} as any, { onSuccess });
+      captureCallback((webClient.protobuf as any).sendRoomCommand)({ responseCode: 1 });
       expect(onSuccess).toHaveBeenCalled();
     });
 
     it('sendModeratorCommand callback invokes handleResponse', () => {
       const onSuccess = vi.fn();
-      BackendService.sendModeratorCommand('Command_Mod', {}, { onSuccess });
-      captureCallback((webClient.protobuf as any).sendModeratorCommand)({ responseCode: 0 });
+      BackendService.sendModeratorCommand({} as any, {} as any, { onSuccess });
+      captureCallback((webClient.protobuf as any).sendModeratorCommand)({ responseCode: 1 });
       expect(onSuccess).toHaveBeenCalled();
     });
 
     it('sendAdminCommand callback invokes handleResponse', () => {
       const onSuccess = vi.fn();
-      BackendService.sendAdminCommand('Command_Admin', {}, { onSuccess });
-      captureCallback((webClient.protobuf as any).sendAdminCommand)({ responseCode: 0 });
+      BackendService.sendAdminCommand({} as any, {} as any, { onSuccess });
+      captureCallback((webClient.protobuf as any).sendAdminCommand)({ responseCode: 1 });
       expect(onSuccess).toHaveBeenCalled();
     });
   });
 
   describe('handleResponse (via sendSessionCommand callback)', () => {
     function invokeCallback(options: any, raw: any) {
-      BackendService.sendSessionCommand('Command_Test', {}, options);
+      BackendService.sendSessionCommand({} as any, {} as any, options);
       const cb = (webClient.protobuf as any).sendSessionCommand.mock.calls[0][1];
       cb(raw);
     }
@@ -95,17 +93,19 @@ describe('BackendService', () => {
       expect(onSuccess).not.toHaveBeenCalled();
     });
 
-    it('calls onSuccess with raw when responseCode is RespOk and no responseName', () => {
+    it('calls onSuccess with raw when responseCode is RespOk and no responseExt', () => {
       const onSuccess = vi.fn();
-      const raw = { responseCode: 0 };
+      const raw = { responseCode: 1 };
       invokeCallback({ onSuccess }, raw);
       expect(onSuccess).toHaveBeenCalledWith(raw, raw);
     });
 
-    it('calls onSuccess with nested response when responseName is set', () => {
+    it('calls onSuccess with nested response when responseExt is set', () => {
+      vi.mocked(getExtension).mockReturnValue({ nested: true });
       const onSuccess = vi.fn();
-      const raw = { responseCode: 0, '.Response_Test.ext': { nested: true } };
-      invokeCallback({ onSuccess, responseName: 'Response_Test' }, raw);
+      const fakeExt = {} as any;
+      const raw = { responseCode: 1 };
+      invokeCallback({ onSuccess, responseExt: fakeExt }, raw);
       expect(onSuccess).toHaveBeenCalledWith({ nested: true }, raw);
     });
 

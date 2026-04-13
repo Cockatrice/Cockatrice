@@ -8,15 +8,9 @@ vi.mock('websocket', () => ({
   },
 }));
 
-vi.mock('websocket/services/ProtoController', () => ({
-  ProtoController: {
-    root: {
-      ServerInfo_User: {
-        UserLevelFlag: {
-          IsModerator: 4,
-        },
-      },
-    },
+vi.mock('generated/proto/serverinfo_user_pb', () => ({
+  ServerInfo_User_UserLevelFlag: {
+    IsModerator: 4,
   },
 }));
 

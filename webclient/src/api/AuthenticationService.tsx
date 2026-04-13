@@ -1,6 +1,6 @@
 import { StatusEnum, User, WebSocketConnectReason, WebSocketConnectOptions } from 'types';
 import { SessionCommands, webClient } from 'websocket';
-import { ProtoController } from 'websocket/services/ProtoController';
+import { ServerInfo_User_UserLevelFlag } from 'generated/proto/serverinfo_user_pb';
 
 export class AuthenticationService {
   static login(options: WebSocketConnectOptions): void {
@@ -40,7 +40,7 @@ export class AuthenticationService {
   }
 
   static isModerator(user: User): boolean {
-    const moderatorLevel = ProtoController.root.ServerInfo_User.UserLevelFlag.IsModerator;
+    const moderatorLevel = ServerInfo_User_UserLevelFlag.IsModerator;
     // @TODO tell cockatrice not to do this so shittily
     return (user.userLevel & moderatorLevel) === moderatorLevel;
   }

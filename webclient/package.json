@@ -14,9 +14,11 @@
     "lint:fix": "eslint src/**/*.{ts,tsx} --fix",
     "golden": "npm run lint && npm run test",
     "prepare": "cd .. && husky install",
-    "translate": "node prebuild.js -i18nOnly"
+    "translate": "node prebuild.js -i18nOnly",
+    "proto:generate": "npx buf generate"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "^2.11.0",
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.5.1",
@@ -32,7 +34,6 @@
     "intl-messageformat": "^10.2.1",
     "lodash": "^4.17.21",
     "prop-types": "^15.8.1",
-    "protobufjs": "^7.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-final-form": "^6.5.8",
@@ -48,6 +49,8 @@
     "rxjs": "^7.5.4"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.67.0",
+    "@bufbuild/protoc-gen-es": "^2.11.0",
     "@mui/types": "^7.1.3",
     "@testing-library/jest-dom": "^6.4.0",
     "@testing-library/react": "^13.4.0",

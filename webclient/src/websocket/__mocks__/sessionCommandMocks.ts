@@ -25,38 +25,6 @@ export function makeWebClientMock() {
   };
 }
 
-/** Superset ProtoController.root mock — includes all ResponseCode values and Event_ServerIdentification. */
-export function makeProtoControllerRootMock() {
-  return {
-    Response: {
-      ResponseCode: {
-        RespOk: 0,
-        RespClientUpdateRequired: 1,
-        RespWrongPassword: 2,
-        RespUsernameInvalid: 3,
-        RespWouldOverwriteOldSession: 4,
-        RespUserIsBanned: 5,
-        RespRegistrationRequired: 6,
-        RespClientIdRequired: 7,
-        RespContextError: 8,
-        RespAccountNotActivated: 9,
-        RespRegistrationAccepted: 10,
-        RespRegistrationAcceptedNeedsActivation: 11,
-        RespUserAlreadyExists: 12,
-        RespPasswordTooShort: 13,
-        RespEmailRequiredToRegister: 14,
-        RespEmailBlackListed: 15,
-        RespTooManyRequests: 16,
-        RespRegistrationDisabled: 17,
-        RespActivationAccepted: 18,
-      },
-    },
-    Event_ServerIdentification: {
-      ServerOptions: { SupportsPasswordHash: 2 },
-    },
-  };
-}
-
 /** Utils mock with unified return values. */
 export function makeUtilsMock() {
   return {

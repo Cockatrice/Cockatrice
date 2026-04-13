@@ -1,90 +1,31 @@
-import { Game, NotificationType, ReplayMatch, Room, User } from 'types';
+import type { Event_AddToList } from 'generated/proto/event_add_to_list_pb';
+import type { Event_ConnectionClosed } from 'generated/proto/event_connection_closed_pb';
+import type { Event_GameJoined } from 'generated/proto/event_game_joined_pb';
+import type { Event_ListRooms } from 'generated/proto/event_list_rooms_pb';
+import type { Event_NotifyUser } from 'generated/proto/event_notify_user_pb';
+import type { Event_RemoveFromList } from 'generated/proto/event_remove_from_list_pb';
+import type { Event_ReplayAdded } from 'generated/proto/event_replay_added_pb';
+import type { Event_ServerCompleteList } from 'generated/proto/event_server_complete_list_pb';
+import type { Event_ServerIdentification } from 'generated/proto/event_server_identification_pb';
+import type { Event_ServerMessage } from 'generated/proto/event_server_message_pb';
+import type { Event_ServerShutdown } from 'generated/proto/event_server_shutdown_pb';
+import type { Event_UserJoined } from 'generated/proto/event_user_joined_pb';
+import type { Event_UserLeft } from 'generated/proto/event_user_left_pb';
+import type { Event_UserMessage } from 'generated/proto/event_user_message_pb';
+import type { Event_PlayerPropertiesChanged } from 'generated/proto/event_player_properties_changed_pb';
 
-export interface AddToListData {
-  listName: string;
-  userInfo: User;
-}
-
-export interface ConnectionClosedData {
-  endTime: number;
-  reason: number;
-  reasonStr: string;
-}
-
-export interface GameJoinedData {
-  gameInfo: Game;
-  gameTypes: any[];
-  hostId: number;
-  playerId: number;
-  spectator: boolean;
-  resuming: boolean;
-  judge: boolean;
-}
-
-export interface ListRoomsData {
-  roomList: Room[];
-}
-
-export interface NotifyUserData {
-  type: NotificationType;
-  warningReason: string;
-  customTitle: string;
-  customContent: string;
-}
-
-export interface PlayerGamePropertiesData {
-  playerId: number;
-  userInfo: User;
-  spectator: boolean;
-  conceded: boolean;
-  readyStart: boolean;
-  deckHash: string;
-  pingSeconds: number;
-  sideboardLocked: boolean;
-  judge: boolean;
-}
-
-export interface RemoveFromListData {
-  listName: string;
-  userName: string;
-}
-
-export interface ServerIdentificationData {
-  protocolVersion: number;
-  serverName: string;
-  serverVersion: string;
-  serverOptions: number;
-}
-
-export interface ServerMessageData {
-  message: string;
-}
-
-export interface ServerShutdownData {
-  reason: string;
-  minutes: number;
-}
-
-export interface UserJoinedData {
-  userInfo: User;
-}
-
-export interface UserLeftData {
-  name: string;
-}
-
-export interface UserMessageData {
-  senderName: string;
-  receiverName: string;
-  message: string;
-}
-
-export interface ReplayAddedData {
-  matchInfo: ReplayMatch;
-}
-
-export interface ServerCompleteListData {
-  serverId: number;
-  userList: User[];
-  roomList: Room[];
-}
+export type AddToListData = Event_AddToList;
+export type ConnectionClosedData = Event_ConnectionClosed;
+export type GameJoinedData = Event_GameJoined;
+export type ListRoomsData = Event_ListRooms;
+export type NotifyUserData = Event_NotifyUser;
+export type RemoveFromListData = Event_RemoveFromList;
+export type ReplayAddedData = Event_ReplayAdded;
+export type ServerCompleteListData = Event_ServerCompleteList;
+export type ServerIdentificationData = Event_ServerIdentification;
+export type ServerMessageData = Event_ServerMessage;
+export type ServerShutdownData = Event_ServerShutdown;
+export type UserJoinedData = Event_UserJoined;
+export type UserLeftData = Event_UserLeft;
+export type UserMessageData = Event_UserMessage;
+export type PlayerGamePropertiesData = Event_PlayerPropertiesChanged;

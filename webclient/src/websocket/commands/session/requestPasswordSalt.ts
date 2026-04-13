@@ -1,10 +1,15 @@
 import { RequestPasswordSaltParams } from 'store';
 import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
 
+import { create } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
 import { BackendService } from '../../services/BackendService';
-import { ProtoController } from '../../services/ProtoController';
+import {
+  Command_RequestPasswordSalt_ext, Command_RequestPasswordSaltSchema,
+} from 'generated/proto/session_commands_pb';
 import { SessionPersistence } from '../../persistence';
+import { Response_PasswordSalt_ext } from 'generated/proto/response_password_salt_pb';
+import { Response_ResponseCode } from 'generated/proto/response_pb';
 
 import {
   activate,
@@ -31,11 +36,11 @@ export function requestPasswordSalt(options: WebSocketConnectOptions, password?:
     disconnect();
   };
 
-  BackendService.sendSessionCommand('Command_RequestPasswordSalt', {
+  BackendService.sendSessionCommand(Command_RequestPasswordSalt_ext, create(Command_RequestPasswordSaltSchema, {
     ...webClient.clientConfig,
     userName,
-  }, {
-    responseName: 'Response_PasswordSalt',
+  }), {
+    responseExt: Response_PasswordSalt_ext,
     onSuccess: (resp) => {
       const passwordSalt = resp?.passwordSalt;
 
@@ -51,7 +56,7 @@ export function requestPasswordSalt(options: WebSocketConnectOptions, password?:
       }
     },
     onResponseCode: {
-      [ProtoController.root.Response.ResponseCode.RespRegistrationRequired]: () => {
+      [Response_ResponseCode.RespRegistrationRequired]: () => {
         updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
         onFailure();
       },

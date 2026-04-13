@@ -17,7 +17,7 @@ vi.mock('./services/ProtobufService', () => ({
 
 vi.mock('./persistence', () => ({
   RoomPersistence: { clearStore: vi.fn() },
-  SessionPersistence: { clearStore: vi.fn() },
+  SessionPersistence: { clearStore: vi.fn(), initialized: vi.fn() },
 }));
 
 import { WebClient } from './WebClient';
@@ -59,6 +59,10 @@ describe('WebClient', () => {
       const event = { data: new ArrayBuffer(0) } as MessageEvent;
       messageSubject.next(event);
       expect(client.protobuf.handleMessageEvent).toHaveBeenCalledWith(event);
+    });
+
+    it('calls SessionPersistence.initialized', () => {
+      expect(SessionPersistence.initialized).toHaveBeenCalled();
     });
   });
 

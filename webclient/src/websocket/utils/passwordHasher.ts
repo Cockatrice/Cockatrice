@@ -1,6 +1,6 @@
 import sha512 from 'crypto-js/sha512';
 import Base64 from 'crypto-js/enc-base64';
-import { ProtoController } from '../services/ProtoController';
+import { Event_ServerIdentification_ServerOptions } from 'generated/proto/event_server_identification_pb';
 
 const HASH_ROUNDS = 1_000;
 const SALT_LENGTH = 16;
@@ -28,5 +28,5 @@ export const generateSalt = (): string => {
 
 export const passwordSaltSupported = (serverOptions: number): number => {
   // Intentional use of Bitwise operator b/c of how Servatrice Enums work
-  return serverOptions & ProtoController.root.Event_ServerIdentification.ServerOptions.SupportsPasswordHash;
+  return serverOptions & Event_ServerIdentification_ServerOptions.SupportsPasswordHash;
 }

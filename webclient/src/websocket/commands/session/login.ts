@@ -1,9 +1,13 @@
 import { StatusEnum, WebSocketConnectOptions } from 'types';
+import { create } from '@bufbuild/protobuf';
+import type { MessageInitShape } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
 import { BackendService } from '../../services/BackendService';
-import { ProtoController } from '../../services/ProtoController';
+import { Command_Login_ext, Command_LoginSchema } from 'generated/proto/session_commands_pb';
 import { hashPassword } from '../../utils';
 import { SessionPersistence } from '../../persistence';
+import { Response_Login_ext } from 'generated/proto/response_login_pb';
+import { Response_ResponseCode } from 'generated/proto/response_pb';
 
 import {
   disconnect,
@@ -15,19 +19,14 @@ import {
 export function login(options: WebSocketConnectOptions, password?: string, passwordSalt?: string): void {
   const { userName, hashedPassword } = options;
 
-  const loginConfig: any = {
+  const loginConfig: MessageInitShape<typeof Command_LoginSchema> = {
     ...webClient.clientConfig,
     clientid: 'webatrice',
     userName,
+    ...(passwordSalt
+      ? { hashedPassword: hashedPassword || hashPassword(passwordSalt, password) }
+      : { password }),
   };
-
-  if (passwordSalt) {
-    loginConfig.hashedPassword = hashedPassword || hashPassword(passwordSalt, password);
-  } else {
-    loginConfig.password = password;
-  }
-
-  const { ResponseCode } = ProtoController.root.Response;
 
   const onLoginError = (message: string, extra?: () => void) => {
     updateStatus(StatusEnum.DISCONNECTED, message);
@@ -36,8 +35,8 @@ export function login(options: WebSocketConnectOptions, password?: string, passw
     disconnect();
   };
 
-  BackendService.sendSessionCommand('Command_Login', loginConfig, {
-    responseName: 'Response_Login',
+  BackendService.sendSessionCommand(Command_Login_ext, create(Command_LoginSchema, loginConfig), {
+    responseExt: Response_Login_ext,
     onSuccess: (resp) => {
       const { buddyList, ignoreList, userInfo } = resp;
 
@@ -53,23 +52,23 @@ export function login(options: WebSocketConnectOptions, password?: string, passw
       updateStatus(StatusEnum.LOGGED_IN, 'Logged in.');
     },
     onResponseCode: {
-      [ResponseCode.RespClientUpdateRequired]: () =>
+      [Response_ResponseCode.RespClientUpdateRequired]: () =>
         onLoginError('Login failed: missing features'),
-      [ResponseCode.RespWrongPassword]: () =>
+      [Response_ResponseCode.RespWrongPassword]: () =>
         onLoginError('Login failed: incorrect username or password'),
-      [ResponseCode.RespUsernameInvalid]: () =>
+      [Response_ResponseCode.RespUsernameInvalid]: () =>
         onLoginError('Login failed: incorrect username or password'),
-      [ResponseCode.RespWouldOverwriteOldSession]: () =>
+      [Response_ResponseCode.RespWouldOverwriteOldSession]: () =>
         onLoginError('Login failed: duplicated user session'),
-      [ResponseCode.RespUserIsBanned]: () =>
+      [Response_ResponseCode.RespUserIsBanned]: () =>
         onLoginError('Login failed: banned user'),
-      [ResponseCode.RespRegistrationRequired]: () =>
+      [Response_ResponseCode.RespRegistrationRequired]: () =>
         onLoginError('Login failed: registration required'),
-      [ResponseCode.RespClientIdRequired]: () =>
+      [Response_ResponseCode.RespClientIdRequired]: () =>
         onLoginError('Login failed: missing client ID'),
-      [ResponseCode.RespContextError]: () =>
+      [Response_ResponseCode.RespContextError]: () =>
         onLoginError('Login failed: server error'),
-      [ResponseCode.RespAccountNotActivated]: () =>
+      [Response_ResponseCode.RespAccountNotActivated]: () =>
         onLoginError('Login failed: account not activated',
           () => {
             const { password: _p, newPassword: _np, ...safeOptions } = options;

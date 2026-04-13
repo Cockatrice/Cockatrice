@@ -15,7 +15,7 @@ import { listGames } from './listGames';
 import { removeMessages } from './removeMessages';
 import { roomSay } from './roomSay';
 
-const makeRoomEvent = (roomId: number) => ({ roomEvent: { roomId } });
+const makeRoomEvent = (roomId: number) => ({ roomId }) as any;
 
 beforeEach(() => vi.clearAllMocks());
 

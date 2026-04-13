@@ -1,12 +1,25 @@
+import { create, fromBinary, hasExtension, getExtension, toBinary } from '@bufbuild/protobuf';
+import type { GenExtension, Message } from '@bufbuild/protobuf';
+
+import type { Response } from 'generated/proto/response_pb';
+import type { RoomEvent } from 'generated/proto/room_event_pb';
+import type { SessionEvent } from 'generated/proto/session_event_pb';
+import type { GameEventContainer } from 'generated/proto/game_event_container_pb';
+
 import { GameEvents, RoomEvents, SessionEvents } from '../events';
 import { WebClient } from '../WebClient';
 import { SessionCommands } from 'websocket';
-import { ProtoController } from './ProtoController';
 import { GameEventMeta } from 'types';
 
-export interface ProtobufEvents {
-  [event: string]: Function;
-}
+import { CommandContainerSchema, type CommandContainer } from 'generated/proto/commands_pb';
+import { ServerMessageSchema, ServerMessage_MessageType, type ServerMessage } from 'generated/proto/server_message_pb';
+import type { SessionCommand } from 'generated/proto/session_commands_pb';
+import type { GameCommand } from 'generated/proto/game_commands_pb';
+import type { RoomCommand } from 'generated/proto/room_commands_pb';
+import type { ModeratorCommand } from 'generated/proto/moderator_commands_pb';
+import type { AdminCommand } from 'generated/proto/admin_commands_pb';
+
+export type ExtensionRegistry = Array<[GenExtension<any, any>, (...args: unknown[]) => void]>;
 
 export class ProtobufService {
   private cmdId = 0;
@@ -16,7 +29,6 @@ export class ProtobufService {
 
   constructor(webClient: WebClient) {
     this.webClient = webClient;
-    ProtoController.load();
   }
 
   public resetCommands() {
@@ -24,56 +36,51 @@ export class ProtobufService {
     this.pendingCommands = {};
   }
 
-  public sendGameCommand(gameId: number, gameCmd: any, callback?: Function) {
-    const cmd = ProtoController.root.CommandContainer.create({
+  public sendGameCommand(gameId: number, gameCmd: GameCommand, callback?: Function) {
+    const cmd = create(CommandContainerSchema, {
       gameId,
       gameCommand: [gameCmd],
     });
-
-    this.sendCommand(cmd, (raw: any) => callback && callback(raw));
+    this.sendCommand(cmd, (raw: Response) => callback && callback(raw));
   }
 
-  public sendRoomCommand(roomId: number, roomCmd: any, callback?: Function) {
-    const cmd = ProtoController.root.CommandContainer.create({
-      'roomId': roomId,
-      'roomCommand': [roomCmd]
+  public sendRoomCommand(roomId: number, roomCmd: RoomCommand, callback?: Function) {
+    const cmd = create(CommandContainerSchema, {
+      roomId,
+      roomCommand: [roomCmd],
     });
-
     this.sendCommand(cmd, raw => callback && callback(raw));
   }
 
-  public sendSessionCommand(sesCmd: any, callback?: Function) {
-    const cmd = ProtoController.root.CommandContainer.create({
-      'sessionCommand': [sesCmd]
+  public sendSessionCommand(sesCmd: SessionCommand, callback?: Function) {
+    const cmd = create(CommandContainerSchema, {
+      sessionCommand: [sesCmd],
     });
-
     this.sendCommand(cmd, (raw) => callback && callback(raw));
   }
 
-  public sendModeratorCommand(modCmd: any, callback?: Function) {
-    const cmd = ProtoController.root.CommandContainer.create({
-      'moderatorCommand': [modCmd]
+  public sendModeratorCommand(modCmd: ModeratorCommand, callback?: Function) {
+    const cmd = create(CommandContainerSchema, {
+      moderatorCommand: [modCmd],
     });
-
     this.sendCommand(cmd, (raw) => callback && callback(raw));
   }
 
-  public sendAdminCommand(adminCmd: any, callback?: Function) {
-    const cmd = ProtoController.root.CommandContainer.create({
-      'adminCommand': [adminCmd]
+  public sendAdminCommand(adminCmd: AdminCommand, callback?: Function) {
+    const cmd = create(CommandContainerSchema, {
+      adminCommand: [adminCmd],
     });
-
     this.sendCommand(cmd, (raw) => callback && callback(raw));
   }
 
-  public sendCommand(cmd: any, callback: Function) {
+  public sendCommand(cmd: CommandContainer, callback: Function) {
     this.cmdId++;
 
-    cmd['cmdId'] = this.cmdId;
+    cmd.cmdId = BigInt(this.cmdId);
     this.pendingCommands[this.cmdId] = callback;
 
     if (this.webClient.socket.checkReadyState(WebSocket.OPEN)) {
-      this.webClient.socket.send(ProtoController.root.CommandContainer.encode(cmd).finish());
+      this.webClient.socket.send(toBinary(CommandContainerSchema, cmd));
     }
   }
 
@@ -84,21 +91,21 @@ export class ProtobufService {
   public handleMessageEvent({ data }: MessageEvent): void {
     try {
       const uint8msg = new Uint8Array(data);
-      const msg = ProtoController.root.ServerMessage.decode(uint8msg);
+      const msg: ServerMessage = fromBinary(ServerMessageSchema, uint8msg);
 
       if (msg) {
         switch (msg.messageType) {
-          case ProtoController.root.ServerMessage.MessageType.RESPONSE:
+          case ServerMessage_MessageType.RESPONSE:
             this.processServerResponse(msg.response);
             break;
-          case ProtoController.root.ServerMessage.MessageType.ROOM_EVENT:
-            this.processRoomEvent(msg.roomEvent, msg);
+          case ServerMessage_MessageType.ROOM_EVENT:
+            this.processRoomEvent(msg.roomEvent);
             break;
-          case ProtoController.root.ServerMessage.MessageType.SESSION_EVENT:
-            this.processSessionEvent(msg.sessionEvent, msg);
+          case ServerMessage_MessageType.SESSION_EVENT:
+            this.processSessionEvent(msg.sessionEvent);
             break;
-          case ProtoController.root.ServerMessage.MessageType.GAME_EVENT_CONTAINER:
-            this.processGameEvent(msg.gameEventContainer, msg);
+          case ServerMessage_MessageType.GAME_EVENT_CONTAINER:
+            this.processGameEvent(msg.gameEventContainer);
             break;
           default:
             console.log(msg);
@@ -110,8 +117,11 @@ export class ProtobufService {
     }
   }
 
-  private processServerResponse(response: any) {
-    const { cmdId } = response;
+  private processServerResponse(response: Response | undefined) {
+    if (!response) {
+      return;
+    }
+    const cmdId = Number(response.cmdId);
 
     if (this.pendingCommands[cmdId]) {
       this.pendingCommands[cmdId](response);
@@ -119,15 +129,21 @@ export class ProtobufService {
     }
   }
 
-  private processRoomEvent(response: any, raw: any) {
-    this.processEvent(response, RoomEvents, raw);
+  private processRoomEvent(event: RoomEvent | undefined) {
+    if (!event) {
+      return;
+    }
+    this.processEvent(event, RoomEvents, event);
   }
 
-  private processSessionEvent(response: any, raw: any) {
-    this.processEvent(response, SessionEvents, raw);
+  private processSessionEvent(event: SessionEvent | undefined) {
+    if (!event) {
+      return;
+    }
+    this.processEvent(event, SessionEvents);
   }
 
-  private processGameEvent(container: any, raw: any): void {
+  private processGameEvent(container: GameEventContainer | undefined): void {
     if (!container?.eventList?.length) {
       return;
     }
@@ -143,24 +159,22 @@ export class ProtobufService {
         forcedByJudge: forcedByJudge ?? 0,
       };
 
-      for (const key of Object.keys(GameEvents)) {
-        const payload = event[key];
-        if (payload !== undefined && payload !== null) {
-          (GameEvents[key] as Function)(payload, meta);
+      for (const [ext, handler] of GameEvents) {
+        if (hasExtension(event, ext)) {
+          (handler as Function)(getExtension(event, ext), meta);
           break;
         }
       }
     }
   }
 
-  private processEvent(response: any, events: ProtobufEvents, raw: any) {
-    for (const event in events) {
-      const payload = response[event];
-
-      if (payload !== undefined && payload !== null) {
-        events[event](payload, raw);
+  private processEvent(response: Message<string>, registry: ExtensionRegistry, raw?: Message) {
+    for (const [ext, handler] of registry) {
+      if (hasExtension(response, ext)) {
+        (handler as Function)(getExtension(response, ext), raw);
         return;
       }
     }
   }
 }
+
