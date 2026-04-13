@@ -1244,6 +1244,41 @@ StorageSettingsPage::StorageSettingsPage()
     pixmapCacheEdit.setValue(SettingsCache::instance().getPixmapCacheSize());
     pixmapCacheEdit.setSuffix(" MB");
 
+    // Caching method
+
+    cardPictureLoaderCacheMethodComboBox = new QComboBox;
+    for (auto method : CardPictureLoaderCacheMethod::methods()) {
+        cardPictureLoaderCacheMethodComboBox->addItem(method.displayName, static_cast<int>(method.id));
+    }
+
+    int currentCacheMethod = static_cast<int>(SettingsCache::instance().getCardPictureLoaderCacheMethod());
+
+    int currentIndex = cardPictureLoaderCacheMethodComboBox->findData(currentCacheMethod);
+    if (currentIndex >= 0) {
+        cardPictureLoaderCacheMethodComboBox->setCurrentIndex(currentIndex);
+    }
+
+    connect(cardPictureLoaderCacheMethodComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            [this](int index) {
+                auto cacheMethod = static_cast<CardPictureLoaderCacheMethod::CacheMethod>(
+                    cardPictureLoaderCacheMethodComboBox->itemData(index).toInt());
+
+                bool useNetworkCache = (cacheMethod == CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE);
+
+                if (useNetworkCache) {
+                    clearImageBackupsButtonClicked();
+                } else {
+                    clearDownloadedPicsButtonClicked();
+                }
+
+                mpNetworkCacheGroupBox->setEnabled(useNetworkCache);
+                mpImageBackupGroupBox->setEnabled(!useNetworkCache);
+
+                SettingsCache::instance().setCardImageCacheMethod(cacheMethod);
+            });
+
+    // Network Cache
+
     networkCacheEdit.setMinimum(NETWORK_CACHE_SIZE_MIN);
     networkCacheEdit.setMaximum(NETWORK_CACHE_SIZE_MAX);
     networkCacheEdit.setSingleStep(1);
@@ -1256,10 +1291,6 @@ StorageSettingsPage::StorageSettingsPage()
     networkRedirectCacheTtlEdit.setValue(SettingsCache::instance().getRedirectCacheTtl());
 
     // Image Backup
-    saveCardImagesToLocalStorageCheckBox.setChecked(SettingsCache::instance().getSaveCardImagesToLocalStorage());
-    connect(&saveCardImagesToLocalStorageCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setSaveCardImagesToLocalStorage);
-
     localCardImageStorageNamingSchemeComboBox = new QComboBox;
     for (const auto &scheme : CardPictureLoaderLocalSchemes::exportSchemes()) {
         localCardImageStorageNamingSchemeComboBox->addItem(scheme.displayName, static_cast<int>(scheme.id));
@@ -1281,7 +1312,12 @@ StorageSettingsPage::StorageSettingsPage()
 
     connect(&clearBackupsButton, &QPushButton::clicked, this, &StorageSettingsPage::clearImageBackupsButtonClicked);
 
+    auto cacheMethodLayout = new QHBoxLayout;
+    cacheMethodLayout->addWidget(&cardPictureLoaderCacheMethodLabel);
+    cacheMethodLayout->addWidget(cardPictureLoaderCacheMethodComboBox);
+
     auto networkCacheLayout = new QHBoxLayout;
+    networkCacheLayout->addWidget(&clearDownloadedPicsButton);
     networkCacheLayout->addStretch();
     networkCacheLayout->addWidget(&networkCacheLabel);
     networkCacheLayout->addWidget(&networkCacheEdit);
@@ -1299,7 +1335,6 @@ StorageSettingsPage::StorageSettingsPage()
     lpNetworkCacheGrid->addWidget(&networkCacheExplainerLabel, 0, 0);
     lpNetworkCacheGrid->addLayout(networkCacheLayout, 1, 0);
     lpNetworkCacheGrid->addLayout(networkRedirectCacheLayout, 2, 0);
-    lpNetworkCacheGrid->addWidget(&clearDownloadedPicsButton, 3, 0);
 
     // Image Backup Layout
     lpImageBackupGrid->addWidget(&imageBackupExplainerLabel, 0, 0, 1, 2);
@@ -1309,7 +1344,7 @@ StorageSettingsPage::StorageSettingsPage()
     lpImageBackupGrid->addWidget(&clearBackupsButton, 3, 1);
 
     lpPixmapCacheGrid->addWidget(&pixmapCacheExplainerLabel, 0, 0);
-    lpPixmapCacheGrid->addLayout(pixmapCacheLayout, 1, 0);
+    lpPixmapCacheGrid->addLayout(pixmapCacheLayout, 1, 1);
 
     connect(&pixmapCacheEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
             &SettingsCache::setPixmapCacheSize);
@@ -1317,6 +1352,9 @@ StorageSettingsPage::StorageSettingsPage()
             &SettingsCache::setNetworkCacheSizeInMB);
     connect(&networkRedirectCacheTtlEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
             &SettingsCache::setNetworkRedirectCacheTtl);
+
+    mpCacheMethodGroupBox = new QGroupBox;
+    mpCacheMethodGroupBox->setLayout(cacheMethodLayout);
 
     mpNetworkCacheGroupBox = new QGroupBox;
     mpNetworkCacheGroupBox->setLayout(lpNetworkCacheGrid);
@@ -1329,11 +1367,18 @@ StorageSettingsPage::StorageSettingsPage()
 
     auto *lpMainLayout = new QVBoxLayout;
 
+    lpMainLayout->addWidget(mpCacheMethodGroupBox);
     lpMainLayout->addWidget(mpNetworkCacheGroupBox);
     lpMainLayout->addWidget(mpImageBackupGroupBox);
     lpMainLayout->addWidget(mpPixmapCacheGroupBox);
 
     setLayout(lpMainLayout);
+
+    bool useNetworkCache = SettingsCache::instance().getCardPictureLoaderCacheMethod() ==
+                           CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE;
+
+    mpNetworkCacheGroupBox->setEnabled(useNetworkCache);
+    mpImageBackupGroupBox->setEnabled(!useNetworkCache);
 
     connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &StorageSettingsPage::retranslateUi);
     retranslateUi();
@@ -1342,6 +1387,7 @@ StorageSettingsPage::StorageSettingsPage()
 void StorageSettingsPage::clearDownloadedPicsButtonClicked()
 {
     CardPictureLoader::clearNetworkCache();
+    CardPictureLoader::clearPixmapCache();
     QMessageBox::information(this, tr("Success"), tr("Cached card pictures have been reset."));
 }
 
@@ -1352,6 +1398,8 @@ void StorageSettingsPage::clearImageBackupsButtonClicked()
     QDir dir(picsPath);
     bool success = dir.removeRecursively();
 
+    CardPictureLoader::clearPixmapCache();
+
     if (success) {
         QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
     } else {
@@ -1361,6 +1409,8 @@ void StorageSettingsPage::clearImageBackupsButtonClicked()
 
 void StorageSettingsPage::retranslateUi()
 {
+    cardPictureLoaderCacheMethodLabel.setText(tr("Card Picture Loader Caching Method:"));
+
     networkCacheExplainerLabel.setText(
         tr("The network cache is the preferred way of storing images. Downloaded images "
            "are stored here until the size of the cache exceeds the configured size. Cockatrice automatically monitors "
@@ -1383,6 +1433,7 @@ void StorageSettingsPage::retranslateUi()
     clearDownloadedPicsButton.setText(tr("Delete Cached Images"));
     clearBackupsButton.setText(tr("Delete Saved Images"));
 
+    mpCacheMethodGroupBox->setTitle(tr("Card Picture Loader Cache Method"));
     mpNetworkCacheGroupBox->setTitle(tr("Network Cache"));
     mpImageBackupGroupBox->setTitle(tr("Image Backup"));
     mpPixmapCacheGroupBox->setTitle(tr("In-Memory Picture Cache"));

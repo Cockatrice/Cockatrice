@@ -1,5 +1,6 @@
 #include "cache_settings.h"
 
+#include "../../interface/card_picture_loader/card_picture_loader_cache_method.h"
 #include "../../interface/card_picture_loader/card_picture_loader_local_schemes.h"
 #include "../network/update/client/release_channel.h"
 #include "card_counter_settings.h"
@@ -265,7 +266,11 @@ SettingsCache::SettingsCache()
 
     networkCacheSize = settings->value("personal/networkCacheSize", NETWORK_CACHE_SIZE_DEFAULT).toInt();
     redirectCacheTtl = settings->value("personal/redirectCacheTtl", NETWORK_REDIRECT_CACHE_TTL_DEFAULT).toInt();
-    saveCardImagesToLocalStorage = settings->value("personal/saveCardImagesToLocalStorage", true).toBool();
+    cardPictureLoaderCacheMethod =
+        settings
+            ->value("personal/cardPictureLoaderCacheMethod",
+                    static_cast<int>(CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE))
+            .toInt();
     localCardImageStorageNamingScheme =
         settings
             ->value("personal/localCardImageStorageNamingScheme",
@@ -1104,6 +1109,13 @@ void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
     emit pixmapCacheSizeChanged(pixmapCacheSize);
 }
 
+void SettingsCache::setCardImageCacheMethod(const CardPictureLoaderCacheMethod::CacheMethod _cardImageCachingMethod)
+{
+    cardPictureLoaderCacheMethod = static_cast<int>(_cardImageCachingMethod);
+    settings->setValue("personal/cardPictureLoaderCacheMethod", cardPictureLoaderCacheMethod);
+    emit cardPictureLoaderCacheMethodChanged(cardPictureLoaderCacheMethod);
+}
+
 void SettingsCache::setNetworkCacheSizeInMB(const int _networkCacheSize)
 {
     networkCacheSize = _networkCacheSize;
@@ -1116,13 +1128,6 @@ void SettingsCache::setNetworkRedirectCacheTtl(const int _redirectCacheTtl)
     redirectCacheTtl = _redirectCacheTtl;
     settings->setValue("personal/redirectCacheSize", redirectCacheTtl);
     emit redirectCacheTtlChanged(redirectCacheTtl);
-}
-
-void SettingsCache::setSaveCardImagesToLocalStorage(QT_STATE_CHANGED_T _saveCardImagesToLocalStorage)
-{
-    saveCardImagesToLocalStorage = _saveCardImagesToLocalStorage;
-    settings->setValue("personal/saveCardImagesToLocalStorage", saveCardImagesToLocalStorage);
-    emit saveCardImagesToLocalStorageChanged(saveCardImagesToLocalStorage);
 }
 
 void SettingsCache::setLocalCardImageStorageNamingScheme(

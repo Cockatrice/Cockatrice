@@ -169,7 +169,8 @@ void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
 
     QPixmapCache::insert(card.getPixmapCacheKey(), finalPixmap);
 
-    if (SettingsCache::instance().getSaveCardImagesToLocalStorage()) {
+    if (SettingsCache::instance().getCardPictureLoaderCacheMethod() ==
+        CardPictureLoaderCacheMethod::CacheMethod::FILESYSTEM_CACHE) {
         saveCardImageToLocalStorage(card, finalPixmap);
     }
 

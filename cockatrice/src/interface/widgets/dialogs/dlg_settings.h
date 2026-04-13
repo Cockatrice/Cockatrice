@@ -249,6 +249,7 @@ private:
     QPushButton clearDownloadedPicsButton;
     QPushButton clearBackupsButton;
 
+    QGroupBox *mpCacheMethodGroupBox;
     QGroupBox *mpNetworkCacheGroupBox;
     QGroupBox *mpImageBackupGroupBox;
     QGroupBox *mpPixmapCacheGroupBox;
@@ -257,6 +258,8 @@ private:
     QLabel imageBackupExplainerLabel;
     QLabel pixmapCacheExplainerLabel;
 
+    QLabel cardPictureLoaderCacheMethodLabel;
+    QComboBox *cardPictureLoaderCacheMethodComboBox;
     QLabel networkCacheLabel;
     QSpinBox networkCacheEdit;
     QLabel networkRedirectCacheTtlLabel;

@@ -7,6 +7,7 @@
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 
+#include "../../interface/card_picture_loader/card_picture_loader_cache_method.h"
 #include "../../interface/card_picture_loader/card_picture_loader_local_schemes.h"
 #include "shortcuts_settings.h"
 
@@ -185,7 +186,7 @@ signals:
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void networkCacheSizeChanged(int newSizeInMBs);
     void redirectCacheTtlChanged(int newTtl);
-    void saveCardImagesToLocalStorageChanged(bool saveCardImagesToLocalStorage);
+    void cardPictureLoaderCacheMethodChanged(int cardPictureLoaderCacheMethod);
     void localCardImageStorageNamingSchemeChanged(int localCardImageStorageNamingScheme);
     void masterVolumeChanged(int value);
     void chatMentionCompleterChanged();
@@ -305,7 +306,7 @@ private:
     int pixmapCacheSize;
     int networkCacheSize;
     int redirectCacheTtl;
-    bool saveCardImagesToLocalStorage;
+    int cardPictureLoaderCacheMethod;
     int localCardImageStorageNamingScheme;
     bool scaleCards;
     int verticalCardOverlapPercent;
@@ -786,6 +787,10 @@ public:
     {
         return pixmapCacheSize;
     }
+    [[nodiscard]] CardPictureLoaderCacheMethod::CacheMethod getCardPictureLoaderCacheMethod() const
+    {
+        return static_cast<CardPictureLoaderCacheMethod::CacheMethod>(cardPictureLoaderCacheMethod);
+    }
     [[nodiscard]] int getNetworkCacheSizeInMB() const
     {
         return networkCacheSize;
@@ -793,10 +798,6 @@ public:
     [[nodiscard]] int getRedirectCacheTtl() const
     {
         return redirectCacheTtl;
-    }
-    [[nodiscard]] bool getSaveCardImagesToLocalStorage() const
-    {
-        return saveCardImagesToLocalStorage;
     }
     [[nodiscard]] CardPictureLoaderLocalSchemes::NamingScheme getLocalCardImageStorageNamingScheme() const
     {
@@ -1106,9 +1107,9 @@ public slots:
     void setIgnoreUnregisteredUsers(QT_STATE_CHANGED_T _ignoreUnregisteredUsers);
     void setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignoreUnregisteredUserMessages);
     void setPixmapCacheSize(const int _pixmapCacheSize);
+    void setCardImageCacheMethod(CardPictureLoaderCacheMethod::CacheMethod _cardImageCachingMethod);
     void setNetworkCacheSizeInMB(const int _networkCacheSize);
     void setNetworkRedirectCacheTtl(const int _redirectCacheTtl);
-    void setSaveCardImagesToLocalStorage(QT_STATE_CHANGED_T _saveCardImagesToLocalStorage);
     void setLocalCardImageStorageNamingScheme(
         const CardPictureLoaderLocalSchemes::NamingScheme _localCardImageStorageNamingScheme);
     void setCardScaling(const QT_STATE_CHANGED_T _scaleCards);
