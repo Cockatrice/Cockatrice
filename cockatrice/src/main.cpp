@@ -24,6 +24,7 @@
 #include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
 #include "database/interface/settings_card_preference_provider.h"
+#include "interface/intents/intent_open_local_deck.h"
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
@@ -318,11 +319,8 @@ int main(int argc, char *argv[])
         if (file.startsWith("cockatrice://")) {
             // ui.openUrl(QUrl(file));
         } else if (QFileInfo(file).exists()) {
-            std::optional<LoadedDeck> deckOpt =
-                DeckLoader::loadFromFile(file, DeckFileFormat::getFormatFromName(file), true);
-            if (deckOpt) {
-                ui.getTabSupervisor()->openDeckInNewTab(deckOpt.value());
-            }
+            auto openDeckIntent = new IntentOpenLocalDeck(ui.getTabSupervisor(), file);
+            openDeckIntent->execute();
         }
     }
 
@@ -332,11 +330,8 @@ int main(int argc, char *argv[])
             if (file.startsWith("cockatrice://")) {
                 // ui.openUrl(QUrl(file));
             } else if (QFileInfo(file).exists()) {
-                std::optional<LoadedDeck> deckOpt =
-                    DeckLoader::loadFromFile(file, DeckFileFormat::getFormatFromName(file), true);
-                if (deckOpt) {
-                    ui.getTabSupervisor()->openDeckInNewTab(deckOpt.value());
-                }
+                auto openDeckIntent = new IntentOpenLocalDeck(ui.getTabSupervisor(), file);
+                openDeckIntent->execute();
             }
         }
     });

@@ -125,6 +125,9 @@ set(cockatrice_SOURCES
     src/interface/card_picture_loader/card_picture_loader_worker.cpp
     src/interface/card_picture_loader/card_picture_loader_worker_work.cpp
     src/interface/card_picture_loader/card_picture_to_load.cpp
+    src/interface/intents/intent.cpp
+    src/interface/intents/intent_open_local_deck.cpp
+    src/interface/intents/intent_wait_for_database_load.cpp
     src/interface/layouts/flow_layout.cpp
     src/interface/layouts/overlap_layout.cpp
     src/interface/widgets/utility/line_edit_completer.cpp
