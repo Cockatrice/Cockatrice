@@ -213,13 +213,9 @@ private slots:
     void actAddURL();
     void actRemoveURL();
     void actEditURL();
-    void clearDownloadedPicsButtonClicked();
     void resetDownloadedURLsButtonClicked();
-    void clearImageBackupsButtonClicked();
 
 private:
-    QPushButton clearDownloadedPicsButton;
-    QPushButton clearBackupsButton;
     QPushButton resetDownloadURLs;
     QLabel urlLinkLabel;
     QCheckBox picDownloadCheckBox;
@@ -229,7 +225,6 @@ private:
     QLabel msDownloadSpoilersLabel;
     QGroupBox *mpGeneralGroupBox;
     QGroupBox *mpSpoilerGroupBox;
-    QGroupBox *mpImageBackupGroupBox;
 
     QLineEdit *mpSpoilerSavePathLineEdit;
     QLabel mcSpoilerSaveLabel;
@@ -237,6 +232,31 @@ private:
     QLabel infoOnSpoilersLabel;
     QPushButton *mpSpoilerPathButton;
     QPushButton *updateNowButton;
+};
+
+class StorageSettingsPage : public AbstractSettingsPage
+{
+    Q_OBJECT
+public:
+    StorageSettingsPage();
+    void retranslateUi() override;
+
+private slots:
+    void clearDownloadedPicsButtonClicked();
+    void clearImageBackupsButtonClicked();
+
+private:
+    QPushButton clearDownloadedPicsButton;
+    QPushButton clearBackupsButton;
+
+    QGroupBox *mpNetworkCacheGroupBox;
+    QGroupBox *mpImageBackupGroupBox;
+    QGroupBox *mpPixmapCacheGroupBox;
+
+    QLabel networkCacheExplainerLabel;
+    QLabel imageBackupExplainerLabel;
+    QLabel pixmapCacheExplainerLabel;
+
     QLabel networkCacheLabel;
     QSpinBox networkCacheEdit;
     QLabel networkRedirectCacheTtlLabel;
@@ -360,8 +380,8 @@ private slots:
 private:
     QListWidget *contentsWidget;
     QStackedWidget *pagesWidget;
-    QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton,
-        *soundButton, *shortcutsButton;
+    QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *storageButton,
+        *messagesButton, *soundButton, *shortcutsButton;
     void createIcons();
     void retranslateUi();
 

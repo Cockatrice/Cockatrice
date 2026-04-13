@@ -1003,13 +1003,10 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     urlLinkLabel.setOpenExternalLinks(true);
 
-    connect(&clearDownloadedPicsButton, &QPushButton::clicked, this,
-            &DeckEditorSettingsPage::clearDownloadedPicsButtonClicked);
     connect(&resetDownloadURLs, &QPushButton::clicked, this, &DeckEditorSettingsPage::resetDownloadedURLsButtonClicked);
 
     auto *lpGeneralGrid = new QGridLayout;
     auto *lpSpoilerGrid = new QGridLayout;
-    auto *lpImageBackupGrid = new QGridLayout;
 
     mcDownloadSpoilersCheckBox.setChecked(SettingsCache::instance().getDownloadSpoilersStatus());
 
@@ -1057,75 +1054,11 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     urlListLayout->addWidget(urlToolBar);
     urlListLayout->addWidget(urlList);
 
-    // pixmap cache
-    pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
-    // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
-    pixmapCacheEdit.setMaximum(PIXMAPCACHE_SIZE_MAX);
-    pixmapCacheEdit.setSingleStep(64);
-    pixmapCacheEdit.setValue(SettingsCache::instance().getPixmapCacheSize());
-    pixmapCacheEdit.setSuffix(" MB");
-
-    networkCacheEdit.setMinimum(NETWORK_CACHE_SIZE_MIN);
-    networkCacheEdit.setMaximum(NETWORK_CACHE_SIZE_MAX);
-    networkCacheEdit.setSingleStep(1);
-    networkCacheEdit.setValue(SettingsCache::instance().getNetworkCacheSizeInMB());
-    networkCacheEdit.setSuffix(" MB");
-
-    networkRedirectCacheTtlEdit.setMinimum(NETWORK_REDIRECT_CACHE_TTL_MIN);
-    networkRedirectCacheTtlEdit.setMaximum(NETWORK_REDIRECT_CACHE_TTL_MAX);
-    networkRedirectCacheTtlEdit.setSingleStep(1);
-    networkRedirectCacheTtlEdit.setValue(SettingsCache::instance().getRedirectCacheTtl());
-
-    // Image Backup
-    saveCardImagesToLocalStorageCheckBox.setChecked(SettingsCache::instance().getSaveCardImagesToLocalStorage());
-    connect(&saveCardImagesToLocalStorageCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setSaveCardImagesToLocalStorage);
-
-    localCardImageStorageNamingSchemeComboBox = new QComboBox;
-    for (const auto &scheme : CardPictureLoaderLocalSchemes::exportSchemes()) {
-        localCardImageStorageNamingSchemeComboBox->addItem(scheme.displayName, static_cast<int>(scheme.id));
-    }
-
-    int current = static_cast<int>(SettingsCache::instance().getLocalCardImageStorageNamingScheme());
-
-    int index = localCardImageStorageNamingSchemeComboBox->findData(current);
-    if (index >= 0) {
-        localCardImageStorageNamingSchemeComboBox->setCurrentIndex(index);
-    }
-
-    connect(localCardImageStorageNamingSchemeComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
-            [this](int index) {
-                auto scheme = static_cast<CardPictureLoaderLocalSchemes::NamingScheme>(
-                    localCardImageStorageNamingSchemeComboBox->itemData(index).toInt());
-                SettingsCache::instance().setLocalCardImageStorageNamingScheme(scheme);
-            });
-
-    connect(&clearBackupsButton, &QPushButton::clicked, this, &DeckEditorSettingsPage::clearImageBackupsButtonClicked);
-
-    auto networkCacheLayout = new QHBoxLayout;
-    networkCacheLayout->addStretch();
-    networkCacheLayout->addWidget(&networkCacheLabel);
-    networkCacheLayout->addWidget(&networkCacheEdit);
-
-    auto networkRedirectCacheLayout = new QHBoxLayout;
-    networkRedirectCacheLayout->addStretch();
-    networkRedirectCacheLayout->addWidget(&networkRedirectCacheTtlLabel);
-    networkRedirectCacheLayout->addWidget(&networkRedirectCacheTtlEdit);
-
-    auto pixmapCacheLayout = new QHBoxLayout;
-    pixmapCacheLayout->addStretch();
-    pixmapCacheLayout->addWidget(&pixmapCacheLabel);
-    pixmapCacheLayout->addWidget(&pixmapCacheEdit);
-
     // Top Layout
     lpGeneralGrid->addWidget(&picDownloadCheckBox, 0, 0);
     lpGeneralGrid->addWidget(&resetDownloadURLs, 0, 1);
     lpGeneralGrid->addLayout(urlListLayout, 1, 0, 1, 2);
-    lpGeneralGrid->addLayout(networkCacheLayout, 2, 1);
-    lpGeneralGrid->addLayout(networkRedirectCacheLayout, 3, 0);
-    lpGeneralGrid->addLayout(pixmapCacheLayout, 3, 1);
     lpGeneralGrid->addWidget(&urlLinkLabel, 4, 0);
-    lpGeneralGrid->addWidget(&clearDownloadedPicsButton, 4, 1);
 
     // Spoiler Layout
     lpSpoilerGrid->addWidget(&mcDownloadSpoilersCheckBox, 0, 0);
@@ -1136,22 +1069,10 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(updateNowButton, 2, 1);
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
 
-    // Image Backup Layout
-    lpImageBackupGrid->addWidget(&saveCardImagesToLocalStorageCheckBox, 0, 0, 1, 2);
-    lpImageBackupGrid->addWidget(&localCardImageStorageNamingSchemeLabel, 1, 0);
-    lpImageBackupGrid->addWidget(localCardImageStorageNamingSchemeComboBox, 1, 1);
-    lpImageBackupGrid->addWidget(&clearBackupsButton, 3, 1);
-
     // On a change to the checkbox, hide/un-hide the other fields
     connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, &SettingsCache::instance(),
             &SettingsCache::setDownloadSpoilerStatus);
     connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, this, &DeckEditorSettingsPage::setSpoilersEnabled);
-    connect(&pixmapCacheEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
-            &SettingsCache::setPixmapCacheSize);
-    connect(&networkCacheEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
-            &SettingsCache::setNetworkCacheSizeInMB);
-    connect(&networkRedirectCacheTtlEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
-            &SettingsCache::setNetworkRedirectCacheTtl);
 
     mpGeneralGroupBox = new QGroupBox;
     mpGeneralGroupBox->setLayout(lpGeneralGrid);
@@ -1159,13 +1080,9 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     mpSpoilerGroupBox = new QGroupBox;
     mpSpoilerGroupBox->setLayout(lpSpoilerGrid);
 
-    mpImageBackupGroupBox = new QGroupBox;
-    mpImageBackupGroupBox->setLayout(lpImageBackupGrid);
-
     auto *lpMainLayout = new QVBoxLayout;
     lpMainLayout->addWidget(mpGeneralGroupBox);
     lpMainLayout->addWidget(mpSpoilerGroupBox);
-    lpMainLayout->addWidget(mpImageBackupGroupBox);
 
     setLayout(lpMainLayout);
 
@@ -1179,26 +1096,6 @@ void DeckEditorSettingsPage::resetDownloadedURLsButtonClicked()
     urlList->clear();
     urlList->addItems(SettingsCache::instance().downloads().getAllURLs());
     QMessageBox::information(this, tr("Success"), tr("Download URLs have been reset."));
-}
-
-void DeckEditorSettingsPage::clearDownloadedPicsButtonClicked()
-{
-    CardPictureLoader::clearNetworkCache();
-    QMessageBox::information(this, tr("Success"), tr("Cached card pictures have been reset."));
-}
-
-void DeckEditorSettingsPage::clearImageBackupsButtonClicked()
-{
-    QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics";
-
-    QDir dir(picsPath);
-    bool success = dir.removeRecursively();
-
-    if (success) {
-        QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
-    } else {
-        QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card pictures could not be cleared."));
-    }
 }
 
 void DeckEditorSettingsPage::actAddURL()
@@ -1311,7 +1208,6 @@ void DeckEditorSettingsPage::retranslateUi()
 {
     mpGeneralGroupBox->setTitle(tr("URL Download Priority"));
     mpSpoilerGroupBox->setTitle(tr("Spoilers"));
-    mpImageBackupGroupBox->setTitle(tr("Image Backup"));
     mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));
     lastUpdatedLabel.setText(tr("Last Change") + ": " + getLastUpdateTime());
@@ -1320,9 +1216,177 @@ void DeckEditorSettingsPage::retranslateUi()
                                 tr("Do not close settings until manual update is complete"));
     picDownloadCheckBox.setText(tr("Download card pictures on the fly"));
     urlLinkLabel.setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_PIC_URL).arg(tr("How to add a custom URL")));
+    resetDownloadURLs.setText(tr("Reset Download URLs"));
+    updateNowButton->setText(tr("Update Spoilers"));
+    aAdd->setText(tr("Add New URL"));
+    aEdit->setText(tr("Edit URL"));
+    aRemove->setText(tr("Remove URL"));
+}
+
+StorageSettingsPage::StorageSettingsPage()
+{
+    auto *lpNetworkCacheGrid = new QGridLayout;
+    auto *lpImageBackupGrid = new QGridLayout;
+    auto *lpPixmapCacheGrid = new QGridLayout;
+
+    networkCacheExplainerLabel.setWordWrap(true);
+    imageBackupExplainerLabel.setWordWrap(true);
+    pixmapCacheExplainerLabel.setWordWrap(true);
+
+    connect(&clearDownloadedPicsButton, &QPushButton::clicked, this,
+            &StorageSettingsPage::clearDownloadedPicsButtonClicked);
+
+    // pixmap cache
+    pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
+    // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
+    pixmapCacheEdit.setMaximum(PIXMAPCACHE_SIZE_MAX);
+    pixmapCacheEdit.setSingleStep(64);
+    pixmapCacheEdit.setValue(SettingsCache::instance().getPixmapCacheSize());
+    pixmapCacheEdit.setSuffix(" MB");
+
+    networkCacheEdit.setMinimum(NETWORK_CACHE_SIZE_MIN);
+    networkCacheEdit.setMaximum(NETWORK_CACHE_SIZE_MAX);
+    networkCacheEdit.setSingleStep(1);
+    networkCacheEdit.setValue(SettingsCache::instance().getNetworkCacheSizeInMB());
+    networkCacheEdit.setSuffix(" MB");
+
+    networkRedirectCacheTtlEdit.setMinimum(NETWORK_REDIRECT_CACHE_TTL_MIN);
+    networkRedirectCacheTtlEdit.setMaximum(NETWORK_REDIRECT_CACHE_TTL_MAX);
+    networkRedirectCacheTtlEdit.setSingleStep(1);
+    networkRedirectCacheTtlEdit.setValue(SettingsCache::instance().getRedirectCacheTtl());
+
+    // Image Backup
+    saveCardImagesToLocalStorageCheckBox.setChecked(SettingsCache::instance().getSaveCardImagesToLocalStorage());
+    connect(&saveCardImagesToLocalStorageCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setSaveCardImagesToLocalStorage);
+
+    localCardImageStorageNamingSchemeComboBox = new QComboBox;
+    for (const auto &scheme : CardPictureLoaderLocalSchemes::exportSchemes()) {
+        localCardImageStorageNamingSchemeComboBox->addItem(scheme.displayName, static_cast<int>(scheme.id));
+    }
+
+    int current = static_cast<int>(SettingsCache::instance().getLocalCardImageStorageNamingScheme());
+
+    int index = localCardImageStorageNamingSchemeComboBox->findData(current);
+    if (index >= 0) {
+        localCardImageStorageNamingSchemeComboBox->setCurrentIndex(index);
+    }
+
+    connect(localCardImageStorageNamingSchemeComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            [this](int index) {
+                auto scheme = static_cast<CardPictureLoaderLocalSchemes::NamingScheme>(
+                    localCardImageStorageNamingSchemeComboBox->itemData(index).toInt());
+                SettingsCache::instance().setLocalCardImageStorageNamingScheme(scheme);
+            });
+
+    connect(&clearBackupsButton, &QPushButton::clicked, this, &StorageSettingsPage::clearImageBackupsButtonClicked);
+
+    auto networkCacheLayout = new QHBoxLayout;
+    networkCacheLayout->addStretch();
+    networkCacheLayout->addWidget(&networkCacheLabel);
+    networkCacheLayout->addWidget(&networkCacheEdit);
+
+    auto networkRedirectCacheLayout = new QHBoxLayout;
+    networkRedirectCacheLayout->addStretch();
+    networkRedirectCacheLayout->addWidget(&networkRedirectCacheTtlLabel);
+    networkRedirectCacheLayout->addWidget(&networkRedirectCacheTtlEdit);
+
+    auto pixmapCacheLayout = new QHBoxLayout;
+    pixmapCacheLayout->addStretch();
+    pixmapCacheLayout->addWidget(&pixmapCacheLabel);
+    pixmapCacheLayout->addWidget(&pixmapCacheEdit);
+
+    lpNetworkCacheGrid->addWidget(&networkCacheExplainerLabel, 0, 0);
+    lpNetworkCacheGrid->addLayout(networkCacheLayout, 1, 0);
+    lpNetworkCacheGrid->addLayout(networkRedirectCacheLayout, 2, 0);
+    lpNetworkCacheGrid->addWidget(&clearDownloadedPicsButton, 3, 0);
+
+    // Image Backup Layout
+    lpImageBackupGrid->addWidget(&imageBackupExplainerLabel, 0, 0, 1, 2);
+    lpImageBackupGrid->addWidget(&saveCardImagesToLocalStorageCheckBox, 1, 0);
+    lpImageBackupGrid->addWidget(&localCardImageStorageNamingSchemeLabel, 2, 0);
+    lpImageBackupGrid->addWidget(localCardImageStorageNamingSchemeComboBox, 2, 1);
+    lpImageBackupGrid->addWidget(&clearBackupsButton, 3, 1);
+
+    lpPixmapCacheGrid->addWidget(&pixmapCacheExplainerLabel, 0, 0);
+    lpPixmapCacheGrid->addLayout(pixmapCacheLayout, 1, 0);
+
+    connect(&pixmapCacheEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setPixmapCacheSize);
+    connect(&networkCacheEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setNetworkCacheSizeInMB);
+    connect(&networkRedirectCacheTtlEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
+            &SettingsCache::setNetworkRedirectCacheTtl);
+
+    mpNetworkCacheGroupBox = new QGroupBox;
+    mpNetworkCacheGroupBox->setLayout(lpNetworkCacheGrid);
+
+    mpImageBackupGroupBox = new QGroupBox;
+    mpImageBackupGroupBox->setLayout(lpImageBackupGrid);
+
+    mpPixmapCacheGroupBox = new QGroupBox;
+    mpPixmapCacheGroupBox->setLayout(lpPixmapCacheGrid);
+
+    auto *lpMainLayout = new QVBoxLayout;
+
+    lpMainLayout->addWidget(mpNetworkCacheGroupBox);
+    lpMainLayout->addWidget(mpImageBackupGroupBox);
+    lpMainLayout->addWidget(mpPixmapCacheGroupBox);
+
+    setLayout(lpMainLayout);
+
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &StorageSettingsPage::retranslateUi);
+    retranslateUi();
+}
+
+void StorageSettingsPage::clearDownloadedPicsButtonClicked()
+{
+    CardPictureLoader::clearNetworkCache();
+    QMessageBox::information(this, tr("Success"), tr("Cached card pictures have been reset."));
+}
+
+void StorageSettingsPage::clearImageBackupsButtonClicked()
+{
+    QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics";
+
+    QDir dir(picsPath);
+    bool success = dir.removeRecursively();
+
+    if (success) {
+        QMessageBox::information(this, tr("Success"), tr("Downloaded card pictures have been reset."));
+    } else {
+        QMessageBox::critical(this, tr("Error"), tr("One or more downloaded card pictures could not be cleared."));
+    }
+}
+
+void StorageSettingsPage::retranslateUi()
+{
+    networkCacheExplainerLabel.setText(
+        tr("The network cache is the preferred way of storing images. Downloaded images "
+           "are stored here until the size of the cache exceeds the configured size. Cockatrice automatically monitors "
+           "this cache and deletes the least recently seen card images to ensure the cache does not exceed the "
+           "configured size."));
+    imageBackupExplainerLabel.setText(
+        tr("Writing card images directly to a folder on your hard drive is another way "
+           "of storing images. This does not change how Cockatrice accesses or downloads "
+           "images. Cockatrice will NOT automatically monitor and clear this folder, so if you enable this option, it "
+           "is up to you to ensure sufficient available space. It should also be noted that if a provider outage "
+           "causes you to download the wrong picture (i.e. wrong printing) you will be stuck with it until you "
+           "manually delete the file, as opposed to using the network cache, which automatically rotates and thus "
+           "correct errors after a while."));
+    pixmapCacheExplainerLabel.setText(
+        tr("This is the in-memory picture cache used by the application at runtime. It determines how much memory "
+           "(RAM) Cockatrice can use before it has to fetch card images from the hard disk again. Increasing this will "
+           "allow more card images to be displayed at once but shouldn't be necessary. Clearing this will make "
+           "Cockatrice reload all images from the network cache or the disk."));
+
     clearDownloadedPicsButton.setText(tr("Delete Cached Images"));
     clearBackupsButton.setText(tr("Delete Saved Images"));
-    resetDownloadURLs.setText(tr("Reset Download URLs"));
+
+    mpNetworkCacheGroupBox->setTitle(tr("Network Cache"));
+    mpImageBackupGroupBox->setTitle(tr("Image Backup"));
+    mpPixmapCacheGroupBox->setTitle(tr("In-Memory Picture Cache"));
+
     networkCacheLabel.setText(tr("Network Cache Size:"));
     networkCacheEdit.setToolTip(tr("On-disk cache for downloaded pictures"));
     networkRedirectCacheTtlLabel.setText(tr("Redirect Cache TTL:"));
@@ -1331,10 +1395,7 @@ void DeckEditorSettingsPage::retranslateUi()
     pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));
     saveCardImagesToLocalStorageCheckBox.setText(tr("Back up downloaded images to local storage"));
     localCardImageStorageNamingSchemeLabel.setText(tr("Naming scheme:"));
-    updateNowButton->setText(tr("Update Spoilers"));
-    aAdd->setText(tr("Add New URL"));
-    aEdit->setText(tr("Edit URL"));
-    aRemove->setText(tr("Remove URL"));
+
     networkRedirectCacheTtlEdit.setSuffix(" " + tr("Day(s)"));
 }
 
@@ -1810,6 +1871,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     pagesWidget->addWidget(makeScrollable(new AppearanceSettingsPage));
     pagesWidget->addWidget(makeScrollable(new UserInterfaceSettingsPage));
     pagesWidget->addWidget(new DeckEditorSettingsPage);
+    pagesWidget->addWidget(new StorageSettingsPage);
     pagesWidget->addWidget(new MessagesSettingsPage);
     pagesWidget->addWidget(new SoundSettingsPage);
     pagesWidget->addWidget(new ShortcutSettingsPage);
@@ -1857,6 +1919,11 @@ void DlgSettings::createIcons()
     deckEditorButton->setTextAlignment(Qt::AlignHCenter);
     deckEditorButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     deckEditorButton->setIcon(QPixmap("theme:config/deckeditor"));
+
+    storageButton = new QListWidgetItem(contentsWidget);
+    storageButton->setTextAlignment(Qt::AlignHCenter);
+    storageButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    storageButton->setIcon(QPixmap("theme:config/deckeditor"));
 
     messagesButton = new QListWidgetItem(contentsWidget);
     messagesButton->setTextAlignment(Qt::AlignHCenter);
