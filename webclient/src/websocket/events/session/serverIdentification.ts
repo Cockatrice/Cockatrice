@@ -1,6 +1,7 @@
 import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
 
 import webClient from '../../WebClient';
+import { PROTOCOL_VERSION } from '../../config';
 import {
   activate,
   disconnect,
@@ -18,7 +19,7 @@ import { SessionPersistence } from '../../persistence';
 
 export function serverIdentification(info: ServerIdentificationData): void {
   const { serverName, serverVersion, protocolVersion, serverOptions } = info;
-  if (protocolVersion !== webClient.protocolVersion) {
+  if (protocolVersion !== PROTOCOL_VERSION) {
     updateStatus(StatusEnum.DISCONNECTED, `Protocol version mismatch: ${protocolVersion}`);
     disconnect();
     return;

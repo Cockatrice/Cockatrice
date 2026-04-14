@@ -17,11 +17,11 @@ export function makeWebClientMock() {
     testConnect: vi.fn(),
     disconnect: vi.fn(),
     updateStatus: vi.fn(),
-    clientConfig: { clientid: 'webatrice', clientver: '1.0', clientfeatures: [] },
     options: {},
-    protocolVersion: 14,
     status: 0,
-    connectionAttemptMade: false,
+    protobuf: {
+      sendSessionCommand: vi.fn(),
+    },
   };
 }
 

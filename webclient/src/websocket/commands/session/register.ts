@@ -3,8 +3,8 @@ import { StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { create, getExtension } from '@bufbuild/protobuf';
 import type { MessageInitShape } from '@bufbuild/protobuf';
+import { CLIENT_CONFIG } from '../../config';
 import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
 import { Command_Register_ext, Command_RegisterSchema } from 'generated/proto/session_commands_pb';
 import { SessionPersistence } from '../../persistence';
 import { hashPassword } from '../../utils';
@@ -17,7 +17,7 @@ export function register(options: WebSocketConnectOptions, password?: string, pa
   const { userName, email, country, realName } = options as ServerRegisterParams;
 
   const params: MessageInitShape<typeof Command_RegisterSchema> = {
-    ...webClient.clientConfig,
+    ...CLIENT_CONFIG,
     userName,
     email,
     country,
@@ -33,7 +33,7 @@ export function register(options: WebSocketConnectOptions, password?: string, pa
     disconnect();
   };
 
-  BackendService.sendSessionCommand(Command_Register_ext, create(Command_RegisterSchema, params), {
+  webClient.protobuf.sendSessionCommand(Command_Register_ext, create(Command_RegisterSchema, params), {
     onResponseCode: {
       [Response_ResponseCode.RespRegistrationAccepted]: () => {
         login(options, password, passwordSalt);

@@ -5,6 +5,10 @@ vi.mock('../WebClient', () => ({
   WebClient: vi.fn(),
 }));
 
+vi.mock('../config', () => ({
+  CLIENT_OPTIONS: { keepalive: 1000 },
+}));
+
 vi.mock('../commands/session', () => ({
   updateStatus: vi.fn(),
 }));
@@ -25,7 +29,7 @@ import { StatusEnum } from 'types';
 let MockWS: Mock;
 let mockInstance: ReturnType<typeof installMockWebSocket>['mockInstance'];
 let restoreWebSocket: ReturnType<typeof installMockWebSocket>['restore'];
-let mockWebClient: any;
+let mockConfig: any;
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -36,10 +40,8 @@ beforeEach(() => {
   mockInstance = installed.mockInstance;
   restoreWebSocket = installed.restore;
 
-  mockWebClient = {
-    status: StatusEnum.CONNECTED,
-    clientOptions: { keepalive: 1000 },
-    keepAlive: vi.fn(),
+  mockConfig = {
+    keepAliveFn: vi.fn(),
   };
 });
 
@@ -50,25 +52,25 @@ afterEach(() => {
 
 describe('WebSocketService', () => {
   function createConnectedService() {
-    const service = new WebSocketService(mockWebClient);
+    const service = new WebSocketService(mockConfig);
     service.connect({ host: 'h', port: 1 } as any, 'ws');
     return service;
   }
 
   function createTestConnectedService() {
-    const service = new WebSocketService(mockWebClient);
+    const service = new WebSocketService(mockConfig);
     service.testConnect({ host: 'h', port: 1 } as any, 'ws');
     return service;
   }
 
   describe('constructor', () => {
     it('subscribes disconnected$ from KeepAliveService', () => {
-      const service = new WebSocketService(mockWebClient);
+      const service = new WebSocketService(mockConfig);
       expect(service).toBeDefined();
     });
 
     it('calls disconnect and updateStatus when keepAlive disconnected$ fires', () => {
-      const service = new WebSocketService(mockWebClient);
+      const service = new WebSocketService(mockConfig);
       service.connect({ host: 'localhost', port: 8080 } as any, 'ws');
       // trigger keepAliveService.disconnected$
       (service as any).keepAliveService.disconnected$.next();
@@ -79,7 +81,7 @@ describe('WebSocketService', () => {
 
   describe('connect', () => {
     it('creates a WebSocket with wss protocol by default', () => {
-      const service = new WebSocketService(mockWebClient);
+      const service = new WebSocketService(mockConfig);
       Object.defineProperty(window, 'location', {
         value: { hostname: 'example.com' },
         writable: true,
@@ -90,7 +92,7 @@ describe('WebSocketService', () => {
     });
 
     it('switches to ws protocol when hostname is localhost', () => {
-      const service = new WebSocketService(mockWebClient);
+      const service = new WebSocketService(mockConfig);
       Object.defineProperty(window, 'location', {
         value: { hostname: 'localhost' },
         writable: true,
@@ -127,22 +129,22 @@ describe('WebSocketService', () => {
     });
 
     it('starts the ping loop with the keepalive interval', () => {
-      const service = new WebSocketService(mockWebClient);
+      const service = new WebSocketService(mockConfig);
       const startSpy = vi.spyOn((service as any).keepAliveService, 'startPingLoop');
       service.connect({ host: 'h', port: 1 } as any, 'ws');
       mockInstance.onopen();
       expect(startSpy).toHaveBeenCalledWith(1000, expect.any(Function));
     });
 
-    it('ping loop callback calls webClient.keepAlive', () => {
-      const service = new WebSocketService(mockWebClient);
+    it('ping loop callback calls keepAliveFn', () => {
+      const service = new WebSocketService(mockConfig);
       const startSpy = vi.spyOn((service as any).keepAliveService, 'startPingLoop');
       service.connect({ host: 'h', port: 1 } as any, 'ws');
       mockInstance.onopen();
       const pingCb = startSpy.mock.calls[0][1] as (done: Function) => void;
       const done = vi.fn();
       pingCb(done);
-      expect(mockWebClient.keepAlive).toHaveBeenCalledWith(done);
+      expect(mockConfig.keepAliveFn).toHaveBeenCalledWith(done);
     });
   });
 
@@ -155,13 +157,13 @@ describe('WebSocketService', () => {
 
     it('does not overwrite status if already DISCONNECTED', () => {
       createConnectedService();
-      mockWebClient.status = StatusEnum.DISCONNECTED;
+      mockInstance.onerror();
       mockInstance.onclose();
       expect(updateStatus).not.toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Connection Closed');
     });
 
     it('ends the ping loop on close', () => {
-      const service = new WebSocketService(mockWebClient);
+      const service = new WebSocketService(mockConfig);
       const endSpy = vi.spyOn((service as any).keepAliveService, 'endPingLoop');
       service.connect({ host: 'h', port: 1 } as any, 'ws');
       mockInstance.onclose();
@@ -226,7 +228,7 @@ describe('WebSocketService', () => {
     });
 
     it('returns false when socket is null', () => {
-      const service = new WebSocketService(mockWebClient);
+      const service = new WebSocketService(mockConfig);
       // no connect called, socket is undefined
       expect(service.checkReadyState(WebSocket.OPEN)).toBe(false);
     });
@@ -234,7 +236,7 @@ describe('WebSocketService', () => {
 
   describe('testConnect', () => {
     it('creates a test WebSocket with correct URL', () => {
-      const service = new WebSocketService(mockWebClient);
+      const service = new WebSocketService(mockConfig);
       Object.defineProperty(window, 'location', {
         value: { hostname: 'example.com' },
         writable: true,
@@ -245,7 +247,7 @@ describe('WebSocketService', () => {
     });
 
     it('uses ws protocol on localhost', () => {
-      const service = new WebSocketService(mockWebClient);
+      const service = new WebSocketService(mockConfig);
       Object.defineProperty(window, 'location', {
         value: { hostname: 'localhost' },
         writable: true,
@@ -256,7 +258,7 @@ describe('WebSocketService', () => {
     });
 
     it('closes previous testSocket when connecting again', () => {
-      const service = new WebSocketService(mockWebClient);
+      const service = new WebSocketService(mockConfig);
       service.testConnect({ host: 'h', port: 1 } as any, 'ws');
       const firstInstance = mockInstance;
       // install second mock instance and restore after test

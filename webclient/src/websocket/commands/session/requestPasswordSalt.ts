@@ -2,8 +2,8 @@ import { RequestPasswordSaltParams } from 'store';
 import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
 
 import { create } from '@bufbuild/protobuf';
+import { CLIENT_CONFIG } from '../../config';
 import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
 import {
   Command_RequestPasswordSalt_ext, Command_RequestPasswordSaltSchema,
 } from 'generated/proto/session_commands_pb';
@@ -36,8 +36,8 @@ export function requestPasswordSalt(options: WebSocketConnectOptions, password?:
     disconnect();
   };
 
-  BackendService.sendSessionCommand(Command_RequestPasswordSalt_ext, create(Command_RequestPasswordSaltSchema, {
-    ...webClient.clientConfig,
+  webClient.protobuf.sendSessionCommand(Command_RequestPasswordSalt_ext, create(Command_RequestPasswordSaltSchema, {
+    ...CLIENT_CONFIG,
     userName,
   }), {
     responseExt: Response_PasswordSalt_ext,

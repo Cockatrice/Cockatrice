@@ -130,6 +130,7 @@ export function makeServerState(overrides: Partial<ServerState> = {}): ServerSta
     buddyList: [],
     ignoreList: [],
     status: {
+      connectionAttemptMade: false,
       state: StatusEnum.DISCONNECTED,
       description: null,
     },

@@ -1,4 +1,4 @@
-import { GameExtensionRegistry, makeGameEntry } from '../../services/ProtobufService';
+import { GameExtensionRegistry, makeGameEntry } from '../../services/protobuf-types';
 import { attachCard } from './attachCard';
 import { changeZoneProperties } from './changeZoneProperties';
 import { createArrow } from './createArrow';

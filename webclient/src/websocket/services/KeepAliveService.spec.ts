@@ -1,23 +1,17 @@
-vi.mock('../WebClient', () => ({
-  __esModule: true,
-  default: {
-    socket: {
-      checkReadyState: vi.fn(),
-    },
-  },
-}));
-
 import { KeepAliveService } from './KeepAliveService';
+import { WebSocketService } from './WebSocketService';
 
-import webClient from '../WebClient';
+vi.mock('./WebSocketService');
 
 describe('KeepAliveService', () => {
   let service: KeepAliveService;
+  let mockSocket: { checkReadyState: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     vi.useFakeTimers();
 
-    service = new KeepAliveService(webClient.socket);
+    mockSocket = { checkReadyState: vi.fn().mockReturnValue(true) };
+    service = new KeepAliveService(mockSocket as unknown as WebSocketService);
   });
 
   it('should create', () => {
@@ -36,7 +30,7 @@ describe('KeepAliveService', () => {
       promise = new Promise(resolve => resolvePing = resolve);
       ping = (done) => promise.then(done);
 
-      checkReadyStateSpy = vi.spyOn(webClient.socket, 'checkReadyState');
+      checkReadyStateSpy = vi.spyOn(mockSocket, 'checkReadyState');
       checkReadyStateSpy.mockImplementation(() => true);
 
       service.startPingLoop(interval, ping);

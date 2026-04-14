@@ -3,23 +3,28 @@ import { Subject } from 'rxjs';
 import { StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { KeepAliveService } from './KeepAliveService';
-import { WebClient } from '../WebClient';
+import { CLIENT_OPTIONS } from '../config';
 import { SessionPersistence } from '../persistence';
 import { updateStatus } from '../commands/session';
+
+export interface WebSocketServiceConfig {
+  keepAliveFn: (pingReceived: () => void) => void;
+}
 
 export class WebSocketService {
   private socket: WebSocket;
   private testSocket: WebSocket;
 
-  private webClient: WebClient;
+  private config: WebSocketServiceConfig;
   private keepAliveService: KeepAliveService;
+  private errorFired = false;
 
   public message$: Subject<MessageEvent> = new Subject();
 
   private keepalive: number;
 
-  constructor(webClient: WebClient) {
-    this.webClient = webClient;
+  constructor(config: WebSocketServiceConfig) {
+    this.config = config;
 
     this.keepAliveService = new KeepAliveService(this);
     this.keepAliveService.disconnected$.subscribe(() => {
@@ -34,7 +39,7 @@ export class WebSocketService {
     }
 
     const { host, port } = options;
-    this.keepalive = this.webClient.clientOptions.keepalive;
+    this.keepalive = CLIENT_OPTIONS.keepalive;
 
     this.socket = this.createWebSocket(`${protocol}://${host}:${port}`);
   }
@@ -71,23 +76,25 @@ export class WebSocketService {
 
     socket.onopen = () => {
       clearTimeout(connectionTimer);
+      this.errorFired = false;
       updateStatus(StatusEnum.CONNECTED, 'Connected');
 
       this.keepAliveService.startPingLoop(this.keepalive, (pingReceived: () => void) => {
-        this.webClient.keepAlive(pingReceived);
+        this.config.keepAliveFn(pingReceived);
       });
     };
 
     socket.onclose = () => {
       // dont overwrite failure messages
-      if (this.webClient.status !== StatusEnum.DISCONNECTED) {
+      if (!this.errorFired) {
         updateStatus(StatusEnum.DISCONNECTED, 'Connection Closed');
       }
-
+      this.errorFired = false;
       this.keepAliveService.endPingLoop();
     };
 
     socket.onerror = () => {
+      this.errorFired = true;
       updateStatus(StatusEnum.DISCONNECTED, 'Connection Failed');
       SessionPersistence.connectionFailed();
     };
@@ -108,7 +115,7 @@ export class WebSocketService {
     const socket = new WebSocket(url);
     socket.binaryType = 'arraybuffer';
 
-    const connectionTimer = setTimeout(() => socket.close(), this.webClient.clientOptions.keepalive);
+    const connectionTimer = setTimeout(() => socket.close(), CLIENT_OPTIONS.keepalive);
 
     socket.onopen = () => {
       clearTimeout(connectionTimer);

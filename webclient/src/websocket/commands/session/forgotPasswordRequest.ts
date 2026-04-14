@@ -2,8 +2,8 @@ import { ForgotPasswordParams } from 'store';
 import { StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { create } from '@bufbuild/protobuf';
+import { CLIENT_CONFIG } from '../../config';
 import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
 import {
   Command_ForgotPasswordRequest_ext, Command_ForgotPasswordRequestSchema,
 } from 'generated/proto/session_commands_pb';
@@ -15,8 +15,8 @@ import { disconnect, updateStatus } from './';
 export function forgotPasswordRequest(options: WebSocketConnectOptions): void {
   const { userName } = options as unknown as ForgotPasswordParams;
 
-  BackendService.sendSessionCommand(Command_ForgotPasswordRequest_ext, create(Command_ForgotPasswordRequestSchema, {
-    ...webClient.clientConfig,
+  webClient.protobuf.sendSessionCommand(Command_ForgotPasswordRequest_ext, create(Command_ForgotPasswordRequestSchema, {
+    ...CLIENT_CONFIG,
     userName,
   }), {
     responseExt: Response_ForgotPasswordRequest_ext,

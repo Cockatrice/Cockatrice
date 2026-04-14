@@ -14,6 +14,9 @@ export const Actions = {
   clearStore: () => ({
     type: Types.CLEAR_STORE
   }),
+  connectionAttempted: () => ({
+    type: Types.CONNECTION_ATTEMPTED
+  }),
   loginSuccessful: (options: WebSocketConnectOptions) => ({
     type: Types.LOGIN_SUCCESSFUL,
     options

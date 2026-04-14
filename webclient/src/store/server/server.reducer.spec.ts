@@ -55,6 +55,12 @@ describe('Initialisation', () => {
 // ── Account & Connection ─────────────────────────────────────────────────────
 
 describe('Account & Connection', () => {
+  it('CONNECTION_ATTEMPTED → sets connectionAttemptMade to true', () => {
+    const state = makeServerState({ status: { connectionAttemptMade: false, state: StatusEnum.DISCONNECTED, description: null } });
+    const result = serverReducer(state, { type: Types.CONNECTION_ATTEMPTED });
+    expect(result.status.connectionAttemptMade).toBe(true);
+  });
+
   it('ACCOUNT_AWAITING_ACTIVATION → returns state unchanged', () => {
     const options = makeConnectOptions();
     const state = makeServerState();

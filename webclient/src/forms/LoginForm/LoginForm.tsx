@@ -5,11 +5,12 @@ import { useTranslation } from 'react-i18next';
 
 import Button from '@mui/material/Button';
 
-import { AuthenticationService } from 'api';
 import { CheckboxField, InputField, KnownHosts } from 'components';
 import { useAutoConnect } from 'hooks';
 import { HostDTO, SettingDTO } from 'services';
 import { APP_USER } from 'types';
+import { useAppSelector } from 'store';
+import { Selectors as ServerSelectors } from 'store/server';
 
 import './LoginForm.css';
 
@@ -21,6 +22,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
   const [host, setHost] = useState(null);
   const [useStoredPasswordLabel, setUseStoredPasswordLabel] = useState(false);
   const [autoConnect, setAutoConnect] = useAutoConnect();
+  const connectionAttemptMade = useAppSelector(ServerSelectors.getConnectionAttemptMade);
 
   const validate = values => {
     const errors: any = {};
@@ -54,7 +56,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
 
         useEffect(() => {
           SettingDTO.get(APP_USER).then((userSetting: SettingDTO) => {
-            if (userSetting?.autoConnect && !AuthenticationService.connectionAttemptMade()) {
+            if (userSetting?.autoConnect && !connectionAttemptMade) {
               HostDTO.getAll().then(hosts => {
                 let lastSelectedHost = hosts.find(({ lastSelected }) => lastSelected);
 

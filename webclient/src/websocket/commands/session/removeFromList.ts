@@ -1,5 +1,5 @@
 import { create } from '@bufbuild/protobuf';
-import { BackendService } from '../../services/BackendService';
+import webClient from '../../WebClient';
 import { Command_RemoveFromList_ext, Command_RemoveFromListSchema } from 'generated/proto/session_commands_pb';
 import { SessionPersistence } from '../../persistence';
 
@@ -12,7 +12,7 @@ export function removeFromIgnoreList(userName: string): void {
 }
 
 export function removeFromList(list: string, userName: string): void {
-  BackendService.sendSessionCommand(Command_RemoveFromList_ext, create(Command_RemoveFromListSchema, { list, userName }), {
+  webClient.protobuf.sendSessionCommand(Command_RemoveFromList_ext, create(Command_RemoveFromListSchema, { list, userName }), {
     onSuccess: () => {
       SessionPersistence.removeFromList(list, userName);
     },

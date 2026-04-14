@@ -1,8 +1,8 @@
 import { StatusEnum, WebSocketConnectOptions } from 'types';
 import { create } from '@bufbuild/protobuf';
 import type { MessageInitShape } from '@bufbuild/protobuf';
+import { CLIENT_CONFIG } from '../../config';
 import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
 import { Command_Login_ext, Command_LoginSchema } from 'generated/proto/session_commands_pb';
 import { hashPassword } from '../../utils';
 import { SessionPersistence } from '../../persistence';
@@ -20,7 +20,7 @@ export function login(options: WebSocketConnectOptions, password?: string, passw
   const { userName, hashedPassword } = options;
 
   const loginConfig: MessageInitShape<typeof Command_LoginSchema> = {
-    ...webClient.clientConfig,
+    ...CLIENT_CONFIG,
     clientid: 'webatrice',
     userName,
     ...(passwordSalt
@@ -35,7 +35,7 @@ export function login(options: WebSocketConnectOptions, password?: string, passw
     disconnect();
   };
 
-  BackendService.sendSessionCommand(Command_Login_ext, create(Command_LoginSchema, loginConfig), {
+  webClient.protobuf.sendSessionCommand(Command_Login_ext, create(Command_LoginSchema, loginConfig), {
     responseExt: Response_Login_ext,
     onSuccess: (resp) => {
       const { buddyList, ignoreList, userInfo } = resp;

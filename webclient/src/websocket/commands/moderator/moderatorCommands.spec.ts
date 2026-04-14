@@ -1,7 +1,6 @@
-vi.mock('../../services/BackendService', () => ({
-  BackendService: {
-    sendModeratorCommand: vi.fn(),
-  },
+vi.mock('../../WebClient', () => ({
+  __esModule: true,
+  default: { protobuf: { sendModeratorCommand: vi.fn() } },
 }));
 
 vi.mock('../../persistence', () => ({
@@ -20,7 +19,7 @@ vi.mock('../../persistence', () => ({
 }));
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
-import { BackendService } from '../../services/BackendService';
+import webClient from '../../WebClient';
 import { ModeratorPersistence } from '../../persistence';
 import {
   Command_BanFromServer_ext,
@@ -53,7 +52,7 @@ import { warnUser } from './warnUser';
 import { Mock } from 'vitest';
 
 const { invokeOnSuccess } = makeCallbackHelpers(
-  BackendService.sendModeratorCommand as Mock,
+  webClient.protobuf.sendModeratorCommand as Mock,
   2
 );
 
@@ -66,7 +65,7 @@ describe('banFromServer', () => {
 
   it('calls sendModeratorCommand with Command_BanFromServer', () => {
     banFromServer(30, 'alice', '1.2.3.4', 'reason', 'visible', 'cid', 1);
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Command_BanFromServer_ext,
       expect.objectContaining({ minutes: 30, userName: 'alice' }),
       expect.any(Object)
@@ -87,7 +86,9 @@ describe('forceActivateUser', () => {
 
   it('calls sendModeratorCommand with Command_ForceActivateUser', () => {
     forceActivateUser('alice', 'mod1');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(Command_ForceActivateUser_ext, expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+      Command_ForceActivateUser_ext, expect.any(Object), expect.any(Object)
+    );
   });
 
   it('onSuccess calls ModeratorPersistence.forceActivateUser', () => {
@@ -104,7 +105,7 @@ describe('getAdminNotes', () => {
 
   it('calls sendModeratorCommand with Command_GetAdminNotes', () => {
     getAdminNotes('alice');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Command_GetAdminNotes_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Response_GetAdminNotes_ext })
@@ -126,7 +127,7 @@ describe('getBanHistory', () => {
 
   it('calls sendModeratorCommand with Command_GetBanHistory', () => {
     getBanHistory('alice');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Command_GetBanHistory_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Response_BanHistory_ext })
@@ -148,7 +149,7 @@ describe('getWarnHistory', () => {
 
   it('calls sendModeratorCommand with Command_GetWarnHistory', () => {
     getWarnHistory('alice');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Command_GetWarnHistory_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Response_WarnHistory_ext })
@@ -170,7 +171,7 @@ describe('getWarnList', () => {
 
   it('calls sendModeratorCommand with Command_GetWarnList', () => {
     getWarnList('mod1', 'alice', 'US');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Command_GetWarnList_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Response_WarnList_ext })
@@ -192,7 +193,9 @@ describe('grantReplayAccess', () => {
 
   it('calls sendModeratorCommand with Command_GrantReplayAccess', () => {
     grantReplayAccess(10, 'mod1');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(Command_GrantReplayAccess_ext, expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+      Command_GrantReplayAccess_ext, expect.any(Object), expect.any(Object)
+    );
   });
 
   it('onSuccess calls ModeratorPersistence.grantReplayAccess', () => {
@@ -209,7 +212,9 @@ describe('updateAdminNotes', () => {
 
   it('calls sendModeratorCommand with Command_UpdateAdminNotes', () => {
     updateAdminNotes('alice', 'new notes');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(Command_UpdateAdminNotes_ext, expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+      Command_UpdateAdminNotes_ext, expect.any(Object), expect.any(Object)
+    );
   });
 
   it('onSuccess calls ModeratorPersistence.updateAdminNotes', () => {
@@ -226,7 +231,7 @@ describe('viewLogHistory', () => {
 
   it('calls sendModeratorCommand with Command_ViewLogHistory', () => {
     viewLogHistory({ dateRange: 7 } as any);
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Command_ViewLogHistory_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Response_ViewLogHistory_ext })
@@ -248,7 +253,7 @@ describe('warnUser', () => {
 
   it('calls sendModeratorCommand with Command_WarnUser', () => {
     warnUser('alice', 'bad behavior', 'cid');
-    expect(BackendService.sendModeratorCommand).toHaveBeenCalledWith(Command_WarnUser_ext, expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(Command_WarnUser_ext, expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls ModeratorPersistence.warnUser', () => {

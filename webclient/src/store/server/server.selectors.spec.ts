@@ -34,13 +34,18 @@ describe('Selectors', () => {
   });
 
   it('getDescription → returns status.description', () => {
-    const state = makeServerState({ status: { state: StatusEnum.CONNECTED, description: 'ok' } });
+    const state = makeServerState({ status: { connectionAttemptMade: false, state: StatusEnum.CONNECTED, description: 'ok' } });
     expect(Selectors.getDescription(rootState(state))).toBe('ok');
   });
 
   it('getState → returns status.state', () => {
-    const state = makeServerState({ status: { state: StatusEnum.LOGGED_IN, description: null } });
+    const state = makeServerState({ status: { connectionAttemptMade: false, state: StatusEnum.LOGGED_IN, description: null } });
     expect(Selectors.getState(rootState(state))).toBe(StatusEnum.LOGGED_IN);
+  });
+
+  it('getConnectionAttemptMade → returns status.connectionAttemptMade', () => {
+    const state = makeServerState({ status: { connectionAttemptMade: true, state: StatusEnum.DISCONNECTED, description: null } });
+    expect(Selectors.getConnectionAttemptMade(rootState(state))).toBe(true);
   });
 
   it('getUser → returns user', () => {
@@ -88,5 +93,10 @@ describe('Selectors', () => {
   it('getBackendDecks → returns null when not set', () => {
     const state = makeServerState({ backendDecks: null });
     expect(Selectors.getBackendDecks(rootState(state))).toBeNull();
+  });
+
+  it('getRegistrationError → returns registrationError', () => {
+    const state = makeServerState({ registrationError: 'bad input' });
+    expect(Selectors.getRegistrationError(rootState(state))).toBe('bad input');
   });
 });

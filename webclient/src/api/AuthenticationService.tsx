@@ -1,5 +1,5 @@
 import { StatusEnum, User, WebSocketConnectReason, WebSocketConnectOptions } from 'types';
-import { SessionCommands, webClient } from 'websocket';
+import { SessionCommands } from 'websocket';
 import { ServerInfo_User_UserLevelFlag } from 'generated/proto/serverinfo_user_pb';
 
 export class AuthenticationService {
@@ -47,9 +47,5 @@ export class AuthenticationService {
 
   static isAdmin() {
 
-  }
-
-  static connectionAttemptMade() {
-    return webClient.connectionAttemptMade;
   }
 }

@@ -76,6 +76,7 @@ export interface ServerState {
 }
 
 export interface ServerStateStatus {
+  connectionAttemptMade: boolean;
   description: string;
   state: number;
 }

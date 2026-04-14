@@ -27,10 +27,13 @@ vi.mock('../../persistence', () => ({
 vi.mock('../../WebClient', () => ({
   __esModule: true,
   default: {
-    clientOptions: { autojoinrooms: false },
     options: {},
-    protocolVersion: 14,
   },
+}));
+
+vi.mock('../../config', () => ({
+  CLIENT_OPTIONS: { autojoinrooms: false },
+  PROTOCOL_VERSION: 14,
 }));
 
 vi.mock('../../commands/session', () => ({
@@ -70,6 +73,7 @@ import { Event_ServerIdentificationSchema } from 'generated/proto/event_server_i
 
 import { SessionPersistence, RoomPersistence } from '../../persistence';
 import webClient from '../../WebClient';
+import * as Config from '../../config';
 import * as SessionCmds from '../../commands/session';
 import * as Utils from '../../utils';
 import { gameJoined } from './gameJoined';
@@ -266,13 +270,13 @@ describe('listRooms', () => {
   });
 
   it('does not call joinRoom when autojoinrooms is false', () => {
-    (webClient as any).clientOptions = { autojoinrooms: false };
+    (Config as any).CLIENT_OPTIONS = { autojoinrooms: false };
     listRooms(create(Event_ListRoomsSchema, { roomList: [{ autoJoin: true, roomId: 1 }] as any[] }));
     expect(SessionCmds.joinRoom).not.toHaveBeenCalled();
   });
 
   it('calls joinRoom for autoJoin rooms when autojoinrooms is true', () => {
-    (webClient as any).clientOptions = { autojoinrooms: true };
+    (Config as any).CLIENT_OPTIONS = { autojoinrooms: true };
     listRooms(create(Event_ListRoomsSchema, { roomList: [{ autoJoin: true, roomId: 2 }, { autoJoin: false, roomId: 3 }] as any[] }));
     expect(SessionCmds.joinRoom).toHaveBeenCalledTimes(1);
     expect(SessionCmds.joinRoom).toHaveBeenCalledWith(2);
@@ -373,7 +377,7 @@ describe('connectionClosed', () => {
 describe('serverIdentification', () => {
 
   beforeEach(() => {
-    (webClient as any).protocolVersion = 14;
+    (Config as any).PROTOCOL_VERSION = 14;
     (webClient as any).options = {};
   });
 

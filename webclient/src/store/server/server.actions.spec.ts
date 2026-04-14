@@ -25,6 +25,10 @@ describe('Actions', () => {
     expect(Actions.clearStore()).toEqual({ type: Types.CLEAR_STORE });
   });
 
+  it('connectionAttempted', () => {
+    expect(Actions.connectionAttempted()).toEqual({ type: Types.CONNECTION_ATTEMPTED });
+  });
+
   it('loginSuccessful', () => {
     const options = makeConnectOptions();
     expect(Actions.loginSuccessful(options)).toEqual({ type: Types.LOGIN_SUCCESSFUL, options });
@@ -359,5 +363,9 @@ describe('Actions', () => {
     const games = [makeGame({ gameId: 1 })];
     const gametypeMap = { 1: 'Standard' };
     expect(Actions.gamesOfUser('alice', games, gametypeMap)).toEqual({ type: Types.GAMES_OF_USER, userName: 'alice', games, gametypeMap });
+  });
+
+  it('clearRegistrationErrors', () => {
+    expect(Actions.clearRegistrationErrors()).toEqual({ type: Types.CLEAR_REGISTRATION_ERRORS });
   });
 });

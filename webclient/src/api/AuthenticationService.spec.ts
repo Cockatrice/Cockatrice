@@ -3,9 +3,6 @@ vi.mock('websocket', () => ({
     connect: vi.fn(),
     disconnect: vi.fn(),
   },
-  webClient: {
-    connectionAttemptMade: false,
-  },
 }));
 
 vi.mock('generated/proto/serverinfo_user_pb', () => ({
@@ -15,7 +12,7 @@ vi.mock('generated/proto/serverinfo_user_pb', () => ({
 }));
 
 import { AuthenticationService } from './AuthenticationService';
-import { SessionCommands, webClient } from 'websocket';
+import { SessionCommands } from 'websocket';
 import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
 
 const testOptions: WebSocketConnectOptions = { host: 'localhost', port: '4748', userName: 'user', password: 'pw' };
@@ -122,18 +119,6 @@ describe('AuthenticationService', () => {
   describe('isAdmin', () => {
     it('returns undefined (not yet implemented)', () => {
       expect(AuthenticationService.isAdmin()).toBeUndefined();
-    });
-  });
-
-  describe('connectionAttemptMade', () => {
-    it('returns webClient.connectionAttemptMade when false', () => {
-      (webClient as any).connectionAttemptMade = false;
-      expect(AuthenticationService.connectionAttemptMade()).toBe(false);
-    });
-
-    it('returns webClient.connectionAttemptMade when true', () => {
-      (webClient as any).connectionAttemptMade = true;
-      expect(AuthenticationService.connectionAttemptMade()).toBe(true);
     });
   });
 });

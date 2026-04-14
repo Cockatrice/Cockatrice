@@ -14,6 +14,9 @@ export const Dispatch = {
   clearStore: () => {
     store.dispatch(Actions.clearStore());
   },
+  connectionAttempted: () => {
+    store.dispatch(Actions.connectionAttempted());
+  },
   loginSuccessful: (options: WebSocketConnectOptions) => {
     store.dispatch(Actions.loginSuccessful(options));
   },

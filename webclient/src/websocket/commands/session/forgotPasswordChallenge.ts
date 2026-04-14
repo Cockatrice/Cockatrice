@@ -2,8 +2,8 @@ import { ForgotPasswordChallengeParams } from 'store';
 import { StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { create } from '@bufbuild/protobuf';
+import { CLIENT_CONFIG } from '../../config';
 import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
 import {
   Command_ForgotPasswordChallenge_ext, Command_ForgotPasswordChallengeSchema,
 } from 'generated/proto/session_commands_pb';
@@ -13,8 +13,8 @@ import { disconnect, updateStatus } from './';
 export function forgotPasswordChallenge(options: WebSocketConnectOptions): void {
   const { userName, email } = options as unknown as ForgotPasswordChallengeParams;
 
-  BackendService.sendSessionCommand(Command_ForgotPasswordChallenge_ext, create(Command_ForgotPasswordChallengeSchema, {
-    ...webClient.clientConfig,
+  webClient.protobuf.sendSessionCommand(Command_ForgotPasswordChallenge_ext, create(Command_ForgotPasswordChallengeSchema, {
+    ...CLIENT_CONFIG,
     userName,
     email,
   }), {

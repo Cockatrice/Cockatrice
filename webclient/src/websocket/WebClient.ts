@@ -2,47 +2,28 @@ import { StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
+import { ping } from './commands/session';
 
 import { GameDispatch } from 'store';
 import { RoomPersistence, SessionPersistence } from './persistence';
 
 export class WebClient {
-  public socket = new WebSocketService(this);
-  public protobuf = new ProtobufService(this);
-
-  public protocolVersion = 14;
-  public clientConfig = {
-    clientid: 'webatrice',
-    clientver: 'webclient-1.0 (2019-10-31)',
-    clientfeatures: [
-      'client_id',
-      'client_ver',
-      'feature_set',
-      'room_chat_history',
-      'client_warnings',
-      /* unimplemented features */
-      'forgot_password',
-      'idle_client',
-      'mod_log_lookup',
-      'user_ban_history',
-      // satisfy server reqs for POC
-      'websocket',
-      '2.7.0_min_version',
-      '2.8.0_min_version'
-    ]
-  };
-
-  public clientOptions = {
-    autojoinrooms: true,
-    keepalive: 5000
-  };
+  public socket: WebSocketService;
+  public protobuf: ProtobufService;
 
   public options: WebSocketConnectOptions;
   public status: StatusEnum;
 
-  public connectionAttemptMade = false;
-
   constructor() {
+    this.socket = new WebSocketService({
+      keepAliveFn: (cb) => ping(cb),
+    });
+
+    this.protobuf = new ProtobufService({
+      send: (data) => this.socket.send(data),
+      isOpen: () => this.socket.checkReadyState(WebSocket.OPEN),
+    });
+
     this.socket.message$.subscribe((message: MessageEvent) => {
       this.protobuf.handleMessageEvent(message);
     });
@@ -55,7 +36,7 @@ export class WebClient {
   }
 
   public connect(options: WebSocketConnectOptions) {
-    this.connectionAttemptMade = true;
+    SessionPersistence.connectionAttempted();
     this.options = options;
     this.socket.connect(options);
   }
@@ -75,10 +56,6 @@ export class WebClient {
       this.protobuf.resetCommands();
       this.clearStores();
     }
-  }
-
-  public keepAlive(pingReceived: () => void) {
-    this.protobuf.sendKeepAliveCommand(pingReceived);
   }
 
   private clearStores() {

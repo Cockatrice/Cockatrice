@@ -1,7 +1,6 @@
-vi.mock('../../services/BackendService', () => ({
-  BackendService: {
-    sendAdminCommand: vi.fn(),
-  },
+vi.mock('../../WebClient', () => ({
+  __esModule: true,
+  default: { protobuf: { sendAdminCommand: vi.fn() } },
 }));
 
 vi.mock('../../persistence', () => ({
@@ -14,7 +13,7 @@ vi.mock('../../persistence', () => ({
 }));
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
-import { BackendService } from '../../services/BackendService';
+import webClient from '../../WebClient';
 import { AdminPersistence } from '../../persistence';
 import { adjustMod } from './adjustMod';
 import { reloadConfig } from './reloadConfig';
@@ -24,7 +23,7 @@ import { updateServerMessage } from './updateServerMessage';
 import { Mock } from 'vitest';
 
 const { invokeOnSuccess } = makeCallbackHelpers(
-  BackendService.sendAdminCommand as Mock,
+  webClient.protobuf.sendAdminCommand as Mock,
   2
 );
 
@@ -37,7 +36,7 @@ describe('adjustMod', () => {
 
   it('calls sendAdminCommand with Command_AdjustMod', () => {
     adjustMod('alice', true, false);
-    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls AdminPersistence.adjustMod', () => {
@@ -54,7 +53,7 @@ describe('reloadConfig', () => {
 
   it('calls sendAdminCommand with Command_ReloadConfig', () => {
     reloadConfig();
-    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls AdminPersistence.reloadConfig', () => {
@@ -71,7 +70,7 @@ describe('shutdownServer', () => {
 
   it('calls sendAdminCommand with Command_ShutdownServer', () => {
     shutdownServer('maintenance', 10);
-    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls AdminPersistence.shutdownServer', () => {
@@ -88,7 +87,7 @@ describe('updateServerMessage', () => {
 
   it('calls sendAdminCommand with Command_UpdateServerMessage', () => {
     updateServerMessage();
-    expect(BackendService.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls AdminPersistence.updateServerMessage', () => {

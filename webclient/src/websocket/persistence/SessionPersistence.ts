@@ -19,6 +19,10 @@ export class SessionPersistence {
     ServerDispatch.initialized();
   }
 
+  static connectionAttempted() {
+    ServerDispatch.connectionAttempted();
+  }
+
   static clearStore() {
     ServerDispatch.clearStore();
   }

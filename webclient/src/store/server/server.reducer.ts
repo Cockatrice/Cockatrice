@@ -69,6 +69,7 @@ const initialState: ServerState = {
   ignoreList: [],
 
   status: {
+    connectionAttemptMade: false,
     state: StatusEnum.DISCONNECTED,
     description: null
   },
@@ -111,6 +112,12 @@ export const serverReducer = (state = initialState, action: ServerAction) => {
         ...initialState,
         initialized: true
       }
+    }
+    case Types.CONNECTION_ATTEMPTED: {
+      return {
+        ...state,
+        status: { ...state.status, connectionAttemptMade: true }
+      };
     }
     case Types.ACCOUNT_AWAITING_ACTIVATION: {
       return state;

@@ -1,4 +1,4 @@
-import { RoomExtensionRegistry, makeRoomEntry } from '../../services/ProtobufService';
+import { RoomExtensionRegistry, makeRoomEntry } from '../../services/protobuf-types';
 
 import { joinRoom } from './joinRoom';
 import { leaveRoom } from './leaveRoom';

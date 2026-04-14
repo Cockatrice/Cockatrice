@@ -32,6 +32,11 @@ describe('Dispatch', () => {
     expect(store.dispatch).toHaveBeenCalledWith(Actions.clearStore());
   });
 
+  it('connectionAttempted dispatches Actions.connectionAttempted()', () => {
+    Dispatch.connectionAttempted();
+    expect(store.dispatch).toHaveBeenCalledWith(Actions.connectionAttempted());
+  });
+
   it('loginSuccessful dispatches Actions.loginSuccessful()', () => {
     const options = makeConnectOptions();
     Dispatch.loginSuccessful(options);
@@ -390,5 +395,10 @@ describe('Dispatch', () => {
     const gametypeMap = { 1: 'Standard' };
     Dispatch.gamesOfUser('alice', games, gametypeMap);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.gamesOfUser('alice', games, gametypeMap));
+  });
+
+  it('clearRegistrationErrors dispatches correctly', () => {
+    Dispatch.clearRegistrationErrors();
+    expect(store.dispatch).toHaveBeenCalledWith(Actions.clearRegistrationErrors());
   });
 });

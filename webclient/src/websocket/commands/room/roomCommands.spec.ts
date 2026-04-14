@@ -1,7 +1,6 @@
-vi.mock('../../services/BackendService', () => ({
-  BackendService: {
-    sendRoomCommand: vi.fn(),
-  },
+vi.mock('../../WebClient', () => ({
+  __esModule: true,
+  default: { protobuf: { sendRoomCommand: vi.fn() } },
 }));
 
 vi.mock('../../persistence', () => ({
@@ -13,7 +12,7 @@ vi.mock('../../persistence', () => ({
 }));
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
-import { BackendService } from '../../services/BackendService';
+import webClient from '../../WebClient';
 import { RoomPersistence } from '../../persistence';
 import { Command_CreateGame_ext, Command_JoinGame_ext, Command_LeaveRoom_ext, Command_RoomSay_ext } from 'generated/proto/room_commands_pb';
 import { createGame } from './createGame';
@@ -24,7 +23,7 @@ import { roomSay } from './roomSay';
 import { Mock } from 'vitest';
 
 const { invokeOnSuccess } = makeCallbackHelpers(
-  BackendService.sendRoomCommand as Mock,
+  webClient.protobuf.sendRoomCommand as Mock,
   // sendRoomCommand(roomId, ext, value, options) — options at index 3
   3
 );
@@ -38,7 +37,7 @@ describe('createGame', () => {
 
   it('calls sendRoomCommand with Command_CreateGame', () => {
     createGame(5, { maxPlayers: 4 } as any);
-    expect(BackendService.sendRoomCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(
       5, Command_CreateGame_ext, expect.objectContaining({ maxPlayers: 4 }), expect.any(Object)
     );
   });
@@ -57,7 +56,7 @@ describe('joinGame', () => {
 
   it('calls sendRoomCommand with Command_JoinGame', () => {
     joinGame(7, { gameId: 42, password: '' } as any);
-    expect(BackendService.sendRoomCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(
       7, Command_JoinGame_ext, expect.objectContaining({ gameId: 42, password: '' }), expect.any(Object)
     );
   });
@@ -76,7 +75,7 @@ describe('leaveRoom', () => {
 
   it('calls sendRoomCommand with Command_LeaveRoom', () => {
     leaveRoom(3);
-    expect(BackendService.sendRoomCommand).toHaveBeenCalledWith(3, Command_LeaveRoom_ext, expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(3, Command_LeaveRoom_ext, expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls RoomPersistence.leaveRoom with roomId', () => {
@@ -93,7 +92,7 @@ describe('roomSay', () => {
 
   it('calls sendRoomCommand with trimmed message', () => {
     roomSay(2, '  hello  ');
-    expect(BackendService.sendRoomCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(
       2,
       Command_RoomSay_ext,
       expect.objectContaining({ message: 'hello' })
@@ -102,11 +101,11 @@ describe('roomSay', () => {
 
   it('does not call sendRoomCommand when message is blank', () => {
     roomSay(2, '   ');
-    expect(BackendService.sendRoomCommand).not.toHaveBeenCalled();
+    expect(webClient.protobuf.sendRoomCommand).not.toHaveBeenCalled();
   });
 
   it('does not call sendRoomCommand when message is empty string', () => {
     roomSay(2, '');
-    expect(BackendService.sendRoomCommand).not.toHaveBeenCalled();
+    expect(webClient.protobuf.sendRoomCommand).not.toHaveBeenCalled();
   });
 });

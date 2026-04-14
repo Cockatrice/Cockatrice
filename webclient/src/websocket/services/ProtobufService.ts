@@ -1,138 +1,130 @@
-import { create, fromBinary, hasExtension, getExtension, toBinary } from '@bufbuild/protobuf';
+import { create, fromBinary, hasExtension, getExtension, setExtension, toBinary } from '@bufbuild/protobuf';
 import type { GenExtension } from '@bufbuild/protobuf/codegenv2';
 
 import type { Response } from 'generated/proto/response_pb';
 import type { RoomEvent } from 'generated/proto/room_event_pb';
 import type { SessionEvent } from 'generated/proto/session_event_pb';
 import type { GameEventContainer } from 'generated/proto/game_event_container_pb';
-import type { GameEvent } from 'generated/proto/game_event_pb';
 
 import { GameEvents, RoomEvents, SessionEvents } from '../events';
-import { WebClient } from '../WebClient';
-import { SessionCommands } from 'websocket';
 import { GameEventMeta } from 'types';
 
 import { CommandContainerSchema, type CommandContainer } from 'generated/proto/commands_pb';
 import { ServerMessageSchema, ServerMessage_MessageType, type ServerMessage } from 'generated/proto/server_message_pb';
-import type { SessionCommand } from 'generated/proto/session_commands_pb';
-import type { GameCommand } from 'generated/proto/game_commands_pb';
-import type { RoomCommand } from 'generated/proto/room_commands_pb';
-import type { ModeratorCommand } from 'generated/proto/moderator_commands_pb';
-import type { AdminCommand } from 'generated/proto/admin_commands_pb';
+import { SessionCommandSchema, type SessionCommand } from 'generated/proto/session_commands_pb';
+import { GameCommandSchema, type GameCommand } from 'generated/proto/game_commands_pb';
+import { RoomCommandSchema, type RoomCommand } from 'generated/proto/room_commands_pb';
+import { ModeratorCommandSchema, type ModeratorCommand } from 'generated/proto/moderator_commands_pb';
+import { AdminCommandSchema, type AdminCommand } from 'generated/proto/admin_commands_pb';
 
-// Per-family registry entry types. Each family hardcodes its parent message type
-// and the handler's exact secondary-argument signature, eliminating the previous
-// `...args: unknown[]` erasure.
+import { type CommandOptions, handleResponse } from './command-options';
 
-type SessionRegistryEntry<V = unknown> = [
-  GenExtension<SessionEvent, V>,
-  (value: V) => void
-];
-export type SessionExtensionRegistry = SessionRegistryEntry[];
-
-type RoomRegistryEntry<V = unknown> = [
-  GenExtension<RoomEvent, V>,
-  (value: V, roomEvent: RoomEvent) => void
-];
-export type RoomExtensionRegistry = RoomRegistryEntry[];
-
-type GameRegistryEntry<V = unknown> = [
-  GenExtension<GameEvent, V>,
-  (value: V, meta: GameEventMeta) => void
-];
-export type GameExtensionRegistry = GameRegistryEntry[];
-
-/**
- * Type-safe factory functions. The compiler verifies at the call site that the
- * handler's parameter types match the extension's value type and the family's
- * secondary argument type.
- */
-export function makeSessionEntry<V>(
-  ext: GenExtension<SessionEvent, V>,
-  handler: (value: V) => void
-): SessionRegistryEntry {
-  return [ext as GenExtension<SessionEvent, unknown>, handler as (value: unknown) => void];
-}
-
-export function makeRoomEntry<V>(
-  ext: GenExtension<RoomEvent, V>,
-  handler: (value: V, roomEvent: RoomEvent) => void
-): RoomRegistryEntry {
-  return [ext as GenExtension<RoomEvent, unknown>, handler as RoomRegistryEntry[1]];
-}
-
-export function makeGameEntry<V>(
-  ext: GenExtension<GameEvent, V>,
-  handler: (value: V, meta: GameEventMeta) => void
-): GameRegistryEntry {
-  return [ext as GenExtension<GameEvent, unknown>, handler as GameRegistryEntry[1]];
+export interface SocketTransport {
+  send(data: Uint8Array): void;
+  isOpen(): boolean;
 }
 
 export class ProtobufService {
   private cmdId = 0;
-  private pendingCommands: { [cmdId: string]: (response: Response) => void } = {};
+  private pendingCommands = new Map<number, (response: Response) => void>();
 
-  private webClient: WebClient;
+  private transport: SocketTransport;
 
-  constructor(webClient: WebClient) {
-    this.webClient = webClient;
+  constructor(transport: SocketTransport) {
+    this.transport = transport;
   }
 
   public resetCommands() {
     this.cmdId = 0;
-    this.pendingCommands = {};
+    this.pendingCommands.clear();
   }
 
-  public sendGameCommand(gameId: number, gameCmd: GameCommand, callback?: (raw: Response) => void) {
-    const cmd = create(CommandContainerSchema, {
-      gameId,
-      gameCommand: [gameCmd],
+  public sendGameCommand<V, R = unknown>(
+    gameId: number,
+    ext: GenExtension<GameCommand, V>,
+    value: V,
+    options?: CommandOptions<R>
+  ): void {
+    const gameCmd = create(GameCommandSchema);
+    setExtension(gameCmd, ext, value);
+    const cmd = create(CommandContainerSchema, { gameId, gameCommand: [gameCmd] });
+    this.sendCommand(cmd, raw => {
+      if (options) {
+        handleResponse(ext.typeName, raw, options);
+      }
     });
-    this.sendCommand(cmd, (raw: Response) => callback?.(raw));
   }
 
-  public sendRoomCommand(roomId: number, roomCmd: RoomCommand, callback?: (raw: Response) => void) {
-    const cmd = create(CommandContainerSchema, {
-      roomId,
-      roomCommand: [roomCmd],
+  public sendRoomCommand<V, R = unknown>(
+    roomId: number,
+    ext: GenExtension<RoomCommand, V>,
+    value: V,
+    options?: CommandOptions<R>
+  ): void {
+    const roomCmd = create(RoomCommandSchema);
+    setExtension(roomCmd, ext, value);
+    const cmd = create(CommandContainerSchema, { roomId, roomCommand: [roomCmd] });
+    this.sendCommand(cmd, raw => {
+      if (options) {
+        handleResponse(ext.typeName, raw, options);
+      }
     });
-    this.sendCommand(cmd, raw => callback?.(raw));
   }
 
-  public sendSessionCommand(sesCmd: SessionCommand, callback?: (raw: Response) => void) {
-    const cmd = create(CommandContainerSchema, {
-      sessionCommand: [sesCmd],
+  public sendSessionCommand<V, R = unknown>(
+    ext: GenExtension<SessionCommand, V>,
+    value: V,
+    options?: CommandOptions<R>
+  ): void {
+    const sesCmd = create(SessionCommandSchema);
+    setExtension(sesCmd, ext, value);
+    const cmd = create(CommandContainerSchema, { sessionCommand: [sesCmd] });
+    this.sendCommand(cmd, raw => {
+      if (options) {
+        handleResponse(ext.typeName, raw, options);
+      }
     });
-    this.sendCommand(cmd, (raw) => callback?.(raw));
   }
 
-  public sendModeratorCommand(modCmd: ModeratorCommand, callback?: (raw: Response) => void) {
-    const cmd = create(CommandContainerSchema, {
-      moderatorCommand: [modCmd],
+  public sendModeratorCommand<V, R = unknown>(
+    ext: GenExtension<ModeratorCommand, V>,
+    value: V,
+    options?: CommandOptions<R>
+  ): void {
+    const modCmd = create(ModeratorCommandSchema);
+    setExtension(modCmd, ext, value);
+    const cmd = create(CommandContainerSchema, { moderatorCommand: [modCmd] });
+    this.sendCommand(cmd, raw => {
+      if (options) {
+        handleResponse(ext.typeName, raw, options);
+      }
     });
-    this.sendCommand(cmd, (raw) => callback?.(raw));
   }
 
-  public sendAdminCommand(adminCmd: AdminCommand, callback?: (raw: Response) => void) {
-    const cmd = create(CommandContainerSchema, {
-      adminCommand: [adminCmd],
+  public sendAdminCommand<V, R = unknown>(
+    ext: GenExtension<AdminCommand, V>,
+    value: V,
+    options?: CommandOptions<R>
+  ): void {
+    const adminCmd = create(AdminCommandSchema);
+    setExtension(adminCmd, ext, value);
+    const cmd = create(CommandContainerSchema, { adminCommand: [adminCmd] });
+    this.sendCommand(cmd, raw => {
+      if (options) {
+        handleResponse(ext.typeName, raw, options);
+      }
     });
-    this.sendCommand(cmd, (raw) => callback?.(raw));
   }
 
   public sendCommand(cmd: CommandContainer, callback: (raw: Response) => void) {
     this.cmdId++;
 
     cmd.cmdId = BigInt(this.cmdId);
-    this.pendingCommands[this.cmdId] = callback;
+    this.pendingCommands.set(this.cmdId, callback);
 
-    if (this.webClient.socket.checkReadyState(WebSocket.OPEN)) {
-      this.webClient.socket.send(toBinary(CommandContainerSchema, cmd));
+    if (this.transport.isOpen()) {
+      this.transport.send(toBinary(CommandContainerSchema, cmd));
     }
-  }
-
-  public sendKeepAliveCommand(pingReceived: () => void) {
-    SessionCommands.ping(pingReceived);
   }
 
   public handleMessageEvent({ data }: MessageEvent): void {
@@ -170,9 +162,9 @@ export class ProtobufService {
     }
     const cmdId = Number(response.cmdId);
 
-    if (this.pendingCommands[cmdId]) {
-      this.pendingCommands[cmdId](response);
-      delete this.pendingCommands[cmdId];
+    if (this.pendingCommands.has(cmdId)) {
+      this.pendingCommands.get(cmdId)!(response);
+      this.pendingCommands.delete(cmdId);
     }
   }
 

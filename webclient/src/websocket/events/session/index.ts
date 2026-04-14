@@ -1,4 +1,4 @@
-import { SessionExtensionRegistry, makeSessionEntry } from '../../services/ProtobufService';
+import { SessionExtensionRegistry, makeSessionEntry } from '../../services/protobuf-types';
 import { addToList } from './addToList';
 import { connectionClosed } from './connectionClosed';
 import { listRooms } from './listRooms';

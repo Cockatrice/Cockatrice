@@ -1,6 +1,7 @@
 vi.mock('store', () => ({
   ServerDispatch: {
     initialized: vi.fn(),
+    connectionAttempted: vi.fn(),
     clearStore: vi.fn(),
     loginSuccessful: vi.fn(),
     loginFailed: vi.fn(),
@@ -386,5 +387,22 @@ describe('SessionPersistence', () => {
   it('replayDeleteMatch passes gameId', () => {
     SessionPersistence.replayDeleteMatch(7);
     expect(ServerDispatch.replayDeleteMatch).toHaveBeenCalledWith(7);
+  });
+
+  it('connectionAttempted delegates to ServerDispatch', () => {
+    SessionPersistence.connectionAttempted();
+    expect(ServerDispatch.connectionAttempted).toHaveBeenCalled();
+  });
+
+  it('playerPropertiesChanged does nothing when payload has no playerProperties', () => {
+    SessionPersistence.playerPropertiesChanged(5, 1, {} as any);
+    expect(GameDispatch.playerPropertiesChanged).not.toHaveBeenCalled();
+  });
+
+  it('getGamesOfUser handles rooms with missing gametypeList', () => {
+    const room = {} as any;
+    const game = { gameId: 5 };
+    SessionPersistence.getGamesOfUser('alice', { roomList: [room], gameList: [game] } as any);
+    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', [game], {});
   });
 });

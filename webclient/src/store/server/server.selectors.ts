@@ -11,6 +11,7 @@ export const Selectors = {
   getVersion: ({ server }: State) => server.info.version,
   getDescription: ({ server }: State) => server.status.description,
   getState: ({ server }: State) => server.status.state,
+  getConnectionAttemptMade: ({ server }: State) => server.status.connectionAttemptMade,
   getUser: ({ server }: State) => server.user,
   getUsers: ({ server }: State) => server.users,
   getLogs: ({ server }: State) => server.logs,

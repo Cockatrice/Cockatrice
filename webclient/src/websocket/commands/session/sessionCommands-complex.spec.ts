@@ -1,12 +1,6 @@
 // Tests for complex session commands that call webClient directly
 // or have multiple branching callbacks.
 
-vi.mock('../../services/BackendService', () => ({
-  BackendService: {
-    sendSessionCommand: vi.fn(),
-  },
-}));
-
 vi.mock('../../persistence', async () => {
   const { makeSessionPersistenceMock } = await import('../../__mocks__/sessionCommandMocks');
   return {
@@ -33,7 +27,6 @@ vi.mock('./', async () => {
 
 import { Mock } from 'vitest';
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
-import { BackendService } from '../../services/BackendService';
 import { SessionPersistence } from '../../persistence';
 import webClient from '../../WebClient';
 import * as SessionIndexMocks from './';
@@ -66,7 +59,7 @@ import { forgotPasswordReset } from './forgotPasswordReset';
 import { requestPasswordSalt } from './requestPasswordSalt';
 
 const { invokeOnSuccess, invokeResponseCode, invokeOnError } = makeCallbackHelpers(
-  BackendService.sendSessionCommand as Mock,
+  webClient.protobuf.sendSessionCommand as Mock,
   2
 );
 
@@ -144,7 +137,7 @@ describe('login', () => {
 
   it('sends Command_Login with plain password when no salt', () => {
     login({ userName: 'alice' } as any, 'pw');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_Login_ext,
       expect.objectContaining({ password: 'pw' }),
       expect.objectContaining({ responseExt: Response_Login_ext })
@@ -153,7 +146,7 @@ describe('login', () => {
 
   it('sends Command_Login with hashedPassword when salt is given', () => {
     login({ userName: 'alice' } as any, 'pw', 'salt');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_Login_ext,
       expect.objectContaining({ hashedPassword: 'hashed_pw' }),
       expect.objectContaining({ responseExt: Response_Login_ext })
@@ -162,7 +155,7 @@ describe('login', () => {
 
   it('uses options.hashedPassword if provided', () => {
     login({ userName: 'alice', hashedPassword: 'pre_hashed' } as any, 'pw', 'salt');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_Login_ext,
       expect.objectContaining({ hashedPassword: 'pre_hashed' }),
       expect.objectContaining({ responseExt: Response_Login_ext })
@@ -270,7 +263,7 @@ describe('register', () => {
 
   it('sends Command_Register with plain password when no salt', () => {
     register({ userName: 'alice', email: 'a@b.com', country: 'US', realName: 'Al' } as any, 'pw');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_Register_ext,
       expect.objectContaining({ password: 'pw' }),
       expect.any(Object)
@@ -279,7 +272,7 @@ describe('register', () => {
 
   it('uses hashedPassword when salt is provided', () => {
     register({ userName: 'alice' } as any, 'pw', 'salt');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_Register_ext,
       expect.objectContaining({ hashedPassword: 'hashed_pw' }),
       expect.any(Object)
@@ -373,12 +366,12 @@ describe('activate', () => {
 
   it('sends Command_Activate with userName and token, not password', () => {
     activate({ userName: 'alice', token: 'tok' } as any, 'pw');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_Activate_ext,
       expect.objectContaining({ userName: 'alice', token: 'tok' }),
       expect.any(Object)
     );
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_Activate_ext,
       expect.not.objectContaining({ password: expect.anything() }),
       expect.any(Object)
@@ -407,7 +400,7 @@ describe('forgotPasswordChallenge', () => {
 
   it('sends Command_ForgotPasswordChallenge', () => {
     forgotPasswordChallenge({ userName: 'alice', email: 'a@b.com' } as any);
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_ForgotPasswordChallenge_ext, expect.any(Object), expect.any(Object)
     );
   });
@@ -434,7 +427,7 @@ describe('forgotPasswordRequest', () => {
 
   it('sends Command_ForgotPasswordRequest', () => {
     forgotPasswordRequest({ userName: 'alice' } as any);
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_ForgotPasswordRequest_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Response_ForgotPasswordRequest_ext })
@@ -472,7 +465,7 @@ describe('forgotPasswordReset', () => {
 
   it('sends Command_ForgotPasswordReset with plain newPassword when no salt', () => {
     forgotPasswordReset({ userName: 'alice', token: 'tok' } as any, 'newpw');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_ForgotPasswordReset_ext,
       expect.objectContaining({ newPassword: 'newpw' }),
       expect.any(Object)
@@ -481,7 +474,7 @@ describe('forgotPasswordReset', () => {
 
   it('sends hashed new password when salt provided', () => {
     forgotPasswordReset({ userName: 'alice', token: 'tok' } as any, 'newpw', 'salt');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_ForgotPasswordReset_ext,
       expect.objectContaining({ hashedNewPassword: 'hashed_pw' }),
       expect.any(Object)
@@ -510,7 +503,7 @@ describe('requestPasswordSalt', () => {
 
   it('sends Command_RequestPasswordSalt', () => {
     requestPasswordSalt({ userName: 'alice', reason: WebSocketConnectReason.LOGIN } as any, 'pw');
-    expect(BackendService.sendSessionCommand).toHaveBeenCalledWith(
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
       Command_RequestPasswordSalt_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Response_PasswordSalt_ext })

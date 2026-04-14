@@ -1,3 +1,3 @@
-import { SessionExtensionRegistry } from '../../services/ProtobufService';
+import { SessionExtensionRegistry } from '../../services/protobuf-types';
 
 export const CommonEvents: SessionExtensionRegistry = [];

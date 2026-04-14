@@ -3,8 +3,8 @@ import { StatusEnum, WebSocketConnectOptions } from 'types';
 
 import { create } from '@bufbuild/protobuf';
 import type { MessageInitShape } from '@bufbuild/protobuf';
+import { CLIENT_CONFIG } from '../../config';
 import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
 import {
   Command_ForgotPasswordReset_ext, Command_ForgotPasswordResetSchema,
 } from 'generated/proto/session_commands_pb';
@@ -17,7 +17,7 @@ export function forgotPasswordReset(options: WebSocketConnectOptions, newPasswor
   const { userName, token } = options as unknown as ForgotPasswordResetParams;
 
   const params: MessageInitShape<typeof Command_ForgotPasswordResetSchema> = {
-    ...webClient.clientConfig,
+    ...CLIENT_CONFIG,
     userName,
     token,
     ...(passwordSalt
@@ -25,7 +25,7 @@ export function forgotPasswordReset(options: WebSocketConnectOptions, newPasswor
       : { newPassword }),
   };
 
-  BackendService.sendSessionCommand(Command_ForgotPasswordReset_ext, create(Command_ForgotPasswordResetSchema, params), {
+  webClient.protobuf.sendSessionCommand(Command_ForgotPasswordReset_ext, create(Command_ForgotPasswordResetSchema, params), {
     onSuccess: () => {
       updateStatus(StatusEnum.DISCONNECTED, null);
       SessionPersistence.resetPasswordSuccess();
