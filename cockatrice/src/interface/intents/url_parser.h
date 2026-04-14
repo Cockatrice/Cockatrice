@@ -1,7 +1,7 @@
 #ifndef COCKATRICE_URL_PARSER_H
 #define COCKATRICE_URL_PARSER_H
 #include <QObject>
-#include <qt5/QtCore/qurlquery.h>
+#include <QUrlQuery>
 
 class MainWindow;
 class IntentUrlParser : public QObject
