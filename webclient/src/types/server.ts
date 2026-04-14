@@ -111,10 +111,8 @@ export const KnownHosts = {
   [KnownHost.TETRARCH]: { port: 443, host: 'mtg.tetrarch.co/servatrice' },
 }
 
-export type LogItem = ServerInfo_ChatMessage;
-
 export interface LogGroups {
-  room: LogItem[];
-  game: LogItem[];
-  chat: LogItem[];
+  room: ServerInfo_ChatMessage[];
+  game: ServerInfo_ChatMessage[];
+  chat: ServerInfo_ChatMessage[];
 }

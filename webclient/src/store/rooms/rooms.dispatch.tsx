@@ -1,4 +1,5 @@
-import { GameSortField, Message, SortDirection, User } from 'types';
+import { GameSortField, Message, SortDirection } from 'types';
+import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
 import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
 import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
 
@@ -31,7 +32,7 @@ export const Dispatch = {
     store.dispatch(Actions.updateGames(roomId, games));
   },
 
-  userJoined: (roomId: number, user: User) => {
+  userJoined: (roomId: number, user: ServerInfo_User) => {
     store.dispatch(Actions.userJoined(roomId, user));
   },
 

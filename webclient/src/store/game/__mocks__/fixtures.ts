@@ -1,4 +1,8 @@
-import { ArrowInfo, CardInfo, CounterInfo, PlayerProperties, ProtoInit } from 'types';
+import { ProtoInit } from 'types';
+import type { ServerInfo_Card } from 'generated/proto/serverinfo_card_pb';
+import type { ServerInfo_Counter } from 'generated/proto/serverinfo_counter_pb';
+import type { ServerInfo_Arrow } from 'generated/proto/serverinfo_arrow_pb';
+import type { ServerInfo_PlayerProperties } from 'generated/proto/serverinfo_playerproperties_pb';
 import { create } from '@bufbuild/protobuf';
 import { ServerInfo_CardSchema } from 'generated/proto/serverinfo_card_pb';
 import { ServerInfo_CounterSchema } from 'generated/proto/serverinfo_counter_pb';
@@ -7,7 +11,7 @@ import { ServerInfo_ArrowSchema } from 'generated/proto/serverinfo_arrow_pb';
 import { ServerInfo_PlayerPropertiesSchema } from 'generated/proto/serverinfo_playerproperties_pb';
 import { GameEntry, GamesState, PlayerEntry, ZoneEntry } from '../game.interfaces';
 
-export function makeCard(overrides: ProtoInit<CardInfo> = {}): CardInfo {
+export function makeCard(overrides: ProtoInit<ServerInfo_Card> = {}): ServerInfo_Card {
   return create(ServerInfo_CardSchema, {
     id: 1,
     name: 'Test Card',
@@ -30,7 +34,7 @@ export function makeCard(overrides: ProtoInit<CardInfo> = {}): CardInfo {
   });
 }
 
-export function makeCounter(overrides: ProtoInit<CounterInfo> = {}): CounterInfo {
+export function makeCounter(overrides: ProtoInit<ServerInfo_Counter> = {}): ServerInfo_Counter {
   return create(ServerInfo_CounterSchema, {
     id: 1,
     name: 'Life',
@@ -41,7 +45,7 @@ export function makeCounter(overrides: ProtoInit<CounterInfo> = {}): CounterInfo
   });
 }
 
-export function makeArrow(overrides: ProtoInit<ArrowInfo> = {}): ArrowInfo {
+export function makeArrow(overrides: ProtoInit<ServerInfo_Arrow> = {}): ServerInfo_Arrow {
   return create(ServerInfo_ArrowSchema, {
     id: 1,
     startPlayerId: 1,
@@ -68,7 +72,7 @@ export function makeZoneEntry(overrides: Partial<ZoneEntry> = {}): ZoneEntry {
   };
 }
 
-export function makePlayerProperties(overrides: ProtoInit<PlayerProperties> = {}): PlayerProperties {
+export function makePlayerProperties(overrides: ProtoInit<ServerInfo_PlayerProperties> = {}): ServerInfo_PlayerProperties {
   return create(ServerInfo_PlayerPropertiesSchema, {
     playerId: 1,
     spectator: false,

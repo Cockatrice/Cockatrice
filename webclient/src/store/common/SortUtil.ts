@@ -1,4 +1,5 @@
-import { SortBy, SortDirection, User } from 'types';
+import { SortBy, SortDirection } from 'types';
+import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
 
 export default class SortUtil {
   static sortByField<T extends object>(arr: T[], sortBy: SortBy): void {
@@ -51,7 +52,7 @@ export default class SortUtil {
     }
   }
 
-  static sortUsersByField(users: User[], sortBy: SortBy) {
+  static sortUsersByField(users: ServerInfo_User[], sortBy: SortBy) {
     if (users.length) {
       users.sort((a, b) => SortUtil.userComparator(a, b, sortBy))
     }
@@ -75,7 +76,7 @@ export default class SortUtil {
     arr.sort((a, b) => SortUtil.stringComparator(a, b, sortBy));
   }
 
-  private static userComparator(a: User, b: User, sortBy: SortBy, sortByUserLevel = true) {
+  private static userComparator(a: ServerInfo_User, b: ServerInfo_User, sortBy: SortBy, sortByUserLevel = true) {
     if (sortByUserLevel) {
       const adminSortBy = {
         field: 'userLevel',

@@ -1,5 +1,6 @@
 import { create } from '@bufbuild/protobuf';
-import { CardAttribute, PlayerInfo } from 'types';
+import { CardAttribute } from 'generated/proto/card_attributes_pb';
+import type { ServerInfo_Player } from 'generated/proto/serverinfo_player_pb';
 import { gamesReducer } from './game.reducer';
 import { Types } from './game.types';
 import {
@@ -68,7 +69,7 @@ describe('2B: Game state & player management', () => {
     const card = makeCard({ id: 5 });
     const counter = makeCounter({ id: 2 });
     const arrow = makeArrow({ id: 3 });
-    const playerList: PlayerInfo[] = [
+    const playerList: ServerInfo_Player[] = [
       create(ServerInfo_PlayerSchema, {
         properties: makePlayerProperties({ playerId: 7 }),
         deckList: 'some deck',

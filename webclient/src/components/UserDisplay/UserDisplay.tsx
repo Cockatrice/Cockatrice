@@ -8,7 +8,8 @@ import MenuItem from '@mui/material/MenuItem';
 import { Images } from 'images/Images';
 import { SessionService } from 'api';
 import { ServerSelectors } from 'store';
-import { RouteEnum, User } from 'types';
+import { RouteEnum } from 'types';
+import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
 import { useAppSelector } from 'store/store';
 
 import './UserDisplay.css';
@@ -87,7 +88,7 @@ const UserDisplay = ({ user }: UserDisplayProps) => {
 };
 
 interface UserDisplayProps {
-  user: User;
+  user: ServerInfo_User;
 }
 
 export default UserDisplay;

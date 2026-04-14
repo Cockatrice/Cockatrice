@@ -1,7 +1,14 @@
 import {
-  BanHistoryItem, DeckList, DeckStorageTreeItem, GametypeMap, LogItem, ReplayMatch,
-  User, WebSocketConnectOptions, WarnHistoryItem, WarnListItem
+  GametypeMap, WebSocketConnectOptions
 } from 'types';
+import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
+import type { ServerInfo_Ban } from 'generated/proto/serverinfo_ban_pb';
+import type { ServerInfo_Warning } from 'generated/proto/serverinfo_warning_pb';
+import type { Response_WarnList } from 'generated/proto/response_warn_list_pb';
+import type { ServerInfo_ReplayMatch } from 'generated/proto/serverinfo_replay_match_pb';
+import type { Response_DeckList } from 'generated/proto/response_deck_list_pb';
+import type { ServerInfo_DeckStorage_TreeItem } from 'generated/proto/serverinfo_deckstorage_pb';
+import type { ServerInfo_ChatMessage } from 'generated/proto/serverinfo_chat_message_pb';
 import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
 import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
 import { ServerStateStatus } from './server.interfaces';
@@ -41,11 +48,11 @@ export const Actions = {
     type: Types.SERVER_MESSAGE,
     message
   }),
-  updateBuddyList: (buddyList: User[]) => ({
+  updateBuddyList: (buddyList: ServerInfo_User[]) => ({
     type: Types.UPDATE_BUDDY_LIST,
     buddyList
   }),
-  addToBuddyList: (user: User) => ({
+  addToBuddyList: (user: ServerInfo_User) => ({
     type: Types.ADD_TO_BUDDY_LIST,
     user
   }),
@@ -53,11 +60,11 @@ export const Actions = {
     type: Types.REMOVE_FROM_BUDDY_LIST,
     userName
   }),
-  updateIgnoreList: (ignoreList: User[]) => ({
+  updateIgnoreList: (ignoreList: ServerInfo_User[]) => ({
     type: Types.UPDATE_IGNORE_LIST,
     ignoreList
   }),
-  addToIgnoreList: (user: User) => ({
+  addToIgnoreList: (user: ServerInfo_User) => ({
     type: Types.ADD_TO_IGNORE_LIST,
     user
   }),
@@ -73,15 +80,15 @@ export const Actions = {
     type: Types.UPDATE_STATUS,
     status
   }),
-  updateUser: (user: User) => ({
+  updateUser: (user: ServerInfo_User) => ({
     type: Types.UPDATE_USER,
     user
   }),
-  updateUsers: (users: User[]) => ({
+  updateUsers: (users: ServerInfo_User[]) => ({
     type: Types.UPDATE_USERS,
     users
   }),
-  userJoined: (user: User) => ({
+  userJoined: (user: ServerInfo_User) => ({
     type: Types.USER_JOINED,
     user
   }),
@@ -89,7 +96,7 @@ export const Actions = {
     type: Types.USER_LEFT,
     name
   }),
-  viewLogs: (logs: LogItem[]) => ({
+  viewLogs: (logs: ServerInfo_ChatMessage[]) => ({
     type: Types.VIEW_LOGS,
     logs
   }),
@@ -162,15 +169,15 @@ export const Actions = {
   accountPasswordChange: () => ({
     type: Types.ACCOUNT_PASSWORD_CHANGE,
   }),
-  accountEditChanged: (user: Partial<User>) => ({
+  accountEditChanged: (user: Partial<ServerInfo_User>) => ({
     type: Types.ACCOUNT_EDIT_CHANGED,
     user,
   }),
-  accountImageChanged: (user: Partial<User>) => ({
+  accountImageChanged: (user: Partial<ServerInfo_User>) => ({
     type: Types.ACCOUNT_IMAGE_CHANGED,
     user,
   }),
-  getUserInfo: (userInfo: User) => ({
+  getUserInfo: (userInfo: ServerInfo_User) => ({
     type: Types.GET_USER_INFO,
     userInfo,
   }),
@@ -200,17 +207,17 @@ export const Actions = {
     type: Types.BAN_FROM_SERVER,
     userName,
   }),
-  banHistory: (userName: string, banHistory: BanHistoryItem[]) => ({
+  banHistory: (userName: string, banHistory: ServerInfo_Ban[]) => ({
     type: Types.BAN_HISTORY,
     userName,
     banHistory,
   }),
-  warnHistory: (userName: string, warnHistory: WarnHistoryItem[]) => ({
+  warnHistory: (userName: string, warnHistory: ServerInfo_Warning[]) => ({
     type: Types.WARN_HISTORY,
     userName,
     warnHistory,
   }),
-  warnListOptions: (warnList: WarnListItem[]) => ({
+  warnListOptions: (warnList: Response_WarnList[]) => ({
     type: Types.WARN_LIST_OPTIONS,
     warnList,
   }),
@@ -238,14 +245,14 @@ export const Actions = {
     userName,
     notes,
   }),
-  replayList: (matchList: ReplayMatch[]) => ({ type: Types.REPLAY_LIST, matchList }),
-  replayAdded: (matchInfo: ReplayMatch) => ({ type: Types.REPLAY_ADDED, matchInfo }),
+  replayList: (matchList: ServerInfo_ReplayMatch[]) => ({ type: Types.REPLAY_LIST, matchList }),
+  replayAdded: (matchInfo: ServerInfo_ReplayMatch) => ({ type: Types.REPLAY_ADDED, matchInfo }),
   replayModifyMatch: (gameId: number, doNotHide: boolean) => ({ type: Types.REPLAY_MODIFY_MATCH, gameId, doNotHide }),
   replayDeleteMatch: (gameId: number) => ({ type: Types.REPLAY_DELETE_MATCH, gameId }),
-  backendDecks: (deckList: DeckList) => ({ type: Types.BACKEND_DECKS, deckList }),
+  backendDecks: (deckList: Response_DeckList) => ({ type: Types.BACKEND_DECKS, deckList }),
   deckNewDir: (path: string, dirName: string) => ({ type: Types.DECK_NEW_DIR, path, dirName }),
   deckDelDir: (path: string) => ({ type: Types.DECK_DEL_DIR, path }),
-  deckUpload: (path: string, treeItem: DeckStorageTreeItem) => ({ type: Types.DECK_UPLOAD, path, treeItem }),
+  deckUpload: (path: string, treeItem: ServerInfo_DeckStorage_TreeItem) => ({ type: Types.DECK_UPLOAD, path, treeItem }),
   deckDelete: (deckId: number) => ({ type: Types.DECK_DELETE, deckId }),
   gamesOfUser: (userName: string, games: ServerInfo_Game[], gametypeMap: GametypeMap) =>
     ({ type: Types.GAMES_OF_USER, userName, games, gametypeMap }),

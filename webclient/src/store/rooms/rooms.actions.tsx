@@ -1,4 +1,5 @@
-import { GameSortField, Message, SortDirection, User } from 'types';
+import { GameSortField, Message, SortDirection } from 'types';
+import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
 import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
 import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
 
@@ -36,7 +37,7 @@ export const Actions = {
     games,
   }),
 
-  userJoined: (roomId: number, user: User) => ({
+  userJoined: (roomId: number, user: ServerInfo_User) => ({
     type: Types.USER_JOINED,
     roomId,
     user,

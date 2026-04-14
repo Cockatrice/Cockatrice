@@ -1,5 +1,9 @@
 import { GameDispatch, ServerDispatch } from 'store';
-import { DeckList, DeckStorageTreeItem, ReplayMatch, StatusEnum, User, WebSocketConnectOptions } from 'types';
+import { StatusEnum, WebSocketConnectOptions } from 'types';
+import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
+import type { Response_DeckList } from 'generated/proto/response_deck_list_pb';
+import type { ServerInfo_DeckStorage_TreeItem } from 'generated/proto/serverinfo_deckstorage_pb';
+import type { ServerInfo_ReplayMatch } from 'generated/proto/serverinfo_replay_match_pb';
 import { GameEntry } from 'store/game/game.interfaces';
 import { sanitizeHtml } from 'websocket/utils';
 import {
@@ -51,11 +55,11 @@ export class SessionPersistence {
     ServerDispatch.testConnectionFailed();
   }
 
-  static updateBuddyList(buddyList: User[]) {
+  static updateBuddyList(buddyList: ServerInfo_User[]) {
     ServerDispatch.updateBuddyList(buddyList);
   }
 
-  static addToBuddyList(user: User) {
+  static addToBuddyList(user: ServerInfo_User) {
     ServerDispatch.addToBuddyList(user);
   }
 
@@ -63,11 +67,11 @@ export class SessionPersistence {
     ServerDispatch.removeFromBuddyList(userName);
   }
 
-  static updateIgnoreList(ignoreList: User[]) {
+  static updateIgnoreList(ignoreList: ServerInfo_User[]) {
     ServerDispatch.updateIgnoreList(ignoreList);
   }
 
-  static addToIgnoreList(user: User) {
+  static addToIgnoreList(user: ServerInfo_User) {
     ServerDispatch.addToIgnoreList(user);
   }
 
@@ -87,15 +91,15 @@ export class SessionPersistence {
     }
   }
 
-  static updateUser(user: User) {
+  static updateUser(user: ServerInfo_User) {
     ServerDispatch.updateUser(user);
   }
 
-  static updateUsers(users: User[]) {
+  static updateUsers(users: ServerInfo_User[]) {
     ServerDispatch.updateUsers(users);
   }
 
-  static userJoined(user: User) {
+  static userJoined(user: ServerInfo_User) {
     ServerDispatch.userJoined(user);
   }
 
@@ -171,7 +175,7 @@ export class SessionPersistence {
     ServerDispatch.accountImageChanged({ avatarBmp });
   }
 
-  static getUserInfo(userInfo: User) {
+  static getUserInfo(userInfo: ServerInfo_User) {
     ServerDispatch.getUserInfo(userInfo);
   }
 
@@ -238,11 +242,11 @@ export class SessionPersistence {
     ServerDispatch.deckDelete(deckId);
   }
 
-  static updateServerDecks(deckList: DeckList): void {
+  static updateServerDecks(deckList: Response_DeckList): void {
     ServerDispatch.backendDecks(deckList);
   }
 
-  static uploadServerDeck(path: string, treeItem: DeckStorageTreeItem): void {
+  static uploadServerDeck(path: string, treeItem: ServerInfo_DeckStorage_TreeItem): void {
     ServerDispatch.deckUpload(path, treeItem);
   }
 
@@ -254,11 +258,11 @@ export class SessionPersistence {
     ServerDispatch.deckDelDir(path);
   }
 
-  static replayList(matchList: ReplayMatch[]): void {
+  static replayList(matchList: ServerInfo_ReplayMatch[]): void {
     ServerDispatch.replayList(matchList);
   }
 
-  static replayAdded(matchInfo: ReplayMatch): void {
+  static replayAdded(matchInfo: ServerInfo_ReplayMatch): void {
     ServerDispatch.replayAdded(matchInfo);
   }
 

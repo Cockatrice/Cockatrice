@@ -1,7 +1,8 @@
 // ── Imports from generated proto files ───────────────────────────────────────
 
+import type { ProtoInit } from './utilities';
 import type { GameEventContext } from 'generated/proto/game_event_context_pb';
-import type { CardToMove, Command_MoveCard } from 'generated/proto/command_move_card_pb';
+import type { Command_MoveCard } from 'generated/proto/command_move_card_pb';
 import type { Command_DrawCards } from 'generated/proto/command_draw_cards_pb';
 import type { Command_RollDie } from 'generated/proto/command_roll_die_pb';
 import type { Command_Shuffle } from 'generated/proto/command_shuffle_pb';
@@ -24,59 +25,11 @@ import type { Command_KickFromGame } from 'generated/proto/command_kick_from_gam
 import type { Command_ReadyStart } from 'generated/proto/command_ready_start_pb';
 import type { Command_Mulligan } from 'generated/proto/command_mulligan_pb';
 import type { Command_DeckSelect } from 'generated/proto/command_deck_select_pb';
-import type { MoveCard_ToZone } from 'generated/proto/move_card_to_zone_pb';
 import type { Command_SetSideboardPlan } from 'generated/proto/command_set_sideboard_plan_pb';
 import type { Command_SetSideboardLock } from 'generated/proto/command_set_sideboard_lock_pb';
 import type { Command_SetActivePhase } from 'generated/proto/command_set_active_phase_pb';
 import type { Command_GameSay } from 'generated/proto/command_game_say_pb';
-import type { Event_GameStateChanged } from 'generated/proto/event_game_state_changed_pb';
-import type { Event_GameSay } from 'generated/proto/event_game_say_pb';
-import type { Event_MoveCard } from 'generated/proto/event_move_card_pb';
-import type { Event_FlipCard } from 'generated/proto/event_flip_card_pb';
-import type { Event_DestroyCard } from 'generated/proto/event_destroy_card_pb';
-import type { Event_AttachCard } from 'generated/proto/event_attach_card_pb';
-import type { Event_CreateToken } from 'generated/proto/event_create_token_pb';
-import type { Event_SetCardAttr } from 'generated/proto/event_set_card_attr_pb';
-import type { Event_SetCardCounter } from 'generated/proto/event_set_card_counter_pb';
-import type { Event_CreateArrow } from 'generated/proto/event_create_arrow_pb';
-import type { Event_DeleteArrow } from 'generated/proto/event_delete_arrow_pb';
-import type { Event_CreateCounter } from 'generated/proto/event_create_counter_pb';
-import type { Event_SetCounter } from 'generated/proto/event_set_counter_pb';
-import type { Event_DelCounter } from 'generated/proto/event_del_counter_pb';
-import type { Event_DrawCards } from 'generated/proto/event_draw_cards_pb';
-import type { Event_RevealCards } from 'generated/proto/event_reveal_cards_pb';
-import type { Event_Shuffle } from 'generated/proto/event_shuffle_pb';
-import type { Event_RollDie } from 'generated/proto/event_roll_die_pb';
-import type { Event_DumpZone } from 'generated/proto/event_dump_zone_pb';
-import type { Event_ChangeZoneProperties } from 'generated/proto/event_change_zone_properties_pb';
-import type { Event_SetActivePlayer } from 'generated/proto/event_set_active_player_pb';
-import type { Event_SetActivePhase } from 'generated/proto/event_set_active_phase_pb';
-import type { Event_ReverseTurn } from 'generated/proto/event_reverse_turn_pb';
 import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
-import type { color } from 'generated/proto/color_pb';
-import type { ServerInfo_CardCounter } from 'generated/proto/serverinfo_cardcounter_pb';
-import type { ServerInfo_Card } from 'generated/proto/serverinfo_card_pb';
-import type { ServerInfo_Zone } from 'generated/proto/serverinfo_zone_pb';
-import type { ServerInfo_Counter } from 'generated/proto/serverinfo_counter_pb';
-import type { ServerInfo_Arrow } from 'generated/proto/serverinfo_arrow_pb';
-import type { ServerInfo_PlayerProperties } from 'generated/proto/serverinfo_playerproperties_pb';
-import type { ServerInfo_Player } from 'generated/proto/serverinfo_player_pb';
-
-// ── Enum re-exports from generated proto files ────────────────────────────────
-
-export { CardAttribute } from 'generated/proto/card_attributes_pb';
-export { ServerInfo_Zone_ZoneType as ZoneType } from 'generated/proto/serverinfo_zone_pb';
-
-// ── Proto utility types ───────────────────────────────────────────────────────
-
-/**
- * Init shape for constructing protobuf messages via create().
- * Strips $typeName and $unknown branding, making all fields optional.
- * Use for function parameters that feed into create().
- */
-export type ProtoInit<T> = {
-  [K in keyof T as K extends '$typeName' | '$unknown' ? never : K]?: T[K];
-};
 
 // ── UI types (not proto mirrors) ──────────────────────────────────────────────
 
@@ -120,46 +73,7 @@ export enum LeaveGameReason {
   USER_DISCONNECTED = 4
 }
 
-// ── Type aliases for generated state mirror types ─────────────────────────────
-
-export type Color = color;
-export type CardCounterInfo = ServerInfo_CardCounter;
-export type CardInfo = ServerInfo_Card;
-export type ZoneInfo = ServerInfo_Zone;
-export type CounterInfo = ServerInfo_Counter;
-export type ArrowInfo = ServerInfo_Arrow;
-export type PlayerProperties = ServerInfo_PlayerProperties;
-export type PlayerInfo = ServerInfo_Player;
-
-// ── Type aliases for generated event data types ───────────────────────────────
-
-export type GameStateChangedData = Event_GameStateChanged;
-export type GameSayData = Event_GameSay;
-export type MoveCardData = Event_MoveCard;
-export type FlipCardData = Event_FlipCard;
-export type DestroyCardData = Event_DestroyCard;
-export type AttachCardData = Event_AttachCard;
-export type CreateTokenData = Event_CreateToken;
-export type SetCardAttrData = Event_SetCardAttr;
-export type SetCardCounterData = Event_SetCardCounter;
-export type CreateArrowData = Event_CreateArrow;
-export type DeleteArrowData = Event_DeleteArrow;
-export type CreateCounterData = Event_CreateCounter;
-export type SetCounterData = Event_SetCounter;
-export type DelCounterData = Event_DelCounter;
-export type DrawCardsData = Event_DrawCards;
-export type RevealCardsData = Event_RevealCards;
-export type ShuffleData = Event_Shuffle;
-export type RollDieData = Event_RollDie;
-export type DumpZoneData = Event_DumpZone;
-export type ChangeZonePropertiesData = Event_ChangeZoneProperties;
-export type SetActivePlayerData = Event_SetActivePlayer;
-export type SetActivePhaseData = Event_SetActivePhase;
-export type ReverseTurnData = Event_ReverseTurn;
-
-// ── GameEventContext (re-export of generated type) ────────────────────────────
-
-export type { GameEventContext };
+// ── GameEventContext (imported for use in GameEventMeta below) ───────────────
 
 /**
  * Passed to every game event handler alongside the event payload.
@@ -180,7 +94,6 @@ export interface GameEventMeta {
 // These use ProtoInit<> because callers construct plain objects;
 // the command functions internally call create(Schema, params).
 
-export type { CardToMove };
 export type MoveCardParams = ProtoInit<Command_MoveCard>;
 export type DrawCardsParams = ProtoInit<Command_DrawCards>;
 export type RollDieParams = ProtoInit<Command_RollDie>;
@@ -204,7 +117,6 @@ export type KickFromGameParams = ProtoInit<Command_KickFromGame>;
 export type ReadyStartParams = ProtoInit<Command_ReadyStart>;
 export type MulliganParams = ProtoInit<Command_Mulligan>;
 export type DeckSelectParams = ProtoInit<Command_DeckSelect>;
-export type MoveCardToZone = MoveCard_ToZone;
 export type SetSideboardPlanParams = ProtoInit<Command_SetSideboardPlan>;
 export type SetSideboardLockParams = ProtoInit<Command_SetSideboardLock>;
 export type SetActivePhaseParams = ProtoInit<Command_SetActivePhase>;

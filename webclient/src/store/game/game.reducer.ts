@@ -1,12 +1,9 @@
-import {
-  ArrowInfo,
-  CardAttribute,
-  CardCounterInfo,
-  CardInfo,
-  CounterInfo,
-  PlayerInfo,
-  PlayerProperties,
-} from 'types';
+import { CardAttribute } from 'generated/proto/card_attributes_pb';
+import type { ServerInfo_CardCounter } from 'generated/proto/serverinfo_cardcounter_pb';
+import type { ServerInfo_Card } from 'generated/proto/serverinfo_card_pb';
+import type { ServerInfo_Counter } from 'generated/proto/serverinfo_counter_pb';
+import type { ServerInfo_Arrow } from 'generated/proto/serverinfo_arrow_pb';
+import type { ServerInfo_Player } from 'generated/proto/serverinfo_player_pb';
 import { create } from '@bufbuild/protobuf';
 import { ServerInfo_CardSchema } from 'generated/proto/serverinfo_card_pb';
 import { ServerInfo_CardCounterSchema } from 'generated/proto/serverinfo_cardcounter_pb';
@@ -77,7 +74,7 @@ function removeGame(state: GamesState, gameId: number): GamesState {
 }
 
 /** Converts the proto PlayerInfo[] array into the keyed PlayerEntry map used in the store. */
-function normalizePlayers(playerList: PlayerInfo[]): { [playerId: number]: PlayerEntry } {
+function normalizePlayers(playerList: ServerInfo_Player[]): { [playerId: number]: PlayerEntry } {
   const players: { [playerId: number]: PlayerEntry } = {};
   for (const player of playerList) {
     const playerId = player.properties.playerId;
@@ -95,12 +92,12 @@ function normalizePlayers(playerList: PlayerInfo[]): { [playerId: number]: Playe
       };
     }
 
-    const counters: { [counterId: number]: CounterInfo } = {};
+    const counters: { [counterId: number]: ServerInfo_Counter } = {};
     for (const counter of player.counterList) {
       counters[counter.id] = counter;
     }
 
-    const arrows: { [arrowId: number]: ArrowInfo } = {};
+    const arrows: { [arrowId: number]: ServerInfo_Arrow } = {};
     for (const arrow of player.arrowList) {
       arrows[arrow.id] = arrow;
     }
@@ -123,7 +120,7 @@ function buildEmptyCard(
   y: number,
   faceDown: boolean,
   providerId: string
-): CardInfo {
+): ServerInfo_Card {
   return create(ServerInfo_CardSchema, {
     id,
     name,
@@ -209,7 +206,7 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
         return state;
       }
       const newPlayer: PlayerEntry = {
-        properties: playerProperties as PlayerProperties,
+        properties: playerProperties,
         deckList: '',
         zones: {},
         counters: {},
@@ -269,8 +266,8 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
       }
 
       // Locate card in source zone (by id for visible zones, by position for hidden)
-      let removedCard: CardInfo | undefined;
-      let newSourceCards: CardInfo[];
+      let removedCard: ServerInfo_Card | undefined;
+      let newSourceCards: ServerInfo_Card[];
       if (cardId >= 0) {
         removedCard = sourceZoneEntry.cards.find(c => c.id === cardId);
         newSourceCards = sourceZoneEntry.cards.filter(c => c.id !== cardId);
@@ -283,7 +280,7 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
       }
 
       const effectiveNewId = newCardId >= 0 ? newCardId : (removedCard?.id ?? -1);
-      const movedCard: CardInfo = removedCard
+      const movedCard: ServerInfo_Card = removedCard
         ? {
           ...removedCard,
           id: effectiveNewId,
@@ -426,7 +423,7 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
         return state;
       }
 
-      const newCard: CardInfo = create(ServerInfo_CardSchema, {
+      const newCard: ServerInfo_Card = create(ServerInfo_CardSchema, {
         id: cardId,
         name: cardName,
         x,
@@ -472,7 +469,7 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
         return state;
       }
 
-      const attrPatch: Partial<CardInfo> = {};
+      const attrPatch: Partial<ServerInfo_Card> = {};
       switch (attribute as CardAttribute) {
         case CardAttribute.AttrTapped: attrPatch.tapped = attrValue === '1'; break;
         case CardAttribute.AttrAttacking: attrPatch.attacking = attrValue === '1'; break;
@@ -510,7 +507,7 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
       }
 
       const card = zone.cards[cardIdx];
-      let newCounterList: CardCounterInfo[];
+      let newCounterList: ServerInfo_CardCounter[];
       if (counterValue <= 0) {
         newCounterList = card.counterList.filter(c => c.id !== counterId);
       } else {

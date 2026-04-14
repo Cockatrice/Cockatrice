@@ -5,16 +5,16 @@ import {
   ProtoInit,
   Room,
   SortDirection,
-  User,
   UserSortField,
 } from 'types';
+import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
 import { create } from '@bufbuild/protobuf';
 import { ServerInfo_UserSchema } from 'generated/proto/serverinfo_user_pb';
 import { ServerInfo_GameSchema } from 'generated/proto/serverinfo_game_pb';
 import { ServerInfo_RoomSchema } from 'generated/proto/serverinfo_room_pb';
 import { RoomsState } from '../rooms.interfaces';
 
-export function makeUser(overrides: ProtoInit<User> = {}): User {
+export function makeUser(overrides: ProtoInit<ServerInfo_User> = {}): ServerInfo_User {
   return create(ServerInfo_UserSchema, {
     name: 'TestUser',
     accountageSecs: 0n,

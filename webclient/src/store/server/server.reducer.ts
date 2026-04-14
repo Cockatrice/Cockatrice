@@ -1,4 +1,6 @@
-import { DeckStorageFolder, DeckStorageTreeItem, SortDirection, StatusEnum, UserLevelFlag, UserSortField } from 'types';
+import { SortDirection, StatusEnum, UserSortField } from 'types';
+import { ServerInfo_User_UserLevelFlag } from 'generated/proto/serverinfo_user_pb';
+import type { ServerInfo_DeckStorage_Folder, ServerInfo_DeckStorage_TreeItem } from 'generated/proto/serverinfo_deckstorage_pb';
 import { create } from '@bufbuild/protobuf';
 import { Response_DeckListSchema } from 'generated/proto/response_deck_list_pb';
 import { ServerInfo_DeckStorage_FolderSchema, ServerInfo_DeckStorage_TreeItemSchema } from 'generated/proto/serverinfo_deckstorage_pb';
@@ -13,7 +15,11 @@ function splitPath(path: string): string[] {
   return path ? path.split('/') : [];
 }
 
-function insertAtPath(folder: DeckStorageFolder, pathSegments: string[], item: DeckStorageTreeItem): DeckStorageFolder {
+function insertAtPath(
+  folder: ServerInfo_DeckStorage_Folder,
+  pathSegments: string[],
+  item: ServerInfo_DeckStorage_TreeItem,
+): ServerInfo_DeckStorage_Folder {
   if (pathSegments.length === 0 || (pathSegments.length === 1 && pathSegments[0] === '')) {
     return create(ServerInfo_DeckStorage_FolderSchema, { items: [...folder.items, item] });
   }
@@ -28,13 +34,13 @@ function insertAtPath(folder: DeckStorageFolder, pathSegments: string[], item: D
       ),
     });
   }
-  const created: DeckStorageTreeItem = create(ServerInfo_DeckStorage_TreeItemSchema, {
+  const created: ServerInfo_DeckStorage_TreeItem = create(ServerInfo_DeckStorage_TreeItemSchema, {
     id: 0, name: head, folder: insertAtPath(create(ServerInfo_DeckStorage_FolderSchema, { items: [] }), tail, item)
   });
   return create(ServerInfo_DeckStorage_FolderSchema, { items: [...folder.items, created] });
 }
 
-function removeById(folder: DeckStorageFolder, id: number): DeckStorageFolder {
+function removeById(folder: ServerInfo_DeckStorage_Folder, id: number): ServerInfo_DeckStorage_Folder {
   return create(ServerInfo_DeckStorage_FolderSchema, {
     items: folder.items
       .filter(item => item.id !== id)
@@ -44,7 +50,7 @@ function removeById(folder: DeckStorageFolder, id: number): DeckStorageFolder {
   });
 }
 
-function removeByPath(folder: DeckStorageFolder, pathSegments: string[]): DeckStorageFolder {
+function removeByPath(folder: ServerInfo_DeckStorage_Folder, pathSegments: string[]): ServerInfo_DeckStorage_Folder {
   if (pathSegments.length === 0 || (pathSegments.length === 1 && pathSegments[0] === '')) {
     return folder;
   }
@@ -410,8 +416,12 @@ export const serverReducer = (state = initialState, action: ServerAction) => {
             return user;
           }
           let newLevel = user.userLevel;
-          newLevel = shouldBeMod ? (newLevel | UserLevelFlag.IsModerator) : (newLevel & ~UserLevelFlag.IsModerator);
-          newLevel = shouldBeJudge ? (newLevel | UserLevelFlag.IsJudge) : (newLevel & ~UserLevelFlag.IsJudge);
+          newLevel = shouldBeMod
+            ? (newLevel | ServerInfo_User_UserLevelFlag.IsModerator)
+            : (newLevel & ~ServerInfo_User_UserLevelFlag.IsModerator);
+          newLevel = shouldBeJudge
+            ? (newLevel | ServerInfo_User_UserLevelFlag.IsJudge)
+            : (newLevel & ~ServerInfo_User_UserLevelFlag.IsJudge);
           return {
             ...user,
             userLevel: newLevel,
@@ -465,7 +475,7 @@ export const serverReducer = (state = initialState, action: ServerAction) => {
       if (!state.backendDecks?.root) {
         return state;
       }
-      const newFolder: DeckStorageTreeItem = create(ServerInfo_DeckStorage_TreeItemSchema, {
+      const newFolder: ServerInfo_DeckStorage_TreeItem = create(ServerInfo_DeckStorage_TreeItemSchema, {
         id: 0, name: action.dirName, folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
       });
       return {

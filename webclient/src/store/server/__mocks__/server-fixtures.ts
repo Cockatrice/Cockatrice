@@ -1,19 +1,19 @@
 import {
-  BanHistoryItem,
-  DeckList,
-  DeckStorageTreeItem,
   Game,
-  LogItem,
   ProtoInit,
-  ReplayMatch,
   SortDirection,
   StatusEnum,
-  User,
   UserSortField,
   WebSocketConnectOptions,
-  WarnHistoryItem,
-  WarnListItem,
 } from 'types';
+import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
+import type { ServerInfo_Ban } from 'generated/proto/serverinfo_ban_pb';
+import type { ServerInfo_Warning } from 'generated/proto/serverinfo_warning_pb';
+import type { Response_WarnList } from 'generated/proto/response_warn_list_pb';
+import type { ServerInfo_ReplayMatch } from 'generated/proto/serverinfo_replay_match_pb';
+import type { ServerInfo_ChatMessage } from 'generated/proto/serverinfo_chat_message_pb';
+import type { Response_DeckList } from 'generated/proto/response_deck_list_pb';
+import type { ServerInfo_DeckStorage_TreeItem } from 'generated/proto/serverinfo_deckstorage_pb';
 import { create } from '@bufbuild/protobuf';
 import { ServerInfo_GameSchema } from 'generated/proto/serverinfo_game_pb';
 import { ServerInfo_UserSchema } from 'generated/proto/serverinfo_user_pb';
@@ -26,7 +26,7 @@ import { ServerInfo_DeckStorage_TreeItemSchema, ServerInfo_DeckStorage_FolderSch
 import { Response_DeckListSchema } from 'generated/proto/response_deck_list_pb';
 import { ServerState } from '../server.interfaces';
 
-export function makeUser(overrides: ProtoInit<User> = {}): User {
+export function makeUser(overrides: ProtoInit<ServerInfo_User> = {}): ServerInfo_User {
   return create(ServerInfo_UserSchema, {
     name: 'TestUser',
     accountageSecs: 0n,
@@ -36,7 +36,7 @@ export function makeUser(overrides: ProtoInit<User> = {}): User {
   });
 }
 
-export function makeLogItem(overrides: ProtoInit<LogItem> = {}): LogItem {
+export function makeLogItem(overrides: ProtoInit<ServerInfo_ChatMessage> = {}): ServerInfo_ChatMessage {
   return create(ServerInfo_ChatMessageSchema, {
     message: '',
     senderId: '',
@@ -50,7 +50,7 @@ export function makeLogItem(overrides: ProtoInit<LogItem> = {}): LogItem {
   });
 }
 
-export function makeBanHistoryItem(overrides: ProtoInit<BanHistoryItem> = {}): BanHistoryItem {
+export function makeBanHistoryItem(overrides: ProtoInit<ServerInfo_Ban> = {}): ServerInfo_Ban {
   return create(ServerInfo_BanSchema, {
     adminId: '',
     adminName: '',
@@ -62,7 +62,7 @@ export function makeBanHistoryItem(overrides: ProtoInit<BanHistoryItem> = {}): B
   });
 }
 
-export function makeWarnHistoryItem(overrides: ProtoInit<WarnHistoryItem> = {}): WarnHistoryItem {
+export function makeWarnHistoryItem(overrides: ProtoInit<ServerInfo_Warning> = {}): ServerInfo_Warning {
   return create(ServerInfo_WarningSchema, {
     userName: '',
     adminName: '',
@@ -72,7 +72,7 @@ export function makeWarnHistoryItem(overrides: ProtoInit<WarnHistoryItem> = {}):
   });
 }
 
-export function makeWarnListItem(overrides: ProtoInit<WarnListItem> = {}): WarnListItem {
+export function makeWarnListItem(overrides: ProtoInit<Response_WarnList> = {}): Response_WarnList {
   return create(Response_WarnListSchema, {
     warning: [],
     userName: '',
@@ -81,7 +81,7 @@ export function makeWarnListItem(overrides: ProtoInit<WarnListItem> = {}): WarnL
   });
 }
 
-export function makeDeckTreeItem(overrides: ProtoInit<DeckStorageTreeItem> = {}): DeckStorageTreeItem {
+export function makeDeckTreeItem(overrides: ProtoInit<ServerInfo_DeckStorage_TreeItem> = {}): ServerInfo_DeckStorage_TreeItem {
   return create(ServerInfo_DeckStorage_TreeItemSchema, {
     id: 1,
     name: 'item',
@@ -89,14 +89,14 @@ export function makeDeckTreeItem(overrides: ProtoInit<DeckStorageTreeItem> = {})
   });
 }
 
-export function makeDeckList(overrides: ProtoInit<DeckList> = {}): DeckList {
+export function makeDeckList(overrides: ProtoInit<Response_DeckList> = {}): Response_DeckList {
   return create(Response_DeckListSchema, {
     root: create(ServerInfo_DeckStorage_FolderSchema, { items: [] }),
     ...overrides,
   });
 }
 
-export function makeReplayMatch(overrides: ProtoInit<ReplayMatch> = {}): ReplayMatch {
+export function makeReplayMatch(overrides: ProtoInit<ServerInfo_ReplayMatch> = {}): ServerInfo_ReplayMatch {
   return create(ServerInfo_ReplayMatchSchema, {
     gameId: 1,
     roomName: 'Test Room',

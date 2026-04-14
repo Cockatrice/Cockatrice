@@ -1,6 +1,13 @@
 import {
-  WarnHistoryItem, BanHistoryItem, DeckList, Game, LogItem, ReplayMatch, SortBy, User, UserSortField, WarnListItem
+  Game, SortBy, UserSortField
 } from 'types';
+import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
+import type { ServerInfo_Ban } from 'generated/proto/serverinfo_ban_pb';
+import type { ServerInfo_Warning } from 'generated/proto/serverinfo_warning_pb';
+import type { Response_WarnList } from 'generated/proto/response_warn_list_pb';
+import type { ServerInfo_ReplayMatch } from 'generated/proto/serverinfo_replay_match_pb';
+import type { Response_DeckList } from 'generated/proto/response_deck_list_pb';
+import type { ServerInfo_ChatMessage } from 'generated/proto/serverinfo_chat_message_pb';
 import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
 
 export interface ServerConnectParams {
@@ -43,34 +50,34 @@ export interface AccountActivationParams extends ServerRegisterParams {
 
 export interface ServerState {
   initialized: boolean;
-  buddyList: User[];
-  ignoreList: User[];
+  buddyList: ServerInfo_User[];
+  ignoreList: ServerInfo_User[];
   info: ServerStateInfo;
   status: ServerStateStatus;
   logs: ServerStateLogs;
-  user: User;
-  users: User[];
+  user: ServerInfo_User;
+  users: ServerInfo_User[];
   sortUsersBy: ServerStateSortUsersBy;
   messages: {
     [userName: string]: UserMessageData[];
   }
   userInfo: {
-    [userName: string]: User;
+    [userName: string]: ServerInfo_User;
   }
   notifications: NotifyUserData[];
   serverShutdown: ServerShutdownData;
   banUser: string;
   banHistory: {
-    [userName: string]: BanHistoryItem[];
+    [userName: string]: ServerInfo_Ban[];
   };
   warnHistory: {
-    [userName: string]: WarnHistoryItem[];
+    [userName: string]: ServerInfo_Warning[];
   };
-  warnListOptions: WarnListItem[];
+  warnListOptions: Response_WarnList[];
   warnUser: string;
   adminNotes: { [userName: string]: string };
-  replays: ReplayMatch[];
-  backendDecks: DeckList | null;
+  replays: ServerInfo_ReplayMatch[];
+  backendDecks: Response_DeckList | null;
   gamesOfUser: { [userName: string]: Game[] };
   registrationError: string | null;
 }
@@ -88,9 +95,9 @@ export interface ServerStateInfo {
 }
 
 export interface ServerStateLogs {
-  room: LogItem[];
-  game: LogItem[];
-  chat: LogItem[];
+  room: ServerInfo_ChatMessage[];
+  game: ServerInfo_ChatMessage[];
+  chat: ServerInfo_ChatMessage[];
 }
 
 export interface ServerStateSortUsersBy extends SortBy {

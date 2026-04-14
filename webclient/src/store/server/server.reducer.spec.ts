@@ -1,4 +1,5 @@
-import { StatusEnum, UserLevelFlag } from 'types';
+import { StatusEnum } from 'types';
+import { ServerInfo_User_UserLevelFlag as UserLevelFlag } from 'generated/proto/serverinfo_user_pb';
 import { create } from '@bufbuild/protobuf';
 import { Event_UserMessageSchema } from 'generated/proto/event_user_message_pb';
 import { ServerInfo_DeckStorage_FolderSchema, ServerInfo_DeckStorage_TreeItemSchema } from 'generated/proto/serverinfo_deckstorage_pb';

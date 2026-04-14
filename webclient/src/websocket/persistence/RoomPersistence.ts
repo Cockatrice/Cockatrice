@@ -1,5 +1,6 @@
 import { RoomsDispatch } from 'store';
-import { Message, User } from 'types';
+import { Message } from 'types';
+import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
 import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
 import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
 
@@ -35,7 +36,7 @@ export class RoomPersistence {
     RoomsDispatch.addMessage(roomId, message);
   }
 
-  static userJoined(roomId: number, user: User) {
+  static userJoined(roomId: number, user: ServerInfo_User) {
     RoomsDispatch.userJoined(roomId, user);
   }
 

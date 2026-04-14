@@ -1,7 +1,8 @@
 import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
 import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
 import type { ServerInfo_GameType } from 'generated/proto/serverinfo_gametype_pb';
-import { Game, GametypeMap, LogItem, LogGroups, Message, Room } from 'types';
+import type { ServerInfo_ChatMessage } from 'generated/proto/serverinfo_chat_message_pb';
+import { Game, GametypeMap, LogGroups, Message, Room } from 'types';
 
 /** Flatten a gametype list into a lookup map of { gameTypeId → description }. */
 export function normalizeGametypeMap(gametypeList: ServerInfo_GameType[]): GametypeMap {
@@ -40,7 +41,7 @@ export function normalizeGameObject(game: ServerInfo_Game, gametypeMap: Gametype
 }
 
 /** Group a flat LogItem[] into { room, game, chat } buckets for the server store. */
-export function normalizeLogs(logs: LogItem[]): LogGroups {
+export function normalizeLogs(logs: ServerInfo_ChatMessage[]): LogGroups {
   return logs.reduce((obj, log) => {
     const type = log.targetType as keyof LogGroups;
     obj[type] = obj[type] || [];

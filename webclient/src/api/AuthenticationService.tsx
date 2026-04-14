@@ -1,6 +1,6 @@
-import { StatusEnum, User, WebSocketConnectReason, WebSocketConnectOptions } from 'types';
+import { StatusEnum, WebSocketConnectReason, WebSocketConnectOptions } from 'types';
 import { SessionCommands } from 'websocket';
-import { ServerInfo_User_UserLevelFlag } from 'generated/proto/serverinfo_user_pb';
+import { ServerInfo_User, ServerInfo_User_UserLevelFlag } from 'generated/proto/serverinfo_user_pb';
 
 export class AuthenticationService {
   static login(options: WebSocketConnectOptions): void {
@@ -39,7 +39,7 @@ export class AuthenticationService {
     return state === StatusEnum.LOGGED_IN;
   }
 
-  static isModerator(user: User): boolean {
+  static isModerator(user: ServerInfo_User): boolean {
     const moderatorLevel = ServerInfo_User_UserLevelFlag.IsModerator;
     // @TODO tell cockatrice not to do this so shittily
     return (user.userLevel & moderatorLevel) === moderatorLevel;
