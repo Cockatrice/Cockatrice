@@ -149,6 +149,10 @@ public:
     {
         return userListManager;
     }
+    [[nodiscard]] TabServer *getTabServer() const
+    {
+        return tabServer;
+    }
     [[nodiscard]] const QMap<int, TabRoom *> &getRoomTabs() const
     {
         return roomTabs;

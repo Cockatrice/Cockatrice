@@ -150,6 +150,11 @@ public:
     }
     ~MainWindow() override;
 
+    RemoteClient *getRemoteClient() const
+    {
+        return client;
+    };
+
     TabSupervisor *getTabSupervisor() const
     {
         return tabSupervisor;
