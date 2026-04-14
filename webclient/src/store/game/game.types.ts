@@ -31,4 +31,4 @@ export const Types = {
   ZONE_DUMPED: '[Games] Zone Dumped',
   ZONE_PROPERTIES_CHANGED: '[Games] Zone Properties Changed',
   GAME_SAY: '[Games] Game Say',
-};
+} as const;

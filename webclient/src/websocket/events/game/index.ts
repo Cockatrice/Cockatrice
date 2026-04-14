@@ -1,4 +1,4 @@
-import { ExtensionRegistry } from '../../services/ProtobufService';
+import { GameExtensionRegistry, makeGameEntry } from '../../services/ProtobufService';
 import { attachCard } from './attachCard';
 import { changeZoneProperties } from './changeZoneProperties';
 import { createArrow } from './createArrow';
@@ -59,35 +59,35 @@ import { Event_DumpZone_ext } from 'generated/proto/event_dump_zone_pb';
 import { Event_ChangeZoneProperties_ext } from 'generated/proto/event_change_zone_properties_pb';
 import { Event_ReverseTurn_ext } from 'generated/proto/event_reverse_turn_pb';
 
-export const GameEvents: ExtensionRegistry = [
-  [Event_Join_ext, joinGame],
-  [Event_Leave_ext, leaveGame],
-  [Event_GameClosed_ext, gameClosed],
-  [Event_GameHostChanged_ext, gameHostChanged],
-  [Event_Kicked_ext, kicked],
-  [Event_GameStateChanged_ext, gameStateChanged],
-  [Event_PlayerPropertiesChanged_ext, playerPropertiesChanged],
-  [Event_GameSay_ext, gameSay],
-  [Event_CreateArrow_ext, createArrow],
-  [Event_DeleteArrow_ext, deleteArrow],
-  [Event_CreateCounter_ext, createCounter],
-  [Event_SetCounter_ext, setCounter],
-  [Event_DelCounter_ext, delCounter],
-  [Event_DrawCards_ext, drawCards],
-  [Event_RevealCards_ext, revealCards],
-  [Event_Shuffle_ext, shuffle],
-  [Event_RollDie_ext, rollDie],
-  [Event_MoveCard_ext, moveCard],
-  [Event_FlipCard_ext, flipCard],
-  [Event_DestroyCard_ext, destroyCard],
-  [Event_AttachCard_ext, attachCard],
-  [Event_CreateToken_ext, createToken],
-  [Event_SetCardAttr_ext, setCardAttr],
-  [Event_SetCardCounter_ext, setCardCounter],
-  [Event_SetActivePlayer_ext, setActivePlayer],
-  [Event_SetActivePhase_ext, setActivePhase],
-  [Event_DumpZone_ext, dumpZone],
-  [Event_ChangeZoneProperties_ext, changeZoneProperties],
-  [Event_ReverseTurn_ext, reverseTurn],
+export const GameEvents: GameExtensionRegistry = [
+  makeGameEntry(Event_Join_ext, joinGame),
+  makeGameEntry(Event_Leave_ext, leaveGame),
+  makeGameEntry(Event_GameClosed_ext, gameClosed),
+  makeGameEntry(Event_GameHostChanged_ext, gameHostChanged),
+  makeGameEntry(Event_Kicked_ext, kicked),
+  makeGameEntry(Event_GameStateChanged_ext, gameStateChanged),
+  makeGameEntry(Event_PlayerPropertiesChanged_ext, playerPropertiesChanged),
+  makeGameEntry(Event_GameSay_ext, gameSay),
+  makeGameEntry(Event_CreateArrow_ext, createArrow),
+  makeGameEntry(Event_DeleteArrow_ext, deleteArrow),
+  makeGameEntry(Event_CreateCounter_ext, createCounter),
+  makeGameEntry(Event_SetCounter_ext, setCounter),
+  makeGameEntry(Event_DelCounter_ext, delCounter),
+  makeGameEntry(Event_DrawCards_ext, drawCards),
+  makeGameEntry(Event_RevealCards_ext, revealCards),
+  makeGameEntry(Event_Shuffle_ext, shuffle),
+  makeGameEntry(Event_RollDie_ext, rollDie),
+  makeGameEntry(Event_MoveCard_ext, moveCard),
+  makeGameEntry(Event_FlipCard_ext, flipCard),
+  makeGameEntry(Event_DestroyCard_ext, destroyCard),
+  makeGameEntry(Event_AttachCard_ext, attachCard),
+  makeGameEntry(Event_CreateToken_ext, createToken),
+  makeGameEntry(Event_SetCardAttr_ext, setCardAttr),
+  makeGameEntry(Event_SetCardCounter_ext, setCardCounter),
+  makeGameEntry(Event_SetActivePlayer_ext, setActivePlayer),
+  makeGameEntry(Event_SetActivePhase_ext, setActivePhase),
+  makeGameEntry(Event_DumpZone_ext, dumpZone),
+  makeGameEntry(Event_ChangeZoneProperties_ext, changeZoneProperties),
+  makeGameEntry(Event_ReverseTurn_ext, reverseTurn),
 ];
 

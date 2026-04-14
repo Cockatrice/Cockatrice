@@ -1,10 +1,6 @@
-vi.mock('store/store', () => ({ store: { dispatch: vi.fn() } }));
-vi.mock('redux-form', () => ({
-  reset: vi.fn((form) => ({ type: '@@redux-form/RESET', meta: { form } })),
-}));
+vi.mock('store', () => ({ store: { dispatch: vi.fn() } }));
 
-import { store } from 'store/store';
-import { reset } from 'redux-form';
+import { store } from 'store';
 import { Actions } from './rooms.actions';
 import { Dispatch } from './rooms.dispatch';
 import { makeGame, makeMessage, makeRoom, makeUser } from './__mocks__/rooms-fixtures';
@@ -42,11 +38,11 @@ describe('Dispatch', () => {
     expect(store.dispatch).toHaveBeenCalledWith(Actions.addMessage(1, message));
   });
 
-  it('addMessage with message.name truthy → dispatches reset("sayMessage") then Actions.addMessage()', () => {
+  it('addMessage with message.name truthy → dispatches Actions.addMessage()', () => {
     const message = { ...makeMessage(), name: 'Alice' };
     Dispatch.addMessage(1, message);
-    expect(store.dispatch).toHaveBeenNthCalledWith(1, (reset as vi.Mock)('sayMessage'));
-    expect(store.dispatch).toHaveBeenNthCalledWith(2, Actions.addMessage(1, message));
+    expect(store.dispatch).toHaveBeenCalledTimes(1);
+    expect(store.dispatch).toHaveBeenCalledWith(Actions.addMessage(1, message));
   });
 
   it('updateGames dispatches Actions.updateGames()', () => {

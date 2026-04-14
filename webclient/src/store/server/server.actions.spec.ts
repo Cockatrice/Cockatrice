@@ -1,11 +1,16 @@
 import { Actions } from './server.actions';
 import { Types } from './server.types';
+import { create } from '@bufbuild/protobuf';
+import { Event_NotifyUserSchema } from 'generated/proto/event_notify_user_pb';
+import { Event_ServerShutdownSchema } from 'generated/proto/event_server_shutdown_pb';
+import { Event_UserMessageSchema } from 'generated/proto/event_user_message_pb';
 import {
   makeBanHistoryItem,
   makeConnectOptions,
   makeDeckList,
   makeDeckTreeItem,
   makeReplayMatch,
+  makeGame,
   makeUser,
   makeWarnHistoryItem,
   makeWarnListItem,
@@ -107,7 +112,7 @@ describe('Actions', () => {
   });
 
   it('viewLogs', () => {
-    const logs = { room: [], game: [], chat: [] };
+    const logs = [{ targetType: 'room' }] as any[];
     expect(Actions.viewLogs(logs)).toEqual({ type: Types.VIEW_LOGS, logs });
   });
 
@@ -124,7 +129,11 @@ describe('Actions', () => {
   });
 
   it('registrationFailed', () => {
-    expect(Actions.registrationFailed('err')).toEqual({ type: Types.REGISTRATION_FAILED, error: 'err' });
+    expect(Actions.registrationFailed('err', 999)).toEqual({ type: Types.REGISTRATION_FAILED, reason: 'err', endTime: 999 });
+  });
+
+  it('registrationFailed without endTime', () => {
+    expect(Actions.registrationFailed('err')).toEqual({ type: Types.REGISTRATION_FAILED, reason: 'err', endTime: undefined });
   });
 
   it('registrationEmailError', () => {
@@ -209,17 +218,17 @@ describe('Actions', () => {
   });
 
   it('notifyUser', () => {
-    const notification = { type: 1, warningReason: '', customTitle: '', customContent: '' };
+    const notification = create(Event_NotifyUserSchema, { type: 1, warningReason: '', customTitle: '', customContent: '' });
     expect(Actions.notifyUser(notification)).toEqual({ type: Types.NOTIFY_USER, notification });
   });
 
   it('serverShutdown', () => {
-    const data = { reason: 'maintenance', minutes: 5 };
+    const data = create(Event_ServerShutdownSchema, { reason: 'maintenance', minutes: 5 });
     expect(Actions.serverShutdown(data)).toEqual({ type: Types.SERVER_SHUTDOWN, data });
   });
 
   it('userMessage', () => {
-    const messageData = { senderName: 'Alice', receiverName: 'Bob', message: 'hey' };
+    const messageData = create(Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'hey' });
     expect(Actions.userMessage(messageData)).toEqual({ type: Types.USER_MESSAGE, messageData });
   });
 
@@ -347,7 +356,8 @@ describe('Actions', () => {
   });
 
   it('gamesOfUser', () => {
-    const games = [{ gameId: 1 }] as any;
-    expect(Actions.gamesOfUser('alice', games)).toEqual({ type: Types.GAMES_OF_USER, userName: 'alice', games });
+    const games = [makeGame({ gameId: 1 })];
+    const gametypeMap = { 1: 'Standard' };
+    expect(Actions.gamesOfUser('alice', games, gametypeMap)).toEqual({ type: Types.GAMES_OF_USER, userName: 'alice', games, gametypeMap });
   });
 });

@@ -1,4 +1,6 @@
+import { create } from '@bufbuild/protobuf';
 import { SortDirection } from 'types';
+import { ServerInfo_UserSchema } from 'generated/proto/serverinfo_user_pb';
 import SortUtil from './SortUtil';
 
 // ── sortByField ───────────────────────────────────────────────────────────────
@@ -118,11 +120,11 @@ describe('sortByFields', () => {
 describe('sortUsersByField', () => {
   it('sorts by userLevel DESC first, then name ASC', () => {
     const users = [
-      { name: 'Alice', userLevel: 1, accountageSecs: 0n, privlevel: '' },
-      { name: 'Bob', userLevel: 8, accountageSecs: 0n, privlevel: '' },
-      { name: 'Carol', userLevel: 1, accountageSecs: 0n, privlevel: '' },
+      create(ServerInfo_UserSchema, { name: 'Alice', userLevel: 1, accountageSecs: 0n, privlevel: '' }),
+      create(ServerInfo_UserSchema, { name: 'Bob', userLevel: 8, accountageSecs: 0n, privlevel: '' }),
+      create(ServerInfo_UserSchema, { name: 'Carol', userLevel: 1, accountageSecs: 0n, privlevel: '' }),
     ];
-    SortUtil.sortUsersByField(users as any, { field: 'name', order: SortDirection.ASC });
+    SortUtil.sortUsersByField(users, { field: 'name', order: SortDirection.ASC });
     expect(users[0].name).toBe('Bob');
     expect(users[1].name).toBe('Alice');
     expect(users[2].name).toBe('Carol');
@@ -136,11 +138,11 @@ describe('sortUsersByField', () => {
 
   it('returns 0 (stable) when two users tie on both userLevel and name', () => {
     const users = [
-      { name: 'Alice', userLevel: 1, accountageSecs: 0n, privlevel: '' },
-      { name: 'Alice', userLevel: 1, accountageSecs: 0n, privlevel: '' },
+      create(ServerInfo_UserSchema, { name: 'Alice', userLevel: 1, accountageSecs: 0n, privlevel: '' }),
+      create(ServerInfo_UserSchema, { name: 'Alice', userLevel: 1, accountageSecs: 0n, privlevel: '' }),
     ];
     expect(() =>
-      SortUtil.sortUsersByField(users as any, { field: 'name', order: SortDirection.ASC })
+      SortUtil.sortUsersByField(users, { field: 'name', order: SortDirection.ASC })
     ).not.toThrow();
     expect(users).toHaveLength(2);
   });

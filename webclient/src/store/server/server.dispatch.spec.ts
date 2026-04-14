@@ -1,17 +1,18 @@
-vi.mock('store/store', () => ({ store: { dispatch: vi.fn() } }));
-vi.mock('redux-form', () => ({
-  reset: vi.fn((form) => ({ type: '@@redux-form/RESET', meta: { form } })),
-}));
+vi.mock('store', () => ({ store: { dispatch: vi.fn() } }));
 
-import { store } from 'store/store';
-import { reset } from 'redux-form';
+import { store } from 'store';
 import { Actions } from './server.actions';
 import { Dispatch } from './server.dispatch';
+import { create } from '@bufbuild/protobuf';
+import { Event_NotifyUserSchema } from 'generated/proto/event_notify_user_pb';
+import { Event_ServerShutdownSchema } from 'generated/proto/event_server_shutdown_pb';
+import { Event_UserMessageSchema } from 'generated/proto/event_user_message_pb';
 import {
   makeBanHistoryItem,
   makeConnectOptions,
   makeDeckList,
   makeDeckTreeItem,
+  makeGame,
   makeReplayMatch,
   makeUser,
   makeWarnHistoryItem,
@@ -68,11 +69,10 @@ describe('Dispatch', () => {
     expect(store.dispatch).toHaveBeenCalledWith(Actions.updateBuddyList(list));
   });
 
-  it('addToBuddyList dispatches reset("addToBuddies") then Actions.addToBuddyList()', () => {
+  it('addToBuddyList dispatches Actions.addToBuddyList()', () => {
     const user = makeUser();
     Dispatch.addToBuddyList(user);
-    expect(store.dispatch).toHaveBeenNthCalledWith(1, (reset as vi.Mock)('addToBuddies'));
-    expect(store.dispatch).toHaveBeenNthCalledWith(2, Actions.addToBuddyList(user));
+    expect(store.dispatch).toHaveBeenCalledWith(Actions.addToBuddyList(user));
   });
 
   it('removeFromBuddyList dispatches Actions.removeFromBuddyList()', () => {
@@ -86,11 +86,10 @@ describe('Dispatch', () => {
     expect(store.dispatch).toHaveBeenCalledWith(Actions.updateIgnoreList(list));
   });
 
-  it('addToIgnoreList dispatches reset("addToIgnore") then Actions.addToIgnoreList()', () => {
+  it('addToIgnoreList dispatches Actions.addToIgnoreList()', () => {
     const user = makeUser();
     Dispatch.addToIgnoreList(user);
-    expect(store.dispatch).toHaveBeenNthCalledWith(1, (reset as vi.Mock)('addToIgnore'));
-    expect(store.dispatch).toHaveBeenNthCalledWith(2, Actions.addToIgnoreList(user));
+    expect(store.dispatch).toHaveBeenCalledWith(Actions.addToIgnoreList(user));
   });
 
   it('removeFromIgnoreList dispatches Actions.removeFromIgnoreList()', () => {
@@ -132,7 +131,7 @@ describe('Dispatch', () => {
   });
 
   it('viewLogs dispatches Actions.viewLogs()', () => {
-    const logs = { room: [], game: [], chat: [] };
+    const logs = [{ targetType: 'room' }] as any[];
     Dispatch.viewLogs(logs);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.viewLogs(logs));
   });
@@ -157,9 +156,14 @@ describe('Dispatch', () => {
     expect(store.dispatch).toHaveBeenCalledWith(Actions.registrationSuccess());
   });
 
-  it('registrationFailed dispatches correctly', () => {
-    Dispatch.registrationFailed('err');
-    expect(store.dispatch).toHaveBeenCalledWith(Actions.registrationFailed('err'));
+  it('registrationFailed passes reason and endTime to action', () => {
+    Dispatch.registrationFailed('reason', 999);
+    expect(store.dispatch).toHaveBeenCalledWith(Actions.registrationFailed('reason', 999));
+  });
+
+  it('registrationFailed passes reason only when no endTime', () => {
+    Dispatch.registrationFailed('plain reason');
+    expect(store.dispatch).toHaveBeenCalledWith(Actions.registrationFailed('plain reason', undefined));
   });
 
   it('registrationEmailError dispatches correctly', () => {
@@ -257,19 +261,19 @@ describe('Dispatch', () => {
   });
 
   it('notifyUser dispatches correctly', () => {
-    const notification = { type: 1, warningReason: '', customTitle: '', customContent: '' };
+    const notification = create(Event_NotifyUserSchema, { type: 1, warningReason: '', customTitle: '', customContent: '' });
     Dispatch.notifyUser(notification);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.notifyUser(notification));
   });
 
   it('serverShutdown dispatches correctly', () => {
-    const data = { reason: 'maintenance', minutes: 5 };
+    const data = create(Event_ServerShutdownSchema, { reason: 'maintenance', minutes: 5 });
     Dispatch.serverShutdown(data);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.serverShutdown(data));
   });
 
   it('userMessage dispatches correctly', () => {
-    const messageData = { senderName: 'Alice', receiverName: 'Bob', message: 'hey' };
+    const messageData = create(Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'hey' });
     Dispatch.userMessage(messageData);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.userMessage(messageData));
   });
@@ -382,8 +386,9 @@ describe('Dispatch', () => {
   });
 
   it('gamesOfUser dispatches correctly', () => {
-    const games = [{ gameId: 1 }] as any;
-    Dispatch.gamesOfUser('alice', games);
-    expect(store.dispatch).toHaveBeenCalledWith(Actions.gamesOfUser('alice', games));
+    const games = [makeGame({ gameId: 1 })];
+    const gametypeMap = { 1: 'Standard' };
+    Dispatch.gamesOfUser('alice', games, gametypeMap);
+    expect(store.dispatch).toHaveBeenCalledWith(Actions.gamesOfUser('alice', games, gametypeMap));
   });
 });

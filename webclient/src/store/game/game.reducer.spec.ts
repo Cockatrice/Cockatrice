@@ -1,3 +1,4 @@
+import { create } from '@bufbuild/protobuf';
 import { CardAttribute, PlayerInfo } from 'types';
 import { gamesReducer } from './game.reducer';
 import { Types } from './game.types';
@@ -11,6 +12,7 @@ import {
   makeState,
   makeZoneEntry,
 } from './__mocks__/fixtures';
+import { ServerInfo_PlayerSchema } from 'generated/proto/serverinfo_player_pb';
 
 // ── 2A: Initialisation & lifecycle ───────────────────────────────────────────
 
@@ -67,7 +69,7 @@ describe('2B: Game state & player management', () => {
     const counter = makeCounter({ id: 2 });
     const arrow = makeArrow({ id: 3 });
     const playerList: PlayerInfo[] = [
-      {
+      create(ServerInfo_PlayerSchema, {
         properties: makePlayerProperties({ playerId: 7 }),
         deckList: 'some deck',
         zoneList: [
@@ -83,7 +85,7 @@ describe('2B: Game state & player management', () => {
         ],
         counterList: [counter],
         arrowList: [arrow],
-      },
+      }),
     ];
 
     const result = gamesReducer(state, {
@@ -620,7 +622,7 @@ describe('2F: CARD_COUNTER_CHANGED', () => {
       playerId: 1,
       data: { zoneName: 'table', cardId: 4, counterId: 1, counterValue: 3 },
     });
-    expect(result.games[1].players[1].zones['table'].cards[0].counterList).toEqual([{ id: 1, value: 3 }]);
+    expect(result.games[1].players[1].zones['table'].cards[0].counterList).toEqual([expect.objectContaining({ id: 1, value: 3 })]);
   });
 
   it('updates existing counter value when counterId matches', () => {
@@ -631,7 +633,7 @@ describe('2F: CARD_COUNTER_CHANGED', () => {
       playerId: 1,
       data: { zoneName: 'table', cardId: 4, counterId: 1, counterValue: 7 },
     });
-    expect(result.games[1].players[1].zones['table'].cards[0].counterList).toEqual([{ id: 1, value: 7 }]);
+    expect(result.games[1].players[1].zones['table'].cards[0].counterList).toEqual([expect.objectContaining({ id: 1, value: 7 })]);
   });
 
   it('removes counter from counterList when counterValue ≤ 0', () => {

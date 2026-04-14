@@ -21,8 +21,10 @@ import { reloadConfig } from './reloadConfig';
 import { shutdownServer } from './shutdownServer';
 import { updateServerMessage } from './updateServerMessage';
 
-const { getLastSendOpts, invokeOnSuccess } = makeCallbackHelpers(
-  BackendService.sendAdminCommand as vi.Mock,
+import { Mock } from 'vitest';
+
+const { invokeOnSuccess } = makeCallbackHelpers(
+  BackendService.sendAdminCommand as Mock,
   2
 );
 

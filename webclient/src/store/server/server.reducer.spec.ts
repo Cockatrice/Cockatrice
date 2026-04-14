@@ -1,4 +1,7 @@
 import { StatusEnum, UserLevelFlag } from 'types';
+import { create } from '@bufbuild/protobuf';
+import { Event_UserMessageSchema } from 'generated/proto/event_user_message_pb';
+import { ServerInfo_DeckStorage_FolderSchema, ServerInfo_DeckStorage_TreeItemSchema } from 'generated/proto/serverinfo_deckstorage_pb';
 import { serverReducer } from './server.reducer';
 import { Types } from './server.types';
 import {
@@ -6,6 +9,7 @@ import {
   makeConnectOptions,
   makeDeckList,
   makeDeckTreeItem,
+  makeGame,
   makeLogItem,
   makeReplayMatch,
   makeServerState,
@@ -68,6 +72,35 @@ describe('Account & Connection', () => {
     const state = makeServerState();
     const result = serverReducer(state, { type: Types.ACCOUNT_ACTIVATION_FAILED });
     expect(result).toBe(state);
+  });
+});
+
+// ── Registration ──────────────────────────────────────────────────────────────
+
+describe('Registration', () => {
+  it('REGISTRATION_FAILED → stores normalized error (plain reason)', () => {
+    const state = makeServerState({ registrationError: null });
+    const result = serverReducer(state, { type: Types.REGISTRATION_FAILED, reason: 'Server is disabled', endTime: undefined });
+    expect(result.registrationError).toBe('Server is disabled');
+  });
+
+  it('REGISTRATION_FAILED → normalizes banned error when endTime is given', () => {
+    const state = makeServerState({ registrationError: null });
+    const result = serverReducer(state, { type: Types.REGISTRATION_FAILED, reason: 'bad actor', endTime: Date.now() + 100_000 });
+    expect(result.registrationError).toContain('banned');
+    expect(result.registrationError).toContain('bad actor');
+  });
+
+  it('CLEAR_REGISTRATION_ERRORS → sets registrationError to null', () => {
+    const state = makeServerState({ registrationError: 'some error' });
+    const result = serverReducer(state, { type: Types.CLEAR_REGISTRATION_ERRORS });
+    expect(result.registrationError).toBeNull();
+  });
+
+  it('CLEAR_STORE → resets registrationError to null', () => {
+    const state = makeServerState({ registrationError: 'stale error' });
+    const result = serverReducer(state, { type: Types.CLEAR_STORE });
+    expect(result.registrationError).toBeNull();
   });
 });
 
@@ -205,11 +238,11 @@ describe('Ignore List', () => {
 // ── Logs ─────────────────────────────────────────────────────────────────────
 
 describe('Logs', () => {
-  it('VIEW_LOGS → replaces logs entirely', () => {
-    const logs = { room: [makeLogItem()], game: [], chat: [] };
+  it('VIEW_LOGS → groups LogItem[] into room/game/chat buckets', () => {
+    const log = makeLogItem({ targetType: 'room' });
     const state = makeServerState();
-    const result = serverReducer(state, { type: Types.VIEW_LOGS, logs });
-    expect(result.logs).toEqual(logs);
+    const result = serverReducer(state, { type: Types.VIEW_LOGS, logs: [log] });
+    expect(result.logs.room).toEqual([log]);
   });
 
   it('CLEAR_LOGS → resets logs to empty arrays', () => {
@@ -241,12 +274,12 @@ describe('Messaging', () => {
   });
 
   it('USER_MESSAGE → appends to existing messages for that user', () => {
-    const existingMsg = { senderName: 'Alice', receiverName: 'Bob', message: 'first' };
+    const existingMsg = create(Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'first' });
     const state = makeServerState({
       user: makeUser({ name: 'Bob' }),
       messages: { Alice: [existingMsg] },
     });
-    const newMsg = { senderName: 'Alice', receiverName: 'Bob', message: 'second' };
+    const newMsg = create(Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'second' });
     const result = serverReducer(state, { type: Types.USER_MESSAGE, messageData: newMsg });
     expect(result.messages['Alice']).toHaveLength(2);
   });
@@ -442,8 +475,12 @@ describe('Deck Storage', () => {
   });
 
   it('DECK_UPLOAD with nested path → inserts into matching subfolder', () => {
-    const subfolder = { id: 0, name: 'myDecks', file: null, folder: { items: [] } };
-    const state = makeServerState({ backendDecks: { root: { items: [subfolder] } } });
+    const subfolder = create(ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'myDecks', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+    });
+    const state = makeServerState({
+      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
+    });
     const item = makeDeckTreeItem({ name: 'new.cod' });
     const result = serverReducer(state, { type: Types.DECK_UPLOAD, path: 'myDecks', treeItem: item });
     const folder = result.backendDecks.root.items.find(i => i.name === 'myDecks');
@@ -468,15 +505,19 @@ describe('Deck Storage', () => {
 
   it('DECK_DELETE → removes item by id from tree', () => {
     const item = makeDeckTreeItem({ id: 7 });
-    const state = makeServerState({ backendDecks: { root: { items: [item] } } });
+    const state = makeServerState({ backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [item] }) }) });
     const result = serverReducer(state, { type: Types.DECK_DELETE, deckId: 7 });
     expect(result.backendDecks.root.items).toHaveLength(0);
   });
 
   it('DECK_DELETE → recursively removes item nested inside a subfolder', () => {
     const nested = makeDeckTreeItem({ id: 9, name: 'nested.cod' });
-    const subfolder = { id: 0, name: 'sub', file: null, folder: { items: [nested] } };
-    const state = makeServerState({ backendDecks: { root: { items: [subfolder] } } });
+    const subfolder = create(ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'sub', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [nested] })
+    });
+    const state = makeServerState({
+      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
+    });
     const result = serverReducer(state, { type: Types.DECK_DELETE, deckId: 9 });
     expect(result.backendDecks.root.items[0].folder.items).toHaveLength(0);
   });
@@ -492,12 +533,16 @@ describe('Deck Storage', () => {
     const result = serverReducer(state, { type: Types.DECK_NEW_DIR, path: '', dirName: 'myDir' });
     expect(result.backendDecks.root.items).toHaveLength(1);
     expect(result.backendDecks.root.items[0].name).toBe('myDir');
-    expect(result.backendDecks.root.items[0].folder).toEqual({ items: [] });
+    expect(result.backendDecks.root.items[0].folder.items).toEqual([]);
   });
 
   it('DECK_NEW_DIR nested → inserts folder inside matching subfolder', () => {
-    const subfolder = { id: 0, name: 'parent', file: null, folder: { items: [] } };
-    const state = makeServerState({ backendDecks: { root: { items: [subfolder] } } });
+    const subfolder = create(ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'parent', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+    });
+    const state = makeServerState({
+      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
+    });
     const result = serverReducer(state, { type: Types.DECK_NEW_DIR, path: 'parent', dirName: 'child' });
     const parent = result.backendDecks.root.items.find(i => i.name === 'parent');
     expect(parent.folder.items).toHaveLength(1);
@@ -511,23 +556,37 @@ describe('Deck Storage', () => {
   });
 
   it('DECK_DEL_DIR → removes folder from root by name', () => {
-    const subfolder = { id: 0, name: 'myDir', file: null, folder: { items: [] } };
-    const state = makeServerState({ backendDecks: { root: { items: [subfolder] } } });
+    const subfolder = create(ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'myDir', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+    });
+    const state = makeServerState({
+      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
+    });
     const result = serverReducer(state, { type: Types.DECK_DEL_DIR, path: 'myDir' });
     expect(result.backendDecks.root.items).toHaveLength(0);
   });
 
   it('DECK_DEL_DIR → returns deck tree unchanged when path is empty', () => {
-    const subfolder = { id: 0, name: 'keep', file: null, folder: { items: [] } };
-    const state = makeServerState({ backendDecks: { root: { items: [subfolder] } } });
+    const subfolder = create(ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'keep', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+    });
+    const state = makeServerState({
+      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
+    });
     const result = serverReducer(state, { type: Types.DECK_DEL_DIR, path: '' });
     expect(result.backendDecks.root.items).toHaveLength(1);
   });
 
   it('DECK_DEL_DIR → recursively removes nested subfolder via multi-segment path', () => {
-    const child = { id: 0, name: 'child', file: null, folder: { items: [] } };
-    const parent = { id: 0, name: 'parent', file: null, folder: { items: [child] } };
-    const state = makeServerState({ backendDecks: { root: { items: [parent] } } });
+    const child = create(ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'child', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+    });
+    const parent = create(ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'parent', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [child] })
+    });
+    const state = makeServerState({
+      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [parent] }) })
+    });
     const result = serverReducer(state, { type: Types.DECK_DEL_DIR, path: 'parent/child' });
     expect(result.backendDecks.root.items[0].folder.items).toHaveLength(0);
   });
@@ -536,25 +595,25 @@ describe('Deck Storage', () => {
 // ── GAMES_OF_USER ─────────────────────────────────────────────────────────────
 
 describe('GAMES_OF_USER', () => {
-  it('stores games keyed by userName', () => {
-    const games = [{ gameId: 5, roomId: 1 }] as any;
+  it('stores normalized games keyed by userName', () => {
+    const games = [makeGame({ gameId: 5 })];
     const state = makeServerState();
-    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games });
-    expect(result.gamesOfUser['alice']).toBe(games);
+    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games, gametypeMap: {} });
+    expect(result.gamesOfUser['alice']).toEqual(games);
   });
 
   it('overwrites previous games for same user', () => {
-    const old = [{ gameId: 1 }] as any;
-    const fresh = [{ gameId: 2 }] as any;
+    const old = [makeGame({ gameId: 1 })];
+    const fresh = [makeGame({ gameId: 2 })];
     const state = makeServerState({ gamesOfUser: { alice: old } });
-    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games: fresh });
-    expect(result.gamesOfUser['alice']).toBe(fresh);
+    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games: fresh, gametypeMap: {} });
+    expect(result.gamesOfUser['alice']).toEqual(fresh);
   });
 
   it('does not affect other users\' entries', () => {
-    const bobGames = [{ gameId: 3 }] as any;
+    const bobGames = [makeGame({ gameId: 3 })];
     const state = makeServerState({ gamesOfUser: { bob: bobGames } });
-    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games: [] });
+    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games: [], gametypeMap: {} });
     expect(result.gamesOfUser['bob']).toBe(bobGames);
   });
 });

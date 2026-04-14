@@ -1,8 +1,6 @@
 import { ServerDispatch } from 'store';
 import { BanHistoryItem, LogItem, WarnHistoryItem, WarnListItem } from 'types';
 
-import NormalizeService from '../utils/NormalizeService';
-
 export class ModeratorPersistence {
   static banFromServer(userName: string): void {
     ServerDispatch.banFromServer(userName);
@@ -13,7 +11,7 @@ export class ModeratorPersistence {
   }
 
   static viewLogs(logs: LogItem[]): void {
-    ServerDispatch.viewLogs(NormalizeService.normalizeLogs(logs));
+    ServerDispatch.viewLogs(logs);
   }
 
   static warnHistory(userName: string, warnHistory: WarnHistoryItem[]): void {

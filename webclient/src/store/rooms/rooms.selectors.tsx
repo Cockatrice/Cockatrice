@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { createSelector } from '@reduxjs/toolkit';
 import { RoomsState } from './rooms.interfaces';
 
 interface State {
@@ -16,15 +17,15 @@ export const Selectors = {
   getSortGamesBy: ({ rooms: { sortGamesBy } }: State) => sortGamesBy,
   getSortUsersBy: ({ rooms: { sortUsersBy } }: State) => sortUsersBy,
 
-  getJoinedRooms: (state: State) => {
-    const joined = Selectors.getJoinedRoomIds(state);
-    return _.filter(Selectors.getRooms(state), room => joined[room.roomId]);
-  },
+  getJoinedRooms: createSelector(
+    [(state: State) => state.rooms.rooms, (state: State) => state.rooms.joinedRoomIds],
+    (rooms, joined) => _.filter(rooms, room => joined[room.roomId])
+  ),
 
-  getJoinedGames: (state: State, roomId: number) => {
-    const joined = Selectors.getJoinedGameIds(state)[roomId];
-    return _.filter(Selectors.getGames(state)[roomId], game => joined[game.gameId]);
-  },
+  getJoinedGames: createSelector(
+    [(state: State, roomId: number) => state.rooms.games[roomId], (state: State, roomId: number) => state.rooms.joinedGameIds[roomId]],
+    (games, joined) => _.filter(games, game => joined[game.gameId])
+  ),
 
   getRoomMessages: (state: State, roomId: number) => Selectors.getMessages(state)[roomId],
   getRoomGames: (state: State, roomId: number) => Selectors.getRooms(state)[roomId].gameList,

@@ -22,7 +22,7 @@ function Layout(props:LayoutProps) {
   )
 }
 
-function BottomBar(props) {
+function BottomBar() {
   return (
     <div className="bottom-bar__container">
     </div>

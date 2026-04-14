@@ -11,7 +11,7 @@ import { ResetPasswordForm } from 'forms';
 
 import './ResetPasswordDialog.css';
 
-const ResetPasswordDialog = ({ classes, handleClose, isOpen, onSubmit, userName }: any) => {
+const ResetPasswordDialog = ({ handleClose, isOpen, onSubmit, userName }: any) => {
   const { t } = useTranslation();
 
   const handleOnClose = () => {

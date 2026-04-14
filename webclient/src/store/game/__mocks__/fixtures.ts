@@ -1,8 +1,14 @@
-import { ArrowInfo, CardInfo, CounterInfo, PlayerProperties } from 'types';
+import { ArrowInfo, CardInfo, CounterInfo, PlayerProperties, ProtoInit } from 'types';
+import { create } from '@bufbuild/protobuf';
+import { ServerInfo_CardSchema } from 'generated/proto/serverinfo_card_pb';
+import { ServerInfo_CounterSchema } from 'generated/proto/serverinfo_counter_pb';
+import { colorSchema } from 'generated/proto/color_pb';
+import { ServerInfo_ArrowSchema } from 'generated/proto/serverinfo_arrow_pb';
+import { ServerInfo_PlayerPropertiesSchema } from 'generated/proto/serverinfo_playerproperties_pb';
 import { GameEntry, GamesState, PlayerEntry, ZoneEntry } from '../game.interfaces';
 
-export function makeCard(overrides: Partial<CardInfo> = {}): CardInfo {
-  return {
+export function makeCard(overrides: ProtoInit<CardInfo> = {}): CardInfo {
+  return create(ServerInfo_CardSchema, {
     id: 1,
     name: 'Test Card',
     x: 0,
@@ -21,22 +27,22 @@ export function makeCard(overrides: Partial<CardInfo> = {}): CardInfo {
     attachCardId: -1,
     providerId: '',
     ...overrides,
-  };
+  });
 }
 
-export function makeCounter(overrides: Partial<CounterInfo> = {}): CounterInfo {
-  return {
+export function makeCounter(overrides: ProtoInit<CounterInfo> = {}): CounterInfo {
+  return create(ServerInfo_CounterSchema, {
     id: 1,
     name: 'Life',
-    counterColor: { r: 0, g: 0, b: 0, a: 255 },
+    counterColor: create(colorSchema, { r: 0, g: 0, b: 0, a: 255 }),
     radius: 1,
     count: 20,
     ...overrides,
-  };
+  });
 }
 
-export function makeArrow(overrides: Partial<ArrowInfo> = {}): ArrowInfo {
-  return {
+export function makeArrow(overrides: ProtoInit<ArrowInfo> = {}): ArrowInfo {
+  return create(ServerInfo_ArrowSchema, {
     id: 1,
     startPlayerId: 1,
     startZone: 'table',
@@ -44,9 +50,9 @@ export function makeArrow(overrides: Partial<ArrowInfo> = {}): ArrowInfo {
     targetPlayerId: 1,
     targetZone: 'table',
     targetCardId: 2,
-    arrowColor: { r: 255, g: 0, b: 0, a: 255 },
+    arrowColor: create(colorSchema, { r: 255, g: 0, b: 0, a: 255 }),
     ...overrides,
-  };
+  });
 }
 
 export function makeZoneEntry(overrides: Partial<ZoneEntry> = {}): ZoneEntry {
@@ -62,10 +68,9 @@ export function makeZoneEntry(overrides: Partial<ZoneEntry> = {}): ZoneEntry {
   };
 }
 
-export function makePlayerProperties(overrides: Partial<PlayerProperties> = {}): PlayerProperties {
-  return {
+export function makePlayerProperties(overrides: ProtoInit<PlayerProperties> = {}): PlayerProperties {
+  return create(ServerInfo_PlayerPropertiesSchema, {
     playerId: 1,
-    userInfo: null,
     spectator: false,
     conceded: false,
     readyStart: false,
@@ -74,7 +79,7 @@ export function makePlayerProperties(overrides: Partial<PlayerProperties> = {}):
     sideboardLocked: false,
     judge: false,
     ...overrides,
-  };
+  });
 }
 
 export function makePlayerEntry(overrides: Partial<PlayerEntry> = {}): PlayerEntry {

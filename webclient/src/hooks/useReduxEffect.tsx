@@ -6,10 +6,12 @@ File is adapted from https://github.com/Qeepsake/use-redux-effect under MIT Lice
 
 import { useRef, useEffect, DependencyList } from 'react'
 import { useStore } from 'react-redux'
-import { AnyAction } from 'redux'
 import { castArray } from 'lodash'
 
-export type ReduxEffect = (action: AnyAction) => void
+// Actions are identified by string `type` at runtime, so the callback
+// receives an untyped action object to allow free property access.
+
+export type ReduxEffect = (action: any) => void
 
 /**
   * Subscribes to redux store events

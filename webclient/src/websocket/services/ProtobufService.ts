@@ -1,10 +1,11 @@
 import { create, fromBinary, hasExtension, getExtension, toBinary } from '@bufbuild/protobuf';
-import type { GenExtension, Message } from '@bufbuild/protobuf';
+import type { GenExtension } from '@bufbuild/protobuf/codegenv2';
 
 import type { Response } from 'generated/proto/response_pb';
 import type { RoomEvent } from 'generated/proto/room_event_pb';
 import type { SessionEvent } from 'generated/proto/session_event_pb';
 import type { GameEventContainer } from 'generated/proto/game_event_container_pb';
+import type { GameEvent } from 'generated/proto/game_event_pb';
 
 import { GameEvents, RoomEvents, SessionEvents } from '../events';
 import { WebClient } from '../WebClient';
@@ -19,11 +20,57 @@ import type { RoomCommand } from 'generated/proto/room_commands_pb';
 import type { ModeratorCommand } from 'generated/proto/moderator_commands_pb';
 import type { AdminCommand } from 'generated/proto/admin_commands_pb';
 
-export type ExtensionRegistry = Array<[GenExtension<any, any>, (...args: unknown[]) => void]>;
+// Per-family registry entry types. Each family hardcodes its parent message type
+// and the handler's exact secondary-argument signature, eliminating the previous
+// `...args: unknown[]` erasure.
+
+type SessionRegistryEntry<V = unknown> = [
+  GenExtension<SessionEvent, V>,
+  (value: V) => void
+];
+export type SessionExtensionRegistry = SessionRegistryEntry[];
+
+type RoomRegistryEntry<V = unknown> = [
+  GenExtension<RoomEvent, V>,
+  (value: V, roomEvent: RoomEvent) => void
+];
+export type RoomExtensionRegistry = RoomRegistryEntry[];
+
+type GameRegistryEntry<V = unknown> = [
+  GenExtension<GameEvent, V>,
+  (value: V, meta: GameEventMeta) => void
+];
+export type GameExtensionRegistry = GameRegistryEntry[];
+
+/**
+ * Type-safe factory functions. The compiler verifies at the call site that the
+ * handler's parameter types match the extension's value type and the family's
+ * secondary argument type.
+ */
+export function makeSessionEntry<V>(
+  ext: GenExtension<SessionEvent, V>,
+  handler: (value: V) => void
+): SessionRegistryEntry {
+  return [ext as GenExtension<SessionEvent, unknown>, handler as (value: unknown) => void];
+}
+
+export function makeRoomEntry<V>(
+  ext: GenExtension<RoomEvent, V>,
+  handler: (value: V, roomEvent: RoomEvent) => void
+): RoomRegistryEntry {
+  return [ext as GenExtension<RoomEvent, unknown>, handler as RoomRegistryEntry[1]];
+}
+
+export function makeGameEntry<V>(
+  ext: GenExtension<GameEvent, V>,
+  handler: (value: V, meta: GameEventMeta) => void
+): GameRegistryEntry {
+  return [ext as GenExtension<GameEvent, unknown>, handler as GameRegistryEntry[1]];
+}
 
 export class ProtobufService {
   private cmdId = 0;
-  private pendingCommands: { [cmdId: string]: Function } = {};
+  private pendingCommands: { [cmdId: string]: (response: Response) => void } = {};
 
   private webClient: WebClient;
 
@@ -36,44 +83,44 @@ export class ProtobufService {
     this.pendingCommands = {};
   }
 
-  public sendGameCommand(gameId: number, gameCmd: GameCommand, callback?: Function) {
+  public sendGameCommand(gameId: number, gameCmd: GameCommand, callback?: (raw: Response) => void) {
     const cmd = create(CommandContainerSchema, {
       gameId,
       gameCommand: [gameCmd],
     });
-    this.sendCommand(cmd, (raw: Response) => callback && callback(raw));
+    this.sendCommand(cmd, (raw: Response) => callback?.(raw));
   }
 
-  public sendRoomCommand(roomId: number, roomCmd: RoomCommand, callback?: Function) {
+  public sendRoomCommand(roomId: number, roomCmd: RoomCommand, callback?: (raw: Response) => void) {
     const cmd = create(CommandContainerSchema, {
       roomId,
       roomCommand: [roomCmd],
     });
-    this.sendCommand(cmd, raw => callback && callback(raw));
+    this.sendCommand(cmd, raw => callback?.(raw));
   }
 
-  public sendSessionCommand(sesCmd: SessionCommand, callback?: Function) {
+  public sendSessionCommand(sesCmd: SessionCommand, callback?: (raw: Response) => void) {
     const cmd = create(CommandContainerSchema, {
       sessionCommand: [sesCmd],
     });
-    this.sendCommand(cmd, (raw) => callback && callback(raw));
+    this.sendCommand(cmd, (raw) => callback?.(raw));
   }
 
-  public sendModeratorCommand(modCmd: ModeratorCommand, callback?: Function) {
+  public sendModeratorCommand(modCmd: ModeratorCommand, callback?: (raw: Response) => void) {
     const cmd = create(CommandContainerSchema, {
       moderatorCommand: [modCmd],
     });
-    this.sendCommand(cmd, (raw) => callback && callback(raw));
+    this.sendCommand(cmd, (raw) => callback?.(raw));
   }
 
-  public sendAdminCommand(adminCmd: AdminCommand, callback?: Function) {
+  public sendAdminCommand(adminCmd: AdminCommand, callback?: (raw: Response) => void) {
     const cmd = create(CommandContainerSchema, {
       adminCommand: [adminCmd],
     });
-    this.sendCommand(cmd, (raw) => callback && callback(raw));
+    this.sendCommand(cmd, (raw) => callback?.(raw));
   }
 
-  public sendCommand(cmd: CommandContainer, callback: Function) {
+  public sendCommand(cmd: CommandContainer, callback: (raw: Response) => void) {
     this.cmdId++;
 
     cmd.cmdId = BigInt(this.cmdId);
@@ -84,7 +131,7 @@ export class ProtobufService {
     }
   }
 
-  public sendKeepAliveCommand(pingReceived: Function) {
+  public sendKeepAliveCommand(pingReceived: () => void) {
     SessionCommands.ping(pingReceived);
   }
 
@@ -133,14 +180,24 @@ export class ProtobufService {
     if (!event) {
       return;
     }
-    this.processEvent(event, RoomEvents, event);
+    for (const [ext, handler] of RoomEvents) {
+      if (hasExtension(event, ext)) {
+        handler(getExtension(event, ext), event);
+        return;
+      }
+    }
   }
 
   private processSessionEvent(event: SessionEvent | undefined) {
     if (!event) {
       return;
     }
-    this.processEvent(event, SessionEvents);
+    for (const [ext, handler] of SessionEvents) {
+      if (hasExtension(event, ext)) {
+        handler(getExtension(event, ext));
+        return;
+      }
+    }
   }
 
   private processGameEvent(container: GameEventContainer | undefined): void {
@@ -161,20 +218,12 @@ export class ProtobufService {
 
       for (const [ext, handler] of GameEvents) {
         if (hasExtension(event, ext)) {
-          (handler as Function)(getExtension(event, ext), meta);
+          handler(getExtension(event, ext), meta);
           break;
         }
       }
     }
   }
 
-  private processEvent(response: Message<string>, registry: ExtensionRegistry, raw?: Message) {
-    for (const [ext, handler] of registry) {
-      if (hasExtension(response, ext)) {
-        (handler as Function)(getExtension(response, ext), raw);
-        return;
-      }
-    }
-  }
 }
 

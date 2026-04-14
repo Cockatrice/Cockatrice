@@ -1,3 +1,3 @@
-import { ExtensionRegistry } from '../../services/ProtobufService';
+import { SessionExtensionRegistry } from '../../services/ProtobufService';
 
-export const CommonEvents: ExtensionRegistry = [];
+export const CommonEvents: SessionExtensionRegistry = [];

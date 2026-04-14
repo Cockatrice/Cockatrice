@@ -10,7 +10,7 @@ import { CardImportForm } from 'forms';
 
 import './CardImportDialog.css';
 
-const CardImportDialog = ({ classes, handleClose, isOpen }: any) => {
+const CardImportDialog = ({ handleClose, isOpen }: any) => {
   const handleOnClose = () => {
     handleClose();
   }

@@ -1,24 +1,16 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 
 import { ServerSelectors } from 'store';
 import { RouteEnum } from 'types';
-
+import { useAppSelector } from 'store/store';
 import { AuthenticationService } from 'api';
 
-const AuthGuard = ({ state }: AuthGuardProps) => {
+const AuthGuard = () => {
+  const state = useAppSelector(s => ServerSelectors.getState(s));
   return !AuthenticationService.isConnected(state)
     ? <Navigate to={RouteEnum.LOGIN} />
     : <div></div>;
 };
 
-interface AuthGuardProps {
-  state: number;
-}
-
-const mapStateToProps = state => ({
-  state: ServerSelectors.getState(state),
-});
-
-export default connect(mapStateToProps)(AuthGuard);
+export default AuthGuard;

@@ -1,9 +1,8 @@
-// eslint-disable-next-line
+
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Select, MenuItem } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 
 import { Images } from 'images/Images';
 import { Language, LanguageCountry, LanguageNative } from 'types';

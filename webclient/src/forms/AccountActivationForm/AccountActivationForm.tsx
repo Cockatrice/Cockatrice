@@ -1,19 +1,16 @@
 // eslint-disable-next-line
 import React, { useState } from "react";
-import { connect } from 'react-redux';
 import { Form, Field } from 'react-final-form';
-import { OnChange } from 'react-final-form-listeners';
 import { useTranslation } from 'react-i18next';
 
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-import { InputField, KnownHosts } from 'components';
-import { FormKey } from 'types';
-
-import './AccountActivationForm.css';
+import { InputField } from 'components';
 import { useReduxEffect } from 'hooks';
 import { ServerTypes } from 'store';
+
+import './AccountActivationForm.css';
 
 const AccountActivationForm = ({ onSubmit }) => {
   const [errorMessage, setErrorMessage] = useState(false);
@@ -43,7 +40,7 @@ const AccountActivationForm = ({ onSubmit }) => {
 
   return (
     <Form onSubmit={handleOnSubmit} validate={validate}>
-      {({ handleSubmit, form }) => {
+      {({ handleSubmit }) => {
         return (
           <form className="AccountActivationForm" onSubmit={handleSubmit}>
             <div className="AccountActivationForm-item">

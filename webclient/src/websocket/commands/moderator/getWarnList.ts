@@ -8,7 +8,7 @@ export function getWarnList(modName: string, userName: string, userClientid: str
   BackendService.sendModeratorCommand(Command_GetWarnList_ext, create(Command_GetWarnListSchema, { modName, userName, userClientid }), {
     responseExt: Response_WarnList_ext,
     onSuccess: (response) => {
-      ModeratorPersistence.warnListOptions(response.warning);
+      ModeratorPersistence.warnListOptions([response]);
     },
   });
 }

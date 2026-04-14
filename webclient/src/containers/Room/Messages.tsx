@@ -8,7 +8,7 @@ import './Messages.css';
 const Messages = ({ messages }) => (
   <div className="messages">
     {
-      messages && messages.map((message, index) => (
+      messages && messages.map((message) => (
         <div className="message-wrapper" key={message.timeReceived}>
           <Message message={message} />
         </div>

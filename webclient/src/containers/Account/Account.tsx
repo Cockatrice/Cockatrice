@@ -1,27 +1,30 @@
 // eslint-disable-next-line
 import React, { Component } from "react";
 import { useTranslation } from 'react-i18next';
-import { connect } from 'react-redux';
 
 import Button from '@mui/material/Button';
-import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import Paper from '@mui/material/Paper';
 
 import { UserDisplay, VirtualList, AuthGuard, LanguageDropdown } from 'components';
 import { AuthenticationService, SessionService } from 'api';
 import { ServerSelectors } from 'store';
-import { User } from 'types';
 import Layout from 'containers/Layout/Layout';
+import { useAppSelector } from 'store/store';
 
 import AddToBuddies from './AddToBuddies';
 import AddToIgnore from './AddToIgnore';
 
 import './Account.css';
 
-const Account = (props: AccountProps) => {
-  const { buddyList, ignoreList, serverName, serverVersion, user } = props;
+const Account = () => {
+  const buddyList = useAppSelector(state => ServerSelectors.getBuddyList(state));
+  const ignoreList = useAppSelector(state => ServerSelectors.getIgnoreList(state));
+  const serverName = useAppSelector(state => ServerSelectors.getName(state));
+  const serverVersion = useAppSelector(state => ServerSelectors.getVersion(state));
+  const user = useAppSelector(state => ServerSelectors.getUser(state));
   const { country, realName, name, userLevel, accountageSecs, avatarBmp } = user || {};
-  let url = URL.createObjectURL(new Blob([avatarBmp], { 'type': 'image/png' }));
+  let url = URL.createObjectURL(new Blob([avatarBmp as BlobPart], { 'type': 'image/png' }));
 
   const { t } = useTranslation();
 
@@ -42,11 +45,10 @@ const Account = (props: AccountProps) => {
             Buddies Online: ?/{buddyList.length}
           </div>
           <VirtualList
-            itemKey={(index, data) => buddyList[index].name }
             items={ buddyList.map(user => (
-              <ListItem button dense>
+              <ListItemButton dense>
                 <UserDisplay user={user} />
-              </ListItem>
+              </ListItemButton>
             )) }
           />
           <div className="" style={{ borderTop: '1px solid' }}>
@@ -60,11 +62,10 @@ const Account = (props: AccountProps) => {
             Ignored Users Online: ?/{ignoreList.length}
           </div>
           <VirtualList
-            itemKey={(index, data) => ignoreList[index].name }
             items={ ignoreList.map(user => (
-              <ListItem button dense>
+              <ListItemButton dense>
                 <UserDisplay user={user} />
-              </ListItem>
+              </ListItemButton>
             )) }
           />
           <div className="" style={{ borderTop: '1px solid' }}>
@@ -78,7 +79,7 @@ const Account = (props: AccountProps) => {
           <p><strong>{name}</strong></p>
           <p>Location: ({country?.toUpperCase()})</p>
           <p>User Level: {userLevel}</p>
-          <p>Account Age: {accountageSecs}</p>
+          <p>Account Age: {String(accountageSecs)}</p>
           <p>Real Name: {realName}</p>
           <div className="account-details__actions">
             <Button size="small" color="primary" variant="contained">Edit</Button>
@@ -101,20 +102,4 @@ const Account = (props: AccountProps) => {
   )
 }
 
-interface AccountProps {
-  buddyList: User[];
-  ignoreList: User[];
-  serverName: string;
-  serverVersion: string;
-  user: User;
-}
-
-const mapStateToProps = state => ({
-  buddyList: ServerSelectors.getBuddyList(state),
-  ignoreList: ServerSelectors.getIgnoreList(state),
-  serverName: ServerSelectors.getName(state),
-  serverVersion: ServerSelectors.getVersion(state),
-  user: ServerSelectors.getUser(state),
-});
-
-export default connect(mapStateToProps)(Account);
+export default Account;

@@ -1,4 +1,4 @@
-// eslint-disable-next-line
+
 import React, { useMemo, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Popover from '@mui/material/Popover';
@@ -17,7 +17,7 @@ const classes = {
   popoverContent: `${PREFIX}-popoverContent`
 };
 
-const Root = styled('span')(({ theme }) => ({
+const Root = styled('span')(() => ({
   [`& .${classes.popover}`]: {
     pointerEvents: 'none',
   },

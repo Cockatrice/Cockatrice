@@ -1,19 +1,16 @@
 // eslint-disable-next-line
 import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
 import { Form, Field } from 'react-final-form'
-import { OnChange } from 'react-final-form-listeners';
 import { useTranslation } from 'react-i18next';
 
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import { InputField, KnownHosts } from 'components';
-import { FormKey } from 'types';
-
-import './ResetPasswordForm.css';
 import { useReduxEffect } from '../../hooks';
 import { ServerTypes } from '../../store';
+
+import './ResetPasswordForm.css';
 
 const ResetPasswordForm = ({ onSubmit, userName }) => {
   const [errorMessage, setErrorMessage] = useState(false);
@@ -60,7 +57,7 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
 
   return (
     <Form onSubmit={handleOnSubmit} validate={validate} initialValues={{ userName }}>
-      {({ handleSubmit, form }) => (
+      {({ handleSubmit }) => (
         <form className='ResetPasswordForm' onSubmit={handleSubmit}>
           <div className='ResetPasswordForm-items'>
             <div className='ResetPasswordForm-item'>

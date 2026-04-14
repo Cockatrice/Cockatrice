@@ -1,6 +1,5 @@
 // eslint-disable-next-line
 import React, { useState } from "react";
-import { connect } from 'react-redux';
 import { Form, Field } from 'react-final-form'
 import { useTranslation } from 'react-i18next';
 
@@ -87,8 +86,4 @@ const KnownHostForm = ({ host, onRemove, onSubmit }) => {
   );
 };
 
-const mapStateToProps = () => ({
-
-});
-
-export default connect(mapStateToProps)(KnownHostForm);
+export default KnownHostForm;

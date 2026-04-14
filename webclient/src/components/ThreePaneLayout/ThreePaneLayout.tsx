@@ -1,7 +1,5 @@
 import { Component, CElement } from 'react';
-import { connect } from 'react-redux';
 import Grid from '@mui/material/Grid';
-import Hidden from '@mui/material/Hidden';
 
 import './ThreePaneLayout.css';
 
@@ -12,25 +10,23 @@ class ThreePaneLayout extends Component<ThreePaneLayoutProps> {
     return (
       <div className="three-pane-layout">
         <Grid container rowSpacing={0} columnSpacing={2} className="grid">
-          <Grid item xs={12} md={9} lg={10} className="grid-main">
-            <Grid item className={
+          <Grid size={{ xs: 12, md: 9, lg: 10 }} className="grid-main">
+            <Grid className={
               'grid-main__top'
               + (this.props.fixedHeight ? ' fixedHeight' : '')
             }>
               {this.props.top}
             </Grid>
-            <Grid item className={
+            <Grid className={
               'grid-main__bottom'
               + (this.props.fixedHeight ? ' fixedHeight' : '')
             }>
               {this.props.bottom}
             </Grid>
           </Grid>
-          <Hidden mdDown>
-            <Grid item md={3} lg={2} className="grid-side">
-              {this.props.side}
-            </Grid>
-          </Hidden>
+          <Grid size={{ md: 3, lg: 2 }} sx={{ display: { xs: 'none', md: 'block' } }} className="grid-side">
+            {this.props.side}
+          </Grid>
         </Grid>
       </div>
     );
@@ -44,6 +40,4 @@ interface ThreePaneLayoutProps {
   fixedHeight?: boolean,
 }
 
-const mapStateToProps = state => ({});
-
-export default connect(mapStateToProps)(ThreePaneLayout);
+export default ThreePaneLayout;

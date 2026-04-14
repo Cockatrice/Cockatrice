@@ -1,33 +1,50 @@
 // eslint-disable-next-line
-import React, { Component } from "react";
-import { connect } from 'react-redux';
+import React, { useEffect } from "react";
 import * as _ from 'lodash';
 
 import { ModeratorService } from 'api';
 import { AuthGuard, ModGuard } from 'components';
 import { SearchForm } from 'forms';
-import { ServerDispatch, ServerSelectors, ServerStateLogs } from 'store';
+import { ServerDispatch, ServerSelectors } from 'store';
 import { LogFilters } from 'types';
+import { useAppSelector } from 'store/store';
 
 import LogResults from './LogResults';
 import './Logs.css';
 
-class Logs extends Component<LogsTypes> {
-  MAXIMUM_RESULTS = 1000;
+const Logs = () => {
+  const logs = useAppSelector(state => ServerSelectors.getLogs(state));
+  const MAXIMUM_RESULTS = 1000;
 
-  constructor(props) {
-    super(props);
+  useEffect(() => {
+    return () => {
+      ServerDispatch.clearLogs();
+    };
+  }, []);
 
-    this.onSubmit = this.onSubmit.bind(this);
-  }
+  const trimFields = (fields) => {
+    return _.reduce(fields, (obj: any, field, key) => {
+      if (typeof field === 'string') {
+        const trimmed = _.trim(field);
+        if (!!trimmed) {
+          obj[key] = trimmed;
+        }
+      } else {
+        obj[key] = field;
+      }
+      return obj;
+    }, {});
+  };
 
-  componentWillUnmount() {
-    ServerDispatch.clearLogs();
-  }
+  const flattenLogLocations = (logLocations) => {
+    return _.reduce(logLocations, (arr: any[], loc, key) => {
+      arr.push(key);
+      return arr;
+    }, []);
+  };
 
-  onSubmit(fields: LogFilters) {
-    const trimmedFields: any = this.trimFields(fields);
-
+  const onSubmit = (fields: LogFilters) => {
+    const trimmedFields: any = trimFields(fields);
     const { userName, ipAddress, gameName, gameId, message, logLocation } = trimmedFields;
 
     const required = _.filter({
@@ -35,68 +52,35 @@ class Logs extends Component<LogsTypes> {
     }, field => field);
 
     if (logLocation) {
-      trimmedFields.logLocation = this.flattenLogLocations(logLocation);
+      trimmedFields.logLocation = flattenLogLocations(logLocation);
     }
 
-    trimmedFields.maximumResults = this.MAXIMUM_RESULTS;
+    trimmedFields.maximumResults = MAXIMUM_RESULTS;
 
     if (_.size(required)) {
       ModeratorService.viewLogHistory(trimmedFields);
     } else {
       // @TODO use yet-to-be-implemented banner/alert
     }
-  }
+  };
 
-  private trimFields(fields) {
-    return _.reduce(fields, (obj, field, key) => {
-      if (typeof field === 'string') {
-        const trimmed = _.trim(field);
+  return (
+    <div className="moderator-logs overflow-scroll">
+      <AuthGuard />
+      <ModGuard />
 
-        if (!!trimmed) {
-          obj[key] = trimmed;
-        }
-      } else {
-        obj[key] = field;
-      }
-
-      return obj;
-    }, {});
-  }
-
-  private flattenLogLocations(logLocations) {
-    return _.reduce(logLocations, (arr, loc, key) => {
-      arr.push(key);
-      return arr;
-    }, [])
-  }
-
-  render() {
-    return (
-      <div className="moderator-logs overflow-scroll">
-        <AuthGuard />
-        <ModGuard />
-
-        <div className="moderator-logs__form">
-          <SearchForm onSubmit={this.onSubmit} />
-        </div>
-
-        <div className="moderator-logs__results">
-          <LogResults logs={this.props.logs} />
-        </div>
+      <div className="moderator-logs__form">
+        <SearchForm onSubmit={onSubmit} />
       </div>
-    )
-  }
-}
 
-interface LogsTypes {
-  logs: ServerStateLogs
-}
+      <div className="moderator-logs__results">
+        <LogResults logs={logs} />
+      </div>
+    </div>
+  );
+};
 
-const mapStateToProps = state => ({
-  logs: ServerSelectors.getLogs(state)
-});
-
-export default connect(mapStateToProps)(Logs);
+export default Logs;
 
 
 

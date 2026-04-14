@@ -126,6 +126,20 @@ describe('ADD_MESSAGE', () => {
     expect(result.messages[1][0].message).not.toBe('first');
     expect(result.messages[1][MAX_ROOM_MESSAGES - 1].message).toBe('new');
   });
+
+  it('prepends "name: " to message when name is present', () => {
+    const state = makeRoomsState({ messages: { 1: [] } });
+    const message = makeMessage({ name: 'Alice', message: 'hello' });
+    const result = roomsReducer(state, { type: Types.ADD_MESSAGE, roomId: 1, message });
+    expect(result.messages[1][0].message).toBe('Alice: hello');
+  });
+
+  it('does not prepend when name is empty', () => {
+    const state = makeRoomsState({ messages: { 1: [] } });
+    const message = makeMessage({ name: '', message: 'system msg' });
+    const result = roomsReducer(state, { type: Types.ADD_MESSAGE, roomId: 1, message });
+    expect(result.messages[1][0].message).toBe('system msg');
+  });
 });
 
 // ── UPDATE_GAMES ──────────────────────────────────────────────────────────────
@@ -264,6 +278,16 @@ describe('REMOVE_MESSAGES', () => {
     const state = makeRoomsState({ messages: { 1: msgs } });
     const result = roomsReducer(state, { type: Types.REMOVE_MESSAGES, roomId: 1, name: 'Alice', amount: 1 });
     expect(result.messages[1]).toHaveLength(2);
+  });
+});
+
+// ── GAME_CREATED ──────────────────────────────────────────────────────────────
+
+describe('GAME_CREATED', () => {
+  it('returns state unchanged', () => {
+    const state = makeRoomsState();
+    const result = roomsReducer(state, { type: Types.GAME_CREATED, roomId: 1 });
+    expect(result).toBe(state);
   });
 });
 

@@ -59,7 +59,7 @@ export class WebSocketService {
     return this.socket?.readyState === state;
   }
 
-  public send(message): void {
+  public send(message: Uint8Array): void {
     this.socket.send(message);
   }
 
@@ -73,7 +73,7 @@ export class WebSocketService {
       clearTimeout(connectionTimer);
       updateStatus(StatusEnum.CONNECTED, 'Connected');
 
-      this.keepAliveService.startPingLoop(this.keepalive, (pingReceived: Function) => {
+      this.keepAliveService.startPingLoop(this.keepalive, (pingReceived: () => void) => {
         this.webClient.keepAlive(pingReceived);
       });
     };

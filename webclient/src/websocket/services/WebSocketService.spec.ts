@@ -1,4 +1,9 @@
 import { installMockWebSocket } from '../__mocks__/helpers';
+import { Mock } from 'vitest';
+
+vi.mock('../WebClient', () => ({
+  WebClient: vi.fn(),
+}));
 
 vi.mock('../commands/session', () => ({
   updateStatus: vi.fn(),
@@ -17,8 +22,9 @@ import { SessionPersistence } from '../persistence';
 import { updateStatus } from '../commands/session';
 import { StatusEnum } from 'types';
 
-let MockWS: vi.Mock;
+let MockWS: Mock;
 let mockInstance: ReturnType<typeof installMockWebSocket>['mockInstance'];
+let restoreWebSocket: ReturnType<typeof installMockWebSocket>['restore'];
 let mockWebClient: any;
 
 beforeEach(() => {
@@ -28,6 +34,7 @@ beforeEach(() => {
   const installed = installMockWebSocket();
   MockWS = installed.MockWS;
   mockInstance = installed.mockInstance;
+  restoreWebSocket = installed.restore;
 
   mockWebClient = {
     status: StatusEnum.CONNECTED,
@@ -37,6 +44,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  restoreWebSocket();
   vi.useRealTimers();
 });
 
@@ -106,7 +114,7 @@ describe('WebSocketService', () => {
 
   describe('socket event handlers (onopen)', () => {
     it('clears the connection timeout when socket opens', () => {
-      const clearSpy = vi.spyOn(global, 'clearTimeout');
+      const clearSpy = vi.spyOn(globalThis, 'clearTimeout');
       createConnectedService();
       mockInstance.onopen();
       expect(clearSpy).toHaveBeenCalled();
@@ -262,7 +270,7 @@ describe('WebSocketService', () => {
 
     it('calls SessionPersistence.testConnectionSuccessful on open', () => {
       createTestConnectedService();
-      const timer = vi.spyOn(global, 'clearTimeout');
+      vi.spyOn(globalThis, 'clearTimeout');
       mockInstance.onopen();
       expect(SessionPersistence.testConnectionSuccessful).toHaveBeenCalled();
       expect(mockInstance.close).toHaveBeenCalled();

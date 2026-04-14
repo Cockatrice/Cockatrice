@@ -72,6 +72,7 @@ export interface ServerState {
   replays: ReplayMatch[];
   backendDecks: DeckList | null;
   gamesOfUser: { [userName: string]: Game[] };
+  registrationError: string | null;
 }
 
 export interface ServerStateStatus {

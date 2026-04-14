@@ -8,7 +8,9 @@ export function joinRoom(roomId: number): void {
   BackendService.sendSessionCommand(Command_JoinRoom_ext, create(Command_JoinRoomSchema, { roomId }), {
     responseExt: Response_JoinRoom_ext,
     onSuccess: (response) => {
-      RoomPersistence.joinRoom(response.roomInfo);
+      if (response.roomInfo) {
+        RoomPersistence.joinRoom(response.roomInfo);
+      }
     },
   });
 }

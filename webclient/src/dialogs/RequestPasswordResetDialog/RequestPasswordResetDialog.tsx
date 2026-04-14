@@ -11,7 +11,7 @@ import { RequestPasswordResetForm } from 'forms';
 
 import './RequestPasswordResetDialog.css';
 
-const RequestPasswordResetDialog = ({ classes, handleClose, isOpen, onSubmit, skipTokenRequest }: any) => {
+const RequestPasswordResetDialog = ({ handleClose, isOpen, onSubmit, skipTokenRequest }: any) => {
   const { t } = useTranslation();
 
   const handleOnClose = () => {

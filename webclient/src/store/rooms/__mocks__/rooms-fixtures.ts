@@ -1,52 +1,63 @@
 import {
   Game,
   GameSortField,
+  Message,
+  ProtoInit,
   Room,
   SortDirection,
   User,
   UserSortField,
 } from 'types';
-import { Message, RoomsState } from '../rooms.interfaces';
+import { create } from '@bufbuild/protobuf';
+import { ServerInfo_UserSchema } from 'generated/proto/serverinfo_user_pb';
+import { ServerInfo_GameSchema } from 'generated/proto/serverinfo_game_pb';
+import { ServerInfo_RoomSchema } from 'generated/proto/serverinfo_room_pb';
+import { RoomsState } from '../rooms.interfaces';
 
-export function makeUser(overrides: Partial<User> = {}): User {
-  return {
+export function makeUser(overrides: ProtoInit<User> = {}): User {
+  return create(ServerInfo_UserSchema, {
     name: 'TestUser',
     accountageSecs: 0n,
     privlevel: '',
     userLevel: 0,
     ...overrides,
+  });
+}
+
+export function makeRoom(overrides: ProtoInit<Room> = {}): Room {
+  const { gametypeMap = {}, order = 0, gameList = [], ...protoOverrides } = overrides;
+  return {
+    ...create(ServerInfo_RoomSchema, {
+      roomId: 1,
+      name: 'Test Room',
+      description: '',
+      gameCount: 0,
+      gameList: [],
+      gametypeList: [],
+      autoJoin: false,
+      playerCount: 0,
+      userList: [],
+      ...protoOverrides,
+    }),
+    gameList,
+    gametypeMap,
+    order,
   };
 }
 
-export function makeRoom(overrides: Partial<Room> = {}): Room {
+export function makeGame(overrides: ProtoInit<Game & { startTime: number }> = {}): Game & { startTime: number } {
+  const { gameType = '', startTime = 0, ...protoOverrides } = overrides;
   return {
-    roomId: 1,
-    name: 'Test Room',
-    description: '',
-    gameCount: 0,
-    gameList: [],
-    gametypeList: [],
-    gametypeMap: {},
-    autoJoin: false,
-    permissionlevel: 0 as any,
-    playerCount: 0,
-    privilegelevel: 0 as any,
-    userList: [],
-    order: 0,
-    ...overrides,
-  };
-}
-
-export function makeGame(overrides: Partial<Game & { startTime: number }> = {}): Game & { startTime: number } {
-  return {
-    gameId: 1,
-    roomId: 1,
-    description: 'Test Game',
-    gameType: '',
-    gameTypes: [],
-    started: false,
-    startTime: 0,
-    ...overrides,
+    ...create(ServerInfo_GameSchema, {
+      gameId: 1,
+      roomId: 1,
+      description: 'Test Game',
+      gameTypes: [],
+      started: false,
+      ...protoOverrides,
+    }),
+    gameType,
+    startTime,
   };
 }
 

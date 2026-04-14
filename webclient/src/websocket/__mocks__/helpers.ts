@@ -9,7 +9,7 @@ export function makeMockWebSocketInstance() {
   return {
     send: vi.fn(),
     close: vi.fn(),
-    readyState: WebSocket.OPEN,
+    readyState: WebSocket.OPEN as number,
     binaryType: '' as BinaryType,
     onopen: null as any,
     onclose: null as any,
@@ -18,12 +18,17 @@ export function makeMockWebSocketInstance() {
   };
 }
 
-/** Installs a mock WebSocket constructor on global. Returns the mock instance. */
+/** Installs a mock WebSocket constructor on global. Returns the mock instance and a cleanup function. */
 export function installMockWebSocket() {
+  const originalWebSocket = (globalThis as any).WebSocket;
   const mockInstance = makeMockWebSocketInstance();
-  const MockWS = vi.fn(() => mockInstance) as any;
+  const MockWS = vi.fn(function MockWebSocket() {
+    return mockInstance;
+  }) as any;
   MockWS.OPEN = 1;
   MockWS.CLOSED = 3;
-  (global as any).WebSocket = MockWS;
-  return { MockWS, mockInstance };
+  (globalThis as any).WebSocket = MockWS;
+  return { MockWS, mockInstance, restore: () => {
+    (globalThis as any).WebSocket = originalWebSocket;
+  } };
 }

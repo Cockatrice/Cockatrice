@@ -1,6 +1,5 @@
 import { Selectors } from './game.selectors';
-import {
-  makeGameEntry, makePlayerEntry, makePlayerProperties, makeState,
+import { makeGameEntry, makePlayerEntry, makeState,
   makeZoneEntry, makeCard, makeCounter, makeArrow,
 } from './__mocks__/fixtures';
 import { GamesState } from './game.interfaces';

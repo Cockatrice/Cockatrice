@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react';
-import { debounce, DebouncedFunc } from 'lodash';
 
 import { SettingDTO } from 'services';
 import { APP_USER } from 'types';
-
-type OnChange = () => void;
 
 export function useAutoConnect() {
   const [setting, setSetting] = useState(undefined);

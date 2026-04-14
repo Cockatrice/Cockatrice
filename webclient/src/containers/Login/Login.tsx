@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
-import { connect } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
@@ -17,6 +16,7 @@ import { HostDTO, serverProps } from 'services';
 import { RouteEnum, WebSocketConnectOptions, getHostPort } from 'types';
 import { ServerSelectors, ServerTypes } from 'store';
 import Layout from 'containers/Layout/Layout';
+import { useAppSelector } from 'store/store';
 
 import './Login.css';
 import { useToast } from 'components/Toast';
@@ -64,7 +64,9 @@ const Root = styled('div')(({ theme }) => ({
   }
 }));
 
-const Login = ({ state, description }: LoginProps) => {
+const Login = () => {
+  const state = useAppSelector(s => ServerSelectors.getState(s));
+  const description = useAppSelector(s => ServerSelectors.getDescription(s));
   const { t } = useTranslation();
 
   const isConnected = AuthenticationService.isConnected(state);
@@ -349,14 +351,4 @@ const Login = ({ state, description }: LoginProps) => {
   );
 }
 
-interface LoginProps {
-  state: number;
-  description: string;
-}
-
-const mapStateToProps = state => ({
-  state: ServerSelectors.getState(state),
-  description: ServerSelectors.getDescription(state),
-});
-
-export default connect(mapStateToProps)(Login);
+export default Login;

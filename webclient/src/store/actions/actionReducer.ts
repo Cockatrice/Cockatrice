@@ -3,12 +3,12 @@
  * @description Application reducer.
  */
 
-import { AnyAction } from 'redux'
+import { UnknownAction } from '@reduxjs/toolkit'
 
  interface InitialState {
    type: string | null
-   payload: any
-   meta: any
+   payload: unknown
+   meta: unknown
    error: boolean
    count: number
  }
@@ -33,7 +33,7 @@ const initialState: InitialState = {
   */
 export const actionReducer = (
   state = initialState,
-  action: AnyAction,
+  action: UnknownAction,
 ): InitialState => {
   return {
     ...state,

@@ -18,4 +18,5 @@ export const Selectors = {
   getIgnoreList: ({ server }: State) => server.ignoreList,
   getReplays: ({ server }: State) => server.replays,
   getBackendDecks: ({ server }: State) => server.backendDecks,
+  getRegistrationError: ({ server }: State) => server.registrationError,
 }

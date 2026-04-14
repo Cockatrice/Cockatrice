@@ -1,3 +1,5 @@
+import type { ServerInfo_ChatMessage } from 'generated/proto/serverinfo_chat_message_pb';
+
 export interface ServerStatus {
   status: StatusEnum;
   description: string;
@@ -109,16 +111,7 @@ export const KnownHosts = {
   [KnownHost.TETRARCH]: { port: 443, host: 'mtg.tetrarch.co/servatrice' },
 }
 
-export interface LogItem {
-  message: string;
-  senderId: string;
-  senderIp: string;
-  senderName: string;
-  targetId: string;
-  targetName: string;
-  targetType: string;
-  time: string;
-}
+export type LogItem = ServerInfo_ChatMessage;
 
 export interface LogGroups {
   room: LogItem[];

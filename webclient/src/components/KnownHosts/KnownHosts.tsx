@@ -99,7 +99,7 @@ const KnownHosts = (props) => {
   }, [loadKnownHosts]);
 
   useEffect(() => {
-    const { hosts, selectedHost } = hostsState;
+    const { selectedHost } = hostsState;
 
     if (selectedHost?.id) {
       updateLastSelectedHost(selectedHost.id).then(() => {
@@ -255,7 +255,7 @@ const KnownHosts = (props) => {
                   </div>
 
                   { host.editable && (
-                    <IconButton className='KnownHosts-item__edit' size='small' color='primary' onClick={(e) => {
+                    <IconButton className='KnownHosts-item__edit' size='small' color='primary' onClick={() => {
                       openEditKnownHostDialog(hostsState.hosts[index]);
                     }}>
                       <EditRoundedIcon fontSize='small' />

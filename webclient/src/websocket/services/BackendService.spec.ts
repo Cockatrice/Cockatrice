@@ -93,11 +93,11 @@ describe('BackendService', () => {
       expect(onSuccess).not.toHaveBeenCalled();
     });
 
-    it('calls onSuccess with raw when responseCode is RespOk and no responseExt', () => {
+    it('calls onSuccess when responseCode is RespOk and no responseExt', () => {
       const onSuccess = vi.fn();
       const raw = { responseCode: 1 };
       invokeCallback({ onSuccess }, raw);
-      expect(onSuccess).toHaveBeenCalledWith(raw, raw);
+      expect(onSuccess).toHaveBeenCalledWith();
     });
 
     it('calls onSuccess with nested response when responseExt is set', () => {

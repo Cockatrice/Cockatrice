@@ -1,7 +1,7 @@
 import { ServerRegisterParams } from 'store';
 import { StatusEnum, WebSocketConnectOptions } from 'types';
 
-import { create } from '@bufbuild/protobuf';
+import { create, getExtension } from '@bufbuild/protobuf';
 import type { MessageInitShape } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
 import { BackendService } from '../../services/BackendService';
@@ -9,6 +9,7 @@ import { Command_Register_ext, Command_RegisterSchema } from 'generated/proto/se
 import { SessionPersistence } from '../../persistence';
 import { hashPassword } from '../../utils';
 import { Response_ResponseCode } from 'generated/proto/response_pb';
+import { Response_Register_ext } from 'generated/proto/response_register_pb';
 
 import { login, disconnect, updateStatus } from './';
 
@@ -65,9 +66,12 @@ export function register(options: WebSocketConnectOptions, password?: string, pa
       [Response_ResponseCode.RespRegistrationDisabled]: () => onRegistrationError(
         () => SessionPersistence.registrationFailed('Registration is currently disabled')
       ),
-      [Response_ResponseCode.RespUserIsBanned]: (raw) => onRegistrationError(
-        () => SessionPersistence.registrationFailed(raw.reasonStr, raw.endTime)
-      ),
+      [Response_ResponseCode.RespUserIsBanned]: (raw) => {
+        const register = getExtension(raw, Response_Register_ext);
+        onRegistrationError(
+          () => SessionPersistence.registrationFailed(register.deniedReasonStr, Number(register.deniedEndTime))
+        );
+      },
     },
     onError: () => onRegistrationError(
       () => SessionPersistence.registrationFailed('Registration failed due to a server issue')

@@ -21,8 +21,10 @@ import { joinGame } from './joinGame';
 import { leaveRoom } from './leaveRoom';
 import { roomSay } from './roomSay';
 
-const { getLastSendOpts, invokeOnSuccess } = makeCallbackHelpers(
-  BackendService.sendRoomCommand as vi.Mock,
+import { Mock } from 'vitest';
+
+const { invokeOnSuccess } = makeCallbackHelpers(
+  BackendService.sendRoomCommand as Mock,
   // sendRoomCommand(roomId, ext, value, options) — options at index 3
   3
 );

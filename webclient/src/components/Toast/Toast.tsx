@@ -1,9 +1,9 @@
 import * as React from 'react'
 import ReactDOM from 'react-dom'
 
-import Alert, { AlertProps } from '@mui/material/Alert';
+import Alert from '@mui/material/Alert';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import Slide, { SlideProps } from '@mui/material/Slide';
+import Slide from '@mui/material/Slide';
 import Snackbar from '@mui/material/Snackbar';
 
 const iconMapping = {
@@ -11,7 +11,7 @@ const iconMapping = {
 }
 
 function Toast(props) {
-  const { open, onClose, severity, autoHideDuration, children } = props
+  const { open, onClose, severity = 'success', autoHideDuration = 10000, children } = props
 
   const rootElemRef = React.useRef(document.createElement('div'));
 
@@ -37,9 +37,9 @@ function Toast(props) {
       TransitionComponent={TransitionLeft}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
     >
-      <Alert onClose={handleClose} severity={severity} iconMapping={iconMapping}>
-        {children}
-      </Alert>
+      <Alert onClose={handleClose} severity={severity} iconMapping={iconMapping}
+        slotProps={{ message: { children } }}
+      />
     </Snackbar>
   )
   if (!rootElemRef.current) {
@@ -50,12 +50,6 @@ function Toast(props) {
     node,
     rootElemRef.current
   );
-}
-
-Toast.defaultProps = {
-  severity: 'success',
-  // 10s wait before automatically dismissing the Toast.
-  autoHideDuration: 10000,
 }
 
 function TransitionLeft(props) {

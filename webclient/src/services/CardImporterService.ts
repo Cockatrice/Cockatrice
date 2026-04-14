@@ -34,7 +34,7 @@ class CardImporterService {
             .map(key => unsortedCards[key]);
 
           return { cards, sets };
-        } catch (e) {
+        } catch {
           throw new Error(error);
         }
       });
@@ -61,7 +61,7 @@ class CardImporterService {
           );
 
           return tokens;
-        } catch (e) {
+        } catch {
           throw new Error(error);
         }
       })

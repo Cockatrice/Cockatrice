@@ -2,8 +2,6 @@ import {
   URL_REGEX,
   MESSAGE_SENDER_REGEX,
   MENTION_REGEX,
-  CARD_CALLOUT_REGEX,
-  CALLOUT_BOUNDARY_REGEX,
 } from './constants';
 
 describe('RegEx', () => {

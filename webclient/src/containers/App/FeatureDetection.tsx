@@ -11,7 +11,7 @@ const FeatureDetection = () => {
       detectIndexedDB(),
     ];
 
-    Promise.all(features).catch((e) => setUnsupported(true));
+    Promise.all(features).catch(() => setUnsupported(true));
   }, []);
 
   return unsupported

@@ -13,20 +13,11 @@ vi.mock('store', () => ({
   },
 }));
 
-vi.mock('../utils/NormalizeService', () => ({
-  __esModule: true,
-  default: {
-    normalizeLogs: vi.fn((logs: any) => ({ normalized: logs })),
-  },
-}));
-
 import { ModeratorPersistence } from './ModeratorPersistence';
 import { ServerDispatch } from 'store';
-import NormalizeService from '../utils/NormalizeService';
 
 beforeEach(() => {
   vi.clearAllMocks();
-  (NormalizeService.normalizeLogs as vi.Mock).mockImplementation((logs: any) => ({ normalized: logs }));
 });
 
 describe('ModeratorPersistence', () => {
@@ -40,11 +31,10 @@ describe('ModeratorPersistence', () => {
     expect(ServerDispatch.banHistory).toHaveBeenCalledWith('alice', []);
   });
 
-  it('viewLogs normalizes logs and dispatches', () => {
+  it('viewLogs dispatches raw logs', () => {
     const logs = [{ targetType: 'room' }] as any;
     ModeratorPersistence.viewLogs(logs);
-    expect(NormalizeService.normalizeLogs).toHaveBeenCalledWith(logs);
-    expect(ServerDispatch.viewLogs).toHaveBeenCalledWith({ normalized: logs });
+    expect(ServerDispatch.viewLogs).toHaveBeenCalledWith(logs);
   });
 
   it('warnHistory passes userName and warnHistory', () => {

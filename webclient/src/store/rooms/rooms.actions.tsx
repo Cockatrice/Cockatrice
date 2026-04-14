@@ -1,71 +1,77 @@
+import { GameSortField, Message, SortDirection, User } from 'types';
+import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
+import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
+
 import { Types } from './rooms.types';
 
 export const Actions = {
   clearStore: () => ({
-    type: Types.CLEAR_STORE
+    type: Types.CLEAR_STORE,
   }),
 
-  updateRooms: rooms => ({
+  updateRooms: (rooms: ServerInfo_Room[]) => ({
     type: Types.UPDATE_ROOMS,
-    rooms
+    rooms,
   }),
 
-  joinRoom: roomInfo => ({
+  joinRoom: (roomInfo: ServerInfo_Room) => ({
     type: Types.JOIN_ROOM,
-    roomInfo
+    roomInfo,
   }),
 
-  leaveRoom: roomId => ({
+  leaveRoom: (roomId: number) => ({
     type: Types.LEAVE_ROOM,
-    roomId
+    roomId,
   }),
 
-  addMessage: (roomId, message) => ({
+  addMessage: (roomId: number, message: Message) => ({
     type: Types.ADD_MESSAGE,
     roomId,
-    message
+    message,
   }),
 
-  updateGames: (roomId, games) => ({
+  updateGames: (roomId: number, games: ServerInfo_Game[]) => ({
     type: Types.UPDATE_GAMES,
     roomId,
-    games
+    games,
   }),
 
-  userJoined: (roomId, user) => ({
+  userJoined: (roomId: number, user: User) => ({
     type: Types.USER_JOINED,
     roomId,
-    user
+    user,
   }),
 
-  userLeft: (roomId, name) => ({
+  userLeft: (roomId: number, name: string) => ({
     type: Types.USER_LEFT,
     roomId,
-    name
+    name,
   }),
 
-  sortGames: (roomId, field, order) => ({
+  sortGames: (roomId: number, field: GameSortField, order: SortDirection) => ({
     type: Types.SORT_GAMES,
     roomId,
     field,
-    order
+    order,
   }),
 
-  removeMessages: (roomId, name, amount) => ({
+  removeMessages: (roomId: number, name: string, amount: number) => ({
     type: Types.REMOVE_MESSAGES,
     roomId,
     name,
-    amount
+    amount,
   }),
 
-  gameCreated: (roomId) => ({
+  gameCreated: (roomId: number) => ({
     type: Types.GAME_CREATED,
-    roomId
+    roomId,
   }),
 
-  joinedGame: (roomId, gameId) => ({
+  joinedGame: (roomId: number, gameId: number) => ({
     type: Types.JOINED_GAME,
     roomId,
-    gameId
+    gameId,
   }),
 }
+
+export type RoomsAction = ReturnType<typeof Actions[keyof typeof Actions]>;

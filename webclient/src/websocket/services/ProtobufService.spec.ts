@@ -36,7 +36,7 @@ vi.mock('../WebClient', () => ({
   default: {},
 }));
 
-import { fromBinary, toBinary, hasExtension, getExtension } from '@bufbuild/protobuf';
+import { fromBinary, hasExtension, getExtension } from '@bufbuild/protobuf';
 import { ServerMessage_MessageType } from 'generated/proto/server_message_pb';
 import { ProtobufService } from './ProtobufService';
 import { ping as sessionPing } from '../commands/session';
@@ -351,36 +351,4 @@ describe('ProtobufService', () => {
     });
   });
 
-  describe('processEvent', () => {
-    it('calls matching event handler with payload and raw', () => {
-      const service = new ProtobufService({ socket: mockSocket } as any);
-      const handler = vi.fn();
-      const mockExt = {};
-      const registry = [[mockExt, handler]] as any;
-      const payload = { someData: 1 };
-      const raw = { extra: true };
-
-      vi.mocked(hasExtension).mockReturnValue(true);
-      vi.mocked(getExtension).mockReturnValue(payload);
-
-      (service as any).processEvent({}, registry, raw);
-
-      expect(handler).toHaveBeenCalledWith(payload, raw);
-    });
-
-    it('stops after first matching event', () => {
-      const service = new ProtobufService({ socket: mockSocket } as any);
-      const handler1 = vi.fn();
-      const handler2 = vi.fn();
-      const registry = [[{}, handler1], [{}, handler2]] as any;
-
-      vi.mocked(hasExtension).mockReturnValueOnce(true).mockReturnValueOnce(false);
-      vi.mocked(getExtension).mockReturnValue({ x: 1 });
-
-      (service as any).processEvent({}, registry, {});
-
-      expect(handler1).toHaveBeenCalled();
-      expect(handler2).not.toHaveBeenCalled();
-    });
-  });
 });

@@ -6,7 +6,7 @@ import { InputField } from 'components';
 
 import './InputAction.css';
 
-const InputAction = ({ action, label, name, validate, disabled }) => (
+const InputAction = ({ action, label, name, validate = () => false, disabled = false }) => (
   <div className="input-action">
     <div className="input-action__item">
       <Field label={label} name={name} component={InputField} validate={validate} />
@@ -18,10 +18,5 @@ const InputAction = ({ action, label, name, validate, disabled }) => (
     </div>
   </div>
 );
-
-InputAction.defaultProps = {
-  disabled: false,
-  validate: () => false,
-}
 
 export default InputAction;

@@ -1,8 +1,13 @@
+import { createSelector } from '@reduxjs/toolkit';
+import { CardInfo } from 'types';
 import { GamesState, GameEntry, PlayerEntry, ZoneEntry } from './game.interfaces';
 
 interface State {
   games: GamesState;
 }
+
+const EMPTY_ARRAY: CardInfo[] = [];
+const EMPTY_OBJECT = {} as Record<string, never>;
 
 export const Selectors = {
   getGames: ({ games }: State): { [gameId: number]: GameEntry } => games.games,
@@ -41,13 +46,13 @@ export const Selectors = {
   ): ZoneEntry | undefined => games.games[gameId]?.players[playerId]?.zones[zoneName],
 
   getCards: ({ games }: State, gameId: number, playerId: number, zoneName: string) =>
-    games.games[gameId]?.players[playerId]?.zones[zoneName]?.cards ?? [],
+    games.games[gameId]?.players[playerId]?.zones[zoneName]?.cards ?? EMPTY_ARRAY,
 
   getCounters: ({ games }: State, gameId: number, playerId: number) =>
-    games.games[gameId]?.players[playerId]?.counters ?? {},
+    games.games[gameId]?.players[playerId]?.counters ?? EMPTY_OBJECT,
 
   getArrows: ({ games }: State, gameId: number, playerId: number) =>
-    games.games[gameId]?.players[playerId]?.arrows ?? {},
+    games.games[gameId]?.players[playerId]?.arrows ?? EMPTY_OBJECT,
 
   getActivePlayerId: ({ games }: State, gameId: number): number | undefined =>
     games.games[gameId]?.activePlayerId,
@@ -65,8 +70,10 @@ export const Selectors = {
     games.games[gameId]?.reversed ?? false,
 
   getMessages: ({ games }: State, gameId: number) =>
-    games.games[gameId]?.messages ?? [],
+    games.games[gameId]?.messages ?? EMPTY_ARRAY,
 
-  getActiveGameIds: ({ games }: State): number[] =>
-    Object.keys(games.games).map(Number),
+  getActiveGameIds: createSelector(
+    [({ games }: State) => games.games],
+    (games) => Object.keys(games).map(Number)
+  ),
 };

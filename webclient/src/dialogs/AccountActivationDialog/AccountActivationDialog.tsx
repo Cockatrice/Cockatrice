@@ -11,7 +11,7 @@ import { AccountActivationForm } from 'forms';
 
 import './AccountActivationDialog.css';
 
-const AccountActivationDialog = ({ classes, handleClose, isOpen, onSubmit }: any) => {
+const AccountActivationDialog = ({ handleClose, isOpen, onSubmit }: any) => {
   const { t } = useTranslation();
 
   const handleOnClose = () => {

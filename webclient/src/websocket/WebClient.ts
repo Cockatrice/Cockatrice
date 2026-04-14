@@ -77,7 +77,7 @@ export class WebClient {
     }
   }
 
-  public keepAlive(pingReceived: Function) {
+  public keepAlive(pingReceived: () => void) {
     this.protobuf.sendKeepAliveCommand(pingReceived);
   }
 

@@ -1,7 +1,11 @@
 import { DeckStorageFolder, DeckStorageTreeItem, SortDirection, StatusEnum, UserLevelFlag, UserSortField } from 'types';
+import { create } from '@bufbuild/protobuf';
+import { Response_DeckListSchema } from 'generated/proto/response_deck_list_pb';
+import { ServerInfo_DeckStorage_FolderSchema, ServerInfo_DeckStorage_TreeItemSchema } from 'generated/proto/serverinfo_deckstorage_pb';
 
-import { SortUtil } from '../common';
+import { normalizeBannedUserError, normalizeGameObject, normalizeLogs, SortUtil } from '../common';
 
+import { ServerAction } from './server.actions';
 import { ServerState } from './server.interfaces'
 import { Types } from './server.types';
 
@@ -11,31 +15,33 @@ function splitPath(path: string): string[] {
 
 function insertAtPath(folder: DeckStorageFolder, pathSegments: string[], item: DeckStorageTreeItem): DeckStorageFolder {
   if (pathSegments.length === 0 || (pathSegments.length === 1 && pathSegments[0] === '')) {
-    return { items: [...folder.items, item] };
+    return create(ServerInfo_DeckStorage_FolderSchema, { items: [...folder.items, item] });
   }
   const [head, ...tail] = pathSegments;
   const match = folder.items.find(child => child.name === head && child.folder);
   if (match) {
-    return {
+    return create(ServerInfo_DeckStorage_FolderSchema, {
       items: folder.items.map(child =>
         child === match
           ? { ...child, folder: insertAtPath(child.folder!, tail, item) }
           : child
       ),
-    };
+    });
   }
-  const created: DeckStorageTreeItem = { id: 0, name: head, file: null, folder: insertAtPath({ items: [] }, tail, item) };
-  return { items: [...folder.items, created] };
+  const created: DeckStorageTreeItem = create(ServerInfo_DeckStorage_TreeItemSchema, {
+    id: 0, name: head, folder: insertAtPath(create(ServerInfo_DeckStorage_FolderSchema, { items: [] }), tail, item)
+  });
+  return create(ServerInfo_DeckStorage_FolderSchema, { items: [...folder.items, created] });
 }
 
 function removeById(folder: DeckStorageFolder, id: number): DeckStorageFolder {
-  return {
+  return create(ServerInfo_DeckStorage_FolderSchema, {
     items: folder.items
       .filter(item => item.id !== id)
       .map(item =>
         item.folder ? { ...item, folder: removeById(item.folder, id) } : item
       ),
-  };
+  });
 }
 
 function removeByPath(folder: DeckStorageFolder, pathSegments: string[]): DeckStorageFolder {
@@ -44,15 +50,17 @@ function removeByPath(folder: DeckStorageFolder, pathSegments: string[]): DeckSt
   }
   const [head, ...tail] = pathSegments;
   if (tail.length === 0) {
-    return { items: folder.items.filter(item => !(item.name === head && item.folder !== null)) };
+    return create(ServerInfo_DeckStorage_FolderSchema, {
+      items: folder.items.filter(item => !(item.name === head && item.folder != null))
+    });
   }
-  return {
+  return create(ServerInfo_DeckStorage_FolderSchema, {
     items: folder.items.map(item =>
       item.name === head && item.folder
         ? { ...item, folder: removeByPath(item.folder, tail) }
         : item
     ),
-  };
+  });
 }
 
 const initialState: ServerState = {
@@ -93,9 +101,10 @@ const initialState: ServerState = {
   replays: [],
   backendDecks: null,
   gamesOfUser: {},
+  registrationError: null,
 };
 
-export const serverReducer = (state = initialState, action: any) => {
+export const serverReducer = (state = initialState, action: ServerAction) => {
   switch (action.type) {
     case Types.INITIALIZED: {
       return {
@@ -271,7 +280,7 @@ export const serverReducer = (state = initialState, action: any) => {
       return {
         ...state,
         logs: {
-          ...logs
+          ...normalizeLogs(logs)
         }
       };
     }
@@ -424,60 +433,96 @@ export const serverReducer = (state = initialState, action: any) => {
       return { ...state, backendDecks: action.deckList };
     }
     case Types.DECK_UPLOAD: {
-      if (!state.backendDecks) {
+      if (!state.backendDecks?.root) {
         return state;
       }
       return {
         ...state,
-        backendDecks: {
+        backendDecks: create(Response_DeckListSchema, {
           root: insertAtPath(state.backendDecks.root, splitPath(action.path), action.treeItem),
-        },
+        }),
       };
     }
     case Types.DECK_DELETE: {
-      if (!state.backendDecks) {
+      if (!state.backendDecks?.root) {
         return state;
       }
       return {
         ...state,
-        backendDecks: {
+        backendDecks: create(Response_DeckListSchema, {
           root: removeById(state.backendDecks.root, action.deckId),
-        },
+        }),
       };
     }
     case Types.DECK_NEW_DIR: {
-      if (!state.backendDecks) {
+      if (!state.backendDecks?.root) {
         return state;
       }
-      const newFolder: DeckStorageTreeItem = { id: 0, name: action.dirName, file: null, folder: { items: [] } };
+      const newFolder: DeckStorageTreeItem = create(ServerInfo_DeckStorage_TreeItemSchema, {
+        id: 0, name: action.dirName, folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+      });
       return {
         ...state,
-        backendDecks: {
+        backendDecks: create(Response_DeckListSchema, {
           root: insertAtPath(state.backendDecks.root, splitPath(action.path), newFolder),
-        },
+        }),
       };
     }
     case Types.DECK_DEL_DIR: {
-      if (!state.backendDecks) {
+      if (!state.backendDecks?.root) {
         return state;
       }
       return {
         ...state,
-        backendDecks: {
+        backendDecks: create(Response_DeckListSchema, {
           root: removeByPath(state.backendDecks.root, splitPath(action.path)),
-        },
+        }),
       };
     }
     case Types.GAMES_OF_USER: {
-      const { userName, games } = action;
+      const { userName, games, gametypeMap } = action;
+      const normalizedGames = games.map(g => normalizeGameObject(g, gametypeMap));
       return {
         ...state,
         gamesOfUser: {
           ...state.gamesOfUser,
-          [userName]: games,
+          [userName]: normalizedGames,
         },
       };
     }
+    case Types.REGISTRATION_FAILED: {
+      const error = action.endTime
+        ? normalizeBannedUserError(action.reason, action.endTime)
+        : action.reason;
+      return { ...state, registrationError: error };
+    }
+    case Types.CLEAR_REGISTRATION_ERRORS:
+      return { ...state, registrationError: null };
+    // Signal-only action types — no state mutation, explicit for discriminated-union exhaustiveness
+    case Types.LOGIN_SUCCESSFUL:
+    case Types.LOGIN_FAILED:
+    case Types.CONNECTION_CLOSED:
+    case Types.CONNECTION_FAILED:
+    case Types.TEST_CONNECTION_SUCCESSFUL:
+    case Types.TEST_CONNECTION_FAILED:
+    case Types.REGISTRATION_REQUIRES_EMAIL:
+    case Types.REGISTRATION_SUCCESS:
+    case Types.REGISTRATION_EMAIL_ERROR:
+    case Types.REGISTRATION_PASSWORD_ERROR:
+    case Types.REGISTRATION_USERNAME_ERROR:
+    case Types.RESET_PASSWORD_REQUESTED:
+    case Types.RESET_PASSWORD_FAILED:
+    case Types.RESET_PASSWORD_CHALLENGE:
+    case Types.RESET_PASSWORD_SUCCESS:
+    case Types.RELOAD_CONFIG:
+    case Types.SHUTDOWN_SERVER:
+    case Types.UPDATE_SERVER_MESSAGE:
+    case Types.ACCOUNT_PASSWORD_CHANGE:
+    case Types.ADD_TO_LIST:
+    case Types.REMOVE_FROM_LIST:
+    case Types.GRANT_REPLAY_ACCESS:
+    case Types.FORCE_ACTIVATE_USER:
+      return state;
     default:
       return state;
   }

@@ -1,7 +1,6 @@
-// eslint-disable-next-line
+
 import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { Form, Field, reduxForm } from 'redux-form'
+import { Form, Field } from 'react-final-form';
 
 import Button from '@mui/material/Button';
 import Stepper from '@mui/material/Stepper';
@@ -11,12 +10,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import { InputField, VirtualList } from 'components';
 import { cardImporterService, CardDTO, SetDTO, TokenDTO } from 'services';
-import { FormKey } from 'types';
 
 import './CardImportForm.css';
 
-const CardImportForm = (props) => {
-  const { handleSubmit, onSubmit: onClose } = props;
+const CardImportForm = ({ onSubmit: onClose }) => {
 
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -85,20 +82,27 @@ const CardImportForm = (props) => {
   const getStepContent = (stepIndex) => {
     switch (stepIndex) {
       case 0: return (
-        <Form className='cardImportForm' onSubmit={handleSubmit(handleCardDownload)}>
-          <div className='cardImportForm-item'>
-            <Field label='Download URL' name='cardDownloadUrl' component={InputField} />
-          </div>
+        <Form
+          onSubmit={handleCardDownload}
+          initialValues={{ cardDownloadUrl: 'https://www.mtgjson.com/api/v5/AllPrintings.json' }}
+        >
+          {({ handleSubmit }) => (
+            <form className='cardImportForm' onSubmit={handleSubmit}>
+              <div className='cardImportForm-item'>
+                <Field label='Download URL' name='cardDownloadUrl' component={InputField} />
+              </div>
 
-          <div className='cardImportForm-actions'>
-            <Button color='primary' type='submit' disabled={loading}>
-              Import
-            </Button>
-          </div>
+              <div className='cardImportForm-actions'>
+                <Button color='primary' type='submit' disabled={loading}>
+                  Import
+                </Button>
+              </div>
 
-          <div className='cardImportForm-error'>
-            <ErrorMessage error={error} />
-          </div>
+              <div className='cardImportForm-error'>
+                <ErrorMessage error={error} />
+              </div>
+            </form>
+          )}
         </Form>
       );
 
@@ -122,21 +126,28 @@ const CardImportForm = (props) => {
       );
 
       case 2: return (
-        <Form className='cardImportForm' onSubmit={handleSubmit(handleTokenDownload)}>
-          <div className='cardImportForm-content'>
-            <Field label='Download URL' name='tokenDownloadUrl' component={InputField} />
-          </div>
+        <Form
+          onSubmit={handleTokenDownload}
+          initialValues={{ tokenDownloadUrl: 'https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml' }}
+        >
+          {({ handleSubmit }) => (
+            <form className='cardImportForm' onSubmit={handleSubmit}>
+              <div className='cardImportForm-content'>
+                <Field label='Download URL' name='tokenDownloadUrl' component={InputField} />
+              </div>
 
-          <div className='cardImportForm-actions'>
-            <BackButton click={handleBack} disabled={loading} />
-            <Button color='primary' type='submit' disabled={loading}>
-              Import
-            </Button>
-          </div>
+              <div className='cardImportForm-actions'>
+                <BackButton click={handleBack} disabled={loading} />
+                <Button color='primary' type='submit' disabled={loading}>
+                  Import
+                </Button>
+              </div>
 
-          <div className='cardImportForm-error'>
-            <ErrorMessage error={error} />
-          </div>
+              <div className='cardImportForm-error'>
+                <ErrorMessage error={error} />
+              </div>
+            </form>
+          )}
         </Form>
       );
 
@@ -204,7 +215,6 @@ const CardsImported = ({ cards, sets }) => {
   return (
     <div className='card-import-list'>
       <VirtualList
-        itemKey={(index) => index }
         items={items}
         size={15}
       />
@@ -212,16 +222,4 @@ const CardsImported = ({ cards, sets }) => {
   );
 };
 
-const propsMap = {
-  form: FormKey.CARD_IMPORT,
-  onClose: Function
-};
-
-const mapStateToProps = () => ({
-  initialValues: {
-    cardDownloadUrl: 'https://www.mtgjson.com/api/v5/AllPrintings.json',
-    tokenDownloadUrl: 'https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml'
-  },
-});
-
-export default connect(mapStateToProps)(reduxForm(propsMap)(CardImportForm));
+export default CardImportForm;

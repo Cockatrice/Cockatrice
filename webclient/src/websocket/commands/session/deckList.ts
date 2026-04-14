@@ -8,7 +8,9 @@ export function deckList(): void {
   BackendService.sendSessionCommand(Command_DeckList_ext, create(Command_DeckListSchema), {
     responseExt: Response_DeckList_ext,
     onSuccess: (response) => {
-      SessionPersistence.updateServerDecks(response);
+      if (response.root) {
+        SessionPersistence.updateServerDecks(response);
+      }
     },
   });
 }

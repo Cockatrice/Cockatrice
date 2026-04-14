@@ -1,4 +1,4 @@
-import { ExtensionRegistry } from '../../services/ProtobufService';
+import { SessionExtensionRegistry, makeSessionEntry } from '../../services/ProtobufService';
 import { addToList } from './addToList';
 import { connectionClosed } from './connectionClosed';
 import { listRooms } from './listRooms';
@@ -29,20 +29,20 @@ import { Event_UserJoined_ext } from 'generated/proto/event_user_joined_pb';
 import { Event_UserLeft_ext } from 'generated/proto/event_user_left_pb';
 import { Event_UserMessage_ext } from 'generated/proto/event_user_message_pb';
 
-export const SessionEvents: ExtensionRegistry = [
-  [Event_AddToList_ext, addToList],
-  [Event_ConnectionClosed_ext, connectionClosed],
-  [Event_GameJoined_ext, gameJoined],
-  [Event_ListRooms_ext, listRooms],
-  [Event_NotifyUser_ext, notifyUser],
-  [Event_RemoveFromList_ext, removeFromList],
-  [Event_ReplayAdded_ext, replayAdded],
-  [Event_ServerCompleteList_ext, serverCompleteList],
-  [Event_ServerIdentification_ext, serverIdentification],
-  [Event_ServerMessage_ext, serverMessage],
-  [Event_ServerShutdown_ext, serverShutdown],
-  [Event_UserJoined_ext, userJoined],
-  [Event_UserLeft_ext, userLeft],
-  [Event_UserMessage_ext, userMessage],
+export const SessionEvents: SessionExtensionRegistry = [
+  makeSessionEntry(Event_AddToList_ext, addToList),
+  makeSessionEntry(Event_ConnectionClosed_ext, connectionClosed),
+  makeSessionEntry(Event_GameJoined_ext, gameJoined),
+  makeSessionEntry(Event_ListRooms_ext, listRooms),
+  makeSessionEntry(Event_NotifyUser_ext, notifyUser),
+  makeSessionEntry(Event_RemoveFromList_ext, removeFromList),
+  makeSessionEntry(Event_ReplayAdded_ext, replayAdded),
+  makeSessionEntry(Event_ServerCompleteList_ext, serverCompleteList),
+  makeSessionEntry(Event_ServerIdentification_ext, serverIdentification),
+  makeSessionEntry(Event_ServerMessage_ext, serverMessage),
+  makeSessionEntry(Event_ServerShutdown_ext, serverShutdown),
+  makeSessionEntry(Event_UserJoined_ext, userJoined),
+  makeSessionEntry(Event_UserLeft_ext, userLeft),
+  makeSessionEntry(Event_UserMessage_ext, userMessage),
 ];
 

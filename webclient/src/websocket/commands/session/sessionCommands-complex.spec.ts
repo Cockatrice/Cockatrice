@@ -31,6 +31,7 @@ vi.mock('./', async () => {
   return makeSessionBarrelMock();
 });
 
+import { Mock } from 'vitest';
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
 import { BackendService } from '../../services/BackendService';
 import { SessionPersistence } from '../../persistence';
@@ -51,6 +52,9 @@ import {
 import { Response_ForgotPasswordRequest_ext } from 'generated/proto/response_forgotpasswordrequest_pb';
 import { Response_Login_ext } from 'generated/proto/response_login_pb';
 import { Response_PasswordSalt_ext } from 'generated/proto/response_password_salt_pb';
+import { Response_Register_ext, Response_RegisterSchema } from 'generated/proto/response_register_pb';
+import { create, setExtension } from '@bufbuild/protobuf';
+import { ResponseSchema } from 'generated/proto/response_pb';
 import { connect } from './connect';
 import { updateStatus } from './updateStatus';
 import { login } from './login';
@@ -61,16 +65,16 @@ import { forgotPasswordRequest } from './forgotPasswordRequest';
 import { forgotPasswordReset } from './forgotPasswordReset';
 import { requestPasswordSalt } from './requestPasswordSalt';
 
-const { getLastSendOpts, invokeOnSuccess, invokeResponseCode, invokeOnError } = makeCallbackHelpers(
-  BackendService.sendSessionCommand as vi.Mock,
+const { invokeOnSuccess, invokeResponseCode, invokeOnError } = makeCallbackHelpers(
+  BackendService.sendSessionCommand as Mock,
   2
 );
 
 beforeEach(() => {
   vi.clearAllMocks();
-  (hashPassword as vi.Mock).mockReturnValue('hashed_pw');
-  (generateSalt as vi.Mock).mockReturnValue('randSalt');
-  (passwordSaltSupported as vi.Mock).mockReturnValue(0);
+  (hashPassword as Mock).mockReturnValue('hashed_pw');
+  (generateSalt as Mock).mockReturnValue('randSalt');
+  (passwordSaltSupported as Mock).mockReturnValue(0);
 });
 
 // ----------------------------------------------------------------
@@ -182,7 +186,7 @@ describe('login', () => {
     login({ userName: 'alice' } as any, 'secret');
     const loginResp = { buddyList: [], ignoreList: [], userInfo: { name: 'alice' } };
     invokeOnSuccess(loginResp, { responseCode: 0 });
-    const calledWith = (SessionPersistence.loginSuccessful as vi.Mock).mock.calls[0][0];
+    const calledWith = (SessionPersistence.loginSuccessful as Mock).mock.calls[0][0];
     expect(calledWith).not.toHaveProperty('password');
   });
 
@@ -190,7 +194,7 @@ describe('login', () => {
     login({ userName: 'alice' } as any, 'pw', 'salt');
     const loginResp = { buddyList: [], ignoreList: [], userInfo: { name: 'alice' } };
     invokeOnSuccess(loginResp, { responseCode: 0 });
-    const calledWith = (SessionPersistence.loginSuccessful as vi.Mock).mock.calls[0][0];
+    const calledWith = (SessionPersistence.loginSuccessful as Mock).mock.calls[0][0];
     expect(calledWith).toHaveProperty('hashedPassword', 'hashed_pw');
   });
 
@@ -347,9 +351,11 @@ describe('register', () => {
     expect(SessionPersistence.registrationFailed).toHaveBeenCalled();
   });
 
-  it('RespUserIsBanned calls registrationFailed with raw.reasonStr and raw.endTime', () => {
+  it('RespUserIsBanned calls registrationFailed with deniedReasonStr and deniedEndTime', () => {
     register({ userName: 'alice' } as any, 'pw');
-    invokeResponseCode(Response_ResponseCode.RespUserIsBanned, { reasonStr: 'bad user', endTime: 9999 });
+    const raw = create(ResponseSchema, { responseCode: Response_ResponseCode.RespUserIsBanned });
+    setExtension(raw, Response_Register_ext, create(Response_RegisterSchema, { deniedReasonStr: 'bad user', deniedEndTime: 9999n }));
+    invokeResponseCode(Response_ResponseCode.RespUserIsBanned, raw);
     expect(SessionPersistence.registrationFailed).toHaveBeenCalledWith('bad user', 9999);
   });
 

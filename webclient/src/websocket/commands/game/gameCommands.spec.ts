@@ -72,8 +72,10 @@ vi.mock('../../services/BackendService', () => ({
 
 const gameId = 1;
 
+import { Mock } from 'vitest';
+
 beforeEach(() => {
-  (BackendService.sendGameCommand as vi.Mock).mockClear();
+  (BackendService.sendGameCommand as Mock).mockClear();
 });
 
 describe('Game commands — delegate to BackendService.sendGameCommand', () => {

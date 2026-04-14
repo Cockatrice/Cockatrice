@@ -11,7 +11,7 @@ import { RegisterForm } from 'forms';
 
 import './RegistrationDialog.css';
 
-const RegistrationDialog = ({ classes, handleClose, isOpen, onSubmit }: any) => {
+const RegistrationDialog = ({ handleClose, isOpen, onSubmit }: any) => {
   const { t } = useTranslation();
 
   const handleOnClose = () => {

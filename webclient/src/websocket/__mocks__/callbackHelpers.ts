@@ -7,7 +7,9 @@
  *                       Defaults to 2 (ext, value, options).
  *                       Use 3 for sendRoomCommand (roomId, ext, value, options).
  */
-export function makeCallbackHelpers(mockFn: vi.Mock, optsArgIndex = 2) {
+import { Mock } from 'vitest';
+
+export function makeCallbackHelpers(mockFn: Mock, optsArgIndex = 2) {
   function getLastSendOpts() {
     const calls = mockFn.mock.calls;
     return calls[calls.length - 1]?.[optsArgIndex];

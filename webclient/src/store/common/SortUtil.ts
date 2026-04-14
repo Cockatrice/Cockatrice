@@ -1,7 +1,7 @@
 import { SortBy, SortDirection, User } from 'types';
 
 export default class SortUtil {
-  static sortByField(arr: any[], sortBy: SortBy): void {
+  static sortByField<T extends object>(arr: T[], sortBy: SortBy): void {
     if (arr.length) {
       const field = SortUtil.resolveFieldChain(arr[0], sortBy.field);
       const fieldType = typeof field;
@@ -20,7 +20,7 @@ export default class SortUtil {
     }
   }
 
-  static sortByFields(arr: any[], sorts: SortBy[]) {
+  static sortByFields<T extends object>(arr: T[], sorts: SortBy[]) {
     if (arr.length) {
       arr.sort((a, b) => {
         for (let i = 0; i < sorts.length; i++) {
@@ -57,7 +57,7 @@ export default class SortUtil {
     }
   }
 
-  static toggleSortBy(field: string, sortBy: SortBy) {
+  static toggleSortBy<F extends string>(field: F, sortBy: SortBy): { field: F; order: SortDirection } {
     const sameField = field === sortBy.field;
     const isASC = sortBy.order === SortDirection.ASC;
 
@@ -67,15 +67,15 @@ export default class SortUtil {
     }
   }
 
-  private static sortByNumber(arr: any[], sortBy: SortBy): void {
+  private static sortByNumber<T extends object>(arr: T[], sortBy: SortBy): void {
     arr.sort((a, b) => SortUtil.numberComparator(a, b, sortBy));
   }
 
-  private static sortByString(arr: any[], sortBy: SortBy): void {
+  private static sortByString<T extends object>(arr: T[], sortBy: SortBy): void {
     arr.sort((a, b) => SortUtil.stringComparator(a, b, sortBy));
   }
 
-  private static userComparator(a, b, sortBy, sortByUserLevel = true) {
+  private static userComparator(a: User, b: User, sortBy: SortBy, sortByUserLevel = true) {
     if (sortByUserLevel) {
       const adminSortBy = {
         field: 'userLevel',
@@ -98,7 +98,7 @@ export default class SortUtil {
     return 0;
   }
 
-  private static numberComparator(a, b, { field, order }: SortBy) {
+  private static numberComparator<T extends object>(a: T, b: T, { field, order }: SortBy) {
     const aResolved = SortUtil.resolveFieldChain(a, field);
     const bResolved = SortUtil.resolveFieldChain(b, field);
 
@@ -109,7 +109,7 @@ export default class SortUtil {
     }
   }
 
-  private static stringComparator(a, b, { field, order }: SortBy) {
+  private static stringComparator<T extends object>(a: T, b: T, { field, order }: SortBy) {
     const aResolved = SortUtil.resolveFieldChain(a, field);
     const bResolved = SortUtil.resolveFieldChain(b, field);
 

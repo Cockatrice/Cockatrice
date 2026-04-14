@@ -15,7 +15,7 @@ import {
 import CardCallout from './CardCallout';
 import './Message.css';
 
-const Message = ({ message: { message, messageType, timeOf, timeReceived } }) => (
+const Message = ({ message: { message } }) => (
   <div className='message'>
     <div className='message__detail'>
       <ParsedMessage message={message} />

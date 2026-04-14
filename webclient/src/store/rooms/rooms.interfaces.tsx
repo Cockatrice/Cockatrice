@@ -1,4 +1,4 @@
-import { GameSortField, Room, Game, SortBy, UserSortField } from 'types';
+import { GameSortField, Message, Room, Game, SortBy, UserSortField } from 'types';
 
 export interface RoomsState {
   rooms: RoomsStateRooms;
@@ -40,11 +40,4 @@ export interface RoomsStateSortGamesBy extends SortBy {
 
 export interface RoomsStateSortUsersBy extends SortBy {
   field: UserSortField
-}
-
-export interface Message {
-  message: string;
-  messageType: number;
-  timeReceived: number;
-  timeOf?: number;
 }

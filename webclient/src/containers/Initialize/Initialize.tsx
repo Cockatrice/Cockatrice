@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useTranslation, Trans } from 'react-i18next';
-import { connect } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 
@@ -9,6 +7,7 @@ import { Images } from 'images';
 import { ServerSelectors } from 'store';
 import { RouteEnum } from 'types';
 import Layout from 'containers/Layout/Layout';
+import { useAppSelector } from 'store/store';
 
 import './Initialize.css';
 
@@ -30,7 +29,8 @@ const Root = styled('div')(({ theme }) => ({
   }
 }));
 
-const Initialize = ({ initialized }: InitializeProps) => {
+const Initialize = () => {
+  const initialized = useAppSelector(state => ServerSelectors.getInitialized(state));
   const { t } = useTranslation();
 
   return initialized
@@ -60,12 +60,4 @@ const Initialize = ({ initialized }: InitializeProps) => {
     );
 }
 
-interface InitializeProps {
-  initialized: boolean;
-}
-
-const mapStateToProps = state => ({
-  initialized: ServerSelectors.getInitialized(state),
-});
-
-export default connect(mapStateToProps)(Initialize);
+export default Initialize;

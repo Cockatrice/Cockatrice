@@ -67,6 +67,17 @@ import type { ServerInfo_Player } from 'generated/proto/serverinfo_player_pb';
 export { CardAttribute } from 'generated/proto/card_attributes_pb';
 export { ServerInfo_Zone_ZoneType as ZoneType } from 'generated/proto/serverinfo_zone_pb';
 
+// ── Proto utility types ───────────────────────────────────────────────────────
+
+/**
+ * Init shape for constructing protobuf messages via create().
+ * Strips $typeName and $unknown branding, making all fields optional.
+ * Use for function parameters that feed into create().
+ */
+export type ProtoInit<T> = {
+  [K in keyof T as K extends '$typeName' | '$unknown' ? never : K]?: T[K];
+};
+
 // ── UI types (not proto mirrors) ──────────────────────────────────────────────
 
 export type Game = ServerInfo_Game & {
@@ -165,34 +176,36 @@ export interface GameEventMeta {
   forcedByJudge: number;
 }
 
-// ── Type aliases for generated command param types ────────────────────────────
+// ── Type aliases for generated command param types (init shapes) ──────────────
+// These use ProtoInit<> because callers construct plain objects;
+// the command functions internally call create(Schema, params).
 
 export type { CardToMove };
-export type MoveCardParams = Command_MoveCard;
-export type DrawCardsParams = Command_DrawCards;
-export type RollDieParams = Command_RollDie;
-export type ShuffleParams = Command_Shuffle;
-export type FlipCardParams = Command_FlipCard;
-export type AttachCardParams = Command_AttachCard;
-export type CreateTokenParams = Command_CreateToken;
-export type SetCardAttrParams = Command_SetCardAttr;
-export type SetCardCounterParams = Command_SetCardCounter;
-export type IncCardCounterParams = Command_IncCardCounter;
-export type RevealCardsParams = Command_RevealCards;
-export type DumpZoneParams = Command_DumpZone;
-export type ChangeZonePropertiesParams = Command_ChangeZoneProperties;
-export type CreateArrowParams = Command_CreateArrow;
-export type DeleteArrowParams = Command_DeleteArrow;
-export type CreateCounterParams = Command_CreateCounter;
-export type SetCounterParams = Command_SetCounter;
-export type IncCounterParams = Command_IncCounter;
-export type DelCounterParams = Command_DelCounter;
-export type KickFromGameParams = Command_KickFromGame;
-export type ReadyStartParams = Command_ReadyStart;
-export type MulliganParams = Command_Mulligan;
-export type DeckSelectParams = Command_DeckSelect;
+export type MoveCardParams = ProtoInit<Command_MoveCard>;
+export type DrawCardsParams = ProtoInit<Command_DrawCards>;
+export type RollDieParams = ProtoInit<Command_RollDie>;
+export type ShuffleParams = ProtoInit<Command_Shuffle>;
+export type FlipCardParams = ProtoInit<Command_FlipCard>;
+export type AttachCardParams = ProtoInit<Command_AttachCard>;
+export type CreateTokenParams = ProtoInit<Command_CreateToken>;
+export type SetCardAttrParams = ProtoInit<Command_SetCardAttr>;
+export type SetCardCounterParams = ProtoInit<Command_SetCardCounter>;
+export type IncCardCounterParams = ProtoInit<Command_IncCardCounter>;
+export type RevealCardsParams = ProtoInit<Command_RevealCards>;
+export type DumpZoneParams = ProtoInit<Command_DumpZone>;
+export type ChangeZonePropertiesParams = ProtoInit<Command_ChangeZoneProperties>;
+export type CreateArrowParams = ProtoInit<Command_CreateArrow>;
+export type DeleteArrowParams = ProtoInit<Command_DeleteArrow>;
+export type CreateCounterParams = ProtoInit<Command_CreateCounter>;
+export type SetCounterParams = ProtoInit<Command_SetCounter>;
+export type IncCounterParams = ProtoInit<Command_IncCounter>;
+export type DelCounterParams = ProtoInit<Command_DelCounter>;
+export type KickFromGameParams = ProtoInit<Command_KickFromGame>;
+export type ReadyStartParams = ProtoInit<Command_ReadyStart>;
+export type MulliganParams = ProtoInit<Command_Mulligan>;
+export type DeckSelectParams = ProtoInit<Command_DeckSelect>;
 export type MoveCardToZone = MoveCard_ToZone;
-export type SetSideboardPlanParams = Command_SetSideboardPlan;
-export type SetSideboardLockParams = Command_SetSideboardLock;
-export type SetActivePhaseParams = Command_SetActivePhase;
-export type GameSayParams = Command_GameSay;
+export type SetSideboardPlanParams = ProtoInit<Command_SetSideboardPlan>;
+export type SetSideboardLockParams = ProtoInit<Command_SetSideboardLock>;
+export type SetActivePhaseParams = ProtoInit<Command_SetActivePhase>;
+export type GameSayParams = ProtoInit<Command_GameSay>;

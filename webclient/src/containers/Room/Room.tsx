@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
 import { useNavigate, useParams, generatePath } from 'react-router-dom';
 
-import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import Paper from '@mui/material/Paper';
 
 import { RoomsService } from 'api';
 import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard } from 'components';
-import { RoomsStateMessages, RoomsStateRooms, JoinedRooms, RoomsSelectors, RoomsTypes } from 'store';
+import { RoomsSelectors } from 'store';
+import { useAppSelector } from 'store/store';
 import { RouteEnum } from 'types';
 import Layout from 'containers/Layout/Layout';
 
@@ -18,8 +18,10 @@ import SayMessage from './SayMessage';
 import './Room.css';
 
 // @TODO (3)
-const Room = (props) => {
-  const { joined, rooms, messages } = props;
+const Room = () => {
+  const joined = useAppSelector(state => RoomsSelectors.getJoinedRooms(state));
+  const rooms = useAppSelector(state => RoomsSelectors.getRooms(state));
+  const messages = useAppSelector(state => RoomsSelectors.getMessages(state));
   const navigate = useNavigate();
   const params = useParams();
 
@@ -74,11 +76,10 @@ const Room = (props) => {
               </div>
               <VirtualList
                 className="room-view__side-list"
-                itemKey={(index, data) => users[index].name }
                 items={ users.map(user => (
-                  <ListItem button className="room-view__side-list__item">
+                  <ListItemButton className="room-view__side-list__item">
                     <UserDisplay user={user} />
-                  </ListItem>
+                  </ListItemButton>
                 )) }
               />
             </Paper>
@@ -89,16 +90,4 @@ const Room = (props) => {
   );
 }
 
-interface RoomProps {
-  messages: RoomsStateMessages;
-  rooms: RoomsStateRooms;
-  joined: JoinedRooms;
-}
-
-const mapStateToProps = state => ({
-  messages: RoomsSelectors.getMessages(state),
-  rooms: RoomsSelectors.getRooms(state),
-  joined: RoomsSelectors.getJoinedRooms(state),
-});
-
-export default connect(mapStateToProps)(Room);
+export default Room;

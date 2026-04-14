@@ -1,4 +1,7 @@
-import { reset } from 'redux-form';
+import { GameSortField, Message, SortDirection, User } from 'types';
+import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
+import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
+
 import { Actions } from './rooms.actions';
 import { store } from 'store';
 
@@ -7,52 +10,48 @@ export const Dispatch = {
     store.dispatch(Actions.clearStore());
   },
 
-  updateRooms: rooms => {
+  updateRooms: (rooms: ServerInfo_Room[]) => {
     store.dispatch(Actions.updateRooms(rooms));
   },
 
-  joinRoom: roomInfo => {
+  joinRoom: (roomInfo: ServerInfo_Room) => {
     store.dispatch(Actions.joinRoom(roomInfo));
 
   },
 
-  leaveRoom: roomId => {
+  leaveRoom: (roomId: number) => {
     store.dispatch(Actions.leaveRoom(roomId));
   },
 
-  addMessage: (roomId, message) => {
-    if (message.name) {
-      store.dispatch(reset('sayMessage'));
-    }
-
+  addMessage: (roomId: number, message: Message) => {
     store.dispatch(Actions.addMessage(roomId, message));
   },
 
-  updateGames: (roomId, games) => {
+  updateGames: (roomId: number, games: ServerInfo_Game[]) => {
     store.dispatch(Actions.updateGames(roomId, games));
   },
 
-  userJoined: (roomId, user) => {
+  userJoined: (roomId: number, user: User) => {
     store.dispatch(Actions.userJoined(roomId, user));
   },
 
-  userLeft: (roomId, name) => {
+  userLeft: (roomId: number, name: string) => {
     store.dispatch(Actions.userLeft(roomId, name));
   },
 
-  sortGames: (roomId, field, order) => {
+  sortGames: (roomId: number, field: GameSortField, order: SortDirection) => {
     store.dispatch(Actions.sortGames(roomId, field, order));
   },
 
-  removeMessages: (roomId, name, amount) => {
+  removeMessages: (roomId: number, name: string, amount: number) => {
     store.dispatch(Actions.removeMessages(roomId, name, amount));
   },
 
-  gameCreated: (roomId) => {
+  gameCreated: (roomId: number) => {
     store.dispatch(Actions.gameCreated(roomId));
   },
 
-  joinedGame: (roomId, gameId) => {
+  joinedGame: (roomId: number, gameId: number) => {
     store.dispatch(Actions.joinedGame(roomId, gameId));
   }
 }

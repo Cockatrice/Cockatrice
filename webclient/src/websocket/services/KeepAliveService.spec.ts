@@ -1,3 +1,12 @@
+vi.mock('../WebClient', () => ({
+  __esModule: true,
+  default: {
+    socket: {
+      checkReadyState: vi.fn(),
+    },
+  },
+}));
+
 import { KeepAliveService } from './KeepAliveService';
 
 import webClient from '../WebClient';

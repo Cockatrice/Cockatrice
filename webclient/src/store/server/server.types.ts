@@ -28,6 +28,7 @@ export const Types = {
   REGISTRATION_EMAIL_ERROR: '[Server] Registration Email Error',
   REGISTRATION_PASSWORD_ERROR: '[Server] Registration Password Error',
   REGISTRATION_USERNAME_ERROR: '[Server] Registration Username Error',
+  CLEAR_REGISTRATION_ERRORS: '[Server] Clear Registration Errors',
   ACCOUNT_AWAITING_ACTIVATION: '[Server] Account Awaiting Activation',
   ACCOUNT_ACTIVATION_SUCCESS: '[Server] Account Activation Success',
   ACCOUNT_ACTIVATION_FAILED: '[Server] Account Activation Failed',
@@ -70,4 +71,4 @@ export const Types = {
   DECK_DELETE: '[Server] Deck Delete',
   // User games
   GAMES_OF_USER: '[Server] Games Of User',
-};
+} as const;

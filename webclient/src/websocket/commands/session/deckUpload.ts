@@ -8,7 +8,9 @@ export function deckUpload(path: string, deckId: number, deckList: string): void
   BackendService.sendSessionCommand(Command_DeckUpload_ext, create(Command_DeckUploadSchema, { path, deckId, deckList }), {
     responseExt: Response_DeckUpload_ext,
     onSuccess: (response) => {
-      SessionPersistence.uploadServerDeck(path, response.newFile);
+      if (response.newFile) {
+        SessionPersistence.uploadServerDeck(path, response.newFile);
+      }
     },
   });
 }

@@ -50,8 +50,10 @@ import { updateAdminNotes } from './updateAdminNotes';
 import { viewLogHistory } from './viewLogHistory';
 import { warnUser } from './warnUser';
 
-const { getLastSendOpts, invokeOnSuccess } = makeCallbackHelpers(
-  BackendService.sendModeratorCommand as vi.Mock,
+import { Mock } from 'vitest';
+
+const { invokeOnSuccess } = makeCallbackHelpers(
+  BackendService.sendModeratorCommand as Mock,
   2
 );
 
@@ -175,11 +177,11 @@ describe('getWarnList', () => {
     );
   });
 
-  it('onSuccess calls ModeratorPersistence.warnListOptions with warning', () => {
+  it('onSuccess calls ModeratorPersistence.warnListOptions with the response', () => {
     getWarnList('mod1', 'alice', 'US');
-    const resp = { warning: ['w1', 'w2'] };
+    const resp = { warning: ['w1', 'w2'], userName: 'alice', userClientid: 'US' };
     invokeOnSuccess(resp, { responseCode: 0 });
-    expect(ModeratorPersistence.warnListOptions).toHaveBeenCalledWith(['w1', 'w2']);
+    expect(ModeratorPersistence.warnListOptions).toHaveBeenCalledWith([resp]);
   });
 });
 

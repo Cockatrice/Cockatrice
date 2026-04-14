@@ -1,5 +1,4 @@
 vi.mock('store', () => ({
-  store: { getState: vi.fn().mockReturnValue({}) },
   RoomsDispatch: {
     clearStore: vi.fn(),
     joinRoom: vi.fn(),
@@ -13,23 +12,10 @@ vi.mock('store', () => ({
     gameCreated: vi.fn(),
     joinedGame: vi.fn(),
   },
-  RoomsSelectors: {
-    getRoom: vi.fn(),
-  },
-}));
-
-vi.mock('../utils/NormalizeService', () => ({
-  __esModule: true,
-  default: {
-    normalizeRoomInfo: vi.fn(),
-    normalizeGameObject: vi.fn(),
-    normalizeUserMessage: vi.fn(),
-  },
 }));
 
 import { RoomPersistence } from './RoomPersistence';
-import { store, RoomsDispatch, RoomsSelectors } from 'store';
-import NormalizeService from '../utils/NormalizeService';
+import { RoomsDispatch } from 'store';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -41,10 +27,9 @@ describe('RoomPersistence', () => {
     expect(RoomsDispatch.clearStore).toHaveBeenCalled();
   });
 
-  it('joinRoom normalizes and dispatches', () => {
+  it('joinRoom dispatches raw roomInfo', () => {
     const room = { roomId: 1 } as any;
     RoomPersistence.joinRoom(room);
-    expect(NormalizeService.normalizeRoomInfo).toHaveBeenCalledWith(room);
     expect(RoomsDispatch.joinRoom).toHaveBeenCalledWith(room);
   });
 
@@ -53,32 +38,17 @@ describe('RoomPersistence', () => {
     expect(RoomsDispatch.leaveRoom).toHaveBeenCalledWith(5);
   });
 
-  it('updateRooms -> RoomsDispatch.updateRooms', () => {
-    RoomPersistence.updateRooms([]);
-    expect(RoomsDispatch.updateRooms).toHaveBeenCalledWith([]);
+  it('updateRooms dispatches raw rooms', () => {
+    const rooms = [{ roomId: 1 }] as any;
+    RoomPersistence.updateRooms(rooms);
+    expect(RoomsDispatch.updateRooms).toHaveBeenCalledWith(rooms);
   });
 
   describe('updateGames', () => {
-    it('normalizes game when gameType is missing and room exists', () => {
-      const game = { gameType: null, gameTypes: [1] } as any;
-      const room = { gametypeMap: { 1: 'Standard' } } as any;
-      (RoomsSelectors.getRoom as vi.Mock).mockReturnValue(room);
+    it('dispatches raw game list', () => {
+      const game = { gameTypes: [1] } as any;
       RoomPersistence.updateGames(1, [game]);
-      expect(NormalizeService.normalizeGameObject).toHaveBeenCalledWith(game, room.gametypeMap);
       expect(RoomsDispatch.updateGames).toHaveBeenCalledWith(1, [game]);
-    });
-
-    it('does not normalize when game already has gameType', () => {
-      const game = { gameType: 'Standard' } as any;
-      RoomPersistence.updateGames(1, [game]);
-      expect(NormalizeService.normalizeGameObject).not.toHaveBeenCalled();
-    });
-
-    it('does not normalize when room is not found', () => {
-      const game = { gameType: null } as any;
-      (RoomsSelectors.getRoom as vi.Mock).mockReturnValue(null);
-      RoomPersistence.updateGames(1, [game]);
-      expect(NormalizeService.normalizeGameObject).not.toHaveBeenCalled();
     });
 
     it('returns without error when gameList is empty', () => {
@@ -92,10 +62,9 @@ describe('RoomPersistence', () => {
     });
   });
 
-  it('addMessage normalizes message and dispatches', () => {
+  it('addMessage dispatches without pre-normalizing', () => {
     const msg = { name: 'alice', message: 'hi' } as any;
     RoomPersistence.addMessage(1, msg);
-    expect(NormalizeService.normalizeUserMessage).toHaveBeenCalledWith(msg);
     expect(RoomsDispatch.addMessage).toHaveBeenCalledWith(1, msg);
   });
 

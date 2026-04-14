@@ -31,12 +31,12 @@ vi.mock('./', async () => {
   return { ...(actual as any), ...makeSessionBarrelMock() };
 });
 
+import { Mock } from 'vitest';
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
 import { BackendService } from '../../services/BackendService';
 import { SessionPersistence } from '../../persistence';
 import { RoomPersistence } from '../../persistence';
 import webClient from '../../WebClient';
-import * as SessionCommands from './';
 import { hashPassword, generateSalt, passwordSaltSupported } from '../../utils';
 import {
   Command_AccountEdit_ext,
@@ -95,15 +95,15 @@ import { replayGetCode } from './replayGetCode';
 import { replaySubmitCode } from './replaySubmitCode';
 
 const { invokeOnSuccess, invokeCallback } = makeCallbackHelpers(
-  BackendService.sendSessionCommand as vi.Mock,
+  BackendService.sendSessionCommand as Mock,
   2
 );
 
 beforeEach(() => {
   vi.clearAllMocks();
-  (hashPassword as vi.Mock).mockReturnValue('hashed_pw');
-  (generateSalt as vi.Mock).mockReturnValue('randSalt');
-  (passwordSaltSupported as vi.Mock).mockReturnValue(0);
+  (hashPassword as Mock).mockReturnValue('hashed_pw');
+  (generateSalt as Mock).mockReturnValue('randSalt');
+  (passwordSaltSupported as Mock).mockReturnValue(0);
 });
 
 // ----------------------------------------------------------------
@@ -215,9 +215,9 @@ describe('deckList', () => {
 
   it('calls updateServerDecks on success', () => {
     deckList();
-    const resp = { folders: [] };
-    invokeOnSuccess(resp, { responseCode: 0 });
-    expect(SessionPersistence.updateServerDecks).toHaveBeenCalledWith(resp);
+    const root = { items: [] };
+    invokeOnSuccess({ root }, { responseCode: 0 });
+    expect(SessionPersistence.updateServerDecks).toHaveBeenCalledWith({ root });
   });
 });
 
@@ -380,9 +380,8 @@ describe('ping', () => {
   it('calls pingReceived via onResponse', () => {
     const pingReceived = vi.fn();
     ping(pingReceived);
-    const raw = {};
-    invokeCallback('onResponse', raw);
-    expect(pingReceived).toHaveBeenCalledWith(raw);
+    invokeCallback('onResponse', {});
+    expect(pingReceived).toHaveBeenCalled();
   });
 });
 

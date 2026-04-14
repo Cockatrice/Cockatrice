@@ -1,7 +1,11 @@
-import { reset } from 'redux-form';
 import { Actions } from './server.actions';
 import { store } from 'store';
-import { DeckList, DeckStorageTreeItem, Game, ReplayMatch, WebSocketConnectOptions } from 'types';
+import {
+  BanHistoryItem, DeckList, DeckStorageTreeItem, GametypeMap, LogItem, ReplayMatch,
+  User, WarnHistoryItem, WarnListItem, WebSocketConnectOptions
+} from 'types';
+import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
+import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
 
 export const Dispatch = {
   initialized: () => {
@@ -10,13 +14,13 @@ export const Dispatch = {
   clearStore: () => {
     store.dispatch(Actions.clearStore());
   },
-  loginSuccessful: options => {
+  loginSuccessful: (options: WebSocketConnectOptions) => {
     store.dispatch(Actions.loginSuccessful(options));
   },
   loginFailed: () => {
     store.dispatch(Actions.loginFailed());
   },
-  connectionClosed: reason => {
+  connectionClosed: (reason: number) => {
     store.dispatch(Actions.connectionClosed(reason));
   },
   connectionFailed: () => {
@@ -28,57 +32,55 @@ export const Dispatch = {
   testConnectionFailed: () => {
     store.dispatch(Actions.testConnectionFailed());
   },
-  updateBuddyList: buddyList => {
+  updateBuddyList: (buddyList: User[]) => {
     store.dispatch(Actions.updateBuddyList(buddyList));
   },
-  addToBuddyList: user => {
-    store.dispatch(reset('addToBuddies'));
+  addToBuddyList: (user: User) => {
     store.dispatch(Actions.addToBuddyList(user));
   },
-  removeFromBuddyList: userName => {
+  removeFromBuddyList: (userName: string) => {
     store.dispatch(Actions.removeFromBuddyList(userName));
   },
-  updateIgnoreList: ignoreList => {
+  updateIgnoreList: (ignoreList: User[]) => {
     store.dispatch(Actions.updateIgnoreList(ignoreList));
   },
-  addToIgnoreList: user => {
-    store.dispatch(reset('addToIgnore'));
+  addToIgnoreList: (user: User) => {
     store.dispatch(Actions.addToIgnoreList(user));
   },
-  removeFromIgnoreList: userName => {
+  removeFromIgnoreList: (userName: string) => {
     store.dispatch(Actions.removeFromIgnoreList(userName));
   },
-  updateInfo: (name, version) => {
+  updateInfo: (name: string, version: string) => {
     store.dispatch(Actions.updateInfo({
       name,
       version
     }));
   },
-  updateStatus: (state, description) => {
+  updateStatus: (state: number, description: string) => {
     store.dispatch(Actions.updateStatus({
       state,
       description
     }));
   },
-  updateUser: user => {
+  updateUser: (user: User) => {
     store.dispatch(Actions.updateUser(user));
   },
-  updateUsers: users => {
+  updateUsers: (users: User[]) => {
     store.dispatch(Actions.updateUsers(users));
   },
-  userJoined: user => {
+  userJoined: (user: User) => {
     store.dispatch(Actions.userJoined(user));
   },
-  userLeft: name => {
+  userLeft: (name: string) => {
     store.dispatch(Actions.userLeft(name));
   },
-  viewLogs: name => {
-    store.dispatch(Actions.viewLogs(name));
+  viewLogs: (logs: LogItem[]) => {
+    store.dispatch(Actions.viewLogs(logs));
   },
   clearLogs: () => {
     store.dispatch(Actions.clearLogs());
   },
-  serverMessage: message => {
+  serverMessage: (message: string) => {
     store.dispatch(Actions.serverMessage(message));
   },
   registrationRequiresEmail: () => {
@@ -87,16 +89,19 @@ export const Dispatch = {
   registrationSuccess: () => {
     store.dispatch(Actions.registrationSuccess())
   },
-  registrationFailed: (error) => {
-    store.dispatch(Actions.registrationFailed(error));
+  registrationFailed: (reason: string, endTime?: number) => {
+    store.dispatch(Actions.registrationFailed(reason, endTime));
   },
-  registrationEmailError: (error) => {
+  clearRegistrationErrors: () => {
+    store.dispatch(Actions.clearRegistrationErrors());
+  },
+  registrationEmailError: (error: string) => {
     store.dispatch(Actions.registrationEmailError(error));
   },
-  registrationPasswordError: (error) => {
+  registrationPasswordError: (error: string) => {
     store.dispatch(Actions.registrationPasswordError(error));
   },
-  registrationUserNameError: (error) => {
+  registrationUserNameError: (error: string) => {
     store.dispatch(Actions.registrationUserNameError(error));
   },
   accountAwaitingActivation: (options: WebSocketConnectOptions) => {
@@ -120,7 +125,7 @@ export const Dispatch = {
   resetPasswordSuccess: () => {
     store.dispatch(Actions.resetPasswordSuccess());
   },
-  adjustMod: (userName, shouldBeMod, shouldBeJudge) => {
+  adjustMod: (userName: string, shouldBeMod: boolean, shouldBeJudge: boolean) => {
     store.dispatch(Actions.adjustMod(userName, shouldBeMod, shouldBeJudge));
   },
   reloadConfig: () => {
@@ -135,43 +140,43 @@ export const Dispatch = {
   accountPasswordChange: () => {
     store.dispatch(Actions.accountPasswordChange());
   },
-  accountEditChanged: (user) => {
+  accountEditChanged: (user: Partial<User>) => {
     store.dispatch(Actions.accountEditChanged(user));
   },
-  accountImageChanged: (user) => {
+  accountImageChanged: (user: Partial<User>) => {
     store.dispatch(Actions.accountImageChanged(user));
   },
-  getUserInfo: (userInfo) => {
+  getUserInfo: (userInfo: User) => {
     store.dispatch(Actions.getUserInfo(userInfo));
   },
-  notifyUser: (notification) => {
+  notifyUser: (notification: NotifyUserData) => {
     store.dispatch(Actions.notifyUser(notification))
   },
-  serverShutdown: (data) => {
+  serverShutdown: (data: ServerShutdownData) => {
     store.dispatch(Actions.serverShutdown(data))
   },
-  userMessage: (messageData) => {
+  userMessage: (messageData: UserMessageData) => {
     store.dispatch(Actions.userMessage(messageData))
   },
-  addToList: (list, userName) => {
+  addToList: (list: string, userName: string) => {
     store.dispatch(Actions.addToList(list, userName))
   },
-  removeFromList: (list, userName) => {
+  removeFromList: (list: string, userName: string) => {
     store.dispatch(Actions.removeFromList(list, userName))
   },
-  banFromServer: (userName) => {
+  banFromServer: (userName: string) => {
     store.dispatch(Actions.banFromServer(userName));
   },
-  banHistory: (userName, banHistory) => {
+  banHistory: (userName: string, banHistory: BanHistoryItem[]) => {
     store.dispatch(Actions.banHistory(userName, banHistory))
   },
-  warnHistory: (userName, warnHistory) => {
+  warnHistory: (userName: string, warnHistory: WarnHistoryItem[]) => {
     store.dispatch(Actions.warnHistory(userName, warnHistory))
   },
-  warnListOptions: (warnList) => {
+  warnListOptions: (warnList: WarnListItem[]) => {
     store.dispatch(Actions.warnListOptions(warnList))
   },
-  warnUser: (userName) => {
+  warnUser: (userName: string) => {
     store.dispatch(Actions.warnUser(userName))
   },
   grantReplayAccess: (replayId: number, moderatorName: string) => {
@@ -213,7 +218,7 @@ export const Dispatch = {
   deckDelete: (deckId: number) => {
     store.dispatch(Actions.deckDelete(deckId));
   },
-  gamesOfUser: (userName: string, games: Game[]) => {
-    store.dispatch(Actions.gamesOfUser(userName, games));
+  gamesOfUser: (userName: string, games: ServerInfo_Game[], gametypeMap: GametypeMap) => {
+    store.dispatch(Actions.gamesOfUser(userName, games, gametypeMap));
   },
 }

@@ -1,14 +1,14 @@
-import { store, RoomsDispatch, RoomsSelectors } from 'store';
-import { Game, Message, Room, User } from 'types';
-import NormalizeService from '../utils/NormalizeService';
+import { RoomsDispatch } from 'store';
+import { Message, User } from 'types';
+import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
+import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
 
 export class RoomPersistence {
   static clearStore() {
     RoomsDispatch.clearStore();
   }
 
-  static joinRoom(roomInfo: Room) {
-    NormalizeService.normalizeRoomInfo(roomInfo);
+  static joinRoom(roomInfo: ServerInfo_Room) {
     RoomsDispatch.joinRoom(roomInfo);
   }
 
@@ -16,32 +16,22 @@ export class RoomPersistence {
     RoomsDispatch.leaveRoom(roomId);
   }
 
-  static updateRooms(rooms: Room[]) {
+  static updateRooms(rooms: ServerInfo_Room[]) {
     RoomsDispatch.updateRooms(rooms);
   }
 
-  static updateGames(roomId: number, gameList: Game[]) {
+  static updateGames(roomId: number, gameList: ServerInfo_Game[]) {
+    // Guard: the server never sends an empty gameList to signal "clear all games".
+    // An empty array here means no game updates — skip the dispatch to avoid
+    // unnecessarily overwriting the existing game list with an empty one.
     if (!gameList?.length) {
       return;
-    }
-
-    const game = gameList[0];
-
-    if (!game.gameType) {
-      const room = RoomsSelectors.getRoom(store.getState(), roomId);
-
-      if (room) {
-        const { gametypeMap } = room;
-        NormalizeService.normalizeGameObject(game, gametypeMap);
-      }
     }
 
     RoomsDispatch.updateGames(roomId, gameList);
   }
 
   static addMessage(roomId: number, message: Message) {
-    NormalizeService.normalizeUserMessage(message);
-
     RoomsDispatch.addMessage(roomId, message);
   }
 

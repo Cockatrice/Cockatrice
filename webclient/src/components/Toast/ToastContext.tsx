@@ -1,4 +1,4 @@
-import { createContext, FC, PropsWithChildren, ReactChild, ReactNode, useContext, useEffect, useReducer, ContextType, Context } from 'react'
+import { createContext, FC, PropsWithChildren, ReactChild, ReactNode, useContext, useEffect, useReducer, Context } from 'react'
 
 import { ACTIONS, initialState, reducer } from './reducer';
 import Toast from './Toast'
@@ -18,10 +18,10 @@ interface ToastState {
 
 const ToastContext: Context<any> = createContext<ToastState>({
   toasts: new Map<string, ToastEntry>(),
-  addToast: (key, children) => {},
-  openToast: (key) => {},
-  closeToast: (key) => {},
-  removeToast: (key) => {},
+  addToast: (_key, _children) => {},
+  openToast: (_key) => {},
+  closeToast: (_key) => {},
+  removeToast: (_key) => {},
 });
 
 export const ToastProvider: FC<PropsWithChildren> = (props) => {
@@ -56,7 +56,7 @@ export interface ToastHookOptions {
   children: ReactNode
 }
 
-export function useToast<ToastHookOptions>({ key, children }) {
+export function useToast({ key, children }) {
   const { addToast, openToast, closeToast, removeToast } = useContext(ToastContext)
 
   useEffect(() => {

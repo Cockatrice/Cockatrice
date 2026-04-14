@@ -1,4 +1,3 @@
-import { connect } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -23,8 +22,4 @@ const Unsupported = () => {
   );
 };
 
-const mapStateToProps = state => ({
-
-});
-
-export default connect(mapStateToProps)(Unsupported);
+export default Unsupported;

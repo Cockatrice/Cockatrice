@@ -1,21 +1,7 @@
-export interface BanHistoryItem {
-    adminId: string;
-    adminName: string;
-    banTime: string;
-    banLength: string;
-    banReason: string;
-    visibleReason: string;
-}
+import type { ServerInfo_Ban } from 'generated/proto/serverinfo_ban_pb';
+import type { ServerInfo_Warning } from 'generated/proto/serverinfo_warning_pb';
+import type { Response_WarnList } from 'generated/proto/response_warn_list_pb';
 
-export interface WarnHistoryItem {
-    userName: string;
-    adminName: string;
-    reason: string;
-    timeOf: string;
-}
-
-export interface WarnListItem {
-    warning: string;
-    userName: string;
-    userClientid: string;
-}
+export type BanHistoryItem = ServerInfo_Ban;
+export type WarnHistoryItem = ServerInfo_Warning;
+export type WarnListItem = Response_WarnList;

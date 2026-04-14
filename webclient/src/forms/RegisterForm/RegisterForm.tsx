@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import setFieldTouched from 'final-form-set-field-touched';
@@ -9,7 +10,7 @@ import Typography from '@mui/material/Typography';
 
 import { CountryDropdown, InputField, KnownHosts } from 'components';
 import { useReduxEffect } from 'hooks';
-import { ServerTypes } from 'store';
+import { ServerDispatch, ServerSelectors, ServerTypes } from 'store';
 
 import './RegisterForm.css';
 import { useToast } from 'components/Toast';
@@ -17,13 +18,13 @@ import { useToast } from 'components/Toast';
 const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   const { t } = useTranslation();
   const [emailRequired, setEmailRequired] = useState(false);
-  const [error, setError] = useState(null);
   const [emailError, setEmailError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
   const [userNameError, setUserNameError] = useState(null);
+  const error = useSelector(ServerSelectors.getRegistrationError);
   const { openToast } = useToast({ key: 'registration-success', children: t('RegisterForm.toast.registerSuccess') })
 
-  const onHostChange = (host) => setEmailRequired(false);
+  const onHostChange = () => setEmailRequired(false);
   const onEmailChange = () => emailError && setEmailError(null);
   const onPasswordChange = () => passwordError && setPasswordError(null);
   const onUserNameChange = () => userNameError && setUserNameError(null);
@@ -31,10 +32,6 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   useReduxEffect(() => {
     setEmailRequired(true);
   }, ServerTypes.REGISTRATION_REQUIRES_EMAIL);
-
-  useReduxEffect(({ error }) => {
-    setError(error);
-  }, ServerTypes.REGISTRATION_FAILED);
 
   useReduxEffect(() => {
     openToast()
@@ -53,7 +50,7 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   }, ServerTypes.REGISTRATION_USERNAME_ERROR);
 
   const handleOnSubmit = ({ userName, email, realName, ...values }) => {
-    setError(null);
+    ServerDispatch.clearRegistrationErrors();
 
     userName = userName?.trim();
     email = email?.trim();
@@ -100,8 +97,7 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
 
   return (
     <Form onSubmit={handleOnSubmit} validate={validate} mutators={{ setFieldTouched }}>
-      {({ handleSubmit, form, ...args }) => {
-        const { values } = form.getState();
+      {({ handleSubmit, form }) => {
 
         if (emailRequired) {
           // Allow form render to complete

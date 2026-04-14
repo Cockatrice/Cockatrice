@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import { useTranslation } from 'react-i18next';
@@ -87,7 +87,7 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
         const onUserNameChange = (userName) => {
           const fieldChanged = host?.userName?.toLowerCase() !== values.userName?.toLowerCase();
           if (useStoredPassword(values.remember, values.password) && fieldChanged) {
-            setHost(({ hashedPassword, ...s }) => ({ ...s, userName }));
+            setHost(({ hashedPassword: _hashedPassword, ...s }) => ({ ...s, userName }));
           }
         }
 

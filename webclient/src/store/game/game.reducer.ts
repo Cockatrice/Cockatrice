@@ -7,6 +7,10 @@ import {
   PlayerInfo,
   PlayerProperties,
 } from 'types';
+import { create } from '@bufbuild/protobuf';
+import { ServerInfo_CardSchema } from 'generated/proto/serverinfo_card_pb';
+import { ServerInfo_CardCounterSchema } from 'generated/proto/serverinfo_cardcounter_pb';
+import { GameAction } from './game.actions';
 import { GameEntry, GameMessage, GamesState, PlayerEntry, ZoneEntry } from './game.interfaces';
 import { Types } from './game.types';
 
@@ -120,7 +124,7 @@ function buildEmptyCard(
   faceDown: boolean,
   providerId: string
 ): CardInfo {
-  return {
+  return create(ServerInfo_CardSchema, {
     id,
     name,
     x,
@@ -138,7 +142,7 @@ function buildEmptyCard(
     attachZone: '',
     attachCardId: -1,
     providerId,
-  };
+  });
 }
 
 // ── Initial state ─────────────────────────────────────────────────────────────
@@ -149,7 +153,7 @@ const initialState: GamesState = {
 
 // ── Reducer ───────────────────────────────────────────────────────────────────
 
-export const gamesReducer = (state: GamesState = initialState, action: any): GamesState => {
+export const gamesReducer = (state: GamesState = initialState, action: GameAction): GamesState => {
   switch (action.type) {
     case Types.CLEAR_STORE: {
       return initialState;
@@ -422,7 +426,7 @@ export const gamesReducer = (state: GamesState = initialState, action: any): Gam
         return state;
       }
 
-      const newCard: CardInfo = {
+      const newCard: CardInfo = create(ServerInfo_CardSchema, {
         id: cardId,
         name: cardName,
         x,
@@ -440,7 +444,7 @@ export const gamesReducer = (state: GamesState = initialState, action: any): Gam
         attachZone: '',
         attachCardId: -1,
         providerId: cardProviderId,
-      };
+      });
       return updateZone(state, gameId, playerId, zoneName, {
         cards: [...zone.cards, newCard],
         cardCount: zone.cardCount + 1,
@@ -514,7 +518,7 @@ export const gamesReducer = (state: GamesState = initialState, action: any): Gam
         newCounterList =
           existing >= 0
             ? card.counterList.map(c => (c.id === counterId ? { ...c, value: counterValue } : c))
-            : [...card.counterList, { id: counterId, value: counterValue }];
+            : [...card.counterList, create(ServerInfo_CardCounterSchema, { id: counterId, value: counterValue })];
       }
 
       const updatedCards = [...zone.cards];

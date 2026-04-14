@@ -1,9 +1,10 @@
 import * as _ from 'lodash';
 
-import { GameSortField, UserSortField, SortDirection } from 'types';
+import { GameSortField, Room, UserSortField, SortDirection } from 'types';
 
-import { SortUtil } from '../common';
+import { normalizeGameObject, normalizeGametypeMap, normalizeRoomInfo, normalizeUserMessage, SortUtil } from '../common';
 
+import { RoomsAction } from './rooms.actions';
 import { RoomsState } from './rooms.interfaces'
 import { MAX_ROOM_MESSAGES, Types } from './rooms.types';
 
@@ -23,7 +24,7 @@ const initialState: RoomsState = {
   }
 };
 
-export const roomsReducer = (state = initialState, action: any) => {
+export const roomsReducer = (state = initialState, action: RoomsAction) => {
   switch (action.type) {
     case Types.CLEAR_STORE: {
       return {
@@ -36,20 +37,21 @@ export const roomsReducer = (state = initialState, action: any) => {
         ...state.rooms
       };
 
-      // Server does not send everything on updates
-      _.each(action.rooms, (room, order) => {
-        const { roomId } = room;
+      // Server does not send everything on updates — preserve existing gameList/userList
+      _.each(action.rooms, (rawRoom, order) => {
+        const { gameList: _g, gametypeList, userList: _u, ...roomMeta } = rawRoom;
+        const { roomId } = roomMeta;
         const existing = rooms[roomId] || {};
 
-        const update = { ...room };
-        delete update.gameList;
-        delete update.gametypeList;
-        delete update.userList;
+        const gametypeMap = normalizeGametypeMap(gametypeList);
 
         rooms[roomId] = {
-          ...existing,
-          ...update,
-          order
+          ...(existing as Room),
+          ...roomMeta,
+          gametypeMap,
+          gameList: (existing as Room).gameList,
+          userList: (existing as Room).userList,
+          order,
         };
       });
 
@@ -57,9 +59,10 @@ export const roomsReducer = (state = initialState, action: any) => {
     }
 
     case Types.JOIN_ROOM: {
-      const { roomInfo } = action;
+      const { roomInfo: rawRoomInfo } = action;
       const { joinedRoomIds, rooms, sortGamesBy, sortUsersBy } = state;
 
+      const roomInfo = normalizeRoomInfo(rawRoomInfo);
       const { roomId } = roomInfo;
 
       const gameList = [
@@ -125,8 +128,8 @@ export const roomsReducer = (state = initialState, action: any) => {
         roomMessages.shift();
       }
 
-      message.timeReceived = new Date().getTime();
-      roomMessages.push(message);
+      const normalized = normalizeUserMessage({ ...message, timeReceived: Date.now() });
+      roomMessages.push(normalized);
 
       return {
         ...state,
@@ -150,8 +153,12 @@ export const roomsReducer = (state = initialState, action: any) => {
         return { ...state };
       }
 
+      // Normalize incoming raw proto games using the room's gametypeMap
+      const gametypeMap = room.gametypeMap ?? {};
+      const normalizedGames = games.map(g => normalizeGameObject(g, gametypeMap));
+
       // Create map of games with update objects
-      const toUpdate = games.reduce((map, game) => {
+      const toUpdate = normalizedGames.reduce((map, game) => {
         map[game.gameId] = game;
         return map;
       }, {});
@@ -319,6 +326,10 @@ export const roomsReducer = (state = initialState, action: any) => {
         }
       }
     }
+
+    // Signal-only — no state mutation needed; explicit for discriminated-union exhaustiveness
+    case Types.GAME_CREATED:
+      return state;
 
     default:
       return state;

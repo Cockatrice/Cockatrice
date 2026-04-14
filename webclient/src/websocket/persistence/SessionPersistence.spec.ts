@@ -64,26 +64,15 @@ vi.mock('websocket/utils', () => ({
   sanitizeHtml: vi.fn((msg: string) => `sanitized:${msg}`),
 }));
 
-vi.mock('../utils/NormalizeService', () => ({
-  __esModule: true,
-  default: {
-    normalizeBannedUserError: vi.fn((r: string, t: number) => `banned:${r}:${t}`),
-    normalizeGameObject: vi.fn(),
-  },
-}));
-
 import { SessionPersistence } from './SessionPersistence';
 import { ServerDispatch, GameDispatch } from 'store';
 import { sanitizeHtml } from 'websocket/utils';
-import NormalizeService from '../utils/NormalizeService';
 import { StatusEnum } from 'types';
+import { Mock } from 'vitest';
 
 beforeEach(() => {
   vi.clearAllMocks();
-  (sanitizeHtml as vi.Mock).mockImplementation((msg: string) => `sanitized:${msg}`);
-  (NormalizeService.normalizeBannedUserError as vi.Mock).mockImplementation(
-    (r: string, t: number) => `banned:${r}:${t}`
-  );
+  (sanitizeHtml as Mock).mockImplementation((msg: string) => `sanitized:${msg}`);
 });
 
 describe('SessionPersistence', () => {
@@ -230,15 +219,14 @@ describe('SessionPersistence', () => {
     expect(ServerDispatch.registrationSuccess).toHaveBeenCalled();
   });
 
-  it('registrationFailed normalizes ban error when endTime is given', () => {
+  it('registrationFailed passes reason and endTime to ServerDispatch', () => {
     SessionPersistence.registrationFailed('reason', 999);
-    expect(NormalizeService.normalizeBannedUserError).toHaveBeenCalledWith('reason', 999);
-    expect(ServerDispatch.registrationFailed).toHaveBeenCalledWith('banned:reason:999');
+    expect(ServerDispatch.registrationFailed).toHaveBeenCalledWith('reason', 999);
   });
 
-  it('registrationFailed uses reason directly when no endTime', () => {
+  it('registrationFailed passes reason only when no endTime', () => {
     SessionPersistence.registrationFailed('plain reason');
-    expect(ServerDispatch.registrationFailed).toHaveBeenCalledWith('plain reason');
+    expect(ServerDispatch.registrationFailed).toHaveBeenCalledWith('plain reason', undefined);
   });
 
   it('registrationEmailError passes error', () => {
@@ -298,18 +286,17 @@ describe('SessionPersistence', () => {
     expect(ServerDispatch.getUserInfo).toHaveBeenCalledWith(user);
   });
 
-  it('getGamesOfUser normalizes game list and dispatches gamesOfUser', () => {
+  it('getGamesOfUser builds gametypeMap and dispatches raw games with map', () => {
     const gt = { gameTypeId: 1, description: 'Standard' };
     const room = { gametypeList: [gt] };
     const game = { gameId: 5, roomId: 1, gameTypes: [1], description: 'My Game', started: false };
-    SessionPersistence.getGamesOfUser('alice', { roomList: [room], gameList: [game] });
-    expect(NormalizeService.normalizeGameObject).toHaveBeenCalledWith(game, { 1: 'Standard' });
-    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', [game]);
+    SessionPersistence.getGamesOfUser('alice', { roomList: [room], gameList: [game] } as any);
+    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', [game], { 1: 'Standard' });
   });
 
   it('getGamesOfUser handles empty response', () => {
-    SessionPersistence.getGamesOfUser('alice', {});
-    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', []);
+    SessionPersistence.getGamesOfUser('alice', {} as any);
+    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', [], {});
   });
 
   it('gameJoined dispatches via GameDispatch.gameJoined', () => {
@@ -328,8 +315,9 @@ describe('SessionPersistence', () => {
   });
 
   it('playerPropertiesChanged dispatches via GameDispatch', () => {
-    SessionPersistence.playerPropertiesChanged(5, 1, {} as any);
-    expect(GameDispatch.playerPropertiesChanged).toHaveBeenCalledWith(5, 1, {});
+    const props = { pingTime: 100 };
+    SessionPersistence.playerPropertiesChanged(5, 1, { playerProperties: props } as any);
+    expect(GameDispatch.playerPropertiesChanged).toHaveBeenCalledWith(5, 1, props);
   });
 
   it('serverShutdown passes data', () => {

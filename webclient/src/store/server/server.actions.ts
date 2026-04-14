@@ -1,4 +1,10 @@
-import { DeckList, DeckStorageTreeItem, Game, ReplayMatch, WebSocketConnectOptions } from 'types';
+import {
+  BanHistoryItem, DeckList, DeckStorageTreeItem, GametypeMap, LogItem, ReplayMatch,
+  User, WebSocketConnectOptions, WarnHistoryItem, WarnListItem
+} from 'types';
+import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
+import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
+import { ServerStateStatus } from './server.interfaces';
 import { Types } from './server.types';
 
 export const Actions = {
@@ -15,7 +21,7 @@ export const Actions = {
   loginFailed: () => ({
     type: Types.LOGIN_FAILED,
   }),
-  connectionClosed: reason => ({
+  connectionClosed: (reason: number) => ({
     type: Types.CONNECTION_CLOSED,
     reason
   }),
@@ -28,59 +34,59 @@ export const Actions = {
   testConnectionFailed: () => ({
     type: Types.TEST_CONNECTION_FAILED,
   }),
-  serverMessage: message => ({
+  serverMessage: (message: string) => ({
     type: Types.SERVER_MESSAGE,
     message
   }),
-  updateBuddyList: buddyList => ({
+  updateBuddyList: (buddyList: User[]) => ({
     type: Types.UPDATE_BUDDY_LIST,
     buddyList
   }),
-  addToBuddyList: user => ({
+  addToBuddyList: (user: User) => ({
     type: Types.ADD_TO_BUDDY_LIST,
     user
   }),
-  removeFromBuddyList: userName => ({
+  removeFromBuddyList: (userName: string) => ({
     type: Types.REMOVE_FROM_BUDDY_LIST,
     userName
   }),
-  updateIgnoreList: ignoreList => ({
+  updateIgnoreList: (ignoreList: User[]) => ({
     type: Types.UPDATE_IGNORE_LIST,
     ignoreList
   }),
-  addToIgnoreList: user => ({
+  addToIgnoreList: (user: User) => ({
     type: Types.ADD_TO_IGNORE_LIST,
     user
   }),
-  removeFromIgnoreList: userName => ({
+  removeFromIgnoreList: (userName: string) => ({
     type: Types.REMOVE_FROM_IGNORE_LIST,
     userName
   }),
-  updateInfo: info => ({
+  updateInfo: (info: { name: string; version: string }) => ({
     type: Types.UPDATE_INFO,
     info
   }),
-  updateStatus: status => ({
+  updateStatus: (status: ServerStateStatus) => ({
     type: Types.UPDATE_STATUS,
     status
   }),
-  updateUser: user => ({
+  updateUser: (user: User) => ({
     type: Types.UPDATE_USER,
     user
   }),
-  updateUsers: users => ({
+  updateUsers: (users: User[]) => ({
     type: Types.UPDATE_USERS,
     users
   }),
-  userJoined: user => ({
+  userJoined: (user: User) => ({
     type: Types.USER_JOINED,
     user
   }),
-  userLeft: name => ({
+  userLeft: (name: string) => ({
     type: Types.USER_LEFT,
     name
   }),
-  viewLogs: logs => ({
+  viewLogs: (logs: LogItem[]) => ({
     type: Types.VIEW_LOGS,
     logs
   }),
@@ -93,21 +99,25 @@ export const Actions = {
   registrationSuccess: () => ({
     type: Types.REGISTRATION_SUCCESS,
   }),
-  registrationFailed: (error) => ({
+  registrationFailed: (reason: string, endTime?: number) => ({
     type: Types.REGISTRATION_FAILED,
-    error
+    reason,
+    endTime,
   }),
-  registrationEmailError: (error) => ({
+  registrationEmailError: (error: string) => ({
     type: Types.REGISTRATION_EMAIL_ERROR,
     error
   }),
-  registrationPasswordError: (error) => ({
+  registrationPasswordError: (error: string) => ({
     type: Types.REGISTRATION_PASSWORD_ERROR,
     error
   }),
-  registrationUserNameError: (error) => ({
+  registrationUserNameError: (error: string) => ({
     type: Types.REGISTRATION_USERNAME_ERROR,
     error
+  }),
+  clearRegistrationErrors: () => ({
+    type: Types.CLEAR_REGISTRATION_ERRORS,
   }),
   accountAwaitingActivation: (options: WebSocketConnectOptions) => ({
     type: Types.ACCOUNT_AWAITING_ACTIVATION,
@@ -131,7 +141,7 @@ export const Actions = {
   resetPasswordSuccess: () => ({
     type: Types.RESET_PASSWORD_SUCCESS,
   }),
-  adjustMod: (userName, shouldBeMod, shouldBeJudge) => ({
+  adjustMod: (userName: string, shouldBeMod: boolean, shouldBeJudge: boolean) => ({
     type: Types.ADJUST_MOD,
     userName,
     shouldBeMod,
@@ -149,59 +159,59 @@ export const Actions = {
   accountPasswordChange: () => ({
     type: Types.ACCOUNT_PASSWORD_CHANGE,
   }),
-  accountEditChanged: (user) => ({
+  accountEditChanged: (user: Partial<User>) => ({
     type: Types.ACCOUNT_EDIT_CHANGED,
     user,
   }),
-  accountImageChanged: (user) => ({
+  accountImageChanged: (user: Partial<User>) => ({
     type: Types.ACCOUNT_IMAGE_CHANGED,
     user,
   }),
-  getUserInfo: (userInfo) => ({
+  getUserInfo: (userInfo: User) => ({
     type: Types.GET_USER_INFO,
     userInfo,
   }),
-  notifyUser: (notification) => ({
+  notifyUser: (notification: NotifyUserData) => ({
     type: Types.NOTIFY_USER,
     notification,
   }),
-  serverShutdown: (data) => ({
+  serverShutdown: (data: ServerShutdownData) => ({
     type: Types.SERVER_SHUTDOWN,
     data,
   }),
-  userMessage: (messageData) => ({
+  userMessage: (messageData: UserMessageData) => ({
     type: Types.USER_MESSAGE,
     messageData,
   }),
-  addToList: (list, userName) => ({
+  addToList: (list: string, userName: string) => ({
     type: Types.ADD_TO_LIST,
     list,
     userName,
   }),
-  removeFromList: (list, userName) => ({
+  removeFromList: (list: string, userName: string) => ({
     type: Types.REMOVE_FROM_LIST,
     list,
     userName,
   }),
-  banFromServer: (userName) => ({
+  banFromServer: (userName: string) => ({
     type: Types.BAN_FROM_SERVER,
     userName,
   }),
-  banHistory: (userName, banHistory) => ({
+  banHistory: (userName: string, banHistory: BanHistoryItem[]) => ({
     type: Types.BAN_HISTORY,
     userName,
     banHistory,
   }),
-  warnHistory: (userName, warnHistory) => ({
+  warnHistory: (userName: string, warnHistory: WarnHistoryItem[]) => ({
     type: Types.WARN_HISTORY,
     userName,
     warnHistory,
   }),
-  warnListOptions: (warnList) => ({
+  warnListOptions: (warnList: WarnListItem[]) => ({
     type: Types.WARN_LIST_OPTIONS,
     warnList,
   }),
-  warnUser: (userName) => ({
+  warnUser: (userName: string) => ({
     type: Types.WARN_USER,
     userName,
   }),
@@ -234,5 +244,8 @@ export const Actions = {
   deckDelDir: (path: string) => ({ type: Types.DECK_DEL_DIR, path }),
   deckUpload: (path: string, treeItem: DeckStorageTreeItem) => ({ type: Types.DECK_UPLOAD, path, treeItem }),
   deckDelete: (deckId: number) => ({ type: Types.DECK_DELETE, deckId }),
-  gamesOfUser: (userName: string, games: Game[]) => ({ type: Types.GAMES_OF_USER, userName, games }),
+  gamesOfUser: (userName: string, games: ServerInfo_Game[], gametypeMap: GametypeMap) =>
+    ({ type: Types.GAMES_OF_USER, userName, games, gametypeMap }),
 }
+
+export type ServerAction = ReturnType<typeof Actions[keyof typeof Actions]>;

@@ -92,16 +92,14 @@ describe('Selectors', () => {
   });
 
   it('getRoomGames → returns gameList for roomId', () => {
-    const games = [makeGame()];
-    const room = makeRoom({ roomId: 1, gameList: games });
+    const room = makeRoom({ roomId: 1, gameList: [makeGame()] });
     const state = makeRoomsState({ rooms: { 1: room } });
-    expect(Selectors.getRoomGames(rootState(state), 1)).toBe(games);
+    expect(Selectors.getRoomGames(rootState(state), 1)).toBe(room.gameList);
   });
 
   it('getRoomUsers → returns userList for roomId', () => {
-    const users = [makeUser()];
-    const room = makeRoom({ roomId: 1, userList: users });
+    const room = makeRoom({ roomId: 1, userList: [makeUser()] });
     const state = makeRoomsState({ rooms: { 1: room } });
-    expect(Selectors.getRoomUsers(rootState(state), 1)).toBe(users);
+    expect(Selectors.getRoomUsers(rootState(state), 1)).toBe(room.userList);
   });
 });

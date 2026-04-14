@@ -1,23 +1,31 @@
 vi.mock('./services/WebSocketService', () => ({
-  WebSocketService: vi.fn().mockImplementation(() => ({
-    message$: { subscribe: vi.fn() },
-    connect: vi.fn(),
-    testConnect: vi.fn(),
-    disconnect: vi.fn(),
-  })),
+  WebSocketService: vi.fn().mockImplementation(function WebSocketServiceImpl() {
+    return {
+      message$: { subscribe: vi.fn() },
+      connect: vi.fn(),
+      testConnect: vi.fn(),
+      disconnect: vi.fn(),
+    };
+  }),
 }));
 
 vi.mock('./services/ProtobufService', () => ({
-  ProtobufService: vi.fn().mockImplementation(() => ({
-    handleMessageEvent: vi.fn(),
-    sendKeepAliveCommand: vi.fn(),
-    resetCommands: vi.fn(),
-  })),
+  ProtobufService: vi.fn().mockImplementation(function ProtobufServiceImpl() {
+    return {
+      handleMessageEvent: vi.fn(),
+      sendKeepAliveCommand: vi.fn(),
+      resetCommands: vi.fn(),
+    };
+  }),
 }));
 
 vi.mock('./persistence', () => ({
   RoomPersistence: { clearStore: vi.fn() },
   SessionPersistence: { clearStore: vi.fn(), initialized: vi.fn() },
+}));
+
+vi.mock('store', () => ({
+  GameDispatch: { clearStore: vi.fn() },
 }));
 
 import { WebClient } from './WebClient';
@@ -26,6 +34,7 @@ import { ProtobufService } from './services/ProtobufService';
 import { RoomPersistence, SessionPersistence } from './persistence';
 import { StatusEnum } from 'types';
 import { Subject } from 'rxjs';
+import { Mock } from 'vitest';
 
 describe('WebClient', () => {
   let client: WebClient;
@@ -33,18 +42,22 @@ describe('WebClient', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (ProtobufService as vi.Mock).mockImplementation(() => ({
-      handleMessageEvent: vi.fn(),
-      sendKeepAliveCommand: vi.fn(),
-      resetCommands: vi.fn(),
-    }));
+    (ProtobufService as Mock).mockImplementation(function ProtobufServiceImpl() {
+      return {
+        handleMessageEvent: vi.fn(),
+        sendKeepAliveCommand: vi.fn(),
+        resetCommands: vi.fn(),
+      };
+    });
     messageSubject = new Subject<MessageEvent>();
-    (WebSocketService as vi.Mock).mockImplementation(() => ({
-      message$: messageSubject,
-      connect: vi.fn(),
-      testConnect: vi.fn(),
-      disconnect: vi.fn(),
-    }));
+    (WebSocketService as Mock).mockImplementation(function WebSocketServiceImpl() {
+      return {
+        message$: messageSubject,
+        connect: vi.fn(),
+        testConnect: vi.fn(),
+        disconnect: vi.fn(),
+      };
+    });
     // suppress console.log from constructor in non-test-env check
     vi.spyOn(console, 'log').mockImplementation(() => {});
     client = new WebClient();

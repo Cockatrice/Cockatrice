@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import { NavLink, useNavigate, generatePath } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
@@ -8,17 +7,26 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CloseIcon from '@mui/icons-material/Close';
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutline';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import * as _ from 'lodash';
 
 import { AuthenticationService, RoomsService } from 'api';
 import { CardImportDialog } from 'dialogs';
 import { Images } from 'images';
 import { RoomsSelectors, ServerSelectors } from 'store';
-import { Room, RouteEnum, User } from 'types';
+import { RouteEnum } from 'types';
+import { useAppSelector } from 'store/store';
 
 import './LeftNav.css';
 
-const LeftNav = ({ joinedRooms, serverState, user }: LeftNavProps) => {
+interface LeftNavState {
+  anchorEl: Element;
+  showCardImportDialog: boolean;
+  options: string[];
+}
+
+const LeftNav = () => {
+  const joinedRooms = useAppSelector(state => RoomsSelectors.getJoinedRooms(state));
+  const serverState = useAppSelector(state => ServerSelectors.getState(state));
+  const user = useAppSelector(state => ServerSelectors.getUser(state));
   const navigate = useNavigate();
   const [state, setState] = useState<LeftNavState>({
     anchorEl: null,
@@ -147,12 +155,12 @@ const LeftNav = ({ joinedRooms, serverState, user }: LeftNavProps) => {
                     }}
                   >
                     {state.options.map((option) => (
-                      <MenuItem key={option} onClick={(event) => handleMenuItemClick(option)}>
+                      <MenuItem key={option} onClick={() => handleMenuItemClick(option)}>
                         {option}
                       </MenuItem>
                     ))}
 
-                    <MenuItem key='Import Cards' onClick={(event) => openImportCardWizard()}>
+                    <MenuItem key='Import Cards' onClick={() => openImportCardWizard()}>
                       Import Cards
                     </MenuItem>
                   </Menu>
@@ -171,25 +179,4 @@ const LeftNav = ({ joinedRooms, serverState, user }: LeftNavProps) => {
   );
 }
 
-interface LeftNavProps {
-  serverState: number;
-  server: string;
-  user: User;
-  joinedRooms: Room[];
-  showNav?: boolean;
-}
-
-interface LeftNavState {
-  anchorEl: Element;
-  showCardImportDialog: boolean;
-  options: string[];
-}
-
-const mapStateToProps = state => ({
-  serverState: ServerSelectors.getState(state),
-  server: ServerSelectors.getName(state),
-  user: ServerSelectors.getUser(state),
-  joinedRooms: RoomsSelectors.getJoinedRooms(state),
-});
-
-export default connect(mapStateToProps)(LeftNav);
+export default LeftNav;

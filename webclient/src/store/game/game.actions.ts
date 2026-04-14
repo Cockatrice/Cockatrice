@@ -232,3 +232,5 @@ export const Actions = {
     message,
   }),
 };
+
+export type GameAction = ReturnType<typeof Actions[keyof typeof Actions]>;
