@@ -1236,6 +1236,8 @@ StorageSettingsPage::StorageSettingsPage()
     connect(&clearDownloadedPicsButton, &QPushButton::clicked, this,
             &StorageSettingsPage::clearDownloadedPicsButtonClicked);
 
+    connect(&clearPixmapCacheButton, &QPushButton::clicked, this, &StorageSettingsPage::clearPixmapCacheButtonClicked);
+
     // pixmap cache
     pixmapCacheEdit.setMinimum(PIXMAPCACHE_SIZE_MIN);
     // 2047 is the max value to avoid overflowing of QPixmapCache::setCacheLimit(int size)
@@ -1328,6 +1330,7 @@ StorageSettingsPage::StorageSettingsPage()
     networkRedirectCacheLayout->addWidget(&networkRedirectCacheTtlEdit);
 
     auto pixmapCacheLayout = new QHBoxLayout;
+    pixmapCacheLayout->addWidget(&clearPixmapCacheButton);
     pixmapCacheLayout->addStretch();
     pixmapCacheLayout->addWidget(&pixmapCacheLabel);
     pixmapCacheLayout->addWidget(&pixmapCacheEdit);
@@ -1338,10 +1341,9 @@ StorageSettingsPage::StorageSettingsPage()
 
     // Image Backup Layout
     lpImageBackupGrid->addWidget(&imageBackupExplainerLabel, 0, 0, 1, 2);
-    lpImageBackupGrid->addWidget(&saveCardImagesToLocalStorageCheckBox, 1, 0);
-    lpImageBackupGrid->addWidget(&localCardImageStorageNamingSchemeLabel, 2, 0);
-    lpImageBackupGrid->addWidget(localCardImageStorageNamingSchemeComboBox, 2, 1);
-    lpImageBackupGrid->addWidget(&clearBackupsButton, 3, 1);
+    lpImageBackupGrid->addWidget(&localCardImageStorageNamingSchemeLabel, 1, 0);
+    lpImageBackupGrid->addWidget(localCardImageStorageNamingSchemeComboBox, 1, 1);
+    lpImageBackupGrid->addWidget(&clearBackupsButton, 2, 1);
 
     lpPixmapCacheGrid->addWidget(&pixmapCacheExplainerLabel, 0, 0);
     lpPixmapCacheGrid->addLayout(pixmapCacheLayout, 1, 1);
@@ -1407,6 +1409,12 @@ void StorageSettingsPage::clearImageBackupsButtonClicked()
     }
 }
 
+void StorageSettingsPage::clearPixmapCacheButtonClicked()
+{
+    CardPictureLoader::clearPixmapCache();
+    QMessageBox::information(this, tr("Success"), tr("In-memory (currently loaded) card pictures have been reset."));
+}
+
 void StorageSettingsPage::retranslateUi()
 {
     cardPictureLoaderCacheMethodLabel.setText(tr("Card Picture Loader Caching Method:"));
@@ -1432,6 +1440,7 @@ void StorageSettingsPage::retranslateUi()
 
     clearDownloadedPicsButton.setText(tr("Delete Cached Images"));
     clearBackupsButton.setText(tr("Delete Saved Images"));
+    clearPixmapCacheButton.setText(tr("Clear In-Memory Images"));
 
     mpCacheMethodGroupBox->setTitle(tr("Card Picture Loader Cache Method"));
     mpNetworkCacheGroupBox->setTitle(tr("Network Cache"));
@@ -1444,7 +1453,6 @@ void StorageSettingsPage::retranslateUi()
     networkRedirectCacheTtlEdit.setToolTip(tr("How long cached redirects for urls are valid for."));
     pixmapCacheLabel.setText(tr("Picture Cache Size:"));
     pixmapCacheEdit.setToolTip(tr("In-memory cache for pictures not currently on screen"));
-    saveCardImagesToLocalStorageCheckBox.setText(tr("Back up downloaded images to local storage"));
     localCardImageStorageNamingSchemeLabel.setText(tr("Naming scheme:"));
 
     networkRedirectCacheTtlEdit.setSuffix(" " + tr("Day(s)"));

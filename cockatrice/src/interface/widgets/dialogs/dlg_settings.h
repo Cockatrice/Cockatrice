@@ -244,10 +244,12 @@ public:
 private slots:
     void clearDownloadedPicsButtonClicked();
     void clearImageBackupsButtonClicked();
+    void clearPixmapCacheButtonClicked();
 
 private:
     QPushButton clearDownloadedPicsButton;
     QPushButton clearBackupsButton;
+    QPushButton clearPixmapCacheButton;
 
     QGroupBox *mpCacheMethodGroupBox;
     QGroupBox *mpNetworkCacheGroupBox;
@@ -266,7 +268,6 @@ private:
     QSpinBox networkRedirectCacheTtlEdit;
     QSpinBox pixmapCacheEdit;
     QLabel pixmapCacheLabel;
-    QCheckBox saveCardImagesToLocalStorageCheckBox;
     QLabel localCardImageStorageNamingSchemeLabel;
     QComboBox *localCardImageStorageNamingSchemeComboBox;
 };
