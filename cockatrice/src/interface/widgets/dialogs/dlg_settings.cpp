@@ -1343,10 +1343,10 @@ StorageSettingsPage::StorageSettingsPage()
     lpImageBackupGrid->addWidget(&imageBackupExplainerLabel, 0, 0, 1, 2);
     lpImageBackupGrid->addWidget(&localCardImageStorageNamingSchemeLabel, 1, 0);
     lpImageBackupGrid->addWidget(localCardImageStorageNamingSchemeComboBox, 1, 1);
-    lpImageBackupGrid->addWidget(&clearBackupsButton, 2, 1);
+    lpImageBackupGrid->addWidget(&clearBackupsButton, 2, 0);
 
     lpPixmapCacheGrid->addWidget(&pixmapCacheExplainerLabel, 0, 0);
-    lpPixmapCacheGrid->addLayout(pixmapCacheLayout, 1, 1);
+    lpPixmapCacheGrid->addLayout(pixmapCacheLayout, 1, 0);
 
     connect(&pixmapCacheEdit, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
             &SettingsCache::setPixmapCacheSize);

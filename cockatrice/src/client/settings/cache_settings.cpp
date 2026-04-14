@@ -274,7 +274,7 @@ SettingsCache::SettingsCache()
     localCardImageStorageNamingScheme =
         settings
             ->value("personal/localCardImageStorageNamingScheme",
-                    static_cast<int>(CardPictureLoaderLocalSchemes::NamingScheme::Set_Folder_Name_ProviderId))
+                    static_cast<int>(CardPictureLoaderLocalSchemes::NamingScheme::Set_Folder_Name_Set_Collector))
             .toInt();
 
     picDownload = settings->value("personal/picturedownload", true).toBool();
