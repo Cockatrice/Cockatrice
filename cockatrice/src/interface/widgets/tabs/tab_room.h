@@ -127,6 +127,10 @@ public:
     {
         return ownUser;
     }
+    [[nodiscard]] GameSelector *getGameSelector() const
+    {
+        return gameSelector;
+    }
 
     PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd);
     void sendRoomCommand(PendingCommand *pend);
