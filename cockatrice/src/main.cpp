@@ -25,6 +25,7 @@
 #include "client/sound_engine.h"
 #include "database/interface/settings_card_preference_provider.h"
 #include "interface/intents/intent_open_local_deck.h"
+#include "interface/intents/url_parser.h"
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
@@ -317,7 +318,8 @@ int main(int argc, char *argv[])
 
     for (const QString &file : startupFiles) {
         if (file.startsWith("cockatrice://")) {
-            // ui.openUrl(QUrl(file));
+            auto urlParser = new IntentUrlParser(&ui, &ui);
+            urlParser->handle(file);
         } else if (QFileInfo(file).exists()) {
             auto openDeckIntent = new IntentOpenLocalDeck(ui.getTabSupervisor(), file);
             openDeckIntent->execute();
@@ -328,7 +330,8 @@ int main(int argc, char *argv[])
     QObject::connect(&instance, &SingleInstanceManager::filesReceived, [&ui](const QStringList &files) {
         for (const QString &file : files) {
             if (file.startsWith("cockatrice://")) {
-                // ui.openUrl(QUrl(file));
+                auto urlParser = new IntentUrlParser(&ui, &ui);
+                urlParser->handle(file);
             } else if (QFileInfo(file).exists()) {
                 auto openDeckIntent = new IntentOpenLocalDeck(ui.getTabSupervisor(), file);
                 openDeckIntent->execute();

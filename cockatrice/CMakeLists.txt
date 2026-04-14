@@ -330,6 +330,17 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
     src/single_instance_manager.cpp
     src/single_instance_manager.h
+    src/interface/intents/intent_connect_to_server.cpp
+    src/interface/intents/intent_connect_to_server.h
+    src/interface/intents/intent_disconnect_from_server.cpp
+    src/interface/intents/intent_disconnect_from_server.h
+    src/interface/intents/intent_join_server_game.cpp
+    src/interface/intents/intent_join_server_room.cpp
+    src/interface/intents/intent_join_server_room.h
+    src/interface/intents/url_parser.cpp
+    src/interface/intents/url_parser.h
+    src/interface/intents/intent_login.cpp
+    src/interface/intents/intent_login.h
 )
 
 add_subdirectory(sounds)

@@ -305,6 +305,7 @@ void GameSelector::customContextMenu(const QPoint &point)
     connect(&getGameInfo, &QAction::triggered, this, [=, this]() {
         const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
         const QMap<int, QString> &gameTypes = gameListModel->getGameTypes().value(gameInfo.room_id());
+        qWarning() << "Game Id: " << gameInfo.game_id();
 
         DlgCreateGame dlg(gameInfo, gameTypes, this);
         dlg.exec();
@@ -372,6 +373,24 @@ void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
     r->sendRoomCommand(pend);
 
     disableButtons();
+}
+
+bool GameSelector::joinGameById(int gameId)
+{
+    auto *model = gameListView->model();
+
+    for (int row = 0; row < model->rowCount(); ++row) {
+        QModelIndex idx = model->index(row, 0);
+        const ServerInfo_Game &game = gameListModel->getGame(idx.data(Qt::UserRole).toInt());
+        if (game.game_id() == gameId) {
+            gameListView->setCurrentIndex(idx);
+            joinGame();
+            return true;
+        }
+    }
+
+    qWarning() << "Game" << gameId << "not found";
+    return false;
 }
 
 void GameSelector::disableButtons()
