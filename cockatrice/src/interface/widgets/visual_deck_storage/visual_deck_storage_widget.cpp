@@ -1,6 +1,7 @@
 #include "visual_deck_storage_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../general/tutorial/tutorial_controller.h"
 #include "../quick_settings/settings_button_widget.h"
 #include "deck_preview/deck_preview_widget.h"
 #include "visual_deck_storage_folder_display_widget.h"
@@ -86,6 +87,30 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     } else {
         scrollArea->setWidget(databaseLoadIndicator);
     }
+}
+
+TutorialSequence VisualDeckStorageWidget::generateTutorialSequence(TutorialSequence vdsSequence)
+{
+    vdsSequence.addStep(
+        {this, tr("This is the visual deck storage. It displays all the files and folders located in "
+                  "your default deck storage location. You can adjust this location in the settings.")});
+    vdsSequence.addStep({searchAndSortContainer,
+                         tr("You can filter the decks in your collection using these widgets. Check the (i) symbol in "
+                            "the search bar for more information on the syntax used to filter decks.")});
+    vdsSequence.addStep(
+        {tagFilterWidget,
+         tr("Additionally, the VDS allows you to assign and filter by tags. This is very helpful for large deck "
+            "collections, as it allows you to group similar decks (i.e. by power level or theme) and then 'drill down' "
+            "to exactly the combination of tags that interests you (i.e. 'I want to play a mid-power deck focused on "
+            "this type of card that wins with this strategy.')\n\nYou can left-click a tag to add it to the "
+            "filter.\nThe widget will then automatically filter the list to only include tags from decks which also "
+            "contain your original tag.\n\nYou can exclude a tag by right-clicking it.\n\nYou can clear a tags filter "
+            "status with the middle mouse button.")});
+    vdsSequence.addStep({scrollArea, tr("This is where all your local decks will be displayed. You can customize their "
+                                        "display status using the cogwheel in the top right.\nYou can select a deck by "
+                                        "double-clicking it.\n\nRight-click a deck for more options.")});
+
+    return vdsSequence;
 }
 
 void VisualDeckStorageWidget::refreshIfPossible()

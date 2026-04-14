@@ -7,6 +7,7 @@
 #ifndef DECK_ANALYTICS_WIDGET_H
 #define DECK_ANALYTICS_WIDGET_H
 
+#include "../general/tutorial/tutorial_controller.h"
 #include "abstract_analytics_panel_widget.h"
 #include "deck_list_statistics_analyzer.h"
 #include "resizable_panel.h"
@@ -29,6 +30,7 @@ public slots:
 public:
     explicit DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer);
     void retranslateUi();
+    TutorialSequence generateTutorialSequence();
 
 private slots:
     void onAddPanel();
