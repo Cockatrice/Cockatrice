@@ -1,5 +1,6 @@
 #ifndef COCKATRICE_CARD_PICTURE_LOADER_CACHE_METHOD_H
 #define COCKATRICE_CARD_PICTURE_LOADER_CACHE_METHOD_H
+#include <QCoreApplication>
 #include <QList>
 #include <QString>
 
@@ -20,8 +21,9 @@ struct CacheMethodInfo
 static inline const QList<CacheMethodInfo> methods()
 {
     static QList<CacheMethodInfo> all = {
-        {CacheMethod::NETWORK_CACHE, "Network Cache"},
-        {CacheMethod::FILESYSTEM_CACHE, "Filesystem Cache"},
+        {CacheMethod::NETWORK_CACHE, QCoreApplication::translate("CardPictureLoaderCacheMethod", "Network Cache")},
+        {CacheMethod::FILESYSTEM_CACHE,
+         QCoreApplication::translate("CardPictureLoaderCacheMethod", "Filesystem Cache")},
     };
     return all;
 }
