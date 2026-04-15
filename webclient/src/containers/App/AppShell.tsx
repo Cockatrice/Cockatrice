@@ -1,4 +1,4 @@
-import { Component, Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -10,33 +10,31 @@ import './AppShell.css';
 
 import { ToastProvider } from '@app/components'
 
-class AppShell extends Component {
-  componentDidMount() {
+function AppShell() {
+  useEffect(() => {
     // @TODO (1)
     window.onbeforeunload = () => true;
-  }
+  }, []);
 
-  handleContextMenu(event) {
+  const handleContextMenu = (event) => {
     event.preventDefault();
-  }
+  };
 
-  render() {
-    return (
-      <Suspense fallback="loading">
-        <Provider store={store}>
-          <CssBaseline />
-          <ToastProvider>
-            <div className="AppShell" onContextMenu={this.handleContextMenu}>
-              <Router>
-                <FeatureDetection />
-                <Routes />
-              </Router>
-            </div>
-          </ToastProvider>
-        </Provider>
-      </Suspense>
-    );
-  }
+  return (
+    <Suspense fallback="loading">
+      <Provider store={store}>
+        <CssBaseline />
+        <ToastProvider>
+          <div className="AppShell" onContextMenu={handleContextMenu}>
+            <Router>
+              <FeatureDetection />
+              <Routes />
+            </Router>
+          </div>
+        </ToastProvider>
+      </Provider>
+    </Suspense>
+  );
 }
 
 export default AppShell;

@@ -898,17 +898,20 @@ describe('2J: Turn, phase, and chat', () => {
 
   it('GAME_SAY → appends message with mocked Date.now() as timeReceived', () => {
     const state = makeState();
-    vi.spyOn(Date, 'now').mockReturnValue(123456789);
-    const result = gamesReducer(state, {
-      type: Types.GAME_SAY,
-      gameId: 1,
-      playerId: 2,
-      message: 'gg',
-    });
-    vi.restoreAllMocks();
+    const dateNowSpy = vi.spyOn(Date, 'now').mockReturnValue(123456789);
+    try {
+      const result = gamesReducer(state, {
+        type: Types.GAME_SAY,
+        gameId: 1,
+        playerId: 2,
+        message: 'gg',
+      });
 
-    expect(result.games[1].messages).toHaveLength(1);
-    expect(result.games[1].messages[0]).toEqual({ playerId: 2, message: 'gg', timeReceived: 123456789 });
+      expect(result.games[1].messages).toHaveLength(1);
+      expect(result.games[1].messages[0]).toEqual({ playerId: 2, message: 'gg', timeReceived: 123456789 });
+    } finally {
+      dateNowSpy.mockRestore();
+    }
   });
 });
 

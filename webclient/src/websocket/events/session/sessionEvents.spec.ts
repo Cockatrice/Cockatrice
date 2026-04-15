@@ -204,6 +204,9 @@ describe('addToList', () => {
   beforeEach(() => {
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
   });
+  afterEach(() => {
+    logSpy.mockRestore();
+  });
 
   it('buddy list → addToBuddyList', () => {
     const data = create(Data.Event_AddToListSchema, {

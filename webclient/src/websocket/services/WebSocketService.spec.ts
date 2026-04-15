@@ -1,4 +1,5 @@
 import { installMockWebSocket } from '../__mocks__/helpers';
+import { withMockLocation } from '../../__test-utils__';
 import { Mock } from 'vitest';
 
 vi.mock('../WebClient', () => ({
@@ -37,6 +38,7 @@ let MockWS: Mock;
 let mockInstance: ReturnType<typeof installMockWebSocket>['mockInstance'];
 let restoreWebSocket: ReturnType<typeof installMockWebSocket>['restore'];
 let mockConfig: WebSocketServiceConfig;
+let locationRestores: Array<() => void>;
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -49,9 +51,14 @@ beforeEach(() => {
   mockConfig = {
     keepAliveFn: vi.fn(),
   };
+
+  locationRestores = [];
 });
 
 afterEach(() => {
+  while (locationRestores.length > 0) {
+    locationRestores.pop()!();
+  }
   restoreWebSocket();
   vi.useRealTimers();
 });
@@ -88,22 +95,14 @@ describe('WebSocketService', () => {
   describe('connect', () => {
     it('creates a WebSocket with wss protocol by default', () => {
       const service = new WebSocketService(mockConfig);
-      Object.defineProperty(window, 'location', {
-        value: { hostname: 'example.com' },
-        writable: true,
-        configurable: true,
-      });
+      locationRestores.push(withMockLocation({ hostname: 'example.com' }));
       service.connect({ host: 'example.com', port: '8080' });
       expect(MockWS).toHaveBeenCalledWith('wss://example.com:8080');
     });
 
     it('switches to ws protocol when hostname is localhost', () => {
       const service = new WebSocketService(mockConfig);
-      Object.defineProperty(window, 'location', {
-        value: { hostname: 'localhost' },
-        writable: true,
-        configurable: true,
-      });
+      locationRestores.push(withMockLocation({ hostname: 'localhost' }));
       service.connect({ host: 'somehost', port: '1234' });
       expect(MockWS).toHaveBeenCalledWith('ws://somehost:1234');
     });
@@ -243,22 +242,14 @@ describe('WebSocketService', () => {
   describe('testConnect', () => {
     it('creates a test WebSocket with correct URL', () => {
       const service = new WebSocketService(mockConfig);
-      Object.defineProperty(window, 'location', {
-        value: { hostname: 'example.com' },
-        writable: true,
-        configurable: true,
-      });
+      locationRestores.push(withMockLocation({ hostname: 'example.com' }));
       service.testConnect({ host: 'example.com', port: '9000' });
       expect(MockWS).toHaveBeenCalledWith('wss://example.com:9000');
     });
 
     it('uses ws protocol on localhost', () => {
       const service = new WebSocketService(mockConfig);
-      Object.defineProperty(window, 'location', {
-        value: { hostname: 'localhost' },
-        writable: true,
-        configurable: true,
-      });
+      locationRestores.push(withMockLocation({ hostname: 'localhost' }));
       service.testConnect({ host: 'h', port: '1' });
       expect(MockWS).toHaveBeenCalledWith('ws://h:1');
     });

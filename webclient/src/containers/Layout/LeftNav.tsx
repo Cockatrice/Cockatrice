@@ -5,7 +5,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CloseIcon from '@mui/icons-material/Close';
-import MailOutlineRoundedIcon from '@mui/icons-material/MailOutline';
+import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 
 import { AuthenticationService, RoomsService } from '@app/api';
@@ -56,7 +56,7 @@ const LeftNav = () => {
   }
 
   const handleMenuItemClick = (option: string) => {
-    const route = RouteEnum[option.toUpperCase()];
+    const route = App.RouteEnum[option.toUpperCase()];
     navigate(generatePath(route));
   }
 
@@ -149,10 +149,12 @@ const LeftNav = () => {
                     keepMounted
                     open={!!state.anchorEl}
                     onClose={() => handleMenuClose()}
-                    PaperProps={{
-                      style: {
-                        marginTop: '32px',
-                        width: '20ch',
+                    slotProps={{
+                      paper: {
+                        style: {
+                          marginTop: '32px',
+                          width: '20ch',
+                        },
                       },
                     }}
                   >

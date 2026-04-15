@@ -33,8 +33,30 @@ import '@testing-library/jest-dom/vitest';
 // `mockImplementation`, it should set it in that test's body and rely on
 // the next test overwriting or the global `clearAllMocks` clearing calls —
 // it should NOT assume the mock is reset to its factory default automatically.
+//
+// Global snapshot/restore guards for non-`vi.spyOn` globals that tests mutate
+// directly. `vi.restoreAllMocks()` only restores `vi.spyOn` targets, so bare
+// `Object.defineProperty` writes on `window.location` and `globalThis.WebSocket`
+// reassignments leak between tests unless we explicitly capture and restore them.
+let _locationDescriptor: PropertyDescriptor | undefined;
+let _originalWebSocket: typeof globalThis.WebSocket | undefined;
+
+beforeEach(() => {
+  _locationDescriptor = Object.getOwnPropertyDescriptor(window, 'location');
+  _originalWebSocket = globalThis.WebSocket;
+});
+
 afterEach(() => {
   vi.clearAllMocks();
   vi.restoreAllMocks();
   vi.useRealTimers();
+
+  const currentLocationDescriptor = Object.getOwnPropertyDescriptor(window, 'location');
+  if (currentLocationDescriptor !== _locationDescriptor && _locationDescriptor) {
+    Object.defineProperty(window, 'location', _locationDescriptor);
+  }
+
+  if (globalThis.WebSocket !== _originalWebSocket) {
+    globalThis.WebSocket = _originalWebSocket as typeof globalThis.WebSocket;
+  }
 });

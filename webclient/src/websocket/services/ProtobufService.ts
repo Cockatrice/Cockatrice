@@ -175,7 +175,7 @@ export class ProtobufService {
     }
     for (const [ext, handler] of SessionEvents) {
       if (hasExtension(event, ext)) {
-        handler(getExtension(event, ext));
+        handler(getExtension(event, ext), undefined);
         return;
       }
     }

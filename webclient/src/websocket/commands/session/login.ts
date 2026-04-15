@@ -17,14 +17,14 @@ import {
 export function login(options: Omit<Enriched.LoginConnectOptions, 'password'>, password?: string, passwordSalt?: string): void {
   const { userName, hashedPassword } = options;
 
-  const loginConfig: MessageInitShape<typeof Data.Command_LoginSchema> = {
+  const loginConfig = {
     ...CLIENT_CONFIG,
     clientid: 'webatrice',
     userName,
     ...(passwordSalt
       ? { hashedPassword: hashedPassword || hashPassword(passwordSalt, password) }
       : { password }),
-  };
+  } satisfies MessageInitShape<typeof Data.Command_LoginSchema>;
 
   const onLoginError = (message: string, extra?: () => void) => {
     updateStatus(App.StatusEnum.DISCONNECTED, message);

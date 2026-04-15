@@ -1,24 +1,10 @@
-vi.mock('@bufbuild/protobuf', () => ({
-  create: vi.fn((_schema: unknown, fields?: Record<string, unknown>) => ({ ...(fields ?? {}) })),
+vi.mock('@bufbuild/protobuf', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@bufbuild/protobuf')>()),
   fromBinary: vi.fn(),
   toBinary: vi.fn().mockReturnValue(new Uint8Array()),
   hasExtension: vi.fn().mockReturnValue(false),
   getExtension: vi.fn(),
   setExtension: vi.fn(),
-}));
-
-vi.mock('../../generated/proto/commands_pb', () => ({
-  CommandContainerSchema: {},
-}));
-
-vi.mock('../../generated/proto/server_message_pb', () => ({
-  ServerMessageSchema: {},
-  ServerMessage_MessageType: {
-    RESPONSE: 1,
-    ROOM_EVENT: 2,
-    SESSION_EVENT: 3,
-    GAME_EVENT_CONTAINER: 4,
-  },
 }));
 
 vi.mock('../events', () => ({
@@ -40,6 +26,7 @@ import { GameEvents, RoomEvents, SessionEvents } from '../events';
 import type { GameExtensionRegistry } from '../events/game';
 import type { RoomExtensionRegistry } from '../events/room';
 import type { SessionExtensionRegistry } from '../events/session';
+import { withEventRegistry } from '../../__test-utils__';
 
 import { Data } from '@app/types';
 
@@ -53,12 +40,20 @@ type ProtobufInternal = ProtobufService & {
 };
 
 let mockSocket: { isOpen: ReturnType<typeof vi.fn>; send: ReturnType<typeof vi.fn> };
+let registryTeardowns: Array<() => void>;
 
 beforeEach(() => {
   mockSocket = {
     isOpen: vi.fn().mockReturnValue(true),
     send: vi.fn(),
   };
+  registryTeardowns = [];
+});
+
+afterEach(() => {
+  while (registryTeardowns.length > 0) {
+    registryTeardowns.pop()!();
+  }
 });
 
 describe('ProtobufService', () => {
@@ -348,8 +343,7 @@ describe('ProtobufService', () => {
       const mockExt = {} as GenExtension<Data.GameEvent, unknown>;
       const payload = { someData: 1 };
 
-      // Temporarily override GameEvents for this test
-      (GameEvents as GameExtensionRegistry).push([mockExt, handler]);
+      registryTeardowns.push(withEventRegistry(GameEvents as GameExtensionRegistry, [mockExt, handler]));
       vi.mocked(hasExtension).mockReturnValue(true);
       vi.mocked(getExtension).mockReturnValue(payload);
 
@@ -359,7 +353,6 @@ describe('ProtobufService', () => {
       }, {});
 
       expect(handler).toHaveBeenCalledWith(payload, expect.objectContaining({ gameId: 42, playerId: 5 }));
-      (GameEvents as GameExtensionRegistry).pop();
     });
 
     it('defaults gameId and playerId to -1 when undefined', () => {
@@ -368,7 +361,7 @@ describe('ProtobufService', () => {
       const mockExt = {} as GenExtension<Data.GameEvent, unknown>;
       const payload = { someData: 1 };
 
-      (GameEvents as GameExtensionRegistry).push([mockExt, handler]);
+      registryTeardowns.push(withEventRegistry(GameEvents as GameExtensionRegistry, [mockExt, handler]));
       vi.mocked(hasExtension).mockReturnValue(true);
       vi.mocked(getExtension).mockReturnValue(payload);
 
@@ -378,7 +371,6 @@ describe('ProtobufService', () => {
       });
 
       expect(handler).toHaveBeenCalledWith(payload, expect.objectContaining({ gameId: -1, playerId: -1 }));
-      (GameEvents as GameExtensionRegistry).pop();
     });
   });
 
@@ -405,7 +397,7 @@ describe('ProtobufService', () => {
       const mockExt = {} as GenExtension<Data.RoomEvent, unknown>;
       const payload = { roomData: 1 };
 
-      (RoomEvents as RoomExtensionRegistry).push([mockExt, handler]);
+      registryTeardowns.push(withEventRegistry(RoomEvents as RoomExtensionRegistry, [mockExt, handler]));
       vi.mocked(hasExtension).mockReturnValue(true);
       vi.mocked(getExtension).mockReturnValue(payload);
 
@@ -413,7 +405,6 @@ describe('ProtobufService', () => {
       (service as ProtobufInternal).processRoomEvent(event);
 
       expect(handler).toHaveBeenCalledWith(payload, event);
-      (RoomEvents as RoomExtensionRegistry).pop();
     });
   });
 
@@ -431,14 +422,13 @@ describe('ProtobufService', () => {
       const mockExt = {} as GenExtension<Data.SessionEvent, unknown>;
       const payload = { sessionData: 1 };
 
-      (SessionEvents as SessionExtensionRegistry).push([mockExt, handler]);
+      registryTeardowns.push(withEventRegistry(SessionEvents as SessionExtensionRegistry, [mockExt, handler]));
       vi.mocked(hasExtension).mockReturnValue(true);
       vi.mocked(getExtension).mockReturnValue(payload);
 
       (service as ProtobufInternal).processSessionEvent({ sessionId: 7 });
 
-      expect(handler).toHaveBeenCalledWith(payload);
-      (SessionEvents as SessionExtensionRegistry).pop();
+      expect(handler).toHaveBeenCalledWith(payload, undefined);
     });
   });
 

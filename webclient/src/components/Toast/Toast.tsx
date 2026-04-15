@@ -1,5 +1,5 @@
 import * as React from 'react'
-import ReactDOM from 'react-dom'
+import { createPortal } from 'react-dom'
 
 import Alert from '@mui/material/Alert';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -46,7 +46,7 @@ function Toast(props) {
     return null
   }
 
-  return ReactDOM.createPortal(
+  return createPortal(
     node,
     rootElemRef.current
   );

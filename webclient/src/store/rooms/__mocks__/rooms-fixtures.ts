@@ -55,12 +55,15 @@ export function makeGame(
   };
 }
 
-export function makeMessage(overrides: Partial<Enriched.Message> = {}): Enriched.Message {
+export function makeMessage(overrides: Partial<Omit<Enriched.Message, '$typeName' | '$unknown'>> = {}): Enriched.Message {
+  const { timeReceived = 0, ...protoOverrides } = overrides;
   return {
-    message: 'hello',
-    messageType: 0,
-    timeReceived: 0,
-    ...overrides,
+    ...create(Data.Event_RoomSaySchema, {
+      message: 'hello',
+      messageType: 0,
+      ...protoOverrides,
+    }),
+    timeReceived,
   };
 }
 

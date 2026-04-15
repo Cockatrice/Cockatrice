@@ -65,7 +65,7 @@ export class WebSocketService {
   }
 
   public send(message: Uint8Array): void {
-    this.socket.send(message);
+    this.socket.send(message as unknown as ArrayBufferView);
   }
 
   private createWebSocket(url: string): WebSocket {

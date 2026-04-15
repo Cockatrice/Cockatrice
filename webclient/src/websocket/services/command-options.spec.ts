@@ -9,9 +9,11 @@ import { create, getExtension } from '@bufbuild/protobuf';
 
 import { handleResponse } from './command-options';
 
-beforeEach(() => {
-  vi.resetAllMocks();
-});
+// NOTE: do NOT call `vi.resetAllMocks()` here — under `isolate: false` it
+// resets `vi.fn()` implementations set inside other files' `vi.mock(...)`
+// factories, which breaks any spec that relied on those factory defaults
+// (e.g. ProtobufService.spec.ts expects `hasExtension` to return `false`).
+// The root `setupTests.ts` afterEach already calls `vi.clearAllMocks()`.
 
 describe('handleResponse', () => {
   it('calls onResponse and returns early when provided', () => {
