@@ -1,7 +1,10 @@
 #include "replay_manager.h"
 
+#include "../../../client/settings/cache_settings.h"
+#include "../game/abstract_game.h"
 #include "../interface/widgets/tabs/tab_game.h"
 
+#include <QAction>
 #include <QHBoxLayout>
 #include <QToolButton>
 

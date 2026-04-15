@@ -7,14 +7,13 @@
 #ifndef DECK_PREVIEW_COLOR_IDENTITY_FILTER_WIDGET_H
 #define DECK_PREVIEW_COLOR_IDENTITY_FILTER_WIDGET_H
 
-#include "../visual_deck_storage_widget.h"
-
-#include <QHBoxLayout>
-#include <QPushButton>
+#include <QMap>
 #include <QWidget>
 
 class DeckPreviewWidget;
 class VisualDeckStorageWidget;
+class QHBoxLayout;
+class QPushButton;
 
 class DeckPreviewColorIdentityFilterWidget : public QWidget
 {

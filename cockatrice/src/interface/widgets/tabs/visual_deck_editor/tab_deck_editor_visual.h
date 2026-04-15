@@ -1,8 +1,10 @@
 #ifndef WINDOW_DECKEDITORVISUAL_H
 #define WINDOW_DECKEDITORVISUAL_H
 
-#include "../tab.h"
-#include "tab_deck_editor_visual_tab_widget.h"
+#include "../abstract_tab_deck_editor.h"
+
+class TabDeckEditorVisualTabWidget;
+class CardInfoPictureWithTextOverlayWidget;
 
 /**
  * @class TabDeckEditorVisual

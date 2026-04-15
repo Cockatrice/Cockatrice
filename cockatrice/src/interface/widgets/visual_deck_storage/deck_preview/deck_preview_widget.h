@@ -7,20 +7,21 @@
 #ifndef DECK_PREVIEW_WIDGET_H
 #define DECK_PREVIEW_WIDGET_H
 
-#include "../../../deck_loader/deck_loader.h"
-#include "../../cards/additional_info/color_identity_widget.h"
-#include "../../cards/deck_preview_card_picture_widget.h"
-#include "../visual_deck_storage_widget.h"
-#include "deck_preview_deck_tags_display_widget.h"
-
 #include <QAbstractItemView>
+#include <QAbstractScrollArea>
 #include <QApplication>
 #include <QComboBox>
+#include <QDateTime>
 #include <QEvent>
-#include <QVBoxLayout>
 #include <QWidget>
 
+class QVBoxLayout;
+class DeckLoader;
+class DeckPreviewCardPictureWidget;
+class ColorIdentityWidget;
+class QLabel;
 class QMenu;
+struct LoadedDeck;
 class VisualDeckStorageWidget;
 class DeckPreviewDeckTagsDisplayWidget;
 

@@ -8,6 +8,8 @@
 #include <QLineEdit>
 #include <QWidget>
 
+class QCheckBox;
+class QComboBox;
 class GameSelectorQuickFilterToolBar : public QWidget
 {
 

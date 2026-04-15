@@ -7,6 +7,8 @@
 #ifndef ABSTRACTCLIENT_H
 #define ABSTRACTCLIENT_H
 
+#include "client_status.h"
+
 #include <QMutex>
 #include <QVariant>
 #include <libcockatrice/protocol/pb/response.pb.h>
@@ -31,22 +33,6 @@ class Event_ConnectionClosed;
 class Event_ServerShutdown;
 class Event_ReplayAdded;
 class FeatureSet;
-
-enum ClientStatus
-{
-    StatusDisconnected,
-    StatusDisconnecting,
-    StatusConnecting,
-    StatusRegistering,
-    StatusActivating,
-    StatusLoggingIn,
-    StatusLoggedIn,
-    StatusRequestingForgotPassword,
-    StatusSubmitForgotPasswordReset,
-    StatusSubmitForgotPasswordChallenge,
-    StatusGettingPasswordSalt,
-};
-
 class AbstractClient : public QObject
 {
     Q_OBJECT

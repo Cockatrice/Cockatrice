@@ -1,11 +1,16 @@
 #include "tab_supervisor.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../deck_loader/deck_loader.h"
+#include "../game/abstract_game.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
+#include "../interface/widgets/server/user/user_list_proxy.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
+#include "abstract_tab_deck_editor.h"
 #include "api/archidekt/tab_archidekt.h"
+#include "api/edhrec/tab_edhrec.h"
 #include "api/edhrec/tab_edhrec_main.h"
 #include "tab_account.h"
 #include "tab_admin.h"
@@ -24,6 +29,7 @@
 #include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QApplication>
+#include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
 #include <QSystemTrayIcon>

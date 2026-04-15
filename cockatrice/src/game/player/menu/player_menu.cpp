@@ -2,6 +2,7 @@
 
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
+#include "../../game/abstract_game.h"
 #include "../../zones/hand_zone.h"
 #include "../../zones/pile_zone.h"
 #include "../../zones/table_zone.h"

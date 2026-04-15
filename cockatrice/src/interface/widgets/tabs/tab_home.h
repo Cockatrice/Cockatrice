@@ -7,13 +7,10 @@
 #ifndef TAB_HOME_H
 #define TAB_HOME_H
 
-#include "../interface/widgets/general/home_widget.h"
 #include "tab.h"
 
-#include <libcockatrice/network/client/abstract/abstract_client.h>
-
 class AbstractClient;
-
+class HomeWidget;
 class TabHome : public Tab
 {
     Q_OBJECT

@@ -4,9 +4,14 @@
 #include "../../../filters/deck_filter_string.h"
 #include "../../../filters/syntax_help.h"
 #include "../../pixel_map_generator.h"
+#include "deck_preview/deck_preview_widget.h"
+#include "visual_deck_storage_widget.h"
 
 #include <QAction>
 #include <QFileInfo>
+#include <QHBoxLayout>
+#include <QLineEdit>
+#include <QTimer>
 
 /**
  * @brief Constructs a PrintingSelectorCardSearchWidget for searching cards by set name or set code.

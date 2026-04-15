@@ -1,8 +1,12 @@
 #include "all_zones_card_amount_widget.h"
 
+#include "../../deck_loader/deck_loader.h"
 #include "../general/display/shadow_background_label.h"
+#include "card_amount_widget.h"
 
+#include <QSlider>
 #include <QTimer>
+#include <QVBoxLayout>
 
 /**
  * @brief Constructor for the AllZonesCardAmountWidget class.

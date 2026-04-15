@@ -2,7 +2,6 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../deck_loader/deck_loader.h"
-#include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
 
 #include <QAction>
@@ -19,6 +18,7 @@
 #include <QUrl>
 #include <QVBoxLayout>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_del.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_del_dir.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>

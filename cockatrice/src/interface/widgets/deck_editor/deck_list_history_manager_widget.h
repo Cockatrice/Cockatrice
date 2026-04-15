@@ -4,17 +4,16 @@
 #ifndef COCKATRICE_DECK_UNDO_WIDGET_H
 #define COCKATRICE_DECK_UNDO_WIDGET_H
 
-#include "../quick_settings/settings_button_widget.h"
-#include "deck_list_style_proxy.h"
-
-#include <QAction>
-#include <QHBoxLayout>
-#include <QListWidget>
 #include <QWidget>
-#include <libcockatrice/deck_list/deck_list_history_manager.h>
-#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 class DeckStateManager;
+class DeckListStyleProxy;
+class QListWidgetItem;
+class QHBoxLayout;
+class QToolButton;
+class SettingsButtonWidget;
+class QLabel;
+class QListWidget;
 
 class DeckListHistoryManagerWidget : public QWidget
 {

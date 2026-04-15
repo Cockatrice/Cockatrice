@@ -1,7 +1,6 @@
 #ifndef COCKATRICE_BAR_CHART_BACKGROUND_WIDGET_H
 #define COCKATRICE_BAR_CHART_BACKGROUND_WIDGET_H
 
-#include <QPainter>
 #include <QWidget>
 
 class BarChartBackgroundWidget : public QWidget

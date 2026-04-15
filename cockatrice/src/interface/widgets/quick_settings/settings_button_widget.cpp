@@ -1,9 +1,12 @@
 #include "settings_button_widget.h"
 
+#include "settings_popup_widget.h"
+
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QScreen>
+#include <QToolButton>
 
 SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
     : QWidget(parent), button(new QToolButton(this)), popup(new SettingsPopupWidget(nullptr))

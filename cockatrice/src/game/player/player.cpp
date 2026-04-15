@@ -6,6 +6,7 @@
 #include "../board/card_item.h"
 #include "../board/card_list.h"
 #include "../board/counter_general.h"
+#include "../game/abstract_game.h"
 #include "../game_scene.h"
 #include "../zones/hand_zone.h"
 #include "../zones/pile_zone.h"

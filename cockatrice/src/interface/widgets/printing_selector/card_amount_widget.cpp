@@ -1,9 +1,17 @@
 #include "card_amount_widget.h"
 
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../deck_editor/deck_state_manager.h"
+#include "../general/display/dynamic_font_size_push_button.h"
 
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QPainter>
 #include <QTimer>
+#include <QTreeView>
+#include <QVBoxLayout>
+#include <libcockatrice/card/card_info.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 /**
  * @brief Constructs a widget for displaying and controlling the card count in a specific zone.

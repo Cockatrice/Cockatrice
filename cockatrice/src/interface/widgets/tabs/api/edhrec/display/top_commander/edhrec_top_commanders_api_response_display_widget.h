@@ -7,13 +7,12 @@
 #ifndef EDHREC_TOP_COMMANDERS_API_RESPONSE_DISPLAY_WIDGET_H
 #define EDHREC_TOP_COMMANDERS_API_RESPONSE_DISPLAY_WIDGET_H
 
-#include "../../api_response/top_commanders/edhrec_top_commanders_api_response.h"
-
-#include <QResizeEvent>
-#include <QScrollArea>
-#include <QVBoxLayout>
 #include <QWidget>
 
+class EdhrecTopCommandersApiResponse;
+class QHBoxLayout;
+class QVBoxLayout;
+class QScrollArea;
 class EdhrecTopCommandersApiResponseDisplayWidget : public QWidget
 {
     Q_OBJECT

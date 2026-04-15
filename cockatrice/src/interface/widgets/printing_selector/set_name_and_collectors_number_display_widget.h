@@ -8,11 +8,10 @@
 #ifndef SET_NAME_AND_COLLECTORS_NUMBER_DISPLAY_WIDGET_H
 #define SET_NAME_AND_COLLECTORS_NUMBER_DISPLAY_WIDGET_H
 
-#include <QLabel>
-#include <QSlider>
-#include <QVBoxLayout>
 #include <QWidget>
 
+class QVBoxLayout;
+class QLabel;
 class SetNameAndCollectorsNumberDisplayWidget : public QWidget
 {
     Q_OBJECT

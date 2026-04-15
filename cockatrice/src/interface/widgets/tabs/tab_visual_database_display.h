@@ -7,9 +7,10 @@
 #ifndef TAB_VISUAL_DATABASE_DISPLAY_H
 #define TAB_VISUAL_DATABASE_DISPLAY_H
 
-#include "../interface/widgets/visual_database_display/visual_database_display_widget.h"
 #include "tab.h"
 
+class VisualDatabaseDisplayWidget;
+class TabDeckEditor;
 class TabVisualDatabaseDisplay : public Tab
 {
     Q_OBJECT
@@ -21,11 +22,7 @@ private:
 public:
     TabVisualDatabaseDisplay(TabSupervisor *_tabSupervisor);
     void retranslateUi() override;
-    [[nodiscard]] QString getTabText() const override
-    {
-        return visualDatabaseDisplayWidget->displayModeButton->isChecked() ? tr("Database Display")
-                                                                           : tr("Visual Database Display");
-    }
+    [[nodiscard]] QString getTabText() const override;
 };
 
 #endif // TAB_VISUAL_DATABASE_DISPLAY_H

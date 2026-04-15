@@ -7,15 +7,15 @@
 #ifndef EDHREC_COMMANDER_API_RESPONSE_COMMANDER_DETAILS_DISPLAY_WIDGET_H
 #define EDHREC_COMMANDER_API_RESPONSE_COMMANDER_DETAILS_DISPLAY_WIDGET_H
 
-#include "../../../../../cards/card_info_picture_widget.h"
 #include "../../api_response/cards/edhrec_commander_api_response_commander_details.h"
-#include "../card_prices/edhrec_api_response_card_prices_display_widget.h"
-#include "edhrec_commander_api_response_navigation_widget.h"
 
-#include <QLabel>
-#include <QVBoxLayout>
 #include <QWidget>
 
+class QHBoxLayout;
+class QVBoxLayout;
+class CardInfoPictureWidget;
+class QLabel;
+class EdhrecApiResponseCardPricesDisplayWidget;
 class EdhrecCommanderApiResponseNavigationWidget;
 class EdhrecCommanderResponseCommanderDetailsDisplayWidget : public QWidget
 {

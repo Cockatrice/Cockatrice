@@ -4,6 +4,7 @@
 #include "../board/arrow_item.h"
 #include "../board/card_item.h"
 #include "../board/card_list.h"
+#include "../game/abstract_game.h"
 #include "../zones/view_zone.h"
 #include "player.h"
 #include "player_actions.h"

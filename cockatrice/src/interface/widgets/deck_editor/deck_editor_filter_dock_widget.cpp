@@ -3,10 +3,12 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../filters/filter_builder.h"
 #include "../../../filters/filter_tree_model.h"
+#include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 
 #include <QGridLayout>
 #include <QMenu>
 #include <QToolButton>
+#include <QTreeView>
 
 DeckEditorFilterDockWidget::DeckEditorFilterDockWidget(AbstractTabDeckEditor *parent)
     : QDockWidget(parent), deckEditor(parent)

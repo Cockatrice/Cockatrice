@@ -7,12 +7,12 @@
 #ifndef PRINTING_SELECTOR_CARD_SELECTION_WIDGET_H
 #define PRINTING_SELECTOR_CARD_SELECTION_WIDGET_H
 
-#include "printing_selector.h"
-
-#include <QHBoxLayout>
-#include <QPushButton>
 #include <QWidget>
 
+class PrintingSelector;
+class DeckStateManager;
+class QHBoxLayout;
+class QPushButton;
 class PrintingSelectorCardSelectionWidget : public QWidget
 {
     Q_OBJECT

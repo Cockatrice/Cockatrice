@@ -7,13 +7,10 @@
 #ifndef VISUAL_DATABASE_FILTER_DISPLAY_WIDGET_H
 #define VISUAL_DATABASE_FILTER_DISPLAY_WIDGET_H
 
-#include <QMouseEvent>
-#include <QPushButton>
-#include <QString>
 #include <QWidget>
 
 class FilterTreeModel;
-
+class QPushButton;
 class FilterDisplayWidget : public QWidget
 {
     Q_OBJECT

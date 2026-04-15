@@ -8,21 +8,12 @@
 #ifndef TAB_SUPERVISOR_H
 #define TAB_SUPERVISOR_H
 
-#include "../../deck_loader/deck_loader.h"
-#include "../interface/widgets/server/user/user_list_proxy.h"
-#include "abstract_tab_deck_editor.h"
-#include "api/archidekt/tab_archidekt.h"
-#include "api/edhrec/tab_edhrec.h"
-#include "api/edhrec/tab_edhrec_main.h"
-#include "tab_visual_database_display.h"
-#include "visual_deck_editor/tab_deck_editor_visual.h"
-#include "visual_deck_storage/tab_deck_storage_visual.h"
-
 #include <QAbstractButton>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QProxyStyle>
 #include <QTabWidget>
+#include <libcockatrice/card/card_info.h>
 
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 
@@ -35,12 +26,20 @@ class TabRoom;
 class TabHome;
 class TabGame;
 class TabDeckStorage;
+class TabDeckStorageVisual;
+class AbstractTabDeckEditor;
+class TabDeckEditorVisual;
+class TabVisualDatabaseDisplay;
+class TabEdhRecMain;
+class TabArchidekt;
+class TabEdhRec;
 class TabReplays;
 class TabAdmin;
 class TabMessage;
 class TabAccount;
 class TabDeckEditor;
 class TabLog;
+struct LoadedDeck;
 class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;

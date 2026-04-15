@@ -1,6 +1,16 @@
 #include "deck_list_history_manager_widget.h"
 
+#include "../quick_settings/settings_button_widget.h"
+#include "deck_list_style_proxy.h"
 #include "deck_state_manager.h"
+
+#include <QAction>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QListWidget>
+#include <QToolButton>
+#include <libcockatrice/deck_list/deck_list_history_manager.h>
+#include <libcockatrice/models/deck_list/deck_list_model.h>
 
 DeckListHistoryManagerWidget::DeckListHistoryManagerWidget(DeckStateManager *_deckStateManager,
                                                            DeckListStyleProxy *_styleProxy,

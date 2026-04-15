@@ -2,6 +2,7 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/widgets/tabs/tab_game.h"
+#include "../abstract_game.h"
 #include "../game_scene.h"
 #include "../phase.h"
 #include "../player/player.h"

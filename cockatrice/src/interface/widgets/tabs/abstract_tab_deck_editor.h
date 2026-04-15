@@ -8,24 +8,15 @@
 #ifndef TAB_GENERIC_DECK_EDITOR_H
 #define TAB_GENERIC_DECK_EDITOR_H
 
-#include "../interface/widgets/deck_editor/deck_editor_card_database_dock_widget.h"
-#include "../interface/widgets/deck_editor/deck_editor_card_info_dock_widget.h"
-#include "../interface/widgets/deck_editor/deck_editor_database_display_widget.h"
-#include "../interface/widgets/deck_editor/deck_editor_deck_dock_widget.h"
-#include "../interface/widgets/deck_editor/deck_editor_filter_dock_widget.h"
-#include "../interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.h"
-#include "../interface/widgets/menus/deck_editor_menu.h"
-#include "../interface/widgets/visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
+#include "../interface/deck_loader/deck_loader.h"
 #include "tab.h"
-
-#include <libcockatrice/deck_list/deck_list_history_manager.h>
 
 class DeckStateManager;
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 
 class CardInfoFrameWidget;
-class DeckLoader;
+class ExactCard;
 class DeckEditorMenu;
 class DeckEditorCardInfoDockWidget;
 class DeckEditorCardDatabaseDockWidget;

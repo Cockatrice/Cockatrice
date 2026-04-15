@@ -1,6 +1,9 @@
 #include "deck_state_manager.h"
 
+#include "deck_list_model.h"
+
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/deck_list_history_manager.h>
 
 DeckStateManager::DeckStateManager(QObject *parent)

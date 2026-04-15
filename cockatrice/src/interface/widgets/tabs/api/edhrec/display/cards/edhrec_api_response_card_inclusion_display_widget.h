@@ -7,13 +7,13 @@
 #ifndef EDHREC_API_RESPONSE_CARD_INCLUSION_DISPLAY_WIDGET_H
 #define EDHREC_API_RESPONSE_CARD_INCLUSION_DISPLAY_WIDGET_H
 
-#include "../../../../../general/display/charts/bars/percent_bar_widget.h"
 #include "../../api_response/cards/edhrec_api_response_card_details.h"
 
-#include <QLabel>
-#include <QVBoxLayout>
 #include <QWidget>
 
+class QVBoxLayout;
+class QLabel;
+class PercentBarWidget;
 class EdhrecApiResponseCardInclusionDisplayWidget : public QWidget
 {
     Q_OBJECT

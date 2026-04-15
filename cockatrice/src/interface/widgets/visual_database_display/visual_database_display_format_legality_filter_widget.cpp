@@ -1,11 +1,14 @@
 #include "visual_database_display_format_legality_filter_widget.h"
 
 #include "../../../filters/filter_tree_model.h"
+#include "../general/layout_containers/flow_widget.h"
 
 #include <QLabel>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QTimer>
+#include <QToolButton>
+#include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>
 

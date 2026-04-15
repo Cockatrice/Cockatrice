@@ -9,11 +9,6 @@
 #ifndef TAB_GAME_H
 #define TAB_GAME_H
 
-#include "../game/abstract_game.h"
-#include "../game/log/message_log_widget.h"
-#include "../game/player/player.h"
-#include "../interface/widgets/menus/tearoff_menu.h"
-#include "../interface/widgets/replay/replay_manager.h"
 #include "tab.h"
 
 #include <QCompleter>
@@ -51,6 +46,15 @@ class GameReplay;
 class LineEditCompleter;
 class QDockWidget;
 class QStackedWidget;
+class AbstractGame;
+class MessageLogWidget;
+class TearOffMenu;
+class Player;
+class ServerInfo_Player;
+class GameEventContext;
+struct LoadedDeck;
+class Event_GameJoined;
+class ServerInfo_User;
 
 class TabGame : public Tab
 {

@@ -3,6 +3,8 @@
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "deck_view.h"
 
+#include <QTabBar>
+
 TabbedDeckViewContainer::TabbedDeckViewContainer(int _playerId, TabGame *parent)
     : QTabWidget(nullptr), playerId(_playerId), parentGame(parent)
 {

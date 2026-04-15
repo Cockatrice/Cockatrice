@@ -10,6 +10,7 @@
 #include <QScrollArea>
 #include <QSplitter>
 #include <QStringListModel>
+#include <QVBoxLayout>
 
 EdhrecCommanderApiResponseDisplayWidget::EdhrecCommanderApiResponseDisplayWidget(QWidget *parent,
                                                                                  EdhrecCommanderApiResponse response,

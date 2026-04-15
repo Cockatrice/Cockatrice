@@ -1,15 +1,16 @@
 #ifndef COCKATRICE_VISUAL_DECK_DISPLAY_OPTIONS_WIDGET_H
 #define COCKATRICE_VISUAL_DECK_DISPLAY_OPTIONS_WIDGET_H
 
-#include "visual_deck_editor_widget.h"
+#include "visual_deck_editor_display_type.h"
 
-#include <QComboBox>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QListWidget>
-#include <QPushButton>
 #include <QWidget>
 
+class QHBoxLayout;
+class QPushButton;
+class QComboBox;
+class QLabel;
+class QListWidget;
+class SettingsButtonWidget;
 /**
  * @class VisualDeckDisplayOptionsWidget
  * @brief A widget that controls how deck cards are displayed in the visual deck editor.

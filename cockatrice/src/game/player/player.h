@@ -23,6 +23,7 @@
 #include <QInputDialog>
 #include <QLoggingCategory>
 #include <QMap>
+#include <QObject>
 #include <QTimer>
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/protocol/pb/card_attributes.pb.h>

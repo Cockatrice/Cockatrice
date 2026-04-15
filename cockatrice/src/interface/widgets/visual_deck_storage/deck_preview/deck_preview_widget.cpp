@@ -1,14 +1,23 @@
 #include "deck_preview_widget.h"
 
 #include "../../../../client/settings/cache_settings.h"
+#include "../../../deck_loader/deck_loader.h"
 #include "../../cards/additional_info/color_identity_widget.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
+#include "../visual_deck_storage_quick_settings_widget.h"
+#include "../visual_deck_storage_tag_filter_widget.h"
+#include "../visual_deck_storage_widget.h"
 #include "deck_preview_deck_tags_display_widget.h"
 
+#include <QAbstractItemView>
+#include <QApplication>
 #include <QClipboard>
+#include <QComboBox>
 #include <QDir>
+#include <QEvent>
 #include <QFileInfo>
 #include <QInputDialog>
+#include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>

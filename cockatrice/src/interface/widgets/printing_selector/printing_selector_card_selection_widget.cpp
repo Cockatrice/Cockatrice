@@ -2,6 +2,10 @@
 
 #include "../../../interface/widgets/dialogs/dlg_select_set_for_cards.h"
 #include "../tabs/abstract_tab_deck_editor.h"
+#include "printing_selector.h"
+
+#include <QHBoxLayout>
+#include <QPushButton>
 
 /**
  * @brief Constructs a PrintingSelectorCardSelectionWidget for navigating through cards in the deck.

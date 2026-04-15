@@ -2,10 +2,15 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../filters/filter_tree_model.h"
+#include "../general/layout_containers/flow_widget.h"
 
+#include <QCheckBox>
 #include <QLineEdit>
+#include <QMap>
 #include <QPushButton>
+#include <QSpinBox>
 #include <QTimer>
+#include <QVBoxLayout>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/filters/filter_tree.h>

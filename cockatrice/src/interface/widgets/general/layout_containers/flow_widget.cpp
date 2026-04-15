@@ -5,11 +5,13 @@
 
 #include "flow_widget.h"
 
+#include "../../../layouts/flow_layout.h"
+
 #include <QHBoxLayout>
 #include <QResizeEvent>
+#include <QScrollArea>
+#include <QSizePolicy>
 #include <QWidget>
-#include <qscrollarea.h>
-#include <qsizepolicy.h>
 
 /**
  * @brief Constructs a FlowWidget with a scrollable layout.

@@ -7,12 +7,15 @@
 #ifndef PRINTING_SELECTOR_CARD_SORTING_WIDGET_H
 #define PRINTING_SELECTOR_CARD_SORTING_WIDGET_H
 
-#include "printing_selector.h"
-
-#include <QComboBox>
-#include <QPushButton>
 #include <QWidget>
+#include <libcockatrice/card/card_info.h>
 
+class PrintingSelector;
+class PrintingInfo;
+class DeckListModel;
+class QHBoxLayout;
+class QComboBox;
+class QPushButton;
 class PrintingSelectorCardSortingWidget : public QWidget
 {
     Q_OBJECT

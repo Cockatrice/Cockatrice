@@ -2,9 +2,11 @@
 
 #include <QApplication>
 #include <QFocusEvent>
+#include <QLabel>
 #include <QPainter>
 #include <QScreen>
 #include <QScrollArea>
+#include <QVBoxLayout>
 
 SettingsPopupWidget::SettingsPopupWidget(QWidget *parent) : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
 {

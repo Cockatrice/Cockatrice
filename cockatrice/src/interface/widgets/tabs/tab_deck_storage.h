@@ -9,10 +9,8 @@
 #define TAB_DECK_STORAGE_H
 
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
+#include "client_status.h"
 #include "tab.h"
-
-#include <libcockatrice/network/client/abstract/abstract_client.h>
-
 struct LoadedDeck;
 class ServerInfo_User;
 class AbstractClient;

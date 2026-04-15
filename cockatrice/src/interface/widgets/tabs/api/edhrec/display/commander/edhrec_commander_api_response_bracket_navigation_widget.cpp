@@ -1,5 +1,9 @@
 #include "edhrec_commander_api_response_bracket_navigation_widget.h"
 
+#include <QGridLayout>
+#include <QLabel>
+#include <QMap>
+#include <QPushButton>
 #include <QSet>
 
 EdhrecCommanderApiResponseBracketNavigationWidget::EdhrecCommanderApiResponseBracketNavigationWidget(

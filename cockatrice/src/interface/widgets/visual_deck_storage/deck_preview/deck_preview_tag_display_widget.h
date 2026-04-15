@@ -7,9 +7,6 @@
 #ifndef DECK_PREVIEW_TAG_DISPLAY_WIDGET_H
 #define DECK_PREVIEW_TAG_DISPLAY_WIDGET_H
 
-#include <QLabel>
-#include <QPushButton>
-#include <QString>
 #include <QWidget>
 
 enum class TagState
@@ -19,6 +16,8 @@ enum class TagState
     Excluded
 };
 
+class QPushButton;
+class QLabel;
 class DeckPreviewTagDisplayWidget : public QWidget
 {
     Q_OBJECT

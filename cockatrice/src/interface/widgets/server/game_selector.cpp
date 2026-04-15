@@ -1,5 +1,6 @@
 #include "game_selector.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/dialogs/dlg_filter_games.h"
 #include "../interface/widgets/tabs/tab_account.h"
@@ -13,6 +14,7 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTreeView>

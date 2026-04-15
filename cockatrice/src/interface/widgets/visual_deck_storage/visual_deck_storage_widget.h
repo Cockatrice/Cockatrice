@@ -7,19 +7,17 @@
 #ifndef VISUAL_DECK_STORAGE_WIDGET_H
 #define VISUAL_DECK_STORAGE_WIDGET_H
 
-#include "../../deck_loader/deck_loader.h"
-#include "../cards/card_size_widget.h"
-#include "../quick_settings/settings_button_widget.h"
-#include "deck_preview/deck_preview_color_identity_filter_widget.h"
-#include "visual_deck_storage_folder_display_widget.h"
-#include "visual_deck_storage_quick_settings_widget.h"
-#include "visual_deck_storage_search_widget.h"
-#include "visual_deck_storage_sort_widget.h"
-#include "visual_deck_storage_tag_filter_widget.h"
+#include <QWidget>
 
-#include <libcockatrice/models/deck_list/deck_list_model.h>
-
+class VisualDeckStorageQuickSettingsWidget;
+struct LoadedDeck;
 class QSpinBox;
+class QVBoxLayout;
+class QHBoxLayout;
+class QLabel;
+class QToolButton;
+class QScrollArea;
+class DeckListModel;
 class VisualDeckStorageSearchWidget;
 class VisualDeckStorageSortWidget;
 class VisualDeckStorageTagFilterWidget;

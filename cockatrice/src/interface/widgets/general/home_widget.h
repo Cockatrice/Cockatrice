@@ -7,14 +7,18 @@
 
 #ifndef HOME_WIDGET_H
 #define HOME_WIDGET_H
-#include "../../../interface/widgets/tabs/tab_supervisor.h"
-#include "../cards/card_info_picture_art_crop_widget.h"
-#include "home_styled_button.h"
 
-#include <QGridLayout>
 #include <QWidget>
-#include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/network/client/abstract/client_status.h>
 
+class TabSupervisor;
+class QGroupBox;
+class QGridLayout;
+class CardInfoPictureArtCropWidget;
+class DeckList;
+class HomeStyledButton;
+class ExactCard;
 class HomeWidget : public QWidget
 {
 

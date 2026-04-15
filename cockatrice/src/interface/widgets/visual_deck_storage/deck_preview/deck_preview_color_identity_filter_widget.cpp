@@ -1,9 +1,12 @@
 #include "deck_preview_color_identity_filter_widget.h"
 
 #include "../../cards/additional_info/mana_symbol_widget.h"
+#include "../visual_deck_storage_widget.h"
 #include "deck_preview_widget.h"
 
+#include <QHBoxLayout>
 #include <QMouseEvent>
+#include <QPushButton>
 
 DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(VisualDeckStorageWidget *parent)
     : QWidget(parent), layout(new QHBoxLayout(this))
