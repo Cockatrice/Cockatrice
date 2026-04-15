@@ -38,10 +38,10 @@ on:
       - 'vcpkg.json'
       - 'vcpkg'
 
-# Cancel earlier, unfinished runs of this workflow on the same branch (unless on master)
+# Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
   group: "${{ github.workflow }} @ ${{ github.ref_name }}"
-  cancel-in-progress: ${{ github.ref_name != 'master' }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 jobs:
   configure:
@@ -142,21 +142,28 @@ jobs:
           - distro: Ubuntu
             version: 22.04
             package: DEB
+            test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 24.04
+            package: DEB
+
+          - distro: Ubuntu
+            version: 26.04
             package: DEB
 
     name: ${{matrix.distro}} ${{matrix.version}}
     needs: configure
     runs-on: ubuntu-latest
     continue-on-error: ${{matrix.allow-failure == 'yes'}}
+    timeout-minutes: 70
     env:
       NAME: ${{matrix.distro}}${{matrix.version}}
       CACHE: ${{github.workspace}}/.cache/${{matrix.distro}}${{matrix.version}}   # directory for caching docker image and ccache
       # Cache size over the entire repo is 10Gi:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 550M
+      CCACHE_EVICTION_AGE: 7d
       CMAKE_GENERATOR: 'Ninja'
 
     steps:
@@ -180,34 +187,43 @@ jobs:
       - name: Build debug and test
         if: matrix.test != 'skip'
         shell: bash
-        env:
-          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE"
+          RUN --server --debug --test --ccache "$CCACHE_SIZE" \
+                  --cmake-generator "$CMAKE_GENERATOR"
 
       - name: Build release package
         id: build
         if: matrix.package != 'skip'
         shell: bash
         env:
-          BUILD_DIR: build
           SUFFIX: '-${{matrix.distro}}${{matrix.version}}'
           package: '${{matrix.package}}'
-          CMAKE_GENERATOR: '${{env.CMAKE_GENERATOR}}'
-          NO_CLIENT: ${{matrix.server_only == 'yes' && '--no-client' || '' }}
+          server_only: '${{matrix.server_only}}'
         run: |
           source .ci/docker.sh
-          RUN --server --release --package "$package" --dir "$BUILD_DIR" \
-                  --ccache "$CCACHE_SIZE" $NO_CLIENT
-          .ci/name_build.sh
+          args=()
+          if [[ $server_only == yes ]]; then
+            args+=(--no-client)
+          fi
+          if [[ $GITHUB_REF == "refs/heads/master" ]]; then
+            args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
+          fi
+          args+=(--ccache "$CCACHE_SIZE")
+          args+=(--cmake-generator "$CMAKE_GENERATOR")
+          args+=(--suffix "$SUFFIX")
+          RUN --server --release --package "$package" "${args[@]}"
 
-      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342.
+      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: Delete remote compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
+        run: |
+          if gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}; then
+            echo "Cache deleted successfully"
+          fi
 
       - name: Save updated compiler cache (ccache)
         if: github.ref == 'refs/heads/master'
@@ -265,11 +281,12 @@ jobs:
             override_target: 13
             make_package: 1
             package_suffix: "-macOS13_Intel"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: macOS
             target: 14
@@ -279,11 +296,12 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS14"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: macOS
             target: 15
@@ -293,11 +311,12 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS15"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: macOS
             target: 15
@@ -305,11 +324,12 @@ jobs:
             soc: Apple
             xcode: "16.4"
             type: Debug
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
             use_ccache: 1
+            ccache_eviction_age: 7d
 
           - os: Windows
             target: 10
@@ -317,7 +337,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-Win10"
-            qt_version: 6.10.*
+            qt_version: 6.11.*
             qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: "Visual Studio 17 2022"
@@ -326,6 +346,7 @@ jobs:
     name: ${{matrix.os}} ${{matrix.target}}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
     runs-on: ${{matrix.runner}}
+    timeout-minutes: 100
     env:
       CCACHE_DIR: ${{github.workspace}}/.cache/
       # Cache size over the entire repo is 10Gi:
@@ -404,6 +425,8 @@ jobs:
         if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
+          # qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
+          aqtsource: git+https://github.com/miurahr/aqtinstall.git
           version: ${{ steps.resolve_qt_version.outputs.version }}
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
@@ -440,14 +463,19 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
+          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
         run: .ci/compile.sh --server --test --vcpkg
 
-      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342.
+      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: Delete remote compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1 && steps.ccache_restore.outputs.cache-hit
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}
+        run: |
+          if gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}; then
+            echo "Cache deleted successfully"
+          fi
 
       - name: Save updated compiler cache (ccache)
         if: github.ref == 'refs/heads/master' && matrix.use_ccache == 1

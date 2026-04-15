@@ -20,7 +20,7 @@ peg::parser math(R"(
 
     NUMBER       <-  < '-'? [0-9]+ >
     NAME         <-  < [a-z][a-z0-9]* >
-    VARIABLE     <-  < [x] >
+    VARIABLE     <-  < [xX] >
     FUNCTION     <-  NAME '(' EXPRESSION ( [,\n] EXPRESSION )* ')'
 
     %whitespace  <-  [ \t\r]*

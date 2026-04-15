@@ -3,6 +3,7 @@
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
 #include "../board/card_item.h"
+#include "../client/settings/card_counter_settings.h"
 #include "../dialogs/dlg_move_top_cards_until.h"
 #include "../dialogs/dlg_roll_dice.h"
 #include "../zones/hand_zone.h"
@@ -27,13 +28,15 @@
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
+#include <libcockatrice/utility/expression.h>
 #include <libcockatrice/utility/trice_limits.h>
 #include <libcockatrice/utility/zone_names.h>
 
 // milliseconds in between triggers of the move top cards until action
 static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;
 
-PlayerActions::PlayerActions(Player *_player) : player(_player), lastTokenTableRow(0), movingCardsUntil(false)
+PlayerActions::PlayerActions(Player *_player)
+    : QObject(_player), player(_player), lastTokenTableRow(0), movingCardsUntil(false)
 {
     moveTopCardTimer = new QTimer(this);
     moveTopCardTimer->setInterval(MOVE_TOP_CARD_UNTIL_INTERVAL);
@@ -1568,23 +1571,34 @@ void PlayerActions::actCardCounterTrigger()
             break;
         }
         case 11: { // set counter with dialog
-            bool ok;
             player->setDialogSemaphore(true);
 
-            int oldValue = 0;
-            if (player->getGameScene()->selectedItems().size() == 1) {
-                auto *card = static_cast<CardItem *>(player->getGameScene()->selectedItems().first());
-                oldValue = card->getCounters().value(counterId, 0);
+            // If a single card is selected, we show the old value in the dialog. Otherwise, we show "x"
+            QList<QGraphicsItem *> sel = player->getGameScene()->selectedItems();
+            QString oldValueForDlg = "x";
+            if (sel.size() == 1) {
+                auto *card = dynamic_cast<CardItem *>(sel.first());
+                oldValueForDlg = QString::number(card->getCounters().value(counterId, 0));
             }
-            int number = QInputDialog::getInt(player->getGame()->getTab(), tr("Set counters"), tr("Number:"), oldValue,
-                                              0, MAX_COUNTERS_ON_CARD, 1, &ok);
+
+            auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+            QString counterName = cardCounterSettings.displayName(counterId);
+
+            AbstractCounterDialog dialog(counterName, oldValueForDlg, player->getGame()->getTab());
+            int ok = dialog.exec();
+
             player->setDialogSemaphore(false);
             if (player->clearCardsToDelete() || !ok) {
                 return;
             }
 
-            for (const auto &item : player->getGameScene()->selectedItems()) {
-                auto *card = static_cast<CardItem *>(item);
+            for (const auto &item : sel) {
+                auto *card = dynamic_cast<CardItem *>(item);
+
+                int oldValue = card->getCounters().value(counterId, 0);
+                Expression exp(oldValue);
+                int number = static_cast<int>(exp.parse(dialog.textValue()));
+
                 auto *cmd = new Command_SetCardCounter;
                 cmd->set_zone(card->getZone()->getName().toStdString());
                 cmd->set_card_id(card->getId());

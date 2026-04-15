@@ -3,8 +3,9 @@ import { addToList } from './addToList';
 import { connectionClosed } from './connectionClosed';
 import { listRooms } from './listRooms';
 import { notifyUser } from './notifyUser';
-import { playerPropertiesChanged } from '../common/playerPropertiesChanged';
 import { removeFromList } from './removeFromList';
+import { replayAdded } from './replayAdded';
+import { serverCompleteList } from './serverCompleteList';
 import { serverIdentification } from './serverIdentification';
 import { serverMessage } from './serverMessage';
 import { serverShutdown } from './serverShutdown';
@@ -20,8 +21,8 @@ export const SessionEvents: ProtobufEvents = {
   '.Event_ListRooms.ext': listRooms,
   '.Event_NotifyUser.ext': notifyUser,
   '.Event_RemoveFromList.ext': removeFromList,
-  '.Event_ReplayAdded.ext': () => console.log('Event_ReplayAdded'),
-  '.Event_ServerCompleteList.ext': () => console.log('Event_ServerCompleteList'),
+  '.Event_ReplayAdded.ext': replayAdded,
+  '.Event_ServerCompleteList.ext': serverCompleteList,
   '.Event_ServerIdentification.ext': serverIdentification,
   '.Event_ServerMessage.ext': serverMessage,
   '.Event_ServerShutdown.ext': serverShutdown,

@@ -1,9 +1,59 @@
-import { SortDirection, StatusEnum, UserLevelFlag, UserSortField } from 'types';
+import { DeckStorageFolder, DeckStorageTreeItem, SortDirection, StatusEnum, UserLevelFlag, UserSortField } from 'types';
 
 import { SortUtil } from '../common';
 
 import { ServerState } from './server.interfaces'
 import { Types } from './server.types';
+
+function splitPath(path: string): string[] {
+  return path ? path.split('/') : [];
+}
+
+function insertAtPath(folder: DeckStorageFolder, pathSegments: string[], item: DeckStorageTreeItem): DeckStorageFolder {
+  if (pathSegments.length === 0 || (pathSegments.length === 1 && pathSegments[0] === '')) {
+    return { items: [...folder.items, item] };
+  }
+  const [head, ...tail] = pathSegments;
+  const match = folder.items.find(child => child.name === head && child.folder);
+  if (match) {
+    return {
+      items: folder.items.map(child =>
+        child === match
+          ? { ...child, folder: insertAtPath(child.folder!, tail, item) }
+          : child
+      ),
+    };
+  }
+  const created: DeckStorageTreeItem = { id: 0, name: head, file: null, folder: insertAtPath({ items: [] }, tail, item) };
+  return { items: [...folder.items, created] };
+}
+
+function removeById(folder: DeckStorageFolder, id: number): DeckStorageFolder {
+  return {
+    items: folder.items
+      .filter(item => item.id !== id)
+      .map(item =>
+        item.folder ? { ...item, folder: removeById(item.folder, id) } : item
+      ),
+  };
+}
+
+function removeByPath(folder: DeckStorageFolder, pathSegments: string[]): DeckStorageFolder {
+  if (pathSegments.length === 0 || (pathSegments.length === 1 && pathSegments[0] === '')) {
+    return folder;
+  }
+  const [head, ...tail] = pathSegments;
+  if (tail.length === 0) {
+    return { items: folder.items.filter(item => !(item.name === head && item.folder !== null)) };
+  }
+  return {
+    items: folder.items.map(item =>
+      item.name === head && item.folder
+        ? { ...item, folder: removeByPath(item.folder, tail) }
+        : item
+    ),
+  };
+}
 
 const initialState: ServerState = {
   initialized: false,
@@ -40,6 +90,9 @@ const initialState: ServerState = {
   warnHistory: {},
   warnListOptions: [],
   warnUser: '',
+  adminNotes: {},
+  replays: [],
+  backendDecks: null,
 };
 
 export const serverReducer = (state = initialState, action: any) => {
@@ -247,7 +300,7 @@ export const serverReducer = (state = initialState, action: any) => {
         messages: {
           ...state.messages,
           [userName]: [
-            ...state.messages[userName],
+            ...(state.messages[userName] ?? []),
             action.messageData,
           ],
         }
@@ -328,6 +381,17 @@ export const serverReducer = (state = initialState, action: any) => {
         warnUser: userName,
       };
     }
+    case Types.GET_ADMIN_NOTES:
+    case Types.UPDATE_ADMIN_NOTES: {
+      const { userName, notes } = action;
+      return {
+        ...state,
+        adminNotes: {
+          ...state.adminNotes,
+          [userName]: notes,
+        }
+      };
+    }
     case Types.ADJUST_MOD: {
       const { userName, shouldBeMod, shouldBeJudge } = action;
 
@@ -344,6 +408,71 @@ export const serverReducer = (state = initialState, action: any) => {
             userLevel: user.userLevel & (judgeFlag | modFlag)
           }
         })
+      };
+    }
+    case Types.REPLAY_LIST: {
+      return { ...state, replays: [...action.matchList] };
+    }
+    case Types.REPLAY_ADDED: {
+      return { ...state, replays: [...state.replays, action.matchInfo] };
+    }
+    case Types.REPLAY_MODIFY_MATCH: {
+      return {
+        ...state,
+        replays: state.replays.map(r =>
+          r.gameId === action.gameId ? { ...r, doNotHide: action.doNotHide } : r
+        ),
+      };
+    }
+    case Types.REPLAY_DELETE_MATCH: {
+      return { ...state, replays: state.replays.filter(r => r.gameId !== action.gameId) };
+    }
+    case Types.BACKEND_DECKS: {
+      return { ...state, backendDecks: action.deckList };
+    }
+    case Types.DECK_UPLOAD: {
+      if (!state.backendDecks) {
+        return state;
+      }
+      return {
+        ...state,
+        backendDecks: {
+          root: insertAtPath(state.backendDecks.root, splitPath(action.path), action.treeItem),
+        },
+      };
+    }
+    case Types.DECK_DELETE: {
+      if (!state.backendDecks) {
+        return state;
+      }
+      return {
+        ...state,
+        backendDecks: {
+          root: removeById(state.backendDecks.root, action.deckId),
+        },
+      };
+    }
+    case Types.DECK_NEW_DIR: {
+      if (!state.backendDecks) {
+        return state;
+      }
+      const newFolder: DeckStorageTreeItem = { id: 0, name: action.dirName, file: null, folder: { items: [] } };
+      return {
+        ...state,
+        backendDecks: {
+          root: insertAtPath(state.backendDecks.root, splitPath(action.path), newFolder),
+        },
+      };
+    }
+    case Types.DECK_DEL_DIR: {
+      if (!state.backendDecks) {
+        return state;
+      }
+      return {
+        ...state,
+        backendDecks: {
+          root: removeByPath(state.backendDecks.root, splitPath(action.path)),
+        },
       };
     }
     default:

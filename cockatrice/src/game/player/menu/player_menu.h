@@ -37,7 +37,7 @@ private slots:
     void refreshShortcuts();
 
 public:
-    PlayerMenu(Player *player);
+    explicit PlayerMenu(Player *player);
     /// Lifecycle methods: delegate to all managedComponents, plus counters separately via player->getCounters().
     void retranslateUi();
 

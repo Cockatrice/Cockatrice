@@ -2,6 +2,7 @@ import { ForgotPasswordParams } from 'store';
 import { StatusEnum, WebSocketConnectOptions } from 'types';
 
 import webClient from '../../WebClient';
+import { BackendService } from '../../services/BackendService';
 import { SessionPersistence } from '../../persistence';
 
 import { disconnect, updateStatus } from './';
@@ -9,30 +10,25 @@ import { disconnect, updateStatus } from './';
 export function forgotPasswordRequest(options: WebSocketConnectOptions): void {
   const { userName } = options as unknown as ForgotPasswordParams;
 
-  const forgotPasswordConfig = {
+  BackendService.sendSessionCommand('Command_ForgotPasswordRequest', {
     ...webClient.clientConfig,
     userName,
-  };
-
-  const command = webClient.protobuf.controller.Command_ForgotPasswordRequest.create(forgotPasswordConfig);
-  const sc = webClient.protobuf.controller.SessionCommand.create({ '.Command_ForgotPasswordRequest.ext': command });
-
-  webClient.protobuf.sendSessionCommand(sc, raw => {
-    if (raw.responseCode === webClient.protobuf.controller.Response.ResponseCode.RespOk) {
-      const resp = raw['.Response_ForgotPasswordRequest.ext'];
-
-      if (resp.challengeEmail) {
+  }, {
+    responseName: 'Response_ForgotPasswordRequest',
+    onSuccess: (resp) => {
+      if (resp?.challengeEmail) {
         updateStatus(StatusEnum.DISCONNECTED, null);
         SessionPersistence.resetPasswordChallenge();
       } else {
         updateStatus(StatusEnum.DISCONNECTED, null);
         SessionPersistence.resetPassword();
       }
-    } else {
+      disconnect();
+    },
+    onError: () => {
       updateStatus(StatusEnum.DISCONNECTED, null);
       SessionPersistence.resetPasswordFailed();
-    }
-
-    disconnect();
+      disconnect();
+    },
   });
 }

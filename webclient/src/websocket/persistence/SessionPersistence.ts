@@ -1,5 +1,5 @@
 import { ServerDispatch } from 'store';
-import { DeckStorageTreeItem, StatusEnum, User, WebSocketConnectOptions } from 'types';
+import { DeckList, DeckStorageTreeItem, ReplayMatch, StatusEnum, User, WebSocketConnectOptions } from 'types';
 
 import { sanitizeHtml } from 'websocket/utils';
 import {
@@ -10,9 +10,6 @@ import {
   UserMessageData
 } from '../events/session/interfaces';
 import NormalizeService from '../utils/NormalizeService';
-import { DeckList } from 'types';
-import { common } from 'protobufjs';
-import IBytesValue = common.IBytesValue;
 
 export class SessionPersistence {
   static initialized() {
@@ -165,7 +162,7 @@ export class SessionPersistence {
     ServerDispatch.accountEditChanged({ realName, email, country });
   }
 
-  static accountImageChanged(avatarBmp: IBytesValue): void {
+  static accountImageChanged(avatarBmp: Uint8Array): void {
     ServerDispatch.accountImageChanged({ avatarBmp });
   }
 
@@ -178,7 +175,8 @@ export class SessionPersistence {
   }
 
   static getGamesOfUser(userName: string, response: any): void {
-    console.log('getGamesOfUser');
+    // Response_GetGamesOfUser contains a gameList field — log for now until game layer is complete
+    console.log('getGamesOfUser', userName, response);
   }
 
   static gameJoined(gameJoinedData: GameJoinedData): void {
@@ -209,28 +207,40 @@ export class SessionPersistence {
     ServerDispatch.removeFromList(list, userName);
   }
 
-  static deckDelete(deckId: number): void {
-    console.log('deckDelete', deckId);
+  static deleteServerDeck(deckId: number): void {
+    ServerDispatch.deckDelete(deckId);
   }
 
-  static deckDeleteDir(path: string): void {
-    console.log('deckDeleteDir', path);
+  static updateServerDecks(deckList: DeckList): void {
+    ServerDispatch.backendDecks(deckList);
   }
 
-  static deckDownload(deckId: number): void {
-    console.log('deckDownload', deckId);
+  static uploadServerDeck(path: string, treeItem: DeckStorageTreeItem): void {
+    ServerDispatch.deckUpload(path, treeItem);
   }
 
-  static deckList(deckList: DeckList): void {
-    console.log('deckList', deckList);
+  static createServerDeckDir(path: string, dirName: string): void {
+    ServerDispatch.deckNewDir(path, dirName);
   }
 
-  static deckNewDir(path: string, dirName: string): void {
-    console.log('deckNewDir', path, dirName);
+  static deleteServerDeckDir(path: string): void {
+    ServerDispatch.deckDelDir(path);
   }
 
-  static deckUpload(treeItem: DeckStorageTreeItem): void {
-    console.log('deckUpload', treeItem);
+  static replayList(matchList: ReplayMatch[]): void {
+    ServerDispatch.replayList(matchList);
+  }
+
+  static replayAdded(matchInfo: ReplayMatch): void {
+    ServerDispatch.replayAdded(matchInfo);
+  }
+
+  static replayModifyMatch(gameId: number, doNotHide: boolean): void {
+    ServerDispatch.replayModifyMatch(gameId, doNotHide);
+  }
+
+  static replayDeleteMatch(gameId: number): void {
+    ServerDispatch.replayDeleteMatch(gameId);
   }
 }
 

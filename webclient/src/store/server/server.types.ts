@@ -54,4 +54,19 @@ export const Types = {
   WARN_HISTORY: '[Server] Warn History',
   WARN_LIST_OPTIONS: '[Server] Warn List Options',
   WARN_USER: '[Server] Warn User',
+  GRANT_REPLAY_ACCESS: '[Server] Grant Replay Access',
+  FORCE_ACTIVATE_USER: '[Server] Force Activate User',
+  GET_ADMIN_NOTES: '[Server] Get Admin Notes',
+  UPDATE_ADMIN_NOTES: '[Server] Update Admin Notes',
+  // Replay
+  REPLAY_LIST: '[Server] Replay List',
+  REPLAY_ADDED: '[Server] Replay Added',
+  REPLAY_MODIFY_MATCH: '[Server] Replay Modify Match',
+  REPLAY_DELETE_MATCH: '[Server] Replay Delete Match',
+  // Deck Storage
+  BACKEND_DECKS: '[Server] Backend Decks',
+  DECK_NEW_DIR: '[Server] Deck New Dir',
+  DECK_DEL_DIR: '[Server] Deck Del Dir',
+  DECK_UPLOAD: '[Server] Deck Upload',
+  DECK_DELETE: '[Server] Deck Delete',
 };

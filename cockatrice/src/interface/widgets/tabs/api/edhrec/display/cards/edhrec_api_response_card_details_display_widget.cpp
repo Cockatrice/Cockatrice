@@ -3,6 +3,7 @@
 #include "../../../../../general/display/background_plate_widget.h"
 #include "../../tab_edhrec_main.h"
 
+#include <QMouseEvent>
 #include <libcockatrice/card/database/card_database_manager.h>
 
 EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWidget(
@@ -48,7 +49,7 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
     if (parentTab) {
         cardPictureWidget->setScaleFactor(parentTab->getCardSizeSlider()->getSlider()->value());
         connect(cardPictureWidget, &CardInfoPictureWidget::cardClicked, this,
-                &EdhrecApiResponseCardDetailsDisplayWidget::actRequestPageNavigation);
+                &EdhrecApiResponseCardDetailsDisplayWidget::mousePressEvent);
         connect(parentTab->getCardSizeSlider()->getSlider(), &QSlider::valueChanged, cardPictureWidget,
                 &CardInfoPictureWidget::setScaleFactor);
         connect(this, &EdhrecApiResponseCardDetailsDisplayWidget::requestUrl, parentTab,
@@ -59,7 +60,9 @@ EdhrecApiResponseCardDetailsDisplayWidget::EdhrecApiResponseCardDetailsDisplayWi
 void EdhrecApiResponseCardDetailsDisplayWidget::mousePressEvent(QMouseEvent *event)
 {
     QWidget::mousePressEvent(event);
-    actRequestPageNavigation();
+    if (event->button() == Qt::LeftButton) {
+        actRequestPageNavigation();
+    }
 }
 
 void EdhrecApiResponseCardDetailsDisplayWidget::enterEvent(QEnterEvent *event)
