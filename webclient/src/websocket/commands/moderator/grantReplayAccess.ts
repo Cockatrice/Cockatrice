@@ -1,14 +1,13 @@
 import { create } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
-import {
-  Command_GrantReplayAccess_ext, Command_GrantReplayAccessSchema,
-} from 'generated/proto/moderator_commands_pb';
+
 import { ModeratorPersistence } from '../../persistence';
+import { Data } from '@app/types';
 
 export function grantReplayAccess(replayId: number, moderatorName: string): void {
   webClient.protobuf.sendModeratorCommand(
-    Command_GrantReplayAccess_ext,
-    create(Command_GrantReplayAccessSchema, { replayId, moderatorName }),
+    Data.Command_GrantReplayAccess_ext,
+    create(Data.Command_GrantReplayAccessSchema, { replayId, moderatorName }),
     {
       onSuccess: () => {
         ModeratorPersistence.grantReplayAccess(replayId, moderatorName);

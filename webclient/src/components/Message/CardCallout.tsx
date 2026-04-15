@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Popover from '@mui/material/Popover';
 
-import { CardDTO, TokenDTO } from 'services';
+import { CardDTO, TokenDTO } from '@app/services';
 
 import CardDetails from '../CardDetails/CardDetails';
 import TokenDetails from '../TokenDetails/TokenDetails';

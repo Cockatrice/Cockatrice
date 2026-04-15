@@ -1,25 +1,21 @@
-vi.mock('store', () => ({ store: { dispatch: vi.fn() } }));
+vi.mock('..', () => ({ store: { dispatch: vi.fn() } }));
 
-import { store } from 'store';
+import { store } from '..';
 import { Actions } from './server.actions';
 import { Dispatch } from './server.dispatch';
+import { App, Data } from '@app/types';
 import { create } from '@bufbuild/protobuf';
-import { Event_NotifyUserSchema } from 'generated/proto/event_notify_user_pb';
-import { Event_ServerShutdownSchema } from 'generated/proto/event_server_shutdown_pb';
-import { Event_UserMessageSchema } from 'generated/proto/event_user_message_pb';
 import {
   makeBanHistoryItem,
-  makeConnectOptions,
+  makeLoginSuccessContext,
+  makePendingActivationContext,
   makeDeckList,
   makeDeckTreeItem,
-  makeGame,
   makeReplayMatch,
   makeUser,
   makeWarnHistoryItem,
   makeWarnListItem,
 } from './__mocks__/server-fixtures';
-
-beforeEach(() => vi.clearAllMocks());
 
 describe('Dispatch', () => {
   it('initialized dispatches Actions.initialized()', () => {
@@ -38,7 +34,7 @@ describe('Dispatch', () => {
   });
 
   it('loginSuccessful dispatches Actions.loginSuccessful()', () => {
-    const options = makeConnectOptions();
+    const options = makeLoginSuccessContext();
     Dispatch.loginSuccessful(options);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.loginSuccessful(options));
   });
@@ -46,11 +42,6 @@ describe('Dispatch', () => {
   it('loginFailed dispatches Actions.loginFailed()', () => {
     Dispatch.loginFailed();
     expect(store.dispatch).toHaveBeenCalledWith(Actions.loginFailed());
-  });
-
-  it('connectionClosed dispatches Actions.connectionClosed()', () => {
-    Dispatch.connectionClosed(3);
-    expect(store.dispatch).toHaveBeenCalledWith(Actions.connectionClosed(3));
   });
 
   it('connectionFailed dispatches Actions.connectionFailed()', () => {
@@ -108,8 +99,8 @@ describe('Dispatch', () => {
   });
 
   it('updateStatus dispatches Actions.updateStatus({ state, description })', () => {
-    Dispatch.updateStatus(2, 'ok');
-    expect(store.dispatch).toHaveBeenCalledWith(Actions.updateStatus({ state: 2, description: 'ok' }));
+    Dispatch.updateStatus(App.StatusEnum.CONNECTED, 'ok');
+    expect(store.dispatch).toHaveBeenCalledWith(Actions.updateStatus({ state: App.StatusEnum.CONNECTED, description: 'ok' }));
   });
 
   it('updateUser dispatches Actions.updateUser()', () => {
@@ -136,7 +127,7 @@ describe('Dispatch', () => {
   });
 
   it('viewLogs dispatches Actions.viewLogs()', () => {
-    const logs = [{ targetType: 'room' }] as any[];
+    const logs = [create(Data.ServerInfo_ChatMessageSchema, { targetType: 'room' })];
     Dispatch.viewLogs(logs);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.viewLogs(logs));
   });
@@ -187,7 +178,7 @@ describe('Dispatch', () => {
   });
 
   it('accountAwaitingActivation dispatches correctly', () => {
-    const options = makeConnectOptions();
+    const options = makePendingActivationContext();
     Dispatch.accountAwaitingActivation(options);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.accountAwaitingActivation(options));
   });
@@ -266,19 +257,19 @@ describe('Dispatch', () => {
   });
 
   it('notifyUser dispatches correctly', () => {
-    const notification = create(Event_NotifyUserSchema, { type: 1, warningReason: '', customTitle: '', customContent: '' });
+    const notification = create(Data.Event_NotifyUserSchema, { type: 1, warningReason: '', customTitle: '', customContent: '' });
     Dispatch.notifyUser(notification);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.notifyUser(notification));
   });
 
   it('serverShutdown dispatches correctly', () => {
-    const data = create(Event_ServerShutdownSchema, { reason: 'maintenance', minutes: 5 });
+    const data = create(Data.Event_ServerShutdownSchema, { reason: 'maintenance', minutes: 5 });
     Dispatch.serverShutdown(data);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.serverShutdown(data));
   });
 
   it('userMessage dispatches correctly', () => {
-    const messageData = create(Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'hey' });
+    const messageData = create(Data.Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'hey' });
     Dispatch.userMessage(messageData);
     expect(store.dispatch).toHaveBeenCalledWith(Actions.userMessage(messageData));
   });
@@ -391,10 +382,9 @@ describe('Dispatch', () => {
   });
 
   it('gamesOfUser dispatches correctly', () => {
-    const games = [makeGame({ gameId: 1 })];
-    const gametypeMap = { 1: 'Standard' };
-    Dispatch.gamesOfUser('alice', games, gametypeMap);
-    expect(store.dispatch).toHaveBeenCalledWith(Actions.gamesOfUser('alice', games, gametypeMap));
+    const response = create(Data.Response_GetGamesOfUserSchema, { roomList: [], gameList: [] });
+    Dispatch.gamesOfUser('alice', response);
+    expect(store.dispatch).toHaveBeenCalledWith(Actions.gamesOfUser('alice', response));
   });
 
   it('clearRegistrationErrors dispatches correctly', () => {

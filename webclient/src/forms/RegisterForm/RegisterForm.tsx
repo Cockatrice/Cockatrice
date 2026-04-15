@@ -8,12 +8,12 @@ import { useTranslation } from 'react-i18next';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-import { CountryDropdown, InputField, KnownHosts } from 'components';
-import { useReduxEffect } from 'hooks';
-import { ServerDispatch, ServerSelectors, ServerTypes } from 'store';
+import { CountryDropdown, InputField, KnownHosts } from '@app/components';
+import { useReduxEffect } from '@app/hooks';
+import { ServerDispatch, ServerSelectors, ServerTypes } from '@app/store';
 
 import './RegisterForm.css';
-import { useToast } from 'components/Toast';
+import { useToast } from '@app/components';
 
 const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   const { t } = useTranslation();

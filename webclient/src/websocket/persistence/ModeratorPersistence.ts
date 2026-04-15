@@ -1,27 +1,24 @@
-import { ServerDispatch } from 'store';
-import type { ServerInfo_Ban } from 'generated/proto/serverinfo_ban_pb';
-import type { ServerInfo_ChatMessage } from 'generated/proto/serverinfo_chat_message_pb';
-import type { ServerInfo_Warning } from 'generated/proto/serverinfo_warning_pb';
-import type { Response_WarnList } from 'generated/proto/response_warn_list_pb';
+import { ServerDispatch } from '@app/store';
+import { Data } from '@app/types';
 
 export class ModeratorPersistence {
   static banFromServer(userName: string): void {
     ServerDispatch.banFromServer(userName);
   }
 
-  static banHistory(userName: string, banHistory: ServerInfo_Ban[]): void {
+  static banHistory(userName: string, banHistory: Data.ServerInfo_Ban[]): void {
     ServerDispatch.banHistory(userName, banHistory);
   }
 
-  static viewLogs(logs: ServerInfo_ChatMessage[]): void {
+  static viewLogs(logs: Data.ServerInfo_ChatMessage[]): void {
     ServerDispatch.viewLogs(logs);
   }
 
-  static warnHistory(userName: string, warnHistory: ServerInfo_Warning[]): void {
+  static warnHistory(userName: string, warnHistory: Data.ServerInfo_Warning[]): void {
     ServerDispatch.warnHistory(userName, warnHistory);
   }
 
-  static warnListOptions(warnList: Response_WarnList[]): void {
+  static warnListOptions(warnList: Data.Response_WarnList[]): void {
     ServerDispatch.warnListOptions(warnList);
   }
 

@@ -1,6 +1,6 @@
 import { create } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
-import { Command_RoomSay_ext, Command_RoomSaySchema } from 'generated/proto/room_commands_pb';
+import { Data } from '@app/types';
 
 export function roomSay(roomId: number, message: string): void {
   const trimmed = message.trim();
@@ -9,5 +9,5 @@ export function roomSay(roomId: number, message: string): void {
     return;
   }
 
-  webClient.protobuf.sendRoomCommand(roomId, Command_RoomSay_ext, create(Command_RoomSaySchema, { message: trimmed }));
+  webClient.protobuf.sendRoomCommand(roomId, Data.Command_RoomSay_ext, create(Data.Command_RoomSaySchema, { message: trimmed }));
 }

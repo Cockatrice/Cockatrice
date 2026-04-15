@@ -1,7 +1,7 @@
 import { Actions } from './rooms.actions';
 import { Types } from './rooms.types';
 import { makeGame, makeMessage, makeRoom, makeUser } from './__mocks__/rooms-fixtures';
-import { GameSortField, SortDirection } from 'types';
+import { App } from '@app/types';
 
 describe('Actions', () => {
   it('clearStore', () => {
@@ -42,11 +42,11 @@ describe('Actions', () => {
   });
 
   it('sortGames', () => {
-    expect(Actions.sortGames(1, GameSortField.START_TIME, SortDirection.ASC)).toEqual({
+    expect(Actions.sortGames(1, App.GameSortField.START_TIME, App.SortDirection.ASC)).toEqual({
       type: Types.SORT_GAMES,
       roomId: 1,
-      field: GameSortField.START_TIME,
-      order: SortDirection.ASC,
+      field: App.GameSortField.START_TIME,
+      order: App.SortDirection.ASC,
     });
   });
 

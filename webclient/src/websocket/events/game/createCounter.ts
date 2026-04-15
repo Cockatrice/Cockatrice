@@ -1,7 +1,6 @@
-import type { Event_CreateCounter } from 'generated/proto/event_create_counter_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function createCounter(data: Event_CreateCounter, meta: GameEventMeta): void {
+export function createCounter(data: Data.Event_CreateCounter, meta: Enriched.GameEventMeta): void {
   GamePersistence.counterCreated(meta.gameId, meta.playerId, data);
 }

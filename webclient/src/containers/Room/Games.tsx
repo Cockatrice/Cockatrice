@@ -12,9 +12,9 @@ import Tooltip from '@mui/material/Tooltip';
 
 // import { RoomsService } from "AppShell/common/services";
 
-import { SortUtil, RoomsDispatch, RoomsSelectors } from 'store';
-import { UserDisplay } from 'components';
-import { useAppSelector } from 'store/store';
+import { SortUtil, RoomsDispatch, RoomsSelectors } from '@app/store';
+import { UserDisplay } from '@app/components';
+import { useAppSelector } from '@app/store';
 
 import './Games.css';
 

@@ -1,16 +1,14 @@
 import { Actions } from './server.actions';
+import { App, Data } from '@app/types';
 import { Types } from './server.types';
 import { create } from '@bufbuild/protobuf';
-import { Event_NotifyUserSchema } from 'generated/proto/event_notify_user_pb';
-import { Event_ServerShutdownSchema } from 'generated/proto/event_server_shutdown_pb';
-import { Event_UserMessageSchema } from 'generated/proto/event_user_message_pb';
 import {
   makeBanHistoryItem,
-  makeConnectOptions,
+  makeLoginSuccessContext,
+  makePendingActivationContext,
   makeDeckList,
   makeDeckTreeItem,
   makeReplayMatch,
-  makeGame,
   makeUser,
   makeWarnHistoryItem,
   makeWarnListItem,
@@ -30,16 +28,12 @@ describe('Actions', () => {
   });
 
   it('loginSuccessful', () => {
-    const options = makeConnectOptions();
+    const options = makeLoginSuccessContext();
     expect(Actions.loginSuccessful(options)).toEqual({ type: Types.LOGIN_SUCCESSFUL, options });
   });
 
   it('loginFailed', () => {
     expect(Actions.loginFailed()).toEqual({ type: Types.LOGIN_FAILED });
-  });
-
-  it('connectionClosed', () => {
-    expect(Actions.connectionClosed(3)).toEqual({ type: Types.CONNECTION_CLOSED, reason: 3 });
   });
 
   it('connectionFailed', () => {
@@ -92,7 +86,7 @@ describe('Actions', () => {
   });
 
   it('updateStatus', () => {
-    const status = { state: 2, description: 'connected' };
+    const status = { state: App.StatusEnum.CONNECTED, description: 'connected' };
     expect(Actions.updateStatus(status)).toEqual({ type: Types.UPDATE_STATUS, status });
   });
 
@@ -116,7 +110,7 @@ describe('Actions', () => {
   });
 
   it('viewLogs', () => {
-    const logs = [{ targetType: 'room' }] as any[];
+    const logs = [create(Data.ServerInfo_ChatMessageSchema, { targetType: 'room' })];
     expect(Actions.viewLogs(logs)).toEqual({ type: Types.VIEW_LOGS, logs });
   });
 
@@ -153,7 +147,7 @@ describe('Actions', () => {
   });
 
   it('accountAwaitingActivation', () => {
-    const options = makeConnectOptions();
+    const options = makePendingActivationContext();
     expect(Actions.accountAwaitingActivation(options)).toEqual({ type: Types.ACCOUNT_AWAITING_ACTIVATION, options });
   });
 
@@ -222,17 +216,17 @@ describe('Actions', () => {
   });
 
   it('notifyUser', () => {
-    const notification = create(Event_NotifyUserSchema, { type: 1, warningReason: '', customTitle: '', customContent: '' });
+    const notification = create(Data.Event_NotifyUserSchema, { type: 1, warningReason: '', customTitle: '', customContent: '' });
     expect(Actions.notifyUser(notification)).toEqual({ type: Types.NOTIFY_USER, notification });
   });
 
   it('serverShutdown', () => {
-    const data = create(Event_ServerShutdownSchema, { reason: 'maintenance', minutes: 5 });
+    const data = create(Data.Event_ServerShutdownSchema, { reason: 'maintenance', minutes: 5 });
     expect(Actions.serverShutdown(data)).toEqual({ type: Types.SERVER_SHUTDOWN, data });
   });
 
   it('userMessage', () => {
-    const messageData = create(Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'hey' });
+    const messageData = create(Data.Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'hey' });
     expect(Actions.userMessage(messageData)).toEqual({ type: Types.USER_MESSAGE, messageData });
   });
 
@@ -360,9 +354,8 @@ describe('Actions', () => {
   });
 
   it('gamesOfUser', () => {
-    const games = [makeGame({ gameId: 1 })];
-    const gametypeMap = { 1: 'Standard' };
-    expect(Actions.gamesOfUser('alice', games, gametypeMap)).toEqual({ type: Types.GAMES_OF_USER, userName: 'alice', games, gametypeMap });
+    const response = create(Data.Response_GetGamesOfUserSchema, { roomList: [], gameList: [] });
+    expect(Actions.gamesOfUser('alice', response)).toEqual({ type: Types.GAMES_OF_USER, userName: 'alice', response });
   });
 
   it('clearRegistrationErrors', () => {

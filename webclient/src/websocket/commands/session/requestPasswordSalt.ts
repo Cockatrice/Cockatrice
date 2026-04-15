@@ -1,15 +1,10 @@
-import { RequestPasswordSaltParams } from 'store';
-import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
+import { App, Enriched, Data } from '@app/types';
 
 import { create } from '@bufbuild/protobuf';
 import { CLIENT_CONFIG } from '../../config';
 import webClient from '../../WebClient';
-import {
-  Command_RequestPasswordSalt_ext, Command_RequestPasswordSaltSchema,
-} from 'generated/proto/session_commands_pb';
+
 import { SessionPersistence } from '../../persistence';
-import { Response_PasswordSalt_ext } from 'generated/proto/response_password_salt_pb';
-import { Response_ResponseCode } from 'generated/proto/response_pb';
 
 import {
   activate,
@@ -19,15 +14,20 @@ import {
   updateStatus
 } from './';
 
-export function requestPasswordSalt(options: WebSocketConnectOptions, password?: string, newPassword?: string): void {
-  const { userName } = options as RequestPasswordSaltParams;
+type PasswordSaltOptions =
+  | Omit<Enriched.LoginConnectOptions, 'password'>
+  | Omit<Enriched.ActivateConnectOptions, 'password'>
+  | Omit<Enriched.PasswordResetConnectOptions, 'newPassword'>;
+
+export function requestPasswordSalt(options: PasswordSaltOptions, password?: string, newPassword?: string): void {
+  const { userName } = options;
 
   const onFailure = () => {
     switch (options.reason) {
-      case WebSocketConnectReason.ACTIVATE_ACCOUNT:
+      case App.WebSocketConnectReason.ACTIVATE_ACCOUNT:
         SessionPersistence.accountActivationFailed();
         break;
-      case WebSocketConnectReason.PASSWORD_RESET:
+      case App.WebSocketConnectReason.PASSWORD_RESET:
         SessionPersistence.resetPasswordFailed();
         break;
       default:
@@ -36,19 +36,19 @@ export function requestPasswordSalt(options: WebSocketConnectOptions, password?:
     disconnect();
   };
 
-  webClient.protobuf.sendSessionCommand(Command_RequestPasswordSalt_ext, create(Command_RequestPasswordSaltSchema, {
+  webClient.protobuf.sendSessionCommand(Data.Command_RequestPasswordSalt_ext, create(Data.Command_RequestPasswordSaltSchema, {
     ...CLIENT_CONFIG,
     userName,
   }), {
-    responseExt: Response_PasswordSalt_ext,
+    responseExt: Data.Response_PasswordSalt_ext,
     onSuccess: (resp) => {
       const passwordSalt = resp?.passwordSalt;
 
       switch (options.reason) {
-        case WebSocketConnectReason.ACTIVATE_ACCOUNT:
+        case App.WebSocketConnectReason.ACTIVATE_ACCOUNT:
           activate(options, password, passwordSalt);
           break;
-        case WebSocketConnectReason.PASSWORD_RESET:
+        case App.WebSocketConnectReason.PASSWORD_RESET:
           forgotPasswordReset(options, newPassword, passwordSalt);
           break;
         default:
@@ -56,13 +56,13 @@ export function requestPasswordSalt(options: WebSocketConnectOptions, password?:
       }
     },
     onResponseCode: {
-      [Response_ResponseCode.RespRegistrationRequired]: () => {
-        updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
+      [Data.Response_ResponseCode.RespRegistrationRequired]: () => {
+        updateStatus(App.StatusEnum.DISCONNECTED, 'Login failed: registration required');
         onFailure();
       },
     },
     onError: () => {
-      updateStatus(StatusEnum.DISCONNECTED, 'Login failed: Unknown Reason');
+      updateStatus(App.StatusEnum.DISCONNECTED, 'Login failed: Unknown Reason');
       onFailure();
     },
   });

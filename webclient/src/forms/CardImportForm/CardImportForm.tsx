@@ -8,8 +8,8 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { InputField, VirtualList } from 'components';
-import { cardImporterService, CardDTO, SetDTO, TokenDTO } from 'services';
+import { InputField, VirtualList } from '@app/components';
+import { cardImporterService, CardDTO, SetDTO, TokenDTO } from '@app/services';
 
 import './CardImportForm.css';
 

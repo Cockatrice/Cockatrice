@@ -1,7 +1,6 @@
-import type { Event_DrawCards } from 'generated/proto/event_draw_cards_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function drawCards(data: Event_DrawCards, meta: GameEventMeta): void {
+export function drawCards(data: Data.Event_DrawCards, meta: Enriched.GameEventMeta): void {
   GamePersistence.cardsDrawn(meta.gameId, meta.playerId, data);
 }

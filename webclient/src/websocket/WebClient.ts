@@ -1,18 +1,18 @@
-import { StatusEnum, WebSocketConnectOptions } from 'types';
+import { App, Enriched } from '@app/types';
 
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
 import { ping } from './commands/session';
 
-import { GameDispatch } from 'store';
+import { GameDispatch } from '@app/store';
 import { RoomPersistence, SessionPersistence } from './persistence';
 
 export class WebClient {
   public socket: WebSocketService;
   public protobuf: ProtobufService;
 
-  public options: WebSocketConnectOptions;
-  public status: StatusEnum;
+  public options: Enriched.WebSocketConnectOptions | null = null;
+  public status: App.StatusEnum;
 
   constructor() {
     this.socket = new WebSocketService({
@@ -35,13 +35,13 @@ export class WebClient {
     }
   }
 
-  public connect(options: WebSocketConnectOptions) {
+  public connect(options: Enriched.WebSocketConnectOptions) {
     SessionPersistence.connectionAttempted();
     this.options = options;
     this.socket.connect(options);
   }
 
-  public testConnect(options: WebSocketConnectOptions) {
+  public testConnect(options: Enriched.WebSocketConnectOptions) {
     this.socket.testConnect(options);
   }
 
@@ -49,10 +49,10 @@ export class WebClient {
     this.socket.disconnect();
   }
 
-  public updateStatus(status: StatusEnum) {
+  public updateStatus(status: App.StatusEnum) {
     this.status = status;
 
-    if (status === StatusEnum.DISCONNECTED) {
+    if (status === App.StatusEnum.DISCONNECTED) {
       this.protobuf.resetCommands();
       this.clearStores();
     }

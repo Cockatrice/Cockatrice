@@ -1,21 +1,18 @@
-import { GameSortField, Message, SortDirection } from 'types';
-import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
-import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
-import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
+import { App, Data, Enriched } from '@app/types';
 
 import { Actions } from './rooms.actions';
-import { store } from 'store';
+import { store } from '..';
 
 export const Dispatch = {
   clearStore: () => {
     store.dispatch(Actions.clearStore());
   },
 
-  updateRooms: (rooms: ServerInfo_Room[]) => {
+  updateRooms: (rooms: Data.ServerInfo_Room[]) => {
     store.dispatch(Actions.updateRooms(rooms));
   },
 
-  joinRoom: (roomInfo: ServerInfo_Room) => {
+  joinRoom: (roomInfo: Data.ServerInfo_Room) => {
     store.dispatch(Actions.joinRoom(roomInfo));
 
   },
@@ -24,15 +21,15 @@ export const Dispatch = {
     store.dispatch(Actions.leaveRoom(roomId));
   },
 
-  addMessage: (roomId: number, message: Message) => {
+  addMessage: (roomId: number, message: Enriched.Message) => {
     store.dispatch(Actions.addMessage(roomId, message));
   },
 
-  updateGames: (roomId: number, games: ServerInfo_Game[]) => {
+  updateGames: (roomId: number, games: Data.ServerInfo_Game[]) => {
     store.dispatch(Actions.updateGames(roomId, games));
   },
 
-  userJoined: (roomId: number, user: ServerInfo_User) => {
+  userJoined: (roomId: number, user: Data.ServerInfo_User) => {
     store.dispatch(Actions.userJoined(roomId, user));
   },
 
@@ -40,7 +37,7 @@ export const Dispatch = {
     store.dispatch(Actions.userLeft(roomId, name));
   },
 
-  sortGames: (roomId: number, field: GameSortField, order: SortDirection) => {
+  sortGames: (roomId: number, field: App.GameSortField, order: App.SortDirection) => {
     store.dispatch(Actions.sortGames(roomId, field, order));
   },
 

@@ -1,4 +1,4 @@
-import { AdminCommands } from 'websocket';
+import { AdminCommands } from '@app/websocket';
 
 export class AdminService {
   static adjustMod(userName: string, shouldBeMod?: boolean, shouldBeJudge?: boolean): void {

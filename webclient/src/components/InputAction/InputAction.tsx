@@ -2,7 +2,7 @@ import React from 'react';
 import { Field } from 'react-final-form'
 import Button from '@mui/material/Button';
 
-import { InputField } from 'components';
+import { InputField } from '..';
 
 import './InputAction.css';
 

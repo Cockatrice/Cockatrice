@@ -8,12 +8,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutline';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 
-import { AuthenticationService, RoomsService } from 'api';
-import { CardImportDialog } from 'dialogs';
-import { Images } from 'images';
-import { RoomsSelectors, ServerSelectors } from 'store';
-import { RouteEnum } from 'types';
-import { useAppSelector } from 'store/store';
+import { AuthenticationService, RoomsService } from '@app/api';
+import { CardImportDialog } from '@app/dialogs';
+import { Images } from '@app/images';
+import { RoomsSelectors, ServerSelectors } from '@app/store';
+import { App } from '@app/types';
+import { useAppSelector } from '@app/store';
 
 import './LeftNav.css';
 
@@ -82,7 +82,7 @@ const LeftNav = () => {
     <div className="LeftNav__container">
       <div>
         <div className="LeftNav__logo">
-          <NavLink to={RouteEnum.SERVER}>
+          <NavLink to={App.RouteEnum.SERVER}>
             <img src={Images.Logo} alt="logo" />
           </NavLink>
           { AuthenticationService.isConnected(serverState) && (
@@ -98,8 +98,8 @@ const LeftNav = () => {
                     className="LeftNav-nav__link-btn"
                     to={
                       joinedRooms.length
-                        ? generatePath(RouteEnum.ROOM, { roomId: joinedRooms[0].roomId.toString() })
-                        : RouteEnum.SERVER
+                        ? generatePath(App.RouteEnum.ROOM, { roomId: joinedRooms[0].roomId.toString() })
+                        : App.RouteEnum.SERVER
                     }
                   >
                     Rooms
@@ -108,7 +108,9 @@ const LeftNav = () => {
                   <div className="LeftNav-nav__link-menu">
                     {joinedRooms.map(({ name, roomId }) => (
                       <div className="LeftNav-nav__link-menu__item" key={roomId}>
-                        <NavLink className="LeftNav-nav__link-menu__btn" to={ generatePath(RouteEnum.ROOM, { roomId: roomId.toString() }) }>
+                        <NavLink className="LeftNav-nav__link-menu__btn"
+                          to={ generatePath(App.RouteEnum.ROOM, { roomId: roomId.toString() }) }
+                        >
                           {name}
 
                           <IconButton size="small" edge="end" onClick={event => leaveRoom(event, roomId)}>
@@ -120,13 +122,13 @@ const LeftNav = () => {
                   </div>
                 </div>
                 <div className="LeftNav-nav__link">
-                  <NavLink className="LeftNav-nav__link-btn" to={ RouteEnum.GAME }>
+                  <NavLink className="LeftNav-nav__link-btn" to={ App.RouteEnum.GAME }>
                     Games
                     <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>
                 </div>
                 <div className="LeftNav-nav__link">
-                  <NavLink className="LeftNav-nav__link-btn" to={ RouteEnum.DECKS }>
+                  <NavLink className="LeftNav-nav__link-btn" to={ App.RouteEnum.DECKS }>
                     Decks
                     <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>

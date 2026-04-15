@@ -1,6 +1,6 @@
+import type { Data } from '@app/types';
 import { RoomPersistence } from '../../persistence';
-import { LeaveRoomData, RoomEvent } from './interfaces';
 
-export function leaveRoom({ name }: LeaveRoomData, { roomId }: RoomEvent): void {
+export function leaveRoom({ name }: Data.Event_LeaveRoom, { roomId }: Data.RoomEvent): void {
   RoomPersistence.userLeft(roomId, name);
 }

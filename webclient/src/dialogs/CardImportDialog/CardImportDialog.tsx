@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 
-import { CardImportForm } from 'forms';
+import { CardImportForm } from '@app/forms';
 
 import './CardImportDialog.css';
 

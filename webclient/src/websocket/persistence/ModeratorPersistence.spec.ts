@@ -1,4 +1,4 @@
-vi.mock('store', () => ({
+vi.mock('@app/store', () => ({
   ServerDispatch: {
     banFromServer: vi.fn(),
     banHistory: vi.fn(),
@@ -14,11 +14,9 @@ vi.mock('store', () => ({
 }));
 
 import { ModeratorPersistence } from './ModeratorPersistence';
-import { ServerDispatch } from 'store';
-
-beforeEach(() => {
-  vi.clearAllMocks();
-});
+import { ServerDispatch } from '@app/store';
+import { create } from '@bufbuild/protobuf';
+import { Data } from '@app/types';
 
 describe('ModeratorPersistence', () => {
   it('banFromServer passes userName', () => {
@@ -32,7 +30,7 @@ describe('ModeratorPersistence', () => {
   });
 
   it('viewLogs dispatches raw logs', () => {
-    const logs = [{ targetType: 'room' }] as any;
+    const logs = [create(Data.ServerInfo_ChatMessageSchema, { targetType: 'room' })];
     ModeratorPersistence.viewLogs(logs);
     expect(ServerDispatch.viewLogs).toHaveBeenCalledWith(logs);
   });

@@ -3,14 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { NavLink, generatePath } from 'react-router-dom';
 
-import {
-  RouteEnum,
-  URL_REGEX,
-  MESSAGE_SENDER_REGEX,
-  MENTION_REGEX,
-  CARD_CALLOUT_REGEX,
-  CALLOUT_BOUNDARY_REGEX,
-} from 'types';
+import { App } from '@app/types';
 
 import CardCallout from './CardCallout';
 import './Message.css';
@@ -28,7 +21,7 @@ const ParsedMessage = ({ message }) => {
   const [name, setName] = useState(null);
 
   useMemo(() => {
-    const name = message.match(MESSAGE_SENDER_REGEX);
+    const name = message.match(App.MESSAGE_SENDER_REGEX);
 
     if (name) {
       setName(name[1]);
@@ -46,29 +39,29 @@ const ParsedMessage = ({ message }) => {
 };
 
 const PlayerLink = ({ name, label = name }) => (
-  <NavLink className="link" to={generatePath(RouteEnum.PLAYER, { name })}>
+  <NavLink className="link" to={generatePath(App.RouteEnum.PLAYER, { name })}>
     {label}
   </NavLink>
 );
 
 function parseMessage(message) {
-  return message.replace(MESSAGE_SENDER_REGEX, '')
-    .split(CARD_CALLOUT_REGEX)
+  return message.replace(App.MESSAGE_SENDER_REGEX, '')
+    .split(App.CARD_CALLOUT_REGEX)
     .filter(chunk => !!chunk)
     .map(parseChunks);
 }
 
 function parseChunks(chunk, index) {
-  if (chunk.match(CARD_CALLOUT_REGEX)) {
-    const name = chunk.replace(CALLOUT_BOUNDARY_REGEX, '').trim();
+  if (chunk.match(App.CARD_CALLOUT_REGEX)) {
+    const name = chunk.replace(App.CALLOUT_BOUNDARY_REGEX, '').trim();
     return (<CardCallout name={name} key={index}></CardCallout>);
   }
 
-  if (chunk.match(URL_REGEX)) {
+  if (chunk.match(App.URL_REGEX)) {
     return parseUrlChunk(chunk);
   }
 
-  if (chunk.match(MENTION_REGEX)) {
+  if (chunk.match(App.MENTION_REGEX)) {
     return parseMentionChunk(chunk);
   }
 
@@ -76,10 +69,10 @@ function parseChunks(chunk, index) {
 }
 
 function parseUrlChunk(chunk) {
-  return chunk.split(URL_REGEX)
+  return chunk.split(App.URL_REGEX)
     .filter(urlChunk => !!urlChunk)
     .map((urlChunk, index) => {
-      if (urlChunk.match(URL_REGEX)) {
+      if (urlChunk.match(App.URL_REGEX)) {
         return (<a className='link' href={urlChunk} key={index} target='_blank' rel='noopener noreferrer'>{urlChunk}</a>);
       }
 
@@ -88,10 +81,10 @@ function parseUrlChunk(chunk) {
 }
 
 function parseMentionChunk(chunk) {
-  return chunk.split(MENTION_REGEX)
+  return chunk.split(App.MENTION_REGEX)
     .filter(mentionChunk => !!mentionChunk)
     .map((mentionChunk, index) => {
-      const mention = mentionChunk.match(MENTION_REGEX);
+      const mention = mentionChunk.match(App.MENTION_REGEX);
 
       if (mention) {
         const name = mention[0].substr(1);

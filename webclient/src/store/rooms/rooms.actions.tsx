@@ -1,7 +1,4 @@
-import { GameSortField, Message, SortDirection } from 'types';
-import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
-import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
-import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
+import { App, Data, Enriched } from '@app/types';
 
 import { Types } from './rooms.types';
 
@@ -10,12 +7,12 @@ export const Actions = {
     type: Types.CLEAR_STORE,
   }),
 
-  updateRooms: (rooms: ServerInfo_Room[]) => ({
+  updateRooms: (rooms: Data.ServerInfo_Room[]) => ({
     type: Types.UPDATE_ROOMS,
     rooms,
   }),
 
-  joinRoom: (roomInfo: ServerInfo_Room) => ({
+  joinRoom: (roomInfo: Data.ServerInfo_Room) => ({
     type: Types.JOIN_ROOM,
     roomInfo,
   }),
@@ -25,19 +22,19 @@ export const Actions = {
     roomId,
   }),
 
-  addMessage: (roomId: number, message: Message) => ({
+  addMessage: (roomId: number, message: Enriched.Message) => ({
     type: Types.ADD_MESSAGE,
     roomId,
     message,
   }),
 
-  updateGames: (roomId: number, games: ServerInfo_Game[]) => ({
+  updateGames: (roomId: number, games: Data.ServerInfo_Game[]) => ({
     type: Types.UPDATE_GAMES,
     roomId,
     games,
   }),
 
-  userJoined: (roomId: number, user: ServerInfo_User) => ({
+  userJoined: (roomId: number, user: Data.ServerInfo_User) => ({
     type: Types.USER_JOINED,
     roomId,
     user,
@@ -49,7 +46,7 @@ export const Actions = {
     name,
   }),
 
-  sortGames: (roomId: number, field: GameSortField, order: SortDirection) => ({
+  sortGames: (roomId: number, field: App.GameSortField, order: App.SortDirection) => ({
     type: Types.SORT_GAMES,
     roomId,
     field,

@@ -4,7 +4,6 @@ export const Types = {
   CONNECTION_ATTEMPTED: '[Server] Connection Attempted',
   LOGIN_SUCCESSFUL: '[Server] Login Successful',
   LOGIN_FAILED: '[Server] Login Failed',
-  CONNECTION_CLOSED: '[Server] Connection Closed',
   CONNECTION_FAILED: '[Server] Connection Failed',
   TEST_CONNECTION_SUCCESSFUL: '[Server] Test Connection Successful',
   TEST_CONNECTION_FAILED: '[Server] Test Connection Failed',

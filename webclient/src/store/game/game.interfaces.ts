@@ -1,7 +1,4 @@
-import type { ServerInfo_Card } from 'generated/proto/serverinfo_card_pb';
-import type { ServerInfo_Counter } from 'generated/proto/serverinfo_counter_pb';
-import type { ServerInfo_Arrow } from 'generated/proto/serverinfo_arrow_pb';
-import type { ServerInfo_PlayerProperties } from 'generated/proto/serverinfo_playerproperties_pb';
+import type { Data } from '@app/types';
 
 export interface GamesState {
   games: { [gameId: number]: GameEntry };
@@ -32,14 +29,14 @@ export interface GameEntry {
 
 /** Normalized from ServerInfo_Player — keyed collections for O(1) lookup. */
 export interface PlayerEntry {
-  properties: ServerInfo_PlayerProperties;
+  properties: Data.ServerInfo_PlayerProperties;
   deckList: string;
   /** Zones keyed by zone name (e.g. "hand", "deck", "table"). */
   zones: { [zoneName: string]: ZoneEntry };
   /** Player-level counters (e.g. life) keyed by counter id. */
-  counters: { [counterId: number]: ServerInfo_Counter };
+  counters: { [counterId: number]: Data.ServerInfo_Counter };
   /** Arrows keyed by arrow id. */
-  arrows: { [arrowId: number]: ServerInfo_Arrow };
+  arrows: { [arrowId: number]: Data.ServerInfo_Arrow };
 }
 
 /** Normalized from ServerInfo_Zone — card list is an ordered array matching proto. */
@@ -51,7 +48,7 @@ export interface ZoneEntry {
   /** Authoritative card count (used for hidden zones where cardList may be empty). */
   cardCount: number;
   /** Ordered card list; may be empty for hidden zones with no dump active. */
-  cards: ServerInfo_Card[];
+  cards: Data.ServerInfo_Card[];
   alwaysRevealTopCard: boolean;
   alwaysLookAtTopCard: boolean;
 }

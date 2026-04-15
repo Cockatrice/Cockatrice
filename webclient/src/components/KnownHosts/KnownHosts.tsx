@@ -13,13 +13,13 @@ import AddIcon from '@mui/icons-material/Add';
 import EditRoundedIcon from '@mui/icons-material/Edit';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 
-import { AuthenticationService } from 'api';
-import { KnownHostDialog } from 'dialogs';
-import { useReduxEffect } from 'hooks';
-import { HostDTO } from 'services';
-import { ServerTypes } from 'store';
-import { DefaultHosts, Host, getHostPort } from 'types';
-import Toast from 'components/Toast/Toast';
+import { AuthenticationService } from '@app/api';
+import { KnownHostDialog } from '@app/dialogs';
+import { useReduxEffect } from '@app/hooks';
+import { HostDTO } from '@app/services';
+import { ServerTypes } from '@app/store';
+import { App } from '@app/types';
+import Toast from '../Toast/Toast';
 
 import './KnownHosts.css';
 
@@ -86,7 +86,7 @@ const KnownHosts = (props) => {
 
     if (!hosts?.length) {
       // @TODO: find a better pattern to seeding default data in indexedDB
-      await HostDTO.bulkAdd(DefaultHosts);
+      await HostDTO.bulkAdd(App.DefaultHosts);
       loadKnownHosts();
     } else {
       const selectedHost = hosts.find(({ lastSelected }) => lastSelected) || hosts[0];
@@ -159,7 +159,7 @@ const KnownHosts = (props) => {
       }));
       setShowEditToast(true)
     } else {
-      const newHost: Host = { name, host, port, editable: true };
+      const newHost: App.Host = { name, host, port, editable: true };
       newHost.id = await HostDTO.add(newHost) as number;
 
       setHostsState(s => ({
@@ -196,7 +196,7 @@ const KnownHosts = (props) => {
   const testConnection = () => {
     setTestingConnection(TestConnection.TESTING);
 
-    const options = { ...getHostPort(hostsState.selectedHost) };
+    const options = { ...App.getHostPort(hostsState.selectedHost) };
     AuthenticationService.testConnection(options);
   }
 
@@ -236,34 +236,38 @@ const KnownHosts = (props) => {
           </Button>
 
           {
-            hostsState.hosts.map((host, index) => (
-              <MenuItem value={host} key={index}>
-                <div className='KnownHosts-item'>
-                  <div className='KnownHosts-item__wrapper'>
-                    <div className={'KnownHosts-item__status ' + testingConnection}>
-                      {
-                        testingConnection === TestConnection.FAILED
-                          ? <PortableWifiOffIcon fontSize="small" />
-                          : <WifiTetheringIcon fontSize="small" />
-                      }
+            hostsState.hosts.map((host, index) => {
+              const hostPort = App.getHostPort(hostsState.hosts[index]);
+
+              return (
+                <MenuItem value={host} key={index}>
+                  <div className='KnownHosts-item'>
+                    <div className='KnownHosts-item__wrapper'>
+                      <div className={'KnownHosts-item__status ' + testingConnection}>
+                        {
+                          testingConnection === TestConnection.FAILED
+                            ? <PortableWifiOffIcon fontSize="small" />
+                            : <WifiTetheringIcon fontSize="small" />
+                        }
+                      </div>
+
+                      <div className='KnownHosts-item__label'>
+                        <Check />
+                        <span>{host.name} ({ hostPort.host }:{hostPort.port})</span>
+                      </div>
                     </div>
 
-                    <div className='KnownHosts-item__label'>
-                      <Check />
-                      <span>{host.name} ({ getHostPort(hostsState.hosts[index]).host }:{getHostPort(hostsState.hosts[index]).port})</span>
-                    </div>
+                    { host.editable && (
+                      <IconButton className='KnownHosts-item__edit' size='small' color='primary' onClick={() => {
+                        openEditKnownHostDialog(hostsState.hosts[index]);
+                      }}>
+                        <EditRoundedIcon fontSize='small' />
+                      </IconButton>
+                    ) }
                   </div>
-
-                  { host.editable && (
-                    <IconButton className='KnownHosts-item__edit' size='small' color='primary' onClick={() => {
-                      openEditKnownHostDialog(hostsState.hosts[index]);
-                    }}>
-                      <EditRoundedIcon fontSize='small' />
-                    </IconButton>
-                  ) }
-                </div>
-              </MenuItem>
-            ))
+                </MenuItem>
+              );
+            })
           }
         </Select>
       </FormControl>

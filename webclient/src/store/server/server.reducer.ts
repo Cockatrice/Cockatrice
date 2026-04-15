@@ -1,11 +1,7 @@
-import { SortDirection, StatusEnum, UserSortField } from 'types';
-import { ServerInfo_User_UserLevelFlag } from 'generated/proto/serverinfo_user_pb';
-import type { ServerInfo_DeckStorage_Folder, ServerInfo_DeckStorage_TreeItem } from 'generated/proto/serverinfo_deckstorage_pb';
+import { App, Data } from '@app/types';
 import { create } from '@bufbuild/protobuf';
-import { Response_DeckListSchema } from 'generated/proto/response_deck_list_pb';
-import { ServerInfo_DeckStorage_FolderSchema, ServerInfo_DeckStorage_TreeItemSchema } from 'generated/proto/serverinfo_deckstorage_pb';
 
-import { normalizeBannedUserError, normalizeGameObject, normalizeLogs, SortUtil } from '../common';
+import { normalizeBannedUserError, normalizeGameObject, normalizeGametypeMap, normalizeLogs, SortUtil } from '../common';
 
 import { ServerAction } from './server.actions';
 import { ServerState } from './server.interfaces'
@@ -16,17 +12,17 @@ function splitPath(path: string): string[] {
 }
 
 function insertAtPath(
-  folder: ServerInfo_DeckStorage_Folder,
+  folder: Data.ServerInfo_DeckStorage_Folder,
   pathSegments: string[],
-  item: ServerInfo_DeckStorage_TreeItem,
-): ServerInfo_DeckStorage_Folder {
+  item: Data.ServerInfo_DeckStorage_TreeItem,
+): Data.ServerInfo_DeckStorage_Folder {
   if (pathSegments.length === 0 || (pathSegments.length === 1 && pathSegments[0] === '')) {
-    return create(ServerInfo_DeckStorage_FolderSchema, { items: [...folder.items, item] });
+    return create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [...folder.items, item] });
   }
   const [head, ...tail] = pathSegments;
   const match = folder.items.find(child => child.name === head && child.folder);
   if (match) {
-    return create(ServerInfo_DeckStorage_FolderSchema, {
+    return create(Data.ServerInfo_DeckStorage_FolderSchema, {
       items: folder.items.map(child =>
         child === match
           ? { ...child, folder: insertAtPath(child.folder!, tail, item) }
@@ -34,14 +30,14 @@ function insertAtPath(
       ),
     });
   }
-  const created: ServerInfo_DeckStorage_TreeItem = create(ServerInfo_DeckStorage_TreeItemSchema, {
-    id: 0, name: head, folder: insertAtPath(create(ServerInfo_DeckStorage_FolderSchema, { items: [] }), tail, item)
+  const created: Data.ServerInfo_DeckStorage_TreeItem = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
+    id: 0, name: head, folder: insertAtPath(create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] }), tail, item)
   });
-  return create(ServerInfo_DeckStorage_FolderSchema, { items: [...folder.items, created] });
+  return create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [...folder.items, created] });
 }
 
-function removeById(folder: ServerInfo_DeckStorage_Folder, id: number): ServerInfo_DeckStorage_Folder {
-  return create(ServerInfo_DeckStorage_FolderSchema, {
+function removeById(folder: Data.ServerInfo_DeckStorage_Folder, id: number): Data.ServerInfo_DeckStorage_Folder {
+  return create(Data.ServerInfo_DeckStorage_FolderSchema, {
     items: folder.items
       .filter(item => item.id !== id)
       .map(item =>
@@ -50,17 +46,17 @@ function removeById(folder: ServerInfo_DeckStorage_Folder, id: number): ServerIn
   });
 }
 
-function removeByPath(folder: ServerInfo_DeckStorage_Folder, pathSegments: string[]): ServerInfo_DeckStorage_Folder {
+function removeByPath(folder: Data.ServerInfo_DeckStorage_Folder, pathSegments: string[]): Data.ServerInfo_DeckStorage_Folder {
   if (pathSegments.length === 0 || (pathSegments.length === 1 && pathSegments[0] === '')) {
     return folder;
   }
   const [head, ...tail] = pathSegments;
   if (tail.length === 0) {
-    return create(ServerInfo_DeckStorage_FolderSchema, {
+    return create(Data.ServerInfo_DeckStorage_FolderSchema, {
       items: folder.items.filter(item => !(item.name === head && item.folder != null))
     });
   }
-  return create(ServerInfo_DeckStorage_FolderSchema, {
+  return create(Data.ServerInfo_DeckStorage_FolderSchema, {
     items: folder.items.map(item =>
       item.name === head && item.folder
         ? { ...item, folder: removeByPath(item.folder, tail) }
@@ -76,7 +72,7 @@ const initialState: ServerState = {
 
   status: {
     connectionAttemptMade: false,
-    state: StatusEnum.DISCONNECTED,
+    state: App.StatusEnum.DISCONNECTED,
     description: null
   },
   info: {
@@ -92,8 +88,8 @@ const initialState: ServerState = {
   user: null,
   users: [],
   sortUsersBy: {
-    field: UserSortField.NAME,
-    order: SortDirection.ASC
+    field: App.UserSortField.NAME,
+    order: App.SortDirection.ASC
   },
   messages: {},
   userInfo: {},
@@ -232,11 +228,19 @@ export const serverReducer = (state = initialState, action: ServerAction) => {
     }
     case Types.UPDATE_STATUS: {
       const { status } = action;
-
-      return {
+      const newState = {
         ...state,
-        status: { ...status }
+        status: { ...state.status, ...status }
+      };
+
+      if (status.state === App.StatusEnum.DISCONNECTED) {
+        return {
+          ...newState,
+          status: { ...newState.status, connectionAttemptMade: false }
+        };
       }
+
+      return newState;
     }
     case Types.UPDATE_USER:
     case Types.ACCOUNT_EDIT_CHANGED:
@@ -417,11 +421,11 @@ export const serverReducer = (state = initialState, action: ServerAction) => {
           }
           let newLevel = user.userLevel;
           newLevel = shouldBeMod
-            ? (newLevel | ServerInfo_User_UserLevelFlag.IsModerator)
-            : (newLevel & ~ServerInfo_User_UserLevelFlag.IsModerator);
+            ? (newLevel | Data.ServerInfo_User_UserLevelFlag.IsModerator)
+            : (newLevel & ~Data.ServerInfo_User_UserLevelFlag.IsModerator);
           newLevel = shouldBeJudge
-            ? (newLevel | ServerInfo_User_UserLevelFlag.IsJudge)
-            : (newLevel & ~ServerInfo_User_UserLevelFlag.IsJudge);
+            ? (newLevel | Data.ServerInfo_User_UserLevelFlag.IsJudge)
+            : (newLevel & ~Data.ServerInfo_User_UserLevelFlag.IsJudge);
           return {
             ...user,
             userLevel: newLevel,
@@ -455,7 +459,7 @@ export const serverReducer = (state = initialState, action: ServerAction) => {
       }
       return {
         ...state,
-        backendDecks: create(Response_DeckListSchema, {
+        backendDecks: create(Data.Response_DeckListSchema, {
           root: insertAtPath(state.backendDecks.root, splitPath(action.path), action.treeItem),
         }),
       };
@@ -466,7 +470,7 @@ export const serverReducer = (state = initialState, action: ServerAction) => {
       }
       return {
         ...state,
-        backendDecks: create(Response_DeckListSchema, {
+        backendDecks: create(Data.Response_DeckListSchema, {
           root: removeById(state.backendDecks.root, action.deckId),
         }),
       };
@@ -475,12 +479,12 @@ export const serverReducer = (state = initialState, action: ServerAction) => {
       if (!state.backendDecks?.root) {
         return state;
       }
-      const newFolder: ServerInfo_DeckStorage_TreeItem = create(ServerInfo_DeckStorage_TreeItemSchema, {
-        id: 0, name: action.dirName, folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+      const newFolder: Data.ServerInfo_DeckStorage_TreeItem = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
+        id: 0, name: action.dirName, folder: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] })
       });
       return {
         ...state,
-        backendDecks: create(Response_DeckListSchema, {
+        backendDecks: create(Data.Response_DeckListSchema, {
           root: insertAtPath(state.backendDecks.root, splitPath(action.path), newFolder),
         }),
       };
@@ -491,14 +495,17 @@ export const serverReducer = (state = initialState, action: ServerAction) => {
       }
       return {
         ...state,
-        backendDecks: create(Response_DeckListSchema, {
+        backendDecks: create(Data.Response_DeckListSchema, {
           root: removeByPath(state.backendDecks.root, splitPath(action.path)),
         }),
       };
     }
     case Types.GAMES_OF_USER: {
-      const { userName, games, gametypeMap } = action;
-      const normalizedGames = games.map(g => normalizeGameObject(g, gametypeMap));
+      const { userName, response } = action;
+      const gametypeMap = normalizeGametypeMap(
+        (response.roomList ?? []).flatMap(room => room.gametypeList ?? [])
+      );
+      const normalizedGames = (response.gameList ?? []).map(g => normalizeGameObject(g, gametypeMap));
       return {
         ...state,
         gamesOfUser: {
@@ -518,7 +525,6 @@ export const serverReducer = (state = initialState, action: ServerAction) => {
     // Signal-only action types — no state mutation, explicit for discriminated-union exhaustiveness
     case Types.LOGIN_SUCCESSFUL:
     case Types.LOGIN_FAILED:
-    case Types.CONNECTION_CLOSED:
     case Types.CONNECTION_FAILED:
     case Types.TEST_CONNECTION_SUCCESSFUL:
     case Types.TEST_CONNECTION_FAILED:

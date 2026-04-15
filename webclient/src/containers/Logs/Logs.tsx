@@ -2,12 +2,12 @@
 import React, { useEffect } from "react";
 import * as _ from 'lodash';
 
-import { ModeratorService } from 'api';
-import { AuthGuard, ModGuard } from 'components';
-import { SearchForm } from 'forms';
-import { ServerDispatch, ServerSelectors } from 'store';
-import { LogFilters } from 'types';
-import { useAppSelector } from 'store/store';
+import { ModeratorService } from '@app/api';
+import { AuthGuard, ModGuard } from '@app/components';
+import { SearchForm } from '@app/forms';
+import { ServerDispatch, ServerSelectors } from '@app/store';
+import { Data } from '@app/types';
+import { useAppSelector } from '@app/store';
 
 import LogResults from './LogResults';
 import './Logs.css';
@@ -43,7 +43,7 @@ const Logs = () => {
     }, []);
   };
 
-  const onSubmit = (fields: LogFilters) => {
+  const onSubmit = (fields: Data.ViewLogHistoryParams) => {
     const trimmedFields: any = trimFields(fields);
     const { userName, ipAddress, gameName, gameId, message, logLocation } = trimmedFields;
 

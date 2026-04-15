@@ -1,8 +1,8 @@
 import { create } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
-import { Command_RevealCardsSchema, Command_RevealCards_ext } from 'generated/proto/command_reveal_cards_pb';
-import { RevealCardsParams } from 'types';
 
-export function revealCards(gameId: number, params: RevealCardsParams): void {
-  webClient.protobuf.sendGameCommand(gameId, Command_RevealCards_ext, create(Command_RevealCardsSchema, params));
+import { Data } from '@app/types';
+
+export function revealCards(gameId: number, params: Data.RevealCardsParams): void {
+  webClient.protobuf.sendGameCommand(gameId, Data.Command_RevealCards_ext, create(Data.Command_RevealCardsSchema, params));
 }

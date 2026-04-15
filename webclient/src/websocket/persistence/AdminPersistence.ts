@@ -1,4 +1,4 @@
-import { ServerDispatch } from 'store';
+import { ServerDispatch } from '@app/store';
 
 export class AdminPersistence {
   static adjustMod(userName: string, shouldBeMod: boolean, shouldBeJudge: boolean) {

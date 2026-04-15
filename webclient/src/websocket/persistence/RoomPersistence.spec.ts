@@ -1,4 +1,4 @@
-vi.mock('store', () => ({
+vi.mock('@app/store', () => ({
   RoomsDispatch: {
     clearStore: vi.fn(),
     joinRoom: vi.fn(),
@@ -15,11 +15,9 @@ vi.mock('store', () => ({
 }));
 
 import { RoomPersistence } from './RoomPersistence';
-import { RoomsDispatch } from 'store';
-
-beforeEach(() => {
-  vi.clearAllMocks();
-});
+import { RoomsDispatch } from '@app/store';
+import { create } from '@bufbuild/protobuf';
+import { Data, Enriched } from '@app/types';
 
 describe('RoomPersistence', () => {
   it('clearStore -> RoomsDispatch.clearStore', () => {
@@ -28,7 +26,7 @@ describe('RoomPersistence', () => {
   });
 
   it('joinRoom dispatches raw roomInfo', () => {
-    const room = { roomId: 1 } as any;
+    const room = create(Data.ServerInfo_RoomSchema, { roomId: 1 });
     RoomPersistence.joinRoom(room);
     expect(RoomsDispatch.joinRoom).toHaveBeenCalledWith(room);
   });
@@ -39,37 +37,37 @@ describe('RoomPersistence', () => {
   });
 
   it('updateRooms dispatches raw rooms', () => {
-    const rooms = [{ roomId: 1 }] as any;
+    const rooms = [create(Data.ServerInfo_RoomSchema, { roomId: 1 })];
     RoomPersistence.updateRooms(rooms);
     expect(RoomsDispatch.updateRooms).toHaveBeenCalledWith(rooms);
   });
 
   describe('updateGames', () => {
     it('dispatches raw game list', () => {
-      const game = { gameTypes: [1] } as any;
+      const game = create(Data.ServerInfo_GameSchema, { gameTypes: [1] });
       RoomPersistence.updateGames(1, [game]);
       expect(RoomsDispatch.updateGames).toHaveBeenCalledWith(1, [game]);
     });
 
     it('returns without error when gameList is empty', () => {
       expect(() => RoomPersistence.updateGames(1, [])).not.toThrow();
-      expect(RoomsDispatch.updateGames).not.toHaveBeenCalled();
+      expect(RoomsDispatch.updateGames).toHaveBeenCalledWith(1, []);
     });
 
     it('returns without error when gameList is null', () => {
-      expect(() => RoomPersistence.updateGames(1, null as any)).not.toThrow();
-      expect(RoomsDispatch.updateGames).not.toHaveBeenCalled();
+      expect(() => RoomPersistence.updateGames(1, null as unknown as Data.ServerInfo_Game[])).not.toThrow();
+      expect(RoomsDispatch.updateGames).toHaveBeenCalledWith(1, null);
     });
   });
 
   it('addMessage dispatches without pre-normalizing', () => {
-    const msg = { name: 'alice', message: 'hi' } as any;
+    const msg: Enriched.Message = { ...create(Data.Event_RoomSaySchema), timeReceived: 0, name: 'alice', message: 'hi' };
     RoomPersistence.addMessage(1, msg);
     expect(RoomsDispatch.addMessage).toHaveBeenCalledWith(1, msg);
   });
 
   it('userJoined -> RoomsDispatch.userJoined', () => {
-    const user = { name: 'bob' } as any;
+    const user = create(Data.ServerInfo_UserSchema, { name: 'bob' });
     RoomPersistence.userJoined(1, user);
     expect(RoomsDispatch.userJoined).toHaveBeenCalledWith(1, user);
   });

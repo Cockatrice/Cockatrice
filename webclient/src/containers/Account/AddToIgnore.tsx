@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-final-form'
 
-import { InputAction } from 'components';
+import { InputAction } from '@app/components';
 
 const AddToIgnore = ({ onSubmit }) => (
   <Form onSubmit={values => onSubmit(values)}>

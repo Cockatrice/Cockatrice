@@ -20,24 +20,9 @@ vi.mock('../../persistence', () => ({
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
 import webClient from '../../WebClient';
+import { Data } from '@app/types';
 import { ModeratorPersistence } from '../../persistence';
-import {
-  Command_BanFromServer_ext,
-  Command_ForceActivateUser_ext,
-  Command_GetAdminNotes_ext,
-  Command_GetBanHistory_ext,
-  Command_GetWarnHistory_ext,
-  Command_GetWarnList_ext,
-  Command_GrantReplayAccess_ext,
-  Command_UpdateAdminNotes_ext,
-  Command_ViewLogHistory_ext,
-  Command_WarnUser_ext,
-} from 'generated/proto/moderator_commands_pb';
-import { Response_GetAdminNotes_ext } from 'generated/proto/response_get_admin_notes_pb';
-import { Response_BanHistory_ext } from 'generated/proto/response_ban_history_pb';
-import { Response_WarnHistory_ext } from 'generated/proto/response_warn_history_pb';
-import { Response_WarnList_ext } from 'generated/proto/response_warn_list_pb';
-import { Response_ViewLogHistory_ext } from 'generated/proto/response_viewlog_history_pb';
+
 import { banFromServer } from './banFromServer';
 import { forceActivateUser } from './forceActivateUser';
 import { getAdminNotes } from './getAdminNotes';
@@ -48,15 +33,13 @@ import { grantReplayAccess } from './grantReplayAccess';
 import { updateAdminNotes } from './updateAdminNotes';
 import { viewLogHistory } from './viewLogHistory';
 import { warnUser } from './warnUser';
-
+import { create } from '@bufbuild/protobuf';
 import { Mock } from 'vitest';
 
 const { invokeOnSuccess } = makeCallbackHelpers(
   webClient.protobuf.sendModeratorCommand as Mock,
   2
 );
-
-beforeEach(() => vi.clearAllMocks());
 
 // ----------------------------------------------------------------
 // banFromServer
@@ -66,7 +49,7 @@ describe('banFromServer', () => {
   it('calls sendModeratorCommand with Command_BanFromServer', () => {
     banFromServer(30, 'alice', '1.2.3.4', 'reason', 'visible', 'cid', 1);
     expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
-      Command_BanFromServer_ext,
+      Data.Command_BanFromServer_ext,
       expect.objectContaining({ minutes: 30, userName: 'alice' }),
       expect.any(Object)
     );
@@ -87,7 +70,7 @@ describe('forceActivateUser', () => {
   it('calls sendModeratorCommand with Command_ForceActivateUser', () => {
     forceActivateUser('alice', 'mod1');
     expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
-      Command_ForceActivateUser_ext, expect.any(Object), expect.any(Object)
+      Data.Command_ForceActivateUser_ext, expect.any(Object), expect.any(Object)
     );
   });
 
@@ -106,9 +89,9 @@ describe('getAdminNotes', () => {
   it('calls sendModeratorCommand with Command_GetAdminNotes', () => {
     getAdminNotes('alice');
     expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
-      Command_GetAdminNotes_ext,
+      Data.Command_GetAdminNotes_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_GetAdminNotes_ext })
+      expect.objectContaining({ responseExt: Data.Response_GetAdminNotes_ext })
     );
   });
 
@@ -128,9 +111,9 @@ describe('getBanHistory', () => {
   it('calls sendModeratorCommand with Command_GetBanHistory', () => {
     getBanHistory('alice');
     expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
-      Command_GetBanHistory_ext,
+      Data.Command_GetBanHistory_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_BanHistory_ext })
+      expect.objectContaining({ responseExt: Data.Response_BanHistory_ext })
     );
   });
 
@@ -150,9 +133,9 @@ describe('getWarnHistory', () => {
   it('calls sendModeratorCommand with Command_GetWarnHistory', () => {
     getWarnHistory('alice');
     expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
-      Command_GetWarnHistory_ext,
+      Data.Command_GetWarnHistory_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_WarnHistory_ext })
+      expect.objectContaining({ responseExt: Data.Response_WarnHistory_ext })
     );
   });
 
@@ -172,9 +155,9 @@ describe('getWarnList', () => {
   it('calls sendModeratorCommand with Command_GetWarnList', () => {
     getWarnList('mod1', 'alice', 'US');
     expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
-      Command_GetWarnList_ext,
+      Data.Command_GetWarnList_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_WarnList_ext })
+      expect.objectContaining({ responseExt: Data.Response_WarnList_ext })
     );
   });
 
@@ -194,7 +177,7 @@ describe('grantReplayAccess', () => {
   it('calls sendModeratorCommand with Command_GrantReplayAccess', () => {
     grantReplayAccess(10, 'mod1');
     expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
-      Command_GrantReplayAccess_ext, expect.any(Object), expect.any(Object)
+      Data.Command_GrantReplayAccess_ext, expect.any(Object), expect.any(Object)
     );
   });
 
@@ -213,7 +196,7 @@ describe('updateAdminNotes', () => {
   it('calls sendModeratorCommand with Command_UpdateAdminNotes', () => {
     updateAdminNotes('alice', 'new notes');
     expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
-      Command_UpdateAdminNotes_ext, expect.any(Object), expect.any(Object)
+      Data.Command_UpdateAdminNotes_ext, expect.any(Object), expect.any(Object)
     );
   });
 
@@ -230,16 +213,18 @@ describe('updateAdminNotes', () => {
 describe('viewLogHistory', () => {
 
   it('calls sendModeratorCommand with Command_ViewLogHistory', () => {
-    viewLogHistory({ dateRange: 7 } as any);
+    const filters = create(Data.Command_ViewLogHistorySchema, { dateRange: 7 });
+    viewLogHistory(filters);
     expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
-      Command_ViewLogHistory_ext,
+      Data.Command_ViewLogHistory_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_ViewLogHistory_ext })
+      expect.objectContaining({ responseExt: Data.Response_ViewLogHistory_ext })
     );
   });
 
   it('onSuccess calls ModeratorPersistence.viewLogs with logMessage', () => {
-    viewLogHistory({ dateRange: 7 } as any);
+    const filters = create(Data.Command_ViewLogHistorySchema, { dateRange: 7 });
+    viewLogHistory(filters);
     const resp = { logMessage: ['log1'] };
     invokeOnSuccess(resp, { responseCode: 0 });
     expect(ModeratorPersistence.viewLogs).toHaveBeenCalledWith(['log1']);
@@ -253,7 +238,7 @@ describe('warnUser', () => {
 
   it('calls sendModeratorCommand with Command_WarnUser', () => {
     warnUser('alice', 'bad behavior', 'cid');
-    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(Command_WarnUser_ext, expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(Data.Command_WarnUser_ext, expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls ModeratorPersistence.warnUser', () => {

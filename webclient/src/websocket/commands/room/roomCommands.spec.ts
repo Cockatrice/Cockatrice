@@ -13,13 +13,14 @@ vi.mock('../../persistence', () => ({
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
 import webClient from '../../WebClient';
+import { Data } from '@app/types';
 import { RoomPersistence } from '../../persistence';
-import { Command_CreateGame_ext, Command_JoinGame_ext, Command_LeaveRoom_ext, Command_RoomSay_ext } from 'generated/proto/room_commands_pb';
+
 import { createGame } from './createGame';
 import { joinGame } from './joinGame';
 import { leaveRoom } from './leaveRoom';
 import { roomSay } from './roomSay';
-
+import { create } from '@bufbuild/protobuf';
 import { Mock } from 'vitest';
 
 const { invokeOnSuccess } = makeCallbackHelpers(
@@ -28,22 +29,20 @@ const { invokeOnSuccess } = makeCallbackHelpers(
   3
 );
 
-beforeEach(() => vi.clearAllMocks());
-
 // ----------------------------------------------------------------
 // createGame
 // ----------------------------------------------------------------
 describe('createGame', () => {
 
   it('calls sendRoomCommand with Command_CreateGame', () => {
-    createGame(5, { maxPlayers: 4 } as any);
+    createGame(5, create(Data.Command_CreateGameSchema, { maxPlayers: 4 }));
     expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(
-      5, Command_CreateGame_ext, expect.objectContaining({ maxPlayers: 4 }), expect.any(Object)
+      5, Data.Command_CreateGame_ext, expect.objectContaining({ maxPlayers: 4 }), expect.any(Object)
     );
   });
 
   it('onSuccess calls RoomPersistence.gameCreated with roomId', () => {
-    createGame(5, {} as any);
+    createGame(5, create(Data.Command_CreateGameSchema, {}));
     invokeOnSuccess();
     expect(RoomPersistence.gameCreated).toHaveBeenCalledWith(5);
   });
@@ -55,14 +54,14 @@ describe('createGame', () => {
 describe('joinGame', () => {
 
   it('calls sendRoomCommand with Command_JoinGame', () => {
-    joinGame(7, { gameId: 42, password: '' } as any);
+    joinGame(7, create(Data.Command_JoinGameSchema, { gameId: 42, password: '' }));
     expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(
-      7, Command_JoinGame_ext, expect.objectContaining({ gameId: 42, password: '' }), expect.any(Object)
+      7, Data.Command_JoinGame_ext, expect.objectContaining({ gameId: 42, password: '' }), expect.any(Object)
     );
   });
 
   it('onSuccess calls RoomPersistence.joinedGame with roomId and gameId', () => {
-    joinGame(7, { gameId: 42 } as any);
+    joinGame(7, create(Data.Command_JoinGameSchema, { gameId: 42 }));
     invokeOnSuccess();
     expect(RoomPersistence.joinedGame).toHaveBeenCalledWith(7, 42);
   });
@@ -75,7 +74,7 @@ describe('leaveRoom', () => {
 
   it('calls sendRoomCommand with Command_LeaveRoom', () => {
     leaveRoom(3);
-    expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(3, Command_LeaveRoom_ext, expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(3, Data.Command_LeaveRoom_ext, expect.any(Object), expect.any(Object));
   });
 
   it('onSuccess calls RoomPersistence.leaveRoom with roomId', () => {
@@ -94,7 +93,7 @@ describe('roomSay', () => {
     roomSay(2, '  hello  ');
     expect(webClient.protobuf.sendRoomCommand).toHaveBeenCalledWith(
       2,
-      Command_RoomSay_ext,
+      Data.Command_RoomSay_ext,
       expect.objectContaining({ message: 'hello' })
     );
   });

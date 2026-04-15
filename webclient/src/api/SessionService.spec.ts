@@ -1,4 +1,4 @@
-vi.mock('websocket', () => ({
+vi.mock('@app/websocket', () => ({
   SessionCommands: {
     addToBuddyList: vi.fn(),
     removeFromBuddyList: vi.fn(),
@@ -14,9 +14,7 @@ vi.mock('websocket', () => ({
 }));
 
 import { SessionService } from './SessionService';
-import { SessionCommands } from 'websocket';
-
-beforeEach(() => vi.clearAllMocks());
+import { SessionCommands } from '@app/websocket';
 
 describe('SessionService', () => {
   describe('addToBuddyList', () => {

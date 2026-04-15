@@ -1,8 +1,8 @@
-import { Set } from 'types';
+import { App } from '@app/types';
 
 import { dexieService } from '../DexieService';
 
-export class SetDTO extends Set {
+export class SetDTO extends App.Set {
   save() {
     return dexieService.sets.put(this);
   }

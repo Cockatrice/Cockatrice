@@ -6,20 +6,20 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
-import { AuthenticationService } from 'api';
-import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, AccountActivationDialog } from 'dialogs';
-import { LanguageDropdown } from 'components';
-import { LoginForm } from 'forms';
-import { useReduxEffect, useFireOnce } from 'hooks';
-import { Images } from 'images';
-import { HostDTO, serverProps } from 'services';
-import { RouteEnum, WebSocketConnectOptions, getHostPort } from 'types';
-import { ServerSelectors, ServerTypes } from 'store';
-import Layout from 'containers/Layout/Layout';
-import { useAppSelector } from 'store/store';
+import { AuthenticationService } from '@app/api';
+import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, AccountActivationDialog } from '@app/dialogs';
+import { LanguageDropdown } from '@app/components';
+import { LoginForm } from '@app/forms';
+import { useReduxEffect, useFireOnce } from '@app/hooks';
+import { Images } from '@app/images';
+import { HostDTO, serverProps } from '@app/services';
+import { App, Enriched } from '@app/types';
+import { ServerSelectors, ServerTypes } from '@app/store';
+import Layout from '../Layout/Layout';
+import { useAppSelector } from '@app/store';
 
 import './Login.css';
-import { useToast } from 'components/Toast';
+import { useToast } from '@app/components';
 
 const PREFIX = 'Login';
 
@@ -71,7 +71,7 @@ const Login = () => {
 
   const isConnected = AuthenticationService.isConnected(state);
 
-  const [pendingActivationOptions, setPendingActivationOptions] = useState<WebSocketConnectOptions | null>(null);
+  const [pendingActivationOptions, setPendingActivationOptions] = useState<Enriched.PendingActivationContext | null>(null);
 
   const [rememberLogin, setRememberLogin] = useState(null);
   const [dialogState, setDialogState] = useState({
@@ -126,17 +126,17 @@ const Login = () => {
     setRememberLogin(loginForm);
     const { userName, password, selectedHost, remember } = loginForm;
 
-    const options: WebSocketConnectOptions = {
-      ...getHostPort(selectedHost),
+    const options: Omit<Enriched.LoginConnectOptions, 'reason'> = {
+      ...App.getHostPort(selectedHost),
       userName,
-      password
+      password,
     };
 
     if (remember && !password) {
       options.hashedPassword = selectedHost.hashedPassword;
     }
 
-    AuthenticationService.login(options as WebSocketConnectOptions);
+    AuthenticationService.login(options);
   }, []);
 
   const [submitButtonDisabled, resetSubmitButton, handleLogin] = useFireOnce(onSubmitLogin);
@@ -156,7 +156,7 @@ const Login = () => {
     const { userName, password, email, country, realName, selectedHost } = registerForm;
 
     AuthenticationService.register({
-      ...getHostPort(selectedHost),
+      ...App.getHostPort(selectedHost),
       userName,
       password,
       email,
@@ -166,15 +166,20 @@ const Login = () => {
   };
 
   const handleAccountActivationDialogSubmit = ({ token }) => {
+    if (!pendingActivationOptions) {
+      return;
+    }
     AuthenticationService.activateAccount({
-      ...pendingActivationOptions,
+      host: pendingActivationOptions.host,
+      port: pendingActivationOptions.port,
+      userName: pendingActivationOptions.userName,
       token,
     });
   };
 
   const handleRequestPasswordResetDialogSubmit = (form) => {
     const { userName, email, selectedHost } = form;
-    const { host, port } = getHostPort(selectedHost);
+    const { host, port } = App.getHostPort(selectedHost);
 
     if (email) {
       AuthenticationService.resetPasswordChallenge({ userName, email, host, port });
@@ -185,7 +190,7 @@ const Login = () => {
   };
 
   const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }) => {
-    const { host, port } = getHostPort(selectedHost);
+    const { host, port } = App.getHostPort(selectedHost);
 
     AuthenticationService.resetPassword({ userName, token, newPassword, host, port });
   };
@@ -234,7 +239,7 @@ const Login = () => {
   return (
     <Layout showNav={false} noHeightLimit={true}>
       <Root className={'login overflow-scroll ' + classes.root}>
-        { isConnected && <Navigate to={RouteEnum.SERVER} />}
+        { isConnected && <Navigate to={App.RouteEnum.SERVER} />}
 
         <div className="login__wrapper">
           <Paper className="login-content">

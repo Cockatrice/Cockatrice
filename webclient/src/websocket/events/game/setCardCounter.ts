@@ -1,7 +1,6 @@
-import type { Event_SetCardCounter } from 'generated/proto/event_set_card_counter_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function setCardCounter(data: Event_SetCardCounter, meta: GameEventMeta): void {
+export function setCardCounter(data: Data.Event_SetCardCounter, meta: Enriched.GameEventMeta): void {
   GamePersistence.cardCounterChanged(meta.gameId, meta.playerId, data);
 }

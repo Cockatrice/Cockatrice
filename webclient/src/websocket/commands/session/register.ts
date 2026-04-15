@@ -1,22 +1,19 @@
-import { ServerRegisterParams } from 'store';
-import { StatusEnum, WebSocketConnectOptions } from 'types';
+import { App, Enriched, Data } from '@app/types';
 
 import { create, getExtension } from '@bufbuild/protobuf';
 import type { MessageInitShape } from '@bufbuild/protobuf';
 import { CLIENT_CONFIG } from '../../config';
 import webClient from '../../WebClient';
-import { Command_Register_ext, Command_RegisterSchema } from 'generated/proto/session_commands_pb';
+
 import { SessionPersistence } from '../../persistence';
 import { hashPassword } from '../../utils';
-import { Response_ResponseCode } from 'generated/proto/response_pb';
-import { Response_Register_ext } from 'generated/proto/response_register_pb';
 
 import { login, disconnect, updateStatus } from './';
 
-export function register(options: WebSocketConnectOptions, password?: string, passwordSalt?: string): void {
-  const { userName, email, country, realName } = options as ServerRegisterParams;
+export function register(options: Omit<Enriched.RegisterConnectOptions, 'password'>, password?: string, passwordSalt?: string): void {
+  const { userName, email, country, realName } = options;
 
-  const params: MessageInitShape<typeof Command_RegisterSchema> = {
+  const params: MessageInitShape<typeof Data.Command_RegisterSchema> = {
     ...CLIENT_CONFIG,
     userName,
     email,
@@ -29,45 +26,53 @@ export function register(options: WebSocketConnectOptions, password?: string, pa
 
   const onRegistrationError = (action: () => void) => {
     action();
-    updateStatus(StatusEnum.DISCONNECTED, 'Registration failed');
+    updateStatus(App.StatusEnum.DISCONNECTED, 'Registration failed');
     disconnect();
   };
 
-  webClient.protobuf.sendSessionCommand(Command_Register_ext, create(Command_RegisterSchema, params), {
+  webClient.protobuf.sendSessionCommand(Data.Command_Register_ext, create(Data.Command_RegisterSchema, params), {
     onResponseCode: {
-      [Response_ResponseCode.RespRegistrationAccepted]: () => {
-        login(options, password, passwordSalt);
+      [Data.Response_ResponseCode.RespRegistrationAccepted]: () => {
+        login({
+          host: options.host,
+          port: options.port,
+          userName: options.userName,
+          reason: App.WebSocketConnectReason.LOGIN,
+        }, password, passwordSalt);
         SessionPersistence.registrationSuccess();
       },
-      [Response_ResponseCode.RespRegistrationAcceptedNeedsActivation]: () => {
-        updateStatus(StatusEnum.DISCONNECTED, 'Registration accepted, awaiting activation');
-        const { password: _p, newPassword: _np, ...safeOptions } = options;
-        SessionPersistence.accountAwaitingActivation(safeOptions);
+      [Data.Response_ResponseCode.RespRegistrationAcceptedNeedsActivation]: () => {
+        updateStatus(App.StatusEnum.DISCONNECTED, 'Registration accepted, awaiting activation');
+        SessionPersistence.accountAwaitingActivation({
+          host: options.host,
+          port: options.port,
+          userName: options.userName,
+        });
         disconnect();
       },
-      [Response_ResponseCode.RespUserAlreadyExists]: () => onRegistrationError(
+      [Data.Response_ResponseCode.RespUserAlreadyExists]: () => onRegistrationError(
         () => SessionPersistence.registrationUserNameError('Username is taken')
       ),
-      [Response_ResponseCode.RespUsernameInvalid]: () => onRegistrationError(
+      [Data.Response_ResponseCode.RespUsernameInvalid]: () => onRegistrationError(
         () => SessionPersistence.registrationUserNameError('Invalid username')
       ),
-      [Response_ResponseCode.RespPasswordTooShort]: () => onRegistrationError(
+      [Data.Response_ResponseCode.RespPasswordTooShort]: () => onRegistrationError(
         () => SessionPersistence.registrationPasswordError('Your password was too short')
       ),
-      [Response_ResponseCode.RespEmailRequiredToRegister]: () => onRegistrationError(
+      [Data.Response_ResponseCode.RespEmailRequiredToRegister]: () => onRegistrationError(
         () => SessionPersistence.registrationRequiresEmail()
       ),
-      [Response_ResponseCode.RespEmailBlackListed]: () => onRegistrationError(
+      [Data.Response_ResponseCode.RespEmailBlackListed]: () => onRegistrationError(
         () => SessionPersistence.registrationEmailError('This email provider has been blocked')
       ),
-      [Response_ResponseCode.RespTooManyRequests]: () => onRegistrationError(
+      [Data.Response_ResponseCode.RespTooManyRequests]: () => onRegistrationError(
         () => SessionPersistence.registrationEmailError('Max accounts reached for this email')
       ),
-      [Response_ResponseCode.RespRegistrationDisabled]: () => onRegistrationError(
+      [Data.Response_ResponseCode.RespRegistrationDisabled]: () => onRegistrationError(
         () => SessionPersistence.registrationFailed('Registration is currently disabled')
       ),
-      [Response_ResponseCode.RespUserIsBanned]: (raw) => {
-        const register = getExtension(raw, Response_Register_ext);
+      [Data.Response_ResponseCode.RespUserIsBanned]: (raw) => {
+        const register = getExtension(raw, Data.Response_Register_ext);
         onRegistrationError(
           () => SessionPersistence.registrationFailed(register.deniedReasonStr, Number(register.deniedEndTime))
         );

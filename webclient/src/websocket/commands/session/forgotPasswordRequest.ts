@@ -1,37 +1,33 @@
-import { ForgotPasswordParams } from 'store';
-import { StatusEnum, WebSocketConnectOptions } from 'types';
+import { App, Enriched, Data } from '@app/types';
 
 import { create } from '@bufbuild/protobuf';
 import { CLIENT_CONFIG } from '../../config';
 import webClient from '../../WebClient';
-import {
-  Command_ForgotPasswordRequest_ext, Command_ForgotPasswordRequestSchema,
-} from 'generated/proto/session_commands_pb';
+
 import { SessionPersistence } from '../../persistence';
-import { Response_ForgotPasswordRequest_ext } from 'generated/proto/response_forgotpasswordrequest_pb';
 
 import { disconnect, updateStatus } from './';
 
-export function forgotPasswordRequest(options: WebSocketConnectOptions): void {
-  const { userName } = options as unknown as ForgotPasswordParams;
+export function forgotPasswordRequest(options: Enriched.PasswordResetRequestConnectOptions): void {
+  const { userName } = options;
 
-  webClient.protobuf.sendSessionCommand(Command_ForgotPasswordRequest_ext, create(Command_ForgotPasswordRequestSchema, {
+  webClient.protobuf.sendSessionCommand(Data.Command_ForgotPasswordRequest_ext, create(Data.Command_ForgotPasswordRequestSchema, {
     ...CLIENT_CONFIG,
     userName,
   }), {
-    responseExt: Response_ForgotPasswordRequest_ext,
+    responseExt: Data.Response_ForgotPasswordRequest_ext,
     onSuccess: (resp) => {
       if (resp?.challengeEmail) {
-        updateStatus(StatusEnum.DISCONNECTED, null);
+        updateStatus(App.StatusEnum.DISCONNECTED, null);
         SessionPersistence.resetPasswordChallenge();
       } else {
-        updateStatus(StatusEnum.DISCONNECTED, null);
+        updateStatus(App.StatusEnum.DISCONNECTED, null);
         SessionPersistence.resetPassword();
       }
       disconnect();
     },
     onError: () => {
-      updateStatus(StatusEnum.DISCONNECTED, null);
+      updateStatus(App.StatusEnum.DISCONNECTED, null);
       SessionPersistence.resetPasswordFailed();
       disconnect();
     },

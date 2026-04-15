@@ -1,22 +1,6 @@
-import { GameDispatch, ServerDispatch } from 'store';
-import { StatusEnum, WebSocketConnectOptions } from 'types';
-import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
-import type { Response_DeckList } from 'generated/proto/response_deck_list_pb';
-import type { ServerInfo_DeckStorage_TreeItem } from 'generated/proto/serverinfo_deckstorage_pb';
-import type { ServerInfo_ReplayMatch } from 'generated/proto/serverinfo_replay_match_pb';
-import { GameEntry } from 'store/game/game.interfaces';
-import { sanitizeHtml } from 'websocket/utils';
-import {
-  GameJoinedData,
-  NotifyUserData,
-  PlayerGamePropertiesData,
-  ServerShutdownData,
-  UserMessageData
-} from '../events/session/interfaces';
-
-import type { Response_GetGamesOfUser } from 'generated/proto/response_get_games_of_user_pb';
-import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
-import type { ServerInfo_GameType } from 'generated/proto/serverinfo_gametype_pb';
+import { GameDispatch, ServerDispatch } from '@app/store';
+import { App, Data, Enriched } from '@app/types';
+import { sanitizeHtml } from '../utils';
 
 export class SessionPersistence {
   static initialized() {
@@ -31,16 +15,12 @@ export class SessionPersistence {
     ServerDispatch.clearStore();
   }
 
-  static loginSuccessful(options: WebSocketConnectOptions) {
+  static loginSuccessful(options: Enriched.LoginSuccessContext) {
     ServerDispatch.loginSuccessful(options);
   }
 
   static loginFailed() {
     ServerDispatch.loginFailed();
-  }
-
-  static connectionClosed(reason: number) {
-    ServerDispatch.connectionClosed(reason);
   }
 
   static connectionFailed() {
@@ -55,11 +35,11 @@ export class SessionPersistence {
     ServerDispatch.testConnectionFailed();
   }
 
-  static updateBuddyList(buddyList: ServerInfo_User[]) {
+  static updateBuddyList(buddyList: Data.ServerInfo_User[]) {
     ServerDispatch.updateBuddyList(buddyList);
   }
 
-  static addToBuddyList(user: ServerInfo_User) {
+  static addToBuddyList(user: Data.ServerInfo_User) {
     ServerDispatch.addToBuddyList(user);
   }
 
@@ -67,11 +47,11 @@ export class SessionPersistence {
     ServerDispatch.removeFromBuddyList(userName);
   }
 
-  static updateIgnoreList(ignoreList: ServerInfo_User[]) {
+  static updateIgnoreList(ignoreList: Data.ServerInfo_User[]) {
     ServerDispatch.updateIgnoreList(ignoreList);
   }
 
-  static addToIgnoreList(user: ServerInfo_User) {
+  static addToIgnoreList(user: Data.ServerInfo_User) {
     ServerDispatch.addToIgnoreList(user);
   }
 
@@ -83,23 +63,19 @@ export class SessionPersistence {
     ServerDispatch.updateInfo(name, version);
   }
 
-  static updateStatus(state: number, description: string) {
+  static updateStatus(state: App.StatusEnum, description: string) {
     ServerDispatch.updateStatus(state, description);
-
-    if (state === StatusEnum.DISCONNECTED) {
-      this.connectionClosed(state);
-    }
   }
 
-  static updateUser(user: ServerInfo_User) {
+  static updateUser(user: Data.ServerInfo_User) {
     ServerDispatch.updateUser(user);
   }
 
-  static updateUsers(users: ServerInfo_User[]) {
+  static updateUsers(users: Data.ServerInfo_User[]) {
     ServerDispatch.updateUsers(users);
   }
 
-  static userJoined(user: ServerInfo_User) {
+  static userJoined(user: Data.ServerInfo_User) {
     ServerDispatch.userJoined(user);
   }
 
@@ -111,7 +87,7 @@ export class SessionPersistence {
     ServerDispatch.serverMessage(sanitizeHtml(message));
   }
 
-  static accountAwaitingActivation(options: WebSocketConnectOptions) {
+  static accountAwaitingActivation(options: Enriched.PendingActivationContext) {
     ServerDispatch.accountAwaitingActivation(options);
   }
 
@@ -175,58 +151,33 @@ export class SessionPersistence {
     ServerDispatch.accountImageChanged({ avatarBmp });
   }
 
-  static getUserInfo(userInfo: ServerInfo_User) {
+  static getUserInfo(userInfo: Data.ServerInfo_User) {
     ServerDispatch.getUserInfo(userInfo);
   }
 
-  static getGamesOfUser(userName: string, response: Response_GetGamesOfUser): void {
-    const gametypeMap: Record<number, string> = {};
-    (response.roomList || []).forEach((room: ServerInfo_Room) => {
-      (room.gametypeList || []).forEach((gt: ServerInfo_GameType) => {
-        gametypeMap[gt.gameTypeId] = gt.description;
-      });
-    });
-    const games = response.gameList || [];
-    ServerDispatch.gamesOfUser(userName, games, gametypeMap);
+  static getGamesOfUser(userName: string, response: Data.Response_GetGamesOfUser): void {
+    ServerDispatch.gamesOfUser(userName, response);
   }
 
-  static gameJoined(gameJoinedData: GameJoinedData): void {
-    const { gameInfo, hostId, playerId, spectator, judge, resuming } = gameJoinedData;
-    const gameEntry: GameEntry = {
-      gameId: gameInfo.gameId,
-      roomId: gameInfo.roomId,
-      description: gameInfo.description,
-      hostId,
-      localPlayerId: playerId,
-      spectator,
-      judge,
-      resuming,
-      started: gameInfo.started,
-      activePlayerId: -1,
-      activePhase: -1,
-      secondsElapsed: 0,
-      reversed: false,
-      players: {},
-      messages: [],
-    };
-    GameDispatch.gameJoined(gameInfo.gameId, gameEntry);
+  static gameJoined(gameJoinedData: Data.Event_GameJoined): void {
+    GameDispatch.gameJoined(gameJoinedData);
   }
 
-  static notifyUser(notification: NotifyUserData): void {
+  static notifyUser(notification: Data.Event_NotifyUser): void {
     ServerDispatch.notifyUser(notification);
   }
 
-  static playerPropertiesChanged(gameId: number, playerId: number, payload: PlayerGamePropertiesData): void {
+  static playerPropertiesChanged(gameId: number, playerId: number, payload: Data.Event_PlayerPropertiesChanged): void {
     if (payload.playerProperties) {
       GameDispatch.playerPropertiesChanged(gameId, playerId, payload.playerProperties);
     }
   }
 
-  static serverShutdown(data: ServerShutdownData): void {
+  static serverShutdown(data: Data.Event_ServerShutdown): void {
     ServerDispatch.serverShutdown(data);
   }
 
-  static userMessage(messageData: UserMessageData): void {
+  static userMessage(messageData: Data.Event_UserMessage): void {
     ServerDispatch.userMessage(messageData);
   }
 
@@ -242,11 +193,11 @@ export class SessionPersistence {
     ServerDispatch.deckDelete(deckId);
   }
 
-  static updateServerDecks(deckList: Response_DeckList): void {
+  static updateServerDecks(deckList: Data.Response_DeckList): void {
     ServerDispatch.backendDecks(deckList);
   }
 
-  static uploadServerDeck(path: string, treeItem: ServerInfo_DeckStorage_TreeItem): void {
+  static uploadServerDeck(path: string, treeItem: Data.ServerInfo_DeckStorage_TreeItem): void {
     ServerDispatch.deckUpload(path, treeItem);
   }
 
@@ -258,11 +209,11 @@ export class SessionPersistence {
     ServerDispatch.deckDelDir(path);
   }
 
-  static replayList(matchList: ServerInfo_ReplayMatch[]): void {
+  static replayList(matchList: Data.ServerInfo_ReplayMatch[]): void {
     ServerDispatch.replayList(matchList);
   }
 
-  static replayAdded(matchInfo: ServerInfo_ReplayMatch): void {
+  static replayAdded(matchInfo: Data.ServerInfo_ReplayMatch): void {
     ServerDispatch.replayAdded(matchInfo);
   }
 

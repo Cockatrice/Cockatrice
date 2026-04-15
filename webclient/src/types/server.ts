@@ -1,5 +1,3 @@
-import type { ServerInfo_ChatMessage } from 'generated/proto/serverinfo_chat_message_pb';
-
 export interface ServerStatus {
   status: StatusEnum;
   description: string;
@@ -12,23 +10,6 @@ export enum StatusEnum {
   LOGGING_IN,
   LOGGED_IN,
   DISCONNECTING = 99
-}
-
-export interface WebSocketConnectOptions {
-  host?: string;
-  port?: string;
-  userName?: string;
-  password?: string;
-  hashedPassword?: string;
-  newPassword?: string;
-  token?: string;
-  email?: string;
-  realName?: string;
-  country?: string;
-  autojoinrooms?: boolean;
-  keepalive?: number;
-  clientid?: string;
-  reason?: WebSocketConnectReason;
 }
 
 export enum WebSocketConnectReason {
@@ -109,10 +90,4 @@ export enum KnownHost {
 export const KnownHosts = {
   [KnownHost.ROOSTER]: { port: 4748, host: 'server.cockatrice.us', },
   [KnownHost.TETRARCH]: { port: 443, host: 'mtg.tetrarch.co/servatrice' },
-}
-
-export interface LogGroups {
-  room: ServerInfo_ChatMessage[];
-  game: ServerInfo_ChatMessage[];
-  chat: ServerInfo_ChatMessage[];
 }

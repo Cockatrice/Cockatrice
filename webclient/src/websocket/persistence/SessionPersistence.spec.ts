@@ -1,11 +1,10 @@
-vi.mock('store', () => ({
+vi.mock('@app/store', () => ({
   ServerDispatch: {
     initialized: vi.fn(),
     connectionAttempted: vi.fn(),
     clearStore: vi.fn(),
     loginSuccessful: vi.fn(),
     loginFailed: vi.fn(),
-    connectionClosed: vi.fn(),
     connectionFailed: vi.fn(),
     testConnectionSuccessful: vi.fn(),
     testConnectionFailed: vi.fn(),
@@ -61,18 +60,19 @@ vi.mock('store', () => ({
   },
 }));
 
-vi.mock('websocket/utils', () => ({
+vi.mock('../utils', () => ({
   sanitizeHtml: vi.fn((msg: string) => `sanitized:${msg}`),
 }));
 
 import { SessionPersistence } from './SessionPersistence';
-import { ServerDispatch, GameDispatch } from 'store';
-import { sanitizeHtml } from 'websocket/utils';
-import { StatusEnum } from 'types';
+import { ServerDispatch, GameDispatch } from '@app/store';
+import { sanitizeHtml } from '../utils';
+import { App, Data, Enriched } from '@app/types';
+import { create } from '@bufbuild/protobuf';
+
 import { Mock } from 'vitest';
 
 beforeEach(() => {
-  vi.clearAllMocks();
   (sanitizeHtml as Mock).mockImplementation((msg: string) => `sanitized:${msg}`);
 });
 
@@ -88,7 +88,7 @@ describe('SessionPersistence', () => {
   });
 
   it('loginSuccessful passes options', () => {
-    const opts = { userName: 'alice' } as any;
+    const opts: Enriched.LoginSuccessContext = { hashedPassword: 'hash' };
     SessionPersistence.loginSuccessful(opts);
     expect(ServerDispatch.loginSuccessful).toHaveBeenCalledWith(opts);
   });
@@ -96,11 +96,6 @@ describe('SessionPersistence', () => {
   it('loginFailed -> ServerDispatch.loginFailed', () => {
     SessionPersistence.loginFailed();
     expect(ServerDispatch.loginFailed).toHaveBeenCalled();
-  });
-
-  it('connectionClosed passes reason', () => {
-    SessionPersistence.connectionClosed(3);
-    expect(ServerDispatch.connectionClosed).toHaveBeenCalledWith(3);
   });
 
   it('connectionFailed -> ServerDispatch.connectionFailed', () => {
@@ -124,7 +119,7 @@ describe('SessionPersistence', () => {
   });
 
   it('addToBuddyList passes user', () => {
-    const user = { name: 'bob' } as any;
+    const user = create(Data.ServerInfo_UserSchema, { name: 'bob' });
     SessionPersistence.addToBuddyList(user);
     expect(ServerDispatch.addToBuddyList).toHaveBeenCalledWith(user);
   });
@@ -140,7 +135,7 @@ describe('SessionPersistence', () => {
   });
 
   it('addToIgnoreList passes user', () => {
-    const user = { name: 'bob' } as any;
+    const user = create(Data.ServerInfo_UserSchema, { name: 'bob' });
     SessionPersistence.addToIgnoreList(user);
     expect(ServerDispatch.addToIgnoreList).toHaveBeenCalledWith(user);
   });
@@ -155,19 +150,13 @@ describe('SessionPersistence', () => {
     expect(ServerDispatch.updateInfo).toHaveBeenCalledWith('Server', '1.0');
   });
 
-  it('updateStatus dispatches status and calls connectionClosed when DISCONNECTED', () => {
-    SessionPersistence.updateStatus(StatusEnum.DISCONNECTED, 'bye');
-    expect(ServerDispatch.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'bye');
-    expect(ServerDispatch.connectionClosed).toHaveBeenCalledWith(StatusEnum.DISCONNECTED);
-  });
-
-  it('updateStatus does not call connectionClosed when not DISCONNECTED', () => {
-    SessionPersistence.updateStatus(StatusEnum.CONNECTED, 'hi');
-    expect(ServerDispatch.connectionClosed).not.toHaveBeenCalled();
+  it('updateStatus passes state and description', () => {
+    SessionPersistence.updateStatus(App.StatusEnum.DISCONNECTED, 'bye');
+    expect(ServerDispatch.updateStatus).toHaveBeenCalledWith(App.StatusEnum.DISCONNECTED, 'bye');
   });
 
   it('updateUser passes user', () => {
-    const user = { name: 'alice' } as any;
+    const user = create(Data.ServerInfo_UserSchema, { name: 'alice' });
     SessionPersistence.updateUser(user);
     expect(ServerDispatch.updateUser).toHaveBeenCalledWith(user);
   });
@@ -178,7 +167,7 @@ describe('SessionPersistence', () => {
   });
 
   it('userJoined passes user', () => {
-    const user = { name: 'carol' } as any;
+    const user = create(Data.ServerInfo_UserSchema, { name: 'carol' });
     SessionPersistence.userJoined(user);
     expect(ServerDispatch.userJoined).toHaveBeenCalledWith(user);
   });
@@ -195,7 +184,7 @@ describe('SessionPersistence', () => {
   });
 
   it('accountAwaitingActivation passes options', () => {
-    const opts = { userName: 'u' } as any;
+    const opts: Enriched.PendingActivationContext = { host: 'h', port: '1', userName: 'u' };
     SessionPersistence.accountAwaitingActivation(opts);
     expect(ServerDispatch.accountAwaitingActivation).toHaveBeenCalledWith(opts);
   });
@@ -282,53 +271,55 @@ describe('SessionPersistence', () => {
   });
 
   it('getUserInfo passes userInfo', () => {
-    const user = { name: 'u' } as any;
+    const user = create(Data.ServerInfo_UserSchema, { name: 'u' });
     SessionPersistence.getUserInfo(user);
     expect(ServerDispatch.getUserInfo).toHaveBeenCalledWith(user);
   });
 
-  it('getGamesOfUser builds gametypeMap and dispatches raw games with map', () => {
-    const gt = { gameTypeId: 1, description: 'Standard' };
-    const room = { gametypeList: [gt] };
-    const game = { gameId: 5, roomId: 1, gameTypes: [1], description: 'My Game', started: false };
-    SessionPersistence.getGamesOfUser('alice', { roomList: [room], gameList: [game] } as any);
-    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', [game], { 1: 'Standard' });
+  it('getGamesOfUser passes response to ServerDispatch', () => {
+    const response = create(Data.Response_GetGamesOfUserSchema, {
+      roomList: [create(Data.ServerInfo_RoomSchema, {
+        gametypeList: [create(Data.ServerInfo_GameTypeSchema, { gameTypeId: 1, description: 'Standard' })]
+      })],
+      gameList: [create(Data.ServerInfo_GameSchema, { gameId: 5 })],
+    });
+    SessionPersistence.getGamesOfUser('alice', response);
+    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', response);
   });
 
   it('getGamesOfUser handles empty response', () => {
-    SessionPersistence.getGamesOfUser('alice', {} as any);
-    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', [], {});
+    const emptyResponse = create(Data.Response_GetGamesOfUserSchema, {});
+    SessionPersistence.getGamesOfUser('alice', emptyResponse);
+    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', emptyResponse);
   });
 
-  it('gameJoined dispatches via GameDispatch.gameJoined', () => {
-    const gameInfo = { gameId: 10, roomId: 2, description: 'test', started: false };
-    SessionPersistence.gameJoined({ gameInfo, hostId: 3, playerId: 4, spectator: false, judge: false, resuming: true } as any);
-    expect(GameDispatch.gameJoined).toHaveBeenCalledWith(
-      10,
-      expect.objectContaining({ gameId: 10, hostId: 3, localPlayerId: 4, resuming: true })
-    );
+  it('gameJoined dispatches raw event via GameDispatch.gameJoined', () => {
+    const gameInfo = create(Data.ServerInfo_GameSchema, { gameId: 10, roomId: 2, description: 'test', started: false });
+    const data = create(Data.Event_GameJoinedSchema, { gameInfo, hostId: 3, playerId: 4, spectator: false, judge: false, resuming: true });
+    SessionPersistence.gameJoined(data);
+    expect(GameDispatch.gameJoined).toHaveBeenCalledWith(data);
   });
 
   it('notifyUser passes notification', () => {
-    const notif = { type: 1 } as any;
+    const notif = create(Data.Event_NotifyUserSchema, { type: 1 });
     SessionPersistence.notifyUser(notif);
     expect(ServerDispatch.notifyUser).toHaveBeenCalledWith(notif);
   });
 
   it('playerPropertiesChanged dispatches via GameDispatch', () => {
-    const props = { pingTime: 100 };
-    SessionPersistence.playerPropertiesChanged(5, 1, { playerProperties: props } as any);
+    const props = create(Data.ServerInfo_PlayerPropertiesSchema, { pingTime: 100 });
+    SessionPersistence.playerPropertiesChanged(5, 1, create(Data.Event_PlayerPropertiesChangedSchema, { playerProperties: props }));
     expect(GameDispatch.playerPropertiesChanged).toHaveBeenCalledWith(5, 1, props);
   });
 
   it('serverShutdown passes data', () => {
-    const data = { gracePeriod: 5 } as any;
+    const data = create(Data.Event_ServerShutdownSchema, { gracePeriod: 5 });
     SessionPersistence.serverShutdown(data);
     expect(ServerDispatch.serverShutdown).toHaveBeenCalledWith(data);
   });
 
   it('userMessage passes messageData', () => {
-    const msg = { message: 'hello' } as any;
+    const msg = create(Data.Event_UserMessageSchema, { message: 'hello' });
     SessionPersistence.userMessage(msg);
     expect(ServerDispatch.userMessage).toHaveBeenCalledWith(msg);
   });
@@ -349,13 +340,14 @@ describe('SessionPersistence', () => {
   });
 
   it('updateServerDecks passes deckList', () => {
-    SessionPersistence.updateServerDecks({ folders: [] } as any);
+    SessionPersistence.updateServerDecks(create(Data.Response_DeckListSchema, { folders: [] }));
     expect(ServerDispatch.backendDecks).toHaveBeenCalled();
   });
 
   it('uploadServerDeck passes path and treeItem', () => {
-    SessionPersistence.uploadServerDeck('/path', { id: 1 } as any);
-    expect(ServerDispatch.deckUpload).toHaveBeenCalledWith('/path', { id: 1 });
+    const treeItem = create(Data.ServerInfo_DeckStorage_TreeItemSchema, { id: 1 });
+    SessionPersistence.uploadServerDeck('/path', treeItem);
+    expect(ServerDispatch.deckUpload).toHaveBeenCalledWith('/path', treeItem);
   });
 
   it('createServerDeckDir passes path and dirName', () => {
@@ -374,7 +366,7 @@ describe('SessionPersistence', () => {
   });
 
   it('replayAdded passes matchInfo', () => {
-    const match = { gameId: 1 } as any;
+    const match = create(Data.ServerInfo_ReplayMatchSchema, { gameId: 1 });
     SessionPersistence.replayAdded(match);
     expect(ServerDispatch.replayAdded).toHaveBeenCalledWith(match);
   });
@@ -395,14 +387,15 @@ describe('SessionPersistence', () => {
   });
 
   it('playerPropertiesChanged does nothing when payload has no playerProperties', () => {
-    SessionPersistence.playerPropertiesChanged(5, 1, {} as any);
+    SessionPersistence.playerPropertiesChanged(5, 1, create(Data.Event_PlayerPropertiesChangedSchema, {}));
     expect(GameDispatch.playerPropertiesChanged).not.toHaveBeenCalled();
   });
 
   it('getGamesOfUser handles rooms with missing gametypeList', () => {
-    const room = {} as any;
-    const game = { gameId: 5 };
-    SessionPersistence.getGamesOfUser('alice', { roomList: [room], gameList: [game] } as any);
-    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', [game], {});
+    const room = create(Data.ServerInfo_RoomSchema, {});
+    const game = create(Data.ServerInfo_GameSchema, { gameId: 5 });
+    const response = create(Data.Response_GetGamesOfUserSchema, { roomList: [room], gameList: [game] });
+    SessionPersistence.getGamesOfUser('alice', response);
+    expect(ServerDispatch.gamesOfUser).toHaveBeenCalledWith('alice', response);
   });
 });

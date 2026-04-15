@@ -1,4 +1,4 @@
-import { SessionCommands } from 'websocket';
+import { SessionCommands } from '@app/websocket';
 
 export class SessionService {
   static addToBuddyList(userName: string) {

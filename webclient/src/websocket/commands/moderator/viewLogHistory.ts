@@ -1,13 +1,13 @@
 import { create } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
-import { Command_ViewLogHistory_ext, Command_ViewLogHistorySchema } from 'generated/proto/moderator_commands_pb';
-import { ModeratorPersistence } from '../../persistence';
-import { Response_ViewLogHistory_ext } from 'generated/proto/response_viewlog_history_pb';
-import { LogFilters } from 'types';
 
-export function viewLogHistory(filters: LogFilters): void {
-  webClient.protobuf.sendModeratorCommand(Command_ViewLogHistory_ext, create(Command_ViewLogHistorySchema, filters), {
-    responseExt: Response_ViewLogHistory_ext,
+import { ModeratorPersistence } from '../../persistence';
+
+import { Data } from '@app/types';
+
+export function viewLogHistory(filters: Data.ViewLogHistoryParams): void {
+  webClient.protobuf.sendModeratorCommand(Data.Command_ViewLogHistory_ext, create(Data.Command_ViewLogHistorySchema, filters), {
+    responseExt: Data.Response_ViewLogHistory_ext,
     onSuccess: (response) => {
       ModeratorPersistence.viewLogs(response.logMessage);
     },

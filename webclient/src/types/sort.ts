@@ -3,7 +3,15 @@ export enum SortDirection {
   DESC = 'DESC'
 }
 
-export interface SortBy {
-  field: string;
+export interface SortBy<T extends string = string> {
+  field: T;
   order: SortDirection;
+}
+
+export enum GameSortField {
+  START_TIME = 'startTime'
+}
+
+export enum UserSortField {
+  NAME = 'name'
 }

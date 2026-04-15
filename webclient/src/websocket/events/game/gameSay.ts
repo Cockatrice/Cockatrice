@@ -1,7 +1,6 @@
-import type { Event_GameSay } from 'generated/proto/event_game_say_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function gameSay(data: Event_GameSay, meta: GameEventMeta): void {
+export function gameSay(data: Data.Event_GameSay, meta: Enriched.GameEventMeta): void {
   GamePersistence.gameSay(meta.gameId, meta.playerId, data.message);
 }

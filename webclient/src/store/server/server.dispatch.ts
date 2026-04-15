@@ -1,18 +1,6 @@
 import { Actions } from './server.actions';
-import { store } from 'store';
-import {
-  GametypeMap, WebSocketConnectOptions
-} from 'types';
-import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
-import type { ServerInfo_Ban } from 'generated/proto/serverinfo_ban_pb';
-import type { ServerInfo_Warning } from 'generated/proto/serverinfo_warning_pb';
-import type { Response_WarnList } from 'generated/proto/response_warn_list_pb';
-import type { ServerInfo_ReplayMatch } from 'generated/proto/serverinfo_replay_match_pb';
-import type { Response_DeckList } from 'generated/proto/response_deck_list_pb';
-import type { ServerInfo_DeckStorage_TreeItem } from 'generated/proto/serverinfo_deckstorage_pb';
-import type { ServerInfo_ChatMessage } from 'generated/proto/serverinfo_chat_message_pb';
-import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
-import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
+import { store } from '..';
+import { App, Data, Enriched } from '@app/types';
 
 export const Dispatch = {
   initialized: () => {
@@ -24,14 +12,11 @@ export const Dispatch = {
   connectionAttempted: () => {
     store.dispatch(Actions.connectionAttempted());
   },
-  loginSuccessful: (options: WebSocketConnectOptions) => {
+  loginSuccessful: (options: Enriched.LoginSuccessContext) => {
     store.dispatch(Actions.loginSuccessful(options));
   },
   loginFailed: () => {
     store.dispatch(Actions.loginFailed());
-  },
-  connectionClosed: (reason: number) => {
-    store.dispatch(Actions.connectionClosed(reason));
   },
   connectionFailed: () => {
     store.dispatch(Actions.connectionFailed());
@@ -42,19 +27,19 @@ export const Dispatch = {
   testConnectionFailed: () => {
     store.dispatch(Actions.testConnectionFailed());
   },
-  updateBuddyList: (buddyList: ServerInfo_User[]) => {
+  updateBuddyList: (buddyList: Data.ServerInfo_User[]) => {
     store.dispatch(Actions.updateBuddyList(buddyList));
   },
-  addToBuddyList: (user: ServerInfo_User) => {
+  addToBuddyList: (user: Data.ServerInfo_User) => {
     store.dispatch(Actions.addToBuddyList(user));
   },
   removeFromBuddyList: (userName: string) => {
     store.dispatch(Actions.removeFromBuddyList(userName));
   },
-  updateIgnoreList: (ignoreList: ServerInfo_User[]) => {
+  updateIgnoreList: (ignoreList: Data.ServerInfo_User[]) => {
     store.dispatch(Actions.updateIgnoreList(ignoreList));
   },
-  addToIgnoreList: (user: ServerInfo_User) => {
+  addToIgnoreList: (user: Data.ServerInfo_User) => {
     store.dispatch(Actions.addToIgnoreList(user));
   },
   removeFromIgnoreList: (userName: string) => {
@@ -66,25 +51,25 @@ export const Dispatch = {
       version
     }));
   },
-  updateStatus: (state: number, description: string) => {
+  updateStatus: (state: App.StatusEnum, description: string) => {
     store.dispatch(Actions.updateStatus({
       state,
       description
     }));
   },
-  updateUser: (user: ServerInfo_User) => {
+  updateUser: (user: Data.ServerInfo_User) => {
     store.dispatch(Actions.updateUser(user));
   },
-  updateUsers: (users: ServerInfo_User[]) => {
+  updateUsers: (users: Data.ServerInfo_User[]) => {
     store.dispatch(Actions.updateUsers(users));
   },
-  userJoined: (user: ServerInfo_User) => {
+  userJoined: (user: Data.ServerInfo_User) => {
     store.dispatch(Actions.userJoined(user));
   },
   userLeft: (name: string) => {
     store.dispatch(Actions.userLeft(name));
   },
-  viewLogs: (logs: ServerInfo_ChatMessage[]) => {
+  viewLogs: (logs: Data.ServerInfo_ChatMessage[]) => {
     store.dispatch(Actions.viewLogs(logs));
   },
   clearLogs: () => {
@@ -114,7 +99,7 @@ export const Dispatch = {
   registrationUserNameError: (error: string) => {
     store.dispatch(Actions.registrationUserNameError(error));
   },
-  accountAwaitingActivation: (options: WebSocketConnectOptions) => {
+  accountAwaitingActivation: (options: Enriched.PendingActivationContext) => {
     store.dispatch(Actions.accountAwaitingActivation(options));
   },
   accountActivationSuccess: () => {
@@ -150,22 +135,22 @@ export const Dispatch = {
   accountPasswordChange: () => {
     store.dispatch(Actions.accountPasswordChange());
   },
-  accountEditChanged: (user: Partial<ServerInfo_User>) => {
+  accountEditChanged: (user: Partial<Data.ServerInfo_User>) => {
     store.dispatch(Actions.accountEditChanged(user));
   },
-  accountImageChanged: (user: Partial<ServerInfo_User>) => {
+  accountImageChanged: (user: Partial<Data.ServerInfo_User>) => {
     store.dispatch(Actions.accountImageChanged(user));
   },
-  getUserInfo: (userInfo: ServerInfo_User) => {
+  getUserInfo: (userInfo: Data.ServerInfo_User) => {
     store.dispatch(Actions.getUserInfo(userInfo));
   },
-  notifyUser: (notification: NotifyUserData) => {
+  notifyUser: (notification: Data.Event_NotifyUser) => {
     store.dispatch(Actions.notifyUser(notification))
   },
-  serverShutdown: (data: ServerShutdownData) => {
+  serverShutdown: (data: Data.Event_ServerShutdown) => {
     store.dispatch(Actions.serverShutdown(data))
   },
-  userMessage: (messageData: UserMessageData) => {
+  userMessage: (messageData: Data.Event_UserMessage) => {
     store.dispatch(Actions.userMessage(messageData))
   },
   addToList: (list: string, userName: string) => {
@@ -177,13 +162,13 @@ export const Dispatch = {
   banFromServer: (userName: string) => {
     store.dispatch(Actions.banFromServer(userName));
   },
-  banHistory: (userName: string, banHistory: ServerInfo_Ban[]) => {
+  banHistory: (userName: string, banHistory: Data.ServerInfo_Ban[]) => {
     store.dispatch(Actions.banHistory(userName, banHistory))
   },
-  warnHistory: (userName: string, warnHistory: ServerInfo_Warning[]) => {
+  warnHistory: (userName: string, warnHistory: Data.ServerInfo_Warning[]) => {
     store.dispatch(Actions.warnHistory(userName, warnHistory))
   },
-  warnListOptions: (warnList: Response_WarnList[]) => {
+  warnListOptions: (warnList: Data.Response_WarnList[]) => {
     store.dispatch(Actions.warnListOptions(warnList))
   },
   warnUser: (userName: string) => {
@@ -201,10 +186,10 @@ export const Dispatch = {
   updateAdminNotes: (userName: string, notes: string) => {
     store.dispatch(Actions.updateAdminNotes(userName, notes));
   },
-  replayList: (matchList: ServerInfo_ReplayMatch[]) => {
+  replayList: (matchList: Data.ServerInfo_ReplayMatch[]) => {
     store.dispatch(Actions.replayList(matchList));
   },
-  replayAdded: (matchInfo: ServerInfo_ReplayMatch) => {
+  replayAdded: (matchInfo: Data.ServerInfo_ReplayMatch) => {
     store.dispatch(Actions.replayAdded(matchInfo));
   },
   replayModifyMatch: (gameId: number, doNotHide: boolean) => {
@@ -213,7 +198,7 @@ export const Dispatch = {
   replayDeleteMatch: (gameId: number) => {
     store.dispatch(Actions.replayDeleteMatch(gameId));
   },
-  backendDecks: (deckList: Response_DeckList) => {
+  backendDecks: (deckList: Data.Response_DeckList) => {
     store.dispatch(Actions.backendDecks(deckList));
   },
   deckNewDir: (path: string, dirName: string) => {
@@ -222,13 +207,13 @@ export const Dispatch = {
   deckDelDir: (path: string) => {
     store.dispatch(Actions.deckDelDir(path));
   },
-  deckUpload: (path: string, treeItem: ServerInfo_DeckStorage_TreeItem) => {
+  deckUpload: (path: string, treeItem: Data.ServerInfo_DeckStorage_TreeItem) => {
     store.dispatch(Actions.deckUpload(path, treeItem));
   },
   deckDelete: (deckId: number) => {
     store.dispatch(Actions.deckDelete(deckId));
   },
-  gamesOfUser: (userName: string, games: ServerInfo_Game[], gametypeMap: GametypeMap) => {
-    store.dispatch(Actions.gamesOfUser(userName, games, gametypeMap));
+  gamesOfUser: (userName: string, response: Data.Response_GetGamesOfUser) => {
+    store.dispatch(Actions.gamesOfUser(userName, response));
   },
 }

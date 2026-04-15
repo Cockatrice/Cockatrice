@@ -4,9 +4,9 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import { useTranslation } from 'react-i18next';
 
-import { useLocaleSort } from 'hooks';
-import { Images } from 'images/Images';
-import { countryCodes } from 'types';
+import { useLocaleSort } from '@app/hooks';
+import { Images } from '@app/images';
+import { App } from '@app/types';
 
 
 import './CountryDropdown.css';
@@ -18,7 +18,7 @@ const CountryDropdown = ({ input: { onChange } }) => {
   useEffect(() => onChange(value), [value]);
 
   const translateCountry = country => t(`Common.countries.${country}`);
-  const sortedCountries = useLocaleSort(countryCodes, translateCountry);
+  const sortedCountries = useLocaleSort(App.countryCodes, translateCountry);
 
   return (
     <FormControl size='small' variant='outlined' className='CountryDropdown'>

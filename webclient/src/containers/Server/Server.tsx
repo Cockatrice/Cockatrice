@@ -5,13 +5,13 @@ import { generatePath, useNavigate } from 'react-router-dom';
 import ListItemButton from '@mui/material/ListItemButton';
 import Paper from '@mui/material/Paper';
 
-import { AuthGuard, ThreePaneLayout, UserDisplay, VirtualList } from 'components';
-import { useReduxEffect } from 'hooks';
-import { RoomsSelectors, RoomsTypes, ServerSelectors } from 'store';
-import { RouteEnum } from 'types';
-import { useAppSelector } from 'store/store';
+import { AuthGuard, ThreePaneLayout, UserDisplay, VirtualList } from '@app/components';
+import { useReduxEffect } from '@app/hooks';
+import { RoomsSelectors, RoomsTypes, ServerSelectors } from '@app/store';
+import { App } from '@app/types';
+import { useAppSelector } from '@app/store';
 import Rooms from './Rooms';
-import Layout from 'containers/Layout/Layout';
+import Layout from '../Layout/Layout';
 
 import './Server.css';
 
@@ -24,7 +24,7 @@ const Server = () => {
 
   useReduxEffect((action: any) => {
     const roomId = action.roomInfo.roomId.toString();
-    navigate(generatePath(RouteEnum.ROOM, { roomId }));
+    navigate(generatePath(App.RouteEnum.ROOM, { roomId }));
   }, RoomsTypes.JOIN_ROOM, []);
 
   return (

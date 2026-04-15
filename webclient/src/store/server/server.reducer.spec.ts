@@ -1,13 +1,10 @@
-import { StatusEnum } from 'types';
-import { ServerInfo_User_UserLevelFlag as UserLevelFlag } from 'generated/proto/serverinfo_user_pb';
+import { App, Data } from '@app/types';
 import { create } from '@bufbuild/protobuf';
-import { Event_UserMessageSchema } from 'generated/proto/event_user_message_pb';
-import { ServerInfo_DeckStorage_FolderSchema, ServerInfo_DeckStorage_TreeItemSchema } from 'generated/proto/serverinfo_deckstorage_pb';
 import { serverReducer } from './server.reducer';
 import { Types } from './server.types';
 import {
   makeBanHistoryItem,
-  makeConnectOptions,
+  makePendingActivationContext,
   makeDeckList,
   makeDeckTreeItem,
   makeGame,
@@ -19,6 +16,8 @@ import {
   makeWarnListItem,
 } from './__mocks__/server-fixtures';
 
+const UserLevelFlag = Data.ServerInfo_User_UserLevelFlag;
+
 // ── Initialisation ───────────────────────────────────────────────────────────
 
 describe('Initialisation', () => {
@@ -26,7 +25,7 @@ describe('Initialisation', () => {
     const result = serverReducer(undefined, { type: '@@INIT' });
     expect(result.initialized).toBe(false);
     expect(result.buddyList).toEqual([]);
-    expect(result.status.state).toBe(StatusEnum.DISCONNECTED);
+    expect(result.status.state).toBe(App.StatusEnum.DISCONNECTED);
   });
 
   it('INITIALIZED → resets to initialState with initialized: true', () => {
@@ -38,7 +37,7 @@ describe('Initialisation', () => {
   });
 
   it('CLEAR_STORE → resets to initialState but preserves status', () => {
-    const status = { state: StatusEnum.LOGGED_IN, description: 'logged in' };
+    const status = { state: App.StatusEnum.LOGGED_IN, description: 'logged in', connectionAttemptMade: true };
     const state = makeServerState({ status, banUser: 'someone' });
     const result = serverReducer(state, { type: Types.CLEAR_STORE });
     expect(result.banUser).toBe('');
@@ -57,13 +56,13 @@ describe('Initialisation', () => {
 
 describe('Account & Connection', () => {
   it('CONNECTION_ATTEMPTED → sets connectionAttemptMade to true', () => {
-    const state = makeServerState({ status: { connectionAttemptMade: false, state: StatusEnum.DISCONNECTED, description: null } });
+    const state = makeServerState({ status: { connectionAttemptMade: false, state: App.StatusEnum.DISCONNECTED, description: null } });
     const result = serverReducer(state, { type: Types.CONNECTION_ATTEMPTED });
     expect(result.status.connectionAttemptMade).toBe(true);
   });
 
   it('ACCOUNT_AWAITING_ACTIVATION → returns state unchanged', () => {
-    const options = makeConnectOptions();
+    const options = makePendingActivationContext();
     const state = makeServerState();
     const result = serverReducer(state, { type: Types.ACCOUNT_AWAITING_ACTIVATION, options });
     expect(result).toBe(state);
@@ -133,11 +132,13 @@ describe('Server Info & Status', () => {
     expect(result.info.message).toBe('hi');
   });
 
-  it('UPDATE_STATUS → replaces state.status entirely', () => {
+  it('UPDATE_STATUS → merges state and description into status', () => {
     const state = makeServerState();
-    const status = { state: StatusEnum.LOGGED_IN, description: 'ok' };
-    const result = serverReducer(state, { type: Types.UPDATE_STATUS, status });
-    expect(result.status).toEqual(status);
+    const update = { state: App.StatusEnum.LOGGED_IN, description: 'ok' };
+    const result = serverReducer(state, { type: Types.UPDATE_STATUS, status: update });
+    expect(result.status.state).toBe(App.StatusEnum.LOGGED_IN);
+    expect(result.status.description).toBe('ok');
+    expect(result.status.connectionAttemptMade).toBe(false);
   });
 });
 
@@ -281,12 +282,12 @@ describe('Messaging', () => {
   });
 
   it('USER_MESSAGE → appends to existing messages for that user', () => {
-    const existingMsg = create(Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'first' });
+    const existingMsg = create(Data.Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'first' });
     const state = makeServerState({
       user: makeUser({ name: 'Bob' }),
       messages: { Alice: [existingMsg] },
     });
-    const newMsg = create(Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'second' });
+    const newMsg = create(Data.Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'second' });
     const result = serverReducer(state, { type: Types.USER_MESSAGE, messageData: newMsg });
     expect(result.messages['Alice']).toHaveLength(2);
   });
@@ -482,11 +483,11 @@ describe('Deck Storage', () => {
   });
 
   it('DECK_UPLOAD with nested path → inserts into matching subfolder', () => {
-    const subfolder = create(ServerInfo_DeckStorage_TreeItemSchema, {
-      id: 0, name: 'myDecks', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+    const subfolder = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'myDecks', folder: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] })
     });
     const state = makeServerState({
-      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
+      backendDecks: makeDeckList({ root: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
     });
     const item = makeDeckTreeItem({ name: 'new.cod' });
     const result = serverReducer(state, { type: Types.DECK_UPLOAD, path: 'myDecks', treeItem: item });
@@ -512,18 +513,20 @@ describe('Deck Storage', () => {
 
   it('DECK_DELETE → removes item by id from tree', () => {
     const item = makeDeckTreeItem({ id: 7 });
-    const state = makeServerState({ backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [item] }) }) });
+    const state = makeServerState({
+      backendDecks: makeDeckList({ root: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [item] }) }),
+    });
     const result = serverReducer(state, { type: Types.DECK_DELETE, deckId: 7 });
     expect(result.backendDecks.root.items).toHaveLength(0);
   });
 
   it('DECK_DELETE → recursively removes item nested inside a subfolder', () => {
     const nested = makeDeckTreeItem({ id: 9, name: 'nested.cod' });
-    const subfolder = create(ServerInfo_DeckStorage_TreeItemSchema, {
-      id: 0, name: 'sub', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [nested] })
+    const subfolder = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'sub', folder: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [nested] })
     });
     const state = makeServerState({
-      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
+      backendDecks: makeDeckList({ root: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
     });
     const result = serverReducer(state, { type: Types.DECK_DELETE, deckId: 9 });
     expect(result.backendDecks.root.items[0].folder.items).toHaveLength(0);
@@ -544,11 +547,11 @@ describe('Deck Storage', () => {
   });
 
   it('DECK_NEW_DIR nested → inserts folder inside matching subfolder', () => {
-    const subfolder = create(ServerInfo_DeckStorage_TreeItemSchema, {
-      id: 0, name: 'parent', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+    const subfolder = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'parent', folder: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] })
     });
     const state = makeServerState({
-      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
+      backendDecks: makeDeckList({ root: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
     });
     const result = serverReducer(state, { type: Types.DECK_NEW_DIR, path: 'parent', dirName: 'child' });
     const parent = result.backendDecks.root.items.find(i => i.name === 'parent');
@@ -563,36 +566,36 @@ describe('Deck Storage', () => {
   });
 
   it('DECK_DEL_DIR → removes folder from root by name', () => {
-    const subfolder = create(ServerInfo_DeckStorage_TreeItemSchema, {
-      id: 0, name: 'myDir', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+    const subfolder = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'myDir', folder: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] })
     });
     const state = makeServerState({
-      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
+      backendDecks: makeDeckList({ root: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
     });
     const result = serverReducer(state, { type: Types.DECK_DEL_DIR, path: 'myDir' });
     expect(result.backendDecks.root.items).toHaveLength(0);
   });
 
   it('DECK_DEL_DIR → returns deck tree unchanged when path is empty', () => {
-    const subfolder = create(ServerInfo_DeckStorage_TreeItemSchema, {
-      id: 0, name: 'keep', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+    const subfolder = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'keep', folder: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] })
     });
     const state = makeServerState({
-      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
+      backendDecks: makeDeckList({ root: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [subfolder] }) })
     });
     const result = serverReducer(state, { type: Types.DECK_DEL_DIR, path: '' });
     expect(result.backendDecks.root.items).toHaveLength(1);
   });
 
   it('DECK_DEL_DIR → recursively removes nested subfolder via multi-segment path', () => {
-    const child = create(ServerInfo_DeckStorage_TreeItemSchema, {
-      id: 0, name: 'child', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [] })
+    const child = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'child', folder: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] })
     });
-    const parent = create(ServerInfo_DeckStorage_TreeItemSchema, {
-      id: 0, name: 'parent', folder: create(ServerInfo_DeckStorage_FolderSchema, { items: [child] })
+    const parent = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
+      id: 0, name: 'parent', folder: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [child] })
     });
     const state = makeServerState({
-      backendDecks: makeDeckList({ root: create(ServerInfo_DeckStorage_FolderSchema, { items: [parent] }) })
+      backendDecks: makeDeckList({ root: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [parent] }) })
     });
     const result = serverReducer(state, { type: Types.DECK_DEL_DIR, path: 'parent/child' });
     expect(result.backendDecks.root.items[0].folder.items).toHaveLength(0);
@@ -603,24 +606,31 @@ describe('Deck Storage', () => {
 
 describe('GAMES_OF_USER', () => {
   it('stores normalized games keyed by userName', () => {
-    const games = [makeGame({ gameId: 5 })];
+    const response = create(Data.Response_GetGamesOfUserSchema, {
+      gameList: [create(Data.ServerInfo_GameSchema, { gameId: 5, description: '' })],
+      roomList: [],
+    });
     const state = makeServerState();
-    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games, gametypeMap: {} });
-    expect(result.gamesOfUser['alice']).toEqual(games);
+    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', response });
+    expect(result.gamesOfUser['alice']).toEqual([makeGame({ gameId: 5 })]);
   });
 
   it('overwrites previous games for same user', () => {
     const old = [makeGame({ gameId: 1 })];
-    const fresh = [makeGame({ gameId: 2 })];
+    const response = create(Data.Response_GetGamesOfUserSchema, {
+      gameList: [create(Data.ServerInfo_GameSchema, { gameId: 2, description: '' })],
+      roomList: [],
+    });
     const state = makeServerState({ gamesOfUser: { alice: old } });
-    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games: fresh, gametypeMap: {} });
-    expect(result.gamesOfUser['alice']).toEqual(fresh);
+    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', response });
+    expect(result.gamesOfUser['alice']).toEqual([makeGame({ gameId: 2 })]);
   });
 
   it('does not affect other users\' entries', () => {
     const bobGames = [makeGame({ gameId: 3 })];
+    const response = create(Data.Response_GetGamesOfUserSchema, { gameList: [], roomList: [] });
     const state = makeServerState({ gamesOfUser: { bob: bobGames } });
-    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', games: [], gametypeMap: {} });
+    const result = serverReducer(state, { type: Types.GAMES_OF_USER, userName: 'alice', response });
     expect(result.gamesOfUser['bob']).toBe(bobGames);
   });
 });

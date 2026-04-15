@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import React from "react";
 
-import { Message } from 'components';
+import { Message } from '@app/components';
 
 import './Messages.css';
 

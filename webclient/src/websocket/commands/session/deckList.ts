@@ -1,12 +1,12 @@
 import { create } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
-import { Command_DeckListSchema, Command_DeckList_ext } from 'generated/proto/command_deck_list_pb';
+
 import { SessionPersistence } from '../../persistence';
-import { Response_DeckList_ext } from 'generated/proto/response_deck_list_pb';
+import { Data } from '@app/types';
 
 export function deckList(): void {
-  webClient.protobuf.sendSessionCommand(Command_DeckList_ext, create(Command_DeckListSchema), {
-    responseExt: Response_DeckList_ext,
+  webClient.protobuf.sendSessionCommand(Data.Command_DeckList_ext, create(Data.Command_DeckListSchema), {
+    responseExt: Data.Response_DeckList_ext,
     onSuccess: (response) => {
       if (response.root) {
         SessionPersistence.updateServerDecks(response);

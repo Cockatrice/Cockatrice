@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import { GameSortField, Room, UserSortField, SortDirection } from 'types';
+import { App, Enriched } from '@app/types';
 
 import { normalizeGameObject, normalizeGametypeMap, normalizeRoomInfo, normalizeUserMessage, SortUtil } from '../common';
 
@@ -15,12 +15,12 @@ const initialState: RoomsState = {
   joinedGameIds: {},
   messages: {},
   sortGamesBy: {
-    field: GameSortField.START_TIME,
-    order: SortDirection.DESC
+    field: App.GameSortField.START_TIME,
+    order: App.SortDirection.DESC
   },
   sortUsersBy: {
-    field: UserSortField.NAME,
-    order: SortDirection.ASC
+    field: App.UserSortField.NAME,
+    order: App.SortDirection.ASC
   }
 };
 
@@ -46,11 +46,11 @@ export const roomsReducer = (state = initialState, action: RoomsAction) => {
         const gametypeMap = normalizeGametypeMap(gametypeList);
 
         rooms[roomId] = {
-          ...(existing as Room),
+          ...(existing as Enriched.Room),
           ...roomMeta,
           gametypeMap,
-          gameList: (existing as Room).gameList,
-          userList: (existing as Room).userList,
+          gameList: (existing as Enriched.Room).gameList,
+          userList: (existing as Enriched.Room).userList,
           order,
         };
       });
@@ -149,8 +149,10 @@ export const roomsReducer = (state = initialState, action: RoomsAction) => {
       const { rooms, sortGamesBy } = state;
       const room = rooms[roomId];
 
-      if (!room) {
-        return { ...state };
+      // An empty gameList means no game updates — skip to avoid
+      // overwriting the existing game list with an empty one.
+      if (!room || !games?.length) {
+        return state;
       }
 
       // Normalize incoming raw proto games using the room's gametypeMap

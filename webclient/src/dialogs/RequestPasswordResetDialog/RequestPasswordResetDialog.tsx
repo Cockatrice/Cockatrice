@@ -7,7 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 
-import { RequestPasswordResetForm } from 'forms';
+import { RequestPasswordResetForm } from '@app/forms';
 
 import './RequestPasswordResetDialog.css';
 

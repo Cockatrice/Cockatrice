@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import React, { useMemo, useState } from 'react';
 
-import { TokenDTO } from 'services';
+import { TokenDTO } from '@app/services';
 
 import Token from '../Token/Token';
 

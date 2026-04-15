@@ -22,7 +22,7 @@ vi.mock('../../utils', async () => {
 vi.mock('./', async () => {
   const actual = await vi.importActual('./');
   const { makeSessionBarrelMock } = await import('../../__mocks__/sessionCommandMocks');
-  return { ...(actual as any), ...makeSessionBarrelMock() };
+  return { ...(actual as Record<string, unknown>), ...makeSessionBarrelMock() };
 });
 
 import { Mock } from 'vitest';
@@ -31,38 +31,7 @@ import { SessionPersistence } from '../../persistence';
 import { RoomPersistence } from '../../persistence';
 import webClient from '../../WebClient';
 import { hashPassword, generateSalt, passwordSaltSupported } from '../../utils';
-import {
-  Command_AccountEdit_ext,
-  Command_AccountImage_ext,
-  Command_AccountPassword_ext,
-  Command_AddToList_ext,
-  Command_GetGamesOfUser_ext,
-  Command_GetUserInfo_ext,
-  Command_JoinRoom_ext,
-  Command_ListRooms_ext,
-  Command_ListUsers_ext,
-  Command_Message_ext,
-  Command_Ping_ext,
-  Command_RemoveFromList_ext,
-} from 'generated/proto/session_commands_pb';
-import { Command_DeckDel_ext } from 'generated/proto/command_deck_del_pb';
-import { Command_DeckDelDir_ext } from 'generated/proto/command_deck_del_dir_pb';
-import { Command_DeckList_ext } from 'generated/proto/command_deck_list_pb';
-import { Command_DeckNewDir_ext } from 'generated/proto/command_deck_new_dir_pb';
-import { Command_DeckUpload_ext } from 'generated/proto/command_deck_upload_pb';
-import { Command_ReplayDeleteMatch_ext } from 'generated/proto/command_replay_delete_match_pb';
-import { Command_ReplayGetCode_ext } from 'generated/proto/command_replay_get_code_pb';
-import { Command_ReplayList_ext } from 'generated/proto/command_replay_list_pb';
-import { Command_ReplayModifyMatch_ext } from 'generated/proto/command_replay_modify_match_pb';
-import { Command_ReplaySubmitCode_ext } from 'generated/proto/command_replay_submit_code_pb';
-import { Response_DeckList_ext } from 'generated/proto/response_deck_list_pb';
-import { Response_DeckUpload_ext } from 'generated/proto/response_deck_upload_pb';
-import { Response_GetGamesOfUser_ext } from 'generated/proto/response_get_games_of_user_pb';
-import { Response_GetUserInfo_ext } from 'generated/proto/response_get_user_info_pb';
-import { Response_JoinRoom_ext } from 'generated/proto/response_join_room_pb';
-import { Response_ListUsers_ext } from 'generated/proto/response_list_users_pb';
-import { Response_ReplayGetCode_ext } from 'generated/proto/response_replay_get_code_pb';
-import { Response_ReplayList_ext } from 'generated/proto/response_replay_list_pb';
+
 import { accountEdit } from './accountEdit';
 import { accountImage } from './accountImage';
 import { accountPassword } from './accountPassword';
@@ -86,6 +55,7 @@ import { addToList, addToBuddyList, addToIgnoreList } from './addToList';
 import { removeFromList, removeFromBuddyList, removeFromIgnoreList } from './removeFromList';
 import { replayGetCode } from './replayGetCode';
 import { replaySubmitCode } from './replaySubmitCode';
+import { Data } from '@app/types';
 
 const { invokeOnSuccess, invokeCallback } = makeCallbackHelpers(
   webClient.protobuf.sendSessionCommand as Mock,
@@ -93,7 +63,6 @@ const { invokeOnSuccess, invokeCallback } = makeCallbackHelpers(
 );
 
 beforeEach(() => {
-  vi.clearAllMocks();
   (hashPassword as Mock).mockReturnValue('hashed_pw');
   (generateSalt as Mock).mockReturnValue('randSalt');
   (passwordSaltSupported as Mock).mockReturnValue(0);
@@ -102,12 +71,10 @@ beforeEach(() => {
 // ----------------------------------------------------------------
 
 describe('accountEdit', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_AccountEdit with correct params', () => {
     accountEdit('pw', 'Alice', 'a@b.com', 'US');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_AccountEdit_ext,
+      Data.Command_AccountEdit_ext,
       expect.objectContaining({ passwordCheck: 'pw', realName: 'Alice', email: 'a@b.com', country: 'US' }),
       expect.any(Object)
     );
@@ -121,13 +88,11 @@ describe('accountEdit', () => {
 });
 
 describe('accountImage', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_AccountImage', () => {
     const img = new Uint8Array([1, 2]);
     accountImage(img);
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_AccountImage_ext, expect.objectContaining({ image: img }), expect.any(Object)
+      Data.Command_AccountImage_ext, expect.objectContaining({ image: img }), expect.any(Object)
     );
   });
 
@@ -140,12 +105,10 @@ describe('accountImage', () => {
 });
 
 describe('accountPassword', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_AccountPassword', () => {
     accountPassword('old', 'new', 'hashed');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_AccountPassword_ext,
+      Data.Command_AccountPassword_ext,
       expect.objectContaining({ oldPassword: 'old', newPassword: 'new', hashedNewPassword: 'hashed' }),
       expect.any(Object)
     );
@@ -159,12 +122,10 @@ describe('accountPassword', () => {
 });
 
 describe('deckDel', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_DeckDel', () => {
     deckDel(42);
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_DeckDel_ext,
+      Data.Command_DeckDel_ext,
       expect.objectContaining({ deckId: 42 }),
       expect.any(Object)
     );
@@ -178,12 +139,10 @@ describe('deckDel', () => {
 });
 
 describe('deckDelDir', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_DeckDelDir', () => {
     deckDelDir('/path');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_DeckDelDir_ext, expect.objectContaining({ path: '/path' }), expect.any(Object)
+      Data.Command_DeckDelDir_ext, expect.objectContaining({ path: '/path' }), expect.any(Object)
     );
   });
 
@@ -195,14 +154,12 @@ describe('deckDelDir', () => {
 });
 
 describe('deckList', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_DeckList', () => {
     deckList();
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_DeckList_ext,
+      Data.Command_DeckList_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_DeckList_ext })
+      expect.objectContaining({ responseExt: Data.Response_DeckList_ext })
     );
   });
 
@@ -215,12 +172,10 @@ describe('deckList', () => {
 });
 
 describe('deckNewDir', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_DeckNewDir', () => {
     deckNewDir('/path', 'dir');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_DeckNewDir_ext, expect.objectContaining({ path: '/path', dirName: 'dir' }), expect.any(Object)
+      Data.Command_DeckNewDir_ext, expect.objectContaining({ path: '/path', dirName: 'dir' }), expect.any(Object)
     );
   });
 
@@ -232,14 +187,12 @@ describe('deckNewDir', () => {
 });
 
 describe('deckUpload', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_DeckUpload', () => {
     deckUpload('/path', 1, 'content');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_DeckUpload_ext,
+      Data.Command_DeckUpload_ext,
       expect.objectContaining({ path: '/path', deckId: 1, deckList: 'content' }),
-      expect.objectContaining({ responseExt: Response_DeckUpload_ext })
+      expect.objectContaining({ responseExt: Data.Response_DeckUpload_ext })
     );
   });
 
@@ -252,8 +205,6 @@ describe('deckUpload', () => {
 });
 
 describe('disconnect', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('calls webClient.disconnect', () => {
     disconnect();
     expect(webClient.disconnect).toHaveBeenCalled();
@@ -261,14 +212,12 @@ describe('disconnect', () => {
 });
 
 describe('getGamesOfUser', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_GetGamesOfUser', () => {
     getGamesOfUser('alice');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_GetGamesOfUser_ext,
+      Data.Command_GetGamesOfUser_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_GetGamesOfUser_ext })
+      expect.objectContaining({ responseExt: Data.Response_GetGamesOfUser_ext })
     );
   });
 
@@ -281,14 +230,12 @@ describe('getGamesOfUser', () => {
 });
 
 describe('getUserInfo', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_GetUserInfo', () => {
     getUserInfo('alice');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_GetUserInfo_ext,
+      Data.Command_GetUserInfo_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_GetUserInfo_ext })
+      expect.objectContaining({ responseExt: Data.Response_GetUserInfo_ext })
     );
   });
 
@@ -301,14 +248,12 @@ describe('getUserInfo', () => {
 });
 
 describe('joinRoom', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_JoinRoom', () => {
     joinRoom(5);
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_JoinRoom_ext,
+      Data.Command_JoinRoom_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_JoinRoom_ext })
+      expect.objectContaining({ responseExt: Data.Response_JoinRoom_ext })
     );
   });
 
@@ -321,23 +266,19 @@ describe('joinRoom', () => {
 });
 
 describe('listRooms (command)', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_ListRooms', () => {
     listRooms();
-    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(Command_ListRooms_ext, expect.any(Object));
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(Data.Command_ListRooms_ext, expect.any(Object));
   });
 });
 
 describe('listUsers', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_ListUsers', () => {
     listUsers();
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_ListUsers_ext,
+      Data.Command_ListUsers_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_ListUsers_ext })
+      expect.objectContaining({ responseExt: Data.Response_ListUsers_ext })
     );
   });
 
@@ -350,24 +291,20 @@ describe('listUsers', () => {
 });
 
 describe('message', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_Message', () => {
     message('bob', 'hi');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_Message_ext, expect.objectContaining({ userName: 'bob', message: 'hi' })
+      Data.Command_Message_ext, expect.objectContaining({ userName: 'bob', message: 'hi' })
     );
   });
 
 });
 
 describe('ping', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_Ping', () => {
     const pingReceived = vi.fn();
     ping(pingReceived);
-    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(Command_Ping_ext, expect.any(Object), expect.any(Object));
+    expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(Data.Command_Ping_ext, expect.any(Object), expect.any(Object));
   });
 
   it('calls pingReceived via onResponse', () => {
@@ -379,12 +316,10 @@ describe('ping', () => {
 });
 
 describe('replayDeleteMatch', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_ReplayDeleteMatch', () => {
     replayDeleteMatch(7);
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_ReplayDeleteMatch_ext,
+      Data.Command_ReplayDeleteMatch_ext,
       expect.objectContaining({ gameId: 7 }),
       expect.any(Object)
     );
@@ -398,14 +333,12 @@ describe('replayDeleteMatch', () => {
 });
 
 describe('replayList', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_ReplayList', () => {
     replayList();
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_ReplayList_ext,
+      Data.Command_ReplayList_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_ReplayList_ext })
+      expect.objectContaining({ responseExt: Data.Response_ReplayList_ext })
     );
   });
 
@@ -418,12 +351,10 @@ describe('replayList', () => {
 });
 
 describe('replayModifyMatch', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_ReplayModifyMatch', () => {
     replayModifyMatch(7, true);
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_ReplayModifyMatch_ext, expect.objectContaining({ gameId: 7, doNotHide: true }), expect.any(Object)
+      Data.Command_ReplayModifyMatch_ext, expect.objectContaining({ gameId: 7, doNotHide: true }), expect.any(Object)
     );
   });
 
@@ -435,12 +366,10 @@ describe('replayModifyMatch', () => {
 });
 
 describe('addToList / addToBuddyList / addToIgnoreList', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('addToBuddyList sends Command_AddToList with list=buddy', () => {
     addToBuddyList('alice');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_AddToList_ext,
+      Data.Command_AddToList_ext,
       expect.objectContaining({ list: 'buddy' }),
       expect.any(Object)
     );
@@ -449,7 +378,7 @@ describe('addToList / addToBuddyList / addToIgnoreList', () => {
   it('addToIgnoreList sends Command_AddToList with list=ignore', () => {
     addToIgnoreList('bob');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_AddToList_ext,
+      Data.Command_AddToList_ext,
       expect.objectContaining({ list: 'ignore' }),
       expect.any(Object)
     );
@@ -463,12 +392,10 @@ describe('addToList / addToBuddyList / addToIgnoreList', () => {
 });
 
 describe('removeFromList / removeFromBuddyList / removeFromIgnoreList', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('removeFromBuddyList sends Command_RemoveFromList with list=buddy', () => {
     removeFromBuddyList('alice');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_RemoveFromList_ext,
+      Data.Command_RemoveFromList_ext,
       expect.objectContaining({ list: 'buddy' }),
       expect.any(Object)
     );
@@ -477,7 +404,7 @@ describe('removeFromList / removeFromBuddyList / removeFromIgnoreList', () => {
   it('removeFromIgnoreList sends Command_RemoveFromList with list=ignore', () => {
     removeFromIgnoreList('bob');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_RemoveFromList_ext,
+      Data.Command_RemoveFromList_ext,
       expect.objectContaining({ list: 'ignore' }),
       expect.any(Object)
     );
@@ -491,14 +418,12 @@ describe('removeFromList / removeFromBuddyList / removeFromIgnoreList', () => {
 });
 
 describe('replayGetCode', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_ReplayGetCode with gameId and responseExt', () => {
     replayGetCode(42, vi.fn());
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_ReplayGetCode_ext,
+      Data.Command_ReplayGetCode_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Response_ReplayGetCode_ext })
+      expect.objectContaining({ responseExt: Data.Response_ReplayGetCode_ext })
     );
   });
 
@@ -511,12 +436,10 @@ describe('replayGetCode', () => {
 });
 
 describe('replaySubmitCode', () => {
-  beforeEach(() => vi.clearAllMocks());
-
   it('sends Command_ReplaySubmitCode with replayCode', () => {
     replaySubmitCode('42-abc123');
     expect(webClient.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Command_ReplaySubmitCode_ext, expect.objectContaining({ replayCode: '42-abc123' }), expect.any(Object)
+      Data.Command_ReplaySubmitCode_ext, expect.objectContaining({ replayCode: '42-abc123' }), expect.any(Object)
     );
   });
 

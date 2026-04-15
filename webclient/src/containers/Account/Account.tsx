@@ -6,11 +6,11 @@ import Button from '@mui/material/Button';
 import ListItemButton from '@mui/material/ListItemButton';
 import Paper from '@mui/material/Paper';
 
-import { UserDisplay, VirtualList, AuthGuard, LanguageDropdown } from 'components';
-import { AuthenticationService, SessionService } from 'api';
-import { ServerSelectors } from 'store';
-import Layout from 'containers/Layout/Layout';
-import { useAppSelector } from 'store/store';
+import { UserDisplay, VirtualList, AuthGuard, LanguageDropdown } from '@app/components';
+import { AuthenticationService, SessionService } from '@app/api';
+import { ServerSelectors } from '@app/store';
+import Layout from '../Layout/Layout';
+import { useAppSelector } from '@app/store';
 
 import AddToBuddies from './AddToBuddies';
 import AddToIgnore from './AddToIgnore';

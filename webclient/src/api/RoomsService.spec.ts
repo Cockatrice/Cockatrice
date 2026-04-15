@@ -1,4 +1,4 @@
-vi.mock('websocket', () => ({
+vi.mock('@app/websocket', () => ({
   SessionCommands: {
     joinRoom: vi.fn(),
   },
@@ -9,9 +9,7 @@ vi.mock('websocket', () => ({
 }));
 
 import { RoomsService } from './RoomsService';
-import { RoomCommands, SessionCommands } from 'websocket';
-
-beforeEach(() => vi.clearAllMocks());
+import { RoomCommands, SessionCommands } from '@app/websocket';
 
 describe('RoomsService', () => {
   describe('joinRoom', () => {

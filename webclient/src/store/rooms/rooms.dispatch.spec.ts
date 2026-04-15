@@ -1,12 +1,10 @@
-vi.mock('store', () => ({ store: { dispatch: vi.fn() } }));
+vi.mock('..', () => ({ store: { dispatch: vi.fn() } }));
 
-import { store } from 'store';
+import { store } from '..';
 import { Actions } from './rooms.actions';
 import { Dispatch } from './rooms.dispatch';
 import { makeGame, makeMessage, makeRoom, makeUser } from './__mocks__/rooms-fixtures';
-import { GameSortField, SortDirection } from 'types';
-
-beforeEach(() => vi.clearAllMocks());
+import { App } from '@app/types';
 
 describe('Dispatch', () => {
   it('clearStore dispatches Actions.clearStore()', () => {
@@ -63,9 +61,9 @@ describe('Dispatch', () => {
   });
 
   it('sortGames dispatches Actions.sortGames()', () => {
-    Dispatch.sortGames(1, GameSortField.START_TIME, SortDirection.ASC);
+    Dispatch.sortGames(1, App.GameSortField.START_TIME, App.SortDirection.ASC);
     expect(store.dispatch).toHaveBeenCalledWith(
-      Actions.sortGames(1, GameSortField.START_TIME, SortDirection.ASC)
+      Actions.sortGames(1, App.GameSortField.START_TIME, App.SortDirection.ASC)
     );
   });
 

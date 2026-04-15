@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Select, MenuItem } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 
-import { Images } from 'images/Images';
-import { Language, LanguageCountry, LanguageNative } from 'types';
+import { Images } from '@app/images';
+import { App } from '@app/types';
 
 import './LanguageDropdown.css';
 
@@ -26,19 +26,19 @@ const LanguageDropdown = () => {
         margin='dense'
         value={language}
         fullWidth={true}
-        onChange={e => setLanguage(e.target.value as Language)}
+        onChange={e => setLanguage(e.target.value as App.Language)}
       >
         {
-          Object.keys(Language).map((lang) => {
-            const country = LanguageCountry[lang];
+          Object.keys(App.Language).map((lang) => {
+            const country = App.LanguageCountry[lang];
 
             return (
               <MenuItem value={lang} key={lang}>
                 <div className="LanguageDropdown-item">
                   <img className="LanguageDropdown-item__image" src={Images.Countries[country]} />
                   <span className="LanguageDropdown-item__label">
-                    {LanguageNative[lang]} {
-                      LanguageNative[lang] !== t(`Common.languages.${lang}`) && (
+                    {App.LanguageNative[lang]} {
+                      App.LanguageNative[lang] !== t(`Common.languages.${lang}`) && (
                         <>({ t(`Common.languages.${lang}`) })</>
                       )
                     }

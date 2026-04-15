@@ -1,12 +1,5 @@
-import { CardAttribute } from 'generated/proto/card_attributes_pb';
-import type { ServerInfo_CardCounter } from 'generated/proto/serverinfo_cardcounter_pb';
-import type { ServerInfo_Card } from 'generated/proto/serverinfo_card_pb';
-import type { ServerInfo_Counter } from 'generated/proto/serverinfo_counter_pb';
-import type { ServerInfo_Arrow } from 'generated/proto/serverinfo_arrow_pb';
-import type { ServerInfo_Player } from 'generated/proto/serverinfo_player_pb';
+import { Data } from '@app/types';
 import { create } from '@bufbuild/protobuf';
-import { ServerInfo_CardSchema } from 'generated/proto/serverinfo_card_pb';
-import { ServerInfo_CardCounterSchema } from 'generated/proto/serverinfo_cardcounter_pb';
 import { GameAction } from './game.actions';
 import { GameEntry, GameMessage, GamesState, PlayerEntry, ZoneEntry } from './game.interfaces';
 import { Types } from './game.types';
@@ -74,7 +67,7 @@ function removeGame(state: GamesState, gameId: number): GamesState {
 }
 
 /** Converts the proto PlayerInfo[] array into the keyed PlayerEntry map used in the store. */
-function normalizePlayers(playerList: ServerInfo_Player[]): { [playerId: number]: PlayerEntry } {
+function normalizePlayers(playerList: Data.ServerInfo_Player[]): { [playerId: number]: PlayerEntry } {
   const players: { [playerId: number]: PlayerEntry } = {};
   for (const player of playerList) {
     const playerId = player.properties.playerId;
@@ -92,12 +85,12 @@ function normalizePlayers(playerList: ServerInfo_Player[]): { [playerId: number]
       };
     }
 
-    const counters: { [counterId: number]: ServerInfo_Counter } = {};
+    const counters: { [counterId: number]: Data.ServerInfo_Counter } = {};
     for (const counter of player.counterList) {
       counters[counter.id] = counter;
     }
 
-    const arrows: { [arrowId: number]: ServerInfo_Arrow } = {};
+    const arrows: { [arrowId: number]: Data.ServerInfo_Arrow } = {};
     for (const arrow of player.arrowList) {
       arrows[arrow.id] = arrow;
     }
@@ -120,8 +113,8 @@ function buildEmptyCard(
   y: number,
   faceDown: boolean,
   providerId: string
-): ServerInfo_Card {
-  return create(ServerInfo_CardSchema, {
+): Data.ServerInfo_Card {
+  return create(Data.ServerInfo_CardSchema, {
     id,
     name,
     x,
@@ -157,9 +150,31 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
     }
 
     case Types.GAME_JOINED: {
+      const { data } = action;
+      const gameInfo = data.gameInfo;
+      if (!gameInfo) {
+        return state;
+      }
+      const gameEntry: GameEntry = {
+        gameId: gameInfo.gameId,
+        roomId: gameInfo.roomId,
+        description: gameInfo.description,
+        hostId: data.hostId,
+        localPlayerId: data.playerId,
+        spectator: data.spectator,
+        judge: data.judge,
+        resuming: data.resuming,
+        started: gameInfo.started,
+        activePlayerId: -1,
+        activePhase: -1,
+        secondsElapsed: 0,
+        reversed: false,
+        players: {},
+        messages: [],
+      };
       return {
         ...state,
-        games: { ...state.games, [action.gameId]: action.gameEntry },
+        games: { ...state.games, [gameEntry.gameId]: gameEntry },
       };
     }
 
@@ -266,8 +281,8 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
       }
 
       // Locate card in source zone (by id for visible zones, by position for hidden)
-      let removedCard: ServerInfo_Card | undefined;
-      let newSourceCards: ServerInfo_Card[];
+      let removedCard: Data.ServerInfo_Card | undefined;
+      let newSourceCards: Data.ServerInfo_Card[];
       if (cardId >= 0) {
         removedCard = sourceZoneEntry.cards.find(c => c.id === cardId);
         newSourceCards = sourceZoneEntry.cards.filter(c => c.id !== cardId);
@@ -280,7 +295,7 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
       }
 
       const effectiveNewId = newCardId >= 0 ? newCardId : (removedCard?.id ?? -1);
-      const movedCard: ServerInfo_Card = removedCard
+      const movedCard: Data.ServerInfo_Card = removedCard
         ? {
           ...removedCard,
           id: effectiveNewId,
@@ -423,7 +438,7 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
         return state;
       }
 
-      const newCard: ServerInfo_Card = create(ServerInfo_CardSchema, {
+      const newCard: Data.ServerInfo_Card = create(Data.ServerInfo_CardSchema, {
         id: cardId,
         name: cardName,
         x,
@@ -469,15 +484,15 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
         return state;
       }
 
-      const attrPatch: Partial<ServerInfo_Card> = {};
-      switch (attribute as CardAttribute) {
-        case CardAttribute.AttrTapped: attrPatch.tapped = attrValue === '1'; break;
-        case CardAttribute.AttrAttacking: attrPatch.attacking = attrValue === '1'; break;
-        case CardAttribute.AttrFaceDown: attrPatch.faceDown = attrValue === '1'; break;
-        case CardAttribute.AttrColor: attrPatch.color = attrValue; break;
-        case CardAttribute.AttrPT: attrPatch.pt = attrValue; break;
-        case CardAttribute.AttrAnnotation: attrPatch.annotation = attrValue; break;
-        case CardAttribute.AttrDoesntUntap: attrPatch.doesntUntap = attrValue === '1'; break;
+      const attrPatch: Partial<Data.ServerInfo_Card> = {};
+      switch (attribute as Data.CardAttribute) {
+        case Data.CardAttribute.AttrTapped: attrPatch.tapped = attrValue === '1'; break;
+        case Data.CardAttribute.AttrAttacking: attrPatch.attacking = attrValue === '1'; break;
+        case Data.CardAttribute.AttrFaceDown: attrPatch.faceDown = attrValue === '1'; break;
+        case Data.CardAttribute.AttrColor: attrPatch.color = attrValue; break;
+        case Data.CardAttribute.AttrPT: attrPatch.pt = attrValue; break;
+        case Data.CardAttribute.AttrAnnotation: attrPatch.annotation = attrValue; break;
+        case Data.CardAttribute.AttrDoesntUntap: attrPatch.doesntUntap = attrValue === '1'; break;
       }
 
       const updatedCards = [...zone.cards];
@@ -507,7 +522,7 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
       }
 
       const card = zone.cards[cardIdx];
-      let newCounterList: ServerInfo_CardCounter[];
+      let newCounterList: Data.ServerInfo_CardCounter[];
       if (counterValue <= 0) {
         newCounterList = card.counterList.filter(c => c.id !== counterId);
       } else {
@@ -515,7 +530,7 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
         newCounterList =
           existing >= 0
             ? card.counterList.map(c => (c.id === counterId ? { ...c, value: counterValue } : c))
-            : [...card.counterList, create(ServerInfo_CardCounterSchema, { id: counterId, value: counterValue })];
+            : [...card.counterList, create(Data.ServerInfo_CardCounterSchema, { id: counterId, value: counterValue })];
       }
 
       const updatedCards = [...zone.cards];

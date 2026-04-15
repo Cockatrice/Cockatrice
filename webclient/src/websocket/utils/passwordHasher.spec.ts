@@ -1,4 +1,4 @@
-vi.mock('generated/proto/event_server_identification_pb', () => ({
+vi.mock('../../generated/proto/event_server_identification_pb', () => ({
   Event_ServerIdentification_ServerOptions: { SupportsPasswordHash: 2 },
 }));
 

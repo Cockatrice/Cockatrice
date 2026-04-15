@@ -1,4 +1,4 @@
-vi.mock('store', () => ({
+vi.mock('@app/store', () => ({
   ServerDispatch: {
     adjustMod: vi.fn(),
     reloadConfig: vi.fn(),
@@ -8,11 +8,7 @@ vi.mock('store', () => ({
 }));
 
 import { AdminPersistence } from './AdminPersistence';
-import { ServerDispatch } from 'store';
-
-beforeEach(() => {
-  vi.clearAllMocks();
-});
+import { ServerDispatch } from '@app/store';
 
 describe('AdminPersistence', () => {
   it('adjustMod passes userName, shouldBeMod, shouldBeJudge', () => {

@@ -11,8 +11,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
 
-import { RoomsService } from 'api';
-import { RouteEnum } from 'types';
+import { RoomsService } from '@app/api';
+import { App } from '@app/types';
 
 import './Rooms.css';
 
@@ -21,7 +21,7 @@ const Rooms = ({ rooms, joinedRooms }) => {
 
   function onClick(roomId) {
     if (_.find(joinedRooms, room => room.roomId === roomId)) {
-      navigate(generatePath(RouteEnum.ROOM, { roomId }));
+      navigate(generatePath(App.RouteEnum.ROOM, { roomId }));
     } else {
       RoomsService.joinRoom(roomId);
     }

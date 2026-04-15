@@ -1,7 +1,7 @@
 import { create } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
-import { Command_ReverseTurnSchema, Command_ReverseTurn_ext } from 'generated/proto/command_reverse_turn_pb';
+import { Data } from '@app/types';
 
 export function reverseTurn(gameId: number): void {
-  webClient.protobuf.sendGameCommand(gameId, Command_ReverseTurn_ext, create(Command_ReverseTurnSchema));
+  webClient.protobuf.sendGameCommand(gameId, Data.Command_ReverseTurn_ext, create(Data.Command_ReverseTurnSchema));
 }

@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 
-import { SettingDTO } from 'services';
-import { APP_USER } from 'types';
+import { SettingDTO } from '@app/services';
+import { App } from '@app/types';
 
 export function useAutoConnect() {
   const [setting, setSetting] = useState(undefined);
   const [autoConnect, setAutoConnect] = useState(undefined);
 
   useEffect(() => {
-    SettingDTO.get(APP_USER).then((setting: SettingDTO) => {
+    SettingDTO.get(App.APP_USER).then((setting: SettingDTO) => {
       if (!setting) {
-        setting = new SettingDTO(APP_USER);
+        setting = new SettingDTO(App.APP_USER);
         setting.save();
       }
 

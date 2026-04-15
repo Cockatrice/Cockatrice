@@ -1,9 +1,7 @@
-import { StatusEnum } from 'types';
-import { Event_ConnectionClosed_CloseReason } from 'generated/proto/event_connection_closed_pb';
+import { App, Data } from '@app/types';
 import { updateStatus } from '../../commands/session';
-import { ConnectionClosedData } from './interfaces';
 
-export function connectionClosed({ reason, reasonStr, endTime }: ConnectionClosedData): void {
+export function connectionClosed({ reason, reasonStr, endTime }: Data.Event_ConnectionClosed): void {
   let message: string;
 
   // @TODO (5)
@@ -11,35 +9,35 @@ export function connectionClosed({ reason, reasonStr, endTime }: ConnectionClose
     message = reasonStr;
   } else {
     switch (reason) {
-      case Event_ConnectionClosed_CloseReason.USER_LIMIT_REACHED:
+      case Data.Event_ConnectionClosed_CloseReason.USER_LIMIT_REACHED:
         message = 'The server has reached its maximum user capacity';
         break;
-      case Event_ConnectionClosed_CloseReason.TOO_MANY_CONNECTIONS:
+      case Data.Event_ConnectionClosed_CloseReason.TOO_MANY_CONNECTIONS:
         message = 'There are too many concurrent connections from your address';
         break;
-      case Event_ConnectionClosed_CloseReason.BANNED:
+      case Data.Event_ConnectionClosed_CloseReason.BANNED:
         message = typeof endTime === 'number' && endTime > 0 && Number.isFinite(endTime)
           ? `You are banned until ${new Date(endTime * 1000).toLocaleString()}`
           : 'You are banned';
         break;
-      case Event_ConnectionClosed_CloseReason.DEMOTED:
+      case Data.Event_ConnectionClosed_CloseReason.DEMOTED:
         message = 'You were demoted';
         break;
-      case Event_ConnectionClosed_CloseReason.SERVER_SHUTDOWN:
+      case Data.Event_ConnectionClosed_CloseReason.SERVER_SHUTDOWN:
         message = 'Scheduled server shutdown';
         break;
-      case Event_ConnectionClosed_CloseReason.USERNAMEINVALID:
+      case Data.Event_ConnectionClosed_CloseReason.USERNAMEINVALID:
         message = 'Invalid username';
         break;
-      case Event_ConnectionClosed_CloseReason.LOGGEDINELSEWERE:
+      case Data.Event_ConnectionClosed_CloseReason.LOGGEDINELSEWERE:
         message = 'You have been logged out due to logging in at another location';
         break;
-      case Event_ConnectionClosed_CloseReason.OTHER:
+      case Data.Event_ConnectionClosed_CloseReason.OTHER:
       default:
         message = 'Unknown reason';
         break;
     }
   }
 
-  updateStatus(StatusEnum.DISCONNECTED, message);
+  updateStatus(App.StatusEnum.DISCONNECTED, message);
 }

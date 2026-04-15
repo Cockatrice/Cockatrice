@@ -1,6 +1,6 @@
-import { GameEventMeta } from 'types';
+import { Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function gameClosed(_data: {}, meta: GameEventMeta): void {
+export function gameClosed(_data: {}, meta: Enriched.GameEventMeta): void {
   GamePersistence.gameClosed(meta.gameId);
 }

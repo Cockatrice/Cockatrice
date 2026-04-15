@@ -1,33 +1,13 @@
-import {
-  Game,
-  ProtoInit,
-  SortDirection,
-  StatusEnum,
-  UserSortField,
-  WebSocketConnectOptions,
-} from 'types';
-import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
-import type { ServerInfo_Ban } from 'generated/proto/serverinfo_ban_pb';
-import type { ServerInfo_Warning } from 'generated/proto/serverinfo_warning_pb';
-import type { Response_WarnList } from 'generated/proto/response_warn_list_pb';
-import type { ServerInfo_ReplayMatch } from 'generated/proto/serverinfo_replay_match_pb';
-import type { ServerInfo_ChatMessage } from 'generated/proto/serverinfo_chat_message_pb';
-import type { Response_DeckList } from 'generated/proto/response_deck_list_pb';
-import type { ServerInfo_DeckStorage_TreeItem } from 'generated/proto/serverinfo_deckstorage_pb';
+import { App, Data, Enriched } from '@app/types';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+
 import { create } from '@bufbuild/protobuf';
-import { ServerInfo_GameSchema } from 'generated/proto/serverinfo_game_pb';
-import { ServerInfo_UserSchema } from 'generated/proto/serverinfo_user_pb';
-import { ServerInfo_ReplayMatchSchema } from 'generated/proto/serverinfo_replay_match_pb';
-import { ServerInfo_ChatMessageSchema } from 'generated/proto/serverinfo_chat_message_pb';
-import { ServerInfo_BanSchema } from 'generated/proto/serverinfo_ban_pb';
-import { ServerInfo_WarningSchema } from 'generated/proto/serverinfo_warning_pb';
-import { Response_WarnListSchema } from 'generated/proto/response_warn_list_pb';
-import { ServerInfo_DeckStorage_TreeItemSchema, ServerInfo_DeckStorage_FolderSchema } from 'generated/proto/serverinfo_deckstorage_pb';
-import { Response_DeckListSchema } from 'generated/proto/response_deck_list_pb';
 import { ServerState } from '../server.interfaces';
 
-export function makeUser(overrides: ProtoInit<ServerInfo_User> = {}): ServerInfo_User {
-  return create(ServerInfo_UserSchema, {
+export function makeUser(
+  overrides: MessageInitShape<typeof Data.ServerInfo_UserSchema> = {}
+): Data.ServerInfo_User {
+  return create(Data.ServerInfo_UserSchema, {
     name: 'TestUser',
     accountageSecs: 0n,
     privlevel: '',
@@ -36,8 +16,10 @@ export function makeUser(overrides: ProtoInit<ServerInfo_User> = {}): ServerInfo
   });
 }
 
-export function makeLogItem(overrides: ProtoInit<ServerInfo_ChatMessage> = {}): ServerInfo_ChatMessage {
-  return create(ServerInfo_ChatMessageSchema, {
+export function makeLogItem(
+  overrides: MessageInitShape<typeof Data.ServerInfo_ChatMessageSchema> = {}
+): Data.ServerInfo_ChatMessage {
+  return create(Data.ServerInfo_ChatMessageSchema, {
     message: '',
     senderId: '',
     senderIp: '',
@@ -50,8 +32,10 @@ export function makeLogItem(overrides: ProtoInit<ServerInfo_ChatMessage> = {}): 
   });
 }
 
-export function makeBanHistoryItem(overrides: ProtoInit<ServerInfo_Ban> = {}): ServerInfo_Ban {
-  return create(ServerInfo_BanSchema, {
+export function makeBanHistoryItem(
+  overrides: MessageInitShape<typeof Data.ServerInfo_BanSchema> = {}
+): Data.ServerInfo_Ban {
+  return create(Data.ServerInfo_BanSchema, {
     adminId: '',
     adminName: '',
     banTime: '',
@@ -62,8 +46,10 @@ export function makeBanHistoryItem(overrides: ProtoInit<ServerInfo_Ban> = {}): S
   });
 }
 
-export function makeWarnHistoryItem(overrides: ProtoInit<ServerInfo_Warning> = {}): ServerInfo_Warning {
-  return create(ServerInfo_WarningSchema, {
+export function makeWarnHistoryItem(
+  overrides: MessageInitShape<typeof Data.ServerInfo_WarningSchema> = {}
+): Data.ServerInfo_Warning {
+  return create(Data.ServerInfo_WarningSchema, {
     userName: '',
     adminName: '',
     reason: '',
@@ -72,8 +58,10 @@ export function makeWarnHistoryItem(overrides: ProtoInit<ServerInfo_Warning> = {
   });
 }
 
-export function makeWarnListItem(overrides: ProtoInit<Response_WarnList> = {}): Response_WarnList {
-  return create(Response_WarnListSchema, {
+export function makeWarnListItem(
+  overrides: MessageInitShape<typeof Data.Response_WarnListSchema> = {}
+): Data.Response_WarnList {
+  return create(Data.Response_WarnListSchema, {
     warning: [],
     userName: '',
     userClientid: '',
@@ -81,23 +69,29 @@ export function makeWarnListItem(overrides: ProtoInit<Response_WarnList> = {}): 
   });
 }
 
-export function makeDeckTreeItem(overrides: ProtoInit<ServerInfo_DeckStorage_TreeItem> = {}): ServerInfo_DeckStorage_TreeItem {
-  return create(ServerInfo_DeckStorage_TreeItemSchema, {
+export function makeDeckTreeItem(
+  overrides: MessageInitShape<typeof Data.ServerInfo_DeckStorage_TreeItemSchema> = {},
+): Data.ServerInfo_DeckStorage_TreeItem {
+  return create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
     id: 1,
     name: 'item',
     ...overrides,
   });
 }
 
-export function makeDeckList(overrides: ProtoInit<Response_DeckList> = {}): Response_DeckList {
-  return create(Response_DeckListSchema, {
-    root: create(ServerInfo_DeckStorage_FolderSchema, { items: [] }),
+export function makeDeckList(
+  overrides: MessageInitShape<typeof Data.Response_DeckListSchema> = {}
+): Data.Response_DeckList {
+  return create(Data.Response_DeckListSchema, {
+    root: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] }),
     ...overrides,
   });
 }
 
-export function makeReplayMatch(overrides: ProtoInit<ServerInfo_ReplayMatch> = {}): ServerInfo_ReplayMatch {
-  return create(ServerInfo_ReplayMatchSchema, {
+export function makeReplayMatch(
+  overrides: MessageInitShape<typeof Data.ServerInfo_ReplayMatchSchema> = {}
+): Data.ServerInfo_ReplayMatch {
+  return create(Data.ServerInfo_ReplayMatchSchema, {
     gameId: 1,
     roomName: 'Test Room',
     timeStarted: 0,
@@ -110,16 +104,26 @@ export function makeReplayMatch(overrides: ProtoInit<ServerInfo_ReplayMatch> = {
   });
 }
 
-export function makeGame(overrides: Partial<Game> = {}): Game {
-  return { ...create(ServerInfo_GameSchema, { description: '' }), gameType: '', ...overrides };
+export function makeGame(overrides: Partial<Enriched.Game> = {}): Enriched.Game {
+  return { ...create(Data.ServerInfo_GameSchema, { description: '' }), gameType: '', ...overrides };
 }
 
-export function makeConnectOptions(overrides: Partial<WebSocketConnectOptions> = {}): WebSocketConnectOptions {
+export function makeLoginSuccessContext(
+  overrides: Partial<Enriched.LoginSuccessContext> = {}
+): Enriched.LoginSuccessContext {
+  return {
+    hashedPassword: 'hash',
+    ...overrides,
+  };
+}
+
+export function makePendingActivationContext(
+  overrides: Partial<Enriched.PendingActivationContext> = {}
+): Enriched.PendingActivationContext {
   return {
     host: 'localhost',
     port: '4747',
     userName: 'user',
-    password: 'pass',
     ...overrides,
   };
 }
@@ -131,7 +135,7 @@ export function makeServerState(overrides: Partial<ServerState> = {}): ServerSta
     ignoreList: [],
     status: {
       connectionAttemptMade: false,
-      state: StatusEnum.DISCONNECTED,
+      state: App.StatusEnum.DISCONNECTED,
       description: null,
     },
     info: {
@@ -147,8 +151,8 @@ export function makeServerState(overrides: Partial<ServerState> = {}): ServerSta
     user: null,
     users: [],
     sortUsersBy: {
-      field: UserSortField.NAME,
-      order: SortDirection.ASC,
+      field: App.UserSortField.NAME,
+      order: App.SortDirection.ASC,
     },
     messages: {},
     userInfo: {},

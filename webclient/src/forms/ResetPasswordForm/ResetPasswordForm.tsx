@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-import { InputField, KnownHosts } from 'components';
-import { useReduxEffect } from '../../hooks';
-import { ServerTypes } from '../../store';
+import { InputField, KnownHosts } from '@app/components';
+import { useReduxEffect } from '@app/hooks';
+import { ServerTypes } from '@app/store';
 
 import './ResetPasswordForm.css';
 

@@ -1,8 +1,7 @@
-import { SortBy, SortDirection } from 'types';
-import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
+import { App, Data } from '@app/types';
 
 export default class SortUtil {
-  static sortByField<T extends object>(arr: T[], sortBy: SortBy): void {
+  static sortByField<T extends object>(arr: T[], sortBy: App.SortBy): void {
     if (arr.length) {
       const field = SortUtil.resolveFieldChain(arr[0], sortBy.field);
       const fieldType = typeof field;
@@ -21,7 +20,7 @@ export default class SortUtil {
     }
   }
 
-  static sortByFields<T extends object>(arr: T[], sorts: SortBy[]) {
+  static sortByFields<T extends object>(arr: T[], sorts: App.SortBy[]) {
     if (arr.length) {
       arr.sort((a, b) => {
         for (let i = 0; i < sorts.length; i++) {
@@ -52,35 +51,35 @@ export default class SortUtil {
     }
   }
 
-  static sortUsersByField(users: ServerInfo_User[], sortBy: SortBy) {
+  static sortUsersByField(users: Data.ServerInfo_User[], sortBy: App.SortBy) {
     if (users.length) {
       users.sort((a, b) => SortUtil.userComparator(a, b, sortBy))
     }
   }
 
-  static toggleSortBy<F extends string>(field: F, sortBy: SortBy): { field: F; order: SortDirection } {
+  static toggleSortBy<F extends string>(field: F, sortBy: App.SortBy): { field: F; order: App.SortDirection } {
     const sameField = field === sortBy.field;
-    const isASC = sortBy.order === SortDirection.ASC;
+    const isASC = sortBy.order === App.SortDirection.ASC;
 
     return {
       field,
-      order: sameField && isASC ? SortDirection.DESC : SortDirection.ASC
+      order: sameField && isASC ? App.SortDirection.DESC : App.SortDirection.ASC
     }
   }
 
-  private static sortByNumber<T extends object>(arr: T[], sortBy: SortBy): void {
+  private static sortByNumber<T extends object>(arr: T[], sortBy: App.SortBy): void {
     arr.sort((a, b) => SortUtil.numberComparator(a, b, sortBy));
   }
 
-  private static sortByString<T extends object>(arr: T[], sortBy: SortBy): void {
+  private static sortByString<T extends object>(arr: T[], sortBy: App.SortBy): void {
     arr.sort((a, b) => SortUtil.stringComparator(a, b, sortBy));
   }
 
-  private static userComparator(a: ServerInfo_User, b: ServerInfo_User, sortBy: SortBy, sortByUserLevel = true) {
+  private static userComparator(a: Data.ServerInfo_User, b: Data.ServerInfo_User, sortBy: App.SortBy, sortByUserLevel = true) {
     if (sortByUserLevel) {
       const adminSortBy = {
         field: 'userLevel',
-        order: SortDirection.DESC
+        order: App.SortDirection.DESC
       };
 
       const adminSorted = SortUtil.numberComparator(a, b, adminSortBy);
@@ -99,18 +98,18 @@ export default class SortUtil {
     return 0;
   }
 
-  private static numberComparator<T extends object>(a: T, b: T, { field, order }: SortBy) {
+  private static numberComparator<T extends object>(a: T, b: T, { field, order }: App.SortBy) {
     const aResolved = SortUtil.resolveFieldChain(a, field);
     const bResolved = SortUtil.resolveFieldChain(b, field);
 
-    if (order === SortDirection.ASC) {
+    if (order === App.SortDirection.ASC) {
       return aResolved - bResolved;
     } else {
       return bResolved - aResolved;
     }
   }
 
-  private static stringComparator<T extends object>(a: T, b: T, { field, order }: SortBy) {
+  private static stringComparator<T extends object>(a: T, b: T, { field, order }: App.SortBy) {
     const aResolved = SortUtil.resolveFieldChain(a, field);
     const bResolved = SortUtil.resolveFieldChain(b, field);
 
@@ -125,7 +124,7 @@ export default class SortUtil {
       return -1;
     }
 
-    if (order === SortDirection.ASC) {
+    if (order === App.SortDirection.ASC) {
       return aResolved.localeCompare(bResolved);
     } else {
       return bResolved.localeCompare(aResolved);

@@ -1,10 +1,11 @@
 import { create } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
-import { Command_DeckDelDirSchema, Command_DeckDelDir_ext } from 'generated/proto/command_deck_del_dir_pb';
+
 import { SessionPersistence } from '../../persistence';
+import { Data } from '@app/types';
 
 export function deckDelDir(path: string): void {
-  webClient.protobuf.sendSessionCommand(Command_DeckDelDir_ext, create(Command_DeckDelDirSchema, { path }), {
+  webClient.protobuf.sendSessionCommand(Data.Command_DeckDelDir_ext, create(Data.Command_DeckDelDirSchema, { path }), {
     onSuccess: () => {
       SessionPersistence.deleteServerDeckDir(path);
     },

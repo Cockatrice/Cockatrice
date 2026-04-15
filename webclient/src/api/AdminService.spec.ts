@@ -1,4 +1,4 @@
-vi.mock('websocket', () => ({
+vi.mock('@app/websocket', () => ({
   AdminCommands: {
     adjustMod: vi.fn(),
     reloadConfig: vi.fn(),
@@ -8,9 +8,7 @@ vi.mock('websocket', () => ({
 }));
 
 import { AdminService } from './AdminService';
-import { AdminCommands } from 'websocket';
-
-beforeEach(() => vi.clearAllMocks());
+import { AdminCommands } from '@app/websocket';
 
 describe('AdminService', () => {
   describe('adjustMod', () => {

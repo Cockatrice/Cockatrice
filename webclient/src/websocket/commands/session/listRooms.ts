@@ -1,7 +1,7 @@
 import { create } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
-import { Command_ListRooms_ext, Command_ListRoomsSchema } from 'generated/proto/session_commands_pb';
+import { Data } from '@app/types';
 
 export function listRooms(): void {
-  webClient.protobuf.sendSessionCommand(Command_ListRooms_ext, create(Command_ListRoomsSchema));
+  webClient.protobuf.sendSessionCommand(Data.Command_ListRooms_ext, create(Data.Command_ListRoomsSchema));
 }

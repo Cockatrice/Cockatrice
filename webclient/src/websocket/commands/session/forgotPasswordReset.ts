@@ -1,22 +1,23 @@
-import { ForgotPasswordResetParams } from 'store';
-import { StatusEnum, WebSocketConnectOptions } from 'types';
+import { App, Enriched, Data } from '@app/types';
 
 import { create } from '@bufbuild/protobuf';
 import type { MessageInitShape } from '@bufbuild/protobuf';
 import { CLIENT_CONFIG } from '../../config';
 import webClient from '../../WebClient';
-import {
-  Command_ForgotPasswordReset_ext, Command_ForgotPasswordResetSchema,
-} from 'generated/proto/session_commands_pb';
+
 import { SessionPersistence } from '../../persistence';
 import { hashPassword } from '../../utils';
 
 import { disconnect, updateStatus } from '.';
 
-export function forgotPasswordReset(options: WebSocketConnectOptions, newPassword?: string, passwordSalt?: string): void {
-  const { userName, token } = options as unknown as ForgotPasswordResetParams;
+export function forgotPasswordReset(
+  options: Omit<Enriched.PasswordResetConnectOptions, 'newPassword'>,
+  newPassword?: string,
+  passwordSalt?: string
+): void {
+  const { userName, token } = options;
 
-  const params: MessageInitShape<typeof Command_ForgotPasswordResetSchema> = {
+  const params: MessageInitShape<typeof Data.Command_ForgotPasswordResetSchema> = {
     ...CLIENT_CONFIG,
     userName,
     token,
@@ -25,14 +26,14 @@ export function forgotPasswordReset(options: WebSocketConnectOptions, newPasswor
       : { newPassword }),
   };
 
-  webClient.protobuf.sendSessionCommand(Command_ForgotPasswordReset_ext, create(Command_ForgotPasswordResetSchema, params), {
+  webClient.protobuf.sendSessionCommand(Data.Command_ForgotPasswordReset_ext, create(Data.Command_ForgotPasswordResetSchema, params), {
     onSuccess: () => {
-      updateStatus(StatusEnum.DISCONNECTED, null);
+      updateStatus(App.StatusEnum.DISCONNECTED, null);
       SessionPersistence.resetPasswordSuccess();
       disconnect();
     },
     onError: () => {
-      updateStatus(StatusEnum.DISCONNECTED, null);
+      updateStatus(App.StatusEnum.DISCONNECTED, null);
       SessionPersistence.resetPasswordFailed();
       disconnect();
     },

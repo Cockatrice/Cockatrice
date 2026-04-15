@@ -1,4 +1,4 @@
-import { GameSortField, SortDirection } from 'types';
+import { App } from '@app/types';
 import { roomsReducer } from './rooms.reducer';
 import { Types, MAX_ROOM_MESSAGES } from './rooms.types';
 import { makeGame, makeMessage, makeRoom, makeRoomsState, makeUser } from './__mocks__/rooms-fixtures';
@@ -191,11 +191,10 @@ describe('UPDATE_GAMES', () => {
     expect(result.rooms[1].gameList.find(g => g.gameId === 2).description).toBe('new');
   });
 
-  it('returns { ...state } (not identity) when roomId is unknown', () => {
+  it('returns state identity when roomId is unknown', () => {
     const state = makeRoomsState({ rooms: {} });
     const result = roomsReducer(state, { type: Types.UPDATE_GAMES, roomId: 999, games: [] });
-    expect(result).not.toBe(state);
-    expect(result.rooms).toEqual(state.rooms);
+    expect(result).toBe(state);
   });
 });
 
@@ -231,10 +230,10 @@ describe('SORT_GAMES', () => {
     const result = roomsReducer(state, {
       type: Types.SORT_GAMES,
       roomId: 1,
-      field: GameSortField.START_TIME,
-      order: SortDirection.ASC,
+      field: App.GameSortField.START_TIME,
+      order: App.SortDirection.ASC,
     });
-    expect(result.sortGamesBy).toEqual({ field: GameSortField.START_TIME, order: SortDirection.ASC });
+    expect(result.sortGamesBy).toEqual({ field: App.GameSortField.START_TIME, order: App.SortDirection.ASC });
   });
 });
 

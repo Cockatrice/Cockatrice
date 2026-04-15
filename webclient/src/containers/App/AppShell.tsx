@@ -2,13 +2,13 @@ import { Component, Suspense } from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
-import { store } from 'store';
+import { store } from '@app/store';
 import Routes from './AppShellRoutes';
 import FeatureDetection from './FeatureDetection';
 
 import './AppShell.css';
 
-import { ToastProvider } from 'components/Toast'
+import { ToastProvider } from '@app/components'
 
 class AppShell extends Component {
   componentDidMount() {

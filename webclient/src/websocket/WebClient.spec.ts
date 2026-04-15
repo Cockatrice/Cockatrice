@@ -1,10 +1,10 @@
 const captured = vi.hoisted(() => ({
-  wsOptions: null as any,
-  pbOptions: null as any,
+  wsOptions: null as WebSocketServiceConfig | null,
+  pbOptions: null as SocketTransport | null,
 }));
 
 vi.mock('./services/WebSocketService', () => ({
-  WebSocketService: vi.fn().mockImplementation(function WebSocketServiceImpl(options: any) {
+  WebSocketService: vi.fn().mockImplementation(function WebSocketServiceImpl(options: WebSocketServiceConfig) {
     captured.wsOptions = options;
     return {
       message$: { subscribe: vi.fn() },
@@ -18,7 +18,7 @@ vi.mock('./services/WebSocketService', () => ({
 }));
 
 vi.mock('./services/ProtobufService', () => ({
-  ProtobufService: vi.fn().mockImplementation(function ProtobufServiceImpl(options: any) {
+  ProtobufService: vi.fn().mockImplementation(function ProtobufServiceImpl(options: SocketTransport) {
     captured.pbOptions = options;
     return {
       handleMessageEvent: vi.fn(),
@@ -32,7 +32,7 @@ vi.mock('./persistence', () => ({
   SessionPersistence: { clearStore: vi.fn(), initialized: vi.fn(), connectionAttempted: vi.fn() },
 }));
 
-vi.mock('store', () => ({
+vi.mock('@app/store', () => ({
   GameDispatch: { clearStore: vi.fn() },
 }));
 
@@ -45,17 +45,18 @@ import { WebSocketService } from './services/WebSocketService';
 import { ProtobufService } from './services/ProtobufService';
 import { RoomPersistence, SessionPersistence } from './persistence';
 import { ping } from './commands/session';
-import { StatusEnum } from 'types';
+import { App, Enriched } from '@app/types';
 import { Subject } from 'rxjs';
 import { Mock } from 'vitest';
+import { SocketTransport } from './services/ProtobufService';
+import { WebSocketServiceConfig } from './services/WebSocketService';
 
 describe('WebClient', () => {
   let client: WebClient;
   let messageSubject: Subject<MessageEvent>;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    (ProtobufService as Mock).mockImplementation(function ProtobufServiceImpl(options: any) {
+    (ProtobufService as Mock).mockImplementation(function ProtobufServiceImpl(options: SocketTransport) {
       captured.pbOptions = options;
       return {
         handleMessageEvent: vi.fn(),
@@ -63,7 +64,7 @@ describe('WebClient', () => {
       };
     });
     messageSubject = new Subject<MessageEvent>();
-    (WebSocketService as Mock).mockImplementation(function WebSocketServiceImpl(options: any) {
+    (WebSocketService as Mock).mockImplementation(function WebSocketServiceImpl(options: WebSocketServiceConfig) {
       captured.wsOptions = options;
       return {
         message$: messageSubject,
@@ -97,13 +98,13 @@ describe('WebClient', () => {
 
   describe('connect', () => {
     it('calls SessionPersistence.connectionAttempted', () => {
-      const opts: any = { host: 'h', port: 1 };
+      const opts: Enriched.WebSocketConnectOptions = { host: 'h', port: '1', reason: App.WebSocketConnectReason.LOGIN, userName: 'u' };
       client.connect(opts);
       expect(SessionPersistence.connectionAttempted).toHaveBeenCalled();
     });
 
     it('stores options and calls socket.connect', () => {
-      const opts: any = { host: 'h', port: 1 };
+      const opts: Enriched.WebSocketConnectOptions = { host: 'h', port: '1', reason: App.WebSocketConnectReason.LOGIN, userName: 'u' };
       client.connect(opts);
       expect(client.options).toBe(opts);
       expect(client.socket.connect).toHaveBeenCalledWith(opts);
@@ -112,7 +113,7 @@ describe('WebClient', () => {
 
   describe('testConnect', () => {
     it('delegates to socket.testConnect', () => {
-      const opts: any = { host: 'h', port: 1 };
+      const opts: Enriched.WebSocketConnectOptions = { host: 'h', port: '1', reason: App.WebSocketConnectReason.LOGIN, userName: 'u' };
       client.testConnect(opts);
       expect(client.socket.testConnect).toHaveBeenCalledWith(opts);
     });
@@ -127,19 +128,19 @@ describe('WebClient', () => {
 
   describe('updateStatus', () => {
     it('sets the status', () => {
-      client.updateStatus(StatusEnum.CONNECTED);
-      expect(client.status).toBe(StatusEnum.CONNECTED);
+      client.updateStatus(App.StatusEnum.CONNECTED);
+      expect(client.status).toBe(App.StatusEnum.CONNECTED);
     });
 
     it('calls protobuf.resetCommands and clears stores on DISCONNECTED', () => {
-      client.updateStatus(StatusEnum.DISCONNECTED);
+      client.updateStatus(App.StatusEnum.DISCONNECTED);
       expect(client.protobuf.resetCommands).toHaveBeenCalled();
       expect(RoomPersistence.clearStore).toHaveBeenCalled();
       expect(SessionPersistence.clearStore).toHaveBeenCalled();
     });
 
     it('does not clear stores when status is not DISCONNECTED', () => {
-      client.updateStatus(StatusEnum.CONNECTED);
+      client.updateStatus(App.StatusEnum.CONNECTED);
       expect(client.protobuf.resetCommands).not.toHaveBeenCalled();
       expect(RoomPersistence.clearStore).not.toHaveBeenCalled();
     });

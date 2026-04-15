@@ -1,7 +1,6 @@
-import type { Event_MoveCard } from 'generated/proto/event_move_card_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function moveCard(data: Event_MoveCard, meta: GameEventMeta): void {
+export function moveCard(data: Data.Event_MoveCard, meta: Enriched.GameEventMeta): void {
   GamePersistence.cardMoved(meta.gameId, meta.playerId, data);
 }

@@ -1,15 +1,12 @@
-import { RoomsDispatch } from 'store';
-import { Message } from 'types';
-import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
-import type { ServerInfo_Room } from 'generated/proto/serverinfo_room_pb';
-import type { ServerInfo_Game } from 'generated/proto/serverinfo_game_pb';
+import { RoomsDispatch } from '@app/store';
+import { Data, Enriched } from '@app/types';
 
 export class RoomPersistence {
   static clearStore() {
     RoomsDispatch.clearStore();
   }
 
-  static joinRoom(roomInfo: ServerInfo_Room) {
+  static joinRoom(roomInfo: Data.ServerInfo_Room) {
     RoomsDispatch.joinRoom(roomInfo);
   }
 
@@ -17,26 +14,19 @@ export class RoomPersistence {
     RoomsDispatch.leaveRoom(roomId);
   }
 
-  static updateRooms(rooms: ServerInfo_Room[]) {
+  static updateRooms(rooms: Data.ServerInfo_Room[]) {
     RoomsDispatch.updateRooms(rooms);
   }
 
-  static updateGames(roomId: number, gameList: ServerInfo_Game[]) {
-    // Guard: the server never sends an empty gameList to signal "clear all games".
-    // An empty array here means no game updates — skip the dispatch to avoid
-    // unnecessarily overwriting the existing game list with an empty one.
-    if (!gameList?.length) {
-      return;
-    }
-
+  static updateGames(roomId: number, gameList: Data.ServerInfo_Game[]) {
     RoomsDispatch.updateGames(roomId, gameList);
   }
 
-  static addMessage(roomId: number, message: Message) {
+  static addMessage(roomId: number, message: Enriched.Message) {
     RoomsDispatch.addMessage(roomId, message);
   }
 
-  static userJoined(roomId: number, user: ServerInfo_User) {
+  static userJoined(roomId: number, user: Data.ServerInfo_User) {
     RoomsDispatch.userJoined(roomId, user);
   }
 

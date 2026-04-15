@@ -1,6 +1,11 @@
 import { KeepAliveService } from './KeepAliveService';
 import { WebSocketService } from './WebSocketService';
 
+type KeepAliveInternal = KeepAliveService & {
+  keepalivecb: NodeJS.Timeout;
+  lastPingPending: boolean;
+};
+
 vi.mock('./WebSocketService');
 
 describe('KeepAliveService', () => {
@@ -38,15 +43,15 @@ describe('KeepAliveService', () => {
     });
 
     it('should start ping loop', () => {
-      expect((service as any).keepalivecb).toBeDefined();
-      expect((service as any).lastPingPending).toBeTruthy();
+      expect((service as KeepAliveInternal).keepalivecb).toBeDefined();
+      expect((service as KeepAliveInternal).lastPingPending).toBeTruthy();
     });
 
     it('should call ping callback when done', () => {
       resolvePing();
 
       return promise.then(() => {
-        expect((service as any).lastPingPending).toBeFalsy();
+        expect((service as KeepAliveInternal).lastPingPending).toBeFalsy();
       });
     });
 

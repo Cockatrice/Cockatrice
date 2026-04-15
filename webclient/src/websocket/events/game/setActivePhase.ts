@@ -1,7 +1,6 @@
-import type { Event_SetActivePhase } from 'generated/proto/event_set_active_phase_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function setActivePhase(data: Event_SetActivePhase, meta: GameEventMeta): void {
+export function setActivePhase(data: Data.Event_SetActivePhase, meta: Enriched.GameEventMeta): void {
   GamePersistence.activePhaseSet(meta.gameId, data.phase);
 }

@@ -1,7 +1,6 @@
-import type { Event_DestroyCard } from 'generated/proto/event_destroy_card_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function destroyCard(data: Event_DestroyCard, meta: GameEventMeta): void {
+export function destroyCard(data: Data.Event_DestroyCard, meta: Enriched.GameEventMeta): void {
   GamePersistence.cardDestroyed(meta.gameId, meta.playerId, data);
 }

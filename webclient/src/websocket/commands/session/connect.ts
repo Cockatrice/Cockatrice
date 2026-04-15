@@ -1,24 +1,25 @@
-import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
+import { App, Enriched } from '@app/types';
 import webClient from '../../WebClient';
 import { updateStatus } from './';
 
-export function connect(options: WebSocketConnectOptions, reason: WebSocketConnectReason): void {
-  switch (reason) {
-    case WebSocketConnectReason.LOGIN:
-    case WebSocketConnectReason.REGISTER:
-    case WebSocketConnectReason.ACTIVATE_ACCOUNT:
-    case WebSocketConnectReason.PASSWORD_RESET_REQUEST:
-    case WebSocketConnectReason.PASSWORD_RESET_CHALLENGE:
-    case WebSocketConnectReason.PASSWORD_RESET:
-      updateStatus(StatusEnum.CONNECTING, 'Connecting...');
-      break;
-    case WebSocketConnectReason.TEST_CONNECTION:
-      webClient.testConnect({ ...options });
+export function connect(options: Enriched.WebSocketConnectOptions): void {
+  switch (options.reason) {
+    case App.WebSocketConnectReason.LOGIN:
+    case App.WebSocketConnectReason.REGISTER:
+    case App.WebSocketConnectReason.ACTIVATE_ACCOUNT:
+    case App.WebSocketConnectReason.PASSWORD_RESET_REQUEST:
+    case App.WebSocketConnectReason.PASSWORD_RESET_CHALLENGE:
+    case App.WebSocketConnectReason.PASSWORD_RESET:
+      updateStatus(App.StatusEnum.CONNECTING, 'Connecting...');
+      webClient.connect(options);
       return;
-    default:
-      updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Attempt: ' + reason);
+    case App.WebSocketConnectReason.TEST_CONNECTION:
+      webClient.testConnect(options);
       return;
+    default: {
+      const { reason } = options as Enriched.WebSocketConnectOptions;
+      updateStatus(App.StatusEnum.DISCONNECTED, `Unknown Connection Attempt: ${reason}`);
+      return;
+    }
   }
-
-  webClient.connect({ ...options, reason });
 }

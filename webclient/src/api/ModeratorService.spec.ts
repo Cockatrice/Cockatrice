@@ -1,4 +1,4 @@
-vi.mock('websocket', () => ({
+vi.mock('@app/websocket', () => ({
   ModeratorCommands: {
     banFromServer: vi.fn(),
     getBanHistory: vi.fn(),
@@ -10,10 +10,8 @@ vi.mock('websocket', () => ({
 }));
 
 import { ModeratorService } from './ModeratorService';
-import { ModeratorCommands } from 'websocket';
-import { LogFilters } from 'types';
-
-beforeEach(() => vi.clearAllMocks());
+import { ModeratorCommands } from '@app/websocket';
+import { Data } from '@app/types';
 
 describe('ModeratorService', () => {
   describe('banFromServer', () => {
@@ -55,7 +53,7 @@ describe('ModeratorService', () => {
 
   describe('viewLogHistory', () => {
     it('delegates to ModeratorCommands.viewLogHistory', () => {
-      const filters: LogFilters = { dateRange: 7, userName: 'alice' };
+      const filters: Data.ViewLogHistoryParams = { dateRange: 7, userName: 'alice' };
       ModeratorService.viewLogHistory(filters);
       expect(ModeratorCommands.viewLogHistory).toHaveBeenCalledWith(filters);
     });

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import Button from '@mui/material/Button';
 import AnchorLink from '@mui/material/Link';
 
-import { InputField } from 'components';
+import { InputField } from '@app/components';
 
 import './KnownHostForm.css';
 

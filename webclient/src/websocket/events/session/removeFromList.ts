@@ -1,7 +1,7 @@
+import type { Data } from '@app/types';
 import { SessionPersistence } from '../../persistence';
-import { RemoveFromListData } from './interfaces';
 
-export function removeFromList({ listName, userName }: RemoveFromListData): void {
+export function removeFromList({ listName, userName }: Data.Event_RemoveFromList): void {
   switch (listName) {
     case 'buddy': {
       SessionPersistence.removeFromBuddyList(userName);

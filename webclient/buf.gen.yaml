@@ -6,3 +6,7 @@ plugins:
     out: src/generated/proto
     opt:
       - target=ts
+  - local: [node, buf.gen.plugin.mjs]
+    out: src/generated
+    opt:
+      - target=ts

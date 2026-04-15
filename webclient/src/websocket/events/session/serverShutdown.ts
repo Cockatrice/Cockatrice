@@ -1,7 +1,6 @@
+import type { Data } from '@app/types';
 import { SessionPersistence } from '../../persistence';
-import { ServerShutdownData } from './interfaces';
 
-
-export function serverShutdown(payload: ServerShutdownData): void {
+export function serverShutdown(payload: Data.Event_ServerShutdown): void {
   SessionPersistence.serverShutdown(payload);
 }

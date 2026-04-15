@@ -1,7 +1,6 @@
-import type { Event_CreateToken } from 'generated/proto/event_create_token_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function createToken(data: Event_CreateToken, meta: GameEventMeta): void {
+export function createToken(data: Data.Event_CreateToken, meta: Enriched.GameEventMeta): void {
   GamePersistence.tokenCreated(meta.gameId, meta.playerId, data);
 }

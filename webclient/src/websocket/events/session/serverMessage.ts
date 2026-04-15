@@ -1,6 +1,6 @@
+import type { Data } from '@app/types';
 import { SessionPersistence } from '../../persistence';
-import { ServerMessageData } from './interfaces';
 
-export function serverMessage({ message }: ServerMessageData): void {
+export function serverMessage({ message }: Data.Event_ServerMessage): void {
   SessionPersistence.serverMessage(message);
 }

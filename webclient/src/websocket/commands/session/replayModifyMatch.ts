@@ -1,12 +1,17 @@
 import { create } from '@bufbuild/protobuf';
 import webClient from '../../WebClient';
-import { Command_ReplayModifyMatchSchema, Command_ReplayModifyMatch_ext } from 'generated/proto/command_replay_modify_match_pb';
+
 import { SessionPersistence } from '../../persistence';
+import { Data } from '@app/types';
 
 export function replayModifyMatch(gameId: number, doNotHide: boolean): void {
-  webClient.protobuf.sendSessionCommand(Command_ReplayModifyMatch_ext, create(Command_ReplayModifyMatchSchema, { gameId, doNotHide }), {
-    onSuccess: () => {
-      SessionPersistence.replayModifyMatch(gameId, doNotHide);
-    },
-  });
+  webClient.protobuf.sendSessionCommand(
+    Data.Command_ReplayModifyMatch_ext,
+    create(Data.Command_ReplayModifyMatchSchema, { gameId, doNotHide }),
+    {
+      onSuccess: () => {
+        SessionPersistence.replayModifyMatch(gameId, doNotHide);
+      },
+    }
+  );
 }

@@ -1,7 +1,6 @@
-import type { Event_CreateArrow } from 'generated/proto/event_create_arrow_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function createArrow(data: Event_CreateArrow, meta: GameEventMeta): void {
+export function createArrow(data: Data.Event_CreateArrow, meta: Enriched.GameEventMeta): void {
   GamePersistence.arrowCreated(meta.gameId, meta.playerId, data);
 }

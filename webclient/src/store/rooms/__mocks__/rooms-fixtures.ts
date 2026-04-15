@@ -1,21 +1,13 @@
-import {
-  Game,
-  GameSortField,
-  Message,
-  ProtoInit,
-  Room,
-  SortDirection,
-  UserSortField,
-} from 'types';
-import type { ServerInfo_User } from 'generated/proto/serverinfo_user_pb';
+import { App, Data, Enriched } from '@app/types';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+
 import { create } from '@bufbuild/protobuf';
-import { ServerInfo_UserSchema } from 'generated/proto/serverinfo_user_pb';
-import { ServerInfo_GameSchema } from 'generated/proto/serverinfo_game_pb';
-import { ServerInfo_RoomSchema } from 'generated/proto/serverinfo_room_pb';
 import { RoomsState } from '../rooms.interfaces';
 
-export function makeUser(overrides: ProtoInit<ServerInfo_User> = {}): ServerInfo_User {
-  return create(ServerInfo_UserSchema, {
+export function makeUser(
+  overrides: MessageInitShape<typeof Data.ServerInfo_UserSchema> = {}
+): Data.ServerInfo_User {
+  return create(Data.ServerInfo_UserSchema, {
     name: 'TestUser',
     accountageSecs: 0n,
     privlevel: '',
@@ -24,10 +16,10 @@ export function makeUser(overrides: ProtoInit<ServerInfo_User> = {}): ServerInfo
   });
 }
 
-export function makeRoom(overrides: ProtoInit<Room> = {}): Room {
+export function makeRoom(overrides: Partial<Omit<Enriched.Room, '$typeName' | '$unknown'>> = {}): Enriched.Room {
   const { gametypeMap = {}, order = 0, gameList = [], ...protoOverrides } = overrides;
   return {
-    ...create(ServerInfo_RoomSchema, {
+    ...create(Data.ServerInfo_RoomSchema, {
       roomId: 1,
       name: 'Test Room',
       description: '',
@@ -45,10 +37,12 @@ export function makeRoom(overrides: ProtoInit<Room> = {}): Room {
   };
 }
 
-export function makeGame(overrides: ProtoInit<Game & { startTime: number }> = {}): Game & { startTime: number } {
+export function makeGame(
+  overrides: Partial<Omit<Enriched.Game & { startTime: number }, '$typeName' | '$unknown'>> = {},
+): Enriched.Game & { startTime: number } {
   const { gameType = '', startTime = 0, ...protoOverrides } = overrides;
   return {
-    ...create(ServerInfo_GameSchema, {
+    ...create(Data.ServerInfo_GameSchema, {
       gameId: 1,
       roomId: 1,
       description: 'Test Game',
@@ -61,7 +55,7 @@ export function makeGame(overrides: ProtoInit<Game & { startTime: number }> = {}
   };
 }
 
-export function makeMessage(overrides: Partial<Message> = {}): Message {
+export function makeMessage(overrides: Partial<Enriched.Message> = {}): Enriched.Message {
   return {
     message: 'hello',
     messageType: 0,
@@ -80,12 +74,12 @@ export function makeRoomsState(overrides: Partial<RoomsState> = {}): RoomsState 
     joinedGameIds: {},
     messages: {},
     sortGamesBy: {
-      field: GameSortField.START_TIME,
-      order: SortDirection.DESC,
+      field: App.GameSortField.START_TIME,
+      order: App.SortDirection.DESC,
     },
     sortUsersBy: {
-      field: UserSortField.NAME,
-      order: SortDirection.ASC,
+      field: App.UserSortField.NAME,
+      order: App.SortDirection.ASC,
     },
     ...overrides,
   };

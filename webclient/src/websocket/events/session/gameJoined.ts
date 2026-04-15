@@ -1,6 +1,6 @@
+import type { Data } from '@app/types';
 import { SessionPersistence } from '../../persistence';
-import { GameJoinedData } from './interfaces';
 
-export function gameJoined(gameJoined: GameJoinedData): void {
+export function gameJoined(gameJoined: Data.Event_GameJoined): void {
   SessionPersistence.gameJoined(gameJoined);
 }

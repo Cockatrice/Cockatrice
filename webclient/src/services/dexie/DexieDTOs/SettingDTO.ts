@@ -1,8 +1,8 @@
-import { Setting } from 'types';
+import { App } from '@app/types';
 
 import { dexieService } from '../DexieService';
 
-export class SettingDTO extends Setting {
+export class SettingDTO extends App.Setting {
   constructor(user) {
     super();
 

@@ -1,12 +1,12 @@
 import { createSelector } from '@reduxjs/toolkit';
-import type { ServerInfo_Card } from 'generated/proto/serverinfo_card_pb';
+import type { Data } from '@app/types';
 import { GamesState, GameEntry, PlayerEntry, ZoneEntry } from './game.interfaces';
 
 interface State {
   games: GamesState;
 }
 
-const EMPTY_ARRAY: ServerInfo_Card[] = [];
+const EMPTY_ARRAY: Data.ServerInfo_Card[] = [];
 const EMPTY_OBJECT = {} as Record<string, never>;
 
 export const Selectors = {

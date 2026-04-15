@@ -4,12 +4,12 @@ import { useNavigate, useParams, generatePath } from 'react-router-dom';
 import ListItemButton from '@mui/material/ListItemButton';
 import Paper from '@mui/material/Paper';
 
-import { RoomsService } from 'api';
-import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard } from 'components';
-import { RoomsSelectors } from 'store';
-import { useAppSelector } from 'store/store';
-import { RouteEnum } from 'types';
-import Layout from 'containers/Layout/Layout';
+import { RoomsService } from '@app/api';
+import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard } from '@app/components';
+import { RoomsSelectors } from '@app/store';
+import { useAppSelector } from '@app/store';
+import { App } from '@app/types';
+import Layout from '../Layout/Layout';
 
 import OpenGames from './OpenGames';
 import Messages from './Messages';
@@ -32,7 +32,7 @@ const Room = () => {
 
   useEffect(() => {
     if (!joined.find(({ roomId: id }) => id === roomId)) {
-      navigate(generatePath(RouteEnum.SERVER));
+      navigate(generatePath(App.RouteEnum.SERVER));
     }
   }, [joined]);
 

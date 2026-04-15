@@ -1,6 +1,6 @@
+import type { Data } from '@app/types';
 import { SessionPersistence } from '../../persistence';
-import { ReplayAddedData } from './interfaces';
 
-export function replayAdded({ matchInfo }: ReplayAddedData): void {
+export function replayAdded({ matchInfo }: Data.Event_ReplayAdded): void {
   SessionPersistence.replayAdded(matchInfo);
 }

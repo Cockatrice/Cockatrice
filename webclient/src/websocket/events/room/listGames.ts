@@ -1,6 +1,6 @@
+import type { Data } from '@app/types';
 import { RoomPersistence } from '../../persistence';
-import { ListGamesData, RoomEvent } from './interfaces';
 
-export function listGames({ gameList }: ListGamesData, { roomId }: RoomEvent): void {
+export function listGames({ gameList }: Data.Event_ListGames, { roomId }: Data.RoomEvent): void {
   RoomPersistence.updateGames(roomId, gameList);
 }

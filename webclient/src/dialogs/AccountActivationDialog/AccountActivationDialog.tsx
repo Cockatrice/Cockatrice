@@ -7,7 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 
-import { AccountActivationForm } from 'forms';
+import { AccountActivationForm } from '@app/forms';
 
 import './AccountActivationDialog.css';
 

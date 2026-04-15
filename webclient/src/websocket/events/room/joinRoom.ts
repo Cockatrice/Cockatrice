@@ -1,6 +1,6 @@
+import type { Data } from '@app/types';
 import { RoomPersistence } from '../../persistence';
-import { JoinRoomData, RoomEvent } from './interfaces';
 
-export function joinRoom({ userInfo }: JoinRoomData, { roomId }: RoomEvent): void {
+export function joinRoom({ userInfo }: Data.Event_JoinRoom, { roomId }: Data.RoomEvent): void {
   RoomPersistence.userJoined(roomId, userInfo);
 }

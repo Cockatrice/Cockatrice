@@ -1,5 +1,5 @@
-import { ModeratorCommands } from 'websocket';
-import { LogFilters } from 'types';
+import { ModeratorCommands } from '@app/websocket';
+import { Data } from '@app/types';
 
 export class ModeratorService {
   static banFromServer(minutes: number, userName?: string, address?: string, reason?: string,
@@ -19,7 +19,7 @@ export class ModeratorService {
     ModeratorCommands.getWarnList(modName, userName, userClientid);
   }
 
-  static viewLogHistory(filters: LogFilters): void {
+  static viewLogHistory(filters: Data.ViewLogHistoryParams): void {
     ModeratorCommands.viewLogHistory(filters);
   }
 

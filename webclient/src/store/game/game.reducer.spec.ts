@@ -1,6 +1,5 @@
 import { create } from '@bufbuild/protobuf';
-import { CardAttribute } from 'generated/proto/card_attributes_pb';
-import type { ServerInfo_Player } from 'generated/proto/serverinfo_player_pb';
+import { Data } from '@app/types';
 import { gamesReducer } from './game.reducer';
 import { Types } from './game.types';
 import {
@@ -13,7 +12,6 @@ import {
   makeState,
   makeZoneEntry,
 } from './__mocks__/fixtures';
-import { ServerInfo_PlayerSchema } from 'generated/proto/serverinfo_player_pb';
 
 // ── 2A: Initialisation & lifecycle ───────────────────────────────────────────
 
@@ -30,9 +28,16 @@ describe('2A: Initialisation & lifecycle', () => {
   });
 
   it('GAME_JOINED → inserts gameEntry keyed by gameId', () => {
-    const entry = makeGameEntry({ gameId: 42 });
-    const result = gamesReducer({ games: {} }, { type: Types.GAME_JOINED, gameId: 42, gameEntry: entry });
-    expect(result.games[42]).toBe(entry);
+    const data = create(Data.Event_GameJoinedSchema, {
+      gameInfo: create(Data.ServerInfo_GameSchema, { gameId: 42, roomId: 1, description: 'test' }),
+      hostId: 5,
+      playerId: 2,
+      spectator: false,
+      judge: false,
+      resuming: false,
+    });
+    const result = gamesReducer({ games: {} }, { type: Types.GAME_JOINED, data });
+    expect(result.games[42]).toEqual(expect.objectContaining({ gameId: 42, hostId: 5, localPlayerId: 2 }));
   });
 
   it('GAME_LEFT → removes game by gameId', () => {
@@ -69,8 +74,8 @@ describe('2B: Game state & player management', () => {
     const card = makeCard({ id: 5 });
     const counter = makeCounter({ id: 2 });
     const arrow = makeArrow({ id: 3 });
-    const playerList: ServerInfo_Player[] = [
-      create(ServerInfo_PlayerSchema, {
+    const playerList: Data.ServerInfo_Player[] = [
+      create(Data.ServerInfo_PlayerSchema, {
         properties: makePlayerProperties({ playerId: 7 }),
         deckList: 'some deck',
         zoneList: [
@@ -550,7 +555,7 @@ describe('2E: CARD_ATTR_CHANGED', () => {
     });
   }
 
-  function dispatchAttr(state: ReturnType<typeof makeState>, attribute: CardAttribute, attrValue: string) {
+  function dispatchAttr(state: ReturnType<typeof makeState>, attribute: Data.CardAttribute, attrValue: string) {
     return gamesReducer(state, {
       type: Types.CARD_ATTR_CHANGED,
       gameId: 1,
@@ -560,37 +565,37 @@ describe('2E: CARD_ATTR_CHANGED', () => {
   }
 
   it('AttrTapped (1) → card.tapped = true when attrValue is "1"', () => {
-    const result = dispatchAttr(stateWithCard(), CardAttribute.AttrTapped, '1');
+    const result = dispatchAttr(stateWithCard(), Data.CardAttribute.AttrTapped, '1');
     expect(result.games[1].players[1].zones['table'].cards[0].tapped).toBe(true);
   });
 
   it('AttrAttacking (2) → card.attacking = true when attrValue is "1"', () => {
-    const result = dispatchAttr(stateWithCard(), CardAttribute.AttrAttacking, '1');
+    const result = dispatchAttr(stateWithCard(), Data.CardAttribute.AttrAttacking, '1');
     expect(result.games[1].players[1].zones['table'].cards[0].attacking).toBe(true);
   });
 
   it('AttrFaceDown (3) → card.faceDown = true when attrValue is "1"', () => {
-    const result = dispatchAttr(stateWithCard(), CardAttribute.AttrFaceDown, '1');
+    const result = dispatchAttr(stateWithCard(), Data.CardAttribute.AttrFaceDown, '1');
     expect(result.games[1].players[1].zones['table'].cards[0].faceDown).toBe(true);
   });
 
   it('AttrColor (4) → card.color = attrValue', () => {
-    const result = dispatchAttr(stateWithCard(), CardAttribute.AttrColor, 'red');
+    const result = dispatchAttr(stateWithCard(), Data.CardAttribute.AttrColor, 'red');
     expect(result.games[1].players[1].zones['table'].cards[0].color).toBe('red');
   });
 
   it('AttrPT (5) → card.pt = attrValue', () => {
-    const result = dispatchAttr(stateWithCard(), CardAttribute.AttrPT, '2/3');
+    const result = dispatchAttr(stateWithCard(), Data.CardAttribute.AttrPT, '2/3');
     expect(result.games[1].players[1].zones['table'].cards[0].pt).toBe('2/3');
   });
 
   it('AttrAnnotation (6) → card.annotation = attrValue', () => {
-    const result = dispatchAttr(stateWithCard(), CardAttribute.AttrAnnotation, 'enchanted');
+    const result = dispatchAttr(stateWithCard(), Data.CardAttribute.AttrAnnotation, 'enchanted');
     expect(result.games[1].players[1].zones['table'].cards[0].annotation).toBe('enchanted');
   });
 
   it('AttrDoesntUntap (7) → card.doesntUntap = true when attrValue is "1"', () => {
-    const result = dispatchAttr(stateWithCard(), CardAttribute.AttrDoesntUntap, '1');
+    const result = dispatchAttr(stateWithCard(), Data.CardAttribute.AttrDoesntUntap, '1');
     expect(result.games[1].players[1].zones['table'].cards[0].doesntUntap).toBe(true);
   });
 });

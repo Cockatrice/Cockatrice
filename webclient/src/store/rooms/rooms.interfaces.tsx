@@ -1,4 +1,4 @@
-import { GameSortField, Message, Room, Game, SortBy, UserSortField } from 'types';
+import { App, Enriched } from '@app/types';
 
 export interface RoomsState {
   rooms: RoomsStateRooms;
@@ -11,12 +11,12 @@ export interface RoomsState {
 }
 
 export interface RoomsStateRooms {
-  [roomId: number]: Room;
+  [roomId: number]: Enriched.Room;
 }
 
 export interface RoomsStateGames {
   [roomId: number]: {
-    [gameId: number]: Game;
+    [gameId: number]: Enriched.Game;
   };
 }
 
@@ -31,13 +31,13 @@ export interface JoinedGames {
 }
 
 export interface RoomsStateMessages {
-  [roomId: number]: Message[];
+  [roomId: number]: Enriched.Message[];
 }
 
-export interface RoomsStateSortGamesBy extends SortBy {
-  field: GameSortField
+export interface RoomsStateSortGamesBy extends App.SortBy {
+  field: App.GameSortField
 }
 
-export interface RoomsStateSortUsersBy extends SortBy {
-  field: UserSortField
+export interface RoomsStateSortUsersBy extends App.SortBy {
+  field: App.UserSortField
 }

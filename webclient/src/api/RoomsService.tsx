@@ -1,4 +1,4 @@
-import { RoomCommands, SessionCommands } from 'websocket';
+import { RoomCommands, SessionCommands } from '@app/websocket';
 
 export class RoomsService {
   static joinRoom(roomId: number): void {

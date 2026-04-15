@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
 
-import { StatusEnum, WebSocketConnectOptions } from 'types';
+import { App, Enriched } from '@app/types';
 
 import { KeepAliveService } from './KeepAliveService';
 import { CLIENT_OPTIONS } from '../config';
@@ -29,11 +29,11 @@ export class WebSocketService {
     this.keepAliveService = new KeepAliveService(this);
     this.keepAliveService.disconnected$.subscribe(() => {
       this.disconnect();
-      updateStatus(StatusEnum.DISCONNECTED, 'Connection timeout');
+      updateStatus(App.StatusEnum.DISCONNECTED, 'Connection timeout');
     });
   }
 
-  public connect(options: WebSocketConnectOptions, protocol: string = 'wss'): void {
+  public connect(options: Enriched.WebSocketConnectOptions, protocol: string = 'wss'): void {
     if (window.location.hostname === 'localhost') {
       protocol = 'ws';
     }
@@ -44,7 +44,7 @@ export class WebSocketService {
     this.socket = this.createWebSocket(`${protocol}://${host}:${port}`);
   }
 
-  public testConnect(options: WebSocketConnectOptions, protocol: string = 'wss'): void {
+  public testConnect(options: Enriched.WebSocketConnectOptions, protocol: string = 'wss'): void {
     if (window.location.hostname === 'localhost') {
       protocol = 'ws';
     }
@@ -77,7 +77,7 @@ export class WebSocketService {
     socket.onopen = () => {
       clearTimeout(connectionTimer);
       this.errorFired = false;
-      updateStatus(StatusEnum.CONNECTED, 'Connected');
+      updateStatus(App.StatusEnum.CONNECTED, 'Connected');
 
       this.keepAliveService.startPingLoop(this.keepalive, (pingReceived: () => void) => {
         this.config.keepAliveFn(pingReceived);
@@ -87,7 +87,7 @@ export class WebSocketService {
     socket.onclose = () => {
       // dont overwrite failure messages
       if (!this.errorFired) {
-        updateStatus(StatusEnum.DISCONNECTED, 'Connection Closed');
+        updateStatus(App.StatusEnum.DISCONNECTED, 'Connection Closed');
       }
       this.errorFired = false;
       this.keepAliveService.endPingLoop();
@@ -95,7 +95,7 @@ export class WebSocketService {
 
     socket.onerror = () => {
       this.errorFired = true;
-      updateStatus(StatusEnum.DISCONNECTED, 'Connection Failed');
+      updateStatus(App.StatusEnum.DISCONNECTED, 'Connection Failed');
       SessionPersistence.connectionFailed();
     };
 

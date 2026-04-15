@@ -7,7 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 
-import { RegisterForm } from 'forms';
+import { RegisterForm } from '@app/forms';
 
 import './RegistrationDialog.css';
 

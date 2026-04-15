@@ -9,7 +9,7 @@ export {
   Selectors as GameSelectors,
   Dispatch as GameDispatch } from './game';
 
-export * from 'store/game/game.interfaces';
+export * from './game/game.interfaces';
 
 // Server
 export {
@@ -17,13 +17,13 @@ export {
   Selectors as ServerSelectors,
   Dispatch as ServerDispatch } from './server';
 
-export * from 'store/server/server.interfaces';
+export * from './server/server.interfaces';
 
 export {
   Types as RoomsTypes,
   Selectors as RoomsSelectors,
-  Dispatch as RoomsDispatch } from 'store/rooms';
+  Dispatch as RoomsDispatch } from './rooms';
 
-export * from 'store/rooms/rooms.interfaces';
+export * from './rooms/rooms.interfaces';
 
 

@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
     "target": "es2020",
     "lib": [
       "dom",
@@ -10,6 +9,7 @@
     "typeRoots": [
       "node_modules/@types"
     ],
+    "types": ["node"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -22,7 +22,21 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@app/api": ["./src/api/index.ts"],
+      "@app/components": ["./src/components/index.ts"],
+      "@app/containers": ["./src/containers/index.ts"],
+      "@app/dialogs": ["./src/dialogs/index.ts"],
+      "@app/forms": ["./src/forms/index.ts"],
+      "@app/hooks": ["./src/hooks/index.ts"],
+      "@app/images": ["./src/images/index.ts"],
+      "@app/services": ["./src/services/index.ts"],
+      "@app/store": ["./src/store/index.ts"],
+      "@app/types": ["./src/types/index.ts"],
+      "@app/websocket": ["./src/websocket/index.ts"],
+      "@app/generated": ["./src/generated/index.ts"]
+    }
   },
   "include": [
     "src"

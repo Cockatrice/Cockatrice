@@ -1,7 +1,6 @@
-import type { Event_RevealCards } from 'generated/proto/event_reveal_cards_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function revealCards(data: Event_RevealCards, meta: GameEventMeta): void {
+export function revealCards(data: Data.Event_RevealCards, meta: Enriched.GameEventMeta): void {
   GamePersistence.cardsRevealed(meta.gameId, meta.playerId, data);
 }

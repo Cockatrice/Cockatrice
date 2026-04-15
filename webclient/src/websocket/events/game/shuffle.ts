@@ -1,7 +1,6 @@
-import type { Event_Shuffle } from 'generated/proto/event_shuffle_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function shuffle(data: Event_Shuffle, meta: GameEventMeta): void {
+export function shuffle(data: Data.Event_Shuffle, meta: Enriched.GameEventMeta): void {
   GamePersistence.zoneShuffled(meta.gameId, meta.playerId, data);
 }

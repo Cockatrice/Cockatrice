@@ -1,18 +1,18 @@
 import { ModuleType } from 'i18next';
 
-import { Language } from 'types';
+import { App } from '@app/types';
 
 class I18nBackend {
   static type: ModuleType = 'backend';
   static BASE_URL = `${import.meta.env.BASE_URL}locales`;
 
   read(language, namespace, callback) {
-    if (!Language[language]) {
+    if (!language[App.Language]) {
       callback(true, null);
       return;
     }
 
-    fetch(`${I18nBackend.BASE_URL}/${Language[language]}/${namespace}.json`)
+    fetch(`${I18nBackend.BASE_URL}/${language[App.Language]}/${namespace}.json`)
       .then(resp => resp.json().then(json => callback(null, json)))
       .catch(error => callback(error, null));
   }

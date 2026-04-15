@@ -27,8 +27,6 @@ const { invokeOnSuccess } = makeCallbackHelpers(
   2
 );
 
-beforeEach(() => vi.clearAllMocks());
-
 // ----------------------------------------------------------------
 // adjustMod
 // ----------------------------------------------------------------

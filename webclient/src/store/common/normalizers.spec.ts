@@ -1,18 +1,15 @@
 import { normalizeRoomInfo, normalizeGameObject, normalizeLogs, normalizeBannedUserError, normalizeUserMessage } from './normalizers';
 import { create } from '@bufbuild/protobuf';
-import { ServerInfo_RoomSchema } from 'generated/proto/serverinfo_room_pb';
-import { ServerInfo_GameSchema } from 'generated/proto/serverinfo_game_pb';
-import { Event_RoomSaySchema } from 'generated/proto/event_room_say_pb';
-import { Message } from 'types';
+import { Data, Enriched } from '@app/types';
 
 describe('normalizeRoomInfo', () => {
   it('builds gametypeMap from gametypeList and normalises games', () => {
-    const room = create(ServerInfo_RoomSchema, {
+    const room = create(Data.ServerInfo_RoomSchema, {
       roomId: 1,
       name: 'Lobby',
       gametypeList: [{ gameTypeId: 1, description: 'Standard' }],
       gameList: [
-        create(ServerInfo_GameSchema, { gameId: 10, gameTypes: [1], description: 'My Game' }),
+        create(Data.ServerInfo_GameSchema, { gameId: 10, gameTypes: [1], description: 'My Game' }),
       ],
     });
 
@@ -25,7 +22,7 @@ describe('normalizeRoomInfo', () => {
   });
 
   it('handles room with empty gametypeList', () => {
-    const room = create(ServerInfo_RoomSchema, { roomId: 2, name: 'Empty' });
+    const room = create(Data.ServerInfo_RoomSchema, { roomId: 2, name: 'Empty' });
     const result = normalizeRoomInfo(room);
     expect(result.gametypeMap).toEqual({});
     expect(result.gameList).toEqual([]);
@@ -34,19 +31,19 @@ describe('normalizeRoomInfo', () => {
 
 describe('normalizeGameObject', () => {
   it('maps gameTypes[0] to gameType string via gametypeMap', () => {
-    const game = create(ServerInfo_GameSchema, { gameId: 1, gameTypes: [5] });
+    const game = create(Data.ServerInfo_GameSchema, { gameId: 1, gameTypes: [5] });
     const result = normalizeGameObject(game, { 5: 'Legacy' });
     expect(result.gameType).toBe('Legacy');
   });
 
   it('returns empty string when no gameTypes', () => {
-    const game = create(ServerInfo_GameSchema, { gameId: 2 });
+    const game = create(Data.ServerInfo_GameSchema, { gameId: 2 });
     const result = normalizeGameObject(game, {});
     expect(result.gameType).toBe('');
   });
 
   it('fills empty description with empty string', () => {
-    const game = create(ServerInfo_GameSchema, { gameId: 3 });
+    const game = create(Data.ServerInfo_GameSchema, { gameId: 3 });
     const result = normalizeGameObject(game, {});
     expect(result.description).toBe('');
   });
@@ -55,10 +52,10 @@ describe('normalizeGameObject', () => {
 describe('normalizeLogs', () => {
   it('groups logs by targetType', () => {
     const logs = [
-      { targetType: 'room' },
-      { targetType: 'game' },
-      { targetType: 'room' },
-    ] as any[];
+      create(Data.ServerInfo_ChatMessageSchema, { targetType: 'room' }),
+      create(Data.ServerInfo_ChatMessageSchema, { targetType: 'game' }),
+      create(Data.ServerInfo_ChatMessageSchema, { targetType: 'room' }),
+    ];
     const result = normalizeLogs(logs);
     expect(result.room).toHaveLength(2);
     expect(result.game).toHaveLength(1);
@@ -71,7 +68,7 @@ describe('normalizeLogs', () => {
 });
 
 describe('normalizeBannedUserError', () => {
-  it('returns permanently banned message when endTime is 0', () => {
+  it('returns permanently banned Enriched.Message when endTime is 0', () => {
     expect(normalizeBannedUserError('', 0)).toBe('You are permanently banned');
   });
 
@@ -92,11 +89,11 @@ describe('normalizeBannedUserError', () => {
 });
 
 describe('normalizeUserMessage', () => {
-  const makeMsg = (fields: Partial<Message>): Message => ({
-    ...create(Event_RoomSaySchema),
+  const makeMsg = (fields: Partial<Enriched.Message>): Enriched.Message => ({
+    ...create(Data.Event_RoomSaySchema),
     timeReceived: 0,
     ...fields,
-  } as Message);
+  } as Enriched.Message);
 
   it('prepends "name: " to message when name is present', () => {
     const result = normalizeUserMessage(makeMsg({ name: 'Alice', message: 'hello' }));

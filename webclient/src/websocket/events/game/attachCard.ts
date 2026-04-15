@@ -1,7 +1,6 @@
-import type { Event_AttachCard } from 'generated/proto/event_attach_card_pb';
-import type { GameEventMeta } from 'types';
+import type { Data, Enriched } from '@app/types';
 import { GamePersistence } from '../../persistence';
 
-export function attachCard(data: Event_AttachCard, meta: GameEventMeta): void {
+export function attachCard(data: Data.Event_AttachCard, meta: Enriched.GameEventMeta): void {
   GamePersistence.cardAttached(meta.gameId, meta.playerId, data);
 }
