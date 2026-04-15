@@ -1,7 +1,7 @@
 import { reset } from 'redux-form';
 import { Actions } from './server.actions';
 import { store } from 'store';
-import { WebSocketConnectOptions } from 'types';
+import { DeckList, DeckStorageTreeItem, ReplayMatch, WebSocketConnectOptions } from 'types';
 
 export const Dispatch = {
   initialized: () => {
@@ -176,5 +176,44 @@ export const Dispatch = {
   },
   warnUser: (userName) => {
     store.dispatch(Actions.warnUser(userName))
+  },
+  grantReplayAccess: (replayId: number, moderatorName: string) => {
+    store.dispatch(Actions.grantReplayAccess(replayId, moderatorName));
+  },
+  forceActivateUser: (usernameToActivate: string, moderatorName: string) => {
+    store.dispatch(Actions.forceActivateUser(usernameToActivate, moderatorName));
+  },
+  getAdminNotes: (userName: string, notes: string) => {
+    store.dispatch(Actions.getAdminNotes(userName, notes));
+  },
+  updateAdminNotes: (userName: string, notes: string) => {
+    store.dispatch(Actions.updateAdminNotes(userName, notes));
+  },
+  replayList: (matchList: ReplayMatch[]) => {
+    store.dispatch(Actions.replayList(matchList));
+  },
+  replayAdded: (matchInfo: ReplayMatch) => {
+    store.dispatch(Actions.replayAdded(matchInfo));
+  },
+  replayModifyMatch: (gameId: number, doNotHide: boolean) => {
+    store.dispatch(Actions.replayModifyMatch(gameId, doNotHide));
+  },
+  replayDeleteMatch: (gameId: number) => {
+    store.dispatch(Actions.replayDeleteMatch(gameId));
+  },
+  backendDecks: (deckList: DeckList) => {
+    store.dispatch(Actions.backendDecks(deckList));
+  },
+  deckNewDir: (path: string, dirName: string) => {
+    store.dispatch(Actions.deckNewDir(path, dirName));
+  },
+  deckDelDir: (path: string) => {
+    store.dispatch(Actions.deckDelDir(path));
+  },
+  deckUpload: (path: string, treeItem: DeckStorageTreeItem) => {
+    store.dispatch(Actions.deckUpload(path, treeItem));
+  },
+  deckDelete: (deckId: number) => {
+    store.dispatch(Actions.deckDelete(deckId));
   },
 }

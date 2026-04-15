@@ -1,4 +1,4 @@
-import { WebSocketConnectOptions } from 'types';
+import { DeckList, DeckStorageTreeItem, ReplayMatch, WebSocketConnectOptions } from 'types';
 import { Types } from './server.types';
 
 export const Actions = {
@@ -210,4 +210,33 @@ export const Actions = {
     type: Types.WARN_USER,
     userName,
   }),
+  grantReplayAccess: (replayId: number, moderatorName: string) => ({
+    type: Types.GRANT_REPLAY_ACCESS,
+    replayId,
+    moderatorName,
+  }),
+  forceActivateUser: (usernameToActivate: string, moderatorName: string) => ({
+    type: Types.FORCE_ACTIVATE_USER,
+    usernameToActivate,
+    moderatorName,
+  }),
+  getAdminNotes: (userName: string, notes: string) => ({
+    type: Types.GET_ADMIN_NOTES,
+    userName,
+    notes,
+  }),
+  updateAdminNotes: (userName: string, notes: string) => ({
+    type: Types.UPDATE_ADMIN_NOTES,
+    userName,
+    notes,
+  }),
+  replayList: (matchList: ReplayMatch[]) => ({ type: Types.REPLAY_LIST, matchList }),
+  replayAdded: (matchInfo: ReplayMatch) => ({ type: Types.REPLAY_ADDED, matchInfo }),
+  replayModifyMatch: (gameId: number, doNotHide: boolean) => ({ type: Types.REPLAY_MODIFY_MATCH, gameId, doNotHide }),
+  replayDeleteMatch: (gameId: number) => ({ type: Types.REPLAY_DELETE_MATCH, gameId }),
+  backendDecks: (deckList: DeckList) => ({ type: Types.BACKEND_DECKS, deckList }),
+  deckNewDir: (path: string, dirName: string) => ({ type: Types.DECK_NEW_DIR, path, dirName }),
+  deckDelDir: (path: string) => ({ type: Types.DECK_DEL_DIR, path }),
+  deckUpload: (path: string, treeItem: DeckStorageTreeItem) => ({ type: Types.DECK_UPLOAD, path, treeItem }),
+  deckDelete: (deckId: number) => ({ type: Types.DECK_DELETE, deckId }),
 }

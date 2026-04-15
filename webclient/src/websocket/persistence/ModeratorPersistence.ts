@@ -27,4 +27,20 @@ export class ModeratorPersistence {
   static warnUser(userName: string): void {
     ServerDispatch.warnUser(userName);
   }
+
+  static grantReplayAccess(replayId: number, moderatorName: string): void {
+    ServerDispatch.grantReplayAccess(replayId, moderatorName);
+  }
+
+  static forceActivateUser(usernameToActivate: string, moderatorName: string): void {
+    ServerDispatch.forceActivateUser(usernameToActivate, moderatorName);
+  }
+
+  static getAdminNotes(userName: string, notes: string): void {
+    ServerDispatch.getAdminNotes(userName, notes);
+  }
+
+  static updateAdminNotes(userName: string, notes: string): void {
+    ServerDispatch.updateAdminNotes(userName, notes);
+  }
 }

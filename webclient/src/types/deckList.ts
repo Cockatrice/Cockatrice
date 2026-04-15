@@ -13,6 +13,6 @@ export interface DeckStorageFile {
 export interface DeckStorageTreeItem {
     id: number;
     name: string;
-    file: DeckStorageFile;
-    folder: DeckStorageFolder;
+    file: DeckStorageFile | null;
+    folder: DeckStorageFolder | null;
 }

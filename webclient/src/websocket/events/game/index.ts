@@ -4,8 +4,8 @@ import { leaveGame } from './leaveGame';
 
 
 export const GameEvents: ProtobufEvents = {
-  '.Event_Join.ext': () => joinGame,
-  '.Event_Leave.ext': () => leaveGame,
+  '.Event_Join.ext': joinGame,
+  '.Event_Leave.ext': leaveGame,
   '.Event_GameClosed.ext': () => console.log('Event_GameClosed.ext'),
   '.Event_GameHostChanged.ext': () => console.log('Event_GameHostChanged.ext'),
   '.Event_Kicked.ext': () => console.log('Event_Kicked.ext'),

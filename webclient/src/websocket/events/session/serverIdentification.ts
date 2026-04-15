@@ -1,4 +1,4 @@
-import { StatusEnum, WebSocketConnectReason } from 'types';
+import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
 
 import webClient from '../../WebClient';
 import {
@@ -24,48 +24,48 @@ export function serverIdentification(info: ServerIdentificationData): void {
     return;
   }
 
-  const getPasswordSalt = passwordSaltSupported(serverOptions, webClient);
-  const { options } = webClient;
+  const getPasswordSalt = passwordSaltSupported(serverOptions);
+  const connectOptions = { ...webClient.options };
 
-  switch (options.reason) {
+  switch (connectOptions.reason) {
     case WebSocketConnectReason.LOGIN:
       updateStatus(StatusEnum.LOGGING_IN, 'Logging In...');
       if (getPasswordSalt) {
-        requestPasswordSalt(options);
+        requestPasswordSalt(connectOptions);
       } else {
-        login(options);
+        login(connectOptions);
       }
       break;
     case WebSocketConnectReason.REGISTER:
       const passwordSalt = getPasswordSalt ? generateSalt() : null;
-      register(options, passwordSalt);
+      register(connectOptions, passwordSalt);
       break;
     case WebSocketConnectReason.ACTIVATE_ACCOUNT:
       if (getPasswordSalt) {
-        requestPasswordSalt(options);
+        requestPasswordSalt(connectOptions);
       } else {
-        activate(options);
+        activate(connectOptions);
       }
       break;
     case WebSocketConnectReason.PASSWORD_RESET_REQUEST:
-      forgotPasswordRequest(options);
+      forgotPasswordRequest(connectOptions);
       break;
     case WebSocketConnectReason.PASSWORD_RESET_CHALLENGE:
-      forgotPasswordChallenge(options);
+      forgotPasswordChallenge(connectOptions);
       break;
     case WebSocketConnectReason.PASSWORD_RESET:
       if (getPasswordSalt) {
-        requestPasswordSalt(options);
+        requestPasswordSalt(connectOptions);
       } else {
-        forgotPasswordReset(options);
+        forgotPasswordReset(connectOptions);
       }
       break;
     default:
-      updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Reason: ' + options.reason);
+      updateStatus(StatusEnum.DISCONNECTED, 'Unknown Connection Reason: ' + connectOptions.reason);
       disconnect();
       break;
   }
 
-  webClient.options = {};
+  webClient.options = {} as WebSocketConnectOptions;
   SessionPersistence.updateInfo(serverName, serverVersion);
 }
