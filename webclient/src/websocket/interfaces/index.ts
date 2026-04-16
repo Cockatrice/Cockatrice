@@ -17,3 +17,7 @@ export type {
   IModeratorRequest,
   IWebClientRequest,
 } from './WebClientRequest';
+
+export * from './WebClientConfig';
+export * from './WebSocketConfig';
+export * from './StatusEnum';

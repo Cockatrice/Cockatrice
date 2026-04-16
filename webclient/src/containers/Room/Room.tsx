@@ -4,8 +4,8 @@ import { useNavigate, useParams, generatePath } from 'react-router-dom';
 import ListItemButton from '@mui/material/ListItemButton';
 import Paper from '@mui/material/Paper';
 
-import { request } from '@app/api';
 import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard } from '@app/components';
+import { useWebClient } from '@app/hooks';
 import { RoomsSelectors } from '@app/store';
 import { useAppSelector } from '@app/store';
 import { App } from '@app/types';
@@ -29,6 +29,7 @@ const Room = () => {
   const room = rooms[roomId];
   const roomMessages = messages[roomId];
   const users = useAppSelector(state => RoomsSelectors.getSortedRoomUsers(state, roomId));
+  const webClient = useWebClient();
 
   useEffect(() => {
     if (!joined.find(r => r.info.roomId === roomId)) {
@@ -38,7 +39,7 @@ const Room = () => {
 
   const handleRoomSay = ({ message }) => {
     if (message) {
-      request.rooms.roomSay(roomId, message);
+      webClient.request.rooms.roomSay(roomId, message);
     }
   }
 

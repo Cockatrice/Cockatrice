@@ -8,8 +8,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 
-import { request } from '@app/api';
 import { CardImportDialog } from '@app/dialogs';
+import { useWebClient } from '@app/hooks';
 import { Images } from '@app/images';
 import { RoomsSelectors, ServerSelectors } from '@app/store';
 import { App } from '@app/types';
@@ -28,6 +28,7 @@ const LeftNav = () => {
   const isConnected = useAppSelector(ServerSelectors.getIsConnected);
   const isModerator = useAppSelector(ServerSelectors.getIsUserModerator);
   const navigate = useNavigate();
+  const webClient = useWebClient();
   const [state, setState] = useState<LeftNavState>({
     anchorEl: null,
     showCardImportDialog: false,
@@ -66,7 +67,7 @@ const LeftNav = () => {
 
   const leaveRoom = (event, roomId) => {
     event.preventDefault();
-    request.rooms.leaveRoom(roomId);
+    webClient.request.rooms.leaveRoom(roomId);
   };
 
   const openImportCardWizard = () => {

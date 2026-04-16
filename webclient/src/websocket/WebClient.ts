@@ -1,39 +1,40 @@
-import { StatusEnum } from './interfaces/StatusEnum';
+import { ping } from './commands/session';
+import { CLIENT_OPTIONS } from './config';
+import type {
+  ConnectTarget,
+  IWebClientRequest,
+  IWebClientResponse,
+} from './interfaces';
+import { StatusEnum } from './interfaces';
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
-import { CLIENT_OPTIONS } from './config';
-import type { IWebClientResponse } from './interfaces';
-import type { WebClientConfig, ConnectTarget } from './interfaces/WebClientConfig';
 
 export class WebClient {
   private static _instance: WebClient | null = null;
 
-  public static get instance(): WebClient {
+  static get instance(): WebClient {
     if (!WebClient._instance) {
       throw new Error(
-        'WebClient has not been initialized. Instantiate it via `new WebClient(config)` before accessing `WebClient.instance`.'
+        'WebClient has not been initialized. Instantiate it via `new WebClient()` before accessing `WebClient.instance`.'
       );
     }
     return WebClient._instance;
   }
 
-  public socket: WebSocketService;
-  public protobuf: ProtobufService;
-  public response: IWebClientResponse;
-  public config: WebClientConfig;
+  protobuf: ProtobufService;
+  socket: WebSocketService;
+  status: StatusEnum;
 
-  public status: StatusEnum;
-
-  constructor(config: WebClientConfig) {
+  constructor(
+    public request: IWebClientRequest,
+    public response: IWebClientResponse
+  ) {
     if (WebClient._instance) {
       throw new Error('WebClient is a singleton and has already been initialized.');
     }
 
-    this.config = config;
-    this.response = config.response;
-
     this.socket = new WebSocketService({
-      keepAliveFn: config.keepAliveFn,
+      keepAliveFn: ping,
       onStatusChange: (status, description) => {
         this.response.session.updateStatus(status, description);
         this.updateStatus(status);
@@ -47,12 +48,7 @@ export class WebClient {
       {
         send: (data) => this.socket.send(data),
         isOpen: () => this.socket.checkReadyState(WebSocket.OPEN),
-      },
-      {
-        sessionEvents: config.sessionEvents,
-        roomEvents: config.roomEvents,
-        gameEvents: config.gameEvents,
-      },
+      }
     );
 
     this.socket.message$.subscribe((message: MessageEvent) => {

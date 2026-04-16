@@ -21,10 +21,11 @@ import {
   type GameEventContainer,
   type SessionEvent,
   type RoomEvent,
-  type RegistryEntry,
-  type GameEvent,
 } from '@app/generated';
 
+import { GameEvents } from '../events/game';
+import { RoomEvents } from '../events/room';
+import { SessionEvents } from '../events/session';
 import type { GameEventMeta } from '../interfaces/WebSocketConfig';
 import { type CommandOptions, handleResponse } from './command-options';
 
@@ -33,23 +34,11 @@ export interface SocketTransport {
   isOpen(): boolean;
 }
 
-export interface EventRegistries {
-  sessionEvents: RegistryEntry<unknown, SessionEvent>[];
-  roomEvents: RegistryEntry<unknown, RoomEvent, RoomEvent>[];
-  gameEvents: RegistryEntry<unknown, GameEvent, GameEventMeta>[];
-}
-
 export class ProtobufService {
   private cmdId = 0;
   private pendingCommands = new Map<number, (response: Response) => void>();
 
-  private transport: SocketTransport;
-  private events: EventRegistries;
-
-  constructor(transport: SocketTransport, events: EventRegistries) {
-    this.transport = transport;
-    this.events = events;
-  }
+  constructor(private transport: SocketTransport) {}
 
   public resetCommands() {
     this.cmdId = 0;
@@ -189,7 +178,7 @@ export class ProtobufService {
     if (!event) {
       return;
     }
-    for (const [ext, handler] of this.events.roomEvents) {
+    for (const [ext, handler] of RoomEvents) {
       if (hasExtension(event, ext)) {
         handler(getExtension(event, ext), event);
         return;
@@ -201,7 +190,7 @@ export class ProtobufService {
     if (!event) {
       return;
     }
-    for (const [ext, handler] of this.events.sessionEvents) {
+    for (const [ext, handler] of SessionEvents) {
       if (hasExtension(event, ext)) {
         handler(getExtension(event, ext), undefined);
         return;
@@ -225,7 +214,7 @@ export class ProtobufService {
         forcedByJudge: forcedByJudge ?? 0,
       };
 
-      for (const [ext, handler] of this.events.gameEvents) {
+      for (const [ext, handler] of GameEvents) {
         if (hasExtension(event, ext)) {
           handler(getExtension(event, ext), meta);
           break;

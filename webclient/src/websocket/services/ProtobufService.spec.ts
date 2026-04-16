@@ -7,13 +7,25 @@ vi.mock('@bufbuild/protobuf', async (importOriginal) => ({
   setExtension: vi.fn(),
 }));
 
-vi.mock('../WebClient');
+vi.mock('../events/game', () => ({
+  GameEvents: [],
+}));
+
+vi.mock('../events/room', () => ({
+  RoomEvents: [],
+}));
+
+vi.mock('../events/session', () => ({
+  SessionEvents: [],
+}));
 
 import { create, fromBinary, hasExtension, getExtension } from '@bufbuild/protobuf';
 import type { GenExtension } from '@bufbuild/protobuf/codegenv2';
 
 import { ProtobufService } from './ProtobufService';
-import type { EventRegistries } from './ProtobufService';
+import { GameEvents } from '../events/game';
+import { RoomEvents } from '../events/room';
+import { SessionEvents } from '../events/session';
 
 import type {
   AdminCommand,
@@ -43,18 +55,17 @@ type ProtobufInternal = ProtobufService & {
 };
 
 let mockSocket: { isOpen: ReturnType<typeof vi.fn>; send: ReturnType<typeof vi.fn> };
-let mockEvents: EventRegistries;
 
 beforeEach(() => {
   mockSocket = {
     isOpen: vi.fn().mockReturnValue(true),
     send: vi.fn(),
   };
-  mockEvents = {
-    sessionEvents: [],
-    roomEvents: [],
-    gameEvents: [],
-  };
+
+  // Reset event registries
+  (GameEvents as any).length = 0;
+  (RoomEvents as any).length = 0;
+  (SessionEvents as any).length = 0;
 });
 
 describe('ProtobufService', () => {
@@ -67,7 +78,7 @@ describe('ProtobufService', () => {
 
   describe('resetCommands', () => {
     it('resets cmdId and pendingCommands', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       service.sendSessionCommand(sessionExt, vi.fn());
       expect((service as ProtobufInternal).cmdId).toBe(1);
       service.resetCommands();
@@ -78,7 +89,7 @@ describe('ProtobufService', () => {
 
   describe('sendCommand', () => {
     it('increments cmdId and stores callback', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const cb = vi.fn();
       service.sendCommand(create(CommandContainerSchema), cb);
       expect((service as ProtobufInternal).cmdId).toBe(1);
@@ -86,14 +97,14 @@ describe('ProtobufService', () => {
     });
 
     it('sends encoded data when socket is OPEN', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       mockSocket.isOpen.mockReturnValue(true);
       service.sendCommand(create(CommandContainerSchema), vi.fn());
       expect(mockSocket.send).toHaveBeenCalled();
     });
 
     it('does not register callback or increment cmdId when transport is closed', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       mockSocket.isOpen.mockReturnValue(false);
       const cb = vi.fn();
       service.sendCommand(create(CommandContainerSchema), cb);
@@ -105,14 +116,14 @@ describe('ProtobufService', () => {
 
   describe('sendSessionCommand', () => {
     it('stores callback and increments cmdId', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       service.sendSessionCommand(sessionExt, {});
       expect((service as ProtobufInternal).cmdId).toBe(1);
       expect((service as ProtobufInternal).pendingCommands.get(1)).toBeTypeOf('function');
     });
 
     it('invokes onResponse with raw response when the pending command is triggered', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const cb = vi.fn();
       service.sendSessionCommand(sessionExt, {}, { onResponse: cb });
 
@@ -123,7 +134,7 @@ describe('ProtobufService', () => {
     });
 
     it('does not throw when no callback is provided and pending command is triggered', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       service.sendSessionCommand(sessionExt, {});
 
       const storedCb = (service as ProtobufInternal).pendingCommands.get(1)!;
@@ -133,13 +144,13 @@ describe('ProtobufService', () => {
 
   describe('sendRoomCommand', () => {
     it('stores callback and increments cmdId', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       service.sendRoomCommand(42, roomExt, {});
       expect((service as ProtobufInternal).cmdId).toBe(1);
     });
 
     it('invokes onResponse with raw response when the pending command is triggered', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const cb = vi.fn();
       service.sendRoomCommand(42, roomExt, {}, { onResponse: cb });
 
@@ -150,7 +161,7 @@ describe('ProtobufService', () => {
     });
 
     it('does not throw when no callback is provided and pending command is triggered', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       service.sendRoomCommand(42, roomExt, {});
 
       const storedCb = (service as ProtobufInternal).pendingCommands.get(1)!;
@@ -160,13 +171,13 @@ describe('ProtobufService', () => {
 
   describe('sendGameCommand', () => {
     it('stores callback and increments cmdId', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       service.sendGameCommand(7, gameExt, {});
       expect((service as ProtobufInternal).cmdId).toBe(1);
     });
 
     it('invokes onResponse with raw response when the pending command is triggered', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const cb = vi.fn();
       service.sendGameCommand(7, gameExt, {}, { onResponse: cb });
 
@@ -177,7 +188,7 @@ describe('ProtobufService', () => {
     });
 
     it('does not throw when no callback is provided and pending command is triggered', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       service.sendGameCommand(7, gameExt, {});
 
       const storedCb = (service as ProtobufInternal).pendingCommands.get(1)!;
@@ -187,13 +198,13 @@ describe('ProtobufService', () => {
 
   describe('sendModeratorCommand', () => {
     it('stores callback and increments cmdId', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       service.sendModeratorCommand(moderatorExt, {});
       expect((service as ProtobufInternal).cmdId).toBe(1);
     });
 
     it('invokes onResponse with raw response when the pending command is triggered', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const cb = vi.fn();
       service.sendModeratorCommand(moderatorExt, {}, { onResponse: cb });
 
@@ -204,7 +215,7 @@ describe('ProtobufService', () => {
     });
 
     it('does not throw when no callback is provided and pending command is triggered', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       service.sendModeratorCommand(moderatorExt, {});
 
       const storedCb = (service as ProtobufInternal).pendingCommands.get(1)!;
@@ -214,13 +225,13 @@ describe('ProtobufService', () => {
 
   describe('sendAdminCommand', () => {
     it('stores callback and increments cmdId', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       service.sendAdminCommand(adminExt, {});
       expect((service as ProtobufInternal).cmdId).toBe(1);
     });
 
     it('invokes onResponse with raw response when the pending command is triggered', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const cb = vi.fn();
       service.sendAdminCommand(adminExt, {}, { onResponse: cb });
 
@@ -231,7 +242,7 @@ describe('ProtobufService', () => {
     });
 
     it('does not throw when no callback is provided and pending command is triggered', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       service.sendAdminCommand(adminExt, {});
 
       const storedCb = (service as ProtobufInternal).pendingCommands.get(1)!;
@@ -241,7 +252,7 @@ describe('ProtobufService', () => {
 
   describe('handleMessageEvent', () => {
     it('routes RESPONSE message to processServerResponse', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const cb = vi.fn();
       (service as ProtobufInternal).cmdId = 1;
       (service as ProtobufInternal).pendingCommands.set(1, cb);
@@ -259,7 +270,7 @@ describe('ProtobufService', () => {
     });
 
     it('routes ROOM_EVENT message', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const processRoomEvent = vi.spyOn(service as ProtobufInternal, 'processRoomEvent');
 
       vi.mocked(fromBinary).mockReturnValue(
@@ -273,7 +284,7 @@ describe('ProtobufService', () => {
     });
 
     it('routes SESSION_EVENT message', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const processSessionEvent = vi.spyOn(service as ProtobufInternal, 'processSessionEvent');
 
       vi.mocked(fromBinary).mockReturnValue(
@@ -287,7 +298,7 @@ describe('ProtobufService', () => {
     });
 
     it('routes GAME_EVENT_CONTAINER message', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const processGameEvent = vi.spyOn(service as ProtobufInternal, 'processGameEvent');
 
       vi.mocked(fromBinary).mockReturnValue(
@@ -301,7 +312,7 @@ describe('ProtobufService', () => {
     });
 
     it('logs unknown message types (default case)', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       vi.mocked(fromBinary).mockReturnValue(
@@ -316,13 +327,13 @@ describe('ProtobufService', () => {
     });
 
     it('does nothing when decoded message is null', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       vi.mocked(fromBinary).mockReturnValue(null!);
       expect(() => service.handleMessageEvent({ data: new ArrayBuffer(0) } as MessageEvent)).not.toThrow();
     });
 
     it('catches and logs decode errors', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       vi.mocked(fromBinary).mockImplementation(() => {
         throw new Error('decode error');
@@ -335,7 +346,7 @@ describe('ProtobufService', () => {
 
   describe('processGameEvent', () => {
     it('returns early when container has no eventList', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       vi.mocked(hasExtension).mockReturnValue(false);
       (service as ProtobufInternal).processGameEvent(null, {});
       expect(hasExtension).not.toHaveBeenCalled();
@@ -346,8 +357,8 @@ describe('ProtobufService', () => {
       const mockExt = {} as GenExtension<GameEvent, unknown>;
       const payload = { someData: 1 };
 
-      mockEvents.gameEvents.push([mockExt, handler] as any);
-      const service = new ProtobufService(mockSocket, mockEvents);
+      (GameEvents as any).push([mockExt, handler]);
+      const service = new ProtobufService(mockSocket);
       vi.mocked(hasExtension).mockReturnValue(true);
       vi.mocked(getExtension).mockReturnValue(payload);
 
@@ -364,8 +375,8 @@ describe('ProtobufService', () => {
       const mockExt = {} as GenExtension<GameEvent, unknown>;
       const payload = { someData: 1 };
 
-      mockEvents.gameEvents.push([mockExt, handler] as any);
-      const service = new ProtobufService(mockSocket, mockEvents);
+      (GameEvents as any).push([mockExt, handler]);
+      const service = new ProtobufService(mockSocket);
       vi.mocked(hasExtension).mockReturnValue(true);
       vi.mocked(getExtension).mockReturnValue(payload);
 
@@ -380,7 +391,7 @@ describe('ProtobufService', () => {
 
   describe('processServerResponse', () => {
     it('returns early when response is undefined', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       (service as ProtobufInternal).pendingCommands.set(1, vi.fn());
       (service as ProtobufInternal).processServerResponse(undefined);
       expect((service as ProtobufInternal).pendingCommands.size).toBe(1);
@@ -389,7 +400,7 @@ describe('ProtobufService', () => {
 
   describe('processRoomEvent', () => {
     it('returns early when event is undefined', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       vi.mocked(hasExtension).mockReturnValue(false);
       (service as ProtobufInternal).processRoomEvent(undefined);
       expect(hasExtension).not.toHaveBeenCalled();
@@ -400,8 +411,8 @@ describe('ProtobufService', () => {
       const mockExt = {} as GenExtension<RoomEvent, unknown>;
       const payload = { roomData: 1 };
 
-      mockEvents.roomEvents.push([mockExt, handler] as any);
-      const service = new ProtobufService(mockSocket, mockEvents);
+      (RoomEvents as any).push([mockExt, handler]);
+      const service = new ProtobufService(mockSocket);
       vi.mocked(hasExtension).mockReturnValue(true);
       vi.mocked(getExtension).mockReturnValue(payload);
 
@@ -414,7 +425,7 @@ describe('ProtobufService', () => {
 
   describe('processSessionEvent', () => {
     it('returns early when event is undefined', () => {
-      const service = new ProtobufService(mockSocket, mockEvents);
+      const service = new ProtobufService(mockSocket);
       vi.mocked(hasExtension).mockReturnValue(false);
       (service as ProtobufInternal).processSessionEvent(undefined);
       expect(hasExtension).not.toHaveBeenCalled();
@@ -425,8 +436,8 @@ describe('ProtobufService', () => {
       const mockExt = {} as GenExtension<SessionEvent, unknown>;
       const payload = { sessionData: 1 };
 
-      mockEvents.sessionEvents.push([mockExt, handler] as any);
-      const service = new ProtobufService(mockSocket, mockEvents);
+      (SessionEvents as any).push([mockExt, handler]);
+      const service = new ProtobufService(mockSocket);
       vi.mocked(hasExtension).mockReturnValue(true);
       vi.mocked(getExtension).mockReturnValue(payload);
 

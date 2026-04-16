@@ -6,11 +6,10 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
-import { request } from '@app/api';
 import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, AccountActivationDialog } from '@app/dialogs';
 import { LanguageDropdown } from '@app/components';
 import { LoginForm } from '@app/forms';
-import { useReduxEffect, useFireOnce } from '@app/hooks';
+import { useReduxEffect, useFireOnce, useWebClient } from '@app/hooks';
 import { Images } from '@app/images';
 import { HostDTO, serverProps } from '@app/services';
 import { App, Enriched } from '@app/types';
@@ -67,6 +66,7 @@ const Root = styled('div')(({ theme }) => ({
 const Login = () => {
   const description = useAppSelector(s => ServerSelectors.getDescription(s));
   const isConnected = useAppSelector(ServerSelectors.getIsConnected);
+  const webClient = useWebClient();
   const { t } = useTranslation();
 
   const [pendingActivationOptions, setPendingActivationOptions] = useState<Enriched.PendingActivationContext | null>(null);
@@ -134,7 +134,7 @@ const Login = () => {
       options.hashedPassword = selectedHost.hashedPassword;
     }
 
-    request.authentication.login(options);
+    webClient.request.authentication.login(options);
   }, []);
 
   const [submitButtonDisabled, resetSubmitButton, handleLogin] = useFireOnce(onSubmitLogin);
@@ -153,7 +153,7 @@ const Login = () => {
     setRememberLogin(registerForm);
     const { userName, password, email, country, realName, selectedHost } = registerForm;
 
-    request.authentication.register({
+    webClient.request.authentication.register({
       ...App.getHostPort(selectedHost),
       userName,
       password,
@@ -167,7 +167,7 @@ const Login = () => {
     if (!pendingActivationOptions) {
       return;
     }
-    request.authentication.activateAccount({
+    webClient.request.authentication.activateAccount({
       host: pendingActivationOptions.host,
       port: pendingActivationOptions.port,
       userName: pendingActivationOptions.userName,
@@ -180,17 +180,17 @@ const Login = () => {
     const { host, port } = App.getHostPort(selectedHost);
 
     if (email) {
-      request.authentication.resetPasswordChallenge({ userName, email, host, port });
+      webClient.request.authentication.resetPasswordChallenge({ userName, email, host, port });
     } else {
       setUserToResetPassword(userName);
-      request.authentication.resetPasswordRequest({ userName, host, port });
+      webClient.request.authentication.resetPasswordRequest({ userName, host, port });
     }
   };
 
   const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }) => {
     const { host, port } = App.getHostPort(selectedHost);
 
-    request.authentication.resetPassword({ userName, token, newPassword, host, port });
+    webClient.request.authentication.resetPassword({ userName, token, newPassword, host, port });
   };
 
   const skipTokenRequest = (userName) => {

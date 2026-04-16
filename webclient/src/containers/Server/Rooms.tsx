@@ -9,20 +9,20 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
-
-import { request } from '@app/api';
+import { useWebClient } from '@app/hooks';
 import { App } from '@app/types';
 
 import './Rooms.css';
 
 const Rooms = ({ rooms, joinedRooms }) => {
   const navigate = useNavigate();
+  const webClient = useWebClient();
 
   function onClick(roomId) {
     if (joinedRooms.find(room => room.info.roomId === roomId)) {
       navigate(generatePath(App.RouteEnum.ROOM, { roomId }));
     } else {
-      request.rooms.joinRoom(roomId);
+      webClient.request.rooms.joinRoom(roomId);
     }
   }
 

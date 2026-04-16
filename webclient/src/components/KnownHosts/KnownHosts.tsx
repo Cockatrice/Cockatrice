@@ -13,7 +13,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditRoundedIcon from '@mui/icons-material/Edit';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 
-import { request } from '@app/api';
+import { useWebClient } from '@app/hooks';
 import { KnownHostDialog } from '@app/dialogs';
 import { useReduxEffect } from '@app/hooks';
 import { HostDTO } from '@app/services';
@@ -64,6 +64,7 @@ const KnownHosts = (props) => {
   const { touched, error, warning } = meta;
 
   const { t } = useTranslation();
+  const webClient = useWebClient();
 
   const [hostsState, setHostsState] = useState({
     hosts: [],
@@ -197,7 +198,7 @@ const KnownHosts = (props) => {
     setTestingConnection(TestConnection.TESTING);
 
     const options = { ...App.getHostPort(hostsState.selectedHost) };
-    request.authentication.testConnection(options);
+    webClient.request.authentication.testConnection(options);
   }
 
   return (

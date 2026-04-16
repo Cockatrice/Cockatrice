@@ -1,9 +1,9 @@
 // eslint-disable-next-line
 import React, { useEffect } from "react";
 
-import { request } from '@app/api';
 import { AuthGuard, ModGuard } from '@app/components';
 import { SearchForm } from '@app/forms';
+import { useWebClient } from '@app/hooks';
 import { ServerDispatch, ServerSelectors } from '@app/store';
 import { Data } from '@app/types';
 import { useAppSelector } from '@app/store';
@@ -13,6 +13,7 @@ import './Logs.css';
 
 const Logs = () => {
   const logs = useAppSelector(state => ServerSelectors.getLogs(state));
+  const webClient = useWebClient();
   const MAXIMUM_RESULTS = 1000;
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const Logs = () => {
     trimmedFields.maximumResults = MAXIMUM_RESULTS;
 
     if (required.length) {
-      request.moderator.viewLogHistory(trimmedFields);
+      webClient.request.moderator.viewLogHistory(trimmedFields);
     } else {
       // @TODO use yet-to-be-implemented banner/alert
     }

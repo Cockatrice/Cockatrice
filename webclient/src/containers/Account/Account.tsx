@@ -7,7 +7,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import Paper from '@mui/material/Paper';
 
 import { UserDisplay, VirtualList, AuthGuard, LanguageDropdown } from '@app/components';
-import { request } from '@app/api';
+import { useWebClient } from '@app/hooks';
 import { ServerSelectors } from '@app/store';
 import Layout from '../Layout/Layout';
 import { useAppSelector } from '@app/store';
@@ -23,17 +23,18 @@ const Account = () => {
   const serverName = useAppSelector(state => ServerSelectors.getName(state));
   const serverVersion = useAppSelector(state => ServerSelectors.getVersion(state));
   const user = useAppSelector(state => ServerSelectors.getUser(state));
+  const webClient = useWebClient();
   const { country, realName, name, userLevel, accountageSecs, avatarBmp } = user || {};
   let url = URL.createObjectURL(new Blob([avatarBmp as BlobPart], { 'type': 'image/png' }));
 
   const { t } = useTranslation();
 
   const handleAddToBuddies = ({ userName }) => {
-    request.session.addToBuddyList(userName);
+    webClient.request.session.addToBuddyList(userName);
   };
 
   const handleAddToIgnore = ({ userName }) => {
-    request.session.addToIgnoreList(userName);
+    webClient.request.session.addToIgnoreList(userName);
   };
 
   return (

@@ -6,7 +6,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 import { Images } from '@app/images';
-import { request } from '@app/api';
+import { useWebClient } from '@app/hooks';
 import { ServerSelectors } from '@app/store';
 import { App, Data } from '@app/types';
 import { useAppSelector } from '@app/store';
@@ -18,6 +18,7 @@ const UserDisplay = ({ user }: UserDisplayProps) => {
   const buddyList = useAppSelector(state => ServerSelectors.getBuddyList(state));
   const ignoreList = useAppSelector(state => ServerSelectors.getIgnoreList(state));
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const webClient = useWebClient();
 
   const { name, country } = user;
 
@@ -32,19 +33,19 @@ const UserDisplay = ({ user }: UserDisplayProps) => {
   const isIgnored = Boolean(ignoreList[user.name]);
 
   const onAddBuddy = () => {
-    request.session.addToBuddyList(user.name);
+    webClient.request.session.addToBuddyList(user.name);
     handleClose();
   };
   const onRemoveBuddy = () => {
-    request.session.removeFromBuddyList(user.name);
+    webClient.request.session.removeFromBuddyList(user.name);
     handleClose();
   };
   const onAddIgnore = () => {
-    request.session.addToIgnoreList(user.name);
+    webClient.request.session.addToIgnoreList(user.name);
     handleClose();
   };
   const onRemoveIgnore = () => {
-    request.session.removeFromIgnoreList(user.name);
+    webClient.request.session.removeFromIgnoreList(user.name);
     handleClose();
   };
 
