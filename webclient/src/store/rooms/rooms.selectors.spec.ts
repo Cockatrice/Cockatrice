@@ -12,11 +12,6 @@ describe('Selectors', () => {
     expect(Selectors.getRooms(rootState(state))).toBe(state.rooms);
   });
 
-  it('getGames → returns games map', () => {
-    const state = makeRoomsState({ games: { 1: { 1: makeGame() } } });
-    expect(Selectors.getGames(rootState(state))).toBe(state.games);
-  });
-
   it('getRoom → returns room matching roomId', () => {
     const room = makeRoom({ roomId: 1 });
     const state = makeRoomsState({ rooms: { 1: room } });
@@ -76,13 +71,19 @@ describe('Selectors', () => {
   it('getJoinedGames → returns only games whose gameId is in joinedGameIds for that room', () => {
     const game1 = makeGame({ gameId: 1 });
     const game2 = makeGame({ gameId: 2 });
+    const room = makeRoom({ roomId: 1, games: { 1: game1, 2: game2 } });
     const state = makeRoomsState({
-      games: { 1: { 1: game1, 2: game2 } },
+      rooms: { 1: room },
       joinedGameIds: { 1: { 1: true } },
     });
     const result = Selectors.getJoinedGames(rootState(state), 1);
     expect(result).toHaveLength(1);
     expect(result[0]).toBe(game1);
+  });
+
+  it('getJoinedGames → returns empty array when room is unknown', () => {
+    const state = makeRoomsState({ rooms: {}, joinedGameIds: { 1: { 1: true } } });
+    expect(Selectors.getJoinedGames(rootState(state), 1)).toHaveLength(0);
   });
 
   it('getRoomMessages → returns messages array for roomId', () => {
@@ -91,15 +92,41 @@ describe('Selectors', () => {
     expect(Selectors.getRoomMessages(rootState(state), 1)).toBe(messages);
   });
 
-  it('getRoomGames → returns gameList for roomId', () => {
-    const room = makeRoom({ roomId: 1, gameList: [makeGame()] });
+  it('getRoomGames → returns keyed games map for roomId', () => {
+    const game = makeGame({ gameId: 10 });
+    const room = makeRoom({ roomId: 1, games: { 10: game } });
     const state = makeRoomsState({ rooms: { 1: room } });
-    expect(Selectors.getRoomGames(rootState(state), 1)).toBe(room.gameList);
+    expect(Selectors.getRoomGames(rootState(state), 1)).toBe(room.games);
   });
 
-  it('getRoomUsers → returns userList for roomId', () => {
-    const room = makeRoom({ roomId: 1, userList: [makeUser()] });
+  it('getRoomGames → returns EMPTY_GAMES_MAP for unknown roomId', () => {
+    const state = makeRoomsState({ rooms: {} });
+    expect(Selectors.getRoomGames(rootState(state), 999)).toEqual({});
+  });
+
+  it('getRoomUsers → returns keyed users map for roomId', () => {
+    const user = makeUser({ name: 'alice' });
+    const room = makeRoom({ roomId: 1, users: { alice: user } });
     const state = makeRoomsState({ rooms: { 1: room } });
-    expect(Selectors.getRoomUsers(rootState(state), 1)).toBe(room.userList);
+    expect(Selectors.getRoomUsers(rootState(state), 1)).toBe(room.users);
+  });
+
+  it('getSortedRoomGames → returns sorted array view of games map', () => {
+    const game1 = makeGame({ gameId: 1, description: 'beta' });
+    const game2 = makeGame({ gameId: 2, description: 'alpha' });
+    const room = makeRoom({ roomId: 1, games: { 1: game1, 2: game2 } });
+    const state = makeRoomsState({ rooms: { 1: room } });
+    const result = Selectors.getSortedRoomGames(rootState(state), 1);
+    expect(result).toHaveLength(2);
+  });
+
+  it('getSortedRoomUsers → returns sorted user array sorted by name', () => {
+    const zane = makeUser({ name: 'Zane' });
+    const alice = makeUser({ name: 'Alice' });
+    const room = makeRoom({ roomId: 1, users: { Zane: zane, Alice: alice } });
+    const state = makeRoomsState({ rooms: { 1: room } });
+    const result = Selectors.getSortedRoomUsers(rootState(state), 1);
+    expect(result[0].name).toBe('Alice');
+    expect(result[1].name).toBe('Zane');
   });
 });

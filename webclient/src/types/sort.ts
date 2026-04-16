@@ -9,7 +9,8 @@ export interface SortBy<T extends string = string> {
 }
 
 export enum GameSortField {
-  START_TIME = 'startTime'
+  // Nested under `info` because Enriched.Game is a composition type.
+  START_TIME = 'info.startTime'
 }
 
 export enum UserSortField {

@@ -1,5 +1,5 @@
 import { create } from '@bufbuild/protobuf';
-import webClient from '../../WebClient';
+import { WebClient } from '../../WebClient';
 import { Data } from '@app/types';
 
 export function roomSay(roomId: number, message: string): void {
@@ -9,5 +9,5 @@ export function roomSay(roomId: number, message: string): void {
     return;
   }
 
-  webClient.protobuf.sendRoomCommand(roomId, Data.Command_RoomSay_ext, create(Data.Command_RoomSaySchema, { message: trimmed }));
+  WebClient.instance.protobuf.sendRoomCommand(roomId, Data.Command_RoomSay_ext, create(Data.Command_RoomSaySchema, { message: trimmed }));
 }

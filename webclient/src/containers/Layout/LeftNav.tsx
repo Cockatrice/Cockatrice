@@ -8,7 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 
-import { AuthenticationService, RoomsService } from '@app/api';
+import { request } from '@app/api';
 import { CardImportDialog } from '@app/dialogs';
 import { Images } from '@app/images';
 import { RoomsSelectors, ServerSelectors } from '@app/store';
@@ -25,8 +25,8 @@ interface LeftNavState {
 
 const LeftNav = () => {
   const joinedRooms = useAppSelector(state => RoomsSelectors.getJoinedRooms(state));
-  const serverState = useAppSelector(state => ServerSelectors.getState(state));
-  const user = useAppSelector(state => ServerSelectors.getUser(state));
+  const isConnected = useAppSelector(ServerSelectors.getIsConnected);
+  const isModerator = useAppSelector(ServerSelectors.getIsUserModerator);
   const navigate = useNavigate();
   const [state, setState] = useState<LeftNavState>({
     anchorEl: null,
@@ -40,7 +40,7 @@ const LeftNav = () => {
       'Replays',
     ];
 
-    if (user && AuthenticationService.isModerator(user)) {
+    if (isModerator) {
       options = [
         ...options,
         'Administration',
@@ -49,7 +49,7 @@ const LeftNav = () => {
     }
 
     setState(s => ({ ...s, options }));
-  }, [user]);
+  }, [isModerator]);
 
   const handleMenuOpen = (event) => {
     setState(s => ({ ...s, anchorEl: event.target }));
@@ -66,7 +66,7 @@ const LeftNav = () => {
 
   const leaveRoom = (event, roomId) => {
     event.preventDefault();
-    RoomsService.leaveRoom(roomId);
+    request.rooms.leaveRoom(roomId);
   };
 
   const openImportCardWizard = () => {
@@ -85,11 +85,11 @@ const LeftNav = () => {
           <NavLink to={App.RouteEnum.SERVER}>
             <img src={Images.Logo} alt="logo" />
           </NavLink>
-          { AuthenticationService.isConnected(serverState) && (
+          { isConnected && (
             <span className="LeftNav-server__indicator"></span>
           ) }
         </div>
-        { AuthenticationService.isConnected(serverState) && (
+        { isConnected && (
           <div className="LeftNav-content">
             <nav className="LeftNav-nav">
               <nav className="LeftNav-nav__links">
@@ -98,7 +98,7 @@ const LeftNav = () => {
                     className="LeftNav-nav__link-btn"
                     to={
                       joinedRooms.length
-                        ? generatePath(App.RouteEnum.ROOM, { roomId: joinedRooms[0].roomId.toString() })
+                        ? generatePath(App.RouteEnum.ROOM, { roomId: joinedRooms[0].info.roomId.toString() })
                         : App.RouteEnum.SERVER
                     }
                   >
@@ -106,14 +106,14 @@ const LeftNav = () => {
                     <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>
                   <div className="LeftNav-nav__link-menu">
-                    {joinedRooms.map(({ name, roomId }) => (
-                      <div className="LeftNav-nav__link-menu__item" key={roomId}>
+                    {joinedRooms.map((room) => (
+                      <div className="LeftNav-nav__link-menu__item" key={room.info.roomId}>
                         <NavLink className="LeftNav-nav__link-menu__btn"
-                          to={ generatePath(App.RouteEnum.ROOM, { roomId: roomId.toString() }) }
+                          to={ generatePath(App.RouteEnum.ROOM, { roomId: room.info.roomId.toString() }) }
                         >
-                          {name}
+                          {room.info.name}
 
-                          <IconButton size="small" edge="end" onClick={event => leaveRoom(event, roomId)}>
+                          <IconButton size="small" edge="end" onClick={event => leaveRoom(event, room.info.roomId)}>
                             <CloseIcon style={{ fontSize: 10, color: 'white' }} />
                           </IconButton>
                         </NavLink>

@@ -1,85 +1,31 @@
-import { Data } from '@app/types';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Data, Enriched } from '@app/types';
 import { create } from '@bufbuild/protobuf';
-import { GameAction } from './game.actions';
-import { GameEntry, GameMessage, GamesState, PlayerEntry, ZoneEntry } from './game.interfaces';
-import { Types } from './game.types';
+import { GamesState } from './game.interfaces';
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+export const MAX_GAME_MESSAGES = 1000;
 
-function updateGame(state: GamesState, gameId: number, updates: Partial<GameEntry>): GamesState {
-  const game = state.games[gameId];
-  if (!game) {
-    return state;
-  }
-  return {
-    ...state,
-    games: { ...state.games, [gameId]: { ...game, ...updates } },
-  };
-}
-
-function updatePlayer(
-  state: GamesState,
-  gameId: number,
-  playerId: number,
-  updates: Partial<PlayerEntry>
-): GamesState {
-  const game = state.games[gameId];
-  if (!game) {
-    return state;
-  }
-  const player = game.players[playerId];
-  if (!player) {
-    return state;
-  }
-  return updateGame(state, gameId, {
-    players: { ...game.players, [playerId]: { ...player, ...updates } },
-  });
-}
-
-function updateZone(
-  state: GamesState,
-  gameId: number,
-  playerId: number,
-  zoneName: string,
-  updates: Partial<ZoneEntry>
-): GamesState {
-  const game = state.games[gameId];
-  if (!game) {
-    return state;
-  }
-  const player = game.players[playerId];
-  if (!player) {
-    return state;
-  }
-  const zone = player.zones[zoneName];
-  if (!zone) {
-    return state;
-  }
-  return updatePlayer(state, gameId, playerId, {
-    zones: { ...player.zones, [zoneName]: { ...zone, ...updates } },
-  });
-}
-
-function removeGame(state: GamesState, gameId: number): GamesState {
-  const games = { ...state.games };
-  delete games[gameId];
-  return { ...state, games };
-}
-
-/** Converts the proto PlayerInfo[] array into the keyed PlayerEntry map used in the store. */
-function normalizePlayers(playerList: Data.ServerInfo_Player[]): { [playerId: number]: PlayerEntry } {
-  const players: { [playerId: number]: PlayerEntry } = {};
+/** Converts the proto ServerInfo_Player[] array into the keyed PlayerEntry map. */
+function normalizePlayers(playerList: Data.ServerInfo_Player[]): { [playerId: number]: Enriched.PlayerEntry } {
+  const players: { [playerId: number]: Enriched.PlayerEntry } = {};
   for (const player of playerList) {
     const playerId = player.properties.playerId;
 
-    const zones: { [zoneName: string]: ZoneEntry } = {};
+    const zones: { [zoneName: string]: Enriched.ZoneEntry } = {};
     for (const zone of player.zoneList) {
+      const order: number[] = [];
+      const byId: { [id: number]: Data.ServerInfo_Card } = {};
+      for (const card of zone.cardList) {
+        order.push(card.id);
+        byId[card.id] = card;
+      }
       zones[zone.name] = {
         name: zone.name,
         type: zone.type,
         withCoords: zone.withCoords,
         cardCount: zone.cardCount,
-        cards: [...zone.cardList],
+        order,
+        byId,
         alwaysRevealTopCard: zone.alwaysRevealTopCard,
         alwaysLookAtTopCard: zone.alwaysLookAtTopCard,
       };
@@ -115,50 +61,29 @@ function buildEmptyCard(
   providerId: string
 ): Data.ServerInfo_Card {
   return create(Data.ServerInfo_CardSchema, {
-    id,
-    name,
-    x,
-    y,
-    faceDown,
-    tapped: false,
-    attacking: false,
-    color: '',
-    pt: '',
-    annotation: '',
-    destroyOnZoneChange: false,
-    doesntUntap: false,
-    counterList: [],
-    attachPlayerId: -1,
-    attachZone: '',
-    attachCardId: -1,
-    providerId,
+    id, name, x, y, faceDown,
+    tapped: false, attacking: false, color: '', pt: '', annotation: '',
+    destroyOnZoneChange: false, doesntUntap: false, counterList: [],
+    attachPlayerId: -1, attachZone: '', attachCardId: -1, providerId,
   });
 }
 
-// ── Initial state ─────────────────────────────────────────────────────────────
+const initialState: GamesState = { games: {} };
 
-const initialState: GamesState = {
-  games: {},
-};
+export const gamesSlice = createSlice({
+  name: 'games',
+  initialState,
+  reducers: {
+    clearStore: () => initialState,
 
-// ── Reducer ───────────────────────────────────────────────────────────────────
-
-export const gamesReducer = (state: GamesState = initialState, action: GameAction): GamesState => {
-  switch (action.type) {
-    case Types.CLEAR_STORE: {
-      return initialState;
-    }
-
-    case Types.GAME_JOINED: {
-      const { data } = action;
+    gameJoined: (state, action: PayloadAction<{ data: Data.Event_GameJoined }>) => {
+      const { data } = action.payload;
       const gameInfo = data.gameInfo;
       if (!gameInfo) {
-        return state;
+        return;
       }
-      const gameEntry: GameEntry = {
-        gameId: gameInfo.gameId,
-        roomId: gameInfo.roomId,
-        description: gameInfo.description,
+      state.games[gameInfo.gameId] = {
+        info: gameInfo,
         hostId: data.hostId,
         localPlayerId: data.playerId,
         spectator: data.spectator,
@@ -172,574 +97,391 @@ export const gamesReducer = (state: GamesState = initialState, action: GameActio
         players: {},
         messages: [],
       };
-      return {
-        ...state,
-        games: { ...state.games, [gameEntry.gameId]: gameEntry },
-      };
-    }
+    },
 
-    case Types.GAME_LEFT:
-    case Types.GAME_CLOSED:
-    case Types.KICKED: {
-      return removeGame(state, action.gameId);
-    }
+    gameLeft: (state, action: PayloadAction<{ gameId: number }>) => {
+      delete state.games[action.payload.gameId];
+    },
 
-    case Types.GAME_HOST_CHANGED: {
-      return updateGame(state, action.gameId, { hostId: action.hostId });
-    }
+    gameClosed: (state, action: PayloadAction<{ gameId: number }>) => {
+      delete state.games[action.payload.gameId];
+    },
 
-    case Types.GAME_STATE_CHANGED: {
-      const { gameId, data } = action;
+    kicked: (state, action: PayloadAction<{ gameId: number }>) => {
+      delete state.games[action.payload.gameId];
+    },
+
+    gameHostChanged: (state, action: PayloadAction<{ gameId: number; hostId: number }>) => {
+      const { gameId, hostId } = action.payload;
+      const game = state.games[gameId];
+      if (game) {
+        game.hostId = hostId;
+      }
+    },
+
+    gameStateChanged: (state, action: PayloadAction<{ gameId: number; data: Data.Event_GameStateChanged }>) => {
+      const { gameId, data } = action.payload;
       const game = state.games[gameId];
       if (!game) {
-        return state;
+        return;
       }
 
-      const updates: Partial<GameEntry> = {};
       if (data.playerList?.length > 0) {
-        updates.players = normalizePlayers(data.playerList);
+        game.players = normalizePlayers(data.playerList);
       }
       if (data.gameStarted !== undefined && data.gameStarted !== null) {
-        updates.started = data.gameStarted;
+        game.started = data.gameStarted;
       }
       if (data.activePlayerId !== undefined && data.activePlayerId !== null) {
-        updates.activePlayerId = data.activePlayerId;
+        game.activePlayerId = data.activePlayerId;
       }
       if (data.activePhase !== undefined && data.activePhase !== null) {
-        updates.activePhase = data.activePhase;
+        game.activePhase = data.activePhase;
       }
       if (data.secondsElapsed !== undefined) {
-        updates.secondsElapsed = data.secondsElapsed;
+        game.secondsElapsed = data.secondsElapsed;
       }
-      return updateGame(state, gameId, updates);
-    }
+    },
 
-    case Types.PLAYER_JOINED: {
-      const { gameId, playerProperties } = action;
+    playerJoined: (state, action: PayloadAction<{ gameId: number; playerProperties: Data.ServerInfo_PlayerProperties }>) => {
+      const { gameId, playerProperties } = action.payload;
       const game = state.games[gameId];
       if (!game) {
-        return state;
+        return;
       }
-      const newPlayer: PlayerEntry = {
+      game.players[playerProperties.playerId] = {
         properties: playerProperties,
         deckList: '',
         zones: {},
         counters: {},
         arrows: {},
       };
-      return updateGame(state, gameId, {
-        players: { ...game.players, [playerProperties.playerId]: newPlayer },
-      });
-    }
+    },
 
-    case Types.PLAYER_LEFT: {
-      const { gameId, playerId } = action;
+    playerLeft: (state, action: PayloadAction<{ gameId: number; playerId: number }>) => {
+      const { gameId, playerId } = action.payload;
       const game = state.games[gameId];
-      if (!game) {
-        return state;
+      if (game) {
+        delete game.players[playerId];
       }
-      const players = { ...game.players };
-      delete players[playerId];
-      return updateGame(state, gameId, { players });
-    }
+    },
 
-    case Types.PLAYER_PROPERTIES_CHANGED: {
-      return updatePlayer(state, action.gameId, action.playerId, {
-        properties: action.properties,
-      });
-    }
+    playerPropertiesChanged: (
+      state,
+      action: PayloadAction<{ gameId: number; playerId: number; properties: Data.ServerInfo_PlayerProperties }>,
+    ) => {
+      const { gameId, playerId, properties } = action.payload;
+      const player = state.games[gameId]?.players[playerId];
+      if (player) {
+        player.properties = properties;
+      }
+    },
 
     // ── Card manipulation ────────────────────────────────────────────────────
 
-    case Types.CARD_MOVED: {
-      const { gameId, playerId, data } = action;
+    cardMoved: (
+      state,
+      action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_MoveCard }>,
+    ) => {
+      const { gameId, playerId, data } = action.payload;
       const {
-        cardId,
-        cardName,
-        startPlayerId,
-        startZone,
-        position,
-        targetPlayerId,
-        targetZone,
-        x,
-        y,
-        newCardId,
-        faceDown,
-        newCardProviderId,
+        cardId, cardName, startPlayerId, startZone, position,
+        targetPlayerId, targetZone, x, y, newCardId, faceDown, newCardProviderId,
       } = data;
 
       const game = state.games[gameId];
       if (!game) {
-        return state;
+        return;
       }
 
       const effectiveStartPlayerId = startPlayerId >= 0 ? startPlayerId : playerId;
       const sourcePlayer = game.players[effectiveStartPlayerId];
-      const sourceZoneEntry = sourcePlayer?.zones[startZone];
-      if (!sourcePlayer || !sourceZoneEntry) {
-        return state;
+      const sourceZone = sourcePlayer?.zones[startZone];
+      if (!sourcePlayer || !sourceZone) {
+        return;
       }
 
-      // Locate card in source zone (by id for visible zones, by position for hidden)
-      let removedCard: Data.ServerInfo_Card | undefined;
-      let newSourceCards: Data.ServerInfo_Card[];
+      let resolvedCardId = -1;
       if (cardId >= 0) {
-        removedCard = sourceZoneEntry.cards.find(c => c.id === cardId);
-        newSourceCards = sourceZoneEntry.cards.filter(c => c.id !== cardId);
-      } else if (position >= 0 && position < sourceZoneEntry.cards.length) {
-        removedCard = sourceZoneEntry.cards[position];
-        newSourceCards = sourceZoneEntry.cards.filter((_, i) => i !== position);
-      } else {
-        // Hidden zone with unknown position — just decrement count
-        newSourceCards = sourceZoneEntry.cards;
+        resolvedCardId = cardId;
+      } else if (position >= 0 && position < sourceZone.order.length) {
+        resolvedCardId = sourceZone.order[position];
       }
+
+      const removedCard: Data.ServerInfo_Card | undefined =
+        resolvedCardId >= 0 ? sourceZone.byId[resolvedCardId] : undefined;
+
+      if (resolvedCardId >= 0) {
+        const idx = sourceZone.order.indexOf(resolvedCardId);
+        if (idx >= 0) {
+          sourceZone.order.splice(idx, 1);
+        }
+        delete sourceZone.byId[resolvedCardId];
+      }
+      sourceZone.cardCount = Math.max(0, sourceZone.cardCount - 1);
 
       const effectiveNewId = newCardId >= 0 ? newCardId : (removedCard?.id ?? -1);
       const movedCard: Data.ServerInfo_Card = removedCard
         ? {
-          ...removedCard,
-          id: effectiveNewId,
-          name: cardName || removedCard.name,
-          x,
-          y,
-          faceDown,
-          providerId: newCardProviderId || removedCard.providerId,
+          ...removedCard, id: effectiveNewId, name: cardName || removedCard.name,
+          x, y, faceDown, providerId: newCardProviderId || removedCard.providerId,
         }
         : buildEmptyCard(effectiveNewId, cardName, x, y, faceDown, newCardProviderId ?? '');
 
-      let newState = updateZone(state, gameId, effectiveStartPlayerId, startZone, {
-        cards: newSourceCards,
-        cardCount: Math.max(0, sourceZoneEntry.cardCount - 1),
-      });
-
-      const updatedGame = newState.games[gameId];
-      const targetPlayer = updatedGame?.players[targetPlayerId];
+      const targetPlayer = game.players[targetPlayerId];
       const targetZoneEntry = targetPlayer?.zones[targetZone];
       if (!targetPlayer || !targetZoneEntry) {
-        return newState;
+        return;
       }
 
-      newState = updateZone(newState, gameId, targetPlayerId, targetZone, {
-        cards: [...targetZoneEntry.cards, movedCard],
-        cardCount: targetZoneEntry.cardCount + 1,
-      });
-      return newState;
-    }
+      targetZoneEntry.order.push(movedCard.id);
+      targetZoneEntry.byId[movedCard.id] = movedCard;
+      targetZoneEntry.cardCount++;
+    },
 
-    case Types.CARD_FLIPPED: {
-      const { gameId, playerId, data } = action;
+    cardFlipped: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_FlipCard }>) => {
+      const { gameId, playerId, data } = action.payload;
       const { zoneName, cardId, cardName, faceDown, cardProviderId } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
+      const card = state.games[gameId]?.players[playerId]?.zones[zoneName]?.byId[cardId];
+      if (!card) {
+        return;
       }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
+      card.faceDown = faceDown;
+      if (cardName) {
+        card.name = cardName;
       }
-      const zone = player.zones[zoneName];
-      if (!zone) {
-        return state;
+      if (cardProviderId) {
+        card.providerId = cardProviderId;
       }
+    },
 
-      const cardIdx = zone.cards.findIndex(c => c.id === cardId);
-      if (cardIdx < 0) {
-        return state;
-      }
-
-      const updatedCards = [...zone.cards];
-      updatedCards[cardIdx] = {
-        ...updatedCards[cardIdx],
-        faceDown,
-        name: cardName || updatedCards[cardIdx].name,
-        providerId: cardProviderId || updatedCards[cardIdx].providerId,
-      };
-      return updateZone(state, gameId, playerId, zoneName, { cards: updatedCards });
-    }
-
-    case Types.CARD_DESTROYED: {
-      const { gameId, playerId, data } = action;
+    cardDestroyed: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_DestroyCard }>) => {
+      const { gameId, playerId, data } = action.payload;
       const { zoneName, cardId } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
-      }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
-      }
-      const zone = player.zones[zoneName];
+      const zone = state.games[gameId]?.players[playerId]?.zones[zoneName];
       if (!zone) {
-        return state;
+        return;
       }
+      const idx = zone.order.indexOf(cardId);
+      if (idx >= 0) {
+        zone.order.splice(idx, 1);
+      }
+      delete zone.byId[cardId];
+      zone.cardCount = Math.max(0, zone.cardCount - 1);
+    },
 
-      return updateZone(state, gameId, playerId, zoneName, {
-        cards: zone.cards.filter(c => c.id !== cardId),
-        cardCount: Math.max(0, zone.cardCount - 1),
-      });
-    }
-
-    case Types.CARD_ATTACHED: {
-      const { gameId, playerId, data } = action;
+    cardAttached: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_AttachCard }>) => {
+      const { gameId, playerId, data } = action.payload;
       const { startZone, cardId, targetPlayerId, targetZone, targetCardId } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
+      const card = state.games[gameId]?.players[playerId]?.zones[startZone]?.byId[cardId];
+      if (!card) {
+        return;
       }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
-      }
-      const zone = player.zones[startZone];
+      card.attachPlayerId = targetPlayerId;
+      card.attachZone = targetZone;
+      card.attachCardId = targetCardId;
+    },
+
+    tokenCreated: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_CreateToken }>) => {
+      const { gameId, playerId, data } = action.payload;
+      const { zoneName, cardId, cardName, color, pt, annotation, destroyOnZoneChange, x, y, cardProviderId, faceDown } = data;
+      const zone = state.games[gameId]?.players[playerId]?.zones[zoneName];
       if (!zone) {
-        return state;
+        return;
       }
-
-      const cardIdx = zone.cards.findIndex(c => c.id === cardId);
-      if (cardIdx < 0) {
-        return state;
-      }
-
-      const updatedCards = [...zone.cards];
-      updatedCards[cardIdx] = {
-        ...updatedCards[cardIdx],
-        attachPlayerId: targetPlayerId,
-        attachZone: targetZone,
-        attachCardId: targetCardId,
-      };
-      return updateZone(state, gameId, playerId, startZone, { cards: updatedCards });
-    }
-
-    case Types.TOKEN_CREATED: {
-      const { gameId, playerId, data } = action;
-      const {
-        zoneName,
-        cardId,
-        cardName,
-        color,
-        pt,
-        annotation,
-        destroyOnZoneChange,
-        x,
-        y,
-        cardProviderId,
-        faceDown,
-      } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
-      }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
-      }
-      const zone = player.zones[zoneName];
-      if (!zone) {
-        return state;
-      }
-
-      const newCard: Data.ServerInfo_Card = create(Data.ServerInfo_CardSchema, {
-        id: cardId,
-        name: cardName,
-        x,
-        y,
-        faceDown,
-        tapped: false,
-        attacking: false,
-        color,
-        pt,
-        annotation,
-        destroyOnZoneChange,
-        doesntUntap: false,
-        counterList: [],
-        attachPlayerId: -1,
-        attachZone: '',
-        attachCardId: -1,
-        providerId: cardProviderId,
+      const newCard = create(Data.ServerInfo_CardSchema, {
+        id: cardId, name: cardName, x, y, faceDown,
+        tapped: false, attacking: false, color, pt, annotation, destroyOnZoneChange,
+        doesntUntap: false, counterList: [],
+        attachPlayerId: -1, attachZone: '', attachCardId: -1, providerId: cardProviderId,
       });
-      return updateZone(state, gameId, playerId, zoneName, {
-        cards: [...zone.cards, newCard],
-        cardCount: zone.cardCount + 1,
-      });
-    }
+      zone.order.push(newCard.id);
+      zone.byId[newCard.id] = newCard;
+      zone.cardCount++;
+    },
 
-    case Types.CARD_ATTR_CHANGED: {
-      const { gameId, playerId, data } = action;
+    cardAttrChanged: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_SetCardAttr }>) => {
+      const { gameId, playerId, data } = action.payload;
       const { zoneName, cardId, attribute, attrValue } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
+      const card = state.games[gameId]?.players[playerId]?.zones[zoneName]?.byId[cardId];
+      if (!card) {
+        return;
       }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
-      }
-      const zone = player.zones[zoneName];
-      if (!zone) {
-        return state;
-      }
-
-      const cardIdx = zone.cards.findIndex(c => c.id === cardId);
-      if (cardIdx < 0) {
-        return state;
-      }
-
-      const attrPatch: Partial<Data.ServerInfo_Card> = {};
       switch (attribute as Data.CardAttribute) {
-        case Data.CardAttribute.AttrTapped: attrPatch.tapped = attrValue === '1'; break;
-        case Data.CardAttribute.AttrAttacking: attrPatch.attacking = attrValue === '1'; break;
-        case Data.CardAttribute.AttrFaceDown: attrPatch.faceDown = attrValue === '1'; break;
-        case Data.CardAttribute.AttrColor: attrPatch.color = attrValue; break;
-        case Data.CardAttribute.AttrPT: attrPatch.pt = attrValue; break;
-        case Data.CardAttribute.AttrAnnotation: attrPatch.annotation = attrValue; break;
-        case Data.CardAttribute.AttrDoesntUntap: attrPatch.doesntUntap = attrValue === '1'; break;
+        case Data.CardAttribute.AttrTapped: card.tapped = attrValue === '1'; break;
+        case Data.CardAttribute.AttrAttacking: card.attacking = attrValue === '1'; break;
+        case Data.CardAttribute.AttrFaceDown: card.faceDown = attrValue === '1'; break;
+        case Data.CardAttribute.AttrColor: card.color = attrValue; break;
+        case Data.CardAttribute.AttrPT: card.pt = attrValue; break;
+        case Data.CardAttribute.AttrAnnotation: card.annotation = attrValue; break;
+        case Data.CardAttribute.AttrDoesntUntap: card.doesntUntap = attrValue === '1'; break;
       }
+    },
 
-      const updatedCards = [...zone.cards];
-      updatedCards[cardIdx] = { ...updatedCards[cardIdx], ...attrPatch };
-      return updateZone(state, gameId, playerId, zoneName, { cards: updatedCards });
-    }
-
-    case Types.CARD_COUNTER_CHANGED: {
-      const { gameId, playerId, data } = action;
+    cardCounterChanged: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_SetCardCounter }>) => {
+      const { gameId, playerId, data } = action.payload;
       const { zoneName, cardId, counterId, counterValue } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
+      const card = state.games[gameId]?.players[playerId]?.zones[zoneName]?.byId[cardId];
+      if (!card) {
+        return;
       }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
-      }
-      const zone = player.zones[zoneName];
-      if (!zone) {
-        return state;
-      }
-
-      const cardIdx = zone.cards.findIndex(c => c.id === cardId);
-      if (cardIdx < 0) {
-        return state;
-      }
-
-      const card = zone.cards[cardIdx];
-      let newCounterList: Data.ServerInfo_CardCounter[];
       if (counterValue <= 0) {
-        newCounterList = card.counterList.filter(c => c.id !== counterId);
+        card.counterList = card.counterList.filter(c => c.id !== counterId);
       } else {
-        const existing = card.counterList.findIndex(c => c.id === counterId);
-        newCounterList =
-          existing >= 0
-            ? card.counterList.map(c => (c.id === counterId ? { ...c, value: counterValue } : c))
-            : [...card.counterList, create(Data.ServerInfo_CardCounterSchema, { id: counterId, value: counterValue })];
+        const idx = card.counterList.findIndex(c => c.id === counterId);
+        if (idx >= 0) {
+          card.counterList[idx] = { ...card.counterList[idx], value: counterValue };
+        } else {
+          card.counterList.push(create(Data.ServerInfo_CardCounterSchema, { id: counterId, value: counterValue }));
+        }
       }
-
-      const updatedCards = [...zone.cards];
-      updatedCards[cardIdx] = { ...card, counterList: newCounterList };
-      return updateZone(state, gameId, playerId, zoneName, { cards: updatedCards });
-    }
+    },
 
     // ── Arrows ───────────────────────────────────────────────────────────────
 
-    case Types.ARROW_CREATED: {
-      const { gameId, playerId, data } = action;
-      const { arrowInfo } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
+    arrowCreated: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_CreateArrow }>) => {
+      const { gameId, playerId, data } = action.payload;
+      const player = state.games[gameId]?.players[playerId];
+      if (player) {
+        player.arrows[data.arrowInfo.id] = data.arrowInfo;
       }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
-      }
-      return updatePlayer(state, gameId, playerId, {
-        arrows: { ...player.arrows, [arrowInfo.id]: arrowInfo },
-      });
-    }
+    },
 
-    case Types.ARROW_DELETED: {
-      const { gameId, playerId, data } = action;
-      const { arrowId } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
+    arrowDeleted: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_DeleteArrow }>) => {
+      const { gameId, playerId, data } = action.payload;
+      const player = state.games[gameId]?.players[playerId];
+      if (player) {
+        delete player.arrows[data.arrowId];
       }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
-      }
-      const arrows = { ...player.arrows };
-      delete arrows[arrowId];
-      return updatePlayer(state, gameId, playerId, { arrows });
-    }
+    },
 
     // ── Player counters ───────────────────────────────────────────────────────
 
-    case Types.COUNTER_CREATED: {
-      const { gameId, playerId, data } = action;
-      const { counterInfo } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
+    counterCreated: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_CreateCounter }>) => {
+      const { gameId, playerId, data } = action.payload;
+      const player = state.games[gameId]?.players[playerId];
+      if (player) {
+        player.counters[data.counterInfo.id] = data.counterInfo;
       }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
-      }
-      return updatePlayer(state, gameId, playerId, {
-        counters: { ...player.counters, [counterInfo.id]: counterInfo },
-      });
-    }
+    },
 
-    case Types.COUNTER_SET: {
-      const { gameId, playerId, data } = action;
-      const { counterId, value } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
+    counterSet: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_SetCounter }>) => {
+      const { gameId, playerId, data } = action.payload;
+      const counter = state.games[gameId]?.players[playerId]?.counters[data.counterId];
+      if (counter) {
+        counter.count = data.value;
       }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
-      }
-      const counter = player.counters[counterId];
-      if (!counter) {
-        return state;
-      }
-      return updatePlayer(state, gameId, playerId, {
-        counters: { ...player.counters, [counterId]: { ...counter, count: value } },
-      });
-    }
+    },
 
-    case Types.COUNTER_DELETED: {
-      const { gameId, playerId, data } = action;
-      const { counterId } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
+    counterDeleted: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_DelCounter }>) => {
+      const { gameId, playerId, data } = action.payload;
+      const player = state.games[gameId]?.players[playerId];
+      if (player) {
+        delete player.counters[data.counterId];
       }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
-      }
-      const counters = { ...player.counters };
-      delete counters[counterId];
-      return updatePlayer(state, gameId, playerId, { counters });
-    }
+    },
 
     // ── Zone operations ───────────────────────────────────────────────────────
 
-    case Types.CARDS_DRAWN: {
-      const { gameId, playerId, data } = action;
+    cardsDrawn: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_DrawCards }>) => {
+      const { gameId, playerId, data } = action.payload;
       const { number: drawCount, cards } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
-      }
-      const player = game.players[playerId];
+      const player = state.games[gameId]?.players[playerId];
       if (!player) {
-        return state;
+        return;
       }
 
       const deckZone = player.zones['deck'];
       const handZone = player.zones['hand'];
       if (!handZone) {
-        return state;
+        return;
       }
 
-      // Decrement deck count for the drawing player
-      let newState = deckZone
-        ? updateZone(state, gameId, playerId, 'deck', {
-          cardCount: Math.max(0, deckZone.cardCount - drawCount),
-        })
-        : state;
+      if (deckZone) {
+        deckZone.cardCount = Math.max(0, deckZone.cardCount - drawCount);
+      }
 
-      // Append revealed cards to hand (cards array is empty for non-drawing players;
-      // use drawCount for count math so all observers track the correct hand/deck size)
-      const updatedHand = newState.games[gameId]!.players[playerId]!.zones['hand']!;
-      return updateZone(newState, gameId, playerId, 'hand', {
-        cards: [...updatedHand.cards, ...cards],
-        cardCount: updatedHand.cardCount + drawCount,
-      });
-    }
+      for (const card of cards) {
+        handZone.order.push(card.id);
+        handZone.byId[card.id] = card;
+      }
+      handZone.cardCount += drawCount;
+    },
 
-    case Types.CARDS_REVEALED: {
-      const { gameId, playerId, data } = action;
+    cardsRevealed: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_RevealCards }>) => {
+      const { gameId, playerId, data } = action.payload;
       const { zoneName, cards } = data;
-      const game = state.games[gameId];
-      if (!game) {
-        return state;
-      }
-      const player = game.players[playerId];
-      if (!player) {
-        return state;
-      }
-      const zone = player.zones[zoneName];
+      const zone = state.games[gameId]?.players[playerId]?.zones[zoneName];
       if (!zone) {
-        return state;
+        return;
       }
 
-      // Merge revealed card data into existing zone cards (update existing, append new)
-      const merged = [...zone.cards];
       for (const revealedCard of cards) {
-        const idx = merged.findIndex(c => c.id === revealedCard.id);
-        if (idx >= 0) {
-          merged[idx] = { ...merged[idx], ...revealedCard };
+        if (zone.byId[revealedCard.id]) {
+          Object.assign(zone.byId[revealedCard.id], revealedCard);
         } else {
-          merged.push(revealedCard);
+          zone.order.push(revealedCard.id);
+          zone.byId[revealedCard.id] = revealedCard;
         }
       }
-      return updateZone(state, gameId, playerId, zoneName, { cards: merged });
-    }
+    },
 
-    case Types.ZONE_PROPERTIES_CHANGED: {
-      const { gameId, playerId, data } = action;
-      const { zoneName, alwaysRevealTopCard, alwaysLookAtTopCard } = data;
-      const patch: Partial<ZoneEntry> = {};
-      if (alwaysRevealTopCard !== undefined && alwaysRevealTopCard !== null) {
-        patch.alwaysRevealTopCard = alwaysRevealTopCard;
+    zonePropertiesChanged: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_ChangeZoneProperties }>) => {
+      const { gameId, playerId, data } = action.payload;
+      const zone = state.games[gameId]?.players[playerId]?.zones[data.zoneName];
+      if (!zone) {
+        return;
       }
-      if (alwaysLookAtTopCard !== undefined && alwaysLookAtTopCard !== null) {
-        patch.alwaysLookAtTopCard = alwaysLookAtTopCard;
+      if (data.alwaysRevealTopCard !== undefined && data.alwaysRevealTopCard !== null) {
+        zone.alwaysRevealTopCard = data.alwaysRevealTopCard;
       }
-      return updateZone(state, gameId, playerId, zoneName, patch);
-    }
+      if (data.alwaysLookAtTopCard !== undefined && data.alwaysLookAtTopCard !== null) {
+        zone.alwaysLookAtTopCard = data.alwaysLookAtTopCard;
+      }
+    },
 
     // ── Turn / phase ──────────────────────────────────────────────────────────
 
-    case Types.ACTIVE_PLAYER_SET: {
-      return updateGame(state, action.gameId, { activePlayerId: action.activePlayerId });
-    }
+    activePlayerSet: (state, action: PayloadAction<{ gameId: number; activePlayerId: number }>) => {
+      const game = state.games[action.payload.gameId];
+      if (game) {
+        game.activePlayerId = action.payload.activePlayerId;
+      }
+    },
 
-    case Types.ACTIVE_PHASE_SET: {
-      return updateGame(state, action.gameId, { activePhase: action.phase });
-    }
+    activePhaseSet: (state, action: PayloadAction<{ gameId: number; phase: number }>) => {
+      const game = state.games[action.payload.gameId];
+      if (game) {
+        game.activePhase = action.payload.phase;
+      }
+    },
 
-    case Types.TURN_REVERSED: {
-      return updateGame(state, action.gameId, { reversed: action.reversed });
-    }
+    turnReversed: (state, action: PayloadAction<{ gameId: number; reversed: boolean }>) => {
+      const game = state.games[action.payload.gameId];
+      if (game) {
+        game.reversed = action.payload.reversed;
+      }
+    },
 
     // ── Chat ──────────────────────────────────────────────────────────────────
 
-    case Types.GAME_SAY: {
-      const { gameId, playerId, message } = action;
+    gameSay: (state, action: PayloadAction<{ gameId: number; playerId: number; message: string }>) => {
+      const { gameId, playerId, message } = action.payload;
       const game = state.games[gameId];
       if (!game) {
-        return state;
+        return;
       }
-      const newMessage: GameMessage = { playerId, message, timeReceived: Date.now() };
-      return updateGame(state, gameId, {
-        messages: [...game.messages, newMessage],
-      });
-    }
+      if (game.messages.length >= MAX_GAME_MESSAGES) {
+        game.messages = game.messages.slice(game.messages.length - MAX_GAME_MESSAGES + 1);
+      }
+      game.messages.push({ playerId, message, timeReceived: Date.now() });
+    },
 
-    // ── Log-only events (state unchanged, future game log will use these) ─────
-    case Types.ZONE_SHUFFLED:
-    case Types.ZONE_DUMPED:
-    case Types.DIE_ROLLED: {
-      return state;
-    }
+    // ── Log-only events ─────────────────────────────────────────────────────
+    zoneShuffled: (_state, _action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_Shuffle }>) => {},
+    zoneDumped: (_state, _action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_DumpZone }>) => {},
+    dieRolled: (_state, _action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_RollDie }>) => {},
+  },
+});
 
-    default:
-      return state;
-  }
-};
+export const gamesReducer = gamesSlice.reducer;

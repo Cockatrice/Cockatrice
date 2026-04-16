@@ -25,5 +25,3 @@ export {
   Dispatch as RoomsDispatch } from './rooms';
 
 export * from './rooms/rooms.interfaces';
-
-

@@ -3,20 +3,43 @@ import { App, Enriched } from '@app/types';
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
 import { ping } from './commands/session';
-
-import { GameDispatch } from '@app/store';
-import { RoomPersistence, SessionPersistence } from './persistence';
+import { IWebClientResponse, IWebClientRequest } from './interfaces';
 
 export class WebClient {
+  private static _instance: WebClient | null = null;
+
+  public static get instance(): WebClient {
+    if (!WebClient._instance) {
+      throw new Error(
+        'WebClient has not been initialized. Instantiate it via `new WebClient(response, request)` before accessing `WebClient.instance`.'
+      );
+    }
+    return WebClient._instance;
+  }
+
   public socket: WebSocketService;
   public protobuf: ProtobufService;
+  public response: IWebClientResponse;
+  public request: IWebClientRequest;
 
   public options: Enriched.WebSocketConnectOptions | null = null;
   public status: App.StatusEnum;
 
-  constructor() {
+  constructor(response: IWebClientResponse, request: IWebClientRequest) {
+    if (WebClient._instance) {
+      throw new Error('WebClient is a singleton and has already been initialized.');
+    }
+
+    this.response = response;
+    this.request = request;
+
     this.socket = new WebSocketService({
       keepAliveFn: (cb) => ping(cb),
+      response,
+      onStatusChange: (status, description) => {
+        this.response.session.updateStatus(status, description);
+        this.updateStatus(status);
+      },
     });
 
     this.protobuf = new ProtobufService({
@@ -28,7 +51,9 @@ export class WebClient {
       this.protobuf.handleMessageEvent(message);
     });
 
-    SessionPersistence.initialized();
+    WebClient._instance = this;
+
+    this.response.session.initialized();
 
     if (import.meta.env.MODE !== 'test') {
       console.log(this);
@@ -36,7 +61,7 @@ export class WebClient {
   }
 
   public connect(options: Enriched.WebSocketConnectOptions) {
-    SessionPersistence.connectionAttempted();
+    this.response.session.connectionAttempted();
     this.options = options;
     this.socket.connect(options);
   }
@@ -54,17 +79,6 @@ export class WebClient {
 
     if (status === App.StatusEnum.DISCONNECTED) {
       this.protobuf.resetCommands();
-      this.clearStores();
     }
   }
-
-  private clearStores() {
-    GameDispatch.clearStore();
-    RoomPersistence.clearStore();
-    SessionPersistence.clearStore();
-  }
 }
-
-const webClient = new WebClient();
-
-export default webClient;

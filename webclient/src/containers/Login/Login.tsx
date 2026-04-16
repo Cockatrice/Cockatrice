@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
-import { AuthenticationService } from '@app/api';
+import { request } from '@app/api';
 import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, AccountActivationDialog } from '@app/dialogs';
 import { LanguageDropdown } from '@app/components';
 import { LoginForm } from '@app/forms';
@@ -65,11 +65,9 @@ const Root = styled('div')(({ theme }) => ({
 }));
 
 const Login = () => {
-  const state = useAppSelector(s => ServerSelectors.getState(s));
   const description = useAppSelector(s => ServerSelectors.getDescription(s));
+  const isConnected = useAppSelector(ServerSelectors.getIsConnected);
   const { t } = useTranslation();
-
-  const isConnected = AuthenticationService.isConnected(state);
 
   const [pendingActivationOptions, setPendingActivationOptions] = useState<Enriched.PendingActivationContext | null>(null);
 
@@ -104,7 +102,7 @@ const Login = () => {
     setPendingActivationOptions(null);
   }, ServerTypes.ACCOUNT_ACTIVATION_SUCCESS, []);
 
-  useReduxEffect(({ options }) => {
+  useReduxEffect(({ payload: { options } }) => {
     setPendingActivationOptions(options);
     closeRegistrationDialog();
     openActivateAccountDialog();
@@ -114,7 +112,7 @@ const Login = () => {
     resetSubmitButton();
   }, [ServerTypes.CONNECTION_FAILED, ServerTypes.LOGIN_FAILED], []);
 
-  useReduxEffect(({ options: { hashedPassword } }) => {
+  useReduxEffect(({ payload: { options: { hashedPassword } } }) => {
     updateHost(hashedPassword, rememberLogin);
   }, ServerTypes.LOGIN_SUCCESSFUL, [rememberLogin]);
 
@@ -136,7 +134,7 @@ const Login = () => {
       options.hashedPassword = selectedHost.hashedPassword;
     }
 
-    AuthenticationService.login(options);
+    request.authentication.login(options);
   }, []);
 
   const [submitButtonDisabled, resetSubmitButton, handleLogin] = useFireOnce(onSubmitLogin);
@@ -155,7 +153,7 @@ const Login = () => {
     setRememberLogin(registerForm);
     const { userName, password, email, country, realName, selectedHost } = registerForm;
 
-    AuthenticationService.register({
+    request.authentication.register({
       ...App.getHostPort(selectedHost),
       userName,
       password,
@@ -169,7 +167,7 @@ const Login = () => {
     if (!pendingActivationOptions) {
       return;
     }
-    AuthenticationService.activateAccount({
+    request.authentication.activateAccount({
       host: pendingActivationOptions.host,
       port: pendingActivationOptions.port,
       userName: pendingActivationOptions.userName,
@@ -182,17 +180,17 @@ const Login = () => {
     const { host, port } = App.getHostPort(selectedHost);
 
     if (email) {
-      AuthenticationService.resetPasswordChallenge({ userName, email, host, port });
+      request.authentication.resetPasswordChallenge({ userName, email, host, port });
     } else {
       setUserToResetPassword(userName);
-      AuthenticationService.resetPasswordRequest({ userName, host, port });
+      request.authentication.resetPasswordRequest({ userName, host, port });
     }
   };
 
   const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }) => {
     const { host, port } = App.getHostPort(selectedHost);
 
-    AuthenticationService.resetPassword({ userName, token, newPassword, host, port });
+    request.authentication.resetPassword({ userName, token, newPassword, host, port });
   };
 
   const skipTokenRequest = (userName) => {

@@ -1,6 +1,5 @@
 // eslint-disable-next-line
 import React from "react";
-import * as _ from 'lodash';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -24,20 +23,21 @@ interface OpenGamesProps {
 }
 
 const OpenGames = ({ room }: OpenGamesProps) => {
+  const roomId = room.info.roomId;
   const sortBy = useAppSelector(state => RoomsSelectors.getSortGamesBy(state));
+  const sortedGames = useAppSelector(state => RoomsSelectors.getSortedRoomGames(state, roomId));
 
   const headerCells = [
-    { label: 'Age', field: 'startTime' },
-    { label: 'Description', field: 'description' },
-    { label: 'Creator', field: 'creatorInfo.name' },
+    { label: 'Age', field: 'info.startTime' },
+    { label: 'Description', field: 'info.description' },
+    { label: 'Creator', field: 'info.creatorInfo.name' },
     { label: 'Type', field: 'gameType' },
     { label: 'Restrictions' },
     { label: 'Players' },
-    { label: 'Spectators', field: 'spectatorsCount' },
+    { label: 'Spectators', field: 'info.spectatorsCount' },
   ];
 
   const handleSort = (sortByField) => {
-    const { roomId } = room;
     const { field, order } = SortUtil.toggleSortBy(sortByField, sortBy);
     RoomsDispatch.sortGames(roomId, field, order);
   };
@@ -49,10 +49,10 @@ const OpenGames = ({ room }: OpenGamesProps) => {
 
   const isBuddiesOnlyGame = ({ onlyBuddies }) => !onlyBuddies;
 
-  const games = room.gameList.filter(game => (
-    isUnavailableGame(game) &&
-    isPasswordProtectedGame(game) &&
-    isBuddiesOnlyGame(game)
+  const games = sortedGames.filter(game => (
+    isUnavailableGame(game.info) &&
+    isPasswordProtectedGame(game.info) &&
+    isBuddiesOnlyGame(game.info)
   ));
 
   return (
@@ -60,7 +60,7 @@ const OpenGames = ({ room }: OpenGamesProps) => {
       <Table size="small">
         <TableHead>
           <TableRow>
-            { _.map(headerCells, ({ label, field }) => {
+            { headerCells.map(({ label, field }) => {
               const active = field === sortBy.field;
               const order = sortBy.order.toLowerCase();
               const sortDirection = active ? (order === 'asc' ? 'asc' : 'desc') : false;
@@ -82,25 +82,29 @@ const OpenGames = ({ room }: OpenGamesProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          { _.map(games, ({ description, gameId, gameType, creatorInfo, maxPlayers, playerCount, spectatorsCount, startTime }) => (
-            <TableRow key={gameId}>
-              <TableCell className="games-header__cell single-line-ellipsis">{startTime}</TableCell>
-              <TableCell className="games-header__cell">
-                <Tooltip title={description} placement="bottom-start" enterDelay={500}>
-                  <div className="single-line-ellipsis">
-                    {description}
-                  </div>
-                </Tooltip>
-              </TableCell>
-              <TableCell className="games-header__cell">
-                <UserDisplay user={ creatorInfo } />
-              </TableCell>
-              <TableCell className="games-header__cell single-line-ellipsis">{gameType}</TableCell>
-              <TableCell className="games-header__cell single-line-ellipsis">?</TableCell>
-              <TableCell className="games-header__cell single-line-ellipsis">{`${playerCount}/${maxPlayers}`}</TableCell>
-              <TableCell className="games-header__cell single-line-ellipsis">{spectatorsCount}</TableCell>
-            </TableRow>
-          ))}
+          { games.map((game) => {
+            const { info, gameType } = game;
+            const { description, gameId, creatorInfo, maxPlayers, playerCount, spectatorsCount, startTime } = info;
+            return (
+              <TableRow key={gameId}>
+                <TableCell className="games-header__cell single-line-ellipsis">{startTime}</TableCell>
+                <TableCell className="games-header__cell">
+                  <Tooltip title={description} placement="bottom-start" enterDelay={500}>
+                    <div className="single-line-ellipsis">
+                      {description}
+                    </div>
+                  </Tooltip>
+                </TableCell>
+                <TableCell className="games-header__cell">
+                  <UserDisplay user={ creatorInfo } />
+                </TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">{gameType}</TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">?</TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">{`${playerCount}/${maxPlayers}`}</TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">{spectatorsCount}</TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

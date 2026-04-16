@@ -16,10 +16,49 @@ export function makeUser(
   });
 }
 
-export function makeRoom(overrides: Partial<Omit<Enriched.Room, '$typeName' | '$unknown'>> = {}): Enriched.Room {
-  const { gametypeMap = {}, order = 0, gameList = [], ...protoOverrides } = overrides;
+type MakeGameOverrides = MessageInitShape<typeof Data.ServerInfo_GameSchema> & {
+  gameType?: string;
+};
+
+/**
+ * Test fixture for Enriched.Game.
+ *
+ * Accepts proto field shorthands (gameId, description, etc.) which populate
+ * `info`, plus the top-level client field `gameType`.
+ */
+export function makeGame(overrides: MakeGameOverrides = {}): Enriched.Game {
+  const { gameType = '', ...protoFields } = overrides;
   return {
-    ...create(Data.ServerInfo_RoomSchema, {
+    info: create(Data.ServerInfo_GameSchema, {
+      gameId: 1,
+      roomId: 1,
+      description: 'Test Game',
+      gameTypes: [],
+      started: false,
+      ...protoFields,
+    }),
+    gameType,
+  };
+}
+
+type MakeRoomOverrides = MessageInitShape<typeof Data.ServerInfo_RoomSchema> & {
+  gametypeMap?: Enriched.GametypeMap;
+  order?: number;
+  games?: { [gameId: number]: Enriched.Game };
+  users?: { [userName: string]: Data.ServerInfo_User };
+};
+
+/**
+ * Test fixture for Enriched.Room.
+ *
+ * Accepts proto field shorthands (roomId, name, etc.) which populate `info`,
+ * plus normalized collections (games, users, gametypeMap) and the client-only
+ * `order` field.
+ */
+export function makeRoom(overrides: MakeRoomOverrides = {}): Enriched.Room {
+  const { gametypeMap = {}, order = 0, games = {}, users = {}, ...protoFields } = overrides;
+  return {
+    info: create(Data.ServerInfo_RoomSchema, {
       roomId: 1,
       name: 'Test Room',
       description: '',
@@ -29,29 +68,12 @@ export function makeRoom(overrides: Partial<Omit<Enriched.Room, '$typeName' | '$
       autoJoin: false,
       playerCount: 0,
       userList: [],
-      ...protoOverrides,
+      ...protoFields,
     }),
-    gameList,
     gametypeMap,
     order,
-  };
-}
-
-export function makeGame(
-  overrides: Partial<Omit<Enriched.Game & { startTime: number }, '$typeName' | '$unknown'>> = {},
-): Enriched.Game & { startTime: number } {
-  const { gameType = '', startTime = 0, ...protoOverrides } = overrides;
-  return {
-    ...create(Data.ServerInfo_GameSchema, {
-      gameId: 1,
-      roomId: 1,
-      description: 'Test Game',
-      gameTypes: [],
-      started: false,
-      ...protoOverrides,
-    }),
-    gameType,
-    startTime,
+    games,
+    users,
   };
 }
 
@@ -72,7 +94,6 @@ export function makeRoomsState(overrides: Partial<RoomsState> = {}): RoomsState 
     rooms: {
       1: makeRoom({ roomId: 1 }),
     },
-    games: {},
     joinedRoomIds: {},
     joinedGameIds: {},
     messages: {},

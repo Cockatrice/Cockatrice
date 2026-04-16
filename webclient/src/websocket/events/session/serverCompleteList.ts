@@ -1,7 +1,7 @@
 import type { Data } from '@app/types';
-import { RoomPersistence, SessionPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function serverCompleteList({ userList, roomList }: Data.Event_ServerCompleteList): void {
-  SessionPersistence.updateUsers(userList);
-  RoomPersistence.updateRooms(roomList);
+  WebClient.instance.response.session.updateUsers(userList);
+  WebClient.instance.response.room.updateRooms(roomList);
 }

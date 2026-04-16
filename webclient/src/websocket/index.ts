@@ -1,3 +1,4 @@
 export * from './commands';
+export * from './interfaces';
 
-export { default as webClient } from './WebClient';
+export { WebClient } from './WebClient';

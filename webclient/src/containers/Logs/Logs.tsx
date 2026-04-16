@@ -1,8 +1,7 @@
 // eslint-disable-next-line
 import React, { useEffect } from "react";
-import * as _ from 'lodash';
 
-import { ModeratorService } from '@app/api';
+import { request } from '@app/api';
 import { AuthGuard, ModGuard } from '@app/components';
 import { SearchForm } from '@app/forms';
 import { ServerDispatch, ServerSelectors } from '@app/store';
@@ -23,33 +22,27 @@ const Logs = () => {
   }, []);
 
   const trimFields = (fields) => {
-    return _.reduce(fields, (obj: any, field, key) => {
+    const result: any = {};
+    for (const [key, field] of Object.entries(fields)) {
       if (typeof field === 'string') {
-        const trimmed = _.trim(field);
-        if (!!trimmed) {
-          obj[key] = trimmed;
+        const trimmed = field.trim();
+        if (trimmed) {
+          result[key] = trimmed;
         }
       } else {
-        obj[key] = field;
+        result[key] = field;
       }
-      return obj;
-    }, {});
+    }
+    return result;
   };
 
-  const flattenLogLocations = (logLocations) => {
-    return _.reduce(logLocations, (arr: any[], loc, key) => {
-      arr.push(key);
-      return arr;
-    }, []);
-  };
+  const flattenLogLocations = (logLocations) => Object.keys(logLocations);
 
   const onSubmit = (fields: Data.ViewLogHistoryParams) => {
     const trimmedFields: any = trimFields(fields);
     const { userName, ipAddress, gameName, gameId, message, logLocation } = trimmedFields;
 
-    const required = _.filter({
-      userName, ipAddress, gameName, gameId, message
-    }, field => field);
+    const required = [userName, ipAddress, gameName, gameId, message].filter(Boolean);
 
     if (logLocation) {
       trimmedFields.logLocation = flattenLogLocations(logLocation);
@@ -57,8 +50,8 @@ const Logs = () => {
 
     trimmedFields.maximumResults = MAXIMUM_RESULTS;
 
-    if (_.size(required)) {
-      ModeratorService.viewLogHistory(trimmedFields);
+    if (required.length) {
+      request.moderator.viewLogHistory(trimmedFields);
     } else {
       // @TODO use yet-to-be-implemented banner/alert
     }

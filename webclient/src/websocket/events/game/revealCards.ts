@@ -1,6 +1,6 @@
 import type { Data, Enriched } from '@app/types';
-import { GamePersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function revealCards(data: Data.Event_RevealCards, meta: Enriched.GameEventMeta): void {
-  GamePersistence.cardsRevealed(meta.gameId, meta.playerId, data);
+  WebClient.instance.response.game.cardsRevealed(meta.gameId, meta.playerId, data);
 }

@@ -1,16 +1,15 @@
 /**
  * Shared mock shape factories for session command specs.
  *
- * Usage inside vi.mock() factory callbacks (require is used because
- * vi.mock() is hoisted above imports):
+ * Usage inside vi.mock() factory callbacks:
  *
- *   vi.mock('../../WebClient', () => {
- *     const { makeWebClientMock } = require('../../__mocks__/sessionCommandMocks');
- *     return { __esModule: true, default: makeWebClientMock() };
+ *   vi.mock('../../WebClient', async () => {
+ *     const { makeWebClientMock } = await import('../../__mocks__/sessionCommandMocks');
+ *     return { WebClient: { instance: makeWebClientMock() } };
  *   });
  */
 
-/** Superset WebClient mock — covers all properties used across both session spec files. */
+/** Superset WebClient instance mock — covers all properties used across both session spec files. */
 export function makeWebClientMock() {
   return {
     connect: vi.fn(),
@@ -21,6 +20,17 @@ export function makeWebClientMock() {
     status: 0,
     protobuf: {
       sendSessionCommand: vi.fn(),
+      sendRoomCommand: vi.fn(),
+      sendGameCommand: vi.fn(),
+      sendAdminCommand: vi.fn(),
+      sendModeratorCommand: vi.fn(),
+    },
+    response: {
+      session: makeSessionPersistenceMock(),
+      room: { joinRoom: vi.fn() },
+      game: {},
+      admin: {},
+      moderator: {},
     },
   };
 }

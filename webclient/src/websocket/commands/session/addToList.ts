@@ -1,7 +1,6 @@
 import { create } from '@bufbuild/protobuf';
-import webClient from '../../WebClient';
+import { WebClient } from '../../WebClient';
 
-import { SessionPersistence } from '../../persistence';
 import { Data } from '@app/types';
 
 export function addToBuddyList(userName: string): void {
@@ -13,9 +12,9 @@ export function addToIgnoreList(userName: string): void {
 }
 
 export function addToList(list: string, userName: string): void {
-  webClient.protobuf.sendSessionCommand(Data.Command_AddToList_ext, create(Data.Command_AddToListSchema, { list, userName }), {
+  WebClient.instance.protobuf.sendSessionCommand(Data.Command_AddToList_ext, create(Data.Command_AddToListSchema, { list, userName }), {
     onSuccess: () => {
-      SessionPersistence.addToList(list, userName);
+      WebClient.instance.response.session.addToList(list, userName);
     },
   });
 }

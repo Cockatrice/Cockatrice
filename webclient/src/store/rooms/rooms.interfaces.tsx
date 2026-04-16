@@ -2,7 +2,6 @@ import { App, Enriched } from '@app/types';
 
 export interface RoomsState {
   rooms: RoomsStateRooms;
-  games: RoomsStateGames;
   joinedRoomIds: JoinedRooms;
   joinedGameIds: JoinedGames;
   messages: RoomsStateMessages;
@@ -12,12 +11,6 @@ export interface RoomsState {
 
 export interface RoomsStateRooms {
   [roomId: number]: Enriched.Room;
-}
-
-export interface RoomsStateGames {
-  [roomId: number]: {
-    [gameId: number]: Enriched.Game;
-  };
 }
 
 export interface JoinedRooms {

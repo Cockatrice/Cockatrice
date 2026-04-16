@@ -1,6 +1,6 @@
 import type { Data, Enriched } from '@app/types';
-import { GamePersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function delCounter(data: Data.Event_DelCounter, meta: Enriched.GameEventMeta): void {
-  GamePersistence.counterDeleted(meta.gameId, meta.playerId, data);
+  WebClient.instance.response.game.counterDeleted(meta.gameId, meta.playerId, data);
 }

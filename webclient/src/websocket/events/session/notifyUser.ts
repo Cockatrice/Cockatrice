@@ -1,6 +1,6 @@
 import type { Data } from '@app/types';
-import { SessionPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function notifyUser(payload: Data.Event_NotifyUser): void {
-  SessionPersistence.notifyUser(payload);
+  WebClient.instance.response.session.notifyUser(payload);
 }

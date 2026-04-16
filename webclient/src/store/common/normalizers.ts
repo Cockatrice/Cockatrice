@@ -8,31 +8,43 @@ export function normalizeGametypeMap(gametypeList: Data.ServerInfo_GameType[]): 
   }, {});
 }
 
-/** Flatten room gameTypes into a map object and normalize all games inside. */
+/**
+ * Build an Enriched.Room (composition shape) from a raw proto. The proto is
+ * stored verbatim on `info` and the repeated collections are normalized into
+ * keyed maps alongside it. `info.gameList`, `info.userList`, `info.gametypeList`
+ * are left as the wire snapshot — callers should always read the normalized
+ * fields, never those.
+ */
 export function normalizeRoomInfo(roomInfo: Data.ServerInfo_Room): Enriched.Room {
   const gametypeMap = normalizeGametypeMap(roomInfo.gametypeList);
 
-  const gameList = roomInfo.gameList.map(
-    (game) => normalizeGameObject(game, gametypeMap),
-  );
+  const games: { [gameId: number]: Enriched.Game } = {};
+  for (const rawGame of roomInfo.gameList) {
+    const normalized = normalizeGameObject(rawGame, gametypeMap);
+    games[normalized.info.gameId] = normalized;
+  }
+
+  const users: { [userName: string]: Data.ServerInfo_User } = {};
+  for (const user of roomInfo.userList) {
+    users[user.name] = user;
+  }
 
   return {
-    ...roomInfo,
+    info: roomInfo,
     gametypeMap,
-    gameList,
     order: 0,
+    games,
+    users,
   };
 }
 
-/** Flatten gameTypes[] into a gameType string; fill in default sortable values. */
+/** Wrap a raw ServerInfo_Game in the composition shape with cached gameType. */
 export function normalizeGameObject(game: Data.ServerInfo_Game, gametypeMap: Enriched.GametypeMap): Enriched.Game {
-  const { gameTypes, description } = game;
+  const { gameTypes } = game;
   const hasType = gameTypes && gameTypes.length;
-
   return {
-    ...game,
-    gameType: hasType ? gametypeMap[gameTypes[0]] : '',
-    description: description || '',
+    info: game,
+    gameType: hasType ? (gametypeMap[gameTypes[0]] ?? '') : '',
   };
 }
 

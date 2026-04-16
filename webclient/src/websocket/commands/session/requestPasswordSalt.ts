@@ -2,9 +2,7 @@ import { App, Enriched, Data } from '@app/types';
 
 import { create } from '@bufbuild/protobuf';
 import { CLIENT_CONFIG } from '../../config';
-import webClient from '../../WebClient';
-
-import { SessionPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 import {
   activate,
@@ -25,18 +23,18 @@ export function requestPasswordSalt(options: PasswordSaltOptions, password?: str
   const onFailure = () => {
     switch (options.reason) {
       case App.WebSocketConnectReason.ACTIVATE_ACCOUNT:
-        SessionPersistence.accountActivationFailed();
+        WebClient.instance.response.session.accountActivationFailed();
         break;
       case App.WebSocketConnectReason.PASSWORD_RESET:
-        SessionPersistence.resetPasswordFailed();
+        WebClient.instance.response.session.resetPasswordFailed();
         break;
       default:
-        SessionPersistence.loginFailed();
+        WebClient.instance.response.session.loginFailed();
     }
     disconnect();
   };
 
-  webClient.protobuf.sendSessionCommand(Data.Command_RequestPasswordSalt_ext, create(Data.Command_RequestPasswordSaltSchema, {
+  WebClient.instance.protobuf.sendSessionCommand(Data.Command_RequestPasswordSalt_ext, create(Data.Command_RequestPasswordSaltSchema, {
     ...CLIENT_CONFIG,
     userName,
   }), {

@@ -19,11 +19,11 @@ const Server = () => {
   const message = useAppSelector(state => ServerSelectors.getMessage(state));
   const rooms = useAppSelector(state => RoomsSelectors.getRooms(state));
   const joinedRooms = useAppSelector(state => RoomsSelectors.getJoinedRooms(state));
-  const users = useAppSelector(state => ServerSelectors.getUsers(state));
+  const users = useAppSelector(state => ServerSelectors.getSortedUsers(state));
   const navigate = useNavigate();
 
   useReduxEffect((action: any) => {
-    const roomId = action.roomInfo.roomId.toString();
+    const roomId = action.payload.roomInfo.roomId.toString();
     navigate(generatePath(App.RouteEnum.ROOM, { roomId }));
   }, RoomsTypes.JOIN_ROOM, []);
 

@@ -1,27 +1,28 @@
 vi.mock('../../WebClient', () => ({
-  __esModule: true,
-  default: { protobuf: { sendModeratorCommand: vi.fn() } },
-}));
-
-vi.mock('../../persistence', () => ({
-  ModeratorPersistence: {
-    banFromServer: vi.fn(),
-    forceActivateUser: vi.fn(),
-    getAdminNotes: vi.fn(),
-    banHistory: vi.fn(),
-    warnHistory: vi.fn(),
-    warnListOptions: vi.fn(),
-    grantReplayAccess: vi.fn(),
-    updateAdminNotes: vi.fn(),
-    viewLogs: vi.fn(),
-    warnUser: vi.fn(),
+  WebClient: {
+    instance: {
+      protobuf: { sendModeratorCommand: vi.fn() },
+      response: {
+        moderator: {
+          banFromServer: vi.fn(),
+          forceActivateUser: vi.fn(),
+          getAdminNotes: vi.fn(),
+          banHistory: vi.fn(),
+          warnHistory: vi.fn(),
+          warnListOptions: vi.fn(),
+          grantReplayAccess: vi.fn(),
+          updateAdminNotes: vi.fn(),
+          viewLogs: vi.fn(),
+          warnUser: vi.fn(),
+        },
+      },
+    },
   },
 }));
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
-import webClient from '../../WebClient';
+import { WebClient } from '../../WebClient';
 import { Data } from '@app/types';
-import { ModeratorPersistence } from '../../persistence';
 
 import { banFromServer } from './banFromServer';
 import { forceActivateUser } from './forceActivateUser';
@@ -37,7 +38,7 @@ import { create } from '@bufbuild/protobuf';
 import { Mock } from 'vitest';
 
 const { invokeOnSuccess } = makeCallbackHelpers(
-  webClient.protobuf.sendModeratorCommand as Mock,
+  WebClient.instance.protobuf.sendModeratorCommand as Mock,
   2
 );
 
@@ -48,17 +49,17 @@ describe('banFromServer', () => {
 
   it('calls sendModeratorCommand with Command_BanFromServer', () => {
     banFromServer(30, 'alice', '1.2.3.4', 'reason', 'visible', 'cid', 1);
-    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(WebClient.instance.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Data.Command_BanFromServer_ext,
       expect.objectContaining({ minutes: 30, userName: 'alice' }),
       expect.any(Object)
     );
   });
 
-  it('onSuccess calls ModeratorPersistence.banFromServer', () => {
+  it('onSuccess calls response.moderator.banFromServer', () => {
     banFromServer(30, 'alice');
     invokeOnSuccess();
-    expect(ModeratorPersistence.banFromServer).toHaveBeenCalledWith('alice');
+    expect(WebClient.instance.response.moderator.banFromServer).toHaveBeenCalledWith('alice');
   });
 });
 
@@ -69,15 +70,15 @@ describe('forceActivateUser', () => {
 
   it('calls sendModeratorCommand with Command_ForceActivateUser', () => {
     forceActivateUser('alice', 'mod1');
-    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(WebClient.instance.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Data.Command_ForceActivateUser_ext, expect.any(Object), expect.any(Object)
     );
   });
 
-  it('onSuccess calls ModeratorPersistence.forceActivateUser', () => {
+  it('onSuccess calls response.moderator.forceActivateUser', () => {
     forceActivateUser('alice', 'mod1');
     invokeOnSuccess();
-    expect(ModeratorPersistence.forceActivateUser).toHaveBeenCalledWith('alice', 'mod1');
+    expect(WebClient.instance.response.moderator.forceActivateUser).toHaveBeenCalledWith('alice', 'mod1');
   });
 });
 
@@ -88,18 +89,18 @@ describe('getAdminNotes', () => {
 
   it('calls sendModeratorCommand with Command_GetAdminNotes', () => {
     getAdminNotes('alice');
-    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(WebClient.instance.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Data.Command_GetAdminNotes_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Data.Response_GetAdminNotes_ext })
     );
   });
 
-  it('onSuccess calls ModeratorPersistence.getAdminNotes with notes', () => {
+  it('onSuccess calls response.moderator.getAdminNotes with notes', () => {
     getAdminNotes('alice');
     const resp = { notes: 'some notes' };
     invokeOnSuccess(resp, { responseCode: 0 });
-    expect(ModeratorPersistence.getAdminNotes).toHaveBeenCalledWith('alice', 'some notes');
+    expect(WebClient.instance.response.moderator.getAdminNotes).toHaveBeenCalledWith('alice', 'some notes');
   });
 });
 
@@ -110,18 +111,18 @@ describe('getBanHistory', () => {
 
   it('calls sendModeratorCommand with Command_GetBanHistory', () => {
     getBanHistory('alice');
-    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(WebClient.instance.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Data.Command_GetBanHistory_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Data.Response_BanHistory_ext })
     );
   });
 
-  it('onSuccess calls ModeratorPersistence.banHistory with banList', () => {
+  it('onSuccess calls response.moderator.banHistory with banList', () => {
     getBanHistory('alice');
     const resp = { banList: [{ id: 1 }] };
     invokeOnSuccess(resp, { responseCode: 0 });
-    expect(ModeratorPersistence.banHistory).toHaveBeenCalledWith('alice', [{ id: 1 }]);
+    expect(WebClient.instance.response.moderator.banHistory).toHaveBeenCalledWith('alice', [{ id: 1 }]);
   });
 });
 
@@ -132,18 +133,18 @@ describe('getWarnHistory', () => {
 
   it('calls sendModeratorCommand with Command_GetWarnHistory', () => {
     getWarnHistory('alice');
-    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(WebClient.instance.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Data.Command_GetWarnHistory_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Data.Response_WarnHistory_ext })
     );
   });
 
-  it('onSuccess calls ModeratorPersistence.warnHistory with warnList', () => {
+  it('onSuccess calls response.moderator.warnHistory with warnList', () => {
     getWarnHistory('alice');
     const resp = { warnList: [{ id: 2 }] };
     invokeOnSuccess(resp, { responseCode: 0 });
-    expect(ModeratorPersistence.warnHistory).toHaveBeenCalledWith('alice', [{ id: 2 }]);
+    expect(WebClient.instance.response.moderator.warnHistory).toHaveBeenCalledWith('alice', [{ id: 2 }]);
   });
 });
 
@@ -154,18 +155,18 @@ describe('getWarnList', () => {
 
   it('calls sendModeratorCommand with Command_GetWarnList', () => {
     getWarnList('mod1', 'alice', 'US');
-    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(WebClient.instance.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Data.Command_GetWarnList_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Data.Response_WarnList_ext })
     );
   });
 
-  it('onSuccess calls ModeratorPersistence.warnListOptions with the response', () => {
+  it('onSuccess calls response.moderator.warnListOptions with the response', () => {
     getWarnList('mod1', 'alice', 'US');
     const resp = { warning: ['w1', 'w2'], userName: 'alice', userClientid: 'US' };
     invokeOnSuccess(resp, { responseCode: 0 });
-    expect(ModeratorPersistence.warnListOptions).toHaveBeenCalledWith([resp]);
+    expect(WebClient.instance.response.moderator.warnListOptions).toHaveBeenCalledWith([resp]);
   });
 });
 
@@ -176,15 +177,15 @@ describe('grantReplayAccess', () => {
 
   it('calls sendModeratorCommand with Command_GrantReplayAccess', () => {
     grantReplayAccess(10, 'mod1');
-    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(WebClient.instance.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Data.Command_GrantReplayAccess_ext, expect.any(Object), expect.any(Object)
     );
   });
 
-  it('onSuccess calls ModeratorPersistence.grantReplayAccess', () => {
+  it('onSuccess calls response.moderator.grantReplayAccess', () => {
     grantReplayAccess(10, 'mod1');
     invokeOnSuccess();
-    expect(ModeratorPersistence.grantReplayAccess).toHaveBeenCalledWith(10, 'mod1');
+    expect(WebClient.instance.response.moderator.grantReplayAccess).toHaveBeenCalledWith(10, 'mod1');
   });
 });
 
@@ -195,15 +196,15 @@ describe('updateAdminNotes', () => {
 
   it('calls sendModeratorCommand with Command_UpdateAdminNotes', () => {
     updateAdminNotes('alice', 'new notes');
-    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(WebClient.instance.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Data.Command_UpdateAdminNotes_ext, expect.any(Object), expect.any(Object)
     );
   });
 
-  it('onSuccess calls ModeratorPersistence.updateAdminNotes', () => {
+  it('onSuccess calls response.moderator.updateAdminNotes', () => {
     updateAdminNotes('alice', 'new notes');
     invokeOnSuccess();
-    expect(ModeratorPersistence.updateAdminNotes).toHaveBeenCalledWith('alice', 'new notes');
+    expect(WebClient.instance.response.moderator.updateAdminNotes).toHaveBeenCalledWith('alice', 'new notes');
   });
 });
 
@@ -215,19 +216,19 @@ describe('viewLogHistory', () => {
   it('calls sendModeratorCommand with Command_ViewLogHistory', () => {
     const filters = create(Data.Command_ViewLogHistorySchema, { dateRange: 7 });
     viewLogHistory(filters);
-    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+    expect(WebClient.instance.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
       Data.Command_ViewLogHistory_ext,
       expect.any(Object),
       expect.objectContaining({ responseExt: Data.Response_ViewLogHistory_ext })
     );
   });
 
-  it('onSuccess calls ModeratorPersistence.viewLogs with logMessage', () => {
+  it('onSuccess calls response.moderator.viewLogs with logMessage', () => {
     const filters = create(Data.Command_ViewLogHistorySchema, { dateRange: 7 });
     viewLogHistory(filters);
     const resp = { logMessage: ['log1'] };
     invokeOnSuccess(resp, { responseCode: 0 });
-    expect(ModeratorPersistence.viewLogs).toHaveBeenCalledWith(['log1']);
+    expect(WebClient.instance.response.moderator.viewLogs).toHaveBeenCalledWith(['log1']);
   });
 });
 
@@ -238,12 +239,14 @@ describe('warnUser', () => {
 
   it('calls sendModeratorCommand with Command_WarnUser', () => {
     warnUser('alice', 'bad behavior', 'cid');
-    expect(webClient.protobuf.sendModeratorCommand).toHaveBeenCalledWith(Data.Command_WarnUser_ext, expect.any(Object), expect.any(Object));
+    expect(WebClient.instance.protobuf.sendModeratorCommand).toHaveBeenCalledWith(
+      Data.Command_WarnUser_ext, expect.any(Object), expect.any(Object)
+    );
   });
 
-  it('onSuccess calls ModeratorPersistence.warnUser', () => {
+  it('onSuccess calls response.moderator.warnUser', () => {
     warnUser('alice', 'bad behavior', 'cid');
     invokeOnSuccess();
-    expect(ModeratorPersistence.warnUser).toHaveBeenCalledWith('alice');
+    expect(WebClient.instance.response.moderator.warnUser).toHaveBeenCalledWith('alice');
   });
 });

@@ -1,7 +1,6 @@
 // eslint-disable-next-line
 import React from "react";
 import { generatePath, useNavigate } from 'react-router-dom';
-import * as _ from 'lodash';
 
 import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
@@ -11,7 +10,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
 
-import { RoomsService } from '@app/api';
+import { request } from '@app/api';
 import { App } from '@app/types';
 
 import './Rooms.css';
@@ -20,10 +19,10 @@ const Rooms = ({ rooms, joinedRooms }) => {
   const navigate = useNavigate();
 
   function onClick(roomId) {
-    if (_.find(joinedRooms, room => room.roomId === roomId)) {
+    if (joinedRooms.find(room => room.info.roomId === roomId)) {
       navigate(generatePath(App.RouteEnum.ROOM, { roomId }));
     } else {
-      RoomsService.joinRoom(roomId);
+      request.rooms.joinRoom(roomId);
     }
   }
 
@@ -41,20 +40,23 @@ const Rooms = ({ rooms, joinedRooms }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          { _.map(rooms, ({ description, gameCount, name, permissionlevel, playerCount, roomId }) => (
-            <TableRow key={roomId}>
-              <TableCell>{name}</TableCell>
-              <TableCell>{description}</TableCell>
-              <TableCell>{permissionlevel}</TableCell>
-              <TableCell>{playerCount}</TableCell>
-              <TableCell>{gameCount}</TableCell>
-              <TableCell>
-                <Button size="small" color="primary" variant="contained" onClick={() => onClick(roomId)}>
-                  Join
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
+          { Object.values(rooms).map((room) => {
+            const { description, gameCount, name, permissionlevel, playerCount, roomId } = room.info;
+            return (
+              <TableRow key={roomId}>
+                <TableCell>{name}</TableCell>
+                <TableCell>{description}</TableCell>
+                <TableCell>{permissionlevel}</TableCell>
+                <TableCell>{playerCount}</TableCell>
+                <TableCell>{gameCount}</TableCell>
+                <TableCell>
+                  <Button size="small" color="primary" variant="contained" onClick={() => onClick(roomId)}>
+                    Join
+                  </Button>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

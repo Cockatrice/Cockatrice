@@ -1,6 +1,6 @@
 import type { Data } from '@app/types';
-import { SessionPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function serverShutdown(payload: Data.Event_ServerShutdown): void {
-  SessionPersistence.serverShutdown(payload);
+  WebClient.instance.response.session.serverShutdown(payload);
 }

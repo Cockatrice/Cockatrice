@@ -2,23 +2,21 @@ import { App, Enriched, Data } from '@app/types';
 
 import { create } from '@bufbuild/protobuf';
 import { CLIENT_CONFIG } from '../../config';
-import webClient from '../../WebClient';
-
-import { SessionPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 import { disconnect, login, updateStatus } from './';
 
 export function activate(options: Omit<Enriched.ActivateConnectOptions, 'password'>, password?: string, passwordSalt?: string): void {
   const { userName, token } = options;
 
-  webClient.protobuf.sendSessionCommand(Data.Command_Activate_ext, create(Data.Command_ActivateSchema, {
+  WebClient.instance.protobuf.sendSessionCommand(Data.Command_Activate_ext, create(Data.Command_ActivateSchema, {
     ...CLIENT_CONFIG,
     userName,
     token,
   }), {
     onResponseCode: {
       [Data.Response_ResponseCode.RespActivationAccepted]: () => {
-        SessionPersistence.accountActivationSuccess();
+        WebClient.instance.response.session.accountActivationSuccess();
         login({
           host: options.host,
           port: options.port,
@@ -30,7 +28,7 @@ export function activate(options: Omit<Enriched.ActivateConnectOptions, 'passwor
     onError: () => {
       updateStatus(App.StatusEnum.DISCONNECTED, 'Account Activation Failed');
       disconnect();
-      SessionPersistence.accountActivationFailed();
+      WebClient.instance.response.session.accountActivationFailed();
     },
   });
 }

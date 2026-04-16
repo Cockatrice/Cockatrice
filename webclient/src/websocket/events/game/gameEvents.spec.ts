@@ -1,40 +1,46 @@
-vi.mock('../../persistence', () => ({
-  GamePersistence: {
-    gameStateChanged: vi.fn(),
-    playerJoined: vi.fn(),
-    playerLeft: vi.fn(),
-    playerPropertiesChanged: vi.fn(),
-    gameClosed: vi.fn(),
-    gameHostChanged: vi.fn(),
-    kicked: vi.fn(),
-    gameSay: vi.fn(),
-    cardMoved: vi.fn(),
-    cardFlipped: vi.fn(),
-    cardDestroyed: vi.fn(),
-    cardAttached: vi.fn(),
-    tokenCreated: vi.fn(),
-    cardAttrChanged: vi.fn(),
-    cardCounterChanged: vi.fn(),
-    arrowCreated: vi.fn(),
-    arrowDeleted: vi.fn(),
-    counterCreated: vi.fn(),
-    counterSet: vi.fn(),
-    counterDeleted: vi.fn(),
-    cardsDrawn: vi.fn(),
-    cardsRevealed: vi.fn(),
-    zoneShuffled: vi.fn(),
-    dieRolled: vi.fn(),
-    activePlayerSet: vi.fn(),
-    activePhaseSet: vi.fn(),
-    turnReversed: vi.fn(),
-    zoneDumped: vi.fn(),
-    zonePropertiesChanged: vi.fn(),
+vi.mock('../../WebClient', () => ({
+  WebClient: {
+    instance: {
+      response: {
+        game: {
+          gameStateChanged: vi.fn(),
+          playerJoined: vi.fn(),
+          playerLeft: vi.fn(),
+          playerPropertiesChanged: vi.fn(),
+          gameClosed: vi.fn(),
+          gameHostChanged: vi.fn(),
+          kicked: vi.fn(),
+          gameSay: vi.fn(),
+          cardMoved: vi.fn(),
+          cardFlipped: vi.fn(),
+          cardDestroyed: vi.fn(),
+          cardAttached: vi.fn(),
+          tokenCreated: vi.fn(),
+          cardAttrChanged: vi.fn(),
+          cardCounterChanged: vi.fn(),
+          arrowCreated: vi.fn(),
+          arrowDeleted: vi.fn(),
+          counterCreated: vi.fn(),
+          counterSet: vi.fn(),
+          counterDeleted: vi.fn(),
+          cardsDrawn: vi.fn(),
+          cardsRevealed: vi.fn(),
+          zoneShuffled: vi.fn(),
+          dieRolled: vi.fn(),
+          activePlayerSet: vi.fn(),
+          activePhaseSet: vi.fn(),
+          turnReversed: vi.fn(),
+          zoneDumped: vi.fn(),
+          zonePropertiesChanged: vi.fn(),
+        },
+      },
+    },
   },
 }));
 
 import { create } from '@bufbuild/protobuf';
 import { Data } from '@app/types';
-import { GamePersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 import { attachCard } from './attachCard';
 import { changeZoneProperties } from './changeZoneProperties';
@@ -69,232 +75,232 @@ import { shuffle } from './shuffle';
 const meta = { gameId: 5, playerId: 2, context: null, secondsElapsed: 0, forcedByJudge: 0 };
 
 describe('joinGame event', () => {
-  it('delegates to GamePersistence.playerJoined with gameId from meta', () => {
+  it('delegates to WebClient.instance.response.game.playerJoined with gameId from meta', () => {
     const playerProperties = create(Data.ServerInfo_PlayerPropertiesSchema, { playerId: 1 });
     const data = { playerProperties };
     joinGame(data, meta);
-    expect(GamePersistence.playerJoined).toHaveBeenCalledWith(5, playerProperties);
+    expect(WebClient.instance.response.game.playerJoined).toHaveBeenCalledWith(5, playerProperties);
   });
 });
 
 describe('leaveGame event', () => {
-  it('delegates to GamePersistence.playerLeft with gameId/playerId from meta', () => {
+  it('delegates to WebClient.instance.response.game.playerLeft with gameId/playerId from meta', () => {
     const data = { reason: 3 };
     leaveGame(data, meta);
-    expect(GamePersistence.playerLeft).toHaveBeenCalledWith(5, 2, 3);
+    expect(WebClient.instance.response.game.playerLeft).toHaveBeenCalledWith(5, 2, 3);
   });
 });
 
 describe('gameClosed event', () => {
-  it('delegates to GamePersistence.gameClosed with gameId', () => {
+  it('delegates to WebClient.instance.response.game.gameClosed with gameId', () => {
     gameClosed({}, meta);
-    expect(GamePersistence.gameClosed).toHaveBeenCalledWith(5);
+    expect(WebClient.instance.response.game.gameClosed).toHaveBeenCalledWith(5);
   });
 });
 
 describe('gameHostChanged event', () => {
-  it('delegates to GamePersistence.gameHostChanged using meta.playerId as hostId', () => {
+  it('delegates to WebClient.instance.response.game.gameHostChanged using meta.playerId as hostId', () => {
     gameHostChanged({}, meta);
-    expect(GamePersistence.gameHostChanged).toHaveBeenCalledWith(5, 2);
+    expect(WebClient.instance.response.game.gameHostChanged).toHaveBeenCalledWith(5, 2);
   });
 });
 
 describe('kicked event', () => {
-  it('delegates to GamePersistence.kicked with gameId', () => {
+  it('delegates to WebClient.instance.response.game.kicked with gameId', () => {
     kicked({}, meta);
-    expect(GamePersistence.kicked).toHaveBeenCalledWith(5);
+    expect(WebClient.instance.response.game.kicked).toHaveBeenCalledWith(5);
   });
 });
 
 describe('gameStateChanged event', () => {
-  it('delegates to GamePersistence.gameStateChanged with gameId and full data', () => {
+  it('delegates to WebClient.instance.response.game.gameStateChanged with gameId and full data', () => {
     const data = create(Data.Event_GameStateChangedSchema, { playerList: [] });
     gameStateChanged(data, meta);
-    expect(GamePersistence.gameStateChanged).toHaveBeenCalledWith(5, data);
+    expect(WebClient.instance.response.game.gameStateChanged).toHaveBeenCalledWith(5, data);
   });
 });
 
 describe('playerPropertiesChanged event', () => {
-  it('delegates to GamePersistence.playerPropertiesChanged with gameId, playerId, properties', () => {
+  it('delegates to WebClient.instance.response.game.playerPropertiesChanged with gameId, playerId, properties', () => {
     const playerProperties = create(Data.ServerInfo_PlayerPropertiesSchema, { playerId: 2 });
     const data = { playerProperties };
     playerPropertiesChanged(data, meta);
-    expect(GamePersistence.playerPropertiesChanged).toHaveBeenCalledWith(5, 2, playerProperties);
+    expect(WebClient.instance.response.game.playerPropertiesChanged).toHaveBeenCalledWith(5, 2, playerProperties);
   });
 });
 
 describe('gameSay event', () => {
-  it('delegates to GamePersistence.gameSay with gameId, playerId, message', () => {
+  it('delegates to WebClient.instance.response.game.gameSay with gameId, playerId, message', () => {
     const data = create(Data.Event_GameSaySchema, { message: 'gg' });
     gameSay(data, meta);
-    expect(GamePersistence.gameSay).toHaveBeenCalledWith(5, 2, 'gg');
+    expect(WebClient.instance.response.game.gameSay).toHaveBeenCalledWith(5, 2, 'gg');
   });
 });
 
 describe('moveCard event', () => {
-  it('delegates to GamePersistence.cardMoved with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.cardMoved with gameId, playerId and data', () => {
     const data = create(Data.Event_MoveCardSchema, { cardId: 3 });
     moveCard(data, meta);
-    expect(GamePersistence.cardMoved).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.cardMoved).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('flipCard event', () => {
-  it('delegates to GamePersistence.cardFlipped with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.cardFlipped with gameId, playerId and data', () => {
     const data = create(Data.Event_FlipCardSchema, { cardId: 3 });
     flipCard(data, meta);
-    expect(GamePersistence.cardFlipped).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.cardFlipped).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('destroyCard event', () => {
-  it('delegates to GamePersistence.cardDestroyed with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.cardDestroyed with gameId, playerId and data', () => {
     const data = create(Data.Event_DestroyCardSchema, { cardId: 3 });
     destroyCard(data, meta);
-    expect(GamePersistence.cardDestroyed).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.cardDestroyed).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('attachCard event', () => {
-  it('delegates to GamePersistence.cardAttached with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.cardAttached with gameId, playerId and data', () => {
     const data = create(Data.Event_AttachCardSchema, { cardId: 3 });
     attachCard(data, meta);
-    expect(GamePersistence.cardAttached).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.cardAttached).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('createToken event', () => {
-  it('delegates to GamePersistence.tokenCreated with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.tokenCreated with gameId, playerId and data', () => {
     const data = create(Data.Event_CreateTokenSchema, { cardId: 3 });
     createToken(data, meta);
-    expect(GamePersistence.tokenCreated).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.tokenCreated).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('setCardAttr event', () => {
-  it('delegates to GamePersistence.cardAttrChanged with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.cardAttrChanged with gameId, playerId and data', () => {
     const data = create(Data.Event_SetCardAttrSchema, { cardId: 3 });
     setCardAttr(data, meta);
-    expect(GamePersistence.cardAttrChanged).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.cardAttrChanged).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('setCardCounter event', () => {
-  it('delegates to GamePersistence.cardCounterChanged with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.cardCounterChanged with gameId, playerId and data', () => {
     const data = create(Data.Event_SetCardCounterSchema, { cardId: 3 });
     setCardCounter(data, meta);
-    expect(GamePersistence.cardCounterChanged).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.cardCounterChanged).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('createArrow event', () => {
-  it('delegates to GamePersistence.arrowCreated with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.arrowCreated with gameId, playerId and data', () => {
     const data = create(Data.Event_CreateArrowSchema, {});
     createArrow(data, meta);
-    expect(GamePersistence.arrowCreated).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.arrowCreated).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('deleteArrow event', () => {
-  it('delegates to GamePersistence.arrowDeleted with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.arrowDeleted with gameId, playerId and data', () => {
     const data = create(Data.Event_DeleteArrowSchema, { arrowId: 9 });
     deleteArrow(data, meta);
-    expect(GamePersistence.arrowDeleted).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.arrowDeleted).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('createCounter event', () => {
-  it('delegates to GamePersistence.counterCreated with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.counterCreated with gameId, playerId and data', () => {
     const data = create(Data.Event_CreateCounterSchema, {});
     createCounter(data, meta);
-    expect(GamePersistence.counterCreated).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.counterCreated).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('setCounter event', () => {
-  it('delegates to GamePersistence.counterSet with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.counterSet with gameId, playerId and data', () => {
     const data = create(Data.Event_SetCounterSchema, { counterId: 1, value: 20 });
     setCounter(data, meta);
-    expect(GamePersistence.counterSet).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.counterSet).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('delCounter event', () => {
-  it('delegates to GamePersistence.counterDeleted with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.counterDeleted with gameId, playerId and data', () => {
     const data = create(Data.Event_DelCounterSchema, { counterId: 1 });
     delCounter(data, meta);
-    expect(GamePersistence.counterDeleted).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.counterDeleted).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('drawCards event', () => {
-  it('delegates to GamePersistence.cardsDrawn with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.cardsDrawn with gameId, playerId and data', () => {
     const data = create(Data.Event_DrawCardsSchema, { number: 2, cards: [] });
     drawCards(data, meta);
-    expect(GamePersistence.cardsDrawn).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.cardsDrawn).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('revealCards event', () => {
-  it('delegates to GamePersistence.cardsRevealed with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.cardsRevealed with gameId, playerId and data', () => {
     const data = create(Data.Event_RevealCardsSchema, { zoneName: 'hand', cards: [] });
     revealCards(data, meta);
-    expect(GamePersistence.cardsRevealed).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.cardsRevealed).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('shuffle event', () => {
-  it('delegates to GamePersistence.zoneShuffled with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.zoneShuffled with gameId, playerId and data', () => {
     const data = create(Data.Event_ShuffleSchema, { zoneName: 'deck' });
     shuffle(data, meta);
-    expect(GamePersistence.zoneShuffled).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.zoneShuffled).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('rollDie event', () => {
-  it('delegates to GamePersistence.dieRolled with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.dieRolled with gameId, playerId and data', () => {
     const data = create(Data.Event_RollDieSchema, { die: 6, result: 4 });
     rollDie(data, meta);
-    expect(GamePersistence.dieRolled).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.dieRolled).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('setActivePlayer event', () => {
-  it('delegates to GamePersistence.activePlayerSet with gameId and activePlayerId', () => {
+  it('delegates to WebClient.instance.response.game.activePlayerSet with gameId and activePlayerId', () => {
     const data = create(Data.Event_SetActivePlayerSchema, { activePlayerId: 3 });
     setActivePlayer(data, meta);
-    expect(GamePersistence.activePlayerSet).toHaveBeenCalledWith(5, 3);
+    expect(WebClient.instance.response.game.activePlayerSet).toHaveBeenCalledWith(5, 3);
   });
 });
 
 describe('setActivePhase event', () => {
-  it('delegates to GamePersistence.activePhaseSet with gameId and phase', () => {
+  it('delegates to WebClient.instance.response.game.activePhaseSet with gameId and phase', () => {
     const data = create(Data.Event_SetActivePhaseSchema, { phase: 4 });
     setActivePhase(data, meta);
-    expect(GamePersistence.activePhaseSet).toHaveBeenCalledWith(5, 4);
+    expect(WebClient.instance.response.game.activePhaseSet).toHaveBeenCalledWith(5, 4);
   });
 });
 
 describe('reverseTurn event', () => {
-  it('delegates to GamePersistence.turnReversed with gameId and reversed', () => {
+  it('delegates to WebClient.instance.response.game.turnReversed with gameId and reversed', () => {
     const data = create(Data.Event_ReverseTurnSchema, { reversed: true });
     reverseTurn(data, meta);
-    expect(GamePersistence.turnReversed).toHaveBeenCalledWith(5, true);
+    expect(WebClient.instance.response.game.turnReversed).toHaveBeenCalledWith(5, true);
   });
 });
 
 describe('dumpZone event', () => {
-  it('delegates to GamePersistence.zoneDumped with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.zoneDumped with gameId, playerId and data', () => {
     const data = create(Data.Event_DumpZoneSchema, { zoneName: 'hand' });
     dumpZone(data, meta);
-    expect(GamePersistence.zoneDumped).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.zoneDumped).toHaveBeenCalledWith(5, 2, data);
   });
 });
 
 describe('changeZoneProperties event', () => {
-  it('delegates to GamePersistence.zonePropertiesChanged with gameId, playerId and data', () => {
+  it('delegates to WebClient.instance.response.game.zonePropertiesChanged with gameId, playerId and data', () => {
     const data = create(Data.Event_ChangeZonePropertiesSchema, { zoneName: 'hand', alwaysRevealTopCard: true });
     changeZoneProperties(data, meta);
-    expect(GamePersistence.zonePropertiesChanged).toHaveBeenCalledWith(5, 2, data);
+    expect(WebClient.instance.response.game.zonePropertiesChanged).toHaveBeenCalledWith(5, 2, data);
   });
 });

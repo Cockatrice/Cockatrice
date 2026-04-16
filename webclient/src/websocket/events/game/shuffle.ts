@@ -1,6 +1,6 @@
 import type { Data, Enriched } from '@app/types';
-import { GamePersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function shuffle(data: Data.Event_Shuffle, meta: Enriched.GameEventMeta): void {
-  GamePersistence.zoneShuffled(meta.gameId, meta.playerId, data);
+  WebClient.instance.response.game.zoneShuffled(meta.gameId, meta.playerId, data);
 }

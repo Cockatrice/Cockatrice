@@ -1,33 +1,33 @@
 // Tests for simple session events that delegate 1:1 to SessionPersistence
 // or RoomPersistence with minimal logic.
 
-vi.mock('../../persistence', () => ({
-  SessionPersistence: {
-    gameJoined: vi.fn(),
-    notifyUser: vi.fn(),
-    replayAdded: vi.fn(),
-    serverMessage: vi.fn(),
-    serverShutdown: vi.fn(),
-    updateUsers: vi.fn(),
-    updateInfo: vi.fn(),
-    userJoined: vi.fn(),
-    userLeft: vi.fn(),
-    userMessage: vi.fn(),
-    addToBuddyList: vi.fn(),
-    addToIgnoreList: vi.fn(),
-    removeFromBuddyList: vi.fn(),
-    removeFromIgnoreList: vi.fn(),
-    playerPropertiesChanged: vi.fn(),
-  },
-  RoomPersistence: {
-    updateRooms: vi.fn(),
-  },
-}));
-
 vi.mock('../../WebClient', () => ({
-  __esModule: true,
-  default: {
-    options: {},
+  WebClient: {
+    instance: {
+      options: null,
+      response: {
+        session: {
+          gameJoined: vi.fn(),
+          notifyUser: vi.fn(),
+          replayAdded: vi.fn(),
+          serverMessage: vi.fn(),
+          serverShutdown: vi.fn(),
+          updateUsers: vi.fn(),
+          updateInfo: vi.fn(),
+          userJoined: vi.fn(),
+          userLeft: vi.fn(),
+          userMessage: vi.fn(),
+          addToBuddyList: vi.fn(),
+          addToIgnoreList: vi.fn(),
+          removeFromBuddyList: vi.fn(),
+          removeFromIgnoreList: vi.fn(),
+          playerPropertiesChanged: vi.fn(),
+        },
+        room: {
+          updateRooms: vi.fn(),
+        },
+      },
+    },
   },
 }));
 
@@ -52,13 +52,13 @@ vi.mock('../../commands/session', () => ({
 vi.mock('../../utils', () => ({
   generateSalt: vi.fn().mockReturnValue('newSalt'),
   passwordSaltSupported: vi.fn().mockReturnValue(0),
+  sanitizeHtml: vi.fn((msg: string) => msg),
 }));
 
 import { App, Data, Enriched } from '@app/types';
 import { create } from '@bufbuild/protobuf';
 
-import { SessionPersistence, RoomPersistence } from '../../persistence';
-import webClient from '../../WebClient';
+import { WebClient } from '../../WebClient';
 import * as Config from '../../config';
 import * as SessionCmds from '../../commands/session';
 import * as Utils from '../../utils';
@@ -78,6 +78,7 @@ import { connectionClosed } from './connectionClosed';
 import { serverIdentification } from './serverIdentification';
 import { Mock } from 'vitest';
 
+
 const ConfigMock = Config as { -readonly [K in keyof typeof Config]: (typeof Config)[K] };
 
 beforeEach(() => {
@@ -90,10 +91,10 @@ beforeEach(() => {
 // ----------------------------------------------------------------
 describe('gameJoined', () => {
 
-  it('calls SessionPersistence.gameJoined', () => {
+  it('calls WebClient.instance.response.session.gameJoined', () => {
     const data = create(Data.Event_GameJoinedSchema, { playerId: 1 });
     gameJoined(data);
-    expect(SessionPersistence.gameJoined).toHaveBeenCalledWith(data);
+    expect(WebClient.instance.response.session.gameJoined).toHaveBeenCalledWith(data);
   });
 });
 
@@ -102,10 +103,10 @@ describe('gameJoined', () => {
 // ----------------------------------------------------------------
 describe('notifyUser', () => {
 
-  it('calls SessionPersistence.notifyUser', () => {
+  it('calls WebClient.instance.response.session.notifyUser', () => {
     const data = create(Data.Event_NotifyUserSchema, { warningReason: 'yo' });
     notifyUser(data);
-    expect(SessionPersistence.notifyUser).toHaveBeenCalledWith(data);
+    expect(WebClient.instance.response.session.notifyUser).toHaveBeenCalledWith(data);
   });
 });
 
@@ -114,12 +115,12 @@ describe('notifyUser', () => {
 // ----------------------------------------------------------------
 describe('replayAdded', () => {
 
-  it('calls SessionPersistence.replayAdded with matchInfo', () => {
+  it('calls WebClient.instance.response.session.replayAdded with matchInfo', () => {
     const data = create(Data.Event_ReplayAddedSchema, {
       matchInfo: create(Data.ServerInfo_ReplayMatchSchema, { gameId: 42 }),
     });
     replayAdded(data);
-    expect(SessionPersistence.replayAdded).toHaveBeenCalledWith(data.matchInfo);
+    expect(WebClient.instance.response.session.replayAdded).toHaveBeenCalledWith(data.matchInfo);
   });
 });
 
@@ -128,11 +129,11 @@ describe('replayAdded', () => {
 // ----------------------------------------------------------------
 describe('serverCompleteList', () => {
 
-  it('calls SessionPersistence.updateUsers and RoomPersistence.updateRooms', () => {
+  it('calls WebClient.instance.response.session.updateUsers and WebClient.instance.response.room.updateRooms', () => {
     const data = create(Data.Event_ServerCompleteListSchema, { userList: [], roomList: [] });
     serverCompleteList(data);
-    expect(SessionPersistence.updateUsers).toHaveBeenCalledWith(data.userList);
-    expect(RoomPersistence.updateRooms).toHaveBeenCalledWith(data.roomList);
+    expect(WebClient.instance.response.session.updateUsers).toHaveBeenCalledWith(data.userList);
+    expect(WebClient.instance.response.room.updateRooms).toHaveBeenCalledWith(data.roomList);
   });
 });
 
@@ -141,9 +142,9 @@ describe('serverCompleteList', () => {
 // ----------------------------------------------------------------
 describe('serverMessage', () => {
 
-  it('calls SessionPersistence.serverMessage with message', () => {
+  it('calls WebClient.instance.response.session.serverMessage with message', () => {
     serverMessage(create(Data.Event_ServerMessageSchema, { message: 'hello server' }));
-    expect(SessionPersistence.serverMessage).toHaveBeenCalledWith('hello server');
+    expect(WebClient.instance.response.session.serverMessage).toHaveBeenCalledWith('hello server');
   });
 });
 
@@ -152,10 +153,10 @@ describe('serverMessage', () => {
 // ----------------------------------------------------------------
 describe('serverShutdown', () => {
 
-  it('calls SessionPersistence.serverShutdown', () => {
+  it('calls WebClient.instance.response.session.serverShutdown', () => {
     const payload = create(Data.Event_ServerShutdownSchema, { reason: 'maintenance' });
     serverShutdown(payload);
-    expect(SessionPersistence.serverShutdown).toHaveBeenCalledWith(payload);
+    expect(WebClient.instance.response.session.serverShutdown).toHaveBeenCalledWith(payload);
   });
 });
 
@@ -164,12 +165,12 @@ describe('serverShutdown', () => {
 // ----------------------------------------------------------------
 describe('userJoined', () => {
 
-  it('calls SessionPersistence.userJoined with userInfo', () => {
+  it('calls WebClient.instance.response.session.userJoined with userInfo', () => {
     const data = create(Data.Event_UserJoinedSchema, {
       userInfo: create(Data.ServerInfo_UserSchema, { name: 'alice' }),
     });
     userJoined(data);
-    expect(SessionPersistence.userJoined).toHaveBeenCalledWith(data.userInfo);
+    expect(WebClient.instance.response.session.userJoined).toHaveBeenCalledWith(data.userInfo);
   });
 });
 
@@ -178,9 +179,9 @@ describe('userJoined', () => {
 // ----------------------------------------------------------------
 describe('userLeft', () => {
 
-  it('calls SessionPersistence.userLeft with name', () => {
+  it('calls WebClient.instance.response.session.userLeft with name', () => {
     userLeft(create(Data.Event_UserLeftSchema, { name: 'bob' }));
-    expect(SessionPersistence.userLeft).toHaveBeenCalledWith('bob');
+    expect(WebClient.instance.response.session.userLeft).toHaveBeenCalledWith('bob');
   });
 });
 
@@ -189,10 +190,10 @@ describe('userLeft', () => {
 // ----------------------------------------------------------------
 describe('userMessage', () => {
 
-  it('calls SessionPersistence.userMessage', () => {
+  it('calls WebClient.instance.response.session.userMessage', () => {
     const payload = create(Data.Event_UserMessageSchema, { senderName: 'alice', message: 'hi' });
     userMessage(payload);
-    expect(SessionPersistence.userMessage).toHaveBeenCalledWith(payload);
+    expect(WebClient.instance.response.session.userMessage).toHaveBeenCalledWith(payload);
   });
 });
 
@@ -214,7 +215,7 @@ describe('addToList', () => {
       userInfo: create(Data.ServerInfo_UserSchema, { name: 'alice' }),
     });
     addToList(data);
-    expect(SessionPersistence.addToBuddyList).toHaveBeenCalledWith(data.userInfo);
+    expect(WebClient.instance.response.session.addToBuddyList).toHaveBeenCalledWith(data.userInfo);
   });
 
   it('ignore list → addToIgnoreList', () => {
@@ -223,7 +224,7 @@ describe('addToList', () => {
       userInfo: create(Data.ServerInfo_UserSchema, { name: 'bob' }),
     });
     addToList(data);
-    expect(SessionPersistence.addToIgnoreList).toHaveBeenCalledWith(data.userInfo);
+    expect(WebClient.instance.response.session.addToIgnoreList).toHaveBeenCalledWith(data.userInfo);
   });
 
   it('unknown list → console.log', () => {
@@ -239,12 +240,12 @@ describe('removeFromList', () => {
 
   it('buddy list → removeFromBuddyList', () => {
     removeFromList(create(Data.Event_RemoveFromListSchema, { listName: 'buddy', userName: 'alice' }));
-    expect(SessionPersistence.removeFromBuddyList).toHaveBeenCalledWith('alice');
+    expect(WebClient.instance.response.session.removeFromBuddyList).toHaveBeenCalledWith('alice');
   });
 
   it('ignore list → removeFromIgnoreList', () => {
     removeFromList(create(Data.Event_RemoveFromListSchema, { listName: 'ignore', userName: 'bob' }));
-    expect(SessionPersistence.removeFromIgnoreList).toHaveBeenCalledWith('bob');
+    expect(WebClient.instance.response.session.removeFromIgnoreList).toHaveBeenCalledWith('bob');
   });
 
   it('unknown list → console.log', () => {
@@ -260,9 +261,9 @@ describe('removeFromList', () => {
 // ----------------------------------------------------------------
 describe('listRooms', () => {
 
-  it('calls RoomPersistence.updateRooms', () => {
+  it('calls WebClient.instance.response.room.updateRooms', () => {
     listRooms(create(Data.Event_ListRoomsSchema, { roomList: [] }));
-    expect(RoomPersistence.updateRooms).toHaveBeenCalledWith([]);
+    expect(WebClient.instance.response.room.updateRooms).toHaveBeenCalledWith([]);
   });
 
   it('does not call joinRoom when autojoinrooms is false', () => {
@@ -385,7 +386,7 @@ describe('serverIdentification', () => {
 
   beforeEach(() => {
     ConfigMock.PROTOCOL_VERSION = 14;
-    webClient.options = null;
+    WebClient.instance.options = null;
   });
 
   it('disconnects when protocolVersion mismatches', () => {
@@ -396,7 +397,7 @@ describe('serverIdentification', () => {
   });
 
   it('LOGIN reason without salt → calls login with password as separate param', () => {
-    webClient.options = { host: 'h', port: '1', userName: 'u', reason: App.WebSocketConnectReason.LOGIN, password: 'secret' };
+    WebClient.instance.options = { host: 'h', port: '1', userName: 'u', reason: App.WebSocketConnectReason.LOGIN, password: 'secret' };
     (Utils.passwordSaltSupported as Mock).mockReturnValue(0);
     serverIdentification(create(Data.Event_ServerIdentificationSchema,
       { serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 }));
@@ -407,7 +408,7 @@ describe('serverIdentification', () => {
   });
 
   it('LOGIN reason with salt → calls requestPasswordSalt with password as separate param', () => {
-    webClient.options = { host: 'h', port: '1', userName: 'u', reason: App.WebSocketConnectReason.LOGIN, password: 'secret' };
+    WebClient.instance.options = { host: 'h', port: '1', userName: 'u', reason: App.WebSocketConnectReason.LOGIN, password: 'secret' };
     (Utils.passwordSaltSupported as Mock).mockReturnValue(1);
     serverIdentification(create(Data.Event_ServerIdentificationSchema,
       { serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 1 }));
@@ -418,7 +419,7 @@ describe('serverIdentification', () => {
   });
 
   it('REGISTER reason without salt → calls register with password and null salt', () => {
-    webClient.options = {
+    WebClient.instance.options = {
       host: 'h', port: '1', userName: 'u', email: 'e', country: 'US', realName: 'R',
       reason: App.WebSocketConnectReason.REGISTER, password: 'secret',
     };
@@ -433,7 +434,7 @@ describe('serverIdentification', () => {
   });
 
   it('REGISTER reason with salt → calls register with password and generated salt', () => {
-    webClient.options = {
+    WebClient.instance.options = {
       host: 'h', port: '1', userName: 'u', email: 'e', country: 'US', realName: 'R',
       reason: App.WebSocketConnectReason.REGISTER, password: 'secret',
     };
@@ -448,7 +449,7 @@ describe('serverIdentification', () => {
   });
 
   it('ACTIVATE_ACCOUNT reason without salt → calls activate with password as separate param', () => {
-    webClient.options = {
+    WebClient.instance.options = {
       host: 'h', port: '1', userName: 'u', token: 'tok',
       reason: App.WebSocketConnectReason.ACTIVATE_ACCOUNT, password: 'secret',
     };
@@ -462,7 +463,7 @@ describe('serverIdentification', () => {
   });
 
   it('ACTIVATE_ACCOUNT reason with salt → calls requestPasswordSalt with password as separate param', () => {
-    webClient.options = {
+    WebClient.instance.options = {
       host: 'h', port: '1', userName: 'u', token: 'tok',
       reason: App.WebSocketConnectReason.ACTIVATE_ACCOUNT, password: 'secret',
     };
@@ -476,21 +477,23 @@ describe('serverIdentification', () => {
   });
 
   it('PASSWORD_RESET_REQUEST reason → calls forgotPasswordRequest', () => {
-    webClient.options = { host: 'h', port: '1', userName: 'u', reason: App.WebSocketConnectReason.PASSWORD_RESET_REQUEST };
+    WebClient.instance.options = { host: 'h', port: '1', userName: 'u', reason: App.WebSocketConnectReason.PASSWORD_RESET_REQUEST };
     serverIdentification(create(Data.Event_ServerIdentificationSchema,
       { serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 }));
     expect(SessionCmds.forgotPasswordRequest).toHaveBeenCalled();
   });
 
   it('PASSWORD_RESET_CHALLENGE reason → calls forgotPasswordChallenge', () => {
-    webClient.options = { host: 'h', port: '1', userName: 'u', email: 'e', reason: App.WebSocketConnectReason.PASSWORD_RESET_CHALLENGE };
+    WebClient.instance.options = {
+      host: 'h', port: '1', userName: 'u', email: 'e', reason: App.WebSocketConnectReason.PASSWORD_RESET_CHALLENGE,
+    };
     serverIdentification(create(Data.Event_ServerIdentificationSchema,
       { serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 }));
     expect(SessionCmds.forgotPasswordChallenge).toHaveBeenCalled();
   });
 
   it('PASSWORD_RESET reason without salt → calls forgotPasswordReset with newPassword as separate param', () => {
-    webClient.options = {
+    WebClient.instance.options = {
       host: 'h', port: '1', userName: 'u', token: 'tok',
       reason: App.WebSocketConnectReason.PASSWORD_RESET, newPassword: 'newpw',
     };
@@ -504,7 +507,7 @@ describe('serverIdentification', () => {
   });
 
   it('PASSWORD_RESET reason with salt → calls requestPasswordSalt with newPassword as separate param', () => {
-    webClient.options = {
+    WebClient.instance.options = {
       host: 'h', port: '1', userName: 'u', token: 'tok',
       reason: App.WebSocketConnectReason.PASSWORD_RESET, newPassword: 'newpw',
     };
@@ -519,18 +522,18 @@ describe('serverIdentification', () => {
   });
 
   it('unknown reason → updateStatus DISCONNECTED and disconnect', () => {
-    webClient.options = { host: 'h', port: '1', reason: 999 as App.WebSocketConnectReason } as Enriched.WebSocketConnectOptions;
+    WebClient.instance.options = { host: 'h', port: '1', reason: 999 as App.WebSocketConnectReason } as Enriched.WebSocketConnectOptions;
     serverIdentification(create(Data.Event_ServerIdentificationSchema,
       { serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 }));
     expect(SessionCmds.updateStatus).toHaveBeenCalled();
     expect(SessionCmds.disconnect).toHaveBeenCalled();
   });
 
-  it('resets webClient.options and calls SessionPersistence.updateInfo', () => {
-    webClient.options = { host: 'h', port: '1', userName: 'u', reason: App.WebSocketConnectReason.LOGIN };
+  it('resets WebClient.instance.options and calls WebClient.instance.response.session.updateInfo', () => {
+    WebClient.instance.options = { host: 'h', port: '1', userName: 'u', reason: App.WebSocketConnectReason.LOGIN };
     serverIdentification(create(Data.Event_ServerIdentificationSchema,
       { serverName: 'myServer', serverVersion: '2.0', protocolVersion: 14, serverOptions: 0 }));
-    expect(SessionPersistence.updateInfo).toHaveBeenCalledWith('myServer', '2.0');
-    expect(webClient.options).toBeNull();
+    expect(WebClient.instance.response.session.updateInfo).toHaveBeenCalledWith('myServer', '2.0');
+    expect(WebClient.instance.options).toBeNull();
   });
 });

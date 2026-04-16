@@ -2,13 +2,16 @@ import { App, Data, Enriched } from '@app/types';
 
 export interface ServerState {
   initialized: boolean;
-  buddyList: Data.ServerInfo_User[];
-  ignoreList: Data.ServerInfo_User[];
+  /** Buddies keyed by username for O(1) lookup. Use `getSortedBuddyList` for display. */
+  buddyList: { [userName: string]: Data.ServerInfo_User };
+  /** Ignored users keyed by username for O(1) lookup. Use `getSortedIgnoreList` for display. */
+  ignoreList: { [userName: string]: Data.ServerInfo_User };
   info: ServerStateInfo;
   status: ServerStateStatus;
   logs: ServerStateLogs;
   user: Data.ServerInfo_User | null;
-  users: Data.ServerInfo_User[];
+  /** Connected users keyed by username for O(1) lookup. Use `getSortedUsers` for display. */
+  users: { [userName: string]: Data.ServerInfo_User };
   sortUsersBy: ServerStateSortUsersBy;
   messages: {
     [userName: string]: Data.Event_UserMessage[];
@@ -28,7 +31,8 @@ export interface ServerState {
   warnListOptions: Data.Response_WarnList[];
   warnUser: string;
   adminNotes: { [userName: string]: string };
-  replays: Data.ServerInfo_ReplayMatch[];
+  /** Replays keyed by gameId for O(1) lookup/update. */
+  replays: { [gameId: number]: Data.ServerInfo_ReplayMatch };
   backendDecks: Data.Response_DeckList | null;
   gamesOfUser: { [userName: string]: Enriched.Game[] };
   registrationError: string | null;

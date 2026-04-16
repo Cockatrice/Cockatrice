@@ -37,15 +37,15 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
     openToast()
   }, ServerTypes.REGISTRATION_SUCCESS);
 
-  useReduxEffect(({ error }) => {
+  useReduxEffect(({ payload: { error } }) => {
     setEmailError(error);
   }, ServerTypes.REGISTRATION_EMAIL_ERROR);
 
-  useReduxEffect(({ error }) => {
+  useReduxEffect(({ payload: { error } }) => {
     setPasswordError(error);
   }, ServerTypes.REGISTRATION_PASSWORD_ERROR);
 
-  useReduxEffect(({ error }) => {
+  useReduxEffect(({ payload: { error } }) => {
     setUserNameError(error);
   }, ServerTypes.REGISTRATION_USERNAME_ERROR);
 

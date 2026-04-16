@@ -2,26 +2,43 @@
 // creates the Redux store or connects to Redux DevTools.
 import './polyfills';
 
-import { StrictMode } from 'react';
+import { StrictMode, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { StyledEngineProvider } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 
+import { WebClient } from '@app/websocket';
+import { createWebClientResponse, createWebClientRequest } from '@app/api';
 import { AppShell } from '@app/containers';
 import { materialTheme } from './material-theme';
 
 import './i18n';
 import './index.css';
 
-const AppWithMaterialTheme = () => (
-  <StrictMode>
-    <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={materialTheme}>
-        <AppShell />
-      </ThemeProvider>
-    </StyledEngineProvider>
-  </StrictMode>
-);
+function initWebClient() {
+  const initialized = useRef(false);
+
+  if (!initialized.current) {
+    initialized.current = true;
+    new WebClient(createWebClientResponse(), createWebClientRequest());
+  }
+}
+
+const AppWithMaterialTheme = () => {
+  // Instantiate the WebClient singleton before any container renders or any
+  // hook touches WebClient.instance.
+  initWebClient();
+
+  return (
+    <StrictMode>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={materialTheme}>
+          <AppShell />
+        </ThemeProvider>
+      </StyledEngineProvider>
+    </StrictMode>
+  );
+}
 
 const container = document.getElementById('root');
 const root = createRoot(container!);

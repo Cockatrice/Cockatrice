@@ -104,8 +104,16 @@ export function makeReplayMatch(
   });
 }
 
-export function makeGame(overrides: Partial<Enriched.Game> = {}): Enriched.Game {
-  return { ...create(Data.ServerInfo_GameSchema, { description: '' }), gameType: '', ...overrides };
+type MakeGameOverrides = MessageInitShape<typeof Data.ServerInfo_GameSchema> & {
+  gameType?: string;
+};
+
+export function makeGame(overrides: MakeGameOverrides = {}): Enriched.Game {
+  const { gameType = '', ...protoFields } = overrides;
+  return {
+    info: create(Data.ServerInfo_GameSchema, { description: '', ...protoFields }),
+    gameType,
+  };
 }
 
 export function makeLoginSuccessContext(
@@ -131,8 +139,8 @@ export function makePendingActivationContext(
 export function makeServerState(overrides: Partial<ServerState> = {}): ServerState {
   return {
     initialized: false,
-    buddyList: [],
-    ignoreList: [],
+    buddyList: {},
+    ignoreList: {},
     status: {
       connectionAttemptMade: false,
       state: App.StatusEnum.DISCONNECTED,
@@ -149,7 +157,7 @@ export function makeServerState(overrides: Partial<ServerState> = {}): ServerSta
       chat: [],
     },
     user: null,
-    users: [],
+    users: {},
     sortUsersBy: {
       field: App.UserSortField.NAME,
       order: App.SortDirection.ASC,
@@ -164,7 +172,7 @@ export function makeServerState(overrides: Partial<ServerState> = {}): ServerSta
     warnListOptions: [],
     warnUser: '',
     adminNotes: {},
-    replays: [],
+    replays: {},
     backendDecks: null,
     gamesOfUser: {},
     registrationError: null,

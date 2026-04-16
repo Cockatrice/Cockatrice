@@ -4,7 +4,7 @@ import { useNavigate, useParams, generatePath } from 'react-router-dom';
 import ListItemButton from '@mui/material/ListItemButton';
 import Paper from '@mui/material/Paper';
 
-import { RoomsService } from '@app/api';
+import { request } from '@app/api';
 import { ScrollToBottomOnChanges, ThreePaneLayout, UserDisplay, VirtualList, AuthGuard } from '@app/components';
 import { RoomsSelectors } from '@app/store';
 import { useAppSelector } from '@app/store';
@@ -28,17 +28,17 @@ const Room = () => {
   const roomId = parseInt(params.roomId, 0);
   const room = rooms[roomId];
   const roomMessages = messages[roomId];
-  const users = room.userList;
+  const users = useAppSelector(state => RoomsSelectors.getSortedRoomUsers(state, roomId));
 
   useEffect(() => {
-    if (!joined.find(({ roomId: id }) => id === roomId)) {
+    if (!joined.find(r => r.info.roomId === roomId)) {
       navigate(generatePath(App.RouteEnum.SERVER));
     }
   }, [joined]);
 
   const handleRoomSay = ({ message }) => {
     if (message) {
-      RoomsService.roomSay(roomId, message);
+      request.rooms.roomSay(roomId, message);
     }
   }
 

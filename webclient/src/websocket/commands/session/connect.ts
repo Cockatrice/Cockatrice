@@ -1,5 +1,5 @@
 import { App, Enriched } from '@app/types';
-import webClient from '../../WebClient';
+import { WebClient } from '../../WebClient';
 import { updateStatus } from './';
 
 export function connect(options: Enriched.WebSocketConnectOptions): void {
@@ -11,10 +11,10 @@ export function connect(options: Enriched.WebSocketConnectOptions): void {
     case App.WebSocketConnectReason.PASSWORD_RESET_CHALLENGE:
     case App.WebSocketConnectReason.PASSWORD_RESET:
       updateStatus(App.StatusEnum.CONNECTING, 'Connecting...');
-      webClient.connect(options);
+      WebClient.instance.connect(options);
       return;
     case App.WebSocketConnectReason.TEST_CONNECTION:
-      webClient.testConnect(options);
+      WebClient.instance.testConnect(options);
       return;
     default: {
       const { reason } = options as Enriched.WebSocketConnectOptions;

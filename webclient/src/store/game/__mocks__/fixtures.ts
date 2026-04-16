@@ -1,7 +1,7 @@
 import type { MessageInitShape } from '@bufbuild/protobuf';
-import { Data } from '@app/types';
+import { Data, Enriched } from '@app/types';
 import { create } from '@bufbuild/protobuf';
-import { GameEntry, GamesState, PlayerEntry, ZoneEntry } from '../game.interfaces';
+import { GamesState } from '../game.interfaces';
 
 export function makeCard(overrides: MessageInitShape<typeof Data.ServerInfo_CardSchema> = {}): Data.ServerInfo_Card {
   return create(Data.ServerInfo_CardSchema, {
@@ -45,22 +45,42 @@ export function makeArrow(overrides: MessageInitShape<typeof Data.ServerInfo_Arr
     startCardId: 1,
     targetPlayerId: 1,
     targetZone: 'table',
-    targetCardId: 2,
     arrowColor: create(Data.colorSchema, { r: 255, g: 0, b: 0, a: 255 }),
+    targetCardId: 2,
     ...overrides,
   });
 }
 
-export function makeZoneEntry(overrides: Partial<ZoneEntry> = {}): ZoneEntry {
+type ZoneEntryOverrides = Partial<Enriched.ZoneEntry> & {
+  /**
+   * Convenience for tests: pass an ordered card array and the fixture
+   * materializes it into `{ order, byId }`. If provided, takes precedence
+   * over an explicit `order`/`byId` in the same overrides object.
+   */
+  cards?: Data.ServerInfo_Card[];
+};
+
+export function makeZoneEntry(overrides: ZoneEntryOverrides = {}): Enriched.ZoneEntry {
+  const { cards, order, byId, ...rest } = overrides;
+  let resolvedOrder: number[] = order ?? [];
+  let resolvedById: { [id: number]: Data.ServerInfo_Card } = byId ?? {};
+  if (cards !== undefined) {
+    resolvedOrder = cards.map(c => c.id);
+    resolvedById = {};
+    for (const c of cards) {
+      resolvedById[c.id] = c;
+    }
+  }
   return {
     name: 'hand',
     type: 1,
     withCoords: false,
     cardCount: 0,
-    cards: [],
+    order: resolvedOrder,
+    byId: resolvedById,
     alwaysRevealTopCard: false,
     alwaysLookAtTopCard: false,
-    ...overrides,
+    ...rest,
   };
 }
 
@@ -80,7 +100,7 @@ export function makePlayerProperties(
   });
 }
 
-export function makePlayerEntry(overrides: Partial<PlayerEntry> = {}): PlayerEntry {
+export function makePlayerEntry(overrides: Partial<Enriched.PlayerEntry> = {}): Enriched.PlayerEntry {
   return {
     properties: makePlayerProperties(),
     deckList: '',
@@ -94,11 +114,22 @@ export function makePlayerEntry(overrides: Partial<PlayerEntry> = {}): PlayerEnt
   };
 }
 
-export function makeGameEntry(overrides: Partial<GameEntry> = {}): GameEntry {
-  return {
+export function makeGameInfo(
+  overrides: MessageInitShape<typeof Data.ServerInfo_GameSchema> = {},
+): Data.ServerInfo_Game {
+  return create(Data.ServerInfo_GameSchema, {
     gameId: 1,
     roomId: 1,
     description: 'Test Game',
+    gameTypes: [],
+    started: false,
+    ...overrides,
+  });
+}
+
+export function makeGameEntry(overrides: Partial<Enriched.GameEntry> = {}): Enriched.GameEntry {
+  return {
+    info: makeGameInfo(),
     hostId: 1,
     localPlayerId: 1,
     spectator: false,

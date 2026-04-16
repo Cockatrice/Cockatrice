@@ -1,6 +1,6 @@
 import { Enriched } from '@app/types';
-import { GamePersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function gameClosed(_data: {}, meta: Enriched.GameEventMeta): void {
-  GamePersistence.gameClosed(meta.gameId);
+  WebClient.instance.response.game.gameClosed(meta.gameId);
 }

@@ -1,16 +1,14 @@
-import * as _ from 'lodash';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { App, Data, Enriched } from '@app/types';
 
-import { App, Enriched } from '@app/types';
+import { normalizeGameObject, normalizeGametypeMap, normalizeRoomInfo, normalizeUserMessage } from '../common';
 
-import { normalizeGameObject, normalizeGametypeMap, normalizeRoomInfo, normalizeUserMessage, SortUtil } from '../common';
-
-import { RoomsAction } from './rooms.actions';
 import { RoomsState } from './rooms.interfaces'
-import { MAX_ROOM_MESSAGES, Types } from './rooms.types';
+
+export const MAX_ROOM_MESSAGES = 1000;
 
 const initialState: RoomsState = {
   rooms: {},
-  games: {},
   joinedRoomIds: {},
   joinedGameIds: {},
   messages: {},
@@ -24,316 +22,163 @@ const initialState: RoomsState = {
   }
 };
 
-export const roomsReducer = (state = initialState, action: RoomsAction) => {
-  switch (action.type) {
-    case Types.CLEAR_STORE: {
-      return {
-        ...initialState
-      };
-    }
+export const roomsSlice = createSlice({
+  name: 'rooms',
+  initialState,
+  reducers: {
+    clearStore: () => initialState,
 
-    case Types.UPDATE_ROOMS: {
-      const rooms = {
-        ...state.rooms
-      };
+    updateRooms: (state, action: PayloadAction<{ rooms: Data.ServerInfo_Room[] }>) => {
+      const { rooms } = action.payload;
 
-      // Server does not send everything on updates — preserve existing gameList/userList
-      _.each(action.rooms, (rawRoom, order) => {
-        const { gameList: _g, gametypeList, userList: _u, ...roomMeta } = rawRoom;
-        const { roomId } = roomMeta;
-        const existing = rooms[roomId] || {};
+      // UPDATE_ROOMS carries metadata only. For existing rooms, replace
+      // `info`, `gametypeMap` and `order`; preserve the normalized `games`
+      // and `users` maps (those are maintained by their own events).
+      rooms.forEach((rawRoom, order) => {
+        const { roomId } = rawRoom;
+        const existing = state.rooms[roomId];
+        const gametypeMap = normalizeGametypeMap(rawRoom.gametypeList);
 
-        const gametypeMap = normalizeGametypeMap(gametypeList);
-
-        rooms[roomId] = {
-          ...(existing as Enriched.Room),
-          ...roomMeta,
-          gametypeMap,
-          gameList: (existing as Enriched.Room).gameList,
-          userList: (existing as Enriched.Room).userList,
-          order,
-        };
+        if (existing) {
+          existing.info = rawRoom;
+          existing.gametypeMap = gametypeMap;
+          existing.order = order;
+        } else {
+          state.rooms[roomId] = {
+            info: rawRoom,
+            gametypeMap,
+            order,
+            games: {},
+            users: {},
+          };
+        }
       });
+    },
 
-      return { ...state, rooms };
-    }
+    joinRoom: (state, action: PayloadAction<{ roomInfo: Data.ServerInfo_Room }>) => {
+      const { roomInfo: rawRoomInfo } = action.payload;
 
-    case Types.JOIN_ROOM: {
-      const { roomInfo: rawRoomInfo } = action;
-      const { joinedRoomIds, rooms, sortGamesBy, sortUsersBy } = state;
+      const roomEntry = normalizeRoomInfo(rawRoomInfo);
+      const roomId = roomEntry.info.roomId;
 
-      const roomInfo = normalizeRoomInfo(rawRoomInfo);
-      const { roomId } = roomInfo;
+      state.rooms[roomId] = roomEntry;
+      state.joinedRoomIds[roomId] = true;
+    },
 
-      const gameList = [
-        ...roomInfo.gameList
-      ];
+    leaveRoom: (state, action: PayloadAction<{ roomId: number }>) => {
+      const { roomId } = action.payload;
 
-      const userList = [
-        ...roomInfo.userList
-      ];
+      delete state.joinedRoomIds[roomId];
+      delete state.messages[roomId];
+    },
 
-      SortUtil.sortByField(gameList, sortGamesBy);
-      SortUtil.sortUsersByField(userList, sortUsersBy);
+    addMessage: (state, action: PayloadAction<{ roomId: number; message: Enriched.Message }>) => {
+      const { roomId, message } = action.payload;
 
-      return {
-        ...state,
-
-        rooms: {
-          ...rooms,
-          [roomId]: {
-            ...roomInfo,
-            gameList,
-            userList
-          }
-        },
-
-        joinedRoomIds: {
-          ...joinedRoomIds,
-          [roomId]: true
-        },
-      }
-    }
-
-    case Types.LEAVE_ROOM: {
-      const { roomId } = action;
-      const { joinedRoomIds, messages } = state;
-
-      const _joined = {
-        ...joinedRoomIds
-      };
-
-      const _messages = {
-        ...messages
-      };
-
-      delete _joined[roomId];
-      delete _messages[roomId];
-
-      return {
-        ...state,
-
-        joinedRoomIds: _joined,
-        messages: _messages,
-      }
-    }
-
-    case Types.ADD_MESSAGE: {
-      const { roomId, message } = action;
-      const { messages } = state;
-
-      let roomMessages = [...(messages[roomId] || [])];
-
-      if (roomMessages.length === MAX_ROOM_MESSAGES) {
-        roomMessages.shift();
-      }
-
+      const existing = state.messages[roomId] ?? [];
       const normalized = normalizeUserMessage({ ...message, timeReceived: Date.now() });
-      roomMessages.push(normalized);
+      const next =
+        existing.length >= MAX_ROOM_MESSAGES
+          ? [...existing.slice(existing.length - MAX_ROOM_MESSAGES + 1), normalized]
+          : [...existing, normalized];
 
-      return {
-        ...state,
-        messages: {
-          ...messages,
+      state.messages[roomId] = next;
+    },
 
-          [roomId]: [
-            ...roomMessages
-          ]
-        }
-      }
-    }
-    // @TODO improve this reducer, likely by improving the store model
+    updateGames: (state, action: PayloadAction<{ roomId: number; games: Data.ServerInfo_Game[] }>) => {
+      const { roomId, games } = action.payload;
+      const room = state.rooms[roomId];
 
-    case Types.UPDATE_GAMES: {
-      const { roomId, games } = action;
-      const { rooms, sortGamesBy } = state;
-      const room = rooms[roomId];
-
-      // An empty gameList means no game updates — skip to avoid
-      // overwriting the existing game list with an empty one.
+      // An empty games array means no game updates — skip to avoid
+      // accidentally wiping the existing normalized games map.
       if (!room || !games?.length) {
-        return state;
+        return;
       }
 
-      // Normalize incoming raw proto games using the room's gametypeMap
       const gametypeMap = room.gametypeMap ?? {};
-      const normalizedGames = games.map(g => normalizeGameObject(g, gametypeMap));
 
-      // Create map of games with update objects
-      const toUpdate = normalizedGames.reduce((map, game) => {
-        map[game.gameId] = game;
-        return map;
-      }, {});
-
-      const gameUpdates = room.gameList
-      // filter out closed games and remove from update map
-        .filter(game => {
-          const gameUpdate = toUpdate[game.gameId];
-          const closedGame = gameUpdate && gameUpdate.closed;
-
-          if (closedGame) {
-            delete toUpdate[game.gameId];
-          }
-
-          return !closedGame;
-        })
-        .map(game => {
-          const gameUpdate = toUpdate[game.gameId];
-
-          if (gameUpdate) {
-            delete toUpdate[game.gameId];
-
-            return {
-              ...game,
-              ...gameUpdate
-            };
-          }
-
-          return game;
-        });
-
-      // Push new games to end of list
-      if (_.size(toUpdate)) {
-        _.each(toUpdate, game => gameUpdates.push(game));
-      }
-
-      const gameList = [...gameUpdates];
-
-      SortUtil.sortByField(gameList, sortGamesBy);
-
-      return {
-        ...state,
-        rooms: {
-          ...rooms,
-          [roomId]: {
-            ...room,
-            gameList
-          }
+      for (const rawGame of games) {
+        if (rawGame.closed) {
+          delete room.games[rawGame.gameId];
+          continue;
+        }
+        const existing = room.games[rawGame.gameId];
+        if (existing) {
+          // Merge the incoming proto into the existing snapshot.
+          const merged: Data.ServerInfo_Game = { ...existing.info, ...rawGame };
+          room.games[rawGame.gameId] = {
+            info: merged,
+            gameType: merged.gameTypes?.length
+              ? (gametypeMap[merged.gameTypes[0]] ?? '')
+              : existing.gameType,
+          };
+        } else {
+          room.games[rawGame.gameId] = normalizeGameObject(rawGame, gametypeMap);
         }
       }
-    }
+    },
 
-    case Types.USER_JOINED: {
-      const { roomId, user } = action;
-      const { rooms, sortUsersBy } = state;
-
-      const room = { ...rooms[roomId] };
-
-      const userList = [
-        ...room.userList,
-        user
-      ];
-
-      SortUtil.sortUsersByField(userList, sortUsersBy);
-
-      return {
-        ...state,
-        rooms: {
-          ...rooms,
-          [roomId]: {
-            ...room,
-            userList
-          }
-        }
-      };
-    }
-
-    case Types.USER_LEFT: {
-      const { roomId, name } = action;
-      const { rooms } = state;
-
-      const room = { ...rooms[roomId] };
-      const userList = room.userList.filter(user => user.name !== name);
-
-      return {
-        ...state,
-        rooms: {
-          ...rooms,
-          [roomId]: {
-            ...room,
-            userList
-          }
-        }
-      };
-    }
-
-    case Types.SORT_GAMES: {
-      const { field, order, roomId } = action;
-      const { rooms } = state;
-
-      const gameList = [...rooms[roomId].gameList];
-
-      const sortGamesBy = {
-        field, order
-      };
-
-      SortUtil.sortByField(gameList, sortGamesBy);
-
-      return {
-        ...state,
-
-        rooms: {
-          ...rooms,
-          [roomId]: {
-            ...rooms[roomId],
-            gameList
-          }
-        },
-
-        sortGamesBy
+    userJoined: (state, action: PayloadAction<{ roomId: number; user: Data.ServerInfo_User }>) => {
+      const { roomId, user } = action.payload;
+      const room = state.rooms[roomId];
+      if (!room) {
+        return;
       }
-    }
 
-    case Types.REMOVE_MESSAGES: {
-      const { name, amount, roomId } = action;
-      const { messages } = state;
-      let amountRemoved = 0;
+      room.users[user.name] = user;
+    },
 
-      return {
-        ...state,
-        messages: {
-          ...messages,
-          [roomId]: messages[roomId]
-            .reverse()
-            .filter(({ message }) => {
-              if (amount === amountRemoved) {
-                return true;
-              }
+    userLeft: (state, action: PayloadAction<{ roomId: number; name: string }>) => {
+      const { roomId, name } = action.payload;
+      const room = state.rooms[roomId];
+      if (!room) {
+        return;
+      }
 
-              const keep = message.indexOf(`${name}:`) !== 0;
+      delete room.users[name];
+    },
 
-              if (!keep) {
-                amountRemoved++;
-              }
+    sortGames: (state, action: PayloadAction<{ field: App.GameSortField; order: App.SortDirection }>) => {
+      // Sort is now derived in selectors; the reducer only stores the sort config.
+      const { field, order } = action.payload;
+      state.sortGamesBy = { field, order };
+    },
 
-              return keep;
-            })
-            .reverse()
+    removeMessages: (state, action: PayloadAction<{ roomId: number; name: string; amount: number }>) => {
+      const { name, amount, roomId } = action.payload;
+      const roomMessages = state.messages[roomId];
+
+      if (!roomMessages) {
+        return;
+      }
+
+      // Drop the `amount` most-recent messages whose text starts with `${name}:`.
+      // Walk newest → oldest so we remove the N latest matches.
+      const prefix = `${name}:`;
+      const keep = new Array(roomMessages.length).fill(true);
+      let remaining = amount;
+      for (let i = roomMessages.length - 1; i >= 0 && remaining > 0; i--) {
+        if (roomMessages[i].message.indexOf(prefix) === 0) {
+          keep[i] = false;
+          remaining--;
         }
       }
-    }
 
-    case Types.JOINED_GAME: {
-      const { gameId, roomId } = action;
-      const { joinedGameIds } = state;
+      state.messages[roomId] = roomMessages.filter((_, i) => keep[i]);
+    },
 
-      return {
-        ...state,
-        joinedGameIds: {
-          ...joinedGameIds,
-          [roomId]: {
-            ...joinedGameIds[roomId],
-            [gameId]: true,
-          }
-        }
+    joinedGame: (state, action: PayloadAction<{ gameId: number; roomId: number }>) => {
+      const { gameId, roomId } = action.payload;
+
+      if (!state.joinedGameIds[roomId]) {
+        state.joinedGameIds[roomId] = {};
       }
-    }
+      state.joinedGameIds[roomId][gameId] = true;
+    },
 
     // Signal-only — no state mutation needed; explicit for discriminated-union exhaustiveness
-    case Types.GAME_CREATED:
-      return state;
+    gameCreated: (_state, _action: PayloadAction<{ roomId: number }>) => {},
+  },
+});
 
-    default:
-      return state;
-  }
-}
+export const roomsReducer = roomsSlice.reducer;

@@ -1,6 +1,6 @@
 import type { Data, Enriched } from '@app/types';
-import { GamePersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function deleteArrow(data: Data.Event_DeleteArrow, meta: Enriched.GameEventMeta): void {
-  GamePersistence.arrowDeleted(meta.gameId, meta.playerId, data);
+  WebClient.instance.response.game.arrowDeleted(meta.gameId, meta.playerId, data);
 }

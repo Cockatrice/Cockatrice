@@ -1,6 +1,6 @@
 import type { Data, Enriched } from '@app/types';
-import { GamePersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function destroyCard(data: Data.Event_DestroyCard, meta: Enriched.GameEventMeta): void {
-  GamePersistence.cardDestroyed(meta.gameId, meta.playerId, data);
+  WebClient.instance.response.game.cardDestroyed(meta.gameId, meta.playerId, data);
 }

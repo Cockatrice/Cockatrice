@@ -1,6 +1,7 @@
 import { App } from '@app/types';
 import { roomsReducer } from './rooms.reducer';
-import { Types, MAX_ROOM_MESSAGES } from './rooms.types';
+import { Actions } from './rooms.actions';
+import { MAX_ROOM_MESSAGES } from './rooms.types';
 import { makeGame, makeMessage, makeRoom, makeRoomsState, makeUser } from './__mocks__/rooms-fixtures';
 
 // ── Initialisation ───────────────────────────────────────────────────────────
@@ -14,7 +15,7 @@ describe('Initialisation', () => {
 
   it('CLEAR_STORE → resets to initialState', () => {
     const state = makeRoomsState({ joinedRoomIds: { 1: true } });
-    const result = roomsReducer(state, { type: Types.CLEAR_STORE });
+    const result = roomsReducer(state, Actions.clearStore());
     expect(result.joinedRoomIds).toEqual({});
     expect(result.rooms).toEqual({});
   });
@@ -22,63 +23,77 @@ describe('Initialisation', () => {
   it('default → returns state unchanged for unknown action', () => {
     const state = makeRoomsState();
     const result = roomsReducer(state, { type: '@@UNKNOWN' });
-    expect(result).toBe(state);
+    expect(result).toEqual(state);
   });
 });
 
 // ── UPDATE_ROOMS ──────────────────────────────────────────────────────────────
 
 describe('UPDATE_ROOMS', () => {
-  it('merges rooms and strips gameList, gametypeList, userList from update', () => {
+  it('creates RoomEntry with empty normalized games/users for new room', () => {
     const state = makeRoomsState({ rooms: {} });
-    const room = { ...makeRoom({ roomId: 1 }), gameList: [makeGame()], userList: [makeUser()], gametypeList: ['standard'] };
-    const result = roomsReducer(state, { type: Types.UPDATE_ROOMS, rooms: [room] });
+    // UPDATE_ROOMS carries raw ServerInfo_Room protos via the action
+    const room = makeRoom({ roomId: 1 }).info;
+    const result = roomsReducer(state, Actions.updateRooms({ rooms: [room] }));
     expect(result.rooms[1]).toBeDefined();
-    expect(result.rooms[1].gameList).toBeUndefined();
-    expect(result.rooms[1].userList).toBeUndefined();
-    expect(result.rooms[1].gametypeList).toBeUndefined();
+    expect(result.rooms[1].info).toBe(room);
+    expect(result.rooms[1].games).toEqual({});
+    expect(result.rooms[1].users).toEqual({});
   });
 
   it('sets numeric order from array index', () => {
     const state = makeRoomsState({ rooms: {} });
-    const rooms = [makeRoom({ roomId: 1 }), makeRoom({ roomId: 2 })];
-    const result = roomsReducer(state, { type: Types.UPDATE_ROOMS, rooms });
+    const rooms = [makeRoom({ roomId: 1 }).info, makeRoom({ roomId: 2 }).info];
+    const result = roomsReducer(state, Actions.updateRooms({ rooms }));
     expect(result.rooms[1].order).toBe(0);
     expect(result.rooms[2].order).toBe(1);
   });
 
-  it('merges into existing room entry (preserves existing fields)', () => {
-    const existingRoom = makeRoom({ roomId: 1, name: 'Old Name', gameList: [makeGame()] });
+  it('preserves existing normalized games/users when merging into existing room', () => {
+    const existingGame = makeGame({ gameId: 42 });
+    const existingUser = makeUser({ name: 'alice' });
+    const existingRoom = makeRoom({
+      roomId: 1,
+      name: 'Old Name',
+      games: { 42: existingGame },
+      users: { alice: existingUser },
+    });
     const state = makeRoomsState({ rooms: { 1: existingRoom } });
-    const update = makeRoom({ roomId: 1, name: 'New Name' });
-    const result = roomsReducer(state, { type: Types.UPDATE_ROOMS, rooms: [update] });
-    expect(result.rooms[1].name).toBe('New Name');
-    expect(result.rooms[1].gameList).toEqual([makeGame()]);
+
+    const update = makeRoom({ roomId: 1, name: 'New Name' }).info;
+    const result = roomsReducer(state, Actions.updateRooms({ rooms: [update] }));
+
+    expect(result.rooms[1].info.name).toBe('New Name');
+    expect(result.rooms[1].games[42]).toBe(existingGame);
+    expect(result.rooms[1].users['alice']).toBe(existingUser);
   });
 
   it('creates new room entry for unknown roomId', () => {
     const state = makeRoomsState({ rooms: {} });
-    const room = makeRoom({ roomId: 99, name: 'New Room' });
-    const result = roomsReducer(state, { type: Types.UPDATE_ROOMS, rooms: [room] });
+    const room = makeRoom({ roomId: 99, name: 'New Room' }).info;
+    const result = roomsReducer(state, Actions.updateRooms({ rooms: [room] }));
     expect(result.rooms[99]).toBeDefined();
-    expect(result.rooms[99].name).toBe('New Room');
+    expect(result.rooms[99].info.name).toBe('New Room');
   });
 });
 
 // ── JOIN_ROOM ──────────────────────────────────────────────────────────────────
 
 describe('JOIN_ROOM', () => {
-  it('copies gameList and userList, sorts both, sets joinedRoomIds', () => {
+  it('normalizes raw room into keyed games/users maps and marks joined', () => {
     const state = makeRoomsState({ rooms: {}, joinedRoomIds: {} });
-    const roomInfo = makeRoom({
+    // JOIN_ROOM carries a raw proto Room with its gameList/userList populated
+    const rawRoom = makeRoom({
       roomId: 2,
-      gameList: [makeGame({ gameId: 1 })],
+      gameList: [makeGame({ gameId: 1 }).info],
       userList: [makeUser({ name: 'Zane' }), makeUser({ name: 'Alice' })],
-    });
-    const result = roomsReducer(state, { type: Types.JOIN_ROOM, roomInfo });
+    }).info;
+    const result = roomsReducer(state, Actions.joinRoom({ roomInfo: rawRoom }));
     expect(result.joinedRoomIds[2]).toBe(true);
-    expect(result.rooms[2].userList[0].name).toBe('Alice');
-    expect(result.rooms[2]).toMatchObject({ roomId: 2 });
+    expect(result.rooms[2].users['Alice']).toBeDefined();
+    expect(result.rooms[2].users['Zane']).toBeDefined();
+    expect(result.rooms[2].games[1]).toBeDefined();
+    expect(result.rooms[2].info.roomId).toBe(2);
   });
 });
 
@@ -90,7 +105,7 @@ describe('LEAVE_ROOM', () => {
       joinedRoomIds: { 1: true },
       messages: { 1: [makeMessage()] },
     });
-    const result = roomsReducer(state, { type: Types.LEAVE_ROOM, roomId: 1 });
+    const result = roomsReducer(state, Actions.leaveRoom({ roomId: 1 }));
     expect(result.joinedRoomIds[1]).toBeUndefined();
     expect(result.messages[1]).toBeUndefined();
   });
@@ -102,7 +117,7 @@ describe('ADD_MESSAGE', () => {
   it('appends message with timeReceived set', () => {
     const state = makeRoomsState({ messages: { 1: [] } });
     const message = makeMessage({ message: 'hello', timeReceived: 0 });
-    const result = roomsReducer(state, { type: Types.ADD_MESSAGE, roomId: 1, message });
+    const result = roomsReducer(state, Actions.addMessage({ roomId: 1, message }));
     expect(result.messages[1]).toHaveLength(1);
     expect(result.messages[1][0].timeReceived).toBeGreaterThan(0);
   });
@@ -110,7 +125,7 @@ describe('ADD_MESSAGE', () => {
   it('creates message list for roomId when none exists', () => {
     const state = makeRoomsState({ messages: {} });
     const message = makeMessage();
-    const result = roomsReducer(state, { type: Types.ADD_MESSAGE, roomId: 5, message });
+    const result = roomsReducer(state, Actions.addMessage({ roomId: 5, message }));
     expect(result.messages[5]).toHaveLength(1);
   });
 
@@ -121,7 +136,7 @@ describe('ADD_MESSAGE', () => {
     );
     const state = makeRoomsState({ messages: { 1: messages } });
     const newMsg = makeMessage({ message: 'new' });
-    const result = roomsReducer(state, { type: Types.ADD_MESSAGE, roomId: 1, message: newMsg });
+    const result = roomsReducer(state, Actions.addMessage({ roomId: 1, message: newMsg }));
     expect(result.messages[1]).toHaveLength(MAX_ROOM_MESSAGES);
     expect(result.messages[1][0].message).not.toBe('first');
     expect(result.messages[1][MAX_ROOM_MESSAGES - 1].message).toBe('new');
@@ -130,14 +145,14 @@ describe('ADD_MESSAGE', () => {
   it('prepends "name: " to message when name is present', () => {
     const state = makeRoomsState({ messages: { 1: [] } });
     const message = makeMessage({ name: 'Alice', message: 'hello' });
-    const result = roomsReducer(state, { type: Types.ADD_MESSAGE, roomId: 1, message });
+    const result = roomsReducer(state, Actions.addMessage({ roomId: 1, message }));
     expect(result.messages[1][0].message).toBe('Alice: hello');
   });
 
   it('does not prepend when name is empty', () => {
     const state = makeRoomsState({ messages: { 1: [] } });
     const message = makeMessage({ name: '', message: 'system msg' });
-    const result = roomsReducer(state, { type: Types.ADD_MESSAGE, roomId: 1, message });
+    const result = roomsReducer(state, Actions.addMessage({ roomId: 1, message }));
     expect(result.messages[1][0].message).toBe('system msg');
   });
 });
@@ -145,94 +160,92 @@ describe('ADD_MESSAGE', () => {
 // ── UPDATE_GAMES ──────────────────────────────────────────────────────────────
 
 describe('UPDATE_GAMES', () => {
-  it('removes closed games from gameList', () => {
-    const room = makeRoom({ roomId: 1, gameList: [makeGame({ gameId: 1 })] });
+  it('removes closed games from the keyed games map', () => {
+    const room = makeRoom({ roomId: 1, games: { 1: makeGame({ gameId: 1 }) } });
     const state = makeRoomsState({ rooms: { 1: room } });
-    const result = roomsReducer(state, {
-      type: Types.UPDATE_GAMES,
+    const result = roomsReducer(state, Actions.updateGames({
       roomId: 1,
       games: [{ gameId: 1, closed: true }],
-    });
-    expect(result.rooms[1].gameList).toHaveLength(0);
+    }));
+    expect(result.rooms[1].games[1]).toBeUndefined();
   });
 
-  it('merges update into existing game', () => {
+  it('merges update into existing game info', () => {
     const game = makeGame({ gameId: 1, description: 'old' });
-    const room = makeRoom({ roomId: 1, gameList: [game] });
+    const room = makeRoom({ roomId: 1, games: { 1: game } });
     const state = makeRoomsState({ rooms: { 1: room } });
-    const result = roomsReducer(state, {
-      type: Types.UPDATE_GAMES,
+    const result = roomsReducer(state, Actions.updateGames({
       roomId: 1,
       games: [{ gameId: 1, description: 'new' }],
-    });
-    expect(result.rooms[1].gameList[0].description).toBe('new');
+    }));
+    expect(result.rooms[1].games[1].info.description).toBe('new');
   });
 
-  it('appends new game to list and sorts', () => {
-    const room = makeRoom({ roomId: 1, gameList: [] });
+  it('inserts new game into the keyed map', () => {
+    const room = makeRoom({ roomId: 1 });
     const state = makeRoomsState({ rooms: { 1: room } });
-    const newGame = makeGame({ gameId: 99, description: 'extra' });
-    const result = roomsReducer(state, { type: Types.UPDATE_GAMES, roomId: 1, games: [newGame] });
-    expect(result.rooms[1].gameList).toHaveLength(1);
-    expect(result.rooms[1].gameList[0].gameId).toBe(99);
+    const newGame = makeGame({ gameId: 99, description: 'extra' }).info;
+    const result = roomsReducer(state, Actions.updateGames({ roomId: 1, games: [newGame] }));
+    expect(Object.keys(result.rooms[1].games)).toHaveLength(1);
+    expect(result.rooms[1].games[99]).toBeDefined();
+    expect(result.rooms[1].games[99].info.gameId).toBe(99);
   });
 
   it('preserves existing games not included in the update', () => {
     const game1 = makeGame({ gameId: 1, description: 'untouched' });
     const game2 = makeGame({ gameId: 2, description: 'old' });
-    const room = makeRoom({ roomId: 1, gameList: [game1, game2] });
+    const room = makeRoom({ roomId: 1, games: { 1: game1, 2: game2 } });
     const state = makeRoomsState({ rooms: { 1: room } });
-    const result = roomsReducer(state, {
-      type: Types.UPDATE_GAMES,
+    const result = roomsReducer(state, Actions.updateGames({
       roomId: 1,
       games: [{ gameId: 2, description: 'new' }],
-    });
-    expect(result.rooms[1].gameList.find(g => g.gameId === 1).description).toBe('untouched');
-    expect(result.rooms[1].gameList.find(g => g.gameId === 2).description).toBe('new');
+    }));
+    expect(result.rooms[1].games[1].info.description).toBe('untouched');
+    expect(result.rooms[1].games[2].info.description).toBe('new');
   });
 
   it('returns state identity when roomId is unknown', () => {
     const state = makeRoomsState({ rooms: {} });
-    const result = roomsReducer(state, { type: Types.UPDATE_GAMES, roomId: 999, games: [] });
-    expect(result).toBe(state);
+    const result = roomsReducer(state, Actions.updateGames({ roomId: 999, games: [] }));
+    expect(result).toEqual(state);
   });
 });
 
 // ── USER_JOINED / USER_LEFT ───────────────────────────────────────────────────
 
 describe('USER_JOINED', () => {
-  it('appends user to userList and sorts by name ASC', () => {
-    const room = makeRoom({ roomId: 1, userList: [makeUser({ name: 'Zane' })] });
+  it('inserts user into the keyed users map', () => {
+    const room = makeRoom({ roomId: 1, users: { Zane: makeUser({ name: 'Zane' }) } });
     const state = makeRoomsState({ rooms: { 1: room } });
-    const result = roomsReducer(state, { type: Types.USER_JOINED, roomId: 1, user: makeUser({ name: 'Alice' }) });
-    expect(result.rooms[1].userList[0].name).toBe('Alice');
-    expect(result.rooms[1].userList).toHaveLength(2);
+    const result = roomsReducer(state, Actions.userJoined({ roomId: 1, user: makeUser({ name: 'Alice' }) }));
+    expect(result.rooms[1].users['Alice']).toBeDefined();
+    expect(result.rooms[1].users['Zane']).toBeDefined();
+    expect(Object.keys(result.rooms[1].users)).toHaveLength(2);
   });
 });
 
 describe('USER_LEFT', () => {
-  it('removes user by name from userList', () => {
-    const room = makeRoom({ roomId: 1, userList: [makeUser({ name: 'Alice' }), makeUser({ name: 'Bob' })] });
+  it('removes user by name from the keyed users map', () => {
+    const room = makeRoom({
+      roomId: 1,
+      users: { Alice: makeUser({ name: 'Alice' }), Bob: makeUser({ name: 'Bob' }) },
+    });
     const state = makeRoomsState({ rooms: { 1: room } });
-    const result = roomsReducer(state, { type: Types.USER_LEFT, roomId: 1, name: 'Alice' });
-    expect(result.rooms[1].userList).toHaveLength(1);
-    expect(result.rooms[1].userList[0].name).toBe('Bob');
+    const result = roomsReducer(state, Actions.userLeft({ roomId: 1, name: 'Alice' }));
+    expect(result.rooms[1].users['Alice']).toBeUndefined();
+    expect(result.rooms[1].users['Bob']).toBeDefined();
   });
 });
 
 // ── SORT_GAMES ────────────────────────────────────────────────────────────────
 
 describe('SORT_GAMES', () => {
-  it('resorts gameList and updates sortGamesBy on state', () => {
-    const games = [makeGame({ gameId: 2 }), makeGame({ gameId: 1 })];
-    const room = makeRoom({ roomId: 1, gameList: games });
-    const state = makeRoomsState({ rooms: { 1: room } });
-    const result = roomsReducer(state, {
-      type: Types.SORT_GAMES,
-      roomId: 1,
+  it('updates sortGamesBy on state (sorting itself is now derived in selectors)', () => {
+    const state = makeRoomsState({ rooms: {} });
+    const result = roomsReducer(state, Actions.sortGames({
       field: App.GameSortField.START_TIME,
       order: App.SortDirection.ASC,
-    });
+    }));
     expect(result.sortGamesBy).toEqual({ field: App.GameSortField.START_TIME, order: App.SortDirection.ASC });
   });
 });
@@ -247,7 +260,7 @@ describe('REMOVE_MESSAGES', () => {
       makeMessage({ message: 'Alice: world' }),
     ];
     const state = makeRoomsState({ messages: { 1: msgs } });
-    const result = roomsReducer(state, { type: Types.REMOVE_MESSAGES, roomId: 1, name: 'Alice', amount: 1 });
+    const result = roomsReducer(state, Actions.removeMessages({ roomId: 1, name: 'Alice', amount: 1 }));
     // reverse scan: removes LAST 'Alice:' message first, stops after 1
     const remaining = result.messages[1];
     expect(remaining).toHaveLength(2);
@@ -263,7 +276,7 @@ describe('REMOVE_MESSAGES', () => {
       makeMessage({ message: 'Alice: three' }),
     ];
     const state = makeRoomsState({ messages: { 1: msgs } });
-    const result = roomsReducer(state, { type: Types.REMOVE_MESSAGES, roomId: 1, name: 'Alice', amount: 2 });
+    const result = roomsReducer(state, Actions.removeMessages({ roomId: 1, name: 'Alice', amount: 2 }));
     const remaining = result.messages[1];
     expect(remaining).toHaveLength(1);
   });
@@ -275,7 +288,7 @@ describe('REMOVE_MESSAGES', () => {
       makeMessage({ message: 'Alice: c' }),
     ];
     const state = makeRoomsState({ messages: { 1: msgs } });
-    const result = roomsReducer(state, { type: Types.REMOVE_MESSAGES, roomId: 1, name: 'Alice', amount: 1 });
+    const result = roomsReducer(state, Actions.removeMessages({ roomId: 1, name: 'Alice', amount: 1 }));
     expect(result.messages[1]).toHaveLength(2);
   });
 });
@@ -285,8 +298,8 @@ describe('REMOVE_MESSAGES', () => {
 describe('GAME_CREATED', () => {
   it('returns state unchanged', () => {
     const state = makeRoomsState();
-    const result = roomsReducer(state, { type: Types.GAME_CREATED, roomId: 1 });
-    expect(result).toBe(state);
+    const result = roomsReducer(state, Actions.gameCreated({ roomId: 1 }));
+    expect(result).toEqual(state);
   });
 });
 
@@ -295,13 +308,13 @@ describe('GAME_CREATED', () => {
 describe('JOINED_GAME', () => {
   it('sets joinedGameIds[roomId][gameId] = true', () => {
     const state = makeRoomsState({ joinedGameIds: {} });
-    const result = roomsReducer(state, { type: Types.JOINED_GAME, roomId: 1, gameId: 5 });
+    const result = roomsReducer(state, Actions.joinedGame({ roomId: 1, gameId: 5 }));
     expect(result.joinedGameIds[1][5]).toBe(true);
   });
 
   it('preserves other roomId entries in joinedGameIds', () => {
     const state = makeRoomsState({ joinedGameIds: { 2: { 9: true } } });
-    const result = roomsReducer(state, { type: Types.JOINED_GAME, roomId: 1, gameId: 5 });
+    const result = roomsReducer(state, Actions.joinedGame({ roomId: 1, gameId: 5 }));
     expect(result.joinedGameIds[2][9]).toBe(true);
     expect(result.joinedGameIds[1][5]).toBe(true);
   });

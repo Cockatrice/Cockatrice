@@ -6,7 +6,6 @@ File is adapted from https://github.com/Qeepsake/use-redux-effect under MIT Lice
 
 import { useEffect, useRef, DependencyList } from 'react'
 import { useStore } from 'react-redux'
-import { castArray } from 'lodash'
 
 // Actions are identified by string `type` at runtime, so the callback
 // receives an untyped action object to allow free property access.
@@ -43,7 +42,8 @@ export function useReduxEffect(
         return;
       }
       lastHandledCountRef.current = action.count;
-      if (castArray(typeRef.current).includes(action.type)) {
+      const types = Array.isArray(typeRef.current) ? typeRef.current : [typeRef.current];
+      if (types.includes(action.type)) {
         effectRef.current(action);
       }
     };
@@ -52,6 +52,5 @@ export function useReduxEffect(
 
     const unsubscribe = store.subscribe(check);
     return (): void => unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }

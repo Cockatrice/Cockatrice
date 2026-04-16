@@ -1,6 +1,6 @@
 import type { Data } from '@app/types';
-import { SessionPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function replayAdded({ matchInfo }: Data.Event_ReplayAdded): void {
-  SessionPersistence.replayAdded(matchInfo);
+  WebClient.instance.response.session.replayAdded(matchInfo);
 }

@@ -2,11 +2,9 @@ import { App, Enriched, Data } from '@app/types';
 import { create } from '@bufbuild/protobuf';
 import type { MessageInitShape } from '@bufbuild/protobuf';
 import { CLIENT_CONFIG } from '../../config';
-import webClient from '../../WebClient';
+import { WebClient } from '../../WebClient';
 
 import { hashPassword } from '../../utils';
-import { SessionPersistence } from '../../persistence';
-
 import {
   disconnect,
   listUsers,
@@ -29,19 +27,19 @@ export function login(options: Omit<Enriched.LoginConnectOptions, 'password'>, p
   const onLoginError = (message: string, extra?: () => void) => {
     updateStatus(App.StatusEnum.DISCONNECTED, message);
     extra?.();
-    SessionPersistence.loginFailed();
+    WebClient.instance.response.session.loginFailed();
     disconnect();
   };
 
-  webClient.protobuf.sendSessionCommand(Data.Command_Login_ext, create(Data.Command_LoginSchema, loginConfig), {
+  WebClient.instance.protobuf.sendSessionCommand(Data.Command_Login_ext, create(Data.Command_LoginSchema, loginConfig), {
     responseExt: Data.Response_Login_ext,
     onSuccess: (resp) => {
       const { buddyList, ignoreList, userInfo } = resp;
 
-      SessionPersistence.updateBuddyList(buddyList);
-      SessionPersistence.updateIgnoreList(ignoreList);
-      SessionPersistence.updateUser(userInfo);
-      SessionPersistence.loginSuccessful({ hashedPassword: loginConfig.hashedPassword });
+      WebClient.instance.response.session.updateBuddyList(buddyList);
+      WebClient.instance.response.session.updateIgnoreList(ignoreList);
+      WebClient.instance.response.session.updateUser(userInfo);
+      WebClient.instance.response.session.loginSuccessful({ hashedPassword: loginConfig.hashedPassword });
 
       listUsers();
       listRooms();
@@ -68,7 +66,7 @@ export function login(options: Omit<Enriched.LoginConnectOptions, 'password'>, p
       [Data.Response_ResponseCode.RespAccountNotActivated]: () =>
         onLoginError('Login failed: account not activated',
           () => {
-            SessionPersistence.accountAwaitingActivation({
+            WebClient.instance.response.session.accountAwaitingActivation({
               host: options.host,
               port: options.port,
               userName: options.userName,

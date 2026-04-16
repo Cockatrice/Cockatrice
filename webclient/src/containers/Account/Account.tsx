@@ -7,7 +7,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import Paper from '@mui/material/Paper';
 
 import { UserDisplay, VirtualList, AuthGuard, LanguageDropdown } from '@app/components';
-import { AuthenticationService, SessionService } from '@app/api';
+import { request } from '@app/api';
 import { ServerSelectors } from '@app/store';
 import Layout from '../Layout/Layout';
 import { useAppSelector } from '@app/store';
@@ -18,8 +18,8 @@ import AddToIgnore from './AddToIgnore';
 import './Account.css';
 
 const Account = () => {
-  const buddyList = useAppSelector(state => ServerSelectors.getBuddyList(state));
-  const ignoreList = useAppSelector(state => ServerSelectors.getIgnoreList(state));
+  const buddyList = useAppSelector(state => ServerSelectors.getSortedBuddyList(state));
+  const ignoreList = useAppSelector(state => ServerSelectors.getSortedIgnoreList(state));
   const serverName = useAppSelector(state => ServerSelectors.getName(state));
   const serverVersion = useAppSelector(state => ServerSelectors.getVersion(state));
   const user = useAppSelector(state => ServerSelectors.getUser(state));
@@ -29,11 +29,11 @@ const Account = () => {
   const { t } = useTranslation();
 
   const handleAddToBuddies = ({ userName }) => {
-    SessionService.addToBuddyList(userName);
+    request.session.addToBuddyList(userName);
   };
 
   const handleAddToIgnore = ({ userName }) => {
-    SessionService.addToIgnoreList(userName);
+    request.session.addToIgnoreList(userName);
   };
 
   return (
@@ -91,7 +91,13 @@ const Account = () => {
         <Paper className="account-details">
           <p>Server Name: {serverName}</p>
           <p>Server Version: {serverVersion}</p>
-          <Button color="primary" variant="contained" onClick={() => AuthenticationService.disconnect()}>{ t('Common.disconnect') }</Button>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={() => request.authentication.disconnect()}
+          >
+            { t('Common.disconnect') }
+          </Button>
 
           <div className="account-details__lang">
             <LanguageDropdown />

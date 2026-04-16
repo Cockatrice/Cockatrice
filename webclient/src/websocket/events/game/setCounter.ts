@@ -1,6 +1,6 @@
 import type { Data, Enriched } from '@app/types';
-import { GamePersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function setCounter(data: Data.Event_SetCounter, meta: Enriched.GameEventMeta): void {
-  GamePersistence.counterSet(meta.gameId, meta.playerId, data);
+  WebClient.instance.response.game.counterSet(meta.gameId, meta.playerId, data);
 }

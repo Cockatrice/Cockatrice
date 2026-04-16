@@ -1,11 +1,10 @@
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { App, Data } from '@app/types';
 import { create } from '@bufbuild/protobuf';
 
-import { normalizeBannedUserError, normalizeGameObject, normalizeGametypeMap, normalizeLogs, SortUtil } from '../common';
+import { normalizeBannedUserError, normalizeGameObject, normalizeGametypeMap, normalizeLogs } from '../common';
 
-import { ServerAction } from './server.actions';
-import { ServerState } from './server.interfaces'
-import { Types } from './server.types';
+import { ServerState, ServerStateStatus } from './server.interfaces';
 
 function splitPath(path: string): string[] {
   return path ? path.split('/') : [];
@@ -67,8 +66,8 @@ function removeByPath(folder: Data.ServerInfo_DeckStorage_Folder, pathSegments: 
 
 const initialState: ServerState = {
   initialized: false,
-  buddyList: [],
-  ignoreList: [],
+  buddyList: {},
+  ignoreList: {},
 
   status: {
     connectionAttemptMade: false,
@@ -86,7 +85,7 @@ const initialState: ServerState = {
     chat: []
   },
   user: null,
-  users: [],
+  users: {},
   sortUsersBy: {
     field: App.UserSortField.NAME,
     order: App.SortDirection.ASC
@@ -101,452 +100,303 @@ const initialState: ServerState = {
   warnListOptions: [],
   warnUser: '',
   adminNotes: {},
-  replays: [],
+  replays: {},
   backendDecks: null,
   gamesOfUser: {},
   registrationError: null,
 };
 
-export const serverReducer = (state = initialState, action: ServerAction) => {
-  switch (action.type) {
-    case Types.INITIALIZED: {
-      return {
-        ...initialState,
-        initialized: true
+export const serverSlice = createSlice({
+  name: 'server',
+  initialState,
+  reducers: {
+    initialized: () => ({
+      ...initialState,
+      initialized: true,
+    }),
+
+    connectionAttempted: (state) => {
+      state.status.connectionAttemptMade = true;
+    },
+
+    clearStore: (state) => ({
+      ...initialState,
+      status: { ...state.status },
+    }),
+
+    serverMessage: (state, action: PayloadAction<{ message: string }>) => {
+      state.info.message = action.payload.message;
+    },
+
+    updateBuddyList: (state, action: PayloadAction<{ buddyList: Data.ServerInfo_User[] }>) => {
+      const buddyList: { [userName: string]: Data.ServerInfo_User } = {};
+      for (const user of action.payload.buddyList) {
+        buddyList[user.name] = user;
       }
-    }
-    case Types.CONNECTION_ATTEMPTED: {
-      return {
-        ...state,
-        status: { ...state.status, connectionAttemptMade: true }
-      };
-    }
-    case Types.ACCOUNT_AWAITING_ACTIVATION: {
-      return state;
-    }
-    case Types.ACCOUNT_ACTIVATION_FAILED:
-    case Types.ACCOUNT_ACTIVATION_SUCCESS: {
-      return state;
-    }
-    case Types.CLEAR_STORE: {
-      return {
-        ...initialState,
-        status: {
-          ...state.status
-        }
+      state.buddyList = buddyList;
+    },
+
+    addToBuddyList: (state, action: PayloadAction<{ user: Data.ServerInfo_User }>) => {
+      const { user } = action.payload;
+      state.buddyList[user.name] = user;
+    },
+
+    removeFromBuddyList: (state, action: PayloadAction<{ userName: string }>) => {
+      delete state.buddyList[action.payload.userName];
+    },
+
+    updateIgnoreList: (state, action: PayloadAction<{ ignoreList: Data.ServerInfo_User[] }>) => {
+      const ignoreList: { [userName: string]: Data.ServerInfo_User } = {};
+      for (const user of action.payload.ignoreList) {
+        ignoreList[user.name] = user;
       }
-    }
-    case Types.SERVER_MESSAGE: {
-      const { message } = action;
-      const { info } = state;
+      state.ignoreList = ignoreList;
+    },
 
-      return {
-        ...state,
-        info: { ...info, message }
-      }
-    }
-    case Types.UPDATE_BUDDY_LIST: {
-      const { buddyList } = action;
-      const { sortUsersBy } = state;
+    addToIgnoreList: (state, action: PayloadAction<{ user: Data.ServerInfo_User }>) => {
+      const { user } = action.payload;
+      state.ignoreList[user.name] = user;
+    },
 
-      SortUtil.sortUsersByField(buddyList, sortUsersBy);
+    removeFromIgnoreList: (state, action: PayloadAction<{ userName: string }>) => {
+      delete state.ignoreList[action.payload.userName];
+    },
 
-      return {
-        ...state,
-        buddyList: [
-          ...buddyList
-        ]
-      };
-    }
-    case Types.ADD_TO_BUDDY_LIST: {
-      const { user } = action;
-      const { sortUsersBy } = state;
+    updateInfo: (state, action: PayloadAction<{ info: { name: string; version: string } }>) => {
+      const { name, version } = action.payload.info;
+      state.info.name = name;
+      state.info.version = version;
+    },
 
-      const buddyList = [...state.buddyList];
-
-      buddyList.push(user);
-      SortUtil.sortUsersByField(buddyList, sortUsersBy);
-
-      return {
-        ...state,
-        buddyList
-      };
-    }
-    case Types.REMOVE_FROM_BUDDY_LIST: {
-      const { userName } = action;
-      const buddyList = state.buddyList.filter(user => user.name !== userName);
-
-      return {
-        ...state,
-        buddyList
-      };
-    }
-    case Types.UPDATE_IGNORE_LIST: {
-      const { ignoreList } = action;
-      const { sortUsersBy } = state;
-
-      SortUtil.sortUsersByField(ignoreList, sortUsersBy);
-
-      return {
-        ...state,
-        ignoreList: [
-          ...ignoreList
-        ]
-      };
-    }
-    case Types.ADD_TO_IGNORE_LIST: {
-      const { user } = action;
-      const { sortUsersBy } = state;
-
-      const ignoreList = [...state.ignoreList];
-
-      ignoreList.push(user);
-      SortUtil.sortUsersByField(ignoreList, sortUsersBy);
-
-      return {
-        ...state,
-        ignoreList
-      };
-    }
-    case Types.REMOVE_FROM_IGNORE_LIST: {
-      const { userName } = action;
-      const ignoreList = state.ignoreList.filter(user => user.name !== userName);
-
-      return {
-        ...state,
-        ignoreList
-      };
-    }
-    case Types.UPDATE_INFO: {
-      const { name, version } = action.info;
-      const { info } = state;
-
-      return {
-        ...state,
-        info: { ...info, name, version }
-      }
-    }
-    case Types.UPDATE_STATUS: {
-      const { status } = action;
-      const newState = {
-        ...state,
-        status: { ...state.status, ...status }
-      };
+    updateStatus: (state, action: PayloadAction<{ status: Pick<ServerStateStatus, 'state' | 'description'> }>) => {
+      const { status } = action.payload;
+      state.status = { ...state.status, ...status };
 
       if (status.state === App.StatusEnum.DISCONNECTED) {
-        return {
-          ...newState,
-          status: { ...newState.status, connectionAttemptMade: false }
-        };
+        state.status.connectionAttemptMade = false;
       }
+    },
 
-      return newState;
-    }
-    case Types.UPDATE_USER:
-    case Types.ACCOUNT_EDIT_CHANGED:
-    case Types.ACCOUNT_IMAGE_CHANGED: {
-      const { user } = action;
+    updateUser: (state, action: PayloadAction<{ user: Data.ServerInfo_User | Partial<Data.ServerInfo_User> }>) => {
+      state.user = { ...state.user, ...action.payload.user } as Data.ServerInfo_User;
+    },
 
-      return {
-        ...state,
-        user: {
-          ...state.user,
-          ...user
-        }
+    updateUsers: (state, action: PayloadAction<{ users: Data.ServerInfo_User[] }>) => {
+      const users: { [userName: string]: Data.ServerInfo_User } = {};
+      for (const user of action.payload.users) {
+        users[user.name] = user;
       }
-    }
-    case Types.UPDATE_USERS: {
-      const users = [...action.users];
-      const { sortUsersBy } = state;
+      state.users = users;
+    },
 
+    userJoined: (state, action: PayloadAction<{ user: Data.ServerInfo_User }>) => {
+      const { user } = action.payload;
+      state.users[user.name] = user;
+    },
 
-      SortUtil.sortUsersByField(users, sortUsersBy);
+    userLeft: (state, action: PayloadAction<{ name: string }>) => {
+      delete state.users[action.payload.name];
+    },
 
-      return {
-        ...state,
-        users
-      };
-    }
-    case Types.USER_JOINED: {
-      const { sortUsersBy } = state;
+    viewLogs: (state, action: PayloadAction<{ logs: Data.ServerInfo_ChatMessage[] }>) => {
+      state.logs = { ...normalizeLogs(action.payload.logs) };
+    },
 
-      const users = [
-        ...state.users,
-        { ...action.user }
-      ];
+    clearLogs: (state) => {
+      state.logs = { ...initialState.logs };
+    },
 
-      SortUtil.sortUsersByField(users, sortUsersBy);
-
-      return {
-        ...state,
-        users
-      };
-    }
-    case Types.USER_LEFT: {
-      const { name } = action;
-      const users = state.users.filter(user => user.name !== name);
-
-      return {
-        ...state,
-        users
-      };
-    }
-    case Types.VIEW_LOGS: {
-      const { logs } = action;
-
-      return {
-        ...state,
-        logs: {
-          ...normalizeLogs(logs)
-        }
-      };
-    }
-    case Types.CLEAR_LOGS: {
-      return {
-        ...state,
-        logs: {
-          ...initialState.logs
-        }
+    userMessage: (state, action: PayloadAction<{ messageData: Data.Event_UserMessage }>) => {
+      const { senderName, receiverName } = action.payload.messageData;
+      const userName = state.user!.name === senderName ? receiverName : senderName;
+      if (!state.messages[userName]) {
+        state.messages[userName] = [];
       }
-    }
-    case Types.USER_MESSAGE: {
-      const { senderName, receiverName } = action.messageData;
-      const userName = state.user.name === senderName ? receiverName : senderName;
+      state.messages[userName].push(action.payload.messageData);
+    },
 
-      return {
-        ...state,
-        messages: {
-          ...state.messages,
-          [userName]: [
-            ...(state.messages[userName] ?? []),
-            action.messageData,
-          ],
-        }
-      };
-    }
-    case Types.GET_USER_INFO: {
-      const { userInfo } = action;
+    getUserInfo: (state, action: PayloadAction<{ userInfo: Data.ServerInfo_User }>) => {
+      const { userInfo } = action.payload;
+      state.userInfo[userInfo.name] = userInfo;
+    },
 
-      return {
-        ...state,
-        userInfo: {
-          ...state.userInfo,
-          [userInfo.name]: userInfo,
-        }
-      };
-    }
-    case Types.NOTIFY_USER: {
-      const { notification } = action;
+    notifyUser: (state, action: PayloadAction<{ notification: Data.Event_NotifyUser }>) => {
+      state.notifications.push(action.payload.notification);
+    },
 
-      return {
-        ...state,
-        notifications: [
-          ...state.notifications,
-          notification
-        ]
-      };
-    }
-    case Types.SERVER_SHUTDOWN: {
-      const { data } = action;
+    serverShutdown: (state, action: PayloadAction<{ data: Data.Event_ServerShutdown }>) => {
+      state.serverShutdown = action.payload.data;
+    },
 
-      return {
-        ...state,
-        serverShutdown: data,
-      };
-    }
-    case Types.BAN_FROM_SERVER: {
-      const { userName } = action;
+    banFromServer: (state, action: PayloadAction<{ userName: string }>) => {
+      state.banUser = action.payload.userName;
+    },
 
-      return {
-        ...state,
-        banUser: userName,
-      };
-    }
-    case Types.BAN_HISTORY: {
-      const { userName, banHistory } = action;
+    banHistory: (state, action: PayloadAction<{ userName: string; banHistory: Data.ServerInfo_Ban[] }>) => {
+      state.banHistory[action.payload.userName] = action.payload.banHistory;
+    },
 
-      return {
-        ...state,
-        banHistory: {
-          ...state.banHistory,
-          [userName]: banHistory,
-        }
-      };
-    }
-    case Types.WARN_HISTORY: {
-      const { userName, warnHistory } = action;
+    warnHistory: (state, action: PayloadAction<{ userName: string; warnHistory: Data.ServerInfo_Warning[] }>) => {
+      state.warnHistory[action.payload.userName] = action.payload.warnHistory;
+    },
 
-      return {
-        ...state,
-        warnHistory: {
-          ...state.warnHistory,
-          [userName]: warnHistory,
-        }
-      };
-    }
-    case Types.WARN_LIST_OPTIONS: {
-      const { warnList } = action;
+    warnListOptions: (state, action: PayloadAction<{ warnList: Data.Response_WarnList[] }>) => {
+      state.warnListOptions = action.payload.warnList;
+    },
 
-      return {
-        ...state,
-        warnListOptions: warnList,
-      };
-    }
-    case Types.WARN_USER: {
-      const { userName } = action;
-      return {
-        ...state,
-        warnUser: userName,
-      };
-    }
-    case Types.GET_ADMIN_NOTES:
-    case Types.UPDATE_ADMIN_NOTES: {
-      const { userName, notes } = action;
-      return {
-        ...state,
-        adminNotes: {
-          ...state.adminNotes,
-          [userName]: notes,
-        }
-      };
-    }
-    case Types.ADJUST_MOD: {
-      const { userName, shouldBeMod, shouldBeJudge } = action;
+    warnUser: (state, action: PayloadAction<{ userName: string }>) => {
+      state.warnUser = action.payload.userName;
+    },
 
-      return {
-        ...state,
-        users: state.users.map((user) => {
-          if (user.name !== userName) {
-            return user;
-          }
-          let newLevel = user.userLevel;
-          newLevel = shouldBeMod
-            ? (newLevel | Data.ServerInfo_User_UserLevelFlag.IsModerator)
-            : (newLevel & ~Data.ServerInfo_User_UserLevelFlag.IsModerator);
-          newLevel = shouldBeJudge
-            ? (newLevel | Data.ServerInfo_User_UserLevelFlag.IsJudge)
-            : (newLevel & ~Data.ServerInfo_User_UserLevelFlag.IsJudge);
-          return {
-            ...user,
-            userLevel: newLevel,
-          }
-        })
-      };
-    }
-    case Types.REPLAY_LIST: {
-      return { ...state, replays: [...action.matchList] };
-    }
-    case Types.REPLAY_ADDED: {
-      return { ...state, replays: [...state.replays, action.matchInfo] };
-    }
-    case Types.REPLAY_MODIFY_MATCH: {
-      return {
-        ...state,
-        replays: state.replays.map(r =>
-          r.gameId === action.gameId ? { ...r, doNotHide: action.doNotHide } : r
-        ),
-      };
-    }
-    case Types.REPLAY_DELETE_MATCH: {
-      return { ...state, replays: state.replays.filter(r => r.gameId !== action.gameId) };
-    }
-    case Types.BACKEND_DECKS: {
-      return { ...state, backendDecks: action.deckList };
-    }
-    case Types.DECK_UPLOAD: {
+    getAdminNotes: (state, action: PayloadAction<{ userName: string; notes: string }>) => {
+      state.adminNotes[action.payload.userName] = action.payload.notes;
+    },
+
+    updateAdminNotes: (state, action: PayloadAction<{ userName: string; notes: string }>) => {
+      state.adminNotes[action.payload.userName] = action.payload.notes;
+    },
+
+    adjustMod: (state, action: PayloadAction<{ userName: string; shouldBeMod: boolean; shouldBeJudge: boolean }>) => {
+      const { userName, shouldBeMod, shouldBeJudge } = action.payload;
+      const user = state.users[userName];
+      if (!user) {
+        return;
+      }
+      let newLevel = user.userLevel;
+      newLevel = shouldBeMod
+        ? (newLevel | Data.ServerInfo_User_UserLevelFlag.IsModerator)
+        : (newLevel & ~Data.ServerInfo_User_UserLevelFlag.IsModerator);
+      newLevel = shouldBeJudge
+        ? (newLevel | Data.ServerInfo_User_UserLevelFlag.IsJudge)
+        : (newLevel & ~Data.ServerInfo_User_UserLevelFlag.IsJudge);
+      state.users[userName] = { ...user, userLevel: newLevel };
+    },
+
+    replayList: (state, action: PayloadAction<{ matchList: Data.ServerInfo_ReplayMatch[] }>) => {
+      const replays: { [gameId: number]: Data.ServerInfo_ReplayMatch } = {};
+      for (const match of action.payload.matchList) {
+        replays[match.gameId] = match;
+      }
+      state.replays = replays;
+    },
+
+    replayAdded: (state, action: PayloadAction<{ matchInfo: Data.ServerInfo_ReplayMatch }>) => {
+      const { matchInfo } = action.payload;
+      state.replays[matchInfo.gameId] = matchInfo;
+    },
+
+    replayModifyMatch: (state, action: PayloadAction<{ gameId: number; doNotHide: boolean }>) => {
+      const { gameId, doNotHide } = action.payload;
+      const existing = state.replays[gameId];
+      if (!existing) {
+        return;
+      }
+      state.replays[gameId] = { ...existing, doNotHide };
+    },
+
+    replayDeleteMatch: (state, action: PayloadAction<{ gameId: number }>) => {
+      delete state.replays[action.payload.gameId];
+    },
+
+    backendDecks: (state, action: PayloadAction<{ deckList: Data.Response_DeckList }>) => {
+      state.backendDecks = action.payload.deckList;
+    },
+
+    deckUpload: (state, action: PayloadAction<{ path: string; treeItem: Data.ServerInfo_DeckStorage_TreeItem }>) => {
       if (!state.backendDecks?.root) {
-        return state;
+        return;
       }
-      return {
-        ...state,
-        backendDecks: create(Data.Response_DeckListSchema, {
-          root: insertAtPath(state.backendDecks.root, splitPath(action.path), action.treeItem),
-        }),
-      };
-    }
-    case Types.DECK_DELETE: {
+      state.backendDecks = create(Data.Response_DeckListSchema, {
+        root: insertAtPath(state.backendDecks.root, splitPath(action.payload.path), action.payload.treeItem),
+      });
+    },
+
+    deckDelete: (state, action: PayloadAction<{ deckId: number }>) => {
       if (!state.backendDecks?.root) {
-        return state;
+        return;
       }
-      return {
-        ...state,
-        backendDecks: create(Data.Response_DeckListSchema, {
-          root: removeById(state.backendDecks.root, action.deckId),
-        }),
-      };
-    }
-    case Types.DECK_NEW_DIR: {
+      state.backendDecks = create(Data.Response_DeckListSchema, {
+        root: removeById(state.backendDecks.root, action.payload.deckId),
+      });
+    },
+
+    deckNewDir: (state, action: PayloadAction<{ path: string; dirName: string }>) => {
       if (!state.backendDecks?.root) {
-        return state;
+        return;
       }
       const newFolder: Data.ServerInfo_DeckStorage_TreeItem = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
-        id: 0, name: action.dirName, folder: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] })
+        id: 0, name: action.payload.dirName, folder: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] })
       });
-      return {
-        ...state,
-        backendDecks: create(Data.Response_DeckListSchema, {
-          root: insertAtPath(state.backendDecks.root, splitPath(action.path), newFolder),
-        }),
-      };
-    }
-    case Types.DECK_DEL_DIR: {
+      state.backendDecks = create(Data.Response_DeckListSchema, {
+        root: insertAtPath(state.backendDecks.root, splitPath(action.payload.path), newFolder),
+      });
+    },
+
+    deckDelDir: (state, action: PayloadAction<{ path: string }>) => {
       if (!state.backendDecks?.root) {
-        return state;
+        return;
       }
-      return {
-        ...state,
-        backendDecks: create(Data.Response_DeckListSchema, {
-          root: removeByPath(state.backendDecks.root, splitPath(action.path)),
-        }),
-      };
-    }
-    case Types.GAMES_OF_USER: {
-      const { userName, response } = action;
+      state.backendDecks = create(Data.Response_DeckListSchema, {
+        root: removeByPath(state.backendDecks.root, splitPath(action.payload.path)),
+      });
+    },
+
+    gamesOfUser: (state, action: PayloadAction<{ userName: string; response: Data.Response_GetGamesOfUser }>) => {
+      const { userName, response } = action.payload;
       const gametypeMap = normalizeGametypeMap(
         (response.roomList ?? []).flatMap(room => room.gametypeList ?? [])
       );
       const normalizedGames = (response.gameList ?? []).map(g => normalizeGameObject(g, gametypeMap));
-      return {
-        ...state,
-        gamesOfUser: {
-          ...state.gamesOfUser,
-          [userName]: normalizedGames,
-        },
-      };
-    }
-    case Types.REGISTRATION_FAILED: {
-      const error = action.endTime
-        ? normalizeBannedUserError(action.reason, action.endTime)
-        : action.reason;
-      return { ...state, registrationError: error };
-    }
-    case Types.CLEAR_REGISTRATION_ERRORS:
-      return { ...state, registrationError: null };
-    // Signal-only action types — no state mutation, explicit for discriminated-union exhaustiveness
-    case Types.LOGIN_SUCCESSFUL:
-    case Types.LOGIN_FAILED:
-    case Types.CONNECTION_FAILED:
-    case Types.TEST_CONNECTION_SUCCESSFUL:
-    case Types.TEST_CONNECTION_FAILED:
-    case Types.REGISTRATION_REQUIRES_EMAIL:
-    case Types.REGISTRATION_SUCCESS:
-    case Types.REGISTRATION_EMAIL_ERROR:
-    case Types.REGISTRATION_PASSWORD_ERROR:
-    case Types.REGISTRATION_USERNAME_ERROR:
-    case Types.RESET_PASSWORD_REQUESTED:
-    case Types.RESET_PASSWORD_FAILED:
-    case Types.RESET_PASSWORD_CHALLENGE:
-    case Types.RESET_PASSWORD_SUCCESS:
-    case Types.RELOAD_CONFIG:
-    case Types.SHUTDOWN_SERVER:
-    case Types.UPDATE_SERVER_MESSAGE:
-    case Types.ACCOUNT_PASSWORD_CHANGE:
-    case Types.ADD_TO_LIST:
-    case Types.REMOVE_FROM_LIST:
-    case Types.GRANT_REPLAY_ACCESS:
-    case Types.FORCE_ACTIVATE_USER:
-      return state;
-    default:
-      return state;
-  }
-}
+      state.gamesOfUser[userName] = normalizedGames;
+    },
+
+    registrationFailed: (state, action: PayloadAction<{ reason: string; endTime?: number }>) => {
+      const { reason, endTime } = action.payload;
+      const error = endTime
+        ? normalizeBannedUserError(reason, endTime)
+        : reason;
+      state.registrationError = error;
+    },
+
+    clearRegistrationErrors: (state) => {
+      state.registrationError = null;
+    },
+
+    accountEditChanged: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
+      state.user = { ...state.user, ...action.payload.user } as Data.ServerInfo_User;
+    },
+
+    accountImageChanged: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
+      state.user = { ...state.user, ...action.payload.user } as Data.ServerInfo_User;
+    },
+
+    // Signal-only action types — no state mutation, defined so type strings are generated
+    accountAwaitingActivation: (_state, _action: PayloadAction<any>) => {},
+    accountActivationFailed: (_state, _action: PayloadAction<any>) => {},
+    accountActivationSuccess: (_state, _action: PayloadAction<any>) => {},
+    loginSuccessful: (_state, _action: PayloadAction<any>) => {},
+    loginFailed: (_state, _action: PayloadAction<any>) => {},
+    connectionFailed: (_state, _action: PayloadAction<any>) => {},
+    testConnectionSuccessful: (_state, _action: PayloadAction<any>) => {},
+    testConnectionFailed: (_state, _action: PayloadAction<any>) => {},
+    registrationRequiresEmail: (_state, _action: PayloadAction<any>) => {},
+    registrationSuccess: (_state, _action: PayloadAction<any>) => {},
+    registrationEmailError: (_state, _action: PayloadAction<any>) => {},
+    registrationPasswordError: (_state, _action: PayloadAction<any>) => {},
+    registrationUserNameError: (_state, _action: PayloadAction<any>) => {},
+    resetPassword: (_state, _action: PayloadAction<any>) => {},
+    resetPasswordFailed: (_state, _action: PayloadAction<any>) => {},
+    resetPasswordChallenge: (_state, _action: PayloadAction<any>) => {},
+    resetPasswordSuccess: (_state, _action: PayloadAction<any>) => {},
+    reloadConfig: (_state, _action: PayloadAction<any>) => {},
+    shutdownServer: (_state, _action: PayloadAction<any>) => {},
+    updateServerMessage: (_state, _action: PayloadAction<any>) => {},
+    accountPasswordChange: (_state, _action: PayloadAction<any>) => {},
+    addToList: (_state, _action: PayloadAction<any>) => {},
+    removeFromList: (_state, _action: PayloadAction<any>) => {},
+    grantReplayAccess: (_state, _action: PayloadAction<any>) => {},
+    forceActivateUser: (_state, _action: PayloadAction<any>) => {},
+  },
+});
+
+export const serverReducer = serverSlice.reducer;

@@ -1,6 +1,6 @@
 import type { Data } from '@app/types';
-import { RoomPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function joinRoom({ userInfo }: Data.Event_JoinRoom, { roomId }: Data.RoomEvent): void {
-  RoomPersistence.userJoined(roomId, userInfo);
+  WebClient.instance.response.room.userJoined(roomId, userInfo);
 }

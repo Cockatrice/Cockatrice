@@ -3,7 +3,7 @@ import { create } from '@bufbuild/protobuf';
 import { Data, Enriched } from '@app/types';
 
 describe('normalizeRoomInfo', () => {
-  it('builds gametypeMap from gametypeList and normalises games', () => {
+  it('builds gametypeMap from gametypeList and keys games by gameId', () => {
     const room = create(Data.ServerInfo_RoomSchema, {
       roomId: 1,
       name: 'Lobby',
@@ -15,9 +15,11 @@ describe('normalizeRoomInfo', () => {
 
     const result = normalizeRoomInfo(room);
 
+    expect(result.info).toBe(room);
     expect(result.gametypeMap).toEqual({ 1: 'Standard' });
-    expect(result.gameList).toHaveLength(1);
-    expect(result.gameList[0].gameType).toBe('Standard');
+    expect(Object.keys(result.games)).toHaveLength(1);
+    expect(result.games[10].gameType).toBe('Standard');
+    expect(result.games[10].info.gameId).toBe(10);
     expect(result.order).toBe(0);
   });
 
@@ -25,7 +27,21 @@ describe('normalizeRoomInfo', () => {
     const room = create(Data.ServerInfo_RoomSchema, { roomId: 2, name: 'Empty' });
     const result = normalizeRoomInfo(room);
     expect(result.gametypeMap).toEqual({});
-    expect(result.gameList).toEqual([]);
+    expect(result.games).toEqual({});
+    expect(result.users).toEqual({});
+  });
+
+  it('keys users by name', () => {
+    const room = create(Data.ServerInfo_RoomSchema, {
+      roomId: 1,
+      userList: [
+        create(Data.ServerInfo_UserSchema, { name: 'alice' }),
+        create(Data.ServerInfo_UserSchema, { name: 'bob' }),
+      ],
+    });
+    const result = normalizeRoomInfo(room);
+    expect(result.users['alice']).toBeDefined();
+    expect(result.users['bob']).toBeDefined();
   });
 });
 
@@ -34,6 +50,7 @@ describe('normalizeGameObject', () => {
     const game = create(Data.ServerInfo_GameSchema, { gameId: 1, gameTypes: [5] });
     const result = normalizeGameObject(game, { 5: 'Legacy' });
     expect(result.gameType).toBe('Legacy');
+    expect(result.info).toBe(game);
   });
 
   it('returns empty string when no gameTypes', () => {
@@ -42,10 +59,11 @@ describe('normalizeGameObject', () => {
     expect(result.gameType).toBe('');
   });
 
-  it('fills empty description with empty string', () => {
+  it('stores raw proto on info', () => {
     const game = create(Data.ServerInfo_GameSchema, { gameId: 3 });
     const result = normalizeGameObject(game, {});
-    expect(result.description).toBe('');
+    expect(result.info.gameId).toBe(3);
+    expect(result.info.description).toBe('');
   });
 });
 

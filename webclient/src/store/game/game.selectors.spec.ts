@@ -146,8 +146,8 @@ describe('Selectors', () => {
   it('getActiveGameIds → returns numeric array of gameIds', () => {
     const state = makeState({
       games: {
-        1: makeGameEntry({ gameId: 1 }),
-        2: makeGameEntry({ gameId: 2 }),
+        1: makeGameEntry(),
+        2: makeGameEntry(),
       },
     });
     const ids = Selectors.getActiveGameIds(rootState(state));

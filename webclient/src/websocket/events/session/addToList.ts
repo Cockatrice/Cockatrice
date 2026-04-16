@@ -1,14 +1,14 @@
 import type { Data } from '@app/types';
-import { SessionPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function addToList({ listName, userInfo }: Data.Event_AddToList): void {
   switch (listName) {
     case 'buddy': {
-      SessionPersistence.addToBuddyList(userInfo);
+      WebClient.instance.response.session.addToBuddyList(userInfo);
       break;
     }
     case 'ignore': {
-      SessionPersistence.addToIgnoreList(userInfo);
+      WebClient.instance.response.session.addToIgnoreList(userInfo);
       break;
     }
     default: {

@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
-import type { Data } from '@app/types';
-import { GamesState, GameEntry, PlayerEntry, ZoneEntry } from './game.interfaces';
+import type { Data, Enriched } from '@app/types';
+import { GamesState } from './game.interfaces';
 
 interface State {
   games: GamesState;
@@ -9,21 +9,39 @@ interface State {
 const EMPTY_ARRAY: Data.ServerInfo_Card[] = [];
 const EMPTY_OBJECT = {} as Record<string, never>;
 
+/**
+ * Memoized cache for materialized zone card arrays. Keyed by the zone object
+ * identity so that repeated selector calls on the same zone reuse the same
+ * array reference — this preserves React referential equality and avoids
+ * spurious re-renders when `getCards` is called from a selector.
+ */
+const zoneCardsCache = new WeakMap<Enriched.ZoneEntry, Data.ServerInfo_Card[]>();
+
+function materializeZoneCards(zone: Enriched.ZoneEntry): Data.ServerInfo_Card[] {
+  const cached = zoneCardsCache.get(zone);
+  if (cached) {
+    return cached;
+  }
+  const arr = zone.order.map(id => zone.byId[id]);
+  zoneCardsCache.set(zone, arr);
+  return arr;
+}
+
 export const Selectors = {
-  getGames: ({ games }: State): { [gameId: number]: GameEntry } => games.games,
+  getGames: ({ games }: State): { [gameId: number]: Enriched.GameEntry } => games.games,
 
-  getGame: ({ games }: State, gameId: number): GameEntry | undefined => games.games[gameId],
+  getGame: ({ games }: State, gameId: number): Enriched.GameEntry | undefined => games.games[gameId],
 
-  getPlayers: ({ games }: State, gameId: number): { [playerId: number]: PlayerEntry } | undefined =>
+  getPlayers: ({ games }: State, gameId: number): { [playerId: number]: Enriched.PlayerEntry } | undefined =>
     games.games[gameId]?.players,
 
-  getPlayer: ({ games }: State, gameId: number, playerId: number): PlayerEntry | undefined =>
+  getPlayer: ({ games }: State, gameId: number, playerId: number): Enriched.PlayerEntry | undefined =>
     games.games[gameId]?.players[playerId],
 
   getLocalPlayerId: ({ games }: State, gameId: number): number | undefined =>
     games.games[gameId]?.localPlayerId,
 
-  getLocalPlayer: (state: State, gameId: number): PlayerEntry | undefined => {
+  getLocalPlayer: (state: State, gameId: number): Enriched.PlayerEntry | undefined => {
     const game = state.games.games[gameId];
     if (!game) {
       return undefined;
@@ -35,7 +53,7 @@ export const Selectors = {
     { games }: State,
     gameId: number,
     playerId: number
-  ): { [zoneName: string]: ZoneEntry } | undefined =>
+  ): { [zoneName: string]: Enriched.ZoneEntry } | undefined =>
     games.games[gameId]?.players[playerId]?.zones,
 
   getZone: (
@@ -43,10 +61,12 @@ export const Selectors = {
     gameId: number,
     playerId: number,
     zoneName: string
-  ): ZoneEntry | undefined => games.games[gameId]?.players[playerId]?.zones[zoneName],
+  ): Enriched.ZoneEntry | undefined => games.games[gameId]?.players[playerId]?.zones[zoneName],
 
-  getCards: ({ games }: State, gameId: number, playerId: number, zoneName: string) =>
-    games.games[gameId]?.players[playerId]?.zones[zoneName]?.cards ?? EMPTY_ARRAY,
+  getCards: ({ games }: State, gameId: number, playerId: number, zoneName: string): Data.ServerInfo_Card[] => {
+    const zone = games.games[gameId]?.players[playerId]?.zones[zoneName];
+    return zone ? materializeZoneCards(zone) : EMPTY_ARRAY;
+  },
 
   getCounters: ({ games }: State, gameId: number, playerId: number) =>
     games.games[gameId]?.players[playerId]?.counters ?? EMPTY_OBJECT,

@@ -6,7 +6,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 import { Images } from '@app/images';
-import { SessionService } from '@app/api';
+import { request } from '@app/api';
 import { ServerSelectors } from '@app/store';
 import { App, Data } from '@app/types';
 import { useAppSelector } from '@app/store';
@@ -28,23 +28,23 @@ const UserDisplay = ({ user }: UserDisplayProps) => {
 
   const handleClose = () => setPosition(null);
 
-  const isABuddy = buddyList.filter(u => u.name === user.name).length;
-  const isIgnored = ignoreList.filter(u => u.name === user.name).length;
+  const isABuddy = Boolean(buddyList[user.name]);
+  const isIgnored = Boolean(ignoreList[user.name]);
 
   const onAddBuddy = () => {
-    SessionService.addToBuddyList(user.name);
+    request.session.addToBuddyList(user.name);
     handleClose();
   };
   const onRemoveBuddy = () => {
-    SessionService.removeFromBuddyList(user.name);
+    request.session.removeFromBuddyList(user.name);
     handleClose();
   };
   const onAddIgnore = () => {
-    SessionService.addToIgnoreList(user.name);
+    request.session.addToIgnoreList(user.name);
     handleClose();
   };
   const onRemoveIgnore = () => {
-    SessionService.removeFromIgnoreList(user.name);
+    request.session.removeFromIgnoreList(user.name);
     handleClose();
   };
 

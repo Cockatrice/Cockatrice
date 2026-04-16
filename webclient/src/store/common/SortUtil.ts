@@ -57,6 +57,20 @@ export default class SortUtil {
     }
   }
 
+  /** Non-mutating variant: returns a new sorted array. Intended for use inside selectors. */
+  static sortedByField<T extends object>(arr: readonly T[], sortBy: App.SortBy): T[] {
+    const copy = [...arr];
+    SortUtil.sortByField(copy, sortBy);
+    return copy;
+  }
+
+  /** Non-mutating variant: returns a new sorted user array. Intended for use inside selectors. */
+  static sortedUsersByField(users: readonly Data.ServerInfo_User[], sortBy: App.SortBy): Data.ServerInfo_User[] {
+    const copy = [...users];
+    SortUtil.sortUsersByField(copy, sortBy);
+    return copy;
+  }
+
   static toggleSortBy<F extends string>(field: F, sortBy: App.SortBy): { field: F; order: App.SortDirection } {
     const sameField = field === sortBy.field;
     const isASC = sortBy.order === App.SortDirection.ASC;
@@ -133,19 +147,20 @@ export default class SortUtil {
 
   private static resolveFieldChain(obj: object, field: string) {
     const links = field.split('.');
-
-    if (links.length > 1) {
-      return links.reduce((obj, link) => {
-        const parsed = parseInt(link, 10);
-
-        if (parsed.toLocaleString() === 'NaN') {
-          return obj[link];
-        } else {
-          return obj[parsed];
-        }
-      }, obj) || null;
-    } else {
+    if (links.length === 1) {
       return obj[field];
     }
+    // Walk nested path; bail to null if we hit a missing intermediate object.
+    // Note: intentionally avoids `|| null` so falsy-but-valid leaf values
+    // (0, '', false) are preserved.
+    let cursor: any = obj;
+    for (const link of links) {
+      if (cursor == null) {
+        return null;
+      }
+      const parsed = parseInt(link, 10);
+      cursor = Number.isNaN(parsed) ? cursor[link] : cursor[parsed];
+    }
+    return cursor ?? null;
   }
 }

@@ -1,6 +1,6 @@
 import type { Data } from '@app/types';
-import { SessionPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function userLeft({ name }: Data.Event_UserLeft): void {
-  SessionPersistence.userLeft(name);
+  WebClient.instance.response.session.userLeft(name);
 }

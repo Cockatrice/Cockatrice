@@ -1,6 +1,6 @@
 import type { Data, Enriched } from '@app/types';
-import { GamePersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function dumpZone(data: Data.Event_DumpZone, meta: Enriched.GameEventMeta): void {
-  GamePersistence.zoneDumped(meta.gameId, meta.playerId, data);
+  WebClient.instance.response.game.zoneDumped(meta.gameId, meta.playerId, data);
 }

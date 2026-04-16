@@ -1,6 +1,6 @@
 import type { Data, Enriched } from '@app/types';
-import { GamePersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function createArrow(data: Data.Event_CreateArrow, meta: Enriched.GameEventMeta): void {
-  GamePersistence.arrowCreated(meta.gameId, meta.playerId, data);
+  WebClient.instance.response.game.arrowCreated(meta.gameId, meta.playerId, data);
 }

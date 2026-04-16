@@ -1,7 +1,6 @@
 import { create } from '@bufbuild/protobuf';
-import webClient from '../../WebClient';
+import { WebClient } from '../../WebClient';
 
-import { SessionPersistence } from '../../persistence';
 import { Data } from '@app/types';
 
 export function removeFromBuddyList(userName: string): void {
@@ -13,9 +12,13 @@ export function removeFromIgnoreList(userName: string): void {
 }
 
 export function removeFromList(list: string, userName: string): void {
-  webClient.protobuf.sendSessionCommand(Data.Command_RemoveFromList_ext, create(Data.Command_RemoveFromListSchema, { list, userName }), {
-    onSuccess: () => {
-      SessionPersistence.removeFromList(list, userName);
-    },
-  });
+  WebClient.instance.protobuf.sendSessionCommand(
+    Data.Command_RemoveFromList_ext,
+    create(Data.Command_RemoveFromListSchema, { list, userName }),
+    {
+      onSuccess: () => {
+        WebClient.instance.response.session.removeFromList(list, userName);
+      },
+    }
+  );
 }

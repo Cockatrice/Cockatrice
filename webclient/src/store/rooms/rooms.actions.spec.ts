@@ -5,65 +5,68 @@ import { App } from '@app/types';
 
 describe('Actions', () => {
   it('clearStore', () => {
-    expect(Actions.clearStore()).toEqual({ type: Types.CLEAR_STORE });
+    expect(Actions.clearStore()).toEqual({ type: Types.CLEAR_STORE, payload: undefined });
   });
 
   it('updateRooms', () => {
     const rooms = [makeRoom()];
-    expect(Actions.updateRooms(rooms)).toEqual({ type: Types.UPDATE_ROOMS, rooms });
+    expect(Actions.updateRooms({ rooms })).toEqual({ type: Types.UPDATE_ROOMS, payload: { rooms } });
   });
 
   it('joinRoom', () => {
     const roomInfo = makeRoom({ roomId: 2 });
-    expect(Actions.joinRoom(roomInfo)).toEqual({ type: Types.JOIN_ROOM, roomInfo });
+    expect(Actions.joinRoom({ roomInfo })).toEqual({ type: Types.JOIN_ROOM, payload: { roomInfo } });
   });
 
   it('leaveRoom', () => {
-    expect(Actions.leaveRoom(3)).toEqual({ type: Types.LEAVE_ROOM, roomId: 3 });
+    expect(Actions.leaveRoom({ roomId: 3 })).toEqual({ type: Types.LEAVE_ROOM, payload: { roomId: 3 } });
   });
 
   it('addMessage', () => {
     const message = makeMessage();
-    expect(Actions.addMessage(1, message)).toEqual({ type: Types.ADD_MESSAGE, roomId: 1, message });
+    expect(Actions.addMessage({ roomId: 1, message })).toEqual({ type: Types.ADD_MESSAGE, payload: { roomId: 1, message } });
   });
 
   it('updateGames', () => {
     const games = [makeGame()];
-    expect(Actions.updateGames(1, games)).toEqual({ type: Types.UPDATE_GAMES, roomId: 1, games });
+    expect(Actions.updateGames({ roomId: 1, games })).toEqual({ type: Types.UPDATE_GAMES, payload: { roomId: 1, games } });
   });
 
   it('userJoined', () => {
     const user = makeUser();
-    expect(Actions.userJoined(1, user)).toEqual({ type: Types.USER_JOINED, roomId: 1, user });
+    expect(Actions.userJoined({ roomId: 1, user })).toEqual({ type: Types.USER_JOINED, payload: { roomId: 1, user } });
   });
 
   it('userLeft', () => {
-    expect(Actions.userLeft(1, 'Alice')).toEqual({ type: Types.USER_LEFT, roomId: 1, name: 'Alice' });
+    expect(Actions.userLeft({ roomId: 1, name: 'Alice' })).toEqual({ type: Types.USER_LEFT, payload: { roomId: 1, name: 'Alice' } });
   });
 
   it('sortGames', () => {
-    expect(Actions.sortGames(1, App.GameSortField.START_TIME, App.SortDirection.ASC)).toEqual({
+    expect(Actions.sortGames({ field: App.GameSortField.START_TIME, order: App.SortDirection.ASC })).toEqual({
       type: Types.SORT_GAMES,
-      roomId: 1,
-      field: App.GameSortField.START_TIME,
-      order: App.SortDirection.ASC,
+      payload: {
+        field: App.GameSortField.START_TIME,
+        order: App.SortDirection.ASC,
+      },
     });
   });
 
   it('removeMessages', () => {
-    expect(Actions.removeMessages(1, 'Alice', 3)).toEqual({
+    expect(Actions.removeMessages({ roomId: 1, name: 'Alice', amount: 3 })).toEqual({
       type: Types.REMOVE_MESSAGES,
-      roomId: 1,
-      name: 'Alice',
-      amount: 3,
+      payload: {
+        roomId: 1,
+        name: 'Alice',
+        amount: 3,
+      },
     });
   });
 
   it('gameCreated', () => {
-    expect(Actions.gameCreated(2)).toEqual({ type: Types.GAME_CREATED, roomId: 2 });
+    expect(Actions.gameCreated({ roomId: 2 })).toEqual({ type: Types.GAME_CREATED, payload: { roomId: 2 } });
   });
 
   it('joinedGame', () => {
-    expect(Actions.joinedGame(1, 5)).toEqual({ type: Types.JOINED_GAME, roomId: 1, gameId: 5 });
+    expect(Actions.joinedGame({ roomId: 1, gameId: 5 })).toEqual({ type: Types.JOINED_GAME, payload: { roomId: 1, gameId: 5 } });
   });
 });

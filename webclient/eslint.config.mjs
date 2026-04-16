@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import globals from 'globals';
+import { boundariesConfig } from './eslint.boundaries.mjs';
 
 export default tseslint.config(
   // Global ignores
@@ -11,6 +12,9 @@ export default tseslint.config(
 
   // TypeScript recommended (sets up parser + plugin)
   ...tseslint.configs.recommended,
+
+  // Enforce module boundaries
+  boundariesConfig,
 
   // Project-specific config
   {

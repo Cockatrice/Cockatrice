@@ -1,6 +1,7 @@
 import type { Data } from '@app/types';
-import { SessionPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
+import { sanitizeHtml } from '../../utils';
 
 export function serverMessage({ message }: Data.Event_ServerMessage): void {
-  SessionPersistence.serverMessage(message);
+  WebClient.instance.response.session.serverMessage(sanitizeHtml(message));
 }

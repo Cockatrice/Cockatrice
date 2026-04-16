@@ -16,349 +16,348 @@ import {
 
 describe('Actions', () => {
   it('initialized', () => {
-    expect(Actions.initialized()).toEqual({ type: Types.INITIALIZED });
+    expect(Actions.initialized()).toEqual({ type: Types.INITIALIZED, payload: undefined });
   });
 
   it('clearStore', () => {
-    expect(Actions.clearStore()).toEqual({ type: Types.CLEAR_STORE });
+    expect(Actions.clearStore()).toEqual({ type: Types.CLEAR_STORE, payload: undefined });
   });
 
   it('connectionAttempted', () => {
-    expect(Actions.connectionAttempted()).toEqual({ type: Types.CONNECTION_ATTEMPTED });
+    expect(Actions.connectionAttempted()).toEqual({ type: Types.CONNECTION_ATTEMPTED, payload: undefined });
   });
 
   it('loginSuccessful', () => {
     const options = makeLoginSuccessContext();
-    expect(Actions.loginSuccessful(options)).toEqual({ type: Types.LOGIN_SUCCESSFUL, options });
+    expect(Actions.loginSuccessful({ options })).toEqual({ type: Types.LOGIN_SUCCESSFUL, payload: { options } });
   });
 
   it('loginFailed', () => {
-    expect(Actions.loginFailed()).toEqual({ type: Types.LOGIN_FAILED });
+    expect(Actions.loginFailed()).toEqual({ type: Types.LOGIN_FAILED, payload: undefined });
   });
 
   it('connectionFailed', () => {
-    expect(Actions.connectionFailed()).toEqual({ type: Types.CONNECTION_FAILED });
+    expect(Actions.connectionFailed()).toEqual({ type: Types.CONNECTION_FAILED, payload: undefined });
   });
 
   it('testConnectionSuccessful', () => {
-    expect(Actions.testConnectionSuccessful()).toEqual({ type: Types.TEST_CONNECTION_SUCCESSFUL });
+    expect(Actions.testConnectionSuccessful()).toEqual({ type: Types.TEST_CONNECTION_SUCCESSFUL, payload: undefined });
   });
 
   it('testConnectionFailed', () => {
-    expect(Actions.testConnectionFailed()).toEqual({ type: Types.TEST_CONNECTION_FAILED });
+    expect(Actions.testConnectionFailed()).toEqual({ type: Types.TEST_CONNECTION_FAILED, payload: undefined });
   });
 
   it('serverMessage', () => {
-    expect(Actions.serverMessage('hello')).toEqual({ type: Types.SERVER_MESSAGE, message: 'hello' });
+    expect(Actions.serverMessage({ message: 'hello' })).toEqual({ type: Types.SERVER_MESSAGE, payload: { message: 'hello' } });
   });
 
   it('updateBuddyList', () => {
     const list = [makeUser()];
-    expect(Actions.updateBuddyList(list)).toEqual({ type: Types.UPDATE_BUDDY_LIST, buddyList: list });
+    expect(Actions.updateBuddyList({ buddyList: list })).toEqual({ type: Types.UPDATE_BUDDY_LIST, payload: { buddyList: list } });
   });
 
   it('addToBuddyList', () => {
     const user = makeUser();
-    expect(Actions.addToBuddyList(user)).toEqual({ type: Types.ADD_TO_BUDDY_LIST, user });
+    expect(Actions.addToBuddyList({ user })).toEqual({ type: Types.ADD_TO_BUDDY_LIST, payload: { user } });
   });
 
   it('removeFromBuddyList', () => {
-    expect(Actions.removeFromBuddyList('Alice')).toEqual({ type: Types.REMOVE_FROM_BUDDY_LIST, userName: 'Alice' });
+    const action = Actions.removeFromBuddyList({ userName: 'Alice' });
+    expect(action).toEqual({ type: Types.REMOVE_FROM_BUDDY_LIST, payload: { userName: 'Alice' } });
   });
 
   it('updateIgnoreList', () => {
     const list = [makeUser()];
-    expect(Actions.updateIgnoreList(list)).toEqual({ type: Types.UPDATE_IGNORE_LIST, ignoreList: list });
+    expect(Actions.updateIgnoreList({ ignoreList: list })).toEqual({ type: Types.UPDATE_IGNORE_LIST, payload: { ignoreList: list } });
   });
 
   it('addToIgnoreList', () => {
     const user = makeUser();
-    expect(Actions.addToIgnoreList(user)).toEqual({ type: Types.ADD_TO_IGNORE_LIST, user });
+    expect(Actions.addToIgnoreList({ user })).toEqual({ type: Types.ADD_TO_IGNORE_LIST, payload: { user } });
   });
 
   it('removeFromIgnoreList', () => {
-    expect(Actions.removeFromIgnoreList('Bob')).toEqual({ type: Types.REMOVE_FROM_IGNORE_LIST, userName: 'Bob' });
+    const action = Actions.removeFromIgnoreList({ userName: 'Bob' });
+    expect(action).toEqual({ type: Types.REMOVE_FROM_IGNORE_LIST, payload: { userName: 'Bob' } });
   });
 
   it('updateInfo', () => {
     const info = { name: 'Servatrice', version: '2.0' };
-    expect(Actions.updateInfo(info)).toEqual({ type: Types.UPDATE_INFO, info });
+    expect(Actions.updateInfo({ info })).toEqual({ type: Types.UPDATE_INFO, payload: { info } });
   });
 
   it('updateStatus', () => {
     const status = { state: App.StatusEnum.CONNECTED, description: 'connected' };
-    expect(Actions.updateStatus(status)).toEqual({ type: Types.UPDATE_STATUS, status });
+    expect(Actions.updateStatus({ status })).toEqual({ type: Types.UPDATE_STATUS, payload: { status } });
   });
 
   it('updateUser', () => {
     const user = makeUser();
-    expect(Actions.updateUser(user)).toEqual({ type: Types.UPDATE_USER, user });
+    expect(Actions.updateUser({ user })).toEqual({ type: Types.UPDATE_USER, payload: { user } });
   });
 
   it('updateUsers', () => {
     const users = [makeUser()];
-    expect(Actions.updateUsers(users)).toEqual({ type: Types.UPDATE_USERS, users });
+    expect(Actions.updateUsers({ users })).toEqual({ type: Types.UPDATE_USERS, payload: { users } });
   });
 
   it('userJoined', () => {
     const user = makeUser();
-    expect(Actions.userJoined(user)).toEqual({ type: Types.USER_JOINED, user });
+    expect(Actions.userJoined({ user })).toEqual({ type: Types.USER_JOINED, payload: { user } });
   });
 
   it('userLeft', () => {
-    expect(Actions.userLeft('Carol')).toEqual({ type: Types.USER_LEFT, name: 'Carol' });
+    expect(Actions.userLeft({ name: 'Carol' })).toEqual({ type: Types.USER_LEFT, payload: { name: 'Carol' } });
   });
 
   it('viewLogs', () => {
     const logs = [create(Data.ServerInfo_ChatMessageSchema, { targetType: 'room' })];
-    expect(Actions.viewLogs(logs)).toEqual({ type: Types.VIEW_LOGS, logs });
+    expect(Actions.viewLogs({ logs })).toEqual({ type: Types.VIEW_LOGS, payload: { logs } });
   });
 
   it('clearLogs', () => {
-    expect(Actions.clearLogs()).toEqual({ type: Types.CLEAR_LOGS });
+    expect(Actions.clearLogs()).toEqual({ type: Types.CLEAR_LOGS, payload: undefined });
   });
 
   it('registrationRequiresEmail', () => {
-    expect(Actions.registrationRequiresEmail()).toEqual({ type: Types.REGISTRATION_REQUIRES_EMAIL });
+    expect(Actions.registrationRequiresEmail()).toEqual({ type: Types.REGISTRATION_REQUIRES_EMAIL, payload: undefined });
   });
 
   it('registrationSuccess', () => {
-    expect(Actions.registrationSuccess()).toEqual({ type: Types.REGISTRATION_SUCCESS });
+    expect(Actions.registrationSuccess()).toEqual({ type: Types.REGISTRATION_SUCCESS, payload: undefined });
   });
 
   it('registrationFailed', () => {
-    expect(Actions.registrationFailed('err', 999)).toEqual({ type: Types.REGISTRATION_FAILED, reason: 'err', endTime: 999 });
+    const action = Actions.registrationFailed({ reason: 'err', endTime: 999 });
+    expect(action.payload).toEqual({ reason: 'err', endTime: 999 });
   });
 
   it('registrationFailed without endTime', () => {
-    expect(Actions.registrationFailed('err')).toEqual({ type: Types.REGISTRATION_FAILED, reason: 'err', endTime: undefined });
+    const action = Actions.registrationFailed({ reason: 'err' });
+    expect(action.payload).toEqual({ reason: 'err' });
   });
 
   it('registrationEmailError', () => {
-    expect(Actions.registrationEmailError('bad email')).toEqual({ type: Types.REGISTRATION_EMAIL_ERROR, error: 'bad email' });
+    const action = Actions.registrationEmailError({ error: 'bad email' });
+    expect(action.payload).toEqual({ error: 'bad email' });
   });
 
   it('registrationPasswordError', () => {
-    expect(Actions.registrationPasswordError('bad pw')).toEqual({ type: Types.REGISTRATION_PASSWORD_ERROR, error: 'bad pw' });
+    const action = Actions.registrationPasswordError({ error: 'bad pw' });
+    expect(action.payload).toEqual({ error: 'bad pw' });
   });
 
   it('registrationUserNameError', () => {
-    expect(Actions.registrationUserNameError('bad name')).toEqual({ type: Types.REGISTRATION_USERNAME_ERROR, error: 'bad name' });
+    const action = Actions.registrationUserNameError({ error: 'bad name' });
+    expect(action.payload).toEqual({ error: 'bad name' });
   });
 
   it('accountAwaitingActivation', () => {
     const options = makePendingActivationContext();
-    expect(Actions.accountAwaitingActivation(options)).toEqual({ type: Types.ACCOUNT_AWAITING_ACTIVATION, options });
+    expect(Actions.accountAwaitingActivation({ options })).toEqual({ type: Types.ACCOUNT_AWAITING_ACTIVATION, payload: { options } });
   });
 
   it('accountActivationSuccess', () => {
-    expect(Actions.accountActivationSuccess()).toEqual({ type: Types.ACCOUNT_ACTIVATION_SUCCESS });
+    expect(Actions.accountActivationSuccess()).toEqual({ type: Types.ACCOUNT_ACTIVATION_SUCCESS, payload: undefined });
   });
 
   it('accountActivationFailed', () => {
-    expect(Actions.accountActivationFailed()).toEqual({ type: Types.ACCOUNT_ACTIVATION_FAILED });
+    expect(Actions.accountActivationFailed()).toEqual({ type: Types.ACCOUNT_ACTIVATION_FAILED, payload: undefined });
   });
 
   it('resetPassword', () => {
-    expect(Actions.resetPassword()).toEqual({ type: Types.RESET_PASSWORD_REQUESTED });
+    expect(Actions.resetPassword()).toEqual({ type: Types.RESET_PASSWORD_REQUESTED, payload: undefined });
   });
 
   it('resetPasswordFailed', () => {
-    expect(Actions.resetPasswordFailed()).toEqual({ type: Types.RESET_PASSWORD_FAILED });
+    expect(Actions.resetPasswordFailed()).toEqual({ type: Types.RESET_PASSWORD_FAILED, payload: undefined });
   });
 
   it('resetPasswordChallenge', () => {
-    expect(Actions.resetPasswordChallenge()).toEqual({ type: Types.RESET_PASSWORD_CHALLENGE });
+    expect(Actions.resetPasswordChallenge()).toEqual({ type: Types.RESET_PASSWORD_CHALLENGE, payload: undefined });
   });
 
   it('resetPasswordSuccess', () => {
-    expect(Actions.resetPasswordSuccess()).toEqual({ type: Types.RESET_PASSWORD_SUCCESS });
+    expect(Actions.resetPasswordSuccess()).toEqual({ type: Types.RESET_PASSWORD_SUCCESS, payload: undefined });
   });
 
   it('adjustMod', () => {
-    expect(Actions.adjustMod('Dan', true, false)).toEqual({
+    expect(Actions.adjustMod({ userName: 'Dan', shouldBeMod: true, shouldBeJudge: false })).toEqual({
       type: Types.ADJUST_MOD,
-      userName: 'Dan',
-      shouldBeMod: true,
-      shouldBeJudge: false,
+      payload: { userName: 'Dan', shouldBeMod: true, shouldBeJudge: false },
     });
   });
 
   it('reloadConfig', () => {
-    expect(Actions.reloadConfig()).toEqual({ type: Types.RELOAD_CONFIG });
+    expect(Actions.reloadConfig()).toEqual({ type: Types.RELOAD_CONFIG, payload: undefined });
   });
 
   it('shutdownServer', () => {
-    expect(Actions.shutdownServer()).toEqual({ type: Types.SHUTDOWN_SERVER });
+    expect(Actions.shutdownServer()).toEqual({ type: Types.SHUTDOWN_SERVER, payload: undefined });
   });
 
   it('updateServerMessage', () => {
-    expect(Actions.updateServerMessage()).toEqual({ type: Types.UPDATE_SERVER_MESSAGE });
+    expect(Actions.updateServerMessage()).toEqual({ type: Types.UPDATE_SERVER_MESSAGE, payload: undefined });
   });
 
   it('accountPasswordChange', () => {
-    expect(Actions.accountPasswordChange()).toEqual({ type: Types.ACCOUNT_PASSWORD_CHANGE });
+    expect(Actions.accountPasswordChange()).toEqual({ type: Types.ACCOUNT_PASSWORD_CHANGE, payload: undefined });
   });
 
   it('accountEditChanged', () => {
     const user = makeUser();
-    expect(Actions.accountEditChanged(user)).toEqual({ type: Types.ACCOUNT_EDIT_CHANGED, user });
+    expect(Actions.accountEditChanged({ user })).toEqual({ type: Types.ACCOUNT_EDIT_CHANGED, payload: { user } });
   });
 
   it('accountImageChanged', () => {
     const user = makeUser();
-    expect(Actions.accountImageChanged(user)).toEqual({ type: Types.ACCOUNT_IMAGE_CHANGED, user });
+    expect(Actions.accountImageChanged({ user })).toEqual({ type: Types.ACCOUNT_IMAGE_CHANGED, payload: { user } });
   });
 
   it('getUserInfo', () => {
     const userInfo = makeUser({ name: 'Frank' });
-    expect(Actions.getUserInfo(userInfo)).toEqual({ type: Types.GET_USER_INFO, userInfo });
+    expect(Actions.getUserInfo({ userInfo })).toEqual({ type: Types.GET_USER_INFO, payload: { userInfo } });
   });
 
   it('notifyUser', () => {
     const notification = create(Data.Event_NotifyUserSchema, { type: 1, warningReason: '', customTitle: '', customContent: '' });
-    expect(Actions.notifyUser(notification)).toEqual({ type: Types.NOTIFY_USER, notification });
+    expect(Actions.notifyUser({ notification })).toEqual({ type: Types.NOTIFY_USER, payload: { notification } });
   });
 
   it('serverShutdown', () => {
     const data = create(Data.Event_ServerShutdownSchema, { reason: 'maintenance', minutes: 5 });
-    expect(Actions.serverShutdown(data)).toEqual({ type: Types.SERVER_SHUTDOWN, data });
+    expect(Actions.serverShutdown({ data })).toEqual({ type: Types.SERVER_SHUTDOWN, payload: { data } });
   });
 
   it('userMessage', () => {
     const messageData = create(Data.Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'hey' });
-    expect(Actions.userMessage(messageData)).toEqual({ type: Types.USER_MESSAGE, messageData });
+    expect(Actions.userMessage({ messageData })).toEqual({ type: Types.USER_MESSAGE, payload: { messageData } });
   });
 
   it('addToList', () => {
-    expect(Actions.addToList('buddyList', 'Grace')).toEqual({
+    expect(Actions.addToList({ list: 'buddyList', userName: 'Grace' })).toEqual({
       type: Types.ADD_TO_LIST,
-      list: 'buddyList',
-      userName: 'Grace',
+      payload: { list: 'buddyList', userName: 'Grace' },
     });
   });
 
   it('removeFromList', () => {
-    expect(Actions.removeFromList('buddyList', 'Hank')).toEqual({
+    expect(Actions.removeFromList({ list: 'buddyList', userName: 'Hank' })).toEqual({
       type: Types.REMOVE_FROM_LIST,
-      list: 'buddyList',
-      userName: 'Hank',
+      payload: { list: 'buddyList', userName: 'Hank' },
     });
   });
 
   it('banFromServer', () => {
-    expect(Actions.banFromServer('Ira')).toEqual({ type: Types.BAN_FROM_SERVER, userName: 'Ira' });
+    expect(Actions.banFromServer({ userName: 'Ira' })).toEqual({ type: Types.BAN_FROM_SERVER, payload: { userName: 'Ira' } });
   });
 
   it('banHistory', () => {
     const history = [makeBanHistoryItem()];
-    expect(Actions.banHistory('Ira', history)).toEqual({ type: Types.BAN_HISTORY, userName: 'Ira', banHistory: history });
+    const action = Actions.banHistory({ userName: 'Ira', banHistory: history });
+    expect(action.payload).toEqual({ userName: 'Ira', banHistory: history });
   });
 
   it('warnHistory', () => {
     const history = [makeWarnHistoryItem()];
-    expect(Actions.warnHistory('Jack', history)).toEqual({ type: Types.WARN_HISTORY, userName: 'Jack', warnHistory: history });
+    const action = Actions.warnHistory({ userName: 'Jack', warnHistory: history });
+    expect(action.payload).toEqual({ userName: 'Jack', warnHistory: history });
   });
 
   it('warnListOptions', () => {
     const list = [makeWarnListItem()];
-    expect(Actions.warnListOptions(list)).toEqual({ type: Types.WARN_LIST_OPTIONS, warnList: list });
+    expect(Actions.warnListOptions({ warnList: list })).toEqual({ type: Types.WARN_LIST_OPTIONS, payload: { warnList: list } });
   });
 
   it('warnUser', () => {
-    expect(Actions.warnUser('Kelly')).toEqual({ type: Types.WARN_USER, userName: 'Kelly' });
+    expect(Actions.warnUser({ userName: 'Kelly' })).toEqual({ type: Types.WARN_USER, payload: { userName: 'Kelly' } });
   });
 
   it('grantReplayAccess', () => {
-    expect(Actions.grantReplayAccess(7, 'Moe')).toEqual({
+    expect(Actions.grantReplayAccess({ replayId: 7, moderatorName: 'Moe' })).toEqual({
       type: Types.GRANT_REPLAY_ACCESS,
-      replayId: 7,
-      moderatorName: 'Moe',
+      payload: { replayId: 7, moderatorName: 'Moe' },
     });
   });
 
   it('forceActivateUser', () => {
-    expect(Actions.forceActivateUser('Ned', 'Moe')).toEqual({
+    expect(Actions.forceActivateUser({ usernameToActivate: 'Ned', moderatorName: 'Moe' })).toEqual({
       type: Types.FORCE_ACTIVATE_USER,
-      usernameToActivate: 'Ned',
-      moderatorName: 'Moe',
+      payload: { usernameToActivate: 'Ned', moderatorName: 'Moe' },
     });
   });
 
   it('getAdminNotes', () => {
-    expect(Actions.getAdminNotes('Ned', 'some notes')).toEqual({
+    expect(Actions.getAdminNotes({ userName: 'Ned', notes: 'some notes' })).toEqual({
       type: Types.GET_ADMIN_NOTES,
-      userName: 'Ned',
-      notes: 'some notes',
+      payload: { userName: 'Ned', notes: 'some notes' },
     });
   });
 
   it('updateAdminNotes', () => {
-    expect(Actions.updateAdminNotes('Ned', 'updated notes')).toEqual({
+    expect(Actions.updateAdminNotes({ userName: 'Ned', notes: 'updated notes' })).toEqual({
       type: Types.UPDATE_ADMIN_NOTES,
-      userName: 'Ned',
-      notes: 'updated notes',
+      payload: { userName: 'Ned', notes: 'updated notes' },
     });
   });
 
   it('replayList', () => {
     const list = [makeReplayMatch()];
-    expect(Actions.replayList(list)).toEqual({ type: Types.REPLAY_LIST, matchList: list });
+    expect(Actions.replayList({ matchList: list })).toEqual({ type: Types.REPLAY_LIST, payload: { matchList: list } });
   });
 
   it('replayAdded', () => {
     const match = makeReplayMatch();
-    expect(Actions.replayAdded(match)).toEqual({ type: Types.REPLAY_ADDED, matchInfo: match });
+    expect(Actions.replayAdded({ matchInfo: match })).toEqual({ type: Types.REPLAY_ADDED, payload: { matchInfo: match } });
   });
 
   it('replayModifyMatch', () => {
-    expect(Actions.replayModifyMatch(5, true)).toEqual({
+    expect(Actions.replayModifyMatch({ gameId: 5, doNotHide: true })).toEqual({
       type: Types.REPLAY_MODIFY_MATCH,
-      gameId: 5,
-      doNotHide: true,
+      payload: { gameId: 5, doNotHide: true },
     });
   });
 
   it('replayDeleteMatch', () => {
-    expect(Actions.replayDeleteMatch(5)).toEqual({ type: Types.REPLAY_DELETE_MATCH, gameId: 5 });
+    expect(Actions.replayDeleteMatch({ gameId: 5 })).toEqual({ type: Types.REPLAY_DELETE_MATCH, payload: { gameId: 5 } });
   });
 
   it('backendDecks', () => {
     const deckList = makeDeckList();
-    expect(Actions.backendDecks(deckList)).toEqual({ type: Types.BACKEND_DECKS, deckList });
+    expect(Actions.backendDecks({ deckList })).toEqual({ type: Types.BACKEND_DECKS, payload: { deckList } });
   });
 
   it('deckNewDir', () => {
-    expect(Actions.deckNewDir('a/b', 'newFolder')).toEqual({
+    expect(Actions.deckNewDir({ path: 'a/b', dirName: 'newFolder' })).toEqual({
       type: Types.DECK_NEW_DIR,
-      path: 'a/b',
-      dirName: 'newFolder',
+      payload: { path: 'a/b', dirName: 'newFolder' },
     });
   });
 
   it('deckDelDir', () => {
-    expect(Actions.deckDelDir('a/b')).toEqual({ type: Types.DECK_DEL_DIR, path: 'a/b' });
+    expect(Actions.deckDelDir({ path: 'a/b' })).toEqual({ type: Types.DECK_DEL_DIR, payload: { path: 'a/b' } });
   });
 
   it('deckUpload', () => {
     const treeItem = makeDeckTreeItem();
-    expect(Actions.deckUpload('a/b', treeItem)).toEqual({
+    expect(Actions.deckUpload({ path: 'a/b', treeItem })).toEqual({
       type: Types.DECK_UPLOAD,
-      path: 'a/b',
-      treeItem,
+      payload: { path: 'a/b', treeItem },
     });
   });
 
   it('deckDelete', () => {
-    expect(Actions.deckDelete(42)).toEqual({ type: Types.DECK_DELETE, deckId: 42 });
+    expect(Actions.deckDelete({ deckId: 42 })).toEqual({ type: Types.DECK_DELETE, payload: { deckId: 42 } });
   });
 
   it('gamesOfUser', () => {
     const response = create(Data.Response_GetGamesOfUserSchema, { roomList: [], gameList: [] });
-    expect(Actions.gamesOfUser('alice', response)).toEqual({ type: Types.GAMES_OF_USER, userName: 'alice', response });
+    const action = Actions.gamesOfUser({ userName: 'alice', response });
+    expect(action.payload).toEqual({ userName: 'alice', response });
   });
 
   it('clearRegistrationErrors', () => {
-    expect(Actions.clearRegistrationErrors()).toEqual({ type: Types.CLEAR_REGISTRATION_ERRORS });
+    expect(Actions.clearRegistrationErrors()).toEqual({ type: Types.CLEAR_REGISTRATION_ERRORS, payload: undefined });
   });
 });

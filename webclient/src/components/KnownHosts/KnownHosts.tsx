@@ -13,7 +13,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditRoundedIcon from '@mui/icons-material/Edit';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 
-import { AuthenticationService } from '@app/api';
+import { request } from '@app/api';
 import { KnownHostDialog } from '@app/dialogs';
 import { useReduxEffect } from '@app/hooks';
 import { HostDTO } from '@app/services';
@@ -197,7 +197,7 @@ const KnownHosts = (props) => {
     setTestingConnection(TestConnection.TESTING);
 
     const options = { ...App.getHostPort(hostsState.selectedHost) };
-    AuthenticationService.testConnection(options);
+    request.authentication.testConnection(options);
   }
 
   return (

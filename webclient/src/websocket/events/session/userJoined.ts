@@ -1,6 +1,6 @@
 import type { Data } from '@app/types';
-import { SessionPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 
 export function userJoined({ userInfo }: Data.Event_UserJoined): void {
-  SessionPersistence.userJoined(userInfo);
+  WebClient.instance.response.session.userJoined(userInfo);
 }

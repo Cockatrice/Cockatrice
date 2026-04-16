@@ -1,20 +1,21 @@
 vi.mock('../../WebClient', () => ({
-  __esModule: true,
-  default: { protobuf: { sendAdminCommand: vi.fn() } },
-}));
-
-vi.mock('../../persistence', () => ({
-  AdminPersistence: {
-    adjustMod: vi.fn(),
-    reloadConfig: vi.fn(),
-    shutdownServer: vi.fn(),
-    updateServerMessage: vi.fn(),
+  WebClient: {
+    instance: {
+      protobuf: { sendAdminCommand: vi.fn() },
+      response: {
+        admin: {
+          adjustMod: vi.fn(),
+          reloadConfig: vi.fn(),
+          shutdownServer: vi.fn(),
+          updateServerMessage: vi.fn(),
+        },
+      },
+    },
   },
 }));
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
-import webClient from '../../WebClient';
-import { AdminPersistence } from '../../persistence';
+import { WebClient } from '../../WebClient';
 import { adjustMod } from './adjustMod';
 import { reloadConfig } from './reloadConfig';
 import { shutdownServer } from './shutdownServer';
@@ -23,7 +24,7 @@ import { updateServerMessage } from './updateServerMessage';
 import { Mock } from 'vitest';
 
 const { invokeOnSuccess } = makeCallbackHelpers(
-  webClient.protobuf.sendAdminCommand as Mock,
+  WebClient.instance.protobuf.sendAdminCommand as Mock,
   2
 );
 
@@ -34,13 +35,13 @@ describe('adjustMod', () => {
 
   it('calls sendAdminCommand with Command_AdjustMod', () => {
     adjustMod('alice', true, false);
-    expect(webClient.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
+    expect(WebClient.instance.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
-  it('onSuccess calls AdminPersistence.adjustMod', () => {
+  it('onSuccess calls response.admin.adjustMod', () => {
     adjustMod('alice', true, false);
     invokeOnSuccess();
-    expect(AdminPersistence.adjustMod).toHaveBeenCalledWith('alice', true, false);
+    expect(WebClient.instance.response.admin.adjustMod).toHaveBeenCalledWith('alice', true, false);
   });
 });
 
@@ -51,13 +52,13 @@ describe('reloadConfig', () => {
 
   it('calls sendAdminCommand with Command_ReloadConfig', () => {
     reloadConfig();
-    expect(webClient.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
+    expect(WebClient.instance.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
-  it('onSuccess calls AdminPersistence.reloadConfig', () => {
+  it('onSuccess calls response.admin.reloadConfig', () => {
     reloadConfig();
     invokeOnSuccess();
-    expect(AdminPersistence.reloadConfig).toHaveBeenCalled();
+    expect(WebClient.instance.response.admin.reloadConfig).toHaveBeenCalled();
   });
 });
 
@@ -68,13 +69,13 @@ describe('shutdownServer', () => {
 
   it('calls sendAdminCommand with Command_ShutdownServer', () => {
     shutdownServer('maintenance', 10);
-    expect(webClient.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
+    expect(WebClient.instance.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
-  it('onSuccess calls AdminPersistence.shutdownServer', () => {
+  it('onSuccess calls response.admin.shutdownServer', () => {
     shutdownServer('maintenance', 10);
     invokeOnSuccess();
-    expect(AdminPersistence.shutdownServer).toHaveBeenCalled();
+    expect(WebClient.instance.response.admin.shutdownServer).toHaveBeenCalled();
   });
 });
 
@@ -85,12 +86,12 @@ describe('updateServerMessage', () => {
 
   it('calls sendAdminCommand with Command_UpdateServerMessage', () => {
     updateServerMessage();
-    expect(webClient.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
+    expect(WebClient.instance.protobuf.sendAdminCommand).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), expect.any(Object));
   });
 
-  it('onSuccess calls AdminPersistence.updateServerMessage', () => {
+  it('onSuccess calls response.admin.updateServerMessage', () => {
     updateServerMessage();
     invokeOnSuccess();
-    expect(AdminPersistence.updateServerMessage).toHaveBeenCalled();
+    expect(WebClient.instance.response.admin.updateServerMessage).toHaveBeenCalled();
   });
 });

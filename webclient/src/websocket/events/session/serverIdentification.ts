@@ -1,6 +1,6 @@
 import { App, Data, Enriched } from '@app/types';
 
-import webClient from '../../WebClient';
+import { WebClient } from '../../WebClient';
 import { PROTOCOL_VERSION } from '../../config';
 import {
   activate,
@@ -14,8 +14,6 @@ import {
   updateStatus,
 } from '../../commands/session';
 import { generateSalt, passwordSaltSupported } from '../../utils';
-import { SessionPersistence } from '../../persistence';
-
 export function serverIdentification(info: Data.Event_ServerIdentification): void {
   const { serverName, serverVersion, protocolVersion, serverOptions } = info;
   if (protocolVersion !== PROTOCOL_VERSION) {
@@ -25,7 +23,7 @@ export function serverIdentification(info: Data.Event_ServerIdentification): voi
   }
 
   const getPasswordSalt = passwordSaltSupported(serverOptions);
-  const options = webClient.options;
+  const options = WebClient.instance.options;
 
   if (!options) {
     updateStatus(App.StatusEnum.DISCONNECTED, 'Missing connection options');
@@ -85,6 +83,6 @@ export function serverIdentification(info: Data.Event_ServerIdentification): voi
     }
   }
 
-  webClient.options = null;
-  SessionPersistence.updateInfo(serverName, serverVersion);
+  WebClient.instance.options = null;
+  WebClient.instance.response.session.updateInfo(serverName, serverVersion);
 }

@@ -1,6 +1,7 @@
-import { GamePersistence } from '../../persistence';
 import type { Data, Enriched } from '@app/types';
+import { WebClient } from '../../WebClient';
+
 
 export function joinGame(data: Data.Event_Join, meta: Enriched.GameEventMeta): void {
-  GamePersistence.playerJoined(meta.gameId, data.playerProperties);
+  WebClient.instance.response.game.playerJoined(meta.gameId, data.playerProperties);
 }

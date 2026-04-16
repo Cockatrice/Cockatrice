@@ -1,5 +1,4 @@
 import React from 'react';
-import * as _ from 'lodash';
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -98,13 +97,13 @@ const Results = ({ headerCells, logs }) => (
     <Table size="small">
       <TableHead>
         <TableRow>
-          { _.map(headerCells, ({ label }) => (
+          { headerCells.map(({ label }) => (
             <TableCell key={label}>{label}</TableCell>
           ))}
         </TableRow>
       </TableHead>
       <TableBody>
-        { _.map(logs, ({ time, senderName, senderIp, message, targetId, targetName }, index) => (
+        { logs.map(({ time, senderName, senderIp, message, targetId, targetName }, index) => (
           <TableRow key={index}>
             <TableCell>{time}</TableCell>
             <TableCell>{senderName}</TableCell>
