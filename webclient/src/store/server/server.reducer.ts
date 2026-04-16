@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { App, Data } from '@app/types';
+import { App, Data, Enriched } from '@app/types';
 import { create } from '@bufbuild/protobuf';
 
 import { normalizeBannedUserError, normalizeGameObject, normalizeGametypeMap, normalizeLogs } from '../common';
@@ -179,8 +179,10 @@ export const serverSlice = createSlice({
       }
     },
 
-    updateUser: (state, action: PayloadAction<{ user: Data.ServerInfo_User | Partial<Data.ServerInfo_User> }>) => {
-      state.user = { ...state.user, ...action.payload.user } as Data.ServerInfo_User;
+    updateUser: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
+      state.user = state.user
+        ? { ...state.user, ...action.payload.user } as Data.ServerInfo_User
+        : action.payload.user as Data.ServerInfo_User;
     },
 
     updateUsers: (state, action: PayloadAction<{ users: Data.ServerInfo_User[] }>) => {
@@ -356,8 +358,12 @@ export const serverSlice = createSlice({
       const gametypeMap = normalizeGametypeMap(
         (response.roomList ?? []).flatMap(room => room.gametypeList ?? [])
       );
-      const normalizedGames = (response.gameList ?? []).map(g => normalizeGameObject(g, gametypeMap));
-      state.gamesOfUser[userName] = normalizedGames;
+      const games: { [gameId: number]: Enriched.Game } = {};
+      for (const g of response.gameList ?? []) {
+        const normalized = normalizeGameObject(g, gametypeMap);
+        games[normalized.info.gameId] = normalized;
+      }
+      state.gamesOfUser[userName] = games;
     },
 
     registrationFailed: (state, action: PayloadAction<{ reason: string; endTime?: number }>) => {

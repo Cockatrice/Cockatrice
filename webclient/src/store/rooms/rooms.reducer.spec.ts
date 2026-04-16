@@ -114,12 +114,12 @@ describe('LEAVE_ROOM', () => {
 // ── ADD_MESSAGE ───────────────────────────────────────────────────────────────
 
 describe('ADD_MESSAGE', () => {
-  it('appends message with timeReceived set', () => {
+  it('appends message preserving the timeReceived from the event handler', () => {
     const state = makeRoomsState({ messages: { 1: [] } });
-    const message = makeMessage({ message: 'hello', timeReceived: 0 });
+    const message = makeMessage({ message: 'hello', timeReceived: 1700000000000 });
     const result = roomsReducer(state, Actions.addMessage({ roomId: 1, message }));
     expect(result.messages[1]).toHaveLength(1);
-    expect(result.messages[1][0].timeReceived).toBeGreaterThan(0);
+    expect(result.messages[1][0].timeReceived).toBe(1700000000000);
   });
 
   it('creates message list for roomId when none exists', () => {

@@ -648,29 +648,29 @@ describe('Deck Storage', () => {
 // ── GAMES_OF_USER ─────────────────────────────────────────────────────────────
 
 describe('GAMES_OF_USER', () => {
-  it('stores normalized games keyed by userName', () => {
+  it('stores normalized games keyed by userName and gameId', () => {
     const response = create(Data.Response_GetGamesOfUserSchema, {
       gameList: [create(Data.ServerInfo_GameSchema, { gameId: 5, description: '' })],
       roomList: [],
     });
     const state = makeServerState();
     const result = serverReducer(state, Actions.gamesOfUser({ userName: 'alice', response }));
-    expect(result.gamesOfUser['alice']).toEqual([makeGame({ gameId: 5 })]);
+    expect(result.gamesOfUser['alice']).toEqual({ 5: makeGame({ gameId: 5 }) });
   });
 
   it('overwrites previous games for same user', () => {
-    const old = [makeGame({ gameId: 1 })];
+    const old = { 1: makeGame({ gameId: 1 }) };
     const response = create(Data.Response_GetGamesOfUserSchema, {
       gameList: [create(Data.ServerInfo_GameSchema, { gameId: 2, description: '' })],
       roomList: [],
     });
     const state = makeServerState({ gamesOfUser: { alice: old } });
     const result = serverReducer(state, Actions.gamesOfUser({ userName: 'alice', response }));
-    expect(result.gamesOfUser['alice']).toEqual([makeGame({ gameId: 2 })]);
+    expect(result.gamesOfUser['alice']).toEqual({ 2: makeGame({ gameId: 2 }) });
   });
 
   it('does not affect other users\' entries', () => {
-    const bobGames = [makeGame({ gameId: 3 })];
+    const bobGames = { 3: makeGame({ gameId: 3 }) };
     const response = create(Data.Response_GetGamesOfUserSchema, { gameList: [], roomList: [] });
     const state = makeServerState({ gamesOfUser: { bob: bobGames } });
     const result = serverReducer(state, Actions.gamesOfUser({ userName: 'alice', response }));

@@ -31,14 +31,18 @@ export const Selectors = {
    * Reads from the room's normalized `games` map — fixes the pre-existing
    * bug where this selector read from a never-populated top-level `games` field.
    */
-  getJoinedGames: (state: State, roomId: number): Enriched.Game[] => {
-    const room = state.rooms.rooms[roomId];
-    const joined = state.rooms.joinedGameIds[roomId];
-    if (!room || !joined) {
-      return EMPTY_GAMES;
+  getJoinedGames: createSelector(
+    [
+      (state: State, roomId: number) => state.rooms.rooms[roomId]?.games,
+      (state: State, roomId: number) => state.rooms.joinedGameIds[roomId],
+    ],
+    (games, joined): Enriched.Game[] => {
+      if (!games || !joined) {
+        return EMPTY_GAMES;
+      }
+      return Object.values(games).filter(game => joined[game.info.gameId]);
     }
-    return Object.values(room.games).filter(game => joined[game.info.gameId]);
-  },
+  ),
 
   getRoomMessages: (state: State, roomId: number) => state.rooms.messages[roomId],
 

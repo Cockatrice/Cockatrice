@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Data, Enriched } from '@app/types';
-import { create } from '@bufbuild/protobuf';
+import { create, isFieldSet } from '@bufbuild/protobuf';
 import { GamesState } from './game.interfaces';
 
 export const MAX_GAME_MESSAGES = 1000;
@@ -129,16 +129,16 @@ export const gamesSlice = createSlice({
       if (data.playerList?.length > 0) {
         game.players = normalizePlayers(data.playerList);
       }
-      if (data.gameStarted !== undefined && data.gameStarted !== null) {
+      if (isFieldSet(data, Data.Event_GameStateChangedSchema.field.gameStarted)) {
         game.started = data.gameStarted;
       }
-      if (data.activePlayerId !== undefined && data.activePlayerId !== null) {
+      if (isFieldSet(data, Data.Event_GameStateChangedSchema.field.activePlayerId)) {
         game.activePlayerId = data.activePlayerId;
       }
-      if (data.activePhase !== undefined && data.activePhase !== null) {
+      if (isFieldSet(data, Data.Event_GameStateChangedSchema.field.activePhase)) {
         game.activePhase = data.activePhase;
       }
-      if (data.secondsElapsed !== undefined) {
+      if (isFieldSet(data, Data.Event_GameStateChangedSchema.field.secondsElapsed)) {
         game.secondsElapsed = data.secondsElapsed;
       }
     },
@@ -201,6 +201,12 @@ export const gamesSlice = createSlice({
         return;
       }
 
+      const targetPlayer = game.players[targetPlayerId];
+      const targetZoneEntry = targetPlayer?.zones[targetZone];
+      if (!targetPlayer || !targetZoneEntry) {
+        return;
+      }
+
       let resolvedCardId = -1;
       if (cardId >= 0) {
         resolvedCardId = cardId;
@@ -227,12 +233,6 @@ export const gamesSlice = createSlice({
           x, y, faceDown, providerId: newCardProviderId || removedCard.providerId,
         }
         : buildEmptyCard(effectiveNewId, cardName, x, y, faceDown, newCardProviderId ?? '');
-
-      const targetPlayer = game.players[targetPlayerId];
-      const targetZoneEntry = targetPlayer?.zones[targetZone];
-      if (!targetPlayer || !targetZoneEntry) {
-        return;
-      }
 
       targetZoneEntry.order.push(movedCard.id);
       targetZoneEntry.byId[movedCard.id] = movedCard;
@@ -432,10 +432,10 @@ export const gamesSlice = createSlice({
       if (!zone) {
         return;
       }
-      if (data.alwaysRevealTopCard !== undefined && data.alwaysRevealTopCard !== null) {
+      if (isFieldSet(data, Data.Event_ChangeZonePropertiesSchema.field.alwaysRevealTopCard)) {
         zone.alwaysRevealTopCard = data.alwaysRevealTopCard;
       }
-      if (data.alwaysLookAtTopCard !== undefined && data.alwaysLookAtTopCard !== null) {
+      if (isFieldSet(data, Data.Event_ChangeZonePropertiesSchema.field.alwaysLookAtTopCard)) {
         zone.alwaysLookAtTopCard = data.alwaysLookAtTopCard;
       }
     },

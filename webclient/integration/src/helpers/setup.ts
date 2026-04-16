@@ -23,7 +23,7 @@ import {
 } from '@app/websocket';
 import type { WebSocketConnectOptions } from '@app/websocket';
 import { PROTOCOL_VERSION } from '../../../src/websocket/config';
-import { initWebClient } from '@app/api';
+import { createWebClientRequest, createWebClientResponse } from '@app/api';
 
 import {
   buildResponse,
@@ -196,7 +196,7 @@ installMockWebSocket();
 
 beforeEach(() => {
   vi.useFakeTimers();
-  initWebClient();
+  new WebClient(createWebClientRequest(), createWebClientResponse());
 });
 
 afterEach(() => {

@@ -121,12 +121,12 @@ describe('2B: Game state & player management', () => {
     const state = makeState();
     const result = gamesReducer(state, Actions.gameStateChanged({
       gameId: 1,
-      data: {
+      data: create(Data.Event_GameStateChangedSchema, {
         gameStarted: true,
         activePlayerId: 3,
         activePhase: 2,
         secondsElapsed: 60,
-      },
+      }),
     }));
 
     expect(result.games[1].started).toBe(true);
@@ -394,7 +394,7 @@ describe('2C: CARD_MOVED', () => {
     expect(moved.providerId).toBe('new-prov');
   });
 
-  it('CARD_MOVED → returns newState (card removed from source) when targetZone does not exist on player', () => {
+  it('CARD_MOVED → no-ops when targetZone does not exist on player', () => {
     const { state } = stateWithCard();
     const result = gamesReducer(state, Actions.cardMoved({
       gameId: 1,
@@ -414,7 +414,7 @@ describe('2C: CARD_MOVED', () => {
         newCardProviderId: '',
       },
     }));
-    expect(cardsIn(result, 1, 1, 'hand')).toHaveLength(0);
+    expect(cardsIn(result, 1, 1, 'hand')).toHaveLength(1);
     expect(result.games[1].players[1].zones['nonexistent']).toBeUndefined();
   });
 });
@@ -850,7 +850,9 @@ describe('2I: Zone operations', () => {
     const result = gamesReducer(state, Actions.zonePropertiesChanged({
       gameId: 1,
       playerId: 1,
-      data: { zoneName: 'hand', alwaysRevealTopCard: true, alwaysLookAtTopCard: true },
+      data: create(Data.Event_ChangeZonePropertiesSchema, {
+        zoneName: 'hand', alwaysRevealTopCard: true, alwaysLookAtTopCard: true,
+      }),
     }));
 
     const zone = result.games[1].players[1].zones['hand'];

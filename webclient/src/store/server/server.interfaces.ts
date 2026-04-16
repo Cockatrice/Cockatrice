@@ -36,7 +36,7 @@ export interface ServerState {
   backendDecks: Data.Response_DeckList | null;
   downloadedDeck: { deckId: number; deck: string } | null;
   downloadedReplay: { replayId: number; replayData: Uint8Array } | null;
-  gamesOfUser: { [userName: string]: Enriched.Game[] };
+  gamesOfUser: { [userName: string]: { [gameId: number]: Enriched.Game } };
   registrationError: string | null;
 }
 

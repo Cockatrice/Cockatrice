@@ -69,14 +69,21 @@ export const roomsSlice = createSlice({
       const { roomId } = action.payload;
 
       delete state.joinedRoomIds[roomId];
+      delete state.joinedGameIds[roomId];
       delete state.messages[roomId];
+
+      const room = state.rooms[roomId];
+      if (room) {
+        room.games = {};
+        room.users = {};
+      }
     },
 
     addMessage: (state, action: PayloadAction<{ roomId: number; message: Enriched.Message }>) => {
       const { roomId, message } = action.payload;
 
       const existing = state.messages[roomId] ?? [];
-      const normalized = normalizeUserMessage({ ...message, timeReceived: Date.now() });
+      const normalized = normalizeUserMessage(message);
       const next =
         existing.length >= MAX_ROOM_MESSAGES
           ? [...existing.slice(existing.length - MAX_ROOM_MESSAGES + 1), normalized]
