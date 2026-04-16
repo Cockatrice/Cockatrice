@@ -13,7 +13,6 @@ import { App } from '@app/types';
 
 type WebSocketInternal = WebSocketService & {
   keepAliveService: KeepAliveService;
-  testSocket: WebSocket | null;
 };
 
 let MockWS: Mock;
@@ -23,8 +22,6 @@ let mockConfig: WebSocketServiceConfig;
 let mockResponse: {
   session: {
     connectionFailed: Mock;
-    testConnectionSuccessful: Mock;
-    testConnectionFailed: Mock;
   };
 };
 let mockOnStatusChange: Mock;
@@ -41,8 +38,6 @@ beforeEach(() => {
   mockResponse = {
     session: {
       connectionFailed: vi.fn(),
-      testConnectionSuccessful: vi.fn(),
-      testConnectionFailed: vi.fn(),
     },
   };
   mockOnStatusChange = vi.fn();
@@ -68,12 +63,6 @@ describe('WebSocketService', () => {
   function createConnectedService() {
     const service = new WebSocketService(mockConfig);
     service.connect({ host: 'h', port: '1' }, 'ws');
-    return service;
-  }
-
-  function createTestConnectedService() {
-    const service = new WebSocketService(mockConfig);
-    service.testConnect({ host: 'h', port: '1' }, 'ws');
     return service;
   }
 
@@ -240,58 +229,4 @@ describe('WebSocketService', () => {
     });
   });
 
-  describe('testConnect', () => {
-    it('creates a test WebSocket with correct URL', () => {
-      const service = new WebSocketService(mockConfig);
-      locationRestores.push(withMockLocation({ hostname: 'example.com' }));
-      service.testConnect({ host: 'example.com', port: '9000' });
-      expect(MockWS).toHaveBeenCalledWith('wss://example.com:9000');
-    });
-
-    it('uses ws protocol on localhost', () => {
-      const service = new WebSocketService(mockConfig);
-      locationRestores.push(withMockLocation({ hostname: 'localhost' }));
-      service.testConnect({ host: 'h', port: '1' });
-      expect(MockWS).toHaveBeenCalledWith('ws://h:1');
-    });
-
-    it('closes previous testSocket when connecting again', () => {
-      const service = new WebSocketService(mockConfig);
-      service.testConnect({ host: 'h', port: '1' }, 'ws');
-      const firstInstance = mockInstance;
-      // install second mock instance and restore after test
-      const installed2 = installMockWebSocket();
-      service.testConnect({ host: 'h', port: '2' }, 'ws');
-      expect(firstInstance.close).toHaveBeenCalled();
-      // restore original mock so subsequent tests see a clean global
-      mockInstance = installed2.mockInstance;
-      MockWS = installed2.MockWS;
-    });
-
-    it('calls response.session.testConnectionSuccessful on open', () => {
-      createTestConnectedService();
-      vi.spyOn(globalThis, 'clearTimeout');
-      mockInstance.onopen();
-      expect(mockResponse.session.testConnectionSuccessful).toHaveBeenCalled();
-      expect(mockInstance.close).toHaveBeenCalled();
-    });
-
-    it('fires socket.close after keepalive timeout for testConnect', () => {
-      createTestConnectedService();
-      vi.advanceTimersByTime(1000);
-      expect(mockInstance.close).toHaveBeenCalled();
-    });
-
-    it('calls response.session.testConnectionFailed on error', () => {
-      createTestConnectedService();
-      mockInstance.onerror();
-      expect(mockResponse.session.testConnectionFailed).toHaveBeenCalled();
-    });
-
-    it('nulls out testSocket on close', () => {
-      const service = createTestConnectedService();
-      mockInstance.onclose();
-      expect((service as WebSocketInternal).testSocket).toBeNull();
-    });
-  });
 });

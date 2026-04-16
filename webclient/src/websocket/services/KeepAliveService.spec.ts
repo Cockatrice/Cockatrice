@@ -1,22 +1,19 @@
 import { KeepAliveService } from './KeepAliveService';
-import { WebSocketService } from './WebSocketService';
 
 type KeepAliveInternal = KeepAliveService & {
   keepalivecb: NodeJS.Timeout;
   lastPingPending: boolean;
 };
 
-vi.mock('./WebSocketService');
-
 describe('KeepAliveService', () => {
   let service: KeepAliveService;
-  let mockSocket: { checkReadyState: ReturnType<typeof vi.fn> };
+  let mockIsOpen: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.useFakeTimers();
 
-    mockSocket = { checkReadyState: vi.fn().mockReturnValue(true) };
-    service = new KeepAliveService(mockSocket as unknown as WebSocketService);
+    mockIsOpen = vi.fn().mockReturnValue(true);
+    service = new KeepAliveService(mockIsOpen);
   });
 
   it('should create', () => {
@@ -28,15 +25,11 @@ describe('KeepAliveService', () => {
     let interval;
     let promise;
     let ping;
-    let checkReadyStateSpy;
 
     beforeEach(() => {
       interval = 100;
       promise = new Promise(resolve => resolvePing = resolve);
       ping = (done) => promise.then(done);
-
-      checkReadyStateSpy = vi.spyOn(mockSocket, 'checkReadyState');
-      checkReadyStateSpy.mockImplementation(() => true);
 
       service.startPingLoop(interval, ping);
       vi.advanceTimersByTime(interval);
@@ -64,7 +57,7 @@ describe('KeepAliveService', () => {
 
     it('should endPingLoop if socket is not open', () => {
       vi.spyOn(service, 'endPingLoop').mockImplementation(() => {});
-      checkReadyStateSpy.mockImplementation(() => false);
+      mockIsOpen.mockReturnValue(false);
 
       resolvePing();
       vi.advanceTimersByTime(interval);

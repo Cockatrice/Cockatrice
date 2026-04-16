@@ -106,14 +106,14 @@ export class ProtobufService {
   }
 
   public sendCommand(cmd: Data.CommandContainer, callback: (raw: Data.Response) => void) {
-    this.cmdId++;
+    if (!this.transport.isOpen()) {
+      return;
+    }
 
+    this.cmdId++;
     cmd.cmdId = BigInt(this.cmdId);
     this.pendingCommands.set(this.cmdId, callback);
-
-    if (this.transport.isOpen()) {
-      this.transport.send(toBinary(Data.CommandContainerSchema, cmd));
-    }
+    this.transport.send(toBinary(Data.CommandContainerSchema, cmd));
   }
 
   public handleMessageEvent({ data }: MessageEvent): void {

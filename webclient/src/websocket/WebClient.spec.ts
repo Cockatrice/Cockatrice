@@ -9,7 +9,6 @@ vi.mock('./services/WebSocketService', () => ({
     return {
       message$: { subscribe: vi.fn() },
       connect: vi.fn(),
-      testConnect: vi.fn(),
       disconnect: vi.fn(),
       send: vi.fn(),
       checkReadyState: vi.fn().mockReturnValue(true),
@@ -41,6 +40,7 @@ import { Mock } from 'vitest';
 import { SocketTransport } from './services/ProtobufService';
 import { WebSocketServiceConfig } from './services/WebSocketService';
 import type { IWebClientResponse, IWebClientRequest } from './interfaces';
+import { installMockWebSocket } from './__mocks__/helpers';
 
 function makeMockResponse(): IWebClientResponse {
   return {
@@ -90,7 +90,6 @@ describe('WebClient', () => {
       return {
         message$: messageSubject,
         connect: vi.fn(),
-        testConnect: vi.fn(),
         disconnect: vi.fn(),
         send: vi.fn(),
         checkReadyState: vi.fn().mockReturnValue(true),
@@ -156,10 +155,49 @@ describe('WebClient', () => {
   });
 
   describe('testConnect', () => {
-    it('delegates to socket.testConnect', () => {
-      const opts: Enriched.WebSocketConnectOptions = { host: 'h', port: '1', reason: App.WebSocketConnectReason.LOGIN, userName: 'u' };
+    let MockWS: ReturnType<typeof installMockWebSocket>['MockWS'];
+    let wsMockInstance: ReturnType<typeof installMockWebSocket>['mockInstance'];
+    let restoreWS: ReturnType<typeof installMockWebSocket>['restore'];
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      const installed = installMockWebSocket();
+      MockWS = installed.MockWS;
+      wsMockInstance = installed.mockInstance;
+      restoreWS = installed.restore;
+    });
+
+    afterEach(() => {
+      restoreWS();
+      vi.useRealTimers();
+    });
+
+    const opts: Enriched.WebSocketConnectOptions = { host: 'h', port: '1', reason: App.WebSocketConnectReason.LOGIN, userName: 'u' };
+
+    it('creates a WebSocket with the correct URL', () => {
       client.testConnect(opts);
-      expect(client.socket.testConnect).toHaveBeenCalledWith(opts);
+      expect(MockWS).toHaveBeenCalledWith(expect.stringContaining('://h:1'));
+    });
+
+    it('calls testConnectionSuccessful and closes on open', () => {
+      (mockResponse.session as any).testConnectionSuccessful = vi.fn();
+      client.testConnect(opts);
+      wsMockInstance.onopen();
+      expect((mockResponse.session as any).testConnectionSuccessful).toHaveBeenCalled();
+      expect(wsMockInstance.close).toHaveBeenCalled();
+    });
+
+    it('calls testConnectionFailed on error', () => {
+      (mockResponse.session as any).testConnectionFailed = vi.fn();
+      client.testConnect(opts);
+      wsMockInstance.onerror();
+      expect((mockResponse.session as any).testConnectionFailed).toHaveBeenCalled();
+    });
+
+    it('closes socket after keepalive timeout', () => {
+      client.testConnect(opts);
+      vi.advanceTimersByTime(5000);
+      expect(wsMockInstance.close).toHaveBeenCalled();
     });
   });
 

@@ -91,11 +91,14 @@ describe('ProtobufService', () => {
       expect(mockSocket.send).toHaveBeenCalled();
     });
 
-    it('does not send when socket is not OPEN', () => {
+    it('does not register callback or increment cmdId when transport is closed', () => {
       const service = new ProtobufService(mockSocket);
       mockSocket.isOpen.mockReturnValue(false);
-      service.sendCommand(create(Data.CommandContainerSchema), vi.fn());
+      const cb = vi.fn();
+      service.sendCommand(create(Data.CommandContainerSchema), cb);
       expect(mockSocket.send).not.toHaveBeenCalled();
+      expect((service as ProtobufInternal).cmdId).toBe(0);
+      expect((service as ProtobufInternal).pendingCommands.size).toBe(0);
     });
   });
 

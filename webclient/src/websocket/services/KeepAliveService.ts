@@ -1,17 +1,15 @@
 import { Subject } from 'rxjs';
 
-import { WebSocketService } from './WebSocketService';
-
 export class KeepAliveService {
-  private socket: WebSocketService;
+  private isOpen: () => boolean;
 
   private keepalivecb: NodeJS.Timeout;
   private lastPingPending: boolean;
 
   public disconnected$ = new Subject<void>();
 
-  constructor(socket: WebSocketService) {
-    this.socket = socket;
+  constructor(isOpen: () => boolean) {
+    this.isOpen = isOpen;
   }
 
   public startPingLoop(interval: number, ping: (onPong: () => void) => void): void {
@@ -22,7 +20,7 @@ export class KeepAliveService {
       }
 
       // stop the ping loop if we"re disconnected
-      if (!this.socket.checkReadyState(WebSocket.OPEN)) {
+      if (!this.isOpen()) {
         this.endPingLoop();
         return;
       }

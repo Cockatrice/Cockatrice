@@ -3,6 +3,7 @@ import { App, Enriched } from '@app/types';
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
 import { ping } from './commands/session';
+import { CLIENT_OPTIONS } from './config';
 import { IWebClientResponse, IWebClientRequest } from './interfaces';
 
 export class WebClient {
@@ -54,10 +55,6 @@ export class WebClient {
     WebClient._instance = this;
 
     this.response.session.initialized();
-
-    if (import.meta.env.MODE !== 'test') {
-      console.log(this);
-    }
   }
 
   public connect(options: Enriched.WebSocketConnectOptions) {
@@ -67,7 +64,24 @@ export class WebClient {
   }
 
   public testConnect(options: Enriched.WebSocketConnectOptions) {
-    this.socket.testConnect(options);
+    const protocol = window.location.hostname === 'localhost' ? 'ws' : 'wss';
+    const { host, port } = options;
+    const socket = new WebSocket(`${protocol}://${host}:${port}`);
+    socket.binaryType = 'arraybuffer';
+
+    const timeout = setTimeout(() => socket.close(), CLIENT_OPTIONS.keepalive);
+
+    socket.onopen = () => {
+      clearTimeout(timeout);
+      this.response.session.testConnectionSuccessful();
+      socket.close();
+    };
+
+    socket.onerror = () => {
+      this.response.session.testConnectionFailed();
+    };
+
+    socket.onclose = () => {};
   }
 
   public disconnect() {

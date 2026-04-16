@@ -14,7 +14,6 @@ export interface WebSocketServiceConfig {
 
 export class WebSocketService {
   private socket: WebSocket;
-  private testSocket: WebSocket;
 
   private config: WebSocketServiceConfig;
   private response: IWebClientResponse;
@@ -29,7 +28,7 @@ export class WebSocketService {
     this.config = config;
     this.response = config.response;
 
-    this.keepAliveService = new KeepAliveService(this);
+    this.keepAliveService = new KeepAliveService(() => this.checkReadyState(WebSocket.OPEN));
     this.keepAliveService.disconnected$.subscribe(() => {
       this.disconnect();
       this.config.onStatusChange(App.StatusEnum.DISCONNECTED, 'Connection timeout');
@@ -45,16 +44,6 @@ export class WebSocketService {
     this.keepalive = CLIENT_OPTIONS.keepalive;
 
     this.socket = this.createWebSocket(`${protocol}://${host}:${port}`);
-  }
-
-  public testConnect(options: Enriched.WebSocketConnectOptions, protocol: string = 'wss'): void {
-    if (window.location.hostname === 'localhost') {
-      protocol = 'ws';
-    }
-
-    const { host, port } = options;
-
-    this.testWebSocket(`${protocol}://${host}:${port}`);
   }
 
   public disconnect(): void {
@@ -109,31 +98,4 @@ export class WebSocketService {
     return socket;
   }
 
-  private testWebSocket(url: string): void {
-    if (this.testSocket) {
-      this.testSocket.onerror = null;
-      this.testSocket.close();
-    }
-
-    const socket = new WebSocket(url);
-    socket.binaryType = 'arraybuffer';
-
-    const connectionTimer = setTimeout(() => socket.close(), CLIENT_OPTIONS.keepalive);
-
-    socket.onopen = () => {
-      clearTimeout(connectionTimer);
-      this.response.session.testConnectionSuccessful();
-      socket.close();
-    };
-
-    socket.onerror = () => {
-      this.response.session.testConnectionFailed();
-    };
-
-    socket.onclose = () => {
-      this.testSocket = null;
-    }
-
-    this.testSocket = socket;
-  }
 }
