@@ -229,4 +229,12 @@ export class SessionResponseImpl implements ISessionResponse {
   replayDeleteMatch(gameId: number): void {
     ServerDispatch.replayDeleteMatch(gameId);
   }
+
+  downloadServerDeck(deckId: number, response: Data.Response_DeckDownload): void {
+    ServerDispatch.deckDownloaded(deckId, response.deck);
+  }
+
+  replayDownloaded(replayId: number, response: Data.Response_ReplayDownload): void {
+    ServerDispatch.replayDownloaded(replayId, response.replayData);
+  }
 }

@@ -624,6 +624,25 @@ describe('Deck Storage', () => {
     const result = serverReducer(state, Actions.deckDelDir({ path: 'parent/child' }));
     expect(result.backendDecks!.root!.items[0].folder!.items).toHaveLength(0);
   });
+
+  it('DECK_DOWNLOADED → sets downloadedDeck', () => {
+    const state = makeServerState();
+    const result = serverReducer(state, Actions.deckDownloaded({ deckId: 42, deck: '<deck-xml>' }));
+    expect(result.downloadedDeck).toEqual({ deckId: 42, deck: '<deck-xml>' });
+  });
+
+  it('DECK_DOWNLOADED → overwrites previous download', () => {
+    const state = makeServerState({ downloadedDeck: { deckId: 1, deck: 'old' } });
+    const result = serverReducer(state, Actions.deckDownloaded({ deckId: 2, deck: 'new' }));
+    expect(result.downloadedDeck).toEqual({ deckId: 2, deck: 'new' });
+  });
+
+  it('REPLAY_DOWNLOADED → sets downloadedReplay', () => {
+    const state = makeServerState();
+    const data = new Uint8Array([1, 2, 3]);
+    const result = serverReducer(state, Actions.replayDownloaded({ replayId: 99, replayData: data }));
+    expect(result.downloadedReplay).toEqual({ replayId: 99, replayData: data });
+  });
 });
 
 // ── GAMES_OF_USER ─────────────────────────────────────────────────────────────

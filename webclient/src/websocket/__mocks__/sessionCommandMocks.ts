@@ -73,6 +73,8 @@ export function makeSessionPersistenceMock() {
     replayAdded: vi.fn(),
     replayModifyMatch: vi.fn(),
     replayDeleteMatch: vi.fn(),
+    downloadServerDeck: vi.fn(),
+    replayDownloaded: vi.fn(),
     resetPasswordChallenge: vi.fn(),
     resetPassword: vi.fn(),
     resetPasswordFailed: vi.fn(),

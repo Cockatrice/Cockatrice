@@ -31,3 +31,4 @@ export { deckSelect } from './deckSelect';
 export { setSideboardPlan } from './setSideboardPlan';
 export { setSideboardLock } from './setSideboardLock';
 export { mulligan } from './mulligan';
+export { rollDie } from './rollDie';

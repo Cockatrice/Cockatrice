@@ -388,6 +388,17 @@ describe('Dispatch', () => {
     expect(mockDispatch).toHaveBeenCalledWith(Actions.deckDelete({ deckId: 42 }));
   });
 
+  it('deckDownloaded dispatches correctly', () => {
+    Dispatch.deckDownloaded(42, '<deck-xml>');
+    expect(mockDispatch).toHaveBeenCalledWith(Actions.deckDownloaded({ deckId: 42, deck: '<deck-xml>' }));
+  });
+
+  it('replayDownloaded dispatches correctly', () => {
+    const data = new Uint8Array([1, 2, 3]);
+    Dispatch.replayDownloaded(99, data);
+    expect(mockDispatch).toHaveBeenCalledWith(Actions.replayDownloaded({ replayId: 99, replayData: data }));
+  });
+
   it('gamesOfUser dispatches correctly', () => {
     const response = create(Data.Response_GetGamesOfUserSchema, { roomList: [], gameList: [] });
     Dispatch.gamesOfUser('alice', response);

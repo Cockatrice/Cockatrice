@@ -29,4 +29,7 @@ export const request: IWebClientRequest = {
   get moderator() {
     return WebClient.instance.request.moderator;
   },
+  get game() {
+    return WebClient.instance.request.game;
+  },
 };

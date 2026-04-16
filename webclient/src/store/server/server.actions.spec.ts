@@ -351,6 +351,21 @@ describe('Actions', () => {
     expect(Actions.deckDelete({ deckId: 42 })).toEqual({ type: Types.DECK_DELETE, payload: { deckId: 42 } });
   });
 
+  it('deckDownloaded', () => {
+    expect(Actions.deckDownloaded({ deckId: 42, deck: '<xml>' })).toEqual({
+      type: Types.DECK_DOWNLOADED,
+      payload: { deckId: 42, deck: '<xml>' },
+    });
+  });
+
+  it('replayDownloaded', () => {
+    const replayData = new Uint8Array([1, 2, 3]);
+    expect(Actions.replayDownloaded({ replayId: 99, replayData })).toEqual({
+      type: Types.REPLAY_DOWNLOADED,
+      payload: { replayId: 99, replayData },
+    });
+  });
+
   it('gamesOfUser', () => {
     const response = create(Data.Response_GetGamesOfUserSchema, { roomList: [], gameList: [] });
     const action = Actions.gamesOfUser({ userName: 'alice', response });

@@ -102,6 +102,8 @@ const initialState: ServerState = {
   adminNotes: {},
   replays: {},
   backendDecks: null,
+  downloadedDeck: null,
+  downloadedReplay: null,
   gamesOfUser: {},
   registrationError: null,
 };
@@ -339,6 +341,14 @@ export const serverSlice = createSlice({
       state.backendDecks = create(Data.Response_DeckListSchema, {
         root: removeByPath(state.backendDecks.root, splitPath(action.payload.path)),
       });
+    },
+
+    deckDownloaded: (state, action: PayloadAction<{ deckId: number; deck: string }>) => {
+      state.downloadedDeck = action.payload;
+    },
+
+    replayDownloaded: (state, action: PayloadAction<{ replayId: number; replayData: Uint8Array }>) => {
+      state.downloadedReplay = action.payload;
     },
 
     gamesOfUser: (state, action: PayloadAction<{ userName: string; response: Data.Response_GetGamesOfUser }>) => {

@@ -39,6 +39,8 @@ export const Selectors = {
   ),
   getLogs: ({ server }: State) => server.logs,
   getBackendDecks: ({ server }: State) => server.backendDecks,
+  getDownloadedDeck: ({ server }: State) => server.downloadedDeck,
+  getDownloadedReplay: ({ server }: State) => server.downloadedReplay,
   getRegistrationError: ({ server }: State) => server.registrationError,
   getSortUsersBy: ({ server }: State) => server.sortUsersBy,
 

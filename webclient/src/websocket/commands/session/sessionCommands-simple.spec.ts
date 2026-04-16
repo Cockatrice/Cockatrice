@@ -27,6 +27,7 @@ import { accountImage } from './accountImage';
 import { accountPassword } from './accountPassword';
 import { deckDel } from './deckDel';
 import { deckDelDir } from './deckDelDir';
+import { deckDownload } from './deckDownload';
 import { deckList } from './deckList';
 import { deckNewDir } from './deckNewDir';
 import { deckUpload } from './deckUpload';
@@ -39,6 +40,7 @@ import { listUsers } from './listUsers';
 import { message } from './message';
 import { ping } from './ping';
 import { replayDeleteMatch } from './replayDeleteMatch';
+import { replayDownload } from './replayDownload';
 import { replayList } from './replayList';
 import { replayModifyMatch } from './replayModifyMatch';
 import { addToList, addToBuddyList, addToIgnoreList } from './addToList';
@@ -448,5 +450,41 @@ describe('replaySubmitCode', () => {
     replaySubmitCode('42-abc123', undefined, onError);
     invokeCallback('onError', 404);
     expect(onError).toHaveBeenCalledWith(404);
+  });
+});
+
+describe('deckDownload', () => {
+  it('sends Command_DeckDownload', () => {
+    deckDownload(42);
+    expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
+      Data.Command_DeckDownload_ext,
+      expect.objectContaining({ deckId: 42 }),
+      expect.objectContaining({ responseExt: Data.Response_DeckDownload_ext })
+    );
+  });
+
+  it('calls downloadServerDeck on success', () => {
+    deckDownload(42);
+    const resp = { deck: 'deck-content' };
+    invokeOnSuccess(resp, { responseCode: 0 });
+    expect(WebClient.instance.response.session.downloadServerDeck).toHaveBeenCalledWith(42, resp);
+  });
+});
+
+describe('replayDownload', () => {
+  it('sends Command_ReplayDownload', () => {
+    replayDownload(99);
+    expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
+      Data.Command_ReplayDownload_ext,
+      expect.objectContaining({ replayId: 99 }),
+      expect.objectContaining({ responseExt: Data.Response_ReplayDownload_ext })
+    );
+  });
+
+  it('calls replayDownloaded on success', () => {
+    replayDownload(99);
+    const resp = { replayData: new Uint8Array([1, 2, 3]) };
+    invokeOnSuccess(resp, { responseCode: 0 });
+    expect(WebClient.instance.response.session.replayDownloaded).toHaveBeenCalledWith(99, resp);
   });
 });

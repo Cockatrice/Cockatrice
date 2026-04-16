@@ -133,6 +133,18 @@ describe('Selectors', () => {
     expect(Selectors.getBackendDecks(rootState(state))).toBeNull();
   });
 
+  it('getDownloadedDeck → returns downloadedDeck', () => {
+    const downloadedDeck = { deckId: 42, deck: '<xml>' };
+    const state = makeServerState({ downloadedDeck });
+    expect(Selectors.getDownloadedDeck(rootState(state))).toEqual(downloadedDeck);
+  });
+
+  it('getDownloadedReplay → returns downloadedReplay', () => {
+    const downloadedReplay = { replayId: 99, replayData: new Uint8Array([1, 2, 3]) };
+    const state = makeServerState({ downloadedReplay });
+    expect(Selectors.getDownloadedReplay(rootState(state))).toEqual(downloadedReplay);
+  });
+
   it('getRegistrationError → returns registrationError', () => {
     const state = makeServerState({ registrationError: 'bad input' });
     expect(Selectors.getRegistrationError(rootState(state))).toBe('bad input');

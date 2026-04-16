@@ -6,11 +6,7 @@ import { GameResponseImpl } from './GameResponseImpl';
 import { AdminResponseImpl } from './AdminResponseImpl';
 import { ModeratorResponseImpl } from './ModeratorResponseImpl';
 
-export { SessionResponseImpl } from './SessionResponseImpl';
-export { RoomResponseImpl } from './RoomResponseImpl';
-export { GameResponseImpl } from './GameResponseImpl';
-export { AdminResponseImpl } from './AdminResponseImpl';
-export { ModeratorResponseImpl } from './ModeratorResponseImpl';
+export { SessionResponseImpl, RoomResponseImpl, GameResponseImpl, AdminResponseImpl, ModeratorResponseImpl };
 
 export function createWebClientResponse(): IWebClientResponse {
   return {

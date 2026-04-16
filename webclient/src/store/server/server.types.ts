@@ -73,6 +73,8 @@ export const Types = {
   DECK_DEL_DIR: a.deckDelDir.type,
   DECK_UPLOAD: a.deckUpload.type,
   DECK_DELETE: a.deckDelete.type,
+  DECK_DOWNLOADED: a.deckDownloaded.type,
+  REPLAY_DOWNLOADED: a.replayDownloaded.type,
   // User games
   GAMES_OF_USER: a.gamesOfUser.type,
 } as const;

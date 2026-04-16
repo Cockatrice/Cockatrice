@@ -34,6 +34,8 @@ export interface ServerState {
   /** Replays keyed by gameId for O(1) lookup/update. */
   replays: { [gameId: number]: Data.ServerInfo_ReplayMatch };
   backendDecks: Data.Response_DeckList | null;
+  downloadedDeck: { deckId: number; deck: string } | null;
+  downloadedReplay: { replayId: number; replayData: Uint8Array } | null;
   gamesOfUser: { [userName: string]: Enriched.Game[] };
   registrationError: string | null;
 }

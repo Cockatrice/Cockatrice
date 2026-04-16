@@ -11,6 +11,7 @@ export type {
   IAuthenticationRequest,
   ISessionRequest,
   IRoomsRequest,
+  IGameRequest,
   IAdminRequest,
   IModeratorRequest,
   IWebClientRequest,

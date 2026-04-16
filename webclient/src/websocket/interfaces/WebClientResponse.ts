@@ -50,12 +50,14 @@ export interface ISessionResponse {
   deleteServerDeck(deckId: number): void;
   updateServerDecks(deckList: Data.Response_DeckList): void;
   uploadServerDeck(path: string, treeItem: Data.ServerInfo_DeckStorage_TreeItem): void;
+  downloadServerDeck(deckId: number, response: Data.Response_DeckDownload): void;
   createServerDeckDir(path: string, dirName: string): void;
   deleteServerDeckDir(path: string): void;
   replayList(matchList: Data.ServerInfo_ReplayMatch[]): void;
   replayAdded(matchInfo: Data.ServerInfo_ReplayMatch): void;
   replayModifyMatch(gameId: number, doNotHide: boolean): void;
   replayDeleteMatch(gameId: number): void;
+  replayDownloaded(replayId: number, response: Data.Response_ReplayDownload): void;
 }
 
 export interface IRoomResponse {

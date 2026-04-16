@@ -41,4 +41,12 @@ export class SessionRequestImpl implements ISessionRequest {
   getUserGames(userName: string): void {
     SessionCommands.getGamesOfUser(userName);
   }
+
+  deckDownload(deckId: number): void {
+    SessionCommands.deckDownload(deckId);
+  }
+
+  replayDownload(replayId: number): void {
+    SessionCommands.replayDownload(replayId);
+  }
 }

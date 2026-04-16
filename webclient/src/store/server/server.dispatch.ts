@@ -207,6 +207,12 @@ export const Dispatch = {
   deckDelete: (deckId: number) => {
     store.dispatch(Actions.deckDelete({ deckId }));
   },
+  deckDownloaded: (deckId: number, deck: string) => {
+    store.dispatch(Actions.deckDownloaded({ deckId, deck }));
+  },
+  replayDownloaded: (replayId: number, replayData: Uint8Array) => {
+    store.dispatch(Actions.replayDownloaded({ replayId, replayData }));
+  },
   gamesOfUser: (userName: string, response: Data.Response_GetGamesOfUser) => {
     store.dispatch(Actions.gamesOfUser({ userName, response }));
   },

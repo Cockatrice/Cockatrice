@@ -34,6 +34,7 @@ import { nextTurn } from './nextTurn';
 import { readyStart } from './readyStart';
 import { revealCards } from './revealCards';
 import { reverseTurn } from './reverseTurn';
+import { rollDie } from './rollDie';
 import { setActivePhase } from './setActivePhase';
 import { setCardAttr } from './setCardAttr';
 import { setCardCounter } from './setCardCounter';
@@ -260,6 +261,13 @@ describe('Game commands — delegate to WebClient.instance.protobuf.sendGameComm
   it('unconcede sends Command_Unconcede with empty object', () => {
     unconcede(gameId);
     expect(WebClient.instance.protobuf.sendGameCommand).toHaveBeenCalledWith(gameId, Data.Command_Unconcede_ext, expect.any(Object));
+  });
+
+  it('rollDie sends Command_RollDie', () => {
+    rollDie(gameId, { sides: 6, count: 2 });
+    expect(WebClient.instance.protobuf.sendGameCommand).toHaveBeenCalledWith(
+      gameId, Data.Command_RollDie_ext, expect.objectContaining({ sides: 6, count: 2 })
+    );
   });
 
   it('judge sends Command_Judge with targetId and wrapped gameCommand array', () => {
