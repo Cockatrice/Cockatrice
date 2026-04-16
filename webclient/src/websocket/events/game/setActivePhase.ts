@@ -1,6 +1,7 @@
-import type { Data, Enriched } from '@app/types';
+import type { Event_SetActivePhase } from '@app/generated';
+import type { GameEventMeta } from '../../types';
 import { WebClient } from '../../WebClient';
 
-export function setActivePhase(data: Data.Event_SetActivePhase, meta: Enriched.GameEventMeta): void {
+export function setActivePhase(data: Event_SetActivePhase, meta: GameEventMeta): void {
   WebClient.instance.response.game.activePhaseSet(meta.gameId, data.phase);
 }

@@ -1,6 +1,7 @@
 const captured = vi.hoisted(() => ({
   wsOptions: null as WebSocketServiceConfig | null,
   pbOptions: null as SocketTransport | null,
+  pbEvents: null as EventRegistries | null,
 }));
 
 vi.mock('./services/WebSocketService', () => ({
@@ -17,8 +18,9 @@ vi.mock('./services/WebSocketService', () => ({
 }));
 
 vi.mock('./services/ProtobufService', () => ({
-  ProtobufService: vi.fn().mockImplementation(function ProtobufServiceImpl(options: SocketTransport) {
-    captured.pbOptions = options;
+  ProtobufService: vi.fn().mockImplementation(function ProtobufServiceImpl(transport: SocketTransport, events: EventRegistries) {
+    captured.pbOptions = transport;
+    captured.pbEvents = events;
     return {
       handleMessageEvent: vi.fn(),
       resetCommands: vi.fn(),
@@ -26,29 +28,28 @@ vi.mock('./services/ProtobufService', () => ({
   }),
 }));
 
-vi.mock('./commands/session', () => ({
-  ping: vi.fn(),
-}));
-
 import { WebClient } from './WebClient';
 import { WebSocketService } from './services/WebSocketService';
 import { ProtobufService } from './services/ProtobufService';
-import { ping } from './commands/session';
-import { App, Enriched } from '@app/types';
+import { StatusEnum } from './StatusEnum';
 import { Subject } from 'rxjs';
 import { Mock } from 'vitest';
-import { SocketTransport } from './services/ProtobufService';
+import { SocketTransport, EventRegistries } from './services/ProtobufService';
 import { WebSocketServiceConfig } from './services/WebSocketService';
-import type { IWebClientResponse, IWebClientRequest } from './interfaces';
-import { installMockWebSocket } from './__mocks__/helpers';
+import type { IWebClientResponse } from './interfaces';
+import type { WebClientConfig, ConnectTarget } from './WebClientConfig';
+import { installMockWebSocket, useWebClientCleanup } from './__mocks__/helpers';
 
 function makeMockResponse(): IWebClientResponse {
   return {
     session: {
       initialized: vi.fn(),
       connectionAttempted: vi.fn(),
+      connectionFailed: vi.fn(),
       clearStore: vi.fn(),
       updateStatus: vi.fn(),
+      testConnectionSuccessful: vi.fn(),
+      testConnectionFailed: vi.fn(),
     },
     room: { clearStore: vi.fn() },
     game: { clearStore: vi.fn() },
@@ -57,28 +58,35 @@ function makeMockResponse(): IWebClientResponse {
   } as unknown as IWebClientResponse;
 }
 
-function makeMockRequest(): IWebClientRequest {
+function makeMockConfig(response: IWebClientResponse): WebClientConfig {
   return {
-    authentication: {},
-    session: {},
-    rooms: {},
-    admin: {},
-    moderator: {},
-  } as unknown as IWebClientRequest;
+    response,
+    onServerIdentified: vi.fn(),
+    sessionEvents: [],
+    roomEvents: [],
+    gameEvents: [],
+    keepAliveFn: vi.fn(),
+  };
 }
+
+useWebClientCleanup();
 
 describe('WebClient', () => {
   let client: WebClient;
   let mockResponse: IWebClientResponse;
-  let mockRequest: IWebClientRequest;
+  let mockConfig: WebClientConfig;
   let messageSubject: Subject<MessageEvent>;
 
   beforeEach(() => {
     // Reset the singleton so each test starts fresh.
+    // This direct reset is needed in addition to useWebClientCleanup() because
+    // this file imports the real WebClient (not a mock), and with isolate:false
+    // the helper's import may resolve to a different (mocked) module reference.
     (WebClient as unknown as { _instance: WebClient | null })._instance = null;
 
-    (ProtobufService as Mock).mockImplementation(function ProtobufServiceImpl(options: SocketTransport) {
-      captured.pbOptions = options;
+    (ProtobufService as Mock).mockImplementation(function ProtobufServiceImpl(transport: SocketTransport, events: EventRegistries) {
+      captured.pbOptions = transport;
+      captured.pbEvents = events;
       return {
         handleMessageEvent: vi.fn(),
         resetCommands: vi.fn(),
@@ -98,8 +106,8 @@ describe('WebClient', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
 
     mockResponse = makeMockResponse();
-    mockRequest = makeMockRequest();
-    client = new WebClient(mockResponse, mockRequest);
+    mockConfig = makeMockConfig(mockResponse);
+    client = new WebClient(mockConfig);
   });
 
   afterEach(() => {
@@ -108,9 +116,9 @@ describe('WebClient', () => {
   });
 
   describe('constructor', () => {
-    it('stores the response and request on the instance', () => {
+    it('stores the response and config on the instance', () => {
       expect(client.response).toBe(mockResponse);
-      expect(client.request).toBe(mockRequest);
+      expect(client.config).toBe(mockConfig);
     });
 
     it('subscribes socket.message$ to protobuf.handleMessageEvent', () => {
@@ -128,7 +136,7 @@ describe('WebClient', () => {
     });
 
     it('throws when instantiated more than once', () => {
-      expect(() => new WebClient(makeMockResponse(), makeMockRequest())).toThrow(/singleton/);
+      expect(() => new WebClient(makeMockConfig(makeMockResponse()))).toThrow(/singleton/);
     });
   });
 
@@ -141,16 +149,15 @@ describe('WebClient', () => {
 
   describe('connect', () => {
     it('calls response.session.connectionAttempted', () => {
-      const opts: Enriched.WebSocketConnectOptions = { host: 'h', port: '1', reason: App.WebSocketConnectReason.LOGIN, userName: 'u' };
-      client.connect(opts);
+      const target: ConnectTarget = { host: 'h', port: '1' };
+      client.connect(target);
       expect(mockResponse.session.connectionAttempted).toHaveBeenCalled();
     });
 
-    it('stores options and calls socket.connect', () => {
-      const opts: Enriched.WebSocketConnectOptions = { host: 'h', port: '1', reason: App.WebSocketConnectReason.LOGIN, userName: 'u' };
-      client.connect(opts);
-      expect(client.options).toBe(opts);
-      expect(client.socket.connect).toHaveBeenCalledWith(opts);
+    it('calls socket.connect with target', () => {
+      const target: ConnectTarget = { host: 'h', port: '1' };
+      client.connect(target);
+      expect(client.socket.connect).toHaveBeenCalledWith(target);
     });
   });
 
@@ -172,30 +179,28 @@ describe('WebClient', () => {
       vi.useRealTimers();
     });
 
-    const opts: Enriched.WebSocketConnectOptions = { host: 'h', port: '1', reason: App.WebSocketConnectReason.LOGIN, userName: 'u' };
+    const target: ConnectTarget = { host: 'h', port: '1' };
 
     it('creates a WebSocket with the correct URL', () => {
-      client.testConnect(opts);
+      client.testConnect(target);
       expect(MockWS).toHaveBeenCalledWith(expect.stringContaining('://h:1'));
     });
 
     it('calls testConnectionSuccessful and closes on open', () => {
-      (mockResponse.session as any).testConnectionSuccessful = vi.fn();
-      client.testConnect(opts);
+      client.testConnect(target);
       wsMockInstance.onopen();
-      expect((mockResponse.session as any).testConnectionSuccessful).toHaveBeenCalled();
+      expect(mockResponse.session.testConnectionSuccessful).toHaveBeenCalled();
       expect(wsMockInstance.close).toHaveBeenCalled();
     });
 
     it('calls testConnectionFailed on error', () => {
-      (mockResponse.session as any).testConnectionFailed = vi.fn();
-      client.testConnect(opts);
+      client.testConnect(target);
       wsMockInstance.onerror();
-      expect((mockResponse.session as any).testConnectionFailed).toHaveBeenCalled();
+      expect(mockResponse.session.testConnectionFailed).toHaveBeenCalled();
     });
 
     it('closes socket after keepalive timeout', () => {
-      client.testConnect(opts);
+      client.testConnect(target);
       vi.advanceTimersByTime(5000);
       expect(wsMockInstance.close).toHaveBeenCalled();
     });
@@ -210,32 +215,43 @@ describe('WebClient', () => {
 
   describe('updateStatus', () => {
     it('sets the status', () => {
-      client.updateStatus(App.StatusEnum.CONNECTED);
-      expect(client.status).toBe(App.StatusEnum.CONNECTED);
+      client.updateStatus(StatusEnum.CONNECTED);
+      expect(client.status).toBe(StatusEnum.CONNECTED);
     });
 
     it('calls protobuf.resetCommands on DISCONNECTED', () => {
-      client.updateStatus(App.StatusEnum.DISCONNECTED);
+      client.updateStatus(StatusEnum.DISCONNECTED);
       expect(client.protobuf.resetCommands).toHaveBeenCalled();
     });
 
     it('does not reset protobuf when status is not DISCONNECTED', () => {
-      client.updateStatus(App.StatusEnum.CONNECTED);
+      client.updateStatus(StatusEnum.CONNECTED);
       expect(client.protobuf.resetCommands).not.toHaveBeenCalled();
     });
   });
 
   describe('constructor closures', () => {
-    it('keepAliveFn calls ping with the callback', () => {
+    it('keepAliveFn forwards from config to WebSocketService', () => {
       const cb = vi.fn();
       captured.wsOptions!.keepAliveFn(cb);
-      expect(ping).toHaveBeenCalledWith(cb);
+      expect(mockConfig.keepAliveFn).toHaveBeenCalledWith(cb);
     });
 
     it('onStatusChange routes to response.session.updateStatus and updates own status', () => {
-      captured.wsOptions!.onStatusChange(App.StatusEnum.CONNECTED, 'Connected');
-      expect(mockResponse.session.updateStatus).toHaveBeenCalledWith(App.StatusEnum.CONNECTED, 'Connected');
-      expect(client.status).toBe(App.StatusEnum.CONNECTED);
+      captured.wsOptions!.onStatusChange(StatusEnum.CONNECTED, 'Connected');
+      expect(mockResponse.session.updateStatus).toHaveBeenCalledWith(StatusEnum.CONNECTED, 'Connected');
+      expect(client.status).toBe(StatusEnum.CONNECTED);
+    });
+
+    it('onConnectionFailed routes to response.session.connectionFailed', () => {
+      captured.wsOptions!.onConnectionFailed();
+      expect(mockResponse.session.connectionFailed).toHaveBeenCalled();
+    });
+
+    it('passes event registries from config to ProtobufService', () => {
+      expect(captured.pbEvents!.sessionEvents).toBe(mockConfig.sessionEvents);
+      expect(captured.pbEvents!.roomEvents).toBe(mockConfig.roomEvents);
+      expect(captured.pbEvents!.gameEvents).toBe(mockConfig.gameEvents);
     });
 
     it('send closure delegates to socket.send', () => {

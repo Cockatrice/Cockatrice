@@ -1,10 +1,10 @@
 import { create } from '@bufbuild/protobuf';
-import { Data } from '@app/types';
+import { Command_AdjustMod_ext, Command_AdjustModSchema } from '@app/generated';
 import { WebClient } from '../../WebClient';
 export function adjustMod(userName: string, shouldBeMod?: boolean, shouldBeJudge?: boolean): void {
   WebClient.instance.protobuf.sendAdminCommand(
-    Data.Command_AdjustMod_ext,
-    create(Data.Command_AdjustModSchema, { userName, shouldBeMod, shouldBeJudge }),
+    Command_AdjustMod_ext,
+    create(Command_AdjustModSchema, { userName, shouldBeMod, shouldBeJudge }),
     {
       onSuccess: () => {
         WebClient.instance.response.admin.adjustMod(userName, shouldBeMod, shouldBeJudge);

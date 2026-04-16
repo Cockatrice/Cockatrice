@@ -11,10 +11,12 @@ import { Data } from '@app/types';
 
 import { getMockWebSocket } from './setup';
 
-/** The three command scopes a CommandContainer can carry in practice. */
+/** The command scopes a CommandContainer can carry in practice. */
 type SessionCmd = Data.SessionCommand;
 type RoomCmd = Data.RoomCommand;
 type GameCmd = Data.GameCommand;
+type AdminCmd = Data.AdminCommand;
+type ModeratorCmd = Data.ModeratorCommand;
 
 /** Decode every CommandContainer sent through the mock socket so far. */
 export function captureAllOutbound(): Data.CommandContainer[] {
@@ -108,5 +110,49 @@ export function findLastGameCommand<V>(
   }
   throw new Error(
     `No outbound game command with extension ${ext.typeName} has been sent.`
+  );
+}
+
+/** Admin-scoped equivalent of {@link findLastSessionCommand}. */
+export function findLastAdminCommand<V>(
+  ext: GenExtension<AdminCmd, V>
+): { container: Data.CommandContainer; value: V; cmdId: number } {
+  const containers = captureAllOutbound();
+  for (let i = containers.length - 1; i >= 0; i--) {
+    const container = containers[i];
+    for (const adminCmd of container.adminCommand ?? []) {
+      if (hasExtension(adminCmd, ext)) {
+        return {
+          container,
+          value: getExtension(adminCmd, ext),
+          cmdId: Number(container.cmdId),
+        };
+      }
+    }
+  }
+  throw new Error(
+    `No outbound admin command with extension ${ext.typeName} has been sent.`
+  );
+}
+
+/** Moderator-scoped equivalent of {@link findLastSessionCommand}. */
+export function findLastModeratorCommand<V>(
+  ext: GenExtension<ModeratorCmd, V>
+): { container: Data.CommandContainer; value: V; cmdId: number } {
+  const containers = captureAllOutbound();
+  for (let i = containers.length - 1; i >= 0; i--) {
+    const container = containers[i];
+    for (const modCmd of container.moderatorCommand ?? []) {
+      if (hasExtension(modCmd, ext)) {
+        return {
+          container,
+          value: getExtension(modCmd, ext),
+          cmdId: Number(container.cmdId),
+        };
+      }
+    }
+  }
+  throw new Error(
+    `No outbound moderator command with extension ${ext.typeName} has been sent.`
   );
 }

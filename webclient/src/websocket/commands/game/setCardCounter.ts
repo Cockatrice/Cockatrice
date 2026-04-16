@@ -1,8 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_SetCardCounter_ext, Command_SetCardCounterSchema, type SetCardCounterParams } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
-
-export function setCardCounter(gameId: number, params: Data.SetCardCounterParams): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_SetCardCounter_ext, create(Data.Command_SetCardCounterSchema, params));
+export function setCardCounter(gameId: number, params: SetCardCounterParams): void {
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_SetCardCounter_ext, create(Command_SetCardCounterSchema, params));
 }

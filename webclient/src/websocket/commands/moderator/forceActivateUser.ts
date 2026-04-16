@@ -1,11 +1,11 @@
 import { create } from '@bufbuild/protobuf';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
+import { Command_ForceActivateUser_ext, Command_ForceActivateUserSchema } from '@app/generated';
 
 export function forceActivateUser(usernameToActivate: string, moderatorName: string): void {
-  const cmd = create(Data.Command_ForceActivateUserSchema, { usernameToActivate, moderatorName });
-  WebClient.instance.protobuf.sendModeratorCommand(Data.Command_ForceActivateUser_ext, cmd, {
+  const cmd = create(Command_ForceActivateUserSchema, { usernameToActivate, moderatorName });
+  WebClient.instance.protobuf.sendModeratorCommand(Command_ForceActivateUser_ext, cmd, {
     onSuccess: () => {
       WebClient.instance.response.moderator.forceActivateUser(usernameToActivate, moderatorName);
     },

@@ -1,7 +1,7 @@
 import { create } from '@bufbuild/protobuf';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
+import { Command_RemoveFromList_ext, Command_RemoveFromListSchema } from '@app/generated';
 
 export function removeFromBuddyList(userName: string): void {
   removeFromList('buddy', userName);
@@ -13,8 +13,8 @@ export function removeFromIgnoreList(userName: string): void {
 
 export function removeFromList(list: string, userName: string): void {
   WebClient.instance.protobuf.sendSessionCommand(
-    Data.Command_RemoveFromList_ext,
-    create(Data.Command_RemoveFromListSchema, { list, userName }),
+    Command_RemoveFromList_ext,
+    create(Command_RemoveFromListSchema, { list, userName }),
     {
       onSuccess: () => {
         WebClient.instance.response.session.removeFromList(list, userName);

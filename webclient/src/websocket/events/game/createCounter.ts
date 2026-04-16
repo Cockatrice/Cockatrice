@@ -1,6 +1,7 @@
-import type { Data, Enriched } from '@app/types';
+import type { Event_CreateCounter } from '@app/generated';
+import type { GameEventMeta } from '../../types';
 import { WebClient } from '../../WebClient';
 
-export function createCounter(data: Data.Event_CreateCounter, meta: Enriched.GameEventMeta): void {
+export function createCounter(data: Event_CreateCounter, meta: GameEventMeta): void {
   WebClient.instance.response.game.counterCreated(meta.gameId, meta.playerId, data);
 }

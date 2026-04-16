@@ -1,8 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_FlipCard_ext, Command_FlipCardSchema, type FlipCardParams } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
-
-export function flipCard(gameId: number, params: Data.FlipCardParams): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_FlipCard_ext, create(Data.Command_FlipCardSchema, params));
+export function flipCard(gameId: number, params: FlipCardParams): void {
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_FlipCard_ext, create(Command_FlipCardSchema, params));
 }

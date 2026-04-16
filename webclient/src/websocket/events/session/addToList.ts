@@ -1,7 +1,7 @@
-import type { Data } from '@app/types';
+import type { Event_AddToList } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-export function addToList({ listName, userInfo }: Data.Event_AddToList): void {
+export function addToList({ listName, userInfo }: Event_AddToList): void {
   switch (listName) {
     case 'buddy': {
       WebClient.instance.response.session.addToBuddyList(userInfo);

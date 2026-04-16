@@ -1,7 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_Unconcede_ext, Command_UnconcedeSchema } from '@app/generated';
 import { WebClient } from '../../WebClient';
-import { Data } from '@app/types';
 
 export function unconcede(gameId: number): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_Unconcede_ext, create(Data.Command_UnconcedeSchema));
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_Unconcede_ext, create(Command_UnconcedeSchema));
 }

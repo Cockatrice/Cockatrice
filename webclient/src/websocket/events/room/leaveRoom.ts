@@ -1,6 +1,6 @@
-import type { Data } from '@app/types';
+import type { Event_LeaveRoom, RoomEvent } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-export function leaveRoom({ name }: Data.Event_LeaveRoom, { roomId }: Data.RoomEvent): void {
+export function leaveRoom({ name }: Event_LeaveRoom, { roomId }: RoomEvent): void {
   WebClient.instance.response.room.userLeft(roomId, name);
 }

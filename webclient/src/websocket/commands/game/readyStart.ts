@@ -1,8 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_ReadyStart_ext, Command_ReadyStartSchema, type ReadyStartParams } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
-
-export function readyStart(gameId: number, params: Data.ReadyStartParams): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_ReadyStart_ext, create(Data.Command_ReadyStartSchema, params));
+export function readyStart(gameId: number, params: ReadyStartParams): void {
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_ReadyStart_ext, create(Command_ReadyStartSchema, params));
 }

@@ -1,8 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_CreateArrow_ext, Command_CreateArrowSchema, type CreateArrowParams } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
-
-export function createArrow(gameId: number, params: Data.CreateArrowParams): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_CreateArrow_ext, create(Data.Command_CreateArrowSchema, params));
+export function createArrow(gameId: number, params: CreateArrowParams): void {
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_CreateArrow_ext, create(Command_CreateArrowSchema, params));
 }

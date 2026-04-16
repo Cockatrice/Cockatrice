@@ -9,7 +9,7 @@ vi.mock('../config', () => ({
 import { WebSocketService } from './WebSocketService';
 import type { WebSocketServiceConfig } from './WebSocketService';
 import { KeepAliveService } from './KeepAliveService';
-import { App } from '@app/types';
+import { StatusEnum } from '../StatusEnum';
 
 type WebSocketInternal = WebSocketService & {
   keepAliveService: KeepAliveService;
@@ -19,11 +19,7 @@ let MockWS: Mock;
 let mockInstance: ReturnType<typeof installMockWebSocket>['mockInstance'];
 let restoreWebSocket: ReturnType<typeof installMockWebSocket>['restore'];
 let mockConfig: WebSocketServiceConfig;
-let mockResponse: {
-  session: {
-    connectionFailed: Mock;
-  };
-};
+let mockOnConnectionFailed: Mock;
 let mockOnStatusChange: Mock;
 let locationRestores: Array<() => void>;
 
@@ -35,16 +31,12 @@ beforeEach(() => {
   mockInstance = installed.mockInstance;
   restoreWebSocket = installed.restore;
 
-  mockResponse = {
-    session: {
-      connectionFailed: vi.fn(),
-    },
-  };
+  mockOnConnectionFailed = vi.fn();
   mockOnStatusChange = vi.fn();
 
   mockConfig = {
     keepAliveFn: vi.fn(),
-    response: mockResponse as unknown as WebSocketServiceConfig['response'],
+    onConnectionFailed: mockOnConnectionFailed,
     onStatusChange: mockOnStatusChange,
   };
 
@@ -78,7 +70,7 @@ describe('WebSocketService', () => {
       // trigger keepAliveService.disconnected$
       (service as WebSocketInternal).keepAliveService.disconnected$.next();
       expect(mockInstance.close).toHaveBeenCalled();
-      expect(mockOnStatusChange).toHaveBeenCalledWith(App.StatusEnum.DISCONNECTED, 'Connection timeout');
+      expect(mockOnStatusChange).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Connection timeout');
     });
   });
 
@@ -120,7 +112,7 @@ describe('WebSocketService', () => {
     it('calls onStatusChange CONNECTED on open', () => {
       createConnectedService();
       mockInstance.onopen();
-      expect(mockOnStatusChange).toHaveBeenCalledWith(App.StatusEnum.CONNECTED, 'Connected');
+      expect(mockOnStatusChange).toHaveBeenCalledWith(StatusEnum.CONNECTED, 'Connected');
     });
 
     it('starts the ping loop with the keepalive interval', () => {
@@ -147,14 +139,14 @@ describe('WebSocketService', () => {
     it('calls onStatusChange DISCONNECTED on close when not already DISCONNECTED', () => {
       createConnectedService();
       mockInstance.onclose();
-      expect(mockOnStatusChange).toHaveBeenCalledWith(App.StatusEnum.DISCONNECTED, 'Connection Closed');
+      expect(mockOnStatusChange).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Connection Closed');
     });
 
     it('does not overwrite status if already DISCONNECTED', () => {
       createConnectedService();
       mockInstance.onerror();
       mockInstance.onclose();
-      expect(mockOnStatusChange).not.toHaveBeenCalledWith(App.StatusEnum.DISCONNECTED, 'Connection Closed');
+      expect(mockOnStatusChange).not.toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Connection Closed');
     });
 
     it('ends the ping loop on close', () => {
@@ -170,13 +162,13 @@ describe('WebSocketService', () => {
     it('calls onStatusChange DISCONNECTED on error', () => {
       createConnectedService();
       mockInstance.onerror();
-      expect(mockOnStatusChange).toHaveBeenCalledWith(App.StatusEnum.DISCONNECTED, 'Connection Failed');
+      expect(mockOnStatusChange).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Connection Failed');
     });
 
-    it('calls response.session.connectionFailed on error', () => {
+    it('calls onConnectionFailed on error', () => {
       createConnectedService();
       mockInstance.onerror();
-      expect(mockResponse.session.connectionFailed).toHaveBeenCalled();
+      expect(mockOnConnectionFailed).toHaveBeenCalled();
     });
   });
 

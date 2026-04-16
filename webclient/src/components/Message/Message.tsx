@@ -1,5 +1,5 @@
-// eslint-disable-next-line
-import React, { useEffect, useMemo, useState } from 'react';
+
+import React, { useEffect, useState } from 'react';
 
 import { NavLink, generatePath } from 'react-router-dom';
 
@@ -20,7 +20,7 @@ const ParsedMessage = ({ message }) => {
   const [messageChunks, setMessageChunks] = useState(null);
   const [name, setName] = useState(null);
 
-  useMemo(() => {
+  useEffect(() => {
     const name = message.match(App.MESSAGE_SENDER_REGEX);
 
     if (name) {

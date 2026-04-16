@@ -1,8 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_DeleteArrow_ext, Command_DeleteArrowSchema, type DeleteArrowParams } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
-
-export function deleteArrow(gameId: number, params: Data.DeleteArrowParams): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_DeleteArrow_ext, create(Data.Command_DeleteArrowSchema, params));
+export function deleteArrow(gameId: number, params: DeleteArrowParams): void {
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_DeleteArrow_ext, create(Command_DeleteArrowSchema, params));
 }

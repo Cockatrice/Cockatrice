@@ -1,7 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_UndoDraw_ext, Command_UndoDrawSchema } from '@app/generated';
 import { WebClient } from '../../WebClient';
-import { Data } from '@app/types';
 
 export function undoDraw(gameId: number): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_UndoDraw_ext, create(Data.Command_UndoDrawSchema));
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_UndoDraw_ext, create(Command_UndoDrawSchema));
 }

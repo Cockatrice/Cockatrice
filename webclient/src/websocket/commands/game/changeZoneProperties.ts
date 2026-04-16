@@ -1,12 +1,11 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_ChangeZoneProperties_ext, Command_ChangeZonePropertiesSchema, type ChangeZonePropertiesParams } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
-
-export function changeZoneProperties(gameId: number, params: Data.ChangeZonePropertiesParams): void {
+export function changeZoneProperties(gameId: number, params: ChangeZonePropertiesParams): void {
   WebClient.instance.protobuf.sendGameCommand(
     gameId,
-    Data.Command_ChangeZoneProperties_ext,
-    create(Data.Command_ChangeZonePropertiesSchema, params)
+    Command_ChangeZoneProperties_ext,
+    create(Command_ChangeZonePropertiesSchema, params)
   );
 }

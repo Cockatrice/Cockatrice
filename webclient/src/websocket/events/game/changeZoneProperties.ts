@@ -1,6 +1,7 @@
-import type { Data, Enriched } from '@app/types';
+import type { Event_ChangeZoneProperties } from '@app/generated';
+import type { GameEventMeta } from '../../types';
 import { WebClient } from '../../WebClient';
 
-export function changeZoneProperties(data: Data.Event_ChangeZoneProperties, meta: Enriched.GameEventMeta): void {
+export function changeZoneProperties(data: Event_ChangeZoneProperties, meta: GameEventMeta): void {
   WebClient.instance.response.game.zonePropertiesChanged(meta.gameId, meta.playerId, data);
 }

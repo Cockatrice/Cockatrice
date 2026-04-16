@@ -1,6 +1,7 @@
-import type { Data, Enriched } from '@app/types';
+import type { Event_SetCardAttr } from '@app/generated';
+import type { GameEventMeta } from '../../types';
 import { WebClient } from '../../WebClient';
 
-export function setCardAttr(data: Data.Event_SetCardAttr, meta: Enriched.GameEventMeta): void {
+export function setCardAttr(data: Event_SetCardAttr, meta: GameEventMeta): void {
   WebClient.instance.response.game.cardAttrChanged(meta.gameId, meta.playerId, data);
 }

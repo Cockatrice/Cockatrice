@@ -1,8 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_DrawCards_ext, Command_DrawCardsSchema, type DrawCardsParams } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
-
-export function drawCards(gameId: number, params: Data.DrawCardsParams): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_DrawCards_ext, create(Data.Command_DrawCardsSchema, params));
+export function drawCards(gameId: number, params: DrawCardsParams): void {
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_DrawCards_ext, create(Command_DrawCardsSchema, params));
 }

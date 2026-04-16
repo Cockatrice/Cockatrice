@@ -14,7 +14,7 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
 
   // Enforce module boundaries
-  boundariesConfig,
+  ...boundariesConfig,
 
   // Project-specific config
   {

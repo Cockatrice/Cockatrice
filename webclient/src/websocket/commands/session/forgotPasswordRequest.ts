@@ -1,31 +1,37 @@
-import { App, Enriched, Data } from '@app/types';
-
 import { create } from '@bufbuild/protobuf';
+import {
+  Command_ForgotPasswordRequest_ext,
+  Command_ForgotPasswordRequestSchema,
+  Response_ForgotPasswordRequest_ext,
+  type ForgotPasswordRequestParams,
+} from '@app/generated';
+
+import { StatusEnum } from '../../StatusEnum';
 import { CLIENT_CONFIG } from '../../config';
 import { WebClient } from '../../WebClient';
-
+import type { ConnectTarget } from '../../WebClientConfig';
 import { disconnect, updateStatus } from './';
 
-export function forgotPasswordRequest(options: Enriched.PasswordResetRequestConnectOptions): void {
+export function forgotPasswordRequest(options: ConnectTarget & ForgotPasswordRequestParams): void {
   const { userName } = options;
 
-  WebClient.instance.protobuf.sendSessionCommand(Data.Command_ForgotPasswordRequest_ext, create(Data.Command_ForgotPasswordRequestSchema, {
+  WebClient.instance.protobuf.sendSessionCommand(Command_ForgotPasswordRequest_ext, create(Command_ForgotPasswordRequestSchema, {
     ...CLIENT_CONFIG,
     userName,
   }), {
-    responseExt: Data.Response_ForgotPasswordRequest_ext,
+    responseExt: Response_ForgotPasswordRequest_ext,
     onSuccess: (resp) => {
       if (resp?.challengeEmail) {
-        updateStatus(App.StatusEnum.DISCONNECTED, null);
+        updateStatus(StatusEnum.DISCONNECTED, null);
         WebClient.instance.response.session.resetPasswordChallenge();
       } else {
-        updateStatus(App.StatusEnum.DISCONNECTED, null);
+        updateStatus(StatusEnum.DISCONNECTED, null);
         WebClient.instance.response.session.resetPassword();
       }
       disconnect();
     },
     onError: () => {
-      updateStatus(App.StatusEnum.DISCONNECTED, null);
+      updateStatus(StatusEnum.DISCONNECTED, null);
       WebClient.instance.response.session.resetPasswordFailed();
       disconnect();
     },

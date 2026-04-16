@@ -1,9 +1,7 @@
-import type { Data } from '@app/types';
-import { Enriched } from '@app/types';
+import type { Event_RoomSay, RoomEvent } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-
-export function roomSay(data: Data.Event_RoomSay, { roomId }: Data.RoomEvent): void {
-  const message: Enriched.Message = { ...data, timeReceived: Date.now() };
+export function roomSay(data: Event_RoomSay, { roomId }: RoomEvent): void {
+  const message = { ...data, timeReceived: Date.now() };
   WebClient.instance.response.room.addMessage(roomId, message);
 }

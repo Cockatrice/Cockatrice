@@ -15,6 +15,7 @@ vi.mock('../../WebClient', () => ({
 }));
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
+import { useWebClientCleanup } from '../../__mocks__/helpers';
 import { WebClient } from '../../WebClient';
 import { adjustMod } from './adjustMod';
 import { reloadConfig } from './reloadConfig';
@@ -22,6 +23,8 @@ import { shutdownServer } from './shutdownServer';
 import { updateServerMessage } from './updateServerMessage';
 
 import { Mock } from 'vitest';
+
+useWebClientCleanup();
 
 const { invokeOnSuccess } = makeCallbackHelpers(
   WebClient.instance.protobuf.sendAdminCommand as Mock,

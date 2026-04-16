@@ -1,7 +1,8 @@
-import type { Data, Enriched } from '@app/types';
+import type { Event_Join } from '@app/generated';
+import type { GameEventMeta } from '../../types';
 import { WebClient } from '../../WebClient';
 
 
-export function joinGame(data: Data.Event_Join, meta: Enriched.GameEventMeta): void {
+export function joinGame(data: Event_Join, meta: GameEventMeta): void {
   WebClient.instance.response.game.playerJoined(meta.gameId, data.playerProperties);
 }

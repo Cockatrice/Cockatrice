@@ -16,12 +16,15 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./integration/src/helpers/setup.ts'],
     include: ['integration/src/**/*.spec.ts'],
-    isolate: false,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
       reportsDirectory: './coverage/integration',
-      include: ['src/**/*.{ts,tsx}'],
+      include: [
+        'src/websocket/**/*.{ts,tsx}',
+        'src/store/**/*.{ts,tsx}',
+        'src/api/**/*.{ts,tsx}',
+      ],
       exclude: [
         'src/generated/**',
         'src/**/*.spec.{ts,tsx}',

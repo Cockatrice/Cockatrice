@@ -1,8 +1,10 @@
-import { Data, Enriched } from '@app/types';
-import type { IRoomResponse } from '@app/websocket';
+import { Data } from '@app/types';
+import type { IRoomResponse, WebSocketRoomResponseOverrides } from '@app/websocket';
 import { RoomsDispatch } from '@app/store';
 
-export class RoomResponseImpl implements IRoomResponse {
+type Message = WebSocketRoomResponseOverrides['Event_RoomSay'];
+
+export class RoomResponseImpl implements IRoomResponse<WebSocketRoomResponseOverrides> {
   clearStore(): void {
     RoomsDispatch.clearStore();
   }
@@ -23,7 +25,7 @@ export class RoomResponseImpl implements IRoomResponse {
     RoomsDispatch.updateGames(roomId, gameList);
   }
 
-  addMessage(roomId: number, message: Enriched.Message): void {
+  addMessage(roomId: number, message: Message): void {
     RoomsDispatch.addMessage(roomId, message);
   }
 

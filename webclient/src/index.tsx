@@ -7,27 +7,26 @@ import { createRoot } from 'react-dom/client';
 import { StyledEngineProvider } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 
-import { WebClient } from '@app/websocket';
-import { createWebClientResponse, createWebClientRequest } from '@app/api';
+import { initWebClient } from '@app/api';
 import { AppShell } from '@app/containers';
 import { materialTheme } from './material-theme';
 
 import './i18n';
 import './index.css';
 
-function initWebClient() {
+function useInitWebClient() {
   const initialized = useRef(false);
 
   if (!initialized.current) {
     initialized.current = true;
-    new WebClient(createWebClientResponse(), createWebClientRequest());
+    initWebClient();
   }
 }
 
 const AppWithMaterialTheme = () => {
   // Instantiate the WebClient singleton before any container renders or any
   // hook touches WebClient.instance.
-  initWebClient();
+  useInitWebClient();
 
   return (
     <StrictMode>

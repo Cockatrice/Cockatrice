@@ -1,12 +1,14 @@
-// Authentication scenarios — login success/failure, register, and activate.
+// Authentication scenarios — login success/failure, register, activate,
+// and the hashed-password (salt) login path.
 
 import { create } from '@bufbuild/protobuf';
 import { describe, expect, it } from 'vitest';
 
-import { App, Data } from '@app/types';
+import { Data } from '@app/types';
 import { store } from '@app/store';
+import { StatusEnum, WebSocketConnectReason } from '@app/websocket';
 
-import { connectAndHandshake } from './helpers/setup';
+import { connectAndHandshake, connectAndHandshakeWithSalt } from './helpers/setup';
 import {
   buildResponse,
   buildResponseMessage,
@@ -42,7 +44,7 @@ describe('authentication', () => {
       })));
 
       const state = store.getState().server;
-      expect(state.status.state).toBe(App.StatusEnum.LOGGED_IN);
+      expect(state.status.state).toBe(StatusEnum.LOGGED_IN);
       expect(state.status.description).toBe('Logged in.');
       expect(state.user?.name).toBe('alice');
       expect(Object.keys(state.buddyList)).toEqual(['bob']);
@@ -62,7 +64,7 @@ describe('authentication', () => {
       })));
 
       const state = store.getState().server;
-      expect(state.status.state).toBe(App.StatusEnum.DISCONNECTED);
+      expect(state.status.state).toBe(StatusEnum.DISCONNECTED);
       expect(state.user).toBeNull();
       expect(state.buddyList).toEqual({});
     });
@@ -70,7 +72,7 @@ describe('authentication', () => {
 
   describe('register', () => {
     const registerOptions = {
-      reason: App.WebSocketConnectReason.REGISTER,
+      reason: WebSocketConnectReason.REGISTER as const,
       host: 'localhost',
       port: '4748',
       userName: 'newbie',
@@ -78,10 +80,10 @@ describe('authentication', () => {
       email: 'newbie@example.com',
       country: 'US',
       realName: 'New Bie',
-    } as const;
+    };
 
     it('auto-logs-in on RespRegistrationAccepted', () => {
-      connectAndHandshake(registerOptions as any);
+      connectAndHandshake(registerOptions);
 
       const register = findLastSessionCommand(Data.Command_Register_ext);
       expect(register.value.userName).toBe('newbie');
@@ -97,7 +99,7 @@ describe('authentication', () => {
     });
 
     it('parks registration in awaiting-activation on RespRegistrationAcceptedNeedsActivation', () => {
-      connectAndHandshake(registerOptions as any);
+      connectAndHandshake(registerOptions);
 
       const register = findLastSessionCommand(Data.Command_Register_ext);
       deliverMessage(buildResponseMessage(buildResponse({
@@ -105,7 +107,7 @@ describe('authentication', () => {
         responseCode: Data.Response_ResponseCode.RespRegistrationAcceptedNeedsActivation,
       })));
 
-      expect(store.getState().server.status.state).toBe(App.StatusEnum.DISCONNECTED);
+      expect(store.getState().server.status.state).toBe(StatusEnum.DISCONNECTED);
       expect(() => findLastSessionCommand(Data.Command_Login_ext)).toThrow();
     });
   });
@@ -113,13 +115,13 @@ describe('authentication', () => {
   describe('activate', () => {
     it('auto-logs-in on RespActivationAccepted', () => {
       connectAndHandshake({
-        reason: App.WebSocketConnectReason.ACTIVATE_ACCOUNT,
+        reason: WebSocketConnectReason.ACTIVATE_ACCOUNT as const,
         host: 'localhost',
         port: '4748',
         userName: 'alice',
         token: 'abc-123',
         password: 'secret',
-      } as any);
+      });
 
       const activate = findLastSessionCommand(Data.Command_Activate_ext);
       expect(activate.value.userName).toBe('alice');
@@ -131,6 +133,45 @@ describe('authentication', () => {
 
       const login = findLastSessionCommand(Data.Command_Login_ext);
       expect(login.value.userName).toBe('alice');
+    });
+  });
+
+  describe('hashed-password login (salt path)', () => {
+    it('requests salt then sends login with hashedPassword instead of plaintext', () => {
+      connectAndHandshakeWithSalt({ userName: 'alice', password: 'secret' });
+
+      // First command should be RequestPasswordSalt, not Login
+      const salt = findLastSessionCommand(Data.Command_RequestPasswordSalt_ext);
+      expect(salt.value.userName).toBe('alice');
+      expect(() => findLastSessionCommand(Data.Command_Login_ext)).toThrow();
+
+      // Deliver salt response
+      deliverMessage(buildResponseMessage(buildResponse({
+        cmdId: salt.cmdId,
+        responseCode: Data.Response_ResponseCode.RespOk,
+        ext: Data.Response_PasswordSalt_ext,
+        value: create(Data.Response_PasswordSaltSchema, { passwordSalt: 'test-salt-value' }),
+      })));
+
+      // Now login should have been sent with hashedPassword
+      const login = findLastSessionCommand(Data.Command_Login_ext);
+      expect(login.value.userName).toBe('alice');
+      expect(login.value.hashedPassword).toBeTruthy();
+      expect(login.value.password).toBeFalsy();
+
+      // Complete login
+      deliverMessage(buildResponseMessage(buildResponse({
+        cmdId: login.cmdId,
+        responseCode: Data.Response_ResponseCode.RespOk,
+        ext: Data.Response_Login_ext,
+        value: create(Data.Response_LoginSchema, {
+          userInfo: makeUser('alice'),
+          buddyList: [],
+          ignoreList: [],
+        }),
+      })));
+
+      expect(store.getState().server.status.state).toBe(StatusEnum.LOGGED_IN);
     });
   });
 });

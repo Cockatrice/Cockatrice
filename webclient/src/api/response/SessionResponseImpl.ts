@@ -1,8 +1,12 @@
-import { App, Data, Enriched } from '@app/types';
-import type { ISessionResponse } from '@app/websocket';
+import { Data } from '@app/types';
+import type { ISessionResponse, WebSocketSessionResponseOverrides } from '@app/websocket';
+import { StatusEnum } from '@app/websocket';
 import { GameDispatch, RoomsDispatch, ServerDispatch } from '@app/store';
 
-export class SessionResponseImpl implements ISessionResponse {
+type LoginSuccess = WebSocketSessionResponseOverrides['Response_Login'];
+type PendingActivation = WebSocketSessionResponseOverrides['Response'];
+
+export class SessionResponseImpl implements ISessionResponse<WebSocketSessionResponseOverrides> {
   initialized(): void {
     ServerDispatch.initialized();
   }
@@ -15,7 +19,7 @@ export class SessionResponseImpl implements ISessionResponse {
     ServerDispatch.clearStore();
   }
 
-  loginSuccessful(options: Enriched.LoginSuccessContext): void {
+  loginSuccessful(options: LoginSuccess): void {
     ServerDispatch.loginSuccessful(options);
   }
 
@@ -63,8 +67,8 @@ export class SessionResponseImpl implements ISessionResponse {
     ServerDispatch.updateInfo(name, version);
   }
 
-  updateStatus(state: App.StatusEnum, description: string): void {
-    if (state === App.StatusEnum.DISCONNECTED) {
+  updateStatus(state: StatusEnum, description: string): void {
+    if (state === StatusEnum.DISCONNECTED) {
       GameDispatch.clearStore();
       RoomsDispatch.clearStore();
       ServerDispatch.clearStore();
@@ -92,7 +96,7 @@ export class SessionResponseImpl implements ISessionResponse {
     ServerDispatch.serverMessage(message);
   }
 
-  accountAwaitingActivation(options: Enriched.PendingActivationContext): void {
+  accountAwaitingActivation(options: PendingActivation): void {
     ServerDispatch.accountAwaitingActivation(options);
   }
 

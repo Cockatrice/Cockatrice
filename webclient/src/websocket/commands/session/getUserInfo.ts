@@ -1,11 +1,11 @@
 import { create } from '@bufbuild/protobuf';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
+import { Command_GetUserInfo_ext, Command_GetUserInfoSchema, Response_GetUserInfo_ext } from '@app/generated';
 
 export function getUserInfo(userName: string): void {
-  WebClient.instance.protobuf.sendSessionCommand(Data.Command_GetUserInfo_ext, create(Data.Command_GetUserInfoSchema, { userName }), {
-    responseExt: Data.Response_GetUserInfo_ext,
+  WebClient.instance.protobuf.sendSessionCommand(Command_GetUserInfo_ext, create(Command_GetUserInfoSchema, { userName }), {
+    responseExt: Response_GetUserInfo_ext,
     onSuccess: (response) => {
       WebClient.instance.response.session.getUserInfo(response.userInfo);
     },

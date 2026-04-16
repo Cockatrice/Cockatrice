@@ -1,8 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_AttachCard_ext, Command_AttachCardSchema, type AttachCardParams } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
-
-export function attachCard(gameId: number, params: Data.AttachCardParams): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_AttachCard_ext, create(Data.Command_AttachCardSchema, params));
+export function attachCard(gameId: number, params: AttachCardParams): void {
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_AttachCard_ext, create(Command_AttachCardSchema, params));
 }

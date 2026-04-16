@@ -1,13 +1,68 @@
-import { Data, Enriched } from '@app/types';
+import type {
+  LoginParams,
+  RegisterParams,
+  ActivateParams,
+  ForgotPasswordRequestParams,
+  ForgotPasswordChallengeParams,
+  ForgotPasswordResetParams,
+  ViewLogHistoryParams,
+  KickFromGameParams,
+  GameSayParams,
+  ReadyStartParams,
+  SetActivePhaseParams,
+  MoveCardParams,
+  FlipCardParams,
+  AttachCardParams,
+  CreateTokenParams,
+  SetCardAttrParams,
+  SetCardCounterParams,
+  IncCardCounterParams,
+  DrawCardsParams,
+  CreateArrowParams,
+  DeleteArrowParams,
+  CreateCounterParams,
+  SetCounterParams,
+  IncCounterParams,
+  DelCounterParams,
+  ShuffleParams,
+  DumpZoneParams,
+  RevealCardsParams,
+  ChangeZonePropertiesParams,
+  DeckSelectParams,
+  SetSideboardPlanParams,
+  SetSideboardLockParams,
+  MulliganParams,
+  RollDieParams,
+  GameCommand,
+} from '@app/generated';
 
-export interface IAuthenticationRequest {
-  login(options: Omit<Enriched.LoginConnectOptions, 'reason'>): void;
-  testConnection(options: Omit<Enriched.TestConnectionOptions, 'reason'>): void;
-  register(options: Omit<Enriched.RegisterConnectOptions, 'reason'>): void;
-  activateAccount(options: Omit<Enriched.ActivateConnectOptions, 'reason'>): void;
-  resetPasswordRequest(options: Omit<Enriched.PasswordResetRequestConnectOptions, 'reason'>): void;
-  resetPasswordChallenge(options: Omit<Enriched.PasswordResetChallengeConnectOptions, 'reason'>): void;
-  resetPassword(options: Omit<Enriched.PasswordResetConnectOptions, 'reason'>): void;
+import type { ConnectTarget } from '../WebClientConfig';
+import type { KeyOf } from '../types';
+
+// ── Auth request type map ────────────────────────────────────────────────────
+// Keys = generated *Params type names composed with ConnectTarget.
+// @app/api overrides these with Enriched connect option types.
+
+export interface AuthRequestMap {
+  LoginParams: ConnectTarget & LoginParams;
+  ConnectTarget: ConnectTarget;
+  RegisterParams: ConnectTarget & RegisterParams;
+  ActivateParams: ConnectTarget & ActivateParams;
+  ForgotPasswordRequestParams: ConnectTarget & ForgotPasswordRequestParams;
+  ForgotPasswordChallengeParams: ConnectTarget & ForgotPasswordChallengeParams;
+  ForgotPasswordResetParams: ConnectTarget & ForgotPasswordResetParams;
+}
+
+type AK<V> = KeyOf<AuthRequestMap, V>;
+
+export interface IAuthenticationRequest<T extends AuthRequestMap = AuthRequestMap> {
+  login(options: T[AK<ConnectTarget & LoginParams>]): void;
+  testConnection(options: T[AK<ConnectTarget>]): void;
+  register(options: T[AK<ConnectTarget & RegisterParams>]): void;
+  activateAccount(options: T[AK<ConnectTarget & ActivateParams>]): void;
+  resetPasswordRequest(options: T[AK<ConnectTarget & ForgotPasswordRequestParams>]): void;
+  resetPasswordChallenge(options: T[AK<ConnectTarget & ForgotPasswordChallengeParams>]): void;
+  resetPassword(options: T[AK<ConnectTarget & ForgotPasswordResetParams>]): void;
   disconnect(): void;
 }
 
@@ -52,49 +107,51 @@ export interface IModeratorRequest {
   getBanHistory(userName: string): void;
   getWarnHistory(userName: string): void;
   getWarnList(modName: string, userName: string, userClientid: string): void;
-  viewLogHistory(filters: Data.ViewLogHistoryParams): void;
+  viewLogHistory(filters: ViewLogHistoryParams): void;
   warnUser(userName: string, reason: string, clientid?: string, removeMessages?: number): void;
 }
 
 export interface IGameRequest {
   leaveGame(gameId: number): void;
-  kickFromGame(gameId: number, params: Data.KickFromGameParams): void;
-  gameSay(gameId: number, params: Data.GameSayParams): void;
-  readyStart(gameId: number, params: Data.ReadyStartParams): void;
+  kickFromGame(gameId: number, params: KickFromGameParams): void;
+  gameSay(gameId: number, params: GameSayParams): void;
+  readyStart(gameId: number, params: ReadyStartParams): void;
   concede(gameId: number): void;
   unconcede(gameId: number): void;
-  judge(gameId: number, targetId: number, innerGameCommand: Data.GameCommand): void;
+  judge(gameId: number, targetId: number, innerGameCommand: GameCommand): void;
   nextTurn(gameId: number): void;
-  setActivePhase(gameId: number, params: Data.SetActivePhaseParams): void;
+  setActivePhase(gameId: number, params: SetActivePhaseParams): void;
   reverseTurn(gameId: number): void;
-  moveCard(gameId: number, params: Data.MoveCardParams): void;
-  flipCard(gameId: number, params: Data.FlipCardParams): void;
-  attachCard(gameId: number, params: Data.AttachCardParams): void;
-  createToken(gameId: number, params: Data.CreateTokenParams): void;
-  setCardAttr(gameId: number, params: Data.SetCardAttrParams): void;
-  setCardCounter(gameId: number, params: Data.SetCardCounterParams): void;
-  incCardCounter(gameId: number, params: Data.IncCardCounterParams): void;
-  drawCards(gameId: number, params: Data.DrawCardsParams): void;
+  moveCard(gameId: number, params: MoveCardParams): void;
+  flipCard(gameId: number, params: FlipCardParams): void;
+  attachCard(gameId: number, params: AttachCardParams): void;
+  createToken(gameId: number, params: CreateTokenParams): void;
+  setCardAttr(gameId: number, params: SetCardAttrParams): void;
+  setCardCounter(gameId: number, params: SetCardCounterParams): void;
+  incCardCounter(gameId: number, params: IncCardCounterParams): void;
+  drawCards(gameId: number, params: DrawCardsParams): void;
   undoDraw(gameId: number): void;
-  createArrow(gameId: number, params: Data.CreateArrowParams): void;
-  deleteArrow(gameId: number, params: Data.DeleteArrowParams): void;
-  createCounter(gameId: number, params: Data.CreateCounterParams): void;
-  setCounter(gameId: number, params: Data.SetCounterParams): void;
-  incCounter(gameId: number, params: Data.IncCounterParams): void;
-  delCounter(gameId: number, params: Data.DelCounterParams): void;
-  shuffle(gameId: number, params: Data.ShuffleParams): void;
-  dumpZone(gameId: number, params: Data.DumpZoneParams): void;
-  revealCards(gameId: number, params: Data.RevealCardsParams): void;
-  changeZoneProperties(gameId: number, params: Data.ChangeZonePropertiesParams): void;
-  deckSelect(gameId: number, params: Data.DeckSelectParams): void;
-  setSideboardPlan(gameId: number, params: Data.SetSideboardPlanParams): void;
-  setSideboardLock(gameId: number, params: Data.SetSideboardLockParams): void;
-  mulligan(gameId: number, params: Data.MulliganParams): void;
-  rollDie(gameId: number, params: Data.RollDieParams): void;
+  createArrow(gameId: number, params: CreateArrowParams): void;
+  deleteArrow(gameId: number, params: DeleteArrowParams): void;
+  createCounter(gameId: number, params: CreateCounterParams): void;
+  setCounter(gameId: number, params: SetCounterParams): void;
+  incCounter(gameId: number, params: IncCounterParams): void;
+  delCounter(gameId: number, params: DelCounterParams): void;
+  shuffle(gameId: number, params: ShuffleParams): void;
+  dumpZone(gameId: number, params: DumpZoneParams): void;
+  revealCards(gameId: number, params: RevealCardsParams): void;
+  changeZoneProperties(gameId: number, params: ChangeZonePropertiesParams): void;
+  deckSelect(gameId: number, params: DeckSelectParams): void;
+  setSideboardPlan(gameId: number, params: SetSideboardPlanParams): void;
+  setSideboardLock(gameId: number, params: SetSideboardLockParams): void;
+  mulligan(gameId: number, params: MulliganParams): void;
+  rollDie(gameId: number, params: RollDieParams): void;
 }
 
-export interface IWebClientRequest {
-  authentication: IAuthenticationRequest;
+export interface IWebClientRequest<
+  A extends AuthRequestMap = AuthRequestMap,
+> {
+  authentication: IAuthenticationRequest<A>;
   session: ISessionRequest;
   rooms: IRoomsRequest;
   game: IGameRequest;

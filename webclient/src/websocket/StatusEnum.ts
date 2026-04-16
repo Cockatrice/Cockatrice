@@ -1,0 +1,8 @@
+export enum StatusEnum {
+  DISCONNECTED,
+  CONNECTING,
+  CONNECTED,
+  LOGGING_IN,
+  LOGGED_IN,
+  DISCONNECTING = 99
+}

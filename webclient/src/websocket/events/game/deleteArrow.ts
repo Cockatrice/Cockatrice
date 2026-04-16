@@ -1,6 +1,7 @@
-import type { Data, Enriched } from '@app/types';
+import type { Event_DeleteArrow } from '@app/generated';
+import type { GameEventMeta } from '../../types';
 import { WebClient } from '../../WebClient';
 
-export function deleteArrow(data: Data.Event_DeleteArrow, meta: Enriched.GameEventMeta): void {
+export function deleteArrow(data: Event_DeleteArrow, meta: GameEventMeta): void {
   WebClient.instance.response.game.arrowDeleted(meta.gameId, meta.playerId, data);
 }

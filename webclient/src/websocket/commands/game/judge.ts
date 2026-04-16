@@ -1,11 +1,10 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_Judge_ext, Command_JudgeSchema, type GameCommand } from '@app/generated';
 import { WebClient } from '../../WebClient';
-import { Data } from '@app/types';
 
-export function judge(gameId: number, targetId: number, innerGameCommand: Data.GameCommand): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_Judge_ext, create(Data.Command_JudgeSchema, {
+export function judge(gameId: number, targetId: number, innerGameCommand: GameCommand): void {
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_Judge_ext, create(Command_JudgeSchema, {
     targetId,
     gameCommand: [innerGameCommand],
   }));
 }
-

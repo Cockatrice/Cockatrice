@@ -1,8 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_Shuffle_ext, Command_ShuffleSchema, type ShuffleParams } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
-
-export function shuffle(gameId: number, params: Data.ShuffleParams): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_Shuffle_ext, create(Data.Command_ShuffleSchema, params));
+export function shuffle(gameId: number, params: ShuffleParams): void {
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_Shuffle_ext, create(Command_ShuffleSchema, params));
 }

@@ -1,7 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_NextTurn_ext, Command_NextTurnSchema } from '@app/generated';
 import { WebClient } from '../../WebClient';
-import { Data } from '@app/types';
 
 export function nextTurn(gameId: number): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_NextTurn_ext, create(Data.Command_NextTurnSchema));
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_NextTurn_ext, create(Command_NextTurnSchema));
 }

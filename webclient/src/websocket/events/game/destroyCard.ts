@@ -1,6 +1,7 @@
-import type { Data, Enriched } from '@app/types';
+import type { Event_DestroyCard } from '@app/generated';
+import type { GameEventMeta } from '../../types';
 import { WebClient } from '../../WebClient';
 
-export function destroyCard(data: Data.Event_DestroyCard, meta: Enriched.GameEventMeta): void {
+export function destroyCard(data: Event_DestroyCard, meta: GameEventMeta): void {
   WebClient.instance.response.game.cardDestroyed(meta.gameId, meta.playerId, data);
 }

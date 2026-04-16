@@ -2,8 +2,9 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { App, Data } from '@app/types';
+import { Data } from '@app/types';
 import { store } from '@app/store';
+import { StatusEnum } from '@app/websocket';
 
 import { connectRaw, getMockWebSocket } from './helpers/setup';
 import {
@@ -31,7 +32,7 @@ describe('keep-alive', () => {
     vi.advanceTimersByTime(5000);
     const second = findLastSessionCommand(Data.Command_Ping_ext);
     expect(second.cmdId).toBeGreaterThan(first.cmdId);
-    expect(store.getState().server.status.state).toBe(App.StatusEnum.CONNECTED);
+    expect(store.getState().server.status.state).toBe(StatusEnum.CONNECTED);
   });
 
   it('stays CONNECTED while pongs arrive before the next tick', () => {
@@ -46,7 +47,7 @@ describe('keep-alive', () => {
       })));
     }
 
-    expect(store.getState().server.status.state).toBe(App.StatusEnum.CONNECTED);
+    expect(store.getState().server.status.state).toBe(StatusEnum.CONNECTED);
     expect(getMockWebSocket().close).not.toHaveBeenCalled();
   });
 
@@ -55,11 +56,11 @@ describe('keep-alive', () => {
 
     vi.advanceTimersByTime(5000);
     expect(() => findLastSessionCommand(Data.Command_Ping_ext)).not.toThrow();
-    expect(store.getState().server.status.state).toBe(App.StatusEnum.CONNECTED);
+    expect(store.getState().server.status.state).toBe(StatusEnum.CONNECTED);
 
     vi.advanceTimersByTime(5000);
 
     expect(getMockWebSocket().close).toHaveBeenCalled();
-    expect(store.getState().server.status.state).toBe(App.StatusEnum.DISCONNECTED);
+    expect(store.getState().server.status.state).toBe(StatusEnum.DISCONNECTED);
   });
 });

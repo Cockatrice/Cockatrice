@@ -19,8 +19,6 @@ export const CLIENT_CONFIG = {
   ]
 } as const;
 
-export const PROTOCOL_VERSION = 14;
-
 export const CLIENT_OPTIONS = {
   autojoinrooms: true,
   keepalive: 5000

@@ -19,14 +19,32 @@ vi.mock('./', async () => {
 
 import { Mock } from 'vitest';
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
+import { useWebClientCleanup } from '../../__mocks__/helpers';
 import { WebClient } from '../../WebClient';
 import * as SessionIndexMocks from './';
-import { App, Enriched, Data } from '@app/types';
+import { App, Enriched } from '@app/types';
+import { StatusEnum } from '../../StatusEnum';
+import {
+  Command_Activate_ext,
+  Command_ForgotPasswordChallenge_ext,
+  Command_ForgotPasswordRequest_ext,
+  Command_ForgotPasswordReset_ext,
+  Command_Login_ext,
+  Command_Register_ext,
+  Command_RequestPasswordSalt_ext,
+  Response_ForgotPasswordRequest_ext,
+  Response_Login_ext,
+  Response_PasswordSalt_ext,
+  Response_Register_ext,
+  Response_RegisterSchema,
+  Response_ResponseCode,
+  ResponseSchema,
+} from '@app/generated';
 import { hashPassword, generateSalt, passwordSaltSupported } from '../../utils';
 
 import { create, setExtension } from '@bufbuild/protobuf';
 
-import { connect } from './connect';
+import { connect, testConnect } from './connect';
 import { updateStatus } from './updateStatus';
 import { login } from './login';
 import { register } from './register';
@@ -36,6 +54,7 @@ import { forgotPasswordRequest } from './forgotPasswordRequest';
 import { forgotPasswordReset } from './forgotPasswordReset';
 import { requestPasswordSalt } from './requestPasswordSalt';
 
+useWebClientCleanup();
 
 const { invokeOnSuccess, invokeResponseCode, invokeOnError } = makeCallbackHelpers(
   WebClient.instance.protobuf.sendSessionCommand as Mock,
@@ -88,13 +107,7 @@ const makeForgotResetOpts = (): Enriched.PasswordResetConnectOptions => ({
   newPassword: 'newpw',
   reason: App.WebSocketConnectReason.PASSWORD_RESET,
 });
-const makeSaltOpts = (
-  reason: App.WebSocketConnectReason,
-  extras: Record<string, unknown> = {}
-) => ({ ...baseTransport, userName: 'alice', reason, ...extras } as
-  | Enriched.LoginConnectOptions
-  | Enriched.ActivateConnectOptions
-  | Enriched.PasswordResetConnectOptions);
+
 
 beforeEach(() => {
   (hashPassword as Mock).mockReturnValue('hashed_pw');
@@ -107,47 +120,17 @@ beforeEach(() => {
 // ----------------------------------------------------------------
 describe('connect', () => {
 
-  it('calls updateStatus CONNECTING for LOGIN reason', () => {
-    connect({ host: 'h', port: '1', userName: 'u', reason: App.WebSocketConnectReason.LOGIN });
-    expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(App.StatusEnum.CONNECTING, 'Connecting...');
-    expect(WebClient.instance.connect).toHaveBeenCalled();
+  it('calls WebClient.instance.connect with the target', () => {
+    connect({ host: 'h', port: '1' });
+    expect(WebClient.instance.connect).toHaveBeenCalledWith({ host: 'h', port: '1' });
   });
+});
 
-  it('calls updateStatus CONNECTING for REGISTER reason', () => {
-    connect(makeRegisterOpts({ userName: 'u', realName: 'U' }));
-    expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(App.StatusEnum.CONNECTING, 'Connecting...');
-  });
+describe('testConnect', () => {
 
-  it('calls updateStatus CONNECTING for ACTIVATE_ACCOUNT reason', () => {
-    connect({ host: 'h', port: '1', userName: 'u', token: 'tok', reason: App.WebSocketConnectReason.ACTIVATE_ACCOUNT });
-    expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(App.StatusEnum.CONNECTING, 'Connecting...');
-  });
-
-  it('calls updateStatus CONNECTING for PASSWORD_RESET_REQUEST reason', () => {
-    connect({ host: 'h', port: '1', userName: 'u', reason: App.WebSocketConnectReason.PASSWORD_RESET_REQUEST });
-    expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(App.StatusEnum.CONNECTING, 'Connecting...');
-  });
-
-  it('calls updateStatus CONNECTING for PASSWORD_RESET_CHALLENGE reason', () => {
-    connect({ host: 'h', port: '1', userName: 'u', email: 'a@b.com', reason: App.WebSocketConnectReason.PASSWORD_RESET_CHALLENGE });
-    expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(App.StatusEnum.CONNECTING, 'Connecting...');
-  });
-
-  it('calls updateStatus CONNECTING for PASSWORD_RESET reason', () => {
-    connect({ host: 'h', port: '1', userName: 'u', token: 'tok', newPassword: 'newpw', reason: App.WebSocketConnectReason.PASSWORD_RESET });
-    expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(App.StatusEnum.CONNECTING, 'Connecting...');
-  });
-
-  it('calls testConnect for TEST_CONNECTION reason', () => {
-    connect({ host: 'h', port: '1', reason: App.WebSocketConnectReason.TEST_CONNECTION });
-    expect(WebClient.instance.testConnect).toHaveBeenCalled();
-    expect(WebClient.instance.connect).not.toHaveBeenCalled();
-  });
-
-  it('calls updateStatus DISCONNECTED for unknown reason', () => {
-    const bogus = { host: 'h', port: '1', reason: 999 as App.WebSocketConnectReason };
-    connect(bogus as Enriched.WebSocketConnectOptions);
-    expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(App.StatusEnum.DISCONNECTED, expect.stringContaining('Unknown'));
+  it('calls WebClient.instance.testConnect with the target', () => {
+    testConnect({ host: 'h', port: '1' });
+    expect(WebClient.instance.testConnect).toHaveBeenCalledWith({ host: 'h', port: '1' });
   });
 });
 
@@ -157,9 +140,9 @@ describe('connect', () => {
 describe('updateStatus', () => {
 
   it('calls WebClient.instance.response.session.updateStatus and WebClient.instance.updateStatus', () => {
-    updateStatus(App.StatusEnum.CONNECTED, 'OK');
-    expect(WebClient.instance.response.session.updateStatus).toHaveBeenCalledWith(App.StatusEnum.CONNECTED, 'OK');
-    expect(WebClient.instance.updateStatus).toHaveBeenCalledWith(App.StatusEnum.CONNECTED);
+    updateStatus(StatusEnum.CONNECTED, 'OK');
+    expect(WebClient.instance.response.session.updateStatus).toHaveBeenCalledWith(StatusEnum.CONNECTED, 'OK');
+    expect(WebClient.instance.updateStatus).toHaveBeenCalledWith(StatusEnum.CONNECTED);
   });
 });
 
@@ -171,27 +154,27 @@ describe('login', () => {
   it('sends Command_Login with plain password when no salt', () => {
     login(makeLoginOpts(), 'pw');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_Login_ext,
+      Command_Login_ext,
       expect.objectContaining({ password: 'pw' }),
-      expect.objectContaining({ responseExt: Data.Response_Login_ext })
+      expect.objectContaining({ responseExt: Response_Login_ext })
     );
   });
 
   it('sends Command_Login with hashedPassword when salt is given', () => {
     login(makeLoginOpts(), 'pw', 'salt');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_Login_ext,
+      Command_Login_ext,
       expect.objectContaining({ hashedPassword: 'hashed_pw' }),
-      expect.objectContaining({ responseExt: Data.Response_Login_ext })
+      expect.objectContaining({ responseExt: Response_Login_ext })
     );
   });
 
   it('uses options.hashedPassword if provided', () => {
     login(makeLoginOpts({ hashedPassword: 'pre_hashed' }), 'pw', 'salt');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_Login_ext,
+      Command_Login_ext,
       expect.objectContaining({ hashedPassword: 'pre_hashed' }),
-      expect.objectContaining({ responseExt: Data.Response_Login_ext })
+      expect.objectContaining({ responseExt: Response_Login_ext })
     );
   });
 
@@ -205,7 +188,7 @@ describe('login', () => {
     expect(WebClient.instance.response.session.loginSuccessful).toHaveBeenCalled();
     expect(SessionIndexMocks.listUsers).toHaveBeenCalled();
     expect(SessionIndexMocks.listRooms).toHaveBeenCalled();
-    expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(App.StatusEnum.LOGGED_IN, 'Logged in.');
+    expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGED_IN, 'Logged in.');
   });
 
   it('onSuccess does NOT pass plaintext password to loginSuccessful', () => {
@@ -226,56 +209,56 @@ describe('login', () => {
 
   it('onResponseCode RespClientUpdateRequired calls onLoginError', () => {
     login(makeLoginOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespClientUpdateRequired);
+    invokeResponseCode(Response_ResponseCode.RespClientUpdateRequired);
     expect(WebClient.instance.response.session.loginFailed).toHaveBeenCalled();
     expect(SessionIndexMocks.disconnect).toHaveBeenCalled();
   });
 
   it('onResponseCode RespWrongPassword', () => {
     login(makeLoginOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespWrongPassword);
+    invokeResponseCode(Response_ResponseCode.RespWrongPassword);
     expect(WebClient.instance.response.session.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespUsernameInvalid', () => {
     login(makeLoginOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespUsernameInvalid);
+    invokeResponseCode(Response_ResponseCode.RespUsernameInvalid);
     expect(WebClient.instance.response.session.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespWouldOverwriteOldSession', () => {
     login(makeLoginOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespWouldOverwriteOldSession);
+    invokeResponseCode(Response_ResponseCode.RespWouldOverwriteOldSession);
     expect(WebClient.instance.response.session.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespUserIsBanned', () => {
     login(makeLoginOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespUserIsBanned);
+    invokeResponseCode(Response_ResponseCode.RespUserIsBanned);
     expect(WebClient.instance.response.session.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespRegistrationRequired', () => {
     login(makeLoginOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespRegistrationRequired);
+    invokeResponseCode(Response_ResponseCode.RespRegistrationRequired);
     expect(WebClient.instance.response.session.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespClientIdRequired', () => {
     login(makeLoginOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespClientIdRequired);
+    invokeResponseCode(Response_ResponseCode.RespClientIdRequired);
     expect(WebClient.instance.response.session.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespContextError', () => {
     login(makeLoginOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespContextError);
+    invokeResponseCode(Response_ResponseCode.RespContextError);
     expect(WebClient.instance.response.session.loginFailed).toHaveBeenCalled();
   });
 
   it('onResponseCode RespAccountNotActivated calls accountAwaitingActivation without password in options', () => {
     login(makeLoginOpts({ password: 'leaked' }), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespAccountNotActivated);
+    invokeResponseCode(Response_ResponseCode.RespAccountNotActivated);
     expect(WebClient.instance.response.session.accountAwaitingActivation).toHaveBeenCalledWith(
       expect.not.objectContaining({ password: expect.anything() })
     );
@@ -297,7 +280,7 @@ describe('register', () => {
   it('sends Command_Register with plain password when no salt', () => {
     register(makeRegisterOpts(), 'pw');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_Register_ext,
+      Command_Register_ext,
       expect.objectContaining({ password: 'pw' }),
       expect.any(Object)
     );
@@ -306,7 +289,7 @@ describe('register', () => {
   it('uses hashedPassword when salt is provided', () => {
     register(makeRegisterOpts(), 'pw', 'salt');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_Register_ext,
+      Command_Register_ext,
       expect.objectContaining({ hashedPassword: 'hashed_pw' }),
       expect.any(Object)
     );
@@ -314,21 +297,21 @@ describe('register', () => {
 
   it('RespRegistrationAccepted calls login without salt and registrationSuccess', () => {
     register(makeRegisterOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespRegistrationAccepted);
+    invokeResponseCode(Response_ResponseCode.RespRegistrationAccepted);
     expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), 'pw', undefined);
     expect(WebClient.instance.response.session.registrationSuccess).toHaveBeenCalled();
   });
 
   it('RespRegistrationAccepted forwards salt to login', () => {
     register(makeRegisterOpts(), 'pw', 'mySalt');
-    invokeResponseCode(Data.Response_ResponseCode.RespRegistrationAccepted);
+    invokeResponseCode(Response_ResponseCode.RespRegistrationAccepted);
     expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), 'pw', 'mySalt');
     expect(WebClient.instance.response.session.registrationSuccess).toHaveBeenCalled();
   });
 
   it('RespRegistrationAcceptedNeedsActivation calls accountAwaitingActivation without password in options', () => {
     register(makeRegisterOpts({ password: 'leaked' }), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespRegistrationAcceptedNeedsActivation);
+    invokeResponseCode(Response_ResponseCode.RespRegistrationAcceptedNeedsActivation);
     expect(WebClient.instance.response.session.accountAwaitingActivation).toHaveBeenCalledWith(
       expect.not.objectContaining({ password: expect.anything() })
     );
@@ -337,53 +320,53 @@ describe('register', () => {
 
   it('RespUserAlreadyExists calls registrationUserNameError', () => {
     register(makeRegisterOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespUserAlreadyExists);
+    invokeResponseCode(Response_ResponseCode.RespUserAlreadyExists);
     expect(WebClient.instance.response.session.registrationUserNameError).toHaveBeenCalled();
   });
 
   it('RespUsernameInvalid calls registrationUserNameError', () => {
     register(makeRegisterOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespUsernameInvalid);
+    invokeResponseCode(Response_ResponseCode.RespUsernameInvalid);
     expect(WebClient.instance.response.session.registrationUserNameError).toHaveBeenCalled();
   });
 
   it('RespPasswordTooShort calls registrationPasswordError', () => {
     register(makeRegisterOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespPasswordTooShort);
+    invokeResponseCode(Response_ResponseCode.RespPasswordTooShort);
     expect(WebClient.instance.response.session.registrationPasswordError).toHaveBeenCalled();
   });
 
   it('RespEmailRequiredToRegister calls registrationRequiresEmail', () => {
     register(makeRegisterOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespEmailRequiredToRegister);
+    invokeResponseCode(Response_ResponseCode.RespEmailRequiredToRegister);
     expect(WebClient.instance.response.session.registrationRequiresEmail).toHaveBeenCalled();
   });
 
   it('RespEmailBlackListed calls registrationEmailError', () => {
     register(makeRegisterOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespEmailBlackListed);
+    invokeResponseCode(Response_ResponseCode.RespEmailBlackListed);
     expect(WebClient.instance.response.session.registrationEmailError).toHaveBeenCalled();
   });
 
   it('RespTooManyRequests calls registrationEmailError', () => {
     register(makeRegisterOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespTooManyRequests);
+    invokeResponseCode(Response_ResponseCode.RespTooManyRequests);
     expect(WebClient.instance.response.session.registrationEmailError).toHaveBeenCalled();
   });
 
   it('RespRegistrationDisabled calls registrationFailed', () => {
     register(makeRegisterOpts(), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespRegistrationDisabled);
+    invokeResponseCode(Response_ResponseCode.RespRegistrationDisabled);
     expect(WebClient.instance.response.session.registrationFailed).toHaveBeenCalled();
   });
 
   it('RespUserIsBanned calls registrationFailed with deniedReasonStr and deniedEndTime', () => {
     register(makeRegisterOpts(), 'pw');
-    const raw = create(Data.ResponseSchema, { responseCode: Data.Response_ResponseCode.RespUserIsBanned });
-    setExtension(raw, Data.Response_Register_ext, create(Data.Response_RegisterSchema, {
+    const raw = create(ResponseSchema, { responseCode: Response_ResponseCode.RespUserIsBanned });
+    setExtension(raw, Response_Register_ext, create(Response_RegisterSchema, {
       deniedReasonStr: 'bad user', deniedEndTime: 9999n,
     }));
-    invokeResponseCode(Data.Response_ResponseCode.RespUserIsBanned, raw);
+    invokeResponseCode(Response_ResponseCode.RespUserIsBanned, raw);
     expect(WebClient.instance.response.session.registrationFailed).toHaveBeenCalledWith('bad user', 9999);
   });
 
@@ -402,12 +385,12 @@ describe('activate', () => {
   it('sends Command_Activate with userName and token, not password', () => {
     activate(makeActivateOpts(), 'pw');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_Activate_ext,
+      Command_Activate_ext,
       expect.objectContaining({ userName: 'alice', token: 'tok' }),
       expect.any(Object)
     );
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_Activate_ext,
+      Command_Activate_ext,
       expect.not.objectContaining({ password: expect.anything() }),
       expect.any(Object)
     );
@@ -415,7 +398,7 @@ describe('activate', () => {
 
   it('RespActivationAccepted calls accountActivationSuccess and forwards password+salt to login', () => {
     activate(makeActivateOpts(), 'pw', 'salt');
-    invokeResponseCode(Data.Response_ResponseCode.RespActivationAccepted);
+    invokeResponseCode(Response_ResponseCode.RespActivationAccepted);
     expect(WebClient.instance.response.session.accountActivationSuccess).toHaveBeenCalled();
     expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), 'pw', 'salt');
   });
@@ -436,7 +419,7 @@ describe('forgotPasswordChallenge', () => {
   it('sends Command_ForgotPasswordChallenge', () => {
     forgotPasswordChallenge(makeForgotChallengeOpts());
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_ForgotPasswordChallenge_ext, expect.any(Object), expect.any(Object)
+      Command_ForgotPasswordChallenge_ext, expect.any(Object), expect.any(Object)
     );
   });
 
@@ -463,9 +446,9 @@ describe('forgotPasswordRequest', () => {
   it('sends Command_ForgotPasswordRequest', () => {
     forgotPasswordRequest(makeForgotRequestOpts());
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_ForgotPasswordRequest_ext,
+      Command_ForgotPasswordRequest_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Data.Response_ForgotPasswordRequest_ext })
+      expect.objectContaining({ responseExt: Response_ForgotPasswordRequest_ext })
     );
   });
 
@@ -501,7 +484,7 @@ describe('forgotPasswordReset', () => {
   it('sends Command_ForgotPasswordReset with plain newPassword when no salt', () => {
     forgotPasswordReset(makeForgotResetOpts(), 'newpw');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_ForgotPasswordReset_ext,
+      Command_ForgotPasswordReset_ext,
       expect.objectContaining({ newPassword: 'newpw' }),
       expect.any(Object)
     );
@@ -510,7 +493,7 @@ describe('forgotPasswordReset', () => {
   it('sends hashed new password when salt provided', () => {
     forgotPasswordReset(makeForgotResetOpts(), 'newpw', 'salt');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_ForgotPasswordReset_ext,
+      Command_ForgotPasswordReset_ext,
       expect.objectContaining({ hashedNewPassword: 'hashed_pw' }),
       expect.any(Object)
     );
@@ -537,66 +520,40 @@ describe('forgotPasswordReset', () => {
 describe('requestPasswordSalt', () => {
 
   it('sends Command_RequestPasswordSalt', () => {
-    requestPasswordSalt(makeSaltOpts(App.WebSocketConnectReason.LOGIN), 'pw');
+    const onSaltReceived = vi.fn();
+    const onFailure = vi.fn();
+    requestPasswordSalt({ host: 'h', port: '1', userName: 'alice' }, onSaltReceived, onFailure);
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_RequestPasswordSalt_ext,
+      Command_RequestPasswordSalt_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Data.Response_PasswordSalt_ext })
+      expect.objectContaining({ responseExt: Response_PasswordSalt_ext })
     );
   });
 
-  it('onSuccess with LOGIN reason forwards password+salt to login', () => {
-    requestPasswordSalt(makeSaltOpts(App.WebSocketConnectReason.LOGIN), 'pw');
+  it('onSuccess calls onSaltReceived with the salt', () => {
+    const onSaltReceived = vi.fn();
+    const onFailure = vi.fn();
+    requestPasswordSalt({ host: 'h', port: '1', userName: 'alice' }, onSaltReceived, onFailure);
     const resp = { passwordSalt: 'salt123' };
     invokeOnSuccess(resp, { responseCode: 0 });
-    expect(SessionIndexMocks.login).toHaveBeenCalledWith(expect.any(Object), 'pw', 'salt123');
+    expect(onSaltReceived).toHaveBeenCalledWith('salt123');
   });
 
-  it('onSuccess with ACTIVATE_ACCOUNT reason forwards password+salt to activate', () => {
-    requestPasswordSalt(makeSaltOpts(App.WebSocketConnectReason.ACTIVATE_ACCOUNT, { token: 'tok' }), 'pw');
-    const resp = { passwordSalt: 'salt123' };
-    invokeOnSuccess(resp, { responseCode: 0 });
-    expect(SessionIndexMocks.activate).toHaveBeenCalledWith(expect.any(Object), 'pw', 'salt123');
+  it('onResponseCode RespRegistrationRequired calls updateStatus and onFailure', () => {
+    const onSaltReceived = vi.fn();
+    const onFailure = vi.fn();
+    requestPasswordSalt({ host: 'h', port: '1', userName: 'alice' }, onSaltReceived, onFailure);
+    invokeResponseCode(Response_ResponseCode.RespRegistrationRequired);
+    expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, expect.any(String));
+    expect(onFailure).toHaveBeenCalled();
   });
 
-  it('onSuccess with PASSWORD_RESET reason forwards newPassword+salt to forgotPasswordReset', () => {
-    requestPasswordSalt(
-      makeSaltOpts(App.WebSocketConnectReason.PASSWORD_RESET, { token: 'tok', newPassword: 'newpw' }),
-      undefined,
-      'newpw'
-    );
-    const resp = { passwordSalt: 'salt123' };
-    invokeOnSuccess(resp, { responseCode: 0 });
-    expect(SessionIndexMocks.forgotPasswordReset).toHaveBeenCalledWith(expect.any(Object), 'newpw', 'salt123');
-  });
-
-  it('onResponseCode RespRegistrationRequired calls updateStatus and disconnect', () => {
-    requestPasswordSalt(makeSaltOpts(App.WebSocketConnectReason.LOGIN), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespRegistrationRequired);
-    expect(SessionIndexMocks.updateStatus).toHaveBeenCalledWith(App.StatusEnum.DISCONNECTED, expect.any(String));
-    expect(SessionIndexMocks.disconnect).toHaveBeenCalled();
-  });
-
-  it('onResponseCode RespRegistrationRequired with ACTIVATE_ACCOUNT calls accountActivationFailed', () => {
-    requestPasswordSalt(makeSaltOpts(App.WebSocketConnectReason.ACTIVATE_ACCOUNT, { token: 'tok' }), 'pw');
-    invokeResponseCode(Data.Response_ResponseCode.RespRegistrationRequired);
-    expect(WebClient.instance.response.session.accountActivationFailed).toHaveBeenCalled();
-  });
-
-  it('onError calls updateStatus DISCONNECTED and disconnect', () => {
-    requestPasswordSalt(makeSaltOpts(App.WebSocketConnectReason.LOGIN), 'pw');
+  it('onError calls updateStatus DISCONNECTED and onFailure', () => {
+    const onSaltReceived = vi.fn();
+    const onFailure = vi.fn();
+    requestPasswordSalt({ host: 'h', port: '1', userName: 'alice' }, onSaltReceived, onFailure);
     invokeOnError();
     expect(SessionIndexMocks.updateStatus).toHaveBeenCalled();
-    expect(SessionIndexMocks.disconnect).toHaveBeenCalled();
-  });
-
-  it('onError with PASSWORD_RESET reason calls resetPasswordFailed', () => {
-    requestPasswordSalt(
-      makeSaltOpts(App.WebSocketConnectReason.PASSWORD_RESET, { token: 'tok', newPassword: 'newpw' }),
-      undefined,
-      'newpw'
-    );
-    invokeOnError();
-    expect(WebClient.instance.response.session.resetPasswordFailed).toHaveBeenCalled();
+    expect(onFailure).toHaveBeenCalled();
   });
 });

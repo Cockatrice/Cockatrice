@@ -1,15 +1,9 @@
+export { StatusEnum } from '@app/websocket';
+import type { StatusEnum } from '@app/websocket';
+
 export interface ServerStatus {
   status: StatusEnum;
   description: string;
-}
-
-export enum StatusEnum {
-  DISCONNECTED,
-  CONNECTING,
-  CONNECTED,
-  LOGGING_IN,
-  LOGGED_IN,
-  DISCONNECTING = 99
 }
 
 export enum WebSocketConnectReason {

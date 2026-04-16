@@ -1,6 +1,24 @@
 import type { GenExtension } from '@bufbuild/protobuf/codegenv2';
 
-import { Data } from '@app/types';
+import {
+  type RegistryEntry,
+  type SessionEvent,
+  makeEntry,
+  Event_AddToList_ext,
+  Event_ConnectionClosed_ext,
+  Event_GameJoined_ext,
+  Event_ListRooms_ext,
+  Event_NotifyUser_ext,
+  Event_RemoveFromList_ext,
+  Event_ReplayAdded_ext,
+  Event_ServerCompleteList_ext,
+  Event_ServerIdentification_ext,
+  Event_ServerMessage_ext,
+  Event_ServerShutdown_ext,
+  Event_UserJoined_ext,
+  Event_UserLeft_ext,
+  Event_UserMessage_ext,
+} from '@app/generated';
 
 import { addToList } from './addToList';
 import { connectionClosed } from './connectionClosed';
@@ -17,29 +35,29 @@ import { userLeft } from './userLeft';
 import { userMessage } from './userMessage';
 import { gameJoined } from './gameJoined';
 
-type SessionRegistryEntry<V = unknown> = Data.RegistryEntry<V, Data.SessionEvent>;
+type SessionRegistryEntry<V = unknown> = RegistryEntry<V, SessionEvent>;
 export type SessionExtensionRegistry = SessionRegistryEntry[];
 
 function makeSessionEntry<V>(
-  ext: GenExtension<Data.SessionEvent, V>,
+  ext: GenExtension<SessionEvent, V>,
   handler: (value: V) => void,
 ): SessionRegistryEntry {
-  return Data.makeEntry(ext, handler);
+  return makeEntry(ext, handler);
 }
 
 export const SessionEvents: SessionExtensionRegistry = [
-  makeSessionEntry(Data.Event_AddToList_ext, addToList),
-  makeSessionEntry(Data.Event_ConnectionClosed_ext, connectionClosed),
-  makeSessionEntry(Data.Event_GameJoined_ext, gameJoined),
-  makeSessionEntry(Data.Event_ListRooms_ext, listRooms),
-  makeSessionEntry(Data.Event_NotifyUser_ext, notifyUser),
-  makeSessionEntry(Data.Event_RemoveFromList_ext, removeFromList),
-  makeSessionEntry(Data.Event_ReplayAdded_ext, replayAdded),
-  makeSessionEntry(Data.Event_ServerCompleteList_ext, serverCompleteList),
-  makeSessionEntry(Data.Event_ServerIdentification_ext, serverIdentification),
-  makeSessionEntry(Data.Event_ServerMessage_ext, serverMessage),
-  makeSessionEntry(Data.Event_ServerShutdown_ext, serverShutdown),
-  makeSessionEntry(Data.Event_UserJoined_ext, userJoined),
-  makeSessionEntry(Data.Event_UserLeft_ext, userLeft),
-  makeSessionEntry(Data.Event_UserMessage_ext, userMessage),
+  makeSessionEntry(Event_AddToList_ext, addToList),
+  makeSessionEntry(Event_ConnectionClosed_ext, connectionClosed),
+  makeSessionEntry(Event_GameJoined_ext, gameJoined),
+  makeSessionEntry(Event_ListRooms_ext, listRooms),
+  makeSessionEntry(Event_NotifyUser_ext, notifyUser),
+  makeSessionEntry(Event_RemoveFromList_ext, removeFromList),
+  makeSessionEntry(Event_ReplayAdded_ext, replayAdded),
+  makeSessionEntry(Event_ServerCompleteList_ext, serverCompleteList),
+  makeSessionEntry(Event_ServerIdentification_ext, serverIdentification),
+  makeSessionEntry(Event_ServerMessage_ext, serverMessage),
+  makeSessionEntry(Event_ServerShutdown_ext, serverShutdown),
+  makeSessionEntry(Event_UserJoined_ext, userJoined),
+  makeSessionEntry(Event_UserLeft_ext, userLeft),
+  makeSessionEntry(Event_UserMessage_ext, userMessage),
 ];

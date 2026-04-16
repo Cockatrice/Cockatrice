@@ -1,10 +1,9 @@
-import { App, Enriched } from '@app/types';
-
+import { StatusEnum } from './StatusEnum';
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
-import { ping } from './commands/session';
 import { CLIENT_OPTIONS } from './config';
-import { IWebClientResponse, IWebClientRequest } from './interfaces';
+import type { IWebClientResponse } from './interfaces';
+import type { WebClientConfig, ConnectTarget } from './WebClientConfig';
 
 export class WebClient {
   private static _instance: WebClient | null = null;
@@ -12,7 +11,7 @@ export class WebClient {
   public static get instance(): WebClient {
     if (!WebClient._instance) {
       throw new Error(
-        'WebClient has not been initialized. Instantiate it via `new WebClient(response, request)` before accessing `WebClient.instance`.'
+        'WebClient has not been initialized. Instantiate it via `new WebClient(config)` before accessing `WebClient.instance`.'
       );
     }
     return WebClient._instance;
@@ -21,32 +20,40 @@ export class WebClient {
   public socket: WebSocketService;
   public protobuf: ProtobufService;
   public response: IWebClientResponse;
-  public request: IWebClientRequest;
+  public config: WebClientConfig;
 
-  public options: Enriched.WebSocketConnectOptions | null = null;
-  public status: App.StatusEnum;
+  public status: StatusEnum;
 
-  constructor(response: IWebClientResponse, request: IWebClientRequest) {
+  constructor(config: WebClientConfig) {
     if (WebClient._instance) {
       throw new Error('WebClient is a singleton and has already been initialized.');
     }
 
-    this.response = response;
-    this.request = request;
+    this.config = config;
+    this.response = config.response;
 
     this.socket = new WebSocketService({
-      keepAliveFn: (cb) => ping(cb),
-      response,
+      keepAliveFn: config.keepAliveFn,
       onStatusChange: (status, description) => {
         this.response.session.updateStatus(status, description);
         this.updateStatus(status);
       },
+      onConnectionFailed: () => {
+        this.response.session.connectionFailed();
+      },
     });
 
-    this.protobuf = new ProtobufService({
-      send: (data) => this.socket.send(data),
-      isOpen: () => this.socket.checkReadyState(WebSocket.OPEN),
-    });
+    this.protobuf = new ProtobufService(
+      {
+        send: (data) => this.socket.send(data),
+        isOpen: () => this.socket.checkReadyState(WebSocket.OPEN),
+      },
+      {
+        sessionEvents: config.sessionEvents,
+        roomEvents: config.roomEvents,
+        gameEvents: config.gameEvents,
+      },
+    );
 
     this.socket.message$.subscribe((message: MessageEvent) => {
       this.protobuf.handleMessageEvent(message);
@@ -57,15 +64,14 @@ export class WebClient {
     this.response.session.initialized();
   }
 
-  public connect(options: Enriched.WebSocketConnectOptions) {
+  public connect(target: ConnectTarget) {
     this.response.session.connectionAttempted();
-    this.options = options;
-    this.socket.connect(options);
+    this.socket.connect(target);
   }
 
-  public testConnect(options: Enriched.WebSocketConnectOptions) {
+  public testConnect(target: ConnectTarget) {
     const protocol = window.location.hostname === 'localhost' ? 'ws' : 'wss';
-    const { host, port } = options;
+    const { host, port } = target;
     const socket = new WebSocket(`${protocol}://${host}:${port}`);
     socket.binaryType = 'arraybuffer';
 
@@ -88,10 +94,10 @@ export class WebClient {
     this.socket.disconnect();
   }
 
-  public updateStatus(status: App.StatusEnum) {
+  public updateStatus(status: StatusEnum) {
     this.status = status;
 
-    if (status === App.StatusEnum.DISCONNECTED) {
+    if (status === StatusEnum.DISCONNECTED) {
       this.protobuf.resetCommands();
     }
   }

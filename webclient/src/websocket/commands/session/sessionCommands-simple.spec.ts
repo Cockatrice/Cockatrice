@@ -19,6 +19,7 @@ vi.mock('./', async () => {
 
 import { Mock } from 'vitest';
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
+import { useWebClientCleanup } from '../../__mocks__/helpers';
 import { WebClient } from '../../WebClient';
 import { hashPassword, generateSalt, passwordSaltSupported } from '../../utils';
 
@@ -47,8 +48,44 @@ import { addToList, addToBuddyList, addToIgnoreList } from './addToList';
 import { removeFromList, removeFromBuddyList, removeFromIgnoreList } from './removeFromList';
 import { replayGetCode } from './replayGetCode';
 import { replaySubmitCode } from './replaySubmitCode';
-import { Data } from '@app/types';
+import {
+  Command_AccountEdit_ext,
+  Command_AccountImage_ext,
+  Command_AccountPassword_ext,
+  Command_AddToList_ext,
+  Command_DeckDel_ext,
+  Command_DeckDelDir_ext,
+  Command_DeckDownload_ext,
+  Command_DeckList_ext,
+  Command_DeckNewDir_ext,
+  Command_DeckUpload_ext,
+  Command_GetGamesOfUser_ext,
+  Command_GetUserInfo_ext,
+  Command_JoinRoom_ext,
+  Command_ListRooms_ext,
+  Command_ListUsers_ext,
+  Command_Message_ext,
+  Command_Ping_ext,
+  Command_RemoveFromList_ext,
+  Command_ReplayDeleteMatch_ext,
+  Command_ReplayDownload_ext,
+  Command_ReplayGetCode_ext,
+  Command_ReplayList_ext,
+  Command_ReplayModifyMatch_ext,
+  Command_ReplaySubmitCode_ext,
+  Response_DeckDownload_ext,
+  Response_DeckList_ext,
+  Response_DeckUpload_ext,
+  Response_GetGamesOfUser_ext,
+  Response_GetUserInfo_ext,
+  Response_JoinRoom_ext,
+  Response_ListUsers_ext,
+  Response_ReplayDownload_ext,
+  Response_ReplayGetCode_ext,
+  Response_ReplayList_ext,
+} from '@app/generated';
 
+useWebClientCleanup();
 
 const { invokeOnSuccess, invokeCallback } = makeCallbackHelpers(
   WebClient.instance.protobuf.sendSessionCommand as Mock,
@@ -67,7 +104,7 @@ describe('accountEdit', () => {
   it('sends Command_AccountEdit with correct params', () => {
     accountEdit('pw', 'Alice', 'a@b.com', 'US');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_AccountEdit_ext,
+      Command_AccountEdit_ext,
       expect.objectContaining({ passwordCheck: 'pw', realName: 'Alice', email: 'a@b.com', country: 'US' }),
       expect.any(Object)
     );
@@ -85,7 +122,7 @@ describe('accountImage', () => {
     const img = new Uint8Array([1, 2]);
     accountImage(img);
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_AccountImage_ext, expect.objectContaining({ image: img }), expect.any(Object)
+      Command_AccountImage_ext, expect.objectContaining({ image: img }), expect.any(Object)
     );
   });
 
@@ -101,7 +138,7 @@ describe('accountPassword', () => {
   it('sends Command_AccountPassword', () => {
     accountPassword('old', 'new', 'hashed');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_AccountPassword_ext,
+      Command_AccountPassword_ext,
       expect.objectContaining({ oldPassword: 'old', newPassword: 'new', hashedNewPassword: 'hashed' }),
       expect.any(Object)
     );
@@ -118,7 +155,7 @@ describe('deckDel', () => {
   it('sends Command_DeckDel', () => {
     deckDel(42);
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_DeckDel_ext,
+      Command_DeckDel_ext,
       expect.objectContaining({ deckId: 42 }),
       expect.any(Object)
     );
@@ -135,7 +172,7 @@ describe('deckDelDir', () => {
   it('sends Command_DeckDelDir', () => {
     deckDelDir('/path');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_DeckDelDir_ext, expect.objectContaining({ path: '/path' }), expect.any(Object)
+      Command_DeckDelDir_ext, expect.objectContaining({ path: '/path' }), expect.any(Object)
     );
   });
 
@@ -150,9 +187,9 @@ describe('deckList', () => {
   it('sends Command_DeckList', () => {
     deckList();
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_DeckList_ext,
+      Command_DeckList_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Data.Response_DeckList_ext })
+      expect.objectContaining({ responseExt: Response_DeckList_ext })
     );
   });
 
@@ -168,7 +205,7 @@ describe('deckNewDir', () => {
   it('sends Command_DeckNewDir', () => {
     deckNewDir('/path', 'dir');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_DeckNewDir_ext, expect.objectContaining({ path: '/path', dirName: 'dir' }), expect.any(Object)
+      Command_DeckNewDir_ext, expect.objectContaining({ path: '/path', dirName: 'dir' }), expect.any(Object)
     );
   });
 
@@ -183,9 +220,9 @@ describe('deckUpload', () => {
   it('sends Command_DeckUpload', () => {
     deckUpload('/path', 1, 'content');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_DeckUpload_ext,
+      Command_DeckUpload_ext,
       expect.objectContaining({ path: '/path', deckId: 1, deckList: 'content' }),
-      expect.objectContaining({ responseExt: Data.Response_DeckUpload_ext })
+      expect.objectContaining({ responseExt: Response_DeckUpload_ext })
     );
   });
 
@@ -208,9 +245,9 @@ describe('getGamesOfUser', () => {
   it('sends Command_GetGamesOfUser', () => {
     getGamesOfUser('alice');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_GetGamesOfUser_ext,
+      Command_GetGamesOfUser_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Data.Response_GetGamesOfUser_ext })
+      expect.objectContaining({ responseExt: Response_GetGamesOfUser_ext })
     );
   });
 
@@ -226,9 +263,9 @@ describe('getUserInfo', () => {
   it('sends Command_GetUserInfo', () => {
     getUserInfo('alice');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_GetUserInfo_ext,
+      Command_GetUserInfo_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Data.Response_GetUserInfo_ext })
+      expect.objectContaining({ responseExt: Response_GetUserInfo_ext })
     );
   });
 
@@ -244,9 +281,9 @@ describe('joinRoom', () => {
   it('sends Command_JoinRoom', () => {
     joinRoom(5);
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_JoinRoom_ext,
+      Command_JoinRoom_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Data.Response_JoinRoom_ext })
+      expect.objectContaining({ responseExt: Response_JoinRoom_ext })
     );
   });
 
@@ -261,7 +298,7 @@ describe('joinRoom', () => {
 describe('listRooms (command)', () => {
   it('sends Command_ListRooms', () => {
     listRooms();
-    expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(Data.Command_ListRooms_ext, expect.any(Object));
+    expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(Command_ListRooms_ext, expect.any(Object));
   });
 });
 
@@ -269,9 +306,9 @@ describe('listUsers', () => {
   it('sends Command_ListUsers', () => {
     listUsers();
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_ListUsers_ext,
+      Command_ListUsers_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Data.Response_ListUsers_ext })
+      expect.objectContaining({ responseExt: Response_ListUsers_ext })
     );
   });
 
@@ -287,7 +324,7 @@ describe('message', () => {
   it('sends Command_Message', () => {
     message('bob', 'hi');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_Message_ext, expect.objectContaining({ userName: 'bob', message: 'hi' })
+      Command_Message_ext, expect.objectContaining({ userName: 'bob', message: 'hi' })
     );
   });
 
@@ -298,7 +335,7 @@ describe('ping', () => {
     const pingReceived = vi.fn();
     ping(pingReceived);
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_Ping_ext, expect.any(Object), expect.any(Object)
+      Command_Ping_ext, expect.any(Object), expect.any(Object)
     );
   });
 
@@ -314,7 +351,7 @@ describe('replayDeleteMatch', () => {
   it('sends Command_ReplayDeleteMatch', () => {
     replayDeleteMatch(7);
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_ReplayDeleteMatch_ext,
+      Command_ReplayDeleteMatch_ext,
       expect.objectContaining({ gameId: 7 }),
       expect.any(Object)
     );
@@ -331,9 +368,9 @@ describe('replayList', () => {
   it('sends Command_ReplayList', () => {
     replayList();
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_ReplayList_ext,
+      Command_ReplayList_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Data.Response_ReplayList_ext })
+      expect.objectContaining({ responseExt: Response_ReplayList_ext })
     );
   });
 
@@ -349,7 +386,7 @@ describe('replayModifyMatch', () => {
   it('sends Command_ReplayModifyMatch', () => {
     replayModifyMatch(7, true);
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_ReplayModifyMatch_ext, expect.objectContaining({ gameId: 7, doNotHide: true }), expect.any(Object)
+      Command_ReplayModifyMatch_ext, expect.objectContaining({ gameId: 7, doNotHide: true }), expect.any(Object)
     );
   });
 
@@ -364,7 +401,7 @@ describe('addToList / addToBuddyList / addToIgnoreList', () => {
   it('addToBuddyList sends Command_AddToList with list=buddy', () => {
     addToBuddyList('alice');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_AddToList_ext,
+      Command_AddToList_ext,
       expect.objectContaining({ list: 'buddy' }),
       expect.any(Object)
     );
@@ -373,7 +410,7 @@ describe('addToList / addToBuddyList / addToIgnoreList', () => {
   it('addToIgnoreList sends Command_AddToList with list=ignore', () => {
     addToIgnoreList('bob');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_AddToList_ext,
+      Command_AddToList_ext,
       expect.objectContaining({ list: 'ignore' }),
       expect.any(Object)
     );
@@ -390,7 +427,7 @@ describe('removeFromList / removeFromBuddyList / removeFromIgnoreList', () => {
   it('removeFromBuddyList sends Command_RemoveFromList with list=buddy', () => {
     removeFromBuddyList('alice');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_RemoveFromList_ext,
+      Command_RemoveFromList_ext,
       expect.objectContaining({ list: 'buddy' }),
       expect.any(Object)
     );
@@ -399,7 +436,7 @@ describe('removeFromList / removeFromBuddyList / removeFromIgnoreList', () => {
   it('removeFromIgnoreList sends Command_RemoveFromList with list=ignore', () => {
     removeFromIgnoreList('bob');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_RemoveFromList_ext,
+      Command_RemoveFromList_ext,
       expect.objectContaining({ list: 'ignore' }),
       expect.any(Object)
     );
@@ -416,9 +453,9 @@ describe('replayGetCode', () => {
   it('sends Command_ReplayGetCode with gameId and responseExt', () => {
     replayGetCode(42, vi.fn());
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_ReplayGetCode_ext,
+      Command_ReplayGetCode_ext,
       expect.any(Object),
-      expect.objectContaining({ responseExt: Data.Response_ReplayGetCode_ext })
+      expect.objectContaining({ responseExt: Response_ReplayGetCode_ext })
     );
   });
 
@@ -434,7 +471,7 @@ describe('replaySubmitCode', () => {
   it('sends Command_ReplaySubmitCode with replayCode', () => {
     replaySubmitCode('42-abc123');
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_ReplaySubmitCode_ext, expect.objectContaining({ replayCode: '42-abc123' }), expect.any(Object)
+      Command_ReplaySubmitCode_ext, expect.objectContaining({ replayCode: '42-abc123' }), expect.any(Object)
     );
   });
 
@@ -457,9 +494,9 @@ describe('deckDownload', () => {
   it('sends Command_DeckDownload', () => {
     deckDownload(42);
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_DeckDownload_ext,
+      Command_DeckDownload_ext,
       expect.objectContaining({ deckId: 42 }),
-      expect.objectContaining({ responseExt: Data.Response_DeckDownload_ext })
+      expect.objectContaining({ responseExt: Response_DeckDownload_ext })
     );
   });
 
@@ -475,9 +512,9 @@ describe('replayDownload', () => {
   it('sends Command_ReplayDownload', () => {
     replayDownload(99);
     expect(WebClient.instance.protobuf.sendSessionCommand).toHaveBeenCalledWith(
-      Data.Command_ReplayDownload_ext,
+      Command_ReplayDownload_ext,
       expect.objectContaining({ replayId: 99 }),
-      expect.objectContaining({ responseExt: Data.Response_ReplayDownload_ext })
+      expect.objectContaining({ responseExt: Response_ReplayDownload_ext })
     );
   });
 

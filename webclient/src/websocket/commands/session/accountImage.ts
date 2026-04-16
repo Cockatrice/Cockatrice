@@ -1,10 +1,10 @@
 import { create } from '@bufbuild/protobuf';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
+import { Command_AccountImage_ext, Command_AccountImageSchema } from '@app/generated';
 
 export function accountImage(image: Uint8Array): void {
-  WebClient.instance.protobuf.sendSessionCommand(Data.Command_AccountImage_ext, create(Data.Command_AccountImageSchema, { image }), {
+  WebClient.instance.protobuf.sendSessionCommand(Command_AccountImage_ext, create(Command_AccountImageSchema, { image }), {
     onSuccess: () => {
       WebClient.instance.response.session.accountImageChanged(image);
     },

@@ -1,6 +1,7 @@
-import type { Data, Enriched } from '@app/types';
+import type { Event_SetCardCounter } from '@app/generated';
+import type { GameEventMeta } from '../../types';
 import { WebClient } from '../../WebClient';
 
-export function setCardCounter(data: Data.Event_SetCardCounter, meta: Enriched.GameEventMeta): void {
+export function setCardCounter(data: Event_SetCardCounter, meta: GameEventMeta): void {
   WebClient.instance.response.game.cardCounterChanged(meta.gameId, meta.playerId, data);
 }

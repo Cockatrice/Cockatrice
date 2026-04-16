@@ -1,14 +1,14 @@
 import { create } from '@bufbuild/protobuf';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
+import { Command_ReplayDownload_ext, Command_ReplayDownloadSchema, Response_ReplayDownload_ext } from '@app/generated';
 
 export function replayDownload(replayId: number): void {
   WebClient.instance.protobuf.sendSessionCommand(
-    Data.Command_ReplayDownload_ext,
-    create(Data.Command_ReplayDownloadSchema, { replayId }),
+    Command_ReplayDownload_ext,
+    create(Command_ReplayDownloadSchema, { replayId }),
     {
-      responseExt: Data.Response_ReplayDownload_ext,
+      responseExt: Response_ReplayDownload_ext,
       onSuccess: (response) => {
         WebClient.instance.response.session.replayDownloaded(replayId, response);
       },

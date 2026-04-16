@@ -1,7 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_LeaveGame_ext, Command_LeaveGameSchema } from '@app/generated';
 import { WebClient } from '../../WebClient';
-import { Data } from '@app/types';
 
 export function leaveGame(gameId: number): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_LeaveGame_ext, create(Data.Command_LeaveGameSchema));
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_LeaveGame_ext, create(Command_LeaveGameSchema));
 }

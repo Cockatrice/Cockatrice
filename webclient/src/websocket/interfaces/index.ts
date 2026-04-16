@@ -8,6 +8,7 @@ export type {
 } from './WebClientResponse';
 
 export type {
+  AuthRequestMap,
   IAuthenticationRequest,
   ISessionRequest,
   IRoomsRequest,

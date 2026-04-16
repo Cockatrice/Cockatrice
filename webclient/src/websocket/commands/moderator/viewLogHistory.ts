@@ -1,11 +1,12 @@
 import { create } from '@bufbuild/protobuf';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
+import { Command_ViewLogHistory_ext, Command_ViewLogHistorySchema, Response_ViewLogHistory_ext } from '@app/generated';
+import type { ViewLogHistoryParams } from '@app/generated';
 
-export function viewLogHistory(filters: Data.ViewLogHistoryParams): void {
-  WebClient.instance.protobuf.sendModeratorCommand(Data.Command_ViewLogHistory_ext, create(Data.Command_ViewLogHistorySchema, filters), {
-    responseExt: Data.Response_ViewLogHistory_ext,
+export function viewLogHistory(filters: ViewLogHistoryParams): void {
+  WebClient.instance.protobuf.sendModeratorCommand(Command_ViewLogHistory_ext, create(Command_ViewLogHistorySchema, filters), {
+    responseExt: Response_ViewLogHistory_ext,
     onSuccess: (response) => {
       WebClient.instance.response.moderator.viewLogs(response.logMessage);
     },

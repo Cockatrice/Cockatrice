@@ -19,9 +19,9 @@ const types = (...types) => types.map((type) => ({ to: { type } }));
 
 const rules = [
   { from: { type: 'generated' }, allow: [] },
-  { from: { type: 'types' }, allow:  types('generated')  },
+  { from: { type: 'types' }, allow:  types('generated', 'websocket')  },
 
-  { from: { type: 'websocket' }, allow: types('types') },
+  { from: { type: 'websocket' }, allow: types('generated') },
   { from: { type: 'store' }, allow: types('types') },
   { from: { type: 'api' }, allow: types('types', 'store', 'websocket') },
 
@@ -35,21 +35,27 @@ const rules = [
   { from: { type: 'forms' }, allow: types('components', 'hooks', 'types', 'services', 'store') },
 ];
 
-export const boundariesConfig = {
-  plugins: { boundaries },
-  settings: {
-    'boundaries/elements': elements,
-    'import/resolver': {
+export const boundariesConfig = [
+  {
+    plugins: { boundaries },
+    settings: {
+      'boundaries/elements': elements,
+      'import/resolver': {
         typescript: {
-            alwaysTryTypes: true,
-            project: './tsconfig.json',
+          alwaysTryTypes: true,
+          project: './tsconfig.json',
         },
+      },
+    },
+    rules: {
+      'boundaries/dependencies': ['error', {
+        default: 'disallow',
+        rules,
+      }],
     },
   },
-  rules: {
-    'boundaries/dependencies': ['error', {
-      default: 'disallow',
-      rules,
-    }],
+  {
+    files: ['**/*.spec.*'],
+    rules: { 'boundaries/dependencies': 'off' },
   },
-};
+];

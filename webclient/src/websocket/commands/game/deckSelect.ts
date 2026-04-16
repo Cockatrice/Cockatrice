@@ -1,8 +1,7 @@
 import { create } from '@bufbuild/protobuf';
+import { Command_DeckSelect_ext, Command_DeckSelectSchema, type DeckSelectParams } from '@app/generated';
 import { WebClient } from '../../WebClient';
 
-import { Data } from '@app/types';
-
-export function deckSelect(gameId: number, params: Data.DeckSelectParams): void {
-  WebClient.instance.protobuf.sendGameCommand(gameId, Data.Command_DeckSelect_ext, create(Data.Command_DeckSelectSchema, params));
+export function deckSelect(gameId: number, params: DeckSelectParams): void {
+  WebClient.instance.protobuf.sendGameCommand(gameId, Command_DeckSelect_ext, create(Command_DeckSelectSchema, params));
 }

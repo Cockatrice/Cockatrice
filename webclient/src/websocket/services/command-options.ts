@@ -1,16 +1,16 @@
 import { getExtension } from '@bufbuild/protobuf';
 import type { GenExtension } from '@bufbuild/protobuf/codegenv2';
-import { Data } from '@app/types';
+import { Response_ResponseCode, type Response } from '@app/generated';
 
 interface CommandOptionsBase {
-  onError?: (responseCode: number, raw: Data.Response) => void;
-  onResponseCode?: { [code: number]: (raw: Data.Response) => void };
-  onResponse?: (raw: Data.Response) => void;
+  onError?: (responseCode: number, raw: Response) => void;
+  onResponseCode?: { [code: number]: (raw: Response) => void };
+  onResponse?: (raw: Response) => void;
 }
 
 export interface CommandOptionsWithResponse<R> extends CommandOptionsBase {
-  responseExt: GenExtension<Data.Response, R>;
-  onSuccess?: (response: R, raw: Data.Response) => void;
+  responseExt: GenExtension<Response, R>;
+  onSuccess?: (response: R, raw: Response) => void;
 }
 
 export interface CommandOptionsWithoutResponse extends CommandOptionsBase {
@@ -24,7 +24,7 @@ export function hasResponseExt<R>(options: CommandOptions<R>): options is Comman
   return options.responseExt !== undefined;
 }
 
-export function handleResponse<R>(typeName: string, raw: Data.Response, options: CommandOptions<R>): void {
+export function handleResponse<R>(typeName: string, raw: Response, options: CommandOptions<R>): void {
   if (options.onResponse) {
     options.onResponse(raw);
     return;
@@ -32,7 +32,7 @@ export function handleResponse<R>(typeName: string, raw: Data.Response, options:
 
   const { responseCode } = raw;
 
-  if (responseCode === Data.Response_ResponseCode.RespOk) {
+  if (responseCode === Response_ResponseCode.RespOk) {
     if (hasResponseExt(options)) {
       options.onSuccess?.(getExtension(raw, options.responseExt), raw);
     } else {

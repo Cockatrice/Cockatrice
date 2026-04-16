@@ -1,6 +1,7 @@
-import type { Data, Enriched } from '@app/types';
+import type { Event_ReverseTurn } from '@app/generated';
+import type { GameEventMeta } from '../../types';
 import { WebClient } from '../../WebClient';
 
-export function reverseTurn(data: Data.Event_ReverseTurn, meta: Enriched.GameEventMeta): void {
+export function reverseTurn(data: Event_ReverseTurn, meta: GameEventMeta): void {
   WebClient.instance.response.game.turnReversed(meta.gameId, data.reversed);
 }

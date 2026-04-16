@@ -14,10 +14,16 @@ import { create } from '@bufbuild/protobuf';
 import { afterEach, beforeEach, vi } from 'vitest';
 
 import { ServerDispatch, RoomsDispatch, GameDispatch } from '@app/store';
-import { App, Data, Enriched } from '@app/types';
-import { WebClient } from '@app/websocket';
+import { Data } from '@app/types';
+import {
+  WebClient,
+  StatusEnum,
+  WebSocketConnectReason,
+  setPendingOptions,
+} from '@app/websocket';
+import type { WebSocketConnectOptions } from '@app/websocket';
 import { PROTOCOL_VERSION } from '../../../src/websocket/config';
-import { createWebClientResponse, createWebClientRequest } from '@app/api';
+import { initWebClient } from '@app/api';
 
 import {
   buildResponse,
@@ -26,6 +32,8 @@ import {
   deliverMessage,
 } from './protobuf-builders';
 import { findLastSessionCommand } from './command-capture';
+
+export { setPendingOptions };
 
 export interface MockWebSocketInstance {
   send: ReturnType<typeof vi.fn>;
@@ -97,8 +105,7 @@ function resetAll(): void {
   }
 
   client.protobuf.resetCommands();
-  client.options = null;
-  client.status = App.StatusEnum.DISCONNECTED;
+  client.status = StatusEnum.DISCONNECTED;
 
   ServerDispatch.clearStore();
   RoomsDispatch.clearStore();
@@ -117,8 +124,8 @@ function resetAll(): void {
 
 // ── Shared connect helpers ──────────────────────────────────────────────────
 
-const DEFAULT_LOGIN_OPTIONS: Enriched.LoginConnectOptions = {
-  reason: App.WebSocketConnectReason.LOGIN,
+const DEFAULT_LOGIN_OPTIONS: WebSocketConnectOptions = {
+  reason: WebSocketConnectReason.LOGIN,
   host: 'localhost',
   port: '4748',
   userName: 'alice',
@@ -126,14 +133,16 @@ const DEFAULT_LOGIN_OPTIONS: Enriched.LoginConnectOptions = {
 };
 
 export function connectRaw(
-  overrides: Partial<Enriched.LoginConnectOptions> = {}
+  overrides: Partial<WebSocketConnectOptions> = {}
 ): void {
-  getWebClient().connect({ ...DEFAULT_LOGIN_OPTIONS, ...overrides });
+  const opts = { ...DEFAULT_LOGIN_OPTIONS, ...overrides };
+  setPendingOptions(opts as WebSocketConnectOptions);
+  getWebClient().connect({ host: opts.host, port: opts.port });
   openMockWebSocket();
 }
 
 export function connectAndHandshake(
-  overrides: Partial<Enriched.LoginConnectOptions> = {}
+  overrides: Partial<WebSocketConnectOptions> = {}
 ): void {
   connectRaw(overrides);
   deliverMessage(buildSessionEventMessage(
@@ -142,6 +151,21 @@ export function connectAndHandshake(
       serverName: 'TestServer',
       serverVersion: '2.8.0',
       protocolVersion: PROTOCOL_VERSION,
+    })
+  ));
+}
+
+export function connectAndHandshakeWithSalt(
+  overrides: Partial<WebSocketConnectOptions> = {}
+): void {
+  connectRaw(overrides);
+  deliverMessage(buildSessionEventMessage(
+    Data.Event_ServerIdentification_ext,
+    create(Data.Event_ServerIdentificationSchema, {
+      serverName: 'TestServer',
+      serverVersion: '2.8.0',
+      protocolVersion: PROTOCOL_VERSION,
+      serverOptions: Data.Event_ServerIdentification_ServerOptions.SupportsPasswordHash,
     })
   ));
 }
@@ -172,7 +196,7 @@ installMockWebSocket();
 
 beforeEach(() => {
   vi.useFakeTimers();
-  new WebClient(createWebClientResponse(), createWebClientRequest());
+  initWebClient();
 });
 
 afterEach(() => {

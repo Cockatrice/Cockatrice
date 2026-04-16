@@ -1,11 +1,31 @@
 import { create, fromBinary, hasExtension, getExtension, setExtension, toBinary } from '@bufbuild/protobuf';
 import type { GenExtension } from '@bufbuild/protobuf/codegenv2';
 
+import {
+  CommandContainerSchema,
+  GameCommandSchema,
+  SessionCommandSchema,
+  RoomCommandSchema,
+  ModeratorCommandSchema,
+  AdminCommandSchema,
+  ServerMessageSchema,
+  ServerMessage_MessageType,
+  type Response,
+  type CommandContainer,
+  type GameCommand,
+  type SessionCommand,
+  type RoomCommand,
+  type ModeratorCommand,
+  type AdminCommand,
+  type ServerMessage,
+  type GameEventContainer,
+  type SessionEvent,
+  type RoomEvent,
+  type RegistryEntry,
+  type GameEvent,
+} from '@app/generated';
 
-import { GameEvents, RoomEvents, SessionEvents } from '../events';
-import { Data, Enriched } from '@app/types';
-
-
+import type { GameEventMeta } from '../types';
 import { type CommandOptions, handleResponse } from './command-options';
 
 export interface SocketTransport {
@@ -13,14 +33,22 @@ export interface SocketTransport {
   isOpen(): boolean;
 }
 
+export interface EventRegistries {
+  sessionEvents: RegistryEntry<unknown, SessionEvent>[];
+  roomEvents: RegistryEntry<unknown, RoomEvent, RoomEvent>[];
+  gameEvents: RegistryEntry<unknown, GameEvent, GameEventMeta>[];
+}
+
 export class ProtobufService {
   private cmdId = 0;
-  private pendingCommands = new Map<number, (response: Data.Response) => void>();
+  private pendingCommands = new Map<number, (response: Response) => void>();
 
   private transport: SocketTransport;
+  private events: EventRegistries;
 
-  constructor(transport: SocketTransport) {
+  constructor(transport: SocketTransport, events: EventRegistries) {
     this.transport = transport;
+    this.events = events;
   }
 
   public resetCommands() {
@@ -30,13 +58,13 @@ export class ProtobufService {
 
   public sendGameCommand<V, R = unknown>(
     gameId: number,
-    ext: GenExtension<Data.GameCommand, V>,
+    ext: GenExtension<GameCommand, V>,
     value: V,
     options?: CommandOptions<R>
   ): void {
-    const gameCmd = create(Data.GameCommandSchema);
+    const gameCmd = create(GameCommandSchema);
     setExtension(gameCmd, ext, value);
-    const cmd = create(Data.CommandContainerSchema, { gameId, gameCommand: [gameCmd] });
+    const cmd = create(CommandContainerSchema, { gameId, gameCommand: [gameCmd] });
     this.sendCommand(cmd, raw => {
       if (options) {
         handleResponse(ext.typeName, raw, options);
@@ -46,13 +74,13 @@ export class ProtobufService {
 
   public sendRoomCommand<V, R = unknown>(
     roomId: number,
-    ext: GenExtension<Data.RoomCommand, V>,
+    ext: GenExtension<RoomCommand, V>,
     value: V,
     options?: CommandOptions<R>
   ): void {
-    const roomCmd = create(Data.RoomCommandSchema);
+    const roomCmd = create(RoomCommandSchema);
     setExtension(roomCmd, ext, value);
-    const cmd = create(Data.CommandContainerSchema, { roomId, roomCommand: [roomCmd] });
+    const cmd = create(CommandContainerSchema, { roomId, roomCommand: [roomCmd] });
     this.sendCommand(cmd, raw => {
       if (options) {
         handleResponse(ext.typeName, raw, options);
@@ -61,13 +89,13 @@ export class ProtobufService {
   }
 
   public sendSessionCommand<V, R = unknown>(
-    ext: GenExtension<Data.SessionCommand, V>,
+    ext: GenExtension<SessionCommand, V>,
     value: V,
     options?: CommandOptions<R>
   ): void {
-    const sesCmd = create(Data.SessionCommandSchema);
+    const sesCmd = create(SessionCommandSchema);
     setExtension(sesCmd, ext, value);
-    const cmd = create(Data.CommandContainerSchema, { sessionCommand: [sesCmd] });
+    const cmd = create(CommandContainerSchema, { sessionCommand: [sesCmd] });
     this.sendCommand(cmd, raw => {
       if (options) {
         handleResponse(ext.typeName, raw, options);
@@ -76,13 +104,13 @@ export class ProtobufService {
   }
 
   public sendModeratorCommand<V, R = unknown>(
-    ext: GenExtension<Data.ModeratorCommand, V>,
+    ext: GenExtension<ModeratorCommand, V>,
     value: V,
     options?: CommandOptions<R>
   ): void {
-    const modCmd = create(Data.ModeratorCommandSchema);
+    const modCmd = create(ModeratorCommandSchema);
     setExtension(modCmd, ext, value);
-    const cmd = create(Data.CommandContainerSchema, { moderatorCommand: [modCmd] });
+    const cmd = create(CommandContainerSchema, { moderatorCommand: [modCmd] });
     this.sendCommand(cmd, raw => {
       if (options) {
         handleResponse(ext.typeName, raw, options);
@@ -91,13 +119,13 @@ export class ProtobufService {
   }
 
   public sendAdminCommand<V, R = unknown>(
-    ext: GenExtension<Data.AdminCommand, V>,
+    ext: GenExtension<AdminCommand, V>,
     value: V,
     options?: CommandOptions<R>
   ): void {
-    const adminCmd = create(Data.AdminCommandSchema);
+    const adminCmd = create(AdminCommandSchema);
     setExtension(adminCmd, ext, value);
-    const cmd = create(Data.CommandContainerSchema, { adminCommand: [adminCmd] });
+    const cmd = create(CommandContainerSchema, { adminCommand: [adminCmd] });
     this.sendCommand(cmd, raw => {
       if (options) {
         handleResponse(ext.typeName, raw, options);
@@ -105,7 +133,7 @@ export class ProtobufService {
     });
   }
 
-  public sendCommand(cmd: Data.CommandContainer, callback: (raw: Data.Response) => void) {
+  public sendCommand(cmd: CommandContainer, callback: (raw: Response) => void) {
     if (!this.transport.isOpen()) {
       return;
     }
@@ -113,26 +141,26 @@ export class ProtobufService {
     this.cmdId++;
     cmd.cmdId = BigInt(this.cmdId);
     this.pendingCommands.set(this.cmdId, callback);
-    this.transport.send(toBinary(Data.CommandContainerSchema, cmd));
+    this.transport.send(toBinary(CommandContainerSchema, cmd));
   }
 
   public handleMessageEvent({ data }: MessageEvent): void {
     try {
       const uint8msg = new Uint8Array(data);
-      const msg: Data.ServerMessage = fromBinary(Data.ServerMessageSchema, uint8msg);
+      const msg: ServerMessage = fromBinary(ServerMessageSchema, uint8msg);
 
       if (msg) {
         switch (msg.messageType) {
-          case Data.ServerMessage_MessageType.RESPONSE:
+          case ServerMessage_MessageType.RESPONSE:
             this.processServerResponse(msg.response);
             break;
-          case Data.ServerMessage_MessageType.ROOM_EVENT:
+          case ServerMessage_MessageType.ROOM_EVENT:
             this.processRoomEvent(msg.roomEvent);
             break;
-          case Data.ServerMessage_MessageType.SESSION_EVENT:
+          case ServerMessage_MessageType.SESSION_EVENT:
             this.processSessionEvent(msg.sessionEvent);
             break;
-          case Data.ServerMessage_MessageType.GAME_EVENT_CONTAINER:
+          case ServerMessage_MessageType.GAME_EVENT_CONTAINER:
             this.processGameEvent(msg.gameEventContainer);
             break;
           default:
@@ -145,7 +173,7 @@ export class ProtobufService {
     }
   }
 
-  private processServerResponse(response: Data.Response | undefined) {
+  private processServerResponse(response: Response | undefined) {
     if (!response) {
       return;
     }
@@ -157,11 +185,11 @@ export class ProtobufService {
     }
   }
 
-  private processRoomEvent(event: Data.RoomEvent | undefined) {
+  private processRoomEvent(event: RoomEvent | undefined) {
     if (!event) {
       return;
     }
-    for (const [ext, handler] of RoomEvents) {
+    for (const [ext, handler] of this.events.roomEvents) {
       if (hasExtension(event, ext)) {
         handler(getExtension(event, ext), event);
         return;
@@ -169,11 +197,11 @@ export class ProtobufService {
     }
   }
 
-  private processSessionEvent(event: Data.SessionEvent | undefined) {
+  private processSessionEvent(event: SessionEvent | undefined) {
     if (!event) {
       return;
     }
-    for (const [ext, handler] of SessionEvents) {
+    for (const [ext, handler] of this.events.sessionEvents) {
       if (hasExtension(event, ext)) {
         handler(getExtension(event, ext), undefined);
         return;
@@ -181,7 +209,7 @@ export class ProtobufService {
     }
   }
 
-  private processGameEvent(container: Data.GameEventContainer | undefined): void {
+  private processGameEvent(container: GameEventContainer | undefined): void {
     if (!container?.eventList?.length) {
       return;
     }
@@ -189,7 +217,7 @@ export class ProtobufService {
     const { gameId, context, secondsElapsed, forcedByJudge } = container;
 
     for (const event of container.eventList) {
-      const meta: Enriched.GameEventMeta = {
+      const meta: GameEventMeta = {
         gameId: gameId ?? -1,
         playerId: event.playerId ?? -1,
         context,
@@ -197,7 +225,7 @@ export class ProtobufService {
         forcedByJudge: forcedByJudge ?? 0,
       };
 
-      for (const [ext, handler] of GameEvents) {
+      for (const [ext, handler] of this.events.gameEvents) {
         if (hasExtension(event, ext)) {
           handler(getExtension(event, ext), meta);
           break;
@@ -207,4 +235,3 @@ export class ProtobufService {
   }
 
 }
-

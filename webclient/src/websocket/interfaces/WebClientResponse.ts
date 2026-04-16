@@ -1,28 +1,79 @@
-import { App, Data, Enriched } from '@app/types';
+import type {
+  Response_Login,
+  Response,
+  Response_GetGamesOfUser,
+  Response_DeckList,
+  Response_DeckDownload,
+  Response_ReplayDownload,
+  Response_WarnList,
+  ResponseMap,
+  Event_RoomSay,
+  Event_GameJoined,
+  Event_GameStateChanged,
+  Event_MoveCard,
+  Event_FlipCard,
+  Event_DestroyCard,
+  Event_AttachCard,
+  Event_CreateToken,
+  Event_SetCardAttr,
+  Event_SetCardCounter,
+  Event_CreateArrow,
+  Event_DeleteArrow,
+  Event_CreateCounter,
+  Event_SetCounter,
+  Event_DelCounter,
+  Event_DrawCards,
+  Event_RevealCards,
+  Event_Shuffle,
+  Event_RollDie,
+  Event_DumpZone,
+  Event_ChangeZoneProperties,
+  Event_NotifyUser,
+  Event_PlayerPropertiesChanged,
+  Event_ServerShutdown,
+  Event_UserMessage,
+  RoomEventMap,
+  ServerInfo_User,
+  ServerInfo_Room,
+  ServerInfo_Game,
+  ServerInfo_PlayerProperties,
+  ServerInfo_Ban,
+  ServerInfo_ChatMessage,
+  ServerInfo_Warning,
+  ServerInfo_DeckStorage_TreeItem,
+  ServerInfo_ReplayMatch,
+} from '@app/generated';
 
-export interface ISessionResponse {
+import type { StatusEnum } from '../StatusEnum';
+import type {
+  KeyOf,
+  WebSocketSessionResponseOverrides,
+  WebSocketRoomResponseOverrides,
+} from '../types';
+
+export interface ISessionResponse<T extends ResponseMap = WebSocketSessionResponseOverrides> {
   initialized(): void;
   connectionAttempted(): void;
   clearStore(): void;
-  loginSuccessful(options: Enriched.LoginSuccessContext): void;
+  loginSuccessful(result: T[KeyOf<ResponseMap, Response_Login>]): void;
   loginFailed(): void;
   connectionFailed(): void;
   testConnectionSuccessful(): void;
   testConnectionFailed(): void;
-  updateBuddyList(buddyList: Data.ServerInfo_User[]): void;
-  addToBuddyList(user: Data.ServerInfo_User): void;
+  updateBuddyList(buddyList: ServerInfo_User[]): void;
+  addToBuddyList(user: ServerInfo_User): void;
   removeFromBuddyList(userName: string): void;
-  updateIgnoreList(ignoreList: Data.ServerInfo_User[]): void;
-  addToIgnoreList(user: Data.ServerInfo_User): void;
+  updateIgnoreList(ignoreList: ServerInfo_User[]): void;
+  addToIgnoreList(user: ServerInfo_User): void;
   removeFromIgnoreList(userName: string): void;
   updateInfo(name: string, version: string): void;
-  updateStatus(state: App.StatusEnum, description: string): void;
-  updateUser(user: Data.ServerInfo_User): void;
-  updateUsers(users: Data.ServerInfo_User[]): void;
-  userJoined(user: Data.ServerInfo_User): void;
+  updateStatus(state: StatusEnum, description: string): void;
+  updateUser(user: ServerInfo_User): void;
+  updateUsers(users: ServerInfo_User[]): void;
+  userJoined(user: ServerInfo_User): void;
   userLeft(userName: string): void;
   serverMessage(message: string): void;
-  accountAwaitingActivation(options: Enriched.PendingActivationContext): void;
+  accountAwaitingActivation(result: T[KeyOf<ResponseMap, Response>]): void;
   accountActivationSuccess(): void;
   accountActivationFailed(): void;
   registrationRequiresEmail(): void;
@@ -38,36 +89,36 @@ export interface ISessionResponse {
   accountPasswordChange(): void;
   accountEditChanged(realName?: string, email?: string, country?: string): void;
   accountImageChanged(avatarBmp: Uint8Array): void;
-  getUserInfo(userInfo: Data.ServerInfo_User): void;
-  getGamesOfUser(userName: string, response: Data.Response_GetGamesOfUser): void;
-  gameJoined(gameJoinedData: Data.Event_GameJoined): void;
-  notifyUser(notification: Data.Event_NotifyUser): void;
-  playerPropertiesChanged(gameId: number, playerId: number, payload: Data.Event_PlayerPropertiesChanged): void;
-  serverShutdown(data: Data.Event_ServerShutdown): void;
-  userMessage(messageData: Data.Event_UserMessage): void;
+  getUserInfo(userInfo: ServerInfo_User): void;
+  getGamesOfUser(userName: string, response: Response_GetGamesOfUser): void;
+  gameJoined(gameJoinedData: Event_GameJoined): void;
+  notifyUser(notification: Event_NotifyUser): void;
+  playerPropertiesChanged(gameId: number, playerId: number, payload: Event_PlayerPropertiesChanged): void;
+  serverShutdown(data: Event_ServerShutdown): void;
+  userMessage(messageData: Event_UserMessage): void;
   addToList(list: string, userName: string): void;
   removeFromList(list: string, userName: string): void;
   deleteServerDeck(deckId: number): void;
-  updateServerDecks(deckList: Data.Response_DeckList): void;
-  uploadServerDeck(path: string, treeItem: Data.ServerInfo_DeckStorage_TreeItem): void;
-  downloadServerDeck(deckId: number, response: Data.Response_DeckDownload): void;
+  updateServerDecks(deckList: Response_DeckList): void;
+  uploadServerDeck(path: string, treeItem: ServerInfo_DeckStorage_TreeItem): void;
+  downloadServerDeck(deckId: number, response: Response_DeckDownload): void;
   createServerDeckDir(path: string, dirName: string): void;
   deleteServerDeckDir(path: string): void;
-  replayList(matchList: Data.ServerInfo_ReplayMatch[]): void;
-  replayAdded(matchInfo: Data.ServerInfo_ReplayMatch): void;
+  replayList(matchList: ServerInfo_ReplayMatch[]): void;
+  replayAdded(matchInfo: ServerInfo_ReplayMatch): void;
   replayModifyMatch(gameId: number, doNotHide: boolean): void;
   replayDeleteMatch(gameId: number): void;
-  replayDownloaded(replayId: number, response: Data.Response_ReplayDownload): void;
+  replayDownloaded(replayId: number, response: Response_ReplayDownload): void;
 }
 
-export interface IRoomResponse {
+export interface IRoomResponse<T extends RoomEventMap = WebSocketRoomResponseOverrides> {
   clearStore(): void;
-  joinRoom(roomInfo: Data.ServerInfo_Room): void;
+  joinRoom(roomInfo: ServerInfo_Room): void;
   leaveRoom(roomId: number): void;
-  updateRooms(rooms: Data.ServerInfo_Room[]): void;
-  updateGames(roomId: number, gameList: Data.ServerInfo_Game[]): void;
-  addMessage(roomId: number, message: Enriched.Message): void;
-  userJoined(roomId: number, user: Data.ServerInfo_User): void;
+  updateRooms(rooms: ServerInfo_Room[]): void;
+  updateGames(roomId: number, gameList: ServerInfo_Game[]): void;
+  addMessage(roomId: number, message: T[KeyOf<RoomEventMap, Event_RoomSay>]): void;
+  userJoined(roomId: number, user: ServerInfo_User): void;
   userLeft(roomId: number, name: string): void;
   removeMessages(roomId: number, name: string, amount: number): void;
   gameCreated(roomId: number): void;
@@ -76,35 +127,35 @@ export interface IRoomResponse {
 
 export interface IGameResponse {
   clearStore(): void;
-  gameStateChanged(gameId: number, data: Data.Event_GameStateChanged): void;
-  playerJoined(gameId: number, playerProperties: Data.ServerInfo_PlayerProperties): void;
+  gameStateChanged(gameId: number, data: Event_GameStateChanged): void;
+  playerJoined(gameId: number, playerProperties: ServerInfo_PlayerProperties): void;
   playerLeft(gameId: number, playerId: number, reason: number): void;
-  playerPropertiesChanged(gameId: number, playerId: number, properties: Data.ServerInfo_PlayerProperties): void;
+  playerPropertiesChanged(gameId: number, playerId: number, properties: ServerInfo_PlayerProperties): void;
   gameClosed(gameId: number): void;
   gameHostChanged(gameId: number, hostId: number): void;
   kicked(gameId: number): void;
   gameSay(gameId: number, playerId: number, message: string): void;
-  cardMoved(gameId: number, playerId: number, data: Data.Event_MoveCard): void;
-  cardFlipped(gameId: number, playerId: number, data: Data.Event_FlipCard): void;
-  cardDestroyed(gameId: number, playerId: number, data: Data.Event_DestroyCard): void;
-  cardAttached(gameId: number, playerId: number, data: Data.Event_AttachCard): void;
-  tokenCreated(gameId: number, playerId: number, data: Data.Event_CreateToken): void;
-  cardAttrChanged(gameId: number, playerId: number, data: Data.Event_SetCardAttr): void;
-  cardCounterChanged(gameId: number, playerId: number, data: Data.Event_SetCardCounter): void;
-  arrowCreated(gameId: number, playerId: number, data: Data.Event_CreateArrow): void;
-  arrowDeleted(gameId: number, playerId: number, data: Data.Event_DeleteArrow): void;
-  counterCreated(gameId: number, playerId: number, data: Data.Event_CreateCounter): void;
-  counterSet(gameId: number, playerId: number, data: Data.Event_SetCounter): void;
-  counterDeleted(gameId: number, playerId: number, data: Data.Event_DelCounter): void;
-  cardsDrawn(gameId: number, playerId: number, data: Data.Event_DrawCards): void;
-  cardsRevealed(gameId: number, playerId: number, data: Data.Event_RevealCards): void;
-  zoneShuffled(gameId: number, playerId: number, data: Data.Event_Shuffle): void;
-  dieRolled(gameId: number, playerId: number, data: Data.Event_RollDie): void;
+  cardMoved(gameId: number, playerId: number, data: Event_MoveCard): void;
+  cardFlipped(gameId: number, playerId: number, data: Event_FlipCard): void;
+  cardDestroyed(gameId: number, playerId: number, data: Event_DestroyCard): void;
+  cardAttached(gameId: number, playerId: number, data: Event_AttachCard): void;
+  tokenCreated(gameId: number, playerId: number, data: Event_CreateToken): void;
+  cardAttrChanged(gameId: number, playerId: number, data: Event_SetCardAttr): void;
+  cardCounterChanged(gameId: number, playerId: number, data: Event_SetCardCounter): void;
+  arrowCreated(gameId: number, playerId: number, data: Event_CreateArrow): void;
+  arrowDeleted(gameId: number, playerId: number, data: Event_DeleteArrow): void;
+  counterCreated(gameId: number, playerId: number, data: Event_CreateCounter): void;
+  counterSet(gameId: number, playerId: number, data: Event_SetCounter): void;
+  counterDeleted(gameId: number, playerId: number, data: Event_DelCounter): void;
+  cardsDrawn(gameId: number, playerId: number, data: Event_DrawCards): void;
+  cardsRevealed(gameId: number, playerId: number, data: Event_RevealCards): void;
+  zoneShuffled(gameId: number, playerId: number, data: Event_Shuffle): void;
+  dieRolled(gameId: number, playerId: number, data: Event_RollDie): void;
   activePlayerSet(gameId: number, activePlayerId: number): void;
   activePhaseSet(gameId: number, phase: number): void;
   turnReversed(gameId: number, reversed: boolean): void;
-  zoneDumped(gameId: number, playerId: number, data: Data.Event_DumpZone): void;
-  zonePropertiesChanged(gameId: number, playerId: number, data: Data.Event_ChangeZoneProperties): void;
+  zoneDumped(gameId: number, playerId: number, data: Event_DumpZone): void;
+  zonePropertiesChanged(gameId: number, playerId: number, data: Event_ChangeZoneProperties): void;
 }
 
 export interface IAdminResponse {
@@ -116,10 +167,10 @@ export interface IAdminResponse {
 
 export interface IModeratorResponse {
   banFromServer(userName: string): void;
-  banHistory(userName: string, banHistory: Data.ServerInfo_Ban[]): void;
-  viewLogs(logs: Data.ServerInfo_ChatMessage[]): void;
-  warnHistory(userName: string, warnHistory: Data.ServerInfo_Warning[]): void;
-  warnListOptions(warnList: Data.Response_WarnList[]): void;
+  banHistory(userName: string, banHistory: ServerInfo_Ban[]): void;
+  viewLogs(logs: ServerInfo_ChatMessage[]): void;
+  warnHistory(userName: string, warnHistory: ServerInfo_Warning[]): void;
+  warnListOptions(warnList: Response_WarnList[]): void;
   warnUser(userName: string): void;
   grantReplayAccess(replayId: number, moderatorName: string): void;
   forceActivateUser(usernameToActivate: string, moderatorName: string): void;
@@ -127,9 +178,12 @@ export interface IModeratorResponse {
   updateAdminNotes(userName: string, notes: string): void;
 }
 
-export interface IWebClientResponse {
-  session: ISessionResponse;
-  room: IRoomResponse;
+export interface IWebClientResponse<
+  S extends ResponseMap = WebSocketSessionResponseOverrides,
+  R extends RoomEventMap = WebSocketRoomResponseOverrides,
+> {
+  session: ISessionResponse<S>;
+  room: IRoomResponse<R>;
   game: IGameResponse;
   admin: IAdminResponse;
   moderator: IModeratorResponse;
