@@ -1,16 +1,6 @@
-vi.mock('../../WebClient', () => ({
-  WebClient: {
-    instance: {
-      protobuf: { sendGameCommand: vi.fn() },
-      response: { game: {} },
-    },
-  },
-}));
+vi.mock('../../WebClient');
 
 import { WebClient } from '../../WebClient';
-import { useWebClientCleanup } from '../../__mocks__/helpers';
-
-useWebClientCleanup();
 import { create, setExtension } from '@bufbuild/protobuf';
 import {
   Command_AttachCard_ext,

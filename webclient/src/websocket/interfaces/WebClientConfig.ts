@@ -3,11 +3,10 @@ import type {
   SessionEvent,
   RoomEvent,
   GameEvent,
-  Event_ServerIdentification,
 } from '@app/generated';
 
-import type { GameEventMeta } from './types';
-import type { IWebClientResponse } from './interfaces';
+import type { GameEventMeta } from './WebSocketConfig';
+import type { IWebClientResponse } from '.';
 
 export interface ConnectTarget {
   host: string;
@@ -16,8 +15,6 @@ export interface ConnectTarget {
 
 export interface WebClientConfig {
   response: IWebClientResponse;
-
-  onServerIdentified(info: Event_ServerIdentification): void;
 
   sessionEvents: RegistryEntry<unknown, SessionEvent>[];
   roomEvents: RegistryEntry<unknown, RoomEvent, RoomEvent>[];

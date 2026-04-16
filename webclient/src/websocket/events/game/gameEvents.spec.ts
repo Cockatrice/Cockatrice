@@ -1,44 +1,4 @@
-vi.mock('../../WebClient', () => ({
-  WebClient: {
-    instance: {
-      response: {
-        game: {
-          gameStateChanged: vi.fn(),
-          playerJoined: vi.fn(),
-          playerLeft: vi.fn(),
-          playerPropertiesChanged: vi.fn(),
-          gameClosed: vi.fn(),
-          gameHostChanged: vi.fn(),
-          kicked: vi.fn(),
-          gameSay: vi.fn(),
-          cardMoved: vi.fn(),
-          cardFlipped: vi.fn(),
-          cardDestroyed: vi.fn(),
-          cardAttached: vi.fn(),
-          tokenCreated: vi.fn(),
-          cardAttrChanged: vi.fn(),
-          cardCounterChanged: vi.fn(),
-          arrowCreated: vi.fn(),
-          arrowDeleted: vi.fn(),
-          counterCreated: vi.fn(),
-          counterSet: vi.fn(),
-          counterDeleted: vi.fn(),
-          cardsDrawn: vi.fn(),
-          cardsRevealed: vi.fn(),
-          zoneShuffled: vi.fn(),
-          dieRolled: vi.fn(),
-          activePlayerSet: vi.fn(),
-          activePhaseSet: vi.fn(),
-          turnReversed: vi.fn(),
-          zoneDumped: vi.fn(),
-          zonePropertiesChanged: vi.fn(),
-        },
-      },
-    },
-  },
-}));
-
-import { useWebClientCleanup } from '../../__mocks__/helpers';
+vi.mock('../../WebClient');
 import { create } from '@bufbuild/protobuf';
 import {
   Event_AttachCardSchema,
@@ -67,7 +27,6 @@ import {
   ServerInfo_PlayerPropertiesSchema,
 } from '@app/generated';
 import { WebClient } from '../../WebClient';
-
 import { attachCard } from './attachCard';
 import { changeZoneProperties } from './changeZoneProperties';
 import { createArrow } from './createArrow';
@@ -97,8 +56,6 @@ import { setCardAttr } from './setCardAttr';
 import { setCardCounter } from './setCardCounter';
 import { setCounter } from './setCounter';
 import { shuffle } from './shuffle';
-
-useWebClientCleanup();
 
 const meta = { gameId: 5, playerId: 2, context: null, secondsElapsed: 0, forcedByJudge: 0 };
 

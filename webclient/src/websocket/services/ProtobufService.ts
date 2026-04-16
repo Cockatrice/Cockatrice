@@ -25,7 +25,7 @@ import {
   type GameEvent,
 } from '@app/generated';
 
-import type { GameEventMeta } from '../types';
+import type { GameEventMeta } from '../interfaces/WebSocketConfig';
 import { type CommandOptions, handleResponse } from './command-options';
 
 export interface SocketTransport {

@@ -1,5 +1,5 @@
 import type { Event_SetCardAttr } from '@app/generated';
-import type { GameEventMeta } from '../../types';
+import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function setCardAttr(data: Event_SetCardAttr, meta: GameEventMeta): void {

@@ -1,3 +1,5 @@
+export const PROTOCOL_VERSION = 14;
+
 export const CLIENT_CONFIG = {
   clientid: 'webatrice',
   clientver: 'webclient-1.0 (2019-10-31)',

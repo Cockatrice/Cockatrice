@@ -44,12 +44,12 @@ import type {
   ServerInfo_ReplayMatch,
 } from '@app/generated';
 
-import type { StatusEnum } from '../StatusEnum';
+import type { StatusEnum } from './StatusEnum';
 import type {
   KeyOf,
   WebSocketSessionResponseOverrides,
   WebSocketRoomResponseOverrides,
-} from '../types';
+} from './WebSocketConfig';
 
 export interface ISessionResponse<T extends ResponseMap = WebSocketSessionResponseOverrides> {
   initialized(): void;

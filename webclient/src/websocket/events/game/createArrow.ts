@@ -1,5 +1,5 @@
 import type { Event_CreateArrow } from '@app/generated';
-import type { GameEventMeta } from '../../types';
+import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function createArrow(data: Event_CreateArrow, meta: GameEventMeta): void {

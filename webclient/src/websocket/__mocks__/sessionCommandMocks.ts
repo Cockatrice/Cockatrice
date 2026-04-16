@@ -16,7 +16,7 @@ export function makeWebClientMock() {
     testConnect: vi.fn(),
     disconnect: vi.fn(),
     updateStatus: vi.fn(),
-    config: { onServerIdentified: vi.fn() },
+    config: {},
     status: 0,
     protobuf: {
       sendSessionCommand: vi.fn(),

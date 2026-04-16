@@ -1,20 +1,5 @@
-vi.mock('../../WebClient', () => ({
-  WebClient: {
-    instance: {
-      response: {
-        room: {
-          userJoined: vi.fn(),
-          userLeft: vi.fn(),
-          updateGames: vi.fn(),
-          removeMessages: vi.fn(),
-          addMessage: vi.fn(),
-        },
-      },
-    },
-  },
-}));
+vi.mock('../../WebClient');
 
-import { useWebClientCleanup } from '../../__mocks__/helpers';
 import { create } from '@bufbuild/protobuf';
 import {
   Event_JoinRoomSchema,
@@ -30,8 +15,6 @@ import { leaveRoom } from './leaveRoom';
 import { listGames } from './listGames';
 import { removeMessages } from './removeMessages';
 import { roomSay } from './roomSay';
-
-useWebClientCleanup();
 
 const makeRoomEvent = (roomId: number) => create(RoomEventSchema, { roomId });
 

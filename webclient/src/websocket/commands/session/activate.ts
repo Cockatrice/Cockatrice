@@ -6,10 +6,10 @@ import {
   type ActivateParams,
 } from '@app/generated';
 
-import { StatusEnum } from '../../StatusEnum';
+import { StatusEnum } from '../../interfaces/StatusEnum';
 import { CLIENT_CONFIG } from '../../config';
 import { WebClient } from '../../WebClient';
-import type { ConnectTarget } from '../../WebClientConfig';
+import type { ConnectTarget } from '../../interfaces/WebClientConfig';
 import { disconnect, login, updateStatus } from './';
 
 export function activate(options: ConnectTarget & ActivateParams, password?: string, passwordSalt?: string): void {

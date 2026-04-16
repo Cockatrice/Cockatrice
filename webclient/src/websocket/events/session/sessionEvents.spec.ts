@@ -1,51 +1,36 @@
 // Tests for simple session events that delegate 1:1 to SessionPersistence
 // or RoomPersistence with minimal logic.
 
-vi.mock('../../WebClient', () => ({
-  WebClient: {
-    instance: {
-      config: { onServerIdentified: vi.fn() },
-      response: {
-        session: {
-          gameJoined: vi.fn(),
-          notifyUser: vi.fn(),
-          replayAdded: vi.fn(),
-          serverMessage: vi.fn(),
-          serverShutdown: vi.fn(),
-          updateUsers: vi.fn(),
-          updateInfo: vi.fn(),
-          userJoined: vi.fn(),
-          userLeft: vi.fn(),
-          userMessage: vi.fn(),
-          addToBuddyList: vi.fn(),
-          addToIgnoreList: vi.fn(),
-          removeFromBuddyList: vi.fn(),
-          removeFromIgnoreList: vi.fn(),
-          playerPropertiesChanged: vi.fn(),
-        },
-        room: {
-          updateRooms: vi.fn(),
-        },
-      },
-    },
-  },
-}));
+vi.mock('../../WebClient');
 
 vi.mock('../../config', () => ({
   CLIENT_OPTIONS: { autojoinrooms: false },
+  PROTOCOL_VERSION: 14,
 }));
 
 vi.mock('../../commands/session', () => ({
   joinRoom: vi.fn(),
   updateStatus: vi.fn(),
   disconnect: vi.fn(),
+  login: vi.fn(),
+  register: vi.fn(),
+  activate: vi.fn(),
+  forgotPasswordRequest: vi.fn(),
+  forgotPasswordChallenge: vi.fn(),
+  forgotPasswordReset: vi.fn(),
+  requestPasswordSalt: vi.fn(),
 }));
 
 vi.mock('../../utils', () => ({
   sanitizeHtml: vi.fn((msg: string) => msg),
+  generateSalt: vi.fn().mockReturnValue('randSalt'),
+  passwordSaltSupported: vi.fn().mockReturnValue(0),
 }));
 
-import { useWebClientCleanup } from '../../__mocks__/helpers';
+vi.mock('../../utils/connectionState', () => ({
+  consumePendingOptions: vi.fn().mockReturnValue(null),
+}));
+
 import {
   Event_AddToListSchema,
   Event_ConnectionClosedSchema,
@@ -71,6 +56,11 @@ import { create } from '@bufbuild/protobuf';
 import { WebClient } from '../../WebClient';
 import * as Config from '../../config';
 import * as SessionCmds from '../../commands/session';
+import { consumePendingOptions } from '../../utils/connectionState';
+import { passwordSaltSupported } from '../../utils';
+import { WebSocketConnectReason } from '../../interfaces/ConnectOptions';
+import { StatusEnum } from '../../interfaces/StatusEnum';
+import { Mock } from 'vitest';
 import { gameJoined } from './gameJoined';
 import { notifyUser } from './notifyUser';
 import { replayAdded } from './replayAdded';
@@ -85,8 +75,6 @@ import { removeFromList } from './removeFromList';
 import { listRooms } from './listRooms';
 import { connectionClosed } from './connectionClosed';
 import { serverIdentification } from './serverIdentification';
-
-useWebClientCleanup();
 
 const ConfigMock = Config as { -readonly [K in keyof typeof Config]: (typeof Config)[K] };
 
@@ -387,11 +375,149 @@ describe('connectionClosed', () => {
 // serverIdentification
 // ----------------------------------------------------------------
 describe('serverIdentification', () => {
+  const makeInfo = (overrides: Record<string, unknown> = {}) =>
+    create(Event_ServerIdentificationSchema, {
+      serverName: 'TestServer',
+      serverVersion: '1.0',
+      protocolVersion: 14,
+      serverOptions: 0,
+      ...overrides,
+    });
 
-  it('calls config.onServerIdentified with the event info', () => {
-    const info = create(Event_ServerIdentificationSchema,
-      { serverName: 's', serverVersion: '1', protocolVersion: 14, serverOptions: 0 });
-    serverIdentification(info);
-    expect(WebClient.instance.config.onServerIdentified).toHaveBeenCalledWith(info);
+  const makeLoginOptions = () => ({
+    host: 'h', port: '1', userName: 'alice', password: 'pw',
+    reason: WebSocketConnectReason.LOGIN as const,
+  });
+
+  beforeEach(() => {
+    (consumePendingOptions as Mock).mockReturnValue(null);
+    (passwordSaltSupported as Mock).mockReturnValue(0);
+  });
+
+  it('disconnects on protocol version mismatch', () => {
+    serverIdentification(makeInfo({ protocolVersion: 99 }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, expect.stringContaining('Protocol version mismatch'));
+    expect(SessionCmds.disconnect).toHaveBeenCalled();
+    expect(WebClient.instance.response.session.updateInfo).not.toHaveBeenCalled();
+  });
+
+  it('disconnects when pending options are missing', () => {
+    serverIdentification(makeInfo());
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Missing connection options');
+    expect(SessionCmds.disconnect).toHaveBeenCalled();
+    expect(WebClient.instance.response.session.updateInfo).not.toHaveBeenCalled();
+  });
+
+  it('LOGIN → calls login without salt when server does not support it', () => {
+    const opts = makeLoginOptions();
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGING_IN, 'Logging In...');
+    expect(SessionCmds.login).toHaveBeenCalledWith(expect.objectContaining({ userName: 'alice' }), 'pw');
+    expect(WebClient.instance.response.session.updateInfo).toHaveBeenCalledWith('TestServer', '1.0');
+  });
+
+  it('LOGIN → calls requestPasswordSalt when server supports it', () => {
+    const opts = makeLoginOptions();
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    (passwordSaltSupported as Mock).mockReturnValue(1);
+    serverIdentification(makeInfo({ serverOptions: 1 }));
+    expect(SessionCmds.requestPasswordSalt).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice' }),
+      expect.any(Function),
+      expect.any(Function),
+    );
+  });
+
+  it('REGISTER → calls register', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', password: 'pw',
+      email: 'a@b.com', country: 'US', realName: 'Al',
+      reason: WebSocketConnectReason.REGISTER as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.register).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice' }), 'pw', null,
+    );
+  });
+
+  it('REGISTER with password salt → passes generated salt', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', password: 'pw',
+      email: 'a@b.com', country: 'US', realName: 'Al',
+      reason: WebSocketConnectReason.REGISTER as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    (passwordSaltSupported as Mock).mockReturnValue(1);
+    serverIdentification(makeInfo({ serverOptions: 1 }));
+    expect(SessionCmds.register).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice' }), 'pw', 'randSalt',
+    );
+  });
+
+  it('ACTIVATE_ACCOUNT → calls activate', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', token: 'tok', password: 'pw',
+      reason: WebSocketConnectReason.ACTIVATE_ACCOUNT as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.activate).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice', token: 'tok' }), 'pw',
+    );
+  });
+
+  it('PASSWORD_RESET_REQUEST → calls forgotPasswordRequest', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice',
+      reason: WebSocketConnectReason.PASSWORD_RESET_REQUEST as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.forgotPasswordRequest).toHaveBeenCalledWith(opts);
+  });
+
+  it('PASSWORD_RESET_CHALLENGE → calls forgotPasswordChallenge', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', email: 'a@b.com',
+      reason: WebSocketConnectReason.PASSWORD_RESET_CHALLENGE as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.forgotPasswordChallenge).toHaveBeenCalledWith(opts);
+  });
+
+  it('PASSWORD_RESET → calls forgotPasswordReset without salt', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', token: 'tok', newPassword: 'newpw',
+      reason: WebSocketConnectReason.PASSWORD_RESET as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.forgotPasswordReset).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice', token: 'tok' }), 'newpw',
+    );
+  });
+
+  it('PASSWORD_RESET with salt → calls requestPasswordSalt', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', token: 'tok', newPassword: 'newpw',
+      reason: WebSocketConnectReason.PASSWORD_RESET as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    (passwordSaltSupported as Mock).mockReturnValue(1);
+    serverIdentification(makeInfo({ serverOptions: 1 }));
+    expect(SessionCmds.requestPasswordSalt).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice' }),
+      expect.any(Function),
+      expect.any(Function),
+    );
+  });
+
+  it('always calls updateInfo after successful routing', () => {
+    (consumePendingOptions as Mock).mockReturnValue(makeLoginOptions());
+    serverIdentification(makeInfo());
+    expect(WebClient.instance.response.session.updateInfo).toHaveBeenCalledWith('TestServer', '1.0');
   });
 });

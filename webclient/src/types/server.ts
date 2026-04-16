@@ -1,19 +1,9 @@
-export { StatusEnum } from '@app/websocket';
+export { StatusEnum, WebSocketConnectReason } from '@app/websocket';
 import type { StatusEnum } from '@app/websocket';
 
 export interface ServerStatus {
   status: StatusEnum;
   description: string;
-}
-
-export enum WebSocketConnectReason {
-  LOGIN,
-  REGISTER,
-  ACTIVATE_ACCOUNT,
-  PASSWORD_RESET_REQUEST,
-  PASSWORD_RESET_CHALLENGE,
-  PASSWORD_RESET,
-  TEST_CONNECTION,
 }
 
 export class Host {

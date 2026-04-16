@@ -1,5 +1,5 @@
 import type { Event_AttachCard } from '@app/generated';
-import type { GameEventMeta } from '../../types';
+import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function attachCard(data: Event_AttachCard, meta: GameEventMeta): void {

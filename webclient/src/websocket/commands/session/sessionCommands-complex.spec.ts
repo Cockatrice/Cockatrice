@@ -1,10 +1,7 @@
 // Tests for complex session commands that call WebClient directly
 // or have multiple branching callbacks.
 
-vi.mock('../../WebClient', async () => {
-  const { makeWebClientMock } = await import('../../__mocks__/sessionCommandMocks');
-  return { WebClient: { instance: makeWebClientMock() } };
-});
+vi.mock('../../WebClient');
 
 vi.mock('../../utils', async () => {
   const { makeUtilsMock } = await import('../../__mocks__/sessionCommandMocks');
@@ -19,11 +16,10 @@ vi.mock('./', async () => {
 
 import { Mock } from 'vitest';
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
-import { useWebClientCleanup } from '../../__mocks__/helpers';
 import { WebClient } from '../../WebClient';
 import * as SessionIndexMocks from './';
 import { App, Enriched } from '@app/types';
-import { StatusEnum } from '../../StatusEnum';
+import { StatusEnum } from '../../interfaces/StatusEnum';
 import {
   Command_Activate_ext,
   Command_ForgotPasswordChallenge_ext,
@@ -53,8 +49,6 @@ import { forgotPasswordChallenge } from './forgotPasswordChallenge';
 import { forgotPasswordRequest } from './forgotPasswordRequest';
 import { forgotPasswordReset } from './forgotPasswordReset';
 import { requestPasswordSalt } from './requestPasswordSalt';
-
-useWebClientCleanup();
 
 const { invokeOnSuccess, invokeResponseCode, invokeOnError } = makeCallbackHelpers(
   WebClient.instance.protobuf.sendSessionCommand as Mock,

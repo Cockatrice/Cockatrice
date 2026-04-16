@@ -1,5 +1,5 @@
 import type { Event_ChangeZoneProperties } from '@app/generated';
-import type { GameEventMeta } from '../../types';
+import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function changeZoneProperties(data: Event_ChangeZoneProperties, meta: GameEventMeta): void {

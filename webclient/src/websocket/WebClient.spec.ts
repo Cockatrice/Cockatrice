@@ -31,14 +31,14 @@ vi.mock('./services/ProtobufService', () => ({
 import { WebClient } from './WebClient';
 import { WebSocketService } from './services/WebSocketService';
 import { ProtobufService } from './services/ProtobufService';
-import { StatusEnum } from './StatusEnum';
+import { StatusEnum } from './interfaces/StatusEnum';
 import { Subject } from 'rxjs';
 import { Mock } from 'vitest';
 import { SocketTransport, EventRegistries } from './services/ProtobufService';
 import { WebSocketServiceConfig } from './services/WebSocketService';
 import type { IWebClientResponse } from './interfaces';
-import type { WebClientConfig, ConnectTarget } from './WebClientConfig';
-import { installMockWebSocket, useWebClientCleanup } from './__mocks__/helpers';
+import type { WebClientConfig, ConnectTarget } from './interfaces/WebClientConfig';
+import { installMockWebSocket } from './__mocks__/helpers';
 
 function makeMockResponse(): IWebClientResponse {
   return {
@@ -61,15 +61,12 @@ function makeMockResponse(): IWebClientResponse {
 function makeMockConfig(response: IWebClientResponse): WebClientConfig {
   return {
     response,
-    onServerIdentified: vi.fn(),
     sessionEvents: [],
     roomEvents: [],
     gameEvents: [],
     keepAliveFn: vi.fn(),
   };
 }
-
-useWebClientCleanup();
 
 describe('WebClient', () => {
   let client: WebClient;
@@ -78,10 +75,6 @@ describe('WebClient', () => {
   let messageSubject: Subject<MessageEvent>;
 
   beforeEach(() => {
-    // Reset the singleton so each test starts fresh.
-    // This direct reset is needed in addition to useWebClientCleanup() because
-    // this file imports the real WebClient (not a mock), and with isolate:false
-    // the helper's import may resolve to a different (mocked) module reference.
     (WebClient as unknown as { _instance: WebClient | null })._instance = null;
 
     (ProtobufService as Mock).mockImplementation(function ProtobufServiceImpl(transport: SocketTransport, events: EventRegistries) {

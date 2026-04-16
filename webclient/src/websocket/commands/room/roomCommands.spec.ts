@@ -1,20 +1,6 @@
-vi.mock('../../WebClient', () => ({
-  WebClient: {
-    instance: {
-      protobuf: { sendRoomCommand: vi.fn() },
-      response: {
-        room: {
-          gameCreated: vi.fn(),
-          joinedGame: vi.fn(),
-          leaveRoom: vi.fn(),
-        },
-      },
-    },
-  },
-}));
+vi.mock('../../WebClient');
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
-import { useWebClientCleanup } from '../../__mocks__/helpers';
 import { WebClient } from '../../WebClient';
 import {
   Command_CreateGame_ext,
@@ -31,8 +17,6 @@ import { leaveRoom } from './leaveRoom';
 import { roomSay } from './roomSay';
 import { create } from '@bufbuild/protobuf';
 import { Mock } from 'vitest';
-
-useWebClientCleanup();
 
 const { invokeOnSuccess } = makeCallbackHelpers(
   WebClient.instance.protobuf.sendRoomCommand as Mock,

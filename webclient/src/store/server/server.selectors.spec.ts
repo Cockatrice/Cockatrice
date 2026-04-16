@@ -6,7 +6,7 @@ import {
   makeServerState,
   makeUser,
 } from './__mocks__/server-fixtures';
-import { App } from '@app/types';
+import { App, Data } from '@app/types';
 
 function rootState(server: ServerState) {
   return { server };
@@ -148,5 +148,87 @@ describe('Selectors', () => {
   it('getRegistrationError → returns registrationError', () => {
     const state = makeServerState({ registrationError: 'bad input' });
     expect(Selectors.getRegistrationError(rootState(state))).toBe('bad input');
+  });
+
+  // ── derived selectors (createSelector) ──────────────────────────────
+
+  it('getIsConnected → true when state is LOGGED_IN', () => {
+    const state = makeServerState({ status: { connectionAttemptMade: true, state: App.StatusEnum.LOGGED_IN, description: null } });
+    expect(Selectors.getIsConnected(rootState(state))).toBe(true);
+  });
+
+  it('getIsConnected → false when state is CONNECTED', () => {
+    const state = makeServerState({ status: { connectionAttemptMade: true, state: App.StatusEnum.CONNECTED, description: null } });
+    expect(Selectors.getIsConnected(rootState(state))).toBe(false);
+  });
+
+  it('getIsConnected → false when state is DISCONNECTED', () => {
+    const state = makeServerState({ status: { connectionAttemptMade: false, state: App.StatusEnum.DISCONNECTED, description: null } });
+    expect(Selectors.getIsConnected(rootState(state))).toBe(false);
+  });
+
+  it('getIsUserModerator → true when user has IsModerator flag', () => {
+    const Flag = Data.ServerInfo_User_UserLevelFlag;
+    const user = makeUser({ userLevel: Flag.IsUser | Flag.IsModerator });
+    const state = makeServerState({ user });
+    expect(Selectors.getIsUserModerator(rootState(state))).toBe(true);
+  });
+
+  it('getIsUserModerator → false when user lacks IsModerator flag', () => {
+    const Flag = Data.ServerInfo_User_UserLevelFlag;
+    const user = makeUser({ userLevel: Flag.IsUser | Flag.IsRegistered });
+    const state = makeServerState({ user });
+    expect(Selectors.getIsUserModerator(rootState(state))).toBe(false);
+  });
+
+  it('getIsUserModerator → false when user is null', () => {
+    const state = makeServerState({ user: null });
+    expect(Selectors.getIsUserModerator(rootState(state))).toBe(false);
+  });
+
+  // ── createSelector reference stability ──────────────────────────────
+
+  it('getIsConnected → returns same value reference for identical state', () => {
+    const state = makeServerState({ status: { connectionAttemptMade: true, state: App.StatusEnum.LOGGED_IN, description: null } });
+    const root = rootState(state);
+    const a = Selectors.getIsConnected(root);
+    const b = Selectors.getIsConnected(root);
+    expect(a).toBe(b);
+  });
+
+  it('getSortedUsers → returns same array reference for identical state', () => {
+    const users = { Alice: makeUser({ name: 'Alice' }), Bob: makeUser({ name: 'Bob' }) };
+    const state = makeServerState({ users });
+    const root = rootState(state);
+    const a = Selectors.getSortedUsers(root);
+    const b = Selectors.getSortedUsers(root);
+    expect(a).toBe(b);
+  });
+
+  it('getSortedBuddyList → returns same array reference for identical state', () => {
+    const buddyList = { Alice: makeUser({ name: 'Alice' }) };
+    const state = makeServerState({ buddyList });
+    const root = rootState(state);
+    const a = Selectors.getSortedBuddyList(root);
+    const b = Selectors.getSortedBuddyList(root);
+    expect(a).toBe(b);
+  });
+
+  it('getSortedIgnoreList → returns same array reference for identical state', () => {
+    const ignoreList = { Troll: makeUser({ name: 'Troll' }) };
+    const state = makeServerState({ ignoreList });
+    const root = rootState(state);
+    const a = Selectors.getSortedIgnoreList(root);
+    const b = Selectors.getSortedIgnoreList(root);
+    expect(a).toBe(b);
+  });
+
+  it('getReplaysList → returns same array reference for identical state', () => {
+    const replays = { 1: makeReplayMatch({ gameId: 1 }) };
+    const state = makeServerState({ replays });
+    const root = rootState(state);
+    const a = Selectors.getReplaysList(root);
+    const b = Selectors.getReplaysList(root);
+    expect(a).toBe(b);
   });
 });

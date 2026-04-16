@@ -1,27 +1,6 @@
-vi.mock('../../WebClient', () => ({
-  WebClient: {
-    instance: {
-      protobuf: { sendModeratorCommand: vi.fn() },
-      response: {
-        moderator: {
-          banFromServer: vi.fn(),
-          forceActivateUser: vi.fn(),
-          getAdminNotes: vi.fn(),
-          banHistory: vi.fn(),
-          warnHistory: vi.fn(),
-          warnListOptions: vi.fn(),
-          grantReplayAccess: vi.fn(),
-          updateAdminNotes: vi.fn(),
-          viewLogs: vi.fn(),
-          warnUser: vi.fn(),
-        },
-      },
-    },
-  },
-}));
+vi.mock('../../WebClient');
 
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
-import { useWebClientCleanup } from '../../__mocks__/helpers';
 import { WebClient } from '../../WebClient';
 import {
   Command_BanFromServer_ext,
@@ -54,8 +33,6 @@ import { viewLogHistory } from './viewLogHistory';
 import { warnUser } from './warnUser';
 import { create } from '@bufbuild/protobuf';
 import { Mock } from 'vitest';
-
-useWebClientCleanup();
 
 const { invokeOnSuccess } = makeCallbackHelpers(
   WebClient.instance.protobuf.sendModeratorCommand as Mock,

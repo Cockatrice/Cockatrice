@@ -8,10 +8,10 @@ import {
   type RegisterParams,
 } from '@app/generated';
 
-import { StatusEnum } from '../../StatusEnum';
+import { StatusEnum } from '../../interfaces/StatusEnum';
 import { CLIENT_CONFIG } from '../../config';
 import { WebClient } from '../../WebClient';
-import type { ConnectTarget } from '../../WebClientConfig';
+import type { ConnectTarget } from '../../interfaces/WebClientConfig';
 import { hashPassword } from '../../utils';
 import { login, disconnect, updateStatus } from './';
 

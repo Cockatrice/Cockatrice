@@ -36,8 +36,8 @@ import type {
   GameCommand,
 } from '@app/generated';
 
-import type { ConnectTarget } from '../WebClientConfig';
-import type { KeyOf } from '../types';
+import type { ConnectTarget } from './WebClientConfig';
+import type { KeyOf } from './WebSocketConfig';
 
 // ── Auth request type map ────────────────────────────────────────────────────
 // Keys = generated *Params type names composed with ConnectTarget.

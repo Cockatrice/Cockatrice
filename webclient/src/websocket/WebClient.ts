@@ -1,9 +1,9 @@
-import { StatusEnum } from './StatusEnum';
+import { StatusEnum } from './interfaces/StatusEnum';
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
 import { CLIENT_OPTIONS } from './config';
 import type { IWebClientResponse } from './interfaces';
-import type { WebClientConfig, ConnectTarget } from './WebClientConfig';
+import type { WebClientConfig, ConnectTarget } from './interfaces/WebClientConfig';
 
 export class WebClient {
   private static _instance: WebClient | null = null;

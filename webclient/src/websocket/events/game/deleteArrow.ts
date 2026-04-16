@@ -1,5 +1,5 @@
 import type { Event_DeleteArrow } from '@app/generated';
-import type { GameEventMeta } from '../../types';
+import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function deleteArrow(data: Event_DeleteArrow, meta: GameEventMeta): void {

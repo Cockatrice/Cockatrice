@@ -1,4 +1,4 @@
-import type { GameEventMeta } from '../../types';
+import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function gameClosed(_data: {}, meta: GameEventMeta): void {

@@ -1,5 +1,5 @@
 import type { Event_DelCounter } from '@app/generated';
-import type { GameEventMeta } from '../../types';
+import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function delCounter(data: Event_DelCounter, meta: GameEventMeta): void {

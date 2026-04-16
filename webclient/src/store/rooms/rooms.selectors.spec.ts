@@ -1,6 +1,7 @@
 import { Selectors } from './rooms.selectors';
 import { RoomsState } from './rooms.interfaces';
 import { makeGame, makeMessage, makeRoom, makeRoomsState, makeUser } from './__mocks__/rooms-fixtures';
+import { App } from '@app/types';
 
 function rootState(rooms: RoomsState) {
   return { rooms };
@@ -111,13 +112,23 @@ describe('Selectors', () => {
     expect(Selectors.getRoomUsers(rootState(state), 1)).toBe(room.users);
   });
 
-  it('getSortedRoomGames → returns sorted array view of games map', () => {
-    const game1 = makeGame({ gameId: 1, description: 'beta' });
-    const game2 = makeGame({ gameId: 2, description: 'alpha' });
+  it('getSortedRoomGames → returns games sorted by the active sort config', () => {
+    const game1 = makeGame({ gameId: 1, description: 'Beta' });
+    const game2 = makeGame({ gameId: 2, description: 'Alpha' });
     const room = makeRoom({ roomId: 1, games: { 1: game1, 2: game2 } });
-    const state = makeRoomsState({ rooms: { 1: room } });
+    const state = makeRoomsState({
+      rooms: { 1: room },
+      sortGamesBy: { field: 'info.description' as App.GameSortField, order: App.SortDirection.ASC },
+    });
     const result = Selectors.getSortedRoomGames(rootState(state), 1);
     expect(result).toHaveLength(2);
+    expect(result[0].info.description).toBe('Alpha');
+    expect(result[1].info.description).toBe('Beta');
+  });
+
+  it('getSortedRoomGames → returns EMPTY_GAMES for unknown roomId', () => {
+    const state = makeRoomsState({ rooms: {} });
+    expect(Selectors.getSortedRoomGames(rootState(state), 999)).toHaveLength(0);
   });
 
   it('getSortedRoomUsers → returns sorted user array sorted by name', () => {
@@ -128,5 +139,41 @@ describe('Selectors', () => {
     const result = Selectors.getSortedRoomUsers(rootState(state), 1);
     expect(result[0].name).toBe('Alice');
     expect(result[1].name).toBe('Zane');
+  });
+
+  it('getSortedRoomUsers → returns EMPTY_USERS for unknown roomId', () => {
+    const state = makeRoomsState({ rooms: {} });
+    expect(Selectors.getSortedRoomUsers(rootState(state), 999)).toHaveLength(0);
+  });
+
+  // ── createSelector reference stability ──────────────────────────────
+
+  it('getSortedRoomGames → returns same array reference for identical state', () => {
+    const game = makeGame({ gameId: 1 });
+    const room = makeRoom({ roomId: 1, games: { 1: game } });
+    const state = makeRoomsState({ rooms: { 1: room } });
+    const root = rootState(state);
+    const a = Selectors.getSortedRoomGames(root, 1);
+    const b = Selectors.getSortedRoomGames(root, 1);
+    expect(a).toBe(b);
+  });
+
+  it('getSortedRoomUsers → returns same array reference for identical state', () => {
+    const user = makeUser({ name: 'Alice' });
+    const room = makeRoom({ roomId: 1, users: { Alice: user } });
+    const state = makeRoomsState({ rooms: { 1: room } });
+    const root = rootState(state);
+    const a = Selectors.getSortedRoomUsers(root, 1);
+    const b = Selectors.getSortedRoomUsers(root, 1);
+    expect(a).toBe(b);
+  });
+
+  it('getJoinedRooms → returns same array reference for identical state', () => {
+    const room = makeRoom({ roomId: 1 });
+    const state = makeRoomsState({ rooms: { 1: room }, joinedRoomIds: { 1: true } });
+    const root = rootState(state);
+    const a = Selectors.getJoinedRooms(root);
+    const b = Selectors.getJoinedRooms(root);
+    expect(a).toBe(b);
   });
 });

@@ -1,5 +1,5 @@
 import type { Event_DestroyCard } from '@app/generated';
-import type { GameEventMeta } from '../../types';
+import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function destroyCard(data: Event_DestroyCard, meta: GameEventMeta): void {

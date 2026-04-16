@@ -1,9 +1,9 @@
 import { Subject } from 'rxjs';
 
-import { StatusEnum } from '../StatusEnum';
+import { StatusEnum } from '../interfaces/StatusEnum';
 import { KeepAliveService } from './KeepAliveService';
 import { CLIENT_OPTIONS } from '../config';
-import type { ConnectTarget } from '../WebClientConfig';
+import type { ConnectTarget } from '../interfaces/WebClientConfig';
 
 export interface WebSocketServiceConfig {
   keepAliveFn: (pingReceived: () => void) => void;

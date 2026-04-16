@@ -7,13 +7,8 @@ vi.mock('@bufbuild/protobuf', async (importOriginal) => ({
   setExtension: vi.fn(),
 }));
 
-vi.mock('../WebClient', () => ({
-  __esModule: true,
-  default: {},
-  WebClient: { _instance: null },
-}));
+vi.mock('../WebClient');
 
-import { useWebClientCleanup } from '../__mocks__/helpers';
 import { create, fromBinary, hasExtension, getExtension } from '@bufbuild/protobuf';
 import type { GenExtension } from '@bufbuild/protobuf/codegenv2';
 
@@ -46,8 +41,6 @@ type ProtobufInternal = ProtobufService & {
   processSessionEvent(event: unknown): void;
   processServerResponse(response: unknown): void;
 };
-
-useWebClientCleanup();
 
 let mockSocket: { isOpen: ReturnType<typeof vi.fn>; send: ReturnType<typeof vi.fn> };
 let mockEvents: EventRegistries;
@@ -443,4 +436,73 @@ describe('ProtobufService', () => {
     });
   });
 
+});
+
+// ── Real protobuf round-trip test ─────────────────────────────────────────────
+// This describe block does NOT mock @bufbuild/protobuf so it exercises real
+// binary serialization.  It proves that the schemas ProtobufService uses
+// survive a toBinary → fromBinary cycle without data loss.
+describe('ProtobufService protobuf round-trip (real @bufbuild/protobuf)', () => {
+  it('CommandContainer round-trips cmdId through toBinary → fromBinary', async () => {
+    const { create, toBinary, fromBinary: realFromBinary } =
+      await vi.importActual<typeof import('@bufbuild/protobuf')>('@bufbuild/protobuf');
+    const { CommandContainerSchema } =
+      await vi.importActual<typeof import('@app/generated')>('@app/generated');
+
+    const original = create(CommandContainerSchema, { cmdId: BigInt(42) });
+    const bytes = toBinary(CommandContainerSchema, original);
+    const decoded = realFromBinary(CommandContainerSchema, bytes);
+
+    expect(decoded.cmdId).toBe(BigInt(42));
+  });
+
+  it('ServerMessage RESPONSE round-trips with cmdId and responseCode', async () => {
+    const { create, toBinary, fromBinary: realFromBinary } =
+      await vi.importActual<typeof import('@bufbuild/protobuf')>('@bufbuild/protobuf');
+    const { ServerMessageSchema, ServerMessage_MessageType, ResponseSchema, Response_ResponseCode } =
+      await vi.importActual<typeof import('@app/generated')>('@app/generated');
+
+    const response = create(ResponseSchema, {
+      cmdId: BigInt(7),
+      responseCode: Response_ResponseCode.RespOk,
+    });
+    const msg = create(ServerMessageSchema, {
+      messageType: ServerMessage_MessageType.RESPONSE,
+      response,
+    });
+
+    const bytes = toBinary(ServerMessageSchema, msg);
+    const decoded = realFromBinary(ServerMessageSchema, bytes);
+
+    expect(decoded.messageType).toBe(ServerMessage_MessageType.RESPONSE);
+    expect(decoded.response?.cmdId).toBe(BigInt(7));
+    expect(decoded.response?.responseCode).toBe(Response_ResponseCode.RespOk);
+  });
+
+  it('SessionCommand with extension round-trips through CommandContainer', async () => {
+    const { create, toBinary, fromBinary: realFromBinary, setExtension, getExtension: realGetExtension } =
+      await vi.importActual<typeof import('@bufbuild/protobuf')>('@bufbuild/protobuf');
+    const {
+      CommandContainerSchema, SessionCommandSchema,
+      Command_Ping_ext, Command_PingSchema,
+    } = await vi.importActual<typeof import('@app/generated')>('@app/generated');
+
+    const pingCmd = create(Command_PingSchema, {});
+    const sesCmd = create(SessionCommandSchema, {});
+    setExtension(sesCmd, Command_Ping_ext, pingCmd);
+
+    const container = create(CommandContainerSchema, {
+      cmdId: BigInt(1),
+      sessionCommand: [sesCmd],
+    });
+
+    const bytes = toBinary(CommandContainerSchema, container);
+    const decoded = realFromBinary(CommandContainerSchema, bytes);
+
+    expect(decoded.cmdId).toBe(BigInt(1));
+    expect(decoded.sessionCommand).toHaveLength(1);
+
+    const decodedPing = realGetExtension(decoded.sessionCommand[0], Command_Ping_ext);
+    expect(decodedPing).toBeDefined();
+  });
 });

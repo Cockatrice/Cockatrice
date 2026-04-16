@@ -1,5 +1,5 @@
 import { Event_ConnectionClosed_CloseReason, type Event_ConnectionClosed } from '@app/generated';
-import { StatusEnum } from '../../StatusEnum';
+import { StatusEnum } from '../../interfaces/StatusEnum';
 import { updateStatus } from '../../commands/session';
 
 export function connectionClosed({ reason, reasonStr, endTime }: Event_ConnectionClosed): void {

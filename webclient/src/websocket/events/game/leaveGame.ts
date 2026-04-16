@@ -1,4 +1,4 @@
-import type { GameEventMeta } from '../../types';
+import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function leaveGame(data: { reason: number }, meta: GameEventMeta): void {

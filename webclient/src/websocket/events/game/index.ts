@@ -35,7 +35,7 @@ import {
   Event_ReverseTurn_ext,
 } from '@app/generated';
 
-import type { GameEventMeta } from '../../types';
+import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
 
 import { attachCard } from './attachCard';
 import { changeZoneProperties } from './changeZoneProperties';

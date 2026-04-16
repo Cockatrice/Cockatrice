@@ -1,9 +1,6 @@
 // Shared mock setup for session command tests
 
-vi.mock('../../WebClient', async () => {
-  const { makeWebClientMock } = await import('../../__mocks__/sessionCommandMocks');
-  return { WebClient: { instance: makeWebClientMock() } };
-});
+vi.mock('../../WebClient');
 
 vi.mock('../../utils', async () => {
   const { makeUtilsMock } = await import('../../__mocks__/sessionCommandMocks');
@@ -19,7 +16,6 @@ vi.mock('./', async () => {
 
 import { Mock } from 'vitest';
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
-import { useWebClientCleanup } from '../../__mocks__/helpers';
 import { WebClient } from '../../WebClient';
 import { hashPassword, generateSalt, passwordSaltSupported } from '../../utils';
 
@@ -84,8 +80,6 @@ import {
   Response_ReplayGetCode_ext,
   Response_ReplayList_ext,
 } from '@app/generated';
-
-useWebClientCleanup();
 
 const { invokeOnSuccess, invokeCallback } = makeCallbackHelpers(
   WebClient.instance.protobuf.sendSessionCommand as Mock,

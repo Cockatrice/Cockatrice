@@ -1,4 +1,4 @@
-import { StatusEnum } from '../../StatusEnum';
+import { StatusEnum } from '../../interfaces/StatusEnum';
 import { WebClient } from '../../WebClient';
 
 export function updateStatus(status: StatusEnum, description: string): void {

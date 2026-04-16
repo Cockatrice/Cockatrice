@@ -1,5 +1,5 @@
 import type { Event_RollDie } from '@app/generated';
-import type { GameEventMeta } from '../../types';
+import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function rollDie(data: Event_RollDie, meta: GameEventMeta): void {
