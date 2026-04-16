@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:integration:coverage": "vitest run --config vitest.integration.config.ts --coverage",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "golden": "npm run lint && npm run test",

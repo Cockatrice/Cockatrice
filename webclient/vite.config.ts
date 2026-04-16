@@ -19,5 +19,18 @@ export default defineConfig({
     setupFiles: ['./src/setupTests.ts'],
     include: ['src/**/*.spec.{ts,tsx}'],
     isolate: false,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      reportsDirectory: './coverage/testing',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'src/generated/**',
+        'src/**/*.spec.{ts,tsx}',
+        'src/**/__mocks__/**',
+        'src/setupTests.ts',
+        'src/polyfills.ts',
+      ],
+    },
   },
 });
