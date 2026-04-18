@@ -1,35 +1,33 @@
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 
 import { SettingDTO } from '@app/services';
 import { App } from '@app/types';
 
-export function useAutoConnect() {
-  const [setting, setSetting] = useState(undefined);
-  const [autoConnect, setAutoConnect] = useState(undefined);
+export function useAutoConnect(): [boolean | undefined, Dispatch<SetStateAction<boolean | undefined>>] {
+  const [setting, setSetting] = useState<SettingDTO | undefined>(undefined);
+  const [autoConnect, setAutoConnect] = useState<boolean | undefined>(undefined);
+  const prevAutoConnectRef = useRef<boolean | undefined>(undefined);
 
   useEffect(() => {
-    SettingDTO.get(App.APP_USER).then((setting: SettingDTO) => {
-      if (!setting) {
-        setting = new SettingDTO(App.APP_USER);
-        setting.save();
+    SettingDTO.get(App.APP_USER).then((loaded: SettingDTO) => {
+      if (!loaded) {
+        loaded = new SettingDTO(App.APP_USER);
+        loaded.save();
       }
 
-      setSetting(setting);
+      setSetting(loaded);
+      setAutoConnect(loaded.autoConnect);
+      prevAutoConnectRef.current = loaded.autoConnect;
     });
   }, []);
 
   useEffect(() => {
-    if (setting) {
-      setAutoConnect(setting.autoConnect);
-    }
-  }, [setting]);
-
-  useEffect(() => {
-    if (setting) {
+    if (setting && autoConnect !== prevAutoConnectRef.current) {
+      prevAutoConnectRef.current = autoConnect;
       setting.autoConnect = autoConnect;
       setting.save();
     }
-  }, [setting, autoConnect]);
+  }, [autoConnect]);
 
   return [autoConnect, setAutoConnect];
 }

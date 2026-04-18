@@ -112,6 +112,67 @@ describe('ProtobufService', () => {
       expect((service as ProtobufInternal).cmdId).toBe(0);
       expect((service as ProtobufInternal).pendingCommands.size).toBe(0);
     });
+
+    it('returns true when command is sent', () => {
+      const service = new ProtobufService(mockSocket);
+      const result = service.sendCommand(create(CommandContainerSchema), vi.fn());
+      expect(result).toBe(true);
+    });
+
+    it('returns false when transport is closed', () => {
+      const service = new ProtobufService(mockSocket);
+      mockSocket.isOpen.mockReturnValue(false);
+      const result = service.sendCommand(create(CommandContainerSchema), vi.fn());
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('send*Command when transport is closed', () => {
+    it('calls onError when sendSessionCommand is dropped', () => {
+      const service = new ProtobufService(mockSocket);
+      mockSocket.isOpen.mockReturnValue(false);
+      const onError = vi.fn();
+      service.sendSessionCommand(sessionExt, {}, { onError });
+      expect(onError).toHaveBeenCalledWith(-1, expect.any(Object));
+    });
+
+    it('calls onError when sendRoomCommand is dropped', () => {
+      const service = new ProtobufService(mockSocket);
+      mockSocket.isOpen.mockReturnValue(false);
+      const onError = vi.fn();
+      service.sendRoomCommand(42, roomExt, {}, { onError });
+      expect(onError).toHaveBeenCalledWith(-1, expect.any(Object));
+    });
+
+    it('calls onError when sendGameCommand is dropped', () => {
+      const service = new ProtobufService(mockSocket);
+      mockSocket.isOpen.mockReturnValue(false);
+      const onError = vi.fn();
+      service.sendGameCommand(7, gameExt, {}, { onError });
+      expect(onError).toHaveBeenCalledWith(-1, expect.any(Object));
+    });
+
+    it('calls onError when sendModeratorCommand is dropped', () => {
+      const service = new ProtobufService(mockSocket);
+      mockSocket.isOpen.mockReturnValue(false);
+      const onError = vi.fn();
+      service.sendModeratorCommand(moderatorExt, {}, { onError });
+      expect(onError).toHaveBeenCalledWith(-1, expect.any(Object));
+    });
+
+    it('calls onError when sendAdminCommand is dropped', () => {
+      const service = new ProtobufService(mockSocket);
+      mockSocket.isOpen.mockReturnValue(false);
+      const onError = vi.fn();
+      service.sendAdminCommand(adminExt, {}, { onError });
+      expect(onError).toHaveBeenCalledWith(-1, expect.any(Object));
+    });
+
+    it('does not throw when command is dropped with no options', () => {
+      const service = new ProtobufService(mockSocket);
+      mockSocket.isOpen.mockReturnValue(false);
+      expect(() => service.sendSessionCommand(sessionExt, {})).not.toThrow();
+    });
   });
 
   describe('sendSessionCommand', () => {
@@ -311,9 +372,9 @@ describe('ProtobufService', () => {
       expect(processGameEvent).toHaveBeenCalled();
     });
 
-    it('logs unknown message types (default case)', () => {
+    it('warns on unknown message types (default case)', () => {
       const service = new ProtobufService(mockSocket);
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
       vi.mocked(fromBinary).mockReturnValue(
         create(ServerMessageSchema, {

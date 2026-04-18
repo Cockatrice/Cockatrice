@@ -43,8 +43,6 @@ const LoginForm = ({ onSubmit, disableSubmitButton, onResetPassword }: LoginForm
 
   const handleOnSubmit = ({ userName, ...values }) => {
     userName = userName?.trim();
-    console.log(userName, values);
-
     onSubmit({ userName, ...values });
   }
 

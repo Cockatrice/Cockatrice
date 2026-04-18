@@ -115,10 +115,10 @@ describe('playerPropertiesChanged event', () => {
 });
 
 describe('gameSay event', () => {
-  it('delegates to WebClient.instance.response.game.gameSay with gameId, playerId, message', () => {
+  it('delegates to WebClient.instance.response.game.gameSay with gameId, playerId, message, timeReceived', () => {
     const data = create(Event_GameSaySchema, { message: 'gg' });
     gameSay(data, meta);
-    expect(WebClient.instance.response.game.gameSay).toHaveBeenCalledWith(5, 2, 'gg');
+    expect(WebClient.instance.response.game.gameSay).toHaveBeenCalledWith(5, 2, 'gg', expect.any(Number));
   });
 });
 

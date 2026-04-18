@@ -25,19 +25,21 @@ const initialState: InitialState = {
 }
 
 /**
-  * Calculates the application state.
+  * Stores the most recent action so `useReduxEffect` can react to dispatches.
   *
-  * @param state
-  * @param action
-  * @return {*}
+  * Payloads are deep-cloned to prevent shared object references between this
+  * slice and the slice that owns the action. Without the clone, Immer mutations
+  * in the target slice are detected as mutations of the stale payload stored here.
   */
 export const actionReducer = (
   state = initialState,
   action: UnknownAction,
 ): InitialState => {
   return {
-    ...state,
-    ...action,
+    type: action.type ?? null,
+    payload: 'payload' in action ? structuredClone(action.payload) : null,
+    meta: 'meta' in action ? structuredClone(action.meta) : null,
+    error: !!action.error,
     count: state.count + 1,
   }
 }

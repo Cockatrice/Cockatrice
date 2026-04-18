@@ -13,6 +13,7 @@ export class KeepAliveService {
   }
 
   public startPingLoop(interval: number, ping: (onPong: () => void) => void): void {
+    this.endPingLoop();
     this.keepalivecb = setInterval(() => {
       // check if the previous ping got no reply
       if (this.lastPingPending) {

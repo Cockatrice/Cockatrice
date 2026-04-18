@@ -2,6 +2,8 @@ import {
   render,
   fireEvent,
   waitFor,
+  renderHook,
+  act,
 } from '@testing-library/react';
 import { useFireOnce } from './useFireOnce';
 
@@ -97,5 +99,57 @@ describe('useFireOnce hook', () => {
       },
       { timeout: 100 }
     );
+  });
+
+  test('resetInFlightStatus re-enables firing', () => {
+    const fn = vi.fn();
+    const { result } = renderHook(() => useFireOnce(fn));
+
+    act(() => {
+      result.current[2]();
+    });
+
+    expect(result.current[0]).toBe(true);
+    expect(fn).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      result.current[1]();
+    });
+
+    expect(result.current[0]).toBe(false);
+
+    act(() => {
+      result.current[2]();
+    });
+
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
+
+  test('calls the latest fn when parent updates it', () => {
+    const fn1 = vi.fn();
+    const fn2 = vi.fn();
+    const { result, rerender } = renderHook(({ fn }) => useFireOnce(fn), {
+      initialProps: { fn: fn1 },
+    });
+
+    rerender({ fn: fn2 });
+
+    act(() => {
+      result.current[2]();
+    });
+
+    expect(fn1).not.toHaveBeenCalled();
+    expect(fn2).toHaveBeenCalledTimes(1);
+  });
+
+  test('passes all arguments through to fn', () => {
+    const fn = vi.fn();
+    const { result } = renderHook(() => useFireOnce(fn));
+
+    act(() => {
+      result.current[2]('a', 'b', 'c');
+    });
+
+    expect(fn).toHaveBeenCalledWith('a', 'b', 'c');
   });
 });

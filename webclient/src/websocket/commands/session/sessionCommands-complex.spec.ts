@@ -18,7 +18,7 @@ import { Mock } from 'vitest';
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
 import { WebClient } from '../../WebClient';
 import * as SessionIndexMocks from './';
-import { App, Enriched } from '@app/types';
+import { Enriched } from '@app/types';
 import { StatusEnum } from '../../interfaces/StatusEnum';
 import {
   Command_Activate_ext,
@@ -59,7 +59,7 @@ const baseTransport = { host: 'h', port: '1' };
 const makeLoginOpts = (overrides: Partial<Enriched.LoginConnectOptions> = {}): Enriched.LoginConnectOptions => ({
   ...baseTransport,
   userName: 'alice',
-  reason: App.WebSocketConnectReason.LOGIN,
+  reason: Enriched.WebSocketConnectReason.LOGIN,
   ...overrides,
 });
 const makeRegisterOpts = (
@@ -71,7 +71,7 @@ const makeRegisterOpts = (
   email: 'a@b.com',
   country: 'US',
   realName: 'Al',
-  reason: App.WebSocketConnectReason.REGISTER,
+  reason: Enriched.WebSocketConnectReason.REGISTER,
   ...overrides,
 });
 const makeActivateOpts = (
@@ -80,26 +80,26 @@ const makeActivateOpts = (
   ...baseTransport,
   userName: 'alice',
   token: 'tok',
-  reason: App.WebSocketConnectReason.ACTIVATE_ACCOUNT,
+  reason: Enriched.WebSocketConnectReason.ACTIVATE_ACCOUNT,
   ...overrides,
 });
 const makeForgotRequestOpts = (): Enriched.PasswordResetRequestConnectOptions => ({
   ...baseTransport,
   userName: 'alice',
-  reason: App.WebSocketConnectReason.PASSWORD_RESET_REQUEST,
+  reason: Enriched.WebSocketConnectReason.PASSWORD_RESET_REQUEST,
 });
 const makeForgotChallengeOpts = (): Enriched.PasswordResetChallengeConnectOptions => ({
   ...baseTransport,
   userName: 'alice',
   email: 'a@b.com',
-  reason: App.WebSocketConnectReason.PASSWORD_RESET_CHALLENGE,
+  reason: Enriched.WebSocketConnectReason.PASSWORD_RESET_CHALLENGE,
 });
 const makeForgotResetOpts = (): Enriched.PasswordResetConnectOptions => ({
   ...baseTransport,
   userName: 'alice',
   token: 'tok',
   newPassword: 'newpw',
-  reason: App.WebSocketConnectReason.PASSWORD_RESET,
+  reason: Enriched.WebSocketConnectReason.PASSWORD_RESET,
 });
 
 
@@ -194,7 +194,7 @@ describe('login', () => {
   });
 
   it('onSuccess passes hashedPassword to loginSuccessful when salt is used', () => {
-    login({ host: 'h', port: '1', userName: 'alice', reason: App.WebSocketConnectReason.LOGIN }, 'pw', 'salt');
+    login({ host: 'h', port: '1', userName: 'alice', reason: Enriched.WebSocketConnectReason.LOGIN }, 'pw', 'salt');
     const loginResp = { buddyList: [], ignoreList: [], userInfo: { name: 'alice' } };
     invokeOnSuccess(loginResp, { responseCode: 0 });
     const calledWith = (WebClient.instance.response.session.loginSuccessful as Mock).mock.calls[0][0];

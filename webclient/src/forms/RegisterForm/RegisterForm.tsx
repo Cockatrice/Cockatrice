@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
@@ -99,10 +99,11 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
     <Form onSubmit={handleOnSubmit} validate={validate} mutators={{ setFieldTouched }}>
       {({ handleSubmit, form }) => {
 
-        if (emailRequired) {
-          // Allow form render to complete
-          setTimeout(() => form.mutators.setFieldTouched('email', true))
-        }
+        useEffect(() => {
+          if (emailRequired) {
+            form.mutators.setFieldTouched('email', true);
+          }
+        }, [emailRequired]);
 
         return (
           <>

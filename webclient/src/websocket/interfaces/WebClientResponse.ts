@@ -134,7 +134,7 @@ export interface IGameResponse {
   gameClosed(gameId: number): void;
   gameHostChanged(gameId: number, hostId: number): void;
   kicked(gameId: number): void;
-  gameSay(gameId: number, playerId: number, message: string): void;
+  gameSay(gameId: number, playerId: number, message: string, timeReceived: number): void;
   cardMoved(gameId: number, playerId: number, data: Event_MoveCard): void;
   cardFlipped(gameId: number, playerId: number, data: Event_FlipCard): void;
   cardDestroyed(gameId: number, playerId: number, data: Event_DestroyCard): void;

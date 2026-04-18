@@ -1,5 +1,4 @@
-// eslint-disable-next-line
-import React from "react";
+import React from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 
 import ListItemButton from '@mui/material/ListItemButton';
@@ -40,6 +39,7 @@ const Server = () => {
 
         bottom={(
           <Paper className="serverMessage overflow-scroll">
+            {/* message is sanitized via DOMPurify in websocket/events/session/serverMessage.ts */}
             <div className="serverMessage__content" dangerouslySetInnerHTML={{ __html: message }} />
           </Paper>
         )}
@@ -51,7 +51,7 @@ const Server = () => {
             </div>
             <VirtualList
               items={ users.map(user => (
-                <ListItemButton dense>
+                <ListItemButton key={user.name} dense>
                   <UserDisplay user={user} />
                 </ListItemButton>
               )) }

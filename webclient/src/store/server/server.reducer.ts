@@ -6,6 +6,8 @@ import { normalizeBannedUserError, normalizeGameObject, normalizeGametypeMap, no
 
 import { ServerState, ServerStateStatus } from './server.interfaces';
 
+export const MAX_USER_MESSAGES = 1000;
+
 function splitPath(path: string): string[] {
   return path ? path.split('/') : [];
 }
@@ -71,7 +73,7 @@ const initialState: ServerState = {
 
   status: {
     connectionAttemptMade: false,
-    state: App.StatusEnum.DISCONNECTED,
+    state: Enriched.StatusEnum.DISCONNECTED,
     description: null
   },
   info: {
@@ -172,17 +174,20 @@ export const serverSlice = createSlice({
 
     updateStatus: (state, action: PayloadAction<{ status: Pick<ServerStateStatus, 'state' | 'description'> }>) => {
       const { status } = action.payload;
-      state.status = { ...state.status, ...status };
+      state.status.state = status.state;
+      state.status.description = status.description;
 
-      if (status.state === App.StatusEnum.DISCONNECTED) {
+      if (status.state === Enriched.StatusEnum.DISCONNECTED) {
         state.status.connectionAttemptMade = false;
       }
     },
 
     updateUser: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
-      state.user = state.user
-        ? { ...state.user, ...action.payload.user } as Data.ServerInfo_User
-        : action.payload.user as Data.ServerInfo_User;
+      if (state.user) {
+        Object.assign(state.user, action.payload.user);
+      } else {
+        state.user = action.payload.user as Data.ServerInfo_User;
+      }
     },
 
     updateUsers: (state, action: PayloadAction<{ users: Data.ServerInfo_User[] }>) => {
@@ -203,7 +208,7 @@ export const serverSlice = createSlice({
     },
 
     viewLogs: (state, action: PayloadAction<{ logs: Data.ServerInfo_ChatMessage[] }>) => {
-      state.logs = { ...normalizeLogs(action.payload.logs) };
+      state.logs = normalizeLogs(action.payload.logs);
     },
 
     clearLogs: (state) => {
@@ -211,10 +216,17 @@ export const serverSlice = createSlice({
     },
 
     userMessage: (state, action: PayloadAction<{ messageData: Data.Event_UserMessage }>) => {
+      if (!state.user) {
+        return;
+      }
       const { senderName, receiverName } = action.payload.messageData;
-      const userName = state.user!.name === senderName ? receiverName : senderName;
+      const userName = state.user.name === senderName ? receiverName : senderName;
       if (!state.messages[userName]) {
         state.messages[userName] = [];
+      }
+      const msgs = state.messages[userName];
+      if (msgs.length >= MAX_USER_MESSAGES) {
+        state.messages[userName] = msgs.slice(msgs.length - MAX_USER_MESSAGES + 1);
       }
       state.messages[userName].push(action.payload.messageData);
     },
@@ -273,7 +285,7 @@ export const serverSlice = createSlice({
       newLevel = shouldBeJudge
         ? (newLevel | Data.ServerInfo_User_UserLevelFlag.IsJudge)
         : (newLevel & ~Data.ServerInfo_User_UserLevelFlag.IsJudge);
-      state.users[userName] = { ...user, userLevel: newLevel };
+      user.userLevel = newLevel;
     },
 
     replayList: (state, action: PayloadAction<{ matchList: Data.ServerInfo_ReplayMatch[] }>) => {
@@ -295,7 +307,7 @@ export const serverSlice = createSlice({
       if (!existing) {
         return;
       }
-      state.replays[gameId] = { ...existing, doNotHide };
+      existing.doNotHide = doNotHide;
     },
 
     replayDeleteMatch: (state, action: PayloadAction<{ gameId: number }>) => {
@@ -379,39 +391,43 @@ export const serverSlice = createSlice({
     },
 
     accountEditChanged: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
-      state.user = { ...state.user, ...action.payload.user } as Data.ServerInfo_User;
+      if (state.user) {
+        Object.assign(state.user, action.payload.user);
+      }
     },
 
     accountImageChanged: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
-      state.user = { ...state.user, ...action.payload.user } as Data.ServerInfo_User;
+      if (state.user) {
+        Object.assign(state.user, action.payload.user);
+      }
     },
 
     // Signal-only action types — no state mutation, defined so type strings are generated
-    accountAwaitingActivation: (_state, _action: PayloadAction<any>) => {},
-    accountActivationFailed: (_state, _action: PayloadAction<any>) => {},
-    accountActivationSuccess: (_state, _action: PayloadAction<any>) => {},
-    loginSuccessful: (_state, _action: PayloadAction<any>) => {},
-    loginFailed: (_state, _action: PayloadAction<any>) => {},
-    connectionFailed: (_state, _action: PayloadAction<any>) => {},
-    testConnectionSuccessful: (_state, _action: PayloadAction<any>) => {},
-    testConnectionFailed: (_state, _action: PayloadAction<any>) => {},
-    registrationRequiresEmail: (_state, _action: PayloadAction<any>) => {},
-    registrationSuccess: (_state, _action: PayloadAction<any>) => {},
-    registrationEmailError: (_state, _action: PayloadAction<any>) => {},
-    registrationPasswordError: (_state, _action: PayloadAction<any>) => {},
-    registrationUserNameError: (_state, _action: PayloadAction<any>) => {},
-    resetPassword: (_state, _action: PayloadAction<any>) => {},
-    resetPasswordFailed: (_state, _action: PayloadAction<any>) => {},
-    resetPasswordChallenge: (_state, _action: PayloadAction<any>) => {},
-    resetPasswordSuccess: (_state, _action: PayloadAction<any>) => {},
-    reloadConfig: (_state, _action: PayloadAction<any>) => {},
-    shutdownServer: (_state, _action: PayloadAction<any>) => {},
-    updateServerMessage: (_state, _action: PayloadAction<any>) => {},
-    accountPasswordChange: (_state, _action: PayloadAction<any>) => {},
-    addToList: (_state, _action: PayloadAction<any>) => {},
-    removeFromList: (_state, _action: PayloadAction<any>) => {},
-    grantReplayAccess: (_state, _action: PayloadAction<any>) => {},
-    forceActivateUser: (_state, _action: PayloadAction<any>) => {},
+    accountAwaitingActivation: (_state, _action: PayloadAction<{ options: Enriched.PendingActivationContext }>) => {},
+    accountActivationFailed: (_state) => {},
+    accountActivationSuccess: (_state) => {},
+    loginSuccessful: (_state, _action: PayloadAction<{ options: Enriched.LoginSuccessContext }>) => {},
+    loginFailed: (_state) => {},
+    connectionFailed: (_state) => {},
+    testConnectionSuccessful: (_state) => {},
+    testConnectionFailed: (_state) => {},
+    registrationRequiresEmail: (_state) => {},
+    registrationSuccess: (_state) => {},
+    registrationEmailError: (_state, _action: PayloadAction<{ error: string }>) => {},
+    registrationPasswordError: (_state, _action: PayloadAction<{ error: string }>) => {},
+    registrationUserNameError: (_state, _action: PayloadAction<{ error: string }>) => {},
+    resetPassword: (_state) => {},
+    resetPasswordFailed: (_state) => {},
+    resetPasswordChallenge: (_state) => {},
+    resetPasswordSuccess: (_state) => {},
+    reloadConfig: (_state) => {},
+    shutdownServer: (_state) => {},
+    updateServerMessage: (_state) => {},
+    accountPasswordChange: (_state) => {},
+    addToList: (_state, _action: PayloadAction<{ list: string; userName: string }>) => {},
+    removeFromList: (_state, _action: PayloadAction<{ list: string; userName: string }>) => {},
+    grantReplayAccess: (_state, _action: PayloadAction<{ replayId: number; moderatorName: string }>) => {},
+    forceActivateUser: (_state, _action: PayloadAction<{ usernameToActivate: string; moderatorName: string }>) => {},
   },
 });
 

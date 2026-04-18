@@ -1,12 +1,19 @@
 // Fetch and parse card sets
 
+import { App } from '@app/types';
+
 class CardImporterService {
-  importCards(url): Promise<any> {
+  importCards(url: string): Promise<{ cards: App.Card[]; sets: App.Set[] }> {
     const error = 'Card import must be in valid MTG JSON format';
 
     return fetch(url)
       .then(response => {
-        if (response.headers.get('Content-Type') !== 'application/json') {
+        if (!response.ok) {
+          throw new Error(error);
+        }
+
+        const contentType = response.headers.get('Content-Type') ?? '';
+        if (!contentType.includes('application/json')) {
           throw new Error(error);
         }
 
@@ -34,13 +41,13 @@ class CardImporterService {
             .map(key => unsortedCards[key]);
 
           return { cards, sets };
-        } catch {
-          throw new Error(error);
+        } catch (err) {
+          throw new Error(error, { cause: err });
         }
       });
   }
 
-  importTokens(url): Promise<any> {
+  importTokens(url: string): Promise<Record<string, unknown>[]> {
     const error = 'Token import must be in valid MTG XML format';
 
     return fetch(url)
@@ -56,13 +63,17 @@ class CardImporterService {
           const parser = new DOMParser();
           const dom = parser.parseFromString(xmlString, 'application/xml');
 
+          if (dom.querySelector('parsererror')) {
+            throw new Error(error);
+          }
+
           const tokens = Array.from(dom.querySelectorAll('card')).map(
             (tokenElement) => this.parseXmlAttributes(tokenElement)
           );
 
           return tokens;
-        } catch {
-          throw new Error(error);
+        } catch (err) {
+          throw new Error(error, { cause: err });
         }
       })
   }
@@ -90,7 +101,7 @@ class CardImporterService {
         if (Array.isArray(attributes[child.tagName])) {
           attributes[child.tagName].push(parsedAttributes)
         } else {
-          attributes[child.tagName] = [parsedAttributes];
+          attributes[child.tagName] = [attributes[child.tagName], parsedAttributes];
         }
       } else {
         attributes[child.tagName] = parsedAttributes;

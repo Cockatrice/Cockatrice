@@ -15,7 +15,7 @@ const Row = ({ index, style, items }: RowComponentProps<RowData>) => (
   </div>
 );
 
-const VirtualList = ({ items, className = {}, size = 30 }) => (
+const VirtualList = ({ items, className = '', size = 30 }) => (
   <div className="virtual-list">
     <List<RowData>
       className={`virtual-list__list ${className}`}

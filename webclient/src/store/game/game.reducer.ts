@@ -183,7 +183,7 @@ export const gamesSlice = createSlice({
       state,
       action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_MoveCard }>,
     ) => {
-      const { gameId, playerId, data } = action.payload;
+      const { gameId, data } = action.payload;
       const {
         cardId, cardName, startPlayerId, startZone, position,
         targetPlayerId, targetZone, x, y, newCardId, faceDown, newCardProviderId,
@@ -194,8 +194,7 @@ export const gamesSlice = createSlice({
         return;
       }
 
-      const effectiveStartPlayerId = startPlayerId >= 0 ? startPlayerId : playerId;
-      const sourcePlayer = game.players[effectiveStartPlayerId];
+      const sourcePlayer = game.players[startPlayerId];
       const sourceZone = sourcePlayer?.zones[startZone];
       if (!sourcePlayer || !sourceZone) {
         return;
@@ -214,10 +213,16 @@ export const gamesSlice = createSlice({
         resolvedCardId = sourceZone.order[position];
       }
 
-      const removedCard: Data.ServerInfo_Card | undefined =
-        resolvedCardId >= 0 ? sourceZone.byId[resolvedCardId] : undefined;
+      // If the card can't be resolved and no newCardId is provided, the event
+      // is malformed — bail out to avoid creating phantom cards with id -1.
+      if (resolvedCardId < 0 && newCardId < 0) {
+        return;
+      }
 
+      // Remove from source zone if the card was resolved to a known entry
+      let removedCard: Data.ServerInfo_Card | undefined;
       if (resolvedCardId >= 0) {
+        removedCard = sourceZone.byId[resolvedCardId];
         const idx = sourceZone.order.indexOf(resolvedCardId);
         if (idx >= 0) {
           sourceZone.order.splice(idx, 1);
@@ -226,11 +231,12 @@ export const gamesSlice = createSlice({
       }
       sourceZone.cardCount = Math.max(0, sourceZone.cardCount - 1);
 
-      const effectiveNewId = newCardId >= 0 ? newCardId : (removedCard?.id ?? -1);
+      const effectiveNewId = newCardId >= 0 ? newCardId : (removedCard?.id ?? resolvedCardId);
       const movedCard: Data.ServerInfo_Card = removedCard
         ? {
           ...removedCard, id: effectiveNewId, name: cardName || removedCard.name,
           x, y, faceDown, providerId: newCardProviderId || removedCard.providerId,
+          counterList: [...removedCard.counterList],
         }
         : buildEmptyCard(effectiveNewId, cardName, x, y, faceDown, newCardProviderId ?? '');
 
@@ -342,8 +348,8 @@ export const gamesSlice = createSlice({
     arrowCreated: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_CreateArrow }>) => {
       const { gameId, playerId, data } = action.payload;
       const player = state.games[gameId]?.players[playerId];
-      if (player) {
-        player.arrows[data.arrowInfo.id] = data.arrowInfo;
+      if (player && data.arrowInfo) {
+        player.arrows[data.arrowInfo.id] = { ...data.arrowInfo };
       }
     },
 
@@ -360,8 +366,8 @@ export const gamesSlice = createSlice({
     counterCreated: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_CreateCounter }>) => {
       const { gameId, playerId, data } = action.payload;
       const player = state.games[gameId]?.players[playerId];
-      if (player) {
-        player.counters[data.counterInfo.id] = data.counterInfo;
+      if (player && data.counterInfo) {
+        player.counters[data.counterInfo.id] = { ...data.counterInfo };
       }
     },
 
@@ -417,12 +423,10 @@ export const gamesSlice = createSlice({
       }
 
       for (const revealedCard of cards) {
-        if (zone.byId[revealedCard.id]) {
-          Object.assign(zone.byId[revealedCard.id], revealedCard);
-        } else {
+        if (!zone.byId[revealedCard.id]) {
           zone.order.push(revealedCard.id);
-          zone.byId[revealedCard.id] = revealedCard;
         }
+        zone.byId[revealedCard.id] = { ...revealedCard, counterList: [...revealedCard.counterList] };
       }
     },
 
@@ -465,8 +469,8 @@ export const gamesSlice = createSlice({
 
     // ── Chat ──────────────────────────────────────────────────────────────────
 
-    gameSay: (state, action: PayloadAction<{ gameId: number; playerId: number; message: string }>) => {
-      const { gameId, playerId, message } = action.payload;
+    gameSay: (state, action: PayloadAction<{ gameId: number; playerId: number; message: string; timeReceived: number }>) => {
+      const { gameId, playerId, message, timeReceived } = action.payload;
       const game = state.games[gameId];
       if (!game) {
         return;
@@ -474,7 +478,7 @@ export const gamesSlice = createSlice({
       if (game.messages.length >= MAX_GAME_MESSAGES) {
         game.messages = game.messages.slice(game.messages.length - MAX_GAME_MESSAGES + 1);
       }
-      game.messages.push({ playerId, message, timeReceived: Date.now() });
+      game.messages.push({ playerId, message, timeReceived });
     },
 
     // ── Log-only events ─────────────────────────────────────────────────────

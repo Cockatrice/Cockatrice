@@ -6,7 +6,7 @@ import {
   makeServerState,
   makeUser,
 } from './__mocks__/server-fixtures';
-import { App, Data } from '@app/types';
+import { Data, Enriched } from '@app/types';
 
 function rootState(server: ServerState) {
   return { server };
@@ -34,17 +34,17 @@ describe('Selectors', () => {
   });
 
   it('getDescription → returns status.description', () => {
-    const state = makeServerState({ status: { connectionAttemptMade: false, state: App.StatusEnum.CONNECTED, description: 'ok' } });
+    const state = makeServerState({ status: { connectionAttemptMade: false, state: Enriched.StatusEnum.CONNECTED, description: 'ok' } });
     expect(Selectors.getDescription(rootState(state))).toBe('ok');
   });
 
   it('getState → returns status.state', () => {
-    const state = makeServerState({ status: { connectionAttemptMade: false, state: App.StatusEnum.LOGGED_IN, description: null } });
-    expect(Selectors.getState(rootState(state))).toBe(App.StatusEnum.LOGGED_IN);
+    const state = makeServerState({ status: { connectionAttemptMade: false, state: Enriched.StatusEnum.LOGGED_IN, description: null } });
+    expect(Selectors.getState(rootState(state))).toBe(Enriched.StatusEnum.LOGGED_IN);
   });
 
   it('getConnectionAttemptMade → returns status.connectionAttemptMade', () => {
-    const state = makeServerState({ status: { connectionAttemptMade: true, state: App.StatusEnum.DISCONNECTED, description: null } });
+    const state = makeServerState({ status: { connectionAttemptMade: true, state: Enriched.StatusEnum.DISCONNECTED, description: null } });
     expect(Selectors.getConnectionAttemptMade(rootState(state))).toBe(true);
   });
 
@@ -153,17 +153,17 @@ describe('Selectors', () => {
   // ── derived selectors (createSelector) ──────────────────────────────
 
   it('getIsConnected → true when state is LOGGED_IN', () => {
-    const state = makeServerState({ status: { connectionAttemptMade: true, state: App.StatusEnum.LOGGED_IN, description: null } });
+    const state = makeServerState({ status: { connectionAttemptMade: true, state: Enriched.StatusEnum.LOGGED_IN, description: null } });
     expect(Selectors.getIsConnected(rootState(state))).toBe(true);
   });
 
   it('getIsConnected → false when state is CONNECTED', () => {
-    const state = makeServerState({ status: { connectionAttemptMade: true, state: App.StatusEnum.CONNECTED, description: null } });
+    const state = makeServerState({ status: { connectionAttemptMade: true, state: Enriched.StatusEnum.CONNECTED, description: null } });
     expect(Selectors.getIsConnected(rootState(state))).toBe(false);
   });
 
   it('getIsConnected → false when state is DISCONNECTED', () => {
-    const state = makeServerState({ status: { connectionAttemptMade: false, state: App.StatusEnum.DISCONNECTED, description: null } });
+    const state = makeServerState({ status: { connectionAttemptMade: false, state: Enriched.StatusEnum.DISCONNECTED, description: null } });
     expect(Selectors.getIsConnected(rootState(state))).toBe(false);
   });
 
@@ -189,7 +189,7 @@ describe('Selectors', () => {
   // ── createSelector reference stability ──────────────────────────────
 
   it('getIsConnected → returns same value reference for identical state', () => {
-    const state = makeServerState({ status: { connectionAttemptMade: true, state: App.StatusEnum.LOGGED_IN, description: null } });
+    const state = makeServerState({ status: { connectionAttemptMade: true, state: Enriched.StatusEnum.LOGGED_IN, description: null } });
     const root = rootState(state);
     const a = Selectors.getIsConnected(root);
     const b = Selectors.getIsConnected(root);

@@ -1,5 +1,4 @@
-// eslint-disable-next-line
-import React, { useEffect } from "react";
+import { useEffect } from 'react';
 
 import { AuthGuard, ModGuard } from '@app/components';
 import { SearchForm } from '@app/forms';

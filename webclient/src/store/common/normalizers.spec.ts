@@ -77,11 +77,23 @@ describe('normalizeLogs', () => {
     const result = normalizeLogs(logs);
     expect(result.room).toHaveLength(2);
     expect(result.game).toHaveLength(1);
-    expect(result.chat).toBeUndefined();
+    expect(result.chat).toEqual([]);
   });
 
-  it('returns empty object for empty logs', () => {
-    expect(normalizeLogs([])).toEqual({});
+  it('returns all three keys as empty arrays for empty logs', () => {
+    expect(normalizeLogs([])).toEqual({ room: [], game: [], chat: [] });
+  });
+
+  it('skips logs whose targetType is not one of the known buckets', () => {
+    const logs = [
+      create(Data.ServerInfo_ChatMessageSchema, { targetType: 'room' }),
+      create(Data.ServerInfo_ChatMessageSchema, { targetType: '' }),
+      create(Data.ServerInfo_ChatMessageSchema, { targetType: 'unknown' }),
+    ];
+    const result = normalizeLogs(logs);
+    expect(result.room).toHaveLength(1);
+    expect(result.game).toEqual([]);
+    expect(result.chat).toEqual([]);
   });
 });
 

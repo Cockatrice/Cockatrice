@@ -35,8 +35,8 @@ export class GameResponseImpl implements IGameResponse {
     GameDispatch.kicked(gameId);
   }
 
-  gameSay(gameId: number, playerId: number, message: string): void {
-    GameDispatch.gameSay(gameId, playerId, message);
+  gameSay(gameId: number, playerId: number, message: string, timeReceived: number): void {
+    GameDispatch.gameSay(gameId, playerId, message, timeReceived);
   }
 
   cardMoved(gameId: number, playerId: number, data: Data.Event_MoveCard): void {

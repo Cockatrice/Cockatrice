@@ -1,5 +1,5 @@
 export * from './cards';
-export * from './constants';
+export * from './regex-patterns';
 export * from './countries';
 export * from './languages';
 export * from './routes';

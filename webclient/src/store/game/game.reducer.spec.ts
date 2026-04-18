@@ -417,6 +417,69 @@ describe('2C: CARD_MOVED', () => {
     expect(cardsIn(result, 1, 1, 'hand')).toHaveLength(1);
     expect(result.games[1].players[1].zones['nonexistent']).toBeUndefined();
   });
+
+  it('CARD_MOVED → no-ops when neither cardId nor position resolve and newCardId < 0', () => {
+    const state = makeState({
+      games: {
+        1: makeGameEntry({
+          players: {
+            1: makePlayerEntry({
+              zones: {
+                deck: makeZoneEntry({ name: 'deck', cards: [], cardCount: 5 }),
+                hand: makeZoneEntry({ name: 'hand', cards: [], cardCount: 0 }),
+              },
+            }),
+          },
+        }),
+      },
+    });
+
+    const result = gamesReducer(state, Actions.cardMoved({
+      gameId: 1,
+      playerId: 1,
+      data: {
+        cardId: -1, cardName: '', startPlayerId: 1, startZone: 'deck',
+        position: -1, targetPlayerId: 1, targetZone: 'hand',
+        x: 0, y: 0, newCardId: -1, faceDown: false, newCardProviderId: '',
+      },
+    }));
+
+    expect(result.games[1].players[1].zones['deck'].cardCount).toBe(5);
+    expect(cardsIn(result, 1, 1, 'hand')).toHaveLength(0);
+  });
+
+  it('CARD_MOVED → deep-clones counterList so moved card is independent', () => {
+    const cardCounter = create(Data.ServerInfo_CardCounterSchema, { id: 1, value: 3 });
+    const card = makeCard({ id: 10, counterList: [cardCounter] });
+    const state = makeState({
+      games: {
+        1: makeGameEntry({
+          players: {
+            1: makePlayerEntry({
+              zones: {
+                hand: makeZoneEntry({ name: 'hand', cards: [card], cardCount: 1 }),
+                table: makeZoneEntry({ name: 'table', cardCount: 0 }),
+              },
+            }),
+          },
+        }),
+      },
+    });
+
+    const result = gamesReducer(state, Actions.cardMoved({
+      gameId: 1,
+      playerId: 1,
+      data: {
+        cardId: 10, cardName: '', startPlayerId: 1, startZone: 'hand',
+        position: -1, targetPlayerId: 1, targetZone: 'table',
+        x: 0, y: 0, newCardId: -1, faceDown: false, newCardProviderId: '',
+      },
+    }));
+
+    const movedCard = cardsIn(result, 1, 1, 'table')[0];
+    expect(movedCard.counterList).toHaveLength(1);
+    expect(movedCard.counterList).not.toBe(card.counterList);
+  });
 });
 
 // ── 2D: Card mutations ────────────────────────────────────────────────────────
@@ -696,6 +759,17 @@ describe('2H: Player counters', () => {
     expect(result.games[1].players[1].counters[5]).toEqual(counter);
   });
 
+  it('COUNTER_CREATED → clones counterInfo to prevent shared references', () => {
+    const state = makeState();
+    const counter = makeCounter({ id: 5, name: 'Life', count: 20 });
+    const result = gamesReducer(state, Actions.counterCreated({
+      gameId: 1,
+      playerId: 1,
+      data: { counterInfo: counter },
+    }));
+    expect(result.games[1].players[1].counters[5]).not.toBe(counter);
+  });
+
   it('COUNTER_SET → updates counter.count to new value', () => {
     const counter = makeCounter({ id: 5, count: 20 });
     const state = makeState({
@@ -845,6 +919,34 @@ describe('2I: Zone operations', () => {
     expect(cardsIn(result, 1, 1, 'deck')[1]).toEqual(newCard);
   });
 
+  it('CARDS_REVEALED → clones counterList to prevent shared references', () => {
+    const cardCounter = create(Data.ServerInfo_CardCounterSchema, { id: 1, value: 5 });
+    const revealedCard = makeCard({ id: 3, counterList: [cardCounter] });
+    const state = makeState({
+      games: {
+        1: makeGameEntry({
+          players: {
+            1: makePlayerEntry({
+              zones: {
+                deck: makeZoneEntry({ name: 'deck', cards: [], cardCount: 0 }),
+              },
+            }),
+          },
+        }),
+      },
+    });
+
+    const result = gamesReducer(state, Actions.cardsRevealed({
+      gameId: 1,
+      playerId: 1,
+      data: { zoneName: 'deck', cards: [revealedCard] },
+    }));
+
+    const stored = cardsIn(result, 1, 1, 'deck')[0];
+    expect(stored.counterList).toEqual(revealedCard.counterList);
+    expect(stored.counterList).not.toBe(revealedCard.counterList);
+  });
+
   it('ZONE_PROPERTIES_CHANGED → sets alwaysRevealTopCard and alwaysLookAtTopCard', () => {
     const state = makeState();
     const result = gamesReducer(state, Actions.zonePropertiesChanged({
@@ -882,21 +984,17 @@ describe('2J: Turn, phase, and chat', () => {
     expect(result.games[1].reversed).toBe(true);
   });
 
-  it('GAME_SAY → appends message with mocked Date.now() as timeReceived', () => {
+  it('GAME_SAY → appends message with timeReceived from payload', () => {
     const state = makeState();
-    const dateNowSpy = vi.spyOn(Date, 'now').mockReturnValue(123456789);
-    try {
-      const result = gamesReducer(state, Actions.gameSay({
-        gameId: 1,
-        playerId: 2,
-        message: 'gg',
-      }));
+    const result = gamesReducer(state, Actions.gameSay({
+      gameId: 1,
+      playerId: 2,
+      message: 'gg',
+      timeReceived: 123456789,
+    }));
 
-      expect(result.games[1].messages).toHaveLength(1);
-      expect(result.games[1].messages[0]).toEqual({ playerId: 2, message: 'gg', timeReceived: 123456789 });
-    } finally {
-      dateNowSpy.mockRestore();
-    }
+    expect(result.games[1].messages).toHaveLength(1);
+    expect(result.games[1].messages[0]).toEqual({ playerId: 2, message: 'gg', timeReceived: 123456789 });
   });
 });
 
@@ -1332,6 +1430,6 @@ describe('2L: Null-guard / missing entity early-returns', () => {
 
   it('GAME_SAY with unknown gameId → state unchanged', () => {
     const state = makeState();
-    expect(gamesReducer(state, Actions.gameSay({ gameId: UNKNOWN_GAME, playerId: 1, message: 'hi' }))).toBe(state);
+    expect(gamesReducer(state, Actions.gameSay({ gameId: UNKNOWN_GAME, playerId: 1, message: 'hi', timeReceived: 0 }))).toBe(state);
   });
 });

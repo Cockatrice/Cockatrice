@@ -1,3 +1,5 @@
+import Dexie from 'dexie';
+
 export enum Stores {
   SETTINGS = 'settings',
   CARDS = 'cards',
@@ -6,7 +8,7 @@ export enum Stores {
   HOSTS = 'hosts',
 }
 
-export const schemaV1 = (db) => {
+export const schemaV1 = (db: Dexie) => {
   db.version(1).stores({
     [Stores.CARDS]: 'name',
     [Stores.SETS]: 'code',

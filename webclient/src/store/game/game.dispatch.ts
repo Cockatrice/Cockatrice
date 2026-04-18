@@ -127,7 +127,7 @@ export const Dispatch = {
     store.dispatch(Actions.zonePropertiesChanged({ gameId, playerId, data }));
   },
 
-  gameSay: (gameId: number, playerId: number, message: string) => {
-    store.dispatch(Actions.gameSay({ gameId, playerId, message }));
+  gameSay: (gameId: number, playerId: number, message: string, timeReceived: number) => {
+    store.dispatch(Actions.gameSay({ gameId, playerId, message, timeReceived }));
   },
 };

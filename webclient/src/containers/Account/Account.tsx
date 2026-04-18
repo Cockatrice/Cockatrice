@@ -1,5 +1,4 @@
-// eslint-disable-next-line
-import React, { Component } from "react";
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Button from '@mui/material/Button';
@@ -25,7 +24,21 @@ const Account = () => {
   const user = useAppSelector(state => ServerSelectors.getUser(state));
   const webClient = useWebClient();
   const { country, realName, name, userLevel, accountageSecs, avatarBmp } = user || {};
-  let url = URL.createObjectURL(new Blob([avatarBmp as BlobPart], { 'type': 'image/png' }));
+
+  const avatarUrl = useMemo(() => {
+    if (!avatarBmp) {
+      return '';
+    }
+    return URL.createObjectURL(new Blob([avatarBmp as BlobPart], { type: 'image/png' }));
+  }, [avatarBmp]);
+
+  useEffect(() => {
+    return () => {
+      if (avatarUrl) {
+        URL.revokeObjectURL(avatarUrl);
+      }
+    };
+  }, [avatarUrl]);
 
   const { t } = useTranslation();
 
@@ -42,41 +55,41 @@ const Account = () => {
       <AuthGuard />
       <div className="account-column">
         <Paper className="account-list">
-          <div className="">
+          <div>
             Buddies Online: ?/{buddyList.length}
           </div>
           <VirtualList
             items={ buddyList.map(user => (
-              <ListItemButton dense>
+              <ListItemButton key={user.name} dense>
                 <UserDisplay user={user} />
               </ListItemButton>
             )) }
           />
-          <div className="" style={{ borderTop: '1px solid' }}>
+          <div style={{ borderTop: '1px solid' }}>
             <AddToBuddies onSubmit={handleAddToBuddies} />
           </div>
         </Paper>
       </div>
       <div className="account-column">
         <Paper className="account-list overflow-scroll">
-          <div className="">
+          <div>
             Ignored Users Online: ?/{ignoreList.length}
           </div>
           <VirtualList
             items={ ignoreList.map(user => (
-              <ListItemButton dense>
+              <ListItemButton key={user.name} dense>
                 <UserDisplay user={user} />
               </ListItemButton>
             )) }
           />
-          <div className="" style={{ borderTop: '1px solid' }}>
+          <div style={{ borderTop: '1px solid' }}>
             <AddToIgnore onSubmit={handleAddToIgnore} />
           </div>
         </Paper>
       </div>
       <div className="account-column overflow-scroll">
         <Paper className="account-details" style={{ margin: '0 0 5px 0' }}>
-          <img src={url} alt={name} />
+          { avatarUrl && <img src={avatarUrl} alt={name} /> }
           <p><strong>{name}</strong></p>
           <p>Location: ({country?.toUpperCase()})</p>
           <p>User Level: {userLevel}</p>
@@ -95,7 +108,7 @@ const Account = () => {
           <Button
             color="primary"
             variant="contained"
-            onClick={() => request.authentication.disconnect()}
+            onClick={() => webClient.request.authentication.disconnect()}
           >
             { t('Common.disconnect') }
           </Button>

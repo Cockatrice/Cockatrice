@@ -1,6 +1,6 @@
 import { Actions } from './server.actions';
 import { store } from '..';
-import { App, Data, Enriched } from '@app/types';
+import { Data, Enriched } from '@app/types';
 
 export const Dispatch = {
   initialized: () => {
@@ -48,7 +48,7 @@ export const Dispatch = {
   updateInfo: (name: string, version: string) => {
     store.dispatch(Actions.updateInfo({ info: { name, version } }));
   },
-  updateStatus: (state: App.StatusEnum, description: string) => {
+  updateStatus: (state: Enriched.StatusEnum, description: string) => {
     store.dispatch(Actions.updateStatus({ status: { state, description } }));
   },
   updateUser: (user: Data.ServerInfo_User) => {

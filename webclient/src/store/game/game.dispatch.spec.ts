@@ -197,7 +197,7 @@ describe('Dispatch', () => {
   });
 
   it('gameSay dispatches Actions.gameSay()', () => {
-    Dispatch.gameSay(1, 2, 'gg wp');
-    expect(mockDispatch).toHaveBeenCalledWith(Actions.gameSay({ gameId: 1, playerId: 2, message: 'gg wp' }));
+    Dispatch.gameSay(1, 2, 'gg wp', 1700000000000);
+    expect(mockDispatch).toHaveBeenCalledWith(Actions.gameSay({ gameId: 1, playerId: 2, message: 'gg wp', timeReceived: 1700000000000 }));
   });
 });

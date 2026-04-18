@@ -6,7 +6,7 @@ vi.mock('..', () => ({ store: { dispatch: mockDispatch } }));
 
 import { Actions } from './server.actions';
 import { Dispatch } from './server.dispatch';
-import { App, Data } from '@app/types';
+import { Data, Enriched } from '@app/types';
 import { create } from '@bufbuild/protobuf';
 import {
   makeBanHistoryItem,
@@ -106,8 +106,10 @@ describe('Dispatch', () => {
   });
 
   it('updateStatus dispatches Actions.updateStatus({ status: { state, description } })', () => {
-    Dispatch.updateStatus(App.StatusEnum.CONNECTED, 'ok');
-    expect(mockDispatch).toHaveBeenCalledWith(Actions.updateStatus({ status: { state: App.StatusEnum.CONNECTED, description: 'ok' } }));
+    Dispatch.updateStatus(Enriched.StatusEnum.CONNECTED, 'ok');
+    expect(mockDispatch).toHaveBeenCalledWith(
+      Actions.updateStatus({ status: { state: Enriched.StatusEnum.CONNECTED, description: 'ok' } })
+    );
   });
 
   it('updateUser dispatches Actions.updateUser()', () => {

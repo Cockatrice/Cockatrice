@@ -37,7 +37,7 @@ export const Dispatch = {
   },
 
   sortGames: (roomId: number, field: App.GameSortField, order: App.SortDirection) => {
-    store.dispatch(Actions.sortGames({ field, order }));
+    store.dispatch(Actions.sortGames({ roomId, field, order }));
   },
 
   removeMessages: (roomId: number, name: string, amount: number) => {

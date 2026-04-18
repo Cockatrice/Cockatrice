@@ -243,6 +243,7 @@ describe('SORT_GAMES', () => {
   it('updates sortGamesBy on state (sorting itself is now derived in selectors)', () => {
     const state = makeRoomsState({ rooms: {} });
     const result = roomsReducer(state, Actions.sortGames({
+      roomId: 1,
       field: App.GameSortField.START_TIME,
       order: App.SortDirection.ASC,
     }));

@@ -8,7 +8,7 @@ const AuthGuard = () => {
   const isConnected = useAppSelector(ServerSelectors.getIsConnected);
   return !isConnected
     ? <Navigate to={App.RouteEnum.LOGIN} />
-    : <div></div>;
+    : <></>;
 };
 
 export default AuthGuard;

@@ -82,14 +82,14 @@ export const roomsSlice = createSlice({
     addMessage: (state, action: PayloadAction<{ roomId: number; message: Enriched.Message }>) => {
       const { roomId, message } = action.payload;
 
-      const existing = state.messages[roomId] ?? [];
-      const normalized = normalizeUserMessage(message);
-      const next =
-        existing.length >= MAX_ROOM_MESSAGES
-          ? [...existing.slice(existing.length - MAX_ROOM_MESSAGES + 1), normalized]
-          : [...existing, normalized];
-
-      state.messages[roomId] = next;
+      if (!state.messages[roomId]) {
+        state.messages[roomId] = [];
+      }
+      const msgs = state.messages[roomId];
+      if (msgs.length >= MAX_ROOM_MESSAGES) {
+        state.messages[roomId] = msgs.slice(msgs.length - MAX_ROOM_MESSAGES + 1);
+      }
+      state.messages[roomId].push(normalizeUserMessage(message));
     },
 
     updateGames: (state, action: PayloadAction<{ roomId: number; games: Data.ServerInfo_Game[] }>) => {
@@ -145,8 +145,9 @@ export const roomsSlice = createSlice({
       delete room.users[name];
     },
 
-    sortGames: (state, action: PayloadAction<{ field: App.GameSortField; order: App.SortDirection }>) => {
-      // Sort is now derived in selectors; the reducer only stores the sort config.
+    sortGames: (state, action: PayloadAction<{ roomId: number; field: App.GameSortField; order: App.SortDirection }>) => {
+      // Sort is derived in selectors; the reducer stores the sort config.
+      // roomId is passed through for future per-room sorting support.
       const { field, order } = action.payload;
       state.sortGamesBy = { field, order };
     },

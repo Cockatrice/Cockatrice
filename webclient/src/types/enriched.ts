@@ -1,6 +1,5 @@
 import type {
   Event_RoomSay,
-  GameEventContext,
   ServerInfo_Arrow,
   ServerInfo_Card,
   ServerInfo_ChatMessage,
@@ -110,32 +109,20 @@ export interface GameMessage {
   timeReceived: number;
 }
 
-/**
- * Passed to every game event handler alongside the event payload.
- * Contains per-container metadata from GameEventContainer.
- * Not stored in Redux — transient routing metadata only.
- */
-export interface GameEventMeta {
-  gameId: number;
-  playerId: number;
-  /** Raw protobuf GameEventContext object. Not stored in Redux. */
-  context: GameEventContext | null;
-  secondsElapsed: number;
-  /** Proto type is uint32. Non-zero means the action was forced by a judge. */
-  forcedByJudge: number;
-}
-
 export interface LogGroups {
   room: ServerInfo_ChatMessage[];
   game: ServerInfo_ChatMessage[];
   chat: ServerInfo_ChatMessage[];
 }
 
-// ── Connect options (re-exported from @app/websocket) ────────────────────────
-// Source of truth lives in src/websocket/connectOptions.ts. Re-exported here
-// so UI code can use the Enriched.* namespace without importing @app/websocket.
+// ── Websocket re-exports ─────────────────────────────────────────────────────
+// Source of truth lives in @app/websocket. Re-exported here so app code can
+// reach these via the Enriched.* namespace without importing @app/websocket.
+
+export { StatusEnum, WebSocketConnectReason } from '@app/websocket';
 
 export type {
+  GameEventMeta,
   LoginConnectOptions,
   RegisterConnectOptions,
   ActivateConnectOptions,

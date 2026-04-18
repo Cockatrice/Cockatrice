@@ -5,6 +5,43 @@ import './polyfills';
 // Ensure jest-dom matchers are available in every test file.
 import '@testing-library/jest-dom/vitest';
 
+// jsdom doesn't provide ResizeObserver; react-window needs it.
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as any;
+}
+
+// Mock Dexie globally to prevent IndexedDB initialization in jsdom.
+// Dexie eagerly opens IndexedDB on import, and jsdom's fake-indexeddb
+// is memory-intensive. No UI test needs a real database.
+vi.mock('dexie', () => {
+  const fakeTable = {
+    mapToClass: () => {},
+    get: () => Promise.resolve(null),
+    put: () => Promise.resolve(),
+    add: () => Promise.resolve(1),
+    bulkAdd: () => Promise.resolve(),
+    delete: () => Promise.resolve(),
+    toArray: () => Promise.resolve([]),
+    where: () => ({ equals: () => ({ first: () => Promise.resolve(null) }) }),
+  };
+  class FakeDexie {
+    version() {
+      return { stores: () => this };
+    }
+    open() {
+      return Promise.resolve(this);
+    }
+    table() {
+      return fakeTable;
+    }
+  }
+  return { default: FakeDexie, __esModule: true };
+});
+
 // ── Global mock hygiene under `isolate: false` ────────────────────────────────
 //
 // Vitest is configured with `test.isolate: false` for speed — every spec file

@@ -3,8 +3,7 @@ import Grid from '@mui/material/Grid';
 
 import './ThreePaneLayout.css';
 
-// @DEPRECATED
-// This component sucks balls, dont use it. It will be removed sooner than later.
+/** @deprecated Scheduled for replacement with a more flexible layout component. */
 function ThreePaneLayout(props: ThreePaneLayoutProps) {
   return (
     <div className="three-pane-layout">

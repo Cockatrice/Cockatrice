@@ -74,7 +74,7 @@ describe('Dispatch', () => {
   it('sortGames dispatches Actions.sortGames()', () => {
     Dispatch.sortGames(1, App.GameSortField.START_TIME, App.SortDirection.ASC);
     expect(mockDispatch).toHaveBeenCalledWith(
-      Actions.sortGames({ field: App.GameSortField.START_TIME, order: App.SortDirection.ASC })
+      Actions.sortGames({ roomId: 1, field: App.GameSortField.START_TIME, order: App.SortDirection.ASC })
     );
   });
 

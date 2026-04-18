@@ -3,7 +3,7 @@ import { App } from '@app/types';
 import { dexieService } from '../DexieService';
 
 export class SettingDTO extends App.Setting {
-  constructor(user) {
+  constructor(user: string) {
     super();
 
     this.user = user;
@@ -14,7 +14,7 @@ export class SettingDTO extends App.Setting {
     return dexieService.settings.put(this);
   }
 
-  static get(user) {
+  static get(user: string) {
     return dexieService.settings.where('user').equalsIgnoreCase(user).first();
   }
 };

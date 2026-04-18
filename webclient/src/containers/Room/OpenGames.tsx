@@ -1,5 +1,4 @@
-// eslint-disable-next-line
-import React from "react";
+import React from 'react';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -42,17 +41,17 @@ const OpenGames = ({ room }: OpenGamesProps) => {
     RoomsDispatch.sortGames(roomId, field, order);
   };
 
-  const isUnavailableGame = ({ started, maxPlayers, playerCount }) =>
+  const isAvailable = ({ started, maxPlayers, playerCount }) =>
     !started && playerCount < maxPlayers;
 
-  const isPasswordProtectedGame = ({ withPassword }) => !withPassword;
+  const isOpen = ({ withPassword }) => !withPassword;
 
-  const isBuddiesOnlyGame = ({ onlyBuddies }) => !onlyBuddies;
+  const isPublic = ({ onlyBuddies }) => !onlyBuddies;
 
   const games = sortedGames.filter(game => (
-    isUnavailableGame(game.info) &&
-    isPasswordProtectedGame(game.info) &&
-    isBuddiesOnlyGame(game.info)
+    isAvailable(game.info) &&
+    isOpen(game.info) &&
+    isPublic(game.info)
   ));
 
   return (

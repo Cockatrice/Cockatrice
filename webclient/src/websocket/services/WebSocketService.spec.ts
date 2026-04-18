@@ -198,6 +198,12 @@ describe('WebSocketService', () => {
       service.send(data);
       expect(mockInstance.send).toHaveBeenCalledWith(data);
     });
+
+    it('does not throw when socket is undefined (before connect)', () => {
+      const service = new WebSocketService(mockConfig);
+      const data = new Uint8Array([1, 2, 3]);
+      expect(() => service.send(data)).not.toThrow();
+    });
   });
 
   describe('checkReadyState', () => {

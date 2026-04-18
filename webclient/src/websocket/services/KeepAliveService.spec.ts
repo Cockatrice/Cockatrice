@@ -64,5 +64,14 @@ describe('KeepAliveService', () => {
 
       expect(service.endPingLoop).toHaveBeenCalled();
     });
+
+    it('should clear previous interval when startPingLoop is called again', () => {
+      const clearSpy = vi.spyOn(globalThis, 'clearInterval');
+      const previousCb = (service as KeepAliveInternal).keepalivecb;
+
+      service.startPingLoop(interval, ping);
+
+      expect(clearSpy).toHaveBeenCalledWith(previousCb);
+    });
   });
 });

@@ -42,9 +42,10 @@ describe('Actions', () => {
   });
 
   it('sortGames', () => {
-    expect(Actions.sortGames({ field: App.GameSortField.START_TIME, order: App.SortDirection.ASC })).toEqual({
+    expect(Actions.sortGames({ roomId: 1, field: App.GameSortField.START_TIME, order: App.SortDirection.ASC })).toEqual({
       type: Types.SORT_GAMES,
       payload: {
+        roomId: 1,
         field: App.GameSortField.START_TIME,
         order: App.SortDirection.ASC,
       },

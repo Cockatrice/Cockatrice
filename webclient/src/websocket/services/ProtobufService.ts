@@ -54,11 +54,7 @@ export class ProtobufService {
     const gameCmd = create(GameCommandSchema);
     setExtension(gameCmd, ext, value);
     const cmd = create(CommandContainerSchema, { gameId, gameCommand: [gameCmd] });
-    this.sendCommand(cmd, raw => {
-      if (options) {
-        handleResponse(ext.typeName, raw, options);
-      }
-    });
+    this.dispatchCommand(ext.typeName, cmd, options);
   }
 
   public sendRoomCommand<V, R = unknown>(
@@ -70,11 +66,7 @@ export class ProtobufService {
     const roomCmd = create(RoomCommandSchema);
     setExtension(roomCmd, ext, value);
     const cmd = create(CommandContainerSchema, { roomId, roomCommand: [roomCmd] });
-    this.sendCommand(cmd, raw => {
-      if (options) {
-        handleResponse(ext.typeName, raw, options);
-      }
-    });
+    this.dispatchCommand(ext.typeName, cmd, options);
   }
 
   public sendSessionCommand<V, R = unknown>(
@@ -85,11 +77,7 @@ export class ProtobufService {
     const sesCmd = create(SessionCommandSchema);
     setExtension(sesCmd, ext, value);
     const cmd = create(CommandContainerSchema, { sessionCommand: [sesCmd] });
-    this.sendCommand(cmd, raw => {
-      if (options) {
-        handleResponse(ext.typeName, raw, options);
-      }
-    });
+    this.dispatchCommand(ext.typeName, cmd, options);
   }
 
   public sendModeratorCommand<V, R = unknown>(
@@ -100,11 +88,7 @@ export class ProtobufService {
     const modCmd = create(ModeratorCommandSchema);
     setExtension(modCmd, ext, value);
     const cmd = create(CommandContainerSchema, { moderatorCommand: [modCmd] });
-    this.sendCommand(cmd, raw => {
-      if (options) {
-        handleResponse(ext.typeName, raw, options);
-      }
-    });
+    this.dispatchCommand(ext.typeName, cmd, options);
   }
 
   public sendAdminCommand<V, R = unknown>(
@@ -115,22 +99,31 @@ export class ProtobufService {
     const adminCmd = create(AdminCommandSchema);
     setExtension(adminCmd, ext, value);
     const cmd = create(CommandContainerSchema, { adminCommand: [adminCmd] });
-    this.sendCommand(cmd, raw => {
-      if (options) {
-        handleResponse(ext.typeName, raw, options);
-      }
-    });
+    this.dispatchCommand(ext.typeName, cmd, options);
   }
 
-  public sendCommand(cmd: CommandContainer, callback: (raw: Response) => void) {
+  private dispatchCommand<R>(typeName: string, cmd: CommandContainer, options?: CommandOptions<R>): void {
+    const sent = this.sendCommand(cmd, raw => {
+      if (options) {
+        handleResponse(typeName, raw, options);
+      }
+    });
+
+    if (!sent) {
+      options?.onError?.(-1, {} as Response);
+    }
+  }
+
+  public sendCommand(cmd: CommandContainer, callback: (raw: Response) => void): boolean {
     if (!this.transport.isOpen()) {
-      return;
+      return false;
     }
 
     this.cmdId++;
     cmd.cmdId = BigInt(this.cmdId);
     this.pendingCommands.set(this.cmdId, callback);
     this.transport.send(toBinary(CommandContainerSchema, cmd));
+    return true;
   }
 
   public handleMessageEvent({ data }: MessageEvent): void {
@@ -153,7 +146,7 @@ export class ProtobufService {
             this.processGameEvent(msg.gameEventContainer);
             break;
           default:
-            console.log(msg);
+            console.warn('Unknown message type:', msg);
             break;
         }
       }

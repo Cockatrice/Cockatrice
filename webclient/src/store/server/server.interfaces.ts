@@ -43,7 +43,7 @@ export interface ServerState {
 export interface ServerStateStatus {
   connectionAttemptMade: boolean;
   description: string | null;
-  state: App.StatusEnum;
+  state: Enriched.StatusEnum;
 }
 
 export interface ServerStateInfo {

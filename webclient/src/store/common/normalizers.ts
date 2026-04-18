@@ -50,12 +50,13 @@ export function normalizeGameObject(game: Data.ServerInfo_Game, gametypeMap: Enr
 
 /** Group a flat LogItem[] into { room, game, chat } buckets for the server store. */
 export function normalizeLogs(logs: Data.ServerInfo_ChatMessage[]): Enriched.LogGroups {
-  return logs.reduce((obj, log) => {
+  return logs.reduce<Enriched.LogGroups>((obj, log) => {
     const type = log.targetType as keyof Enriched.LogGroups;
-    obj[type] = obj[type] || [];
-    obj[type]!.push(log);
+    if (obj[type]) {
+      obj[type].push(log);
+    }
     return obj;
-  }, {} as Enriched.LogGroups);
+  }, { room: [], game: [], chat: [] });
 }
 
 /**

@@ -11,7 +11,7 @@ import { LanguageDropdown } from '@app/components';
 import { LoginForm } from '@app/forms';
 import { useReduxEffect, useFireOnce, useWebClient } from '@app/hooks';
 import { Images } from '@app/images';
-import { HostDTO, serverProps } from '@app/services';
+import { HostDTO, getHostPort, serverProps } from '@app/services';
 import { App, Enriched } from '@app/types';
 import { ServerSelectors, ServerTypes } from '@app/store';
 import Layout from '../Layout/Layout';
@@ -125,7 +125,7 @@ const Login = () => {
     const { userName, password, selectedHost, remember } = loginForm;
 
     const options: Omit<Enriched.LoginConnectOptions, 'reason'> = {
-      ...App.getHostPort(selectedHost),
+      ...getHostPort(selectedHost),
       userName,
       password,
     };
@@ -154,7 +154,7 @@ const Login = () => {
     const { userName, password, email, country, realName, selectedHost } = registerForm;
 
     webClient.request.authentication.register({
-      ...App.getHostPort(selectedHost),
+      ...getHostPort(selectedHost),
       userName,
       password,
       email,
@@ -177,7 +177,7 @@ const Login = () => {
 
   const handleRequestPasswordResetDialogSubmit = (form) => {
     const { userName, email, selectedHost } = form;
-    const { host, port } = App.getHostPort(selectedHost);
+    const { host, port } = getHostPort(selectedHost);
 
     if (email) {
       webClient.request.authentication.resetPasswordChallenge({ userName, email, host, port });
@@ -188,7 +188,7 @@ const Login = () => {
   };
 
   const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }) => {
-    const { host, port } = App.getHostPort(selectedHost);
+    const { host, port } = getHostPort(selectedHost);
 
     webClient.request.authentication.resetPassword({ userName, token, newPassword, host, port });
   };

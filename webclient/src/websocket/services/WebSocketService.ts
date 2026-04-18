@@ -54,6 +54,9 @@ export class WebSocketService {
   }
 
   public send(message: Uint8Array): void {
+    if (!this.socket) {
+      return;
+    }
     this.socket.send(message as unknown as ArrayBufferView);
   }
 

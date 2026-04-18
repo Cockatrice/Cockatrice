@@ -1,6 +1,6 @@
-import { App, Data } from '@app/types';
+import { Data, Enriched } from '@app/types';
 import { create } from '@bufbuild/protobuf';
-import { serverReducer } from './server.reducer';
+import { serverReducer, MAX_USER_MESSAGES } from './server.reducer';
 import { Actions } from './server.actions';
 import {
   makeBanHistoryItem,
@@ -25,7 +25,7 @@ describe('Initialisation', () => {
     const result = serverReducer(undefined, { type: '@@INIT' });
     expect(result.initialized).toBe(false);
     expect(result.buddyList).toEqual({});
-    expect(result.status.state).toBe(App.StatusEnum.DISCONNECTED);
+    expect(result.status.state).toBe(Enriched.StatusEnum.DISCONNECTED);
   });
 
   it('INITIALIZED → resets to initialState with initialized: true', () => {
@@ -37,7 +37,7 @@ describe('Initialisation', () => {
   });
 
   it('CLEAR_STORE → resets to initialState but preserves status', () => {
-    const status = { state: App.StatusEnum.LOGGED_IN, description: 'logged in', connectionAttemptMade: true };
+    const status = { state: Enriched.StatusEnum.LOGGED_IN, description: 'logged in', connectionAttemptMade: true };
     const state = makeServerState({ status, banUser: 'someone' });
     const result = serverReducer(state, Actions.clearStore());
     expect(result.banUser).toBe('');
@@ -56,7 +56,7 @@ describe('Initialisation', () => {
 
 describe('Account & Connection', () => {
   it('CONNECTION_ATTEMPTED → sets connectionAttemptMade to true', () => {
-    const state = makeServerState({ status: { connectionAttemptMade: false, state: App.StatusEnum.DISCONNECTED, description: null } });
+    const state = makeServerState({ status: { connectionAttemptMade: false, state: Enriched.StatusEnum.DISCONNECTED, description: null } });
     const result = serverReducer(state, Actions.connectionAttempted());
     expect(result.status.connectionAttemptMade).toBe(true);
   });
@@ -131,9 +131,9 @@ describe('Server Info & Status', () => {
 
   it('UPDATE_STATUS → merges state and description into status', () => {
     const state = makeServerState();
-    const update = { state: App.StatusEnum.LOGGED_IN, description: 'ok' };
+    const update = { state: Enriched.StatusEnum.LOGGED_IN, description: 'ok' };
     const result = serverReducer(state, Actions.updateStatus({ status: update }));
-    expect(result.status.state).toBe(App.StatusEnum.LOGGED_IN);
+    expect(result.status.state).toBe(Enriched.StatusEnum.LOGGED_IN);
     expect(result.status.description).toBe('ok');
     expect(result.status.connectionAttemptMade).toBe(false);
   });
@@ -256,6 +256,14 @@ describe('Logs', () => {
     expect(result.logs.room).toEqual([log]);
   });
 
+  it('VIEW_LOGS with empty array → produces all three keys as empty arrays', () => {
+    const state = makeServerState();
+    const result = serverReducer(state, Actions.viewLogs({ logs: [] }));
+    expect(result.logs.room).toEqual([]);
+    expect(result.logs.game).toEqual([]);
+    expect(result.logs.chat).toEqual([]);
+  });
+
   it('CLEAR_LOGS → resets logs to empty arrays', () => {
     const state = makeServerState({ logs: { room: [makeLogItem()], game: [], chat: [] } });
     const result = serverReducer(state, Actions.clearLogs());
@@ -284,6 +292,13 @@ describe('Messaging', () => {
     expect(result.messages['Alice'][0]).toEqual(messageData);
   });
 
+  it('USER_MESSAGE → no-ops when user is null (not yet logged in)', () => {
+    const state = makeServerState({ user: null, messages: {} });
+    const messageData = { senderName: 'Alice', receiverName: 'Bob', message: 'hi' } as Data.Event_UserMessage;
+    const result = serverReducer(state, Actions.userMessage({ messageData }));
+    expect(result.messages).toEqual({});
+  });
+
   it('USER_MESSAGE → appends to existing messages for that user', () => {
     const existingMsg = create(Data.Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'first' });
     const state = makeServerState({
@@ -293,6 +308,21 @@ describe('Messaging', () => {
     const newMsg = create(Data.Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'second' });
     const result = serverReducer(state, Actions.userMessage({ messageData: newMsg }));
     expect(result.messages['Alice']).toHaveLength(2);
+  });
+
+  it(`USER_MESSAGE → caps messages at MAX_USER_MESSAGES (${MAX_USER_MESSAGES})`, () => {
+    const messages = Array.from({ length: MAX_USER_MESSAGES }, (_, i) =>
+      create(Data.Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: `msg-${i}` })
+    );
+    const state = makeServerState({
+      user: makeUser({ name: 'Bob' }),
+      messages: { Alice: messages },
+    });
+    const newMsg = create(Data.Event_UserMessageSchema, { senderName: 'Alice', receiverName: 'Bob', message: 'overflow' });
+    const result = serverReducer(state, Actions.userMessage({ messageData: newMsg }));
+    expect(result.messages['Alice']).toHaveLength(MAX_USER_MESSAGES);
+    expect(result.messages['Alice'][MAX_USER_MESSAGES - 1]).toEqual(newMsg);
+    expect(result.messages['Alice'][0].message).not.toBe('msg-0');
   });
 });
 

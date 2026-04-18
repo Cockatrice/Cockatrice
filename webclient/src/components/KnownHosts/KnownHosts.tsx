@@ -16,7 +16,7 @@ import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import { useWebClient } from '@app/hooks';
 import { KnownHostDialog } from '@app/dialogs';
 import { useReduxEffect } from '@app/hooks';
-import { HostDTO } from '@app/services';
+import { DefaultHosts, HostDTO, getHostPort } from '@app/services';
 import { ServerTypes } from '@app/store';
 import { App } from '@app/types';
 import Toast from '../Toast/Toast';
@@ -87,7 +87,7 @@ const KnownHosts = (props) => {
 
     if (!hosts?.length) {
       // @TODO: find a better pattern to seeding default data in indexedDB
-      await HostDTO.bulkAdd(App.DefaultHosts);
+      await HostDTO.bulkAdd(DefaultHosts);
       loadKnownHosts();
     } else {
       const selectedHost = hosts.find(({ lastSelected }) => lastSelected) || hosts[0];
@@ -197,7 +197,7 @@ const KnownHosts = (props) => {
   const testConnection = () => {
     setTestingConnection(TestConnection.TESTING);
 
-    const options = { ...App.getHostPort(hostsState.selectedHost) };
+    const options = { ...getHostPort(hostsState.selectedHost) };
     webClient.request.authentication.testConnection(options);
   }
 
@@ -238,7 +238,7 @@ const KnownHosts = (props) => {
 
           {
             hostsState.hosts.map((host, index) => {
-              const hostPort = App.getHostPort(hostsState.hosts[index]);
+              const hostPort = getHostPort(hostsState.hosts[index]);
 
               return (
                 <MenuItem value={host} key={index}>

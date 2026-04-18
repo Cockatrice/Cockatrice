@@ -143,7 +143,7 @@ export function makeServerState(overrides: Partial<ServerState> = {}): ServerSta
     ignoreList: {},
     status: {
       connectionAttemptMade: false,
-      state: App.StatusEnum.DISCONNECTED,
+      state: Enriched.StatusEnum.DISCONNECTED,
       description: null,
     },
     info: {

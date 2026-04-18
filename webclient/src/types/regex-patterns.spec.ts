@@ -2,7 +2,7 @@ import {
   URL_REGEX,
   MESSAGE_SENDER_REGEX,
   MENTION_REGEX,
-} from './constants';
+} from './regex-patterns';
 
 describe('RegEx', () => {
   describe('URL_REGEX', () => {

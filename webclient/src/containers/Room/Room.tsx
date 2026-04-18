@@ -25,7 +25,7 @@ const Room = () => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const roomId = parseInt(params.roomId, 0);
+  const roomId = parseInt(params.roomId, 10);
   const room = rooms[roomId];
   const roomMessages = messages[roomId];
   const users = useAppSelector(state => RoomsSelectors.getSortedRoomUsers(state, roomId));
@@ -36,6 +36,10 @@ const Room = () => {
       navigate(generatePath(App.RouteEnum.SERVER));
     }
   }, [joined]);
+
+  if (!room) {
+    return null;
+  }
 
   const handleRoomSay = ({ message }) => {
     if (message) {
@@ -78,7 +82,7 @@ const Room = () => {
               <VirtualList
                 className="room-view__side-list"
                 items={ users.map(user => (
-                  <ListItemButton className="room-view__side-list__item">
+                  <ListItemButton key={user.name} className="room-view__side-list__item">
                     <UserDisplay user={user} />
                   </ListItemButton>
                 )) }
