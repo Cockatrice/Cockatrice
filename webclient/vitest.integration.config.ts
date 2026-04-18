@@ -15,7 +15,11 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./integration/src/helpers/setup.ts'],
-    include: ['integration/src/**/*.spec.ts'],
+    include: ['integration/src/**/*.spec.{ts,tsx}'],
+    // App-suite tests render the full Login container against real Dexie
+    // (fake-indexeddb) + real WebClient. Under CI/disk load the default
+    // 5s timeout is tight; 10s leaves headroom without masking real hangs.
+    testTimeout: 10000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],

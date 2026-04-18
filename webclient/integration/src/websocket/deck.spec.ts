@@ -8,13 +8,13 @@ import { Data } from '@app/types';
 import { store } from '@app/store';
 import { SessionCommands } from '@app/websocket';
 
-import { connectAndLogin } from './helpers/setup';
+import { connectAndLogin } from '../helpers/setup';
 import {
   buildResponse,
   buildResponseMessage,
   deliverMessage,
-} from './helpers/protobuf-builders';
-import { findLastSessionCommand } from './helpers/command-capture';
+} from '../helpers/protobuf-builders';
+import { findLastSessionCommand } from '../helpers/command-capture';
 
 describe('deck operations', () => {
   it('populates backendDecks from deckList response', () => {

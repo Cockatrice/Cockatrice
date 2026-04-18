@@ -8,11 +8,11 @@ import { Data } from '@app/types';
 import { store } from '@app/store';
 import { StatusEnum } from '@app/websocket';
 
-import { connectAndHandshake } from './helpers/setup';
+import { connectAndHandshake } from '../helpers/setup';
 import {
   buildSessionEventMessage,
   deliverMessage,
-} from './helpers/protobuf-builders';
+} from '../helpers/protobuf-builders';
 
 describe('server events', () => {
   it('writes the server banner into server.info.message on Event_ServerMessage', () => {

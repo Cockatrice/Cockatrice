@@ -8,7 +8,7 @@ import { Data } from '@app/types';
 import { store } from '@app/store';
 import { GameCommands, RoomCommands } from '@app/websocket';
 
-import { connectAndHandshake, connectAndLogin } from './helpers/setup';
+import { connectAndHandshake, connectAndLogin } from '../helpers/setup';
 import {
   buildResponse,
   buildResponseMessage,
@@ -16,8 +16,8 @@ import {
   buildRoomEventMessage,
   buildGameEventMessage,
   deliverMessage,
-} from './helpers/protobuf-builders';
-import { findLastGameCommand, findLastRoomCommand, findLastSessionCommand } from './helpers/command-capture';
+} from '../helpers/protobuf-builders';
+import { findLastGameCommand, findLastRoomCommand, findLastSessionCommand } from '../helpers/command-capture';
 
 function joinGame(gameId: number): void {
   deliverMessage(buildSessionEventMessage(

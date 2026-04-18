@@ -6,14 +6,14 @@ import { describe, expect, it } from 'vitest';
 import { Data } from '@app/types';
 import { store } from '@app/store';
 
-import { connectAndLogin } from './helpers/setup';
+import { connectAndLogin } from '../helpers/setup';
 import {
   buildResponse,
   buildResponseMessage,
   buildSessionEventMessage,
   deliverMessage,
-} from './helpers/protobuf-builders';
-import { findLastSessionCommand } from './helpers/command-capture';
+} from '../helpers/protobuf-builders';
+import { findLastSessionCommand } from '../helpers/command-capture';
 
 function makeUser(name: string): Data.ServerInfo_User {
   return create(Data.ServerInfo_UserSchema, {

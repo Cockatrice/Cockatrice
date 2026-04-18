@@ -11,7 +11,12 @@ import './LanguageDropdown.css';
 
 const LanguageDropdown = () => {
   const { t, i18n } = useTranslation();
-  const [language, setLanguage] = useState(i18n.resolvedLanguage);
+  // `resolvedLanguage` can be undefined when i18next hasn't matched the
+  // active lng against any registered resource yet — most often at the
+  // first render in tests with a minimal i18n instance. Fall back to
+  // `i18n.language` (always set to whatever was passed to init) and then
+  // to empty string so MUI's Select has a concrete, in-range value.
+  const [language, setLanguage] = useState(i18n.resolvedLanguage ?? i18n.language ?? '');
 
   useEffect(() => {
     if (language !== i18n.resolvedLanguage) {

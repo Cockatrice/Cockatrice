@@ -9,13 +9,13 @@ import { Data } from '@app/types';
 import { store } from '@app/store';
 import { ModeratorCommands } from '@app/websocket';
 
-import { connectAndLogin } from './helpers/setup';
+import { connectAndLogin } from '../helpers/setup';
 import {
   buildResponse,
   buildResponseMessage,
   deliverMessage,
-} from './helpers/protobuf-builders';
-import { findLastModeratorCommand } from './helpers/command-capture';
+} from '../helpers/protobuf-builders';
+import { findLastModeratorCommand } from '../helpers/command-capture';
 
 describe('moderator commands', () => {
   it('getBanHistory populates server.banHistory on success', () => {

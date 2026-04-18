@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { Select, MenuItem } from '@mui/material';
@@ -13,10 +13,9 @@ import AddIcon from '@mui/icons-material/Add';
 import EditRoundedIcon from '@mui/icons-material/Edit';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 
-import { useWebClient } from '@app/hooks';
+import { LoadingState, useKnownHosts, useReduxEffect, useWebClient } from '@app/hooks';
 import { KnownHostDialog } from '@app/dialogs';
-import { useReduxEffect } from '@app/hooks';
-import { DefaultHosts, HostDTO, getHostPort } from '@app/services';
+import { getHostPort, HostDTO } from '@app/services';
 import { ServerTypes } from '@app/store';
 import { App } from '@app/types';
 import Toast from '../Toast/Toast';
@@ -32,244 +31,215 @@ enum TestConnection {
 const PREFIX = 'KnownHosts';
 
 const classes = {
-  root: `${PREFIX}-root`
+  root: `${PREFIX}-root`,
 };
 
 const Root = styled('div')(({ theme }) => ({
   [`&.${classes.root}`]: {
     '& .KnownHosts-error': {
-      color: theme.palette.error.main
+      color: theme.palette.error.main,
     },
 
     '& .KnownHosts-warning': {
-      color: theme.palette.warning.main
+      color: theme.palette.warning.main,
     },
 
     '& .KnownHosts-item': {
       [`& .${TestConnection.TESTING}`]: {
-        color: theme.palette.warning.main
+        color: theme.palette.warning.main,
       },
       [`& .${TestConnection.FAILED}`]: {
-        color: theme.palette.error.main
+        color: theme.palette.error.main,
       },
       [`& .${TestConnection.SUCCESS}`]: {
-        color: theme.palette.success.main
-      }
-    }
-  }
+        color: theme.palette.success.main,
+      },
+    },
+  },
 }));
-
-const KnownHosts = (props) => {
-  const { input: { onChange }, meta, disabled } = props;
+const KnownHosts = (props: any) => {
+  const { input, meta, disabled } = props;
+  const onChange: (value: HostDTO) => void = input.onChange;
   const { touched, error, warning } = meta;
 
   const { t } = useTranslation();
   const webClient = useWebClient();
+  const knownHosts = useKnownHosts();
 
-  const [hostsState, setHostsState] = useState({
-    hosts: [],
-    selectedHost: {} as any,
-  });
-
-  const [dialogState, setDialogState] = useState({
+  const [dialogState, setDialogState] = useState<{ open: boolean; edit: HostDTO | null }>({
     open: false,
     edit: null,
   });
 
-  const [testingConnection, setTestingConnection] = useState<TestConnection>(null);
+  const [testingConnection, setTestingConnection] = useState<TestConnection | null>(null);
 
   const [showCreateToast, setShowCreateToast] = useState(false);
   const [showDeleteToast, setShowDeleteToast] = useState(false);
   const [showEditToast, setShowEditToast] = useState(false);
 
-  const loadKnownHosts = useCallback(async () => {
-    const hosts = await HostDTO.getAll();
+  const selectedHost =
+    knownHosts.status === LoadingState.READY ? knownHosts.value?.selectedHost : undefined;
+  const hosts = knownHosts.status === LoadingState.READY ? knownHosts.value?.hosts ?? [] : [];
 
-    if (!hosts?.length) {
-      // @TODO: find a better pattern to seeding default data in indexedDB
-      await HostDTO.bulkAdd(DefaultHosts);
-      loadKnownHosts();
-    } else {
-      const selectedHost = hosts.find(({ lastSelected }) => lastSelected) || hosts[0];
-      setHostsState(s => ({ ...s, hosts, selectedHost }));
-    }
-  }, []);
+  const testConnection = (host: HostDTO) => {
+    setTestingConnection(TestConnection.TESTING);
+    webClient.request.authentication.testConnection({ ...getHostPort(host) });
+  };
 
+  // Mirror the store's selectedHost into the form field. Also kick off a
+  // connection test so the user sees the green/red indicator on mount.
   useEffect(() => {
-    loadKnownHosts();
-  }, [loadKnownHosts]);
-
-  useEffect(() => {
-    const { selectedHost } = hostsState;
-
-    if (selectedHost?.id) {
-      updateLastSelectedHost(selectedHost.id).then(() => {
-        onChange(selectedHost);
-      });
+    if (!selectedHost) {
+      return;
     }
-  }, [hostsState, onChange]);
+    onChange(selectedHost);
+    testConnection(selectedHost);
+  }, [selectedHost]);
 
-  useReduxEffect(() => {
-    setTestingConnection(TestConnection.SUCCESS);
-  }, ServerTypes.TEST_CONNECTION_SUCCESSFUL, []);
+  useReduxEffect(
+    () => {
+      setTestingConnection(TestConnection.SUCCESS);
+    },
+    ServerTypes.TEST_CONNECTION_SUCCESSFUL,
+    []
+  );
 
-  useReduxEffect(() => {
-    setTestingConnection(TestConnection.FAILED);
-  }, ServerTypes.TEST_CONNECTION_FAILED, []);
+  useReduxEffect(
+    () => {
+      setTestingConnection(TestConnection.FAILED);
+    },
+    ServerTypes.TEST_CONNECTION_FAILED,
+    []
+  );
 
-  const selectHost = (selectedHost) => {
-    setHostsState(s => ({ ...s, selectedHost }));
+  const onPick = async (host: HostDTO) => {
+    if (knownHosts.status !== LoadingState.READY) {
+      return;
+    }
+    onChange(host);
+    await knownHosts.select(host.id!);
+    testConnection(host);
   };
 
   const openAddKnownHostDialog = () => {
-    setDialogState(s => ({ ...s, open: true, edit: null }));
+    setDialogState((s) => ({ ...s, open: true, edit: null }));
   };
 
   const openEditKnownHostDialog = (host: HostDTO) => {
-    setDialogState(s => ({ ...s, open: true, edit: host }));
+    setDialogState((s) => ({ ...s, open: true, edit: host }));
   };
 
   const closeKnownHostDialog = () => {
-    setDialogState(s => ({ ...s, open: false }));
-  }
-
-  const handleDialogRemove = async ({ id }) => {
-    setHostsState(s => ({
-      ...s,
-      hosts: s.hosts.filter(host => host.id !== id),
-      selectedHost: s.selectedHost.id === id ? s.hosts[0] : s.selectedHost,
-    }));
-
-    closeKnownHostDialog();
-    HostDTO.delete(id);
-    setShowDeleteToast(true)
+    setDialogState((s) => ({ ...s, open: false }));
   };
 
-  const handleDialogSubmit = async ({ id, name, host, port }) => {
-    if (id) {
-      const hostDTO = await HostDTO.get(id);
-      hostDTO.name = name;
-      hostDTO.host = host;
-      hostDTO.port = port;
-      await hostDTO.save();
+  const handleDialogRemove = async ({ id }: { id: number }) => {
+    if (knownHosts.status !== LoadingState.READY) {
+      return;
+    }
+    await knownHosts.remove(id);
+    closeKnownHostDialog();
+    setShowDeleteToast(true);
+  };
 
-      setHostsState(s => ({
-        ...s,
-        hosts: s.hosts.map(h => h.id === id ? hostDTO : h),
-        selectedHost: hostDTO
-      }));
-      setShowEditToast(true)
+  const handleDialogSubmit = async ({
+    id,
+    name,
+    host,
+    port,
+  }: {
+    id?: number;
+    name: string;
+    host: string;
+    port: string;
+  }) => {
+    if (knownHosts.status !== LoadingState.READY) {
+      return;
+    }
+
+    if (id) {
+      await knownHosts.update(id, { name, host, port });
+      setShowEditToast(true);
     } else {
       const newHost: App.Host = { name, host, port, editable: true };
-      newHost.id = await HostDTO.add(newHost) as number;
-
-      setHostsState(s => ({
-        ...s,
-        hosts: [...s.hosts, newHost],
-        selectedHost: newHost,
-      }));
-      setShowCreateToast(true)
+      await knownHosts.add(newHost);
+      setShowCreateToast(true);
     }
 
     closeKnownHostDialog();
   };
 
-  const updateLastSelectedHost = (hostId): Promise<any[]> => {
-    testConnection();
-
-    return HostDTO.getAll().then(hosts =>
-      hosts.map(async host => {
-        if (host.id === hostId) {
-          host.lastSelected = true;
-          return await host.save();
-        }
-
-        if (host.lastSelected) {
-          host.lastSelected = false;
-          return await host.save();
-        }
-
-        return host;
-      })
-    );
-  };
-
-  const testConnection = () => {
-    setTestingConnection(TestConnection.TESTING);
-
-    const options = { ...getHostPort(hostsState.selectedHost) };
-    webClient.request.authentication.testConnection(options);
-  }
-
   return (
     <Root className={'KnownHosts ' + classes.root}>
-      <FormControl className='KnownHosts-form' size='small' variant='outlined'>
-        { touched && (
-          <div className='KnownHosts-validation'>
-            {
-              (error &&
-                <div className='KnownHosts-error'>
-                  {error}
-                  <ErrorOutlinedIcon style={{ fontSize: 'small', fontWeight: 'bold' }} />
-                </div>
-              ) ||
-
-              (warning && <div className='KnownHosts-warning'>{warning}</div>)
-            }
+      <FormControl className="KnownHosts-form" size="small" variant="outlined">
+        {touched && (
+          <div className="KnownHosts-validation">
+            {(error && (
+              <div className="KnownHosts-error">
+                {error}
+                <ErrorOutlinedIcon style={{ fontSize: 'small', fontWeight: 'bold' }} />
+              </div>
+            )) ||
+              (warning && <div className="KnownHosts-warning">{warning}</div>)}
           </div>
-        ) }
+        )}
 
-        <InputLabel id='KnownHosts-select'>{ t('KnownHosts.label') }</InputLabel>
+        <InputLabel id="KnownHosts-select">{t('KnownHosts.label')}</InputLabel>
         <Select
-          id='KnownHosts-select'
-          labelId='KnownHosts-label'
-          label='Host'
-          margin='dense'
-          name='host'
-          value={hostsState.selectedHost}
+          id="KnownHosts-select"
+          labelId="KnownHosts-label"
+          label="Host"
+          margin="dense"
+          name="host"
+          value={selectedHost ?? ''}
           fullWidth={true}
-          onChange={e => selectHost(e.target.value)}
+          onChange={(e) => onPick(e.target.value as unknown as HostDTO)}
           disabled={disabled}
         >
-          <Button value={hostsState.selectedHost} onClick={openAddKnownHostDialog}>
-            <span>{ t('KnownHosts.add') }</span>
-            <AddIcon fontSize='small' color='primary' />
+          <Button value={selectedHost} onClick={openAddKnownHostDialog}>
+            <span>{t('KnownHosts.add')}</span>
+            <AddIcon fontSize="small" color="primary" />
           </Button>
 
-          {
-            hostsState.hosts.map((host, index) => {
-              const hostPort = getHostPort(hostsState.hosts[index]);
+          {hosts.map((host, index) => {
+            const hostPort = getHostPort(host);
 
-              return (
-                <MenuItem value={host} key={index}>
-                  <div className='KnownHosts-item'>
-                    <div className='KnownHosts-item__wrapper'>
-                      <div className={'KnownHosts-item__status ' + testingConnection}>
-                        {
-                          testingConnection === TestConnection.FAILED
-                            ? <PortableWifiOffIcon fontSize="small" />
-                            : <WifiTetheringIcon fontSize="small" />
-                        }
-                      </div>
-
-                      <div className='KnownHosts-item__label'>
-                        <Check />
-                        <span>{host.name} ({ hostPort.host }:{hostPort.port})</span>
-                      </div>
+            return (
+              <MenuItem value={host as any} key={host.id ?? index}>
+                <div className="KnownHosts-item">
+                  <div className="KnownHosts-item__wrapper">
+                    <div className={'KnownHosts-item__status ' + testingConnection}>
+                      {testingConnection === TestConnection.FAILED ? (
+                        <PortableWifiOffIcon fontSize="small" />
+                      ) : (
+                        <WifiTetheringIcon fontSize="small" />
+                      )}
                     </div>
 
-                    { host.editable && (
-                      <IconButton className='KnownHosts-item__edit' size='small' color='primary' onClick={() => {
-                        openEditKnownHostDialog(hostsState.hosts[index]);
-                      }}>
-                        <EditRoundedIcon fontSize='small' />
-                      </IconButton>
-                    ) }
+                    <div className="KnownHosts-item__label">
+                      <Check />
+                      <span>
+                        {host.name} ({hostPort.host}:{hostPort.port})
+                      </span>
+                    </div>
                   </div>
-                </MenuItem>
-              );
-            })
-          }
+
+                  {host.editable && (
+                    <IconButton
+                      className="KnownHosts-item__edit"
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        openEditKnownHostDialog(host);
+                      }}
+                    >
+                      <EditRoundedIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </div>
+              </MenuItem>
+            );
+          })}
         </Select>
       </FormControl>
 
@@ -280,9 +250,15 @@ const KnownHosts = (props) => {
         onSubmit={handleDialogSubmit}
         handleClose={closeKnownHostDialog}
       />
-      <Toast open={showCreateToast} onClose={() => setShowCreateToast(false)}>{ t('KnownHosts.toast', { mode: 'created' }) }</Toast>
-      <Toast open={showDeleteToast} onClose={() => setShowDeleteToast(false)}>{ t('KnownHosts.toast', { mode: 'deleted' }) }</Toast>
-      <Toast open={showEditToast} onClose={() => setShowEditToast(false)}>{ t('KnownHosts.toast', { mode: 'edited' }) }</Toast>
+      <Toast open={showCreateToast} onClose={() => setShowCreateToast(false)}>
+        {t('KnownHosts.toast', { mode: 'created' })}
+      </Toast>
+      <Toast open={showDeleteToast} onClose={() => setShowDeleteToast(false)}>
+        {t('KnownHosts.toast', { mode: 'deleted' })}
+      </Toast>
+      <Toast open={showEditToast} onClose={() => setShowEditToast(false)}>
+        {t('KnownHosts.toast', { mode: 'edited' })}
+      </Toast>
     </Root>
   );
 };

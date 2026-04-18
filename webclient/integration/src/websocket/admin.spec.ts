@@ -8,14 +8,14 @@ import { Data } from '@app/types';
 import { store } from '@app/store';
 import { AdminCommands } from '@app/websocket';
 
-import { connectAndLogin } from './helpers/setup';
+import { connectAndLogin } from '../helpers/setup';
 import {
   buildResponse,
   buildResponseMessage,
   buildSessionEventMessage,
   deliverMessage,
-} from './helpers/protobuf-builders';
-import { findLastAdminCommand } from './helpers/command-capture';
+} from '../helpers/protobuf-builders';
+import { findLastAdminCommand } from '../helpers/command-capture';
 
 describe('admin commands', () => {
   it('adjustMod modifies the user level bitflags on success', () => {

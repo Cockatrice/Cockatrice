@@ -8,13 +8,13 @@ import { Data } from '@app/types';
 import { store } from '@app/store';
 import { StatusEnum, WebSocketConnectReason } from '@app/websocket';
 
-import { connectAndHandshake, connectAndHandshakeWithSalt } from './helpers/setup';
+import { connectAndHandshake, connectAndHandshakeWithSalt } from '../helpers/setup';
 import {
   buildResponse,
   buildResponseMessage,
   deliverMessage,
-} from './helpers/protobuf-builders';
-import { findLastSessionCommand } from './helpers/command-capture';
+} from '../helpers/protobuf-builders';
+import { findLastSessionCommand } from '../helpers/command-capture';
 
 function makeUser(name: string): Data.ServerInfo_User {
   return create(Data.ServerInfo_UserSchema, {

@@ -71,6 +71,7 @@
     "eslint": "^10.2.0",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-boundaries": "^6.0.2",
+    "fake-indexeddb": "^6.2.5",
     "fs-extra": "^11.3.4",
     "globals": "^17.5.0",
     "husky": "^9.1.7",

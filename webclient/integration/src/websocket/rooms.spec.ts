@@ -8,15 +8,15 @@ import { Data } from '@app/types';
 import { store } from '@app/store';
 import { RoomCommands } from '@app/websocket';
 
-import { connectAndHandshake } from './helpers/setup';
+import { connectAndHandshake } from '../helpers/setup';
 import {
   buildResponse,
   buildResponseMessage,
   buildRoomEventMessage,
   buildSessionEventMessage,
   deliverMessage,
-} from './helpers/protobuf-builders';
-import { findLastSessionCommand, findLastRoomCommand, captureAllOutbound } from './helpers/command-capture';
+} from '../helpers/protobuf-builders';
+import { findLastSessionCommand, findLastRoomCommand, captureAllOutbound } from '../helpers/command-capture';
 import { fromBinary, hasExtension, getExtension } from '@bufbuild/protobuf';
 
 function makeRoom(overrides: Partial<{

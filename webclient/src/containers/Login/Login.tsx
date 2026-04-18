@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router-dom';
@@ -9,9 +9,9 @@ import Typography from '@mui/material/Typography';
 import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, AccountActivationDialog } from '@app/dialogs';
 import { LanguageDropdown } from '@app/components';
 import { LoginForm } from '@app/forms';
-import { useReduxEffect, useFireOnce, useWebClient } from '@app/hooks';
+import { useAutoLogin, useFireOnce, useKnownHosts, useReduxEffect, useWebClient } from '@app/hooks';
 import { Images } from '@app/images';
-import { HostDTO, getHostPort, serverProps } from '@app/services';
+import { getHostPort, serverProps } from '@app/services';
 import { App, Enriched } from '@app/types';
 import { ServerSelectors, ServerTypes } from '@app/store';
 import Layout from '../Layout/Layout';
@@ -66,12 +66,14 @@ const Root = styled('div')(({ theme }) => ({
 const Login = () => {
   const description = useAppSelector(s => ServerSelectors.getDescription(s));
   const isConnected = useAppSelector(ServerSelectors.getIsConnected);
+  const connectionAttemptMade = useAppSelector(ServerSelectors.getConnectionAttemptMade);
   const webClient = useWebClient();
   const { t } = useTranslation();
 
   const [pendingActivationOptions, setPendingActivationOptions] = useState<Enriched.PendingActivationContext | null>(null);
 
-  const [rememberLogin, setRememberLogin] = useState(null);
+  const rememberLoginRef = useRef<any>(null);
+  const knownHosts = useKnownHosts();
   const [dialogState, setDialogState] = useState({
     passwordResetRequestDialog: false,
     resetPasswordDialog: false,
@@ -113,15 +115,17 @@ const Login = () => {
   }, [ServerTypes.CONNECTION_FAILED, ServerTypes.LOGIN_FAILED], []);
 
   useReduxEffect(({ payload: { options: { hashedPassword } } }) => {
-    updateHost(hashedPassword, rememberLogin);
-  }, ServerTypes.LOGIN_SUCCESSFUL, [rememberLogin]);
+    if (rememberLoginRef.current) {
+      updateHost(hashedPassword, rememberLoginRef.current);
+    }
+  }, ServerTypes.LOGIN_SUCCESSFUL, []);
 
   const showDescription = () => {
     return !isConnected && description?.length;
   };
 
   const onSubmitLogin = useCallback((loginForm) => {
-    setRememberLogin(loginForm);
+    rememberLoginRef.current = loginForm;
     const { userName, password, selectedHost, remember } = loginForm;
 
     const options: Omit<Enriched.LoginConnectOptions, 'reason'> = {
@@ -139,18 +143,18 @@ const Login = () => {
 
   const [submitButtonDisabled, resetSubmitButton, handleLogin] = useFireOnce(onSubmitLogin);
 
-  const updateHost = (hashedPassword, { selectedHost, remember, userName }) => {
-    HostDTO.get(selectedHost.id).then(hostDTO => {
-      hostDTO.remember = remember;
-      hostDTO.userName = remember ? userName : null;
-      hostDTO.hashedPassword = remember ? hashedPassword : null;
+  useAutoLogin(handleLogin, connectionAttemptMade);
 
-      hostDTO.save();
+  const updateHost = (hashedPassword, { selectedHost, remember, userName }) => {
+    knownHosts.update(selectedHost.id, {
+      remember,
+      userName: remember ? userName : null,
+      hashedPassword: remember ? hashedPassword : null,
     });
   };
 
   const handleRegistrationDialogSubmit = (registerForm) => {
-    setRememberLogin(registerForm);
+    rememberLoginRef.current = registerForm;
     const { userName, password, email, country, realName, selectedHost } = registerForm;
 
     webClient.request.authentication.register({

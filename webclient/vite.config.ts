@@ -12,6 +12,9 @@ export default defineConfig({
   },
   server: {
     open: true,
+    watch: {
+      ignored: ['build', 'coverage', 'integration']
+    }
   },
   test: {
     globals: true,

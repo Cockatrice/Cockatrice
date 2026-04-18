@@ -8,13 +8,13 @@ import { Data } from '@app/types';
 import { store } from '@app/store';
 import { StatusEnum, WebSocketConnectReason } from '@app/websocket';
 
-import { connectAndHandshake } from './helpers/setup';
+import { connectAndHandshake } from '../helpers/setup';
 import {
   buildResponse,
   buildResponseMessage,
   deliverMessage,
-} from './helpers/protobuf-builders';
-import { findLastSessionCommand } from './helpers/command-capture';
+} from '../helpers/protobuf-builders';
+import { findLastSessionCommand } from '../helpers/command-capture';
 
 describe('password reset', () => {
   it('forgotPasswordRequest sends command and disconnects on success', () => {

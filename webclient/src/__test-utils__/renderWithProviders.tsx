@@ -14,12 +14,17 @@ import { actionReducer } from '../store/actions';
 import { ToastProvider } from '../components/Toast/ToastContext';
 import type { RootState } from '../store/store';
 
-// Minimal i18n instance for tests — returns keys as-is.
+// Minimal i18n instance for tests — returns keys as-is. A non-empty
+// `resources` entry is required so i18next registers `en-US` as a known
+// language; otherwise `i18n.resolvedLanguage` stays `undefined`, which
+// LanguageDropdown seeds into a MUI Select and MUI warns "out-of-range
+// value `undefined`". Value is an empty translation map, since tests
+// already assert on i18n keys directly.
 const testI18n = i18n.createInstance();
 testI18n.use(initReactI18next).init({
-  lng: 'en',
-  resources: {},
-  fallbackLng: 'en',
+  lng: 'en-US',
+  resources: { 'en-US': { translation: {} } },
+  fallbackLng: 'en-US',
   interpolation: { escapeValue: false },
 });
 

@@ -19,15 +19,15 @@ const types = (...types) => types.map((type) => ({ to: { type } }));
 
 const rules = [
   { from: { type: 'generated' }, allow: [] },
+  { from: { type: 'websocket' }, allow: types('generated') },
   { from: { type: 'types' }, allow:  types('generated', 'websocket')  },
 
-  { from: { type: 'websocket' }, allow: types('generated') },
   { from: { type: 'store' }, allow: types('types') },
   { from: { type: 'api' }, allow: types('store', 'types', 'websocket') },
 
-  { from: { type: 'hooks' }, allow: types('api', 'services', 'types', 'websocket') },
   { from: { type: 'images' }, allow: types('types') },
   { from: { type: 'services' }, allow: types('api', 'store', 'types') },
+  { from: { type: 'hooks' }, allow: types('api', 'services', 'store', 'types', 'websocket') },
 
   {
     from: { type: 'components' },

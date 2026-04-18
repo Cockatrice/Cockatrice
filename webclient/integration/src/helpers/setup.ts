@@ -9,6 +9,10 @@
 
 import '@testing-library/jest-dom/vitest';
 import '../../../src/polyfills';
+// fake-indexeddb polyfills globalThis.indexedDB. MUST be imported before any
+// module that opens a Dexie database (Dexie opens on first table access).
+// Harmless for the websocket suite, which doesn't touch Dexie.
+import 'fake-indexeddb/auto';
 
 import { create } from '@bufbuild/protobuf';
 import { afterEach, beforeEach, vi } from 'vitest';

@@ -9,7 +9,7 @@ import { Data } from '@app/types';
 import { store } from '@app/store';
 import { StatusEnum } from '@app/websocket';
 
-import { PROTOCOL_VERSION } from '../../src/websocket/config';
+import { PROTOCOL_VERSION } from '../../../src/websocket/config';
 
 import {
   getMockWebSocket,
@@ -17,14 +17,14 @@ import {
   openMockWebSocket,
   setPendingOptions,
   connectAndHandshake,
-} from './helpers/setup';
+} from '../helpers/setup';
 import type { WebSocketConnectOptions } from '@app/websocket';
 import { WebSocketConnectReason } from '@app/websocket';
 import {
   buildSessionEventMessage,
   deliverMessage,
-} from './helpers/protobuf-builders';
-import { findLastSessionCommand } from './helpers/command-capture';
+} from '../helpers/protobuf-builders';
+import { findLastSessionCommand } from '../helpers/command-capture';
 
 function loginOptions(overrides: Partial<{ userName: string; password: string }> = {}): WebSocketConnectOptions {
   return {

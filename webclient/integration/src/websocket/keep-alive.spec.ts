@@ -6,13 +6,13 @@ import { Data } from '@app/types';
 import { store } from '@app/store';
 import { StatusEnum } from '@app/websocket';
 
-import { connectRaw, getMockWebSocket } from './helpers/setup';
+import { connectRaw, getMockWebSocket } from '../helpers/setup';
 import {
   buildResponse,
   buildResponseMessage,
   deliverMessage,
-} from './helpers/protobuf-builders';
-import { findLastSessionCommand } from './helpers/command-capture';
+} from '../helpers/protobuf-builders';
+import { findLastSessionCommand } from '../helpers/command-capture';
 
 describe('keep-alive', () => {
   it('sends a Command_Ping on every keepalive interval tick', () => {
