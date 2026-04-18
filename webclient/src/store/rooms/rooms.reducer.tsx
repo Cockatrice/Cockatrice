@@ -31,9 +31,8 @@ export const roomsSlice = createSlice({
     updateRooms: (state, action: PayloadAction<{ rooms: Data.ServerInfo_Room[] }>) => {
       const { rooms } = action.payload;
 
-      // UPDATE_ROOMS carries metadata only. For existing rooms, replace
-      // `info`, `gametypeMap` and `order`; preserve the normalized `games`
-      // and `users` maps (those are maintained by their own events).
+      // @critical Partial merge — preserve normalized games/users maps.
+      // See .github/instructions/webclient.instructions.md#reducer-merge-rules.
       rooms.forEach((rawRoom, order) => {
         const { roomId } = rawRoom;
         const existing = state.rooms[roomId];
@@ -96,8 +95,6 @@ export const roomsSlice = createSlice({
       const { roomId, games } = action.payload;
       const room = state.rooms[roomId];
 
-      // An empty games array means no game updates — skip to avoid
-      // accidentally wiping the existing normalized games map.
       if (!room || !games?.length) {
         return;
       }
@@ -111,7 +108,6 @@ export const roomsSlice = createSlice({
         }
         const existing = room.games[rawGame.gameId];
         if (existing) {
-          // Merge the incoming proto into the existing snapshot.
           const merged: Data.ServerInfo_Game = { ...existing.info, ...rawGame };
           room.games[rawGame.gameId] = {
             info: merged,
@@ -146,8 +142,6 @@ export const roomsSlice = createSlice({
     },
 
     sortGames: (state, action: PayloadAction<{ roomId: number; field: App.GameSortField; order: App.SortDirection }>) => {
-      // Sort is derived in selectors; the reducer stores the sort config.
-      // roomId is passed through for future per-room sorting support.
       const { field, order } = action.payload;
       state.sortGamesBy = { field, order };
     },
@@ -160,8 +154,6 @@ export const roomsSlice = createSlice({
         return;
       }
 
-      // Drop the `amount` most-recent messages whose text starts with `${name}:`.
-      // Walk newest → oldest so we remove the N latest matches.
       const prefix = `${name}:`;
       const keep = new Array(roomMessages.length).fill(true);
       let remaining = amount;
@@ -184,7 +176,7 @@ export const roomsSlice = createSlice({
       state.joinedGameIds[roomId][gameId] = true;
     },
 
-    // Signal-only — no state mutation needed; explicit for discriminated-union exhaustiveness
+    // Signal-only; kept for discriminated-union exhaustiveness.
     gameCreated: (_state, _action: PayloadAction<{ roomId: number }>) => {},
   },
 });

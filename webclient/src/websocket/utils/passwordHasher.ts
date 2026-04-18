@@ -8,7 +8,6 @@ const SALT_LENGTH = 16;
 export const hashPassword = (salt: string, password: string): string => {
   let hashedPassword = salt + password;
   for (let i = 0; i < HASH_ROUNDS; i++) {
-    // WHY DO WE DO IT THIS WAY?
     hashedPassword = sha512(hashedPassword);
   }
 
@@ -27,6 +26,6 @@ export const generateSalt = (): string => {
 }
 
 export const passwordSaltSupported = (serverOptions: number): number => {
-  // Intentional use of Bitwise operator b/c of how Servatrice Enums work
+  // @critical Servatrice ServerOptions is a bitmask. See .github/instructions/webclient.instructions.md#protocol-quirks.
   return serverOptions & Event_ServerIdentification_ServerOptions.SupportsPasswordHash;
 }

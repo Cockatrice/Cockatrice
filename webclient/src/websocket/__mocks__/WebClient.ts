@@ -17,9 +17,6 @@
  * property, not a getter that throws.
  */
 
-// ---------------------------------------------------------------------------
-// response.session  (ISessionResponse)
-// ---------------------------------------------------------------------------
 const session = {
   initialized: vi.fn(),
   connectionAttempted: vi.fn(),
@@ -80,9 +77,6 @@ const session = {
   replayDownloaded: vi.fn(),
 };
 
-// ---------------------------------------------------------------------------
-// response.room  (IRoomResponse)
-// ---------------------------------------------------------------------------
 const room = {
   clearStore: vi.fn(),
   joinRoom: vi.fn(),
@@ -97,9 +91,6 @@ const room = {
   joinedGame: vi.fn(),
 };
 
-// ---------------------------------------------------------------------------
-// response.game  (IGameResponse)
-// ---------------------------------------------------------------------------
 const game = {
   clearStore: vi.fn(),
   gameStateChanged: vi.fn(),
@@ -133,9 +124,6 @@ const game = {
   zonePropertiesChanged: vi.fn(),
 };
 
-// ---------------------------------------------------------------------------
-// response.admin  (IAdminResponse)
-// ---------------------------------------------------------------------------
 const admin = {
   adjustMod: vi.fn(),
   reloadConfig: vi.fn(),
@@ -143,9 +131,6 @@ const admin = {
   updateServerMessage: vi.fn(),
 };
 
-// ---------------------------------------------------------------------------
-// response.moderator  (IModeratorResponse)
-// ---------------------------------------------------------------------------
 const moderator = {
   banFromServer: vi.fn(),
   banHistory: vi.fn(),
@@ -159,9 +144,6 @@ const moderator = {
   updateAdminNotes: vi.fn(),
 };
 
-// ---------------------------------------------------------------------------
-// Exported mock — replaces the real WebClient module for all consumers.
-// ---------------------------------------------------------------------------
 export const WebClient = {
   _instance: null as any,
   instance: {

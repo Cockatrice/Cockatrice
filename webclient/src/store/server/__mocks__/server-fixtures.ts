@@ -1,4 +1,5 @@
 import { App, Data, Enriched } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 import type { MessageInitShape } from '@bufbuild/protobuf';
 
 import { create } from '@bufbuild/protobuf';
@@ -117,8 +118,8 @@ export function makeGame(overrides: MakeGameOverrides = {}): Enriched.Game {
 }
 
 export function makeLoginSuccessContext(
-  overrides: Partial<Enriched.LoginSuccessContext> = {}
-): Enriched.LoginSuccessContext {
+  overrides: Partial<WebsocketTypes.LoginSuccessContext> = {}
+): WebsocketTypes.LoginSuccessContext {
   return {
     hashedPassword: 'hash',
     ...overrides,
@@ -126,8 +127,8 @@ export function makeLoginSuccessContext(
 }
 
 export function makePendingActivationContext(
-  overrides: Partial<Enriched.PendingActivationContext> = {}
-): Enriched.PendingActivationContext {
+  overrides: Partial<WebsocketTypes.PendingActivationContext> = {}
+): WebsocketTypes.PendingActivationContext {
   return {
     host: 'localhost',
     port: '4747',
@@ -143,7 +144,7 @@ export function makeServerState(overrides: Partial<ServerState> = {}): ServerSta
     ignoreList: {},
     status: {
       connectionAttemptMade: false,
-      state: Enriched.StatusEnum.DISCONNECTED,
+      state: WebsocketTypes.StatusEnum.DISCONNECTED,
       description: null,
     },
     info: {

@@ -12,6 +12,7 @@ const elements = [
   { type: 'services', pattern: ['src/services/**'] },
   { type: 'store', pattern: ['src/store/**'] },
   { type: 'types', pattern: ['src/types/**'] },
+  { type: 'websocket-types', pattern: ['src/websocket/types/**'] },
   { type: 'websocket', pattern: ['src/websocket/**'] },
 ];
 
@@ -19,26 +20,27 @@ const types = (...types) => types.map((type) => ({ to: { type } }));
 
 const rules = [
   { from: { type: 'generated' }, allow: [] },
-  { from: { type: 'websocket' }, allow: types('generated') },
-  { from: { type: 'types' }, allow:  types('generated', 'websocket')  },
+  { from: { type: 'websocket-types' }, allow: types('generated') },
+  { from: { type: 'websocket' }, allow: types('generated', 'websocket-types') },
+  { from: { type: 'types' }, allow: types('generated') },
 
-  { from: { type: 'store' }, allow: types('types') },
-  { from: { type: 'api' }, allow: types('store', 'types', 'websocket') },
+  { from: { type: 'store' }, allow: types('types', 'websocket-types') },
+  { from: { type: 'api' }, allow: types('store', 'types', 'websocket', 'websocket-types') },
 
   { from: { type: 'images' }, allow: types('types') },
   { from: { type: 'services' }, allow: types('api', 'store', 'types') },
-  { from: { type: 'hooks' }, allow: types('api', 'services', 'store', 'types', 'websocket') },
+  { from: { type: 'hooks' }, allow: types('api', 'services', 'store', 'types', 'websocket', 'websocket-types') },
 
   {
     from: { type: 'components' },
-    allow: types('api', 'dialogs', 'forms', 'hooks', 'images', 'services', 'store', 'types')
+    allow: types('api', 'dialogs', 'forms', 'hooks', 'images', 'services', 'store', 'types', 'websocket-types')
   },
   {
     from: { type: 'containers' },
-    allow: types('api', 'components', 'dialogs', 'forms', 'hooks', 'images', 'services', 'store', 'types')
+    allow: types('api', 'components', 'dialogs', 'forms', 'hooks', 'images', 'services', 'store', 'types', 'websocket-types')
   },
-  { from: { type: 'dialogs' }, allow: types('components', 'forms', 'hooks', 'services', 'store', 'types') },
-  { from: { type: 'forms' }, allow: types('components', 'hooks', 'services', 'store', 'types') },
+  { from: { type: 'dialogs' }, allow: types('components', 'forms', 'hooks', 'services', 'store', 'types', 'websocket-types') },
+  { from: { type: 'forms' }, allow: types('components', 'hooks', 'services', 'store', 'types', 'websocket-types') },
 ];
 
 export const boundariesConfig = [

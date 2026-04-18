@@ -12,7 +12,6 @@ import { ToastProvider } from '@app/components'
 
 function AppShell() {
   useEffect(() => {
-    // @TODO (1)
     window.onbeforeunload = () => true;
   }, []);
 

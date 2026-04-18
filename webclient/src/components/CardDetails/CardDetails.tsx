@@ -11,7 +11,7 @@ interface CardProps {
   card: CardDTO;
 }
 
-// @TODO: add missing fields (loyalty, hand, etc)
+// @TODO add missing fields (loyalty, hand, etc)
 
 const CardDetails = ({ card }: CardProps) => {
   return (

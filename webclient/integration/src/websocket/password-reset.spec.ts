@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { Data } from '@app/types';
 import { store } from '@app/store';
-import { StatusEnum, WebSocketConnectReason } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
 import { connectAndHandshake } from '../helpers/setup';
 import {
@@ -19,7 +19,7 @@ import { findLastSessionCommand } from '../helpers/command-capture';
 describe('password reset', () => {
   it('forgotPasswordRequest sends command and disconnects on success', () => {
     connectAndHandshake({
-      reason: WebSocketConnectReason.PASSWORD_RESET_REQUEST as const,
+      reason: WebsocketTypes.WebSocketConnectReason.PASSWORD_RESET_REQUEST as const,
       host: 'localhost',
       port: '4748',
       userName: 'alice',
@@ -37,12 +37,12 @@ describe('password reset', () => {
       }),
     })));
 
-    expect(store.getState().server.status.state).toBe(StatusEnum.DISCONNECTED);
+    expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
   });
 
   it('forgotPasswordChallenge sends command with userName and email', () => {
     connectAndHandshake({
-      reason: WebSocketConnectReason.PASSWORD_RESET_CHALLENGE as const,
+      reason: WebsocketTypes.WebSocketConnectReason.PASSWORD_RESET_CHALLENGE as const,
       host: 'localhost',
       port: '4748',
       userName: 'alice',
@@ -58,12 +58,12 @@ describe('password reset', () => {
       responseCode: Data.Response_ResponseCode.RespOk,
     })));
 
-    expect(store.getState().server.status.state).toBe(StatusEnum.DISCONNECTED);
+    expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
   });
 
   it('forgotPasswordReset sends command with userName, token, and newPassword', () => {
     connectAndHandshake({
-      reason: WebSocketConnectReason.PASSWORD_RESET as const,
+      reason: WebsocketTypes.WebSocketConnectReason.PASSWORD_RESET as const,
       host: 'localhost',
       port: '4748',
       userName: 'alice',
@@ -81,6 +81,6 @@ describe('password reset', () => {
       responseCode: Data.Response_ResponseCode.RespOk,
     })));
 
-    expect(store.getState().server.status.state).toBe(StatusEnum.DISCONNECTED);
+    expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
   });
 });

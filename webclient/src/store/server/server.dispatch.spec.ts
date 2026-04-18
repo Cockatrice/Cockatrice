@@ -1,12 +1,11 @@
-// Use `vi.hoisted` so the mocked `store.dispatch` reference stays stable across
-// re-runs of the factory under `isolate: false`. See rooms.dispatch.spec.ts for
-// the same pattern and rationale.
+// @critical See rooms.dispatch.spec.ts — same hoisted-mockDispatch pattern.
 const { mockDispatch } = vi.hoisted(() => ({ mockDispatch: vi.fn() }));
 vi.mock('..', () => ({ store: { dispatch: mockDispatch } }));
 
 import { Actions } from './server.actions';
 import { Dispatch } from './server.dispatch';
-import { Data, Enriched } from '@app/types';
+import { Data } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 import { create } from '@bufbuild/protobuf';
 import {
   makeBanHistoryItem,
@@ -106,9 +105,9 @@ describe('Dispatch', () => {
   });
 
   it('updateStatus dispatches Actions.updateStatus({ status: { state, description } })', () => {
-    Dispatch.updateStatus(Enriched.StatusEnum.CONNECTED, 'ok');
+    Dispatch.updateStatus(WebsocketTypes.StatusEnum.CONNECTED, 'ok');
     expect(mockDispatch).toHaveBeenCalledWith(
-      Actions.updateStatus({ status: { state: Enriched.StatusEnum.CONNECTED, description: 'ok' } })
+      Actions.updateStatus({ status: { state: WebsocketTypes.StatusEnum.CONNECTED, description: 'ok' } })
     );
   });
 

@@ -1,10 +1,10 @@
 import { Data } from '@app/types';
-import type { IRoomResponse, WebSocketRoomResponseOverrides } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 import { RoomsDispatch } from '@app/store';
 
-type Message = WebSocketRoomResponseOverrides['Event_RoomSay'];
+type Message = WebsocketTypes.WebSocketRoomResponseOverrides['Event_RoomSay'];
 
-export class RoomResponseImpl implements IRoomResponse<WebSocketRoomResponseOverrides> {
+export class RoomResponseImpl implements WebsocketTypes.IRoomResponse<WebsocketTypes.WebSocketRoomResponseOverrides> {
   clearStore(): void {
     RoomsDispatch.clearStore();
   }

@@ -1,5 +1,5 @@
 import type { Event_Shuffle } from '@app/generated';
-import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
+import type { GameEventMeta } from '../../types/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function shuffle(data: Event_Shuffle, meta: GameEventMeta): void {

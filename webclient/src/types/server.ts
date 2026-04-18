@@ -1,10 +1,3 @@
-import type { StatusEnum } from './enriched';
-
-export interface ServerStatus {
-  status: StatusEnum;
-  description: string;
-}
-
 export class Host {
   id?: number;
   name: string;

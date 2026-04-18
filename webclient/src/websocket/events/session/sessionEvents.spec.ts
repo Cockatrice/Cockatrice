@@ -58,8 +58,8 @@ import * as Config from '../../config';
 import * as SessionCmds from '../../commands/session';
 import { consumePendingOptions } from '../../utils/connectionState';
 import { passwordSaltSupported } from '../../utils';
-import { WebSocketConnectReason } from '../../interfaces/ConnectOptions';
-import { StatusEnum } from '../../interfaces/StatusEnum';
+import { WebSocketConnectReason } from '../../types/ConnectOptions';
+import { StatusEnum } from '../../types/StatusEnum';
 import { Mock } from 'vitest';
 import { gameJoined } from './gameJoined';
 import { notifyUser } from './notifyUser';
@@ -78,9 +78,6 @@ import { serverIdentification } from './serverIdentification';
 
 const ConfigMock = Config as { -readonly [K in keyof typeof Config]: (typeof Config)[K] };
 
-// ----------------------------------------------------------------
-// gameJoined
-// ----------------------------------------------------------------
 describe('gameJoined', () => {
 
   it('calls WebClient.instance.response.session.gameJoined', () => {
@@ -90,9 +87,6 @@ describe('gameJoined', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// notifyUser
-// ----------------------------------------------------------------
 describe('notifyUser', () => {
 
   it('calls WebClient.instance.response.session.notifyUser', () => {
@@ -102,9 +96,6 @@ describe('notifyUser', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// replayAdded
-// ----------------------------------------------------------------
 describe('replayAdded', () => {
 
   it('calls WebClient.instance.response.session.replayAdded with matchInfo', () => {
@@ -116,9 +107,6 @@ describe('replayAdded', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// serverCompleteList
-// ----------------------------------------------------------------
 describe('serverCompleteList', () => {
 
   it('calls WebClient.instance.response.session.updateUsers and WebClient.instance.response.room.updateRooms', () => {
@@ -129,9 +117,6 @@ describe('serverCompleteList', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// serverMessage
-// ----------------------------------------------------------------
 describe('serverMessage', () => {
 
   it('calls WebClient.instance.response.session.serverMessage with message', () => {
@@ -140,9 +125,6 @@ describe('serverMessage', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// serverShutdown
-// ----------------------------------------------------------------
 describe('serverShutdown', () => {
 
   it('calls WebClient.instance.response.session.serverShutdown', () => {
@@ -152,9 +134,6 @@ describe('serverShutdown', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// userJoined
-// ----------------------------------------------------------------
 describe('userJoined', () => {
 
   it('calls WebClient.instance.response.session.userJoined with userInfo', () => {
@@ -166,9 +145,6 @@ describe('userJoined', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// userLeft
-// ----------------------------------------------------------------
 describe('userLeft', () => {
 
   it('calls WebClient.instance.response.session.userLeft with name', () => {
@@ -177,9 +153,6 @@ describe('userLeft', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// userMessage
-// ----------------------------------------------------------------
 describe('userMessage', () => {
 
   it('calls WebClient.instance.response.session.userMessage', () => {
@@ -189,9 +162,6 @@ describe('userMessage', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// addToList
-// ----------------------------------------------------------------
 describe('addToList', () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
   beforeEach(() => {
@@ -225,9 +195,6 @@ describe('addToList', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// removeFromList
-// ----------------------------------------------------------------
 describe('removeFromList', () => {
 
   it('buddy list → removeFromBuddyList', () => {
@@ -248,9 +215,6 @@ describe('removeFromList', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// listRooms
-// ----------------------------------------------------------------
 describe('listRooms', () => {
 
   it('calls WebClient.instance.response.room.updateRooms', () => {
@@ -279,9 +243,6 @@ describe('listRooms', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// connectionClosed
-// ----------------------------------------------------------------
 describe('connectionClosed', () => {
 
   it('uses reasonStr when provided', () => {
@@ -371,9 +332,6 @@ describe('connectionClosed', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// serverIdentification
-// ----------------------------------------------------------------
 describe('serverIdentification', () => {
   const makeInfo = (overrides: Record<string, unknown> = {}) =>
     create(Event_ServerIdentificationSchema, {

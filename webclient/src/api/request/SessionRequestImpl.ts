@@ -1,7 +1,7 @@
-import type { ISessionRequest } from '@app/websocket';
 import { SessionCommands } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
-export class SessionRequestImpl implements ISessionRequest {
+export class SessionRequestImpl implements WebsocketTypes.ISessionRequest {
   addToBuddyList(userName: string): void {
     SessionCommands.addToBuddyList(userName);
   }

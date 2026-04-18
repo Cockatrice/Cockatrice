@@ -1,9 +1,9 @@
-import type { IGameRequest } from '@app/websocket';
 import { GameCommands } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
 import { Data } from '@app/types';
 
-export class GameRequestImpl implements IGameRequest {
+export class GameRequestImpl implements WebsocketTypes.IGameRequest {
   leaveGame(gameId: number): void {
     GameCommands.leaveGame(gameId);
   }

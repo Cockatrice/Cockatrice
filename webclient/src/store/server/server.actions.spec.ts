@@ -1,5 +1,6 @@
 import { Actions } from './server.actions';
-import { Data, Enriched } from '@app/types';
+import { Data } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 import { Types } from './server.types';
 import { create } from '@bufbuild/protobuf';
 import {
@@ -88,7 +89,7 @@ describe('Actions', () => {
   });
 
   it('updateStatus', () => {
-    const status = { state: Enriched.StatusEnum.CONNECTED, description: 'connected' };
+    const status = { state: WebsocketTypes.StatusEnum.CONNECTED, description: 'connected' };
     expect(Actions.updateStatus({ status })).toEqual({ type: Types.UPDATE_STATUS, payload: { status } });
   });
 

@@ -29,13 +29,14 @@ vi.mock('./services/ProtobufService', () => ({
 import { WebClient } from './WebClient';
 import { WebSocketService } from './services/WebSocketService';
 import { ProtobufService } from './services/ProtobufService';
-import { StatusEnum } from './interfaces/StatusEnum';
+import { StatusEnum } from './types/StatusEnum';
 import { Subject } from 'rxjs';
 import { Mock } from 'vitest';
 import { SocketTransport } from './services/ProtobufService';
 import { WebSocketServiceConfig } from './services/WebSocketService';
-import type { IWebClientResponse, IWebClientRequest } from './interfaces';
-import type { ConnectTarget } from './interfaces/WebClientConfig';
+import type { IWebClientResponse } from './types/WebClientResponse';
+import type { IWebClientRequest } from './types/WebClientRequest';
+import type { ConnectTarget } from './types/WebClientConfig';
 import { installMockWebSocket } from './__mocks__/helpers';
 
 function makeMockResponse(): IWebClientResponse {

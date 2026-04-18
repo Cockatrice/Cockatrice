@@ -1,4 +1,5 @@
 import { App, Data, Enriched } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 
 export interface ServerState {
   initialized: boolean;
@@ -43,7 +44,7 @@ export interface ServerState {
 export interface ServerStateStatus {
   connectionAttemptMade: boolean;
   description: string | null;
-  state: Enriched.StatusEnum;
+  state: WebsocketTypes.StatusEnum;
 }
 
 export interface ServerStateInfo {

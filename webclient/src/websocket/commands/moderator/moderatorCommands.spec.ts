@@ -39,9 +39,6 @@ const { invokeOnSuccess } = makeCallbackHelpers(
   2
 );
 
-// ----------------------------------------------------------------
-// banFromServer
-// ----------------------------------------------------------------
 describe('banFromServer', () => {
 
   it('calls sendModeratorCommand with Command_BanFromServer', () => {
@@ -60,9 +57,6 @@ describe('banFromServer', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// forceActivateUser
-// ----------------------------------------------------------------
 describe('forceActivateUser', () => {
 
   it('calls sendModeratorCommand with Command_ForceActivateUser', () => {
@@ -79,9 +73,6 @@ describe('forceActivateUser', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// getAdminNotes
-// ----------------------------------------------------------------
 describe('getAdminNotes', () => {
 
   it('calls sendModeratorCommand with Command_GetAdminNotes', () => {
@@ -101,9 +92,6 @@ describe('getAdminNotes', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// getBanHistory
-// ----------------------------------------------------------------
 describe('getBanHistory', () => {
 
   it('calls sendModeratorCommand with Command_GetBanHistory', () => {
@@ -123,9 +111,6 @@ describe('getBanHistory', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// getWarnHistory
-// ----------------------------------------------------------------
 describe('getWarnHistory', () => {
 
   it('calls sendModeratorCommand with Command_GetWarnHistory', () => {
@@ -145,9 +130,6 @@ describe('getWarnHistory', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// getWarnList
-// ----------------------------------------------------------------
 describe('getWarnList', () => {
 
   it('calls sendModeratorCommand with Command_GetWarnList', () => {
@@ -167,9 +149,6 @@ describe('getWarnList', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// grantReplayAccess
-// ----------------------------------------------------------------
 describe('grantReplayAccess', () => {
 
   it('calls sendModeratorCommand with Command_GrantReplayAccess', () => {
@@ -186,9 +165,6 @@ describe('grantReplayAccess', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// updateAdminNotes
-// ----------------------------------------------------------------
 describe('updateAdminNotes', () => {
 
   it('calls sendModeratorCommand with Command_UpdateAdminNotes', () => {
@@ -205,9 +181,6 @@ describe('updateAdminNotes', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// viewLogHistory
-// ----------------------------------------------------------------
 describe('viewLogHistory', () => {
 
   it('calls sendModeratorCommand with Command_ViewLogHistory', () => {
@@ -229,9 +202,6 @@ describe('viewLogHistory', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// warnUser
-// ----------------------------------------------------------------
 describe('warnUser', () => {
 
   it('calls sendModeratorCommand with Command_WarnUser', () => {

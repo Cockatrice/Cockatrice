@@ -1,8 +1,8 @@
 import { Data } from '@app/types';
-import type { IModeratorRequest } from '@app/websocket';
 import { ModeratorCommands } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
-export class ModeratorRequestImpl implements IModeratorRequest {
+export class ModeratorRequestImpl implements WebsocketTypes.IModeratorRequest {
   banFromServer(
     minutes: number,
     userName?: string,

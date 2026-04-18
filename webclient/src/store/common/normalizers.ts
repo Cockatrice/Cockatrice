@@ -1,6 +1,5 @@
 import { Data, Enriched } from '@app/types';
 
-/** Flatten a gametype list into a lookup map of { gameTypeId → description }. */
 export function normalizeGametypeMap(gametypeList: Data.ServerInfo_GameType[]): Enriched.GametypeMap {
   return gametypeList.reduce<Enriched.GametypeMap>((map, type) => {
     map[type.gameTypeId] = type.description;
@@ -8,13 +7,6 @@ export function normalizeGametypeMap(gametypeList: Data.ServerInfo_GameType[]): 
   }, {});
 }
 
-/**
- * Build an Enriched.Room (composition shape) from a raw proto. The proto is
- * stored verbatim on `info` and the repeated collections are normalized into
- * keyed maps alongside it. `info.gameList`, `info.userList`, `info.gametypeList`
- * are left as the wire snapshot — callers should always read the normalized
- * fields, never those.
- */
 export function normalizeRoomInfo(roomInfo: Data.ServerInfo_Room): Enriched.Room {
   const gametypeMap = normalizeGametypeMap(roomInfo.gametypeList);
 
@@ -38,7 +30,6 @@ export function normalizeRoomInfo(roomInfo: Data.ServerInfo_Room): Enriched.Room
   };
 }
 
-/** Wrap a raw ServerInfo_Game in the composition shape with cached gameType. */
 export function normalizeGameObject(game: Data.ServerInfo_Game, gametypeMap: Enriched.GametypeMap): Enriched.Game {
   const { gameTypes } = game;
   const hasType = gameTypes && gameTypes.length;
@@ -48,7 +39,6 @@ export function normalizeGameObject(game: Data.ServerInfo_Game, gametypeMap: Enr
   };
 }
 
-/** Group a flat LogItem[] into { room, game, chat } buckets for the server store. */
 export function normalizeLogs(logs: Data.ServerInfo_ChatMessage[]): Enriched.LogGroups {
   return logs.reduce<Enriched.LogGroups>((obj, log) => {
     const type = log.targetType as keyof Enriched.LogGroups;
@@ -59,12 +49,8 @@ export function normalizeLogs(logs: Data.ServerInfo_ChatMessage[]): Enriched.Log
   }, { room: [], game: [], chat: [] });
 }
 
-/**
- * Prepend "name: " to the message text when a sender name is present.
- * Messages from the current user are sent without a name by the server,
- * so this is a no-op for those.
- * Returns a new Message — does not mutate the original.
- */
+// @critical Server omits `name` on messages from the current user; preserves that as a no-op.
+// See .github/instructions/webclient.instructions.md#protocol-quirks.
 export function normalizeUserMessage(message: Enriched.Message): Enriched.Message {
   if (!message.name) {
     return message;
@@ -72,12 +58,7 @@ export function normalizeUserMessage(message: Enriched.Message): Enriched.Messag
   return { ...message, message: `${message.name}: ${message.message}` };
 }
 
-/**
- * Build the user-facing ban error string from raw server data.
- * The server sends a reason string and an endTime epoch ms (0 = permanent).
- * Messages from the current user do not carry the username — this quirk is
- * handled at the dispatch layer so the redux store always stores a clean string.
- */
+// endTime is epoch ms; 0 means permanent.
 export function normalizeBannedUserError(reason: string, endTime: number): string {
   let error: string;
 

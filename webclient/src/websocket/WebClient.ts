@@ -1,11 +1,9 @@
 import { ping } from './commands/session';
 import { CLIENT_OPTIONS } from './config';
-import type {
-  ConnectTarget,
-  IWebClientRequest,
-  IWebClientResponse,
-} from './interfaces';
-import { StatusEnum } from './interfaces';
+import type { ConnectTarget } from './types/WebClientConfig';
+import type { IWebClientRequest } from './types/WebClientRequest';
+import type { IWebClientResponse } from './types/WebClientResponse';
+import { StatusEnum } from './types/StatusEnum';
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
 

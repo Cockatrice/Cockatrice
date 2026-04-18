@@ -1,27 +1,6 @@
 /**
  * Shared mock factories for websocket layer unit tests.
- * Import the helpers you need in each spec file via:
- *   import { makeMockWebSocket, useWebClientCleanup } from '../__mocks__/helpers';
  */
-import { WebClient } from '../WebClient';
-
-/**
- * Resets the WebClient singleton to null. Call directly, or use
- * `useWebClientCleanup()` to register automatic beforeEach/afterEach hooks.
- */
-export function resetWebClientSingleton() {
-  (WebClient as unknown as { _instance: WebClient | null })._instance = null;
-}
-
-/**
- * Registers beforeEach/afterEach hooks that reset the WebClient singleton.
- * Call at describe-level or file-level in any spec that mocks WebClient.
- * Prevents isolate:false singleton leakage between spec files.
- */
-export function useWebClientCleanup() {
-  beforeEach(() => resetWebClientSingleton());
-  afterEach(() => resetWebClientSingleton());
-}
 
 /** Builds a mock WebSocket instance */
 export function makeMockWebSocketInstance() {

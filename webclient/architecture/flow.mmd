@@ -1,0 +1,41 @@
+%%{init: {"theme": "base", "themeVariables": {"background": "#ffffff", "primaryColor": "#ffffff", "primaryBorderColor": "#1f2937", "primaryTextColor": "#0b1220", "lineColor": "#1f2937", "textColor": "#0b1220", "signalColor": "#1f2937", "signalTextColor": "#0b1220", "actorBkg": "#ffedd5", "actorBorder": "#1f2937", "actorTextColor": "#0b1220", "actorLineColor": "#1f2937", "sequenceNumberColor": "#ffffff", "noteBkgColor": "#fef3c7", "noteBorderColor": "#1f2937", "noteTextColor": "#0b1220", "labelBoxBkgColor": "#ffffff", "labelTextColor": "#0b1220"}, "sequence": {"showSequenceNumbers": true, "mirrorActors": false, "messageFontSize": "13px", "actorFontSize": "13px", "noteFontSize": "12px", "actorMargin": 14, "boxMargin": 6, "boxTextMargin": 3, "noteMargin": 8, "messageMargin": 48, "diagramMarginX": 8, "diagramMarginY": 8, "width": 120}}}%%
+sequenceDiagram
+    autonumber
+
+    participant C as Application
+    participant RQ as API Request
+    participant CMD as Command
+    participant PB as Protobuf
+    participant WS as WebSocket
+    participant S as Servatrice
+    participant EV as Event
+    participant RS as API Response
+
+    rect rgb(219, 234, 254)
+        Note over C,S: Request — user action → command
+        C->>RQ: joinRoom(roomId)
+        RQ->>CMD: build RoomCommand
+        CMD->>PB: sendRoomCommand(cmd, onSuccess/onError)
+        PB->>PB: assign cmdId,<br/>register callback
+        PB->>WS: send(bytes)
+        WS->>S: Command
+    end
+
+    rect rgb(254, 243, 199)
+        Note over S,RS: Response — correlated by cmdId
+        S-->>WS: Response (cmdId)
+        WS-->>PB: processServerResponse
+        PB->>RS: onSuccess(response)
+        RS->>RS: dispatch → Redux
+    end
+
+    rect rgb(220, 252, 231)
+        Note over S,RS: Event — no cmdId — dispatched by extension
+        S-->>WS: Event
+        WS-->>PB: processRoomEvent
+        PB->>EV: pick handler by extension
+        EV->>RS: roomEvent(...)
+        RS->>RS: dispatch → Redux
+    end
+
+    Note over PB,WS: No timeout, no retry.<br/>resetCommands() on reconnect<br/>silently drops pending callbacks.

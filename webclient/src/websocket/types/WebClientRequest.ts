@@ -39,7 +39,6 @@ import type {
 import type { ConnectTarget } from './WebClientConfig';
 import type { KeyOf } from './WebSocketConfig';
 
-// ── Auth request type map ────────────────────────────────────────────────────
 // Keys = generated *Params type names composed with ConnectTarget.
 // @app/api overrides these with Enriched connect option types.
 

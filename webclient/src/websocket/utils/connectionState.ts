@@ -1,4 +1,4 @@
-import type { WebSocketConnectOptions } from '../interfaces/ConnectOptions';
+import type { WebSocketConnectOptions } from '../types/ConnectOptions';
 
 let pendingOptions: WebSocketConnectOptions | null = null;
 

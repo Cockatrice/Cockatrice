@@ -2,7 +2,6 @@ import { create } from '@bufbuild/protobuf';
 import { App, Data } from '@app/types';
 import SortUtil from './SortUtil';
 
-// ── sortByField ───────────────────────────────────────────────────────────────
 
 describe('sortByField', () => {
   it('sorts string field ASC alphabetically', () => {
@@ -55,7 +54,6 @@ describe('sortByField', () => {
   });
 });
 
-// ── sortByFields ──────────────────────────────────────────────────────────────
 
 describe('sortByFields', () => {
   it('sorts by the first key when all items have distinct first-key values', () => {
@@ -114,7 +112,6 @@ describe('sortByFields', () => {
   });
 });
 
-// ── sortUsersByField ──────────────────────────────────────────────────────────
 
 describe('sortUsersByField', () => {
   it('sorts by userLevel DESC first, then name ASC', () => {
@@ -147,7 +144,6 @@ describe('sortUsersByField', () => {
   });
 });
 
-// ── toggleSortBy ──────────────────────────────────────────────────────────────
 
 describe('toggleSortBy', () => {
   it('same field + ASC → returns DESC', () => {
@@ -166,7 +162,6 @@ describe('toggleSortBy', () => {
   });
 });
 
-// ── resolveFieldChain with numeric index ─────────────────────────────────────
 
 describe('resolveFieldChain via sortByField (numeric index)', () => {
   it('resolves numeric index in dot-notation chain', () => {

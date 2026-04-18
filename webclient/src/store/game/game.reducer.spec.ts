@@ -20,7 +20,6 @@ function cardsIn(state: GamesState, gameId: number, playerId: number, zoneName: 
   return zone ? zone.order.map(id => zone.byId[id]) : [];
 }
 
-// ── 2A: Initialisation & lifecycle ───────────────────────────────────────────
 
 describe('2A: Initialisation & lifecycle', () => {
   it('returns initialState ({ games: {} }) when called with undefined state', () => {
@@ -77,7 +76,6 @@ describe('2A: Initialisation & lifecycle', () => {
   });
 });
 
-// ── 2B: Game state & player management ───────────────────────────────────────
 
 describe('2B: Game state & player management', () => {
   it('GAME_STATE_CHANGED with playerList → replaces players via normalizePlayers', () => {
@@ -165,7 +163,6 @@ describe('2B: Game state & player management', () => {
   });
 });
 
-// ── 2C: CARD_MOVED ────────────────────────────────────────────────────────────
 
 describe('2C: CARD_MOVED', () => {
   function stateWithCard(cardOverrides: Parameters<typeof makeCard>[0] = {}) {
@@ -482,7 +479,6 @@ describe('2C: CARD_MOVED', () => {
   });
 });
 
-// ── 2D: Card mutations ────────────────────────────────────────────────────────
 
 describe('2D: Card mutations', () => {
   function stateWithCardInZone(zoneName: string) {
@@ -587,7 +583,6 @@ describe('2D: Card mutations', () => {
   });
 });
 
-// ── 2E: CARD_ATTR_CHANGED ─────────────────────────────────────────────────────
 
 describe('2E: CARD_ATTR_CHANGED', () => {
   function stateWithCard() {
@@ -660,7 +655,6 @@ describe('2E: CARD_ATTR_CHANGED', () => {
   });
 });
 
-// ── 2F: CARD_COUNTER_CHANGED ─────────────────────────────────────────────────
 
 describe('2F: CARD_COUNTER_CHANGED', () => {
   function stateWithCard(existingCounters: any[] = []) {
@@ -711,7 +705,6 @@ describe('2F: CARD_COUNTER_CHANGED', () => {
   });
 });
 
-// ── 2G: Arrows ────────────────────────────────────────────────────────────────
 
 describe('2G: Arrows', () => {
   it('ARROW_CREATED → inserts arrowInfo into player.arrows keyed by id', () => {
@@ -745,7 +738,6 @@ describe('2G: Arrows', () => {
   });
 });
 
-// ── 2H: Player counters ───────────────────────────────────────────────────────
 
 describe('2H: Player counters', () => {
   it('COUNTER_CREATED → inserts counterInfo into player.counters keyed by id', () => {
@@ -809,7 +801,6 @@ describe('2H: Player counters', () => {
   });
 });
 
-// ── 2I: Zone operations ───────────────────────────────────────────────────────
 
 describe('2I: Zone operations', () => {
   it('CARDS_DRAWN → decrements deck.cardCount, appends cards to hand, increments hand.cardCount', () => {
@@ -963,7 +954,6 @@ describe('2I: Zone operations', () => {
   });
 });
 
-// ── 2J: Turn / phase / chat ───────────────────────────────────────────────────
 
 describe('2J: Turn, phase, and chat', () => {
   it('ACTIVE_PLAYER_SET → sets game.activePlayerId', () => {
@@ -998,7 +988,6 @@ describe('2J: Turn, phase, and chat', () => {
   });
 });
 
-// ── 2K: No-op / passthrough actions ──────────────────────────────────────────
 
 describe('2K: No-op / passthrough actions', () => {
   it('ZONE_SHUFFLED → returns state unchanged (identity)', () => {
@@ -1026,7 +1015,6 @@ describe('2K: No-op / passthrough actions', () => {
   });
 });
 
-// ── 2L: Null-guard / missing entity early-returns ─────────────────────────────
 // Each test dispatches an action with a non-existent gameId (999) or playerId/zone
 // to exercise the `if (!game) return state` / `if (!player) return state` guards.
 

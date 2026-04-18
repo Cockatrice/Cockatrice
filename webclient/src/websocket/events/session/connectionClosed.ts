@@ -1,11 +1,10 @@
 import { Event_ConnectionClosed_CloseReason, type Event_ConnectionClosed } from '@app/generated';
-import { StatusEnum } from '../../interfaces/StatusEnum';
+import { StatusEnum } from '../../types/StatusEnum';
 import { updateStatus } from '../../commands/session';
 
 export function connectionClosed({ reason, reasonStr, endTime }: Event_ConnectionClosed): void {
   let message: string;
 
-  // @TODO (5)
   if (reasonStr) {
     message = reasonStr;
   } else {

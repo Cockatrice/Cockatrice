@@ -5,10 +5,10 @@ import {
   type ForgotPasswordChallengeParams,
 } from '@app/generated';
 
-import { StatusEnum } from '../../interfaces/StatusEnum';
+import { StatusEnum } from '../../types/StatusEnum';
 import { CLIENT_CONFIG } from '../../config';
 import { WebClient } from '../../WebClient';
-import type { ConnectTarget } from '../../interfaces/WebClientConfig';
+import type { ConnectTarget } from '../../types/WebClientConfig';
 import { disconnect, updateStatus } from './';
 
 export function forgotPasswordChallenge(options: ConnectTarget & ForgotPasswordChallengeParams): void {

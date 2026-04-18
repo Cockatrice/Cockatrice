@@ -2,9 +2,6 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 import { WebClient } from '@app/websocket';
 import { createWebClientRequest, createWebClientResponse } from '@app/api';
 
-// Exported so integration tests can inject the WebClient singleton built
-// by their shared setup without going through the production provider
-// (which would attempt to `new WebClient(...)` a second time and throw).
 export const WebClientContext = createContext<WebClient | null>(null);
 
 export function WebClientProvider({ children }: { children: ReactNode }) {

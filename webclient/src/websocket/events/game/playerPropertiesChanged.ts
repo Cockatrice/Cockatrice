@@ -1,5 +1,5 @@
 import type { Event_PlayerPropertiesChanged } from '@app/generated';
-import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
+import type { GameEventMeta } from '../../types/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function playerPropertiesChanged(data: Event_PlayerPropertiesChanged, meta: GameEventMeta): void {

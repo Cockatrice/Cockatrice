@@ -10,12 +10,6 @@ export enum WebSocketConnectReason {
   TEST_CONNECTION,
 }
 
-// ── Connect options ───────────────────────────────────────────────────────────
-// Each variant is the enriched input for one session flow: the network
-// transport fields (host/port) + the subset of proto Command_* fields the UI
-// actually produces (user-entered credentials, tokens, email, etc.) + a
-// `reason` discriminator so the websocket layer can route.
-
 interface ConnectTransport extends ConnectTarget {
   keepalive?: number;
   autojoinrooms?: boolean;

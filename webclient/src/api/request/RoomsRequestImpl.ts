@@ -1,7 +1,7 @@
-import type { IRoomsRequest } from '@app/websocket';
 import { RoomCommands, SessionCommands } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
-export class RoomsRequestImpl implements IRoomsRequest {
+export class RoomsRequestImpl implements WebsocketTypes.IRoomsRequest {
   joinRoom(roomId: number): void {
     SessionCommands.joinRoom(roomId);
   }

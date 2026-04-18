@@ -1,5 +1,5 @@
 import type { Event_SetCardCounter } from '@app/generated';
-import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
+import type { GameEventMeta } from '../../types/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function setCardCounter(data: Event_SetCardCounter, meta: GameEventMeta): void {

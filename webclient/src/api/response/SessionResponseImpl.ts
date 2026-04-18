@@ -1,12 +1,11 @@
 import { Data } from '@app/types';
-import type { ISessionResponse, WebSocketSessionResponseOverrides } from '@app/websocket';
-import { StatusEnum } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 import { GameDispatch, RoomsDispatch, ServerDispatch } from '@app/store';
 
-type LoginSuccess = WebSocketSessionResponseOverrides['Response_Login'];
-type PendingActivation = WebSocketSessionResponseOverrides['Response'];
+type LoginSuccess = WebsocketTypes.WebSocketSessionResponseOverrides['Response_Login'];
+type PendingActivation = WebsocketTypes.WebSocketSessionResponseOverrides['Response'];
 
-export class SessionResponseImpl implements ISessionResponse<WebSocketSessionResponseOverrides> {
+export class SessionResponseImpl implements WebsocketTypes.ISessionResponse<WebsocketTypes.WebSocketSessionResponseOverrides> {
   initialized(): void {
     ServerDispatch.initialized();
   }
@@ -67,8 +66,8 @@ export class SessionResponseImpl implements ISessionResponse<WebSocketSessionRes
     ServerDispatch.updateInfo(name, version);
   }
 
-  updateStatus(state: StatusEnum, description: string): void {
-    if (state === StatusEnum.DISCONNECTED) {
+  updateStatus(state: WebsocketTypes.StatusEnum, description: string): void {
+    if (state === WebsocketTypes.StatusEnum.DISCONNECTED) {
       GameDispatch.clearStore();
       RoomsDispatch.clearStore();
       ServerDispatch.clearStore();

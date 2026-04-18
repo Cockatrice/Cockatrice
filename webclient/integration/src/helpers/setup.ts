@@ -19,13 +19,8 @@ import { afterEach, beforeEach, vi } from 'vitest';
 
 import { ServerDispatch, RoomsDispatch, GameDispatch } from '@app/store';
 import { Data } from '@app/types';
-import {
-  WebClient,
-  StatusEnum,
-  WebSocketConnectReason,
-  setPendingOptions,
-} from '@app/websocket';
-import type { WebSocketConnectOptions } from '@app/websocket';
+import { WebClient, setPendingOptions } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 import { PROTOCOL_VERSION } from '../../../src/websocket/config';
 import { createWebClientRequest, createWebClientResponse } from '@app/api';
 
@@ -109,7 +104,7 @@ function resetAll(): void {
   }
 
   client.protobuf.resetCommands();
-  client.status = StatusEnum.DISCONNECTED;
+  client.status = WebsocketTypes.StatusEnum.DISCONNECTED;
 
   ServerDispatch.clearStore();
   RoomsDispatch.clearStore();
@@ -128,8 +123,8 @@ function resetAll(): void {
 
 // ── Shared connect helpers ──────────────────────────────────────────────────
 
-const DEFAULT_LOGIN_OPTIONS: WebSocketConnectOptions = {
-  reason: WebSocketConnectReason.LOGIN,
+const DEFAULT_LOGIN_OPTIONS: WebsocketTypes.WebSocketConnectOptions = {
+  reason: WebsocketTypes.WebSocketConnectReason.LOGIN,
   host: 'localhost',
   port: '4748',
   userName: 'alice',
@@ -137,16 +132,16 @@ const DEFAULT_LOGIN_OPTIONS: WebSocketConnectOptions = {
 };
 
 export function connectRaw(
-  overrides: Partial<WebSocketConnectOptions> = {}
+  overrides: Partial<WebsocketTypes.WebSocketConnectOptions> = {}
 ): void {
   const opts = { ...DEFAULT_LOGIN_OPTIONS, ...overrides };
-  setPendingOptions(opts as WebSocketConnectOptions);
+  setPendingOptions(opts as WebsocketTypes.WebSocketConnectOptions);
   getWebClient().connect({ host: opts.host, port: opts.port });
   openMockWebSocket();
 }
 
 export function connectAndHandshake(
-  overrides: Partial<WebSocketConnectOptions> = {}
+  overrides: Partial<WebsocketTypes.WebSocketConnectOptions> = {}
 ): void {
   connectRaw(overrides);
   deliverMessage(buildSessionEventMessage(
@@ -160,7 +155,7 @@ export function connectAndHandshake(
 }
 
 export function connectAndHandshakeWithSalt(
-  overrides: Partial<WebSocketConnectOptions> = {}
+  overrides: Partial<WebsocketTypes.WebSocketConnectOptions> = {}
 ): void {
   connectRaw(overrides);
   deliverMessage(buildSessionEventMessage(

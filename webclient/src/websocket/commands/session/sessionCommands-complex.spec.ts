@@ -18,8 +18,16 @@ import { Mock } from 'vitest';
 import { makeCallbackHelpers } from '../../__mocks__/callbackHelpers';
 import { WebClient } from '../../WebClient';
 import * as SessionIndexMocks from './';
-import { Enriched } from '@app/types';
-import { StatusEnum } from '../../interfaces/StatusEnum';
+import {
+  WebSocketConnectReason,
+  type LoginConnectOptions,
+  type RegisterConnectOptions,
+  type ActivateConnectOptions,
+  type PasswordResetRequestConnectOptions,
+  type PasswordResetChallengeConnectOptions,
+  type PasswordResetConnectOptions,
+} from '../../types/ConnectOptions';
+import { StatusEnum } from '../../types/StatusEnum';
 import {
   Command_Activate_ext,
   Command_ForgotPasswordChallenge_ext,
@@ -56,50 +64,50 @@ const { invokeOnSuccess, invokeResponseCode, invokeOnError } = makeCallbackHelpe
 );
 
 const baseTransport = { host: 'h', port: '1' };
-const makeLoginOpts = (overrides: Partial<Enriched.LoginConnectOptions> = {}): Enriched.LoginConnectOptions => ({
+const makeLoginOpts = (overrides: Partial<LoginConnectOptions> = {}): LoginConnectOptions => ({
   ...baseTransport,
   userName: 'alice',
-  reason: Enriched.WebSocketConnectReason.LOGIN,
+  reason: WebSocketConnectReason.LOGIN,
   ...overrides,
 });
 const makeRegisterOpts = (
-  overrides: Partial<Enriched.RegisterConnectOptions> = {}
-): Enriched.RegisterConnectOptions => ({
+  overrides: Partial<RegisterConnectOptions> = {}
+): RegisterConnectOptions => ({
   ...baseTransport,
   userName: 'alice',
   password: 'pw',
   email: 'a@b.com',
   country: 'US',
   realName: 'Al',
-  reason: Enriched.WebSocketConnectReason.REGISTER,
+  reason: WebSocketConnectReason.REGISTER,
   ...overrides,
 });
 const makeActivateOpts = (
-  overrides: Partial<Enriched.ActivateConnectOptions> = {}
-): Enriched.ActivateConnectOptions => ({
+  overrides: Partial<ActivateConnectOptions> = {}
+): ActivateConnectOptions => ({
   ...baseTransport,
   userName: 'alice',
   token: 'tok',
-  reason: Enriched.WebSocketConnectReason.ACTIVATE_ACCOUNT,
+  reason: WebSocketConnectReason.ACTIVATE_ACCOUNT,
   ...overrides,
 });
-const makeForgotRequestOpts = (): Enriched.PasswordResetRequestConnectOptions => ({
+const makeForgotRequestOpts = (): PasswordResetRequestConnectOptions => ({
   ...baseTransport,
   userName: 'alice',
-  reason: Enriched.WebSocketConnectReason.PASSWORD_RESET_REQUEST,
+  reason: WebSocketConnectReason.PASSWORD_RESET_REQUEST,
 });
-const makeForgotChallengeOpts = (): Enriched.PasswordResetChallengeConnectOptions => ({
+const makeForgotChallengeOpts = (): PasswordResetChallengeConnectOptions => ({
   ...baseTransport,
   userName: 'alice',
   email: 'a@b.com',
-  reason: Enriched.WebSocketConnectReason.PASSWORD_RESET_CHALLENGE,
+  reason: WebSocketConnectReason.PASSWORD_RESET_CHALLENGE,
 });
-const makeForgotResetOpts = (): Enriched.PasswordResetConnectOptions => ({
+const makeForgotResetOpts = (): PasswordResetConnectOptions => ({
   ...baseTransport,
   userName: 'alice',
   token: 'tok',
   newPassword: 'newpw',
-  reason: Enriched.WebSocketConnectReason.PASSWORD_RESET,
+  reason: WebSocketConnectReason.PASSWORD_RESET,
 });
 
 
@@ -109,9 +117,6 @@ beforeEach(() => {
   (passwordSaltSupported as Mock).mockReturnValue(0);
 });
 
-// ----------------------------------------------------------------
-// connect.ts
-// ----------------------------------------------------------------
 describe('connect', () => {
 
   it('calls WebClient.instance.connect with the target', () => {
@@ -128,9 +133,6 @@ describe('testConnect', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// updateStatus.ts
-// ----------------------------------------------------------------
 describe('updateStatus', () => {
 
   it('calls WebClient.instance.response.session.updateStatus and WebClient.instance.updateStatus', () => {
@@ -140,9 +142,6 @@ describe('updateStatus', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// login.ts
-// ----------------------------------------------------------------
 describe('login', () => {
 
   it('sends Command_Login with plain password when no salt', () => {
@@ -194,7 +193,7 @@ describe('login', () => {
   });
 
   it('onSuccess passes hashedPassword to loginSuccessful when salt is used', () => {
-    login({ host: 'h', port: '1', userName: 'alice', reason: Enriched.WebSocketConnectReason.LOGIN }, 'pw', 'salt');
+    login({ host: 'h', port: '1', userName: 'alice', reason: WebSocketConnectReason.LOGIN }, 'pw', 'salt');
     const loginResp = { buddyList: [], ignoreList: [], userInfo: { name: 'alice' } };
     invokeOnSuccess(loginResp, { responseCode: 0 });
     const calledWith = (WebClient.instance.response.session.loginSuccessful as Mock).mock.calls[0][0];
@@ -266,9 +265,6 @@ describe('login', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// register.ts
-// ----------------------------------------------------------------
 describe('register', () => {
 
   it('sends Command_Register with plain password when no salt', () => {
@@ -371,9 +367,6 @@ describe('register', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// activate.ts
-// ----------------------------------------------------------------
 describe('activate', () => {
 
   it('sends Command_Activate with userName and token, not password', () => {
@@ -405,9 +398,6 @@ describe('activate', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// forgotPasswordChallenge.ts
-// ----------------------------------------------------------------
 describe('forgotPasswordChallenge', () => {
 
   it('sends Command_ForgotPasswordChallenge', () => {
@@ -432,9 +422,6 @@ describe('forgotPasswordChallenge', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// forgotPasswordRequest.ts
-// ----------------------------------------------------------------
 describe('forgotPasswordRequest', () => {
 
   it('sends Command_ForgotPasswordRequest', () => {
@@ -470,9 +457,6 @@ describe('forgotPasswordRequest', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// forgotPasswordReset.ts
-// ----------------------------------------------------------------
 describe('forgotPasswordReset', () => {
 
   it('sends Command_ForgotPasswordReset with plain newPassword when no salt', () => {
@@ -508,9 +492,6 @@ describe('forgotPasswordReset', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// requestPasswordSalt.ts
-// ----------------------------------------------------------------
 describe('requestPasswordSalt', () => {
 
   it('sends Command_RequestPasswordSalt', () => {

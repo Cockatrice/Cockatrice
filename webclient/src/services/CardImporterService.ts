@@ -96,7 +96,7 @@ class CardImporterService {
         };
       }
 
-      // @TODO: clean this up and normalize what i'm returning
+      // @TODO clean this up and normalize what i'm returning
       if (attributes[child.tagName]) {
         if (Array.isArray(attributes[child.tagName])) {
           attributes[child.tagName].push(parsedAttributes)

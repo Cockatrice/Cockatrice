@@ -1,6 +1,7 @@
 import { Actions } from './server.actions';
 import { store } from '..';
-import { Data, Enriched } from '@app/types';
+import { Data } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 
 export const Dispatch = {
   initialized: () => {
@@ -12,7 +13,7 @@ export const Dispatch = {
   connectionAttempted: () => {
     store.dispatch(Actions.connectionAttempted());
   },
-  loginSuccessful: (options: Enriched.LoginSuccessContext) => {
+  loginSuccessful: (options: WebsocketTypes.LoginSuccessContext) => {
     store.dispatch(Actions.loginSuccessful({ options }));
   },
   loginFailed: () => {
@@ -48,7 +49,7 @@ export const Dispatch = {
   updateInfo: (name: string, version: string) => {
     store.dispatch(Actions.updateInfo({ info: { name, version } }));
   },
-  updateStatus: (state: Enriched.StatusEnum, description: string) => {
+  updateStatus: (state: WebsocketTypes.StatusEnum, description: string) => {
     store.dispatch(Actions.updateStatus({ status: { state, description } }));
   },
   updateUser: (user: Data.ServerInfo_User) => {
@@ -93,7 +94,7 @@ export const Dispatch = {
   registrationUserNameError: (error: string) => {
     store.dispatch(Actions.registrationUserNameError({ error }));
   },
-  accountAwaitingActivation: (options: Enriched.PendingActivationContext) => {
+  accountAwaitingActivation: (options: WebsocketTypes.PendingActivationContext) => {
     store.dispatch(Actions.accountAwaitingActivation({ options }));
   },
   accountActivationSuccess: () => {

@@ -47,9 +47,7 @@ const LoginFormBody = ({
 
   const togglePasswordLabel = (on: boolean) => setUseStoredPasswordLabel(on);
 
-  // Host-sync: when the selected host changes, mirror its username + stored-
-  // password hint into the form. Deliberately does NOT touch autoConnect — the
-  // persisted setting is decoupled from which host is currently picked.
+  // @critical Host-sync must not touch autoConnect — app-level setting, not per-host.
   useEffect(() => {
     if (!selectedHost) {
       return;
@@ -65,8 +63,6 @@ const LoginFormBody = ({
     );
   }, [selectedHost, form]);
 
-  // Mirror the persisted autoConnect setting into the form checkbox so the
-  // field reflects truth as soon as settings load.
   useEffect(() => {
     if (settings.status !== LoadingState.READY) {
       return;
@@ -82,11 +78,7 @@ const LoginFormBody = ({
   };
 
   const onRememberChange = (checked: boolean) => {
-    // When the user unchecks "remember password", the auto-connect checkbox
-    // can't meaningfully stay on (there are no saved credentials to use), so
-    // reflect that in the form UI. Note: this writes only to the form field,
-    // NOT to the persisted setting — toggling host-level remember is not a
-    // user intent to change the app-level auto-connect preference.
+    // @critical Writes form-only, never to persisted setting — "remember" toggle isn't a preference edit.
     if (!checked && values.autoConnect) {
       form.change('autoConnect', false);
     }
@@ -94,11 +86,8 @@ const LoginFormBody = ({
     togglePasswordLabel(canUseStoredPassword(checked, values.password));
   };
 
-  // User-initiated toggle of the auto-connect checkbox. This is the ONLY path
-  // that writes to the persisted setting — wired directly to the Checkbox's
-  // native onChange (see JSX below), not to a <OnChange> listener, because
-  // OnChange fires on programmatic form.change calls too (host-sync effects
-  // etc.) and would leak those into Dexie.
+  // @critical Only persist-path for autoConnect; wired to native onChange, not <OnChange>,
+  // to avoid leaking form.change() writes into Dexie.
   const onUserToggleAutoConnect = (checked: boolean, fieldOnChange: (v: boolean) => void) => {
     fieldOnChange(checked);
 

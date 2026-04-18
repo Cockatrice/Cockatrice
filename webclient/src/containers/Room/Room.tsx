@@ -17,7 +17,6 @@ import SayMessage from './SayMessage';
 
 import './Room.css';
 
-// @TODO (3)
 const Room = () => {
   const joined = useAppSelector(state => RoomsSelectors.getJoinedRooms(state));
   const rooms = useAppSelector(state => RoomsSelectors.getRooms(state));

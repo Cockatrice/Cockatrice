@@ -24,9 +24,6 @@ const { invokeOnSuccess } = makeCallbackHelpers(
   3
 );
 
-// ----------------------------------------------------------------
-// createGame
-// ----------------------------------------------------------------
 describe('createGame', () => {
 
   it('calls sendRoomCommand with Command_CreateGame', () => {
@@ -43,9 +40,6 @@ describe('createGame', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// joinGame
-// ----------------------------------------------------------------
 describe('joinGame', () => {
 
   it('calls sendRoomCommand with Command_JoinGame', () => {
@@ -62,9 +56,6 @@ describe('joinGame', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// leaveRoom
-// ----------------------------------------------------------------
 describe('leaveRoom', () => {
 
   it('calls sendRoomCommand with Command_LeaveRoom', () => {
@@ -81,9 +72,6 @@ describe('leaveRoom', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// roomSay
-// ----------------------------------------------------------------
 describe('roomSay', () => {
 
   it('calls sendRoomCommand with trimmed message', () => {

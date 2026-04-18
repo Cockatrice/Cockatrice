@@ -1,5 +1,5 @@
 import type { Event_DrawCards } from '@app/generated';
-import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
+import type { GameEventMeta } from '../../types/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function drawCards(data: Event_DrawCards, meta: GameEventMeta): void {

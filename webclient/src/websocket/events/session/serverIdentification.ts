@@ -1,9 +1,9 @@
 import type { Event_ServerIdentification } from '@app/generated';
 import { WebClient } from '../../WebClient';
-import { StatusEnum } from '../../interfaces/StatusEnum';
+import { StatusEnum } from '../../types/StatusEnum';
 import { PROTOCOL_VERSION } from '../../config';
 import { consumePendingOptions } from '../../utils/connectionState';
-import { WebSocketConnectReason } from '../../interfaces/ConnectOptions';
+import { WebSocketConnectReason } from '../../types/ConnectOptions';
 import { generateSalt, passwordSaltSupported } from '../../utils';
 import * as SessionCommands from '../../commands/session';
 

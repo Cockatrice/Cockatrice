@@ -1,5 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { Data, Enriched } from '@app/types';
+import { Data } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 import { SortUtil } from '../common';
 import { ServerState } from './server.interfaces';
 
@@ -23,7 +24,7 @@ export const Selectors = {
   /** True when the server status has reached LOGGED_IN. */
   getIsConnected: createSelector(
     [({ server }: State) => server.status.state],
-    (state): boolean => state === Enriched.StatusEnum.LOGGED_IN
+    (state): boolean => state === WebsocketTypes.StatusEnum.LOGGED_IN
   ),
 
   /** True when the currently logged-in user has the IsModerator level flag. */

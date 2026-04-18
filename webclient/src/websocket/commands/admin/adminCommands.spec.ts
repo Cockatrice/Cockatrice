@@ -20,9 +20,6 @@ const { invokeOnSuccess } = makeCallbackHelpers(
   2
 );
 
-// ----------------------------------------------------------------
-// adjustMod
-// ----------------------------------------------------------------
 describe('adjustMod', () => {
 
   it('calls sendAdminCommand with Command_AdjustMod extension and fields', () => {
@@ -41,9 +38,6 @@ describe('adjustMod', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// reloadConfig
-// ----------------------------------------------------------------
 describe('reloadConfig', () => {
 
   it('calls sendAdminCommand with Command_ReloadConfig extension', () => {
@@ -62,9 +56,6 @@ describe('reloadConfig', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// shutdownServer
-// ----------------------------------------------------------------
 describe('shutdownServer', () => {
 
   it('calls sendAdminCommand with Command_ShutdownServer extension and fields', () => {
@@ -83,9 +74,6 @@ describe('shutdownServer', () => {
   });
 });
 
-// ----------------------------------------------------------------
-// updateServerMessage
-// ----------------------------------------------------------------
 describe('updateServerMessage', () => {
 
   it('calls sendAdminCommand with Command_UpdateServerMessage extension', () => {

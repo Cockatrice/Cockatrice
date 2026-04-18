@@ -1,4 +1,4 @@
-import type { IWebClientRequest } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
 import { AuthenticationRequestImpl } from './AuthenticationRequestImpl';
 import { SessionRequestImpl } from './SessionRequestImpl';
@@ -9,7 +9,7 @@ import { ModeratorRequestImpl } from './ModeratorRequestImpl';
 
 export { AuthenticationRequestImpl, SessionRequestImpl, RoomsRequestImpl, GameRequestImpl, AdminRequestImpl, ModeratorRequestImpl };
 
-export function createWebClientRequest(): IWebClientRequest {
+export function createWebClientRequest(): WebsocketTypes.IWebClientRequest {
   return {
     authentication: new AuthenticationRequestImpl(),
     session: new SessionRequestImpl(),

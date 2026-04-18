@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 
 import { Data } from '@app/types';
 import { store } from '@app/store';
-import { StatusEnum } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
 import { PROTOCOL_VERSION } from '../../../src/websocket/config';
 
@@ -18,17 +18,15 @@ import {
   setPendingOptions,
   connectAndHandshake,
 } from '../helpers/setup';
-import type { WebSocketConnectOptions } from '@app/websocket';
-import { WebSocketConnectReason } from '@app/websocket';
 import {
   buildSessionEventMessage,
   deliverMessage,
 } from '../helpers/protobuf-builders';
 import { findLastSessionCommand } from '../helpers/command-capture';
 
-function loginOptions(overrides: Partial<{ userName: string; password: string }> = {}): WebSocketConnectOptions {
+function loginOptions(overrides: Partial<{ userName: string; password: string }> = {}): WebsocketTypes.WebSocketConnectOptions {
   return {
-    reason: WebSocketConnectReason.LOGIN,
+    reason: WebsocketTypes.WebSocketConnectReason.LOGIN,
     host: 'localhost',
     port: '4748',
     userName: overrides.userName ?? 'alice',
@@ -36,7 +34,7 @@ function loginOptions(overrides: Partial<{ userName: string; password: string }>
   };
 }
 
-function connectWithOptions(opts: WebSocketConnectOptions): void {
+function connectWithOptions(opts: WebsocketTypes.WebSocketConnectOptions): void {
   setPendingOptions(opts);
   getWebClient().connect({ host: opts.host, port: opts.port });
 }
@@ -63,7 +61,7 @@ describe('connection lifecycle', () => {
 
     openMockWebSocket();
 
-    expect(store.getState().server.status.state).toBe(StatusEnum.CONNECTED);
+    expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.CONNECTED);
     expect(store.getState().server.status.description).toBe('Connected');
   });
 
@@ -73,7 +71,7 @@ describe('connection lifecycle', () => {
 
     deliverMessage(serverIdentification());
 
-    expect(store.getState().server.status.state).toBe(StatusEnum.LOGGING_IN);
+    expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.LOGGING_IN);
     expect(store.getState().server.info.name).toBe('TestServer');
     expect(store.getState().server.info.version).toBe('2.8.0');
 
@@ -90,7 +88,7 @@ describe('connection lifecycle', () => {
 
     const mock = getMockWebSocket();
     expect(mock.close).toHaveBeenCalled();
-    expect(store.getState().server.status.state).toBe(StatusEnum.DISCONNECTED);
+    expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
     expect(() => findLastSessionCommand(Data.Command_Login_ext)).toThrow();
   });
 
@@ -103,7 +101,7 @@ describe('connection lifecycle', () => {
     vi.advanceTimersByTime(5000);
 
     expect(mock.close).toHaveBeenCalled();
-    expect(store.getState().server.status.state).toBe(StatusEnum.DISCONNECTED);
+    expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
   });
 
   it('releases keep-alive ping loop on explicit disconnect', () => {
@@ -115,7 +113,7 @@ describe('connection lifecycle', () => {
     getWebClient().disconnect();
 
     expect(mock.close).toHaveBeenCalled();
-    expect(store.getState().server.status.state).toBe(StatusEnum.DISCONNECTED);
+    expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
   });
 
   it('drops pending commands and clears state on unexpected socket close', () => {
@@ -129,6 +127,6 @@ describe('connection lifecycle', () => {
     mock.readyState = 3;
     mock.onclose?.({ code: 1006, reason: '', wasClean: false } as CloseEvent);
 
-    expect(store.getState().server.status.state).toBe(StatusEnum.DISCONNECTED);
+    expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
   });
 });

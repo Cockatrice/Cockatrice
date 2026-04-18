@@ -25,14 +25,14 @@ const flushStoresAndEffects = async (): Promise<void> => {
   });
 };
 
-import { autoLoginSession } from '../../../src/hooks/useAutoLogin';
+import { autoLoginGate } from '../../../src/hooks/useAutoLogin';
 import { settingsStore } from '../../../src/hooks/useSettings';
 import { knownHostsStore } from '../../../src/hooks/useKnownHosts';
 import Login from '../../../src/containers/Login/Login';
 import { HostDTO, SettingDTO } from '@app/services';
 import { App } from '@app/types';
 import { ServerSelectors, ServerDispatch } from '@app/store';
-import { StatusEnum } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
 import { resetDexie } from '../services/dexie/resetDexie';
 import { renderAppScreen, store } from './helpers';
@@ -41,7 +41,7 @@ import { renderAppScreen, store } from './helpers';
 // dispatching updateStatus(DISCONNECTED) is what the real reducer uses to
 // clear connectionAttemptMade (clearStore intentionally preserves status).
 const simulateLogout = () => {
-  ServerDispatch.updateStatus(StatusEnum.DISCONNECTED, null);
+  ServerDispatch.updateStatus(WebsocketTypes.StatusEnum.DISCONNECTED, null);
 };
 
 const seedAutoConnect = async () => {
@@ -86,7 +86,7 @@ beforeEach(async () => {
   // cached values).
   settingsStore.reset();
   knownHostsStore.reset();
-  autoLoginSession.startupCheckRan = false;
+  autoLoginGate.hasChecked = false;
 });
 
 describe('autoconnect — cold start', () => {
@@ -182,7 +182,7 @@ describe('autoconnect — refresh', () => {
     // Simulate a browser refresh: the session gate naturally resets on a
     // fresh JS context, and the real connection flag resets too.
     simulateLogout();
-    autoLoginSession.startupCheckRan = false;
+    autoLoginGate.hasChecked = false;
 
     renderAppScreen(<Login />);
     await waitFor(() => {

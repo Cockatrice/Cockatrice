@@ -3,11 +3,8 @@ import { isMessage } from '@bufbuild/protobuf';
 import { useDispatch, useSelector } from 'react-redux';
 import rootReducer from './rootReducer';
 
-// Protobuf-es v2 messages are already plain objects (no class prototype, unlike v1).
-// They carry $typeName (string, identifies the message) and $unknown (binary unknown
-// fields) — both are serializable and harmless in Redux state. No conversion needed.
-// Fields may include Uint8Array (bytes) and BigInt (int64/uint64), which fail Redux
-// Toolkit’s default serializable check, so we extend it to accept these types.
+// Protobuf-es v2 messages are plain objects with $typeName/$unknown siblings;
+// bytes fields are Uint8Array and int64/uint64 are BigInt. All four pass through.
 function isSerializable(value: unknown): boolean {
   return isPlain(value) || isMessage(value) || value instanceof Uint8Array || typeof value === 'bigint';
 }

@@ -92,7 +92,6 @@ beforeEach(() => {
   (passwordSaltSupported as Mock).mockReturnValue(0);
 });
 
-// ----------------------------------------------------------------
 
 describe('accountEdit', () => {
   it('sends Command_AccountEdit with correct params', () => {

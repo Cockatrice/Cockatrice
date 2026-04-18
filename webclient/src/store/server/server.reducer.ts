@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { App, Data, Enriched } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 import { create } from '@bufbuild/protobuf';
 
 import { normalizeBannedUserError, normalizeGameObject, normalizeGametypeMap, normalizeLogs } from '../common';
@@ -73,7 +74,7 @@ const initialState: ServerState = {
 
   status: {
     connectionAttemptMade: false,
-    state: Enriched.StatusEnum.DISCONNECTED,
+    state: WebsocketTypes.StatusEnum.DISCONNECTED,
     description: null
   },
   info: {
@@ -177,7 +178,7 @@ export const serverSlice = createSlice({
       state.status.state = status.state;
       state.status.description = status.description;
 
-      if (status.state === Enriched.StatusEnum.DISCONNECTED) {
+      if (status.state === WebsocketTypes.StatusEnum.DISCONNECTED) {
         state.status.connectionAttemptMade = false;
       }
     },
@@ -403,10 +404,10 @@ export const serverSlice = createSlice({
     },
 
     // Signal-only action types — no state mutation, defined so type strings are generated
-    accountAwaitingActivation: (_state, _action: PayloadAction<{ options: Enriched.PendingActivationContext }>) => {},
+    accountAwaitingActivation: (_state, _action: PayloadAction<{ options: WebsocketTypes.PendingActivationContext }>) => {},
     accountActivationFailed: (_state) => {},
     accountActivationSuccess: (_state) => {},
-    loginSuccessful: (_state, _action: PayloadAction<{ options: Enriched.LoginSuccessContext }>) => {},
+    loginSuccessful: (_state, _action: PayloadAction<{ options: WebsocketTypes.LoginSuccessContext }>) => {},
     loginFailed: (_state) => {},
     connectionFailed: (_state) => {},
     testConnectionSuccessful: (_state) => {},

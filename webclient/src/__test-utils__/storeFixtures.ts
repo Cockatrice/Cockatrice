@@ -1,4 +1,5 @@
-import { App, Data, Enriched } from '@app/types';
+import { App, Data } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 import type { RootState } from '../store/store';
 
 /**
@@ -30,7 +31,7 @@ export const disconnectedState: Partial<RootState> = {
     ignoreList: {},
     status: {
       connectionAttemptMade: false,
-      state: Enriched.StatusEnum.DISCONNECTED,
+      state: WebsocketTypes.StatusEnum.DISCONNECTED,
       description: null,
     },
     info: { message: null, name: null, version: null },
@@ -77,7 +78,7 @@ export const connectedState: Partial<RootState> = {
     initialized: true,
     status: {
       connectionAttemptMade: true,
-      state: Enriched.StatusEnum.LOGGED_IN,
+      state: WebsocketTypes.StatusEnum.LOGGED_IN,
       description: null,
     },
     info: {

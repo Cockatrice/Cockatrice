@@ -12,7 +12,7 @@ let makeSettings: (o?: AnyRecord) => AnyRecord;
 let makeHost: (o?: AnyRecord) => AnyRecord;
 
 beforeEach(async () => {
-  // Fresh module graph per test so the module-level hasFiredThisSession flag resets.
+  // Fresh module graph per test so autoLoginGate.hasChecked resets.
   vi.resetModules();
   useAutoLoginModule = await import('./useAutoLogin');
   const settingsMockModule = await import('./__mocks__/useSettings');
@@ -119,21 +119,14 @@ describe('useAutoLogin', () => {
   });
 
   test('manual login then logout does NOT auto-connect on return to /login', async () => {
-    // Regression: the flag tracks whether the startup check RAN, not whether
-    // it FIRED. Without that distinction, a first-session manual login (where
-    // the hook saw conditions unmet) would leave the flag unset, and the
-    // next mount (after logout) would find conditions met and auto-connect.
     const onLogin = vi.fn();
 
-    // First mount: autoConnect=false, so the check runs but doesn't fire.
     configure({ autoConnect: false, remember: true, hashedPassword: 'hp' });
     const { unmount } = renderHook(() => useAutoLoginModule.useAutoLogin(onLogin, false));
     await Promise.resolve();
     await Promise.resolve();
     expect(onLogin).not.toHaveBeenCalled();
 
-    // User logs in manually and later hits logout; Login re-mounts with
-    // autoConnect now flipped on (they ticked the box during the session).
     unmount();
     configure({ autoConnect: true, remember: true, hashedPassword: 'hp' });
     renderHook(() => useAutoLoginModule.useAutoLogin(onLogin, false));
@@ -144,10 +137,6 @@ describe('useAutoLogin', () => {
   });
 
   test('ticking the auto-connect checkbox after mount does NOT trigger a login', async () => {
-    // This is the specific regression: editing the persisted preference is a
-    // settings write, not a "log in now" signal. Because useAutoLogin reads
-    // via whenReady (one-shot) instead of subscribing, a subsequent settings
-    // change cannot re-run the orchestrator.
     const onLogin = vi.fn();
     configure({ autoConnect: false, remember: true, hashedPassword: 'hp' });
 
@@ -156,9 +145,6 @@ describe('useAutoLogin', () => {
     await Promise.resolve();
     expect(onLogin).not.toHaveBeenCalled();
 
-    // Swap to a "settings.autoConnect=true" world and rerender. Since
-    // getSettings is a one-shot that already resolved with the old value,
-    // changing its mockResolvedValue doesn't retroactively matter.
     configure({ autoConnect: true, remember: true, hashedPassword: 'hp' });
     rerender();
 

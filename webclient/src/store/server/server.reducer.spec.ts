@@ -1,4 +1,5 @@
-import { Data, Enriched } from '@app/types';
+import { Data } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 import { create } from '@bufbuild/protobuf';
 import { serverReducer, MAX_USER_MESSAGES } from './server.reducer';
 import { Actions } from './server.actions';
@@ -18,14 +19,13 @@ import {
 
 const UserLevelFlag = Data.ServerInfo_User_UserLevelFlag;
 
-// ── Initialisation ───────────────────────────────────────────────────────────
 
 describe('Initialisation', () => {
   it('returns initialState when called with undefined state', () => {
     const result = serverReducer(undefined, { type: '@@INIT' });
     expect(result.initialized).toBe(false);
     expect(result.buddyList).toEqual({});
-    expect(result.status.state).toBe(Enriched.StatusEnum.DISCONNECTED);
+    expect(result.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
   });
 
   it('INITIALIZED → resets to initialState with initialized: true', () => {
@@ -37,7 +37,7 @@ describe('Initialisation', () => {
   });
 
   it('CLEAR_STORE → resets to initialState but preserves status', () => {
-    const status = { state: Enriched.StatusEnum.LOGGED_IN, description: 'logged in', connectionAttemptMade: true };
+    const status = { state: WebsocketTypes.StatusEnum.LOGGED_IN, description: 'logged in', connectionAttemptMade: true };
     const state = makeServerState({ status, banUser: 'someone' });
     const result = serverReducer(state, Actions.clearStore());
     expect(result.banUser).toBe('');
@@ -52,11 +52,12 @@ describe('Initialisation', () => {
   });
 });
 
-// ── Account & Connection ─────────────────────────────────────────────────────
 
 describe('Account & Connection', () => {
   it('CONNECTION_ATTEMPTED → sets connectionAttemptMade to true', () => {
-    const state = makeServerState({ status: { connectionAttemptMade: false, state: Enriched.StatusEnum.DISCONNECTED, description: null } });
+    const state = makeServerState({
+      status: { connectionAttemptMade: false, state: WebsocketTypes.StatusEnum.DISCONNECTED, description: null },
+    });
     const result = serverReducer(state, Actions.connectionAttempted());
     expect(result.status.connectionAttemptMade).toBe(true);
   });
@@ -81,7 +82,6 @@ describe('Account & Connection', () => {
   });
 });
 
-// ── Registration ──────────────────────────────────────────────────────────────
 
 describe('Registration', () => {
   it('REGISTRATION_FAILED → stores normalized error (plain reason)', () => {
@@ -110,7 +110,6 @@ describe('Registration', () => {
   });
 });
 
-// ── Server Info & Status ──────────────────────────────────────────────────────
 
 describe('Server Info & Status', () => {
   it('SERVER_MESSAGE → merges message into state.info', () => {
@@ -131,15 +130,14 @@ describe('Server Info & Status', () => {
 
   it('UPDATE_STATUS → merges state and description into status', () => {
     const state = makeServerState();
-    const update = { state: Enriched.StatusEnum.LOGGED_IN, description: 'ok' };
+    const update = { state: WebsocketTypes.StatusEnum.LOGGED_IN, description: 'ok' };
     const result = serverReducer(state, Actions.updateStatus({ status: update }));
-    expect(result.status.state).toBe(Enriched.StatusEnum.LOGGED_IN);
+    expect(result.status.state).toBe(WebsocketTypes.StatusEnum.LOGGED_IN);
     expect(result.status.description).toBe('ok');
     expect(result.status.connectionAttemptMade).toBe(false);
   });
 });
 
-// ── User ──────────────────────────────────────────────────────────────────────
 
 describe('User', () => {
   it('UPDATE_USER → merges action.payload.user into state.user', () => {
@@ -163,7 +161,6 @@ describe('User', () => {
   });
 });
 
-// ── Users List ────────────────────────────────────────────────────────────────
 
 describe('Users List', () => {
   it('UPDATE_USERS → replaces users map keyed by name', () => {
@@ -192,7 +189,6 @@ describe('Users List', () => {
   });
 });
 
-// ── Buddy & Ignore Lists ──────────────────────────────────────────────────────
 
 describe('Buddy List', () => {
   it('UPDATE_BUDDY_LIST → replaces map keyed by name', () => {
@@ -246,7 +242,6 @@ describe('Ignore List', () => {
   });
 });
 
-// ── Logs ─────────────────────────────────────────────────────────────────────
 
 describe('Logs', () => {
   it('VIEW_LOGS → groups LogItem[] into room/game/chat buckets', () => {
@@ -273,7 +268,6 @@ describe('Logs', () => {
   });
 });
 
-// ── Messaging ─────────────────────────────────────────────────────────────────
 
 describe('Messaging', () => {
   it('USER_MESSAGE → uses receiverName as key when current user is sender', () => {
@@ -326,7 +320,6 @@ describe('Messaging', () => {
   });
 });
 
-// ── User Info & Notifications ─────────────────────────────────────────────────
 
 describe('User Info & Notifications', () => {
   it('GET_USER_INFO → adds userInfo keyed by name', () => {
@@ -352,7 +345,6 @@ describe('User Info & Notifications', () => {
   });
 });
 
-// ── Moderation ────────────────────────────────────────────────────────────────
 
 describe('Moderation', () => {
   it('BAN_FROM_SERVER → sets banUser', () => {
@@ -401,7 +393,6 @@ describe('Moderation', () => {
   });
 });
 
-// ── ADJUST_MOD ────────────────────────────────────────────────────────────────
 
 describe('ADJUST_MOD', () => {
   const baseUserLevel = UserLevelFlag.IsUser | UserLevelFlag.IsRegistered | UserLevelFlag.IsModerator | UserLevelFlag.IsJudge;
@@ -459,7 +450,6 @@ describe('ADJUST_MOD', () => {
   });
 });
 
-// ── Replays ───────────────────────────────────────────────────────────────────
 
 describe('Replays', () => {
   it('REPLAY_LIST → replaces replays map keyed by gameId', () => {
@@ -512,7 +502,6 @@ describe('Replays', () => {
   });
 });
 
-// ── Deck Storage ──────────────────────────────────────────────────────────────
 
 describe('Deck Storage', () => {
   it('BACKEND_DECKS → sets backendDecks', () => {
@@ -675,7 +664,6 @@ describe('Deck Storage', () => {
   });
 });
 
-// ── GAMES_OF_USER ─────────────────────────────────────────────────────────────
 
 describe('GAMES_OF_USER', () => {
   it('stores normalized games keyed by userName and gameId', () => {

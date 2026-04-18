@@ -26,7 +26,7 @@ import {
 import { GameEvents } from '../events/game';
 import { RoomEvents } from '../events/room';
 import { SessionEvents } from '../events/session';
-import type { GameEventMeta } from '../interfaces/WebSocketConfig';
+import type { GameEventMeta } from '../types/WebSocketConfig';
 import { type CommandOptions, handleResponse } from './command-options';
 
 export interface SocketTransport {

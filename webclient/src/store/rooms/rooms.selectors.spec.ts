@@ -146,7 +146,6 @@ describe('Selectors', () => {
     expect(Selectors.getSortedRoomUsers(rootState(state), 999)).toHaveLength(0);
   });
 
-  // ── createSelector reference stability ──────────────────────────────
 
   it('getSortedRoomGames → returns same array reference for identical state', () => {
     const game = makeGame({ gameId: 1 });

@@ -12,7 +12,8 @@ import { LoginForm } from '@app/forms';
 import { useAutoLogin, useFireOnce, useKnownHosts, useReduxEffect, useWebClient } from '@app/hooks';
 import { Images } from '@app/images';
 import { getHostPort, serverProps } from '@app/services';
-import { App, Enriched } from '@app/types';
+import { App } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 import { ServerSelectors, ServerTypes } from '@app/store';
 import Layout from '../Layout/Layout';
 import { useAppSelector } from '@app/store';
@@ -70,7 +71,7 @@ const Login = () => {
   const webClient = useWebClient();
   const { t } = useTranslation();
 
-  const [pendingActivationOptions, setPendingActivationOptions] = useState<Enriched.PendingActivationContext | null>(null);
+  const [pendingActivationOptions, setPendingActivationOptions] = useState<WebsocketTypes.PendingActivationContext | null>(null);
 
   const rememberLoginRef = useRef<any>(null);
   const knownHosts = useKnownHosts();
@@ -128,7 +129,7 @@ const Login = () => {
     rememberLoginRef.current = loginForm;
     const { userName, password, selectedHost, remember } = loginForm;
 
-    const options: Omit<Enriched.LoginConnectOptions, 'reason'> = {
+    const options: Omit<WebsocketTypes.LoginConnectOptions, 'reason'> = {
       ...getHostPort(selectedHost),
       userName,
       password,

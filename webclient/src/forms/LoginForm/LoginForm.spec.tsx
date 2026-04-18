@@ -58,9 +58,6 @@ describe('LoginForm — regression: settings.autoConnect is not clobbered by hos
       { preloadedState: disconnectedState }
     );
 
-    // After mount + all host-sync effects settle, the form has updated its
-    // local fields to reflect the selected host. What MUST NOT happen is a
-    // write to the persisted autoConnect setting.
     expect(update).not.toHaveBeenCalled();
   });
 

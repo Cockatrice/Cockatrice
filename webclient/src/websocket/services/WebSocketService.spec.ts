@@ -9,7 +9,7 @@ vi.mock('../config', () => ({
 import { WebSocketService } from './WebSocketService';
 import type { WebSocketServiceConfig } from './WebSocketService';
 import { KeepAliveService } from './KeepAliveService';
-import { StatusEnum } from '../interfaces/StatusEnum';
+import { StatusEnum } from '../types/StatusEnum';
 
 type WebSocketInternal = WebSocketService & {
   keepAliveService: KeepAliveService;

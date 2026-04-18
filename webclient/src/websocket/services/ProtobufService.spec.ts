@@ -510,10 +510,6 @@ describe('ProtobufService', () => {
 
 });
 
-// ── Real protobuf round-trip test ─────────────────────────────────────────────
-// This describe block does NOT mock @bufbuild/protobuf so it exercises real
-// binary serialization.  It proves that the schemas ProtobufService uses
-// survive a toBinary → fromBinary cycle without data loss.
 describe('ProtobufService protobuf round-trip (real @bufbuild/protobuf)', () => {
   it('CommandContainer round-trips cmdId through toBinary → fromBinary', async () => {
     const { create, toBinary, fromBinary: realFromBinary } =

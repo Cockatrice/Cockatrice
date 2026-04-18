@@ -1,8 +1,8 @@
 import { Data } from '@app/types';
-import type { IModeratorResponse } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 import { ServerDispatch } from '@app/store';
 
-export class ModeratorResponseImpl implements IModeratorResponse {
+export class ModeratorResponseImpl implements WebsocketTypes.IModeratorResponse {
   banFromServer(userName: string): void {
     ServerDispatch.banFromServer(userName);
   }

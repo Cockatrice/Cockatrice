@@ -1,10 +1,5 @@
-// Use `vi.hoisted` so the mocked `store.dispatch` reference stays stable across
-// re-runs of the factory under `isolate: false`. Other dispatch specs mock the
-// same `..` path with their own factories; under the shared module graph, the
-// cache entry for `..` can flip between competing `vi.fn()` instances. Asserting
-// against the hoisted `mockDispatch` directly (rather than reaching through
-// `store.dispatch`) decouples the assertions from whatever the module cache
-// currently resolves `store` to.
+// Hoisted so the mockDispatch reference is available inside the vi.mock factory
+// below and can be asserted against directly from each test.
 const { mockDispatch } = vi.hoisted(() => ({ mockDispatch: vi.fn() }));
 vi.mock('..', () => ({ store: { dispatch: mockDispatch } }));
 

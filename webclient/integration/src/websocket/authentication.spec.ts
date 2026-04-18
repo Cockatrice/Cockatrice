@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { Data } from '@app/types';
 import { store } from '@app/store';
-import { StatusEnum, WebSocketConnectReason } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
 import { connectAndHandshake, connectAndHandshakeWithSalt } from '../helpers/setup';
 import {
@@ -44,7 +44,7 @@ describe('authentication', () => {
       })));
 
       const state = store.getState().server;
-      expect(state.status.state).toBe(StatusEnum.LOGGED_IN);
+      expect(state.status.state).toBe(WebsocketTypes.StatusEnum.LOGGED_IN);
       expect(state.status.description).toBe('Logged in.');
       expect(state.user?.name).toBe('alice');
       expect(Object.keys(state.buddyList)).toEqual(['bob']);
@@ -64,7 +64,7 @@ describe('authentication', () => {
       })));
 
       const state = store.getState().server;
-      expect(state.status.state).toBe(StatusEnum.DISCONNECTED);
+      expect(state.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
       expect(state.user).toBeNull();
       expect(state.buddyList).toEqual({});
     });
@@ -72,7 +72,7 @@ describe('authentication', () => {
 
   describe('register', () => {
     const registerOptions = {
-      reason: WebSocketConnectReason.REGISTER as const,
+      reason: WebsocketTypes.WebSocketConnectReason.REGISTER as const,
       host: 'localhost',
       port: '4748',
       userName: 'newbie',
@@ -107,7 +107,7 @@ describe('authentication', () => {
         responseCode: Data.Response_ResponseCode.RespRegistrationAcceptedNeedsActivation,
       })));
 
-      expect(store.getState().server.status.state).toBe(StatusEnum.DISCONNECTED);
+      expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
       expect(() => findLastSessionCommand(Data.Command_Login_ext)).toThrow();
     });
   });
@@ -115,7 +115,7 @@ describe('authentication', () => {
   describe('activate', () => {
     it('auto-logs-in on RespActivationAccepted', () => {
       connectAndHandshake({
-        reason: WebSocketConnectReason.ACTIVATE_ACCOUNT as const,
+        reason: WebsocketTypes.WebSocketConnectReason.ACTIVATE_ACCOUNT as const,
         host: 'localhost',
         port: '4748',
         userName: 'alice',
@@ -171,7 +171,7 @@ describe('authentication', () => {
         }),
       })));
 
-      expect(store.getState().server.status.state).toBe(StatusEnum.LOGGED_IN);
+      expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.LOGGED_IN);
     });
   });
 });

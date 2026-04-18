@@ -177,7 +177,6 @@ export const gamesSlice = createSlice({
       }
     },
 
-    // ── Card manipulation ────────────────────────────────────────────────────
 
     cardMoved: (
       state,
@@ -343,7 +342,6 @@ export const gamesSlice = createSlice({
       }
     },
 
-    // ── Arrows ───────────────────────────────────────────────────────────────
 
     arrowCreated: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_CreateArrow }>) => {
       const { gameId, playerId, data } = action.payload;
@@ -361,7 +359,6 @@ export const gamesSlice = createSlice({
       }
     },
 
-    // ── Player counters ───────────────────────────────────────────────────────
 
     counterCreated: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_CreateCounter }>) => {
       const { gameId, playerId, data } = action.payload;
@@ -387,7 +384,6 @@ export const gamesSlice = createSlice({
       }
     },
 
-    // ── Zone operations ───────────────────────────────────────────────────────
 
     cardsDrawn: (state, action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_DrawCards }>) => {
       const { gameId, playerId, data } = action.payload;
@@ -444,7 +440,6 @@ export const gamesSlice = createSlice({
       }
     },
 
-    // ── Turn / phase ──────────────────────────────────────────────────────────
 
     activePlayerSet: (state, action: PayloadAction<{ gameId: number; activePlayerId: number }>) => {
       const game = state.games[action.payload.gameId];
@@ -467,7 +462,6 @@ export const gamesSlice = createSlice({
       }
     },
 
-    // ── Chat ──────────────────────────────────────────────────────────────────
 
     gameSay: (state, action: PayloadAction<{ gameId: number; playerId: number; message: string; timeReceived: number }>) => {
       const { gameId, playerId, message, timeReceived } = action.payload;
@@ -481,7 +475,6 @@ export const gamesSlice = createSlice({
       game.messages.push({ playerId, message, timeReceived });
     },
 
-    // ── Log-only events ─────────────────────────────────────────────────────
     zoneShuffled: (_state, _action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_Shuffle }>) => {},
     zoneDumped: (_state, _action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_DumpZone }>) => {},
     dieRolled: (_state, _action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_RollDie }>) => {},

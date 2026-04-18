@@ -1,8 +1,8 @@
 import { Data } from '@app/types';
-import type { IGameResponse } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 import { GameDispatch } from '@app/store';
 
-export class GameResponseImpl implements IGameResponse {
+export class GameResponseImpl implements WebsocketTypes.IGameResponse {
   clearStore(): void {
     GameDispatch.clearStore();
   }

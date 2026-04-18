@@ -21,3 +21,5 @@ export type {
 export * from './WebClientConfig';
 export * from './WebSocketConfig';
 export * from './StatusEnum';
+export * from './ConnectOptions';
+export * from './SignalContexts';

@@ -7,10 +7,10 @@ import {
   type RequestPasswordSaltParams,
 } from '@app/generated';
 
-import { StatusEnum } from '../../interfaces/StatusEnum';
+import { StatusEnum } from '../../types/StatusEnum';
 import { CLIENT_CONFIG } from '../../config';
 import { WebClient } from '../../WebClient';
-import type { ConnectTarget } from '../../interfaces/WebClientConfig';
+import type { ConnectTarget } from '../../types/WebClientConfig';
 import { updateStatus } from './';
 
 export function requestPasswordSalt(

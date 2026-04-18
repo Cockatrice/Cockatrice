@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { Data } from '@app/types';
 import { store } from '@app/store';
-import { StatusEnum } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
 import { connectAndHandshake } from '../helpers/setup';
 import {
@@ -73,7 +73,7 @@ describe('server events', () => {
       ));
 
       const status = store.getState().server.status;
-      expect(status.state).toBe(StatusEnum.DISCONNECTED);
+      expect(status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
       expect(status.description).toBe('kicked by admin');
     });
 

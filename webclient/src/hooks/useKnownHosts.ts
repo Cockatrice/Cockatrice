@@ -3,12 +3,6 @@ import { App } from '@app/types';
 
 import { createSharedStore, Loadable, useSharedStore } from './useSharedStore';
 
-// Shared-store scope justification: multiple components on the login screen
-// read the same host list and selected host simultaneously (KnownHosts
-// dropdown, LoginForm's host-sync effect, useAutoLogin, and the Login
-// container's post-login write). Collapsing to useState inside one component
-// would duplicate Dexie reads and race on lastSelected updates — exactly the
-// bug we set out to fix.
 export interface KnownHostsValue {
   hosts: HostDTO[];
   selectedHost: HostDTO;
@@ -29,15 +23,12 @@ const normalize = async (hosts: HostDTO[]): Promise<KnownHostsValue> => {
     return { hosts, selectedHost: existing };
   }
 
-  // No row marked lastSelected yet (first-ever load after seeding, or legacy
-  // data). Pin hosts[0] and persist so subsequent boots are deterministic.
   const selected = hosts[0];
   selected.lastSelected = true;
   await selected.save();
   return { hosts, selectedHost: selected };
 };
 
-// Exported for integration-test reset; see settingsStore for the rationale.
 export const knownHostsStore = createSharedStore<KnownHostsValue>(async () => {
   const hosts = await loadAll();
   return normalize(hosts);
@@ -51,8 +42,6 @@ export type KnownHostsHook = Loadable<KnownHostsValue> & {
   remove: (id: number) => Promise<void>;
 };
 
-// Guard for mutators. Mutators run outside React render, so we can't gate
-// them through the hook's status; peek + throw is the fail-fast alternative.
 const requireValue = (method: string): KnownHostsValue => {
   const current = store.peek();
   if (!current) {
@@ -127,6 +116,4 @@ export function useKnownHosts(): KnownHostsHook {
   return { ...state, select, add, update, remove };
 }
 
-// Non-reactive one-shot accessor, mirroring getSettings. See the comment on
-// that export in useSettings.ts for the rationale.
 export const getKnownHosts = (): Promise<KnownHostsValue> => store.whenReady();

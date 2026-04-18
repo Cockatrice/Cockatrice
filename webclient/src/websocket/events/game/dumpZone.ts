@@ -1,5 +1,5 @@
 import type { Event_DumpZone } from '@app/generated';
-import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
+import type { GameEventMeta } from '../../types/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function dumpZone(data: Event_DumpZone, meta: GameEventMeta): void {

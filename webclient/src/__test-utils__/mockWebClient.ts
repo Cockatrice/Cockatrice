@@ -2,8 +2,9 @@ import type { WebClient } from '@app/websocket';
 
 /**
  * Creates a mock WebClient whose `request` property has vi.fn() stubs
- * for every service method that containers/forms call. Inject this into
- * tests via `renderWithProviders({ webClient: createMockWebClient() })`.
+ * for every service method that containers/forms call. Inject via a
+ * vi.hoisted reference returned from a `vi.mock('@app/hooks', ...)` stub
+ * of `useWebClient`; see LoginForm.spec.tsx for the canonical pattern.
  */
 export function createMockWebClient() {
   return {

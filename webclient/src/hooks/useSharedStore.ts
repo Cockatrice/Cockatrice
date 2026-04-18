@@ -12,27 +12,14 @@ export interface Loadable<T> {
   error?: Error;
 }
 
+// @critical Two surfaces: subscribe (reactive) vs whenReady (one-shot).
+// See .github/instructions/webclient.instructions.md#shared-store-pattern.
 export interface SharedStore<T> {
-  // Reactive surface: subscribe + snapshot back useSyncExternalStore so
-  // consuming components re-render on every store update.
   subscribe: (cb: () => void) => () => void;
   getSnapshot: () => Loadable<T>;
-
-  // One-shot surface: whenReady resolves with the initial loaded value and
-  // never fires again. Callers that only need "read once after init" (e.g.
-  // the auto-login orchestrator) use this to avoid subscribing to updates
-  // they don't care about — which would otherwise turn a user preference
-  // toggle into a re-evaluation of startup logic.
   whenReady: () => Promise<T>;
-
-  // Mutator-side helpers, not for consumption inside render.
   setValue: (value: T) => void;
   peek: () => T | undefined;
-
-  // Clear cached state and the resolved readyPromise; the next subscribe /
-  // whenReady call triggers a fresh load. In production nobody calls this;
-  // integration tests use it to discard per-test Dexie state without
-  // paying the cost of vi.resetModules across the whole dep graph.
   reset: () => void;
 }
 
@@ -41,9 +28,7 @@ export function createSharedStore<T>(load: () => Promise<T>): SharedStore<T> {
   const subscribers = new Set<() => void>();
   let loadStarted = false;
 
-  // whenReady is lazy: we only attach a promise once someone asks for one.
-  // This avoids Node's unhandled-rejection bookkeeping for stores whose
-  // loader fails but never had a whenReady caller.
+  // Lazy to avoid unhandled-rejection bookkeeping when no caller awaits it.
   let readyPromise: Promise<T> | null = null;
 
   const notify = () => {

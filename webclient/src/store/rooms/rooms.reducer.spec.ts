@@ -4,7 +4,6 @@ import { Actions } from './rooms.actions';
 import { MAX_ROOM_MESSAGES } from './rooms.types';
 import { makeGame, makeMessage, makeRoom, makeRoomsState, makeUser } from './__mocks__/rooms-fixtures';
 
-// ── Initialisation ───────────────────────────────────────────────────────────
 
 describe('Initialisation', () => {
   it('returns initialState when called with undefined state', () => {
@@ -27,7 +26,6 @@ describe('Initialisation', () => {
   });
 });
 
-// ── UPDATE_ROOMS ──────────────────────────────────────────────────────────────
 
 describe('UPDATE_ROOMS', () => {
   it('creates RoomEntry with empty normalized games/users for new room', () => {
@@ -77,7 +75,6 @@ describe('UPDATE_ROOMS', () => {
   });
 });
 
-// ── JOIN_ROOM ──────────────────────────────────────────────────────────────────
 
 describe('JOIN_ROOM', () => {
   it('normalizes raw room into keyed games/users maps and marks joined', () => {
@@ -97,7 +94,6 @@ describe('JOIN_ROOM', () => {
   });
 });
 
-// ── LEAVE_ROOM ────────────────────────────────────────────────────────────────
 
 describe('LEAVE_ROOM', () => {
   it('removes joinedRoomIds entry and messages for roomId', () => {
@@ -111,7 +107,6 @@ describe('LEAVE_ROOM', () => {
   });
 });
 
-// ── ADD_MESSAGE ───────────────────────────────────────────────────────────────
 
 describe('ADD_MESSAGE', () => {
   it('appends message preserving the timeReceived from the event handler', () => {
@@ -157,7 +152,6 @@ describe('ADD_MESSAGE', () => {
   });
 });
 
-// ── UPDATE_GAMES ──────────────────────────────────────────────────────────────
 
 describe('UPDATE_GAMES', () => {
   it('removes closed games from the keyed games map', () => {
@@ -211,7 +205,6 @@ describe('UPDATE_GAMES', () => {
   });
 });
 
-// ── USER_JOINED / USER_LEFT ───────────────────────────────────────────────────
 
 describe('USER_JOINED', () => {
   it('inserts user into the keyed users map', () => {
@@ -237,7 +230,6 @@ describe('USER_LEFT', () => {
   });
 });
 
-// ── SORT_GAMES ────────────────────────────────────────────────────────────────
 
 describe('SORT_GAMES', () => {
   it('updates sortGamesBy on state (sorting itself is now derived in selectors)', () => {
@@ -251,7 +243,6 @@ describe('SORT_GAMES', () => {
   });
 });
 
-// ── REMOVE_MESSAGES ───────────────────────────────────────────────────────────
 
 describe('REMOVE_MESSAGES', () => {
   it('removes messages starting with "name:" up to amount, in reverse scan order', () => {
@@ -294,7 +285,6 @@ describe('REMOVE_MESSAGES', () => {
   });
 });
 
-// ── GAME_CREATED ──────────────────────────────────────────────────────────────
 
 describe('GAME_CREATED', () => {
   it('returns state unchanged', () => {
@@ -304,7 +294,6 @@ describe('GAME_CREATED', () => {
   });
 });
 
-// ── JOINED_GAME ───────────────────────────────────────────────────────────────
 
 describe('JOINED_GAME', () => {
   it('sets joinedGameIds[roomId][gameId] = true', () => {

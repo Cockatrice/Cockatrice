@@ -1,4 +1,4 @@
-import type { IWebClientResponse } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
 import { SessionResponseImpl } from './SessionResponseImpl';
 import { RoomResponseImpl } from './RoomResponseImpl';
@@ -8,7 +8,7 @@ import { ModeratorResponseImpl } from './ModeratorResponseImpl';
 
 export { SessionResponseImpl, RoomResponseImpl, GameResponseImpl, AdminResponseImpl, ModeratorResponseImpl };
 
-export function createWebClientResponse(): IWebClientResponse {
+export function createWebClientResponse(): WebsocketTypes.IWebClientResponse {
   return {
     session: new SessionResponseImpl(),
     room: new RoomResponseImpl(),

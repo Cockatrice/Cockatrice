@@ -1,5 +1,5 @@
 import type { Event_RevealCards } from '@app/generated';
-import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
+import type { GameEventMeta } from '../../types/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function revealCards(data: Event_RevealCards, meta: GameEventMeta): void {

@@ -1,5 +1,5 @@
 import type { Event_GameSay } from '@app/generated';
-import type { GameEventMeta } from '../../interfaces/WebSocketConfig';
+import type { GameEventMeta } from '../../types/WebSocketConfig';
 import { WebClient } from '../../WebClient';
 
 export function gameSay(data: Event_GameSay, meta: GameEventMeta): void {

@@ -1,5 +1,4 @@
-// MUST be first: installs BigInt.prototype.toJSON before any module that
-// creates the Redux store or connects to Redux DevTools.
+// @critical Must be the first import. See .github/instructions/webclient.instructions.md#initialization-order.
 import './polyfills';
 
 import { StrictMode } from 'react';

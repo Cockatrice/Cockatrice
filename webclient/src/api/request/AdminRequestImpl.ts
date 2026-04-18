@@ -1,7 +1,7 @@
-import type { IAdminRequest } from '@app/websocket';
 import { AdminCommands } from '@app/websocket';
+import { WebsocketTypes } from '@app/websocket/types';
 
-export class AdminRequestImpl implements IAdminRequest {
+export class AdminRequestImpl implements WebsocketTypes.IAdminRequest {
   adjustMod(userName: string, shouldBeMod?: boolean, shouldBeJudge?: boolean): void {
     AdminCommands.adjustMod(userName, shouldBeMod, shouldBeJudge);
   }

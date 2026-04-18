@@ -3,9 +3,9 @@ import { defineConfig } from 'vitest/config';
 
 // Integration tests exercise the full inbound/outbound webclient pipeline
 // (ProtobufService → event handlers → persistence → Redux) with only the
-// browser WebSocket constructor mocked. They live in `integration/` and run
-// under their own config so they can use `isolate: true` without slowing down
-// the unit suite (which relies on `isolate: false` for shared vi.mock state).
+// browser WebSocket constructor mocked. They live in `integration/` with
+// their own config so the include glob and longer testTimeout stay scoped
+// to this suite; both suites run `isolate: true`.
 export default defineConfig({
   plugins: [react()],
   resolve: {

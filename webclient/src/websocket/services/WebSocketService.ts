@@ -1,9 +1,9 @@
 import { Subject } from 'rxjs';
 
-import { StatusEnum } from '../interfaces/StatusEnum';
+import { StatusEnum } from '../types/StatusEnum';
 import { KeepAliveService } from './KeepAliveService';
 import { CLIENT_OPTIONS } from '../config';
-import type { ConnectTarget } from '../interfaces/WebClientConfig';
+import type { ConnectTarget } from '../types/WebClientConfig';
 
 export interface WebSocketServiceConfig {
   keepAliveFn: (pingReceived: () => void) => void;
@@ -16,7 +16,7 @@ export class WebSocketService {
 
   private config: WebSocketServiceConfig;
   private keepAliveService: KeepAliveService;
-  private errorFired = false;
+  private hasReportedError = false;
 
   public message$: Subject<MessageEvent> = new Subject();
 
@@ -68,7 +68,7 @@ export class WebSocketService {
 
     socket.onopen = () => {
       clearTimeout(connectionTimer);
-      this.errorFired = false;
+      this.hasReportedError = false;
       this.config.onStatusChange(StatusEnum.CONNECTED, 'Connected');
 
       this.keepAliveService.startPingLoop(this.keepalive, (pingReceived: () => void) => {
@@ -77,16 +77,17 @@ export class WebSocketService {
     };
 
     socket.onclose = () => {
-      // dont overwrite failure messages
-      if (!this.errorFired) {
+      // @critical onerror + onclose both fire on failed connects; don't overwrite the richer error status.
+      // See .github/instructions/webclient.instructions.md#websocket-lifecycle.
+      if (!this.hasReportedError) {
         this.config.onStatusChange(StatusEnum.DISCONNECTED, 'Connection Closed');
       }
-      this.errorFired = false;
+      this.hasReportedError = false;
       this.keepAliveService.endPingLoop();
     };
 
     socket.onerror = () => {
-      this.errorFired = true;
+      this.hasReportedError = true;
       this.config.onStatusChange(StatusEnum.DISCONNECTED, 'Connection Failed');
       this.config.onConnectionFailed();
     };

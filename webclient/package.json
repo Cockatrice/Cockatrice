@@ -19,7 +19,11 @@
     "golden:coverage": "npm run lint && npm run test:coverage && npm run test:integration:coverage",
     "prepare": "cd .. && husky",
     "translate": "node prebuild.js -i18nOnly",
-    "proto:generate": "npx buf generate"
+    "proto:generate": "npx buf generate",
+    "diagram": "npm run diagram:simple && npm run diagram:detailed && npm run diagram:flow",
+    "diagram:simple": "npx -y -p @mermaid-js/mermaid-cli -p puppeteer mmdc -i architecture/simple.mmd -o architecture/simple.png -b white -s 2",
+    "diagram:detailed": "npx -y -p @mermaid-js/mermaid-cli -p puppeteer mmdc -i architecture/detailed.mmd -o architecture/detailed.png -b white -s 2",
+    "diagram:flow": "npx -y -p @mermaid-js/mermaid-cli -p puppeteer mmdc -i architecture/flow.mmd -o architecture/flow.png -b white -s 2"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.11.0",
