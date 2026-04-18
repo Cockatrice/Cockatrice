@@ -35,7 +35,7 @@ Var ReinstallMode
 !define MUI_PAGE_CUSTOMFUNCTION_PRE SkipIfReinstall
 !insertmacro MUI_PAGE_LICENSE "${NSIS_SOURCE_PATH}\LICENSE"
 
-Page Custom PortableModePageCreate PortableModePageLeave "" SkipIfReinstall
+Page Custom PortableModePageCreate PortableModePageLeave
 !define MUI_PAGE_CUSTOMFUNCTION_PRE componentsPagePre
 !insertmacro MUI_PAGE_COMPONENTS
 
@@ -199,6 +199,11 @@ ${EndIf}
 FunctionEnd
 
 Function PortableModePageCreate
+
+${If} $ReinstallMode = 1
+    Abort
+${EndIf}
+
 Call SetModeDestinationFromInstdir ; If the user clicks BACK on the directory page we will remember their mode specific directory
 !insertmacro MUI_HEADER_TEXT "Install Mode" "Choose how you want to install Cockatrice."
 nsDialogs::Create 1018
