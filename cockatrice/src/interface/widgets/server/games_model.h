@@ -138,6 +138,9 @@ private:
     bool showOnlyIfSpectatorsCanChat;
     bool showOnlyIfSpectatorsCanSeeHands;
 
+signals:
+    void filtersChanged();
+
 public:
     /**
      * @brief Constructs a GamesProxyModel.

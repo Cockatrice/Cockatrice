@@ -91,6 +91,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
     clearFilterButton->setEnabled(!filtersSetToDefault);
     connect(clearFilterButton, &QPushButton::clicked, this, &GameSelector::actClearFilter);
+    connect(gameListProxyModel, &GamesProxyModel::filtersChanged, this, &GameSelector::checkClearFilterButtonState);
 
     if (room) {
         createButton = new QPushButton;
@@ -188,15 +189,16 @@ void GameSelector::actSetFilter()
         dlg.getShowOnlyIfSpectatorsCanChat(), dlg.getShowOnlyIfSpectatorsCanSeeHands());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
 
-    clearFilterButton->setEnabled(!gameListProxyModel->areFilterParametersSetToDefaults());
-
     updateTitle();
+}
+
+void GameSelector::checkClearFilterButtonState()
+{
+    clearFilterButton->setEnabled(!gameListProxyModel->areFilterParametersSetToDefaults());
 }
 
 void GameSelector::actClearFilter()
 {
-    clearFilterButton->setEnabled(false);
-
     gameListProxyModel->resetFilterParameters();
     gameListProxyModel->saveFilterParameters(gameTypeMap);
 

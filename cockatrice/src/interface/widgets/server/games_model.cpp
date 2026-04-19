@@ -326,6 +326,7 @@ void GamesProxyModel::setGameFilters(bool _hideBuddiesOnlyGames,
 #else
     invalidateFilter();
 #endif
+    emit filtersChanged();
 }
 
 int GamesProxyModel::getNumFilteredGames() const
