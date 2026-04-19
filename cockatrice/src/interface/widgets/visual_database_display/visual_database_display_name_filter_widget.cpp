@@ -95,8 +95,21 @@ void VisualDatabaseDisplayNameFilterWidget::createNameFilter(const QString &name
 
     // Create a button for the filter
     auto *button = new QPushButton(name, flowWidget);
-    button->setStyleSheet("QPushButton { background-color: lightgray; border: 1px solid gray; padding: 5px; }"
-                          "QPushButton:hover { background-color: red; color: white; }");
+    QPalette pal = button->palette();
+    QString base = pal.button().color().name();
+    QString highlight = pal.highlight().color().name();
+
+    button->setStyleSheet(QString(R"(
+    QPushButton {
+        background-color: %1;
+        padding: 5px;
+    }
+    QPushButton:checked {
+        background-color: %2;
+        color: white;
+    }
+)")
+                              .arg(base, highlight));
 
     connect(button, &QPushButton::clicked, this, [this, name]() {
         removeNameFilter(name);

@@ -80,8 +80,21 @@ void VisualDatabaseDisplaySubTypeFilterWidget::createSubTypeButtons()
     for (auto it = allSubCardTypesWithCount.begin(); it != allSubCardTypesWithCount.end(); ++it) {
         auto *button = new QPushButton(it.key(), flowWidget);
         button->setCheckable(true);
-        button->setStyleSheet("QPushButton { background-color: lightgray; border: 1px solid gray; padding: 5px; }"
-                              "QPushButton:checked { background-color: green; color: white; }");
+        QPalette pal = button->palette();
+        QString base = pal.button().color().name();
+        QString highlight = pal.highlight().color().name();
+
+        button->setStyleSheet(QString(R"(
+    QPushButton {
+        background-color: %1;
+        padding: 5px;
+    }
+    QPushButton:checked {
+        background-color: %2;
+        color: white;
+    }
+)")
+                                  .arg(base, highlight));
 
         flowWidget->addWidget(button);
         typeButtons[it.key()] = button;

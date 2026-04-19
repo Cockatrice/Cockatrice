@@ -101,8 +101,21 @@ void VisualDatabaseDisplaySetFilterWidget::createSetButtons()
 
         auto *button = new QPushButton(longName + " (" + shortName + ")", flowWidget);
         button->setCheckable(true);
-        button->setStyleSheet("QPushButton { background-color: lightgray; border: 1px solid gray; padding: 5px; }"
-                              "QPushButton:checked { background-color: green; color: white; }");
+        QPalette pal = button->palette();
+        QString base = pal.button().color().name();
+        QString highlight = pal.highlight().color().name();
+
+        button->setStyleSheet(QString(R"(
+    QPushButton {
+        background-color: %1;
+        padding: 5px;
+    }
+    QPushButton:checked {
+        background-color: %2;
+        color: white;
+    }
+)")
+                                  .arg(base, highlight));
 
         flowWidget->addWidget(button);
         setButtons[shortName] = button;
