@@ -17,6 +17,7 @@ struct DeckListStatisticsAnalyzerConfig
     bool computeCategories = true;
     bool computeCurveBreakdowns = true;
     bool computeProbabilities = true;
+    bool includeSideboard = false;
 };
 
 class DeckListStatisticsAnalyzer : public QObject
@@ -131,6 +132,11 @@ public:
     DeckListModel *getModel() const
     {
         return model;
+    }
+
+    DeckListStatisticsAnalyzerConfig &getConfig()
+    {
+        return config;
     }
 
 signals:
