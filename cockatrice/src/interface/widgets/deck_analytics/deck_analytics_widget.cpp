@@ -29,10 +29,14 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnal
     removeButton = new QPushButton(this);
     saveButton = new QPushButton(this);
     loadButton = new QPushButton(this);
+    includeSideboardCheckBox = new QCheckBox(this);
+    includeSideboardCheckBox->setChecked(true);
+
     controlLayout->addWidget(addButton);
     controlLayout->addWidget(removeButton);
     controlLayout->addWidget(saveButton);
     controlLayout->addWidget(loadButton);
+    controlLayout->addWidget(includeSideboardCheckBox);
 
     layout->addWidget(controlContainer);
 
@@ -40,6 +44,7 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnal
     connect(removeButton, &QPushButton::clicked, this, &DeckAnalyticsWidget::onRemoveSelected);
     connect(saveButton, &QPushButton::clicked, this, &DeckAnalyticsWidget::saveLayout);
     connect(loadButton, &QPushButton::clicked, this, &DeckAnalyticsWidget::loadLayout);
+    connect(includeSideboardCheckBox, &QCheckBox::clicked, this, &DeckAnalyticsWidget::includeSideboardChanged);
 
     // Scroll area and container
     scrollArea = new QScrollArea(this);
@@ -66,6 +71,13 @@ void DeckAnalyticsWidget::retranslateUi()
     removeButton->setText(tr("Remove Panel"));
     saveButton->setText(tr("Save Layout"));
     loadButton->setText(tr("Load Layout"));
+    includeSideboardCheckBox->setText(tr("Include Sideboard"));
+}
+
+void DeckAnalyticsWidget::includeSideboardChanged(bool checked)
+{
+    statsAnalyzer->getConfig().includeSideboard = checked;
+    updateDisplays();
 }
 
 void DeckAnalyticsWidget::updateDisplays()
