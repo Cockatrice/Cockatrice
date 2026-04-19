@@ -4,10 +4,29 @@ void ArchidektApiResponseCardEntry::fromJson(const QJsonObject &json)
 {
     id = json.value("id").toInt();
 
+    categories.clear();
+
     auto categoriesJson = json.value("categories").toArray();
 
-    for (auto category : categoriesJson) {
-        categories.append(category.toString());
+    for (const auto &categoryValue : categoriesJson) {
+        Category cat;
+
+        if (categoryValue.isObject()) {
+            QJsonObject obj = categoryValue.toObject();
+
+            cat.id = obj.value("id").toInt();
+            cat.name = obj.value("name").toString();
+            cat.isPremier = obj.value("isPremier").toBool();
+            cat.includedInDeck = obj.value("includedInDeck").toBool();
+            cat.includedInPrice = obj.value("includedInPrice").toBool();
+        } else if (categoryValue.isString()) {
+            cat.name = categoryValue.toString();
+
+            // assume mainboard unless known otherwise
+            cat.includedInDeck = true;
+        }
+
+        categories.append(cat);
     }
 
     companion = json.value("companion").toBool();
@@ -27,7 +46,13 @@ void ArchidektApiResponseCardEntry::fromJson(const QJsonObject &json)
 void ArchidektApiResponseCardEntry::debugPrint() const
 {
     qDebug() << "Id:" << id;
-    qDebug() << "Categories:" << categories;
+    for (auto category : categories) {
+        qDebug() << "Category ID:" << category.id;
+        qDebug() << "Category Name:" << category.name;
+        qDebug() << "Category Premier:" << category.isPremier;
+        qDebug() << "Category Included in Deck:" << category.includedInDeck;
+        qDebug() << "Category Included in Price:" << category.includedInPrice;
+    }
     qDebug() << "Companion:" << companion;
     qDebug() << "FlippedDefault:" << flippedDefault;
     qDebug() << "Label:" << label;
