@@ -20,13 +20,13 @@ on:
 
 jobs:
   format:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-slim
 
     steps:
     - name: Checkout
       uses: actions/checkout@v6
       with:
-        fetch-depth: 20 # should be enough to find merge base
+        fetch-depth: 20    # should be enough to find merge base
 
     - name: Install dependencies
       shell: bash
