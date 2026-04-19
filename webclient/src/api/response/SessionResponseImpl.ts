@@ -2,10 +2,10 @@ import { Data } from '@app/types';
 import { WebsocketTypes } from '@app/websocket/types';
 import { GameDispatch, RoomsDispatch, ServerDispatch } from '@app/store';
 
-type LoginSuccess = WebsocketTypes.WebSocketSessionResponseOverrides['Response_Login'];
-type PendingActivation = WebsocketTypes.WebSocketSessionResponseOverrides['Response'];
+type LoginSuccess = WebsocketTypes.LoginSuccessContext;
+type PendingActivation = WebsocketTypes.PendingActivationContext;
 
-export class SessionResponseImpl implements WebsocketTypes.ISessionResponse<WebsocketTypes.WebSocketSessionResponseOverrides> {
+export class SessionResponseImpl implements WebsocketTypes.ISessionResponse {
   initialized(): void {
     ServerDispatch.initialized();
   }

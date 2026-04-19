@@ -23,9 +23,9 @@ import {
   type RoomEvent,
 } from '@app/generated';
 
-import { GameEvents } from '../events/game';
-import { RoomEvents } from '../events/room';
-import { SessionEvents } from '../events/session';
+import type { GameExtensionRegistry } from '../events/game';
+import type { RoomExtensionRegistry } from '../events/room';
+import type { SessionExtensionRegistry } from '../events/session';
 import type { GameEventMeta } from '../types/WebSocketConfig';
 import { type CommandOptions, handleResponse } from './command-options';
 
@@ -34,11 +34,20 @@ export interface SocketTransport {
   isOpen(): boolean;
 }
 
+export interface EventRegistries {
+  game: GameExtensionRegistry;
+  room: RoomExtensionRegistry;
+  session: SessionExtensionRegistry;
+}
+
 export class ProtobufService {
   private cmdId = 0;
   private pendingCommands = new Map<number, (response: Response) => void>();
 
-  constructor(private transport: SocketTransport) {}
+  constructor(
+    private transport: SocketTransport,
+    private events: EventRegistries,
+  ) {}
 
   public resetCommands() {
     this.cmdId = 0;
@@ -171,7 +180,7 @@ export class ProtobufService {
     if (!event) {
       return;
     }
-    for (const [ext, handler] of RoomEvents) {
+    for (const [ext, handler] of this.events.room) {
       if (hasExtension(event, ext)) {
         handler(getExtension(event, ext), event);
         return;
@@ -183,7 +192,7 @@ export class ProtobufService {
     if (!event) {
       return;
     }
-    for (const [ext, handler] of SessionEvents) {
+    for (const [ext, handler] of this.events.session) {
       if (hasExtension(event, ext)) {
         handler(getExtension(event, ext), undefined);
         return;
@@ -207,7 +216,7 @@ export class ProtobufService {
         forcedByJudge: forcedByJudge ?? 0,
       };
 
-      for (const [ext, handler] of GameEvents) {
+      for (const [ext, handler] of this.events.game) {
         if (hasExtension(event, ext)) {
           handler(getExtension(event, ext), meta);
           break;

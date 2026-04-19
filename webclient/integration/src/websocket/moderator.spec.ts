@@ -101,4 +101,111 @@ describe('moderator commands', () => {
 
     expect(store.getState().server.banUser).toBe('baduser');
   });
+
+  it('getWarnHistory dispatches with the response warnList', () => {
+    connectAndLogin();
+
+    ModeratorCommands.getWarnHistory('baduser');
+
+    const { cmdId, value } = findLastModeratorCommand(Data.Command_GetWarnHistory_ext);
+    expect(value.userName).toBe('baduser');
+
+    const warning = create(Data.ServerInfo_WarningSchema, {
+      adminName: 'Admin',
+      reason: 'spamming',
+    });
+    deliverMessage(buildResponseMessage(buildResponse({
+      cmdId,
+      responseCode: Data.Response_ResponseCode.RespOk,
+      ext: Data.Response_WarnHistory_ext,
+      value: create(Data.Response_WarnHistorySchema, { warnList: [warning] }),
+    })));
+
+    const history = store.getState().server.warnHistory.baduser;
+    expect(history).toHaveLength(1);
+    expect(history[0].reason).toBe('spamming');
+  });
+
+  it('getWarnList dispatches the warn-list options on success', () => {
+    connectAndLogin();
+
+    ModeratorCommands.getWarnList('mod', 'troublemaker', 'client-1');
+
+    const { cmdId, value } = findLastModeratorCommand(Data.Command_GetWarnList_ext);
+    expect(value.modName).toBe('mod');
+    expect(value.userName).toBe('troublemaker');
+    expect(value.userClientid).toBe('client-1');
+
+    deliverMessage(buildResponseMessage(buildResponse({
+      cmdId,
+      responseCode: Data.Response_ResponseCode.RespOk,
+      ext: Data.Response_WarnList_ext,
+      value: create(Data.Response_WarnListSchema, { warning: ['spam', 'abuse'] }),
+    })));
+
+    expect(store.getState().server.warnListOptions.length).toBeGreaterThan(0);
+  });
+
+  it('forceActivateUser sends command and resolves on RespOk', () => {
+    connectAndLogin();
+
+    ModeratorCommands.forceActivateUser('inactive', 'mod');
+
+    const { cmdId, value } = findLastModeratorCommand(Data.Command_ForceActivateUser_ext);
+    expect(value.usernameToActivate).toBe('inactive');
+    expect(value.moderatorName).toBe('mod');
+
+    deliverMessage(buildResponseMessage(buildResponse({
+      cmdId,
+      responseCode: Data.Response_ResponseCode.RespOk,
+    })));
+  });
+
+  it('getAdminNotes populates server.adminNotes on success', () => {
+    connectAndLogin();
+
+    ModeratorCommands.getAdminNotes('subject');
+
+    const { cmdId, value } = findLastModeratorCommand(Data.Command_GetAdminNotes_ext);
+    expect(value.userName).toBe('subject');
+
+    deliverMessage(buildResponseMessage(buildResponse({
+      cmdId,
+      responseCode: Data.Response_ResponseCode.RespOk,
+      ext: Data.Response_GetAdminNotes_ext,
+      value: create(Data.Response_GetAdminNotesSchema, { notes: 'prior offenses' }),
+    })));
+
+    expect(store.getState().server.adminNotes.subject).toBe('prior offenses');
+  });
+
+  it('updateAdminNotes sends notes payload and resolves on RespOk', () => {
+    connectAndLogin();
+
+    ModeratorCommands.updateAdminNotes('subject', 'updated notes text');
+
+    const { cmdId, value } = findLastModeratorCommand(Data.Command_UpdateAdminNotes_ext);
+    expect(value.userName).toBe('subject');
+    expect(value.notes).toBe('updated notes text');
+
+    deliverMessage(buildResponseMessage(buildResponse({
+      cmdId,
+      responseCode: Data.Response_ResponseCode.RespOk,
+    })));
+  });
+
+  it('grantReplayAccess sends command and resolves on RespOk', () => {
+    connectAndLogin();
+
+    ModeratorCommands.grantReplayAccess(42, 'mod');
+
+    const { cmdId, value } = findLastModeratorCommand(Data.Command_GrantReplayAccess_ext);
+    expect(value.replayId).toBe(42);
+    expect(value.moderatorName).toBe('mod');
+
+    deliverMessage(buildResponseMessage(buildResponse({
+      cmdId,
+      responseCode: Data.Response_ResponseCode.RespOk,
+    })));
+  });
 });

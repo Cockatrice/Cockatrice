@@ -189,6 +189,18 @@ describe('WebClient', () => {
       vi.advanceTimersByTime(5000);
       expect(wsMockInstance.close).toHaveBeenCalled();
     });
+
+    it('closes the prior in-flight socket on rapid re-click', () => {
+      const { instances } = installMockWebSocket();
+      // The fresh installMockWebSocket replaces the stub from beforeEach so
+      // we observe the next two constructions in isolation.
+      client.testConnect(target);
+      const first = instances[instances.length - 1];
+      expect(first.close).not.toHaveBeenCalled();
+
+      client.testConnect(target);
+      expect(first.close).toHaveBeenCalled();
+    });
   });
 
   describe('disconnect', () => {

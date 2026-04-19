@@ -5,6 +5,21 @@ import { GamesState } from './game.interfaces';
 
 export const MAX_GAME_MESSAGES = 1000;
 
+// Mirrors Event_Leave.LeaveReason values (1=OTHER, 2=USER_KICKED,
+// 3=USER_LEFT, 4=USER_DISCONNECTED); kept in sync with desktop
+// `GameEventHandler::getLeaveReason` in game_event_handler.cpp.
+const LEAVE_REASON_MESSAGES: Record<number, string> = {
+  1: 'reason unknown',
+  2: 'kicked by game host or moderator',
+  3: 'player left the game',
+  4: 'player disconnected from server',
+};
+
+function formatLeaveMessage(playerName: string, reason: number): string {
+  const reasonText = LEAVE_REASON_MESSAGES[reason] ?? LEAVE_REASON_MESSAGES[1];
+  return `${playerName} has left the game (${reasonText}).`;
+}
+
 /** Converts the proto ServerInfo_Player[] array into the keyed PlayerEntry map. */
 function normalizePlayers(playerList: Data.ServerInfo_Player[]): { [playerId: number]: Enriched.PlayerEntry } {
   const players: { [playerId: number]: Enriched.PlayerEntry } = {};
@@ -158,12 +173,28 @@ export const gamesSlice = createSlice({
       };
     },
 
-    playerLeft: (state, action: PayloadAction<{ gameId: number; playerId: number }>) => {
-      const { gameId, playerId } = action.payload;
+    playerLeft: (
+      state,
+      action: PayloadAction<{ gameId: number; playerId: number; reason: number; timeReceived: number }>,
+    ) => {
+      const { gameId, playerId, reason, timeReceived } = action.payload;
       const game = state.games[gameId];
-      if (game) {
-        delete game.players[playerId];
+      if (!game) {
+        return;
       }
+      const player = game.players[playerId];
+      const playerName = player?.properties.userInfo?.name ?? 'Unknown player';
+
+      if (game.messages.length >= MAX_GAME_MESSAGES) {
+        game.messages = game.messages.slice(game.messages.length - MAX_GAME_MESSAGES + 1);
+      }
+      game.messages.push({
+        playerId,
+        message: formatLeaveMessage(playerName, reason),
+        timeReceived,
+      });
+
+      delete game.players[playerId];
     },
 
     playerPropertiesChanged: (
@@ -393,8 +424,8 @@ export const gamesSlice = createSlice({
         return;
       }
 
-      const deckZone = player.zones['deck'];
-      const handZone = player.zones['hand'];
+      const deckZone = player.zones[Enriched.ZoneName.DECK];
+      const handZone = player.zones[Enriched.ZoneName.HAND];
       if (!handZone) {
         return;
       }
@@ -475,6 +506,9 @@ export const gamesSlice = createSlice({
       game.messages.push({ playerId, message, timeReceived });
     },
 
+    // Intentional no-op: action-type placeholders so UI/middleware can
+    // subscribe to notifications without mutating store state. Removing
+    // them would silently drop the dispatch path; keep the empty bodies.
     zoneShuffled: (_state, _action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_Shuffle }>) => {},
     zoneDumped: (_state, _action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_DumpZone }>) => {},
     dieRolled: (_state, _action: PayloadAction<{ gameId: number; playerId: number; data: Data.Event_RollDie }>) => {},

@@ -31,8 +31,8 @@ export const Dispatch = {
     store.dispatch(Actions.playerJoined({ gameId, playerProperties }));
   },
 
-  playerLeft: (gameId: number, playerId: number, _reason: number) => {
-    store.dispatch(Actions.playerLeft({ gameId, playerId }));
+  playerLeft: (gameId: number, playerId: number, reason: number) => {
+    store.dispatch(Actions.playerLeft({ gameId, playerId, reason, timeReceived: Date.now() }));
   },
 
   playerPropertiesChanged: (gameId: number, playerId: number, properties: Data.ServerInfo_PlayerProperties) => {

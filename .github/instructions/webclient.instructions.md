@@ -4,9 +4,25 @@ applyTo: "webclient/**"
 
 # Webclient instructions
 
-Applies to the React/TypeScript SPA in `webclient/` (Webatrice) that connects to a Servatrice server over a WebSocket. The package is self-contained; the only thing it shares with the rest of the repo (C++ desktop/server stack) is the protobuf protocol in `../libcockatrice_protocol/`. Anything outside `webclient/` is out of scope unless a task explicitly touches the protocol.
+Applies to the React/TypeScript SPA in `webclient/` (Webatrice) — a **browser port of the desktop Cockatrice client**. It connects to the **same Servatrice server** as desktop over a WebSocket. UI behavior, and especially how UI code drives the websocket layer (commands, response handling, event-driven state changes), **must match the desktop client** unless a scope reduction is explicitly agreed per milestone. Divergence is a defect by default — see [#desktop-parity-mandate](#desktop-parity-mandate). The package is otherwise self-contained; the only thing it shares with the rest of the repo (C++ desktop/server stack) is the protobuf protocol in `../libcockatrice_protocol/`, and anything outside `webclient/` is out of scope unless a task explicitly touches the protocol.
 
 Canonical AI-tool instruction surface for this package — invariants, policy, and external facts. When a source comment ends with `See .github/instructions/webclient.instructions.md#<anchor>`, the section with that anchor lives here. Source comments tagged `// @critical` guard cross-file invariants; do not remove them without updating the relevant section. For commands, stack, and getting-started, see [webclient/README.md](../../webclient/README.md).
+
+## Desktop parity mandate
+
+The webclient is a port of the desktop Cockatrice C++ client — same server, same game, same users. This is a **hard baseline**, not an ambiguity tie-breaker. Every webclient behavior difference from desktop is treated as a defect unless it has been explicitly scoped out for the current milestone.
+
+**UI ↔ websocket parity is the sharpest edge of this rule.** Command shapes, field-level defaults (what the client sends vs. omits), response/event handling, and the resulting state transitions must mirror desktop. A webclient that issues a subtly different command, or reacts differently to the same event, breaks multi-client play — a desktop player and a webclient player joined to the same Servatrice room must see consistent game state.
+
+**Desktop is the spec.** The reference implementation lives at `../cockatrice/src/` (relative to the repo root). Before proposing any UX or websocket-interaction decision that isn't obvious from the webclient code, read the corresponding desktop source.
+
+**Divergence protocol:**
+
+1. If desktop behavior is expensive to replicate in the current milestone, propose a **scope reduction explicitly** (e.g. "M4 ships default red arrows; color picker defers to M6"). Get agreement before coding. Record deferred parity gaps in [webclient/plans/gameboard-deferrables.md](../../webclient/plans/gameboard-deferrables.md) as "parity gap — deferred to <milestone>".
+2. Phase-end reviews treat Cockatrice-parity findings as **blockers** by default. Elevate them; don't defer unless the user has explicitly OK'd the gap.
+3. The only categorically valid reasons to diverge without a scope-reduction sign-off are: a browser security constraint (e.g. no raw TCP), a fundamental input-model difference (touch vs. mouse), or an accessibility requirement desktop doesn't meet.
+
+This section subsumes the one-line "matches the Cockatrice desktop client" note in [#startup--session-invariants](#startup--session-invariants); that remains as a concrete example of the rule, not a standalone source of truth.
 
 ## Architecture
 

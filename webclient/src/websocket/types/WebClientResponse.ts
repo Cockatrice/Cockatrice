@@ -1,12 +1,9 @@
 import type {
-  Response_Login,
-  Response,
   Response_GetGamesOfUser,
   Response_DeckList,
   Response_DeckDownload,
   Response_ReplayDownload,
   Response_WarnList,
-  ResponseMap,
   Event_RoomSay,
   Event_GameJoined,
   Event_GameStateChanged,
@@ -45,17 +42,17 @@ import type {
 } from '@app/generated';
 
 import type { StatusEnum } from './StatusEnum';
+import type { LoginSuccessContext, PendingActivationContext } from './SignalContexts';
 import type {
   KeyOf,
-  WebSocketSessionResponseOverrides,
   WebSocketRoomResponseOverrides,
 } from './WebSocketConfig';
 
-export interface ISessionResponse<T extends ResponseMap = WebSocketSessionResponseOverrides> {
+export interface ISessionResponse {
   initialized(): void;
   connectionAttempted(): void;
   clearStore(): void;
-  loginSuccessful(result: T[KeyOf<ResponseMap, Response_Login>]): void;
+  loginSuccessful(options: LoginSuccessContext): void;
   loginFailed(): void;
   connectionFailed(): void;
   testConnectionSuccessful(): void;
@@ -73,7 +70,7 @@ export interface ISessionResponse<T extends ResponseMap = WebSocketSessionRespon
   userJoined(user: ServerInfo_User): void;
   userLeft(userName: string): void;
   serverMessage(message: string): void;
-  accountAwaitingActivation(result: T[KeyOf<ResponseMap, Response>]): void;
+  accountAwaitingActivation(options: PendingActivationContext): void;
   accountActivationSuccess(): void;
   accountActivationFailed(): void;
   registrationRequiresEmail(): void;
@@ -179,10 +176,9 @@ export interface IModeratorResponse {
 }
 
 export interface IWebClientResponse<
-  S extends ResponseMap = WebSocketSessionResponseOverrides,
   R extends RoomEventMap = WebSocketRoomResponseOverrides,
 > {
-  session: ISessionResponse<S>;
+  session: ISessionResponse;
   room: IRoomResponse<R>;
   game: IGameResponse;
   admin: IAdminResponse;

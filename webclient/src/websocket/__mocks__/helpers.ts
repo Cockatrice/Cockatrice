@@ -20,13 +20,21 @@ export function makeMockWebSocketInstance() {
 export function installMockWebSocket() {
   const originalWebSocket = (globalThis as any).WebSocket;
   const mockInstance = makeMockWebSocketInstance();
+  const instances: ReturnType<typeof makeMockWebSocketInstance>[] = [mockInstance];
+  let firstCall = true;
   const MockWS = vi.fn(function MockWebSocket() {
-    return mockInstance;
+    if (firstCall) {
+      firstCall = false;
+      return mockInstance;
+    }
+    const next = makeMockWebSocketInstance();
+    instances.push(next);
+    return next;
   }) as any;
   MockWS.OPEN = 1;
   MockWS.CLOSED = 3;
   (globalThis as any).WebSocket = MockWS;
-  return { MockWS, mockInstance, restore: () => {
+  return { MockWS, mockInstance, instances, restore: () => {
     (globalThis as any).WebSocket = originalWebSocket;
   } };
 }

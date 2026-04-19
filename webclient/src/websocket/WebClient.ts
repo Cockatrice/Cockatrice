@@ -1,5 +1,8 @@
 import { ping } from './commands/session';
 import { CLIENT_OPTIONS } from './config';
+import { GameEvents } from './events/game';
+import { RoomEvents } from './events/room';
+import { SessionEvents } from './events/session';
 import type { ConnectTarget } from './types/WebClientConfig';
 import type { IWebClientRequest } from './types/WebClientRequest';
 import type { IWebClientResponse } from './types/WebClientResponse';
@@ -22,6 +25,7 @@ export class WebClient {
   protobuf: ProtobufService;
   socket: WebSocketService;
   status: StatusEnum;
+  private testSocket: WebSocket | null = null;
 
   constructor(
     public request: IWebClientRequest,
@@ -46,7 +50,8 @@ export class WebClient {
       {
         send: (data) => this.socket.send(data),
         isOpen: () => this.socket.checkReadyState(WebSocket.OPEN),
-      }
+      },
+      { game: GameEvents, room: RoomEvents, session: SessionEvents },
     );
 
     this.socket.message$.subscribe((message: MessageEvent) => {
@@ -64,24 +69,42 @@ export class WebClient {
   }
 
   public testConnect(target: ConnectTarget) {
+    // A prior test connection still in flight when the user re-clicks would
+    // otherwise leak the socket until its keepalive timeout. Close eagerly.
+    if (this.testSocket) {
+      this.testSocket.close();
+      this.testSocket = null;
+    }
+
     const protocol = window.location.hostname === 'localhost' ? 'ws' : 'wss';
     const { host, port } = target;
     const socket = new WebSocket(`${protocol}://${host}:${port}`);
     socket.binaryType = 'arraybuffer';
+    this.testSocket = socket;
 
     const timeout = setTimeout(() => socket.close(), CLIENT_OPTIONS.keepalive);
+
+    const clearIfActive = () => {
+      if (this.testSocket === socket) {
+        this.testSocket = null;
+      }
+    };
 
     socket.onopen = () => {
       clearTimeout(timeout);
       this.response.session.testConnectionSuccessful();
       socket.close();
+      clearIfActive();
     };
 
     socket.onerror = () => {
       this.response.session.testConnectionFailed();
+      clearIfActive();
     };
 
-    socket.onclose = () => {};
+    socket.onclose = () => {
+      clearIfActive();
+    };
   }
 
   public disconnect() {

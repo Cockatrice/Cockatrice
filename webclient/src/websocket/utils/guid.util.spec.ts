@@ -10,8 +10,13 @@ describe('guid', () => {
     expect(guid()).toMatch(uuidPattern);
   });
 
-  it('returns deterministic value when Math.random is mocked', () => {
-    const spy = vi.spyOn(Math, 'random').mockReturnValue(0.5);
+  it('returns deterministic value when crypto.getRandomValues is mocked', () => {
+    const spy = vi.spyOn(crypto, 'getRandomValues').mockImplementation((buf: any) => {
+      for (let i = 0; i < buf.length; i++) {
+        buf[i] = 0x1234;
+      }
+      return buf;
+    });
     const result = guid();
     expect(result).toBe(guid());
     spy.mockRestore();

@@ -57,9 +57,13 @@ describe('Dispatch', () => {
     expect(mockDispatch).toHaveBeenCalledWith(Actions.playerJoined({ gameId: 1, playerProperties: props }));
   });
 
-  it('playerLeft dispatches Actions.playerLeft()', () => {
+  it('playerLeft dispatches Actions.playerLeft() with reason + timeReceived', () => {
+    const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(9999);
     Dispatch.playerLeft(1, 2, 3);
-    expect(mockDispatch).toHaveBeenCalledWith(Actions.playerLeft({ gameId: 1, playerId: 2 }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      Actions.playerLeft({ gameId: 1, playerId: 2, reason: 3, timeReceived: 9999 }),
+    );
+    nowSpy.mockRestore();
   });
 
   it('playerPropertiesChanged dispatches Actions.playerPropertiesChanged()', () => {

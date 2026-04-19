@@ -80,6 +80,18 @@ export const Selectors = {
   getActivePhase: ({ games }: State, gameId: number): number | undefined =>
     games.games[gameId]?.activePhase,
 
+  getHostId: ({ games }: State, gameId: number): number | undefined =>
+    games.games[gameId]?.hostId,
+
+  getSecondsElapsed: ({ games }: State, gameId: number): number | undefined =>
+    games.games[gameId]?.secondsElapsed,
+
+  getJudge: ({ games }: State, gameId: number): boolean =>
+    games.games[gameId]?.judge ?? false,
+
+  getResuming: ({ games }: State, gameId: number): boolean =>
+    games.games[gameId]?.resuming ?? false,
+
   isStarted: ({ games }: State, gameId: number): boolean =>
     games.games[gameId]?.started ?? false,
 

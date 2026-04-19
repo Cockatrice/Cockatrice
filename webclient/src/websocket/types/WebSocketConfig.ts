@@ -1,9 +1,6 @@
 import type {
   GameEventContext,
-  Response_Login,
-  Response,
   Event_RoomSay,
-  ResponseMap,
   RoomEventMap,
 } from '@app/generated';
 
@@ -16,11 +13,6 @@ export interface GameEventMeta {
   context: GameEventContext | null;
   secondsElapsed: number;
   forcedByJudge: number;
-}
-
-export interface WebSocketSessionResponseOverrides extends ResponseMap {
-  Response_Login: Response_Login & { hashedPassword?: string };
-  Response: Response & { host: string; port: string; userName: string };
 }
 
 export interface WebSocketRoomResponseOverrides extends RoomEventMap {

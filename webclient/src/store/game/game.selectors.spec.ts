@@ -112,6 +112,41 @@ describe('Selectors', () => {
     expect(Selectors.getActivePhase(rootState(state), 1)).toBe(3);
   });
 
+  it('getHostId → returns hostId from game', () => {
+    const state = makeState({ games: { 1: makeGameEntry({ hostId: 7 }) } });
+    expect(Selectors.getHostId(rootState(state), 1)).toBe(7);
+  });
+
+  it('getHostId → returns undefined for unknown gameId', () => {
+    const state = makeState();
+    expect(Selectors.getHostId(rootState(state), 999)).toBeUndefined();
+  });
+
+  it('getSecondsElapsed → returns secondsElapsed from game', () => {
+    const state = makeState({ games: { 1: makeGameEntry({ secondsElapsed: 314 }) } });
+    expect(Selectors.getSecondsElapsed(rootState(state), 1)).toBe(314);
+  });
+
+  it('getJudge → returns judge flag from game', () => {
+    const state = makeState({ games: { 1: makeGameEntry({ judge: true }) } });
+    expect(Selectors.getJudge(rootState(state), 1)).toBe(true);
+  });
+
+  it('getJudge → returns false when game not found', () => {
+    const state = makeState();
+    expect(Selectors.getJudge(rootState(state), 999)).toBe(false);
+  });
+
+  it('getResuming → returns resuming flag from game', () => {
+    const state = makeState({ games: { 1: makeGameEntry({ resuming: true }) } });
+    expect(Selectors.getResuming(rootState(state), 1)).toBe(true);
+  });
+
+  it('getResuming → returns false when game not found', () => {
+    const state = makeState();
+    expect(Selectors.getResuming(rootState(state), 999)).toBe(false);
+  });
+
   it('isStarted → returns true when game is started', () => {
     const state = makeState({ games: { 1: makeGameEntry({ started: true }) } });
     expect(Selectors.isStarted(rootState(state), 1)).toBe(true);

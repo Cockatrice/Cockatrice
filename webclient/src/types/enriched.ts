@@ -61,6 +61,19 @@ export interface PlayerEntry {
   arrows: { [arrowId: number]: ServerInfo_Arrow };
 }
 
+// Canonical wire values for `ZoneEntry.name`. Server-defined and stable.
+export const ZoneName = {
+  TABLE: 'table',
+  GRAVE: 'grave',
+  EXILE: 'rfg',
+  HAND: 'hand',
+  DECK: 'deck',
+  SIDEBOARD: 'sb',
+  STACK: 'stack',
+} as const;
+
+export type ZoneNameValue = typeof ZoneName[keyof typeof ZoneName];
+
 export interface ZoneEntry {
   name: string;
   /** ZoneType enum value (0=Private, 1=Public, 2=Hidden). */

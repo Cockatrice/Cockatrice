@@ -63,4 +63,32 @@ describe('admin commands', () => {
       responseCode: Data.Response_ResponseCode.RespOk,
     })));
   });
+
+  it('reloadConfig sends command and resolves on RespOk', () => {
+    connectAndLogin();
+
+    AdminCommands.reloadConfig();
+
+    const { cmdId } = findLastAdminCommand(Data.Command_ReloadConfig_ext);
+    expect(cmdId).toBeGreaterThan(0);
+
+    deliverMessage(buildResponseMessage(buildResponse({
+      cmdId,
+      responseCode: Data.Response_ResponseCode.RespOk,
+    })));
+  });
+
+  it('updateServerMessage sends command and resolves on RespOk', () => {
+    connectAndLogin();
+
+    AdminCommands.updateServerMessage();
+
+    const { cmdId } = findLastAdminCommand(Data.Command_UpdateServerMessage_ext);
+    expect(cmdId).toBeGreaterThan(0);
+
+    deliverMessage(buildResponseMessage(buildResponse({
+      cmdId,
+      responseCode: Data.Response_ResponseCode.RespOk,
+    })));
+  });
 });

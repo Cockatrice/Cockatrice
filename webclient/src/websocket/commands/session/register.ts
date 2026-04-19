@@ -45,10 +45,9 @@ export function register(options: ConnectTarget & RegisterParams, password?: str
         }, password, passwordSalt);
         WebClient.instance.response.session.registrationSuccess();
       },
-      [Response_ResponseCode.RespRegistrationAcceptedNeedsActivation]: (raw) => {
+      [Response_ResponseCode.RespRegistrationAcceptedNeedsActivation]: () => {
         updateStatus(StatusEnum.DISCONNECTED, 'Registration accepted, awaiting activation');
         WebClient.instance.response.session.accountAwaitingActivation({
-          ...raw,
           host: options.host,
           port: options.port,
           userName: options.userName,

@@ -50,8 +50,8 @@ describe('Actions', () => {
   });
 
   it('playerLeft', () => {
-    const action = Actions.playerLeft({ gameId: 1, playerId: 2 });
-    expect(action.payload).toEqual({ gameId: 1, playerId: 2 });
+    const action = Actions.playerLeft({ gameId: 1, playerId: 2, reason: 3, timeReceived: 42 });
+    expect(action.payload).toEqual({ gameId: 1, playerId: 2, reason: 3, timeReceived: 42 });
   });
 
   it('playerPropertiesChanged', () => {

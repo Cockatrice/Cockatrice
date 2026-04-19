@@ -64,6 +64,16 @@ describe('sanitizeHtml', () => {
     expect(result).not.toContain('src="javascript:');
   });
 
+  it('strips ftp: scheme from img src (scheme-hardening vs desktop)', () => {
+    const result = sanitizeHtml('<img src="ftp://evil.example/tracker.png" />');
+    expect(result).not.toContain('ftp://');
+  });
+
+  it('preserves https: scheme on img src', () => {
+    const result = sanitizeHtml('<img src="https://example.com/img.png" />');
+    expect(result).toContain('src="https://example.com/img.png"');
+  });
+
   it('strips onerror from img while keeping safe src', () => {
     const result = sanitizeHtml('<img src="http://example.com/img.png" onerror="alert(1)" />');
     expect(result).not.toContain('onerror');

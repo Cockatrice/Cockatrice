@@ -147,8 +147,47 @@ describe('2B: Game state & player management', () => {
 
   it('PLAYER_LEFT → removes player from game.players', () => {
     const state = makeState();
-    const result = gamesReducer(state, Actions.playerLeft({ gameId: 1, playerId: 1 }));
+    const result = gamesReducer(
+      state,
+      Actions.playerLeft({ gameId: 1, playerId: 1, reason: 3, timeReceived: 1000 }),
+    );
     expect(result.games[1].players[1]).toBeUndefined();
+  });
+
+  it('PLAYER_LEFT → emits a GameMessage with the formatted reason string', () => {
+    const state = makeState();
+    state.games[1].players[1].properties = makePlayerProperties({
+      playerId: 1,
+      userInfo: { name: 'Alice' },
+    });
+    const before = state.games[1].messages.length;
+
+    const result = gamesReducer(
+      state,
+      Actions.playerLeft({ gameId: 1, playerId: 1, reason: 2, timeReceived: 1234 }),
+    );
+
+    const msgs = result.games[1].messages;
+    expect(msgs.length).toBe(before + 1);
+    const added = msgs[msgs.length - 1];
+    expect(added.playerId).toBe(1);
+    expect(added.timeReceived).toBe(1234);
+    expect(added.message).toBe('Alice has left the game (kicked by game host or moderator).');
+  });
+
+  it.each([
+    [1, 'reason unknown'],
+    [2, 'kicked by game host or moderator'],
+    [3, 'player left the game'],
+    [4, 'player disconnected from server'],
+  ])('PLAYER_LEFT reason=%i → log text includes "%s"', (reason, fragment) => {
+    const state = makeState();
+    const result = gamesReducer(
+      state,
+      Actions.playerLeft({ gameId: 1, playerId: 1, reason, timeReceived: 0 }),
+    );
+    const last = result.games[1].messages[result.games[1].messages.length - 1];
+    expect(last.message).toContain(fragment);
   });
 
   it('PLAYER_PROPERTIES_CHANGED → replaces properties on existing player', () => {
@@ -1040,7 +1079,9 @@ describe('2L: Null-guard / missing entity early-returns', () => {
 
   it('PLAYER_LEFT with unknown gameId → state unchanged', () => {
     const state = makeState();
-    expect(gamesReducer(state, Actions.playerLeft({ gameId: UNKNOWN_GAME, playerId: 1 }))).toBe(state);
+    expect(
+      gamesReducer(state, Actions.playerLeft({ gameId: UNKNOWN_GAME, playerId: 1, reason: 3, timeReceived: 0 })),
+    ).toBe(state);
   });
 
   it('updatePlayer guard: PLAYER_PROPERTIES_CHANGED with unknown gameId → state unchanged', () => {

@@ -17,9 +17,12 @@ export const hashPassword = (salt: string, password: string): string => {
 export const generateSalt = (): string => {
   const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
+  const bytes = new Uint8Array(SALT_LENGTH);
+  crypto.getRandomValues(bytes);
+
   let salt = '';
   for (let i = 0; i < SALT_LENGTH; i++) {
-    salt += characters.charAt(Math.floor(Math.random() * characters.length));
+    salt += characters.charAt(bytes[i] % characters.length);
   }
 
   return salt;

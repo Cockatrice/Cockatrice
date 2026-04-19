@@ -47,7 +47,7 @@ export function login(options: ConnectTarget & LoginParams, password?: string, p
       WebClient.instance.response.session.updateBuddyList(buddyList);
       WebClient.instance.response.session.updateIgnoreList(ignoreList);
       WebClient.instance.response.session.updateUser(userInfo);
-      WebClient.instance.response.session.loginSuccessful({ ...resp, hashedPassword: loginConfig.hashedPassword });
+      WebClient.instance.response.session.loginSuccessful({ hashedPassword: loginConfig.hashedPassword });
 
       listUsers();
       listRooms();
@@ -71,11 +71,10 @@ export function login(options: ConnectTarget & LoginParams, password?: string, p
         onLoginError('Login failed: missing client ID'),
       [Response_ResponseCode.RespContextError]: () =>
         onLoginError('Login failed: server error'),
-      [Response_ResponseCode.RespAccountNotActivated]: (raw) =>
+      [Response_ResponseCode.RespAccountNotActivated]: () =>
         onLoginError('Login failed: account not activated',
           () => {
             WebClient.instance.response.session.accountAwaitingActivation({
-              ...raw,
               host: options.host,
               port: options.port,
               userName: options.userName,
