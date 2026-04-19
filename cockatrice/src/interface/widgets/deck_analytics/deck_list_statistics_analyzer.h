@@ -17,7 +17,7 @@ struct DeckListStatisticsAnalyzerConfig
     bool computeCategories = true;
     bool computeCurveBreakdowns = true;
     bool computeProbabilities = true;
-    bool includeSideboard = true;
+    bool includeSideboard = false;
 };
 
 class DeckListStatisticsAnalyzer : public QObject

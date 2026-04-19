@@ -30,7 +30,7 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnal
     saveButton = new QPushButton(this);
     loadButton = new QPushButton(this);
     includeSideboardCheckBox = new QCheckBox(this);
-    includeSideboardCheckBox->setChecked(true);
+    includeSideboardCheckBox->setChecked(false);
 
     controlLayout->addWidget(addButton);
     controlLayout->addWidget(removeButton);
