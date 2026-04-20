@@ -23,6 +23,8 @@ const initialState: RoomsState = {
   },
   selectedGameIds: {},
   gameFilters: {},
+  joinGamePending: false,
+  joinGameError: null,
 };
 
 export const roomsSlice = createSlice({
@@ -204,6 +206,19 @@ export const roomsSlice = createSlice({
     clearGameFilters: (state, action: PayloadAction<{ roomId: number }>) => {
       const { roomId } = action.payload;
       state.gameFilters[roomId] = { ...DEFAULT_GAME_FILTERS };
+    },
+
+    setJoinGamePending: (state, action: PayloadAction<{ pending: boolean }>) => {
+      state.joinGamePending = action.payload.pending;
+    },
+
+    setJoinGameError: (state, action: PayloadAction<{ code: number; message: string }>) => {
+      state.joinGameError = { code: action.payload.code, message: action.payload.message };
+      state.joinGamePending = false;
+    },
+
+    clearJoinGameError: (state) => {
+      state.joinGameError = null;
     },
   },
 });

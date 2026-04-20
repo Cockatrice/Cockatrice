@@ -55,6 +55,7 @@ function buildState(
   room: ReturnType<typeof makeRoomEntry>,
   user = makeUser(),
   selectedGameId?: number,
+  roomsOverrides: Partial<{ joinGamePending: boolean; joinGameError: { code: number; message: string } | null }> = {},
 ) {
   return makeStoreState({
     ...connectedWithRoomsState,
@@ -67,6 +68,9 @@ function buildState(
       sortUsersBy: { field: App.UserSortField.NAME, order: App.SortDirection.ASC },
       selectedGameIds: selectedGameId != null ? { 1: selectedGameId } : {},
       gameFilters: {},
+      joinGamePending: false,
+      joinGameError: null,
+      ...roomsOverrides,
     } as any,
     server: {
       ...(connectedWithRoomsState.server as any),
@@ -179,6 +183,41 @@ describe('GameSelector', () => {
     });
     expect(screen.getByRole('button', { name: /Join as Judge$/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Join as Judge Spectator/i })).toBeInTheDocument();
+  });
+
+  it('renders AlertDialog with the join error message from state', () => {
+    mockUseWebClient.mockReturnValue(makeWebClient());
+    const room = makeRoomEntry([]);
+    renderWithProviders(<GameSelector room={room as any} />, {
+      preloadedState: buildState(room, makeUser(), undefined, {
+        joinGameError: { code: 10, message: 'The game is already full.' },
+      }),
+    });
+    expect(screen.getByText('Error')).toBeInTheDocument();
+    expect(screen.getByText('The game is already full.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^ok$/i })).toBeInTheDocument();
+  });
+
+  it('does not render AlertDialog when joinGameError is null (covers silent RespContextError)', () => {
+    mockUseWebClient.mockReturnValue(makeWebClient());
+    const room = makeRoomEntry([]);
+    renderWithProviders(<GameSelector room={room as any} />, {
+      preloadedState: buildState(room, makeUser(), undefined, { joinGameError: null }),
+    });
+    // Only the CreateGame / FilterGames / PromptDialog / AlertDialog dialogs might exist; none
+    // should be open, so no role="dialog" in the DOM.
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('Join button is disabled while joinGamePending is true even when a game is selected', () => {
+    mockUseWebClient.mockReturnValue(makeWebClient());
+    const game = makeGame({ gameId: 7 });
+    const room = makeRoomEntry([game]);
+    renderWithProviders(<GameSelector room={room as any} />, {
+      preloadedState: buildState(room, makeUser(), 7, { joinGamePending: true }),
+    });
+    expect(screen.getByRole('button', { name: /^Join$/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Join as Spectator/i })).toBeDisabled();
   });
 
   it('clicking Create then submitting forwards createGame', () => {

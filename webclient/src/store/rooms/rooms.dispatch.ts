@@ -64,4 +64,16 @@ export const Dispatch = {
   clearGameFilters: (roomId: number) => {
     store.dispatch(Actions.clearGameFilters({ roomId }));
   },
+
+  setJoinGamePending: (pending: boolean) => {
+    store.dispatch(Actions.setJoinGamePending({ pending }));
+  },
+
+  setJoinGameError: (code: number, message: string) => {
+    store.dispatch(Actions.setJoinGameError({ code, message }));
+  },
+
+  clearJoinGameError: () => {
+    store.dispatch(Actions.clearJoinGameError());
+  },
 }

@@ -48,4 +48,12 @@ export class RoomResponseImpl implements WebsocketTypes.IRoomResponse<WebsocketT
   joinedGame(roomId: number, gameId: number): void {
     RoomsDispatch.joinedGame(roomId, gameId);
   }
+
+  setJoinGamePending(pending: boolean): void {
+    RoomsDispatch.setJoinGamePending(pending);
+  }
+
+  setJoinGameError(code: number, message: string): void {
+    RoomsDispatch.setJoinGameError(code, message);
+  }
 }

@@ -9,6 +9,13 @@ export interface RoomsState {
   sortUsersBy: RoomsStateSortUsersBy;
   selectedGameIds: SelectedGameIds;
   gameFilters: RoomsStateGameFilters;
+  joinGamePending: boolean;
+  joinGameError: JoinGameError | null;
+}
+
+export interface JoinGameError {
+  code: number;
+  message: string;
 }
 
 export interface RoomsStateRooms {

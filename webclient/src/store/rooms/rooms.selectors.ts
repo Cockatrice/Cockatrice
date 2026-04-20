@@ -109,6 +109,9 @@ export const Selectors = {
     return !isGameFiltersAtDefaults(filters);
   },
 
+  getJoinGamePending: ({ rooms }: State) => rooms.joinGamePending,
+  getJoinGameError: ({ rooms }: State) => rooms.joinGameError,
+
   /**
    * Sorted + filter-applied view of a room's games for display. Filters
    * mirror desktop GamesProxyModel; buddy/ignore checks read from server.

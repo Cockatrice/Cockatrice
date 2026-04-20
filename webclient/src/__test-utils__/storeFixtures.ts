@@ -65,6 +65,8 @@ export const disconnectedState: Partial<RootState> = {
     sortUsersBy: { field: App.UserSortField.NAME, order: App.SortDirection.ASC },
     selectedGameIds: {},
     gameFilters: {},
+    joinGamePending: false,
+    joinGameError: null,
   },
   games: { games: {} },
   action: { type: null, payload: null, meta: null, error: false, count: 0 },

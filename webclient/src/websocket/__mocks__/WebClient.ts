@@ -89,6 +89,8 @@ const room = {
   removeMessages: vi.fn(),
   gameCreated: vi.fn(),
   joinedGame: vi.fn(),
+  setJoinGamePending: vi.fn(),
+  setJoinGameError: vi.fn(),
 };
 
 const game = {

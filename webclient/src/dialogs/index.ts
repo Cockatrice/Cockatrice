@@ -1,4 +1,6 @@
 export { default as AccountActivationDialog } from './AccountActivationDialog/AccountActivationDialog';
+export { default as AlertDialog } from './AlertDialog/AlertDialog';
+export type { AlertDialogProps, AlertDialogSeverity } from './AlertDialog/AlertDialog';
 export { default as CardImportDialog } from './CardImportDialog/CardImportDialog';
 export { default as ConfirmDialog } from './ConfirmDialog/ConfirmDialog';
 export { default as CreateCounterDialog } from './CreateCounterDialog/CreateCounterDialog';

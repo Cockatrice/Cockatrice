@@ -120,6 +120,8 @@ export interface IRoomResponse<T extends RoomEventMap = WebSocketRoomResponseOve
   removeMessages(roomId: number, name: string, amount: number): void;
   gameCreated(roomId: number): void;
   joinedGame(roomId: number, gameId: number): void;
+  setJoinGamePending(pending: boolean): void;
+  setJoinGameError(code: number, message: string): void;
 }
 
 export interface IGameResponse {

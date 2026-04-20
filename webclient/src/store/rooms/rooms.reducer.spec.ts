@@ -401,6 +401,38 @@ describe('LEAVE_ROOM \u2014 selection and filters', () => {
 });
 
 
+describe('JoinGame error state', () => {
+  it('SET_JOIN_GAME_PENDING toggles joinGamePending', () => {
+    const state = makeRoomsState({ joinGamePending: false });
+    const result = roomsReducer(state, Actions.setJoinGamePending({ pending: true }));
+    expect(result.joinGamePending).toBe(true);
+  });
+
+  it('SET_JOIN_GAME_ERROR sets the error and clears joinGamePending', () => {
+    const state = makeRoomsState({ joinGamePending: true });
+    const result = roomsReducer(state, Actions.setJoinGameError({ code: 10, message: 'The game is already full.' }));
+    expect(result.joinGameError).toEqual({ code: 10, message: 'The game is already full.' });
+    expect(result.joinGamePending).toBe(false);
+  });
+
+  it('CLEAR_JOIN_GAME_ERROR nulls the error', () => {
+    const state = makeRoomsState({ joinGameError: { code: 10, message: 'The game is already full.' } });
+    const result = roomsReducer(state, Actions.clearJoinGameError());
+    expect(result.joinGameError).toBeNull();
+  });
+
+  it('CLEAR_STORE resets joinGame error state', () => {
+    const state = makeRoomsState({
+      joinGamePending: true,
+      joinGameError: { code: 12, message: 'Wrong password.' },
+    });
+    const result = roomsReducer(state, Actions.clearStore());
+    expect(result.joinGamePending).toBe(false);
+    expect(result.joinGameError).toBeNull();
+  });
+});
+
+
 describe('SET_GAME_FILTERS / CLEAR_GAME_FILTERS', () => {
   it('SET_GAME_FILTERS stores filter state for the room', () => {
     const state = makeRoomsState();

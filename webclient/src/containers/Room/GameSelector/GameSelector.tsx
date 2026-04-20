@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import { RoomsDispatch, RoomsSelectors, ServerSelectors, useAppSelector } from '@app/store';
 import { useWebClient } from '@app/hooks';
 import type { App, Enriched } from '@app/types';
-import { CreateGameDialog, FilterGamesDialog, PromptDialog } from '@app/dialogs';
+import { AlertDialog, CreateGameDialog, FilterGamesDialog, PromptDialog } from '@app/dialogs';
 
 import OpenGames from '../OpenGames';
 import GameSelectorToolbar from './GameSelectorToolbar';
@@ -16,7 +16,7 @@ interface GameSelectorProps {
   room: Enriched.Room;
 }
 
-interface PendingJoin {
+interface PendingPasswordJoin {
   gameId: number;
   asSpectator: boolean;
   asJudge: boolean;
@@ -34,10 +34,12 @@ const GameSelector = ({ room }: GameSelectorProps) => {
   const isFilterActive = useAppSelector((state) => RoomsSelectors.isGameFilterActive(state, roomId));
   const filters = useAppSelector((state) => RoomsSelectors.getGameFilters(state, roomId));
   const isJudgeUser = useAppSelector(ServerSelectors.getIsUserJudge);
+  const joinPending = useAppSelector(RoomsSelectors.getJoinGamePending);
+  const joinError = useAppSelector(RoomsSelectors.getJoinGameError);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [pendingJoin, setPendingJoin] = useState<PendingJoin | null>(null);
+  const [pendingPasswordJoin, setPendingPasswordJoin] = useState<PendingPasswordJoin | null>(null);
 
   const sendJoin = useCallback(
     (gameId: number, asSpectator: boolean, asJudge: boolean, password: string) => {
@@ -65,7 +67,7 @@ const GameSelector = ({ room }: GameSelectorProps) => {
       const needsPassword =
         info.withPassword && !(effectiveSpectator && !info.spectatorsNeedPassword);
       if (needsPassword) {
-        setPendingJoin({ gameId: info.gameId, asSpectator: effectiveSpectator, asJudge });
+        setPendingPasswordJoin({ gameId: info.gameId, asSpectator: effectiveSpectator, asJudge });
         return;
       }
       sendJoin(info.gameId, effectiveSpectator, asJudge, '');
@@ -80,8 +82,9 @@ const GameSelector = ({ room }: GameSelectorProps) => {
     [beginJoin],
   );
 
-  const canJoin = Boolean(selectedGame && selectedGame.info.playerCount < selectedGame.info.maxPlayers);
-  const canSpectate = Boolean(selectedGame && selectedGame.info.spectatorsAllowed);
+  const canJoin =
+    Boolean(selectedGame && selectedGame.info.playerCount < selectedGame.info.maxPlayers) && !joinPending;
+  const canSpectate = Boolean(selectedGame && selectedGame.info.spectatorsAllowed) && !joinPending;
 
   const handleCreateSubmit = (params: App.CreateGameParams) => {
     webClient.request.rooms.createGame(roomId, params);
@@ -94,11 +97,11 @@ const GameSelector = ({ room }: GameSelectorProps) => {
   };
 
   const handlePasswordSubmit = (password: string) => {
-    if (!pendingJoin) {
+    if (!pendingPasswordJoin) {
       return;
     }
-    sendJoin(pendingJoin.gameId, pendingJoin.asSpectator, pendingJoin.asJudge, password);
-    setPendingJoin(null);
+    sendJoin(pendingPasswordJoin.gameId, pendingPasswordJoin.asSpectator, pendingPasswordJoin.asJudge, password);
+    setPendingPasswordJoin(null);
   };
 
   return (
@@ -138,12 +141,18 @@ const GameSelector = ({ room }: GameSelectorProps) => {
         onSubmit={handleFilterSubmit}
       />
       <PromptDialog
-        isOpen={pendingJoin !== null}
+        isOpen={pendingPasswordJoin !== null}
         title="Password required"
         label="Password"
         submitLabel="Join"
         onSubmit={handlePasswordSubmit}
-        onCancel={() => setPendingJoin(null)}
+        onCancel={() => setPendingPasswordJoin(null)}
+      />
+      <AlertDialog
+        isOpen={joinError !== null}
+        title="Error"
+        message={joinError?.message ?? ''}
+        onDismiss={() => RoomsDispatch.clearJoinGameError()}
       />
     </Paper>
   );

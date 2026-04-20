@@ -109,4 +109,21 @@ describe('Dispatch', () => {
     Dispatch.clearGameFilters(1);
     expect(mockDispatch).toHaveBeenCalledWith(Actions.clearGameFilters({ roomId: 1 }));
   });
+
+  it('setJoinGamePending dispatches Actions.setJoinGamePending()', () => {
+    Dispatch.setJoinGamePending(true);
+    expect(mockDispatch).toHaveBeenCalledWith(Actions.setJoinGamePending({ pending: true }));
+  });
+
+  it('setJoinGameError dispatches Actions.setJoinGameError()', () => {
+    Dispatch.setJoinGameError(10, 'The game is already full.');
+    expect(mockDispatch).toHaveBeenCalledWith(
+      Actions.setJoinGameError({ code: 10, message: 'The game is already full.' })
+    );
+  });
+
+  it('clearJoinGameError dispatches Actions.clearJoinGameError()', () => {
+    Dispatch.clearJoinGameError();
+    expect(mockDispatch).toHaveBeenCalledWith(Actions.clearJoinGameError());
+  });
 });

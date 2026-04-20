@@ -107,6 +107,8 @@ export function makeRoomsState(overrides: Partial<RoomsState> = {}): RoomsState 
     },
     selectedGameIds: {},
     gameFilters: {},
+    joinGamePending: false,
+    joinGameError: null,
     ...overrides,
   };
 }
