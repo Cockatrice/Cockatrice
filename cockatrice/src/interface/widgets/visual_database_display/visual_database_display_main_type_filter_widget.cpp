@@ -1,6 +1,7 @@
 #include "visual_database_display_main_type_filter_widget.h"
 
 #include "../../../filters/filter_tree_model.h"
+#include "visual_database_display_filter_button.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -75,21 +76,8 @@ void VisualDatabaseDisplayMainTypeFilterWidget::createMainTypeButtons()
     for (auto it = allMainCardTypesWithCount.begin(); it != allMainCardTypesWithCount.end(); ++it) {
         auto *button = new QPushButton(it.key(), flowWidget);
         button->setCheckable(true);
-        QPalette pal = button->palette();
-        QString base = pal.button().color().name();
-        QString highlight = pal.highlight().color().name();
 
-        button->setStyleSheet(QString(R"(
-    QPushButton {
-        background-color: %1;
-        padding: 5px;
-    }
-    QPushButton:checked {
-        background-color: %2;
-        color: white;
-    }
-)")
-                                  .arg(base, highlight));
+        button->setStyleSheet(visualDatabaseDisplayFilterButtonStyle);
 
         flowWidget->addWidget(button);
         typeButtons[it.key()] = button;

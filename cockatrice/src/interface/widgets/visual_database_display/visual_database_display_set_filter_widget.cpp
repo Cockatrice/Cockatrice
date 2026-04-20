@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../filters/filter_tree_model.h"
+#include "visual_database_display_filter_button.h"
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -101,21 +102,8 @@ void VisualDatabaseDisplaySetFilterWidget::createSetButtons()
 
         auto *button = new QPushButton(longName + " (" + shortName + ")", flowWidget);
         button->setCheckable(true);
-        QPalette pal = button->palette();
-        QString base = pal.button().color().name();
-        QString highlight = pal.highlight().color().name();
 
-        button->setStyleSheet(QString(R"(
-    QPushButton {
-        background-color: %1;
-        padding: 5px;
-    }
-    QPushButton:checked {
-        background-color: %2;
-        color: white;
-    }
-)")
-                                  .arg(base, highlight));
+        button->setStyleSheet(visualDatabaseDisplayFilterButtonStyle);
 
         flowWidget->addWidget(button);
         setButtons[shortName] = button;
