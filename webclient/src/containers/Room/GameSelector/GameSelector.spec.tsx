@@ -7,12 +7,20 @@ import {
   connectedWithRoomsState,
 } from '../../../__test-utils__';
 import { App, Data } from '@app/types';
+import { GameTypes } from '@app/store';
 import GameSelector from './GameSelector';
 
-const { mockUseWebClient } = vi.hoisted(() => ({ mockUseWebClient: vi.fn() }));
+const { mockUseWebClient, mockNavigate } = vi.hoisted(() => ({
+  mockUseWebClient: vi.fn(),
+  mockNavigate: vi.fn(),
+}));
 vi.mock('@app/hooks', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@app/hooks')>();
   return { ...actual, useWebClient: mockUseWebClient };
+});
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router-dom')>();
+  return { ...actual, useNavigate: () => mockNavigate };
 });
 
 function makeRoomEntry(games: Data.ServerInfo_Game[] = [], gametypeMap: Record<number, string> = {}) {
@@ -81,6 +89,7 @@ function buildState(
 
 beforeEach(() => {
   mockUseWebClient.mockReset();
+  mockNavigate.mockReset();
 });
 
 describe('GameSelector', () => {
@@ -207,6 +216,38 @@ describe('GameSelector', () => {
     // Only the CreateGame / FilterGames / PromptDialog / AlertDialog dialogs might exist; none
     // should be open, so no role="dialog" in the DOM.
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('clicking Join on a game already present in games.games navigates to /game without sending a command', () => {
+    const client = makeWebClient();
+    mockUseWebClient.mockReturnValue(client);
+    const game = makeGame({ gameId: 7, withPassword: false });
+    const room = makeRoomEntry([game]);
+    const state = buildState(room, makeUser(), 7);
+    (state as any).games = { games: { 7: { info: { gameId: 7 } } } };
+    renderWithProviders(<GameSelector room={room as any} />, { preloadedState: state });
+
+    fireEvent.click(screen.getByRole('button', { name: /^Join$/ }));
+
+    expect(client.request.rooms.joinGame).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith(App.RouteEnum.GAME);
+  });
+
+  it('dispatching GAME_JOINED navigates to /game (mirrors JOIN_ROOM → /room)', async () => {
+    mockUseWebClient.mockReturnValue(makeWebClient());
+    const room = makeRoomEntry([]);
+    const { store } = renderWithProviders(<GameSelector room={room as any} />, {
+      preloadedState: buildState(room),
+    });
+
+    mockNavigate.mockClear();
+    store.dispatch({
+      type: GameTypes.GAME_JOINED,
+      payload: { data: { gameInfo: { gameId: 42 }, hostId: 0, playerId: 0, spectator: false } },
+    });
+
+    await Promise.resolve();
+    expect(mockNavigate).toHaveBeenCalledWith(App.RouteEnum.GAME);
   });
 
   it('Join button is disabled while joinGamePending is true even when a game is selected', () => {

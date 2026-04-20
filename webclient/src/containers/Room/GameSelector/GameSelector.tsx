@@ -1,10 +1,18 @@
 import React, { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
-import { RoomsDispatch, RoomsSelectors, ServerSelectors, useAppSelector } from '@app/store';
-import { useWebClient } from '@app/hooks';
-import type { App, Enriched } from '@app/types';
+import {
+  GameSelectors,
+  GameTypes,
+  RoomsDispatch,
+  RoomsSelectors,
+  ServerSelectors,
+  useAppSelector,
+} from '@app/store';
+import { useReduxEffect, useWebClient } from '@app/hooks';
+import { App, type Enriched } from '@app/types';
 import { AlertDialog, CreateGameDialog, FilterGamesDialog, PromptDialog } from '@app/dialogs';
 
 import OpenGames from '../OpenGames';
@@ -25,6 +33,7 @@ interface PendingPasswordJoin {
 const GameSelector = ({ room }: GameSelectorProps) => {
   const roomId = room.info.roomId;
   const webClient = useWebClient();
+  const navigate = useNavigate();
 
   const selectedGameId = useAppSelector((state) => RoomsSelectors.getSelectedGameId(state, roomId));
   const selectedGame = useAppSelector((state) =>
@@ -36,6 +45,13 @@ const GameSelector = ({ room }: GameSelectorProps) => {
   const isJudgeUser = useAppSelector(ServerSelectors.getIsUserJudge);
   const joinPending = useAppSelector(RoomsSelectors.getJoinGamePending);
   const joinError = useAppSelector(RoomsSelectors.getJoinGameError);
+  const activeGameIds = useAppSelector(GameSelectors.getActiveGameIds);
+
+  // Mirrors Server.tsx's JOIN_ROOM → navigate(ROOM) pattern: when Event_GameJoined
+  // lands, we're actually in the game — route to /game.
+  useReduxEffect(() => {
+    navigate(App.RouteEnum.GAME);
+  }, GameTypes.GAME_JOINED, [navigate]);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -43,6 +59,14 @@ const GameSelector = ({ room }: GameSelectorProps) => {
 
   const sendJoin = useCallback(
     (gameId: number, asSpectator: boolean, asJudge: boolean, password: string) => {
+      // Mirrors Rooms.tsx short-circuit: if we already have a live game entry
+      // (Event_GameJoined has populated games.games[gameId]), skip the duplicate
+      // JoinGame — the server would reject it with RespContextError — and go
+      // straight to the game view.
+      if (activeGameIds.includes(gameId)) {
+        navigate(App.RouteEnum.GAME);
+        return;
+      }
       const params: App.JoinGameParams = {
         gameId,
         password,
@@ -52,7 +76,7 @@ const GameSelector = ({ room }: GameSelectorProps) => {
       };
       webClient.request.rooms.joinGame(roomId, params);
     },
-    [roomId, webClient],
+    [activeGameIds, navigate, roomId, webClient],
   );
 
   const beginJoin = useCallback(
