@@ -1,5 +1,3 @@
-import React from 'react';
-
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -12,6 +10,8 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 
+import { useLogResults } from './useLogResults';
+
 import './LogResults.css';
 
 const LogResults = (props) => {
@@ -21,31 +21,15 @@ const LogResults = (props) => {
   const hasGameLogs = logs.game && logs.game.length;
   const hasChatLogs = logs.chat && logs.chat.length;
 
-  const [value, setValue] = React.useState(0);
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  const { value, handleChange } = useLogResults();
 
   const headerCells = [
-    {
-      label: 'Time'
-    },
-    {
-      label: 'Sender Name'
-    },
-    {
-      label: 'Sender IP'
-    },
-    {
-      label: 'Message'
-    },
-    {
-      label: 'Target ID'
-    },
-    {
-      label: 'Target Name'
-    }
+    { label: 'Time' },
+    { label: 'Sender Name' },
+    { label: 'Sender IP' },
+    { label: 'Message' },
+    { label: 'Target ID' },
+    { label: 'Target Name' },
   ];
 
   return (
@@ -67,7 +51,7 @@ const LogResults = (props) => {
         <Results logs={logs.chat} headerCells={headerCells} />
       </TabPanel>
     </div>
-  )
+  );
 };
 
 const a11yProps = index => {
@@ -97,13 +81,13 @@ const Results = ({ headerCells, logs }) => (
     <Table size="small">
       <TableHead>
         <TableRow>
-          { headerCells.map(({ label }) => (
+          {headerCells.map(({ label }) => (
             <TableCell key={label}>{label}</TableCell>
           ))}
         </TableRow>
       </TableHead>
       <TableBody>
-        { logs.map(({ time, senderName, senderIp, message, targetId, targetName }, index) => (
+        {logs.map(({ time, senderName, senderIp, message, targetId, targetName }, index) => (
           <TableRow key={index}>
             <TableCell>{time}</TableCell>
             <TableCell>{senderName}</TableCell>

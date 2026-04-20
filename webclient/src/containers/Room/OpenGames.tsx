@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,10 +6,10 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Tooltip from '@mui/material/Tooltip';
 
-import { SortUtil, RoomsDispatch, RoomsSelectors } from '@app/store';
 import { UserDisplay } from '@app/components';
-import { useAppSelector } from '@app/store';
 import { Data, Enriched } from '@app/types';
+
+import { useOpenGames } from './useOpenGames';
 
 import './OpenGames.css';
 
@@ -56,9 +54,10 @@ function formatSpectators(info: Data.ServerInfo_Game): string {
 
 const OpenGames = ({ room, onActivateGame }: OpenGamesProps) => {
   const roomId = room.info.roomId;
-  const sortBy = useAppSelector(state => RoomsSelectors.getSortGamesBy(state));
-  const games = useAppSelector(state => RoomsSelectors.getFilteredRoomGames(state, roomId));
-  const selectedGameId = useAppSelector(state => RoomsSelectors.getSelectedGameId(state, roomId));
+  const { sortBy, games, selectedGameId, handleSort, handleSelect, handleActivate } = useOpenGames({
+    roomId,
+    onActivateGame,
+  });
 
   const headerCells = [
     { label: 'Age', field: 'info.startTime' },
@@ -70,26 +69,12 @@ const OpenGames = ({ room, onActivateGame }: OpenGamesProps) => {
     { label: 'Spectators', field: 'info.spectatorsCount' },
   ];
 
-  const handleSort = (sortByField) => {
-    const { field, order } = SortUtil.toggleSortBy(sortByField, sortBy);
-    RoomsDispatch.sortGames(roomId, field, order);
-  };
-
-  const handleSelect = (gameId: number) => {
-    RoomsDispatch.selectGame(roomId, gameId);
-  };
-
-  const handleActivate = (gameId: number) => {
-    RoomsDispatch.selectGame(roomId, gameId);
-    onActivateGame?.(gameId);
-  };
-
   return (
     <div className="games">
       <Table size="small">
         <TableHead>
           <TableRow>
-            { headerCells.map(({ label, field }) => {
+            {headerCells.map(({ label, field }) => {
               const active = field === sortBy.field;
               const order = sortBy.order.toLowerCase();
               const sortDirection = active ? (order === 'asc' ? 'asc' : 'desc') : false;
@@ -111,7 +96,7 @@ const OpenGames = ({ room, onActivateGame }: OpenGamesProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          { games.map((game: Enriched.Game) => {
+          {games.map((game: Enriched.Game) => {
             const { info, gameType } = game;
             const { description, gameId, creatorInfo, maxPlayers, playerCount, startTime } = info;
             const isSelected = gameId === selectedGameId;

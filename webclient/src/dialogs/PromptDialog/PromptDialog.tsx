@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -7,6 +6,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+
+import { usePromptDialog } from './usePromptDialog';
 
 import './PromptDialog.css';
 
@@ -48,27 +49,12 @@ function PromptDialog({
   onSubmit,
   onCancel,
 }: PromptDialogProps) {
-  const [value, setValue] = useState(initialValue);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      setValue(initialValue);
-      setError(null);
-    }
-  }, [isOpen, initialValue]);
-
-  const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
-    e?.preventDefault();
-    if (validate) {
-      const message = validate(value);
-      if (message) {
-        setError(message);
-        return;
-      }
-    }
-    onSubmit(value);
-  };
+  const { value, error, handleChange, handleSubmit } = usePromptDialog({
+    isOpen,
+    initialValue,
+    validate,
+    onSubmit,
+  });
 
   return (
     <StyledDialog
@@ -91,12 +77,7 @@ function PromptDialog({
             size="small"
             label={label}
             value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
-              if (error) {
-                setError(null);
-              }
-            }}
+            onChange={(e) => handleChange(e.target.value)}
             error={error != null}
             helperText={error ?? helperText ?? ''}
             slotProps={{ htmlInput: { 'aria-label': label } }}

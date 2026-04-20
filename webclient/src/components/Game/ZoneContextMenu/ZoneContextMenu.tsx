@@ -3,9 +3,9 @@ import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 import Check from '@mui/icons-material/Check';
 
-import { useWebClient } from '@app/hooks';
-import { GameSelectors, useAppSelector } from '@app/store';
 import { App } from '@app/types';
+
+import { useZoneContextMenu } from './useZoneContextMenu';
 
 import './ZoneContextMenu.css';
 
@@ -22,89 +22,52 @@ export interface ZoneContextMenuProps {
   onRequestRevealZone: () => void;
 }
 
-function ZoneContextMenu({
-  isOpen,
-  anchorPosition,
-  gameId,
-  playerId,
-  zoneName,
-  onClose,
-  onRequestDrawN,
-  onRequestDumpN,
-  onRequestRevealTopN,
-  onRequestRevealZone,
-}: ZoneContextMenuProps) {
-  const webClient = useWebClient();
+function ZoneContextMenu(props: ZoneContextMenuProps) {
+  const {
+    isOpen,
+    anchorPosition,
+    zoneName,
+    onClose,
+    onRequestDrawN,
+    onRequestDumpN,
+    onRequestRevealTopN,
+    onRequestRevealZone,
+  } = props;
+  const {
+    ready,
+    alwaysReveal,
+    alwaysLook,
+    handleDrawOne,
+    handleShuffle,
+    handleRevealTop,
+    handleToggleAlwaysReveal,
+    handleToggleAlwaysLook,
+    runAndClose,
+  } = useZoneContextMenu(props);
 
-  const zone = useAppSelector((state) =>
-    playerId != null && zoneName != null
-      ? GameSelectors.getZone(state, gameId, playerId, zoneName)
-      : undefined,
-  );
-
-  if (playerId == null || zoneName == null) {
+  if (!ready) {
     return null;
   }
-
-  const game = webClient.request.game;
-  const alwaysReveal = zone?.alwaysRevealTopCard ?? false;
-  const alwaysLook = zone?.alwaysLookAtTopCard ?? false;
-
-  // Close-then-act helpers (avoid duplicating onClose at every site).
-  const run = (fn: () => void) => () => {
-    fn();
-    onClose();
-  };
-
-  const handleDrawOne = () => {
-    game.drawCards(gameId, { number: 1 });
-  };
-
-  const handleShuffle = () => {
-    game.shuffle(gameId, { zoneName: App.ZoneName.DECK, start: 0, end: -1 });
-  };
-
-  const handleRevealTop = () => {
-    game.revealCards(gameId, {
-      zoneName: App.ZoneName.DECK,
-      playerId: -1,
-      topCards: 1,
-    });
-  };
-
-  const handleToggleAlwaysReveal = () => {
-    game.changeZoneProperties(gameId, {
-      zoneName: App.ZoneName.DECK,
-      alwaysRevealTopCard: !alwaysReveal,
-    });
-  };
-
-  const handleToggleAlwaysLook = () => {
-    game.changeZoneProperties(gameId, {
-      zoneName: App.ZoneName.DECK,
-      alwaysLookAtTopCard: !alwaysLook,
-    });
-  };
 
   const menuItems: React.ReactNode[] = [];
 
   if (zoneName === App.ZoneName.DECK) {
     menuItems.push(
-      <MenuItem key="draw-one" onClick={run(handleDrawOne)}>Draw a card</MenuItem>,
-      <MenuItem key="draw-n" onClick={run(onRequestDrawN)}>Draw N cards…</MenuItem>,
-      <MenuItem key="shuffle" onClick={run(handleShuffle)}>Shuffle</MenuItem>,
-      <MenuItem key="dump-n" onClick={run(onRequestDumpN)}>Dump top N…</MenuItem>,
+      <MenuItem key="draw-one" onClick={runAndClose(handleDrawOne)}>Draw a card</MenuItem>,
+      <MenuItem key="draw-n" onClick={runAndClose(onRequestDrawN)}>Draw N cards…</MenuItem>,
+      <MenuItem key="shuffle" onClick={runAndClose(handleShuffle)}>Shuffle</MenuItem>,
+      <MenuItem key="dump-n" onClick={runAndClose(onRequestDumpN)}>Dump top N…</MenuItem>,
       <Divider key="d1" />,
-      <MenuItem key="reveal-top" onClick={run(handleRevealTop)}>
+      <MenuItem key="reveal-top" onClick={runAndClose(handleRevealTop)}>
         Reveal top card to all
       </MenuItem>,
-      <MenuItem key="reveal-top-n" onClick={run(onRequestRevealTopN)}>
+      <MenuItem key="reveal-top-n" onClick={runAndClose(onRequestRevealTopN)}>
         Reveal top N to…
       </MenuItem>,
       <Divider key="d2" />,
       <MenuItem
         key="always-reveal"
-        onClick={run(handleToggleAlwaysReveal)}
+        onClick={runAndClose(handleToggleAlwaysReveal)}
         className="zone-context-menu__toggle"
       >
         <span className="zone-context-menu__check" aria-hidden>
@@ -114,7 +77,7 @@ function ZoneContextMenu({
       </MenuItem>,
       <MenuItem
         key="always-look"
-        onClick={run(handleToggleAlwaysLook)}
+        onClick={runAndClose(handleToggleAlwaysLook)}
         className="zone-context-menu__toggle"
       >
         <span className="zone-context-menu__check" aria-hidden>
@@ -125,13 +88,13 @@ function ZoneContextMenu({
     );
   } else if (zoneName === App.ZoneName.GRAVE) {
     menuItems.push(
-      <MenuItem key="reveal-grave" onClick={run(onRequestRevealZone)}>
+      <MenuItem key="reveal-grave" onClick={runAndClose(onRequestRevealZone)}>
         Reveal graveyard to…
       </MenuItem>,
     );
   } else if (zoneName === App.ZoneName.EXILE) {
     menuItems.push(
-      <MenuItem key="reveal-exile" onClick={run(onRequestRevealZone)}>
+      <MenuItem key="reveal-exile" onClick={runAndClose(onRequestRevealZone)}>
         Reveal exile to…
       </MenuItem>,
     );

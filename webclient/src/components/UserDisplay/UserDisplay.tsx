@@ -1,53 +1,32 @@
-
-import React, { useState } from 'react';
 import { NavLink, generatePath } from 'react-router-dom';
 
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 import { Images } from '@app/images';
-import { useWebClient } from '@app/hooks';
-import { ServerSelectors } from '@app/store';
 import { App, Data } from '@app/types';
-import { useAppSelector } from '@app/store';
+
+import { useUserDisplay } from './useUserDisplay';
 
 import './UserDisplay.css';
 
+interface UserDisplayProps {
+  user: Data.ServerInfo_User;
+}
 
 const UserDisplay = ({ user }: UserDisplayProps) => {
-  const buddyList = useAppSelector(state => ServerSelectors.getBuddyList(state));
-  const ignoreList = useAppSelector(state => ServerSelectors.getIgnoreList(state));
-  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
-  const webClient = useWebClient();
-
   const { name, country } = user;
-
-  const handleClick = (event) => {
-    event.preventDefault();
-    setPosition({ x: event.clientX + 2, y: event.clientY + 4 });
-  };
-
-  const handleClose = () => setPosition(null);
-
-  const isABuddy = Boolean(buddyList[user.name]);
-  const isIgnored = Boolean(ignoreList[user.name]);
-
-  const onAddBuddy = () => {
-    webClient.request.session.addToBuddyList(user.name);
-    handleClose();
-  };
-  const onRemoveBuddy = () => {
-    webClient.request.session.removeFromBuddyList(user.name);
-    handleClose();
-  };
-  const onAddIgnore = () => {
-    webClient.request.session.addToIgnoreList(user.name);
-    handleClose();
-  };
-  const onRemoveIgnore = () => {
-    webClient.request.session.removeFromIgnoreList(user.name);
-    handleClose();
-  };
+  const {
+    position,
+    isABuddy,
+    isIgnored,
+    handleClick,
+    handleClose,
+    onAddBuddy,
+    onRemoveBuddy,
+    onAddIgnore,
+    onRemoveIgnore,
+  } = useUserDisplay(name);
 
   return (
     <div className="user-display">
@@ -86,9 +65,5 @@ const UserDisplay = ({ user }: UserDisplayProps) => {
     </div>
   );
 };
-
-interface UserDisplayProps {
-  user: Data.ServerInfo_User;
-}
 
 export default UserDisplay;

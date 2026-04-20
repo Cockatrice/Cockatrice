@@ -1,6 +1,3 @@
-// eslint-disable-next-line
-import React from "react";
-
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -9,11 +6,9 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Tooltip from '@mui/material/Tooltip';
 
-// import { RoomsService } from "AppShell/common/services";
-
-import { SortUtil, RoomsDispatch, RoomsSelectors } from '@app/store';
 import { UserDisplay } from '@app/components';
-import { useAppSelector } from '@app/store';
+
+import { useGames } from './useGames';
 
 import './Games.css';
 
@@ -24,8 +19,7 @@ interface GamesProps {
 
 const Games = ({ room }: GamesProps) => {
   const roomId = room.info.roomId;
-  const sortBy = useAppSelector(state => RoomsSelectors.getSortGamesBy(state));
-  const sortedGames = useAppSelector(state => RoomsSelectors.getSortedRoomGames(state, roomId));
+  const { sortBy, games, handleSort } = useGames(roomId);
 
   const headerCells = [
     { label: 'Age', field: 'info.startTime' },
@@ -37,30 +31,12 @@ const Games = ({ room }: GamesProps) => {
     { label: 'Spectators', field: 'info.spectatorsCount' },
   ];
 
-  const handleSort = (sortByField) => {
-    const { field, order } = SortUtil.toggleSortBy(sortByField, sortBy);
-    RoomsDispatch.sortGames(roomId, field, order);
-  };
-
-  const isUnavailableGame = ({ started, maxPlayers, playerCount }) =>
-    !started && playerCount < maxPlayers;
-
-  const isPasswordProtectedGame = ({ withPassword }) => !withPassword;
-
-  const isBuddiesOnlyGame = ({ onlyBuddies }) => !onlyBuddies;
-
-  const games = sortedGames.filter(game => (
-    isUnavailableGame(game.info) &&
-    isPasswordProtectedGame(game.info) &&
-    isBuddiesOnlyGame(game.info)
-  ));
-
   return (
     <div className="games">
       <Table size="small">
         <TableHead>
           <TableRow>
-            { headerCells.map(({ label, field }) => {
+            {headerCells.map(({ label, field }) => {
               const active = field === sortBy.field;
               const order = sortBy.order.toLowerCase();
               const sortDirection = active ? (order === 'asc' ? 'asc' : 'desc') : false;
@@ -82,7 +58,7 @@ const Games = ({ room }: GamesProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          { games.map((game) => {
+          {games.map((game) => {
             const { info, gameType } = game;
             const { description, gameId, creatorInfo, maxPlayers, playerCount, spectatorsCount, startTime } = info;
             return (
@@ -96,7 +72,7 @@ const Games = ({ room }: GamesProps) => {
                   </Tooltip>
                 </TableCell>
                 <TableCell className="games-header__cell">
-                  <UserDisplay user={ creatorInfo } />
+                  <UserDisplay user={creatorInfo} />
                 </TableCell>
                 <TableCell className="games-header__cell single-line-ellipsis">{gameType}</TableCell>
                 <TableCell className="games-header__cell single-line-ellipsis">?</TableCell>

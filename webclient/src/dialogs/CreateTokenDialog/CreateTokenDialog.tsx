@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -13,6 +12,13 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+
+import {
+  MAX_ANNOTATION_LEN,
+  MAX_NAME_LEN,
+  MAX_PT_LEN,
+  useCreateTokenDialog,
+} from './useCreateTokenDialog';
 
 import './CreateTokenDialog.css';
 
@@ -58,51 +64,23 @@ const COLOR_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
   { value: '', label: 'Colorless' },
 ];
 
-const DEFAULT_COLOR = 'w';
-
-// Desktop server-side MAX_NAME_LENGTH is 0xff (255). Client-side caps on
-// the other free-text fields mirror that to prevent oversize-payload
-// round-trips that the server would reject anyway.
-const MAX_NAME_LEN = 255;
-const MAX_PT_LEN = 255;
-const MAX_ANNOTATION_LEN = 255;
-
 function CreateTokenDialog({ isOpen, onSubmit, onCancel }: CreateTokenDialogProps) {
-  const [name, setName] = useState('');
-  const [color, setColor] = useState(DEFAULT_COLOR);
-  const [pt, setPT] = useState('');
-  const [annotation, setAnnotation] = useState('');
-  const [destroyOnZoneChange, setDestroyOnZoneChange] = useState(true);
-  const [faceDown, setFaceDown] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      setName('');
-      setColor(DEFAULT_COLOR);
-      setPT('');
-      setAnnotation('');
-      setDestroyOnZoneChange(true);
-      setFaceDown(false);
-      setError(null);
-    }
-  }, [isOpen]);
-
-  const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
-    e?.preventDefault();
-    if (name.trim().length === 0) {
-      setError('Name is required');
-      return;
-    }
-    onSubmit({
-      name: name.trim(),
-      color,
-      pt: pt.trim(),
-      annotation: annotation.trim(),
-      destroyOnZoneChange,
-      faceDown,
-    });
-  };
+  const {
+    name,
+    color,
+    pt,
+    annotation,
+    destroyOnZoneChange,
+    faceDown,
+    error,
+    handleNameChange,
+    setColor,
+    setPT,
+    setAnnotation,
+    setDestroyOnZoneChange,
+    setFaceDown,
+    handleSubmit,
+  } = useCreateTokenDialog({ isOpen, onSubmit });
 
   return (
     <StyledDialog
@@ -125,12 +103,7 @@ function CreateTokenDialog({ isOpen, onSubmit, onCancel }: CreateTokenDialogProp
             size="small"
             label="Token name"
             value={name}
-            onChange={(e) => {
-              setName(e.target.value.slice(0, MAX_NAME_LEN));
-              if (error) {
-                setError(null);
-              }
-            }}
+            onChange={(e) => handleNameChange(e.target.value)}
             error={error != null}
             helperText={error ?? ''}
             slotProps={{ htmlInput: { 'aria-label': 'Token name', maxLength: MAX_NAME_LEN } }}

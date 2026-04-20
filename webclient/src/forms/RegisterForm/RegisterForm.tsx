@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
 import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import setFieldTouched from 'final-form-set-field-touched';
@@ -9,45 +8,25 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import { CountryDropdown, InputField, KnownHosts } from '@app/components';
-import { useReduxEffect } from '@app/hooks';
-import { ServerDispatch, ServerSelectors, ServerTypes } from '@app/store';
+import { ServerDispatch } from '@app/store';
+
+import { useRegisterForm } from './useRegisterForm';
 
 import './RegisterForm.css';
-import { useToast } from '@app/components';
 
 const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   const { t } = useTranslation();
-  const [emailRequired, setEmailRequired] = useState(false);
-  const [emailError, setEmailError] = useState(null);
-  const [passwordError, setPasswordError] = useState(null);
-  const [userNameError, setUserNameError] = useState(null);
-  const error = useSelector(ServerSelectors.getRegistrationError);
-  const { openToast } = useToast({ key: 'registration-success', children: t('RegisterForm.toast.registerSuccess') })
-
-  const onHostChange = () => setEmailRequired(false);
-  const onEmailChange = () => emailError && setEmailError(null);
-  const onPasswordChange = () => passwordError && setPasswordError(null);
-  const onUserNameChange = () => userNameError && setUserNameError(null);
-
-  useReduxEffect(() => {
-    setEmailRequired(true);
-  }, ServerTypes.REGISTRATION_REQUIRES_EMAIL);
-
-  useReduxEffect(() => {
-    openToast()
-  }, ServerTypes.REGISTRATION_SUCCESS);
-
-  useReduxEffect(({ payload: { error } }) => {
-    setEmailError(error);
-  }, ServerTypes.REGISTRATION_EMAIL_ERROR);
-
-  useReduxEffect(({ payload: { error } }) => {
-    setPasswordError(error);
-  }, ServerTypes.REGISTRATION_PASSWORD_ERROR);
-
-  useReduxEffect(({ payload: { error } }) => {
-    setUserNameError(error);
-  }, ServerTypes.REGISTRATION_USERNAME_ERROR);
+  const {
+    emailRequired,
+    emailError,
+    passwordError,
+    userNameError,
+    error,
+    onHostChange,
+    onEmailChange,
+    onPasswordChange,
+    onUserNameChange,
+  } = useRegisterForm();
 
   const handleOnSubmit = ({ userName, email, realName, ...values }) => {
     ServerDispatch.clearRegistrationErrors();
@@ -57,7 +36,7 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
     realName = realName?.trim();
 
     onSubmit({ userName, email, realName, ...values });
-  }
+  };
 
   const validate = values => {
     const errors: any = {};
@@ -93,7 +72,7 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
     }
 
     return errors;
-  }
+  };
 
   return (
     <Form onSubmit={handleOnSubmit} validate={validate} mutators={{ setFieldTouched }}>
@@ -149,12 +128,12 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
                   <Field label={t('Common.label.country')} name="country" component={CountryDropdown} />
                 </div>
                 <Button className="RegisterForm-submit tall" color="primary" variant="contained" type="submit">
-                  { t('RegisterForm.label.register') }
+                  {t('RegisterForm.label.register')}
                 </Button>
               </div>
             </form>
 
-            { error && (
+            {error && (
               <div className="RegisterForm-item">
                 <Typography color="error">{error}</Typography>
               </div>

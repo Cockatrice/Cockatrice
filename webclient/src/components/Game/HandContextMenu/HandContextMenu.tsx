@@ -2,7 +2,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 
-import { useWebClient } from '@app/hooks';
+import { useHandContextMenu } from './useHandContextMenu';
 
 import './HandContextMenu.css';
 
@@ -27,51 +27,15 @@ function HandContextMenu({
   onRequestRevealHand,
   onRequestRevealRandom,
 }: HandContextMenuProps) {
-  const webClient = useWebClient();
-
-  const handleChoose = () => {
-    if (gameId <= 0) {
-      return;
-    }
-    onRequestChooseMulligan();
-    onClose();
-  };
-
-  const handleSameSize = () => {
-    if (gameId <= 0) {
-      return;
-    }
-    webClient.request.game.mulligan(gameId, { number: handSize });
-    onClose();
-  };
-
-  const handleMinusOne = () => {
-    if (gameId <= 0) {
-      return;
-    }
-    // Desktop's actMulliganMinusOne floors at 1 (see
-    // cockatrice/src/game/player/player_actions.cpp actMulliganMinusOne);
-    // the server-side doMulligan rejects number < 1.
-    const next = Math.max(1, handSize - 1);
-    webClient.request.game.mulligan(gameId, { number: next });
-    onClose();
-  };
-
-  const handleRevealHand = () => {
-    if (gameId <= 0) {
-      return;
-    }
-    onRequestRevealHand();
-    onClose();
-  };
-
-  const handleRevealRandom = () => {
-    if (gameId <= 0) {
-      return;
-    }
-    onRequestRevealRandom();
-    onClose();
-  };
+  const { handleChoose, handleSameSize, handleMinusOne, handleRevealHand, handleRevealRandom } =
+    useHandContextMenu({
+      gameId,
+      handSize,
+      onClose,
+      onRequestChooseMulligan,
+      onRequestRevealHand,
+      onRequestRevealRandom,
+    });
 
   return (
     <Menu

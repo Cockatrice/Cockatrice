@@ -1,11 +1,10 @@
-
-import React, { useEffect, useState } from 'react';
-
 import { NavLink, generatePath } from 'react-router-dom';
+import type { ReactNode } from 'react';
 
 import { App } from '@app/types';
 
 import CardCallout from './CardCallout';
+import { useParsedMessage } from './useMessage';
 import './Message.css';
 
 const Message = ({ message: { message } }) => (
@@ -17,23 +16,12 @@ const Message = ({ message: { message } }) => (
 );
 
 const ParsedMessage = ({ message }) => {
-  const [messageChunks, setMessageChunks] = useState(null);
-  const [name, setName] = useState(null);
-
-  useEffect(() => {
-    const name = message.match(App.MESSAGE_SENDER_REGEX);
-
-    if (name) {
-      setName(name[1]);
-    }
-
-    setMessageChunks(parseMessage(message));
-  }, [message]);
+  const { name, chunks } = useParsedMessage(message, parseChunks);
 
   return (
     <div>
-      { name && (<strong><PlayerLink name={name} />:</strong>) }
-      { messageChunks }
+      {name && (<strong><PlayerLink name={name} />:</strong>)}
+      {chunks}
     </div>
   );
 };
@@ -44,14 +32,7 @@ const PlayerLink = ({ name, label = name }) => (
   </NavLink>
 );
 
-function parseMessage(message) {
-  return message.replace(App.MESSAGE_SENDER_REGEX, '')
-    .split(App.CARD_CALLOUT_REGEX)
-    .filter(chunk => !!chunk)
-    .map(parseChunks);
-}
-
-function parseChunks(chunk, index) {
+function parseChunks(chunk: string, index: number): ReactNode {
   if (chunk.match(App.CARD_CALLOUT_REGEX)) {
     const name = chunk.replace(App.CALLOUT_BOUNDARY_REGEX, '').trim();
     return (<CardCallout name={name} key={index}></CardCallout>);
@@ -68,9 +49,9 @@ function parseChunks(chunk, index) {
   return chunk;
 }
 
-function parseUrlChunk(chunk) {
+function parseUrlChunk(chunk: string): ReactNode {
   return chunk.split(App.URL_REGEX)
-    .filter(urlChunk => !!urlChunk)
+    .filter((urlChunk) => !!urlChunk)
     .map((urlChunk, index) => {
       if (urlChunk.match(App.URL_REGEX)) {
         return (<a className='link' href={urlChunk} key={index} target='_blank' rel='noopener noreferrer'>{urlChunk}</a>);
@@ -80,9 +61,9 @@ function parseUrlChunk(chunk) {
     });
 }
 
-function parseMentionChunk(chunk) {
+function parseMentionChunk(chunk: string): ReactNode {
   return chunk.split(App.MENTION_REGEX)
-    .filter(mentionChunk => !!mentionChunk)
+    .filter((mentionChunk) => !!mentionChunk)
     .map((mentionChunk, index) => {
       const mention = mentionChunk.match(App.MENTION_REGEX);
 

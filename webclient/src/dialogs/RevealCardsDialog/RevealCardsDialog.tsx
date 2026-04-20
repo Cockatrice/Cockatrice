@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -11,6 +10,8 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+
+import { useRevealCardsDialog } from './useRevealCardsDialog';
 
 import './RevealCardsDialog.css';
 
@@ -59,31 +60,14 @@ function RevealCardsDialog({
   onSubmit,
   onCancel,
 }: RevealCardsDialogProps) {
-  const [targetPlayerId, setTargetPlayerId] = useState<number>(ALL_PLAYERS);
-  const [countDraft, setCountDraft] = useState(String(defaultCount));
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      setTargetPlayerId(ALL_PLAYERS);
-      setCountDraft(String(defaultCount));
-      setError(null);
-    }
-  }, [isOpen, defaultCount]);
-
-  const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
-    e?.preventDefault();
-    let topCards = -1;
-    if (showCountInput) {
-      const n = Number(countDraft);
-      if (!Number.isInteger(n) || n < 1) {
-        setError('Enter a positive integer');
-        return;
-      }
-      topCards = n;
-    }
-    onSubmit({ targetPlayerId, topCards });
-  };
+  const {
+    targetPlayerId,
+    countDraft,
+    error,
+    setTargetPlayerId,
+    handleCountChange,
+    handleSubmit,
+  } = useRevealCardsDialog({ isOpen, showCountInput, defaultCount, onSubmit });
 
   return (
     <StyledDialog
@@ -128,12 +112,7 @@ function RevealCardsDialog({
               type="number"
               label="How many?"
               value={countDraft}
-              onChange={(e) => {
-                setCountDraft(e.target.value);
-                if (error) {
-                  setError(null);
-                }
-              }}
+              onChange={(e) => handleCountChange(e.target.value)}
               onFocus={(e) => e.currentTarget.select()}
               error={error != null}
               helperText={error ?? 'Enter a positive integer'}

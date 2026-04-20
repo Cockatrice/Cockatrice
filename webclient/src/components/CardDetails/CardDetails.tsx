@@ -1,6 +1,3 @@
-// eslint-disable-next-line
-import React, { useMemo, useState } from 'react';
-
 import { CardDTO } from '@app/services';
 
 import Card from '../Card/Card';

@@ -1,5 +1,3 @@
-
-import React, { useEffect, useState } from 'react';
 import { Form, Field } from 'react-final-form';
 
 import Button from '@mui/material/Button';
@@ -9,75 +7,25 @@ import StepLabel from '@mui/material/StepLabel';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { InputField, VirtualList } from '@app/components';
-import { cardImporterService, CardDTO, SetDTO, TokenDTO } from '@app/services';
+
+import { useCardImportForm } from './useCardImportForm';
 
 import './CardImportForm.css';
 
 const CardImportForm = ({ onSubmit: onClose }) => {
-
-  const [loading, setLoading] = useState(false);
-  const [activeStep, setActiveStep] = useState(0);
-  const [importedCards, setImportedCards] = useState([]);
-  const [importedSets, setImportedSets] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (loading) {
-      setError(null);
-    }
-  }, [loading])
+  const {
+    loading,
+    activeStep,
+    importedCards,
+    importedSets,
+    error,
+    handleBack,
+    handleCardDownload,
+    handleCardSave,
+    handleTokenDownload,
+  } = useCardImportForm();
 
   const steps = ['Imports sets', 'Save sets', 'Import tokens', 'Finished'];
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleCardDownload = ({ cardDownloadUrl }) => {
-    setLoading(true);
-
-    cardImporterService.importCards(cardDownloadUrl)
-      .then(({ cards, sets }) => {
-        setImportedCards(cards);
-        setImportedSets(sets);
-
-        handleNext();
-      })
-      .catch(({ message }) => setError(message))
-      .finally(() => setLoading(false));
-  };
-
-  const handleCardSave = async () => {
-    setLoading(true);
-
-    try {
-      await CardDTO.bulkAdd(importedCards);
-      await SetDTO.bulkAdd(importedSets);
-
-      handleNext();
-    } catch (e) {
-      console.error(e);
-      setError('Failed to save cards');
-    }
-
-    setLoading(false);
-  };
-
-  const handleTokenDownload = ({ tokenDownloadUrl }) => {
-    setLoading(true);
-
-    cardImporterService.importTokens(tokenDownloadUrl)
-      .then(async tokens => {
-        await TokenDTO.bulkAdd(tokens);
-        handleNext();
-      })
-      .catch(({ message }) => setError(message))
-      .finally(() => setLoading(false));
-  };
 
   const getStepContent = (stepIndex) => {
     switch (stepIndex) {
@@ -175,14 +123,14 @@ const CardImportForm = ({ onSubmit: onClose }) => {
       </Stepper>
 
       <div>
-        { getStepContent(activeStep) }
+        {getStepContent(activeStep)}
       </div>
 
-      { loading && (
+      {loading && (
         <div className='loading'>
           <CircularProgress size={60} />
         </div>
-      ) }
+      )}
     </div>
   );
 };

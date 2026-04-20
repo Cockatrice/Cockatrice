@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { create } from '@bufbuild/protobuf';
 import {
   renderWithProviders,
@@ -241,12 +241,12 @@ describe('GameSelector', () => {
     });
 
     mockNavigate.mockClear();
-    store.dispatch({
-      type: GameTypes.GAME_JOINED,
-      payload: { data: { gameInfo: { gameId: 42 }, hostId: 0, playerId: 0, spectator: false } },
+    await act(async () => {
+      store.dispatch({
+        type: GameTypes.GAME_JOINED,
+        payload: { data: { gameInfo: { gameId: 42 }, hostId: 0, playerId: 0, spectator: false } },
+      });
     });
-
-    await Promise.resolve();
     expect(mockNavigate).toHaveBeenCalledWith(App.RouteEnum.GAME);
   });
 

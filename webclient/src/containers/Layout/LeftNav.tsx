@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate, generatePath } from 'react-router-dom';
+import { NavLink, generatePath } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -9,75 +8,25 @@ import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 
 import { CardImportDialog } from '@app/dialogs';
-import { useWebClient } from '@app/hooks';
 import { Images } from '@app/images';
-import { RoomsSelectors, ServerSelectors } from '@app/store';
 import { App } from '@app/types';
-import { useAppSelector } from '@app/store';
+
+import { useLeftNav } from './useLeftNav';
 
 import './LeftNav.css';
 
-interface LeftNavState {
-  anchorEl: Element;
-  showCardImportDialog: boolean;
-  options: string[];
-}
-
 const LeftNav = () => {
-  const joinedRooms = useAppSelector(state => RoomsSelectors.getJoinedRooms(state));
-  const isConnected = useAppSelector(ServerSelectors.getIsConnected);
-  const isModerator = useAppSelector(ServerSelectors.getIsUserModerator);
-  const navigate = useNavigate();
-  const webClient = useWebClient();
-  const [state, setState] = useState<LeftNavState>({
-    anchorEl: null,
-    showCardImportDialog: false,
-    options: [],
-  });
-
-  useEffect(() => {
-    let options: string[] = [
-      'Account',
-      'Replays',
-    ];
-
-    if (isModerator) {
-      options = [
-        ...options,
-        'Administration',
-        'Logs'
-      ];
-    }
-
-    setState(s => ({ ...s, options }));
-  }, [isModerator]);
-
-  const handleMenuOpen = (event) => {
-    setState(s => ({ ...s, anchorEl: event.target }));
-  }
-
-  const handleMenuItemClick = (option: string) => {
-    const route = App.RouteEnum[option.toUpperCase()];
-    navigate(generatePath(route));
-  }
-
-  const handleMenuClose = () => {
-    setState(s => ({ ...s, anchorEl: null }));
-  }
-
-  const leaveRoom = (event, roomId) => {
-    event.preventDefault();
-    webClient.request.rooms.leaveRoom(roomId);
-  };
-
-  const openImportCardWizard = () => {
-    setState(s => ({ ...s, showCardImportDialog: true }));
-    handleMenuClose();
-  }
-
-  const closeImportCardWizard = () => {
-    setState(s => ({ ...s, showCardImportDialog: false }));
-  }
+  const {
+    joinedRooms,
+    isConnected,
+    state,
+    handleMenuOpen,
+    handleMenuItemClick,
+    handleMenuClose,
+    leaveRoom,
+    openImportCardWizard,
+    closeImportCardWizard,
+  } = useLeftNav();
 
   return (
     <div className="LeftNav__container">
@@ -86,11 +35,11 @@ const LeftNav = () => {
           <NavLink to={App.RouteEnum.SERVER}>
             <img src={Images.Logo} alt="logo" />
           </NavLink>
-          { isConnected && (
+          {isConnected && (
             <span className="LeftNav-server__indicator"></span>
-          ) }
+          )}
         </div>
-        { isConnected && (
+        {isConnected && (
           <div className="LeftNav-content">
             <nav className="LeftNav-nav">
               <nav className="LeftNav-nav__links">
@@ -110,7 +59,7 @@ const LeftNav = () => {
                     {joinedRooms.map((room) => (
                       <div className="LeftNav-nav__link-menu__item" key={room.info.roomId}>
                         <NavLink className="LeftNav-nav__link-menu__btn"
-                          to={ generatePath(App.RouteEnum.ROOM, { roomId: room.info.roomId.toString() }) }
+                          to={generatePath(App.RouteEnum.ROOM, { roomId: room.info.roomId.toString() })}
                         >
                           {room.info.name}
 
@@ -123,13 +72,13 @@ const LeftNav = () => {
                   </div>
                 </div>
                 <div className="LeftNav-nav__link">
-                  <NavLink className="LeftNav-nav__link-btn" to={ App.RouteEnum.GAME }>
+                  <NavLink className="LeftNav-nav__link-btn" to={App.RouteEnum.GAME}>
                     Games
                     <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>
                 </div>
                 <div className="LeftNav-nav__link">
-                  <NavLink className="LeftNav-nav__link-btn" to={ App.RouteEnum.DECKS }>
+                  <NavLink className="LeftNav-nav__link-btn" to={App.RouteEnum.DECKS}>
                     Decks
                     <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>
@@ -173,7 +122,7 @@ const LeftNav = () => {
               </div>
             </nav>
           </div>
-        ) }
+        )}
       </div>
 
       <CardImportDialog
@@ -182,6 +131,6 @@ const LeftNav = () => {
       ></CardImportDialog>
     </div>
   );
-}
+};
 
 export default LeftNav;

@@ -1,24 +1,18 @@
-// eslint-disable-next-line
-import React, { useEffect, useState } from 'react';
-import { Form, Field } from 'react-final-form'
+import { Form, Field } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import { InputField, KnownHosts } from '@app/components';
-import { useReduxEffect } from '@app/hooks';
-import { ServerTypes } from '@app/store';
+
+import { useResetPasswordForm } from './useResetPasswordForm';
 
 import './ResetPasswordForm.css';
 
 const ResetPasswordForm = ({ onSubmit, userName }) => {
-  const [errorMessage, setErrorMessage] = useState(false);
   const { t } = useTranslation();
-
-  useReduxEffect(() => {
-    setErrorMessage(true);
-  }, ServerTypes.RESET_PASSWORD_FAILED, []);
+  const { errorMessage } = useResetPasswordForm();
 
   const validate = values => {
     const errors: any = {};
@@ -53,7 +47,7 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
     token = token?.trim();
 
     onSubmit({ userName, token, ...values });
-  }
+  };
 
   return (
     <Form onSubmit={handleOnSubmit} validate={validate} initialValues={{ userName }}>
@@ -96,12 +90,12 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
 
             {errorMessage && (
               <div className='ResetPasswordForm-item'>
-                <Typography color="error">{ t('ResetPasswordForm.error') }</Typography>
+                <Typography color="error">{t('ResetPasswordForm.error')}</Typography>
               </div>
             )}
           </div>
           <Button className='ResetPasswordForm-submit rounded tall' color='primary' variant='contained' type='submit'>
-            { t('ResetPasswordForm.label.reset') }
+            {t('ResetPasswordForm.label.reset')}
           </Button>
         </form>
       )}

@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -10,6 +9,8 @@ import TextField from '@mui/material/TextField';
 
 import { App } from '@app/types';
 import { cx } from '@app/utils';
+
+import { useCreateCounterDialog } from './useCreateCounterDialog';
 
 import './CreateCounterDialog.css';
 
@@ -58,26 +59,8 @@ const SWATCHES: ReadonlyArray<Swatch> = [
 ];
 
 function CreateCounterDialog({ isOpen, onSubmit, onCancel }: CreateCounterDialogProps) {
-  const [name, setName] = useState('');
-  const [selectedIdx, setSelectedIdx] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      setName('');
-      setSelectedIdx(0);
-      setError(null);
-    }
-  }, [isOpen]);
-
-  const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
-    e?.preventDefault();
-    if (name.trim().length === 0) {
-      setError('Name is required');
-      return;
-    }
-    onSubmit({ name: name.trim(), color: SWATCHES[selectedIdx].color });
-  };
+  const { name, selectedIdx, error, handleNameChange, setSelectedIdx, handleSubmit } =
+    useCreateCounterDialog({ isOpen, swatches: SWATCHES, onSubmit });
 
   return (
     <StyledDialog
@@ -100,12 +83,7 @@ function CreateCounterDialog({ isOpen, onSubmit, onCancel }: CreateCounterDialog
             size="small"
             label="Counter name"
             value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              if (error) {
-                setError(null);
-              }
-            }}
+            onChange={(e) => handleNameChange(e.target.value)}
             error={error != null}
             helperText={error ?? ''}
             slotProps={{ htmlInput: { 'aria-label': 'Counter name' } }}

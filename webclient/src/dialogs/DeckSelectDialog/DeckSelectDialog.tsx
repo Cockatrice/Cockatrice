@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -6,8 +5,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
-import { useWebClient } from '@app/hooks';
-import { GameSelectors, useAppSelector } from '@app/store';
+import { useDeckSelectDialog } from './useDeckSelectDialog';
 
 import './DeckSelectDialog.css';
 
@@ -40,34 +38,16 @@ export interface DeckSelectDialogProps {
 }
 
 function DeckSelectDialog({ isOpen, gameId, handleClose }: DeckSelectDialogProps) {
-  const webClient = useWebClient();
-  const localPlayer = useAppSelector((state) =>
-    gameId != null ? GameSelectors.getLocalPlayer(state, gameId) : undefined,
-  );
-  const [deckText, setDeckText] = useState('');
-
-  const deckHash = localPlayer?.properties.deckHash ?? '';
-  const isReady = localPlayer?.properties.readyStart ?? false;
-  const hasLocalPlayer = localPlayer != null;
-  // Guard Submit/Ready on having a local player — today the deckSelectOpen
-  // predicate in Game.tsx implies one, but the dialog mounts before the
-  // Event_GameJoined echo populates players during reconnect.
-  const canSubmit = hasLocalPlayer && deckText.trim().length > 0;
-  const canToggleReady = hasLocalPlayer && deckHash.length > 0;
-
-  const handleSubmitDeck = () => {
-    if (!canSubmit || gameId == null) {
-      return;
-    }
-    webClient.request.game.deckSelect(gameId, { deck: deckText.trim() });
-  };
-
-  const handleToggleReady = () => {
-    if (!canToggleReady || gameId == null) {
-      return;
-    }
-    webClient.request.game.readyStart(gameId, { ready: !isReady });
-  };
+  const {
+    deckText,
+    setDeckText,
+    deckHash,
+    isReady,
+    canSubmit,
+    canToggleReady,
+    handleSubmitDeck,
+    handleToggleReady,
+  } = useDeckSelectDialog(gameId);
 
   return (
     <StyledDialog

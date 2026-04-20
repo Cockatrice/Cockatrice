@@ -1,12 +1,10 @@
-
-import React, { useMemo, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Popover from '@mui/material/Popover';
 
-import { CardDTO, TokenDTO } from '@app/services';
-
 import CardDetails from '../CardDetails/CardDetails';
 import TokenDetails from '../TokenDetails/TokenDetails';
+
+import { useCardCallout } from './useCardCallout';
 
 import './CardCallout.css';
 
@@ -28,31 +26,8 @@ const Root = styled('span')(() => ({
 }));
 
 const CardCallout = ({ name }) => {
-  const [card, setCard] = useState<CardDTO>(null);
-  const [token, setToken] = useState<TokenDTO>(null);
-  const [anchorEl, setAnchorEl] = useState<Element>(null);
-
-  useMemo(async () => {
-    const card = await CardDTO.get(name);
-    if (card) {
-      return setCard(card)
-    }
-
-    const token = await TokenDTO.get(name);
-    if (token) {
-      return setToken(token);
-    }
-  }, [name]);
-
-  const handlePopoverOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
+  const { card, token, anchorEl, open, handlePopoverOpen, handlePopoverClose } =
+    useCardCallout(name);
 
   return (
     <Root className='callout'>
@@ -81,8 +56,8 @@ const CardCallout = ({ name }) => {
             }}
           >
             <div className="callout-card">
-              { card && (<CardDetails card={card} />) }
-              { token && (<TokenDetails token={token} />) }
+              {card && (<CardDetails card={card} />)}
+              {token && (<TokenDetails token={token} />)}
             </div>
           </Popover>
         )

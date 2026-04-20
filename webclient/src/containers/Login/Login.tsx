@@ -1,4 +1,3 @@
-import { useState, useCallback, useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router-dom';
@@ -9,28 +8,25 @@ import Typography from '@mui/material/Typography';
 import { RegistrationDialog, RequestPasswordResetDialog, ResetPasswordDialog, AccountActivationDialog } from '@app/dialogs';
 import { LanguageDropdown } from '@app/components';
 import { LoginForm } from '@app/forms';
-import { useAutoLogin, useFireOnce, useKnownHosts, useReduxEffect, useWebClient } from '@app/hooks';
 import { Images } from '@app/images';
-import { getHostPort, serverProps } from '@app/services';
+import { serverProps } from '@app/services';
 import { App } from '@app/types';
-import { WebsocketTypes } from '@app/websocket/types';
-import { ServerSelectors, ServerTypes } from '@app/store';
 import Layout from '../Layout/Layout';
-import { useAppSelector } from '@app/store';
+
+import { useLogin } from './useLogin';
 
 import './Login.css';
-import { useToast } from '@app/components';
 
 const PREFIX = 'Login';
 
 const classes = {
-  root: `${PREFIX}-root`
+  root: `${PREFIX}-root`,
 };
 
 const Root = styled('div')(({ theme }) => ({
   [`&.${classes.root}`]: {
     '& .login-content__header': {
-      color: theme.palette.success.light
+      color: theme.palette.success.light,
     },
 
     '& .login-content__description': {
@@ -61,188 +57,36 @@ const Root = styled('div')(({ theme }) => ({
         display: 'flex',
       },
     },
-  }
+  },
 }));
 
 const Login = () => {
-  const description = useAppSelector(s => ServerSelectors.getDescription(s));
-  const isConnected = useAppSelector(ServerSelectors.getIsConnected);
-  const connectionAttemptMade = useAppSelector(ServerSelectors.getConnectionAttemptMade);
-  const webClient = useWebClient();
   const { t } = useTranslation();
-
-  const [pendingActivationOptions, setPendingActivationOptions] = useState<WebsocketTypes.PendingActivationContext | null>(null);
-
-  const rememberLoginRef = useRef<any>(null);
-  const knownHosts = useKnownHosts();
-  const [dialogState, setDialogState] = useState({
-    passwordResetRequestDialog: false,
-    resetPasswordDialog: false,
-    registrationDialog: false,
-    activationDialog: false,
-  });
-  const [userToResetPassword, setUserToResetPassword] = useState(null);
-
-  const passwordResetToast = useToast({ key: 'password-reset-success', children: t('LoginContainer.toasts.passwordResetSuccess') });
-  const accountActivatedToast = useToast({
-    key: 'account-activation-success',
-    children: t('LoginContainer.toasts.accountActivationSuccess')
-  });
-
-  useReduxEffect(() => {
-    closeRequestPasswordResetDialog();
-    openResetPasswordDialog();
-  }, ServerTypes.RESET_PASSWORD_REQUESTED, []);
-
-  useReduxEffect(() => {
-    passwordResetToast.openToast()
-    closeResetPasswordDialog();
-  }, ServerTypes.RESET_PASSWORD_SUCCESS, []);
-
-  useReduxEffect(() => {
-    accountActivatedToast.openToast()
-    closeActivateAccountDialog();
-    setPendingActivationOptions(null);
-  }, ServerTypes.ACCOUNT_ACTIVATION_SUCCESS, []);
-
-  useReduxEffect(({ payload: { options } }) => {
-    setPendingActivationOptions(options);
-    closeRegistrationDialog();
-    openActivateAccountDialog();
-  }, ServerTypes.ACCOUNT_AWAITING_ACTIVATION, []);
-
-  useReduxEffect(() => {
-    resetSubmitButton();
-  }, [ServerTypes.CONNECTION_FAILED, ServerTypes.LOGIN_FAILED], []);
-
-  useReduxEffect(({ payload: { options: { hashedPassword } } }) => {
-    if (rememberLoginRef.current) {
-      updateHost(hashedPassword, rememberLoginRef.current);
-    }
-  }, ServerTypes.LOGIN_SUCCESSFUL, []);
-
-  const showDescription = () => {
-    return !isConnected && description?.length;
-  };
-
-  const onSubmitLogin = useCallback((loginForm) => {
-    rememberLoginRef.current = loginForm;
-    const { userName, password, selectedHost, remember } = loginForm;
-
-    const options: Omit<WebsocketTypes.LoginConnectOptions, 'reason'> = {
-      ...getHostPort(selectedHost),
-      userName,
-      password,
-    };
-
-    if (remember && !password) {
-      options.hashedPassword = selectedHost.hashedPassword;
-    }
-
-    webClient.request.authentication.login(options);
-  }, []);
-
-  const [submitButtonDisabled, resetSubmitButton, handleLogin] = useFireOnce(onSubmitLogin);
-
-  useAutoLogin(handleLogin, connectionAttemptMade);
-
-  const updateHost = (hashedPassword, { selectedHost, remember, userName }) => {
-    knownHosts.update(selectedHost.id, {
-      remember,
-      userName: remember ? userName : null,
-      hashedPassword: remember ? hashedPassword : null,
-    });
-  };
-
-  const handleRegistrationDialogSubmit = (registerForm) => {
-    rememberLoginRef.current = registerForm;
-    const { userName, password, email, country, realName, selectedHost } = registerForm;
-
-    webClient.request.authentication.register({
-      ...getHostPort(selectedHost),
-      userName,
-      password,
-      email,
-      country,
-      realName,
-    });
-  };
-
-  const handleAccountActivationDialogSubmit = ({ token }) => {
-    if (!pendingActivationOptions) {
-      return;
-    }
-    webClient.request.authentication.activateAccount({
-      host: pendingActivationOptions.host,
-      port: pendingActivationOptions.port,
-      userName: pendingActivationOptions.userName,
-      token,
-    });
-  };
-
-  const handleRequestPasswordResetDialogSubmit = (form) => {
-    const { userName, email, selectedHost } = form;
-    const { host, port } = getHostPort(selectedHost);
-
-    if (email) {
-      webClient.request.authentication.resetPasswordChallenge({ userName, email, host, port });
-    } else {
-      setUserToResetPassword(userName);
-      webClient.request.authentication.resetPasswordRequest({ userName, host, port });
-    }
-  };
-
-  const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }) => {
-    const { host, port } = getHostPort(selectedHost);
-
-    webClient.request.authentication.resetPassword({ userName, token, newPassword, host, port });
-  };
-
-  const skipTokenRequest = (userName) => {
-    setUserToResetPassword(userName);
-
-    setDialogState(s => ({ ...s,
-      passwordResetRequestDialog: false,
-      resetPasswordDialog: true,
-    }));
-  };
-
-  const closeRequestPasswordResetDialog = () => {
-    setDialogState(s => ({ ...s, passwordResetRequestDialog: false }));
-  }
-
-  const openRequestPasswordResetDialog = () => {
-    setDialogState(s => ({ ...s, passwordResetRequestDialog: true }));
-  }
-
-  const closeResetPasswordDialog = () => {
-    setDialogState(s => ({ ...s, resetPasswordDialog: false }));
-  }
-
-  const openResetPasswordDialog = () => {
-    setDialogState(s => ({ ...s, resetPasswordDialog: true }));
-  }
-
-  const closeRegistrationDialog = () => {
-    setDialogState(s => ({ ...s, registrationDialog: false }));
-  }
-
-  const openRegistrationDialog = () => {
-    setDialogState(s => ({ ...s, registrationDialog: true }));
-  }
-
-  const closeActivateAccountDialog = () => {
-    setDialogState(s => ({ ...s, activationDialog: false }));
-  };
-
-  const openActivateAccountDialog = () => {
-    setDialogState(s => ({ ...s, activationDialog: true }));
-  };
+  const {
+    description,
+    isConnected,
+    dialogState,
+    userToResetPassword,
+    submitButtonDisabled,
+    handleLogin,
+    showDescription,
+    handleRegistrationDialogSubmit,
+    handleAccountActivationDialogSubmit,
+    handleRequestPasswordResetDialogSubmit,
+    handleResetPasswordDialogSubmit,
+    skipTokenRequest,
+    closeRequestPasswordResetDialog,
+    openRequestPasswordResetDialog,
+    closeResetPasswordDialog,
+    closeRegistrationDialog,
+    openRegistrationDialog,
+    closeActivateAccountDialog,
+  } = useLogin();
 
   return (
     <Layout showNav={false} noHeightLimit={true}>
       <Root className={'login overflow-scroll ' + classes.root}>
-        { isConnected && <Navigate to={App.RouteEnum.SERVER} />}
+        {isConnected && <Navigate to={App.RouteEnum.SERVER} />}
 
         <div className="login__wrapper">
           <Paper className="login-content">
@@ -251,8 +95,8 @@ const Login = () => {
                 <img src={Images.Logo} alt="logo" />
                 <span>COCKATRICE</span>
               </div>
-              <Typography variant="h1">{ t('LoginContainer.header.title') }</Typography>
-              <Typography variant="subtitle1">{ t('LoginContainer.header.subtitle') }</Typography>
+              <Typography variant="h1">{t('LoginContainer.header.title')}</Typography>
+              <Typography variant="subtitle1">{t('LoginContainer.header.subtitle')}</Typography>
               <div className="login-form">
                 <LoginForm
                   onSubmit={handleLogin}
@@ -261,30 +105,26 @@ const Login = () => {
                 />
               </div>
 
-              {
-                showDescription() && (
-                  <Paper className="login-content__connectionStatus">
-                    {description}
-                  </Paper>
-                )
-              }
+              {showDescription() && (
+                <Paper className="login-content__connectionStatus">
+                  {description}
+                </Paper>
+              )}
 
               <div className="login-footer">
                 <div className="login-footer__register">
-                  <span>{ t('LoginContainer.footer.registerPrompt') }</span>
-                  <Button color="primary" onClick={openRegistrationDialog}>{ t('LoginContainer.footer.registerAction') }</Button>
+                  <span>{t('LoginContainer.footer.registerPrompt')}</span>
+                  <Button color="primary" onClick={openRegistrationDialog}>{t('LoginContainer.footer.registerAction')}</Button>
                 </div>
                 <Typography variant="subtitle2">
-                  { t('LoginContainer.footer.credit') } - { new Date().getUTCFullYear() }
+                  {t('LoginContainer.footer.credit')} - {new Date().getUTCFullYear()}
                 </Typography>
 
-                {
-                  serverProps.REACT_APP_VERSION && (
-                    <Typography variant="subtitle2">
-                      { t('LoginContainer.footer.version') }: { serverProps.REACT_APP_VERSION }
-                    </Typography>
-                  )
-                }
+                {serverProps.REACT_APP_VERSION && (
+                  <Typography variant="subtitle2">
+                    {t('LoginContainer.footer.version')}: {serverProps.REACT_APP_VERSION}
+                  </Typography>
+                )}
 
                 <div className="login-footer__language">
                   <LanguageDropdown />
@@ -321,9 +161,8 @@ const Login = () => {
                     </div>
                   </div>
                 </div>
-                { /*<img src={loginGraphic} className="login-content__description-image"/>*/}
-                <p className="login-content__description-subtitle1">{ t('LoginContainer.content.subtitle1') }</p>
-                <p className="login-content__description-subtitle2">{ t('LoginContainer.content.subtitle2') }</p>
+                <p className="login-content__description-subtitle1">{t('LoginContainer.content.subtitle1')}</p>
+                <p className="login-content__description-subtitle2">{t('LoginContainer.content.subtitle2')}</p>
               </div>
             </div>
           </Paper>
@@ -357,6 +196,6 @@ const Login = () => {
       </Root>
     </Layout>
   );
-}
+};
 
 export default Login;

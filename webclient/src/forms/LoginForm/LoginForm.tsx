@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Form, Field, useFormState, FormApi } from 'react-final-form';
+import React from 'react';
+import { Form, Field, FormApi } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import { useTranslation } from 'react-i18next';
 
@@ -9,7 +9,8 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { CheckboxField, InputField, KnownHosts } from '@app/components';
 import { LoadingState, useKnownHosts, useSettings } from '@app/hooks';
-import { HostDTO } from '@app/services';
+
+import { useLoginFormBody } from './useLoginForm';
 
 import './LoginForm.css';
 
@@ -34,61 +35,15 @@ const LoginFormBody = ({
   const PASSWORD_LABEL = t('Common.label.password');
   const STORED_PASSWORD_LABEL = `* ${t('LoginForm.label.savedPassword')} *`;
 
-  const settings = useSettings();
-  const hosts = useKnownHosts();
-  const { values } = useFormState();
-
-  const selectedHost = hosts.status === LoadingState.READY ? hosts.value?.selectedHost : undefined;
-
-  const [useStoredPasswordLabel, setUseStoredPasswordLabel] = useState(false);
-  const [storedHashInvalidated, setStoredHashInvalidated] = useState(false);
-
-  const canUseStoredPassword = (remember: boolean, password: string | undefined) =>
-    Boolean(remember && selectedHost?.hashedPassword && !password && !storedHashInvalidated);
-
-  const togglePasswordLabel = (on: boolean) => setUseStoredPasswordLabel(on);
-
-  // @critical Host-sync must not touch autoConnect — app-level setting, not per-host.
-  const onSelectedHostChange = (host: HostDTO | undefined) => {
-    if (!host) {
-      return;
-    }
-    form.change('userName', host.userName ?? '');
-    form.change('password', '');
-    form.change('remember', Boolean(host.remember));
-    setStoredHashInvalidated(false);
-    togglePasswordLabel(Boolean(host.remember && host.hashedPassword));
-  };
-
-  const onUserNameChange = (userName: string | undefined) => {
-    const fieldChanged = selectedHost?.userName?.toLowerCase() !== userName?.toLowerCase();
-    if (canUseStoredPassword(values.remember, values.password) && fieldChanged) {
-      setStoredHashInvalidated(true);
-    }
-  };
-
-  const onRememberChange = (checked: boolean) => {
-    // @critical Writes form-only, never to persisted setting — "remember" toggle isn't a preference edit.
-    if (!checked && values.autoConnect) {
-      form.change('autoConnect', false);
-    }
-
-    togglePasswordLabel(canUseStoredPassword(checked, values.password));
-  };
-
-  // @critical Only persist-path for autoConnect; wired to native onChange, not <OnChange>,
-  // to avoid leaking form.change() writes into Dexie.
-  const onUserToggleAutoConnect = (checked: boolean, fieldOnChange: (v: boolean) => void) => {
-    fieldOnChange(checked);
-
-    if (settings.status === LoadingState.READY) {
-      void settings.update({ autoConnect: checked });
-    }
-
-    if (checked && !values.remember) {
-      form.change('remember', true);
-    }
-  };
+  const {
+    useStoredPasswordLabel,
+    setUseStoredPasswordLabel,
+    onSelectedHostChange,
+    onUserNameChange,
+    onRememberChange,
+    onUserToggleAutoConnect,
+    passwordFieldBlur,
+  } = useLoginFormBody(form);
 
   return (
     <form className="loginForm" onSubmit={handleSubmit}>
@@ -106,9 +61,7 @@ const LoginFormBody = ({
           <Field
             label={useStoredPasswordLabel ? STORED_PASSWORD_LABEL : PASSWORD_LABEL}
             onFocus={() => setUseStoredPasswordLabel(false)}
-            onBlur={() =>
-              togglePasswordLabel(canUseStoredPassword(values.remember, values.password))
-            }
+            onBlur={passwordFieldBlur}
             name="password"
             type="password"
             component={InputField}

@@ -1,5 +1,3 @@
-// eslint-disable-next-line
-import React, { useState } from "react";
 import { Form, Field } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import { useTranslation } from 'react-i18next';
@@ -8,23 +6,14 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import { InputField, KnownHosts } from '@app/components';
-import { useReduxEffect } from '@app/hooks';
-import { ServerTypes } from '@app/store';
+
+import { useRequestPasswordResetForm } from './useRequestPasswordResetForm';
 
 import './RequestPasswordResetForm.css';
 
 const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
-  const [errorMessage, setErrorMessage] = useState(false);
-  const [isMFA, setIsMFA] = useState(false);
   const { t } = useTranslation();
-
-  useReduxEffect(() => {
-    setErrorMessage(true);
-  }, ServerTypes.RESET_PASSWORD_FAILED, []);
-
-  useReduxEffect(() => {
-    setIsMFA(true);
-  }, ServerTypes.RESET_PASSWORD_CHALLENGE, []);
+  const { errorMessage, setErrorMessage, isMFA, setIsMFA } = useRequestPasswordResetForm();
 
   const handleOnSubmit = ({ userName, email, ...values }) => {
     setErrorMessage(false);
@@ -33,7 +22,7 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
     email = email?.trim();
 
     onSubmit({ userName, email, ...values });
-  }
+  };
 
   const validate = values => {
     const errors: any = {};
@@ -57,7 +46,7 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
         const onHostChange: any = ({ userName }) => {
           form.change('userName', userName);
           setIsMFA(false);
-        }
+        };
 
         return (
           <form className="RequestPasswordResetForm" onSubmit={handleSubmit}>
@@ -68,7 +57,7 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
               {isMFA ? (
                 <div className="RequestPasswordResetForm-item">
                   <Field label={t('Common.label.email')} name="email" type="email" component={InputField} autoComplete="email" />
-                  <div>{ t('RequestPasswordResetForm.mfaEnabled') }</div>
+                  <div>{t('RequestPasswordResetForm.mfaEnabled')}</div>
                 </div>
               ) : null}
               <div className="RequestPasswordResetForm-item selectedHost">
@@ -78,18 +67,18 @@ const RequestPasswordResetForm = ({ onSubmit, skipTokenRequest }) => {
 
               {errorMessage && (
                 <div className="RequestPasswordResetForm-item">
-                  <Typography color="error">{ t('RequestPasswordResetForm.error') }</Typography>
+                  <Typography color="error">{t('RequestPasswordResetForm.error')}</Typography>
                 </div>
               )}
             </div>
 
             <Button className="RequestPasswordResetForm-submit rounded tall" color="primary" variant="contained" type="submit">
-              { t('RequestPasswordResetForm.request') }
+              {t('RequestPasswordResetForm.request')}
             </Button>
 
             <div>
               <Button color="primary" onClick={() => skipTokenRequest(form.getState().values.userName)}>
-                { t('RequestPasswordResetForm.skipRequest') }
+                {t('RequestPasswordResetForm.skipRequest')}
               </Button>
             </div>
           </form>

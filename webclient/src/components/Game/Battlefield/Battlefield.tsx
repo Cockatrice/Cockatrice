@@ -1,11 +1,9 @@
-import { useMemo } from 'react';
 import { App, Data } from '@app/types';
-import { GameSelectors, useAppSelector } from '@app/store';
-import { useSettings } from '@app/hooks';
 
 import CardSlot from '../CardSlot/CardSlot';
 import { makeCardKey } from '../CardRegistry/CardRegistryContext';
 import BattlefieldRow from './BattlefieldRow';
+import { useBattlefield } from './useBattlefield';
 
 import './Battlefield.css';
 
@@ -21,13 +19,6 @@ export interface BattlefieldProps {
   onCardDoubleClick?: (card: Data.ServerInfo_Card) => void;
 }
 
-const ROW_COUNT = 3;
-
-function rowIndexFor(card: Data.ServerInfo_Card): number {
-  const y = card.y ?? 0;
-  return Math.max(0, Math.min(ROW_COUNT - 1, y));
-}
-
 function Battlefield({
   gameId,
   playerId,
@@ -39,28 +30,7 @@ function Battlefield({
   onCardContextMenu,
   onCardDoubleClick,
 }: BattlefieldProps) {
-  const cards = useAppSelector((state) =>
-    GameSelectors.getCards(state, gameId, playerId, App.ZoneName.TABLE),
-  );
-
-  const { value: settings } = useSettings();
-  const invertVerticalCoordinate = settings?.invertVerticalCoordinate ?? false;
-  // Mirrors desktop TableZone::isInverted() — XOR of per-player mirrored and
-  // the global invertVerticalCoordinate preference.
-  const isInverted = mirrored !== invertVerticalCoordinate;
-
-  const rows = useMemo<Data.ServerInfo_Card[][]>(() => {
-    const bucketed: Data.ServerInfo_Card[][] = Array.from({ length: ROW_COUNT }, () => []);
-    for (const card of cards) {
-      bucketed[rowIndexFor(card)].push(card);
-    }
-    for (const row of bucketed) {
-      row.sort((a, b) => (a.x ?? 0) - (b.x ?? 0));
-    }
-    return bucketed;
-  }, [cards]);
-
-  const rowOrder = isInverted ? [2, 1, 0] : [0, 1, 2];
+  const { rows, rowOrder, isInverted } = useBattlefield({ gameId, playerId, mirrored });
 
   return (
     <div className="battlefield" data-testid="battlefield">

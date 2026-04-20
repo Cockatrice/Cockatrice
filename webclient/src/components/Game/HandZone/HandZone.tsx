@@ -1,10 +1,9 @@
-import { useDroppable } from '@dnd-kit/core';
 import { App, Data } from '@app/types';
-import { GameSelectors, useAppSelector } from '@app/store';
 import { cx } from '@app/utils';
 
 import CardSlot from '../CardSlot/CardSlot';
 import { makeCardKey } from '../CardRegistry/CardRegistryContext';
+import { useHandZone } from './useHandZone';
 
 import './HandZone.css';
 
@@ -29,32 +28,12 @@ function HandZone({
   onCardContextMenu,
   onZoneContextMenu,
 }: HandZoneProps) {
-  const cards = useAppSelector((state) =>
-    GameSelectors.getCards(state, gameId, playerId, App.ZoneName.HAND),
-  );
-
-  // Match desktop: can't drop into a hand zone that isn't yours (judges
-  // aside; server enforces the same restriction). Today only the local
-  // HandZone mounts, but this guard future-proofs opponent-hand mirrors.
-  const { setNodeRef, isOver } = useDroppable({
-    id: `hand-${playerId}`,
-    data: { targetPlayerId: playerId, targetZone: App.ZoneName.HAND },
-    disabled: !canAct,
+  const { cards, setNodeRef, isOver, handleZoneContextMenu } = useHandZone({
+    gameId,
+    playerId,
+    canAct,
+    onZoneContextMenu,
   });
-
-  // Right-click anywhere inside the hand that doesn't land on a card opens
-  // the hand zone context menu (mulligan / reveal hand). Card-level right-
-  // click has its own handler on CardSlot.
-  const handleZoneContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!onZoneContextMenu) {
-      return;
-    }
-    const target = e.target as HTMLElement;
-    if (target.closest('[data-card-id]')) {
-      return;
-    }
-    onZoneContextMenu(e);
-  };
 
   return (
     <div
