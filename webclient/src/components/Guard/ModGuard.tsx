@@ -1,4 +1,3 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { ServerSelectors, useAppSelector } from '@app/store';

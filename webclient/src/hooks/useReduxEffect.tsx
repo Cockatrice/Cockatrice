@@ -7,10 +7,15 @@ File is adapted from https://github.com/Qeepsake/use-redux-effect under MIT Lice
 import { useEffect, useRef, DependencyList } from 'react'
 import { useStore } from 'react-redux'
 
-// Actions are identified by string `type` at runtime, so the callback
-// receives an untyped action object to allow free property access.
+export interface ReduxEffectAction<P = unknown> {
+  type: string;
+  payload: P;
+  meta: unknown;
+  error: boolean;
+  count: number;
+}
 
-export type ReduxEffect = (action: any) => void
+export type ReduxEffect<P = unknown> = (action: ReduxEffectAction<P>) => void;
 
 /**
  * Subscribes to redux store events.
@@ -20,8 +25,8 @@ export type ReduxEffect = (action: any) => void
  * what lets `<Server />` catch a `JOIN_ROOM` that auto-join fired while the
  * route was transitioning.
  */
-export function useReduxEffect(
-  effect: ReduxEffect,
+export function useReduxEffect<P = unknown>(
+  effect: ReduxEffect<P>,
   type: string | string[],
   deps: DependencyList = [],
 ): void {
@@ -37,7 +42,7 @@ export function useReduxEffect(
 
   useEffect(() => {
     const check = (): void => {
-      const action = (store.getState() as any).action;
+      const action = (store.getState() as { action?: ReduxEffectAction<P> }).action;
       if (!action || action.count === lastHandledCountRef.current) {
         return;
       }

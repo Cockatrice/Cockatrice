@@ -16,4 +16,4 @@ export const schemaV1 = (db: Dexie) => {
     [Stores.TOKENS]: 'name.value',
     [Stores.HOSTS]: '++id',
   });
-}
+};

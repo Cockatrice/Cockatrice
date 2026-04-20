@@ -71,6 +71,13 @@ export class Set {
   type: string;
 }
 
+/**
+ * Token fields are shaped `{ value: string }` because Cockatrice serves tokens
+ * as XML (tokens.xml), and each leaf preserves the XML element's text content
+ * alongside its attributes. The wrapper is not a DB artifact — it mirrors the
+ * `<element attr="...">value</element>` shape produced by CardImporterService's
+ * parseXmlAttributes.
+ */
 export class Token {
   name: { value: string };
   prop: {

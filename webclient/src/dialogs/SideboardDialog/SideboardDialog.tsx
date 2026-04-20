@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Tooltip from '@mui/material/Tooltip';
 
 import { App, Enriched } from '@app/types';
 
@@ -84,19 +85,14 @@ function SideboardDialog({
 }: SideboardDialogProps) {
   const [moves, setMoves] = useState<SideboardPlanMove[]>([]);
 
-  // Reset the draft every time the dialog opens, and also when the server
-  // locks the sideboard mid-edit (desktop's resetSideboardPlan parity).
+  // Reset the draft whenever the dialog opens, or when the server locks the
+  // sideboard mid-edit (desktop's resetSideboardPlan parity). Consolidated
+  // into one effect keyed on both triggers.
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen || isLocked) {
       setMoves([]);
     }
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (isLocked && moves.length > 0) {
-      setMoves([]);
-    }
-  }, [isLocked, moves.length]);
+  }, [isOpen, isLocked]);
 
   const { deck, sideboard } = useMemo(
     () => applyMoves(deckCards, sideboardCards, moves),
@@ -166,15 +162,19 @@ function SideboardDialog({
               {deck.map((card, idx) => (
                 <li key={`${card.id}-${idx}`} className="sideboard-dialog__row">
                   <span className="sideboard-dialog__name">{card.name}</span>
-                  <Button
-                    type="button"
-                    size="small"
-                    onClick={() => handleMoveToSideboard(card)}
-                    disabled={isLocked}
-                    aria-label={`Move ${card.name} to sideboard`}
-                  >
-                    →
-                  </Button>
+                  <Tooltip title={`Move ${card.name} to sideboard`}>
+                    <span>
+                      <Button
+                        type="button"
+                        size="small"
+                        onClick={() => handleMoveToSideboard(card)}
+                        disabled={isLocked}
+                        aria-label={`Move ${card.name} to sideboard`}
+                      >
+                        →
+                      </Button>
+                    </span>
+                  </Tooltip>
                 </li>
               ))}
               {deck.length === 0 && (
@@ -192,15 +192,19 @@ function SideboardDialog({
             <ul className="sideboard-dialog__list" data-testid="sideboard-dialog-sb">
               {sideboard.map((card, idx) => (
                 <li key={`${card.id}-${idx}`} className="sideboard-dialog__row">
-                  <Button
-                    type="button"
-                    size="small"
-                    onClick={() => handleMoveToDeck(card)}
-                    disabled={isLocked}
-                    aria-label={`Move ${card.name} to main deck`}
-                  >
-                    ←
-                  </Button>
+                  <Tooltip title={`Move ${card.name} to main deck`}>
+                    <span>
+                      <Button
+                        type="button"
+                        size="small"
+                        onClick={() => handleMoveToDeck(card)}
+                        disabled={isLocked}
+                        aria-label={`Move ${card.name} to main deck`}
+                      >
+                        ←
+                      </Button>
+                    </span>
+                  </Tooltip>
                   <span className="sideboard-dialog__name">{card.name}</span>
                 </li>
               ))}

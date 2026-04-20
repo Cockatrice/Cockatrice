@@ -1,21 +1,35 @@
-// eslint-disable-next-line
-import React, { useState } from "react";
-import { Form, Field } from 'react-final-form'
+import { useState } from 'react';
+import { Form, Field } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 
 import Button from '@mui/material/Button';
 import AnchorLink from '@mui/material/Link';
 
 import { InputField } from '@app/components';
+import type { FormErrors } from '@app/forms';
+import type { HostDTO } from '@app/services';
 
 import './KnownHostForm.css';
 
-const KnownHostForm = ({ host, onRemove, onSubmit }) => {
+export interface KnownHostFormValues {
+  id?: number;
+  name: string;
+  host: string;
+  port: string;
+}
+
+interface KnownHostFormProps {
+  host?: HostDTO;
+  onRemove: (host: HostDTO) => void;
+  onSubmit: (values: KnownHostFormValues) => void;
+}
+
+const KnownHostForm = ({ host, onRemove, onSubmit }: KnownHostFormProps) => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const { t } = useTranslation();
 
-  const validate = values => {
-    const errors: any = {};
+  const validate = (values: Partial<KnownHostFormValues>): FormErrors<KnownHostFormValues> => {
+    const errors: FormErrors<KnownHostFormValues> = {};
 
     if (!values.name) {
       errors.name = t('Common.validation.required');
@@ -29,17 +43,27 @@ const KnownHostForm = ({ host, onRemove, onSubmit }) => {
       errors.port = t('Common.validation.required');
     }
 
-    if (Object.keys(errors).length) {
-      return errors;
-    }
+    return errors;
   };
 
-  const handleOnSubmit = ({ name, host, ...values }) => {
-    name = name?.trim();
-    host = host?.trim();
+  const handleOnSubmit = ({ name, host: hostValue, ...values }: KnownHostFormValues) => {
+    onSubmit({
+      ...values,
+      name: name?.trim(),
+      host: hostValue?.trim(),
+    });
+  };
 
-    onSubmit({ name, host, ...values });
-  }
+  const handleRemoveClick = () => {
+    if (!host) {
+      return;
+    }
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
+    onRemove(host);
+  };
 
   return (
     <Form
@@ -71,7 +95,7 @@ const KnownHostForm = ({ host, onRemove, onSubmit }) => {
           <div className="KnownHostForm-actions">
             <div className="KnownHostForm-actions__delete">
               { host && (
-                <Button color="inherit" onClick={() => !confirmDelete ? setConfirmDelete(true) : onRemove(host)}>
+                <Button color="inherit" onClick={handleRemoveClick}>
                   { !confirmDelete ? t('Common.label.delete') : t('Common.label.confirmSure') }
                 </Button>
               ) }

@@ -16,10 +16,10 @@ export interface ServerState {
   sortUsersBy: ServerStateSortUsersBy;
   messages: {
     [userName: string]: Data.Event_UserMessage[];
-  }
+  };
   userInfo: {
     [userName: string]: Data.ServerInfo_User;
-  }
+  };
   notifications: Data.Event_NotifyUser[];
   serverShutdown: Data.Event_ServerShutdown | null;
   banUser: string;
@@ -60,5 +60,5 @@ export interface ServerStateLogs {
 }
 
 export interface ServerStateSortUsersBy extends App.SortBy {
-  field: App.UserSortField
+  field: App.UserSortField;
 }

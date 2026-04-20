@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 
 import ListItemButton from '@mui/material/ListItemButton';
@@ -6,9 +6,8 @@ import Paper from '@mui/material/Paper';
 
 import { AuthGuard, ThreePaneLayout, UserDisplay, VirtualList } from '@app/components';
 import { useReduxEffect } from '@app/hooks';
-import { RoomsSelectors, RoomsTypes, ServerSelectors } from '@app/store';
-import { App } from '@app/types';
-import { useAppSelector } from '@app/store';
+import { RoomsSelectors, RoomsTypes, ServerSelectors, useAppSelector } from '@app/store';
+import { App, Data } from '@app/types';
 import Rooms from './Rooms';
 import Layout from '../Layout/Layout';
 
@@ -21,10 +20,19 @@ const Server = () => {
   const users = useAppSelector(state => ServerSelectors.getSortedUsers(state));
   const navigate = useNavigate();
 
-  useReduxEffect((action: any) => {
+  useReduxEffect<{ roomInfo: Data.ServerInfo_Room }>((action) => {
     const roomId = action.payload.roomInfo.roomId.toString();
     navigate(generatePath(App.RouteEnum.ROOM, { roomId }));
   }, RoomsTypes.JOIN_ROOM, []);
+
+  const userItems = useMemo(
+    () => users.map((user) => (
+      <ListItemButton key={user.name} dense>
+        <UserDisplay user={user} />
+      </ListItemButton>
+    )),
+    [users],
+  );
 
   return (
     <Layout className="server-rooms">
@@ -49,13 +57,7 @@ const Server = () => {
             <div className="server-rooms__side-label">
               Users connected to server: {users.length}
             </div>
-            <VirtualList
-              items={ users.map(user => (
-                <ListItemButton key={user.name} dense>
-                  <UserDisplay user={user} />
-                </ListItemButton>
-              )) }
-            />
+            <VirtualList items={userItems} />
           </Paper>
         )}
       />

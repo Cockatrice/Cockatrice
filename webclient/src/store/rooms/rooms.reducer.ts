@@ -3,7 +3,7 @@ import { App, Data, Enriched } from '@app/types';
 
 import { mergeSetFields, normalizeGameObject, normalizeGametypeMap, normalizeRoomInfo, normalizeUserMessage } from '../common';
 
-import { GameFilters, RoomsState } from './rooms.interfaces'
+import { GameFilters, RoomsState } from './rooms.interfaces';
 import { DEFAULT_GAME_FILTERS } from './gameFilters';
 
 export const MAX_ROOM_MESSAGES = 1000;

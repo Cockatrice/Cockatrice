@@ -1,62 +1,40 @@
-import React from 'react';
-import { styled } from '@mui/material/styles';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 
+import type { KnownHostFormValues } from '@app/forms';
 import { KnownHostForm } from '@app/forms';
+import type { HostDTO } from '@app/services';
+
+import AuthDialogShell from '../AuthDialogShell/AuthDialogShell';
 
 import './KnownHostDialog.css';
 
-const PREFIX = 'KnownHostDialog';
+interface KnownHostDialogProps {
+  isOpen: boolean;
+  handleClose?: () => void;
+  onRemove: (host: HostDTO) => void;
+  onSubmit: (values: KnownHostFormValues) => void;
+  host?: HostDTO;
+}
 
-const classes = {
-  root: `${PREFIX}-root`
-};
-
-const StyledDialog = styled(Dialog)(({ theme }) => ({
-  [`&.${classes.root}`]: {
-    '& .dialog-title__wrapper': {
-      borderColor: theme.palette.grey[300]
-    }
-  }
-}));
-
-const KnownHostDialog = ({ handleClose, onRemove, onSubmit, isOpen, host }: any) => {
+const KnownHostDialog = ({ handleClose, onRemove, onSubmit, isOpen, host }: KnownHostDialogProps) => {
   const { t } = useTranslation();
 
   const mode = host ? 'edit' : 'add';
 
-  const handleOnClose = () => {
-    if (handleClose) {
-      handleClose();
-    }
-  };
-
   return (
-    <StyledDialog className={'KnownHostDialog ' + classes.root} onClose={handleOnClose} open={isOpen}>
-      <DialogTitle className='dialog-title'>
-        <div className='dialog-title__wrapper'>
-          <Typography variant='h2'>{ t('KnownHostDialog.title', { mode }) }</Typography>
-
-          {handleClose ? (
-            <IconButton onClick={handleClose} size="large">
-              <CloseIcon fontSize='large' />
-            </IconButton>
-          ) : null}
-        </div>
-      </DialogTitle>
-      <DialogContent className='dialog-content'>
-        <Typography className='dialog-content__subtitle' variant='subtitle1'>
-          { t('KnownHostDialog.subtitle') }
-        </Typography>
-        <KnownHostForm onRemove={onRemove} onSubmit={onSubmit} host={host}></KnownHostForm>
-      </DialogContent>
-    </StyledDialog>
+    <AuthDialogShell
+      className="KnownHostDialog"
+      contentClassName="dialog-content"
+      isOpen={isOpen}
+      handleClose={handleClose}
+      title={t('KnownHostDialog.title', { mode })}
+    >
+      <Typography className="dialog-content__subtitle" variant="subtitle1">
+        {t('KnownHostDialog.subtitle')}
+      </Typography>
+      <KnownHostForm onRemove={onRemove} onSubmit={onSubmit} host={host} />
+    </AuthDialogShell>
   );
 };
 

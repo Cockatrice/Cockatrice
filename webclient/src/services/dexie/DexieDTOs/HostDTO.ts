@@ -24,9 +24,9 @@ export class HostDTO extends App.Host {
     return dexieService.hosts.bulkAdd(hosts);
   }
 
-  static delete(id: string): Promise<void> {
+  static delete(id: number): Promise<void> {
     return dexieService.hosts.delete(id);
   }
-};
+}
 
 dexieService.hosts.mapToClass(HostDTO);

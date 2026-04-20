@@ -62,6 +62,9 @@ export const Selectors = {
       return (user.userLevel & mask) === mask;
     }
   ),
+  /** Fetched user profile info, keyed by username. Populated by Command_GetUserInfo responses. */
+  getUserInfoByName: ({ server }: State, userName: string): Data.ServerInfo_User | undefined =>
+    server.userInfo[userName],
   getLogs: ({ server }: State) => server.logs,
   getBackendDecks: ({ server }: State) => server.backendDecks,
   getDownloadedDeck: ({ server }: State) => server.downloadedDeck,

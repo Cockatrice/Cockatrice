@@ -1,6 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
+import { TokenDTO } from '@app/services';
 
 import type { CreateTokenSubmit } from './CreateTokenDialog';
+
+export type ChooserScope = 'all' | 'deck';
 
 export interface CreateTokenDialogState {
   name: string;
@@ -10,6 +14,17 @@ export interface CreateTokenDialogState {
   destroyOnZoneChange: boolean;
   faceDown: boolean;
   error: string | null;
+
+  scope: ChooserScope;
+  search: string;
+  availableTokens: TokenDTO[];
+  filteredTokens: TokenDTO[];
+  selectedTokenName: string | null;
+
+  setScope: (value: ChooserScope) => void;
+  setSearch: (value: string) => void;
+  selectPredefinedToken: (token: TokenDTO) => void;
+
   handleNameChange: (value: string) => void;
   setColor: (value: string) => void;
   setPT: (value: string) => void;
@@ -31,11 +46,39 @@ export const MAX_ANNOTATION_LEN = 255;
 export interface UseCreateTokenDialogArgs {
   isOpen: boolean;
   onSubmit: (args: CreateTokenSubmit) => void;
+  /** Optional deck-scoped token names; mirrors desktop DlgCreateToken predefinedTokens. */
+  predefinedTokenNames?: string[];
+}
+
+/** Maps a MTGJSON-shaped color list ("W", "U", ...) to the dialog's single-letter color value. */
+function colorFromToken(token: TokenDTO): string {
+  const raw = token.prop?.value?.colors?.value ?? '';
+  if (!raw) {
+    return '';
+  }
+  const colors = raw.split(/[\s,]+/).filter(Boolean).map((c: string) => c.toLowerCase());
+  if (colors.length === 0) {
+    return '';
+  }
+  if (colors.length > 1) {
+    return 'm';
+  }
+  const first = colors[0];
+  if (first === 'w' || first === 'u' || first === 'b' || first === 'r' || first === 'g') {
+    return first;
+  }
+  return '';
+}
+
+/** Best-effort providerId from the token's first set entry; matches desktop TokenInfo.providerId. */
+function providerIdFromToken(token: TokenDTO): string | undefined {
+  return token.set?.[0]?.value ?? undefined;
 }
 
 export function useCreateTokenDialog({
   isOpen,
   onSubmit,
+  predefinedTokenNames,
 }: UseCreateTokenDialogArgs): CreateTokenDialogState {
   const [name, setName] = useState('');
   const [color, setColor] = useState(CREATE_TOKEN_DEFAULT_COLOR);
@@ -44,6 +87,12 @@ export function useCreateTokenDialog({
   const [destroyOnZoneChange, setDestroyOnZoneChange] = useState(true);
   const [faceDown, setFaceDown] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [scope, setScope] = useState<ChooserScope>(predefinedTokenNames?.length ? 'deck' : 'all');
+  const [search, setSearch] = useState('');
+  const [availableTokens, setAvailableTokens] = useState<TokenDTO[]>([]);
+  const [selectedTokenName, setSelectedTokenName] = useState<string | null>(null);
+  const [providerId, setProviderId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (isOpen) {
@@ -54,11 +103,68 @@ export function useCreateTokenDialog({
       setDestroyOnZoneChange(true);
       setFaceDown(false);
       setError(null);
+      setSearch('');
+      setSelectedTokenName(null);
+      setProviderId(undefined);
+      setScope(predefinedTokenNames?.length ? 'deck' : 'all');
     }
+  }, [isOpen, predefinedTokenNames]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    let cancelled = false;
+    // Best-effort load of the token library. On failure the chooser renders
+    // empty and freeform creation still works.
+    import('@app/services').then(({ dexieService }) => {
+      dexieService.tokens.toArray().then((tokens: TokenDTO[]) => {
+        if (!cancelled) {
+          setAvailableTokens(tokens);
+        }
+      }).catch(() => {
+        if (!cancelled) {
+          setAvailableTokens([]);
+        }
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen]);
+
+  const filteredTokens = useMemo(() => {
+    const allowByScope = scope === 'deck' && predefinedTokenNames?.length
+      ? new Set(predefinedTokenNames.map((n) => n.toLowerCase()))
+      : null;
+    const needle = search.trim().toLowerCase();
+    return availableTokens.filter((token) => {
+      const tokenName = token.name?.value ?? '';
+      if (allowByScope && !allowByScope.has(tokenName.toLowerCase())) {
+        return false;
+      }
+      if (needle && !tokenName.toLowerCase().includes(needle)) {
+        return false;
+      }
+      return true;
+    });
+  }, [availableTokens, scope, search, predefinedTokenNames]);
 
   const handleNameChange = (value: string) => {
     setName(value.slice(0, MAX_NAME_LEN));
+    if (error) {
+      setError(null);
+    }
+  };
+
+  const selectPredefinedToken = (token: TokenDTO) => {
+    const tokenName = token.name?.value ?? '';
+    setSelectedTokenName(tokenName);
+    setName(tokenName.slice(0, MAX_NAME_LEN));
+    setColor(colorFromToken(token));
+    const ptRaw = token.prop?.value?.pt?.value ?? '';
+    setPT(ptRaw.slice(0, MAX_PT_LEN));
+    setProviderId(providerIdFromToken(token));
     if (error) {
       setError(null);
     }
@@ -70,14 +176,18 @@ export function useCreateTokenDialog({
       setError('Name is required');
       return;
     }
-    onSubmit({
+    const payload: CreateTokenSubmit = {
       name: name.trim(),
       color,
       pt: pt.trim(),
       annotation: annotation.trim(),
       destroyOnZoneChange,
       faceDown,
-    });
+    };
+    if (providerId) {
+      payload.providerId = providerId;
+    }
+    onSubmit(payload);
   };
 
   return {
@@ -88,6 +198,14 @@ export function useCreateTokenDialog({
     destroyOnZoneChange,
     faceDown,
     error,
+    scope,
+    search,
+    availableTokens,
+    filteredTokens,
+    selectedTokenName,
+    setScope,
+    setSearch,
+    selectPredefinedToken,
     handleNameChange,
     setColor,
     setPT,

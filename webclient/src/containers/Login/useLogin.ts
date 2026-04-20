@@ -2,6 +2,12 @@ import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useToast } from '@app/components';
+import type {
+  LoginFormValues,
+  RegisterFormValues,
+  RequestPasswordResetFormValues,
+  ResetPasswordFormValues,
+} from '@app/forms';
 import { useAutoLogin, useFireOnce, useKnownHosts, useReduxEffect, useWebClient } from '@app/hooks';
 import { getHostPort } from '@app/services';
 import { ServerSelectors, ServerTypes, useAppSelector } from '@app/store';
@@ -17,16 +23,15 @@ export interface LoginDialogState {
 export interface Login {
   description: string | undefined;
   isConnected: boolean;
-  pendingActivationOptions: WebsocketTypes.PendingActivationContext | null;
   dialogState: LoginDialogState;
   userToResetPassword: string | null;
   submitButtonDisabled: boolean;
-  handleLogin: (form: any) => void;
+  handleLogin: (form: LoginFormValues) => void;
   showDescription: () => boolean;
-  handleRegistrationDialogSubmit: (form: any) => void;
+  handleRegistrationDialogSubmit: (form: RegisterFormValues) => void;
   handleAccountActivationDialogSubmit: (args: { token: string }) => void;
-  handleRequestPasswordResetDialogSubmit: (form: any) => void;
-  handleResetPasswordDialogSubmit: (args: any) => void;
+  handleRequestPasswordResetDialogSubmit: (form: RequestPasswordResetFormValues) => void;
+  handleResetPasswordDialogSubmit: (form: ResetPasswordFormValues) => void;
   skipTokenRequest: (userName: string) => void;
   closeRequestPasswordResetDialog: () => void;
   openRequestPasswordResetDialog: () => void;
@@ -46,7 +51,7 @@ export function useLogin(): Login {
   const [pendingActivationOptions, setPendingActivationOptions] =
     useState<WebsocketTypes.PendingActivationContext | null>(null);
 
-  const rememberLoginRef = useRef<any>(null);
+  const rememberLoginRef = useRef<LoginFormValues | RegisterFormValues | null>(null);
   const knownHosts = useKnownHosts();
   const [dialogState, setDialogState] = useState<LoginDialogState>({
     passwordResetRequestDialog: false,
@@ -113,13 +118,13 @@ export function useLogin(): Login {
     setPendingActivationOptions(null);
   }, ServerTypes.ACCOUNT_ACTIVATION_SUCCESS, []);
 
-  useReduxEffect(({ payload: { options } }) => {
+  useReduxEffect<{ options: WebsocketTypes.PendingActivationContext }>(({ payload: { options } }) => {
     setPendingActivationOptions(options);
     closeRegistrationDialog();
     openActivateAccountDialog();
   }, ServerTypes.ACCOUNT_AWAITING_ACTIVATION, []);
 
-  const onSubmitLogin = useCallback((loginForm) => {
+  const onSubmitLogin = useCallback((loginForm: LoginFormValues) => {
     rememberLoginRef.current = loginForm;
     const { userName, password, selectedHost, remember } = loginForm;
 
@@ -134,7 +139,7 @@ export function useLogin(): Login {
     }
 
     webClient.request.authentication.login(options);
-  }, []);
+  }, [webClient]);
 
   const [submitButtonDisabled, resetSubmitButton, handleLogin] = useFireOnce(onSubmitLogin);
 
@@ -142,7 +147,13 @@ export function useLogin(): Login {
     resetSubmitButton();
   }, [ServerTypes.CONNECTION_FAILED, ServerTypes.LOGIN_FAILED], []);
 
-  const updateHost = (hashedPassword: string, { selectedHost, remember, userName }: any) => {
+  const updateHost = (
+    hashedPassword: string,
+    { selectedHost, remember, userName }: LoginFormValues,
+  ) => {
+    if (selectedHost.id == null) {
+      return;
+    }
     knownHosts.update(selectedHost.id, {
       remember,
       userName: remember ? userName : null,
@@ -150,9 +161,10 @@ export function useLogin(): Login {
     });
   };
 
-  useReduxEffect(({ payload: { options: { hashedPassword } } }) => {
-    if (rememberLoginRef.current) {
-      updateHost(hashedPassword, rememberLoginRef.current);
+  useReduxEffect<{ options: WebsocketTypes.LoginSuccessContext }>(({ payload: { options } }) => {
+    const loginForm = rememberLoginRef.current;
+    if (loginForm && 'remember' in loginForm) {
+      updateHost(options.hashedPassword, loginForm);
     }
   }, ServerTypes.LOGIN_SUCCESSFUL, []);
 
@@ -162,7 +174,7 @@ export function useLogin(): Login {
     return Boolean(!isConnected && description?.length);
   };
 
-  const handleRegistrationDialogSubmit = (registerForm: any) => {
+  const handleRegistrationDialogSubmit = (registerForm: RegisterFormValues) => {
     rememberLoginRef.current = registerForm;
     const { userName, password, email, country, realName, selectedHost } = registerForm;
 
@@ -188,7 +200,7 @@ export function useLogin(): Login {
     });
   };
 
-  const handleRequestPasswordResetDialogSubmit = (form: any) => {
+  const handleRequestPasswordResetDialogSubmit = (form: RequestPasswordResetFormValues) => {
     const { userName, email, selectedHost } = form;
     const { host, port } = getHostPort(selectedHost);
 
@@ -200,7 +212,12 @@ export function useLogin(): Login {
     }
   };
 
-  const handleResetPasswordDialogSubmit = ({ userName, token, newPassword, selectedHost }: any) => {
+  const handleResetPasswordDialogSubmit = ({
+    userName,
+    token,
+    newPassword,
+    selectedHost,
+  }: ResetPasswordFormValues) => {
     const { host, port } = getHostPort(selectedHost);
     webClient.request.authentication.resetPassword({ userName, token, newPassword, host, port });
   };
@@ -218,7 +235,6 @@ export function useLogin(): Login {
   return {
     description,
     isConnected,
-    pendingActivationOptions,
     dialogState,
     userToResetPassword,
     submitButtonDisabled,

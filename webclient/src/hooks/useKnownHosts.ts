@@ -17,22 +17,16 @@ const loadAll = async (): Promise<HostDTO[]> => {
   return hosts;
 };
 
-const normalize = async (hosts: HostDTO[]): Promise<KnownHostsValue> => {
+const normalize = (hosts: HostDTO[]): KnownHostsValue => {
   const existing = hosts.find((h) => h.lastSelected);
-  if (existing) {
-    return { hosts, selectedHost: existing };
-  }
-
-  const selected = hosts[0];
-  selected.lastSelected = true;
-  await selected.save();
-  return { hosts, selectedHost: selected };
+  return { hosts, selectedHost: existing ?? hosts[0] };
 };
 
 export const knownHostsStore = createSharedStore<KnownHostsValue>(async () => {
   const hosts = await loadAll();
   return normalize(hosts);
 });
+
 const store = knownHostsStore;
 
 export type KnownHostsHook = Loadable<KnownHostsValue> & {
@@ -98,7 +92,7 @@ const update = async (id: number, patch: Partial<HostDTO>): Promise<HostDTO> => 
 
 const remove = async (id: number): Promise<void> => {
   const { hosts, selectedHost } = requireValue('remove');
-  await HostDTO.delete(id as unknown as string);
+  await HostDTO.delete(id);
   const next = hosts.filter((h) => h.id !== id);
   let nextSelected = selectedHost;
   if (selectedHost.id === id) {

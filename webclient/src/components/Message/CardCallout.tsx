@@ -25,7 +25,11 @@ const Root = styled('span')(() => ({
   }
 }));
 
-const CardCallout = ({ name }) => {
+interface CardCalloutProps {
+  name: string;
+}
+
+const CardCallout = ({ name }: CardCalloutProps) => {
   const { card, token, anchorEl, open, handlePopoverOpen, handlePopoverClose } =
     useCardCallout(name);
 

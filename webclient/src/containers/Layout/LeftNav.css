@@ -38,9 +38,6 @@
   margin-left: 10px;
 }
 
-.LeftNav-nav {
-}
-
 .LeftNav-nav__links {
   display: flex;
   flex-flow: column;
@@ -102,27 +99,7 @@
   justify-content: center;
 }
 
-.LeftNav-nav__action {
-
-}
-
 .LeftNav-nav__action button {
   color: white;
 }
 
-.temp-subnav__rooms {
-  display: flex;
-  align-items: center;
-  font-size: 10px;
-  padding: 5px;
-}
-
-.temp-chip {
-  margin-left: 5px;
-  text-decoration: none;
-}
-
-
-.temp-chip > div {
-  cursor: inherit;
-}

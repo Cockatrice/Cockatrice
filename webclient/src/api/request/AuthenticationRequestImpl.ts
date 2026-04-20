@@ -15,11 +15,20 @@ interface AppAuthRequestOverrides extends WebsocketTypes.AuthRequestMap {
   ForgotPasswordResetParams: Omit<WebsocketTypes.PasswordResetConnectOptions, 'reason'>;
 }
 
+const CONNECTING_STATUS_LABEL = 'Connecting...';
+
+function beginConnect(
+  options: { host: string; port: string | number },
+  reason: WebsocketTypes.WebSocketConnectReason,
+): void {
+  setPendingOptions({ ...options, reason });
+  SessionCommands.updateStatus(WebsocketTypes.StatusEnum.CONNECTING, CONNECTING_STATUS_LABEL);
+  WebClient.instance.connect({ host: options.host, port: options.port });
+}
+
 export class AuthenticationRequestImpl implements WebsocketTypes.IAuthenticationRequest<AppAuthRequestOverrides> {
   login(options: Omit<WebsocketTypes.LoginConnectOptions, 'reason'>): void {
-    setPendingOptions({ ...options, reason: WebsocketTypes.WebSocketConnectReason.LOGIN });
-    SessionCommands.updateStatus(WebsocketTypes.StatusEnum.CONNECTING, 'Connecting...');
-    WebClient.instance.connect({ host: options.host, port: options.port });
+    beginConnect(options, WebsocketTypes.WebSocketConnectReason.LOGIN);
   }
 
   testConnection(options: Omit<WebsocketTypes.TestConnectionOptions, 'reason'>): void {
@@ -27,33 +36,23 @@ export class AuthenticationRequestImpl implements WebsocketTypes.IAuthentication
   }
 
   register(options: Omit<WebsocketTypes.RegisterConnectOptions, 'reason'>): void {
-    setPendingOptions({ ...options, reason: WebsocketTypes.WebSocketConnectReason.REGISTER });
-    SessionCommands.updateStatus(WebsocketTypes.StatusEnum.CONNECTING, 'Connecting...');
-    WebClient.instance.connect({ host: options.host, port: options.port });
+    beginConnect(options, WebsocketTypes.WebSocketConnectReason.REGISTER);
   }
 
   activateAccount(options: Omit<WebsocketTypes.ActivateConnectOptions, 'reason'>): void {
-    setPendingOptions({ ...options, reason: WebsocketTypes.WebSocketConnectReason.ACTIVATE_ACCOUNT });
-    SessionCommands.updateStatus(WebsocketTypes.StatusEnum.CONNECTING, 'Connecting...');
-    WebClient.instance.connect({ host: options.host, port: options.port });
+    beginConnect(options, WebsocketTypes.WebSocketConnectReason.ACTIVATE_ACCOUNT);
   }
 
   resetPasswordRequest(options: Omit<WebsocketTypes.PasswordResetRequestConnectOptions, 'reason'>): void {
-    setPendingOptions({ ...options, reason: WebsocketTypes.WebSocketConnectReason.PASSWORD_RESET_REQUEST });
-    SessionCommands.updateStatus(WebsocketTypes.StatusEnum.CONNECTING, 'Connecting...');
-    WebClient.instance.connect({ host: options.host, port: options.port });
+    beginConnect(options, WebsocketTypes.WebSocketConnectReason.PASSWORD_RESET_REQUEST);
   }
 
   resetPasswordChallenge(options: Omit<WebsocketTypes.PasswordResetChallengeConnectOptions, 'reason'>): void {
-    setPendingOptions({ ...options, reason: WebsocketTypes.WebSocketConnectReason.PASSWORD_RESET_CHALLENGE });
-    SessionCommands.updateStatus(WebsocketTypes.StatusEnum.CONNECTING, 'Connecting...');
-    WebClient.instance.connect({ host: options.host, port: options.port });
+    beginConnect(options, WebsocketTypes.WebSocketConnectReason.PASSWORD_RESET_CHALLENGE);
   }
 
   resetPassword(options: Omit<WebsocketTypes.PasswordResetConnectOptions, 'reason'>): void {
-    setPendingOptions({ ...options, reason: WebsocketTypes.WebSocketConnectReason.PASSWORD_RESET });
-    SessionCommands.updateStatus(WebsocketTypes.StatusEnum.CONNECTING, 'Connecting...');
-    WebClient.instance.connect({ host: options.host, port: options.port });
+    beginConnect(options, WebsocketTypes.WebSocketConnectReason.PASSWORD_RESET);
   }
 
   disconnect(): void {

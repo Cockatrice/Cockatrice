@@ -109,8 +109,8 @@ const LeftNav = () => {
                     }}
                   >
                     {state.options.map((option) => (
-                      <MenuItem key={option} onClick={() => handleMenuItemClick(option)}>
-                        {option}
+                      <MenuItem key={option.label} onClick={() => handleMenuItemClick(option)}>
+                        {option.label}
                       </MenuItem>
                     ))}
 

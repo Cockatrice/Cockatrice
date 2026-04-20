@@ -15,6 +15,6 @@ export class SetDTO extends App.Set {
   static bulkAdd(sets: SetDTO[]): Promise<IndexableType> {
     return dexieService.sets.bulkPut(sets);
   }
-};
+}
 
 dexieService.sets.mapToClass(SetDTO);

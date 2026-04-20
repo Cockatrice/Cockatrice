@@ -1,43 +1,35 @@
-import React from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 
+import type { AccountActivationFormValues } from '@app/forms';
 import { AccountActivationForm } from '@app/forms';
+
+import AuthDialogShell from '../AuthDialogShell/AuthDialogShell';
 
 import './AccountActivationDialog.css';
 
-const AccountActivationDialog = ({ handleClose, isOpen, onSubmit }: any) => {
+interface AccountActivationDialogProps {
+  isOpen: boolean;
+  handleClose?: () => void;
+  onSubmit: (values: AccountActivationFormValues) => void;
+}
+
+const AccountActivationDialog = ({ handleClose, isOpen, onSubmit }: AccountActivationDialogProps) => {
   const { t } = useTranslation();
 
-  const handleOnClose = () => {
-    handleClose();
-  }
-
   return (
-    <Dialog onClose={handleOnClose} open={isOpen}>
-      <DialogTitle className="dialog-title">
-        <Typography variant="h6">{ t('AccountActivationDialog.title') }</Typography>
+    <AuthDialogShell
+      isOpen={isOpen}
+      handleClose={handleClose}
+      title={t('AccountActivationDialog.title')}
+    >
+      <div className="content">
+        <Typography variant='subtitle1'>{ t('AccountActivationDialog.subtitle1') }</Typography>
+        <Typography variant='subtitle1'>{ t('AccountActivationDialog.subtitle2') }</Typography>
+      </div>
 
-        {handleOnClose ? (
-          <IconButton onClick={handleOnClose} size="large">
-            <CloseIcon />
-          </IconButton>
-        ) : null}
-      </DialogTitle>
-      <DialogContent>
-        <div className="content">
-          <Typography variant='subtitle1'>{ t('AccountActivationDialog.subtitle1') }</Typography>
-          <Typography variant='subtitle1'>{ t('AccountActivationDialog.subtitle2') }</Typography>
-        </div>
-
-        <AccountActivationForm onSubmit={onSubmit}></AccountActivationForm>
-      </DialogContent>
-    </Dialog>
+      <AccountActivationForm onSubmit={onSubmit} />
+    </AuthDialogShell>
   );
 };
 

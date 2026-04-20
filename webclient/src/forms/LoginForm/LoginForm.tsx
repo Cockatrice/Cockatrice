@@ -5,17 +5,28 @@ import { useTranslation } from 'react-i18next';
 
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
+import CircularProgress from '@mui/material/CircularProgress';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { CheckboxField, InputField, KnownHosts } from '@app/components';
+import type { FormErrors } from '@app/forms';
 import { LoadingState, useKnownHosts, useSettings } from '@app/hooks';
+import { HostDTO } from '@app/services';
 
 import { useLoginFormBody } from './useLoginForm';
 
 import './LoginForm.css';
 
+export interface LoginFormValues {
+  userName: string;
+  password: string;
+  remember: boolean;
+  autoConnect: boolean;
+  selectedHost: HostDTO;
+}
+
 interface LoginFormProps {
-  onSubmit: (values: any) => void;
+  onSubmit: (values: LoginFormValues) => void;
   disableSubmitButton: boolean;
   onResetPassword: () => void;
 }
@@ -33,7 +44,7 @@ const LoginFormBody = ({
 }: LoginFormBodyProps) => {
   const { t } = useTranslation();
   const PASSWORD_LABEL = t('Common.label.password');
-  const STORED_PASSWORD_LABEL = `* ${t('LoginForm.label.savedPassword')} *`;
+  const STORED_PASSWORD_LABEL = t('LoginForm.label.savedPassword');
 
   const {
     useStoredPasswordLabel,
@@ -121,8 +132,8 @@ const LoginForm = (props: LoginFormProps) => {
   const knownHosts = useKnownHosts();
   const settings = useSettings();
 
-  const validate = (values: any) => {
-    const errors: any = {};
+  const validate = (values: Partial<LoginFormValues>): FormErrors<LoginFormValues> => {
+    const errors: FormErrors<LoginFormValues> = {};
 
     if (!values.userName) {
       errors.userName = t('Common.validation.required');
@@ -134,17 +145,20 @@ const LoginForm = (props: LoginFormProps) => {
     return errors;
   };
 
-  const handleOnSubmit = ({ userName, ...values }: any) => {
-    userName = userName?.trim();
-    props.onSubmit({ userName, ...values });
+  const handleOnSubmit = ({ userName, ...values }: LoginFormValues) => {
+    props.onSubmit({ ...values, userName: userName?.trim() });
   };
 
   if (knownHosts.status !== LoadingState.READY || settings.status !== LoadingState.READY) {
-    return null;
+    return (
+      <div className="loginForm-loading">
+        <CircularProgress size={40} />
+      </div>
+    );
   }
 
   const selectedHost = knownHosts.value?.selectedHost;
-  const initialValues = {
+  const initialValues: Partial<LoginFormValues> = {
     selectedHost,
     userName: selectedHost?.userName ?? '',
     remember: Boolean(selectedHost?.remember),

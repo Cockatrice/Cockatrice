@@ -1,0 +1,20 @@
+{
+  "Logs": {
+    "tab": {
+      "rooms": "Rooms",
+      "games": "Games",
+      "chats": "Chats"
+    },
+    "column": {
+      "time": "Time",
+      "senderName": "Sender Name",
+      "senderIp": "Sender IP",
+      "message": "Message",
+      "targetId": "Target ID",
+      "targetName": "Target Name"
+    },
+    "message": {
+      "emptyFilter": "Enter at least one search field before submitting."
+    }
+  }
+}

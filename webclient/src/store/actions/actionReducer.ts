@@ -5,17 +5,17 @@
 
 import { UnknownAction } from '@reduxjs/toolkit'
 
- interface InitialState {
-   type: string | null
-   payload: unknown
-   meta: unknown
-   error: boolean
-   count: number
- }
+interface InitialState {
+  type: string | null
+  payload: unknown
+  meta: unknown
+  error: boolean
+  count: number
+}
 
 /**
-  * Initial data.
-  */
+ * Initial data.
+ */
 const initialState: InitialState = {
   type: null,
   payload: null,
@@ -25,12 +25,12 @@ const initialState: InitialState = {
 }
 
 /**
-  * Stores the most recent action so `useReduxEffect` can react to dispatches.
-  *
-  * Payloads are deep-cloned to prevent shared object references between this
-  * slice and the slice that owns the action. Without the clone, Immer mutations
-  * in the target slice are detected as mutations of the stale payload stored here.
-  */
+ * Stores the most recent action so `useReduxEffect` can react to dispatches.
+ *
+ * Payloads are deep-cloned to prevent shared object references between this
+ * slice and the slice that owns the action. Without the clone, Immer mutations
+ * in the target slice are detected as mutations of the stale payload stored here.
+ */
 export const actionReducer = (
   state = initialState,
   action: UnknownAction,

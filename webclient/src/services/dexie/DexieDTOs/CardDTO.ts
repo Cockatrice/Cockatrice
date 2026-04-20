@@ -15,6 +15,6 @@ export class CardDTO extends App.Card {
   static bulkAdd(cards: CardDTO[]): Promise<IndexableType> {
     return dexieService.cards.bulkPut(cards);
   }
-};
+}
 
 dexieService.cards.mapToClass(CardDTO);

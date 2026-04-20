@@ -1,14 +1,17 @@
-import React from 'react';
-import { Form } from 'react-final-form'
+import { Form } from 'react-final-form';
 
 import { InputAction } from '@app/components';
 
-const SayMessage = ({ onSubmit }) => (
+interface SayMessageProps {
+  onSubmit: (args: { message: string }) => void;
+}
+
+const SayMessage = ({ onSubmit }: SayMessageProps) => (
   <Form onSubmit={onSubmit}>
     {({ handleSubmit, form }) => (
       <form onSubmit={e => {
-        handleSubmit(e)
-        form.restart()
+        handleSubmit(e);
+        form.restart();
       }}>
         <InputAction action="Send" label="Chat" name="message" />
       </form>

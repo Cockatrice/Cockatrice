@@ -3,6 +3,12 @@ import { useMemo, useState } from 'react';
 import { LoadingState, useCurrentGame, useSettings, useWebClient } from '@app/hooks';
 import { GameSelectors, useAppSelector } from '@app/store';
 
+/**
+ * MTG turn phase count (0..10). Mirrors desktop's wrap-around behavior in
+ * `GameView::actNextPhase` — see `types/game.ts` for the Phase enum.
+ */
+const PHASE_COUNT = 11;
+
 export interface TurnControlsOpponent {
   playerId: number;
   name: string;
@@ -119,11 +125,11 @@ export function useTurnControls({
     if (!canAdvance || !hasLiveGame) {
       return;
     }
-    // Desktop wraps at 11 → 0 (the Phase enum is 0–10). When no phase is
-    // active yet (activePhase < 0 during the pre-game lobby), advance to
+    // Desktop wraps at PHASE_COUNT → 0 (the Phase enum is 0–10). When no phase
+    // is active yet (activePhase < 0 during the pre-game lobby), advance to
     // Untap (0).
     const current = game.activePhase;
-    const next = current >= 0 ? (current + 1) % 11 : 0;
+    const next = current >= 0 ? (current + 1) % PHASE_COUNT : 0;
     webClient.request.game.setActivePhase(gameId, { phase: next });
   };
 

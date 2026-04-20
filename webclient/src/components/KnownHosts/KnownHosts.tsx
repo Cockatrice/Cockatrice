@@ -1,6 +1,6 @@
 import { styled } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
-import { Select, MenuItem } from '@mui/material';
+import { Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
@@ -14,8 +14,8 @@ import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 
 import { KnownHostDialog } from '@app/dialogs';
 import { getHostPort, HostDTO } from '@app/services';
-import Toast from '../Toast/Toast';
 
+import type { FinalFormFieldProps } from '../fieldTypes';
 import { TestConnection, useKnownHostsComponent } from './useKnownHostsComponent';
 
 import './KnownHosts.css';
@@ -50,9 +50,11 @@ const Root = styled('div')(({ theme }) => ({
   },
 }));
 
-const KnownHosts = (props: any) => {
-  const { input, meta, disabled } = props;
-  const onChange: (value: HostDTO) => void = input.onChange;
+type KnownHostsProps = FinalFormFieldProps<HostDTO | undefined, HTMLElement> & {
+  disabled?: boolean;
+};
+
+const KnownHosts = ({ input, meta, disabled }: KnownHostsProps) => {
   const { touched, error, warning } = meta;
 
   const { t } = useTranslation();
@@ -61,22 +63,25 @@ const KnownHosts = (props: any) => {
     selectedHost,
     testingConnection,
     dialogState,
-    showCreateToast,
-    showDeleteToast,
-    showEditToast,
-    setShowCreateToast,
-    setShowDeleteToast,
-    setShowEditToast,
     onPick,
     openAddKnownHostDialog,
     openEditKnownHostDialog,
     closeKnownHostDialog,
     handleDialogRemove,
     handleDialogSubmit,
-  } = useKnownHostsComponent({ onChange });
+  } = useKnownHostsComponent({ onChange: input.onChange });
+
+  const selectedId = selectedHost?.id ?? '';
+
+  const handleSelectChange = (event: SelectChangeEvent<number | ''>) => {
+    const value = event.target.value;
+    if (typeof value === 'number') {
+      void onPick(value);
+    }
+  };
 
   return (
-    <Root className={'KnownHosts ' + classes.root}>
+    <Root className={`KnownHosts ${classes.root}`}>
       <FormControl className="KnownHosts-form" size="small" variant="outlined">
         {touched && (
           <div className="KnownHosts-validation">
@@ -97,24 +102,24 @@ const KnownHosts = (props: any) => {
           label="Host"
           margin="dense"
           name="host"
-          value={selectedHost ?? ''}
-          fullWidth={true}
-          onChange={(e) => onPick(e.target.value as unknown as HostDTO)}
+          value={selectedId}
+          fullWidth
+          onChange={handleSelectChange}
           disabled={disabled}
         >
-          <Button value={selectedHost} onClick={openAddKnownHostDialog}>
+          <Button onClick={openAddKnownHostDialog}>
             <span>{t('KnownHosts.add')}</span>
             <AddIcon fontSize="small" color="primary" />
           </Button>
 
-          {hosts.map((host, index) => {
+          {hosts.map((host) => {
             const hostPort = getHostPort(host);
 
             return (
-              <MenuItem value={host as any} key={host.id ?? index}>
+              <MenuItem value={host.id} key={host.id}>
                 <div className="KnownHosts-item">
                   <div className="KnownHosts-item__wrapper">
-                    <div className={'KnownHosts-item__status ' + testingConnection}>
+                    <div className={`KnownHosts-item__status ${testingConnection ?? ''}`}>
                       {testingConnection === TestConnection.FAILED ? (
                         <PortableWifiOffIcon fontSize="small" />
                       ) : (
@@ -151,20 +156,11 @@ const KnownHosts = (props: any) => {
 
       <KnownHostDialog
         isOpen={dialogState.open}
-        host={dialogState.edit}
+        host={dialogState.edit ?? undefined}
         onRemove={handleDialogRemove}
         onSubmit={handleDialogSubmit}
         handleClose={closeKnownHostDialog}
       />
-      <Toast open={showCreateToast} onClose={() => setShowCreateToast(false)}>
-        {t('KnownHosts.toast', { mode: 'created' })}
-      </Toast>
-      <Toast open={showDeleteToast} onClose={() => setShowDeleteToast(false)}>
-        {t('KnownHosts.toast', { mode: 'deleted' })}
-      </Toast>
-      <Toast open={showEditToast} onClose={() => setShowEditToast(false)}>
-        {t('KnownHosts.toast', { mode: 'edited' })}
-      </Toast>
     </Root>
   );
 };

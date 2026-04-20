@@ -30,7 +30,7 @@ const CardDetails = ({ card }: CardProps) => {
                 (!card.power && !card.toughness) ? null : (
                   <div className='cardDetails-attribute'>
                     <span className='cardDetails-attribute__label'>P/T:</span>
-                    <span className='cardDetails-attribute__value'>{card.power || 0}/{card.toughness || 0}</span>
+                    <span className='cardDetails-attribute__value'>{card.power ?? 0}/{card.toughness ?? 0}</span>
                   </div>
                 )
               }

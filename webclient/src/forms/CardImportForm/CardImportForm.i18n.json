@@ -1,0 +1,25 @@
+{
+  "CardImportForm": {
+    "steps": {
+      "importSets": "Import sets",
+      "saveSets": "Save sets",
+      "importTokens": "Import tokens",
+      "finished": "Finished"
+    },
+    "label": {
+      "downloadUrl": "Download URL"
+    },
+    "button": {
+      "import": "Import",
+      "save": "Save",
+      "goBack": "Go Back",
+      "done": "Done"
+    },
+    "message": {
+      "finished": "Finished!",
+      "importSummary": "Import finished: {count} cards.",
+      "setSummary": "{name}: {count} cards imported",
+      "failedToSave": "Failed to save cards"
+    }
+  }
+}

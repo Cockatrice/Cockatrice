@@ -3,6 +3,7 @@ import { WebClient } from '@app/websocket';
 import { createWebClientRequest, createWebClientResponse } from '@app/api';
 
 export const WebClientContext = createContext<WebClient | null>(null);
+WebClientContext.displayName = 'WebClientContext';
 
 export function WebClientProvider({ children }: { children: ReactNode }) {
   const [client] = useState(() => new WebClient(createWebClientRequest(), createWebClientResponse()));

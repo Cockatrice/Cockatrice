@@ -32,7 +32,7 @@ const UserDisplay = ({ user }: UserDisplayProps) => {
     <div className="user-display">
       <NavLink to={generatePath(App.RouteEnum.PLAYER, { name })} className="plain-link">
         <div className="user-display__details" onContextMenu={handleClick}>
-          <img className="user-display__country" src={Images.Countries[country]} alt={country}></img>
+          <img className="user-display__country" src={Images.Countries[country]} alt={country} />
           <div className="user-display__name single-line-ellipsis">{name}</div>
         </div>
       </NavLink>

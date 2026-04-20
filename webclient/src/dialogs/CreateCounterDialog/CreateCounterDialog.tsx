@@ -88,7 +88,20 @@ function CreateCounterDialog({ isOpen, onSubmit, onCancel }: CreateCounterDialog
             helperText={error ?? ''}
             slotProps={{ htmlInput: { 'aria-label': 'Counter name' } }}
           />
-          <div className="create-counter-dialog__swatches" role="radiogroup" aria-label="Counter color">
+          <div
+            className="create-counter-dialog__swatches"
+            role="radiogroup"
+            aria-label="Counter color"
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                setSelectedIdx((selectedIdx + 1) % SWATCHES.length);
+              } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                setSelectedIdx((selectedIdx - 1 + SWATCHES.length) % SWATCHES.length);
+              }
+            }}
+          >
             {SWATCHES.map((s, idx) => (
               <button
                 key={s.label}
@@ -96,6 +109,7 @@ function CreateCounterDialog({ isOpen, onSubmit, onCancel }: CreateCounterDialog
                 role="radio"
                 aria-checked={idx === selectedIdx}
                 aria-label={s.label}
+                tabIndex={idx === selectedIdx ? 0 : -1}
                 className={cx('create-counter-dialog__swatch', {
                   'create-counter-dialog__swatch--selected': idx === selectedIdx,
                 })}

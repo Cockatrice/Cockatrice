@@ -18,6 +18,6 @@ export class SettingDTO extends App.Setting {
   static get(user: string) {
     return dexieService.settings.where('user').equalsIgnoreCase(user).first();
   }
-};
+}
 
 dexieService.settings.mapToClass(SettingDTO);

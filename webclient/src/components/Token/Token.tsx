@@ -1,6 +1,3 @@
-// eslint-disable-next-line
-import React, { useMemo, useState } from 'react';
-
 import { TokenDTO } from '@app/services';
 
 import './Token.css';
@@ -10,10 +7,11 @@ interface TokenProps {
 }
 
 const Token = ({ token }: TokenProps) => {
-  const set = Array.isArray(token?.set) ? token?.set[0] : token?.set;
-  return token && (
-    <img className="token" src={set?.picURL} alt={token?.name?.value} />
-  );
-}
+  if (!token) {
+    return null;
+  }
+  const set = Array.isArray(token.set) ? token.set[0] : token.set;
+  return <img className="token" src={set?.picURL} alt={token.name?.value} />;
+};
 
 export default Token;

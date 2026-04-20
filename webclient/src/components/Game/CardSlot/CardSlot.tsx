@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import type { Data } from '@app/types';
 import { cx } from '@app/utils';
 
@@ -94,4 +96,4 @@ function CardSlot({
   );
 }
 
-export default CardSlot;
+export default memo(CardSlot);

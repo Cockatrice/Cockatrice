@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
 
-type UseFireOnceType = (...args: any) => any;
+type FireOnceFn = (...args: never[]) => unknown;
 
-export function useFireOnce<T extends UseFireOnceType>(fn: T): [boolean, () => void, (...args: Parameters<T>) => void] {
+export function useFireOnce<T extends FireOnceFn>(fn: T): [boolean, () => void, (...args: Parameters<T>) => void] {
   const [actionIsInFlight, setActionIsInFlight] = useState(false);
   const fnRef = useRef(fn);
   fnRef.current = fn;

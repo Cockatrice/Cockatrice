@@ -7,7 +7,15 @@ import CardCallout from './CardCallout';
 import { useParsedMessage } from './useMessage';
 import './Message.css';
 
-const Message = ({ message: { message } }) => (
+interface MessagePayload {
+  message: string;
+}
+
+interface MessageProps {
+  message: MessagePayload;
+}
+
+const Message = ({ message: { message } }: MessageProps) => (
   <div className='message'>
     <div className='message__detail'>
       <ParsedMessage message={message} />
@@ -15,7 +23,11 @@ const Message = ({ message: { message } }) => (
   </div>
 );
 
-const ParsedMessage = ({ message }) => {
+interface ParsedMessageProps {
+  message: string;
+}
+
+const ParsedMessage = ({ message }: ParsedMessageProps) => {
   const { name, chunks } = useParsedMessage(message, parseChunks);
 
   return (
@@ -26,7 +38,12 @@ const ParsedMessage = ({ message }) => {
   );
 };
 
-const PlayerLink = ({ name, label = name }) => (
+interface PlayerLinkProps {
+  name: string;
+  label?: string;
+}
+
+const PlayerLink = ({ name, label = name }: PlayerLinkProps) => (
   <NavLink className="link" to={generatePath(App.RouteEnum.PLAYER, { name })}>
     {label}
   </NavLink>
@@ -69,7 +86,7 @@ function parseMentionChunk(chunk: string): ReactNode {
 
       if (mention) {
         const name = mention[0].substr(1);
-        return (<PlayerLink name={name} label={mention} key={index} />);
+        return (<PlayerLink name={name} label={mention[0]} key={index} />);
       }
 
       return mentionChunk;

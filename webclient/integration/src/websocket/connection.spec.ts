@@ -100,7 +100,12 @@ describe('connection lifecycle', () => {
 
     vi.advanceTimersByTime(5000);
 
+    // Fire onclose the way a real browser would when the connection-attempt
+    // timer closes a still-connecting socket.
+    mock.onclose?.({ code: 1006, reason: '', wasClean: false } as CloseEvent);
+
     expect(mock.close).toHaveBeenCalled();
+    // Never-opened sockets bypass reconnect and land on DISCONNECTED directly.
     expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
   });
 
@@ -111,12 +116,15 @@ describe('connection lifecycle', () => {
 
     const mock = getMockWebSocket();
     getWebClient().disconnect();
+    // The transport schedules close() synchronously; onclose follows in the
+    // browser event loop. Simulate it so the status transition fires.
+    mock.onclose?.({ code: 1000, reason: '', wasClean: true } as CloseEvent);
 
     expect(mock.close).toHaveBeenCalled();
     expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
   });
 
-  it('drops pending commands and clears state on unexpected socket close', () => {
+  it('enters RECONNECTING on unexpected socket close after a successful handshake', () => {
     connectAndHandshake();
 
     // A login command is now pending (sent during handshake)
@@ -127,6 +135,8 @@ describe('connection lifecycle', () => {
     mock.readyState = 3;
     mock.onclose?.({ code: 1006, reason: '', wasClean: false } as CloseEvent);
 
-    expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.DISCONNECTED);
+    // With reconnect configured, a drop after a successful open enters the
+    // reconnect state machine rather than going straight to DISCONNECTED.
+    expect(store.getState().server.status.state).toBe(WebsocketTypes.StatusEnum.RECONNECTING);
   });
 });

@@ -4,5 +4,8 @@ export enum StatusEnum {
   CONNECTED,
   LOGGING_IN,
   LOGGED_IN,
-  DISCONNECTING = 99
+  /** Separated from sequential states to reserve room for future connection phases. */
+  RECONNECTING = 50,
+  /** High sentinel value — marks the terminal "tearing down" state that must not collide with future states added above. */
+  DISCONNECTING = 99,
 }

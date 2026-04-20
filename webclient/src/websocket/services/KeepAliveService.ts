@@ -20,7 +20,7 @@ export class KeepAliveService {
         this.disconnected$.next();
       }
 
-      // stop the ping loop if we"re disconnected
+      // stop the ping loop if we're disconnected
       if (!this.isOpen()) {
         this.endPingLoop();
         return;

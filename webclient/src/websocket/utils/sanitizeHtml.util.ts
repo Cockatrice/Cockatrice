@@ -15,6 +15,10 @@ export function sanitizeHtml(msg: string): string {
   return DOMPurify.sanitize(msg, {
     ALLOWED_TAGS: ['br', 'a', 'img', 'center', 'b', 'font'],
     ALLOWED_ATTR: ['href', 'color', 'rel', 'target', 'src', 'alt'],
+    // Load-bearing: DOMPurify applies ALLOWED_URI_REGEXP to *every* attribute
+    // it isn't explicitly told is URI-safe. `color` values like "red" don't
+    // match the regex and would be stripped. This whitelists `color` out of
+    // URI validation. Removing it breaks the <font color="red"> sanitizer test.
     ADD_URI_SAFE_ATTR: ['color'],
     ALLOWED_URI_REGEXP: /^https?:/i,
   });

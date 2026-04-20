@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
+import { useToast } from '@app/components';
 import { LoadingState, useKnownHosts, useReduxEffect, useWebClient } from '@app/hooks';
 import { getHostPort, HostDTO } from '@app/services';
 import { ServerTypes } from '@app/store';
@@ -16,13 +18,7 @@ export interface KnownHostsComponent {
   selectedHost: App.Host | undefined;
   testingConnection: TestConnection | null;
   dialogState: { open: boolean; edit: HostDTO | null };
-  showCreateToast: boolean;
-  showDeleteToast: boolean;
-  showEditToast: boolean;
-  setShowCreateToast: (v: boolean) => void;
-  setShowDeleteToast: (v: boolean) => void;
-  setShowEditToast: (v: boolean) => void;
-  onPick: (host: HostDTO) => Promise<void>;
+  onPick: (id: number) => Promise<void>;
   openAddKnownHostDialog: () => void;
   openEditKnownHostDialog: (host: HostDTO) => void;
   closeKnownHostDialog: () => void;
@@ -39,11 +35,20 @@ export interface UseKnownHostsComponentArgs {
   onChange: (value: HostDTO) => void;
 }
 
+type ToastMode = 'created' | 'deleted' | 'edited';
+
 export function useKnownHostsComponent({
   onChange,
 }: UseKnownHostsComponentArgs): KnownHostsComponent {
   const webClient = useWebClient();
   const knownHosts = useKnownHosts();
+  const { t } = useTranslation();
+
+  const [toastMode, setToastMode] = useState<ToastMode>('created');
+  const knownHostToast = useToast({
+    key: 'known-hosts-action',
+    children: t('KnownHosts.toast', { mode: toastMode }),
+  });
 
   const [dialogState, setDialogState] = useState<{ open: boolean; edit: HostDTO | null }>({
     open: false,
@@ -51,16 +56,16 @@ export function useKnownHostsComponent({
   });
 
   const [testingConnection, setTestingConnection] = useState<TestConnection | null>(null);
-
-  const [showCreateToast, setShowCreateToast] = useState(false);
-  const [showDeleteToast, setShowDeleteToast] = useState(false);
-  const [showEditToast, setShowEditToast] = useState(false);
+  // Tracks the host currently awaiting a testConnection response. If null when a
+  // response arrives, the caller has moved on — ignore the stale reply.
+  const pendingTestRef = useRef<HostDTO | null>(null);
 
   const selectedHost =
     knownHosts.status === LoadingState.READY ? knownHosts.value?.selectedHost : undefined;
   const hosts = knownHosts.status === LoadingState.READY ? knownHosts.value?.hosts ?? [] : [];
 
   const testConnection = (host: HostDTO) => {
+    pendingTestRef.current = host;
     setTestingConnection(TestConnection.TESTING);
     webClient.request.authentication.testConnection({ ...getHostPort(host) });
   };
@@ -73,28 +78,37 @@ export function useKnownHostsComponent({
     testConnection(selectedHost);
   }, [selectedHost]);
 
-  useReduxEffect(
-    () => {
-      setTestingConnection(TestConnection.SUCCESS);
-    },
-    ServerTypes.TEST_CONNECTION_SUCCESSFUL,
-    [],
-  );
+  useReduxEffect(() => {
+    if (!pendingTestRef.current) {
+      return;
+    }
+    setTestingConnection(TestConnection.SUCCESS);
+    pendingTestRef.current = null;
+  }, ServerTypes.TEST_CONNECTION_SUCCESSFUL, []);
 
-  useReduxEffect(
-    () => {
-      setTestingConnection(TestConnection.FAILED);
-    },
-    ServerTypes.TEST_CONNECTION_FAILED,
-    [],
-  );
+  useReduxEffect(() => {
+    if (!pendingTestRef.current) {
+      return;
+    }
+    setTestingConnection(TestConnection.FAILED);
+    pendingTestRef.current = null;
+  }, ServerTypes.TEST_CONNECTION_FAILED, []);
 
-  const onPick = async (host: HostDTO) => {
+  const fireToast = (mode: ToastMode) => {
+    setToastMode(mode);
+    knownHostToast.openToast();
+  };
+
+  const onPick = async (id: number) => {
     if (knownHosts.status !== LoadingState.READY) {
       return;
     }
+    const host = knownHosts.value?.hosts.find((h) => h.id === id);
+    if (!host) {
+      return;
+    }
     onChange(host);
-    await knownHosts.select(host.id!);
+    await knownHosts.select(id);
     testConnection(host);
   };
 
@@ -116,7 +130,7 @@ export function useKnownHostsComponent({
     }
     await knownHosts.remove(id);
     closeKnownHostDialog();
-    setShowDeleteToast(true);
+    fireToast('deleted');
   };
 
   const handleDialogSubmit = async ({
@@ -136,11 +150,11 @@ export function useKnownHostsComponent({
 
     if (id) {
       await knownHosts.update(id, { name, host, port });
-      setShowEditToast(true);
+      fireToast('edited');
     } else {
       const newHost: App.Host = { name, host, port, editable: true };
       await knownHosts.add(newHost);
-      setShowCreateToast(true);
+      fireToast('created');
     }
 
     closeKnownHostDialog();
@@ -151,12 +165,6 @@ export function useKnownHostsComponent({
     selectedHost,
     testingConnection,
     dialogState,
-    showCreateToast,
-    showDeleteToast,
-    showEditToast,
-    setShowCreateToast,
-    setShowDeleteToast,
-    setShowEditToast,
     onPick,
     openAddKnownHostDialog,
     openEditKnownHostDialog,

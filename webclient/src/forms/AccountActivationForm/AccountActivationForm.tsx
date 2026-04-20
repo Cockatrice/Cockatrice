@@ -1,5 +1,4 @@
-// eslint-disable-next-line
-import React, { useState } from "react";
+import { useState } from 'react';
 import { Form, Field } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 
@@ -7,12 +6,21 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import { InputField } from '@app/components';
+import type { FormErrors } from '@app/forms';
 import { useReduxEffect } from '@app/hooks';
 import { ServerTypes } from '@app/store';
 
 import './AccountActivationForm.css';
 
-const AccountActivationForm = ({ onSubmit }) => {
+export interface AccountActivationFormValues {
+  token: string;
+}
+
+interface AccountActivationFormProps {
+  onSubmit: (values: AccountActivationFormValues) => void;
+}
+
+const AccountActivationForm = ({ onSubmit }: AccountActivationFormProps) => {
   const [errorMessage, setErrorMessage] = useState(false);
   const { t } = useTranslation();
 
@@ -20,16 +28,14 @@ const AccountActivationForm = ({ onSubmit }) => {
     setErrorMessage(true);
   }, ServerTypes.ACCOUNT_ACTIVATION_FAILED, []);
 
-  const handleOnSubmit = ({ token, ...values }) => {
+  const handleOnSubmit = ({ token, ...values }: AccountActivationFormValues) => {
     setErrorMessage(false);
 
-    token = token?.trim();
+    onSubmit({ ...values, token: token?.trim() });
+  };
 
-    onSubmit({ token, ...values });
-  }
-
-  const validate = values => {
-    const errors: any = {};
+  const validate = (values: Partial<AccountActivationFormValues>): FormErrors<AccountActivationFormValues> => {
+    const errors: FormErrors<AccountActivationFormValues> = {};
 
     if (!values.token) {
       errors.token = t('Common.validation.required');

@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Select, MenuItem } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -8,49 +7,48 @@ import { useLocaleSort } from '@app/hooks';
 import { Images } from '@app/images';
 import { App } from '@app/types';
 
+import type { FinalFormFieldProps } from '../fieldTypes';
 
 import './CountryDropdown.css';
 
-const CountryDropdown = ({ input: { onChange } }) => {
-  const [value, setValue] = useState('');
+type CountryDropdownProps = FinalFormFieldProps<string, HTMLElement>;
+
+const CountryDropdown = ({ input }: CountryDropdownProps) => {
   const { t } = useTranslation();
+  const currentValue = (input.value as string | undefined) ?? '';
 
-  useEffect(() => onChange(value), [value]);
-
-  const translateCountry = country => t(`Common.countries.${country}`);
+  const translateCountry = (country: string) => t(`Common.countries.${country}`);
   const sortedCountries = useLocaleSort(App.countryCodes, translateCountry);
 
   return (
-    <FormControl size='small' variant='outlined' className='CountryDropdown'>
-      <InputLabel id='CountryDropdown-select'>Country</InputLabel>
+    <FormControl size="small" variant="outlined" className="CountryDropdown">
+      <InputLabel id="CountryDropdown-label">Country</InputLabel>
       <Select
-        id='CountryDropdown-select'
-        labelId='CountryDropdown-label'
-        label='Country'
-        margin='dense'
-        value={value}
-        fullWidth={true}
-        onChange={e => setValue(e.target.value as string)}
+        id="CountryDropdown-select"
+        labelId="CountryDropdown-label"
+        label="Country"
+        margin="dense"
+        fullWidth
+        {...input}
+        value={currentValue}
       >
-        <MenuItem value={''} key={-1}>
+        <MenuItem value="" key="none">
           <div className="CountryDropdown-item">
             <span className="CountryDropdown-item__label">None</span>
           </div>
         </MenuItem>
 
-        {
-          sortedCountries.map((country, index:number) => (
-            <MenuItem value={country} key={index}>
-              <div className="CountryDropdown-item">
-                <img className="CountryDropdown-item__image" src={Images.Countries[country.toLowerCase()]} />
-                <span className="CountryDropdown-item__label">{translateCountry(country)}</span>
-              </div>
-            </MenuItem>
-          ))
-        }
+        {sortedCountries.map(country => (
+          <MenuItem value={country} key={country}>
+            <div className="CountryDropdown-item">
+              <img className="CountryDropdown-item__image" src={Images.Countries[country.toLowerCase()]} />
+              <span className="CountryDropdown-item__label">{translateCountry(country)}</span>
+            </div>
+          </MenuItem>
+        ))}
       </Select>
     </FormControl>
-  )
+  );
 };
 
 export default CountryDropdown;

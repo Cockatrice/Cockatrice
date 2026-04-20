@@ -3,6 +3,7 @@
     "language": "English",
     "disconnect": "Disconnect",
     "label": {
+      "confirmEmail": "Confirm Email",
       "confirmPassword": "Confirm Password",
       "confirmSure": "Are you sure?",
       "country": "Country",
@@ -19,6 +20,7 @@
       "username": "Username"
     },
     "validation": {
+      "emailsMustMatch": "Emails don't match",
       "minChars": "Minimum of {count} {count, plural, one {character} other {characters}} required",
       "passwordsMustMatch": "Passwords don't match",
       "required": "Required"
@@ -312,6 +314,55 @@
       "accountActivationSuccess": "Account Activated Successfully"
     }
   },
+  "Logs": {
+    "tab": {
+      "rooms": "Rooms",
+      "games": "Games",
+      "chats": "Chats"
+    },
+    "column": {
+      "time": "Time",
+      "senderName": "Sender Name",
+      "senderIp": "Sender IP",
+      "message": "Message",
+      "targetId": "Target ID",
+      "targetName": "Target Name"
+    },
+    "message": {
+      "emptyFilter": "Enter at least one search field before submitting."
+    }
+  },
+  "Player": {
+    "title": "User Information",
+    "label": {
+      "realName": "Real Name",
+      "location": "Location",
+      "userLevel": "User Level",
+      "accountAge": "Account Age"
+    },
+    "level": {
+      "administrator": "Administrator",
+      "moderator": "Moderator",
+      "registered": "Registered user",
+      "unregistered": "Unregistered user",
+      "judge": "Judge"
+    },
+    "age": {
+      "unknown": "Unknown",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "daysWithYears": "{years, plural, one {# year} other {# years}}, {days, plural, one {# day} other {# days}}"
+    },
+    "action": {
+      "addBuddy": "Add to Buddy List",
+      "removeBuddy": "Remove from Buddy List",
+      "addIgnore": "Add to Ignore List",
+      "removeIgnore": "Remove from Ignore List",
+      "message": "Message",
+      "warn": "Warn User",
+      "ban": "Ban from Server",
+      "notFound": "User not found or still loading…"
+    }
+  },
   "UnsupportedContainer": {
     "title": "Unsupported Browser",
     "subtitle1": "Please update your browser and/or check your permissions.",
@@ -343,6 +394,29 @@
       "activate": "Activate Account"
     }
   },
+  "CardImportForm": {
+    "steps": {
+      "importSets": "Import sets",
+      "saveSets": "Save sets",
+      "importTokens": "Import tokens",
+      "finished": "Finished"
+    },
+    "label": {
+      "downloadUrl": "Download URL"
+    },
+    "button": {
+      "import": "Import",
+      "save": "Save",
+      "goBack": "Go Back",
+      "done": "Done"
+    },
+    "message": {
+      "finished": "Finished!",
+      "importSummary": "Import finished: {count} cards.",
+      "setSummary": "{name}: {count} cards imported",
+      "failedToSave": "Failed to save cards"
+    }
+  },
   "KnownHostForm": {
     "help": "Need help adding a new host?",
     "label": {
@@ -356,7 +430,7 @@
       "forgot": "Forgot Password",
       "login": "Login",
       "savePassword": "Save Password",
-      "savedPassword": "Saved Password"
+      "savedPassword": "* Saved Password *"
     }
   },
   "RegisterForm": {
@@ -377,6 +451,21 @@
     "error": "Password reset failed",
     "label": {
       "reset": "Reset Password"
+    }
+  },
+  "SearchForm": {
+    "label": {
+      "userName": "Username",
+      "ipAddress": "IP Address",
+      "gameName": "Game Name",
+      "gameId": "GameID",
+      "message": "Message",
+      "rooms": "Rooms",
+      "games": "Games",
+      "chats": "Chats"
+    },
+    "button": {
+      "search": "Search Logs"
     }
   }
 }

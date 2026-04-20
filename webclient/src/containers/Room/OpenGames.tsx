@@ -14,7 +14,7 @@ import { useOpenGames } from './useOpenGames';
 import './OpenGames.css';
 
 interface OpenGamesProps {
-  room: { info: { roomId: number } };
+  room: Enriched.Room;
   onActivateGame?: (gameId: number) => void;
 }
 

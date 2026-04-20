@@ -5,17 +5,32 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import { InputField, KnownHosts } from '@app/components';
+import type { FormErrors } from '@app/forms';
+import { HostDTO } from '@app/services';
 
 import { useResetPasswordForm } from './useResetPasswordForm';
 
 import './ResetPasswordForm.css';
 
-const ResetPasswordForm = ({ onSubmit, userName }) => {
+export interface ResetPasswordFormValues {
+  userName: string;
+  token: string;
+  newPassword: string;
+  passwordAgain: string;
+  selectedHost: HostDTO;
+}
+
+interface ResetPasswordFormProps {
+  onSubmit: (values: ResetPasswordFormValues) => void;
+  userName?: string;
+}
+
+const ResetPasswordForm = ({ onSubmit, userName }: ResetPasswordFormProps) => {
   const { t } = useTranslation();
   const { errorMessage } = useResetPasswordForm();
 
-  const validate = values => {
-    const errors: any = {};
+  const validate = (values: Partial<ResetPasswordFormValues>): FormErrors<ResetPasswordFormValues> => {
+    const errors: FormErrors<ResetPasswordFormValues> = {};
 
     if (!values.userName) {
       errors.userName = t('Common.validation.required');
@@ -42,11 +57,12 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
     return errors;
   };
 
-  const handleOnSubmit = ({ userName, token, ...values }) => {
-    userName = userName?.trim();
-    token = token?.trim();
-
-    onSubmit({ userName, token, ...values });
+  const handleOnSubmit = ({ userName: uName, token, ...values }: ResetPasswordFormValues) => {
+    onSubmit({
+      ...values,
+      userName: uName?.trim(),
+      token: token?.trim(),
+    });
   };
 
   return (
@@ -60,7 +76,7 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
                 name='userName'
                 component={InputField}
                 autoComplete='username'
-                disabled={!!userName}
+                InputProps={{ readOnly: Boolean(userName) }}
               />
             </div>
             <div className='ResetPasswordForm-item'>

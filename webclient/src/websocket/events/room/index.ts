@@ -14,8 +14,8 @@ import {
 import { joinRoom } from './joinRoom';
 import { leaveRoom } from './leaveRoom';
 import { listGames } from './listGames';
-import { roomSay } from './roomSay';
 import { removeMessages } from './removeMessages';
+import { roomSay } from './roomSay';
 
 type RoomRegistryEntry<V = unknown> = RegistryEntry<V, RoomEvent, RoomEvent>;
 export type RoomExtensionRegistry = RoomRegistryEntry[];

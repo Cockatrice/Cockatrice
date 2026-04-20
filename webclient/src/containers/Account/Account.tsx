@@ -7,8 +7,7 @@ import Paper from '@mui/material/Paper';
 import { UserDisplay, VirtualList, AuthGuard, LanguageDropdown } from '@app/components';
 import Layout from '../Layout/Layout';
 
-import AddToBuddies from './AddToBuddies';
-import AddToIgnore from './AddToIgnore';
+import AddUserForm from './AddUserForm';
 import { useAccount } from './useAccount';
 
 import './Account.css';
@@ -44,7 +43,7 @@ const Account = () => {
             ))}
           />
           <div style={{ borderTop: '1px solid' }}>
-            <AddToBuddies onSubmit={handleAddToBuddies} />
+            <AddUserForm label="Add to Buddies" onSubmit={handleAddToBuddies} />
           </div>
         </Paper>
       </div>
@@ -61,7 +60,7 @@ const Account = () => {
             ))}
           />
           <div style={{ borderTop: '1px solid' }}>
-            <AddToIgnore onSubmit={handleAddToIgnore} />
+            <AddUserForm label="Add to Ignore" onSubmit={handleAddToIgnore} />
           </div>
         </Paper>
       </div>

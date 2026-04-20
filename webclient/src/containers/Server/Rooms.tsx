@@ -1,5 +1,4 @@
-// eslint-disable-next-line
-import React from "react";
+import { useMemo } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 
 import Button from '@mui/material/Button';
@@ -10,21 +9,31 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
 import { useWebClient } from '@app/hooks';
-import { App } from '@app/types';
+import { App, Enriched } from '@app/types';
 
 import './Rooms.css';
 
-const Rooms = ({ rooms, joinedRooms }) => {
+interface RoomsProps {
+  rooms: Record<number, Enriched.Room>;
+  joinedRooms: Enriched.Room[];
+}
+
+const Rooms = ({ rooms, joinedRooms }: RoomsProps) => {
   const navigate = useNavigate();
   const webClient = useWebClient();
 
-  function onClick(roomId) {
-    if (joinedRooms.find(room => room.info.roomId === roomId)) {
-      navigate(generatePath(App.RouteEnum.ROOM, { roomId }));
+  const joinedRoomIds = useMemo(
+    () => new Set(joinedRooms.map((room) => room.info.roomId)),
+    [joinedRooms],
+  );
+
+  const onClick = (roomId: number) => {
+    if (joinedRoomIds.has(roomId)) {
+      navigate(generatePath(App.RouteEnum.ROOM, { roomId: String(roomId) }));
     } else {
       webClient.request.rooms.joinRoom(roomId);
     }
-  }
+  };
 
   return (
     <div className="rooms">
@@ -40,7 +49,7 @@ const Rooms = ({ rooms, joinedRooms }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          { Object.values(rooms).map((room) => {
+          {Object.values(rooms).map((room) => {
             const { description, gameCount, name, permissionlevel, playerCount, roomId } = room.info;
             return (
               <TableRow key={roomId}>

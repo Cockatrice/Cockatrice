@@ -84,7 +84,7 @@ function normalizePlayers(playerList: Data.ServerInfo_Player[]): { [playerId: nu
         byId[card.id] = card;
       }
       zones[zone.name] = {
-        name: zone.name,
+        name: zone.name as Enriched.ZoneNameValue,
         type: zone.type,
         withCoords: zone.withCoords,
         cardCount: zone.cardCount,

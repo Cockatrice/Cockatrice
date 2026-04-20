@@ -1,24 +1,23 @@
-import React, { useEffect, useRef } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 
-const ScrollToBottomOnChanges = ({ content, changes }) => {
-  const messagesEndRef = useRef(null);
+interface ScrollToBottomOnChangesProps {
+  content: ReactNode;
+  changes: unknown;
+}
 
-  const scrollToBottom = () => {
-    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
-  }
+const ScrollToBottomOnChanges = ({ content, changes }: ScrollToBottomOnChangesProps) => {
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(scrollToBottom, [changes]);
-
-  const styling = {
-    height: '100%'
-  };
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [changes]);
 
   return (
-    <div style={styling}>
+    <div style={{ height: '100%' }}>
       {content}
       <div ref={messagesEndRef} />
     </div>
-  )
-}
+  );
+};
 
 export default ScrollToBottomOnChanges;

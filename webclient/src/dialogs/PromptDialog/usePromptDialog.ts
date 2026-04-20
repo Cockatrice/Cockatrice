@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export interface PromptDialog {
+export interface PromptDialogHandle {
   value: string;
   error: string | null;
   handleChange: (v: string) => void;
@@ -19,7 +19,7 @@ export function usePromptDialog({
   initialValue,
   validate,
   onSubmit,
-}: UsePromptDialogArgs): PromptDialog {
+}: UsePromptDialogArgs): PromptDialogHandle {
   const [value, setValue] = useState(initialValue);
   const [error, setError] = useState<string | null>(null);
 

@@ -26,7 +26,7 @@ const AppWithMaterialTheme = () => {
       </StrictMode>
     </WebClientProvider>
   );
-}
+};
 
 const container = document.getElementById('root');
 const root = createRoot(container!);

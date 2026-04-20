@@ -5,7 +5,7 @@
       "forgot": "Forgot Password",
       "login": "Login",
       "savePassword": "Save Password",
-      "savedPassword": "Saved Password"
+      "savedPassword": "* Saved Password *"
     }
   }
 }

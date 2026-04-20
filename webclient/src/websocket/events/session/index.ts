@@ -22,6 +22,7 @@ import {
 
 import { addToList } from './addToList';
 import { connectionClosed } from './connectionClosed';
+import { gameJoined } from './gameJoined';
 import { listRooms } from './listRooms';
 import { notifyUser } from './notifyUser';
 import { removeFromList } from './removeFromList';
@@ -33,7 +34,6 @@ import { serverShutdown } from './serverShutdown';
 import { userJoined } from './userJoined';
 import { userLeft } from './userLeft';
 import { userMessage } from './userMessage';
-import { gameJoined } from './gameJoined';
 
 type SessionRegistryEntry<V = unknown> = RegistryEntry<V, SessionEvent>;
 export type SessionExtensionRegistry = SessionRegistryEntry[];

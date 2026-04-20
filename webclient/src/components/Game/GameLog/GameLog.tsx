@@ -37,7 +37,7 @@ function GameLog({ gameId }: GameLogProps) {
           const name = players?.[m.playerId]?.properties.userInfo?.name ?? `p${m.playerId}`;
           const lineClass = isEvent ? 'game-log__line game-log__line--event' : 'game-log__line';
           return (
-            <div key={idx} className={lineClass}>
+            <div key={`${m.timeReceived}-${idx}`} className={lineClass}>
               {!isEvent && <span className="game-log__author">{name}:</span>}
               <span className="game-log__text">{m.message}</span>
             </div>

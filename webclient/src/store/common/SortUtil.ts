@@ -22,12 +22,12 @@ export default class SortUtil {
 
   static sortByFields<T extends object>(arr: T[], sorts: App.SortBy[]) {
     if (arr.length) {
+      const fieldTypes = sorts.map(s => typeof SortUtil.resolveFieldChain(arr[0], s.field));
+
       arr.sort((a, b) => {
         for (let i = 0; i < sorts.length; i++) {
           const sortBy = sorts[i];
-          const field = SortUtil.resolveFieldChain(arr[0], sortBy.field);
-
-          const fieldType = typeof field;
+          const fieldType = fieldTypes[i];
 
           if (fieldType === 'string') {
             const result = SortUtil.stringComparator(a, b, sortBy);
@@ -47,13 +47,13 @@ export default class SortUtil {
         }
 
         return 0;
-      })
+      });
     }
   }
 
   static sortUsersByField(users: Data.ServerInfo_User[], sortBy: App.SortBy) {
     if (users.length) {
-      users.sort((a, b) => SortUtil.userComparator(a, b, sortBy))
+      users.sort((a, b) => SortUtil.userComparator(a, b, sortBy));
     }
   }
 
@@ -89,18 +89,16 @@ export default class SortUtil {
     arr.sort((a, b) => SortUtil.stringComparator(a, b, sortBy));
   }
 
-  private static userComparator(a: Data.ServerInfo_User, b: Data.ServerInfo_User, sortBy: App.SortBy, sortByUserLevel = true) {
-    if (sortByUserLevel) {
-      const adminSortBy = {
-        field: 'userLevel',
-        order: App.SortDirection.DESC
-      };
+  private static userComparator(a: Data.ServerInfo_User, b: Data.ServerInfo_User, sortBy: App.SortBy) {
+    const adminSortBy = {
+      field: 'userLevel',
+      order: App.SortDirection.DESC
+    };
 
-      const adminSorted = SortUtil.numberComparator(a, b, adminSortBy);
+    const adminSorted = SortUtil.numberComparator(a, b, adminSortBy);
 
-      if (adminSorted) {
-        return adminSorted;
-      }
+    if (adminSorted) {
+      return adminSorted;
     }
 
     const sorted = SortUtil.stringComparator(a, b, sortBy);

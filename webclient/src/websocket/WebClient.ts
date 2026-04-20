@@ -44,6 +44,11 @@ export class WebClient {
       onConnectionFailed: () => {
         this.response.session.connectionFailed();
       },
+      reconnect: {
+        maxAttempts: 5,
+        baseDelayMs: 1000,
+        maxDelayMs: 30000,
+      },
     });
 
     this.protobuf = new ProtobufService(
@@ -63,12 +68,12 @@ export class WebClient {
     this.response.session.initialized();
   }
 
-  public connect(target: ConnectTarget) {
+  public connect(target: ConnectTarget): void {
     this.response.session.connectionAttempted();
     this.socket.connect(target);
   }
 
-  public testConnect(target: ConnectTarget) {
+  public testConnect(target: ConnectTarget): void {
     // A prior test connection still in flight when the user re-clicks would
     // otherwise leak the socket until its keepalive timeout. Close eagerly.
     if (this.testSocket) {
@@ -107,15 +112,19 @@ export class WebClient {
     };
   }
 
-  public disconnect() {
+  public disconnect(): void {
     this.socket.disconnect();
   }
 
-  public updateStatus(status: StatusEnum) {
+  public updateStatus(status: StatusEnum): void {
     this.status = status;
 
     if (status === StatusEnum.DISCONNECTED) {
       this.protobuf.resetCommands();
     }
+  }
+
+  public get isReconnecting(): boolean {
+    return this.status === StatusEnum.RECONNECTING;
   }
 }

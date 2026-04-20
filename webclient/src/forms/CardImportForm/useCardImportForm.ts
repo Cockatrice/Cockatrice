@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 
 import { cardImporterService, CardDTO, SetDTO, TokenDTO } from '@app/services';
+import type { App } from '@app/types';
 
 export interface CardImportForm {
   loading: boolean;
   activeStep: number;
-  importedCards: any[];
-  importedSets: any[];
+  importedCards: App.Card[];
+  importedSets: App.Set[];
   error: string | null;
   handleNext: () => void;
   handleBack: () => void;
@@ -18,8 +19,8 @@ export interface CardImportForm {
 export function useCardImportForm(): CardImportForm {
   const [loading, setLoading] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
-  const [importedCards, setImportedCards] = useState<any[]>([]);
-  const [importedSets, setImportedSets] = useState<any[]>([]);
+  const [importedCards, setImportedCards] = useState<App.Card[]>([]);
+  const [importedSets, setImportedSets] = useState<App.Set[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

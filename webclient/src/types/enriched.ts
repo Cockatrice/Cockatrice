@@ -75,7 +75,7 @@ export const ZoneName = {
 export type ZoneNameValue = typeof ZoneName[keyof typeof ZoneName];
 
 export interface ZoneEntry {
-  name: string;
+  name: ZoneNameValue;
   /** ZoneType enum value (0=Private, 1=Public, 2=Hidden). */
   type: number;
   withCoords: boolean;

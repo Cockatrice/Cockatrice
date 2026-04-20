@@ -12,6 +12,11 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 
 import {
   MAX_ANNOTATION_LEN,
@@ -43,12 +48,15 @@ export interface CreateTokenSubmit {
   annotation: string;
   destroyOnZoneChange: boolean;
   faceDown: boolean;
+  providerId?: string;
 }
 
 export interface CreateTokenDialogProps {
   isOpen: boolean;
   onSubmit: (args: CreateTokenSubmit) => void;
   onCancel: () => void;
+  /** Optional deck-scoped predefined token names; enables the "Deck" radio in the chooser. */
+  predefinedTokenNames?: string[];
 }
 
 // Matches desktop DlgCreateToken color dropdown values. Desktop orders
@@ -64,7 +72,7 @@ const COLOR_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
   { value: '', label: 'Colorless' },
 ];
 
-function CreateTokenDialog({ isOpen, onSubmit, onCancel }: CreateTokenDialogProps) {
+function CreateTokenDialog({ isOpen, onSubmit, onCancel, predefinedTokenNames }: CreateTokenDialogProps) {
   const {
     name,
     color,
@@ -73,6 +81,13 @@ function CreateTokenDialog({ isOpen, onSubmit, onCancel }: CreateTokenDialogProp
     destroyOnZoneChange,
     faceDown,
     error,
+    scope,
+    search,
+    filteredTokens,
+    selectedTokenName,
+    setScope,
+    setSearch,
+    selectPredefinedToken,
     handleNameChange,
     setColor,
     setPT,
@@ -80,7 +95,9 @@ function CreateTokenDialog({ isOpen, onSubmit, onCancel }: CreateTokenDialogProp
     setDestroyOnZoneChange,
     setFaceDown,
     handleSubmit,
-  } = useCreateTokenDialog({ isOpen, onSubmit });
+  } = useCreateTokenDialog({ isOpen, onSubmit, predefinedTokenNames });
+
+  const hasDeckScope = Boolean(predefinedTokenNames?.length);
 
   return (
     <StyledDialog
@@ -96,74 +113,134 @@ function CreateTokenDialog({ isOpen, onSubmit, onCancel }: CreateTokenDialogProp
       </DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent className="dialog-content create-token-dialog__body">
-          <TextField
-            autoFocus
-            fullWidth
-            variant="outlined"
-            size="small"
-            label="Token name"
-            value={name}
-            onChange={(e) => handleNameChange(e.target.value)}
-            error={error != null}
-            helperText={error ?? ''}
-            slotProps={{ htmlInput: { 'aria-label': 'Token name', maxLength: MAX_NAME_LEN } }}
-          />
-          <FormControl fullWidth size="small" variant="outlined" disabled={faceDown}>
-            <InputLabel id="create-token-color-label">Color</InputLabel>
-            <Select
-              labelId="create-token-color-label"
-              label="Color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              slotProps={{ input: { 'aria-label': 'Token color' } }}
+          <div className="create-token-dialog__chooser">
+            <RadioGroup
+              row
+              value={scope}
+              onChange={(e) => setScope(e.target.value as 'all' | 'deck')}
+              aria-label="Token source"
             >
-              {COLOR_OPTIONS.map((opt) => (
-                <MenuItem key={opt.label} value={opt.value}>
-                  {opt.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <TextField
-            fullWidth
-            variant="outlined"
-            size="small"
-            label="Token power/toughness"
-            placeholder="e.g. 3/3"
-            value={pt}
-            onChange={(e) => setPT(e.target.value.slice(0, MAX_PT_LEN))}
-            disabled={faceDown}
-            slotProps={{ htmlInput: { 'aria-label': 'Token power/toughness', maxLength: MAX_PT_LEN } }}
-          />
-          <TextField
-            fullWidth
-            variant="outlined"
-            size="small"
-            label="Token annotation"
-            value={annotation}
-            onChange={(e) => setAnnotation(e.target.value.slice(0, MAX_ANNOTATION_LEN))}
-            slotProps={{ htmlInput: { 'aria-label': 'Token annotation', maxLength: MAX_ANNOTATION_LEN } }}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={destroyOnZoneChange}
-                onChange={(e) => setDestroyOnZoneChange(e.target.checked)}
-                slotProps={{ input: { 'aria-label': 'Destroy when it leaves the table' } }}
+              <FormControlLabel value="all" control={<Radio size="small" />} label="All Tokens" />
+              <FormControlLabel
+                value="deck"
+                control={<Radio size="small" />}
+                label="Deck Tokens"
+                disabled={!hasDeckScope}
               />
-            }
-            label="Destroy when it leaves the table"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={faceDown}
-                onChange={(e) => setFaceDown(e.target.checked)}
-                slotProps={{ input: { 'aria-label': 'Create face-down' } }}
-              />
-            }
-            label="Create face-down"
-          />
+            </RadioGroup>
+            <TextField
+              fullWidth
+              variant="outlined"
+              size="small"
+              label="Search tokens"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              slotProps={{ htmlInput: { 'aria-label': 'Search tokens' } }}
+            />
+            <div className="create-token-dialog__chooser-list">
+              {filteredTokens.length === 0 ? (
+                <div className="create-token-dialog__chooser-empty">
+                  No predefined tokens available.
+                </div>
+              ) : (
+                <List dense disablePadding>
+                  {filteredTokens.map((token) => {
+                    const tokenName = token.name?.value ?? '';
+                    return (
+                      <ListItemButton
+                        key={tokenName}
+                        selected={tokenName === selectedTokenName}
+                        onClick={() => selectPredefinedToken(token)}
+                      >
+                        <ListItemText
+                          primary={tokenName}
+                          secondary={token.prop?.value?.type?.value}
+                        />
+                      </ListItemButton>
+                    );
+                  })}
+                </List>
+              )}
+            </div>
+            {selectedTokenName && (
+              <div className="create-token-dialog__preview">
+                <strong>{selectedTokenName}</strong>
+                {pt ? ` — ${pt}` : ''}
+              </div>
+            )}
+          </div>
+
+          <div className="create-token-dialog__form">
+            <TextField
+              autoFocus
+              fullWidth
+              variant="outlined"
+              size="small"
+              label="Token name"
+              value={name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              error={error != null}
+              helperText={error ?? ''}
+              disabled={faceDown}
+              slotProps={{ htmlInput: { 'aria-label': 'Token name', maxLength: MAX_NAME_LEN } }}
+            />
+            <FormControl fullWidth size="small" variant="outlined" disabled={faceDown}>
+              <InputLabel id="create-token-color-label">Color</InputLabel>
+              <Select
+                labelId="create-token-color-label"
+                label="Color"
+                value={color}
+                onChange={(e) => setColor(e.target.value)}
+                slotProps={{ input: { 'aria-label': 'Token color' } }}
+              >
+                {COLOR_OPTIONS.map((opt) => (
+                  <MenuItem key={opt.label} value={opt.value}>
+                    {opt.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              fullWidth
+              variant="outlined"
+              size="small"
+              label="Token power/toughness"
+              placeholder="e.g. 3/3"
+              value={pt}
+              onChange={(e) => setPT(e.target.value.slice(0, MAX_PT_LEN))}
+              disabled={faceDown}
+              slotProps={{ htmlInput: { 'aria-label': 'Token power/toughness', maxLength: MAX_PT_LEN } }}
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              size="small"
+              label="Token annotation"
+              value={annotation}
+              onChange={(e) => setAnnotation(e.target.value.slice(0, MAX_ANNOTATION_LEN))}
+              slotProps={{ htmlInput: { 'aria-label': 'Token annotation', maxLength: MAX_ANNOTATION_LEN } }}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={destroyOnZoneChange}
+                  onChange={(e) => setDestroyOnZoneChange(e.target.checked)}
+                  slotProps={{ input: { 'aria-label': 'Destroy when it leaves the table' } }}
+                />
+              }
+              label="Destroy when it leaves the table"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={faceDown}
+                  onChange={(e) => setFaceDown(e.target.checked)}
+                  slotProps={{ input: { 'aria-label': 'Create face-down' } }}
+                />
+              }
+              label="Create face-down"
+            />
+          </div>
         </DialogContent>
         <DialogActions>
           <Button type="button" onClick={onCancel}>Cancel</Button>

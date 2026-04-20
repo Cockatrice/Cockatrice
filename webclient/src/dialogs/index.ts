@@ -1,5 +1,7 @@
 export { default as AccountActivationDialog } from './AccountActivationDialog/AccountActivationDialog';
 export { default as AlertDialog } from './AlertDialog/AlertDialog';
+export { default as AuthDialogShell } from './AuthDialogShell/AuthDialogShell';
+export type { AuthDialogShellProps } from './AuthDialogShell/AuthDialogShell';
 export type { AlertDialogProps, AlertDialogSeverity } from './AlertDialog/AlertDialog';
 export { default as CardImportDialog } from './CardImportDialog/CardImportDialog';
 export { default as ConfirmDialog } from './ConfirmDialog/ConfirmDialog';

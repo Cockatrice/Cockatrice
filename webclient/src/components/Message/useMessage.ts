@@ -1,27 +1,25 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 
 import { App } from '@app/types';
 
 export interface ParsedMessage {
   name: string | null;
-  chunks: ReactNode[] | null;
+  chunks: ReactNode[];
 }
 
 export type ChunkParser = (chunk: string, index: number) => ReactNode;
 
+// `parseChunk` must be a stable reference across renders (module-level function
+// or `useCallback`). Passing a fresh closure every render will thrash the memo.
 export function useParsedMessage(message: string, parseChunk: ChunkParser): ParsedMessage {
-  const [chunks, setChunks] = useState<ReactNode[] | null>(null);
-  const [name, setName] = useState<string | null>(null);
-
-  useEffect(() => {
+  return useMemo<ParsedMessage>(() => {
     const match = message.match(App.MESSAGE_SENDER_REGEX);
-    if (match) {
-      setName(match[1]);
-    }
-    setChunks(parseMessage(message, parseChunk));
+    const name = match ? match[1] : null;
+    return {
+      name,
+      chunks: parseMessage(message, parseChunk),
+    };
   }, [message, parseChunk]);
-
-  return { name, chunks };
 }
 
 export function parseMessage(message: string, parseChunk: ChunkParser): ReactNode[] {

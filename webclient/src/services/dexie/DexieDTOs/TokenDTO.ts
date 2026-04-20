@@ -15,6 +15,6 @@ export class TokenDTO extends App.Token {
   static bulkAdd(tokens: TokenDTO[]): Promise<IndexableType> {
     return dexieService.tokens.bulkPut(tokens);
   }
-};
+}
 
 dexieService.tokens.mapToClass(TokenDTO);

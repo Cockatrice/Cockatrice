@@ -7,7 +7,7 @@ function Decks() {
   return (
     <Layout>
       <AuthGuard />
-      <span>"Decks"</span>
+      <span>Decks</span>
     </Layout>
   );
 }

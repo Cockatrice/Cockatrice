@@ -1,38 +1,28 @@
-import React from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 
+import type { ResetPasswordFormValues } from '@app/forms';
 import { ResetPasswordForm } from '@app/forms';
 
-import './ResetPasswordDialog.css';
+import AuthDialogShell from '../AuthDialogShell/AuthDialogShell';
 
-const ResetPasswordDialog = ({ handleClose, isOpen, onSubmit, userName }: any) => {
+interface ResetPasswordDialogProps {
+  isOpen: boolean;
+  handleClose?: () => void;
+  onSubmit: (values: ResetPasswordFormValues) => void;
+  userName?: string;
+}
+
+const ResetPasswordDialog = ({ handleClose, isOpen, onSubmit, userName }: ResetPasswordDialogProps) => {
   const { t } = useTranslation();
 
-  const handleOnClose = () => {
-    handleClose();
-  }
-
   return (
-    <Dialog onClose={handleOnClose} open={isOpen}>
-      <DialogTitle className="dialog-title">
-        <Typography variant="h6">{t('ResetPasswordDialog.title')}</Typography>
-
-        {handleOnClose ? (
-          <IconButton onClick={handleOnClose} size="large">
-            <CloseIcon />
-          </IconButton>
-        ) : null}
-      </DialogTitle>
-      <DialogContent>
-        <ResetPasswordForm onSubmit={onSubmit} userName={userName}/>
-      </DialogContent>
-    </Dialog>
+    <AuthDialogShell
+      isOpen={isOpen}
+      handleClose={handleClose}
+      title={t('ResetPasswordDialog.title')}
+    >
+      <ResetPasswordForm onSubmit={onSubmit} userName={userName} />
+    </AuthDialogShell>
   );
 };
 

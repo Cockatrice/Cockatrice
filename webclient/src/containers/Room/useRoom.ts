@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate, useParams, generatePath } from 'react-router-dom';
 
 import { useWebClient } from '@app/hooks';
 import { RoomsSelectors, useAppSelector } from '@app/store';
-import { App } from '@app/types';
+import { App, Data, Enriched } from '@app/types';
 
 export interface Room {
   roomId: number;
-  room: any;
-  roomMessages: any;
-  users: any[];
+  room: Enriched.Room | undefined;
+  roomMessages: Enriched.Message[] | undefined;
+  users: Data.ServerInfo_User[];
   handleRoomSay: (args: { message: string }) => void;
 }
 
@@ -20,23 +20,24 @@ export function useRoom(): Room {
   const navigate = useNavigate();
   const params = useParams();
 
-  const roomId = parseInt(params.roomId, 10);
-  const room = rooms[roomId];
-  const roomMessages = messages[roomId];
+  const parsed = params.roomId != null ? parseInt(params.roomId, 10) : NaN;
+  const roomId = Number.isNaN(parsed) ? -1 : parsed;
+  const room = roomId === -1 ? undefined : rooms[roomId];
+  const roomMessages = roomId === -1 ? undefined : messages[roomId];
   const users = useAppSelector((state) => RoomsSelectors.getSortedRoomUsers(state, roomId));
   const webClient = useWebClient();
 
   useEffect(() => {
-    if (!joined.find((r) => r.info.roomId === roomId)) {
+    if (roomId === -1 || !joined.find((r) => r.info.roomId === roomId)) {
       navigate(generatePath(App.RouteEnum.SERVER));
     }
-  }, [joined]);
+  }, [joined, roomId, navigate]);
 
-  const handleRoomSay = ({ message }: { message: string }) => {
+  const handleRoomSay = useCallback(({ message }: { message: string }) => {
     if (message) {
       webClient.request.rooms.roomSay(roomId, message);
     }
-  };
+  }, [webClient, roomId]);
 
   return { roomId, room, roomMessages, users, handleRoomSay };
 }

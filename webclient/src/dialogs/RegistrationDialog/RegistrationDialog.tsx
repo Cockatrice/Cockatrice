@@ -1,38 +1,32 @@
-import React from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 
+import type { RegisterFormValues } from '@app/forms';
 import { RegisterForm } from '@app/forms';
+
+import AuthDialogShell from '../AuthDialogShell/AuthDialogShell';
 
 import './RegistrationDialog.css';
 
-const RegistrationDialog = ({ handleClose, isOpen, onSubmit }: any) => {
+interface RegistrationDialogProps {
+  isOpen: boolean;
+  handleClose?: () => void;
+  onSubmit: (values: RegisterFormValues) => void;
+}
+
+const RegistrationDialog = ({ handleClose, isOpen, onSubmit }: RegistrationDialogProps) => {
   const { t } = useTranslation();
 
-  const handleOnClose = () => {
-    handleClose();
-  }
-
   return (
-    <Dialog className="RegistrationDialog" onClose={handleOnClose} open={isOpen} maxWidth='xl'>
-      <DialogTitle className="dialog-title">
-        <Typography variant="h6">{ t('RegistrationDialog.title') }</Typography>
-
-        {handleOnClose ? (
-          <IconButton onClick={handleOnClose} size="large">
-            <CloseIcon />
-          </IconButton>
-        ) : null}
-      </DialogTitle>
-      <DialogContent className="dialog-content">
-        <RegisterForm onSubmit={onSubmit}></RegisterForm>
-      </DialogContent>
-    </Dialog>
+    <AuthDialogShell
+      className="RegistrationDialog"
+      contentClassName="dialog-content"
+      isOpen={isOpen}
+      handleClose={handleClose}
+      title={t('RegistrationDialog.title')}
+      maxWidth="xl"
+    >
+      <RegisterForm onSubmit={onSubmit} />
+    </AuthDialogShell>
   );
 };
 

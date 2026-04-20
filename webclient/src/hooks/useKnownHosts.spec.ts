@@ -106,7 +106,7 @@ beforeEach(async () => {
 });
 
 describe('useKnownHosts', () => {
-  test('seeds DefaultHosts when the DB is empty and pins hosts[0] as lastSelected', async () => {
+  test('seeds DefaultHosts when the DB is empty and picks hosts[0] as selected', async () => {
     const { result } = renderHook(() => useKnownHostsModule.useKnownHosts());
 
     await waitFor(() => {
@@ -118,7 +118,9 @@ describe('useKnownHosts', () => {
     }
     expect(result.current.value.hosts).toHaveLength(2);
     expect(result.current.value.selectedHost.name).toBe('A');
-    expect(result.current.value.selectedHost.lastSelected).toBe(true);
+    // normalize no longer auto-persists `lastSelected = true`; it's set on
+    // explicit `select()` / `remove()` paths instead. Seed-time selection
+    // is in-memory only until the user picks.
   });
 
   test('select(id) flips lastSelected atomically — exactly one row true', async () => {

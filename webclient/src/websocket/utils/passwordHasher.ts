@@ -15,7 +15,7 @@ export const hashPassword = (salt: string, password: string): string => {
 };
 
 export const generateSalt = (): string => {
-  const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+  const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
   const bytes = new Uint8Array(SALT_LENGTH);
   crypto.getRandomValues(bytes);
@@ -26,9 +26,9 @@ export const generateSalt = (): string => {
   }
 
   return salt;
-}
+};
 
-export const passwordSaltSupported = (serverOptions: number): number => {
-  // @critical Servatrice ServerOptions is a bitmask. See .github/instructions/webclient.instructions.md#protocol-quirks.
-  return serverOptions & Event_ServerIdentification_ServerOptions.SupportsPasswordHash;
-}
+export const passwordSaltSupported = (serverOptions: number): boolean => {
+  // Servatrice ServerOptions is a bitmask. See .github/instructions/webclient.instructions.md#protocol-quirks.
+  return (serverOptions & Event_ServerIdentification_ServerOptions.SupportsPasswordHash) !== 0;
+};

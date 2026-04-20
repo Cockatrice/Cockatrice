@@ -42,13 +42,6 @@ export const materialTheme = createTheme({
   palette,
 
   components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        '@global': {
-          '@font-face': [],
-        },
-      },
-    },
     MuiButton: {
       styleOverrides: {
         root: {

@@ -1,12 +1,21 @@
+import { ReactNode } from 'react';
+
 import LeftNav from './LeftNav';
 
 import './Layout.css'
 
-function Layout(props:LayoutProps) {
+interface LayoutProps {
+  showNav?: boolean;
+  children: ReactNode;
+  className?: string;
+  noHeightLimit?: boolean;
+}
+
+function Layout(props: LayoutProps) {
   const { children, className, showNav = true, noHeightLimit = false } = props;
-  const containerClasses = ['layout']
-  if (noHeightLimit === true) {
-    containerClasses.push('layout--no-height-limit')
+  const containerClasses = ['layout'];
+  if (noHeightLimit) {
+    containerClasses.push('layout--no-height-limit');
   }
 
   return (
@@ -27,13 +36,6 @@ function BottomBar() {
     <div className="bottom-bar__container">
     </div>
   )
-}
-
-interface LayoutProps {
-    showNav?: boolean;
-    children: any;
-    className?: string;
-    noHeightLimit?: boolean
 }
 
 export default Layout;
