@@ -1,6 +1,7 @@
 #include "visual_database_display_sub_type_filter_widget.h"
 
 #include "../../../filters/filter_tree_model.h"
+#include "visual_database_display_filter_button.h"
 
 #include <QLabel>
 #include <QLineEdit>
@@ -80,8 +81,8 @@ void VisualDatabaseDisplaySubTypeFilterWidget::createSubTypeButtons()
     for (auto it = allSubCardTypesWithCount.begin(); it != allSubCardTypesWithCount.end(); ++it) {
         auto *button = new QPushButton(it.key(), flowWidget);
         button->setCheckable(true);
-        button->setStyleSheet("QPushButton { background-color: lightgray; border: 1px solid gray; padding: 5px; }"
-                              "QPushButton:checked { background-color: green; color: white; }");
+
+        button->setStyleSheet(visualDatabaseDisplayFilterButtonStyle);
 
         flowWidget->addWidget(button);
         typeButtons[it.key()] = button;
