@@ -468,18 +468,18 @@ describe('replaySubmitCode', () => {
     );
   });
 
-  it('forwards onSuccess callback', () => {
-    const onSuccess = vi.fn();
-    replaySubmitCode('42-abc123', onSuccess);
+  it('forwards onSubmitted callback', () => {
+    const onSubmitted = vi.fn();
+    replaySubmitCode('42-abc123', onSubmitted);
     invokeOnSuccess();
-    expect(onSuccess).toHaveBeenCalled();
+    expect(onSubmitted).toHaveBeenCalled();
   });
 
-  it('forwards onError callback', () => {
-    const onError = vi.fn();
-    replaySubmitCode('42-abc123', undefined, onError);
+  it('forwards onFailure callback', () => {
+    const onFailure = vi.fn();
+    replaySubmitCode('42-abc123', undefined, onFailure);
     invokeCallback('onError', 404);
-    expect(onError).toHaveBeenCalledWith(404);
+    expect(onFailure).toHaveBeenCalledWith(404);
   });
 });
 

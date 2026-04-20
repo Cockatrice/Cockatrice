@@ -5,7 +5,6 @@ import { serverReducer, MAX_USER_MESSAGES } from './server.reducer';
 import { Actions } from './server.actions';
 import {
   makeBanHistoryItem,
-  makePendingActivationContext,
   makeDeckList,
   makeDeckTreeItem,
   makeGame,
@@ -62,24 +61,6 @@ describe('Account & Connection', () => {
     expect(result.status.connectionAttemptMade).toBe(true);
   });
 
-  it('ACCOUNT_AWAITING_ACTIVATION → returns state unchanged', () => {
-    const options = makePendingActivationContext();
-    const state = makeServerState();
-    const result = serverReducer(state, Actions.accountAwaitingActivation({ options }));
-    expect(result).toEqual(state);
-  });
-
-  it('ACCOUNT_ACTIVATION_SUCCESS → returns state unchanged', () => {
-    const state = makeServerState();
-    const result = serverReducer(state, Actions.accountActivationSuccess());
-    expect(result).toEqual(state);
-  });
-
-  it('ACCOUNT_ACTIVATION_FAILED → returns state unchanged', () => {
-    const state = makeServerState();
-    const result = serverReducer(state, Actions.accountActivationFailed());
-    expect(result).toEqual(state);
-  });
 });
 
 

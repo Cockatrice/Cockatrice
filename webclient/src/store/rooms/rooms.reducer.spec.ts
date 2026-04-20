@@ -318,14 +318,6 @@ describe('REMOVE_MESSAGES', () => {
 });
 
 
-describe('GAME_CREATED', () => {
-  it('returns state unchanged', () => {
-    const state = makeRoomsState();
-    const result = roomsReducer(state, Actions.gameCreated({ roomId: 1 }));
-    expect(result).toEqual(state);
-  });
-});
-
 
 describe('JOINED_GAME', () => {
   it('sets joinedGameIds[roomId][gameId] = true', () => {

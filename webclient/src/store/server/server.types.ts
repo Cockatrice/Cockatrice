@@ -1,6 +1,6 @@
-import { serverSlice } from './server.reducer';
+import { Actions } from './server.actions';
 
-const a = serverSlice.actions;
+const a = Actions;
 
 export const Types = {
   INITIALIZED: a.initialized.type,

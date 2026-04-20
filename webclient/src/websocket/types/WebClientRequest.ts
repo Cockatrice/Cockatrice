@@ -107,9 +107,13 @@ export interface IModeratorRequest {
     clientid?: string,
     removeMessages?: number
   ): void;
+  forceActivateUser(usernameToActivate: string, moderatorName: string): void;
+  getAdminNotes(userName: string): void;
   getBanHistory(userName: string): void;
   getWarnHistory(userName: string): void;
   getWarnList(modName: string, userName: string, userClientid: string): void;
+  grantReplayAccess(replayId: number, moderatorName: string): void;
+  updateAdminNotes(userName: string, notes: string): void;
   viewLogHistory(filters: ViewLogHistoryParams): void;
   warnUser(userName: string, reason: string, clientid?: string, removeMessages?: number): void;
 }

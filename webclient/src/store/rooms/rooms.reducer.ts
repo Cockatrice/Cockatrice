@@ -190,9 +190,6 @@ export const roomsSlice = createSlice({
       state.joinedGameIds[roomId][gameId] = true;
     },
 
-    // Signal-only; kept for discriminated-union exhaustiveness.
-    gameCreated: (_state, _action: PayloadAction<{ roomId: number }>) => {},
-
     selectGame: (state, action: PayloadAction<{ roomId: number; gameId: number | undefined }>) => {
       const { roomId, gameId } = action.payload;
       state.selectedGameIds[roomId] = gameId;

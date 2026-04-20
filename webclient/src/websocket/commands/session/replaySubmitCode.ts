@@ -4,15 +4,15 @@ import { Command_ReplaySubmitCode_ext, Command_ReplaySubmitCodeSchema } from '@a
 
 export function replaySubmitCode(
   replayCode: string,
-  onSuccess?: () => void,
-  onError?: (responseCode: number) => void,
+  onSubmitted?: () => void,
+  onFailure?: (responseCode: number) => void,
 ): void {
   WebClient.instance.protobuf.sendSessionCommand(
     Command_ReplaySubmitCode_ext,
     create(Command_ReplaySubmitCodeSchema, { replayCode }),
     {
-      onSuccess,
-      onError,
+      onSuccess: onSubmitted,
+      onError: onFailure,
     }
   );
 }

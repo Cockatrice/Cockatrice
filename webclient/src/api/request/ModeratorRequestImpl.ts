@@ -15,6 +15,14 @@ export class ModeratorRequestImpl implements WebsocketTypes.IModeratorRequest {
     ModeratorCommands.banFromServer(minutes, userName, address, reason, visibleReason, clientid, removeMessages);
   }
 
+  forceActivateUser(usernameToActivate: string, moderatorName: string): void {
+    ModeratorCommands.forceActivateUser(usernameToActivate, moderatorName);
+  }
+
+  getAdminNotes(userName: string): void {
+    ModeratorCommands.getAdminNotes(userName);
+  }
+
   getBanHistory(userName: string): void {
     ModeratorCommands.getBanHistory(userName);
   }
@@ -25,6 +33,14 @@ export class ModeratorRequestImpl implements WebsocketTypes.IModeratorRequest {
 
   getWarnList(modName: string, userName: string, userClientid: string): void {
     ModeratorCommands.getWarnList(modName, userName, userClientid);
+  }
+
+  grantReplayAccess(replayId: number, moderatorName: string): void {
+    ModeratorCommands.grantReplayAccess(replayId, moderatorName);
+  }
+
+  updateAdminNotes(userName: string, notes: string): void {
+    ModeratorCommands.updateAdminNotes(userName, notes);
   }
 
   viewLogHistory(filters: Data.ViewLogHistoryParams): void {

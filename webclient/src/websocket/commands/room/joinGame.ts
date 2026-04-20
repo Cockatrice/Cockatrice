@@ -13,7 +13,7 @@ const ERROR_MESSAGES: Record<number, string> = {
   [Response_ResponseCode.RespGameFull]: 'The game is already full.',
   [Response_ResponseCode.RespWrongPassword]: 'Wrong password.',
   [Response_ResponseCode.RespSpectatorsNotAllowed]: 'Spectators are not allowed in this game.',
-  [Response_ResponseCode.RespOnlyBuddies]: "This game is only open to its creator's buddies.",
+  [Response_ResponseCode.RespOnlyBuddies]: 'This game is only open to its creator\'s buddies.',
   [Response_ResponseCode.RespUserLevelTooLow]: 'This game is only open to registered users.',
   [Response_ResponseCode.RespInIgnoreList]: 'You are being ignored by the creator of this game.',
 };

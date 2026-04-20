@@ -1,6 +1,6 @@
-import { roomsSlice } from './rooms.reducer';
+import { Actions } from './rooms.actions';
 
-const a = roomsSlice.actions;
+const a = Actions;
 
 export const Types = {
   CLEAR_STORE: a.clearStore.type,

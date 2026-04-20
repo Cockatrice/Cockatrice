@@ -185,7 +185,7 @@ export const serverSlice = createSlice({
 
     updateUser: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
       if (state.user) {
-        Object.assign(state.user, action.payload.user);
+        state.user = create(Data.ServerInfo_UserSchema, { ...state.user, ...action.payload.user });
       } else {
         state.user = action.payload.user as Data.ServerInfo_User;
       }
@@ -393,42 +393,15 @@ export const serverSlice = createSlice({
 
     accountEditChanged: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
       if (state.user) {
-        Object.assign(state.user, action.payload.user);
+        state.user = create(Data.ServerInfo_UserSchema, { ...state.user, ...action.payload.user });
       }
     },
 
     accountImageChanged: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
       if (state.user) {
-        Object.assign(state.user, action.payload.user);
+        state.user = create(Data.ServerInfo_UserSchema, { ...state.user, ...action.payload.user });
       }
     },
-
-    // Signal-only action types — no state mutation, defined so type strings are generated
-    accountAwaitingActivation: (_state, _action: PayloadAction<{ options: WebsocketTypes.PendingActivationContext }>) => {},
-    accountActivationFailed: (_state) => {},
-    accountActivationSuccess: (_state) => {},
-    loginSuccessful: (_state, _action: PayloadAction<{ options: WebsocketTypes.LoginSuccessContext }>) => {},
-    loginFailed: (_state) => {},
-    connectionFailed: (_state) => {},
-    testConnectionSuccessful: (_state) => {},
-    testConnectionFailed: (_state) => {},
-    registrationRequiresEmail: (_state) => {},
-    registrationSuccess: (_state) => {},
-    registrationEmailError: (_state, _action: PayloadAction<{ error: string }>) => {},
-    registrationPasswordError: (_state, _action: PayloadAction<{ error: string }>) => {},
-    registrationUserNameError: (_state, _action: PayloadAction<{ error: string }>) => {},
-    resetPassword: (_state) => {},
-    resetPasswordFailed: (_state) => {},
-    resetPasswordChallenge: (_state) => {},
-    resetPasswordSuccess: (_state) => {},
-    reloadConfig: (_state) => {},
-    shutdownServer: (_state) => {},
-    updateServerMessage: (_state) => {},
-    accountPasswordChange: (_state) => {},
-    addToList: (_state, _action: PayloadAction<{ list: string; userName: string }>) => {},
-    removeFromList: (_state, _action: PayloadAction<{ list: string; userName: string }>) => {},
-    grantReplayAccess: (_state, _action: PayloadAction<{ replayId: number; moderatorName: string }>) => {},
-    forceActivateUser: (_state, _action: PayloadAction<{ usernameToActivate: string; moderatorName: string }>) => {},
   },
 });
 
