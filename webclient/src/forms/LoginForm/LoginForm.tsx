@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Form, Field, useFormState, FormApi } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { CheckboxField, InputField, KnownHosts } from '@app/components';
 import { LoadingState, useKnownHosts, useSettings } from '@app/hooks';
+import { HostDTO } from '@app/services';
 
 import './LoginForm.css';
 
@@ -48,27 +49,16 @@ const LoginFormBody = ({
   const togglePasswordLabel = (on: boolean) => setUseStoredPasswordLabel(on);
 
   // @critical Host-sync must not touch autoConnect — app-level setting, not per-host.
-  useEffect(() => {
-    if (!selectedHost) {
+  const onSelectedHostChange = (host: HostDTO | undefined) => {
+    if (!host) {
       return;
     }
-
-    form.change('userName', selectedHost.userName);
+    form.change('userName', host.userName ?? '');
     form.change('password', '');
-    form.change('remember', Boolean(selectedHost.remember));
-
+    form.change('remember', Boolean(host.remember));
     setStoredHashInvalidated(false);
-    togglePasswordLabel(
-      Boolean(selectedHost.remember && selectedHost.hashedPassword)
-    );
-  }, [selectedHost, form]);
-
-  useEffect(() => {
-    if (settings.status !== LoadingState.READY) {
-      return;
-    }
-    form.change('autoConnect', settings.value?.autoConnect);
-  }, [settings, form]);
+    togglePasswordLabel(Boolean(host.remember && host.hashedPassword));
+  };
 
   const onUserNameChange = (userName: string | undefined) => {
     const fieldChanged = selectedHost?.userName?.toLowerCase() !== userName?.toLowerCase();
@@ -139,6 +129,7 @@ const LoginFormBody = ({
         </div>
         <div className="loginForm-item">
           <Field name="selectedHost" component={KnownHosts} />
+          <OnChange name="selectedHost">{onSelectedHostChange}</OnChange>
         </div>
         <div className="loginForm-actions">
           <Field name="autoConnect" type="checkbox">
