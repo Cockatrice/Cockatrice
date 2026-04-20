@@ -339,7 +339,7 @@ jobs:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 550M
       CCACHE_EVICTION_AGE: 7d
-      QT_VERSION: 6.11.*
+      QT_VERSION: 6.11
       QT_MODULES: qtimageformats qtmultimedia qtwebsockets
 
     steps:
@@ -372,8 +372,8 @@ jobs:
       - name: Install aqtinstall
         run: pipx install aqtinstall
 
-      # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version via aqtinstall to avoid stale caches on new releases
-      - name: Resolve latest Qt patch version
+      # Resolve given version (e.g. Qt 6.8, Qt 6) to latest in range via aqtinstall to avoid stale caches on new releases
+      - name: Resolve latest version for Qt ${{ env.QT_VERSION }}
         id: resolve_qt_version
         shell: bash
         run: .ci/resolve_latest_aqt_qt_version.sh "${{ env.QT_VERSION }}"
