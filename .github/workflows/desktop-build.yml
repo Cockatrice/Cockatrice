@@ -4,7 +4,7 @@ permissions:
   contents: write
   id-token: write
   attestations: write
-  actions: write # needed for ccache action to be able to delete gha caches
+  actions: write    # needed for ccache action to be able to delete gha caches
 
 on:
   push:
@@ -339,7 +339,7 @@ jobs:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 550M
       CCACHE_EVICTION_AGE: 7d
-      QT_VERSION: 6.10
+      QT_VERSION: "6.10"
       QT_MODULES: qtimageformats qtmultimedia qtwebsockets
 
     steps:
