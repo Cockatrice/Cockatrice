@@ -1,4 +1,4 @@
-import { act, waitFor } from '@testing-library/react';
+import { act, fireEvent, waitFor } from '@testing-library/react';
 
 import { renderWithProviders, createMockWebClient, disconnectedState } from '../../__test-utils__';
 
@@ -165,6 +165,26 @@ describe('Login — logout cycle (same JS session)', () => {
     renderWithProviders(<Login />, { preloadedState: disconnectedState });
     await flushEffects();
     expect(hoisted.mockWebClient.request.authentication.login).not.toHaveBeenCalled();
+  });
+
+  test('submits with the restored host after a logout→remount without Required error', async () => {
+    const first = renderWithProviders(<Login />, { preloadedState: disconnectedState });
+    await flushEffects();
+    first.unmount();
+
+    const { getByRole, queryByText } = renderWithProviders(<Login />, {
+      preloadedState: disconnectedState,
+    });
+    await flushEffects();
+
+    fireEvent.click(getByRole('button', { name: /LoginForm\.label\.login/ }));
+    await flushEffects();
+
+    expect(queryByText(/required/i)).toBeNull();
+    expect(hoisted.mockWebClient.request.authentication.login).toHaveBeenCalledTimes(1);
+    expect(hoisted.mockWebClient.request.authentication.login.mock.calls[0][0]).toMatchObject({
+      userName: 'alice',
+    });
   });
 });
 

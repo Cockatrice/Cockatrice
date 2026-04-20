@@ -174,6 +174,8 @@ const LoginFormBody = ({
 
 const LoginForm = (props: LoginFormProps) => {
   const { t } = useTranslation();
+  const knownHosts = useKnownHosts();
+  const settings = useSettings();
 
   const validate = (values: any) => {
     const errors: any = {};
@@ -193,8 +195,26 @@ const LoginForm = (props: LoginFormProps) => {
     props.onSubmit({ userName, ...values });
   };
 
+  if (knownHosts.status !== LoadingState.READY || settings.status !== LoadingState.READY) {
+    return null;
+  }
+
+  const selectedHost = knownHosts.value?.selectedHost;
+  const initialValues = {
+    selectedHost,
+    userName: selectedHost?.userName ?? '',
+    remember: Boolean(selectedHost?.remember),
+    autoConnect: Boolean(settings.value?.autoConnect),
+    password: '',
+  };
+
   return (
-    <Form onSubmit={handleOnSubmit} validate={validate}>
+    <Form
+      onSubmit={handleOnSubmit}
+      validate={validate}
+      initialValues={initialValues}
+      keepDirtyOnReinitialize
+    >
       {({ handleSubmit, form }) => (
         <LoginFormBody {...props} form={form} handleSubmit={handleSubmit} />
       )}

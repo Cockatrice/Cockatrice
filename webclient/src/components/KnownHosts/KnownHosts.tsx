@@ -86,8 +86,6 @@ const KnownHosts = (props: any) => {
     webClient.request.authentication.testConnection({ ...getHostPort(host) });
   };
 
-  // Mirror the store's selectedHost into the form field. Also kick off a
-  // connection test so the user sees the green/red indicator on mount.
   useEffect(() => {
     if (!selectedHost) {
       return;
