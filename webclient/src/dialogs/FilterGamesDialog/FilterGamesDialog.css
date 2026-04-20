@@ -1,0 +1,16 @@
+.filter-games-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-games-dialog__row {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-games-dialog__section {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+}

@@ -1,0 +1,92 @@
+.zone-view-dialog {
+  position: fixed;
+  z-index: 1200;
+  width: 720px;
+  max-width: calc(100vw - 32px);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: #0a1225;
+  border: 1px solid #233a68;
+  border-radius: 6px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+  color: #e5ecf7;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.zone-view-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 14px;
+  background: #17223d;
+  border-bottom: 1px solid #233a68;
+  border-radius: 6px 6px 0 0;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+}
+
+.zone-view-dialog__title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: #c8d4ef;
+}
+
+.zone-view-dialog__close {
+  color: #c8d4ef !important;
+}
+
+.zone-view-dialog__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.zone-view-dialog__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 100px);
+  gap: 10px;
+  justify-content: center;
+  padding: 4px 0 8px;
+}
+
+.zone-view-dialog__card {
+  width: 100px;
+  height: 140px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #0d1930;
+  border: 1px solid #1a2b52;
+  box-sizing: border-box;
+}
+
+.zone-view-dialog__card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.zone-view-dialog__card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  box-sizing: border-box;
+  color: #c8d4ef;
+  font-size: 11px;
+  text-align: center;
+  background: linear-gradient(135deg, #17223d 0%, #0d1930 100%);
+}
+
+.zone-view-dialog__empty {
+  padding: 32px 0;
+  text-align: center;
+  color: #6a7488;
+  font-style: italic;
+}

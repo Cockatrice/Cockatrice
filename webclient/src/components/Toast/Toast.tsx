@@ -34,7 +34,7 @@ function Toast(props) {
       open={open}
       autoHideDuration={autoHideDuration}
       onClose={handleClose}
-      TransitionComponent={TransitionLeft}
+      slots={{ transition: TransitionLeft }}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
     >
       <Alert onClose={handleClose} severity={severity} iconMapping={iconMapping}

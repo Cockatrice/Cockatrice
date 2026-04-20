@@ -24,4 +24,15 @@ export {
   Selectors as RoomsSelectors,
   Dispatch as RoomsDispatch } from './rooms';
 
+export {
+  DEFAULT_GAME_FILTERS,
+  DEFAULT_MAX_PLAYERS_MIN,
+  DEFAULT_MAX_PLAYERS_MAX,
+  DEFAULT_MAX_GAME_AGE_SECONDS,
+  isGameFiltersAtDefaults,
+  gameMatchesFilters,
+} from './rooms/gameFilters';
+
+export type { GameFilterContext } from './rooms/gameFilters';
+
 export * from './rooms/rooms.interfaces';

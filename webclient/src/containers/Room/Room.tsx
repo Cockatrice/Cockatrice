@@ -11,7 +11,7 @@ import { useAppSelector } from '@app/store';
 import { App } from '@app/types';
 import Layout from '../Layout/Layout';
 
-import OpenGames from './OpenGames';
+import GameSelector from './GameSelector/GameSelector';
 import Messages from './Messages';
 import SayMessage from './SayMessage';
 
@@ -55,9 +55,9 @@ const Room = () => {
           fixedHeight
 
           top={(
-            <Paper className="room-view__games overflow-scroll">
-              <OpenGames room={room} />
-            </Paper>
+            <div className="room-view__games">
+              <GameSelector room={room} />
+            </div>
           )}
 
           bottom={(

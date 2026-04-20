@@ -1,0 +1,33 @@
+.game-selector {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.game-selector__title {
+  padding: 6px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  font-weight: 600;
+}
+
+.game-selector__games {
+  flex: 1;
+  overflow: auto;
+}
+
+.game-selector__toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  flex-wrap: wrap;
+}
+
+.game-selector__toolbar-left,
+.game-selector__toolbar-right {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}

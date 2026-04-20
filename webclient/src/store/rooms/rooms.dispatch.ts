@@ -1,6 +1,7 @@
 import { App, Data, Enriched } from '@app/types';
 
 import { Actions } from './rooms.actions';
+import { GameFilters } from './rooms.interfaces';
 import { store } from '..';
 
 export const Dispatch = {
@@ -50,5 +51,17 @@ export const Dispatch = {
 
   joinedGame: (roomId: number, gameId: number) => {
     store.dispatch(Actions.joinedGame({ roomId, gameId }));
-  }
+  },
+
+  selectGame: (roomId: number, gameId: number | undefined) => {
+    store.dispatch(Actions.selectGame({ roomId, gameId }));
+  },
+
+  setGameFilters: (roomId: number, filters: GameFilters) => {
+    store.dispatch(Actions.setGameFilters({ roomId, filters }));
+  },
+
+  clearGameFilters: (roomId: number) => {
+    store.dispatch(Actions.clearGameFilters({ roomId }));
+  },
 }

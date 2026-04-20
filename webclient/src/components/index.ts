@@ -20,3 +20,6 @@ export { default as ModGuard } from './Guard/ModGuard';
 
 // Toast
 export { default as Toast, useToast, ToastProvider } from './Toast';
+
+// Game board
+export * from './Game';

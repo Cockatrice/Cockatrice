@@ -5,17 +5,20 @@ import rootReducer from './rootReducer';
 
 // Protobuf-es v2 messages are plain objects with $typeName/$unknown siblings;
 // bytes fields are Uint8Array and int64/uint64 are BigInt. All four pass through.
-function isSerializable(value: unknown): boolean {
+export function isSerializable(value: unknown): boolean {
   return isPlain(value) || isMessage(value) || value instanceof Uint8Array || typeof value === 'bigint';
 }
 
+// Shared config between production store and renderWithProviders test harness.
+// Exporting ensures the test store tolerates the same proto actions as prod.
+export const storeMiddlewareOptions = {
+  immutableCheck: { warnAfter: 128 },
+  serializableCheck: { isSerializable, warnAfter: 128 },
+} as const;
+
 export const store = configureStore({
   reducer: rootReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      immutableCheck: { warnAfter: 128 },
-      serializableCheck: { isSerializable, warnAfter: 128 },
-    }),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(storeMiddlewareOptions),
 });
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

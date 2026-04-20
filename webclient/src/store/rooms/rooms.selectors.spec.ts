@@ -1,5 +1,6 @@
 import { Selectors } from './rooms.selectors';
 import { RoomsState } from './rooms.interfaces';
+import { DEFAULT_GAME_FILTERS } from './gameFilters';
 import { makeGame, makeMessage, makeRoom, makeRoomsState, makeUser } from './__mocks__/rooms-fixtures';
 import { App } from '@app/types';
 
@@ -174,5 +175,104 @@ describe('Selectors', () => {
     const a = Selectors.getJoinedRooms(root);
     const b = Selectors.getJoinedRooms(root);
     expect(a).toBe(b);
+  });
+
+  describe('getSelectedGameId', () => {
+    it('returns the selected gameId for the room', () => {
+      const state = makeRoomsState({ selectedGameIds: { 1: 5 } });
+      expect(Selectors.getSelectedGameId(rootState(state), 1)).toBe(5);
+    });
+
+    it('returns undefined when no game is selected', () => {
+      const state = makeRoomsState();
+      expect(Selectors.getSelectedGameId(rootState(state), 1)).toBeUndefined();
+    });
+  });
+
+  describe('getGameFilters', () => {
+    it('returns DEFAULT_GAME_FILTERS when room has no filter state', () => {
+      const state = makeRoomsState();
+      expect(Selectors.getGameFilters(rootState(state), 1)).toBe(DEFAULT_GAME_FILTERS);
+    });
+
+    it('returns the stored filters when set', () => {
+      const filters = { ...DEFAULT_GAME_FILTERS, hideFullGames: true };
+      const state = makeRoomsState({ gameFilters: { 1: filters } });
+      expect(Selectors.getGameFilters(rootState(state), 1)).toBe(filters);
+    });
+  });
+
+  describe('isGameFilterActive', () => {
+    it('returns false when room has no filter state', () => {
+      const state = makeRoomsState();
+      expect(Selectors.isGameFilterActive(rootState(state), 1)).toBe(false);
+    });
+
+    it('returns false when filter state matches defaults', () => {
+      const state = makeRoomsState({ gameFilters: { 1: { ...DEFAULT_GAME_FILTERS } } });
+      expect(Selectors.isGameFilterActive(rootState(state), 1)).toBe(false);
+    });
+
+    it('returns true when any filter differs from defaults', () => {
+      const state = makeRoomsState({ gameFilters: { 1: { ...DEFAULT_GAME_FILTERS, hideFullGames: true } } });
+      expect(Selectors.isGameFilterActive(rootState(state), 1)).toBe(true);
+    });
+  });
+
+  describe('getFilteredRoomGames', () => {
+    it('returns the sorted list unchanged when no filters are set', () => {
+      const game1 = makeGame({ gameId: 1, description: 'Beta' });
+      const game2 = makeGame({ gameId: 2, description: 'Alpha' });
+      const room = makeRoom({ roomId: 1, games: { 1: game1, 2: game2 } });
+      const state = makeRoomsState({
+        rooms: { 1: room },
+        sortGamesBy: { field: 'info.description' as App.GameSortField, order: App.SortDirection.ASC },
+      });
+      const result = Selectors.getFilteredRoomGames(rootState(state), 1);
+      expect(result).toHaveLength(2);
+      expect(result[0].info.description).toBe('Alpha');
+    });
+
+    it('applies the active filter against the sorted list', () => {
+      const open = makeGame({ gameId: 1, description: 'open', playerCount: 1, maxPlayers: 4 });
+      const full = makeGame({ gameId: 2, description: 'full', playerCount: 4, maxPlayers: 4 });
+      const room = makeRoom({ roomId: 1, games: { 1: open, 2: full } });
+      const state = makeRoomsState({
+        rooms: { 1: room },
+        gameFilters: { 1: { ...DEFAULT_GAME_FILTERS, hideFullGames: true } },
+      });
+      const result = Selectors.getFilteredRoomGames(rootState(state), 1);
+      expect(result).toHaveLength(1);
+      expect(result[0].info.gameId).toBe(1);
+    });
+
+    it('returns EMPTY_GAMES for unknown roomId', () => {
+      const state = makeRoomsState({ rooms: {} });
+      expect(Selectors.getFilteredRoomGames(rootState(state), 999)).toHaveLength(0);
+    });
+  });
+
+  describe('getRoomGameCounts', () => {
+    it('reports total = visible when no filters are active', () => {
+      const room = makeRoom({ roomId: 1, games: { 1: makeGame({ gameId: 1 }), 2: makeGame({ gameId: 2 }) } });
+      const state = makeRoomsState({ rooms: { 1: room } });
+      expect(Selectors.getRoomGameCounts(rootState(state), 1)).toEqual({ visible: 2, total: 2 });
+    });
+
+    it('reports a smaller visible count when filters hide games', () => {
+      const open = makeGame({ gameId: 1, playerCount: 1, maxPlayers: 4 });
+      const full = makeGame({ gameId: 2, playerCount: 4, maxPlayers: 4 });
+      const room = makeRoom({ roomId: 1, games: { 1: open, 2: full } });
+      const state = makeRoomsState({
+        rooms: { 1: room },
+        gameFilters: { 1: { ...DEFAULT_GAME_FILTERS, hideFullGames: true } },
+      });
+      expect(Selectors.getRoomGameCounts(rootState(state), 1)).toEqual({ visible: 1, total: 2 });
+    });
+
+    it('returns 0/0 for unknown roomId', () => {
+      const state = makeRoomsState({ rooms: {} });
+      expect(Selectors.getRoomGameCounts(rootState(state), 999)).toEqual({ visible: 0, total: 0 });
+    });
   });
 });

@@ -105,6 +105,8 @@ export function makeRoomsState(overrides: Partial<RoomsState> = {}): RoomsState 
       field: App.UserSortField.NAME,
       order: App.SortDirection.ASC,
     },
+    selectedGameIds: {},
+    gameFilters: {},
     ...overrides,
   };
 }

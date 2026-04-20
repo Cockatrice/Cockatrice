@@ -15,6 +15,9 @@ export const Types = {
   REMOVE_MESSAGES: a.removeMessages.type,
   GAME_CREATED: a.gameCreated.type,
   JOINED_GAME: a.joinedGame.type,
+  SELECT_GAME: a.selectGame.type,
+  SET_GAME_FILTERS: a.setGameFilters.type,
+  CLEAR_GAME_FILTERS: a.clearGameFilters.type,
 } as const;
 
 export { MAX_ROOM_MESSAGES } from './rooms.reducer';

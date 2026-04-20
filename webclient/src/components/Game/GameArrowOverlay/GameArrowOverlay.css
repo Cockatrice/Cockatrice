@@ -1,0 +1,24 @@
+.game-arrow-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.game-arrow-overlay__line {
+  stroke-width: 4;
+  stroke-linecap: round;
+  cursor: pointer;
+  pointer-events: stroke;
+  transition: stroke-width 80ms ease-out;
+}
+
+.game-arrow-overlay__line:hover {
+  stroke-width: 6;
+}
+
+.game-arrow-overlay__line--preview {
+  stroke-dasharray: 8 6;
+  pointer-events: none;
+  opacity: 0.85;
+}

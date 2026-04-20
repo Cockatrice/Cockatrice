@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { App, Data, Enriched } from '@app/types';
 
-import { normalizeGameObject, normalizeGametypeMap, normalizeRoomInfo, normalizeUserMessage } from '../common';
+import { mergeSetFields, normalizeGameObject, normalizeGametypeMap, normalizeRoomInfo, normalizeUserMessage } from '../common';
 
-import { RoomsState } from './rooms.interfaces'
+import { GameFilters, RoomsState } from './rooms.interfaces'
+import { DEFAULT_GAME_FILTERS } from './gameFilters';
 
 export const MAX_ROOM_MESSAGES = 1000;
 
@@ -19,7 +20,9 @@ const initialState: RoomsState = {
   sortUsersBy: {
     field: App.UserSortField.NAME,
     order: App.SortDirection.ASC
-  }
+  },
+  selectedGameIds: {},
+  gameFilters: {},
 };
 
 export const roomsSlice = createSlice({
@@ -31,21 +34,25 @@ export const roomsSlice = createSlice({
     updateRooms: (state, action: PayloadAction<{ rooms: Data.ServerInfo_Room[] }>) => {
       const { rooms } = action.payload;
 
-      // @critical Partial merge — preserve normalized games/users maps.
-      // See .github/instructions/webclient.instructions.md#reducer-merge-rules.
+      // @critical Partial merge — preserve normalized games/users maps AND
+      // any fields the incoming ServerInfo_Room didn't set. The desktop server
+      // broadcasts Event_ListRooms with only room_id/player_count/game_count
+      // set on user join/leave (server_room.cpp addClient/removeClient); a
+      // wholesale replacement would wipe name/description/permissions.
       rooms.forEach((rawRoom, order) => {
         const { roomId } = rawRoom;
         const existing = state.rooms[roomId];
-        const gametypeMap = normalizeGametypeMap(rawRoom.gametypeList);
 
         if (existing) {
-          existing.info = rawRoom;
-          existing.gametypeMap = gametypeMap;
+          mergeSetFields(Data.ServerInfo_RoomSchema, existing.info, rawRoom);
+          if (rawRoom.gametypeList.length > 0) {
+            existing.gametypeMap = normalizeGametypeMap(rawRoom.gametypeList);
+          }
           existing.order = order;
         } else {
           state.rooms[roomId] = {
             info: rawRoom,
-            gametypeMap,
+            gametypeMap: normalizeGametypeMap(rawRoom.gametypeList),
             order,
             games: {},
             users: {},
@@ -70,6 +77,8 @@ export const roomsSlice = createSlice({
       delete state.joinedRoomIds[roomId];
       delete state.joinedGameIds[roomId];
       delete state.messages[roomId];
+      delete state.selectedGameIds[roomId];
+      delete state.gameFilters[roomId];
 
       const room = state.rooms[roomId];
       if (room) {
@@ -104,6 +113,9 @@ export const roomsSlice = createSlice({
       for (const rawGame of games) {
         if (rawGame.closed) {
           delete room.games[rawGame.gameId];
+          if (state.selectedGameIds[roomId] === rawGame.gameId) {
+            state.selectedGameIds[roomId] = undefined;
+          }
           continue;
         }
         const existing = room.games[rawGame.gameId];
@@ -178,6 +190,21 @@ export const roomsSlice = createSlice({
 
     // Signal-only; kept for discriminated-union exhaustiveness.
     gameCreated: (_state, _action: PayloadAction<{ roomId: number }>) => {},
+
+    selectGame: (state, action: PayloadAction<{ roomId: number; gameId: number | undefined }>) => {
+      const { roomId, gameId } = action.payload;
+      state.selectedGameIds[roomId] = gameId;
+    },
+
+    setGameFilters: (state, action: PayloadAction<{ roomId: number; filters: GameFilters }>) => {
+      const { roomId, filters } = action.payload;
+      state.gameFilters[roomId] = filters;
+    },
+
+    clearGameFilters: (state, action: PayloadAction<{ roomId: number }>) => {
+      const { roomId } = action.payload;
+      state.gameFilters[roomId] = { ...DEFAULT_GAME_FILTERS };
+    },
   },
 });
 

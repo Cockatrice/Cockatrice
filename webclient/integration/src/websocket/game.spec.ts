@@ -306,10 +306,22 @@ describe('game', () => {
             userInfo: create(Data.ServerInfo_UserSchema, { name: 'alice' }),
           }),
           zoneList: [
-            create(Data.ServerInfo_ZoneSchema, { name: 'deck', type: Data.ServerInfo_Zone_ZoneType.HiddenZone, cardList: deckCards, cardCount: 3 }),
-            create(Data.ServerInfo_ZoneSchema, { name: 'hand', type: Data.ServerInfo_Zone_ZoneType.HiddenZone, cardList: [], cardCount: 0 }),
-            create(Data.ServerInfo_ZoneSchema, { name: 'table', type: Data.ServerInfo_Zone_ZoneType.PublicZone, withCoords: true, cardList: [], cardCount: 0 }),
-            create(Data.ServerInfo_ZoneSchema, { name: 'grave', type: Data.ServerInfo_Zone_ZoneType.PublicZone, cardList: [], cardCount: 0 }),
+            create(Data.ServerInfo_ZoneSchema, {
+              name: 'deck', type: Data.ServerInfo_Zone_ZoneType.HiddenZone,
+              cardList: deckCards, cardCount: 3,
+            }),
+            create(Data.ServerInfo_ZoneSchema, {
+              name: 'hand', type: Data.ServerInfo_Zone_ZoneType.HiddenZone,
+              cardList: [], cardCount: 0,
+            }),
+            create(Data.ServerInfo_ZoneSchema, {
+              name: 'table', type: Data.ServerInfo_Zone_ZoneType.PublicZone,
+              withCoords: true, cardList: [], cardCount: 0,
+            }),
+            create(Data.ServerInfo_ZoneSchema, {
+              name: 'grave', type: Data.ServerInfo_Zone_ZoneType.PublicZone,
+              cardList: [], cardCount: 0,
+            }),
           ],
           counterList: [],
           arrowList: [],
@@ -356,7 +368,14 @@ describe('game', () => {
       ext: Data.Event_GameSay_ext,
       value: create(Data.Event_GameSaySchema, { message: 'good luck!' }),
     }));
-    expect(store.getState().games.games[99].messages).toHaveLength(1);
+    // game.messages is a merged chat + event-log stream (matches desktop's
+    // MessageLogWidget). Earlier steps in this lifecycle (game-started,
+    // phase change, draw) also push event entries, so filter to chat.
+    const chatMessages = store
+      .getState()
+      .games.games[99].messages.filter((m) => m.kind === 'chat');
+    expect(chatMessages).toHaveLength(1);
+    expect(chatMessages[0].message).toBe('good luck!');
 
     // ── 6. Discard (move card from hand to graveyard) ────────────────────
     deliverMessage(buildGameEventMessage({

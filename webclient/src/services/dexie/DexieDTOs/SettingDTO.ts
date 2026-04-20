@@ -8,6 +8,7 @@ export class SettingDTO extends App.Setting {
 
     this.user = user;
     this.autoConnect = false;
+    this.invertVerticalCoordinate = false;
   }
 
   save() {

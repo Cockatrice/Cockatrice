@@ -34,6 +34,8 @@ import type {
   MulliganParams,
   RollDieParams,
   GameCommand,
+  CreateGameParams,
+  JoinGameParams,
 } from '@app/generated';
 
 import type { ConnectTarget } from './WebClientConfig';
@@ -84,6 +86,8 @@ export interface IRoomsRequest {
   joinRoom(roomId: number): void;
   leaveRoom(roomId: number): void;
   roomSay(roomId: number, message: string): void;
+  createGame(roomId: number, params: CreateGameParams): void;
+  joinGame(roomId: number, params: JoinGameParams): void;
 }
 
 export interface IAdminRequest {

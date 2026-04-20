@@ -1,0 +1,16 @@
+.zone-context-menu .MuiPaper-root {
+  min-width: 220px;
+}
+
+.zone-context-menu__toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.zone-context-menu__check {
+  display: inline-flex;
+  width: 16px;
+  justify-content: center;
+  color: var(--color-highlight-yellow);
+}

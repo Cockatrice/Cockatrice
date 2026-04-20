@@ -11,6 +11,7 @@ import { AppShell } from '@app/containers';
 import { materialTheme } from './material-theme';
 
 import './i18n';
+import './colors.css';
 import './index.css';
 
 const AppWithMaterialTheme = () => {

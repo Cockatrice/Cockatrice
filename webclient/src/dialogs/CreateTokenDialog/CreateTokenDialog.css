@@ -1,0 +1,6 @@
+.create-token-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 320px;
+}

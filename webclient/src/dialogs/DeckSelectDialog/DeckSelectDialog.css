@@ -1,0 +1,46 @@
+.DeckSelectDialog .MuiDialog-paper {
+  width: 540px;
+  max-width: 540px;
+}
+
+.deck-select-dialog__textarea {
+  width: 100%;
+  min-height: 220px;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  background: #f7f8fa;
+  border: 1px solid #c4c9d1;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.deck-select-dialog__textarea:focus {
+  outline: none;
+  border-color: #5a78c8;
+  box-shadow: 0 0 0 3px rgba(90, 120, 200, 0.15);
+}
+
+.deck-select-dialog__hash {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #56607a;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  word-break: break-all;
+}
+
+.deck-select-dialog__hash--pending {
+  color: #9ea6b8;
+  font-style: italic;
+}
+
+.deck-select-dialog__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e3e6eb;
+}

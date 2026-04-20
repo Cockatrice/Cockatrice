@@ -8,23 +8,57 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Tooltip from '@mui/material/Tooltip';
 
-// import { RoomsService } from "AppShell/common/services";
-
 import { SortUtil, RoomsDispatch, RoomsSelectors } from '@app/store';
 import { UserDisplay } from '@app/components';
 import { useAppSelector } from '@app/store';
+import { Data, Enriched } from '@app/types';
 
 import './OpenGames.css';
 
-// @TODO run interval to update timeSinceCreated
 interface OpenGamesProps {
-  room: any;
+  room: { info: { roomId: number } };
+  onActivateGame?: (gameId: number) => void;
 }
 
-const OpenGames = ({ room }: OpenGamesProps) => {
+function formatRestrictions(info: Data.ServerInfo_Game): string {
+  const parts: string[] = [];
+  if (info.withPassword) {
+    parts.push('password');
+  }
+  if (info.onlyBuddies) {
+    parts.push('buddies only');
+  }
+  if (info.onlyRegistered) {
+    parts.push('reg. users only');
+  }
+  if (info.shareDecklistsOnLoad) {
+    parts.push('open decklists');
+  }
+  return parts.join(', ');
+}
+
+function formatSpectators(info: Data.ServerInfo_Game): string {
+  if (!info.spectatorsAllowed) {
+    return 'not allowed';
+  }
+  const flags: string[] = [];
+  if (info.spectatorsCanChat) {
+    flags.push('can chat');
+  }
+  if (info.spectatorsOmniscient) {
+    flags.push('see hands');
+  }
+  if (flags.length === 0) {
+    return String(info.spectatorsCount);
+  }
+  return `${info.spectatorsCount} (${flags.join(' & ')})`;
+}
+
+const OpenGames = ({ room, onActivateGame }: OpenGamesProps) => {
   const roomId = room.info.roomId;
   const sortBy = useAppSelector(state => RoomsSelectors.getSortGamesBy(state));
-  const sortedGames = useAppSelector(state => RoomsSelectors.getSortedRoomGames(state, roomId));
+  const games = useAppSelector(state => RoomsSelectors.getFilteredRoomGames(state, roomId));
+  const selectedGameId = useAppSelector(state => RoomsSelectors.getSelectedGameId(state, roomId));
 
   const headerCells = [
     { label: 'Age', field: 'info.startTime' },
@@ -41,18 +75,14 @@ const OpenGames = ({ room }: OpenGamesProps) => {
     RoomsDispatch.sortGames(roomId, field, order);
   };
 
-  const isAvailable = ({ started, maxPlayers, playerCount }) =>
-    !started && playerCount < maxPlayers;
+  const handleSelect = (gameId: number) => {
+    RoomsDispatch.selectGame(roomId, gameId);
+  };
 
-  const isOpen = ({ withPassword }) => !withPassword;
-
-  const isPublic = ({ onlyBuddies }) => !onlyBuddies;
-
-  const games = sortedGames.filter(game => (
-    isAvailable(game.info) &&
-    isOpen(game.info) &&
-    isPublic(game.info)
-  ));
+  const handleActivate = (gameId: number) => {
+    RoomsDispatch.selectGame(roomId, gameId);
+    onActivateGame?.(gameId);
+  };
 
   return (
     <div className="games">
@@ -81,11 +111,21 @@ const OpenGames = ({ room }: OpenGamesProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          { games.map((game) => {
+          { games.map((game: Enriched.Game) => {
             const { info, gameType } = game;
-            const { description, gameId, creatorInfo, maxPlayers, playerCount, spectatorsCount, startTime } = info;
+            const { description, gameId, creatorInfo, maxPlayers, playerCount, startTime } = info;
+            const isSelected = gameId === selectedGameId;
+            const restrictions = formatRestrictions(info);
+            const spectators = formatSpectators(info);
             return (
-              <TableRow key={gameId}>
+              <TableRow
+                key={gameId}
+                hover
+                selected={isSelected}
+                onClick={() => handleSelect(gameId)}
+                onDoubleClick={() => handleActivate(gameId)}
+                className={isSelected ? 'games__row games__row--selected' : 'games__row'}
+              >
                 <TableCell className="games-header__cell single-line-ellipsis">{startTime}</TableCell>
                 <TableCell className="games-header__cell">
                   <Tooltip title={description} placement="bottom-start" enterDelay={500}>
@@ -95,12 +135,12 @@ const OpenGames = ({ room }: OpenGamesProps) => {
                   </Tooltip>
                 </TableCell>
                 <TableCell className="games-header__cell">
-                  <UserDisplay user={ creatorInfo } />
+                  {creatorInfo ? <UserDisplay user={creatorInfo} /> : null}
                 </TableCell>
                 <TableCell className="games-header__cell single-line-ellipsis">{gameType}</TableCell>
-                <TableCell className="games-header__cell single-line-ellipsis">?</TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">{restrictions}</TableCell>
                 <TableCell className="games-header__cell single-line-ellipsis">{`${playerCount}/${maxPlayers}`}</TableCell>
-                <TableCell className="games-header__cell single-line-ellipsis">{spectatorsCount}</TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">{spectators}</TableCell>
               </TableRow>
             );
           })}

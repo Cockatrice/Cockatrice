@@ -5,6 +5,7 @@ vi.mock('..', () => ({ store: { dispatch: mockDispatch } }));
 
 import { Actions } from './rooms.actions';
 import { Dispatch } from './rooms.dispatch';
+import { DEFAULT_GAME_FILTERS } from './gameFilters';
 import { makeGame, makeMessage, makeRoom, makeUser } from './__mocks__/rooms-fixtures';
 import { App } from '@app/types';
 
@@ -86,5 +87,26 @@ describe('Dispatch', () => {
   it('joinedGame dispatches Actions.joinedGame()', () => {
     Dispatch.joinedGame(1, 5);
     expect(mockDispatch).toHaveBeenCalledWith(Actions.joinedGame({ roomId: 1, gameId: 5 }));
+  });
+
+  it('selectGame dispatches Actions.selectGame()', () => {
+    Dispatch.selectGame(1, 7);
+    expect(mockDispatch).toHaveBeenCalledWith(Actions.selectGame({ roomId: 1, gameId: 7 }));
+  });
+
+  it('selectGame with undefined dispatches a clear', () => {
+    Dispatch.selectGame(1, undefined);
+    expect(mockDispatch).toHaveBeenCalledWith(Actions.selectGame({ roomId: 1, gameId: undefined }));
+  });
+
+  it('setGameFilters dispatches Actions.setGameFilters()', () => {
+    const filters = { ...DEFAULT_GAME_FILTERS, hideFullGames: true };
+    Dispatch.setGameFilters(1, filters);
+    expect(mockDispatch).toHaveBeenCalledWith(Actions.setGameFilters({ roomId: 1, filters }));
+  });
+
+  it('clearGameFilters dispatches Actions.clearGameFilters()', () => {
+    Dispatch.clearGameFilters(1);
+    expect(mockDispatch).toHaveBeenCalledWith(Actions.clearGameFilters({ roomId: 1 }));
   });
 });

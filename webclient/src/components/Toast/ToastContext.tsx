@@ -9,7 +9,7 @@ interface ToastEntry {
 }
 
 interface ToastState {
-    toasts: Map<string, ToastEntry>,
+    toasts: Record<string, ToastEntry>,
     addToast: (key, children) => void,
     openToast: (key) => void,
     closeToast: (key) => void,
@@ -17,7 +17,7 @@ interface ToastState {
 }
 
 const ToastContext: Context<any> = createContext<ToastState>({
-  toasts: new Map<string, ToastEntry>(),
+  toasts: {},
   addToast: (_key, _children) => {},
   openToast: (_key) => {},
   closeToast: (_key) => {},
@@ -38,7 +38,7 @@ export const ToastProvider: FC<PropsWithChildren> = (props) => {
     <ToastContext.Provider value={providerState}>
       {children}
       <div>
-        {Array.from(state.toasts).map(([key, value]) => {
+        {Object.entries(state.toasts).map(([key, value]: [string, ToastEntry]) => {
           const { isOpen, children } = value;
           return (
             <Toast key={key} open={isOpen} onClose={() => dispatch({ type: ACTIONS.CLOSE_TOAST, payload: { key } })}>

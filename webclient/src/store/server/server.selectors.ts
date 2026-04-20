@@ -38,6 +38,30 @@ export const Selectors = {
       return (user.userLevel & mask) === mask;
     }
   ),
+
+  /** True when the currently logged-in user has the IsJudge level flag. */
+  getIsUserJudge: createSelector(
+    [({ server }: State) => server.user],
+    (user): boolean => {
+      if (!user) {
+        return false;
+      }
+      const mask = Data.ServerInfo_User_UserLevelFlag.IsJudge;
+      return (user.userLevel & mask) === mask;
+    }
+  ),
+
+  /** True when the currently logged-in user has the IsRegistered level flag. */
+  getIsUserRegistered: createSelector(
+    [({ server }: State) => server.user],
+    (user): boolean => {
+      if (!user) {
+        return false;
+      }
+      const mask = Data.ServerInfo_User_UserLevelFlag.IsRegistered;
+      return (user.userLevel & mask) === mask;
+    }
+  ),
   getLogs: ({ server }: State) => server.logs,
   getBackendDecks: ({ server }: State) => server.backendDecks,
   getDownloadedDeck: ({ server }: State) => server.downloadedDeck,

@@ -6,3 +6,4 @@ export * from './useReduxEffect';
 export * from './useSettings';
 export * from './useSharedStore';
 export * from './useWebClient';
+export * from './game';

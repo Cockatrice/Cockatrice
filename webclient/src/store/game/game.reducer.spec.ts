@@ -190,7 +190,7 @@ describe('2B: Game state & player management', () => {
     expect(last.message).toContain(fragment);
   });
 
-  it('PLAYER_PROPERTIES_CHANGED → replaces properties on existing player', () => {
+  it('PLAYER_PROPERTIES_CHANGED → merges set fields onto existing player properties', () => {
     const state = makeState();
     const newProps = makePlayerProperties({ playerId: 1, conceded: true });
     const result = gamesReducer(state, Actions.playerPropertiesChanged({
@@ -198,7 +198,61 @@ describe('2B: Game state & player management', () => {
       playerId: 1,
       properties: newProps,
     }));
-    expect(result.games[1].players[1].properties).toBe(newProps);
+    expect(result.games[1].players[1].properties.conceded).toBe(true);
+    expect(result.games[1].players[1].properties.playerId).toBe(1);
+  });
+
+  it('PLAYER_PROPERTIES_CHANGED → partial update (only pingSeconds) preserves deckHash', () => {
+    // Regression: the desktop server's per-second ping tick sends
+    // Event_PlayerPropertiesChanged with only ping_seconds set. A naive
+    // overwrite would wipe deck_hash and disable the Ready button in the
+    // deck-select dialog mid-lobby.
+    const existing = makePlayerProperties({
+      playerId: 1,
+      deckHash: 'abc123',
+      readyStart: false,
+      sideboardLocked: true,
+    });
+    const state = makeState({
+      games: {
+        1: makeGameEntry({
+          players: { 1: makePlayerEntry({ properties: existing }) },
+        }),
+      },
+    });
+    const pingOnly = create(Data.ServerInfo_PlayerPropertiesSchema, { pingSeconds: 42 });
+    const result = gamesReducer(state, Actions.playerPropertiesChanged({
+      gameId: 1,
+      playerId: 1,
+      properties: pingOnly,
+    }));
+    const merged = result.games[1].players[1].properties;
+    expect(merged.pingSeconds).toBe(42);
+    expect(merged.deckHash).toBe('abc123');
+    expect(merged.readyStart).toBe(false);
+    expect(merged.sideboardLocked).toBe(true);
+  });
+
+  it('PLAYER_PROPERTIES_CHANGED → partial update (only readyStart) preserves deckHash', () => {
+    // Regression: cmdReadyStart server-side sends only ready_start set.
+    // The client must not lose the deck hash when the user clicks Ready.
+    const existing = makePlayerProperties({ playerId: 1, deckHash: 'abc123', readyStart: false });
+    const state = makeState({
+      games: {
+        1: makeGameEntry({
+          players: { 1: makePlayerEntry({ properties: existing }) },
+        }),
+      },
+    });
+    const readyOnly = create(Data.ServerInfo_PlayerPropertiesSchema, { readyStart: true });
+    const result = gamesReducer(state, Actions.playerPropertiesChanged({
+      gameId: 1,
+      playerId: 1,
+      properties: readyOnly,
+    }));
+    const merged = result.games[1].players[1].properties;
+    expect(merged.readyStart).toBe(true);
+    expect(merged.deckHash).toBe('abc123');
   });
 });
 
@@ -1023,27 +1077,54 @@ describe('2J: Turn, phase, and chat', () => {
     }));
 
     expect(result.games[1].messages).toHaveLength(1);
-    expect(result.games[1].messages[0]).toEqual({ playerId: 2, message: 'gg', timeReceived: 123456789 });
+    expect(result.games[1].messages[0]).toEqual({
+      playerId: 2, message: 'gg', timeReceived: 123456789, kind: 'chat',
+    });
   });
 });
 
 
-describe('2K: No-op / passthrough actions', () => {
-  it('ZONE_SHUFFLED → returns state unchanged (identity)', () => {
+describe('2K: Log-only actions', () => {
+  // These actions don't mutate game state, but they do append an event-log
+  // message — mirrors desktop's MessageLogWidget::logShuffle / logDumpZone /
+  // logRollDie which fire purely as chat-log entries.
+  it('ZONE_SHUFFLED → appends an event-log message', () => {
     const state = makeState();
     const result = gamesReducer(state, Actions.zoneShuffled({ gameId: 1, playerId: 1, data: {} }));
-    expect(result).toBe(state);
+    const msgs = result.games[1].messages;
+    expect(msgs.length).toBe(1);
+    expect(msgs[0].kind).toBe('event');
+    expect(msgs[0].message).toContain('shuffles');
   });
 
-  it('ZONE_DUMPED → returns state unchanged (identity)', () => {
+  it('ZONE_DUMPED → appends an event-log message', () => {
     const state = makeState();
-    const result = gamesReducer(state, Actions.zoneDumped({ gameId: 1, playerId: 1, data: {} }));
-    expect(result).toBe(state);
+    const result = gamesReducer(state, Actions.zoneDumped({
+      gameId: 1, playerId: 1,
+      data: { zoneOwnerId: 1, zoneName: 'deck', numberCards: 3, isReversed: false },
+    }));
+    const msgs = result.games[1].messages;
+    expect(msgs.length).toBe(1);
+    expect(msgs[0].kind).toBe('event');
+    expect(msgs[0].message).toContain('3');
   });
 
-  it('DIE_ROLLED → returns state unchanged (identity)', () => {
+  it('DIE_ROLLED → appends an event-log message', () => {
     const state = makeState();
-    const result = gamesReducer(state, Actions.dieRolled({ gameId: 1, playerId: 1, data: {} }));
+    const result = gamesReducer(state, Actions.dieRolled({
+      gameId: 1, playerId: 1,
+      data: { sides: 20, value: 17, values: [17] },
+    }));
+    const msgs = result.games[1].messages;
+    expect(msgs.length).toBe(1);
+    expect(msgs[0].kind).toBe('event');
+    expect(msgs[0].message).toContain('17');
+    expect(msgs[0].message).toContain('20');
+  });
+
+  it('ZONE_SHUFFLED with unknown gameId → state unchanged', () => {
+    const state = makeState();
+    const result = gamesReducer(state, Actions.zoneShuffled({ gameId: 999, playerId: 1, data: {} }));
     expect(result).toBe(state);
   });
 

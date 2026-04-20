@@ -1,0 +1,12 @@
+.reveal-cards-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 320px;
+}
+
+.reveal-cards-dialog__zone {
+  display: block;
+  margin-top: 4px;
+  color: #7f90b5;
+}

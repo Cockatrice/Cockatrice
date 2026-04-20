@@ -1,0 +1,53 @@
+.phase-bar {
+  width: 56px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 2px;
+  box-sizing: border-box;
+  background: #0a1225;
+  border-right: 1px solid #1a2b52;
+}
+
+.phase-bar__btn-wrap {
+  flex: 0 0 auto;
+  display: flex;
+}
+
+.phase-bar__btn {
+  flex: 1;
+  height: 44px;
+  padding: 0;
+  background: #162445;
+  border: 1px solid #233a68;
+  color: #c8d4ef;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: default;
+  border-radius: 3px;
+}
+
+.phase-bar__btn:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.phase-bar__btn--active {
+  background: #d48a00;
+  border-color: var(--color-highlight-yellow);
+  color: #1a1100;
+  box-shadow: 0 0 6px var(--color-highlight-yellow-soft);
+}
+
+.phase-bar__btn--pass {
+  background: #3f1a1a;
+  border-color: #5e2828;
+  color: #ffd4d4;
+}
+
+.phase-bar__spacer {
+  flex: 1;
+}

@@ -91,6 +91,8 @@ export interface GameMessage {
   playerId: number;
   message: string;
   timeReceived: number;
+  /** Defaults to 'chat'. Event messages are rendered without a leading speaker label. */
+  kind?: 'chat' | 'event';
 }
 
 export interface LogGroups {

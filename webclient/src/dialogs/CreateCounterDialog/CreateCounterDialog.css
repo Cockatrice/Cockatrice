@@ -1,0 +1,30 @@
+.CreateCounterDialog .MuiDialog-paper {
+  width: 400px;
+  max-width: 400px;
+}
+
+.create-counter-dialog__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.create-counter-dialog__swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid #c4c9d1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.create-counter-dialog__swatch:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(90, 120, 200, 0.35);
+}
+
+.create-counter-dialog__swatch--selected {
+  border-color: #2f4a8a;
+  box-shadow: 0 0 0 2px #8ab0ff;
+}

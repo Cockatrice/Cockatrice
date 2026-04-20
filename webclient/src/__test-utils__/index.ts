@@ -1,4 +1,10 @@
 export { withMockLocation } from './globalGuards';
 export { renderWithProviders } from './renderWithProviders';
 export { createMockWebClient } from './mockWebClient';
-export { disconnectedState, connectedState, connectedWithRoomsState, makeUser } from './storeFixtures';
+export {
+  disconnectedState,
+  connectedState,
+  connectedWithRoomsState,
+  makeStoreState,
+  makeUser,
+} from './storeFixtures';

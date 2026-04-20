@@ -1,7 +1,9 @@
-import { App } from '@app/types';
+import { create } from '@bufbuild/protobuf';
+import { App, Data } from '@app/types';
 import { roomsReducer } from './rooms.reducer';
 import { Actions } from './rooms.actions';
 import { MAX_ROOM_MESSAGES } from './rooms.types';
+import { DEFAULT_GAME_FILTERS } from './gameFilters';
 import { makeGame, makeMessage, makeRoom, makeRoomsState, makeUser } from './__mocks__/rooms-fixtures';
 
 
@@ -72,6 +74,36 @@ describe('UPDATE_ROOMS', () => {
     const result = roomsReducer(state, Actions.updateRooms({ rooms: [room] }));
     expect(result.rooms[99]).toBeDefined();
     expect(result.rooms[99].info.name).toBe('New Room');
+  });
+
+  it('partial room update (only playerCount) preserves name, description, and gametypeMap', () => {
+    // Regression: the desktop server fires Event_ListRooms with only
+    // room_id/player_count/game_count set on every user join/leave
+    // (server_room.cpp addClient/removeClient). A wholesale info replacement
+    // would blank out name/description until the next full room listing.
+    const gametypeMap = { 0: 'Constructed' };
+    const existingRoom = makeRoom({
+      roomId: 1,
+      name: 'Main Hall',
+      description: 'General play',
+      permissionlevel: 'none',
+      gametypeMap,
+    });
+    const state = makeRoomsState({ rooms: { 1: existingRoom } });
+
+    const partial = create(Data.ServerInfo_RoomSchema, {
+      roomId: 1,
+      playerCount: 42,
+      gameCount: 3,
+    });
+    const result = roomsReducer(state, Actions.updateRooms({ rooms: [partial] }));
+
+    expect(result.rooms[1].info.name).toBe('Main Hall');
+    expect(result.rooms[1].info.description).toBe('General play');
+    expect(result.rooms[1].info.permissionlevel).toBe('none');
+    expect(result.rooms[1].info.playerCount).toBe(42);
+    expect(result.rooms[1].info.gameCount).toBe(3);
+    expect(result.rooms[1].gametypeMap).toBe(gametypeMap);
   });
 });
 
@@ -307,5 +339,81 @@ describe('JOINED_GAME', () => {
     const result = roomsReducer(state, Actions.joinedGame({ roomId: 1, gameId: 5 }));
     expect(result.joinedGameIds[2][9]).toBe(true);
     expect(result.joinedGameIds[1][5]).toBe(true);
+  });
+});
+
+
+describe('SELECT_GAME', () => {
+  it('records the selected gameId for the room', () => {
+    const state = makeRoomsState();
+    const result = roomsReducer(state, Actions.selectGame({ roomId: 1, gameId: 7 }));
+    expect(result.selectedGameIds[1]).toBe(7);
+  });
+
+  it('clears the selection when called with undefined', () => {
+    const state = makeRoomsState({ selectedGameIds: { 1: 7 } });
+    const result = roomsReducer(state, Actions.selectGame({ roomId: 1, gameId: undefined }));
+    expect(result.selectedGameIds[1]).toBeUndefined();
+  });
+
+  it('keeps other rooms\u2019 selections untouched', () => {
+    const state = makeRoomsState({ selectedGameIds: { 1: 7, 2: 11 } });
+    const result = roomsReducer(state, Actions.selectGame({ roomId: 1, gameId: 8 }));
+    expect(result.selectedGameIds[2]).toBe(11);
+  });
+});
+
+
+describe('UPDATE_GAMES \u2014 selection lifecycle', () => {
+  it('clears selectedGameIds[roomId] when the selected game is closed', () => {
+    const room = makeRoom({ roomId: 1, games: { 5: makeGame({ gameId: 5 }) } });
+    const state = makeRoomsState({ rooms: { 1: room }, selectedGameIds: { 1: 5 } });
+    const result = roomsReducer(state, Actions.updateGames({
+      roomId: 1,
+      games: [{ gameId: 5, closed: true } as any],
+    }));
+    expect(result.selectedGameIds[1]).toBeUndefined();
+  });
+
+  it('preserves selection when an unrelated game is closed', () => {
+    const room = makeRoom({ roomId: 1, games: { 5: makeGame({ gameId: 5 }), 6: makeGame({ gameId: 6 }) } });
+    const state = makeRoomsState({ rooms: { 1: room }, selectedGameIds: { 1: 5 } });
+    const result = roomsReducer(state, Actions.updateGames({
+      roomId: 1,
+      games: [{ gameId: 6, closed: true } as any],
+    }));
+    expect(result.selectedGameIds[1]).toBe(5);
+  });
+});
+
+
+describe('LEAVE_ROOM \u2014 selection and filters', () => {
+  it('clears selectedGameIds and gameFilters for the leaving room', () => {
+    const state = makeRoomsState({
+      selectedGameIds: { 1: 5, 2: 7 },
+      gameFilters: { 1: { ...DEFAULT_GAME_FILTERS, hideFullGames: true } },
+    });
+    const result = roomsReducer(state, Actions.leaveRoom({ roomId: 1 }));
+    expect(result.selectedGameIds[1]).toBeUndefined();
+    expect(result.selectedGameIds[2]).toBe(7);
+    expect(result.gameFilters[1]).toBeUndefined();
+  });
+});
+
+
+describe('SET_GAME_FILTERS / CLEAR_GAME_FILTERS', () => {
+  it('SET_GAME_FILTERS stores filter state for the room', () => {
+    const state = makeRoomsState();
+    const filters = { ...DEFAULT_GAME_FILTERS, hideFullGames: true };
+    const result = roomsReducer(state, Actions.setGameFilters({ roomId: 1, filters }));
+    expect(result.gameFilters[1]).toEqual(filters);
+  });
+
+  it('CLEAR_GAME_FILTERS resets the room filter state to defaults', () => {
+    const state = makeRoomsState({
+      gameFilters: { 1: { ...DEFAULT_GAME_FILTERS, hideFullGames: true } },
+    });
+    const result = roomsReducer(state, Actions.clearGameFilters({ roomId: 1 }));
+    expect(result.gameFilters[1]).toEqual(DEFAULT_GAME_FILTERS);
   });
 });

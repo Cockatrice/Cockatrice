@@ -34,6 +34,7 @@
       "@app/services": ["./src/services/index.ts"],
       "@app/store": ["./src/store/index.ts"],
       "@app/types": ["./src/types/index.ts"],
+      "@app/utils": ["./src/utils/index.ts"],
       "@app/websocket": ["./src/websocket/index.ts"],
       "@app/websocket/types": ["./src/websocket/types/index.ts"],
       "@app/generated": ["./src/generated/index.ts"]

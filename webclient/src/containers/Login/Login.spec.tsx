@@ -29,10 +29,14 @@ vi.mock('../../hooks/useKnownHosts', () => ({
   useKnownHosts: hoisted.useKnownHosts,
   getKnownHosts: hoisted.getKnownHosts,
 }));
-vi.mock('../../hooks/useWebClient', () => ({
-  useWebClient: () => hoisted.mockWebClient,
-  WebClientProvider: ({ children }: { children: any }) => children,
-}));
+vi.mock('../../hooks/useWebClient', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../hooks/useWebClient')>();
+  return {
+    ...actual,
+    useWebClient: () => hoisted.mockWebClient,
+    WebClientProvider: ({ children }: { children: any }) => children,
+  };
+});
 
 beforeAll(() => {
   const client = createMockWebClient();

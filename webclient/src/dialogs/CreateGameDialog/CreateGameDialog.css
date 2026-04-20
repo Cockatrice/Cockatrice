@@ -1,0 +1,11 @@
+.create-game-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.create-game-dialog__section {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+}

@@ -1,16 +1,26 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { Data, Enriched } from '@app/types';
 import { SortUtil } from '../common';
-import { RoomsState } from './rooms.interfaces';
+import { GameFilters, RoomsState } from './rooms.interfaces';
+import { ServerState } from '../server/server.interfaces';
+import {
+  DEFAULT_GAME_FILTERS,
+  GameFilterContext,
+  gameMatchesFilters,
+  isGameFiltersAtDefaults,
+} from './gameFilters';
 
 interface State {
-  rooms: RoomsState
+  rooms: RoomsState;
+  server?: ServerState;
 }
 
 const EMPTY_GAMES: Enriched.Game[] = [];
 const EMPTY_USERS: Data.ServerInfo_User[] = [];
 const EMPTY_GAMES_MAP: { [id: number]: Enriched.Game } = {};
 const EMPTY_USERS_MAP: { [name: string]: Data.ServerInfo_User } = {};
+
+const ZERO_COUNTS = { visible: 0, total: 0 };
 
 export const Selectors = {
   getRooms: ({ rooms }: State) => rooms.rooms,
@@ -81,6 +91,87 @@ export const Selectors = {
         return EMPTY_USERS;
       }
       return SortUtil.sortedUsersByField(Object.values(users), sortBy);
+    }
+  ),
+
+  getSelectedGameId: (state: State, roomId: number): number | undefined =>
+    state.rooms.selectedGameIds?.[roomId],
+
+  /** Returns the room's filter state, or DEFAULT_GAME_FILTERS if unset. */
+  getGameFilters: (state: State, roomId: number): GameFilters =>
+    state.rooms.gameFilters?.[roomId] ?? DEFAULT_GAME_FILTERS,
+
+  isGameFilterActive: (state: State, roomId: number): boolean => {
+    const filters = state.rooms.gameFilters?.[roomId];
+    if (!filters) {
+      return false;
+    }
+    return !isGameFiltersAtDefaults(filters);
+  },
+
+  /**
+   * Sorted + filter-applied view of a room's games for display. Filters
+   * mirror desktop GamesProxyModel; buddy/ignore checks read from server.
+   */
+  getFilteredRoomGames: createSelector(
+    [
+      (state: State, roomId: number) => state.rooms.rooms[roomId]?.games,
+      (state: State) => state.rooms.sortGamesBy,
+      (state: State, roomId: number) => state.rooms.gameFilters?.[roomId],
+      (state: State) => state.server?.user,
+      (state: State) => state.server?.buddyList,
+      (state: State) => state.server?.ignoreList,
+    ],
+    (games, sortBy, filters, user, buddyList, ignoreList): Enriched.Game[] => {
+      if (!games) {
+        return EMPTY_GAMES;
+      }
+      const sorted = SortUtil.sortedByField(Object.values(games), sortBy);
+      if (!filters || isGameFiltersAtDefaults(filters)) {
+        return sorted;
+      }
+      const ctx: GameFilterContext = {
+        isOwnUserRegistered: user
+          ? (user.userLevel & Data.ServerInfo_User_UserLevelFlag.IsRegistered) ===
+            Data.ServerInfo_User_UserLevelFlag.IsRegistered
+          : false,
+        isUserBuddy: (name) => Boolean(buddyList?.[name]),
+        isUserIgnored: (name) => Boolean(ignoreList?.[name]),
+        nowSeconds: Math.floor(Date.now() / 1000),
+      };
+      return sorted.filter((game) => gameMatchesFilters(game, filters, ctx));
+    }
+  ),
+
+  /** Visible (post-filter) and total counts for the games-shown title. */
+  getRoomGameCounts: createSelector(
+    [
+      (state: State, roomId: number) => state.rooms.rooms[roomId]?.games,
+      (state: State, roomId: number) => state.rooms.gameFilters?.[roomId],
+      (state: State) => state.server?.user,
+      (state: State) => state.server?.buddyList,
+      (state: State) => state.server?.ignoreList,
+    ],
+    (games, filters, user, buddyList, ignoreList): { visible: number; total: number } => {
+      if (!games) {
+        return ZERO_COUNTS;
+      }
+      const all = Object.values(games);
+      const total = all.length;
+      if (!filters || isGameFiltersAtDefaults(filters)) {
+        return { visible: total, total };
+      }
+      const ctx: GameFilterContext = {
+        isOwnUserRegistered: user
+          ? (user.userLevel & Data.ServerInfo_User_UserLevelFlag.IsRegistered) ===
+            Data.ServerInfo_User_UserLevelFlag.IsRegistered
+          : false,
+        isUserBuddy: (name) => Boolean(buddyList?.[name]),
+        isUserIgnored: (name) => Boolean(ignoreList?.[name]),
+        nowSeconds: Math.floor(Date.now() / 1000),
+      };
+      const visible = all.reduce((n, game) => (gameMatchesFilters(game, filters, ctx) ? n + 1 : n), 0);
+      return { visible, total };
     }
   ),
 }

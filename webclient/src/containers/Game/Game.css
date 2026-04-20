@@ -1,0 +1,67 @@
+.game {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) 320px;
+  grid-template-rows: 1fr;
+  height: 100%;
+  min-height: 0;
+  background: #050914;
+  color: #e5ecf7;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.game__board {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.game__board-inner {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr) 176px;
+}
+
+/* Rotate 90°: view-only transform on the whole board. Mirrors desktop's
+   Player::actRotateLocal which applies a QGraphicsView transform with no
+   server call. */
+.game__board-inner--rotated {
+  transform: rotate(90deg);
+  transform-origin: center center;
+}
+
+.game__empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5a6a8a;
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* A11y: keyboard-focus ring on the board's interactive surfaces. Scoped
+   to specific classes (not `.game *`) so MUI's own focus styles inside
+   portaled menus/dialogs aren't overwritten. */
+.card-slot:focus-visible,
+.zone-stack:focus-visible,
+.battlefield__row:focus-visible,
+.hand-zone:focus-visible,
+.game-log__input:focus-visible,
+.turn-controls__btn:focus-visible,
+.phase-bar__btn:focus-visible,
+.player-info-panel__counter-value--editable:focus-visible,
+.player-info-panel__counter-input:focus-visible,
+.player-info-panel__counter-btn:focus-visible,
+.player-info-panel__life-value--editable:focus-visible,
+.player-info-panel__life-input:focus-visible,
+.player-info-panel__life-btn:focus-visible,
+.player-info-panel__new-counter:focus-visible,
+.opponent-selector__button:focus-visible {
+  outline: 2px solid var(--color-highlight-yellow);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
