@@ -339,7 +339,7 @@ jobs:
       # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CCACHE_SIZE: 550M
       CCACHE_EVICTION_AGE: 7d
-      QT_VERSION: 6.11
+      QT_VERSION: 6.10
       QT_MODULES: qtimageformats qtmultimedia qtwebsockets
 
     steps:
