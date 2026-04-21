@@ -244,10 +244,11 @@ static bool shouldBeFromTheBottom(const Server_CardZone *startZone, const std::s
 
     int movedCount = static_cast<int>(cardsToMove.size());
     int tailStart = startZone->getCards().size() - movedCount;
-    if (tailStart <= 0) { // if the move includes the start of the deck, it should not be considered from the bottom
+    if (tailStart <= 0) { // if the entire deck is moved it should not be considered from the bottom
         return false;
     }
 
+    // check if the move is a contiguous block at the end of the deck, fail fast when not
     int expectedPosition = tailStart;
     for (const auto &card : cardsToMove) {
         if (card.position != expectedPosition) {

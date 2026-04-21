@@ -19,7 +19,7 @@ TEST(ReverseCardMoveTest, MoveCardFromBottomTest)
     ServerInfo_User user;
     user.set_name("test-user");
 
-    // instatiate necessary dependencies of the library
+    // instantiate a fake server instance
     FakeServer server;
     Server_Room room(0, 0, "", "", "", "", false, "", {}, &server);
     Server_Game game(user, 1, "", "", 2, QList<int>(), false, false, false, false, false, false, 20, false, &room);
@@ -65,19 +65,19 @@ TEST(ReverseCardMoveTest, MoveCardFromBottomTest)
     int positionB;
     int positionC;
     int positionD;
-    // check if they are on the destination zone
+    // find the cards in the destination zone and check they are the right card
     EXPECT_EQ(exileZone.getCard(cardA->getId(), &positionA), cardA);
     EXPECT_EQ(exileZone.getCard(cardB->getId(), &positionB), cardB);
     EXPECT_EQ(exileZone.getCard(cardC->getId(), &positionC), cardC);
     EXPECT_EQ(exileZone.getCard(cardD->getId(), &positionD), cardD);
 
-    // check if they are with the expected coordinates
+    // check that they are at the expected index
     EXPECT_EQ(cardA->getX(), 3);
     EXPECT_EQ(cardB->getX(), 2);
     EXPECT_EQ(cardC->getX(), 1);
     EXPECT_EQ(cardD->getX(), 0);
 
-    // check if they are with the expected positions
+    // also check if the given positions are correct
     EXPECT_EQ(positionA, 3);
     EXPECT_EQ(positionB, 2);
     EXPECT_EQ(positionC, 1);
