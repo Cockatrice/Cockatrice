@@ -77,6 +77,7 @@ public slots:
 
     void actUntapAll();
     void actRollDie();
+    void actFlipCoin();
     void actCreateToken();
     void actCreateAnotherToken();
     void actShuffle();

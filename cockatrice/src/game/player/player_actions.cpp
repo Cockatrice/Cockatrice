@@ -852,6 +852,14 @@ void PlayerActions::actRollDie()
     sendGameCommand(cmd);
 }
 
+void PlayerActions::actFlipCoin()
+{
+    Command_RollDie cmd;
+    cmd.set_sides(2);
+    cmd.set_count(1);
+    sendGameCommand(cmd);
+}
+
 void PlayerActions::actCreateToken()
 {
     DlgCreateToken dlg(player->getPlayerMenu()->getUtilityMenu()->getPredefinedTokens(), player->getGame()->getTab());
