@@ -9,6 +9,15 @@
 #include <QString>
 #include <QVector>
 
+struct Category
+{
+    int id;
+    QString name;
+    bool isPremier;
+    bool includedInDeck;
+    bool includedInPrice;
+};
+
 class ArchidektApiResponseCardEntry
 {
 public:
@@ -26,7 +35,7 @@ public:
         return card;
     };
 
-    QStringList getCategories() const
+    QList<Category> getCategories() const
     {
         return categories;
     }
@@ -38,7 +47,7 @@ public:
 
 private:
     int id;
-    QStringList categories;
+    QList<Category> categories;
     bool companion;
     bool flippedDefault;
     QString label;

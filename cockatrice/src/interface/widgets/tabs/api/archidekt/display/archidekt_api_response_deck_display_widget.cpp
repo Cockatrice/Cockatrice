@@ -63,16 +63,60 @@ ArchidektApiResponseDeckDisplayWidget::ArchidektApiResponseDeckDisplayWidget(QWi
     QString tempDeck;
     QTextStream deckStream(&tempDeck);
 
-    for (auto card : response.getCards()) {
+    QString mainboardText;
+    QString sideboardText;
+
+    QTextStream mainStream(&mainboardText);
+    QTextStream sideStream(&sideboardText);
+
+    for (const auto &card : response.getCards()) {
         QString fullName = card.getCard().getOracleCard().value("name").toString();
         // We don't really care about the second card, the card database already has it as a relation
         QString cleanName = fullName.split("//").first().trimmed();
 
-        tempDeck += QString("%1 %2 (%3) %4\n")
-                        .arg(card.getQuantity())
-                        .arg(cleanName)
-                        .arg(card.getCard().getEdition().getEditionCode().toUpper())
-                        .arg(card.getCard().getCollectorNumber());
+        QString line = QString("%1 %2 (%3) %4\n")
+                           .arg(card.getQuantity())
+                           .arg(cleanName)
+                           .arg(card.getCard().getEdition().getEditionCode().toUpper())
+                           .arg(card.getCard().getCollectorNumber());
+
+        bool isCommander = false;
+        bool isSideboardCategory = false;
+        bool includedInDeck = false;
+
+        for (const auto &cat : card.getCategories()) {
+
+            if (cat.name.compare("Commander", Qt::CaseInsensitive) == 0) {
+                isCommander = true;
+            }
+
+            if (cat.name.compare("Sideboard", Qt::CaseInsensitive) == 0 ||
+                cat.name.compare("Maybeboard", Qt::CaseInsensitive) == 0) {
+                isSideboardCategory = true;
+            }
+
+            if (cat.includedInDeck) {
+                includedInDeck = true;
+            }
+        }
+
+        QString target;
+
+        if (isCommander || isSideboardCategory) {
+            sideStream << line;
+        } else if (includedInDeck) {
+            mainStream << line;
+        } else {
+            sideStream << line;
+        }
+    }
+
+    // Combine with blank line separator
+    tempDeck = mainboardText;
+
+    if (!sideboardText.isEmpty()) {
+        tempDeck += "\n";
+        tempDeck += sideboardText;
     }
 
     model = new DeckListModel(this);
