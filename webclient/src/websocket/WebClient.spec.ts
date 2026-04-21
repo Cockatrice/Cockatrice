@@ -38,6 +38,35 @@ import type { IWebClientResponse } from './types/WebClientResponse';
 import type { IWebClientRequest } from './types/WebClientRequest';
 import type { ConnectTarget } from './types/WebClientConfig';
 import { installMockWebSocket } from './__mocks__/helpers';
+import { create, setExtension, toBinary } from '@bufbuild/protobuf';
+import {
+  Event_ServerIdentification_ext,
+  Event_ServerIdentification_ServerOptions,
+  Event_ServerIdentificationSchema,
+  ServerMessageSchema,
+  ServerMessage_MessageType,
+  SessionEventSchema,
+} from '@app/generated';
+import { PROTOCOL_VERSION } from './config';
+
+function buildServerIdentificationMessage({
+  protocolVersion = PROTOCOL_VERSION,
+  serverOptions = 0,
+}: { protocolVersion?: number; serverOptions?: number } = {}): Uint8Array {
+  const ident = create(Event_ServerIdentificationSchema, {
+    serverName: 'TestServer',
+    serverVersion: '2.8.0',
+    protocolVersion,
+    serverOptions,
+  });
+  const sessionEvent = create(SessionEventSchema);
+  setExtension(sessionEvent, Event_ServerIdentification_ext, ident);
+  const server = create(ServerMessageSchema, {
+    messageType: ServerMessage_MessageType.SESSION_EVENT,
+    sessionEvent,
+  });
+  return toBinary(ServerMessageSchema, server);
+}
 
 function makeMockResponse(): IWebClientResponse {
   return {
@@ -171,11 +200,36 @@ describe('WebClient', () => {
       expect(MockWS).toHaveBeenCalledWith(expect.stringContaining('://h:1'));
     });
 
-    it('calls testConnectionSuccessful and closes on open', () => {
+    it('routes path-bearing hosts through the default TLS port (nginx proxy)', () => {
+      client.testConnect({ host: 'server.example.com/servatrice', port: '4748' });
+      expect(MockWS).toHaveBeenCalledWith(expect.stringMatching(/:\/\/server\.example\.com\/servatrice$/));
+    });
+
+    it('dispatches testConnectionSuccessful with serverOptions on ServerIdentification', () => {
       client.testConnect(target);
-      wsMockInstance.onopen();
-      expect(mockResponse.session.testConnectionSuccessful).toHaveBeenCalled();
+      const data = buildServerIdentificationMessage({
+        serverOptions: Event_ServerIdentification_ServerOptions.SupportsPasswordHash,
+      });
+      wsMockInstance.onmessage({ data: data.buffer });
+      expect(mockResponse.session.testConnectionSuccessful).toHaveBeenCalledWith(
+        Event_ServerIdentification_ServerOptions.SupportsPasswordHash,
+      );
       expect(wsMockInstance.close).toHaveBeenCalled();
+    });
+
+    it('reports success with serverOptions=0 for naked-password servers', () => {
+      client.testConnect(target);
+      const data = buildServerIdentificationMessage({ serverOptions: 0 });
+      wsMockInstance.onmessage({ data: data.buffer });
+      expect(mockResponse.session.testConnectionSuccessful).toHaveBeenCalledWith(0);
+    });
+
+    it('fails on protocol-version mismatch instead of reporting success', () => {
+      client.testConnect(target);
+      const data = buildServerIdentificationMessage({ protocolVersion: PROTOCOL_VERSION + 1 });
+      wsMockInstance.onmessage({ data: data.buffer });
+      expect(mockResponse.session.testConnectionFailed).toHaveBeenCalled();
+      expect(mockResponse.session.testConnectionSuccessful).not.toHaveBeenCalled();
     });
 
     it('calls testConnectionFailed on error', () => {
@@ -184,10 +238,11 @@ describe('WebClient', () => {
       expect(mockResponse.session.testConnectionFailed).toHaveBeenCalled();
     });
 
-    it('closes socket after keepalive timeout', () => {
+    it('fires testConnectionFailed when ServerIdentification never arrives before the keepalive timeout', () => {
       client.testConnect(target);
       vi.advanceTimersByTime(5000);
       expect(wsMockInstance.close).toHaveBeenCalled();
+      expect(mockResponse.session.testConnectionFailed).toHaveBeenCalled();
     });
 
     it('closes the prior in-flight socket on rapid re-click', () => {

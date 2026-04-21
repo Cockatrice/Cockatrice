@@ -1,5 +1,13 @@
+import { fromBinary, getExtension, hasExtension } from '@bufbuild/protobuf';
+
+import {
+  Event_ServerIdentification_ext,
+  ServerMessageSchema,
+  ServerMessage_MessageType,
+} from '@app/generated';
+
 import { ping } from './commands/session';
-import { CLIENT_OPTIONS } from './config';
+import { CLIENT_OPTIONS, PROTOCOL_VERSION } from './config';
 import { GameEvents } from './events/game';
 import { RoomEvents } from './events/room';
 import { SessionEvents } from './events/session';
@@ -9,6 +17,7 @@ import type { IWebClientResponse } from './types/WebClientResponse';
 import { StatusEnum } from './types/StatusEnum';
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
+import { buildWebSocketUrl } from './utils/buildWebSocketUrl';
 
 export class WebClient {
   private static _instance: WebClient | null = null;
@@ -82,34 +91,58 @@ export class WebClient {
     }
 
     const protocol = window.location.hostname === 'localhost' ? 'ws' : 'wss';
-    const { host, port } = target;
-    const socket = new WebSocket(`${protocol}://${host}:${port}`);
+    const socket = new WebSocket(buildWebSocketUrl(protocol, target.host, target.port));
     socket.binaryType = 'arraybuffer';
     this.testSocket = socket;
 
-    const timeout = setTimeout(() => socket.close(), CLIENT_OPTIONS.keepalive);
-
-    const clearIfActive = () => {
+    // "Green" means reachable AND speaking a compatible Cockatrice protocol.
+    // Waiting for Event_ServerIdentification lets us carry serverOptions back
+    // to the UI so naked-password hosts can be distinguished without a login.
+    let resolved = false;
+    const resolve = (ok: boolean, serverOptions = 0): void => {
+      if (resolved) {
+        return;
+      }
+      resolved = true;
+      clearTimeout(timeout);
+      // Suppress dispatches from a superseded socket — a newer test has
+      // already taken over and we'd race a stale result into its pending-ref.
       if (this.testSocket === socket) {
+        if (ok) {
+          this.response.session.testConnectionSuccessful(serverOptions);
+        } else {
+          this.response.session.testConnectionFailed();
+        }
         this.testSocket = null;
+      }
+      socket.close();
+    };
+
+    const timeout = setTimeout(() => resolve(false), CLIENT_OPTIONS.keepalive);
+
+    socket.onmessage = (event: MessageEvent) => {
+      try {
+        const msg = fromBinary(ServerMessageSchema, new Uint8Array(event.data));
+        if (msg.messageType !== ServerMessage_MessageType.SESSION_EVENT) {
+          return;
+        }
+        const sessionEvent = msg.sessionEvent;
+        if (!sessionEvent || !hasExtension(sessionEvent, Event_ServerIdentification_ext)) {
+          return;
+        }
+        const ident = getExtension(sessionEvent, Event_ServerIdentification_ext);
+        if (ident.protocolVersion !== PROTOCOL_VERSION) {
+          resolve(false);
+          return;
+        }
+        resolve(true, ident.serverOptions);
+      } catch {
+        resolve(false);
       }
     };
 
-    socket.onopen = () => {
-      clearTimeout(timeout);
-      this.response.session.testConnectionSuccessful();
-      socket.close();
-      clearIfActive();
-    };
-
-    socket.onerror = () => {
-      this.response.session.testConnectionFailed();
-      clearIfActive();
-    };
-
-    socket.onclose = () => {
-      clearIfActive();
-    };
+    socket.onerror = () => resolve(false);
+    socket.onclose = () => resolve(false);
   }
 
   public disconnect(): void {

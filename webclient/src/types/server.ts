@@ -10,4 +10,8 @@ export class Host {
   userName?: string;
   hashedPassword?: string;
   remember?: boolean;
+  // Captured from Event_ServerIdentification.serverOptions during test connection.
+  // `undefined` = never tested; `true`/`false` = confirmed. UI gates the
+  // Remember Password and Auto Connect checkboxes on this.
+  supportsHashedPassword?: boolean;
 }

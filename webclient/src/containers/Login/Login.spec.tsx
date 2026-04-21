@@ -172,8 +172,13 @@ describe('Login — logout cycle (same JS session)', () => {
     await flushEffects();
     first.unmount();
 
+    // Submit button stays disabled until testConnectionStatus resolves to 'success';
+    // preload it so the click actually dispatches.
     const { getByRole, queryByText } = renderWithProviders(<Login />, {
-      preloadedState: disconnectedState,
+      preloadedState: {
+        ...disconnectedState,
+        server: { ...(disconnectedState.server as any), testConnectionStatus: 'success' },
+      },
     });
     await flushEffects();
 
@@ -196,6 +201,99 @@ describe('Login — refresh cycle', () => {
 
     await waitFor(() => {
       expect(hoisted.mockWebClient.request.authentication.login).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+
+// End-to-end regression: the symptom reported on this branch was "save-password
+// checkbox shows, login succeeds, but HostDTO.hashedPassword stays empty in
+// Dexie". These tests wire the full chain — auto-login fires onSubmitLogin
+// (capturing the form in rememberLoginRef), then a store.dispatch of
+// LOGIN_SUCCESSFUL drives the useReduxEffect that calls knownHosts.update.
+describe('Login — LOGIN_SUCCESSFUL → knownHosts persistence', () => {
+  const armWithUpdate = () => {
+    const update = vi.fn().mockResolvedValue(undefined);
+    const host = makeHost({
+      id: 7,
+      remember: true,
+      userName: 'alice',
+      hashedPassword: 'stored-hash',
+      supportsHashedPassword: true,
+      lastSelected: true,
+    });
+    hoisted.useSettings.mockReturnValue(
+      makeSettingsHook({
+        status: LoadingState.READY,
+        value: makeSettings({ autoConnect: true }),
+        update: vi.fn().mockResolvedValue(undefined),
+      })
+    );
+    hoisted.useKnownHosts.mockReturnValue(
+      makeKnownHostsHook({
+        status: LoadingState.READY,
+        value: { hosts: [host], selectedHost: host },
+        update,
+      })
+    );
+    hoisted.getSettings.mockResolvedValue(makeSettings({ autoConnect: true }));
+    hoisted.getKnownHosts.mockResolvedValue({ hosts: [host], selectedHost: host });
+    return { update, hostId: host.id! };
+  };
+
+  test('persists userName + hashedPassword when loginSuccessful carries a real hash', async () => {
+    const { update, hostId } = armWithUpdate();
+
+    const { store } = renderWithProviders(<Login />, {
+      preloadedState: {
+        ...disconnectedState,
+        server: { ...(disconnectedState.server as any), testConnectionStatus: 'success' },
+      },
+    });
+    await waitFor(() => {
+      expect(hoisted.mockWebClient.request.authentication.login).toHaveBeenCalledTimes(1);
+    });
+
+    store.dispatch({
+      type: 'server/loginSuccessful',
+      payload: { options: { hashedPassword: 'real-hash-xyz' } },
+    });
+    await flushEffects();
+
+    expect(update).toHaveBeenCalledWith(hostId, {
+      remember: true,
+      userName: 'alice',
+      hashedPassword: 'real-hash-xyz',
+    });
+  });
+
+  test('does not persist credentials when hashedPassword is empty (empty-salt fallback)', async () => {
+    const { update, hostId } = armWithUpdate();
+
+    const { store } = renderWithProviders(<Login />, {
+      preloadedState: {
+        ...disconnectedState,
+        server: { ...(disconnectedState.server as any), testConnectionStatus: 'success' },
+      },
+    });
+    await waitFor(() => {
+      expect(hoisted.mockWebClient.request.authentication.login).toHaveBeenCalledTimes(1);
+    });
+
+    // Empty-salt fallback path: login went through as plain password, so the
+    // response layer has no hash to carry forward.
+    store.dispatch({
+      type: 'server/loginSuccessful',
+      payload: { options: { hashedPassword: undefined } },
+    });
+    await flushEffects();
+
+    // Guard in useLogin.updateHost clears remember+credentials so next load
+    // reflects that save-password wasn't honoured — no stale "checked" checkbox
+    // sitting against a null hash.
+    expect(update).toHaveBeenCalledWith(hostId, {
+      remember: false,
+      userName: null,
+      hashedPassword: null,
     });
   });
 });

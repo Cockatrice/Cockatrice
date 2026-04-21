@@ -10,8 +10,6 @@ const SignalActions = {
   loginSuccessful: createAction<{ options: WebsocketTypes.LoginSuccessContext }>('server/loginSuccessful'),
   loginFailed: createAction('server/loginFailed'),
   connectionFailed: createAction('server/connectionFailed'),
-  testConnectionSuccessful: createAction('server/testConnectionSuccessful'),
-  testConnectionFailed: createAction('server/testConnectionFailed'),
   registrationRequiresEmail: createAction('server/registrationRequiresEmail'),
   registrationSuccess: createAction('server/registrationSuccess'),
   registrationEmailError: createAction<{ error: string }>('server/registrationEmailError'),

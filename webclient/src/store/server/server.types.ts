@@ -9,6 +9,7 @@ export const Types = {
   LOGIN_SUCCESSFUL: a.loginSuccessful.type,
   LOGIN_FAILED: a.loginFailed.type,
   CONNECTION_FAILED: a.connectionFailed.type,
+  TEST_CONNECTION_STARTED: a.testConnectionStarted.type,
   TEST_CONNECTION_SUCCESSFUL: a.testConnectionSuccessful.type,
   TEST_CONNECTION_FAILED: a.testConnectionFailed.type,
   SERVER_MESSAGE: a.serverMessage.type,

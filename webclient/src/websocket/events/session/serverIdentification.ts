@@ -32,7 +32,12 @@ export function serverIdentification(info: Event_ServerIdentification): void {
       SessionCommands.updateStatus(StatusEnum.LOGGING_IN, 'Logging In...');
       if (getPasswordSalt) {
         SessionCommands.requestPasswordSalt(rest,
-          (salt) => SessionCommands.login(rest, password, salt),
+          // Empty salt means the server advertised SupportsPasswordHash but
+          // can't actually produce one. Treat it as effectively unsupported —
+          // fall through to a plain-password login rather than failing.
+          (salt) => salt
+            ? SessionCommands.login(rest, password, salt)
+            : SessionCommands.login(rest, password),
           () => {
             response.session.loginFailed(); SessionCommands.disconnect();
           },

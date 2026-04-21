@@ -42,7 +42,10 @@ describe('Actions', () => {
   });
 
   it('testConnectionSuccessful', () => {
-    expect(Actions.testConnectionSuccessful()).toEqual({ type: Types.TEST_CONNECTION_SUCCESSFUL, payload: undefined });
+    expect(Actions.testConnectionSuccessful({ serverOptions: 1 })).toEqual({
+      type: Types.TEST_CONNECTION_SUCCESSFUL,
+      payload: { serverOptions: 1 },
+    });
   });
 
   it('testConnectionFailed', () => {

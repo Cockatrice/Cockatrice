@@ -69,6 +69,7 @@ function removeByPath(folder: Data.ServerInfo_DeckStorage_Folder, pathSegments: 
 
 const initialState: ServerState = {
   initialized: false,
+  testConnectionStatus: null,
   buddyList: {},
   ignoreList: {},
 
@@ -122,6 +123,22 @@ export const serverSlice = createSlice({
 
     connectionAttempted: (state) => {
       state.status.connectionAttemptMade = true;
+    },
+
+    testConnectionStarted: (state) => {
+      state.testConnectionStatus = 'testing';
+    },
+
+    // `serverOptions` is typed on the action so `useReduxEffect` subscribers
+    // (see useKnownHostsComponent) can read it from the dispatched action —
+    // it's deliberately not stored in state since only the lifecycle matters
+    // here; the capability bitmask is persisted per-host to Dexie.
+    testConnectionSuccessful: (state, _action: PayloadAction<{ serverOptions: number }>) => {
+      state.testConnectionStatus = 'success';
+    },
+
+    testConnectionFailed: (state) => {
+      state.testConnectionStatus = 'failed';
     },
 
     clearStore: (state) => ({

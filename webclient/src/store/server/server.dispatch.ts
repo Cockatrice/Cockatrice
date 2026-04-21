@@ -22,8 +22,11 @@ export const Dispatch = {
   connectionFailed: () => {
     store.dispatch(Actions.connectionFailed());
   },
-  testConnectionSuccessful: () => {
-    store.dispatch(Actions.testConnectionSuccessful());
+  testConnectionStarted: () => {
+    store.dispatch(Actions.testConnectionStarted());
+  },
+  testConnectionSuccessful: (serverOptions: number) => {
+    store.dispatch(Actions.testConnectionSuccessful({ serverOptions }));
   },
   testConnectionFailed: () => {
     store.dispatch(Actions.testConnectionFailed());

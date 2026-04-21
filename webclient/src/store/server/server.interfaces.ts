@@ -1,8 +1,12 @@
 import { App, Data, Enriched } from '@app/types';
 import { WebsocketTypes } from '@app/websocket/types';
 
+export type TestConnectionStatus = 'testing' | 'success' | 'failed' | null;
+
 export interface ServerState {
   initialized: boolean;
+  /** Lifecycle of the most recent test connection — drives Login button + hashed-password UI gates. */
+  testConnectionStatus: TestConnectionStatus;
   /** Buddies keyed by username for O(1) lookup. Use `getSortedBuddyList` for display. */
   buddyList: { [userName: string]: Data.ServerInfo_User };
   /** Ignored users keyed by username for O(1) lookup. Use `getSortedIgnoreList` for display. */

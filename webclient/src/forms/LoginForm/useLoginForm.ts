@@ -5,6 +5,7 @@ import { LoadingState, useKnownHosts, useSettings } from '@app/hooks';
 import { HostDTO } from '@app/services';
 
 export interface LoginFormBody {
+  selectedHost: HostDTO | undefined;
   useStoredPasswordLabel: boolean;
   setUseStoredPasswordLabel: (v: boolean) => void;
   onSelectedHostChange: (host: HostDTO | undefined) => void;
@@ -35,16 +36,30 @@ export function useLoginFormBody(form: MinimalFormApi): LoginFormBody {
 
   const togglePasswordLabel = (on: boolean) => setUseStoredPasswordLabel(on);
 
-  // @critical Host-sync must not touch autoConnect — app-level setting, not per-host.
+  // @critical Host-sync normally must not touch autoConnect — it's an app-level
+  // setting, not per-host. The single exception is switching to a host that is
+  // *proven* naked (supportsHashedPassword === false): the Remember/AutoConnect
+  // UI is hidden there, so we also clear the persisted setting to prevent a
+  // stale `true` from surviving silently. `undefined` (fresh host, test not
+  // yet complete) leaves the preference alone — test-connection will resolve
+  // capability in milliseconds.
   const onSelectedHostChange = (host: HostDTO | undefined) => {
     if (!host) {
       return;
     }
+    const nakedServer = host.supportsHashedPassword === false;
     form.change('userName', host.userName ?? '');
     form.change('password', '');
-    form.change('remember', Boolean(host.remember));
+    form.change('remember', !nakedServer && Boolean(host.remember));
     setStoredHashInvalidated(false);
-    togglePasswordLabel(Boolean(host.remember && host.hashedPassword));
+    togglePasswordLabel(!nakedServer && Boolean(host.remember && host.hashedPassword));
+
+    if (nakedServer) {
+      form.change('autoConnect', false);
+      if (settings.status === LoadingState.READY && settings.value?.autoConnect) {
+        void settings.update({ autoConnect: false });
+      }
+    }
   };
 
   const onUserNameChange = (userName: string | undefined) => {
@@ -81,6 +96,7 @@ export function useLoginFormBody(form: MinimalFormApi): LoginFormBody {
     togglePasswordLabel(canUseStoredPassword(values.remember, values.password));
 
   return {
+    selectedHost,
     useStoredPasswordLabel,
     setUseStoredPasswordLabel,
     onSelectedHostChange,

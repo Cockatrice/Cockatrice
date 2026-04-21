@@ -27,6 +27,7 @@ function makeUser(overrides: Partial<Data.ServerInfo_User> = {}): Data.ServerInf
 export const disconnectedState: Partial<RootState> = {
   server: {
     initialized: false,
+    testConnectionStatus: null,
     buddyList: {},
     ignoreList: {},
     status: {

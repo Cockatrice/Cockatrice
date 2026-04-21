@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@app/components';
 import { LoadingState, useKnownHosts, useReduxEffect, useWebClient } from '@app/hooks';
 import { getHostPort, HostDTO } from '@app/services';
-import { ServerTypes } from '@app/store';
+import { ServerDispatch, ServerSelectors, ServerTypes, useAppSelector } from '@app/store';
 import { App } from '@app/types';
+import { passwordSaltSupported } from '@app/websocket';
 
 export enum TestConnection {
   TESTING = 'testing',
@@ -16,7 +17,7 @@ export enum TestConnection {
 export interface KnownHostsComponent {
   hosts: App.Host[];
   selectedHost: App.Host | undefined;
-  testingConnection: TestConnection | null;
+  testConnectionStatus: TestConnection | null;
   dialogState: { open: boolean; edit: HostDTO | null };
   onPick: (id: number) => Promise<void>;
   openAddKnownHostDialog: () => void;
@@ -55,9 +56,13 @@ export function useKnownHostsComponent({
     edit: null,
   });
 
-  const [testingConnection, setTestingConnection] = useState<TestConnection | null>(null);
-  // Tracks the host currently awaiting a testConnection response. If null when a
-  // response arrives, the caller has moved on — ignore the stale reply.
+  // UI status lives in redux (see ServerSelectors.getTestConnectionStatus) so
+  // the LoginForm can gate its submit button + hashing-capability UI on the
+  // same signal. Tracks-the-host-pending lives in a ref — redux doesn't know
+  // the Host.id, and we need it to persist `supportsHashedPassword` on success.
+  const testConnectionStatus = useAppSelector(ServerSelectors.getTestConnectionStatus) as
+    | TestConnection
+    | null;
   const pendingTestRef = useRef<HostDTO | null>(null);
 
   const selectedHost =
@@ -66,7 +71,7 @@ export function useKnownHostsComponent({
 
   const testConnection = (host: HostDTO) => {
     pendingTestRef.current = host;
-    setTestingConnection(TestConnection.TESTING);
+    ServerDispatch.testConnectionStarted();
     webClient.request.authentication.testConnection({ ...getHostPort(host) });
   };
 
@@ -78,19 +83,20 @@ export function useKnownHostsComponent({
     testConnection(selectedHost);
   }, [selectedHost]);
 
-  useReduxEffect(() => {
-    if (!pendingTestRef.current) {
+  useReduxEffect<{ serverOptions: number }>(({ payload: { serverOptions } }) => {
+    const host = pendingTestRef.current;
+    if (!host) {
       return;
     }
-    setTestingConnection(TestConnection.SUCCESS);
     pendingTestRef.current = null;
+
+    const supportsHashedPassword = passwordSaltSupported(serverOptions);
+    if (host.id != null && host.supportsHashedPassword !== supportsHashedPassword) {
+      void knownHosts.update(host.id, { supportsHashedPassword });
+    }
   }, ServerTypes.TEST_CONNECTION_SUCCESSFUL, []);
 
   useReduxEffect(() => {
-    if (!pendingTestRef.current) {
-      return;
-    }
-    setTestingConnection(TestConnection.FAILED);
     pendingTestRef.current = null;
   }, ServerTypes.TEST_CONNECTION_FAILED, []);
 
@@ -163,7 +169,7 @@ export function useKnownHostsComponent({
   return {
     hosts,
     selectedHost,
-    testingConnection,
+    testConnectionStatus,
     dialogState,
     onPick,
     openAddKnownHostDialog,

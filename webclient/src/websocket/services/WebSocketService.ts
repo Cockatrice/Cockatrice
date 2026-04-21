@@ -4,6 +4,7 @@ import { StatusEnum } from '../types/StatusEnum';
 import { KeepAliveService } from './KeepAliveService';
 import { CLIENT_OPTIONS } from '../config';
 import type { ConnectTarget } from '../types/WebClientConfig';
+import { buildWebSocketUrl } from '../utils/buildWebSocketUrl';
 
 export interface ReconnectConfig {
   maxAttempts: number;
@@ -79,7 +80,7 @@ export class WebSocketService {
     this.keepalive = CLIENT_OPTIONS.keepalive;
 
     const { host, port } = target;
-    this.socket = this.createWebSocket(`${protocol}://${host}:${port}`);
+    this.socket = this.createWebSocket(buildWebSocketUrl(protocol as 'ws' | 'wss', host, port));
   }
 
   public disconnect(): void {
@@ -204,7 +205,9 @@ export class WebSocketService {
         return;
       }
       const { host, port } = this.lastTarget;
-      this.socket = this.createWebSocket(`${this.lastProtocol}://${host}:${port}`);
+      this.socket = this.createWebSocket(
+        buildWebSocketUrl(this.lastProtocol as 'ws' | 'wss', host, port),
+      );
     }, delay);
   }
 

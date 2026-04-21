@@ -12,10 +12,21 @@ import { CheckboxField, InputField, KnownHosts } from '@app/components';
 import type { FormErrors } from '@app/forms';
 import { LoadingState, useKnownHosts, useSettings } from '@app/hooks';
 import { HostDTO } from '@app/services';
+import { ServerSelectors, TestConnectionStatus, useAppSelector } from '@app/store';
 
 import { useLoginFormBody } from './useLoginForm';
 
 import './LoginForm.css';
+
+// Remember Password and Auto Connect both require server-side password hashing
+// to be useful (no hash to save = nothing to resume with). Test-connection
+// captures capability from ServerIdentification before the user ever logs in,
+// so we can afford a strict "hidden until a completed test proves supported" gate.
+const hostSupportsHashedPassword = (
+  host: HostDTO | undefined,
+  testConnectionStatus: TestConnectionStatus,
+): boolean =>
+  testConnectionStatus === 'success' && host?.supportsHashedPassword === true;
 
 export interface LoginFormValues {
   userName: string;
@@ -47,6 +58,7 @@ const LoginFormBody = ({
   const STORED_PASSWORD_LABEL = t('LoginForm.label.savedPassword');
 
   const {
+    selectedHost,
     useStoredPasswordLabel,
     setUseStoredPasswordLabel,
     onSelectedHostChange,
@@ -55,6 +67,13 @@ const LoginFormBody = ({
     onUserToggleAutoConnect,
     passwordFieldBlur,
   } = useLoginFormBody(form);
+
+  const testConnectionStatus = useAppSelector(ServerSelectors.getTestConnectionStatus);
+  const showHashingGatedOptions = hostSupportsHashedPassword(selectedHost, testConnectionStatus);
+  // Login is only meaningful once we know the host is reachable + speaks the
+  // Cockatrice protocol. Keep the button disabled until test-connection resolves
+  // to 'success'; re-disable on any subsequent re-test.
+  const loginDisabled = disableSubmitButton || testConnectionStatus !== 'success';
 
   return (
     <form className="loginForm" onSubmit={handleSubmit}>
@@ -80,12 +99,16 @@ const LoginFormBody = ({
           />
         </div>
         <div className="loginForm-actions">
-          <Field
-            label={t('LoginForm.label.savePassword')}
-            name="remember"
-            component={CheckboxField}
-          />
-          <OnChange name="remember">{onRememberChange}</OnChange>
+          {showHashingGatedOptions && (
+            <>
+              <Field
+                label={t('LoginForm.label.savePassword')}
+                name="remember"
+                component={CheckboxField}
+              />
+              <OnChange name="remember">{onRememberChange}</OnChange>
+            </>
+          )}
 
           <Button color="primary" onClick={onResetPassword}>
             {t('LoginForm.label.forgot')}
@@ -95,31 +118,33 @@ const LoginFormBody = ({
           <Field name="selectedHost" component={KnownHosts} />
           <OnChange name="selectedHost">{onSelectedHostChange}</OnChange>
         </div>
-        <div className="loginForm-actions">
-          <Field name="autoConnect" type="checkbox">
-            {({ input }) => (
-              <FormControlLabel
-                className="checkbox-field"
-                label={t('LoginForm.label.autoConnect')}
-                control={
-                  <Checkbox
-                    className="checkbox-field__box"
-                    checked={!!input.value}
-                    onChange={(_e, checked) => onUserToggleAutoConnect(checked, input.onChange)}
-                    color="primary"
-                  />
-                }
-              />
-            )}
-          </Field>
-        </div>
+        {showHashingGatedOptions && (
+          <div className="loginForm-actions">
+            <Field name="autoConnect" type="checkbox">
+              {({ input }) => (
+                <FormControlLabel
+                  className="checkbox-field"
+                  label={t('LoginForm.label.autoConnect')}
+                  control={
+                    <Checkbox
+                      className="checkbox-field__box"
+                      checked={!!input.value}
+                      onChange={(_e, checked) => onUserToggleAutoConnect(checked, input.onChange)}
+                      color="primary"
+                    />
+                  }
+                />
+              )}
+            </Field>
+          </div>
+        )}
       </div>
       <Button
         className="loginForm-submit rounded tall"
         color="primary"
         variant="contained"
         type="submit"
-        disabled={disableSubmitButton}
+        disabled={loginDisabled}
       >
         {t('LoginForm.label.login')}
       </Button>

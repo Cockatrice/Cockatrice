@@ -61,7 +61,7 @@ const KnownHosts = ({ input, meta, disabled }: KnownHostsProps) => {
   const {
     hosts,
     selectedHost,
-    testingConnection,
+    testConnectionStatus,
     dialogState,
     onPick,
     openAddKnownHostDialog,
@@ -119,8 +119,8 @@ const KnownHosts = ({ input, meta, disabled }: KnownHostsProps) => {
               <MenuItem value={host.id} key={host.id}>
                 <div className="KnownHosts-item">
                   <div className="KnownHosts-item__wrapper">
-                    <div className={`KnownHosts-item__status ${testingConnection ?? ''}`}>
-                      {testingConnection === TestConnection.FAILED ? (
+                    <div className={`KnownHosts-item__status ${testConnectionStatus ?? ''}`}>
+                      {testConnectionStatus === TestConnection.FAILED ? (
                         <PortableWifiOffIcon fontSize="small" />
                       ) : (
                         <WifiTetheringIcon fontSize="small" />

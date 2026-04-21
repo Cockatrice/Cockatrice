@@ -1,6 +1,6 @@
 vi.mock('../../generated/proto/event_server_identification_pb', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../generated/proto/event_server_identification_pb')>()),
-  Event_ServerIdentification_ServerOptions: { SupportsPasswordHash: 2 },
+  Event_ServerIdentification_ServerOptions: { SupportsPasswordHash: 1 },
 }));
 
 import { hashPassword, generateSalt, passwordSaltSupported } from './passwordHasher';
@@ -40,13 +40,19 @@ describe('generateSalt', () => {
 });
 
 describe('passwordSaltSupported', () => {
-  it('returns non-zero when SupportsPasswordHash bit is set', () => {
-    // SupportsPasswordHash = 2 from mock; 2 & 2 = 2
-    expect(passwordSaltSupported(2)).toBeTruthy();
+  it('returns false for NoOptions (0)', () => {
+    expect(passwordSaltSupported(0)).toBeFalsy();
   });
 
-  it('returns zero when SupportsPasswordHash bit is not set', () => {
-    // 1 & 2 = 0
-    expect(passwordSaltSupported(1)).toBeFalsy();
+  it('returns true when the SupportsPasswordHash bit (1) is set', () => {
+    expect(passwordSaltSupported(1)).toBeTruthy();
+  });
+
+  it('returns false when an unrelated bit is set (2)', () => {
+    expect(passwordSaltSupported(2)).toBeFalsy();
+  });
+
+  it('returns true when bit 0 is set alongside other bits (3)', () => {
+    expect(passwordSaltSupported(3)).toBeTruthy();
   });
 });

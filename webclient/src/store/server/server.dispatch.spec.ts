@@ -56,8 +56,10 @@ describe('Dispatch', () => {
   });
 
   it('testConnectionSuccessful dispatches Actions.testConnectionSuccessful()', () => {
-    Dispatch.testConnectionSuccessful();
-    expect(mockDispatch).toHaveBeenCalledWith(Actions.testConnectionSuccessful());
+    Dispatch.testConnectionSuccessful(3);
+    expect(mockDispatch).toHaveBeenCalledWith(
+      Actions.testConnectionSuccessful({ serverOptions: 3 }),
+    );
   });
 
   it('testConnectionFailed dispatches Actions.testConnectionFailed()', () => {

@@ -19,6 +19,8 @@ export const Selectors = {
   getDescription: ({ server }: State) => server.status.description,
   getState: ({ server }: State) => server.status.state,
   getConnectionAttemptMade: ({ server }: State) => server.status.connectionAttemptMade,
+  /** Lifecycle status of the latest test connection. `null` until the first test fires. */
+  getTestConnectionStatus: ({ server }: State) => server.testConnectionStatus,
   getUser: ({ server }: State) => server.user,
 
   /** True when the server status has reached LOGGED_IN. */

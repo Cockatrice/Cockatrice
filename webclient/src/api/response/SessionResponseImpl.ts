@@ -30,8 +30,8 @@ export class SessionResponseImpl implements WebsocketTypes.ISessionResponse {
     ServerDispatch.connectionFailed();
   }
 
-  testConnectionSuccessful(): void {
-    ServerDispatch.testConnectionSuccessful();
+  testConnectionSuccessful(serverOptions: number): void {
+    ServerDispatch.testConnectionSuccessful(serverOptions);
   }
 
   testConnectionFailed(): void {
