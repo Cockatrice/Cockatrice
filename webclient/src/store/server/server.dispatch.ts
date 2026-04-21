@@ -25,8 +25,8 @@ export const Dispatch = {
   testConnectionStarted: () => {
     store.dispatch(Actions.testConnectionStarted());
   },
-  testConnectionSuccessful: (serverOptions: number) => {
-    store.dispatch(Actions.testConnectionSuccessful({ serverOptions }));
+  testConnectionSuccessful: (supportsHashedPassword: boolean) => {
+    store.dispatch(Actions.testConnectionSuccessful({ supportsHashedPassword }));
   },
   testConnectionFailed: () => {
     store.dispatch(Actions.testConnectionFailed());

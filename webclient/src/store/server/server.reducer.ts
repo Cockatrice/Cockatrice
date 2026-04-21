@@ -129,11 +129,11 @@ export const serverSlice = createSlice({
       state.testConnectionStatus = 'testing';
     },
 
-    // `serverOptions` is typed on the action so `useReduxEffect` subscribers
-    // (see useKnownHostsComponent) can read it from the dispatched action —
-    // it's deliberately not stored in state since only the lifecycle matters
-    // here; the capability bitmask is persisted per-host to Dexie.
-    testConnectionSuccessful: (state, _action: PayloadAction<{ serverOptions: number }>) => {
+    // `supportsHashedPassword` is typed on the action so `useReduxEffect`
+    // subscribers (see useKnownHostsComponent) can persist it to the host
+    // record in Dexie. It's deliberately not stored in redux state since
+    // only the lifecycle matters here; per-host capability lives in Dexie.
+    testConnectionSuccessful: (state, _action: PayloadAction<{ supportsHashedPassword: boolean }>) => {
       state.testConnectionStatus = 'success';
     },
 

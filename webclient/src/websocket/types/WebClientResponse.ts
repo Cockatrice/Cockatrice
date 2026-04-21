@@ -55,7 +55,7 @@ export interface ISessionResponse {
   loginSuccessful(options: LoginSuccessContext): void;
   loginFailed(): void;
   connectionFailed(): void;
-  testConnectionSuccessful(serverOptions: number): void;
+  testConnectionSuccessful(supportsHashedPassword: boolean): void;
   testConnectionFailed(): void;
   updateBuddyList(buddyList: ServerInfo_User[]): void;
   addToBuddyList(user: ServerInfo_User): void;

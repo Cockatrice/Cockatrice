@@ -42,9 +42,9 @@ describe('Actions', () => {
   });
 
   it('testConnectionSuccessful', () => {
-    expect(Actions.testConnectionSuccessful({ serverOptions: 1 })).toEqual({
+    expect(Actions.testConnectionSuccessful({ supportsHashedPassword: true })).toEqual({
       type: Types.TEST_CONNECTION_SUCCESSFUL,
-      payload: { serverOptions: 1 },
+      payload: { supportsHashedPassword: true },
     });
   });
 

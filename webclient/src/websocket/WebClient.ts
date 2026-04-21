@@ -18,6 +18,7 @@ import { StatusEnum } from './types/StatusEnum';
 import { ProtobufService } from './services/ProtobufService';
 import { WebSocketService } from './services/WebSocketService';
 import { buildWebSocketUrl } from './utils/buildWebSocketUrl';
+import { passwordSaltSupported } from './utils/passwordHasher';
 
 export class WebClient {
   private static _instance: WebClient | null = null;
@@ -96,10 +97,12 @@ export class WebClient {
     this.testSocket = socket;
 
     // "Green" means reachable AND speaking a compatible Cockatrice protocol.
-    // Waiting for Event_ServerIdentification lets us carry serverOptions back
-    // to the UI so naked-password hosts can be distinguished without a login.
+    // Waiting for Event_ServerIdentification lets us read the hashed-password
+    // capability before the user ever logs in. The bitmask is resolved here
+    // (the websocket layer owns protocol details) so downstream consumers
+    // receive a domain-level boolean instead of a raw integer.
     let resolved = false;
-    const resolve = (ok: boolean, serverOptions = 0): void => {
+    const resolve = (ok: boolean, supportsHashedPassword = false): void => {
       if (resolved) {
         return;
       }
@@ -109,7 +112,7 @@ export class WebClient {
       // already taken over and we'd race a stale result into its pending-ref.
       if (this.testSocket === socket) {
         if (ok) {
-          this.response.session.testConnectionSuccessful(serverOptions);
+          this.response.session.testConnectionSuccessful(supportsHashedPassword);
         } else {
           this.response.session.testConnectionFailed();
         }
@@ -135,7 +138,7 @@ export class WebClient {
           resolve(false);
           return;
         }
-        resolve(true, ident.serverOptions);
+        resolve(true, passwordSaltSupported(ident.serverOptions));
       } catch {
         resolve(false);
       }

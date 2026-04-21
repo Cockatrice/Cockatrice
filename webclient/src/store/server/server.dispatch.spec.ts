@@ -56,9 +56,9 @@ describe('Dispatch', () => {
   });
 
   it('testConnectionSuccessful dispatches Actions.testConnectionSuccessful()', () => {
-    Dispatch.testConnectionSuccessful(3);
+    Dispatch.testConnectionSuccessful(true);
     expect(mockDispatch).toHaveBeenCalledWith(
-      Actions.testConnectionSuccessful({ serverOptions: 3 }),
+      Actions.testConnectionSuccessful({ supportsHashedPassword: true }),
     );
   });
 

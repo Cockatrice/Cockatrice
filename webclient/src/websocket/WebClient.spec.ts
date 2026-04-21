@@ -205,23 +205,21 @@ describe('WebClient', () => {
       expect(MockWS).toHaveBeenCalledWith(expect.stringMatching(/:\/\/server\.example\.com\/servatrice$/));
     });
 
-    it('dispatches testConnectionSuccessful with serverOptions on ServerIdentification', () => {
+    it('dispatches testConnectionSuccessful with supportsHashedPassword=true when the bit is set', () => {
       client.testConnect(target);
       const data = buildServerIdentificationMessage({
         serverOptions: Event_ServerIdentification_ServerOptions.SupportsPasswordHash,
       });
       wsMockInstance.onmessage({ data: data.buffer });
-      expect(mockResponse.session.testConnectionSuccessful).toHaveBeenCalledWith(
-        Event_ServerIdentification_ServerOptions.SupportsPasswordHash,
-      );
+      expect(mockResponse.session.testConnectionSuccessful).toHaveBeenCalledWith(true);
       expect(wsMockInstance.close).toHaveBeenCalled();
     });
 
-    it('reports success with serverOptions=0 for naked-password servers', () => {
+    it('dispatches testConnectionSuccessful with supportsHashedPassword=false for naked-password servers', () => {
       client.testConnect(target);
       const data = buildServerIdentificationMessage({ serverOptions: 0 });
       wsMockInstance.onmessage({ data: data.buffer });
-      expect(mockResponse.session.testConnectionSuccessful).toHaveBeenCalledWith(0);
+      expect(mockResponse.session.testConnectionSuccessful).toHaveBeenCalledWith(false);
     });
 
     it('fails on protocol-version mismatch instead of reporting success', () => {

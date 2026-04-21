@@ -6,7 +6,6 @@ import { LoadingState, useKnownHosts, useReduxEffect, useWebClient } from '@app/
 import { getHostPort, HostDTO } from '@app/services';
 import { ServerDispatch, ServerSelectors, ServerTypes, useAppSelector } from '@app/store';
 import { App } from '@app/types';
-import { passwordSaltSupported } from '@app/websocket';
 
 export enum TestConnection {
   TESTING = 'testing',
@@ -83,14 +82,13 @@ export function useKnownHostsComponent({
     testConnection(selectedHost);
   }, [selectedHost]);
 
-  useReduxEffect<{ serverOptions: number }>(({ payload: { serverOptions } }) => {
+  useReduxEffect<{ supportsHashedPassword: boolean }>(({ payload: { supportsHashedPassword } }) => {
     const host = pendingTestRef.current;
     if (!host) {
       return;
     }
     pendingTestRef.current = null;
 
-    const supportsHashedPassword = passwordSaltSupported(serverOptions);
     if (host.id != null && host.supportsHashedPassword !== supportsHashedPassword) {
       void knownHosts.update(host.id, { supportsHashedPassword });
     }
