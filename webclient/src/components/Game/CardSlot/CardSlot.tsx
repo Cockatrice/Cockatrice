@@ -9,7 +9,6 @@ import './CardSlot.css';
 
 export interface CardSlotProps {
   card: Data.ServerInfo_Card;
-  inverted?: boolean;
   draggable?: boolean;
   isArrowSource?: boolean;
   /** The player that owns this card (matches desktop's `getOwner()`). Kept
@@ -25,7 +24,6 @@ export interface CardSlotProps {
 
 function CardSlot({
   card,
-  inverted = false,
   draggable = false,
   isArrowSource = false,
   ownerPlayerId,
@@ -44,7 +42,6 @@ function CardSlot({
 
   const className = cx('card-slot', {
     'card-slot--tapped': card.tapped,
-    'card-slot--inverted': inverted,
     'card-slot--face-down': card.faceDown,
     'card-slot--attacking': card.attacking,
     'card-slot--dragging': isDragging,

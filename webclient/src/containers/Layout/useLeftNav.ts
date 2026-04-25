@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate, generatePath } from 'react-router-dom';
 
 import { useWebClient } from '@app/hooks';
-import { RoomsSelectors, ServerSelectors, useAppSelector } from '@app/store';
+import { GameSelectors, RoomsSelectors, ServerSelectors, useAppSelector } from '@app/store';
 import { App } from '@app/types';
 
 export interface LeftNavOption {
@@ -18,12 +18,14 @@ interface LeftNavState {
 
 export interface LeftNav {
   joinedRooms: ReturnType<typeof RoomsSelectors.getJoinedRooms>;
+  joinedGames: ReturnType<typeof GameSelectors.getActiveGames>;
   isConnected: boolean;
   state: LeftNavState;
   handleMenuOpen: (event: React.MouseEvent) => void;
   handleMenuItemClick: (option: LeftNavOption) => void;
   handleMenuClose: () => void;
   leaveRoom: (event: React.MouseEvent, roomId: number) => void;
+  leaveGame: (event: React.MouseEvent, gameId: number) => void;
   openImportCardWizard: () => void;
   closeImportCardWizard: () => void;
 }
@@ -40,6 +42,7 @@ const MODERATOR_OPTIONS: LeftNavOption[] = [
 
 export function useLeftNav(): LeftNav {
   const joinedRooms = useAppSelector((state) => RoomsSelectors.getJoinedRooms(state));
+  const joinedGames = useAppSelector(GameSelectors.getActiveGames);
   const isConnected = useAppSelector(ServerSelectors.getIsConnected);
   const isModerator = useAppSelector(ServerSelectors.getIsUserModerator);
   const navigate = useNavigate();
@@ -71,6 +74,11 @@ export function useLeftNav(): LeftNav {
     webClient.request.rooms.leaveRoom(roomId);
   };
 
+  const leaveGame = (event: React.MouseEvent, gameId: number) => {
+    event.preventDefault();
+    webClient.request.game.leaveGame(gameId);
+  };
+
   const openImportCardWizard = () => {
     setShowCardImportDialog(true);
     handleMenuClose();
@@ -82,12 +90,14 @@ export function useLeftNav(): LeftNav {
 
   return {
     joinedRooms,
+    joinedGames,
     isConnected,
     state,
     handleMenuOpen,
     handleMenuItemClick,
     handleMenuClose,
     leaveRoom,
+    leaveGame,
     openImportCardWizard,
     closeImportCardWizard,
   };

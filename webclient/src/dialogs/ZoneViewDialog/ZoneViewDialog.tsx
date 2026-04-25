@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -44,6 +45,19 @@ function ZoneViewDialog({
 }: ZoneViewDialogProps) {
   const { cards, count, title, position, handlePointerDown, handlePointerMove, handlePointerUp } =
     useZoneViewDialog({ gameId, playerId, zoneName, initialPosition });
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, handleClose]);
 
   if (!isOpen) {
     return null;

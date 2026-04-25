@@ -31,7 +31,7 @@ function buildState(
 }
 
 describe('PlayerList', () => {
-  it('lists every player in the game', () => {
+  it('lists every player in the game with a ping-dot tooltip', () => {
     const p1 = makePlayerEntry({
       properties: makePlayerProperties({
         playerId: 1,
@@ -53,8 +53,96 @@ describe('PlayerList', () => {
 
     expect(screen.getByText('Alice')).toBeInTheDocument();
     expect(screen.getByText('Bob')).toBeInTheDocument();
-    expect(screen.getByText('10s')).toBeInTheDocument();
-    expect(screen.getByText('20s')).toBeInTheDocument();
+    expect(screen.getByLabelText('ping 10s')).toBeInTheDocument();
+    expect(screen.getByLabelText('ping 20s')).toBeInTheDocument();
+    // Raw-seconds text no longer renders; the dot carries the info via tooltip.
+    expect(screen.queryByText('10s')).not.toBeInTheDocument();
+    expect(screen.queryByText('20s')).not.toBeInTheDocument();
+  });
+
+  describe('ping-dot color', () => {
+    it('colors a low ping green', () => {
+      const p = makePlayerEntry({
+        properties: makePlayerProperties({
+          playerId: 1,
+          userInfo: makeUser({ name: 'Alice' }),
+          pingSeconds: 0,
+        }),
+      });
+      renderWithProviders(<PlayerList gameId={1} />, {
+        preloadedState: buildState([p], 1),
+      });
+
+      expect(screen.getByTestId('ping-dot-1')).toHaveStyle({
+        background: 'hsl(120, 100%, 50%)',
+      });
+    });
+
+    it('colors a saturated ping red (clamped at 10s)', () => {
+      const p = makePlayerEntry({
+        properties: makePlayerProperties({
+          playerId: 1,
+          userInfo: makeUser({ name: 'Alice' }),
+          pingSeconds: 15,
+        }),
+      });
+      renderWithProviders(<PlayerList gameId={1} />, {
+        preloadedState: buildState([p], 1),
+      });
+
+      expect(screen.getByTestId('ping-dot-1')).toHaveStyle({
+        background: 'hsl(0, 100%, 50%)',
+      });
+    });
+
+    it('colors a disconnected player black (ping < 0)', () => {
+      const p = makePlayerEntry({
+        properties: makePlayerProperties({
+          playerId: 1,
+          userInfo: makeUser({ name: 'Alice' }),
+          pingSeconds: -1,
+        }),
+      });
+      renderWithProviders(<PlayerList gameId={1} />, {
+        preloadedState: buildState([p], 1),
+      });
+
+      expect(screen.getByTestId('ping-dot-1')).toHaveStyle({
+        background: '#000',
+      });
+    });
+  });
+
+  describe('sideboard lock', () => {
+    it('shows the 🔒 icon for a player with a locked sideboard', () => {
+      const p = makePlayerEntry({
+        properties: makePlayerProperties({
+          playerId: 1,
+          userInfo: makeUser({ name: 'Alice' }),
+          sideboardLocked: true,
+        }),
+      });
+      renderWithProviders(<PlayerList gameId={1} />, {
+        preloadedState: buildState([p], 1),
+      });
+
+      expect(screen.getByLabelText('sideboard locked')).toBeInTheDocument();
+    });
+
+    it('hides the 🔒 icon for a player with an unlocked sideboard', () => {
+      const p = makePlayerEntry({
+        properties: makePlayerProperties({
+          playerId: 1,
+          userInfo: makeUser({ name: 'Alice' }),
+          sideboardLocked: false,
+        }),
+      });
+      renderWithProviders(<PlayerList gameId={1} />, {
+        preloadedState: buildState([p], 1),
+      });
+
+      expect(screen.queryByLabelText('sideboard locked')).not.toBeInTheDocument();
+    });
   });
 
   it('highlights the active player', () => {

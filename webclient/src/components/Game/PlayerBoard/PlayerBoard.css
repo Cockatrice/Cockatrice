@@ -1,6 +1,6 @@
 .player-board {
   display: grid;
-  grid-template-columns: 160px minmax(0, 1fr) 110px;
+  grid-template-columns: 150px 76px minmax(0, 1fr);
   height: 100%;
   min-height: 0;
   background: #0a1225;

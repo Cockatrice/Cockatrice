@@ -7,6 +7,19 @@ export interface PlayerListProps {
   gameId: number | undefined;
 }
 
+// HSV gradient from green (0s) to red (>=10s); black when disconnected
+// (ping < 0). Mirrors desktop's PingPixmapGenerator in
+// cockatrice/src/interface/pixel_map_generator.cpp.
+function pingCssColor(pingSeconds: number | undefined): string {
+  if (pingSeconds == null || pingSeconds < 0) {
+    return '#000';
+  }
+  const max = 10;
+  const ratio = Math.min(pingSeconds, max) / max;
+  const hue = 120 * (1 - ratio);
+  return `hsl(${hue}, 100%, 50%)`;
+}
+
 function PlayerList({ gameId }: PlayerListProps) {
   const players = useAppSelector((state) =>
     gameId != null ? GameSelectors.getPlayers(state, gameId) : undefined,
@@ -32,6 +45,9 @@ function PlayerList({ gameId }: PlayerListProps) {
           const name = p.properties.userInfo?.name ?? '(unknown)';
           const isActive = pid === activePlayerId;
           const isHost = pid === hostId;
+          const sideboardLocked = p.properties.sideboardLocked ?? false;
+          const pingSeconds = p.properties.pingSeconds;
+          const pingLabel = `ping ${pingSeconds ?? '?'}s`;
           return (
             <li
               key={pid}
@@ -56,7 +72,22 @@ function PlayerList({ gameId }: PlayerListProps) {
                 </span>
               )}
               <span className="player-list__name">{name}</span>
-              <span className="player-list__ping">{p.properties.pingSeconds}s</span>
+              {sideboardLocked && (
+                <span
+                  className="player-list__sideboard-lock"
+                  aria-label="sideboard locked"
+                  title="Sideboard locked"
+                >
+                  🔒
+                </span>
+              )}
+              <span
+                className="player-list__ping-dot"
+                style={{ background: pingCssColor(pingSeconds) }}
+                aria-label={pingLabel}
+                title={pingLabel}
+                data-testid={`ping-dot-${pid}`}
+              />
             </li>
           );
         })}

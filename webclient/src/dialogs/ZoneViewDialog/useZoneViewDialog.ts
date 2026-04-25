@@ -76,6 +76,12 @@ export function useZoneViewDialog({
     if (e.button !== 0) {
       return;
     }
+    // Skip drag initiation when the pointer lands on an interactive child
+    // (e.g. the close button). Capturing the pointer on the header would
+    // otherwise swallow the button's click event.
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
     const target = e.currentTarget;
     target.setPointerCapture(e.pointerId);
     dragStateRef.current = {

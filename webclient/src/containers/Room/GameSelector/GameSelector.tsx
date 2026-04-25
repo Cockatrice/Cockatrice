@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
@@ -13,7 +13,7 @@ import {
   type GameFilters,
 } from '@app/store';
 import { useReduxEffect, useWebClient } from '@app/hooks';
-import { App, type Enriched } from '@app/types';
+import { App, type Data, type Enriched } from '@app/types';
 import { AlertDialog, CreateGameDialog, FilterGamesDialog, PromptDialog } from '@app/dialogs';
 
 import OpenGames from '../OpenGames';
@@ -49,9 +49,12 @@ const GameSelector = ({ room }: GameSelectorProps) => {
   const activeGameIds = useAppSelector(GameSelectors.getActiveGameIds);
 
   // Mirrors Server.tsx's JOIN_ROOM → navigate(ROOM) pattern: when Event_GameJoined
-  // lands, we're actually in the game — route to /game.
-  useReduxEffect(() => {
-    navigate(App.RouteEnum.GAME);
+  // lands, we're actually in the game — route to /game/:gameId so the URL
+  // identifies which joined game to display.
+  useReduxEffect<{ data: Data.Event_GameJoined }>((action) => {
+    const gameId = action.payload.data.gameInfo?.gameId;
+    if (gameId == null) return;
+    navigate(generatePath(App.RouteEnum.GAME, { gameId: gameId.toString() }));
   }, GameTypes.GAME_JOINED, [navigate]);
 
   const [createOpen, setCreateOpen] = useState(false);
@@ -65,7 +68,7 @@ const GameSelector = ({ room }: GameSelectorProps) => {
       // JoinGame — the server would reject it with RespContextError — and go
       // straight to the game view.
       if (activeGameIds.includes(gameId)) {
-        navigate(App.RouteEnum.GAME);
+        navigate(generatePath(App.RouteEnum.GAME, { gameId: gameId.toString() }));
         return;
       }
       const params: App.JoinGameParams = {

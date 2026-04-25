@@ -12,6 +12,7 @@ export interface ZoneStackProps {
   playerId: number;
   zoneName: string;
   label: string;
+  rotated?: boolean;
   onCardHover?: (card: Data.ServerInfo_Card) => void;
   onClick?: (zoneName: string) => void;
   onContextMenu?: (zoneName: string, event: React.MouseEvent) => void;
@@ -22,6 +23,7 @@ function ZoneStack({
   playerId,
   zoneName,
   label,
+  rotated = false,
   onCardHover,
   onClick,
   onContextMenu,
@@ -49,7 +51,10 @@ function ZoneStack({
   return (
     <div
       ref={setNodeRef}
-      className={cx('zone-stack', { 'zone-stack--drop-over': isOver })}
+      className={cx('zone-stack', {
+        'zone-stack--drop-over': isOver,
+        'zone-stack--rotated': rotated,
+      })}
       data-testid={`zone-stack-${zoneName}`}
       onMouseEnter={() => topCard && onCardHover?.(topCard)}
       onClick={() => onClick?.(zoneName)}

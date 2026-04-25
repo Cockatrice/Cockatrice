@@ -51,20 +51,6 @@ describe('CardSlot', () => {
     expect(screen.getByTestId('card-slot')).toHaveClass('card-slot--tapped');
   });
 
-  it('adds the inverted modifier when prop inverted is true', () => {
-    const card = makeCard();
-    render(<CardSlot card={card} inverted />);
-    expect(screen.getByTestId('card-slot')).toHaveClass('card-slot--inverted');
-  });
-
-  it('combines tapped and inverted classes so CSS can compose rotation', () => {
-    const card = makeCard({ tapped: true });
-    render(<CardSlot card={card} inverted />);
-    const el = screen.getByTestId('card-slot');
-    expect(el).toHaveClass('card-slot--tapped');
-    expect(el).toHaveClass('card-slot--inverted');
-  });
-
   it('renders P/T overlay when pt is set', () => {
     const card = makeCard({ pt: '5/5' });
     render(<CardSlot card={card} />);

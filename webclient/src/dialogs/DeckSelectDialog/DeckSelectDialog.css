@@ -3,6 +3,37 @@
   max-width: 540px;
 }
 
+.deck-select-dialog__file-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.deck-select-dialog__file-name {
+  font-size: 13px;
+  color: #56607a;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  word-break: break-all;
+}
+
+.deck-select-dialog__divider {
+  display: block;
+  margin: 4px 0 6px;
+  color: #9ea6b8;
+  text-align: center;
+}
+
+.deck-select-dialog__error {
+  margin-top: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #8a1f1f;
+  background: #fdecec;
+  border: 1px solid #f2b8b8;
+  border-radius: 4px;
+}
+
 .deck-select-dialog__textarea {
   width: 100%;
   min-height: 220px;

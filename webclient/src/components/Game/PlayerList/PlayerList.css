@@ -70,7 +70,17 @@
   text-overflow: ellipsis;
 }
 
-.player-list__ping {
-  color: #7f90b5;
-  font-size: 10px;
+.player-list__sideboard-lock {
+  font-size: 11px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.player-list__ping-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
 }

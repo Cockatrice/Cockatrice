@@ -1,0 +1,17 @@
+.battlefield-stack-column {
+  position: relative;
+  height: 100%;
+  flex: 0 0 auto;
+  /* width set inline per-stack (dynamic: card width + sub-position offsets + attachments) */
+}
+
+.battlefield-stack-column__slot {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  /* left + zIndex set inline per sub-position */
+  /* AttachmentStack fills this slot; its own width is self-managed via flex
+     basis + max-width inline styles. */
+  display: flex;
+  align-items: center;
+}

@@ -144,6 +144,34 @@ describe('ZoneStack', () => {
     expect(el).not.toHaveAttribute('tabindex');
   });
 
+  it('applies the rotated modifier class when rotated is true', () => {
+    renderWithProviders(
+      <ZoneStack
+        gameId={1}
+        playerId={1}
+        zoneName={App.ZoneName.GRAVE}
+        label="Graveyard"
+        rotated
+      />,
+      { preloadedState: stateWithZone(App.ZoneName.GRAVE, { cardCount: 0 }) },
+    );
+
+    expect(screen.getByTestId(`zone-stack-${App.ZoneName.GRAVE}`)).toHaveClass(
+      'zone-stack--rotated',
+    );
+  });
+
+  it('omits the rotated modifier by default', () => {
+    renderWithProviders(
+      <ZoneStack gameId={1} playerId={1} zoneName={App.ZoneName.DECK} label="Deck" />,
+      { preloadedState: stateWithZone(App.ZoneName.DECK, { cardCount: 0 }) },
+    );
+
+    expect(screen.getByTestId(`zone-stack-${App.ZoneName.DECK}`)).not.toHaveClass(
+      'zone-stack--rotated',
+    );
+  });
+
   it.each([['Enter'], [' ']])('fires onClick on %s keypress when focusable', (key) => {
     const onClick = vi.fn();
     renderWithProviders(

@@ -270,7 +270,7 @@ describe('Game container', () => {
       expect(screen.queryByRole('button', { name: /close zone view/i })).not.toBeInTheDocument();
     });
 
-    it('opens when a zone-rail entry is clicked, showing the cards in that zone', () => {
+    it('opens when a zone entry in the info panel is clicked, showing the cards in that zone', () => {
       const graveCard = makeCard({ id: 77, name: 'Final Card' });
       renderWithProviders(<Game />, {
         preloadedState: buildGame({

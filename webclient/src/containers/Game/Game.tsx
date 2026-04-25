@@ -13,7 +13,6 @@ import {
   PlayerBoard,
   PlayerContextMenu,
   RightPanel,
-  StackStrip,
   ZoneContextMenu,
 } from '@app/components';
 import {
@@ -43,6 +42,7 @@ function Game() {
     gameId,
     game,
     localPlayer,
+    isSpectator,
     boardRef,
     cardRegistry,
     sensors,
@@ -114,56 +114,42 @@ function Game() {
                     onZoneClick={dialogs.handleZoneClick}
                     onZoneContextMenu={dialogs.handleZoneContextMenu}
                   />
-                  <StackStrip
-                    gameId={gameId!}
-                    entries={[
-                      {
-                        playerId: opponents.shownOpponentId,
-                        name:
-                          opponents.opponents.find((o) => o.playerId === opponents.shownOpponentId)?.name ??
-                          `p${opponents.shownOpponentId}`,
-                      },
-                      {
-                        playerId: game.localPlayerId,
-                        name:
-                          localPlayer?.properties.userInfo?.name ??
-                          `p${game.localPlayerId}`,
-                      },
-                    ]}
-                    onZoneClick={dialogs.handleZoneClick}
-                  />
-                  <PlayerBoard
-                    gameId={gameId!}
-                    playerId={game.localPlayerId}
-                    canAct={localAccess.canAct}
-                    canEditCounters={localAccess.canAct}
-                    arrowSourceKey={arrows.arrowSourceKey}
-                    onCardHover={setHoveredCard}
-                    onCardClick={arrows.handleCardClick}
-                    onCardContextMenu={(card, e) =>
-                      dialogs.handleCardContextMenu(game.localPlayerId, App.ZoneName.TABLE, card, e)
-                    }
-                    onCardDoubleClick={(card) =>
-                      arrows.handleCardDoubleClick(App.ZoneName.TABLE, card)
-                    }
-                    onZoneClick={dialogs.handleZoneClick}
-                    onZoneContextMenu={dialogs.handleZoneContextMenu}
-                    onRequestCreateCounter={dialogs.openCreateCounter}
-                    onPlayerContextMenu={dialogs.handlePlayerContextMenu}
-                  />
-                  {localPlayer && (
-                    <HandZone
-                      gameId={gameId!}
-                      playerId={game.localPlayerId}
-                      canAct={localAccess.canAct}
-                      arrowSourceKey={arrows.arrowSourceKey}
-                      onCardHover={setHoveredCard}
-                      onCardClick={arrows.handleCardClick}
-                      onCardContextMenu={(card, e) =>
-                        dialogs.handleCardContextMenu(game.localPlayerId, App.ZoneName.HAND, card, e)
-                      }
-                      onZoneContextMenu={dialogs.handleHandContextMenu}
-                    />
+                  {!isSpectator && (
+                    <>
+                      <PlayerBoard
+                        gameId={gameId!}
+                        playerId={game.localPlayerId}
+                        canAct={localAccess.canAct}
+                        canEditCounters={localAccess.canAct}
+                        arrowSourceKey={arrows.arrowSourceKey}
+                        onCardHover={setHoveredCard}
+                        onCardClick={arrows.handleCardClick}
+                        onCardContextMenu={(card, e) =>
+                          dialogs.handleCardContextMenu(game.localPlayerId, App.ZoneName.TABLE, card, e)
+                        }
+                        onCardDoubleClick={(card) =>
+                          arrows.handleCardDoubleClick(App.ZoneName.TABLE, card)
+                        }
+                        onZoneClick={dialogs.handleZoneClick}
+                        onZoneContextMenu={dialogs.handleZoneContextMenu}
+                        onRequestCreateCounter={dialogs.openCreateCounter}
+                        onPlayerContextMenu={dialogs.handlePlayerContextMenu}
+                      />
+                      {localPlayer && (
+                        <HandZone
+                          gameId={gameId!}
+                          playerId={game.localPlayerId}
+                          canAct={localAccess.canAct}
+                          arrowSourceKey={arrows.arrowSourceKey}
+                          onCardHover={setHoveredCard}
+                          onCardClick={arrows.handleCardClick}
+                          onCardContextMenu={(card, e) =>
+                            dialogs.handleCardContextMenu(game.localPlayerId, App.ZoneName.HAND, card, e)
+                          }
+                          onZoneContextMenu={dialogs.handleHandContextMenu}
+                        />
+                      )}
+                    </>
                   )}
                 </div>
               )}

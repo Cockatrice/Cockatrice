@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -41,6 +42,9 @@ function DeckSelectDialog({ isOpen, gameId, handleClose }: DeckSelectDialogProps
   const {
     deckText,
     setDeckText,
+    fileName,
+    handleFilePicked,
+    validationError,
     deckHash,
     isReady,
     canSubmit,
@@ -48,6 +52,8 @@ function DeckSelectDialog({ isOpen, gameId, handleClose }: DeckSelectDialogProps
     handleSubmitDeck,
     handleToggleReady,
   } = useDeckSelectDialog(gameId);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   return (
     <StyledDialog
@@ -63,8 +69,37 @@ function DeckSelectDialog({ isOpen, gameId, handleClose }: DeckSelectDialogProps
       </DialogTitle>
       <DialogContent className="dialog-content">
         <Typography className="dialog-content__subtitle" variant="subtitle1">
-          Paste your deck list below, then click Submit Deck. After the server
-          accepts the deck, the Ready button unlocks.
+          Pick a .cod file from your computer or paste its XML below, then click
+          Submit Deck. After the server accepts the deck, the Ready button unlocks.
+        </Typography>
+
+        <div className="deck-select-dialog__file-row">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".cod"
+            aria-label="deck file"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files?.[0] ?? null;
+              handleFilePicked(file);
+              e.target.value = '';
+            }}
+          />
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            Choose .cod file
+          </Button>
+          <span className="deck-select-dialog__file-name">
+            {fileName ?? 'No file selected'}
+          </span>
+        </div>
+
+        <Typography className="deck-select-dialog__divider" variant="caption">
+          — or paste XML below —
         </Typography>
 
         <textarea
@@ -72,9 +107,15 @@ function DeckSelectDialog({ isOpen, gameId, handleClose }: DeckSelectDialogProps
           rows={10}
           value={deckText}
           onChange={(e) => setDeckText(e.target.value)}
-          placeholder="4 Lightning Bolt&#10;20 Mountain&#10;..."
+          placeholder={'<?xml version="1.0"?>\n<cockatrice_deck version="1">\n  ...\n</cockatrice_deck>'}
           aria-label="deck list"
         />
+
+        {validationError != null && (
+          <div className="deck-select-dialog__error" role="alert">
+            {validationError}
+          </div>
+        )}
 
         <div className="deck-select-dialog__hash">
           Deck hash: {deckHash.length > 0 ? deckHash : <span className="deck-select-dialog__hash--pending">—</span>}

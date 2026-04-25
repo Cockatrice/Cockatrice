@@ -1,36 +1,69 @@
-import { useState } from 'react';
 import { useWebClient } from '@app/hooks';
 import { GameSelectors, useAppSelector } from '@app/store';
 import type { Data, Enriched } from '@app/types';
 
-export function cssColor(c: { r: number; g: number; b: number; a: number } | undefined): string {
-  if (!c) {
-    return '#666';
-  }
-  return `rgba(${c.r}, ${c.g}, ${c.b}, ${(c.a ?? 255) / 255})`;
+type ServerColor = { r: number; g: number; b: number; a: number } | undefined;
+
+// Canonical MTG mana colors, mirroring the dead-code table in desktop's
+// libcockatrice_utility/libcockatrice/utility/color.h colorHelper(). Used
+// as a fallback when the server leaves counterColor unset or all-zero.
+const NAME_COLOR_MAP: Record<string, [number, number, number]> = {
+  W: [245, 245, 220],
+  U: [80, 140, 255],
+  B: [60, 60, 60],
+  R: [220, 60, 50],
+  G: [70, 160, 70],
+  LIFE: [220, 140, 60],
+};
+
+function isBlankColor(c: ServerColor): boolean {
+  if (!c) return true;
+  if ((c.a ?? 255) === 0) return true;
+  return c.r === 0 && c.g === 0 && c.b === 0;
 }
 
-// Desktop renders Life larger/bolder than other counters (see
-// cockatrice/src/game/player/player.cpp PlayerTarget sizing). We special-
-// case the counter whose name is exactly 'Life' (case-insensitive) and
-// pull it out of the regular counter list into a prominent life block.
-export function isLifeCounter(c: { name: string }): boolean {
+// Stable 32-bit FNV-1a hash of a string. Matches the shape of desktop's
+// qHash-based procedural fallback for unknown counter names.
+function hashName(name: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < name.length; i++) {
+    h ^= name.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+function hashColor(name: string): [number, number, number] {
+  const h = hashName(name);
+  return [100 + (h % 120), 100 + ((h >> 8) % 120), 100 + ((h >> 16) % 120)];
+}
+
+export function counterCssColor(counter: { name: string; counterColor?: ServerColor }): string {
+  const server = counter.counterColor;
+  if (!isBlankColor(server)) {
+    return `rgba(${server!.r}, ${server!.g}, ${server!.b}, ${(server!.a ?? 255) / 255})`;
+  }
+  const key = counter.name.trim().toUpperCase();
+  const mapped = NAME_COLOR_MAP[key];
+  if (mapped) {
+    return `rgba(${mapped[0]}, ${mapped[1]}, ${mapped[2]}, 1)`;
+  }
+  const [r, g, b] = hashColor(counter.name);
+  return `rgba(${r}, ${g}, ${b}, 1)`;
+}
+
+function isLifeCounter(c: { name: string }): boolean {
   return c.name.trim().toLowerCase() === 'life';
 }
 
 export interface PlayerInfoPanel {
   player: Enriched.PlayerEntry | undefined;
   isHost: boolean;
+  // Life renders in the header alongside the name; all other counters render
+  // as circles centered in the rail body.
   lifeCounter: Data.ServerInfo_Counter | undefined;
   otherCounters: Data.ServerInfo_Counter[];
-  editingId: number | null;
-  editDraft: string;
-  setEditDraft: (v: string) => void;
-  beginEdit: (counterId: number, currentValue: number) => void;
-  commitEdit: (counterId: number) => void;
-  cancelEdit: () => void;
   handleIncrement: (counterId: number, delta: number) => void;
-  handleDelete: (counterId: number) => void;
 }
 
 export interface UsePlayerInfoPanelArgs {
@@ -44,14 +77,11 @@ export function usePlayerInfoPanel({
 }: UsePlayerInfoPanelArgs): PlayerInfoPanel {
   const webClient = useWebClient();
   const player = useAppSelector((state) => GameSelectors.getPlayer(state, gameId, playerId));
-  const counters = useAppSelector((state) => GameSelectors.getCounters(state, gameId, playerId));
+  const countersMap = useAppSelector((state) => GameSelectors.getCounters(state, gameId, playerId));
   const hostId = useAppSelector((state) => GameSelectors.getHostId(state, gameId));
 
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editDraft, setEditDraft] = useState('');
-
   const isHost = hostId != null && hostId === playerId;
-  const allCounters = Object.values(counters);
+  const allCounters = Object.values(countersMap);
   const lifeCounter = allCounters.find(isLifeCounter);
   const otherCounters = allCounters.filter((c) => !isLifeCounter(c));
 
@@ -59,48 +89,11 @@ export function usePlayerInfoPanel({
     webClient.request.game.incCounter(gameId, { counterId, delta });
   };
 
-  const handleDelete = (counterId: number) => {
-    webClient.request.game.delCounter(gameId, { counterId });
-  };
-
-  const beginEdit = (counterId: number, currentValue: number) => {
-    setEditingId(counterId);
-    setEditDraft(String(currentValue));
-  };
-
-  const commitEdit = (counterId: number) => {
-    const trimmed = editDraft.trim();
-    // Empty input cancels the edit (desktop inline edits treat blur-with-
-    // no-change and blur-with-empty-string identically). Prior behavior
-    // coerced '' → 0 because `Number('')` is 0 and `Number.isInteger(0)` is
-    // true, which surprised users expecting cancel-on-blank.
-    if (trimmed.length === 0) {
-      setEditingId(null);
-      return;
-    }
-    const value = Number(trimmed);
-    if (Number.isInteger(value)) {
-      webClient.request.game.setCounter(gameId, { counterId, value });
-    }
-    setEditingId(null);
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-  };
-
   return {
     player,
     isHost,
     lifeCounter,
     otherCounters,
-    editingId,
-    editDraft,
-    setEditDraft,
-    beginEdit,
-    commitEdit,
-    cancelEdit,
     handleIncrement,
-    handleDelete,
   };
 }

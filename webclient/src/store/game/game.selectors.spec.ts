@@ -1,3 +1,5 @@
+import { App } from '@app/types';
+
 import { Selectors } from './game.selectors';
 import { makeGameEntry, makePlayerEntry, makeState,
   makeZoneEntry, makeCard, makeCounter, makeArrow,
@@ -178,6 +180,120 @@ describe('Selectors', () => {
     expect(Selectors.getMessages(rootState(state), 999)).toEqual([]);
   });
 
+  describe('getAttachmentsByParent', () => {
+    function stateWithTable(cards: ReturnType<typeof makeCard>[]): GamesState {
+      return makeState({
+        games: {
+          1: makeGameEntry({
+            players: {
+              1: makePlayerEntry({
+                zones: {
+                  [App.ZoneName.TABLE]: makeZoneEntry({
+                    name: App.ZoneName.TABLE,
+                    withCoords: true,
+                    cardCount: cards.length,
+                    cards,
+                  }),
+                },
+              }),
+            },
+          }),
+        },
+      });
+    }
+
+    it('returns an empty map when the TABLE zone is absent', () => {
+      const state = makeState();
+      const result = Selectors.getAttachmentsByParent(rootState(state), 1, 1);
+      expect(result.size).toBe(0);
+    });
+
+    it('returns an empty map when no cards are attached', () => {
+      const cards = [
+        makeCard({ id: 1, name: 'Creature A' }),
+        makeCard({ id: 2, name: 'Creature B' }),
+      ];
+      const state = stateWithTable(cards);
+      const result = Selectors.getAttachmentsByParent(rootState(state), 1, 1);
+      expect(result.size).toBe(0);
+    });
+
+    it('buckets a single attached child under its parent id', () => {
+      const cards = [
+        makeCard({ id: 10, name: 'Creature' }),
+        makeCard({
+          id: 11, name: 'Aura',
+          attachPlayerId: 1, attachZone: App.ZoneName.TABLE, attachCardId: 10,
+        }),
+      ];
+      const state = stateWithTable(cards);
+      const result = Selectors.getAttachmentsByParent(rootState(state), 1, 1);
+      expect(result.size).toBe(1);
+      expect(result.get(10)?.map((c) => c.name)).toEqual(['Aura']);
+    });
+
+    it('buckets multiple children under the same parent, sorted by id', () => {
+      const cards = [
+        makeCard({ id: 5, name: 'Creature' }),
+        makeCard({
+          id: 30, name: 'Aura C',
+          attachPlayerId: 1, attachZone: App.ZoneName.TABLE, attachCardId: 5,
+        }),
+        makeCard({
+          id: 10, name: 'Aura A',
+          attachPlayerId: 1, attachZone: App.ZoneName.TABLE, attachCardId: 5,
+        }),
+        makeCard({
+          id: 20, name: 'Aura B',
+          attachPlayerId: 1, attachZone: App.ZoneName.TABLE, attachCardId: 5,
+        }),
+      ];
+      const state = stateWithTable(cards);
+      const result = Selectors.getAttachmentsByParent(rootState(state), 1, 1);
+      expect(result.get(5)?.map((c) => c.name)).toEqual(['Aura A', 'Aura B', 'Aura C']);
+    });
+
+    it('ignores attachments pointing to a different player', () => {
+      const cards = [
+        makeCard({ id: 1, name: 'Creature' }),
+        makeCard({
+          id: 2, name: 'Cross-player ref',
+          attachPlayerId: 99, attachZone: App.ZoneName.TABLE, attachCardId: 1,
+        }),
+      ];
+      const state = stateWithTable(cards);
+      const result = Selectors.getAttachmentsByParent(rootState(state), 1, 1);
+      expect(result.size).toBe(0);
+    });
+
+    it('ignores attachments pointing to a non-TABLE zone', () => {
+      const cards = [
+        makeCard({ id: 1, name: 'Creature' }),
+        makeCard({
+          id: 2, name: 'Non-table ref',
+          attachPlayerId: 1, attachZone: App.ZoneName.HAND, attachCardId: 1,
+        }),
+      ];
+      const state = stateWithTable(cards);
+      const result = Selectors.getAttachmentsByParent(rootState(state), 1, 1);
+      expect(result.size).toBe(0);
+    });
+
+    it('returns a stable Map reference for the same zone object', () => {
+      const cards = [
+        makeCard({ id: 1, name: 'Creature' }),
+        makeCard({
+          id: 2, name: 'Aura',
+          attachPlayerId: 1, attachZone: App.ZoneName.TABLE, attachCardId: 1,
+        }),
+      ];
+      const state = stateWithTable(cards);
+      const a = Selectors.getAttachmentsByParent(rootState(state), 1, 1);
+      const b = Selectors.getAttachmentsByParent(rootState(state), 1, 1);
+      expect(a).toBe(b);
+    });
+  });
+
   it('getActiveGameIds → returns numeric array of gameIds', () => {
     const state = makeState({
       games: {
@@ -188,5 +304,19 @@ describe('Selectors', () => {
     const ids = Selectors.getActiveGameIds(rootState(state));
     expect(ids).toEqual(expect.arrayContaining([1, 2]));
     expect(ids).toHaveLength(2);
+  });
+
+  it('getActiveGames → returns the full GameEntry array', () => {
+    const e1 = makeGameEntry();
+    const e2 = makeGameEntry();
+    const state = makeState({ games: { 1: e1, 2: e2 } });
+    const games = Selectors.getActiveGames(rootState(state));
+    expect(games).toHaveLength(2);
+    expect(games).toEqual(expect.arrayContaining([e1, e2]));
+  });
+
+  it('getActiveGames → returns empty array when no games are active', () => {
+    const state = makeState({ games: {} });
+    expect(Selectors.getActiveGames(rootState(state))).toHaveLength(0);
   });
 });

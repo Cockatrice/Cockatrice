@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
-import type { Data, Enriched } from '@app/types';
+import { App, type Data, type Enriched } from '@app/types';
 import { GamesState } from './game.interfaces';
 
 interface State {
@@ -8,6 +8,7 @@ interface State {
 
 const EMPTY_ARRAY: Data.ServerInfo_Card[] = [];
 const EMPTY_OBJECT = {} as Record<string, never>;
+const EMPTY_ATTACHMENTS: ReadonlyMap<number, Data.ServerInfo_Card[]> = new Map();
 
 /**
  * Memoized cache for materialized zone card arrays. Keyed by the zone object
@@ -25,6 +26,47 @@ function materializeZoneCards(zone: Enriched.ZoneEntry): Data.ServerInfo_Card[] 
   const arr = zone.order.map(id => zone.byId[id]);
   zoneCardsCache.set(zone, arr);
   return arr;
+}
+
+/**
+ * Memoized cache for the parent-id → attached-children map for a TABLE zone.
+ * Keyed by the zone identity so re-renders reuse the same Map reference unless
+ * the reducer has produced a new zone object.
+ */
+const attachmentsByParentCache = new WeakMap<
+  Enriched.ZoneEntry,
+  ReadonlyMap<number, Data.ServerInfo_Card[]>
+>();
+
+function materializeAttachmentsByParent(
+  zone: Enriched.ZoneEntry,
+  playerId: number,
+): ReadonlyMap<number, Data.ServerInfo_Card[]> {
+  const cached = attachmentsByParentCache.get(zone);
+  if (cached) {
+    return cached;
+  }
+  const map = new Map<number, Data.ServerInfo_Card[]>();
+  for (const card of materializeZoneCards(zone)) {
+    // Only the webclient-owned parent-pointer side of attachment is encoded:
+    // desktop maintains a child list, but here every child points up via
+    // attachCardId. Skip unattached cards and any pointer to a different
+    // player / zone (the protocol allows cross-player attach).
+    if (card.attachCardId == null || card.attachCardId === -1) continue;
+    if (card.attachPlayerId !== playerId) continue;
+    if (card.attachZone !== App.ZoneName.TABLE) continue;
+    let bucket = map.get(card.attachCardId);
+    if (!bucket) {
+      bucket = [];
+      map.set(card.attachCardId, bucket);
+    }
+    bucket.push(card);
+  }
+  for (const bucket of map.values()) {
+    bucket.sort((a, b) => a.id - b.id);
+  }
+  attachmentsByParentCache.set(zone, map);
+  return map;
 }
 
 export const Selectors = {
@@ -68,6 +110,15 @@ export const Selectors = {
     return zone ? materializeZoneCards(zone) : EMPTY_ARRAY;
   },
 
+  getAttachmentsByParent: (
+    { games }: State,
+    gameId: number,
+    playerId: number,
+  ): ReadonlyMap<number, Data.ServerInfo_Card[]> => {
+    const zone = games.games[gameId]?.players[playerId]?.zones[App.ZoneName.TABLE];
+    return zone ? materializeAttachmentsByParent(zone, playerId) : EMPTY_ATTACHMENTS;
+  },
+
   getCounters: ({ games }: State, gameId: number, playerId: number) =>
     games.games[gameId]?.players[playerId]?.counters ?? EMPTY_OBJECT,
 
@@ -107,5 +158,10 @@ export const Selectors = {
   getActiveGameIds: createSelector(
     [({ games }: State) => games.games],
     (games) => Object.keys(games).map(Number)
+  ),
+
+  getActiveGames: createSelector(
+    [({ games }: State) => games.games],
+    (games): Enriched.GameEntry[] => Object.values(games)
   ),
 };

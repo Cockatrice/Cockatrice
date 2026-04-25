@@ -248,7 +248,7 @@ describe('Game board integration', () => {
     expect(screen.getByTestId('player-board-1')).not.toHaveClass('player-board--mirrored');
   });
 
-  it('renders the deck/graveyard/exile rail in desktop order (no stack in rail)', async () => {
+  it('renders the deck/graveyard/exile zones inside the info panel in desktop order', async () => {
     renderAppScreen(<Game />);
 
     act(() => {
@@ -266,12 +266,14 @@ describe('Game board integration', () => {
     });
 
     const localBoard = screen.getByTestId('player-board-1');
-    const rail = within(localBoard).getByTestId('zone-rail');
-    const labels = Array.from(rail.querySelectorAll('.zone-stack__label')).map(
+    const zones = localBoard.querySelector('.player-info-panel__zones')!;
+    const labels = Array.from(zones.querySelectorAll('.zone-stack__label')).map(
       (n) => n.textContent,
     );
     expect(labels).toEqual(['Deck', 'Graveyard', 'Exile']);
-    expect(within(rail).queryByText('Stack')).not.toBeInTheDocument();
+    // Stack is now its own column, not a zone inside the rail.
+    expect(within(zones as HTMLElement).queryByText('Stack')).not.toBeInTheDocument();
+    expect(within(localBoard).getByTestId('stack-column-1')).toBeInTheDocument();
   });
 
   it('sends a game_say command through the socket when a chat message is submitted', async () => {

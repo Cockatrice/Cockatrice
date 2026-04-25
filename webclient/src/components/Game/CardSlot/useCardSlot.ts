@@ -45,9 +45,22 @@ export function useCardSlot({ card, draggable, ownerPlayerId, zone }: UseCardSlo
 
   // Cards on the battlefield double as drop targets for drag-to-attach.
   // Other zones don't support attach (desktop's Player::actAttach rejects
-  // non-table targets), so the droppable is only live for TABLE.
+  // non-table targets), so the droppable is only live for TABLE. Already-
+  // attached cards (children) are also excluded so you can only attach to a
+  // lead card — matches the server-side rule that auto-unattaches children
+  // when their parent is re-attached.
+  //
+  // `!isDragging` ensures the currently-dragged card cannot be its own drop
+  // target. Without it, the default rectIntersection collision prefers the
+  // card's own droppable (smaller, contained in the row) over the battlefield
+  // row for short drags — self-drop guard then silently no-ops the move and
+  // the UI appears not to update.
+  const isAttachedChild = card.attachCardId != null && card.attachCardId !== -1;
   const droppableEnabled =
-    ownerPlayerId != null && zone === App.ZoneName.TABLE;
+    ownerPlayerId != null &&
+    zone === App.ZoneName.TABLE &&
+    !isAttachedChild &&
+    !isDragging;
   const { setNodeRef: setDropRef, isOver } = useDroppable({
     id: `card-drop-${ownerPlayerId ?? instanceId}-${zone ?? 'x'}-${card.id}`,
     data: {

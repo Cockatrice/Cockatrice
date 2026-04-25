@@ -35,13 +35,20 @@ function statefulPlayer(
 }
 
 describe('PlayerInfoPanel', () => {
-  it('renders the player name and ping', () => {
+  it('renders the player name', () => {
     renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} />, {
       preloadedState: statefulPlayer(),
     });
 
     expect(screen.getByText('Pumuky')).toBeInTheDocument();
-    expect(screen.getByText('42s')).toBeInTheDocument();
+  });
+
+  it('does not render ping (ping lives in the right-side PlayerList)', () => {
+    renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} />, {
+      preloadedState: statefulPlayer(),
+    });
+
+    expect(screen.queryByText('42s')).not.toBeInTheDocument();
   });
 
   it('falls back to "(unknown)" when userInfo is absent', () => {
@@ -57,12 +64,12 @@ describe('PlayerInfoPanel', () => {
     expect(screen.getByText('(unknown)')).toBeInTheDocument();
   });
 
-  it('renders Life in a prominent block above the rest, with "LIFE" label', () => {
+  it('renders the Life counter inline in the header and other counters as circles in the body', () => {
     const life = makeCounter({
       id: 1,
       name: 'Life',
       count: 20,
-      counterColor: create(Data.colorSchema, { r: 255, g: 255, b: 255, a: 255 }),
+      counterColor: create(Data.colorSchema, { r: 255, g: 150, b: 0, a: 255 }),
     });
     const white = makeCounter({
       id: 2,
@@ -71,25 +78,68 @@ describe('PlayerInfoPanel', () => {
       counterColor: create(Data.colorSchema, { r: 250, g: 245, b: 220, a: 255 }),
     });
 
-    renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} />, {
-      preloadedState: statefulPlayer({
-        counters: { 1: life, 2: white },
-      }),
-    });
+    const { container } = renderWithProviders(
+      <PlayerInfoPanel gameId={1} playerId={1} />,
+      {
+        preloadedState: statefulPlayer({ counters: { 2: white, 1: life } }),
+      },
+    );
 
-    expect(screen.getByTestId('life-1')).toHaveTextContent('20');
-    expect(screen.getByText('LIFE')).toBeInTheDocument();
-    // Other counters still render in the list with their name.
-    expect(screen.getByText('W')).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
+    const lifePill = screen.getByTestId('counter-1');
+    const whitePill = screen.getByTestId('counter-2');
+
+    expect(lifePill).toHaveTextContent('20');
+    expect(whitePill).toHaveTextContent('3');
+    expect(lifePill).toHaveClass('player-info-panel__counter--life');
+    expect(whitePill).not.toHaveClass('player-info-panel__counter--life');
+
+    // Life sits inside the header (life-slot); others sit in the body list.
+    expect(container.querySelector('.player-info-panel__header')?.contains(lifePill)).toBe(true);
+    expect(container.querySelector('.player-info-panel__counters')?.contains(whitePill)).toBe(true);
+    expect(container.querySelector('.player-info-panel__counters')?.contains(lifePill)).toBe(false);
   });
 
-  it('shows an empty-state line when no counters exist', () => {
+  it('renders no counter elements when the player has no counters', () => {
     renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} />, {
       preloadedState: statefulPlayer({ counters: {} }),
     });
 
-    expect(screen.getByText(/no counters/i)).toBeInTheDocument();
+    expect(screen.queryByTestId(/^counter-/)).not.toBeInTheDocument();
+  });
+
+  it('renders the Deck, Hand, Graveyard, and Exile zones inside the body', () => {
+    renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} />, {
+      preloadedState: statefulPlayer(),
+    });
+
+    expect(screen.getByTestId('zone-stack-deck')).toBeInTheDocument();
+    expect(screen.getByTestId('zone-stack-hand')).toBeInTheDocument();
+    expect(screen.getByTestId('zone-stack-grave')).toBeInTheDocument();
+    expect(screen.getByTestId('zone-stack-rfg')).toBeInTheDocument();
+  });
+
+  it('does not wire left-click onZoneClick for the Hand row', () => {
+    const onZoneClick = vi.fn();
+    renderWithProviders(
+      <PlayerInfoPanel gameId={1} playerId={1} onZoneClick={onZoneClick} />,
+      { preloadedState: statefulPlayer() },
+    );
+
+    fireEvent.click(screen.getByTestId('zone-stack-hand'));
+
+    expect(onZoneClick).not.toHaveBeenCalled();
+  });
+
+  it('forwards zone clicks with (playerId, zoneName)', () => {
+    const onZoneClick = vi.fn();
+    renderWithProviders(
+      <PlayerInfoPanel gameId={1} playerId={1} onZoneClick={onZoneClick} />,
+      { preloadedState: statefulPlayer() },
+    );
+
+    fireEvent.click(screen.getByTestId('zone-stack-deck'));
+
+    expect(onZoneClick).toHaveBeenCalledWith(1, 'deck');
   });
 
   it('shows the Conceded flag when player has conceded', () => {
@@ -182,10 +232,9 @@ describe('PlayerInfoPanel', () => {
     expect(container.querySelector('.player-info-panel__host-badge')).toBeNull();
   });
 
-  // Sideboard lock indicator — mirrors desktop's `DeckViewContainer`
-  // lock UI. The webclient surfaces it on the info panel since we don't
-  // have a persistent deck view.
-  it('renders a 🔒 indicator when player.properties.sideboardLocked is true', () => {
+  // Sideboard lock lives in the right-side PlayerList — it must NOT render
+  // inside the PlayerInfoPanel.
+  it('never renders the sideboard-lock indicator in the panel', () => {
     const player = makePlayerEntry({
       properties: makePlayerProperties({
         playerId: 1,
@@ -199,24 +248,65 @@ describe('PlayerInfoPanel', () => {
       }),
     });
 
-    expect(screen.getByLabelText('sideboard locked')).toBeInTheDocument();
+    expect(screen.queryByLabelText('sideboard locked')).not.toBeInTheDocument();
   });
 
-  it('omits the lock indicator when sideboardLocked is false', () => {
-    const player = makePlayerEntry({
-      properties: makePlayerProperties({
-        playerId: 1,
-        userInfo: makeUser({ name: 'P1' }),
-        sideboardLocked: false,
-      }),
-    });
-    renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} />, {
-      preloadedState: makeStoreState({
-        games: { games: { 1: makeGameEntry({ players: { 1: player } }) } },
-      }),
+  describe('counter color fallback', () => {
+    it('falls back to the MTG name map when the server omits the color', () => {
+      const white = makeCounter({
+        id: 1,
+        name: 'W',
+        count: 1,
+        counterColor: create(Data.colorSchema, { r: 0, g: 0, b: 0, a: 0 }),
+      });
+      renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} />, {
+        preloadedState: statefulPlayer({ counters: { 1: white } }),
+      });
+
+      expect(screen.getByTestId('counter-1')).toHaveStyle({
+        background: 'rgba(245, 245, 220, 1)',
+      });
     });
 
-    expect(screen.queryByLabelText('sideboard locked')).not.toBeInTheDocument();
+    it('respects the server color when it is present and non-zero', () => {
+      const custom = makeCounter({
+        id: 2,
+        name: 'W',
+        count: 1,
+        counterColor: create(Data.colorSchema, { r: 10, g: 20, b: 30, a: 255 }),
+      });
+      renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} />, {
+        preloadedState: statefulPlayer({ counters: { 2: custom } }),
+      });
+
+      expect(screen.getByTestId('counter-2')).toHaveStyle({
+        background: 'rgba(10, 20, 30, 1)',
+      });
+    });
+
+    it('derives a stable non-black hash color for unknown names', () => {
+      const poison1 = makeCounter({
+        id: 3,
+        name: 'Poison',
+        count: 1,
+        counterColor: create(Data.colorSchema, { r: 0, g: 0, b: 0, a: 0 }),
+      });
+      const { unmount } = renderWithProviders(
+        <PlayerInfoPanel gameId={1} playerId={1} />,
+        { preloadedState: statefulPlayer({ counters: { 3: poison1 } }) },
+      );
+      const first = screen.getByTestId('counter-3').getAttribute('style') ?? '';
+      unmount();
+
+      renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} />, {
+        preloadedState: statefulPlayer({ counters: { 3: poison1 } }),
+      });
+      const second = screen.getByTestId('counter-3').getAttribute('style') ?? '';
+
+      expect(first).toBe(second);
+      expect(first).toMatch(/rgba\(\d+, \d+, \d+, 1\)/);
+      expect(first).not.toMatch(/rgba\(0, 0, 0/);
+    });
   });
 
   describe('editable counters', () => {
@@ -227,96 +317,61 @@ describe('PlayerInfoPanel', () => {
       counterColor: create(Data.colorSchema, { r: 255, g: 255, b: 255, a: 255 }),
     });
 
-    it('does not render counter controls when canEdit is false (default)', () => {
+    it('does not attach click handlers when canEdit is false (default)', () => {
+      const webClient = createMockWebClient();
       renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} />, {
         preloadedState: statefulPlayer({ counters: { 1: life } }),
+        webClient,
       });
 
-      expect(screen.queryByLabelText('increment Life')).not.toBeInTheDocument();
-      expect(screen.queryByLabelText('decrement Life')).not.toBeInTheDocument();
-      expect(screen.queryByLabelText('delete Life')).not.toBeInTheDocument();
+      const pill = screen.getByTestId('counter-1');
+      expect(pill).not.toHaveAttribute('role', 'button');
+
+      fireEvent.click(pill);
+      fireEvent.contextMenu(pill);
+      expect(webClient.request.game.incCounter).not.toHaveBeenCalled();
     });
 
-    it('renders +/− controls on the Life block when canEdit is true (Life has no delete — desktop parity)', () => {
-      renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} canEdit />, {
-        preloadedState: statefulPlayer({ counters: { 1: life } }),
-      });
-
-      expect(screen.getByLabelText('increment Life')).toBeInTheDocument();
-      expect(screen.getByLabelText('decrement Life')).toBeInTheDocument();
-      expect(screen.queryByLabelText('delete Life')).not.toBeInTheDocument();
-    });
-
-    it('dispatches incCounter(+1) when + is clicked', () => {
+    it('dispatches incCounter(+1) on left-click when canEdit is true', () => {
       const webClient = createMockWebClient();
       renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} canEdit />, {
         preloadedState: statefulPlayer({ counters: { 1: life } }),
         webClient,
       });
 
-      fireEvent.click(screen.getByLabelText('increment Life'));
+      fireEvent.click(screen.getByTestId('counter-1'));
 
       expect(webClient.request.game.incCounter).toHaveBeenCalledWith(1, { counterId: 1, delta: 1 });
     });
 
-    it('dispatches incCounter(-1) when − is clicked', () => {
+    it('dispatches incCounter(-1) on right-click, suppresses browser menu, and does not bubble to the panel', () => {
       const webClient = createMockWebClient();
-      renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} canEdit />, {
-        preloadedState: statefulPlayer({ counters: { 1: life } }),
-        webClient,
-      });
+      const onContextMenu = vi.fn();
+      renderWithProviders(
+        <PlayerInfoPanel gameId={1} playerId={1} canEdit onContextMenu={onContextMenu} />,
+        {
+          preloadedState: statefulPlayer({ counters: { 1: life } }),
+          webClient,
+        },
+      );
 
-      fireEvent.click(screen.getByLabelText('decrement Life'));
+      const dispatched = fireEvent.contextMenu(screen.getByTestId('counter-1'));
 
+      expect(dispatched).toBe(false);
       expect(webClient.request.game.incCounter).toHaveBeenCalledWith(1, { counterId: 1, delta: -1 });
+      expect(onContextMenu).not.toHaveBeenCalled();
     });
 
-    it('dispatches delCounter when × is clicked on a non-Life counter', () => {
-      const webClient = createMockWebClient();
-      const mana = makeCounter({
-        id: 2,
-        name: 'W',
-        count: 3,
-        counterColor: create(Data.colorSchema, { r: 255, g: 255, b: 255, a: 255 }),
-      });
-      renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} canEdit />, {
-        preloadedState: statefulPlayer({ counters: { 2: mana } }),
-        webClient,
-      });
+    it('still fires the panel-level onContextMenu when right-clicking outside a counter', () => {
+      const onContextMenu = vi.fn();
+      const { container } = renderWithProviders(
+        <PlayerInfoPanel gameId={1} playerId={1} canEdit onContextMenu={onContextMenu} />,
+        { preloadedState: statefulPlayer({ counters: { 1: life } }) },
+      );
 
-      fireEvent.click(screen.getByLabelText('delete W'));
+      fireEvent.contextMenu(container.querySelector('.player-info-panel__name')!);
 
-      expect(webClient.request.game.delCounter).toHaveBeenCalledWith(1, { counterId: 2 });
-    });
-
-    it('swaps the value into an input on click and dispatches setCounter on Enter', () => {
-      const webClient = createMockWebClient();
-      renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} canEdit />, {
-        preloadedState: statefulPlayer({ counters: { 1: life } }),
-        webClient,
-      });
-
-      fireEvent.click(screen.getByText('20'));
-      const input = screen.getByLabelText('set Life') as HTMLInputElement;
-      fireEvent.change(input, { target: { value: '18' } });
-      fireEvent.keyDown(input, { key: 'Enter' });
-
-      expect(webClient.request.game.setCounter).toHaveBeenCalledWith(1, { counterId: 1, value: 18 });
-    });
-
-    it('does not dispatch setCounter when Escape is pressed during inline edit', () => {
-      const webClient = createMockWebClient();
-      renderWithProviders(<PlayerInfoPanel gameId={1} playerId={1} canEdit />, {
-        preloadedState: statefulPlayer({ counters: { 1: life } }),
-        webClient,
-      });
-
-      fireEvent.click(screen.getByText('20'));
-      const input = screen.getByLabelText('set Life') as HTMLInputElement;
-      fireEvent.change(input, { target: { value: '99' } });
-      fireEvent.keyDown(input, { key: 'Escape' });
-
-      expect(webClient.request.game.setCounter).not.toHaveBeenCalled();
+      expect(onContextMenu).toHaveBeenCalled();
     });
 
     it('fires onRequestCreateCounter when "+ New counter" is clicked', () => {

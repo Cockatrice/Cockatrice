@@ -1,12 +1,31 @@
 .card-slot {
   position: relative;
-  width: 146px;
-  height: 204px;
+  height: 100%;
+  max-height: 204px;
+  aspect-ratio: 146 / 204;
+  flex: 0 0 auto;
   border-radius: 6px;
   overflow: hidden;
   user-select: none;
   cursor: pointer;
   transition: transform 120ms ease-out;
+}
+
+/* Battlefield cards scale to fill the lane height; width follows via aspect-
+ * ratio. No pixel cap, so tall viewports grow cards rather than leaving empty
+ * vertical space; short lanes shrink them proportionally. Crowded rows do not
+ * compress cards — .battlefield__row has overflow-x: auto, so packed rows
+ * scroll horizontally (desktop parity).
+ *
+ * HandZone's .card-slot keeps the default height-driven rules above. */
+.battlefield .card-slot {
+  aspect-ratio: 146 / 204;
+  height: 100%;
+  width: auto;
+  max-height: none;
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 0;
 }
 
 .card-slot__image {
@@ -71,14 +90,6 @@
 
 .card-slot--tapped {
   transform: rotate(90deg);
-}
-
-.card-slot--inverted {
-  transform: rotate(180deg);
-}
-
-.card-slot--tapped.card-slot--inverted {
-  transform: rotate(270deg);
 }
 
 .card-slot--attacking {

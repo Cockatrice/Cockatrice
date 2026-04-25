@@ -1,29 +1,54 @@
 .battlefield {
-  display: flex;
-  flex-direction: column;
+  /* --card-base-width is the preferred width of a single card inside a lane.
+   * Scoped here (not on :root) so HandZone's own .card-slot rules remain
+   * unaffected. Consumed by .battlefield .card-slot and AttachmentStack. */
+  --card-base-width: 146px;
+  display: grid;
+  /* minmax(0, 1fr) — "1fr" alone is shorthand for minmax(auto, 1fr), which
+   * lets a track grow past 1/3 when a card's intrinsic height is bigger than
+   * the track's share. That's what made lanes visibly uneven. Clamping the
+   * min to 0 forces strictly equal 1/3 splits regardless of content. */
+  grid-template-rows: repeat(3, minmax(0, 1fr));
   height: 100%;
   background: #0f1c38;
   border: 1px solid #1a2b52;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .battlefield__row {
-  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 4px;
+  /* Desktop-parity gap between stack columns (PADDING_X port). Stack columns
+   * are fixed-width blocks positioned via flex order; horizontal overflow
+   * scrolls inside the row rather than compressing cards (desktop behavior). */
+  gap: 16px;
   padding: 4px 8px;
   box-sizing: border-box;
   overflow-x: auto;
   overflow-y: hidden;
 }
 
-.battlefield__row + .battlefield__row {
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+/* Inset box-shadow instead of border-top so the divider doesn't consume
+ * grid track height — otherwise rows 2 and 3 are 1px taller than row 1. */
+.battlefield__row:not(:first-child) {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .battlefield__row--drop-over {
   background: rgba(247, 176, 28, 0.08);
   box-shadow: inset 0 0 0 2px rgba(247, 176, 28, 0.55);
+}
+
+/* Spacer for empty stack columns so a card stored at x=9 renders at visual
+ * column 3, not column 0. Matches a 1-card stack's footprint (aspect-ratio
+ * 146/204) so gridMath's pointer→stack walk aligns with the rendered layout. */
+.battlefield__stack-placeholder {
+  height: 100%;
+  aspect-ratio: 146 / 204;
+  flex: 0 0 auto;
+  pointer-events: none;
 }

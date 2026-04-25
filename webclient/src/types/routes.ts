@@ -4,7 +4,7 @@ export enum RouteEnum {
   ROOM = '/room/:roomId',
   LOGIN = '/login',
   LOGS = '/logs',
-  GAME = '/game',
+  GAME = '/game/:gameId',
   DECKS = '/decks',
   DECK = '/deck',
   ACCOUNT = '/account',

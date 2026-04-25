@@ -218,7 +218,7 @@ describe('GameSelector', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('clicking Join on a game already present in games.games navigates to /game without sending a command', () => {
+  it('clicking Join on a game already present in games.games navigates to /game/<id> without sending a command', () => {
     const client = makeWebClient();
     mockUseWebClient.mockReturnValue(client);
     const game = makeGame({ gameId: 7, withPassword: false });
@@ -230,10 +230,10 @@ describe('GameSelector', () => {
     fireEvent.click(screen.getByRole('button', { name: /^Join$/ }));
 
     expect(client.request.rooms.joinGame).not.toHaveBeenCalled();
-    expect(mockNavigate).toHaveBeenCalledWith(App.RouteEnum.GAME);
+    expect(mockNavigate).toHaveBeenCalledWith('/game/7');
   });
 
-  it('dispatching GAME_JOINED navigates to /game (mirrors JOIN_ROOM → /room)', async () => {
+  it('dispatching GAME_JOINED navigates to /game/<id> (mirrors JOIN_ROOM → /room)', async () => {
     mockUseWebClient.mockReturnValue(makeWebClient());
     const room = makeRoomEntry([]);
     const { store } = renderWithProviders(<GameSelector room={room as any} />, {
@@ -247,7 +247,7 @@ describe('GameSelector', () => {
         payload: { data: { gameInfo: { gameId: 42 }, hostId: 0, playerId: 0, spectator: false } },
       });
     });
-    expect(mockNavigate).toHaveBeenCalledWith(App.RouteEnum.GAME);
+    expect(mockNavigate).toHaveBeenCalledWith('/game/42');
   });
 
   it('Join button is disabled while joinGamePending is true even when a game is selected', () => {

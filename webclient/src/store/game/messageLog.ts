@@ -7,10 +7,13 @@ import { App, Data } from '@app/types';
 // return a formatted English string, or null when desktop does not log that
 // case (e.g. same-zone table reorders).
 
-export const EVENT_PLAYER_ID_SYSTEM = 0;
+// -1 matches the proto2 default for GameEvent.player_id — the on-wire "no
+// actor" sentinel. Must NOT be 0, which is a valid player id (the server
+// assigns ids starting at 0, see server_game.cpp nextPlayerId).
+export const EVENT_PLAYER_ID_SYSTEM = -1;
 
 function nameOf(game: Enriched.GameEntry, playerId: number): string {
-  if (playerId <= 0) {
+  if (playerId < 0) {
     return 'The server';
   }
   return game.players[playerId]?.properties.userInfo?.name ?? `Player ${playerId}`;

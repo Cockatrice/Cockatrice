@@ -22,8 +22,7 @@ export { default as PlayerContextMenu } from './PlayerContextMenu/PlayerContextM
 export { default as PlayerInfoPanel } from './PlayerInfoPanel/PlayerInfoPanel';
 export { default as PlayerList } from './PlayerList/PlayerList';
 export { default as RightPanel } from './RightPanel/RightPanel';
-export { default as StackStrip } from './StackStrip/StackStrip';
+export { default as StackColumn } from './StackColumn/StackColumn';
 export { default as TurnControls } from './TurnControls/TurnControls';
 export { default as ZoneContextMenu } from './ZoneContextMenu/ZoneContextMenu';
-export { default as ZoneRail } from './ZoneRail/ZoneRail';
 export { default as ZoneStack } from './ZoneStack/ZoneStack';

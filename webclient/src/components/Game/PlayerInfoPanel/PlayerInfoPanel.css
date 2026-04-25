@@ -1,7 +1,7 @@
 .player-info-panel {
-  width: 160px;
+  width: 150px;
   height: 100%;
-  padding: 8px 10px;
+  padding: 8px 6px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -9,6 +9,7 @@
   border-right: 1px solid #1a2b52;
   color: #e5ecf7;
   font-size: 12px;
+  overflow: hidden;
 }
 
 .player-info-panel--empty {
@@ -17,7 +18,7 @@
 
 .player-info-panel__header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
   margin-bottom: 6px;
   padding-bottom: 6px;
@@ -40,15 +41,13 @@
   text-overflow: ellipsis;
 }
 
-.player-info-panel__sideboard-lock {
-  font-size: 11px;
-  line-height: 1;
+/* Life lives in the header slot where ping used to be. Rendered through
+   the shared counter-circle markup so its UL wrapper is cosmetic-only. */
+.player-info-panel__life-slot {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   flex-shrink: 0;
-}
-
-.player-info-panel__ping {
-  color: #7f90b5;
-  font-size: 10px;
 }
 
 .player-info-panel__flag {
@@ -69,183 +68,96 @@
   color: #dfffe3;
 }
 
-/* Life display: prominent box above the regular counter list. Mirrors
-   desktop's PlayerTarget sizing where Life renders at ~2x other counters. */
-.player-info-panel__life {
+/* Two columns: counters (narrow, left-aligned) and zones (Deck/Graveyard/
+   Exile rendered as 3 vertically-stacked thumbnails). */
+.player-info-panel__body {
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  grid-template-rows: auto auto;
-  grid-column-gap: 6px;
-  align-items: center;
-  margin: 2px 0 10px;
-  padding: 6px 10px 4px;
-  background: #0f1a35;
-  border: 2px solid #4a5d87;
-  border-radius: 6px;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 6px;
 }
 
-.player-info-panel__life-btn {
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  background: #17223d;
-  border: 1px solid #355090;
-  color: #dae3f7;
-  font: inherit;
-  font-size: 16px;
-  line-height: 1;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-.player-info-panel__life-btn:hover {
-  background: #223060;
-  color: #fff;
-}
-
-.player-info-panel__life-value,
-.player-info-panel__life-input {
-  grid-row: 1;
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1;
-  color: #ffffff;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-}
-
-.player-info-panel__life-input {
-  width: 72px;
-  height: 32px;
-  padding: 0 6px;
-  background: #17223d;
-  border: 1px solid #355090;
-  border-radius: 3px;
-}
-
-.player-info-panel__life-value--editable {
-  cursor: text;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.25);
-}
-
-.player-info-panel__life-value--editable:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.player-info-panel__life-label {
-  grid-row: 2;
-  grid-column: 1 / -1;
-  text-align: center;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: #7f90b5;
-  margin-top: 4px;
-}
-
+/* Counter column runs full panel height; rows of equal share keep the
+   first counter flush to the top (no drift between opponent and local
+   panels) and let circles scale to fit — or shrink when there are many. */
 .player-info-panel__counters {
   list-style: none;
-  padding: 0;
+  padding: 2px 0;
   margin: 0;
-  display: flex;
-  flex-direction: column;
+  min-height: 0;
+  display: grid;
+  grid-auto-rows: minmax(0, 1fr);
+  justify-items: start;
+  align-content: stretch;
   gap: 3px;
 }
 
 .player-info-panel__counter {
-  display: grid;
-  grid-template-columns: 12px 1fr auto auto auto auto;
+  display: flex;
   align-items: center;
-  gap: 3px;
-  padding: 2px 0;
-}
-
-.player-info-panel__counter--empty {
-  color: #5a6a8a;
-  font-style: italic;
-  grid-template-columns: 1fr;
-}
-
-.player-info-panel__swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.player-info-panel__counter-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.player-info-panel__counter-value {
-  font-weight: 700;
-  color: #fff;
-  min-width: 22px;
-  text-align: right;
-  padding: 0 4px;
-}
-
-.player-info-panel__counter-value--editable {
-  cursor: text;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
-}
-
-.player-info-panel__counter-value--editable:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.player-info-panel__counter-input {
-  width: 36px;
-  height: 18px;
-  padding: 0 4px;
+  justify-content: center;
+  aspect-ratio: 1;
+  height: 100%;
+  width: auto;
+  max-width: 30px;
+  max-height: 30px;
+  min-width: 18px;
+  min-height: 18px;
   box-sizing: border-box;
-  background: #17223d;
-  border: 1px solid #355090;
-  color: #fff;
-  font: inherit;
-  font-weight: 700;
-  text-align: right;
-  border-radius: 2px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+  user-select: none;
 }
 
-.player-info-panel__counter-input::-webkit-outer-spin-button,
-.player-info-panel__counter-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+/* The Life pill sits in the fixed-height header slot, outside the grid,
+   so it keeps a constant size regardless of counter count. */
+.player-info-panel__counter--life {
+  width: 32px;
+  height: 32px;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  border-width: 2px;
 }
 
-.player-info-panel__counter-btn {
-  width: 18px;
-  height: 18px;
-  padding: 0;
-  background: #17223d;
-  border: 1px solid #233a68;
-  color: #c8d4ef;
-  font: inherit;
-  font-size: 13px;
-  line-height: 1;
-  border-radius: 2px;
+.player-info-panel__counter[role='button'] {
   cursor: pointer;
 }
 
-.player-info-panel__counter-btn:hover {
-  background: #223060;
-  border-color: #355090;
-  color: #fff;
+.player-info-panel__counter[role='button']:hover {
+  border-color: rgba(255, 255, 255, 0.7);
 }
 
-.player-info-panel__counter-btn--del {
-  color: #f7a3a3;
-  border-color: #5e2828;
-  background: #3f1a1a;
+.player-info-panel__counter-value {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-.player-info-panel__counter-btn--del:hover {
-  background: #5e2828;
-  color: #fff;
+.player-info-panel__counter--life .player-info-panel__counter-value {
+  font-size: 13px;
+}
+
+/* Zones column: 4 rows (Deck, Hand, Graveyard, Exile), each row gets an
+   equal share of the remaining body height. minmax(0, 1fr) + min-height on
+   the column lets each ZoneStack thumb shrink when the rail is short
+   instead of overflowing the panel. All four zones render as landscape
+   thumbs, matching desktop's info panel. */
+.player-info-panel__zones {
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  justify-items: center;
+  align-items: center;
+  gap: 4px;
 }
 
 .player-info-panel__new-counter {

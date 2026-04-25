@@ -1,4 +1,5 @@
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 
 import { createCardRegistry, type CardRegistry } from '@app/components';
@@ -29,7 +30,10 @@ export interface Game extends CurrentGame {
 }
 
 export function useGame(): Game {
-  const current = useCurrentGame();
+  const params = useParams<{ gameId?: string }>();
+  const parsed = params.gameId != null ? Number(params.gameId) : NaN;
+  const routeGameId = Number.isFinite(parsed) ? parsed : undefined;
+  const current = useCurrentGame(routeGameId);
   const { gameId, game, localPlayer, isSpectator } = current;
 
   useGameLifecycleNavigation(gameId);

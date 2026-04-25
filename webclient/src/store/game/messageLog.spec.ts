@@ -266,6 +266,18 @@ describe('formatActivePhaseSet / formatActivePlayerSet / formatTurnReversed', ()
     expect(formatTurnReversed(game, 1, true)).toBe('Alice reverses the turn order.');
     expect(formatTurnReversed(game, 1, false)).toBe('Alice restores the turn order.');
   });
+  // Regression: player 0 used to render as "The server" because of a
+  // playerId <= 0 guard in nameOf.
+  it('attributes player 0 as the active player by name, not "The server"', () => {
+    const gameWithHost = makeGameEntry({
+      players: {
+        0: makePlayerEntry({
+          properties: makePlayerProperties({ playerId: 0, userInfo: { name: 'Host' } }),
+        }),
+      },
+    });
+    expect(formatActivePlayerSet(gameWithHost, 0)).toBe('It is now Host\'s turn.');
+  });
 });
 
 describe('formatDieRolled', () => {
@@ -278,6 +290,20 @@ describe('formatDieRolled', () => {
   });
   it('no-rolls falls back to bare sides', () => {
     expect(formatDieRolled(game, 1, { sides: 20, value: 0, values: [] })).toBe('Alice rolls a 20-sided die.');
+  });
+  // Regression: server player ids start at 0, so the host is usually player 0.
+  // The log helper used to treat playerId <= 0 as a "system" sentinel and
+  // render "The server rolled a die" for that player's rolls.
+  it('attributes player 0 by name, not "The server"', () => {
+    const gameWithHost = makeGameEntry({
+      players: {
+        0: makePlayerEntry({
+          properties: makePlayerProperties({ playerId: 0, userInfo: { name: 'Host' } }),
+        }),
+      },
+    });
+    expect(formatDieRolled(gameWithHost, 0, { sides: 20, value: 17, values: [17] }))
+      .toBe('Host rolls a 17 on a 20-sided die.');
   });
 });
 

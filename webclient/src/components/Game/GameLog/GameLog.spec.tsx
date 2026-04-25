@@ -61,6 +61,28 @@ describe('GameLog', () => {
     expect(screen.getAllByText('Alice:').length).toBe(2);
   });
 
+  // Regression: server assigns player ids starting at 0 (see server_game.cpp
+  // nextPlayerId), so the first/host player is usually player 0. The log
+  // helper used to treat playerId <= 0 as the "system" sentinel and render
+  // "The server" for that player's chat and events. The sentinel is now -1.
+  it('renders the real player name for player 0 chat (regression: was "The server")', () => {
+    const host = makePlayerEntry({
+      properties: makePlayerProperties({
+        playerId: 0,
+        userInfo: makeUser({ name: 'Host' }),
+      }),
+    });
+    renderWithProviders(<GameLog gameId={1} />, {
+      preloadedState: stateWithMessages(
+        [host],
+        [{ playerId: 0, message: 'gl', timeReceived: 0, kind: 'chat' }],
+      ),
+    });
+
+    expect(screen.getByText('Host:')).toBeInTheDocument();
+    expect(screen.queryByText(/The server:/)).not.toBeInTheDocument();
+  });
+
   it('renders a fallback author label when the speaker is not in the player list', () => {
     renderWithProviders(<GameLog gameId={1} />, {
       preloadedState: stateWithMessages(

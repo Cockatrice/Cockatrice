@@ -32,18 +32,6 @@ function stateWithHand(cards: ReturnType<typeof makeCard>[]) {
 }
 
 describe('HandZone', () => {
-  it('renders the hand label with the current count', () => {
-    const cards = [
-      makeCard({ id: 1, name: 'Island' }),
-      makeCard({ id: 2, name: 'Swamp' }),
-    ];
-    renderWithProviders(<HandZone gameId={1} playerId={1} />, {
-      preloadedState: stateWithHand(cards),
-    });
-
-    expect(screen.getByText(/Hand · 2/)).toBeInTheDocument();
-  });
-
   it('renders a CardSlot for every card in hand', () => {
     const cards = [
       makeCard({ id: 1, name: 'Forest' }),
@@ -63,8 +51,8 @@ describe('HandZone', () => {
       preloadedState: stateWithHand([]),
     });
 
-    expect(screen.getByText(/Hand · 0/)).toBeInTheDocument();
     expect(screen.queryAllByTestId('card-slot')).toHaveLength(0);
+    expect(screen.getByTestId('hand-zone')).toBeInTheDocument();
   });
 
   describe('zone-level context menu', () => {

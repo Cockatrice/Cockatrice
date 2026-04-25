@@ -18,12 +18,14 @@ import './LeftNav.css';
 const LeftNav = () => {
   const {
     joinedRooms,
+    joinedGames,
     isConnected,
     state,
     handleMenuOpen,
     handleMenuItemClick,
     handleMenuClose,
     leaveRoom,
+    leaveGame,
     openImportCardWizard,
     closeImportCardWizard,
   } = useLeftNav();
@@ -72,10 +74,32 @@ const LeftNav = () => {
                   </div>
                 </div>
                 <div className="LeftNav-nav__link">
-                  <NavLink className="LeftNav-nav__link-btn" to={App.RouteEnum.GAME}>
+                  <NavLink
+                    className="LeftNav-nav__link-btn"
+                    to={
+                      joinedGames.length
+                        ? generatePath(App.RouteEnum.GAME, { gameId: joinedGames[0].info.gameId.toString() })
+                        : App.RouteEnum.SERVER
+                    }
+                  >
                     Games
                     <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>
+                  <div className="LeftNav-nav__link-menu">
+                    {joinedGames.map((game) => (
+                      <div className="LeftNav-nav__link-menu__item" key={game.info.gameId}>
+                        <NavLink className="LeftNav-nav__link-menu__btn"
+                          to={generatePath(App.RouteEnum.GAME, { gameId: game.info.gameId.toString() })}
+                        >
+                          {game.info.description || `#${game.info.gameId}`}
+
+                          <IconButton size="small" edge="end" onClick={event => leaveGame(event, game.info.gameId)}>
+                            <CloseIcon style={{ fontSize: 10, color: 'white' }} />
+                          </IconButton>
+                        </NavLink>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <div className="LeftNav-nav__link">
                   <NavLink className="LeftNav-nav__link-btn" to={App.RouteEnum.DECKS}>

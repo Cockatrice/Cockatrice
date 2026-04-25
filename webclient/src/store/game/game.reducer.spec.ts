@@ -570,6 +570,151 @@ describe('2C: CARD_MOVED', () => {
     expect(movedCard.counterList).toHaveLength(1);
     expect(movedCard.counterList).not.toBe(card.counterList);
   });
+
+  it('intra-zone TABLE move: card stays in the zone with updated x/y', () => {
+    const card = makeCard({ id: 10, x: 0, y: 0, name: 'InPlace' });
+    const state = makeState({
+      games: {
+        1: makeGameEntry({
+          players: {
+            1: makePlayerEntry({
+              zones: {
+                table: makeZoneEntry({ name: 'table', cards: [card], cardCount: 1 }),
+              },
+            }),
+          },
+        }),
+      },
+    });
+
+    const result = gamesReducer(state, Actions.cardMoved({
+      gameId: 1,
+      playerId: 1,
+      data: {
+        cardId: 10, cardName: '', startPlayerId: 1, startZone: 'table',
+        position: -1, targetPlayerId: 1, targetZone: 'table',
+        x: 3, y: 1, newCardId: -1, faceDown: false, newCardProviderId: '',
+      },
+    }));
+
+    const tableCards = cardsIn(result, 1, 1, 'table');
+    expect(tableCards).toHaveLength(1);
+    expect(tableCards[0].id).toBe(10);
+    expect(tableCards[0].x).toBe(3);
+    expect(tableCards[0].y).toBe(1);
+    expect(tableCards[0].name).toBe('InPlace');
+    expect(result.games[1].players[1].zones['table'].cardCount).toBe(1);
+  });
+
+  it('intra-zone TABLE move produces a new zone reference so selector caches invalidate', () => {
+    const card = makeCard({ id: 10, x: 0, y: 0 });
+    const state = makeState({
+      games: {
+        1: makeGameEntry({
+          players: {
+            1: makePlayerEntry({
+              zones: {
+                table: makeZoneEntry({ name: 'table', cards: [card], cardCount: 1 }),
+              },
+            }),
+          },
+        }),
+      },
+    });
+    const originalZone = state.games[1].players[1].zones['table'];
+
+    const result = gamesReducer(state, Actions.cardMoved({
+      gameId: 1,
+      playerId: 1,
+      data: {
+        cardId: 10, cardName: '', startPlayerId: 1, startZone: 'table',
+        position: -1, targetPlayerId: 1, targetZone: 'table',
+        x: 3, y: 1, newCardId: -1, faceDown: false, newCardProviderId: '',
+      },
+    }));
+
+    const nextZone = result.games[1].players[1].zones['table'];
+    expect(nextZone).not.toBe(originalZone);
+    expect(nextZone.byId[10]).not.toBe(originalZone.byId[10]);
+  });
+
+  it('intra-zone TABLE move with an omitted targetZone defaults to startZone', () => {
+    // Protobuf strips target_zone from the wire when it equals start_zone
+    // (default empty string). Desktop falls back to start_zone; this reducer
+    // must too, otherwise `zones[undefined]` misses and the move silently no-ops.
+    const card = makeCard({ id: 15, x: 0, y: 0, name: 'A Good Day to Pie' });
+    const state = makeState({
+      games: {
+        1: makeGameEntry({
+          players: {
+            1: makePlayerEntry({
+              zones: {
+                table: makeZoneEntry({ name: 'table', cards: [card], cardCount: 1 }),
+              },
+            }),
+          },
+        }),
+      },
+    });
+
+    const result = gamesReducer(state, Actions.cardMoved({
+      gameId: 1,
+      playerId: 1,
+      data: {
+        cardId: 15, cardName: '', startPlayerId: 1, startZone: 'table',
+        position: -1, targetPlayerId: 1, targetZone: '',  // ← stripped on the wire
+        x: 18, y: 1, newCardId: 15, faceDown: false, newCardProviderId: '',
+      },
+    }));
+
+    const tableCards = cardsIn(result, 1, 1, 'table');
+    expect(tableCards).toHaveLength(1);
+    expect(tableCards[0].x).toBe(18);
+    expect(tableCards[0].y).toBe(1);
+  });
+
+  it('intra-zone TABLE move with two cards: moved card updates, other card untouched', () => {
+    const movingCard = makeCard({ id: 10, x: 0, y: 0, name: 'Mover' });
+    const stillCard = makeCard({ id: 11, x: 3, y: 0, name: 'Still' });
+    const state = makeState({
+      games: {
+        1: makeGameEntry({
+          players: {
+            1: makePlayerEntry({
+              zones: {
+                table: makeZoneEntry({
+                  name: 'table',
+                  cards: [movingCard, stillCard],
+                  cardCount: 2,
+                }),
+              },
+            }),
+          },
+        }),
+      },
+    });
+
+    const result = gamesReducer(state, Actions.cardMoved({
+      gameId: 1,
+      playerId: 1,
+      data: {
+        cardId: 10, cardName: '', startPlayerId: 1, startZone: 'table',
+        position: -1, targetPlayerId: 1, targetZone: 'table',
+        x: 6, y: 2, newCardId: -1, faceDown: false, newCardProviderId: '',
+      },
+    }));
+
+    const tableCards = cardsIn(result, 1, 1, 'table').sort((a, b) => a.id - b.id);
+    expect(tableCards).toHaveLength(2);
+    const [c10, c11] = tableCards;
+    expect(c10.id).toBe(10);
+    expect(c10.x).toBe(6);
+    expect(c10.y).toBe(2);
+    expect(c11.id).toBe(11);
+    expect(c11.x).toBe(3);
+    expect(c11.y).toBe(0);
+    expect(result.games[1].players[1].zones['table'].cardCount).toBe(2);
+  });
 });
 
 

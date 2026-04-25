@@ -42,7 +42,6 @@ function HandZone({
       data-testid="hand-zone"
       onContextMenu={handleZoneContextMenu}
     >
-      <div className="hand-zone__label">Hand · {cards.length}</div>
       <div className="hand-zone__cards">
         {cards.map((card) => {
           const key = makeCardKey(playerId, App.ZoneName.HAND, card.id);

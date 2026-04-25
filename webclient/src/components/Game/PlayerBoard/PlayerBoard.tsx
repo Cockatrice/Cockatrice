@@ -3,7 +3,7 @@ import { cx } from '@app/utils';
 
 import Battlefield from '../Battlefield/Battlefield';
 import PlayerInfoPanel from '../PlayerInfoPanel/PlayerInfoPanel';
-import ZoneRail from '../ZoneRail/ZoneRail';
+import StackColumn from '../StackColumn/StackColumn';
 
 import './PlayerBoard.css';
 
@@ -51,6 +51,15 @@ function PlayerBoard({
         canEdit={canEditCounters}
         onRequestCreateCounter={onRequestCreateCounter}
         onContextMenu={onPlayerContextMenu}
+        onCardHover={onCardHover}
+        onZoneClick={onZoneClick}
+        onZoneContextMenu={onZoneContextMenu}
+      />
+      <StackColumn
+        gameId={gameId}
+        playerId={playerId}
+        mirrored={mirrored}
+        onCardHover={onCardHover}
       />
       <Battlefield
         gameId={gameId}
@@ -62,13 +71,6 @@ function PlayerBoard({
         onCardClick={onCardClick}
         onCardContextMenu={onCardContextMenu}
         onCardDoubleClick={onCardDoubleClick}
-      />
-      <ZoneRail
-        gameId={gameId}
-        playerId={playerId}
-        onCardHover={onCardHover}
-        onZoneClick={onZoneClick}
-        onZoneContextMenu={onZoneContextMenu}
       />
     </div>
   );

@@ -22,7 +22,7 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr) 176px;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) 176px;
 }
 
 /* Rotate 90°: view-only transform on the whole board. Mirrors desktop's
@@ -53,12 +53,7 @@
 .game-log__input:focus-visible,
 .turn-controls__btn:focus-visible,
 .phase-bar__btn:focus-visible,
-.player-info-panel__counter-value--editable:focus-visible,
-.player-info-panel__counter-input:focus-visible,
-.player-info-panel__counter-btn:focus-visible,
-.player-info-panel__life-value--editable:focus-visible,
-.player-info-panel__life-input:focus-visible,
-.player-info-panel__life-btn:focus-visible,
+.player-info-panel__counter[role='button']:focus-visible,
 .player-info-panel__new-counter:focus-visible,
 .opponent-selector__button:focus-visible {
   outline: 2px solid var(--color-highlight-yellow);

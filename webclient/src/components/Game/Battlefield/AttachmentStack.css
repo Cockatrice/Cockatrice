@@ -1,0 +1,24 @@
+.attachment-stack {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  display: block;
+}
+
+.attachment-stack__parent {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  /* width set inline per-stack */
+}
+
+.attachment-stack__child {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  /* left, width, z-index set inline per-child */
+}

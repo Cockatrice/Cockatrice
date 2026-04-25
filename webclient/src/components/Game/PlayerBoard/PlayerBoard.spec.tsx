@@ -47,14 +47,14 @@ function buildState() {
 }
 
 describe('PlayerBoard', () => {
-  it('renders the info panel, battlefield, and zone rail in order', () => {
+  it('renders the info panel, stack column, and battlefield', () => {
     renderWithProviders(<PlayerBoard gameId={1} playerId={1} />, {
       preloadedState: buildState(),
     });
 
     expect(screen.getByText('Trajer')).toBeInTheDocument();
     expect(screen.getByTestId('battlefield')).toBeInTheDocument();
-    expect(screen.getByTestId('zone-rail')).toBeInTheDocument();
+    expect(screen.getByTestId('stack-column-1')).toBeInTheDocument();
   });
 
   it('passes mirrored=false by default so the battlefield uses natural row order', () => {
@@ -67,10 +67,9 @@ describe('PlayerBoard', () => {
       container.querySelectorAll('.battlefield__row'),
     ).map((r) => r.getAttribute('data-row'));
     expect(rowsInOrder).toEqual(['0', '1', '2']);
-    expect(container.querySelector('.card-slot--inverted')).toBeNull();
   });
 
-  it('propagates mirrored=true → battlefield reverses row order and cards are inverted', () => {
+  it('propagates mirrored=true → battlefield reverses row order', () => {
     const { container } = renderWithProviders(
       <PlayerBoard gameId={1} playerId={1} mirrored />,
       { preloadedState: buildState() },
@@ -80,10 +79,9 @@ describe('PlayerBoard', () => {
       container.querySelectorAll('.battlefield__row'),
     ).map((r) => r.getAttribute('data-row'));
     expect(rowsInOrder).toEqual(['2', '1', '0']);
-    expect(container.querySelectorAll('.card-slot--inverted').length).toBeGreaterThan(0);
   });
 
-  it('keeps the info panel on the left and zone rail on the right in mirrored mode', () => {
+  it('renders info panel, stack column, battlefield left-to-right (even when mirrored)', () => {
     const { container } = renderWithProviders(
       <PlayerBoard gameId={1} playerId={1} mirrored />,
       { preloadedState: buildState() },
@@ -91,8 +89,8 @@ describe('PlayerBoard', () => {
 
     const children = Array.from(container.querySelector('.player-board')!.children);
     expect(children[0]).toHaveClass('player-info-panel');
-    expect(children[1]).toHaveClass('battlefield');
-    expect(children[2]).toHaveClass('zone-rail');
+    expect(children[1]).toHaveClass('stack-column');
+    expect(children[2]).toHaveClass('battlefield');
   });
 
   it('adds the --mirrored CSS modifier only when mirrored', () => {
