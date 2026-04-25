@@ -180,7 +180,7 @@ Bitte überprüfen Sie, ob das Verzeichnis bearbeitet werden kann und versuchen 
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="730"/>
         <source>Display card name of background in bottom right:</source>
-        <translation type="unfinished"/>
+        <translation>Kartenname des Hintergrunds unten rechts anzeigen:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="732"/>
@@ -304,7 +304,7 @@ Bitte überprüfen Sie, ob das Verzeichnis bearbeitet werden kann und versuchen 
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp" line="92"/>
         <source>Back to results</source>
-        <translation type="unfinished"/>
+        <translation>Zurück zu den Ergebnissen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp" line="93"/>
@@ -741,7 +741,7 @@ Dies wird nur für Moderatoren gespeichert und kann von der gebannten Person nic
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="455"/>
         <source>Skip &amp;untapping</source>
-        <translation type="unfinished"/>
+        <translation>Enttappen überspringen</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="457"/>
@@ -2959,32 +2959,32 @@ https://tappedout.net/mtg-decks/your-deck-name/</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="15"/>
         <source>Players:</source>
-        <translation type="unfinished"/>
+        <translation>Spieler:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="26"/>
         <source>General</source>
-        <translation type="unfinished"/>
+        <translation>Allgemein</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="29"/>
         <source>Starting life total:</source>
-        <translation type="unfinished"/>
+        <translation>Anfangslebenspunktzahl:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="40"/>
         <source>Game setup options</source>
-        <translation type="unfinished"/>
+        <translation>Spielaufsetzungsoptionen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="43"/>
         <source>Remember settings</source>
-        <translation type="unfinished"/>
+        <translation>Einstellungen merken</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="62"/>
         <source>Local game options</source>
-        <translation type="unfinished"/>
+        <translation>Lokale Spieloptionen</translation>
     </message>
 </context>
 <context>
@@ -4588,7 +4588,7 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="235"/>
         <source>Move top cards to graveyard face down...</source>
-        <translation type="unfinished"/>
+        <translation>Die obersten Karten verdeckt in den Friedhof bewegen...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="236"/>
@@ -4598,7 +4598,7 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="237"/>
         <source>Move top cards to exile face down...</source>
-        <translation type="unfinished"/>
+        <translation>Die obersten Karten verdeckt ins Exil bewegen...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="238"/>
@@ -4648,7 +4648,7 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="248"/>
         <source>Move bottom cards to graveyard face down...</source>
-        <translation type="unfinished"/>
+        <translation>Die untersten Karten verdeckt in den Friedhof bewegen...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="249"/>
@@ -4658,7 +4658,7 @@ Eventuell müssen sie manuell eine neue Version herunterladen.</translation>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="250"/>
         <source>Move bottom cards to exile face down...</source>
-        <translation type="unfinished"/>
+        <translation>Die untersten Karten verdeckt ins Exil bewegen...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/library_menu.cpp" line="251"/>
@@ -5922,7 +5922,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/game/log/message_log_widget.cpp" line="311"/>
         <source>%1 puts %2%3 into their graveyard face down.</source>
-        <translation type="unfinished"/>
+        <translation>%1 legt %2%3 verdeckt in ihren Friedhof</translation>
     </message>
     <message>
         <location filename="src/game/log/message_log_widget.cpp" line="313"/>
@@ -5932,7 +5932,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/game/log/message_log_widget.cpp" line="317"/>
         <source>%1 exiles %2%3 face down.</source>
-        <translation type="unfinished"/>
+        <translation>%1 schickt %2%3 verdeckt ins Exil.</translation>
     </message>
     <message>
         <location filename="src/game/log/message_log_widget.cpp" line="319"/>
@@ -5972,7 +5972,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/game/log/message_log_widget.cpp" line="340"/>
         <source>%1 plays %2%3 face down.</source>
-        <translation type="unfinished"/>
+        <translation>%1 bringt %2%3 verdeckt ins Spiel.</translation>
     </message>
     <message>
         <location filename="src/game/log/message_log_widget.cpp" line="342"/>
@@ -5982,7 +5982,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/game/log/message_log_widget.cpp" line="347"/>
         <source>%1 moves %2%3 to custom zone &apos;%4&apos; face down.</source>
-        <translation type="unfinished"/>
+        <translation>%1 bewegt %2%3 verdeckt zur benutzerdefinierten Zone &apos;%4&apos;.</translation>
     </message>
     <message>
         <location filename="src/game/log/message_log_widget.cpp" line="349"/>
@@ -6449,7 +6449,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
     <message>
         <location filename="src/game/player/menu/move_menu.cpp" line="66"/>
         <source>T&amp;able</source>
-        <translation type="unfinished"/>
+        <translation>T&amp;isch</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/move_menu.cpp" line="67"/>
@@ -6724,7 +6724,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
         <location filename="src/game/player/player_actions.cpp" line="618"/>
         <location filename="src/game/player/player_actions.cpp" line="623"/>
         <source>grave</source>
-        <translation type="unfinished"/>
+        <translation>Grab</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="433"/>
@@ -6732,17 +6732,17 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
         <location filename="src/game/player/player_actions.cpp" line="628"/>
         <location filename="src/game/player/player_actions.cpp" line="633"/>
         <source>exile</source>
-        <translation type="unfinished"/>
+        <translation>Exil</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="449"/>
         <source>Move top cards to %1</source>
-        <translation type="unfinished"/>
+        <translation>Oberste Karten nach %1 bewegen</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="644"/>
         <source>Move bottom cards to %1</source>
-        <translation type="unfinished"/>
+        <translation>Unterste Karten nach %1 bewegen</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="767"/>
@@ -6829,12 +6829,15 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
 This setting means you'll only see the default printing for each card, instead of being able to select a printing, and will not see the printings other people have selected.
 
 </source>
-        <translation type="unfinished"/>
+        <translation>Die Druckauswahl ist deaktiviert, da sie momentan die Einstellung zur Überschreibung aller ausgewählten Drucke mit ihren persönlichen Setpräferenzen aktiviert ist.
+
+Diese Einstellung bedeutet, dass sie nur den Standarddruck für jede Karte sehen, anstatt einen bestimmten Druck auszuwählen, und sie werden auch nicht die von anderen Personen ausgewählten Drucke sehen können.
+</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/printing_disabled_info_widget.cpp" line="49"/>
         <source>Enable printings again</source>
-        <translation type="unfinished"/>
+        <translation>Drucke wieder aktivieren</translation>
     </message>
 </context>
 <context>
@@ -6847,7 +6850,7 @@ This setting means you'll only see the default printing for each card, instead o
     <message>
         <location filename="src/interface/widgets/printing_selector/printing_selector.cpp" line="155"/>
         <source>Printing Selector</source>
-        <translation type="unfinished"/>
+        <translation>Druckauswahl</translation>
     </message>
 </context>
 <context>
@@ -6933,7 +6936,7 @@ This setting means you'll only see the default printing for each card, instead o
     <message>
         <location filename="src/interface/widgets/printing_selector/printing_selector_placeholder_widget.cpp" line="41"/>
         <source>Select a card to view its available printings</source>
-        <translation type="unfinished"/>
+        <translation>Wählen sie eine Karte aus, um ihre verfügbaren Drucke anzusehen</translation>
     </message>
 </context>
 <context>
@@ -7083,7 +7086,13 @@ You will not be able to manage printing preferences on a per-deck basis, or see 
 You will have to use the Set Manager, available through Card Database -&gt; Manage Sets.
 
 Are you sure you would like to enable this feature?</source>
-        <translation type="unfinished"/>
+        <translation>Diese Funktion zu aktivieren wird die Nutzung der Druckauswahl deaktivieren.
+
+Es wird ihnen nicht möglich sein ihre Druckeinstellungen auf einer Per-Deck Basis zu verwalten, oder die Drucke, die andere Personen für ihre Decks ausgewählt haben, zu sehen.
+
+Sie werden den Set-Manager verwenden müssen, der über Kartendatenbank -&gt; Sets verwalten verfügbar ist.
+
+Sind sie sicher, dass diese Funktion aktiviert werden soll?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/override_printing_warning.cpp" line="17"/>
@@ -7094,12 +7103,18 @@ You can now choose printings on a per-deck basis in the Deck Editor and configur
 You can also use the Set Manager to adjust custom sort order for printings in the Printing Selector (other sort orders like alphabetical or release date are available).
 
 Are you sure you would like to disable this feature?</source>
-        <translation type="unfinished"/>
+        <translation>Diese Funktion zu deaktivieren wird die Nutzung der Druckauswahl aktivieren.
+
+Es wird ihnen nun möglich sein ihre Druckeinstellungen auf einer Per-Deck Basis im Deck-Editor zu verwalten und zu konfigurieren, welcher Druck standardmäßig in ein Deck hinzugefügt wird, indem sie es anheften in der Druckauswahl
+
+Sie können auch den Set-Manager verwenden, um selbstständig die Sortierungsreihenfolge für Drucke in der Druckauswahl festzulegen (andere Sortierungsoptionen wie alphabetisch oder Veröffentlichkeitsdatum sind verfügbar).
+
+Sind sie sicher, dass diese Funktion deaktiviert werden soll?</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/override_printing_warning.cpp" line="27"/>
         <source>Confirm Change</source>
-        <translation type="unfinished"/>
+        <translation>Änderung bestätigen</translation>
     </message>
 </context>
 <context>
@@ -7327,7 +7342,7 @@ Are you sure you would like to disable this feature?</source>
     <message>
         <location filename="src/game/player/menu/say_menu.cpp" line="16"/>
         <source>S&amp;ay</source>
-        <translation type="unfinished"/>
+        <translation>S&amp;agen</translation>
     </message>
 </context>
 <context>
@@ -7755,77 +7770,77 @@ Bitte überprüfen Sie die Verknüpfungseinstellungen!</translation>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="104"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="391"/>
         <source>AND</source>
-        <translation type="unfinished"/>
+        <translation>UND</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="105"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="392"/>
         <source>Require ALL selected colors</source>
-        <translation type="unfinished"/>
+        <translation>Benötigt ALLE ausgewählten Farben</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="109"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="394"/>
         <source>Deck name...</source>
-        <translation type="unfinished"/>
+        <translation>Deckname...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="113"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="395"/>
         <source>Owner...</source>
-        <translation type="unfinished"/>
+        <translation>Besitzer...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="120"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="396"/>
         <source>Packages</source>
-        <translation type="unfinished"/>
+        <translation>Pakete</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="127"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="397"/>
         <source>Advanced Filters</source>
-        <translation type="unfinished"/>
+        <translation>Erweiterte Filter</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="205"/>
         <source>Bracket:</source>
-        <translation type="unfinished"/>
+        <translation>Klammer:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="207"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="261"/>
         <source>Any</source>
-        <translation type="unfinished"/>
+        <translation>Beliebig</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="241"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="399"/>
         <source>Contains card...</source>
-        <translation type="unfinished"/>
+        <translation>Enthält Karte...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="245"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="400"/>
         <source>Commander...</source>
-        <translation type="unfinished"/>
+        <translation>Kommandant...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="249"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="401"/>
         <source>Tag...</source>
-        <translation type="unfinished"/>
+        <translation>Etikett...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="254"/>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="404"/>
         <source>Deck Size</source>
-        <translation type="unfinished"/>
+        <translation>Deckgröße</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="269"/>
         <source>Cards:</source>
-        <translation type="unfinished"/>
+        <translation>Karten:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="333"/>
@@ -7836,17 +7851,17 @@ Bitte überprüfen Sie die Verknüpfungseinstellungen!</translation>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="386"/>
         <source>Sort by:</source>
-        <translation type="unfinished"/>
+        <translation>Sortieren nach:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="389"/>
         <source>Filter by:</source>
-        <translation type="unfinished"/>
+        <translation>Filtern nach:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="408"/>
         <source>Display Settings</source>
-        <translation type="unfinished"/>
+        <translation>Anzeigeeinstellungen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="123"/>
@@ -9529,12 +9544,12 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="968"/>
         <source>Show selection counter during drag selection</source>
-        <translation type="unfinished"/>
+        <translation>Auswahlzähler während Zugauswahl anzeigen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="969"/>
         <source>Show total selection counter</source>
-        <translation type="unfinished"/>
+        <translation>Gesamtauswahlszähler anzeigen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="970"/>
@@ -9698,23 +9713,23 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="52"/>
         <source>Exact match</source>
-        <translation type="unfinished"/>
+        <translation>Exakte Übereinstimmung</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="53"/>
         <source>Includes</source>
-        <translation type="unfinished"/>
+        <translation>Enthält</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="54"/>
         <source>Include / Exclude</source>
         <oldsource>Mode: Includes</oldsource>
-        <translation type="unfinished"/>
+        <translation>Inkludieren / Exkludieren</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_color_filter_widget.cpp" line="56"/>
         <source>How selected and unselected colors are combined in the filter</source>
-        <translation type="unfinished"/>
+        <translation>Wie ausgewählte und nicht ausgewählte Farben im Filter kombiniert werden</translation>
     </message>
 </context>
 <context>
@@ -9745,72 +9760,72 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="142"/>
         <source>Sort by</source>
-        <translation type="unfinished"/>
+        <translation>Sortieren nach</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="143"/>
         <source>Filter by</source>
-        <translation type="unfinished"/>
+        <translation>Filtern nach</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="145"/>
         <source>Save and load filters</source>
-        <translation type="unfinished"/>
+        <translation>Filter speichern und laden</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="146"/>
         <source>Filter by exact card name</source>
-        <translation type="unfinished"/>
+        <translation>Nach exaktem Kartennamen filtern</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="147"/>
         <source>Filter by card main-type</source>
-        <translation type="unfinished"/>
+        <translation>Nach Kartenhaupttyp filtern</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="148"/>
         <source>Filter by card sub-type</source>
-        <translation type="unfinished"/>
+        <translation>Nach Kartenuntertyp filtern</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="149"/>
         <source>Filter by set</source>
-        <translation type="unfinished"/>
+        <translation>Nach Set filtern</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="150"/>
         <source>Filter by format legality</source>
-        <translation type="unfinished"/>
+        <translation>Nach Formatslegalität filtern</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="152"/>
         <source>Save/Load</source>
-        <translation type="unfinished"/>
+        <translation>Speichern/Laden</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="153"/>
         <source>Name</source>
-        <translation type="unfinished"/>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="154"/>
         <source>Main Type</source>
-        <translation type="unfinished"/>
+        <translation>Haupttyp</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="155"/>
         <source>Sub Type</source>
-        <translation type="unfinished"/>
+        <translation>Untertyp</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="156"/>
         <source>Sets</source>
-        <translation type="unfinished"/>
+        <translation>Sets</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="157"/>
         <source>Formats</source>
-        <translation type="unfinished"/>
+        <translation>Formate</translation>
     </message>
 </context>
 <context>
@@ -9818,12 +9833,12 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="71"/>
         <source>Show formats with at least:</source>
-        <translation type="unfinished"/>
+        <translation>Formate anzeigen mit mindestens:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="72"/>
         <source> cards</source>
-        <translation type="unfinished"/>
+        <translation>Karten</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_format_legality_filter_widget.cpp" line="73"/>
@@ -9851,12 +9866,12 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="66"/>
         <source>Show main types with at least:</source>
-        <translation type="unfinished"/>
+        <translation>Haupttypen anzeigen mit mindestens:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="67"/>
         <source> cards</source>
-        <translation type="unfinished"/>
+        <translation>Karten</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_main_type_filter_widget.cpp" line="68"/>
@@ -9945,12 +9960,12 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="71"/>
         <source>Show sub types with at least:</source>
-        <translation type="unfinished"/>
+        <translation>Untertypen anzeigen mit mindestens:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="72"/>
         <source> cards</source>
-        <translation type="unfinished"/>
+        <translation>Karten</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_sub_type_filter_widget.cpp" line="73"/>
@@ -10051,7 +10066,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_deck_editor/visual_deck_editor_placeholder_widget.cpp" line="40"/>
         <source>Add cards using the search bar or database tab to have them appear here</source>
-        <translation type="unfinished"/>
+        <translation>Karten über die Suchleiste oder den Datenbanktab hinzufügen, damit sie hier angezeigt werden</translation>
     </message>
 </context>
 <context>
@@ -10108,7 +10123,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="131"/>
         <source>Show Color Identity</source>
-        <translation type="unfinished"/>
+        <translation>Farbidentität anzeigen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp" line="132"/>
@@ -11132,7 +11147,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
         <location filename="src/client/settings/shortcuts_settings.h" line="504"/>
         <source>Toggle Skip Untapping</source>
         <oldsource>Toggle Untap</oldsource>
-        <translation type="unfinished"/>
+        <translation>Enttapen überspringen umschalten</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="507"/>
@@ -11152,7 +11167,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="516"/>
         <source>Play Card, Face Down</source>
-        <translation type="unfinished"/>
+        <translation>Karte spielen, verdeckt</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="519"/>
@@ -11296,7 +11311,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
         <location filename="src/client/settings/shortcuts_settings.h" line="602"/>
         <location filename="src/client/settings/shortcuts_settings.h" line="632"/>
         <source>Graveyard (Multiple), Face Down</source>
-        <translation type="unfinished"/>
+        <translation>Friedhof (mehrere), verdeckt</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="607"/>
@@ -11308,7 +11323,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
         <location filename="src/client/settings/shortcuts_settings.h" line="611"/>
         <location filename="src/client/settings/shortcuts_settings.h" line="641"/>
         <source>Exile (Multiple), Face Down</source>
-        <translation type="unfinished"/>
+        <translation>Exile (mehrere), verdeckt</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="614"/>
