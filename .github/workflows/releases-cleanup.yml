@@ -13,8 +13,8 @@ jobs:
       contents: write    # required to delete releases and tags
 
     env:
-      DELETE_RELEASES: true
-      DELETE_TAGS: true
+      DELETE_RELEASES: false
+      DELETE_TAGS: false
       KEEP_COUNT: 2      # number of newest pre-releases/tags to keep
 
     steps:
