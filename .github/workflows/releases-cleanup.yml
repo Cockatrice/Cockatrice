@@ -23,6 +23,7 @@ jobs:
           echo "Workflow triggered by"
           echo "Release tag: ${{ github.event.release.tag_name }}"
           echo "Release name: ${{ github.event.release.name }}"
+          echo "Target branch: ${{ github.event.release.target_commitish }}"
 
       - name: Delete old pre-releases
         uses: actions/github-script@v9
@@ -49,7 +50,7 @@ jobs:
 
             core.startGroup('Filter pre-releases');
             const prereleases = releases
-              .filter(r => r.prerelease)
+              .filter(r => r.prerelease && r.tag_name.toLowerCase().includes('-beta')))
               .sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
 
             console.log(`Found ${prereleases.length} pre-release(s):`);
