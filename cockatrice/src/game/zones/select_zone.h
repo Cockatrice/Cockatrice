@@ -50,11 +50,11 @@ protected:
     /// Parameters describing a vertical card stack's geometry.
     struct StackLayoutParams
     {
-        int cardCount;
-        qreal totalHeight;
-        qreal cardHeight;
-        qreal desiredOffset;
-        qreal minOffset = 0.0;
+        int cardCount;         ///< Number of cards in the stack
+        qreal totalHeight;     ///< Available height for the stack (zone height)
+        qreal cardHeight;      ///< Height of a single card
+        qreal desiredOffset;   ///< Preferred vertical offset between card tops
+        qreal minOffset = 0.0; ///< Minimum offset to preserve (0 allows full compression)
         /// When false (default), reserves full cardHeight for the bottom card, ensuring
         /// all cards remain within zone bounds. When true, allows the bottom card to
         /// partially overflow using sqrt-scaled allowance. Use with setupClipContainer()
