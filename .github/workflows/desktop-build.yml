@@ -274,9 +274,9 @@ jobs:
         include:
           - os: macOS
             target: 13
-            runner: macos-15-intel
+            runner: macos-26-intel
             soc: Intel
-            xcode: "16.4"
+            xcode: "26.5"
             type: Release
             override_target: 13
             make_package: 1
@@ -290,10 +290,11 @@ jobs:
 
           - os: macOS
             target: 14
-            runner: macos-14
+            runner: macos-26
             soc: Apple
-            xcode: "15.4"
+            xcode: "26.5"
             type: Release
+            override_target: 14
             make_package: 1
             package_suffix: "-macOS14"
             qt_version: 6.11.*
@@ -305,10 +306,11 @@ jobs:
 
           - os: macOS
             target: 15
-            runner: macos-15
+            runner: macos-26
             soc: Apple
-            xcode: "16.4"
+            xcode: "26.5"
             type: Release
+            override_target: 15
             make_package: 1
             package_suffix: "-macOS15"
             qt_version: 6.11.*
@@ -320,10 +322,11 @@ jobs:
 
           - os: macOS
             target: 15
-            runner: macos-15
+            runner: macos-26
             soc: Apple
-            xcode: "16.4"
+            xcode: "26.5"
             type: Debug
+            override_target: 15
             qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
