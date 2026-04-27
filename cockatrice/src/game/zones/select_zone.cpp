@@ -8,14 +8,11 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QtMath>
 
-namespace
-{
-qreal stackingOffset(qreal cardHeight)
+static qreal stackingOffset(qreal cardHeight)
 {
     const qreal overlapPercent = SettingsCache::instance().getStackCardOverlapPercent();
     return cardHeight * (100.0 - overlapPercent) / 100.0;
 }
-} // namespace
 
 SelectZone::ZoneLayout SelectZone::computeZoneLayout(const StackLayoutParams &params)
 {
@@ -56,13 +53,16 @@ SelectZone::ZoneLayout SelectZone::computeZoneLayout(const StackLayoutParams &pa
 SelectZone *SelectZone::findOwningSelectZone(const QGraphicsItem *card)
 {
     QGraphicsItem *parent = card ? card->parentItem() : nullptr;
-    if (!parent)
+    if (!parent) {
         return nullptr;
+    }
     // Card may be direct child of zone (escaped for hover) or child of clip container.
-    if (auto *zone = dynamic_cast<SelectZone *>(parent))
+    if (auto *zone = dynamic_cast<SelectZone *>(parent)) {
         return zone;
-    if (auto *zone = dynamic_cast<SelectZone *>(parent->parentItem()))
+    }
+    if (auto *zone = dynamic_cast<SelectZone *>(parent->parentItem())) {
         return zone;
+    }
     return nullptr;
 }
 
