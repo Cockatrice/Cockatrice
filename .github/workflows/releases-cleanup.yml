@@ -6,7 +6,7 @@ on:
 
 jobs:
   cleanup:
-    if: ${{ github.event.release.prerelease == false && github.event.release.target_commitish == 'master' }}
+    if: ${{ github.event.release.prerelease == false && github.event.release.target_commitish == 'master' && github.repository_owner == 'Cockatrice'}}
     runs-on: ubuntu-slim
 
     permissions:
