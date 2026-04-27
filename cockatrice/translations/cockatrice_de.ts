@@ -2969,12 +2969,12 @@ https://tappedout.net/mtg-decks/your-deck-name/</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="29"/>
         <source>Starting life total:</source>
-        <translation>Anfangslebenspunktzahl:</translation>
+        <translation>Lebenspunkte zum Spielstart:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="40"/>
         <source>Game setup options</source>
-        <translation>Spielaufsetzungsoptionen</translation>
+        <translation>Spieleinstellungen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="43"/>
@@ -2984,7 +2984,7 @@ https://tappedout.net/mtg-decks/your-deck-name/</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="62"/>
         <source>Local game options</source>
-        <translation>Lokale Spieloptionen</translation>
+        <translation>Lokale Spieleinstellungen</translation>
     </message>
 </context>
 <context>
@@ -6724,7 +6724,7 @@ Cockatrice wird jetzt die Kartendatenbank neu laden.</translation>
         <location filename="src/game/player/player_actions.cpp" line="618"/>
         <location filename="src/game/player/player_actions.cpp" line="623"/>
         <source>grave</source>
-        <translation>Grab</translation>
+        <translation>Friedhof</translation>
     </message>
     <message>
         <location filename="src/game/player/player_actions.cpp" line="433"/>
@@ -7805,7 +7805,7 @@ Bitte überprüfen Sie die Verknüpfungseinstellungen!</translation>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="205"/>
         <source>Bracket:</source>
-        <translation>Klammer:</translation>
+        <translation>Kategorie:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp" line="207"/>
@@ -9820,7 +9820,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="156"/>
         <source>Sets</source>
-        <translation>Sets</translation>
+        <translation>Editionen</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_display_filter_toolbar_widget.cpp" line="157"/>
@@ -11323,7 +11323,7 @@ Bitte unterlassen Sie diese Aktivitäten oder weitere Schritte werden gegen Sie 
         <location filename="src/client/settings/shortcuts_settings.h" line="611"/>
         <location filename="src/client/settings/shortcuts_settings.h" line="641"/>
         <source>Exile (Multiple), Face Down</source>
-        <translation>Exile (mehrere), verdeckt</translation>
+        <translation>Exil (mehrere), verdeckt</translation>
     </message>
     <message>
         <location filename="src/client/settings/shortcuts_settings.h" line="614"/>
