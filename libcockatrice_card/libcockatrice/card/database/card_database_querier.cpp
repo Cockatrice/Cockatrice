@@ -133,7 +133,7 @@ ExactCard CardDatabaseQuerier::getRandomCard() const
 ExactCard CardDatabaseQuerier::getCardFromSameSet(const QString &cardName, const PrintingInfo &otherPrinting) const
 {
     // The source card does not have a printing defined, which means we can't get a card from the same set.
-    if (otherPrinting == PrintingInfo()) {
+    if (otherPrinting.isEmpty()) {
         return getCard({cardName});
     }
 

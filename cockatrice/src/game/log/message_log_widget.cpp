@@ -54,7 +54,7 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
                     fromStr = tr(" from the top of their library");
                 }
             }
-        } else if (position >= zone->getCards().size() - 1) {
+        } else if (position == zone->getCards().size()) {
             if (cardName.isEmpty()) {
                 if (ownerChange) {
                     cardName = tr("the bottom card of %1's library").arg(zone->getPlayer()->getPlayerInfo()->getName());

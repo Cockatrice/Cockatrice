@@ -86,11 +86,11 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-project("Cockatrice" VERSION 2.11.0)
+project("Cockatrice" VERSION 3.0.0)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
-  set(GIT_TAG_RELEASENAME "Omenpath")
+  set(GIT_TAG_RELEASENAME "Graduation Day")
 endif()
 
 # Use c++20 for all targets

@@ -62,7 +62,7 @@ void CardInfoTextWidget::setCard(const ExactCard &exactCard)
     text += QString("<tr><td>%1</td><td width=\"5\"></td><td>%2</td></tr>")
                 .arg(tr("Name:"), card->getName().toHtmlEscaped());
 
-    if (exactCard.getPrinting() != PrintingInfo()) {
+    if (!exactCard.getPrinting().isEmpty()) {
         QString setShort = exactCard.getPrinting().getSet()->getShortName().toHtmlEscaped();
         QString cardNum = exactCard.getPrinting().getProperty("num").toHtmlEscaped();
 

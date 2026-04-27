@@ -259,6 +259,9 @@ TabGame::~TabGame()
     if (replayManager) {
         delete replayManager->replay;
     }
+    for (auto &player : game->getPlayerManager()->getPlayers()) {
+        player->clear();
+    }
 }
 
 void TabGame::updatePlayerListDockTitle()
