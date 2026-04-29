@@ -1,17 +1,19 @@
 name: Build Docker Image
 
 on:
-  push:
-    tags:
-      - '*Release*'
-    branches:
-      - master
+  release:
+    types:
+      - released 
   pull_request:
     branches:
       - master
     paths:
       - '.github/workflows/docker-release.yml'
       - 'Dockerfile'
+
+permissions:
+  contents: read
+  packages: write
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
@@ -22,9 +24,6 @@ jobs:
   docker:
     name: amd64 & arm64
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - name: Checkout
