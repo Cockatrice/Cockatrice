@@ -25,6 +25,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "connection_controller/remote_connection_controller.h"
 #include "widgets/dialogs/dlg_local_game_options.h"
 
 #include <QList>
@@ -68,38 +69,19 @@ public slots:
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
-    void processConnectionClosedEvent(const Event_ConnectionClosed &event);
-    void processServerShutdownEvent(const Event_ServerShutdown &event);
-    void serverTimeout();
-    void loginError(Response::ResponseCode r, QString reasonStr, quint32 endTime, QList<QString> missingFeatures);
-    void registerError(Response::ResponseCode r, QString reasonStr, quint32 endTime);
-    void activateError();
-    void socketError(const QString &errorStr);
-    void protocolVersionMismatch(int localVersion, int remoteVersion);
-    void userInfoReceived(const ServerInfo_User &userInfo);
-    void registerAccepted();
-    void registerAcceptedNeedsActivate();
-    void activateAccepted();
     void localGameEnded();
     void pixmapCacheSizeChanged(int newSizeInMBs);
-    void notifyUserAboutUpdate();
     void actDisconnect();
     void actSinglePlayer();
     void actWatchReplay();
     void actFullScreen(bool checked);
-    void actRegister();
     void actSettings();
-    void actForgotPasswordRequest();
     void actAbout();
     void actTips();
     void actUpdate();
     void actViewLog();
     void actOpenSettingsFolder();
-    void forgotPasswordSuccess();
-    void forgotPasswordError();
-    void promptForgotPasswordReset();
     void actShow();
-    void promptForgotPasswordChallenge();
     void showWindowIfHidden();
 
     void cardUpdateError(QProcess::ProcessError err);
@@ -125,7 +107,6 @@ private slots:
 private:
     static const QString appName;
     static const QStringList fileNameFilters;
-    void setClientStatusTitle();
     void retranslateUi();
     void createActions();
     void createMenus();
@@ -152,14 +133,11 @@ private:
 
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;
-    RemoteClient *client;
-    QThread *clientThread;
+    ConnectionController *connectionController;
     LocalServer *localServer;
     bool bHasActivated, askedForDbUpdater;
-    QMessageBox serverShutdownMessageBox;
     QProcess *cardUpdateProcess;
     DlgViewLog *logviewDialog;
-    DlgConnect *dlgConnect;
     GameReplay *replay;
     DlgTipOfTheDay *tip;
     QUrl connectTo;
@@ -180,7 +158,6 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
     void changeEvent(QEvent *event) override;
-    QString extractInvalidUsernameMessage(QString &in);
 };
 
 #endif
