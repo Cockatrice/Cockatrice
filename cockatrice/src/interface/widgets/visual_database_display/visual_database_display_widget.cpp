@@ -140,6 +140,7 @@ void VisualDatabaseDisplayWidget::initialize()
     databaseLoadIndicator->setVisible(false);
 
     filterContainer->initialize();
+    filterContainer->setVisible(true);
 
     searchLayout->addWidget(colorFilterWidget);
     searchLayout->addWidget(clearFilterWidget);
