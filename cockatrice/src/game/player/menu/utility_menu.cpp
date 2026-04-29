@@ -118,3 +118,13 @@ void UtilityMenu::setShortcutsInactive()
         aIncrementAllCardCounters->setShortcut(QKeySequence());
     }
 }
+
+void UtilityMenu::setLobbyShortcutsActive()
+{
+    if (!player->getPlayerInfo()->getLocalOrJudge()) {
+        return;
+    }
+
+    ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
+    aRollDie->setShortcuts(shortcuts.getShortcut("Player/aRollDie"));
+}
