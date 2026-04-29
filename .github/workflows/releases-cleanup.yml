@@ -1,0 +1,112 @@
+name: Delete Beta Releases
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  cleanup:
+    if: ${{ github.event.release.prerelease == false && github.event.release.target_commitish == 'master' && github.repository_owner == 'Cockatrice'}}
+    runs-on: ubuntu-slim
+
+    permissions:
+      contents: write    # required to delete releases and tags
+
+    env:
+      DELETE_RELEASES: false
+      DELETE_TAGS: false
+      KEEP_COUNT: 2      # number of newest pre-releases/tags to keep
+
+    steps:
+      - name: Print release info
+        run: |
+          echo "Workflow triggered by"
+          echo "Release tag: ${{ github.event.release.tag_name }}"
+          echo "Release name: ${{ github.event.release.name }}"
+          echo "Target branch: ${{ github.event.release.target_commitish }}"
+
+      - name: Delete old pre-releases
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const core = require('@actions/core');
+            
+            const deleteReleases = process.env.DELETE_RELEASES === 'true';
+            const deleteTags = process.env.DELETE_TAGS === 'true';
+            const keep = parseInt(process.env.KEEP_COUNT, 10);
+
+            core.startGroup('Fetch all releases');
+            const releases = await github.paginate(
+              github.rest.repos.listReleases,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              }
+            );
+            
+            console.log(`Fetched ${releases.length} release(s):`);
+            releases.forEach(r => console.log(`${r.tag_name} (prerelease: ${r.prerelease}, published at: ${r.published_at})`));
+            core.endGroup();
+
+            core.startGroup('Filter pre-releases');
+            const prereleases = releases
+              .filter(r => r.prerelease && r.tag_name.toLowerCase().includes('-beta')))
+              .sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
+
+            console.log(`Found ${prereleases.length} pre-release(s):`);
+            prereleases.forEach(r => console.log(`Pre-release: ${r.tag_name}, published at ${r.published_at}`));
+            core.endGroup();
+
+            core.startGroup('Delete pre-releases and tags');
+            // Determine releases to delete (keep newest N pre-releases)
+            const toDelete = prereleases.slice(keep);
+            
+            if (toDelete.length === 0) {
+              console.log('No releases marked for deletion.');
+              return;
+            }
+            
+            let deletedReleasesCount = 0;
+            let deletedTagsCount = 0;
+            
+            for (const rel of toDelete) {
+              console.log(`Processing pre-release: ${rel.tag_name}`);
+              
+              // Delete release
+              if (deleteReleases) {
+                try {
+                  await github.rest.repos.deleteRelease({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    release_id: rel.id,
+                  });
+                  console.log(`Deleted release: ${rel.tag_name}`);
+                  deletedReleasesCount++;
+                } catch (err) {
+                  console.log(`Failed to delete release ${rel.tag_name}: ${err.message}`);
+                }
+              } else {
+                console.log(`[DRY RUN] Would delete release: ${rel.tag_name}`);
+              }
+
+              // Delete tag
+              if (deleteTags) {
+                try {
+                  await github.rest.git.deleteRef({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: `tags/${rel.tag_name}`,
+                  });
+                  console.log(`Deleted tag: ${rel.tag_name}`);
+                  deletedTagsCount++;
+                } catch (err) {
+                  console.log(`Tag deletion failed or not found: ${rel.tag_name}`);
+                }
+              } else {
+                console.log(`[DRY RUN] Would delete tag: ${rel.tag_name}`);
+              }
+            }
+
+            console.log(`Total releases deleted: ${deletedReleasesCount}`);
+            console.log(`Total tags deleted: ${deletedTagsCount}`);
+            core.endGroup();
