@@ -378,8 +378,8 @@ jobs:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           path: ${{env.CCACHE_DIR}}
-          key: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-${{env.BRANCH_NAME}}
-          restore-keys: ccache-${{matrix.runner}}-${{matrix.soc}}-${{matrix.type}}-
+          key: ccache-${{matrix.os}}${{matrix.target}}${{matrix.soc == 'Intel' && '_Intel' || ''}}-${{matrix.type}}-${{env.BRANCH_NAME}}
+          restore-keys: ccache-${{matrix.os}}${{matrix.target}}${{matrix.soc == 'Intel' && '_Intel' || ''}}-${{matrix.type}}-
 
       - name: Install aqtinstall
         run: pipx install aqtinstall
@@ -390,18 +390,18 @@ jobs:
         shell: bash
         run: .ci/resolve_latest_aqt_qt_version.sh "${{matrix.qt_version}}"
 
-      - name: Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries (${{ matrix.soc }} macOS)
+      - name: Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries (macOS${{matrix.soc == 'Intel' && ', Intel' || ''}})
         if: matrix.os == 'macOS'
-        id: restore_qt
+        id: qt_restore
         uses: actions/cache/restore@v5
         with:
           path: ${{ github.workspace }}/Qt
-          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+          key: qt-${{matrix.os}}${{matrix.soc == 'Intel' && '_Intel' || '_Apple'}}-${{ steps.resolve_qt_version.outputs.version }}-thin
 
       # Using jurplel/install-qt-action to install Qt without using brew
-      # qt build using vcpkg either just fails or takes too long to build
-      - name: Install fat Qt ${{ steps.resolve_qt_version.outputs.version }} (${{ matrix.soc }} macOS)
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+      # Qt build using vcpkg either just fails or takes too long to build
+      - name: Install fat Qt ${{ steps.resolve_qt_version.outputs.version }} (macOS${{matrix.soc == 'Intel' && ', Intel' || ''}})
+        if: matrix.os == 'macOS' && steps.qt_restore.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ steps.resolve_qt_version.outputs.version }}
@@ -410,16 +410,16 @@ jobs:
           cache: false
           dir: ${{github.workspace}}
 
-      - name: Thin Qt libraries (${{ matrix.soc }} macOS)
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+      - name: Thin Qt libraries (macOS${{matrix.soc == 'Intel' && ', Intel' || ''}})
+        if: matrix.os == 'macOS' && steps.qt_restore.outputs.cache-hit != 'true'
         run: .ci/thin_macos_qtlib.sh
 
-      - name: Cache thin Qt libraries (${{ matrix.soc }} macOS)
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+      - name: Cache thin Qt libraries (macOS${{matrix.soc == 'Intel' && ', Intel' || ''}})
+        if: matrix.os == 'macOS' && steps.qt_restore.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v5
         with:
           path: ${{ github.workspace }}/Qt
-          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+          key: ${{ steps.qt_restore.outputs.cache-primary-key }}
 
       - name: Install Qt ${{matrix.qt_version}} (Windows)
         if: matrix.os == 'Windows'
@@ -430,7 +430,8 @@ jobs:
           version: ${{ steps.resolve_qt_version.outputs.version }}
           arch: ${{matrix.qt_arch}}
           modules: ${{matrix.qt_modules}}
-          cache: true
+          cache: ${{ github.ref == 'refs/heads/master' }}
+          cache-key-prefix: qt
 
       - name: Install NSIS
         if: matrix.os == 'Windows'
@@ -442,26 +443,28 @@ jobs:
         uses: TAServers/vcpkg-cache@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          prefix: vcpkg-
 
       # uses environment variables, see compile.sh for more details
       - name: Build Cockatrice
         id: build
         shell: bash
         env:
-          BUILDTYPE: '${{matrix.type}}'
-          MAKE_PACKAGE: '${{matrix.make_package}}'
-          PACKAGE_SUFFIX: '${{matrix.package_suffix}}'
-          CMAKE_GENERATOR: ${{matrix.cmake_generator}}
-          CMAKE_GENERATOR_PLATFORM: ${{matrix.cmake_generator_platform}}
-          USE_CCACHE: ${{matrix.use_ccache}}
-          VCPKG_DISABLE_METRICS: 1
-          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
+          BUILDTYPE: ${{ matrix.type }}
+          MAKE_PACKAGE: ${{ matrix.make_package }}
+          PACKAGE_SUFFIX: ${{ matrix.package_suffix }}
+          CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
+          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
+          USE_CCACHE: ${{ matrix.use_ccache }}
+          VCPKG_DISABLE_METRICS: true
+          VCPKG_FEATURE_FLAGS: "binarycaching"
+          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ github.ref == 'refs/heads/master' && 'readwrite' || 'read' }}"
           # macOS-specific environment variables, will be ignored on Windows
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
-          DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
+          DEVELOPER_DIR: "/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer"
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
         run: .ci/compile.sh --server --test --vcpkg
