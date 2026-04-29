@@ -112,6 +112,39 @@ void ThemeManager::ensureThemeDirectoryExists()
     }
 }
 
+bool ThemeManager::isDarkMode()
+{
+    auto themeName = SettingsCache::instance().getThemeName();
+    // Explicit Dark Mode
+    if (themeName == FUSION_THEME_NAME_LIGHT || themeName.endsWith("(Light)")) {
+        return false;
+    }
+    // Explicit Light Mode
+    if (themeName == FUSION_THEME_NAME_DARK || themeName.endsWith("(Dark)")) {
+        return true;
+    }
+
+    // Auto detection on compatible Qt versions
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark &&
+        (themeName == NONE_THEME_NAME || themeName == FUSION_THEME_NAME || themeName.endsWith("(System Default)"))) {
+        return true;
+    } else {
+        return false;
+    }
+#endif
+    // Default to light mode
+    return false;
+}
+
+bool ThemeManager::isBuiltInTheme()
+{
+    const auto themeName = SettingsCache::instance().getThemeName();
+
+    return themeName == NONE_THEME_NAME || themeName == FUSION_THEME_NAME || themeName == FUSION_THEME_NAME_LIGHT ||
+           themeName == FUSION_THEME_NAME_DARK;
+}
+
 QStringMap &ThemeManager::getAvailableThemes()
 {
     QDir dir;
