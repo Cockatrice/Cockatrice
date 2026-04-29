@@ -1,11 +1,10 @@
 #include "expression.h"
 
-#include "peglib.h"
-
 #include <QByteArray>
 #include <QString>
 #include <QtMath>
 #include <functional>
+#include <peglib.h>
 
 peg::parser math(R"(
     EXPRESSION   <-  P0

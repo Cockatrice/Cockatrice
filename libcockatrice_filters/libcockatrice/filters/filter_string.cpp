@@ -5,7 +5,7 @@
 #include <QRegularExpression>
 #include <QString>
 #include <functional>
-#include <libcockatrice/utility/peglib.h>
+#include <peglib.h>
 
 static peg::parser search(R"(
 Start <- QueryPartList

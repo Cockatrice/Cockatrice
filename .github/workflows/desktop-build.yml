@@ -170,6 +170,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Checkout thirdparty submodules
+        run: |
+          git submodule init thirdparty
+          git submodule update thirdparty
+
       - name: Restore compiler cache (ccache)
         id: ccache_restore
         uses: actions/cache/restore@v5
