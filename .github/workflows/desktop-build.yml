@@ -185,7 +185,7 @@ jobs:
         run: source .ci/docker.sh --build
 
       - name: Build debug and test
-        if: matrix.test != 'skip'
+        if: matrix.test != 'skip' && github.event_name == 'pull_request'
         shell: bash
         run: |
           source .ci/docker.sh
@@ -445,6 +445,7 @@ jobs:
 
       # uses environment variables, see compile.sh for more details
       - name: Build Cockatrice
+        if: matrix.type == 'Release' || (matrix.type == 'Debug' && github.event_name == 'pull_request')
         id: build
         shell: bash
         env:
