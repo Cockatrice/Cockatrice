@@ -1,9 +1,27 @@
-import { createStore, applyMiddleware } from 'redux';
-import thunk from 'redux-thunk';
+import { configureStore, isPlain } from '@reduxjs/toolkit';
+import { isMessage } from '@bufbuild/protobuf';
+import { useDispatch, useSelector } from 'react-redux';
 import rootReducer from './rootReducer';
 
-const initialState = {};
+// Protobuf-es v2 messages are plain objects with $typeName/$unknown siblings;
+// bytes fields are Uint8Array and int64/uint64 are BigInt. All four pass through.
+export function isSerializable(value: unknown): boolean {
+  return isPlain(value) || isMessage(value) || value instanceof Uint8Array || typeof value === 'bigint';
+}
 
-const middleware: any = [thunk];
+// Shared config between production store and renderWithProviders test harness.
+// Exporting ensures the test store tolerates the same proto actions as prod.
+export const storeMiddlewareOptions = {
+  immutableCheck: { warnAfter: 128 },
+  serializableCheck: { isSerializable, warnAfter: 128 },
+} as const;
 
-export const store = createStore(rootReducer, initialState, applyMiddleware(...middleware));
+export const store = configureStore({
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(storeMiddlewareOptions),
+});
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
+export const useAppSelector = useSelector.withTypes<RootState>();

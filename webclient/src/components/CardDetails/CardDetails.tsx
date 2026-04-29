@@ -1,7 +1,4 @@
-// eslint-disable-next-line
-import React, { useMemo, useState } from 'react';
-
-import { CardDTO } from 'services';
+import { CardDTO } from '@app/services';
 
 import Card from '../Card/Card';
 
@@ -11,7 +8,7 @@ interface CardProps {
   card: CardDTO;
 }
 
-// @TODO: add missing fields (loyalty, hand, etc)
+// @TODO add missing fields (loyalty, hand, etc)
 
 const CardDetails = ({ card }: CardProps) => {
   return (
@@ -33,7 +30,7 @@ const CardDetails = ({ card }: CardProps) => {
                 (!card.power && !card.toughness) ? null : (
                   <div className='cardDetails-attribute'>
                     <span className='cardDetails-attribute__label'>P/T:</span>
-                    <span className='cardDetails-attribute__value'>{card.power || 0}/{card.toughness || 0}</span>
+                    <span className='cardDetails-attribute__value'>{card.power ?? 0}/{card.toughness ?? 0}</span>
                   </div>
                 )
               }

@@ -1,87 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
-import { NavLink, useNavigate, generatePath } from 'react-router-dom';
+import { NavLink, generatePath } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CloseIcon from '@mui/icons-material/Close';
-import MailOutlineRoundedIcon from '@mui/icons-material/MailOutline';
+import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import * as _ from 'lodash';
 
-import { AuthenticationService, RoomsService } from 'api';
-import { CardImportDialog } from 'dialogs';
-import { Images } from 'images';
-import { RoomsSelectors, ServerSelectors } from 'store';
-import { Room, RouteEnum, User } from 'types';
+import { CardImportDialog } from '@app/dialogs';
+import { Images } from '@app/images';
+import { App } from '@app/types';
+
+import { useLeftNav } from './useLeftNav';
 
 import './LeftNav.css';
 
-const LeftNav = ({ joinedRooms, serverState, user }: LeftNavProps) => {
-  const navigate = useNavigate();
-  const [state, setState] = useState<LeftNavState>({
-    anchorEl: null,
-    showCardImportDialog: false,
-    options: [],
-  });
-
-  useEffect(() => {
-    let options: string[] = [
-      'Account',
-      'Replays',
-    ];
-
-    if (user && AuthenticationService.isModerator(user)) {
-      options = [
-        ...options,
-        'Administration',
-        'Logs'
-      ];
-    }
-
-    setState(s => ({ ...s, options }));
-  }, [user]);
-
-  const handleMenuOpen = (event) => {
-    setState(s => ({ ...s, anchorEl: event.target }));
-  }
-
-  const handleMenuItemClick = (option: string) => {
-    const route = RouteEnum[option.toUpperCase()];
-    navigate(generatePath(route));
-  }
-
-  const handleMenuClose = () => {
-    setState(s => ({ ...s, anchorEl: null }));
-  }
-
-  const leaveRoom = (event, roomId) => {
-    event.preventDefault();
-    RoomsService.leaveRoom(roomId);
-  };
-
-  const openImportCardWizard = () => {
-    setState(s => ({ ...s, showCardImportDialog: true }));
-    handleMenuClose();
-  }
-
-  const closeImportCardWizard = () => {
-    setState(s => ({ ...s, showCardImportDialog: false }));
-  }
+const LeftNav = () => {
+  const {
+    joinedRooms,
+    isConnected,
+    state,
+    handleMenuOpen,
+    handleMenuItemClick,
+    handleMenuClose,
+    leaveRoom,
+    openImportCardWizard,
+    closeImportCardWizard,
+  } = useLeftNav();
 
   return (
     <div className="LeftNav__container">
       <div>
         <div className="LeftNav__logo">
-          <NavLink to={RouteEnum.SERVER}>
+          <NavLink to={App.RouteEnum.SERVER}>
             <img src={Images.Logo} alt="logo" />
           </NavLink>
-          { AuthenticationService.isConnected(serverState) && (
+          {isConnected && (
             <span className="LeftNav-server__indicator"></span>
-          ) }
+          )}
         </div>
-        { AuthenticationService.isConnected(serverState) && (
+        {isConnected && (
           <div className="LeftNav-content">
             <nav className="LeftNav-nav">
               <nav className="LeftNav-nav__links">
@@ -90,20 +48,22 @@ const LeftNav = ({ joinedRooms, serverState, user }: LeftNavProps) => {
                     className="LeftNav-nav__link-btn"
                     to={
                       joinedRooms.length
-                        ? generatePath(RouteEnum.ROOM, { roomId: joinedRooms[0].roomId.toString() })
-                        : RouteEnum.SERVER
+                        ? generatePath(App.RouteEnum.ROOM, { roomId: joinedRooms[0].info.roomId.toString() })
+                        : App.RouteEnum.SERVER
                     }
                   >
                     Rooms
                     <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>
                   <div className="LeftNav-nav__link-menu">
-                    {joinedRooms.map(({ name, roomId }) => (
-                      <div className="LeftNav-nav__link-menu__item" key={roomId}>
-                        <NavLink className="LeftNav-nav__link-menu__btn" to={ generatePath(RouteEnum.ROOM, { roomId: roomId.toString() }) }>
-                          {name}
+                    {joinedRooms.map((room) => (
+                      <div className="LeftNav-nav__link-menu__item" key={room.info.roomId}>
+                        <NavLink className="LeftNav-nav__link-menu__btn"
+                          to={generatePath(App.RouteEnum.ROOM, { roomId: room.info.roomId.toString() })}
+                        >
+                          {room.info.name}
 
-                          <IconButton size="small" edge="end" onClick={event => leaveRoom(event, roomId)}>
+                          <IconButton size="small" edge="end" onClick={event => leaveRoom(event, room.info.roomId)}>
                             <CloseIcon style={{ fontSize: 10, color: 'white' }} />
                           </IconButton>
                         </NavLink>
@@ -112,13 +72,13 @@ const LeftNav = ({ joinedRooms, serverState, user }: LeftNavProps) => {
                   </div>
                 </div>
                 <div className="LeftNav-nav__link">
-                  <NavLink className="LeftNav-nav__link-btn" to={ RouteEnum.GAME }>
+                  <NavLink className="LeftNav-nav__link-btn" to={App.RouteEnum.GAME}>
                     Games
                     <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>
                 </div>
                 <div className="LeftNav-nav__link">
-                  <NavLink className="LeftNav-nav__link-btn" to={ RouteEnum.DECKS }>
+                  <NavLink className="LeftNav-nav__link-btn" to={App.RouteEnum.DECKS}>
                     Decks
                     <ArrowDropDownIcon className="LeftNav-nav__link-btn__icon" fontSize="small" />
                   </NavLink>
@@ -139,20 +99,22 @@ const LeftNav = ({ joinedRooms, serverState, user }: LeftNavProps) => {
                     keepMounted
                     open={!!state.anchorEl}
                     onClose={() => handleMenuClose()}
-                    PaperProps={{
-                      style: {
-                        marginTop: '32px',
-                        width: '20ch',
+                    slotProps={{
+                      paper: {
+                        style: {
+                          marginTop: '32px',
+                          width: '20ch',
+                        },
                       },
                     }}
                   >
                     {state.options.map((option) => (
-                      <MenuItem key={option} onClick={(event) => handleMenuItemClick(option)}>
-                        {option}
+                      <MenuItem key={option.label} onClick={() => handleMenuItemClick(option)}>
+                        {option.label}
                       </MenuItem>
                     ))}
 
-                    <MenuItem key='Import Cards' onClick={(event) => openImportCardWizard()}>
+                    <MenuItem key='Import Cards' onClick={() => openImportCardWizard()}>
                       Import Cards
                     </MenuItem>
                   </Menu>
@@ -160,7 +122,7 @@ const LeftNav = ({ joinedRooms, serverState, user }: LeftNavProps) => {
               </div>
             </nav>
           </div>
-        ) }
+        )}
       </div>
 
       <CardImportDialog
@@ -169,27 +131,6 @@ const LeftNav = ({ joinedRooms, serverState, user }: LeftNavProps) => {
       ></CardImportDialog>
     </div>
   );
-}
+};
 
-interface LeftNavProps {
-  serverState: number;
-  server: string;
-  user: User;
-  joinedRooms: Room[];
-  showNav?: boolean;
-}
-
-interface LeftNavState {
-  anchorEl: Element;
-  showCardImportDialog: boolean;
-  options: string[];
-}
-
-const mapStateToProps = state => ({
-  serverState: ServerSelectors.getState(state),
-  server: ServerSelectors.getName(state),
-  user: ServerSelectors.getUser(state),
-  joinedRooms: RoomsSelectors.getJoinedRooms(state),
-});
-
-export default connect(mapStateToProps)(LeftNav);
+export default LeftNav;

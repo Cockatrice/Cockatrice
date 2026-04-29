@@ -1,0 +1,29 @@
+.battlefield {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #0f1c38;
+  border: 1px solid #1a2b52;
+  box-sizing: border-box;
+}
+
+.battlefield__row {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.battlefield__row + .battlefield__row {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.battlefield__row--drop-over {
+  background: rgba(247, 176, 28, 0.08);
+  box-shadow: inset 0 0 0 2px rgba(247, 176, 28, 0.55);
+}

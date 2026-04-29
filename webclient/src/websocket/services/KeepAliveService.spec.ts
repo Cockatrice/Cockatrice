@@ -1,14 +1,19 @@
 import { KeepAliveService } from './KeepAliveService';
 
-import webClient from '../WebClient';
+type KeepAliveInternal = KeepAliveService & {
+  keepalivecb: NodeJS.Timeout;
+  lastPingPending: boolean;
+};
 
 describe('KeepAliveService', () => {
   let service: KeepAliveService;
+  let mockIsOpen: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
 
-    service = new KeepAliveService(webClient.socket);
+    mockIsOpen = vi.fn().mockReturnValue(true);
+    service = new KeepAliveService(mockIsOpen);
   });
 
   it('should create', () => {
@@ -20,49 +25,53 @@ describe('KeepAliveService', () => {
     let interval;
     let promise;
     let ping;
-    let checkReadyStateSpy;
 
     beforeEach(() => {
       interval = 100;
       promise = new Promise(resolve => resolvePing = resolve);
       ping = (done) => promise.then(done);
 
-      checkReadyStateSpy = jest.spyOn(webClient.socket, 'checkReadyState');
-      checkReadyStateSpy.mockImplementation(() => true);
-
       service.startPingLoop(interval, ping);
-      jest.advanceTimersByTime(interval);
+      vi.advanceTimersByTime(interval);
     });
 
     it('should start ping loop', () => {
-      expect((service as any).keepalivecb).toBeDefined();
-      expect((service as any).lastPingPending).toBeTruthy();
+      expect((service as KeepAliveInternal).keepalivecb).toBeDefined();
+      expect((service as KeepAliveInternal).lastPingPending).toBeTruthy();
     });
 
-    it('should call ping callback when done', (done: jest.DoneCallback) => {
+    it('should call ping callback when done', () => {
       resolvePing();
 
-      promise.then(() => {
-        expect((service as any).lastPingPending).toBeFalsy();
-        done();
+      return promise.then(() => {
+        expect((service as KeepAliveInternal).lastPingPending).toBeFalsy();
       });
     });
 
     it('should fire disconnected$ if lastPingPending is still true', () => {
-      jest.spyOn(service.disconnected$, 'next').mockImplementation(() => {});
-      jest.advanceTimersByTime(interval);
+      vi.spyOn(service.disconnected$, 'next').mockImplementation(() => {});
+      vi.advanceTimersByTime(interval);
 
       expect(service.disconnected$.next).toHaveBeenCalled();
     });
 
     it('should endPingLoop if socket is not open', () => {
-      jest.spyOn(service, 'endPingLoop').mockImplementation(() => {});
-      checkReadyStateSpy.mockImplementation(() => false);
+      vi.spyOn(service, 'endPingLoop').mockImplementation(() => {});
+      mockIsOpen.mockReturnValue(false);
 
       resolvePing();
-      jest.advanceTimersByTime(interval);
+      vi.advanceTimersByTime(interval);
 
       expect(service.endPingLoop).toHaveBeenCalled();
+    });
+
+    it('should clear previous interval when startPingLoop is called again', () => {
+      const clearSpy = vi.spyOn(globalThis, 'clearInterval');
+      const previousCb = (service as KeepAliveInternal).keepalivecb;
+
+      service.startPingLoop(interval, ping);
+
+      expect(clearSpy).toHaveBeenCalledWith(previousCb);
     });
   });
 });

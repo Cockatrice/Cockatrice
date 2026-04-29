@@ -1,10 +1,10 @@
-import { BackendService } from '../../services/BackendService';
-import { AdminPersistence } from '../../persistence';
-
+import { create } from '@bufbuild/protobuf';
+import { Command_UpdateServerMessage_ext, Command_UpdateServerMessageSchema } from '@app/generated';
+import { WebClient } from '../../WebClient';
 export function updateServerMessage(): void {
-  BackendService.sendAdminCommand('Command_UpdateServerMessage', {}, {
+  WebClient.instance.protobuf.sendAdminCommand(Command_UpdateServerMessage_ext, create(Command_UpdateServerMessageSchema), {
     onSuccess: () => {
-      AdminPersistence.updateServerMessage();
+      WebClient.instance.response.admin.updateServerMessage();
     },
   });
 }

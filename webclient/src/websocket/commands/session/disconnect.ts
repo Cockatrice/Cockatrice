@@ -1,5 +1,5 @@
-import webClient from '../../WebClient';
+import { WebClient } from '../../WebClient';
 
 export function disconnect(): void {
-  webClient.disconnect();
+  WebClient.instance.disconnect();
 }

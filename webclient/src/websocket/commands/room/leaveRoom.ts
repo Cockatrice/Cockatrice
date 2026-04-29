@@ -1,10 +1,12 @@
-import { BackendService } from '../../services/BackendService';
-import { RoomPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_LeaveRoom_ext, Command_LeaveRoomSchema } from '@app/generated';
 
 export function leaveRoom(roomId: number): void {
-  BackendService.sendRoomCommand(roomId, 'Command_LeaveRoom', {}, {
+  WebClient.instance.protobuf.sendRoomCommand(roomId, Command_LeaveRoom_ext, create(Command_LeaveRoomSchema), {
     onSuccess: () => {
-      RoomPersistence.leaveRoom(roomId);
+      WebClient.instance.response.room.leaveRoom(roomId);
     },
   });
 }

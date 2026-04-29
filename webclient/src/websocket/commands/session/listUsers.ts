@@ -1,11 +1,13 @@
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_ListUsers_ext, Command_ListUsersSchema, Response_ListUsers_ext } from '@app/generated';
 
 export function listUsers(): void {
-  BackendService.sendSessionCommand('Command_ListUsers', {}, {
-    responseName: 'Response_ListUsers',
+  WebClient.instance.protobuf.sendSessionCommand(Command_ListUsers_ext, create(Command_ListUsersSchema), {
+    responseExt: Response_ListUsers_ext,
     onSuccess: (response) => {
-      SessionPersistence.updateUsers(response.userList);
+      WebClient.instance.response.session.updateUsers(response.userList);
     },
   });
 }

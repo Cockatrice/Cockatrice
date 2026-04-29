@@ -1,6 +1,6 @@
-import { RoomPersistence } from '../../persistence';
-import { LeaveRoomData, RoomEvent } from './interfaces';
+import type { Event_LeaveRoom, RoomEvent } from '@app/generated';
+import { WebClient } from '../../WebClient';
 
-export function leaveRoom({ name }: LeaveRoomData, { roomEvent: { roomId } }: RoomEvent): void {
-  RoomPersistence.userLeft(roomId, name);
+export function leaveRoom({ name }: Event_LeaveRoom, { roomId }: RoomEvent): void {
+  WebClient.instance.response.room.userLeft(roomId, name);
 }

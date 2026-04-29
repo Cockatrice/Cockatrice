@@ -1,10 +1,18 @@
-import { StatusEnum, WebSocketConnectOptions } from 'types';
-import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
-import { ProtoController } from '../../services/ProtoController';
-import { hashPassword } from '../../utils';
-import { SessionPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+import {
+  Command_Login_ext,
+  Command_LoginSchema,
+  Response_Login_ext,
+  Response_ResponseCode,
+  type LoginParams,
+} from '@app/generated';
 
+import { StatusEnum } from '../../types/StatusEnum';
+import { CLIENT_CONFIG } from '../../config';
+import { WebClient } from '../../WebClient';
+import type { ConnectTarget } from '../../types/WebClientConfig';
+import { hashPassword } from '../../utils';
 import {
   disconnect,
   listUsers,
@@ -12,39 +20,34 @@ import {
   updateStatus,
 } from './';
 
-export function login(options: WebSocketConnectOptions, passwordSalt?: string): void {
-  const { userName, password, hashedPassword } = options;
+export function login(options: ConnectTarget & LoginParams, password?: string, passwordSalt?: string): void {
+  const { userName, hashedPassword } = options;
 
-  const loginConfig: any = {
-    ...webClient.clientConfig,
+  const loginConfig = {
+    ...CLIENT_CONFIG,
     clientid: 'webatrice',
     userName,
-  };
-
-  if (passwordSalt) {
-    loginConfig.hashedPassword = hashedPassword || hashPassword(passwordSalt, password);
-  } else {
-    loginConfig.password = password;
-  }
-
-  const { ResponseCode } = ProtoController.root.Response;
+    ...(passwordSalt
+      ? { hashedPassword: hashedPassword || hashPassword(passwordSalt, password) }
+      : { password }),
+  } satisfies MessageInitShape<typeof Command_LoginSchema>;
 
   const onLoginError = (message: string, extra?: () => void) => {
     updateStatus(StatusEnum.DISCONNECTED, message);
     extra?.();
-    SessionPersistence.loginFailed();
+    WebClient.instance.response.session.loginFailed();
     disconnect();
   };
 
-  BackendService.sendSessionCommand('Command_Login', loginConfig, {
-    responseName: 'Response_Login',
+  WebClient.instance.protobuf.sendSessionCommand(Command_Login_ext, create(Command_LoginSchema, loginConfig), {
+    responseExt: Response_Login_ext,
     onSuccess: (resp) => {
       const { buddyList, ignoreList, userInfo } = resp;
 
-      SessionPersistence.updateBuddyList(buddyList);
-      SessionPersistence.updateIgnoreList(ignoreList);
-      SessionPersistence.updateUser(userInfo);
-      SessionPersistence.loginSuccessful(loginConfig);
+      WebClient.instance.response.session.updateBuddyList(buddyList);
+      WebClient.instance.response.session.updateIgnoreList(ignoreList);
+      WebClient.instance.response.session.updateUser(userInfo);
+      WebClient.instance.response.session.loginSuccessful({ hashedPassword: loginConfig.hashedPassword });
 
       listUsers();
       listRooms();
@@ -52,25 +55,31 @@ export function login(options: WebSocketConnectOptions, passwordSalt?: string): 
       updateStatus(StatusEnum.LOGGED_IN, 'Logged in.');
     },
     onResponseCode: {
-      [ResponseCode.RespClientUpdateRequired]: () =>
+      [Response_ResponseCode.RespClientUpdateRequired]: () =>
         onLoginError('Login failed: missing features'),
-      [ResponseCode.RespWrongPassword]: () =>
+      [Response_ResponseCode.RespWrongPassword]: () =>
         onLoginError('Login failed: incorrect username or password'),
-      [ResponseCode.RespUsernameInvalid]: () =>
+      [Response_ResponseCode.RespUsernameInvalid]: () =>
         onLoginError('Login failed: incorrect username or password'),
-      [ResponseCode.RespWouldOverwriteOldSession]: () =>
+      [Response_ResponseCode.RespWouldOverwriteOldSession]: () =>
         onLoginError('Login failed: duplicated user session'),
-      [ResponseCode.RespUserIsBanned]: () =>
+      [Response_ResponseCode.RespUserIsBanned]: () =>
         onLoginError('Login failed: banned user'),
-      [ResponseCode.RespRegistrationRequired]: () =>
+      [Response_ResponseCode.RespRegistrationRequired]: () =>
         onLoginError('Login failed: registration required'),
-      [ResponseCode.RespClientIdRequired]: () =>
+      [Response_ResponseCode.RespClientIdRequired]: () =>
         onLoginError('Login failed: missing client ID'),
-      [ResponseCode.RespContextError]: () =>
+      [Response_ResponseCode.RespContextError]: () =>
         onLoginError('Login failed: server error'),
-      [ResponseCode.RespAccountNotActivated]: () =>
+      [Response_ResponseCode.RespAccountNotActivated]: () =>
         onLoginError('Login failed: account not activated',
-          () => SessionPersistence.accountAwaitingActivation(options)
+          () => {
+            WebClient.instance.response.session.accountAwaitingActivation({
+              host: options.host,
+              port: options.port,
+              userName: options.userName,
+            });
+          }
         ),
     },
     onError: (responseCode) =>

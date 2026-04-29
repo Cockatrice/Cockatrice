@@ -1,4 +1,6 @@
-import { BackendService } from '../../services/BackendService';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+import { Command_RoomSay_ext, Command_RoomSaySchema } from '@app/generated';
 
 export function roomSay(roomId: number, message: string): void {
   const trimmed = message.trim();
@@ -7,5 +9,5 @@ export function roomSay(roomId: number, message: string): void {
     return;
   }
 
-  BackendService.sendRoomCommand(roomId, 'Command_RoomSay', { message: trimmed }, {});
+  WebClient.instance.protobuf.sendRoomCommand(roomId, Command_RoomSay_ext, create(Command_RoomSaySchema, { message: trimmed }));
 }

@@ -1,0 +1,17 @@
+{
+  "SearchForm": {
+    "label": {
+      "userName": "Username",
+      "ipAddress": "IP Address",
+      "gameName": "Game Name",
+      "gameId": "GameID",
+      "message": "Message",
+      "rooms": "Rooms",
+      "games": "Games",
+      "chats": "Chats"
+    },
+    "button": {
+      "search": "Search Logs"
+    }
+  }
+}

@@ -1,12 +1,19 @@
 // Fetch and parse card sets
 
+import { App } from '@app/types';
+
 class CardImporterService {
-  importCards(url): Promise<any> {
+  importCards(url: string): Promise<{ cards: App.Card[]; sets: App.Set[] }> {
     const error = 'Card import must be in valid MTG JSON format';
 
     return fetch(url)
       .then(response => {
-        if (response.headers.get('Content-Type') !== 'application/json') {
+        if (!response.ok) {
+          throw new Error(error);
+        }
+
+        const contentType = response.headers.get('Content-Type') ?? '';
+        if (!contentType.includes('application/json')) {
           throw new Error(error);
         }
 
@@ -24,7 +31,7 @@ class CardImporterService {
             tokens: tokens.map(({ name }) => name),
           }));
 
-          const unsortedCards = sortedSets.reduce((acc, set) => {
+          const unsortedCards = sortedSets.reduce<Record<string, App.Card>>((acc, set) => {
             set.cards.forEach(card => acc[card.name] = card);
             return acc;
           }, {});
@@ -34,13 +41,13 @@ class CardImporterService {
             .map(key => unsortedCards[key]);
 
           return { cards, sets };
-        } catch (e) {
-          throw new Error(error);
+        } catch (err) {
+          throw new Error(error, { cause: err });
         }
       });
   }
 
-  importTokens(url): Promise<any> {
+  importTokens(url: string): Promise<Record<string, unknown>[]> {
     const error = 'Token import must be in valid MTG XML format';
 
     return fetch(url)
@@ -49,32 +56,36 @@ class CardImporterService {
           throw new Error('Failed to fetch');
         }
 
-        return response.text()
+        return response.text();
       })
       .then((xmlString) => {
         try {
           const parser = new DOMParser();
           const dom = parser.parseFromString(xmlString, 'application/xml');
 
+          if (dom.querySelector('parsererror')) {
+            throw new Error(error);
+          }
+
           const tokens = Array.from(dom.querySelectorAll('card')).map(
             (tokenElement) => this.parseXmlAttributes(tokenElement)
           );
 
           return tokens;
-        } catch (e) {
-          throw new Error(error);
+        } catch (err) {
+          throw new Error(error, { cause: err });
         }
-      })
+      });
   }
 
   private parseXmlAttributes(dom: Element) {
-    return Array.from(dom.children).reduce((attributes, child) => {
+    return Array.from(dom.children).reduce<Record<string, unknown>>((attributes, child) => {
       const value = child.children.length ? this.parseXmlAttributes(child) : child.innerHTML;
 
       let parsedAttributes = { value };
 
       if (child.attributes.length) {
-        const childAttributes = Array.from(child.attributes).reduce((acc, { name, value }) => {
+        const childAttributes = Array.from(child.attributes).reduce<Record<string, string>>((acc, { name, value }) => {
           acc[name] = value;
           return acc;
         }, {});
@@ -85,12 +96,12 @@ class CardImporterService {
         };
       }
 
-      // @TODO: clean this up and normalize what i'm returning
+      // @TODO clean this up and normalize what i'm returning
       if (attributes[child.tagName]) {
         if (Array.isArray(attributes[child.tagName])) {
-          attributes[child.tagName].push(parsedAttributes)
+          attributes[child.tagName].push(parsedAttributes);
         } else {
-          attributes[child.tagName] = [parsedAttributes];
+          attributes[child.tagName] = [attributes[child.tagName], parsedAttributes];
         }
       } else {
         attributes[child.tagName] = parsedAttributes;

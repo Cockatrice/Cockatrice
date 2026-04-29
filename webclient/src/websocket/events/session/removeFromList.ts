@@ -1,14 +1,14 @@
-import { SessionPersistence } from '../../persistence';
-import { RemoveFromListData } from './interfaces';
+import type { Event_RemoveFromList } from '@app/generated';
+import { WebClient } from '../../WebClient';
 
-export function removeFromList({ listName, userName }: RemoveFromListData): void {
+export function removeFromList({ listName, userName }: Event_RemoveFromList): void {
   switch (listName) {
     case 'buddy': {
-      SessionPersistence.removeFromBuddyList(userName);
+      WebClient.instance.response.session.removeFromBuddyList(userName);
       break;
     }
     case 'ignore': {
-      SessionPersistence.removeFromIgnoreList(userName);
+      WebClient.instance.response.session.removeFromIgnoreList(userName);
       break;
     }
     default: {

@@ -32,35 +32,9 @@ const palette = {
     A400: '#303030',
     A700: '#616161',
   },
-  // secondary: {
-  //   main: '',
-  //   light: '',
-  //   dark: '',
-  //   contrastText: '',
-  // },
-  // error: {
-  //   main: '',
-  //   light: '',
-  //   dark: '',
-  //   contrastText: '',
-  // },
-  // warning: {
-  //   main: '',
-  //   light: '',
-  //   dark: '',
-  //   contrastText: '',
-  // },
-  // info: {
-  //   main: '',
-  //   light: '',
-  //   dark: '',
-  //   contrastText: '',
-  // },
   success: {
     main: '#6CDF39',
     light: '#6CDF39',
-    // dark: '',
-    // contrastText: '',
   },
 };
 
@@ -68,13 +42,6 @@ export const materialTheme = createTheme({
   palette,
 
   components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        '@global': {
-          '@font-face': [],
-        },
-      },
-    },
     MuiButton: {
       styleOverrides: {
         root: {
@@ -201,10 +168,6 @@ export const materialTheme = createTheme({
       fontSize: 24,
       fontWeight: 'bold',
     },
-    // h3: {},
-    // h4: {},
-    // h5: {},
-    // h6: {},
     subtitle1: {
       fontSize: 14,
       fontWeight: 'bold',
@@ -219,10 +182,6 @@ export const materialTheme = createTheme({
       fontSize: '.75rem',
       lineHeight: 1.4,
     },
-    // body2: {},
-    // button: {},
-    // caption: {},
-    // overline: {},
   },
 
   spacing: 8,

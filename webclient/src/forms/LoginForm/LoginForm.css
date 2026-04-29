@@ -18,3 +18,9 @@
 .loginForm-submit {
   width: 100%;
 }
+
+.loginForm-loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}

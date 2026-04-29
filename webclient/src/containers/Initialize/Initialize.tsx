@@ -1,14 +1,13 @@
-import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { useTranslation, Trans } from 'react-i18next';
-import { connect } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 
-import { Images } from 'images';
-import { ServerSelectors } from 'store';
-import { RouteEnum } from 'types';
-import Layout from 'containers/Layout/Layout';
+import { Images } from '@app/images';
+import { ServerSelectors } from '@app/store';
+import { App } from '@app/types';
+import Layout from '../Layout/Layout';
+import { useAppSelector } from '@app/store';
 
 import './Initialize.css';
 
@@ -30,11 +29,12 @@ const Root = styled('div')(({ theme }) => ({
   }
 }));
 
-const Initialize = ({ initialized }: InitializeProps) => {
+const Initialize = () => {
+  const initialized = useAppSelector(state => ServerSelectors.getInitialized(state));
   const { t } = useTranslation();
 
   return initialized
-    ? <Navigate to={RouteEnum.LOGIN} />
+    ? <Navigate to={App.RouteEnum.LOGIN} />
     : (
       <Layout>
         <Root className={'Initialize ' + classes.root}>
@@ -60,12 +60,4 @@ const Initialize = ({ initialized }: InitializeProps) => {
     );
 }
 
-interface InitializeProps {
-  initialized: boolean;
-}
-
-const mapStateToProps = state => ({
-  initialized: ServerSelectors.getInitialized(state),
-});
-
-export default connect(mapStateToProps)(Initialize);
+export default Initialize;

@@ -1,3 +1,5 @@
+export type { FormErrors } from './types';
+
 export { default as AccountActivationForm } from './AccountActivationForm/AccountActivationForm';
 export { default as CardImportForm } from './CardImportForm/CardImportForm';
 export { default as LoginForm } from './LoginForm/LoginForm';

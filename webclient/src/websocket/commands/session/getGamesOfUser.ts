@@ -1,11 +1,13 @@
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_GetGamesOfUser_ext, Command_GetGamesOfUserSchema, Response_GetGamesOfUser_ext } from '@app/generated';
 
 export function getGamesOfUser(userName: string): void {
-  BackendService.sendSessionCommand('Command_GetGamesOfUser', { userName }, {
-    responseName: 'Response_GetGamesOfUser',
+  WebClient.instance.protobuf.sendSessionCommand(Command_GetGamesOfUser_ext, create(Command_GetGamesOfUserSchema, { userName }), {
+    responseExt: Response_GetGamesOfUser_ext,
     onSuccess: (response) => {
-      SessionPersistence.getGamesOfUser(userName, response);
+      WebClient.instance.response.session.getGamesOfUser(userName, response);
     },
   });
 }

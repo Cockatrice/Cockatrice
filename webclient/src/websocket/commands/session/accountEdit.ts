@@ -1,10 +1,13 @@
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_AccountEdit_ext, Command_AccountEditSchema } from '@app/generated';
 
 export function accountEdit(passwordCheck: string, realName?: string, email?: string, country?: string): void {
-  BackendService.sendSessionCommand('Command_AccountEdit', { passwordCheck, realName, email, country }, {
+  const cmd = create(Command_AccountEditSchema, { passwordCheck, realName, email, country });
+  WebClient.instance.protobuf.sendSessionCommand(Command_AccountEdit_ext, cmd, {
     onSuccess: () => {
-      SessionPersistence.accountEditChanged(realName, email, country);
+      WebClient.instance.response.session.accountEditChanged(realName, email, country);
     },
   });
 }

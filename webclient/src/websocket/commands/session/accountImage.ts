@@ -1,10 +1,12 @@
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_AccountImage_ext, Command_AccountImageSchema } from '@app/generated';
 
 export function accountImage(image: Uint8Array): void {
-  BackendService.sendSessionCommand('Command_AccountImage', { image }, {
+  WebClient.instance.protobuf.sendSessionCommand(Command_AccountImage_ext, create(Command_AccountImageSchema, { image }), {
     onSuccess: () => {
-      SessionPersistence.accountImageChanged(image);
+      WebClient.instance.response.session.accountImageChanged(image);
     },
   });
 }

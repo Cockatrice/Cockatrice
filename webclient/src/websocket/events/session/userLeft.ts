@@ -1,6 +1,6 @@
-import { SessionPersistence } from '../../persistence';
-import { UserLeftData } from './interfaces';
+import type { Event_UserLeft } from '@app/generated';
+import { WebClient } from '../../WebClient';
 
-export function userLeft({ name }: UserLeftData): void {
-  SessionPersistence.userLeft(name);
+export function userLeft({ name }: Event_UserLeft): void {
+  WebClient.instance.response.session.userLeft(name);
 }

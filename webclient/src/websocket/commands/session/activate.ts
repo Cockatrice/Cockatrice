@@ -1,31 +1,39 @@
-import { AccountActivationParams } from 'store';
-import { StatusEnum, WebSocketConnectOptions } from 'types';
+import { create } from '@bufbuild/protobuf';
+import {
+  Command_Activate_ext,
+  Command_ActivateSchema,
+  Response_ResponseCode,
+  type ActivateParams,
+} from '@app/generated';
 
-import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
-import { ProtoController } from '../../services/ProtoController';
-import { SessionPersistence } from '../../persistence';
-
+import { StatusEnum } from '../../types/StatusEnum';
+import { CLIENT_CONFIG } from '../../config';
+import { WebClient } from '../../WebClient';
+import type { ConnectTarget } from '../../types/WebClientConfig';
 import { disconnect, login, updateStatus } from './';
 
-export function activate(options: WebSocketConnectOptions, passwordSalt?: string): void {
-  const { userName, token } = options as unknown as AccountActivationParams;
+export function activate(options: ConnectTarget & ActivateParams, password?: string, passwordSalt?: string): void {
+  const { userName, token } = options;
 
-  BackendService.sendSessionCommand('Command_Activate', {
-    ...webClient.clientConfig,
+  WebClient.instance.protobuf.sendSessionCommand(Command_Activate_ext, create(Command_ActivateSchema, {
+    ...CLIENT_CONFIG,
     userName,
     token,
-  }, {
+  }), {
     onResponseCode: {
-      [ProtoController.root.Response.ResponseCode.RespActivationAccepted]: () => {
-        SessionPersistence.accountActivationSuccess();
-        login(options, passwordSalt);
+      [Response_ResponseCode.RespActivationAccepted]: () => {
+        WebClient.instance.response.session.accountActivationSuccess();
+        login({
+          host: options.host,
+          port: options.port,
+          userName: options.userName,
+        }, password, passwordSalt);
       },
     },
     onError: () => {
       updateStatus(StatusEnum.DISCONNECTED, 'Account Activation Failed');
       disconnect();
-      SessionPersistence.accountActivationFailed();
+      WebClient.instance.response.session.accountActivationFailed();
     },
   });
 }

@@ -1,34 +1,33 @@
-// eslint-disable-next-line
-import React from "react";
-
-import { FixedSizeList as List } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
+import { ReactNode } from 'react';
+import { List, RowComponentProps } from 'react-window';
 
 import './VirtualList.css';
 
-const VirtualList = ({ items, itemKey, className = {}, size = 30 }) => (
-  <div className="virtual-list">
-    <AutoSizer>
-      {({ height, width }) => (
-        <List
-          className={`virtual-list__list ${className}`}
-          height={height}
-          width={width}
-          itemData={items}
-          itemCount={items.length}
-          itemSize={size}
-          itemKey={itemKey}
-        >
-          {Row}
-        </List>
-      )}
-    </AutoSizer>
+interface RowData {
+  items: ReactNode[];
+}
+
+interface VirtualListProps {
+  items: ReactNode[];
+  className?: string;
+  size?: number;
+}
+
+const Row = ({ index, style, items }: RowComponentProps<RowData>) => (
+  <div style={style}>
+    {items[index]}
   </div>
 );
 
-const Row = ({ data, index, style }) => (
-  <div style={style}>
-    {data[index]}
+const VirtualList = ({ items, className = '', size = 30 }: VirtualListProps) => (
+  <div className="virtual-list">
+    <List<RowData>
+      className={`virtual-list__list ${className}`}
+      rowCount={items.length}
+      rowHeight={size}
+      rowComponent={Row}
+      rowProps={{ items }}
+    />
   </div>
 );
 

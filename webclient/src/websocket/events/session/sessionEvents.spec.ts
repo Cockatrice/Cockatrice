@@ -1,0 +1,481 @@
+// Tests for simple session events that delegate 1:1 to SessionPersistence
+// or RoomPersistence with minimal logic.
+
+vi.mock('../../WebClient');
+
+vi.mock('../../config', () => ({
+  CLIENT_OPTIONS: { autojoinrooms: false },
+  PROTOCOL_VERSION: 14,
+}));
+
+vi.mock('../../commands/session', () => ({
+  joinRoom: vi.fn(),
+  updateStatus: vi.fn(),
+  disconnect: vi.fn(),
+  login: vi.fn(),
+  register: vi.fn(),
+  activate: vi.fn(),
+  forgotPasswordRequest: vi.fn(),
+  forgotPasswordChallenge: vi.fn(),
+  forgotPasswordReset: vi.fn(),
+  requestPasswordSalt: vi.fn(),
+}));
+
+vi.mock('../../utils', () => ({
+  sanitizeHtml: vi.fn((msg: string) => msg),
+  generateSalt: vi.fn().mockReturnValue('randSalt'),
+  passwordSaltSupported: vi.fn().mockReturnValue(0),
+}));
+
+vi.mock('../../utils/connectionState', () => ({
+  consumePendingOptions: vi.fn().mockReturnValue(null),
+}));
+
+import {
+  Event_AddToListSchema,
+  Event_ConnectionClosedSchema,
+  Event_ConnectionClosed_CloseReason,
+  Event_GameJoinedSchema,
+  Event_ListRoomsSchema,
+  Event_NotifyUserSchema,
+  Event_RemoveFromListSchema,
+  Event_ReplayAddedSchema,
+  Event_ServerCompleteListSchema,
+  Event_ServerIdentificationSchema,
+  Event_ServerMessageSchema,
+  Event_ServerShutdownSchema,
+  Event_UserJoinedSchema,
+  Event_UserLeftSchema,
+  Event_UserMessageSchema,
+  ServerInfo_ReplayMatchSchema,
+  ServerInfo_RoomSchema,
+  ServerInfo_UserSchema,
+} from '@app/generated';
+import { create } from '@bufbuild/protobuf';
+
+import { WebClient } from '../../WebClient';
+import * as Config from '../../config';
+import * as SessionCmds from '../../commands/session';
+import { consumePendingOptions } from '../../utils/connectionState';
+import { passwordSaltSupported } from '../../utils';
+import { WebSocketConnectReason } from '../../types/ConnectOptions';
+import { StatusEnum } from '../../types/StatusEnum';
+import { Mock } from 'vitest';
+import { gameJoined } from './gameJoined';
+import { notifyUser } from './notifyUser';
+import { replayAdded } from './replayAdded';
+import { serverCompleteList } from './serverCompleteList';
+import { serverMessage } from './serverMessage';
+import { serverShutdown } from './serverShutdown';
+import { userJoined } from './userJoined';
+import { userLeft } from './userLeft';
+import { userMessage } from './userMessage';
+import { addToList } from './addToList';
+import { removeFromList } from './removeFromList';
+import { listRooms } from './listRooms';
+import { connectionClosed } from './connectionClosed';
+import { serverIdentification } from './serverIdentification';
+
+const ConfigMock = Config as { -readonly [K in keyof typeof Config]: (typeof Config)[K] };
+
+describe('gameJoined', () => {
+
+  it('calls WebClient.instance.response.session.gameJoined', () => {
+    const data = create(Event_GameJoinedSchema, { playerId: 1 });
+    gameJoined(data);
+    expect(WebClient.instance.response.session.gameJoined).toHaveBeenCalledWith(data);
+  });
+});
+
+describe('notifyUser', () => {
+
+  it('calls WebClient.instance.response.session.notifyUser', () => {
+    const data = create(Event_NotifyUserSchema, { warningReason: 'yo' });
+    notifyUser(data);
+    expect(WebClient.instance.response.session.notifyUser).toHaveBeenCalledWith(data);
+  });
+});
+
+describe('replayAdded', () => {
+
+  it('calls WebClient.instance.response.session.replayAdded with matchInfo', () => {
+    const data = create(Event_ReplayAddedSchema, {
+      matchInfo: create(ServerInfo_ReplayMatchSchema, { gameId: 42 }),
+    });
+    replayAdded(data);
+    expect(WebClient.instance.response.session.replayAdded).toHaveBeenCalledWith(data.matchInfo);
+  });
+});
+
+describe('serverCompleteList', () => {
+
+  it('calls WebClient.instance.response.session.updateUsers and WebClient.instance.response.room.updateRooms', () => {
+    const data = create(Event_ServerCompleteListSchema, { userList: [], roomList: [] });
+    serverCompleteList(data);
+    expect(WebClient.instance.response.session.updateUsers).toHaveBeenCalledWith(data.userList);
+    expect(WebClient.instance.response.room.updateRooms).toHaveBeenCalledWith(data.roomList);
+  });
+});
+
+describe('serverMessage', () => {
+
+  it('calls WebClient.instance.response.session.serverMessage with message', () => {
+    serverMessage(create(Event_ServerMessageSchema, { message: 'hello server' }));
+    expect(WebClient.instance.response.session.serverMessage).toHaveBeenCalledWith('hello server');
+  });
+});
+
+describe('serverShutdown', () => {
+
+  it('calls WebClient.instance.response.session.serverShutdown', () => {
+    const payload = create(Event_ServerShutdownSchema, { reason: 'maintenance' });
+    serverShutdown(payload);
+    expect(WebClient.instance.response.session.serverShutdown).toHaveBeenCalledWith(payload);
+  });
+});
+
+describe('userJoined', () => {
+
+  it('calls WebClient.instance.response.session.userJoined with userInfo', () => {
+    const data = create(Event_UserJoinedSchema, {
+      userInfo: create(ServerInfo_UserSchema, { name: 'alice' }),
+    });
+    userJoined(data);
+    expect(WebClient.instance.response.session.userJoined).toHaveBeenCalledWith(data.userInfo);
+  });
+});
+
+describe('userLeft', () => {
+
+  it('calls WebClient.instance.response.session.userLeft with name', () => {
+    userLeft(create(Event_UserLeftSchema, { name: 'bob' }));
+    expect(WebClient.instance.response.session.userLeft).toHaveBeenCalledWith('bob');
+  });
+});
+
+describe('userMessage', () => {
+
+  it('calls WebClient.instance.response.session.userMessage', () => {
+    const payload = create(Event_UserMessageSchema, { senderName: 'alice', message: 'hi' });
+    userMessage(payload);
+    expect(WebClient.instance.response.session.userMessage).toHaveBeenCalledWith(payload);
+  });
+});
+
+describe('addToList', () => {
+  let logSpy: ReturnType<typeof vi.spyOn>;
+  beforeEach(() => {
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+  });
+  afterEach(() => {
+    logSpy.mockRestore();
+  });
+
+  it('buddy list → addToBuddyList', () => {
+    const data = create(Event_AddToListSchema, {
+      listName: 'buddy',
+      userInfo: create(ServerInfo_UserSchema, { name: 'alice' }),
+    });
+    addToList(data);
+    expect(WebClient.instance.response.session.addToBuddyList).toHaveBeenCalledWith(data.userInfo);
+  });
+
+  it('ignore list → addToIgnoreList', () => {
+    const data = create(Event_AddToListSchema, {
+      listName: 'ignore',
+      userInfo: create(ServerInfo_UserSchema, { name: 'bob' }),
+    });
+    addToList(data);
+    expect(WebClient.instance.response.session.addToIgnoreList).toHaveBeenCalledWith(data.userInfo);
+  });
+
+  it('unknown list → console.log', () => {
+    addToList(create(Event_AddToListSchema, { listName: 'unknown' }));
+    expect(logSpy).toHaveBeenCalled();
+  });
+});
+
+describe('removeFromList', () => {
+
+  it('buddy list → removeFromBuddyList', () => {
+    removeFromList(create(Event_RemoveFromListSchema, { listName: 'buddy', userName: 'alice' }));
+    expect(WebClient.instance.response.session.removeFromBuddyList).toHaveBeenCalledWith('alice');
+  });
+
+  it('ignore list → removeFromIgnoreList', () => {
+    removeFromList(create(Event_RemoveFromListSchema, { listName: 'ignore', userName: 'bob' }));
+    expect(WebClient.instance.response.session.removeFromIgnoreList).toHaveBeenCalledWith('bob');
+  });
+
+  it('unknown list → console.log', () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    removeFromList(create(Event_RemoveFromListSchema, { listName: 'other', userName: 'x' }));
+    expect(logSpy).toHaveBeenCalled();
+    logSpy.mockRestore();
+  });
+});
+
+describe('listRooms', () => {
+
+  it('calls WebClient.instance.response.room.updateRooms', () => {
+    listRooms(create(Event_ListRoomsSchema, { roomList: [] }));
+    expect(WebClient.instance.response.room.updateRooms).toHaveBeenCalledWith([]);
+  });
+
+  it('does not call joinRoom when autojoinrooms is false', () => {
+    ConfigMock.CLIENT_OPTIONS = { autojoinrooms: false };
+    listRooms(create(Event_ListRoomsSchema, {
+      roomList: [create(ServerInfo_RoomSchema, { autoJoin: true, roomId: 1 })]
+    }));
+    expect(SessionCmds.joinRoom).not.toHaveBeenCalled();
+  });
+
+  it('calls joinRoom for autoJoin rooms when autojoinrooms is true', () => {
+    ConfigMock.CLIENT_OPTIONS = { autojoinrooms: true };
+    listRooms(create(Event_ListRoomsSchema, {
+      roomList: [
+        create(ServerInfo_RoomSchema, { autoJoin: true, roomId: 2 }),
+        create(ServerInfo_RoomSchema, { autoJoin: false, roomId: 3 })
+      ]
+    }));
+    expect(SessionCmds.joinRoom).toHaveBeenCalledTimes(1);
+    expect(SessionCmds.joinRoom).toHaveBeenCalledWith(2);
+  });
+});
+
+describe('connectionClosed', () => {
+
+  it('uses reasonStr when provided', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: 0, reasonStr: 'custom' }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'custom');
+  });
+
+  it('USER_LIMIT_REACHED → specific message', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: Event_ConnectionClosed_CloseReason.USER_LIMIT_REACHED }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining('maximum user capacity')
+    );
+  });
+
+  it('TOO_MANY_CONNECTIONS → specific message', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: Event_ConnectionClosed_CloseReason.TOO_MANY_CONNECTIONS }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('too many concurrent'));
+  });
+
+  it('BANNED → specific message', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: Event_ConnectionClosed_CloseReason.BANNED }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
+  });
+
+  it('DEMOTED → specific message', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: Event_ConnectionClosed_CloseReason.DEMOTED }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('demoted'));
+  });
+
+  it('SERVER_SHUTDOWN → specific message', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: Event_ConnectionClosed_CloseReason.SERVER_SHUTDOWN }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('shutdown'));
+  });
+
+  it('USERNAMEINVALID → specific message', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: Event_ConnectionClosed_CloseReason.USERNAMEINVALID }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('username'));
+  });
+
+  it('LOGGEDINELSEWERE → specific message', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: Event_ConnectionClosed_CloseReason.LOGGEDINELSEWERE }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('logged out'));
+  });
+
+  it('OTHER → "Unknown reason"', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: Event_ConnectionClosed_CloseReason.OTHER }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'Unknown reason');
+  });
+
+  it('BANNED with valid positive endTime → shows formatted date', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, {
+      reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: 1700000000,
+    }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining('You are banned until')
+    );
+  });
+
+  it('BANNED with endTime = 0 → shows generic banned message', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: 0 }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
+  });
+
+  it('BANNED with endTime = -1 → shows generic banned message', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: -1 }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
+  });
+
+  it('BANNED with endTime = NaN → shows generic banned message', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, { reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: NaN }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
+  });
+
+  it('BANNED with endTime = Infinity → shows generic banned message', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema, {
+      reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: Infinity,
+    }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'You are banned');
+  });
+
+  it('BANNED with reasonStr → uses reasonStr regardless of endTime', () => {
+    connectionClosed(create(Event_ConnectionClosedSchema,
+      { reason: Event_ConnectionClosed_CloseReason.BANNED, endTime: 0, reasonStr: 'custom ban reason' }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(expect.anything(), 'custom ban reason');
+  });
+});
+
+describe('serverIdentification', () => {
+  const makeInfo = (overrides: Record<string, unknown> = {}) =>
+    create(Event_ServerIdentificationSchema, {
+      serverName: 'TestServer',
+      serverVersion: '1.0',
+      protocolVersion: 14,
+      serverOptions: 0,
+      ...overrides,
+    });
+
+  const makeLoginOptions = () => ({
+    host: 'h', port: '1', userName: 'alice', password: 'pw',
+    reason: WebSocketConnectReason.LOGIN as const,
+  });
+
+  beforeEach(() => {
+    (consumePendingOptions as Mock).mockReturnValue(null);
+    (passwordSaltSupported as Mock).mockReturnValue(0);
+  });
+
+  it('disconnects on protocol version mismatch', () => {
+    serverIdentification(makeInfo({ protocolVersion: 99 }));
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, expect.stringContaining('Protocol version mismatch'));
+    expect(SessionCmds.disconnect).toHaveBeenCalled();
+    expect(WebClient.instance.response.session.updateInfo).not.toHaveBeenCalled();
+  });
+
+  it('disconnects when pending options are missing', () => {
+    serverIdentification(makeInfo());
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(StatusEnum.DISCONNECTED, 'Missing connection options');
+    expect(SessionCmds.disconnect).toHaveBeenCalled();
+    expect(WebClient.instance.response.session.updateInfo).not.toHaveBeenCalled();
+  });
+
+  it('LOGIN → calls login without salt when server does not support it', () => {
+    const opts = makeLoginOptions();
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.updateStatus).toHaveBeenCalledWith(StatusEnum.LOGGING_IN, 'Logging In...');
+    expect(SessionCmds.login).toHaveBeenCalledWith(expect.objectContaining({ userName: 'alice' }), 'pw');
+    expect(WebClient.instance.response.session.updateInfo).toHaveBeenCalledWith('TestServer', '1.0');
+  });
+
+  it('LOGIN → calls requestPasswordSalt when server supports it', () => {
+    const opts = makeLoginOptions();
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    (passwordSaltSupported as Mock).mockReturnValue(1);
+    serverIdentification(makeInfo({ serverOptions: 1 }));
+    expect(SessionCmds.requestPasswordSalt).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice' }),
+      expect.any(Function),
+      expect.any(Function),
+    );
+  });
+
+  it('REGISTER → calls register', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', password: 'pw',
+      email: 'a@b.com', country: 'US', realName: 'Al',
+      reason: WebSocketConnectReason.REGISTER as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.register).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice' }), 'pw', null,
+    );
+  });
+
+  it('REGISTER with password salt → passes generated salt', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', password: 'pw',
+      email: 'a@b.com', country: 'US', realName: 'Al',
+      reason: WebSocketConnectReason.REGISTER as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    (passwordSaltSupported as Mock).mockReturnValue(1);
+    serverIdentification(makeInfo({ serverOptions: 1 }));
+    expect(SessionCmds.register).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice' }), 'pw', 'randSalt',
+    );
+  });
+
+  it('ACTIVATE_ACCOUNT → calls activate', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', token: 'tok', password: 'pw',
+      reason: WebSocketConnectReason.ACTIVATE_ACCOUNT as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.activate).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice', token: 'tok' }), 'pw',
+    );
+  });
+
+  it('PASSWORD_RESET_REQUEST → calls forgotPasswordRequest', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice',
+      reason: WebSocketConnectReason.PASSWORD_RESET_REQUEST as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.forgotPasswordRequest).toHaveBeenCalledWith(opts);
+  });
+
+  it('PASSWORD_RESET_CHALLENGE → calls forgotPasswordChallenge', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', email: 'a@b.com',
+      reason: WebSocketConnectReason.PASSWORD_RESET_CHALLENGE as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.forgotPasswordChallenge).toHaveBeenCalledWith(opts);
+  });
+
+  it('PASSWORD_RESET → calls forgotPasswordReset without salt', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', token: 'tok', newPassword: 'newpw',
+      reason: WebSocketConnectReason.PASSWORD_RESET as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    serverIdentification(makeInfo());
+    expect(SessionCmds.forgotPasswordReset).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice', token: 'tok' }), 'newpw',
+    );
+  });
+
+  it('PASSWORD_RESET with salt → calls requestPasswordSalt', () => {
+    const opts = {
+      host: 'h', port: '1', userName: 'alice', token: 'tok', newPassword: 'newpw',
+      reason: WebSocketConnectReason.PASSWORD_RESET as const,
+    };
+    (consumePendingOptions as Mock).mockReturnValue(opts);
+    (passwordSaltSupported as Mock).mockReturnValue(1);
+    serverIdentification(makeInfo({ serverOptions: 1 }));
+    expect(SessionCmds.requestPasswordSalt).toHaveBeenCalledWith(
+      expect.objectContaining({ userName: 'alice' }),
+      expect.any(Function),
+      expect.any(Function),
+    );
+  });
+
+  it('always calls updateInfo after successful routing', () => {
+    (consumePendingOptions as Mock).mockReturnValue(makeLoginOptions());
+    serverIdentification(makeInfo());
+    expect(WebClient.instance.response.session.updateInfo).toHaveBeenCalledWith('TestServer', '1.0');
+  });
+});

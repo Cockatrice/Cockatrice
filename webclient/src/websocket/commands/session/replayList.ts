@@ -1,11 +1,13 @@
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_ReplayList_ext, Command_ReplayListSchema, Response_ReplayList_ext } from '@app/generated';
 
 export function replayList(): void {
-  BackendService.sendSessionCommand('Command_ReplayList', {}, {
-    responseName: 'Response_ReplayList',
+  WebClient.instance.protobuf.sendSessionCommand(Command_ReplayList_ext, create(Command_ReplayListSchema), {
+    responseExt: Response_ReplayList_ext,
     onSuccess: (response) => {
-      SessionPersistence.replayList(response.matchList);
+      WebClient.instance.response.session.replayList(response.matchList);
     },
   });
 }

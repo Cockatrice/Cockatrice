@@ -1,96 +1,68 @@
-import {
-  WarnHistoryItem, BanHistoryItem, DeckList, LogItem, ReplayMatch, SortBy, User, UserSortField, WebSocketConnectOptions, WarnListItem
-} from 'types';
-import { NotifyUserData, ServerShutdownData, UserMessageData } from 'websocket/events/session/interfaces';
+import { App, Data, Enriched } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 
-export interface ServerConnectParams {
-  host: string;
-  port: string;
-  userName: string;
-  password: string;
-}
-
-export interface ServerRegisterParams {
-  host: string;
-  port: string;
-  userName: string;
-  password: string;
-  email: string;
-  country: string;
-  realName: string;
-}
-
-export interface RequestPasswordSaltParams {
-  userName: string;
-}
-
-export interface ForgotPasswordParams {
-  userName: string;
-}
-
-export interface ForgotPasswordChallengeParams extends ForgotPasswordParams {
-  email: string;
-}
-
-export interface ForgotPasswordResetParams extends ForgotPasswordParams {
-  token: string;
-  newPassword: string;
-}
-
-export interface AccountActivationParams extends ServerRegisterParams {
-  token: string;
-}
+export type TestConnectionStatus = 'testing' | 'success' | 'failed' | null;
 
 export interface ServerState {
   initialized: boolean;
-  buddyList: User[];
-  ignoreList: User[];
+  /** Lifecycle of the most recent test connection — drives Login button + hashed-password UI gates. */
+  testConnectionStatus: TestConnectionStatus;
+  /** Buddies keyed by username for O(1) lookup. Use `getSortedBuddyList` for display. */
+  buddyList: { [userName: string]: Data.ServerInfo_User };
+  /** Ignored users keyed by username for O(1) lookup. Use `getSortedIgnoreList` for display. */
+  ignoreList: { [userName: string]: Data.ServerInfo_User };
   info: ServerStateInfo;
   status: ServerStateStatus;
   logs: ServerStateLogs;
-  user: User;
-  users: User[];
+  user: Data.ServerInfo_User | null;
+  /** Connected users keyed by username for O(1) lookup. Use `getSortedUsers` for display. */
+  users: { [userName: string]: Data.ServerInfo_User };
   sortUsersBy: ServerStateSortUsersBy;
-  connectOptions: WebSocketConnectOptions;
   messages: {
-    [userName: string]: UserMessageData[];
-  }
+    [userName: string]: Data.Event_UserMessage[];
+  };
   userInfo: {
-    [userName: string]: User;
-  }
-  notifications: NotifyUserData[];
-  serverShutdown: ServerShutdownData;
+    [userName: string]: Data.ServerInfo_User;
+  };
+  notifications: Data.Event_NotifyUser[];
+  serverShutdown: Data.Event_ServerShutdown | null;
   banUser: string;
   banHistory: {
-    [userName: string]: BanHistoryItem[];
+    [userName: string]: Data.ServerInfo_Ban[];
   };
   warnHistory: {
-    [userName: string]: WarnHistoryItem[];
+    [userName: string]: Data.ServerInfo_Warning[];
   };
-  warnListOptions: WarnListItem[];
+  warnListOptions: Data.Response_WarnList[];
   warnUser: string;
   adminNotes: { [userName: string]: string };
-  replays: ReplayMatch[];
-  backendDecks: DeckList | null;
+  /** Replays keyed by gameId for O(1) lookup/update. */
+  replays: { [gameId: number]: Data.ServerInfo_ReplayMatch };
+  backendDecks: Data.Response_DeckList | null;
+  downloadedDeck: { deckId: number; deck: string } | null;
+  downloadedReplay: { replayId: number; replayData: Uint8Array } | null;
+  gamesOfUser: { [userName: string]: { [gameId: number]: Enriched.Game } };
+  registrationError: string | null;
 }
 
 export interface ServerStateStatus {
-  description: string;
-  state: number;
+  connectionAttemptMade: boolean;
+  description: string | null;
+  state: WebsocketTypes.StatusEnum;
 }
 
 export interface ServerStateInfo {
-  message: string;
-  name: string;
-  version: string;
+  message: string | null;
+  name: string | null;
+  version: string | null;
 }
 
 export interface ServerStateLogs {
-  room: LogItem[];
-  game: LogItem[];
-  chat: LogItem[];
+  room: Data.ServerInfo_ChatMessage[];
+  game: Data.ServerInfo_ChatMessage[];
+  chat: Data.ServerInfo_ChatMessage[];
 }
 
-export interface ServerStateSortUsersBy extends SortBy {
-  field: UserSortField
+export interface ServerStateSortUsersBy extends App.SortBy {
+  field: App.UserSortField;
 }

@@ -1,0 +1,123 @@
+---
+config:
+  layout: elk
+  theme: base
+  themeVariables:
+    background: "#ffffff"
+    primaryColor: "#ffffff"
+    primaryBorderColor: "#1f2937"
+    primaryTextColor: "#0b1220"
+    lineColor: "#1f2937"
+    textColor: "#0b1220"
+    edgeLabelBackground: "#ffffff"
+    fontSize: "20px"
+    clusterBkg: "#fafafa"
+    clusterBorder: "#9ca3af"
+  flowchart:
+    htmlLabels: true
+    curve: basis
+    nodeSpacing: 60
+    rankSpacing: 90
+---
+flowchart LR
+    %% =========================================================
+    %% Left bookend — browser-side Application
+    %% =========================================================
+    subgraph LBE["<b>Application</b>"]
+      direction TB
+      UI["<b>UI</b><br/><span style='font-size:15px'>containers · components<br/>forms · dialogs</span>"]
+      Hooks["<b>hooks/</b><br/><span style='font-size:15px'>useWebClient · useAutoLogin<br/>useSettings · useKnownHosts</span>"]
+      Store[("<b>@app/store</b><br/><span style='font-size:15px'>server · rooms · game<br/>actions · common</span>")]
+      DTOs["<b>dexie DTOs</b><br/><span style='font-size:15px'>Card · Host · Set<br/>Setting · Token</span>"]
+      IDB[("<b>IndexedDB</b>")]
+    end
+
+    %% =========================================================
+    %% Racetrack — three lanes: outbound / transport / inbound
+    %% =========================================================
+    subgraph RACE[" "]
+      direction TB
+
+      subgraph TOP["<b>Outbound lane</b>"]
+        direction LR
+        Req["<b>src/api/request/</b><br/><span style='font-size:15px'>Authentication · Session · Rooms<br/>Game · Admin · Moderator</span>"]
+        Cmds["<b>commands/</b><br/><span style='font-size:15px'>session · room · game<br/>admin · moderator</span>"]
+      end
+
+      subgraph MID["<b>Transport</b>"]
+        direction LR
+        Provider["<b>WebClientProvider</b>"]
+        WC[["<b>WebClient</b><br/><span style='font-size:15px'>singleton · request · response</span>"]]
+        Svc["<b>services/</b><br/><span style='font-size:15px'>ProtobufService · WebSocketService<br/>KeepAliveService · command-options</span>"]
+      end
+
+      subgraph BOT["<b>Inbound lane</b>"]
+        direction LR
+        Evts["<b>events/</b><br/><span style='font-size:15px'>session · room · game</span>"]
+        Res["<b>src/api/response/</b><br/><span style='font-size:15px'>Session · Room · Game<br/>Admin · Moderator</span>"]
+      end
+    end
+
+    %% =========================================================
+    %% Right bookend — Servatrice
+    %% =========================================================
+    Srv[("<b>Servatrice</b>")]
+
+    %% =========================================================
+    %% Protocol satellite — cross-cutting types
+    %% =========================================================
+    subgraph PROTO["<b>Protocol (cross-cutting)</b>"]
+      direction LR
+      Types["<b>src/types/</b><br/><span style='font-size:15px'>Data · Enriched · App</span>"]
+      Gen["<b>src/generated/proto/</b><br/><span style='font-size:15px'>@bufbuild/protobuf</span>"]
+    end
+
+    %% =========================================================
+    %% UI-side wiring
+    %% =========================================================
+    UI --> Hooks
+    Hooks -- "useWebClient()" --> Provider
+    Provider --> WC
+    UI -- "selectors (read)" --> Store
+    Hooks --> DTOs
+    DTOs <--> IDB
+
+    %% =========================================================
+    %% Outbound — request goes up through the top lane to Srv
+    %% =========================================================
+    WC --> Req
+    Req --> Cmds
+    Cmds --> Svc
+    Svc -- "frames" --> Srv
+
+    %% =========================================================
+    %% Inbound — Srv comes back through services, splits to
+    %% cmdId response (direct) and event-registry dispatch
+    %% =========================================================
+    Srv -- "frames" --> Svc
+    Svc --> Evts
+    Svc -- "response by cmdId" --> Res
+    Evts --> Res
+    Res -- "dispatch" --> Store
+
+    %% =========================================================
+    %% Protocol edges — dashed, cross-cutting
+    %% =========================================================
+    Req -.-> Types
+    Res -.-> Types
+    Cmds -.-> Types
+    Evts -.-> Types
+    Types --> Gen
+
+    %% =========================================================
+    %% Palette — four roles
+    %% =========================================================
+    classDef app       fill:#dbeafe,stroke:#1f2937,stroke-width:1.5px,color:#0b1220
+    classDef transport fill:#ede9fe,stroke:#1f2937,stroke-width:1.5px,color:#0b1220
+    classDef store     fill:#fde68a,stroke:#1f2937,stroke-width:1.5px,color:#0b1220
+    classDef external  fill:#e5e7eb,stroke:#1f2937,stroke-width:1.5px,color:#0b1220
+
+    class UI,Hooks,DTOs,Provider,WC app
+    class Req,Cmds,Svc,Evts,Res transport
+    class Store,Types,Gen store
+    class Srv,IDB external

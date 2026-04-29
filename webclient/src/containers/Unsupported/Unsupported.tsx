@@ -1,8 +1,7 @@
-import { connect } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import Layout from 'containers/Layout/Layout';
+import Layout from '../Layout/Layout';
 
 import './Unsupported.css';
 
@@ -23,8 +22,4 @@ const Unsupported = () => {
   );
 };
 
-const mapStateToProps = state => ({
-
-});
-
-export default connect(mapStateToProps)(Unsupported);
+export default Unsupported;

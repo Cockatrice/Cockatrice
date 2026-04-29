@@ -1,10 +1,16 @@
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_ReplayDeleteMatch_ext, Command_ReplayDeleteMatchSchema } from '@app/generated';
 
 export function replayDeleteMatch(gameId: number): void {
-  BackendService.sendSessionCommand('Command_ReplayDeleteMatch', { gameId }, {
-    onSuccess: () => {
-      SessionPersistence.replayDeleteMatch(gameId);
-    },
-  });
+  WebClient.instance.protobuf.sendSessionCommand(
+    Command_ReplayDeleteMatch_ext,
+    create(Command_ReplayDeleteMatchSchema, { gameId }),
+    {
+      onSuccess: () => {
+        WebClient.instance.response.session.replayDeleteMatch(gameId);
+      },
+    }
+  );
 }

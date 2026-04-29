@@ -1,0 +1,11 @@
+.zone-rail {
+  width: 110px;
+  height: 100%;
+  padding: 8px 4px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #0a1225;
+  border-left: 1px solid #1a2b52;
+}

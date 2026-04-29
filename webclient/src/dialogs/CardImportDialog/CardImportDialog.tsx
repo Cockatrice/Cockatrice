@@ -1,4 +1,3 @@
-import React from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -6,28 +5,27 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 
-import { CardImportForm } from 'forms';
+import { CardImportForm } from '@app/forms';
 
 import './CardImportDialog.css';
 
-const CardImportDialog = ({ classes, handleClose, isOpen }: any) => {
-  const handleOnClose = () => {
-    handleClose();
-  }
+export interface CardImportDialogProps {
+  isOpen: boolean;
+  handleClose: () => void;
+}
 
+const CardImportDialog = ({ handleClose, isOpen }: CardImportDialogProps) => {
   return (
-    <Dialog onClose={handleOnClose} open={isOpen}>
+    <Dialog onClose={handleClose} open={isOpen}>
       <DialogTitle className="dialog-title">
         <Typography variant="h2">Import Cards</Typography>
 
-        {handleOnClose ? (
-          <IconButton onClick={handleOnClose} size="large">
-            <CloseIcon />
-          </IconButton>
-        ) : null}
+        <IconButton onClick={handleClose} size="large">
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
       <DialogContent>
-        <CardImportForm onSubmit={handleOnClose}></CardImportForm>
+        <CardImportForm onSubmit={handleClose} />
       </DialogContent>
     </Dialog>
   );

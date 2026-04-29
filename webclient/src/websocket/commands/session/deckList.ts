@@ -1,11 +1,15 @@
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_DeckList_ext, Command_DeckListSchema, Response_DeckList_ext } from '@app/generated';
 
 export function deckList(): void {
-  BackendService.sendSessionCommand('Command_DeckList', {}, {
-    responseName: 'Response_DeckList',
+  WebClient.instance.protobuf.sendSessionCommand(Command_DeckList_ext, create(Command_DeckListSchema), {
+    responseExt: Response_DeckList_ext,
     onSuccess: (response) => {
-      SessionPersistence.updateServerDecks(response);
+      if (response.root) {
+        WebClient.instance.response.session.updateServerDecks(response);
+      }
     },
   });
 }

@@ -1,42 +1,34 @@
-export interface Game {
-  description: string;
-  gameId: number;
-  gameType: string;
-  gameTypes: string[];
-  roomId: number;
-  started: boolean;
+export enum Phase {
+  Untap = 0,
+  Upkeep = 1,
+  Draw = 2,
+  FirstMain = 3,
+  BeginCombat = 4,
+  DeclareAttackers = 5,
+  DeclareBlockers = 6,
+  CombatDamage = 7,
+  EndCombat = 8,
+  SecondMain = 9,
+  EndCleanup = 10,
 }
 
-export enum GameSortField {
-  START_TIME = 'startTime'
-}
+export const ZoneName = {
+  TABLE: 'table',
+  GRAVE: 'grave',
+  EXILE: 'rfg',
+  HAND: 'hand',
+  DECK: 'deck',
+  SIDEBOARD: 'sb',
+  STACK: 'stack',
+} as const;
 
-export interface GameConfig {
-  description: string;
-  password: string;
-  maxPlayer: number;
-  onlyBuddies: boolean;
-  onlyRegistered: boolean;
-  spectatorsAllowed: boolean;
-  spectatorsNeedPassword: boolean;
-  spectatorsCanTalk: boolean;
-  spectatorsSeeEverything: boolean;
-  gameTypeIds: number[];
-  joinAsJudge: boolean;
-  joinAsSpectator: boolean;
-}
+export type ZoneName = typeof ZoneName[keyof typeof ZoneName];
 
-export interface JoinGameParams {
-  gameId: number;
-  password: string;
-  spectator: boolean;
-  overrideRestrictions: boolean;
-  joinAsJudge: boolean;
-}
-
-export enum LeaveGameReason {
-  OTHER = 1,
-  USER_KICKED = 2,
-  USER_LEFT = 3,
-  USER_DISCONNECTED = 4
+export enum ScryfallImageSize {
+  Small = 'small',
+  Normal = 'normal',
+  Large = 'large',
+  Png = 'png',
+  ArtCrop = 'art_crop',
+  BorderCrop = 'border_crop',
 }

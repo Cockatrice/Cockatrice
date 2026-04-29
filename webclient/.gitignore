@@ -5,9 +5,13 @@
 /.pnp
 .pnp.js
 
+# AI generated docs
+/plans
+
 # generated ./src files
 /src/proto-files.json
 /src/server-props.json
+/src/generated/
 
 # testing
 /coverage

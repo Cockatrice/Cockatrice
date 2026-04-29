@@ -1,9 +1,7 @@
-import { StatusEnum } from 'types';
-import webClient from '../../WebClient';
-import { SessionPersistence } from '../../persistence';
+import { StatusEnum } from '../../types/StatusEnum';
+import { WebClient } from '../../WebClient';
 
 export function updateStatus(status: StatusEnum, description: string): void {
-  SessionPersistence.updateStatus(status, description);
-
-  webClient.updateStatus(status);
+  WebClient.instance.response.session.updateStatus(status, description);
+  WebClient.instance.updateStatus(status);
 }

@@ -1,21 +1,26 @@
-// eslint-disable-next-line
-import React, { useState } from "react";
-import { connect } from 'react-redux';
+import { useState } from 'react';
 import { Form, Field } from 'react-final-form';
-import { OnChange } from 'react-final-form-listeners';
 import { useTranslation } from 'react-i18next';
 
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-import { InputField, KnownHosts } from 'components';
-import { FormKey } from 'types';
+import { InputField } from '@app/components';
+import type { FormErrors } from '@app/forms';
+import { useReduxEffect } from '@app/hooks';
+import { ServerTypes } from '@app/store';
 
 import './AccountActivationForm.css';
-import { useReduxEffect } from 'hooks';
-import { ServerTypes } from 'store';
 
-const AccountActivationForm = ({ onSubmit }) => {
+export interface AccountActivationFormValues {
+  token: string;
+}
+
+interface AccountActivationFormProps {
+  onSubmit: (values: AccountActivationFormValues) => void;
+}
+
+const AccountActivationForm = ({ onSubmit }: AccountActivationFormProps) => {
   const [errorMessage, setErrorMessage] = useState(false);
   const { t } = useTranslation();
 
@@ -23,16 +28,14 @@ const AccountActivationForm = ({ onSubmit }) => {
     setErrorMessage(true);
   }, ServerTypes.ACCOUNT_ACTIVATION_FAILED, []);
 
-  const handleOnSubmit = ({ token, ...values }) => {
+  const handleOnSubmit = ({ token, ...values }: AccountActivationFormValues) => {
     setErrorMessage(false);
 
-    token = token?.trim();
+    onSubmit({ ...values, token: token?.trim() });
+  };
 
-    onSubmit({ token, ...values });
-  }
-
-  const validate = values => {
-    const errors: any = {};
+  const validate = (values: Partial<AccountActivationFormValues>): FormErrors<AccountActivationFormValues> => {
+    const errors: FormErrors<AccountActivationFormValues> = {};
 
     if (!values.token) {
       errors.token = t('Common.validation.required');
@@ -43,7 +46,7 @@ const AccountActivationForm = ({ onSubmit }) => {
 
   return (
     <Form onSubmit={handleOnSubmit} validate={validate}>
-      {({ handleSubmit, form }) => {
+      {({ handleSubmit }) => {
         return (
           <form className="AccountActivationForm" onSubmit={handleSubmit}>
             <div className="AccountActivationForm-item">

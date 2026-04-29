@@ -1,11 +1,13 @@
-import { BackendService } from '../../services/BackendService';
-import { RoomPersistence } from '../../persistence';
-import { GameConfig } from 'types';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
 
-export function createGame(roomId: number, gameConfig: GameConfig): void {
-  BackendService.sendRoomCommand(roomId, 'Command_CreateGame', gameConfig, {
+import { Command_CreateGame_ext, Command_CreateGameSchema } from '@app/generated';
+import type { CreateGameParams } from '@app/generated';
+
+export function createGame(roomId: number, gameConfig: CreateGameParams): void {
+  WebClient.instance.protobuf.sendRoomCommand(roomId, Command_CreateGame_ext, create(Command_CreateGameSchema, gameConfig), {
     onSuccess: () => {
-      RoomPersistence.gameCreated(roomId);
+      WebClient.instance.response.room.gameCreated(roomId);
     },
   });
 }

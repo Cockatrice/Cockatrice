@@ -1,0 +1,13 @@
+.player-board {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr) 110px;
+  height: 100%;
+  min-height: 0;
+  background: #0a1225;
+  border-bottom: 2px solid #1a2b52;
+}
+
+.player-board--mirrored {
+  border-bottom: none;
+  border-top: 2px solid #1a2b52;
+}

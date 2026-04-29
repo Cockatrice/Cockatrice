@@ -1,10 +1,13 @@
-import { BackendService } from '../../services/BackendService';
-import { ModeratorPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_ForceActivateUser_ext, Command_ForceActivateUserSchema } from '@app/generated';
 
 export function forceActivateUser(usernameToActivate: string, moderatorName: string): void {
-  BackendService.sendModeratorCommand('Command_ForceActivateUser', { usernameToActivate, moderatorName }, {
+  const cmd = create(Command_ForceActivateUserSchema, { usernameToActivate, moderatorName });
+  WebClient.instance.protobuf.sendModeratorCommand(Command_ForceActivateUser_ext, cmd, {
     onSuccess: () => {
-      ModeratorPersistence.forceActivateUser(usernameToActivate, moderatorName);
+      WebClient.instance.response.moderator.forceActivateUser(usernameToActivate, moderatorName);
     },
   });
 }

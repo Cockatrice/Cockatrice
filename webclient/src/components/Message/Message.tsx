@@ -1,21 +1,21 @@
-// eslint-disable-next-line
-import React, { useEffect, useMemo, useState } from 'react';
-
 import { NavLink, generatePath } from 'react-router-dom';
+import type { ReactNode } from 'react';
 
-import {
-  RouteEnum,
-  URL_REGEX,
-  MESSAGE_SENDER_REGEX,
-  MENTION_REGEX,
-  CARD_CALLOUT_REGEX,
-  CALLOUT_BOUNDARY_REGEX,
-} from 'types';
+import { App } from '@app/types';
 
 import CardCallout from './CardCallout';
+import { useParsedMessage } from './useMessage';
 import './Message.css';
 
-const Message = ({ message: { message, messageType, timeOf, timeReceived } }) => (
+interface MessagePayload {
+  message: string;
+}
+
+interface MessageProps {
+  message: MessagePayload;
+}
+
+const Message = ({ message: { message } }: MessageProps) => (
   <div className='message'>
     <div className='message__detail'>
       <ParsedMessage message={message} />
@@ -23,63 +23,54 @@ const Message = ({ message: { message, messageType, timeOf, timeReceived } }) =>
   </div>
 );
 
-const ParsedMessage = ({ message }) => {
-  const [messageChunks, setMessageChunks] = useState(null);
-  const [name, setName] = useState(null);
+interface ParsedMessageProps {
+  message: string;
+}
 
-  useMemo(() => {
-    const name = message.match(MESSAGE_SENDER_REGEX);
-
-    if (name) {
-      setName(name[1]);
-    }
-
-    setMessageChunks(parseMessage(message));
-  }, [message]);
+const ParsedMessage = ({ message }: ParsedMessageProps) => {
+  const { name, chunks } = useParsedMessage(message, parseChunks);
 
   return (
     <div>
-      { name && (<strong><PlayerLink name={name} />:</strong>) }
-      { messageChunks }
+      {name && (<strong><PlayerLink name={name} />:</strong>)}
+      {chunks}
     </div>
   );
 };
 
-const PlayerLink = ({ name, label = name }) => (
-  <NavLink className="link" to={generatePath(RouteEnum.PLAYER, { name })}>
+interface PlayerLinkProps {
+  name: string;
+  label?: string;
+}
+
+const PlayerLink = ({ name, label = name }: PlayerLinkProps) => (
+  <NavLink className="link" to={generatePath(App.RouteEnum.PLAYER, { name })}>
     {label}
   </NavLink>
 );
 
-function parseMessage(message) {
-  return message.replace(MESSAGE_SENDER_REGEX, '')
-    .split(CARD_CALLOUT_REGEX)
-    .filter(chunk => !!chunk)
-    .map(parseChunks);
-}
-
-function parseChunks(chunk, index) {
-  if (chunk.match(CARD_CALLOUT_REGEX)) {
-    const name = chunk.replace(CALLOUT_BOUNDARY_REGEX, '').trim();
+function parseChunks(chunk: string, index: number): ReactNode {
+  if (chunk.match(App.CARD_CALLOUT_REGEX)) {
+    const name = chunk.replace(App.CALLOUT_BOUNDARY_REGEX, '').trim();
     return (<CardCallout name={name} key={index}></CardCallout>);
   }
 
-  if (chunk.match(URL_REGEX)) {
+  if (chunk.match(App.URL_REGEX)) {
     return parseUrlChunk(chunk);
   }
 
-  if (chunk.match(MENTION_REGEX)) {
+  if (chunk.match(App.MENTION_REGEX)) {
     return parseMentionChunk(chunk);
   }
 
   return chunk;
 }
 
-function parseUrlChunk(chunk) {
-  return chunk.split(URL_REGEX)
-    .filter(urlChunk => !!urlChunk)
+function parseUrlChunk(chunk: string): ReactNode {
+  return chunk.split(App.URL_REGEX)
+    .filter((urlChunk) => !!urlChunk)
     .map((urlChunk, index) => {
-      if (urlChunk.match(URL_REGEX)) {
+      if (urlChunk.match(App.URL_REGEX)) {
         return (<a className='link' href={urlChunk} key={index} target='_blank' rel='noopener noreferrer'>{urlChunk}</a>);
       }
 
@@ -87,15 +78,15 @@ function parseUrlChunk(chunk) {
     });
 }
 
-function parseMentionChunk(chunk) {
-  return chunk.split(MENTION_REGEX)
-    .filter(mentionChunk => !!mentionChunk)
+function parseMentionChunk(chunk: string): ReactNode {
+  return chunk.split(App.MENTION_REGEX)
+    .filter((mentionChunk) => !!mentionChunk)
     .map((mentionChunk, index) => {
-      const mention = mentionChunk.match(MENTION_REGEX);
+      const mention = mentionChunk.match(App.MENTION_REGEX);
 
       if (mention) {
         const name = mention[0].substr(1);
-        return (<PlayerLink name={name} label={mention} key={index} />);
+        return (<PlayerLink name={name} label={mention[0]} key={index} />);
       }
 
       return mentionChunk;

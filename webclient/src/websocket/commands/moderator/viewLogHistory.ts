@@ -1,12 +1,14 @@
-import { BackendService } from '../../services/BackendService';
-import { ModeratorPersistence } from '../../persistence';
-import { LogFilters } from 'types';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
 
-export function viewLogHistory(filters: LogFilters): void {
-  BackendService.sendModeratorCommand('Command_ViewLogHistory', filters, {
-    responseName: 'Response_ViewLogHistory',
+import { Command_ViewLogHistory_ext, Command_ViewLogHistorySchema, Response_ViewLogHistory_ext } from '@app/generated';
+import type { ViewLogHistoryParams } from '@app/generated';
+
+export function viewLogHistory(filters: ViewLogHistoryParams): void {
+  WebClient.instance.protobuf.sendModeratorCommand(Command_ViewLogHistory_ext, create(Command_ViewLogHistorySchema, filters), {
+    responseExt: Response_ViewLogHistory_ext,
     onSuccess: (response) => {
-      ModeratorPersistence.viewLogs(response.logMessage);
+      WebClient.instance.response.moderator.viewLogs(response.logMessage);
     },
   });
 }

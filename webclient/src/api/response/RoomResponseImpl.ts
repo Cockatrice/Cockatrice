@@ -1,0 +1,59 @@
+import { Data } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
+import { RoomsDispatch } from '@app/store';
+
+type Message = WebsocketTypes.WebSocketRoomResponseOverrides['Event_RoomSay'];
+
+export class RoomResponseImpl implements WebsocketTypes.IRoomResponse<WebsocketTypes.WebSocketRoomResponseOverrides> {
+  clearStore(): void {
+    RoomsDispatch.clearStore();
+  }
+
+  joinRoom(roomInfo: Data.ServerInfo_Room): void {
+    RoomsDispatch.joinRoom(roomInfo);
+  }
+
+  leaveRoom(roomId: number): void {
+    RoomsDispatch.leaveRoom(roomId);
+  }
+
+  updateRooms(rooms: Data.ServerInfo_Room[]): void {
+    RoomsDispatch.updateRooms(rooms);
+  }
+
+  updateGames(roomId: number, gameList: Data.ServerInfo_Game[]): void {
+    RoomsDispatch.updateGames(roomId, gameList);
+  }
+
+  addMessage(roomId: number, message: Message): void {
+    RoomsDispatch.addMessage(roomId, message);
+  }
+
+  userJoined(roomId: number, user: Data.ServerInfo_User): void {
+    RoomsDispatch.userJoined(roomId, user);
+  }
+
+  userLeft(roomId: number, name: string): void {
+    RoomsDispatch.userLeft(roomId, name);
+  }
+
+  removeMessages(roomId: number, name: string, amount: number): void {
+    RoomsDispatch.removeMessages(roomId, name, amount);
+  }
+
+  gameCreated(roomId: number): void {
+    RoomsDispatch.gameCreated(roomId);
+  }
+
+  joinedGame(roomId: number, gameId: number): void {
+    RoomsDispatch.joinedGame(roomId, gameId);
+  }
+
+  setJoinGamePending(pending: boolean): void {
+    RoomsDispatch.setJoinGamePending(pending);
+  }
+
+  setJoinGameError(code: number, message: string): void {
+    RoomsDispatch.setJoinGameError(code, message);
+  }
+}

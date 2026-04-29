@@ -1,10 +1,16 @@
-import { BackendService } from '../../services/BackendService';
-import { ModeratorPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_GrantReplayAccess_ext, Command_GrantReplayAccessSchema } from '@app/generated';
 
 export function grantReplayAccess(replayId: number, moderatorName: string): void {
-  BackendService.sendModeratorCommand('Command_GrantReplayAccess', { replayId, moderatorName }, {
-    onSuccess: () => {
-      ModeratorPersistence.grantReplayAccess(replayId, moderatorName);
+  WebClient.instance.protobuf.sendModeratorCommand(
+    Command_GrantReplayAccess_ext,
+    create(Command_GrantReplayAccessSchema, { replayId, moderatorName }),
+    {
+      onSuccess: () => {
+        WebClient.instance.response.moderator.grantReplayAccess(replayId, moderatorName);
+      },
     },
-  });
+  );
 }

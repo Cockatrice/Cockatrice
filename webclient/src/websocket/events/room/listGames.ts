@@ -1,6 +1,6 @@
-import { RoomPersistence } from '../../persistence';
-import { ListGamesData, RoomEvent } from './interfaces';
+import type { Event_ListGames, RoomEvent } from '@app/generated';
+import { WebClient } from '../../WebClient';
 
-export function listGames({ gameList }: ListGamesData, { roomEvent: { roomId } }: RoomEvent): void {
-  RoomPersistence.updateGames(roomId, gameList);
+export function listGames({ gameList }: Event_ListGames, { roomId }: RoomEvent): void {
+  WebClient.instance.response.room.updateGames(roomId, gameList);
 }

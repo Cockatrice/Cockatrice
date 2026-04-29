@@ -1,71 +1,77 @@
-import { createContext, FC, PropsWithChildren, ReactChild, ReactNode, useContext, useEffect, useReducer, ContextType, Context } from 'react'
+import { createContext, FC, PropsWithChildren, ReactNode, useContext, useEffect, useReducer } from 'react';
 
-import { ACTIONS, initialState, reducer } from './reducer';
-import Toast from './Toast'
+import { ACTIONS, initialState, reducer, ToastEntry } from './reducer';
+import Toast from './Toast';
 
-interface ToastEntry {
-  isOpen: boolean,
-  children: ReactChild,
+interface ToastContextValue {
+  toasts: Record<string, ToastEntry>;
+  addToast: (key: string, children: ReactNode) => void;
+  openToast: (key: string) => void;
+  closeToast: (key: string) => void;
+  removeToast: (key: string) => void;
 }
 
-interface ToastState {
-    toasts: Map<string, ToastEntry>,
-    addToast: (key, children) => void,
-    openToast: (key) => void,
-    closeToast: (key) => void,
-    removeToast: (key) => void,
-}
-
-const ToastContext: Context<any> = createContext<ToastState>({
-  toasts: new Map<string, ToastEntry>(),
-  addToast: (key, children) => {},
-  openToast: (key) => {},
-  closeToast: (key) => {},
-  removeToast: (key) => {},
+const ToastContext = createContext<ToastContextValue>({
+  toasts: {},
+  addToast: () => {},
+  openToast: () => {},
+  closeToast: () => {},
+  removeToast: () => {},
 });
 
-export const ToastProvider: FC<PropsWithChildren> = (props) => {
-  const { children } = props
-  const [state, dispatch] = useReducer(reducer, initialState)
-  const providerState = {
+export const ToastProvider: FC<PropsWithChildren> = ({ children }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const providerState: ToastContextValue = {
     toasts: state.toasts,
-    addToast: (key, children) => dispatch({ type: ACTIONS.ADD_TOAST, payload: { key, children } }),
-    openToast: key => dispatch({ type: ACTIONS.OPEN_TOAST, payload: { key } }),
-    closeToast: key => dispatch({ type: ACTIONS.CLOSE_TOAST, payload: { key } }),
-    removeToast: key => dispatch({ type: ACTIONS.REMOVE_TOAST, payload: { key } }),
-  }
+    addToast: (key, toastChildren) => dispatch({ type: ACTIONS.ADD_TOAST, payload: { key, children: toastChildren } }),
+    openToast: (key) => dispatch({ type: ACTIONS.OPEN_TOAST, payload: { key } }),
+    closeToast: (key) => dispatch({ type: ACTIONS.CLOSE_TOAST, payload: { key } }),
+    removeToast: (key) => dispatch({ type: ACTIONS.REMOVE_TOAST, payload: { key } }),
+  };
   return (
     <ToastContext.Provider value={providerState}>
       {children}
       <div>
-        {Array.from(state.toasts).map(([key, value]) => {
-          const { isOpen, children } = value;
-          return (
-            <Toast key={key} open={isOpen} onClose={() => dispatch({ type: ACTIONS.CLOSE_TOAST, payload: { key } })}>
-              {children}
-            </Toast>
-          )
-        })}
+        {Object.entries(state.toasts).map(([key, entry]) => (
+          <Toast
+            key={key}
+            open={entry.isOpen}
+            onClose={() => dispatch({ type: ACTIONS.CLOSE_TOAST, payload: { key } })}
+          >
+            {entry.children}
+          </Toast>
+        ))}
       </div>
     </ToastContext.Provider>
-  )
-}
+  );
+};
 
 export interface ToastHookOptions {
-  key: string,
-  children: ReactNode
+  key: string;
+  children: ReactNode;
 }
 
-export function useToast<ToastHookOptions>({ key, children }) {
-  const { addToast, openToast, closeToast, removeToast } = useContext(ToastContext)
+export interface ToastHandle {
+  openToast: () => void;
+  closeToast: () => void;
+  removeToast: () => void;
+}
 
+export function useToast({ key, children }: ToastHookOptions): ToastHandle {
+  const { addToast, openToast, closeToast, removeToast } = useContext(ToastContext);
+
+  // Toast children are captured at registration; re-registering every render
+  // would churn provider state. Intentional mount/unmount-only effect keyed on `key`.
   useEffect(() => {
-    addToast(key, children)
-  }, [])
+    addToast(key, children);
+    return () => {
+      removeToast(key);
+    };
+  }, [key]);
 
   return {
     openToast: () => openToast(key),
     closeToast: () => closeToast(key),
     removeToast: () => removeToast(key),
-  }
+  };
 }

@@ -54,7 +54,7 @@
   overflow: hidden;
 }
 
-.login-content__description-wrapper { 
+.login-content__description-wrapper {
   position: relative;
   width: 70%;
   display: flex;
@@ -115,8 +115,8 @@
   margin: 40px 0 20px;
   font-size: 28px;
   font-weight: bold;
-  
 }
+
 .login-content__description-subtitle2 {
   font-size: 14px;
 }

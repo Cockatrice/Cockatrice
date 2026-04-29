@@ -12,7 +12,7 @@
 
 .three-pane-layout .grid-main {
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
 }
 
 .three-pane-layout .grid-main__top {

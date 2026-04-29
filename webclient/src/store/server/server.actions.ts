@@ -1,242 +1,34 @@
-import { DeckList, DeckStorageTreeItem, ReplayMatch, WebSocketConnectOptions } from 'types';
-import { Types } from './server.types';
+import { createAction } from '@reduxjs/toolkit';
+import { WebsocketTypes } from '@app/websocket/types';
 
-export const Actions = {
-  initialized: () => ({
-    type: Types.INITIALIZED
-  }),
-  clearStore: () => ({
-    type: Types.CLEAR_STORE
-  }),
-  loginSuccessful: (options: WebSocketConnectOptions) => ({
-    type: Types.LOGIN_SUCCESSFUL,
-    options
-  }),
-  loginFailed: () => ({
-    type: Types.LOGIN_FAILED,
-  }),
-  connectionClosed: reason => ({
-    type: Types.CONNECTION_CLOSED,
-    reason
-  }),
-  connectionFailed: () => ({
-    type: Types.CONNECTION_FAILED,
-  }),
-  testConnectionSuccessful: () => ({
-    type: Types.TEST_CONNECTION_SUCCESSFUL,
-  }),
-  testConnectionFailed: () => ({
-    type: Types.TEST_CONNECTION_FAILED,
-  }),
-  serverMessage: message => ({
-    type: Types.SERVER_MESSAGE,
-    message
-  }),
-  updateBuddyList: buddyList => ({
-    type: Types.UPDATE_BUDDY_LIST,
-    buddyList
-  }),
-  addToBuddyList: user => ({
-    type: Types.ADD_TO_BUDDY_LIST,
-    user
-  }),
-  removeFromBuddyList: userName => ({
-    type: Types.REMOVE_FROM_BUDDY_LIST,
-    userName
-  }),
-  updateIgnoreList: ignoreList => ({
-    type: Types.UPDATE_IGNORE_LIST,
-    ignoreList
-  }),
-  addToIgnoreList: user => ({
-    type: Types.ADD_TO_IGNORE_LIST,
-    user
-  }),
-  removeFromIgnoreList: userName => ({
-    type: Types.REMOVE_FROM_IGNORE_LIST,
-    userName
-  }),
-  updateInfo: info => ({
-    type: Types.UPDATE_INFO,
-    info
-  }),
-  updateStatus: status => ({
-    type: Types.UPDATE_STATUS,
-    status
-  }),
-  updateUser: user => ({
-    type: Types.UPDATE_USER,
-    user
-  }),
-  updateUsers: users => ({
-    type: Types.UPDATE_USERS,
-    users
-  }),
-  userJoined: user => ({
-    type: Types.USER_JOINED,
-    user
-  }),
-  userLeft: name => ({
-    type: Types.USER_LEFT,
-    name
-  }),
-  viewLogs: logs => ({
-    type: Types.VIEW_LOGS,
-    logs
-  }),
-  clearLogs: () => ({
-    type: Types.CLEAR_LOGS,
-  }),
-  registrationRequiresEmail: () => ({
-    type: Types.REGISTRATION_REQUIRES_EMAIL,
-  }),
-  registrationSuccess: () => ({
-    type: Types.REGISTRATION_SUCCES,
-  }),
-  registrationFailed: (error) => ({
-    type: Types.REGISTRATION_FAILED,
-    error
-  }),
-  registrationEmailError: (error) => ({
-    type: Types.REGISTRATION_EMAIL_ERROR,
-    error
-  }),
-  registrationPasswordError: (error) => ({
-    type: Types.REGISTRATION_PASSWORD_ERROR,
-    error
-  }),
-  registrationUserNameError: (error) => ({
-    type: Types.REGISTRATION_USERNAME_ERROR,
-    error
-  }),
-  accountAwaitingActivation: (options: WebSocketConnectOptions) => ({
-    type: Types.ACCOUNT_AWAITING_ACTIVATION,
-    options
-  }),
-  accountActivationSuccess: () => ({
-    type: Types.ACCOUNT_ACTIVATION_SUCCESS,
-  }),
-  accountActivationFailed: () => ({
-    type: Types.ACCOUNT_ACTIVATION_FAILED,
-  }),
-  resetPassword: () => ({
-    type: Types.RESET_PASSWORD_REQUESTED,
-  }),
-  resetPasswordFailed: () => ({
-    type: Types.RESET_PASSWORD_FAILED,
-  }),
-  resetPasswordChallenge: () => ({
-    type: Types.RESET_PASSWORD_CHALLENGE,
-  }),
-  resetPasswordSuccess: () => ({
-    type: Types.RESET_PASSWORD_SUCCESS,
-  }),
-  adjustMod: (userName, shouldBeMod, shouldBeJudge) => ({
-    type: Types.ADJUST_MOD,
-    userName,
-    shouldBeMod,
-    shouldBeJudge,
-  }),
-  reloadConfig: () => ({
-    type: Types.RELOAD_CONFIG,
-  }),
-  shutdownServer: () => ({
-    type: Types.SHUTDOWN_SERVER,
-  }),
-  updateServerMessage: () => ({
-    type: Types.UPDATE_SERVER_MESSAGE,
-  }),
-  accountPasswordChange: () => ({
-    type: Types.ACCOUNT_PASSWORD_CHANGE,
-  }),
-  accountEditChanged: (user) => ({
-    type: Types.ACCOUNT_EDIT_CHANGED,
-    user,
-  }),
-  accountImageChanged: (user) => ({
-    type: Types.ACCOUNT_IMAGE_CHANGED,
-    user,
-  }),
-  directMessageSent: (userName, message) => ({
-    type: Types.DIRECT_MESSAGE_SENT,
-    userName,
-    message,
-  }),
-  getUserInfo: (userInfo) => ({
-    type: Types.GET_USER_INFO,
-    userInfo,
-  }),
-  notifyUser: (notification) => ({
-    type: Types.NOTIFY_USER,
-    notification,
-  }),
-  serverShutdown: (data) => ({
-    type: Types.SERVER_SHUTDOWN,
-    data,
-  }),
-  userMessage: (messageData) => ({
-    type: Types.USER_MESSAGE,
-    messageData,
-  }),
-  addToList: (list, userName) => ({
-    type: Types.ADD_TO_LIST,
-    list,
-    userName,
-  }),
-  removeFromList: (list, userName) => ({
-    type: Types.REMOVE_FROM_LIST,
-    list,
-    userName,
-  }),
-  banFromServer: (userName) => ({
-    type: Types.BAN_FROM_SERVER,
-    userName,
-  }),
-  banHistory: (userName, banHistory) => ({
-    type: Types.BAN_HISTORY,
-    userName,
-    banHistory,
-  }),
-  warnHistory: (userName, warnHistory) => ({
-    type: Types.WARN_HISTORY,
-    userName,
-    warnHistory,
-  }),
-  warnListOptions: (warnList) => ({
-    type: Types.WARN_LIST_OPTIONS,
-    warnList,
-  }),
-  warnUser: (userName) => ({
-    type: Types.WARN_USER,
-    userName,
-  }),
-  grantReplayAccess: (replayId: number, moderatorName: string) => ({
-    type: Types.GRANT_REPLAY_ACCESS,
-    replayId,
-    moderatorName,
-  }),
-  forceActivateUser: (usernameToActivate: string, moderatorName: string) => ({
-    type: Types.FORCE_ACTIVATE_USER,
-    usernameToActivate,
-    moderatorName,
-  }),
-  getAdminNotes: (userName: string, notes: string) => ({
-    type: Types.GET_ADMIN_NOTES,
-    userName,
-    notes,
-  }),
-  updateAdminNotes: (userName: string, notes: string) => ({
-    type: Types.UPDATE_ADMIN_NOTES,
-    userName,
-    notes,
-  }),
-  replayList: (matchList: ReplayMatch[]) => ({ type: Types.REPLAY_LIST, matchList }),
-  replayAdded: (matchInfo: ReplayMatch) => ({ type: Types.REPLAY_ADDED, matchInfo }),
-  replayModifyMatch: (gameId: number, doNotHide: boolean) => ({ type: Types.REPLAY_MODIFY_MATCH, gameId, doNotHide }),
-  replayDeleteMatch: (gameId: number) => ({ type: Types.REPLAY_DELETE_MATCH, gameId }),
-  backendDecks: (deckList: DeckList) => ({ type: Types.BACKEND_DECKS, deckList }),
-  deckNewDir: (path: string, dirName: string) => ({ type: Types.DECK_NEW_DIR, path, dirName }),
-  deckDelDir: (path: string) => ({ type: Types.DECK_DEL_DIR, path }),
-  deckUpload: (path: string, treeItem: DeckStorageTreeItem) => ({ type: Types.DECK_UPLOAD, path, treeItem }),
-  deckDelete: (deckId: number) => ({ type: Types.DECK_DELETE, deckId }),
-}
+import { serverSlice } from './server.reducer';
+
+const SignalActions = {
+  accountAwaitingActivation: createAction<{ options: WebsocketTypes.PendingActivationContext }>('server/accountAwaitingActivation'),
+  accountActivationFailed: createAction('server/accountActivationFailed'),
+  accountActivationSuccess: createAction('server/accountActivationSuccess'),
+  loginSuccessful: createAction<{ options: WebsocketTypes.LoginSuccessContext }>('server/loginSuccessful'),
+  loginFailed: createAction('server/loginFailed'),
+  connectionFailed: createAction('server/connectionFailed'),
+  registrationRequiresEmail: createAction('server/registrationRequiresEmail'),
+  registrationSuccess: createAction('server/registrationSuccess'),
+  registrationEmailError: createAction<{ error: string }>('server/registrationEmailError'),
+  registrationPasswordError: createAction<{ error: string }>('server/registrationPasswordError'),
+  registrationUserNameError: createAction<{ error: string }>('server/registrationUserNameError'),
+  resetPassword: createAction('server/resetPassword'),
+  resetPasswordFailed: createAction('server/resetPasswordFailed'),
+  resetPasswordChallenge: createAction('server/resetPasswordChallenge'),
+  resetPasswordSuccess: createAction('server/resetPasswordSuccess'),
+  reloadConfig: createAction('server/reloadConfig'),
+  shutdownServer: createAction('server/shutdownServer'),
+  updateServerMessage: createAction('server/updateServerMessage'),
+  accountPasswordChange: createAction('server/accountPasswordChange'),
+  addToList: createAction<{ list: string; userName: string }>('server/addToList'),
+  removeFromList: createAction<{ list: string; userName: string }>('server/removeFromList'),
+  grantReplayAccess: createAction<{ replayId: number; moderatorName: string }>('server/grantReplayAccess'),
+  forceActivateUser: createAction<{ usernameToActivate: string; moderatorName: string }>('server/forceActivateUser'),
+};
+
+export const Actions = { ...serverSlice.actions, ...SignalActions };
+
+export type ServerAction = ReturnType<typeof Actions[keyof typeof Actions]>;

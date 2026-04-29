@@ -1,0 +1,58 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#ffffff"
+    primaryColor: "#ffffff"
+    primaryBorderColor: "#1f2937"
+    primaryTextColor: "#0b1220"
+    lineColor: "#1f2937"
+    textColor: "#0b1220"
+    edgeLabelBackground: "#ffffff"
+    fontSize: "18px"
+    clusterBkg: "#ffffff"
+    clusterBorder: "#9ca3af"
+  flowchart:
+    htmlLabels: true
+    curve: basis
+    nodeSpacing: 55
+    rankSpacing: 90
+---
+flowchart LR
+    subgraph APP_COL[" "]
+      direction TB
+      App["<b>Application</b><br/><span style='font-size:13px'>containers · components · hooks</span>"]
+      Rdx[("<b>Redux</b><br/><span style='font-size:12px'>in-memory state</span>")]
+    end
+
+    subgraph SRV_COL[" "]
+      direction TB
+      Srv[("<b>Servatrice</b>")]
+      IDB[("<b>IndexedDB</b><br/><span style='font-size:12px'>local persistent store</span>")]
+    end
+
+    Req["client.request"]
+    Res["client.response"]
+
+    %% Outbound lane (top)
+    App -- "useWebClient()" --> Req
+    Req -- "Commands" --> Srv
+
+    %% Inbound lane (bottom)
+    Srv -- "Events · Responses" --> Res
+    Res -- "dispatch · rerender" --> App
+
+    %% Local stores — Application owns both; edges only to IndexedDB
+    %% (Redux state is implicit — reducers sit under dispatch, selectors under rerender)
+    App -. "Dexie: settings · hosts · cards" .-> IDB
+
+    %% Palette — four roles
+    classDef app       fill:#dbeafe,stroke:#1f2937,stroke-width:1.5px,color:#0b1220
+    classDef seam      fill:#dbeafe,stroke:#1f2937,stroke-width:1.5px,color:#0b1220
+    classDef store     fill:#fde68a,stroke:#1f2937,stroke-width:1.5px,color:#0b1220
+    classDef external  fill:#e5e7eb,stroke:#1f2937,stroke-width:1.5px,color:#0b1220
+
+    class App app
+    class Req,Res seam
+    class Rdx store
+    class Srv,IDB external

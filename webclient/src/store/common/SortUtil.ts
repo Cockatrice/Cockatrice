@@ -1,7 +1,7 @@
-import { SortBy, SortDirection, User } from 'types';
+import { App, Data } from '@app/types';
 
 export default class SortUtil {
-  static sortByField(arr: any[], sortBy: SortBy): void {
+  static sortByField<T extends object>(arr: T[], sortBy: App.SortBy): void {
     if (arr.length) {
       const field = SortUtil.resolveFieldChain(arr[0], sortBy.field);
       const fieldType = typeof field;
@@ -20,14 +20,14 @@ export default class SortUtil {
     }
   }
 
-  static sortByFields(arr: any[], sorts: SortBy[]) {
+  static sortByFields<T extends object>(arr: T[], sorts: App.SortBy[]) {
     if (arr.length) {
+      const fieldTypes = sorts.map(s => typeof SortUtil.resolveFieldChain(arr[0], s.field));
+
       arr.sort((a, b) => {
         for (let i = 0; i < sorts.length; i++) {
           const sortBy = sorts[i];
-          const field = SortUtil.resolveFieldChain(arr[0], sortBy.field);
-
-          const fieldType = typeof field;
+          const fieldType = fieldTypes[i];
 
           if (fieldType === 'string') {
             const result = SortUtil.stringComparator(a, b, sortBy);
@@ -35,60 +35,70 @@ export default class SortUtil {
             if (result) {
               return result;
             }
-          }
-
-          if (fieldType === 'number') {
+          } else if (fieldType === 'number') {
             const result = SortUtil.numberComparator(a, b, sortBy);
 
             if (result) {
               return result;
             }
+          } else {
+            throw new Error('SortField must resolve to either a string or number');
           }
-
-          throw new Error('SortField must resolve to either a string or number');
         }
 
         return 0;
-      })
+      });
     }
   }
 
-  static sortUsersByField(users: User[], sortBy: SortBy) {
+  static sortUsersByField(users: Data.ServerInfo_User[], sortBy: App.SortBy) {
     if (users.length) {
-      users.sort((a, b) => SortUtil.userComparator(a, b, sortBy))
+      users.sort((a, b) => SortUtil.userComparator(a, b, sortBy));
     }
   }
 
-  static toggleSortBy(field: string, sortBy: SortBy) {
+  /** Non-mutating variant: returns a new sorted array. Intended for use inside selectors. */
+  static sortedByField<T extends object>(arr: readonly T[], sortBy: App.SortBy): T[] {
+    const copy = [...arr];
+    SortUtil.sortByField(copy, sortBy);
+    return copy;
+  }
+
+  /** Non-mutating variant: returns a new sorted user array. Intended for use inside selectors. */
+  static sortedUsersByField(users: readonly Data.ServerInfo_User[], sortBy: App.SortBy): Data.ServerInfo_User[] {
+    const copy = [...users];
+    SortUtil.sortUsersByField(copy, sortBy);
+    return copy;
+  }
+
+  static toggleSortBy<F extends string>(field: F, sortBy: App.SortBy): { field: F; order: App.SortDirection } {
     const sameField = field === sortBy.field;
-    const isASC = sortBy.order === SortDirection.ASC;
+    const isASC = sortBy.order === App.SortDirection.ASC;
 
     return {
       field,
-      order: sameField && isASC ? SortDirection.DESC : SortDirection.ASC
+      order: sameField && isASC ? App.SortDirection.DESC : App.SortDirection.ASC
     }
   }
 
-  private static sortByNumber(arr: any[], sortBy: SortBy): void {
+  private static sortByNumber<T extends object>(arr: T[], sortBy: App.SortBy): void {
     arr.sort((a, b) => SortUtil.numberComparator(a, b, sortBy));
   }
 
-  private static sortByString(arr: any[], sortBy: SortBy): void {
+  private static sortByString<T extends object>(arr: T[], sortBy: App.SortBy): void {
     arr.sort((a, b) => SortUtil.stringComparator(a, b, sortBy));
   }
 
-  private static userComparator(a, b, sortBy, sortByUserLevel = true) {
-    if (sortByUserLevel) {
-      const adminSortBy = {
-        field: 'userLevel',
-        order: SortDirection.DESC
-      };
+  private static userComparator(a: Data.ServerInfo_User, b: Data.ServerInfo_User, sortBy: App.SortBy) {
+    const adminSortBy = {
+      field: 'userLevel',
+      order: App.SortDirection.DESC
+    };
 
-      const adminSorted = SortUtil.numberComparator(a, b, adminSortBy);
+    const adminSorted = SortUtil.numberComparator(a, b, adminSortBy);
 
-      if (adminSorted) {
-        return adminSorted;
-      }
+    if (adminSorted) {
+      return adminSorted;
     }
 
     const sorted = SortUtil.stringComparator(a, b, sortBy);
@@ -100,18 +110,18 @@ export default class SortUtil {
     return 0;
   }
 
-  private static numberComparator(a, b, { field, order }: SortBy) {
+  private static numberComparator<T extends object>(a: T, b: T, { field, order }: App.SortBy) {
     const aResolved = SortUtil.resolveFieldChain(a, field);
     const bResolved = SortUtil.resolveFieldChain(b, field);
 
-    if (order === SortDirection.ASC) {
+    if (order === App.SortDirection.ASC) {
       return aResolved - bResolved;
     } else {
       return bResolved - aResolved;
     }
   }
 
-  private static stringComparator(a, b, { field, order }: SortBy) {
+  private static stringComparator<T extends object>(a: T, b: T, { field, order }: App.SortBy) {
     const aResolved = SortUtil.resolveFieldChain(a, field);
     const bResolved = SortUtil.resolveFieldChain(b, field);
 
@@ -126,7 +136,7 @@ export default class SortUtil {
       return -1;
     }
 
-    if (order === SortDirection.ASC) {
+    if (order === App.SortDirection.ASC) {
       return aResolved.localeCompare(bResolved);
     } else {
       return bResolved.localeCompare(aResolved);
@@ -135,19 +145,20 @@ export default class SortUtil {
 
   private static resolveFieldChain(obj: object, field: string) {
     const links = field.split('.');
-
-    if (links.length > 1) {
-      return links.reduce((obj, link) => {
-        const parsed = parseInt(link, 10);
-
-        if (parsed.toLocaleString() === 'NaN') {
-          return obj[link];
-        } else {
-          return obj[parsed];
-        }
-      }, obj) || null;
-    } else {
+    if (links.length === 1) {
       return obj[field];
     }
+    // Walk nested path; bail to null if we hit a missing intermediate object.
+    // Note: intentionally avoids `|| null` so falsy-but-valid leaf values
+    // (0, '', false) are preserved.
+    let cursor: any = obj;
+    for (const link of links) {
+      if (cursor == null) {
+        return null;
+      }
+      const parsed = parseInt(link, 10);
+      cursor = Number.isNaN(parsed) ? cursor[link] : cursor[parsed];
+    }
+    return cursor ?? null;
   }
 }

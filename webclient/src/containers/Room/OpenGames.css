@@ -1,8 +1,7 @@
 .games {
 }
 
-.games-header,
-.game {
+.games-header {
   display: flex;
   padding: 10px;
   border-bottom: 1px solid black;
@@ -27,4 +26,8 @@
 .games-header__label.creator,
 .game__detail.creator {
   width: 20%;
+}
+
+.games__row {
+  cursor: pointer;
 }

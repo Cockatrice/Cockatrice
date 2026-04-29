@@ -1,10 +1,8 @@
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_Message_ext, Command_MessageSchema } from '@app/generated';
 
 export function message(userName: string, message: string): void {
-  BackendService.sendSessionCommand('Command_Message', { userName, message }, {
-    onSuccess: () => {
-      SessionPersistence.directMessageSent(userName, message);
-    },
-  });
+  WebClient.instance.protobuf.sendSessionCommand(Command_Message_ext, create(Command_MessageSchema, { userName, message }));
 }

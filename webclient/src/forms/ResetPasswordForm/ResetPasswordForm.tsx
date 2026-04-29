@@ -1,30 +1,36 @@
-// eslint-disable-next-line
-import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { Form, Field } from 'react-final-form'
-import { OnChange } from 'react-final-form-listeners';
+import { Form, Field } from 'react-final-form';
 import { useTranslation } from 'react-i18next';
 
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-import { InputField, KnownHosts } from 'components';
-import { FormKey } from 'types';
+import { InputField, KnownHosts } from '@app/components';
+import type { FormErrors } from '@app/forms';
+import { HostDTO } from '@app/services';
+
+import { useResetPasswordForm } from './useResetPasswordForm';
 
 import './ResetPasswordForm.css';
-import { useReduxEffect } from '../../hooks';
-import { ServerTypes } from '../../store';
 
-const ResetPasswordForm = ({ onSubmit, userName }) => {
-  const [errorMessage, setErrorMessage] = useState(false);
+export interface ResetPasswordFormValues {
+  userName: string;
+  token: string;
+  newPassword: string;
+  passwordAgain: string;
+  selectedHost: HostDTO;
+}
+
+interface ResetPasswordFormProps {
+  onSubmit: (values: ResetPasswordFormValues) => void;
+  userName?: string;
+}
+
+const ResetPasswordForm = ({ onSubmit, userName }: ResetPasswordFormProps) => {
   const { t } = useTranslation();
+  const { errorMessage } = useResetPasswordForm();
 
-  useReduxEffect(() => {
-    setErrorMessage(true);
-  }, ServerTypes.RESET_PASSWORD_FAILED, []);
-
-  const validate = values => {
-    const errors: any = {};
+  const validate = (values: Partial<ResetPasswordFormValues>): FormErrors<ResetPasswordFormValues> => {
+    const errors: FormErrors<ResetPasswordFormValues> = {};
 
     if (!values.userName) {
       errors.userName = t('Common.validation.required');
@@ -51,16 +57,17 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
     return errors;
   };
 
-  const handleOnSubmit = ({ userName, token, ...values }) => {
-    userName = userName?.trim();
-    token = token?.trim();
-
-    onSubmit({ userName, token, ...values });
-  }
+  const handleOnSubmit = ({ userName: uName, token, ...values }: ResetPasswordFormValues) => {
+    onSubmit({
+      ...values,
+      userName: uName?.trim(),
+      token: token?.trim(),
+    });
+  };
 
   return (
     <Form onSubmit={handleOnSubmit} validate={validate} initialValues={{ userName }}>
-      {({ handleSubmit, form }) => (
+      {({ handleSubmit }) => (
         <form className='ResetPasswordForm' onSubmit={handleSubmit}>
           <div className='ResetPasswordForm-items'>
             <div className='ResetPasswordForm-item'>
@@ -69,7 +76,7 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
                 name='userName'
                 component={InputField}
                 autoComplete='username'
-                disabled={!!userName}
+                InputProps={{ readOnly: Boolean(userName) }}
               />
             </div>
             <div className='ResetPasswordForm-item'>
@@ -99,12 +106,12 @@ const ResetPasswordForm = ({ onSubmit, userName }) => {
 
             {errorMessage && (
               <div className='ResetPasswordForm-item'>
-                <Typography color="error">{ t('ResetPasswordForm.error') }</Typography>
+                <Typography color="error">{t('ResetPasswordForm.error')}</Typography>
               </div>
             )}
           </div>
           <Button className='ResetPasswordForm-submit rounded tall' color='primary' variant='contained' type='submit'>
-            { t('ResetPasswordForm.label.reset') }
+            {t('ResetPasswordForm.label.reset')}
           </Button>
         </form>
       )}

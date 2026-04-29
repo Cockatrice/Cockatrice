@@ -1,28 +1,37 @@
-import { ForgotPasswordChallengeParams } from 'store';
-import { StatusEnum, WebSocketConnectOptions } from 'types';
+import { create } from '@bufbuild/protobuf';
+import {
+  Command_ForgotPasswordChallenge_ext,
+  Command_ForgotPasswordChallengeSchema,
+  type ForgotPasswordChallengeParams,
+} from '@app/generated';
 
-import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
+import { StatusEnum } from '../../types/StatusEnum';
+import { CLIENT_CONFIG } from '../../config';
+import { WebClient } from '../../WebClient';
+import type { ConnectTarget } from '../../types/WebClientConfig';
 import { disconnect, updateStatus } from './';
 
-export function forgotPasswordChallenge(options: WebSocketConnectOptions): void {
-  const { userName, email } = options as unknown as ForgotPasswordChallengeParams;
+export function forgotPasswordChallenge(options: ConnectTarget & ForgotPasswordChallengeParams): void {
+  const { userName, email } = options;
 
-  BackendService.sendSessionCommand('Command_ForgotPasswordChallenge', {
-    ...webClient.clientConfig,
-    userName,
-    email,
-  }, {
-    onSuccess: () => {
-      updateStatus(StatusEnum.DISCONNECTED, null);
-      SessionPersistence.resetPassword();
-      disconnect();
-    },
-    onError: () => {
-      updateStatus(StatusEnum.DISCONNECTED, null);
-      SessionPersistence.resetPasswordFailed();
-      disconnect();
-    },
-  });
+  WebClient.instance.protobuf.sendSessionCommand(
+    Command_ForgotPasswordChallenge_ext,
+    create(Command_ForgotPasswordChallengeSchema, {
+      ...CLIENT_CONFIG,
+      userName,
+      email,
+    }),
+    {
+      onSuccess: () => {
+        updateStatus(StatusEnum.DISCONNECTED, null);
+        WebClient.instance.response.session.resetPassword();
+        disconnect();
+      },
+      onError: () => {
+        updateStatus(StatusEnum.DISCONNECTED, null);
+        WebClient.instance.response.session.resetPasswordFailed();
+        disconnect();
+      },
+    }
+  );
 }

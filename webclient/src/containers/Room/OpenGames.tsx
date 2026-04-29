@@ -1,8 +1,3 @@
-// eslint-disable-next-line
-import React, { Component } from "react";
-import { connect } from 'react-redux';
-import * as _ from 'lodash';
-
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,102 +6,111 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Tooltip from '@mui/material/Tooltip';
 
-// import { RoomsService } from "AppShell/common/services";
+import { UserDisplay } from '@app/components';
+import { Data, Enriched } from '@app/types';
 
-import { SortUtil, RoomsDispatch, RoomsSelectors } from 'store';
-import { UserDisplay } from 'components';
+import { useOpenGames } from './useOpenGames';
 
 import './OpenGames.css';
 
-// @TODO run interval to update timeSinceCreated
-class OpenGames extends Component<OpenGamesProps> {
-  private headerCells = [
-    {
-      label: 'Age',
-      field: 'startTime'
-    },
-    {
-      label: 'Description',
-      field: 'description'
-    },
-    {
-      label: 'Creator',
-      field: 'creatorInfo.name'
-    },
-    {
-      label: 'Type',
-      field: 'gameType'
-    },
-    {
-      label: 'Restrictions',
-      // field: "?"
-    },
-    {
-      label: 'Players',
-      // field: ["maxPlayers", "playerCount"]
-    },
-    {
-      label: 'Spectators',
-      field: 'spectatorsCount'
-    },
+interface OpenGamesProps {
+  room: Enriched.Room;
+  onActivateGame?: (gameId: number) => void;
+}
+
+function formatRestrictions(info: Data.ServerInfo_Game): string {
+  const parts: string[] = [];
+  if (info.withPassword) {
+    parts.push('password');
+  }
+  if (info.onlyBuddies) {
+    parts.push('buddies only');
+  }
+  if (info.onlyRegistered) {
+    parts.push('reg. users only');
+  }
+  if (info.shareDecklistsOnLoad) {
+    parts.push('open decklists');
+  }
+  return parts.join(', ');
+}
+
+function formatSpectators(info: Data.ServerInfo_Game): string {
+  if (!info.spectatorsAllowed) {
+    return 'not allowed';
+  }
+  const flags: string[] = [];
+  if (info.spectatorsCanChat) {
+    flags.push('can chat');
+  }
+  if (info.spectatorsOmniscient) {
+    flags.push('see hands');
+  }
+  if (flags.length === 0) {
+    return String(info.spectatorsCount);
+  }
+  return `${info.spectatorsCount} (${flags.join(' & ')})`;
+}
+
+const OpenGames = ({ room, onActivateGame }: OpenGamesProps) => {
+  const roomId = room.info.roomId;
+  const { sortBy, games, selectedGameId, handleSort, handleSelect, handleActivate } = useOpenGames({
+    roomId,
+    onActivateGame,
+  });
+
+  const headerCells = [
+    { label: 'Age', field: 'info.startTime' },
+    { label: 'Description', field: 'info.description' },
+    { label: 'Creator', field: 'info.creatorInfo.name' },
+    { label: 'Type', field: 'gameType' },
+    { label: 'Restrictions' },
+    { label: 'Players' },
+    { label: 'Spectators', field: 'info.spectatorsCount' },
   ];
 
-  handleSort(sortByField) {
-    const { room: { roomId }, sortBy } = this.props;
-    const { field, order } = SortUtil.toggleSortBy(sortByField, sortBy);
-    RoomsDispatch.sortGames(roomId, field, order);
-  }
+  return (
+    <div className="games">
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            {headerCells.map(({ label, field }) => {
+              const active = field === sortBy.field;
+              const order = sortBy.order.toLowerCase();
+              const sortDirection = active ? (order === 'asc' ? 'asc' : 'desc') : false;
 
-  private isUnavailableGame({ started, maxPlayers, playerCount }) {
-    return !started && playerCount < maxPlayers;
-  }
-
-  private isPasswordProtectedGame({ withPassword }) {
-    return !withPassword;
-  }
-
-  private isBuddiesOnlyGame({ onlyBuddies }) {
-    return !onlyBuddies;
-  }
-
-  render() {
-    const { room, sortBy } = this.props;
-
-    const games = room.gameList.filter(game => (
-      this.isUnavailableGame(game) &&
-      this.isPasswordProtectedGame(game) &&
-      this.isBuddiesOnlyGame(game)
-    ));
-
-    return (
-      <div className="games">
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              { _.map(this.headerCells, ({ label, field }) => {
-                const active = field === sortBy.field;
-                const order = sortBy.order.toLowerCase();
-                const sortDirection = active ? order : false;
-
-                return (
-                  <TableCell sortDirection={sortDirection} key={label}>
-                    {!field ? label : (
-                      <TableSortLabel
-                        active={active}
-                        direction={order}
-                        onClick={() => this.handleSort(field)}
-                      >
-                        {label}
-                      </TableSortLabel>
-                    )}
-                  </TableCell>
-                );
-              })}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            { _.map(games, ({ description, gameId, gameType, creatorInfo, maxPlayers, playerCount, spectatorsCount, startTime }) => (
-              <TableRow key={gameId}>
+              return (
+                <TableCell sortDirection={sortDirection} key={label}>
+                  {!field ? label : (
+                    <TableSortLabel
+                      active={active}
+                      direction={order}
+                      onClick={() => handleSort(field)}
+                    >
+                      {label}
+                    </TableSortLabel>
+                  )}
+                </TableCell>
+              );
+            })}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {games.map((game: Enriched.Game) => {
+            const { info, gameType } = game;
+            const { description, gameId, creatorInfo, maxPlayers, playerCount, startTime } = info;
+            const isSelected = gameId === selectedGameId;
+            const restrictions = formatRestrictions(info);
+            const spectators = formatSpectators(info);
+            return (
+              <TableRow
+                key={gameId}
+                hover
+                selected={isSelected}
+                onClick={() => handleSelect(gameId)}
+                onDoubleClick={() => handleActivate(gameId)}
+                className={isSelected ? 'games__row games__row--selected' : 'games__row'}
+              >
                 <TableCell className="games-header__cell single-line-ellipsis">{startTime}</TableCell>
                 <TableCell className="games-header__cell">
                   <Tooltip title={description} placement="bottom-start" enterDelay={500}>
@@ -116,28 +120,19 @@ class OpenGames extends Component<OpenGamesProps> {
                   </Tooltip>
                 </TableCell>
                 <TableCell className="games-header__cell">
-                  <UserDisplay user={ creatorInfo } />
+                  {creatorInfo ? <UserDisplay user={creatorInfo} /> : null}
                 </TableCell>
                 <TableCell className="games-header__cell single-line-ellipsis">{gameType}</TableCell>
-                <TableCell className="games-header__cell single-line-ellipsis">?</TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">{restrictions}</TableCell>
                 <TableCell className="games-header__cell single-line-ellipsis">{`${playerCount}/${maxPlayers}`}</TableCell>
-                <TableCell className="games-header__cell single-line-ellipsis">{spectatorsCount}</TableCell>
+                <TableCell className="games-header__cell single-line-ellipsis">{spectators}</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    );
-  }
-}
+            );
+          })}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};
 
-interface OpenGamesProps {
-  room: any;
-  sortBy: any;
-}
-
-const mapStateToProps = state => ({
-  sortBy: RoomsSelectors.getSortGamesBy(state)
-});
-
-export default connect(mapStateToProps)(OpenGames);
+export default OpenGames;

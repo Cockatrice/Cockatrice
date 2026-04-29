@@ -1,6 +1,6 @@
-import { RoomPersistence } from '../../persistence';
-import { JoinRoomData, RoomEvent } from './interfaces';
+import type { Event_JoinRoom, RoomEvent } from '@app/generated';
+import { WebClient } from '../../WebClient';
 
-export function joinRoom({ userInfo }: JoinRoomData, { roomEvent: { roomId } }: RoomEvent): void {
-  RoomPersistence.userJoined(roomId, userInfo);
+export function joinRoom({ userInfo }: Event_JoinRoom, { roomId }: RoomEvent): void {
+  WebClient.instance.response.room.userJoined(roomId, userInfo);
 }

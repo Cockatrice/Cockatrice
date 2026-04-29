@@ -1,7 +1,7 @@
-import { reset } from 'redux-form';
 import { Actions } from './server.actions';
-import { store } from 'store';
-import { DeckList, DeckStorageTreeItem, ReplayMatch, WebSocketConnectOptions } from 'types';
+import { store } from '..';
+import { Data } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
 
 export const Dispatch = {
   initialized: () => {
@@ -10,97 +10,95 @@ export const Dispatch = {
   clearStore: () => {
     store.dispatch(Actions.clearStore());
   },
-  loginSuccessful: options => {
-    store.dispatch(Actions.loginSuccessful(options));
+  connectionAttempted: () => {
+    store.dispatch(Actions.connectionAttempted());
+  },
+  loginSuccessful: (options: WebsocketTypes.LoginSuccessContext) => {
+    store.dispatch(Actions.loginSuccessful({ options }));
   },
   loginFailed: () => {
     store.dispatch(Actions.loginFailed());
   },
-  connectionClosed: reason => {
-    store.dispatch(Actions.connectionClosed(reason));
-  },
   connectionFailed: () => {
     store.dispatch(Actions.connectionFailed());
   },
-  testConnectionSuccessful: () => {
-    store.dispatch(Actions.testConnectionSuccessful());
+  testConnectionStarted: () => {
+    store.dispatch(Actions.testConnectionStarted());
+  },
+  testConnectionSuccessful: (supportsHashedPassword: boolean) => {
+    store.dispatch(Actions.testConnectionSuccessful({ supportsHashedPassword }));
   },
   testConnectionFailed: () => {
     store.dispatch(Actions.testConnectionFailed());
   },
-  updateBuddyList: buddyList => {
-    store.dispatch(Actions.updateBuddyList(buddyList));
+  updateBuddyList: (buddyList: Data.ServerInfo_User[]) => {
+    store.dispatch(Actions.updateBuddyList({ buddyList }));
   },
-  addToBuddyList: user => {
-    store.dispatch(reset('addToBuddies'));
-    store.dispatch(Actions.addToBuddyList(user));
+  addToBuddyList: (user: Data.ServerInfo_User) => {
+    store.dispatch(Actions.addToBuddyList({ user }));
   },
-  removeFromBuddyList: userName => {
-    store.dispatch(Actions.removeFromBuddyList(userName));
+  removeFromBuddyList: (userName: string) => {
+    store.dispatch(Actions.removeFromBuddyList({ userName }));
   },
-  updateIgnoreList: ignoreList => {
-    store.dispatch(Actions.updateIgnoreList(ignoreList));
+  updateIgnoreList: (ignoreList: Data.ServerInfo_User[]) => {
+    store.dispatch(Actions.updateIgnoreList({ ignoreList }));
   },
-  addToIgnoreList: user => {
-    store.dispatch(reset('addToIgnore'));
-    store.dispatch(Actions.addToIgnoreList(user));
+  addToIgnoreList: (user: Data.ServerInfo_User) => {
+    store.dispatch(Actions.addToIgnoreList({ user }));
   },
-  removeFromIgnoreList: userName => {
-    store.dispatch(Actions.removeFromIgnoreList(userName));
+  removeFromIgnoreList: (userName: string) => {
+    store.dispatch(Actions.removeFromIgnoreList({ userName }));
   },
-  updateInfo: (name, version) => {
-    store.dispatch(Actions.updateInfo({
-      name,
-      version
-    }));
+  updateInfo: (name: string, version: string) => {
+    store.dispatch(Actions.updateInfo({ info: { name, version } }));
   },
-  updateStatus: (state, description) => {
-    store.dispatch(Actions.updateStatus({
-      state,
-      description
-    }));
+  updateStatus: (state: WebsocketTypes.StatusEnum, description: string) => {
+    store.dispatch(Actions.updateStatus({ status: { state, description } }));
   },
-  updateUser: user => {
-    store.dispatch(Actions.updateUser(user));
+  updateUser: (user: Data.ServerInfo_User) => {
+    store.dispatch(Actions.updateUser({ user }));
   },
-  updateUsers: users => {
-    store.dispatch(Actions.updateUsers(users));
+  updateUsers: (users: Data.ServerInfo_User[]) => {
+    store.dispatch(Actions.updateUsers({ users }));
   },
-  userJoined: user => {
-    store.dispatch(Actions.userJoined(user));
+  userJoined: (user: Data.ServerInfo_User) => {
+    store.dispatch(Actions.userJoined({ user }));
   },
-  userLeft: name => {
-    store.dispatch(Actions.userLeft(name));
+  userLeft: (name: string) => {
+    store.dispatch(Actions.userLeft({ name }));
   },
-  viewLogs: name => {
-    store.dispatch(Actions.viewLogs(name));
+  viewLogs: (logs: Data.ServerInfo_ChatMessage[]) => {
+    store.dispatch(Actions.viewLogs({ logs }));
   },
   clearLogs: () => {
     store.dispatch(Actions.clearLogs());
   },
-  serverMessage: message => {
-    store.dispatch(Actions.serverMessage(message));
+  serverMessage: (message: string) => {
+    store.dispatch(Actions.serverMessage({ message }));
   },
   registrationRequiresEmail: () => {
     store.dispatch(Actions.registrationRequiresEmail());
   },
   registrationSuccess: () => {
-    store.dispatch(Actions.registrationSuccess())
+    store.dispatch(Actions.registrationSuccess());
   },
-  registrationFailed: (error) => {
-    store.dispatch(Actions.registrationFailed(error));
+  registrationFailed: (reason: string, endTime?: number) => {
+    store.dispatch(Actions.registrationFailed({ reason, endTime }));
   },
-  registrationEmailError: (error) => {
-    store.dispatch(Actions.registrationEmailError(error));
+  clearRegistrationErrors: () => {
+    store.dispatch(Actions.clearRegistrationErrors());
   },
-  registrationPasswordError: (error) => {
-    store.dispatch(Actions.registrationPasswordError(error));
+  registrationEmailError: (error: string) => {
+    store.dispatch(Actions.registrationEmailError({ error }));
   },
-  registrationUserNameError: (error) => {
-    store.dispatch(Actions.registrationUserNameError(error));
+  registrationPasswordError: (error: string) => {
+    store.dispatch(Actions.registrationPasswordError({ error }));
   },
-  accountAwaitingActivation: (options: WebSocketConnectOptions) => {
-    store.dispatch(Actions.accountAwaitingActivation(options));
+  registrationUserNameError: (error: string) => {
+    store.dispatch(Actions.registrationUserNameError({ error }));
+  },
+  accountAwaitingActivation: (options: WebsocketTypes.PendingActivationContext) => {
+    store.dispatch(Actions.accountAwaitingActivation({ options }));
   },
   accountActivationSuccess: () => {
     store.dispatch(Actions.accountActivationSuccess());
@@ -120,8 +118,8 @@ export const Dispatch = {
   resetPasswordSuccess: () => {
     store.dispatch(Actions.resetPasswordSuccess());
   },
-  adjustMod: (userName, shouldBeMod, shouldBeJudge) => {
-    store.dispatch(Actions.adjustMod(userName, shouldBeMod, shouldBeJudge));
+  adjustMod: (userName: string, shouldBeMod: boolean, shouldBeJudge: boolean) => {
+    store.dispatch(Actions.adjustMod({ userName, shouldBeMod, shouldBeJudge }));
   },
   reloadConfig: () => {
     store.dispatch(Actions.reloadConfig());
@@ -135,85 +133,91 @@ export const Dispatch = {
   accountPasswordChange: () => {
     store.dispatch(Actions.accountPasswordChange());
   },
-  accountEditChanged: (user) => {
-    store.dispatch(Actions.accountEditChanged(user));
+  accountEditChanged: (user: Partial<Data.ServerInfo_User>) => {
+    store.dispatch(Actions.accountEditChanged({ user }));
   },
-  accountImageChanged: (user) => {
-    store.dispatch(Actions.accountImageChanged(user));
+  accountImageChanged: (user: Partial<Data.ServerInfo_User>) => {
+    store.dispatch(Actions.accountImageChanged({ user }));
   },
-  directMessageSent: (userName, message) => {
-    store.dispatch(Actions.directMessageSent(userName, message));
+  getUserInfo: (userInfo: Data.ServerInfo_User) => {
+    store.dispatch(Actions.getUserInfo({ userInfo }));
   },
-  getUserInfo: (userInfo) => {
-    store.dispatch(Actions.getUserInfo(userInfo));
+  notifyUser: (notification: Data.Event_NotifyUser) => {
+    store.dispatch(Actions.notifyUser({ notification }));
   },
-  notifyUser: (notification) => {
-    store.dispatch(Actions.notifyUser(notification))
+  serverShutdown: (data: Data.Event_ServerShutdown) => {
+    store.dispatch(Actions.serverShutdown({ data }));
   },
-  serverShutdown: (data) => {
-    store.dispatch(Actions.serverShutdown(data))
+  userMessage: (messageData: Data.Event_UserMessage) => {
+    store.dispatch(Actions.userMessage({ messageData }));
   },
-  userMessage: (messageData) => {
-    store.dispatch(Actions.userMessage(messageData))
+  addToList: (list: string, userName: string) => {
+    store.dispatch(Actions.addToList({ list, userName }));
   },
-  addToList: (list, userName) => {
-    store.dispatch(Actions.addToList(list, userName))
+  removeFromList: (list: string, userName: string) => {
+    store.dispatch(Actions.removeFromList({ list, userName }));
   },
-  removeFromList: (list, userName) => {
-    store.dispatch(Actions.removeFromList(list, userName))
+  banFromServer: (userName: string) => {
+    store.dispatch(Actions.banFromServer({ userName }));
   },
-  banFromServer: (userName) => {
-    store.dispatch(Actions.banFromServer(userName));
+  banHistory: (userName: string, banHistory: Data.ServerInfo_Ban[]) => {
+    store.dispatch(Actions.banHistory({ userName, banHistory }));
   },
-  banHistory: (userName, banHistory) => {
-    store.dispatch(Actions.banHistory(userName, banHistory))
+  warnHistory: (userName: string, warnHistory: Data.ServerInfo_Warning[]) => {
+    store.dispatch(Actions.warnHistory({ userName, warnHistory }));
   },
-  warnHistory: (userName, warnHistory) => {
-    store.dispatch(Actions.warnHistory(userName, warnHistory))
+  warnListOptions: (warnList: Data.Response_WarnList[]) => {
+    store.dispatch(Actions.warnListOptions({ warnList }));
   },
-  warnListOptions: (warnList) => {
-    store.dispatch(Actions.warnListOptions(warnList))
-  },
-  warnUser: (userName) => {
-    store.dispatch(Actions.warnUser(userName))
+  warnUser: (userName: string) => {
+    store.dispatch(Actions.warnUser({ userName }));
   },
   grantReplayAccess: (replayId: number, moderatorName: string) => {
-    store.dispatch(Actions.grantReplayAccess(replayId, moderatorName));
+    store.dispatch(Actions.grantReplayAccess({ replayId, moderatorName }));
   },
   forceActivateUser: (usernameToActivate: string, moderatorName: string) => {
-    store.dispatch(Actions.forceActivateUser(usernameToActivate, moderatorName));
+    store.dispatch(Actions.forceActivateUser({ usernameToActivate, moderatorName }));
   },
   getAdminNotes: (userName: string, notes: string) => {
-    store.dispatch(Actions.getAdminNotes(userName, notes));
+    store.dispatch(Actions.getAdminNotes({ userName, notes }));
   },
   updateAdminNotes: (userName: string, notes: string) => {
-    store.dispatch(Actions.updateAdminNotes(userName, notes));
+    store.dispatch(Actions.updateAdminNotes({ userName, notes }));
   },
-  replayList: (matchList: ReplayMatch[]) => {
-    store.dispatch(Actions.replayList(matchList));
+  replayList: (matchList: Data.ServerInfo_ReplayMatch[]) => {
+    store.dispatch(Actions.replayList({ matchList }));
   },
-  replayAdded: (matchInfo: ReplayMatch) => {
-    store.dispatch(Actions.replayAdded(matchInfo));
+  replayAdded: (matchInfo: Data.ServerInfo_ReplayMatch) => {
+    store.dispatch(Actions.replayAdded({ matchInfo }));
   },
   replayModifyMatch: (gameId: number, doNotHide: boolean) => {
-    store.dispatch(Actions.replayModifyMatch(gameId, doNotHide));
+    store.dispatch(Actions.replayModifyMatch({ gameId, doNotHide }));
   },
   replayDeleteMatch: (gameId: number) => {
-    store.dispatch(Actions.replayDeleteMatch(gameId));
+    store.dispatch(Actions.replayDeleteMatch({ gameId }));
   },
-  backendDecks: (deckList: DeckList) => {
-    store.dispatch(Actions.backendDecks(deckList));
+  backendDecks: (deckList: Data.Response_DeckList) => {
+    store.dispatch(Actions.backendDecks({ deckList }));
   },
   deckNewDir: (path: string, dirName: string) => {
-    store.dispatch(Actions.deckNewDir(path, dirName));
+    store.dispatch(Actions.deckNewDir({ path, dirName }));
   },
   deckDelDir: (path: string) => {
-    store.dispatch(Actions.deckDelDir(path));
+    store.dispatch(Actions.deckDelDir({ path }));
   },
-  deckUpload: (path: string, treeItem: DeckStorageTreeItem) => {
-    store.dispatch(Actions.deckUpload(path, treeItem));
+  deckUpload: (path: string, treeItem: Data.ServerInfo_DeckStorage_TreeItem) => {
+    store.dispatch(Actions.deckUpload({ path, treeItem }));
   },
   deckDelete: (deckId: number) => {
-    store.dispatch(Actions.deckDelete(deckId));
+    store.dispatch(Actions.deckDelete({ deckId }));
   },
-}
+  deckDownloaded: (deckId: number, deck: string) => {
+    store.dispatch(Actions.deckDownloaded({ deckId, deck }));
+  },
+  replayDownloaded: (replayId: number, replayData: Uint8Array) => {
+    store.dispatch(Actions.replayDownloaded({ replayId, replayData }));
+  },
+  gamesOfUser: (userName: string, response: Data.Response_GetGamesOfUser) => {
+    store.dispatch(Actions.gamesOfUser({ userName, response }));
+  },
+};

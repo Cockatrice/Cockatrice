@@ -1,49 +1,40 @@
-import { Component, CElement } from 'react';
-import { connect } from 'react-redux';
+import { ReactElement } from 'react';
 import Grid from '@mui/material/Grid';
-import Hidden from '@mui/material/Hidden';
 
 import './ThreePaneLayout.css';
 
-// @DEPRECATED
-// This component sucks balls, dont use it. It will be removed sooner than later.
-class ThreePaneLayout extends Component<ThreePaneLayoutProps> {
-  render() {
-    return (
-      <div className="three-pane-layout">
-        <Grid container rowSpacing={0} columnSpacing={2} className="grid">
-          <Grid item xs={12} md={9} lg={10} className="grid-main">
-            <Grid item className={
-              'grid-main__top'
-              + (this.props.fixedHeight ? ' fixedHeight' : '')
-            }>
-              {this.props.top}
-            </Grid>
-            <Grid item className={
-              'grid-main__bottom'
-              + (this.props.fixedHeight ? ' fixedHeight' : '')
-            }>
-              {this.props.bottom}
-            </Grid>
+/** @deprecated Scheduled for replacement with a more flexible layout component. */
+function ThreePaneLayout(props: ThreePaneLayoutProps) {
+  return (
+    <div className="three-pane-layout">
+      <Grid container rowSpacing={0} columnSpacing={2} className="grid">
+        <Grid size={{ xs: 12, md: 9, lg: 10 }} className="grid-main">
+          <Grid className={
+            'grid-main__top'
+            + (props.fixedHeight ? ' fixedHeight' : '')
+          }>
+            {props.top}
           </Grid>
-          <Hidden mdDown>
-            <Grid item md={3} lg={2} className="grid-side">
-              {this.props.side}
-            </Grid>
-          </Hidden>
+          <Grid className={
+            'grid-main__bottom'
+            + (props.fixedHeight ? ' fixedHeight' : '')
+          }>
+            {props.bottom}
+          </Grid>
         </Grid>
-      </div>
-    );
-  }
+        <Grid size={{ md: 3, lg: 2 }} sx={{ display: { xs: 'none', md: 'block' } }} className="grid-side">
+          {props.side}
+        </Grid>
+      </Grid>
+    </div>
+  );
 }
 
 interface ThreePaneLayoutProps {
-  top: CElement<any, any>,
-  bottom: CElement<any, any>,
-  side?: CElement<any, any>,
+  top: ReactElement,
+  bottom: ReactElement,
+  side?: ReactElement,
   fixedHeight?: boolean,
 }
 
-const mapStateToProps = state => ({});
-
-export default connect(mapStateToProps)(ThreePaneLayout);
+export default ThreePaneLayout;

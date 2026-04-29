@@ -1,7 +1,5 @@
-// eslint-disable-next-line
-import React from "react";
+import { useMemo } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
-import * as _ from 'lodash';
 
 import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
@@ -10,22 +8,32 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
-
-import { RoomsService } from 'api';
-import { RouteEnum } from 'types';
+import { useWebClient } from '@app/hooks';
+import { App, Enriched } from '@app/types';
 
 import './Rooms.css';
 
-const Rooms = ({ rooms, joinedRooms }) => {
-  const navigate = useNavigate();
+interface RoomsProps {
+  rooms: Record<number, Enriched.Room>;
+  joinedRooms: Enriched.Room[];
+}
 
-  function onClick(roomId) {
-    if (_.find(joinedRooms, room => room.roomId === roomId)) {
-      navigate(generatePath(RouteEnum.ROOM, { roomId }));
+const Rooms = ({ rooms, joinedRooms }: RoomsProps) => {
+  const navigate = useNavigate();
+  const webClient = useWebClient();
+
+  const joinedRoomIds = useMemo(
+    () => new Set(joinedRooms.map((room) => room.info.roomId)),
+    [joinedRooms],
+  );
+
+  const onClick = (roomId: number) => {
+    if (joinedRoomIds.has(roomId)) {
+      navigate(generatePath(App.RouteEnum.ROOM, { roomId: String(roomId) }));
     } else {
-      RoomsService.joinRoom(roomId);
+      webClient.request.rooms.joinRoom(roomId);
     }
-  }
+  };
 
   return (
     <div className="rooms">
@@ -41,20 +49,23 @@ const Rooms = ({ rooms, joinedRooms }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          { _.map(rooms, ({ description, gameCount, name, permissionlevel, playerCount, roomId }) => (
-            <TableRow key={roomId}>
-              <TableCell>{name}</TableCell>
-              <TableCell>{description}</TableCell>
-              <TableCell>{permissionlevel}</TableCell>
-              <TableCell>{playerCount}</TableCell>
-              <TableCell>{gameCount}</TableCell>
-              <TableCell>
-                <Button size="small" color="primary" variant="contained" onClick={() => onClick(roomId)}>
-                  Join
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
+          {Object.values(rooms).map((room) => {
+            const { description, gameCount, name, permissionlevel, playerCount, roomId } = room.info;
+            return (
+              <TableRow key={roomId}>
+                <TableCell>{name}</TableCell>
+                <TableCell>{description}</TableCell>
+                <TableCell>{permissionlevel}</TableCell>
+                <TableCell>{playerCount}</TableCell>
+                <TableCell>{gameCount}</TableCell>
+                <TableCell>
+                  <Button size="small" color="primary" variant="contained" onClick={() => onClick(roomId)}>
+                    Join
+                  </Button>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

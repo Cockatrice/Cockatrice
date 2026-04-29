@@ -1,13 +1,3 @@
-.dialog-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.MuiDialogTitle-root.dialog-title {
-  padding-bottom: 0;
-}
-
 .content {
   margin-bottom: 20px;
 }

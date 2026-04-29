@@ -1,57 +1,35 @@
-import { RequestPasswordSaltParams } from 'store';
-import { StatusEnum, WebSocketConnectOptions, WebSocketConnectReason } from 'types';
-
-import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
-import { ProtoController } from '../../services/ProtoController';
-import { SessionPersistence } from '../../persistence';
-
+import { create } from '@bufbuild/protobuf';
 import {
-  activate,
-  disconnect,
-  login,
-  forgotPasswordReset,
-  updateStatus
-} from './';
+  Command_RequestPasswordSalt_ext,
+  Command_RequestPasswordSaltSchema,
+  Response_PasswordSalt_ext,
+  Response_ResponseCode,
+  type RequestPasswordSaltParams,
+} from '@app/generated';
 
-export function requestPasswordSalt(options: WebSocketConnectOptions): void {
-  const { userName } = options as RequestPasswordSaltParams;
+import { StatusEnum } from '../../types/StatusEnum';
+import { CLIENT_CONFIG } from '../../config';
+import { WebClient } from '../../WebClient';
+import type { ConnectTarget } from '../../types/WebClientConfig';
+import { updateStatus } from './';
 
-  const onFailure = () => {
-    switch (options.reason) {
-      case WebSocketConnectReason.ACTIVATE_ACCOUNT:
-        SessionPersistence.accountActivationFailed();
-        break;
-      case WebSocketConnectReason.PASSWORD_RESET:
-        SessionPersistence.resetPasswordFailed();
-        break;
-      default:
-        SessionPersistence.loginFailed();
-    }
-    disconnect();
-  };
+export function requestPasswordSalt(
+  options: ConnectTarget & RequestPasswordSaltParams,
+  onSaltReceived: (passwordSalt: string) => void,
+  onFailure: () => void,
+): void {
+  const { userName } = options;
 
-  BackendService.sendSessionCommand('Command_RequestPasswordSalt', {
-    ...webClient.clientConfig,
+  WebClient.instance.protobuf.sendSessionCommand(Command_RequestPasswordSalt_ext, create(Command_RequestPasswordSaltSchema, {
+    ...CLIENT_CONFIG,
     userName,
-  }, {
-    responseName: 'Response_PasswordSalt',
+  }), {
+    responseExt: Response_PasswordSalt_ext,
     onSuccess: (resp) => {
-      const passwordSalt = resp?.passwordSalt;
-
-      switch (options.reason) {
-        case WebSocketConnectReason.ACTIVATE_ACCOUNT:
-          activate(options, passwordSalt);
-          break;
-        case WebSocketConnectReason.PASSWORD_RESET:
-          forgotPasswordReset(options, passwordSalt);
-          break;
-        default:
-          login(options, passwordSalt);
-      }
+      onSaltReceived(resp?.passwordSalt);
     },
     onResponseCode: {
-      [ProtoController.root.Response.ResponseCode.RespRegistrationRequired]: () => {
+      [Response_ResponseCode.RespRegistrationRequired]: () => {
         updateStatus(StatusEnum.DISCONNECTED, 'Login failed: registration required');
         onFailure();
       },

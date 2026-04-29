@@ -1,14 +1,14 @@
-import { SessionPersistence } from '../../persistence';
-import { AddToListData } from './interfaces';
+import type { Event_AddToList } from '@app/generated';
+import { WebClient } from '../../WebClient';
 
-export function addToList({ listName, userInfo }: AddToListData): void {
+export function addToList({ listName, userInfo }: Event_AddToList): void {
   switch (listName) {
     case 'buddy': {
-      SessionPersistence.addToBuddyList(userInfo);
+      WebClient.instance.response.session.addToBuddyList(userInfo);
       break;
     }
     case 'ignore': {
-      SessionPersistence.addToIgnoreList(userInfo);
+      WebClient.instance.response.session.addToIgnoreList(userInfo);
       break;
     }
     default: {

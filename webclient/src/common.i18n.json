@@ -3,6 +3,7 @@
     "language": "English",
     "disconnect": "Disconnect",
     "label": {
+      "confirmEmail": "Confirm Email",
       "confirmPassword": "Confirm Password",
       "confirmSure": "Are you sure?",
       "country": "Country",
@@ -19,6 +20,7 @@
       "username": "Username"
     },
     "validation": {
+      "emailsMustMatch": "Emails don't match",
       "minChars": "Minimum of {count} {count, plural, one {character} other {characters}} required",
       "passwordsMustMatch": "Passwords don't match",
       "required": "Required"

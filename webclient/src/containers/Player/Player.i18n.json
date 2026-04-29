@@ -1,0 +1,33 @@
+{
+  "Player": {
+    "title": "User Information",
+    "label": {
+      "realName": "Real Name",
+      "location": "Location",
+      "userLevel": "User Level",
+      "accountAge": "Account Age"
+    },
+    "level": {
+      "administrator": "Administrator",
+      "moderator": "Moderator",
+      "registered": "Registered user",
+      "unregistered": "Unregistered user",
+      "judge": "Judge"
+    },
+    "age": {
+      "unknown": "Unknown",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "daysWithYears": "{years, plural, one {# year} other {# years}}, {days, plural, one {# day} other {# days}}"
+    },
+    "action": {
+      "addBuddy": "Add to Buddy List",
+      "removeBuddy": "Remove from Buddy List",
+      "addIgnore": "Add to Ignore List",
+      "removeIgnore": "Remove from Ignore List",
+      "message": "Message",
+      "warn": "Warn User",
+      "ban": "Ban from Server",
+      "notFound": "User not found or still loading…"
+    }
+  }
+}

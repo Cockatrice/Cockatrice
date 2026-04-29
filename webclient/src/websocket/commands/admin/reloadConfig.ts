@@ -1,10 +1,10 @@
-import { BackendService } from '../../services/BackendService';
-import { AdminPersistence } from '../../persistence';
-
+import { create } from '@bufbuild/protobuf';
+import { Command_ReloadConfig_ext, Command_ReloadConfigSchema } from '@app/generated';
+import { WebClient } from '../../WebClient';
 export function reloadConfig(): void {
-  BackendService.sendAdminCommand('Command_ReloadConfig', {}, {
+  WebClient.instance.protobuf.sendAdminCommand(Command_ReloadConfig_ext, create(Command_ReloadConfigSchema), {
     onSuccess: () => {
-      AdminPersistence.reloadConfig();
+      WebClient.instance.response.admin.reloadConfig();
     },
   });
 }

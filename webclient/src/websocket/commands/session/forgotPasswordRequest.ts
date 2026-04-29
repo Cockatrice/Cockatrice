@@ -1,33 +1,38 @@
-import { ForgotPasswordParams } from 'store';
-import { StatusEnum, WebSocketConnectOptions } from 'types';
+import { create } from '@bufbuild/protobuf';
+import {
+  Command_ForgotPasswordRequest_ext,
+  Command_ForgotPasswordRequestSchema,
+  Response_ForgotPasswordRequest_ext,
+  type ForgotPasswordRequestParams,
+} from '@app/generated';
 
-import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
-
+import { StatusEnum } from '../../types/StatusEnum';
+import { CLIENT_CONFIG } from '../../config';
+import { WebClient } from '../../WebClient';
+import type { ConnectTarget } from '../../types/WebClientConfig';
 import { disconnect, updateStatus } from './';
 
-export function forgotPasswordRequest(options: WebSocketConnectOptions): void {
-  const { userName } = options as unknown as ForgotPasswordParams;
+export function forgotPasswordRequest(options: ConnectTarget & ForgotPasswordRequestParams): void {
+  const { userName } = options;
 
-  BackendService.sendSessionCommand('Command_ForgotPasswordRequest', {
-    ...webClient.clientConfig,
+  WebClient.instance.protobuf.sendSessionCommand(Command_ForgotPasswordRequest_ext, create(Command_ForgotPasswordRequestSchema, {
+    ...CLIENT_CONFIG,
     userName,
-  }, {
-    responseName: 'Response_ForgotPasswordRequest',
+  }), {
+    responseExt: Response_ForgotPasswordRequest_ext,
     onSuccess: (resp) => {
       if (resp?.challengeEmail) {
         updateStatus(StatusEnum.DISCONNECTED, null);
-        SessionPersistence.resetPasswordChallenge();
+        WebClient.instance.response.session.resetPasswordChallenge();
       } else {
         updateStatus(StatusEnum.DISCONNECTED, null);
-        SessionPersistence.resetPassword();
+        WebClient.instance.response.session.resetPassword();
       }
       disconnect();
     },
     onError: () => {
       updateStatus(StatusEnum.DISCONNECTED, null);
-      SessionPersistence.resetPasswordFailed();
+      WebClient.instance.response.session.resetPasswordFailed();
       disconnect();
     },
   });

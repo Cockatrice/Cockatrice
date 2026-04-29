@@ -1,0 +1,24 @@
+.card-drag-overlay {
+  width: 146px;
+  height: 204px;
+  border-radius: 6px;
+  overflow: hidden;
+  opacity: 0.85;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+.card-drag-overlay__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-drag-overlay__back {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #2a1f3d 0%, #1a1028 60%, #0d0617 100%);
+  border: 1px solid #3a2d50;
+  box-sizing: border-box;
+}

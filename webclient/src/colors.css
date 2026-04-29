@@ -1,0 +1,25 @@
+/**
+ * Shared CSS custom properties. Declared at :root so any stylesheet can
+ * reference them via var(--name). Mirrors the constants in
+ * src/types/colors.ts — keep both in sync when adding new entries.
+ *
+ * Loaded once from src/index.tsx alongside the top-level stylesheet.
+ */
+
+:root {
+  /* Arrow / modifier colors — paired with App.ArrowColor.* in TS. */
+  --color-arrow-red: #e04b3b;
+  --color-arrow-yellow: #f0c83c;
+  --color-arrow-blue: #89b8e0;
+  --color-arrow-green: #3da26b;
+
+  --color-arrow-red-glow: rgba(224, 75, 59, 0.55);
+  --color-arrow-green-glow: rgba(61, 162, 107, 0.55);
+
+  /* Highlight yellow: active turn indicator, host crown, focus ring,
+     chat author, PhaseBar selection border. Kept as a single shade for
+     visual consistency across the game surface. */
+  --color-highlight-yellow: #f7b01c;
+  --color-highlight-yellow-soft: rgba(247, 176, 28, 0.4);
+  --color-highlight-yellow-soft-alt: rgba(247, 176, 28, 0.55);
+}

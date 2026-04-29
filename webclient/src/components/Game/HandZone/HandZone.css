@@ -1,0 +1,33 @@
+.hand-zone {
+  height: 176px;
+  display: flex;
+  flex-direction: column;
+  background: #0a4a1e;
+  border-top: 2px solid #1a6a33;
+  padding: 4px 12px;
+  box-sizing: border-box;
+}
+
+.hand-zone__label {
+  color: #c4e8ce;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.hand-zone__cards {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.hand-zone--drop-over {
+  background: #126a2d;
+  box-shadow: inset 0 0 0 2px #4de078;
+}

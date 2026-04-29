@@ -1,7 +1,4 @@
-// eslint-disable-next-line
-import React, { useMemo, useState } from 'react';
-
-import { CardDTO } from 'services';
+import { CardDTO } from '@app/services';
 
 import './Card.css';
 
@@ -10,11 +7,13 @@ interface CardProps {
 }
 
 const Card = ({ card }: CardProps) => {
-  const src = `https://api.scryfall.com/cards/${card?.identifiers?.scryfallId}?format=image`;
+  if (!card) {
+    return null;
+  }
 
-  return card && (
-    <img className="card" src={src} alt={card?.name} />
-  );
-}
+  const src = `https://api.scryfall.com/cards/${card.identifiers?.scryfallId}?format=image`;
+
+  return <img className="card" src={src} alt={card.name} />;
+};
 
 export default Card;

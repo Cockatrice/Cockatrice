@@ -250,4 +250,6 @@ export const countryCodes = [
   'XK',
   'ZM',
   'ZW',
-];
+] as const;
+
+export type CountryCode = typeof countryCodes[number];

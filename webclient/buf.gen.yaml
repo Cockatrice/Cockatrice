@@ -1,0 +1,12 @@
+version: v2
+inputs:
+  - directory: ../libcockatrice_protocol/libcockatrice/protocol/pb
+plugins:
+  - local: protoc-gen-es
+    out: src/generated/proto
+    opt:
+      - target=ts
+  - local: [node, buf.gen.plugin.mjs]
+    out: src/generated
+    opt:
+      - target=ts

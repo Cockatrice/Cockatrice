@@ -1,10 +1,12 @@
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_DeckNewDir_ext, Command_DeckNewDirSchema } from '@app/generated';
 
 export function deckNewDir(path: string, dirName: string): void {
-  BackendService.sendSessionCommand('Command_DeckNewDir', { path, dirName }, {
+  WebClient.instance.protobuf.sendSessionCommand(Command_DeckNewDir_ext, create(Command_DeckNewDirSchema, { path, dirName }), {
     onSuccess: () => {
-      SessionPersistence.createServerDeckDir(path, dirName);
+      WebClient.instance.response.session.createServerDeckDir(path, dirName);
     },
   });
 }

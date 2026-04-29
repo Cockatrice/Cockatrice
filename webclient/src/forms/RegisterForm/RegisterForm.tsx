@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Form, Field } from 'react-final-form';
+import { useEffect } from 'react';
+import { Form, Field, useForm } from 'react-final-form';
 import { OnChange } from 'react-final-form-listeners';
 import setFieldTouched from 'final-form-set-field-touched';
 import { useTranslation } from 'react-i18next';
@@ -7,63 +7,70 @@ import { useTranslation } from 'react-i18next';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
-import { CountryDropdown, InputField, KnownHosts } from 'components';
-import { useReduxEffect } from 'hooks';
-import { ServerTypes } from 'store';
+import { CountryDropdown, InputField, KnownHosts } from '@app/components';
+import type { FormErrors } from '@app/forms';
+import type { HostDTO } from '@app/services';
+import { ServerDispatch } from '@app/store';
+
+import { useRegisterForm } from './useRegisterForm';
 
 import './RegisterForm.css';
-import { useToast } from 'components/Toast';
+
+export interface RegisterFormValues {
+  userName: string;
+  password: string;
+  passwordConfirm: string;
+  email?: string;
+  emailConfirm?: string;
+  realName?: string;
+  country?: string;
+  selectedHost: HostDTO;
+}
+
+interface RegisterFormProps {
+  onSubmit: (values: RegisterFormValues) => void;
+}
+
+// Drives `setFieldTouched` from inside the react-final-form context so the
+// hook lives in a real component body instead of the <Form> render prop,
+// where react-final-form might short-circuit rendering and desync hook order.
+const EmailTouchOnRequire = ({ emailRequired }: { emailRequired: boolean }) => {
+  const form = useForm();
+  useEffect(() => {
+    if (emailRequired) {
+      form.mutators.setFieldTouched('email', true);
+    }
+  }, [emailRequired, form]);
+  return null;
+};
 
 const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   const { t } = useTranslation();
-  const [emailRequired, setEmailRequired] = useState(false);
-  const [error, setError] = useState(null);
-  const [emailError, setEmailError] = useState(null);
-  const [passwordError, setPasswordError] = useState(null);
-  const [userNameError, setUserNameError] = useState(null);
-  const { openToast } = useToast({ key: 'registration-success', children: t('RegisterForm.toast.registerSuccess') })
+  const {
+    emailRequired,
+    emailError,
+    passwordError,
+    userNameError,
+    error,
+    onHostChange,
+    onEmailChange,
+    onPasswordChange,
+    onUserNameChange,
+  } = useRegisterForm();
 
-  const onHostChange = (host) => setEmailRequired(false);
-  const onEmailChange = () => emailError && setEmailError(null);
-  const onPasswordChange = () => passwordError && setPasswordError(null);
-  const onUserNameChange = () => userNameError && setUserNameError(null);
+  const handleOnSubmit = (values: RegisterFormValues) => {
+    ServerDispatch.clearRegistrationErrors();
 
-  useReduxEffect(() => {
-    setEmailRequired(true);
-  }, ServerTypes.REGISTRATION_REQUIRES_EMAIL);
+    onSubmit({
+      ...values,
+      userName: values.userName?.trim(),
+      email: values.email?.trim(),
+      realName: values.realName?.trim(),
+    });
+  };
 
-  useReduxEffect(({ error }) => {
-    setError(error);
-  }, ServerTypes.REGISTRATION_FAILED);
-
-  useReduxEffect(() => {
-    openToast()
-  }, ServerTypes.REGISTRATION_SUCCES);
-
-  useReduxEffect(({ error }) => {
-    setEmailError(error);
-  }, ServerTypes.REGISTRATION_EMAIL_ERROR);
-
-  useReduxEffect(({ error }) => {
-    setPasswordError(error);
-  }, ServerTypes.REGISTRATION_PASSWORD_ERROR);
-
-  useReduxEffect(({ error }) => {
-    setUserNameError(error);
-  }, ServerTypes.REGISTRATION_USERNAME_ERROR);
-
-  const handleOnSubmit = ({ userName, email, realName, ...values }) => {
-    setError(null);
-
-    userName = userName?.trim();
-    email = email?.trim();
-    realName = realName?.trim();
-
-    onSubmit({ userName, email, realName, ...values });
-  }
-
-  const validate = values => {
-    const errors: any = {};
+  const validate = (values: Partial<RegisterFormValues>): FormErrors<RegisterFormValues> => {
+    const errors: FormErrors<RegisterFormValues> = {};
 
     if (!values.userName) {
       errors.userName = t('Common.validation.required');
@@ -95,83 +102,87 @@ const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
       errors.email = emailError;
     }
 
+    if (emailRequired) {
+      if (!values.emailConfirm) {
+        errors.emailConfirm = t('Common.validation.required');
+      } else if (values.email !== values.emailConfirm) {
+        errors.emailConfirm = t('Common.validation.emailsMustMatch');
+      }
+    }
+
     return errors;
-  }
+  };
 
   return (
     <Form onSubmit={handleOnSubmit} validate={validate} mutators={{ setFieldTouched }}>
-      {({ handleSubmit, form, ...args }) => {
-        const { values } = form.getState();
-
-        if (emailRequired) {
-          // Allow form render to complete
-          setTimeout(() => form.mutators.setFieldTouched('email', true))
-        }
-
-        return (
-          <>
-            <form className="RegisterForm" onSubmit={handleSubmit}>
-              <div className="RegisterForm-column">
-                <div className="RegisterForm-item">
-                  <Field label={t('Common.label.username')} name="userName" component={InputField} autoComplete="username" />
-                  <OnChange name="userName">{onUserNameChange}</OnChange>
-                </div>
-                <div className="RegisterForm-item">
-                  <Field
-                    label={t('Common.label.password')}
-                    name="password"
-                    type="password"
-                    component={InputField}
-                    autoComplete='new-password'
-                  />
-                  <OnChange name="password">{onPasswordChange}</OnChange>
-                </div>
-                <div className="RegisterForm-item">
-                  <Field
-                    label={t('Common.label.confirmPassword')}
-                    name="passwordConfirm"
-                    type="password"
-                    component={InputField}
-                    autoComplete='new-password'
-                  />
-                </div>
-                <div className="RegisterForm-item">
-                  <Field name="selectedHost" component={KnownHosts} />
-                  <OnChange name="selectedHost">{onHostChange}</OnChange>
-                </div>
-              </div>
-              <div className="RegisterForm-column" >
-                <div className="RegisterForm-item">
-                  <Field label={t('Common.label.realName')} name="realName" component={InputField} />
-                </div>
-                <div className="RegisterForm-item">
-                  <Field label={t('Common.label.email')} name="email" type="email" component={InputField} />
-                  <OnChange name="email">{onEmailChange}</OnChange>
-                </div>
-                <div className="RegisterForm-item">
-                  <Field label={t('Common.label.country')} name="country" component={CountryDropdown} />
-                </div>
-                <Button className="RegisterForm-submit tall" color="primary" variant="contained" type="submit">
-                  { t('RegisterForm.label.register') }
-                </Button>
-              </div>
-            </form>
-
-            { error && (
+      {({ handleSubmit }) => (
+        <>
+          <EmailTouchOnRequire emailRequired={emailRequired} />
+          <form className="RegisterForm" onSubmit={handleSubmit}>
+            <div className="RegisterForm-column">
               <div className="RegisterForm-item">
-                <Typography color="error">{error}</Typography>
+                <Field label={t('Common.label.username')} name="userName" component={InputField} autoComplete="username" />
+                <OnChange name="userName">{onUserNameChange}</OnChange>
               </div>
-            )}
-          </>
-        );
-      }}
+              <div className="RegisterForm-item">
+                <Field
+                  label={t('Common.label.password')}
+                  name="password"
+                  type="password"
+                  component={InputField}
+                  autoComplete='new-password'
+                />
+                <OnChange name="password">{onPasswordChange}</OnChange>
+              </div>
+              <div className="RegisterForm-item">
+                <Field
+                  label={t('Common.label.confirmPassword')}
+                  name="passwordConfirm"
+                  type="password"
+                  component={InputField}
+                  autoComplete='new-password'
+                />
+              </div>
+              <div className="RegisterForm-item">
+                <Field name="selectedHost" component={KnownHosts} />
+                <OnChange name="selectedHost">{onHostChange}</OnChange>
+              </div>
+            </div>
+            <div className="RegisterForm-column" >
+              <div className="RegisterForm-item">
+                <Field label={t('Common.label.realName')} name="realName" component={InputField} />
+              </div>
+              <div className="RegisterForm-item">
+                <Field label={t('Common.label.email')} name="email" type="email" component={InputField} />
+                <OnChange name="email">{onEmailChange}</OnChange>
+              </div>
+              <div className="RegisterForm-item">
+                <Field
+                  label={t('Common.label.confirmEmail')}
+                  name="emailConfirm"
+                  type="email"
+                  component={InputField}
+                />
+              </div>
+              <div className="RegisterForm-item">
+                <Field label={t('Common.label.country')} name="country" component={CountryDropdown} />
+              </div>
+              <Button className="RegisterForm-submit tall" color="primary" variant="contained" type="submit">
+                {t('RegisterForm.label.register')}
+              </Button>
+            </div>
+          </form>
+
+          {error && (
+            <div className="RegisterForm-item">
+              <Typography color="error">{error}</Typography>
+            </div>
+          )}
+        </>
+      )}
 
     </Form >
   );
 };
-
-interface RegisterFormProps {
-  onSubmit: any;
-}
 
 export default RegisterForm;

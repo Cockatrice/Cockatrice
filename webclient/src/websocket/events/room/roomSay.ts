@@ -1,8 +1,7 @@
-import { Message } from 'types';
+import type { Event_RoomSay, RoomEvent } from '@app/generated';
+import { WebClient } from '../../WebClient';
 
-import { RoomPersistence } from '../../persistence';
-import { RoomEvent } from './interfaces';
-
-export function roomSay(message: Message, { roomEvent: { roomId } }: RoomEvent): void {
-  RoomPersistence.addMessage(roomId, message);
+export function roomSay(data: Event_RoomSay, { roomId }: RoomEvent): void {
+  const message = { ...data, timeReceived: Date.now() };
+  WebClient.instance.response.room.addMessage(roomId, message);
 }

@@ -1,10 +1,13 @@
-import { BackendService } from '../../services/BackendService';
-import { SessionPersistence } from '../../persistence';
+import { create } from '@bufbuild/protobuf';
+import { WebClient } from '../../WebClient';
+
+import { Command_AccountPassword_ext, Command_AccountPasswordSchema } from '@app/generated';
 
 export function accountPassword(oldPassword: string, newPassword: string, hashedNewPassword: string): void {
-  BackendService.sendSessionCommand('Command_AccountPassword', { oldPassword, newPassword, hashedNewPassword }, {
+  const cmd = create(Command_AccountPasswordSchema, { oldPassword, newPassword, hashedNewPassword });
+  WebClient.instance.protobuf.sendSessionCommand(Command_AccountPassword_ext, cmd, {
     onSuccess: () => {
-      SessionPersistence.accountPasswordChange();
+      WebClient.instance.response.session.accountPasswordChange();
     },
   });
 }

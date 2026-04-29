@@ -1,0 +1,39 @@
+.turn-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 6px 12px;
+  border-top: 1px solid #1a2b52;
+}
+
+.turn-controls__btn {
+  height: 28px;
+  padding: 0 6px;
+  background: #17223d;
+  border: 1px solid #233a68;
+  color: #c8d4ef;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.turn-controls__btn:hover:not(:disabled) {
+  background: #223060;
+  border-color: #355090;
+  color: #fff;
+}
+
+.turn-controls__btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.turn-controls__btn--active {
+  background: #2d4583;
+  border-color: #5a7fcd;
+  color: #fff;
+}

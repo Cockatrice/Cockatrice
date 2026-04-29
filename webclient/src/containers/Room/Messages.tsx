@@ -1,15 +1,17 @@
-// eslint-disable-next-line
-import React from "react";
-
-import { Message } from 'components';
+import { Message } from '@app/components';
+import type { Enriched } from '@app/types';
 
 import './Messages.css';
 
-const Messages = ({ messages }) => (
+interface MessagesProps {
+  messages?: Enriched.Message[];
+}
+
+const Messages = ({ messages }: MessagesProps) => (
   <div className="messages">
     {
-      messages && messages.map((message, index) => (
-        <div className="message-wrapper" key={message.timeReceived}>
+      messages && messages.map((message, idx) => (
+        <div className="message-wrapper" key={`${message.timeReceived}-${idx}`}>
           <Message message={message} />
         </div>
       ))

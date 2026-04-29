@@ -1,38 +1,33 @@
-import React from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 
-import { RequestPasswordResetForm } from 'forms';
+import type { RequestPasswordResetFormValues } from '@app/forms';
+import { RequestPasswordResetForm } from '@app/forms';
 
-import './RequestPasswordResetDialog.css';
+import AuthDialogShell from '../AuthDialogShell/AuthDialogShell';
 
-const RequestPasswordResetDialog = ({ classes, handleClose, isOpen, onSubmit, skipTokenRequest }: any) => {
+interface RequestPasswordResetDialogProps {
+  isOpen: boolean;
+  handleClose?: () => void;
+  onSubmit: (values: RequestPasswordResetFormValues) => void;
+  skipTokenRequest: (userName: string) => void;
+}
+
+const RequestPasswordResetDialog = ({
+  handleClose,
+  isOpen,
+  onSubmit,
+  skipTokenRequest,
+}: RequestPasswordResetDialogProps) => {
   const { t } = useTranslation();
 
-  const handleOnClose = () => {
-    handleClose();
-  }
-
   return (
-    <Dialog onClose={handleOnClose} open={isOpen}>
-      <DialogTitle className="dialog-title">
-        <Typography variant="h6">{ t('RequestPasswordResetDialog.title') }</Typography>
-
-        {handleOnClose ? (
-          <IconButton onClick={handleOnClose} size="large">
-            <CloseIcon />
-          </IconButton>
-        ) : null}
-      </DialogTitle>
-      <DialogContent>
-        <RequestPasswordResetForm onSubmit={onSubmit} skipTokenRequest={skipTokenRequest}></RequestPasswordResetForm>
-      </DialogContent>
-    </Dialog>
+    <AuthDialogShell
+      isOpen={isOpen}
+      handleClose={handleClose}
+      title={t('RequestPasswordResetDialog.title')}
+    >
+      <RequestPasswordResetForm onSubmit={onSubmit} skipTokenRequest={skipTokenRequest} />
+    </AuthDialogShell>
   );
 };
 

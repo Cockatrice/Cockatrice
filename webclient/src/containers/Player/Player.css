@@ -1,0 +1,66 @@
+.player-view {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.player-view__card {
+  width: 100%;
+  max-width: 640px;
+  padding: 24px;
+}
+
+.player-view__avatar-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.player-view__avatar {
+  width: 160px;
+  height: 160px;
+  border-radius: 8px;
+  object-fit: cover;
+  background-color: var(--bg-subtle, #eee);
+}
+
+.player-view__name {
+  text-align: center;
+  margin: 0 0 8px;
+}
+
+.player-view__level-badge {
+  text-align: center;
+  margin-bottom: 16px;
+  color: var(--text-muted, #666);
+}
+
+.player-view__details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+}
+
+.player-view__label {
+  font-weight: bold;
+}
+
+.player-view__country-flag {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+  height: 16px;
+}
+
+.player-view__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.player-view__empty {
+  text-align: center;
+  color: var(--text-muted, #666);
+}

@@ -1,21 +1,28 @@
-import React from 'react';
-import Checkbox from '@mui/material/Checkbox';
+import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-const CheckboxField = (props) => {
-  const { input: { value, onChange }, label, ...args } = props;
+import type { FinalFormFieldProps } from '../fieldTypes';
 
-  // @TODO this isnt unchecking properly
+type CheckboxFieldProps = FinalFormFieldProps<boolean, HTMLInputElement> & {
+  label?: string;
+} & Omit<CheckboxProps, 'checked' | 'onChange' | 'onBlur' | 'onFocus' | 'name' | 'value'>;
+
+const CheckboxField = ({ input, meta: _meta, label, ...args }: CheckboxFieldProps) => {
+  const { value, onChange, onBlur, onFocus, name } = input;
+
   return (
     <FormControlLabel
       className="checkbox-field"
-      label={label}
+      label={label ?? ''}
       control={
         <Checkbox
-          { ...args }
+          {...args}
           className="checkbox-field__box"
-          checked={!!value}
-          onChange={(e, checked) => onChange(checked)}
+          name={name}
+          checked={Boolean(value)}
+          onChange={onChange}
+          onBlur={onBlur}
+          onFocus={onFocus}
           color="primary"
         />
       }

@@ -1,32 +1,33 @@
-import { ServerRegisterParams } from 'store';
-import { StatusEnum, WebSocketConnectOptions } from 'types';
+import { create, getExtension } from '@bufbuild/protobuf';
+import type { MessageInitShape } from '@bufbuild/protobuf';
+import {
+  Command_Register_ext,
+  Command_RegisterSchema,
+  Response_Register_ext,
+  Response_ResponseCode,
+  type RegisterParams,
+} from '@app/generated';
 
-import webClient from '../../WebClient';
-import { BackendService } from '../../services/BackendService';
-import { ProtoController } from '../../services/ProtoController';
-import { SessionPersistence } from '../../persistence';
+import { StatusEnum } from '../../types/StatusEnum';
+import { CLIENT_CONFIG } from '../../config';
+import { WebClient } from '../../WebClient';
+import type { ConnectTarget } from '../../types/WebClientConfig';
 import { hashPassword } from '../../utils';
-
 import { login, disconnect, updateStatus } from './';
 
-export function register(options: WebSocketConnectOptions, passwordSalt?: string): void {
-  const { userName, password, email, country, realName } = options as ServerRegisterParams;
+export function register(options: ConnectTarget & RegisterParams, password?: string, passwordSalt?: string): void {
+  const { userName, email, country, realName } = options;
 
-  const params: any = {
-    ...webClient.clientConfig,
+  const params: MessageInitShape<typeof Command_RegisterSchema> = {
+    ...CLIENT_CONFIG,
     userName,
     email,
     country,
     realName,
+    ...(passwordSalt
+      ? { hashedPassword: hashPassword(passwordSalt, password) }
+      : { password }),
   };
-
-  if (passwordSalt) {
-    params.hashedPassword = hashPassword(passwordSalt, password);
-  } else {
-    params.password = password;
-  }
-
-  const { ResponseCode } = ProtoController.root.Response;
 
   const onRegistrationError = (action: () => void) => {
     action();
@@ -34,44 +35,55 @@ export function register(options: WebSocketConnectOptions, passwordSalt?: string
     disconnect();
   };
 
-  BackendService.sendSessionCommand('Command_Register', params, {
+  WebClient.instance.protobuf.sendSessionCommand(Command_Register_ext, create(Command_RegisterSchema, params), {
     onResponseCode: {
-      [ResponseCode.RespRegistrationAccepted]: () => {
-        login(options, passwordSalt);
-        SessionPersistence.registrationSuccess();
+      [Response_ResponseCode.RespRegistrationAccepted]: () => {
+        login({
+          host: options.host,
+          port: options.port,
+          userName: options.userName,
+        }, password, passwordSalt);
+        WebClient.instance.response.session.registrationSuccess();
       },
-      [ResponseCode.RespRegistrationAcceptedNeedsActivation]: () => {
+      [Response_ResponseCode.RespRegistrationAcceptedNeedsActivation]: () => {
         updateStatus(StatusEnum.DISCONNECTED, 'Registration accepted, awaiting activation');
-        SessionPersistence.accountAwaitingActivation(options);
+        WebClient.instance.response.session.accountAwaitingActivation({
+          host: options.host,
+          port: options.port,
+          userName: options.userName,
+        });
         disconnect();
       },
-      [ResponseCode.RespUserAlreadyExists]: () => onRegistrationError(
-        () => SessionPersistence.registrationUserNameError('Username is taken')
+      [Response_ResponseCode.RespUserAlreadyExists]: () => onRegistrationError(
+        () => WebClient.instance.response.session.registrationUserNameError('Username is taken')
       ),
-      [ResponseCode.RespUsernameInvalid]: () => onRegistrationError(
-        () => SessionPersistence.registrationUserNameError('Invalid username')
+      [Response_ResponseCode.RespUsernameInvalid]: () => onRegistrationError(
+        () => WebClient.instance.response.session.registrationUserNameError('Invalid username')
       ),
-      [ResponseCode.RespPasswordTooShort]: () => onRegistrationError(
-        () => SessionPersistence.registrationPasswordError('Your password was too short')
+      [Response_ResponseCode.RespPasswordTooShort]: () => onRegistrationError(
+        () => WebClient.instance.response.session.registrationPasswordError('Your password was too short')
       ),
-      [ResponseCode.RespEmailRequiredToRegister]: () => onRegistrationError(
-        () => SessionPersistence.registrationRequiresEmail()
+      [Response_ResponseCode.RespEmailRequiredToRegister]: () => onRegistrationError(
+        () => WebClient.instance.response.session.registrationRequiresEmail()
       ),
-      [ResponseCode.RespEmailBlackListed]: () => onRegistrationError(
-        () => SessionPersistence.registrationEmailError('This email provider has been blocked')
+      [Response_ResponseCode.RespEmailBlackListed]: () => onRegistrationError(
+        () => WebClient.instance.response.session.registrationEmailError('This email provider has been blocked')
       ),
-      [ResponseCode.RespTooManyRequests]: () => onRegistrationError(
-        () => SessionPersistence.registrationEmailError('Max accounts reached for this email')
+      [Response_ResponseCode.RespTooManyRequests]: () => onRegistrationError(
+        () => WebClient.instance.response.session.registrationEmailError('Max accounts reached for this email')
       ),
-      [ResponseCode.RespRegistrationDisabled]: () => onRegistrationError(
-        () => SessionPersistence.registrationFailed('Registration is currently disabled')
+      [Response_ResponseCode.RespRegistrationDisabled]: () => onRegistrationError(
+        () => WebClient.instance.response.session.registrationFailed('Registration is currently disabled')
       ),
-      [ResponseCode.RespUserIsBanned]: (raw) => onRegistrationError(
-        () => SessionPersistence.registrationFailed(raw.reasonStr, raw.endTime)
-      ),
+      [Response_ResponseCode.RespUserIsBanned]: (raw) => {
+        const register = getExtension(raw, Response_Register_ext);
+        onRegistrationError(
+          () => WebClient.instance.response.session.registrationFailed(register.deniedReasonStr, Number(register.deniedEndTime))
+        );
+      },
     },
     onError: () => onRegistrationError(
-      () => SessionPersistence.registrationFailed('Registration failed due to a server issue')
+      () => WebClient.instance.response.session.registrationFailed('Registration failed due to a server issue')
     ),
   });
 }

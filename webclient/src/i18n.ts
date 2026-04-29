@@ -3,7 +3,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import ICU from 'i18next-icu';
 import { initReactI18next } from 'react-i18next';
 
-import { Language } from 'types';
+import { App } from '@app/types';
 
 import I18nBackend from './i18n-backend';
 
@@ -17,9 +17,9 @@ i18n
   .use(initReactI18next)
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
-    fallbackLng: Language['en-US'],
+    fallbackLng: App.Language['en-US'],
     resources: {
-      [Language['en-US']]: { translation },
+      [App.Language['en-US']]: { translation },
     },
     partialBundledLanguages: true,
 

@@ -1,67 +1,81 @@
-import { DeckStorageFolder, DeckStorageTreeItem, SortDirection, StatusEnum, UserLevelFlag, UserSortField } from 'types';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { App, Data, Enriched } from '@app/types';
+import { WebsocketTypes } from '@app/websocket/types';
+import { create } from '@bufbuild/protobuf';
 
-import { SortUtil } from '../common';
+import { normalizeBannedUserError, normalizeGameObject, normalizeGametypeMap, normalizeLogs } from '../common';
 
-import { ServerState } from './server.interfaces'
-import { Types } from './server.types';
+import { ServerState, ServerStateStatus } from './server.interfaces';
+
+export const MAX_USER_MESSAGES = 1000;
 
 function splitPath(path: string): string[] {
   return path ? path.split('/') : [];
 }
 
-function insertAtPath(folder: DeckStorageFolder, pathSegments: string[], item: DeckStorageTreeItem): DeckStorageFolder {
+function insertAtPath(
+  folder: Data.ServerInfo_DeckStorage_Folder,
+  pathSegments: string[],
+  item: Data.ServerInfo_DeckStorage_TreeItem,
+): Data.ServerInfo_DeckStorage_Folder {
   if (pathSegments.length === 0 || (pathSegments.length === 1 && pathSegments[0] === '')) {
-    return { items: [...folder.items, item] };
+    return create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [...folder.items, item] });
   }
   const [head, ...tail] = pathSegments;
   const match = folder.items.find(child => child.name === head && child.folder);
   if (match) {
-    return {
+    return create(Data.ServerInfo_DeckStorage_FolderSchema, {
       items: folder.items.map(child =>
         child === match
           ? { ...child, folder: insertAtPath(child.folder!, tail, item) }
           : child
       ),
-    };
+    });
   }
-  const created: DeckStorageTreeItem = { id: 0, name: head, file: null, folder: insertAtPath({ items: [] }, tail, item) };
-  return { items: [...folder.items, created] };
+  const created: Data.ServerInfo_DeckStorage_TreeItem = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
+    id: 0, name: head, folder: insertAtPath(create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] }), tail, item)
+  });
+  return create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [...folder.items, created] });
 }
 
-function removeById(folder: DeckStorageFolder, id: number): DeckStorageFolder {
-  return {
+function removeById(folder: Data.ServerInfo_DeckStorage_Folder, id: number): Data.ServerInfo_DeckStorage_Folder {
+  return create(Data.ServerInfo_DeckStorage_FolderSchema, {
     items: folder.items
       .filter(item => item.id !== id)
       .map(item =>
         item.folder ? { ...item, folder: removeById(item.folder, id) } : item
       ),
-  };
+  });
 }
 
-function removeByPath(folder: DeckStorageFolder, pathSegments: string[]): DeckStorageFolder {
+function removeByPath(folder: Data.ServerInfo_DeckStorage_Folder, pathSegments: string[]): Data.ServerInfo_DeckStorage_Folder {
   if (pathSegments.length === 0 || (pathSegments.length === 1 && pathSegments[0] === '')) {
     return folder;
   }
   const [head, ...tail] = pathSegments;
   if (tail.length === 0) {
-    return { items: folder.items.filter(item => !(item.name === head && item.folder !== null)) };
+    return create(Data.ServerInfo_DeckStorage_FolderSchema, {
+      items: folder.items.filter(item => !(item.name === head && item.folder != null))
+    });
   }
-  return {
+  return create(Data.ServerInfo_DeckStorage_FolderSchema, {
     items: folder.items.map(item =>
       item.name === head && item.folder
         ? { ...item, folder: removeByPath(item.folder, tail) }
         : item
     ),
-  };
+  });
 }
 
 const initialState: ServerState = {
   initialized: false,
-  buddyList: [],
-  ignoreList: [],
+  testConnectionStatus: null,
+  buddyList: {},
+  ignoreList: {},
 
   status: {
-    state: StatusEnum.DISCONNECTED,
+    connectionAttemptMade: false,
+    state: WebsocketTypes.StatusEnum.DISCONNECTED,
     description: null
   },
   info: {
@@ -75,12 +89,11 @@ const initialState: ServerState = {
     chat: []
   },
   user: null,
-  users: [],
+  users: {},
   sortUsersBy: {
-    field: UserSortField.NAME,
-    order: SortDirection.ASC
+    field: App.UserSortField.NAME,
+    order: App.SortDirection.ASC
   },
-  connectOptions: {},
   messages: {},
   userInfo: {},
   notifications: [],
@@ -91,391 +104,322 @@ const initialState: ServerState = {
   warnListOptions: [],
   warnUser: '',
   adminNotes: {},
-  replays: [],
+  replays: {},
   backendDecks: null,
+  downloadedDeck: null,
+  downloadedReplay: null,
+  gamesOfUser: {},
+  registrationError: null,
 };
 
-export const serverReducer = (state = initialState, action: any) => {
-  switch (action.type) {
-    case Types.INITIALIZED: {
-      return {
-        ...initialState,
-        initialized: true
+export const serverSlice = createSlice({
+  name: 'server',
+  initialState,
+  reducers: {
+    initialized: () => ({
+      ...initialState,
+      initialized: true,
+    }),
+
+    connectionAttempted: (state) => {
+      state.status.connectionAttemptMade = true;
+    },
+
+    testConnectionStarted: (state) => {
+      state.testConnectionStatus = 'testing';
+    },
+
+    // `supportsHashedPassword` is typed on the action so `useReduxEffect`
+    // subscribers (see useKnownHostsComponent) can persist it to the host
+    // record in Dexie. It's deliberately not stored in redux state since
+    // only the lifecycle matters here; per-host capability lives in Dexie.
+    testConnectionSuccessful: (state, _action: PayloadAction<{ supportsHashedPassword: boolean }>) => {
+      state.testConnectionStatus = 'success';
+    },
+
+    testConnectionFailed: (state) => {
+      state.testConnectionStatus = 'failed';
+    },
+
+    clearStore: (state) => ({
+      ...initialState,
+      status: { ...state.status },
+    }),
+
+    serverMessage: (state, action: PayloadAction<{ message: string }>) => {
+      state.info.message = action.payload.message;
+    },
+
+    updateBuddyList: (state, action: PayloadAction<{ buddyList: Data.ServerInfo_User[] }>) => {
+      const buddyList: { [userName: string]: Data.ServerInfo_User } = {};
+      for (const user of action.payload.buddyList) {
+        buddyList[user.name] = user;
       }
-    }
-    case Types.ACCOUNT_AWAITING_ACTIVATION: {
-      return {
-        ...state,
-        connectOptions: {
-          ...action.options
-        }
+      state.buddyList = buddyList;
+    },
+
+    addToBuddyList: (state, action: PayloadAction<{ user: Data.ServerInfo_User }>) => {
+      const { user } = action.payload;
+      state.buddyList[user.name] = user;
+    },
+
+    removeFromBuddyList: (state, action: PayloadAction<{ userName: string }>) => {
+      delete state.buddyList[action.payload.userName];
+    },
+
+    updateIgnoreList: (state, action: PayloadAction<{ ignoreList: Data.ServerInfo_User[] }>) => {
+      const ignoreList: { [userName: string]: Data.ServerInfo_User } = {};
+      for (const user of action.payload.ignoreList) {
+        ignoreList[user.name] = user;
       }
-    }
-    case Types.ACCOUNT_ACTIVATION_FAILED:
-    case Types.ACCOUNT_ACTIVATION_SUCCESS: {
-      return {
-        ...state,
-        connectOptions: {}
+      state.ignoreList = ignoreList;
+    },
+
+    addToIgnoreList: (state, action: PayloadAction<{ user: Data.ServerInfo_User }>) => {
+      const { user } = action.payload;
+      state.ignoreList[user.name] = user;
+    },
+
+    removeFromIgnoreList: (state, action: PayloadAction<{ userName: string }>) => {
+      delete state.ignoreList[action.payload.userName];
+    },
+
+    updateInfo: (state, action: PayloadAction<{ info: { name: string; version: string } }>) => {
+      const { name, version } = action.payload.info;
+      state.info.name = name;
+      state.info.version = version;
+    },
+
+    updateStatus: (state, action: PayloadAction<{ status: Pick<ServerStateStatus, 'state' | 'description'> }>) => {
+      const { status } = action.payload;
+      state.status.state = status.state;
+      state.status.description = status.description;
+
+      if (status.state === WebsocketTypes.StatusEnum.DISCONNECTED) {
+        state.status.connectionAttemptMade = false;
       }
-    }
-    case Types.CLEAR_STORE: {
-      return {
-        ...initialState,
-        status: {
-          ...state.status
-        }
+    },
+
+    updateUser: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
+      if (state.user) {
+        state.user = create(Data.ServerInfo_UserSchema, { ...state.user, ...action.payload.user });
+      } else {
+        state.user = action.payload.user as Data.ServerInfo_User;
       }
-    }
-    case Types.SERVER_MESSAGE: {
-      const { message } = action;
-      const { info } = state;
+    },
 
-      return {
-        ...state,
-        info: { ...info, message }
+    updateUsers: (state, action: PayloadAction<{ users: Data.ServerInfo_User[] }>) => {
+      const users: { [userName: string]: Data.ServerInfo_User } = {};
+      for (const user of action.payload.users) {
+        users[user.name] = user;
       }
-    }
-    case Types.UPDATE_BUDDY_LIST: {
-      const { buddyList } = action;
-      const { sortUsersBy } = state;
+      state.users = users;
+    },
 
-      SortUtil.sortUsersByField(buddyList, sortUsersBy);
+    userJoined: (state, action: PayloadAction<{ user: Data.ServerInfo_User }>) => {
+      const { user } = action.payload;
+      state.users[user.name] = user;
+    },
 
-      return {
-        ...state,
-        buddyList: [
-          ...buddyList
-        ]
-      };
-    }
-    case Types.ADD_TO_BUDDY_LIST: {
-      const { user } = action;
-      const { sortUsersBy } = state;
+    userLeft: (state, action: PayloadAction<{ name: string }>) => {
+      delete state.users[action.payload.name];
+    },
 
-      const buddyList = [...state.buddyList];
+    viewLogs: (state, action: PayloadAction<{ logs: Data.ServerInfo_ChatMessage[] }>) => {
+      state.logs = normalizeLogs(action.payload.logs);
+    },
 
-      buddyList.push(user);
-      SortUtil.sortUsersByField(buddyList, sortUsersBy);
+    clearLogs: (state) => {
+      state.logs = { ...initialState.logs };
+    },
 
-      return {
-        ...state,
-        buddyList
-      };
-    }
-    case Types.REMOVE_FROM_BUDDY_LIST: {
-      const { userName } = action;
-      const buddyList = state.buddyList.filter(user => user.name !== userName);
-
-      return {
-        ...state,
-        buddyList
-      };
-    }
-    case Types.UPDATE_IGNORE_LIST: {
-      const { ignoreList } = action;
-      const { sortUsersBy } = state;
-
-      SortUtil.sortUsersByField(ignoreList, sortUsersBy);
-
-      return {
-        ...state,
-        ignoreList: [
-          ...ignoreList
-        ]
-      };
-    }
-    case Types.ADD_TO_IGNORE_LIST: {
-      const { user } = action;
-      const { sortUsersBy } = state;
-
-      const ignoreList = [...state.ignoreList];
-
-      ignoreList.push(user);
-      SortUtil.sortUsersByField(ignoreList, sortUsersBy);
-
-      return {
-        ...state,
-        ignoreList
-      };
-    }
-    case Types.REMOVE_FROM_IGNORE_LIST: {
-      const { userName } = action;
-      const ignoreList = state.ignoreList.filter(user => user.name !== userName);
-
-      return {
-        ...state,
-        ignoreList
-      };
-    }
-    case Types.UPDATE_INFO: {
-      const { name, version } = action.info;
-      const { info } = state;
-
-      return {
-        ...state,
-        info: { ...info, name, version }
+    userMessage: (state, action: PayloadAction<{ messageData: Data.Event_UserMessage }>) => {
+      if (!state.user) {
+        return;
       }
-    }
-    case Types.UPDATE_STATUS: {
-      const { status } = action;
-
-      return {
-        ...state,
-        status: { ...status }
-      }
-    }
-    case Types.UPDATE_USER:
-    case Types.ACCOUNT_EDIT_CHANGED:
-    case Types.ACCOUNT_IMAGE_CHANGED: {
-      const { user } = action;
-
-      return {
-        ...state,
-        user: {
-          ...state.user,
-          ...user
-        }
-      }
-    }
-    case Types.UPDATE_USERS: {
-      const users = [...action.users];
-      const { sortUsersBy } = state;
-
-
-      SortUtil.sortUsersByField(users, sortUsersBy);
-
-      return {
-        ...state,
-        users
-      };
-    }
-    case Types.USER_JOINED: {
-      const { sortUsersBy } = state;
-
-      const users = [
-        ...state.users,
-        { ...action.user }
-      ];
-
-      SortUtil.sortUsersByField(users, sortUsersBy);
-
-      return {
-        ...state,
-        users
-      };
-    }
-    case Types.USER_LEFT: {
-      const { name } = action;
-      const users = state.users.filter(user => user.name !== name);
-
-      return {
-        ...state,
-        users
-      };
-    }
-    case Types.VIEW_LOGS: {
-      const { logs } = action;
-
-      return {
-        ...state,
-        logs: {
-          ...logs
-        }
-      };
-    }
-    case Types.CLEAR_LOGS: {
-      return {
-        ...state,
-        logs: {
-          ...initialState.logs
-        }
-      }
-    }
-    case Types.USER_MESSAGE: {
-      const { senderName, receiverName } = action.messageData;
+      const { senderName, receiverName } = action.payload.messageData;
       const userName = state.user.name === senderName ? receiverName : senderName;
-
-      return {
-        ...state,
-        messages: {
-          ...state.messages,
-          [userName]: [
-            ...(state.messages[userName] ?? []),
-            action.messageData,
-          ],
-        }
-      };
-    }
-    case Types.GET_USER_INFO: {
-      const { userInfo } = action;
-
-      return {
-        ...state,
-        userInfo: {
-          ...state.userInfo,
-          [userInfo.name]: userInfo,
-        }
-      };
-    }
-    case Types.NOTIFY_USER: {
-      const { notification } = action;
-
-      return {
-        ...state,
-        notifications: [
-          ...state.notifications,
-          notification
-        ]
-      };
-    }
-    case Types.SERVER_SHUTDOWN: {
-      const { data } = action;
-
-      return {
-        ...state,
-        serverShutdown: data,
-      };
-    }
-    case Types.BAN_FROM_SERVER: {
-      const { userName } = action;
-
-      return {
-        ...state,
-        banUser: userName,
-      };
-    }
-    case Types.BAN_HISTORY: {
-      const { userName, banHistory } = action;
-
-      return {
-        ...state,
-        banHistory: {
-          ...state.banHistory,
-          [userName]: banHistory,
-        }
-      };
-    }
-    case Types.WARN_HISTORY: {
-      const { userName, warnHistory } = action;
-
-      return {
-        ...state,
-        warnHistory: {
-          ...state.warnHistory,
-          [userName]: warnHistory,
-        }
-      };
-    }
-    case Types.WARN_LIST_OPTIONS: {
-      const { warnList } = action;
-
-      return {
-        ...state,
-        warnListOptions: warnList,
-      };
-    }
-    case Types.WARN_USER: {
-      const { userName } = action;
-      return {
-        ...state,
-        warnUser: userName,
-      };
-    }
-    case Types.GET_ADMIN_NOTES:
-    case Types.UPDATE_ADMIN_NOTES: {
-      const { userName, notes } = action;
-      return {
-        ...state,
-        adminNotes: {
-          ...state.adminNotes,
-          [userName]: notes,
-        }
-      };
-    }
-    case Types.ADJUST_MOD: {
-      const { userName, shouldBeMod, shouldBeJudge } = action;
-
-      return {
-        ...state,
-        users: state.users.map((user) => {
-          if (user.name !== userName) {
-            return user;
-          }
-          const judgeFlag = shouldBeJudge ? UserLevelFlag.IsJudge : UserLevelFlag.IsNothing;
-          const modFlag = shouldBeMod ? UserLevelFlag.IsModerator : UserLevelFlag.IsNothing;
-          return {
-            ...user,
-            userLevel: user.userLevel & (judgeFlag | modFlag)
-          }
-        })
-      };
-    }
-    case Types.REPLAY_LIST: {
-      return { ...state, replays: [...action.matchList] };
-    }
-    case Types.REPLAY_ADDED: {
-      return { ...state, replays: [...state.replays, action.matchInfo] };
-    }
-    case Types.REPLAY_MODIFY_MATCH: {
-      return {
-        ...state,
-        replays: state.replays.map(r =>
-          r.gameId === action.gameId ? { ...r, doNotHide: action.doNotHide } : r
-        ),
-      };
-    }
-    case Types.REPLAY_DELETE_MATCH: {
-      return { ...state, replays: state.replays.filter(r => r.gameId !== action.gameId) };
-    }
-    case Types.BACKEND_DECKS: {
-      return { ...state, backendDecks: action.deckList };
-    }
-    case Types.DECK_UPLOAD: {
-      if (!state.backendDecks) {
-        return state;
+      if (!state.messages[userName]) {
+        state.messages[userName] = [];
       }
-      return {
-        ...state,
-        backendDecks: {
-          root: insertAtPath(state.backendDecks.root, splitPath(action.path), action.treeItem),
-        },
-      };
-    }
-    case Types.DECK_DELETE: {
-      if (!state.backendDecks) {
-        return state;
+      const msgs = state.messages[userName];
+      if (msgs.length >= MAX_USER_MESSAGES) {
+        state.messages[userName] = msgs.slice(msgs.length - MAX_USER_MESSAGES + 1);
       }
-      return {
-        ...state,
-        backendDecks: {
-          root: removeById(state.backendDecks.root, action.deckId),
-        },
-      };
-    }
-    case Types.DECK_NEW_DIR: {
-      if (!state.backendDecks) {
-        return state;
+      state.messages[userName].push(action.payload.messageData);
+    },
+
+    getUserInfo: (state, action: PayloadAction<{ userInfo: Data.ServerInfo_User }>) => {
+      const { userInfo } = action.payload;
+      state.userInfo[userInfo.name] = userInfo;
+    },
+
+    notifyUser: (state, action: PayloadAction<{ notification: Data.Event_NotifyUser }>) => {
+      state.notifications.push(action.payload.notification);
+    },
+
+    serverShutdown: (state, action: PayloadAction<{ data: Data.Event_ServerShutdown }>) => {
+      state.serverShutdown = action.payload.data;
+    },
+
+    banFromServer: (state, action: PayloadAction<{ userName: string }>) => {
+      state.banUser = action.payload.userName;
+    },
+
+    banHistory: (state, action: PayloadAction<{ userName: string; banHistory: Data.ServerInfo_Ban[] }>) => {
+      state.banHistory[action.payload.userName] = action.payload.banHistory;
+    },
+
+    warnHistory: (state, action: PayloadAction<{ userName: string; warnHistory: Data.ServerInfo_Warning[] }>) => {
+      state.warnHistory[action.payload.userName] = action.payload.warnHistory;
+    },
+
+    warnListOptions: (state, action: PayloadAction<{ warnList: Data.Response_WarnList[] }>) => {
+      state.warnListOptions = action.payload.warnList;
+    },
+
+    warnUser: (state, action: PayloadAction<{ userName: string }>) => {
+      state.warnUser = action.payload.userName;
+    },
+
+    getAdminNotes: (state, action: PayloadAction<{ userName: string; notes: string }>) => {
+      state.adminNotes[action.payload.userName] = action.payload.notes;
+    },
+
+    updateAdminNotes: (state, action: PayloadAction<{ userName: string; notes: string }>) => {
+      state.adminNotes[action.payload.userName] = action.payload.notes;
+    },
+
+    adjustMod: (state, action: PayloadAction<{ userName: string; shouldBeMod: boolean; shouldBeJudge: boolean }>) => {
+      const { userName, shouldBeMod, shouldBeJudge } = action.payload;
+      const user = state.users[userName];
+      if (!user) {
+        return;
       }
-      const newFolder: DeckStorageTreeItem = { id: 0, name: action.dirName, file: null, folder: { items: [] } };
-      return {
-        ...state,
-        backendDecks: {
-          root: insertAtPath(state.backendDecks.root, splitPath(action.path), newFolder),
-        },
-      };
-    }
-    case Types.DECK_DEL_DIR: {
-      if (!state.backendDecks) {
-        return state;
+      let newLevel = user.userLevel;
+      newLevel = shouldBeMod
+        ? (newLevel | Data.ServerInfo_User_UserLevelFlag.IsModerator)
+        : (newLevel & ~Data.ServerInfo_User_UserLevelFlag.IsModerator);
+      newLevel = shouldBeJudge
+        ? (newLevel | Data.ServerInfo_User_UserLevelFlag.IsJudge)
+        : (newLevel & ~Data.ServerInfo_User_UserLevelFlag.IsJudge);
+      user.userLevel = newLevel;
+    },
+
+    replayList: (state, action: PayloadAction<{ matchList: Data.ServerInfo_ReplayMatch[] }>) => {
+      const replays: { [gameId: number]: Data.ServerInfo_ReplayMatch } = {};
+      for (const match of action.payload.matchList) {
+        replays[match.gameId] = match;
       }
-      return {
-        ...state,
-        backendDecks: {
-          root: removeByPath(state.backendDecks.root, splitPath(action.path)),
-        },
-      };
-    }
-    default:
-      return state;
-  }
-}
+      state.replays = replays;
+    },
+
+    replayAdded: (state, action: PayloadAction<{ matchInfo: Data.ServerInfo_ReplayMatch }>) => {
+      const { matchInfo } = action.payload;
+      state.replays[matchInfo.gameId] = matchInfo;
+    },
+
+    replayModifyMatch: (state, action: PayloadAction<{ gameId: number; doNotHide: boolean }>) => {
+      const { gameId, doNotHide } = action.payload;
+      const existing = state.replays[gameId];
+      if (!existing) {
+        return;
+      }
+      existing.doNotHide = doNotHide;
+    },
+
+    replayDeleteMatch: (state, action: PayloadAction<{ gameId: number }>) => {
+      delete state.replays[action.payload.gameId];
+    },
+
+    backendDecks: (state, action: PayloadAction<{ deckList: Data.Response_DeckList }>) => {
+      state.backendDecks = action.payload.deckList;
+    },
+
+    deckUpload: (state, action: PayloadAction<{ path: string; treeItem: Data.ServerInfo_DeckStorage_TreeItem }>) => {
+      if (!state.backendDecks?.root) {
+        return;
+      }
+      state.backendDecks = create(Data.Response_DeckListSchema, {
+        root: insertAtPath(state.backendDecks.root, splitPath(action.payload.path), action.payload.treeItem),
+      });
+    },
+
+    deckDelete: (state, action: PayloadAction<{ deckId: number }>) => {
+      if (!state.backendDecks?.root) {
+        return;
+      }
+      state.backendDecks = create(Data.Response_DeckListSchema, {
+        root: removeById(state.backendDecks.root, action.payload.deckId),
+      });
+    },
+
+    deckNewDir: (state, action: PayloadAction<{ path: string; dirName: string }>) => {
+      if (!state.backendDecks?.root) {
+        return;
+      }
+      const newFolder: Data.ServerInfo_DeckStorage_TreeItem = create(Data.ServerInfo_DeckStorage_TreeItemSchema, {
+        id: 0, name: action.payload.dirName, folder: create(Data.ServerInfo_DeckStorage_FolderSchema, { items: [] })
+      });
+      state.backendDecks = create(Data.Response_DeckListSchema, {
+        root: insertAtPath(state.backendDecks.root, splitPath(action.payload.path), newFolder),
+      });
+    },
+
+    deckDelDir: (state, action: PayloadAction<{ path: string }>) => {
+      if (!state.backendDecks?.root) {
+        return;
+      }
+      state.backendDecks = create(Data.Response_DeckListSchema, {
+        root: removeByPath(state.backendDecks.root, splitPath(action.payload.path)),
+      });
+    },
+
+    deckDownloaded: (state, action: PayloadAction<{ deckId: number; deck: string }>) => {
+      state.downloadedDeck = action.payload;
+    },
+
+    replayDownloaded: (state, action: PayloadAction<{ replayId: number; replayData: Uint8Array }>) => {
+      state.downloadedReplay = action.payload;
+    },
+
+    gamesOfUser: (state, action: PayloadAction<{ userName: string; response: Data.Response_GetGamesOfUser }>) => {
+      const { userName, response } = action.payload;
+      const gametypeMap = normalizeGametypeMap(
+        (response.roomList ?? []).flatMap(room => room.gametypeList ?? [])
+      );
+      const games: { [gameId: number]: Enriched.Game } = {};
+      for (const g of response.gameList ?? []) {
+        const normalized = normalizeGameObject(g, gametypeMap);
+        games[normalized.info.gameId] = normalized;
+      }
+      state.gamesOfUser[userName] = games;
+    },
+
+    registrationFailed: (state, action: PayloadAction<{ reason: string; endTime?: number }>) => {
+      const { reason, endTime } = action.payload;
+      const error = endTime
+        ? normalizeBannedUserError(reason, endTime)
+        : reason;
+      state.registrationError = error;
+    },
+
+    clearRegistrationErrors: (state) => {
+      state.registrationError = null;
+    },
+
+    accountEditChanged: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
+      if (state.user) {
+        state.user = create(Data.ServerInfo_UserSchema, { ...state.user, ...action.payload.user });
+      }
+    },
+
+    accountImageChanged: (state, action: PayloadAction<{ user: Partial<Data.ServerInfo_User> }>) => {
+      if (state.user) {
+        state.user = create(Data.ServerInfo_UserSchema, { ...state.user, ...action.payload.user });
+      }
+    },
+  },
+});
+
+export const serverReducer = serverSlice.reducer;

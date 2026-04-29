@@ -1,6 +1,6 @@
-import { SessionPersistence } from '../../persistence';
-import { UserJoinedData } from './interfaces';
+import type { Event_UserJoined } from '@app/generated';
+import { WebClient } from '../../WebClient';
 
-export function userJoined({ userInfo }: UserJoinedData): void {
-  SessionPersistence.userJoined(userInfo);
+export function userJoined({ userInfo }: Event_UserJoined): void {
+  WebClient.instance.response.session.userJoined(userInfo);
 }

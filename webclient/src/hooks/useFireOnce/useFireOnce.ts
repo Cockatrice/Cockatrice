@@ -1,17 +1,20 @@
-import { useCallback, useState } from 'react';
-import { useReduxEffect } from 'hooks';
-import { ServerTypes } from 'store';
+import { useCallback, useRef, useState } from 'react';
 
-type UseFireOnceType = (...args: any) => any;
+type FireOnceFn = (...args: never[]) => unknown;
 
-export function useFireOnce<T extends UseFireOnceType>(fn: T): [boolean, any, any] {
-  const [actionIsInFlight, setActionIsInFlight] = useState(false)
-  const handleFireOnce = useCallback((args) => {
+export function useFireOnce<T extends FireOnceFn>(fn: T): [boolean, () => void, (...args: Parameters<T>) => void] {
+  const [actionIsInFlight, setActionIsInFlight] = useState(false);
+  const fnRef = useRef(fn);
+  fnRef.current = fn;
+
+  const handleFireOnce = useCallback((...args: Parameters<T>) => {
     setActionIsInFlight(true);
-    fn(args);
-  }, [])
-  function resetInFlightStatus() {
+    fnRef.current(...args);
+  }, []);
+
+  const resetInFlightStatus = useCallback(() => {
     setActionIsInFlight(false);
-  }
-  return [actionIsInFlight, resetInFlightStatus, handleFireOnce]
+  }, []);
+
+  return [actionIsInFlight, resetInFlightStatus, handleFireOnce];
 }
