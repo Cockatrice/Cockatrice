@@ -6,6 +6,7 @@
 #include "../client/settings/card_counter_settings.h"
 #include "../dialogs/dlg_move_top_cards_until.h"
 #include "../dialogs/dlg_roll_dice.h"
+#include "../dialogs/dlg_select_all_matching.h"
 #include "../zones/hand_zone.h"
 #include "../zones/logic/view_zone_logic.h"
 #include "../zones/table_zone.h"
@@ -694,10 +695,12 @@ void PlayerActions::actMoveBottomCardToTop()
  *
  * @param zone The zone to select from
  * @param filter A predicate to filter which cards are selected. Defaults to always returning true.
+ * @param toggleSelected If true, toggles the selection state if card is already selected
  */
 static void selectCardsInZone(
     const CardZoneLogic *zone,
-    std::function<bool(const CardItem *)> filter = [](const CardItem *) { return true; })
+    std::function<bool(const CardItem *)> filter = [](const CardItem *) { return true; },
+    bool toggleSelected = false)
 {
     if (!zone) {
         return;
@@ -705,7 +708,11 @@ static void selectCardsInZone(
 
     for (auto &cardItem : zone->getCards()) {
         if (cardItem && filter(cardItem)) {
-            cardItem->setSelected(true);
+            if (toggleSelected) {
+                cardItem->setSelected(!cardItem->isSelected());
+            } else {
+                cardItem->setSelected(true);
+            }
         }
     }
 }
@@ -742,6 +749,33 @@ void PlayerActions::actSelectColumn()
 
     auto isSameColumn = [card](const CardItem *cardItem) { return cardItem->x() == card->x(); };
     selectCardsInZone(card->getZone(), isSameColumn);
+}
+
+void PlayerActions::actSelectAllMatching()
+{
+    const CardItem *card = player->getGame()->getActiveCard();
+    if (!card) {
+        return;
+    }
+
+    auto dlg = DlgSelectAllMatching(player->getGame()->getTab(), lastSelectAllMatchingOptions);
+    if (!dlg.exec()) {
+        return;
+    }
+
+    QString expr = dlg.getExpr();
+    lastSelectAllMatchingOptions = dlg.getOptions();
+
+    if (lastSelectAllMatchingOptions.clearSelection) {
+        player->getGameScene()->clearSelection();
+    }
+
+    auto filterString = FilterString(expr);
+    auto matches = [filterString](const CardItem *cardItem) {
+        return filterString.check(cardItem->getCard().getCardPtr());
+    };
+
+    selectCardsInZone(card->getZone(), matches, lastSelectAllMatchingOptions.toggleSelected);
 }
 
 void PlayerActions::actDrawBottomCard()

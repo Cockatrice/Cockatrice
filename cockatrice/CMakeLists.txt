@@ -71,6 +71,7 @@ set(cockatrice_SOURCES
     src/game/dialogs/dlg_create_token.cpp
     src/game/dialogs/dlg_move_top_cards_until.cpp
     src/game/dialogs/dlg_roll_dice.cpp
+    src/game/dialogs/dlg_select_all_matching.cpp
     src/game/game.cpp
     src/game/game_event_handler.cpp
     src/game/game_meta_info.cpp
