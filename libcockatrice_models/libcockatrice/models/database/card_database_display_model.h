@@ -38,6 +38,7 @@ private:
 
 public:
     explicit CardDatabaseDisplayModel(QObject *parent = nullptr);
+    void setSourceModel(QAbstractItemModel *model) override;
     void setFilterTree(FilterTree *_filterTree);
     void setIsToken(FilterBool _isToken)
     {
