@@ -66,11 +66,7 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
 
 void ReplayTimelineWidget::mousePressEvent(QMouseEvent *event)
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     int newTime = static_cast<int>((qint64)maxTime * (qint64)event->position().x() / width());
-#else
-    int newTime = static_cast<int>((qint64)maxTime * (qint64)event->x() / width());
-#endif
     // don't buffer rewinds from clicks, since clicks usually don't happen fast enough to require buffering
     skipToTime(newTime, false);
 }

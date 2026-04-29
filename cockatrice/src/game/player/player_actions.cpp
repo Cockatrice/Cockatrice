@@ -1388,11 +1388,7 @@ void PlayerActions::actSetPT()
             const auto oldpt = parsePT(card->getPT());
             int ptIter = 0;
             for (const auto &_item : ptList) {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
                 if (_item.typeId() == QMetaType::Type::Int) {
-#else
-                if (_item.type() == QVariant::Int) {
-#endif
                     int oldItem = ptIter < oldpt.size() ? oldpt.at(ptIter).toInt() : 0;
                     newpt += '/' + QString::number(oldItem + _item.toInt());
                 } else {

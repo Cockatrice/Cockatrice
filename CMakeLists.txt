@@ -5,8 +5,7 @@
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-# cmake 3.16 is required if using qt6
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.25)
 
 # Early detect ccache
 option(USE_CCACHE "Cache the build results with ccache" ON)
@@ -57,7 +56,6 @@ if(WIN32 OR USE_VCPKG)
   # Qt path set by user or env var
   if(QTDIR
      OR DEFINED ENV{QTDIR}
-     OR DEFINED ENV{QTDIR32}
      OR DEFINED ENV{QTDIR64}
   )
 
@@ -151,7 +149,7 @@ if(MSVC)
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 
   add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
-elseif(CMAKE_COMPILER_IS_GNUCXX)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   # linux/gcc, bsd/gcc, windows/mingw
   include(CheckCXXCompilerFlag)
 
@@ -197,14 +195,9 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   add_definitions("-DSFMT_MEXP=19937")
 endif()
 
-find_package(Threads REQUIRED)
+find_package(Qt6 6.4 REQUIRED)
 
-# Determine 32 or 64 bit build
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  set(_lib_suffix 64)
-else()
-  set(_lib_suffix 32)
-endif()
+find_package(Threads REQUIRED)
 
 if(DEFINED QTDIR${_lib_suffix})
   list(APPEND CMAKE_PREFIX_PATH "${QTDIR${_lib_suffix}}")
@@ -222,7 +215,8 @@ include(FindQtRuntime)
 
 set(CMAKE_AUTOMOC TRUE)
 
-# Find other needed libraries
+## Find other needed libraries
+# Find Protobuf
 find_package(Protobuf CONFIG)
 if(NOT Protobuf_FOUND)
   find_package(Protobuf REQUIRED)
@@ -232,7 +226,7 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0" AND NOT EXISTS "${Protobuf_PROTOC
   message(FATAL_ERROR "No protoc command found!")
 endif()
 
-#Find OpenSSL
+# Find OpenSSL
 if(WIN32)
   find_package(OpenSSL REQUIRED)
   if(OPENSSL_FOUND)
@@ -245,7 +239,7 @@ if(WIN32)
   endif()
 endif()
 
-#Find VCredist
+# Find VCredist
 if(MSVC)
   find_package(VCredistRuntime)
 endif()
@@ -281,8 +275,6 @@ if(UNIX)
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
       if(Qt6_FOUND)
         set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
-      elseif(Qt5_FOUND)
-        set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt5-qttools, qt5-qtsvg, qt5-qtmultimedia")
       endif()
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
       set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
@@ -304,8 +296,6 @@ if(UNIX)
       if(Qt6_FOUND)
         set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
         set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
-      elseif(Qt5_FOUND)
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
       endif()
     endif()
   endif()
@@ -366,7 +356,6 @@ if(TEST)
   add_subdirectory(tests)
 endif()
 
-if(Qt6_FOUND AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
-  # Qt6.3+ requires project finalization to support translations
+if(Qt6_FOUND)
   qt6_finalize_project()
 endif()

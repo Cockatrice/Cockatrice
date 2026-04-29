@@ -24,11 +24,7 @@ void installNewTranslator()
     QString lang = SettingsCache::instance().getLang();
 
     QString qtNameHint = "qt_" + lang;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     QString qtTranslationPath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
-#else
-    QString qtTranslationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
-#endif
 
     bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
     if (!qtTranslationLoaded) {

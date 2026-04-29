@@ -105,11 +105,7 @@ void PrintingSelectorCardOverlayWidget::resizeEvent(QResizeEvent *event)
  *
  * @param event The event triggered when the mouse enters the widget.
  */
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void PrintingSelectorCardOverlayWidget::enterEvent(QEnterEvent *event)
-#else
-void PrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
-#endif
 {
     QWidget::enterEvent(event);
     deckEditor->updateCard(rootCard);
