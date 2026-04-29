@@ -273,6 +273,11 @@ echo "::endgroup::"
 if [[ $USE_CCACHE ]]; then
   if [[ $CCACHE_EVICTION_AGE ]]; then
     echo "::group::evict ccache files older than $CCACHE_EVICTION_AGE"
+    ccache_dir=$(ccache --get-config cache_dir)
+    mapfile -t timestamps < <(find "$ccache_dir" -name CACHEDIR.TAG -prune -o -type f -printf '%T+\n' | sort)
+    filecount=${#timestamps[@]}
+    oldest_file=${timestamps[0]}
+    echo "the oldest file before deletion is from $oldest_file out of $filecount files in $ccache_dir"
     ccache --evict-older-than "$CCACHE_EVICTION_AGE"
     echo "::endgroup::"
   fi
