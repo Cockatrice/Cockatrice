@@ -485,27 +485,43 @@ jobs:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
 
       - name: Sign app bundle
-        if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
+        if: matrix.os == 'macOS' && matrix.make_package
         id: sign_macos
+        shell: bash
         env:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
         run: |
-          if [[ -n "$MACOS_CERTIFICATE_NAME" ]]
-          then
+          if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
             security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-            /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose ${{steps.build.outputs.path}}
+            codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose ${{steps.build.outputs.path}}
+
+            echo "Inspect app signature"
+            codesign -dv --verbose ${{steps.build.outputs.path}}
+
+            echo "Verify app signature"
+            codesign --verify --deep --verbose ${{steps.build.outputs.path}}
+
+            echo "Checking Gatekeepr conformance of the app"
+            codesign --verify --deep --strict --verbose=2 ${{steps.build.outputs.path}}
+
+           # echo "Assess the application"
+           # spctl --assess --type execute --verbose ${{steps.build.outputs.path}}
+
+           # echo "Checking Gatekeepr conformance of the app 2"
+           # spctl -a -t exec -vv ${{steps.build.outputs.path}}
+
           fi
 
       - name: Notarize app bundle
-        if: steps.sign_macos.outcome == 'success'
+        if: steps.sign_macos.outcome == 'success' && needs.configure.outputs.tag != null
+        shell: bash
         env:
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
           MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
         run: |
-          if [[ -n "$MACOS_NOTARIZATION_APPLE_ID" ]]
-          then
+          if [[ -n "$MACOS_NOTARIZATION_APPLE_ID" ]]; then
             # Store the notarization credentials so that we can prevent a UI password dialog from blocking the CI
             echo "Create keychain profile"
             xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MACOS_NOTARIZATION_APPLE_ID" --team-id "$MACOS_NOTARIZATION_TEAM_ID" --password "$MACOS_NOTARIZATION_PWD"
@@ -527,6 +543,15 @@ jobs:
             # validated by macOS even when an internet connection is not available.
             echo "Attach staple"
             xcrun stapler staple ${{steps.build.outputs.path}}
+
+            echo "Verify notarization status"
+            spctl -a -v ${{steps.build.outputs.path}}
+
+            echo "Check Gatekeeper assessment"
+            spctl --assess --type execute --verbose ${{steps.build.outputs.path}}
+
+            echo "Validate notarization ticket"
+            xcrun stapler validate ${{steps.build.outputs.path}}
           fi
 
       - name: Upload artifact
