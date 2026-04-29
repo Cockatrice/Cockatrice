@@ -58,7 +58,7 @@ void AbstractCardItem::pixmapUpdated()
 
 void AbstractCardItem::refreshCardInfo()
 {
-    exactCard = CardDatabaseManager::query()->getCard(cardRef);
+    exactCard = CardDatabaseManager::query().getCard(cardRef);
 
     if (!exactCard && !cardRef.name.isEmpty()) {
         CardInfo::UiAttributes attributes = {.tableRow = -1};

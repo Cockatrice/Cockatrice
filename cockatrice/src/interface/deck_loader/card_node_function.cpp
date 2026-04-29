@@ -7,7 +7,7 @@
 void CardNodeFunction::SetProviderIdToPreferred::operator()(const InnerDecklistNode *node, DecklistCardNode *card) const
 {
     Q_UNUSED(node);
-    PrintingInfo preferredPrinting = CardDatabaseManager::query()->getPreferredPrinting(card->getName());
+    PrintingInfo preferredPrinting = CardDatabaseManager::query().getPreferredPrinting(card->getName());
     QString providerId = preferredPrinting.getUuid();
     QString setShortName = preferredPrinting.getSet()->getShortName();
     QString collectorNumber = preferredPrinting.getProperty("num");
@@ -30,9 +30,8 @@ void CardNodeFunction::ResolveProviderId::operator()(const InnerDecklistNode *no
     Q_UNUSED(node);
     // Retrieve the providerId based on setName and collectorNumber
     QString providerId =
-        CardDatabaseManager::getInstance()
-            ->query()
-            ->getSpecificPrinting(card->getName(), card->getCardSetShortName(), card->getCardCollectorNumber())
+        CardDatabaseManager::query()
+            .getSpecificPrinting(card->getName(), card->getCardSetShortName(), card->getCardCollectorNumber())
             .getUuid();
 
     // Set the providerId on the card

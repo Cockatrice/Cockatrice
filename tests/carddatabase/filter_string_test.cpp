@@ -24,10 +24,10 @@ protected:
                                             new TestCardDatabasePathProvider(), new NoopCardSetPriorityController());
         db->loadCardDatabases();
 
-        cat = db->query()->getCardBySimpleName("Cat");
-        notDeadAfterAll = db->query()->getCardBySimpleName("Not Dead");
-        truth = db->query()->getCardBySimpleName("Truth");
-        doctor = db->query()->getCardBySimpleName("Doctor");
+        cat = db->query().getCardBySimpleName("Cat");
+        notDeadAfterAll = db->query().getCardBySimpleName("Not Dead");
+        truth = db->query().getCardBySimpleName("Truth");
+        doctor = db->query().getCardBySimpleName("Doctor");
     }
     // void TearDown() override {}
 

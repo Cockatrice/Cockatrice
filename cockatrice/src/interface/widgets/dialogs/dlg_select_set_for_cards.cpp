@@ -153,8 +153,8 @@ static bool swapPrinting(DeckListModel *model, const QString &modifiedSet, const
     }
     int amount = model->data(idx.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT), Qt::DisplayRole).toInt();
     model->removeCardAtIndex(idx);
-    CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(cardName);
-    PrintingInfo printing = CardDatabaseManager::query()->getSpecificPrinting(cardName, modifiedSet, "");
+    CardInfoPtr cardInfo = CardDatabaseManager::query().getCardInfo(cardName);
+    PrintingInfo printing = CardDatabaseManager::query().getSpecificPrinting(cardName, modifiedSet, "");
     for (int i = 0; i < amount; i++) {
         model->addCard(ExactCard(cardInfo, printing), DECK_ZONE_MAIN);
     }
@@ -236,7 +236,7 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
     QList<QString> cardNames = deckStateManager->getModel()->getCardNames();
 
     for (auto cardName : cardNames) {
-        CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(cardName);
+        CardInfoPtr infoPtr = CardDatabaseManager::query().getCardInfo(cardName);
         if (!infoPtr)
             continue;
 
@@ -289,16 +289,13 @@ void DlgSelectSetForCards::updateCardLists()
 
         if (!found) {
             // The card was not in any selected set
-            ExactCard card = CardDatabaseManager::query()->getCard({cardName});
+            ExactCard card = CardDatabaseManager::query().getCard({cardName});
             CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(uneditedCardsFlowWidget);
             picture_widget->setCard(card);
             uneditedCardsFlowWidget->addWidget(picture_widget);
         } else {
-            ExactCard card =
-                CardDatabaseManager::query()->getCard({cardName, CardDatabaseManager::getInstance()
-                                                                     ->query()
-                                                                     ->getSpecificPrinting(cardName, foundSetName, "")
-                                                                     .getUuid()});
+            QString providerId = CardDatabaseManager::query().getSpecificPrinting(cardName, foundSetName, "").getUuid();
+            ExactCard card = CardDatabaseManager::query().getCard({cardName, providerId});
             CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(modifiedCardsFlowWidget);
             picture_widget->setCard(card);
             modifiedCardsFlowWidget->addWidget(picture_widget);
@@ -358,7 +355,7 @@ QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
     QList<QString> cardNames = deckStateManager->getModel()->getCardNames();
 
     for (auto cardName : cardNames) {
-        CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(cardName);
+        CardInfoPtr infoPtr = CardDatabaseManager::query().getCardInfo(cardName);
         if (!infoPtr)
             continue;
 
@@ -608,15 +605,15 @@ void SetEntryWidget::updateCardDisplayWidgets()
 
     for (const QString &cardName : possibleCards) {
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(cardListContainer);
-        QString providerId = CardDatabaseManager::query()->getSpecificPrinting(cardName, setName, nullptr).getUuid();
-        picture_widget->setCard(CardDatabaseManager::query()->getCard({cardName, providerId}));
+        QString providerId = CardDatabaseManager::query().getSpecificPrinting(cardName, setName, nullptr).getUuid();
+        picture_widget->setCard(CardDatabaseManager::query().getCard({cardName, providerId}));
         cardListContainer->addWidget(picture_widget);
     }
 
     for (const QString &cardName : unusedCards) {
         CardInfoPictureWidget *picture_widget = new CardInfoPictureWidget(alreadySelectedCardListContainer);
-        QString providerId = CardDatabaseManager::query()->getSpecificPrinting(cardName, setName, nullptr).getUuid();
-        picture_widget->setCard(CardDatabaseManager::query()->getCard({cardName, providerId}));
+        QString providerId = CardDatabaseManager::query().getSpecificPrinting(cardName, setName, nullptr).getUuid();
+        picture_widget->setCard(CardDatabaseManager::query().getCard({cardName, providerId}));
         alreadySelectedCardListContainer->addWidget(picture_widget);
     }
 }

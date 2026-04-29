@@ -15,7 +15,8 @@ CardDatabase::CardDatabase(QObject *parent,
                            ICardPreferenceProvider *prefs,
                            ICardDatabasePathProvider *pathProvider,
                            ICardSetPriorityController *_setPriorityController)
-    : QObject(parent), setPriorityController(_setPriorityController), loadStatus(NotLoaded)
+    : QObject(parent), setPriorityController(_setPriorityController), loadStatus(NotLoaded),
+      querier(CardDatabaseQuerier(this, prefs))
 {
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");
     qRegisterMetaType<CardInfoPtr>("CardSetPtr");
@@ -27,8 +28,6 @@ CardDatabase::CardDatabase(QObject *parent,
     connect(loader, &CardDatabaseLoader::loadingFailed, this, &CardDatabase::cardDatabaseLoadingFailed);
     connect(loader, &CardDatabaseLoader::newSetsFound, this, &CardDatabase::cardDatabaseNewSetsFound);
     connect(loader, &CardDatabaseLoader::allNewSetsEnabled, this, &CardDatabase::cardDatabaseAllNewSetsEnabled);
-
-    querier = new CardDatabaseQuerier(this, this, prefs);
 }
 
 CardDatabase::~CardDatabase()

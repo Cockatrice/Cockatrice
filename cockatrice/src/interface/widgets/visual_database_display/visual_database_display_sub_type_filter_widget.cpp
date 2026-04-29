@@ -15,7 +15,7 @@ VisualDatabaseDisplaySubTypeFilterWidget::VisualDatabaseDisplaySubTypeFilterWidg
                                                                                    FilterTreeModel *_filterModel)
     : QWidget(parent), filterModel(_filterModel)
 {
-    allSubCardTypesWithCount = CardDatabaseManager::query()->getAllSubCardTypesWithCount();
+    allSubCardTypesWithCount = CardDatabaseManager::query().getAllSubCardTypesWithCount();
 
     setMinimumWidth(300);
 

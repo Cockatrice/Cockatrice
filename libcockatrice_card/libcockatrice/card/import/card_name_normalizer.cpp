@@ -12,7 +12,7 @@
  */
 static QString getCompleteCardName(const QString &cardName)
 {
-    ExactCard temp = CardDatabaseManager::query()->guessCard({cardName});
+    ExactCard temp = CardDatabaseManager::query().guessCard({cardName});
     if (temp) {
         return temp.getName();
     }

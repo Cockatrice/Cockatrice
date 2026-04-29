@@ -74,7 +74,7 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
         if (!searchBar->hasFocus())
             return;
 
-        ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
+        ExactCard card = CardDatabaseManager::query().getCard({searchBar->text()});
         if (card) {
             emit cardAdditionRequested(card);
         }
@@ -135,7 +135,7 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
     // Search button functionality
     searchPushButton = new QPushButton(this);
     connect(searchPushButton, &QPushButton::clicked, this, [=, this]() {
-        ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
+        ExactCard card = CardDatabaseManager::query().getCard({searchBar->text()});
         if (card) {
             emit cardAdditionRequested(card);
         }
