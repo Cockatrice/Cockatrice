@@ -213,11 +213,9 @@ private slots:
     void actAddURL();
     void actRemoveURL();
     void actEditURL();
-    void clearDownloadedPicsButtonClicked();
     void resetDownloadedURLsButtonClicked();
 
 private:
-    QPushButton clearDownloadedPicsButton;
     QPushButton resetDownloadURLs;
     QLabel urlLinkLabel;
     QCheckBox picDownloadCheckBox;
@@ -227,18 +225,51 @@ private:
     QLabel msDownloadSpoilersLabel;
     QGroupBox *mpGeneralGroupBox;
     QGroupBox *mpSpoilerGroupBox;
+
     QLineEdit *mpSpoilerSavePathLineEdit;
     QLabel mcSpoilerSaveLabel;
     QLabel lastUpdatedLabel;
     QLabel infoOnSpoilersLabel;
     QPushButton *mpSpoilerPathButton;
     QPushButton *updateNowButton;
+};
+
+class StorageSettingsPage : public AbstractSettingsPage
+{
+    Q_OBJECT
+public:
+    StorageSettingsPage();
+    void retranslateUi() override;
+
+private slots:
+    void clearDownloadedPicsButtonClicked();
+    void clearImageBackupsButtonClicked();
+    void clearPixmapCacheButtonClicked();
+
+private:
+    QPushButton clearDownloadedPicsButton;
+    QPushButton clearBackupsButton;
+    QPushButton clearPixmapCacheButton;
+
+    QGroupBox *mpCacheMethodGroupBox;
+    QGroupBox *mpNetworkCacheGroupBox;
+    QGroupBox *mpImageBackupGroupBox;
+    QGroupBox *mpPixmapCacheGroupBox;
+
+    QLabel networkCacheExplainerLabel;
+    QLabel imageBackupExplainerLabel;
+    QLabel pixmapCacheExplainerLabel;
+
+    QLabel cardPictureLoaderCacheMethodLabel;
+    QComboBox *cardPictureLoaderCacheMethodComboBox;
     QLabel networkCacheLabel;
     QSpinBox networkCacheEdit;
     QLabel networkRedirectCacheTtlLabel;
     QSpinBox networkRedirectCacheTtlEdit;
     QSpinBox pixmapCacheEdit;
     QLabel pixmapCacheLabel;
+    QLabel localCardImageStorageNamingSchemeLabel;
+    QComboBox *localCardImageStorageNamingSchemeComboBox;
 };
 
 class MessagesSettingsPage : public AbstractSettingsPage
@@ -353,8 +384,8 @@ private slots:
 private:
     QListWidget *contentsWidget;
     QStackedWidget *pagesWidget;
-    QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *messagesButton,
-        *soundButton, *shortcutsButton;
+    QListWidgetItem *generalButton, *appearanceButton, *userInterfaceButton, *deckEditorButton, *storageButton,
+        *messagesButton, *soundButton, *shortcutsButton;
     void createIcons();
     void retranslateUi();
 
