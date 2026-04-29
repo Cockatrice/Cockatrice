@@ -529,7 +529,7 @@ if(WIN32)
   set(qtconf_dest_dir .)
 
   install(
-    DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
+    DIRECTORY "$<TARGET_FILE_DIR:cockatrice>/"
     DESTINATION ./
     FILES_MATCHING
     PATTERN "*.dll"
