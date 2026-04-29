@@ -202,6 +202,7 @@ public:
      * @param info The ServerInfo_Game object containing information about the game to update.
      */
     void processGameInfo(const ServerInfo_Game &info);
+    bool joinGameById(int gameId);
 };
 
 #endif

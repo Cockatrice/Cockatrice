@@ -289,3 +289,46 @@ bool ServersSettings::updateExistingServer(QString saveName,
     }
     return false;
 }
+
+int ServersSettings::findServerIndex(const QString &host, const QString &port) const
+{
+    int size = getValue("totalServers", "server", "server_details").toInt();
+
+    for (int i = 0; i <= size; ++i) {
+        QString storedHost = getValue(QString("server%1").arg(i), "server", "server_details").toString();
+        QString storedPort = getValue(QString("port%1").arg(i), "server", "server_details").toString();
+
+        if (storedHost == host && storedPort == port) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+bool ServersSettings::hasUsername(const QString &host, const QString &port) const
+{
+    int index = findServerIndex(host, port);
+    if (index < 0)
+        return false;
+
+    QString user = getValue(QString("username%1").arg(index), "server", "server_details").toString();
+    return !user.isEmpty();
+}
+
+bool ServersSettings::hasCredentials(const QString &host, const QString &port) const
+{
+    int index = findServerIndex(host, port);
+    if (index < 0)
+        return false;
+
+    bool save = getValue(QString("savePassword%1").arg(index), "server", "server_details").toBool();
+    QString password = getValue(QString("password%1").arg(index), "server", "server_details").toString();
+
+    return save && !password.isEmpty();
+}
+
+bool ServersSettings::hasLoginData(const QString &host, const QString &port) const
+{
+    return hasUsername(host, port) && hasCredentials(host, port);
+}
