@@ -1540,80 +1540,77 @@ void PlayerActions::actUnattach()
     sendGameCommand(prepareGameCommand(commandList));
 }
 
-void PlayerActions::actCardCounterTrigger()
+void PlayerActions::actAddCardCounter(int counterId)
 {
-    auto *action = static_cast<QAction *>(sender());
-    int counterId = action->data().toInt() / 1000;
+    offsetCardCounter(counterId, 1);
+}
+
+void PlayerActions::actRemoveCardCounter(int counterId)
+{
+    offsetCardCounter(counterId, -1);
+}
+
+void PlayerActions::offsetCardCounter(int counterId, int offset)
+{
     QList<const ::google::protobuf::Message *> commandList;
-    switch (action->data().toInt() % 1000) {
-        case 9: { // increment counter
-            for (const auto &item : player->getGameScene()->selectedItems()) {
-                auto *card = static_cast<CardItem *>(item);
-                if (card->getCounters().value(counterId, 0) < MAX_COUNTERS_ON_CARD) {
-                    auto *cmd = new Command_SetCardCounter;
-                    cmd->set_zone(card->getZone()->getName().toStdString());
-                    cmd->set_card_id(card->getId());
-                    cmd->set_counter_id(counterId);
-                    cmd->set_counter_value(card->getCounters().value(counterId, 0) + 1);
-                    commandList.append(cmd);
-                }
-            }
-            break;
+    for (const auto &item : player->getGameScene()->selectedItems()) {
+        auto *card = static_cast<CardItem *>(item);
+
+        int oldValue = card->getCounters().value(counterId, 0);
+        int newValue = oldValue + offset;
+
+        if (newValue >= 0 && newValue <= MAX_COUNTERS_ON_CARD) {
+            auto *cmd = new Command_SetCardCounter;
+            cmd->set_zone(card->getZone()->getName().toStdString());
+            cmd->set_card_id(card->getId());
+            cmd->set_counter_id(counterId);
+            cmd->set_counter_value(newValue);
+            commandList.append(cmd);
         }
-        case 10: { // decrement counter
-            for (const auto &item : player->getGameScene()->selectedItems()) {
-                auto *card = static_cast<CardItem *>(item);
-                if (card->getCounters().value(counterId, 0)) {
-                    auto *cmd = new Command_SetCardCounter;
-                    cmd->set_zone(card->getZone()->getName().toStdString());
-                    cmd->set_card_id(card->getId());
-                    cmd->set_counter_id(counterId);
-                    cmd->set_counter_value(card->getCounters().value(counterId, 0) - 1);
-                    commandList.append(cmd);
-                }
-            }
-            break;
-        }
-        case 11: { // set counter with dialog
-            player->setDialogSemaphore(true);
-
-            // If a single card is selected, we show the old value in the dialog. Otherwise, we show "x"
-            QList<QGraphicsItem *> sel = player->getGameScene()->selectedItems();
-            QString oldValueForDlg = "x";
-            if (sel.size() == 1) {
-                auto *card = dynamic_cast<CardItem *>(sel.first());
-                oldValueForDlg = QString::number(card->getCounters().value(counterId, 0));
-            }
-
-            auto &cardCounterSettings = SettingsCache::instance().cardCounters();
-            QString counterName = cardCounterSettings.displayName(counterId);
-
-            AbstractCounterDialog dialog(counterName, oldValueForDlg, player->getGame()->getTab());
-            int ok = dialog.exec();
-
-            player->setDialogSemaphore(false);
-            if (player->clearCardsToDelete() || !ok) {
-                return;
-            }
-
-            for (const auto &item : sel) {
-                auto *card = dynamic_cast<CardItem *>(item);
-
-                int oldValue = card->getCounters().value(counterId, 0);
-                Expression exp(oldValue);
-                int number = static_cast<int>(exp.parse(dialog.textValue()));
-
-                auto *cmd = new Command_SetCardCounter;
-                cmd->set_zone(card->getZone()->getName().toStdString());
-                cmd->set_card_id(card->getId());
-                cmd->set_counter_id(counterId);
-                cmd->set_counter_value(number);
-                commandList.append(cmd);
-            }
-            break;
-        }
-        default:;
     }
+
+    sendGameCommand(prepareGameCommand(commandList));
+}
+
+void PlayerActions::actSetCardCounter(int counterId)
+{
+    player->setDialogSemaphore(true);
+
+    // If a single card is selected, we show the old value in the dialog. Otherwise, we show "x"
+    QList<QGraphicsItem *> sel = player->getGameScene()->selectedItems();
+    QString oldValueForDlg = "x";
+    if (sel.size() == 1) {
+        auto *card = dynamic_cast<CardItem *>(sel.first());
+        oldValueForDlg = QString::number(card->getCounters().value(counterId, 0));
+    }
+
+    auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+    QString counterName = cardCounterSettings.displayName(counterId);
+
+    AbstractCounterDialog dialog(counterName, oldValueForDlg, player->getGame()->getTab());
+    int ok = dialog.exec();
+
+    player->setDialogSemaphore(false);
+    if (player->clearCardsToDelete() || !ok) {
+        return;
+    }
+
+    QList<const ::google::protobuf::Message *> commandList;
+    for (const auto &item : sel) {
+        auto *card = dynamic_cast<CardItem *>(item);
+
+        int oldValue = card->getCounters().value(counterId, 0);
+        Expression exp(oldValue);
+        int number = static_cast<int>(exp.parse(dialog.textValue()));
+
+        auto *cmd = new Command_SetCardCounter;
+        cmd->set_zone(card->getZone()->getName().toStdString());
+        cmd->set_card_id(card->getId());
+        cmd->set_counter_id(counterId);
+        cmd->set_counter_value(number);
+        commandList.append(cmd);
+    }
+
     sendGameCommand(prepareGameCommand(commandList));
 }
 
