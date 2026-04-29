@@ -1562,7 +1562,7 @@ Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseCo
             zone->addWritePermission(cmd.player_id());
         }
 
-        if (isJudge()) {
+        if (judge) {
             ges.setOverwriteOwnership(true);
         }
 
