@@ -3,17 +3,13 @@ name: Build Docker Image
 on:
   release:
     types:
-      - released 
+      - released    # publishing of stable releases
   pull_request:
     branches:
       - master
     paths:
       - '.github/workflows/docker-release.yml'
       - 'Dockerfile'
-
-permissions:
-  contents: read
-  packages: write
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
@@ -23,14 +19,18 @@ concurrency:
 jobs:
   docker:
     name: amd64 & arm64
+    if: ${{ github.repository_owner == 'Cockatrice' }}
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+  
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
       - name: Docker metadata
-        if: ${{ github.repository_owner == 'Cockatrice' }}
         id: metadata
         uses: docker/metadata-action@v6
         with:
