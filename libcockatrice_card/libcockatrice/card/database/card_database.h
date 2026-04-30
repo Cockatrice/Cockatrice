@@ -147,6 +147,7 @@ public slots:
 
     /** @brief Loads card databases from configured paths. */
     void loadCardDatabases();
+    void reloadCardDatabasesAndNotify();
 
     /** @brief Saves custom tokens to file.
      * @return True if successful.

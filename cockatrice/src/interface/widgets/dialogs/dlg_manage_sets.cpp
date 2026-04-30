@@ -254,15 +254,9 @@ void WndSets::actSave()
     model->save(CardDatabaseManager::getInstance());
     SettingsCache::instance().setIncludeRebalancedCards(includeRebalancedCards);
     CardPictureLoader::clearPixmapCache();
-    const auto reloadOk1 = QtConcurrent::run([this] {
-        CardDatabaseManager::getInstance()->loadCardDatabases();
-        QMetaObject::Connection conn;
+    const auto reloadOk1 = QtConcurrent::run([] {
+        CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify();
 
-        conn = connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
-                       [conn]() mutable {
-                           CardDatabaseManager::getInstance()->notifyEnabledSetsChanged();
-                           QObject::disconnect(conn);
-                       });
         SettingsCache::instance().downloads().sync();
     });
     close();

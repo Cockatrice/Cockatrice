@@ -1191,7 +1191,8 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
 
     if (msgBox.clickedButton() == yesButton) {
         CardDatabaseManager::getInstance()->enableAllUnknownSets();
-        const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
+        const auto reloadOk1 =
+            QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
     } else if (msgBox.clickedButton() == noButton) {
         CardDatabaseManager::getInstance()->markAllSetsAsKnown();
     } else if (msgBox.clickedButton() == settingsButton) {
@@ -1473,7 +1474,7 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
 void MainWindow::actReloadCardDatabase()
 {
     const auto reloadOk1 = QtConcurrent::run([] {
-        CardDatabaseManager::getInstance()->loadCardDatabases();
+        CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify();
         SettingsCache::instance().downloads().sync();
     });
 }
