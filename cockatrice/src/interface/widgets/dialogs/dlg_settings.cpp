@@ -1983,7 +1983,7 @@ void DlgSettings::createIcons()
     storageButton = new QListWidgetItem(contentsWidget);
     storageButton->setTextAlignment(Qt::AlignHCenter);
     storageButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    storageButton->setIcon(QPixmap("theme:config/deckeditor"));
+    storageButton->setIcon(QPixmap("theme:config/storage"));
 
     messagesButton = new QListWidgetItem(contentsWidget);
     messagesButton->setTextAlignment(Qt::AlignHCenter);
@@ -2108,6 +2108,7 @@ void DlgSettings::retranslateUi()
     generalButton->setText(tr("General"));
     appearanceButton->setText(tr("Appearance"));
     userInterfaceButton->setText(tr("User Interface"));
+    storageButton->setText(tr("Storage"));
     deckEditorButton->setText(tr("Card Sources"));
     messagesButton->setText(tr("Chat"));
     soundButton->setText(tr("Sound"));
