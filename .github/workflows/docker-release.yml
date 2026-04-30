@@ -36,6 +36,8 @@ jobs:
       - name: Docker metadata
         id: metadata
         uses: docker/metadata-action@v6
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: index    # needed for GHCR
         with:
           images: |
             ghcr.io/cockatrice/servatrice
