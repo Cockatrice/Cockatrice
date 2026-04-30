@@ -1373,6 +1373,7 @@ StorageSettingsPage::StorageSettingsPage()
     lpMainLayout->addWidget(mpNetworkCacheGroupBox);
     lpMainLayout->addWidget(mpImageBackupGroupBox);
     lpMainLayout->addWidget(mpPixmapCacheGroupBox);
+    lpMainLayout->addStretch();
 
     setLayout(lpMainLayout);
 
