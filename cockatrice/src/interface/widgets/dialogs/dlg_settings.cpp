@@ -1931,7 +1931,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     pagesWidget->addWidget(makeScrollable(new AppearanceSettingsPage));
     pagesWidget->addWidget(makeScrollable(new UserInterfaceSettingsPage));
     pagesWidget->addWidget(new DeckEditorSettingsPage);
-    pagesWidget->addWidget(new StorageSettingsPage);
+    pagesWidget->addWidget(makeScrollable(new StorageSettingsPage));
     pagesWidget->addWidget(new MessagesSettingsPage);
     pagesWidget->addWidget(new SoundSettingsPage);
     pagesWidget->addWidget(new ShortcutSettingsPage);
