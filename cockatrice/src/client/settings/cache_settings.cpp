@@ -211,6 +211,7 @@ SettingsCache::SettingsCache()
     startupCardUpdateCheckAlwaysUpdate = settings->value("personal/startupCardUpdateCheckAlwaysUpdate", false).toBool();
     cardUpdateCheckInterval = settings->value("personal/cardUpdateCheckInterval", 7).toInt();
     lastCardUpdateCheck = settings->value("personal/lastCardUpdateCheck", QDateTime::currentDateTime().date()).toDate();
+    alwaysEnableNewSets = settings->value("personal/alwaysEnableNewSets", false).toBool();
     notifyAboutUpdates = settings->value("personal/updatenotification", true).toBool();
     notifyAboutNewVersion = settings->value("personal/newversionnotification", true).toBool();
 
@@ -1244,6 +1245,12 @@ void SettingsCache::setLastCardUpdateCheck(QDate value)
 {
     lastCardUpdateCheck = value;
     settings->setValue("personal/lastCardUpdateCheck", lastCardUpdateCheck);
+}
+
+void SettingsCache::setAlwaysEnableNewSets(bool value)
+{
+    alwaysEnableNewSets = value;
+    settings->setValue("personal/alwaysEnableNewSets", alwaysEnableNewSets);
 }
 
 void SettingsCache::setRememberGameSettings(const bool _rememberGameSettings)

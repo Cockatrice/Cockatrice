@@ -1173,6 +1173,13 @@ void MainWindow::cardDatabaseLoadingFailed()
 
 void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames)
 {
+    if (SettingsCache::instance().getAlwaysEnableNewSets()) {
+        CardDatabaseManager::getInstance()->enableAllUnknownSets();
+        const auto reloadOk1 =
+            QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
+        return;
+    }
+
     QMessageBox msgBox(this);
     msgBox.setWindowTitle(tr("New sets found"));
     msgBox.setIcon(QMessageBox::Question);
@@ -1183,6 +1190,7 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
                        .arg(unknownSetsNames.join(", ")));
 
     QPushButton *yesButton = msgBox.addButton(tr("Yes"), QMessageBox::YesRole);
+    QPushButton *yesAlwaysButton = msgBox.addButton(tr("Yes, always enable"), QMessageBox::YesRole);
     QPushButton *noButton = msgBox.addButton(tr("No"), QMessageBox::NoRole);
     QPushButton *settingsButton = msgBox.addButton(tr("View sets"), QMessageBox::ActionRole);
     msgBox.setDefaultButton(yesButton);
@@ -1193,6 +1201,11 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
         CardDatabaseManager::getInstance()->enableAllUnknownSets();
         const auto reloadOk1 =
             QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
+    } else if (msgBox.clickedButton() == yesAlwaysButton) {
+        CardDatabaseManager::getInstance()->enableAllUnknownSets();
+        const auto reloadOk1 =
+            QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
+        SettingsCache::instance().setAlwaysEnableNewSets(true);
     } else if (msgBox.clickedButton() == noButton) {
         CardDatabaseManager::getInstance()->markAllSetsAsKnown();
     } else if (msgBox.clickedButton() == settingsButton) {
