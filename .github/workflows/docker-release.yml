@@ -4,6 +4,9 @@ on:
   release:
     types:
       - released    # publishing of stable releases
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
