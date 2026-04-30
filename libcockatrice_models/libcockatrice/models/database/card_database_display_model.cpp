@@ -10,7 +10,10 @@ CardDatabaseDisplayModel::CardDatabaseDisplayModel(QObject *parent)
     setSortCaseSensitivity(Qt::CaseInsensitive);
 
     dirtyTimer.setSingleShot(true);
-    connect(&dirtyTimer, &QTimer::timeout, this, &CardDatabaseDisplayModel::invalidate);
+    connect(&dirtyTimer, &QTimer::timeout, this, [this]() {
+        invalidate();
+        emit modelDirty();
+    });
 
     loadedRowCount = 0;
 }
@@ -19,13 +22,9 @@ void CardDatabaseDisplayModel::setSourceModel(QAbstractItemModel *model)
 {
     QSortFilterProxyModel::setSourceModel(model);
 
-    connect(model, &QAbstractItemModel::rowsInserted, this, [this]() {
-        dirty();
-    });
+    connect(model, &QAbstractItemModel::rowsInserted, this, [this]() { dirty(); });
 
-    connect(model, &QAbstractItemModel::rowsRemoved, this, [this]() {
-        dirty();
-    });
+    connect(model, &QAbstractItemModel::rowsRemoved, this, [this]() { dirty(); });
 
     connect(model, &QAbstractItemModel::modelReset, this, [this]() {
         loadedRowCount = 0;

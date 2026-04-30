@@ -29,6 +29,11 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     : QWidget(parent), deckEditor(_deckEditor), databaseModel(database_model),
       databaseDisplayModel(database_display_model)
 {
+    debounceTimer = new QTimer(this);
+    debounceTimer->setSingleShot(true); // Ensure it only fires once after the timeout
+
+    connect(debounceTimer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::onSearchModelChanged);
+
     cards = new QList<ExactCard>;
     connect(databaseDisplayModel, &CardDatabaseDisplayModel::modelDirty, this,
             &VisualDatabaseDisplayWidget::modelDirty);
@@ -155,11 +160,6 @@ void VisualDatabaseDisplayWidget::initialize()
     mainLayout->addWidget(flowWidget);
 
     mainLayout->addWidget(cardSizeWidget);
-
-    debounceTimer = new QTimer(this);
-    debounceTimer->setSingleShot(true); // Ensure it only fires once after the timeout
-
-    connect(debounceTimer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::onSearchModelChanged);
 
     databaseDisplayModel->setFilterTree(filterModel->filterTree());
 

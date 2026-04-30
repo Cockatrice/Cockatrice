@@ -43,7 +43,6 @@ public:
     void setIsToken(FilterBool _isToken)
     {
         isToken = _isToken;
-        emit modelDirty();
         dirty();
     }
 
@@ -54,20 +53,17 @@ public:
             filterString = nullptr;
         }
         cardName = sanitizeCardName(_cardName, characterTranslation);
-        emit modelDirty();
         dirty();
     }
     void setStringFilter(const QString &_src)
     {
         delete filterString;
         filterString = new FilterString(_src);
-        emit modelDirty();
         dirty();
     }
     void setCardNameSet(const QSet<QString> &_cardNameSet)
     {
         cardNameSet = _cardNameSet;
-        emit modelDirty();
         dirty();
     }
 
