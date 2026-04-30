@@ -22,8 +22,7 @@ static inline const QList<CacheMethodInfo> methods()
 {
     static QList<CacheMethodInfo> all = {
         {CacheMethod::NETWORK_CACHE, QCoreApplication::translate("CardPictureLoaderCacheMethod", "Network Cache")},
-        {CacheMethod::FILESYSTEM_CACHE,
-         QCoreApplication::translate("CardPictureLoaderCacheMethod", "Filesystem Cache")},
+        {CacheMethod::FILESYSTEM_CACHE, QCoreApplication::translate("CardPictureLoaderCacheMethod", "Filesystem")},
     };
     return all;
 }

@@ -1445,7 +1445,7 @@ void StorageSettingsPage::retranslateUi()
 
     mpCacheMethodGroupBox->setTitle(tr("Card Picture Loader Cache Method"));
     mpNetworkCacheGroupBox->setTitle(tr("Network Cache"));
-    mpImageBackupGroupBox->setTitle(tr("Image Backup"));
+    mpImageBackupGroupBox->setTitle(tr("Filesystem"));
     mpPixmapCacheGroupBox->setTitle(tr("In-Memory Picture Cache"));
 
     networkCacheLabel.setText(tr("Network Cache Size:"));
