@@ -285,7 +285,9 @@ void VisualDatabaseDisplayWidget::loadNextPage()
     }
 
     // Load the next page of cards and add them to the flow widget
+    flowWidget->setUpdatesEnabled(false);
     loadPage(start, end);
+    flowWidget->setUpdatesEnabled(true);
 }
 
 void VisualDatabaseDisplayWidget::loadPage(int start, int end)

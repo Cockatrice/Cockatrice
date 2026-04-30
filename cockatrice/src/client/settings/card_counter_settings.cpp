@@ -11,8 +11,6 @@ CardCounterSettings::CardCounterSettings(const QString &settingsPath, QObject *p
 
 void CardCounterSettings::setColor(int counterId, const QColor &color)
 {
-    QSettings settings = getSettings();
-
     QString key = QString("cards/counters/%1/color").arg(counterId);
 
     if (settings.value(key).value<QColor>() == color)
@@ -38,7 +36,7 @@ QColor CardCounterSettings::color(int counterId) const
         defaultColor = QColor::fromHsv(h, s, v);
     }
 
-    return getSettings().value(QString("cards/counters/%1/color").arg(counterId), defaultColor).value<QColor>();
+    return settings.value(QString("cards/counters/%1/color").arg(counterId), defaultColor).value<QColor>();
 }
 
 QString CardCounterSettings::displayName(int counterId) const
