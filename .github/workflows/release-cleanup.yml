@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-slim
     
     permissions:
-      contents: write    # required to delete releases and tags
+      contents: write    # required to delete releases
     
     concurrency:
       group: cleanup-beta-releases @ ${{ github.ref_name }}
@@ -53,7 +53,7 @@ jobs:
         uses: actions/github-script@v9
         with:
           script: |
-            const deleteReleasesTags = process.env.DRY_RUN === 'false';
+            const deleteReleases = process.env.DRY_RUN === 'false';
 
             core.startGroup('Fetching all releases...');
             const releases = await github.paginate(
@@ -77,17 +77,15 @@ jobs:
             prereleases.forEach(r => console.log(`${r.published_at.split('T')[0]}: ${r.tag_name}`));
             core.endGroup();
 
-            core.startGroup('Deleting pre-releases & related tags...');
+            core.startGroup('Deleting pre-releases...');
             console.log(`${prereleases.length} pre-release(s) marked for deletion:`);
             
             let deletedReleasesCount = 0;
-            let deletedTagsCount = 0;
             
             for (const rel of [...prereleases].reverse()) {
               
-              // Delete release
               console.log(`Processing release: ${rel.name}`);
-              if (deleteReleasesTags) {
+              if (deleteReleases) {
                 try {
                   await github.rest.repos.deleteRelease({
                     owner: context.repo.owner,
@@ -102,35 +100,13 @@ jobs:
               } else {
                 console.log(`  [DRY RUN] Release would be deleted.`);
               }
-
-              // Delete tag
-              console.log(`  Processing related tag: ${rel.tag_name}`);
-              if (deleteReleasesTags) {
-                try {
-                  await github.rest.git.deleteRef({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    ref: `tags/${rel.tag_name}`,
-                  });
-                  console.log(`  Tag deleted.`);
-                  deletedTagsCount++;
-                } catch (err) {
-                  console.log(`  Tag deletion failed: ${err.message}`);
-                }
-              } else {
-                console.log(`  [DRY RUN] Tag would be deleted.`);
-              }
             }
 
             console.log();
             console.log(`Total releases deleted: ${deletedReleasesCount}`);
-            console.log(`Total tags deleted: ${deletedTagsCount}`);
             core.endGroup();
 
             await core.summary
-              .addRaw (`${prereleases.length} pre-release(s) marked for deletion:`)
-              .addCodeBlock(
-                `Total releases deleted: ${deletedReleasesCount}\n` +
-                `Total tags deleted: ${deletedTagsCount}`
-              )
+              .addRaw(`${prereleases.length} pre-release(s) marked for deletion:`)
+              .addCodeBlock(`Total releases deleted: ${deletedReleasesCount}`)
               .write();
