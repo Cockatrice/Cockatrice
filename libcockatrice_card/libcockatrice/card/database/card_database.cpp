@@ -65,11 +65,9 @@ void CardDatabase::reloadCardDatabasesAndNotify()
 {
     loadCardDatabases();
 
-    QMetaObject::Connection conn;
-    conn = connect(this, &CardDatabase::cardDatabaseLoadingFinished, this, [conn, this]() mutable {
+    if (loadStatus == Ok) {
         notifyEnabledSetsChanged();
-        QObject::disconnect(conn);
-    });
+    }
 }
 
 bool CardDatabase::saveCustomTokensToFile()
