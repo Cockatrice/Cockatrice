@@ -174,6 +174,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
       -Wno-error=delete-non-virtual-dtor
       -Wno-error=sign-compare
       -Wno-error=missing-declarations
+      -Wno-error=sfinae-incomplete  # GCC 16+: Qt MOC + protobuf forward decls trigger this
   )
 
   foreach(FLAG ${ADDITIONAL_DEBUG_FLAGS})

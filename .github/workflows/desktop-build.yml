@@ -138,7 +138,6 @@ jobs:
           - distro: Fedora
             version: 44
             package: RPM
-            test: skip   # This is failing to build, currently. To be fixed.
 
           - distro: Ubuntu
             version: 22.04
