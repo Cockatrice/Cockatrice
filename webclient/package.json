@@ -60,7 +60,7 @@
     "react-virtualized-auto-sizer": "^2.0.3",
     "react-window": "^2.2.7",
     "rxjs": "^7.5.4",
-    "sockatrice": "https://github.com/seavor/Sockatrice/releases/download/v2.1.3/sockatrice-2.1.3.tgz"
+    "sockatrice": "https://github.com/seavor/Sockatrice/releases/download/v2.2.0/sockatrice-2.2.0.tgz"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

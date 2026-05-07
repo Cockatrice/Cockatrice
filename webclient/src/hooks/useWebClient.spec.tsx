@@ -10,7 +10,6 @@ vi.mock('@app/api', () => ({
   createWebClientResponse: vi.fn(() => 'response'),
   CLIENT_CONFIG: { clientid: 'test', clientver: 'test', clientfeatures: [] },
   CLIENT_OPTIONS: { autojoinrooms: false, keepalive: 5000 },
-  PROTOCOL_VERSION: 14,
 }));
 
 function Wrapper({ children }: { children: ReactNode }) {

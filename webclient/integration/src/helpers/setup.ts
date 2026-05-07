@@ -19,12 +19,13 @@ import { afterEach, beforeEach, vi } from 'vitest';
 
 import { ServerDispatch, RoomsDispatch, GameDispatch } from '@app/store';
 import { Data } from '@app/types';
+import { PROTOCOL_VERSION } from 'sockatrice';
+
 import { WebClient, setPendingOptions } from '@app/websocket';
 import { WebsocketTypes } from '@app/websocket/types';
 import {
   CLIENT_CONFIG,
   CLIENT_OPTIONS,
-  PROTOCOL_VERSION,
   createWebClientResponse,
 } from '@app/api';
 
@@ -205,7 +206,6 @@ beforeEach(() => {
     createWebClientResponse(),
     CLIENT_CONFIG,
     CLIENT_OPTIONS,
-    PROTOCOL_VERSION,
   );
 });
 

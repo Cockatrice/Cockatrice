@@ -3,7 +3,6 @@ import { WebClient } from '@app/websocket';
 import {
   CLIENT_CONFIG,
   CLIENT_OPTIONS,
-  PROTOCOL_VERSION,
   createWebClientResponse,
 } from '@app/api';
 
@@ -15,7 +14,6 @@ export function WebClientProvider({ children }: { children: ReactNode }) {
     createWebClientResponse(),
     CLIENT_CONFIG,
     CLIENT_OPTIONS,
-    PROTOCOL_VERSION,
   ));
 
   return <WebClientContext value={client}>{children}</WebClientContext>;
