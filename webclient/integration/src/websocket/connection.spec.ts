@@ -9,14 +9,13 @@ import { Data } from '@app/types';
 import { store } from '@app/store';
 import { WebsocketTypes } from '@app/websocket/types';
 
-import { PROTOCOL_VERSION } from '../../../src/websocket/config';
-
 import {
   getMockWebSocket,
   getWebClient,
   openMockWebSocket,
   setPendingOptions,
   connectAndHandshake,
+  PROTOCOL_VERSION,
 } from '../helpers/setup';
 import {
   buildSessionEventMessage,

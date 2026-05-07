@@ -1,2 +1,2 @@
 export { createWebClientResponse } from './response';
-export { createWebClientRequest } from './request';
+export { CLIENT_CONFIG, CLIENT_OPTIONS, PROTOCOL_VERSION } from './clientConfig';

@@ -35,9 +35,9 @@
       "@app/store": ["./src/store/index.ts"],
       "@app/types": ["./src/types/index.ts"],
       "@app/utils": ["./src/utils/index.ts"],
-      "@app/websocket": ["./src/websocket/index.ts"],
-      "@app/websocket/types": ["./src/websocket/types/index.ts"],
-      "@app/generated": ["./src/generated/index.ts"]
+      "@app/websocket": ["./node_modules/sockatrice/dist/index.d.ts"],
+      "@app/websocket/types": ["./node_modules/sockatrice/dist/types/index.d.ts"],
+      "@app/generated": ["./node_modules/sockatrice/dist/generated/index.d.ts"]
     }
   },
   "include": [

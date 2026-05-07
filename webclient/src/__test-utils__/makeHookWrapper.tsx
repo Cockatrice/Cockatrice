@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { configureStore, Reducer } from '@reduxjs/toolkit';
 
 import { WebClientContext } from '../hooks/useWebClient';
-import type { WebClient } from '../websocket';
+import type { WebClient } from '@app/websocket';
 import { createMockWebClient } from './mockWebClient';
 
 // Minimal Provider wrapper for hook-only tests. Use this instead of

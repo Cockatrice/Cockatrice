@@ -5,7 +5,7 @@ import { boundariesConfig } from './eslint.boundaries.mjs';
 
 export default tseslint.config(
   // Global ignores
-  { ignores: ['node_modules/**', 'build/**', 'public/pb/**', 'src/generated/**'] },
+  { ignores: ['node_modules/**', 'build/**'] },
 
   // Base JS recommended
   js.configs.recommended,

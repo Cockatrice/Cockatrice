@@ -37,7 +37,7 @@ const testTheme = createTheme({
 });
 
 import { WebClientContext } from '../hooks/useWebClient';
-import type { WebClient } from '../websocket';
+import type { WebClient } from '@app/websocket';
 import rootReducer from '../store/rootReducer';
 import { ToastProvider } from '../components/Toast/ToastContext';
 import { storeMiddlewareOptions } from '../store/store';

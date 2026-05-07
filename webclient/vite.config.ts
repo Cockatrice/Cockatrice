@@ -21,9 +21,9 @@ export default defineConfig({
       '@app/store': srcPath('store/index.ts'),
       '@app/types': srcPath('types/index.ts'),
       '@app/utils': srcPath('utils/index.ts'),
-      '@app/websocket/types': srcPath('websocket/types/index.ts'),
-      '@app/websocket': srcPath('websocket/index.ts'),
-      '@app/generated': srcPath('generated/index.ts'),
+      '@app/websocket/types': 'sockatrice/types',
+      '@app/websocket': 'sockatrice',
+      '@app/generated': 'sockatrice/generated',
     },
   },
   optimizeDeps: {
@@ -47,6 +47,9 @@ export default defineConfig({
       '@testing-library/react',
       '@testing-library/jest-dom/vitest',
       '@bufbuild/protobuf',
+      'sockatrice',
+      'sockatrice/types',
+      'sockatrice/generated',
     ],
   },
   publicDir: 'public',
@@ -62,6 +65,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    server: {
+      deps: {
+        inline: ['sockatrice'],
+      },
+    },
     setupFiles: ['./src/setupTests.ts'],
     include: ['src/**/*.spec.{ts,tsx}'],
     exclude: ['node_modules', 'build', 'integration', 'coverage'],
@@ -75,7 +83,6 @@ export default defineConfig({
       reportsDirectory: './coverage/testing',
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
-        'src/generated/**',
         'src/**/*.spec.{ts,tsx}',
         'src/**/__mocks__/**',
         'src/setupTests.ts',

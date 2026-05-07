@@ -25,11 +25,10 @@
     "test:e2e:down": "docker compose -f e2e/docker/docker-compose.e2e.yml down -v",
     "test:e2e:install-browsers": "npx playwright install --with-deps chromium",
     "pretest:e2e": "npm run test:e2e:install-browsers",
-    "prebuild": "npm run proto:generate && node prebuild.js",
+    "prebuild": "node prebuild.js",
     "prepare": "cd .. && husky",
-    "prestart": "npm run proto:generate && node prebuild.js",
+    "prestart": "node prebuild.js",
     "preview": "vite preview",
-    "proto:generate": "npx buf generate",
     "start": "vite",
     "translate": "node prebuild.js -i18nOnly"
   },
@@ -44,7 +43,6 @@
     "@reduxjs/toolkit": "^2.11.2",
     "crypto-js": "^4.2.0",
     "dexie": "^4.4.2",
-    "dompurify": "^3.4.0",
     "final-form": "^5.0.0",
     "final-form-set-field-touched": "^1.0.1",
     "i18next": "^26.0.5",
@@ -61,11 +59,10 @@
     "react-router-dom": "^7.14.1",
     "react-virtualized-auto-sizer": "^2.0.3",
     "react-window": "^2.2.7",
-    "rxjs": "^7.5.4"
+    "rxjs": "^7.5.4",
+    "sockatrice": "https://github.com/seavor/Sockatrice/releases/download/v2.1.3/sockatrice-2.1.3.tgz"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.68.1",
-    "@bufbuild/protoc-gen-es": "^2.11.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.51.0",
     "@types/ws": "^8.5.12",
@@ -73,7 +70,6 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.4.0",
     "@testing-library/react": "^16.3.2",
-    "@types/dompurify": "^3.0.5",
     "@types/node": "^22.19.17",
     "@types/prop-types": "^15.7.4",
     "@types/react": "^19.0.0",

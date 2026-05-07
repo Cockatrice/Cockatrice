@@ -31,7 +31,7 @@ const Rooms = ({ rooms, joinedRooms }: RoomsProps) => {
     if (joinedRoomIds.has(roomId)) {
       navigate(generatePath(App.RouteEnum.ROOM, { roomId: String(roomId) }));
     } else {
-      webClient.request.rooms.joinRoom(roomId);
+      webClient.request.session.joinRoom(roomId);
     }
   };
 

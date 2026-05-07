@@ -21,8 +21,14 @@ import { ServerDispatch, RoomsDispatch, GameDispatch } from '@app/store';
 import { Data } from '@app/types';
 import { WebClient, setPendingOptions } from '@app/websocket';
 import { WebsocketTypes } from '@app/websocket/types';
-import { PROTOCOL_VERSION } from '../../../src/websocket/config';
-import { createWebClientRequest, createWebClientResponse } from '@app/api';
+import {
+  CLIENT_CONFIG,
+  CLIENT_OPTIONS,
+  PROTOCOL_VERSION,
+  createWebClientResponse,
+} from '@app/api';
+
+export { PROTOCOL_VERSION };
 
 import {
   buildResponse,
@@ -195,7 +201,12 @@ installMockWebSocket();
 
 beforeEach(() => {
   vi.useFakeTimers();
-  new WebClient(createWebClientRequest(), createWebClientResponse());
+  new WebClient(
+    createWebClientResponse(),
+    CLIENT_CONFIG,
+    CLIENT_OPTIONS,
+    PROTOCOL_VERSION,
+  );
 });
 
 afterEach(() => {

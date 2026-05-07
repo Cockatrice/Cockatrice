@@ -60,7 +60,7 @@ export function usePlayer(): PlayerViewModel {
   const onRemoveBuddy = () => name && webClient.request.session.removeFromBuddyList(name);
   const onAddIgnore = () => name && webClient.request.session.addToIgnoreList(name);
   const onRemoveIgnore = () => name && webClient.request.session.removeFromIgnoreList(name);
-  const onSendMessage = (message: string) => name && webClient.request.session.sendDirectMessage(name, message);
+  const onSendMessage = (message: string) => name && webClient.request.session.message(name, message);
   const onWarnUser = (reason: string) => name && webClient.request.moderator.warnUser(name, reason);
   const onBanFromServer = (minutes: number, reason: string, visibleReason?: string) =>
     name && webClient.request.moderator.banFromServer(minutes, name, undefined, reason, visibleReason);
