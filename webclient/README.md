@@ -15,6 +15,7 @@ React 19 + TypeScript, built with [Vite](https://vite.dev/) 8. State via Redux T
 ## Prerequisites
 
 - Node.js and npm
+- Docker Desktop — only required for `npm run test:e2e` (spins up servatrice + MySQL via docker compose)
 - Run every command below from the `webclient/` directory
 
 ## Getting started
@@ -40,11 +41,18 @@ npm start
 - `npm run test:watch` — Vitest in watch mode
 - `npm run test:integration` — integration specs via `vitest.integration.config.ts`
 - `npm run test:coverage` / `npm run test:integration:coverage` — the above with v8 coverage
+- `npm run test:e2e` — full Playwright e2e pipeline (requires Docker Desktop): `test:e2e:up` → `test:e2e:run` → `test:e2e:down`, preserving the run's exit code
+- `npm run test:e2e:run` — run specs against an already-running stack (use this in dev loops)
+- `npm run test:e2e:open` — Playwright UI mode for debugging specs interactively
+- `npm run test:e2e:up` / `npm run test:e2e:down` — bring the dockerized servatrice + MySQL stack up / down (volumes are wiped on `down`)
+
+The `pretest:e2e` hook runs `playwright install --with-deps chromium` automatically on first invocation, so no manual browser install is needed.
 
 ### Quality
 
 - `npm run lint` / `npm run lint:fix` — ESLint over `src/`
-- `npm run golden` — `lint` + `test` + `test:integration`; the CI-equivalent gate to run before declaring work done
+- `npm run golden` — `lint` + `test` + `test:integration`; the fast CI-equivalent gate to run before declaring work done
+- `npm run golden:full` — `golden` + `test:e2e`; the full pre-merge gate (requires Docker Desktop)
 
 ### Codegen & i18n
 

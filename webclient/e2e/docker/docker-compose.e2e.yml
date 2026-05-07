@@ -1,0 +1,41 @@
+# Standalone compose used by the webclient e2e harness.
+# Paths are relative to THIS file's directory (webclient/e2e/docker/), so the
+# file must be invoked with `-f webclient/e2e/docker/docker-compose.e2e.yml`
+# from anywhere — Docker Compose resolves relative mounts / build contexts
+# against the compose file's own directory.
+services:
+  mysql:
+    image: mysql:8
+    command: --sql_mode=
+    environment:
+      MYSQL_ROOT_PASSWORD: root-password
+      MYSQL_DATABASE: servatrice
+      MYSQL_USER: servatrice
+      MYSQL_PASSWORD: password
+    volumes:
+      - ../../../servatrice/servatrice.sql:/docker-entrypoint-initdb.d/servatrice.sql:ro
+      - cockatrice_e2e_mysql:/var/lib/mysql
+
+  servatrice:
+    build:
+      # Build context is the repo root so the Dockerfile can see the full
+      # C++ source tree (three levels up from this file).
+      context: ../../..
+      dockerfile: Dockerfile
+    image: cockatrice/servatrice:e2e
+    depends_on:
+      - mysql
+    ports:
+      - "4748:4748"
+    # Wait for MySQL's TCP port to accept connections before launching
+    # servatrice. The first-time `up --build` has to load servatrice.sql, which
+    # takes longer than any fixed sleep — without this wait, servatrice exits
+    # silently with code 0 when it can't reach the DB. The trailing `sleep 2`
+    # gives mysqld a moment after the port opens to finish accepting auth.
+    # global-setup.ts additionally polls the WebSocket port to avoid races.
+    entrypoint: "/bin/bash -c 'until (echo > /dev/tcp/mysql/3306) 2>/dev/null; do sleep 1; done; sleep 2; servatrice --config /tmp/servatrice.ini --log-to-console'"
+    volumes:
+      - ./servatrice-e2e.ini:/tmp/servatrice.ini:ro
+
+volumes:
+  cockatrice_e2e_mysql:
