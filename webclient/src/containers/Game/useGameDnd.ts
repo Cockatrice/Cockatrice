@@ -34,7 +34,9 @@ export interface UseGameDndArgs {
 function computePointerXInRow(event: DragEndEvent): number {
   const overRect = event.over?.rect;
   const activeRect = event.active.rect.current.translated;
-  if (!overRect || !activeRect) return 0;
+  if (!overRect || !activeRect) {
+    return 0;
+  }
   const cardCenterX = activeRect.left + activeRect.width / 2;
   return cardCenterX - overRect.left - MARGIN_LEFT_PX;
 }
@@ -152,7 +154,9 @@ export function useGameDnd({ gameId, onDragStart }: UseGameDndArgs): GameDnd {
         const resolved = closestGridPoint(rawGridX, occupied);
         // Fully-occupied 3-card stack → desktop silently rejects (see
         // card_drag_item.cpp:115); skip dispatch to match.
-        if (resolved == null) return;
+        if (resolved == null) {
+          return;
+        }
         gridX = resolved;
       }
 

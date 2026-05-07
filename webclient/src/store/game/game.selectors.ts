@@ -52,9 +52,15 @@ function materializeAttachmentsByParent(
     // desktop maintains a child list, but here every child points up via
     // attachCardId. Skip unattached cards and any pointer to a different
     // player / zone (the protocol allows cross-player attach).
-    if (card.attachCardId == null || card.attachCardId === -1) continue;
-    if (card.attachPlayerId !== playerId) continue;
-    if (card.attachZone !== App.ZoneName.TABLE) continue;
+    if (card.attachCardId == null || card.attachCardId === -1) {
+      continue;
+    }
+    if (card.attachPlayerId !== playerId) {
+      continue;
+    }
+    if (card.attachZone !== App.ZoneName.TABLE) {
+      continue;
+    }
     let bucket = map.get(card.attachCardId);
     if (!bucket) {
       bucket = [];

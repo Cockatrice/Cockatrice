@@ -53,7 +53,9 @@ const GameSelector = ({ room }: GameSelectorProps) => {
   // identifies which joined game to display.
   useReduxEffect<{ data: Data.Event_GameJoined }>((action) => {
     const gameId = action.payload.data.gameInfo?.gameId;
-    if (gameId == null) return;
+    if (gameId == null) {
+      return;
+    }
     navigate(generatePath(App.RouteEnum.GAME, { gameId: gameId.toString() }));
   }, GameTypes.GAME_JOINED, [navigate]);
 

@@ -51,7 +51,9 @@ export function useBattlefield({ gameId, playerId, mirrored }: UseBattlefieldArg
     for (const card of cards) {
       // Children render nested under their parent via AttachmentStack, not as
       // their own lane slot.
-      if (isAttachedChild(card)) continue;
+      if (isAttachedChild(card)) {
+        continue;
+      }
       bucketed[rowIndexFor(card)].push(card);
     }
     for (const row of bucketed) {
@@ -74,9 +76,13 @@ export function useBattlefield({ gameId, playerId, mirrored }: UseBattlefieldArg
       let maxCol = -1;
       for (const card of rowCards) {
         const col = Math.floor((card.x ?? 0) / MAX_SUBPOS);
-        if (!sparse[col]) sparse[col] = [];
+        if (!sparse[col]) {
+          sparse[col] = [];
+        }
         (sparse[col] as Data.ServerInfo_Card[]).push(card);
-        if (col > maxCol) maxCol = col;
+        if (col > maxCol) {
+          maxCol = col;
+        }
       }
       const filled: (Data.ServerInfo_Card[] | null)[] = [];
       for (let i = 0; i <= maxCol; i++) {

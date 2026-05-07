@@ -24,8 +24,12 @@ export const ROW_COUNT = 3;
 export const MAX_SUBPOS = 3; // cards per stack column before overflow
 
 export function clampRow(y: number): number {
-  if (y < 0) return 0;
-  if (y >= ROW_COUNT) return ROW_COUNT - 1;
+  if (y < 0) {
+    return 0;
+  }
+  if (y >= ROW_COUNT) {
+    return ROW_COUNT - 1;
+  }
   return y;
 }
 
@@ -39,7 +43,9 @@ export function stackColumnWidth(
   cardWidth: number = CARD_WIDTH_PX,
   offsetX: number = STACKED_CARD_OFFSET_X_PX,
 ): number {
-  if (cardCount <= 1) return cardWidth;
+  if (cardCount <= 1) {
+    return cardWidth;
+  }
   const extras = Math.min(cardCount - 1, MAX_SUBPOS - 1);
   return cardWidth + extras * offsetX;
 }
@@ -98,7 +104,9 @@ export function closestGridPoint(
 ): number | null {
   const base = Math.floor(gridX / MAX_SUBPOS) * MAX_SUBPOS;
   for (let i = 0; i < MAX_SUBPOS; i++) {
-    if (!occupiedXs.has(base + i)) return base + i;
+    if (!occupiedXs.has(base + i)) {
+      return base + i;
+    }
   }
   return null;
 }

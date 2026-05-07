@@ -62,7 +62,6 @@ export default tseslint.config(
       'max-len': ['error', { code: 140 }],
       'no-eq-null': ['off'],
       'no-func-assign': ['error'],
-      'no-inline-comments': ['error'],
       'no-mixed-spaces-and-tabs': ['error'],
       'no-multi-spaces': ['error'],
       'no-trailing-spaces': ['error'],

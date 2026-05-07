@@ -53,19 +53,19 @@ function PlayerInfoPanel({
   const counterHandlers = (c: Data.ServerInfo_Counter) =>
     canEdit
       ? {
-          role: 'button' as const,
-          onClick: (e: React.MouseEvent) => {
-            e.stopPropagation();
-            handleIncrement(c.id, +1);
-          },
-          // stopPropagation prevents the panel's onContextMenu (player menu)
-          // from firing when the user right-clicks a counter to decrement.
-          onContextMenu: (e: React.MouseEvent) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleIncrement(c.id, -1);
-          },
-        }
+        role: 'button' as const,
+        onClick: (e: React.MouseEvent) => {
+          e.stopPropagation();
+          handleIncrement(c.id, +1);
+        },
+        // stopPropagation prevents the panel's onContextMenu (player menu)
+        // from firing when the user right-clicks a counter to decrement.
+        onContextMenu: (e: React.MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleIncrement(c.id, -1);
+        },
+      }
       : {};
 
   const renderCounterCircle = (c: Data.ServerInfo_Counter, modifier?: string) => (

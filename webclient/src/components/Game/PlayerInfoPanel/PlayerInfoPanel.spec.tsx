@@ -304,8 +304,9 @@ describe('PlayerInfoPanel', () => {
       const second = screen.getByTestId('counter-3').getAttribute('style') ?? '';
 
       expect(first).toBe(second);
-      expect(first).toMatch(/rgba\(\d+, \d+, \d+, 1\)/);
-      expect(first).not.toMatch(/rgba\(0, 0, 0/);
+      // jsdom normalizes rgba(r,g,b,1) → rgb(r,g,b) on style attributes; accept either.
+      expect(first).toMatch(/rgba?\(\d+, \d+, \d+(?:, 1)?\)/);
+      expect(first).not.toMatch(/rgba?\(0, 0, 0/);
     });
   });
 

@@ -17,8 +17,12 @@ const NAME_COLOR_MAP: Record<string, [number, number, number]> = {
 };
 
 function isBlankColor(c: ServerColor): boolean {
-  if (!c) return true;
-  if ((c.a ?? 255) === 0) return true;
+  if (!c) {
+    return true;
+  }
+  if ((c.a ?? 255) === 0) {
+    return true;
+  }
   return c.r === 0 && c.g === 0 && c.b === 0;
 }
 

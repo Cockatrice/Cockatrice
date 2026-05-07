@@ -270,7 +270,7 @@ describe('Game board integration', () => {
     const labels = Array.from(zones.querySelectorAll('.zone-stack__label')).map(
       (n) => n.textContent,
     );
-    expect(labels).toEqual(['Deck', 'Graveyard', 'Exile']);
+    expect(labels).toEqual(['Deck', 'Hand', 'Graveyard', 'Exile']);
     // Stack is now its own column, not a zone inside the rail.
     expect(within(zones as HTMLElement).queryByText('Stack')).not.toBeInTheDocument();
     expect(within(localBoard).getByTestId('stack-column-1')).toBeInTheDocument();

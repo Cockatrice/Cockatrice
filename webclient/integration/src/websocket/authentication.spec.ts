@@ -2,7 +2,7 @@
 // and the hashed-password (salt) login path.
 
 import { create } from '@bufbuild/protobuf';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { Data } from '@app/types';
 import { store } from '@app/store';
@@ -137,7 +137,7 @@ describe('authentication', () => {
   });
 
   describe('hashed-password login (salt path)', () => {
-    it('requests salt then sends login with hashedPassword instead of plaintext', () => {
+    it('requests salt then sends login with hashedPassword instead of plaintext', async () => {
       connectAndHandshakeWithSalt({ userName: 'alice', password: 'secret' });
 
       // First command should be RequestPasswordSalt, not Login
@@ -152,6 +152,11 @@ describe('authentication', () => {
         ext: Data.Response_PasswordSalt_ext,
         value: create(Data.Response_PasswordSaltSchema, { passwordSalt: 'test-salt-value' }),
       })));
+
+      // Sockatrice's serverIdentification handler awaits hashPassword (1000 SHA-512 rounds)
+      // before dispatching Command_Login. With fake timers active, advance real-time enough
+      // for crypto.subtle.digest + the chained microtasks to complete.
+      await vi.waitFor(() => findLastSessionCommand(Data.Command_Login_ext));
 
       // Now login should have been sent with hashedPassword
       const login = findLastSessionCommand(Data.Command_Login_ext);

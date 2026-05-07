@@ -1,7 +1,6 @@
 import { makeCard } from '../../../store/game/__mocks__/fixtures';
 import {
   CARD_WIDTH_PX,
-  MAX_SUBPOS,
   PADDING_X_PX,
   STACKED_CARD_OFFSET_X_PX,
   applyInvertY,

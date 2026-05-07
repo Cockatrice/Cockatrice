@@ -662,7 +662,7 @@ describe('2C: CARD_MOVED', () => {
       playerId: 1,
       data: {
         cardId: 15, cardName: '', startPlayerId: 1, startZone: 'table',
-        position: -1, targetPlayerId: 1, targetZone: '',  // ← stripped on the wire
+        position: -1, targetPlayerId: 1, targetZone: '', // ← stripped on the wire
         x: 18, y: 1, newCardId: 15, faceDown: false, newCardProviderId: '',
       },
     }));
