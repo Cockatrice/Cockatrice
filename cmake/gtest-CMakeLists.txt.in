@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(gtest-download LANGUAGES NONE)
 
 include(ExternalProject)
-ExternalProject_Add(
+externalproject_add(
   googletest
   URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
   URL_HASH SHA1=f638fa0e724760e2ba07ff8cfba32cd644e1ce28
