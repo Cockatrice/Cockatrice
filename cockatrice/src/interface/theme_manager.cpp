@@ -414,7 +414,6 @@ void ThemeManager::themeChangedSlot()
         newStyle->polish(widget);
 
         widget->update();
-        widget->repaint();
     }
 
     if (dirPath.isEmpty()) {
