@@ -5,7 +5,7 @@ project(gtest-download LANGUAGES NONE)
 include(ExternalProject)
 ExternalProject_Add(
   googletest
-  URL https://github.com/google/googletest/archive/release-1.12.0.zip
+  URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
   URL_HASH SHA1=9ffb7b5923f4a8fcdabf2f42c6540cce299f44c0
   SOURCE_DIR "${CMAKE_BINARY_DIR}/gtest-src"
   BINARY_DIR "${CMAKE_BINARY_DIR}/gtest-build"
