@@ -203,7 +203,11 @@ if [[ $RUNNER_OS == macOS ]]; then
       arch="x64"
     fi
     mkdir -p "$triplets_dir"
-    cp "../vcpkg/triplets/$arch-osx.cmake" "$triplet_file"
+    triplet_source="../vcpkg/triplets/$arch-osx.cmake"
+    if [[ ! -f "$triplet_source" ]]; then
+      triplet_source="../vcpkg/triplets/community/$arch-osx.cmake"
+    fi
+    cp "$triplet_source" "$triplet_file"
     echo "set(VCPKG_CMAKE_SYSTEM_VERSION $TARGET_MACOS_VERSION)" >>"$triplet_file"
     echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $TARGET_MACOS_VERSION)" >>"$triplet_file"
     flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
