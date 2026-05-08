@@ -1,15 +1,16 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.10)
 
 project(gtest-download LANGUAGES NONE)
 
 include(ExternalProject)
-ExternalProject_Add(googletest
-  URL https://github.com/google/googletest/archive/release-1.11.0.zip
-  URL_HASH SHA1=9ffb7b5923f4a8fcdabf2f42c6540cce299f44c0
+externalproject_add(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
+  URL_HASH SHA1=f638fa0e724760e2ba07ff8cfba32cd644e1ce28
   SOURCE_DIR "${CMAKE_BINARY_DIR}/gtest-src"
   BINARY_DIR "${CMAKE_BINARY_DIR}/gtest-build"
   CONFIGURE_COMMAND ""
-  BUILD_COMMAND     ""
-  INSTALL_COMMAND   ""
-  TEST_COMMAND      ""
+  BUILD_COMMAND ""
+  INSTALL_COMMAND ""
+  TEST_COMMAND ""
 )
