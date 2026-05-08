@@ -15,6 +15,7 @@
 #include <QStyle>
 #include <QStyleFactory>
 #include <QStyleHints>
+#include <QWidget>
 #include <Qt>
 
 #define NONE_THEME_NAME "Default"
@@ -91,6 +92,10 @@ struct PaletteColorInfo
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     defaultStyleName = qApp->style()->objectName();
+    // FIXME workaround for windows11 style being broken
+    if (defaultStyleName == "windows11") {
+        defaultStyleName = "windowsvista";
+    }
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, &ThemeManager::themeChangedSlot);
@@ -364,26 +369,55 @@ void ThemeManager::themeChangedSlot()
         qApp->setStyleSheet("");
     }
 
+    QStyle *newStyle = nullptr;
+    QPalette newPalette;
+
     if (themeName == FUSION_THEME_NAME) {
-        QStyle *fusionStyle = QStyleFactory::create("Fusion");
-        qApp->setStyle(fusionStyle);
+        newStyle = QStyleFactory::create("Fusion");
+
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
         // Start from Fusion's own palette so dark mode is handled correctly,
         // then apply any tweaks on top of it.
-        QPalette palette = fusionStyle->standardPalette();
+        newPalette = newStyle->standardPalette();
         if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
-            palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+            newPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
         }
-        qApp->setPalette(palette);
+#else
+        newPalette = qApp->palette();
 #endif
     } else if (themeName == FUSION_THEME_NAME_LIGHT) {
-        qApp->setStyle(QStyleFactory::create("Fusion"));
-        qApp->setPalette(createLightGreenFusionPalette());
+        newStyle = QStyleFactory::create("Fusion");
+        newPalette = createLightGreenFusionPalette();
     } else if (themeName == FUSION_THEME_NAME_DARK) {
-        qApp->setStyle(QStyleFactory::create("Fusion"));
-        qApp->setPalette(createDarkGreenFusionPalette());
+        newStyle = QStyleFactory::create("Fusion");
+        newPalette = createDarkGreenFusionPalette();
     } else {
-        qApp->setStyle(QStyleFactory::create(defaultStyleName)); // setting the style also sets the palette
+        newStyle = QStyleFactory::create(defaultStyleName);
+        // Use the style's default palette.
+        newPalette = newStyle->standardPalette();
+    }
+
+    // Apply palette FIRST.
+    qApp->setPalette(newPalette);
+    // Then apply style.
+    qApp->setStyle(newStyle);
+
+    // Force every widget to re-polish and repaint immediately rather than
+    // waiting for natural expose events, which produces a patchwork of old
+    // and new colours during a live preview.
+    // Note: we do NOT call widget->setPalette(base) here — qApp->setPalette()
+    // already propagates to all widgets that haven't explicitly overridden their
+    // palette (WA_SetPalette not set). Calling it unconditionally would clobber
+    // intentional per-widget palette customisations across the whole app.
+    for (QWidget *widget : qApp->allWidgets()) {
+        newStyle->unpolish(widget);
+        newStyle->polish(widget);
+
+        widget->style()->unpolish(widget);
+        widget->style()->polish(widget);
+
+        widget->update();
+        widget->repaint();
     }
 
     if (dirPath.isEmpty()) {
