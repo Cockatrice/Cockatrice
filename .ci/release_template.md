@@ -85,7 +85,6 @@ Remove empty headers when done.
 ### Under the Hood
 ### Oracle
 ### Servatrice
-### Webatrice
 
 </details>
 
