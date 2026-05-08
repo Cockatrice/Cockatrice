@@ -54,6 +54,8 @@ protected:
     QBrush loadExtraBrush(QString fileName, QBrush &fallbackBrush);
 
 public:
+    bool isBuiltInTheme();
+    bool isDarkMode();
     QStringMap &getAvailableThemes();
 
     QBrush &getBgBrush(Role zone);
