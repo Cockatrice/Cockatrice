@@ -539,6 +539,7 @@ if(WIN32)
     DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
     DESTINATION ./
     FILES_MATCHING
+    PATTERN "CMakeFiles" EXCLUDE
     PATTERN "*.ini"
   )
 
