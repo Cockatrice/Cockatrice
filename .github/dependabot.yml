@@ -10,7 +10,7 @@ updates:
     # Look for `.gitmodules` in the `root` directory
     directory: "/"
     ignore:
-      # Ignore updates for vcpkg (Bump to latest tag not working (no SemVer used) & macOS Intel triplet broken with newer releases)
+      # Ignore updates for vcpkg (Bump to latest tag not working (no SemVer used)
       - dependency-name: "vcpkg"
     # Check for updates once a month
     schedule:
