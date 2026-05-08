@@ -48,6 +48,8 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     // Lambda is cleaner to read than overloading this
     connect(&SettingsCache::instance(), &SettingsCache::homeTabDisplayCardNameChanged, this, [this] { repaint(); });
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
+            &HomeWidget::initializeBackgroundFromSource);
+    connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
             &HomeWidget::updateButtonsToBackgroundColor);
 }
 
