@@ -410,10 +410,12 @@ void ThemeManager::themeChangedSlot()
     // palette (WA_SetPalette not set). Calling it unconditionally would clobber
     // intentional per-widget palette customisations across the whole app.
     for (QWidget *widget : qApp->allWidgets()) {
-        newStyle->unpolish(widget);
-        newStyle->polish(widget);
+        if (widget->isVisible()) {
+            newStyle->unpolish(widget);
+            newStyle->polish(widget);
 
-        widget->update();
+            widget->update();
+        }
     }
 
     if (dirPath.isEmpty()) {
