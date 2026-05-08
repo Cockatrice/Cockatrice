@@ -413,9 +413,6 @@ void ThemeManager::themeChangedSlot()
         newStyle->unpolish(widget);
         newStyle->polish(widget);
 
-        widget->style()->unpolish(widget);
-        widget->style()->polish(widget);
-
         widget->update();
         widget->repaint();
     }
