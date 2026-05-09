@@ -29,19 +29,7 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
     hideGamesNotCreatedByBuddiesCheckBox = new QCheckBox(this);
     hideGamesNotCreatedByBuddiesCheckBox->setChecked(filters.hideNotBuddyCreatedGames);
     connect(hideGamesNotCreatedByBuddiesCheckBox, &QCheckBox::toggled, this, [this](bool checked) {
-        applyFilters([&](GameFilterConfigs &configs) {
-            configs.hideNotBuddyCreatedGames = checked;
-
-            if (checked) {
-                QStringList buddyNames;
-                for (auto buddy : tabSupervisor->getUserListManager()->getBuddyList().values()) {
-                    buddyNames << QString::fromStdString(buddy.name());
-                }
-                configs.creatorNameFilters = buddyNames;
-            } else {
-                configs.creatorNameFilters.clear();
-            }
-        });
+        applyFilters([&](GameFilterConfigs &configs) { configs.hideNotBuddyCreatedGames = checked; });
     });
 
     hideFullGamesCheckBox = new QCheckBox(this);
