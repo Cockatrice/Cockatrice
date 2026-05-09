@@ -93,6 +93,19 @@ public:
                                     bool fixFreeSpaces = true,
                                     bool undoingDraw = false,
                                     bool isReversed = false);
+
+    void processMoveCard(GameEventStorage &ges,
+                         Server_CardZone *startzone,
+                         Server_CardZone *targetzone,
+                         MoveCardStruct cardStruct,
+                         int xCoord,
+                         int yCoord,
+                         int &xIndex,
+                         bool &revealTopStart,
+                         bool &revealTopTarget,
+                         bool isReversed,
+                         bool undoingDraw);
+
     virtual void onCardBeingMoved(GameEventStorage &ges,
                                   const MoveCardStruct &cardStruct,
                                   Server_CardZone *startzone,

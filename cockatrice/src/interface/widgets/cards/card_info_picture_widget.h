@@ -43,7 +43,7 @@ signals:
     void hoveredOnCard(const ExactCard &hoveredCard);
     void cardScaleFactorChanged(int _scale);
     void cardChanged(const ExactCard &card);
-    void cardClicked();
+    void cardClicked(QMouseEvent *event);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

@@ -19,7 +19,13 @@ void DeckListStatisticsAnalyzer::analyze()
 {
     clearData();
 
-    QList<const DecklistCardNode *> nodes = model->getCardNodes();
+    QList<const DecklistCardNode *> nodes;
+
+    if (config.includeSideboard) {
+        nodes = model->getCardNodes();
+    } else {
+        nodes = model->getCardNodesForZone(DECK_ZONE_MAIN);
+    }
 
     for (auto node : nodes) {
         CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(node->getName());

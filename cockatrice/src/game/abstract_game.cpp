@@ -1,8 +1,9 @@
 #include "abstract_game.h"
 
+#include "../interface/widgets/tabs/tab_game.h"
 #include "player/player.h"
 
-AbstractGame::AbstractGame(TabGame *_tab) : tab(_tab)
+AbstractGame::AbstractGame(TabGame *_tab) : QObject(_tab), tab(_tab)
 {
     gameMetaInfo = new GameMetaInfo(this);
     gameEventHandler = new GameEventHandler(this);

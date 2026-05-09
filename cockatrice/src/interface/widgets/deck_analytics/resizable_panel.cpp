@@ -20,7 +20,6 @@ ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWid
     frame = new QFrame(this);
     frame->setFrameShape(QFrame::Box);
     frame->setLineWidth(2);
-    frame->setStyleSheet("border: none;");
 
     auto *frameLayout = new QVBoxLayout(frame);
     frameLayout->setContentsMargins(0, 0, 0, 0);
@@ -30,15 +29,13 @@ ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWid
     frameLayout->addWidget(analyticsPanel);
 
     dropIndicator = new QFrame(frame);
-    dropIndicator->setStyleSheet("background-color: #3daee9;");
     dropIndicator->setFixedHeight(3);
     dropIndicator->hide();  // hidden by default
     dropIndicator->raise(); // make sure it's above children
 
     selectionOverlay = new QFrame(frame);
-    selectionOverlay->setStyleSheet("background-color: rgba(61,174,233,50);"); // semi-transparent blue
-    selectionOverlay->hide();                                                  // hidden by default
-    selectionOverlay->raise();                                                 // make sure it is above children
+    selectionOverlay->hide();  // hidden by default
+    selectionOverlay->raise(); // make sure it is above children
     selectionOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
 
     // Bottom bar with drag button and resize handle
@@ -51,23 +48,40 @@ ResizablePanel::ResizablePanel(const QString &_typeId, AbstractAnalyticsPanelWid
     dragButton = new QPushButton("☰", bottomBar);
     dragButton->setFixedSize(40, 8);
     dragButton->setCursor(Qt::OpenHandCursor);
-    dragButton->setStyleSheet("QPushButton { "
-                              "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #4a4a4a, stop:1 #3a3a3a); "
-                              "border: none; color: #888; font-size: 10px; }"
-                              "QPushButton:hover { background: #5a5a5a; }");
     bottomLayout->addWidget(dragButton);
 
     // Resize handle fills the rest
     resizeHandle = new QWidget(bottomBar);
     resizeHandle->setFixedHeight(8);
     resizeHandle->setCursor(Qt::SizeVerCursor);
-    resizeHandle->setStyleSheet("background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
-                                "stop:0 #3a3a3a, stop:1 #2a2a2a);");
     bottomLayout->addWidget(resizeHandle, 1);
 
     frameLayout->addWidget(bottomBar);
 
     mainLayout->addWidget(frame);
+
+    const QPalette &pal = QApplication::palette();
+    QColor mid = pal.color(QPalette::Mid);
+    QColor dark = pal.color(QPalette::Dark);
+    QColor midLight = pal.color(QPalette::Midlight);
+    QColor shadow = pal.color(QPalette::Shadow);
+    QColor placeholderText = pal.color(QPalette::PlaceholderText);
+
+    frame->setStyleSheet("QFrame { border: none; }");
+
+    dropIndicator->setStyleSheet("QFrame { background-color: #3daee9; }");
+
+    selectionOverlay->setStyleSheet("QFrame { background-color: rgba(61,174,233,50); }");
+
+    dragButton->setStyleSheet(QString("QPushButton { "
+                                      "background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 %1, stop:1 %2); "
+                                      "border: none; color: %3; font-size: 10px; }"
+                                      "QPushButton:hover { background: %4; }")
+                                  .arg(mid.name(), dark.name(), placeholderText.name(), midLight.name()));
+
+    resizeHandle->setStyleSheet(QString("QWidget { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, "
+                                        "stop:0 %1, stop:1 %2); }")
+                                    .arg(dark.name(), shadow.name()));
 
     // Set size policy
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);

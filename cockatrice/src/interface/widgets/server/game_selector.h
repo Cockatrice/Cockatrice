@@ -40,6 +40,7 @@ private slots:
      * Updates the proxy model with selected filter parameters and refreshes the displayed game list.
      */
     void actSetFilter();
+    void checkClearFilterButtonState();
 
     /**
      * @brief Clears all filters applied to the game list.

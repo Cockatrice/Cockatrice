@@ -33,7 +33,7 @@ jobs:
       - name: Install Doxygen
         uses: ssciwr/doxygen-install@v2
         with:
-          version: "1.14.0"
+          version: "1.16.1"
 
       - name: Update Doxygen Configuration
         run: |

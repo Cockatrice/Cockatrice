@@ -6,6 +6,12 @@
 class ICardSetPriorityController
 {
 public:
+    struct SetSaveData {
+        QString shortName;
+        unsigned int sortKey;
+        bool enabled;
+    };
+
     virtual ~ICardSetPriorityController() = default;
 
     virtual void setSortKey(QString shortName, unsigned int sortKey) = 0;
@@ -15,6 +21,8 @@ public:
     virtual unsigned int getSortKey(QString shortName) const = 0;
     virtual bool isEnabled(QString shortName) const = 0;
     virtual bool isKnown(QString shortName) const = 0;
+
+    virtual void saveSets(const QVector<SetSaveData> &data) = 0;
 };
 
 #endif // COCKATRICE_INTERFACE_CARD_SET_PRIORITY_CONTROLLER_H

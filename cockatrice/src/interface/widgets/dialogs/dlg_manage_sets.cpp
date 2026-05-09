@@ -16,6 +16,7 @@
 #include <QPushButton>
 #include <QToolBar>
 #include <QTreeView>
+#include <QtConcurrentRun>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_set/card_sets_model.h>
@@ -253,6 +254,11 @@ void WndSets::actSave()
     model->save(CardDatabaseManager::getInstance());
     SettingsCache::instance().setIncludeRebalancedCards(includeRebalancedCards);
     CardPictureLoader::clearPixmapCache();
+    const auto reloadOk1 = QtConcurrent::run([] {
+        CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify();
+
+        SettingsCache::instance().downloads().sync();
+    });
     close();
 }
 

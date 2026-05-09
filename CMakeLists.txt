@@ -74,11 +74,11 @@ endif()
 
 # A project name is needed for CPack
 # Version can be overriden by git tags, see cmake/getversion.cmake
-project("Cockatrice" VERSION 2.11.0)
+project("Cockatrice" VERSION 3.0.1)
 
 # Set release name if not provided via env/cmake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
-  set(GIT_TAG_RELEASENAME "Omenpath")
+  set(GIT_TAG_RELEASENAME "Graduation Day")
 endif()
 
 # Use c++20 for all targets
@@ -174,6 +174,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
       -Wno-error=delete-non-virtual-dtor
       -Wno-error=sign-compare
       -Wno-error=missing-declarations
+      -Wno-error=sfinae-incomplete  # GCC 16+: Qt MOC + protobuf forward decls trigger this
   )
 
   foreach(FLAG ${ADDITIONAL_DEBUG_FLAGS})

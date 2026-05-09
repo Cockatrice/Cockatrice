@@ -3,6 +3,7 @@
 #include "../../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../deck_editor/deck_state_manager.h"
+#include "visual_database_display_filter_button.h"
 
 #include <QHBoxLayout>
 
@@ -95,8 +96,8 @@ void VisualDatabaseDisplayNameFilterWidget::createNameFilter(const QString &name
 
     // Create a button for the filter
     auto *button = new QPushButton(name, flowWidget);
-    button->setStyleSheet("QPushButton { background-color: lightgray; border: 1px solid gray; padding: 5px; }"
-                          "QPushButton:hover { background-color: red; color: white; }");
+
+    button->setStyleSheet(visualDatabaseDisplayFilterButtonStyle);
 
     connect(button, &QPushButton::clicked, this, [this, name]() {
         removeNameFilter(name);

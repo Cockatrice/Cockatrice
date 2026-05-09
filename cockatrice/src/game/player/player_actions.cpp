@@ -35,7 +35,8 @@
 // milliseconds in between triggers of the move top cards until action
 static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;
 
-PlayerActions::PlayerActions(Player *_player) : player(_player), lastTokenTableRow(0), movingCardsUntil(false)
+PlayerActions::PlayerActions(Player *_player)
+    : QObject(_player), player(_player), lastTokenTableRow(0), movingCardsUntil(false)
 {
     moveTopCardTimer = new QTimer(this);
     moveTopCardTimer->setInterval(MOVE_TOP_CARD_UNTIL_INTERVAL);
@@ -851,6 +852,14 @@ void PlayerActions::actRollDie()
     sendGameCommand(cmd);
 }
 
+void PlayerActions::actFlipCoin()
+{
+    Command_RollDie cmd;
+    cmd.set_sides(2);
+    cmd.set_count(1);
+    sendGameCommand(cmd);
+}
+
 void PlayerActions::actCreateToken()
 {
     DlgCreateToken dlg(player->getPlayerMenu()->getUtilityMenu()->getPredefinedTokens(), player->getGame()->getTab());
@@ -1148,61 +1157,6 @@ void PlayerActions::actSayMessage()
     sendGameCommand(cmd);
 }
 
-void PlayerActions::setCardAttrHelper(const GameEventContext &context,
-                                      CardItem *card,
-                                      CardAttribute attribute,
-                                      const QString &avalue,
-                                      bool allCards,
-                                      EventProcessingOptions options)
-{
-    if (card == nullptr) {
-        return;
-    }
-
-    bool moveCardContext = context.HasExtension(Context_MoveCard::ext);
-    switch (attribute) {
-        case AttrTapped: {
-            bool tapped = avalue == "1";
-            if (!(!tapped && card->getDoesntUntap() && allCards)) {
-                if (!allCards) {
-                    emit logSetTapped(player, card, tapped);
-                }
-                bool canAnimate = !options.testFlag(SKIP_TAP_ANIMATION) && !moveCardContext;
-                card->setTapped(tapped, canAnimate);
-            }
-            break;
-        }
-        case AttrAttacking: {
-            card->setAttacking(avalue == "1");
-            break;
-        }
-        case AttrFaceDown: {
-            card->setFaceDown(avalue == "1");
-            break;
-        }
-        case AttrColor: {
-            card->setColor(avalue);
-            break;
-        }
-        case AttrAnnotation: {
-            emit logSetAnnotation(player, card, avalue);
-            card->setAnnotation(avalue);
-            break;
-        }
-        case AttrDoesntUntap: {
-            bool value = (avalue == "1");
-            emit logSetDoesntUntap(player, card, value);
-            card->setDoesntUntap(value);
-            break;
-        }
-        case AttrPT: {
-            emit logSetPT(player, card, avalue);
-            card->setPT(avalue);
-            break;
-        }
-    }
-}
-
 void PlayerActions::actMoveCardXCardsFromTop()
 {
     int deckSize = player->getDeckZone()->getCards().size() + 1; // add the card to move to the deck
@@ -1263,7 +1217,7 @@ void PlayerActions::actIncPT(int deltaP, int deltaT)
     for (const auto &item : player->getGameScene()->selectedItems()) {
         auto *card = static_cast<CardItem *>(item);
         QString pt = card->getPT();
-        const auto ptList = parsePT(pt);
+        const auto ptList = CardItem::parsePT(pt);
         QString newpt;
         if (ptList.isEmpty()) {
             newpt = QString::number(deltaP) + (deltaT ? "/" + QString::number(deltaT) : "");
@@ -1323,37 +1277,6 @@ void PlayerActions::actResetPT()
     }
 }
 
-QVariantList PlayerActions::parsePT(const QString &pt)
-{
-    QVariantList ptList = QVariantList();
-    if (!pt.isEmpty()) {
-        int sep = pt.indexOf('/');
-        if (sep == 0) {
-            ptList.append(QVariant(pt.mid(1))); // cut off starting '/' and take full string
-        } else {
-            int start = 0;
-            for (;;) {
-                QString item = pt.mid(start, sep - start);
-                if (item.isEmpty()) {
-                    ptList.append(QVariant(QString()));
-                } else if (item[0] == '+') {
-                    ptList.append(QVariant(item.mid(1).toInt())); // add as int
-                } else if (item[0] == '-') {
-                    ptList.append(QVariant(item.toInt())); // add as int
-                } else {
-                    ptList.append(QVariant(item)); // add as qstring
-                }
-                if (sep == -1) {
-                    break;
-                }
-                start = sep + 1;
-                sep = pt.indexOf('/', start);
-            }
-        }
-    }
-    return ptList;
-}
-
 void PlayerActions::actSetPT()
 {
     QString oldPT;
@@ -1375,7 +1298,7 @@ void PlayerActions::actSetPT()
         return;
     }
 
-    const auto ptList = parsePT(pt);
+    const auto ptList = CardItem::parsePT(pt);
     bool empty = ptList.isEmpty();
 
     QList<const ::google::protobuf::Message *> commandList;
@@ -1384,7 +1307,7 @@ void PlayerActions::actSetPT()
         auto *cmd = new Command_SetCardAttr;
         QString newpt = QString();
         if (!empty) {
-            const auto oldpt = parsePT(card->getPT());
+            const auto oldpt = CardItem::parsePT(card->getPT());
             int ptIter = 0;
             for (const auto &_item : ptList) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))

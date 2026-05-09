@@ -9,6 +9,7 @@
 #include "event_processing_options.h"
 
 #include <QObject>
+#include <libcockatrice/protocol/pb/card_attributes.pb.h>
 #include <libcockatrice/protocol/pb/game_event.pb.h>
 #include <libcockatrice/protocol/pb/game_event_context.pb.h>
 
@@ -110,6 +111,13 @@ public:
 
 private:
     Player *player;
+
+    void setCardAttrHelper(const GameEventContext &context,
+                           CardItem *card,
+                           CardAttribute attribute,
+                           const QString &avalue,
+                           bool allCards,
+                           EventProcessingOptions options);
 };
 
 #endif // COCKATRICE_PLAYER_EVENT_HANDLER_H

@@ -28,6 +28,7 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
     connect(&SettingsCache::instance(), &SettingsCache::picDownloadChanged, this,
             &CardPictureLoader::picDownloadChanged);
 
+    qRegisterMetaType<ExactCard>();
     connect(worker, &CardPictureLoaderWorker::imageLoaded, this, &CardPictureLoader::imageLoaded);
 
     statusBar = new CardPictureLoaderStatusBar(nullptr);

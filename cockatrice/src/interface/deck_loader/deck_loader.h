@@ -13,6 +13,7 @@
 #include <QPrinter>
 #include <QTextCursor>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <optional>
 
 inline Q_LOGGING_CATEGORY(DeckLoaderLog, "deck_loader");
 

@@ -181,6 +181,15 @@ public:
      */
     void loadSetOptions();
 
+    void setSortKeyInMemory(unsigned int _sortKey)
+    {
+        sortKey = _sortKey;
+    }
+    void setEnabledInMemory(bool _enabled)
+    {
+        enabled = _enabled;
+    }
+
     /// @return The sort key assigned to this set.
     [[nodiscard]] int getSortKey() const
     {

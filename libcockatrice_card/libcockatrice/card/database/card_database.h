@@ -130,6 +130,11 @@ public:
     /** @brief Notifies listeners that enabled sets changed. */
     void notifyEnabledSetsChanged();
 
+    ICardSetPriorityController *getPriorityController()
+    {
+        return setPriorityController;
+    };
+
 public slots:
     /**
      * @brief Adds a card to the database.
@@ -147,6 +152,7 @@ public slots:
 
     /** @brief Loads card databases from configured paths. */
     void loadCardDatabases();
+    void reloadCardDatabasesAndNotify();
 
     /** @brief Saves custom tokens to file.
      * @return True if successful.

@@ -1785,7 +1785,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     contentsWidget->setSpacing(5);
 
     pagesWidget = new QStackedWidget;
-    pagesWidget->addWidget(new GeneralSettingsPage);
+    pagesWidget->addWidget(makeScrollable(new GeneralSettingsPage));
     pagesWidget->addWidget(makeScrollable(new AppearanceSettingsPage));
     pagesWidget->addWidget(makeScrollable(new UserInterfaceSettingsPage));
     pagesWidget->addWidget(new DeckEditorSettingsPage);

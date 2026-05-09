@@ -57,6 +57,8 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     this->addNewTab(visualDatabaseDisplay, tr("Visual Database Display"));
     this->addNewTab(deckAnalytics, tr("Deck Analytics"));
     this->addNewTab(sampleHandWidget, tr("Sample Hand"));
+
+    setTabsClosable(false);
 }
 
 /**

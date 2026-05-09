@@ -228,16 +228,19 @@ void SetsModel::sort(int column, Qt::SortOrder order)
 
 void SetsModel::save(CardDatabase *db)
 {
-    // order
-    for (int i = 0; i < sets.size(); i++)
-        sets[i]->setSortKey(static_cast<unsigned int>(i + 1));
+    QVector<ICardSetPriorityController::SetSaveData> saveData;
+    saveData.reserve(sets.size());
 
-    // enabled sets
-    for (const CardSetPtr &set : sets)
-        set->setEnabled(enabledSets.contains(set));
+    for (int i = 0; i < sets.size(); ++i) {
+        const unsigned int sortKey = static_cast<unsigned int>(i + 1);
+        const bool enabled = enabledSets.contains(sets[i]);
+        sets[i]->setSortKeyInMemory(sortKey);
+        sets[i]->setEnabledInMemory(enabled);
+        saveData.append({sets[i]->getShortName(), sortKey, enabled});
+    }
 
+    db->getPriorityController()->saveSets(saveData);
     sets.sortByKey();
-
     db->notifyEnabledSetsChanged();
 }
 

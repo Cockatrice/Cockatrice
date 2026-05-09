@@ -10,7 +10,7 @@
 
 #include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
 
-PlayerMenu::PlayerMenu(Player *_player) : player(_player)
+PlayerMenu::PlayerMenu(Player *_player) : QObject(_player), player(_player)
 {
     playerMenu = new TearOffMenu();
 

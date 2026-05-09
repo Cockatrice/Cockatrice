@@ -49,6 +49,7 @@
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/trice_limits.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <ranges>
 
 Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
                                              int _playerId,
@@ -228,6 +229,37 @@ shouldBeFaceDown(const MoveCardStruct &cardStruct, const Server_CardZone *startZ
     return false;
 }
 
+/**
+ * @brief Determines whether a set of moved cards is from the bottom of the deck
+ */
+static bool shouldBeFromTheBottom(const Server_CardZone *startZone, const std::set<MoveCardStruct> &cardsToMove)
+{
+    if (!startZone) {
+        return false;
+    }
+
+    if (startZone->getName() != ZoneNames::DECK) {
+        return false;
+    }
+
+    int movedCount = static_cast<int>(cardsToMove.size());
+    int tailStart = startZone->getCards().size() - movedCount;
+    if (tailStart <= 0) { // if the entire deck is moved it should not be considered from the bottom
+        return false;
+    }
+
+    // check if the move is a contiguous block at the end of the deck, fail fast when not
+    int expectedPosition = tailStart;
+    for (const auto &card : cardsToMove) {
+        if (card.position != expectedPosition) {
+            return false;
+        }
+        ++expectedPosition;
+    }
+
+    return true;
+}
+
 Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
                                                        Server_CardZone *startzone,
                                                        const QList<const CardToMove *> &_cards,
@@ -244,8 +276,11 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
         return Response::RespContextError;
     }
 
-    if (!targetzone->hasCoords() && (xCoord <= -1)) {
-        xCoord = targetzone->getCards().size();
+    if (!targetzone->hasCoords()) {
+        yCoord = 0;
+        if (xCoord <= -1) {
+            xCoord = targetzone->getCards().size();
+        }
     }
 
     std::set<MoveCardStruct> cardsToMove;
@@ -285,164 +320,21 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
     bool revealTopStart = false;
     bool revealTopTarget = false;
 
-    for (auto cardStruct : cardsToMove) {
-        Server_Card *card = cardStruct.card;
-        int originalPosition = cardStruct.position;
+    bool isFromBottom = shouldBeFromTheBottom(startzone, cardsToMove);
 
-        bool sourceBeingLookedAt;
-        int position = startzone->removeCard(card, sourceBeingLookedAt);
-
-        // Attachment relationships can be retained when moving a card onto the opponent's table
-        if (startzone->getName() != targetzone->getName()) {
-            // Delete all attachment relationships
-            if (card->getParentCard()) {
-                card->setParentCard(nullptr);
-            }
-
-            // Make a copy of the list because the original one gets modified during the loop
-            QList<Server_Card *> attachedCards = card->getAttachedCards();
-            for (auto &attachedCard : attachedCards) {
-                attachedCard->getZone()->getPlayer()->unattachCard(ges, attachedCard);
-            }
+    if (isFromBottom) {
+        std::ranges::reverse_view reversedCardsToMove{cardsToMove};
+        for (auto card : reversedCardsToMove) {
+            processMoveCard(ges, startzone, targetzone, card, xCoord, yCoord, xIndex, revealTopStart, revealTopTarget,
+                            isReversed, undoingDraw);
         }
-
-        if (startzone != targetzone) {
-            // Delete all arrows from and to the card
-            for (auto *player : game->getPlayers().values()) {
-                QList<int> arrowsToDelete;
-                for (Server_Arrow *arrow : player->getArrows()) {
-                    if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
-                        arrowsToDelete.append(arrow->getId());
-                }
-                for (int j : arrowsToDelete) {
-                    player->deleteArrow(j);
-                }
-            }
-        }
-
-        if (shouldDestroyOnMove(card, startzone, targetzone)) {
-            Event_DestroyCard event;
-            event.set_zone_name(startzone->getName().toStdString());
-            event.set_card_id(static_cast<google::protobuf::uint32>(card->getId()));
-            ges.enqueueGameEvent(event, playerId);
-
-            if (Server_Card *stashedCard = card->takeStashedCard()) {
-                stashedCard->setId(newCardId());
-                ges.enqueueGameEvent(makeCreateTokenEvent(startzone, stashedCard, card->getX(), card->getY()),
-                                     playerId);
-                card->deleteLater();
-                card = stashedCard;
-            } else {
-                card->deleteLater();
-                card = nullptr;
-            }
-        }
-
-        if (card) {
-            ++xIndex;
-            int newX = isReversed ? targetzone->getCards().size() - xCoord + xIndex : xCoord + xIndex;
-
-            bool faceDown = shouldBeFaceDown(cardStruct, startzone, targetzone);
-
-            if (targetzone->hasCoords()) {
-                newX = targetzone->getFreeGridColumn(newX, yCoord, card->getName(), faceDown);
-            } else {
-                yCoord = 0;
-                card->resetState(targetzone->getName() == ZoneNames::STACK);
-            }
-
-            targetzone->insertCard(card, newX, yCoord);
-            int targetLookedCards = targetzone->getCardsBeingLookedAt();
-            bool sourceKnownToPlayer = isReversed || (sourceBeingLookedAt && !card->getFaceDown());
-            if (targetzone->getType() == ServerInfo_Zone::HiddenZone && targetLookedCards >= newX) {
-                if (sourceKnownToPlayer) {
-                    targetLookedCards += 1;
-                } else {
-                    targetLookedCards = newX;
-                }
-                targetzone->setCardsBeingLookedAt(targetLookedCards);
-            }
-
-            bool targetHiddenToOthers = faceDown || (targetzone->getType() != ServerInfo_Zone::PublicZone);
-            bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != ServerInfo_Zone::PublicZone);
-
-            int oldCardId = card->getId();
-            if ((faceDown && (startzone != targetzone)) || (targetzone->getPlayer() != startzone->getPlayer())) {
-                card->setId(targetzone->getPlayer()->newCardId());
-            }
-            card->setFaceDown(faceDown);
-
-            Event_MoveCard eventOthers;
-            eventOthers.set_start_player_id(startzone->getPlayer()->getPlayerId());
-            eventOthers.set_start_zone(startzone->getName().toStdString());
-            eventOthers.set_target_player_id(targetzone->getPlayer()->getPlayerId());
-            if (startzone != targetzone) {
-                eventOthers.set_target_zone(targetzone->getName().toStdString());
-            }
-            eventOthers.set_y(yCoord);
-            eventOthers.set_face_down(faceDown);
-
-            Event_MoveCard eventPrivate(eventOthers);
-            if (sourceBeingLookedAt || targetzone->getType() != ServerInfo_Zone::HiddenZone ||
-                startzone->getType() != ServerInfo_Zone::HiddenZone) {
-                eventPrivate.set_card_id(oldCardId);
-                eventPrivate.set_new_card_id(card->getId());
-            } else {
-                eventPrivate.set_card_id(-1);
-                eventPrivate.set_new_card_id(-1);
-            }
-            if (sourceKnownToPlayer || !(faceDown || targetzone->getType() == ServerInfo_Zone::HiddenZone)) {
-                QString privateCardName = card->getName();
-                eventPrivate.set_card_name(privateCardName.toStdString());
-                eventPrivate.set_new_card_provider_id(card->getProviderId().toStdString());
-            }
-            if (startzone->getType() == ServerInfo_Zone::HiddenZone) {
-                eventPrivate.set_position(position);
-            } else {
-                eventPrivate.set_position(-1);
-            }
-
-            eventPrivate.set_x(newX);
-
-            if (
-                // cards from public zones have their id known, their previous position is already known, the event does
-                // not accomodate for previous locations in zones with coordinates (which are always public)
-                (startzone->getType() != ServerInfo_Zone::PublicZone) &&
-                // other players are not allowed to be able to track which card is which in private zones like the hand
-                (startzone->getType() != ServerInfo_Zone::PrivateZone)) {
-                eventOthers.set_position(position);
-            }
-            if (
-                // other players are not allowed to be able to track which card is which in private zones like the hand
-                (targetzone->getType() != ServerInfo_Zone::PrivateZone)) {
-                eventOthers.set_x(newX);
-            }
-
-            if ((startzone->getType() == ServerInfo_Zone::PublicZone) ||
-                (targetzone->getType() == ServerInfo_Zone::PublicZone)) {
-                eventOthers.set_card_id(oldCardId);
-                if (!(sourceHiddenToOthers && targetHiddenToOthers)) {
-                    QString publicCardName = card->getName();
-                    eventOthers.set_card_name(publicCardName.toStdString());
-                    eventOthers.set_new_card_provider_id(card->getProviderId().toStdString());
-                }
-                eventOthers.set_new_card_id(card->getId());
-            }
-
-            ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
-            ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
-
-            if (originalPosition == 0) {
-                revealTopStart = true;
-            }
-            if (newX == 0) {
-                revealTopTarget = true;
-            }
-
-            // handle side effects for this card
-            onCardBeingMoved(ges, cardStruct, startzone, targetzone, undoingDraw);
+    } else {
+        for (auto card : cardsToMove) {
+            processMoveCard(ges, startzone, targetzone, card, xCoord, yCoord, xIndex, revealTopStart, revealTopTarget,
+                            isReversed, undoingDraw);
         }
     }
+
     if (revealTopStart) {
         revealTopCardIfNeeded(startzone, ges);
     }
@@ -460,6 +352,174 @@ Response::ResponseCode Server_AbstractPlayer::moveCard(GameEventStorage &ges,
     }
 
     return Response::RespOk;
+}
+
+void Server_AbstractPlayer::processMoveCard(GameEventStorage &ges,
+                                            Server_CardZone *startzone,
+                                            Server_CardZone *targetzone,
+                                            MoveCardStruct cardStruct,
+                                            int xCoord,
+                                            int yCoord,
+                                            int &xIndex,
+                                            bool &revealTopStart,
+                                            bool &revealTopTarget,
+                                            bool isReversed,
+                                            bool undoingDraw)
+{
+    Server_Card *card = cardStruct.card;
+    int originalPosition = cardStruct.position;
+
+    bool sourceBeingLookedAt;
+    int position = startzone->removeCard(card, sourceBeingLookedAt);
+
+    // Attachment relationships can be retained when moving a card onto the opponent's table
+    if (startzone->getName() != targetzone->getName()) {
+        // Delete all attachment relationships
+        if (card->getParentCard()) {
+            card->setParentCard(nullptr);
+        }
+
+        // Make a copy of the list because the original one gets modified during the loop
+        QList<Server_Card *> attachedCards = card->getAttachedCards();
+        for (auto &attachedCard : attachedCards) {
+            attachedCard->getZone()->getPlayer()->unattachCard(ges, attachedCard);
+        }
+    }
+
+    if (startzone != targetzone) {
+        // Delete all arrows from and to the card
+        for (auto *player : game->getPlayers().values()) {
+            QList<int> arrowsToDelete;
+            for (Server_Arrow *arrow : player->getArrows()) {
+                if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
+                    arrowsToDelete.append(arrow->getId());
+            }
+            for (int j : arrowsToDelete) {
+                player->deleteArrow(j);
+            }
+        }
+    }
+
+    if (shouldDestroyOnMove(card, startzone, targetzone)) {
+        Event_DestroyCard event;
+        event.set_zone_name(startzone->getName().toStdString());
+        event.set_card_id(static_cast<google::protobuf::uint32>(card->getId()));
+        ges.enqueueGameEvent(event, playerId);
+
+        if (Server_Card *stashedCard = card->takeStashedCard()) {
+            stashedCard->setId(newCardId());
+            ges.enqueueGameEvent(makeCreateTokenEvent(startzone, stashedCard, card->getX(), card->getY()), playerId);
+            card->deleteLater();
+            card = stashedCard;
+        } else {
+            card->deleteLater();
+            card = nullptr;
+        }
+    }
+
+    if (card) {
+        ++xIndex;
+        int newX = isReversed ? targetzone->getCards().size() - xCoord + xIndex : xCoord + xIndex;
+
+        bool faceDown = shouldBeFaceDown(cardStruct, startzone, targetzone);
+
+        if (targetzone->hasCoords()) {
+            newX = targetzone->getFreeGridColumn(newX, yCoord, card->getName(), faceDown);
+        } else {
+            card->resetState(targetzone->getName() == ZoneNames::STACK);
+        }
+
+        targetzone->insertCard(card, newX, yCoord);
+        int targetLookedCards = targetzone->getCardsBeingLookedAt();
+        bool sourceKnownToPlayer = isReversed || (sourceBeingLookedAt && !card->getFaceDown());
+        if (targetzone->getType() == ServerInfo_Zone::HiddenZone && targetLookedCards >= newX) {
+            if (sourceKnownToPlayer) {
+                targetLookedCards += 1;
+            } else {
+                targetLookedCards = newX;
+            }
+            targetzone->setCardsBeingLookedAt(targetLookedCards);
+        }
+
+        bool targetHiddenToOthers = faceDown || (targetzone->getType() != ServerInfo_Zone::PublicZone);
+        bool sourceHiddenToOthers = card->getFaceDown() || (startzone->getType() != ServerInfo_Zone::PublicZone);
+
+        int oldCardId = card->getId();
+        if ((faceDown && (startzone != targetzone)) || (targetzone->getPlayer() != startzone->getPlayer())) {
+            card->setId(targetzone->getPlayer()->newCardId());
+        }
+        card->setFaceDown(faceDown);
+
+        Event_MoveCard eventOthers;
+        eventOthers.set_start_player_id(startzone->getPlayer()->getPlayerId());
+        eventOthers.set_start_zone(startzone->getName().toStdString());
+        eventOthers.set_target_player_id(targetzone->getPlayer()->getPlayerId());
+        if (startzone != targetzone) {
+            eventOthers.set_target_zone(targetzone->getName().toStdString());
+        }
+        eventOthers.set_y(yCoord);
+        eventOthers.set_face_down(faceDown);
+
+        Event_MoveCard eventPrivate(eventOthers);
+        if (sourceBeingLookedAt || targetzone->getType() != ServerInfo_Zone::HiddenZone ||
+            startzone->getType() != ServerInfo_Zone::HiddenZone) {
+            eventPrivate.set_card_id(oldCardId);
+            eventPrivate.set_new_card_id(card->getId());
+        } else {
+            eventPrivate.set_card_id(-1);
+            eventPrivate.set_new_card_id(-1);
+        }
+        if (sourceKnownToPlayer || !(faceDown || targetzone->getType() == ServerInfo_Zone::HiddenZone)) {
+            QString privateCardName = card->getName();
+            eventPrivate.set_card_name(privateCardName.toStdString());
+            eventPrivate.set_new_card_provider_id(card->getProviderId().toStdString());
+        }
+        if (startzone->getType() == ServerInfo_Zone::HiddenZone) {
+            eventPrivate.set_position(position);
+        } else {
+            eventPrivate.set_position(-1);
+        }
+
+        eventPrivate.set_x(newX);
+
+        if (
+            // cards from public zones have their id known, their previous position is already known, the event does
+            // not accomodate for previous locations in zones with coordinates (which are always public)
+            (startzone->getType() != ServerInfo_Zone::PublicZone) &&
+            // other players are not allowed to be able to track which card is which in private zones like the hand
+            (startzone->getType() != ServerInfo_Zone::PrivateZone)) {
+            eventOthers.set_position(position);
+        }
+        if (
+            // other players are not allowed to be able to track which card is which in private zones like the hand
+            (targetzone->getType() != ServerInfo_Zone::PrivateZone)) {
+            eventOthers.set_x(newX);
+        }
+
+        if ((startzone->getType() == ServerInfo_Zone::PublicZone) ||
+            (targetzone->getType() == ServerInfo_Zone::PublicZone)) {
+            eventOthers.set_card_id(oldCardId);
+            if (!(sourceHiddenToOthers && targetHiddenToOthers)) {
+                QString publicCardName = card->getName();
+                eventOthers.set_card_name(publicCardName.toStdString());
+                eventOthers.set_new_card_provider_id(card->getProviderId().toStdString());
+            }
+            eventOthers.set_new_card_id(card->getId());
+        }
+
+        ges.enqueueGameEvent(eventPrivate, playerId, GameEventStorageItem::SendToPrivate, playerId);
+        ges.enqueueGameEvent(eventOthers, playerId, GameEventStorageItem::SendToOthers);
+
+        if (originalPosition == 0) {
+            revealTopStart = true;
+        }
+        if (newX == 0) {
+            revealTopTarget = true;
+        }
+
+        // handle side effects for this card
+        onCardBeingMoved(ges, cardStruct, startzone, targetzone, undoingDraw);
+    }
 }
 
 void Server_AbstractPlayer::onCardBeingMoved(GameEventStorage &ges,
@@ -1502,7 +1562,7 @@ Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseCo
             zone->addWritePermission(cmd.player_id());
         }
 
-        if (isJudge()) {
+        if (judge) {
             ges.setOverwriteOwnership(true);
         }
 

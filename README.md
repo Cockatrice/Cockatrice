@@ -8,7 +8,7 @@
    <a href="#related-repositories">Related</a> <b>|</b>
    <a href="#community-resources-">Community</a> <b>|</b>
    <a href="#contribute">Contribute</a> <b>|</b>
-   <a href="#build---">Build</a> <b>|</b>
+   <a href="#build--">Build</a> <b>|</b>
    <a href="#run">Run</a>
 </p>
 
@@ -25,7 +25,6 @@
 
 Cockatrice is an open-source, multiplatform application for playing tabletop card games over a network. The program's server design prevents users from manipulating the game for unfair advantage. The client also provides a single-player mode, which allows users to brew while offline.<br><br>
 This project uses <kbd>C++</kbd> and the <kbd>Qt</kbd> libraries.<br>
-First work on a webclient with <kbd>Typescript</kbd> was started as well.<br>
 
 
 # Download [![Cockatrice Eternal Download Count](https://img.shields.io/github/downloads/cockatrice/cockatrice/total.svg)](https://tooomm.github.io/github-release-stats/?username=Cockatrice&repository=Cockatrice&search=0)
@@ -48,6 +47,7 @@ Latest <kbd>beta</kbd> version:
 - [Magic-Spoiler](https://github.com/Cockatrice/Magic-Spoiler): Code to generate MtG spoiler data from [MTGJSON](https://github.com/mtgjson/mtgjson) for use in Cockatrice
 - [cockatrice.github.io](https://github.com/Cockatrice/cockatrice.github.io): Code of the official Cockatrice webpage
 - [io.github.Cockatrice.cockatrice](https://github.com/flathub/io.github.Cockatrice.cockatrice): Configuration of our Linux `flatpak` package hosted at [Flathub](https://flathub.org/en/apps/io.github.Cockatrice.cockatrice)
+- [Webatrice](https://github.com/Cockatrice/Webatrice): Web client for Cockatrice servers (TypeScript / React)
 
 
 # Community Resources [![Discord](https://img.shields.io/discord/314987288398659595?label=Discord&logo=discord&logoColor=white)](https://discord.gg/3Z9yzmA)
@@ -107,12 +107,12 @@ Cockatrice tries to use the [Google Developer Documentation Style Guide](https:/
 
 ### Translation [![Transifex Project](https://img.shields.io/badge/translate-on%20transifex-brightgreen)](https://explore.transifex.com/cockatrice/cockatrice/)
 
-Cockatrice uses Transifex to manage translations. You can help us bring <kbd>Cockatrice</kbd>, <kbd>Oracle</kbd> and <kbd>Webatrice</kbd> to your language and just adjust single wordings right from within your browser by visiting our [Transifex project page](https://explore.transifex.com/cockatrice/cockatrice/).<br>
+Cockatrice uses Transifex to manage translations. You can help us bring <kbd>Cockatrice</kbd> and <kbd>Oracle</kbd> to your language and just adjust single wordings right from within your browser by visiting our [Transifex project page](https://explore.transifex.com/cockatrice/cockatrice/). The [Webatrice](https://github.com/seavor/Webatrice) web client manages its own translations in its repo.<br>
 
 Check out our [Translator FAQ](https://github.com/Cockatrice/Cockatrice/wiki/Translation-FAQ) for more information about getting involved, and join a group of hundreds of others!<br>
 
 
-# Build [![CI Desktop](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml?query=branch%3Amaster+event%3Apush) [![CI Docker](https://github.com/Cockatrice/Cockatrice/actions/workflows/docker-release.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/docker-release.yml?query=branch%3Amaster+event%3Apush) [![CI Web](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/web-build.yml?query=branch%3Amaster+event%3Apush)
+# Build [![CI Desktop](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/desktop-build.yml?query=branch%3Amaster+event%3Apush) [![CI Docker](https://github.com/Cockatrice/Cockatrice/actions/workflows/docker-release.yml/badge.svg?branch=master&event=push)](https://github.com/Cockatrice/Cockatrice/actions/workflows/docker-release.yml?query=branch%3Amaster+event%3Apush)
 
 Dependencies: *(for minimum versions search our [CMake file](https://github.com/Cockatrice/Cockatrice/blob/master/CMakeLists.txt))*
 - [Qt](https://www.qt.io/developers/)

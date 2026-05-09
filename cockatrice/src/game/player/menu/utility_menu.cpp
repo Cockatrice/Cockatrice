@@ -19,6 +19,9 @@ UtilityMenu::UtilityMenu(Player *_player, QMenu *playerMenu) : QMenu(playerMenu)
         aRollDie = new QAction(this);
         connect(aRollDie, &QAction::triggered, playerActions, &PlayerActions::actRollDie);
 
+        aFlipCoin = new QAction(this);
+        connect(aFlipCoin, &QAction::triggered, playerActions, &PlayerActions::actFlipCoin);
+
         aCreateToken = new QAction(this);
         connect(aCreateToken, &QAction::triggered, playerActions, &PlayerActions::actCreateToken);
 
@@ -38,6 +41,7 @@ UtilityMenu::UtilityMenu(Player *_player, QMenu *playerMenu) : QMenu(playerMenu)
         playerMenu->addAction(aUntapAll);
         playerMenu->addSeparator();
         playerMenu->addAction(aRollDie);
+        playerMenu->addAction(aFlipCoin);
         playerMenu->addSeparator();
         playerMenu->addAction(aCreateToken);
         playerMenu->addAction(aCreateAnotherToken);
@@ -50,6 +54,7 @@ UtilityMenu::UtilityMenu(Player *_player, QMenu *playerMenu) : QMenu(playerMenu)
         aIncrementAllCardCounters = nullptr;
         aUntapAll = nullptr;
         aRollDie = nullptr;
+        aFlipCoin = nullptr;
     }
 
     retranslateUi();
@@ -89,6 +94,7 @@ void UtilityMenu::retranslateUi()
         aIncrementAllCardCounters->setText(tr("Increment all card counters"));
         aUntapAll->setText(tr("&Untap all permanents"));
         aRollDie->setText(tr("R&oll die..."));
+        aFlipCoin->setText(tr("Flip coin"));
         aCreateToken->setText(tr("&Create token..."));
         aCreateAnotherToken->setText(tr("C&reate another token"));
         createPredefinedTokenMenu->setTitle(tr("Cr&eate predefined token"));
@@ -103,6 +109,7 @@ void UtilityMenu::setShortcutsActive()
         aIncrementAllCardCounters->setShortcuts(shortcuts.getShortcut("Player/aIncrementAllCardCounters"));
         aUntapAll->setShortcuts(shortcuts.getShortcut("Player/aUntapAll"));
         aRollDie->setShortcuts(shortcuts.getShortcut("Player/aRollDie"));
+        aFlipCoin->setShortcuts(shortcuts.getShortcut("Player/aFlipCoin"));
         aCreateToken->setShortcuts(shortcuts.getShortcut("Player/aCreateToken"));
         aCreateAnotherToken->setShortcuts(shortcuts.getShortcut("Player/aCreateAnotherToken"));
     }
@@ -113,6 +120,7 @@ void UtilityMenu::setShortcutsInactive()
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         aUntapAll->setShortcut(QKeySequence());
         aRollDie->setShortcut(QKeySequence());
+        aFlipCoin->setShortcut(QKeySequence());
         aCreateToken->setShortcut(QKeySequence());
         aCreateAnotherToken->setShortcut(QKeySequence());
         aIncrementAllCardCounters->setShortcut(QKeySequence());

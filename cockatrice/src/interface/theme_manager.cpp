@@ -15,6 +15,7 @@
 #include <QStyle>
 #include <QStyleFactory>
 #include <QStyleHints>
+#include <QWidget>
 #include <Qt>
 
 #define NONE_THEME_NAME "Default"
@@ -91,6 +92,10 @@ struct PaletteColorInfo
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     defaultStyleName = qApp->style()->objectName();
+    // FIXME workaround for windows11 style being broken
+    if (defaultStyleName == "windows11") {
+        defaultStyleName = "windowsvista";
+    }
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, &ThemeManager::themeChangedSlot);
@@ -106,6 +111,39 @@ void ThemeManager::ensureThemeDirectoryExists()
         qCInfo(ThemeManagerLog) << "Theme name not set, setting default value";
         SettingsCache::instance().setThemeName(NONE_THEME_NAME);
     }
+}
+
+bool ThemeManager::isDarkMode()
+{
+    auto themeName = SettingsCache::instance().getThemeName();
+    // Explicit Dark Mode
+    if (themeName == FUSION_THEME_NAME_LIGHT || themeName.endsWith("(Light)")) {
+        return false;
+    }
+    // Explicit Light Mode
+    if (themeName == FUSION_THEME_NAME_DARK || themeName.endsWith("(Dark)")) {
+        return true;
+    }
+
+    // Auto detection on compatible Qt versions
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+    if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark &&
+        (themeName == NONE_THEME_NAME || themeName == FUSION_THEME_NAME || themeName.endsWith("(System Default)"))) {
+        return true;
+    } else {
+        return false;
+    }
+#endif
+    // Default to light mode
+    return false;
+}
+
+bool ThemeManager::isBuiltInTheme()
+{
+    const auto themeName = SettingsCache::instance().getThemeName();
+
+    return themeName == NONE_THEME_NAME || themeName == FUSION_THEME_NAME || themeName == FUSION_THEME_NAME_LIGHT ||
+           themeName == FUSION_THEME_NAME_DARK;
 }
 
 QStringMap &ThemeManager::getAvailableThemes()
@@ -179,7 +217,7 @@ QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 
 static inline QPalette createDarkGreenFusionPalette()
 {
-    QPalette p;
+    QPalette p = QStyleFactory::create("Fusion")->standardPalette();
 
     // ---------- Core backgrounds ----------
     p.setColor(QPalette::Window, QColor(30, 30, 30));        // #ff1e1e1e
@@ -248,7 +286,7 @@ static inline QPalette createDarkGreenFusionPalette()
 
 static inline QPalette createLightGreenFusionPalette()
 {
-    QPalette p;
+    QPalette p = QStyleFactory::create("Fusion")->standardPalette();
 
     // ---------- Core backgrounds ----------
     p.setColor(QPalette::Window, QColor(240, 240, 240));        // #fff0f0f0
@@ -331,24 +369,53 @@ void ThemeManager::themeChangedSlot()
         qApp->setStyleSheet("");
     }
 
-    if (themeName == FUSION_THEME_NAME) {
-        qApp->setStyle(QStyleFactory::create("Fusion"));
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
-        QPalette palette;
-        if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
-            palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-        }
+    QStyle *newStyle = nullptr;
+    QPalette newPalette;
 
-        qApp->setPalette(palette);
+    if (themeName == FUSION_THEME_NAME) {
+        newStyle = QStyleFactory::create("Fusion");
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+        // Start from Fusion's own palette so dark mode is handled correctly,
+        // then apply any tweaks on top of it.
+        newPalette = newStyle->standardPalette();
+        if (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark) {
+            newPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+        }
+#else
+        newPalette = qApp->palette();
 #endif
     } else if (themeName == FUSION_THEME_NAME_LIGHT) {
-        qApp->setStyle(QStyleFactory::create("Fusion"));
-        qApp->setPalette(createLightGreenFusionPalette());
+        newStyle = QStyleFactory::create("Fusion");
+        newPalette = createLightGreenFusionPalette();
     } else if (themeName == FUSION_THEME_NAME_DARK) {
-        qApp->setStyle(QStyleFactory::create("Fusion"));
-        qApp->setPalette(createDarkGreenFusionPalette());
+        newStyle = QStyleFactory::create("Fusion");
+        newPalette = createDarkGreenFusionPalette();
     } else {
-        qApp->setStyle(defaultStyleName); // setting the style also sets the palette
+        newStyle = QStyleFactory::create(defaultStyleName);
+        // Use the style's default palette.
+        newPalette = newStyle->standardPalette();
+    }
+
+    // Apply palette FIRST.
+    qApp->setPalette(newPalette);
+    // Then apply style.
+    qApp->setStyle(newStyle);
+
+    // Force every widget to re-polish and repaint immediately rather than
+    // waiting for natural expose events, which produces a patchwork of old
+    // and new colours during a live preview.
+    // Note: we do NOT call widget->setPalette(base) here — qApp->setPalette()
+    // already propagates to all widgets that haven't explicitly overridden their
+    // palette (WA_SetPalette not set). Calling it unconditionally would clobber
+    // intentional per-widget palette customisations across the whole app.
+    for (QWidget *widget : qApp->allWidgets()) {
+        if (widget->isVisible()) {
+            newStyle->unpolish(widget);
+            newStyle->polish(widget);
+
+            widget->update();
+        }
     }
 
     if (dirPath.isEmpty()) {

@@ -22,6 +22,7 @@ const QMap<QString, CardSet::Priority> setTypePriorities{
     {"archenemy", CardSet::PriorityReprint},
     {"arsenal", CardSet::PriorityReprint},
     {"box", CardSet::PriorityReprint},
+    {"eternal", CardSet::PriorityReprint},
     {"from_the_vault", CardSet::PriorityReprint},
     {"masterpiece", CardSet::PriorityReprint},
     {"masters", CardSet::PriorityReprint},

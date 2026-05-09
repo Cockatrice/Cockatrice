@@ -91,6 +91,7 @@ GameSelector::GameSelector(AbstractClient *_client,
     bool filtersSetToDefault = showFilters && gameListProxyModel->areFilterParametersSetToDefaults();
     clearFilterButton->setEnabled(!filtersSetToDefault);
     connect(clearFilterButton, &QPushButton::clicked, this, &GameSelector::actClearFilter);
+    connect(gameListProxyModel, &GamesProxyModel::filtersChanged, this, &GameSelector::checkClearFilterButtonState);
 
     if (room) {
         createButton = new QPushButton;
@@ -179,24 +180,19 @@ void GameSelector::actSetFilter()
     if (!dlg.exec())
         return;
 
-    gameListProxyModel->setGameFilters(
-        dlg.getHideBuddiesOnlyGames(), dlg.getHideIgnoredUserGames(), dlg.getHideFullGames(),
-        dlg.getHideGamesThatStarted(), dlg.getHidePasswordProtectedGames(), dlg.getHideNotBuddyCreatedGames(),
-        dlg.getHideOpenDecklistGames(), dlg.getGameNameFilter(), dlg.getCreatorNameFilters(), dlg.getGameTypeFilter(),
-        dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax(), dlg.getMaxGameAge(),
-        dlg.getShowOnlyIfSpectatorsCanWatch(), dlg.getShowSpectatorPasswordProtected(),
-        dlg.getShowOnlyIfSpectatorsCanChat(), dlg.getShowOnlyIfSpectatorsCanSeeHands());
+    gameListProxyModel->setGameFilters(dlg.getFilters());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
-
-    clearFilterButton->setEnabled(!gameListProxyModel->areFilterParametersSetToDefaults());
 
     updateTitle();
 }
 
+void GameSelector::checkClearFilterButtonState()
+{
+    clearFilterButton->setEnabled(!gameListProxyModel->areFilterParametersSetToDefaults());
+}
+
 void GameSelector::actClearFilter()
 {
-    clearFilterButton->setEnabled(false);
-
     gameListProxyModel->resetFilterParameters();
     gameListProxyModel->saveFilterParameters(gameTypeMap);
 

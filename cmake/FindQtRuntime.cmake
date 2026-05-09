@@ -42,7 +42,7 @@ list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
 if(NOT FORCE_USE_QT5)
   # Linguist is now a component in Qt6 instead of an external package
   find_package(
-    Qt6 6.2.3
+    Qt6 6.4.2
     COMPONENTS ${REQUIRED_QT_COMPONENTS} Linguist
     QUIET HINTS ${Qt6_DIR}
   )

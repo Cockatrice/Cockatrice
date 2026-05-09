@@ -396,6 +396,37 @@ void CardItem::playCard(bool faceDown)
     }
 }
 
+QVariantList CardItem::parsePT(const QString &pt)
+{
+    QVariantList ptList = QVariantList();
+    if (!pt.isEmpty()) {
+        int sep = pt.indexOf('/');
+        if (sep == 0) {
+            ptList.append(QVariant(pt.mid(1))); // cut off starting '/' and take full string
+        } else {
+            int start = 0;
+            for (;;) {
+                QString item = pt.mid(start, sep - start);
+                if (item.isEmpty()) {
+                    ptList.append(QVariant(QString()));
+                } else if (item[0] == '+') {
+                    ptList.append(QVariant(item.mid(1).toInt())); // add as int
+                } else if (item[0] == '-') {
+                    ptList.append(QVariant(item.toInt())); // add as int
+                } else {
+                    ptList.append(QVariant(item)); // add as qstring
+                }
+                if (sep == -1) {
+                    break;
+                }
+                start = sep + 1;
+                sep = pt.indexOf('/', start);
+            }
+        }
+    }
+    return ptList;
+}
+
 /**
  * @brief returns true if the zone is a unwritable reveal zone view (eg a card reveal window). Will return false if zone
  * is nullptr.
@@ -460,9 +491,6 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 bool CardItem::animationEvent()
 {
-    if (owner == nullptr) {
-        return false;
-    }
     int rotation = ROTATION_DEGREES_PER_FRAME;
     bool animationIncomplete = true;
     if (!tapped)

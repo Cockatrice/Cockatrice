@@ -1,6 +1,0 @@
-# Ignore all files
-* 
-# Except gitignore
-!.gitignore
-
-!_Countries.ts

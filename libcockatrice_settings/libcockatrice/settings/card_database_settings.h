@@ -26,6 +26,8 @@ public:
     bool isEnabled(QString shortName) const override;
     bool isKnown(QString shortName) const override;
 
+    void saveSets(const QVector<SetSaveData> &data) override;
+
 private:
     explicit CardDatabaseSettings(const QString &settingPath, QObject *parent = nullptr);
 };

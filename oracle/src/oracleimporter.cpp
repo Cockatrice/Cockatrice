@@ -360,14 +360,12 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         }
 
         // split cards are considered a single card, enqueue for later merging
-        if (layout == "split" || layout == "aftermath" || layout == "adventure") {
+        if (layout == "split" || layout == "aftermath" || layout == "adventure" || layout == "prepare") {
             auto _faceName = getStringPropertyFromMap(card, "faceName");
             SplitCardPart split(_faceName, text, properties, printingInfo);
             auto found_iter = splitCards.find(name + numProperty);
             if (found_iter == splitCards.end()) {
                 splitCards.insert(name + numProperty, {{split}, name});
-            } else if (layout == "adventure") {
-                found_iter->first.insert(0, split);
             } else {
                 found_iter->first.append(split);
             }
