@@ -180,13 +180,7 @@ void GameSelector::actSetFilter()
     if (!dlg.exec())
         return;
 
-    gameListProxyModel->setGameFilters(
-        dlg.getHideBuddiesOnlyGames(), dlg.getHideIgnoredUserGames(), dlg.getHideFullGames(),
-        dlg.getHideGamesThatStarted(), dlg.getHidePasswordProtectedGames(), dlg.getHideNotBuddyCreatedGames(),
-        dlg.getHideOpenDecklistGames(), dlg.getGameNameFilter(), dlg.getCreatorNameFilters(), dlg.getGameTypeFilter(),
-        dlg.getMaxPlayersFilterMin(), dlg.getMaxPlayersFilterMax(), dlg.getMaxGameAge(),
-        dlg.getShowOnlyIfSpectatorsCanWatch(), dlg.getShowSpectatorPasswordProtected(),
-        dlg.getShowOnlyIfSpectatorsCanChat(), dlg.getShowOnlyIfSpectatorsCanSeeHands());
+    gameListProxyModel->setGameFilters(dlg.getFilters());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
 
     updateTitle();

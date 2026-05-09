@@ -19,23 +19,7 @@ public:
                                             GamesProxyModel *model,
                                             const QMap<int, QString> &allGameTypes);
     void syncFromModel();
-    void applyFilters(std::function<void(bool &,
-                                         bool &,
-                                         bool &,
-                                         bool &,
-                                         bool &,
-                                         bool &,
-                                         bool &,
-                                         QString &,
-                                         QStringList &,
-                                         QSet<int> &,
-                                         int &,
-                                         int &,
-                                         QTime &,
-                                         bool &,
-                                         bool &,
-                                         bool &,
-                                         bool &)> mutator);
+    void applyFilters(std::function<void(GameFilterConfigs &)> mutator);
     void retranslateUi();
 
 private:

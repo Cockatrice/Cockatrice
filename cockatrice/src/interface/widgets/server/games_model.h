@@ -1,6 +1,7 @@
 #ifndef GAMESMODEL_H
 #define GAMESMODEL_H
 
+#include "game_filter_configs.h"
 #include "game_type_map.h"
 
 #include <QList>
@@ -121,22 +122,7 @@ private:
     // - loadFilterParameters()
     // - saveFilterParameters()
     // - filterAcceptsRow()
-    bool hideBuddiesOnlyGames;
-    bool hideIgnoredUserGames;
-    bool hideFullGames;
-    bool hideGamesThatStarted;
-    bool hidePasswordProtectedGames;
-    bool hideNotBuddyCreatedGames;
-    bool hideOpenDecklistGames;
-    QString gameNameFilter;
-    QStringList creatorNameFilters;
-    QSet<int> gameTypeFilter;
-    quint32 maxPlayersFilterMin, maxPlayersFilterMax;
-    QTime maxGameAge;
-    bool showOnlyIfSpectatorsCanWatch;
-    bool showSpectatorPasswordProtected;
-    bool showOnlyIfSpectatorsCanChat;
-    bool showOnlyIfSpectatorsCanSeeHands;
+    GameFilterConfigs filters;
 
 signals:
     void filtersChanged();
@@ -150,182 +136,15 @@ public:
     explicit GamesProxyModel(QObject *parent = nullptr, const UserListProxy *_userListProxy = nullptr);
 
     // Getters for filter parameters
-    [[nodiscard]] bool getHideBuddiesOnlyGames() const
+    [[nodiscard]] const GameFilterConfigs &getFilters() const
     {
-        return hideBuddiesOnlyGames;
-    }
-    [[nodiscard]] bool getHideIgnoredUserGames() const
-    {
-        return hideIgnoredUserGames;
-    }
-    [[nodiscard]] bool getHideFullGames() const
-    {
-        return hideFullGames;
-    }
-    [[nodiscard]] bool getHideGamesThatStarted() const
-    {
-        return hideGamesThatStarted;
-    }
-    [[nodiscard]] bool getHidePasswordProtectedGames() const
-    {
-        return hidePasswordProtectedGames;
-    }
-    [[nodiscard]] bool getHideNotBuddyCreatedGames() const
-    {
-        return hideNotBuddyCreatedGames;
-    }
-    [[nodiscard]] bool getHideOpenDecklistGames() const
-    {
-        return hideOpenDecklistGames;
-    }
-    [[nodiscard]] QString getGameNameFilter() const
-    {
-        return gameNameFilter;
-    }
-    [[nodiscard]] QStringList getCreatorNameFilters() const
-    {
-        return creatorNameFilters;
-    }
-    [[nodiscard]] QSet<int> getGameTypeFilter() const
-    {
-        return gameTypeFilter;
-    }
-    [[nodiscard]] int getMaxPlayersFilterMin() const
-    {
-        return maxPlayersFilterMin;
-    }
-    [[nodiscard]] int getMaxPlayersFilterMax() const
-    {
-        return maxPlayersFilterMax;
-    }
-    [[nodiscard]] const QTime &getMaxGameAge() const
-    {
-        return maxGameAge;
-    }
-    [[nodiscard]] bool getShowOnlyIfSpectatorsCanWatch() const
-    {
-        return showOnlyIfSpectatorsCanWatch;
-    }
-    [[nodiscard]] bool getShowSpectatorPasswordProtected() const
-    {
-        return showSpectatorPasswordProtected;
-    }
-    [[nodiscard]] bool getShowOnlyIfSpectatorsCanChat() const
-    {
-        return showOnlyIfSpectatorsCanChat;
-    }
-    [[nodiscard]] bool getShowOnlyIfSpectatorsCanSeeHands() const
-    {
-        return showOnlyIfSpectatorsCanSeeHands;
+        return filters;
     }
 
     /**
      * @brief Sets all game filters at once.
      */
-    void setGameFilters(bool _hideBuddiesOnlyGames,
-                        bool _hideIgnoredUserGames,
-                        bool _hideFullGames,
-                        bool _hideGamesThatStarted,
-                        bool _hidePasswordProtectedGames,
-                        bool _hideNotBuddyCreatedGames,
-                        bool _hideOpenDecklistGames,
-                        const QString &_gameNameFilter,
-                        const QStringList &_creatorNameFilter,
-                        const QSet<int> &_gameTypeFilter,
-                        int _maxPlayersFilterMin,
-                        int _maxPlayersFilterMax,
-                        const QTime &_maxGameAge,
-                        bool _showOnlyIfSpectatorsCanWatch,
-                        bool _showSpectatorPasswordProtected,
-                        bool _showOnlyIfSpectatorsCanChat,
-                        bool _showOnlyIfSpectatorsCanSeeHands);
-
-    // Individual setters
-    void setHideBuddiesOnlyGames(bool value)
-    {
-        hideBuddiesOnlyGames = value;
-        refresh();
-    }
-    void setHideIgnoredUserGames(bool value)
-    {
-        hideIgnoredUserGames = value;
-        refresh();
-    }
-    void setHideFullGames(bool value)
-    {
-        hideFullGames = value;
-        refresh();
-    }
-    void setHideGamesThatStarted(bool value)
-    {
-        hideGamesThatStarted = value;
-        refresh();
-    }
-    void setHidePasswordProtectedGames(bool value)
-    {
-        hidePasswordProtectedGames = value;
-        refresh();
-    }
-    void setHideNotBuddyCreatedGames(bool value)
-    {
-        hideNotBuddyCreatedGames = value;
-        refresh();
-    }
-    void setHideOpenDecklistGames(bool value)
-    {
-        hideOpenDecklistGames = value;
-        refresh();
-    }
-    void setGameNameFilter(const QString &value)
-    {
-        gameNameFilter = value;
-        refresh();
-    }
-    void setCreatorNameFilters(const QStringList &values)
-    {
-        creatorNameFilters = values;
-        refresh();
-    }
-    void setGameTypeFilter(const QSet<int> &value)
-    {
-        gameTypeFilter = value;
-        refresh();
-    }
-    void setMaxPlayersFilterMin(int value)
-    {
-        maxPlayersFilterMin = value;
-        refresh();
-    }
-    void setMaxPlayersFilterMax(int value)
-    {
-        maxPlayersFilterMax = value;
-        refresh();
-    }
-    void setMaxGameAge(const QTime &value)
-    {
-        maxGameAge = value;
-        refresh();
-    }
-    void setShowOnlyIfSpectatorsCanWatch(bool value)
-    {
-        showOnlyIfSpectatorsCanWatch = value;
-        refresh();
-    }
-    void setShowSpectatorPasswordProtected(bool value)
-    {
-        showSpectatorPasswordProtected = value;
-        refresh();
-    }
-    void setShowOnlyIfSpectatorsCanChat(bool value)
-    {
-        showOnlyIfSpectatorsCanChat = value;
-        refresh();
-    }
-    void setShowOnlyIfSpectatorsCanSeeHands(bool value)
-    {
-        showOnlyIfSpectatorsCanSeeHands = value;
-        refresh();
-    }
+    void setGameFilters(const GameFilterConfigs &_filters);
 
     /**
      * @brief Returns the number of games filtered out by the current filter.
