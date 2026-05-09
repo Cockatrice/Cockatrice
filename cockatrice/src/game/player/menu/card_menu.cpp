@@ -75,17 +75,17 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
 
     for (int i = 0; i < 6; ++i) {
         auto *tempAddCounter = new QAction(this);
-        tempAddCounter->setData(9 + i * 1000);
         auto *tempRemoveCounter = new QAction(this);
-        tempRemoveCounter->setData(10 + i * 1000);
         auto *tempSetCounter = new QAction(this);
-        tempSetCounter->setData(11 + i * 1000);
         aAddCounter.append(tempAddCounter);
         aRemoveCounter.append(tempRemoveCounter);
         aSetCounter.append(tempSetCounter);
-        connect(tempAddCounter, &QAction::triggered, playerActions, &PlayerActions::actCardCounterTrigger);
-        connect(tempRemoveCounter, &QAction::triggered, playerActions, &PlayerActions::actCardCounterTrigger);
-        connect(tempSetCounter, &QAction::triggered, playerActions, &PlayerActions::actCardCounterTrigger);
+        connect(tempAddCounter, &QAction::triggered, playerActions,
+                [playerActions, i] { playerActions->actAddCardCounter(i); });
+        connect(tempRemoveCounter, &QAction::triggered, playerActions,
+                [playerActions, i] { playerActions->actRemoveCardCounter(i); });
+        connect(tempSetCounter, &QAction::triggered, playerActions,
+                [playerActions, i] { playerActions->actSetCardCounter(i); });
     }
 
     setShortcutsActive();

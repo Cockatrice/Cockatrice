@@ -128,7 +128,9 @@ public slots:
     void actCreateAllRelatedCards();
 
     void actMoveCardXCardsFromTop();
-    void actCardCounterTrigger();
+    void actRemoveCardCounter(int counterId);
+    void actAddCardCounter(int counterId);
+    void actSetCardCounter(int counterId);
     void actAttach();
     void actUnattach();
     void actDrawArrow();
@@ -183,6 +185,8 @@ private:
 
     void cmdSetTopCard(Command_MoveCard &cmd);
     void cmdSetBottomCard(Command_MoveCard &cmd);
+
+    void offsetCardCounter(int counterId, int offset);
 };
 
 #endif // COCKATRICE_PLAYER_ACTIONS_H
