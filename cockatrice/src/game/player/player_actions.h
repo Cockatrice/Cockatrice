@@ -197,8 +197,6 @@ private:
 
     void cmdSetTopCard(Command_MoveCard &cmd);
     void cmdSetBottomCard(Command_MoveCard &cmd);
-
-    QVariantList parsePT(const QString &pt);
 };
 
 #endif // COCKATRICE_PLAYER_ACTIONS_H
