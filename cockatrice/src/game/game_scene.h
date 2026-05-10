@@ -70,6 +70,9 @@ public:
     /** Updates UI text for all zone views. */
     void retranslateUi();
 
+    /** Gets all selected CardItems */
+    QList<CardItem *> selectedCards() const;
+
     /**
      * @brief Adds a player to the scene and stores their graphics item.
      * @param player Player to add.
