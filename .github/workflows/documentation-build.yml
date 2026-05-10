@@ -1,9 +1,10 @@
 name: Generate Docs
 
 on:
-  push:
-    tags:
-      - '*'   # Only re-generate docs when a new tagged version is pushed
+  release:
+    types:
+      - prereleased    # publishing of pre-releases
+      - released    # publishing of stable releases
   pull_request:
     paths:
       - 'doc/doxygen/**'
