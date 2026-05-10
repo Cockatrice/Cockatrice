@@ -53,11 +53,11 @@ jobs:
         run: doxygen Doxyfile
 
       - name: Deploy to cockatrice.github.io
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'release'
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
           external_repository: Cockatrice/cockatrice.github.io
           publish_branch: master
           publish_dir: ./docs/html
-          destination_dir: docs   # Docs will live under https://cockatrice.github.io/docs/
+          destination_dir: docs    # Docs will live under https://cockatrice.github.io/docs/
