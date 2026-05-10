@@ -10,6 +10,7 @@ SettingsManager::SettingsManager(const QString &_settingPath,
 
 QSettings SettingsManager::getSettings() const
 {
+    // Do not store the QSettings instance in a field, as that is not threadsafe (see #6747)
     return QSettings(settingPath, QSettings::IniFormat);
 }
 
@@ -156,6 +157,15 @@ QVariant SettingsManager::getValue(const QString &name, const QString &group, co
     }
 
     return value;
+}
+
+void SettingsManager::batchWrite(std::function<void(QSettings &)> batchWriteFunction)
+{
+    auto settings = getSettings();
+    settings.setAtomicSyncRequired(false);
+    batchWriteFunction(settings);
+    settings.sync(); // single flush
+    settings.setAtomicSyncRequired(true);
 }
 
 /**

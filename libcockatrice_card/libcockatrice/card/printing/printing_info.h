@@ -54,6 +54,16 @@ public:
         return this->set == other.set && this->properties == other.properties;
     }
 
+    /**
+     * @brief check if the info is empty, as if default constructed.
+     *
+     * @return True if both set and properties are empty, otherwise false.
+     */
+    bool isEmpty() const
+    {
+        return set == nullptr && properties.isEmpty();
+    }
+
 private:
     CardSetPtr set;          ///< The set this variation belongs to.
     QVariantHash properties; ///< Key-value store for variation-specific attributes.

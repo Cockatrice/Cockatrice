@@ -216,6 +216,7 @@ private:
     bool checkCardUpdatesOnStartup;
     int cardUpdateCheckInterval;
     QDate lastCardUpdateCheck;
+    bool alwaysEnableNewSets;
     bool notifyAboutUpdates;
     bool notifyAboutNewVersion;
     bool showTipsOnStartup;
@@ -501,6 +502,10 @@ public:
     {
         return getLastCardUpdateCheck().daysTo(QDateTime::currentDateTime().date()) >= getCardUpdateCheckInterval() &&
                getLastCardUpdateCheck() != QDateTime::currentDateTime().date();
+    }
+    [[nodiscard]] bool getAlwaysEnableNewSets() const
+    {
+        return alwaysEnableNewSets;
     }
     [[nodiscard]] bool getNotifyAboutUpdates() const override
     {
@@ -1125,6 +1130,7 @@ public slots:
     void setStartupCardUpdateCheckAlwaysUpdate(bool value);
     void setCardUpdateCheckInterval(int value);
     void setLastCardUpdateCheck(QDate value);
+    void setAlwaysEnableNewSets(bool value);
     void setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate);
     void setNotifyAboutNewVersion(QT_STATE_CHANGED_T _notifyaboutnewversion);
     void setUpdateReleaseChannelIndex(int value);

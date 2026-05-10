@@ -43,20 +43,6 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, A
     connect(this, &Player::activeChanged, graphicsItem, &PlayerGraphicsItem::onPlayerActiveChanged);
 
     connect(this, &Player::openDeckEditor, game->getTab(), &TabGame::openDeckEditor);
-
-    forwardActionSignalsToEventHandler();
-}
-
-// Event Handler is the controller i.e. everything hooks up to this to know about player state
-// Player should forward (private) signals to the event handler
-
-void Player::forwardActionSignalsToEventHandler()
-{
-    connect(playerActions, &PlayerActions::logSetTapped, playerEventHandler, &PlayerEventHandler::logSetTapped);
-    connect(playerActions, &PlayerActions::logSetDoesntUntap, playerEventHandler,
-            &PlayerEventHandler::logSetDoesntUntap);
-    connect(playerActions, &PlayerActions::logSetAnnotation, playerEventHandler, &PlayerEventHandler::logSetAnnotation);
-    connect(playerActions, &PlayerActions::logSetPT, playerEventHandler, &PlayerEventHandler::logSetPT);
 }
 
 void Player::initializeZones()
@@ -323,19 +309,10 @@ void Player::clearCounters()
 
 void Player::incrementAllCardCounters()
 {
-    QList<CardItem *> cardsToUpdate;
-
-    auto selectedItems = getGameScene()->selectedItems();
-    if (!selectedItems.isEmpty()) {
-        // If cards are selected, only update those
-        for (const auto &item : selectedItems) {
-            auto *card = static_cast<CardItem *>(item);
-            cardsToUpdate.append(card);
-        }
-    } else {
+    auto cardsToUpdate = getGameScene()->selectedCards();
+    if (cardsToUpdate.isEmpty()) {
         // If no cards selected, update all cards on table
-        const CardList &tableCards = getTableZone()->getCards();
-        cardsToUpdate = tableCards;
+        cardsToUpdate = static_cast<QList<CardItem *>>(getTableZone()->getCards());
     }
 
     QList<const ::google::protobuf::Message *> commandList;

@@ -11,6 +11,7 @@
 #include "deck_list_statistics_analyzer.h"
 #include "resizable_panel.h"
 
+#include <QCheckBox>
 #include <QJsonObject>
 #include <QScrollArea>
 #include <QVBoxLayout>
@@ -29,6 +30,7 @@ public slots:
 public:
     explicit DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer);
     void retranslateUi();
+    void includeSideboardChanged(bool checked);
 
 private slots:
     void onAddPanel();
@@ -56,6 +58,8 @@ private:
     QPushButton *removeButton;
     QPushButton *saveButton;
     QPushButton *loadButton;
+
+    QCheckBox *includeSideboardCheckBox;
 
     QScrollArea *scrollArea;
     QWidget *panelContainer;

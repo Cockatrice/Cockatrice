@@ -18,6 +18,8 @@ public:
                                             TabSupervisor *tabSupervisor,
                                             GamesProxyModel *model,
                                             const QMap<int, QString> &allGameTypes);
+    void syncFromModel();
+    void applyFilters(std::function<void(GameFilterConfigs &)> mutator);
     void retranslateUi();
 
 private:

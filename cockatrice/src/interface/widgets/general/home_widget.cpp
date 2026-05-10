@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
+#include "../../theme_manager.h"
 #include "../../window_main.h"
 #include "background_sources.h"
 #include "home_styled_button.h"
@@ -46,6 +47,8 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
             &HomeWidget::onBackgroundShuffleFrequencyChanged);
     // Lambda is cleaner to read than overloading this
     connect(&SettingsCache::instance(), &SettingsCache::homeTabDisplayCardNameChanged, this, [this] { repaint(); });
+    connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
+            &HomeWidget::initializeBackgroundFromSource);
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
             &HomeWidget::updateButtonsToBackgroundColor);
 }
@@ -256,7 +259,7 @@ void HomeWidget::updateConnectButton(const ClientStatus status)
 
 QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)
 {
-    if (SettingsCache::instance().getThemeName() == "Default" &&
+    if (themeManager->isBuiltInTheme() &&
         SettingsCache::instance().getHomeTabBackgroundSource() == BackgroundSources::toId(BackgroundSources::Theme)) {
         return QPair<QColor, QColor>(QColor::fromRgb(20, 140, 60), QColor::fromRgb(120, 200, 80));
     }

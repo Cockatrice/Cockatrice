@@ -1,6 +1,7 @@
 #include "card_database.h"
 
 #include "../relation/card_relation.h"
+#include "card_database_manager.h"
 #include "parser/cockatrice_xml_4.h"
 
 #include <QCryptographicHash>
@@ -58,6 +59,15 @@ void CardDatabase::clear()
 void CardDatabase::loadCardDatabases()
 {
     loadStatus = loader->loadCardDatabases();
+}
+
+void CardDatabase::reloadCardDatabasesAndNotify()
+{
+    loadCardDatabases();
+
+    if (loadStatus == Ok) {
+        notifyEnabledSetsChanged();
+    }
 }
 
 bool CardDatabase::saveCustomTokensToFile()

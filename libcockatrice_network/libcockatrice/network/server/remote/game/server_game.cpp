@@ -306,7 +306,7 @@ void Server_Game::sendGameStateToPlayers()
             }
         } else {
             Event_GameStateChanged event;
-            createGameStateChangedEvent(&event, participant, false, false);
+            createGameStateChangedEvent(&event, participant, participant->isJudge(), false);
 
             gec = prepareGameEvent(event, -1);
         }
@@ -750,7 +750,7 @@ void Server_Game::createGameJoinedEvent(Server_AbstractParticipant *joiningParti
     event2.set_active_player_id(activePlayer);
     event2.set_active_phase(activePhase);
 
-    bool omniscient = joiningParticipant->isSpectator() && (spectatorsSeeEverything || joiningParticipant->isJudge());
+    bool omniscient = (joiningParticipant->isSpectator() && spectatorsSeeEverything) || joiningParticipant->isJudge();
     for (auto *participant : participants.values()) {
         participant->getInfo(event2.add_player_list(), joiningParticipant, omniscient, true);
     }
@@ -766,8 +766,8 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont,
 
     cont->set_game_id(gameId);
     for (auto *participant : participants.values()) {
-        const bool playerPrivate = (participant->getPlayerId() == privatePlayerId) ||
-                                   (participant->isSpectator() && (spectatorsSeeEverything || participant->isJudge()));
+        const bool playerPrivate = (participant->getPlayerId() == privatePlayerId) || participant->isJudge() ||
+                                   (participant->isSpectator() && spectatorsSeeEverything);
         if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
             (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))
             participant->sendGameEvent(*cont);

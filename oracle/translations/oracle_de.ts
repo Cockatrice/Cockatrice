@@ -276,7 +276,7 @@
 <context>
     <name>OracleImporter</name>
     <message>
-        <location filename="src/oracleimporter.cpp" line="541"/>
+        <location filename="src/oracleimporter.cpp" line="540"/>
         <source>Dummy set containing tokens</source>
         <translation>Platzhalter Edition mit Spielsteinen</translation>
     </message>
@@ -284,7 +284,7 @@
 <context>
     <name>OracleWizard</name>
     <message>
-        <location filename="src/oraclewizard.cpp" line="70"/>
+        <location filename="src/oraclewizard.cpp" line="97"/>
         <source>Oracle Importer</source>
         <translation>Oracle Importer</translation>
     </message>

@@ -11,6 +11,7 @@ SetCompressor LZMA
 Var NormalDestDir
 Var PortableDestDir
 Var PortableMode
+Var ReinstallMode
 
 !include LogicLib.nsh
 !include FileFunc.nsh
@@ -28,13 +29,23 @@ Var PortableMode
 !define MUI_FINISHPAGE_RUN_TEXT "Run 'Cockatrice' now"
 !define MUI_ICON "${NSIS_SOURCE_PATH}\cockatrice\resources\appicon.ico"
 
+!define MUI_PAGE_CUSTOMFUNCTION_PRE SkipIfReinstall
 !insertmacro MUI_PAGE_WELCOME
+
+!define MUI_PAGE_CUSTOMFUNCTION_PRE SkipIfReinstall
 !insertmacro MUI_PAGE_LICENSE "${NSIS_SOURCE_PATH}\LICENSE"
+
 Page Custom PortableModePageCreate PortableModePageLeave
 !define MUI_PAGE_CUSTOMFUNCTION_PRE componentsPagePre
 !insertmacro MUI_PAGE_COMPONENTS
+
+!define MUI_PAGE_CUSTOMFUNCTION_PRE SkipIfReinstall
 !insertmacro MUI_PAGE_DIRECTORY
+
+!define MUI_PAGE_CUSTOMFUNCTION_PRE SkipIfReinstall
 !insertmacro MUI_PAGE_INSTFILES
+
+!define MUI_PAGE_CUSTOMFUNCTION_PRE SkipIfReinstall
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -73,6 +84,7 @@ ${IfNot} ${Errors}
     MessageBox MB_ICONINFORMATION|MB_SETFOREGROUND "\
       /PORTABLE : Install in portable mode$\n\
       /S : Silent install$\n\
+      /R : Silent upgrade$\n\
       /D=%directory% : Specify destination directory$\n"
     Quit
 ${EndIf}
@@ -90,12 +102,38 @@ ${Else}
     ${EndIf}
 ${EndIf}
 
+ClearErrors
+${GetOptions} $9 "/R" $8
+${IfNot} ${Errors}
+    StrCpy $ReinstallMode 1
+    SetSilent silent
+    SetAutoClose true
+${Else}
+    StrCpy $ReinstallMode 0
+${EndIf}
+
 ${If} $InstDir == ""
     ; User did not use /D to specify a directory,
     ; we need to set a default based on the install mode
     StrCpy $InstDir $0
 ${EndIf}
 Call SetModeDestinationFromInstdir
+
+; --- Detect portable install when using /R ---
+${If} $ReinstallMode = 1
+    IfFileExists "$InstDir\portable.dat" 0 not_portable
+        StrCpy $PortableMode 1
+        Goto portable_done
+
+    not_portable:
+        StrCpy $PortableMode 0
+
+    portable_done:
+${EndIf}
+
+${If} $ReinstallMode = 1
+    Call AutoUninstallIfNeeded
+${EndIf}
 
 FunctionEnd
 
@@ -126,8 +164,46 @@ ${Else}
 ${EndIf}
 FunctionEnd
 
+Function SkipIfReinstall
+${If} $ReinstallMode = 1
+    Abort
+${EndIf}
+FunctionEnd
+
+Function AutoUninstallIfNeeded
+
+SetShellVarContext all
+
+; --- 32-bit uninstall ---
+SetRegView 32
+ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
+
+StrCmp $R0 "" done32
+DetailPrint "Removing previous version (32-bit)..."
+ExecWait '$R0'
+
+done32:
+
+; --- 64-bit uninstall ---
+${If} ${RunningX64}
+    SetRegView 64
+    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
+
+    StrCmp $R0 "" done64
+    DetailPrint "Removing previous version (64-bit)..."
+    ExecWait '$R0'
+
+    done64:
+${EndIf}
+
+FunctionEnd
 
 Function PortableModePageCreate
+
+${If} $ReinstallMode = 1
+    Abort
+${EndIf}
+
 Call SetModeDestinationFromInstdir ; If the user clicks BACK on the directory page we will remember their mode specific directory
 !insertmacro MUI_HEADER_TEXT "Install Mode" "Choose how you want to install Cockatrice."
 nsDialogs::Create 1018
@@ -159,6 +235,11 @@ ${EndIf}
 FunctionEnd
 
 Function componentsPagePre
+
+${If} $ReinstallMode = 1
+    Return
+${EndIf}
+
 ${If} $PortableMode = 0
     SetShellVarContext all
 
@@ -168,8 +249,12 @@ ${If} $PortableMode = 0
     ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
     StrCmp $R0 "" done32
 
-    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst32
-    Abort
+    ${If} $ReinstallMode = 0
+        MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst32
+        Abort
+    ${Else}
+        Goto uninst32
+    ${EndIf}
 
     uninst32:
     ClearErrors
@@ -184,8 +269,12 @@ ${If} $PortableMode = 0
 	    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
 	    StrCmp $R0 "" done64
 
-	    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst64
-	    Abort
+	    ${If} $ReinstallMode = 0
+            MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst64
+            Abort
+        ${Else}
+            Goto uninst64
+        ${EndIf}
 
 	    uninst64:
 	    ClearErrors
@@ -277,6 +366,12 @@ ${Else}
     FileWrite $0 "PORTABLE"
     FileClose $0
 ${EndIf}
+
+${If} $ReinstallMode = 1
+    IfFileExists "$INSTDIR\cockatrice.exe" 0 +2
+        Exec '"$INSTDIR\cockatrice.exe"'
+${EndIf}
+
 SectionEnd
 
 Section "Start menu item" SecStartMenu

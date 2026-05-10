@@ -1,5 +1,5 @@
 # -------- Build Stage --------
-FROM ubuntu:24.04 AS build
+FROM ubuntu:26.04 AS build
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -26,7 +26,7 @@ RUN mkdir build && cd build && \
 
 
 # -------- Runtime Stage (clean) --------
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   libprotobuf32t64 \

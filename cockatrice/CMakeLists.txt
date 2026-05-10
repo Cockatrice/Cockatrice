@@ -7,6 +7,7 @@ project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
     # sort by alphabetical order, so that there is no debate about where to add new sources to the list
+    src/client/network/connection_controller/remote_connection_controller.cpp
     src/client/network/update/client/update_downloader.cpp
     src/client/network/interfaces/deck_stats_interface.cpp
     src/client/network/interfaces/tapped_out_interface.cpp
@@ -216,6 +217,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/replay/replay_manager.cpp
     src/interface/widgets/replay/replay_timeline_widget.cpp
     src/interface/widgets/server/chat_view/chat_view.cpp
+    src/interface/widgets/server/game_filter_configs.cpp
     src/interface/widgets/server/game_selector.cpp
     src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp
     src/interface/widgets/server/games_model.cpp
@@ -498,6 +500,7 @@ if(WIN32)
     DIRECTORY "${CMAKE_BINARY_DIR}/cockatrice/"
     DESTINATION ./
     FILES_MATCHING
+    PATTERN "CMakeFiles" EXCLUDE
     PATTERN "*.ini"
   )
 

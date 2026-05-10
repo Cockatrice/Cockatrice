@@ -47,7 +47,7 @@ private:
     QMenu *createPredefinedTokenMenu;
 
     QAction *aIncrementAllCardCounters;
-    QAction *aUntapAll, *aRollDie;
+    QAction *aUntapAll, *aRollDie, *aFlipCoin;
     QAction *aCreateToken, *aCreateAnotherToken;
 };
 

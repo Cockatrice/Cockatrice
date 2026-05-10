@@ -1,6 +1,7 @@
 #include "visual_database_display_format_legality_filter_widget.h"
 
 #include "../../../filters/filter_tree_model.h"
+#include "visual_database_display_filter_button.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -80,8 +81,7 @@ void VisualDatabaseDisplayFormatLegalityFilterWidget::createFormatButtons()
     for (auto it = allFormatsWithCount.begin(); it != allFormatsWithCount.end(); ++it) {
         auto *button = new QPushButton(it.key(), flowWidget);
         button->setCheckable(true);
-        button->setStyleSheet("QPushButton { background-color: lightgray; border: 1px solid gray; padding: 5px; }"
-                              "QPushButton:checked { background-color: green; color: white; }");
+        button->setStyleSheet(visualDatabaseDisplayFilterButtonStyle);
 
         flowWidget->addWidget(button);
         formatButtons[it.key()] = button;

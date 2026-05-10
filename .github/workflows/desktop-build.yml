@@ -14,10 +14,8 @@ on:
       - '*/**'    # matches all files not in root
       - '!**.md'
       - '!.github/**'
-      - '!.husky/**'
       - '!.tx/**'
       - '!doc/**'
-      - '!webclient/**'
       - '.github/workflows/desktop-build.yml'
       - 'CMakeLists.txt'
       - 'vcpkg.json'
@@ -29,10 +27,8 @@ on:
       - '*/**'    # matches all files not in root
       - '!**.md'
       - '!.github/**'
-      - '!.husky/**'
       - '!.tx/**'
       - '!doc/**'
-      - '!webclient/**'
       - '.github/workflows/desktop-build.yml'
       - 'CMakeLists.txt'
       - 'vcpkg.json'
@@ -46,7 +42,7 @@ concurrency:
 jobs:
   configure:
     name: Configure
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       tag: ${{steps.configure.outputs.tag}}
       sha: ${{steps.configure.outputs.sha}}
@@ -111,12 +107,8 @@ jobs:
             package: skip    # We are packaged in Arch already
             allow-failure: yes
 
-          - distro: Debian
-            version: 11
-            package: DEB
-
           - distro: Servatrice_Debian
-            version: 11
+            version: 12
             package: DEB
             test: skip
             server_only: yes
@@ -131,22 +123,18 @@ jobs:
             package: DEB
 
           - distro: Fedora
-            version: 42
+            version: 43
             package: RPM
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Fedora
-            version: 43
+            version: 44
             package: RPM
-
-          - distro: Ubuntu
-            version: 22.04
-            package: DEB
-            test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 24.04
             package: DEB
+            test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 26.04
@@ -265,7 +253,7 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
-        run: gh attestation verify ${{steps.build.outputs.path}} --repo Cockatrice/Cockatrice
+        run: gh attestation verify "${{steps.build.outputs.path}}" --repo Cockatrice/Cockatrice
 
   build-vcpkg:
     strategy:
@@ -281,7 +269,7 @@ jobs:
             override_target: 13
             make_package: 1
             package_suffix: "-macOS13_Intel"
-            qt_version: 6.11.*
+            qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -296,7 +284,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS14"
-            qt_version: 6.11.*
+            qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -311,7 +299,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-macOS15"
-            qt_version: 6.11.*
+            qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -324,7 +312,7 @@ jobs:
             soc: Apple
             xcode: "16.4"
             type: Debug
-            qt_version: 6.11.*
+            qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: Ninja
@@ -337,7 +325,7 @@ jobs:
             type: Release
             make_package: 1
             package_suffix: "-Win10"
-            qt_version: 6.11.*
+            qt_version: 6.11.0
             qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             cmake_generator: "Visual Studio 17 2022"
@@ -494,7 +482,7 @@ jobs:
           if [[ -n "$MACOS_CERTIFICATE_NAME" ]]
           then
             security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-            /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose ${{steps.build.outputs.path}}
+            /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "${{steps.build.outputs.path}}"
           fi
 
       - name: Notarize app bundle
@@ -514,7 +502,7 @@ jobs:
             # Therefore, we create a zip file containing our app bundle, so that we can send it to the
             # notarization service
             echo "Creating temp notarization archive"
-            ditto -c -k --keepParent ${{steps.build.outputs.path}} "notarization.zip"
+            ditto -c -k --keepParent "${{steps.build.outputs.path}}" "notarization.zip"
 
             # Here we send the notarization request to the Apple's Notarization service, waiting for the result.
             # This typically takes a few seconds inside a CI environment, but it might take more depending on the App
@@ -526,7 +514,7 @@ jobs:
             # Finally, we need to "attach the staple" to our executable, which will allow our app to be
             # validated by macOS even when an internet connection is not available.
             echo "Attach staple"
-            xcrun stapler staple ${{steps.build.outputs.path}}
+            xcrun stapler staple "${{steps.build.outputs.path}}"
           fi
 
       - name: Upload artifact
@@ -573,4 +561,4 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{github.token}}
-        run: gh attestation verify ${{steps.build.outputs.path}} --repo Cockatrice/Cockatrice
+        run: gh attestation verify "${{steps.build.outputs.path}}" --repo Cockatrice/Cockatrice

@@ -89,6 +89,8 @@ void TappedOutInterface::analyzeDeck(const DeckList &deck)
     QNetworkRequest request(QUrl("https://tappedout.net/mtg-decks/paste/"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     request.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
+    // we interpret the redirect and open it in the browser instead, do not follow redirects
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
 
     manager->post(request, data);
 }

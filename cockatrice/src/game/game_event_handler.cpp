@@ -429,13 +429,13 @@ void GameEventHandler::eventLeave(const Event_Leave &event, int eventPlayerId, c
     if (!player)
         return;
 
+    player->clear();
     emit playerLeft(eventPlayerId);
 
     emit logLeave(player, getLeaveReason(event.reason()));
 
     game->getPlayerManager()->removePlayer(eventPlayerId);
 
-    player->clear();
     player->deleteLater();
 
     // Rearrange all remaining zones so that attachment relationship updates take place

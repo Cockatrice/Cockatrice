@@ -149,8 +149,8 @@ void PlayerEventHandler::eventSetCardAttr(const Event_SetCardAttr &event,
     if (!event.has_card_id()) {
         const CardList &cards = zone->getCards();
         for (int i = 0; i < cards.size(); ++i) {
-            player->getPlayerActions()->setCardAttrHelper(context, cards.at(i), event.attribute(),
-                                                          QString::fromStdString(event.attr_value()), true, options);
+            setCardAttrHelper(context, cards.at(i), event.attribute(), QString::fromStdString(event.attr_value()), true,
+                              options);
         }
         if (event.attribute() == AttrTapped) {
             emit logSetTapped(player, nullptr, event.attr_value() == "1");
@@ -161,8 +161,62 @@ void PlayerEventHandler::eventSetCardAttr(const Event_SetCardAttr &event,
             qWarning() << "PlayerEventHandler::eventSetCardAttr: card id=" << event.card_id() << "not found";
             return;
         }
-        player->getPlayerActions()->setCardAttrHelper(context, card, event.attribute(),
-                                                      QString::fromStdString(event.attr_value()), false, options);
+        setCardAttrHelper(context, card, event.attribute(), QString::fromStdString(event.attr_value()), false, options);
+    }
+}
+
+void PlayerEventHandler::setCardAttrHelper(const GameEventContext &context,
+                                           CardItem *card,
+                                           CardAttribute attribute,
+                                           const QString &avalue,
+                                           bool allCards,
+                                           EventProcessingOptions options)
+{
+    if (card == nullptr) {
+        return;
+    }
+
+    bool moveCardContext = context.HasExtension(Context_MoveCard::ext);
+    switch (attribute) {
+        case AttrTapped: {
+            bool tapped = avalue == "1";
+            if (!(!tapped && card->getDoesntUntap() && allCards)) {
+                if (!allCards) {
+                    emit logSetTapped(player, card, tapped);
+                }
+                bool canAnimate = !options.testFlag(SKIP_TAP_ANIMATION) && !moveCardContext;
+                card->setTapped(tapped, canAnimate);
+            }
+            break;
+        }
+        case AttrAttacking: {
+            card->setAttacking(avalue == "1");
+            break;
+        }
+        case AttrFaceDown: {
+            card->setFaceDown(avalue == "1");
+            break;
+        }
+        case AttrColor: {
+            card->setColor(avalue);
+            break;
+        }
+        case AttrAnnotation: {
+            emit logSetAnnotation(player, card, avalue);
+            card->setAnnotation(avalue);
+            break;
+        }
+        case AttrDoesntUntap: {
+            bool value = (avalue == "1");
+            emit logSetDoesntUntap(player, card, value);
+            card->setDoesntUntap(value);
+            break;
+        }
+        case AttrPT: {
+            emit logSetPT(player, card, avalue);
+            card->setPT(avalue);
+            break;
+        }
     }
 }
 

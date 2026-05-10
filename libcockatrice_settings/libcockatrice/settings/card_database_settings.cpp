@@ -34,3 +34,17 @@ bool CardDatabaseSettings::isKnown(QString shortName) const
 {
     return getValue("isknown", "sets", std::move(shortName)).toBool();
 }
+
+void CardDatabaseSettings::saveSets(const QVector<ICardSetPriorityController::SetSaveData> &data)
+{
+    batchWrite([&](QSettings &s) {
+        s.beginGroup("sets");
+        for (const auto &entry : data) {
+            s.beginGroup(entry.shortName);
+            s.setValue("sortkey", entry.sortKey);
+            s.setValue("enabled", entry.enabled);
+            s.endGroup();
+        }
+        s.endGroup();
+    });
+}
