@@ -103,6 +103,7 @@ class AppearanceSettingsPage : public AbstractSettingsPage
 private slots:
     void themeBoxChanged(int index);
     void openThemeLocation();
+    void editPalette();
     void updateHomeTabSettingsVisibility();
     void showShortcutsChanged(QT_STATE_CHANGED_T enabled);
     void overrideAllCardArtWithPersonalPreferenceToggled(QT_STATE_CHANGED_T enabled);
@@ -114,6 +115,7 @@ private:
     QLabel themeLabel;
     QComboBox themeBox;
     QPushButton openThemeButton;
+    QPushButton editPaletteButton;
     QLabel homeTabBackgroundSourceLabel;
     QComboBox homeTabBackgroundSourceBox;
     QLabel homeTabBackgroundShuffleFrequencyLabel;

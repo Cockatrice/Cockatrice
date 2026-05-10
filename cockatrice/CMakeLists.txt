@@ -130,7 +130,13 @@ set(cockatrice_SOURCES
     src/interface/layouts/overlap_layout.cpp
     src/interface/widgets/utility/line_edit_completer.cpp
     src/interface/pixel_map_generator.cpp
+    src/interface/theme_config.cpp
     src/interface/theme_manager.cpp
+    src/interface/palette_editor/color_button.cpp
+    src/interface/palette_editor/palette_generator.cpp
+    src/interface/palette_editor/quick_setup_panel.cpp
+    src/interface/palette_editor/palette_grid_widget.cpp
+    src/interface/palette_editor/palette_editor_dialog.cpp
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
     src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
     src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
