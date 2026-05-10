@@ -172,7 +172,7 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
       -Wno-error=delete-non-virtual-dtor
       -Wno-error=sign-compare
       -Wno-error=missing-declarations
-      -Wno-error=sfinae-incomplete  # GCC 16+: Qt MOC + protobuf forward decls trigger this
+      -Wno-error=sfinae-incomplete # GCC 16+: Qt MOC + protobuf forward decls trigger this
   )
 
   foreach(FLAG ${ADDITIONAL_DEBUG_FLAGS})
