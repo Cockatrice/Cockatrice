@@ -37,8 +37,9 @@ GameSelector::GameSelector(AbstractClient *_client,
     connect(gameListView, &QTreeView::customContextMenuRequested, this, &GameSelector::customContextMenu);
 
     gameListModel = new GamesModel(_rooms, _gameTypes, this);
+    gameListProxyModel = new GamesProxyModel(this, tabSupervisor->getUserListManager());
+
     if (showFilters) {
-        gameListProxyModel = new GamesProxyModel(this, tabSupervisor->getUserListManager());
         gameListProxyModel->setSourceModel(gameListModel);
         gameListProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         gameListView->setModel(gameListProxyModel);
