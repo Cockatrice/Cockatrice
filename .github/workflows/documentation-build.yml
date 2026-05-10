@@ -3,8 +3,7 @@ name: Generate Docs
 on:
   release:
     types:
-      - prereleased    # publishing of pre-releases
-      - released    # publishing of stable releases
+      - published    # publishing of stable releases and pre-releases
   pull_request:
     paths:
       - 'doc/doxygen/**'
