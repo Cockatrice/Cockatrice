@@ -25,7 +25,6 @@ class DeckEditorDatabaseDisplayWidget : public QWidget
 public:
     explicit DeckEditorDatabaseDisplayWidget(QWidget *parent, AbstractTabDeckEditor *deckEditor);
     AbstractTabDeckEditor *deckEditor;
-    SearchLineEdit *searchEdit;
     CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
 
@@ -58,6 +57,7 @@ private:
     KeySignals searchKeySignals;
     QTreeView *databaseView;
     QHBoxLayout *searchLayout;
+    SearchLineEdit *searchEdit;
     QAction *aAddCard, *aAddCardToSideboard;
     QVBoxLayout *centralFrame;
     QWidget *centralWidget;
