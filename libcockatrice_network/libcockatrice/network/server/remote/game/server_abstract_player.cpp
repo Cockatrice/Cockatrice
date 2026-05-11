@@ -49,6 +49,7 @@
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/trice_limits.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <limits>
 #include <ranges>
 
 Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
@@ -1090,8 +1091,9 @@ Server_AbstractPlayer::cmdCreateToken(const Command_CreateToken &cmd, ResponseCo
                 _event.set_zone_name(card->getZone()->getName().toStdString());
                 _event.set_card_id(card->getId());
 
-                card->setCounter(i.key(), i.value(), &_event);
-                ges.enqueueGameEvent(_event, playerId);
+                if (card->setCounter(i.key(), i.value(), &_event)) {
+                    ges.enqueueGameEvent(_event, playerId);
+                }
             }
 
             // Copy parent card
@@ -1337,8 +1339,9 @@ Response::ResponseCode Server_AbstractPlayer::cmdSetCardCounter(const Command_Se
     Event_SetCardCounter event;
     event.set_zone_name(zone->getName().toStdString());
     event.set_card_id(card->getId());
-    card->setCounter(cmd.counter_id(), cmd.counter_value(), &event);
-    ges.enqueueGameEvent(event, playerId);
+    if (card->setCounter(cmd.counter_id(), cmd.counter_value(), &event)) {
+        ges.enqueueGameEvent(event, playerId);
+    }
 
     return Response::RespOk;
 }
@@ -1367,14 +1370,13 @@ Response::ResponseCode Server_AbstractPlayer::cmdIncCardCounter(const Command_In
         return Response::RespNameNotFound;
     }
 
-    int newValue = card->getCounter(cmd.counter_id()) + cmd.counter_delta();
-    card->setCounter(cmd.counter_id(), newValue);
-
     Event_SetCardCounter event;
     event.set_zone_name(zone->getName().toStdString());
     event.set_card_id(card->getId());
-    event.set_counter_id(cmd.counter_id());
-    event.set_counter_value(newValue);
+    if (!card->incrementCounter(cmd.counter_id(), cmd.counter_delta(), &event)) {
+        return Response::RespOk;
+    }
+
     ges.enqueueGameEvent(event, playerId);
 
     return Response::RespOk;

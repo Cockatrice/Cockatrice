@@ -26,6 +26,7 @@
 #include <libcockatrice/protocol/pb/event_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
+#include <limits>
 
 Server_Card::Server_Card(const CardRef &cardRef, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)
     : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), cardRef(cardRef), tapped(false), attacking(false),
@@ -104,17 +105,52 @@ QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue
     return avalue;
 }
 
-void Server_Card::setCounter(int _id, int value, Event_SetCardCounter *event)
+bool Server_Card::setCounter(int _id, int value, Event_SetCardCounter *event)
 {
-    if (value)
+    const int oldValue = counters.value(_id, 0);
+    if (value == oldValue) {
+        return false;
+    }
+
+    if (value) {
         counters.insert(_id, value);
-    else
+    } else {
         counters.remove(_id);
+    }
 
     if (event) {
         event->set_counter_id(_id);
         event->set_counter_value(value);
     }
+
+    return true;
+}
+
+bool Server_Card::incrementCounter(int counterId, int delta, Event_SetCardCounter *event)
+{
+    // TODO: Extract overflow-safe arithmetic into shared helper.
+    // Duplicated in Server_Counter::incrementCount() - keep in sync if modified.
+    const int oldValue = counters.value(counterId, 0);
+    const auto result = static_cast<int64_t>(oldValue) + static_cast<int64_t>(delta);
+    const int newValue = static_cast<int>(qBound(static_cast<int64_t>(std::numeric_limits<int>::min()), result,
+                                                 static_cast<int64_t>(std::numeric_limits<int>::max())));
+
+    if (newValue == oldValue) {
+        return false;
+    }
+
+    if (newValue) {
+        counters.insert(counterId, newValue);
+    } else {
+        counters.remove(counterId);
+    }
+
+    if (event) {
+        event->set_counter_id(counterId);
+        event->set_counter_value(newValue);
+    }
+
+    return true;
 }
 
 void Server_Card::setParentCard(Server_Card *_parentCard)

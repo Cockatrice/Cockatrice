@@ -22,9 +22,22 @@
 
 #include <QString>
 #include <libcockatrice/protocol/pb/color.pb.h>
+#include <limits>
 
 class ServerInfo_Counter;
 
+/**
+ * @class Server_Counter
+ * @brief Represents a player counter with overflow-safe increment arithmetic.
+ *
+ * All value modifications return whether the value actually changed,
+ * enabling callers to skip unnecessary network events.
+ *
+ * @note Direct assignment via setCount() does not clamp; only
+ *       incrementCount() enforces int boundary saturation.
+ * @note Unlike card counters, player counters are never auto-removed
+ *       when they reach zero - they persist with value 0.
+ */
 class Server_Counter
 {
 protected:
@@ -59,11 +72,42 @@ public:
     {
         return count;
     }
-    void setCount(int _count)
+
+    /**
+     * @brief Sets the counter to an exact value.
+     * @param _count The new value (assigned directly without clamping).
+     * @return true if the value changed, false otherwise.
+     * @warning This performs raw assignment. For overflow-safe incrementing,
+     *          use incrementCount().
+     */
+    [[nodiscard]] bool setCount(int _count)
     {
+        const int oldCount = count;
         count = _count;
+        return count != oldCount;
     }
 
+    /**
+     * @brief Increments the counter by delta with overflow-safe arithmetic.
+     * @param delta The amount to add (may be negative for decrement).
+     * @return true if the value changed, false otherwise.
+     * @note Clamps result to [INT_MIN, INT_MAX] to prevent overflow.
+     */
+    [[nodiscard]] bool incrementCount(int delta)
+    {
+        // TODO: Extract overflow-safe arithmetic into shared helper.
+        // Duplicated in Server_Card::incrementCounter() - keep in sync if modified.
+        const int oldCount = count;
+        const auto result = static_cast<int64_t>(count) + static_cast<int64_t>(delta);
+        count = static_cast<int>(qBound(static_cast<int64_t>(std::numeric_limits<int>::min()), result,
+                                        static_cast<int64_t>(std::numeric_limits<int>::max())));
+        return count != oldCount;
+    }
+
+    /**
+     * @brief Populates info with this counter's current state for network serialization.
+     * @param info The protobuf message to populate.
+     */
     void getInfo(ServerInfo_Counter *info);
 };
 
