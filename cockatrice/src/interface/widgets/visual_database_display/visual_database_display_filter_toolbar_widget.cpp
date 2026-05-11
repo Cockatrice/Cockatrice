@@ -101,7 +101,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     filterLayout->setAlignment(Qt::AlignLeft);
 
     // create settings widgets
-    auto filterModel = visualDatabaseDisplay->filterModel;
+    auto filterModel = visualDatabaseDisplay->getFilterModel();
 
     saveLoadWidget = new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel);
     nameFilterWidget =

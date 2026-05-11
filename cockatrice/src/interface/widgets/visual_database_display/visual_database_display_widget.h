@@ -62,12 +62,15 @@ public:
         return databaseView;
     }
 
-    QWidget *searchContainer;
-    QHBoxLayout *searchLayout;
-    SearchLineEdit *searchEdit;
-    QPushButton *displayModeButton;
-    FilterTreeModel *filterModel;
-    VisualDatabaseDisplayColorFilterWidget *colorFilterWidget;
+    FilterTreeModel *getFilterModel()
+    {
+        return filterModel;
+    }
+
+    /**
+     * @return False if the widget is in database display mode and true if it's in visual display mode
+     */
+    bool isVisualDisplayMode() const;
 
 public slots:
     void onSearchModelChanged();
@@ -88,6 +91,13 @@ protected slots:
     void onDisplayModeChanged(bool checked);
 
 private:
+    QWidget *searchContainer;
+    QHBoxLayout *searchLayout;
+    SearchLineEdit *searchEdit;
+    QPushButton *displayModeButton;
+    FilterTreeModel *filterModel;
+    VisualDatabaseDisplayColorFilterWidget *colorFilterWidget;
+
     QLabel *databaseLoadIndicator;
 
     QToolButton *clearFilterWidget;

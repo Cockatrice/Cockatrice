@@ -23,8 +23,8 @@ public:
     void retranslateUi() override;
     [[nodiscard]] QString getTabText() const override
     {
-        return visualDatabaseDisplayWidget->displayModeButton->isChecked() ? tr("Database Display")
-                                                                           : tr("Visual Database Display");
+        return visualDatabaseDisplayWidget->isVisualDisplayMode() ? tr("Visual Database Display")
+                                                                  : tr("Database Display");
     }
 };
 
