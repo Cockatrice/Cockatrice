@@ -7,6 +7,7 @@
 
 #include <QApplication>
 #include <QComboBox>
+#include <QDialogButtonBox>
 #include <QFrame>
 #include <QGuiApplication>
 #include <QLabel>
