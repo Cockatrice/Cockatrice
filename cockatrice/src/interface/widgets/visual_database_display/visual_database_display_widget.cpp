@@ -99,6 +99,11 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
             &DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents);
     connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
 
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,
+            &VisualDatabaseDisplayWidget::highlightAllSearchEdit);
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToSideboard, this,
+            &VisualDatabaseDisplayWidget::highlightAllSearchEdit);
+
     databaseView = databaseDisplayWidget->getDatabaseView();
     databaseView->setFocusProxy(searchEdit);
     databaseView->setItemDelegate(nullptr);
@@ -179,6 +184,11 @@ void VisualDatabaseDisplayWidget::retranslateUi()
 {
     databaseLoadIndicator->setText(tr("Loading database ..."));
     clearFilterWidget->setToolTip(tr("Clear all filters"));
+}
+
+void VisualDatabaseDisplayWidget::highlightAllSearchEdit()
+{
+    searchEdit->setSelection(0, searchEdit->text().length());
 }
 
 void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
