@@ -6,8 +6,8 @@
 
 #include <QMap>
 #include <QPalette>
+#include <QVBoxLayout>
 #include <QWidget>
-#include <qt5/QtWidgets/QVBoxLayout>
 
 class QLabel;
 class QScrollArea;
