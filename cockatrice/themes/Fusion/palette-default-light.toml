@@ -1,0 +1,69 @@
+[Palette]
+WindowText           = #ff000000
+Button               = #fff0f0f0
+Light                = #ffffffff
+Midlight             = #ffe3e3e3
+Dark                 = #ffa0a0a0
+Mid                  = #ffa0a0a0
+Text                 = #ff000000
+BrightText           = #ffffffff
+ButtonText           = #ff000000
+Base                 = #ffffffff
+Window               = #fff0f0f0
+Shadow               = #ff696969
+Highlight            = #ff148c3c
+HighlightedText      = #ffffffff
+Link                 = #ff0d5f28
+LinkVisited          = #ff08401b
+AlternateBase        = #ffe9e7e3
+ToolTipBase          = #ffffffdc
+ToolTipText          = #ff000000
+PlaceholderText      = #80000000
+Accent               = #ff107532
+
+[Palette.Disabled]
+WindowText           = #ff787878
+Button               = #fff0f0f0
+Light                = #ffffffff
+Midlight             = #fff7f7f7
+Dark                 = #ffa0a0a0
+Mid                  = #ffa0a0a0
+Text                 = #ff787878
+BrightText           = #ffffffff
+ButtonText           = #ff787878
+Base                 = #fff0f0f0
+Window               = #fff0f0f0
+Shadow               = #ff000000
+Highlight            = #ff148c3c
+HighlightedText      = #ffffffff
+Link                 = #ff0000ff
+LinkVisited          = #ffff00ff
+AlternateBase        = #fff7f7f7
+ToolTipBase          = #ffffffdc
+ToolTipText          = #ff000000
+PlaceholderText      = #80000000
+Accent               = #ff787878
+
+[Palette.Inactive]
+WindowText           = #ff000000
+Button               = #fff0f0f0
+Light                = #ffffffff
+Midlight             = #ffe3e3e3
+Dark                 = #ffa0a0a0
+Mid                  = #ffa0a0a0
+Text                 = #ff000000
+BrightText           = #ffffffff
+ButtonText           = #ff000000
+Base                 = #ffffffff
+Window               = #fff0f0f0
+Shadow               = #ff696969
+Highlight            = #fff0f0f0
+HighlightedText      = #ff000000
+Link                 = #ff0d5f28
+LinkVisited          = #ff08401b
+AlternateBase        = #ffe9e7e3
+ToolTipBase          = #ffffffdc
+ToolTipText          = #ff000000
+PlaceholderText      = #80000000
+Accent               = #fff0f0f0
+
