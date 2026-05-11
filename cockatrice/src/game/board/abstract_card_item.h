@@ -1,7 +1,7 @@
 /**
  * @file abstract_card_item.h
  * @ingroup GameGraphicsCards
- * @brief TODO: Document this.
+ * @brief Base class for graphical card items, providing shared rendering, identity, and interaction logic.
  */
 
 #ifndef ABSTRACTCARDITEM_H
@@ -96,6 +96,10 @@ public:
     }
     void setRealZValue(qreal _zValue);
     void setHovered(bool _hovered);
+    bool getIsHovered() const
+    {
+        return isHovered;
+    }
     QString getColor() const
     {
         return color;
