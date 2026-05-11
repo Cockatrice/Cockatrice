@@ -62,6 +62,8 @@ private:
     QVBoxLayout *centralFrame;
     QWidget *centralWidget;
 
+    void highlightAllSearchEdit();
+
 private slots:
     void retranslateUi();
     void saveDbHeaderState();
