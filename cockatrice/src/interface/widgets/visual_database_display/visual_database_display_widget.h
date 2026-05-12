@@ -85,7 +85,6 @@ protected slots:
     void onHover(const ExactCard &hoveredCard);
     void addCard(const ExactCard &cardToAdd);
     void databaseDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
-    void wheelEvent(QWheelEvent *event) override;
     void modelDirty() const;
     void updateSearch(const QString &search) const;
     void onDisplayModeChanged(bool checked);
@@ -123,6 +122,7 @@ private:
     int cardsPerPage = 100; // Number of cards per page
 
     void highlightAllSearchEdit();
+    bool nearEndOfPage();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
