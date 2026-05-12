@@ -122,6 +122,8 @@ private:
     int currentPage = 0;    // Current page index
     int cardsPerPage = 100; // Number of cards per page
 
+    void highlightAllSearchEdit();
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
 };
