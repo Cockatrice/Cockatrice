@@ -7,7 +7,6 @@
 #include "../client/sound_engine.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/theme_manager.h"
-#include "../interface/widgets/general/background_sources.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
@@ -425,45 +424,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&themeBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &AppearanceSettingsPage::themeBoxChanged);
     connect(&openThemeButton, &QPushButton::clicked, this, &AppearanceSettingsPage::openThemeLocation);
 
-    for (const auto &entry : BackgroundSources::all()) {
-        homeTabBackgroundSourceBox.addItem(QObject::tr(entry.trKey), QVariant::fromValue(entry.type));
-    }
-
-    QString homeTabBackgroundSource = SettingsCache::instance().getHomeTabBackgroundSource();
-    int homeTabBackgroundSourceId =
-        homeTabBackgroundSourceBox.findData(BackgroundSources::fromId(homeTabBackgroundSource));
-    if (homeTabBackgroundSourceId != -1) {
-        homeTabBackgroundSourceBox.setCurrentIndex(homeTabBackgroundSourceId);
-    }
-
-    connect(&homeTabBackgroundSourceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
-        auto type = homeTabBackgroundSourceBox.currentData().value<BackgroundSources::Type>();
-        SettingsCache::instance().setHomeTabBackgroundSource(BackgroundSources::toId(type));
-        updateHomeTabSettingsVisibility();
-    });
-
-    homeTabBackgroundShuffleFrequencySpinBox.setRange(0, 3600);
-    homeTabBackgroundShuffleFrequencySpinBox.setSuffix(tr(" seconds"));
-    homeTabBackgroundShuffleFrequencySpinBox.setValue(SettingsCache::instance().getHomeTabBackgroundShuffleFrequency());
-    connect(&homeTabBackgroundShuffleFrequencySpinBox, qOverload<int>(&QSpinBox::valueChanged),
-            &SettingsCache::instance(), &SettingsCache::setHomeTabBackgroundShuffleFrequency);
-
-    homeTabDisplayCardNameCheckBox.setChecked(settings.getHomeTabDisplayCardName());
-    connect(&homeTabDisplayCardNameCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setHomeTabDisplayCardName);
-
-    updateHomeTabSettingsVisibility();
-
     auto *themeGrid = new QGridLayout;
     themeGrid->addWidget(&themeLabel, 0, 0);
     themeGrid->addWidget(&themeBox, 0, 1);
     themeGrid->addWidget(&openThemeButton, 1, 1);
-    themeGrid->addWidget(&homeTabBackgroundSourceLabel, 2, 0);
-    themeGrid->addWidget(&homeTabBackgroundSourceBox, 2, 1);
-    themeGrid->addWidget(&homeTabBackgroundShuffleFrequencyLabel, 3, 0);
-    themeGrid->addWidget(&homeTabBackgroundShuffleFrequencySpinBox, 3, 1);
-    themeGrid->addWidget(&homeTabDisplayCardNameLabel, 4, 0);
-    themeGrid->addWidget(&homeTabDisplayCardNameCheckBox, 4, 1);
 
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
@@ -660,17 +624,6 @@ void AppearanceSettingsPage::openThemeLocation()
     }
 }
 
-void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
-{
-    bool visible =
-        SettingsCache::instance().getHomeTabBackgroundSource() != BackgroundSources::toId(BackgroundSources::Theme);
-
-    homeTabBackgroundShuffleFrequencyLabel.setVisible(visible);
-    homeTabBackgroundShuffleFrequencySpinBox.setVisible(visible);
-    homeTabDisplayCardNameLabel.setVisible(visible);
-    homeTabDisplayCardNameCheckBox.setVisible(visible);
-}
-
 void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
 {
     SettingsCache::instance().setShowShortcuts(value);
@@ -724,10 +677,6 @@ void AppearanceSettingsPage::retranslateUi()
     themeGroupBox->setTitle(tr("Theme settings"));
     themeLabel.setText(tr("Current theme:"));
     openThemeButton.setText(tr("Open themes folder"));
-    homeTabBackgroundSourceLabel.setText(tr("Home tab background source:"));
-    homeTabBackgroundShuffleFrequencyLabel.setText(tr("Home tab background shuffle frequency:"));
-    homeTabBackgroundShuffleFrequencySpinBox.setSpecialValueText(tr("Disabled"));
-    homeTabDisplayCardNameLabel.setText(tr("Display card name of background in bottom right:"));
 
     menuGroupBox->setTitle(tr("Menu settings"));
     showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));
@@ -872,47 +821,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setOpenDeckInNewTab);
 
-    visualDeckStorageInGameCheckBox.setChecked(SettingsCache::instance().getVisualDeckStorageInGame());
-    connect(&visualDeckStorageInGameCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckStorageInGame);
-
-    visualDeckStorageSelectionAnimationCheckBox.setChecked(
-        SettingsCache::instance().getVisualDeckStorageSelectionAnimation());
-    connect(&visualDeckStorageSelectionAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckStorageSelectionAnimation);
-
-    visualDeckStoragePromptForConversionSelector.addItem(""); // these will be set in retranslateUI
-    visualDeckStoragePromptForConversionSelector.addItem("");
-    visualDeckStoragePromptForConversionSelector.addItem("");
-    if (SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
-        visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexPrompt);
-    } else if (SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
-        visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexAlways);
-    } else {
-        visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexNone);
-    }
-    connect(&visualDeckStoragePromptForConversionSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-            [](int index) {
-                SettingsCache::instance().setVisualDeckStoragePromptForConversion(
-                    index == visualDeckStoragePromptForConversionIndexPrompt);
-                SettingsCache::instance().setVisualDeckStorageAlwaysConvert(
-                    index == visualDeckStoragePromptForConversionIndexAlways);
-            });
-
-    defaultDeckEditorTypeSelector.addItem(""); // these will be set in retranslateUI
-    defaultDeckEditorTypeSelector.addItem("");
-    defaultDeckEditorTypeSelector.setCurrentIndex(SettingsCache::instance().getDefaultDeckEditorType());
-    connect(&defaultDeckEditorTypeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            &SettingsCache::instance(), &SettingsCache::setDefaultDeckEditorType);
-
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
-    deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 1, 0);
-    deckEditorGrid->addWidget(&visualDeckStorageSelectionAnimationCheckBox, 2, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 3, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 3, 1);
-    deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 4, 0);
-    deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 4, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -976,19 +886,6 @@ void UserInterfaceSettingsPage::retranslateUi()
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
-    visualDeckStorageInGameCheckBox.setText(tr("Use visual deck storage in game lobby"));
-    visualDeckStorageSelectionAnimationCheckBox.setText(tr("Use selection animation for Visual Deck Storage"));
-    visualDeckStoragePromptForConversionLabel.setText(
-        tr("When adding a tag in the visual deck storage to a .txt deck:"));
-    visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexNone,
-                                                             tr("do nothing"));
-    visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexPrompt,
-                                                             tr("ask to convert to .cod"));
-    visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexAlways,
-                                                             tr("always convert to .cod"));
-    defaultDeckEditorTypeLabel.setText(tr("Default deck editor type"));
-    defaultDeckEditorTypeSelector.setItemText(TabSupervisor::ClassicDeckEditor, tr("Classic Deck Editor"));
-    defaultDeckEditorTypeSelector.setItemText(TabSupervisor::VisualDeckEditor, tr("Visual Deck Editor"));
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(" ms");

@@ -119,8 +119,6 @@ void DeckEditorDeckDockWidget::createDeckDock()
     showTagsWidgetCheckBox->setChecked(SettingsCache::instance().getDeckEditorTagsWidgetVisible());
     connect(showTagsWidgetCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setDeckEditorTagsWidgetVisible);
-    connect(&SettingsCache::instance(), &SettingsCache::deckEditorTagsWidgetVisibleChanged, this,
-            &DeckEditorDeckDockWidget::updateShowTagsWidget);
 
     quickSettingsWidget->addSettingsWidget(showBannerCardCheckBox);
     quickSettingsWidget->addSettingsWidget(showTagsWidgetCheckBox);
@@ -163,11 +161,6 @@ void DeckEditorDeckDockWidget::createDeckDock()
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckEditorDeckDockWidget::writeBannerCard);
     bannerCardComboBox->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
-
-    deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, {});
-    deckTagsDisplayWidget->setHidden(!SettingsCache::instance().getDeckEditorTagsWidgetVisible());
-    connect(deckTagsDisplayWidget, &DeckPreviewDeckTagsDisplayWidget::tagsChanged, deckStateManager,
-            &DeckStateManager::setTags);
 
     activeGroupCriteriaLabel = new QLabel(this);
 
@@ -218,8 +211,6 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     upperLayout->addWidget(bannerCardLabel, 3, 0);
     upperLayout->addWidget(bannerCardComboBox, 3, 1);
-
-    upperLayout->addWidget(deckTagsDisplayWidget, 4, 1);
 
     upperLayout->addWidget(activeGroupCriteriaLabel, 5, 0);
     upperLayout->addWidget(activeGroupCriteriaComboBox, 5, 1);
@@ -439,11 +430,6 @@ void DeckEditorDeckDockWidget::updateShowBannerCardComboBox(const bool visible)
     bannerCardComboBox->setHidden(!visible);
 }
 
-void DeckEditorDeckDockWidget::updateShowTagsWidget(const bool visible)
-{
-    deckTagsDisplayWidget->setHidden(!visible);
-}
-
 void DeckEditorDeckDockWidget::syncBannerCardComboBoxSelectionWithDeck()
 {
     if (deckStateManager->getMetadata().bannerCard.name == "") {
@@ -488,10 +474,6 @@ void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()
     formatComboBox->blockSignals(true);
     formatComboBox->setCurrentIndex(formatComboBox->findData(deckStateManager->getMetadata().gameFormat));
     formatComboBox->blockSignals(false);
-
-    deckTagsDisplayWidget->blockSignals(true);
-    deckTagsDisplayWidget->setTags(deckStateManager->getMetadata().tags);
-    deckTagsDisplayWidget->blockSignals(false);
 }
 
 /**

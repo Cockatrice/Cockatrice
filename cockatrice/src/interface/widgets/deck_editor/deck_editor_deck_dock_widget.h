@@ -11,10 +11,11 @@
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../key_signals.h"
 #include "../utility/custom_line_edit.h"
-#include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "deck_list_history_manager_widget.h"
 #include "deck_list_style_proxy.h"
 
+#include <QCheckBox>
+#include <QComboBox>
 #include <QDockWidget>
 #include <QLabel>
 #include <QTextEdit>
@@ -79,7 +80,6 @@ private:
     QTextEdit *commentsEdit;
     QTimer *commentsDebounceTimer;
     QLabel *bannerCardLabel;
-    DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
     QLabel *hashLabel1;
     LineEditUnfocusable *hashLabel;
     QLabel *activeGroupCriteriaLabel;
@@ -104,7 +104,6 @@ private slots:
     void updateHash();
     void refreshShortcuts();
     void updateShowBannerCardComboBox(bool visible);
-    void updateShowTagsWidget(bool visible);
     void syncBannerCardComboBoxSelectionWithDeck();
     void changeSelectedCard(int changeBy);
     void recursiveExpand(const QModelIndex &parent);

@@ -5,23 +5,16 @@
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
-#include "api/archidekt/tab_archidekt.h"
-#include "api/edhrec/tab_edhrec_main.h"
 #include "tab_account.h"
 #include "tab_admin.h"
 #include "tab_deck_editor.h"
 #include "tab_deck_storage.h"
 #include "tab_game.h"
-#include "tab_home.h"
 #include "tab_logs.h"
 #include "tab_message.h"
 #include "tab_replays.h"
 #include "tab_room.h"
 #include "tab_server.h"
-#include "tab_visual_database_display.h"
-#include "visual_deck_editor/tab_deck_editor_visual.h"
-#include "visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
-#include "visual_deck_storage/tab_deck_storage_visual.h"
 
 #include <QApplication>
 #include <QMessageBox>
@@ -104,9 +97,9 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 }
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
-    : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr),
-      tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr),
-      tabLog(nullptr), isLocalGame(false)
+    : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabServer(nullptr),
+      tabAccount(nullptr), tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr), tabLog(nullptr),
+      isLocalGame(false)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -134,26 +127,6 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     // create tabs menu actions
     aTabDeckEditor = new QAction(this);
     connect(aTabDeckEditor, &QAction::triggered, this, [this] { addDeckEditorTab(LoadedDeck()); });
-
-    aTabVisualDeckEditor = new QAction(this);
-    connect(aTabVisualDeckEditor, &QAction::triggered, this, [this] { addVisualDeckEditorTab(LoadedDeck()); });
-
-    aTabEdhRec = new QAction(this);
-    connect(aTabEdhRec, &QAction::triggered, this, [this] { addEdhrecMainTab(); });
-
-    aTabArchidekt = new QAction(this);
-    connect(aTabArchidekt, &QAction::triggered, this, [this] { addArchidektTab(); });
-
-    aTabHome = new QAction(this);
-    aTabHome->setCheckable(true);
-    connect(aTabHome, &QAction::triggered, this, &TabSupervisor::actTabHome);
-
-    aTabVisualDeckStorage = new QAction(this);
-    aTabVisualDeckStorage->setCheckable(true);
-    connect(aTabVisualDeckStorage, &QAction::triggered, this, &TabSupervisor::actTabVisualDeckStorage);
-
-    aTabVisualDatabaseDisplay = new QAction(this);
-    connect(aTabVisualDatabaseDisplay, &QAction::triggered, this, [this] { addVisualDatabaseDisplayTab(); });
 
     aTabServer = new QAction(this);
     aTabServer->setCheckable(true);
@@ -206,12 +179,6 @@ void TabSupervisor::retranslateUi()
 {
     // tab menu actions
     aTabDeckEditor->setText(tr("Deck Editor"));
-    aTabVisualDeckEditor->setText(tr("Visual Deck Editor"));
-    aTabEdhRec->setText(tr("EDHRec"));
-    aTabArchidekt->setText(tr("Archidekt"));
-    aTabHome->setText(tr("Home"));
-    aTabVisualDeckStorage->setText(tr("&Visual Deck Storage"));
-    aTabVisualDatabaseDisplay->setText(tr("Visual Database Display"));
     aTabServer->setText(tr("Server"));
     aTabAccount->setText(tr("Account"));
     aTabDeckStorage->setText(tr("Deck Storage"));
@@ -258,10 +225,6 @@ void TabSupervisor::refreshShortcuts()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aTabDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabDeckEditor"));
-    aTabVisualDeckEditor->setShortcuts(shortcuts.getShortcut("Tabs/aTabVisualDeckEditor"));
-
-    aTabHome->setShortcuts(shortcuts.getShortcut("Tabs/aTabHome"));
-    aTabVisualDeckStorage->setShortcuts(shortcuts.getShortcut("Tabs/aTabVisualDeckStorage"));
     aTabServer->setShortcuts(shortcuts.getShortcut("Tabs/aTabServer"));
     aTabAccount->setShortcuts(shortcuts.getShortcut("Tabs/aTabAccount"));
     aTabDeckStorage->setShortcuts(shortcuts.getShortcut("Tabs/aTabDeckStorage"));
@@ -324,12 +287,8 @@ static void checkAndTrigger(QAction *checkableAction, bool checked)
  */
 void TabSupervisor::initStartupTabs()
 {
-    openTabHome();
-    setCurrentWidget(tabHome);
+    openDeckInNewTab(LoadedDeck());
 
-    if (SettingsCache::instance().getTabVisualDeckStorageOpen()) {
-        openTabVisualDeckStorage();
-    }
     if (SettingsCache::instance().getTabDeckStorageOpen()) {
         openTabDeckStorage();
     }
@@ -389,13 +348,6 @@ void TabSupervisor::resetTabsMenu()
 {
     tabsMenu->clear();
     tabsMenu->addAction(aTabDeckEditor);
-    tabsMenu->addAction(aTabVisualDeckEditor);
-    tabsMenu->addAction(aTabEdhRec);
-    tabsMenu->addAction(aTabArchidekt);
-    tabsMenu->addSeparator();
-    tabsMenu->addAction(aTabHome);
-    tabsMenu->addAction(aTabVisualDeckStorage);
-    tabsMenu->addAction(aTabVisualDatabaseDisplay);
     tabsMenu->addAction(aTabDeckStorage);
     tabsMenu->addAction(aTabReplays);
 }
@@ -504,51 +456,6 @@ void TabSupervisor::stop()
 
     delete userInfo;
     userInfo = nullptr;
-}
-
-void TabSupervisor::actTabHome(bool checked)
-{
-    if (checked && !tabHome) {
-        openTabHome();
-        setCurrentWidget(tabHome);
-    } else if (!checked && tabHome) {
-        tabHome->closeRequest();
-    }
-}
-
-void TabSupervisor::openTabHome()
-{
-    tabHome = new TabHome(this, client);
-    myAddTab(tabHome, aTabHome);
-    connect(tabHome, &QObject::destroyed, this, [this] {
-        tabHome = nullptr;
-        aTabHome->setChecked(false);
-    });
-    aTabHome->setChecked(true);
-}
-
-void TabSupervisor::actTabVisualDeckStorage(bool checked)
-{
-    SettingsCache::instance().setTabVisualDeckStorageOpen(checked);
-    if (checked && !tabVisualDeckStorage) {
-        openTabVisualDeckStorage();
-        setCurrentWidget(tabVisualDeckStorage);
-    } else if (checked && tabVisualDeckStorage) {
-        setCurrentWidget(tabVisualDeckStorage);
-    } else if (!checked && tabVisualDeckStorage) {
-        tabVisualDeckStorage->closeRequest();
-    }
-}
-
-void TabSupervisor::openTabVisualDeckStorage()
-{
-    tabVisualDeckStorage = new TabDeckStorageVisual(this);
-    myAddTab(tabVisualDeckStorage, aTabVisualDeckStorage);
-    connect(tabVisualDeckStorage, &QObject::destroyed, this, [this] {
-        tabVisualDeckStorage = nullptr;
-        aTabVisualDeckStorage->setChecked(false);
-    });
-    aTabVisualDeckStorage->setChecked(true);
 }
 
 void TabSupervisor::actTabServer(bool checked)
@@ -850,20 +757,7 @@ void TabSupervisor::talkLeft(TabMessage *tab)
  */
 void TabSupervisor::openDeckInNewTab(const LoadedDeck &deckToOpen)
 {
-    int type = SettingsCache::instance().getDefaultDeckEditorType();
-    switch (type) {
-        case ClassicDeckEditor:
-            addDeckEditorTab(deckToOpen);
-            break;
-        case VisualDeckEditor:
-            addVisualDeckEditorTab(deckToOpen);
-            break;
-        default:
-            qCWarning(TabSupervisorLog) << "Unknown DeckEditorType [" << type
-                                        << "]; opening ClassicDeckEditor as fallback";
-            addDeckEditorTab(deckToOpen);
-            break;
-    }
+    addDeckEditorTab(deckToOpen);
 }
 
 /**
@@ -878,56 +772,6 @@ TabDeckEditor *TabSupervisor::addDeckEditorTab(const LoadedDeck &deckToOpen)
     connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addDeckEditorTab);
     myAddTab(tab);
     deckEditorTabs.append(tab);
-    setCurrentWidget(tab);
-    return tab;
-}
-
-TabDeckEditorVisual *TabSupervisor::addVisualDeckEditorTab(const LoadedDeck &deckToOpen)
-{
-    auto *tab = new TabDeckEditorVisual(this);
-    tab->openDeck(deckToOpen);
-    connect(tab, &AbstractTabDeckEditor::deckEditorClosing, this, &TabSupervisor::deckEditorClosed);
-    connect(tab, &AbstractTabDeckEditor::openDeckEditor, this, &TabSupervisor::addVisualDeckEditorTab);
-    myAddTab(tab);
-    deckEditorTabs.append(tab);
-    setCurrentWidget(tab);
-    return tab;
-}
-
-TabEdhRecMain *TabSupervisor::addEdhrecMainTab()
-{
-    auto *tab = new TabEdhRecMain(this);
-
-    myAddTab(tab);
-    setCurrentWidget(tab);
-    return tab;
-}
-
-TabArchidekt *TabSupervisor::addArchidektTab()
-{
-    auto *tab = new TabArchidekt(this);
-
-    myAddTab(tab);
-    setCurrentWidget(tab);
-    return tab;
-}
-
-TabVisualDatabaseDisplay *TabSupervisor::addVisualDatabaseDisplayTab()
-{
-    auto *tab = new TabVisualDatabaseDisplay(this);
-    myAddTab(tab);
-    setCurrentWidget(tab);
-    return tab;
-}
-
-TabEdhRec *TabSupervisor::addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander)
-{
-    auto *tab = new TabEdhRec(this);
-    if (cardToQuery) {
-        tab->setCard(cardToQuery, isCommander);
-    }
-
-    myAddTab(tab);
     setCurrentWidget(tab);
     return tab;
 }

@@ -14,13 +14,6 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 
-static bool canBeCommander(const CardInfo &cardInfo)
-{
-    return (cardInfo.getCardType().contains("Legendary", Qt::CaseInsensitive) &&
-            cardInfo.getCardType().contains("Creature", Qt::CaseInsensitive)) ||
-           cardInfo.getText().contains("can be your commander", Qt::CaseInsensitive);
-}
-
 DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent, AbstractTabDeckEditor *deckEditor)
     : QWidget(parent), deckEditor(deckEditor)
 {
@@ -186,22 +179,14 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
 
     if (card) {
         // add to deck and sideboard options
-        QAction *addToDeck, *addToSideboard, *selectPrinting, *edhRecCommander, *edhRecCard;
+        QAction *addToDeck, *addToSideboard, *selectPrinting;
         addToDeck = menu.addAction(tr("Add to Deck"));
         addToSideboard = menu.addAction(tr("Add to Sideboard"));
         selectPrinting = menu.addAction(tr("Select Printing"));
         connect(selectPrinting, &QAction::triggered, this, [this, card] { deckEditor->showPrintingSelector(); });
-        if (canBeCommander(card.getInfo())) {
-            edhRecCommander = menu.addAction(tr("Show on EDHRec (Commander)"));
-            connect(edhRecCommander, &QAction::triggered, this,
-                    [this, card] { deckEditor->getTabSupervisor()->addEdhrecTab(card.getCardPtr(), true); });
-        }
-        edhRecCard = menu.addAction(tr("Show on EDHRec (Card)"));
 
         connect(addToDeck, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
         connect(addToSideboard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-        connect(edhRecCard, &QAction::triggered, this,
-                [this, card] { deckEditor->getTabSupervisor()->addEdhrecTab(card.getCardPtr()); });
 
         // filling out the related cards submenu
         auto *relatedMenu = new QMenu(tr("Show Related cards"));

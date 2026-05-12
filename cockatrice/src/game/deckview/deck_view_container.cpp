@@ -46,7 +46,7 @@ void ToggleButton::setState(bool _state)
 }
 
 DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
-    : QWidget(nullptr), visualDeckStorageWidget(nullptr), parentGame(parent), playerId(_playerId)
+    : QWidget(nullptr), parentGame(parent), playerId(_playerId)
 {
     loadLocalButton = new QPushButton;
     loadRemoteButton = new QPushButton;
@@ -101,23 +101,6 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
     switchToDeckSelectView();
 }
 
-/**
- * Creates the VDS widget and inserts it into the layout. No-ops if the widget already exists
- */
-void DeckViewContainer::tryCreateVisualDeckStorageWidget()
-{
-    if (visualDeckStorageWidget) {
-        return;
-    }
-
-    visualDeckStorageWidget = new VisualDeckStorageWidget(this);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckLoadRequested, this,
-            &DeckViewContainer::loadDeckFromFile);
-    connect(visualDeckStorageWidget, &VisualDeckStorageWidget::openDeckEditor, parentGame, &TabGame::openDeckEditor);
-
-    deckViewLayout->addWidget(visualDeckStorageWidget);
-}
-
 void DeckViewContainer::retranslateUi()
 {
     loadLocalButton->setText(tr("Load deck..."));
@@ -138,17 +121,7 @@ static void setVisibility(QPushButton *button, bool visible)
 
 void DeckViewContainer::switchToDeckSelectView()
 {
-    if (SettingsCache::instance().getVisualDeckStorageInGame()) {
-        deckView->setHidden(true);
-
-        tryCreateVisualDeckStorageWidget();
-        visualDeckStorageWidget->setHidden(false);
-    } else {
-        deckView->setHidden(false);
-        if (visualDeckStorageWidget) {
-            visualDeckStorageWidget->setHidden(true);
-        }
-    }
+    deckView->setHidden(false);
 
     deckViewLayout->update();
 
@@ -172,9 +145,6 @@ void DeckViewContainer::switchToDeckSelectView()
 void DeckViewContainer::switchToDeckLoadedView()
 {
     deckView->setHidden(false);
-    if (visualDeckStorageWidget) {
-        visualDeckStorageWidget->setHidden(true);
-    }
 
     deckViewLayout->update();
 
@@ -227,15 +197,9 @@ void DeckViewContainer::setVisualDeckStorageExists(bool exists)
         if (loadLocalButton->isEnabled()) {
             // We only need to handle the setting changing while in deck select state; tryCreate already gets called
             // when switching from deck loaded to deck select state
-            tryCreateVisualDeckStorageWidget();
-            visualDeckStorageWidget->setHidden(false);
             deckView->setHidden(true);
         }
     } else {
-        if (visualDeckStorageWidget) {
-            visualDeckStorageWidget->deleteLater();
-            visualDeckStorageWidget = nullptr;
-        }
         deckView->setHidden(false);
     }
 
