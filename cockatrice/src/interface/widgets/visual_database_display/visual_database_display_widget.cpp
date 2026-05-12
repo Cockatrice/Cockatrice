@@ -237,6 +237,11 @@ void VisualDatabaseDisplayWidget::updateSearch(const QString &search) const
                                                         QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
 }
 
+bool VisualDatabaseDisplayWidget::isVisualDisplayMode() const
+{
+    return !displayModeButton->isChecked();
+}
+
 void VisualDatabaseDisplayWidget::onSearchModelChanged()
 {
     if (flowWidget->isVisible()) {
