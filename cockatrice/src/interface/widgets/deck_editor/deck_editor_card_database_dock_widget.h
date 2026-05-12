@@ -23,7 +23,6 @@ public:
 public slots:
     void retranslateUi();
     void clearAllDatabaseFilters();
-    void highlightAllSearchEdit();
 
 private:
     void createDatabaseDisplayDock(AbstractTabDeckEditor *deckEditor);
