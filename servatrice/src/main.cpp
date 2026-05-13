@@ -69,19 +69,22 @@ void testRNG()
     for (int i = 0; i <= maxMax - min; ++i) {
         std::cerr << (min + i);
         for (auto &number : numbers) {
-            if (i < number.size())
+            if (i < number.size()) {
                 std::cerr << "\t" << number[i];
-            else
+            } else {
                 std::cerr << "\t";
+            }
         }
         std::cerr << std::endl;
     }
     std::cerr << std::endl << "Chi^2 =";
-    for (double j : chisq)
+    for (double j : chisq) {
         std::cerr << "\t" << QString::number(j, 'f', 3).toStdString();
+    }
     std::cerr << std::endl << "k =";
-    for (int j = 0; j < chisq.size(); ++j)
+    for (int j = 0; j < chisq.size(); ++j) {
         std::cerr << "\t" << (j - min + minMax);
+    }
     std::cerr << std::endl << std::endl;
 }
 
@@ -90,8 +93,9 @@ void testHash()
     const int n = 5000;
     std::cerr << "Benchmarking password hash function (n =" << n << ")..." << std::endl;
     QDateTime startTime = QDateTime::currentDateTime();
-    for (int i = 0; i < n; ++i)
+    for (int i = 0; i < n; ++i) {
         PasswordHasher::computeHash("aaaaaa", "aaaaaaaaaaaaaaaa");
+    }
     QDateTime endTime = QDateTime::currentDateTime();
     std::cerr << startTime.secsTo(endTime) << "secs" << std::endl;
 }
@@ -157,10 +161,11 @@ int main(int argc, char *argv[])
     QMetaObject::invokeMethod(logger, "startLog", Qt::BlockingQueuedConnection,
                               Q_ARG(QString, settingsCache->value("server/logfile", QString("server.log")).toString()));
 
-    if (logToConsole)
+    if (logToConsole) {
         qInstallMessageHandler(myMessageOutput);
-    else
+    } else {
         qInstallMessageHandler(myMessageOutput2);
+    }
 
     signalhandler = new SignalHandler();
 

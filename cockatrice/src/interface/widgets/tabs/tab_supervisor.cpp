@@ -86,18 +86,22 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
     QStyleOption opt;
     opt.initFrom(this);
     opt.state |= QStyle::State_AutoRaise;
-    if (isEnabled() && underMouse() && !isChecked() && !isDown())
+    if (isEnabled() && underMouse() && !isChecked() && !isDown()) {
         opt.state |= QStyle::State_Raised;
-    if (isChecked())
+    }
+    if (isChecked()) {
         opt.state |= QStyle::State_On;
-    if (isDown())
+    }
+    if (isDown()) {
         opt.state |= QStyle::State_Sunken;
+    }
 
     if (const auto *tb = qobject_cast<const QTabBar *>(parent())) {
         int index = tb->currentIndex();
         auto position = (QTabBar::ButtonPosition)style()->styleHint(QStyle::SH_TabBar_CloseButtonPosition, nullptr, tb);
-        if (tb->tabButton(index, position) == this)
+        if (tb->tabButton(index, position) == this) {
             opt.state |= QStyle::State_Selected;
+        }
     }
 
     style()->drawPrimitive(QStyle::PE_IndicatorTabClose, &opt, &p, this);
@@ -228,20 +232,25 @@ void TabSupervisor::retranslateUi()
     tabs.append(tabAccount);
     tabs.append(tabLog);
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
-    while (roomIterator.hasNext())
+    while (roomIterator.hasNext()) {
         tabs.append(roomIterator.next().value());
+    }
     QMapIterator<int, TabGame *> gameIterator(gameTabs);
-    while (gameIterator.hasNext())
+    while (gameIterator.hasNext()) {
         tabs.append(gameIterator.next().value());
+    }
     QListIterator<TabGame *> replayIterator(replayTabs);
-    while (replayIterator.hasNext())
+    while (replayIterator.hasNext()) {
         tabs.append(replayIterator.next());
+    }
     QListIterator<AbstractTabDeckEditor *> deckEditorIterator(deckEditorTabs);
-    while (deckEditorIterator.hasNext())
+    while (deckEditorIterator.hasNext()) {
         tabs.append(deckEditorIterator.next());
+    }
     QMapIterator<QString, TabMessage *> messageIterator(messageTabs);
-    while (messageIterator.hasNext())
+    while (messageIterator.hasNext()) {
         tabs.append(messageIterator.next().value());
+    }
 
     for (auto &tab : tabs) {
         if (tab) {
@@ -448,9 +457,10 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     isLocalGame = true;
     userInfo = new ServerInfo_User;
     localClients = _clients;
-    for (int i = 0; i < localClients.size(); ++i)
+    for (int i = 0; i < localClients.size(); ++i) {
         connect(localClients[i], &AbstractClient::gameEventContainerReceived, this,
                 &TabSupervisor::processGameEventContainer);
+    }
     connect(localClients.first(), &AbstractClient::gameJoinedEventReceived, this, &TabSupervisor::localGameJoined);
 }
 
@@ -459,8 +469,9 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
  */
 void TabSupervisor::stop()
 {
-    if ((!client) && localClients.isEmpty())
+    if ((!client) && localClients.isEmpty()) {
         return;
+    }
 
     resetTabsMenu();
 
@@ -694,10 +705,12 @@ void TabSupervisor::openTabLog()
 
 void TabSupervisor::updatePingTime(int value, int max)
 {
-    if (!tabServer)
+    if (!tabServer) {
         return;
-    if (tabServer->getContentsChanged())
+    }
+    if (tabServer->getContentsChanged()) {
         return;
+    }
 
     setTabIcon(indexOf(tabServer), QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
 }
@@ -706,12 +719,14 @@ void TabSupervisor::gameJoined(const Event_GameJoined &event)
 {
     QMap<int, QString> roomGameTypes;
     TabRoom *room = roomTabs.value(event.game_info().room_id());
-    if (room)
+    if (room) {
         roomGameTypes = room->getGameTypes();
-    else
-        for (int i = 0; i < event.game_types_size(); ++i)
+    } else {
+        for (int i = 0; i < event.game_types_size(); ++i) {
             roomGameTypes.insert(event.game_types(i).game_type_id(),
                                  QString::fromStdString(event.game_types(i).description()));
+        }
+    }
 
     auto *tab = new TabGame(this, QList<AbstractClient *>() << client, event, roomGameTypes);
     connect(tab, &TabGame::gameClosing, this, &TabSupervisor::gameLeft);
@@ -740,14 +755,16 @@ void TabSupervisor::localGameJoined(const Event_GameJoined &event)
 
 void TabSupervisor::gameLeft(TabGame *tab)
 {
-    if (tab == currentWidget())
+    if (tab == currentWidget()) {
         emit setMenu();
+    }
 
     gameTabs.remove(tab->getGame()->getGameMetaInfo()->gameId());
     removeTab(indexOf(tab));
 
-    if (!localClients.isEmpty())
+    if (!localClients.isEmpty()) {
         stop();
+    }
 }
 
 void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
@@ -758,14 +775,16 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     connect(tab, &TabRoom::openMessageDialog, this, &TabSupervisor::addMessageTab);
     myAddTab(tab);
     roomTabs.insert(info.room_id(), tab);
-    if (setCurrent)
+    if (setCurrent) {
         setCurrentWidget(tab);
+    }
 }
 
 void TabSupervisor::roomLeft(TabRoom *tab)
 {
-    if (tab == currentWidget())
+    if (tab == currentWidget()) {
         emit setMenu();
+    }
 
     roomTabs.remove(tab->getRoomId());
     removeTab(indexOf(tab));
@@ -793,16 +812,18 @@ void TabSupervisor::openReplay(GameReplay *replay)
 
 void TabSupervisor::replayLeft(TabGame *tab)
 {
-    if (tab == currentWidget())
+    if (tab == currentWidget()) {
         emit setMenu();
+    }
 
     replayTabs.removeOne(tab);
 }
 
 TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus)
 {
-    if (receiverName == QString::fromStdString(userInfo->name()))
+    if (receiverName == QString::fromStdString(userInfo->name())) {
         return nullptr;
+    }
 
     ServerInfo_User otherUser;
     if (auto user = userListManager->getOnlineUser(receiverName)) {
@@ -814,8 +835,9 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     TabMessage *tab;
     tab = messageTabs.value(QString::fromStdString(otherUser.name()));
     if (tab) {
-        if (focus)
+        if (focus) {
             setCurrentWidget(tab);
+        }
         return tab;
     }
 
@@ -824,8 +846,9 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     connect(tab, &TabMessage::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     myAddTab(tab);
     messageTabs.insert(receiverName, tab);
-    if (focus)
+    if (focus) {
         setCurrentWidget(tab);
+    }
     return tab;
 }
 
@@ -836,8 +859,9 @@ void TabSupervisor::maximizeMainWindow()
 
 void TabSupervisor::talkLeft(TabMessage *tab)
 {
-    if (tab == currentWidget())
+    if (tab == currentWidget()) {
         emit setMenu();
+    }
 
     messageTabs.remove(tab->getUserName());
     removeTab(indexOf(tab));
@@ -934,8 +958,9 @@ TabEdhRec *TabSupervisor::addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCo
 
 void TabSupervisor::deckEditorClosed(AbstractTabDeckEditor *tab)
 {
-    if (tab == currentWidget())
+    if (tab == currentWidget()) {
         emit setMenu();
+    }
 
     deckEditorTabs.removeOne(tab);
     removeTab(indexOf(tab));
@@ -948,8 +973,9 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
         tab->setContentsChanged(true);
         setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
     }
-    if (globalEvent && SettingsCache::instance().getNotificationsEnabled())
+    if (globalEvent && SettingsCache::instance().getNotificationsEnabled()) {
         QApplication::alert(this);
+    }
 }
 
 void TabSupervisor::updateTabText(Tab *tab, const QString &newTabText)
@@ -962,39 +988,44 @@ void TabSupervisor::updateTabText(Tab *tab, const QString &newTabText)
 void TabSupervisor::processRoomEvent(const RoomEvent &event)
 {
     TabRoom *tab = roomTabs.value(event.room_id(), 0);
-    if (tab)
+    if (tab) {
         tab->processRoomEvent(event);
+    }
 }
 
 void TabSupervisor::processGameEventContainer(const GameEventContainer &cont)
 {
     TabGame *tab = gameTabs.value(cont.game_id());
-    if (tab)
+    if (tab) {
         tab->getGame()->getGameEventHandler()->processGameEventContainer(cont, qobject_cast<AbstractClient *>(sender()),
                                                                          {});
-    else
+    } else {
         qCInfo(TabSupervisorLog) << "gameEvent: invalid gameId" << cont.game_id();
+    }
 }
 
 void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
 {
     QString senderName = QString::fromStdString(event.sender_name());
     TabMessage *tab = messageTabs.value(senderName);
-    if (!tab)
+    if (!tab) {
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
+    }
     if (!tab) {
         const ServerInfo_User *onlineUserInfo = userListManager->getOnlineUser(senderName);
         if (onlineUserInfo) {
             auto userLevel = UserLevelFlags(onlineUserInfo->user_level());
             if (SettingsCache::instance().getIgnoreUnregisteredUserMessages() &&
-                !userLevel.testFlag(ServerInfo_User::IsRegistered))
+                !userLevel.testFlag(ServerInfo_User::IsRegistered)) {
                 // Flags are additive, so reg/mod/admin are all IsRegistered
                 return;
+            }
         }
         tab = addMessageTab(QString::fromStdString(event.sender_name()), false);
     }
-    if (!tab)
+    if (!tab) {
         return;
+    }
     tab->processUserMessageEvent(event);
 }
 
@@ -1012,8 +1043,9 @@ void TabSupervisor::actShowPopup(const QString &message)
 void TabSupervisor::processUserLeft(const QString &userName)
 {
     TabMessage *tab = messageTabs.value(userName);
-    if (tab)
+    if (tab) {
         tab->processUserLeft();
+    }
 }
 
 void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
@@ -1037,8 +1069,9 @@ void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
     }
 
     TabMessage *tab = messageTabs.value(userName);
-    if (tab)
+    if (tab) {
         tab->processUserJoined(userInfoJoined);
+    }
 }
 
 void TabSupervisor::updateCurrent(int index)
@@ -1051,8 +1084,9 @@ void TabSupervisor::updateCurrent(int index)
         }
         emit setMenu(static_cast<Tab *>(widget(index))->getTabMenus());
         tab->tabActivated();
-    } else
+    } else {
         emit setMenu();
+    }
 }
 
 /**
@@ -1062,8 +1096,9 @@ void TabSupervisor::updateCurrent(int index)
  */
 bool TabSupervisor::getAdminLocked() const
 {
-    if (!tabAdmin)
+    if (!tabAdmin) {
         return true;
+    }
     return tabAdmin->getLocked();
 }
 
@@ -1087,12 +1122,13 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
                 tr("You have been promoted. Please log out and back in for changes to take effect."));
             break;
         case Event_NotifyUser::WARNING: {
-            if (!QString::fromStdString(event.warning_reason()).simplified().isEmpty())
+            if (!QString::fromStdString(event.warning_reason()).simplified().isEmpty()) {
                 QMessageBox::warning(this, tr("Warned"),
                                      tr("You have received a warning due to %1.\nPlease refrain from engaging in this "
                                         "activity or further actions may be taken against you. If you have any "
                                         "questions, please private message a moderator.")
                                          .arg(QString::fromStdString(event.warning_reason()).simplified()));
+            }
             break;
         }
         case Event_NotifyUser::CUSTOM: {

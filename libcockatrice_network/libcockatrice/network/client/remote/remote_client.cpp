@@ -213,8 +213,9 @@ Command_Login RemoteClient::generateCommandLogin()
 
     if (!clientFeatures.isEmpty()) {
         QMap<QString, bool>::iterator i;
-        for (i = clientFeatures.begin(); i != clientFeatures.end(); ++i)
+        for (i = clientFeatures.begin(); i != clientFeatures.end(); ++i) {
             cmdLogin.add_clientfeatures(i.key().toStdString().c_str());
+        }
     }
 
     return cmdLogin;
@@ -284,8 +285,9 @@ void RemoteClient::loginResponse(const Response &response)
 
     QString possibleMissingFeatures;
     if (resp.missing_features_size() > 0) {
-        for (int i = 0; i < resp.missing_features_size(); ++i)
+        for (int i = 0; i < resp.missing_features_size(); ++i) {
             possibleMissingFeatures.append("," + QString::fromStdString(resp.missing_features(i)));
+        }
     }
 
     if (response.response_code() == Response::RespOk) {
@@ -293,13 +295,15 @@ void RemoteClient::loginResponse(const Response &response)
         emit userInfoChanged(resp.user_info());
 
         QList<ServerInfo_User> buddyList;
-        for (int i = resp.buddy_list_size() - 1; i >= 0; --i)
+        for (int i = resp.buddy_list_size() - 1; i >= 0; --i) {
             buddyList.append(resp.buddy_list(i));
+        }
         emit buddyListReceived(buddyList);
 
         QList<ServerInfo_User> ignoreList;
-        for (int i = resp.ignore_list_size() - 1; i >= 0; --i)
+        for (int i = resp.ignore_list_size() - 1; i >= 0; --i) {
             ignoreList.append(resp.ignore_list(i));
+        }
         emit ignoreListReceived(ignoreList);
 
         if (newMissingFeatureFound(possibleMissingFeatures) && resp.missing_features_size() > 0 &&
@@ -311,8 +315,9 @@ void RemoteClient::loginResponse(const Response &response)
     } else if (response.response_code() != Response::RespNotConnected) {
         QList<QString> missingFeatures;
         if (resp.missing_features_size() > 0) {
-            for (int i = 0; i < resp.missing_features_size(); ++i)
+            for (int i = 0; i < resp.missing_features_size(); ++i) {
                 missingFeatures << QString::fromStdString(resp.missing_features(i));
+            }
         }
         emit loginError(response.response_code(), QString::fromStdString(resp.denied_reason_str()),
                         static_cast<quint32>(resp.denied_end_time()), missingFeatures);
@@ -383,11 +388,13 @@ void RemoteClient::readData()
                     inputBuffer.remove(0, 4);
                     messageInProgress = true;
                 }
-            } else
+            } else {
                 return;
+            }
         }
-        if (inputBuffer.size() < messageLength)
+        if (inputBuffer.size() < messageLength) {
             return;
+        }
 
         ServerMessage newServerMessage;
         bool ok = newServerMessage.ParseFromArray(inputBuffer.data(), messageLength);
@@ -403,8 +410,9 @@ void RemoteClient::readData()
             qCDebug(RemoteClientLog) << "parsing error!";
         }
 
-        if (getStatus() == StatusDisconnecting) // use thread-safe getter
+        if (getStatus() == StatusDisconnecting) { // use thread-safe getter
             doDisconnectFromServer();
+        }
     } while (!inputBuffer.isEmpty());
 }
 
@@ -537,8 +545,9 @@ void RemoteClient::doDisconnectFromServer()
     pendingCommands.clear();
 
     setStatus(StatusDisconnected);
-    if (websocket->isValid())
+    if (websocket->isValid()) {
         websocket->close();
+    }
     socket->close();
 }
 
@@ -615,8 +624,9 @@ bool RemoteClient::newMissingFeatureFound(const QString &_serversMissingFeatures
     QStringList serversMissingFeaturesList = _serversMissingFeatures.split(",");
     for (const QString &feature : serversMissingFeaturesList) {
         if (!feature.isEmpty()) {
-            if (!networkSettingsProvider->getKnownMissingFeatures().contains(feature))
+            if (!networkSettingsProvider->getKnownMissingFeatures().contains(feature)) {
                 return true;
+            }
         }
     }
     return newMissingFeature;
@@ -628,8 +638,9 @@ void RemoteClient::clearNewClientFeatures()
     QStringList existingKnownMissingFeatures = networkSettingsProvider->getKnownMissingFeatures().split(",");
     for (const QString &existingKnownFeature : existingKnownMissingFeatures) {
         if (!existingKnownFeature.isEmpty()) {
-            if (!clientFeatures.contains(existingKnownFeature))
+            if (!clientFeatures.contains(existingKnownFeature)) {
                 newKnownMissingFeatures.append("," + existingKnownFeature);
+            }
         }
     }
     networkSettingsProvider->setKnownMissingFeatures(newKnownMissingFeatures);
@@ -667,10 +678,12 @@ void RemoteClient::requestForgotPasswordResponse(const Response &response)
     if (response.response_code() == Response::RespOk) {
         if (resp.challenge_email()) {
             emit sigPromptForForgotPasswordChallenge();
-        } else
+        } else {
             emit sigPromptForForgotPasswordReset();
-    } else
+        }
+    } else {
         emit sigForgotPasswordError();
+    }
 
     doDisconnectFromServer();
 }
@@ -698,8 +711,9 @@ void RemoteClient::submitForgotPasswordResetResponse(const Response &response)
 {
     if (response.response_code() == Response::RespOk) {
         emit sigForgotPasswordSuccess();
-    } else
+    } else {
         emit sigForgotPasswordError();
+    }
 
     doDisconnectFromServer();
 }
@@ -732,8 +746,9 @@ void RemoteClient::submitForgotPasswordChallengeResponse(const Response &respons
 {
     if (response.response_code() == Response::RespOk) {
         emit sigPromptForForgotPasswordReset();
-    } else
+    } else {
         emit sigForgotPasswordError();
+    }
 
     doDisconnectFromServer();
 }

@@ -242,9 +242,10 @@ void VisualDatabaseDisplayWidget::updateSearch(const QString &search) const
 {
     databaseDisplayModel->setStringFilter(search);
     QModelIndexList sel = databaseView->selectionModel()->selectedRows();
-    if (sel.isEmpty() && databaseDisplayModel->rowCount())
+    if (sel.isEmpty() && databaseDisplayModel->rowCount()) {
         databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
                                                         QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+    }
 }
 
 bool VisualDatabaseDisplayWidget::isVisualDisplayMode() const

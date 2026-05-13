@@ -95,8 +95,9 @@ void DlgDefaultTagsEditor::addItem()
     // Prevent duplicate tags
     for (int i = 0; i < listWidget->count(); ++i) {
         QWidget *widget = listWidget->itemWidget(listWidget->item(i));
-        if (!widget)
+        if (!widget) {
             continue;
+        }
         QLineEdit *lineEdit = widget->findChild<QLineEdit *>();
         if (lineEdit && lineEdit->text() == newTag) {
             QMessageBox::warning(this, tr("Duplicate Tag"), tr("This tag already exists."));
@@ -138,8 +139,9 @@ void DlgDefaultTagsEditor::confirmChanges()
     QStringList updatedList;
     for (int i = 0; i < listWidget->count(); ++i) {
         QWidget *widget = listWidget->itemWidget(listWidget->item(i));
-        if (!widget)
+        if (!widget) {
             continue;
+        }
         QLineEdit *lineEdit = widget->findChild<QLineEdit *>();
         if (lineEdit) {
             updatedList.append(lineEdit->text());

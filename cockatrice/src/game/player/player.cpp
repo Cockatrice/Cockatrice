@@ -63,8 +63,9 @@ Player::~Player()
     qCInfo(PlayerLog) << "Player destructor:" << getPlayerInfo()->getName();
 
     QMapIterator<QString, CardZoneLogic *> i(zones);
-    while (i.hasNext())
+    while (i.hasNext()) {
         delete i.next().value();
+    }
     zones.clear();
 
     delete playerMenu;

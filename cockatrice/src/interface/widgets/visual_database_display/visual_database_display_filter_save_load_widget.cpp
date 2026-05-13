@@ -57,8 +57,9 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::retranslateUi()
 void VisualDatabaseDisplayFilterSaveLoadWidget::saveFilter()
 {
     QString filename = filenameInput->text().trimmed();
-    if (filename.isEmpty())
+    if (filename.isEmpty()) {
         return;
+    }
 
     QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filename + ".json";
 
@@ -88,19 +89,22 @@ void VisualDatabaseDisplayFilterSaveLoadWidget::loadFilter(const QString &filena
     QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filename;
 
     QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly))
+    if (!file.open(QIODevice::ReadOnly)) {
         return;
+    }
 
     QByteArray jsonData = file.readAll();
     file.close();
 
     QJsonDocument doc = QJsonDocument::fromJson(jsonData);
-    if (!doc.isObject())
+    if (!doc.isObject()) {
         return;
+    }
 
     QJsonObject root = doc.object();
-    if (!root.contains("filters") || !root["filters"].isArray())
+    if (!root.contains("filters") || !root["filters"].isArray()) {
         return;
+    }
 
     QJsonArray filtersArray = root["filters"].toArray();
 

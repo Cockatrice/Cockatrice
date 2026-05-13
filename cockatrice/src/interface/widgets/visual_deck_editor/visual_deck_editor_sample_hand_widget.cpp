@@ -112,13 +112,15 @@ static QList<ExactCard> cardNodesToExactCards(QList<const DecklistCardNode *> no
 QList<ExactCard> VisualDeckEditorSampleHandWidget::getRandomCards(int amountToGet)
 {
     QList<ExactCard> randomCards;
-    if (!deckListModel)
+    if (!deckListModel) {
         return randomCards;
+    }
 
     QList<ExactCard> mainDeckCards = cardNodesToExactCards(deckListModel->getCardNodesForZone(DECK_ZONE_MAIN));
 
-    if (mainDeckCards.isEmpty())
+    if (mainDeckCards.isEmpty()) {
         return randomCards;
+    }
 
     // Shuffle the deck
     std::random_device rd;

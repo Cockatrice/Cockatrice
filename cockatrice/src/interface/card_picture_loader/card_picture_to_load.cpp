@@ -63,8 +63,9 @@ static PrintingInfo findPrintingForSet(const ExactCard &card, const QString &set
 {
     SetToPrintingsMap setsToPrintings = card.getInfo().getSets();
 
-    if (!setsToPrintings.contains(setName))
+    if (!setsToPrintings.contains(setName)) {
         return PrintingInfo();
+    }
 
     for (const auto &printing : setsToPrintings[setName]) {
         if (printing.getUuid() == card.getPrinting().getUuid()) {

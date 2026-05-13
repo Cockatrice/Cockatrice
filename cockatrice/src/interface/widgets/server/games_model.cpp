@@ -63,14 +63,18 @@ GamesModel::GamesModel(const QMap<int, QString> &_rooms, const QMap<int, GameTyp
 
 QVariant GamesModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
         return QVariant();
-    if (role == Qt::UserRole)
+    }
+    if (role == Qt::UserRole) {
         return index.row();
-    if (role != Qt::DisplayRole && role != SORT_ROLE && role != Qt::DecorationRole && role != Qt::TextAlignmentRole)
+    }
+    if (role != Qt::DisplayRole && role != SORT_ROLE && role != Qt::DecorationRole && role != Qt::TextAlignmentRole) {
         return QVariant();
-    if ((index.row() >= gameList.size()) || (index.column() >= columnCount()))
+    }
+    if ((index.row() >= gameList.size()) || (index.column() >= columnCount())) {
         return QVariant();
+    }
 
     const ServerInfo_Game &gameentry = gameList[index.row()];
     switch (index.column()) {
@@ -126,8 +130,9 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                 case Qt::DisplayRole: {
                     QStringList result;
                     GameTypeMap gameTypeMap = gameTypes.value(gameentry.room_id());
-                    for (int i = gameentry.game_types_size() - 1; i >= 0; --i)
+                    for (int i = gameentry.game_types_size() - 1; i >= 0; --i) {
                         result.append(gameTypeMap.value(gameentry.game_types(i)));
+                    }
                     return result.join(", ");
                 }
                 case Qt::TextAlignmentRole:
@@ -140,14 +145,18 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                 case SORT_ROLE:
                 case Qt::DisplayRole: {
                     QStringList result;
-                    if (gameentry.with_password())
+                    if (gameentry.with_password()) {
                         result.append(tr("password"));
-                    if (gameentry.only_buddies())
+                    }
+                    if (gameentry.only_buddies()) {
                         result.append(tr("buddies only"));
-                    if (gameentry.only_registered())
+                    }
+                    if (gameentry.only_registered()) {
                         result.append(tr("reg. users only"));
-                    if (gameentry.share_decklists_on_load())
+                    }
+                    if (gameentry.share_decklists_on_load()) {
                         result.append(tr("open decklists"));
+                    }
                     return result.join(", ");
                 }
                 case Qt::DecorationRole: {
@@ -205,8 +214,9 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
 
 QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, int role) const
 {
-    if ((role != Qt::DisplayRole) && (role != Qt::TextAlignmentRole))
+    if ((role != Qt::DisplayRole) && (role != Qt::TextAlignmentRole)) {
         return QVariant();
+    }
     switch (section) {
         case ROOM:
             return tr("Room");
@@ -296,8 +306,9 @@ void GamesProxyModel::setGameFilters(const GameFilterConfigs &_filters)
 int GamesProxyModel::getNumFilteredGames() const
 {
     auto *model = qobject_cast<GamesModel *>(sourceModel());
-    if (!model)
+    if (!model) {
         return 0;
+    }
 
     int numFilteredGames = 0;
     for (int row = 0; row < model->rowCount(); ++row) {
@@ -384,8 +395,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     static const QDate epochDate = QDateTime::fromSecsSinceEpoch(0, Qt::UTC).date();
 #endif
     auto *model = qobject_cast<GamesModel *>(sourceModel());
-    if (!model)
+    if (!model) {
         return false;
+    }
 
     const ServerInfo_Game &game = model->getGame(sourceRow);
 
@@ -403,18 +415,25 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
         !userListProxy->isUserBuddy(QString::fromStdString(game.creator_info().name()))) {
         return false;
     }
-    if (filters.hideFullGames && game.player_count() == game.max_players())
+    if (filters.hideFullGames && game.player_count() == game.max_players()) {
         return false;
-    if (filters.hideGamesThatStarted && game.started())
+    }
+    if (filters.hideGamesThatStarted && game.started()) {
         return false;
-    if (!userListProxy->isOwnUserRegistered())
-        if (game.only_registered())
+    }
+    if (!userListProxy->isOwnUserRegistered()) {
+        if (game.only_registered()) {
             return false;
-    if (filters.hidePasswordProtectedGames && game.with_password())
+        }
+    }
+    if (filters.hidePasswordProtectedGames && game.with_password()) {
         return false;
-    if (!filters.gameNameFilter.isEmpty())
-        if (!QString::fromStdString(game.description()).contains(filters.gameNameFilter, Qt::CaseInsensitive))
+    }
+    if (!filters.gameNameFilter.isEmpty()) {
+        if (!QString::fromStdString(game.description()).contains(filters.gameNameFilter, Qt::CaseInsensitive)) {
             return false;
+        }
+    }
     if (!filters.creatorNameFilters.isEmpty()) {
         bool found = false;
         for (const auto &createNameFilter : filters.creatorNameFilters) {
@@ -428,15 +447,19 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     }
 
     QSet<int> gameTypes;
-    for (int i = 0; i < game.game_types_size(); ++i)
+    for (int i = 0; i < game.game_types_size(); ++i) {
         gameTypes.insert(game.game_types(i));
-    if (!filters.gameTypeFilter.isEmpty() && gameTypes.intersect(filters.gameTypeFilter).isEmpty())
+    }
+    if (!filters.gameTypeFilter.isEmpty() && gameTypes.intersect(filters.gameTypeFilter).isEmpty()) {
         return false;
+    }
 
-    if (static_cast<int>(game.max_players()) < filters.maxPlayersFilterMin)
+    if (static_cast<int>(game.max_players()) < filters.maxPlayersFilterMin) {
         return false;
-    if (static_cast<int>(game.max_players()) > filters.maxPlayersFilterMax)
+    }
+    if (static_cast<int>(game.max_players()) > filters.maxPlayersFilterMax) {
         return false;
+    }
 
     if (filters.maxGameAge.isValid()) {
         QDateTime now = QDateTime::currentDateTimeUtc();
@@ -451,14 +474,18 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
     }
 
     if (filters.showOnlyIfSpectatorsCanWatch) {
-        if (!game.spectators_allowed())
+        if (!game.spectators_allowed()) {
             return false;
-        if (!filters.showSpectatorPasswordProtected && game.spectators_need_password())
+        }
+        if (!filters.showSpectatorPasswordProtected && game.spectators_need_password()) {
             return false;
-        if (filters.showOnlyIfSpectatorsCanChat && !game.spectators_can_chat())
+        }
+        if (filters.showOnlyIfSpectatorsCanChat && !game.spectators_can_chat()) {
             return false;
-        if (filters.showOnlyIfSpectatorsCanSeeHands && !game.spectators_omniscient())
+        }
+        if (filters.showOnlyIfSpectatorsCanSeeHands && !game.spectators_omniscient()) {
             return false;
+        }
     }
     return true;
 }

@@ -43,11 +43,13 @@ CardInfoDisplayWidget::CardInfoDisplayWidget(const CardRef &cardRef, QWidget *pa
 
 void CardInfoDisplayWidget::setCard(const ExactCard &card)
 {
-    if (exactCard)
+    if (exactCard) {
         disconnect(exactCard.getCardPtr().data(), nullptr, this, nullptr);
+    }
     exactCard = card;
-    if (exactCard)
+    if (exactCard) {
         connect(exactCard.getCardPtr().data(), &QObject::destroyed, this, &CardInfoDisplayWidget::clear);
+    }
 
     text->setCard(exactCard);
     pic->setCard(exactCard);

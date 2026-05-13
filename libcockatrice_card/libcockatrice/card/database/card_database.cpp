@@ -103,9 +103,11 @@ void CardDatabase::addCard(CardInfoPtr card)
 
     // If a card already exists, just add the new set property.
     if (auto existing = cards.value(name)) {
-        for (const auto &printings : card->getSets())
-            for (const auto &printing : printings)
+        for (const auto &printings : card->getSets()) {
+            for (const auto &printing : printings) {
                 existing->addToSet(printing.getSet(), printing);
+            }
+        }
         return;
     }
 
@@ -123,14 +125,17 @@ void CardDatabase::removeCard(CardInfoPtr card)
         return;
     }
 
-    for (auto *cardRelation : card->getRelatedCards())
+    for (auto *cardRelation : card->getRelatedCards()) {
         cardRelation->deleteLater();
+    }
 
-    for (auto *cardRelation : card->getReverseRelatedCards())
+    for (auto *cardRelation : card->getReverseRelatedCards()) {
         cardRelation->deleteLater();
+    }
 
-    for (auto *cardRelation : card->getReverseRelatedCards2Me())
+    for (auto *cardRelation : card->getReverseRelatedCards2Me()) {
         cardRelation->deleteLater();
+    }
 
     QMutexLocker locker(removeCardMutex);
     cards.remove(card->getName());

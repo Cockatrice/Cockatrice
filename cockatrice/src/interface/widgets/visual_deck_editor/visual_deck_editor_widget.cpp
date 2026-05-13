@@ -71,8 +71,9 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
 {
     searchBar = new QLineEdit(this);
     connect(searchBar, &QLineEdit::returnPressed, this, [=, this]() {
-        if (!searchBar->hasFocus())
+        if (!searchBar->hasFocus()) {
             return;
+        }
 
         ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
         if (card) {

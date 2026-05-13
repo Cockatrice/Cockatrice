@@ -40,8 +40,9 @@ public:
     static QString toId(Type type)
     {
         for (const auto &e : all()) {
-            if (e.type == type)
+            if (e.type == type) {
                 return e.id;
+            }
         }
         return {};
     }
@@ -49,8 +50,9 @@ public:
     static Type fromId(const QString &id)
     {
         for (const auto &e : all()) {
-            if (id == e.id)
+            if (id == e.id) {
                 return e.type;
+            }
         }
         return Theme; // default
     }
@@ -58,8 +60,9 @@ public:
     static QString toDisplay(Type type)
     {
         for (const auto &e : all()) {
-            if (e.type == type)
+            if (e.type == type) {
                 return QObject::tr(e.trKey);
+            }
         }
         return {};
     }

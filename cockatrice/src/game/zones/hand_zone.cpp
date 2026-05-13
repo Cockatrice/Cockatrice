@@ -34,9 +34,11 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     QPoint point = dropPoint + scenePos().toPoint();
     int x = -1;
     if (SettingsCache::instance().getHorizontalHand()) {
-        for (x = 0; x < getLogic()->getCards().size(); x++)
-            if (point.x() < static_cast<CardItem *>(getLogic()->getCards().at(x))->scenePos().x())
+        for (x = 0; x < getLogic()->getCards().size(); x++) {
+            if (point.x() < static_cast<CardItem *>(getLogic()->getCards().at(x))->scenePos().x()) {
                 break;
+            }
+        }
     } else {
         x = calcDropIndexFromY(dropPoint.y());
     }
@@ -49,18 +51,20 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     cmd.set_x(x);
     cmd.set_y(-1);
 
-    for (int i = 0; i < dragItems.size(); ++i)
+    for (int i = 0; i < dragItems.size(); ++i) {
         cmd.mutable_cards_to_move()->add_card()->set_card_id(dragItems[i]->getId());
+    }
 
     getLogic()->getPlayer()->getPlayerActions()->sendGameCommand(cmd);
 }
 
 QRectF HandZone::boundingRect() const
 {
-    if (SettingsCache::instance().getHorizontalHand())
+    if (SettingsCache::instance().getHorizontalHand()) {
         return QRectF(0, 0, width, CardDimensions::HEIGHT_F + 10);
-    else
+    } else {
         return QRectF(0, 0, CardDimensions::WIDTH_F * 1.5, zoneHeight);
+    }
 }
 
 void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -90,9 +94,9 @@ void HandZone::reorganizeCards()
                     CardItem *c = getLogic()->getCards().at(i);
                     // If the total width of the cards is smaller than the available width,
                     // the cards do not need to overlap and are displayed in the center of the area.
-                    if (cardWidth * cardCount > totalWidth)
+                    if (cardWidth * cardCount > totalWidth) {
                         c->setPos(xPadding + ((qreal)i) * (totalWidth - cardWidth) / (cardCount - 1), 5);
-                    else {
+                    } else {
                         qreal xPosition = leftJustified ? xPadding + ((qreal)i) * cardWidth
                                                         : xPadding + ((qreal)i) * cardWidth +
                                                               (totalWidth - cardCount * cardWidth) / 2;

@@ -230,8 +230,9 @@ bool CardPictureLoader::hasCustomArt()
         QFileInfo dir(it.next());
 #endif
 
-        if (it.fileName() == "downloadedPics")
+        if (it.fileName() == "downloadedPics") {
             continue;
+        }
 
         QDirIterator subIt(it.filePath(), QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
         if (subIt.hasNext()) {

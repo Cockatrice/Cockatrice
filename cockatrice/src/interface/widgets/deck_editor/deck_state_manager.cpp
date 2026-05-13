@@ -192,8 +192,9 @@ QModelIndex DeckStateManager::addCard(const ExactCard &card, const QString &zone
 
 QModelIndex DeckStateManager::decrementCard(const ExactCard &card, const QString &zoneName)
 {
-    if (!card)
+    if (!card) {
         return {};
+    }
 
     QString providerId = card.getPrinting().getUuid();
     QString collectorNumber = card.getPrinting().getProperty("num");
@@ -241,15 +242,17 @@ static bool doSwapCard(DeckListModel *model,
 
 bool DeckStateManager::swapCardAtIndex(const QModelIndex &idx)
 {
-    if (!idx.isValid())
+    if (!idx.isValid()) {
         return false;
+    }
 
     QString cardName = idx.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString();
     QString providerId = idx.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data().toString();
     QModelIndex gparent = idx.parent().parent();
 
-    if (!gparent.isValid())
+    if (!gparent.isValid()) {
         return false;
+    }
 
     QString zoneName = gparent.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
     QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;

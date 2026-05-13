@@ -55,8 +55,9 @@ GameScene::~GameScene()
  */
 void GameScene::retranslateUi()
 {
-    for (ZoneViewWidget *view : zoneViews)
+    for (ZoneViewWidget *view : zoneViews) {
         view->retranslateUi();
+    }
 }
 
 QList<CardItem *> GameScene::selectedCards() const
@@ -209,10 +210,12 @@ QList<Player *> GameScene::rotatePlayers(const QList<Player *> &activePlayers, i
     QList<Player *> rotated = activePlayers;
     if (!rotated.isEmpty()) {
         int totalRotation = firstPlayerIndex + playerRotation;
-        while (totalRotation < 0)
+        while (totalRotation < 0) {
             totalRotation += rotated.size();
-        for (int i = 0; i < totalRotation; ++i)
+        }
+        for (int i = 0; i < totalRotation; ++i) {
             rotated.append(rotated.takeFirst());
+        }
     }
     return rotated;
 }
@@ -252,10 +255,11 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &players
 
         for (int j = 0; j < rowsInColumn; ++j) {
             Player *player = playersIter.next();
-            if (col == 0)
+            if (col == 0) {
                 playersByColumn[col].prepend(player->getGraphicsItem());
-            else
+            } else {
                 playersByColumn[col].append(player->getGraphicsItem());
+            }
 
             auto *pgItem = player->getGraphicsItem();
             thisColumnHeight += pgItem->boundingRect().height() + playerAreaSpacing;
@@ -294,8 +298,9 @@ QList<qreal> GameScene::calculateMinWidthByColumn() const
     QList<qreal> minWidthByColumn;
     for (const auto &col : playersByColumn) {
         qreal maxWidth = 0;
-        for (PlayerGraphicsItem *player : col)
+        for (PlayerGraphicsItem *player : col) {
             maxWidth = std::max(maxWidth, player->getMinimumWidth());
+        }
         minWidthByColumn.append(maxWidth);
     }
     return minWidthByColumn;
@@ -356,32 +361,38 @@ void GameScene::updateHover(const QPointF &scenePos)
 
 void GameScene::updateHoveredCard(CardItem *newCard)
 {
-    if (hoveredCard && (newCard != hoveredCard))
+    if (hoveredCard && (newCard != hoveredCard)) {
         endCardHover(hoveredCard);
-    if (newCard && (newCard != hoveredCard))
+    }
+    if (newCard && (newCard != hoveredCard)) {
         beginCardHover(newCard);
+    }
     hoveredCard = newCard;
 }
 
 void GameScene::beginCardHover(CardItem *card)
 {
     card->setHovered(true);
-    if (auto *zone = SelectZone::findOwningSelectZone(card))
+    if (auto *zone = SelectZone::findOwningSelectZone(card)) {
         zone->escapeClipForHover(card);
+    }
 }
 
 void GameScene::endCardHover(CardItem *card)
 {
-    if (auto *zone = SelectZone::findOwningSelectZone(card))
+    if (auto *zone = SelectZone::findOwningSelectZone(card)) {
         zone->restoreClipAfterHover(card);
+    }
     card->setHovered(false);
 }
 
 CardZone *GameScene::findTopmostZone(const QList<QGraphicsItem *> &items)
 {
-    for (QGraphicsItem *item : items)
-        if (auto *zone = qgraphicsitem_cast<CardZone *>(item))
+    for (QGraphicsItem *item : items) {
+        if (auto *zone = qgraphicsitem_cast<CardZone *>(item)) {
             return zone;
+        }
+    }
     return nullptr;
 }
 
@@ -392,14 +403,17 @@ CardItem *GameScene::findTopmostCardInZone(const QList<QGraphicsItem *> &items, 
 
     for (QGraphicsItem *item : items) {
         CardItem *card = qgraphicsitem_cast<CardItem *>(item);
-        if (!card)
+        if (!card) {
             continue;
+        }
 
         if (card->getAttachedTo()) {
-            if (card->getAttachedTo()->getZone() != zone->getLogic())
+            if (card->getAttachedTo()->getZone() != zone->getLogic()) {
                 continue;
-        } else if (card->getZone() != zone->getLogic())
+            }
+        } else if (card->getZone() != zone->getLogic()) {
             continue;
+        }
 
         if (card->getRealZValue() > maxZ) {
             maxZ = card->getRealZValue();
@@ -438,12 +452,13 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
     connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
     addItem(item);
 
-    if (zoneName == ZoneNames::GRAVE)
+    if (zoneName == ZoneNames::GRAVE) {
         item->setPos(360, 100);
-    else if (zoneName == ZoneNames::EXILE)
+    } else if (zoneName == ZoneNames::EXILE) {
         item->setPos(380, 120);
-    else
+    } else {
         item->setPos(340, 80);
+    }
 }
 
 /**
@@ -480,8 +495,9 @@ void GameScene::removeZoneView(ZoneViewWidget *item)
  */
 void GameScene::clearViews()
 {
-    while (!zoneViews.isEmpty())
+    while (!zoneViews.isEmpty()) {
         zoneViews.first()->close();
+    }
 }
 
 /**
@@ -489,8 +505,9 @@ void GameScene::clearViews()
  */
 void GameScene::closeMostRecentZoneView()
 {
-    if (!zoneViews.isEmpty())
+    if (!zoneViews.isEmpty()) {
         zoneViews.last()->close();
+    }
 }
 
 // ---------- View Transforms ----------
@@ -509,10 +526,11 @@ QTransform GameScene::getViewportTransform() const
 
 bool GameScene::event(QEvent *event)
 {
-    if (event->type() == QEvent::GraphicsSceneMouseMove)
+    if (event->type() == QEvent::GraphicsSceneMouseMove) {
         updateHover(static_cast<QGraphicsSceneMouseEvent *>(event)->scenePos());
-    else if (event->type() == QEvent::Leave)
+    } else if (event->type() == QEvent::Leave) {
         updateHoveredCard(nullptr);
+    }
 
     return QGraphicsScene::event(event);
 }
@@ -522,25 +540,29 @@ void GameScene::timerEvent(QTimerEvent * /*event*/)
     QMutableSetIterator<CardItem *> i(cardsToAnimate);
     while (i.hasNext()) {
         i.next();
-        if (!i.value()->animationEvent())
+        if (!i.value()->animationEvent()) {
             i.remove();
+        }
     }
-    if (cardsToAnimate.isEmpty())
+    if (cardsToAnimate.isEmpty()) {
         animationTimer->stop();
+    }
 }
 
 void GameScene::registerAnimationItem(AbstractCardItem *card)
 {
     cardsToAnimate.insert(static_cast<CardItem *>(card));
-    if (!animationTimer->isActive())
+    if (!animationTimer->isActive()) {
         animationTimer->start(10, this);
+    }
 }
 
 void GameScene::unregisterAnimationItem(AbstractCardItem *card)
 {
     cardsToAnimate.remove(static_cast<CardItem *>(card));
-    if (cardsToAnimate.isEmpty())
+    if (cardsToAnimate.isEmpty()) {
         animationTimer->stop();
+    }
 }
 
 // ---------- Rubber Band ----------

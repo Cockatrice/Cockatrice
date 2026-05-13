@@ -24,10 +24,11 @@ SettingsCache &SettingsCache::instance()
 
 QString SettingsCache::getDataPath()
 {
-    if (isPortableBuild)
+    if (isPortableBuild) {
         return qApp->applicationDirPath() + "/data";
-    else
+    } else {
         return QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    }
 }
 
 QString SettingsCache::getSettingsPath()
@@ -37,10 +38,11 @@ QString SettingsCache::getSettingsPath()
 
 QString SettingsCache::getCachePath() const
 {
-    if (isPortableBuild)
+    if (isPortableBuild) {
         return qApp->applicationDirPath() + "/cache";
-    else
+    } else {
         return QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+    }
 }
 
 QString SettingsCache::getNetworkCachePath() const
@@ -50,14 +52,17 @@ QString SettingsCache::getNetworkCachePath() const
 
 void SettingsCache::translateLegacySettings()
 {
-    if (isPortableBuild)
+    if (isPortableBuild) {
         return;
+    }
 
     // Layouts
     QFile layoutFile(getSettingsPath() + "layouts/deckLayout.ini");
-    if (layoutFile.exists())
-        if (layoutFile.copy(getSettingsPath() + "layouts.ini"))
+    if (layoutFile.exists()) {
+        if (layoutFile.copy(getSettingsPath() + "layouts.ini")) {
             layoutFile.remove();
+        }
+    }
 
     QStringList usedKeys;
     QSettings legacySetting;
@@ -116,10 +121,11 @@ void SettingsCache::translateLegacySettings()
     gameFilters().setHideIgnoredUserGames(legacySetting.value("hide_ignored_user_games").toBool());
     gameFilters().setMinPlayers(legacySetting.value("min_players").toInt());
 
-    if (legacySetting.value("max_players").toInt() > 1)
+    if (legacySetting.value("max_players").toInt() > 1) {
         gameFilters().setMaxPlayers(legacySetting.value("max_players").toInt());
-    else
+    } else {
         gameFilters().setMaxPlayers(99); // This prevents a bug where no games will show if max was not set before
+    }
 
     QStringList allFilters = legacySetting.allKeys();
     for (int i = 0; i < allFilters.size(); ++i) {
@@ -135,8 +141,9 @@ void SettingsCache::translateLegacySettings()
 
     QStringList allLegacyKeys = legacySetting.allKeys();
     for (int i = 0; i < allLegacyKeys.size(); ++i) {
-        if (usedKeys.contains(allLegacyKeys.at(i)))
+        if (usedKeys.contains(allLegacyKeys.at(i))) {
             continue;
+        }
         settings->setValue(allLegacyKeys.at(i), legacySetting.value(allLegacyKeys.at(i)));
     }
 }
@@ -147,8 +154,9 @@ QString SettingsCache::getSafeConfigPath(QString configEntry, QString defaultPat
     // if the config settings is empty or refers to a not-existing folder,
     // ensure that the defaut path exists and return it
     if (tmp.isEmpty() || !QDir(tmp).exists()) {
-        if (!QDir().mkpath(defaultPath))
+        if (!QDir().mkpath(defaultPath)) {
             qCInfo(SettingsCacheLog) << "[SettingsCache] Could not create folder:" << defaultPath;
+        }
         tmp = defaultPath;
     }
     return tmp;
@@ -159,8 +167,9 @@ QString SettingsCache::getSafeConfigFilePath(QString configEntry, QString defaul
     QString tmp = settings->value(configEntry).toString();
     // if the config settings is empty or refers to a not-existing file,
     // return the default Path
-    if (!QFile::exists(tmp) || tmp.isEmpty())
+    if (!QFile::exists(tmp) || tmp.isEmpty()) {
         tmp = std::move(defaultPath);
+    }
     return tmp;
 }
 
@@ -168,8 +177,9 @@ SettingsCache::SettingsCache()
 {
     // first, figure out if we are running in portable mode
     isPortableBuild = QFile::exists(qApp->applicationDirPath() + "/portable.dat");
-    if (isPortableBuild)
+    if (isPortableBuild) {
         qCInfo(SettingsCacheLog) << "Portable mode enabled";
+    }
 
     // define a dummy context that will be used where needed
     QString dummy = QT_TRANSLATE_NOOP("i18n", "English");
@@ -189,8 +199,9 @@ SettingsCache::SettingsCache()
 
     cardCounterSettings = new CardCounterSettings(settingsPath, this);
 
-    if (!QFile(settingsPath + "global.ini").exists())
+    if (!QFile(settingsPath + "global.ini").exists()) {
         translateLegacySettings();
+    }
 
     // updates - don't reorder them or their index in the settings won't match
     // append channels one by one, or msvc will add them in the wrong order.
@@ -257,11 +268,13 @@ SettingsCache::SettingsCache()
         settings->setValue("personal/pixmapCacheSize", pixmapCacheSize);
         settings->setValue("personal/picturedownloadhq", false);
         settings->setValue("revert/pixmapCacheSize", true);
-    } else
+    } else {
         pixmapCacheSize = settings->value("personal/pixmapCacheSize", PIXMAPCACHE_SIZE_DEFAULT).toInt();
+    }
     // sanity check
-    if (pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX)
+    if (pixmapCacheSize < PIXMAPCACHE_SIZE_MIN || pixmapCacheSize > PIXMAPCACHE_SIZE_MAX) {
         pixmapCacheSize = PIXMAPCACHE_SIZE_DEFAULT;
+    }
 
     networkCacheSize = settings->value("personal/networkCacheSize", NETWORK_CACHE_SIZE_DEFAULT).toInt();
     redirectCacheTtl = settings->value("personal/redirectCacheTtl", NETWORK_REDIRECT_CACHE_TTL_DEFAULT).toInt();
@@ -770,8 +783,9 @@ void SettingsCache::setPrintingSelectorCardSize(int _printingSelectorCardSize)
 
 void SettingsCache::setIncludeRebalancedCards(bool _includeRebalancedCards)
 {
-    if (includeRebalancedCards == _includeRebalancedCards)
+    if (includeRebalancedCards == _includeRebalancedCards) {
         return;
+    }
 
     includeRebalancedCards = _includeRebalancedCards;
     settings->setValue("cards/includerebalancedcards", includeRebalancedCards);
@@ -1310,8 +1324,9 @@ void SettingsCache::setMaxFontSize(int _max)
 
 void SettingsCache::setRoundCardCorners(bool _roundCardCorners)
 {
-    if (_roundCardCorners == roundCardCorners)
+    if (_roundCardCorners == roundCardCorners) {
         return;
+    }
 
     roundCardCorners = _roundCardCorners;
     settings->setValue("cards/roundcardcorners", _roundCardCorners);

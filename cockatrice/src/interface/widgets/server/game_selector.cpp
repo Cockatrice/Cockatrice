@@ -61,14 +61,17 @@ GameSelector::GameSelector(AbstractClient *_client,
     gameListView->setColumnWidth(3, gameListView->columnWidth(3) * 1.2);
     // game type width
     gameListView->setColumnWidth(4, gameListView->columnWidth(4) * 1.4);
-    if (_room)
+    if (_room) {
         gameListView->header()->hideSection(gameListModel->roomColIndex());
+    }
 
-    if (room)
+    if (room) {
         gameTypeMap = gameListModel->getGameTypes().value(room->getRoomId());
+    }
 
-    if (showFilters && restoresettings)
+    if (showFilters && restoresettings) {
         gameListProxyModel->loadFilterParameters(gameTypeMap);
+    }
 
     gameListView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
@@ -111,8 +114,9 @@ GameSelector::GameSelector(AbstractClient *_client,
         buttonLayout->addWidget(clearFilterButton);
     }
     buttonLayout->addStretch();
-    if (room)
+    if (room) {
         buttonLayout->addWidget(createButton);
+    }
     buttonLayout->addWidget(joinButton);
     if (tabSupervisor->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
         buttonLayout->addWidget(joinAsJudgeButton);
@@ -178,8 +182,9 @@ void GameSelector::actSetFilter()
 {
     DlgFilterGames dlg(gameTypeMap, gameListProxyModel, this);
 
-    if (!dlg.exec())
+    if (!dlg.exec()) {
         return;
+    }
 
     gameListProxyModel->setGameFilters(dlg.getFilters());
     gameListProxyModel->saveFilterParameters(gameTypeMap);
@@ -373,8 +378,9 @@ void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
 
 void GameSelector::disableButtons()
 {
-    if (createButton)
+    if (createButton) {
         createButton->setEnabled(false);
+    }
 
     joinButton->setEnabled(false);
     spectateButton->setEnabled(false);
@@ -382,8 +388,9 @@ void GameSelector::disableButtons()
 
 void GameSelector::enableButtons()
 {
-    if (createButton)
+    if (createButton) {
         createButton->setEnabled(true);
+    }
 
     // Enable buttons for the currently selected game
     enableButtonsForIndex(gameListView->currentIndex());
@@ -391,8 +398,9 @@ void GameSelector::enableButtons()
 
 void GameSelector::enableButtonsForIndex(const QModelIndex &current)
 {
-    if (!current.isValid())
+    if (!current.isValid()) {
         return;
+    }
 
     const ServerInfo_Game &game = gameListModel->getGame(current.data(Qt::UserRole).toInt());
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
@@ -405,8 +413,9 @@ void GameSelector::retranslateUi()
 {
     filterButton->setText(tr("&Filter games"));
     clearFilterButton->setText(tr("C&lear filter"));
-    if (createButton)
+    if (createButton) {
         createButton->setText(tr("C&reate"));
+    }
     joinButton->setText(tr("&Join"));
     joinAsJudgeButton->setText(tr("Join as judge"));
     spectateButton->setText(tr("J&oin as spectator"));

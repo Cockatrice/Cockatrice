@@ -126,8 +126,9 @@ void VisualDeckStorageTagFilterWidget::addTagIfNotPresent(const QString &tag)
 void VisualDeckStorageTagFilterWidget::sortTags()
 {
     auto *flowWidget = findChild<FlowWidget *>();
-    if (!flowWidget)
+    if (!flowWidget) {
         return;
+    }
 
     // Get all tag widgets
     QList<DeckPreviewTagDisplayWidget *> tagWidgets = findChildren<DeckPreviewTagDisplayWidget *>();

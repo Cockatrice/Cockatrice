@@ -51,16 +51,21 @@ enum class CardMatchType
 // convert string to enum
 inline CardMatchType matchTypeFromString(const QString &str)
 {
-    if (str == "equals")
+    if (str == "equals") {
         return CardMatchType::Equals;
-    if (str == "notEquals")
+    }
+    if (str == "notEquals") {
         return CardMatchType::NotEquals;
-    if (str == "contains")
+    }
+    if (str == "contains") {
         return CardMatchType::Contains;
-    if (str == "notContains")
+    }
+    if (str == "notContains") {
         return CardMatchType::NotContains;
-    if (str == "regex")
+    }
+    if (str == "regex") {
         return CardMatchType::Regex;
+    }
     return CardMatchType::Equals; // fallback default
 }
 

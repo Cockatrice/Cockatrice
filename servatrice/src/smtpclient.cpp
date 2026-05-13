@@ -125,11 +125,13 @@ bool SmtpClient::enqueueForgotPasswordTokenMail(const QString &nickname, const Q
 void SmtpClient::sendAllEmails()
 {
     // still connected from the previous round
-    if (smtp->socket()->state() == QAbstractSocket::ConnectedState)
+    if (smtp->socket()->state() == QAbstractSocket::ConnectedState) {
         return;
+    }
 
-    if (smtp->pendingMessages() == 0)
+    if (smtp->pendingMessages() == 0) {
         return;
+    }
 
     QString connectionType = settingsCache->value("smtp/connection", "tcp").toString();
     QString host = settingsCache->value("smtp/host", "localhost").toString();
@@ -143,8 +145,9 @@ void SmtpClient::sendAllEmails()
 
     // Connect
     if (connectionType == "ssl") {
-        if (acceptAllCerts)
+        if (acceptAllCerts) {
             smtp->sslSocket()->setPeerVerifyMode(QSslSocket::QueryPeer);
+        }
         smtp->connectToSecureHost(host, port);
     } else {
         smtp->connectToHost(host, port);

@@ -391,8 +391,9 @@ void Server_AbstractPlayer::processMoveCard(GameEventStorage &ges,
         for (auto *player : game->getPlayers().values()) {
             QList<int> arrowsToDelete;
             for (Server_Arrow *arrow : player->getArrows()) {
-                if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
+                if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card)) {
                     arrowsToDelete.append(arrow->getId());
+                }
             }
             for (int j : arrowsToDelete) {
                 player->deleteArrow(j);
@@ -1472,8 +1473,9 @@ Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseCo
 
     if (cmd.has_player_id()) {
         Server_AbstractPlayer *otherPlayer = game->getPlayer(cmd.player_id());
-        if (!otherPlayer)
+        if (!otherPlayer) {
             return Response::RespNameNotFound;
+        }
     }
     Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone_name()));
     if (!zone) {

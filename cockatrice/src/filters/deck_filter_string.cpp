@@ -88,20 +88,27 @@ static void setupParserRules()
         const auto arg = std::any_cast<int>(sv[1]);
         const auto op = std::any_cast<QString>(sv[0]);
 
-        if (op == ">")
+        if (op == ">") {
             return [=](const int s) { return s > arg; };
-        if (op == ">=")
+        }
+        if (op == ">=") {
             return [=](const int s) { return s >= arg; };
-        if (op == "<")
+        }
+        if (op == "<") {
             return [=](const int s) { return s < arg; };
-        if (op == "<=")
+        }
+        if (op == "<=") {
             return [=](const int s) { return s <= arg; };
-        if (op == "=")
+        }
+        if (op == "=") {
             return [=](const int s) { return s == arg; };
-        if (op == ":")
+        }
+        if (op == ":") {
             return [=](const int s) { return s == arg; };
-        if (op == "!=")
+        }
+        if (op == "!=") {
             return [=](const int s) { return s != arg; };
+        }
         return [](int) { return false; };
     };
 

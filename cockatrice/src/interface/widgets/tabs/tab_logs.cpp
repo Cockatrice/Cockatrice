@@ -83,18 +83,22 @@ void TabLog::getClicked()
         privateChat->setChecked(true);
     }
 
-    if (maximumResults->value() == 0)
+    if (maximumResults->value() == 0) {
         maximumResults->setValue(1000);
+    }
 
     int dateRange = 0;
-    if (lastHour->isChecked())
+    if (lastHour->isChecked()) {
         dateRange = 1;
+    }
 
-    if (today->isChecked())
+    if (today->isChecked()) {
         dateRange = 24;
+    }
 
-    if (pastDays->isChecked())
+    if (pastDays->isChecked()) {
         dateRange = pastXDays->value() * 24;
+    }
 
     Command_ViewLogHistory cmd;
     cmd.set_user_name(findUsername->text().toStdString());

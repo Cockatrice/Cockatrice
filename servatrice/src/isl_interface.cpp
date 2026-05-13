@@ -76,8 +76,9 @@ IslInterface::~IslInterface()
         QMapIterator<QString, ServerInfo_User_Container> roomUsers(room->getExternalUsers());
         while (roomUsers.hasNext()) {
             roomUsers.next();
-            if (roomUsers.value().getUserInfo()->server_id() == serverId)
+            if (roomUsers.value().getUserInfo()->server_id() == serverId) {
                 emit externalRoomUserLeft(room->getId(), roomUsers.key());
+            }
         }
         room->usersLock.unlock();
     }
@@ -87,8 +88,9 @@ IslInterface::~IslInterface()
     QMapIterator<QString, Server_AbstractUserInterface *> extUsers(server->getExternalUsers());
     while (extUsers.hasNext()) {
         extUsers.next();
-        if (extUsers.value()->getUserInfo()->server_id() == serverId)
+        if (extUsers.value()->getUserInfo()->server_id() == serverId) {
             emit externalUserLeft(extUsers.key());
+        }
     }
     server->clientsLock.unlock();
 }
@@ -101,11 +103,12 @@ void IslInterface::initServer()
 
     QList<ServerProperties> serverList = server->getServerList();
     int listIndex = -1;
-    for (int i = 0; i < serverList.size(); ++i)
+    for (int i = 0; i < serverList.size(); ++i) {
         if (serverList[i].address == socket->peerAddress()) {
             listIndex = i;
             break;
         }
+    }
     if (listIndex == -1) {
         logger->logMessage(
             QString("[ISL] address %1 unknown, terminating connection").arg(socket->peerAddress().toString()));
@@ -125,9 +128,9 @@ void IslInterface::initServer()
         return;
     }
 
-    if (serverList[listIndex].cert == socket->peerCertificate())
+    if (serverList[listIndex].cert == socket->peerCertificate()) {
         logger->logMessage(QString("[ISL] Peer authenticated as " + serverList[listIndex].hostname));
-    else {
+    } else {
         logger->logMessage(QString("[ISL] Authentication failed, terminating connection"));
         deleteLater();
         return;
@@ -139,8 +142,9 @@ void IslInterface::initServer()
 
     server->clientsLock.lockForRead();
     QMapIterator<QString, Server_ProtocolHandler *> userIterator(server->getUsers());
-    while (userIterator.hasNext())
+    while (userIterator.hasNext()) {
         event.add_user_list()->CopyFrom(userIterator.next().value()->copyUserInfo(true, true));
+    }
     server->clientsLock.unlock();
 
     server->roomsLock.lockForRead();
@@ -217,8 +221,9 @@ void IslInterface::initClient()
 void IslInterface::flushOutputBuffer()
 {
     QMutexLocker locker(&outputBufferMutex);
-    if (outputBuffer.isEmpty())
+    if (outputBuffer.isEmpty()) {
         return;
+    }
     server->incTxBytes(outputBuffer.size());
     socket->write(outputBuffer);
     socket->flush();
@@ -240,11 +245,13 @@ void IslInterface::readClient()
                                 ((quint32)(unsigned char)inputBuffer[3]);
                 inputBuffer.remove(0, 4);
                 messageInProgress = true;
-            } else
+            } else {
                 return;
+            }
         }
-        if (inputBuffer.size() < messageLength)
+        if (inputBuffer.size() < messageLength) {
             return;
+        }
 
         IslMessage newMessage;
         bool ok = newMessage.ParseFromArray(inputBuffer.data(), messageLength);

@@ -42,8 +42,9 @@ Server_Room::~Server_Room()
 
     gamesLock.lockForWrite();
     const QList<Server_Game *> gameList = games.values();
-    for (int i = 0; i < gameList.size(); ++i)
+    for (int i = 0; i < gameList.size(); ++i) {
         delete gameList[i];
+    }
     games.clear();
     gamesLock.unlock();
 
@@ -55,19 +56,23 @@ Server_Room::~Server_Room()
 bool Server_Room::userMayJoin(const ServerInfo_User &userInfo)
 {
 
-    if (permissionLevel.toLower() == "administrator" || permissionLevel.toLower() == "moderator")
+    if (permissionLevel.toLower() == "administrator" || permissionLevel.toLower() == "moderator") {
         return false;
+    }
 
-    if (permissionLevel.toLower() == "registered" && !(userInfo.user_level() & ServerInfo_User::IsRegistered))
+    if (permissionLevel.toLower() == "registered" && !(userInfo.user_level() & ServerInfo_User::IsRegistered)) {
         return false;
+    }
 
     if (privilegeLevel.toLower() != "none") {
         if (privilegeLevel.toLower() == "privileged") {
-            if (privilegeLevel.toLower() == "none")
+            if (privilegeLevel.toLower() == "none") {
                 return false;
+            }
         } else {
-            if (privilegeLevel.toLower() != QString::fromStdString(userInfo.privlevel()).toLower())
+            if (privilegeLevel.toLower() != QString::fromStdString(userInfo.privlevel()).toLower()) {
                 return false;
+            }
         }
     }
     return true;
@@ -92,12 +97,14 @@ Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes,
     result.set_game_count(games.size() + externalGames.size());
     if (complete) {
         QMapIterator<int, Server_Game *> gameIterator(games);
-        while (gameIterator.hasNext())
+        while (gameIterator.hasNext()) {
             gameIterator.next().value()->getInfo(*result.add_game_list());
+        }
         if (includeExternalData) {
             QMapIterator<int, ServerInfo_Game> externalGameIterator(externalGames);
-            while (externalGameIterator.hasNext())
+            while (externalGameIterator.hasNext()) {
                 result.add_game_list()->CopyFrom(externalGameIterator.next().value());
+            }
         }
     }
     gamesLock.unlock();
@@ -106,22 +113,25 @@ Server_Room::getInfo(ServerInfo_Room &result, bool complete, bool showGameTypes,
     result.set_player_count(users.size() + externalUsers.size());
     if (complete) {
         QMapIterator<QString, Server_ProtocolHandler *> userIterator(users);
-        while (userIterator.hasNext())
+        while (userIterator.hasNext()) {
             result.add_user_list()->CopyFrom(userIterator.next().value()->copyUserInfo(false));
+        }
         if (includeExternalData) {
             QMapIterator<QString, ServerInfo_User_Container> externalUserIterator(externalUsers);
-            while (externalUserIterator.hasNext())
+            while (externalUserIterator.hasNext()) {
                 result.add_user_list()->CopyFrom(externalUserIterator.next().value().copyUserInfo(false));
+            }
         }
     }
     usersLock.unlock();
 
-    if (complete || showGameTypes)
+    if (complete || showGameTypes) {
         for (int i = 0; i < gameTypes.size(); ++i) {
             ServerInfo_GameType *gameTypeInfo = result.add_gametype_list();
             gameTypeInfo->set_game_type_id(i);
             gameTypeInfo->set_description(gameTypes[i].toStdString());
         }
+    }
 
     return result;
 }
@@ -208,8 +218,9 @@ void Server_Room::removeExternalUser(const QString &_name)
     roomInfo.set_room_id(id);
 
     usersLock.lockForWrite();
-    if (externalUsers.contains(_name))
+    if (externalUsers.contains(_name)) {
         externalUsers.remove(_name);
+    }
     roomInfo.set_player_count(users.size() + externalUsers.size());
     usersLock.unlock();
 
@@ -227,10 +238,11 @@ void Server_Room::updateExternalGameList(const ServerInfo_Game &gameInfo)
     roomInfo.set_room_id(id);
 
     gamesLock.lockForWrite();
-    if (!gameInfo.has_player_count() && externalGames.contains(gameInfo.game_id()))
+    if (!gameInfo.has_player_count() && externalGames.contains(gameInfo.game_id())) {
         externalGames.remove(gameInfo.game_id());
-    else
+    } else {
         externalGames.insert(gameInfo.game_id(), gameInfo);
+    }
     roomInfo.set_game_count(games.size() + externalGames.size());
     gamesLock.unlock();
 
@@ -242,8 +254,9 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
                                                            ResponseContainer &rc,
                                                            Server_AbstractUserInterface *userInterface)
 {
-    if (cmd.password().length() > MAX_NAME_LENGTH)
+    if (cmd.password().length() > MAX_NAME_LENGTH) {
         return Response::RespWrongPassword;
+    }
     // This function is called from the Server thread and from the S_PH thread.
     // server->roomsMutex is always locked.
 
@@ -271,8 +284,9 @@ Response::ResponseCode Server_Room::processJoinGameCommand(const Command_JoinGam
     Response::ResponseCode result =
         game->checkJoin(userInterface->getUserInfo(), QString::fromStdString(cmd.password()), cmd.spectator(),
                         cmd.override_restrictions(), cmd.join_as_judge());
-    if (result == Response::RespOk)
+    if (result == Response::RespOk) {
         game->addPlayer(userInterface, rc, cmd.spectator(), cmd.join_as_judge());
+    }
 
     return result;
 }
@@ -329,13 +343,15 @@ void Server_Room::sendRoomEvent(RoomEvent *event, bool sendToIsl)
     usersLock.lockForRead();
     {
         QMapIterator<QString, Server_ProtocolHandler *> userIterator(users);
-        while (userIterator.hasNext())
+        while (userIterator.hasNext()) {
             userIterator.next().value()->sendProtocolItem(*event);
+        }
     }
     usersLock.unlock();
 
-    if (sendToIsl)
+    if (sendToIsl) {
         static_cast<Server *>(parent())->sendIsl_RoomEvent(*event);
+    }
 
     delete event;
 }
@@ -405,9 +421,11 @@ int Server_Room::getGamesCreatedByUser(const QString &userName) const
 
     QMapIterator<int, Server_Game *> gamesIterator(games);
     int result = 0;
-    while (gamesIterator.hasNext())
-        if (gamesIterator.next().value()->getCreatorInfo()->name() == userName.toStdString())
+    while (gamesIterator.hasNext()) {
+        if (gamesIterator.next().value()->getCreatorInfo()->name() == userName.toStdString()) {
             ++result;
+        }
+    }
     return result;
 }
 

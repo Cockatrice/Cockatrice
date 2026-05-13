@@ -168,8 +168,9 @@ void HandMenu::populateRevealHandMenuWithActivePlayers()
 
     const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
     for (auto *other : players) {
-        if (other == player)
+        if (other == player) {
             continue;
+        }
         QAction *a = mRevealHand->addAction(other->getPlayerInfo()->getName());
         a->setData(other->getPlayerInfo()->getId());
         connect(a, &QAction::triggered, this, &HandMenu::onRevealHandTriggered);
@@ -186,8 +187,9 @@ void HandMenu::populateRevealRandomHandCardMenuWithActivePlayers()
 
     const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
     for (auto *other : players) {
-        if (other == player)
+        if (other == player) {
             continue;
+        }
         QAction *a = mRevealRandomHandCard->addAction(other->getPlayerInfo()->getName());
         a->setData(other->getPlayerInfo()->getId());
         connect(a, &QAction::triggered, this, &HandMenu::onRevealRandomHandCardTriggered);
@@ -197,8 +199,9 @@ void HandMenu::populateRevealRandomHandCardMenuWithActivePlayers()
 void HandMenu::onRevealHandTriggered()
 {
     auto *action = qobject_cast<QAction *>(sender());
-    if (!action)
+    if (!action) {
         return;
+    }
 
     const int targetId = action->data().toInt();
     player->getPlayerActions()->actRevealHand(targetId);
@@ -207,8 +210,9 @@ void HandMenu::onRevealHandTriggered()
 void HandMenu::onRevealRandomHandCardTriggered()
 {
     auto *action = qobject_cast<QAction *>(sender());
-    if (!action)
+    if (!action) {
         return;
+    }
 
     const int targetId = action->data().toInt();
     player->getPlayerActions()->actRevealRandomHandCard(targetId);

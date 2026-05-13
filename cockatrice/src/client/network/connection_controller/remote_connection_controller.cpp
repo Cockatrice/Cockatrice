@@ -140,13 +140,15 @@ void ConnectionController::onConnectionClosedEvent(const Event_ConnectionClosed 
         }
         case Event_ConnectionClosed::BANNED: {
             reasonStr = tr("Banned by moderator");
-            if (event.has_end_time())
+            if (event.has_end_time()) {
                 reasonStr.append(
                     "\n" + tr("Expected end time: %1").arg(QDateTime::fromSecsSinceEpoch(event.end_time()).toString()));
-            else
+            } else {
                 reasonStr.append("\n" + tr("This ban lasts indefinitely."));
-            if (event.has_reason_str())
+            }
+            if (event.has_reason_str()) {
                 reasonStr.append("\n\n" + QString::fromStdString(event.reason_str()));
+            }
             break;
         }
         case Event_ConnectionClosed::SERVER_SHUTDOWN: {
@@ -240,8 +242,9 @@ void ConnectionController::onLoginError(int r,
             QString bannedStr =
                 endTime ? tr("You are banned until %1.").arg(QDateTime::fromSecsSinceEpoch(endTime).toString())
                         : tr("You are banned indefinitely.");
-            if (!reasonStr.isEmpty())
+            if (!reasonStr.isEmpty()) {
                 bannedStr.append("\n\n" + reasonStr);
+            }
             QMessageBox::critical(dialogParent, tr("Error"), bannedStr);
             break;
         }
@@ -354,8 +357,9 @@ void ConnectionController::onRegisterError(int r, QString reasonStr, quint32 end
             QString bannedStr =
                 endTime ? tr("You are banned until %1.").arg(QDateTime::fromSecsSinceEpoch(endTime).toString())
                         : tr("You are banned indefinitely.");
-            if (!reasonStr.isEmpty())
+            if (!reasonStr.isEmpty()) {
                 bannedStr.append("\n\n" + reasonStr);
+            }
             QMessageBox::critical(dialogParent, tr("Error"), bannedStr);
             break;
         }
@@ -545,8 +549,9 @@ QString ConnectionController::extractInvalidUsernameMessage(QString &in)
         out +=
             "<li>" + tr("can %1 contain numeric characters").arg((rules.at(4).toInt() > 0) ? "" : tr("NOT")) + "</li>";
 
-        if (rules.at(6).size() > 0)
+        if (rules.at(6).size() > 0) {
             out += "<li>" + tr("can contain the following punctuation: %1").arg(rules.at(6).toHtmlEscaped()) + "</li>";
+        }
 
         out += "<li>" +
                tr("first character can %1 be a punctuation mark").arg((rules.at(5).toInt() > 0) ? "" : tr("NOT")) +
@@ -566,10 +571,11 @@ QString ConnectionController::extractInvalidUsernameMessage(QString &in)
                 }
             }
 
-            if (rules.at(8).size() > 0)
+            if (rules.at(8).size() > 0) {
                 out += "<li>" +
                        tr("can not match any of the following expressions: %1").arg(rules.at(8).toHtmlEscaped()) +
                        "</li>";
+            }
         }
 
         out += "</ul>";

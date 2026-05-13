@@ -192,13 +192,15 @@ void UserContextMenu::banUserHistory_processResponse(const Response &resp)
             table->setMinimumSize(table->horizontalHeader()->length() + (table->columnCount() * 5),
                                   table->verticalHeader()->length() + (table->rowCount() * 3));
             table->show();
-        } else
+        } else {
             QMessageBox::information(static_cast<QWidget *>(parent()), tr("Ban History"),
                                      tr("User has never been banned."));
+        }
 
-    } else
+    } else {
         QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Ban History"),
                               tr("Failed to collect ban information."));
+    }
 }
 
 void UserContextMenu::warnUserHistory_processResponse(const Response &resp)
@@ -228,13 +230,15 @@ void UserContextMenu::warnUserHistory_processResponse(const Response &resp)
             table->setMinimumSize(table->horizontalHeader()->length() + (table->columnCount() * 5),
                                   table->verticalHeader()->length() + (table->rowCount() * 3));
             table->show();
-        } else
+        } else {
             QMessageBox::information(static_cast<QWidget *>(parent()), tr("Warning History"),
                                      tr("User has never been warned."));
+        }
 
-    } else
+    } else {
         QMessageBox::critical(static_cast<QWidget *>(parent()), tr("Warning History"),
                               tr("Failed to collect warning information."));
+    }
 }
 
 void UserContextMenu::getAdminNotes_processResponse(const Response &resp)
@@ -297,8 +301,9 @@ void UserContextMenu::warnUser_dialogFinished()
 {
     auto *dlg = static_cast<WarningDialog *>(sender());
 
-    if (dlg->getName().isEmpty() || userListProxy->getOwnUsername().simplified().isEmpty())
+    if (dlg->getName().isEmpty() || userListProxy->getOwnUsername().simplified().isEmpty()) {
         return;
+    }
 
     Command_WarnUser cmd;
     cmd.set_user_name(dlg->getName().toStdString());

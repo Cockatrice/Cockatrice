@@ -40,8 +40,9 @@ BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(par
     idBanCheckBox->setChecked(true);
     idBanEdit = new QLineEdit(QString::fromStdString(info.clientid()));
     idBanEdit->setMaxLength(MAX_NAME_LENGTH);
-    if (QString::fromStdString(info.clientid()).isEmpty())
+    if (QString::fromStdString(info.clientid()).isEmpty()) {
         idBanCheckBox->setChecked(false);
+    }
 
     QGridLayout *banTypeGrid = new QGridLayout;
     banTypeGrid->addWidget(nameBanCheckBox, 0, 0);
@@ -207,27 +208,30 @@ void BanDialog::okClicked()
         return;
     }
 
-    if (nameBanCheckBox->isChecked())
+    if (nameBanCheckBox->isChecked()) {
         if (nameBanEdit->text().simplified() == "") {
             QMessageBox::critical(this, tr("Error"),
                                   tr("You must have a value in the name ban when selecting the name ban checkbox."));
             return;
         }
+    }
 
-    if (ipBanCheckBox->isChecked())
+    if (ipBanCheckBox->isChecked()) {
         if (ipBanEdit->text().simplified() == "") {
             QMessageBox::critical(this, tr("Error"),
                                   tr("You must have a value in the ip ban when selecting the ip ban checkbox."));
             return;
         }
+    }
 
-    if (idBanCheckBox->isChecked())
+    if (idBanCheckBox->isChecked()) {
         if (idBanEdit->text().simplified() == "") {
             QMessageBox::critical(
                 this, tr("Error"),
                 tr("You must have a value in the clientid ban when selecting the clientid ban checkbox."));
             return;
         }
+    }
 
     accept();
 }
@@ -461,14 +465,15 @@ void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
 {
     const QString userName = QString::fromStdString(user.name());
     UserListTWI *item = users.value(userName);
-    if (item)
+    if (item) {
         item->setUserInfo(user);
-    else {
+    } else {
         item = new UserListTWI(user);
         users.insert(userName, item);
         userTree->addTopLevelItem(item);
-        if (online)
+        if (online) {
             ++onlineCount;
+        }
         updateCount();
     }
     item->setOnline(online);
@@ -480,8 +485,9 @@ bool UserListWidget::deleteUser(const QString &userName)
     if (twi) {
         users.remove(userName);
         userTree->takeTopLevelItem(userTree->indexOfTopLevelItem(twi));
-        if (twi->data(0, Qt::UserRole + 1).toBool())
+        if (twi->data(0, Qt::UserRole + 1).toBool()) {
             --onlineCount;
+        }
         delete twi;
         updateCount();
         return true;
@@ -493,22 +499,25 @@ bool UserListWidget::deleteUser(const QString &userName)
 void UserListWidget::setUserOnline(const QString &userName, bool online)
 {
     UserListTWI *twi = users.value(userName);
-    if (!twi)
+    if (!twi) {
         return;
+    }
 
     twi->setOnline(online);
-    if (online)
+    if (online) {
         ++onlineCount;
-    else
+    } else {
         --onlineCount;
+    }
     updateCount();
 }
 
 void UserListWidget::updateCount()
 {
     QString str = titleStr;
-    if ((type == BuddyList) || (type == IgnoreList))
+    if ((type == BuddyList) || (type == IgnoreList)) {
         str = str.arg(onlineCount);
+    }
     setTitle(str.arg(userTree->topLevelItemCount()));
 }
 

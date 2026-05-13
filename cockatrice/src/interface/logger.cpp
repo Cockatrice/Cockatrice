@@ -66,8 +66,9 @@ void Logger::openLogfileSession()
 
 void Logger::closeLogfileSession()
 {
-    if (!logToFileEnabled)
+    if (!logToFileEnabled) {
         return;
+    }
 
     logToFileEnabled = false;
     fileStream << "Log session closed at " << QDateTime::currentDateTime().toString() << Qt::endl;

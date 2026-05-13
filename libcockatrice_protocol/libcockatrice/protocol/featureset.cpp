@@ -33,14 +33,16 @@ void FeatureSet::initalizeFeatureList(QMap<QString, bool> &_featureList)
 
 void FeatureSet::enableRequiredFeature(QMap<QString, bool> &_featureList, const QString &featureName)
 {
-    if (_featureList.contains(featureName))
+    if (_featureList.contains(featureName)) {
         _featureList.insert(featureName, true);
+    }
 }
 
 void FeatureSet::disableRequiredFeature(QMap<QString, bool> &_featureList, const QString &featureName)
 {
-    if (_featureList.contains(featureName))
+    if (_featureList.contains(featureName)) {
         _featureList.insert(featureName, false);
+    }
 }
 
 QMap<QString, bool>

@@ -252,8 +252,9 @@ void ZoneViewWidget::retranslateUi()
 
 void ZoneViewWidget::stopWindowDrag()
 {
-    if (!draggingWindow)
+    if (!draggingWindow) {
         return;
+    }
 
     draggingWindow = false;
     ungrabMouse();
@@ -312,13 +313,15 @@ QGraphicsView *ZoneViewWidget::findDragView(QWidget *eventWidget) const
 {
     QWidget *current = eventWidget;
     while (current) {
-        if (auto *view = qobject_cast<QGraphicsView *>(current))
+        if (auto *view = qobject_cast<QGraphicsView *>(current)) {
             return view;
+        }
         current = current->parentWidget();
     }
 
-    if (scene() && !scene()->views().isEmpty())
+    if (scene() && !scene()->views().isEmpty()) {
         return scene()->views().constFirst();
+    }
 
     return nullptr;
 }
@@ -346,8 +349,9 @@ bool ZoneViewWidget::windowFrameEvent(QEvent *event)
     }
 
     auto *me = dynamic_cast<QGraphicsSceneMouseEvent *>(event);
-    if (!me)
+    if (!me) {
         return QGraphicsWidget::windowFrameEvent(event);
+    }
 
     switch (event->type()) {
         case QEvent::GraphicsSceneMousePress:
@@ -506,8 +510,9 @@ void ZoneViewWidget::resizeToZoneContents(bool forceInitialHeight)
 
     zone->setGeometry(QRectF(0, -scrollBar->value(), zoneContainer->size().width(), totalZoneHeight));
 
-    if (layout())
+    if (layout()) {
         layout()->invalidate();
+    }
 }
 
 void ZoneViewWidget::handleScrollBarChange(int value)
@@ -521,8 +526,9 @@ void ZoneViewWidget::closeEvent(QCloseEvent *event)
     disconnect(zone, &ZoneViewZone::closed, this, 0);
     // manually call zone->close in order to remove it from the origZones views
     zone->close();
-    if (shuffleCheckBox.isChecked())
+    if (shuffleCheckBox.isChecked()) {
         player->getPlayerActions()->sendGameCommand(Command_Shuffle());
+    }
     zoneDeleted();
     event->accept();
 }
@@ -536,8 +542,9 @@ void ZoneViewWidget::zoneDeleted()
 void ZoneViewWidget::initStyleOption(QStyleOption *option) const
 {
     QStyleOptionTitleBar *titleBar = qstyleoption_cast<QStyleOptionTitleBar *>(option);
-    if (titleBar)
+    if (titleBar) {
         titleBar->icon = QPixmap("theme:cockatrice");
+    }
 }
 
 /**

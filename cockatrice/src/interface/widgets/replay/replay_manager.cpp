@@ -19,16 +19,19 @@ ReplayManager::ReplayManager(TabGame *parent, GameReplay *_replay)
         const int eventCount = replay->event_list_size();
         for (int i = 0; i < eventCount; ++i) {
             int j = i + 1;
-            while ((j < eventCount) && (replay->event_list(j).seconds_elapsed() == lastEventTimestamp))
+            while ((j < eventCount) && (replay->event_list(j).seconds_elapsed() == lastEventTimestamp)) {
                 ++j;
+            }
 
             const int numberEventsThisSecond = j - i;
-            for (int k = 0; k < numberEventsThisSecond; ++k)
+            for (int k = 0; k < numberEventsThisSecond; ++k) {
                 replayTimeline.append(replay->event_list(i + k).seconds_elapsed() * 1000 +
                                       (int)((qreal)k / (qreal)numberEventsThisSecond * 1000));
+            }
 
-            if (j < eventCount)
+            if (j < eventCount) {
                 lastEventTimestamp = replay->event_list(j).seconds_elapsed();
+            }
             i += numberEventsThisSecond - 1;
         }
     }

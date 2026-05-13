@@ -139,8 +139,9 @@ void HomeWidget::updateRandomCard()
             }
             break;
     }
-    if (!newCard)
+    if (!newCard) {
         return;
+    }
 
     connect(newCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &HomeWidget::updateBackgroundProperties);
     backgroundSourceCard->setCard(newCard);

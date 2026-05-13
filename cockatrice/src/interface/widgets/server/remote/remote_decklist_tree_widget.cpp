@@ -22,8 +22,9 @@ RemoteDeckList_TreeModel::DirectoryNode::~DirectoryNode()
 
 void RemoteDeckList_TreeModel::DirectoryNode::clearTree()
 {
-    for (int i = 0; i < size(); ++i)
+    for (int i = 0; i < size(); ++i) {
         delete at(i);
+    }
     clear();
 }
 
@@ -31,31 +32,37 @@ QString RemoteDeckList_TreeModel::DirectoryNode::getPath() const
 {
     if (parent) {
         QString parentPath = parent->getPath();
-        if (parentPath.isEmpty())
+        if (parentPath.isEmpty()) {
             return name;
-        else
+        } else {
             return parentPath + "/" + name;
-    } else
+        }
+    } else {
         return name;
+    }
 }
 
 RemoteDeckList_TreeModel::DirectoryNode *RemoteDeckList_TreeModel::DirectoryNode::getNodeByPath(QStringList path)
 {
     QString pathItem;
     if (parent) {
-        if (path.isEmpty())
+        if (path.isEmpty()) {
             return this;
+        }
         pathItem = path.takeFirst();
-        if (pathItem.isEmpty() && name.isEmpty())
+        if (pathItem.isEmpty() && name.isEmpty()) {
             return this;
+        }
     }
 
     for (int i = 0; i < size(); ++i) {
         DirectoryNode *node = dynamic_cast<DirectoryNode *>(at(i));
-        if (!node)
+        if (!node) {
             continue;
-        if (node->getName() == pathItem)
+        }
+        if (node->getName() == pathItem) {
             return node->getNodeByPath(path);
+        }
     }
     return 0;
 }
@@ -66,12 +73,14 @@ RemoteDeckList_TreeModel::FileNode *RemoteDeckList_TreeModel::DirectoryNode::get
         DirectoryNode *node = dynamic_cast<DirectoryNode *>(at(i));
         if (node) {
             FileNode *result = node->getNodeById(id);
-            if (result)
+            if (result) {
                 return result;
+            }
         } else {
             FileNode *file = dynamic_cast<FileNode *>(at(i));
-            if (file->getId() == id)
+            if (file->getId() == id) {
                 return file;
+            }
         }
     }
     return 0;
@@ -95,10 +104,11 @@ RemoteDeckList_TreeModel::~RemoteDeckList_TreeModel()
 int RemoteDeckList_TreeModel::rowCount(const QModelIndex &parent) const
 {
     DirectoryNode *node = getNode<DirectoryNode *>(parent);
-    if (node)
+    if (node) {
         return node->size();
-    else
+    } else {
         return 0;
+    }
 }
 
 int RemoteDeckList_TreeModel::columnCount(const QModelIndex & /*parent*/) const
@@ -108,10 +118,12 @@ int RemoteDeckList_TreeModel::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
         return QVariant();
-    if (index.column() >= 3)
+    }
+    if (index.column() >= 3) {
         return QVariant();
+    }
 
     Node *temp = static_cast<Node *>(index.internalPointer());
     FileNode *file = dynamic_cast<FileNode *>(temp);
@@ -157,8 +169,9 @@ QVariant RemoteDeckList_TreeModel::data(const QModelIndex &index, int role) cons
 
 QVariant RemoteDeckList_TreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (orientation != Qt::Horizontal)
+    if (orientation != Qt::Horizontal) {
         return QVariant();
+    }
     switch (role) {
         case Qt::TextAlignmentRole:
             return section == 1 ? Qt::AlignRight : Qt::AlignLeft;
@@ -181,20 +194,23 @@ QVariant RemoteDeckList_TreeModel::headerData(int section, Qt::Orientation orien
 
 QModelIndex RemoteDeckList_TreeModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if (!hasIndex(row, column, parent))
+    if (!hasIndex(row, column, parent)) {
         return QModelIndex();
+    }
 
     DirectoryNode *parentNode = getNode<DirectoryNode *>(parent);
-    if (row >= parentNode->size())
+    if (row >= parentNode->size()) {
         return QModelIndex();
+    }
 
     return createIndex(row, column, parentNode->at(row));
 }
 
 QModelIndex RemoteDeckList_TreeModel::parent(const QModelIndex &ind) const
 {
-    if (!ind.isValid())
+    if (!ind.isValid()) {
         return QModelIndex();
+    }
 
     return nodeToIndex(static_cast<Node *>(ind.internalPointer())->getParent());
 }
@@ -210,8 +226,9 @@ Qt::ItemFlags RemoteDeckList_TreeModel::flags(const QModelIndex &index) const
 
 QModelIndex RemoteDeckList_TreeModel::nodeToIndex(Node *node) const
 {
-    if (node == nullptr || node == root)
+    if (node == nullptr || node == root) {
         return QModelIndex();
+    }
     return createIndex(node->getParent()->indexOf(node), 0, node);
 }
 
@@ -233,10 +250,11 @@ void RemoteDeckList_TreeModel::addFolderToTree(const ServerInfo_DeckStorage_Tree
     const int folderItemsSize = folderInfo.items_size();
     for (int i = 0; i < folderItemsSize; ++i) {
         const ServerInfo_DeckStorage_TreeItem &subItem = folderInfo.items(i);
-        if (subItem.has_folder())
+        if (subItem.has_folder()) {
             addFolderToTree(subItem, newItem);
-        else
+        } else {
             addFileToTree(subItem, newItem);
+        }
     }
 }
 

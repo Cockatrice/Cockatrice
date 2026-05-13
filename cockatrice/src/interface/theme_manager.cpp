@@ -51,8 +51,9 @@ struct PaletteColorInfo
         // Iterate through all color roles (excluding NoRole and NColorRoles)
         for (int r = 0; r < QPalette::NColorRoles; ++r) {
             auto role = static_cast<QPalette::ColorRole>(r);
-            if (role == QPalette::NoRole)
+            if (role == QPalette::NoRole) {
                 continue;
+            }
 
             PaletteColorInfo info;
             info.group = group;
@@ -78,8 +79,9 @@ struct PaletteColorInfo
 
         for (int r = 0; r < QPalette::NColorRoles; ++r) {
             auto role = static_cast<QPalette::ColorRole>(r);
-            if (role == QPalette::NoRole)
+            if (role == QPalette::NoRole) {
                 continue;
+            }
 
             QColor color = palette.color(group, role);
             qInfo().nospace() << qPrintable(QString("%1").arg(roleEnum.valueToKey(role), -20)) << " : "

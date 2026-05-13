@@ -58,8 +58,9 @@ void SafePrinter::applySafePrinter(const ::google::protobuf::Message &message,
             case ::google::protobuf::FieldDescriptor::CPPTYPE_STRING:
                 if (field->name().find("password") != std::string::npos) { // name contains password
                     auto *safePrinter = new SafePrinter();
-                    if (!printer.RegisterFieldValuePrinter(field, safePrinter))
+                    if (!printer.RegisterFieldValuePrinter(field, safePrinter)) {
                         delete safePrinter; // in case safePrinter has not been taken ownership of
+                    }
                 }
                 break;
             case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:

@@ -272,8 +272,9 @@ QString GeneralSettingsPage::languageName(const QString &lang)
 void GeneralSettingsPage::deckPathButtonClicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), deckPathEdit->text());
-    if (path.isEmpty())
+    if (path.isEmpty()) {
         return;
+    }
 
     deckPathEdit->setText(path);
     SettingsCache::instance().setDeckPath(path);
@@ -282,8 +283,9 @@ void GeneralSettingsPage::deckPathButtonClicked()
 void GeneralSettingsPage::filtersPathButtonClicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), filtersPathEdit->text());
-    if (path.isEmpty())
+    if (path.isEmpty()) {
         return;
+    }
 
     filtersPathEdit->setText(path);
     SettingsCache::instance().setFiltersPath(path);
@@ -292,8 +294,9 @@ void GeneralSettingsPage::filtersPathButtonClicked()
 void GeneralSettingsPage::replaysPathButtonClicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), replaysPathEdit->text());
-    if (path.isEmpty())
+    if (path.isEmpty()) {
         return;
+    }
 
     replaysPathEdit->setText(path);
     SettingsCache::instance().setReplaysPath(path);
@@ -302,8 +305,9 @@ void GeneralSettingsPage::replaysPathButtonClicked()
 void GeneralSettingsPage::picsPathButtonClicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), picsPathEdit->text());
-    if (path.isEmpty())
+    if (path.isEmpty()) {
         return;
+    }
 
     picsPathEdit->setText(path);
     SettingsCache::instance().setPicsPath(path);
@@ -312,8 +316,9 @@ void GeneralSettingsPage::picsPathButtonClicked()
 void GeneralSettingsPage::cardDatabasePathButtonClicked()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Choose path"), cardDatabasePathEdit->text());
-    if (path.isEmpty())
+    if (path.isEmpty()) {
         return;
+    }
 
     cardDatabasePathEdit->setText(path);
     SettingsCache::instance().setCardDatabasePath(path);
@@ -322,8 +327,9 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
 void GeneralSettingsPage::customCardDatabaseButtonClicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, tr("Choose path"), customCardDatabasePathEdit->text());
-    if (path.isEmpty())
+    if (path.isEmpty()) {
         return;
+    }
 
     customCardDatabasePathEdit->setText(path);
     SettingsCache::instance().setCustomCardDatabasePath(path);
@@ -332,8 +338,9 @@ void GeneralSettingsPage::customCardDatabaseButtonClicked()
 void GeneralSettingsPage::tokenDatabasePathButtonClicked()
 {
     QString path = QFileDialog::getOpenFileName(this, tr("Choose path"), tokenDatabasePathEdit->text());
-    if (path.isEmpty())
+    if (path.isEmpty()) {
         return;
+    }
 
     tokenDatabasePathEdit->setText(path);
     SettingsCache::instance().setTokenDatabasePath(path);
@@ -418,8 +425,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
     for (int i = 0; i < themeDirs.size(); i++) {
         themeBox.addItem(themeDirs[i]);
-        if (themeDirs[i] == themeName)
+        if (themeDirs[i] == themeName) {
             themeBox.setCurrentIndex(i);
+        }
     }
 
     connect(&themeBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &AppearanceSettingsPage::themeBoxChanged);
@@ -560,8 +568,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
             auto &cardCounterSettings = SettingsCache::instance().cardCounters();
 
             auto newColor = QColorDialog::getColor(cardCounterSettings.color(index), this);
-            if (!newColor.isValid())
+            if (!newColor.isValid()) {
                 return;
+            }
 
             cardCounterSettings.setColor(index, newColor);
         });
@@ -643,8 +652,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 void AppearanceSettingsPage::themeBoxChanged(int index)
 {
     QStringList themeDirs = themeManager->getAvailableThemes().keys();
-    if (index >= 0 && index < themeDirs.count())
+    if (index >= 0 && index < themeDirs.count()) {
         SettingsCache::instance().setThemeName(themeDirs.at(index));
+    }
 }
 
 void AppearanceSettingsPage::openThemeLocation()
@@ -1395,8 +1405,9 @@ MessagesSettingsPage::MessagesSettingsPage()
     messageList = new QListWidget;
 
     int count = SettingsCache::instance().messages().getCount();
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         messageList->addItem(SettingsCache::instance().messages().getMessageAt(i));
+    }
 
     aAdd = new QAction(this);
     aAdd->setIcon(QPixmap("theme:icons/increment"));
@@ -1496,8 +1507,9 @@ void MessagesSettingsPage::updateHighlightPreview()
 void MessagesSettingsPage::storeSettings()
 {
     SettingsCache::instance().messages().setCount(messageList->count());
-    for (int i = 0; i < messageList->count(); i++)
+    for (int i = 0; i < messageList->count(); i++) {
         SettingsCache::instance().messages().setMessageAt(i, messageList->item(i)->text());
+    }
     emit SettingsCache::instance().messages().messageMacrosChanged();
 }
 
@@ -1570,8 +1582,9 @@ SoundSettingsPage::SoundSettingsPage()
     QStringList themeDirs = soundEngine->getAvailableThemes().keys();
     for (int i = 0; i < themeDirs.size(); i++) {
         themeBox.addItem(themeDirs[i]);
-        if (themeDirs[i] == themeName)
+        if (themeDirs[i] == themeName) {
             themeBox.setCurrentIndex(i);
+        }
     }
 
     connect(&themeBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &SoundSettingsPage::themeBoxChanged);
@@ -1619,8 +1632,9 @@ SoundSettingsPage::SoundSettingsPage()
 void SoundSettingsPage::themeBoxChanged(int index)
 {
     QStringList themeDirs = soundEngine->getAvailableThemes().keys();
-    if (index >= 0 && index < themeDirs.count())
+    if (index >= 0 && index < themeDirs.count()) {
         SettingsCache::instance().setSoundThemeName(themeDirs.at(index));
+    }
 }
 
 void SoundSettingsPage::masterVolumeChanged(int value)
@@ -1857,8 +1871,9 @@ void DlgSettings::createIcons()
 
 void DlgSettings::changePage(QListWidgetItem *current, QListWidgetItem *previous)
 {
-    if (!current)
+    if (!current) {
         current = previous;
+    }
 
     pagesWidget->setCurrentIndex(contentsWidget->row(current));
 }

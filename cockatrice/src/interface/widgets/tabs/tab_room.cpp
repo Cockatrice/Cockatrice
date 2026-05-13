@@ -41,9 +41,10 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
       ownUser(_ownUser), userListProxy(_tabSupervisor->getUserListManager())
 {
     const int gameTypeListSize = info.gametype_list_size();
-    for (int i = 0; i < gameTypeListSize; ++i)
+    for (int i = 0; i < gameTypeListSize; ++i) {
         gameTypes.insert(info.gametype_list(i).game_type_id(),
                          QString::fromStdString(info.gametype_list(i).description()));
+    }
 
     QMap<int, GameTypeMap> tempMap;
     tempMap.insert(info.room_id(), gameTypes);
@@ -117,8 +118,9 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     userList->sortItems();
 
     const int gameListSize = info.game_list_size();
-    for (int i = 0; i < gameListSize; ++i)
+    for (int i = 0; i < gameListSize; ++i) {
         gameSelector->processGameInfo(info.game_list(i));
+    }
 
     completer = new QCompleter(autocompleteUserList, sayEdit);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
@@ -182,8 +184,9 @@ void TabRoom::closeEvent(QCloseEvent *event)
 
 void TabRoom::tabActivated()
 {
-    if (!sayEdit->hasFocus())
+    if (!sayEdit->hasFocus()) {
         sayEdit->setFocus();
+    }
 }
 
 QString TabRoom::sanitizeHtml(QString dirty) const
@@ -211,8 +214,9 @@ void TabRoom::sendMessage()
 
 void TabRoom::sayFinished(const Response &response)
 {
-    if (response.response_code() == Response::RespChatFlood)
+    if (response.response_code() == Response::RespChatFlood) {
         chatView->appendMessage(tr("You are flooding the chat. Please wait a couple of seconds."));
+    }
 }
 
 void TabRoom::actClearChat()
@@ -258,8 +262,9 @@ void TabRoom::processRoomEvent(const RoomEvent &event)
 void TabRoom::processListGamesEvent(const Event_ListGames &event)
 {
     const int gameListSize = event.game_list_size();
-    for (int i = 0; i < gameListSize; ++i)
+    for (int i = 0; i < gameListSize; ++i) {
         gameSelector->processGameInfo(event.game_list(i));
+    }
 }
 
 void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)
@@ -284,26 +289,30 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     QString senderName = QString::fromStdString(event.name());
     QString message = QString::fromStdString(event.message());
 
-    if (userListProxy->isUserIgnored(senderName))
+    if (userListProxy->isUserIgnored(senderName)) {
         return;
+    }
 
     UserListTWI *twi = userList->getUsers().value(senderName);
     ServerInfo_User userInfo = {};
     if (twi) {
         userInfo = twi->getUserInfo();
         if (SettingsCache::instance().getIgnoreUnregisteredUsers() &&
-            !UserLevelFlags(userInfo.user_level()).testFlag(ServerInfo_User::IsRegistered))
+            !UserLevelFlags(userInfo.user_level()).testFlag(ServerInfo_User::IsRegistered)) {
             return;
+        }
     }
 
-    if (event.message_type() == Event_RoomSay::ChatHistory && !SettingsCache::instance().getRoomHistory())
+    if (event.message_type() == Event_RoomSay::ChatHistory && !SettingsCache::instance().getRoomHistory()) {
         return;
+    }
 
-    if (event.message_type() == Event_RoomSay::ChatHistory)
+    if (event.message_type() == Event_RoomSay::ChatHistory) {
         message =
             "[" +
             QString(QDateTime::fromMSecsSinceEpoch(event.time_of()).toLocalTime().toString("d MMM yyyy HH:mm:ss")) +
             "] " + message;
+    }
 
     chatView->appendMessage(message, event.message_type(), userInfo, true);
     emit userEvent(false);

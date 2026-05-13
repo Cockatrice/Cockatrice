@@ -123,17 +123,19 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     userLevelIcon.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, user.pawn_colors(), false,
                                                                      QString::fromStdString(user.privlevel())));
     QString userLevelText;
-    if (userLevel.testFlag(ServerInfo_User::IsAdmin))
+    if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
         userLevelText = tr("Administrator");
-    else if (userLevel.testFlag(ServerInfo_User::IsModerator))
+    } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
         userLevelText = tr("Moderator");
-    else if (userLevel.testFlag(ServerInfo_User::IsRegistered))
+    } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {
         userLevelText = tr("Registered user");
-    else
+    } else {
         userLevelText = tr("Unregistered user");
+    }
 
-    if (userLevel.testFlag(ServerInfo_User::IsJudge))
+    if (userLevel.testFlag(ServerInfo_User::IsJudge)) {
         userLevelText += " | " + tr("Judge");
+    }
 
     if (user.has_privlevel() && user.privlevel() != "NONE") {
         userLevelText += " | " + QString("%1").arg(user.privlevel().c_str());
@@ -152,15 +154,17 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
 QString UserInfoBox::getAgeString(int ageSeconds)
 {
     QString accountAgeString = tr("Unknown");
-    if (ageSeconds <= 0)
+    if (ageSeconds <= 0) {
         return accountAgeString;
+    }
 
     // secsSinceEpoch is in utc
     auto secsSinceEpoch = QDateTime::currentSecsSinceEpoch() - ageSeconds;
     // the date is in local time, fromSecsSinceEpoch expects a timestamp from utc and converts it to local time
     auto date = QDateTime::fromSecsSinceEpoch(secsSinceEpoch).date();
-    if (!date.isValid())
+    if (!date.isValid()) {
         return accountAgeString;
+    }
 
     // now can be local time as the date is also local time
     auto now = QDate::currentDate();
@@ -218,8 +222,9 @@ void UserInfoBox::actEditInternal(const Response &r)
     QString realName = QString::fromStdString(user.real_name());
 
     DlgEditUser dlg(this, email, country, realName);
-    if (!dlg.exec())
+    if (!dlg.exec()) {
         return;
+    }
 
     Command_AccountEdit cmd;
     cmd.set_real_name(dlg.getRealName().toStdString());
@@ -231,8 +236,9 @@ void UserInfoBox::actEditInternal(const Response &r)
                 getTextWithMax(this, tr("Enter Password"),
                                tr("Password verification is required in order to change your email address"),
                                QLineEdit::Password, "", &ok);
-            if (!ok)
+            if (!ok) {
                 return;
+            }
             cmd.set_password_check(password.toStdString());
             cmd.set_email(dlg.getEmail().toStdString());
         } // servers that support password hash do not require all fields to be filled anymore
@@ -250,8 +256,9 @@ void UserInfoBox::actEditInternal(const Response &r)
 void UserInfoBox::actPassword()
 {
     DlgEditPassword dlg(this);
-    if (!dlg.exec())
+    if (!dlg.exec()) {
         return;
+    }
 
     auto oldPassword = dlg.getOldPassword();
     auto newPassword = dlg.getNewPassword();
@@ -296,8 +303,9 @@ void UserInfoBox::changePassword(const QString &oldPassword, const QString &newP
 void UserInfoBox::actAvatar()
 {
     DlgEditAvatar dlg(this);
-    if (!dlg.exec())
+    if (!dlg.exec()) {
         return;
+    }
 
     Command_AccountImage cmd;
     cmd.set_image(dlg.getImage().data(), dlg.getImage().size());

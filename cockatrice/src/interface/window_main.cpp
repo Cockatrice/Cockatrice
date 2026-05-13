@@ -88,11 +88,13 @@ inline Q_LOGGING_CATEGORY(MainWindowLog, "main_window");
  */
 void MainWindow::updateTabMenu(const QList<QMenu *> &newMenuList)
 {
-    for (auto &tabMenu : tabMenus)
+    for (auto &tabMenu : tabMenus) {
         menuBar()->removeAction(tabMenu->menuAction());
+    }
     tabMenus = newMenuList;
-    for (auto &tabMenu : tabMenus)
+    for (auto &tabMenu : tabMenus) {
         menuBar()->insertMenu(helpMenu->menuAction(), tabMenu);
+    }
 }
 
 void MainWindow::statusChanged(ClientStatus _status)
@@ -177,13 +179,15 @@ void MainWindow::actWatchReplay()
     QFileDialog dlg(this, tr("Load replay"));
     dlg.setDirectory(SettingsCache::instance().getReplaysPath());
     dlg.setNameFilters(QStringList() << QObject::tr("Cockatrice replays (*.cor)"));
-    if (!dlg.exec())
+    if (!dlg.exec()) {
         return;
+    }
 
     QString fileName = dlg.selectedFiles().at(0);
     QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly))
+    if (!file.open(QIODevice::ReadOnly)) {
         return;
+    }
     QByteArray buf = file.readAll();
     file.close();
 
@@ -208,10 +212,11 @@ void MainWindow::localGameEnded()
 
 void MainWindow::actFullScreen(bool checked)
 {
-    if (checked)
+    if (checked) {
         setWindowState(windowState() | Qt::WindowFullScreen);
-    else
+    } else {
         setWindowState(windowState() & ~Qt::WindowFullScreen);
+    }
 }
 
 void MainWindow::actSettings()
@@ -691,8 +696,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     // workaround Qt bug where closeEvent gets called twice
     static bool bClosingDown = false;
-    if (bClosingDown)
+    if (bClosingDown) {
         return;
+    }
     bClosingDown = true;
 
     if (!tabSupervisor->close()) {
@@ -709,9 +715,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::changeEvent(QEvent *event)
 {
-    if (event->type() == QEvent::LanguageChange)
+    if (event->type() == QEvent::LanguageChange) {
         retranslateUi();
-    else if (event->type() == QEvent::ActivationChange) {
+    } else if (event->type() == QEvent::ActivationChange) {
         if (isActiveWindow() && !bHasActivated) {
             bHasActivated = true;
             if (!connectTo.isEmpty()) {
@@ -1069,8 +1075,9 @@ int MainWindow::getNextCustomSetPrefix(QDir dataDir)
     QStringList::const_iterator filesIterator;
     for (filesIterator = files.constBegin(); filesIterator != files.constEnd(); ++filesIterator) {
         int fileIndex = (*filesIterator).split(".").at(0).toInt();
-        if (fileIndex > maxIndex)
+        if (fileIndex > maxIndex) {
             maxIndex = fileIndex;
+        }
     }
 
     return maxIndex + 1;

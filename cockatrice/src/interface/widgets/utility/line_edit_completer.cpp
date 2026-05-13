@@ -46,8 +46,9 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
                 int lastIndexof = qMax(0, textValue.lastIndexOf(" "));
                 QString finalString = textValue.left(lastIndexof);
                 // Add a space if there's a word
-                if (finalString != "")
+                if (finalString != "") {
                     finalString += " ";
+                }
                 setText(finalString);
                 return;
             }
@@ -121,12 +122,14 @@ void LineEditCompleter::setCompleter(QCompleter *completer)
 
 void LineEditCompleter::setCompletionList(QStringList completionList)
 {
-    if (!c || c->popup()->isVisible())
+    if (!c || c->popup()->isVisible()) {
         return;
+    }
 
     QStringListModel *model;
     model = (QStringListModel *)(c->model());
-    if (model == NULL)
+    if (model == NULL) {
         model = new QStringListModel();
+    }
     model->setStringList(completionList);
 }

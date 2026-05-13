@@ -17,8 +17,9 @@ AbstractAnalyticsPanelWidget *
 AnalyticsPanelWidgetFactory::create(const QString &type, QWidget *parent, DeckListStatisticsAnalyzer *analyzer) const
 {
     auto it = widgets.find(type);
-    if (it == widgets.end())
+    if (it == widgets.end()) {
         return nullptr;
+    }
 
     auto w = it->creator(parent, analyzer);
 

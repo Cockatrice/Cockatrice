@@ -52,8 +52,9 @@ void BarChartWidget::paintEvent(QPaintEvent *)
     int barAreaWidth = right - left;
 
     int barCount = bars.size();
-    if (barCount == 0)
+    if (barCount == 0) {
         return;
+    }
 
     int spacing = 6;
     int barWidth = (barAreaWidth - (barCount - 1) * spacing) / barCount;
@@ -91,8 +92,9 @@ void BarChartWidget::paintEvent(QPaintEvent *)
         for (int j = 0; j < bar.segments.size(); j++) {
             const auto &seg = bar.segments[j];
             int segHeight = (seg.value * barAreaHeight / highest);
-            if (segHeight < 2 && seg.value > 0)
+            if (segHeight < 2 && seg.value > 0) {
                 segHeight = 2;
+            }
 
             int topY = yCurrent - segHeight;
 
@@ -189,8 +191,9 @@ void BarChartWidget::mouseMoveEvent(QMouseEvent *e)
     for (int i = 0; i < segments.size(); i++) {
         const auto &seg = segments[i];
         int segHeight = (seg.value * barAreaHeight / highest);
-        if (segHeight < 2 && seg.value > 0)
+        if (segHeight < 2 && seg.value > 0) {
             segHeight = 2;
+        }
 
         int topY = yCurrent - segHeight;
         int bottomY = yCurrent;

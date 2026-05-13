@@ -88,10 +88,11 @@ void ChatView::refreshBlockColors()
     for (QTextBlock block = doc->begin(); block.isValid(); block = block.next()) {
         QTextBlockFormat fmt = block.blockFormat();
 
-        if (even)
+        if (even) {
             fmt.setBackground(palette().base());
-        else
+        } else {
             fmt.setBackground(palette().window());
+        }
 
         fmt.setForeground(palette().text());
 
@@ -121,10 +122,11 @@ QTextCursor ChatView::prepareBlock(bool same)
         cursor.insertHtml("<br>");
     } else {
         QTextBlockFormat blockFormat;
-        if (evenNumber)
+        if (evenNumber) {
             blockFormat.setBackground(palette().base());
-        else
+        } else {
             blockFormat.setBackground(palette().window());
+        }
 
         evenNumber = !evenNumber;
 
@@ -144,8 +146,9 @@ void ChatView::appendHtml(const QString &html)
 {
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     prepareBlock().insertHtml(html);
-    if (atBottom)
+    if (atBottom) {
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+    }
 }
 
 void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold, QString optionalFontColor)
@@ -156,12 +159,14 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
         "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : serverMessageColor.name()) + ">" +
         QDateTime::currentDateTime().toString("[hh:mm:ss] ") + html + "</font>";
 
-    if (optionalIsBold)
+    if (optionalIsBold) {
         htmlText = "<b>" + htmlText + "</b>";
+    }
 
     prepareBlock().insertHtml(htmlText);
-    if (atBottom)
+    if (atBottom) {
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+    }
 }
 
 void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
@@ -180,8 +185,9 @@ void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 
 void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
 {
-    if (!url.contains("://"))
+    if (!url.contains("://")) {
         url.prepend("https://");
+    }
 
     QTextCharFormat oldFormat = cursor.charFormat();
     QTextCharFormat anchorFormat = oldFormat;
@@ -317,8 +323,9 @@ void ChatView::appendMessage(QString message,
         }
     }
 
-    if (atBottom)
+    if (atBottom) {
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+    }
 }
 
 void ChatView::checkTag(QTextCursor &cursor, QString &message)
@@ -327,10 +334,11 @@ void ChatView::checkTag(QTextCursor &cursor, QString &message)
         message = message.mid(6);
         int closeTagIndex = message.indexOf("[/card]");
         QString cardName = message.left(closeTagIndex);
-        if (closeTagIndex == -1)
+        if (closeTagIndex == -1) {
             message.clear();
-        else
+        } else {
             message = message.mid(closeTagIndex + 7);
+        }
 
         appendCardTag(cursor, cardName);
         return;
@@ -340,10 +348,11 @@ void ChatView::checkTag(QTextCursor &cursor, QString &message)
         message = message.mid(2);
         int closeTagIndex = message.indexOf("]]");
         QString cardName = message.left(closeTagIndex);
-        if (closeTagIndex == -1)
+        if (closeTagIndex == -1) {
             message.clear();
-        else
+        } else {
             message = message.mid(closeTagIndex + 2);
+        }
 
         appendCardTag(cursor, cardName);
         return;
@@ -353,10 +362,11 @@ void ChatView::checkTag(QTextCursor &cursor, QString &message)
         message = message.mid(5);
         int closeTagIndex = message.indexOf("[/url]");
         QString url = message.left(closeTagIndex);
-        if (closeTagIndex == -1)
+        if (closeTagIndex == -1) {
             message.clear();
-        else
+        } else {
             message = message.mid(closeTagIndex + 6);
+        }
 
         appendUrlTag(cursor, url);
         return;
@@ -587,8 +597,9 @@ QTextFragment ChatView::getFragmentUnderMouse(const QPoint &pos) const
     QTextBlock::iterator it;
     for (it = block.begin(); !(it.atEnd()); ++it) {
         QTextFragment frag = it.fragment();
-        if (frag.contains(cursor.position()))
+        if (frag.contains(cursor.position())) {
             return frag;
+        }
     }
     return QTextFragment();
 }
@@ -604,10 +615,11 @@ void ChatView::mouseMoveEvent(QMouseEvent *event)
             if (scheme == "card") {
                 hoveredItemType = HoveredCard;
                 emit cardNameHovered(hoveredContent);
-            } else if (scheme == "user")
+            } else if (scheme == "user") {
                 hoveredItemType = HoveredUser;
-            else
+            } else {
                 hoveredItemType = HoveredUrl;
+            }
             viewport()->setCursor(Qt::PointingHandCursor);
         } else {
             hoveredItemType = HoveredNothing;
@@ -650,8 +662,9 @@ void ChatView::mousePressEvent(QMouseEvent *event)
                     case Qt::LeftButton: {
                         if (event->modifiers() == Qt::ControlModifier) {
                             emit openMessageDialog(userName, true);
-                        } else
+                        } else {
                             emit addMentionTag("@" + userName);
+                        }
                         break;
                     }
                     default:
@@ -668,16 +681,18 @@ void ChatView::mousePressEvent(QMouseEvent *event)
 
 void ChatView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
+    if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton)) {
         emit deleteCardInfoPopup(QString("_"));
+    }
 
     QTextBrowser::mouseReleaseEvent(event);
 }
 
 void ChatView::openLink(const QUrl &link)
 {
-    if ((link.scheme() == "card") || (link.scheme() == "user"))
+    if ((link.scheme() == "card") || (link.scheme() == "user")) {
         return;
+    }
 
     QDesktopServices::openUrl(link);
 }

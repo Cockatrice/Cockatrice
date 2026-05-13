@@ -43,10 +43,11 @@ AbstractCounter::AbstractCounter(Player *_player,
                 menu->addSeparator();
             } else {
                 QAction *aIncrement = new QAction(QString(i < 0 ? "%1" : "+%1").arg(i), this);
-                if (i == -1)
+                if (i == -1) {
                     aDec = aIncrement;
-                else if (i == 1)
+                } else if (i == 1) {
                     aInc = aIncrement;
+                }
                 aIncrement->setData(i);
                 connect(aIncrement, &QAction::triggered, this, &AbstractCounter::incrementCounter);
                 menu->addAction(aIncrement);
@@ -69,10 +70,11 @@ AbstractCounter::~AbstractCounter()
 
 void AbstractCounter::delCounter()
 {
-    if (dialogSemaphore)
+    if (dialogSemaphore) {
         deleteAfterDialog = true;
-    else
+    } else {
         deleteLater();
+    }
 }
 
 void AbstractCounter::retranslateUi()
@@ -136,8 +138,9 @@ void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (isUnderMouse() && player->getPlayerInfo()->getLocalOrJudge()) {
         if (event->button() == Qt::MiddleButton || (QApplication::keyboardModifiers() & Qt::ShiftModifier)) {
-            if (menu)
+            if (menu) {
                 menu->exec(event->screenPos());
+            }
             event->accept();
         } else if (event->button() == Qt::LeftButton) {
             Command_IncCounter cmd;
@@ -152,8 +155,9 @@ void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
             player->getPlayerActions()->sendGameCommand(cmd);
             event->accept();
         }
-    } else
+    } else {
         event->ignore();
+    }
 }
 
 void AbstractCounter::hoverEnterEvent(QGraphicsSceneHoverEvent * /*event*/)
@@ -189,8 +193,9 @@ void AbstractCounter::setCounter()
     }
     dialogSemaphore = false;
 
-    if (!ok)
+    if (!ok) {
         return;
+    }
 
     Expression exp(value);
     int newValue = static_cast<int>(exp.parse(dialog.textValue()));
@@ -231,8 +236,9 @@ void AbstractCounterDialog::changeValue(int diff)
 {
     bool ok;
     int curValue = textValue().toInt(&ok);
-    if (!ok)
+    if (!ok) {
         return;
+    }
     curValue += diff;
     setTextValue(QString::number(curValue));
 }

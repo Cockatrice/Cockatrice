@@ -27,20 +27,23 @@ void ReplayTimelineWidget::setTimeline(const QList<int> &_replayTimeline)
     for (int i : replayTimeline) {
         if (i > binEndTime) {
             histogram.append(binValue);
-            if (binValue > maxBinValue)
+            if (binValue > maxBinValue) {
                 maxBinValue = binValue;
+            }
             while (i > binEndTime + BIN_LENGTH) {
                 histogram.append(0);
                 binEndTime += BIN_LENGTH;
             }
             binValue = 1;
             binEndTime += BIN_LENGTH;
-        } else
+        } else {
             ++binValue;
+        }
     }
     histogram.append(binValue);
-    if (!replayTimeline.isEmpty())
+    if (!replayTimeline.isEmpty()) {
         maxTime = replayTimeline.last();
+    }
 
     update();
 }
@@ -53,8 +56,9 @@ void ReplayTimelineWidget::paintEvent(QPaintEvent * /* event */)
     qreal binWidth = (qreal)width() / histogram.size();
     QPainterPath path;
     path.moveTo(0, height() - 1);
-    for (int i = 0; i < histogram.size(); ++i)
+    for (int i = 0; i < histogram.size(); ++i) {
         path.lineTo(qRound(i * binWidth), (height() - 1) * (1.0 - (qreal)histogram[i] / maxBinValue));
+    }
     path.lineTo(width() - 1, height() - 1);
     path.lineTo(0, height() - 1);
     painter.fillPath(path, Qt::black);
@@ -142,8 +146,9 @@ void ReplayTimelineWidget::replayTimerTimeout()
 
     processNewEvents(NORMAL_PLAYBACK);
 
-    if (!(currentVisualTime % 1000))
+    if (!(currentVisualTime % 1000)) {
         update();
+    }
 }
 
 /// Processes all unprocessed events up to the current time.
@@ -156,12 +161,14 @@ void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
 
         // backwards skip => always skip reveal windows
         // forwards skip => skip reveal windows that don't happen within a big skip of the target
-        if (playbackMode == BACKWARD_SKIP || currentProcessedTime - replayTimeline[currentEvent] > BIG_SKIP_MS)
+        if (playbackMode == BACKWARD_SKIP || currentProcessedTime - replayTimeline[currentEvent] > BIG_SKIP_MS) {
             options |= SKIP_REVEAL_WINDOW;
+        }
 
         // backwards skip => always skip tap animation
-        if (playbackMode == BACKWARD_SKIP)
+        if (playbackMode == BACKWARD_SKIP) {
             options |= SKIP_TAP_ANIMATION;
+        }
 
         emit processNextEvent(options);
         ++currentEvent;

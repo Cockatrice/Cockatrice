@@ -429,8 +429,7 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
         }
         if (addSetNameAndNumber) {
             if (!card->getCardSetShortName().isNull() && !card->getCardSetShortName().isEmpty()) {
-                out << " "
-                    << "(" << card->getCardSetShortName() << ")";
+                out << " " << "(" << card->getCardSetShortName() << ")";
             }
             if (!card->getCardCollectorNumber().isNull()) {
                 out << " " << card->getCardCollectorNumber();

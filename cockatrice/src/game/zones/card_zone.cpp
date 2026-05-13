@@ -25,14 +25,16 @@ void CardZone::onCardAdded(CardItem *addedCard)
 
 void CardZone::retranslateUi()
 {
-    for (int i = 0; i < getLogic()->getCards().size(); ++i)
+    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
         getLogic()->getCards()[i]->retranslateUi();
+    }
 }
 
 void CardZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * /*event*/)
 {
-    if (doubleClickAction)
+    if (doubleClickAction) {
         doubleClickAction->trigger();
+    }
 }
 
 bool CardZone::showContextMenu(const QPoint &screenPos)
@@ -47,12 +49,14 @@ bool CardZone::showContextMenu(const QPoint &screenPos)
 void CardZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton) {
-        if (showContextMenu(event->screenPos()))
+        if (showContextMenu(event->screenPos())) {
             event->accept();
-        else
+        } else {
             event->ignore();
-    } else
+        }
+    } else {
         event->ignore();
+    }
 }
 
 QPointF CardZone::closestGridPoint(const QPointF &point)

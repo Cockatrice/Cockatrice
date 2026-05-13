@@ -215,8 +215,9 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
     spectatorsSeeEverythingCheckBox->setChecked(gameInfo.spectators_omniscient());
 
     QSet<int> types;
-    for (int i = 0; i < gameInfo.game_types_size(); ++i)
+    for (int i = 0; i < gameInfo.game_types_size(); ++i) {
         types.insert(gameInfo.game_types(i));
+    }
 
     QMapIterator<int, QString> gameTypeIterator(gameTypes);
     while (gameTypeIterator.hasNext()) {
@@ -316,9 +317,9 @@ void DlgCreateGame::checkResponse(const Response &response)
 {
     buttonBox->setEnabled(true);
 
-    if (response.response_code() == Response::RespOk)
+    if (response.response_code() == Response::RespOk) {
         accept();
-    else {
+    } else {
         QMessageBox::critical(this, tr("Error"), tr("Server error."));
         return;
     }

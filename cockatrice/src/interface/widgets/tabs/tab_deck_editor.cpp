@@ -81,8 +81,9 @@ void TabDeckEditor::createMenus()
 QString TabDeckEditor::getTabText() const
 {
     QString result = tr("Deck: %1").arg(deckStateManager->getSimpleDeckName());
-    if (deckStateManager->isModified())
+    if (deckStateManager->isModified()) {
         result.prepend("* ");
+    }
     return result;
 }
 
@@ -137,9 +138,9 @@ void TabDeckEditor::loadLayout()
     LayoutsSettings &layouts = SettingsCache::instance().layouts();
 
     auto layoutState = layouts.getDeckEditorLayoutState();
-    if (layoutState.isNull())
+    if (layoutState.isNull()) {
         restartLayout();
-    else {
+    } else {
         restoreState(layoutState);
         restoreGeometry(layouts.getDeckEditorGeometry());
     }

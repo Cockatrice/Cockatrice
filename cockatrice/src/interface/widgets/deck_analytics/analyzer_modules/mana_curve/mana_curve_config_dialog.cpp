@@ -69,8 +69,9 @@ void ManaCurveConfigDialog::setFromConfig(const ManaCurveConfig &cfg)
 {
     groupBy->setCurrentText(cfg.groupBy);
     // restore filters
-    for (int i = 0; i < filterList->count(); ++i)
+    for (int i = 0; i < filterList->count(); ++i) {
         filterList->item(i)->setSelected(cfg.filters.contains(filterList->item(i)->text()));
+    }
 
     showMain->setChecked(cfg.showMain);
     showCatRows->setChecked(cfg.showCategoryRows);
@@ -81,8 +82,9 @@ void ManaCurveConfigDialog::accept()
     cfg.groupBy = groupBy->currentText();
 
     cfg.filters.clear();
-    for (auto *item : filterList->selectedItems())
+    for (auto *item : filterList->selectedItems()) {
         cfg.filters << item->text();
+    }
 
     cfg.showMain = showMain->isChecked();
     cfg.showCategoryRows = showCatRows->isChecked();
