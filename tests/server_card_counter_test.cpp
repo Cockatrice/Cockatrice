@@ -7,6 +7,7 @@
 #include <libcockatrice/network/server/remote/game/server_card.h>
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/utility/trice_limits.h>
 #include <limits>
 
 TEST(ServerCardCounter, IncrementNewCounter)
@@ -27,17 +28,18 @@ TEST(ServerCardCounter, IncrementExistingCounter)
 TEST(ServerCardCounter, IncrementOverflowProtection)
 {
     Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
-    ASSERT_TRUE(card.setCounter(1, std::numeric_limits<int>::max()));
+    ASSERT_TRUE(card.setCounter(1, MAX_COUNTERS_ON_CARD));
     EXPECT_FALSE(card.incrementCounter(1, 1));
-    EXPECT_EQ(card.getCounter(1), std::numeric_limits<int>::max());
+    EXPECT_EQ(card.getCounter(1), MAX_COUNTERS_ON_CARD);
 }
 
 TEST(ServerCardCounter, DecrementUnderflowProtection)
 {
     Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
-    ASSERT_TRUE(card.setCounter(1, std::numeric_limits<int>::min()));
-    EXPECT_FALSE(card.incrementCounter(1, -1));
-    EXPECT_EQ(card.getCounter(1), std::numeric_limits<int>::min());
+    ASSERT_TRUE(card.setCounter(1, 5));
+    EXPECT_TRUE(card.incrementCounter(1, -10));
+    EXPECT_EQ(card.getCounter(1), 0);
+    EXPECT_FALSE(card.getCounters().contains(1));
 }
 
 TEST(ServerCardCounter, ReturnsFalseWhenUnchanged)
@@ -111,13 +113,13 @@ TEST(ServerCardCounter, IncrementCounterPopulatesEvent)
 TEST(ServerCardCounter, IncrementCounterEventReflectsClampedValue)
 {
     Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
-    ASSERT_TRUE(card.setCounter(1, std::numeric_limits<int>::max() - 5));
+    ASSERT_TRUE(card.setCounter(1, MAX_COUNTERS_ON_CARD - 5));
 
     Event_SetCardCounter event;
     EXPECT_TRUE(card.incrementCounter(1, 10, &event));
 
     EXPECT_EQ(event.counter_id(), 1);
-    EXPECT_EQ(event.counter_value(), std::numeric_limits<int>::max());
+    EXPECT_EQ(event.counter_value(), MAX_COUNTERS_ON_CARD);
 }
 
 TEST(ServerCardCounter, IncrementCounterNoEventWhenNullptr)
@@ -131,7 +133,7 @@ TEST(ServerCardCounter, IncrementCounterNoEventWhenNullptr)
 TEST(ServerCardCounter, IncrementCounterEventNotPopulatedWhenUnchanged)
 {
     Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
-    ASSERT_TRUE(card.setCounter(1, std::numeric_limits<int>::max()));
+    ASSERT_TRUE(card.setCounter(1, MAX_COUNTERS_ON_CARD));
 
     Event_SetCardCounter event;
     event.set_counter_id(999);
@@ -140,6 +142,38 @@ TEST(ServerCardCounter, IncrementCounterEventNotPopulatedWhenUnchanged)
     EXPECT_FALSE(card.incrementCounter(1, 1, &event));
     EXPECT_EQ(event.counter_id(), 999);
     EXPECT_EQ(event.counter_value(), 999);
+}
+
+TEST(ServerCardCounter, SetCounterClampsNegativeToZero)
+{
+    Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
+    EXPECT_FALSE(card.setCounter(1, -5));
+    EXPECT_EQ(card.getCounter(1), 0);
+    EXPECT_FALSE(card.getCounters().contains(1));
+}
+
+TEST(ServerCardCounter, SetCounterClampsAboveMaxToMax)
+{
+    Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
+    EXPECT_TRUE(card.setCounter(1, 1500));
+    EXPECT_EQ(card.getCounter(1), MAX_COUNTERS_ON_CARD);
+}
+
+TEST(ServerCardCounter, IncrementDoesNotGoBelowZero)
+{
+    Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
+    ASSERT_TRUE(card.setCounter(1, 5));
+    EXPECT_TRUE(card.incrementCounter(1, -10));
+    EXPECT_EQ(card.getCounter(1), 0);
+    EXPECT_FALSE(card.getCounters().contains(1));
+}
+
+TEST(ServerCardCounter, IncrementDoesNotExceedMax)
+{
+    Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
+    ASSERT_TRUE(card.setCounter(1, MAX_COUNTERS_ON_CARD - 5));
+    EXPECT_TRUE(card.incrementCounter(1, 10));
+    EXPECT_EQ(card.getCounter(1), MAX_COUNTERS_ON_CARD);
 }
 
 int main(int argc, char **argv)

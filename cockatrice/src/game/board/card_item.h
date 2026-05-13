@@ -11,6 +11,7 @@
 #include "abstract_card_item.h"
 
 #include <libcockatrice/network/server/remote/game/server_card.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 class CardDatabase;
 class CardDragItem;
@@ -20,7 +21,6 @@ class Player;
 class QAction;
 class QColor;
 
-const int MAX_COUNTERS_ON_CARD = 999;
 const int ROTATION_DEGREES_PER_FRAME = 10;
 
 class CardItem : public AbstractCardItem

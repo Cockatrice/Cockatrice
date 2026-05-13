@@ -1466,7 +1466,10 @@ void PlayerActions::offsetCardCounter(int counterId, int offset)
         int oldValue = card->getCounters().value(counterId, 0);
         int newValue = oldValue + offset;
 
-        if (newValue >= 0 && newValue <= MAX_COUNTERS_ON_CARD) {
+        // Early exit optimization: server enforces [0, MAX_COUNTERS_ON_CARD].
+        // Compare clamped value to allow recovery from invalid states.
+        int clampedValue = qBound(0, newValue, MAX_COUNTERS_ON_CARD);
+        if (clampedValue != oldValue) {
             auto *cmd = new Command_SetCardCounter;
             cmd->set_zone(card->getZone()->getName().toStdString());
             cmd->set_card_id(card->getId());
@@ -1506,7 +1509,9 @@ void PlayerActions::actSetCardCounter(int counterId)
     for (auto card : sel) {
         int oldValue = card->getCounters().value(counterId, 0);
         Expression exp(oldValue);
-        int number = static_cast<int>(exp.parse(dialog.textValue()));
+        double parsed = exp.parse(dialog.textValue());
+        // Clamp in double precision first to avoid UB, then cast
+        int number = static_cast<int>(qBound(0.0, parsed, static_cast<double>(MAX_COUNTERS_ON_CARD)));
 
         auto *cmd = new Command_SetCardCounter;
         cmd->set_zone(card->getZone()->getName().toStdString());
