@@ -22,12 +22,12 @@ AllowShortFunctionsOnASingleLine: None
 BinPackParameters: false
 AllowAllParametersOfDeclarationOnNextLine: false
 IndentCaseLabels: true
-# requires clang-format 15
-# InsertBraces: true
 PointerAlignment: Right
 SortIncludes: true
 IncludeBlocks: Regroup
 StatementAttributeLikeMacros: [emit]
+# requires clang-format 15
+InsertBraces: true
 # requires clang-format 16
 # RemoveSemicolon: true
 ---
