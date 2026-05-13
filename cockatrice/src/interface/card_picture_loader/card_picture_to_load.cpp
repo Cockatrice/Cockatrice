@@ -53,12 +53,12 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
  * PrintingInfo for the set is returned.
  *
  * This method only exists to maintain existing behavior.
- * TODO: check if going through all sets is still necessary after the ExactCard refactor.
  *
  * @param card The card to look in
  * @param setName The set's short name
  * @return A PrintingInfo, or a default-constructed PrintingInfo if the set name is not in the CardInfo.
  */
+//! \todo Check if going through all sets is still necessary after the ExactCard refactor.
 static PrintingInfo findPrintingForSet(const ExactCard &card, const QString &setName)
 {
     SetToPrintingsMap setsToPrintings = card.getInfo().getSets();

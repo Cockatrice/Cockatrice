@@ -1,8 +1,8 @@
 /**
  * @file tab_visual_database_display.h
  * @ingroup Tabs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_VISUAL_DATABASE_DISPLAY_H
 #define TAB_VISUAL_DATABASE_DISPLAY_H

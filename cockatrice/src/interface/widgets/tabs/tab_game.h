@@ -3,8 +3,8 @@
  * @ingroup Tabs
  * @ingroup GameWidgets
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_GAME_H
 #define TAB_GAME_H

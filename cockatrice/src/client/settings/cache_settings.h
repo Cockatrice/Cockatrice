@@ -1,8 +1,8 @@
 /**
  * @file cache_settings.h
  * @ingroup Settings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H

@@ -1,8 +1,8 @@
 /**
  * @file stack_zone_logic.h
  * @ingroup GameLogicZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_STACK_ZONE_LOGIC_H
 #define COCKATRICE_STACK_ZONE_LOGIC_H

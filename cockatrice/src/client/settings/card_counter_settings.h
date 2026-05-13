@@ -1,8 +1,8 @@
 /**
  * @file card_counter_settings.h
  * @ingroup GameSettings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARD_COUNTER_SETTINGS_H
 #define CARD_COUNTER_SETTINGS_H

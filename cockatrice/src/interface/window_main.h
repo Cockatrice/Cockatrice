@@ -20,8 +20,8 @@
 /**
  * @file window_main.h
  * @ingroup Core
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 #ifndef WINDOW_H
 #define WINDOW_H
 

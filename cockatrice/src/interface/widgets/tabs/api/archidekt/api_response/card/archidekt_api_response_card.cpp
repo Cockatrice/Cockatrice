@@ -21,16 +21,13 @@ void ArchidektApiResponseCard::fromJson(const QJsonObject &json)
     edition.fromJson(json.value("edition").toObject());
 
     flavor = json.value("flavor").toString();
-    //! \todo but not really important
-    //! \todo games = {""};
-    //! \todo options = {""};
+    //! \todo Parse games and options fields (not really important).
     scryfallImageHash = json.value("scryfallImageHash").toString();
     oracleCard = json.value("oracleCard").toObject();
     owned = json.value("owned").toInt();
     pinnedStatus = json.value("pinnedStatus").toInt();
     rarity = json.value("rarity").toString();
-    //! \todo but not really important
-    //! \todo globalCategories = {""};
+    //! \todo Parse globalCategories field (not really important).
 }
 
 void ArchidektApiResponseCard::debugPrint() const

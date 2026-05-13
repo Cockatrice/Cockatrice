@@ -1,8 +1,8 @@
 /**
  * @file download_settings.h
  * @ingroup NetworkSettings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_DOWNLOADSETTINGS_H
 #define COCKATRICE_DOWNLOADSETTINGS_H

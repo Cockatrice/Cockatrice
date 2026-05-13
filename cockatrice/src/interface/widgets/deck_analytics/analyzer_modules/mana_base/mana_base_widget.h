@@ -1,8 +1,8 @@
 /**
  * @file mana_base_widget.h
  * @ingroup DeckEditorAnalyticsWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef MANA_BASE_WIDGET_H
 #define MANA_BASE_WIDGET_H

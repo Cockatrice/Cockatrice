@@ -2,8 +2,8 @@
  * @file tab_room.h
  * @ingroup RoomTabs
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_ROOM_H
 #define TAB_ROOM_H

@@ -2,8 +2,8 @@
  * @file deck_preview_tag_dialog.h
  * @ingroup VisualDeckPreviewWidgets
  * @ingroup Dialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DECK_PREVIEW_TAG_DIALOG_H
 #define DECK_PREVIEW_TAG_DIALOG_H

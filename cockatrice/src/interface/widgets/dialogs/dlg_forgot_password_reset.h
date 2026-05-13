@@ -1,8 +1,8 @@
 /**
  * @file dlg_forgot_password_reset.h
  * @ingroup AccountDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_FORGOTPASSWORDRESET_H
 #define DLG_FORGOTPASSWORDRESET_H

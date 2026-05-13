@@ -1,8 +1,8 @@
 /**
  * @file table_zone.h
  * @ingroup GameGraphicsZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
@@ -11,13 +11,12 @@
 #include "../../game/zones/table_zone_logic.h"
 #include "select_zone.h"
 
-/*
- * TableZone is the grid based rect where CardItems may be placed.
- * It is the main play zone and can be customized with background images.
+/**
+ * @brief TableZone is the grid based rect where CardItems may be placed.
  *
- * TODO: Refactor methods to make more readable, extract some logic to
- * private methods (Im looking at you TableZone::reorganizeCards())
+ * It is the main play zone and can be customized with background images.
  */
+//! \todo Refactor methods to make more readable, extract logic to private methods (especially reorganizeCards()).
 class TableZone : public SelectZone
 {
     Q_OBJECT

@@ -1,8 +1,8 @@
 /**
  * @file player_area.h
  * @ingroup GameGraphicsPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_AREA_H
 #define COCKATRICE_PLAYER_AREA_H

@@ -1,8 +1,8 @@
 /**
  * @file edhrec_top_commanders_api_response.h
  * @ingroup ApiResponses
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef EDHREC_TOP_COMMANDERS_API_RESPONSE_H
 #define EDHREC_TOP_COMMANDERS_API_RESPONSE_H

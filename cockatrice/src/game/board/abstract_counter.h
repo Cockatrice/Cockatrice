@@ -1,8 +1,8 @@
 /**
  * @file abstract_counter.h
  * @ingroup GameGraphicsPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COUNTER_H
 #define COUNTER_H

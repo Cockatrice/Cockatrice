@@ -1,8 +1,8 @@
 /**
  * @file deck_filter_string.h
  * @ingroup DeckStorageWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DECK_FILTER_STRING_H
 #define DECK_FILTER_STRING_H

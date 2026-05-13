@@ -3,6 +3,7 @@
  * @ingroup UI
  * @brief A QWidget that wraps a FlowLayout inside an optional QScrollArea.
  */
+//! \todo Document this file.
 
 #ifndef FLOW_WIDGET_H
 #define FLOW_WIDGET_H

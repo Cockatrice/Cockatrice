@@ -1,8 +1,8 @@
 /**
  * @file user_info_box.h
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef USERINFOBOX_H
 #define USERINFOBOX_H

@@ -1,8 +1,8 @@
 /**
  * @file client_update_checker.h
  * @ingroup ClientUpdate
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CLIENT_UPDATE_CHECKER_H
 #define CLIENT_UPDATE_CHECKER_H

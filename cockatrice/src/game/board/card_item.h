@@ -1,8 +1,8 @@
 /**
  * @file card_item.h
  * @ingroup GameGraphicsCards
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARDITEM_H
 #define CARDITEM_H

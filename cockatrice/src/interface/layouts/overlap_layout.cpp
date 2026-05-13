@@ -223,7 +223,7 @@ void OverlapLayout::setGeometry(const QRect &rect)
         const int yPos = rect.top() + currentRow * (maxItemHeight - overlapOffsetHeight);
         item->setGeometry(QRect(xPos, yPos, maxItemWidth, maxItemHeight));
 
-        // TODO: Figure this out properly or maybe adjust size hint to account for this?
+        //! \todo Figure this out properly or maybe adjust size hint to account for this.
         // Update row and column indices based on the layout direction.
         if (overlapDirection == Qt::Horizontal) {
             currentColumn++;

@@ -2,8 +2,8 @@
  * @file replay.h
  * @ingroup GameLogic
  * @ingroup Replay
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_REPLAY_H
 #define COCKATRICE_REPLAY_H

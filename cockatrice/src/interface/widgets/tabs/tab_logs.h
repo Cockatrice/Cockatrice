@@ -1,8 +1,8 @@
 /**
  * @file tab_logs.h
  * @ingroup ServerTabs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_LOG_H
 #define TAB_LOG_H

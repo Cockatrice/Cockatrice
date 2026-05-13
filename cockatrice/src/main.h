@@ -1,8 +1,8 @@
 /**
  * @file main.h
  * @ingroup Core
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef MAIN_H
 #define MAIN_H

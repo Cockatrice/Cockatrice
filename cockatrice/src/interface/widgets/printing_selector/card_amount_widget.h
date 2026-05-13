@@ -2,8 +2,8 @@
  * @file card_amount_widget.h
  * @ingroup CardExtraInfoWidgets
  * @ingroup PrintingWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARD_AMOUNT_WIDGET_H
 #define CARD_AMOUNT_WIDGET_H

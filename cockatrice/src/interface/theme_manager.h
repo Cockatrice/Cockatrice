@@ -1,8 +1,8 @@
 /**
  * @file theme_manager.h
  * @ingroup CoreSettings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef THEMEMANAGER_H
 #define THEMEMANAGER_H

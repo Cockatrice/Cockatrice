@@ -1,8 +1,8 @@
 /**
  * @file replay_timeline_widget.h
  * @ingroup Replay
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef REPLAY_TIMELINE_WIDGET
 #define REPLAY_TIMELINE_WIDGET

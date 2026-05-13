@@ -66,7 +66,7 @@ void DeckListModel::rebuildTree()
         for (int j = 0; j < currentZone->size(); j++) {
             auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
 
-            // TODO: better sanity checking
+            //! \todo Better sanity checking.
             if (currentCard == nullptr) {
                 continue;
             }
