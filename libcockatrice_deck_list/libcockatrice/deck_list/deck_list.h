@@ -89,7 +89,7 @@ private:
     mutable QString cachedDeckHash;
 
 public:
-    /// @name Metadata setters
+    /** @name Metadata setters */
     ///@{
     void setName(const QString &_name = QString())
     {
@@ -125,11 +125,11 @@ public:
     }
     ///@}
 
-    /// @brief Construct an empty deck.
+    /** @brief Construct an empty deck. */
     explicit DeckList();
-    /// @brief Construct from a serialized native-format string.
+    /** @brief Construct from a serialized native-format string. */
     explicit DeckList(const QString &nativeString);
-    /// @brief Construct from components
+    /** @brief Construct from components. */
     DeckList(const Metadata &metadata,
              const DecklistNodeTree &tree,
              const QMap<QString, SideboardPlan> &sideboardPlans = {});
@@ -144,8 +144,10 @@ public:
         return &tree;
     }
 
-    /// @name Metadata getters
-    /// The individual metadata getters still exist for backwards compatibility.
+    /**
+     * @name Metadata getters
+     * The individual metadata getters still exist for backwards compatibility.
+     */
     ///@{
     //! \todo Figure out when we can remove them.
     const Metadata &getMetadata() const
@@ -183,7 +185,7 @@ public:
         return metadata.isEmpty() && getCardList().isEmpty();
     }
 
-    /// @name Sideboard plans
+    /** @name Sideboard plans */
     ///@{
     QList<MoveCard_ToZone> getCurrentSideboardPlan() const;
     void setCurrentSideboardPlan(const QList<MoveCard_ToZone> &plan);
@@ -193,7 +195,7 @@ public:
     }
     ///@}
 
-    /// @name Serialization (XML)
+    /** @name Serialization (XML) */
     ///@{
     bool readElement(QXmlStreamReader *xml);
     void write(QXmlStreamWriter *xml) const;
@@ -204,7 +206,7 @@ public:
     bool saveToFile_Native(QIODevice *device) const;
     ///@}
 
-    /// @name Serialization (Plain text)
+    /** @name Serialization (Plain text) */
     ///@{
     bool loadFromStream_Plain(QTextStream &stream,
                               bool preserveMetadata,
@@ -216,7 +218,7 @@ public:
     QString writeToString_Plain(bool prefixSideboardCards = true, bool slashTappedOutSplitCards = false) const;
     ///@}
 
-    /// @name Deck manipulation
+    /** @name Deck manipulation */
     ///@{
     void cleanList(bool preserveMetadata = false);
     bool isEmpty() const
@@ -238,7 +240,7 @@ public:
                               const bool formatLegal = true);
     ///@}
 
-    /// @name Deck identity
+    /** @name Deck identity */
     ///@{
     QString getDeckHash() const;
     void refreshDeckHash();

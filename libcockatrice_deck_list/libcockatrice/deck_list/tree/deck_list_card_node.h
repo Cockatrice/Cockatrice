@@ -93,79 +93,79 @@ public:
      */
     explicit DecklistCardNode(DecklistCardNode *other, InnerDecklistNode *_parent);
 
-    /// @return The quantity of this card.
+    /** @return The quantity of this card. */
     [[nodiscard]] int getNumber() const override
     {
         return number;
     }
 
-    /// @param _number Set the quantity of this card.
+    /** @param _number Set the quantity of this card. */
     void setNumber(int _number) override
     {
         number = _number;
     }
 
-    /// @return The display name of this card.
+    /** @return The display name of this card. */
     [[nodiscard]] QString getName() const override
     {
         return name;
     }
 
-    /// @param _name Set the display name of this card.
+    /** @param _name Set the display name of this card. */
     void setName(const QString &_name) override
     {
         name = _name;
     }
 
-    /// @return The provider identifier for this card.
+    /** @return The provider identifier for this card. */
     [[nodiscard]] QString getCardProviderId() const override
     {
         return cardProviderId;
     }
 
-    /// @param _providerId Set the provider identifier for this card.
+    /** @param _providerId Set the provider identifier for this card. */
     void setCardProviderId(const QString &_providerId) override
     {
         cardProviderId = _providerId;
     }
 
-    /// @return The short set code (e.g., "NEO").
+    /** @return The short set code (e.g., "NEO"). */
     [[nodiscard]] QString getCardSetShortName() const override
     {
         return cardSetShortName;
     }
 
-    /// @param _cardSetShortName Set the short set code.
+    /** @param _cardSetShortName Set the short set code. */
     void setCardSetShortName(const QString &_cardSetShortName) override
     {
         cardSetShortName = _cardSetShortName;
     }
 
-    /// @return The collector number of this card within its set.
+    /** @return The collector number of this card within its set. */
     [[nodiscard]] QString getCardCollectorNumber() const override
     {
         return cardSetNumber;
     }
 
-    /// @param _cardSetNumber Set the collector number.
+    /** @param _cardSetNumber Set the collector number. */
     void setCardCollectorNumber(const QString &_cardSetNumber) override
     {
         cardSetNumber = _cardSetNumber;
     }
 
-    /// @return The format legality of the card
+    /** @return The format legality of the card. */
     [[nodiscard]] bool getFormatLegality() const override
     {
         return formatLegal;
     }
 
-    /// @param _formatLegal If the card is considered legal
+    /** @param _formatLegal If the card is considered legal. */
     void setFormatLegality(const bool _formatLegal) override
     {
         formatLegal = _formatLegal;
     }
 
-    /// @return Always false; card nodes are not deck headers.
+    /** @return Always false; card nodes are not deck headers. */
     [[nodiscard]] bool isDeckHeader() const override
     {
         return false;

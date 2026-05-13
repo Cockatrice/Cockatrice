@@ -104,37 +104,37 @@ private slots:
     void updateDisplayType();
 
 private:
-    /// Layout for grouping and sorting UI elements.
+    /** @brief Layout for grouping and sorting UI elements. */
     QHBoxLayout *groupAndSortLayout;
 
-    /// Current deck display type.
+    /** @brief Current deck display type. */
     DisplayType currentDisplayType = DisplayType::Overlap;
 
-    /// Button used to toggle the display layout.
+    /** @brief Button used to toggle the display layout. */
     CompactPushButton *displayTypeButton;
 
-    /// Label for the group-by selector.
+    /** @brief Label for the group-by selector. */
     QLabel *groupByLabel;
 
-    /// Combo box listing group-by criteria.
+    /** @brief Combo box listing group-by criteria. */
     QComboBox *groupByComboBox;
 
-    /// Currently active group-by criterion.
+    /** @brief Currently active group-by criterion. */
     QString activeGroupCriteria = "maintype";
 
-    /// Encapsulates the sort settings widgets (label + list).
+    /** @brief Encapsulates the sort settings widgets (label + list). */
     SettingsButtonWidget *sortCriteriaButton;
 
-    /// Label for “Sort by”.
+    /** @brief Label for "Sort by". */
     QLabel *sortByLabel;
 
-    /// Descriptive label inside the sort criteria button.
+    /** @brief Descriptive label inside the sort criteria button. */
     QLabel *sortLabel;
 
-    /// Draggable list of sort criteria.
+    /** @brief Draggable list of sort criteria. */
     QListWidget *sortByListWidget;
 
-    /// Ordered list of current sort criteria.
+    /** @brief Ordered list of current sort criteria. */
     QStringList activeSortCriteria = {"name", "cmc", "colors", "maintype"};
 };
 

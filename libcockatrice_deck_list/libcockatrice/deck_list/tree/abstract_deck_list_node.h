@@ -101,7 +101,7 @@ public:
      */
     explicit AbstractDecklistNode(InnerDecklistNode *_parent = nullptr, int position = -1);
 
-    /// Virtual destructor. Child classes must clean up their resources.
+    /** @brief Virtual destructor. Child classes must clean up their resources. */
     virtual ~AbstractDecklistNode() = default;
 
     /**
@@ -136,7 +136,7 @@ public:
      */
     [[nodiscard]] virtual bool isDeckHeader() const = 0;
 
-    /// @return The parent node, or nullptr if this is the root.
+    /** @return The parent node, or nullptr if this is the root. */
     [[nodiscard]] InnerDecklistNode *getParent() const
     {
         return parent;

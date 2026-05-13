@@ -63,19 +63,19 @@ public:
                                           CardDatabaseModel *_cardDatabaseModel,
                                           CardDatabaseDisplayModel *_cardDatabaseDisplayModel);
 
-    /// Add a new tab with a widget and title.
+    /** @brief Add a new tab with a widget and title. */
     void addNewTab(QWidget *widget, const QString &title);
 
-    /// Remove the currently active tab.
+    /** @brief Remove the currently active tab. */
     void removeCurrentTab();
 
-    /// Set the title of a specific tab.
+    /** @brief Set the title of a specific tab. */
     void setTabTitle(int index, const QString &title);
 
-    /// Get the currently active tab widget.
+    /** @brief Get the currently active tab widget. */
     [[nodiscard]] QWidget *getCurrentTab() const;
 
-    /// Get the total number of tabs.
+    /** @brief Get the total number of tabs. */
     [[nodiscard]] int getTabCount() const;
 
     VisualDeckEditorWidget *visualDeckView; ///< Visual deck editor widget.
