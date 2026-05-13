@@ -343,6 +343,16 @@ void Player::incrementAllCardCounters()
     }
 }
 
+AbstractCounter *Player::getLifeCounter() const
+{
+    for (auto counter : counters.values()) {
+        if (counter->getName() == "life") {
+            return counter;
+        }
+    }
+    return nullptr;
+}
+
 ArrowItem *Player::addArrow(const ServerInfo_Arrow &arrow)
 {
     const QMap<int, Player *> &playerList = game->getPlayerManager()->getPlayers();

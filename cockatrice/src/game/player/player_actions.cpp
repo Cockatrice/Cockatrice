@@ -19,6 +19,7 @@
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_flip_card.pb.h>
 #include <libcockatrice/protocol/pb/command_game_say.pb.h>
+#include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_mulligan.pb.h>
 #include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
@@ -1376,6 +1377,32 @@ void PlayerActions::actFlowP()
 void PlayerActions::actFlowT()
 {
     actIncPT(-1, 1);
+}
+
+void PlayerActions::actReduceLifeByPower()
+{
+    // find life counter
+    auto lifeCounter = player->getLifeCounter();
+    if (!lifeCounter) {
+        return;
+    }
+
+    // calculate total power
+    auto cards = player->getGameScene()->selectedCards();
+    int total = 0;
+    for (auto card : cards) {
+        QVariantList parsed = CardItem::parsePT(card->getPT());
+        if (!parsed.isEmpty()) {
+            int power = parsed.first().toInt(); // toInt will default to 0 if it's not an int
+            total += qMax(power, 0);
+        }
+    }
+
+    // send cmd
+    Command_IncCounter cmd;
+    cmd.set_counter_id(lifeCounter->getId());
+    cmd.set_delta(-total);
+    sendGameCommand(prepareGameCommand(cmd));
 }
 
 void AnnotationDialog::keyPressEvent(QKeyEvent *event)
