@@ -122,7 +122,7 @@ private:
     int cardsPerPage = 100; // Number of cards per page
 
     void highlightAllSearchEdit();
-    bool nearEndOfPage();
+    bool nearEndOfPage() const;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

@@ -270,7 +270,7 @@ void VisualDatabaseDisplayWidget::onSearchModelChanged()
     }
 }
 
-bool VisualDatabaseDisplayWidget::nearEndOfPage()
+bool VisualDatabaseDisplayWidget::nearEndOfPage() const
 {
     if (!flowWidget->isVisible()) {
         return false;
