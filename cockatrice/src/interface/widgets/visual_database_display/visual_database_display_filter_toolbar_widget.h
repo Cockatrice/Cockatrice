@@ -45,6 +45,12 @@ private:
     VisualDatabaseDisplaySetFilterWidget *setFilterWidget;
     SettingsButtonWidget *quickFilterFormatLegalityWidget;
     VisualDatabaseDisplayFormatLegalityFilterWidget *formatLegalityWidget;
+
+    int fullWidthHint = 0;
+    void updateCompactMode(int availableWidth);
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
 };
 
 #endif // COCKATRICE_VISUAL_DATABASE_DISPLAY_FILTER_TOOLBAR_WIDGET_H

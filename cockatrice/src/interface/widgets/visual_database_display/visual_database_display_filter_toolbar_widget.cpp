@@ -135,6 +135,10 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     filterContainerLayout->addWidget(filterGroupBox);
     filterContainerLayout->addStretch();
     filterContainerLayout->addWidget(quickFilterSaveLoadWidget);
+
+    // Force a layout pass so sizeHint() is accurate
+    layout()->activate();
+    fullWidthHint = sizeHint().width();
 }
 
 void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
@@ -155,4 +159,25 @@ void VisualDatabaseDisplayFilterToolbarWidget::retranslateUi()
     quickFilterSubTypeWidget->setButtonText(tr("Sub Type"));
     quickFilterSetWidget->setButtonText(tr("Sets"));
     quickFilterFormatLegalityWidget->setButtonText(tr("Formats"));
+}
+
+void VisualDatabaseDisplayFilterToolbarWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    updateCompactMode(event->size().width());
+}
+
+void VisualDatabaseDisplayFilterToolbarWidget::updateCompactMode(int availableWidth)
+{
+    const bool compact = availableWidth < fullWidthHint;
+
+    const QList<SettingsButtonWidget *> filterButtons = {
+        quickFilterSaveLoadWidget, quickFilterNameWidget, quickFilterMainTypeWidget,
+        quickFilterSubTypeWidget,  quickFilterSetWidget,  quickFilterFormatLegalityWidget,
+    };
+
+    for (auto *btn : filterButtons) {
+        if (btn->isCompact() != compact) // only act on transitions
+            btn->setCompact(compact);
+    }
 }
