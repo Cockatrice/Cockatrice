@@ -200,7 +200,7 @@ public:
     }
 
     /**
-     * Gets the counter that represents the life total. Shouldn't return null
+     * Gets the counter that represents the life total.
      */
     AbstractCounter *getLifeCounter() const;
 
