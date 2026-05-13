@@ -30,6 +30,7 @@
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
+#include <libcockatrice/protocol/pb/event_undo_draw_failed.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 
 PlayerEventHandler::PlayerEventHandler(PlayerLogic *_player) : QObject(_player), player(_player)
@@ -581,6 +582,11 @@ void PlayerEventHandler::eventChangeZoneProperties(const Event_ChangeZonePropert
     }
 }
 
+void PlayerEventHandler::eventUndoDrawFailed(const Event_UndoDrawFailed &)
+{
+    emit logUndoDrawFailed(player);
+}
+
 void PlayerEventHandler::processGameEvent(GameEvent::GameEventType type,
                                           const GameEvent &event,
                                           const GameEventContext &context,
@@ -643,6 +649,9 @@ void PlayerEventHandler::processGameEvent(GameEvent::GameEventType type,
             break;
         case GameEvent::CHANGE_ZONE_PROPERTIES:
             eventChangeZoneProperties(event.GetExtension(Event_ChangeZoneProperties::ext));
+            break;
+        case GameEvent::UNDO_DRAW_FAILED:
+            eventUndoDrawFailed(event.GetExtension(Event_UndoDrawFailed::ext));
             break;
         default: {
             qWarning() << "unhandled game event" << type;

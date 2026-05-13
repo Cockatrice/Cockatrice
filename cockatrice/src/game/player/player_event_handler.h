@@ -35,6 +35,8 @@ class Event_SetCardAttr;
 class Event_SetCardCounter;
 class Event_SetCounter;
 class Event_Shuffle;
+class Event_UndoDrawFailed;
+
 class PlayerEventHandler : public QObject
 {
 
@@ -52,6 +54,7 @@ signals:
     void logCreateToken(PlayerLogic *player, QString cardName, QString pt, bool faceDown);
     void logDrawCards(PlayerLogic *player, int number, bool deckIsEmpty);
     void logUndoDraw(PlayerLogic *player, QString cardName);
+    void logUndoDrawFailed(PlayerLogic *player);
     void logMoveCard(PlayerLogic *player,
                      CardItem *card,
                      CardZoneLogic *startZone,
@@ -108,6 +111,7 @@ public:
     void eventDrawCards(const Event_DrawCards &event);
     void eventRevealCards(const Event_RevealCards &event, EventProcessingOptions options);
     void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
+    void eventUndoDrawFailed(const Event_UndoDrawFailed &event);
 
 private:
     PlayerLogic *player;

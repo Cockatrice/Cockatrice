@@ -106,6 +106,7 @@ set(PROTO_FILES
     event_set_card_counter.proto
     event_set_counter.proto
     event_shuffle.proto
+    event_undo_draw_failed.proto
     event_user_joined.proto
     event_user_left.proto
     event_user_message.proto

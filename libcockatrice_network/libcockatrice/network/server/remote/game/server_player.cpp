@@ -39,6 +39,7 @@
 #include <libcockatrice/protocol/pb/event_player_properties_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
+#include <libcockatrice/protocol/pb/event_undo_draw_failed.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/response_dump_zone.pb.h>
@@ -409,6 +410,8 @@ Server_Player::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, ResponseContainer &
     }
 
     if (lastDrawList.isEmpty()) {
+        Event_UndoDrawFailed event;
+        ges.enqueueGameEvent(event, playerId);
         return Response::RespContextError;
     }
 
