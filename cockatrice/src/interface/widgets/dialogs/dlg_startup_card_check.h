@@ -1,8 +1,8 @@
 /**
  * @file dlg_startup_card_check.h
  * @ingroup CardDatabaseUpdateDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_STARTUP_CARD_CHECK_H
 #define DLG_STARTUP_CARD_CHECK_H

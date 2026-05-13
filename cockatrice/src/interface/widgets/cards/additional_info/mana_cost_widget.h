@@ -1,8 +1,8 @@
 /**
  * @file mana_cost_widget.h
  * @ingroup CardExtraInfoWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef MANA_COST_WIDGET_H
 #define MANA_COST_WIDGET_H

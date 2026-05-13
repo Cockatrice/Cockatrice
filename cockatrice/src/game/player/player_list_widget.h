@@ -1,8 +1,8 @@
 /**
  * @file player_list_widget.h
  * @ingroup GameWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef PLAYERLISTWIDGET_H
 #define PLAYERLISTWIDGET_H

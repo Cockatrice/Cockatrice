@@ -1,8 +1,8 @@
 /**
  * @file card_info_picture_art_crop_widget.h
  * @ingroup CardWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARD_INFO_PICTURE_ART_CROP_WIDGET_H
 #define CARD_INFO_PICTURE_ART_CROP_WIDGET_H

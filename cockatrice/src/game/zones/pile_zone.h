@@ -1,8 +1,8 @@
 /**
  * @file pile_zone.h
  * @ingroup GameGraphicsZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef PILEZONE_H
 #define PILEZONE_H

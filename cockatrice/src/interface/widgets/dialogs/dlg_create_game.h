@@ -1,8 +1,8 @@
 /**
  * @file dlg_create_game.h
  * @ingroup RoomDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_CREATEGAME_H
 #define DLG_CREATEGAME_H

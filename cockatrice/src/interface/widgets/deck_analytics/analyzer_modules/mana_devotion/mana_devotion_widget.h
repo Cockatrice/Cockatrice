@@ -1,8 +1,8 @@
 /**
  * @file mana_devotion_widget.h
  * @ingroup DeckEditorAnalyticsWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef MANA_DEVOTION_WIDGET_H
 #define MANA_DEVOTION_WIDGET_H

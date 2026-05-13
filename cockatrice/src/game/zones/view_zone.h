@@ -1,8 +1,8 @@
 /**
  * @file view_zone.h
  * @ingroup GameGraphicsZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef ZONEVIEWERZONE_H
 #define ZONEVIEWERZONE_H

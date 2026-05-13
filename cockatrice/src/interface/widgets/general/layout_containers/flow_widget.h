@@ -1,8 +1,8 @@
 /**
  * @file flow_widget.h
  * @ingroup UI
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef FLOW_WIDGET_H
 #define FLOW_WIDGET_H

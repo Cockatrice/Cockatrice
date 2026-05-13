@@ -2,8 +2,8 @@
  * @file dlg_load_remote_deck.h
  * @ingroup RemoteDeckStorageDialogs
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_STARTGAME_H
 #define DLG_STARTGAME_H

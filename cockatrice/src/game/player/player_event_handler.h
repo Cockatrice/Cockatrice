@@ -1,8 +1,8 @@
 /**
  * @file player_event_handler.h
  * @ingroup GameLogicPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_EVENT_HANDLER_H
 #define COCKATRICE_PLAYER_EVENT_HANDLER_H

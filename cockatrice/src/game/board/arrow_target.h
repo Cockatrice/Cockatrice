@@ -1,8 +1,8 @@
 /**
  * @file arrow_target.h
  * @ingroup GameGraphics
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef ARROWTARGET_H
 #define ARROWTARGET_H

@@ -2,8 +2,8 @@
  * @file syntax_help.h
  * @ingroup CardDatabaseModelFilters
  * @ingroup DeckStorageWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef SEARCH_SYNTAX_HELP_H
 #define SEARCH_SYNTAX_HELP_H

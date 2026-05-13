@@ -44,7 +44,7 @@ void ArchidektApiResponseDeck::fromJson(const QJsonObject &json)
         cards.append(entry);
     }
 
-    // TODO but not really important
+    //! \todo Parse customCards field (not really important).
     // customCards = {""};
 }
 

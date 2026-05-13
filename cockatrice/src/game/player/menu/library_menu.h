@@ -1,8 +1,8 @@
 /**
  * @file library_menu.h
  * @ingroup GameMenusZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_LIBRARY_MENU_H
 #define COCKATRICE_LIBRARY_MENU_H

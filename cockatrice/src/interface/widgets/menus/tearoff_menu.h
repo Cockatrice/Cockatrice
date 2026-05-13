@@ -1,8 +1,8 @@
 /**
  * @file tearoff_menu.h
  * @ingroup GameMenus
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #pragma once
 

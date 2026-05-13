@@ -1,8 +1,8 @@
 /**
  * @file dlg_edit user.h
  * @ingroup NetworkDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_EDITUSER_H
 #define DLG_EDITUSER_H

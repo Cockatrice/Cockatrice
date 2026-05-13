@@ -1,8 +1,8 @@
 /**
  * @file custom_zone_menu.h
  * @ingroup GameMenusZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_CUSTOM_ZONE_MENU_H
 #define COCKATRICE_CUSTOM_ZONE_MENU_H

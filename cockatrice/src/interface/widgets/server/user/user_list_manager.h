@@ -1,8 +1,8 @@
 /**
  * @file user_list_manager.h
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_USER_LIST_MANAGER_H
 #define COCKATRICE_USER_LIST_MANAGER_H

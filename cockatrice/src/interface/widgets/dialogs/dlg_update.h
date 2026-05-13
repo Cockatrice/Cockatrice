@@ -1,8 +1,8 @@
 /**
  * @file dlg_update.h
  * @ingroup ClientUpdateDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_UPDATE_H
 #define DLG_UPDATE_H

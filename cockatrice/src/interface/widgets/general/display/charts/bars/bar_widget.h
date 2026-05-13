@@ -2,8 +2,8 @@
  * @file bar_widget.h
  * @ingroup Widgets
  * @ingroup DeckEditorAnalyticsWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef BAR_WIDGET_H
 #define BAR_WIDGET_H

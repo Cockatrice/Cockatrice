@@ -1,8 +1,8 @@
 /**
  * @file card_group_display_widget.h
  * @ingroup DeckEditorCardGroupWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARD_GROUP_DISPLAY_WIDGET_H
 #define CARD_GROUP_DISPLAY_WIDGET_H

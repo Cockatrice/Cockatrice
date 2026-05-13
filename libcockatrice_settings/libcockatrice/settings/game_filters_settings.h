@@ -2,8 +2,8 @@
  * @file game_filters_settings.h
  * @ingroup Lobby
  * @ingroup GameSettings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef GAMEFILTERSSETTINGS_H
 #define GAMEFILTERSSETTINGS_H

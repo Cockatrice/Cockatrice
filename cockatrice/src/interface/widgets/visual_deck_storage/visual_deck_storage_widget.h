@@ -1,8 +1,8 @@
 /**
  * @file visual_deck_storage_widget.h
  * @ingroup VisualDeckStorageWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef VISUAL_DECK_STORAGE_WIDGET_H
 #define VISUAL_DECK_STORAGE_WIDGET_H

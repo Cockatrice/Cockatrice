@@ -1,8 +1,8 @@
 /**
  * @file printing_selector_card_sorting_widget.h
  * @ingroup PrintingWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef PRINTING_SELECTOR_CARD_SORTING_WIDGET_H
 #define PRINTING_SELECTOR_CARD_SORTING_WIDGET_H

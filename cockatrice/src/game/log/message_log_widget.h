@@ -1,8 +1,8 @@
 /**
  * @file message_log_widget.h
  * @ingroup GameWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef MESSAGELOGWIDGET_H
 #define MESSAGELOGWIDGET_H

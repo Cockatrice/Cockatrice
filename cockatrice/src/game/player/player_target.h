@@ -1,8 +1,8 @@
 /**
  * @file player_target.h
  * @ingroup GameGraphicsPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef PLAYERTARGET_H
 #define PLAYERTARGET_H

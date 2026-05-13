@@ -1,8 +1,8 @@
 /**
  * @file settings_manager.h
  * @ingroup Settings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef SETTINGSMANAGER_H
 #define SETTINGSMANAGER_H

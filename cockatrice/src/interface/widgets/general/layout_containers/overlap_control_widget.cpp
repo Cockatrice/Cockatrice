@@ -33,7 +33,7 @@ OverlapControlWidget::OverlapControlWidget(int overlapPercentage,
     layout->addWidget(overlap_percentage_input);
     layout->addWidget(overlap_direction);
 
-    // TODO probably connect this to the parent
+    //! \todo Probably connect this to the parent.
     // connect(card_size_slider, &QSlider::valueChanged, display, &CardPicture::setScaleFactor);
 }
 

@@ -1,8 +1,8 @@
 /**
  * @file tab_server.h
  * @ingroup ServerTabs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_SERVER_H
 #define TAB_SERVER_H

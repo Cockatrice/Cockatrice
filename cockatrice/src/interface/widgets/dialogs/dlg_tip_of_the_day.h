@@ -1,8 +1,8 @@
 /**
  * @file dlg_tip_of_the_day.h
  * @ingroup Dialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_TIPOFDAY_H
 #define DLG_TIPOFDAY_H

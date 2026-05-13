@@ -121,7 +121,7 @@ void DlgForgotPasswordReset::actOk()
         return;
     }
 
-    //! \todo this stuff should be using qvalidators
+    //! \todo This stuff should be using QValidators.
     if (newpasswordEdit->text().length() < 8) {
         QMessageBox::critical(this, tr("Error"), tr("Your password is too short."));
         return;

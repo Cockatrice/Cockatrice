@@ -329,7 +329,7 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
         if (!player->getReadyStart()) {
             if (forceStartGame) {
                 // Player is not ready to start, so kick them
-                // TODO: Move them to Spectators instead
+                //! \todo Move them to Spectators instead.
                 kickParticipant(player->getPlayerId());
             } else {
                 return;
@@ -500,7 +500,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
         allPlayersEver.insert(playerName);
 
         // if the original creator of the game joins, give them host status back
-        //! \todo transferring host to spectators has side effects
+        //! \todo Transferring host to spectators has side effects.
         if (newParticipant->getUserInfo()->name() == creatorInfo->name()) {
             hostId = newParticipant->getPlayerId();
             sendGameEventContainer(prepareGameEvent(Event_GameHostChanged(), hostId));
