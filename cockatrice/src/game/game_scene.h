@@ -56,10 +56,12 @@ private:
      */
     void updateHover(const QPointF &scenePos);
 
-    /// Activates hover state and escapes the card from its clip container so hover scaling is visible beyond zone
-    /// bounds.
+    /**
+     * @brief Activates hover state and escapes the card from its clip container
+     * so hover scaling is visible beyond zone bounds.
+     */
     void beginCardHover(CardItem *card);
-    /// Deactivates hover state and restores the card to its clip container.
+    /** @brief Deactivates hover state and restores the card to its clip container. */
     void endCardHover(CardItem *card);
 
 public:
@@ -70,13 +72,13 @@ public:
      */
     explicit GameScene(PhasesToolbar *_phasesToolbar, QObject *parent = nullptr);
 
-    /** Destructor, cleans up timer and zone views. */
+    /** @brief Destructor, cleans up timer and zone views. */
     ~GameScene() override;
 
-    /** Updates UI text for all zone views. */
+    /** @brief Updates UI text for all zone views. */
     void retranslateUi();
 
-    /** Gets all selected CardItems */
+    /** @brief Gets all selected CardItems. */
     QList<CardItem *> selectedCards() const;
 
     /**
@@ -97,7 +99,7 @@ public:
      */
     void adjustPlayerRotation(int rotationAdjustment);
 
-    /** Recomputes the layout of players and the scene size. */
+    /** @brief Recomputes the layout of players and the scene size. */
     void rearrange();
 
     /**
@@ -157,50 +159,50 @@ public:
      */
     void resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qreal newWidth);
 
-    /** Finds the topmost card zone under the cursor. */
+    /** @brief Finds the topmost card zone under the cursor. */
     static CardZone *findTopmostZone(const QList<QGraphicsItem *> &items);
 
-    /** Finds the topmost card in a given zone, considering attachments and Z-order. */
+    /** @brief Finds the topmost card in a given zone, considering attachments and Z-order. */
     static CardItem *findTopmostCardInZone(const QList<QGraphicsItem *> &items, CardZone *zone);
 
-    /** Updates hovered card highlighting. */
+    /** @brief Updates hovered card highlighting. */
     void updateHoveredCard(CardItem *newCard);
 
-    /** Registers a card for animation updates. */
+    /** @brief Registers a card for animation updates. */
     void registerAnimationItem(AbstractCardItem *card);
 
-    /** Unregisters a card from animation updates. */
+    /** @brief Unregisters a card from animation updates. */
     void unregisterAnimationItem(AbstractCardItem *card);
     void startRubberBand(const QPointF &selectionOrigin);
     void resizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void stopRubberBand();
 
 public slots:
-    /** Toggles a zone view for a player. */
+    /** @brief Toggles a zone view for a player. */
     void toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed = false);
 
-    /** Adds a revealed zone view (for shown cards). */
+    /** @brief Adds a revealed zone view (for shown cards). */
     void addRevealedZoneView(Player *player,
                              CardZoneLogic *zone,
                              const QList<const ServerInfo_Card *> &cardList,
                              bool withWritePermission);
 
-    /** Removes a zone view widget from the scene. */
+    /** @brief Removes a zone view widget from the scene. */
     void removeZoneView(ZoneViewWidget *item);
 
-    /** Closes all zone views. */
+    /** @brief Closes all zone views. */
     void clearViews();
 
-    /** Closes the most recently added zone view. */
+    /** @brief Closes the most recently added zone view. */
     void closeMostRecentZoneView();
     QTransform getViewTransform() const;
     QTransform getViewportTransform() const;
 
 protected:
-    /** Handles hover updates. */
+    /** @brief Handles hover updates. */
     bool event(QEvent *event) override;
 
-    /** Handles animation timer updates. */
+    /** @brief Handles animation timer updates. */
     void timerEvent(QTimerEvent *event) override;
 
 signals:

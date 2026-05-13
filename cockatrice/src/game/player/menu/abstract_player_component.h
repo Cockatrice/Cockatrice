@@ -19,13 +19,13 @@ class AbstractPlayerComponent
 public:
     virtual ~AbstractPlayerComponent() = default;
 
-    /// Bind keyboard shortcuts. Called when this player gains focus.
+    /** @brief Bind keyboard shortcuts. Called when this player gains focus. */
     virtual void setShortcutsActive() = 0;
 
-    /// Unbind keyboard shortcuts. Called when this player loses focus.
+    /** @brief Unbind keyboard shortcuts. Called when this player loses focus. */
     virtual void setShortcutsInactive() = 0;
 
-    /// Retranslate all user-visible strings. Called on language change.
+    /** @brief Retranslate all user-visible strings. Called on language change. */
     virtual void retranslateUi() = 0;
 };
 

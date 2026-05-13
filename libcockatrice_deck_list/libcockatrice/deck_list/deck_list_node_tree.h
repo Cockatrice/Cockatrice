@@ -12,11 +12,11 @@ class DecklistNodeTree
     InnerDecklistNode *root; ///< Root of the deck tree (zones + cards).
 
 public:
-    /// @brief Constructs an empty DecklistNodeTree
+    /** @brief Constructs an empty DecklistNodeTree. */
     explicit DecklistNodeTree();
-    /// @brief Copy constructor. Deep copies the tree
+    /** @brief Copy constructor. Deep copies the tree. */
     explicit DecklistNodeTree(const DecklistNodeTree &other);
-    /// @brief Copy-assignment operator. Deep copies the tree
+    /** @brief Copy-assignment operator. Deep copies the tree. */
     DecklistNodeTree &operator=(const DecklistNodeTree &other);
 
     virtual ~DecklistNodeTree();

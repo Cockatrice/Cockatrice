@@ -58,40 +58,40 @@ public:
     {
     }
 
-    /// @return The number of copies of this card in the deck.
+    /** @return The number of copies of this card in the deck. */
     [[nodiscard]] virtual int getNumber() const = 0;
 
-    /// @param _number Set the number of copies of this card.
+    /** @param _number Set the number of copies of this card. */
     virtual void setNumber(int _number) = 0;
 
-    /// @return The display name of this card.
+    /** @return The display name of this card. */
     [[nodiscard]] QString getName() const override = 0;
 
-    /// @param _name Set the display name of this card.
+    /** @param _name Set the display name of this card. */
     virtual void setName(const QString &_name) = 0;
 
-    /// @return The provider identifier for this card (e.g., UUID).
+    /** @return The provider identifier for this card (e.g., UUID). */
     [[nodiscard]] virtual QString getCardProviderId() const override = 0;
 
-    /// @param _cardProviderId Set the provider identifier for this card.
+    /** @param _cardProviderId Set the provider identifier for this card. */
     virtual void setCardProviderId(const QString &_cardProviderId) = 0;
 
-    /// @return The abbreviated set code (e.g., "NEO").
+    /** @return The abbreviated set code (e.g., "NEO"). */
     [[nodiscard]] virtual QString getCardSetShortName() const override = 0;
 
-    /// @param _cardSetShortName Set the abbreviated set code.
+    /** @param _cardSetShortName Set the abbreviated set code. */
     virtual void setCardSetShortName(const QString &_cardSetShortName) = 0;
 
-    /// @return The collector number of the card within its set.
+    /** @return The collector number of the card within its set. */
     [[nodiscard]] virtual QString getCardCollectorNumber() const override = 0;
 
-    /// @param _cardSetNumber Set the collector number.
+    /** @param _cardSetNumber Set the collector number. */
     virtual void setCardCollectorNumber(const QString &_cardSetNumber) = 0;
 
-    /// @return The format legality of the card
+    /** @return The format legality of the card. */
     virtual bool getFormatLegality() const = 0;
 
-    /// @param _formatLegal If the card is considered legal
+    /** @param _formatLegal If the card is considered legal. */
     virtual void setFormatLegality(const bool _formatLegal) = 0;
 
     /**
