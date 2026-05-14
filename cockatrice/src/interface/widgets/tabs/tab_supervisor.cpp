@@ -566,6 +566,10 @@ void TabSupervisor::openTabServer()
 {
     tabServer = new TabServer(this, client);
     connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
+    connect(tabServer, &TabServer::roomJoined, this,
+            [this](const ServerInfo_Room &info, bool) { emit roomJoinedById(info.room_id()); });
+    connect(tabServer, &TabServer::roomAlreadyJoined, this, [this](int roomId, bool) { emit roomJoinedById(roomId); });
+    connect(tabServer, &TabServer::roomJoinFailed, this, [this](int roomId) { emit roomJoinFailedById(roomId); });
     myAddTab(tabServer, aTabServer);
     connect(tabServer, &QObject::destroyed, this, [this] {
         tabServer = nullptr;
@@ -832,6 +836,14 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
 void TabSupervisor::maximizeMainWindow()
 {
     emit showWindowIfHidden();
+}
+
+bool TabSupervisor::requestJoinRoom(int roomId, bool setCurrent)
+{
+    if (!tabServer)
+        return false;
+    tabServer->joinRoom(roomId, setCurrent);
+    return true;
 }
 
 void TabSupervisor::talkLeft(TabMessage *tab)

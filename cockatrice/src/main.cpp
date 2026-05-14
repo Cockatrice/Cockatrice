@@ -35,12 +35,16 @@
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QDebug>
+#include <QEventLoop>
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QSystemTrayIcon>
 #include <QTranslator>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
+#include <libcockatrice/utility/single_instance_manager.h>
+#include <libcockatrice/utility/url_utils.h>
+#include <libcockatrice/utility_gui/url_scheme_event_filter.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
@@ -230,6 +234,9 @@ int main(int argc, char *argv[])
         {{{"c", "connect"}, QCoreApplication::translate("main", "Connect on startup"), "user:pass@host:port"},
          {{"d", "debug-output"}, QCoreApplication::translate("main", "Debug to file")}});
 
+    parser.addPositionalArgument("url", QCoreApplication::translate("main", "Optional cockatrice:// URL to open"),
+                                 "[url]");
+
     parser.process(app);
 
     if (parser.isSet("debug-output")) {
@@ -253,7 +260,64 @@ int main(int argc, char *argv[])
 
     qCInfo(MainLog) << "Starting main program";
 
+    // Determine if a cockatrice:// URL was passed as a positional argument
+    QString urlArg = UrlUtils::findUrlArgument(parser.positionalArguments(), QStringLiteral("cockatrice://"));
+
+#ifdef Q_OS_MAC
+    // On macOS the OS delivers a registered URL scheme via QFileOpenEvent,
+    // which is queued before main() and dispatched on the FIRST event-loop
+    // spin.  The single-instance handshake below runs a nested event loop, so
+    // the filter MUST be installed beforehand or the cold-start URL is lost.
+    // Until ui exists, buffer the URL into a local; we replay it after
+    // MainWindow construction.  Capture the connection handle so we can
+    // disconnect the buffer-lambda unambiguously once ui is ready.
+    UrlSchemeEventFilter cockatriceFilter(QStringLiteral("cockatrice://"));
+    QString cocoaDeliveredUrl;
+    const auto cocoaBufferConn =
+        QObject::connect(&cockatriceFilter, &UrlSchemeEventFilter::urlReceived,
+                         [&cocoaDeliveredUrl](const QString &url) { cocoaDeliveredUrl = url; });
+    app.installEventFilter(&cockatriceFilter);
+#endif
+
+    // Single-instance: only enforce when delivering a URL to a primary.  When
+    // no URL is involved, try to become primary if available, otherwise allow
+    // this instance to run alongside an existing one (multi-instance workflow).
+    SingleInstanceManager sim(SingleInstanceManager::perUserSocketName(QStringLiteral("CockatriceInstance")));
+    bool wasForwarded = false;
+    {
+        QEventLoop startupLoop;
+        QObject::connect(&sim, &SingleInstanceManager::roleResolved, [&](bool forwarded) {
+            wasForwarded = forwarded;
+            startupLoop.quit();
+        });
+        sim.resolveStartupRole(urlArg);
+        startupLoop.exec();
+    }
+    if (wasForwarded) {
+        qCInfo(MainLog) << "Another instance is already running; URL forwarded. Exiting.";
+        return 0;
+    }
+
     MainWindow ui;
+    if (!urlArg.isEmpty()) {
+        // Deliver the URL once the event loop is running (after ui.show())
+        QTimer::singleShot(0, &ui, [&ui, urlArg]() { ui.handleUrl(urlArg); });
+    }
+
+    // Connect future URLs forwarded from secondary instances (no-op if we are
+    // not the primary)
+    QObject::connect(&sim, &SingleInstanceManager::urlReceived, &ui, &MainWindow::handleUrl);
+
+#ifdef Q_OS_MAC
+    // Re-bind the filter from the buffer-lambda to ui->handleUrl now that ui
+    // exists, and replay any URL captured during the pre-ui startup window.
+    QObject::disconnect(cocoaBufferConn);
+    QObject::connect(&cockatriceFilter, &UrlSchemeEventFilter::urlReceived, &ui, &MainWindow::handleUrl);
+    if (!cocoaDeliveredUrl.isEmpty()) {
+        QTimer::singleShot(0, &ui, [&ui, url = cocoaDeliveredUrl]() { ui.handleUrl(url); });
+    }
+#endif
+
     if (parser.isSet("connect")) {
         ui.setConnectTo(parser.value("connect"));
     }

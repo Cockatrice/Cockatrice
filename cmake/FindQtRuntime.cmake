@@ -115,4 +115,10 @@ string(REGEX REPLACE "([^;]+)" "${COCKATRICE_QT_VERSION_NAME}::\\1" TEST_QT_MODU
 # Core-only export (useful for headless libs)
 set(QT_CORE_MODULE "${COCKATRICE_QT_VERSION_NAME}::Core")
 
+# Network-only export (useful for network-dependent libs that don't need GUI)
+set(QT_NETWORK_MODULE "${COCKATRICE_QT_VERSION_NAME}::Network")
+
+# GUI export
+set(QT_GUI_MODULE "${COCKATRICE_QT_VERSION_NAME}::Gui")
+
 message(STATUS "Found Qt ${${COCKATRICE_QT_VERSION_NAME}_VERSION} at: ${${COCKATRICE_QT_VERSION_NAME}_DIR}")

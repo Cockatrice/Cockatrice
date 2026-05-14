@@ -1,0 +1,33 @@
+# Cockatrice formatter image — mirrors the apt installs in
+# .github/workflows/desktop-lint.yml so a local `format.sh` run matches CI.
+#
+# Build:   docker build -t cockatrice-format -f Dockerfile.format .
+# Check:   docker run --rm -v "$(pwd):/src" cockatrice-format
+# Apply:   docker run --rm -v "$(pwd):/src" cockatrice-format \
+#             ./format.sh --cmake --shell --branch origin/master
+#
+# Or via docker compose (recommended):
+#   docker compose -f docker-compose.format.yml run --rm format          # diff-only check
+#   docker compose -f docker-compose.format.yml run --rm format-apply    # apply changes
+
+FROM ubuntu:24.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        clang-format \
+        cmake-format \
+        git \
+        shellcheck \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Allow git to operate on the bind-mounted repo despite differing owner UID.
+RUN git config --system --add safe.directory /src
+
+WORKDIR /src
+
+# Default to the same invocation CI uses (.ci/lint_cpp.sh).
+CMD ["./format.sh", "--diff", "--cmake", "--shell", "--print-version", "--branch", "origin/master"]

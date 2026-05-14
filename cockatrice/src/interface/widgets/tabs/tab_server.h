@@ -49,9 +49,13 @@ class TabServer : public Tab
     Q_OBJECT
 signals:
     void roomJoined(const ServerInfo_Room &info, bool setCurrent);
+    void roomJoinFailed(int roomId);
+    /** Emitted when joinRoom() short-circuits because the user is already in the room. */
+    void roomAlreadyJoined(int roomId, bool setCurrent);
+public slots:
+    void joinRoom(int id, bool setCurrent = true);
 private slots:
     void processServerMessageEvent(const Event_ServerMessage &event);
-    void joinRoom(int id, bool setCurrent);
     void joinRoomFinished(const Response &resp, const CommandContainer &commandContainer, const QVariant &extraData);
 
 private:

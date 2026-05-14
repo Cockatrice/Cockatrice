@@ -145,6 +145,7 @@ target_link_libraries(
   PUBLIC libcockatrice_card
   PUBLIC libcockatrice_settings
   PUBLIC libcockatrice_network
+  PUBLIC libcockatrice_utility_gui
   PUBLIC ${ORACLE_QT_MODULES}
 )
 
@@ -167,7 +168,7 @@ if(UNIX)
     set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
     set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
-    set_target_properties(oracle PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
+    set_target_properties(oracle PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.oracle.plist)
 
     install(TARGETS oracle BUNDLE DESTINATION ./)
   else()

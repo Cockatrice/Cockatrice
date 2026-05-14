@@ -10,6 +10,8 @@
 #include <QLibraryInfo>
 #include <QTimer>
 #include <QTranslator>
+#include <libcockatrice/utility/url_utils.h>
+#include <libcockatrice/utility_gui/url_scheme_event_filter.h>
 
 QTranslator *translator, *qtTranslator;
 ThemeManager *themeManager;
@@ -63,9 +65,25 @@ int main(int argc, char *argv[])
     QCommandLineOption backgroundOption("b", QCoreApplication::translate("main", "Run in no-confirm background mode"));
     parser.addOption(spoilersOnlyOption);
     parser.addOption(backgroundOption);
+    parser.addPositionalArgument(
+        "url", QCoreApplication::translate("main", "Optional cockatrice-oracle:// URL to handle"), "[url]");
     parser.process(app);
     isSpoilersOnly = parser.isSet(spoilersOnlyOption);
     isBackgrounded = parser.isSet(backgroundOption);
+
+    // Handle cockatrice-oracle:// URL passed via the OS URL scheme handler
+    const QString oracleUrl =
+        UrlUtils::findUrlArgument(parser.positionalArguments(), QStringLiteral("cockatrice-oracle://"));
+    if (!oracleUrl.isEmpty()) {
+        const auto action = UrlUtils::parseOracleUrl(oracleUrl);
+        if (action.isUpdate) {
+            isBackgrounded = true;
+            if (action.spoilersOnly)
+                isSpoilersOnly = true;
+        } else {
+            qDebug() << "Oracle: ignoring unknown cockatrice-oracle:// URL:" << oracleUrl;
+        }
+    }
 
 #ifdef Q_OS_MAC
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
@@ -87,6 +105,27 @@ int main(int argc, char *argv[])
     wizard.setWindowIcon(icon);
     // set name of the app desktop file; used by wayland to load the window icon
     QGuiApplication::setDesktopFileName("oracle");
+
+#ifdef Q_OS_MAC
+    // On macOS the OS delivers a registered URL scheme via QFileOpenEvent,
+    // dispatched on the first event-loop spin.  Oracle has no nested event
+    // loop before app.exec(), so installing the filter here (after wizard
+    // construction but before app.exec()) is sufficient — the cold-start URL
+    // event sits in the queue until app.exec() dispatches it, by which point
+    // both the filter and wizard exist.
+    UrlSchemeEventFilter oracleFilter(QStringLiteral("cockatrice-oracle://"));
+    QObject::connect(&oracleFilter, &UrlSchemeEventFilter::urlReceived, &wizard, [&wizard](const QString &url) {
+        const auto action = UrlUtils::parseOracleUrl(url);
+        if (!action.isUpdate) {
+            qDebug() << "Oracle: ignoring unknown cockatrice-oracle:// URL:" << url;
+            return;
+        }
+        if (action.spoilersOnly)
+            isSpoilersOnly = true;
+        QTimer::singleShot(0, &wizard, [&wizard]() { wizard.runInBackground(); });
+    });
+    app.installEventFilter(&oracleFilter);
+#endif
 
     wizard.show();
 

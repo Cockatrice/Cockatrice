@@ -166,8 +166,24 @@ signals:
     void localGameEnded();
     void adminLockChanged(bool lock);
     void showWindowIfHidden();
+    /** Forwarded from TabServer::roomJoined — emitted whenever a room is successfully joined. */
+    void roomJoinedById(int roomId);
+    /** Forwarded from TabServer::roomJoinFailed — emitted whenever a room join is rejected by the server. */
+    void roomJoinFailedById(int roomId);
 
 public slots:
+    /**
+     * @brief Request joining the server room with the given @p roomId.
+     *
+     * Safe to call any time after login.
+     *
+     * @return true  — request dispatched (or short-circuited because the user
+     *                 is already in the room; @c roomJoinedById is emitted
+     *                 synchronously in that case so listeners aren't stuck).
+     * @return false — the server tab is not yet initialised; caller should
+     *                 treat this as a failure (do not wait for any signal).
+     */
+    bool requestJoinRoom(int roomId, bool setCurrent = true);
     void openDeckInNewTab(const LoadedDeck &deckToOpen);
     TabDeckEditor *addDeckEditorTab(const LoadedDeck &deckToOpen);
     TabDeckEditorVisual *addVisualDeckEditorTab(const LoadedDeck &deckToOpen);

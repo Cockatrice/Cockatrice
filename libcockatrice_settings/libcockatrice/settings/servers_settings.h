@@ -11,10 +11,23 @@
 
 #include <QLoggingCategory>
 #include <QObject>
+#include <optional>
 #define SERVERSETTINGS_DEFAULT_HOST "server.cockatrice.us"
 #define SERVERSETTINGS_DEFAULT_PORT "4748"
 
 inline Q_LOGGING_CATEGORY(ServersSettingsLog, "servers_settings");
+
+/**
+ * @brief Saved credentials for a server identified by hostname+port.
+ *
+ * @c password is empty when the entry's @c savePassword flag is false, in
+ * which case the caller should prompt the user for the password.
+ */
+struct SavedServerCreds
+{
+    QString playerName;
+    QString password;
+};
 
 class ServersSettings : public SettingsManager
 {
@@ -33,6 +46,20 @@ public:
     QString getFPPort(QString defaultPort = SERVERSETTINGS_DEFAULT_PORT) const;
     QString getFPPlayerName(QString defaultName = "") const;
     QString getPassword();
+
+    /**
+     * @brief Look up saved credentials by hostname+port.
+     *
+     * Used by the URL-driven join flow to authenticate against a server
+     * without requiring credentials in the URL itself.  Returns @c nullopt
+     * when no saved server matches.  When the matched entry has
+     * @c savePassword == false, the returned creds have an empty @c password
+     * — the caller is expected to prompt the user.
+     *
+     * Hostname matching is case-insensitive.
+     */
+    [[nodiscard]] std::optional<SavedServerCreds> findSavedCredsByHostPort(const QString &host, quint16 port) const;
+
     QString getSaveName(QString defaultname = "");
     QString getSite(QString defaultName = "");
     bool getSavePassword() const;
