@@ -138,6 +138,13 @@ void FlowWidget::resizeEvent(QResizeEvent *event)
     }
 }
 
+void FlowWidget::setSpacing(int hSpacing, int vSpacing)
+{
+    flowLayout->setHorizontalMargin(hSpacing);
+    flowLayout->setVerticalMargin(vSpacing);
+    flowLayout->invalidate();
+}
+
 /**
  * @brief Sets every child widget's minimum size to the largest sizeHint in the layout.
  *

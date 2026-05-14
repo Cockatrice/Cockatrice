@@ -24,6 +24,7 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnal
 
     // Controls
     controlContainer = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
+    controlContainer->setSpacing(4, 4);
     addButton = new QPushButton(this);
     removeButton = new QPushButton(this);
     saveButton = new QPushButton(this);

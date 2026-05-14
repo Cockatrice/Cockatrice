@@ -21,6 +21,7 @@ DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatistics
     : AbstractAnalyticsPanelWidget(parent, analyzer)
 {
     controls = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
+    controls->setSpacing(4, 4);
 
     labelPrefix = new QLabel(this);
     controls->addWidget(labelPrefix);

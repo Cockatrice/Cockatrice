@@ -39,6 +39,7 @@ public:
 
 public slots:
     void setMinimumSizeToMaxSizeHint();
+    void setSpacing(int hSpacing, int vSpacing);
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

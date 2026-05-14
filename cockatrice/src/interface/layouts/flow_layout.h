@@ -40,7 +40,15 @@ public:
     [[nodiscard]] QSize minimumSize() const override;
 
     // Spacing helpers
+    void setHorizontalMargin(int margin)
+    {
+        horizontalMargin = margin;
+    }
     [[nodiscard]] int horizontalSpacing() const;
+    void setVerticalMargin(int margin)
+    {
+        verticalMargin = margin;
+    }
     [[nodiscard]] int verticalSpacing() const;
     [[nodiscard]] int smartSpacing(QStyle::PixelMetric pm) const;
 
