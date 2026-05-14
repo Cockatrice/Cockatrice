@@ -69,7 +69,13 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
 
 void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
 {
-    searchBar = new QLineEdit(this);
+    searchContainer = new QWidget(this);
+    searchContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    searchLayout = new QHBoxLayout(searchContainer);
+    searchContainer->setLayout(searchLayout);
+
+    searchBar = new QLineEdit(searchContainer);
+    searchContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     connect(searchBar, &QLineEdit::returnPressed, this, [=, this]() {
         if (!searchBar->hasFocus())
             return;
@@ -79,6 +85,8 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
             emit cardAdditionRequested(card);
         }
     });
+
+    searchLayout->addWidget(searchBar);
 
     setFocusProxy(searchBar);
     setFocusPolicy(Qt::ClickFocus);
@@ -133,13 +141,15 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
     });
 
     // Search button functionality
-    searchPushButton = new QPushButton(this);
+    searchPushButton = new QPushButton(searchContainer);
     connect(searchPushButton, &QPushButton::clicked, this, [=, this]() {
         ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
         if (card) {
             emit cardAdditionRequested(card);
         }
     });
+
+    searchLayout->addWidget(searchPushButton);
 }
 
 void VisualDeckEditorWidget::initializeDisplayOptionsWidget()
@@ -156,18 +166,14 @@ void VisualDeckEditorWidget::initializeDisplayOptionsWidget()
 void VisualDeckEditorWidget::initializeDisplayOptionsAndSearchWidget()
 {
     initializeSearchBarAndCompleter();
-
     initializeDisplayOptionsWidget();
 
-    displayOptionsAndSearch = new QWidget(this);
-    displayOptionsAndSearchLayout = new QHBoxLayout(displayOptionsAndSearch);
-    displayOptionsAndSearchLayout->setContentsMargins(0, 0, 0, 0);
-    displayOptionsAndSearchLayout->setAlignment(Qt::AlignLeft);
-    displayOptionsAndSearch->setLayout(displayOptionsAndSearchLayout);
+    displayOptionsAndSearch = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 
-    displayOptionsAndSearchLayout->addWidget(displayOptionsWidget);
-    displayOptionsAndSearchLayout->addWidget(searchBar);
-    displayOptionsAndSearchLayout->addWidget(searchPushButton);
+    // We split into two sub-widgets here so that the searchBar and button wrap together. At this point, we've done
+    // pretty much all we can and have reached our minimum size.
+    displayOptionsAndSearch->addWidget(displayOptionsWidget);
+    displayOptionsAndSearch->addWidget(searchContainer); // Expanding — fills remainder of its row
 }
 
 void VisualDeckEditorWidget::initializeScrollAreaAndZoneContainer()

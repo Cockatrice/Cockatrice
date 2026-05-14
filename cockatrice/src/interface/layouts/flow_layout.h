@@ -54,7 +54,7 @@ public:
 
     // Layout passes (virtual so subclasses can override placement logic)
     virtual int layoutAllRows(int originX, int originY, int availableWidth);
-    virtual void layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, int y);
+    virtual void layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, int y, int availableWidth);
     int layoutAllColumns(int originX, int originY, int availableHeight);
     void layoutSingleColumn(const QVector<QLayoutItem *> &colItems, int x, int y);
 

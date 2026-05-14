@@ -151,7 +151,7 @@ int FlowLayout::layoutAllRows(const int originX, const int originY, const int av
 
         if (!rowItems.isEmpty() && rowUsedWidth + spaceX + itemSize.width() > availableWidth) {
             // Current item does not fit — flush the current row, begin a new one.
-            layoutSingleRow(rowItems, originX, currentY);
+            layoutSingleRow(rowItems, originX, currentY, availableWidth);
             rowItems.clear();
             currentY += rowHeight + verticalSpacing();
             rowUsedWidth = 0;
@@ -166,33 +166,67 @@ int FlowLayout::layoutAllRows(const int originX, const int originY, const int av
         rowHeight = qMax(rowHeight, itemSize.height());
     }
 
-    layoutSingleRow(rowItems, originX, currentY); // Flush the final row.
+    layoutSingleRow(rowItems, originX, currentY, availableWidth); // Flush the final row.
     return currentY + rowHeight;
 }
 
 /**
  * @brief Sets the geometry for every item in @p rowItems, starting at (@p x, @p y).
  *
- * Each item is placed at its sizeHint, clamped to its maximumSize.
+ * Items whose horizontal size policy includes the Expand or MinimumExpanding flag
+ * share the leftover row width proportionally (like QHBoxLayout stretch), so that
+ * e.g. a QLineEdit can fill remaining space while fixed-size buttons stay compact.
+ *
+ * Items without an expanding policy are placed at their sizeHint, clamped to maximumSize.
  */
-void FlowLayout::layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, const int y)
+void FlowLayout::layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, const int y, const int availableWidth)
 {
+    if (rowItems.isEmpty())
+        return;
+
+    // ── Pass 1: measure fixed width and count expanding items ────────────────
+    int fixedWidth = 0;
+    int expandingCount = 0;
+    int spacingTotal = (rowItems.size() - 1) * horizontalSpacing();
+
     for (QLayoutItem *item : rowItems) {
         if (!item || item->isEmpty()) {
             continue;
         }
 
         QWidget *widget = item->widget();
-        if (!widget) {
-            continue;
-        }
+        const QSizePolicy::Policy hPolicy = widget ? widget->sizePolicy().horizontalPolicy() : QSizePolicy::Fixed;
 
+        if (hPolicy & QSizePolicy::ExpandFlag) {
+            ++expandingCount;
+        } else {
+            const int maxW = widget ? widget->maximumWidth() : QWIDGETSIZE_MAX;
+            fixedWidth += qMin(item->sizeHint().width(), maxW);
+        }
+    }
+
+    // Extra pixels to share among expanding items (never negative).
+    const int extra = qMax(0, availableWidth - spacingTotal - fixedWidth);
+    const int expandingShare = (expandingCount > 0) ? extra / expandingCount : 0;
+
+    // ── Pass 2: place items ──────────────────────────────────────────────────
+    for (QLayoutItem *item : rowItems) {
+        if (!item || item->isEmpty())
+            continue;
+
+        QWidget *widget = item->widget();
+        if (!widget)
+            continue;
+
+        const QSizePolicy::Policy hPolicy = widget->sizePolicy().horizontalPolicy();
         const QSize maxSize = widget->maximumSize();
-        const int itemWidth = qMin(item->sizeHint().width(), maxSize.width());
+        const bool expands = hPolicy & QSizePolicy::ExpandFlag;
+
+        const int itemWidth =
+            expands ? qMin(expandingShare, maxSize.width()) : qMin(item->sizeHint().width(), maxSize.width());
         const int itemHeight = qMin(item->sizeHint().height(), maxSize.height());
 
         item->setGeometry(QRect(QPoint(x, y), QSize(itemWidth, itemHeight)));
-        // Move the x-position to the right, leaving space for horizontal spacing
         x += itemWidth + horizontalSpacing();
     }
 }

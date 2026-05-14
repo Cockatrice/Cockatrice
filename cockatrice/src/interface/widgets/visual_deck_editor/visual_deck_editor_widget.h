@@ -90,9 +90,10 @@ private:
     CardDatabaseModel *cardDatabaseModel;
     CardDatabaseDisplayModel *cardDatabaseDisplayModel;
     CardCompleterProxyModel *proxyModel;
+    QWidget *searchContainer;
+    QHBoxLayout *searchLayout;
     QCompleter *completer;
-    QWidget *displayOptionsAndSearch;
-    QHBoxLayout *displayOptionsAndSearchLayout;
+    FlowWidget *displayOptionsAndSearch;
     VisualDeckDisplayOptionsWidget *displayOptionsWidget;
     QPushButton *searchPushButton;
     QScrollArea *scrollArea;
