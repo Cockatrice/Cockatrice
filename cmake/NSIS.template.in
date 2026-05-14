@@ -344,6 +344,16 @@ ${If} $PortableMode = 0
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMajor" "@CPACK_PACKAGE_VERSION_MAJOR@"
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMinor" "@CPACK_PACKAGE_VERSION_MINOR@"
 
+	; Register cockatrice:// URI scheme
+	WriteRegStr HKCR "cockatrice" "" "URL:Cockatrice Protocol"
+	WriteRegStr HKCR "cockatrice" "URL Protocol" ""
+	WriteRegStr HKCR "cockatrice\shell\open\command" "" '"$INSTDIR\cockatrice.exe" "%1"'
+
+	; Register cockatrice-oracle:// URI scheme
+	WriteRegStr HKCR "cockatrice-oracle" "" "URL:Cockatrice Oracle Protocol"
+	WriteRegStr HKCR "cockatrice-oracle" "URL Protocol" ""
+	WriteRegStr HKCR "cockatrice-oracle\shell\open\command" "" '"$INSTDIR\oracle.exe" "%1"'
+
 	IfFileExists "$INSTDIR\vc_redist.x86.exe" VcRedist86Exists PastVcRedist86Check
 	VcRedist86Exists:
 		ExecWait '"$INSTDIR\vc_redist.x86.exe" /passive /norestart'
@@ -401,6 +411,8 @@ Section "un.Application" UnSecApplication
 	RMDir "$SMPROGRAMS\Cockatrice"
 
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
+	DeleteRegKey HKCR "cockatrice"
+	DeleteRegKey HKCR "cockatrice-oracle"
 SectionEnd
 
 ; unselected because it is /o

@@ -33,6 +33,7 @@
 #include "../interface/widgets/tabs/tab_game.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
+#include "intents/url_parser.h"
 #include "logger.h"
 #include "version_string.h"
 #include "widgets/dialogs/dlg_connect.h"
@@ -1095,4 +1096,18 @@ void MainWindow::actEditTokens()
     DlgEditTokens dlg(this);
     dlg.exec();
     CardDatabaseManager::getInstance()->saveCustomTokensToFile();
+}
+
+void MainWindow::handleUrl(const QString &url)
+{
+    qCInfo(WindowMainLog) << "Handling URL:" << url;
+    showWindowIfHidden();
+
+    Intent *intent = UrlParser::parse(url, connectionController, tabSupervisor, /*dialogParent=*/this, /*parent=*/this);
+    if (!intent) {
+        qCWarning(WindowMainLog) << "Unrecognised or invalid URL — ignoring:" << url;
+        return;
+    }
+
+    intent->execute();
 }

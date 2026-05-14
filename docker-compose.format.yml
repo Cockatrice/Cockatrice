@@ -1,0 +1,32 @@
+# Convenience wrapper around Dockerfile.format for running the project's
+# code-style check locally.  Mirrors the CI desktop-lint job.
+#
+# Diff-only check (matches CI; exit 2 means changes are needed):
+#   docker compose -f docker-compose.format.yml run --rm format
+#
+# Apply changes in place (writes to the bind-mounted working tree):
+#   docker compose -f docker-compose.format.yml run --rm format-apply
+#
+# Either service auto-builds the image on first run.
+
+services:
+  # CI-equivalent diff-only check.
+  format:
+    build:
+      context: .
+      dockerfile: Dockerfile.format
+    image: cockatrice-format:latest
+    volumes:
+      - .:/src
+    working_dir: /src
+
+  # Apply mode — same image, different default command.
+  format-apply:
+    build:
+      context: .
+      dockerfile: Dockerfile.format
+    image: cockatrice-format:latest
+    volumes:
+      - .:/src
+    working_dir: /src
+    command: ["./format.sh", "--cmake", "--shell", "--branch", "origin/master"]

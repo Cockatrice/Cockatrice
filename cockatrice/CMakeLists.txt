@@ -262,6 +262,11 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
+    src/interface/intents/intent_connect_to_server.cpp
+    src/interface/intents/intent_join_server_game.cpp
+    src/interface/intents/intent_join_server_room.cpp
+    src/interface/intents/intent_login.cpp
+    src/interface/intents/url_parser.cpp
     src/main.cpp
     src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
     src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp
@@ -429,6 +434,7 @@ if(Qt5_FOUND)
     libcockatrice_deck_list
     libcockatrice_filters
     libcockatrice_utility
+    libcockatrice_utility_gui
     libcockatrice_network
     libcockatrice_models
     libcockatrice_rng
@@ -442,6 +448,7 @@ else()
            libcockatrice_deck_list
            libcockatrice_filters
            libcockatrice_utility
+           libcockatrice_utility_gui
            libcockatrice_network
            libcockatrice_models
            libcockatrice_rng
@@ -459,7 +466,9 @@ if(UNIX)
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
     set(MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION})
 
-    set_target_properties(cockatrice PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.plist)
+    set_target_properties(
+      cockatrice PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/Info.cockatrice.plist
+    )
 
     install(TARGETS cockatrice BUNDLE DESTINATION ./)
   else()

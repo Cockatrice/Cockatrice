@@ -98,6 +98,26 @@ QString ServersSettings::getPassword()
     return QString();
 }
 
+std::optional<SavedServerCreds> ServersSettings::findSavedCredsByHostPort(const QString &host, quint16 port) const
+{
+    const int size = getValue("totalServers", "server", "server_details").toInt();
+    const QString portStr = QString::number(port);
+    for (int i = 0; i <= size; ++i) {
+        const QString storedServer = getValue(QString("server%1").arg(i), "server", "server_details").toString();
+        const QString storedPort = getValue(QString("port%1").arg(i), "server", "server_details").toString();
+        if (storedServer.compare(host, Qt::CaseInsensitive) != 0 || storedPort != portStr)
+            continue;
+
+        SavedServerCreds creds;
+        creds.playerName = getValue(QString("username%1").arg(i), "server", "server_details").toString();
+        const bool savePassword = getValue(QString("savePassword%1").arg(i), "server", "server_details").toBool();
+        if (savePassword)
+            creds.password = getValue(QString("password%1").arg(i), "server", "server_details").toString();
+        return creds;
+    }
+    return std::nullopt;
+}
+
 bool ServersSettings::getSavePassword() const
 {
     int index = getPrevioushostindex(getPrevioushostName());

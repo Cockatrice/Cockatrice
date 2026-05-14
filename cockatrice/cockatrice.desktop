@@ -3,6 +3,7 @@
 Version=1.0
 Type=Application
 Name=Cockatrice
-Exec=cockatrice
+Exec=cockatrice %u
 Icon=cockatrice
 Categories=Game;CardGame;
+MimeType=x-scheme-handler/cockatrice;

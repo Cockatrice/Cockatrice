@@ -6,6 +6,10 @@ add_test(NAME dummy_test COMMAND dummy_test)
 add_test(NAME expression_test COMMAND expression_test)
 add_test(NAME test_age_formatting COMMAND test_age_formatting)
 add_test(NAME password_hash_test COMMAND password_hash_test)
+add_test(NAME url_utils_test COMMAND url_utils_test)
+add_test(NAME url_scheme_event_filter_test COMMAND url_scheme_event_filter_test)
+add_test(NAME intent_test COMMAND intent_test)
+add_test(NAME single_instance_manager_test COMMAND single_instance_manager_test)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
 set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 5)
@@ -17,6 +21,10 @@ add_executable(expression_test expression_test.cpp)
 add_executable(test_age_formatting test_age_formatting.cpp)
 add_executable(password_hash_test password_hash_test.cpp)
 add_executable(deck_hash_performance_test deck_hash_performance_test.cpp)
+add_executable(url_utils_test url_utils_test.cpp)
+add_executable(url_scheme_event_filter_test url_scheme_event_filter_test.cpp)
+add_executable(intent_test intent_test.cpp)
+add_executable(single_instance_manager_test single_instance_manager_test.cpp)
 
 find_package(GTest)
 
@@ -48,6 +56,10 @@ if(NOT GTEST_FOUND)
   add_dependencies(test_age_formatting gtest)
   add_dependencies(password_hash_test gtest)
   add_dependencies(deck_hash_performance_test gtest)
+  add_dependencies(url_utils_test gtest)
+  add_dependencies(url_scheme_event_filter_test gtest)
+  add_dependencies(intent_test gtest)
+  add_dependencies(single_instance_manager_test gtest)
 endif()
 
 include_directories(${GTEST_INCLUDE_DIRS})
@@ -60,6 +72,14 @@ target_link_libraries(
 target_link_libraries(
   deck_hash_performance_test libcockatrice_deck_list libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES}
   ${TEST_QT_MODULES}
+)
+target_link_libraries(url_utils_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(
+  url_scheme_event_filter_test libcockatrice_utility_gui Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+)
+target_link_libraries(intent_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(
+  single_instance_manager_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
 
 add_subdirectory(card_zone_algorithms)

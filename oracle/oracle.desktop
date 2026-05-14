@@ -3,6 +3,7 @@
 Version=1.0
 Type=Application
 Name=Cockatrice Oracle downloader
-Exec=oracle
+Exec=oracle %u
 Icon=oracle
 Categories=Game;CardGame;
+MimeType=x-scheme-handler/cockatrice-oracle;

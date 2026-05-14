@@ -261,13 +261,7 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     QStringList _data = uci.getServerInfo(saveName);
 
     if (_data.isEmpty()) {
-        _data << ""
-              << ""
-              << ""
-              << ""
-              << ""
-              << ""
-              << "";
+        _data << "" << "" << "" << "" << "" << "" << "";
     }
 
     bool savePasswordStatus = (_data.at(5) == "1");
@@ -357,6 +351,18 @@ void DlgConnect::actOk()
 QString DlgConnect::getHost() const
 {
     return hostEdit->text().trimmed();
+}
+
+void DlgConnect::prefillNewHost(const QString &host, const QString &port)
+{
+    // setChecked(true) fires toggled() → newHostSelected(), which clears the
+    // host/port fields.  Set them AFTER toggling so the values stick.
+    newHostButton->setChecked(true);
+    hostEdit->setText(host);
+    portEdit->setText(port);
+    playernameEdit->clear();
+    passwordEdit->clear();
+    playernameEdit->setFocus();
 }
 
 void DlgConnect::actForgotPassword()

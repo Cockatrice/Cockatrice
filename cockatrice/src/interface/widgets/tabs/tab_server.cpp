@@ -171,49 +171,52 @@ void TabServer::processServerMessageEvent(const Event_ServerMessage &event)
 
 void TabServer::joinRoom(int id, bool setCurrent)
 {
-    TabRoom *room = tabSupervisor->getRoomTabs().value(id);
-    if (!room) {
-        Command_JoinRoom cmd;
-        cmd.set_room_id(id);
-
-        PendingCommand *pend = client->prepareSessionCommand(cmd);
-        pend->setExtraData(setCurrent);
-        connect(pend, &PendingCommand::finished, this, &TabServer::joinRoomFinished);
-
-        client->sendCommand(pend);
-
+    if (TabRoom *room = tabSupervisor->getRoomTabs().value(id)) {
+        if (setCurrent)
+            tabSupervisor->setCurrentWidget((QWidget *)room);
+        emit roomAlreadyJoined(id, setCurrent);
         return;
     }
 
-    if (setCurrent)
-        tabSupervisor->setCurrentWidget((QWidget *)room);
+    Command_JoinRoom cmd;
+    cmd.set_room_id(id);
+
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    pend->setExtraData(setCurrent);
+    connect(pend, &PendingCommand::finished, this, &TabServer::joinRoomFinished);
+
+    client->sendCommand(pend);
 }
 
-void TabServer::joinRoomFinished(const Response &r,
-                                 const CommandContainer & /*commandContainer*/,
-                                 const QVariant &extraData)
+void TabServer::joinRoomFinished(const Response &r, const CommandContainer &commandContainer, const QVariant &extraData)
 {
+    const int roomId = commandContainer.session_command(0).GetExtension(Command_JoinRoom::ext).room_id();
+
     switch (r.response_code()) {
         case Response::RespOk:
             break;
         case Response::RespNameNotFound:
             QMessageBox::critical(this, tr("Error"),
                                   tr("Failed to join the server room: it doesn't exist on the server."));
+            emit roomJoinFailed(roomId);
             return;
         case Response::RespContextError:
             QMessageBox::critical(
                 this, tr("Error"),
                 tr("The server thinks you are in the server room but your client is unable to display it. "
                    "Try restarting your client."));
+            emit roomJoinFailed(roomId);
             return;
         case Response::RespUserLevelTooLow:
             QMessageBox::critical(this, tr("Error"),
                                   tr("You do not have the required permission to join this server room."));
+            emit roomJoinFailed(roomId);
             return;
         default:
             QMessageBox::critical(
                 this, tr("Error"),
                 tr("Failed to join the server room due to an unknown error: %1.").arg(r.response_code()));
+            emit roomJoinFailed(roomId);
             return;
     }
 

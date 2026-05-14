@@ -48,6 +48,16 @@ public:
         return passwordEdit->text();
     }
 
+    /**
+     * @brief Pre-fill the new-host inputs with the given host/port, used by
+     *        the cockatrice:// URL flow when no saved server matches.
+     *
+     * Selects the "new host" radio, then writes @p host into the host field
+     * and @p port into the port field.  Player name and password are cleared
+     * so the user must enter them.
+     */
+    void prefillNewHost(const QString &host, const QString &port);
+
 public slots:
     void downloadThePublicServers();
 
