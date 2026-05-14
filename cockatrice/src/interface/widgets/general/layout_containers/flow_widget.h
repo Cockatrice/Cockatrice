@@ -17,7 +17,7 @@
 inline Q_LOGGING_CATEGORY(FlowWidgetLog, "flow_widget", QtInfoMsg);
 inline Q_LOGGING_CATEGORY(FlowWidgetSizeLog, "flow_widget.size", QtInfoMsg);
 
-class FlowWidget final : public QWidget
+class FlowWidget : public QWidget
 {
     Q_OBJECT
 

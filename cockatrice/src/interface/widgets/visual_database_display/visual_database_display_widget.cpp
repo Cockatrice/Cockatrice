@@ -51,9 +51,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
             &SettingsCache::setVisualDatabaseDisplayCardSize);
 
-    searchContainer = new QWidget(this);
-    searchLayout = new QHBoxLayout(searchContainer);
-    searchContainer->setLayout(searchLayout);
+    searchContainer = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 
     searchEdit = new SearchLineEdit();
     searchEdit->setObjectName("searchEdit");
@@ -152,10 +150,10 @@ void VisualDatabaseDisplayWidget::initialize()
     filterContainer->initialize();
     filterContainer->setVisible(true);
 
-    searchLayout->addWidget(colorFilterWidget);
-    searchLayout->addWidget(clearFilterWidget);
-    searchLayout->addWidget(searchEdit);
-    searchLayout->addWidget(displayModeButton);
+    searchContainer->addWidget(colorFilterWidget);
+    searchContainer->addWidget(clearFilterWidget);
+    searchContainer->addWidget(searchEdit);
+    searchContainer->addWidget(displayModeButton);
 
     mainLayout->addWidget(searchContainer);
 

@@ -91,8 +91,7 @@ protected slots:
     void onDisplayModeChanged(bool checked);
 
 private:
-    QWidget *searchContainer;
-    QHBoxLayout *searchLayout;
+    FlowWidget *searchContainer;
     SearchLineEdit *searchEdit;
     QPushButton *displayModeButton;
     FilterTreeModel *filterModel;

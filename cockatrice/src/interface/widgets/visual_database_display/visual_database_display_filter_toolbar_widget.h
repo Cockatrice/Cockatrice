@@ -10,7 +10,7 @@
 
 class VisualDatabaseDisplayWidget;
 
-class VisualDatabaseDisplayFilterToolbarWidget : public QWidget
+class VisualDatabaseDisplayFilterToolbarWidget : public FlowWidget
 {
     Q_OBJECT
 
@@ -32,7 +32,6 @@ private:
     QGroupBox *filterGroupBox;
     QLabel *filterByLabel;
 
-    QHBoxLayout *filterContainerLayout;
     SettingsButtonWidget *quickFilterSaveLoadWidget;
     VisualDatabaseDisplayFilterSaveLoadWidget *saveLoadWidget;
     SettingsButtonWidget *quickFilterNameWidget;

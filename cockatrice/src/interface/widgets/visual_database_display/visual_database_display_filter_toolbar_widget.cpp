@@ -5,16 +5,9 @@
 #include <QGroupBox>
 
 VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidget(VisualDatabaseDisplayWidget *_parent)
-    : QWidget(_parent), visualDatabaseDisplay(_parent)
+    : FlowWidget(_parent, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff),
+      visualDatabaseDisplay(_parent)
 {
-    filterContainerLayout = new QHBoxLayout(this);
-    filterContainerLayout->setContentsMargins(11, 0, 11, 0);
-    filterContainerLayout->setSpacing(2);
-    setLayout(filterContainerLayout);
-    filterContainerLayout->setAlignment(Qt::AlignLeft);
-
-    setMaximumHeight(80);
-
     connect(this, &VisualDatabaseDisplayFilterToolbarWidget::searchModelChanged, visualDatabaseDisplay,
             &VisualDatabaseDisplayWidget::onSearchModelChanged);
 
@@ -131,10 +124,14 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     filterLayout->addWidget(quickFilterFormatLegalityWidget);
 
     // put everything into main layout
-    filterContainerLayout->addWidget(sortGroupBox);
-    filterContainerLayout->addWidget(filterGroupBox);
-    filterContainerLayout->addStretch();
-    filterContainerLayout->addWidget(quickFilterSaveLoadWidget);
+    addWidget(sortGroupBox);
+    addWidget(filterGroupBox);
+    auto *spacer = new QWidget(this);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    spacer->setAttribute(Qt::WA_TransparentForMouseEvents);
+    addWidget(spacer);
+    addWidget(quickFilterSaveLoadWidget);
+    addWidget(quickFilterSaveLoadWidget);
 
     // Force a layout pass so sizeHint() is accurate
     layout()->activate();
