@@ -7,6 +7,7 @@
 #ifndef DECK_ANALYTICS_WIDGET_H
 #define DECK_ANALYTICS_WIDGET_H
 
+#include "../general/layout_containers/flow_widget.h"
 #include "abstract_analytics_panel_widget.h"
 #include "deck_list_statistics_analyzer.h"
 #include "resizable_panel.h"
@@ -51,8 +52,7 @@ private:
     void addPanelInstance(const QString &typeId, AbstractAnalyticsPanelWidget *panel, const QJsonObject &cfg = {});
 
     QVBoxLayout *layout;
-    QWidget *controlContainer;
-    QHBoxLayout *controlLayout;
+    FlowWidget *controlContainer;
 
     QPushButton *addButton;
     QPushButton *removeButton;

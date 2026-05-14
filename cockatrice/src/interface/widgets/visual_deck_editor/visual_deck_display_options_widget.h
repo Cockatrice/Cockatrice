@@ -53,6 +53,9 @@ public slots:
      * Called when the application language changes.
      */
     void retranslateUi();
+    void updateCompactMode(bool mode);
+    int expandedWidth() const;
+    int compactWidth() const;
 
 public:
     /**
@@ -108,7 +111,7 @@ private:
     DisplayType currentDisplayType = DisplayType::Overlap;
 
     /// Button used to toggle the display layout.
-    QPushButton *displayTypeButton;
+    CompactPushButton *displayTypeButton;
 
     /// Label for the group-by selector.
     QLabel *groupByLabel;
