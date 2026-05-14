@@ -86,7 +86,7 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
 
     QNetworkRequest req(url);
     req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
-    req.setRawHeader("Accept", "image/avif,image/webp,image/apng,image/,/*;q=0.8");
+    req.setRawHeader("Accept", "image/avif,image/webp,image/apng,image/*,*/*;q=0.8");
     if (!picDownload) {
         req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
     }
