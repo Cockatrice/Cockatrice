@@ -72,7 +72,7 @@ VisualDeckDisplayOptionsWidget::VisualDeckDisplayOptionsWidget(QWidget *parent) 
     sortCriteriaButton->addSettingsWidget(sortLabel);
     sortCriteriaButton->addSettingsWidget(sortByListWidget);
 
-    displayTypeButton = new QPushButton(this);
+    displayTypeButton = new CompactPushButton(this);
     connect(displayTypeButton, &QPushButton::clicked, this, &VisualDeckDisplayOptionsWidget::updateDisplayType);
 
     groupAndSortLayout->addWidget(groupByLabel);
@@ -91,7 +91,8 @@ void VisualDeckDisplayOptionsWidget::retranslateUi()
     sortByLabel->setText(tr("Sort by:"));
     sortLabel->setText(tr("Click and drag to change the sort order within the groups"));
     sortCriteriaButton->setToolTip(tr("Configure how cards are sorted within their groups"));
-    displayTypeButton->setText(tr("Toggle Layout: Overlap"));
+    displayTypeButton->setButtonText(tr("Toggle Layout: Overlap"));
+    displayTypeButton->setButtonIcon(QPixmap("theme:icons/scales"));
     displayTypeButton->setToolTip(
         tr("Change how cards are displayed within zones (i.e. overlapped or fully visible.)"));
 }
@@ -115,11 +116,32 @@ void VisualDeckDisplayOptionsWidget::updateDisplayType()
     // Update UI and emit signal
     switch (currentDisplayType) {
         case DisplayType::Flat:
-            displayTypeButton->setText(tr("Toggle Layout: Flat"));
+            displayTypeButton->setButtonText(tr("Toggle Layout: Flat"));
+            displayTypeButton->setButtonIcon(QPixmap("theme:icons/scroll"));
             break;
         case DisplayType::Overlap:
-            displayTypeButton->setText(tr("Toggle Layout: Overlap"));
+            displayTypeButton->setButtonText(tr("Toggle Layout: Overlap"));
+            displayTypeButton->setButtonIcon(QPixmap("theme:icons/scales"));
             break;
     }
     emit displayTypeChanged(currentDisplayType);
+}
+
+void VisualDeckDisplayOptionsWidget::updateCompactMode(bool mode)
+{
+    displayTypeButton->setCompact(mode);
+}
+
+int VisualDeckDisplayOptionsWidget::expandedWidth() const
+{
+    return groupByLabel->sizeHint().width() + groupByComboBox->sizeHint().width() + sortByLabel->sizeHint().width() +
+           sortCriteriaButton->sizeHint().width() + displayTypeButton->expandedWidth() +
+           (groupAndSortLayout->spacing() * 4);
+}
+
+int VisualDeckDisplayOptionsWidget::compactWidth() const
+{
+    return groupByLabel->sizeHint().width() + groupByComboBox->sizeHint().width() + sortByLabel->sizeHint().width() +
+           sortCriteriaButton->sizeHint().width() + displayTypeButton->compactWidth() +
+           (groupAndSortLayout->spacing() * 4);
 }

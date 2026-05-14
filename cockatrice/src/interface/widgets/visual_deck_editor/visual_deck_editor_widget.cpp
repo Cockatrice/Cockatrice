@@ -9,6 +9,7 @@
 #include "../general/layout_containers/flow_widget.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
+#include "../utility/compact_push_button.h"
 #include "visual_deck_display_options_widget.h"
 
 #include <QCheckBox>
@@ -141,7 +142,8 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
     });
 
     // Search button functionality
-    searchPushButton = new QPushButton(searchContainer);
+    searchPushButton = new CompactPushButton(searchContainer);
+    searchPushButton->setButtonIcon(QPixmap("theme:icons/search"));
     connect(searchPushButton, &QPushButton::clicked, this, [=, this]() {
         ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
         if (card) {
@@ -211,13 +213,51 @@ void VisualDeckEditorWidget::connectDeckListModel()
 void VisualDeckEditorWidget::retranslateUi()
 {
     searchBar->setPlaceholderText(tr("Type a card name here for suggestions from the database..."));
-    searchPushButton->setText(tr("Quick search and add card"));
+    searchPushButton->setButtonText(tr("Quick search and add card"));
     searchPushButton->setToolTip(tr("Search for closest match in the database (with auto-suggestions) and add "
                                     "preferred printing to the deck on pressing enter"));
 
     if (placeholderWidget) {
         placeholderWidget->retranslateUi();
     }
+}
+
+void VisualDeckEditorWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    updateCompactMode();
+}
+
+void VisualDeckEditorWidget::updateCompactMode()
+{
+    const int spacing = displayOptionsAndSearch->layout()->spacing();
+
+    const int available = displayOptionsAndSearch->width();
+
+    const int searchExpanded =
+        searchBar->sizeHint().width() + searchPushButton->expandedWidth() + searchLayout->spacing();
+
+    const int fullWidth = displayOptionsWidget->expandedWidth() + spacing + searchExpanded;
+
+    const int displayCompactWidth = displayOptionsWidget->compactWidth() + spacing + searchExpanded;
+
+    // everything expanded
+    if (available >= fullWidth) {
+        displayOptionsWidget->updateCompactMode(false);
+        searchPushButton->setCompact(false);
+        return;
+    }
+
+    // only display compact
+    if (available >= displayCompactWidth) {
+        displayOptionsWidget->updateCompactMode(true);
+        searchPushButton->setCompact(false);
+        return;
+    }
+
+    // both compact
+    displayOptionsWidget->updateCompactMode(true);
+    searchPushButton->setCompact(true);
 }
 
 void VisualDeckEditorWidget::updatePlaceholderVisibility()
