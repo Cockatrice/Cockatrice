@@ -11,6 +11,7 @@
 #include "../cards/card_size_widget.h"
 #include "../general/layout_containers/overlap_control_widget.h"
 #include "../quick_settings/settings_button_widget.h"
+#include "../utility/compact_push_button.h"
 #include "visual_deck_editor_placeholder_widget.h"
 
 #include <QCheckBox>
@@ -39,6 +40,7 @@ class VisualDeckEditorWidget : public QWidget
 public:
     explicit VisualDeckEditorWidget(QWidget *parent, DeckListModel *deckListModel, QItemSelectionModel *selectionModel);
     void retranslateUi();
+    void updateCompactMode();
     void clearAllDisplayWidgets();
 
     void setDeckList(const DeckList &_deckListModel);
@@ -82,19 +84,23 @@ protected slots:
     void onHover(const ExactCard &hoveredCard);
     void onCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
     void decklistModelReset();
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
+    int expandedWidthAll = -1;
+    int expandedWidthDisplayCompact = -1;
     DeckListModel *deckListModel;
     QItemSelectionModel *selectionModel;
     QVBoxLayout *mainLayout;
     CardDatabaseModel *cardDatabaseModel;
     CardDatabaseDisplayModel *cardDatabaseDisplayModel;
     CardCompleterProxyModel *proxyModel;
+    QWidget *searchContainer;
+    QHBoxLayout *searchLayout;
     QCompleter *completer;
-    QWidget *displayOptionsAndSearch;
-    QHBoxLayout *displayOptionsAndSearchLayout;
+    FlowWidget *displayOptionsAndSearch;
     VisualDeckDisplayOptionsWidget *displayOptionsWidget;
-    QPushButton *searchPushButton;
+    CompactPushButton *searchPushButton;
     QScrollArea *scrollArea;
     QWidget *zoneContainer;
     QVBoxLayout *zoneContainerLayout;

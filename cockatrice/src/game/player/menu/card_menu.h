@@ -36,6 +36,7 @@ public:
     QAction *aFlip, *aPeek;
     QAction *aAttach, *aUnattach;
     QAction *aSetAnnotation;
+    QAction *aReduceLifeByPower;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 

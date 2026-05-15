@@ -1,7 +1,7 @@
 /**
  * @file card_zone.h
  * @ingroup GameGraphicsZones
- * @brief TODO: Document this.
+ * @brief Base graphics item for zones that contain cards.
  */
 
 #ifndef CARDZONE_H
@@ -40,7 +40,10 @@ protected:
     }
 public slots:
     bool showContextMenu(const QPoint &screenPos);
-    void onCardAdded(CardItem *addedCard);
+    /// @brief Called when a card is added to this zone. Default: reparents card to this item.
+    /// Virtual so subclasses (e.g. SelectZone) can override parenting behavior — the Qt signal
+    /// connection in CardZone's constructor dispatches through the vtable.
+    virtual void onCardAdded(CardItem *addedCard);
 
 public:
     enum

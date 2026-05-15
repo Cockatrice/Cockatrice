@@ -62,12 +62,15 @@ public:
         return databaseView;
     }
 
-    QWidget *searchContainer;
-    QHBoxLayout *searchLayout;
-    SearchLineEdit *searchEdit;
-    QPushButton *displayModeButton;
-    FilterTreeModel *filterModel;
-    VisualDatabaseDisplayColorFilterWidget *colorFilterWidget;
+    FilterTreeModel *getFilterModel()
+    {
+        return filterModel;
+    }
+
+    /**
+     * @return False if the widget is in database display mode and true if it's in visual display mode
+     */
+    bool isVisualDisplayMode() const;
 
 public slots:
     void onSearchModelChanged();
@@ -88,6 +91,12 @@ protected slots:
     void onDisplayModeChanged(bool checked);
 
 private:
+    FlowWidget *searchContainer;
+    SearchLineEdit *searchEdit;
+    QPushButton *displayModeButton;
+    FilterTreeModel *filterModel;
+    VisualDatabaseDisplayColorFilterWidget *colorFilterWidget;
+
     QLabel *databaseLoadIndicator;
 
     QToolButton *clearFilterWidget;
@@ -111,6 +120,8 @@ private:
     int debounceTime = 300; // in Ms
     int currentPage = 0;    // Current page index
     int cardsPerPage = 100; // Number of cards per page
+
+    void highlightAllSearchEdit();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

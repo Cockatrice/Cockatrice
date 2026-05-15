@@ -85,7 +85,11 @@ const CardInfo &AbstractCardItem::getCardInfo() const
 void AbstractCardItem::setRealZValue(qreal _zValue)
 {
     realZValue = _zValue;
-    setZValue(_zValue);
+    // During hover, zValue is overridden to HOVERED_CARD. Layout operations
+    // like reorganizeCards() call setRealZValue() on all cards including the
+    // hovered one — skip setZValue() here to avoid clobbering the override.
+    if (!isHovered)
+        setZValue(_zValue);
 }
 
 QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
@@ -213,8 +217,16 @@ void AbstractCardItem::setHovered(bool _hovered)
     if (isHovered == _hovered)
         return;
 
-    if (_hovered)
+    if (_hovered) {
         processHoverEvent();
+    } else {
+        // Mark the hovered card's current scene footprint dirty so overlapped
+        // sibling zones (e.g. StackZone) repaint after the card moves away.
+        if (scene()) {
+            scene()->update(sceneBoundingRect());
+        }
+    }
+
     isHovered = _hovered;
     setZValue(_hovered ? ZValues::HOVERED_CARD : realZValue);
     setScale(_hovered && SettingsCache::instance().getScaleCards() ? 1.1 : 1);

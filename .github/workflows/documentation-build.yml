@@ -1,9 +1,9 @@
 name: Generate Docs
 
 on:
-  push:
-    tags:
-      - '*'   # Only re-generate docs when a new tagged version is pushed
+  release:
+    types:
+      - published    # publishing of stable releases and pre-releases
   pull_request:
     paths:
       - 'doc/doxygen/**'
@@ -53,11 +53,11 @@ jobs:
         run: doxygen Doxyfile
 
       - name: Deploy to cockatrice.github.io
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
           external_repository: Cockatrice/cockatrice.github.io
           publish_branch: master
           publish_dir: ./docs/html
-          destination_dir: docs   # Docs will live under https://cockatrice.github.io/docs/
+          destination_dir: docs    # Docs will live under https://cockatrice.github.io/docs/
