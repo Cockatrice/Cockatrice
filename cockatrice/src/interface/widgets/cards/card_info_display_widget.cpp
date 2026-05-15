@@ -55,7 +55,7 @@ void CardInfoDisplayWidget::setCard(const ExactCard &card)
 
 void CardInfoDisplayWidget::setCard(const CardRef &cardRef)
 {
-    setCard(CardDatabaseManager::query()->guessCard(cardRef));
+    setCard(CardDatabaseManager::query().guessCard(cardRef));
     if (exactCard.isEmpty()) {
         text->setInvalidCardName(cardRef.name);
     }

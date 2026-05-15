@@ -147,7 +147,7 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
 void DeckPreviewWidget::resyncWidgets()
 {
     auto bannerCardRef = deckLoader->getDeck().deckList.getBannerCard();
-    auto bannerCard = bannerCardRef.name.isEmpty() ? ExactCard() : CardDatabaseManager::query()->getCard(bannerCardRef);
+    auto bannerCard = bannerCardRef.name.isEmpty() ? ExactCard() : CardDatabaseManager::query().getCard(bannerCardRef);
 
     bannerCardDisplayWidget->setCard(bannerCard);
     refreshBannerCardText();
@@ -237,7 +237,7 @@ QString DeckPreviewWidget::getColorIdentity()
     QSet<QChar> colorSet; // A set to collect unique color symbols (e.g., W, U, B, R, G)
 
     for (const QString &cardName : cardList) {
-        CardInfoPtr currentCard = CardDatabaseManager::query()->getCardInfo(cardName);
+        CardInfoPtr currentCard = CardDatabaseManager::query().getCardInfo(cardName);
         if (currentCard) {
             QString colors = currentCard->getColors(); // Assuming this returns something like "WUB"
             for (const QChar &color : colors) {
@@ -362,7 +362,7 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
     CardRef cardRef = {name, id};
     deckLoader->getDeck().deckList.setBannerCard(cardRef);
     writeDeckToFile();
-    bannerCardDisplayWidget->setCard(CardDatabaseManager::query()->getCard(cardRef));
+    bannerCardDisplayWidget->setCard(CardDatabaseManager::query().getCard(cardRef));
 }
 
 void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)

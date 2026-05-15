@@ -7,10 +7,8 @@
 
 #include <qrandom.h>
 
-CardDatabaseQuerier::CardDatabaseQuerier(QObject *_parent,
-                                         const CardDatabase *_db,
-                                         const ICardPreferenceProvider *prefs)
-    : QObject(_parent), db(_db), prefs(prefs)
+CardDatabaseQuerier::CardDatabaseQuerier(const CardDatabase *_db, const ICardPreferenceProvider *prefs)
+    : db(_db), prefs(prefs)
 {
 }
 

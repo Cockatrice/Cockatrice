@@ -19,19 +19,17 @@ class CardDatabase;
  * (e.g., CardInfoPtr, ExactCard, and PrintingInfo) from a CardDatabase. It also applies user
  * printing preferences via ICardPreferenceProvider when determining preferred printings.
  */
-class CardDatabaseQuerier : public QObject
+class CardDatabaseQuerier
 {
-    Q_OBJECT
 
 public:
     /**
      * @brief Constructs a CardDatabaseQuerier.
      *
-     * @param parent Parent QObject.
      * @param db Pointer to the CardDatabase used for lookups.
      * @param prefs Pointer to card preference provider which supplies user-preference for printings.
      */
-    explicit CardDatabaseQuerier(QObject *parent, const CardDatabase *db, const ICardPreferenceProvider *prefs);
+    explicit CardDatabaseQuerier(const CardDatabase *db, const ICardPreferenceProvider *prefs);
 
     /**
      * @brief Retrieves a card by its exact name.
