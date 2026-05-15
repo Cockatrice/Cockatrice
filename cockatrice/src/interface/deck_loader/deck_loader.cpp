@@ -181,6 +181,11 @@ bool DeckLoader::saveToNewFile(LoadedDeck &deck, const QString &fileName, DeckFi
  */
 bool DeckLoader::updateLastLoadedTimestamp(LoadedDeck &deck)
 {
+    // text format doesn't support lastLoadedTimestamp, so there's no point in proceeding
+    if (deck.lastLoadInfo.fileFormat != DeckFileFormat::Cockatrice) {
+        return false;
+    }
+
     QString fileName = deck.lastLoadInfo.fileName;
 
     QFileInfo fileInfo(fileName);
@@ -201,15 +206,8 @@ bool DeckLoader::updateLastLoadedTimestamp(LoadedDeck &deck)
     bool result = false;
 
     // Perform file modifications
-    switch (deck.lastLoadInfo.fileFormat) {
-        case DeckFileFormat::PlainText:
-            result = deck.deckList.saveToFile_Plain(&file);
-            break;
-        case DeckFileFormat::Cockatrice:
-            deck.deckList.setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
-            result = deck.deckList.saveToFile_Native(&file);
-            break;
-    }
+    deck.deckList.setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
+    result = deck.deckList.saveToFile_Native(&file);
 
     file.close(); // Close the file to ensure changes are flushed
 
@@ -429,8 +427,7 @@ void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
         }
         if (addSetNameAndNumber) {
             if (!card->getCardSetShortName().isNull() && !card->getCardSetShortName().isEmpty()) {
-                out << " "
-                    << "(" << card->getCardSetShortName() << ")";
+                out << " " << "(" << card->getCardSetShortName() << ")";
             }
             if (!card->getCardCollectorNumber().isNull()) {
                 out << " " << card->getCardCollectorNumber();

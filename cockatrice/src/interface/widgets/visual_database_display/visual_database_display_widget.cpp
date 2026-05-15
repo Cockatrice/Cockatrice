@@ -51,9 +51,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
             &SettingsCache::setVisualDatabaseDisplayCardSize);
 
-    searchContainer = new QWidget(this);
-    searchLayout = new QHBoxLayout(searchContainer);
-    searchContainer->setLayout(searchLayout);
+    searchContainer = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 
     searchEdit = new SearchLineEdit();
     searchEdit->setObjectName("searchEdit");
@@ -98,6 +96,11 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(&searchKeySignals, &KeySignals::onCtrlC, databaseDisplayWidget,
             &DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents);
     connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
+
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,
+            &VisualDatabaseDisplayWidget::highlightAllSearchEdit);
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToSideboard, this,
+            &VisualDatabaseDisplayWidget::highlightAllSearchEdit);
 
     databaseView = databaseDisplayWidget->getDatabaseView();
     databaseView->setFocusProxy(searchEdit);
@@ -147,10 +150,10 @@ void VisualDatabaseDisplayWidget::initialize()
     filterContainer->initialize();
     filterContainer->setVisible(true);
 
-    searchLayout->addWidget(colorFilterWidget);
-    searchLayout->addWidget(clearFilterWidget);
-    searchLayout->addWidget(searchEdit);
-    searchLayout->addWidget(displayModeButton);
+    searchContainer->addWidget(colorFilterWidget);
+    searchContainer->addWidget(clearFilterWidget);
+    searchContainer->addWidget(searchEdit);
+    searchContainer->addWidget(displayModeButton);
 
     mainLayout->addWidget(searchContainer);
 
@@ -179,6 +182,11 @@ void VisualDatabaseDisplayWidget::retranslateUi()
 {
     databaseLoadIndicator->setText(tr("Loading database ..."));
     clearFilterWidget->setToolTip(tr("Clear all filters"));
+}
+
+void VisualDatabaseDisplayWidget::highlightAllSearchEdit()
+{
+    searchEdit->setSelection(0, searchEdit->text().length());
 }
 
 void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
@@ -235,6 +243,11 @@ void VisualDatabaseDisplayWidget::updateSearch(const QString &search) const
     if (sel.isEmpty() && databaseDisplayModel->rowCount())
         databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
                                                         QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+}
+
+bool VisualDatabaseDisplayWidget::isVisualDisplayMode() const
+{
+    return !displayModeButton->isChecked();
 }
 
 void VisualDatabaseDisplayWidget::onSearchModelChanged()

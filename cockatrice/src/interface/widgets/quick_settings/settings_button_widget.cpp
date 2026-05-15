@@ -35,19 +35,33 @@ void SettingsButtonWidget::setButtonIcon(QPixmap iconMap)
     button->setIcon(iconMap);
 }
 
-void SettingsButtonWidget::setButtonText(const QString &buttonText)
+void SettingsButtonWidget::setButtonText(const QString &text)
 {
-    // 🔓 unlock size constraints
+    buttonText = text;
+
     button->setMinimumSize(QSize(0, 0));
     button->setMaximumSize(QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX));
-
     button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    button->setText(buttonText);
-
+    button->setText(text);
     button->setFixedHeight(32);
     button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-    button->setMinimumWidth(button->sizeHint().width());
+    button->setMinimumWidth(32); // icon-only fallback minimum
+}
+
+void SettingsButtonWidget::setCompact(bool _compact)
+{
+    compact = _compact;
+    if (compact) {
+        button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        button->setFixedWidth(32);
+    } else {
+        button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        button->setText(buttonText);
+        button->setFixedWidth(QWIDGETSIZE_MAX); // release fixed width
+        button->setMinimumWidth(32);
+        button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    }
 }
 
 void SettingsButtonWidget::togglePopup()

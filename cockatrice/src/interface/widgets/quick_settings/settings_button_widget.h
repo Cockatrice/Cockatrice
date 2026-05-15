@@ -23,6 +23,11 @@ public:
     void removeSettingsWidget(QWidget *toRemove) const;
     void setButtonIcon(QPixmap iconMap);
     void setButtonText(const QString &buttonText);
+    void setCompact(bool compact);
+    bool isCompact() const
+    {
+        return compact;
+    };
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -34,6 +39,8 @@ private slots:
 private:
     QHBoxLayout *layout;
     QToolButton *button;
+    QString buttonText;
+    bool compact;
 
 public:
     SettingsPopupWidget *popup;

@@ -1,6 +1,8 @@
 #ifndef COCKATRICE_DRAW_PROBABILITY_WIDGET_H
 #define COCKATRICE_DRAW_PROBABILITY_WIDGET_H
 
+#include "../../../../layouts/flow_layout.h"
+#include "../../../general/layout_containers/flow_widget.h"
 #include "../../abstract_analytics_panel_widget.h"
 #include "../../deck_list_statistics_analyzer.h"
 #include "draw_probability_config.h"
@@ -31,8 +33,7 @@ private slots:
 private:
     DrawProbabilityConfig config;
 
-    QWidget *controls;
-    QHBoxLayout *controlLayout;
+    FlowWidget *controls;
     QLabel *labelPrefix;
     QLabel *labelMiddle;
     QLabel *labelSuffix;

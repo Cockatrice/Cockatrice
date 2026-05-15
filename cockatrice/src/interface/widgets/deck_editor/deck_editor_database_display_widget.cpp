@@ -147,11 +147,13 @@ void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, con
 
 void DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck()
 {
+    highlightAllSearchEdit();
     emit addCardToMainDeck(currentCard());
 }
 
 void DeckEditorDatabaseDisplayWidget::actAddCardToSideboard()
 {
+    highlightAllSearchEdit();
     emit addCardToSideboard(currentCard());
 }
 
@@ -240,4 +242,9 @@ void DeckEditorDatabaseDisplayWidget::retranslateUi()
 {
     aAddCard->setText(tr("Add card to &maindeck"));
     aAddCardToSideboard->setText(tr("Add card to &sideboard"));
+}
+
+void DeckEditorDatabaseDisplayWidget::highlightAllSearchEdit()
+{
+    searchEdit->setSelection(0, searchEdit->text().length());
 }

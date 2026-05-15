@@ -145,6 +145,9 @@ public slots:
     void actDecPT();
     void actFlowP();
     void actFlowT();
+
+    void actReduceLifeByPower();
+
     void actSetAnnotation();
     void actReveal(QAction *action);
     void actRevealHand(int revealToPlayerId);

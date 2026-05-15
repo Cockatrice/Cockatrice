@@ -137,8 +137,6 @@ void AbstractTabDeckEditor::onDeckModified()
 void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, const QString &zoneName)
 {
     deckStateManager->addCard(card, zoneName);
-
-    cardDatabaseDockWidget->highlightAllSearchEdit();
 }
 
 /**
