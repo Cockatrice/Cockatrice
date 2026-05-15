@@ -24,7 +24,7 @@ public:
     {
         return playerId;
     }
-    bool operator==(const PlayerReference &other)
+    bool operator==(const PlayerReference &other) const
     {
         return ((roomId == other.roomId) && (gameId == other.gameId) && (playerId == other.playerId));
     }

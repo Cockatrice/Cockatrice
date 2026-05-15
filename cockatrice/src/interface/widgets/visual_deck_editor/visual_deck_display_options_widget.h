@@ -111,8 +111,6 @@ private:
     DisplayType currentDisplayType = DisplayType::Overlap;
 
     /** @brief Button used to toggle the display layout. */
-    QPushButton *displayTypeButton;
-    /// Button used to toggle the display layout.
     CompactPushButton *displayTypeButton;
 
     /** @brief Label for the group-by selector. */
