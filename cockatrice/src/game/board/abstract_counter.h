@@ -1,7 +1,7 @@
 /**
  * @file abstract_counter.h
  * @ingroup GameGraphicsPlayers
- * @brief TODO: Document this.
+ * @brief Abstract base for player counters displayed on the game board.
  */
 
 #ifndef COUNTER_H
@@ -58,7 +58,13 @@ public:
     ~AbstractCounter() override;
 
     void retranslateUi() override;
+
+    /**
+     * @brief Sets the counter value and triggers a visual update.
+     * Overflow protection is handled server-side, not in client counter classes.
+     */
     void setValue(int _value);
+
     void setShortcutsActive() override;
     void setShortcutsInactive() override;
     void delCounter();
