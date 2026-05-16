@@ -4,7 +4,6 @@ RUN dnf install -y --setopt=install_weak_deps=False \
       ccache \
       cmake \
       gcc-c++ \
-      git \
 	  gtest-devel \
       ninja-build \
       protobuf-devel \

@@ -4,7 +4,6 @@ RUN pacman --sync --refresh --sysupgrade --needed --noconfirm \
       ccache \
       cmake \
 	  gcc \
-	  git \
       gtest \
       ninja \
       protobuf \

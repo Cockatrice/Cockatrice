@@ -8,7 +8,6 @@ RUN apt-get update \
       cmake \
 	  file \
       g++ \
-      git \
       libgl-dev \
 	  libgtest-dev \
       liblzma-dev \

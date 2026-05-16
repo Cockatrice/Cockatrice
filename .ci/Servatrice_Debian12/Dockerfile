@@ -8,7 +8,6 @@ RUN apt-get update \
       cmake \
 	  file \
       g++ \
-      git \
       libmariadb-dev-compat \
       libprotobuf-dev \
       libqt6sql6-mysql \
