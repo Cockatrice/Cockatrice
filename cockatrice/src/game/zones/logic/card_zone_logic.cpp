@@ -55,8 +55,9 @@ void CardZoneLogic::addCard(CardItem *card, const bool reorganize, const int x, 
     emit cardAdded(card);
     addCardImpl(card, x, y);
 
-    if (reorganize)
+    if (reorganize) {
         emit reorganizeCards();
+    }
 
     emit cardCountChanged();
 }
@@ -66,16 +67,19 @@ CardItem *CardZoneLogic::takeCard(int position, int cardId, bool toNewZone)
     if (position == -1) {
         // position == -1 means either that the zone is indexed by card id
         // or that it doesn't matter which card you take.
-        for (int i = 0; i < cards.size(); ++i)
+        for (int i = 0; i < cards.size(); ++i) {
             if (cards[i]->getId() == cardId) {
                 position = i;
                 break;
             }
-        if (position == -1)
+        }
+        if (position == -1) {
             position = 0;
+        }
     }
-    if (position >= cards.size())
+    if (position >= cards.size()) {
         return nullptr;
+    }
 
     for (auto *view : views) {
         qobject_cast<ZoneViewZoneLogic *>(view->getLogic())->removeCard(position, toNewZone);
@@ -142,8 +146,9 @@ void CardZoneLogic::moveAllToZone()
     cmd.set_target_zone(targetZone.toStdString());
     cmd.set_x(targetX);
 
-    for (int i = 0; i < cards.size(); ++i)
+    for (int i = 0; i < cards.size(); ++i) {
         cmd.mutable_cards_to_move()->add_card()->set_card_id(cards[i]->getId());
+    }
 
     player->getPlayerActions()->sendGameCommand(cmd);
 }
@@ -175,9 +180,9 @@ void CardZoneLogic::clearContents()
 QString CardZoneLogic::getTranslatedName(bool theirOwn, GrammaticalCase gc) const
 {
     QString ownerName = player->getPlayerInfo()->getName();
-    if (name == ZoneNames::HAND)
+    if (name == ZoneNames::HAND) {
         return (theirOwn ? tr("their hand", "nominative") : tr("%1's hand", "nominative").arg(ownerName));
-    else if (name == ZoneNames::DECK)
+    } else if (name == ZoneNames::DECK) {
         switch (gc) {
             case CaseLookAtZone:
                 return (theirOwn ? tr("their library", "look at zone")
@@ -193,11 +198,11 @@ QString CardZoneLogic::getTranslatedName(bool theirOwn, GrammaticalCase gc) cons
             default:
                 return (theirOwn ? tr("their library", "nominative") : tr("%1's library", "nominative").arg(ownerName));
         }
-    else if (name == ZoneNames::GRAVE)
+    } else if (name == ZoneNames::GRAVE) {
         return (theirOwn ? tr("their graveyard", "nominative") : tr("%1's graveyard", "nominative").arg(ownerName));
-    else if (name == ZoneNames::EXILE)
+    } else if (name == ZoneNames::EXILE) {
         return (theirOwn ? tr("their exile", "nominative") : tr("%1's exile", "nominative").arg(ownerName));
-    else if (name == ZoneNames::SIDEBOARD)
+    } else if (name == ZoneNames::SIDEBOARD) {
         switch (gc) {
             case CaseLookAtZone:
                 return (theirOwn ? tr("their sideboard", "look at zone")
@@ -208,7 +213,7 @@ QString CardZoneLogic::getTranslatedName(bool theirOwn, GrammaticalCase gc) cons
             default:
                 break;
         }
-    else {
+    } else {
         return (theirOwn ? tr("their custom zone '%1'", "nominative").arg(name)
                          : tr("%1's custom zone '%2'", "nominative").arg(ownerName).arg(name));
     }

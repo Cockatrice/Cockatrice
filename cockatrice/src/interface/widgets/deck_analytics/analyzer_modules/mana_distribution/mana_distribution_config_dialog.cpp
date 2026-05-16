@@ -62,8 +62,9 @@ void ManaDistributionConfigDialog::setFromConfig(const ManaDistributionConfig &c
 
     displayType->setCurrentText(cfg.displayType);
 
-    for (int i = 0; i < filterList->count(); ++i)
+    for (int i = 0; i < filterList->count(); ++i) {
         filterList->item(i)->setSelected(cfg.filters.contains(filterList->item(i)->text()));
+    }
 
     showColorRows->setChecked(cfg.showColorRows);
 }
@@ -74,8 +75,9 @@ void ManaDistributionConfigDialog::accept()
 
     // Filters
     cfg.filters.clear();
-    for (auto *item : filterList->selectedItems())
+    for (auto *item : filterList->selectedItems()) {
         cfg.filters << item->text();
+    }
 
     cfg.showColorRows = showColorRows->isChecked();
 

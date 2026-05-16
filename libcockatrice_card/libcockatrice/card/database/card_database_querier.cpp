@@ -36,8 +36,9 @@ QList<CardInfoPtr> CardDatabaseQuerier::getCardInfos(const QStringList &cardName
     QList<CardInfoPtr> cardInfos;
     for (const QString &cardName : cardNames) {
         CardInfoPtr ptr = db->cards.value(cardName);
-        if (ptr)
+        if (ptr) {
             cardInfos.append(ptr);
+        }
     }
 
     return cardInfos;
@@ -50,10 +51,12 @@ CardInfoPtr CardDatabaseQuerier::getCardBySimpleName(const QString &cardName) co
 
 CardInfoPtr CardDatabaseQuerier::lookupCardByName(const QString &name) const
 {
-    if (auto info = getCardInfo(name))
+    if (auto info = getCardInfo(name)) {
         return info;
-    if (auto info = getCardBySimpleName(name))
+    }
+    if (auto info = getCardBySimpleName(name)) {
         return info;
+    }
     return getCardBySimpleName(CardInfo::simplifyName(name));
 }
 
@@ -71,8 +74,9 @@ QList<ExactCard> CardDatabaseQuerier::getCards(const QList<CardRef> &cardRefs) c
     QList<ExactCard> cards;
     for (const auto &cardRef : cardRefs) {
         ExactCard card = getCard(cardRef);
-        if (card)
+        if (card) {
             cards.append(card);
+        }
     }
 
     return cards;
@@ -119,8 +123,9 @@ ExactCard CardDatabaseQuerier::guessCard(const CardRef &cardRef) const
 
 ExactCard CardDatabaseQuerier::getRandomCard() const
 {
-    if (db->cards.isEmpty())
+    if (db->cards.isEmpty()) {
         return {};
+    }
 
     const auto keys = db->cards.keys();
     int randomIndex = QRandomGenerator::global()->bounded(keys.size());

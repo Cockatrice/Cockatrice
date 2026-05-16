@@ -98,55 +98,79 @@ inline static DeckFormat apiNameToFormat(const QString &name)
 {
     const QString n = name.trimmed();
 
-    if (n.compare("Standard", Qt::CaseInsensitive) == 0)
+    if (n.compare("Standard", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Standard;
-    if (n.compare("Modern", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Modern", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Modern;
-    if (n.compare("Commander", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Commander", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Commander;
-    if (n.compare("Legacy", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Legacy", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Legacy;
-    if (n.compare("Vintage", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Vintage", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Vintage;
-    if (n.compare("Pauper", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Pauper", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Pauper;
-    if (n.compare("Custom", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Custom", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Custom;
-    if (n.compare("Frontier", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Frontier", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Frontier;
-    if (n.compare("Future Std", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Future Std", Qt::CaseInsensitive) == 0) {
         return DeckFormat::FutureStandard;
-    if (n.compare("Penny Dreadful", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Penny Dreadful", Qt::CaseInsensitive) == 0) {
         return DeckFormat::PennyDreadful;
-    if (n.compare("1v1 Commander", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("1v1 Commander", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Commander1v1;
-    if (n.compare("Dual Commander", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Dual Commander", Qt::CaseInsensitive) == 0) {
         return DeckFormat::DualCommander;
-    if (n.compare("Brawl", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Brawl", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Brawl;
+    }
 
-    if (n.compare("Alchemy", Qt::CaseInsensitive) == 0)
+    if (n.compare("Alchemy", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Alchemy;
-    if (n.compare("Historic", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Historic", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Historic;
-    if (n.compare("Gladiator", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Gladiator", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Gladiator;
-    if (n.compare("Oathbreaker", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Oathbreaker", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Oathbreaker;
-    if (n.compare("Old School", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Old School", Qt::CaseInsensitive) == 0) {
         return DeckFormat::OldSchool;
-    if (n.compare("Pauper Commander", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Pauper Commander", Qt::CaseInsensitive) == 0) {
         return DeckFormat::PauperCommander;
-    if (n.compare("Pioneer", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Pioneer", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Pioneer;
-    if (n.compare("PreDH", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("PreDH", Qt::CaseInsensitive) == 0) {
         return DeckFormat::PreDH;
-    if (n.compare("Premodern", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Premodern", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Premodern;
-    if (n.compare("Standard Brawl", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Standard Brawl", Qt::CaseInsensitive) == 0) {
         return DeckFormat::StandardBrawl;
-    if (n.compare("Timeless", Qt::CaseInsensitive) == 0)
+    }
+    if (n.compare("Timeless", Qt::CaseInsensitive) == 0) {
         return DeckFormat::Timeless;
+    }
 
     return DeckFormat::Unknown;
 }

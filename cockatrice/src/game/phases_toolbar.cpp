@@ -21,8 +21,9 @@ PhaseButton::PhaseButton(const QString &_name, QGraphicsItem *parent, QAction *_
         activeAnimationTimer = new QTimer(this);
         connect(activeAnimationTimer, &QTimer::timeout, this, &PhaseButton::updateAnimation);
         activeAnimationTimer->setSingleShot(false);
-    } else
+    } else {
         activeAnimationCounter = 9;
+    }
 
     setCacheMode(DeviceCoordinateCache);
 }
@@ -63,8 +64,9 @@ void PhaseButton::setWidth(double _width)
 
 void PhaseButton::setActive(bool _active)
 {
-    if ((active == _active) || !highlightable)
+    if ((active == _active) || !highlightable) {
         return;
+    }
 
     active = _active;
     activeAnimationTimer->start(25);
@@ -72,8 +74,9 @@ void PhaseButton::setActive(bool _active)
 
 void PhaseButton::updateAnimation()
 {
-    if (!highlightable)
+    if (!highlightable) {
         return;
+    }
 
     // the counter ticks up to 10 when active and down to 0 when inactive
     if (active && activeAnimationCounter < 10) {
@@ -99,8 +102,9 @@ void PhaseButton::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * /*event*/)
 
 void PhaseButton::triggerDoubleClickAction()
 {
-    if (doubleClickAction)
+    if (doubleClickAction) {
         doubleClickAction->trigger();
+    }
 }
 
 PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
@@ -126,8 +130,9 @@ PhasesToolbar::PhasesToolbar(QGraphicsItem *parent)
     buttonList << untapButton << upkeepButton << drawButton << main1Button << combatStartButton << combatAttackersButton
                << combatBlockersButton << combatDamageButton << combatEndButton << main2Button << cleanupButton;
 
-    for (auto &i : buttonList)
+    for (auto &i : buttonList) {
         connect(i, &PhaseButton::clicked, this, &PhasesToolbar::phaseButtonClicked);
+    }
 
     nextTurnButton = new PhaseButton("nextturn", this, nullptr, false);
     connect(nextTurnButton, &PhaseButton::clicked, this, &PhasesToolbar::actNextTurn);
@@ -144,8 +149,9 @@ QRectF PhasesToolbar::boundingRect() const
 
 void PhasesToolbar::retranslateUi()
 {
-    for (int i = 0; i < buttonList.size(); ++i)
+    for (int i = 0; i < buttonList.size(); ++i) {
         buttonList[i]->setToolTip(getLongPhaseName(i));
+    }
 }
 
 QString PhasesToolbar::getLongPhaseName(int phase) const
@@ -187,8 +193,9 @@ const double PhasesToolbar::marginSize = 3;
 
 void PhasesToolbar::rearrangeButtons()
 {
-    for (auto &i : buttonList)
+    for (auto &i : buttonList) {
         i->setWidth(symbolSize);
+    }
     nextTurnButton->setWidth(symbolSize);
 
     double y = marginSize;
@@ -226,11 +233,13 @@ void PhasesToolbar::setHeight(double _height)
 
 void PhasesToolbar::setActivePhase(int phase)
 {
-    if (phase >= buttonList.size())
+    if (phase >= buttonList.size()) {
         return;
+    }
 
-    for (int i = 0; i < buttonList.size(); ++i)
+    for (int i = 0; i < buttonList.size(); ++i) {
         buttonList[i]->setActive(i == phase);
+    }
 }
 
 void PhasesToolbar::triggerPhaseAction(int phase)
@@ -243,8 +252,9 @@ void PhasesToolbar::triggerPhaseAction(int phase)
 void PhasesToolbar::phaseButtonClicked()
 {
     auto *button = qobject_cast<PhaseButton *>(sender());
-    if (button->getActive())
+    if (button->getActive()) {
         button->triggerDoubleClickAction();
+    }
 
     Command_SetActivePhase cmd;
     cmd.set_phase(static_cast<google::protobuf::uint32>(buttonList.indexOf(button)));

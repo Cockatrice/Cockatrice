@@ -21,15 +21,18 @@ bool PlayerManager::isMainPlayerConceded() const
 Player *PlayerManager::getActiveLocalPlayer(int activePlayer) const
 {
     Player *active = players.value(activePlayer, 0);
-    if (active)
-        if (active->getPlayerInfo()->getLocal())
+    if (active) {
+        if (active->getPlayerInfo()->getLocal()) {
             return active;
+        }
+    }
 
     QMapIterator<int, Player *> playerIterator(players);
     while (playerIterator.hasNext()) {
         Player *temp = playerIterator.next().value();
-        if (temp->getPlayerInfo()->getLocal())
+        if (temp->getPlayerInfo()->getLocal()) {
             return temp;
+        }
     }
 
     return nullptr;
@@ -66,8 +69,9 @@ void PlayerManager::removePlayer(int playerId)
 Player *PlayerManager::getPlayer(int playerId) const
 {
     Player *player = players.value(playerId, 0);
-    if (!player)
+    if (!player) {
         return nullptr;
+    }
     return player;
 }
 

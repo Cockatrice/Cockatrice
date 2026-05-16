@@ -58,9 +58,11 @@ int ServersSettings::getPrevioushostindex(const QString &saveName) const
 {
     int size = getValue("totalServers", "server", "server_details").toInt();
 
-    for (int i = 0; i <= size; ++i)
-        if (saveName == getValue(QString("saveName%1").arg(i), "server", "server_details").toString())
+    for (int i = 0; i <= size; ++i) {
+        if (saveName == getValue(QString("saveName%1").arg(i), "server", "server_details").toString()) {
             return i;
+        }
+    }
 
     return -1;
 }
@@ -92,8 +94,9 @@ QString ServersSettings::getPassword()
 {
     int index = getPrevioushostindex(getPrevioushostName());
 
-    if (getSavePassword())
+    if (getSavePassword()) {
         return getValue(QString("password%1").arg(index), "server", "server_details").toString();
+    }
 
     return QString();
 }
@@ -168,8 +171,9 @@ void ServersSettings::addNewServer(const QString &saveName,
                                    bool savePassword,
                                    const QString &site)
 {
-    if (updateExistingServer(saveName, serv, port, username, password, savePassword, site))
+    if (updateExistingServer(saveName, serv, port, username, password, savePassword, site)) {
         return;
+    }
 
     int index = getValue("totalServers", "server", "server_details").toInt() + 1;
 

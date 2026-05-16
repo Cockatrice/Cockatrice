@@ -124,10 +124,11 @@ static void sortAndReduceColors(QString &colors)
     // reduce
     QChar lastChar = '\0';
     for (int i = 0; i < colors.size(); ++i) {
-        if (colors.at(i) == lastChar)
+        if (colors.at(i) == lastChar) {
             colors.remove(i, 1);
-        else
+        } else {
             lastChar = colors.at(i);
+        }
     }
 }
 
@@ -191,12 +192,13 @@ CardInfoPtr OracleImporter::addCard(QString name,
     // table row
     int tableRow = 1;
     QString mainCardType = properties.value("maintype").toString();
-    if (mainCardType == "Land")
+    if (mainCardType == "Land") {
         tableRow = 0;
-    else if (mainCardType == "Sorcery" || mainCardType == "Instant")
+    } else if (mainCardType == "Sorcery" || mainCardType == "Instant") {
         tableRow = 3;
-    else if (mainCardType == "Creature")
+    } else if (mainCardType == "Creature") {
         tableRow = 2;
+    }
 
     // card side
     QString side = properties.value("side").toString() == "b" ? "back" : "front";
@@ -282,8 +284,9 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
             QString mtgjsonProperty = i.key();
             QString xmlPropertyName = i.value();
             QString propertyValue = getStringPropertyFromMap(card, mtgjsonProperty);
-            if (!propertyValue.isEmpty())
+            if (!propertyValue.isEmpty()) {
                 properties.insert(xmlPropertyName, propertyValue);
+            }
         }
 
         // per-set properties
@@ -292,8 +295,9 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
             QString mtgjsonProperty = i.key();
             QString xmlPropertyName = i.value();
             QString propertyValue = getStringPropertyFromMap(card, mtgjsonProperty);
-            if (!propertyValue.isEmpty())
+            if (!propertyValue.isEmpty()) {
                 printingInfo.setProperty(xmlPropertyName, propertyValue);
+            }
         }
 
         // handle flavorNames specially due to double-faced cards
@@ -544,8 +548,9 @@ int OracleImporter::startImport()
         CardSetPtr newSet = CardSet::newInstance(noOpController, curSetToParse.getShortName(),
                                                  curSetToParse.getLongName(), curSetToParse.getSetType(),
                                                  curSetToParse.getReleaseDate(), curSetToParse.getPriority());
-        if (!sets.contains(newSet->getShortName()))
+        if (!sets.contains(newSet->getShortName())) {
             sets.insert(newSet->getShortName(), newSet);
+        }
 
         int numCardsInSet = importCardsFromSet(newSet, curSetToParse.getCards());
 

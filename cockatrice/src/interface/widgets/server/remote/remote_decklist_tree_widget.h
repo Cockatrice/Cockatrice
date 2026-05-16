@@ -75,8 +75,9 @@ public:
 
     template <typename T> [[nodiscard]] T getNode(const QModelIndex &index) const
     {
-        if (!index.isValid())
+        if (!index.isValid()) {
             return dynamic_cast<T>(root);
+        }
         return dynamic_cast<T>(static_cast<Node *>(index.internalPointer()));
     }
 

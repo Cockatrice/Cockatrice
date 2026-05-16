@@ -18,14 +18,17 @@ template <typename T> T *findParentOfType(const QObject *obj)
 
 static inline void clearLayoutRec(QLayout *l)
 {
-    if (!l)
+    if (!l) {
         return;
+    }
     QLayoutItem *it;
     while ((it = l->takeAt(0)) != nullptr) {
-        if (QWidget *w = it->widget())
+        if (QWidget *w = it->widget()) {
             w->deleteLater();
-        if (QLayout *sub = it->layout())
+        }
+        if (QLayout *sub = it->layout()) {
             clearLayoutRec(sub);
+        }
         delete it;
     }
 }

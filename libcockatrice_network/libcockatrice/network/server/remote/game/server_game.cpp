@@ -147,8 +147,9 @@ void Server_Game::storeGameInformation()
 
     const QStringList &allGameTypes = room->getGameTypes();
     QStringList _gameTypes;
-    for (int i = gameInfo.game_types_size() - 1; i >= 0; --i)
+    for (int i = gameInfo.game_types_size() - 1; i >= 0; --i) {
         _gameTypes.append(allGameTypes[gameInfo.game_types(i)]);
+    }
 
     for (const auto &playerName : allPlayersEver) {
         replayMatchInfo->add_player_names(playerName.toStdString());
@@ -166,8 +167,9 @@ void Server_Game::storeGameInformation()
     server->clientsLock.lockForRead();
     for (auto userName : allPlayersEver + allSpectatorsEver) {
         Server_AbstractUserInterface *userHandler = server->findUser(userName);
-        if (userHandler && server->getStoreReplaysEnabled())
+        if (userHandler && server->getStoreReplaysEnabled()) {
             userHandler->sendProtocolItem(*sessionEvent);
+        }
     }
     server->clientsLock.unlock();
     delete sessionEvent;
@@ -189,8 +191,9 @@ void Server_Game::pingClockTimeout()
     bool allPlayersInactive = true;
     int playerCount = 0;
     for (auto *participant : participants) {
-        if (participant == nullptr)
+        if (participant == nullptr) {
             continue;
+        }
 
         if (!participant->isSpectator()) {
             ++playerCount;
@@ -253,8 +256,9 @@ int Server_Game::getSpectatorCount() const
 
     int result = 0;
     for (Server_AbstractParticipant *participant : participants.values()) {
-        if (participant->isSpectator())
+        if (participant->isSpectator()) {
             ++result;
+        }
     }
     return result;
 }
@@ -269,8 +273,9 @@ void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
         event->set_game_started(true);
         event->set_active_player_id(0);
         event->set_active_phase(0);
-    } else
+    } else {
         event->set_game_started(false);
+    }
 
     for (Server_AbstractParticipant *participant : participants.values()) {
         participant->getInfo(event->add_player_list(), recipient, omniscient, withUserInfo);
@@ -367,8 +372,9 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
         delete replayCont;
 
         startTimeOfThisGame = secondsElapsed;
-    } else
+    } else {
         firstGameStarted = true;
+    }
 
     sendGameStateToPlayers();
 
@@ -396,11 +402,13 @@ void Server_Game::stopGameIfFinished()
     int playing = 0;
     auto players = getPlayers();
     for (auto *player : players.values()) {
-        if (!player->getConceded())
+        if (!player->getConceded()) {
             ++playing;
+        }
     }
-    if (playing > 1)
+    if (playing > 1) {
         return;
+    }
 
     gameStarted = false;
 
@@ -428,32 +436,40 @@ Response::ResponseCode Server_Game::checkJoin(ServerInfo_User *user,
 {
     Server_DatabaseInterface *databaseInterface = room->getServer()->getDatabaseInterface();
     for (auto *participant : participants.values()) {
-        if (participant->getUserInfo()->name() == user->name())
+        if (participant->getUserInfo()->name() == user->name()) {
             return Response::RespContextError;
+        }
     }
 
     if (asJudge && !(user->user_level() & ServerInfo_User::IsJudge)) {
         return Response::RespUserLevelTooLow;
     }
     if (!(overrideRestrictions && (user->user_level() & ServerInfo_User::IsModerator))) {
-        if ((_password != password) && !(spectator && !spectatorsNeedPassword))
+        if ((_password != password) && !(spectator && !spectatorsNeedPassword)) {
             return Response::RespWrongPassword;
-        if (!(user->user_level() & ServerInfo_User::IsRegistered) && onlyRegistered)
+        }
+        if (!(user->user_level() & ServerInfo_User::IsRegistered) && onlyRegistered) {
             return Response::RespUserLevelTooLow;
-        if (onlyBuddies && (user->name() != creatorInfo->name()))
+        }
+        if (onlyBuddies && (user->name() != creatorInfo->name())) {
             if (!databaseInterface->isInBuddyList(QString::fromStdString(creatorInfo->name()),
-                                                  QString::fromStdString(user->name())))
+                                                  QString::fromStdString(user->name()))) {
                 return Response::RespOnlyBuddies;
+            }
+        }
         if (databaseInterface->isInIgnoreList(QString::fromStdString(creatorInfo->name()),
-                                              QString::fromStdString(user->name())))
+                                              QString::fromStdString(user->name()))) {
             return Response::RespInIgnoreList;
+        }
         if (spectator) {
-            if (!spectatorsAllowed)
+            if (!spectatorsAllowed) {
                 return Response::RespSpectatorsNotAllowed;
+            }
         }
     }
-    if (!spectator && (gameStarted || (getPlayerCount() >= getMaxPlayers())))
+    if (!spectator && (gameStarted || (getPlayerCount() >= getMaxPlayers()))) {
         return Response::RespGameFull;
+    }
 
     return Response::RespOk;
 }
@@ -463,8 +479,9 @@ bool Server_Game::containsUser(const QString &userName) const
     QMutexLocker locker(&gameMutex);
 
     for (auto *participant : participants.values()) {
-        if (participant->getUserInfo()->name() == userName.toStdString())
+        if (participant->getUserInfo()->name() == userName.toStdString()) {
             return true;
+        }
     }
     return false;
 }
@@ -516,8 +533,9 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
         emit gameInfoChanged(gameInfo);
     }
 
-    if ((newParticipant->getUserInfo()->user_level() & ServerInfo_User::IsRegistered) && !spectator)
+    if ((newParticipant->getUserInfo()->user_level() & ServerInfo_User::IsRegistered) && !spectator) {
         room->getServer()->addPersistentPlayer(playerName, room->getId(), gameId, newParticipant->getPlayerId());
+    }
 
     userInterface->playerAddedToGame(gameId, room->getId(), newParticipant->getPlayerId());
 
@@ -564,8 +582,9 @@ void Server_Game::removeParticipant(Server_AbstractParticipant *participant, Eve
     }
     if (!spectator) {
         stopGameIfFinished();
-        if (gameStarted && playerActive)
+        if (gameStarted && playerActive) {
             nextTurn();
+        }
     }
 
     ServerInfo_Game gameInfo;
@@ -588,15 +607,18 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Abst
         for (auto *arrow : anyPlayer->getArrows().values()) {
             auto *targetCard = qobject_cast<Server_Card *>(arrow->getTargetItem());
             if (targetCard) {
-                if (targetCard->getZone() != nullptr && targetCard->getZone()->getPlayer() == player)
+                if (targetCard->getZone() != nullptr && targetCard->getZone()->getPlayer() == player) {
                     toDelete.append(arrow);
+                }
             } else if (arrow->getTargetItem() == player) {
                 toDelete.append(arrow);
             }
 
             // Don't use else here! It has to happen regardless of whether targetCard == 0.
-            if (arrow->getStartCard()->getZone() != nullptr && arrow->getStartCard()->getZone()->getPlayer() == player)
+            if (arrow->getStartCard()->getZone() != nullptr &&
+                arrow->getStartCard()->getZone()->getPlayer() == player) {
                 toDelete.append(arrow);
+            }
         }
         for (auto *arrow : toDelete) {
             Event_DeleteArrow event;
@@ -635,8 +657,9 @@ bool Server_Game::kickParticipant(int playerId)
     QMutexLocker locker(&gameMutex);
 
     auto *participant = participants.value(playerId);
-    if (!participant)
+    if (!participant) {
         return false;
+    }
 
     GameEventContainer *gec = prepareGameEvent(Event_Kicked(), -1);
     participant->sendGameEvent(*gec);
@@ -769,8 +792,9 @@ void Server_Game::sendGameEventContainer(GameEventContainer *cont,
         const bool playerPrivate = (participant->getPlayerId() == privatePlayerId) || participant->isJudge() ||
                                    (participant->isSpectator() && spectatorsSeeEverything);
         if ((recipients.testFlag(GameEventStorageItem::SendToPrivate) && playerPrivate) ||
-            (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate))
+            (recipients.testFlag(GameEventStorageItem::SendToOthers) && !playerPrivate)) {
             participant->sendGameEvent(*cont);
+        }
     }
     if (recipients.testFlag(GameEventStorageItem::SendToPrivate)) {
         cont->set_seconds_elapsed(secondsElapsed - startTimeOfThisGame);
@@ -786,11 +810,13 @@ Server_Game::prepareGameEvent(const ::google::protobuf::Message &gameEvent, int 
 {
     auto *cont = new GameEventContainer;
     cont->set_game_id(gameId);
-    if (context)
+    if (context) {
         cont->mutable_context()->CopyFrom(*context);
+    }
     GameEvent *event = cont->add_event_list();
-    if (playerId != -1)
+    if (playerId != -1) {
         event->set_player_id(playerId);
+    }
     event->GetReflection()
         ->MutableMessage(event, gameEvent.GetDescriptor()->FindExtensionByName("ext"))
         ->CopyFrom(gameEvent);

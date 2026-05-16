@@ -181,8 +181,9 @@ void TabDeckStorage::retranslateUi()
 QString TabDeckStorage::getTargetPath() const
 {
     RemoteDeckList_TreeModel::Node *curRight = serverDirView->getCurrentItem();
-    if (curRight == nullptr)
+    if (curRight == nullptr) {
         return {};
+    }
     auto *dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight);
     if (dir == nullptr) {
         dir = dynamic_cast<RemoteDeckList_TreeModel::DirectoryNode *>(curRight->getParent());
@@ -237,13 +238,15 @@ void TabDeckStorage::actOpenLocalDeck()
 {
     QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
     for (const auto &curLeft : curLefts) {
-        if (localDirModel->isDir(curLeft))
+        if (localDirModel->isDir(curLeft)) {
             continue;
+        }
         QString filePath = localDirModel->filePath(curLeft);
 
         std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(filePath, DeckFileFormat::Cockatrice, true);
-        if (!deckOpt)
+        if (!deckOpt) {
             continue;
+        }
 
         emit openDeckEditor(deckOpt.value());
     }
@@ -320,10 +323,12 @@ void TabDeckStorage::uploadDeck(const QString &filePath, const QString &targetPa
         QString deckName =
             getTextWithMax(this, tr("Enter deck name"), tr("This decklist does not have a name.\nPlease enter a name:"),
                            QLineEdit::Normal, deckFileInfo.completeBaseName(), &ok);
-        if (!ok)
+        if (!ok) {
             return;
-        if (deckName.isEmpty())
+        }
+        if (deckName.isEmpty()) {
             deckName = tr("Unnamed deck");
+        }
         deck.setName(deckName);
     } else {
         deck.setName(deck.getName().left(MAX_NAME_LENGTH));
@@ -372,8 +377,9 @@ void TabDeckStorage::actNewLocalFolder()
     bool ok;
     QString folderName =
         QInputDialog::getText(this, tr("New folder"), tr("Name of new folder:"), QLineEdit::Normal, "", &ok);
-    if (!ok || folderName.isEmpty())
+    if (!ok || folderName.isEmpty()) {
         return;
+    }
 
     localDirModel->mkdir(dirIndex, folderName);
 }
@@ -387,8 +393,9 @@ void TabDeckStorage::actDeleteLocalDeck()
     }
 
     if (QMessageBox::warning(this, tr("Delete local file"), tr("Are you sure you want to delete the selected files?"),
-                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+                             QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
         return;
+    }
 
     for (const auto &curLeft : curLefts) {
         if (curLeft.isValid()) {
@@ -414,8 +421,9 @@ void TabDeckStorage::actOpenRemoteDeck()
 {
     for (const auto &curRight : serverDirView->getCurrentSelection()) {
         RemoteDeckList_TreeModel::FileNode *node = dynamic_cast<RemoteDeckList_TreeModel::FileNode *>(curRight);
-        if (!node)
+        if (!node) {
             continue;
+        }
 
         Command_DeckDownload cmd;
         cmd.set_deck_id(node->getId());
@@ -428,15 +436,17 @@ void TabDeckStorage::actOpenRemoteDeck()
 
 void TabDeckStorage::openRemoteDeckFinished(const Response &r, const CommandContainer &commandContainer)
 {
-    if (r.response_code() != Response::RespOk)
+    if (r.response_code() != Response::RespOk) {
         return;
+    }
 
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     const Command_DeckDownload &cmd = commandContainer.session_command(0).GetExtension(Command_DeckDownload::ext);
 
     std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromRemote(QString::fromStdString(resp.deck()), cmd.deck_id());
-    if (!deckOpt)
+    if (!deckOpt) {
         return;
+    }
 
     emit openDeckEditor(deckOpt.value());
 }
@@ -488,8 +498,9 @@ void TabDeckStorage::downloadFinished(const Response &r,
                                       const CommandContainer & /*commandContainer*/,
                                       const QVariant &extraData)
 {
-    if (r.response_code() != Response::RespOk)
+    if (r.response_code() != Response::RespOk) {
         return;
+    }
 
     const Response_DeckDownload &resp = r.GetExtension(Response_DeckDownload::ext);
     QString filePath = extraData.toString();
@@ -504,12 +515,14 @@ void TabDeckStorage::actNewFolder()
     QString targetPath = getTargetPath();
     int max_length = MAX_NAME_LENGTH - targetPath.length() - 1; // generated length would be path + / + name
 
-    if (max_length < 1) // can't create path that's short enough
+    if (max_length < 1) { // can't create path that's short enough
         return;
+    }
 
     QString folderName = getTextWithMax(this, tr("New folder"), tr("Name of new folder:"), max_length);
-    if (folderName.isEmpty())
+    if (folderName.isEmpty()) {
         return;
+    }
 
     // '/' isn't a valid filename character on *nix so we're choosing to replace it with a different arbitrary
     // character.
@@ -527,8 +540,9 @@ void TabDeckStorage::actNewFolder()
 
 void TabDeckStorage::newFolderFinished(const Response &response, const CommandContainer &commandContainer)
 {
-    if (response.response_code() != Response::RespOk)
+    if (response.response_code() != Response::RespOk) {
         return;
+    }
 
     const Command_DeckNewDir &cmd = commandContainer.session_command(0).GetExtension(Command_DeckNewDir::ext);
     serverDirView->addFolderToTree(QString::fromStdString(cmd.dir_name()),
@@ -562,8 +576,9 @@ void TabDeckStorage::deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *curR
     PendingCommand *pend;
     if (const auto *dir = dynamic_cast<const RemoteDeckList_TreeModel::DirectoryNode *>(curRight)) {
         QString targetPath = dir->getPath();
-        if (targetPath.isEmpty())
+        if (targetPath.isEmpty()) {
             return;
+        }
         if (targetPath.length() > MAX_NAME_LENGTH) {
             qCritical() << "target path to delete is too long" << targetPath;
             return;
@@ -585,22 +600,26 @@ void TabDeckStorage::deleteRemoteDeck(const RemoteDeckList_TreeModel::Node *curR
 
 void TabDeckStorage::deleteDeckFinished(const Response &response, const CommandContainer &commandContainer)
 {
-    if (response.response_code() != Response::RespOk)
+    if (response.response_code() != Response::RespOk) {
         return;
+    }
 
     const Command_DeckDel &cmd = commandContainer.session_command(0).GetExtension(Command_DeckDel::ext);
     RemoteDeckList_TreeModel::Node *toDelete = serverDirView->getNodeById(cmd.deck_id());
-    if (toDelete)
+    if (toDelete) {
         serverDirView->removeNode(toDelete);
+    }
 }
 
 void TabDeckStorage::deleteFolderFinished(const Response &response, const CommandContainer &commandContainer)
 {
-    if (response.response_code() != Response::RespOk)
+    if (response.response_code() != Response::RespOk) {
         return;
+    }
 
     const Command_DeckDelDir &cmd = commandContainer.session_command(0).GetExtension(Command_DeckDelDir::ext);
     RemoteDeckList_TreeModel::Node *toDelete = serverDirView->getNodeByPath(QString::fromStdString(cmd.path()));
-    if (toDelete)
+    if (toDelete) {
         serverDirView->removeNode(toDelete);
+    }
 }

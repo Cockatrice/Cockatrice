@@ -116,8 +116,9 @@ void TabDeckEditorVisual::createMenus()
 QString TabDeckEditorVisual::getTabText() const
 {
     QString result = tr("Visual Deck: %1").arg(deckStateManager->getSimpleDeckName());
-    if (deckStateManager->isModified())
+    if (deckStateManager->isModified()) {
         result.prepend("* ");
+    }
     return result;
 }
 

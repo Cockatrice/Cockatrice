@@ -157,8 +157,9 @@ QString ColorPie::tooltipForPoint(const QPoint &pt) const
 
     QPointF v = pt - center;
     double distance = std::hypot(v.x(), v.y());
-    if (distance > size / 2.0)
+    if (distance > size / 2.0) {
         return {};
+    }
 
     double angle = std::atan2(-v.y(), v.x()) * 180.0 / M_PI;
     if (angle < 0) {

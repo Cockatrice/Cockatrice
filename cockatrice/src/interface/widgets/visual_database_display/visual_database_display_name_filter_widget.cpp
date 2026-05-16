@@ -64,8 +64,9 @@ void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
 {
     DeckListModel *deckListModel = deckEditor->deckStateManager->getModel();
 
-    if (!deckListModel)
+    if (!deckListModel) {
         return;
+    }
 
     QList<QString> cardNames = deckListModel->getCardNames();
     for (auto cardName : cardNames) {
@@ -78,8 +79,9 @@ void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
 void VisualDatabaseDisplayNameFilterWidget::actLoadFromClipboard()
 {
     DlgLoadDeckFromClipboard dlg(this);
-    if (!dlg.exec())
+    if (!dlg.exec()) {
         return;
+    }
 
     QStringList cardsInClipboard = dlg.getDeckList().getCardList();
     for (QString cardName : cardsInClipboard) {
@@ -91,8 +93,9 @@ void VisualDatabaseDisplayNameFilterWidget::actLoadFromClipboard()
 
 void VisualDatabaseDisplayNameFilterWidget::createNameFilter(const QString &name)
 {
-    if (activeFilters.contains(name))
+    if (activeFilters.contains(name)) {
         return;
+    }
 
     // Create a button for the filter
     auto *button = new QPushButton(name, flowWidget);

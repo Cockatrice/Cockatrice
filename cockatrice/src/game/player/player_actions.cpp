@@ -85,8 +85,9 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
             cardToMove->set_pt(info.getPowTough().toStdString());
         }
         cardToMove->set_tapped(!faceDown && info.getUiAttributes().cipt);
-        if (tableRow != 3)
+        if (tableRow != 3) {
             cmd.set_target_zone(ZoneNames::TABLE);
+        }
         cmd.set_x(gridPoint.x());
         cmd.set_y(gridPoint.y());
     }

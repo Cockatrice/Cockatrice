@@ -51,15 +51,17 @@ void ManaCurveTotalWidget::updateDisplay(const QString &categoryName,
             for (auto it = cmcIt->cbegin(); it != cmcIt->cend(); ++it) {
                 const QString &category = it.key();
 
-                if (!config.filters.isEmpty() && !config.filters.contains(category))
+                if (!config.filters.isEmpty() && !config.filters.contains(category)) {
                     continue;
+                }
 
                 const int value = it.value();
 
                 QStringList cards;
                 const auto catIt = cardsMap.constFind(category);
-                if (catIt != cardsMap.cend())
+                if (catIt != cardsMap.cend()) {
                     cards = catIt->value(cmc);
+                }
 
                 segments.push_back({category, value, cards, GameSpecificColors::MTG::colorHelper(category)});
             }

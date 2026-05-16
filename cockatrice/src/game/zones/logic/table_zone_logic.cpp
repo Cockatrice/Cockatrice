@@ -29,7 +29,8 @@ CardItem *TableZoneLogic::takeCard(int position, int cardId, bool toNewZone)
 {
     CardItem *result = CardZoneLogic::takeCard(position, cardId);
 
-    if (toNewZone)
+    if (toNewZone) {
         emit contentSizeChanged();
+    }
     return result;
 }

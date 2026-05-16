@@ -125,8 +125,9 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     refreshShortcuts();
 
     // append game to rooms game list for others to see
-    for (int i = game->getGameMetaInfo()->gameTypesSize() - 1; i >= 0; i--)
+    for (int i = game->getGameMetaInfo()->gameTypesSize() - 1; i >= 0; i--) {
         gameTypes.append(game->getGameMetaInfo()->findRoomGameType(i));
+    }
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
 }
@@ -282,12 +283,14 @@ void TabGame::retranslateUi()
     updatePlayerListDockTitle();
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
     messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
-    if (replayDock)
+    if (replayDock) {
         replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
+    }
 
     if (phasesMenu) {
-        for (int i = 0; i < phaseActions.size(); ++i)
+        for (int i = 0; i < phaseActions.size(); ++i) {
             phaseActions[i]->setText(phasesToolbar->getLongPhaseName(i));
+        }
         phasesMenu->setTitle(tr("&Phases"));
     }
 
@@ -313,8 +316,9 @@ void TabGame::retranslateUi()
     if (aRotateViewCCW) {
         aRotateViewCCW->setText(tr("Rotate View Co&unterclockwise"));
     }
-    if (aGameInfo)
+    if (aGameInfo) {
         aGameInfo->setText(tr("Game &information"));
+    }
     if (aConcede) {
         if (game->getPlayerManager()->isMainPlayerConceded()) {
             aConcede->setText(tr("Un&concede"));
@@ -361,11 +365,13 @@ void TabGame::retranslateUi()
 
     QMapIterator<int, Player *> i(game->getPlayerManager()->getPlayers());
 
-    while (i.hasNext())
+    while (i.hasNext()) {
         i.next().value()->getGraphicsItem()->retranslateUi();
+    }
     QMapIterator<int, TabbedDeckViewContainer *> j(deckViewContainers);
-    while (j.hasNext())
+    while (j.hasNext()) {
         j.next().value()->playerDeckView->retranslateUi();
+    }
 
     scene->retranslateUi();
 }
@@ -484,18 +490,21 @@ void TabGame::actGameInfo()
 void TabGame::actConcede()
 {
     Player *player = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
-    if (player == nullptr)
+    if (player == nullptr) {
         return;
+    }
     if (!player->getConceded()) {
         if (QMessageBox::question(this, tr("Concede"), tr("Are you sure you want to concede this game?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
             return;
+        }
         emit game->getPlayerManager()->activeLocalPlayerConceded();
     } else {
         if (QMessageBox::question(this, tr("Unconcede"),
                                   tr("You have already conceded.  Do you want to return to this game?"),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
             return;
+        }
         emit game->getPlayerManager()->activeLocalPlayerUnconceded();
     }
 }
@@ -511,20 +520,23 @@ bool TabGame::leaveGame()
         if (!game->getPlayerManager()->isSpectator()) {
             tabSupervisor->setCurrentWidget(this);
             if (QMessageBox::question(this, tr("Leave game"), tr("Are you sure you want to leave this game?"),
-                                      QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+                                      QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
                 return false;
+            }
         }
 
-        if (!replayDock)
+        if (!replayDock) {
             emit gameLeft();
+        }
     }
     return true;
 }
 
 void TabGame::actSay()
 {
-    if (completer->popup()->isVisible())
+    if (completer->popup()->isVisible()) {
         return;
+    }
 
     if (sayEdit->text().startsWith("/card ")) {
         cardInfoFrameWidget->setCard(sayEdit->text().mid(6));
@@ -569,8 +581,9 @@ void TabGame::actPhaseAction()
 void TabGame::actNextPhase()
 {
     int phase = game->getGameState()->getCurrentPhase();
-    if (++phase >= phasesToolbar->phaseCount())
+    if (++phase >= phasesToolbar->phaseCount()) {
         phase = 0;
+    }
 
     emit phaseChanged(phase);
 }
@@ -596,8 +609,9 @@ void TabGame::actRemoveLocalArrows()
     QMapIterator<int, Player *> playerIterator(game->getPlayerManager()->getPlayers());
     while (playerIterator.hasNext()) {
         Player *player = playerIterator.next().value();
-        if (!player->getPlayerInfo()->getLocal())
+        if (!player->getPlayerInfo()->getLocal()) {
             continue;
+        }
         QMapIterator<int, ArrowItem *> arrowIterator(player->getArrows());
         while (arrowIterator.hasNext()) {
             ArrowItem *a = arrowIterator.next().value();
@@ -807,8 +821,9 @@ void TabGame::startGame(bool _resuming)
 
     if (!_resuming) {
         QMapIterator<int, Player *> playerIterator(game->getPlayerManager()->getPlayers());
-        while (playerIterator.hasNext())
+        while (playerIterator.hasNext()) {
             playerIterator.next().value()->setGameStarted();
+        }
     }
 
     playerListWidget->setGameStarted(true, game->getGameState()->isResuming());
@@ -851,8 +866,9 @@ void TabGame::closeGame()
 Player *TabGame::setActivePlayer(int id)
 {
     Player *player = game->getPlayerManager()->getPlayer(id);
-    if (!player)
+    if (!player) {
         return nullptr;
+    }
 
     playerListWidget->setActivePlayer(id);
     QMapIterator<int, Player *> i(game->getPlayerManager()->getPlayers());
@@ -894,26 +910,31 @@ QString TabGame::getTabText() const
     QString gameTypeInfo;
     if (!gameTypes.empty()) {
         gameTypeInfo = gameTypes.at(0);
-        if (gameTypes.size() > 1)
+        if (gameTypes.size() > 1) {
             gameTypeInfo.append("...");
+        }
     }
 
     QString gameDesc(game->getGameMetaInfo()->description());
     QString gameId(QString::number(game->getGameMetaInfo()->gameId()));
 
     QString tabText;
-    if (replayDock)
+    if (replayDock) {
         tabText.append(tr("Replay") + " ");
-    if (!gameTypeInfo.isEmpty())
-        tabText.append(gameTypeInfo + " ");
-    if (!gameDesc.isEmpty()) {
-        if (gameDesc.length() >= 15)
-            tabText.append("| " + gameDesc.left(15) + "... ");
-        else
-            tabText.append("| " + gameDesc + " ");
     }
-    if (!tabText.isEmpty())
+    if (!gameTypeInfo.isEmpty()) {
+        tabText.append(gameTypeInfo + " ");
+    }
+    if (!gameDesc.isEmpty()) {
+        if (gameDesc.length() >= 15) {
+            tabText.append("| " + gameDesc.left(15) + "... ");
+        } else {
+            tabText.append("| " + gameDesc + " ");
+        }
+    }
+    if (!tabText.isEmpty()) {
         tabText.append("| ");
+    }
     tabText.append("#" + gameId);
 
     return tabText;
@@ -1127,9 +1148,10 @@ void TabGame::actResetLayout()
 void TabGame::createPlayAreaWidget(bool bReplay)
 {
     phasesToolbar = new PhasesToolbar;
-    if (!bReplay)
+    if (!bReplay) {
         connect(phasesToolbar, &PhasesToolbar::sendGameCommand, game->getGameEventHandler(),
                 qOverload<const ::google::protobuf::Message &, int>(&GameEventHandler::sendGameCommand));
+    }
     scene = new GameScene(phasesToolbar, this);
     connect(game->getPlayerManager(), &PlayerManager::playerConceded, scene, &GameScene::rearrange);
     connect(game->getPlayerManager(), &PlayerManager::playerCountChanged, scene, &GameScene::rearrange);

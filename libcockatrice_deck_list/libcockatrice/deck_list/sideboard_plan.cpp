@@ -18,28 +18,30 @@ bool SideboardPlan::readElement(QXmlStreamReader *xml)
         xml->readNext();
         const QString childName = xml->name().toString();
         if (xml->isStartElement()) {
-            if (childName == "name")
+            if (childName == "name") {
                 name = xml->readElementText();
-            else if (childName == "move_card_to_zone") {
+            } else if (childName == "move_card_to_zone") {
                 MoveCard_ToZone m;
                 while (!xml->atEnd()) {
                     xml->readNext();
                     const QString childName2 = xml->name().toString();
                     if (xml->isStartElement()) {
-                        if (childName2 == "card_name")
+                        if (childName2 == "card_name") {
                             m.set_card_name(xml->readElementText().toStdString());
-                        else if (childName2 == "start_zone")
+                        } else if (childName2 == "start_zone") {
                             m.set_start_zone(xml->readElementText().toStdString());
-                        else if (childName2 == "target_zone")
+                        } else if (childName2 == "target_zone") {
                             m.set_target_zone(xml->readElementText().toStdString());
+                        }
                     } else if (xml->isEndElement() && (childName2 == "move_card_to_zone")) {
                         moveList.append(m);
                         break;
                     }
                 }
             }
-        } else if (xml->isEndElement() && (childName == "sideboard_plan"))
+        } else if (xml->isEndElement() && (childName == "sideboard_plan")) {
             return true;
+        }
     }
     return false;
 }

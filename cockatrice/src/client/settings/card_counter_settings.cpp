@@ -15,8 +15,9 @@ void CardCounterSettings::setColor(int counterId, const QColor &color)
 
     QString key = QString("cards/counters/%1/color").arg(counterId);
 
-    if (settings.value(key).value<QColor>() == color)
+    if (settings.value(key).value<QColor>() == color) {
         return;
+    }
 
     settings.setValue(key, color);
     emit colorChanged(counterId, color);

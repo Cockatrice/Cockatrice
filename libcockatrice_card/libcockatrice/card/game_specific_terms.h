@@ -31,26 +31,36 @@ QString const ColorIdentity("coloridentity");
 
 inline static const QString getNicePropertyName(QString key)
 {
-    if (key == CardType)
+    if (key == CardType) {
         return QCoreApplication::translate("Mtg", "Card Type");
-    if (key == ConvertedManaCost)
+    }
+    if (key == ConvertedManaCost) {
         return QCoreApplication::translate("Mtg", "Mana Value");
-    if (key == Colors)
+    }
+    if (key == Colors) {
         return QCoreApplication::translate("Mtg", "Color(s)");
-    if (key == Loyalty)
+    }
+    if (key == Loyalty) {
         return QCoreApplication::translate("Mtg", "Loyalty");
-    if (key == MainCardType)
+    }
+    if (key == MainCardType) {
         return QCoreApplication::translate("Mtg", "Main Card Type");
-    if (key == ManaCost)
+    }
+    if (key == ManaCost) {
         return QCoreApplication::translate("Mtg", "Mana Cost");
-    if (key == PowTough)
+    }
+    if (key == PowTough) {
         return QCoreApplication::translate("Mtg", "P/T");
-    if (key == Side)
+    }
+    if (key == Side) {
         return QCoreApplication::translate("Mtg", "Side");
-    if (key == Layout)
+    }
+    if (key == Layout) {
         return QCoreApplication::translate("Mtg", "Layout");
-    if (key == ColorIdentity)
+    }
+    if (key == ColorIdentity) {
         return QCoreApplication::translate("Mtg", "Color Identity");
+    }
     return key;
 }
 } // namespace Mtg

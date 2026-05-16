@@ -125,8 +125,9 @@ QStringList CardDatabaseLoader::collectCustomDatabasePaths() const
                     QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
 
     QStringList paths;
-    while (it.hasNext())
+    while (it.hasNext()) {
         paths << it.next();
+    }
     paths.sort();
     return paths;
 }

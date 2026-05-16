@@ -86,10 +86,11 @@ void SignalHandler::sigSegvHandler(int sig)
     fprintf(stderr, "Error: signal %d:\n", sig);
     backtrace_symbols_fd(array, size, STDERR_FILENO);
 
-    if (sig == SIGSEGV)
+    if (sig == SIGSEGV) {
         logger->logMessage("CRASH: SIGSEGV");
-    else if (sig == SIGABRT)
+    } else if (sig == SIGABRT) {
         logger->logMessage("CRASH: SIGABRT");
+    }
 
     logger->deleteLater();
     loggerThread->wait();

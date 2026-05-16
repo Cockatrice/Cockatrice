@@ -306,8 +306,9 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         PrintingInfo printingInfo(set);
                         for (QXmlStreamAttribute attr : attrs) {
                             QString attrName = attr.name().toString();
-                            if (attrName == "picURL")
+                            if (attrName == "picURL") {
                                 attrName = "picurl";
+                            }
                             printingInfo.setProperty(attrName, attr.value().toString());
                         }
 

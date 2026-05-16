@@ -43,8 +43,9 @@ PlayerListTWI::PlayerListTWI() : QTreeWidgetItem(Type)
 bool PlayerListTWI::operator<(const QTreeWidgetItem &other) const
 {
     // Sort by spectator/player
-    if (data(1, Qt::UserRole) != other.data(1, Qt::UserRole))
+    if (data(1, Qt::UserRole) != other.data(1, Qt::UserRole)) {
         return data(1, Qt::UserRole).toBool();
+    }
 
     // Sort by player ID
     return data(4, Qt::UserRole + 1).toInt() < other.data(4, Qt::UserRole + 1).toInt();
@@ -106,12 +107,14 @@ void PlayerListWidget::addPlayer(const ServerInfo_PlayerProperties &player)
 
 void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties &prop, int playerId)
 {
-    if (playerId == -1)
+    if (playerId == -1) {
         playerId = prop.player_id();
+    }
 
     QTreeWidgetItem *player = players.value(playerId, 0);
-    if (!player)
+    if (!player) {
         return;
+    }
 
     bool isSpectator = prop.has_spectator() && prop.spectator();
     if (prop.has_judge() || prop.has_spectator()) {
@@ -126,13 +129,16 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
     }
 
     if (!isSpectator) {
-        if (prop.has_conceded())
+        if (prop.has_conceded()) {
             player->setData(2, Qt::UserRole, prop.conceded());
-        if (prop.has_ready_start())
+        }
+        if (prop.has_ready_start()) {
             player->setData(2, Qt::UserRole + 1, prop.ready_start());
-        if (prop.has_conceded() || prop.has_ready_start())
+        }
+        if (prop.has_conceded() || prop.has_ready_start()) {
             player->setIcon(2, gameStarted ? (prop.conceded() ? concededIcon : QIcon())
                                            : (prop.ready_start() ? readyIcon : notReadyIcon));
+        }
     }
     if (prop.has_user_info()) {
         player->setData(3, Qt::UserRole, prop.user_info().user_level());
@@ -141,30 +147,35 @@ void PlayerListWidget::updatePlayerProperties(const ServerInfo_PlayerProperties 
                                QString::fromStdString(prop.user_info().privlevel())));
         player->setText(4, QString::fromStdString(prop.user_info().name()));
         const QString country = QString::fromStdString(prop.user_info().country());
-        if (!country.isEmpty())
+        if (!country.isEmpty()) {
             player->setIcon(4, QIcon(CountryPixmapGenerator::generatePixmap(12, country)));
+        }
         player->setData(4, Qt::UserRole, QString::fromStdString(prop.user_info().name()));
     }
 
-    if (prop.has_player_id())
+    if (prop.has_player_id()) {
         player->setData(4, Qt::UserRole + 1, prop.player_id());
+    }
 
     if (!isSpectator) {
         if (prop.has_deck_hash()) {
             player->setText(5, QString::fromStdString(prop.deck_hash()));
         }
-        if (prop.has_sideboard_locked())
+        if (prop.has_sideboard_locked()) {
             player->setIcon(5, prop.sideboard_locked() ? lockIcon : QIcon());
+        }
     }
-    if (prop.has_ping_seconds())
+    if (prop.has_ping_seconds()) {
         player->setIcon(0, QIcon(PingPixmapGenerator::generatePixmap(12, prop.ping_seconds(), 10)));
+    }
 }
 
 void PlayerListWidget::removePlayer(int playerId)
 {
     QTreeWidgetItem *player = players.value(playerId, 0);
-    if (!player)
+    if (!player) {
         return;
+    }
     players.remove(playerId);
     delete takeTopLevelItem(indexOfTopLevelItem(player));
 }
@@ -193,13 +204,14 @@ void PlayerListWidget::setGameStarted(bool _gameStarted, bool resuming)
         QTreeWidgetItem *twi = i.next().value();
 
         bool isPlayer = twi->data(1, Qt::UserRole).toBool();
-        if (!isPlayer)
+        if (!isPlayer) {
             continue;
+        }
 
         if (gameStarted) {
-            if (resuming)
+            if (resuming) {
                 twi->setIcon(2, twi->data(2, Qt::UserRole).toBool() ? concededIcon : QIcon());
-            else {
+            } else {
                 twi->setData(2, Qt::UserRole, false);
                 twi->setIcon(2, QIcon());
             }
@@ -211,8 +223,9 @@ void PlayerListWidget::setGameStarted(bool _gameStarted, bool resuming)
 
 void PlayerListWidget::showContextMenu(const QPoint &pos, const QModelIndex &index)
 {
-    if (!userContextMenu)
+    if (!userContextMenu) {
         return;
+    }
 
     const QString &userName = index.sibling(index.row(), 4).data(Qt::UserRole).toString();
     int playerId = index.sibling(index.row(), 4).data(Qt::UserRole + 1).toInt();

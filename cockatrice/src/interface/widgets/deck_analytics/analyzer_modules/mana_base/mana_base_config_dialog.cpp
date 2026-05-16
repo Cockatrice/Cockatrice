@@ -28,8 +28,9 @@ ManaBaseConfigDialog::ManaBaseConfigDialog(DeckListStatisticsAnalyzer *analyzer,
 
     // select initial filters
     for (int i = 0; i < filterList->count(); ++i) {
-        if (config.filters.contains(filterList->item(i)->text()))
+        if (config.filters.contains(filterList->item(i)->text())) {
             filterList->item(i)->setSelected(true);
+        }
     }
 
     buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);

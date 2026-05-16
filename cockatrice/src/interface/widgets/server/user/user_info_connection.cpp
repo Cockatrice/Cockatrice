@@ -53,8 +53,9 @@ QStringList UserConnection_Information::getServerInfo(const QString &find)
     for (int i = 0; i < size; i++) {
         QString _saveName = servers.getValue(QString("saveName%1").arg(i), "server", "server_details").toString();
 
-        if (find != _saveName)
+        if (find != _saveName) {
             continue;
+        }
 
         QString serverName = servers.getValue(QString("server%1").arg(i), "server", "server_details").toString();
         QString portNum = servers.getValue(QString("port%1").arg(i), "server", "server_details").toString();
@@ -73,8 +74,9 @@ QStringList UserConnection_Information::getServerInfo(const QString &find)
         break;
     }
 
-    if (_server.empty())
+    if (_server.empty()) {
         qCWarning(UserInfoConnectionLog) << "There was a problem!";
+    }
 
     return _server;
 }

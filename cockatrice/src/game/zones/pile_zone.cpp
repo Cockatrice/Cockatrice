@@ -48,9 +48,10 @@ void PileZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 {
     painter->drawPath(shape());
 
-    if (!getLogic()->getCards().isEmpty())
+    if (!getLogic()->getCards().isEmpty()) {
         getLogic()->getCards().at(0)->paintPicture(painter, getLogic()->getCards().at(0)->getTranslatedSize(painter),
                                                    90);
+    }
 
     painter->translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F);
     painter->rotate(-90);
@@ -87,24 +88,28 @@ void PileZone::reorganizeCards()
 void PileZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     CardZone::mousePressEvent(event);
-    if (event->isAccepted())
+    if (event->isAccepted()) {
         return;
+    }
 
     if (event->button() == Qt::LeftButton) {
         setCursor(Qt::ClosedHandCursor);
         event->accept();
-    } else
+    } else {
         event->ignore();
+    }
 }
 
 void PileZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() <
-        QApplication::startDragDistance())
+        QApplication::startDragDistance()) {
         return;
+    }
 
-    if (getLogic()->getCards().isEmpty())
+    if (getLogic()->getCards().isEmpty()) {
         return;
+    }
 
     bool forceFaceDown = event->modifiers().testFlag(Qt::ShiftModifier);
     bool bottomCard = event->modifiers().testFlag(Qt::ControlModifier);
@@ -123,7 +128,8 @@ void PileZone::mouseReleaseEvent(QGraphicsSceneMouseEvent * /*event*/)
 
 void PileZone::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    if (!getLogic()->getCards().isEmpty())
+    if (!getLogic()->getCards().isEmpty()) {
         getLogic()->getCards()[0]->processHoverEvent();
+    }
     QGraphicsItem::hoverEnterEvent(event);
 }

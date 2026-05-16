@@ -44,8 +44,9 @@ void SegmentedBarWidget::paintEvent(QPaintEvent *)
         const auto &seg = segments[i];
 
         int segHeight = total > 0 ? (seg.value * barHeight / total) : 0;
-        if (segHeight < 2)
+        if (segHeight < 2) {
             segHeight = 2;
+        }
 
         QRect r(barX, yCurrent - segHeight, barWidth, segHeight);
         bool isTop = (i == segments.size() - 1);
@@ -110,8 +111,9 @@ int SegmentedBarWidget::segmentAt(int y) const
         int top = currentTop - segHeight;
         int bottom = currentTop;
 
-        if (y >= top && y <= bottom)
+        if (y >= top && y <= bottom) {
             return i;
+        }
 
         currentTop -= segHeight;
     }

@@ -14,14 +14,16 @@ const int RemoteReplayList_TreeModel::numberOfColumns = 6;
 RemoteReplayList_TreeModel::MatchNode::MatchNode(const ServerInfo_ReplayMatch &_matchInfo)
     : RemoteReplayList_TreeModel::Node(QString::fromStdString(_matchInfo.game_name())), matchInfo(_matchInfo)
 {
-    for (int i = 0; i < matchInfo.replay_list_size(); ++i)
+    for (int i = 0; i < matchInfo.replay_list_size(); ++i) {
         append(new ReplayNode(matchInfo.replay_list(i), this));
+    }
 }
 
 RemoteReplayList_TreeModel::MatchNode::~MatchNode()
 {
-    for (int i = 0; i < size(); ++i)
+    for (int i = 0; i < size(); ++i) {
         delete at(i);
+    }
 }
 
 void RemoteReplayList_TreeModel::MatchNode::updateMatchInfo(const ServerInfo_ReplayMatch &_matchInfo)
@@ -45,22 +47,26 @@ RemoteReplayList_TreeModel::~RemoteReplayList_TreeModel()
 
 int RemoteReplayList_TreeModel::rowCount(const QModelIndex &parent) const
 {
-    if (!parent.isValid())
+    if (!parent.isValid()) {
         return replayMatches.size();
+    }
 
     auto *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(parent.internalPointer()));
-    if (matchNode)
+    if (matchNode) {
         return matchNode->size();
-    else
+    } else {
         return 0;
+    }
 }
 
 QVariant RemoteReplayList_TreeModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
         return QVariant();
-    if (index.column() >= numberOfColumns)
+    }
+    if (index.column() >= numberOfColumns) {
         return QVariant();
+    }
 
     auto *replayNode = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
     if (replayNode) {
@@ -103,8 +109,9 @@ QVariant RemoteReplayList_TreeModel::data(const QModelIndex &index, int role) co
                         return QString::fromStdString(matchInfo.game_name());
                     case 2: {
                         QStringList playerList;
-                        for (int i = 0; i < matchInfo.player_names_size(); ++i)
+                        for (int i = 0; i < matchInfo.player_names_size(); ++i) {
                             playerList.append(QString::fromStdString(matchInfo.player_names(i)));
+                        }
                         return playerList.join(", ");
                     }
                     case 4:
@@ -131,8 +138,9 @@ QVariant RemoteReplayList_TreeModel::data(const QModelIndex &index, int role) co
 
 QVariant RemoteReplayList_TreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (orientation != Qt::Horizontal)
+    if (orientation != Qt::Horizontal) {
         return QVariant();
+    }
     switch (role) {
         case Qt::TextAlignmentRole:
             switch (section) {
@@ -167,17 +175,20 @@ QVariant RemoteReplayList_TreeModel::headerData(int section, Qt::Orientation ori
 
 QModelIndex RemoteReplayList_TreeModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if (!hasIndex(row, column, parent))
+    if (!hasIndex(row, column, parent)) {
         return QModelIndex();
+    }
 
     auto *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(parent.internalPointer()));
     if (matchNode) {
-        if (row >= matchNode->size())
+        if (row >= matchNode->size()) {
             return QModelIndex();
+        }
         return createIndex(row, column, (void *)matchNode->at(row));
     } else {
-        if (row >= replayMatches.size())
+        if (row >= replayMatches.size()) {
             return QModelIndex();
+        }
         return createIndex(row, column, (void *)replayMatches[row]);
     }
 }
@@ -185,9 +196,9 @@ QModelIndex RemoteReplayList_TreeModel::index(int row, int column, const QModelI
 QModelIndex RemoteReplayList_TreeModel::parent(const QModelIndex &ind) const
 {
     MatchNode const *matchNode = dynamic_cast<MatchNode *>(static_cast<Node *>(ind.internalPointer()));
-    if (matchNode)
+    if (matchNode) {
         return QModelIndex();
-    else {
+    } else {
         auto *replayNode = dynamic_cast<ReplayNode *>(static_cast<Node *>(ind.internalPointer()));
         return createIndex(replayNode->getParent()->indexOf(replayNode), 0, replayNode->getParent());
     }
@@ -195,45 +206,52 @@ QModelIndex RemoteReplayList_TreeModel::parent(const QModelIndex &ind) const
 
 Qt::ItemFlags RemoteReplayList_TreeModel::flags(const QModelIndex &index) const
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
         return Qt::NoItemFlags;
+    }
 
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
 ServerInfo_Replay const *RemoteReplayList_TreeModel::getReplay(const QModelIndex &index) const
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
         return 0;
+    }
 
     auto *node = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
-    if (!node)
+    if (!node) {
         return 0;
+    }
     return &node->getReplayInfo();
 }
 
 ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getReplayMatch(const QModelIndex &index) const
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
         return nullptr;
+    }
 
     auto *node = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
-    if (!node)
+    if (!node) {
         return nullptr;
+    }
 
     return &node->getMatchInfo();
 }
 
 ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getEnclosingReplayMatch(const QModelIndex &index) const
 {
-    if (!index.isValid())
+    if (!index.isValid()) {
         return nullptr;
+    }
 
     auto *node = dynamic_cast<MatchNode *>(static_cast<Node *>(index.internalPointer()));
     if (!node) {
         auto *_node = dynamic_cast<ReplayNode *>(static_cast<Node *>(index.internalPointer()));
-        if (!_node)
+        if (!_node) {
             return nullptr;
+        }
         return &_node->getParent()->getMatchInfo();
     }
     return &node->getMatchInfo();
@@ -244,8 +262,9 @@ ServerInfo_ReplayMatch const *RemoteReplayList_TreeModel::getEnclosingReplayMatc
  */
 void RemoteReplayList_TreeModel::clearAll()
 {
-    for (int i = 0; i < replayMatches.size(); ++i)
+    for (int i = 0; i < replayMatches.size(); ++i) {
         delete replayMatches[i];
+    }
     replayMatches.clear();
 }
 
@@ -275,24 +294,26 @@ void RemoteReplayList_TreeModel::addMatchInfo(const ServerInfo_ReplayMatch &matc
 
 void RemoteReplayList_TreeModel::updateMatchInfo(int gameId, const ServerInfo_ReplayMatch &matchInfo)
 {
-    for (int i = 0; i < replayMatches.size(); ++i)
+    for (int i = 0; i < replayMatches.size(); ++i) {
         if (replayMatches[i]->getMatchInfo().game_id() == gameId) {
             replayMatches[i]->updateMatchInfo(matchInfo);
             emit dataChanged(createIndex(i, 0, (void *)replayMatches[i]),
                              createIndex(i, numberOfColumns - 1, (void *)replayMatches[i]));
             break;
         }
+    }
 }
 
 void RemoteReplayList_TreeModel::removeMatchInfo(int gameId)
 {
-    for (int i = 0; i < replayMatches.size(); ++i)
+    for (int i = 0; i < replayMatches.size(); ++i) {
         if (replayMatches[i]->getMatchInfo().game_id() == gameId) {
             beginRemoveRows(QModelIndex(), i, i);
             replayMatches.removeAt(i);
             endRemoveRows();
             break;
         }
+    }
 }
 
 void RemoteReplayList_TreeModel::replayListFinished(const Response &r)
@@ -302,8 +323,9 @@ void RemoteReplayList_TreeModel::replayListFinished(const Response &r)
     beginResetModel();
     clearAll();
 
-    for (int i = 0; i < resp.match_list_size(); ++i)
+    for (int i = 0; i < resp.match_list_size(); ++i) {
         replayMatches.append(new MatchNode(resp.match_list(i)));
+    }
 
     endResetModel();
     emit treeRefreshed();

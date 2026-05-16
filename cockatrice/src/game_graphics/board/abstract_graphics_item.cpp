@@ -19,27 +19,29 @@ void AbstractGraphicsItem::paintNumberEllipse(int number,
     QFontMetrics fm(font);
     double w = 1.3 * fm.horizontalAdvance(numStr);
     double h = fm.height() * 1.3;
-    if (w < h)
+    if (w < h) {
         w = h;
+    }
 
     painter->setPen(QColor(255, 255, 255, 0));
     painter->setBrush(QBrush(QColor(color)));
 
     QRectF textRect;
-    if (position == -1)
+    if (position == -1) {
         textRect = QRectF((boundingRect().width() - w) / 2.0, (boundingRect().height() - h) / 2.0, w, h);
-    else {
+    } else {
         qreal xOffset = 10;
         qreal yOffset = 20;
         qreal spacing = 2;
-        if (position < 2)
+        if (position < 2) {
             textRect = QRectF(count == 1 ? ((boundingRect().width() - w) / 2.0)
                                          : (position % 2 == 0 ? xOffset : (boundingRect().width() - xOffset - w)),
                               yOffset, w, h);
-        else
+        } else {
             textRect = QRectF(count == 3 ? ((boundingRect().width() - w) / 2.0)
                                          : (position % 2 == 0 ? xOffset : (boundingRect().width() - xOffset - w)),
                               yOffset + (spacing + h) * (position / 2), w, h);
+        }
     }
 
     painter->drawEllipse(textRect);

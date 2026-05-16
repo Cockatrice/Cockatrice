@@ -154,8 +154,9 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
                 "</a>)<br><br>" + tr("Do you want to update now?"),
             QMessageBox::Yes | QMessageBox::No);
 
-        if (reply == QMessageBox::Yes)
+        if (reply == QMessageBox::Yes) {
             downloadUpdate(release->getName());
+        }
     } else {
         QMessageBox::information(
             this, tr("Update Available"),

@@ -87,8 +87,9 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     if (!allGameTypes.isEmpty()) {
         gameTypeFilterGroupBox = new QGroupBox(tr("&Game types"));
         gameTypeFilterGroupBox->setLayout(gameTypeFilterLayout);
-    } else
+    } else {
         gameTypeFilterGroupBox = nullptr;
+    }
 
     auto *maxPlayersFilterMinLabel = new QLabel(tr("at &least:"));
     maxPlayersFilterMinSpinBox = new QSpinBox;
@@ -226,8 +227,9 @@ QSet<int> DlgFilterGames::getGameTypeFilter() const
     QMapIterator<int, QCheckBox *> i(gameTypeFilterCheckBoxes);
     while (i.hasNext()) {
         i.next();
-        if (i.value()->isChecked())
+        if (i.value()->isChecked()) {
             result.insert(i.key());
+        }
     }
     return result;
 }

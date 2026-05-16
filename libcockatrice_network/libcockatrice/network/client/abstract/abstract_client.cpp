@@ -66,8 +66,9 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
             const int cmdId = response.cmd_id();
 
             PendingCommand *pend = pendingCommands.value(cmdId, 0);
-            if (!pend)
+            if (!pend) {
                 return;
+            }
             pendingCommands.remove(cmdId);
 
             pend->processResponse(response);

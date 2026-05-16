@@ -26,8 +26,9 @@ DlgEditUser::DlgEditUser(QWidget *parent, QString email, QString country, QStrin
     int i = 1;
     for (const QString &c : countries) {
         countryEdit->addItem(QPixmap("theme:countries/" + c.toLower()), c);
-        if (c == country)
+        if (c == country) {
             countryEdit->setCurrentIndex(i);
+        }
 
         ++i;
     }

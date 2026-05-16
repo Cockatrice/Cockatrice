@@ -24,17 +24,21 @@ void DeckViewCardDragItem::updatePosition(const QPointF &cursorScenePos)
     QList<QGraphicsItem *> colliding = scene()->items(cursorScenePos);
 
     DeckViewCardContainer *cursorZone = 0;
-    for (int i = colliding.size() - 1; i >= 0; i--)
-        if ((cursorZone = qgraphicsitem_cast<DeckViewCardContainer *>(colliding.at(i))))
+    for (int i = colliding.size() - 1; i >= 0; i--) {
+        if ((cursorZone = qgraphicsitem_cast<DeckViewCardContainer *>(colliding.at(i)))) {
             break;
-    if (!cursorZone)
+        }
+    }
+    if (!cursorZone) {
         return;
+    }
     currentZone = cursorZone;
 
     QPointF newPos = cursorScenePos;
     if (newPos != pos()) {
-        for (int i = 0; i < childDrags.size(); i++)
+        for (int i = 0; i < childDrags.size(); i++) {
             childDrags[i]->setPos(newPos + childDrags[i]->getHotSpot());
+        }
         setPos(newPos);
     }
 }
@@ -104,11 +108,13 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() <
-        2 * QApplication::startDragDistance())
+        2 * QApplication::startDragDistance()) {
         return;
+    }
 
-    if (static_cast<DeckViewScene *>(scene())->getLocked())
+    if (static_cast<DeckViewScene *>(scene())->getLocked()) {
         return;
+    }
 
     delete dragItem;
     dragItem = new DeckViewCardDragItem(this, event->pos());
@@ -120,8 +126,9 @@ void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     int j = 0;
     for (int i = 0; i < sel.size(); i++) {
         auto *c = static_cast<DeckViewCard *>(sel.at(i));
-        if (c == this)
+        if (c == this) {
             continue;
+        }
         ++j;
         auto childPos = QPointF(j * CardDimensions::WIDTH_HALF_F, 0);
         auto *drag = new DeckViewCardDragItem(c, childPos, dragItem);
@@ -133,8 +140,9 @@ void DeckViewCard::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void DeckView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (static_cast<DeckViewScene *>(scene())->getLocked())
+    if (static_cast<DeckViewScene *>(scene())->getLocked()) {
         return;
+    }
 
     if (event->button() == Qt::LeftButton) {
         QList<MoveCard_ToZone> result;
@@ -147,12 +155,13 @@ void DeckView::mouseDoubleClickEvent(QMouseEvent *event)
             m.set_card_name(c->getName().toStdString());
             m.set_start_zone(zone->getName().toStdString());
 
-            if (zone->getName() == DECK_ZONE_MAIN)
+            if (zone->getName() == DECK_ZONE_MAIN) {
                 m.set_target_zone(DECK_ZONE_SIDE);
-            else if (zone->getName() == DECK_ZONE_SIDE)
+            } else if (zone->getName() == DECK_ZONE_SIDE) {
                 m.set_target_zone(DECK_ZONE_MAIN);
-            else // Trying to move from another zone
+            } else { // Trying to move from another zone
                 m.set_target_zone(zone->getName().toStdString());
+            }
 
             result.append(m);
         }
@@ -232,8 +241,9 @@ QList<QPair<int, int>> DeckViewCardContainer::getRowsAndCols() const
 {
     QList<QPair<int, int>> result;
     QList<QString> cardTypeList = cardsByType.uniqueKeys();
-    for (int i = 0; i < cardTypeList.size(); ++i)
+    for (int i = 0; i < cardTypeList.size(); ++i) {
         result.append(QPair<int, int>(1, cardsByType.count(cardTypeList[i])));
+    }
     return result;
 }
 
@@ -262,8 +272,9 @@ QSizeF DeckViewCardContainer::calculateBoundingRect(const QList<QPair<int, int>>
     // Calculate space needed for cards
     for (int i = 0; i < rowsAndCols.size(); ++i) {
         totalHeight += CardDimensions::HEIGHT_F * rowsAndCols[i].first + paddingY;
-        if (CardDimensions::WIDTH_F * rowsAndCols[i].second > totalWidth)
+        if (CardDimensions::WIDTH_F * rowsAndCols[i].second > totalWidth) {
             totalWidth = CardDimensions::WIDTH_F * rowsAndCols[i].second;
+        }
     }
 
     return QSizeF(getCardTypeTextWidth() + totalWidth, totalHeight + separatorY + paddingY);
@@ -271,8 +282,9 @@ QSizeF DeckViewCardContainer::calculateBoundingRect(const QList<QPair<int, int>>
 
 bool DeckViewCardContainer::sortCardsByName(DeckViewCard *c1, DeckViewCard *c2)
 {
-    if (c1 && c2)
+    if (c1 && c2) {
         return c1->getName() < c2->getName();
+    }
     return false;
 }
 
@@ -322,15 +334,17 @@ DeckViewScene::~DeckViewScene()
 void DeckViewScene::clearContents()
 {
     QMapIterator<QString, DeckViewCardContainer *> i(cardContainers);
-    while (i.hasNext())
+    while (i.hasNext()) {
         delete i.next().value();
+    }
     cardContainers.clear();
 }
 
 void DeckViewScene::setDeck(const DeckList &_deck)
 {
-    if (deck)
+    if (deck) {
         delete deck;
+    }
 
     deck = new DeckList(_deck.writeToString_Native());
     rebuildTree();
@@ -342,8 +356,9 @@ void DeckViewScene::rebuildTree()
 {
     clearContents();
 
-    if (!deck)
+    if (!deck) {
         return;
+    }
 
     for (auto *currentZone : deck->getZoneNodes()) {
         DeckViewCardContainer *container = cardContainers.value(currentZone->getName(), 0);
@@ -355,8 +370,9 @@ void DeckViewScene::rebuildTree()
 
         for (int j = 0; j < currentZone->size(); j++) {
             auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard)
+            if (!currentCard) {
                 continue;
+            }
 
             for (int k = 0; k < currentCard->getNumber(); ++k) {
                 auto *newCard = new DeckViewCard(container, currentCard->toCardRef(), currentZone->getName());
@@ -373,18 +389,21 @@ void DeckViewScene::applySideboardPlan(const QList<MoveCard_ToZone> &plan)
         const MoveCard_ToZone &m = plan[i];
         DeckViewCardContainer *start = cardContainers.value(QString::fromStdString(m.start_zone()));
         DeckViewCardContainer *target = cardContainers.value(QString::fromStdString(m.target_zone()));
-        if (!start || !target)
+        if (!start || !target) {
             continue;
+        }
 
         DeckViewCard *card = 0;
         const QList<DeckViewCard *> &cardList = start->getCards();
-        for (int j = 0; j < cardList.size(); ++j)
+        for (int j = 0; j < cardList.size(); ++j) {
             if (cardList[j]->getName() == QString::fromStdString(m.card_name())) {
                 card = cardList[j];
                 break;
             }
-        if (!card)
+        }
+        if (!card) {
             continue;
+        }
 
         start->removeCard(card);
         target->addCard(card);
@@ -405,8 +424,9 @@ void DeckViewScene::rearrangeItems()
         rowsAndColsList.append(rowsAndCols);
 
         cardCountList.append(QList<int>());
-        for (int j = 0; j < rowsAndCols.size(); ++j)
+        for (int j = 0; j < rowsAndCols.size(); ++j) {
             cardCountList[i].append(rowsAndCols[j].second);
+        }
     }
 
     qreal totalHeight, totalWidth;
@@ -417,23 +437,27 @@ void DeckViewScene::rearrangeItems()
         for (int i = 0; i < contList.size(); ++i) {
             QSizeF contSize = contList[i]->calculateBoundingRect(rowsAndColsList[i]);
             totalHeight += contSize.height() + spacing;
-            if (contSize.width() > totalWidth)
+            if (contSize.width() > totalWidth) {
                 totalWidth = contSize.width();
+            }
         }
 
         // We're done when the aspect ratio shifts from too high to too low.
-        if (totalWidth / totalHeight <= optimalAspectRatio)
+        if (totalWidth / totalHeight <= optimalAspectRatio) {
             break;
+        }
 
         // Find category with highest column count
         int maxIndex1 = -1, maxIndex2 = -1, maxCols = 0;
-        for (int i = 0; i < rowsAndColsList.size(); ++i)
-            for (int j = 0; j < rowsAndColsList[i].size(); ++j)
+        for (int i = 0; i < rowsAndColsList.size(); ++i) {
+            for (int j = 0; j < rowsAndColsList[i].size(); ++j) {
                 if (rowsAndColsList[i][j].second > maxCols) {
                     maxIndex1 = i;
                     maxIndex2 = j;
                     maxCols = rowsAndColsList[i][j].second;
                 }
+            }
+        }
 
         // Add row to category
         const int maxRows = rowsAndColsList[maxIndex1][maxIndex2].first;
@@ -451,8 +475,9 @@ void DeckViewScene::rearrangeItems()
     }
 
     totalWidth = totalHeight * optimalAspectRatio;
-    for (int i = 0; i < contList.size(); ++i)
+    for (int i = 0; i < contList.size(); ++i) {
         contList[i]->setWidth(totalWidth);
+    }
 
     setSceneRect(QRectF(0, 0, totalWidth, totalHeight));
 }
@@ -470,7 +495,7 @@ QList<MoveCard_ToZone> DeckViewScene::getSideboardPlan() const
     while (containerIterator.hasNext()) {
         DeckViewCardContainer *cont = containerIterator.next().value();
         const QList<DeckViewCard *> cardList = cont->getCards();
-        for (int i = 0; i < cardList.size(); ++i)
+        for (int i = 0; i < cardList.size(); ++i) {
             if (cardList[i]->getOriginZone() != cont->getName()) {
                 MoveCard_ToZone m;
                 m.set_card_name(cardList[i]->getName().toStdString());
@@ -478,6 +503,7 @@ QList<MoveCard_ToZone> DeckViewScene::getSideboardPlan() const
                 m.set_target_zone(cont->getName().toStdString());
                 result.append(m);
             }
+        }
     }
     return result;
 }

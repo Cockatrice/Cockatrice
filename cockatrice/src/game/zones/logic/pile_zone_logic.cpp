@@ -25,8 +25,9 @@ void PileZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
         card->setCardRef({});
         card->setId(-1);
         // If we obscure a previously revealed card, its name has to be forgotten
-        if (cards.size() > x + 1)
+        if (cards.size() > x + 1) {
             cards.at(x + 1)->setCardRef({});
+        }
     }
     card->setVisible(false);
     card->resetState();

@@ -158,9 +158,11 @@ QString const generateClientID()
 {
     QString macList;
     for (const QNetworkInterface &networkInterface : QNetworkInterface::allInterfaces()) {
-        if (networkInterface.hardwareAddress() != "")
-            if (networkInterface.hardwareAddress() != "00:00:00:00:00:00:00:E0")
+        if (networkInterface.hardwareAddress() != "") {
+            if (networkInterface.hardwareAddress() != "00:00:00:00:00:00:00:E0") {
                 macList += networkInterface.hardwareAddress() + ".";
+            }
+        }
     }
     QString strClientID = QCryptographicHash::hash(macList.toUtf8(), QCryptographicHash::Sha1).toHex().right(15);
     return strClientID;

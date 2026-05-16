@@ -69,27 +69,35 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
         for (int j = 0; j < roomList->topLevelItemCount(); ++j) {
             QTreeWidgetItem *twi = roomList->topLevelItem(j);
             if (twi->data(0, Qt::UserRole).toInt() == room.room_id()) {
-                if (room.has_name())
+                if (room.has_name()) {
                     twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
-                if (room.has_description())
+                }
+                if (room.has_description()) {
                     twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
-                if (room.has_permissionlevel())
+                }
+                if (room.has_permissionlevel()) {
                     twi->setData(2, Qt::DisplayRole, getRoomPermissionDisplay(room));
-                if (room.has_player_count())
+                }
+                if (room.has_player_count()) {
                     twi->setData(3, Qt::DisplayRole, room.player_count());
-                if (room.has_game_count())
+                }
+                if (room.has_game_count()) {
                     twi->setData(4, Qt::DisplayRole, room.game_count());
+                }
                 return;
             }
         }
         QTreeWidgetItem *twi = new QTreeWidgetItem;
         twi->setData(0, Qt::UserRole, room.room_id());
-        if (room.has_name())
+        if (room.has_name()) {
             twi->setData(0, Qt::DisplayRole, QString::fromStdString(room.name()));
-        if (room.has_description())
+        }
+        if (room.has_description()) {
             twi->setData(1, Qt::DisplayRole, QString::fromStdString(room.description()));
-        if (room.has_permissionlevel())
+        }
+        if (room.has_permissionlevel()) {
             twi->setData(2, Qt::DisplayRole, getRoomPermissionDisplay(room));
+        }
         twi->setData(3, Qt::DisplayRole, room.player_count());
         twi->setData(4, Qt::DisplayRole, room.game_count());
         twi->setTextAlignment(2, Qt::AlignRight);
@@ -97,9 +105,11 @@ void RoomSelector::processListRoomsEvent(const Event_ListRooms &event)
         twi->setTextAlignment(4, Qt::AlignRight);
 
         roomList->addTopLevelItem(twi);
-        if (room.has_auto_join())
-            if (room.auto_join())
+        if (room.has_auto_join()) {
+            if (room.auto_join()) {
                 emit joinRoomRequest(room.room_id(), false);
+            }
+        }
     }
 }
 
@@ -113,10 +123,12 @@ QString RoomSelector::getRoomPermissionDisplay(const ServerInfo_Room &room)
      */
 
     QString roomPermissionDisplay = QString::fromStdString(room.privilegelevel()).toLower();
-    if (QString::fromStdString(room.permissionlevel()).toLower() != "none")
+    if (QString::fromStdString(room.permissionlevel()).toLower() != "none") {
         roomPermissionDisplay = QString::fromStdString(room.permissionlevel()).toLower();
-    if (roomPermissionDisplay == "") // catch all for misconfigured .ini room definitions
+    }
+    if (roomPermissionDisplay == "") { // catch all for misconfigured .ini room definitions
         roomPermissionDisplay = "none";
+    }
 
     return roomPermissionDisplay;
 }
@@ -124,8 +136,9 @@ QString RoomSelector::getRoomPermissionDisplay(const ServerInfo_Room &room)
 void RoomSelector::joinClicked()
 {
     QTreeWidgetItem *twi = roomList->currentItem();
-    if (!twi)
+    if (!twi) {
         return;
+    }
 
     int id = twi->data(0, Qt::UserRole).toInt();
 
@@ -185,8 +198,9 @@ void TabServer::joinRoom(int id, bool setCurrent)
         return;
     }
 
-    if (setCurrent)
+    if (setCurrent) {
         tabSupervisor->setCurrentWidget((QWidget *)room);
+    }
 }
 
 void TabServer::joinRoomFinished(const Response &r,

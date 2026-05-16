@@ -77,8 +77,9 @@ QMap<QString, QPixmap> PhasePixmapGenerator::pmCache;
 QPixmap PhasePixmapGenerator::generatePixmap(int height, QString name)
 {
     QString key = name + QString::number(height);
-    if (pmCache.contains(key))
+    if (pmCache.contains(key)) {
         return pmCache.value(key);
+    }
 
     QPixmap pixmap = tryLoadImage("theme:phases/" + name, QSize(height, height));
 
@@ -95,19 +96,22 @@ QPixmap CounterPixmapGenerator::generatePixmap(int height, QString name, bool hi
         name = "general";
     }
 
-    if (highlight)
+    if (highlight) {
         name.append("_highlight");
+    }
     QString key = name + QString::number(height);
-    if (pmCache.contains(key))
+    if (pmCache.contains(key)) {
         return pmCache.value(key);
+    }
 
     QPixmap pixmap = tryLoadImage("theme:counters/" + name, QSize(height, height));
 
     // fall back to colorless counter if the name can't be found
     if (pixmap.isNull()) {
         name = "general";
-        if (highlight)
+        if (highlight) {
             name.append("_highlight");
+        }
         pixmap = tryLoadImage("theme:counters/" + name, QSize(height, height));
     }
 
@@ -118,17 +122,19 @@ QPixmap CounterPixmapGenerator::generatePixmap(int height, QString name, bool hi
 QPixmap PingPixmapGenerator::generatePixmap(int size, int value, int max)
 {
     int key = size * 1000000 + max * 1000 + value;
-    if (pmCache.contains(key))
+    if (pmCache.contains(key)) {
         return pmCache.value(key);
+    }
 
     QPixmap pixmap(size, size);
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
     QColor color;
-    if ((max == -1) || (value == -1))
+    if ((max == -1) || (value == -1)) {
         color = Qt::black;
-    else
+    } else {
         color.setHsv(120 * (1.0 - ((double)value / max)), 255, 255);
+    }
 
     QRadialGradient g(QPointF((double)pixmap.width() / 2, (double)pixmap.height() / 2),
                       qMin(pixmap.width(), pixmap.height()) / 2.0);
@@ -145,11 +151,13 @@ QMap<int, QPixmap> PingPixmapGenerator::pmCache;
 
 QPixmap CountryPixmapGenerator::generatePixmap(int height, const QString &countryCode)
 {
-    if (countryCode.size() != 2)
+    if (countryCode.size() != 2) {
         return QPixmap();
+    }
     QString key = countryCode + QString::number(height);
-    if (pmCache.contains(key))
+    if (pmCache.contains(key)) {
         return pmCache.value(key);
+    }
 
     int width = height * 2;
     QPixmap pixmap = tryLoadImage("theme:countries/" + countryCode.toLower(), QSize(width, height), true);
@@ -352,8 +360,9 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
 {
 
     int key = height;
-    if (pmCache.contains(key))
+    if (pmCache.contains(key)) {
         return pmCache.value(key);
+    }
 
     QPixmap pixmap = tryLoadImage("theme:icons/lock", QSize(height, height), true);
     pmCache.insert(key, pixmap);
@@ -365,8 +374,9 @@ QMap<int, QPixmap> LockPixmapGenerator::pmCache;
 QPixmap DropdownIconPixmapGenerator::generatePixmap(int height, bool expanded)
 {
     QString key = QString::number(expanded) + ":" + QString::number(height);
-    if (pmCache.contains(key))
+    if (pmCache.contains(key)) {
         return pmCache.value(key);
+    }
 
     QString name = expanded ? "dropdown_expanded" : "dropdown_collapsed";
     QPixmap pixmap = tryLoadImage("theme:icons/" + name, QSize(height, height), true);

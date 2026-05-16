@@ -314,8 +314,9 @@ void DeckEditorDeckDockWidget::initializeFormats()
 ExactCard DeckEditorDeckDockWidget::getCurrentCard()
 {
     QModelIndex current = deckView->selectionModel()->currentIndex();
-    if (!current.isValid())
+    if (!current.isValid()) {
         return {};
+    }
     const QString cardName = current.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString();
     const QString cardProviderID = current.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data().toString();
     const QModelIndex gparent = current.parent().parent();
@@ -651,10 +652,12 @@ void DeckEditorDeckDockWidget::actSwapSelection()
 
 void DeckEditorDeckDockWidget::actDecrementCard(const ExactCard &card, QString zoneName)
 {
-    if (!card)
+    if (!card) {
         return;
-    if (card.getInfo().getIsToken())
+    }
+    if (card.getInfo().getIsToken()) {
         zoneName = DECK_ZONE_TOKENS;
+    }
 
     deckStateManager->decrementCard(card, zoneName);
 }

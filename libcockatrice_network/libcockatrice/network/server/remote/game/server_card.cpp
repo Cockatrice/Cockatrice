@@ -36,11 +36,13 @@ Server_Card::Server_Card(const CardRef &cardRef, int _id, int _coord_x, int _coo
 Server_Card::~Server_Card()
 {
     // setParentCard(0) leads to the item being removed from our list, so we can't iterate properly
-    while (!attachedCards.isEmpty())
+    while (!attachedCards.isEmpty()) {
         attachedCards.first()->setParentCard(0);
+    }
 
-    if (parentCard)
+    if (parentCard) {
         parentCard->removeAttachedCard(this);
+    }
 
     if (stashedCard) {
         stashedCard->deleteLater();
@@ -62,16 +64,18 @@ void Server_Card::resetState(bool keepAnnotations)
 
 QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue, bool allCards)
 {
-    if (attribute == AttrTapped && avalue != "1" && allCards && doesntUntap)
+    if (attribute == AttrTapped && avalue != "1" && allCards && doesntUntap) {
         return QVariant(tapped).toString();
+    }
 
     return setAttribute(attribute, avalue);
 }
 
 QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue, Event_SetCardAttr *event)
 {
-    if (event)
+    if (event) {
         event->set_attribute(attribute);
+    }
 
     switch (attribute) {
         case AttrTapped: {
@@ -89,8 +93,9 @@ QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue
             break;
         case AttrPT:
             setPT(avalue);
-            if (event)
+            if (event) {
                 event->set_attr_value(getPT().toStdString());
+            }
             return getPT();
         case AttrAnnotation:
             setAnnotation(avalue);
@@ -99,17 +104,19 @@ QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue
             setDoesntUntap(avalue == "1");
             break;
     }
-    if (event)
+    if (event) {
         event->set_attr_value(avalue.toStdString());
+    }
     return avalue;
 }
 
 void Server_Card::setCounter(int _id, int value, Event_SetCardCounter *event)
 {
-    if (value)
+    if (value) {
         counters.insert(_id, value);
-    else
+    } else {
         counters.remove(_id);
+    }
 
     if (event) {
         event->set_counter_id(_id);
@@ -119,11 +126,13 @@ void Server_Card::setCounter(int _id, int value, Event_SetCardCounter *event)
 
 void Server_Card::setParentCard(Server_Card *_parentCard)
 {
-    if (parentCard)
+    if (parentCard) {
         parentCard->removeAttachedCard(this);
+    }
     parentCard = _parentCard;
-    if (parentCard)
+    if (parentCard) {
         parentCard->addAttachedCard(this);
+    }
 }
 
 void Server_Card::getInfo(ServerInfo_Card *info)

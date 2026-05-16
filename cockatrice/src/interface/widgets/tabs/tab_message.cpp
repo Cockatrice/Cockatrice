@@ -72,8 +72,9 @@ void TabMessage::retranslateUi()
 
 void TabMessage::tabActivated()
 {
-    if (!sayEdit->hasFocus())
+    if (!sayEdit->hasFocus()) {
         sayEdit->setFocus();
+    }
 }
 
 QString TabMessage::getUserName() const
@@ -94,8 +95,9 @@ void TabMessage::closeEvent(QCloseEvent *event)
 
 void TabMessage::sendMessage()
 {
-    if (sayEdit->text().isEmpty() || !userOnline)
+    if (sayEdit->text().isEmpty() || !userOnline) {
         return;
+    }
 
     Command_Message cmd;
     cmd.set_user_name(otherUserInfo->name());
@@ -110,9 +112,10 @@ void TabMessage::sendMessage()
 
 void TabMessage::messageSent(const Response &response)
 {
-    if (response.response_code() == Response::RespInIgnoreList)
+    if (response.response_code() == Response::RespInIgnoreList) {
         chatView->appendMessage(tr(
             "This user is ignoring you, they cannot see your messages in main chat and you cannot join their games."));
+    }
 }
 
 void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
@@ -120,12 +123,15 @@ void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
     auto userInfo = event.sender_name() == otherUserInfo->name() ? otherUserInfo : ownUserInfo;
 
     chatView->appendMessage(QString::fromStdString(event.message()), {}, *userInfo, true);
-    if (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this))
+    if (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this)) {
         soundEngine->playSound("private_message");
-    if (SettingsCache::instance().getShowMessagePopup() && shouldShowSystemPopup(event))
+    }
+    if (SettingsCache::instance().getShowMessagePopup() && shouldShowSystemPopup(event)) {
         showSystemPopup(event);
-    if (QString::fromStdString(event.sender_name()).toLower().simplified() == "servatrice")
+    }
+    if (QString::fromStdString(event.sender_name()).toLower().simplified() == "servatrice") {
         sayEdit->setDisabled(true);
+    }
 
     emit userEvent();
 }

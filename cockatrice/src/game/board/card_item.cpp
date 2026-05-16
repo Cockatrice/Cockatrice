@@ -27,8 +27,9 @@ CardItem::CardItem(Player *_owner, QGraphicsItem *parent, const CardRef &cardRef
     owner->addCard(this);
 
     connect(&SettingsCache::instance().cardCounters(), &CardCounterSettings::colorChanged, this, [this](int counterId) {
-        if (counters.contains(counterId))
+        if (counters.contains(counterId)) {
             update();
+        }
     });
 }
 
@@ -56,8 +57,9 @@ void CardItem::prepareDelete()
 void CardItem::deleteLater()
 {
     prepareDelete();
-    if (scene())
+    if (scene()) {
         static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
+    }
     AbstractCardItem::deleteLater();
 }
 
@@ -152,10 +154,11 @@ void CardItem::setAttacking(bool _attacking)
 
 void CardItem::setCounter(int _id, int _value)
 {
-    if (_value)
+    if (_value) {
         counters.insert(_id, _value);
-    else
+    } else {
         counters.remove(_id);
+    }
     update();
 }
 
@@ -227,8 +230,9 @@ void CardItem::resetState(bool keepAnnotations)
     attachedCards.clear();
     setTapped(false, false);
     setDoesntUntap(false);
-    if (scene())
+    if (scene()) {
         static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
+    }
     update();
 }
 
@@ -275,8 +279,9 @@ void CardItem::deleteDragItem()
 
 void CardItem::drawArrow(const QColor &arrowColor)
 {
-    if (owner->getGame()->getPlayerManager()->isSpectator())
+    if (owner->getGame()->getPlayerManager()->isSpectator()) {
         return;
+    }
 
     auto *game = owner->getGame();
     Player *arrowOwner = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
@@ -291,10 +296,12 @@ void CardItem::drawArrow(const QColor &arrowColor)
 
     for (const auto &item : scene()->selectedItems()) {
         CardItem *card = qgraphicsitem_cast<CardItem *>(item);
-        if (card == nullptr || card == this)
+        if (card == nullptr || card == this) {
             continue;
-        if (card->getZone() != zone)
+        }
+        if (card->getZone() != zone) {
             continue;
+        }
 
         ArrowDragItem *childArrow = new ArrowDragItem(arrowOwner, card, arrowColor, phase);
         scene()->addItem(childArrow);
@@ -304,8 +311,9 @@ void CardItem::drawArrow(const QColor &arrowColor)
 
 void CardItem::drawAttachArrow()
 {
-    if (owner->getGame()->getPlayerManager()->isSpectator())
+    if (owner->getGame()->getPlayerManager()->isSpectator()) {
         return;
+    }
 
     auto *arrow = new ArrowAttachItem(this);
     scene()->addItem(arrow);
@@ -313,10 +321,12 @@ void CardItem::drawAttachArrow()
 
     for (const auto &item : scene()->selectedItems()) {
         CardItem *card = qgraphicsitem_cast<CardItem *>(item);
-        if (card == nullptr)
+        if (card == nullptr) {
             continue;
-        if (card->getZone() != zone)
+        }
+        if (card->getZone() != zone) {
             continue;
+        }
 
         ArrowAttachItem *childArrow = new ArrowAttachItem(card);
         scene()->addItem(childArrow);
@@ -328,27 +338,32 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->buttons().testFlag(Qt::RightButton)) {
         if ((event->screenPos() - event->buttonDownScreenPos(Qt::RightButton)).manhattanLength() <
-            2 * QApplication::startDragDistance())
+            2 * QApplication::startDragDistance()) {
             return;
+        }
 
         QColor arrowColor = Qt::red;
-        if (event->modifiers().testFlag(Qt::ControlModifier))
+        if (event->modifiers().testFlag(Qt::ControlModifier)) {
             arrowColor = Qt::yellow;
-        else if (event->modifiers().testFlag(Qt::AltModifier))
+        } else if (event->modifiers().testFlag(Qt::AltModifier)) {
             arrowColor = Qt::blue;
-        else if (event->modifiers().testFlag(Qt::ShiftModifier))
+        } else if (event->modifiers().testFlag(Qt::ShiftModifier)) {
             arrowColor = Qt::green;
+        }
 
         drawArrow(arrowColor);
     } else if (event->buttons().testFlag(Qt::LeftButton)) {
         if ((event->screenPos() - event->buttonDownScreenPos(Qt::LeftButton)).manhattanLength() <
-            2 * QApplication::startDragDistance())
+            2 * QApplication::startDragDistance()) {
             return;
+        }
         if (const ZoneViewZoneLogic *view = qobject_cast<const ZoneViewZoneLogic *>(zone)) {
-            if (view->getRevealZone() && !view->getWriteableRevealZone())
+            if (view->getRevealZone() && !view->getWriteableRevealZone()) {
                 return;
-        } else if (!owner->getPlayerInfo()->getLocalOrJudge())
+            }
+        } else if (!owner->getPlayerInfo()->getLocalOrJudge()) {
             return;
+        }
 
         bool forceFaceDown = event->modifiers().testFlag(Qt::ShiftModifier);
 
@@ -360,14 +375,16 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         int childIndex = 0;
         for (const auto &item : scene()->selectedItems()) {
             CardItem *card = static_cast<CardItem *>(item);
-            if ((card == this) || (card->getZone() != zone))
+            if ((card == this) || (card->getZone() != zone)) {
                 continue;
+            }
             ++childIndex;
             QPointF childPos;
-            if (zone->getHasCardAttr())
+            if (zone->getHasCardAttr()) {
                 childPos = card->pos() - pos();
-            else
+            } else {
                 childPos = QPointF(childIndex * CardDimensions::WIDTH_HALF_F, 0);
+            }
             CardDragItem *drag =
                 new CardDragItem(card, card->getId(), childPos, card->getFaceDown() || forceFaceDown, dragItem);
             drag->setPos(dragItem->pos() + childPos);
@@ -380,13 +397,14 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void CardItem::playCard(bool faceDown)
 {
     // Do nothing if the card belongs to another player
-    if (!owner->getPlayerInfo()->getLocalOrJudge())
+    if (!owner->getPlayerInfo()->getLocalOrJudge()) {
         return;
+    }
 
     TableZoneLogic *tz = qobject_cast<TableZoneLogic *>(zone);
-    if (tz)
+    if (tz) {
         emit tz->toggleTapped();
-    else {
+    } else {
         if (SettingsCache::instance().getClickPlaysAllSelected()) {
             faceDown ? zone->getPlayer()->getPlayerActions()->actPlayFacedown()
                      : zone->getPlayer()->getPlayerActions()->actPlay();
@@ -493,8 +511,9 @@ bool CardItem::animationEvent()
 {
     int rotation = ROTATION_DEGREES_PER_FRAME;
     bool animationIncomplete = true;
-    if (!tapped)
+    if (!tapped) {
         rotation *= -1;
+    }
 
     tapAngle += rotation;
     if (tapped && (tapAngle > 90)) {

@@ -75,8 +75,9 @@ void GameView::resizeEvent(QResizeEvent *event)
     QGraphicsView::resizeEvent(event);
 
     GameScene *s = dynamic_cast<GameScene *>(scene());
-    if (s)
+    if (s) {
         s->processViewSizeChange(event->size());
+    }
 
     updateSceneRect(scene()->sceneRect());
     updateTotalSelectionCount(event->size());
@@ -89,8 +90,9 @@ void GameView::updateSceneRect(const QRectF &rect)
 
 void GameView::startRubberBand(const QPointF &_selectionOrigin)
 {
-    if (!rubberBand)
+    if (!rubberBand) {
         return;
+    }
 
     selectionOrigin = _selectionOrigin;
     rubberBand->setGeometry(QRect(mapFromScene(selectionOrigin), QSize(0, 0)));
@@ -99,8 +101,9 @@ void GameView::startRubberBand(const QPointF &_selectionOrigin)
 
 void GameView::resizeRubberBand(const QPointF &cursorPoint, int selectedCount)
 {
-    if (!rubberBand)
+    if (!rubberBand) {
         return;
+    }
 
     constexpr int kLabelPaddingInPixels = 4;
 
@@ -145,8 +148,9 @@ void GameView::resizeRubberBand(const QPointF &cursorPoint, int selectedCount)
 
 void GameView::stopRubberBand()
 {
-    if (!rubberBand)
+    if (!rubberBand) {
         return;
+    }
 
     rubberBand->hide();
     dragCountLabel->hide();

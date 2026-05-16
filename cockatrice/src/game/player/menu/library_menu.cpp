@@ -265,8 +265,9 @@ void LibraryMenu::populateRevealLibraryMenuWithActivePlayers()
 
     const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
     for (auto *other : players) {
-        if (other == player)
+        if (other == player) {
             continue;
+        }
         QAction *a = mRevealLibrary->addAction(other->getPlayerInfo()->getName());
         a->setData(other->getPlayerInfo()->getId());
         connect(a, &QAction::triggered, this, &LibraryMenu::onRevealLibraryTriggered);
@@ -279,8 +280,9 @@ void LibraryMenu::populateLendLibraryMenuWithActivePlayers()
 
     const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
     for (auto *other : players) {
-        if (other == player)
+        if (other == player) {
             continue;
+        }
         QAction *a = mLendLibrary->addAction(other->getPlayerInfo()->getName());
         a->setData(other->getPlayerInfo()->getId());
         connect(a, &QAction::triggered, this, &LibraryMenu::onLendLibraryTriggered);
@@ -299,8 +301,9 @@ void LibraryMenu::populateRevealTopCardMenuWithActivePlayers()
 
     const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
     for (auto *other : players) {
-        if (other == player)
+        if (other == player) {
             continue;
+        }
         QAction *a = mRevealTopCard->addAction(other->getPlayerInfo()->getName());
         a->setData(other->getPlayerInfo()->getId());
         connect(a, &QAction::triggered, this, &LibraryMenu::onRevealTopCardTriggered);

@@ -203,9 +203,9 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
             QString columnProp = extractor(c);
 
             if (i) { // if not the first card
-                if (columnProp == lastColumnProp)
+                if (columnProp == lastColumnProp) {
                     row++; // add below current card
-                else {     // if no match then move card to next column
+                } else {   // if no match then move card to next column
                     col++;
                     row = 0;
                 }
@@ -233,8 +233,9 @@ ZoneViewZone::GridSize ZoneViewZone::positionCardsForDisplay(CardList &cards, Ca
             cols = qCeil((double)cardCount / minRows);
         }
 
-        if (cols < 2)
+        if (cols < 2) {
             cols = 2;
+        }
 
         qCDebug(ViewZoneLog) << "reorganizeCards: rows=" << rows << "cols=" << cols;
 

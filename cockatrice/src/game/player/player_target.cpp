@@ -128,8 +128,9 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     resetPainterTransform(painter);
 
     QString name = QString::fromStdString(info->name());
-    if (name.size() > 13)
+    if (name.size() > 13) {
         name = name.mid(0, 10) + "...";
+    }
 
     QFont font;
     font.setPixelSize(qMax(qRound(translatedNameRect.height() / 1.5), 9));
@@ -144,8 +145,9 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     painter->setPen(pen);
     painter->drawRect(boundingRect().adjusted(border / 2, border / 2, -border / 2, -border / 2));
 
-    if (getBeingPointedAt())
+    if (getBeingPointedAt()) {
         painter->fillRect(boundingRect(), QBrush(QColor(255, 0, 0, 100)));
+    }
 }
 
 AbstractCounter *PlayerTarget::addCounter(int _counterId, const QString &_name, int _value)

@@ -45,11 +45,13 @@ inline QColor colorHelper(const QString &name)
         {"Land", QColor(110, 80, 50)},
     };
 
-    if (colorMap.contains(name))
+    if (colorMap.contains(name)) {
         return colorMap[name];
+    }
 
-    if (name.length() == 1 && colorMap.contains(name.toUpper()))
+    if (name.length() == 1 && colorMap.contains(name.toUpper())) {
         return colorMap[name.toUpper()];
+    }
 
     uint h = qHash(name);
     int r = 100 + (h % 120);

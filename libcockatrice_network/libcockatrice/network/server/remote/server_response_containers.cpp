@@ -25,8 +25,9 @@ GameEventStorage::GameEventStorage() : gameEventContext(0), privatePlayerId(0)
 GameEventStorage::~GameEventStorage()
 {
     delete gameEventContext;
-    for (int i = 0; i < gameEventList.size(); ++i)
+    for (int i = 0; i < gameEventList.size(); ++i) {
         delete gameEventList[i];
+    }
 }
 
 void GameEventStorage::setGameEventContext(const ::google::protobuf::Message &_gameEventContext)
@@ -44,14 +45,16 @@ void GameEventStorage::enqueueGameEvent(const ::google::protobuf::Message &event
                                         int _privatePlayerId)
 {
     gameEventList.append(new GameEventStorageItem(event, playerId, recipients));
-    if (_privatePlayerId != -1)
+    if (_privatePlayerId != -1) {
         privatePlayerId = _privatePlayerId;
+    }
 }
 
 void GameEventStorage::sendToGame(Server_Game *game)
 {
-    if (gameEventList.isEmpty())
+    if (gameEventList.isEmpty()) {
         return;
+    }
 
     auto *contPrivate = new GameEventContainer;
     auto *contOthers = new GameEventContainer;
@@ -68,10 +71,12 @@ void GameEventStorage::sendToGame(Server_Game *game)
     for (const auto &i : gameEventList) {
         const GameEvent &event = i->getGameEvent();
         const GameEventStorageItem::EventRecipients recipients = i->getRecipients();
-        if (recipients.testFlag(GameEventStorageItem::SendToPrivate))
+        if (recipients.testFlag(GameEventStorageItem::SendToPrivate)) {
             contPrivate->add_event_list()->CopyFrom(event);
-        if (recipients.testFlag(GameEventStorageItem::SendToOthers))
+        }
+        if (recipients.testFlag(GameEventStorageItem::SendToOthers)) {
             contOthers->add_event_list()->CopyFrom(event);
+        }
     }
     if (gameEventContext) {
         contPrivate->mutable_context()->CopyFrom(*gameEventContext);
@@ -88,8 +93,10 @@ ResponseContainer::ResponseContainer(int _cmdId) : cmdId(_cmdId), responseExtens
 ResponseContainer::~ResponseContainer()
 {
     delete responseExtension;
-    for (int i = 0; i < preResponseQueue.size(); ++i)
+    for (int i = 0; i < preResponseQueue.size(); ++i) {
         delete preResponseQueue[i].second;
-    for (int i = 0; i < postResponseQueue.size(); ++i)
+    }
+    for (int i = 0; i < postResponseQueue.size(); ++i) {
         delete postResponseQueue[i].second;
+    }
 }

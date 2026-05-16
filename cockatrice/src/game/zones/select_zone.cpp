@@ -69,8 +69,9 @@ SelectZone *SelectZone::findOwningSelectZone(const QGraphicsItem *card)
 SelectZone::StackLayoutParams SelectZone::buildStackParams(qreal minOffset) const
 {
     const auto &cards = getLogic()->getCards();
-    if (cards.isEmpty())
+    if (cards.isEmpty()) {
         return {0, boundingRect().height(), 0.0, 0.0, minOffset};
+    }
     const auto cardCount = static_cast<int>(cards.size());
     const qreal cardHeight = cards.at(0)->boundingRect().height();
     const qreal offset = stackingOffset(cardHeight);
@@ -93,8 +94,9 @@ int SelectZone::calcDropIndexFromY(qreal dropY, qreal minOffset) const
 
 void SelectZone::restoreStaleEscapedCards()
 {
-    if (!cardClipContainer)
+    if (!cardClipContainer) {
         return;
+    }
     for (auto *card : getLogic()->getCards()) {
         // A card parented to the zone (instead of the clip container) should
         // only occur while it is actively hovered. If hover cleanup was
@@ -108,10 +110,12 @@ void SelectZone::restoreStaleEscapedCards()
 void SelectZone::layoutCardsVertically(const StackLayoutParams &params)
 {
     const auto &cards = getLogic()->getCards();
-    if (cards.isEmpty() || params.cardCount <= 0)
+    if (cards.isEmpty() || params.cardCount <= 0) {
         return;
-    if (params.cardCount > cards.size())
+    }
+    if (params.cardCount > cards.size()) {
         return;
+    }
 
     constexpr qreal xspace = 5;
     const qreal cardWidth = cards.at(0)->boundingRect().width();
@@ -163,8 +167,9 @@ void SelectZone::onCardAdded(CardItem *addedCard)
 
 void SelectZone::setupClipContainer(std::optional<qreal> zValue)
 {
-    if (cardClipContainer)
+    if (cardClipContainer) {
         return;
+    }
 
     setFlag(QGraphicsItem::ItemClipsChildrenToShape, false);
 
@@ -209,15 +214,19 @@ void SelectZone::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->buttons().testFlag(Qt::LeftButton)) {
         QPointF pos = event->pos();
-        if (pos.x() < 0)
+        if (pos.x() < 0) {
             pos.setX(0);
+        }
         QRectF br = boundingRect();
-        if (pos.x() > br.width())
+        if (pos.x() > br.width()) {
             pos.setX(br.width());
-        if (pos.y() < 0)
+        }
+        if (pos.y() < 0) {
             pos.setY(0);
-        if (pos.y() > br.height())
+        }
+        if (pos.y() > br.height()) {
             pos.setY(br.height());
+        }
 
         QRectF selectionRect = QRectF(selectionOrigin, pos).normalized();
         for (auto card : getLogic()->getCards()) {
@@ -253,8 +262,9 @@ void SelectZone::mousePressEvent(QGraphicsSceneMouseEvent *event)
         selectionOrigin = event->pos();
         static_cast<GameScene *>(scene())->startRubberBand(event->scenePos());
         event->accept();
-    } else
+    } else {
         CardZone::mousePressEvent(event);
+    }
 }
 
 void SelectZone::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

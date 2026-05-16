@@ -47,19 +47,23 @@ void Server_CardZone::shuffle(int start, int end)
     cardsBeingLookedAt = 0;
 
     // Size 0 or 1 decks are sorted
-    if (cards.size() < 2)
+    if (cards.size() < 2) {
         return;
+    }
 
     // Negative numbers signify positions starting at the end of the
     // zone convert these to actual indexes.
-    if (end < 0)
+    if (end < 0) {
         end += cards.size();
+    }
 
-    if (start < 0)
+    if (start < 0) {
         start += cards.size();
+    }
 
-    if (start < 0 || end < 0 || start >= cards.size() || end >= cards.size())
+    if (start < 0 || end < 0 || start >= cards.size() || end >= cards.size()) {
         return;
+    }
 
     for (int i = end; i > start; i--) {
         int j = rng->rand(start, i);
@@ -70,40 +74,47 @@ void Server_CardZone::shuffle(int start, int end)
 
 void Server_CardZone::removeCardFromCoordMap(Server_Card *card, int oldX, int oldY)
 {
-    if (oldX < 0)
+    if (oldX < 0) {
         return;
+    }
 
     const int baseX = (oldX / 3) * 3;
     QMap<int, Server_Card *> &coordMap = coordinateMap[oldY];
 
-    if (coordMap.contains(baseX) && coordMap.contains(baseX + 1) && coordMap.contains(baseX + 2))
+    if (coordMap.contains(baseX) && coordMap.contains(baseX + 1) && coordMap.contains(baseX + 2)) {
         // If the removal of this card has opened up a previously full pile...
         freePilesMap[oldY].insert(coordMap.value(baseX)->getName(), baseX);
+    }
 
     coordMap.remove(oldX);
 
     if (!(coordMap.contains(baseX) && coordMap.value(baseX)->getName() == card->getName()) &&
         !(coordMap.contains(baseX + 1) && coordMap.value(baseX + 1)->getName() == card->getName()) &&
-        !(coordMap.contains(baseX + 2) && coordMap.value(baseX + 2)->getName() == card->getName()))
+        !(coordMap.contains(baseX + 2) && coordMap.value(baseX + 2)->getName() == card->getName())) {
         // If this card was the last one with this name...
         freePilesMap[oldY].remove(card->getName(), baseX);
+    }
 
     if (!coordMap.contains(baseX) && !coordMap.contains(baseX + 1) && !coordMap.contains(baseX + 2)) {
         // If the removal of this card has freed a whole pile, i.e. it was the last card in it...
-        if (baseX < freeSpaceMap[oldY])
+        if (baseX < freeSpaceMap[oldY]) {
             freeSpaceMap[oldY] = baseX;
+        }
     }
 }
 
 void Server_CardZone::insertCardIntoCoordMap(Server_Card *card, int x, int y)
 {
-    if (x < 0)
+    if (x < 0) {
         return;
+    }
 
     coordinateMap[y].insert(x, card);
     if (!(x % 3)) {
-        if (!card->getFaceDown() && !freePilesMap[y].contains(card->getName(), x) && card->getAttachedCards().isEmpty())
+        if (!card->getFaceDown() && !freePilesMap[y].contains(card->getName(), x) &&
+            card->getAttachedCards().isEmpty()) {
             freePilesMap[y].insert(card->getName(), x);
+        }
         if (freeSpaceMap[y] == x) {
             int nextFreeX = x;
             do {
@@ -146,8 +157,9 @@ Server_Card *Server_CardZone::getCard(int id, int *position, bool remove)
         for (int i = 0; i < cards.size(); ++i) {
             Server_Card *tmp = cards[i];
             if (tmp->getId() == id) {
-                if (position)
+                if (position) {
                     *position = i;
+                }
                 if (remove) {
                     cards.removeAt(i);
                     tmp->setZone(nullptr);
@@ -157,11 +169,13 @@ Server_Card *Server_CardZone::getCard(int id, int *position, bool remove)
         }
         return nullptr;
     } else {
-        if ((id >= cards.size()) || (id < 0))
+        if ((id >= cards.size()) || (id < 0)) {
             return nullptr;
+        }
         Server_Card *tmp = cards[id];
-        if (position)
+        if (position) {
             *position = id;
+        }
         if (remove) {
             cards.removeAt(id);
             tmp->setZone(nullptr);
@@ -184,32 +198,35 @@ int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName, bo
 
             if (coordMap.contains(x) && (coordMap[x]->getFaceDown() || !coordMap[x]->getAttachedCards().isEmpty())) {
                 // don't pile up on: 1. facedown cards 2. cards with attached cards
-            } else if (!coordMap.contains(x))
+            } else if (!coordMap.contains(x)) {
                 return x;
-            else if (!coordMap.contains(x + 1))
+            } else if (!coordMap.contains(x + 1)) {
                 return x + 1;
-            else
+            } else {
                 return x + 2;
+            }
         }
     } else if (x >= 0) {
         int resultX = 0;
         x = (x / 3) * 3;
-        if (!coordMap.contains(x))
+        if (!coordMap.contains(x)) {
             resultX = x;
-        else if (!coordMap.value(x)->getAttachedCards().isEmpty()) {
+        } else if (!coordMap.value(x)->getAttachedCards().isEmpty()) {
             resultX = x;
             x = -1;
-        } else if (!coordMap.contains(x + 1))
+        } else if (!coordMap.contains(x + 1)) {
             resultX = x + 1;
-        else if (!coordMap.contains(x + 2))
+        } else if (!coordMap.contains(x + 2)) {
             resultX = x + 2;
-        else {
+        } else {
             resultX = x;
             x = -1;
         }
-        if (x < 0)
-            while (coordMap.contains(resultX))
+        if (x < 0) {
+            while (coordMap.contains(resultX)) {
                 resultX += 3;
+            }
+        }
 
         return resultX;
     }
@@ -219,16 +236,18 @@ int Server_CardZone::getFreeGridColumn(int x, int y, const QString &cardName, bo
 
 bool Server_CardZone::isColumnStacked(int x, int y) const
 {
-    if (!has_coords)
+    if (!has_coords) {
         return false;
+    }
 
     return coordinateMap[y].contains((x / 3) * 3 + 1);
 }
 
 bool Server_CardZone::isColumnEmpty(int x, int y) const
 {
-    if (!has_coords)
+    if (!has_coords) {
         return true;
+    }
 
     return !coordinateMap[y].contains((x / 3) * 3);
 }
@@ -243,12 +262,14 @@ void Server_CardZone::moveCardInRow(GameEventStorage &ges, Server_Card *card, in
 
 void Server_CardZone::fixFreeSpaces(GameEventStorage &ges)
 {
-    if (!has_coords)
+    if (!has_coords) {
         return;
+    }
 
     QSet<QPair<int, int>> placesToLook;
-    for (auto &card : cards)
+    for (auto &card : cards) {
         placesToLook.insert(QPair<int, int>((card->getX() / 3) * 3, card->getY()));
+    }
 
     QSetIterator<QPair<int, int>> placeIterator(placesToLook);
     while (placeIterator.hasNext()) {
@@ -257,26 +278,30 @@ void Server_CardZone::fixFreeSpaces(GameEventStorage &ges)
         int y = foo.second;
 
         if (!coordinateMap[y].contains(baseX)) {
-            if (coordinateMap[y].contains(baseX + 1))
+            if (coordinateMap[y].contains(baseX + 1)) {
                 moveCardInRow(ges, coordinateMap[y].value(baseX + 1), baseX, y);
-            else if (coordinateMap[y].contains(baseX + 2)) {
+            } else if (coordinateMap[y].contains(baseX + 2)) {
                 moveCardInRow(ges, coordinateMap[y].value(baseX + 2), baseX, y);
                 continue;
-            } else
+            } else {
                 continue;
+            }
         }
-        if (!coordinateMap[y].contains(baseX + 1) && coordinateMap[y].contains(baseX + 2))
+        if (!coordinateMap[y].contains(baseX + 1) && coordinateMap[y].contains(baseX + 2)) {
             moveCardInRow(ges, coordinateMap[y].value(baseX + 2), baseX + 1, y);
+        }
     }
 }
 
 void Server_CardZone::updateCardCoordinates(Server_Card *card, int oldX, int oldY)
 {
-    if (!has_coords)
+    if (!has_coords) {
         return;
+    }
 
-    if (oldX != -1)
+    if (oldX != -1) {
         removeCardFromCoordMap(card, oldX, oldY);
+    }
     insertCardIntoCoordMap(card, card->getX(), card->getY());
 }
 
@@ -299,8 +324,9 @@ void Server_CardZone::insertCard(Server_Card *card, int x, int y)
 
 void Server_CardZone::clear()
 {
-    for (auto card : cards)
+    for (auto card : cards) {
         delete card;
+    }
     cards.clear();
     coordinateMap.clear();
     freePilesMap.clear();
@@ -329,7 +355,8 @@ void Server_CardZone::getInfo(ServerInfo_Zone *info, Server_AbstractParticipant 
     const bool zonesOthersCanSee = type == ServerInfo_Zone::PublicZone;
     if ((selfPlayerAsking && zonesSelfCanSee) || (otherPlayerAsking && zonesOthersCanSee)) {
         QListIterator<Server_Card *> cardIterator(cards);
-        while (cardIterator.hasNext())
+        while (cardIterator.hasNext()) {
             cardIterator.next()->getInfo(info->add_card_list());
+        }
     }
 }
