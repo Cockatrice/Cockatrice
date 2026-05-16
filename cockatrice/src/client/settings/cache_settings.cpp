@@ -313,6 +313,7 @@ SettingsCache::SettingsCache()
 
     showDragSelectionCount = settings->value("interface/showlassoselectioncount", true).toBool();
     showTotalSelectionCount = settings->value("interface/showpersistentselectioncount", true).toBool();
+    showSubtypeSelectionCount = settings->value("interface/showsubtypeselectioncount", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     showGameSelectorFilterToolbar = settings->value("menu/showgameselectorfiltertoolbar", true).toBool();
@@ -1385,6 +1386,12 @@ void SettingsCache::setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSele
 {
     showTotalSelectionCount = static_cast<bool>(_showTotalSelectionCount);
     settings->setValue("interface/showpersistentselectioncount", showTotalSelectionCount);
+}
+
+void SettingsCache::setShowSubtypeSelectionCount(QT_STATE_CHANGED_T _showSubtypeSelectionCount)
+{
+    showSubtypeSelectionCount = static_cast<bool>(_showSubtypeSelectionCount);
+    settings->setValue("interface/showsubtypeselectioncount", showSubtypeSelectionCount);
 }
 
 void SettingsCache::loadPaths()

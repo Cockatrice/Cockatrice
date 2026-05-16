@@ -21,7 +21,11 @@ private:
     QRubberBand *rubberBand;
     QLabel *dragCountLabel;
     QLabel *totalCountLabel;
+    QLabel *subtypeCountLabel; ///< Label displaying subtype breakdown for selected cards
     QPointF selectionOrigin;
+
+    /** @brief Builds formatted text showing subtype counts for all selected cards */
+    QString buildSubtypeCountText() const;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

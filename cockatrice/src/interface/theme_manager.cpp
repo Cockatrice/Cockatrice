@@ -271,6 +271,9 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
                                         const PaletteConfig &palCfg,
                                         const QString &activeScheme)
 {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 5, 0))
+    Q_UNUSED(activeScheme)
+#endif
     QString styleName = themeCfg.styleName;
     if (styleName.isEmpty() || styleName.compare("Default", Qt::CaseInsensitive) == 0) {
         if (themeName == FUSION_THEME_NAME) {
