@@ -36,7 +36,7 @@ FROM debian:13-slim
 
 # Install runtime dependencies
 # Is libprotobuf-lite32t64 enough?
-RUN apt-get update
+RUN apt-get update \
     && apt-get install -y --no-install-recommends \
       libprotobuf32t64 \
       libqt6sql6-mysql \
