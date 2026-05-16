@@ -4,7 +4,7 @@ RUN pacman --sync --refresh --sysupgrade --needed --noconfirm \
       ccache \
       cmake \
 	  gcc \
-    # gtest    Exclude gtest to confirm fallback of downloading source from google repo keeps working
+    # gtest    Exclude gtest to confirm fallback download and building from google repo keeps working
       ninja \
       protobuf \
 	  qt6-imageformats \

@@ -1,6 +1,6 @@
 FROM fedora:43
 
-RUN dnf install -y --setopt=install_weak_deps=False \
+RUN dnf install -y --nodocs --setopt=install_weak_deps=False \
       ccache \
       cmake \
       gcc-c++ \
