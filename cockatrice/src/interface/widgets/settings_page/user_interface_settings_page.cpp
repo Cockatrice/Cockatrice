@@ -68,6 +68,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&showTotalSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setShowTotalSelectionCount);
 
+    showSubtypeSelectionCountCheckBox.setChecked(SettingsCache::instance().getShowSubtypeSelectionCount());
+    connect(&showSubtypeSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setShowSubtypeSelectionCount);
+
     useTearOffMenusCheckBox.setChecked(SettingsCache::instance().getUseTearOffMenus());
     connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             [](const QT_STATE_CHANGED_T state) { SettingsCache::instance().setUseTearOffMenus(state == Qt::Checked); });
@@ -82,7 +86,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&annotateTokensCheckBox, 6, 0);
     generalGrid->addWidget(&showDragSelectionCountCheckBox, 7, 0);
     generalGrid->addWidget(&showTotalSelectionCountCheckBox, 8, 0);
-    generalGrid->addWidget(&useTearOffMenusCheckBox, 9, 0);
+    generalGrid->addWidget(&showSubtypeSelectionCountCheckBox, 9, 0);
+    generalGrid->addWidget(&useTearOffMenusCheckBox, 10, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -206,6 +211,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
     showDragSelectionCountCheckBox.setText(tr("Show selection counter during drag selection"));
     showTotalSelectionCountCheckBox.setText(tr("Show total selection counter"));
+    showSubtypeSelectionCountCheckBox.setText(tr("Show subtype breakdown in selection counter"));
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
     notificationsGroupBox->setTitle(tr("Notifications settings"));
     notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
