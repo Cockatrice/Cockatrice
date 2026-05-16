@@ -16,6 +16,9 @@ cd "${BASH_SOURCE%/*}/" || exit 2 # could not find path, this could happen with 
 include=("cockatrice/src" \
 "libcockatrice_card" \
 "libcockatrice_deck_list" \
+"libcockatrice_filters" \
+"libcockatrice_interfaces" \
+"libcockatrice_models" \
 "libcockatrice_network" \
 "libcockatrice_protocol" \
 "libcockatrice_rng" \
