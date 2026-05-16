@@ -6,6 +6,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
       ccache \
       cmake \
+	  file \
       g++ \
       git \
       libgl-dev \
