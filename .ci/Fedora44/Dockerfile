@@ -5,6 +5,7 @@ RUN dnf install -y --setopt=install_weak_deps=False \
       cmake \
       gcc-c++ \
       git \
+	  gtest-devel \
       ninja-build \
       protobuf-devel \
       qt6-qttools-devel \

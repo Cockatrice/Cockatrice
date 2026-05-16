@@ -10,10 +10,10 @@ RUN apt-get update \
       g++ \
       git \
       libgl-dev \
+	  libgtest-dev \
       liblzma-dev \
       libprotobuf-dev \
       libqt6multimedia6 \
-      libqt6sql6-mysql \
       ninja-build \
       protobuf-compiler \
       qt6-image-formats-plugins \

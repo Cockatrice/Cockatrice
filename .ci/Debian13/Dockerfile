@@ -10,6 +10,7 @@ RUN apt-get update \
       g++ \
       git \
       libgl-dev \
+	  libgtest-dev \
       liblzma-dev \
       libprotobuf-dev \
       libqt6multimedia6 \
