@@ -180,7 +180,7 @@ void PaletteEditorDialog::retranslateUi()
 
     resetBtn->setText(tr("Reset"));
     applyBtn->setText(tr("Apply"));
-    saveBtn->setText(tr("Save & Apply"));
+    saveBtn->setText(tr("Save && Apply"));
     resetBtn->setToolTip(tr("Discard unsaved edits and restore the last saved palette"));
     applyBtn->setToolTip(tr("Preview this palette without saving to disk"));
     saveBtn->setToolTip(tr("Write palette-%1.toml and reload the theme").arg(loadedScheme.toLower()));
