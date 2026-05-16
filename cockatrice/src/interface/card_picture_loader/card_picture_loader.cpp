@@ -150,9 +150,10 @@ void CardPictureLoader::getPixmap(QPixmap &pixmap, const ExactCard &card, QSize 
 
 void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
 {
+    QPixmap finalPixmap;
+
     if (image.isNull()) {
         qCDebug(CardPictureLoaderLog) << "Caching NULL pixmap for" << card.getName();
-        QPixmapCache::insert(card.getPixmapCacheKey(), QPixmap());
     } else {
         if (card.getInfo().getUiAttributes().upsideDownArt) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
@@ -160,10 +161,17 @@ void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
 #else
             QImage mirrorImage = image.mirrored(true, true);
 #endif
-            QPixmapCache::insert(card.getPixmapCacheKey(), QPixmap::fromImage(mirrorImage));
+            finalPixmap = QPixmap::fromImage(mirrorImage);
         } else {
-            QPixmapCache::insert(card.getPixmapCacheKey(), QPixmap::fromImage(image));
+            finalPixmap = QPixmap::fromImage(image);
         }
+    }
+
+    QPixmapCache::insert(card.getPixmapCacheKey(), finalPixmap);
+
+    if (SettingsCache::instance().getCardPictureLoaderCacheMethod() ==
+        CardPictureLoaderCacheMethod::CacheMethod::FILESYSTEM_CACHE) {
+        saveCardImageToLocalStorage(card, finalPixmap);
     }
 
     // imageLoaded should only be reached if the exactCard isn't already in cache.
@@ -173,6 +181,88 @@ void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
             [cacheKey = card.getPixmapCacheKey()] { QPixmapCache::remove(cacheKey); });
 
     card.emitPixmapUpdated();
+}
+
+void CardPictureLoader::saveCardImageToLocalStorage(const ExactCard &card, const QPixmap &pixmap)
+{
+    if (pixmap.isNull() || !card) {
+        return;
+    }
+
+    const QString picsRoot = SettingsCache::instance().getPicsPath();
+    CardPictureLoaderLocalSchemes::NamingScheme scheme =
+        SettingsCache::instance().getLocalCardImageStorageNamingScheme();
+
+    QString pattern;
+
+    for (const auto &s : CardPictureLoaderLocalSchemes::exportSchemes()) {
+        if (s.id == scheme) {
+            pattern = s.pattern;
+            break;
+        }
+    }
+
+    if (picsRoot.isEmpty() || pattern.isEmpty()) {
+        return;
+    }
+
+    // Base directory: <picsPath>/downloadedPics
+    QDir baseDir(picsRoot);
+    if (!baseDir.exists("downloadedPics")) {
+        baseDir.mkpath("downloadedPics");
+    }
+    baseDir.cd("downloadedPics");
+
+    // Collect card metadata
+    const QString cardName = card.getInfo().getCorrectedName();
+
+    QString setName;
+    QString collectorNumber;
+    QString uuid;
+
+    PrintingInfo printing = card.getPrinting();
+    if (printing.getSet()) {
+        setName = printing.getSet()->getCorrectedShortName();
+        collectorNumber = printing.getProperty("num");
+        uuid = printing.getUuid();
+    }
+
+    // Build path from scheme
+    QString relativePath =
+        CardPictureLoaderLocalSchemes::expandPattern(pattern, cardName, setName, collectorNumber, uuid);
+
+    if (relativePath.isEmpty()) {
+        return;
+    }
+
+    // append extension
+    relativePath += ".png";
+
+    // Normalize slashes
+    relativePath = QDir::cleanPath(relativePath);
+
+    QFileInfo outInfo(baseDir.filePath(relativePath));
+
+    // Do not overwrite existing files
+    if (outInfo.exists()) {
+        return;
+    }
+
+    QDir outDir = outInfo.dir();
+
+    // Ensure directory exists
+    if (!outDir.exists()) {
+        if (!baseDir.mkpath(outDir.path())) {
+            qCWarning(CardPictureLoaderLog) << "Failed to create directory for downloaded card image:" << outDir.path();
+            return;
+        }
+    }
+
+    // Save image
+    QImage image = pixmap.toImage();
+    if (!image.save(outInfo.absoluteFilePath(), "PNG")) {
+        qCWarning(CardPictureLoaderLog) << "Failed to save card image to" << outInfo.absoluteFilePath();
+    }
 }
 
 void CardPictureLoader::clearPixmapCache()

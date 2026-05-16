@@ -26,10 +26,14 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
     cache->setMaximumCacheSize(1024L * 1024L *
                                static_cast<qint64>(SettingsCache::instance().getNetworkCacheSizeInMB()));
-    // Note: the settings is in MB, but QNetworkDiskCache uses bytes
-    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, this,
-            [this](int newSizeInMB) { cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB)); });
+
+    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, cache, [this](int newSizeInMB) {
+        if (cache)
+            cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB));
+    });
+
     networkManager->setCache(cache);
+
     // Use a ManualRedirectPolicy since we keep track of redirects in picDownloadFinished
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
@@ -65,14 +69,19 @@ void CardPictureLoaderWorker::queueRequest(const QUrl &url, CardPictureLoaderWor
     QUrl cachedRedirect = getCachedRedirect(url);
     if (!cachedRedirect.isEmpty()) {
         queueRequest(cachedRedirect, worker);
-    } else if (cache->metaData(url).isValid()) {
-        // If we hit a cached url, we get to make the request for free, since it won't contribute towards the rate-limit
-        makeRequest(url, worker);
-    } else {
-        requestLoadQueue.append(qMakePair(url, worker));
-        emit imageRequestQueued(url, worker->cardToDownload.getCard(), worker->cardToDownload.getSetName());
-        processQueuedRequests();
+        return;
     }
+    if (SettingsCache::instance().getCardPictureLoaderCacheMethod() ==
+            CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE &&
+        cache->metaData(url).isValid()) {
+        // If we hit a cached url, we get to make the request for free, since it won't contribute towards the
+        // rate-limit
+        makeRequest(url, worker);
+        return;
+    }
+    requestLoadQueue.append(qMakePair(url, worker));
+    emit imageRequestQueued(url, worker->cardToDownload.getCard(), worker->cardToDownload.getSetName());
+    processQueuedRequests();
 }
 
 QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPictureLoaderWorkerWork *worker)
@@ -87,9 +96,12 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
     QNetworkRequest req(url);
     req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     req.setRawHeader("Accept", "image/avif,image/webp,image/apng,image/,/*;q=0.8");
-    if (!picDownload) {
-        req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::AlwaysCache);
-    }
+
+    bool useNetworkCache = !picDownload && SettingsCache::instance().getCardPictureLoaderCacheMethod() ==
+                                               CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE;
+
+    req.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
+                     useNetworkCache ? QNetworkRequest::AlwaysCache : QNetworkRequest::AlwaysNetwork);
 
     QNetworkReply *reply = networkManager->get(req);
 
