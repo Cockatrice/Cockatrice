@@ -61,6 +61,8 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
     connect(aSelectRow, &QAction::triggered, playerActions, &PlayerActions::actSelectRow);
     aSelectColumn = new QAction(this);
     connect(aSelectColumn, &QAction::triggered, playerActions, &PlayerActions::actSelectColumn);
+    aSelectAllMatching = new QAction(this);
+    connect(aSelectAllMatching, &QAction::triggered, playerActions, &PlayerActions::actSelectAllMatching);
 
     aReduceLifeByPower = new QAction(this);
     connect(aReduceLifeByPower, &QAction::triggered, playerActions, &PlayerActions::actReduceLifeByPower);
@@ -117,6 +119,7 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
         addAction(aClone);
         addSeparator();
         addAction(aSelectAll);
+        addAction(aSelectAllMatching);
         addAction(aSelectColumn);
         addRelatedCardView();
     } else {
@@ -159,6 +162,7 @@ void CardMenu::createTableMenu(bool canModifyCard)
         addAction(aReduceLifeByPower);
         addSeparator();
         addAction(aSelectAll);
+        addAction(aSelectAllMatching);
         addAction(aSelectRow);
         addRelatedCardView();
         addRelatedCardActions();
@@ -187,6 +191,7 @@ void CardMenu::createTableMenu(bool canModifyCard)
     addAction(aReduceLifeByPower);
     addSeparator();
     addAction(aSelectAll);
+    addAction(aSelectAllMatching);
     addAction(aSelectRow);
 
     addSeparator();
@@ -214,6 +219,7 @@ void CardMenu::createStackMenu(bool canModifyCard)
         addAction(aClone);
         addSeparator();
         addAction(aSelectAll);
+        addAction(aSelectAllMatching);
         addRelatedCardView();
         addRelatedCardActions();
         return;
@@ -229,6 +235,7 @@ void CardMenu::createStackMenu(bool canModifyCard)
     addAction(aDrawArrow);
     addSeparator();
     addAction(aSelectAll);
+    addAction(aSelectAllMatching);
     addRelatedCardView();
     addRelatedCardActions();
 }
@@ -243,6 +250,7 @@ void CardMenu::createGraveyardOrExileMenu(bool canModifyCard)
         addSeparator();
         addAction(aSelectAll);
         addAction(aSelectColumn);
+        addAction(aSelectAllMatching);
         addRelatedCardView();
         addRelatedCardActions();
         return;
@@ -259,6 +267,7 @@ void CardMenu::createGraveyardOrExileMenu(bool canModifyCard)
     addSeparator();
     addAction(aSelectAll);
     addAction(aSelectColumn);
+    addAction(aSelectAllMatching);
     addRelatedCardView();
     addRelatedCardActions();
 }
@@ -271,6 +280,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
         addAction(aClone);
         addSeparator();
         addAction(aSelectAll);
+        addAction(aSelectAllMatching);
         addRelatedCardView();
         addRelatedCardActions();
         return;
@@ -299,6 +309,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
 
     addSeparator();
     addAction(aSelectAll);
+    addAction(aSelectAllMatching);
     if (qobject_cast<ZoneViewZoneLogic *>(card->getZone())) {
         addAction(aSelectColumn);
     }
@@ -452,6 +463,7 @@ void CardMenu::retranslateUi()
     aSelectAll->setText(tr("&Select All"));
     aSelectRow->setText(tr("S&elect Row"));
     aSelectColumn->setText(tr("S&elect Column"));
+    aSelectAllMatching->setText(tr("Select All Matching..."));
 
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
@@ -510,6 +522,7 @@ void CardMenu::setShortcutsActive()
     aSelectAll->setShortcuts(shortcuts.getShortcut("Player/aSelectAll"));
     aSelectRow->setShortcuts(shortcuts.getShortcut("Player/aSelectRow"));
     aSelectColumn->setShortcuts(shortcuts.getShortcut("Player/aSelectColumn"));
+    aSelectAllMatching->setShortcuts(shortcuts.getShortcut("Player/aSelectAllMatching"));
 
     static const QStringList colorWords = {"Red", "Yellow", "Green", "Cyan", "Purple", "Magenta"};
     for (int i = 0; i < aAddCounter.size(); i++) {

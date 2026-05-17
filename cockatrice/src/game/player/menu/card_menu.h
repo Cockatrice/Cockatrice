@@ -30,7 +30,7 @@ public:
     QAction *aRevealToAll;
     QAction *aHide;
     QAction *aClone;
-    QAction *aSelectAll, *aSelectRow, *aSelectColumn;
+    QAction *aSelectAll, *aSelectRow, *aSelectColumn, *aSelectAllMatching;
     QAction *aDrawArrow;
     QAction *aTap, *aDoesntUntap;
     QAction *aFlip, *aPeek;
