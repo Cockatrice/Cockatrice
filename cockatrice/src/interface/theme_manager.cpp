@@ -242,6 +242,17 @@ bool ThemeManager::savePaletteConfig(const QString &themeDirPath, const QString 
     return true;
 }
 
+void ThemeManager::setColorScheme(const QString &scheme)
+{
+    const QString dirPath = getAvailableThemes().value(SettingsCache::instance().getThemeName());
+    ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
+
+    cfg.colorScheme = scheme;
+
+    cfg.save(dirPath);
+    reloadCurrentTheme();
+}
+
 void ThemeManager::reloadCurrentTheme()
 {
     themeChangedSlot();

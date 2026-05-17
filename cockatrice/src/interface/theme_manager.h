@@ -76,6 +76,7 @@ public:
     // Load/save per-scheme palette colors
     static PaletteConfig loadPaletteConfig(const QString &themeDirPath, const QString &colorScheme);
     static bool savePaletteConfig(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg);
+    void setColorScheme(const QString &scheme);
 
     void reloadCurrentTheme();
     void previewPalette(const PaletteConfig &cfg, const QString &scheme);

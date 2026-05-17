@@ -115,6 +115,8 @@ private:
     QLabel themeLabel;
     QComboBox themeBox;
     QPushButton openThemeButton;
+    QLabel schemeComboLabel;
+    QComboBox schemeCombo;
     QPushButton editPaletteButton;
     QLabel homeTabBackgroundSourceLabel;
     QComboBox homeTabBackgroundSourceBox;
