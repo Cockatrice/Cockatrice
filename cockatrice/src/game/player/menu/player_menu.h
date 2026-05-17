@@ -69,9 +69,14 @@ public:
     }
 
     /// Delegates to all managedComponents, plus counters separately.
+    /// Stop full activation until game has started; only roll-die shortcut is active in lobby.
     void setShortcutsActive();
     /// Delegates to all managedComponents, plus counters separately.
     void setShortcutsInactive();
+
+private slots:
+    /// Re-evaluate shortcut state when game started/stopped state changes.
+    void onGameStartedChanged(bool started);
 
 private:
     Player *player;
