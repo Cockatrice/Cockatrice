@@ -279,8 +279,9 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
     if (styleName.compare("Fusion", Qt::CaseInsensitive) == 0) {
         base = style->standardPalette();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
-        if (activeScheme == "Dark")
+        if (activeScheme == "Dark") {
             base.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+        }
 #endif
     } else {
         base = qApp->palette();

@@ -206,8 +206,9 @@ void PaletteEditorDialog::loadSchemes()
             for (auto group : {QPalette::Active, QPalette::Disabled, QPalette::Inactive}) {
                 for (int i = 0; i < QPalette::NColorRoles; ++i) {
                     auto role = static_cast<QPalette::ColorRole>(i);
-                    if (role != QPalette::NoRole)
+                    if (role != QPalette::NoRole) {
                         cfg.colors[group][role] = appPal.color(group, role);
+                    }
                 }
             }
         }
@@ -219,8 +220,9 @@ void PaletteEditorDialog::loadSchemes()
 void PaletteEditorDialog::seedAccentFromScheme(const QString &scheme)
 {
     QColor seed = workingConfig.value(scheme).colors.value(QPalette::Active).value(QPalette::Highlight);
-    if (seed.isValid())
+    if (seed.isValid()) {
         quickSetupPanel->setAccentColor(seed);
+    }
 }
 
 void PaletteEditorDialog::onSchemeChanged(const QString &scheme)

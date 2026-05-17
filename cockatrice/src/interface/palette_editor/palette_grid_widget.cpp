@@ -170,9 +170,10 @@ void PaletteGridWidget::loadPalette(const PaletteConfig &cfg)
 PaletteConfig PaletteGridWidget::currentPaletteConfig() const
 {
     PaletteConfig cfg;
-    for (auto group : ALL_GROUPS)
+    for (auto group : ALL_GROUPS) {
         for (auto role : allRoles()) {
             cfg.colors[group][role] = colorButtons[group][role]->getColor();
         }
+    }
     return cfg;
 }
