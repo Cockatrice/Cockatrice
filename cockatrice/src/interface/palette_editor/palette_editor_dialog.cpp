@@ -257,9 +257,8 @@ void PaletteEditorDialog::onSave()
     PaletteConfig cfg = paletteGrid->currentPaletteConfig();
 
     if (!ThemeManager::savePaletteConfig(themeDirPath, loadedScheme, cfg)) {
-        QMessageBox::warning(
-            this, tr("Save failed"),
-            tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(loadedScheme), themeDirPath));
+        QMessageBox::warning(this, tr("Save failed"),
+                             tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(loadedScheme), themeDirPath));
         return;
     }
 

@@ -288,7 +288,7 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
 
     // Overlay custom palette colours
     if (palCfg.hasPalette()) {
-        base = palCfg.apply( base);
+        base = palCfg.apply(base);
     }
 
     // Palette BEFORE style — setStyle() triggers a synchronous repolish of all

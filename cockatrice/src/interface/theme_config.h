@@ -28,10 +28,8 @@ struct PaletteConfig
     static QString fileName(const QString &colorScheme);
 
     static PaletteConfig fromFile(const QString &filePath);
-    static PaletteConfig fromScheme(const QString &themeDirPath,
-                                    const QString &colorScheme);
-    static PaletteConfig fromDefault(const QString &themeDirPath,
-                                     const QString &colorScheme);
+    static PaletteConfig fromScheme(const QString &themeDirPath, const QString &colorScheme);
+    static PaletteConfig fromDefault(const QString &themeDirPath, const QString &colorScheme);
 
     QPalette apply(QPalette base) const;
 };

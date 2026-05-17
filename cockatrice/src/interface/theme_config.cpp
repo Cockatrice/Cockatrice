@@ -127,9 +127,7 @@ QString PaletteConfig::toToml() const
                 continue;
             }
 
-            out += QString("%1 = %2\n")
-                       .arg(QString(roleName), -20)
-                       .arg(it.value().name(QColor::HexArgb));
+            out += QString("%1 = %2\n").arg(QString(roleName), -20).arg(it.value().name(QColor::HexArgb));
         }
 
         out += "\n";
@@ -140,9 +138,7 @@ QString PaletteConfig::toToml() const
 
 QString PaletteConfig::fileName(const QString &colorScheme)
 {
-    return colorScheme.compare("Dark", Qt::CaseInsensitive) == 0
-               ? "palette-dark.toml"
-               : "palette-light.toml";
+    return colorScheme.compare("Dark", Qt::CaseInsensitive) == 0 ? "palette-dark.toml" : "palette-light.toml";
 }
 
 PaletteConfig PaletteConfig::fromFile(const QString &filePath)
@@ -175,9 +171,7 @@ PaletteConfig PaletteConfig::fromFile(const QString &filePath)
             if (currentSection.startsWith("Palette", Qt::CaseInsensitive)) {
                 int dot = currentSection.indexOf('.');
 
-                QString groupStr = (dot >= 0)
-                                       ? currentSection.mid(dot + 1)
-                                       : "Active";
+                QString groupStr = (dot >= 0) ? currentSection.mid(dot + 1) : "Active";
 
                 if (groupStr.compare("Disabled", Qt::CaseInsensitive) == 0) {
                     currentGroup = QPalette::Disabled;
@@ -232,19 +226,16 @@ PaletteConfig PaletteConfig::fromFile(const QString &filePath)
     return cfg;
 }
 
-PaletteConfig PaletteConfig::fromScheme(const QString &themeDirPath,
-                                        const QString &colorScheme)
+PaletteConfig PaletteConfig::fromScheme(const QString &themeDirPath, const QString &colorScheme)
 {
     if (themeDirPath.isEmpty()) {
         return {};
     }
 
-    return fromFile(
-        QDir(themeDirPath).absoluteFilePath(fileName(colorScheme)));
+    return fromFile(QDir(themeDirPath).absoluteFilePath(fileName(colorScheme)));
 }
 
-PaletteConfig PaletteConfig::fromDefault(const QString &themeDirPath,
-                                         const QString &colorScheme)
+PaletteConfig PaletteConfig::fromDefault(const QString &themeDirPath, const QString &colorScheme)
 {
     if (themeDirPath.isEmpty()) {
         return {};
@@ -252,21 +243,13 @@ PaletteConfig PaletteConfig::fromDefault(const QString &themeDirPath,
 
     QDir dir(themeDirPath);
 
-    bool wantDark =
-        colorScheme.compare("Dark", Qt::CaseInsensitive) == 0;
+    bool wantDark = colorScheme.compare("Dark", Qt::CaseInsensitive) == 0;
 
-    PaletteConfig cfg = fromFile(
-        dir.absoluteFilePath(
-            wantDark
-                ? "palette-default-dark.toml"
-                : "palette-default-light.toml"));
+    PaletteConfig cfg =
+        fromFile(dir.absoluteFilePath(wantDark ? "palette-default-dark.toml" : "palette-default-light.toml"));
 
     if (!cfg.hasPalette()) {
-        cfg = fromFile(
-            dir.absoluteFilePath(
-                wantDark
-                    ? "palette-default-light.toml"
-                    : "palette-default-dark.toml"));
+        cfg = fromFile(dir.absoluteFilePath(wantDark ? "palette-default-light.toml" : "palette-default-dark.toml"));
     }
 
     return cfg;
@@ -275,9 +258,7 @@ PaletteConfig PaletteConfig::fromDefault(const QString &themeDirPath,
 QPalette PaletteConfig::apply(QPalette base) const
 {
     for (auto git = colors.cbegin(); git != colors.cend(); ++git) {
-        for (auto rit = git.value().cbegin();
-             rit != git.value().cend();
-             ++rit) {
+        for (auto rit = git.value().cbegin(); rit != git.value().cend(); ++rit) {
             base.setColor(git.key(), rit.key(), rit.value());
         }
     }
