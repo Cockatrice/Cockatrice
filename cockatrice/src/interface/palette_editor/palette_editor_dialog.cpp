@@ -125,7 +125,7 @@ void PaletteEditorDialog::setupUi()
     buttonBox = new QDialogButtonBox;
     resetBtn = buttonBox->addButton(tr("Reset"), QDialogButtonBox::ResetRole);
     applyBtn = buttonBox->addButton(tr("Apply"), QDialogButtonBox::ApplyRole);
-    saveBtn = buttonBox->addButton(tr("Save & Apply"), QDialogButtonBox::AcceptRole);
+    saveBtn = buttonBox->addButton(tr("Save && Apply"), QDialogButtonBox::AcceptRole);
     closeBtn = buttonBox->addButton(QDialogButtonBox::Close);
 
     footerLayout->addWidget(revertButton);
