@@ -115,7 +115,7 @@ void ThemeManager::ensureThemeDirectoryExists()
 
 bool ThemeManager::isDarkMode(const QString &themeDirPath)
 {
-    ThemeConfig themeConfig = ThemeConfigParser::parseThemeConfig(themeDirPath);
+    ThemeConfig themeConfig = ThemeConfig::fromThemeDir(themeDirPath);
     if (themeConfig.colorScheme.compare("Dark", Qt::CaseInsensitive) == 0) {
         return true;
     } else if (themeConfig.colorScheme.compare("Light", Qt::CaseInsensitive) == 0) {
@@ -206,12 +206,12 @@ QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 
 ThemeConfig ThemeManager::loadGlobalConfig(const QString &themeDirPath)
 {
-    return ThemeConfigParser::parseThemeConfig(themeDirPath);
+    return ThemeConfig::fromThemeDir(themeDirPath);
 }
 
 bool ThemeManager::saveGlobalConfig(const QString &themeDirPath, const ThemeConfig &cfg)
 {
-    return ThemeConfigParser::saveThemeConfig(themeDirPath, cfg);
+    return cfg.save(themeDirPath);
 }
 
 PaletteConfig ThemeManager::loadPaletteConfig(const QString &themeDirPath, const QString &colorScheme)
@@ -219,7 +219,7 @@ PaletteConfig ThemeManager::loadPaletteConfig(const QString &themeDirPath, const
     if (themeDirPath.isEmpty()) {
         return {};
     }
-    return ThemeConfigParser::parsePaletteForScheme(themeDirPath, colorScheme);
+    return PaletteConfig::fromScheme(themeDirPath, colorScheme);
 }
 
 bool ThemeManager::savePaletteConfig(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg)
@@ -233,7 +233,7 @@ bool ThemeManager::savePaletteConfig(const QString &themeDirPath, const QString 
         dir.mkpath(".");
     }
 
-    QFile f(dir.absoluteFilePath(ThemeConfigParser::paletteFileName(colorScheme)));
+    QFile f(dir.absoluteFilePath(PaletteConfig::fileName(colorScheme)));
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
         return false;
     }
@@ -251,7 +251,7 @@ void ThemeManager::previewPalette(const PaletteConfig &cfg, const QString &schem
 {
     const QString themeName = SettingsCache::instance().getThemeName();
     const QString dirPath = getAvailableThemes().value(themeName);
-    const ThemeConfig themeCfg = ThemeConfigParser::parseThemeConfig(dirPath);
+    const ThemeConfig themeCfg = ThemeConfig::fromThemeDir(dirPath);
     applyStyleAndPalette(themeName, themeCfg, cfg, scheme);
 }
 
@@ -288,7 +288,7 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
 
     // Overlay custom palette colours
     if (palCfg.hasPalette()) {
-        base = ThemeConfigParser::applyToPalette(palCfg, base);
+        base = palCfg.apply( base);
     }
 
     // Palette BEFORE style — setStyle() triggers a synchronous repolish of all
@@ -328,7 +328,7 @@ void ThemeManager::themeChangedSlot()
     }
 
     // load theme.cfg for style + scheme preference
-    ThemeConfig themeCfg = ThemeConfigParser::parseThemeConfig(dirPath);
+    ThemeConfig themeCfg = ThemeConfig::fromThemeDir(dirPath);
 
     // Resolve active scheme:
     // theme.cfg says Dark/Light → use that
@@ -336,9 +336,9 @@ void ThemeManager::themeChangedSlot()
     QString activeScheme = isDarkMode(dirPath) ? "Dark" : "Light";
 
     // ── Load palette: custom first, then theme default ────────────────────
-    PaletteConfig palette = ThemeConfigParser::parsePaletteForScheme(dirPath, activeScheme);
+    PaletteConfig palette = PaletteConfig::fromScheme(dirPath, activeScheme);
     if (!palette.hasPalette()) {
-        palette = ThemeConfigParser::parsePaletteDefault(dirPath, activeScheme);
+        palette = PaletteConfig::fromDefault(dirPath, activeScheme);
     }
 
     applyStyleAndPalette(themeName, themeCfg, palette, activeScheme);

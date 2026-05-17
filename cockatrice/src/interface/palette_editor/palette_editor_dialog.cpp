@@ -163,8 +163,8 @@ void PaletteEditorDialog::retranslateUi()
     titleLabel->setText(tr("<b>Palette Editor</b> &nbsp;·&nbsp; %1").arg(themeName));
 
     // Revert button only makes sense when the theme ships default palette files
-    const bool hasDefault = ThemeConfigParser::parsePaletteDefault(themeDirPath, "Light").hasPalette() ||
-                            ThemeConfigParser::parsePaletteDefault(themeDirPath, "Dark").hasPalette();
+    const bool hasDefault = PaletteConfig::fromDefault(themeDirPath, "Light").hasPalette() ||
+                            PaletteConfig::fromDefault(themeDirPath, "Dark").hasPalette();
     revertButton->setEnabled(hasDefault);
     if (!hasDefault) {
         revertButton->setToolTip(tr("This theme ships no default palette files"));
@@ -195,10 +195,10 @@ void PaletteEditorDialog::loadSchemes()
 {
     const QStringList schemes = {"Light", "Dark"};
     for (const QString &scheme : schemes) {
-        PaletteConfig cfg = ThemeConfigParser::parsePaletteForScheme(themeDirPath, scheme);
+        PaletteConfig cfg = PaletteConfig::fromScheme(themeDirPath, scheme);
 
         if (!cfg.hasPalette()) {
-            cfg = ThemeConfigParser::parsePaletteDefault(themeDirPath, scheme);
+            cfg = PaletteConfig::fromDefault(themeDirPath, scheme);
         }
 
         if (!cfg.hasPalette()) {
@@ -259,13 +259,13 @@ void PaletteEditorDialog::onSave()
     if (!ThemeManager::savePaletteConfig(themeDirPath, loadedScheme, cfg)) {
         QMessageBox::warning(
             this, tr("Save failed"),
-            tr("Could not write %1 to:\n%2").arg(ThemeConfigParser::paletteFileName(loadedScheme), themeDirPath));
+            tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(loadedScheme), themeDirPath));
         return;
     }
 
-    ThemeConfig globalCfg = ThemeConfigParser::parseThemeConfig(themeDirPath);
+    ThemeConfig globalCfg = ThemeConfig::fromThemeDir(themeDirPath);
     globalCfg.colorScheme = loadedScheme;
-    ThemeConfigParser::saveThemeConfig(themeDirPath, globalCfg);
+    globalCfg.save(themeDirPath);
 
     savedConfig[loadedScheme] = cfg;
     workingConfig[loadedScheme] = cfg;
@@ -281,7 +281,7 @@ void PaletteEditorDialog::onReset()
 
 void PaletteEditorDialog::onRevertToDefault()
 {
-    PaletteConfig def = ThemeConfigParser::parsePaletteDefault(themeDirPath, loadedScheme);
+    PaletteConfig def = PaletteConfig::fromDefault(themeDirPath, loadedScheme);
     if (!def.hasPalette()) {
         QMessageBox::information(this, tr("No default found"),
                                  tr("No default palette file found for the \"%1\" scheme.").arg(loadedScheme));
