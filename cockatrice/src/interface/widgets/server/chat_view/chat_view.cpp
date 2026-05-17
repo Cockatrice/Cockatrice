@@ -611,8 +611,9 @@ void ChatView::mousePressEvent(QMouseEvent *event)
 {
     switch (hoveredItemType) {
         case HoveredCard: {
-            if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
+            if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton)) {
                 emit showCardInfoPopup(event->globalPosition().toPoint(), {hoveredContent});
+            }
             break;
         }
         case HoveredUser: {
