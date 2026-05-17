@@ -64,14 +64,6 @@ ${If} ${NSIS_IS_64_BIT} == 1    #NSIS 64bit
     ${EndIf}
     StrCpy $NormalDestDir "$ProgramFiles64\Cockatrice"
     SetRegView 64
-${Else}    #NSIS 32bit
-    ${If} ${RunningX64}
-        MessageBox MB_OK|MB_ICONEXCLAMATION \
-        "You are about to install a 32-bit version of Cockatrice on a 64-bit Windows system.$\n\
-        We advise you to use the correct 64-bit installer instead to get around potential issues.$\n$\n\
-        Download from our webpage: https://cockatrice.github.io"
-    ${EndIf}
-    StrCpy $NormalDestDir "$ProgramFiles\Cockatrice"
 ${EndIf}
 
 StrCpy $PortableDestDir "$Desktop\CockatricePortable"
@@ -174,27 +166,14 @@ Function AutoUninstallIfNeeded
 
 SetShellVarContext all
 
-; --- 32-bit uninstall ---
-SetRegView 32
+SetRegView 64
 ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
 
-StrCmp $R0 "" done32
-DetailPrint "Removing previous version (32-bit)..."
+StrCmp $R0 "" done64
+DetailPrint "Removing previous version (64-bit)..."
 ExecWait '$R0'
 
-done32:
-
-; --- 64-bit uninstall ---
-${If} ${RunningX64}
-    SetRegView 64
-    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
-
-    StrCmp $R0 "" done64
-    DetailPrint "Removing previous version (64-bit)..."
-    ExecWait '$R0'
-
-    done64:
-${EndIf}
+done64:
 
 FunctionEnd
 
@@ -243,45 +222,23 @@ ${EndIf}
 ${If} $PortableMode = 0
     SetShellVarContext all
 
-    # uninstall 32bit version
-    SetRegView 32
+	SetRegView 64
 
-    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
-    StrCmp $R0 "" done32
+	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
+	StrCmp $R0 "" done64
 
-    ${If} $ReinstallMode = 0
-        MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst32
+	${If} $ReinstallMode = 0
+        MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst64
         Abort
     ${Else}
-        Goto uninst32
+        Goto uninst64
     ${EndIf}
 
-    uninst32:
-    ClearErrors
-    ExecWait "$R0"
+	uninst64:
+	ClearErrors
+	ExecWait "$R0"
 
-	done32:
-
-	# uninstall 64bit version
-	${If} ${NSIS_IS_64_BIT} == 1
-	    SetRegView 64
-
-	    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
-	    StrCmp $R0 "" done64
-
-	    ${If} $ReinstallMode = 0
-            MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst64
-            Abort
-        ${Else}
-            Goto uninst64
-        ${EndIf}
-
-	    uninst64:
-	    ClearErrors
-	    ExecWait "$R0"
-
-		done64:
-	${EndIf}
+	done64:
 
 ${Else}
     Abort
