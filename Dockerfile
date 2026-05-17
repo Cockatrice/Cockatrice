@@ -1,5 +1,5 @@
 # -------- Build Stage --------
-FROM debian:13 AS build
+FROM debian:13-slim AS build
 
 ARG DEBIAN_FRONTEND=noninteractive
 
