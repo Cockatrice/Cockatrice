@@ -773,7 +773,7 @@ void AppearanceSettingsPage::retranslateUi()
     themeGroupBox->setTitle(tr("Theme settings"));
     themeLabel.setText(tr("Current theme:"));
     openThemeButton.setText(tr("Open themes folder"));
-    schemeComboLabel.setText(tr("Active theme palette"));
+    schemeComboLabel.setText(tr("Active theme palette:"));
     editPaletteButton.setText(tr("Edit theme palette"));
     homeTabBackgroundSourceLabel.setText(tr("Home tab background source:"));
     homeTabBackgroundShuffleFrequencyLabel.setText(tr("Home tab background shuffle frequency:"));
