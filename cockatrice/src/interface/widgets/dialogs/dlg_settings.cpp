@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcut_treeview.h"
+#include "../../palette_editor/palette_editor_dialog.h"
 #include "../client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "../client/network/update/client/release_channel.h"
 #include "../client/sound_engine.h"
@@ -433,6 +434,35 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&themeBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &AppearanceSettingsPage::themeBoxChanged);
     connect(&openThemeButton, &QPushButton::clicked, this, &AppearanceSettingsPage::openThemeLocation);
 
+    schemeCombo.addItem(tr("Light"), QStringLiteral("Light"));
+    schemeCombo.addItem(tr("Dark"), QStringLiteral("Dark"));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    schemeCombo.addItem(tr("System"), QStringLiteral("System"));
+#endif
+
+    // Seed from whatever the current theme already has saved
+    const QString dirPath = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
+    const ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
+    const QString current = cfg.colorScheme;
+    const int seedIdx = schemeCombo.findData(current);
+    schemeCombo.setCurrentIndex(seedIdx >= 0 ? seedIdx : 0);
+
+    connect(&schemeCombo, &QComboBox::currentIndexChanged, this,
+            [this] { themeManager->setColorScheme(schemeCombo.currentData().toString()); });
+
+    connect(themeManager, &ThemeManager::themeChanged, this, [this, dirPath] {
+        const QString newDir = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
+        const ThemeConfig cfg = ThemeConfig::fromThemeDir(newDir);
+        const QString current = cfg.colorScheme;
+
+        schemeCombo.blockSignals(true);
+        const int idx = schemeCombo.findData(current);
+        schemeCombo.setCurrentIndex(idx >= 0 ? idx : 0);
+        schemeCombo.blockSignals(false);
+    });
+
+    connect(&editPaletteButton, &QPushButton::clicked, this, &AppearanceSettingsPage::editPalette);
+
     for (const auto &entry : BackgroundSources::all()) {
         homeTabBackgroundSourceBox.addItem(QObject::tr(entry.trKey), QVariant::fromValue(entry.type));
     }
@@ -466,12 +496,15 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGrid->addWidget(&themeLabel, 0, 0);
     themeGrid->addWidget(&themeBox, 0, 1);
     themeGrid->addWidget(&openThemeButton, 1, 1);
-    themeGrid->addWidget(&homeTabBackgroundSourceLabel, 2, 0);
-    themeGrid->addWidget(&homeTabBackgroundSourceBox, 2, 1);
-    themeGrid->addWidget(&homeTabBackgroundShuffleFrequencyLabel, 3, 0);
-    themeGrid->addWidget(&homeTabBackgroundShuffleFrequencySpinBox, 3, 1);
-    themeGrid->addWidget(&homeTabDisplayCardNameLabel, 4, 0);
-    themeGrid->addWidget(&homeTabDisplayCardNameCheckBox, 4, 1);
+    themeGrid->addWidget(&schemeComboLabel, 2, 0);
+    themeGrid->addWidget(&schemeCombo, 2, 1);
+    themeGrid->addWidget(&editPaletteButton, 3, 1);
+    themeGrid->addWidget(&homeTabBackgroundSourceLabel, 4, 0);
+    themeGrid->addWidget(&homeTabBackgroundSourceBox, 4, 1);
+    themeGrid->addWidget(&homeTabBackgroundShuffleFrequencyLabel, 5, 0);
+    themeGrid->addWidget(&homeTabBackgroundShuffleFrequencySpinBox, 5, 1);
+    themeGrid->addWidget(&homeTabDisplayCardNameLabel, 6, 0);
+    themeGrid->addWidget(&homeTabDisplayCardNameCheckBox, 6, 1);
 
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
@@ -670,6 +703,12 @@ void AppearanceSettingsPage::openThemeLocation()
     }
 }
 
+void AppearanceSettingsPage::editPalette()
+{
+    PaletteEditorDialog dlg(themeManager->getCurrentThemePath(), SettingsCache::instance().getThemeName(), this);
+    dlg.exec();
+}
+
 void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
 {
     bool visible =
@@ -734,6 +773,8 @@ void AppearanceSettingsPage::retranslateUi()
     themeGroupBox->setTitle(tr("Theme settings"));
     themeLabel.setText(tr("Current theme:"));
     openThemeButton.setText(tr("Open themes folder"));
+    schemeComboLabel.setText(tr("Active theme palette"));
+    editPaletteButton.setText(tr("Edit theme palette"));
     homeTabBackgroundSourceLabel.setText(tr("Home tab background source:"));
     homeTabBackgroundShuffleFrequencyLabel.setText(tr("Home tab background shuffle frequency:"));
     homeTabBackgroundShuffleFrequencySpinBox.setSpecialValueText(tr("Disabled"));

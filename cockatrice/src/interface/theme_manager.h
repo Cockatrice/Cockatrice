@@ -7,6 +7,8 @@
 #ifndef THEMEMANAGER_H
 #define THEMEMANAGER_H
 
+#include "theme_config.h"
+
 #include <QBrush>
 #include <QDir>
 #include <QLoggingCategory>
@@ -41,6 +43,7 @@ public:
 
 private:
     QString defaultStyleName;
+    QString currentThemePath;
     std::array<QBrush, Role::MaxRole + 1> brushes;
     QStringMap availableThemes;
     /*
@@ -52,11 +55,31 @@ protected:
     void ensureThemeDirectoryExists();
     QBrush loadBrush(QString fileName, QColor fallbackColor);
     QBrush loadExtraBrush(QString fileName, QBrush &fallbackBrush);
+    void applyStyleAndPalette(const QString &themeName,
+                              const ThemeConfig &themeCfg,
+                              const PaletteConfig &palCfg,
+                              const QString &activeScheme);
 
 public:
     bool isBuiltInTheme();
-    bool isDarkMode();
+    bool isDarkMode(const QString &themeDirPath);
     QStringMap &getAvailableThemes();
+    // Returns the path to the currently active theme directory (empty = default)
+    QString getCurrentThemePath() const
+    {
+        return currentThemePath;
+    }
+    // Load the global theme settings (style + color scheme preference)
+    static ThemeConfig loadGlobalConfig(const QString &themeDirPath);
+    static bool saveGlobalConfig(const QString &themeDirPath, const ThemeConfig &cfg);
+
+    // Load/save per-scheme palette colors
+    static PaletteConfig loadPaletteConfig(const QString &themeDirPath, const QString &colorScheme);
+    static bool savePaletteConfig(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg);
+    void setColorScheme(const QString &scheme);
+
+    void reloadCurrentTheme();
+    void previewPalette(const PaletteConfig &cfg, const QString &scheme);
 
     QBrush &getBgBrush(Role zone);
     QBrush getExtraBgBrush(Role zone, int zoneId = 0);

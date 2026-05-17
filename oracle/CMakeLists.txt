@@ -28,6 +28,7 @@ set(oracle_SOURCES
     ../cockatrice/src/client/settings/card_counter_settings.cpp
     ../cockatrice/src/client/settings/shortcuts_settings.cpp
     ../cockatrice/src/client/network/update/client/release_channel.cpp
+    ../cockatrice/src/interface/theme_config.cpp
     ../cockatrice/src/interface/theme_manager.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_popup_widget.cpp
