@@ -22,6 +22,7 @@
 #include <libcockatrice/protocol/pb/event_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/event_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/event_flip_card.pb.h>
+#include <libcockatrice/protocol/pb/event_game_log_notice.pb.h>
 #include <libcockatrice/protocol/pb/event_game_say.pb.h>
 #include <libcockatrice/protocol/pb/event_move_card.pb.h>
 #include <libcockatrice/protocol/pb/event_reveal_cards.pb.h>
@@ -30,7 +31,6 @@
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
-#include <libcockatrice/protocol/pb/event_undo_draw_failed.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 
 PlayerEventHandler::PlayerEventHandler(PlayerLogic *_player) : QObject(_player), player(_player)
@@ -582,9 +582,16 @@ void PlayerEventHandler::eventChangeZoneProperties(const Event_ChangeZonePropert
     }
 }
 
-void PlayerEventHandler::eventUndoDrawFailed(const Event_UndoDrawFailed &)
+void PlayerEventHandler::eventGameLogNotice(const Event_GameLogNotice &event)
 {
-    emit logUndoDrawFailed(player);
+    Event_GameLogNotice::NoticeType type = event.notice_type();
+    switch (type) {
+        case Event_GameLogNotice::UNDO_DRAW_FAILED:
+            emit logUndoDrawFailed(player);
+            break;
+        default:
+            qWarning() << "Received Event_GameLogNotice with unknown noticeType: " << type;
+    }
 }
 
 void PlayerEventHandler::processGameEvent(GameEvent::GameEventType type,
@@ -650,8 +657,8 @@ void PlayerEventHandler::processGameEvent(GameEvent::GameEventType type,
         case GameEvent::CHANGE_ZONE_PROPERTIES:
             eventChangeZoneProperties(event.GetExtension(Event_ChangeZoneProperties::ext));
             break;
-        case GameEvent::UNDO_DRAW_FAILED:
-            eventUndoDrawFailed(event.GetExtension(Event_UndoDrawFailed::ext));
+        case GameEvent::GAME_LOG_NOTICE:
+            eventGameLogNotice(event.GetExtension(Event_GameLogNotice::ext));
             break;
         default: {
             qWarning() << "unhandled game event" << type;

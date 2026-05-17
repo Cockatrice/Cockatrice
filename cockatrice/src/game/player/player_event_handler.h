@@ -35,7 +35,7 @@ class Event_SetCardAttr;
 class Event_SetCardCounter;
 class Event_SetCounter;
 class Event_Shuffle;
-class Event_UndoDrawFailed;
+class Event_GameLogNotice;
 
 class PlayerEventHandler : public QObject
 {
@@ -111,7 +111,7 @@ public:
     void eventDrawCards(const Event_DrawCards &event);
     void eventRevealCards(const Event_RevealCards &event, EventProcessingOptions options);
     void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
-    void eventUndoDrawFailed(const Event_UndoDrawFailed &event);
+    void eventGameLogNotice(const Event_GameLogNotice &event);
 
 private:
     PlayerLogic *player;
