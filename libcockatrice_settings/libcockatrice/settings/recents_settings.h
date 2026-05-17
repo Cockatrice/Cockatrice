@@ -1,8 +1,8 @@
 /**
  * @file recents_settings.h
  * @ingroup DeckSettings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef RECENTS_SETTINGS_H
 #define RECENTS_SETTINGS_H

@@ -1,8 +1,8 @@
 /**
  * @file dlg_manage_sets.h
  * @ingroup Dialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_MANAGE_SETS_H
 #define DLG_MANAGE_SETS_H

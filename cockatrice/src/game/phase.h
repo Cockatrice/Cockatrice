@@ -1,8 +1,8 @@
 /**
  * @file phase.h
  * @ingroup GameLogic
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef PHASE_H
 #define PHASE_H

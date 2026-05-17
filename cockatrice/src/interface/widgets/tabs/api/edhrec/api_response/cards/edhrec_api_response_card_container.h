@@ -1,8 +1,8 @@
 /**
  * @file edhrec_api_response_card_container.h
  * @ingroup ApiResponses
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CONTAINER_ENTRY_H
 #define CONTAINER_ENTRY_H

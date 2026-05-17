@@ -1,8 +1,8 @@
 /**
  * @file grave_menu.h
  * @ingroup GameMenusZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_GRAVE_MENU_H
 #define COCKATRICE_GRAVE_MENU_H

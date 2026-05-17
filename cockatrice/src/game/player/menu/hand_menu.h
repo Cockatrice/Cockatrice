@@ -1,8 +1,8 @@
 /**
  * @file hand_menu.h
  * @ingroup GameMenusZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_HAND_MENU_H
 #define COCKATRICE_HAND_MENU_H

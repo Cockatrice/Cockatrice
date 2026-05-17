@@ -1,8 +1,8 @@
 /**
  * @file card_menu.h
  * @ingroup GameMenusCards
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_CARD_MENU_H
 #define COCKATRICE_CARD_MENU_H

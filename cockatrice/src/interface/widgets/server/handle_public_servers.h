@@ -1,8 +1,8 @@
 /**
  * @file handle_public_servers.h
  * @ingroup Server
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_HANDLE_PUBLIC_SERVERS_H
 #define COCKATRICE_HANDLE_PUBLIC_SERVERS_H

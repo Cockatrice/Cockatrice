@@ -12,16 +12,16 @@
  */
 namespace CardDimensions
 {
-/// Card width in pixels
+/** @brief Card width in pixels. */
 constexpr int WIDTH = 72;
-/// Card height in pixels
+/** @brief Card height in pixels. */
 constexpr int HEIGHT = 102;
 
-/// Pre-converted for floating-point contexts (Z-value calculations)
+/** @brief Pre-converted for floating-point contexts (Z-value calculations). */
 constexpr qreal WIDTH_F = static_cast<qreal>(WIDTH);
 constexpr qreal HEIGHT_F = static_cast<qreal>(HEIGHT);
 
-/// Half-dimensions for centering and rotation transforms
+/** @brief Half-dimensions for centering and rotation transforms. */
 constexpr qreal WIDTH_HALF_F = WIDTH_F / 2;
 constexpr qreal HEIGHT_HALF_F = HEIGHT_F / 2;
 } // namespace CardDimensions

@@ -1,8 +1,8 @@
 /**
  * @file dlg_view_log.h
  * @ingroup ServerLogDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_VIEWLOG_H
 #define DLG_VIEWLOG_H

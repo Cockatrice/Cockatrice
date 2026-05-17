@@ -2,8 +2,8 @@
  * @file card_info_picture_with_text_overlay_widget.h
  * @ingroup CardWidgets
  * @ingroup DeckStorageWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARD_PICTURE_WITH_TEXT_OVERLAY_H
 #define CARD_PICTURE_WITH_TEXT_OVERLAY_H

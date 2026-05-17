@@ -1,8 +1,8 @@
 /**
  * @file move_menu.h
  * @ingroup GameMenusZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_MOVE_MENU_H
 #define COCKATRICE_MOVE_MENU_H

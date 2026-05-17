@@ -66,12 +66,9 @@ namespace ZValueLayerManager
  */
 enum class Layer
 {
-    /// Zone-level elements like backgrounds and containers
-    Zone,
-    /// Cards rendered in zones (uses sequential Z-values)
-    Card,
-    /// Temporary UI elements like hovered cards and drag items
-    Overlay
+    Zone,   ///< Zone-level elements like backgrounds and containers.
+    Card,   ///< Cards rendered in zones (uses sequential Z-values).
+    Overlay ///< Temporary UI elements like hovered cards and drag items.
 };
 
 /**

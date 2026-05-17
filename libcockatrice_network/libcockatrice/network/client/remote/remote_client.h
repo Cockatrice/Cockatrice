@@ -1,8 +1,8 @@
 /**
  * @file remote_client.h
  * @ingroup Client
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef REMOTECLIENT_H
 #define REMOTECLIENT_H

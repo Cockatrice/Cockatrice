@@ -1,8 +1,8 @@
 /**
  * @file tab_home.h
  * @ingroup Tabs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_HOME_H
 #define TAB_HOME_H

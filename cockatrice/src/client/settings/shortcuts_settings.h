@@ -1,8 +1,8 @@
 /**
  * @file shortcuts_settings.h
  * @ingroup CoreSettings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef SHORTCUTSSETTINGS_H
 #define SHORTCUTSSETTINGS_H

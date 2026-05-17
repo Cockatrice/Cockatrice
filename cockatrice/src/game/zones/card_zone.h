@@ -40,9 +40,12 @@ protected:
     }
 public slots:
     bool showContextMenu(const QPoint &screenPos);
-    /// @brief Called when a card is added to this zone. Default: reparents card to this item.
-    /// Virtual so subclasses (e.g. SelectZone) can override parenting behavior — the Qt signal
-    /// connection in CardZone's constructor dispatches through the vtable.
+    /**
+     * @brief Called when a card is added to this zone. Default: reparents card to this item.
+     *
+     * Virtual so subclasses (e.g. SelectZone) can override parenting behavior — the Qt signal
+     * connection in CardZone's constructor dispatches through the vtable.
+     */
     virtual void onCardAdded(CardItem *addedCard);
 
 public:

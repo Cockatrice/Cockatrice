@@ -286,7 +286,7 @@ QList<QString> Server::getOnlineModeratorList() const
     for (auto &client : clients) {
         ServerInfo_User *data = client->getUserInfo();
 
-        // TODO: this line should be updated in the event there is any type of new user level created
+        //! \todo This line should be updated in the event there is any type of new user level created.
         if (data &&
             (data->user_level() & ServerInfo_User::IsModerator || data->user_level() & ServerInfo_User::IsAdmin)) {
             results << QString::fromStdString(data->name()).simplified();

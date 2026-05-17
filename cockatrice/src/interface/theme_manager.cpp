@@ -92,7 +92,7 @@ struct PaletteColorInfo
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     defaultStyleName = qApp->style()->objectName();
-    // FIXME workaround for windows11 style being broken
+    //! \todo Workaround for windows11 style being broken.
     if (defaultStyleName == "windows11") {
         defaultStyleName = "windowsvista";
     }

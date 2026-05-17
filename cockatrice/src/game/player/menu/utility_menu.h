@@ -1,8 +1,8 @@
 /**
  * @file utility_menu.h
  * @ingroup GameMenusPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_UTILITY_MENU_H
 #define COCKATRICE_UTILITY_MENU_H

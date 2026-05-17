@@ -1,8 +1,8 @@
 /**
  * @file update_downloader.h
  * @ingroup ClientUpdate
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_UPDATEDOWNLOADER_H
 #define COCKATRICE_UPDATEDOWNLOADER_H

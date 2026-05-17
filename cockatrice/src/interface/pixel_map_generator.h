@@ -1,8 +1,8 @@
 /**
  * @file pixel_map_generator.h
  * @ingroup UI
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef PIXMAPGENERATOR_H
 #define PIXMAPGENERATOR_H

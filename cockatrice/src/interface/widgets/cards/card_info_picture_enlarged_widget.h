@@ -2,8 +2,8 @@
  * @file card_info_picture_enlarged_widget.h
  * @ingroup CardWigets
  * @ingroup DeckEditorWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARD_PICTURE_ENLARGED_WIDGET_H
 #define CARD_PICTURE_ENLARGED_WIDGET_H

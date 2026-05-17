@@ -1,8 +1,8 @@
 /**
  * @file pile_zone_logic.h
  * @ingroup GameLogicZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_PILE_ZONE_LOGIC_H
 #define COCKATRICE_PILE_ZONE_LOGIC_H
