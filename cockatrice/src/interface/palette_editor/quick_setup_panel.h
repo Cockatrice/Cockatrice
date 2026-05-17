@@ -10,23 +10,72 @@ class QHBoxLayout;
 class QLabel;
 class QSlider;
 
-// The "Quick Setup" bar: accent color picker + intensity slider.
-// Emits generateRequested() when the user clicks Generate.
-// The dialog connects that signal and calls PaletteGenerator::fromAccent().
+/**
+ * @class QuickSetupPanel
+ * @brief Provides a compact "Quick Setup" interface for generating theme palettes.
+ *
+ * The panel contains:
+ * - an accent color picker,
+ * - an intensity slider,
+ * - and a generate button.
+ *
+ * When the user clicks the generate button, the panel emits
+ * generateRequested() with the currently selected accent color
+ * and intensity value.
+ *
+ * Typically used together with PaletteGenerator::fromAccent()
+ * to quickly generate color schemes from a chosen accent color.
+ */
 class QuickSetupPanel : public QWidget
 {
     Q_OBJECT
+
 public:
+    /**
+     * @brief Constructs the quick setup panel.
+     *
+     * @param parent Optional parent widget.
+     */
     explicit QuickSetupPanel(QWidget *parent = nullptr);
+
+    /**
+     * @brief Retranslates all user-visible strings.
+     *
+     * Intended to be called when the application language changes.
+     */
     void retranslateUi();
 
+    /**
+     * @brief Returns the currently selected accent color.
+     *
+     * @return The selected accent color.
+     */
     QColor accentColor() const;
+
+    /**
+     * @brief Returns the current intensity slider value.
+     *
+     * @return The selected intensity value.
+     */
     int intensity() const;
 
-    // Called by the dialog when switching schemes, to keep the swatch in sync
+    /**
+     * @brief Updates the displayed accent color.
+     *
+     * Used by the parent dialog when switching schemes to keep
+     * the color swatch synchronized with the active palette.
+     *
+     * @param c The new accent color.
+     */
     void setAccentColor(const QColor &c);
 
 signals:
+    /**
+     * @brief Emitted when the user requests palette generation.
+     *
+     * @param accent The selected accent color.
+     * @param intensity The selected intensity value.
+     */
     void generateRequested(QColor accent, int intensity);
 
 private:
