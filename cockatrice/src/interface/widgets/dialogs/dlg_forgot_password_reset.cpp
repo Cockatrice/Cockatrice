@@ -49,7 +49,7 @@ DlgForgotPasswordReset::DlgForgotPasswordReset(QWidget *parent) : QDialog(parent
     playernameEdit->setMaxLength(MAX_NAME_LENGTH);
     playernameLabel->setBuddy(playernameEdit);
 
-    tokenLabel = new QLabel(tr("Token:"));
+    tokenLabel = new QLabel(tr("Token") + ":");
     tokenEdit = new QLineEdit();
     tokenEdit->setMaxLength(MAX_NAME_LENGTH);
     tokenLabel->setBuddy(tokenLabel);
