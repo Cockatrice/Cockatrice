@@ -34,6 +34,13 @@ private slots:
 private:
     QStringList findQmFiles();
     QString languageName(const QString &lang);
+
+    QGroupBox *languageGroupBox;
+    QGroupBox *versionGroupBox;
+    QGroupBox *cardDatabaseGroupBox;
+    QGroupBox *startupGroupBox;
+    QGroupBox *pathsGroupBox;
+
     QLineEdit *deckPathEdit;
     QLineEdit *filtersPathEdit;
     QLineEdit *replaysPathEdit;
@@ -43,8 +50,6 @@ private:
     QLineEdit *tokenDatabasePathEdit;
     QPushButton *resetAllPathsButton;
     QLabel *allPathsResetLabel;
-    QGroupBox *personalGroupBox;
-    QGroupBox *pathsGroupBox;
     QComboBox languageBox;
     QCheckBox startupUpdateCheckCheckBox;
     QLabel startupCardUpdateCheckBehaviorLabel;
