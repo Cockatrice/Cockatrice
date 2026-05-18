@@ -9,6 +9,7 @@
 
 #include "../zones/card_zone_logic.h"
 #include "abstract_card_item.h"
+#include "card_state.h"
 
 #include <libcockatrice/network/server/remote/game/server_card.h>
 
@@ -27,16 +28,10 @@ class CardItem : public AbstractCardItem
 {
     Q_OBJECT
 private:
-    CardZoneLogic *zone;
-    bool attacking;
-    QMap<int, int> counters;
-    QString annotation;
-    QString pt;
-    bool destroyOnZoneChange;
-    bool doesntUntap;
+    CardState *state;
+
     QPoint gridPoint;
     CardDragItem *dragItem;
-    CardItem *attachedTo;
     QList<CardItem *> attachedCards;
 
     void prepareDelete();
@@ -62,7 +57,7 @@ public:
     void retranslateUi();
     [[nodiscard]] CardZoneLogic *getZone() const
     {
-        return zone;
+        return state->getZone();
     }
     void setZone(CardZoneLogic *_zone);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -88,40 +83,40 @@ public:
     }
     [[nodiscard]] bool getAttacking() const
     {
-        return attacking;
+        return state->getAttacking();
     }
     void setAttacking(bool _attacking);
     [[nodiscard]] const QMap<int, int> &getCounters() const
     {
-        return counters;
+        return state->getCounters();
     }
     void setCounter(int _id, int _value);
     [[nodiscard]] QString getAnnotation() const
     {
-        return annotation;
+        return state->getAnnotation();
     }
     void setAnnotation(const QString &_annotation);
     [[nodiscard]] bool getDoesntUntap() const
     {
-        return doesntUntap;
+        return state->getDoesntUntap();
     }
     void setDoesntUntap(bool _doesntUntap);
     [[nodiscard]] QString getPT() const
     {
-        return pt;
+        return state->getPT();
     }
     void setPT(const QString &_pt);
     [[nodiscard]] bool getDestroyOnZoneChange() const
     {
-        return destroyOnZoneChange;
+        return state->getDestroyOnZoneChange();
     }
     void setDestroyOnZoneChange(bool _destroy)
     {
-        destroyOnZoneChange = _destroy;
+        state->setDestroyOnZoneChange(_destroy);
     }
     [[nodiscard]] CardItem *getAttachedTo() const
     {
-        return attachedTo;
+        return state->getAttachedTo();
     }
     void setAttachedTo(CardItem *_attachedTo);
     void addAttachedCard(CardItem *card)

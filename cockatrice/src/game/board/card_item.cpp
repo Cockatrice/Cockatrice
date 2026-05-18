@@ -21,13 +21,12 @@
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 
 CardItem::CardItem(Player *_owner, QGraphicsItem *parent, const CardRef &cardRef, int _cardid, CardZoneLogic *_zone)
-    : AbstractCardItem(parent, cardRef, _owner, _cardid), zone(_zone), attacking(false), destroyOnZoneChange(false),
-      doesntUntap(false), dragItem(nullptr), attachedTo(nullptr)
+    : AbstractCardItem(parent, cardRef, _owner, _cardid), state(new CardState(this, _zone)), dragItem(nullptr)
 {
     owner->addCard(this);
 
     connect(&SettingsCache::instance().cardCounters(), &CardCounterSettings::colorChanged, this, [this](int counterId) {
-        if (counters.contains(counterId)) {
+        if (state->getCounters().contains(counterId)) {
             update();
         }
     });
@@ -48,9 +47,9 @@ void CardItem::prepareDelete()
         attachedCards.first()->setAttachedTo(nullptr);
     }
 
-    if (attachedTo != nullptr) {
-        attachedTo->removeAttachedCard(this);
-        attachedTo = nullptr;
+    if (state->getAttachedTo() != nullptr) {
+        state->getAttachedTo()->removeAttachedCard(this);
+        state->setAttachedTo(nullptr);
     }
 }
 
@@ -65,7 +64,7 @@ void CardItem::deleteLater()
 
 void CardItem::setZone(CardZoneLogic *_zone)
 {
-    zone = _zone;
+    state->setZone(_zone);
 }
 
 void CardItem::retranslateUi()
@@ -80,23 +79,23 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     AbstractCardItem::paint(painter, option, widget);
 
     int i = 0;
-    QMapIterator<int, int> counterIterator(counters);
+    QMapIterator<int, int> counterIterator(state->getCounters());
     while (counterIterator.hasNext()) {
         counterIterator.next();
         QColor _color = cardCounterSettings.color(counterIterator.key());
 
-        paintNumberEllipse(counterIterator.value(), 14, _color, i, counters.size(), painter);
+        paintNumberEllipse(counterIterator.value(), 14, _color, i, state->getCounters().size(), painter);
         ++i;
     }
 
     QSizeF translatedSize = getTranslatedSize(painter);
     qreal scaleFactor = translatedSize.width() / boundingRect().width();
 
-    if (!pt.isEmpty()) {
+    if (!state->getPT().isEmpty()) {
         painter->save();
         transformPainter(painter, translatedSize, tapAngle);
 
-        if (!getFaceDown() && pt == exactCard.getInfo().getPowTough()) {
+        if (!getFaceDown() && state->getPT() == exactCard.getInfo().getPowTough()) {
             painter->setPen(Qt::white);
         } else {
             painter->setPen(QColor(255, 150, 0)); // dark orange
@@ -107,11 +106,11 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
         painter->drawText(QRectF(4 * scaleFactor, 4 * scaleFactor, translatedSize.width() - 10 * scaleFactor,
                                  translatedSize.height() - 8 * scaleFactor),
-                          Qt::AlignRight | Qt::AlignBottom, pt);
+                          Qt::AlignRight | Qt::AlignBottom, state->getPT());
         painter->restore();
     }
 
-    if (!annotation.isEmpty()) {
+    if (!state->getAnnotation().isEmpty()) {
         painter->save();
 
         transformPainter(painter, translatedSize, tapAngle);
@@ -121,7 +120,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
         painter->drawText(QRectF(4 * scaleFactor, 4 * scaleFactor, translatedSize.width() - 8 * scaleFactor,
                                  translatedSize.height() - 8 * scaleFactor),
-                          Qt::AlignCenter | Qt::TextWrapAnywhere, annotation);
+                          Qt::AlignCenter | Qt::TextWrapAnywhere, state->getAnnotation());
         painter->restore();
     }
 
@@ -129,7 +128,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->fillPath(shape(), QBrush(QColor(255, 0, 0, 100)));
     }
 
-    if (doesntUntap) {
+    if (state->getDoesntUntap()) {
         painter->save();
 
         painter->setRenderHint(QPainter::Antialiasing, false);
@@ -148,70 +147,66 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 void CardItem::setAttacking(bool _attacking)
 {
-    attacking = _attacking;
+    state->setAttacking(_attacking);
     update();
 }
 
 void CardItem::setCounter(int _id, int _value)
 {
-    if (_value) {
-        counters.insert(_id, _value);
-    } else {
-        counters.remove(_id);
-    }
+    state->setCounter(_id, _value);
     update();
 }
 
 void CardItem::setAnnotation(const QString &_annotation)
 {
-    annotation = _annotation;
+    state->setAnnotation(_annotation);
     update();
 }
 
 void CardItem::setDoesntUntap(bool _doesntUntap)
 {
-    doesntUntap = _doesntUntap;
+    state->setDoesntUntap(_doesntUntap);
     update();
 }
 
 void CardItem::setPT(const QString &_pt)
 {
-    pt = _pt;
+    state->setPT(_pt);
     update();
 }
 
 void CardItem::setAttachedTo(CardItem *_attachedTo)
 {
-    if (attachedTo != nullptr) {
-        attachedTo->removeAttachedCard(this);
+    if (state->getAttachedTo() != nullptr) {
+        state->getAttachedTo()->removeAttachedCard(this);
     }
 
     gridPoint.setX(-1);
-    attachedTo = _attachedTo;
-    if (attachedTo != nullptr) {
+    state->setAttachedTo(_attachedTo);
+    if (state->getAttachedTo() != nullptr) {
         // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
         // attached cards
-        if (attachedTo->zone == nullptr) {
+        if (state->getAttachedTo()->getZone() == nullptr) {
             deleteLater();
         } else {
-            emit attachedTo->zone->cardAdded(this);
-            attachedTo->addAttachedCard(this);
-            if (zone != attachedTo->getZone()) {
-                attachedTo->getZone()->reorganizeCards();
+            emit state->getAttachedTo()->getZone()->cardAdded(this);
+            state->getAttachedTo()->addAttachedCard(this);
+            if (state->getZone() != state->getAttachedTo()->getZone()) {
+                state->getAttachedTo()->getZone()->reorganizeCards();
             }
         }
     } else {
         // If the zone is being torn down, it might already be null by the time a card tries to un-attach all its
         // attached cards
-        if (zone == nullptr) {
+        if (state->getZone() == nullptr) {
             deleteLater();
         } else {
-            emit zone->cardAdded(this);
+            emit state->getZone()->cardAdded(this);
         }
     }
 
-    if (zone != nullptr) {
-        zone->reorganizeCards();
+    if (state->getZone() != nullptr) {
+        state->getZone()->reorganizeCards();
     }
 }
 
@@ -220,13 +215,7 @@ void CardItem::setAttachedTo(CardItem *_attachedTo)
  */
 void CardItem::resetState(bool keepAnnotations)
 {
-    attacking = false;
-    counters.clear();
-    pt.clear();
-    if (!keepAnnotations) {
-        annotation.clear();
-    }
-    attachedTo = 0;
+    state->resetState(keepAnnotations);
     attachedCards.clear();
     setTapped(false, false);
     setDoesntUntap(false);
@@ -238,11 +227,11 @@ void CardItem::resetState(bool keepAnnotations)
 
 void CardItem::processCardInfo(const ServerInfo_Card &_info)
 {
-    counters.clear();
+    state->clearCounters();
     const int counterListSize = _info.counter_list_size();
     for (int i = 0; i < counterListSize; ++i) {
         const ServerInfo_CardCounter &counterInfo = _info.counter_list(i);
-        counters.insert(counterInfo.id(), counterInfo.value());
+        state->insertCounter(counterInfo.id(), counterInfo.value());
     }
 
     setId(_info.id());
@@ -299,7 +288,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
         if (card == nullptr || card == this) {
             continue;
         }
-        if (card->getZone() != zone) {
+        if (card->getZone() != state->getZone()) {
             continue;
         }
 
@@ -324,7 +313,7 @@ void CardItem::drawAttachArrow()
         if (card == nullptr) {
             continue;
         }
-        if (card->getZone() != zone) {
+        if (card->getZone() != state->getZone()) {
             continue;
         }
 
@@ -357,7 +346,7 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
             2 * QApplication::startDragDistance()) {
             return;
         }
-        if (const ZoneViewZoneLogic *view = qobject_cast<const ZoneViewZoneLogic *>(zone)) {
+        if (const ZoneViewZoneLogic *view = qobject_cast<const ZoneViewZoneLogic *>(state->getZone())) {
             if (view->getRevealZone() && !view->getWriteableRevealZone()) {
                 return;
             }
@@ -375,12 +364,12 @@ void CardItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         int childIndex = 0;
         for (const auto &item : scene()->selectedItems()) {
             CardItem *card = static_cast<CardItem *>(item);
-            if ((card == this) || (card->getZone() != zone)) {
+            if ((card == this) || (card->getZone() != state->getZone())) {
                 continue;
             }
             ++childIndex;
             QPointF childPos;
-            if (zone->getHasCardAttr()) {
+            if (state->getZone()->getHasCardAttr()) {
                 childPos = card->pos() - pos();
             } else {
                 childPos = QPointF(childIndex * CardDimensions::WIDTH_HALF_F, 0);
@@ -401,15 +390,15 @@ void CardItem::playCard(bool faceDown)
         return;
     }
 
-    TableZoneLogic *tz = qobject_cast<TableZoneLogic *>(zone);
+    TableZoneLogic *tz = qobject_cast<TableZoneLogic *>(state->getZone());
     if (tz) {
         emit tz->toggleTapped();
     } else {
         if (SettingsCache::instance().getClickPlaysAllSelected()) {
-            faceDown ? zone->getPlayer()->getPlayerActions()->actPlayFacedown()
-                     : zone->getPlayer()->getPlayerActions()->actPlay();
+            faceDown ? state->getZone()->getPlayer()->getPlayerActions()->actPlayFacedown()
+                     : state->getZone()->getPlayer()->getPlayerActions()->actPlay();
         } else {
-            zone->getPlayer()->getPlayerActions()->playCard(this, faceDown);
+            state->getZone()->getPlayer()->getPlayerActions()->playCard(this, faceDown);
         }
     }
 }
@@ -465,11 +454,11 @@ static bool isUnwritableRevealZone(CardZoneLogic *zone)
  */
 void CardItem::handleClickedToPlay(bool shiftHeld)
 {
-    if (isUnwritableRevealZone(zone)) {
+    if (isUnwritableRevealZone(state->getZone())) {
         if (SettingsCache::instance().getClickPlaysAllSelected()) {
-            zone->getPlayer()->getPlayerActions()->actHide();
+            state->getZone()->getPlayer()->getPlayerActions()->actHide();
         } else {
-            zone->removeCard(this);
+            state->getZone()->removeCard(this);
         }
     } else {
         playCard(shiftHeld);
