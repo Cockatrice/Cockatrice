@@ -25,9 +25,9 @@ signals:
     void stateChanged();
 
     void attackingChanged(bool);
-    void countersChanged();
-    void annotationChanged();
-    void ptChanged();
+    void countersChanged(QMap<int, int>);
+    void annotationChanged(QString);
+    void ptChanged(QString);
     void doesntUntapChanged(bool);
     void destroyOnZoneChangeChanged(bool);
     void attachedToChanged(CardItem *);

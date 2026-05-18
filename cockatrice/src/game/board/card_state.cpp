@@ -36,7 +36,7 @@ void CardState::insertCounter(int id, int value)
 {
     counters.insert(id, value);
 
-    emit countersChanged();
+    emit countersChanged(counters);
     emit stateChanged();
 }
 
@@ -48,14 +48,14 @@ void CardState::setCounter(int id, int value)
         counters.remove(id);
     }
 
-    emit countersChanged();
+    emit countersChanged(counters);
     emit stateChanged();
 }
 
 void CardState::clearCounters()
 {
     counters.clear();
-    emit countersChanged();
+    emit countersChanged(counters);
     emit stateChanged();
 }
 
@@ -65,7 +65,7 @@ void CardState::setAnnotation(const QString &a)
         return;
     }
     annotation = a;
-    emit annotationChanged();
+    emit annotationChanged(annotation);
     emit stateChanged();
 }
 
@@ -75,7 +75,7 @@ void CardState::setPT(const QString &v)
         return;
     }
     pt = v;
-    emit ptChanged();
+    emit ptChanged(pt);
     emit stateChanged();
 }
 
