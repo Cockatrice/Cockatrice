@@ -25,22 +25,13 @@ bool CardInfoComparator::operator()(const CardInfoPtr &a, const CardInfoPtr &b) 
 
 bool CardInfoComparator::compareVariants(const QVariant &a, const QVariant &b) const
 {
-    // Determine the type of QVariant based on Qt version
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     if (a.typeId() != b.typeId()) {
-#else
-    if (a.type() != b.type()) {
-#endif
         // If they are not the same type, compare as strings
         return a.toString() < b.toString();
     }
 
     // Perform type-specific comparison
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     switch (static_cast<int>(a.typeId())) {
-#else
-    switch (static_cast<int>(a.type())) {
-#endif
         case static_cast<int>(QMetaType::Int):
             return a.toInt() < b.toInt();
         case static_cast<int>(QMetaType::Double):

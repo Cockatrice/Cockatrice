@@ -13,14 +13,6 @@
 #include <QTextStream>
 #include <algorithm>
 
-#if QT_VERSION < 0x050600
-// qHash on QRegularExpression was added in 5.6, FIX IT
-uint qHash(const QRegularExpression &key, uint seed) noexcept
-{
-    return qHash(key.pattern(), seed); // call qHash on pattern QString instead
-}
-#endif
-
 static const QString CURRENT_SIDEBOARD_PLAN_KEY = "";
 
 bool DeckList::Metadata::isEmpty() const

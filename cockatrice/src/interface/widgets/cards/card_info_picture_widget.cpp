@@ -246,11 +246,7 @@ QSize CardInfoPictureWidget::sizeHint() const
  * @brief Starts the hover timer to show the enlarged pixmap on hover.
  * @param event The enter event.
  */
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void CardInfoPictureWidget::enterEvent(QEnterEvent *event)
-#else
-void CardInfoPictureWidget::enterEvent(QEvent *event)
-#endif
 {
     QWidget::enterEvent(event); // Call the base class implementation
 

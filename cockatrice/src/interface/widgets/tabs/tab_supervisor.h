@@ -21,7 +21,6 @@
 #include <QAbstractButton>
 #include <QLoggingCategory>
 #include <QMap>
-#include <QProxyStyle>
 #include <QTabWidget>
 
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
@@ -51,13 +50,6 @@ class ServerInfo_User;
 class GameReplay;
 class DeckList;
 
-class MacOSTabFixStyle : public QProxyStyle
-{
-    Q_OBJECT
-public:
-    QRect subElementRect(SubElement, const QStyleOption *, const QWidget *) const override;
-};
-
 class CloseButton : public QAbstractButton
 {
     Q_OBJECT
@@ -70,11 +62,7 @@ public:
     }
 
 protected:
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     void enterEvent(QEnterEvent *event) override;
-#else
-    void enterEvent(QEvent *event) override;
-#endif
     void leaveEvent(QEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 };
