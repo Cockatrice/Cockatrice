@@ -38,151 +38,66 @@ public:
     {
     }
 
-    void resetState(bool keepAnnotations)
-    {
-        attacking = false;
-        counters.clear();
-        pt.clear();
-        if (!keepAnnotations) {
-            annotation.clear();
-        }
-        attachedTo = nullptr;
-    }
+    void resetState(bool keepAnnotations);
 
     CardZoneLogic *getZone() const
     {
         return zone;
     }
 
-    void setZone(CardZoneLogic *_zone)
-    {
-        if (zone == _zone) {
-            return;
-        }
-
-        zone = _zone;
-        emit zoneChanged(zone);
-        emit stateChanged();
-    }
+    void setZone(CardZoneLogic *_zone);
 
     bool getAttacking() const
     {
         return attacking;
     }
-    void setAttacking(bool v)
-    {
-        if (attacking == v) {
-            return;
-        }
-        attacking = v;
-        emit attackingChanged(v);
-        emit stateChanged();
-    }
+    void setAttacking(bool v);
 
     const QMap<int, int> &getCounters() const
     {
         return counters;
     }
 
-    void insertCounter(int id, int value)
-    {
-        counters.insert(id, value);
+    void insertCounter(int id, int value);
 
-        emit countersChanged();
-        emit stateChanged();
-    }
+    void setCounter(int id, int value);
 
-    void setCounter(int id, int value)
-    {
-        if (value) {
-            counters[id] = value;
-        } else {
-            counters.remove(id);
-        }
-
-        emit countersChanged();
-        emit stateChanged();
-    }
-
-    void clearCounters()
-    {
-        counters.clear();
-        emit countersChanged();
-        emit stateChanged();
-    }
+    void clearCounters();
 
     QString getAnnotation() const
     {
         return annotation;
     }
-    void setAnnotation(const QString &a)
-    {
-        if (annotation == a) {
-            return;
-        }
-        annotation = a;
-        emit annotationChanged();
-        emit stateChanged();
-    }
+
+    void setAnnotation(const QString &a);
 
     QString getPT() const
     {
         return pt;
     }
-    void setPT(const QString &v)
-    {
-        if (pt == v) {
-            return;
-        }
-        pt = v;
-        emit ptChanged();
-        emit stateChanged();
-    }
+
+    void setPT(const QString &v);
 
     bool getDoesntUntap() const
     {
         return doesntUntap;
     }
-    void setDoesntUntap(bool v)
-    {
-        if (doesntUntap == v) {
-            return;
-        }
-        doesntUntap = v;
-        emit doesntUntapChanged(v);
-        emit stateChanged();
-    }
+
+    void setDoesntUntap(bool v);
 
     bool getDestroyOnZoneChange() const
     {
         return destroyOnZoneChange;
     }
 
-    void setDestroyOnZoneChange(bool v)
-    {
-        if (destroyOnZoneChange == v) {
-            return;
-        }
-
-        destroyOnZoneChange = v;
-        emit destroyOnZoneChangeChanged(v);
-        emit stateChanged();
-    }
+    void setDestroyOnZoneChange(bool v);
 
     CardItem *getAttachedTo() const
     {
         return attachedTo;
     }
 
-    void setAttachedTo(CardItem *c)
-    {
-        if (attachedTo == c) {
-            return;
-        }
-        attachedTo = c;
-        emit attachedToChanged(c);
-        emit stateChanged();
-    }
+    void setAttachedTo(CardItem *c);
 };
 
 #endif // COCKATRICE_CARD_STATE_H
