@@ -64,6 +64,7 @@ set(cockatrice_SOURCES
     src/game/board/card_drag_item.cpp
     src/game/board/card_item.cpp
     src/game/board/card_list.cpp
+    src/game/board/card_state.cpp
     src/game/board/counter_general.cpp
     src/game/board/translate_counter_name.cpp
     src/game/deckview/deck_view.cpp
