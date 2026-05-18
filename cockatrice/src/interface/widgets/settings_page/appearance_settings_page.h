@@ -42,10 +42,10 @@ private:
     QLabel maxFontSizeForCardsLabel;
     QCheckBox showShortcutsCheckBox;
     QCheckBox showGameSelectorFilterToolbarCheckBox;
-    QCheckBox displayCardNamesCheckBox;
-    QCheckBox autoRotateSidewaysLayoutCardsCheckBox;
     QCheckBox overrideAllCardArtWithPersonalPreferenceCheckBox;
     QCheckBox bumpSetsWithCardsInDeckToTopCheckBox;
+    QCheckBox displayCardNamesCheckBox;
+    QCheckBox autoRotateSidewaysLayoutCardsCheckBox;
     QCheckBox cardScalingCheckBox;
     QCheckBox roundCardCornersCheckBox;
     QLabel verticalCardOverlapPercentLabel;
@@ -59,6 +59,7 @@ private:
     QCheckBox invertVerticalCoordinateCheckBox;
     QGroupBox *themeGroupBox;
     QGroupBox *menuGroupBox;
+    QGroupBox *printingsGroupBox;
     QGroupBox *cardsGroupBox;
     QGroupBox *handGroupBox;
     QGroupBox *tableGroupBox;
