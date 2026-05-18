@@ -1,13 +1,13 @@
 #include "game_scene.h"
 
 #include "../client/settings/cache_settings.h"
+#include "../game_graphics/zones/select_zone.h"
+#include "../game_graphics/zones/view_zone.h"
+#include "../game_graphics/zones/view_zone_widget.h"
 #include "board/card_item.h"
 #include "phases_toolbar.h"
 #include "player/player.h"
 #include "player/player_graphics_item.h"
-#include "zones/select_zone.h"
-#include "zones/view_zone.h"
-#include "zones/view_zone_widget.h"
 
 #include <QBasicTimer>
 #include <QDebug>

@@ -2,11 +2,11 @@
 #include "arrow_item.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../game_graphics/zones/card_zone.h"
 #include "../player/player.h"
 #include "../player/player_actions.h"
 #include "../player/player_target.h"
 #include "../z_values.h"
-#include "../zones/card_zone.h"
 #include "card_item.h"
 
 #include <QDebug>

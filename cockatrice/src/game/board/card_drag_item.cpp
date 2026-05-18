@@ -1,9 +1,9 @@
 #include "card_drag_item.h"
 
+#include "../../game_graphics/zones/card_zone.h"
+#include "../../game_graphics/zones/table_zone.h"
+#include "../../game_graphics/zones/view_zone.h"
 #include "../game_scene.h"
-#include "../zones/card_zone.h"
-#include "../zones/table_zone.h"
-#include "../zones/view_zone.h"
 #include "card_item.h"
 
 #include <QCursor>

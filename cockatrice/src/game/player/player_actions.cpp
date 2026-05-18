@@ -1,14 +1,14 @@
 #include "player_actions.h"
 
+#include "../../game_graphics/zones/hand_zone.h"
+#include "../../game_graphics/zones/table_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
 #include "../board/card_item.h"
 #include "../client/settings/card_counter_settings.h"
 #include "../dialogs/dlg_move_top_cards_until.h"
 #include "../dialogs/dlg_roll_dice.h"
-#include "../zones/hand_zone.h"
 #include "../zones/logic/view_zone_logic.h"
-#include "../zones/table_zone.h"
 #include "card_menu_action_type.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>

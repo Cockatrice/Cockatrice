@@ -7,7 +7,7 @@
 #ifndef ZONEVIEWERZONE_H
 #define ZONEVIEWERZONE_H
 
-#include "logic/view_zone_logic.h"
+#include "../../game/zones/logic/view_zone_logic.h"
 #include "select_zone.h"
 
 #include <QGraphicsLayoutItem>

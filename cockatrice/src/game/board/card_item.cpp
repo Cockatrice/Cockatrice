@@ -1,14 +1,14 @@
 #include "card_item.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../game_graphics/zones/table_zone.h"
+#include "../../game_graphics/zones/view_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../game_scene.h"
 #include "../phase.h"
 #include "../player/player.h"
 #include "../player/player_actions.h"
 #include "../zones/logic/view_zone_logic.h"
-#include "../zones/table_zone.h"
-#include "../zones/view_zone.h"
 #include "arrow_item.h"
 #include "card_drag_item.h"
 
