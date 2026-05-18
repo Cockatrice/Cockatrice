@@ -8,7 +8,7 @@
 #define MESSAGELOGWIDGET_H
 
 #include "../../interface/widgets/server/chat_view/chat_view.h"
-#include "../zones/logic/card_zone_logic.h"
+#include "../zones/card_zone_logic.h"
 
 class AbstractGame;
 class CardItem;

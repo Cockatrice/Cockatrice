@@ -7,7 +7,7 @@
 #ifndef HANDZONE_H
 #define HANDZONE_H
 
-#include "logic/hand_zone_logic.h"
+#include "../../game/zones/hand_zone_logic.h"
 #include "select_zone.h"
 
 class HandZone : public SelectZone

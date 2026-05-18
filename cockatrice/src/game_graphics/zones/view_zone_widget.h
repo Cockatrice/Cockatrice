@@ -6,7 +6,7 @@
 #ifndef ZONEVIEWWIDGET_H
 #define ZONEVIEWWIDGET_H
 
-#include "logic/card_zone_logic.h"
+#include "../../game/zones/card_zone_logic.h"
 
 #include <QCheckBox>
 #include <QComboBox>

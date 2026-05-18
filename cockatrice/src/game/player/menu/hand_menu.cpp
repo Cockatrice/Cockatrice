@@ -2,8 +2,8 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../../game_graphics/zones/hand_zone.h"
 #include "../../abstract_game.h"
-#include "../../zones/hand_zone.h"
 #include "../player.h"
 #include "../player_actions.h"
 
