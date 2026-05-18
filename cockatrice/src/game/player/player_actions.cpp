@@ -8,7 +8,7 @@
 #include "../client/settings/card_counter_settings.h"
 #include "../dialogs/dlg_move_top_cards_until.h"
 #include "../dialogs/dlg_roll_dice.h"
-#include "../zones/logic/view_zone_logic.h"
+#include "../zones/view_zone_logic.h"
 #include "card_menu_action_type.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>

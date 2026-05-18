@@ -4,7 +4,7 @@
 #include "../../game/board/card_item.h"
 #include "../../game/player/player.h"
 #include "../../game/player/player_actions.h"
-#include "../../game/zones/logic/view_zone_logic.h"
+#include "../../game/zones/view_zone_logic.h"
 
 #include <QBrush>
 #include <QDebug>

@@ -5,7 +5,7 @@
 #include "../../game/card_dimensions.h"
 #include "../../game/player/player.h"
 #include "../../game/player/player_actions.h"
-#include "../../game/zones/logic/stack_zone_logic.h"
+#include "../../game/zones/stack_zone_logic.h"
 #include "../../interface/theme_manager.h"
 
 #include <QPainter>

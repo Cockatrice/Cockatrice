@@ -7,7 +7,7 @@
 #ifndef STACKZONE_H
 #define STACKZONE_H
 
-#include "../../game/zones/logic/stack_zone_logic.h"
+#include "../../game/zones/stack_zone_logic.h"
 #include "select_zone.h"
 
 class StackZone : public SelectZone

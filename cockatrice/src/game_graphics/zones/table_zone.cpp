@@ -7,7 +7,7 @@
 #include "../../game/player/player.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/z_values.h"
-#include "../../game/zones/logic/table_zone_logic.h"
+#include "../../game/zones/table_zone_logic.h"
 #include "../../interface/theme_manager.h"
 
 #include <QGraphicsScene>

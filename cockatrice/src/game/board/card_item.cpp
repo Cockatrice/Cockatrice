@@ -8,7 +8,7 @@
 #include "../phase.h"
 #include "../player/player.h"
 #include "../player/player_actions.h"
-#include "../zones/logic/view_zone_logic.h"
+#include "../zones/view_zone_logic.h"
 #include "arrow_item.h"
 #include "card_drag_item.h"
 

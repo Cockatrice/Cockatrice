@@ -7,7 +7,7 @@
 #ifndef CARDZONE_H
 #define CARDZONE_H
 
-#include "../../game/zones/logic/card_zone_logic.h"
+#include "../../game/zones/card_zone_logic.h"
 #include "../board/abstract_graphics_item.h"
 #include "../board/graphics_item_type.h"
 

@@ -104,12 +104,12 @@ set(cockatrice_SOURCES
     src/game/player/player_manager.cpp
     src/game/player/player_target.cpp
     src/game/replay.cpp
-    src/game/zones/logic/card_zone_logic.cpp
-    src/game/zones/logic/hand_zone_logic.cpp
-    src/game/zones/logic/pile_zone_logic.cpp
-    src/game/zones/logic/stack_zone_logic.cpp
-    src/game/zones/logic/table_zone_logic.cpp
-    src/game/zones/logic/view_zone_logic.cpp
+    src/game/zones/card_zone_logic.cpp
+    src/game/zones/hand_zone_logic.cpp
+    src/game/zones/pile_zone_logic.cpp
+    src/game/zones/stack_zone_logic.cpp
+    src/game/zones/table_zone_logic.cpp
+    src/game/zones/view_zone_logic.cpp
     src/game_graphics/zones/card_zone.cpp
     src/game_graphics/zones/hand_zone.cpp
     src/game_graphics/zones/pile_zone.cpp

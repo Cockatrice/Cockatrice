@@ -1,4 +1,4 @@
-#include "card_zone_algorithms.h"
+#include "../../cockatrice/src/game/zones/card_zone_algorithms.h"
 
 #include <gtest/gtest.h>
 #include <vector>

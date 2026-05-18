@@ -1,7 +1,7 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
-#include "zones/logic/card_zone_logic.h"
+#include "zones/card_zone_logic.h"
 
 #include <QGraphicsScene>
 #include <QList>

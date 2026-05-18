@@ -7,8 +7,8 @@
 #ifndef COCKATRICE_CARD_ZONE_LOGIC_H
 #define COCKATRICE_CARD_ZONE_LOGIC_H
 
-#include "../../../client/translation.h"
-#include "../../board/card_list.h"
+#include "../../client/translation.h"
+#include "../board/card_list.h"
 
 #include <QLoggingCategory>
 #include <QObject>

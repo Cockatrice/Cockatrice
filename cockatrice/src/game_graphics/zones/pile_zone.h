@@ -7,7 +7,7 @@
 #ifndef PILEZONE_H
 #define PILEZONE_H
 
-#include "../../game/zones/logic/pile_zone_logic.h"
+#include "../../game/zones/pile_zone_logic.h"
 #include "card_zone.h"
 
 /**
