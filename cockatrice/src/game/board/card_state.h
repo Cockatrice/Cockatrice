@@ -24,14 +24,14 @@ private:
 signals:
     void stateChanged();
 
-    void attackingChanged(bool);
-    void countersChanged(QMap<int, int>);
-    void annotationChanged(QString);
-    void ptChanged(QString);
-    void doesntUntapChanged(bool);
-    void destroyOnZoneChangeChanged(bool);
-    void attachedToChanged(CardItem *);
-    void zoneChanged(CardZoneLogic *);
+    void attackingChanged(bool newValue);
+    void countersChanged(const QMap<int, int> &newCounters);
+    void annotationChanged(const QString &newAnnotation);
+    void ptChanged(const QString &newPt);
+    void doesntUntapChanged(bool newValue);
+    void destroyOnZoneChangeChanged(bool newValue);
+    void attachedToChanged(CardItem *newAttachedTo);
+    void zoneChanged(CardZoneLogic *newZone);
 
 public:
     explicit CardState(QObject *parent, CardZoneLogic *_zone) : QObject(parent), zone(_zone)
@@ -51,7 +51,7 @@ public:
     {
         return attacking;
     }
-    void setAttacking(bool v);
+    void setAttacking(bool _attacking);
 
     const QMap<int, int> &getCounters() const
     {
@@ -69,35 +69,35 @@ public:
         return annotation;
     }
 
-    void setAnnotation(const QString &a);
+    void setAnnotation(const QString &_annotation);
 
     QString getPT() const
     {
         return pt;
     }
 
-    void setPT(const QString &v);
+    void setPT(const QString &_pt);
 
     bool getDoesntUntap() const
     {
         return doesntUntap;
     }
 
-    void setDoesntUntap(bool v);
+    void setDoesntUntap(bool _doesntUntap);
 
     bool getDestroyOnZoneChange() const
     {
         return destroyOnZoneChange;
     }
 
-    void setDestroyOnZoneChange(bool v);
+    void setDestroyOnZoneChange(bool _destroyOnZoneChange);
 
     CardItem *getAttachedTo() const
     {
         return attachedTo;
     }
 
-    void setAttachedTo(CardItem *c);
+    void setAttachedTo(CardItem *_attachedTo);
 };
 
 #endif // COCKATRICE_CARD_STATE_H

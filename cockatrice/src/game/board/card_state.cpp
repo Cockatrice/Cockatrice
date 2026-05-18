@@ -22,13 +22,13 @@ void CardState::setZone(CardZoneLogic *_zone)
     emit stateChanged();
 }
 
-void CardState::setAttacking(bool v)
+void CardState::setAttacking(bool _attacking)
 {
-    if (attacking == v) {
+    if (attacking == _attacking) {
         return;
     }
-    attacking = v;
-    emit attackingChanged(v);
+    attacking = _attacking;
+    emit attackingChanged(_attacking);
     emit stateChanged();
 }
 
@@ -59,53 +59,53 @@ void CardState::clearCounters()
     emit stateChanged();
 }
 
-void CardState::setAnnotation(const QString &a)
+void CardState::setAnnotation(const QString &_annotation)
 {
-    if (annotation == a) {
+    if (annotation == _annotation) {
         return;
     }
-    annotation = a;
+    annotation = _annotation;
     emit annotationChanged(annotation);
     emit stateChanged();
 }
 
-void CardState::setPT(const QString &v)
+void CardState::setPT(const QString &_pt)
 {
-    if (pt == v) {
+    if (pt == _pt) {
         return;
     }
-    pt = v;
+    pt = _pt;
     emit ptChanged(pt);
     emit stateChanged();
 }
 
-void CardState::setDoesntUntap(bool v)
+void CardState::setDoesntUntap(bool _doesntUntap)
 {
-    if (doesntUntap == v) {
+    if (doesntUntap == _doesntUntap) {
         return;
     }
-    doesntUntap = v;
-    emit doesntUntapChanged(v);
+    doesntUntap = _doesntUntap;
+    emit doesntUntapChanged(_doesntUntap);
     emit stateChanged();
 }
 
-void CardState::setDestroyOnZoneChange(bool v)
+void CardState::setDestroyOnZoneChange(bool _destroyOnZoneChange)
 {
-    if (destroyOnZoneChange == v) {
+    if (destroyOnZoneChange == _destroyOnZoneChange) {
         return;
     }
 
-    destroyOnZoneChange = v;
-    emit destroyOnZoneChangeChanged(v);
+    destroyOnZoneChange = _destroyOnZoneChange;
+    emit destroyOnZoneChangeChanged(_destroyOnZoneChange);
     emit stateChanged();
 }
 
-void CardState::setAttachedTo(CardItem *c)
+void CardState::setAttachedTo(CardItem *_attachedTo)
 {
-    if (attachedTo == c) {
+    if (attachedTo == _attachedTo) {
         return;
     }
-    attachedTo = c;
-    emit attachedToChanged(c);
+    attachedTo = _attachedTo;
+    emit attachedToChanged(_attachedTo);
     emit stateChanged();
 }
