@@ -28,6 +28,7 @@ void ArchidektApiResponseCard::fromJson(const QJsonObject &json)
     pinnedStatus = json.value("pinnedStatus").toInt();
     rarity = json.value("rarity").toString();
     //! \todo Parse globalCategories field (not really important).
+    // globalCategories = {""};
 }
 
 void ArchidektApiResponseCard::debugPrint() const
