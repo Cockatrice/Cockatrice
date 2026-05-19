@@ -72,6 +72,7 @@ signals:
     void newCardAdded(AbstractCardItem *card);
     void rearrangeCounters();
     void activeChanged(bool active);
+    void zoneIdChanged(int zoneId);
     void concededChanged(int playerId, bool conceded);
     void clearCustomZonesMenu();
     void addViewCustomZoneActionToCustomZoneMenu(QString zoneName);

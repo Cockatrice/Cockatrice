@@ -89,7 +89,6 @@ void Player::setConceded(bool _conceded)
     if (conceded != _conceded) {
         conceded = _conceded;
 
-        getGraphicsItem()->setVisible(!conceded);
         if (conceded) {
             clear();
         }
@@ -100,7 +99,7 @@ void Player::setConceded(bool _conceded)
 void Player::setZoneId(int _zoneId)
 {
     zoneId = _zoneId;
-    graphicsItem->getPlayerArea()->setPlayerZoneId(zoneId);
+    emit zoneIdChanged(zoneId);
 }
 
 void Player::processPlayerInfo(const ServerInfo_Player &info)
