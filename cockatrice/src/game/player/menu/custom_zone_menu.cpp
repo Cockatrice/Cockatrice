@@ -1,13 +1,13 @@
 #include "custom_zone_menu.h"
 
-#include "../player.h"
+#include "../player_logic.h"
 
-CustomZoneMenu::CustomZoneMenu(Player *_player) : player(_player)
+CustomZoneMenu::CustomZoneMenu(PlayerLogic *_player) : player(_player)
 {
     menuAction()->setVisible(false);
 
-    connect(player, &Player::clearCustomZonesMenu, this, &CustomZoneMenu::clearCustomZonesMenu);
-    connect(player, &Player::addViewCustomZoneActionToCustomZoneMenu, this,
+    connect(player, &PlayerLogic::clearCustomZonesMenu, this, &CustomZoneMenu::clearCustomZonesMenu);
+    connect(player, &PlayerLogic::addViewCustomZoneActionToCustomZoneMenu, this,
             &CustomZoneMenu::addViewCustomZoneActionToCustomZoneMenu);
 
     retranslateUi();

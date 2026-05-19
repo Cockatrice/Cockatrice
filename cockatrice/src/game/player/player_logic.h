@@ -62,7 +62,7 @@ class TabGame;
 
 const int MAX_TOKENS_PER_DIALOG = 99;
 
-class Player : public QObject
+class PlayerLogic : public QObject
 {
     Q_OBJECT
 
@@ -82,8 +82,8 @@ public slots:
     void setActive(bool _active);
 
 public:
-    Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent);
-    ~Player() override;
+    PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent);
+    ~PlayerLogic() override;
 
     void initializeZones();
     void updateZones();

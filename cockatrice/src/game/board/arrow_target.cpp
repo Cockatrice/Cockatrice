@@ -1,9 +1,9 @@
 #include "arrow_target.h"
 
-#include "../player/player.h"
+#include "../player/player_logic.h"
 #include "arrow_item.h"
 
-ArrowTarget::ArrowTarget(Player *_owner, QGraphicsItem *parent)
+ArrowTarget::ArrowTarget(PlayerLogic *_owner, QGraphicsItem *parent)
     : AbstractGraphicsItem(parent), owner(_owner), beingPointedAt(false)
 {
     setFlag(ItemSendsScenePositionChanges);

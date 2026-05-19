@@ -1,4 +1,4 @@
-#include "player.h"
+#include "player_logic.h"
 
 #include "../../game_graphics/zones/hand_zone.h"
 #include "../../game_graphics/zones/pile_zone.h"
@@ -29,7 +29,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_zone.pb.h>
 #include <libcockatrice/utility/color.h>
 
-Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
+PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
       playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
       conceded(false), zoneId(0), dialogSemaphore(false)
@@ -40,12 +40,12 @@ Player::Player(const ServerInfo_User &info, int _id, bool _local, bool _judge, A
     graphicsItem = new PlayerGraphicsItem(this);
     playerMenu->setMenusForGraphicItems();
 
-    connect(this, &Player::activeChanged, graphicsItem, &PlayerGraphicsItem::onPlayerActiveChanged);
+    connect(this, &PlayerLogic::activeChanged, graphicsItem, &PlayerGraphicsItem::onPlayerActiveChanged);
 
-    connect(this, &Player::openDeckEditor, game->getTab(), &TabGame::openDeckEditor);
+    connect(this, &PlayerLogic::openDeckEditor, game->getTab(), &TabGame::openDeckEditor);
 }
 
-void Player::initializeZones()
+void PlayerLogic::initializeZones()
 {
     addZone(new PileZoneLogic(this, ZoneNames::DECK, false, true, false, this));
     addZone(new PileZoneLogic(this, ZoneNames::GRAVE, false, false, true, this));
@@ -58,7 +58,7 @@ void Player::initializeZones()
     addZone(new HandZoneLogic(this, ZoneNames::HAND, false, false, visibleHand, this));
 }
 
-Player::~Player()
+PlayerLogic::~PlayerLogic()
 {
     qCInfo(PlayerLog) << "Player destructor:" << getPlayerInfo()->getName();
 
@@ -72,7 +72,7 @@ Player::~Player()
     delete getPlayerInfo()->userInfo;
 }
 
-void Player::clear()
+void PlayerLogic::clear()
 {
     clearArrows();
 
@@ -84,7 +84,7 @@ void Player::clear()
     clearCounters();
 }
 
-void Player::setConceded(bool _conceded)
+void PlayerLogic::setConceded(bool _conceded)
 {
     if (conceded != _conceded) {
         conceded = _conceded;
@@ -96,7 +96,7 @@ void Player::setConceded(bool _conceded)
     }
 }
 
-void Player::setZoneId(int _zoneId)
+void PlayerLogic::setZoneId(int _zoneId)
 {
     if (zoneId != _zoneId) {
         zoneId = _zoneId;
@@ -104,7 +104,7 @@ void Player::setZoneId(int _zoneId)
     }
 }
 
-void Player::processPlayerInfo(const ServerInfo_Player &info)
+void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
 {
     static QSet<QString> builtinZones{/* PileZones */
                                       ZoneNames::DECK, ZoneNames::GRAVE, ZoneNames::EXILE, ZoneNames::SIDEBOARD,
@@ -202,7 +202,7 @@ void Player::processPlayerInfo(const ServerInfo_Player &info)
     setConceded(info.properties().conceded());
 }
 
-void Player::processCardAttachment(const ServerInfo_Player &info)
+void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
 {
     const int zoneListSize = info.zone_list_size();
     for (int i = 0; i < zoneListSize; ++i) {
@@ -235,12 +235,12 @@ void Player::processCardAttachment(const ServerInfo_Player &info)
     }
 }
 
-void Player::addCard(CardItem *card)
+void PlayerLogic::addCard(CardItem *card)
 {
     emit newCardAdded(card);
 }
 
-void Player::deleteCard(CardItem *card)
+void PlayerLogic::deleteCard(CardItem *card)
 {
     if (card == nullptr) {
         return;
@@ -251,20 +251,20 @@ void Player::deleteCard(CardItem *card)
     }
 }
 
-void Player::setDeck(const DeckList &_deck)
+void PlayerLogic::setDeck(const DeckList &_deck)
 {
     deck = _deck;
 
     emit deckChanged();
 }
 
-AbstractCounter *Player::addCounter(const ServerInfo_Counter &counter)
+AbstractCounter *PlayerLogic::addCounter(const ServerInfo_Counter &counter)
 {
     return addCounter(counter.id(), QString::fromStdString(counter.name()),
                       convertColorToQColor(counter.counter_color()), counter.radius(), counter.count());
 }
 
-AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
+AbstractCounter *PlayerLogic::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
 {
     if (counters.contains(counterId)) {
         return nullptr;
@@ -288,7 +288,7 @@ AbstractCounter *Player::addCounter(int counterId, const QString &name, QColor c
     return ctr;
 }
 
-void Player::delCounter(int counterId)
+void PlayerLogic::delCounter(int counterId)
 {
     AbstractCounter *ctr = counters.value(counterId, 0);
     if (!ctr) {
@@ -300,7 +300,7 @@ void Player::delCounter(int counterId)
     emit rearrangeCounters();
 }
 
-void Player::clearCounters()
+void PlayerLogic::clearCounters()
 {
     QMapIterator<int, AbstractCounter *> counterIterator(counters);
     while (counterIterator.hasNext()) {
@@ -309,7 +309,7 @@ void Player::clearCounters()
     counters.clear();
 }
 
-void Player::incrementAllCardCounters()
+void PlayerLogic::incrementAllCardCounters()
 {
     auto cardsToUpdate = getGameScene()->selectedCards();
     if (cardsToUpdate.isEmpty()) {
@@ -345,7 +345,7 @@ void Player::incrementAllCardCounters()
     }
 }
 
-AbstractCounter *Player::getLifeCounter() const
+AbstractCounter *PlayerLogic::getLifeCounter() const
 {
     for (auto counter : counters.values()) {
         if (counter->getName() == "life") {
@@ -355,11 +355,11 @@ AbstractCounter *Player::getLifeCounter() const
     return nullptr;
 }
 
-ArrowItem *Player::addArrow(const ServerInfo_Arrow &arrow)
+ArrowItem *PlayerLogic::addArrow(const ServerInfo_Arrow &arrow)
 {
-    const QMap<int, Player *> &playerList = game->getPlayerManager()->getPlayers();
-    Player *startPlayer = playerList.value(arrow.start_player_id(), 0);
-    Player *targetPlayer = playerList.value(arrow.target_player_id(), 0);
+    const QMap<int, PlayerLogic *> &playerList = game->getPlayerManager()->getPlayers();
+    PlayerLogic *startPlayer = playerList.value(arrow.start_player_id(), 0);
+    PlayerLogic *targetPlayer = playerList.value(arrow.target_player_id(), 0);
     if (!startPlayer || !targetPlayer) {
         return nullptr;
     }
@@ -390,7 +390,7 @@ ArrowItem *Player::addArrow(const ServerInfo_Arrow &arrow)
     }
 }
 
-ArrowItem *Player::addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color)
+ArrowItem *PlayerLogic::addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color)
 {
     auto *arrow = new ArrowItem(this, arrowId, startCard, targetItem, color);
     arrows.insert(arrowId, arrow);
@@ -399,7 +399,7 @@ ArrowItem *Player::addArrow(int arrowId, CardItem *startCard, ArrowTarget *targe
     return arrow;
 }
 
-void Player::delArrow(int arrowId)
+void PlayerLogic::delArrow(int arrowId)
 {
     ArrowItem *arr = arrows.value(arrowId, 0);
     if (!arr) {
@@ -408,14 +408,14 @@ void Player::delArrow(int arrowId)
     arr->delArrow();
 }
 
-void Player::removeArrow(ArrowItem *arrow)
+void PlayerLogic::removeArrow(ArrowItem *arrow)
 {
     if (arrow->getId() != -1) {
         arrows.remove(arrow->getId());
     }
 }
 
-void Player::clearArrows()
+void PlayerLogic::clearArrows()
 {
     QMapIterator<int, ArrowItem *> arrowIterator(arrows);
     while (arrowIterator.hasNext()) {
@@ -424,7 +424,7 @@ void Player::clearArrows()
     arrows.clear();
 }
 
-bool Player::clearCardsToDelete()
+bool PlayerLogic::clearCardsToDelete()
 {
     if (cardsToDelete.isEmpty()) {
         return false;
@@ -440,28 +440,28 @@ bool Player::clearCardsToDelete()
     return true;
 }
 
-void Player::setActive(bool _active)
+void PlayerLogic::setActive(bool _active)
 {
     active = _active;
     emit activeChanged(active);
 }
 
-void Player::updateZones()
+void PlayerLogic::updateZones()
 {
     getTableZone()->reorganizeCards();
 }
 
-PlayerGraphicsItem *Player::getGraphicsItem()
+PlayerGraphicsItem *PlayerLogic::getGraphicsItem()
 {
     return graphicsItem;
 }
 
-GameScene *Player::getGameScene()
+GameScene *PlayerLogic::getGameScene()
 {
     return getGraphicsItem()->getGameScene();
 }
 
-void Player::setGameStarted()
+void PlayerLogic::setGameStarted()
 {
     if (playerInfo->local) {
         emit resetTopCardMenuActions();

@@ -5,7 +5,7 @@
 
 #include <QPainter>
 
-GeneralCounter::GeneralCounter(Player *_player,
+GeneralCounter::GeneralCounter(PlayerLogic *_player,
                                int _id,
                                const QString &_name,
                                const QColor &_color,

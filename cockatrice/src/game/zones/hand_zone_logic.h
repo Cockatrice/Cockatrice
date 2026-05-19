@@ -12,7 +12,7 @@ class HandZoneLogic : public CardZoneLogic
 {
     Q_OBJECT
 public:
-    HandZoneLogic(Player *_player,
+    HandZoneLogic(PlayerLogic *_player,
                   const QString &_name,
                   bool _hasCardAttr,
                   bool _isShufflable,

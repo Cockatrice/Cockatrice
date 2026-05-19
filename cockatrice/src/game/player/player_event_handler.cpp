@@ -5,8 +5,8 @@
 #include "../board/arrow_item.h"
 #include "../board/card_item.h"
 #include "../board/card_list.h"
-#include "player.h"
 #include "player_actions.h"
+#include "player_logic.h"
 
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
@@ -32,7 +32,7 @@
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 
-PlayerEventHandler::PlayerEventHandler(Player *_player) : QObject(_player), player(_player)
+PlayerEventHandler::PlayerEventHandler(PlayerLogic *_player) : QObject(_player), player(_player)
 {
 }
 
@@ -261,7 +261,7 @@ void PlayerEventHandler::eventDelCounter(const Event_DelCounter &event)
 
 void PlayerEventHandler::eventDumpZone(const Event_DumpZone &event)
 {
-    Player *zoneOwner = player->getGame()->getPlayerManager()->getPlayers().value(event.zone_owner_id(), 0);
+    PlayerLogic *zoneOwner = player->getGame()->getPlayerManager()->getPlayers().value(event.zone_owner_id(), 0);
     if (!zoneOwner) {
         return;
     }
@@ -274,13 +274,13 @@ void PlayerEventHandler::eventDumpZone(const Event_DumpZone &event)
 
 void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEventContext &context)
 {
-    Player *startPlayer = player->getGame()->getPlayerManager()->getPlayers().value(event.start_player_id());
+    PlayerLogic *startPlayer = player->getGame()->getPlayerManager()->getPlayers().value(event.start_player_id());
     if (!startPlayer) {
         return;
     }
     QString startZoneString = QString::fromStdString(event.start_zone());
     CardZoneLogic *startZone = startPlayer->getZones().value(startZoneString, 0);
-    Player *targetPlayer = player->getGame()->getPlayerManager()->getPlayers().value(event.target_player_id());
+    PlayerLogic *targetPlayer = player->getGame()->getPlayerManager()->getPlayers().value(event.target_player_id());
     if (!targetPlayer) {
         return;
     }
@@ -353,9 +353,9 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
 
     // Look at all arrows from and to the card.
     // If the card was moved to another zone, delete the arrows, otherwise update them.
-    QMapIterator<int, Player *> playerIterator(player->getGame()->getPlayerManager()->getPlayers());
+    QMapIterator<int, PlayerLogic *> playerIterator(player->getGame()->getPlayerManager()->getPlayers());
     while (playerIterator.hasNext()) {
-        Player *p = playerIterator.next().value();
+        PlayerLogic *p = playerIterator.next().value();
 
         QList<ArrowItem *> arrowsToDelete;
         QMapIterator<int, ArrowItem *> arrowIterator(p->getArrows());
@@ -428,8 +428,8 @@ void PlayerEventHandler::eventDestroyCard(const Event_DestroyCard &event)
 
 void PlayerEventHandler::eventAttachCard(const Event_AttachCard &event)
 {
-    const QMap<int, Player *> &playerList = player->getGame()->getPlayerManager()->getPlayers();
-    Player *targetPlayer = nullptr;
+    const QMap<int, PlayerLogic *> &playerList = player->getGame()->getPlayerManager()->getPlayers();
+    PlayerLogic *targetPlayer = nullptr;
     CardZoneLogic *targetZone = nullptr;
     CardItem *targetCard = nullptr;
     if (event.has_target_player_id()) {
@@ -506,7 +506,7 @@ void PlayerEventHandler::eventRevealCards(const Event_RevealCards &event, EventP
     if (!zone) {
         return;
     }
-    Player *otherPlayer = nullptr;
+    PlayerLogic *otherPlayer = nullptr;
     if (event.has_other_player_id()) {
         otherPlayer = player->getGame()->getPlayerManager()->getPlayers().value(event.other_player_id());
         if (!otherPlayer) {

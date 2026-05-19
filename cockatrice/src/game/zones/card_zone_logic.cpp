@@ -2,8 +2,8 @@
 
 #include "../../game_graphics/zones/view_zone.h"
 #include "../board/card_item.h"
-#include "../player/player.h"
 #include "../player/player_actions.h"
+#include "../player/player_logic.h"
 #include "view_zone_logic.h"
 
 #include <QAction>
@@ -20,7 +20,7 @@
  * @param _contentsKnown whether the cards in the zone are known to the client
  * @param parent the parent QObject.
  */
-CardZoneLogic::CardZoneLogic(Player *_player,
+CardZoneLogic::CardZoneLogic(PlayerLogic *_player,
                              const QString &_name,
                              bool _hasCardAttr,
                              bool _isShufflable,

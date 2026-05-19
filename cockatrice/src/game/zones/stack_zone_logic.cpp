@@ -3,7 +3,7 @@
 #include "../board/card_item.h"
 #include "card_zone_algorithms.h"
 
-StackZoneLogic::StackZoneLogic(Player *_player,
+StackZoneLogic::StackZoneLogic(PlayerLogic *_player,
                                const QString &_name,
                                bool _hasCardAttr,
                                bool _isShufflable,

@@ -10,7 +10,7 @@
 #include "../dialogs/dlg_create_token.h"
 #include "../dialogs/dlg_move_top_cards_until.h"
 #include "event_processing_options.h"
-#include "player.h"
+#include "player_logic.h"
 
 #include <QMenu>
 #include <QObject>
@@ -29,7 +29,7 @@ class CardItem;
 class Command_MoveCard;
 class GameEventContext;
 class PendingCommand;
-class Player;
+class PlayerLogic;
 class PlayerActions : public QObject
 {
     Q_OBJECT
@@ -40,7 +40,7 @@ public:
         RANDOM_CARD_FROM_ZONE = -2
     };
 
-    explicit PlayerActions(Player *player);
+    explicit PlayerActions(PlayerLogic *player);
 
     void sendGameCommand(PendingCommand *pend);
     void sendGameCommand(const google::protobuf::Message &command);
@@ -159,7 +159,7 @@ public slots:
     void cardMenuAction();
 
 private:
-    Player *player;
+    PlayerLogic *player;
 
     int defaultNumberTopCards = 1;
     int defaultNumberTopCardsToPlaceBelow = 1;

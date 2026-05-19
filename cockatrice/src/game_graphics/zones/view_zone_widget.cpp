@@ -4,8 +4,8 @@
 #include "../../filters/syntax_help.h"
 #include "../../game/board/card_item.h"
 #include "../../game/game_scene.h"
-#include "../../game/player/player.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_logic.h"
 #include "../../game/z_values.h"
 #include "../../interface/pixel_map_generator.h"
 #include "view_zone.h"
@@ -37,7 +37,7 @@ constexpr qreal kMinVisibleWidth = 100.0;
  * @param _revealZone if false, the cards will be face down.
  * @param _writeableRevealZone whether the player can interact with the revealed cards.
  */
-ZoneViewWidget::ZoneViewWidget(Player *_player,
+ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
                                CardZoneLogic *_origZone,
                                int numberCards,
                                bool _revealZone,

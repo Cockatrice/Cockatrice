@@ -11,12 +11,12 @@
 
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class CustomZoneMenu : public QMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
 public:
-    explicit CustomZoneMenu(Player *player);
+    explicit CustomZoneMenu(PlayerLogic *player);
     void retranslateUi() override;
     void setShortcutsActive() override
     {
@@ -26,7 +26,7 @@ public:
     }
 
 private:
-    Player *player;
+    PlayerLogic *player;
 private slots:
     void clearCustomZonesMenu();
     void addViewCustomZoneActionToCustomZoneMenu(QString zoneName);

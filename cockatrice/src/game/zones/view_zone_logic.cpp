@@ -9,7 +9,7 @@
  * @param _revealZone if false, the cards will be face down.
  * @param _writeableRevealZone whether the player can interact with the revealed cards.
  */
-ZoneViewZoneLogic::ZoneViewZoneLogic(Player *_player,
+ZoneViewZoneLogic::ZoneViewZoneLogic(PlayerLogic *_player,
                                      CardZoneLogic *_origZone,
                                      int _numberCards,
                                      bool _revealZone,

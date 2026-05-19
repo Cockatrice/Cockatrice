@@ -1,9 +1,9 @@
 #include "pt_menu.h"
 
-#include "../player.h"
 #include "../player_actions.h"
+#include "../player_logic.h"
 
-PtMenu::PtMenu(Player *player) : QMenu(tr("Power / toughness"))
+PtMenu::PtMenu(PlayerLogic *player) : QMenu(tr("Power / toughness"))
 {
     PlayerActions *playerActions = player->getPlayerActions();
 

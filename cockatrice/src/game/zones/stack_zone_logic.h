@@ -12,7 +12,7 @@ class StackZoneLogic : public CardZoneLogic
 {
     Q_OBJECT
 public:
-    StackZoneLogic(Player *_player,
+    StackZoneLogic(PlayerLogic *_player,
                    const QString &_name,
                    bool _hasCardAttr,
                    bool _isShufflable,

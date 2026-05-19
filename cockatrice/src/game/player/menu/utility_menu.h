@@ -11,7 +11,7 @@
 
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class UtilityMenu : public QMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
@@ -22,7 +22,7 @@ public slots:
     void setShortcutsInactive() override;
 
 public:
-    explicit UtilityMenu(Player *player, QMenu *playerMenu);
+    explicit UtilityMenu(PlayerLogic *player, QMenu *playerMenu);
 
     [[nodiscard]] bool createAnotherTokenActionExists() const
     {
@@ -41,7 +41,7 @@ public:
     }
 
 private:
-    Player *player;
+    PlayerLogic *player;
     QStringList predefinedTokens;
 
     QMenu *createPredefinedTokenMenu;

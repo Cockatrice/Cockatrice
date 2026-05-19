@@ -12,7 +12,7 @@
 class CardItem;
 class QGraphicsSceneMouseEvent;
 class QMenu;
-class Player;
+class PlayerLogic;
 class ArrowTarget;
 
 class ArrowItem : public QObject, public QGraphicsItem
@@ -24,7 +24,7 @@ private:
     QMenu *menu;
 
 protected:
-    Player *player;
+    PlayerLogic *player;
     int id;
     ArrowTarget *startItem, *targetItem;
     bool targetLocked;
@@ -33,7 +33,7 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
 public:
-    ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &color);
+    ArrowItem(PlayerLogic *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &color);
     ~ArrowItem() override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     [[nodiscard]] QRectF boundingRect() const override
@@ -51,7 +51,7 @@ public:
     {
         return id;
     }
-    [[nodiscard]] Player *getPlayer() const
+    [[nodiscard]] PlayerLogic *getPlayer() const
     {
         return player;
     }
@@ -86,7 +86,7 @@ private:
     QList<ArrowDragItem *> childArrows;
 
 public:
-    ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase);
+    ArrowDragItem(PlayerLogic *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase);
     void addChildArrow(ArrowDragItem *childArrow);
 
 protected:

@@ -17,7 +17,7 @@ class CardDatabase;
 class CardDragItem;
 class CardZone;
 class ServerInfo_Card;
-class Player;
+class PlayerLogic;
 class QAction;
 class QColor;
 
@@ -48,7 +48,7 @@ public:
     {
         return Type;
     }
-    explicit CardItem(Player *_owner,
+    explicit CardItem(PlayerLogic *_owner,
                       QGraphicsItem *parent = nullptr,
                       const CardRef &cardRef = {},
                       int _cardid = -1,
@@ -73,11 +73,11 @@ public:
     {
         return gridPoint;
     }
-    [[nodiscard]] Player *getOwner() const
+    [[nodiscard]] PlayerLogic *getOwner() const
     {
         return owner;
     }
-    void setOwner(Player *_owner)
+    void setOwner(PlayerLogic *_owner)
     {
         owner = _owner;
     }

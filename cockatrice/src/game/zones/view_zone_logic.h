@@ -30,7 +30,7 @@ public:
         REMOVE_CARD
     };
 
-    ZoneViewZoneLogic(Player *_player,
+    ZoneViewZoneLogic(PlayerLogic *_player,
                       CardZoneLogic *_origZone,
                       int _numberCards,
                       bool _revealZone,

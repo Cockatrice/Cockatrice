@@ -4,14 +4,14 @@
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../../game_graphics/zones/hand_zone.h"
 #include "../../abstract_game.h"
-#include "../player.h"
 #include "../player_actions.h"
+#include "../player_logic.h"
 
 #include <QAction>
 #include <QMenu>
 #include <libcockatrice/utility/zone_names.h>
 
-HandMenu::HandMenu(Player *_player, PlayerActions *actions, QWidget *parent) : TearOffMenu(parent), player(_player)
+HandMenu::HandMenu(PlayerLogic *_player, PlayerActions *actions, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
     if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
         aViewHand = new QAction(this);

@@ -1,11 +1,11 @@
 #include "rfg_menu.h"
 
-#include "../player.h"
 #include "../player_actions.h"
+#include "../player_logic.h"
 
 #include <libcockatrice/utility/zone_names.h>
 
-RfgMenu::RfgMenu(Player *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
+RfgMenu::RfgMenu(PlayerLogic *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
     createMoveActions();
     createViewActions();

@@ -5,8 +5,8 @@
 #include "../../board/card_item.h"
 #include "../../zones/view_zone_logic.h"
 #include "../card_menu_action_type.h"
-#include "../player.h"
 #include "../player_actions.h"
+#include "../player_logic.h"
 #include "move_menu.h"
 #include "pt_menu.h"
 
@@ -14,12 +14,12 @@
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/utility/zone_names.h>
 
-CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive)
+CardMenu::CardMenu(PlayerLogic *_player, const CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
 {
     auto playerActions = player->getPlayerActions();
 
-    const QList<Player *> &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    const QList<PlayerLogic *> &players = player->getGame()->getPlayerManager()->getPlayers().values();
 
     for (auto playerToAdd : players) {
         if (playerToAdd == player) {
@@ -137,7 +137,7 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
     }
 }
 
-void CardMenu::removePlayer(Player *playerToRemove)
+void CardMenu::removePlayer(PlayerLogic *playerToRemove)
 {
     for (auto it = playersInfo.begin(); it != playersInfo.end();) {
         if (it->second == playerToRemove->getPlayerInfo()->getId()) {

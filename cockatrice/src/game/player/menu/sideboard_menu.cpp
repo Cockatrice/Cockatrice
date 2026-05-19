@@ -1,9 +1,9 @@
 #include "sideboard_menu.h"
 
-#include "../player.h"
 #include "../player_actions.h"
+#include "../player_logic.h"
 
-SideboardMenu::SideboardMenu(Player *player, QMenu *playerMenu) : QMenu(playerMenu)
+SideboardMenu::SideboardMenu(PlayerLogic *player, QMenu *playerMenu) : QMenu(playerMenu)
 {
     aViewSideboard = new QAction(this);
     connect(aViewSideboard, &QAction::triggered, player->getPlayerActions(), &PlayerActions::actViewSideboard);

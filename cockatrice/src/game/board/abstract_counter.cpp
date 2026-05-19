@@ -2,8 +2,8 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../interface/widgets/tabs/tab_game.h"
-#include "../player/player.h"
 #include "../player/player_actions.h"
+#include "../player/player_logic.h"
 #include "translate_counter_name.h"
 
 #include <QAction>
@@ -16,7 +16,7 @@
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
 #include <libcockatrice/utility/expression.h>
 
-AbstractCounter::AbstractCounter(Player *_player,
+AbstractCounter::AbstractCounter(PlayerLogic *_player,
                                  int _id,
                                  const QString &_name,
                                  bool _shownInCounterArea,

@@ -13,7 +13,7 @@
 #include <QAction>
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class PlayerActions;
 
 class HandMenu : public TearOffMenu, public AbstractPlayerComponent
@@ -21,7 +21,7 @@ class HandMenu : public TearOffMenu, public AbstractPlayerComponent
     Q_OBJECT
 
 public:
-    HandMenu(Player *player, PlayerActions *actions, QWidget *parent = nullptr);
+    HandMenu(PlayerLogic *player, PlayerActions *actions, QWidget *parent = nullptr);
 
     QMenu *revealHandMenu() const
     {
@@ -43,7 +43,7 @@ private slots:
     void onRevealRandomHandCardTriggered();
 
 private:
-    Player *player;
+    PlayerLogic *player;
 
     QAction *aViewHand = nullptr;
     QAction *aMulligan = nullptr;

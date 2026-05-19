@@ -1,14 +1,14 @@
 #include "utility_menu.h"
 
 #include "../../../interface/deck_loader/deck_loader.h"
-#include "../player.h"
 #include "../player_actions.h"
+#include "../player_logic.h"
 #include "player_menu.h"
 
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 
-UtilityMenu::UtilityMenu(Player *_player, QMenu *playerMenu) : QMenu(playerMenu), player(_player)
+UtilityMenu::UtilityMenu(PlayerLogic *_player, QMenu *playerMenu) : QMenu(playerMenu), player(_player)
 {
     PlayerActions *playerActions = player->getPlayerActions();
 
@@ -30,11 +30,11 @@ UtilityMenu::UtilityMenu(Player *_player, QMenu *playerMenu) : QMenu(playerMenu)
         aCreateAnotherToken->setEnabled(false);
 
         aIncrementAllCardCounters = new QAction(this);
-        connect(aIncrementAllCardCounters, &QAction::triggered, player, &Player::incrementAllCardCounters);
+        connect(aIncrementAllCardCounters, &QAction::triggered, player, &PlayerLogic::incrementAllCardCounters);
 
         createPredefinedTokenMenu = new QMenu(QString());
         createPredefinedTokenMenu->setEnabled(false);
-        connect(player, &Player::deckChanged, this, &UtilityMenu::populatePredefinedTokensMenu);
+        connect(player, &PlayerLogic::deckChanged, this, &UtilityMenu::populatePredefinedTokensMenu);
 
         playerMenu->addAction(aIncrementAllCardCounters);
         playerMenu->addSeparator();

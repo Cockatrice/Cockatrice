@@ -1,10 +1,10 @@
 #include "say_menu.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../player.h"
 #include "../player_actions.h"
+#include "../player_logic.h"
 
-SayMenu::SayMenu(Player *_player) : player(_player)
+SayMenu::SayMenu(PlayerLogic *_player) : player(_player)
 {
     connect(&SettingsCache::instance().messages(), &MessageSettings::messageMacrosChanged, this, &SayMenu::initSayMenu);
     initSayMenu();

@@ -10,14 +10,14 @@
 #include <QMenu>
 
 class CardItem;
-class Player;
+class PlayerLogic;
 class CardMenu : public QMenu
 {
     Q_OBJECT
 
 public:
-    explicit CardMenu(Player *player, const CardItem *card, bool shortcutsActive);
-    void removePlayer(Player *playerToRemove);
+    explicit CardMenu(PlayerLogic *player, const CardItem *card, bool shortcutsActive);
+    void removePlayer(PlayerLogic *playerToRemove);
     void createTableMenu(bool canModifyCard);
     void createStackMenu(bool canModifyCard);
     void createGraveyardOrExileMenu(bool canModifyCard);
@@ -41,7 +41,7 @@ public:
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 
 private:
-    Player *player;
+    PlayerLogic *player;
     const CardItem *card;
     QList<QPair<QString, int>> playersInfo;
     bool shortcutsActive;

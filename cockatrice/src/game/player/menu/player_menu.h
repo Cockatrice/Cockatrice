@@ -8,7 +8,7 @@
 #define COCKATRICE_PLAYER_MENU_H
 
 #include "../../../interface/widgets/menus/tearoff_menu.h"
-#include "../player.h"
+#include "../player_logic.h"
 #include "custom_zone_menu.h"
 #include "grave_menu.h"
 #include "hand_menu.h"
@@ -37,7 +37,7 @@ private slots:
     void refreshShortcuts();
 
 public:
-    explicit PlayerMenu(Player *player);
+    explicit PlayerMenu(PlayerLogic *player);
     /// Lifecycle methods: delegate to all managedComponents, plus counters separately via player->getCounters().
     void retranslateUi();
 
@@ -74,7 +74,7 @@ public:
     void setShortcutsInactive();
 
 private:
-    Player *player;
+    PlayerLogic *player;
     TearOffMenu *playerMenu;
     QMenu *countersMenu;
     HandMenu *handMenu;

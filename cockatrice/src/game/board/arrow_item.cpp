@@ -3,8 +3,8 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../game_graphics/zones/card_zone.h"
-#include "../player/player.h"
 #include "../player/player_actions.h"
+#include "../player/player_logic.h"
 #include "../player/player_target.h"
 #include "../z_values.h"
 #include "card_item.h"
@@ -21,7 +21,11 @@
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/zone_names.h>
 
-ArrowItem::ArrowItem(Player *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color)
+ArrowItem::ArrowItem(PlayerLogic *_player,
+                     int _id,
+                     ArrowTarget *_startItem,
+                     ArrowTarget *_targetItem,
+                     const QColor &_color)
     : QGraphicsItem(), player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), targetLocked(false),
       color(_color), fullColor(true)
 {
@@ -160,7 +164,7 @@ void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
-ArrowDragItem::ArrowDragItem(Player *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase)
+ArrowDragItem::ArrowDragItem(PlayerLogic *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase)
     : ArrowItem(_owner, -1, _startItem, 0, _color), deleteInPhase(_deleteInPhase)
 {
 }
