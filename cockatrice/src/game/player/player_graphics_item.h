@@ -121,6 +121,7 @@ private:
     HandZone *handZoneGraphicsItem;
     QRectF bRect;
     bool mirrored;
+    bool handVisible = false;
 
 private slots:
     void updateBoundingRect();
