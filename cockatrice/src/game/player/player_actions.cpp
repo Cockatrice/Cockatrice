@@ -1069,7 +1069,14 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard, const 
             createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
         }
     } else {
-        auto attachType = cardRelation->getAttachType();
+        CardRelationType attachType;
+        // do not attempt to attach to another player's cards, this causes the card to attempt to attach to the same
+        // cardid on the local player's field instead, which is an entirely different card!
+        if (player->getPlayerInfo()->getLocalOrJudge()) {
+            attachType = cardRelation->getAttachType();
+        } else {
+            attachType = CardRelationType::DoesNotAttach;
+        }
 
         // move card onto table first if attaching from some other zone
         // we only do this for AttachTo because cross-zone TransformInto is already handled server-side
