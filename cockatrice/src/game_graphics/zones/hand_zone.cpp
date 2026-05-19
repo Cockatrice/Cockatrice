@@ -3,8 +3,8 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../game/board/card_drag_item.h"
 #include "../../game/board/card_item.h"
-#include "../../game/player/player.h"
 #include "../../game/player/player_actions.h"
+#include "../../game/player/player_logic.h"
 #include "../../interface/theme_manager.h"
 
 #include <QPainter>

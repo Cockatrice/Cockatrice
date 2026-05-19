@@ -21,7 +21,7 @@ namespace protobuf
 class Message;
 }
 } // namespace google
-class Player;
+class PlayerLogic;
 class GameCommand;
 
 class PhaseButton : public QObject, public QGraphicsItem

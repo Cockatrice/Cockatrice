@@ -6,8 +6,8 @@
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../game_scene.h"
 #include "../phase.h"
-#include "../player/player.h"
 #include "../player/player_actions.h"
+#include "../player/player_logic.h"
 #include "../zones/view_zone_logic.h"
 #include "arrow_item.h"
 #include "card_drag_item.h"
@@ -20,7 +20,11 @@
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 
-CardItem::CardItem(Player *_owner, QGraphicsItem *parent, const CardRef &cardRef, int _cardid, CardZoneLogic *_zone)
+CardItem::CardItem(PlayerLogic *_owner,
+                   QGraphicsItem *parent,
+                   const CardRef &cardRef,
+                   int _cardid,
+                   CardZoneLogic *_zone)
     : AbstractCardItem(parent, cardRef, _owner, _cardid), state(new CardState(this, _zone)), dragItem(nullptr)
 {
     owner->addCard(this);
@@ -273,7 +277,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
     }
 
     auto *game = owner->getGame();
-    Player *arrowOwner = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
+    PlayerLogic *arrowOwner = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
     int phase = 0; // 0 means to not set the phase
     if (SettingsCache::instance().getDoNotDeleteArrowsInSubPhases()) {
         int currentPhase = game->getGameState()->getCurrentPhase();

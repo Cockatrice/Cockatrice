@@ -1,7 +1,7 @@
 #include "abstract_game.h"
 
 #include "../interface/widgets/tabs/tab_game.h"
-#include "player/player.h"
+#include "player/player_logic.h"
 
 AbstractGame::AbstractGame(TabGame *_tab) : QObject(_tab), tab(_tab)
 {
@@ -44,7 +44,7 @@ void AbstractGame::setActiveCard(CardItem *card)
 
 CardItem *AbstractGame::getCard(int playerId, const QString &zoneName, int cardId) const
 {
-    Player *player = playerManager->getPlayer(playerId);
+    PlayerLogic *player = playerManager->getPlayer(playerId);
     if (!player) {
         return nullptr;
     }

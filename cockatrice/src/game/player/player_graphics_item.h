@@ -7,7 +7,7 @@
 #ifndef COCKATRICE_PLAYER_GRAPHICS_ITEM_H
 #define COCKATRICE_PLAYER_GRAPHICS_ITEM_H
 #include "../game_scene.h"
-#include "player.h"
+#include "player_logic.h"
 
 #include <QGraphicsObject>
 
@@ -34,7 +34,7 @@ public:
 
     static constexpr int counterAreaWidth = 55;
 
-    explicit PlayerGraphicsItem(Player *player);
+    explicit PlayerGraphicsItem(PlayerLogic *player);
     void initializeZones();
 
     [[nodiscard]] QRectF boundingRect() const override;
@@ -54,7 +54,7 @@ public:
         return static_cast<GameScene *>(scene());
     }
 
-    Player *getPlayer() const
+    PlayerLogic *getPlayer() const
     {
         return player;
     }
@@ -109,7 +109,7 @@ signals:
     void playerCountChanged();
 
 private:
-    Player *player;
+    PlayerLogic *player;
     PlayerArea *playerArea;
     PlayerTarget *playerTarget;
     PileZone *deckZoneGraphicsItem;

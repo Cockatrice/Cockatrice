@@ -20,7 +20,7 @@ class QLabel;
 class QPushButton;
 class CardZone;
 class ZoneViewZone;
-class Player;
+class PlayerLogic;
 class CardDatabase;
 class QScrollBar;
 class GameScene;
@@ -65,7 +65,7 @@ private:
 
     bool canBeShuffled;
     int extraHeight;
-    Player *player;
+    PlayerLogic *player;
 
     bool draggingWindow = false;
     QPoint dragStartScreenPos;
@@ -108,7 +108,7 @@ private slots:
     void expandWindow();
 
 public:
-    ZoneViewWidget(Player *_player,
+    ZoneViewWidget(PlayerLogic *_player,
                    CardZoneLogic *_origZone,
                    int numberCards = 0,
                    bool _revealZone = false,
@@ -119,7 +119,7 @@ public:
     {
         return zone;
     }
-    Player *getPlayer() const
+    PlayerLogic *getPlayer() const
     {
         return player;
     }

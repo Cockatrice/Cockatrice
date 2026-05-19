@@ -8,15 +8,15 @@
 #include "../board/abstract_card_item.h"
 #include "../hand_counter.h"
 
-PlayerGraphicsItem::PlayerGraphicsItem(Player *_player) : player(_player)
+PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 {
     connect(&SettingsCache::instance(), &SettingsCache::horizontalHandChanged, this,
             &PlayerGraphicsItem::rearrangeZones);
     connect(&SettingsCache::instance(), &SettingsCache::handJustificationChanged, this,
             &PlayerGraphicsItem::rearrangeZones);
-    connect(player, &Player::rearrangeCounters, this, &PlayerGraphicsItem::rearrangeCounters);
-    connect(player, &Player::concededChanged, this, [this](int, bool c) { setVisible(!c); });
-    connect(player, &Player::zoneIdChanged, this, [this](int id) { playerArea->setPlayerZoneId(id); });
+    connect(player, &PlayerLogic::rearrangeCounters, this, &PlayerGraphicsItem::rearrangeCounters);
+    connect(player, &PlayerLogic::concededChanged, this, [this](int, bool c) { setVisible(!c); });
+    connect(player, &PlayerLogic::zoneIdChanged, this, [this](int id) { playerArea->setPlayerZoneId(id); });
 
     playerArea = new PlayerArea(this);
 

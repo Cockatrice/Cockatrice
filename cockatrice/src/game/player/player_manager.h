@@ -12,7 +12,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h>
 
 class AbstractGame;
-class Player;
+class PlayerLogic;
 class PlayerManager : public QObject
 {
     Q_OBJECT
@@ -21,7 +21,7 @@ public:
     PlayerManager(AbstractGame *_game, int _localPlayerId, bool _localPlayerIsJudge, bool localPlayerIsSpectator);
 
     AbstractGame *game;
-    QMap<int, Player *> players;
+    QMap<int, PlayerLogic *> players;
     int localPlayerId;
     bool localPlayerIsJudge;
     bool localPlayerIsSpectator;
@@ -42,7 +42,7 @@ public:
         return localPlayerId;
     }
 
-    [[nodiscard]] const QMap<int, Player *> &getPlayers() const
+    [[nodiscard]] const QMap<int, PlayerLogic *> &getPlayers() const
     {
         return players;
     }
@@ -52,14 +52,14 @@ public:
         return players.size();
     }
 
-    [[nodiscard]] Player *getActiveLocalPlayer(int activePlayer) const;
+    [[nodiscard]] PlayerLogic *getActiveLocalPlayer(int activePlayer) const;
     bool isLocalPlayer(int playerId);
 
-    Player *addPlayer(int playerId, const ServerInfo_User &info);
+    PlayerLogic *addPlayer(int playerId, const ServerInfo_User &info);
 
     void removePlayer(int playerId);
 
-    [[nodiscard]] Player *getPlayer(int playerId) const;
+    [[nodiscard]] PlayerLogic *getPlayer(int playerId) const;
 
     void onPlayerConceded(int playerId, bool conceded);
 
@@ -106,8 +106,8 @@ public:
     }
 
 signals:
-    void playerAdded(Player *player);
-    void playerRemoved(Player *player);
+    void playerAdded(PlayerLogic *player);
+    void playerRemoved(PlayerLogic *player);
     void activeLocalPlayerConceded();
     void activeLocalPlayerUnconceded();
     void playerConceded(int playerId);

@@ -15,7 +15,7 @@
 
 inline Q_LOGGING_CATEGORY(CardZoneLogicLog, "card_zone_logic");
 
-class Player;
+class PlayerLogic;
 class ZoneViewZone;
 class QMenu;
 class QAction;
@@ -35,7 +35,7 @@ signals:
     void retranslateUi();
 
 public:
-    explicit CardZoneLogic(Player *_player,
+    explicit CardZoneLogic(PlayerLogic *_player,
                            const QString &_name,
                            bool _hasCardAttr,
                            bool _isShufflable,
@@ -68,7 +68,7 @@ public:
         return name;
     }
     [[nodiscard]] QString getTranslatedName(bool theirOwn, GrammaticalCase gc) const;
-    [[nodiscard]] Player *getPlayer() const
+    [[nodiscard]] PlayerLogic *getPlayer() const
     {
         return player;
     }
@@ -105,7 +105,7 @@ private slots:
     void refreshCardInfos();
 
 protected:
-    Player *player;
+    PlayerLogic *player;
     QString name;
     CardList cards;
     QList<ZoneViewZone *> views;

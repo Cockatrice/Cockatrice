@@ -99,7 +99,7 @@ void GameEventHandler::processGameEventContainer(const GameEventContainer &cont,
 
         if (cont.has_forced_by_judge()) {
             auto id = cont.forced_by_judge();
-            Player *judgep = game->getPlayerManager()->getPlayers().value(id, nullptr);
+            PlayerLogic *judgep = game->getPlayerManager()->getPlayers().value(id, nullptr);
             if (judgep) {
                 emit setContextJudgeName(judgep->getPlayerInfo()->getName());
             } else if (game->getPlayerManager()->getSpectators().contains(id)) {
@@ -160,7 +160,7 @@ void GameEventHandler::processGameEventContainer(const GameEventContainer &cont,
                     break;
 
                 default: {
-                    Player *player = game->getPlayerManager()->getPlayers().value(playerId, 0);
+                    PlayerLogic *player = game->getPlayerManager()->getPlayers().value(playerId, 0);
                     if (!player) {
                         qCWarning(GameEventHandlerLog) << "unhandled game event: invalid player id";
                         break;
@@ -261,7 +261,7 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
                 emit spectatorJoined(prop);
             }
         } else {
-            Player *player = game->getPlayerManager()->getPlayers().value(playerId, 0);
+            PlayerLogic *player = game->getPlayerManager()->getPlayers().value(playerId, 0);
             if (!player) {
                 player = game->getPlayerManager()->addPlayer(playerId, prop.user_info());
                 emit playerJoined(prop);
@@ -310,7 +310,7 @@ void GameEventHandler::processCardAttachmentsForPlayers(const Event_GameStateCha
         const ServerInfo_Player &playerInfo = event.player_list(i);
         const ServerInfo_PlayerProperties &prop = playerInfo.properties();
         if (!prop.spectator()) {
-            Player *player = game->getPlayerManager()->getPlayers().value(prop.player_id(), 0);
+            PlayerLogic *player = game->getPlayerManager()->getPlayers().value(prop.player_id(), 0);
             if (!player) {
                 continue;
             }
@@ -323,7 +323,7 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
                                                     int eventPlayerId,
                                                     const GameEventContext &context)
 {
-    Player *player = game->getPlayerManager()->getPlayers().value(eventPlayerId, 0);
+    PlayerLogic *player = game->getPlayerManager()->getPlayers().value(eventPlayerId, 0);
     if (!player) {
         return;
     }
@@ -347,7 +347,7 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
         case GameEventContext::CONCEDE: {
             player->setConceded(true);
 
-            QMapIterator<int, Player *> playerIterator(game->getPlayerManager()->getPlayers());
+            QMapIterator<int, PlayerLogic *> playerIterator(game->getPlayerManager()->getPlayers());
             while (playerIterator.hasNext()) {
                 playerIterator.next().value()->updateZones();
             }
@@ -359,7 +359,7 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
         case GameEventContext::UNCONCEDE: {
             player->setConceded(false);
 
-            QMapIterator<int, Player *> playerIterator(game->getPlayerManager()->getPlayers());
+            QMapIterator<int, PlayerLogic *> playerIterator(game->getPlayerManager()->getPlayers());
             while (playerIterator.hasNext()) {
                 playerIterator.next().value()->updateZones();
             }
@@ -409,7 +409,7 @@ void GameEventHandler::eventJoin(const Event_Join &event, int /*eventPlayerId*/,
         emit logJoinSpectator(playerName);
         emit spectatorJoined(playerInfo);
     } else {
-        Player *newPlayer = game->getPlayerManager()->addPlayer(playerId, playerInfo.user_info());
+        PlayerLogic *newPlayer = game->getPlayerManager()->addPlayer(playerId, playerInfo.user_info());
         emit logJoinPlayer(newPlayer);
         emit playerJoined(playerInfo);
     }
@@ -437,7 +437,7 @@ QString GameEventHandler::getLeaveReason(Event_Leave::LeaveReason reason)
 }
 void GameEventHandler::eventLeave(const Event_Leave &event, int eventPlayerId, const GameEventContext & /*context*/)
 {
-    Player *player = game->getPlayerManager()->getPlayers().value(eventPlayerId, 0);
+    PlayerLogic *player = game->getPlayerManager()->getPlayers().value(eventPlayerId, 0);
     if (!player) {
         return;
     }
@@ -452,7 +452,7 @@ void GameEventHandler::eventLeave(const Event_Leave &event, int eventPlayerId, c
     player->deleteLater();
 
     // Rearrange all remaining zones so that attachment relationship updates take place
-    QMapIterator<int, Player *> playerIterator(game->getPlayerManager()->getPlayers());
+    QMapIterator<int, PlayerLogic *> playerIterator(game->getPlayerManager()->getPlayers());
     while (playerIterator.hasNext()) {
         playerIterator.next().value()->updateZones();
     }
@@ -474,7 +474,7 @@ void GameEventHandler::eventReverseTurn(const Event_ReverseTurn &event,
                                         int eventPlayerId,
                                         const GameEventContext & /*context*/)
 {
-    Player *player = game->getPlayerManager()->getPlayers().value(eventPlayerId, 0);
+    PlayerLogic *player = game->getPlayerManager()->getPlayers().value(eventPlayerId, 0);
     if (!player) {
         return;
     }
@@ -505,7 +505,7 @@ void GameEventHandler::eventSetActivePlayer(const Event_SetActivePlayer &event,
                                             const GameEventContext & /*context*/)
 {
     game->getGameState()->setActivePlayer(event.active_player_id());
-    Player *player = game->getPlayerManager()->getPlayer(event.active_player_id());
+    PlayerLogic *player = game->getPlayerManager()->getPlayer(event.active_player_id());
     if (!player) {
         return;
     }

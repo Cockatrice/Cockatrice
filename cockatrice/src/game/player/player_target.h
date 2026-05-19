@@ -13,13 +13,13 @@
 
 #include <QPixmap>
 
-class Player;
+class PlayerLogic;
 
 class PlayerCounter : public AbstractCounter
 {
     Q_OBJECT
 public:
-    PlayerCounter(Player *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent = nullptr);
+    PlayerCounter(PlayerLogic *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent = nullptr);
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 };
@@ -43,7 +43,7 @@ public:
         return Type;
     }
 
-    explicit PlayerTarget(Player *_player = nullptr, QGraphicsItem *parentItem = nullptr);
+    explicit PlayerTarget(PlayerLogic *_player = nullptr, QGraphicsItem *parentItem = nullptr);
     ~PlayerTarget() override;
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

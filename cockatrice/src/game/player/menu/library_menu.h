@@ -13,7 +13,7 @@
 #include <QAction>
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class PlayerActions;
 
 class LibraryMenu : public TearOffMenu, public AbstractPlayerComponent
@@ -24,7 +24,7 @@ public slots:
     void resetTopCardMenuActions();
 
 public:
-    LibraryMenu(Player *player, QWidget *parent = nullptr);
+    LibraryMenu(PlayerLogic *player, QWidget *parent = nullptr);
     void createDrawActions();
     void createShuffleActions();
     void createMoveActions();
@@ -111,7 +111,7 @@ public:
     int defaultNumberTopCards = 1;
 
 private:
-    Player *player;
+    PlayerLogic *player;
 };
 
 #endif // COCKATRICE_LIBRARY_MENU_H

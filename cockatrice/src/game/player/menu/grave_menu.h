@@ -13,7 +13,7 @@
 #include <QAction>
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class GraveyardMenu : public TearOffMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
@@ -21,7 +21,7 @@ signals:
     void newPlayerActionCreated(QAction *action);
 
 public:
-    explicit GraveyardMenu(Player *player, QWidget *parent = nullptr);
+    explicit GraveyardMenu(PlayerLogic *player, QWidget *parent = nullptr);
     void createMoveActions();
     void createViewActions();
     void populateRevealRandomMenuWithActivePlayers();
@@ -40,7 +40,7 @@ public:
     QAction *aMoveGraveToRfg = nullptr;
 
 private:
-    Player *player;
+    PlayerLogic *player;
 };
 
 #endif // COCKATRICE_GRAVE_MENU_H

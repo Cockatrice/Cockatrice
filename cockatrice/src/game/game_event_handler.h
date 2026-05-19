@@ -38,7 +38,7 @@ class Event_Kicked;
 class Event_ReverseTurn;
 class AbstractGame;
 class PendingCommand;
-class Player;
+class PlayerLogic;
 
 inline Q_LOGGING_CATEGORY(GameEventHandlerLog, "game_event_handler");
 
@@ -95,7 +95,7 @@ public slots:
 signals:
     void emitUserEvent();
     void addPlayerToAutoCompleteList(QString playerName);
-    void localPlayerDeckSelected(Player *localPlayer, int playerId, ServerInfo_Player playerInfo);
+    void localPlayerDeckSelected(PlayerLogic *localPlayer, int playerId, ServerInfo_Player playerInfo);
     void remotePlayerDeckSelected(QString deckList, int playerId, QString playerName);
     void remotePlayersDecksSelected(QVector<QPair<int, QPair<QString, QString>>> opponentDecks);
     void localPlayerSideboardLocked(int playerId, bool sideboardLocked);
@@ -115,18 +115,18 @@ signals:
     void logSpectatorSay(ServerInfo_User userInfo, QString message);
     void logSpectatorLeave(QString name, QString reason);
     void logGameStart();
-    void logReadyStart(Player *player);
-    void logNotReadyStart(Player *player);
-    void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
-    void logSideboardLockSet(Player *player, bool sideboardLocked);
-    void logConnectionStateChanged(Player *player, bool connected);
+    void logReadyStart(PlayerLogic *player);
+    void logNotReadyStart(PlayerLogic *player);
+    void logDeckSelect(PlayerLogic *player, QString deckHash, int sideboardSize);
+    void logSideboardLockSet(PlayerLogic *player, bool sideboardLocked);
+    void logConnectionStateChanged(PlayerLogic *player, bool connected);
     void logJoinSpectator(QString spectatorName);
-    void logJoinPlayer(Player *player);
-    void logLeave(Player *player, QString reason);
+    void logJoinPlayer(PlayerLogic *player);
+    void logLeave(PlayerLogic *player, QString reason);
     void logKicked();
-    void logTurnReversed(Player *player, bool reversed);
+    void logTurnReversed(PlayerLogic *player, bool reversed);
     void logGameClosed();
-    void logActivePlayer(Player *activePlayer);
+    void logActivePlayer(PlayerLogic *activePlayer);
     void logActivePhaseChanged(int activePhase);
     void logConcede(int playerId);
     void logUnconcede(int playerId);

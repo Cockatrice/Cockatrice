@@ -17,7 +17,7 @@ private:
     int radius;
 
 public:
-    GeneralCounter(Player *_player,
+    GeneralCounter(PlayerLogic *_player,
                    int _id,
                    const QString &_name,
                    const QColor &_color,

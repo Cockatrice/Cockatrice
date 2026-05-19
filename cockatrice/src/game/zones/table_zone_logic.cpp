@@ -2,7 +2,7 @@
 
 #include "../board/card_item.h"
 
-TableZoneLogic::TableZoneLogic(Player *_player,
+TableZoneLogic::TableZoneLogic(PlayerLogic *_player,
                                const QString &_name,
                                bool _hasCardAttr,
                                bool _isShufflable,

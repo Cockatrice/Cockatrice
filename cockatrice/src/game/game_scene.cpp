@@ -6,8 +6,8 @@
 #include "../game_graphics/zones/view_zone_widget.h"
 #include "board/card_item.h"
 #include "phases_toolbar.h"
-#include "player/player.h"
 #include "player/player_graphics_item.h"
+#include "player/player_logic.h"
 
 #include <QBasicTimer>
 #include <QDebug>
@@ -78,7 +78,7 @@ QList<CardItem *> GameScene::selectedCards() const
  *
  * Connects to the player's sizeChanged signal to recompute layout on resize.
  */
-void GameScene::addPlayer(Player *player)
+void GameScene::addPlayer(PlayerLogic *player)
 {
     qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getPlayerInfo()->getName();
 
@@ -93,7 +93,7 @@ void GameScene::addPlayer(Player *player)
  *
  * Closes any zone views associated with the player and recomputes layout.
  */
-void GameScene::removePlayer(Player *player)
+void GameScene::removePlayer(PlayerLogic *player)
 {
     qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::removePlayer name=" << player->getPlayerInfo()->getName();
 
@@ -178,14 +178,14 @@ void GameScene::processViewSizeChange(const QSize &newSize)
  *
  * Used to determine rotation and layout order.
  */
-QList<Player *> GameScene::collectActivePlayers(int &firstPlayerIndex) const
+QList<PlayerLogic *> GameScene::collectActivePlayers(int &firstPlayerIndex) const
 {
-    QList<Player *> activePlayers;
+    QList<PlayerLogic *> activePlayers;
     firstPlayerIndex = 0;
     bool firstPlayerFound = false;
 
     for (auto *pgItem : players) {
-        Player *p = pgItem->getPlayer();
+        PlayerLogic *p = pgItem->getPlayer();
         if (p && !p->getConceded()) {
             activePlayers.append(p);
             if (!firstPlayerFound && p->getPlayerInfo()->getLocal()) {
@@ -205,9 +205,9 @@ QList<Player *> GameScene::collectActivePlayers(int &firstPlayerIndex) const
  *
  * Applies rotation offset and ensures the list wraps correctly.
  */
-QList<Player *> GameScene::rotatePlayers(const QList<Player *> &activePlayers, int firstPlayerIndex) const
+QList<PlayerLogic *> GameScene::rotatePlayers(const QList<PlayerLogic *> &activePlayers, int firstPlayerIndex) const
 {
-    QList<Player *> rotated = activePlayers;
+    QList<PlayerLogic *> rotated = activePlayers;
     if (!rotated.isEmpty()) {
         int totalRotation = firstPlayerIndex + playerRotation;
         while (totalRotation < 0) {
@@ -238,7 +238,7 @@ int GameScene::determineColumnCount(int playerCount)
  * - Position players in columns with spacing.
  * - Mirror graphics for visual balance.
  */
-QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &playersPlaying, int columns)
+QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<PlayerLogic *> &playersPlaying, int columns)
 {
     playersByColumn.clear();
 
@@ -246,7 +246,7 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &players
     qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;
     QList<int> columnWidth;
 
-    QListIterator<Player *> playersIter(playersPlaying);
+    QListIterator<PlayerLogic *> playersIter(playersPlaying);
     for (int col = 0; col < columns; ++col) {
         playersByColumn.append(QList<PlayerGraphicsItem *>());
         columnWidth.append(0);
@@ -254,7 +254,7 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &players
         int rowsInColumn = rows - (playersPlaying.size() % columns) * col; // Adjust rows for uneven columns
 
         for (int j = 0; j < rowsInColumn; ++j) {
-            Player *player = playersIter.next();
+            PlayerLogic *player = playersIter.next();
             if (col == 0) {
                 playersByColumn[col].prepend(player->getGraphicsItem());
             } else {
@@ -435,7 +435,7 @@ CardItem *GameScene::findTopmostCardInZone(const QList<QGraphicsItem *> &items, 
  * If an identical view exists, it is closed. Otherwise, a new ZoneViewWidget is created
  * and positioned based on zone type.
  */
-void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed)
+void GameScene::toggleZoneView(PlayerLogic *player, const QString &zoneName, int numberCards, bool isReversed)
 {
     for (auto &view : zoneViews) {
         ZoneViewZone *temp = view->getZone();
@@ -468,7 +468,7 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
  * @param cardList List of cards to show.
  * @param withWritePermission Whether edits are allowed.
  */
-void GameScene::addRevealedZoneView(Player *player,
+void GameScene::addRevealedZoneView(PlayerLogic *player,
                                     CardZoneLogic *zone,
                                     const QList<const ServerInfo_Card *> &cardList,
                                     bool withWritePermission)

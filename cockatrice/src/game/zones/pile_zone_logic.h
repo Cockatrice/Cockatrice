@@ -17,7 +17,7 @@ signals:
     void callUpdate();
 
 public:
-    PileZoneLogic(Player *_player,
+    PileZoneLogic(PlayerLogic *_player,
                   const QString &_name,
                   bool _hasCardAttr,
                   bool _isShufflable,

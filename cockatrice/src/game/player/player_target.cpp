@@ -1,7 +1,7 @@
 #include "player_target.h"
 
 #include "../../interface/pixel_map_generator.h"
-#include "player.h"
+#include "player_logic.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -9,7 +9,7 @@
 #include <QtMath>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
-PlayerCounter::PlayerCounter(Player *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent)
+PlayerCounter::PlayerCounter(PlayerLogic *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent)
     : AbstractCounter(_player, _id, _name, false, _value, false, parent)
 {
 }
@@ -47,7 +47,7 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     painter->drawText(translatedRect, Qt::AlignCenter, QString::number(value));
 }
 
-PlayerTarget::PlayerTarget(Player *_owner, QGraphicsItem *parentItem)
+PlayerTarget::PlayerTarget(PlayerLogic *_owner, QGraphicsItem *parentItem)
     : ArrowTarget(_owner, parentItem), playerCounter(nullptr)
 {
     setCacheMode(DeviceCoordinateCache);

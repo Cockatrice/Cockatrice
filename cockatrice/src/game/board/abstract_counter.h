@@ -13,7 +13,7 @@
 #include <QGraphicsItem>
 #include <QInputDialog>
 
-class Player;
+class PlayerLogic;
 class QAction;
 class QKeyEvent;
 class QMenu;
@@ -25,7 +25,7 @@ class AbstractCounter : public QObject, public QGraphicsItem, public AbstractPla
     Q_INTERFACES(QGraphicsItem)
 
 protected:
-    Player *player;
+    PlayerLogic *player;
     int id;
     QString name;
     int value;
@@ -48,7 +48,7 @@ private slots:
     void setCounter();
 
 public:
-    AbstractCounter(Player *_player,
+    AbstractCounter(PlayerLogic *_player,
                     int _id,
                     const QString &_name,
                     bool _shownInCounterArea,

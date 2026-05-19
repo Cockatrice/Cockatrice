@@ -36,7 +36,7 @@
 // milliseconds in between triggers of the move top cards until action
 static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;
 
-PlayerActions::PlayerActions(Player *_player)
+PlayerActions::PlayerActions(PlayerLogic *_player)
     : QObject(_player), player(_player), lastTokenTableRow(0), movingCardsUntil(false)
 {
     moveTopCardTimer = new QTimer(this);
@@ -1770,7 +1770,7 @@ void PlayerActions::cardMenuAction()
             return;
         }
 
-        Player *startPlayer = zone->getPlayer();
+        PlayerLogic *startPlayer = zone->getPlayer();
         if (!startPlayer) {
             return;
         }

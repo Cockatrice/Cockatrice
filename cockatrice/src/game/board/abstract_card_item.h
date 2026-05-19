@@ -14,7 +14,7 @@
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/utility/card_ref.h>
 
-class Player;
+class PlayerLogic;
 
 class AbstractCardItem : public ArrowTarget
 {
@@ -56,7 +56,7 @@ public:
     }
     explicit AbstractCardItem(QGraphicsItem *parent = nullptr,
                               const CardRef &cardRef = {},
-                              Player *_owner = nullptr,
+                              PlayerLogic *_owner = nullptr,
                               int _id = -1);
     ~AbstractCardItem() override;
     QRectF boundingRect() const override;

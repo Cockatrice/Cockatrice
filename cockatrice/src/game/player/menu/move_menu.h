@@ -8,13 +8,13 @@
 #define COCKATRICE_MOVE_MENU_H
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class MoveMenu : public QMenu
 {
     Q_OBJECT
 
 public:
-    explicit MoveMenu(Player *player);
+    explicit MoveMenu(PlayerLogic *player);
     void setShortcutsActive();
     void retranslateUi();
 

@@ -13,12 +13,12 @@
 #include <QAction>
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class RfgMenu : public TearOffMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
 public:
-    explicit RfgMenu(Player *player, QWidget *parent = nullptr);
+    explicit RfgMenu(PlayerLogic *player, QWidget *parent = nullptr);
     void createMoveActions();
     void createViewActions();
     void retranslateUi() override;
@@ -38,7 +38,7 @@ public:
     QAction *aMoveRfgToGrave = nullptr;
 
 private:
-    Player *player;
+    PlayerLogic *player;
 };
 
 #endif // COCKATRICE_RFG_MENU_H

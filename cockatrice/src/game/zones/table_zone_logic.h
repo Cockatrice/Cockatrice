@@ -16,7 +16,7 @@ signals:
     void toggleTapped();
 
 public:
-    TableZoneLogic(Player *_player,
+    TableZoneLogic(PlayerLogic *_player,
                    const QString &_name,
                    bool _hasCardAttr,
                    bool _isShufflable,

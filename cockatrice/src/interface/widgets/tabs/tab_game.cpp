@@ -10,8 +10,8 @@
 #include "../game/game_view.h"
 #include "../game/log/message_log_widget.h"
 #include "../game/phases_toolbar.h"
-#include "../game/player/player.h"
 #include "../game/player/player_list_widget.h"
+#include "../game/player/player_logic.h"
 #include "../game/replay.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
@@ -363,7 +363,7 @@ void TabGame::retranslateUi()
 
     cardInfoFrameWidget->retranslateUi();
 
-    QMapIterator<int, Player *> i(game->getPlayerManager()->getPlayers());
+    QMapIterator<int, PlayerLogic *> i(game->getPlayerManager()->getPlayers());
 
     while (i.hasNext()) {
         i.next().value()->getGraphicsItem()->retranslateUi();
@@ -489,7 +489,7 @@ void TabGame::actGameInfo()
 
 void TabGame::actConcede()
 {
-    Player *player = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
+    PlayerLogic *player = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
     if (player == nullptr) {
         return;
     }
@@ -606,9 +606,9 @@ void TabGame::actNextPhaseAction()
 
 void TabGame::actRemoveLocalArrows()
 {
-    QMapIterator<int, Player *> playerIterator(game->getPlayerManager()->getPlayers());
+    QMapIterator<int, PlayerLogic *> playerIterator(game->getPlayerManager()->getPlayers());
     while (playerIterator.hasNext()) {
-        Player *player = playerIterator.next().value();
+        PlayerLogic *player = playerIterator.next().value();
         if (!player->getPlayerInfo()->getLocal()) {
             continue;
         }
@@ -655,14 +655,14 @@ void TabGame::notifyPlayerKicked()
     msgBox.exec();
 }
 
-Player *TabGame::addPlayer(Player *newPlayer)
+PlayerLogic *TabGame::addPlayer(PlayerLogic *newPlayer)
 {
     QString newPlayerName = "@" + newPlayer->getPlayerInfo()->getName();
     addPlayerToAutoCompleteList(newPlayerName);
 
     scene->addPlayer(newPlayer);
 
-    connect(newPlayer, &Player::newCardAdded, this, &TabGame::newCardAdded);
+    connect(newPlayer, &PlayerLogic::newCardAdded, this, &TabGame::newCardAdded);
     connect(newPlayer->getPlayerMenu(), &PlayerMenu::cardMenuUpdated, this, &TabGame::setCardMenu);
 
     messageLog->connectToPlayerEventHandler(newPlayer->getPlayerEventHandler());
@@ -683,7 +683,7 @@ Player *TabGame::addPlayer(Player *newPlayer)
     return newPlayer;
 }
 
-void TabGame::addLocalPlayer(Player *newPlayer, int playerId)
+void TabGame::addLocalPlayer(PlayerLogic *newPlayer, int playerId)
 {
     if (game->getGameState()->getClients().size() == 1) {
         newPlayer->getPlayerMenu()->setShortcutsActive();
@@ -704,7 +704,7 @@ void TabGame::addLocalPlayer(Player *newPlayer, int playerId)
     }
 }
 
-void TabGame::processPlayerLeave(Player *leavingPlayer)
+void TabGame::processPlayerLeave(PlayerLogic *leavingPlayer)
 {
     QString playerName = "@" + leavingPlayer->getPlayerInfo()->getName();
     removePlayerFromAutoCompleteList(playerName);
@@ -751,13 +751,13 @@ void TabGame::processMultipleRemotePlayerDeckSelect(QVector<QPair<int, QPair<QSt
     }
 }
 
-void TabGame::processLocalPlayerDeckSelect(Player *localPlayer, int playerId, ServerInfo_Player playerInfo)
+void TabGame::processLocalPlayerDeckSelect(PlayerLogic *localPlayer, int playerId, ServerInfo_Player playerInfo)
 {
     loadDeckForLocalPlayer(localPlayer, playerId, playerInfo);
     processLocalPlayerReady(playerId, playerInfo);
 }
 
-void TabGame::loadDeckForLocalPlayer(Player *localPlayer, int playerId, ServerInfo_Player playerInfo)
+void TabGame::loadDeckForLocalPlayer(PlayerLogic *localPlayer, int playerId, ServerInfo_Player playerInfo)
 {
     TabbedDeckViewContainer *deckViewContainer = deckViewContainers.value(playerId);
     if (playerInfo.has_deck_list()) {
@@ -784,7 +784,7 @@ void TabGame::processLocalPlayerReadyStateChanged(int playerId, bool ready)
     deckViewContainers.value(playerId)->playerDeckView->setReadyStart(ready);
 }
 
-void TabGame::createZoneForPlayer(Player *newPlayer, int playerId)
+void TabGame::createZoneForPlayer(PlayerLogic *newPlayer, int playerId)
 {
     if (!game->getPlayerManager()->getSpectators().contains(playerId)) {
 
@@ -820,7 +820,7 @@ void TabGame::startGame(bool _resuming)
     mainWidget->setCurrentWidget(gamePlayAreaWidget);
 
     if (!_resuming) {
-        QMapIterator<int, Player *> playerIterator(game->getPlayerManager()->getPlayers());
+        QMapIterator<int, PlayerLogic *> playerIterator(game->getPlayerManager()->getPlayers());
         while (playerIterator.hasNext()) {
             playerIterator.next().value()->setGameStarted();
         }
@@ -863,15 +863,15 @@ void TabGame::closeGame()
     gameMenu->addAction(aLeaveGame);
 }
 
-Player *TabGame::setActivePlayer(int id)
+PlayerLogic *TabGame::setActivePlayer(int id)
 {
-    Player *player = game->getPlayerManager()->getPlayer(id);
+    PlayerLogic *player = game->getPlayerManager()->getPlayer(id);
     if (!player) {
         return nullptr;
     }
 
     playerListWidget->setActivePlayer(id);
-    QMapIterator<int, Player *> i(game->getPlayerManager()->getPlayers());
+    QMapIterator<int, PlayerLogic *> i(game->getPlayerManager()->getPlayers());
     while (i.hasNext()) {
         i.next();
         if (i.value() == player) {

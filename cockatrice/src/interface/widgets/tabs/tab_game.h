@@ -11,7 +11,7 @@
 
 #include "../game/abstract_game.h"
 #include "../game/log/message_log_widget.h"
-#include "../game/player/player.h"
+#include "../game/player/player_logic.h"
 #include "../interface/widgets/menus/tearoff_menu.h"
 #include "../interface/widgets/replay/replay_manager.h"
 #include "tab.h"
@@ -99,21 +99,21 @@ private:
 
     QMap<QDockWidget *, DockActions> dockToActions;
 
-    Player *addPlayer(Player *newPlayer);
-    void addLocalPlayer(Player *newPlayer, int playerId);
+    PlayerLogic *addPlayer(PlayerLogic *newPlayer);
+    void addLocalPlayer(PlayerLogic *newPlayer, int playerId);
     void processRemotePlayerDeckSelect(QString deckList, int playerId, QString playerName);
     void processMultipleRemotePlayerDeckSelect(QVector<QPair<int, QPair<QString, QString>>> playerIdDeckMap);
-    void processLocalPlayerDeckSelect(Player *localPlayer, int playerId, ServerInfo_Player playerInfo);
-    void loadDeckForLocalPlayer(Player *localPlayer, int playerId, ServerInfo_Player playerInfo);
+    void processLocalPlayerDeckSelect(PlayerLogic *localPlayer, int playerId, ServerInfo_Player playerInfo);
+    void loadDeckForLocalPlayer(PlayerLogic *localPlayer, int playerId, ServerInfo_Player playerInfo);
     void processLocalPlayerReady(int playerId, ServerInfo_Player playerInfo);
-    void createZoneForPlayer(Player *newPlayer, int playerId);
+    void createZoneForPlayer(PlayerLogic *newPlayer, int playerId);
 
     void startGame(bool resuming);
     void stopGame();
     void closeGame();
     bool leaveGame();
 
-    Player *setActivePlayer(int id);
+    PlayerLogic *setActivePlayer(int id);
     void setActivePhase(int phase);
     void createMenuItems();
     void createReplayMenuItems();
@@ -163,7 +163,7 @@ private slots:
     void actCompleterChanged();
     void notifyPlayerJoin(QString playerName);
     void notifyPlayerKicked();
-    void processPlayerLeave(Player *leavingPlayer);
+    void processPlayerLeave(PlayerLogic *leavingPlayer);
     void actResetLayout();
 
     void hideEvent(QHideEvent *event) override;

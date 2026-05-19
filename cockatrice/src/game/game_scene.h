@@ -12,7 +12,7 @@
 inline Q_LOGGING_CATEGORY(GameSceneLog, "game_scene");
 inline Q_LOGGING_CATEGORY(GameScenePlayerAdditionRemovalLog, "game_scene.player_addition_removal");
 
-class Player;
+class PlayerLogic;
 class PlayerGraphicsItem;
 class ZoneViewWidget;
 class CardZone;
@@ -83,13 +83,13 @@ public:
      * @brief Adds a player to the scene and stores their graphics item.
      * @param player Player to add.
      */
-    void addPlayer(Player *player);
+    void addPlayer(PlayerLogic *player);
 
     /**
      * @brief Removes a player from the scene.
      * @param player Player to remove.
      */
-    void removePlayer(Player *player);
+    void removePlayer(PlayerLogic *player);
 
     /**
      * @brief Adjusts the global rotation offset for player layout.
@@ -111,7 +111,7 @@ public:
      * @param firstPlayerIndex Output index of first local player.
      * @return List of active players.
      */
-    QList<Player *> collectActivePlayers(int &firstPlayerIndex) const;
+    QList<PlayerLogic *> collectActivePlayers(int &firstPlayerIndex) const;
 
     /**
      * @brief Rotates the list of players for layout.
@@ -119,7 +119,7 @@ public:
      * @param firstPlayerIndex Index of first local player.
      * @return Rotated list.
      */
-    QList<Player *> rotatePlayers(const QList<Player *> &players, int firstPlayerIndex) const;
+    QList<PlayerLogic *> rotatePlayers(const QList<PlayerLogic *> &players, int firstPlayerIndex) const;
 
     /**
      * @brief Determines the number of columns to display players in.
@@ -134,7 +134,7 @@ public:
      * @param columns Number of columns to split into.
      * @return Calculated scene size.
      */
-    QSizeF computeSceneSizeAndPlayerLayout(const QList<Player *> &playersPlaying, int columns);
+    QSizeF computeSceneSizeAndPlayerLayout(const QList<PlayerLogic *> &playersPlaying, int columns);
 
     /**
      * @brief Computes the minimum width for each column based on player minimum widths.
@@ -177,10 +177,10 @@ public:
 
 public slots:
     /** Toggles a zone view for a player. */
-    void toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed = false);
+    void toggleZoneView(PlayerLogic *player, const QString &zoneName, int numberCards, bool isReversed = false);
 
     /** Adds a revealed zone view (for shown cards). */
-    void addRevealedZoneView(Player *player,
+    void addRevealedZoneView(PlayerLogic *player,
                              CardZoneLogic *zone,
                              const QList<const ServerInfo_Card *> &cardList,
                              bool withWritePermission);

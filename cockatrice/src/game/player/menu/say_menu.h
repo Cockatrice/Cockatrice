@@ -11,12 +11,12 @@
 
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class SayMenu : public QMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
 public:
-    explicit SayMenu(Player *player);
+    explicit SayMenu(PlayerLogic *player);
 
     void retranslateUi() override;
     void setShortcutsActive() override;
@@ -26,7 +26,7 @@ private slots:
     void initSayMenu();
 
 private:
-    Player *player;
+    PlayerLogic *player;
     bool shortcutsActive = false;
 };
 

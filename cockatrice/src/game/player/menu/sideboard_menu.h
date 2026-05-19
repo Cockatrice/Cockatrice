@@ -11,19 +11,19 @@
 
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class SideboardMenu : public QMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
 
 public:
-    explicit SideboardMenu(Player *player, QMenu *playerMenu);
+    explicit SideboardMenu(PlayerLogic *player, QMenu *playerMenu);
     void retranslateUi() override;
     void setShortcutsActive() override;
     void setShortcutsInactive() override;
 
 private:
-    Player *player;
+    PlayerLogic *player;
 
     QAction *aViewSideboard;
 };

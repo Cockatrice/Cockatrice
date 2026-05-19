@@ -95,13 +95,13 @@ set(cockatrice_SOURCES
     src/game/player/menu/say_menu.cpp
     src/game/player/menu/sideboard_menu.cpp
     src/game/player/menu/utility_menu.cpp
-    src/game/player/player.cpp
     src/game/player/player_actions.cpp
     src/game/player/player_area.cpp
     src/game/player/player_event_handler.cpp
     src/game/player/player_graphics_item.cpp
     src/game/player/player_info.cpp
     src/game/player/player_list_widget.cpp
+    src/game/player/player_logic.cpp
     src/game/player/player_manager.cpp
     src/game/player/player_target.cpp
     src/game/replay.cpp

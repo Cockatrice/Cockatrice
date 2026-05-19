@@ -7,7 +7,7 @@
 #ifndef PLAYERLISTWIDGET_H
 #define PLAYERLISTWIDGET_H
 
-#include "player.h"
+#include "player_logic.h"
 
 #include <QIcon>
 #include <QMap>

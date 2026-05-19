@@ -13,7 +13,7 @@
 class AbstractGame;
 class CardItem;
 class GameEventContext;
-class Player;
+class PlayerLogic;
 class PlayerEventHandler;
 
 class MessageLogWidget : public ChatView
@@ -39,66 +39,66 @@ public:
 public slots:
     void containerProcessingDone();
     void containerProcessingStarted(const GameEventContext &context);
-    void logAlwaysRevealTopCard(Player *player, CardZoneLogic *zone, bool reveal);
-    void logAlwaysLookAtTopCard(Player *player, CardZoneLogic *zone, bool reveal);
-    void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
+    void logAlwaysRevealTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
+    void logAlwaysLookAtTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
+    void logAttachCard(PlayerLogic *player, QString cardName, PlayerLogic *targetPlayer, QString targetCardName);
     void logConcede(int playerId);
     void logUnconcede(int playerId);
-    void logConnectionStateChanged(Player *player, bool connectionState);
-    void logCreateArrow(Player *player,
-                        Player *startPlayer,
+    void logConnectionStateChanged(PlayerLogic *player, bool connectionState);
+    void logCreateArrow(PlayerLogic *player,
+                        PlayerLogic *startPlayer,
                         QString startCard,
-                        Player *targetPlayer,
+                        PlayerLogic *targetPlayer,
                         QString targetCard,
                         bool playerTarget);
-    void logCreateToken(Player *player, QString cardName, QString pt, bool faceDown);
-    void logDeckSelect(Player *player, QString deckHash, int sideboardSize);
-    void logDestroyCard(Player *player, QString cardName);
-    void logDrawCards(Player *player, int number, bool deckIsEmpty);
-    void logDumpZone(Player *player, CardZoneLogic *zone, int numberCards, bool isReversed = false);
-    void logFlipCard(Player *player, QString cardName, bool faceDown);
+    void logCreateToken(PlayerLogic *player, QString cardName, QString pt, bool faceDown);
+    void logDeckSelect(PlayerLogic *player, QString deckHash, int sideboardSize);
+    void logDestroyCard(PlayerLogic *player, QString cardName);
+    void logDrawCards(PlayerLogic *player, int number, bool deckIsEmpty);
+    void logDumpZone(PlayerLogic *player, CardZoneLogic *zone, int numberCards, bool isReversed = false);
+    void logFlipCard(PlayerLogic *player, QString cardName, bool faceDown);
     void logGameClosed();
     void logGameStart();
     void logGameFlooded();
-    void logJoin(Player *player);
+    void logJoin(PlayerLogic *player);
     void logJoinSpectator(QString name);
     void logKicked();
-    void logLeave(Player *player, QString reason);
+    void logLeave(PlayerLogic *player, QString reason);
     void logLeaveSpectator(QString name, QString reason);
-    void logNotReadyStart(Player *player);
-    void logMoveCard(Player *player,
+    void logNotReadyStart(PlayerLogic *player);
+    void logMoveCard(PlayerLogic *player,
                      CardItem *card,
                      CardZoneLogic *startZone,
                      int oldX,
                      CardZoneLogic *targetZone,
                      int newX);
-    void logMulligan(Player *player, int number);
+    void logMulligan(PlayerLogic *player, int number);
     void logReplayStarted(int gameId);
-    void logReadyStart(Player *player);
-    void logRevealCards(Player *player,
+    void logReadyStart(PlayerLogic *player);
+    void logRevealCards(PlayerLogic *player,
                         CardZoneLogic *zone,
                         int cardId,
                         QString cardName,
-                        Player *otherPlayer,
+                        PlayerLogic *otherPlayer,
                         bool faceDown,
                         int amount,
                         bool isLentToAnotherPlayer);
-    void logReverseTurn(Player *player, bool reversed);
-    void logRollDie(Player *player, int sides, const QList<uint> &rolls);
-    void logSay(Player *player, QString message);
+    void logReverseTurn(PlayerLogic *player, bool reversed);
+    void logRollDie(PlayerLogic *player, int sides, const QList<uint> &rolls);
+    void logSay(PlayerLogic *player, QString message);
     void logSetActivePhase(int phase);
-    void logSetActivePlayer(Player *player);
-    void logSetAnnotation(Player *player, CardItem *card, QString newAnnotation);
-    void logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue);
-    void logSetCounter(Player *player, QString counterName, int value, int oldValue);
-    void logSetDoesntUntap(Player *player, CardItem *card, bool doesntUntap);
-    void logSetPT(Player *player, CardItem *card, QString newPT);
-    void logSetSideboardLock(Player *player, bool locked);
-    void logSetTapped(Player *player, CardItem *card, bool tapped);
-    void logShuffle(Player *player, CardZoneLogic *zone, int start, int end);
+    void logSetActivePlayer(PlayerLogic *player);
+    void logSetAnnotation(PlayerLogic *player, CardItem *card, QString newAnnotation);
+    void logSetCardCounter(PlayerLogic *player, QString cardName, int counterId, int value, int oldValue);
+    void logSetCounter(PlayerLogic *player, QString counterName, int value, int oldValue);
+    void logSetDoesntUntap(PlayerLogic *player, CardItem *card, bool doesntUntap);
+    void logSetPT(PlayerLogic *player, CardItem *card, QString newPT);
+    void logSetSideboardLock(PlayerLogic *player, bool locked);
+    void logSetTapped(PlayerLogic *player, CardItem *card, bool tapped);
+    void logShuffle(PlayerLogic *player, CardZoneLogic *zone, int start, int end);
     void logSpectatorSay(const ServerInfo_User &spectator, QString message);
-    void logUnattachCard(Player *player, QString cardName);
-    void logUndoDraw(Player *player, QString cardName);
+    void logUnattachCard(PlayerLogic *player, QString cardName);
+    void logUndoDraw(PlayerLogic *player, QString cardName);
     void setContextJudgeName(QString player);
     void appendHtmlServerMessage(const QString &html,
                                  bool optionalIsBold = false,

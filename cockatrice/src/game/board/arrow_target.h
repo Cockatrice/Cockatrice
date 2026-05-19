@@ -11,24 +11,24 @@
 
 #include <QList>
 
-class Player;
+class PlayerLogic;
 class ArrowItem;
 
 class ArrowTarget : public AbstractGraphicsItem
 {
     Q_OBJECT
 protected:
-    Player *owner;
+    PlayerLogic *owner;
 
 private:
     bool beingPointedAt;
     QList<ArrowItem *> arrowsFrom, arrowsTo;
 
 public:
-    explicit ArrowTarget(Player *_owner, QGraphicsItem *parent = nullptr);
+    explicit ArrowTarget(PlayerLogic *_owner, QGraphicsItem *parent = nullptr);
     ~ArrowTarget() override;
 
-    [[nodiscard]] Player *getOwner() const
+    [[nodiscard]] PlayerLogic *getOwner() const
     {
         return owner;
     }
