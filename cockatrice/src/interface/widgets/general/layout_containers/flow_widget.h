@@ -1,10 +1,7 @@
 /**
  * @file flow_widget.h
  * @ingroup UI
-<<<<<<< documentation-standardisation
-=======
  * @brief A QWidget that wraps a FlowLayout inside an optional QScrollArea.
->>>>>>> master
  */
 //! \todo Document this file.
 
