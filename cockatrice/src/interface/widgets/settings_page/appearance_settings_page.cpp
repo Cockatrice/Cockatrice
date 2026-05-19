@@ -60,6 +60,18 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     connect(&editPaletteButton, &QPushButton::clicked, this, &AppearanceSettingsPage::editPalette);
 
+    auto *themeGrid = new QGridLayout;
+    themeGrid->addWidget(&themeLabel, 0, 0);
+    themeGrid->addWidget(&themeBox, 0, 1);
+    themeGrid->addWidget(&openThemeButton, 1, 1);
+    themeGrid->addWidget(&schemeComboLabel, 2, 0);
+    themeGrid->addWidget(&schemeCombo, 2, 1);
+    themeGrid->addWidget(&editPaletteButton, 3, 1);
+
+    themeGroupBox = new QGroupBox;
+    themeGroupBox->setLayout(themeGrid);
+
+    // Home tab settings
     for (const auto &entry : BackgroundSources::all()) {
         homeTabBackgroundSourceBox.addItem(QObject::tr(entry.trKey), QVariant::fromValue(entry.type));
     }
@@ -89,22 +101,15 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     updateHomeTabSettingsVisibility();
 
-    auto *themeGrid = new QGridLayout;
-    themeGrid->addWidget(&themeLabel, 0, 0);
-    themeGrid->addWidget(&themeBox, 0, 1);
-    themeGrid->addWidget(&openThemeButton, 1, 1);
-    themeGrid->addWidget(&schemeComboLabel, 2, 0);
-    themeGrid->addWidget(&schemeCombo, 2, 1);
-    themeGrid->addWidget(&editPaletteButton, 3, 1);
-    themeGrid->addWidget(&homeTabBackgroundSourceLabel, 4, 0);
-    themeGrid->addWidget(&homeTabBackgroundSourceBox, 4, 1);
-    themeGrid->addWidget(&homeTabBackgroundShuffleFrequencyLabel, 5, 0);
-    themeGrid->addWidget(&homeTabBackgroundShuffleFrequencySpinBox, 5, 1);
-    themeGrid->addWidget(&homeTabDisplayCardNameLabel, 6, 0);
-    themeGrid->addWidget(&homeTabDisplayCardNameCheckBox, 6, 1);
+    auto *homeTabGrid = new QGridLayout;
+    homeTabGrid->addWidget(&homeTabBackgroundSourceLabel, 0, 0);
+    homeTabGrid->addWidget(&homeTabBackgroundSourceBox, 0, 1);
+    homeTabGrid->addWidget(&homeTabBackgroundShuffleFrequencyLabel, 1, 0);
+    homeTabGrid->addWidget(&homeTabBackgroundShuffleFrequencySpinBox, 1, 1);
+    homeTabGrid->addWidget(&homeTabDisplayCardNameCheckBox, 2, 0, 1, 2);
 
-    themeGroupBox = new QGroupBox;
-    themeGroupBox->setLayout(themeGrid);
+    homeTabGroupBox = new QGroupBox;
+    homeTabGroupBox->setLayout(homeTabGrid);
 
     // Menu settings
     showShortcutsCheckBox.setChecked(settings.getShowShortcuts());
@@ -266,6 +271,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     // putting it all together
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(themeGroupBox);
+    mainLayout->addWidget(homeTabGroupBox);
     mainLayout->addWidget(menuGroupBox);
     mainLayout->addWidget(cardsGroupBox);
     mainLayout->addWidget(cardCountersGroupBox);
@@ -313,7 +319,6 @@ void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
 
     homeTabBackgroundShuffleFrequencyLabel.setVisible(visible);
     homeTabBackgroundShuffleFrequencySpinBox.setVisible(visible);
-    homeTabDisplayCardNameLabel.setVisible(visible);
     homeTabDisplayCardNameCheckBox.setVisible(visible);
 }
 
@@ -372,10 +377,12 @@ void AppearanceSettingsPage::retranslateUi()
     openThemeButton.setText(tr("Open themes folder"));
     schemeComboLabel.setText(tr("Active theme palette:"));
     editPaletteButton.setText(tr("Edit theme palette"));
+
+    homeTabGroupBox->setTitle(tr("Home tab settings"));
     homeTabBackgroundSourceLabel.setText(tr("Home tab background source:"));
     homeTabBackgroundShuffleFrequencyLabel.setText(tr("Home tab background shuffle frequency:"));
     homeTabBackgroundShuffleFrequencySpinBox.setSpecialValueText(tr("Disabled"));
-    homeTabDisplayCardNameLabel.setText(tr("Display card name of background in bottom right:"));
+    homeTabDisplayCardNameCheckBox.setText(tr("Display card name of background in bottom right"));
 
     menuGroupBox->setTitle(tr("Menu settings"));
     showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));
