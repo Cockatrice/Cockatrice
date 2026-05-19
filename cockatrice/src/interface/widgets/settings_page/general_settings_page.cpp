@@ -19,6 +19,7 @@ enum startupCardUpdateCheckBehaviorIndex
 
 GeneralSettingsPage::GeneralSettingsPage()
 {
+    // language settings
     QStringList languageCodes = findQmFiles();
     for (const QString &code : languageCodes) {
         QString langName = languageName(code);
@@ -33,10 +34,45 @@ GeneralSettingsPage::GeneralSettingsPage()
         languageBox.setCurrentIndex(index);
     }
 
-    // updates
+    advertiseTranslationPageLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    advertiseTranslationPageLabel.setOpenExternalLinks(true);
+
+    connect(&languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &GeneralSettingsPage::languageBoxChanged);
+
+    auto *languageGrid = new QGridLayout;
+    languageGrid->addWidget(&languageLabel, 0, 0);
+    languageGrid->addWidget(&languageBox, 0, 1);
+    languageGrid->addWidget(&advertiseTranslationPageLabel, 1, 1, Qt::AlignRight);
+
+    languageGroupBox = new QGroupBox;
+    languageGroupBox->setLayout(languageGrid);
+
+    // version settings
     SettingsCache &settings = SettingsCache::instance();
     startupUpdateCheckCheckBox.setChecked(settings.getCheckUpdatesOnStartup());
 
+    connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
+            &SettingsCache::setCheckUpdatesOnStartup);
+
+    updateNotificationCheckBox.setChecked(settings.getNotifyAboutUpdates());
+
+    connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
+
+    connect(&newVersionOracleCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
+            &SettingsCache::setNotifyAboutNewVersion);
+
+    auto *versionGrid = new QGridLayout;
+    versionGrid->addWidget(&updateReleaseChannelLabel, 0, 0);
+    versionGrid->addWidget(&updateReleaseChannelBox, 0, 1);
+    versionGrid->addWidget(&startupUpdateCheckCheckBox, 1, 0, 1, 2);
+    versionGrid->addWidget(&updateNotificationCheckBox, 2, 0, 1, 2);
+    versionGrid->addWidget(&newVersionOracleCheckBox, 3, 0, 1, 2);
+
+    versionGroupBox = new QGroupBox;
+    versionGroupBox->setLayout(versionGrid);
+
+    // card database settings
     startupCardUpdateCheckBehaviorSelector.addItem(""); // these will be set in retranslateUI
     startupCardUpdateCheckBehaviorSelector.addItem("");
     startupCardUpdateCheckBehaviorSelector.addItem("");
@@ -48,21 +84,6 @@ GeneralSettingsPage::GeneralSettingsPage()
         startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexNone);
     }
 
-    cardUpdateCheckIntervalSpinBox.setMinimum(1);
-    cardUpdateCheckIntervalSpinBox.setMaximum(30);
-    cardUpdateCheckIntervalSpinBox.setValue(settings.getCardUpdateCheckInterval());
-    updateNotificationCheckBox.setChecked(settings.getNotifyAboutUpdates());
-    newVersionOracleCheckBox.setChecked(settings.getNotifyAboutNewVersion());
-
-    showTipsOnStartup.setChecked(settings.getShowTipsOnStartup());
-
-    advertiseTranslationPageLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
-    advertiseTranslationPageLabel.setOpenExternalLinks(true);
-
-    connect(&languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
-            &GeneralSettingsPage::languageBoxChanged);
-    connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setCheckUpdatesOnStartup);
     connect(&startupCardUpdateCheckBehaviorSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             [](int index) {
                 SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(
@@ -70,32 +91,38 @@ GeneralSettingsPage::GeneralSettingsPage()
                 SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(
                     index == startupCardUpdateCheckBehaviorIndexAlways);
             });
+
+    cardUpdateCheckIntervalSpinBox.setMinimum(1);
+    cardUpdateCheckIntervalSpinBox.setMaximum(30);
+    cardUpdateCheckIntervalSpinBox.setValue(settings.getCardUpdateCheckInterval());
+
     connect(&cardUpdateCheckIntervalSpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings,
             &SettingsCache::setCardUpdateCheckInterval);
-    connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
-    connect(&newVersionOracleCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setNotifyAboutNewVersion);
+
+    newVersionOracleCheckBox.setChecked(settings.getNotifyAboutNewVersion());
+
+    auto *cardDatabaseGrid = new QGridLayout;
+    cardDatabaseGrid->addWidget(&startupCardUpdateCheckBehaviorLabel, 0, 0);
+    cardDatabaseGrid->addWidget(&startupCardUpdateCheckBehaviorSelector, 0, 1);
+    cardDatabaseGrid->addWidget(&cardUpdateCheckIntervalLabel, 1, 0);
+    cardDatabaseGrid->addWidget(&cardUpdateCheckIntervalSpinBox, 1, 1);
+    cardDatabaseGrid->addWidget(&lastCardUpdateCheckDateLabel, 2, 1);
+
+    cardDatabaseGroupBox = new QGroupBox;
+    cardDatabaseGroupBox->setLayout(cardDatabaseGrid);
+
+    // startup settings
+    showTipsOnStartup.setChecked(settings.getShowTipsOnStartup());
+
     connect(&showTipsOnStartup, &QCheckBox::clicked, &settings, &SettingsCache::setShowTipsOnStartup);
 
-    auto *personalGrid = new QGridLayout;
-    personalGrid->addWidget(&languageLabel, 0, 0);
-    personalGrid->addWidget(&languageBox, 0, 1);
-    personalGrid->addWidget(&advertiseTranslationPageLabel, 1, 1, Qt::AlignRight);
-    personalGrid->addWidget(&updateReleaseChannelLabel, 2, 0);
-    personalGrid->addWidget(&updateReleaseChannelBox, 2, 1);
-    personalGrid->addWidget(&startupUpdateCheckCheckBox, 4, 0, 1, 2);
-    personalGrid->addWidget(&startupCardUpdateCheckBehaviorLabel, 5, 0);
-    personalGrid->addWidget(&startupCardUpdateCheckBehaviorSelector, 5, 1);
-    personalGrid->addWidget(&cardUpdateCheckIntervalLabel, 6, 0);
-    personalGrid->addWidget(&cardUpdateCheckIntervalSpinBox, 6, 1);
-    personalGrid->addWidget(&lastCardUpdateCheckDateLabel, 7, 1);
-    personalGrid->addWidget(&updateNotificationCheckBox, 8, 0, 1, 2);
-    personalGrid->addWidget(&newVersionOracleCheckBox, 9, 0, 1, 2);
-    personalGrid->addWidget(&showTipsOnStartup, 10, 0, 1, 2);
+    auto *startupGrid = new QGridLayout;
+    startupGrid->addWidget(&showTipsOnStartup, 0, 0, 1, 2);
 
-    personalGroupBox = new QGroupBox;
-    personalGroupBox->setLayout(personalGrid);
+    startupGroupBox = new QGroupBox;
+    startupGroupBox->setLayout(startupGrid);
 
+    // paths settings
     deckPathEdit = new QLineEdit(settings.getDeckPath());
     deckPathEdit->setReadOnly(true);
     auto *deckPathButton = new QPushButton("...");
@@ -187,7 +214,10 @@ GeneralSettingsPage::GeneralSettingsPage()
     pathsGroupBox->setLayout(pathsGrid);
 
     auto *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget(personalGroupBox);
+    mainLayout->addWidget(languageGroupBox);
+    mainLayout->addWidget(versionGroupBox);
+    mainLayout->addWidget(cardDatabaseGroupBox);
+    mainLayout->addWidget(startupGroupBox);
     mainLayout->addWidget(pathsGroupBox);
     mainLayout->addStretch();
 
@@ -323,8 +353,12 @@ void GeneralSettingsPage::languageBoxChanged(int index)
 
 void GeneralSettingsPage::retranslateUi()
 {
-    personalGroupBox->setTitle(tr("Personal settings"));
+    languageGroupBox->setTitle(tr("Language settings"));
     languageLabel.setText(tr("Language:"));
+
+    versionGroupBox->setTitle(tr("Version settings"));
+    cardDatabaseGroupBox->setTitle(tr("Card database"));
+    startupGroupBox->setTitle(tr("Startup settings"));
 
     if (SettingsCache::instance().getIsPortableBuild()) {
         pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
