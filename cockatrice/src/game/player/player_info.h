@@ -22,7 +22,6 @@ public:
     int id;
     bool local;
     bool judge;
-    bool handVisible;
 
     int getId() const
     {
@@ -49,16 +48,6 @@ public:
     bool getJudge() const
     {
         return judge;
-    }
-
-    void setHandVisible(bool _handVisible)
-    {
-        handVisible = _handVisible;
-    }
-
-    bool getHandVisible() const
-    {
-        return handVisible;
     }
 
     QString getName() const
