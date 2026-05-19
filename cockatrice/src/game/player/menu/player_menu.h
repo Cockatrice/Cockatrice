@@ -87,7 +87,8 @@ private:
     CustomZoneMenu *customZonesMenu;
 
     /** @brief Drives AbstractPlayerComponent lifecycle delegation. Counters are iterated separately via
-     * player->getCounters(). */
+     * player->getCounters().
+     */
     QList<AbstractPlayerComponent *> managedComponents;
     bool shortcutsActive = false;
 
