@@ -15,6 +15,8 @@ PlayerGraphicsItem::PlayerGraphicsItem(Player *_player) : player(_player)
     connect(&SettingsCache::instance(), &SettingsCache::handJustificationChanged, this,
             &PlayerGraphicsItem::rearrangeZones);
     connect(player, &Player::rearrangeCounters, this, &PlayerGraphicsItem::rearrangeCounters);
+    connect(player, &Player::concededChanged, this, [this](int, bool c) { setVisible(!c); });
+    connect(player, &Player::zoneIdChanged, this, [this](int id) { playerArea->setPlayerZoneId(id); });
 
     playerArea = new PlayerArea(this);
 
