@@ -1,11 +1,8 @@
 /**
  * @file flow_layout.h
  * @ingroup UI
-<<<<<<< documentation-standardisation
-=======
  * @brief A QLayout subclass that arranges child widgets in wrapping rows (horizontal flow)
  *        or wrapping columns (vertical flow).
->>>>>>> master
  */
 //! \todo Document this file.
 
