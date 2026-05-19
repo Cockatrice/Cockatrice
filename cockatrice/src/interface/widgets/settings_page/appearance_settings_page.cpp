@@ -126,14 +126,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     menuGroupBox = new QGroupBox;
     menuGroupBox->setLayout(menuGrid);
 
-    // Card rendering
-    displayCardNamesCheckBox.setChecked(settings.getDisplayCardNames());
-    connect(&displayCardNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setDisplayCardNames);
-
-    autoRotateSidewaysLayoutCardsCheckBox.setChecked(settings.getAutoRotateSidewaysLayoutCards());
-    connect(&autoRotateSidewaysLayoutCardsCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setAutoRotateSidewaysLayoutCards);
-
+    // Printings settings
     overrideAllCardArtWithPersonalPreferenceCheckBox.setChecked(settings.getOverrideAllCardArtWithPersonalPreference());
     connect(&overrideAllCardArtWithPersonalPreferenceCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &AppearanceSettingsPage::overrideAllCardArtWithPersonalPreferenceToggled);
@@ -141,6 +134,21 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     bumpSetsWithCardsInDeckToTopCheckBox.setChecked(settings.getBumpSetsWithCardsInDeckToTop());
     connect(&bumpSetsWithCardsInDeckToTopCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
             &SettingsCache::setBumpSetsWithCardsInDeckToTop);
+
+    auto *printingsGrid = new QGridLayout;
+    printingsGrid->addWidget(&overrideAllCardArtWithPersonalPreferenceCheckBox, 0, 0, 1, 2);
+    printingsGrid->addWidget(&bumpSetsWithCardsInDeckToTopCheckBox, 1, 0, 1, 2);
+
+    printingsGroupBox = new QGroupBox;
+    printingsGroupBox->setLayout(printingsGrid);
+
+    // Card rendering
+    displayCardNamesCheckBox.setChecked(settings.getDisplayCardNames());
+    connect(&displayCardNamesCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setDisplayCardNames);
+
+    autoRotateSidewaysLayoutCardsCheckBox.setChecked(settings.getAutoRotateSidewaysLayoutCards());
+    connect(&autoRotateSidewaysLayoutCardsCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
+            &SettingsCache::setAutoRotateSidewaysLayoutCards);
 
     cardScalingCheckBox.setChecked(settings.getScaleCards());
     connect(&cardScalingCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setCardScaling);
@@ -168,14 +176,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardsGrid->addWidget(&autoRotateSidewaysLayoutCardsCheckBox, 1, 0, 1, 2);
     cardsGrid->addWidget(&cardScalingCheckBox, 2, 0, 1, 2);
     cardsGrid->addWidget(&roundCardCornersCheckBox, 3, 0, 1, 2);
-    cardsGrid->addWidget(&overrideAllCardArtWithPersonalPreferenceCheckBox, 4, 0, 1, 2);
-    cardsGrid->addWidget(&bumpSetsWithCardsInDeckToTopCheckBox, 5, 0, 1, 2);
-    cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 6, 0, 1, 1);
-    cardsGrid->addWidget(&verticalCardOverlapPercentBox, 6, 1, 1, 1);
-    cardsGrid->addWidget(&cardViewInitialRowsMaxLabel, 7, 0);
-    cardsGrid->addWidget(&cardViewInitialRowsMaxBox, 7, 1);
-    cardsGrid->addWidget(&cardViewExpandedRowsMaxLabel, 8, 0);
-    cardsGrid->addWidget(&cardViewExpandedRowsMaxBox, 8, 1);
+    cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 4, 0, 1, 1);
+    cardsGrid->addWidget(&verticalCardOverlapPercentBox, 4, 1, 1, 1);
+    cardsGrid->addWidget(&cardViewInitialRowsMaxLabel, 5, 0);
+    cardsGrid->addWidget(&cardViewInitialRowsMaxBox, 5, 1);
+    cardsGrid->addWidget(&cardViewExpandedRowsMaxLabel, 6, 0);
+    cardsGrid->addWidget(&cardViewExpandedRowsMaxBox, 6, 1);
 
     cardsGroupBox = new QGroupBox;
     cardsGroupBox->setLayout(cardsGrid);
@@ -273,6 +279,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     mainLayout->addWidget(themeGroupBox);
     mainLayout->addWidget(homeTabGroupBox);
     mainLayout->addWidget(menuGroupBox);
+    mainLayout->addWidget(printingsGroupBox);
     mainLayout->addWidget(cardsGroupBox);
     mainLayout->addWidget(cardCountersGroupBox);
     mainLayout->addWidget(handGroupBox);
@@ -388,13 +395,15 @@ void AppearanceSettingsPage::retranslateUi()
     showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));
     showGameSelectorFilterToolbarCheckBox.setText(tr("Show game filter toolbar above list in room tab"));
 
-    cardsGroupBox->setTitle(tr("Card rendering"));
-    displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
-    autoRotateSidewaysLayoutCardsCheckBox.setText(tr("Auto-Rotate cards with sideways layout"));
+    printingsGroupBox->setTitle(tr("Card printings"));
     overrideAllCardArtWithPersonalPreferenceCheckBox.setText(
         tr("Override all card art with personal set preference (Pre-ProviderID change behavior)"));
     bumpSetsWithCardsInDeckToTopCheckBox.setText(
         tr("Bump sets that the deck contains cards from to the top in the printing selector"));
+
+    cardsGroupBox->setTitle(tr("Card rendering"));
+    displayCardNamesCheckBox.setText(tr("Display card names on cards having a picture"));
+    autoRotateSidewaysLayoutCardsCheckBox.setText(tr("Auto-Rotate cards with sideways layout"));
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
     roundCardCornersCheckBox.setText(tr("Use rounded card corners"));
     verticalCardOverlapPercentLabel.setText(
