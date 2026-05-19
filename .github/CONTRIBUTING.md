@@ -211,11 +211,11 @@ into smaller parts, for example at spaces or after opening a brace.
 
 ### Documentation Comments ###
 
-Use [Doxygen](https://www.doxygen.nl/) for API documentation:
+Use [Doxygen](https://www.doxygen.nl/) for code documentation:
 
-- **Doc blocks**: Use `/** @brief Description */` (JavaDoc-style), not `///`
+- **Doc blocks**: Use `/** @brief Description */` (Javadoc-style), not `///`
 - **Member comments**: Use trailing `///<` for inline member documentation
-- **TODOs**: Use `//! \todo Description` (Qt-style) so Doxygen collects them into a Todo List
+- **TODOs**: Use `//! \todo Description` (Qt-style), Doxygen collects them into a Todo List
   (uses [Qt-style comments](https://www.doxygen.nl/manual/docblocks.html) with
   Doxygen's [\todo command](https://www.doxygen.nl/manual/commands.html#cmdtodo))
 
