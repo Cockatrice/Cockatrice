@@ -22,6 +22,8 @@ void ArchidektApiResponseCard::fromJson(const QJsonObject &json)
 
     flavor = json.value("flavor").toString();
     //! \todo Parse games and options fields (not really important).
+    // games = {""};
+    // options = {""};
     scryfallImageHash = json.value("scryfallImageHash").toString();
     oracleCard = json.value("oracleCard").toObject();
     owned = json.value("owned").toInt();
