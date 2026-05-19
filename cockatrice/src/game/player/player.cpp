@@ -98,8 +98,10 @@ void Player::setConceded(bool _conceded)
 
 void Player::setZoneId(int _zoneId)
 {
-    zoneId = _zoneId;
-    emit zoneIdChanged(zoneId);
+    if (zoneId != _zoneId) {
+        zoneId = _zoneId;
+        emit zoneIdChanged(zoneId);
+    }
 }
 
 void Player::processPlayerInfo(const ServerInfo_Player &info)
