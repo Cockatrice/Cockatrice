@@ -89,6 +89,8 @@ else
       echo "'$previous' to '$TAG' ($count commits)"
       # --> is the markdown comment escape sequence, emojis are way better
       generated_list="${generated_list//-->/→}"
+      # Escape & to preserve it from commit message into markdown output
+      generated_list="${generated_list//&/\\&}"
       body="${body//--REPLACE-WITH-GENERATED-LIST--/$generated_list}"
       body="${body//--REPLACE-WITH-COMMIT-COUNT--/$count}"
       body="${body//--REPLACE-WITH-PREVIOUS-RELEASE-TAG--/$previous}"
