@@ -82,6 +82,7 @@ signals:
                         bool isLentToAnotherPlayer = false);
     void logAlwaysRevealTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
     void logAlwaysLookAtTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
+    void cardZoneChanged(CardItem *card, bool sameZone);
 
 public:
     PlayerEventHandler(PlayerLogic *player);

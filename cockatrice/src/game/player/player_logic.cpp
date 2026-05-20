@@ -74,7 +74,7 @@ PlayerLogic::~PlayerLogic()
 
 void PlayerLogic::clear()
 {
-    clearArrows();
+    emit arrowsCleared();
 
     QMapIterator<QString, CardZoneLogic *> i(zones);
     while (i.hasNext()) {
@@ -115,7 +115,7 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                                       /* HandZone */
                                       ZoneNames::HAND};
     clearCounters();
-    clearArrows();
+    emit arrowsCleared();
 
     QMutableMapIterator<QString, CardZoneLogic *> zoneIt(zones);
     while (zoneIt.hasNext()) {
@@ -231,7 +231,7 @@ void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
 
     const int arrowListSize = info.arrow_list_size();
     for (int i = 0; i < arrowListSize; ++i) {
-        addArrow(info.arrow_list(i));
+        emit arrowCreateRequested(ArrowData::fromProto(info.arrow_list(i)));
     }
 }
 
@@ -338,75 +338,6 @@ void PlayerLogic::incrementAllCardCounters()
     if (!commandList.isEmpty()) {
         playerActions->sendGameCommand(playerActions->prepareGameCommand(commandList));
     }
-}
-
-ArrowItem *PlayerLogic::addArrow(const ServerInfo_Arrow &arrow)
-{
-    const QMap<int, PlayerLogic *> &playerList = game->getPlayerManager()->getPlayers();
-    PlayerLogic *startPlayer = playerList.value(arrow.start_player_id(), 0);
-    PlayerLogic *targetPlayer = playerList.value(arrow.target_player_id(), 0);
-    if (!startPlayer || !targetPlayer) {
-        return nullptr;
-    }
-
-    CardZoneLogic *startZone = startPlayer->getZones().value(QString::fromStdString(arrow.start_zone()), 0);
-    CardZoneLogic *targetZone = nullptr;
-    if (arrow.has_target_zone()) {
-        targetZone = targetPlayer->getZones().value(QString::fromStdString(arrow.target_zone()), 0);
-    }
-    if (!startZone || (!targetZone && arrow.has_target_zone())) {
-        return nullptr;
-    }
-
-    CardItem *startCard = startZone->getCard(arrow.start_card_id());
-    CardItem *targetCard = nullptr;
-    if (targetZone) {
-        targetCard = targetZone->getCard(arrow.target_card_id());
-    }
-    if (!startCard || (!targetCard && arrow.has_target_card_id())) {
-        return nullptr;
-    }
-
-    if (targetCard) {
-        return addArrow(arrow.id(), startCard, targetCard, convertColorToQColor(arrow.arrow_color()));
-    } else {
-        return addArrow(arrow.id(), startCard, targetPlayer->getGraphicsItem()->getPlayerTarget(),
-                        convertColorToQColor(arrow.arrow_color()));
-    }
-}
-
-ArrowItem *PlayerLogic::addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color)
-{
-    auto *arrow = new ArrowItem(this, arrowId, startCard, targetItem, color);
-    arrows.insert(arrowId, arrow);
-
-    getGameScene()->addItem(arrow);
-    return arrow;
-}
-
-void PlayerLogic::delArrow(int arrowId)
-{
-    ArrowItem *arr = arrows.value(arrowId, 0);
-    if (!arr) {
-        return;
-    }
-    arr->delArrow();
-}
-
-void PlayerLogic::removeArrow(ArrowItem *arrow)
-{
-    if (arrow->getId() != -1) {
-        arrows.remove(arrow->getId());
-    }
-}
-
-void PlayerLogic::clearArrows()
-{
-    QMapIterator<int, ArrowItem *> arrowIterator(arrows);
-    while (arrowIterator.hasNext()) {
-        arrowIterator.next().value()->delArrow();
-    }
-    arrows.clear();
 }
 
 bool PlayerLogic::clearCardsToDelete()

@@ -8,6 +8,7 @@
 #define PLAYER_H
 
 #include "../../interface/widgets/menus/tearoff_menu.h"
+#include "../board/arrow_data.h"
 #include "../interface/deck_loader/loaded_deck.h"
 #include "../zones/hand_zone_logic.h"
 #include "../zones/pile_zone_logic.h"
@@ -77,6 +78,9 @@ signals:
     void clearCustomZonesMenu();
     void addViewCustomZoneActionToCustomZoneMenu(QString zoneName);
     void resetTopCardMenuActions();
+    void arrowCreateRequested(ArrowData data);
+    void arrowDeleteRequested(int arrowId);
+    void arrowsCleared(); // fires on clear() and processPlayerInfo
 
 public slots:
     void setActive(bool _active);
@@ -204,17 +208,6 @@ public:
      * Gets the counter that represents the life total.
      */
     CounterState *getLifeCounter() const;
-
-    ArrowItem *addArrow(const ServerInfo_Arrow &arrow);
-    ArrowItem *addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color);
-    void delArrow(int arrowId);
-    void removeArrow(ArrowItem *arrow);
-    void clearArrows();
-
-    const QMap<int, ArrowItem *> &getArrows() const
-    {
-        return arrows;
-    }
 
     void setConceded(bool _conceded);
     bool getConceded() const
