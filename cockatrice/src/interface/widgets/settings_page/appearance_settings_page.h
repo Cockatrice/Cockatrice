@@ -61,6 +61,7 @@ private:
     QGroupBox *menuGroupBox;
     QGroupBox *printingsGroupBox;
     QGroupBox *cardsGroupBox;
+    QGroupBox *cardLayoutGroupBox;
     QGroupBox *handGroupBox;
     QGroupBox *tableGroupBox;
     QGroupBox *cardCountersGroupBox;

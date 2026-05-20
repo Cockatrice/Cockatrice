@@ -156,6 +156,25 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     roundCardCornersCheckBox.setChecked(settings.getRoundCardCorners());
     connect(&roundCardCornersCheckBox, &QAbstractButton::toggled, &settings, &SettingsCache::setRoundCardCorners);
 
+    connect(&maxFontSizeForCardsEdit, qOverload<int>(&QSpinBox::valueChanged), &settings,
+            &SettingsCache::setMaxFontSize);
+    maxFontSizeForCardsEdit.setValue(settings.getMaxFontSize());
+    maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
+    maxFontSizeForCardsEdit.setMinimum(9);
+    maxFontSizeForCardsEdit.setMaximum(100);
+
+    auto *cardsGrid = new QGridLayout;
+    cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
+    cardsGrid->addWidget(&autoRotateSidewaysLayoutCardsCheckBox, 1, 0, 1, 2);
+    cardsGrid->addWidget(&cardScalingCheckBox, 2, 0, 1, 2);
+    cardsGrid->addWidget(&roundCardCornersCheckBox, 3, 0, 1, 2);
+    cardsGrid->addWidget(&maxFontSizeForCardsLabel, 4, 0, 1, 1);
+    cardsGrid->addWidget(&maxFontSizeForCardsEdit, 4, 1, 1, 1);
+
+    cardsGroupBox = new QGroupBox;
+    cardsGroupBox->setLayout(cardsGrid);
+
+    // Card layout
     verticalCardOverlapPercentBox.setValue(settings.getStackCardOverlapPercent());
     verticalCardOverlapPercentBox.setRange(0, 80);
     connect(&verticalCardOverlapPercentBox, qOverload<int>(&QSpinBox::valueChanged), &settings,
@@ -171,20 +190,16 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&cardViewExpandedRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &AppearanceSettingsPage::cardViewExpandedRowsMaxChanged);
 
-    auto *cardsGrid = new QGridLayout;
-    cardsGrid->addWidget(&displayCardNamesCheckBox, 0, 0, 1, 2);
-    cardsGrid->addWidget(&autoRotateSidewaysLayoutCardsCheckBox, 1, 0, 1, 2);
-    cardsGrid->addWidget(&cardScalingCheckBox, 2, 0, 1, 2);
-    cardsGrid->addWidget(&roundCardCornersCheckBox, 3, 0, 1, 2);
-    cardsGrid->addWidget(&verticalCardOverlapPercentLabel, 4, 0, 1, 1);
-    cardsGrid->addWidget(&verticalCardOverlapPercentBox, 4, 1, 1, 1);
-    cardsGrid->addWidget(&cardViewInitialRowsMaxLabel, 5, 0);
-    cardsGrid->addWidget(&cardViewInitialRowsMaxBox, 5, 1);
-    cardsGrid->addWidget(&cardViewExpandedRowsMaxLabel, 6, 0);
-    cardsGrid->addWidget(&cardViewExpandedRowsMaxBox, 6, 1);
+    auto *cardLayoutGrid = new QGridLayout;
+    cardLayoutGrid->addWidget(&verticalCardOverlapPercentLabel, 0, 0, 1, 1);
+    cardLayoutGrid->addWidget(&verticalCardOverlapPercentBox, 0, 1, 1, 1);
+    cardLayoutGrid->addWidget(&cardViewInitialRowsMaxLabel, 1, 0);
+    cardLayoutGrid->addWidget(&cardViewInitialRowsMaxBox, 1, 1);
+    cardLayoutGrid->addWidget(&cardViewExpandedRowsMaxLabel, 2, 0);
+    cardLayoutGrid->addWidget(&cardViewExpandedRowsMaxBox, 2, 1);
 
-    cardsGroupBox = new QGroupBox;
-    cardsGroupBox->setLayout(cardsGrid);
+    cardLayoutGroupBox = new QGroupBox;
+    cardLayoutGroupBox->setLayout(cardLayoutGrid);
 
     // Card counter colors
 
@@ -257,19 +272,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
             &SettingsCache::setMinPlayersForMultiColumnLayout);
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
-    connect(&maxFontSizeForCardsEdit, qOverload<int>(&QSpinBox::valueChanged), &settings,
-            &SettingsCache::setMaxFontSize);
-    maxFontSizeForCardsEdit.setValue(settings.getMaxFontSize());
-    maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
-    maxFontSizeForCardsEdit.setMinimum(9);
-    maxFontSizeForCardsEdit.setMaximum(100);
-
     auto *tableGrid = new QGridLayout;
     tableGrid->addWidget(&invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
     tableGrid->addWidget(&minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
     tableGrid->addWidget(&minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
-    tableGrid->addWidget(&maxFontSizeForCardsLabel, 2, 0, 1, 1);
-    tableGrid->addWidget(&maxFontSizeForCardsEdit, 2, 1, 1, 1);
 
     tableGroupBox = new QGroupBox;
     tableGroupBox->setLayout(tableGrid);
@@ -281,6 +287,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     mainLayout->addWidget(menuGroupBox);
     mainLayout->addWidget(printingsGroupBox);
     mainLayout->addWidget(cardsGroupBox);
+    mainLayout->addWidget(cardLayoutGroupBox);
     mainLayout->addWidget(cardCountersGroupBox);
     mainLayout->addWidget(handGroupBox);
     mainLayout->addWidget(tableGroupBox);
@@ -406,6 +413,9 @@ void AppearanceSettingsPage::retranslateUi()
     autoRotateSidewaysLayoutCardsCheckBox.setText(tr("Auto-Rotate cards with sideways layout"));
     cardScalingCheckBox.setText(tr("Scale cards on mouse over"));
     roundCardCornersCheckBox.setText(tr("Use rounded card corners"));
+    maxFontSizeForCardsLabel.setText(tr("Maximum font size for information displayed on cards:"));
+
+    cardLayoutGroupBox->setTitle(tr("Card layout"));
     verticalCardOverlapPercentLabel.setText(
         tr("Minimum overlap percentage of cards on the stack and in vertical hand"));
     cardViewInitialRowsMaxLabel.setText(tr("Maximum initial height for card view window:"));
@@ -427,5 +437,4 @@ void AppearanceSettingsPage::retranslateUi()
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
-    maxFontSizeForCardsLabel.setText(tr("Maximum font size for information displayed on cards:"));
 }
