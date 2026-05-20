@@ -97,10 +97,7 @@ void PlayerMenu::retranslateUi()
         countersMenu->setTitle(tr("&Counters"));
     }
 
-    QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
-    while (counterIterator.hasNext()) {
-        counterIterator.next().value()->retranslateUi();
-    }
+    emit retranslateRequested();
 }
 
 void PlayerMenu::refreshShortcuts()
@@ -120,30 +117,17 @@ void PlayerMenu::refreshShortcuts()
 void PlayerMenu::setShortcutsActive()
 {
     shortcutsActive = true;
-
-    for (auto *component : managedComponents) {
-        component->setShortcutsActive();
+    for (auto *c : managedComponents) {
+        c->setShortcutsActive();
     }
-
-    // Counters implement AbstractPlayerComponent but are iterated via Player::counters
-    // (the authoritative source) rather than managedComponents to avoid a redundant
-    // list that must stay in sync with the map.
-    QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
-    while (counterIterator.hasNext()) {
-        counterIterator.next().value()->setShortcutsActive();
-    }
+    emit shortcutsActivated();
 }
 
 void PlayerMenu::setShortcutsInactive()
 {
     shortcutsActive = false;
-
-    for (auto *component : managedComponents) {
-        component->setShortcutsInactive();
+    for (auto *c : managedComponents) {
+        c->setShortcutsInactive();
     }
-
-    QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
-    while (counterIterator.hasNext()) {
-        counterIterator.next().value()->setShortcutsInactive();
-    }
+    emit shortcutsDeactivated();
 }

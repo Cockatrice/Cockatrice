@@ -5,22 +5,15 @@
 
 #include <QPainter>
 
-GeneralCounter::GeneralCounter(PlayerLogic *_player,
-                               int _id,
-                               const QString &_name,
-                               const QColor &_color,
-                               int _radius,
-                               int _value,
-                               bool useNameForShortcut,
-                               QGraphicsItem *parent)
-    : AbstractCounter(_player, _id, _name, true, _value, useNameForShortcut, parent), color(_color), radius(_radius)
+GeneralCounter::GeneralCounter(CounterState *state, PlayerLogic *player, bool useNameForShortcut, QGraphicsItem *parent)
+    : AbstractCounter(state, player, true, useNameForShortcut, parent)
 {
     setCacheMode(DeviceCoordinateCache);
 }
 
 QRectF GeneralCounter::boundingRect() const
 {
-    return QRectF(0, 0, radius * 2, radius * 2);
+    return QRectF(0, 0, state->getRadius() * 2, state->getRadius() * 2);
 }
 
 void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -28,19 +21,19 @@ void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /
     QRectF mapRect = painter->combinedTransform().mapRect(boundingRect());
     int translatedHeight = mapRect.size().height();
     qreal scaleFactor = translatedHeight / boundingRect().height();
-    QPixmap pixmap = CounterPixmapGenerator::generatePixmap(translatedHeight, name, hovered);
+    QPixmap pixmap = CounterPixmapGenerator::generatePixmap(translatedHeight, state->getName(), hovered);
 
     painter->save();
     resetPainterTransform(painter);
     painter->drawPixmap(QPoint(0, 0), pixmap);
 
-    if (value) {
+    if (state->getValue()) {
         QFont f("Serif");
-        f.setPixelSize(qMax((int)(radius * scaleFactor), 10));
+        f.setPixelSize(qMax((int)(state->getRadius() * scaleFactor), 10));
         f.setWeight(QFont::Bold);
         painter->setPen(Qt::black);
         painter->setFont(f);
-        painter->drawText(mapRect, Qt::AlignCenter, QString::number(value));
+        painter->drawText(mapRect, Qt::AlignCenter, QString::number(state->getValue()));
     }
     painter->restore();
 }

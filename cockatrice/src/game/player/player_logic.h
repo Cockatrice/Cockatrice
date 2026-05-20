@@ -7,7 +7,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "../../game_graphics/board/abstract_graphics_item.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../interface/deck_loader/loaded_deck.h"
 #include "../zones/hand_zone_logic.h"
@@ -39,7 +38,6 @@ class Message;
 }
 } // namespace google
 class AbstractCardItem;
-class AbstractCounter;
 class AbstractGame;
 class ArrowItem;
 class ArrowTarget;
@@ -70,6 +68,8 @@ signals:
     void openDeckEditor(const LoadedDeck &deck);
     void deckChanged();
     void newCardAdded(AbstractCardItem *card);
+    void counterAdded(CounterState *state);
+    void counterRemoved(int counterId);
     void rearrangeCounters();
     void activeChanged(bool active);
     void zoneIdChanged(int zoneId);
@@ -189,13 +189,13 @@ public:
         return qobject_cast<HandZoneLogic *>(zones.value(ZoneNames::HAND));
     }
 
-    AbstractCounter *addCounter(const ServerInfo_Counter &counter);
-    AbstractCounter *addCounter(int counterId, const QString &name, QColor color, int radius, int value);
+    CounterState *addCounter(const ServerInfo_Counter &counter);
+    CounterState *addCounter(int id, const QString &name, const QColor &color, int radius, int value);
     void delCounter(int counterId);
     void clearCounters();
     void incrementAllCardCounters();
 
-    QMap<int, AbstractCounter *> getCounters()
+    QMap<int, CounterState *> getCounters() const
     {
         return counters;
     }
@@ -203,7 +203,7 @@ public:
     /**
      * Gets the counter that represents the life total.
      */
-    AbstractCounter *getLifeCounter() const;
+    CounterState *getLifeCounter() const;
 
     ArrowItem *addArrow(const ServerInfo_Arrow &arrow);
     ArrowItem *addArrow(int arrowId, CardItem *startCard, ArrowTarget *targetItem, const QColor &color);
@@ -251,7 +251,7 @@ private:
 
     int zoneId;
     QMap<QString, CardZoneLogic *> zones;
-    QMap<int, AbstractCounter *> counters;
+    QMap<int, CounterState *> counters;
     QMap<int, ArrowItem *> arrows;
 
     bool dialogSemaphore;
