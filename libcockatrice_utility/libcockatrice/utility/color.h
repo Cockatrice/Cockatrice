@@ -22,6 +22,7 @@ inline color convertQColorToColor(const QColor &c)
     return result;
 }
 
+#include <QMap>
 #include <QSet>
 
 namespace GameSpecificColors

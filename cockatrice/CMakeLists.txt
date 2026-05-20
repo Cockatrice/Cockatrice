@@ -59,6 +59,7 @@ set(cockatrice_SOURCES
     src/game/board/abstract_card_drag_item.cpp
     src/game/board/abstract_card_item.cpp
     src/game/board/abstract_counter.cpp
+    src/game/board/arrow_data.cpp
     src/game/board/arrow_item.cpp
     src/game/board/arrow_target.cpp
     src/game/board/card_drag_item.cpp

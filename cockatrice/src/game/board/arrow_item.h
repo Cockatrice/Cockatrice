@@ -7,13 +7,15 @@
 #ifndef ARROWITEM_H
 #define ARROWITEM_H
 
+#include "arrow_target.h"
+
 #include <QGraphicsItem>
+#include <QPointer>
 
 class CardItem;
 class QGraphicsSceneMouseEvent;
 class QMenu;
 class PlayerLogic;
-class ArrowTarget;
 
 class ArrowItem : public QObject, public QGraphicsItem
 {
@@ -21,20 +23,21 @@ class ArrowItem : public QObject, public QGraphicsItem
     Q_INTERFACES(QGraphicsItem)
 private:
     QPainterPath path;
-    QMenu *menu;
 
 protected:
     PlayerLogic *player;
     int id;
-    ArrowTarget *startItem, *targetItem;
-    bool targetLocked;
+    QPointer<ArrowTarget> startItem;
+    QPointer<ArrowTarget> targetItem;
+    bool targetLocked = false;
     QColor color;
-    bool fullColor;
+    bool fullColor = true;
+
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
 public:
-    ArrowItem(PlayerLogic *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &color);
-    ~ArrowItem() override;
+    ArrowItem(PlayerLogic *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color);
+
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     [[nodiscard]] QRectF boundingRect() const override
     {
@@ -44,6 +47,7 @@ public:
     {
         return path;
     }
+
     void updatePath();
     void updatePath(const QPointF &endPoint);
 
@@ -54,14 +58,6 @@ public:
     [[nodiscard]] PlayerLogic *getPlayer() const
     {
         return player;
-    }
-    void setStartItem(ArrowTarget *_item)
-    {
-        startItem = _item;
-    }
-    void setTargetItem(ArrowTarget *_item)
-    {
-        targetItem = _item;
     }
     [[nodiscard]] ArrowTarget *getStartItem() const
     {
@@ -75,6 +71,7 @@ public:
     {
         targetLocked = _targetLocked;
     }
+
     void delArrow();
 };
 
@@ -84,10 +81,11 @@ class ArrowDragItem : public ArrowItem
 private:
     int deleteInPhase;
     QList<ArrowDragItem *> childArrows;
+    QMetaObject::Connection positionConnection;
 
 public:
     ArrowDragItem(PlayerLogic *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase);
-    void addChildArrow(ArrowDragItem *childArrow);
+    void addChildArrow(ArrowDragItem *child);
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
@@ -99,12 +97,12 @@ class ArrowAttachItem : public ArrowItem
     Q_OBJECT
 private:
     QList<ArrowAttachItem *> childArrows;
-
+    QMetaObject::Connection positionConnection;
     void attachCards(CardItem *startCard, const CardItem *targetCard);
 
 public:
     explicit ArrowAttachItem(ArrowTarget *_startItem);
-    void addChildArrow(ArrowAttachItem *childArrow);
+    void addChildArrow(ArrowAttachItem *child);
 
 protected:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;

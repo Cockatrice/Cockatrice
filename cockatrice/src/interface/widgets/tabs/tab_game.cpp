@@ -606,17 +606,9 @@ void TabGame::actNextPhaseAction()
 
 void TabGame::actRemoveLocalArrows()
 {
-    QMapIterator<int, PlayerLogic *> playerIterator(game->getPlayerManager()->getPlayers());
-    while (playerIterator.hasNext()) {
-        PlayerLogic *player = playerIterator.next().value();
-        if (!player->getPlayerInfo()->getLocal()) {
-            continue;
-        }
-        QMapIterator<int, ArrowItem *> arrowIterator(player->getArrows());
-        while (arrowIterator.hasNext()) {
-            ArrowItem *a = arrowIterator.next().value();
-            emit arrowDeletionRequested(a->getId());
-        }
+    auto *local = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
+    if (local) {
+        scene->clearArrowsForPlayer(local->getPlayerInfo()->getId());
     }
 }
 
