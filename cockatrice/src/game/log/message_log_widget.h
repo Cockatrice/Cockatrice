@@ -99,6 +99,7 @@ public slots:
     void logSpectatorSay(const ServerInfo_User &spectator, QString message);
     void logUnattachCard(Player *player, QString cardName);
     void logUndoDraw(Player *player, QString cardName);
+    void logUndoDrawFailed(Player *player);
     void setContextJudgeName(QString player);
     void appendHtmlServerMessage(const QString &html,
                                  bool optionalIsBold = false,

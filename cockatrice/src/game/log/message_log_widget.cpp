@@ -803,6 +803,12 @@ void MessageLogWidget::logUndoDraw(Player *player, QString cardName)
     }
 }
 
+void MessageLogWidget::logUndoDrawFailed(Player *player)
+{
+    appendHtmlServerMessage(
+        tr("%1 failed to undo their last draw.").arg(sanitizeHtml(player->getPlayerInfo()->getName())));
+}
+
 void MessageLogWidget::setContextJudgeName(QString name)
 {
     messagePrefix = QString("<span style=\"color:black\">");
@@ -836,6 +842,7 @@ void MessageLogWidget::connectToPlayerEventHandler(PlayerEventHandler *playerEve
     connect(playerEventHandler, &PlayerEventHandler::logDumpZone, this, &MessageLogWidget::logDumpZone);
     connect(playerEventHandler, &PlayerEventHandler::logDrawCards, this, &MessageLogWidget::logDrawCards);
     connect(playerEventHandler, &PlayerEventHandler::logUndoDraw, this, &MessageLogWidget::logUndoDraw);
+    connect(playerEventHandler, &PlayerEventHandler::logUndoDrawFailed, this, &MessageLogWidget::logUndoDrawFailed);
     connect(playerEventHandler, &PlayerEventHandler::logRevealCards, this, &MessageLogWidget::logRevealCards);
     connect(playerEventHandler, &PlayerEventHandler::logAlwaysRevealTopCard, this,
             &MessageLogWidget::logAlwaysRevealTopCard);
