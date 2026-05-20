@@ -76,6 +76,7 @@ set(PROTO_FILES
     event_game_closed.proto
     event_game_host_changed.proto
     event_game_joined.proto
+    event_game_log_notice.proto
     event_game_say.proto
     event_game_state_changed.proto
     event_game_state_changed.proto

@@ -1,0 +1,20 @@
+syntax = "proto2";
+import "game_event.proto";
+
+// Notifies clients of an event that happened, and which could safely be dropped without affect the game state.
+// This mostly just means events that should cause a message to be logged to chat.
+message Event_GameLogNotice {
+
+    // The type of the notice.
+    // Clients who do not recognize the type should drop the event.
+    enum NoticeType {
+        // Player's "undo draw" command failed due to losing track of recent draw
+        UNDO_DRAW_FAILED = 1;
+    }
+
+    extend GameEvent {
+        optional Event_GameLogNotice ext = 2022;
+    }
+
+    optional NoticeType notice_type = 1;
+}
