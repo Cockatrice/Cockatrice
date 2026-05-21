@@ -133,7 +133,7 @@ public:
     ICardSetPriorityController *getPriorityController()
     {
         return setPriorityController;
-    };
+    }
 
 public slots:
     /**

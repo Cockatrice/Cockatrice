@@ -27,7 +27,7 @@ public:
     bool isCompact() const
     {
         return compact;
-    };
+    }
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

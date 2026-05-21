@@ -37,7 +37,7 @@ public:
     {
         config = ManaCurveConfig::fromJson(o);
         updateDisplay();
-    };
+    }
 
     QJsonObject extractConfigFromDialog(QDialog *dlg) const override;
 

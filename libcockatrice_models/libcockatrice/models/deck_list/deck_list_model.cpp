@@ -257,8 +257,9 @@ Qt::ItemFlags DeckListModel::flags(const QModelIndex &index) const
 void DeckListModel::emitBackgroundUpdates(const QModelIndex &parent)
 {
     int rows = rowCount(parent);
-    if (rows == 0)
+    if (rows == 0) {
         return;
+    }
 
     QModelIndex topLeft = index(0, 0, parent);
     QModelIndex bottomRight = index(rows - 1, columnCount() - 1, parent);
@@ -539,8 +540,9 @@ int DeckListModel::findSortedInsertRow(const InnerDecklistNode *parent, const Ca
 
     for (int i = 0; i < parent->size(); ++i) {
         auto *existingCard = dynamic_cast<DecklistModelCardNode *>(parent->at(i));
-        if (!existingCard)
+        if (!existingCard) {
             continue;
+        }
 
         bool lessThan = false;
         switch (lastKnownColumn) {
@@ -557,8 +559,9 @@ int DeckListModel::findSortedInsertRow(const InnerDecklistNode *parent, const Ca
                 break;
         }
 
-        if (lessThan)
+        if (lessThan) {
             return i;
+        }
     }
 
     return parent->size(); // insert at end if no earlier match
