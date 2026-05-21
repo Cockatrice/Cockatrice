@@ -37,6 +37,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #if !defined(__cplusplus) || __cplusplus < 201703L
@@ -505,7 +506,7 @@ inline constexpr unsigned int str2tag(std::string_view sv) {
 
 namespace udl {
 
-inline constexpr unsigned int operator""_(const char *s, size_t l) {
+inline constexpr unsigned int operator"" _(const char *s, size_t l) {
   return str2tag_core(s, l, 0);
 }
 
@@ -2434,10 +2435,11 @@ struct ComputeFirstSet : public TraversalVisitor {
 
   void visit(Sequence &ope) override {
     for (const auto &op : ope.opes_) {
+      FirstSet element_fs;
       auto save = result_;
       result_ = FirstSet{};
       op->accept(*this);
-      auto element_fs = result_;
+      element_fs = result_;
       result_ = save;
       result_.chars |= element_fs.chars;
       if (element_fs.any_char) { result_.any_char = true; }
@@ -2526,10 +2528,22 @@ struct ComputeFirstSet : public TraversalVisitor {
   void visit(BackReference &) override { result_.any_char = true; }
   void visit(Cut &) override { result_.can_be_empty = true; }
 
+  // Per-rule cache shared across a SetupFirstSets traversal. Without it,
+  // every alternative of every PrioritizedChoice re-walks referenced
+  // rules — O(refs^depth) work for grammars with many cross-references.
+  // Only cycle-free rule computations are cached; results computed under
+  // a cycle (left recursion) would be incomplete and unsafe to reuse from
+  // a different call context.
+  using FirstSetCache = std::unordered_map<const Definition *, FirstSet>;
+
+  explicit ComputeFirstSet(FirstSetCache &cache) : cache_(cache) {}
+
   FirstSet result_;
 
 private:
-  std::unordered_set<std::string> refs_;
+  FirstSetCache &cache_;
+  std::unordered_set<const Definition *> refs_;
+  size_t cycle_count_ = 0;
 };
 
 struct SetupFirstSets : public TraversalVisitor {
@@ -2542,7 +2556,7 @@ struct SetupFirstSets : public TraversalVisitor {
     ope.first_sets_.clear();
     ope.first_sets_.reserve(ope.opes_.size());
     for (const auto &op : ope.opes_) {
-      ComputeFirstSet cfs;
+      ComputeFirstSet cfs(first_set_cache_);
       op->accept(cfs);
       ope.first_sets_.push_back(cfs.result_);
     }
@@ -2559,7 +2573,8 @@ struct SetupFirstSets : public TraversalVisitor {
   void visit(Reference &ope) override;
 
 private:
-  std::unordered_set<std::string> refs_;
+  ComputeFirstSet::FirstSetCache first_set_cache_;
+  std::unordered_set<const Definition *> visited_rules_;
 };
 
 /*
@@ -3806,20 +3821,50 @@ inline void ComputeFirstSet::visit(Reference &ope) {
     result_.any_char = true;
     return;
   }
-  if (refs_.count(ope.name_)) { return; }
-  refs_.insert(ope.name_);
-  ope.rule_->accept(*this);
-  if (!result_.first_rule && ope.rule_->is_token()) {
-    result_.first_rule = ope.rule_;
+
+  auto it = cache_.find(ope.rule_);
+  FirstSet computed;
+  const FirstSet *rule_fs;
+  if (it != cache_.end()) {
+    rule_fs = &it->second;
+  } else {
+    if (!refs_.insert(ope.rule_).second) {
+      cycle_count_++; // cycle / left recursion
+      return;
+    }
+    auto save = std::exchange(result_, FirstSet{});
+    auto saved_cycle_count = cycle_count_;
+    ope.rule_->accept(*this);
+    computed = std::move(result_);
+    result_ = std::move(save);
+    refs_.erase(ope.rule_);
+    if (cycle_count_ == saved_cycle_count) {
+      // Cycle-free: cached value is complete and safe to reuse.
+      it = cache_.try_emplace(ope.rule_, std::move(computed)).first;
+      rule_fs = &it->second;
+    } else {
+      // Cycle was hit during this rule's computation — its result may be
+      // missing contributions from rules that were on the call stack.
+      // Use the value here but do not cache it for other call contexts.
+      rule_fs = &computed;
+    }
   }
-  refs_.erase(ope.name_);
+
+  result_.merge(*rule_fs);
+  if (!result_.first_literal) {
+    result_.first_literal = rule_fs->first_literal;
+  }
+  if (!result_.first_rule) {
+    result_.first_rule = rule_fs->first_rule
+                             ? rule_fs->first_rule
+                             : (ope.rule_->is_token() ? ope.rule_ : nullptr);
+  }
 }
 
 inline void SetupFirstSets::visit(Reference &ope) {
-  if (!ope.rule_ || refs_.count(ope.name_)) { return; }
-  refs_.insert(ope.name_);
+  if (!ope.rule_) { return; }
+  if (!visited_rules_.insert(ope.rule_).second) { return; }
   ope.rule_->accept(*this);
-  refs_.erase(ope.name_);
 }
 
 inline void SetupFirstSets::visit(Sequence &ope) {
