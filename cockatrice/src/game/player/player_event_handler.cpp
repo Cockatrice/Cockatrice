@@ -37,6 +37,7 @@
 
 PlayerEventHandler::PlayerEventHandler(PlayerLogic *_player) : QObject(_player), player(_player)
 {
+    connect(this, &PlayerEventHandler::requestCardMenuUpdate, player, &PlayerLogic::requestCardMenuUpdate);
 }
 
 void PlayerEventHandler::eventGameSay(const Event_GameSay &event)
@@ -255,7 +256,7 @@ void PlayerEventHandler::eventSetCardCounter(const Event_SetCardCounter &event)
 
     int oldValue = card->getCounters().value(event.counter_id(), 0);
     card->setCounter(event.counter_id(), event.counter_value());
-    player->getPlayerMenu()->updateCardMenu(card);
+    emit requestCardMenuUpdate(card);
     emit logSetCardCounter(player, card->getName(), event.counter_id(), event.counter_value(), oldValue);
 }
 
@@ -373,7 +374,7 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
     targetZone->addCard(card, true, x, y);
 
     emit cardZoneChanged(card, startZone == targetZone);
-    player->getPlayerMenu()->updateCardMenu(card);
+    emit requestCardMenuUpdate(card);
 
     if (player->getPlayerActions()->isMovingCardsUntil() && startZoneString == ZoneNames::DECK &&
         targetZone->getName() == ZoneNames::STACK) {
@@ -400,7 +401,7 @@ void PlayerEventHandler::eventFlipCard(const Event_FlipCard &event)
 
     emit logFlipCard(player, card->getName(), event.face_down());
     card->setFaceDown(event.face_down());
-    player->getPlayerMenu()->updateCardMenu(card);
+    emit requestCardMenuUpdate(card);
 }
 
 void PlayerEventHandler::eventDestroyCard(const Event_DestroyCard &event)
@@ -469,7 +470,7 @@ void PlayerEventHandler::eventAttachCard(const Event_AttachCard &event)
     } else {
         emit logUnattachCard(player, startCard->getName());
     }
-    player->getPlayerMenu()->updateCardMenu(startCard);
+    emit requestCardMenuUpdate(startCard);
 }
 
 void PlayerEventHandler::eventDrawCards(const Event_DrawCards &event)
@@ -555,7 +556,7 @@ void PlayerEventHandler::eventRevealCards(const Event_RevealCards &event, EventP
         }
 
         if (!options.testFlag(SKIP_REVEAL_WINDOW) && showZoneView && !cardList.isEmpty()) {
-            player->getGameScene()->addRevealedZoneView(player, zone, cardList, event.grant_write_access());
+            emit player->requestRevealedZoneView(player, zone, cardList, event.grant_write_access());
         }
 
         emit logRevealCards(player, zone, cardId, cardName, otherPlayer, false,

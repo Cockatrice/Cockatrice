@@ -4,8 +4,10 @@
 #include "../game_graphics/zones/select_zone.h"
 #include "../game_graphics/zones/view_zone.h"
 #include "../game_graphics/zones/view_zone_widget.h"
+#include "abstract_game.h"
 #include "board/card_item.h"
 #include "phases_toolbar.h"
+#include "player/player_actions.h"
 #include "player/player_graphics_item.h"
 #include "player/player_logic.h"
 
@@ -72,6 +74,62 @@ QList<CardItem *> GameScene::selectedCards() const
     return selectedCards;
 }
 
+void GameScene::onCardSelectionChanged(AbstractCardItem *abstractCard, bool selected)
+{
+    CardItem *card = qobject_cast<CardItem *>(abstractCard);
+    if (!card || !card->getOwner()) {
+        return;
+    }
+
+    auto *owner = card->getOwner();
+
+    if (selected) {
+        owner->requestCardMenuUpdate(card);
+        return;
+    }
+
+    if (selectedItems().isEmpty()) {
+        owner->getGame()->setActiveCard(nullptr);
+        owner->requestCardMenuUpdate(nullptr);
+    }
+}
+
+void GameScene::onCardRightClicked(AbstractCardItem *abstractCard, QPoint screenPos)
+{
+    auto *card = qobject_cast<CardItem *>(abstractCard);
+    if (!card) {
+        return;
+    }
+    if (!card->getOwner()) {
+        return;
+    }
+    auto *view = playerViews.value(card->getOwner()->getPlayerInfo()->getId());
+    if (!view) {
+        return;
+    }
+
+    card->getOwner()->getGame()->setActiveCard(card);
+
+    if (auto *menu = view->getPlayerMenu()->updateCardMenu(card)) {
+        menu->popup(screenPos);
+    }
+}
+
+void GameScene::playSelected(AbstractCardItem *card)
+{
+    card->getOwner()->getPlayerActions()->actPlay(selectedCards());
+}
+
+void GameScene::playSelectedFaceDown(AbstractCardItem *card)
+{
+    card->getOwner()->getPlayerActions()->actPlayFacedown(selectedCards());
+}
+
+void GameScene::hideSelected(AbstractCardItem *card)
+{
+    card->getOwner()->getPlayerActions()->actHide(selectedCards());
+}
+
 /**
  * @brief Adds a player to the scene and stores their graphics item.
  * @param player Player to add.
@@ -82,9 +140,11 @@ void GameScene::addPlayer(PlayerLogic *player)
 {
     qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getPlayerInfo()->getName();
 
-    playerViews.insert(player->getPlayerInfo()->getId(), player->getGraphicsItem());
-    addItem(player->getGraphicsItem());
-    connect(player->getGraphicsItem(), &PlayerGraphicsItem::sizeChanged, this, &GameScene::rearrange);
+    auto *view = new PlayerGraphicsItem(player);
+
+    playerViews.insert(player->getPlayerInfo()->getId(), view);
+    addItem(view);
+    connect(view, &PlayerGraphicsItem::sizeChanged, this, &GameScene::rearrange);
 
     connect(player, &PlayerLogic::concededChanged, this, [this](int id, bool conceded) {
         if (conceded) {
@@ -93,6 +153,8 @@ void GameScene::addPlayer(PlayerLogic *player)
         rearrange();
     });
 
+    connect(player, &PlayerLogic::requestZoneViewToggle, this, &GameScene::toggleZoneView);
+    connect(player, &PlayerLogic::requestRevealedZoneView, this, &GameScene::addRevealedZoneView);
     connect(player, &PlayerLogic::arrowDeleted, this, &GameScene::onArrowDeleted);
     connect(player, &PlayerLogic::arrowCreateRequested, this, &GameScene::onArrowCreateRequested);
     connect(player, &PlayerLogic::arrowDeleteRequested, this, &GameScene::onArrowDeleteRequested);
@@ -204,7 +266,7 @@ QList<PlayerLogic *> GameScene::collectActivePlayers(int &firstPlayerIndex) cons
     bool firstPlayerFound = false;
 
     for (auto *pgItem : playerViews.values()) {
-        PlayerLogic *p = pgItem->getPlayer();
+        PlayerLogic *p = pgItem->getPlayerLogic();
         if (p && !p->getConceded()) {
             activePlayers.append(p);
             if (!firstPlayerFound && p->getPlayerInfo()->getLocal()) {
@@ -275,12 +337,12 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<PlayerLogic *> &pl
         for (int j = 0; j < rowsInColumn; ++j) {
             PlayerLogic *player = playersIter.next();
             if (col == 0) {
-                playersByColumn[col].prepend(player->getGraphicsItem());
+                playersByColumn[col].prepend(playerViews.value(player->getPlayerInfo()->getId()));
             } else {
-                playersByColumn[col].append(player->getGraphicsItem());
+                playersByColumn[col].append(playerViews.value(player->getPlayerInfo()->getId()));
             }
 
-            auto *pgItem = player->getGraphicsItem();
+            auto *pgItem = playerViews.value(player->getPlayerInfo()->getId());
             thisColumnHeight += pgItem->boundingRect().height() + playerAreaSpacing;
             columnWidth[col] = std::max(columnWidth[col], (int)pgItem->boundingRect().width());
         }
@@ -375,7 +437,7 @@ void GameScene::onArrowCreateRequested(const ArrowData &data)
         return;
     }
 
-    PlayerLogic *startLogic = startView->getPlayer();
+    PlayerLogic *startLogic = startView->getPlayerLogic();
     auto *startZone = startLogic->getZones().value(data.startZone);
     if (!startZone) {
         return;
@@ -390,7 +452,7 @@ void GameScene::onArrowCreateRequested(const ArrowData &data)
     if (data.isPlayerTargeted()) {
         targetItem = targetView->getPlayerTarget();
     } else {
-        auto *zone = targetView->getPlayer()->getZones().value(data.targetZone);
+        auto *zone = targetView->getPlayerLogic()->getZones().value(data.targetZone);
         if (zone) {
             targetItem = zone->getCard(data.targetCardId);
         }
@@ -399,7 +461,7 @@ void GameScene::onArrowCreateRequested(const ArrowData &data)
         return;
     }
 
-    auto *arrow = new ArrowItem(startView->getPlayer(), data.id, startCard, targetItem, data.color);
+    auto *arrow = new ArrowItem(startView->getPlayerLogic(), data.id, startCard, targetItem, data.color);
     addItem(arrow);
     arrowRegistry.insert(data.id, arrow);
     connect(arrow, &ArrowItem::requestDeletion, this, &GameScene::onArrowDeleteRequested);

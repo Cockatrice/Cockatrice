@@ -14,6 +14,7 @@
 
 class HandZone;
 class PileZone;
+class PlayerDialogs;
 class PlayerTarget;
 class StackZone;
 class TableZone;
@@ -55,9 +56,14 @@ public:
         return static_cast<GameScene *>(scene());
     }
 
-    PlayerLogic *getPlayer() const
+    PlayerLogic *getPlayerLogic() const
     {
         return player;
+    }
+
+    [[nodiscard]] PlayerMenu *getPlayerMenu() const
+    {
+        return playerMenu;
     }
 
     PlayerArea *getPlayerArea() const
@@ -111,9 +117,13 @@ public slots:
 signals:
     void sizeChanged();
     void playerCountChanged();
+    void mirroredChanged(bool isMirrored);
+    void cardInfoRequested(const CardRef &cardRef);
 
 private:
     PlayerLogic *player;
+    PlayerMenu *playerMenu;
+    PlayerDialogs *playerDialogs;
     PlayerArea *playerArea;
     PlayerTarget *playerTarget;
     QMap<int, AbstractCounter *> counterWidgets;

@@ -8,21 +8,23 @@
 #define COCKATRICE_UTILITY_MENU_H
 
 #include "abstract_player_component.h"
+#include "libcockatrice/card/card_info.h"
 
 #include <QMenu>
 
-class PlayerLogic;
+class PlayerGraphicsItem;
 class UtilityMenu : public QMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
 public slots:
     void populatePredefinedTokensMenu();
+    void setLastToken(CardInfoPtr lastToken);
     void retranslateUi() override;
     void setShortcutsActive() override;
     void setShortcutsInactive() override;
 
 public:
-    explicit UtilityMenu(PlayerLogic *player, QMenu *playerMenu);
+    explicit UtilityMenu(PlayerGraphicsItem *player, QMenu *playerMenu);
 
     [[nodiscard]] bool createAnotherTokenActionExists() const
     {
@@ -31,7 +33,7 @@ public:
 
     void setAndEnableCreateAnotherTokenAction(QString text)
     {
-        aCreateAnotherToken->setText(text);
+        aCreateAnotherToken->setText(tr("C&reate another %1 token").arg(text));
         aCreateAnotherToken->setEnabled(true);
     }
 
@@ -41,7 +43,7 @@ public:
     }
 
 private:
-    PlayerLogic *player;
+    PlayerGraphicsItem *player;
     QStringList predefinedTokens;
 
     QMenu *createPredefinedTokenMenu;

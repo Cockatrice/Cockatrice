@@ -4,7 +4,7 @@
 #include "../player_actions.h"
 #include "../player_logic.h"
 
-MoveMenu::MoveMenu(PlayerLogic *player) : QMenu(tr("Move to"))
+MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
 {
     aMoveToTopLibrary = new QAction(this);
     aMoveToTopLibrary->setData(cmMoveToTopLibrary);
@@ -20,14 +20,22 @@ MoveMenu::MoveMenu(PlayerLogic *player) : QMenu(tr("Move to"))
     aMoveToExile = new QAction(this);
     aMoveToExile->setData(cmMoveToExile);
 
-    connect(aMoveToTopLibrary, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    connect(aMoveToBottomLibrary, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    connect(aMoveToXfromTopOfLibrary, &QAction::triggered, player->getPlayerActions(),
-            &PlayerActions::actMoveCardXCardsFromTop);
-    connect(aMoveToTable, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    connect(aMoveToHand, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    connect(aMoveToGraveyard, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    connect(aMoveToExile, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
+    auto *actions = player->getPlayerLogic()->getPlayerActions();
+
+    auto invoke = [player](CardMenuActionType type) {
+        return [type, player]() {
+            player->getPlayerLogic()->getPlayerActions()->cardMenuAction(player->getGameScene()->selectedCards(), type);
+        };
+    };
+
+    connect(aMoveToTopLibrary, &QAction::triggered, actions, invoke(cmMoveToTopLibrary));
+    connect(aMoveToBottomLibrary, &QAction::triggered, actions, invoke(cmMoveToBottomLibrary));
+    connect(aMoveToXfromTopOfLibrary, &QAction::triggered, actions,
+            &PlayerActions::actRequestMoveCardXCardsFromTopDialog);
+    connect(aMoveToTable, &QAction::triggered, actions, invoke(cmMoveToTable));
+    connect(aMoveToHand, &QAction::triggered, actions, invoke(cmMoveToHand));
+    connect(aMoveToGraveyard, &QAction::triggered, actions, invoke(cmMoveToGraveyard));
+    connect(aMoveToExile, &QAction::triggered, actions, invoke(cmMoveToExile));
 
     addAction(aMoveToTopLibrary);
     addAction(aMoveToXfromTopOfLibrary);

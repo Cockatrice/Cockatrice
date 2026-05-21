@@ -6,6 +6,7 @@
 #include "../../zones/view_zone_logic.h"
 #include "../card_menu_action_type.h"
 #include "../player_actions.h"
+#include "../player_graphics_item.h"
 #include "../player_logic.h"
 #include "move_menu.h"
 #include "pt_menu.h"
@@ -14,81 +15,80 @@
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/utility/zone_names.h>
 
-CardMenu::CardMenu(PlayerLogic *_player, const CardItem *_card, bool _shortcutsActive)
+template <typename Slot>
+static QAction *makeAction(QObject *parent, Slot &&slot, bool checkable = false, bool checked = false)
+{
+    auto *a = new QAction(parent);
+    a->setCheckable(checkable);
+    if (checkable) {
+        a->setChecked(checked);
+    }
+    QObject::connect(a, &QAction::triggered, parent, std::forward<Slot>(slot));
+    return a;
+}
+
+CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
 {
-    auto playerActions = player->getPlayerActions();
-
-    const QList<PlayerLogic *> &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    const QList<PlayerLogic *> &players =
+        player->getPlayerLogic()->getGame()->getPlayerManager()->getPlayers().values();
 
     for (auto playerToAdd : players) {
-        if (playerToAdd == player) {
+        if (playerToAdd == player->getPlayerLogic()) {
             continue;
         }
         playersInfo.append(qMakePair(playerToAdd->getPlayerInfo()->getName(), playerToAdd->getPlayerInfo()->getId()));
     }
 
-    connect(player->getGame()->getPlayerManager(), &PlayerManager::playerRemoved, this, &CardMenu::removePlayer);
+    auto *actions = player->getPlayerLogic()->getPlayerActions();
+    auto *gameScene = player->getGameScene();
 
-    aTap = new QAction(this);
-    aTap->setData(cmTap);
-    connect(aTap, &QAction::triggered, playerActions, &PlayerActions::cardMenuAction);
-    aDoesntUntap = new QAction(this);
-    aDoesntUntap->setData(cmDoesntUntap);
-    aDoesntUntap->setCheckable(true);
-    aDoesntUntap->setChecked(card != nullptr && card->getDoesntUntap());
-    connect(aDoesntUntap, &QAction::triggered, playerActions, &PlayerActions::cardMenuAction);
+    // Single selection resolver used by all lambdas — called at trigger time
+    auto sel = [gameScene]() { return gameScene->selectedCards(); };
+
+    // Unified dispatcher for card menu actions
+    auto invoke = [actions, sel](CardMenuActionType type) {
+        return [actions, sel, type]() { actions->cardMenuAction(sel(), type); };
+    };
+
+    // Actions using invoke (type dispatch, need selection)
+    aTap = makeAction(this, invoke(cmTap));
+    aDoesntUntap = makeAction(this, invoke(cmDoesntUntap), /*checkable=*/true, card && card->getDoesntUntap());
+    aFlip = makeAction(this, invoke(cmFlip));
+    aPeek = makeAction(this, invoke(cmPeek));
+    aClone = makeAction(this, invoke(cmClone));
+
+    // Actions using selection directly
+    aUnattach = makeAction(this, [actions, sel]() { actions->actUnattach(sel()); });
+    aSetAnnotation = makeAction(this, [actions, sel]() { actions->actRequestSetAnnotationDialog(sel()); });
+    aPlay = makeAction(this, [actions, sel]() { actions->actPlay(sel()); });
+    aPlayFacedown = makeAction(this, [actions, sel]() { actions->actPlayFacedown(sel()); });
+    aHide = makeAction(this, [actions, sel]() { actions->actHide(sel()); });
+    aReduceLifeByPower = makeAction(this, [actions, sel]() { actions->actReduceLifeByPower(sel()); });
+
+    // Actions that use activeCard, not selection — direct connection
     aAttach = new QAction(this);
-    connect(aAttach, &QAction::triggered, playerActions, &PlayerActions::actAttach);
-    aUnattach = new QAction(this);
-    connect(aUnattach, &QAction::triggered, playerActions, &PlayerActions::actUnattach);
     aDrawArrow = new QAction(this);
-    connect(aDrawArrow, &QAction::triggered, playerActions, &PlayerActions::actDrawArrow);
-    aSetAnnotation = new QAction(this);
-    connect(aSetAnnotation, &QAction::triggered, playerActions, &PlayerActions::actSetAnnotation);
-    aFlip = new QAction(this);
-    aFlip->setData(cmFlip);
-    connect(aFlip, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    aPeek = new QAction(this);
-    aPeek->setData(cmPeek);
-    connect(aPeek, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
-    aClone = new QAction(this);
-    aClone->setData(cmClone);
-    connect(aClone, &QAction::triggered, player->getPlayerActions(), &PlayerActions::cardMenuAction);
     aSelectAll = new QAction(this);
-    connect(aSelectAll, &QAction::triggered, playerActions, &PlayerActions::actSelectAll);
     aSelectRow = new QAction(this);
-    connect(aSelectRow, &QAction::triggered, playerActions, &PlayerActions::actSelectRow);
     aSelectColumn = new QAction(this);
-    connect(aSelectColumn, &QAction::triggered, playerActions, &PlayerActions::actSelectColumn);
 
-    aReduceLifeByPower = new QAction(this);
-    connect(aReduceLifeByPower, &QAction::triggered, playerActions, &PlayerActions::actReduceLifeByPower);
-
-    aPlay = new QAction(this);
-    connect(aPlay, &QAction::triggered, playerActions, &PlayerActions::actPlay);
-    aHide = new QAction(this);
-    connect(aHide, &QAction::triggered, playerActions, &PlayerActions::actHide);
-    aPlayFacedown = new QAction(this);
-    connect(aPlayFacedown, &QAction::triggered, playerActions, &PlayerActions::actPlayFacedown);
+    connect(aAttach, &QAction::triggered, actions, &PlayerActions::actAttach);
+    connect(aDrawArrow, &QAction::triggered, actions, &PlayerActions::actDrawArrow);
+    connect(aSelectAll, &QAction::triggered, actions, &PlayerActions::actSelectAll);
+    connect(aSelectRow, &QAction::triggered, actions, &PlayerActions::actSelectRow);
+    connect(aSelectColumn, &QAction::triggered, actions, &PlayerActions::actSelectColumn);
 
     aRevealToAll = new QAction(this);
 
     mCardCounters = new QMenu;
 
+    // Card counters
     for (int i = 0; i < 6; ++i) {
-        auto *tempAddCounter = new QAction(this);
-        auto *tempRemoveCounter = new QAction(this);
-        auto *tempSetCounter = new QAction(this);
-        aAddCounter.append(tempAddCounter);
-        aRemoveCounter.append(tempRemoveCounter);
-        aSetCounter.append(tempSetCounter);
-        connect(tempAddCounter, &QAction::triggered, playerActions,
-                [playerActions, i] { playerActions->actAddCardCounter(i); });
-        connect(tempRemoveCounter, &QAction::triggered, playerActions,
-                [playerActions, i] { playerActions->actRemoveCardCounter(i); });
-        connect(tempSetCounter, &QAction::triggered, playerActions,
-                [playerActions, i] { playerActions->actSetCardCounter(i); });
+        aAddCounter.append(makeAction(this, [actions, sel, i]() { actions->actAddCardCounter(sel(), i); }));
+        aRemoveCounter.append(makeAction(this, [actions, sel, i]() { actions->actRemoveCardCounter(sel(), i); }));
+        aSetCounter.append(
+            makeAction(this, [actions, sel, i]() { actions->actRequestSetCardCounterDialog(sel(), i); }));
     }
 
     setShortcutsActive();
@@ -100,7 +100,7 @@ CardMenu::CardMenu(PlayerLogic *_player, const CardItem *_card, bool _shortcutsA
     }
 
     bool revealedCard = false;
-    bool writeableCard = player->getPlayerInfo()->getLocalOrJudge();
+    bool writeableCard = player->getPlayerLogic()->getPlayerInfo()->getLocalOrJudge();
     if (auto *view = qobject_cast<ZoneViewZoneLogic *>(card->getZone())) {
         if (view->getRevealZone()) {
             if (view->getWriteableRevealZone()) {
@@ -284,7 +284,9 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
 
     initContextualPlayersMenu(revealMenu, aRevealToAll);
 
-    connect(revealMenu, &QMenu::triggered, player->getPlayerActions(), &PlayerActions::actReveal);
+    connect(revealMenu, &QMenu::triggered, this, [this](QAction *action) {
+        player->getPlayerLogic()->getPlayerActions()->actReveal(player->getGameScene()->selectedCards(), action);
+    });
 
     addSeparator();
     addAction(aClone);
@@ -369,8 +371,7 @@ void CardMenu::addRelatedCardView()
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
         Q_UNUSED(viewCard);
 
-        connect(viewCard, &QAction::triggered, player->getGame(),
-                [this, cardRef] { player->getGame()->getTab()->viewCardInfo(cardRef); });
+        connect(viewCard, &QAction::triggered, this, [this, cardRef] { emit cardInfoRequested(cardRef); });
     }
 }
 
@@ -432,7 +433,8 @@ void CardMenu::addRelatedCardActions()
 
         auto *createRelated = new QAction(text, this);
         createRelated->setData(QVariant(index++));
-        connect(createRelated, &QAction::triggered, player->getPlayerActions(), &PlayerActions::actCreateRelatedCard);
+        connect(createRelated, &QAction::triggered, player->getPlayerLogic()->getPlayerActions(),
+                &PlayerActions::actCreateRelatedCard);
         addAction(createRelated);
     }
 
@@ -441,7 +443,7 @@ void CardMenu::addRelatedCardActions()
             createRelatedCards->setShortcuts(
                 SettingsCache::instance().shortcuts().getShortcut("Player/aCreateRelatedTokens"));
         }
-        connect(createRelatedCards, &QAction::triggered, player->getPlayerActions(),
+        connect(createRelatedCards, &QAction::triggered, player->getPlayerLogic()->getPlayerActions(),
                 &PlayerActions::actCreateAllRelatedCards);
         addAction(createRelatedCards);
     }

@@ -22,7 +22,8 @@ const QColor TableZone::FADE_MASK = QColor(0, 0, 0, 80);
 const QColor TableZone::GRADIENT_COLOR = QColor(255, 255, 255, 150);
 const QColor TableZone::GRADIENT_COLORLESS = QColor(255, 255, 255, 0);
 
-TableZone::TableZone(TableZoneLogic *_logic, QGraphicsItem *parent) : SelectZone(_logic, parent), active(false)
+TableZone::TableZone(TableZoneLogic *_logic, bool _mirrored, QGraphicsItem *parent)
+    : SelectZone(_logic, parent), active(false), mirrored(_mirrored)
 {
     connect(_logic, &TableZoneLogic::contentSizeChanged, this, &TableZone::resizeToContents);
     connect(_logic, &TableZoneLogic::toggleTapped, this, &TableZone::toggleTapped);
@@ -50,12 +51,16 @@ QRectF TableZone::boundingRect() const
     return QRectF(0, 0, width, height);
 }
 
+void TableZone::setMirrored(bool isMirrored)
+{
+    mirrored = isMirrored;
+    update();
+}
+
 bool TableZone::isInverted() const
 {
-    return ((getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
-             !SettingsCache::instance().getInvertVerticalCoordinate()) ||
-            (!getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
-             SettingsCache::instance().getInvertVerticalCoordinate()));
+    return ((mirrored && !SettingsCache::instance().getInvertVerticalCoordinate()) ||
+            (!mirrored && SettingsCache::instance().getInvertVerticalCoordinate()));
 }
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)

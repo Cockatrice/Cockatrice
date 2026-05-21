@@ -7,16 +7,22 @@
 #ifndef COCKATRICE_CARD_MENU_H
 #define COCKATRICE_CARD_MENU_H
 
+#include "libcockatrice/utility/card_ref.h"
+
 #include <QMenu>
 
 class CardItem;
+class PlayerGraphicsItem;
 class PlayerLogic;
 class CardMenu : public QMenu
 {
     Q_OBJECT
 
+signals:
+    void cardInfoRequested(const CardRef &cardRef);
+
 public:
-    explicit CardMenu(PlayerLogic *player, const CardItem *card, bool shortcutsActive);
+    explicit CardMenu(PlayerGraphicsItem *player, const CardItem *card, bool shortcutsActive);
     void removePlayer(PlayerLogic *playerToRemove);
     void createTableMenu(bool canModifyCard);
     void createStackMenu(bool canModifyCard);
@@ -41,7 +47,7 @@ public:
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 
 private:
-    PlayerLogic *player;
+    PlayerGraphicsItem *player;
     const CardItem *card;
     QList<QPair<QString, int>> playersInfo;
     bool shortcutsActive;

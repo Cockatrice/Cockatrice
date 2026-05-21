@@ -99,6 +99,7 @@ set(cockatrice_SOURCES
     src/game/player/menu/utility_menu.cpp
     src/game/player/player_actions.cpp
     src/game/player/player_area.cpp
+    src/game/player/player_dialogs.cpp
     src/game/player/player_event_handler.cpp
     src/game/player/player_graphics_item.cpp
     src/game/player/player_info.cpp
