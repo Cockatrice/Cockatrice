@@ -137,7 +137,6 @@ signals:
     void gameLeft();
     void chatMessageSent(QString chatMessage);
     void turnAdvanced();
-    void arrowDeletionRequested(int arrowId);
 
 private slots:
     void adminLockChanged(bool lock);

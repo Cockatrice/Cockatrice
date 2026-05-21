@@ -118,7 +118,9 @@ void PlayerEventHandler::eventCreateArrow(const Event_CreateArrow &event)
 
     emit player->arrowCreateRequested(data);
 
-    if (startPlayer && targetPlayer) {
+    const bool validForLogging = !startCardName.isEmpty() && (data.isPlayerTargeted() || !targetCardName.isEmpty());
+
+    if (startPlayer && targetPlayer && validForLogging) {
         emit logCreateArrow(player, startPlayer, startCardName, targetPlayer, targetCardName, data.isPlayerTargeted());
     }
 }

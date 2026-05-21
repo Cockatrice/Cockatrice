@@ -409,7 +409,7 @@ void GameScene::onArrowCreateRequested(ArrowData data)
 void GameScene::onArrowDeleteRequested(int arrowId)
 {
     if (auto *arrow = arrowRegistry.value(arrowId)) {
-        arrow->delArrow();
+        emit requestArrowDeletion(arrowId);
     }
 }
 
@@ -426,7 +426,7 @@ void GameScene::onCardZoneChanged(CardItem *card, bool sameZone)
         }
     }
     for (auto *arrow : toDelete) {
-        arrow->delArrow();
+        emit requestArrowDeletion(arrow->getId());
     }
 }
 
@@ -434,7 +434,7 @@ void GameScene::clearArrowsForPlayer(int playerId)
 {
     for (auto *arrow : arrowRegistry.values()) {
         if (arrow->getPlayer()->getPlayerInfo()->getId() == playerId) {
-            arrow->delArrow();
+            emit requestArrowDeletion(arrow->getId());
         }
     }
 }
