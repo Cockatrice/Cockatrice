@@ -5,15 +5,8 @@
 
 #include <QPainter>
 
-GeneralCounter::GeneralCounter(PlayerLogic *_player,
-                               int _id,
-                               const QString &_name,
-                               const QColor &_color,
-                               int _radius,
-                               int _value,
-                               bool useNameForShortcut,
-                               QGraphicsItem *parent)
-    : AbstractCounter(_player, _id, _name, true, _value, useNameForShortcut, parent), color(_color), radius(_radius)
+GeneralCounter::GeneralCounter(CounterState *state, PlayerLogic *player, bool useNameForShortcut, QGraphicsItem *parent)
+    : AbstractCounter(state, player, true, useNameForShortcut, parent)
 {
     setCacheMode(DeviceCoordinateCache);
 }

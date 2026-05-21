@@ -9,8 +9,8 @@
 #include <QtMath>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
-PlayerCounter::PlayerCounter(PlayerLogic *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent)
-    : AbstractCounter(_player, _id, _name, false, _value, false, parent)
+PlayerCounter::PlayerCounter(CounterState *state, PlayerLogic *player, QGraphicsItem *parent)
+    : AbstractCounter(state, player, false, false, parent)
 {
 }
 
@@ -150,18 +150,16 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     }
 }
 
-AbstractCounter *PlayerTarget::addCounter(int _counterId, const QString &_name, int _value)
+AbstractCounter *PlayerTarget::addCounter(CounterState *state)
 {
     if (playerCounter) {
         disconnect(playerCounter, nullptr, this, nullptr);
         playerCounter->delCounter();
     }
-
-    playerCounter = new PlayerCounter(owner, _counterId, _name, _value, this);
+    playerCounter = new PlayerCounter(state, owner, this);
     playerCounter->setPos(boundingRect().width() - playerCounter->boundingRect().width(),
                           boundingRect().height() - playerCounter->boundingRect().height());
     connect(playerCounter, &PlayerCounter::destroyed, this, &PlayerTarget::counterDeleted);
-
     return playerCounter;
 }
 

@@ -246,7 +246,7 @@ void PlayerEventHandler::eventCreateCounter(const Event_CreateCounter &event)
 
 void PlayerEventHandler::eventSetCounter(const Event_SetCounter &event)
 {
-    AbstractCounter *ctr = player->getCounters().value(event.counter_id(), 0);
+    CounterState *ctr = player->getCounters().value(event.counter_id(), nullptr);
     if (!ctr) {
         return;
     }

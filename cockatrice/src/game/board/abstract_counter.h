@@ -9,6 +9,7 @@
 
 #include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../player/menu/abstract_player_component.h"
+#include "counter_state.h"
 
 #include <QGraphicsItem>
 #include <QInputDialog>
@@ -29,18 +30,22 @@ protected:
     int id;
     QString name;
     int value;
-    bool useNameForShortcut, hovered;
+    QColor color;
+    int radius;
+    bool hovered = false;
+    bool useNameForShortcut;
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
 private:
-    QAction *aSet, *aDec, *aInc;
-    TearOffMenu *menu;
-    bool dialogSemaphore, deleteAfterDialog;
+    QAction *aSet = nullptr, *aDec = nullptr, *aInc = nullptr;
+    TearOffMenu *menu = nullptr;
+    bool dialogSemaphore = false;
+    bool deleteAfterDialog = false;
     bool shownInCounterArea;
-    bool shortcutActive;
+    bool shortcutActive = false;
 
 private slots:
     void refreshShortcuts();
@@ -48,17 +53,14 @@ private slots:
     void setCounter();
 
 public:
-    AbstractCounter(PlayerLogic *_player,
-                    int _id,
-                    const QString &_name,
-                    bool _shownInCounterArea,
-                    int _value,
-                    bool _useNameForShortcut = false,
+    AbstractCounter(CounterState *state,
+                    PlayerLogic *player,
+                    bool shownInCounterArea,
+                    bool useNameForShortcut = false,
                     QGraphicsItem *parent = nullptr);
     ~AbstractCounter() override;
 
     void retranslateUi() override;
-    void setValue(int _value);
     void setShortcutsActive() override;
     void setShortcutsInactive() override;
     void delCounter();
@@ -67,7 +69,6 @@ public:
     {
         return menu;
     }
-
     int getId() const
     {
         return id;
@@ -76,13 +77,21 @@ public:
     {
         return name;
     }
-    bool getShownInCounterArea() const
+    QColor getColor() const
     {
-        return shownInCounterArea;
+        return color;
+    }
+    int getRadius() const
+    {
+        return radius;
     }
     int getValue() const
     {
         return value;
+    }
+    bool getShownInCounterArea() const
+    {
+        return shownInCounterArea;
     }
 };
 
