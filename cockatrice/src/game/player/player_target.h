@@ -19,7 +19,7 @@ class PlayerCounter : public AbstractCounter
 {
     Q_OBJECT
 public:
-    PlayerCounter(PlayerLogic *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent = nullptr);
+    PlayerCounter(CounterState *state, PlayerLogic *player, QGraphicsItem *parent);
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 };
@@ -48,7 +48,7 @@ public:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    AbstractCounter *addCounter(int _counterId, const QString &_name, int _value);
+    AbstractCounter *addCounter(CounterState *state);
 };
 
 #endif

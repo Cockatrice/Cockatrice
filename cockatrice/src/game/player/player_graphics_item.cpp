@@ -6,6 +6,7 @@
 #include "../../game_graphics/zones/table_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/abstract_card_item.h"
+#include "../board/counter_general.h"
 #include "../hand_counter.h"
 
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
@@ -17,6 +18,25 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
     connect(player, &PlayerLogic::rearrangeCounters, this, &PlayerGraphicsItem::rearrangeCounters);
     connect(player, &PlayerLogic::concededChanged, this, [this](int, bool c) { setVisible(!c); });
     connect(player, &PlayerLogic::zoneIdChanged, this, [this](int id) { playerArea->setPlayerZoneId(id); });
+
+    connect(player, &PlayerLogic::counterAdded, this, &PlayerGraphicsItem::onCounterAdded);
+    connect(player, &PlayerLogic::counterRemoved, this, &PlayerGraphicsItem::onCounterRemoved);
+
+    connect(player->getPlayerMenu(), &PlayerMenu::shortcutsActivated, this, [this]() {
+        for (auto *ctr : counterWidgets) {
+            ctr->setShortcutsActive();
+        }
+    });
+    connect(player->getPlayerMenu(), &PlayerMenu::shortcutsDeactivated, this, [this]() {
+        for (auto *ctr : counterWidgets) {
+            ctr->setShortcutsInactive();
+        }
+    });
+    connect(player->getPlayerMenu(), &PlayerMenu::retranslateRequested, this, [this]() {
+        for (auto *ctr : counterWidgets) {
+            ctr->retranslateUi();
+        }
+    });
 
     playerArea = new PlayerArea(this);
 
@@ -42,11 +62,6 @@ void PlayerGraphicsItem::retranslateUi()
     QMapIterator<QString, CardZoneLogic *> zoneIterator(player->getZones());
     while (zoneIterator.hasNext()) {
         emit zoneIterator.next().value()->retranslateUi();
-    }
-
-    QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
-    while (counterIterator.hasNext()) {
-        counterIterator.next().value()->retranslateUi();
     }
 }
 
@@ -134,20 +149,48 @@ void PlayerGraphicsItem::setMirrored(bool _mirrored)
     }
 }
 
+void PlayerGraphicsItem::onCounterAdded(CounterState *state)
+{
+    AbstractCounter *widget;
+    if (state->getName() == "life") {
+        widget = playerTarget->addCounter(state);
+    } else {
+        widget = new GeneralCounter(state, player, true, this);
+    }
+    counterWidgets.insert(state->getId(), widget);
+
+    if (player->getPlayerMenu()->getCountersMenu() && widget->getMenu()) {
+        player->getPlayerMenu()->getCountersMenu()->addMenu(widget->getMenu());
+    }
+
+    if (player->getPlayerMenu()->getShortcutsActive()) {
+        widget->setShortcutsActive();
+    }
+
+    rearrangeCounters();
+}
+
+void PlayerGraphicsItem::onCounterRemoved(int counterId)
+{
+    auto *widget = counterWidgets.take(counterId);
+    if (!widget) {
+        return;
+    }
+    if (player->getPlayerMenu()->getCountersMenu() && widget->getMenu()) {
+        player->getPlayerMenu()->getCountersMenu()->removeAction(widget->getMenu()->menuAction());
+    }
+    widget->delCounter();
+    rearrangeCounters();
+}
+
 void PlayerGraphicsItem::rearrangeCounters()
 {
-    qreal marginTop = 80;
-    const qreal padding = 5;
-    qreal ySize = boundingRect().y() + marginTop;
-
-    // Place objects
-    for (const auto &counter : player->getCounters()) {
-        AbstractCounter *ctr = counter;
-
+    qreal ySize = boundingRect().y() + 80;
+    constexpr qreal padding = 5;
+    for (auto *ctr : counterWidgets.values()) {
         if (!ctr->getShownInCounterArea()) {
             continue;
         }
-
         QRectF br = ctr->boundingRect();
         ctr->setPos((counterAreaWidth - br.width()) / 2, ySize);
         ySize += br.height() + padding;

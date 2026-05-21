@@ -258,55 +258,50 @@ void PlayerLogic::setDeck(const DeckList &_deck)
     emit deckChanged();
 }
 
-AbstractCounter *PlayerLogic::addCounter(const ServerInfo_Counter &counter)
+CounterState *PlayerLogic::addCounter(const ServerInfo_Counter &counter)
 {
     return addCounter(counter.id(), QString::fromStdString(counter.name()),
                       convertColorToQColor(counter.counter_color()), counter.radius(), counter.count());
 }
 
-AbstractCounter *PlayerLogic::addCounter(int counterId, const QString &name, QColor color, int radius, int value)
+CounterState *PlayerLogic::addCounter(int id, const QString &name, const QColor &color, int radius, int value)
 {
-    if (counters.contains(counterId)) {
+    if (counters.contains(id)) {
         return nullptr;
     }
-
-    AbstractCounter *ctr;
-    if (name == "life") {
-        ctr = getGraphicsItem()->getPlayerTarget()->addCounter(counterId, name, value);
-    } else {
-        ctr = new GeneralCounter(this, counterId, name, color, radius, value, true, graphicsItem);
-    }
-    counters.insert(counterId, ctr);
-
-    if (playerMenu->getCountersMenu() && ctr->getMenu()) {
-        playerMenu->getCountersMenu()->addMenu(ctr->getMenu());
-    }
-    if (playerMenu->getShortcutsActive()) {
-        ctr->setShortcutsActive();
-    }
-    emit rearrangeCounters();
-    return ctr;
+    auto *state = new CounterState(id, name, color, radius, value, this);
+    counters.insert(id, state);
+    emit counterAdded(state);
+    return state;
 }
 
-void PlayerLogic::delCounter(int counterId)
+void PlayerLogic::delCounter(int id)
 {
-    AbstractCounter *ctr = counters.value(counterId, 0);
-    if (!ctr) {
+    auto *state = counters.take(id);
+    if (!state) {
         return;
     }
-
-    ctr->delCounter();
-    counters.remove(counterId);
-    emit rearrangeCounters();
+    emit counterRemoved(id);
+    state->deleteLater();
 }
 
 void PlayerLogic::clearCounters()
 {
-    QMapIterator<int, AbstractCounter *> counterIterator(counters);
-    while (counterIterator.hasNext()) {
-        counterIterator.next().value()->delCounter();
+    for (int id : counters.keys()) {
+        emit counterRemoved(id);
     }
+    qDeleteAll(counters);
     counters.clear();
+}
+
+CounterState *PlayerLogic::getLifeCounter() const
+{
+    for (auto *s : counters.values()) {
+        if (s->getName() == "life") {
+            return s;
+        }
+    }
+    return nullptr;
 }
 
 void PlayerLogic::incrementAllCardCounters()
@@ -343,16 +338,6 @@ void PlayerLogic::incrementAllCardCounters()
     if (!commandList.isEmpty()) {
         playerActions->sendGameCommand(playerActions->prepareGameCommand(commandList));
     }
-}
-
-AbstractCounter *PlayerLogic::getLifeCounter() const
-{
-    for (auto counter : counters.values()) {
-        if (counter->getName() == "life") {
-            return counter;
-        }
-    }
-    return nullptr;
 }
 
 ArrowItem *PlayerLogic::addArrow(const ServerInfo_Arrow &arrow)

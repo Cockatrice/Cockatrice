@@ -6,6 +6,7 @@
 
 #ifndef COCKATRICE_PLAYER_GRAPHICS_ITEM_H
 #define COCKATRICE_PLAYER_GRAPHICS_ITEM_H
+#include "../board/abstract_counter.h"
 #include "../game_scene.h"
 #include "player_logic.h"
 
@@ -102,6 +103,9 @@ public:
 
 public slots:
     void onPlayerActiveChanged(bool _active);
+    void onCounterAdded(CounterState *state);
+    void onCounterRemoved(int counterId);
+    void rearrangeCounters();
     void retranslateUi();
 
 signals:
@@ -112,6 +116,7 @@ private:
     PlayerLogic *player;
     PlayerArea *playerArea;
     PlayerTarget *playerTarget;
+    QMap<int, AbstractCounter *> counterWidgets;
     PileZone *deckZoneGraphicsItem;
     PileZone *sideboardGraphicsItem;
     PileZone *graveyardZoneGraphicsItem;
@@ -126,7 +131,6 @@ private:
 private slots:
     void updateBoundingRect();
     void rearrangeZones();
-    void rearrangeCounters();
 };
 
 #endif // COCKATRICE_PLAYER_GRAPHICS_ITEM_H

@@ -29,6 +29,9 @@ class PlayerMenu : public QObject
 
 signals:
     void cardMenuUpdated(QMenu *cardMenu);
+    void shortcutsActivated();
+    void shortcutsDeactivated();
+    void retranslateRequested();
 
 public slots:
     void setMenusForGraphicItems();
