@@ -3,22 +3,9 @@
 #include "../player/player_logic.h"
 #include "arrow_item.h"
 
-ArrowTarget::ArrowTarget(PlayerLogic *_owner, QGraphicsItem *parent)
-    : AbstractGraphicsItem(parent), owner(_owner), beingPointedAt(false)
+ArrowTarget::ArrowTarget(PlayerLogic *_owner, QGraphicsItem *parent) : AbstractGraphicsItem(parent), owner(_owner)
 {
     setFlag(ItemSendsScenePositionChanges);
-}
-
-ArrowTarget::~ArrowTarget()
-{
-    for (int i = 0; i < arrowsFrom.size(); ++i) {
-        arrowsFrom[i]->setStartItem(0);
-        arrowsFrom[i]->delArrow();
-    }
-    for (int i = 0; i < arrowsTo.size(); ++i) {
-        arrowsTo[i]->setTargetItem(0);
-        arrowsTo[i]->delArrow();
-    }
 }
 
 void ArrowTarget::setBeingPointedAt(bool _beingPointedAt)
@@ -27,17 +14,10 @@ void ArrowTarget::setBeingPointedAt(bool _beingPointedAt)
     update();
 }
 
-QVariant ArrowTarget::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+QVariant ArrowTarget::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if (change == ItemScenePositionHasChanged && scene()) {
-        for (auto *arrow : arrowsFrom) {
-            arrow->updatePath();
-        }
-
-        for (auto *arrow : arrowsTo) {
-            arrow->updatePath();
-        }
+    if (change == ItemScenePositionHasChanged) {
+        emit scenePositionChanged();
     }
-
-    return QGraphicsItem::itemChange(change, value);
+    return AbstractGraphicsItem::itemChange(change, value);
 }

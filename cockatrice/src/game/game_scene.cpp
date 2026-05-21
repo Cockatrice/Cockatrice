@@ -82,9 +82,25 @@ void GameScene::addPlayer(PlayerLogic *player)
 {
     qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getPlayerInfo()->getName();
 
-    players << player->getGraphicsItem();
+    playerViews.insert(player->getPlayerInfo()->getId(), player->getGraphicsItem());
     addItem(player->getGraphicsItem());
     connect(player->getGraphicsItem(), &PlayerGraphicsItem::sizeChanged, this, &GameScene::rearrange);
+
+    connect(player, &PlayerLogic::concededChanged, this, [this](int id, bool conceded) {
+        if (conceded) {
+            clearArrowsForPlayer(id);
+        }
+        rearrange();
+    });
+
+    connect(player, &PlayerLogic::arrowCreateRequested, this, &GameScene::onArrowCreateRequested);
+    connect(player, &PlayerLogic::arrowDeleteRequested, this, &GameScene::onArrowDeleteRequested);
+    connect(player, &PlayerLogic::arrowsCleared, this,
+            [this, id = player->getPlayerInfo()->getId()]() { clearArrowsForPlayer(id); });
+
+    connect(player->getPlayerEventHandler(), &PlayerEventHandler::cardZoneChanged, this, &GameScene::onCardZoneChanged);
+
+    rearrange();
 }
 
 /**
@@ -97,13 +113,15 @@ void GameScene::removePlayer(PlayerLogic *player)
 {
     qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::removePlayer name=" << player->getPlayerInfo()->getName();
 
+    clearArrowsForPlayer(player->getPlayerInfo()->getId());
+
     for (ZoneViewWidget *zone : zoneViews) {
         if (zone->getPlayer() == player) {
             zone->close();
         }
     }
-    players.removeOne(player->getGraphicsItem());
-    removeItem(player->getGraphicsItem());
+    auto *view = playerViews.take(player->getPlayerInfo()->getId());
+    removeItem(view);
     rearrange();
 }
 
@@ -184,7 +202,7 @@ QList<PlayerLogic *> GameScene::collectActivePlayers(int &firstPlayerIndex) cons
     firstPlayerIndex = 0;
     bool firstPlayerFound = false;
 
-    for (auto *pgItem : players) {
+    for (auto *pgItem : playerViews.values()) {
         PlayerLogic *p = pgItem->getPlayer();
         if (p && !p->getConceded()) {
             activePlayers.append(p);
@@ -345,6 +363,77 @@ void GameScene::resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qr
             player->setPos(newx, player->y());
         }
         newx += minWidthByColumn[col] + extraWidthPerColumn;
+    }
+}
+
+void GameScene::onArrowCreateRequested(const ArrowData &data)
+{
+    auto *startView = playerViews.value(data.startPlayerId);
+    auto *targetView = playerViews.value(data.targetPlayerId);
+    if (!startView || !targetView) {
+        return;
+    }
+
+    PlayerLogic *startLogic = startView->getPlayer();
+    auto *startZone = startLogic->getZones().value(data.startZone);
+    if (!startZone) {
+        return;
+    }
+
+    CardItem *startCard = startZone->getCard(data.startCardId);
+    if (!startCard) {
+        return;
+    }
+
+    ArrowTarget *targetItem = nullptr;
+    if (data.isPlayerTargeted()) {
+        targetItem = targetView->getPlayerTarget();
+    } else {
+        auto *zone = targetView->getPlayer()->getZones().value(data.targetZone);
+        if (zone) {
+            targetItem = zone->getCard(data.targetCardId);
+        }
+    }
+    if (!targetItem) {
+        return;
+    }
+
+    auto *arrow = new ArrowItem(startView->getPlayer(), data.id, startCard, targetItem, data.color);
+    addItem(arrow);
+    arrowRegistry.insert(data.id, arrow);
+    connect(arrow, &QObject::destroyed, this, [this, id = data.id]() { arrowRegistry.remove(id); });
+}
+
+void GameScene::onArrowDeleteRequested(int arrowId)
+{
+    if (arrowRegistry.contains(arrowId)) {
+        emit requestArrowDeletion(arrowId);
+    }
+}
+
+void GameScene::onCardZoneChanged(CardItem *card, bool sameZone)
+{
+    QList<ArrowItem *> toDelete;
+    for (auto *arrow : arrowRegistry.values()) {
+        if (arrow->getStartItem() == card || arrow->getTargetItem() == card) {
+            if (sameZone) {
+                arrow->updatePath();
+            } else {
+                toDelete.append(arrow);
+            }
+        }
+    }
+    for (auto *arrow : toDelete) {
+        emit requestArrowDeletion(arrow->getId());
+    }
+}
+
+void GameScene::clearArrowsForPlayer(int playerId)
+{
+    for (auto *arrow : arrowRegistry.values()) {
+        if (arrow->getPlayer()->getPlayerInfo()->getId() == playerId) {
+            emit requestArrowDeletion(arrow->getId());
+        }
     }
 }
 

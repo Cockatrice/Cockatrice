@@ -2,9 +2,11 @@
 
 #include "../../game_graphics/zones/view_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
+#include "../board/arrow_data.h"
 #include "../board/arrow_item.h"
 #include "../board/card_item.h"
 #include "../board/card_list.h"
+#include "libcockatrice/utility/color.h"
 #include "player_actions.h"
 #include "player_logic.h"
 
@@ -90,25 +92,43 @@ void PlayerEventHandler::eventRollDie(const Event_RollDie &event)
 
 void PlayerEventHandler::eventCreateArrow(const Event_CreateArrow &event)
 {
-    ArrowItem *arrow = player->addArrow(event.arrow_info());
-    if (!arrow) {
-        return;
+    const ArrowData data = ArrowData::fromProto(event.arrow_info());
+
+    // Resolve names for logging
+    const auto &playerList = player->getGame()->getPlayerManager()->getPlayers();
+    PlayerLogic *startPlayer = playerList.value(data.startPlayerId);
+    PlayerLogic *targetPlayer = playerList.value(data.targetPlayerId);
+
+    QString startCardName, targetCardName;
+    if (startPlayer) {
+        auto *zone = startPlayer->getZones().value(data.startZone);
+        if (zone) {
+            if (auto *card = zone->getCard(data.startCardId)) {
+                startCardName = card->getName();
+            }
+        }
+    }
+    if (!data.isPlayerTargeted() && targetPlayer) {
+        auto *zone = targetPlayer->getZones().value(data.targetZone);
+        if (zone) {
+            if (auto *card = zone->getCard(data.targetCardId)) {
+                targetCardName = card->getName();
+            }
+        }
     }
 
-    auto *startCard = static_cast<CardItem *>(arrow->getStartItem());
-    auto *targetCard = qgraphicsitem_cast<CardItem *>(arrow->getTargetItem());
-    if (targetCard) {
-        emit logCreateArrow(player, startCard->getOwner(), startCard->getName(), targetCard->getOwner(),
-                            targetCard->getName(), false);
-    } else {
-        emit logCreateArrow(player, startCard->getOwner(), startCard->getName(), arrow->getTargetItem()->getOwner(),
-                            QString(), true);
+    emit player->arrowCreateRequested(data);
+
+    const bool validForLogging = !startCardName.isEmpty() && (data.isPlayerTargeted() || !targetCardName.isEmpty());
+
+    if (startPlayer && targetPlayer && validForLogging) {
+        emit logCreateArrow(player, startPlayer, startCardName, targetPlayer, targetCardName, data.isPlayerTargeted());
     }
 }
 
 void PlayerEventHandler::eventDeleteArrow(const Event_DeleteArrow &event)
 {
-    player->delArrow(event.arrow_id());
+    emit player->arrowDeleteRequested(event.arrow_id());
 }
 
 void PlayerEventHandler::eventCreateToken(const Event_CreateToken &event)
@@ -352,28 +372,7 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
 
     targetZone->addCard(card, true, x, y);
 
-    // Look at all arrows from and to the card.
-    // If the card was moved to another zone, delete the arrows, otherwise update them.
-    QMapIterator<int, PlayerLogic *> playerIterator(player->getGame()->getPlayerManager()->getPlayers());
-    while (playerIterator.hasNext()) {
-        PlayerLogic *p = playerIterator.next().value();
-
-        QList<ArrowItem *> arrowsToDelete;
-        QMapIterator<int, ArrowItem *> arrowIterator(p->getArrows());
-        while (arrowIterator.hasNext()) {
-            ArrowItem *arrow = arrowIterator.next().value();
-            if ((arrow->getStartItem() == card) || (arrow->getTargetItem() == card)) {
-                if (startZone == targetZone) {
-                    arrow->updatePath();
-                } else {
-                    arrowsToDelete.append(arrow);
-                }
-            }
-        }
-        for (auto &i : arrowsToDelete) {
-            i->delArrow();
-        }
-    }
+    emit cardZoneChanged(card, startZone == targetZone);
     player->getPlayerMenu()->updateCardMenu(card);
 
     if (player->getPlayerActions()->isMovingCardsUntil() && startZoneString == ZoneNames::DECK &&
