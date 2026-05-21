@@ -1,8 +1,8 @@
 /**
  * @file deck_editor_menu.h
  * @ingroup DeckEditors
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DECK_EDITOR_MENU_H
 #define DECK_EDITOR_MENU_H

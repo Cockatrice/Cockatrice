@@ -418,7 +418,7 @@ void VisualDeckEditorWidget::onHover(const ExactCard &hoveredCard)
     // If nothing is selected -> this is our "active/preview" card
     emit activeCardChanged(hoveredCard);
 
-    // TODO: highlight hovered card visually:
+    //! \todo Highlight hovered card visually.
     // highlightHoveredCard(hoveredCard);
 }
 
@@ -429,7 +429,7 @@ void VisualDeckEditorWidget::setSelectionModel(QItemSelectionModel *model)
     }
 
     if (selectionModel) {
-        // TODO: Possibly disconnect old ones?
+        //! \todo Possibly disconnect old signal connections.
     }
 
     selectionModel = model;

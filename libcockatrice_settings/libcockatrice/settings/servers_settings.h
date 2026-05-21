@@ -1,8 +1,8 @@
 /**
  * @file servers_settings.h
  * @ingroup NetworkSettings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef SERVERSSETTINGS_H
 #define SERVERSSETTINGS_H

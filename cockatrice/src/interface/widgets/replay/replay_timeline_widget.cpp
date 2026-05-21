@@ -103,8 +103,12 @@ void ReplayTimelineWidget::skipToTime(int newTime, bool doRewindBuffering)
     update();
 }
 
-/// @param doRewindBuffering When true, if multiple backward skips are made in quick succession, only a single rewind
-/// is processed at the end. When false, the backwards skip will always cause an immediate rewind
+/**
+ * @brief Handles a backwards skip in the replay timeline.
+ *
+ * @param doRewindBuffering When true, if multiple backward skips are made in quick succession, only a single rewind
+ * is processed at the end. When false, the backwards skip will always cause an immediate rewind.
+ */
 void ReplayTimelineWidget::handleBackwardsSkip(bool doRewindBuffering)
 {
     if (doRewindBuffering) {
@@ -151,7 +155,7 @@ void ReplayTimelineWidget::replayTimerTimeout()
     }
 }
 
-/// Processes all unprocessed events up to the current time.
+/** @brief Processes all unprocessed events up to the current time. */
 void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
 {
     currentProcessedTime = currentVisualTime;

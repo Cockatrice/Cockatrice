@@ -99,13 +99,13 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
-    /// Map of color keys to counts used for rendering.
+    /** @brief Map of color keys to counts used for rendering. */
     QList<QPair<QString, int>> colors;
 
-    /// True if the mouse is currently inside the widget.
+    /** @brief True if the mouse is currently inside the widget. */
     bool isHovered = false;
 
-    /// Minimum ratio a segment must exceed to be drawn.
+    /** @brief Minimum ratio a segment must exceed to be drawn. */
     double minRatioThreshold = 0.0;
 
     /**

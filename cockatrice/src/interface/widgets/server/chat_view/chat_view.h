@@ -2,8 +2,8 @@
  * @file chat_view.h
  * @ingroup NetworkingWidgets
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CHATVIEW_H
 #define CHATVIEW_H

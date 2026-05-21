@@ -1,8 +1,8 @@
 /**
  * @file debug_settings.h
  * @ingroup CoreSettings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DEBUG_SETTINGS_H
 #define DEBUG_SETTINGS_H

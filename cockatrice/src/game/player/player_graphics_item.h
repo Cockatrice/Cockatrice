@@ -1,8 +1,8 @@
 /**
  * @file player_graphics_item.h
  * @ingroup GameGraphicsPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_GRAPHICS_ITEM_H
 #define COCKATRICE_PLAYER_GRAPHICS_ITEM_H

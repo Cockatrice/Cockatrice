@@ -2,8 +2,8 @@
  * @file settings_button_widget.h
  * @ingroup Widgets
  * @ingroup Settings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef SETTINGS_BUTTON_WIDGET_H
 #define SETTINGS_BUTTON_WIDGET_H
@@ -27,7 +27,7 @@ public:
     bool isCompact() const
     {
         return compact;
-    };
+    }
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

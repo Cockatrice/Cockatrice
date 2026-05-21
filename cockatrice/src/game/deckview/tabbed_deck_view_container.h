@@ -1,8 +1,8 @@
 /**
  * @file tabbed_deck_view_container.h
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TABBED_DECK_VIEW_CONTAINER_H
 #define TABBED_DECK_VIEW_CONTAINER_H

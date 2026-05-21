@@ -1,8 +1,8 @@
 /**
  * @file game_view.h
  * @ingroup GameGraphics
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef GAMEVIEW_H
 #define GAMEVIEW_H

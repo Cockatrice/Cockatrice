@@ -41,7 +41,7 @@ private slots:
 
 public:
     explicit PlayerMenu(PlayerLogic *player);
-    /// Lifecycle methods: delegate to all managedComponents, plus counters separately via player->getCounters().
+    /** @brief Retranslate all user-visible strings. Called on language change. */
     void retranslateUi();
 
     QMenu *updateCardMenu(const CardItem *card);
@@ -71,9 +71,9 @@ public:
         return shortcutsActive;
     }
 
-    /// Delegates to all managedComponents, plus counters separately.
+    /** @brief Bind keyboard shortcuts. Called when this player gains focus. */
     void setShortcutsActive();
-    /// Delegates to all managedComponents, plus counters separately.
+    /** @brief Unbind keyboard shortcuts. Called when this player loses focus. */
     void setShortcutsInactive();
 
 private:
@@ -89,11 +89,13 @@ private:
     SayMenu *sayMenu;
     CustomZoneMenu *customZonesMenu;
 
-    /// Drives AbstractPlayerComponent lifecycle delegation. Counters are iterated separately via player->getCounters().
+    /** @brief Drives AbstractPlayerComponent lifecycle delegation. Counters are iterated separately via
+     * player->getCounters().
+     */
     QList<AbstractPlayerComponent *> managedComponents;
     bool shortcutsActive = false;
 
-    /// Creates component, adds it as a submenu of playerMenu, and registers in managedComponents.
+    /** @brief Creates component, adds it as a submenu of playerMenu, and registers in managedComponents. */
     template <typename MenuT, typename... Args> MenuT *addManagedMenu(Args &&...args)
     {
         auto *menu = new MenuT(std::forward<Args>(args)...);
@@ -102,7 +104,7 @@ private:
         return menu;
     }
 
-    /// Creates component and registers in managedComponents, but does NOT add it as a submenu.
+    /** @brief Creates component and registers in managedComponents, but does NOT add it as a submenu. */
     template <typename ComponentT, typename... Args> ComponentT *createManagedComponent(Args &&...args)
     {
         auto *component = new ComponentT(std::forward<Args>(args)...);

@@ -224,14 +224,14 @@ Command_Login RemoteClient::generateCommandLogin()
 void RemoteClient::doLogin()
 {
     if (!password.isEmpty() && serverSupportsPasswordHash) {
-        // TODO store and log in using stored hashed password
+        //! \todo Store and log in using stored hashed password.
         if (hashedPassword.isEmpty()) {
             doRequestPasswordSalt(); // ask salt to create hashedPassword, then log in
         } else {
             doHashedLogin(); // log in using hashed password instead
         }
     } else {
-        // TODO add setting for client to reject unhashed logins
+        //! \todo Add setting for client to reject unhashed logins.
         setStatus(StatusLoggingIn);
         Command_Login cmdLogin = generateCommandLogin();
         if (!password.isEmpty()) {

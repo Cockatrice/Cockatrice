@@ -3,8 +3,8 @@
  * @ingroup DeckStorageWidgets
  * @ingroup Replays
  * @ingroup NetworkingWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef REMOTEREPLAYLIST_TREEWIDGET_H
 #define REMOTEREPLAYLIST_TREEWIDGET_H

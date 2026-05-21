@@ -1,8 +1,8 @@
 /**
  * @file visual_database_display_sub_type_filter_widget.h
  * @ingroup VisualCardDatabaseWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef VISUAL_DATABASE_DISPLAY_SUB_TYPE_FILTER_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_SUB_TYPE_FILTER_WIDGET_H

@@ -1,8 +1,8 @@
 /**
  * @file game.h
  * @ingroup GameLogic
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_GAME_H
 #define COCKATRICE_GAME_H

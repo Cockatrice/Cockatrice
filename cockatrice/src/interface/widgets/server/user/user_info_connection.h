@@ -1,8 +1,8 @@
 /**
  * @file user_info_connection.h
  * @ingroup Client
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef USERCONNECTION_INFORMATION_H
 #define USERCONNECTION_INFORMATION_H

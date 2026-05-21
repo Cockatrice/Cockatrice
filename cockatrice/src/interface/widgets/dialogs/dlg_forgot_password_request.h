@@ -1,8 +1,8 @@
 /**
  * @file dlg_forgot_password_request.h
  * @ingroup AccountDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_FORGOTPASSWORDREQUEST_H
 #define DLG_FORGOTPASSWORDREQUEST_H

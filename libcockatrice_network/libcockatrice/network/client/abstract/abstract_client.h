@@ -1,8 +1,8 @@
 /**
  * @file abstract_client.h
  * @ingroup Client
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef ABSTRACTCLIENT_H
 #define ABSTRACTCLIENT_H

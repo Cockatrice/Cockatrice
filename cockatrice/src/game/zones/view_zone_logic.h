@@ -1,8 +1,8 @@
 /**
  * @file view_zone_logic.h
  * @ingroup GameLogicZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_VIEW_ZONE_LOGIC_H
 #define COCKATRICE_VIEW_ZONE_LOGIC_H

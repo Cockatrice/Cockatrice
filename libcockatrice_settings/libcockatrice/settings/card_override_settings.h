@@ -1,8 +1,8 @@
 /**
  * @file card_override_settings.h
  * @ingroup CardSettings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_CARD_OVERRIDE_SETTINGS_H
 #define COCKATRICE_CARD_OVERRIDE_SETTINGS_H

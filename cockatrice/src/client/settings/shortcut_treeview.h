@@ -1,8 +1,8 @@
 /**
  * @file shortcut_treeview.h
  * @ingroup CoreSettings
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef SHORTCUT_TREEVIEW_H
 #define SHORTCUT_TREEVIEW_H

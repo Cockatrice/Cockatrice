@@ -1,8 +1,8 @@
 /**
  * @file player_manager.h
  * @ingroup GameLogicPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_MANAGER_H
 #define COCKATRICE_PLAYER_MANAGER_H

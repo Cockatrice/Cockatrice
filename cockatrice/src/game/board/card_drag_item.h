@@ -1,8 +1,8 @@
 /**
  * @file card_drag_item.h
  * @ingroup GameGraphicsCards
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARDDRAGITEM_H
 #define CARDDRAGITEM_H

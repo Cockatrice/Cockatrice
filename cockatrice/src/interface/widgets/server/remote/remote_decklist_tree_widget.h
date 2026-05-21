@@ -2,8 +2,8 @@
  * @file remote_decklist_tree_widget.h
  * @ingroup NetworkingWidgets
  * @ingroup DeckStorageWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef REMOTEDECKLIST_TREEWIDGET_H
 #define REMOTEDECKLIST_TREEWIDGET_H

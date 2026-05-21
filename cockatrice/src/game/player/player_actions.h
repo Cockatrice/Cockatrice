@@ -2,8 +2,8 @@
  * @file player_actions.h
  *  @ingroup GameLogicActions
  * @ingroup GameLogicPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_ACTIONS_H
 #define COCKATRICE_PLAYER_ACTIONS_H

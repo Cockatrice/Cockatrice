@@ -154,9 +154,11 @@ public:
      */
     QModelIndex modifyDeck(const QString &reason, const std::function<QModelIndex(DeckListModel *)> &operation);
 
-    /// @name Metadata setters
-    /// @brief These methods set the metadata. Will no-op if the new value is the same as the current value.
-    /// Saves the operation to history if successful.
+    /**
+     * @name Metadata setters
+     * @brief These methods set the metadata. Will no-op if the new value is the same as the current value.
+     * Saves the operation to history if successful.
+     */
     ///@{
     void setName(const QString &name);
     void setComments(const QString &comments);

@@ -1,8 +1,8 @@
 /**
  * @file tapped_out_interface.h
  * @ingroup ApiInterfaces
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAPPEDOUT_INTERFACE_H
 #define TAPPEDOUT_INTERFACE_H

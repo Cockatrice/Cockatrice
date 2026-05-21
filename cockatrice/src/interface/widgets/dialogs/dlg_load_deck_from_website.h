@@ -2,8 +2,8 @@
  * @file dlg_load_deck_from_website.h
  * @ingroup RemoteDeckStorageDialogs
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_LOAD_DECK_FROM_WEBSITE_H
 #define DLG_LOAD_DECK_FROM_WEBSITE_H

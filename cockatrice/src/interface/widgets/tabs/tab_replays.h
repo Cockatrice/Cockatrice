@@ -2,8 +2,8 @@
  * @file tab_replays.h
  * @ingroup Replays
  * @ingroup Tabs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_REPLAYS_H
 #define TAB_REPLAYS_H

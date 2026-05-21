@@ -1,8 +1,8 @@
 /**
  * @file filter_tree.h
  * @ingroup CardDatabaseModelFilters
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef FILTERTREE_H
 #define FILTERTREE_H
@@ -70,28 +70,33 @@ public:
     }
     virtual void nodeChanged() const
     {
-        if (parent() != nullptr)
+        if (parent() != nullptr) {
             parent()->nodeChanged();
+        }
     }
     virtual void preInsertChild(const FilterTreeNode *p, int i) const
     {
-        if (parent() != nullptr)
+        if (parent() != nullptr) {
             parent()->preInsertChild(p, i);
+        }
     }
     virtual void postInsertChild(const FilterTreeNode *p, int i) const
     {
-        if (parent() != nullptr)
+        if (parent() != nullptr) {
             parent()->postInsertChild(p, i);
+        }
     }
     virtual void preRemoveChild(const FilterTreeNode *p, int i) const
     {
-        if (parent() != nullptr)
+        if (parent() != nullptr) {
             parent()->preRemoveChild(p, i);
+        }
     }
     virtual void postRemoveChild(const FilterTreeNode *p, int i) const
     {
-        if (parent() != nullptr)
+        if (parent() != nullptr) {
             parent()->postRemoveChild(p, i);
+        }
     }
 };
 

@@ -1,8 +1,8 @@
 /**
  * @file pending_command.h
  * @ingroup Messages
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef PENDING_COMMAND_H
 #define PENDING_COMMAND_H

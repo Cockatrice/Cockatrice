@@ -1,8 +1,8 @@
 /**
  * @file dlg_connect.h
  * @ingroup ConnectionDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_CONNECT_H
 #define DLG_CONNECT_H

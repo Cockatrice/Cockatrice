@@ -1,8 +1,8 @@
 /**
  * @file dlg_forgot_password_challenge.h
  * @ingroup AccountDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_FORGOTPASSWORDCHALLENGE_H
 #define DLG_FORGOTPASSWORDCHALLENGE_H

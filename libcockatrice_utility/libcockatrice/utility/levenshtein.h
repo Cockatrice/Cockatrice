@@ -1,8 +1,8 @@
 /**
  * @file levenshtein.h
  * @ingroup Core
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef LEVENSHTEIN_H
 #define LEVENSHTEIN_H

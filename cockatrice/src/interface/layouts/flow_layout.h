@@ -4,6 +4,7 @@
  * @brief A QLayout subclass that arranges child widgets in wrapping rows (horizontal flow)
  *        or wrapping columns (vertical flow).
  */
+//! \todo Document this file.
 
 #ifndef FLOW_LAYOUT_H
 #define FLOW_LAYOUT_H
