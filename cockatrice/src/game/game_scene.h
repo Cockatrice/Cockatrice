@@ -1,6 +1,8 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
+#include "board/arrow_data.h"
+#include "board/arrow_item.h"
 #include "zones/card_zone_logic.h"
 
 #include <QGraphicsScene>
@@ -42,13 +44,15 @@ private:
 
     PhasesToolbar *phasesToolbar;                       ///< Toolbar showing game phases
     QList<PlayerGraphicsItem *> players;                ///< All player graphics items
+    QMap<int, PlayerGraphicsItem *> playerViews;        ///< ID lookup
     QList<QList<PlayerGraphicsItem *>> playersByColumn; ///< Players organized by column
-    QList<ZoneViewWidget *> zoneViews;                  ///< Active zone view widgets
-    QSize viewSize;                                     ///< Current view size
-    QPointer<CardItem> hoveredCard;                     ///< Currently hovered card
-    QBasicTimer *animationTimer;                        ///< Timer for card animations
-    QSet<CardItem *> cardsToAnimate;                    ///< Cards currently animating
-    int playerRotation;                                 ///< Rotation offset for player layout
+    QMap<int, ArrowItem *> arrowRegistry;
+    QList<ZoneViewWidget *> zoneViews; ///< Active zone view widgets
+    QSize viewSize;                    ///< Current view size
+    QPointer<CardItem> hoveredCard;    ///< Currently hovered card
+    QBasicTimer *animationTimer;       ///< Timer for card animations
+    QSet<CardItem *> cardsToAnimate;   ///< Cards currently animating
+    int playerRotation;                ///< Rotation offset for player layout
 
     /**
      * @brief Updates which card is currently hovered based on scene coordinates.
@@ -196,6 +200,11 @@ public slots:
     QTransform getViewTransform() const;
     QTransform getViewportTransform() const;
 
+    void onArrowCreateRequested(ArrowData data);
+    void onArrowDeleteRequested(int arrowId);
+    void onCardZoneChanged(CardItem *card, bool sameZone);
+    void clearArrowsForPlayer(int playerId);
+
 protected:
     /** Handles hover updates. */
     bool event(QEvent *event) override;
@@ -207,6 +216,7 @@ signals:
     void sigStartRubberBand(const QPointF &selectionOrigin);
     void sigResizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void sigStopRubberBand();
+    void requestArrowDeletion(int arrowId);
 };
 
 #endif
