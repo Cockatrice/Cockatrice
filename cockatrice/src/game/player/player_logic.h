@@ -245,12 +245,9 @@ private:
     int zoneId;
     QMap<QString, CardZoneLogic *> zones;
     QMap<int, CounterState *> counters;
-    QMap<int, ArrowItem *> arrows;
 
     bool dialogSemaphore;
     QList<CardItem *> cardsToDelete;
-
-    // void eventConnectionStateChanged(const Event_ConnectionStateChanged &event);
 };
 
 class AnnotationDialog : public QInputDialog

@@ -82,7 +82,6 @@ void GameScene::addPlayer(PlayerLogic *player)
 {
     qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getPlayerInfo()->getName();
 
-    players << player->getGraphicsItem();
     playerViews.insert(player->getPlayerInfo()->getId(), player->getGraphicsItem());
     addItem(player->getGraphicsItem());
     connect(player->getGraphicsItem(), &PlayerGraphicsItem::sizeChanged, this, &GameScene::rearrange);
@@ -122,7 +121,6 @@ void GameScene::removePlayer(PlayerLogic *player)
         }
     }
     auto *view = playerViews.take(player->getPlayerInfo()->getId());
-    players.removeOne(view);
     removeItem(view);
     rearrange();
 }
@@ -204,7 +202,7 @@ QList<PlayerLogic *> GameScene::collectActivePlayers(int &firstPlayerIndex) cons
     firstPlayerIndex = 0;
     bool firstPlayerFound = false;
 
-    for (auto *pgItem : players) {
+    for (auto *pgItem : playerViews.values()) {
         PlayerLogic *p = pgItem->getPlayer();
         if (p && !p->getConceded()) {
             activePlayers.append(p);
@@ -368,7 +366,7 @@ void GameScene::resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qr
     }
 }
 
-void GameScene::onArrowCreateRequested(ArrowData data)
+void GameScene::onArrowCreateRequested(const ArrowData &data)
 {
     auto *startView = playerViews.value(data.startPlayerId);
     auto *targetView = playerViews.value(data.targetPlayerId);

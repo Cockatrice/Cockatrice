@@ -43,16 +43,15 @@ private:
     static const int playerAreaSpacing = 5; ///< Space between player areas
 
     PhasesToolbar *phasesToolbar;                       ///< Toolbar showing game phases
-    QList<PlayerGraphicsItem *> players;                ///< All player graphics items
-    QMap<int, PlayerGraphicsItem *> playerViews;        ///< ID lookup
+    QMap<int, PlayerGraphicsItem *> playerViews;        ///< ID lookup for player graphics items
     QList<QList<PlayerGraphicsItem *>> playersByColumn; ///< Players organized by column
-    QMap<int, ArrowItem *> arrowRegistry;
-    QList<ZoneViewWidget *> zoneViews; ///< Active zone view widgets
-    QSize viewSize;                    ///< Current view size
-    QPointer<CardItem> hoveredCard;    ///< Currently hovered card
-    QBasicTimer *animationTimer;       ///< Timer for card animations
-    QSet<CardItem *> cardsToAnimate;   ///< Cards currently animating
-    int playerRotation;                ///< Rotation offset for player layout
+    QMap<int, ArrowItem *> arrowRegistry;               ///< ID registry for arrow graphics items
+    QList<ZoneViewWidget *> zoneViews;                  ///< Active zone view widgets
+    QSize viewSize;                                     ///< Current view size
+    QPointer<CardItem> hoveredCard;                     ///< Currently hovered card
+    QBasicTimer *animationTimer;                        ///< Timer for card animations
+    QSet<CardItem *> cardsToAnimate;                    ///< Cards currently animating
+    int playerRotation;                                 ///< Rotation offset for player layout
 
     /**
      * @brief Updates which card is currently hovered based on scene coordinates.
