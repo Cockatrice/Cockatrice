@@ -44,7 +44,7 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     font.setPixelSize(qMax(qRound(translatedSize.height() / 1.3), 9));
     painter->setFont(font);
     painter->setPen(Qt::white);
-    painter->drawText(translatedRect, Qt::AlignCenter, QString::number(state->getValue()));
+    painter->drawText(translatedRect, Qt::AlignCenter, QString::number(value));
 }
 
 PlayerTarget::PlayerTarget(PlayerLogic *_owner, QGraphicsItem *parentItem)

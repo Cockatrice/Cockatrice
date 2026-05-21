@@ -26,8 +26,12 @@ class AbstractCounter : public QObject, public QGraphicsItem, public AbstractPla
     Q_INTERFACES(QGraphicsItem)
 
 protected:
-    CounterState *state;
     PlayerLogic *player;
+    int id;
+    QString name;
+    int value;
+    QColor color;
+    int radius;
     bool hovered = false;
     bool useNameForShortcut;
 
@@ -61,25 +65,29 @@ public:
     void setShortcutsInactive() override;
     void delCounter();
 
-    CounterState *getState() const
-    {
-        return state;
-    }
     QMenu *getMenu() const
     {
         return menu;
     }
     int getId() const
     {
-        return state->getId();
+        return id;
     }
     QString getName() const
     {
-        return state->getName();
+        return name;
+    }
+    QColor getColor() const
+    {
+        return color;
+    }
+    int getRadius() const
+    {
+        return radius;
     }
     int getValue() const
     {
-        return state->getValue();
+        return value;
     }
     bool getShownInCounterArea() const
     {

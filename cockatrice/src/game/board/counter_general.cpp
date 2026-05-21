@@ -13,7 +13,7 @@ GeneralCounter::GeneralCounter(CounterState *state, PlayerLogic *player, bool us
 
 QRectF GeneralCounter::boundingRect() const
 {
-    return QRectF(0, 0, state->getRadius() * 2, state->getRadius() * 2);
+    return QRectF(0, 0, radius * 2, radius * 2);
 }
 
 void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -21,19 +21,19 @@ void GeneralCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /
     QRectF mapRect = painter->combinedTransform().mapRect(boundingRect());
     int translatedHeight = mapRect.size().height();
     qreal scaleFactor = translatedHeight / boundingRect().height();
-    QPixmap pixmap = CounterPixmapGenerator::generatePixmap(translatedHeight, state->getName(), hovered);
+    QPixmap pixmap = CounterPixmapGenerator::generatePixmap(translatedHeight, name, hovered);
 
     painter->save();
     resetPainterTransform(painter);
     painter->drawPixmap(QPoint(0, 0), pixmap);
 
-    if (state->getValue()) {
+    if (value) {
         QFont f("Serif");
-        f.setPixelSize(qMax((int)(state->getRadius() * scaleFactor), 10));
+        f.setPixelSize(qMax((int)(radius * scaleFactor), 10));
         f.setWeight(QFont::Bold);
         painter->setPen(Qt::black);
         painter->setFont(f);
-        painter->drawText(mapRect, Qt::AlignCenter, QString::number(state->getValue()));
+        painter->drawText(mapRect, Qt::AlignCenter, QString::number(value));
     }
     painter->restore();
 }
