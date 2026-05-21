@@ -28,7 +28,10 @@ AbstractCounter::AbstractCounter(CounterState *state,
 {
     setAcceptHoverEvents(true);
 
-    connect(state, &CounterState::valueChanged, this, [this]() { update(); });
+    connect(state, &CounterState::valueChanged, this, [this](int, int newValue) {
+        value = newValue;
+        update();
+    });
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         menu = new TearOffMenu(TranslateCounterName::getDisplayName(state->getName()));
