@@ -482,8 +482,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         (!SettingsCache::instance().getDoubleClickToPlay())) {
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
-
-    if (owner != nullptr) { // cards without owner will be deleted
+    if (owner != nullptr) {
         setCursor(Qt::OpenHandCursor);
     }
     AbstractCardItem::mouseReleaseEvent(event);
