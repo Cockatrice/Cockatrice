@@ -68,7 +68,7 @@ bool ZoneViewZoneLogic::prepareAddCard(int x)
  * Make sure prepareAddCard() was called before calling addCard().
  * This method assumes we already checked that the card is being inserted into the visible portion
  */
-void ZoneViewZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
+void ZoneViewZoneLogic::addCardImpl(CardState *card, int x, int /*y*/)
 {
     if (!isReversed) {
         // if x is negative set it to add at end
@@ -137,7 +137,7 @@ void ZoneViewZoneLogic::removeCard(int position, bool toNewZone)
         return;
     }
 
-    CardItem *card = cards.takeAt(position);
+    CardState *card = cards.takeAt(position);
     card->deleteLater();
 
     // The toNewZone check is to prevent the view from auto-closing if the view contains only a single card and that

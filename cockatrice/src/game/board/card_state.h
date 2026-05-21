@@ -1,12 +1,15 @@
 #ifndef COCKATRICE_CARD_STATE_H
 #define COCKATRICE_CARD_STATE_H
 
+#include "abstract_card_state.h"
+
 #include <QMap>
 #include <QObject>
+#include <QPoint>
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 
 class CardZoneLogic;
-class CardItem;
-class CardState : public QObject
+class CardState : public AbstractCardState
 {
     Q_OBJECT
 
@@ -17,8 +20,12 @@ private:
     QString pt;
     bool doesntUntap = false;
     bool destroyOnZoneChange = false;
+    bool visible = false;
 
-    CardItem *attachedTo = nullptr;
+    QPoint gridPoint;
+
+    CardState *attachedTo = nullptr;
+    QList<CardState *> attachedCards;
     CardZoneLogic *zone = nullptr;
 
 signals:
@@ -30,15 +37,17 @@ signals:
     void ptChanged(const QString &newPt);
     void doesntUntapChanged(bool newValue);
     void destroyOnZoneChangeChanged(bool newValue);
-    void attachedToChanged(CardItem *newAttachedTo);
+    void attachedToChanged(CardState *newAttachedTo);
     void zoneChanged(CardState *changedCard, CardZoneLogic *newZone);
+    void visibleChanged(bool visible);
 
 public:
-    explicit CardState(QObject *parent, CardZoneLogic *_zone) : QObject(parent), zone(_zone)
-    {
-    }
+    explicit CardState(PlayerLogic *_owner, const CardRef &cardRef = {}, int _id = -1, CardZoneLogic *_zone = nullptr);
 
+    void prepareDelete();
+    void processCardInfo(const ServerInfo_Card &_info);
     void resetState(bool keepAnnotations);
+    void clearAttachedCards();
 
     CardZoneLogic *getZone() const
     {
@@ -92,12 +101,51 @@ public:
 
     void setDestroyOnZoneChange(bool _destroyOnZoneChange);
 
-    CardItem *getAttachedTo() const
+    CardState *getAttachedTo() const
     {
         return attachedTo;
     }
 
-    void setAttachedTo(CardItem *_attachedTo);
+    [[nodiscard]] QPoint getGridPoint() const
+    {
+        return gridPoint;
+    }
+    void setGridPoint(const QPoint &_gridPoint)
+    {
+        gridPoint = _gridPoint;
+    }
+    [[nodiscard]] QPoint getGridPos() const
+    {
+        return gridPoint;
+    }
+
+    bool getVisible() const
+    {
+        return visible;
+    }
+
+    void setVisible(bool _visible)
+    {
+        if (_visible == visible) {
+            return;
+        }
+        visible = _visible;
+        emit visibleChanged(visible);
+    }
+
+    void setAttachedTo(CardState *_attachedTo);
+    void addAttachedCard(CardState *card)
+    {
+        attachedCards.append(card);
+    }
+    void removeAttachedCard(CardState *card)
+    {
+        attachedCards.removeOne(card);
+    }
+    [[nodiscard]] const QList<CardState *> &getAttachedCards() const
+    {
+        return attachedCards;
+    }
 };
 
 #endif // COCKATRICE_CARD_STATE_H

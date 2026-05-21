@@ -7,7 +7,7 @@
 #include <QMenu>
 
 CardZone::CardZone(CardZoneLogic *_logic, QGraphicsItem *parent)
-    : AbstractGraphicsItem(parent), menu(nullptr), doubleClickAction(0), logic(_logic)
+    : AbstractGraphicsItem(parent), logic(_logic), menu(nullptr), doubleClickAction(0)
 {
     connect(logic, &CardZoneLogic::retranslateUi, this, &CardZone::retranslateUi);
     connect(logic, &CardZoneLogic::cardAdded, this, &CardZone::onCardAdded);
@@ -16,17 +16,21 @@ CardZone::CardZone(CardZoneLogic *_logic, QGraphicsItem *parent)
     connect(logic, &CardZoneLogic::reorganizeCards, this, &CardZone::reorganizeCards);
 }
 
-void CardZone::onCardAdded(CardItem *addedCard)
+void CardZone::onCardAdded(CardState *toAdd, int /*x*/, int /*y*/)
 {
+    CardItem *addedCard = new CardItem(toAdd, this);
     addedCard->setParentItem(this);
     addedCard->setVisible(true);
     addedCard->update();
+    cards.append(addedCard);
+
+    emit cardItemAdded(addedCard);
 }
 
 void CardZone::retranslateUi()
 {
-    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
-        getLogic()->getCards()[i]->retranslateUi();
+    for (int i = 0; i < cards.size(); ++i) {
+        cards[i]->retranslateUi();
     }
 }
 

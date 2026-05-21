@@ -658,7 +658,7 @@ PlayerLogic *TabGame::addPlayer(PlayerLogic *newPlayer)
 
     auto *view = scene->viewForPlayer(newPlayer->getPlayerInfo()->getId());
 
-    connect(newPlayer, &PlayerLogic::newCardAdded, this, &TabGame::newCardAdded);
+    connect(view, &PlayerGraphicsItem::cardItemAdded, this, &TabGame::newCardAdded);
     connect(newPlayer, &PlayerLogic::openDeckEditor, this, &TabGame::openDeckEditor);
     connect(view->getPlayerMenu(), &PlayerMenu::cardMenuUpdated, this, &TabGame::setCardMenu);
     connect(view, &PlayerGraphicsItem::cardInfoRequested, this, &TabGame::viewCardInfo);

@@ -69,7 +69,7 @@ void PlayerMenu::setMenusForGraphicItems()
     }
 }
 
-QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
+QMenu *PlayerMenu::updateCardMenu(const CardState *card)
 {
     if (!card) {
         emit cardMenuUpdated(nullptr);
@@ -80,7 +80,7 @@ QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
     // only update the menu if the card is actually selected
     if ((player->getLogic()->getGame()->getPlayerManager()->isSpectator() &&
          !player->getLogic()->getGame()->getPlayerManager()->isJudge()) ||
-        player->getLogic()->getGame()->getActiveCard() != card) {
+        player->getLogic()->getGame()->getActiveCard()->getState() != card) {
         return nullptr;
     }
 

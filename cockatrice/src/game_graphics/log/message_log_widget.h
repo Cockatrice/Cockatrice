@@ -11,7 +11,7 @@
 #include "../../interface/widgets/server/chat_view/chat_view.h"
 
 class AbstractGame;
-class CardItem;
+class CardState;
 class GameEventContext;
 class PlayerLogic;
 class PlayerEventHandler;
@@ -67,7 +67,7 @@ public slots:
     void logLeaveSpectator(QString name, QString reason);
     void logNotReadyStart(PlayerLogic *player);
     void logMoveCard(PlayerLogic *player,
-                     CardItem *card,
+                     CardState *card,
                      CardZoneLogic *startZone,
                      int oldX,
                      CardZoneLogic *targetZone,
@@ -88,13 +88,13 @@ public slots:
     void logSay(PlayerLogic *player, QString message);
     void logSetActivePhase(int phase);
     void logSetActivePlayer(PlayerLogic *player);
-    void logSetAnnotation(PlayerLogic *player, CardItem *card, QString newAnnotation);
+    void logSetAnnotation(PlayerLogic *player, CardState *card, QString newAnnotation);
     void logSetCardCounter(PlayerLogic *player, QString cardName, int counterId, int value, int oldValue);
     void logSetCounter(PlayerLogic *player, QString counterName, int value, int oldValue);
-    void logSetDoesntUntap(PlayerLogic *player, CardItem *card, bool doesntUntap);
-    void logSetPT(PlayerLogic *player, CardItem *card, QString newPT);
+    void logSetDoesntUntap(PlayerLogic *player, CardState *card, bool doesntUntap);
+    void logSetPT(PlayerLogic *player, CardState *card, QString newPT);
     void logSetSideboardLock(PlayerLogic *player, bool locked);
-    void logSetTapped(PlayerLogic *player, CardItem *card, bool tapped);
+    void logSetTapped(PlayerLogic *player, CardState *card, bool tapped);
     void logShuffle(PlayerLogic *player, CardZoneLogic *zone, int start, int end);
     void logSpectatorSay(const ServerInfo_User &spectator, QString message);
     void logUnattachCard(PlayerLogic *player, QString cardName);

@@ -171,7 +171,7 @@ void CardInfoFrameWidget::setCard(const CardRef &cardRef)
 void CardInfoFrameWidget::setCard(AbstractCardItem *card)
 {
     if (card) {
-        setCard(card->getCard());
+        setCard(card->getState()->getCard());
     }
 }
 

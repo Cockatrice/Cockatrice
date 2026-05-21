@@ -12,15 +12,13 @@ PileZoneLogic::PileZoneLogic(PlayerLogic *_player,
 {
 }
 
-void PileZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
+void PileZoneLogic::addCardImpl(CardState *card, int x, int /*y*/)
 {
-    connect(card, &CardItem::sigPixmapUpdated, this, &PileZoneLogic::callUpdate);
     // if x is negative set it to add at end
     if (x < 0 || x >= cards.size()) {
         x = cards.size();
     }
     cards.insert(x, card);
-    card->setPos(0, 0);
     if (!contentsKnown()) {
         card->setCardRef({});
         card->setId(-1);
@@ -30,5 +28,5 @@ void PileZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
         }
     }
     card->setVisible(false);
-    card->resetState();
+    card->resetState(false);
 }

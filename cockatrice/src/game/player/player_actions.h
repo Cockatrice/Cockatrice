@@ -50,7 +50,7 @@ public:
     PendingCommand *prepareGameCommand(const ::google::protobuf::Message &cmd);
     PendingCommand *prepareGameCommand(const QList<const ::google::protobuf::Message *> &cmdList);
 
-    void moveOneCardUntil(CardItem *card);
+    void moveOneCardUntil(CardState *card);
     void stopMoveTopCardsUntil();
 
     [[nodiscard]] bool isMovingCardsUntil() const
@@ -92,7 +92,7 @@ signals:
 public slots:
     void setLastToken(CardInfoPtr cardInfo);
     void setLastTokenInfo(CardInfoPtr cardInfo);
-    void playCard(CardItem *c, bool faceDown);
+    void playCard(CardState *card, bool faceDown);
     void playCardToTable(const CardItem *c, bool faceDown);
 
     void actUntapAll();
@@ -124,9 +124,9 @@ public slots:
     void actMulliganMinusOne();
     void doMulligan(int number);
 
-    void actPlay(QList<CardItem *> selectedCards);
-    void actPlayFacedown(QList<CardItem *> selectedCards);
-    void actHide(QList<CardItem *> selectedCards);
+    void actPlay(QList<CardState *> selectedCards);
+    void actPlayFacedown(QList<CardState *> selectedCards);
+    void actHide(QList<CardState *> selectedCards);
 
     void actMoveTopCardToPlay();
     void actMoveTopCardToPlayFaceDown();
@@ -183,40 +183,40 @@ public slots:
     void actCreateAllRelatedCards();
 
     void actRequestMoveCardXCardsFromTopDialog();
-    void actMoveCardXCardsFromTop(QList<CardItem *> selectedCards, int number);
-    void actRemoveCardCounter(QList<CardItem *> selectedCards, int counterId);
-    void actAddCardCounter(QList<CardItem *> selectedCards, int counterId);
-    void actRequestSetCardCounterDialog(QList<CardItem *> selectedCards, int counterId);
-    void actSetCardCounter(QList<CardItem *> selectedCards, int counterId, const QString &counterValue);
-    void actIncrementAllCardCounters(QList<CardItem *> cardsToUpdate);
+    void actMoveCardXCardsFromTop(QList<CardState *> selectedCards, int number);
+    void actRemoveCardCounter(QList<CardState *> selectedCards, int counterId);
+    void actAddCardCounter(QList<CardState *> selectedCards, int counterId);
+    void actRequestSetCardCounterDialog(QList<CardState *> selectedCards, int counterId);
+    void actSetCardCounter(QList<CardState *> selectedCards, int counterId, const QString &counterValue);
+    void actIncrementAllCardCounters(QList<CardState *> cardsToUpdate);
     void actAttach();
-    void actUnattach(QList<CardItem *> selectedCards);
+    void actUnattach(QList<CardState *> selectedCards);
     void actDrawArrow();
-    void actIncPT(QList<CardItem *> selectedCards, int deltaP, int deltaT);
-    void actResetPT(QList<CardItem *> selectedCards);
-    void actRequestSetPTDialog(QList<CardItem *> selectedCards);
-    void actSetPT(QList<CardItem *> selectedCards, const QString &pt);
-    void actIncP(QList<CardItem *> selectedCards);
-    void actDecP(QList<CardItem *> selectedCards);
-    void actIncT(QList<CardItem *> selectedCards);
-    void actDecT(QList<CardItem *> selectedCards);
-    void actIncPT(QList<CardItem *> selectedCards);
-    void actDecPT(QList<CardItem *> selectedCards);
-    void actFlowP(QList<CardItem *> selectedCards);
-    void actFlowT(QList<CardItem *> selectedCards);
+    void actIncPT(QList<CardState *> selectedCards, int deltaP, int deltaT);
+    void actResetPT(QList<CardState *> selectedCards);
+    void actRequestSetPTDialog(QList<CardState *> selectedCards);
+    void actSetPT(QList<CardState *> selectedCards, const QString &pt);
+    void actIncP(QList<CardState *> selectedCards);
+    void actDecP(QList<CardState *> selectedCards);
+    void actIncT(QList<CardState *> selectedCards);
+    void actDecT(QList<CardState *> selectedCards);
+    void actIncPT(QList<CardState *> selectedCards);
+    void actDecPT(QList<CardState *> selectedCards);
+    void actFlowP(QList<CardState *> selectedCards);
+    void actFlowT(QList<CardState *> selectedCards);
 
-    void actReduceLifeByPower(QList<CardItem *> selectedCards);
+    void actReduceLifeByPower(QList<CardState *> selectedCards);
 
-    void actRequestSetAnnotationDialog(QList<CardItem *> selectedCards);
-    void actSetAnnotation(QList<CardItem *> selectedCards, const QString &annotation);
-    void actReveal(QList<CardItem *> selectedCards, QAction *action);
+    void actRequestSetAnnotationDialog(QList<CardState *> selectedCards);
+    void actSetAnnotation(QList<CardState *> selectedCards, const QString &annotation);
+    void actReveal(QList<CardState *> selectedCards, QAction *action);
     void actRevealHand(int revealToPlayerId);
     void actRevealRandomHandCard(int revealToPlayerId);
     void actRevealLibrary(int revealToPlayerId);
 
     void actSortHand();
 
-    void cardMenuAction(QList<CardItem *> selectedCards, CardMenuActionType type);
+    void cardMenuAction(QList<CardState *> selectedCards, CardMenuActionType type);
 
 private:
     PlayerLogic *player;
@@ -242,12 +242,12 @@ private:
                     CardRelationType attach = CardRelationType::DoesNotAttach,
                     bool persistent = false);
 
-    void playSelectedCards(QList<CardItem *> selectedCards, bool faceDown = false);
+    void playSelectedCards(QList<CardState *> selectedCards, bool faceDown = false);
 
     void cmdSetTopCard(Command_MoveCard &cmd);
     void cmdSetBottomCard(Command_MoveCard &cmd);
 
-    void offsetCardCounter(QList<CardItem *> selectedCards, int counterId, int offset);
+    void offsetCardCounter(QList<CardState *> selectedCards, int counterId, int offset);
 };
 
 #endif // COCKATRICE_PLAYER_ACTIONS_H

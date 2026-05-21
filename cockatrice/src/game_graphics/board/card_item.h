@@ -29,10 +29,9 @@ class CardItem : public AbstractCardItem
     Q_OBJECT
 private:
     CardState *state;
+    CardZone *zone;
 
-    QPoint gridPoint;
     CardDragItem *dragItem;
-    QList<CardItem *> attachedCards;
 
     void prepareDelete();
     void handleClickedToPlay(bool shiftHeld);
@@ -48,95 +47,20 @@ public:
     {
         return Type;
     }
-    explicit CardItem(PlayerLogic *_owner,
-                      QGraphicsItem *parent = nullptr,
-                      const CardRef &cardRef = {},
-                      int _cardid = -1,
-                      CardZoneLogic *_zone = nullptr);
+    explicit CardItem(CardState *state, CardZone *parent);
 
     void retranslateUi();
+    [[nodiscard]] CardZone *getZone() const
+    {
+        return zone;
+    }
     [[nodiscard]] CardState *getState() const
     {
         return state;
     }
-    [[nodiscard]] CardZoneLogic *getZone() const
-    {
-        return state->getZone();
-    }
-    void setZone(CardZoneLogic *_zone);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    [[nodiscard]] QPoint getGridPoint() const
-    {
-        return gridPoint;
-    }
-    void setGridPoint(const QPoint &_gridPoint)
-    {
-        gridPoint = _gridPoint;
-    }
-    [[nodiscard]] QPoint getGridPos() const
-    {
-        return gridPoint;
-    }
-    [[nodiscard]] PlayerLogic *getOwner() const
-    {
-        return owner;
-    }
-    void setOwner(PlayerLogic *_owner)
-    {
-        owner = _owner;
-    }
-    [[nodiscard]] bool getAttacking() const
-    {
-        return state->getAttacking();
-    }
-    void setAttacking(bool _attacking);
-    [[nodiscard]] const QMap<int, int> &getCounters() const
-    {
-        return state->getCounters();
-    }
-    void setCounter(int _id, int _value);
-    [[nodiscard]] QString getAnnotation() const
-    {
-        return state->getAnnotation();
-    }
-    void setAnnotation(const QString &_annotation);
-    [[nodiscard]] bool getDoesntUntap() const
-    {
-        return state->getDoesntUntap();
-    }
-    void setDoesntUntap(bool _doesntUntap);
-    [[nodiscard]] QString getPT() const
-    {
-        return state->getPT();
-    }
-    void setPT(const QString &_pt);
-    [[nodiscard]] bool getDestroyOnZoneChange() const
-    {
-        return state->getDestroyOnZoneChange();
-    }
-    void setDestroyOnZoneChange(bool _destroy)
-    {
-        state->setDestroyOnZoneChange(_destroy);
-    }
-    [[nodiscard]] CardItem *getAttachedTo() const
-    {
-        return state->getAttachedTo();
-    }
-    void setAttachedTo(CardItem *_attachedTo);
-    void addAttachedCard(CardItem *card)
-    {
-        attachedCards.append(card);
-    }
-    void removeAttachedCard(CardItem *card)
-    {
-        attachedCards.removeOne(card);
-    }
-    [[nodiscard]] const QList<CardItem *> &getAttachedCards() const
-    {
-        return attachedCards;
-    }
+
     void resetState(bool keepAnnotations = false);
-    void processCardInfo(const ServerInfo_Card &_info);
 
     bool animationEvent();
     CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool forceFaceDown);

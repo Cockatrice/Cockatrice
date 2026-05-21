@@ -13,7 +13,7 @@
 #include <libcockatrice/protocol/pb/game_event.pb.h>
 #include <libcockatrice/protocol/pb/game_event_context.pb.h>
 
-class CardItem;
+class CardState;
 class CardZoneLogic;
 class PlayerLogic;
 class Event_AttachCard;
@@ -56,7 +56,7 @@ signals:
     void logUndoDraw(PlayerLogic *player, QString cardName);
     void logUndoDrawFailed(PlayerLogic *player);
     void logMoveCard(PlayerLogic *player,
-                     CardItem *card,
+                     CardState *card,
                      CardZoneLogic *startZone,
                      int oldX,
                      CardZoneLogic *targetZone,
@@ -66,11 +66,11 @@ signals:
     void logAttachCard(PlayerLogic *player, QString cardName, PlayerLogic *targetPlayer, QString targetCardName);
     void logUnattachCard(PlayerLogic *player, QString cardName);
     void logSetCardCounter(PlayerLogic *player, QString cardName, int counterId, int value, int oldValue);
-    void logSetTapped(PlayerLogic *player, CardItem *card, bool tapped);
+    void logSetTapped(PlayerLogic *player, CardState *card, bool tapped);
     void logSetCounter(PlayerLogic *player, QString counterName, int value, int oldValue);
-    void logSetDoesntUntap(PlayerLogic *player, CardItem *card, bool doesntUntap);
-    void logSetPT(PlayerLogic *player, CardItem *card, QString newPT);
-    void logSetAnnotation(PlayerLogic *player, CardItem *card, QString newAnnotation);
+    void logSetDoesntUntap(PlayerLogic *player, CardState *card, bool doesntUntap);
+    void logSetPT(PlayerLogic *player, CardState *card, QString newPT);
+    void logSetAnnotation(PlayerLogic *player, CardState *card, QString newAnnotation);
     void logDumpZone(PlayerLogic *player, CardZoneLogic *zone, int numberCards, bool isReversed = false);
     void logRevealCards(PlayerLogic *player,
                         CardZoneLogic *zone,
@@ -82,8 +82,8 @@ signals:
                         bool isLentToAnotherPlayer = false);
     void logAlwaysRevealTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
     void logAlwaysLookAtTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
-    void cardZoneChanged(CardItem *card, bool sameZone);
-    void requestCardMenuUpdate(const CardItem *card);
+    void cardZoneChanged(CardState *card, bool sameZone);
+    void requestCardMenuUpdate(const CardState *card);
 
 public:
     PlayerEventHandler(PlayerLogic *player);
@@ -119,7 +119,7 @@ private:
     PlayerLogic *player;
 
     void setCardAttrHelper(const GameEventContext &context,
-                           CardItem *card,
+                           CardState *card,
                            CardAttribute attribute,
                            const QString &avalue,
                            bool allCards,

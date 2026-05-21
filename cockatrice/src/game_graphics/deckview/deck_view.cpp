@@ -73,7 +73,7 @@ void DeckViewCardDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 }
 
 DeckViewCard::DeckViewCard(QGraphicsItem *parent, const CardRef &cardRef, const QString &_originZone)
-    : AbstractCardItem(parent, cardRef, 0, -1), originZone(_originZone), dragItem(0)
+    : AbstractCardItem(new AbstractCardState(nullptr, cardRef, -1), parent), originZone(_originZone), dragItem(0)
 {
     setAcceptHoverEvents(true);
 
@@ -152,7 +152,7 @@ void DeckView::mouseDoubleClickEvent(QMouseEvent *event)
             auto *c = static_cast<DeckViewCard *>(sel.at(i));
             auto *zone = static_cast<DeckViewCardContainer *>(c->parentItem());
             MoveCard_ToZone m;
-            m.set_card_name(c->getName().toStdString());
+            m.set_card_name(c->getState()->getName().toStdString());
             m.set_start_zone(zone->getName().toStdString());
 
             if (zone->getName() == DECK_ZONE_MAIN) {
@@ -228,13 +228,15 @@ void DeckViewCardContainer::paint(QPainter *painter, const QStyleOptionGraphicsI
 void DeckViewCardContainer::addCard(DeckViewCard *card)
 {
     cards.append(card);
-    cardsByType.insert(card->getCard().isEmpty() ? "" : card->getCardInfo().getMainCardType(), card);
+    cardsByType.insert(card->getState()->getCard().isEmpty() ? "" : card->getState()->getCardInfo().getMainCardType(),
+                       card);
 }
 
 void DeckViewCardContainer::removeCard(DeckViewCard *card)
 {
     cards.removeOne(card);
-    cardsByType.remove(card->getCard().isEmpty() ? "" : card->getCardInfo().getMainCardType(), card);
+    cardsByType.remove(card->getState()->getCard().isEmpty() ? "" : card->getState()->getCardInfo().getMainCardType(),
+                       card);
 }
 
 QList<QPair<int, int>> DeckViewCardContainer::getRowsAndCols() const
@@ -283,7 +285,7 @@ QSizeF DeckViewCardContainer::calculateBoundingRect(const QList<QPair<int, int>>
 bool DeckViewCardContainer::sortCardsByName(DeckViewCard *c1, DeckViewCard *c2)
 {
     if (c1 && c2) {
-        return c1->getName() < c2->getName();
+        return c1->getState()->getName() < c2->getState()->getName();
     }
     return false;
 }
@@ -396,7 +398,7 @@ void DeckViewScene::applySideboardPlan(const QList<MoveCard_ToZone> &plan)
         DeckViewCard *card = 0;
         const QList<DeckViewCard *> &cardList = start->getCards();
         for (int j = 0; j < cardList.size(); ++j) {
-            if (cardList[j]->getName() == QString::fromStdString(m.card_name())) {
+            if (cardList[j]->getState()->getName() == QString::fromStdString(m.card_name())) {
                 card = cardList[j];
                 break;
             }
@@ -498,7 +500,7 @@ QList<MoveCard_ToZone> DeckViewScene::getSideboardPlan() const
         for (int i = 0; i < cardList.size(); ++i) {
             if (cardList[i]->getOriginZone() != cont->getName()) {
                 MoveCard_ToZone m;
-                m.set_card_name(cardList[i]->getName().toStdString());
+                m.set_card_name(cardList[i]->getState()->getName().toStdString());
                 m.set_start_zone(cardList[i]->getOriginZone().toStdString());
                 m.set_target_zone(cont->getName().toStdString());
                 result.append(m);

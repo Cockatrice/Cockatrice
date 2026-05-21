@@ -13,7 +13,7 @@ HandZoneLogic::HandZoneLogic(PlayerLogic *_player,
 {
 }
 
-void HandZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
+void HandZoneLogic::addCardImpl(CardState *card, int x, int /*y*/)
 {
     CardZoneAlgorithms::addCardToList(cards, card, x, false);
 }

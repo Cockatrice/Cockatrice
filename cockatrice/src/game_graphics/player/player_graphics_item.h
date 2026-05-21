@@ -126,6 +126,7 @@ signals:
     void playerCountChanged();
     void mirroredChanged(bool isMirrored);
     void cardInfoRequested(const CardRef &cardRef);
+    void cardItemAdded(CardItem *added);
 
 private:
     PlayerLogic *player;
