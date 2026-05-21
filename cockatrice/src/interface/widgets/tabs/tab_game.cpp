@@ -962,8 +962,6 @@ void TabGame::createMenuItems()
     connect(aReverseTurn, &QAction::triggered, game->getGameEventHandler(), &GameEventHandler::handleReverseTurn);
     aRemoveLocalArrows = new QAction(this);
     connect(aRemoveLocalArrows, &QAction::triggered, this, &TabGame::actRemoveLocalArrows);
-    connect(this, &TabGame::arrowDeletionRequested, game->getGameEventHandler(),
-            &GameEventHandler::handleArrowDeletion);
     aRotateViewCW = new QAction(this);
     connect(aRotateViewCW, &QAction::triggered, this, &TabGame::actRotateViewCW);
     aRotateViewCCW = new QAction(this);
@@ -1147,6 +1145,8 @@ void TabGame::createPlayAreaWidget(bool bReplay)
     scene = new GameScene(phasesToolbar, this);
     connect(game->getPlayerManager(), &PlayerManager::playerConceded, scene, &GameScene::rearrange);
     connect(game->getPlayerManager(), &PlayerManager::playerCountChanged, scene, &GameScene::rearrange);
+    connect(scene, &GameScene::requestArrowDeletion, game->getGameEventHandler(),
+            &GameEventHandler::handleArrowDeletion);
     gameView = new GameView(scene);
 
     auto gamePlayAreaVBox = new QVBoxLayout;

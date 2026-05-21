@@ -216,6 +216,7 @@ signals:
     void sigStartRubberBand(const QPointF &selectionOrigin);
     void sigResizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void sigStopRubberBand();
+    void requestArrowDeletion(int arrowId);
 };
 
 #endif
