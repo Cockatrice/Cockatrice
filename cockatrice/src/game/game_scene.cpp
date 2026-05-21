@@ -408,7 +408,7 @@ void GameScene::onArrowCreateRequested(ArrowData data)
 
 void GameScene::onArrowDeleteRequested(int arrowId)
 {
-    if (auto *arrow = arrowRegistry.value(arrowId)) {
+    if (arrowRegistry.contains(arrowId)) {
         emit requestArrowDeletion(arrowId);
     }
 }
