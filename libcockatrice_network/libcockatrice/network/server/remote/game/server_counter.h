@@ -22,7 +22,6 @@
 
 #include <QString>
 #include <libcockatrice/protocol/pb/color.pb.h>
-#include <limits>
 
 class ServerInfo_Counter;
 
@@ -93,16 +92,7 @@ public:
      * @return true if the value changed, false otherwise.
      * @note Clamps result to [INT_MIN, INT_MAX] to prevent overflow.
      */
-    [[nodiscard]] bool incrementCount(int delta)
-    {
-        // TODO: Extract overflow-safe arithmetic into shared helper.
-        // Duplicated in Server_Card::incrementCounter() - keep in sync if modified.
-        const int oldCount = count;
-        const auto result = static_cast<int64_t>(count) + static_cast<int64_t>(delta);
-        count = static_cast<int>(qBound(static_cast<int64_t>(std::numeric_limits<int>::min()), result,
-                                        static_cast<int64_t>(std::numeric_limits<int>::max())));
-        return count != oldCount;
-    }
+    [[nodiscard]] bool incrementCount(int delta);
 
     /**
      * @brief Populates info with this counter's current state for network serialization.
