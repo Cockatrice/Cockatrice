@@ -67,6 +67,7 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
                          bool _spectatorsSeeEverything,
                          int _startingLifeTotal,
                          bool _shareDecklistsOnLoad,
+                         bool _enableCommandZone,
                          Server_Room *_room)
     : QObject(), room(_room), nextPlayerId(0), hostId(0), creatorInfo(new ServerInfo_User(_creatorInfo)),
       gameStarted(false), gameClosed(false), gameId(_gameId), password(_password), maxPlayers(_maxPlayers),
@@ -74,9 +75,9 @@ Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
       onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed),
       spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk),
       spectatorsSeeEverything(_spectatorsSeeEverything), startingLifeTotal(_startingLifeTotal),
-      shareDecklistsOnLoad(_shareDecklistsOnLoad), inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0),
-      firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
-      gameMutex()
+      shareDecklistsOnLoad(_shareDecklistsOnLoad), enableCommandZone(_enableCommandZone), inactivityCounter(0),
+      startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false), turnOrderReversed(false),
+      startTime(QDateTime::currentDateTime()), pingClock(nullptr), gameMutex()
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());

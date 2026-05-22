@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 #include <libcockatrice/network/server/remote/game/server_counter.h>
+#include <libcockatrice/utility/trice_limits.h>
 #include <limits>
 
 TEST(ServerCounter, IncrementDoesNotOverflow)
@@ -77,6 +78,37 @@ TEST(ServerCounter, MixedExtremesDoNotClamp)
     bool changed = c.incrementCount(std::numeric_limits<int>::min());
     EXPECT_TRUE(changed);
     EXPECT_EQ(c.getCount(), -1);
+}
+
+TEST(ServerCounter, SetCountClampsToCustomBounds)
+{
+    Server_Counter c(1, "test", color(), 10, 50, 0, 100);
+    EXPECT_TRUE(c.setCount(150));
+    EXPECT_EQ(c.getCount(), 100);
+    EXPECT_TRUE(c.setCount(-10));
+    EXPECT_EQ(c.getCount(), 0);
+}
+
+TEST(ServerCounter, IncrementClampsToCustomBounds)
+{
+    Server_Counter c(1, "test", color(), 10, 50, 0, 100);
+    EXPECT_TRUE(c.incrementCount(100));
+    EXPECT_EQ(c.getCount(), 100);
+    EXPECT_FALSE(c.incrementCount(1));
+    EXPECT_EQ(c.getCount(), 100);
+    EXPECT_TRUE(c.incrementCount(-200));
+    EXPECT_EQ(c.getCount(), 0);
+    EXPECT_FALSE(c.incrementCount(-1));
+    EXPECT_EQ(c.getCount(), 0);
+}
+
+TEST(ServerCounter, CustomBoundsForCommanderTax)
+{
+    Server_Counter taxCounter(1, "tax", color(), 20, 0, 0, MAX_COUNTER_VALUE);
+    EXPECT_TRUE(taxCounter.setCount(1000));
+    EXPECT_EQ(taxCounter.getCount(), MAX_COUNTER_VALUE);
+    EXPECT_TRUE(taxCounter.setCount(-5));
+    EXPECT_EQ(taxCounter.getCount(), 0);
 }
 
 int main(int argc, char **argv)

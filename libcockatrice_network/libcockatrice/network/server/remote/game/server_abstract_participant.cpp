@@ -37,6 +37,7 @@
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_set_counter_active.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
@@ -342,6 +343,13 @@ Response::ResponseCode Server_AbstractParticipant::cmdDelCounter(const Command_D
     return Response::RespFunctionNotAllowed;
 }
 
+Response::ResponseCode Server_AbstractParticipant::cmdSetCounterActive(const Command_SetCounterActive & /*cmd*/,
+                                                                       ResponseContainer & /*rc*/,
+                                                                       GameEventStorage & /*ges*/)
+{
+    return Response::RespFunctionNotAllowed;
+}
+
 Response::ResponseCode Server_AbstractParticipant::cmdNextTurn(const Command_NextTurn & /*cmd*/,
                                                                ResponseContainer & /*rc*/,
                                                                GameEventStorage & /*ges*/)
@@ -524,6 +532,9 @@ Server_AbstractParticipant::processGameCommand(const GameCommand &command, Respo
             break;
         case GameCommand::REVERSE_TURN:
             return cmdReverseTurn(command.GetExtension(Command_ReverseTurn::ext), rc, ges);
+            break;
+        case GameCommand::SET_COUNTER_ACTIVE:
+            return cmdSetCounterActive(command.GetExtension(Command_SetCounterActive::ext), rc, ges);
             break;
         default:
             return Response::RespInvalidCommand;

@@ -10,6 +10,7 @@
 
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
+#include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <utility>
 
@@ -80,6 +81,8 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
         fromStr = tr(" from sideboard");
     } else if (zoneName == ZoneNames::STACK) {
         fromStr = tr(" from the stack");
+    } else if (zoneName == ZoneNames::COMMAND) {
+        fromStr = tr(" from the command zone");
     } else {
         fromStr = tr(" from custom zone '%1'").arg(zoneName);
     }
@@ -344,6 +347,8 @@ void MessageLogWidget::logMoveCard(PlayerLogic *player,
         } else {
             finalStr = tr("%1 plays %2%3.");
         }
+    } else if (targetZoneName == ZoneNames::COMMAND) {
+        finalStr = tr("%1 moves %2%3 to the command zone.");
     } else {
         fourthArg = targetZoneName;
         if (card->getFaceDown()) {
@@ -669,6 +674,20 @@ void MessageLogWidget::logSetCounter(PlayerLogic *player, QString counterName, i
 {
     if (counterName == "life") {
         soundEngine->playSound("life_change");
+    }
+
+    if (counterName == CounterNames::CommanderTax || counterName == CounterNames::PartnerTax) {
+        QString playerName = sanitizeHtml(player->getPlayerInfo()->getName());
+        QString valueStr = QString("<font class=\"blue\">%1</font>").arg(value);
+        int delta = value - oldValue;
+        QString counterDisplayName = TranslateCounterName::getDisplayName(counterName);
+        QString taxLabel = QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterDisplayName));
+        if (value > oldValue) {
+            appendHtmlServerMessage(tr("%1 increases %2 to %3 (+%4).").arg(playerName, taxLabel, valueStr).arg(delta));
+        } else {
+            appendHtmlServerMessage(tr("%1 decreases %2 to %3 (%4).").arg(playerName, taxLabel, valueStr).arg(delta));
+        }
+        return;
     }
 
     QString counterDisplayName = TranslateCounterName::getDisplayName(counterName);

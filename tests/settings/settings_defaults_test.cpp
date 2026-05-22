@@ -109,6 +109,18 @@ TEST_F(SettingsDefaultsTest, Game_LocalGameRememberSettings_Default)
     ASSERT_EQ(s.getLocalGameRememberSettings(), false);
 }
 
+TEST_F(SettingsDefaultsTest, Game_EnableCommandZone_Default)
+{
+    GameSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getEnableCommandZone(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Game_LocalGameEnableCommandZone_Default)
+{
+    GameSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getLocalGameEnableCommandZone(), false);
+}
+
 // --- UpdatesSettings ---
 
 TEST_F(SettingsDefaultsTest, Updates_CheckUpdatesOnStartup_Default)

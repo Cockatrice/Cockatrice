@@ -175,6 +175,7 @@ message GameCommand {
         /// Server: Server_Player::cmdReverseTurn
         /// Client: reflected via subsequent turn events
         REVERSE_TURN = 1034;
+        SET_COUNTER_ACTIVE = 1035;
     }
 
     extensions 100 to max;

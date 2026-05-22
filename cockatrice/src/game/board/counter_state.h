@@ -10,7 +10,13 @@ class CounterState : public QObject
 {
     Q_OBJECT
 public:
-    CounterState(int id, const QString &name, const QColor &color, int radius, int value, QObject *parent = nullptr);
+    CounterState(int id,
+                 const QString &name,
+                 const QColor &color,
+                 int radius,
+                 int value,
+                 bool active = true,
+                 QObject *parent = nullptr);
 
     static CounterState *fromProto(const ServerInfo_Counter &counter, QObject *parent = nullptr);
 
@@ -34,11 +40,17 @@ public:
     {
         return value;
     }
+    bool isActive() const
+    {
+        return active;
+    }
 
     void setValue(int newValue);
+    void setActive(bool newActive);
 
 signals:
     void valueChanged(int oldValue, int newValue);
+    void activeChanged(bool newActive);
 
 private:
     int id;
@@ -46,6 +58,7 @@ private:
     QColor color;
     int radius;
     int value;
+    bool active;
 };
 
 #endif // COCKATRICE_COUNTER_STATE_H

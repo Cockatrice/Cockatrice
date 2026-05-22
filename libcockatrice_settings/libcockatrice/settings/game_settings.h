@@ -24,9 +24,11 @@ public:
     [[nodiscard]] int getDefaultStartingLifeTotal() const override;
     [[nodiscard]] bool getShareDecklistsOnLoad() const override;
     [[nodiscard]] bool getRememberGameSettings() const override;
+    [[nodiscard]] bool getEnableCommandZone() const override;
     [[nodiscard]] bool getLocalGameRememberSettings() const override;
     [[nodiscard]] int getLocalGameMaxPlayers() const override;
     [[nodiscard]] int getLocalGameStartingLifeTotal() const override;
+    [[nodiscard]] bool getLocalGameEnableCommandZone() const override;
 
     void setGameDescription(const QString &_gameDescription);
     void setMaxPlayers(int _maxPlayers);
@@ -41,9 +43,11 @@ public:
     void setDefaultStartingLifeTotal(int _defaultStartingLifeTotal);
     void setShareDecklistsOnLoad(bool _shareDecklistsOnLoad);
     void setRememberGameSettings(bool _rememberGameSettings);
+    void setEnableCommandZone(bool _enableCommandZone);
     void setLocalGameRememberSettings(bool value);
     void setLocalGameMaxPlayers(int value);
     void setLocalGameStartingLifeTotal(int value);
+    void setLocalGameEnableCommandZone(bool value);
 
 public:
     explicit GameSettings(const QString &settingPath, QObject *parent = nullptr);

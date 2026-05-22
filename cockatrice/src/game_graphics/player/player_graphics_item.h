@@ -12,6 +12,7 @@
 
 #include <QGraphicsObject>
 
+class CommandZone;
 class HandZone;
 class PileZone;
 class PlayerDialogs;
@@ -112,6 +113,18 @@ public:
     {
         return handZoneGraphicsItem;
     }
+    /** @brief Returns the command zone graphics item. */
+    [[nodiscard]] CommandZone *getCommandZoneGraphicsItem() const
+    {
+        return commandZoneGraphicsItem;
+    }
+    /** @brief Returns the counter widget for the given counter ID, or nullptr if not found. */
+    [[nodiscard]] AbstractCounter *getCounterWidget(int counterId) const
+    {
+        return counterWidgets.value(counterId, nullptr);
+    }
+    /** @brief Returns all tax counter widgets (commander tax and partner tax). */
+    [[nodiscard]] QList<AbstractCounter *> getTaxCounterWidgets() const;
 
 public slots:
     void onPlayerActiveChanged(bool _active);
@@ -120,6 +133,8 @@ public slots:
     void onCounterRemoved(int counterId);
     void rearrangeCounters();
     void retranslateUi();
+    /** @brief Shows or hides the command zone and rearranges dependent zones. */
+    void setCommandZoneVisible(bool visible);
 
 signals:
     void sizeChanged();
@@ -142,10 +157,15 @@ private:
     TableZone *tableZoneGraphicsItem;
     StackZone *stackZoneGraphicsItem;
     HandZone *handZoneGraphicsItem;
+    CommandZone *commandZoneGraphicsItem;
     QRectF bRect;
     bool mirrored;
     bool handVisible = false;
 
+    /** @brief Returns the command zone's display height, or 0 if hidden. */
+    [[nodiscard]] qreal totalCommandZoneHeight() const;
+    /** @brief Positions the command and stack zones vertically starting from base, updating base.y. */
+    void positionCommandAndStackZones(const QPointF &base);
 private slots:
     void updateBoundingRect();
     void rearrangeZones();
