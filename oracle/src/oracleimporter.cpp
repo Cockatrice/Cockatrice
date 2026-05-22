@@ -473,8 +473,8 @@ FormatRulesNameMap OracleImporter::createDefaultMagicFormats()
     // Predefined common exceptions
     CardCondition superTypeIsBasic;
     superTypeIsBasic.field = "type";
-    superTypeIsBasic.matchType = "contains";
-    superTypeIsBasic.value = "Basic Land";
+    superTypeIsBasic.matchType = "regex";
+    superTypeIsBasic.value = "^Basic(?:\\s+Snow)?\\s+Land";
 
     ExceptionRule basicLands;
     basicLands.conditions.append(superTypeIsBasic);
