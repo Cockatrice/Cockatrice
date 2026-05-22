@@ -42,7 +42,19 @@ SelectZone::ZoneLayout SelectZone::computeZoneLayout(const StackLayoutParams &pa
                 reservedForBottomCard = params.cardHeight;
             }
             fitOffset = (params.totalHeight - reservedForBottomCard) / (params.cardCount - 1);
-            effectiveOffset = qMax(params.minOffset, qMin(params.desiredOffset, fitOffset));
+
+            if (!params.allowBottomOverflow) {
+                // Constrain offset so all card tops remain within zone bounds.
+                // With start=0, last card top at (cardCount-1) * effectiveOffset must be < totalHeight.
+                qreal maxOffsetForTops = params.totalHeight / (params.cardCount - 1);
+                fitOffset = qMin(fitOffset, maxOffsetForTops);
+            }
+
+            // Apply minOffset only if it fits; otherwise compress further to keep all card tops visible.
+            effectiveOffset = qMin(params.desiredOffset, fitOffset);
+            if (fitOffset >= params.minOffset) {
+                effectiveOffset = qMax(params.minOffset, effectiveOffset);
+            }
         }
     }
     qreal stackHeight = (params.cardCount - 1) * effectiveOffset + params.cardHeight;
