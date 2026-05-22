@@ -50,6 +50,7 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
     refreshShortcuts();
 
     loadLayout();
+    filterDockWidget->setHidden(true);
     cardDatabaseDockWidget->setHidden(true);
 }
 
@@ -99,7 +100,7 @@ void TabDeckEditorVisual::createMenus()
 
     registerDockWidget(viewMenu, cardInfoDockWidget, {250, 500});
     registerDockWidget(viewMenu, deckDockWidget, {250, 360});
-    registerDockWidget(viewMenu, filterDockWidget, {250, 250});
+    // registerDockWidget(viewMenu, filterDockWidget, {250, 250});
     registerDockWidget(viewMenu, printingSelectorDockWidget, {525, 250});
 
     viewMenu->addSeparator();
@@ -276,18 +277,18 @@ void TabDeckEditorVisual::restartLayout()
 
     deckDockWidget->setVisible(true);
     cardInfoDockWidget->setVisible(true);
-    filterDockWidget->setVisible(false);
+    // filterDockWidget->setVisible(false);
     printingSelectorDockWidget->setVisible(true);
 
     setCentralWidget(centralWidget);
     addDockWidget(Qt::RightDockWidgetArea, deckDockWidget);
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDockWidget);
-    addDockWidget(Qt::RightDockWidgetArea, filterDockWidget);
+    // addDockWidget(Qt::RightDockWidgetArea, filterDockWidget);
     addDockWidget(Qt::RightDockWidgetArea, printingSelectorDockWidget);
 
     splitDockWidget(cardInfoDockWidget, printingSelectorDockWidget, Qt::Vertical);
     splitDockWidget(cardInfoDockWidget, deckDockWidget, Qt::Horizontal);
-    splitDockWidget(cardInfoDockWidget, filterDockWidget, Qt::Horizontal);
+    // splitDockWidget(cardInfoDockWidget, filterDockWidget, Qt::Horizontal);
 
     QTimer::singleShot(100, this, SLOT(freeDocksSize()));
 }
@@ -299,13 +300,13 @@ void TabDeckEditorVisual::retranslateUi()
 
     cardInfoDockWidget->setWindowTitle(tr("Card Info"));
     deckDockWidget->setWindowTitle(tr("Deck"));
-    filterDockWidget->setWindowTitle(tr("Filters"));
+    // filterDockWidget->setWindowTitle(tr("Filters"));
 
     viewMenu->setTitle(tr("&View"));
 
     dockToActions[cardInfoDockWidget].menu->setTitle(tr("Card Info"));
     dockToActions[deckDockWidget].menu->setTitle(tr("Deck"));
-    dockToActions[filterDockWidget].menu->setTitle(tr("Filters"));
+    // dockToActions[filterDockWidget].menu->setTitle(tr("Filters"));
     dockToActions[printingSelectorDockWidget].menu->setTitle(tr("Printing"));
 
     for (auto &actions : dockToActions.values()) {
