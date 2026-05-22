@@ -202,6 +202,7 @@ public slots:
     QTransform getViewportTransform() const;
 
     void onArrowCreateRequested(const ArrowData &data);
+    void onArrowDeleted(int arrowId);
     void onArrowDeleteRequested(int arrowId);
     void onCardZoneChanged(CardItem *card, bool sameZone);
     void clearArrowsForPlayer(int playerId);

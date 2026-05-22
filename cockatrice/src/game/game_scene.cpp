@@ -93,6 +93,7 @@ void GameScene::addPlayer(PlayerLogic *player)
         rearrange();
     });
 
+    connect(player, &PlayerLogic::arrowDeleted, this, &GameScene::onArrowDeleted);
     connect(player, &PlayerLogic::arrowCreateRequested, this, &GameScene::onArrowCreateRequested);
     connect(player, &PlayerLogic::arrowDeleteRequested, this, &GameScene::onArrowDeleteRequested);
     connect(player, &PlayerLogic::arrowsCleared, this,
@@ -404,11 +405,17 @@ void GameScene::onArrowCreateRequested(const ArrowData &data)
     connect(arrow, &QObject::destroyed, this, [this, id = data.id]() { arrowRegistry.remove(id); });
 }
 
+void GameScene::onArrowDeleted(int arrowId)
+{
+    if (arrowRegistry.contains(arrowId)) {
+        arrowRegistry.take(arrowId)->delArrow();
+    }
+}
+
 void GameScene::onArrowDeleteRequested(int arrowId)
 {
     if (arrowRegistry.contains(arrowId)) {
         emit requestArrowDeletion(arrowId);
-        arrowRegistry.take(arrowId)->delArrow();
     }
 }
 
@@ -426,7 +433,6 @@ void GameScene::onCardZoneChanged(CardItem *card, bool sameZone)
     }
     for (auto *arrow : toDelete) {
         emit requestArrowDeletion(arrow->getId());
-        arrowRegistry.take(arrow->getId())->delArrow();
     }
 }
 
@@ -435,7 +441,6 @@ void GameScene::clearArrowsForPlayer(int playerId)
     for (auto *arrow : arrowRegistry.values()) {
         if (arrow->getPlayer()->getPlayerInfo()->getId() == playerId) {
             emit requestArrowDeletion(arrow->getId());
-            arrowRegistry.take(arrow->getId())->delArrow();
         }
     }
 }
