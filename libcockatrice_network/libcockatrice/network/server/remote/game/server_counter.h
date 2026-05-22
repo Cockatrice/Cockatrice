@@ -29,13 +29,12 @@ class ServerInfo_Counter;
 
 /**
  * @class Server_Counter
- * @brief Represents a player counter with overflow-safe increment arithmetic.
+ * @brief Represents a player counter with overflow-safe increment arithmetic and optional bounds.
  *
  * All value modifications return whether the value actually changed,
  * enabling callers to skip unnecessary network events.
  *
- * @note Direct assignment via setCount() does not clamp; only
- *       incrementCount() enforces int boundary saturation.
+ * @note Values are clamped to [minValue, maxValue] on both setCount() and incrementCount().
  * @note Unlike card counters, player counters are never auto-removed
  *       when they reach zero - they persist with value 0.
  */
@@ -47,9 +46,30 @@ protected:
     color counterColor;
     int radius;
     int count;
+    int minValue;       ///< Minimum allowed value (default: INT_MIN, i.e. unbounded)
+    int maxValue;       ///< Maximum allowed value (default: INT_MAX, i.e. unbounded)
+    bool active = true; ///< Whether this counter is visible/active (default: true)
+
+    static constexpr int DEFAULT_MAX_VALUE = std::numeric_limits<int>::max();
 
 public:
-    Server_Counter(int _id, const QString &_name, const color &_counterColor, int _radius, int _count = 0);
+    /**
+     * @brief Constructs a counter.
+     * @param _id Unique counter identifier
+     * @param _name Display name
+     * @param _counterColor Counter color
+     * @param _radius Display radius
+     * @param _count Initial value (default 0)
+     * @param _minValue Minimum allowed value (default INT_MIN)
+     * @param _maxValue Maximum allowed value (default INT_MAX)
+     */
+    Server_Counter(int _id,
+                   const QString &_name,
+                   const color &_counterColor,
+                   int _radius,
+                   int _count = 0,
+                   int _minValue = std::numeric_limits<int>::min(),
+                   int _maxValue = DEFAULT_MAX_VALUE);
     ~Server_Counter()
     {
     }
@@ -73,18 +93,31 @@ public:
     {
         return count;
     }
-
+    bool isActive() const
+    {
+        return active;
+    }
     /**
-     * @brief Sets the counter to an exact value.
-     * @param _count The new value (assigned directly without clamping).
-     * @return true if the value changed, false otherwise.
-     * @warning This performs raw assignment. For overflow-safe incrementing,
-     *          use incrementCount().
+     * @brief Sets the active (visible) state of this counter.
+     * @param _active True to show the counter, false to hide it
+     * @return true if the state changed
+     */
+    [[nodiscard]] bool setActive(bool _active)
+    {
+        bool oldActive = active;
+        active = _active;
+        return active != oldActive;
+    }
+    /**
+     * @brief Sets the counter value, clamping to [minValue, maxValue].
+     * @param _count The desired new value
+     * @return true if the clamped value differs from the previous value
+     * @note For increment operations, prefer incrementCount() which handles overflow safely.
      */
     [[nodiscard]] bool setCount(int _count)
     {
-        const int oldCount = count;
-        count = _count;
+        int oldCount = count;
+        count = qBound(minValue, _count, maxValue);
         return count != oldCount;
     }
 
@@ -92,7 +125,7 @@ public:
      * @brief Increments the counter by delta with overflow-safe arithmetic.
      * @param delta The amount to add (may be negative for decrement).
      * @return true if the value changed, false otherwise.
-     * @note Clamps result to [INT_MIN, INT_MAX] to prevent overflow.
+     * @note Clamps result to [minValue, maxValue] to prevent overflow.
      */
     [[nodiscard]] bool incrementCount(int delta)
     {

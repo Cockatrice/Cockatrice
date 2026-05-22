@@ -48,6 +48,7 @@ class Event_RollDie;
 class Event_SetCardAttr;
 class Event_SetCardCounter;
 class Event_SetCounter;
+class Event_SetCounterActive;
 class Event_Shuffle;
 class Event_GameLogNotice;
 
@@ -154,6 +155,9 @@ public:
 
     /// Set a player-level counter value.
     void eventSetCounter(const Event_SetCounter &event);
+
+    /// Show or hide a player-level counter without deleting it.
+    void eventSetCounterActive(const Event_SetCounterActive &event);
 
     /// Delete a player-level counter.
     void eventDelCounter(const Event_DelCounter &event);

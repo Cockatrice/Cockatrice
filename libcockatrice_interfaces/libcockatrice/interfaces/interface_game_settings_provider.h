@@ -21,9 +21,11 @@ public:
     [[nodiscard]] virtual int getDefaultStartingLifeTotal() const = 0;
     [[nodiscard]] virtual bool getShareDecklistsOnLoad() const = 0;
     [[nodiscard]] virtual bool getRememberGameSettings() const = 0;
+    [[nodiscard]] virtual bool getEnableCommandZone() const = 0;
     [[nodiscard]] virtual bool getLocalGameRememberSettings() const = 0;
     [[nodiscard]] virtual int getLocalGameMaxPlayers() const = 0;
     [[nodiscard]] virtual int getLocalGameStartingLifeTotal() const = 0;
+    [[nodiscard]] virtual bool getLocalGameEnableCommandZone() const = 0;
 };
 
 #endif // COCKATRICE_INTERFACE_GAME_SETTINGS_PROVIDER_H

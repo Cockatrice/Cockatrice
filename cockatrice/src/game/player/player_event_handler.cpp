@@ -4,6 +4,7 @@
 #include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/zones/view_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
+#include "../board/abstract_counter.h"
 #include "../board/arrow_data.h"
 #include "../board/card_list.h"
 #include "player_actions.h"
@@ -31,8 +32,10 @@
 #include <libcockatrice/protocol/pb/event_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
+#include <libcockatrice/protocol/pb/event_set_counter_active.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
 #include <libcockatrice/utility/color.h>
+#include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/zone_names.h>
 
 PlayerEventHandler::PlayerEventHandler(PlayerLogic *_player) : QObject(_player), player(_player)
@@ -264,13 +267,31 @@ void PlayerEventHandler::eventCreateCounter(const Event_CreateCounter &event)
 
 void PlayerEventHandler::eventSetCounter(const Event_SetCounter &event)
 {
-    CounterState *ctr = player->getCounters().value(event.counter_id(), nullptr);
-    if (!ctr) {
+    CounterState *state = player->getCounters().value(event.counter_id(), nullptr);
+    if (!state) {
         return;
     }
-    int oldValue = ctr->getValue();
-    ctr->setValue(event.value());
-    emit logSetCounter(player, ctr->getName(), event.value(), oldValue);
+    int oldValue = state->getValue();
+    state->setValue(event.value());
+
+    if (event.value() != oldValue) {
+        emit logSetCounter(player, state->getName(), event.value(), oldValue);
+    }
+}
+
+void PlayerEventHandler::eventSetCounterActive(const Event_SetCounterActive &event)
+{
+    CounterState *state = player->getCounters().value(event.counter_id(), nullptr);
+    if (!state) {
+        return;
+    }
+    state->setActive(event.active());
+
+    AbstractCounter *widget = player->getGraphicsItem()->getCounterWidget(event.counter_id());
+    if (widget) {
+        widget->setActive(event.active());
+        emit player->rearrangeCounters();
+    }
 }
 
 void PlayerEventHandler::eventDelCounter(const Event_DelCounter &event)
@@ -626,6 +647,9 @@ void PlayerEventHandler::processGameEvent(GameEvent::GameEventType type,
             break;
         case GameEvent::SET_COUNTER:
             eventSetCounter(event.GetExtension(Event_SetCounter::ext));
+            break;
+        case GameEvent::SET_COUNTER_ACTIVE:
+            eventSetCounterActive(event.GetExtension(Event_SetCounterActive::ext));
             break;
         case GameEvent::DEL_COUNTER:
             eventDelCounter(event.GetExtension(Event_DelCounter::ext));

@@ -34,10 +34,13 @@ DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
     startingLifeTotalEdit->setValue(20);
     startingLifeTotalLabel->setBuddy(startingLifeTotalEdit);
 
+    enableCommandZoneCheckBox = new QCheckBox(tr("Enable command zone"), this);
+
     auto *gameSetupGrid = new QGridLayout;
     gameSetupGrid->setContentsMargins(5, 5, 5, 5);
     gameSetupGrid->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupGrid->addWidget(startingLifeTotalEdit, 0, 1);
+    gameSetupGrid->addWidget(enableCommandZoneCheckBox, 1, 0, 1, 2);
     gameSetupOptionsGroupBox = new QGroupBox(tr("Game setup options"), this);
     gameSetupOptionsGroupBox->setLayout(gameSetupGrid);
 
@@ -58,6 +61,7 @@ DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
     if (rememberSettingsCheckBox->isChecked()) {
         numberPlayersEdit->setValue(SettingsCache::instance().game().getLocalGameMaxPlayers());
         startingLifeTotalEdit->setValue(SettingsCache::instance().game().getLocalGameStartingLifeTotal());
+        enableCommandZoneCheckBox->setChecked(SettingsCache::instance().game().getLocalGameEnableCommandZone());
     }
 
     setWindowTitle(tr("Local game options"));
@@ -72,6 +76,7 @@ void DlgLocalGameOptions::actOK()
     if (rememberSettingsCheckBox->isChecked()) {
         SettingsCache::instance().game().setLocalGameMaxPlayers(numberPlayersEdit->value());
         SettingsCache::instance().game().setLocalGameStartingLifeTotal(startingLifeTotalEdit->value());
+        SettingsCache::instance().game().setLocalGameEnableCommandZone(enableCommandZoneCheckBox->isChecked());
     }
 
     accept();
@@ -82,5 +87,6 @@ LocalGameOptions DlgLocalGameOptions::getOptions() const
     return LocalGameOptions{
         .numberPlayers = numberPlayersEdit->value(),
         .startingLifeTotal = startingLifeTotalEdit->value(),
+        .enableCommandZone = enableCommandZoneCheckBox->isChecked(),
     };
 }

@@ -21,6 +21,8 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     aMoveToGraveyard->setData(cmMoveToGraveyard);
     aMoveToExile = new QAction(this);
     aMoveToExile->setData(cmMoveToExile);
+    aMoveToCommandZone = new QAction(this);
+    aMoveToCommandZone->setData(cmMoveToCommandZone);
 
     auto *actions = player->getLogic()->getPlayerActions();
 
@@ -50,6 +52,8 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     addAction(aMoveToGraveyard);
     addSeparator();
     addAction(aMoveToExile);
+    addSeparator();
+    addAction(aMoveToCommandZone);
 
     setShortcutsActive();
 
@@ -66,6 +70,7 @@ void MoveMenu::setShortcutsActive()
     aMoveToHand->setShortcuts(shortcuts.getShortcut("Player/aMoveToHand"));
     aMoveToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveToGraveyard"));
     aMoveToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveToExile"));
+    aMoveToCommandZone->setShortcuts(shortcuts.getShortcut("Player/aMoveToCommandZone"));
 }
 
 void MoveMenu::retranslateUi()
@@ -77,4 +82,5 @@ void MoveMenu::retranslateUi()
     aMoveToHand->setText(tr("&Hand"));
     aMoveToGraveyard->setText(tr("&Graveyard"));
     aMoveToExile->setText(tr("&Exile"));
+    aMoveToCommandZone->setText(tr("&Command Zone"));
 }
