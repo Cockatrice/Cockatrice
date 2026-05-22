@@ -6,10 +6,10 @@
 SideboardMenu::SideboardMenu(PlayerGraphicsItem *player, QMenu *playerMenu) : QMenu(playerMenu)
 {
     aViewSideboard = new QAction(this);
-    connect(aViewSideboard, &QAction::triggered, player->getPlayerLogic()->getPlayerActions(),
+    connect(aViewSideboard, &QAction::triggered, player->getLogic()->getPlayerActions(),
             &PlayerActions::actViewSideboard);
 
-    if (player->getPlayerLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         addAction(aViewSideboard);
     }
 

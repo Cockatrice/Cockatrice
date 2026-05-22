@@ -20,11 +20,11 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     aMoveToExile = new QAction(this);
     aMoveToExile->setData(cmMoveToExile);
 
-    auto *actions = player->getPlayerLogic()->getPlayerActions();
+    auto *actions = player->getLogic()->getPlayerActions();
 
     auto invoke = [player](CardMenuActionType type) {
         return [type, player]() {
-            player->getPlayerLogic()->getPlayerActions()->cardMenuAction(player->getGameScene()->selectedCards(), type);
+            player->getLogic()->getPlayerActions()->cardMenuAction(player->getGameScene()->selectedCards(), type);
         };
     };
 

@@ -44,8 +44,7 @@ void SayMenu::initSayMenu()
 
     for (int i = 0; i < count; ++i) {
         auto *newAction = new QAction(SettingsCache::instance().messages().getMessageAt(i), this);
-        connect(newAction, &QAction::triggered, player->getPlayerLogic()->getPlayerActions(),
-                &PlayerActions::actSayMessage);
+        connect(newAction, &QAction::triggered, player->getLogic()->getPlayerActions(), &PlayerActions::actSayMessage);
         addAction(newAction);
     }
 

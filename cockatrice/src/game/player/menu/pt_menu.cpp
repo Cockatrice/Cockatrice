@@ -5,7 +5,7 @@
 
 PtMenu::PtMenu(PlayerGraphicsItem *player) : QMenu(tr("Power / toughness"))
 {
-    PlayerActions *playerActions = player->getPlayerLogic()->getPlayerActions();
+    PlayerActions *playerActions = player->getLogic()->getPlayerActions();
 
     aIncP = new QAction(this);
     connect(aIncP, &QAction::triggered, playerActions,

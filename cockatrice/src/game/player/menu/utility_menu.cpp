@@ -10,12 +10,12 @@
 
 UtilityMenu::UtilityMenu(PlayerGraphicsItem *_player, QMenu *playerMenu) : QMenu(playerMenu), player(_player)
 {
-    PlayerActions *playerActions = player->getPlayerLogic()->getPlayerActions();
+    PlayerActions *playerActions = player->getLogic()->getPlayerActions();
     connect(playerActions, &PlayerActions::requestEnableAndSetCreateAnotherTokenAction, this,
             &UtilityMenu::setAndEnableCreateAnotherTokenAction);
     connect(playerActions, &PlayerActions::requestSetLastToken, this, &UtilityMenu::setLastToken);
 
-    if (player->getPlayerLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         aUntapAll = new QAction(this);
         connect(aUntapAll, &QAction::triggered, playerActions, &PlayerActions::actUntapAll);
 
@@ -27,7 +27,7 @@ UtilityMenu::UtilityMenu(PlayerGraphicsItem *_player, QMenu *playerMenu) : QMenu
 
         aCreateToken = new QAction(this);
         connect(aCreateToken, &QAction::triggered, playerActions, [this]() {
-            player->getPlayerLogic()->getPlayerActions()->actRequestCreateTokenDialog(getPredefinedTokens());
+            player->getLogic()->getPlayerActions()->actRequestCreateTokenDialog(getPredefinedTokens());
         });
 
         aCreateAnotherToken = new QAction(this);
@@ -36,13 +36,13 @@ UtilityMenu::UtilityMenu(PlayerGraphicsItem *_player, QMenu *playerMenu) : QMenu
 
         aIncrementAllCardCounters = new QAction(this);
         connect(aIncrementAllCardCounters, &QAction::triggered, playerActions, [this]() {
-            player->getPlayerLogic()->getPlayerActions()->actIncrementAllCardCounters(
+            player->getLogic()->getPlayerActions()->actIncrementAllCardCounters(
                 player->getGameScene()->selectedCards());
         });
 
         createPredefinedTokenMenu = new QMenu(QString());
         createPredefinedTokenMenu->setEnabled(false);
-        connect(player->getPlayerLogic(), &PlayerLogic::deckChanged, this, &UtilityMenu::populatePredefinedTokensMenu);
+        connect(player->getLogic(), &PlayerLogic::deckChanged, this, &UtilityMenu::populatePredefinedTokensMenu);
 
         playerMenu->addAction(aIncrementAllCardCounters);
         playerMenu->addSeparator();
@@ -73,7 +73,7 @@ void UtilityMenu::populatePredefinedTokensMenu()
     clear();
     setEnabled(false);
     predefinedTokens.clear();
-    const DeckList &deckList = player->getPlayerLogic()->getDeck();
+    const DeckList &deckList = player->getLogic()->getDeck();
 
     if (deckList.isEmpty()) {
         return;
@@ -91,7 +91,7 @@ void UtilityMenu::populatePredefinedTokensMenu()
             if (i < 10) {
                 a->setShortcut(QKeySequence("Alt+" + QString::number((i + 1) % 10)));
             }
-            connect(a, &QAction::triggered, player->getPlayerLogic()->getPlayerActions(),
+            connect(a, &QAction::triggered, player->getLogic()->getPlayerActions(),
                     &PlayerActions::actCreatePredefinedToken);
         }
     }
@@ -103,12 +103,12 @@ void UtilityMenu::setLastToken(CardInfoPtr lastToken)
         return;
     }
 
-    player->getPlayerLogic()->getPlayerActions()->setLastTokenInfo(lastToken);
+    player->getLogic()->getPlayerActions()->setLastTokenInfo(lastToken);
 }
 
 void UtilityMenu::retranslateUi()
 {
-    if (player->getPlayerLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         aIncrementAllCardCounters->setText(tr("Increment all card counters"));
         aUntapAll->setText(tr("&Untap all permanents"));
         aRollDie->setText(tr("R&oll die..."));
@@ -123,7 +123,7 @@ void UtilityMenu::setShortcutsActive()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
-    if (player->getPlayerLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         aIncrementAllCardCounters->setShortcuts(shortcuts.getShortcut("Player/aIncrementAllCardCounters"));
         aUntapAll->setShortcuts(shortcuts.getShortcut("Player/aUntapAll"));
         aRollDie->setShortcuts(shortcuts.getShortcut("Player/aRollDie"));
@@ -135,7 +135,7 @@ void UtilityMenu::setShortcutsActive()
 
 void UtilityMenu::setShortcutsInactive()
 {
-    if (player->getPlayerLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         aUntapAll->setShortcut(QKeySequence());
         aRollDie->setShortcut(QKeySequence());
         aFlipCoin->setShortcut(QKeySequence());

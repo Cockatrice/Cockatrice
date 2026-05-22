@@ -56,7 +56,7 @@ public:
         return static_cast<GameScene *>(scene());
     }
 
-    PlayerLogic *getPlayerLogic() const
+    PlayerLogic *getLogic() const
     {
         return player;
     }

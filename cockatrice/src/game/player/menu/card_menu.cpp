@@ -30,17 +30,16 @@ static QAction *makeAction(QObject *parent, Slot &&slot, bool checkable = false,
 CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
 {
-    const QList<PlayerLogic *> &players =
-        player->getPlayerLogic()->getGame()->getPlayerManager()->getPlayers().values();
+    const QList<PlayerLogic *> &players = player->getLogic()->getGame()->getPlayerManager()->getPlayers().values();
 
     for (auto playerToAdd : players) {
-        if (playerToAdd == player->getPlayerLogic()) {
+        if (playerToAdd == player->getLogic()) {
             continue;
         }
         playersInfo.append(qMakePair(playerToAdd->getPlayerInfo()->getName(), playerToAdd->getPlayerInfo()->getId()));
     }
 
-    auto *actions = player->getPlayerLogic()->getPlayerActions();
+    auto *actions = player->getLogic()->getPlayerActions();
     auto *gameScene = player->getGameScene();
 
     // Single selection resolver used by all lambdas — called at trigger time
@@ -100,7 +99,7 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     }
 
     bool revealedCard = false;
-    bool writeableCard = player->getPlayerLogic()->getPlayerInfo()->getLocalOrJudge();
+    bool writeableCard = player->getLogic()->getPlayerInfo()->getLocalOrJudge();
     if (auto *view = qobject_cast<ZoneViewZoneLogic *>(card->getZone())) {
         if (view->getRevealZone()) {
             if (view->getWriteableRevealZone()) {
@@ -285,7 +284,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
     initContextualPlayersMenu(revealMenu, aRevealToAll);
 
     connect(revealMenu, &QMenu::triggered, this, [this](QAction *action) {
-        player->getPlayerLogic()->getPlayerActions()->actReveal(player->getGameScene()->selectedCards(), action);
+        player->getLogic()->getPlayerActions()->actReveal(player->getGameScene()->selectedCards(), action);
     });
 
     addSeparator();
@@ -433,7 +432,7 @@ void CardMenu::addRelatedCardActions()
 
         auto *createRelated = new QAction(text, this);
         createRelated->setData(QVariant(index++));
-        connect(createRelated, &QAction::triggered, player->getPlayerLogic()->getPlayerActions(),
+        connect(createRelated, &QAction::triggered, player->getLogic()->getPlayerActions(),
                 &PlayerActions::actCreateRelatedCard);
         addAction(createRelated);
     }
@@ -443,7 +442,7 @@ void CardMenu::addRelatedCardActions()
             createRelatedCards->setShortcuts(
                 SettingsCache::instance().shortcuts().getShortcut("Player/aCreateRelatedTokens"));
         }
-        connect(createRelatedCards, &QAction::triggered, player->getPlayerLogic()->getPlayerActions(),
+        connect(createRelatedCards, &QAction::triggered, player->getLogic()->getPlayerActions(),
                 &PlayerActions::actCreateAllRelatedCards);
         addAction(createRelatedCards);
     }

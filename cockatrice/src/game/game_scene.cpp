@@ -266,7 +266,7 @@ QList<PlayerLogic *> GameScene::collectActivePlayers(int &firstPlayerIndex) cons
     bool firstPlayerFound = false;
 
     for (auto *pgItem : playerViews.values()) {
-        PlayerLogic *p = pgItem->getPlayerLogic();
+        PlayerLogic *p = pgItem->getLogic();
         if (p && !p->getConceded()) {
             activePlayers.append(p);
             if (!firstPlayerFound && p->getPlayerInfo()->getLocal()) {
@@ -437,7 +437,7 @@ void GameScene::onArrowCreateRequested(const ArrowData &data)
         return;
     }
 
-    PlayerLogic *startLogic = startView->getPlayerLogic();
+    PlayerLogic *startLogic = startView->getLogic();
     auto *startZone = startLogic->getZones().value(data.startZone);
     if (!startZone) {
         return;
@@ -452,7 +452,7 @@ void GameScene::onArrowCreateRequested(const ArrowData &data)
     if (data.isPlayerTargeted()) {
         targetItem = targetView->getPlayerTarget();
     } else {
-        auto *zone = targetView->getPlayerLogic()->getZones().value(data.targetZone);
+        auto *zone = targetView->getLogic()->getZones().value(data.targetZone);
         if (zone) {
             targetItem = zone->getCard(data.targetCardId);
         }
@@ -461,7 +461,7 @@ void GameScene::onArrowCreateRequested(const ArrowData &data)
         return;
     }
 
-    auto *arrow = new ArrowItem(startView->getPlayerLogic(), data.id, startCard, targetItem, data.color);
+    auto *arrow = new ArrowItem(startView->getLogic(), data.id, startCard, targetItem, data.color);
     addItem(arrow);
     arrowRegistry.insert(data.id, arrow);
     connect(arrow, &ArrowItem::requestDeletion, this, &GameScene::onArrowDeleteRequested);
