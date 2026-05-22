@@ -1,11 +1,12 @@
 #include "player_dialogs.h"
 
 #include "../../interface/widgets/utility/get_text_with_max.h"
+#include "../board/card_item.h"
 #include "../client/settings/card_counter_settings.h"
 #include "../dialogs/dlg_roll_dice.h"
-#include "libcockatrice/card/relation/card_relation.h"
 
 #include <QInputDialog>
+#include <libcockatrice/card/relation/card_relation.h>
 
 PlayerDialogs::PlayerDialogs(PlayerGraphicsItem *_player, QWidget *_dialogParent, PlayerActions *_playerActions)
     : QObject(_player), player(_player), dialogParent(_dialogParent), playerActions(_playerActions)
