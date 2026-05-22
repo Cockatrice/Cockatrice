@@ -1,6 +1,6 @@
 #include "card_zone.h"
 
-#include "../../game/board/card_item.h"
+#include "../board/card_item.h"
 #include "view_zone.h"
 
 #include <QGraphicsSceneMouseEvent>

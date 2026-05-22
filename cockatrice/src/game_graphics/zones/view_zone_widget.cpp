@@ -2,12 +2,12 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../filters/syntax_help.h"
-#include "../../game/board/card_item.h"
-#include "../../game/game_scene.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
-#include "../../game/z_values.h"
 #include "../../interface/pixel_map_generator.h"
+#include "../board/card_item.h"
+#include "../game_scene.h"
+#include "../z_values.h"
 #include "view_zone.h"
 
 #include <QCheckBox>

@@ -1,6 +1,6 @@
 #include "table_zone_logic.h"
 
-#include "../board/card_item.h"
+#include "../../game_graphics/board/card_item.h"
 
 TableZoneLogic::TableZoneLogic(PlayerLogic *_player,
                                const QString &_name,

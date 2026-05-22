@@ -1,14 +1,14 @@
 #include "table_zone.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/board/arrow_item.h"
-#include "../../game/board/card_drag_item.h"
-#include "../../game/board/card_item.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
-#include "../../game/z_values.h"
 #include "../../game/zones/table_zone_logic.h"
 #include "../../interface/theme_manager.h"
+#include "../board/arrow_item.h"
+#include "../board/card_drag_item.h"
+#include "../board/card_item.h"
+#include "../z_values.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
