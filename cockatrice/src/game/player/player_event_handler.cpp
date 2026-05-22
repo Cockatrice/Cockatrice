@@ -128,7 +128,7 @@ void PlayerEventHandler::eventCreateArrow(const Event_CreateArrow &event)
 
 void PlayerEventHandler::eventDeleteArrow(const Event_DeleteArrow &event)
 {
-    emit player->arrowDeleteRequested(event.arrow_id());
+    emit player->arrowDeleted(event.arrow_id());
 }
 
 void PlayerEventHandler::eventCreateToken(const Event_CreateToken &event)

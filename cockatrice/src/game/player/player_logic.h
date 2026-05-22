@@ -80,6 +80,7 @@ signals:
     void resetTopCardMenuActions();
     void arrowCreateRequested(ArrowData data);
     void arrowDeleteRequested(int arrowId);
+    void arrowDeleted(int arrowId);
     void arrowsCleared(); // fires on clear() and processPlayerInfo
 
 public slots:
