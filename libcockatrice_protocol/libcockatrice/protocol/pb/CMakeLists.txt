@@ -46,6 +46,7 @@ set(PROTO_FILES
     command_set_card_attr.proto
     command_set_card_counter.proto
     command_set_counter.proto
+    command_set_counter_active.proto
     command_set_sideboard_lock.proto
     command_set_sideboard_plan.proto
     command_shuffle.proto
@@ -106,6 +107,7 @@ set(PROTO_FILES
     event_set_card_attr.proto
     event_set_card_counter.proto
     event_set_counter.proto
+    event_set_counter_active.proto
     event_shuffle.proto
     event_user_joined.proto
     event_user_left.proto

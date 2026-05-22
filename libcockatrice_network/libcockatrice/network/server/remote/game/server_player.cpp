@@ -27,6 +27,7 @@
 #include <libcockatrice/protocol/pb/command_mulligan.pb.h>
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_set_counter_active.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
@@ -39,6 +40,7 @@
 #include <libcockatrice/protocol/pb/event_game_log_notice.pb.h>
 #include <libcockatrice/protocol/pb/event_player_properties_changed.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
+#include <libcockatrice/protocol/pb/event_set_counter_active.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
@@ -47,6 +49,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/color.h>
+#include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
 
@@ -100,6 +103,17 @@ void Server_Player::setupZones()
     addCounter(new Server_Counter(5, "g", makeColor(150, 255, 150), 20, 0));
     addCounter(new Server_Counter(6, "x", makeColor(255, 255, 255), 20, 0));
     addCounter(new Server_Counter(7, "storm", makeColor(255, 150, 30), 20, 0));
+
+    // Command zone for Commander format
+    if (game->getEnableCommandZone()) {
+        addZone(new Server_CardZone(this, ZoneNames::COMMAND, false, ServerInfo_Zone::PublicZone));
+        addCounter(new Server_Counter(CounterIds::CommanderTax, CounterNames::CommanderTax, makeColor(128, 128, 128),
+                                      20, 0, 0, MAX_COUNTER_VALUE));
+        auto *partnerTax = new Server_Counter(CounterIds::PartnerTax, CounterNames::PartnerTax,
+                                              makeColor(128, 128, 128), 20, 0, 0, MAX_COUNTER_VALUE);
+        (void)partnerTax->setActive(false);
+        addCounter(partnerTax);
+    }
 
     // ------------------------------------------------------------------
 
@@ -426,6 +440,12 @@ Server_Player::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, ResponseContainer &
     return retVal;
 }
 
+bool Server_Player::isCommandZoneCounterBlocked(int counterId) const
+{
+    return (counterId == CounterIds::CommanderTax || counterId == CounterIds::PartnerTax) &&
+           !game->getEnableCommandZone();
+}
+
 Response::ResponseCode
 Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
@@ -437,6 +457,11 @@ Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & 
     }
 
     const int counterId = cmd.counter_id();
+
+    if (isCommandZoneCounterBlocked(counterId)) {
+        return Response::RespContextError;
+    }
+
     Server_Counter *c = counters.value(counterId, nullptr);
     if (!c) {
         return Response::RespNameNotFound;
@@ -490,6 +515,11 @@ Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & 
     }
 
     const int counterId = cmd.counter_id();
+
+    if (isCommandZoneCounterBlocked(counterId)) {
+        return Response::RespContextError;
+    }
+
     Server_Counter *c = counters.value(counterId, nullptr);
     if (!c) {
         return Response::RespNameNotFound;
@@ -517,6 +547,11 @@ Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & 
     }
 
     const int counterId = cmd.counter_id();
+
+    if (isCommandZoneCounterBlocked(counterId)) {
+        return Response::RespContextError;
+    }
+
     Server_Counter *counter = counters.value(counterId, nullptr);
     if (!counter) {
         return Response::RespNameNotFound;
@@ -527,6 +562,35 @@ Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & 
     Event_DelCounter event;
     event.set_counter_id(counterId);
     ges.enqueueGameEvent(event, playerId);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode Server_Player::cmdSetCounterActive(const Command_SetCounterActive &cmd,
+                                                          ResponseContainer & /*rc*/,
+                                                          GameEventStorage &ges)
+{
+    if (!game->getGameStarted()) {
+        return Response::RespGameNotStarted;
+    }
+    if (conceded) {
+        return Response::RespContextError;
+    }
+
+    const int counterId = cmd.counter_id();
+    Server_Counter *c = counters.value(counterId, nullptr);
+    if (!c) {
+        return Response::RespNameNotFound;
+    }
+
+    bool didChange = c->setActive(cmd.active());
+
+    if (didChange) {
+        Event_SetCounterActive event;
+        event.set_counter_id(c->getId());
+        event.set_active(c->isActive());
+        ges.enqueueGameEvent(event, playerId);
+    }
 
     return Response::RespOk;
 }

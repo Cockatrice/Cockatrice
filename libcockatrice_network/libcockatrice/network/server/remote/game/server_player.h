@@ -9,6 +9,7 @@ class Server_Player : public Server_AbstractPlayer
 private:
     QMap<int, Server_Counter *> counters;
     QList<int> lastDrawList;
+    bool isCommandZoneCounterBlocked(int counterId) const;
 
 public:
     Server_Player(Server_Game *_game,
@@ -56,6 +57,8 @@ public:
     cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     Response::ResponseCode
     cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
+    Response::ResponseCode
+    cmdSetCounterActive(const Command_SetCounterActive &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     Response::ResponseCode
     cmdNextTurn(const Command_NextTurn &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     Response::ResponseCode

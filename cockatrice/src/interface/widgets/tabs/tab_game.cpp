@@ -690,7 +690,7 @@ void TabGame::addLocalPlayer(PlayerLogic *newPlayer, int playerId)
     auto *deckView = new TabbedDeckViewContainer(playerId, this);
     connect(deckView->playerDeckView, &DeckViewContainer::newCardAdded, this, &TabGame::newCardAdded);
     deckViewContainers.insert(playerId, deckView);
-    deckViewContainerLayout->addWidget(deckView);
+    deckViewContainerLayout->insertWidget(0, deckView, 1);
 
     // auto load deck for player if that debug setting is enabled
     QString deckPath = SettingsCache::instance().debug().getDeckPathForPlayer(newPlayer->getPlayerInfo()->getName());

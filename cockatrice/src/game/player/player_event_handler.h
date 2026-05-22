@@ -34,6 +34,7 @@ class Event_RollDie;
 class Event_SetCardAttr;
 class Event_SetCardCounter;
 class Event_SetCounter;
+class Event_SetCounterActive;
 class Event_Shuffle;
 class Event_GameLogNotice;
 
@@ -104,6 +105,7 @@ public:
     void eventSetCardCounter(const Event_SetCardCounter &event);
     void eventCreateCounter(const Event_CreateCounter &event);
     void eventSetCounter(const Event_SetCounter &event);
+    void eventSetCounterActive(const Event_SetCounterActive &event);
     void eventDelCounter(const Event_DelCounter &event);
     void eventDumpZone(const Event_DumpZone &event);
     void eventMoveCard(const Event_MoveCard &event, const GameEventContext &context);

@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/card_counter_settings.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
+#include "../../board/abstract_counter.h"
 #include "../../board/card_item.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
@@ -14,6 +15,7 @@
 #include <QPainter>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/zone_names.h>
 
 /**
@@ -92,6 +94,12 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     aSelectRow = new QAction(this);
     aSelectColumn = new QAction(this);
 
+    aPlayAndIncreaseTax = new QAction(this);
+    connect(aPlayAndIncreaseTax, &QAction::triggered, playerActions, &PlayerActions::actPlayAndIncreaseTax);
+    aPlayAndIncreasePartnerTax = new QAction(this);
+    connect(aPlayAndIncreasePartnerTax, &QAction::triggered, playerActions,
+            &PlayerActions::actPlayAndIncreasePartnerTax);
+
     connect(aAttach, &QAction::triggered, actions, &PlayerActions::actAttach);
     connect(aDrawArrow, &QAction::triggered, actions, &PlayerActions::actDrawArrow);
     connect(aSelectAll, &QAction::triggered, actions, &PlayerActions::actSelectAll);
@@ -157,6 +165,33 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
             } else if (card->getZone()->getName() == ZoneNames::EXILE ||
                        card->getZone()->getName() == ZoneNames::GRAVE) {
                 createGraveyardOrExileMenu(writeableCard);
+            } else if (card->getZone()->getName() == ZoneNames::COMMAND) {
+                if (writeableCard) {
+                    addAction(aPlay);
+
+                    AbstractCounter *cmdTax = player->getCounterWidget(CounterIds::CommanderTax);
+                    if (cmdTax && cmdTax->isActive()) {
+                        addAction(aPlayAndIncreaseTax);
+                    }
+
+                    AbstractCounter *partnerTax = player->getCounterWidget(CounterIds::PartnerTax);
+                    if (partnerTax && partnerTax->isActive()) {
+                        addAction(aPlayAndIncreasePartnerTax);
+                    }
+
+                    // No reveal submenu - command zone is public
+                    addSeparator();
+                    addAction(aClone);
+                    addMenu(new MoveMenu(player));
+                } else {
+                    addAction(aDrawArrow);
+                    addSeparator();
+                    addAction(aClone);
+                }
+                addSeparator();
+                addAction(aSelectAll);
+                addRelatedCardView();
+                addRelatedCardActions();
             } else {
                 createHandOrCustomZoneMenu(writeableCard);
             }
@@ -487,6 +522,8 @@ void CardMenu::retranslateUi()
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
+    aPlayAndIncreaseTax->setText(tr("Play and &Increase Commander Tax"));
+    aPlayAndIncreasePartnerTax->setText(tr("Play and Increase &Partner Tax"));
     aRevealToAll->setText(tr("&All players"));
     //: Turn sideways or back again
     aTap->setText(tr("&Tap / Untap"));

@@ -7,6 +7,7 @@
 #include "../../game_graphics/zones/table_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
+
 #include "../zones/view_zone_logic.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -24,10 +25,12 @@
 #include <libcockatrice/protocol/pb/command_roll_die.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_set_counter_active.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/utility/clamped_arithmetic.h>
+#include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/counter_limits.h>
 #include <libcockatrice/utility/expression.h>
 #include <libcockatrice/utility/zone_names.h>
@@ -1634,6 +1637,14 @@ static bool isUnwritableRevealZone(CardZoneLogic *zone)
 
 void PlayerActions::playSelectedCards(QList<CardItem *> selectedCards, const bool faceDown)
 {
+    playSelectedCardsImpl(faceDown, nullptr);
+}
+
+void PlayerActions::playSelectedCardsImpl(bool faceDown,
+                                          const std::function<void(CardItem *, const QString &)> &postPlayCallback)
+{
+    QList<CardItem *> selectedCards = player->getGameScene()->selectedCards();
+
     // CardIds will get shuffled downwards when cards leave the deck.
     // We need to iterate through the cards in reverse order so cardIds don't get changed out from under us as we play
     // out the cards one-by-one.
@@ -1642,9 +1653,66 @@ void PlayerActions::playSelectedCards(QList<CardItem *> selectedCards, const boo
 
     for (auto &card : selectedCards) {
         if (card && !isUnwritableRevealZone(card->getZone()) && card->getZone()->getName() != ZoneNames::TABLE) {
+            const QString originalZone = card->getZone()->getName();
             playCard(card, faceDown);
+            if (postPlayCallback) {
+                postPlayCallback(card, originalZone);
+            }
         }
     }
+}
+
+void PlayerActions::actPlayAndIncreaseTax()
+{
+    playSelectedCardsImpl(false, [this](CardItem * /*card*/, const QString &originalZone) {
+        if (originalZone == ZoneNames::COMMAND) {
+            AbstractCounter *ctr = player->getCounterWidget(CounterIds::CommanderTax);
+            if (ctr && ctr->isActive()) {
+                sendIncCounter(CounterIds::CommanderTax, 2);
+            }
+        }
+    });
+}
+
+void PlayerActions::actPlayAndIncreasePartnerTax()
+{
+    playSelectedCardsImpl(false, [this](CardItem * /*card*/, const QString &originalZone) {
+        if (originalZone == ZoneNames::COMMAND) {
+            AbstractCounter *ctr = player->getCounterWidget(CounterIds::PartnerTax);
+            if (ctr && ctr->isActive()) {
+                sendIncCounter(CounterIds::PartnerTax, 2);
+            }
+        }
+    });
+}
+
+void PlayerActions::sendIncCounter(int counterId, int delta)
+{
+    Command_IncCounter cmd;
+    cmd.set_counter_id(counterId);
+    cmd.set_delta(delta);
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::actModifyTaxCounter(int counterId, int delta)
+{
+    AbstractCounter *ctr = player->getCounterWidget(counterId);
+    if (!ctr || !ctr->isActive()) {
+        return;
+    }
+    sendIncCounter(counterId, delta);
+}
+
+void PlayerActions::actToggleTaxCounter(int counterId)
+{
+    AbstractCounter *ctr = player->getCounterWidget(counterId);
+    if (!ctr || (ctr->isActive() && ctr->getValue() != 0)) {
+        return;
+    }
+    Command_SetCounterActive cmd;
+    cmd.set_counter_id(counterId);
+    cmd.set_active(!ctr->isActive());
+    sendGameCommand(cmd);
 }
 
 void PlayerActions::actPlay(QList<CardItem *> selectedCards)
@@ -1922,6 +1990,18 @@ void PlayerActions::cardMenuAction(QList<CardItem *> selectedCards, CardMenuActi
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(player->getPlayerInfo()->getId());
                 cmd->set_target_zone(ZoneNames::EXILE);
+                cmd->set_x(0);
+                cmd->set_y(0);
+                commandList.append(cmd);
+                break;
+            }
+            case cmMoveToCommandZone: {
+                auto *cmd = new Command_MoveCard;
+                cmd->set_start_player_id(startPlayerId);
+                cmd->set_start_zone(startZone.toStdString());
+                cmd->mutable_cards_to_move()->CopyFrom(idList);
+                cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                cmd->set_target_zone(ZoneNames::COMMAND);
                 cmd->set_x(0);
                 cmd->set_y(0);
                 commandList.append(cmd);
