@@ -30,7 +30,8 @@ UtilityMenu::UtilityMenu(PlayerLogic *_player, QMenu *playerMenu) : QMenu(player
         aCreateAnotherToken->setEnabled(false);
 
         aIncrementAllCardCounters = new QAction(this);
-        connect(aIncrementAllCardCounters, &QAction::triggered, player, &PlayerLogic::incrementAllCardCounters);
+        connect(aIncrementAllCardCounters, &QAction::triggered, playerActions,
+                &PlayerActions::actIncrementAllCardCounters);
 
         createPredefinedTokenMenu = new QMenu(QString());
         createPredefinedTokenMenu->setEnabled(false);
