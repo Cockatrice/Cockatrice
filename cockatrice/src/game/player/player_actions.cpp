@@ -1559,6 +1559,42 @@ void PlayerActions::actSetCardCounter(int counterId)
     sendGameCommand(prepareGameCommand(commandList));
 }
 
+void PlayerActions::actIncrementAllCardCounters()
+{
+    auto cardsToUpdate = player->getGameScene()->selectedCards();
+    if (cardsToUpdate.isEmpty()) {
+        // If no cards selected, update all cards on table
+        cardsToUpdate = static_cast<QList<CardItem *>>(player->getTableZone()->getCards());
+    }
+
+    QList<const ::google::protobuf::Message *> commandList;
+
+    for (const auto *card : cardsToUpdate) {
+        const auto &cardCounters = card->getCounters();
+
+        QMapIterator<int, int> counterIterator(cardCounters);
+        while (counterIterator.hasNext()) {
+            counterIterator.next();
+            int counterId = counterIterator.key();
+            int currentValue = counterIterator.value();
+            if (currentValue >= MAX_COUNTERS_ON_CARD) {
+                continue;
+            }
+
+            auto cmd = std::make_unique<Command_SetCardCounter>();
+            cmd->set_zone(card->getZone()->getName().toStdString());
+            cmd->set_card_id(card->getId());
+            cmd->set_counter_id(counterId);
+            cmd->set_counter_value(currentValue + 1);
+            commandList.append(cmd.release());
+        }
+    }
+
+    if (!commandList.isEmpty()) {
+        sendGameCommand(prepareGameCommand(commandList));
+    }
+}
+
 /**
  * @brief returns true if the zone is a unwritable reveal zone view (eg a card reveal window). Will return false if zone
  * is nullptr.

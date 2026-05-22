@@ -197,7 +197,6 @@ public:
     CounterState *addCounter(int id, const QString &name, const QColor &color, int radius, int value);
     void delCounter(int counterId);
     void clearCounters();
-    void incrementAllCardCounters();
 
     QMap<int, CounterState *> getCounters() const
     {
