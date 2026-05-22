@@ -1547,7 +1547,7 @@ void PlayerActions::actSetCardCounter(QList<CardItem *> selectedCards, int count
     for (auto card : selectedCards) {
         int oldValue = card->getCounters().value(counterId, 0);
         Expression exp(oldValue);
-        double parsed = exp.parse(dialog.textValue());
+        double parsed = exp.parse(counterValue);
         // Clamp in double precision first to avoid UB, then cast
         int number = static_cast<int>(qBound(0.0, parsed, static_cast<double>(MAX_COUNTERS_ON_CARD)));
 
@@ -1562,9 +1562,8 @@ void PlayerActions::actSetCardCounter(QList<CardItem *> selectedCards, int count
     sendGameCommand(prepareGameCommand(commandList));
 }
 
-void PlayerActions::actIncrementAllCardCounters()
+void PlayerActions::actIncrementAllCardCounters(QList<CardItem *> cardsToUpdate)
 {
-    auto cardsToUpdate = player->getGameScene()->selectedCards();
     if (cardsToUpdate.isEmpty()) {
         // If no cards selected, update all cards on table
         cardsToUpdate = static_cast<QList<CardItem *>>(player->getTableZone()->getCards());
