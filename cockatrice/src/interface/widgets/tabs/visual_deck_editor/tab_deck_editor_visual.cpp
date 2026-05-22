@@ -51,6 +51,10 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
 
     loadLayout();
     cardDatabaseDockWidget->setHidden(true);
+
+    // disable filters
+    viewMenu->removeAction(dockToActions[filterDockWidget].menu->menuAction());
+    filterDockWidget->hide();
 }
 
 /** @brief Creates the central frame containing the tab container. */
