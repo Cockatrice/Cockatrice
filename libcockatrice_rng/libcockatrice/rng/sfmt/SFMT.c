@@ -60,7 +60,9 @@ inline static void swap(w128_t *array, int size);
  */
   static const w128_t sse2_param_mask = {{SFMT_MSK1, SFMT_MSK2,
                                           SFMT_MSK3, SFMT_MSK4}};
-  #if defined(_MSC_VER)
+  #if defined(__AVX2__) && (SFMT_SL1 >= 16) && !(SFMT_N & 1) && !(SFMT_POS1 & 1)
+    #include "SFMT-avx256.h"
+  #elif defined(_MSC_VER)
     #include "SFMT-sse2-msc.h"
   #else
     #include "SFMT-sse2.h"

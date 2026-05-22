@@ -88,8 +88,13 @@ union W128_T {
     uint64_t u64[2];
     uint32x4_t si;
 };
+//#elif defined(HAVE_SSE2)
 #elif defined(HAVE_SSE2)
-  #include <emmintrin.h>
+  #if defined(__AVX2__)
+    #include <immintrin.h>
+  #else 
+    #include <emmintrin.h>
+  #endif
 
 /** 128-bit data structure */
 union W128_T {
@@ -112,8 +117,18 @@ typedef union W128_T w128_t;
  * SFMT internal state
  */
 struct SFMT_T {
+#if defined(__AVX2__)
+    union {
+        w128_t state[SFMT_N];
+        __m256i state_ymm[SFMT_N/2];
+    #if defined(__AVX512VL__)
+        __m512i state_zmm[SFMT_N/4];
+    #endif
+    };
+#else
     /** the 128-bit internal state array */
     w128_t state[SFMT_N];
+#endif
     /** index counter to the 32-bit internal state array */
     int idx;
 };
@@ -249,9 +264,9 @@ inline static double sfmt_genrand_real3(sfmt_t * sfmt)
 }
 
 /**
- * converts an unsigned 32-bit integer to double on [0,1)
+ * converts an unsigned 64-bit integer to double on [0,1)
  * with 53-bit resolution.
- * @param v 32-bit unsigned integer
+ * @param v 64-bit unsigned integer
  * @return double on [0,1)-real-interval with 53-bit resolution.
  */
 inline static double sfmt_to_res53(uint64_t v)
