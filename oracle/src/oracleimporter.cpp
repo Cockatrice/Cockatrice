@@ -474,7 +474,7 @@ FormatRulesNameMap OracleImporter::createDefaultMagicFormats()
     CardCondition superTypeIsBasic;
     superTypeIsBasic.field = "type";
     superTypeIsBasic.matchType = "regex";
-    superTypeIsBasic.value = "^Basic(?:\\s+Snow)?\\s+Land";
+    superTypeIsBasic.value = "\bBasic\b[^—]+\bLand\b";
 
     ExceptionRule basicLands;
     basicLands.conditions.append(superTypeIsBasic);
