@@ -1,0 +1,46 @@
+/**
+ * @file counter_ids.h
+ * @ingroup GameLogic
+ * @brief Shared counter IDs and names for system counters (e.g. commander tax).
+ */
+
+#ifndef COCKATRICE_COUNTER_IDS_H
+#define COCKATRICE_COUNTER_IDS_H
+
+#include <QString>
+
+/**
+ * Shared counter IDs used by both client and server.
+ * These must match between server_player.cpp and player_event_handler.cpp.
+ *
+ * Reserved counter IDs for system counters:
+ *   IDs 0-7:  Standard player counters (life, mana colors, storm)
+ *   IDs 8-9:  Commander tax counters
+ *   IDs 10+:  Available for user-created counters
+ *
+ * The server's newCounterId() starts from the highest existing ID + 1,
+ * so these reserved IDs won't conflict as long as they're created first
+ * during setupZones(). See server_player.cpp::setupZones() for the
+ * authoritative list of reserved IDs.
+ *
+ * To find all files referencing these IDs, grep for CounterIds::CommanderTax
+ * and CounterIds::PartnerTax across the codebase.
+ */
+namespace CounterIds
+{
+constexpr int CommanderTax = 8;
+constexpr int PartnerTax = 9;
+} // namespace CounterIds
+
+namespace CounterNames
+{
+constexpr const char *CommanderTax = "commander_tax_counter";
+constexpr const char *PartnerTax = "partner_tax_counter";
+
+inline bool isTaxCounter(const QString &name)
+{
+    return name == CommanderTax || name == PartnerTax;
+}
+} // namespace CounterNames
+
+#endif // COCKATRICE_COUNTER_IDS_H

@@ -34,6 +34,7 @@ message GameEvent {
         CHANGE_ZONE_PROPERTIES = 2020;
         REVERSE_TURN = 2021;
         GAME_LOG_NOTICE = 2022;
+        SET_COUNTER_ACTIVE = 2023;
     }
     optional sint32 player_id = 1 [default = -1];
     extensions 100 to max;

@@ -3,6 +3,7 @@
 #include "../../game/player/player_actions.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/abstract_card_item.h"
+#include "../board/commander_tax_counter.h"
 #include "../board/counter_general.h"
 #include "../hand_counter.h"
 #include "../zones/hand_zone.h"
@@ -13,6 +14,10 @@
 #include "player_dialogs.h"
 
 #include <QGraphicsView>
+#include "../z_values.h"
+#include "../zones/command_zone.h"
+
+#include <libcockatrice/utility/counter_ids.h>
 
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 {
@@ -121,6 +126,12 @@ void PlayerGraphicsItem::initializeZones()
         new HandZone(player->getHandZone(), static_cast<int>(tableZoneGraphicsItem->boundingRect().height()), this);
     connect(player->getPlayerActions(), &PlayerActions::requestSortHand, handZoneGraphicsItem, &HandZone::sortHand);
 
+    // Command zone
+    commandZoneGraphicsItem = new CommandZone(player->getCommandZone(), ZoneSizes::COMMAND_ZONE_HEIGHT, this);
+    commandZoneGraphicsItem->setZValue(ZValues::COMMAND_ZONE);
+    commandZoneGraphicsItem->setVisible(false);
+    connect(commandZoneGraphicsItem, &CommandZone::minimizedChanged, this, &PlayerGraphicsItem::rearrangeZones);
+
     connect(handZoneGraphicsItem->getLogic(), &HandZoneLogic::cardCountChanged, handCounter,
             &HandCounter::updateNumber);
     connect(handCounter, &HandCounter::showContextMenu, handZoneGraphicsItem, &HandZone::showContextMenu);
@@ -187,6 +198,13 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
     AbstractCounter *widget;
     if (state->getName() == "life") {
         widget = playerTarget->addCounter(state);
+    } else if (CounterNames::isTaxCounter(state->getName())) {
+        if (!commandZoneGraphicsItem) {
+            qWarning() << "Cannot create tax counter" << state->getName() << "- command zone not available";
+            return;
+        }
+        widget = new CommanderTaxCounter(state, player, commandZoneGraphicsItem);
+        widget->setActive(state->isActive());
     } else {
         widget = new GeneralCounter(state, player, true, this);
     }
@@ -218,9 +236,16 @@ void PlayerGraphicsItem::onCounterRemoved(int counterId)
 
 void PlayerGraphicsItem::rearrangeCounters()
 {
+    if (commandZoneGraphicsItem) {
+        commandZoneGraphicsItem->rearrangeTaxCounters();
+    }
+
     qreal ySize = boundingRect().y() + 80;
     constexpr qreal padding = 5;
     for (auto *ctr : counterWidgets.values()) {
+        if (CounterNames::isTaxCounter(ctr->getName())) {
+            continue;
+        }
         if (!ctr->getShownInCounterArea()) {
             continue;
         }
@@ -230,9 +255,33 @@ void PlayerGraphicsItem::rearrangeCounters()
     }
 }
 
+QList<AbstractCounter *> PlayerGraphicsItem::getTaxCounterWidgets() const
+{
+    QList<AbstractCounter *> result;
+    for (AbstractCounter *ctr : counterWidgets.values()) {
+        if (CounterNames::isTaxCounter(ctr->getName())) {
+            result.append(ctr);
+        }
+    }
+    return result;
+}
+
 void PlayerGraphicsItem::rearrangeZones()
 {
     auto base = QPointF(CardDimensions::HEIGHT_F + counterAreaWidth + 15, 0);
+
+    // Calculate stack height, accounting for command zone if visible
+    bool commandZoneVisible = commandZoneGraphicsItem && commandZoneGraphicsItem->isVisible();
+    qreal tableHeight = tableZoneGraphicsItem->boundingRect().height();
+    qreal stackHeight = tableHeight;
+    if (commandZoneVisible) {
+        stackHeight = tableHeight - totalCommandZoneHeight();
+        if (stackHeight < CommandZone::MINIMUM_STACKING_HEIGHT) {
+            stackHeight = CommandZone::MINIMUM_STACKING_HEIGHT;
+        }
+    }
+    stackZoneGraphicsItem->setHeight(stackHeight);
+
     if (SettingsCache::instance().getHorizontalHand()) {
         if (mirrored) {
             if (player->getHandZone()->contentsKnown()) {
@@ -243,12 +292,12 @@ void PlayerGraphicsItem::rearrangeZones()
                 handVisible = false;
             }
 
-            stackZoneGraphicsItem->setPos(base);
+            positionCommandAndStackZones(base);
             base += QPointF(stackZoneGraphicsItem->boundingRect().width(), 0);
 
             tableZoneGraphicsItem->setPos(base);
         } else {
-            stackZoneGraphicsItem->setPos(base);
+            positionCommandAndStackZones(base);
 
             tableZoneGraphicsItem->setPos(base.x() + stackZoneGraphicsItem->boundingRect().width(), 0);
             base += QPointF(0, tableZoneGraphicsItem->boundingRect().height());
@@ -268,7 +317,7 @@ void PlayerGraphicsItem::rearrangeZones()
         handZoneGraphicsItem->setPos(base);
         base += QPointF(handZoneGraphicsItem->boundingRect().width(), 0);
 
-        stackZoneGraphicsItem->setPos(base);
+        positionCommandAndStackZones(base);
         base += QPointF(stackZoneGraphicsItem->boundingRect().width(), 0);
 
         tableZoneGraphicsItem->setPos(base);
@@ -296,4 +345,29 @@ void PlayerGraphicsItem::updateBoundingRect()
     playerArea->setSize(CardDimensions::HEIGHT_F + counterAreaWidth + 15, bRect.height());
 
     emit sizeChanged();
+}
+
+qreal PlayerGraphicsItem::totalCommandZoneHeight() const
+{
+    if (commandZoneGraphicsItem && commandZoneGraphicsItem->isVisible()) {
+        return commandZoneGraphicsItem->currentHeight();
+    }
+    return 0;
+}
+
+void PlayerGraphicsItem::positionCommandAndStackZones(const QPointF &base)
+{
+    bool commandZoneVisible = commandZoneGraphicsItem && commandZoneGraphicsItem->isVisible();
+    if (commandZoneVisible) {
+        commandZoneGraphicsItem->setPos(base);
+    }
+    stackZoneGraphicsItem->setPos(base.x(), base.y() + (commandZoneVisible ? totalCommandZoneHeight() : 0));
+}
+
+void PlayerGraphicsItem::setCommandZoneVisible(bool visible)
+{
+    if (commandZoneGraphicsItem) {
+        commandZoneGraphicsItem->setVisible(visible);
+    }
+    rearrangeZones();
 }

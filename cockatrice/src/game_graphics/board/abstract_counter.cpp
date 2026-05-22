@@ -79,6 +79,19 @@ void AbstractCounter::delCounter()
     }
 }
 
+void AbstractCounter::setValue(int _value)
+{
+    value = _value;
+    update();
+}
+
+void AbstractCounter::setActive(bool _active)
+{
+    active = _active;
+    setVisible(_active);
+    update();
+}
+
 void AbstractCounter::retranslateUi()
 {
     if (aSet) {

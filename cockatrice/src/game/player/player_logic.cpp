@@ -12,6 +12,10 @@
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/card_list.h"
+#include "../board/commander_tax_counter.h"
+#include "../board/counter_general.h"
+#include "../game_scene.h"
+#include "../zones/command_zone.h"
 #include "player_actions.h"
 
 #include <QDebug>
@@ -28,11 +32,12 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_zone.pb.h>
 #include <libcockatrice/utility/color.h>
+#include <libcockatrice/utility/counter_ids.h>
 
 PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
       playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
-      conceded(false), zoneId(0), dialogSemaphore(false)
+      conceded(false), zoneId(0), dialogSemaphore(false), serverHasCommandZone(false)
 {
     initializeZones();
 }
@@ -48,6 +53,7 @@ void PlayerLogic::initializeZones()
     bool visibleHand = playerInfo->getLocalOrJudge() ||
                        (game->getPlayerManager()->isSpectator() && game->getGameMetaInfo()->spectatorsOmniscient());
     addZone(new HandZoneLogic(this, ZoneNames::HAND, false, false, visibleHand, this));
+    addZone(new CommandZoneLogic(this, ZoneNames::COMMAND, true, false, true, this));
 }
 
 PlayerLogic::~PlayerLogic()
@@ -104,7 +110,9 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                                       /* StackZone */
                                       ZoneNames::STACK,
                                       /* HandZone */
-                                      ZoneNames::HAND};
+                                      ZoneNames::HAND,
+                                      /* CommandZone */
+                                      ZoneNames::COMMAND};
     clearCounters();
     emit arrowsClearedLocally();
 
@@ -119,7 +127,19 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
 
     emit clearCustomZonesMenu();
 
+    // Check if server has command zone by scanning the zone list
     const int zoneListSize = info.zone_list_size();
+    bool foundCommandZone = false;
+    for (int i = 0; i < zoneListSize; ++i) {
+        if (QString::fromStdString(info.zone_list(i).name()) == ZoneNames::COMMAND) {
+            foundCommandZone = true;
+            break;
+        }
+    }
+    if (serverHasCommandZone != foundCommandZone) {
+        serverHasCommandZone = foundCommandZone;
+        emit commandZoneSupportChanged(foundCommandZone);
+    }
     for (int i = 0; i < zoneListSize; ++i) {
         const ServerInfo_Zone &zoneInfo = info.zone_list(i);
 
@@ -253,15 +273,17 @@ void PlayerLogic::setDeck(const DeckList &_deck)
 CounterState *PlayerLogic::addCounter(const ServerInfo_Counter &counter)
 {
     return addCounter(counter.id(), QString::fromStdString(counter.name()),
-                      convertColorToQColor(counter.counter_color()), counter.radius(), counter.count());
+                      convertColorToQColor(counter.counter_color()), counter.radius(), counter.count(),
+                      counter.active());
 }
 
-CounterState *PlayerLogic::addCounter(int id, const QString &name, const QColor &color, int radius, int value)
+CounterState *
+PlayerLogic::addCounter(int id, const QString &name, const QColor &color, int radius, int value, bool active)
 {
     if (counters.contains(id)) {
         return nullptr;
     }
-    auto *state = new CounterState(id, name, color, radius, value, this);
+    auto *state = new CounterState(id, name, color, radius, value, active, this);
     counters.insert(id, state);
     emit counterAdded(state);
     return state;
@@ -294,6 +316,11 @@ CounterState *PlayerLogic::getLifeCounter() const
         }
     }
     return nullptr;
+}
+
+AbstractCounter *PlayerLogic::getCounterWidget(int counterId) const
+{
+    return graphicsItem->getCounterWidget(counterId);
 }
 
 bool PlayerLogic::clearCardsToDelete()

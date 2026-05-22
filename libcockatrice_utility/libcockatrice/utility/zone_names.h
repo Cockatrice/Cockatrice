@@ -14,6 +14,9 @@ constexpr const char *DECK = "deck";
 constexpr const char *SIDEBOARD = "sb";
 constexpr const char *STACK = "stack";
 
+// Command zone (Commander format)
+constexpr const char *COMMAND = "command";
+
 } // namespace ZoneNames
 
 #endif // ZONE_NAMES_H
