@@ -436,17 +436,19 @@ Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    Server_Counter *c = counters.value(cmd.counter_id(), 0);
+    const int counterId = cmd.counter_id();
+    Server_Counter *c = counters.value(counterId, nullptr);
     if (!c) {
         return Response::RespNameNotFound;
     }
 
-    c->setCount(c->getCount() + cmd.delta());
-
-    Event_SetCounter event;
-    event.set_counter_id(c->getId());
-    event.set_value(c->getCount());
-    ges.enqueueGameEvent(event, playerId);
+    bool didChange = c->incrementCount(cmd.delta());
+    if (didChange) {
+        Event_SetCounter event;
+        event.set_counter_id(c->getId());
+        event.set_value(c->getCount());
+        ges.enqueueGameEvent(event, playerId);
+    }
 
     return Response::RespOk;
 }
@@ -487,17 +489,19 @@ Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    Server_Counter *c = counters.value(cmd.counter_id(), 0);
+    const int counterId = cmd.counter_id();
+    Server_Counter *c = counters.value(counterId, nullptr);
     if (!c) {
         return Response::RespNameNotFound;
     }
 
-    c->setCount(cmd.value());
-
-    Event_SetCounter event;
-    event.set_counter_id(c->getId());
-    event.set_value(c->getCount());
-    ges.enqueueGameEvent(event, playerId);
+    bool didChange = c->setCount(cmd.value());
+    if (didChange) {
+        Event_SetCounter event;
+        event.set_counter_id(c->getId());
+        event.set_value(c->getCount());
+        ges.enqueueGameEvent(event, playerId);
+    }
 
     return Response::RespOk;
 }
@@ -512,15 +516,16 @@ Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & 
         return Response::RespContextError;
     }
 
-    Server_Counter *counter = counters.value(cmd.counter_id(), 0);
+    const int counterId = cmd.counter_id();
+    Server_Counter *counter = counters.value(counterId, nullptr);
     if (!counter) {
         return Response::RespNameNotFound;
     }
-    counters.remove(cmd.counter_id());
+    counters.remove(counterId);
     delete counter;
 
     Event_DelCounter event;
-    event.set_counter_id(cmd.counter_id());
+    event.set_counter_id(counterId);
     ges.enqueueGameEvent(event, playerId);
 
     return Response::RespOk;

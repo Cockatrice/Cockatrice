@@ -153,7 +153,24 @@ public:
     {
         cardRef = _cardRef;
     }
-    void setCounter(int _id, int value, Event_SetCardCounter *event = nullptr);
+    /**
+     * @brief Sets a card counter to an exact value with clamping.
+     * @param _id The counter ID.
+     * @param value The desired value (clamped to [0, MAX_COUNTERS_ON_CARD]; 0 removes the counter).
+     * @param event Optional event to populate with counter state.
+     * @return true if the value changed, false otherwise.
+     */
+    [[nodiscard]] bool setCounter(int _id, int value, Event_SetCardCounter *event = nullptr);
+    /**
+     * @brief Increments a card counter with overflow-safe arithmetic.
+     * @param counterId The counter ID to modify.
+     * @param delta The amount to add (may be negative for decrement).
+     * @param event Optional event to populate with counter state.
+     * @return true if the value changed, false otherwise.
+     * @note If counter does not exist, starts from 0. Counter is removed if result is 0.
+     * @note Clamps result to [0, MAX_COUNTERS_ON_CARD].
+     */
+    [[nodiscard]] bool incrementCounter(int counterId, int delta, Event_SetCardCounter *event = nullptr);
     void setTapped(bool _tapped)
     {
         tapped = _tapped;
