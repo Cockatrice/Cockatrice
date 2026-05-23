@@ -402,7 +402,7 @@ void GameScene::onArrowCreateRequested(const ArrowData &data)
     auto *arrow = new ArrowItem(startView->getPlayer(), data.id, startCard, targetItem, data.color);
     addItem(arrow);
     arrowRegistry.insert(data.id, arrow);
-    connect(arrow, &QObject::destroyed, this, [this, id = data.id]() { arrowRegistry.remove(id); });
+    connect(arrow, &ArrowItem::requestDeletion, this, &GameScene::onArrowDeleteRequested);
 }
 
 void GameScene::onArrowDeleted(int arrowId)

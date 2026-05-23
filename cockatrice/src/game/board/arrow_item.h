@@ -21,6 +21,9 @@ class ArrowItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
+signals:
+    void requestDeletion(int id);
+
 private:
     QPainterPath path;
 
@@ -37,6 +40,7 @@ protected:
 
 public:
     ArrowItem(PlayerLogic *_player, int _id, ArrowTarget *_startItem, ArrowTarget *_targetItem, const QColor &_color);
+    void onTargetDestroyed();
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     [[nodiscard]] QRectF boundingRect() const override

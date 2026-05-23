@@ -38,16 +38,21 @@ ArrowItem::ArrowItem(PlayerLogic *_player,
 
     if (startItem) {
         connect(startItem, &ArrowTarget::scenePositionChanged, this, doUpdate);
-        connect(startItem, &QObject::destroyed, this, &ArrowItem::delArrow);
+        connect(startItem, &QObject::destroyed, this, &ArrowItem::onTargetDestroyed);
     }
     if (targetItem) {
         connect(targetItem, &ArrowTarget::scenePositionChanged, this, doUpdate);
-        connect(targetItem, &QObject::destroyed, this, &ArrowItem::delArrow);
+        connect(targetItem, &QObject::destroyed, this, &ArrowItem::onTargetDestroyed);
     }
 
     if (startItem && targetItem) {
         updatePath();
     }
+}
+
+void ArrowItem::onTargetDestroyed()
+{
+    emit requestDeletion(id);
 }
 
 void ArrowItem::delArrow()
@@ -151,9 +156,7 @@ void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     event->accept();
     if (event->button() == Qt::RightButton) {
-        Command_DeleteArrow cmd;
-        cmd.set_arrow_id(id);
-        player->getPlayerActions()->sendGameCommand(cmd);
+        emit requestDeletion(id);
     }
 }
 
