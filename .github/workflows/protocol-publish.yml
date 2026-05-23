@@ -9,8 +9,13 @@ on:
       - master
     paths:
       - '.github/workflows/protocol-publish.yml'
-      - 'scripts/package-protocol.mjs'
       - 'libcockatrice_protocol/**'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Semver to publish (e.g. 15.0.0). Leave blank to dry-run only.'
+        required: false
+        default: ''
 
 concurrency:
   group: "${{ github.workflow }} @ ${{ github.ref_name }}"
@@ -21,6 +26,7 @@ jobs:
     name: Build and publish protocol package
     if: ${{ github.repository_owner == 'Cockatrice' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     permissions:
       contents: read
@@ -29,7 +35,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-        # No submodules; proto files live in this repo.
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -40,27 +45,56 @@ jobs:
 
       - name: Determine package version
         id: pkgver
+        shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "release" ]; then
-            VERSION="${{ github.event.release.tag_name }}"
-          else
-            VERSION="0.0.0-pr${{ github.event.pull_request.number }}"
-          fi
-          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          case "$GITHUB_EVENT_NAME" in
+            release)
+              version="${{ github.event.release.tag_name }}"
+              version="${version#v}"
+              publish=true
+              ;;
+            workflow_dispatch)
+              version="${{ inputs.version }}"
+              if [[ -n "$version" ]]; then
+                version="${version#v}"
+                publish=true
+              else
+                version="0.0.0-manual"
+                publish=false
+              fi
+              ;;
+            *)    # pull_request
+              version="0.0.0-pr${{ github.event.pull_request.number }}"
+              publish=false
+              ;;
+          esac
+          echo "version=$version" >>"$GITHUB_OUTPUT"
+          echo "publish=$publish" >>"$GITHUB_OUTPUT"
 
-      - name: Build package directory
-        run: node scripts/package-protocol.mjs --version "${{ steps.pkgver.outputs.version }}"
+      - name: Assemble package
+        shell: bash
+        env:
+          PKG_VERSION: ${{ steps.pkgver.outputs.version }}
+        run: |
+          pkg=build/protocol-package
+          rm -rf "$pkg"
+          mkdir -p "$pkg/pb"
+          cp libcockatrice_protocol/libcockatrice/protocol/pb/*.proto "$pkg/pb/"
+          cp libcockatrice_protocol/protocol_version.json "$pkg/"
+          cp libcockatrice_protocol/npm/package.json libcockatrice_protocol/npm/README.md "$pkg/"
+          cp LICENSE "$pkg/"
+          npm --prefix "$pkg" version --no-git-tag-version --allow-same-version "$PKG_VERSION"
 
-      - name: Dry-run pack (pull_request)
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Pack and inspect (dry-run)
+        if: ${{ steps.pkgver.outputs.publish != 'true' }}
         working-directory: build/protocol-package
         run: |
           npm pack
-          ls -la *.tgz
-          tar -tzf *.tgz | sort
+          ls -la ./*.tgz
+          tar -tzf ./*.tgz | sort
 
-      - name: Publish to GitHub Packages (release)
-        if: ${{ github.event_name == 'release' }}
+      - name: Publish to GitHub Packages
+        if: ${{ steps.pkgver.outputs.publish == 'true' }}
         working-directory: build/protocol-package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

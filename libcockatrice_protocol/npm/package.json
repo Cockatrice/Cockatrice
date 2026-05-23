@@ -1,0 +1,25 @@
+{
+  "name": "@cockatrice/protocol",
+  "version": "0.0.0",
+  "description": "Cockatrice network protocol: .proto definitions and protocol version constant.",
+  "license": "GPL-2.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cockatrice/Cockatrice.git"
+  },
+  "homepage": "https://github.com/Cockatrice/Cockatrice",
+  "files": [
+    "pb/",
+    "protocol_version.json",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "exports": {
+    "./protocol_version.json": "./protocol_version.json",
+    "./pb/*.proto": "./pb/*.proto"
+  }
+}

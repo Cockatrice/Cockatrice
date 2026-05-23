@@ -11,11 +11,14 @@ if(NOT CMAKE_MATCH_1)
   message(FATAL_ERROR "Failed to extract protocolVersion from ${PROTOCOL_VERSION_JSON_PATH}")
 endif()
 set(COCKATRICE_PROTOCOL_VERSION "${CMAKE_MATCH_1}")
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${PROTOCOL_VERSION_JSON_PATH}")
+set_property(
+  DIRECTORY
+  APPEND
+  PROPERTY CMAKE_CONFIGURE_DEPENDS "${PROTOCOL_VERSION_JSON_PATH}"
+)
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/protocol_version.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/libcockatrice/protocol/protocol_version.h"
-  @ONLY
+  "${CMAKE_CURRENT_BINARY_DIR}/libcockatrice/protocol/protocol_version.h" @ONLY
 )
 
 add_subdirectory(libcockatrice/protocol/pb)
