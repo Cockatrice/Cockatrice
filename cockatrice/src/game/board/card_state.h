@@ -31,7 +31,7 @@ signals:
     void doesntUntapChanged(bool newValue);
     void destroyOnZoneChangeChanged(bool newValue);
     void attachedToChanged(CardItem *newAttachedTo);
-    void zoneChanged(CardZoneLogic *newZone);
+    void zoneChanged(CardState *changedCard, CardZoneLogic *newZone);
 
 public:
     explicit CardState(QObject *parent, CardZoneLogic *_zone) : QObject(parent), zone(_zone)

@@ -432,7 +432,7 @@ void GameScene::onCardZoneChanged(CardItem *card, bool sameZone)
         }
     }
     for (auto *arrow : toDelete) {
-        emit requestArrowDeletion(arrow->getId());
+        onArrowDeleted(arrow->getId());
     }
 }
 
