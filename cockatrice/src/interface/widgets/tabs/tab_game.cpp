@@ -142,7 +142,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
 
     TutorialSequence lobbySequence;
 
-    TutorialStep introStep(deckViewContainerWidget, tr("Let's try this out."));
+    TutorialStep introStep{deckViewContainerWidget, tr("Let's try this out.")};
     lobbySequence.addStep(introStep);
 
     tutorialController->addSequence(lobbySequence);
