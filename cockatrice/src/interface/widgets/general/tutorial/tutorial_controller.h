@@ -71,6 +71,7 @@ public slots:
     void prevStep();
     void nextSequence();
     void prevSequence();
+    void runExitForCurrentStep();
     void exitTutorial();
     void handleTargetClicked(); // Handle clicks on highlighted widget
     void attemptAdvance();      // Try to advance with validation

@@ -110,12 +110,9 @@ void TutorialController::nextStep()
         return;
     }
 
+    runExitForCurrentStep();
+
     if (currentStep >= sequences[currentSequence].steps.size() - 1) {
-        // We're on the last step of this sequence, run its onExit before advancing
-        const auto &lastStep = sequences[currentSequence].steps[currentStep];
-        if (lastStep.onExit) {
-            lastStep.onExit();
-        }
         nextSequence();
         return;
     }
@@ -129,6 +126,8 @@ void TutorialController::prevStep()
     if (currentSequence < 0) {
         return;
     }
+
+    runExitForCurrentStep();
 
     if (currentStep == 0) {
         prevSequence();
@@ -159,6 +158,7 @@ void TutorialController::nextSequence()
 void TutorialController::prevSequence()
 {
     if (currentSequence <= 0) {
+        // Already at the very first step — just re-show it
         currentStep = 0;
         showStep();
         return;
@@ -171,19 +171,28 @@ void TutorialController::prevSequence()
 
 void TutorialController::exitTutorial()
 {
-    if (currentSequence >= 0 && currentStep >= 0 && currentSequence < sequences.size() &&
-        currentStep < sequences[currentSequence].steps.size()) {
-        const auto &curStep = sequences[currentSequence].steps[currentStep];
-        if (curStep.onExit) {
-            curStep.onExit();
-        }
-    }
-
     cleanupValidationMonitoring();
     tutorialOverlay->hide();
+    // TODO Maybe not the best idea:
+    tutorialOverlay->deleteLater();
     currentSequence = -1;
     currentStep = -1;
     tutorialCompleted = true;
+    deleteLater();
+}
+
+void TutorialController::runExitForCurrentStep()
+{
+    if (currentSequence < 0 || currentSequence >= sequences.size()) {
+        return;
+    }
+    const auto &steps = sequences[currentSequence].steps;
+    if (currentStep < 0 || currentStep >= steps.size()) {
+        return;
+    }
+    if (steps[currentStep].onExit) {
+        steps[currentStep].onExit();
+    }
 }
 
 void TutorialController::updateProgress()
@@ -227,29 +236,7 @@ void TutorialController::showStep()
         return;
     }
 
-    // Clean up validation monitoring from previous step
     cleanupValidationMonitoring();
-
-    // Run onExit for the previous step
-    if (!(currentSequence == 0 && currentStep == 0)) {
-        int prevSeq = currentSequence;
-        int prevStepIndex = currentStep - 1;
-        if (prevStepIndex < 0) {
-            prevSeq = currentSequence - 1;
-            if (prevSeq >= 0) {
-                prevStepIndex = sequences[prevSeq].steps.size() - 1;
-            } else {
-                prevStepIndex = -1;
-            }
-        }
-
-        if (prevSeq >= 0 && prevStepIndex >= 0) {
-            const auto &previousStep = sequences[prevSeq].steps[prevStepIndex];
-            if (previousStep.onExit) {
-                previousStep.onExit();
-            }
-        }
-    }
 
     const auto &step = seq.steps[currentStep];
 
@@ -261,7 +248,6 @@ void TutorialController::showStep()
     tutorialOverlay->setText(step.text);
     tutorialOverlay->setInteractive(step.requiresInteraction, step.allowClickThrough);
 
-    // Set custom interaction hint if provided
     if (!step.customInteractionHint.isEmpty()) {
         tutorialOverlay->setInteractionHint(step.customInteractionHint);
     } else if (step.requiresInteraction) {
@@ -270,9 +256,7 @@ void TutorialController::showStep()
         tutorialOverlay->setInteractionHint("");
     }
 
-    // Setup validation monitoring for this step
     setupValidationMonitoring();
-
     updateProgress();
 
     tutorialOverlay->parentResized();
