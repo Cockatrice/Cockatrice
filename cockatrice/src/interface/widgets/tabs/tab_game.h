@@ -170,17 +170,16 @@ private slots:
     void processPlayerLeave(PlayerLogic *leavingPlayer);
     void actResetLayout();
 
-    void hideEvent(QHideEvent *event) override;
-
 protected slots:
     void closeEvent(QCloseEvent *event) override;
+    void showEvent(QShowEvent *event) override;
+    void hideEvent(QHideEvent *event) override;
 
 public:
     TabGame(TabSupervisor *_tabSupervisor,
             QList<AbstractClient *> &_clients,
             const Event_GameJoined &event,
             const QMap<int, QString> &_roomGameTypes);
-    void showEvent(QShowEvent *event);
     void finishTutorialInitialization();
     void connectToGameState();
     void connectToPlayerManager();

@@ -284,7 +284,7 @@ void TabGame::finishTutorialInitialization()
                                     ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
                                     ->getPlayerEventHandler();
     diceRollStep.signalName = SIGNAL(logRollDie(Player *, int, const QList<uint> &));
-    diceRollStep.validator = [this] { return true; };
+    diceRollStep.validator = [] { return true; };
     diceRollStep.validationHint = tr("Roll a dice using any of these methods.");
 
     gamePlaySequence.addStep(diceRollStep);
