@@ -57,7 +57,7 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     }
     auto sequence = TutorialSequence();
     sequence.addStep({connectButton, "Connect to a server to play here!"});
-    auto vdeStep = TutorialStep(visualDeckEditorButton, "Create a new deck from cards in the database here!");
+    auto vdeStep = TutorialStep{visualDeckEditorButton, "Create a new deck from cards in the database here!"};
     vdeStep.requiresInteraction = true;
     vdeStep.allowClickThrough = true;
     vdeStep.validationHint = "Open the deck editor to try it out!";
