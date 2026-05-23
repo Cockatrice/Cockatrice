@@ -38,12 +38,8 @@ void TutorialController::start()
     QTimer::singleShot(0, this, [this]() {
         QWidget *win = tutorializedWidget->window();
 
-        // Reparent to make absolutely sure
-        tutorialOverlay->setParent(win);
-        tutorialOverlay->setGeometry(0, 0, win->width(), win->height());
-
-        // Stack order
-        tutorialOverlay->stackUnder(nullptr);
+        tutorialOverlay->setParent(win); // triggers changeEvent and installs filter
+        tutorialOverlay->setGeometry(win->rect());
         tutorialOverlay->show();
         tutorialOverlay->raise();
 
