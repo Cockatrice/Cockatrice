@@ -3,8 +3,8 @@
 
 #include "tutorial_overlay.h"
 
+#include <QList>
 #include <QObject>
-#include <QVector>
 #include <functional>
 
 enum class ValidationTiming
@@ -43,7 +43,7 @@ struct TutorialStep
 struct TutorialSequence
 {
     QString name;
-    QVector<TutorialStep> steps;
+    QList<TutorialStep> steps;
 
     void addStep(const TutorialStep &step)
     {
