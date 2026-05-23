@@ -17,6 +17,10 @@ public:
     void setProgress(int stepNum, int totalSteps, int overallStep, int overallTotal);
     void setInteractionHint(const QString &hint);
     void setValidationHint(const QString &hint);
+    QGridLayout *getLayout() const
+    {
+        return layout;
+    }
 
 private:
     void clearValidationHint();

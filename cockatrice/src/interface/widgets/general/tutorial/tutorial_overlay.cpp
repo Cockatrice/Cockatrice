@@ -22,8 +22,8 @@ TutorialOverlay::TutorialOverlay(QWidget *parent) : QWidget(parent)
 {
     setAttribute(Qt::WA_TranslucentBackground, true);
     setAttribute(Qt::WA_TransparentForMouseEvents, false);
-
-    setAttribute(Qt::WA_OpaquePaintEvent, false);
+    setAttribute(Qt::WA_StaticContents, false);
+    setAttribute(Qt::WA_NoSystemBackground, true);
     setAutoFillBackground(false);
 
     if (parent) {
@@ -81,12 +81,26 @@ void TutorialOverlay::showEvent(QShowEvent *event)
     QWidget::showEvent(event);
 
     if (parentWidget()) {
-        QWidget *parent = parentWidget();
-        setGeometry(0, 0, parent->width(), parent->height());
+        setGeometry(0, 0, parentWidget()->width(), parentWidget()->height());
     }
 
     raise();
     parentResized();
+}
+
+void TutorialOverlay::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::ParentChange) {
+        // Remove filter from old parent (Qt has already changed parentWidget() by now,
+        // so iterate sender list isn't easy — reinstall unconditionally on the new parent)
+        QWidget *p = parentWidget();
+        if (p) {
+            p->installEventFilter(this); // safe to call multiple times
+            setGeometry(p->rect());
+            raise();
+        }
+    }
+    QWidget::changeEvent(event);
 }
 
 void TutorialOverlay::setTitle(const QString &title)
@@ -107,23 +121,14 @@ void TutorialOverlay::setInteractive(bool interactive, bool clickThrough)
 
     if (nextButton) {
         nextButton->setEnabled(!interactive);
-        if (interactive) {
-            nextButton->setToolTip("Complete the highlighted action to continue");
-        } else {
-            nextButton->setToolTip("Next step");
-        }
+        nextButton->setToolTip(interactive ? "Complete the highlighted action to continue" : "Next step");
     }
 
     if (nextSeqButton) {
         nextSeqButton->setEnabled(!interactive);
-        if (interactive) {
-            nextSeqButton->setToolTip("Complete the highlighted action to continue");
-        } else {
-            nextSeqButton->setToolTip("Next chapter");
-        }
+        nextSeqButton->setToolTip(interactive ? "Complete the highlighted action to continue" : "Next chapter");
     }
 
-    // Update mask when clickThrough changes
     updateMask();
 }
 
@@ -154,6 +159,7 @@ void TutorialOverlay::setProgress(int stepNum,
 
 void TutorialOverlay::setTargetWidget(QWidget *w)
 {
+
     if (targetWidget) {
         targetWidget->removeEventFilter(this);
     }
@@ -169,6 +175,7 @@ void TutorialOverlay::setTargetWidget(QWidget *w)
 
 void TutorialOverlay::setText(const QString &t)
 {
+
     tutorialText = t;
     bubble->setText(t);
     bubble->adjustSize();
@@ -181,56 +188,54 @@ QRect TutorialOverlay::currentHoleRect() const
         return QRect();
     }
 
-    QPoint targetGlobal = targetWidget->mapToGlobal(QPoint(0, 0));
-    QPoint targetInOverlay = mapFromGlobal(targetGlobal);
+    QPoint p = targetWidget->mapToGlobal(QPoint(0, 0));
+    QPoint local = mapFromGlobal(p);
 
-    return QRect(targetInOverlay, targetWidget->size()).adjusted(-6, -6, 6, 6);
+    QRect r(local, targetWidget->size());
+    r = r.adjusted(-6, -6, 6, 6);
+
+    return r;
 }
 
 void TutorialOverlay::mousePressEvent(QMouseEvent *event)
 {
     QRect hole = currentHoleRect();
 
-    // Check if click is in the highlighted area
     if (hole.contains(event->pos())) {
-        // For non-clickthrough steps, emit targetClicked for advancement
+
         if (!allowClickThrough && isInteractive && !qobject_cast<QLineEdit *>(targetWidget) &&
             !qobject_cast<QTextEdit *>(targetWidget) && !qobject_cast<QPlainTextEdit *>(targetWidget) &&
             !qobject_cast<QComboBox *>(targetWidget)) {
             QTimer::singleShot(100, this, [this]() { emit targetClicked(); });
         }
-        // If allowClickThrough, the mask ensures events pass through
         return;
     }
 
-    // Click outside highlighted area - block it
     event->accept();
 }
 
 void TutorialOverlay::updateMask()
 {
-    if (allowClickThrough) {
-        QRect hole = currentHoleRect();
-        if (!hole.isEmpty()) {
-            // Create a mask that excludes the hole area
-            QRegion fullRegion(rect());
-            QRegion holeRegion(hole);
-            QRegion maskRegion = fullRegion.subtracted(holeRegion);
-            setMask(maskRegion);
-        } else {
-            clearMask();
-        }
-    } else {
-        clearMask();
+    clearMask();
+
+    if (!isVisible() || !parentWidget()) {
+        return;
+    }
+    if (!allowClickThrough) {
+        return;
+    }
+
+    QRect hole = currentHoleRect();
+
+    if (!hole.isEmpty()) {
+        QRegion full(rect());
+        QRegion cut(hole);
+        setMask(full.subtracted(cut));
     }
 }
 
 bool TutorialOverlay::event(QEvent *event)
 {
-    // Update mask on any event that might change geometry
-    if (event->type() == QEvent::Move || event->type() == QEvent::Resize) {
-        updateMask();
-    }
     return QWidget::event(event);
 }
 
@@ -241,15 +246,29 @@ void TutorialOverlay::resizeEvent(QResizeEvent *)
 
 bool TutorialOverlay::eventFilter(QObject *obj, QEvent *event)
 {
-    if (obj == parentWidget() && (event->type() == QEvent::Resize || event->type() == QEvent::Move)) {
-        parentResized();
+    if (obj == parentWidget()) {
+        switch (event->type()) {
+            case QEvent::Resize:
+            case QEvent::Move: // window dragged to another monitor / position
+                parentResized();
+                break;
+            default:
+                break;
+        }
     }
 
     if (obj == targetWidget) {
-        if (event->type() == QEvent::Show) {
-            QMetaObject::invokeMethod(this, [this]() { recomputeLayout(); }, Qt::QueuedConnection);
-        } else if (event->type() == QEvent::Hide || event->type() == QEvent::Move || event->type() == QEvent::Resize) {
-            recomputeLayout();
+        switch (event->type()) {
+            case QEvent::Show:
+                QMetaObject::invokeMethod(this, [this] { recomputeLayout(); }, Qt::QueuedConnection);
+                break;
+            case QEvent::Hide:
+            case QEvent::Move:
+            case QEvent::Resize:
+                recomputeLayout();
+                break;
+            default:
+                break;
         }
     }
 
@@ -262,22 +281,38 @@ void TutorialOverlay::parentResized()
         return;
     }
 
-    setGeometry(0, 0, parentWidget()->width(), parentWidget()->height());
+    const QSize s = parentWidget()->size();
+
+    setGeometry(0, 0, s.width(), s.height());
+
+    clearMask();
     recomputeLayout();
+
+    setAttribute(Qt::WA_NoSystemBackground, false);
+    setAttribute(Qt::WA_NoSystemBackground, true);
+
+    update();
 }
 
 void TutorialOverlay::recomputeLayout()
 {
+    if (!parentWidget()) {
+        return;
+    }
+
+    resize(parentWidget()->window()->geometry().size());
+
+    bubble->adjustSize();
+
     QRect hole = currentHoleRect();
 
     if (hole.isEmpty()) {
-        if (bubble) {
-            bubble->hide();
-        }
-        if (controlBar) {
-            controlBar->hide();
-        }
+        bubble->hide();
+        controlBar->hide();
+
         hide();
+
+        update();
         return;
     }
 
@@ -286,9 +321,9 @@ void TutorialOverlay::recomputeLayout()
 
     QSize bsize = bubble->sizeHint().expandedTo(QSize(160, 60));
     highlightBubbleRect = computeBubbleRect(hole, bsize);
+
     bubble->setGeometry(highlightBubbleRect);
     bubble->show();
-    bubble->raise();
 
     controlBar->adjustSize();
     controlBar->show();
@@ -301,28 +336,39 @@ void TutorialOverlay::recomputeLayout()
                                {margin, r.bottom() - controlBar->height() - margin},
                                {margin, margin}};
 
+    QRect placedRect;
+
     for (const QPoint &pos : positions) {
         QRect proposed(pos, controlBar->size());
-        if (!proposed.intersects(hole)) {
-            controlBar->move(pos);
+
+        if (!proposed.intersects(hole) && !proposed.intersects(highlightBubbleRect)) {
+            placedRect = proposed;
             break;
         }
     }
 
-    controlBar->raise();
+    if (!placedRect.isValid()) {
+        placedRect = QRect(QPoint(margin, margin), controlBar->size());
+    }
+
+    controlBar->move(placedRect.topLeft());
+    controlBar->show();
+
+    updateMask();
     update();
-    updateMask(); // Update mask after layout changes
 }
 
 QRect TutorialOverlay::computeBubbleRect(const QRect &hole, const QSize &bubbleSize) const
 {
-    const int margin = 16;
     QRect r = rect();
+
     QRect bubble;
 
     if (hole.isEmpty()) {
         bubble = QRect(r.center() - QPoint(bubbleSize.width() / 2, bubbleSize.height() / 2), bubbleSize);
     } else {
+        const int margin = 16;
+
         bubble = QRect(hole.right() + margin, hole.top(), bubbleSize.width(), bubbleSize.height());
 
         if (!r.contains(bubble)) {
