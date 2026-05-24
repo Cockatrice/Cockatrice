@@ -301,7 +301,8 @@ QString GameView::buildSubtypeCountText() const
                      .arg(namePadding, name, countPadding, count);
     }
 
-    return lines.join(QStringLiteral("<br>"));
+    return QStringLiteral("<span style='font-family: monospace;'>") + lines.join(QStringLiteral("<br>")) +
+           QStringLiteral("</span>");
 }
 
 void GameView::updateTotalSelectionCount(const QSize &viewSize)
