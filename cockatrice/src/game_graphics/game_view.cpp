@@ -1,15 +1,13 @@
 #include "game_view.h"
 
 #include "../client/settings/cache_settings.h"
-#include "board/card_item.h"
 #include "game_scene.h"
+#include "selection_subtype_counter.h"
 
 #include <QAction>
 #include <QLabel>
-#include <QMap>
 #include <QResizeEvent>
 #include <QRubberBand>
-#include <algorithm>
 
 // QRubberBand calls raise() in showEvent() and changeEvent() to stay on top of siblings.
 // This subclass disables that behavior so dragCountLabel can appear above it.
@@ -174,133 +172,13 @@ void GameView::refreshShortcuts()
         SettingsCache::instance().shortcuts().getShortcut("Player/aCloseMostRecentZoneView"));
 }
 
-/** @brief Extracts subtypes from a card face type string (e.g., "Creature — Human Wizard" -> ["Human", "Wizard"]) */
-static QStringList extractSubtypesFromFace(const QString &faceType)
-{
-    QStringList parts = faceType.split(QStringLiteral(" — "));
-    if (parts.size() > 1) {
-        return parts[1].split(QStringLiteral(" "), Qt::SkipEmptyParts);
-    }
-    return {};
-}
-
 QString GameView::buildSubtypeCountText() const
 {
     GameScene *gameScene = dynamic_cast<GameScene *>(scene());
     if (!gameScene) {
         return QString();
     }
-
-    // Map: main card type -> (subtype -> count)
-    QMap<QString, QMap<QString, int>> subtypesByMainType;
-    // Track cards contributing subtypes per main type (for group ordering)
-    QMap<QString, int> cardCountPerMainType;
-
-    for (CardItem *card : gameScene->selectedCards()) {
-        if (card->getFaceDown() || card->getCard().isEmpty()) {
-            continue;
-        }
-
-        QString mainType = card->getCardInfo().getMainCardType();
-        if (mainType.isEmpty()) {
-            mainType = QStringLiteral("Other");
-        }
-
-        QString cardType = card->getCardInfo().getCardType();
-        QStringList cardFaces = cardType.split(QStringLiteral(" // "));
-
-        bool contributedSubtypes = false;
-        for (const QString &face : cardFaces) {
-            QStringList subtypes = extractSubtypesFromFace(face);
-            for (const QString &subtype : subtypes) {
-                subtypesByMainType[mainType][subtype]++;
-                contributedSubtypes = true;
-            }
-        }
-
-        if (contributedSubtypes) {
-            cardCountPerMainType[mainType]++;
-        }
-    }
-
-    if (subtypesByMainType.isEmpty()) {
-        return QString();
-    }
-
-    // Build groups with sorted subtypes
-    struct MainTypeGroup
-    {
-        QString mainType;
-        int cardCount;
-        QList<QPair<QString, int>> subtypes;
-    };
-
-    QList<MainTypeGroup> groups;
-    for (auto it = subtypesByMainType.constBegin(); it != subtypesByMainType.constEnd(); ++it) {
-        MainTypeGroup group;
-        group.mainType = it.key();
-        group.cardCount = cardCountPerMainType.value(it.key(), 0);
-
-        for (auto subIt = it.value().constBegin(); subIt != it.value().constEnd(); ++subIt) {
-            group.subtypes.append({subIt.key(), subIt.value()});
-        }
-
-        /**
-         * Sort subtypes: by count ascending (lower counts at top of the list), then alphabetically.
-         * Since the subtype list displays above the total count label (bottom-right corner),
-         * ascending order places the most common subtypes visually adjacent to the total.
-         */
-        std::sort(group.subtypes.begin(), group.subtypes.end(),
-                  [](const QPair<QString, int> &a, const QPair<QString, int> &b) {
-                      if (a.second != b.second) {
-                          return a.second < b.second;
-                      }
-                      return a.first < b.first;
-                  });
-
-        groups.append(group);
-    }
-
-    // Sort groups: by card count ascending, then alphabetically by main type
-    std::sort(groups.begin(), groups.end(), [](const MainTypeGroup &a, const MainTypeGroup &b) {
-        if (a.cardCount != b.cardCount) {
-            return a.cardCount < b.cardCount;
-        }
-        return a.mainType < b.mainType;
-    });
-
-    // Flatten to final ordered list
-    QList<QPair<QString, int>> sortedEntries;
-    for (const MainTypeGroup &group : groups) {
-        for (const auto &entry : group.subtypes) {
-            sortedEntries.append(entry);
-        }
-    }
-
-    // Calculate padding widths
-    int maxNameLen = 0;
-    int maxCountLen = 0;
-    for (const auto &entry : sortedEntries) {
-        maxNameLen = qMax(maxNameLen, entry.first.length());
-        maxCountLen = qMax(maxCountLen, QString::number(entry.second).length());
-    }
-
-    // Format output
-    QStringList lines;
-    for (const auto &entry : sortedEntries) {
-        QString name = entry.first.toHtmlEscaped();
-        QString count = QString::number(entry.second);
-
-        QString namePadding = QString(QStringLiteral("&nbsp;")).repeated(maxNameLen - entry.first.length());
-        QString countPadding = QString(QStringLiteral("&nbsp;")).repeated(maxCountLen - count.length());
-
-        lines << QStringLiteral(
-                     "%1%2  <span style='font-size:14px;font-weight:bold;vertical-align:middle;'>%3%4</span>")
-                     .arg(namePadding, name, countPadding, count);
-    }
-
-    return QStringLiteral("<span style='font-family: monospace;'>") + lines.join(QStringLiteral("<br>")) +
-           QStringLiteral("</span>");
+    return SelectionSubtypeCounter::buildSubtypeCountText(gameScene->selectedCards());
 }
 
 void GameView::updateSelectionCount(const QSize &viewSize)
