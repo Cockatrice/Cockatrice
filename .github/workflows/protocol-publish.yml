@@ -11,11 +11,6 @@ on:
       - '.github/workflows/protocol-publish.yml'
       - 'libcockatrice_protocol/**'
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Semver to publish (e.g. 15.0.0). Leave blank to dry-run only.'
-        required: false
-        default: ''
 
 concurrency:
   group: "${{ github.workflow }} @ ${{ github.ref_name }}"
@@ -31,6 +26,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
       - name: Checkout
@@ -40,36 +36,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@cockatrice'
 
       - name: Determine package version
         id: pkgver
         shell: bash
         run: |
-          case "$GITHUB_EVENT_NAME" in
-            release)
-              version="${{ github.event.release.tag_name }}"
-              version="${version#v}"
-              publish=true
-              ;;
-            workflow_dispatch)
-              version="${{ inputs.version }}"
-              if [[ -n "$version" ]]; then
-                version="${version#v}"
-                publish=true
-              else
-                version="0.0.0-manual"
-                publish=false
-              fi
-              ;;
-            *)    # pull_request
-              version="0.0.0-pr${{ github.event.pull_request.number }}"
-              publish=false
-              ;;
-          esac
-          echo "version=$version" >>"$GITHUB_OUTPUT"
-          echo "publish=$publish" >>"$GITHUB_OUTPUT"
+          # Cockatrice stable tags: YYYY-MM-DD-Release-X.Y.Z. Non-release events get a
+          # placeholder version and the publish step is skipped.
+          tag="${{ github.event.release.tag_name }}"
+          if [[ "$GITHUB_EVENT_NAME" == "release" ]]; then
+            if [[ "$tag" =~ Release-([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+              echo "version=${BASH_REMATCH[1]}" >>"$GITHUB_OUTPUT"
+            else
+              echo "::error::Release tag '$tag' does not end in Release-X.Y.Z; refusing to publish."
+              exit 1
+            fi
+          else
+            echo "version=0.0.0-dryrun" >>"$GITHUB_OUTPUT"
+          fi
 
       - name: Assemble package
         shell: bash
@@ -86,7 +70,7 @@ jobs:
           npm --prefix "$pkg" version --no-git-tag-version --allow-same-version "$PKG_VERSION"
 
       - name: Pack and inspect (dry-run)
-        if: ${{ steps.pkgver.outputs.publish != 'true' }}
+        if: ${{ github.event_name != 'release' }}
         working-directory: build/protocol-package
         run: |
           npm pack
@@ -94,8 +78,12 @@ jobs:
           tar -tzf ./*.tgz | sort
 
       - name: Publish to GitHub Packages
-        if: ${{ steps.pkgver.outputs.publish == 'true' }}
-        working-directory: build/protocol-package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm publish
+        if: ${{ github.event_name == 'release' }}
+        uses: JS-DevTools/npm-publish@v4
+        with:
+          package: build/protocol-package
+          registry: https://npm.pkg.github.com
+          token: ${{ secrets.GITHUB_TOKEN }}
+          access: restricted
+          provenance: true
+          strategy: upgrade
