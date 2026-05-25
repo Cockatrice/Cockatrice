@@ -397,6 +397,9 @@ void Server_AbstractPlayer::processMoveCard(GameEventStorage &ges,
                 }
             }
             for (int j : arrowsToDelete) {
+                Event_DeleteArrow event;
+                event.set_arrow_id(j);
+                ges.enqueueGameEvent(event, player->getPlayerId());
                 player->deleteArrow(j);
             }
         }
@@ -1132,12 +1135,18 @@ Server_AbstractPlayer::cmdCreateToken(const Command_CreateToken &cmd, ResponseCo
                         targetItem = card;
                     }
                     if (sendGameEvent) {
-                        Event_CreateArrow _event;
-                        ServerInfo_Arrow *arrowInfo = _event.mutable_arrow_info();
-                        changedArrowIds.append(arrow->getId());
-                        int id = player->newArrowId();
-                        arrow->setId(id);
-                        arrowInfo->set_id(id);
+                        const int oldId = arrow->getId();
+                        changedArrowIds.append(oldId);
+
+                        Event_DeleteArrow deleteEvent;
+                        deleteEvent.set_arrow_id(oldId);
+                        ges.enqueueGameEvent(deleteEvent, player->getPlayerId());
+
+                        Event_CreateArrow createEvent;
+                        ServerInfo_Arrow *arrowInfo = createEvent.mutable_arrow_info();
+                        const int newId = player->newArrowId();
+                        arrow->setId(newId);
+                        arrowInfo->set_id(newId);
                         arrowInfo->set_start_player_id(player->getPlayerId());
                         arrowInfo->set_start_zone(startCard->getZone()->getName().toStdString());
                         arrowInfo->set_start_card_id(startCard->getId());
@@ -1151,7 +1160,7 @@ Server_AbstractPlayer::cmdCreateToken(const Command_CreateToken &cmd, ResponseCo
                             arrowInfo->set_target_card_id(arrowTargetCard->getId());
                         }
                         arrowInfo->mutable_arrow_color()->CopyFrom(arrow->getColor());
-                        ges.enqueueGameEvent(_event, player->getPlayerId());
+                        ges.enqueueGameEvent(createEvent, player->getPlayerId());
                     }
                 }
                 for (int id : changedArrowIds) {

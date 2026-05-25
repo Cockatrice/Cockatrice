@@ -1147,6 +1147,7 @@ void TabGame::createPlayAreaWidget(bool bReplay)
     connect(game->getPlayerManager(), &PlayerManager::playerCountChanged, scene, &GameScene::rearrange);
     connect(scene, &GameScene::requestArrowDeletion, game->getGameEventHandler(),
             &GameEventHandler::handleArrowDeletion);
+    connect(game->getGameEventHandler(), &GameEventHandler::arrowDeleted, scene, &GameScene::onArrowDeleted);
     gameView = new GameView(scene);
 
     auto gamePlayAreaVBox = new QVBoxLayout;

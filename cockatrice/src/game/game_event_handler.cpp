@@ -217,7 +217,20 @@ void GameEventHandler::handleArrowDeletion(int arrowId)
 {
     Command_DeleteArrow cmd;
     cmd.set_arrow_id(arrowId);
-    sendGameCommand(cmd);
+
+    auto preparedCommand = prepareGameCommand(cmd);
+
+    connect(preparedCommand, &PendingCommand::finished, this,
+            [arrowId, this](const Response &response) { handleArrowDeletionFinished(response, arrowId); });
+
+    sendGameCommand(preparedCommand);
+}
+
+void GameEventHandler::handleArrowDeletionFinished(const Response &response, int arrowId)
+{
+    if (response.response_code() == Response::RespNameNotFound) {
+        emit arrowDeleted(arrowId);
+    }
 }
 
 void GameEventHandler::eventSpectatorSay(const Event_GameSay &event,
