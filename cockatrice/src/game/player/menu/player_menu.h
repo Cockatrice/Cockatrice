@@ -111,6 +111,14 @@ private:
         managedComponents.append(component);
         return component;
     }
+
+    /// Runs a normal for loop over all managedComponents, applying the provided function.
+    template <typename Func> void forManagedComponents(Func func)
+    {
+        for (auto *component : managedComponents) {
+            func(component);
+        }
+    }
 };
 
 #endif // COCKATRICE_PLAYER_MENU_H

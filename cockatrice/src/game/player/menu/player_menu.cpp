@@ -144,9 +144,7 @@ void PlayerMenu::setShortcutsActive()
     }
 
     if (!player->getGame()->getGameMetaInfo()->started()) {
-        for (auto *component : managedComponents) {
-            component->setShortcutsInactive();
-        }
+        forManagedComponents([](auto *component) { component->setShortcutsInactive(); });
 
         QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
         while (counterIterator.hasNext()) {
@@ -159,9 +157,7 @@ void PlayerMenu::setShortcutsActive()
         return;
     }
 
-    for (auto *component : managedComponents) {
-        component->setShortcutsActive();
-    }
+    forManagedComponents([](auto *component) { component->setShortcutsActive(); });
 
     // Counters implement AbstractPlayerComponent but are iterated via Player::counters
     // (the authoritative source) rather than managedComponents to avoid a redundant
@@ -176,9 +172,7 @@ void PlayerMenu::setShortcutsInactive()
 {
     shortcutsActive = false;
 
-    for (auto *component : managedComponents) {
-        component->setShortcutsInactive();
-    }
+    forManagedComponents([](auto *component) { component->setShortcutsInactive(); });
 
     QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
     while (counterIterator.hasNext()) {
