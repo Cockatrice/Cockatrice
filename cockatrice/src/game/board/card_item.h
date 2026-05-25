@@ -55,6 +55,10 @@ public:
                       CardZoneLogic *_zone = nullptr);
 
     void retranslateUi();
+    [[nodiscard]] CardState *getState() const
+    {
+        return state;
+    }
     [[nodiscard]] CardZoneLogic *getZone() const
     {
         return state->getZone();

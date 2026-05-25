@@ -18,7 +18,7 @@ void CardState::setZone(CardZoneLogic *_zone)
     }
 
     zone = _zone;
-    emit zoneChanged(zone);
+    emit zoneChanged(this, zone);
     emit stateChanged();
 }
 

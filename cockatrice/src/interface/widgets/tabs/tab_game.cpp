@@ -895,6 +895,11 @@ void TabGame::newCardAdded(AbstractCardItem *card)
     connect(card, &AbstractCardItem::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
     connect(card, SIGNAL(deleteCardInfoPopup(QString)), this, SLOT(deleteCardInfoPopup(QString)));
     connect(card, &AbstractCardItem::cardShiftClicked, this, &TabGame::linkCardToChat);
+    CardItem *cardItem = qobject_cast<CardItem *>(card);
+    if (cardItem) {
+        connect(cardItem->getState(), &CardState::zoneChanged, scene,
+                [this, cardItem]() { scene->onCardZoneChanged(cardItem, false); });
+    }
 }
 
 QString TabGame::getTabText() const
