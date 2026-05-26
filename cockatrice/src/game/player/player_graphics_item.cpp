@@ -47,6 +47,8 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 
     playerDialogs = new PlayerDialogs(this, player->getPlayerActions());
 
+    connect(playerDialogs, &PlayerDialogs::requestDialogSemaphore, player, &PlayerLogic::setDialogSemaphore);
+
     playerArea = new PlayerArea(this);
 
     playerTarget = new PlayerTarget(player, playerArea);
