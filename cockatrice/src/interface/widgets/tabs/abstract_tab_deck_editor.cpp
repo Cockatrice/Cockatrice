@@ -129,14 +129,15 @@ void AbstractTabDeckEditor::onDeckModified()
     emit tabTextChanged(this, getTabText());
 }
 
-/**
- * @brief Helper for adding a card to a deck zone.
- * @param card Card to add.
- * @param zoneName Zone to add the card to.
- */
-void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, const QString &zoneName)
+void AbstractTabDeckEditor::addCard(const ExactCard &card, const QString &zoneName)
 {
     deckStateManager->addCard(card, zoneName);
+    deckMenu->setSaveStatus(true);
+}
+
+void AbstractTabDeckEditor::decrementCard(const ExactCard &card, const QString &zoneName)
+{
+    deckStateManager->decrementCard(card, zoneName);
 }
 
 /**
@@ -147,29 +148,26 @@ void AbstractTabDeckEditor::actAddCard(const ExactCard &card)
     if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
         actAddCardToSideboard(card);
     } else {
-        addCardHelper(card, DECK_ZONE_MAIN);
+        addCard(card, DECK_ZONE_MAIN);
     }
-
-    deckMenu->setSaveStatus(true);
 }
 
 /** @brief Adds a card to the sideboard explicitly. */
 void AbstractTabDeckEditor::actAddCardToSideboard(const ExactCard &card)
 {
-    addCardHelper(card, DECK_ZONE_SIDE);
-    deckMenu->setSaveStatus(true);
+    addCard(card, DECK_ZONE_SIDE);
 }
 
 /** @brief Decrements a card from the main deck. */
 void AbstractTabDeckEditor::actDecrementCard(const ExactCard &card)
 {
-    deckStateManager->decrementCard(card, DECK_ZONE_MAIN);
+    decrementCard(card, DECK_ZONE_MAIN);
 }
 
 /** @brief Decrements a card from the sideboard. */
 void AbstractTabDeckEditor::actDecrementCardFromSideboard(const ExactCard &card)
 {
-    deckStateManager->decrementCard(card, DECK_ZONE_SIDE);
+    decrementCard(card, DECK_ZONE_SIDE);
 }
 
 /**

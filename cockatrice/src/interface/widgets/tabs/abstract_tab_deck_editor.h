@@ -145,6 +145,24 @@ public slots:
      */
     void updateCard(const ExactCard &card);
 
+    /**
+     * @brief Adds a card to the given zone
+     * @param card Card to add.
+     * @param zoneName Zone to add the card to.
+     */
+    void addCard(const ExactCard &card, const QString &zoneName);
+
+    /**
+     * @brief Decrements a card from the given zone
+     *
+     * Use an ExactCard with empty PrintingInfo if you want to remove a card by name regardless of printing.
+     * Otherwise, it won't remove anything unless there's an exact printing match.
+     *
+     * @param card Card to decrement.
+     * @param zoneName Zone to decrement from.
+     */
+    void decrementCard(const ExactCard &card, const QString &zoneName);
+
     /** @brief Adds a card to the main deck or sideboard based on Ctrl key. */
     void actAddCard(const ExactCard &card);
 
@@ -292,9 +310,6 @@ protected:
      *  @return Pointer to a QMessageBox.
      */
     QMessageBox *createSaveConfirmationWindow();
-
-    /** @brief Helper function to add a card to a specific deck zone. */
-    void addCardHelper(const ExactCard &card, const QString &zoneName);
 
     /** @brief Opens a deck from a file. */
     virtual void openDeckFromFile(const QString &fileName, DeckOpenLocation deckOpenLocation);
