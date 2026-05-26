@@ -117,16 +117,34 @@ void GameScene::onCardRightClicked(AbstractCardItem *abstractCard, QPoint screen
 
 void GameScene::playSelected(AbstractCardItem *card)
 {
+    if (!card) {
+        return;
+    }
+    if (!card->getOwner()) {
+        return;
+    }
     card->getOwner()->getPlayerActions()->actPlay(selectedCards());
 }
 
 void GameScene::playSelectedFaceDown(AbstractCardItem *card)
 {
+    if (!card) {
+        return;
+    }
+    if (!card->getOwner()) {
+        return;
+    }
     card->getOwner()->getPlayerActions()->actPlayFacedown(selectedCards());
 }
 
 void GameScene::hideSelected(AbstractCardItem *card)
 {
+    if (!card) {
+        return;
+    }
+    if (!card->getOwner()) {
+        return;
+    }
     card->getOwner()->getPlayerActions()->actHide(selectedCards());
 }
 
