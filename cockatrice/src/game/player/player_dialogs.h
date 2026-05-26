@@ -5,6 +5,7 @@
 #include <QGraphicsView>
 #include <QObject>
 
+class PlayerGraphicsItem;
 class PlayerDialogs : public QObject
 {
 
