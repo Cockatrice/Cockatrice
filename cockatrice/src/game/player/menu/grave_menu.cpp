@@ -8,14 +8,14 @@
 #include <QMenu>
 #include <libcockatrice/utility/zone_names.h>
 
-GraveyardMenu::GraveyardMenu(PlayerLogic *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
+GraveyardMenu::GraveyardMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
     createMoveActions();
     createViewActions();
 
     addAction(aViewGraveyard);
 
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+    if (player->getLogic()->getPlayerInfo()->local || player->getLogic()->getPlayerInfo()->judge) {
         mRevealRandomGraveyardCard = addMenu(QString());
         connect(mRevealRandomGraveyardCard, &QMenu::aboutToShow, this,
                 &GraveyardMenu::populateRevealRandomMenuWithActivePlayers);
@@ -36,9 +36,9 @@ GraveyardMenu::GraveyardMenu(PlayerLogic *_player, QWidget *parent) : TearOffMen
 
 void GraveyardMenu::createMoveActions()
 {
-    auto grave = player->getGraveZone();
+    auto grave = player->getLogic()->getGraveZone();
 
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+    if (player->getLogic()->getPlayerInfo()->local || player->getLogic()->getPlayerInfo()->judge) {
         aMoveGraveToTopLibrary = new QAction(this);
         aMoveGraveToTopLibrary->setData(QList<QVariant>() << ZoneNames::DECK << 0);
 
@@ -60,7 +60,7 @@ void GraveyardMenu::createMoveActions()
 
 void GraveyardMenu::createViewActions()
 {
-    PlayerActions *playerActions = player->getPlayerActions();
+    PlayerActions *playerActions = player->getLogic()->getPlayerActions();
 
     aViewGraveyard = new QAction(this);
     connect(aViewGraveyard, &QAction::triggered, playerActions, &PlayerActions::actViewGraveyard);
@@ -76,9 +76,9 @@ void GraveyardMenu::populateRevealRandomMenuWithActivePlayers()
 
     mRevealRandomGraveyardCard->addSeparator();
 
-    const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    const auto &players = player->getLogic()->getGame()->getPlayerManager()->getPlayers().values();
     for (auto *other : players) {
-        if (other == player) {
+        if (other == player->getLogic()) {
             continue;
         }
         QAction *a = mRevealRandomGraveyardCard->addAction(other->getPlayerInfo()->getName());
@@ -90,7 +90,7 @@ void GraveyardMenu::populateRevealRandomMenuWithActivePlayers()
 void GraveyardMenu::onRevealRandomTriggered()
 {
     if (auto *a = qobject_cast<QAction *>(sender())) {
-        player->getPlayerActions()->actRevealRandomGraveyardCard(a->data().toInt());
+        player->getLogic()->getPlayerActions()->actRevealRandomGraveyardCard(a->data().toInt());
     }
 }
 
@@ -100,7 +100,7 @@ void GraveyardMenu::retranslateUi()
 
     aViewGraveyard->setText(tr("&View graveyard"));
 
-    if (player->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         moveGraveMenu->setTitle(tr("&Move graveyard to..."));
         aMoveGraveToTopLibrary->setText(tr("&Top of library"));
         aMoveGraveToBottomLibrary->setText(tr("&Bottom of library"));

@@ -6,6 +6,7 @@
 #include "../../zones/view_zone_logic.h"
 #include "../card_menu_action_type.h"
 #include "../player_actions.h"
+#include "../player_graphics_item.h"
 #include "../player_logic.h"
 #include "move_menu.h"
 #include "pt_menu.h"

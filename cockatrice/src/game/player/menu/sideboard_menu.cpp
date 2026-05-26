@@ -3,12 +3,13 @@
 #include "../player_actions.h"
 #include "../player_logic.h"
 
-SideboardMenu::SideboardMenu(PlayerLogic *player, QMenu *playerMenu) : QMenu(playerMenu)
+SideboardMenu::SideboardMenu(PlayerGraphicsItem *player, QMenu *playerMenu) : QMenu(playerMenu)
 {
     aViewSideboard = new QAction(this);
-    connect(aViewSideboard, &QAction::triggered, player->getPlayerActions(), &PlayerActions::actViewSideboard);
+    connect(aViewSideboard, &QAction::triggered, player->getLogic()->getPlayerActions(),
+            &PlayerActions::actViewSideboard);
 
-    if (player->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         addAction(aViewSideboard);
     }
 
