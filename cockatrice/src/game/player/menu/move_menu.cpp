@@ -30,9 +30,8 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
 
     connect(aMoveToTopLibrary, &QAction::triggered, actions, invoke(cmMoveToTopLibrary));
     connect(aMoveToBottomLibrary, &QAction::triggered, actions, invoke(cmMoveToBottomLibrary));
-    connect(aMoveToXfromTopOfLibrary, &QAction::triggered, actions, [player]() {
-        player->getLogic()->getPlayerActions()->actMoveCardXCardsFromTop(player->getGameScene()->selectedCards());
-    });
+    connect(aMoveToXfromTopOfLibrary, &QAction::triggered, actions,
+            &PlayerActions::actRequestMoveCardXCardsFromTopDialog);
     connect(aMoveToTable, &QAction::triggered, actions, invoke(cmMoveToTable));
     connect(aMoveToHand, &QAction::triggered, actions, invoke(cmMoveToHand));
     connect(aMoveToGraveyard, &QAction::triggered, actions, invoke(cmMoveToGraveyard));

@@ -79,7 +79,7 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
 
     // Actions using selection directly
     aUnattach = makeAction(this, [actions, sel]() { actions->actUnattach(sel()); });
-    aSetAnnotation = makeAction(this, [actions, sel]() { actions->actSetAnnotation(sel()); });
+    aSetAnnotation = makeAction(this, [actions, sel]() { actions->actRequestSetAnnotationDialog(sel()); });
     aPlay = makeAction(this, [actions, sel]() { actions->actPlay(sel()); });
     aPlayFacedown = makeAction(this, [actions, sel]() { actions->actPlayFacedown(sel()); });
     aHide = makeAction(this, [actions, sel]() { actions->actHide(sel()); });
@@ -115,7 +115,7 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
         removeAction->setIcon(circleIcon);
         aRemoveCounter.append(removeAction);
 
-        auto *setAction = makeAction(this, [actions, sel, i]() { actions->actSetCardCounter(sel(), i); });
+        auto *setAction = makeAction(this, [actions, sel, i]() { actions->actRequestSetCardCounter(sel(), i); });
         setAction->setIcon(circleIcon);
         aSetCounter.append(setAction);
     }

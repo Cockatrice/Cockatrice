@@ -9,6 +9,7 @@
 #include "../board/counter_general.h"
 #include "../hand_counter.h"
 #include "player_actions.h"
+#include "player_dialogs.h"
 
 #include <QGraphicsView>
 
@@ -43,6 +44,10 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
             ctr->retranslateUi();
         }
     });
+
+    playerDialogs = new PlayerDialogs(this, player->getPlayerActions());
+
+    connect(playerDialogs, &PlayerDialogs::requestDialogSemaphore, player, &PlayerLogic::setDialogSemaphore);
 
     playerArea = new PlayerArea(this);
 

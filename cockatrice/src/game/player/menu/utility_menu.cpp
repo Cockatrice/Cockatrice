@@ -20,14 +20,15 @@ UtilityMenu::UtilityMenu(PlayerGraphicsItem *_player, QMenu *playerMenu) : QMenu
         connect(aUntapAll, &QAction::triggered, playerActions, &PlayerActions::actUntapAll);
 
         aRollDie = new QAction(this);
-        connect(aRollDie, &QAction::triggered, playerActions, &PlayerActions::actRollDie);
+        connect(aRollDie, &QAction::triggered, playerActions, &PlayerActions::actRequestRollDieDialog);
 
         aFlipCoin = new QAction(this);
         connect(aFlipCoin, &QAction::triggered, playerActions, &PlayerActions::actFlipCoin);
 
         aCreateToken = new QAction(this);
-        connect(aCreateToken, &QAction::triggered, playerActions,
-                [this]() { player->getLogic()->getPlayerActions()->actCreateToken(getPredefinedTokens()); });
+        connect(aCreateToken, &QAction::triggered, playerActions, [this]() {
+            player->getLogic()->getPlayerActions()->actRequestCreateTokenDialog(getPredefinedTokens());
+        });
 
         aCreateAnotherToken = new QAction(this);
         connect(aCreateAnotherToken, &QAction::triggered, playerActions, &PlayerActions::actCreateAnotherToken);
