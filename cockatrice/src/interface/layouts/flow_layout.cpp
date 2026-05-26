@@ -70,8 +70,9 @@ bool FlowLayout::hasHeightForWidth() const
  */
 int FlowLayout::heightForWidth(const int width) const
 {
-    if (flowDirection != Qt::Horizontal)
+    if (flowDirection != Qt::Horizontal) {
         return -1;
+    }
 
     int totalHeight = 0;
     int rowUsedWidth = 0;
@@ -181,8 +182,9 @@ int FlowLayout::layoutAllRows(const int originX, const int originY, const int av
  */
 void FlowLayout::layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, const int y, const int availableWidth)
 {
-    if (rowItems.isEmpty())
+    if (rowItems.isEmpty()) {
         return;
+    }
 
     // ── Pass 1: measure fixed width and count expanding items ────────────────
     int fixedWidth = 0;
@@ -211,12 +213,14 @@ void FlowLayout::layoutSingleRow(const QVector<QLayoutItem *> &rowItems, int x, 
 
     // ── Pass 2: place items ──────────────────────────────────────────────────
     for (QLayoutItem *item : rowItems) {
-        if (!item || item->isEmpty())
+        if (!item || item->isEmpty()) {
             continue;
+        }
 
         QWidget *widget = item->widget();
-        if (!widget)
+        if (!widget) {
             continue;
+        }
 
         const QSizePolicy::Policy hPolicy = widget->sizePolicy().horizontalPolicy();
         const QSize maxSize = widget->maximumSize();

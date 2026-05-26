@@ -24,7 +24,7 @@ public:
     QJsonObject getOracleCard() const
     {
         return oracleCard;
-    };
+    }
 
     QString getCollectorNumber() const
     {

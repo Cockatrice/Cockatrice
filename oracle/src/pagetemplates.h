@@ -27,7 +27,7 @@ protected:
     inline OracleWizard *wizard()
     {
         return (OracleWizard *)QWizardPage::wizard();
-    };
+    }
 };
 
 class SimpleDownloadFilePage : public OracleWizardPage

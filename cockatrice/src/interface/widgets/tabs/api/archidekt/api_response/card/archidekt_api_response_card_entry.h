@@ -33,7 +33,7 @@ public:
     ArchidektApiResponseCard getCard() const
     {
         return card;
-    };
+    }
 
     QList<Category> getCategories() const
     {

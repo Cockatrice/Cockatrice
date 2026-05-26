@@ -61,24 +61,30 @@ inline QString expandPattern(const QString &pattern,
     QString result = pattern;
 
     auto replaceIfPresent = [&](const QString &token, const QString &value) -> bool {
-        if (!result.contains(token))
+        if (!result.contains(token)) {
             return true;
+        }
 
-        if (value.isEmpty())
+        if (value.isEmpty()) {
             return false;
+        }
 
         result.replace(token, value);
         return true;
     };
 
-    if (!replaceIfPresent("{name}", name))
+    if (!replaceIfPresent("{name}", name)) {
         return {};
-    if (!replaceIfPresent("{set}", set))
+    }
+    if (!replaceIfPresent("{set}", set)) {
         return {};
-    if (!replaceIfPresent("{collector}", collector))
+    }
+    if (!replaceIfPresent("{collector}", collector)) {
         return {};
-    if (!replaceIfPresent("{providerId}", providerId))
+    }
+    if (!replaceIfPresent("{providerId}", providerId)) {
         return {};
+    }
 
     return result;
 }
@@ -96,8 +102,9 @@ generateImportVariants(const QString &name, const QString &set, const QString &c
             pattern.replace("_", sep);
 
             QString v = expandPattern(pattern, name, set, collector, providerId);
-            if (!v.isEmpty())
+            if (!v.isEmpty()) {
                 variants << v;
+            }
         }
     }
 

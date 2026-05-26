@@ -29,25 +29,29 @@ bool DeckListSortFilterProxyModel::lessThan(const QModelIndex &left, const QMode
             QString ln = lNode->getName();
             QString rn = rNode->getName();
             int cmp = ln.localeAwareCompare(rn);
-            if (cmp != 0)
+            if (cmp != 0) {
                 return cmp < 0;
+            }
         } else if (crit == "cmc") {
             int lc = lInfo ? lInfo->getCmc().toInt() : 0;
             int rc = rInfo ? rInfo->getCmc().toInt() : 0;
-            if (lc != rc)
+            if (lc != rc) {
                 return lc < rc;
+            }
         } else if (crit == "colors") {
             QString lr = lInfo ? lInfo->getColors() : QString();
             QString rr = rInfo ? rInfo->getColors() : QString();
             int cmp = lr.localeAwareCompare(rr);
-            if (cmp != 0)
+            if (cmp != 0) {
                 return cmp < 0;
+            }
         } else if (crit == "maintype") {
             QString lr = lInfo ? lInfo->getMainCardType() : QString();
             QString rr = rInfo ? rInfo->getMainCardType() : QString();
             int cmp = lr.localeAwareCompare(rr);
-            if (cmp != 0)
+            if (cmp != 0) {
                 return cmp < 0;
+            }
         }
     }
 
