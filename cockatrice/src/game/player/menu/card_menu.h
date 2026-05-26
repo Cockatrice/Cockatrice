@@ -7,9 +7,8 @@
 #ifndef COCKATRICE_CARD_MENU_H
 #define COCKATRICE_CARD_MENU_H
 
-#include "libcockatrice/utility/card_ref.h"
-
 #include <QMenu>
+#include <libcockatrice/utility/card_ref.h>
 
 class CardItem;
 class PlayerGraphicsItem;

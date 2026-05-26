@@ -6,7 +6,6 @@
 #include "../board/arrow_item.h"
 #include "../board/card_item.h"
 #include "../board/card_list.h"
-#include "libcockatrice/utility/color.h"
 #include "player_actions.h"
 #include "player_logic.h"
 
@@ -33,6 +32,7 @@
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
+#include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/zone_names.h>
 
 PlayerEventHandler::PlayerEventHandler(PlayerLogic *_player) : QObject(_player), player(_player)
