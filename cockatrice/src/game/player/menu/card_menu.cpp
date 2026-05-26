@@ -39,6 +39,9 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
         playersInfo.append(qMakePair(playerToAdd->getPlayerInfo()->getName(), playerToAdd->getPlayerInfo()->getId()));
     }
 
+    connect(player->getLogic()->getGame()->getPlayerManager(), &PlayerManager::playerRemoved, this,
+            &CardMenu::removePlayer);
+
     auto *actions = player->getLogic()->getPlayerActions();
     auto *gameScene = player->getGameScene();
 
