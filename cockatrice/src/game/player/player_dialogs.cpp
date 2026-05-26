@@ -147,7 +147,7 @@ void PlayerDialogs::onMoveTopCardsUntilDialogRequested(MoveTopCardsUntilOptions 
     if (!dlg.exec()) {
         return;
     }
-    playerActions->moveTopCardsUntil(dlg.getExpr(), options);
+    playerActions->moveTopCardsUntil(dlg.getExpr(), dlg.getOptions());
 }
 
 void PlayerDialogs::onMoveBottomCardsToDialogRequested(int defaultNumberBottomCards,
