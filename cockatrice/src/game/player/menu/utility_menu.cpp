@@ -99,7 +99,7 @@ void UtilityMenu::populatePredefinedTokensMenu()
 
 void UtilityMenu::setLastToken(CardInfoPtr lastToken)
 {
-    if (createAnotherTokenActionExists()) {
+    if (!createAnotherTokenActionExists()) {
         return;
     }
 
