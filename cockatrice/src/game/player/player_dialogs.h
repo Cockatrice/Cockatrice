@@ -2,6 +2,7 @@
 #define COCKATRICE_PLAYER_DIALOGS_H
 #include "player_actions.h"
 
+#include <QGraphicsView>
 #include <QObject>
 
 class PlayerDialogs : public QObject
@@ -10,7 +11,7 @@ class PlayerDialogs : public QObject
     Q_OBJECT
 
 public:
-    explicit PlayerDialogs(PlayerGraphicsItem *player, QWidget *dialogParent, PlayerActions *playerActions);
+    explicit PlayerDialogs(PlayerGraphicsItem *player, PlayerActions *playerActions);
 
 signals:
     void requestDialogSemaphore(bool active);
@@ -44,8 +45,17 @@ public slots:
 
 private:
     PlayerGraphicsItem *player;
-    QWidget *dialogParent;
     PlayerActions *playerActions;
+
+    QWidget *dialogParent() const
+    {
+        if (auto *s = player->scene()) {
+            if (auto *v = s->views().value(0)) {
+                return v->window();
+            }
+        }
+        return nullptr;
+    }
 };
 
 #endif // COCKATRICE_PLAYER_DIALOGS_H

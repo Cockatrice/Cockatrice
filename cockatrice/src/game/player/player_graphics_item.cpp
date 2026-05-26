@@ -45,12 +45,7 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
         }
     });
 
-    QWidget *dialogParent = nullptr;
-    if (auto *view = scene() ? scene()->views().value(0) : nullptr) {
-        dialogParent = view->window();
-    }
-
-    playerDialogs = new PlayerDialogs(this, dialogParent, player->getPlayerActions());
+    playerDialogs = new PlayerDialogs(this, player->getPlayerActions());
 
     playerArea = new PlayerArea(this);
 
