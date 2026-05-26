@@ -18,18 +18,18 @@ PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_
     playerMenu = new TearOffMenu();
 
     if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
-        handMenu = addManagedMenu<HandMenu>(player->getLogic(), player->getLogic()->getPlayerActions(), playerMenu);
-        libraryMenu = addManagedMenu<LibraryMenu>(player->getLogic(), playerMenu);
+        handMenu = addManagedMenu<HandMenu>(player, playerMenu);
+        libraryMenu = addManagedMenu<LibraryMenu>(player, playerMenu);
     } else {
         handMenu = nullptr;
         libraryMenu = nullptr;
     }
 
-    graveMenu = addManagedMenu<GraveyardMenu>(player->getLogic(), playerMenu);
-    rfgMenu = addManagedMenu<RfgMenu>(player->getLogic(), playerMenu);
+    graveMenu = addManagedMenu<GraveyardMenu>(player, playerMenu);
+    rfgMenu = addManagedMenu<RfgMenu>(player, playerMenu);
 
     if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
-        sideboardMenu = addManagedMenu<SideboardMenu>(player->getLogic(), playerMenu);
+        sideboardMenu = addManagedMenu<SideboardMenu>(player, playerMenu);
         customZonesMenu = addManagedMenu<CustomZoneMenu>(player);
         playerMenu->addSeparator();
 
@@ -44,7 +44,7 @@ PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_
     }
 
     if (player->getLogic()->getPlayerInfo()->getLocal()) {
-        sayMenu = addManagedMenu<SayMenu>(player->getLogic());
+        sayMenu = addManagedMenu<SayMenu>(player);
     } else {
         sayMenu = nullptr;
     }
