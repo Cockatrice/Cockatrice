@@ -267,6 +267,7 @@ void PlayerDialogs::onSetAnnotationDialogRequested(const QString &oldAnnotation)
         return;
     }
     QString annotation = dialog->textValue().left(MAX_NAME_LENGTH);
+    playerActions->actSetAnnotation(player->getGameScene()->selectedCards(), annotation);
 }
 
 void PlayerDialogs::onSetCardCounterDialogRequested(int counterId, const QString &oldValueForDlg)
