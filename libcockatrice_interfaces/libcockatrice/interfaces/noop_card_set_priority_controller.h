@@ -29,8 +29,9 @@ public:
         return true;
     }
 
-    void saveSets(const QVector<SetSaveData> & /* data */) override {
-    };
+    void saveSets(const QVector<SetSaveData> & /* data */) override
+    {
+    }
 };
 
 #endif // COCKATRICE_NOOP_CARD_SET_PRIORITY_CONTROLLER_H

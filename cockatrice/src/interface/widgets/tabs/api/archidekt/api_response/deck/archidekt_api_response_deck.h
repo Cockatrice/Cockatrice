@@ -27,7 +27,7 @@ public:
     QVector<ArchidektApiResponseCardEntry> getCards() const
     {
         return cards;
-    };
+    }
 
     QVector<ArchidektApiResponseDeckCategory> getCategories() const
     {
@@ -37,7 +37,7 @@ public:
     QString getDeckName() const
     {
         return name;
-    };
+    }
 
     int getDeckFormat() const
     {

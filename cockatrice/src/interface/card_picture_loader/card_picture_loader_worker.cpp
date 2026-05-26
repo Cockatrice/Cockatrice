@@ -28,8 +28,9 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
                                static_cast<qint64>(SettingsCache::instance().getNetworkCacheSizeInMB()));
 
     connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, cache, [this](int newSizeInMB) {
-        if (cache)
+        if (cache) {
             cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB));
+        }
     });
 
     networkManager->setCache(cache);

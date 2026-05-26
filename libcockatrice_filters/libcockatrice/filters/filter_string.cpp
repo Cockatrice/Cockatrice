@@ -251,20 +251,27 @@ static void setupParserRules()
         const auto arg = std::any_cast<int>(sv[1]);
         const auto op = std::any_cast<QString>(sv[0]);
 
-        if (op == ">")
+        if (op == ">") {
             return [=](const int s) { return s > arg; };
-        if (op == ">=")
+        }
+        if (op == ">=") {
             return [=](const int s) { return s >= arg; };
-        if (op == "<")
+        }
+        if (op == "<") {
             return [=](const int s) { return s < arg; };
-        if (op == "<=")
+        }
+        if (op == "<=") {
             return [=](const int s) { return s <= arg; };
-        if (op == "=")
+        }
+        if (op == "=") {
             return [=](const int s) { return s == arg; };
-        if (op == ":")
+        }
+        if (op == ":") {
             return [=](const int s) { return s == arg; };
-        if (op == "!=")
+        }
+        if (op == "!=") {
             return [=](const int s) { return s != arg; };
+        }
         return [](int) { return false; };
     };
 
@@ -315,8 +322,9 @@ static void setupParserRules()
                     return true;
                 }
 
-                if (parts.contains("c") && match.length() == 0)
+                if (parts.contains("c") && match.length() == 0) {
                     return true;
+                }
 
                 auto containsColor = [&parts](const QString &s) { return parts.contains(s); };
                 return std::any_of(match.begin(), match.end(), containsColor);

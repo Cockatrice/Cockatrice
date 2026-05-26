@@ -108,8 +108,9 @@ void FlowWidget::clearLayout()
     if (flowLayout) {
         QLayoutItem *item;
         while ((item = flowLayout->takeAt(0))) {
-            if (item->widget())
+            if (item->widget()) {
                 item->widget()->deleteLater();
+            }
             delete item;
         }
     } else {

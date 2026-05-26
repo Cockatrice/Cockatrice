@@ -174,7 +174,8 @@ void VisualDatabaseDisplayFilterToolbarWidget::updateCompactMode(int availableWi
     };
 
     for (auto *btn : filterButtons) {
-        if (btn->isCompact() != compact) // only act on transitions
+        if (btn->isCompact() != compact) { // only act on transitions
             btn->setCompact(compact);
+        }
     }
 }
