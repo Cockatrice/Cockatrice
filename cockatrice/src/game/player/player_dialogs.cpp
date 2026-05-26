@@ -97,7 +97,7 @@ void PlayerDialogs::onShuffleBottomDialogRequested(int defaultNumberBottomCards,
     int number = QInputDialog::getInt(dialogParent, tr("Shuffle bottom cards of library"),
                                       tr("Number of cards: (max. %1)").arg(maxCards), defaultNumberBottomCards, 1,
                                       maxCards, 1, &ok);
-    if (!ok) {
+    if (ok) {
         playerActions->actShuffleBottom(number);
     }
 }
