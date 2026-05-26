@@ -51,11 +51,11 @@ private:
     CardDatabase *db;
     bool showOnlyCardsFromEnabledSets;
 
-    inline bool checkCardHasAtLeastOneEnabledSet(CardInfoPtr card);
+    inline bool checkCardHasAtLeastOneEnabledSet(const CardInfoPtr &card) const;
 private slots:
-    void cardAdded(CardInfoPtr card);
+    void cardAdded(const CardInfoPtr &card);
     void cardRemoved(CardInfoPtr card);
-    void cardInfoChanged(CardInfoPtr card);
+    void cardInfoChanged(const CardInfoPtr &card);
     void cardDatabaseEnabledSetsChanged();
 };
 
