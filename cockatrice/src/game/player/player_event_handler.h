@@ -83,6 +83,7 @@ signals:
     void logAlwaysRevealTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
     void logAlwaysLookAtTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
     void cardZoneChanged(CardItem *card, bool sameZone);
+    void requestCardMenuUpdate(const CardItem *card);
 
 public:
     PlayerEventHandler(PlayerLogic *player);

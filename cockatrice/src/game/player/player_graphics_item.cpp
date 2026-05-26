@@ -8,6 +8,9 @@
 #include "../board/abstract_card_item.h"
 #include "../board/counter_general.h"
 #include "../hand_counter.h"
+#include "player_actions.h"
+
+#include <QGraphicsView>
 
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 {
@@ -16,23 +19,26 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
     connect(&SettingsCache::instance(), &SettingsCache::handJustificationChanged, this,
             &PlayerGraphicsItem::rearrangeZones);
     connect(player, &PlayerLogic::rearrangeCounters, this, &PlayerGraphicsItem::rearrangeCounters);
+    connect(player, &PlayerLogic::activeChanged, this, &PlayerGraphicsItem::onPlayerActiveChanged);
     connect(player, &PlayerLogic::concededChanged, this, [this](int, bool c) { setVisible(!c); });
     connect(player, &PlayerLogic::zoneIdChanged, this, [this](int id) { playerArea->setPlayerZoneId(id); });
 
     connect(player, &PlayerLogic::counterAdded, this, &PlayerGraphicsItem::onCounterAdded);
     connect(player, &PlayerLogic::counterRemoved, this, &PlayerGraphicsItem::onCounterRemoved);
 
-    connect(player->getPlayerMenu(), &PlayerMenu::shortcutsActivated, this, [this]() {
+    playerMenu = new PlayerMenu(this);
+
+    connect(playerMenu, &PlayerMenu::shortcutsActivated, this, [this]() {
         for (auto *ctr : counterWidgets) {
             ctr->setShortcutsActive();
         }
     });
-    connect(player->getPlayerMenu(), &PlayerMenu::shortcutsDeactivated, this, [this]() {
+    connect(playerMenu, &PlayerMenu::shortcutsDeactivated, this, [this]() {
         for (auto *ctr : counterWidgets) {
             ctr->setShortcutsInactive();
         }
     });
-    connect(player->getPlayerMenu(), &PlayerMenu::retranslateRequested, this, [this]() {
+    connect(playerMenu, &PlayerMenu::retranslateRequested, this, [this]() {
         for (auto *ctr : counterWidgets) {
             ctr->retranslateUi();
         }
@@ -47,6 +53,8 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 
     initializeZones();
 
+    playerMenu->setMenusForGraphicItems();
+
     connect(tableZoneGraphicsItem, &TableZone::sizeChanged, this, &PlayerGraphicsItem::updateBoundingRect);
 
     updateBoundingRect();
@@ -57,7 +65,7 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 
 void PlayerGraphicsItem::retranslateUi()
 {
-    player->getPlayerMenu()->retranslateUi();
+    playerMenu->retranslateUi();
 
     QMapIterator<QString, CardZoneLogic *> zoneIterator(player->getZones());
     while (zoneIterator.hasNext()) {
@@ -93,14 +101,16 @@ void PlayerGraphicsItem::initializeZones()
     rfgZoneGraphicsItem = new PileZone(player->getRfgZone(), this);
     rfgZoneGraphicsItem->setPos(base + QPointF(0, 2 * h + h2 + 10));
 
-    tableZoneGraphicsItem = new TableZone(player->getTableZone(), this);
+    tableZoneGraphicsItem = new TableZone(player->getTableZone(), mirrored, this);
     connect(tableZoneGraphicsItem, &TableZone::sizeChanged, this, &PlayerGraphicsItem::updateBoundingRect);
+    connect(this, &PlayerGraphicsItem::mirroredChanged, tableZoneGraphicsItem, &TableZone::setMirrored);
 
     stackZoneGraphicsItem =
         new StackZone(player->getStackZone(), static_cast<int>(tableZoneGraphicsItem->boundingRect().height()), this);
 
     handZoneGraphicsItem =
         new HandZone(player->getHandZone(), static_cast<int>(tableZoneGraphicsItem->boundingRect().height()), this);
+    connect(player->getPlayerActions(), &PlayerActions::requestSortHand, handZoneGraphicsItem, &HandZone::sortHand);
 
     connect(handZoneGraphicsItem->getLogic(), &HandZoneLogic::cardCountChanged, handCounter,
             &HandCounter::updateNumber);
@@ -145,6 +155,7 @@ void PlayerGraphicsItem::setMirrored(bool _mirrored)
 {
     if (mirrored != _mirrored) {
         mirrored = _mirrored;
+        emit mirroredChanged(mirrored);
         rearrangeZones();
     }
 }
@@ -159,11 +170,11 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
     }
     counterWidgets.insert(state->getId(), widget);
 
-    if (player->getPlayerMenu()->getCountersMenu() && widget->getMenu()) {
-        player->getPlayerMenu()->getCountersMenu()->addMenu(widget->getMenu());
+    if (playerMenu->getCountersMenu() && widget->getMenu()) {
+        playerMenu->getCountersMenu()->addMenu(widget->getMenu());
     }
 
-    if (player->getPlayerMenu()->getShortcutsActive()) {
+    if (playerMenu->getShortcutsActive()) {
         widget->setShortcutsActive();
     }
 
@@ -176,8 +187,8 @@ void PlayerGraphicsItem::onCounterRemoved(int counterId)
     if (!widget) {
         return;
     }
-    if (player->getPlayerMenu()->getCountersMenu() && widget->getMenu()) {
-        player->getPlayerMenu()->getCountersMenu()->removeAction(widget->getMenu()->menuAction());
+    if (playerMenu->getCountersMenu() && widget->getMenu()) {
+        playerMenu->getCountersMenu()->removeAction(widget->getMenu()->menuAction());
     }
     widget->delCounter();
     rearrangeCounters();

@@ -40,7 +40,7 @@ void CardItem::prepareDelete()
 {
     if (owner != nullptr) {
         if (owner->getGame()->getActiveCard() == this) {
-            owner->getPlayerMenu()->updateCardMenu(nullptr);
+            emit owner->requestCardMenuUpdate(nullptr);
             owner->getGame()->setActiveCard(nullptr);
         }
         owner = nullptr;
@@ -399,8 +399,11 @@ void CardItem::playCard(bool faceDown)
         emit tz->toggleTapped();
     } else {
         if (SettingsCache::instance().getClickPlaysAllSelected()) {
-            faceDown ? state->getZone()->getPlayer()->getPlayerActions()->actPlayFacedown()
-                     : state->getZone()->getPlayer()->getPlayerActions()->actPlay();
+            if (faceDown) {
+                emit playSelectedFaceDown(this);
+            } else {
+                emit playSelected(this);
+            }
         } else {
             state->getZone()->getPlayer()->getPlayerActions()->playCard(this, faceDown);
         }
@@ -460,7 +463,7 @@ void CardItem::handleClickedToPlay(bool shiftHeld)
 {
     if (isUnwritableRevealZone(state->getZone())) {
         if (SettingsCache::instance().getClickPlaysAllSelected()) {
-            state->getZone()->getPlayer()->getPlayerActions()->actHide();
+            emit hideSelected(this);
         } else {
             state->getZone()->removeCard(this);
         }
@@ -471,17 +474,12 @@ void CardItem::handleClickedToPlay(bool shiftHeld)
 
 void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::RightButton) {
-
-        if (owner != nullptr) {
-            owner->getGame()->setActiveCard(this);
-            if (QMenu *cardMenu = owner->getPlayerMenu()->updateCardMenu(this)) {
-                cardMenu->popup(event->screenPos());
-                return;
-            }
-        }
-    } else if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
-               (!SettingsCache::instance().getDoubleClickToPlay())) {
+    if (event->button() == Qt::RightButton && owner != nullptr) {
+        emit rightClicked(this, event->screenPos());
+        return;
+    }
+    if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
+        (!SettingsCache::instance().getDoubleClickToPlay())) {
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
 
@@ -531,14 +529,14 @@ bool CardItem::animationEvent()
 QVariant CardItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if ((change == ItemSelectedHasChanged) && owner != nullptr) {
-        if (value == true) {
-            owner->getGame()->setActiveCard(this);
-            owner->getPlayerMenu()->updateCardMenu(this);
-        } else if (owner->getGameScene()->selectedItems().isEmpty()) {
+        bool selected = value.toBool();
 
-            owner->getGame()->setActiveCard(nullptr);
-            owner->getPlayerMenu()->updateCardMenu(nullptr);
+        if (selected) {
+            owner->getGame()->setActiveCard(this);
         }
+
+        emit selectionChanged(this, selected);
     }
+
     return AbstractCardItem::itemChange(change, value);
 }

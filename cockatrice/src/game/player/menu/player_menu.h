@@ -8,7 +8,6 @@
 #define COCKATRICE_PLAYER_MENU_H
 
 #include "../../../interface/widgets/menus/tearoff_menu.h"
-#include "../player_logic.h"
 #include "custom_zone_menu.h"
 #include "grave_menu.h"
 #include "hand_menu.h"
@@ -23,28 +22,30 @@
 #include <QObject>
 
 class CardItem;
+class CardMenu;
+class PlayerGraphicsItem;
 class PlayerMenu : public QObject
 {
     Q_OBJECT
 
 signals:
-    void cardMenuUpdated(QMenu *cardMenu);
+    void cardMenuUpdated(CardMenu *cardMenu);
+    void cardInfoRequested(const CardRef &cardRef);
     void shortcutsActivated();
     void shortcutsDeactivated();
     void retranslateRequested();
 
 public slots:
     void setMenusForGraphicItems();
+    QMenu *updateCardMenu(const CardItem *card);
 
 private slots:
     void refreshShortcuts();
 
 public:
-    explicit PlayerMenu(PlayerLogic *player);
+    explicit PlayerMenu(PlayerGraphicsItem *player);
     /** @brief Retranslate all user-visible strings. Called on language change. */
     void retranslateUi();
-
-    QMenu *updateCardMenu(const CardItem *card);
 
     [[nodiscard]] QMenu *getPlayerMenu() const
     {
@@ -77,7 +78,7 @@ public:
     void setShortcutsInactive();
 
 private:
-    PlayerLogic *player;
+    PlayerGraphicsItem *player;
     TearOffMenu *playerMenu;
     QMenu *countersMenu;
     HandMenu *handMenu;

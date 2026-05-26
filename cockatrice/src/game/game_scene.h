@@ -97,6 +97,16 @@ public:
      */
     void removePlayer(PlayerLogic *player);
 
+    QMap<int, PlayerGraphicsItem *> getPlayers() const
+    {
+        return playerViews;
+    }
+
+    PlayerGraphicsItem *viewForPlayer(int playerId)
+    {
+        return playerViews.value(playerId);
+    }
+
     /**
      * @brief Adjusts the global rotation offset for player layout.
      * @param rotationAdjustment Number of positions to rotate.
@@ -182,6 +192,11 @@ public:
     void stopRubberBand();
 
 public slots:
+    void onCardSelectionChanged(AbstractCardItem *card, bool selected);
+    void onCardRightClicked(AbstractCardItem *card, QPoint screenPos);
+    void playSelected(AbstractCardItem *card);
+    void playSelectedFaceDown(AbstractCardItem *card);
+    void hideSelected(AbstractCardItem *card);
     /** @brief Toggles a zone view for a player. */
     void toggleZoneView(PlayerLogic *player, const QString &zoneName, int numberCards, bool isReversed = false);
 
