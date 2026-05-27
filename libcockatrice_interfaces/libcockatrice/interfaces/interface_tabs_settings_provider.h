@@ -19,6 +19,7 @@ public:
     [[nodiscard]] virtual bool getTabReplaysOpen() const = 0;
     [[nodiscard]] virtual bool getTabAdminOpen() const = 0;
     [[nodiscard]] virtual bool getTabLogOpen() const = 0;
+    [[nodiscard]] virtual bool getTabReportOpen() const = 0;
 };
 
 #endif // COCKATRICE_INTERFACE_TABS_SETTINGS_PROVIDER_H

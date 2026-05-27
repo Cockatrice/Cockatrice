@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "response.proto";
+import "serverinfo_report.proto";
+
+message Response_ReportList {
+    extend Response {
+        optional Response_ReportList ext = 1210;
+    }
+    repeated ServerInfo_Report reports = 1;
+}

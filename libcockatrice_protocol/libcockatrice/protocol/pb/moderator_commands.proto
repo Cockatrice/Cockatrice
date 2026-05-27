@@ -14,6 +14,12 @@ message ModeratorCommand {
         ADD_CARD_ART_RULE = 1010;
         REMOVE_CARD_ART_RULE = 1011;
         LIST_CARD_ART_RULES = 1012;
+        REPORT_LIST = 1200;
+        REPORT_ASSIGN = 1201;
+        REPORT_RESOLVE = 1202;
+        REPLAY_DOWNLOAD_BY_GAME_ID = 1203;
+        REPORT_USER_INFO = 1204;
+        REPORT_STATS = 1205;
     }
     extensions 100 to max;
 }

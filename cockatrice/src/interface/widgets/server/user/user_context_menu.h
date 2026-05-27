@@ -41,6 +41,7 @@ private:
     QAction *aAddToBuddyList, *aRemoveFromBuddyList;
     QAction *aAddToIgnoreList, *aRemoveFromIgnoreList;
     QAction *aKick;
+    QAction *aReport;
     QAction *aBan, *aBanHistory;
     QAction *aPromoteToMod, *aDemoteFromMod;
     QAction *aPromoteToJudge, *aDemoteFromJudge;

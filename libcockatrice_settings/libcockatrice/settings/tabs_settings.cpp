@@ -96,6 +96,11 @@ void TabsSettings::setStartupRoomName(const QString &roomName)
     emit startupRoomNameChanged(roomName);
 }
 
+bool TabsSettings::getTabReportOpen() const
+{
+    return getValue("report", QString(), QString(), false).toBool();
+}
+
 void TabsSettings::setTabVisualDeckStorageOpen(bool value)
 {
     setValue(value, "visualDeckStorage");
@@ -129,4 +134,9 @@ void TabsSettings::setTabAdminOpen(bool value)
 void TabsSettings::setTabLogOpen(bool value)
 {
     setValue(value, "log");
+}
+
+void TabsSettings::setTabReportOpen(bool value)
+{
+    setValue(value, "report");
 }

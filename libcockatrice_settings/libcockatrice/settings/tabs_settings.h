@@ -41,6 +41,7 @@ public:
     [[nodiscard]] bool getTabReplaysOpen() const override;
     [[nodiscard]] bool getTabAdminOpen() const override;
     [[nodiscard]] bool getTabLogOpen() const override;
+    [[nodiscard]] bool getTabReportOpen() const override;
 
     void setStartupTabIndex(int value);
     void setStartupServerHost(const QString &host);
@@ -53,6 +54,7 @@ public:
     void setTabReplaysOpen(bool value);
     void setTabAdminOpen(bool value);
     void setTabLogOpen(bool value);
+    void setTabReportOpen(bool value);
 
 signals:
     void startupTabIndexChanged(int index);

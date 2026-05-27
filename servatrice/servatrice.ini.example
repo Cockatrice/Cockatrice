@@ -373,6 +373,13 @@ command_counting_interval=10
 ; Maximum number of game commands in an interval before new commands gets dropped; default is 20
 max_command_count_per_interval=20
 
+[reporting]
+; Maximum number of user reports a single user can file per day; default is 10; set to 0 to disable the limit
+max_reports_per_day=10
+
+; Maximum number of report comments a single user can post per hour; default is 30; set to 0 to disable the limit
+max_comments_per_hour=30
+
 [logging]
 ; Admin/Moderators can query the stored logs for information when looking up reports by various players. This
 ; option can allow or disallow them from doing so.

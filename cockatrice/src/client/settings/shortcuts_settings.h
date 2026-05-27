@@ -786,6 +786,8 @@ private:
                                        ShortcutGroup::Tabs)},
         {"Tabs/aTabLogs",
          ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Logs"), parseSequenceString(""), ShortcutGroup::Tabs)},
+        {"Tabs/aTabReport",
+         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Report Queue"), parseSequenceString(""), ShortcutGroup::Tabs)},
     };
 };
 

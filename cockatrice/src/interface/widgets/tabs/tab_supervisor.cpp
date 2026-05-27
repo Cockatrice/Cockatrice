@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../intents/intent_join_server_game.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
@@ -19,6 +20,7 @@
 #include "tab_logs.h"
 #include "tab_message.h"
 #include "tab_replays.h"
+#include "tab_report.h"
 #include "tab_room.h"
 #include "tab_server.h"
 #include "tab_visual_database_display.h"
@@ -31,6 +33,7 @@
 #include <QPainter>
 #include <QSystemTrayIcon>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/protocol/pb/event_game_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_notify_user.pb.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
@@ -39,6 +42,7 @@
 #include <libcockatrice/protocol/pb/room_event.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
@@ -113,7 +117,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
     : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr),
       tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr),
-      tabLog(nullptr), isLocalGame(false)
+      tabLog(nullptr), tabReport(nullptr), isLocalGame(false)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -190,6 +194,10 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabLog->setCheckable(true);
     connect(aTabLog, &QAction::triggered, this, &TabSupervisor::actTabLog);
 
+    aTabReport = new QAction(this);
+    aTabReport->setCheckable(true);
+    connect(aTabReport, &QAction::triggered, this, &TabSupervisor::actTabReport);
+
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabSupervisor::refreshShortcuts);
     refreshShortcuts();
@@ -229,6 +237,7 @@ void TabSupervisor::retranslateUi()
     aTabReplays->setText(tr("Game Replays"));
     aTabAdmin->setText(tr("Administration"));
     aTabLog->setText(tr("Logs"));
+    aTabReport->setText(tr("Report Queue"));
 
     // tabs
     QList<Tab *> tabs;
@@ -238,6 +247,7 @@ void TabSupervisor::retranslateUi()
     tabs.append(tabAdmin);
     tabs.append(tabAccount);
     tabs.append(tabLog);
+    tabs.append(tabReport);
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext()) {
         tabs.append(roomIterator.next().value());
@@ -284,6 +294,7 @@ void TabSupervisor::refreshShortcuts()
     aTabReplays->setShortcuts(shortcuts.getShortcut("Tabs/aTabReplays"));
     aTabAdmin->setShortcuts(shortcuts.getShortcut("Tabs/aTabAdmin"));
     aTabLog->setShortcuts(shortcuts.getShortcut("Tabs/aTabLog"));
+    aTabReport->setShortcuts(shortcuts.getShortcut("Tabs/aTabReport"));
 }
 
 void TabSupervisor::closeEvent(QCloseEvent *event)
@@ -485,12 +496,16 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         tabsMenu->addAction(aTabAdmin);
         tabsMenu->addAction(aTabLog);
         tabsMenu->addAction(aTabCardArtRules);
+        tabsMenu->addAction(aTabReport);
 
         if (SettingsCache::instance().tabs().getTabAdminOpen()) {
             openTabAdmin();
         }
         if (SettingsCache::instance().tabs().getTabLogOpen()) {
             openTabLog();
+        }
+        if (SettingsCache::instance().tabs().getTabReportOpen()) {
+            openTabReport();
         }
         openTabCardArtRules();
     }
@@ -505,6 +520,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     tabAccount = nullptr;
     tabAdmin = nullptr;
     tabLog = nullptr;
+    tabReport = nullptr;
     isLocalGame = true;
     userInfo = new ServerInfo_User;
     localClients = _clients;
@@ -545,6 +561,9 @@ void TabSupervisor::stop()
         }
         if (tabLog) {
             tabLog->close();
+        }
+        if (tabReport) {
+            tabReport->close();
         }
     }
 
@@ -783,6 +802,30 @@ void TabSupervisor::openTabLog()
     aTabLog->setChecked(true);
 }
 
+void TabSupervisor::actTabReport(bool checked)
+{
+    SettingsCache::instance().tabs().setTabReportOpen(checked);
+    if (checked && !tabReport) {
+        openTabReport();
+        setCurrentWidget(tabReport);
+    } else if (!checked && tabReport) {
+        tabReport->closeRequest();
+    }
+}
+
+void TabSupervisor::openTabReport()
+{
+    tabReport = new TabReport(this, client);
+    myAddTab(tabReport, aTabReport);
+    connect(tabReport, &TabReport::openReplay, this, &TabSupervisor::openReplay);
+    connect(tabReport, &TabReport::requestJoinGame, this, &TabSupervisor::joinReportGame);
+    connect(tabReport, &QObject::destroyed, this, [this] {
+        tabReport = nullptr;
+        aTabReport->setChecked(false);
+    });
+    aTabReport->setChecked(true);
+}
+
 void TabSupervisor::updatePingTime(int value, int max)
 {
     if (!tabServer) {
@@ -898,6 +941,30 @@ void TabSupervisor::replayLeft(TabGame *tab)
     }
 
     replayTabs.removeOne(tab);
+}
+
+void TabSupervisor::joinReportGame(const int gameId, const int roomId)
+{
+    auto *remoteClient = qobject_cast<RemoteClient *>(client);
+    if (!remoteClient) {
+        actShowPopup(tr("Report joins are only available on a remote server."));
+        return;
+    }
+
+    auto ctx = std::make_unique<ContextJoinGame>();
+    ctx->roomContext.serverContext.hostname = remoteClient->peerName();
+    ctx->roomContext.serverContext.port = QString::number(remoteClient->peerPort());
+    ctx->roomContext.roomId = roomId;
+    ctx->gameId = gameId;
+    ctx->asSpectator = true;
+
+    auto *joinGameIntent = new IntentJoinServerGame(this, remoteClient, std::move(ctx));
+    joinGameIntent->setParent(this);
+    connect(joinGameIntent, &Intent::failed, this, [gameId](const QString &reason) {
+        actShowPopup(tr("Could not join game %1.\n%2").arg(gameId).arg(reason));
+    });
+
+    joinGameIntent->execute();
 }
 
 TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus)
@@ -1281,6 +1348,24 @@ void TabSupervisor::processNotifyUserEvent(const Event_NotifyUser &event)
                 msgBox.setDetailedText(QString::fromStdString(event.custom_content()).simplified());
                 msgBox.setMinimumWidth(200);
                 msgBox.exec();
+            }
+            break;
+        }
+        case Event_NotifyUser::REPORT_RESOLVED: {
+            QString title = QString::fromStdString(event.custom_title()).simplified();
+            QString content = QString::fromStdString(event.custom_content()).trimmed();
+            if (!title.isEmpty() && !content.isEmpty()) {
+                actShowPopup(title + "\n" + content);
+                QApplication::alert(this);
+            }
+            break;
+        }
+        case Event_NotifyUser::REPORT_COMMENT: {
+            QString title = QString::fromStdString(event.custom_title()).simplified();
+            QString content = QString::fromStdString(event.custom_content()).trimmed();
+            if (!title.isEmpty() && !content.isEmpty()) {
+                actShowPopup(title + "\n" + content);
+                QApplication::alert(this);
             }
             break;
         }

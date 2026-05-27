@@ -20,6 +20,7 @@
 #ifndef SERVATRICE_H
 #define SERVATRICE_H
 
+#include <QDateTime>
 #include <QHostAddress>
 #include <QMetaType>
 #include <QMutex>
@@ -29,6 +30,8 @@
 #include <QSslKey>
 #include <QTcpServer>
 #include <QWebSocketServer>
+#include <libcockatrice/protocol/pb/response_report_stats.pb.h>
+#include <memory>
 #include <server.h>
 #include <utility>
 
@@ -173,6 +176,11 @@ private:
     int nextShutdownMessageMinutes;
     QTimer *shutdownTimer;
 
+    mutable QMutex reportStatsMutex;
+    QDateTime reportStatsTimestamp;
+    std::shared_ptr<const Response_ReportStats> reportStatsCache;
+    static constexpr int reportStatsCacheTtlSeconds = 60;
+
     mutable QMutex serverListMutex;
     QList<ServerProperties> serverList;
     void updateServerList();
@@ -282,6 +290,11 @@ public:
     void addIslInterface(int _serverId, IslInterface *interface);
     void removeIslInterface(int _serverId);
     QReadWriteLock islLock;
+
+    // The moderation queue statistics are shared between all connected moderators and
+    // cached briefly to avoid re-running several full-table queries on every refresh.
+    std::shared_ptr<const Response_ReportStats> getCachedReportStats() const;
+    void cacheReportStats(const Response_ReportStats &stats);
 
     QList<ServerProperties> getServerList() const;
 };

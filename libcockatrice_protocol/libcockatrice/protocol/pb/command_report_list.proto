@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "moderator_commands.proto";
+
+message Command_ReportList {
+    extend ModeratorCommand {
+        optional Command_ReportList ext = 1200;
+    }
+    optional bool unresolved_only = 1;
+}

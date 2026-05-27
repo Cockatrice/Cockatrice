@@ -1,5 +1,6 @@
 #include "user_context_menu.h"
 
+#include "../../dialogs/dlg_report_user.h"
 #include "../../interface/widgets/tabs/tab_account.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
@@ -41,6 +42,7 @@ UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent,
     aAddToIgnoreList = new QAction(QString(), this);
     aRemoveFromIgnoreList = new QAction(QString(), this);
     aKick = new QAction(QString(), this);
+    aReport = new QAction(QString(), this);
     aWarnUser = new QAction(QString(), this);
     aWarnHistory = new QAction(QString(), this);
     aBan = new QAction(QString(), this);
@@ -64,6 +66,7 @@ void UserContextMenu::retranslateUi()
     aAddToIgnoreList->setText(tr("Add to &ignore list"));
     aRemoveFromIgnoreList->setText(tr("Remove from &ignore list"));
     aKick->setText(tr("Kick from &game"));
+    aReport->setText(tr("Report user"));
     aWarnUser->setText(tr("Warn user"));
     aWarnHistory->setText(tr("View user's war&n history"));
     aBan->setText(tr("Ban from &server"));
@@ -395,6 +398,9 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         aRemoveMessages = new QAction(tr("Remove this user's messages"), this);
         menu->addAction(aRemoveMessages);
     }
+    if (userListProxy->isOwnUserRegistered()) {
+        menu->addAction(aReport);
+    }
     if (game && (game->isHost() || !tabSupervisor->getAdminLocked())) {
         menu->addSeparator();
         menu->addAction(aKick);
@@ -431,6 +437,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     aDetails->setEnabled(true);
     aChat->setEnabled(anotherUser && online);
     aShowGames->setEnabled(online);
+    aReport->setEnabled(anotherUser);
     aAddToBuddyList->setEnabled(anotherUser);
     aRemoveFromBuddyList->setEnabled(anotherUser);
     aAddToIgnoreList->setEnabled(anotherUser);
@@ -462,6 +469,15 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         execRemoveFromIgnore(userName);
     } else if (actionClicked == aKick) {
         execKick(playerId);
+    } else if (actionClicked == aReport) {
+        int gameId = game ? game->getGameMetaInfo()->gameId() : -1;
+        QString autoChatLog;
+        if (chatView) {
+            autoChatLog = chatView->getRecentChatLog(50);
+        }
+        auto dlgReport = new DlgReportUser(client, userName, gameId, autoChatLog, static_cast<QWidget *>(parent()));
+        dlgReport->setAttribute(Qt::WA_DeleteOnClose);
+        dlgReport->exec();
     } else if (actionClicked == aBan) {
         execBan(userName);
     } else if (actionClicked == aPromoteToMod || actionClicked == aDemoteFromMod) {
