@@ -1,6 +1,7 @@
 #ifndef COCKATRICE_PLAYER_DIALOGS_H
 #define COCKATRICE_PLAYER_DIALOGS_H
 #include "../../game/player/player_actions.h"
+#include "player_graphics_item.h"
 
 #include <QGraphicsView>
 #include <QObject>

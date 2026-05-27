@@ -7,6 +7,8 @@
 
 #ifndef COCKATRICE_PLAYER_ACTIONS_H
 #define COCKATRICE_PLAYER_ACTIONS_H
+
+#include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/dialogs/dlg_create_token.h"
 #include "../../game_graphics/dialogs/dlg_move_top_cards_until.h"
 #include "../../game_graphics/player/card_menu_action_type.h"
@@ -26,7 +28,6 @@ class Message;
 }
 } // namespace google
 
-class CardItem;
 class Command_MoveCard;
 class GameEventContext;
 class PendingCommand;

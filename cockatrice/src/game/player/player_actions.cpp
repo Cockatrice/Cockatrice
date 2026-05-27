@@ -1,6 +1,5 @@
 #include "player_actions.h"
 
-#include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/dialogs/dlg_move_top_cards_until.h"
 #include "../../game_graphics/dialogs/dlg_roll_dice.h"
 #include "../../game_graphics/player/card_menu_action_type.h"

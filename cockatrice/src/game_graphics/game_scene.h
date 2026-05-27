@@ -1,7 +1,7 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
-#include "arrow_registry.h"
+#include "../game/arrow_registry.h"
 #include "../game/board/arrow_data.h"
 #include "../game/zones/card_zone_logic.h"
 #include "board/arrow_item.h"

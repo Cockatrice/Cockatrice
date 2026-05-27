@@ -1,7 +1,7 @@
 #ifndef ARROWITEM_H
 #define ARROWITEM_H
 
-#include "arrow_data.h"
+#include "../../game/board/arrow_data.h"
 #include "arrow_target.h"
 
 #include <QGraphicsItem>
