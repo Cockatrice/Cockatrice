@@ -81,7 +81,7 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
     }
 }
 
-void CardDatabaseModel::cardInfoChanged(CardInfoPtr card)
+void CardDatabaseModel::cardInfoChanged(const CardInfoPtr &card)
 {
     const int row = cardList.indexOf(card);
     if (row == -1) {
@@ -91,7 +91,7 @@ void CardDatabaseModel::cardInfoChanged(CardInfoPtr card)
     emit dataChanged(index(row, 0), index(row, CARDDBMODEL_COLUMNS - 1));
 }
 
-bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
+bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(const CardInfoPtr &card) const
 {
     if (!showOnlyCardsFromEnabledSets) {
         return true;
@@ -125,7 +125,7 @@ void CardDatabaseModel::cardDatabaseEnabledSetsChanged()
     }
 }
 
-void CardDatabaseModel::cardAdded(CardInfoPtr card)
+void CardDatabaseModel::cardAdded(const CardInfoPtr &card)
 {
     if (checkCardHasAtLeastOneEnabledSet(card)) {
         // add the card if it's present in at least one enabled set
