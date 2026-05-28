@@ -10,9 +10,26 @@
 #include "move_menu.h"
 #include "pt_menu.h"
 
+#include <QPainter>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/utility/zone_names.h>
+
+/**
+ * @brief Creates a circular icon filled with the specified color.
+ */
+static QIcon createCircleIcon(const QColor &color)
+{
+    QPixmap pixmap(32, 32);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(color);
+    painter.drawEllipse(pixmap.rect());
+
+    return QIcon(pixmap);
+}
 
 CardMenu::CardMenu(PlayerLogic *_player, const CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
@@ -77,9 +94,21 @@ CardMenu::CardMenu(PlayerLogic *_player, const CardItem *_card, bool _shortcutsA
     mCardCounters = new QMenu;
 
     for (int i = 0; i < 6; ++i) {
+        QColor color = SettingsCache::instance().cardCounters().color(i);
+        QIcon circleIcon = createCircleIcon(color);
+
         auto *tempAddCounter = new QAction(this);
+        tempAddCounter->setIconVisibleInMenu(true);
+        tempAddCounter->setIcon(circleIcon);
+
         auto *tempRemoveCounter = new QAction(this);
+        tempRemoveCounter->setIconVisibleInMenu(true);
+        tempRemoveCounter->setIcon(circleIcon);
+
         auto *tempSetCounter = new QAction(this);
+        tempSetCounter->setIconVisibleInMenu(true);
+        tempSetCounter->setIcon(circleIcon);
+
         aAddCounter.append(tempAddCounter);
         aRemoveCounter.append(tempRemoveCounter);
         aSetCounter.append(tempSetCounter);
