@@ -201,11 +201,11 @@ public slots:
     QTransform getViewTransform() const;
     QTransform getViewportTransform() const;
 
-    void onArrowCreateRequested(const ArrowData &data);
-    void onArrowDeleted(int arrowId);
-    void onArrowDeleteRequested(int arrowId);
+    void addArrow(const ArrowData &data);
+    void deleteArrow(int arrowId);
+    void requestArrowDeletion(int arrowId);
     void onCardZoneChanged(CardItem *card, bool sameZone);
-    void clearArrowsForPlayer(int playerId);
+    void requestClearArrowsForPlayer(int playerId);
 
 protected:
     /** @brief Handles hover updates. */
@@ -218,7 +218,7 @@ signals:
     void sigStartRubberBand(const QPointF &selectionOrigin);
     void sigResizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void sigStopRubberBand();
-    void requestArrowDeletion(int arrowId);
+    void arrowDeletionRequested(int arrowId);
 };
 
 #endif
