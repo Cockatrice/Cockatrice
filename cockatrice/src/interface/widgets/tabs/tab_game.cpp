@@ -608,7 +608,7 @@ void TabGame::actRemoveLocalArrows()
 {
     auto *local = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
     if (local) {
-        scene->clearArrowsForPlayer(local->getPlayerInfo()->getId());
+        scene->requestClearArrowsForPlayer(local->getPlayerInfo()->getId());
     }
 }
 
@@ -1150,9 +1150,9 @@ void TabGame::createPlayAreaWidget(bool bReplay)
     scene = new GameScene(phasesToolbar, this);
     connect(game->getPlayerManager(), &PlayerManager::playerConceded, scene, &GameScene::rearrange);
     connect(game->getPlayerManager(), &PlayerManager::playerCountChanged, scene, &GameScene::rearrange);
-    connect(scene, &GameScene::requestArrowDeletion, game->getGameEventHandler(),
+    connect(scene, &GameScene::arrowDeletionRequested, game->getGameEventHandler(),
             &GameEventHandler::handleArrowDeletion);
-    connect(game->getGameEventHandler(), &GameEventHandler::arrowDeleted, scene, &GameScene::onArrowDeleted);
+    connect(game->getGameEventHandler(), &GameEventHandler::arrowDeleted, scene, &GameScene::deleteArrow);
     gameView = new GameView(scene);
 
     auto gamePlayAreaVBox = new QVBoxLayout;
