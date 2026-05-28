@@ -32,6 +32,7 @@
 #include "server_spectator.h"
 
 #include <QDebug>
+#include <QLoggingCategory>
 #include <QRegularExpression>
 #include <QTimer>
 #include <google/protobuf/descriptor.h>
@@ -52,6 +53,8 @@
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/utility/zone_names.h>
+
+Q_LOGGING_CATEGORY(arrowServerLog, "cockatrice.server.game_arrows")
 
 Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
                          int _gameId,
@@ -599,35 +602,85 @@ void Server_Game::removeArrowsRelatedToPlayer(GameEventStorage &ges, Server_Abst
 {
     QMutexLocker locker(&gameMutex);
 
-    // Remove all arrows of other players pointing to the player being removed or to one of his cards.
-    // Also remove all arrows starting at one of his cards. This is necessary since players can create
-    // arrows that start at another person's cards.
+    qCDebug(arrowServerLog) << "[ArrowPlayerCleanup] START"
+                            << "targetPlayer=" << player->getPlayerId();
+
     for (Server_AbstractPlayer *anyPlayer : getPlayers().values()) {
+
         QList<Server_Arrow *> toDelete;
+
+        qCDebug(arrowServerLog) << "[ArrowPlayerCleanup] Scanning player"
+                                << "player=" << anyPlayer->getPlayerId()
+                                << "arrowCount=" << anyPlayer->getArrows().size();
+
         for (auto *arrow : anyPlayer->getArrows().values()) {
+
+            qCDebug(arrowServerLog) << "[ArrowPlayerCleanup] Inspect arrow"
+                                    << "arrowId=" << arrow->getId() << "ownerPlayer=" << anyPlayer->getPlayerId();
+
             auto *targetCard = qobject_cast<Server_Card *>(arrow->getTargetItem());
+
+            bool marked = false;
+
             if (targetCard) {
+
                 if (targetCard->getZone() != nullptr && targetCard->getZone()->getPlayer() == player) {
+
+                    qCDebug(arrowServerLog) << "[ArrowPlayerCleanup] MATCH targetCard belongs to player"
+                                            << "arrowId=" << arrow->getId() << "targetCard=" << targetCard->getId();
+
                     toDelete.append(arrow);
+                    marked = true;
                 }
+
             } else if (arrow->getTargetItem() == player) {
+
+                qCDebug(arrowServerLog) << "[ArrowPlayerCleanup] MATCH target is player"
+                                        << "arrowId=" << arrow->getId();
+
                 toDelete.append(arrow);
+                marked = true;
             }
 
-            // Don't use else here! It has to happen regardless of whether targetCard == 0.
+            // IMPORTANT: always evaluated
             if (arrow->getStartCard()->getZone() != nullptr &&
                 arrow->getStartCard()->getZone()->getPlayer() == player) {
+
+                qCDebug(arrowServerLog) << "[ArrowPlayerCleanup] MATCH startCard belongs to player"
+                                        << "arrowId=" << arrow->getId()
+                                        << "startCard=" << arrow->getStartCard()->getId();
+
                 toDelete.append(arrow);
+                marked = true;
+            }
+
+            if (!marked) {
+                qCDebug(arrowServerLog) << "[ArrowPlayerCleanup] KEEP"
+                                        << "arrowId=" << arrow->getId();
             }
         }
+
+        qCDebug(arrowServerLog) << "[ArrowPlayerCleanup] Deletion batch ready"
+                                << "player=" << anyPlayer->getPlayerId() << "count=" << toDelete.size();
+
         for (auto *arrow : toDelete) {
+
+            qCDebug(arrowServerLog) << "[ArrowPlayerCleanup] DELETING"
+                                    << "arrowId=" << arrow->getId() << "fromPlayer=" << anyPlayer->getPlayerId();
+
             Event_DeleteArrow event;
             event.set_arrow_id(arrow->getId());
+
             ges.enqueueGameEvent(event, anyPlayer->getPlayerId());
 
             anyPlayer->deleteArrow(arrow->getId());
+
+            qCDebug(arrowServerLog) << "[ArrowPlayerCleanup] Deleted"
+                                    << "arrowId=" << arrow->getId();
         }
     }
+
+    qCDebug(arrowServerLog) << "[ArrowPlayerCleanup] END";
 }
 
 void Server_Game::unattachCards(GameEventStorage &ges, Server_AbstractPlayer *player)
@@ -701,17 +754,47 @@ void Server_Game::removeArrows(int newPhase, bool force)
 {
     QMutexLocker locker(&gameMutex);
 
+    qCDebug(arrowServerLog) << "[ArrowPhaseCleanup] START"
+                            << "newPhase=" << newPhase << "force=" << force << "playerCount=" << getPlayers().size();
+
     for (auto *anyPlayer : getPlayers().values()) {
-        for (auto *arrowToDelete : anyPlayer->getArrows().values()) { // values creates a copy
-            if (force || arrowToDelete->checkPhaseDeletion(newPhase)) {
+
+        qCDebug(arrowServerLog) << "[ArrowPhaseCleanup] Player scan"
+                                << "player=" << anyPlayer->getPlayerId()
+                                << "arrowCount=" << anyPlayer->getArrows().size();
+
+        for (auto *arrowToDelete : anyPlayer->getArrows().values()) {
+
+            qCDebug(arrowServerLog) << "[ArrowPhaseCleanup] Inspect arrow"
+                                    << "player=" << anyPlayer->getPlayerId() << "arrowId=" << arrowToDelete->getId()
+                                    << "startCard="
+                                    << (arrowToDelete->getStartCard() ? arrowToDelete->getStartCard()->getId() : -1)
+                                    << "targetItem=" << arrowToDelete->getTargetItem()
+                                    << "currentPhaseOk=" << arrowToDelete->checkPhaseDeletion(newPhase);
+
+            const bool shouldDelete = (force || arrowToDelete->checkPhaseDeletion(newPhase));
+
+            if (shouldDelete) {
+
+                qCDebug(arrowServerLog) << "[ArrowPhaseCleanup] DELETING"
+                                        << "player=" << anyPlayer->getPlayerId() << "arrowId=" << arrowToDelete->getId()
+                                        << "reason=" << (force ? "FORCE" : "PHASE");
+
                 Event_DeleteArrow event;
                 event.set_arrow_id(arrowToDelete->getId());
+
                 sendGameEventContainer(prepareGameEvent(event, anyPlayer->getPlayerId()));
 
                 anyPlayer->deleteArrow(arrowToDelete->getId());
+
+                qCDebug(arrowServerLog) << "[ArrowPhaseCleanup] Deleted"
+                                        << "player=" << anyPlayer->getPlayerId()
+                                        << "arrowId=" << arrowToDelete->getId();
             }
         }
     }
+
+    qCDebug(arrowServerLog) << "[ArrowPhaseCleanup] END";
 }
 
 void Server_Game::nextTurn()

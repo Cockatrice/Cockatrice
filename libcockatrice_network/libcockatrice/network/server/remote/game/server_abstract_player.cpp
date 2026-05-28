@@ -7,6 +7,7 @@
 #include "server_move_card_struct.h"
 
 #include <QDebug>
+#include <QLoggingCategory>
 #include <QRegularExpression>
 #include <algorithm>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -52,6 +53,8 @@
 #include <limits>
 #include <ranges>
 
+Q_LOGGING_CATEGORY(arrowLog, "cockatrice.server.arrows")
+
 Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
                                              int _playerId,
                                              const ServerInfo_User &_userInfo,
@@ -84,11 +87,23 @@ int Server_AbstractPlayer::newCardId()
 int Server_AbstractPlayer::newArrowId() const
 {
     int id = 0;
+
+    qCDebug(arrowLog) << "[ArrowId] Calculating next arrow id for player" << playerId
+                      << "- existing arrow count:" << arrows.size();
+
     for (Server_Arrow *a : arrows) {
+        qCDebug(arrowLog) << "[ArrowId] Existing arrow:"
+                          << "id=" << a->getId()
+                          << "startCard=" << (a->getStartCard() ? a->getStartCard()->getId() : -1)
+                          << "target=" << a->getTargetItem();
+
         if (a->getId() > id) {
             id = a->getId();
         }
     }
+
+    qCDebug(arrowLog) << "[ArrowId] Next arrow id for player" << playerId << "will be" << (id + 1);
+
     return id + 1;
 }
 
@@ -117,23 +132,68 @@ void Server_AbstractPlayer::addZone(Server_CardZone *zone)
 
 void Server_AbstractPlayer::addArrow(Server_Arrow *arrow)
 {
+    qCDebug(arrowLog) << "[ArrowAdd]"
+                      << "player=" << playerId << "arrowId=" << arrow->getId()
+                      << "startCard=" << (arrow->getStartCard() ? arrow->getStartCard()->getId() : -1)
+                      << "targetItem=" << arrow->getTargetItem() << "existingArrowCount=" << arrows.size();
+
     arrows.insert(arrow->getId(), arrow);
+
+    qCDebug(arrowLog) << "[ArrowAdd] Complete:"
+                      << "newArrowCount=" << arrows.size();
 }
 
 void Server_AbstractPlayer::updateArrowId(int id)
 {
+    qCDebug(arrowLog) << "[ArrowUpdateId]"
+                      << "player=" << playerId << "oldId=" << id;
+
     auto *arrow = arrows.take(id);
+
+    if (!arrow) {
+        qCWarning(arrowLog) << "[ArrowUpdateId] FAILED:"
+                            << "could not find arrow with id" << id;
+        return;
+    }
+
+    qCDebug(arrowLog) << "[ArrowUpdateId]"
+                      << "newId=" << arrow->getId();
+
     arrows.insert(arrow->getId(), arrow);
+
+    qCDebug(arrowLog) << "[ArrowUpdateId] Complete";
 }
 
 bool Server_AbstractPlayer::deleteArrow(int arrowId)
 {
-    Server_Arrow *arrow = arrows.value(arrowId, 0);
+    qCDebug(arrowLog) << "[ArrowDelete]"
+                      << "player=" << playerId << "requestedArrowId=" << arrowId;
+
+    Server_Arrow *arrow = arrows.value(arrowId, nullptr);
+
     if (!arrow) {
+        qCWarning(arrowLog) << "[ArrowDelete] FAILED:"
+                            << "arrow not found"
+                            << "arrowId=" << arrowId;
+
         return false;
     }
+
+    qCDebug(arrowLog) << "[ArrowDelete]"
+                      << "startCard=" << (arrow->getStartCard() ? arrow->getStartCard()->getId() : -1)
+                      << "targetItem=" << arrow->getTargetItem();
+
     arrows.remove(arrowId);
+
+    qCDebug(arrowLog) << "[ArrowDelete]"
+                      << "removedFromMap"
+                      << "remainingArrowCount=" << arrows.size();
+
     delete arrow;
+
+    qCDebug(arrowLog) << "[ArrowDelete] Complete:"
+                      << "deletedArrowId=" << arrowId;
+
     return true;
 }
 
@@ -388,15 +448,24 @@ void Server_AbstractPlayer::processMoveCard(GameEventStorage &ges,
     }
 
     if (startzone != targetzone) {
+        qCDebug(arrowLog) << "[ArrowCleanupOnMove]"
+                          << "movingCard=" << card->getId() << "fromZone=" << startzone->getName()
+                          << "toZone=" << targetzone->getName();
         // Delete all arrows from and to the card
         for (auto *player : game->getPlayers().values()) {
             QList<int> arrowsToDelete;
             for (Server_Arrow *arrow : player->getArrows()) {
                 if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card)) {
+                    qCDebug(arrowLog) << "[ArrowCleanupOnMove]"
+                                      << "player=" << player->getPlayerId()
+                                      << "schedulingArrowDelete=" << arrow->getId() << "because card" << card->getId()
+                                      << "is involved";
                     arrowsToDelete.append(arrow->getId());
                 }
             }
             for (int j : arrowsToDelete) {
+                qCDebug(arrowLog) << "[ArrowCleanupOnMove]"
+                                  << "deletingArrowId=" << j;
                 Event_DeleteArrow event;
                 event.set_arrow_id(j);
                 ges.enqueueGameEvent(event, player->getPlayerId());
@@ -1120,50 +1189,117 @@ Server_AbstractPlayer::cmdCreateToken(const Command_CreateToken &cmd, ResponseCo
             // Copy Arrows
             for (auto *player : game->getPlayers().values()) {
                 QList<int> changedArrowIds;
+
                 for (Server_Arrow *arrow : player->getArrows()) {
+
+                    qCDebug(arrowLog) << "[ArrowTransformMigration] Inspecting arrow"
+                                      << "player=" << player->getPlayerId() << "arrowId=" << arrow->getId();
+
                     bool sendGameEvent = false;
+
                     const auto *startCard = arrow->getStartCard();
+
                     if (startCard == targetCard) {
+
+                        qCDebug(arrowLog) << "[ArrowTransformMigration] Replacing start card"
+                                          << "arrowId=" << arrow->getId() << "oldStartCard=" << targetCard->getId()
+                                          << "newStartCard=" << card->getId();
+
                         sendGameEvent = true;
+
                         arrow->setStartCard(card);
                         startCard = card;
                     }
+
                     const auto *targetItem = arrow->getTargetItem();
+
                     if (targetItem == targetCard) {
+
+                        qCDebug(arrowLog) << "[ArrowTransformMigration] Replacing target item"
+                                          << "arrowId=" << arrow->getId() << "oldTargetCard=" << targetCard->getId()
+                                          << "newTargetCard=" << card->getId();
+
                         sendGameEvent = true;
+
                         arrow->setTargetItem(card);
                         targetItem = card;
                     }
+
                     if (sendGameEvent) {
+
                         const int oldId = arrow->getId();
+
+                        qCDebug(arrowLog) << "[ArrowTransformMigration] Migrating arrow"
+                                          << "player=" << player->getPlayerId() << "oldArrowId=" << oldId;
+
                         changedArrowIds.append(oldId);
 
                         Event_DeleteArrow deleteEvent;
                         deleteEvent.set_arrow_id(oldId);
+
+                        qCDebug(arrowLog) << "[ArrowTransformMigration] Enqueue delete event"
+                                          << "arrowId=" << oldId;
+
                         ges.enqueueGameEvent(deleteEvent, player->getPlayerId());
 
                         Event_CreateArrow createEvent;
                         ServerInfo_Arrow *arrowInfo = createEvent.mutable_arrow_info();
+
                         const int newId = player->newArrowId();
+
+                        qCDebug(arrowLog) << "[ArrowTransformMigration] Assigning new arrow id"
+                                          << "oldId=" << oldId << "newId=" << newId;
+
                         arrow->setId(newId);
+
                         arrowInfo->set_id(newId);
                         arrowInfo->set_start_player_id(player->getPlayerId());
                         arrowInfo->set_start_zone(startCard->getZone()->getName().toStdString());
                         arrowInfo->set_start_card_id(startCard->getId());
+
                         const auto *arrowTargetPlayer = qobject_cast<const Server_AbstractPlayer *>(targetItem);
+
                         if (arrowTargetPlayer != nullptr) {
+
+                            qCDebug(arrowLog) << "[ArrowTransformMigration] Target is player"
+                                              << "targetPlayer=" << arrowTargetPlayer->getPlayerId();
+
                             arrowInfo->set_target_player_id(arrowTargetPlayer->getPlayerId());
+
                         } else {
+
                             const auto *arrowTargetCard = qobject_cast<const Server_Card *>(targetItem);
+
+                            qCDebug(arrowLog)
+                                << "[ArrowTransformMigration] Target is card"
+                                << "targetPlayer=" << arrowTargetCard->getZone()->getPlayer()->getPlayerId()
+                                << "targetZone=" << arrowTargetCard->getZone()->getName()
+                                << "targetCard=" << arrowTargetCard->getId();
+
                             arrowInfo->set_target_player_id(arrowTargetCard->getZone()->getPlayer()->getPlayerId());
+
                             arrowInfo->set_target_zone(arrowTargetCard->getZone()->getName().toStdString());
+
                             arrowInfo->set_target_card_id(arrowTargetCard->getId());
                         }
+
                         arrowInfo->mutable_arrow_color()->CopyFrom(arrow->getColor());
+
+                        qCDebug(arrowLog) << "[ArrowTransformMigration] Enqueue create event"
+                                          << "newArrowId=" << newId;
+
                         ges.enqueueGameEvent(createEvent, player->getPlayerId());
+
+                        qCDebug(arrowLog) << "[ArrowTransformMigration] Migration complete"
+                                          << "oldArrowId=" << oldId << "newArrowId=" << newId;
                     }
                 }
+
                 for (int id : changedArrowIds) {
+
+                    qCDebug(arrowLog) << "[ArrowTransformMigration] Updating arrow map"
+                                      << "oldId=" << id;
+
                     player->updateArrowId(id);
                 }
             }
@@ -1261,6 +1397,11 @@ Server_AbstractPlayer::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseCo
 
     for (Server_Arrow *temp : arrows) {
         if ((temp->getStartCard() == startCard) && (temp->getTargetItem() == targetItem)) {
+
+            qCWarning(arrowLog) << "[ArrowCreate] Duplicate rejected:"
+                                << "player=" << playerId << "existingArrowId=" << temp->getId()
+                                << "startCard=" << startCard->getId() << "targetItem=" << targetItem;
+
             return Response::RespContextError;
         }
     }
@@ -1270,6 +1411,10 @@ Server_AbstractPlayer::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseCo
     auto arrow = new Server_Arrow(newArrowId(), startCard, targetItem, cmd.arrow_color(), currentPhase, deletionPhase);
     addArrow(arrow);
 
+    qCDebug(arrowLog) << "[ArrowCreate]"
+                      << "requestingPlayer=" << playerId << "startPlayer=" << startPlayer->getPlayerId()
+                      << "targetPlayer=" << targetPlayer->getPlayerId() << "startZone=" << startZoneName
+                      << "startCard=" << startCard->getId() << "targetIsPlayer=" << playerTarget;
     Event_CreateArrow event;
     ServerInfo_Arrow *arrowInfo = event.mutable_arrow_info();
     arrowInfo->set_id(arrow->getId());
@@ -1290,20 +1435,52 @@ Server_AbstractPlayer::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseCo
 Response::ResponseCode
 Server_AbstractPlayer::cmdDeleteArrow(const Command_DeleteArrow &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
+    qCDebug(arrowLog) << "[ArrowDeleteCommand] Request received"
+                      << "requestingPlayer=" << playerId << "arrowId=" << cmd.arrow_id();
+
     if (!game->getGameStarted()) {
+
+        qCWarning(arrowLog) << "[ArrowDeleteCommand] Rejected:"
+                            << "game not started"
+                            << "player=" << playerId << "arrowId=" << cmd.arrow_id();
+
         return Response::RespGameNotStarted;
     }
+
     if (conceded) {
+
+        qCWarning(arrowLog) << "[ArrowDeleteCommand] Rejected:"
+                            << "player already conceded"
+                            << "player=" << playerId << "arrowId=" << cmd.arrow_id();
+
         return Response::RespContextError;
     }
 
+    qCDebug(arrowLog) << "[ArrowDeleteCommand] Attempting delete"
+                      << "player=" << playerId << "arrowId=" << cmd.arrow_id();
+
     if (!deleteArrow(cmd.arrow_id())) {
+
+        qCWarning(arrowLog) << "[ArrowDeleteCommand] Delete failed:"
+                            << "arrow not found"
+                            << "player=" << playerId << "arrowId=" << cmd.arrow_id();
+
         return Response::RespNameNotFound;
     }
 
+    qCDebug(arrowLog) << "[ArrowDeleteCommand] Delete successful"
+                      << "player=" << playerId << "arrowId=" << cmd.arrow_id();
+
     Event_DeleteArrow event;
     event.set_arrow_id(cmd.arrow_id());
+
+    qCDebug(arrowLog) << "[ArrowDeleteCommand] Enqueueing delete event"
+                      << "player=" << playerId << "arrowId=" << cmd.arrow_id();
+
     ges.enqueueGameEvent(event, playerId);
+
+    qCDebug(arrowLog) << "[ArrowDeleteCommand] Complete"
+                      << "player=" << playerId << "arrowId=" << cmd.arrow_id();
 
     return Response::RespOk;
 }
