@@ -419,6 +419,15 @@ void GameScene::requestArrowDeletion(int arrowId)
     }
 }
 
+void GameScene::requestClearArrowsForPlayer(int playerId)
+{
+    for (auto *arrow : arrowRegistry.values()) {
+        if (arrow->getPlayer()->getPlayerInfo()->getId() == playerId) {
+            emit requestArrowDeletion(arrow->getId());
+        }
+    }
+}
+
 void GameScene::onCardZoneChanged(CardItem *card, bool sameZone)
 {
     QList<ArrowItem *> toDelete;
@@ -433,15 +442,6 @@ void GameScene::onCardZoneChanged(CardItem *card, bool sameZone)
     }
     for (auto *arrow : toDelete) {
         deleteArrow(arrow->getId());
-    }
-}
-
-void GameScene::requestClearArrowsForPlayer(int playerId)
-{
-    for (auto *arrow : arrowRegistry.values()) {
-        if (arrow->getPlayer()->getPlayerInfo()->getId() == playerId) {
-            emit requestArrowDeletion(arrow->getId());
-        }
     }
 }
 
