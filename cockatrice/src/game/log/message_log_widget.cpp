@@ -650,14 +650,16 @@ void MessageLogWidget::logSetCardCounter(PlayerLogic *player, QString cardName, 
     QString finalStr;
     int delta = abs(oldValue - value);
     if (value > oldValue) {
-        finalStr = tr("%1 places %2 \"%3\" counter(s) on %4 (now %5).", "", delta);
+        finalStr = tr("%1 places %2 %3%4 counter(s) on %5 (now %6).", "", delta);
     } else {
-        finalStr = tr("%1 removes %2 \"%3\" counter(s) from %4 (now %5).", "", delta);
+        finalStr = tr("%1 removes %2 %3%4 counter(s) from %5 (now %6).", "", delta);
     }
 
     auto &cardCounterSettings = SettingsCache::instance().cardCounters();
+    QString hex = cardCounterSettings.color(counterId).name();
     appendHtmlServerMessage(finalStr.arg(sanitizeHtml(player->getPlayerInfo()->getName()))
                                 .arg("<font class=\"blue\">" + QString::number(delta) + "</font>")
+                                .arg("<font color=\"" + hex + "\">●</font>")
                                 .arg(cardCounterSettings.displayName(counterId))
                                 .arg(cardLink(std::move(cardName)))
                                 .arg(value));
