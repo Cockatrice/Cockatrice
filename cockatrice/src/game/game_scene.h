@@ -204,6 +204,7 @@ public slots:
     /// Directly modifies the scene
     void addArrow(const ArrowData &data);
     void deleteArrow(int arrowId);
+    void clearArrowsForPlayer(int playerId);
 
     /// Queues up arrow deletion but doesn't directly modify the scene
     void requestArrowDeletion(int arrowId);
