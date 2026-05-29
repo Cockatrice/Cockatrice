@@ -39,6 +39,7 @@ public slots:
     void clearAllDatabaseFilters();
     void updateSearch(const QString &search);
     void updateCard(const QModelIndex &current, const QModelIndex &);
+    void actAddCard();
     void actAddCardToMainDeck();
     void actAddCardToSideboard();
     void actDecrementCardFromMainDeck();

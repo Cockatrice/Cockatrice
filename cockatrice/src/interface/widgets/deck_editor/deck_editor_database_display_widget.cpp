@@ -79,7 +79,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
             &DeckEditorDatabaseDisplayWidget::databaseCustomMenu);
     connect(databaseView->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             &DeckEditorDatabaseDisplayWidget::updateCard);
-    connect(databaseView, &QTreeView::doubleClicked, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
+    connect(databaseView, &QTreeView::doubleClicked, this, &DeckEditorDatabaseDisplayWidget::actAddCard);
 
     QByteArray dbHeaderState = SettingsCache::instance().layouts().getDeckEditorDbHeaderState();
     if (dbHeaderState.isNull()) {
@@ -143,6 +143,15 @@ void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, con
 
     if (!current.model()->hasChildren(current.siblingAtColumn(CardDatabaseModel::NameColumn))) {
         emit cardChanged(CardDatabaseManager::query()->getPreferredCard(cardName));
+    }
+}
+
+void DeckEditorDatabaseDisplayWidget::actAddCard()
+{
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
+        actAddCardToSideboard();
+    } else {
+        actAddCardToMainDeck();
     }
 }
 

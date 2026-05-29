@@ -144,11 +144,7 @@ void AbstractTabDeckEditor::decrementCard(const ExactCard &card, const QString &
  */
 void AbstractTabDeckEditor::actAddCard(const ExactCard &card)
 {
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
-        actAddCardToSideboard(card);
-    } else {
-        addCard(card, DECK_ZONE_MAIN);
-    }
+    addCard(card, DECK_ZONE_MAIN);
 }
 
 /** @brief Adds a card to the sideboard explicitly. */

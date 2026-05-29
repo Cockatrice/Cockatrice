@@ -223,7 +223,11 @@ void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
                                                           CardInfoPictureWithTextOverlayWidget *instance)
 {
     if (event->button() == Qt::LeftButton) {
-        actAddCard(instance->getCard());
+        if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
+            actAddCardToSideboard(instance->getCard());
+        } else {
+            actAddCard(instance->getCard());
+        }
     } else if (event->button() == Qt::RightButton) {
         actDecrementCard(instance->getCard());
     } else if (event->button() == Qt::MiddleButton) {
