@@ -23,8 +23,8 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnal
     layout = new QVBoxLayout(this);
 
     // Controls
-    controlContainer = new QWidget(this);
-    controlLayout = new QHBoxLayout(controlContainer);
+    controlContainer = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
+    controlContainer->setSpacing(4, 4);
     addButton = new QPushButton(this);
     removeButton = new QPushButton(this);
     saveButton = new QPushButton(this);
@@ -32,11 +32,11 @@ DeckAnalyticsWidget::DeckAnalyticsWidget(QWidget *parent, DeckListStatisticsAnal
     includeSideboardCheckBox = new QCheckBox(this);
     includeSideboardCheckBox->setChecked(false);
 
-    controlLayout->addWidget(addButton);
-    controlLayout->addWidget(removeButton);
-    controlLayout->addWidget(saveButton);
-    controlLayout->addWidget(loadButton);
-    controlLayout->addWidget(includeSideboardCheckBox);
+    controlContainer->addWidget(addButton);
+    controlContainer->addWidget(removeButton);
+    controlContainer->addWidget(saveButton);
+    controlContainer->addWidget(loadButton);
+    controlContainer->addWidget(includeSideboardCheckBox);
 
     layout->addWidget(controlContainer);
 

@@ -1,8 +1,8 @@
 /**
  * @file card_list.h
  * @ingroup GameLogicCards
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARDLIST_H
 #define CARDLIST_H

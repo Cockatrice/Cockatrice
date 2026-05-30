@@ -149,8 +149,9 @@ void DlgEditTokens::actAddToken()
     QString name;
     for (;;) {
         name = getTextWithMax(this, tr("Add token"), tr("Please enter the name of the token:"));
-        if (name.isEmpty())
+        if (name.isEmpty()) {
             return;
+        }
         if (databaseModel->getDatabase()->query()->getCardInfo(name)) {
             QMessageBox::critical(this, tr("Error"),
                                   tr("The chosen name conflicts with an existing card or token.\nMake sure to enable "
@@ -181,18 +182,21 @@ void DlgEditTokens::actRemoveToken()
 
 void DlgEditTokens::colorChanged(int colorIndex)
 {
-    if (currentCard)
+    if (currentCard) {
         currentCard->setColors(QString(colorEdit->itemData(colorIndex).toChar()));
+    }
 }
 
 void DlgEditTokens::ptChanged(const QString &_pt)
 {
-    if (currentCard)
+    if (currentCard) {
         currentCard->setPowTough(_pt);
+    }
 }
 
 void DlgEditTokens::annotationChanged(const QString &_annotation)
 {
-    if (currentCard)
+    if (currentCard) {
         currentCard->setText(_annotation);
+    }
 }

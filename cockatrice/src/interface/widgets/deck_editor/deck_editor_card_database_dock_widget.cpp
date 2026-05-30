@@ -58,7 +58,3 @@ void DeckEditorCardDatabaseDockWidget::clearAllDatabaseFilters()
 {
     databaseDisplayWidget->clearAllDatabaseFilters();
 }
-void DeckEditorCardDatabaseDockWidget::highlightAllSearchEdit()
-{
-    databaseDisplayWidget->searchEdit->setSelection(0, databaseDisplayWidget->searchEdit->text().length());
-}

@@ -121,9 +121,10 @@ void DeckEditorDatabaseDisplayWidget::updateSearch(const QString &search)
 {
     databaseDisplayModel->setStringFilter(search);
     QModelIndexList sel = databaseView->selectionModel()->selectedRows();
-    if (sel.isEmpty() && databaseDisplayModel->rowCount())
+    if (sel.isEmpty() && databaseDisplayModel->rowCount()) {
         databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
                                                         QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+    }
 }
 
 void DeckEditorDatabaseDisplayWidget::clearAllDatabaseFilters()
@@ -147,11 +148,13 @@ void DeckEditorDatabaseDisplayWidget::updateCard(const QModelIndex &current, con
 
 void DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck()
 {
+    highlightAllSearchEdit();
     emit addCardToMainDeck(currentCard());
 }
 
 void DeckEditorDatabaseDisplayWidget::actAddCardToSideboard()
 {
+    highlightAllSearchEdit();
     emit addCardToSideboard(currentCard());
 }
 
@@ -240,4 +243,9 @@ void DeckEditorDatabaseDisplayWidget::retranslateUi()
 {
     aAddCard->setText(tr("Add card to &maindeck"));
     aAddCardToSideboard->setText(tr("Add card to &sideboard"));
+}
+
+void DeckEditorDatabaseDisplayWidget::highlightAllSearchEdit()
+{
+    searchEdit->setSelection(0, searchEdit->text().length());
 }

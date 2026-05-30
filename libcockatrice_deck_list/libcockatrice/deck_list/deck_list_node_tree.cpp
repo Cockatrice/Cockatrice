@@ -58,8 +58,9 @@ QList<const InnerDecklistNode *> DecklistNodeTree::getZoneNodes(const QSet<QStri
     QList<const InnerDecklistNode *> zones;
     for (auto *node : *root) {
         InnerDecklistNode *currentZone = dynamic_cast<InnerDecklistNode *>(node);
-        if (!currentZone)
+        if (!currentZone) {
             continue;
+        }
         if (!restrictToZones.isEmpty() && !restrictToZones.contains(currentZone->getName())) {
             continue;
         }

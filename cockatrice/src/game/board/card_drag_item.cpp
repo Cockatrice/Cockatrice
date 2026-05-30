@@ -1,9 +1,9 @@
 #include "card_drag_item.h"
 
+#include "../../game_graphics/zones/card_zone.h"
+#include "../../game_graphics/zones/table_zone.h"
+#include "../../game_graphics/zones/view_zone.h"
 #include "../game_scene.h"
-#include "../zones/card_zone.h"
-#include "../zones/table_zone.h"
-#include "../zones/view_zone.h"
 #include "card_item.h"
 
 #include <QCursor>
@@ -24,8 +24,9 @@ void CardDragItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 {
     AbstractCardDragItem::paint(painter, option, widget);
 
-    if (occupied)
+    if (occupied) {
         painter->fillPath(shape(), QColor(200, 0, 0, 100));
+    }
 }
 
 void CardDragItem::updatePosition(const QPointF &cursorScenePos)
@@ -38,16 +39,19 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
     ZoneViewZone *zoneViewZone = 0;
     for (int i = colliding.size() - 1; i >= 0; i--) {
         CardZone *temp = qgraphicsitem_cast<CardZone *>(colliding.at(i));
-        if (!cardZone)
+        if (!cardZone) {
             cardZone = temp;
-        if (!zoneViewZone)
+        }
+        if (!zoneViewZone) {
             zoneViewZone = qobject_cast<ZoneViewZone *>(temp);
+        }
     }
     CardZone *cursorZone = 0;
-    if (zoneViewZone)
+    if (zoneViewZone) {
         cursorZone = zoneViewZone;
-    else if (cardZone)
+    } else if (cardZone) {
         cursorZone = cardZone;
+    }
 
     // Always update the current zone, even if its null, to cancel the drag
     // instead of dropping cards into an non-intuitive location.
@@ -59,8 +63,9 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
         QPointF newPos = cursorScenePos - hotSpot;
 
         if (newPos != pos()) {
-            for (int i = 0; i < childDrags.size(); i++)
+            for (int i = 0; i < childDrags.size(); i++) {
                 childDrags[i]->setPos(newPos + childDrags[i]->getHotSpot());
+            }
             setPos(newPos);
         }
 
@@ -78,23 +83,27 @@ void CardDragItem::updatePosition(const QPointF &cursorScenePos)
     // position.
     TableZone *tableZone = qobject_cast<TableZone *>(cursorZone);
     QPointF closestGridPoint;
-    if (tableZone)
+    if (tableZone) {
         closestGridPoint = tableZone->closestGridPoint(cursorPosInZone);
-    else
+    } else {
         closestGridPoint = cursorPosInZone - hotSpot;
+    }
 
     QPointF newPos = zonePos + closestGridPoint;
 
     if (newPos != pos()) {
-        for (int i = 0; i < childDrags.size(); i++)
+        for (int i = 0; i < childDrags.size(); i++) {
             childDrags[i]->setPos(newPos + childDrags[i]->getHotSpot());
+        }
         setPos(newPos);
 
         bool newOccupied = false;
         TableZone *table = qobject_cast<TableZone *>(cursorZone);
-        if (table)
-            if (table->getCardFromCoords(closestGridPoint))
+        if (table) {
+            if (table->getCardFromCoords(closestGridPoint)) {
                 newOccupied = true;
+            }
+        }
         if (newOccupied != occupied) {
             occupied = newOccupied;
             update();

@@ -6,7 +6,8 @@
 class ICardSetPriorityController
 {
 public:
-    struct SetSaveData {
+    struct SetSaveData
+    {
         QString shortName;
         unsigned int sortKey;
         bool enabled;

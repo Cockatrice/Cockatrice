@@ -59,12 +59,15 @@ set(cockatrice_SOURCES
     src/game/board/abstract_card_drag_item.cpp
     src/game/board/abstract_card_item.cpp
     src/game/board/abstract_counter.cpp
+    src/game/board/arrow_data.cpp
     src/game/board/arrow_item.cpp
     src/game/board/arrow_target.cpp
     src/game/board/card_drag_item.cpp
     src/game/board/card_item.cpp
     src/game/board/card_list.cpp
+    src/game/board/card_state.cpp
     src/game/board/counter_general.cpp
+    src/game/board/counter_state.cpp
     src/game/board/translate_counter_name.cpp
     src/game/deckview/deck_view.cpp
     src/game/deckview/deck_view_container.cpp
@@ -94,30 +97,30 @@ set(cockatrice_SOURCES
     src/game/player/menu/say_menu.cpp
     src/game/player/menu/sideboard_menu.cpp
     src/game/player/menu/utility_menu.cpp
-    src/game/player/player.cpp
     src/game/player/player_actions.cpp
     src/game/player/player_area.cpp
     src/game/player/player_event_handler.cpp
     src/game/player/player_graphics_item.cpp
     src/game/player/player_info.cpp
     src/game/player/player_list_widget.cpp
+    src/game/player/player_logic.cpp
     src/game/player/player_manager.cpp
     src/game/player/player_target.cpp
     src/game/replay.cpp
-    src/game/zones/card_zone.cpp
-    src/game/zones/hand_zone.cpp
-    src/game/zones/logic/card_zone_logic.cpp
-    src/game/zones/logic/hand_zone_logic.cpp
-    src/game/zones/logic/pile_zone_logic.cpp
-    src/game/zones/logic/stack_zone_logic.cpp
-    src/game/zones/logic/table_zone_logic.cpp
-    src/game/zones/logic/view_zone_logic.cpp
-    src/game/zones/pile_zone.cpp
-    src/game/zones/select_zone.cpp
-    src/game/zones/stack_zone.cpp
-    src/game/zones/table_zone.cpp
-    src/game/zones/view_zone.cpp
-    src/game/zones/view_zone_widget.cpp
+    src/game/zones/card_zone_logic.cpp
+    src/game/zones/hand_zone_logic.cpp
+    src/game/zones/pile_zone_logic.cpp
+    src/game/zones/stack_zone_logic.cpp
+    src/game/zones/table_zone_logic.cpp
+    src/game/zones/view_zone_logic.cpp
+    src/game_graphics/zones/card_zone.cpp
+    src/game_graphics/zones/hand_zone.cpp
+    src/game_graphics/zones/pile_zone.cpp
+    src/game_graphics/zones/select_zone.cpp
+    src/game_graphics/zones/stack_zone.cpp
+    src/game_graphics/zones/table_zone.cpp
+    src/game_graphics/zones/view_zone.cpp
+    src/game_graphics/zones/view_zone_widget.cpp
     src/game_graphics/board/abstract_graphics_item.cpp
     src/interface/card_picture_loader/card_picture_loader.cpp
     src/interface/card_picture_loader/card_picture_loader_local.cpp
@@ -130,7 +133,13 @@ set(cockatrice_SOURCES
     src/interface/layouts/overlap_layout.cpp
     src/interface/widgets/utility/line_edit_completer.cpp
     src/interface/pixel_map_generator.cpp
+    src/interface/theme_config.cpp
     src/interface/theme_manager.cpp
+    src/interface/palette_editor/color_button.cpp
+    src/interface/palette_editor/palette_generator.cpp
+    src/interface/palette_editor/quick_setup_panel.cpp
+    src/interface/palette_editor/palette_grid_widget.cpp
+    src/interface/palette_editor/palette_editor_dialog.cpp
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
     src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
     src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
@@ -229,6 +238,14 @@ set(cockatrice_SOURCES
     src/interface/widgets/server/user/user_info_connection.cpp
     src/interface/widgets/server/user/user_list_manager.cpp
     src/interface/widgets/server/user/user_list_widget.cpp
+    src/interface/widgets/settings_page/appearance_settings_page.cpp
+    src/interface/widgets/settings_page/deck_editor_settings_page.cpp
+    src/interface/widgets/settings_page/general_settings_page.cpp
+    src/interface/widgets/settings_page/messages_settings_page.cpp
+    src/interface/widgets/settings_page/shortcut_settings_page.cpp
+    src/interface/widgets/settings_page/sound_settings_page.cpp
+    src/interface/widgets/settings_page/storage_settings_page.cpp
+    src/interface/widgets/settings_page/user_interface_settings_page.cpp
     src/interface/widgets/utility/custom_line_edit.cpp
     src/interface/widgets/utility/get_text_with_max.cpp
     src/interface/widgets/utility/sequence_edit.cpp
@@ -327,6 +344,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
+    src/interface/widgets/utility/compact_push_button.cpp
+    src/interface/widgets/utility/compact_push_button.h
 )
 
 add_subdirectory(sounds)

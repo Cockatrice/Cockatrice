@@ -3,23 +3,40 @@
 #include "../../../client/settings/card_counter_settings.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
-#include "../../zones/logic/view_zone_logic.h"
+#include "../../zones/view_zone_logic.h"
 #include "../card_menu_action_type.h"
-#include "../player.h"
 #include "../player_actions.h"
+#include "../player_logic.h"
 #include "move_menu.h"
 #include "pt_menu.h"
 
+#include <QPainter>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/utility/zone_names.h>
 
-CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive)
+/**
+ * @brief Creates a circular icon filled with the specified color.
+ */
+static QIcon createCircleIcon(const QColor &color)
+{
+    QPixmap pixmap(32, 32);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(color);
+    painter.drawEllipse(pixmap.rect());
+
+    return QIcon(pixmap);
+}
+
+CardMenu::CardMenu(PlayerLogic *_player, const CardItem *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
 {
     auto playerActions = player->getPlayerActions();
 
-    const QList<Player *> &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    const QList<PlayerLogic *> &players = player->getGame()->getPlayerManager()->getPlayers().values();
 
     for (auto playerToAdd : players) {
         if (playerToAdd == player) {
@@ -62,6 +79,9 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
     aSelectColumn = new QAction(this);
     connect(aSelectColumn, &QAction::triggered, playerActions, &PlayerActions::actSelectColumn);
 
+    aReduceLifeByPower = new QAction(this);
+    connect(aReduceLifeByPower, &QAction::triggered, playerActions, &PlayerActions::actReduceLifeByPower);
+
     aPlay = new QAction(this);
     connect(aPlay, &QAction::triggered, playerActions, &PlayerActions::actPlay);
     aHide = new QAction(this);
@@ -74,9 +94,21 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
     mCardCounters = new QMenu;
 
     for (int i = 0; i < 6; ++i) {
+        QColor color = SettingsCache::instance().cardCounters().color(i);
+        QIcon circleIcon = createCircleIcon(color);
+
         auto *tempAddCounter = new QAction(this);
+        tempAddCounter->setIconVisibleInMenu(true);
+        tempAddCounter->setIcon(circleIcon);
+
         auto *tempRemoveCounter = new QAction(this);
+        tempRemoveCounter->setIconVisibleInMenu(true);
+        tempRemoveCounter->setIcon(circleIcon);
+
         auto *tempSetCounter = new QAction(this);
+        tempSetCounter->setIconVisibleInMenu(true);
+        tempSetCounter->setIcon(circleIcon);
+
         aAddCounter.append(tempAddCounter);
         aRemoveCounter.append(tempRemoveCounter);
         aSetCounter.append(tempSetCounter);
@@ -134,7 +166,7 @@ CardMenu::CardMenu(Player *_player, const CardItem *_card, bool _shortcutsActive
     }
 }
 
-void CardMenu::removePlayer(Player *playerToRemove)
+void CardMenu::removePlayer(PlayerLogic *playerToRemove)
 {
     for (auto it = playersInfo.begin(); it != playersInfo.end();) {
         if (it->second == playerToRemove->getPlayerInfo()->getId()) {
@@ -152,6 +184,8 @@ void CardMenu::createTableMenu(bool canModifyCard)
         addAction(aDrawArrow);
         addSeparator();
         addAction(aClone);
+        addSeparator();
+        addAction(aReduceLifeByPower);
         addSeparator();
         addAction(aSelectAll);
         addAction(aSelectRow);
@@ -178,6 +212,8 @@ void CardMenu::createTableMenu(bool canModifyCard)
     addSeparator();
     addMenu(new PtMenu(player));
     addAction(aSetAnnotation);
+    addSeparator();
+    addAction(aReduceLifeByPower);
     addSeparator();
     addAction(aSelectAll);
     addAction(aSelectRow);
@@ -463,6 +499,7 @@ void CardMenu::retranslateUi()
     aUnattach->setText(tr("Unattac&h"));
     aDrawArrow->setText(tr("&Draw arrow..."));
     aSetAnnotation->setText(tr("&Set annotation..."));
+    aReduceLifeByPower->setText(tr("Reduce life by power"));
 
     mCardCounters->setTitle(tr("Ca&rd counters"));
 
@@ -497,6 +534,7 @@ void CardMenu::setShortcutsActive()
     aUnattach->setShortcuts(shortcuts.getShortcut("Player/aUnattach"));
     aDrawArrow->setShortcuts(shortcuts.getShortcut("Player/aDrawArrow"));
     aSetAnnotation->setShortcuts(shortcuts.getShortcut("Player/aSetAnnotation"));
+    aReduceLifeByPower->setShortcuts(shortcuts.getShortcut("Player/aReduceLifeByPower"));
 
     aSelectAll->setShortcuts(shortcuts.getShortcut("Player/aSelectAll"));
     aSelectRow->setShortcuts(shortcuts.getShortcut("Player/aSelectRow"));

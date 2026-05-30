@@ -3,8 +3,8 @@
  * @ingroup CardWidgets
  * @ingroup DeckEditorWidgets
  * @ingroup DeckStorageWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARD_SIZE_WIDGET_H
 #define CARD_SIZE_WIDGET_H

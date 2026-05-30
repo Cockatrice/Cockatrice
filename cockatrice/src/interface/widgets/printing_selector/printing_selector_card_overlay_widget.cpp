@@ -143,8 +143,9 @@ void PrintingSelectorCardOverlayWidget::updateVisibility()
  */
 void PrintingSelectorCardOverlayWidget::updatePinBadgeVisibility()
 {
-    if (!pinBadge || !cardInfoPicture)
+    if (!pinBadge || !cardInfoPicture) {
         return;
+    }
 
     // Query the persisted preference override to decide whether this printing is pinned.
     const auto &preferredProviderId =

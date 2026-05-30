@@ -75,12 +75,14 @@ bool CardDatabaseDisplayModel::lessThan(const QModelIndex &left, const QModelInd
 
         // test for an exact match: isLeftType && leftString.size() == cardName.size()
         // or an exclusive start match: isLeftType && !isRightType
-        if (isLeftType && (!isRightType || leftString.size() == cardName.size()))
+        if (isLeftType && (!isRightType || leftString.size() == cardName.size())) {
             return true;
+        }
 
         // same checks for the right string
-        if (isRightType && (!isLeftType || rightString.size() == cardName.size()))
+        if (isRightType && (!isLeftType || rightString.size() == cardName.size())) {
             return false;
+        }
     } else if (right.column() == CardDatabaseModel::PTColumn && left.column() == CardDatabaseModel::PTColumn) {
         QStringList leftList = leftString.split("/");
         QStringList rightList = rightString.split("/");
@@ -172,8 +174,9 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 {
     CardInfoPtr info = static_cast<CardDatabaseModel *>(sourceModel())->getCard(sourceRow);
 
-    if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken()))
+    if (((isToken == ShowTrue) && !info->getIsToken()) || ((isToken == ShowFalse) && info->getIsToken())) {
         return false;
+    }
 
     if (filterString != nullptr) {
         if (filterTree != nullptr && !filterTree->acceptsCard(info)) {
@@ -187,14 +190,17 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 
 bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfoPtr info) const
 {
-    if (!cardName.isEmpty() && !info->getName().contains(cardName, Qt::CaseInsensitive))
+    if (!cardName.isEmpty() && !info->getName().contains(cardName, Qt::CaseInsensitive)) {
         return false;
+    }
 
-    if (!cardNameSet.isEmpty() && !cardNameSet.contains(info->getName()))
+    if (!cardNameSet.isEmpty() && !cardNameSet.contains(info->getName())) {
         return false;
+    }
 
-    if (filterTree != nullptr)
+    if (filterTree != nullptr) {
         return filterTree->acceptsCard(info);
+    }
 
     return true;
 }
@@ -208,8 +214,9 @@ void CardDatabaseDisplayModel::clearFilterAll()
     cardText.clear();
     cardTypes.clear();
     cardColors.clear();
-    if (filterTree != nullptr)
+    if (filterTree != nullptr) {
         filterTree->clear();
+    }
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 10, 0))
     endFilterChange(QSortFilterProxyModel::Direction::Rows);
 #else
@@ -219,8 +226,9 @@ void CardDatabaseDisplayModel::clearFilterAll()
 
 void CardDatabaseDisplayModel::setFilterTree(FilterTree *_filterTree)
 {
-    if (this->filterTree != nullptr)
+    if (this->filterTree != nullptr) {
         disconnect(this->filterTree, nullptr, this, nullptr);
+    }
 
     this->filterTree = _filterTree;
     connect(this->filterTree, &FilterTree::changed, this, &CardDatabaseDisplayModel::filterTreeChanged);

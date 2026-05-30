@@ -1,8 +1,8 @@
 /**
  * @file dlg_edit_tokens.h
  * @ingroup GameDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_EDIT_TOKENS_H
 #define DLG_EDIT_TOKENS_H

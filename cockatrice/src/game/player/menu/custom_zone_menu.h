@@ -1,8 +1,8 @@
 /**
  * @file custom_zone_menu.h
  * @ingroup GameMenusZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_CUSTOM_ZONE_MENU_H
 #define COCKATRICE_CUSTOM_ZONE_MENU_H
@@ -11,12 +11,12 @@
 
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class CustomZoneMenu : public QMenu, public AbstractPlayerComponent
 {
     Q_OBJECT
 public:
-    explicit CustomZoneMenu(Player *player);
+    explicit CustomZoneMenu(PlayerLogic *player);
     void retranslateUi() override;
     void setShortcutsActive() override
     {
@@ -26,7 +26,7 @@ public:
     }
 
 private:
-    Player *player;
+    PlayerLogic *player;
 private slots:
     void clearCustomZonesMenu();
     void addViewCustomZoneActionToCustomZoneMenu(QString zoneName);

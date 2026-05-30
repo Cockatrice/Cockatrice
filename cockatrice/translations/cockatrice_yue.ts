@@ -25,12 +25,12 @@
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_clipboard.cpp" line="26"/>
         <source>&amp;Refresh</source>
-        <translation type="unfinished"/>
+        <translation>&amp;刷新</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_clipboard.cpp" line="34"/>
         <source>Parse Set Name and Number (if available)</source>
-        <translation type="unfinished"/>
+        <translation>解析組名及編號(如果有) </translation>
     </message>
 </context>
 <context>
@@ -43,7 +43,7 @@
     <message>
         <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="267"/>
         <source>Are you sure?</source>
-        <translation type="unfinished"/>
+        <translation>你確定嗎？</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="268"/>
@@ -59,7 +59,7 @@ Do you want to save the changes?</source>
         <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="409"/>
         <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="532"/>
         <source>Error</source>
-        <translation type="unfinished"/>
+        <translation>出錯</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/abstract_tab_deck_editor.cpp" line="322"/>
@@ -254,12 +254,12 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="752"/>
         <source>Card counters</source>
-        <translation type="unfinished"/>
+        <translation>牌指示物</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="756"/>
         <source>Counter %1</source>
-        <translation type="unfinished"/>
+        <translation>指示物  %1</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="759"/>
@@ -302,12 +302,12 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp" line="92"/>
         <source>Back to results</source>
-        <translation type="unfinished"/>
+        <translation>返去結果</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp" line="93"/>
         <source>Open Deck in Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>在套牌編輯&amp;打開牌庫檔案</translation>
     </message>
 </context>
 <context>
@@ -315,7 +315,7 @@ Please check that the directory is writable and try again.</source>
     <message>
         <location filename="src/interface/widgets/general/background_sources.h" line="35"/>
         <source>Theme</source>
-        <translation type="unfinished"/>
+        <translation>卡牌主题</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/general/background_sources.h" line="36"/>
@@ -531,7 +531,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../libcockatrice_filters/libcockatrice/filters/filter_card.cpp" line="64"/>
         <source>Name (Exact)</source>
-        <translation type="unfinished"/>
+        <translation>名稱(確切）</translation>
     </message>
     <message>
         <location filename="../libcockatrice_filters/libcockatrice/filters/filter_card.cpp" line="66"/>
@@ -591,12 +591,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="../libcockatrice_filters/libcockatrice/filters/filter_card.cpp" line="88"/>
         <source>Main Type</source>
-        <translation type="unfinished"/>
+        <translation>主要類型</translation>
     </message>
     <message>
         <location filename="../libcockatrice_filters/libcockatrice/filters/filter_card.cpp" line="90"/>
         <source>Sub Type</source>
-        <translation type="unfinished"/>
+        <translation>副類型</translation>
     </message>
 </context>
 <context>
@@ -619,7 +619,7 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="src/interface/widgets/cards/card_info_frame_widget.cpp" line="73"/>
         <source>View transformation</source>
-        <translation type="unfinished"/>
+        <translation>查看轉化</translation>
     </message>
 </context>
 <context>
@@ -632,17 +632,17 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="src/interface/widgets/cards/card_info_picture_widget.cpp" line="420"/>
         <source>Add card to deck</source>
-        <translation type="unfinished"/>
+        <translation>添加卡牌到牌庫</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/cards/card_info_picture_widget.cpp" line="433"/>
         <source>Mainboard</source>
-        <translation type="unfinished"/>
+        <translation>主牌庫</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/cards/card_info_picture_widget.cpp" line="439"/>
         <source>Sideboard</source>
-        <translation type="unfinished"/>
+        <translation>副牌庫</translation>
     </message>
 </context>
 <context>
@@ -655,12 +655,12 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="69"/>
         <source>Set:</source>
-        <translation type="unfinished"/>
+        <translation>牌組:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="71"/>
         <source>Collector Number:</source>
-        <translation type="unfinished"/>
+        <translation>收藏號碼:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="85"/>
@@ -678,63 +678,63 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="276"/>
         <source>Re&amp;veal to...</source>
-        <translation type="unfinished"/>
+        <translation>&amp;展示给...</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="452"/>
         <source>&amp;All players</source>
-        <translation type="unfinished"/>
+        <translation>&amp;所有玩家</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="357"/>
         <source>View related cards</source>
-        <translation type="unfinished"/>
+        <translation>查看關聯卡牌</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="405"/>
         <source>Token: </source>
-        <translation type="unfinished"/>
+        <translation>令牌:</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="422"/>
         <source>All tokens</source>
-        <translation type="unfinished"/>
+        <translation>所有令牌</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="445"/>
         <source>&amp;Select All</source>
-        <translation type="unfinished"/>
+        <translation>&amp;全選</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="446"/>
         <source>S&amp;elect Row</source>
-        <translation type="unfinished"/>
+        <translation>&amp;選擇橫行</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="447"/>
         <source>S&amp;elect Column</source>
-        <translation type="unfinished"/>
+        <translation>&amp;選擇直行</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="449"/>
         <source>&amp;Play</source>
-        <translation type="unfinished"/>
+        <translation>&amp;使出</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="450"/>
         <source>&amp;Hide</source>
-        <translation type="unfinished"/>
+        <translation>&amp;隱藏</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="451"/>
         <source>Play &amp;Face Down</source>
-        <translation type="unfinished"/>
+        <translation>&amp;面朝下使出</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="454"/>
         <source>&amp;Tap / Untap</source>
         <extracomment>Turn sideways or back again</extracomment>
-        <translation type="unfinished"/>
+        <translation>&amp;横置/重置</translation>
     </message>
     <message>
         <location filename="src/game/player/menu/card_menu.cpp" line="455"/>
@@ -812,133 +812,133 @@ This is only saved for moderators and cannot be seen by the banned person.</sour
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="179"/>
         <source>their hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>它們的手牌</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="179"/>
         <source>%1&apos;s hand</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1的手牌</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="183"/>
         <source>their library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>它們的牌庫</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="184"/>
         <source>%1&apos;s library</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>%1的牌庫</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="186"/>
         <source>of their library</source>
         <comment>top cards of zone,</comment>
-        <translation type="unfinished"/>
+        <translation>它們的牌庫中</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="187"/>
         <source>of %1&apos;s library</source>
         <comment>top cards of zone</comment>
-        <translation type="unfinished"/>
+        <translation>%1的牌庫中</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="189"/>
         <source>their library</source>
         <comment>reveal zone</comment>
-        <translation type="unfinished"/>
+        <translation>它們的牌庫</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="190"/>
         <source>%1&apos;s library</source>
         <comment>reveal zone</comment>
-        <translation type="unfinished"/>
+        <translation>%1的牌庫</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="192"/>
         <source>their library</source>
         <comment>shuffle</comment>
-        <translation type="unfinished"/>
+        <translation>它們的牌庫</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="192"/>
         <source>%1&apos;s library</source>
         <comment>shuffle</comment>
-        <translation type="unfinished"/>
+        <translation>%1的牌庫</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="194"/>
         <source>their library</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>它們的牌庫</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="194"/>
         <source>%1&apos;s library</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1的牌庫</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="197"/>
         <source>their graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>它們的墳場</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="197"/>
         <source>%1&apos;s graveyard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1的的墳場</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="199"/>
         <source>their exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>它們的放逐區</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="199"/>
         <source>%1&apos;s exile</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1的放逐區</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="203"/>
         <source>their sideboard</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>它們的備牌</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="204"/>
         <source>%1&apos;s sideboard</source>
         <comment>look at zone</comment>
-        <translation type="unfinished"/>
+        <translation>%1的備牌</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="206"/>
         <source>their sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>它們的備牌</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="207"/>
         <source>%1&apos;s sideboard</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1的備牌</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="212"/>
         <source>their custom zone &apos;%1&apos;</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>它們的自定區域 &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="src/game/zones/logic/card_zone_logic.cpp" line="213"/>
         <source>%1&apos;s custom zone &apos;%2&apos;</source>
         <comment>nominative</comment>
-        <translation type="unfinished"/>
+        <translation>%1的自定區域&apos;%2&apos;</translation>
     </message>
 </context>
 <context>

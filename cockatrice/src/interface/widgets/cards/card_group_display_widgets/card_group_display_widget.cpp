@@ -95,8 +95,9 @@ void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, 
     for (auto &range : deselected) {
         for (int row = range.top(); row <= range.bottom(); ++row) {
             QModelIndex idx = range.model()->index(row, 0, range.parent());
-            if (proxyModel)
+            if (proxyModel) {
                 idx = proxyModel->mapToSource(idx);
+            }
 
             auto it = indexToWidgetMap.find(QPersistentModelIndex(idx));
             if (it != indexToWidgetMap.end()) {

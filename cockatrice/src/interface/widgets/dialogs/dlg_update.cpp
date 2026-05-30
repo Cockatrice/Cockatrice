@@ -40,7 +40,7 @@ DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
     buttonBox->addButton(ok, QDialogButtonBox::AcceptRole);
 
     connect(gotoDownload, &QPushButton::clicked, this, &DlgUpdate::gotoDownloadPage);
-    // TODO: make reinstall button actually do something when clicked
+    //! \todo Make reinstall button actually do something when clicked.
     // connect(manualDownload, &QPushButton::clicked, this, &DlgUpdate::downloadUpdate);
     connect(stopDownload, &QPushButton::clicked, this, &DlgUpdate::cancelDownload);
     connect(ok, &QPushButton::clicked, this, &DlgUpdate::closeDialog);
@@ -154,8 +154,9 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
                 "</a>)<br><br>" + tr("Do you want to update now?"),
             QMessageBox::Yes | QMessageBox::No);
 
-        if (reply == QMessageBox::Yes)
+        if (reply == QMessageBox::Yes) {
             downloadUpdate(release->getName());
+        }
     } else {
         QMessageBox::information(
             this, tr("Update Available"),

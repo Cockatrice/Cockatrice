@@ -51,9 +51,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
             &SettingsCache::setVisualDatabaseDisplayCardSize);
 
-    searchContainer = new QWidget(this);
-    searchLayout = new QHBoxLayout(searchContainer);
-    searchContainer->setLayout(searchLayout);
+    searchContainer = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 
     searchEdit = new SearchLineEdit();
     searchEdit->setObjectName("searchEdit");
@@ -99,6 +97,11 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
             &DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents);
     connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
 
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,
+            &VisualDatabaseDisplayWidget::highlightAllSearchEdit);
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToSideboard, this,
+            &VisualDatabaseDisplayWidget::highlightAllSearchEdit);
+
     databaseView = databaseDisplayWidget->getDatabaseView();
     databaseView->setFocusProxy(searchEdit);
     databaseView->setItemDelegate(nullptr);
@@ -137,6 +140,8 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
         databaseLoadIndicator->setVisible(false);
     }
 
+    QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar();
+    connect(scrollBar, &QScrollBar::valueChanged, [this](int /*value*/) { loadCurrentPage(); });
     retranslateUi();
 }
 
@@ -147,10 +152,10 @@ void VisualDatabaseDisplayWidget::initialize()
     filterContainer->initialize();
     filterContainer->setVisible(true);
 
-    searchLayout->addWidget(colorFilterWidget);
-    searchLayout->addWidget(clearFilterWidget);
-    searchLayout->addWidget(searchEdit);
-    searchLayout->addWidget(displayModeButton);
+    searchContainer->addWidget(colorFilterWidget);
+    searchContainer->addWidget(clearFilterWidget);
+    searchContainer->addWidget(searchEdit);
+    searchContainer->addWidget(displayModeButton);
 
     mainLayout->addWidget(searchContainer);
 
@@ -179,6 +184,11 @@ void VisualDatabaseDisplayWidget::retranslateUi()
 {
     databaseLoadIndicator->setText(tr("Loading database ..."));
     clearFilterWidget->setToolTip(tr("Clear all filters"));
+}
+
+void VisualDatabaseDisplayWidget::highlightAllSearchEdit()
+{
+    searchEdit->setSelection(0, searchEdit->text().length());
 }
 
 void VisualDatabaseDisplayWidget::resizeEvent(QResizeEvent *event)
@@ -232,9 +242,15 @@ void VisualDatabaseDisplayWidget::updateSearch(const QString &search) const
 {
     databaseDisplayModel->setStringFilter(search);
     QModelIndexList sel = databaseView->selectionModel()->selectedRows();
-    if (sel.isEmpty() && databaseDisplayModel->rowCount())
+    if (sel.isEmpty() && databaseDisplayModel->rowCount()) {
         databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
                                                         QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
+    }
+}
+
+bool VisualDatabaseDisplayWidget::isVisualDisplayMode() const
+{
+    return !displayModeButton->isChecked();
 }
 
 void VisualDatabaseDisplayWidget::onSearchModelChanged()
@@ -244,14 +260,27 @@ void VisualDatabaseDisplayWidget::onSearchModelChanged()
         flowWidget->clearLayout(); // Clear existing cards
         cards->clear();            // Clear the card list
         // Reset scrollbar position to the top after loading new cards
-        if (QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar()) {
-            scrollBar->setValue(0); // Reset scrollbar to top
-        }
+        QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar();
+        scrollBar->setValue(0); // Reset scrollbar to top
 
         currentPage = 0;
         loadCurrentPage();
         qCDebug(VisualDatabaseDisplayLog) << "Search model changed";
     }
+}
+
+bool VisualDatabaseDisplayWidget::nearEndOfPage() const
+{
+    if (!flowWidget->isVisible()) {
+        return false;
+    }
+
+    QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar();
+    if (scrollBar->value() + scrollBar->pageStep() * 2 < scrollBar->maximum()) {
+        return false; // there is at least two pages of space to scroll remaining
+    }
+
+    return true;
 }
 
 void VisualDatabaseDisplayWidget::loadCurrentPage()
@@ -261,7 +290,7 @@ void VisualDatabaseDisplayWidget::loadCurrentPage()
         // Only load the first page initially
         qCDebug(VisualDatabaseDisplayLog) << "Loading the first page";
         populateCards();
-    } else {
+    } else if (nearEndOfPage()) {
         // If not the first page, just load the next page and append to the flow widget
         loadNextPage();
     }
@@ -339,24 +368,4 @@ void VisualDatabaseDisplayWidget::databaseDataChanged(const QModelIndex &topLeft
     (void)topLeft;
     (void)bottomRight;
     qCDebug(VisualDatabaseDisplayLog) << "Database Data changed";
-}
-
-void VisualDatabaseDisplayWidget::wheelEvent(QWheelEvent *event)
-{
-    int totalCards = databaseDisplayModel->rowCount(); // Total number of cards
-    int loadedCards = currentPage * cardsPerPage;
-
-    // Handle scrolling down
-    if (event->angleDelta().y() < 0) {
-        // Check if the next page has any cards to load
-        if (loadedCards < totalCards) {
-            loadCurrentPage(); // Load the next page
-            event->accept();   // Accept the event as valid
-            return;
-        }
-        qCDebug(VisualDatabaseDisplayLog) << loadedCards << ":" << totalCards;
-    }
-
-    // Prevent overscrolling when there's no more data to load
-    event->ignore();
 }

@@ -1,8 +1,8 @@
 /**
  * @file deck_preview_widget.h
  * @ingroup VisualDeckPreviewWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DECK_PREVIEW_WIDGET_H
 #define DECK_PREVIEW_WIDGET_H

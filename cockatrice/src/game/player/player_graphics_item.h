@@ -1,13 +1,14 @@
 /**
  * @file player_graphics_item.h
  * @ingroup GameGraphicsPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_GRAPHICS_ITEM_H
 #define COCKATRICE_PLAYER_GRAPHICS_ITEM_H
+#include "../board/abstract_counter.h"
 #include "../game_scene.h"
-#include "player.h"
+#include "player_logic.h"
 
 #include <QGraphicsObject>
 
@@ -34,7 +35,7 @@ public:
 
     static constexpr int counterAreaWidth = 55;
 
-    explicit PlayerGraphicsItem(Player *player);
+    explicit PlayerGraphicsItem(PlayerLogic *player);
     void initializeZones();
 
     [[nodiscard]] QRectF boundingRect() const override;
@@ -54,7 +55,7 @@ public:
         return static_cast<GameScene *>(scene());
     }
 
-    Player *getPlayer() const
+    PlayerLogic *getPlayer() const
     {
         return player;
     }
@@ -102,6 +103,9 @@ public:
 
 public slots:
     void onPlayerActiveChanged(bool _active);
+    void onCounterAdded(CounterState *state);
+    void onCounterRemoved(int counterId);
+    void rearrangeCounters();
     void retranslateUi();
 
 signals:
@@ -109,9 +113,10 @@ signals:
     void playerCountChanged();
 
 private:
-    Player *player;
+    PlayerLogic *player;
     PlayerArea *playerArea;
     PlayerTarget *playerTarget;
+    QMap<int, AbstractCounter *> counterWidgets;
     PileZone *deckZoneGraphicsItem;
     PileZone *sideboardGraphicsItem;
     PileZone *graveyardZoneGraphicsItem;
@@ -121,11 +126,11 @@ private:
     HandZone *handZoneGraphicsItem;
     QRectF bRect;
     bool mirrored;
+    bool handVisible = false;
 
 private slots:
     void updateBoundingRect();
     void rearrangeZones();
-    void rearrangeCounters();
 };
 
 #endif // COCKATRICE_PLAYER_GRAPHICS_ITEM_H

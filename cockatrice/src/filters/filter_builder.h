@@ -1,8 +1,8 @@
 /**
  * @file filter_builder.h
  * @ingroup CardDatabaseModelFilters
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef FILTERBUILDER_H
 #define FILTERBUILDER_H

@@ -191,10 +191,12 @@ double DeckListStatisticsAnalyzer::hypergeometric(int N, int K, int n, int k)
     }
 
     auto choose = [](int n, int r) -> double {
-        if (r > n)
+        if (r > n) {
             return 0.0;
-        if (r == 0 || r == n)
+        }
+        if (r == 0 || r == n) {
             return 1.0;
+        }
         double res = 1.0;
         for (int i = 1; i <= r; ++i) {
             res *= (n - r + i);

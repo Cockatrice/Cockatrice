@@ -217,8 +217,9 @@ void WndSets::saveHeaderState()
 
 void WndSets::rebuildMainLayout(int actionToTake)
 {
-    if (mainLayout == nullptr)
+    if (mainLayout == nullptr) {
         return;
+    }
 
     switch (actionToTake) {
         case NO_SETS_SELECTED:
@@ -382,12 +383,14 @@ void WndSets::actUp()
     std::sort(rows.begin(), rows.end(), std::less<QModelIndex>());
     QSet<int> newRows;
 
-    if (rows.empty())
+    if (rows.empty()) {
         return;
+    }
 
     for (auto i : rows) {
-        if (i.row() <= 0)
+        if (i.row() <= 0) {
             continue;
+        }
         int oldRow = displayModel->mapToSource(i).row();
         int newRow = i.row() - 1;
 
@@ -405,12 +408,14 @@ void WndSets::actDown()
     std::sort(rows.begin(), rows.end(), [](const QModelIndex &a, const QModelIndex &b) { return b < a; });
     QSet<int> newRows;
 
-    if (rows.empty())
+    if (rows.empty()) {
         return;
+    }
 
     for (auto i : rows) {
-        if (i.row() >= displayModel->rowCount() - 1)
+        if (i.row() >= displayModel->rowCount() - 1) {
             continue;
+        }
         int oldRow = displayModel->mapToSource(i).row();
         int newRow = i.row() + 1;
 
@@ -428,8 +433,9 @@ void WndSets::actTop()
     QSet<int> newRows;
     int newRow = 0;
 
-    if (rows.empty())
+    if (rows.empty()) {
         return;
+    }
 
     for (int i = 0; i < rows.length(); i++) {
         int oldRow = displayModel->mapToSource(rows.at(i)).row();
@@ -454,8 +460,9 @@ void WndSets::actBottom()
     QSet<int> newRows;
     int newRow = model->rowCount() - 1;
 
-    if (rows.empty())
+    if (rows.empty()) {
         return;
+    }
 
     for (int i = 0; i < rows.length(); i++) {
         int oldRow = displayModel->mapToSource(rows.at(i)).row();

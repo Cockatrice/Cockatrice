@@ -2,8 +2,8 @@
  * @file remote_decklist_tree_widget.h
  * @ingroup NetworkingWidgets
  * @ingroup DeckStorageWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef REMOTEDECKLIST_TREEWIDGET_H
 #define REMOTEDECKLIST_TREEWIDGET_H
@@ -75,8 +75,9 @@ public:
 
     template <typename T> [[nodiscard]] T getNode(const QModelIndex &index) const
     {
-        if (!index.isValid())
+        if (!index.isValid()) {
             return dynamic_cast<T>(root);
+        }
         return dynamic_cast<T>(static_cast<Node *>(index.internalPointer()));
     }
 

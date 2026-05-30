@@ -2,8 +2,8 @@
  * @file user_list_proxy.h
  * @ingroup UI
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_USERLISTPROXY_H
 #define COCKATRICE_USERLISTPROXY_H

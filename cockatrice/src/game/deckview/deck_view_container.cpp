@@ -251,8 +251,9 @@ void DeckViewContainer::unloadDeck()
 void DeckViewContainer::loadLocalDeck()
 {
     DlgLoadDeck dialog(this);
-    if (!dialog.exec())
+    if (!dialog.exec()) {
         return;
+    }
 
     loadDeckFromFile(dialog.selectedFiles().at(0));
 }
@@ -364,8 +365,9 @@ void DeckViewContainer::sideboardPlanChanged()
 {
     Command_SetSideboardPlan cmd;
     const QList<MoveCard_ToZone> &newPlan = deckView->getSideboardPlan();
-    for (const auto &i : newPlan)
+    for (const auto &i : newPlan) {
         cmd.add_move_list()->CopyFrom(i);
+    }
     parentGame->getGame()->getGameEventHandler()->sendGameCommand(cmd, playerId);
 }
 
@@ -404,8 +406,9 @@ void DeckViewContainer::setSideboardLocked(bool locked)
 {
     sideboardLockButton->setState(!locked);
     deckView->setLocked(readyStartButton->getState() || !sideboardLockButton->getState());
-    if (locked)
+    if (locked) {
         deckView->resetSideboardPlan();
+    }
 }
 
 void DeckViewContainer::setDeck(const DeckList &deck)

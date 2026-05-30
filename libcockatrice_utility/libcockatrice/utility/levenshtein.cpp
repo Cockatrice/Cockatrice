@@ -9,10 +9,12 @@ int levenshteinDistance(const QString &s1, const QString &s2)
     int len2 = s2.size();
     std::vector<std::vector<int>> dp(len1 + 1, std::vector<int>(len2 + 1));
 
-    for (int i = 0; i <= len1; i++)
+    for (int i = 0; i <= len1; i++) {
         dp[i][0] = i;
-    for (int j = 0; j <= len2; j++)
+    }
+    for (int j = 0; j <= len2; j++) {
         dp[0][j] = j;
+    }
 
     for (int i = 1; i <= len1; i++) {
         for (int j = 1; j <= len2; j++) {

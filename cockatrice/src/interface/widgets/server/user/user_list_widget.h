@@ -1,8 +1,8 @@
 /**
  * @file user_list_widget.h
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef USERLIST_H
 #define USERLIST_H

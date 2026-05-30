@@ -237,8 +237,9 @@ QMap<QString, int> DlgSelectSetForCards::getSetsForCards()
 
     for (auto cardName : cardNames) {
         CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(cardName);
-        if (!infoPtr)
+        if (!infoPtr) {
             continue;
+        }
 
         SetToPrintingsMap setMap = infoPtr->getSets();
         for (auto &setName : setMap.keys()) {
@@ -355,8 +356,9 @@ QMap<QString, QStringList> DlgSelectSetForCards::getCardsForSets()
 
     for (auto cardName : cardNames) {
         CardInfoPtr infoPtr = CardDatabaseManager::query()->getCardInfo(cardName);
-        if (!infoPtr)
+        if (!infoPtr) {
             continue;
+        }
 
         SetToPrintingsMap setMap = infoPtr->getSets();
         for (auto it = setMap.begin(); it != setMap.end(); ++it) {

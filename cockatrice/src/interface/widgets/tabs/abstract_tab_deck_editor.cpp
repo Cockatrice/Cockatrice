@@ -137,8 +137,6 @@ void AbstractTabDeckEditor::onDeckModified()
 void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, const QString &zoneName)
 {
     deckStateManager->addCard(card, zoneName);
-
-    cardDatabaseDockWidget->highlightAllSearchEdit();
 }
 
 /**
@@ -146,10 +144,11 @@ void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, const QString &
  */
 void AbstractTabDeckEditor::actAddCard(const ExactCard &card)
 {
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
         actAddCardToSideboard(card);
-    else
+    } else {
         addCardHelper(card, DECK_ZONE_MAIN);
+    }
 
     deckMenu->setSaveStatus(true);
 }
@@ -203,8 +202,9 @@ void AbstractTabDeckEditor::setDeck(const LoadedDeck &_deck)
 void AbstractTabDeckEditor::actNewDeck()
 {
     auto deckOpenLocation = confirmOpen(false);
-    if (deckOpenLocation == CANCELLED)
+    if (deckOpenLocation == CANCELLED) {
         return;
+    }
 
     if (deckOpenLocation == NEW_TAB) {
         emit openDeckEditor(LoadedDeck());
@@ -229,22 +229,25 @@ void AbstractTabDeckEditor::cleanDeckAndResetModified()
 AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const bool openInSameTabIfBlank)
 {
     if (SettingsCache::instance().getOpenDeckInNewTab()) {
-        if (openInSameTabIfBlank && deckStateManager->isBlankNewDeck())
+        if (openInSameTabIfBlank && deckStateManager->isBlankNewDeck()) {
             return SAME_TAB;
-        else
+        } else {
             return NEW_TAB;
+        }
     }
 
-    if (!deckStateManager->isModified())
+    if (!deckStateManager->isModified()) {
         return SAME_TAB;
+    }
 
     tabSupervisor->setCurrentWidget(this);
     QMessageBox *msgBox = createSaveConfirmationWindow();
     QPushButton *newTabButton = msgBox->addButton(tr("Open in new tab"), QMessageBox::ApplyRole);
     int ret = msgBox->exec();
 
-    if (msgBox->clickedButton() == newTabButton)
+    if (msgBox->clickedButton() == newTabButton) {
         return NEW_TAB;
+    }
 
     switch (ret) {
         case QMessageBox::Save:
@@ -277,12 +280,14 @@ QMessageBox *AbstractTabDeckEditor::createSaveConfirmationWindow()
 void AbstractTabDeckEditor::actLoadDeck()
 {
     auto deckOpenLocation = confirmOpen();
-    if (deckOpenLocation == CANCELLED)
+    if (deckOpenLocation == CANCELLED) {
         return;
+    }
 
     DlgLoadDeck dialog(this);
-    if (!dialog.exec())
+    if (!dialog.exec()) {
         return;
+    }
 
     QString fileName = dialog.selectedFiles().at(0);
     openDeckFromFile(fileName, deckOpenLocation);
@@ -295,8 +300,9 @@ void AbstractTabDeckEditor::actLoadDeck()
 void AbstractTabDeckEditor::actOpenRecent(const QString &fileName)
 {
     auto deckOpenLocation = confirmOpen();
-    if (deckOpenLocation == CANCELLED)
+    if (deckOpenLocation == CANCELLED) {
         return;
+    }
 
     openDeckFromFile(fileName, deckOpenLocation);
 }
@@ -349,8 +355,9 @@ bool AbstractTabDeckEditor::actSaveDeck()
 
         return true;
     }
-    if (loadedDeck.lastLoadInfo.fileName.isEmpty())
+    if (loadedDeck.lastLoadInfo.fileName.isEmpty()) {
         return actSaveDeckAs();
+    }
 
     if (DeckLoader::saveToFile(loadedDeck)) {
         deckStateManager->setModified(false);
@@ -378,8 +385,9 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);
     dialog.selectFile(deckList.getName().trimmed());
 
-    if (!dialog.exec())
+    if (!dialog.exec()) {
         return false;
+    }
 
     QString fileName = dialog.selectedFiles().at(0);
     DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(fileName);
@@ -405,10 +413,11 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
  */
 void AbstractTabDeckEditor::saveDeckRemoteFinished(const Response &response)
 {
-    if (response.response_code() != Response::RespOk)
+    if (response.response_code() != Response::RespOk) {
         QMessageBox::critical(this, tr("Error"), tr("The deck could not be saved."));
-    else
+    } else {
         deckStateManager->setModified(false);
+    }
 }
 
 /**
@@ -418,12 +427,14 @@ void AbstractTabDeckEditor::saveDeckRemoteFinished(const Response &response)
 void AbstractTabDeckEditor::actLoadDeckFromClipboard()
 {
     auto deckOpenLocation = confirmOpen();
-    if (deckOpenLocation == CANCELLED)
+    if (deckOpenLocation == CANCELLED) {
         return;
+    }
 
     DlgLoadDeckFromClipboard dlg(this);
-    if (!dlg.exec())
+    if (!dlg.exec()) {
         return;
+    }
 
     if (deckOpenLocation == NEW_TAB) {
         emit openDeckEditor({.deckList = dlg.getDeckList()});
@@ -443,8 +454,9 @@ void AbstractTabDeckEditor::editDeckInClipboard(bool annotated)
 {
     LoadedDeck loadedDeck = deckStateManager->toLoadedDeck();
     DlgEditDeckInClipboard dlg(loadedDeck.deckList, annotated, this);
-    if (!dlg.exec())
+    if (!dlg.exec()) {
         return;
+    }
 
     setDeck({dlg.getDeckList(), loadedDeck.lastLoadInfo});
     deckStateManager->setModified(true);
@@ -502,12 +514,14 @@ void AbstractTabDeckEditor::actPrintDeck()
 void AbstractTabDeckEditor::actLoadDeckFromWebsite()
 {
     auto deckOpenLocation = confirmOpen();
-    if (deckOpenLocation == CANCELLED)
+    if (deckOpenLocation == CANCELLED) {
         return;
+    }
 
     DlgLoadDeckFromWebsite dlg(this);
-    if (!dlg.exec())
+    if (!dlg.exec()) {
         return;
+    }
 
     if (deckOpenLocation == NEW_TAB) {
         emit openDeckEditor({.deckList = dlg.getDeck()});
@@ -590,10 +604,11 @@ bool AbstractTabDeckEditor::confirmClose()
     if (deckStateManager->isModified()) {
         tabSupervisor->setCurrentWidget(this);
         int ret = createSaveConfirmationWindow()->exec();
-        if (ret == QMessageBox::Save)
+        if (ret == QMessageBox::Save) {
             return actSaveDeck();
-        else if (ret == QMessageBox::Cancel)
+        } else if (ret == QMessageBox::Cancel) {
             return false;
+        }
     }
     return true;
 }
@@ -601,7 +616,8 @@ bool AbstractTabDeckEditor::confirmClose()
 /** @brief Handles close requests from outside (tab manager). */
 bool AbstractTabDeckEditor::closeRequest()
 {
-    if (!confirmClose())
+    if (!confirmClose()) {
         return false;
+    }
     return close();
 }

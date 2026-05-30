@@ -59,8 +59,9 @@ GameSelectorQuickFilterToolBar::GameSelectorQuickFilterToolBar(QWidget *parent,
     if (currentTypes.size() == 1) {
         int typeId = *currentTypes.begin();
         int index = filterToFormatComboBox->findData(typeId);
-        if (index >= 0)
+        if (index >= 0) {
             filterToFormatComboBox->setCurrentIndex(index);
+        }
     } else {
         filterToFormatComboBox->setCurrentIndex(0); // "All types" by default
     }

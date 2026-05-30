@@ -135,12 +135,14 @@ bool DeckList::loadFromXml(QXmlStreamReader *xml)
     while (!xml->atEnd()) {
         xml->readNext();
         if (xml->isStartElement()) {
-            if (xml->name().toString() != "cockatrice_deck")
+            if (xml->name().toString() != "cockatrice_deck") {
                 return false;
+            }
             while (!xml->atEnd()) {
                 xml->readNext();
-                if (!readElement(xml))
+                if (!readElement(xml)) {
                     break;
+                }
             }
         }
     }
@@ -283,8 +285,9 @@ bool DeckList::loadFromStream_Plain(QTextStream &in,
     for (; index < max_line; ++index) {
         // check if line is a card
         match = reCardLine.match(inputs.at(index));
-        if (!match.hasMatch())
+        if (!match.hasMatch()) {
             continue;
+        }
 
         QString cardName = match.captured().simplified();
         bool sideboard = false;
@@ -297,8 +300,9 @@ bool DeckList::loadFromStream_Plain(QTextStream &in,
                 cardName = match.captured(1);
             }
         } else {
-            if (index == sBStart)
+            if (index == sBStart) {
                 continue;
+            }
             sideboard = index > sBStart;
         }
 

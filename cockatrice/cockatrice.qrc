@@ -55,6 +55,7 @@
         <file>resources/icons/view.svg</file>
 
         <file>resources/icons/mana/B.svg</file>
+        <file>resources/icons/mana/C.svg</file>
         <file>resources/icons/mana/G.svg</file>
         <file>resources/icons/mana/R.svg</file>
         <file>resources/icons/mana/U.svg</file>
@@ -69,6 +70,7 @@
         <file>resources/config/interface.svg</file>
         <file>resources/config/messages.svg</file>
         <file>resources/config/deckeditor.svg</file>
+        <file>resources/config/storage.svg</file>
         <file>resources/config/shorcuts.svg</file>
         <file>resources/config/sound.svg</file>
         <file>resources/config/debug.ini</file>

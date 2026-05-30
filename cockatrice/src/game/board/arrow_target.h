@@ -1,8 +1,8 @@
 /**
  * @file arrow_target.h
  * @ingroup GameGraphics
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef ARROWTARGET_H
 #define ARROWTARGET_H
@@ -11,24 +11,26 @@
 
 #include <QList>
 
-class Player;
+class PlayerLogic;
 class ArrowItem;
 
 class ArrowTarget : public AbstractGraphicsItem
 {
     Q_OBJECT
 protected:
-    Player *owner;
+    PlayerLogic *owner;
 
 private:
-    bool beingPointedAt;
-    QList<ArrowItem *> arrowsFrom, arrowsTo;
+    bool beingPointedAt = false;
+
+signals:
+    void scenePositionChanged();
 
 public:
-    explicit ArrowTarget(Player *_owner, QGraphicsItem *parent = nullptr);
-    ~ArrowTarget() override;
+    explicit ArrowTarget(PlayerLogic *_owner, QGraphicsItem *parent = nullptr);
+    ~ArrowTarget() override = default;
 
-    [[nodiscard]] Player *getOwner() const
+    [[nodiscard]] PlayerLogic *getOwner() const
     {
         return owner;
     }
@@ -39,32 +41,7 @@ public:
         return beingPointedAt;
     }
 
-    [[nodiscard]] const QList<ArrowItem *> &getArrowsFrom() const
-    {
-        return arrowsFrom;
-    }
-    void addArrowFrom(ArrowItem *arrow)
-    {
-        arrowsFrom.append(arrow);
-    }
-    void removeArrowFrom(ArrowItem *arrow)
-    {
-        arrowsFrom.removeOne(arrow);
-    }
-    [[nodiscard]] const QList<ArrowItem *> &getArrowsTo() const
-    {
-        return arrowsTo;
-    }
-    void addArrowTo(ArrowItem *arrow)
-    {
-        arrowsTo.append(arrow);
-    }
-    void removeArrowTo(ArrowItem *arrow)
-    {
-        arrowsTo.removeOne(arrow);
-    }
-
 protected:
-    QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 };
 #endif

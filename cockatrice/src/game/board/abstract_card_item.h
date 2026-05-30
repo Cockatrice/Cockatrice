@@ -1,7 +1,7 @@
 /**
  * @file abstract_card_item.h
  * @ingroup GameGraphicsCards
- * @brief TODO: Document this.
+ * @brief Base class for graphical card items, providing shared rendering, identity, and interaction logic.
  */
 
 #ifndef ABSTRACTCARDITEM_H
@@ -14,7 +14,7 @@
 #include <libcockatrice/card/printing/exact_card.h>
 #include <libcockatrice/utility/card_ref.h>
 
-class Player;
+class PlayerLogic;
 
 class AbstractCardItem : public ArrowTarget
 {
@@ -56,7 +56,7 @@ public:
     }
     explicit AbstractCardItem(QGraphicsItem *parent = nullptr,
                               const CardRef &cardRef = {},
-                              Player *_owner = nullptr,
+                              PlayerLogic *_owner = nullptr,
                               int _id = -1);
     ~AbstractCardItem() override;
     QRectF boundingRect() const override;
@@ -96,6 +96,10 @@ public:
     }
     void setRealZValue(qreal _zValue);
     void setHovered(bool _hovered);
+    bool getIsHovered() const
+    {
+        return isHovered;
+    }
     QString getColor() const
     {
         return color;

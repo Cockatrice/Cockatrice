@@ -49,6 +49,7 @@
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/trice_limits.h>
 #include <libcockatrice/utility/zone_names.h>
+#include <limits>
 #include <ranges>
 
 Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
@@ -391,10 +392,14 @@ void Server_AbstractPlayer::processMoveCard(GameEventStorage &ges,
         for (auto *player : game->getPlayers().values()) {
             QList<int> arrowsToDelete;
             for (Server_Arrow *arrow : player->getArrows()) {
-                if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card))
+                if ((arrow->getStartCard() == card) || (arrow->getTargetItem() == card)) {
                     arrowsToDelete.append(arrow->getId());
+                }
             }
             for (int j : arrowsToDelete) {
+                Event_DeleteArrow event;
+                event.set_arrow_id(j);
+                ges.enqueueGameEvent(event, player->getPlayerId());
                 player->deleteArrow(j);
             }
         }
@@ -1090,8 +1095,9 @@ Server_AbstractPlayer::cmdCreateToken(const Command_CreateToken &cmd, ResponseCo
                 _event.set_zone_name(card->getZone()->getName().toStdString());
                 _event.set_card_id(card->getId());
 
-                card->setCounter(i.key(), i.value(), &_event);
-                ges.enqueueGameEvent(_event, playerId);
+                if (card->setCounter(i.key(), i.value(), &_event)) {
+                    ges.enqueueGameEvent(_event, playerId);
+                }
             }
 
             // Copy parent card
@@ -1129,12 +1135,18 @@ Server_AbstractPlayer::cmdCreateToken(const Command_CreateToken &cmd, ResponseCo
                         targetItem = card;
                     }
                     if (sendGameEvent) {
-                        Event_CreateArrow _event;
-                        ServerInfo_Arrow *arrowInfo = _event.mutable_arrow_info();
-                        changedArrowIds.append(arrow->getId());
-                        int id = player->newArrowId();
-                        arrow->setId(id);
-                        arrowInfo->set_id(id);
+                        const int oldId = arrow->getId();
+                        changedArrowIds.append(oldId);
+
+                        Event_DeleteArrow deleteEvent;
+                        deleteEvent.set_arrow_id(oldId);
+                        ges.enqueueGameEvent(deleteEvent, player->getPlayerId());
+
+                        Event_CreateArrow createEvent;
+                        ServerInfo_Arrow *arrowInfo = createEvent.mutable_arrow_info();
+                        const int newId = player->newArrowId();
+                        arrow->setId(newId);
+                        arrowInfo->set_id(newId);
                         arrowInfo->set_start_player_id(player->getPlayerId());
                         arrowInfo->set_start_zone(startCard->getZone()->getName().toStdString());
                         arrowInfo->set_start_card_id(startCard->getId());
@@ -1148,7 +1160,7 @@ Server_AbstractPlayer::cmdCreateToken(const Command_CreateToken &cmd, ResponseCo
                             arrowInfo->set_target_card_id(arrowTargetCard->getId());
                         }
                         arrowInfo->mutable_arrow_color()->CopyFrom(arrow->getColor());
-                        ges.enqueueGameEvent(_event, player->getPlayerId());
+                        ges.enqueueGameEvent(createEvent, player->getPlayerId());
                     }
                 }
                 for (int id : changedArrowIds) {
@@ -1337,8 +1349,9 @@ Response::ResponseCode Server_AbstractPlayer::cmdSetCardCounter(const Command_Se
     Event_SetCardCounter event;
     event.set_zone_name(zone->getName().toStdString());
     event.set_card_id(card->getId());
-    card->setCounter(cmd.counter_id(), cmd.counter_value(), &event);
-    ges.enqueueGameEvent(event, playerId);
+    if (card->setCounter(cmd.counter_id(), cmd.counter_value(), &event)) {
+        ges.enqueueGameEvent(event, playerId);
+    }
 
     return Response::RespOk;
 }
@@ -1367,14 +1380,13 @@ Response::ResponseCode Server_AbstractPlayer::cmdIncCardCounter(const Command_In
         return Response::RespNameNotFound;
     }
 
-    int newValue = card->getCounter(cmd.counter_id()) + cmd.counter_delta();
-    card->setCounter(cmd.counter_id(), newValue);
-
     Event_SetCardCounter event;
     event.set_zone_name(zone->getName().toStdString());
     event.set_card_id(card->getId());
-    event.set_counter_id(cmd.counter_id());
-    event.set_counter_value(newValue);
+    if (!card->incrementCounter(cmd.counter_id(), cmd.counter_delta(), &event)) {
+        return Response::RespOk;
+    }
+
     ges.enqueueGameEvent(event, playerId);
 
     return Response::RespOk;
@@ -1472,8 +1484,9 @@ Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseCo
 
     if (cmd.has_player_id()) {
         Server_AbstractPlayer *otherPlayer = game->getPlayer(cmd.player_id());
-        if (!otherPlayer)
+        if (!otherPlayer) {
             return Response::RespNameNotFound;
+        }
     }
     Server_CardZone *zone = zones.value(nameFromStdString(cmd.zone_name()));
     if (!zone) {

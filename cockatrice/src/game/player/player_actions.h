@@ -2,15 +2,15 @@
  * @file player_actions.h
  *  @ingroup GameLogicActions
  * @ingroup GameLogicPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_ACTIONS_H
 #define COCKATRICE_PLAYER_ACTIONS_H
 #include "../dialogs/dlg_create_token.h"
 #include "../dialogs/dlg_move_top_cards_until.h"
 #include "event_processing_options.h"
-#include "player.h"
+#include "player_logic.h"
 
 #include <QMenu>
 #include <QObject>
@@ -29,7 +29,7 @@ class CardItem;
 class Command_MoveCard;
 class GameEventContext;
 class PendingCommand;
-class Player;
+class PlayerLogic;
 class PlayerActions : public QObject
 {
     Q_OBJECT
@@ -40,7 +40,7 @@ public:
         RANDOM_CARD_FROM_ZONE = -2
     };
 
-    explicit PlayerActions(Player *player);
+    explicit PlayerActions(PlayerLogic *player);
 
     void sendGameCommand(PendingCommand *pend);
     void sendGameCommand(const google::protobuf::Message &command);
@@ -131,6 +131,7 @@ public slots:
     void actRemoveCardCounter(int counterId);
     void actAddCardCounter(int counterId);
     void actSetCardCounter(int counterId);
+    void actIncrementAllCardCounters();
     void actAttach();
     void actUnattach();
     void actDrawArrow();
@@ -145,6 +146,9 @@ public slots:
     void actDecPT();
     void actFlowP();
     void actFlowT();
+
+    void actReduceLifeByPower();
+
     void actSetAnnotation();
     void actReveal(QAction *action);
     void actRevealHand(int revealToPlayerId);
@@ -156,7 +160,7 @@ public slots:
     void cardMenuAction();
 
 private:
-    Player *player;
+    PlayerLogic *player;
 
     int defaultNumberTopCards = 1;
     int defaultNumberTopCardsToPlaceBelow = 1;

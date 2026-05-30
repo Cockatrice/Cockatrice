@@ -2,8 +2,8 @@
  * @file home_widget.h
  * @ingroup Core
  * @ingroup Widgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef HOME_WIDGET_H
 #define HOME_WIDGET_H

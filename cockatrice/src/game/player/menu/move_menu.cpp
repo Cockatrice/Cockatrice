@@ -1,10 +1,10 @@
 #include "move_menu.h"
 
 #include "../card_menu_action_type.h"
-#include "../player.h"
 #include "../player_actions.h"
+#include "../player_logic.h"
 
-MoveMenu::MoveMenu(Player *player) : QMenu(tr("Move to"))
+MoveMenu::MoveMenu(PlayerLogic *player) : QMenu(tr("Move to"))
 {
     aMoveToTopLibrary = new QAction(this);
     aMoveToTopLibrary->setData(cmMoveToTopLibrary);

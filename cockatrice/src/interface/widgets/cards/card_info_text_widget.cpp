@@ -73,8 +73,9 @@ void CardInfoTextWidget::setCard(const ExactCard &exactCard)
 
     QStringList cardProps = card->getProperties();
     for (const QString &key : cardProps) {
-        if (key.contains("-"))
+        if (key.contains("-")) {
             continue;
+        }
         QString keyText = Mtg::getNicePropertyName(key).toHtmlEscaped() + ":";
         text +=
             QString("<tr><td>%1</td><td></td><td>%2</td></tr>").arg(keyText, card->getProperty(key).toHtmlEscaped());

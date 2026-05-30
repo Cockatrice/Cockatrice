@@ -1,8 +1,8 @@
 /**
  * @file tab_message.h
  * @ingroup MessagingTabs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_MESSAGE_H
 #define TAB_MESSAGE_H

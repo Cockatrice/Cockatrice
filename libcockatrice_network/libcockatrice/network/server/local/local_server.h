@@ -1,8 +1,8 @@
 /**
  * @file local_server.h
  * @ingroup Server
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef LOCALSERVER_H
 #define LOCALSERVER_H

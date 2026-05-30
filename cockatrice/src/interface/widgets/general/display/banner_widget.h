@@ -3,8 +3,8 @@
  * @ingroup Widgets
  * @ingroup DeckEditorCardGroupWidgets
  * @ingroup DeckStorageWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef BANNER_WIDGET_H
 #define BANNER_WIDGET_H

@@ -2,8 +2,8 @@
  * @file dlg_load_deck.h
  * @ingroup LocalDeckStorageDialogs
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_LOAD_DECK_H
 #define DLG_LOAD_DECK_H

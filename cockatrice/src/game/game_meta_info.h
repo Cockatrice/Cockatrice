@@ -1,8 +1,8 @@
 /**
  * @file game_meta_info.h
  * @ingroup GameLogic
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef GAME_META_INFO_H
 #define GAME_META_INFO_H
@@ -87,15 +87,17 @@ public:
 public slots:
     void setStarted(bool s)
     {
-        if (gameInfo_.started() == s)
+        if (gameInfo_.started() == s) {
             return;
+        }
         gameInfo_.set_started(s);
         emit startedChanged(s);
     }
     void setSpectatorsOmniscient(bool v)
     {
-        if (gameInfo_.spectators_omniscient() == v)
+        if (gameInfo_.spectators_omniscient() == v) {
             return;
+        }
         gameInfo_.set_spectators_omniscient(v);
         emit spectatorsOmniscienceChanged(v);
     }

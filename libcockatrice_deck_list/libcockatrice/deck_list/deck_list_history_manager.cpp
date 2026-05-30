@@ -16,8 +16,9 @@ void DeckListHistoryManager::clear()
 
 void DeckListHistoryManager::undo(DeckList *deck)
 {
-    if (undoStack.isEmpty())
+    if (undoStack.isEmpty()) {
         return;
+    }
 
     // Peek at the memento we are going to restore
     const DeckListMemento &mementoToRestore = undoStack.top();
@@ -35,8 +36,9 @@ void DeckListHistoryManager::undo(DeckList *deck)
 
 void DeckListHistoryManager::redo(DeckList *deck)
 {
-    if (redoStack.isEmpty())
+    if (redoStack.isEmpty()) {
         return;
+    }
 
     // Peek at the memento we are going to restore
     const DeckListMemento &mementoToRestore = redoStack.top();

@@ -10,8 +10,9 @@ UpdateDownloader::UpdateDownloader(QObject *parent) : QObject(parent), response(
 void UpdateDownloader::beginDownload(QUrl downloadUrl)
 {
     // Save the original URL because we need it for the filename
-    if (originalUrl.isEmpty())
+    if (originalUrl.isEmpty()) {
         originalUrl = downloadUrl;
+    }
 
     response = netMan->get(QNetworkRequest(downloadUrl));
     connect(response, &QNetworkReply::finished, this, &UpdateDownloader::fileFinished);
@@ -21,8 +22,9 @@ void UpdateDownloader::beginDownload(QUrl downloadUrl)
 
 void UpdateDownloader::downloadError(QNetworkReply::NetworkError)
 {
-    if (response == nullptr)
+    if (response == nullptr) {
         return;
+    }
 
     emit error(response->errorString().toUtf8());
 }

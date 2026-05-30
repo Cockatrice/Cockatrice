@@ -1,12 +1,13 @@
 #include "game_scene.h"
 
 #include "../client/settings/cache_settings.h"
+#include "../game_graphics/zones/select_zone.h"
+#include "../game_graphics/zones/view_zone.h"
+#include "../game_graphics/zones/view_zone_widget.h"
 #include "board/card_item.h"
 #include "phases_toolbar.h"
-#include "player/player.h"
 #include "player/player_graphics_item.h"
-#include "zones/view_zone.h"
-#include "zones/view_zone_widget.h"
+#include "player/player_logic.h"
 
 #include <QBasicTimer>
 #include <QDebug>
@@ -54,8 +55,9 @@ GameScene::~GameScene()
  */
 void GameScene::retranslateUi()
 {
-    for (ZoneViewWidget *view : zoneViews)
+    for (ZoneViewWidget *view : zoneViews) {
         view->retranslateUi();
+    }
 }
 
 QList<CardItem *> GameScene::selectedCards() const
@@ -76,13 +78,30 @@ QList<CardItem *> GameScene::selectedCards() const
  *
  * Connects to the player's sizeChanged signal to recompute layout on resize.
  */
-void GameScene::addPlayer(Player *player)
+void GameScene::addPlayer(PlayerLogic *player)
 {
     qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::addPlayer name=" << player->getPlayerInfo()->getName();
 
-    players << player->getGraphicsItem();
+    playerViews.insert(player->getPlayerInfo()->getId(), player->getGraphicsItem());
     addItem(player->getGraphicsItem());
     connect(player->getGraphicsItem(), &PlayerGraphicsItem::sizeChanged, this, &GameScene::rearrange);
+
+    connect(player, &PlayerLogic::concededChanged, this, [this](int id, bool conceded) {
+        if (conceded) {
+            clearArrowsForPlayer(id);
+        }
+        rearrange();
+    });
+
+    connect(player, &PlayerLogic::arrowDeleted, this, &GameScene::deleteArrow);
+    connect(player, &PlayerLogic::arrowCreateRequested, this, &GameScene::addArrow);
+    connect(player, &PlayerLogic::arrowDeleteRequested, this, &GameScene::requestArrowDeletion);
+    connect(player, &PlayerLogic::arrowsCleared, this,
+            [this, id = player->getPlayerInfo()->getId()]() { clearArrowsForPlayer(id); });
+
+    connect(player->getPlayerEventHandler(), &PlayerEventHandler::cardZoneChanged, this, &GameScene::onCardZoneChanged);
+
+    rearrange();
 }
 
 /**
@@ -91,17 +110,19 @@ void GameScene::addPlayer(Player *player)
  *
  * Closes any zone views associated with the player and recomputes layout.
  */
-void GameScene::removePlayer(Player *player)
+void GameScene::removePlayer(PlayerLogic *player)
 {
     qCInfo(GameScenePlayerAdditionRemovalLog) << "GameScene::removePlayer name=" << player->getPlayerInfo()->getName();
+
+    clearArrowsForPlayer(player->getPlayerInfo()->getId());
 
     for (ZoneViewWidget *zone : zoneViews) {
         if (zone->getPlayer() == player) {
             zone->close();
         }
     }
-    players.removeOne(player->getGraphicsItem());
-    removeItem(player->getGraphicsItem());
+    auto *view = playerViews.take(player->getPlayerInfo()->getId());
+    removeItem(view);
     rearrange();
 }
 
@@ -176,14 +197,14 @@ void GameScene::processViewSizeChange(const QSize &newSize)
  *
  * Used to determine rotation and layout order.
  */
-QList<Player *> GameScene::collectActivePlayers(int &firstPlayerIndex) const
+QList<PlayerLogic *> GameScene::collectActivePlayers(int &firstPlayerIndex) const
 {
-    QList<Player *> activePlayers;
+    QList<PlayerLogic *> activePlayers;
     firstPlayerIndex = 0;
     bool firstPlayerFound = false;
 
-    for (auto *pgItem : players) {
-        Player *p = pgItem->getPlayer();
+    for (auto *pgItem : playerViews.values()) {
+        PlayerLogic *p = pgItem->getPlayer();
         if (p && !p->getConceded()) {
             activePlayers.append(p);
             if (!firstPlayerFound && p->getPlayerInfo()->getLocal()) {
@@ -203,15 +224,17 @@ QList<Player *> GameScene::collectActivePlayers(int &firstPlayerIndex) const
  *
  * Applies rotation offset and ensures the list wraps correctly.
  */
-QList<Player *> GameScene::rotatePlayers(const QList<Player *> &activePlayers, int firstPlayerIndex) const
+QList<PlayerLogic *> GameScene::rotatePlayers(const QList<PlayerLogic *> &activePlayers, int firstPlayerIndex) const
 {
-    QList<Player *> rotated = activePlayers;
+    QList<PlayerLogic *> rotated = activePlayers;
     if (!rotated.isEmpty()) {
         int totalRotation = firstPlayerIndex + playerRotation;
-        while (totalRotation < 0)
+        while (totalRotation < 0) {
             totalRotation += rotated.size();
-        for (int i = 0; i < totalRotation; ++i)
+        }
+        for (int i = 0; i < totalRotation; ++i) {
             rotated.append(rotated.takeFirst());
+        }
     }
     return rotated;
 }
@@ -234,7 +257,7 @@ int GameScene::determineColumnCount(int playerCount)
  * - Position players in columns with spacing.
  * - Mirror graphics for visual balance.
  */
-QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &playersPlaying, int columns)
+QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<PlayerLogic *> &playersPlaying, int columns)
 {
     playersByColumn.clear();
 
@@ -242,7 +265,7 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &players
     qreal sceneHeight = 0, sceneWidth = -playerAreaSpacing;
     QList<int> columnWidth;
 
-    QListIterator<Player *> playersIter(playersPlaying);
+    QListIterator<PlayerLogic *> playersIter(playersPlaying);
     for (int col = 0; col < columns; ++col) {
         playersByColumn.append(QList<PlayerGraphicsItem *>());
         columnWidth.append(0);
@@ -250,11 +273,12 @@ QSizeF GameScene::computeSceneSizeAndPlayerLayout(const QList<Player *> &players
         int rowsInColumn = rows - (playersPlaying.size() % columns) * col; // Adjust rows for uneven columns
 
         for (int j = 0; j < rowsInColumn; ++j) {
-            Player *player = playersIter.next();
-            if (col == 0)
+            PlayerLogic *player = playersIter.next();
+            if (col == 0) {
                 playersByColumn[col].prepend(player->getGraphicsItem());
-            else
+            } else {
                 playersByColumn[col].append(player->getGraphicsItem());
+            }
 
             auto *pgItem = player->getGraphicsItem();
             thisColumnHeight += pgItem->boundingRect().height() + playerAreaSpacing;
@@ -293,8 +317,9 @@ QList<qreal> GameScene::calculateMinWidthByColumn() const
     QList<qreal> minWidthByColumn;
     for (const auto &col : playersByColumn) {
         qreal maxWidth = 0;
-        for (PlayerGraphicsItem *player : col)
+        for (PlayerGraphicsItem *player : col) {
             maxWidth = std::max(maxWidth, player->getMinimumWidth());
+        }
         minWidthByColumn.append(maxWidth);
     }
     return minWidthByColumn;
@@ -342,6 +367,99 @@ void GameScene::resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qr
     }
 }
 
+void GameScene::addArrow(const ArrowData &data)
+{
+    auto *startView = playerViews.value(data.startPlayerId);
+    auto *targetView = playerViews.value(data.targetPlayerId);
+    if (!startView || !targetView) {
+        return;
+    }
+
+    PlayerLogic *startLogic = startView->getPlayer();
+    auto *startZone = startLogic->getZones().value(data.startZone);
+    if (!startZone) {
+        return;
+    }
+
+    CardItem *startCard = startZone->getCard(data.startCardId);
+    if (!startCard) {
+        return;
+    }
+
+    ArrowTarget *targetItem = nullptr;
+    if (data.isPlayerTargeted()) {
+        targetItem = targetView->getPlayerTarget();
+    } else {
+        auto *zone = targetView->getPlayer()->getZones().value(data.targetZone);
+        if (zone) {
+            targetItem = zone->getCard(data.targetCardId);
+        }
+    }
+    if (!targetItem) {
+        return;
+    }
+
+    auto *arrow = new ArrowItem(startView->getPlayer(), data.id, startCard, targetItem, data.color);
+    addItem(arrow);
+    arrowRegistry.insert(data.id, arrow);
+    connect(arrow, &ArrowItem::requestDeletion, this, &GameScene::requestArrowDeletion);
+}
+
+void GameScene::deleteArrow(int arrowId)
+{
+    if (arrowRegistry.contains(arrowId)) {
+        arrowRegistry.take(arrowId)->delArrow();
+    }
+}
+
+void GameScene::clearArrowsForPlayer(int playerId)
+{
+    QList<int> toDelete;
+    for (auto i = arrowRegistry.cbegin(); i != arrowRegistry.cend(); ++i) {
+        auto *arrow = i.value();
+        if (arrow->getPlayer()->getPlayerInfo()->getId() == playerId) {
+            toDelete.append(i.key());
+        }
+    }
+
+    for (int arrowId : toDelete) {
+        arrowRegistry.take(arrowId)->delArrow();
+    }
+}
+
+void GameScene::requestArrowDeletion(int arrowId)
+{
+    if (arrowRegistry.contains(arrowId)) {
+        emit arrowDeletionRequested(arrowId);
+    }
+}
+
+void GameScene::requestClearArrowsForPlayer(int playerId)
+{
+    for (auto *arrow : arrowRegistry.values()) {
+        if (arrow->getPlayer()->getPlayerInfo()->getId() == playerId) {
+            emit requestArrowDeletion(arrow->getId());
+        }
+    }
+}
+
+void GameScene::onCardZoneChanged(CardItem *card, bool sameZone)
+{
+    QList<ArrowItem *> toDelete;
+    for (auto *arrow : arrowRegistry.values()) {
+        if (arrow->getStartItem() == card || arrow->getTargetItem() == card) {
+            if (sameZone) {
+                arrow->updatePath();
+            } else {
+                toDelete.append(arrow);
+            }
+        }
+    }
+    for (auto *arrow : toDelete) {
+        deleteArrow(arrow->getId());
+    }
+}
+
 // ---------- Hover Handling ----------
 
 void GameScene::updateHover(const QPointF &scenePos)
@@ -355,18 +473,38 @@ void GameScene::updateHover(const QPointF &scenePos)
 
 void GameScene::updateHoveredCard(CardItem *newCard)
 {
-    if (hoveredCard && (newCard != hoveredCard))
-        hoveredCard->setHovered(false);
-    if (newCard && (newCard != hoveredCard))
-        newCard->setHovered(true);
+    if (hoveredCard && (newCard != hoveredCard)) {
+        endCardHover(hoveredCard);
+    }
+    if (newCard && (newCard != hoveredCard)) {
+        beginCardHover(newCard);
+    }
     hoveredCard = newCard;
+}
+
+void GameScene::beginCardHover(CardItem *card)
+{
+    card->setHovered(true);
+    if (auto *zone = SelectZone::findOwningSelectZone(card)) {
+        zone->escapeClipForHover(card);
+    }
+}
+
+void GameScene::endCardHover(CardItem *card)
+{
+    if (auto *zone = SelectZone::findOwningSelectZone(card)) {
+        zone->restoreClipAfterHover(card);
+    }
+    card->setHovered(false);
 }
 
 CardZone *GameScene::findTopmostZone(const QList<QGraphicsItem *> &items)
 {
-    for (QGraphicsItem *item : items)
-        if (auto *zone = qgraphicsitem_cast<CardZone *>(item))
+    for (QGraphicsItem *item : items) {
+        if (auto *zone = qgraphicsitem_cast<CardZone *>(item)) {
             return zone;
+        }
+    }
     return nullptr;
 }
 
@@ -377,14 +515,17 @@ CardItem *GameScene::findTopmostCardInZone(const QList<QGraphicsItem *> &items, 
 
     for (QGraphicsItem *item : items) {
         CardItem *card = qgraphicsitem_cast<CardItem *>(item);
-        if (!card)
+        if (!card) {
             continue;
+        }
 
         if (card->getAttachedTo()) {
-            if (card->getAttachedTo()->getZone() != zone->getLogic())
+            if (card->getAttachedTo()->getZone() != zone->getLogic()) {
                 continue;
-        } else if (card->getZone() != zone->getLogic())
+            }
+        } else if (card->getZone() != zone->getLogic()) {
             continue;
+        }
 
         if (card->getRealZValue() > maxZ) {
             maxZ = card->getRealZValue();
@@ -406,7 +547,7 @@ CardItem *GameScene::findTopmostCardInZone(const QList<QGraphicsItem *> &items, 
  * If an identical view exists, it is closed. Otherwise, a new ZoneViewWidget is created
  * and positioned based on zone type.
  */
-void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numberCards, bool isReversed)
+void GameScene::toggleZoneView(PlayerLogic *player, const QString &zoneName, int numberCards, bool isReversed)
 {
     for (auto &view : zoneViews) {
         ZoneViewZone *temp = view->getZone();
@@ -423,12 +564,13 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
     connect(item, &ZoneViewWidget::closePressed, this, &GameScene::removeZoneView);
     addItem(item);
 
-    if (zoneName == ZoneNames::GRAVE)
+    if (zoneName == ZoneNames::GRAVE) {
         item->setPos(360, 100);
-    else if (zoneName == ZoneNames::EXILE)
+    } else if (zoneName == ZoneNames::EXILE) {
         item->setPos(380, 120);
-    else
+    } else {
         item->setPos(340, 80);
+    }
 }
 
 /**
@@ -438,7 +580,7 @@ void GameScene::toggleZoneView(Player *player, const QString &zoneName, int numb
  * @param cardList List of cards to show.
  * @param withWritePermission Whether edits are allowed.
  */
-void GameScene::addRevealedZoneView(Player *player,
+void GameScene::addRevealedZoneView(PlayerLogic *player,
                                     CardZoneLogic *zone,
                                     const QList<const ServerInfo_Card *> &cardList,
                                     bool withWritePermission)
@@ -465,8 +607,9 @@ void GameScene::removeZoneView(ZoneViewWidget *item)
  */
 void GameScene::clearViews()
 {
-    while (!zoneViews.isEmpty())
+    while (!zoneViews.isEmpty()) {
         zoneViews.first()->close();
+    }
 }
 
 /**
@@ -474,8 +617,9 @@ void GameScene::clearViews()
  */
 void GameScene::closeMostRecentZoneView()
 {
-    if (!zoneViews.isEmpty())
+    if (!zoneViews.isEmpty()) {
         zoneViews.last()->close();
+    }
 }
 
 // ---------- View Transforms ----------
@@ -494,8 +638,11 @@ QTransform GameScene::getViewportTransform() const
 
 bool GameScene::event(QEvent *event)
 {
-    if (event->type() == QEvent::GraphicsSceneMouseMove)
+    if (event->type() == QEvent::GraphicsSceneMouseMove) {
         updateHover(static_cast<QGraphicsSceneMouseEvent *>(event)->scenePos());
+    } else if (event->type() == QEvent::Leave) {
+        updateHoveredCard(nullptr);
+    }
 
     return QGraphicsScene::event(event);
 }
@@ -505,25 +652,29 @@ void GameScene::timerEvent(QTimerEvent * /*event*/)
     QMutableSetIterator<CardItem *> i(cardsToAnimate);
     while (i.hasNext()) {
         i.next();
-        if (!i.value()->animationEvent())
+        if (!i.value()->animationEvent()) {
             i.remove();
+        }
     }
-    if (cardsToAnimate.isEmpty())
+    if (cardsToAnimate.isEmpty()) {
         animationTimer->stop();
+    }
 }
 
 void GameScene::registerAnimationItem(AbstractCardItem *card)
 {
     cardsToAnimate.insert(static_cast<CardItem *>(card));
-    if (!animationTimer->isActive())
+    if (!animationTimer->isActive()) {
         animationTimer->start(10, this);
+    }
 }
 
 void GameScene::unregisterAnimationItem(AbstractCardItem *card)
 {
     cardsToAnimate.remove(static_cast<CardItem *>(card));
-    if (cardsToAnimate.isEmpty())
+    if (cardsToAnimate.isEmpty()) {
         animationTimer->stop();
+    }
 }
 
 // ---------- Rubber Band ----------

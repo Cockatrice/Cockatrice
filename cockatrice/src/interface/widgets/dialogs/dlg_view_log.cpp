@@ -60,8 +60,9 @@ void DlgViewLog::actCopyToClipboard()
 void DlgViewLog::loadInitialLogBuffer()
 {
     QList<QString> logBuffer = Logger::getInstance().getLogBuffer();
-    for (const QString &message : logBuffer)
+    for (const QString &message : logBuffer) {
         appendLogEntry(message);
+    }
 }
 
 void DlgViewLog::appendLogEntry(const QString &message)

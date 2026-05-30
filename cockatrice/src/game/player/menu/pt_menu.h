@@ -1,21 +1,21 @@
 /**
  * @file pt_menu.h
  * @ingroup GameMenusCards
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_PT_MENU_H
 #define COCKATRICE_PT_MENU_H
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class PtMenu : public QMenu
 {
 
     Q_OBJECT
 
 public:
-    explicit PtMenu(Player *player);
+    explicit PtMenu(PlayerLogic *player);
     void retranslateUi();
     void setShortcutsActive();
 

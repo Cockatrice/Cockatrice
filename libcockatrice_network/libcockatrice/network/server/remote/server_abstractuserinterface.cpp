@@ -45,25 +45,28 @@ void Server_AbstractUserInterface::sendResponseContainer(const ResponseContainer
 {
     const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *>> &preResponseQueue =
         responseContainer.getPreResponseQueue();
-    for (int i = 0; i < preResponseQueue.size(); ++i)
+    for (int i = 0; i < preResponseQueue.size(); ++i) {
         sendProtocolItemByType(preResponseQueue[i].first, *preResponseQueue[i].second);
+    }
 
     if (responseCode != Response::RespNothing) {
         Response response;
         response.set_cmd_id(responseContainer.getCmdId());
         response.set_response_code(responseCode);
         ::google::protobuf::Message *responseExtension = responseContainer.getResponseExtension();
-        if (responseExtension)
+        if (responseExtension) {
             response.GetReflection()
                 ->MutableMessage(&response, responseExtension->GetDescriptor()->FindExtensionByName("ext"))
                 ->CopyFrom(*responseExtension);
+        }
         sendProtocolItem(response);
     }
 
     const QList<QPair<ServerMessage::MessageType, ::google::protobuf::Message *>> &postResponseQueue =
         responseContainer.getPostResponseQueue();
-    for (int i = 0; i < postResponseQueue.size(); ++i)
+    for (int i = 0; i < postResponseQueue.size(); ++i) {
         sendProtocolItemByType(postResponseQueue[i].first, *postResponseQueue[i].second);
+    }
 }
 
 void Server_AbstractUserInterface::playerRemovedFromGame(Server_Game *game)
@@ -92,18 +95,21 @@ void Server_AbstractUserInterface::joinPersistentGames(ResponseContainer &rc)
         const PlayerReference &pr = gamesToJoin.at(i);
 
         Server_Room *room = server->getRooms().value(pr.getRoomId());
-        if (!room)
+        if (!room) {
             continue;
+        }
         QReadLocker roomGamesLocker(&room->gamesLock);
 
         Server_Game *game = room->getGames().value(pr.getGameId());
-        if (!game)
+        if (!game) {
             continue;
+        }
         QMutexLocker gameLocker(&game->gameMutex);
 
         auto *participant = game->getParticipants().value(pr.getPlayerId());
-        if (!participant)
+        if (!participant) {
             continue;
+        }
 
         participant->setUserInterface(this);
         playerAddedToGame(game->getGameId(), room->getId(), participant->getPlayerId());

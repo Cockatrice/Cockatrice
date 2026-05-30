@@ -1,8 +1,8 @@
 /**
  * @file player_event_handler.h
  * @ingroup GameLogicPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_EVENT_HANDLER_H
 #define COCKATRICE_PLAYER_EVENT_HANDLER_H
@@ -15,7 +15,7 @@
 
 class CardItem;
 class CardZoneLogic;
-class Player;
+class PlayerLogic;
 class Event_AttachCard;
 class Event_ChangeZoneProperties;
 class Event_CreateArrow;
@@ -35,53 +35,57 @@ class Event_SetCardAttr;
 class Event_SetCardCounter;
 class Event_SetCounter;
 class Event_Shuffle;
+class Event_GameLogNotice;
+
 class PlayerEventHandler : public QObject
 {
 
     Q_OBJECT
 signals:
-    void logSay(Player *player, QString message);
-    void logShuffle(Player *player, CardZoneLogic *zone, int start, int end);
-    void logRollDie(Player *player, int sides, const QList<uint> &rolls);
-    void logCreateArrow(Player *player,
-                        Player *startPlayer,
+    void logSay(PlayerLogic *player, QString message);
+    void logShuffle(PlayerLogic *player, CardZoneLogic *zone, int start, int end);
+    void logRollDie(PlayerLogic *player, int sides, const QList<uint> &rolls);
+    void logCreateArrow(PlayerLogic *player,
+                        PlayerLogic *startPlayer,
                         QString startCard,
-                        Player *targetPlayer,
+                        PlayerLogic *targetPlayer,
                         QString targetCard,
                         bool _playerTarget);
-    void logCreateToken(Player *player, QString cardName, QString pt, bool faceDown);
-    void logDrawCards(Player *player, int number, bool deckIsEmpty);
-    void logUndoDraw(Player *player, QString cardName);
-    void logMoveCard(Player *player,
+    void logCreateToken(PlayerLogic *player, QString cardName, QString pt, bool faceDown);
+    void logDrawCards(PlayerLogic *player, int number, bool deckIsEmpty);
+    void logUndoDraw(PlayerLogic *player, QString cardName);
+    void logUndoDrawFailed(PlayerLogic *player);
+    void logMoveCard(PlayerLogic *player,
                      CardItem *card,
                      CardZoneLogic *startZone,
                      int oldX,
                      CardZoneLogic *targetZone,
                      int newX);
-    void logFlipCard(Player *player, QString cardName, bool faceDown);
-    void logDestroyCard(Player *player, QString cardName);
-    void logAttachCard(Player *player, QString cardName, Player *targetPlayer, QString targetCardName);
-    void logUnattachCard(Player *player, QString cardName);
-    void logSetCardCounter(Player *player, QString cardName, int counterId, int value, int oldValue);
-    void logSetTapped(Player *player, CardItem *card, bool tapped);
-    void logSetCounter(Player *player, QString counterName, int value, int oldValue);
-    void logSetDoesntUntap(Player *player, CardItem *card, bool doesntUntap);
-    void logSetPT(Player *player, CardItem *card, QString newPT);
-    void logSetAnnotation(Player *player, CardItem *card, QString newAnnotation);
-    void logDumpZone(Player *player, CardZoneLogic *zone, int numberCards, bool isReversed = false);
-    void logRevealCards(Player *player,
+    void logFlipCard(PlayerLogic *player, QString cardName, bool faceDown);
+    void logDestroyCard(PlayerLogic *player, QString cardName);
+    void logAttachCard(PlayerLogic *player, QString cardName, PlayerLogic *targetPlayer, QString targetCardName);
+    void logUnattachCard(PlayerLogic *player, QString cardName);
+    void logSetCardCounter(PlayerLogic *player, QString cardName, int counterId, int value, int oldValue);
+    void logSetTapped(PlayerLogic *player, CardItem *card, bool tapped);
+    void logSetCounter(PlayerLogic *player, QString counterName, int value, int oldValue);
+    void logSetDoesntUntap(PlayerLogic *player, CardItem *card, bool doesntUntap);
+    void logSetPT(PlayerLogic *player, CardItem *card, QString newPT);
+    void logSetAnnotation(PlayerLogic *player, CardItem *card, QString newAnnotation);
+    void logDumpZone(PlayerLogic *player, CardZoneLogic *zone, int numberCards, bool isReversed = false);
+    void logRevealCards(PlayerLogic *player,
                         CardZoneLogic *zone,
                         int cardId,
                         QString cardName,
-                        Player *otherPlayer,
+                        PlayerLogic *otherPlayer,
                         bool faceDown,
                         int amount,
                         bool isLentToAnotherPlayer = false);
-    void logAlwaysRevealTopCard(Player *player, CardZoneLogic *zone, bool reveal);
-    void logAlwaysLookAtTopCard(Player *player, CardZoneLogic *zone, bool reveal);
+    void logAlwaysRevealTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
+    void logAlwaysLookAtTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
+    void cardZoneChanged(CardItem *card, bool sameZone);
 
 public:
-    PlayerEventHandler(Player *player);
+    PlayerEventHandler(PlayerLogic *player);
 
     void processGameEvent(GameEvent::GameEventType type,
                           const GameEvent &event,
@@ -108,9 +112,10 @@ public:
     void eventDrawCards(const Event_DrawCards &event);
     void eventRevealCards(const Event_RevealCards &event, EventProcessingOptions options);
     void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
+    void eventGameLogNotice(const Event_GameLogNotice &event);
 
 private:
-    Player *player;
+    PlayerLogic *player;
 
     void setCardAttrHelper(const GameEventContext &context,
                            CardItem *card,

@@ -69,16 +69,18 @@ static void buildMapsByCategory(const QHash<QString, QHash<int, int>> &categoryC
         const QString &category = catIt.key();
         const auto &countsByCmc = catIt.value();
 
-        for (auto it = countsByCmc.cbegin(); it != countsByCmc.cend(); ++it)
+        for (auto it = countsByCmc.cbegin(); it != countsByCmc.cend(); ++it) {
             outCmcMap[it.key()][category] = it.value();
+        }
     }
 
     for (auto catIt = categoryCards.cbegin(); catIt != categoryCards.cend(); ++catIt) {
         const QString &category = catIt.key();
         const auto &cardsByCmc = catIt.value();
 
-        for (auto it = cardsByCmc.cbegin(); it != cardsByCmc.cend(); ++it)
+        for (auto it = cardsByCmc.cbegin(); it != cardsByCmc.cend(); ++it) {
             outCardsMap[category][it.key()] = it.value();
+        }
     }
 }
 
@@ -88,8 +90,9 @@ static void findGlobalCmcRange(const QHash<QString, QHash<int, int>> &categoryCo
     maxCmc = 0;
 
     for (const auto &countsByCmc : categoryCounts) {
-        for (auto it = countsByCmc.cbegin(); it != countsByCmc.cend(); ++it)
+        for (auto it = countsByCmc.cbegin(); it != countsByCmc.cend(); ++it) {
             maxCmc = qMax(maxCmc, it.key());
+        }
     }
 }
 

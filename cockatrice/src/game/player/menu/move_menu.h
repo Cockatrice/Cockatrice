@@ -1,20 +1,20 @@
 /**
  * @file move_menu.h
  * @ingroup GameMenusZones
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_MOVE_MENU_H
 #define COCKATRICE_MOVE_MENU_H
 #include <QMenu>
 
-class Player;
+class PlayerLogic;
 class MoveMenu : public QMenu
 {
     Q_OBJECT
 
 public:
-    explicit MoveMenu(Player *player);
+    explicit MoveMenu(PlayerLogic *player);
     void setShortcutsActive();
     void retranslateUi();
 

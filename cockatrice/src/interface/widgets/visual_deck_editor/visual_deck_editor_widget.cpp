@@ -9,6 +9,7 @@
 #include "../general/layout_containers/flow_widget.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
+#include "../utility/compact_push_button.h"
 #include "visual_deck_display_options_widget.h"
 
 #include <QCheckBox>
@@ -69,16 +70,25 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
 
 void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
 {
-    searchBar = new QLineEdit(this);
+    searchContainer = new QWidget(this);
+    searchContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    searchLayout = new QHBoxLayout(searchContainer);
+    searchContainer->setLayout(searchLayout);
+
+    searchBar = new QLineEdit(searchContainer);
+    searchContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     connect(searchBar, &QLineEdit::returnPressed, this, [=, this]() {
-        if (!searchBar->hasFocus())
+        if (!searchBar->hasFocus()) {
             return;
+        }
 
         ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
         if (card) {
             emit cardAdditionRequested(card);
         }
     });
+
+    searchLayout->addWidget(searchBar);
 
     setFocusProxy(searchBar);
     setFocusPolicy(Qt::ClickFocus);
@@ -133,13 +143,16 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
     });
 
     // Search button functionality
-    searchPushButton = new QPushButton(this);
+    searchPushButton = new CompactPushButton(searchContainer);
+    searchPushButton->setButtonIcon(QPixmap("theme:icons/search"));
     connect(searchPushButton, &QPushButton::clicked, this, [=, this]() {
         ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
         if (card) {
             emit cardAdditionRequested(card);
         }
     });
+
+    searchLayout->addWidget(searchPushButton);
 }
 
 void VisualDeckEditorWidget::initializeDisplayOptionsWidget()
@@ -156,18 +169,14 @@ void VisualDeckEditorWidget::initializeDisplayOptionsWidget()
 void VisualDeckEditorWidget::initializeDisplayOptionsAndSearchWidget()
 {
     initializeSearchBarAndCompleter();
-
     initializeDisplayOptionsWidget();
 
-    displayOptionsAndSearch = new QWidget(this);
-    displayOptionsAndSearchLayout = new QHBoxLayout(displayOptionsAndSearch);
-    displayOptionsAndSearchLayout->setContentsMargins(0, 0, 0, 0);
-    displayOptionsAndSearchLayout->setAlignment(Qt::AlignLeft);
-    displayOptionsAndSearch->setLayout(displayOptionsAndSearchLayout);
+    displayOptionsAndSearch = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 
-    displayOptionsAndSearchLayout->addWidget(displayOptionsWidget);
-    displayOptionsAndSearchLayout->addWidget(searchBar);
-    displayOptionsAndSearchLayout->addWidget(searchPushButton);
+    // We split into two sub-widgets here so that the searchBar and button wrap together. At this point, we've done
+    // pretty much all we can and have reached our minimum size.
+    displayOptionsAndSearch->addWidget(displayOptionsWidget);
+    displayOptionsAndSearch->addWidget(searchContainer); // Expanding — fills remainder of its row
 }
 
 void VisualDeckEditorWidget::initializeScrollAreaAndZoneContainer()
@@ -205,13 +214,51 @@ void VisualDeckEditorWidget::connectDeckListModel()
 void VisualDeckEditorWidget::retranslateUi()
 {
     searchBar->setPlaceholderText(tr("Type a card name here for suggestions from the database..."));
-    searchPushButton->setText(tr("Quick search and add card"));
+    searchPushButton->setButtonText(tr("Quick search and add card"));
     searchPushButton->setToolTip(tr("Search for closest match in the database (with auto-suggestions) and add "
                                     "preferred printing to the deck on pressing enter"));
 
     if (placeholderWidget) {
         placeholderWidget->retranslateUi();
     }
+}
+
+void VisualDeckEditorWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    updateCompactMode();
+}
+
+void VisualDeckEditorWidget::updateCompactMode()
+{
+    const int spacing = displayOptionsAndSearch->layout()->spacing();
+
+    const int available = displayOptionsAndSearch->width();
+
+    const int searchExpanded =
+        searchBar->sizeHint().width() + searchPushButton->expandedWidth() + searchLayout->spacing();
+
+    const int fullWidth = displayOptionsWidget->expandedWidth() + spacing + searchExpanded;
+
+    const int displayCompactWidth = displayOptionsWidget->compactWidth() + spacing + searchExpanded;
+
+    // everything expanded
+    if (available >= fullWidth) {
+        displayOptionsWidget->updateCompactMode(false);
+        searchPushButton->setCompact(false);
+        return;
+    }
+
+    // only display compact
+    if (available >= displayCompactWidth) {
+        displayOptionsWidget->updateCompactMode(true);
+        searchPushButton->setCompact(false);
+        return;
+    }
+
+    // both compact
+    displayOptionsWidget->updateCompactMode(true);
+    searchPushButton->setCompact(true);
 }
 
 void VisualDeckEditorWidget::updatePlaceholderVisibility()
@@ -371,7 +418,7 @@ void VisualDeckEditorWidget::onHover(const ExactCard &hoveredCard)
     // If nothing is selected -> this is our "active/preview" card
     emit activeCardChanged(hoveredCard);
 
-    // TODO: highlight hovered card visually:
+    //! \todo Highlight hovered card visually.
     // highlightHoveredCard(hoveredCard);
 }
 
@@ -382,7 +429,7 @@ void VisualDeckEditorWidget::setSelectionModel(QItemSelectionModel *model)
     }
 
     if (selectionModel) {
-        // TODO: Possibly disconnect old ones?
+        //! \todo Possibly disconnect old signal connections.
     }
 
     selectionModel = model;

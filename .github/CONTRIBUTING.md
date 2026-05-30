@@ -209,6 +209,16 @@ nowadays and clean it up for you.
 Lines should be 120 characters or less. Please break up lines that are too long
 into smaller parts, for example at spaces or after opening a brace.
 
+### Documentation Comments ###
+
+Use [Doxygen](https://www.doxygen.nl/) for code documentation:
+
+- **Doc blocks**: Use `/** @brief Description */` (Javadoc-style), not `///`
+- **Member comments**: Use trailing `///<` for inline member documentation
+- **TODOs**: Use `//! \todo Description` (Qt-style), Doxygen collects them into a Todo List
+  (uses [Qt-style comments](https://www.doxygen.nl/manual/docblocks.html) with
+  Doxygen's [\todo command](https://www.doxygen.nl/manual/commands.html#cmdtodo))
+
 ### Memory Management ###
 
 New code should be written using references over pointers and stack allocation

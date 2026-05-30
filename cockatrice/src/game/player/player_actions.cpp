@@ -1,14 +1,14 @@
 #include "player_actions.h"
 
+#include "../../game_graphics/zones/hand_zone.h"
+#include "../../game_graphics/zones/table_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
 #include "../board/card_item.h"
 #include "../client/settings/card_counter_settings.h"
 #include "../dialogs/dlg_move_top_cards_until.h"
 #include "../dialogs/dlg_roll_dice.h"
-#include "../zones/hand_zone.h"
-#include "../zones/logic/view_zone_logic.h"
-#include "../zones/table_zone.h"
+#include "../zones/view_zone_logic.h"
 #include "card_menu_action_type.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -19,6 +19,7 @@
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_flip_card.pb.h>
 #include <libcockatrice/protocol/pb/command_game_say.pb.h>
+#include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_mulligan.pb.h>
 #include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
@@ -35,7 +36,7 @@
 // milliseconds in between triggers of the move top cards until action
 static constexpr int MOVE_TOP_CARD_UNTIL_INTERVAL = 100;
 
-PlayerActions::PlayerActions(Player *_player)
+PlayerActions::PlayerActions(PlayerLogic *_player)
     : QObject(_player), player(_player), lastTokenTableRow(0), movingCardsUntil(false)
 {
     moveTopCardTimer = new QTimer(this);
@@ -84,8 +85,9 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
             cardToMove->set_pt(info.getPowTough().toStdString());
         }
         cardToMove->set_tapped(!faceDown && info.getUiAttributes().cipt);
-        if (tableRow != 3)
+        if (tableRow != 3) {
             cmd.set_target_zone(ZoneNames::TABLE);
+        }
         cmd.set_x(gridPoint.x());
         cmd.set_y(gridPoint.y());
     }
@@ -1067,7 +1069,14 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard, const 
             createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
         }
     } else {
-        auto attachType = cardRelation->getAttachType();
+        CardRelationType attachType;
+        // do not attempt to attach to another player's cards, this causes the card to attempt to attach to the same
+        // cardid on the local player's field instead, which is an entirely different card!
+        if (player->getPlayerInfo()->getLocalOrJudge()) {
+            attachType = cardRelation->getAttachType();
+        } else {
+            attachType = CardRelationType::DoesNotAttach;
+        }
 
         // move card onto table first if attaching from some other zone
         // we only do this for AttachTo because cross-zone TransformInto is already handled server-side
@@ -1374,6 +1383,32 @@ void PlayerActions::actFlowT()
     actIncPT(-1, 1);
 }
 
+void PlayerActions::actReduceLifeByPower()
+{
+    // find life counter
+    auto lifeCounter = player->getLifeCounter();
+    if (!lifeCounter) {
+        return;
+    }
+
+    // calculate total power
+    auto cards = player->getGameScene()->selectedCards();
+    int total = 0;
+    for (auto card : cards) {
+        QVariantList parsed = CardItem::parsePT(card->getPT());
+        if (!parsed.isEmpty()) {
+            int power = parsed.first().toInt(); // toInt will default to 0 if it's not an int
+            total += qMax(power, 0);
+        }
+    }
+
+    // send cmd
+    Command_IncCounter cmd;
+    cmd.set_counter_id(lifeCounter->getId());
+    cmd.set_delta(-total);
+    sendGameCommand(prepareGameCommand(cmd));
+}
+
 void AnnotationDialog::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Return && event->modifiers() & Qt::ControlModifier) {
@@ -1462,7 +1497,10 @@ void PlayerActions::offsetCardCounter(int counterId, int offset)
         int oldValue = card->getCounters().value(counterId, 0);
         int newValue = oldValue + offset;
 
-        if (newValue >= 0 && newValue <= MAX_COUNTERS_ON_CARD) {
+        // Early exit optimization: server enforces [0, MAX_COUNTERS_ON_CARD].
+        // Compare clamped value to allow recovery from invalid states.
+        int clampedValue = qBound(0, newValue, MAX_COUNTERS_ON_CARD);
+        if (clampedValue != oldValue) {
             auto *cmd = new Command_SetCardCounter;
             cmd->set_zone(card->getZone()->getName().toStdString());
             cmd->set_card_id(card->getId());
@@ -1502,7 +1540,9 @@ void PlayerActions::actSetCardCounter(int counterId)
     for (auto card : sel) {
         int oldValue = card->getCounters().value(counterId, 0);
         Expression exp(oldValue);
-        int number = static_cast<int>(exp.parse(dialog.textValue()));
+        double parsed = exp.parse(dialog.textValue());
+        // Clamp in double precision first to avoid UB, then cast
+        int number = static_cast<int>(qBound(0.0, parsed, static_cast<double>(MAX_COUNTERS_ON_CARD)));
 
         auto *cmd = new Command_SetCardCounter;
         cmd->set_zone(card->getZone()->getName().toStdString());
@@ -1513,6 +1553,42 @@ void PlayerActions::actSetCardCounter(int counterId)
     }
 
     sendGameCommand(prepareGameCommand(commandList));
+}
+
+void PlayerActions::actIncrementAllCardCounters()
+{
+    auto cardsToUpdate = player->getGameScene()->selectedCards();
+    if (cardsToUpdate.isEmpty()) {
+        // If no cards selected, update all cards on table
+        cardsToUpdate = static_cast<QList<CardItem *>>(player->getTableZone()->getCards());
+    }
+
+    QList<const ::google::protobuf::Message *> commandList;
+
+    for (const auto *card : cardsToUpdate) {
+        const auto &cardCounters = card->getCounters();
+
+        QMapIterator<int, int> counterIterator(cardCounters);
+        while (counterIterator.hasNext()) {
+            counterIterator.next();
+            int counterId = counterIterator.key();
+            int currentValue = counterIterator.value();
+            if (currentValue >= MAX_COUNTERS_ON_CARD) {
+                continue;
+            }
+
+            auto cmd = std::make_unique<Command_SetCardCounter>();
+            cmd->set_zone(card->getZone()->getName().toStdString());
+            cmd->set_card_id(card->getId());
+            cmd->set_counter_id(counterId);
+            cmd->set_counter_value(currentValue + 1);
+            commandList.append(cmd.release());
+        }
+    }
+
+    if (!commandList.isEmpty()) {
+        sendGameCommand(prepareGameCommand(commandList));
+    }
 }
 
 /**
@@ -1731,7 +1807,7 @@ void PlayerActions::cardMenuAction()
             return;
         }
 
-        Player *startPlayer = zone->getPlayer();
+        PlayerLogic *startPlayer = zone->getPlayer();
         if (!startPlayer) {
             return;
         }

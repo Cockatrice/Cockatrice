@@ -1,8 +1,8 @@
 /**
  * @file deck_stats_interface.h
  * @ingroup ApiInterfaces
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DECKSTATS_INTERFACE_H
 #define DECKSTATS_INTERFACE_H

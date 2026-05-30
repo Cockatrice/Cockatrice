@@ -48,8 +48,9 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 // The thread must not hold any server locks when calling this (e.g. clientsLock, roomsLock).
 void Server_ProtocolHandler::prepareDestroy()
 {
-    if (deleted)
+    if (deleted) {
         return;
+    }
     deleted = true;
 
     for (auto *room : rooms.values()) {
@@ -64,8 +65,9 @@ void Server_ProtocolHandler::prepareDestroy()
         gameIterator.next();
 
         Server_Room *room = server->getRooms().value(gameIterator.value().first);
-        if (!room)
+        if (!room) {
             continue;
+        }
         room->gamesLock.lockForRead();
         Server_Game *game = room->getGames().value(gameIterator.key());
         if (!game) {
@@ -167,8 +169,9 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
             default:
                 resp = processExtendedSessionCommand(num, sc, rc);
         }
-        if (resp != Response::RespOk)
+        if (resp != Response::RespOk) {
             finalResponseCode = resp;
+        }
     }
     return finalResponseCode;
 }
@@ -176,13 +179,15 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
 Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const CommandContainer &cont,
                                                                            ResponseContainer &rc)
 {
-    if (authState == NotLoggedIn)
+    if (authState == NotLoggedIn) {
         return Response::RespLoginNeeded;
+    }
 
     QReadLocker locker(&server->roomsLock);
     Server_Room *room = rooms.value(cont.room_id(), 0);
-    if (!room)
+    if (!room) {
         return Response::RespNotInRoom;
+    }
 
     resetIdleTimer();
 
@@ -206,8 +211,9 @@ Response::ResponseCode Server_ProtocolHandler::processRoomCommandContainer(const
                 resp = cmdJoinGame(sc.GetExtension(Command_JoinGame::ext), room, rc);
                 break;
         }
-        if (resp != Response::RespOk)
+        if (resp != Response::RespOk) {
             finalResponseCode = resp;
+        }
     }
     return finalResponseCode;
 }
@@ -232,18 +238,21 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
         // allows a user to sideboard without receiving flooding message
         << GameCommand::MOVE_CARD;
 
-    if (authState == NotLoggedIn)
+    if (authState == NotLoggedIn) {
         return Response::RespLoginNeeded;
+    }
 
     QMap<int, QPair<int, int>> gameMap = getGames();
-    if (!gameMap.contains(cont.game_id()))
+    if (!gameMap.contains(cont.game_id())) {
         return Response::RespNotInRoom;
+    }
     const QPair<int, int> roomIdAndPlayerId = gameMap.value(cont.game_id());
 
     QReadLocker roomsLocker(&server->roomsLock);
     Server_Room *room = server->getRooms().value(roomIdAndPlayerId.first);
-    if (!room)
+    if (!room) {
         return Response::RespNotInRoom;
+    }
 
     QReadLocker roomGamesLocker(&room->gamesLock);
     Server_Game *game = room->getGames().value(cont.game_id());
@@ -258,8 +267,9 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 
     QMutexLocker gameLocker(&game->gameMutex);
     auto *participant = game->getParticipants().value(roomIdAndPlayerId.second);
-    if (!participant)
+    if (!participant) {
         return Response::RespNotInRoom;
+    }
 
     resetIdleTimer();
 
@@ -274,11 +284,13 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 
         if (commandCountingInterval > 0) {
             int totalCount = 0;
-            if (commandCountOverTime.isEmpty())
+            if (commandCountOverTime.isEmpty()) {
                 commandCountOverTime.prepend(0);
+            }
 
-            if (!antifloodCommandsWhiteList.contains((GameCommand::GameCommandType)getPbExtension(sc)))
+            if (!antifloodCommandsWhiteList.contains((GameCommand::GameCommandType)getPbExtension(sc))) {
                 ++commandCountOverTime[0];
+            }
 
             for (int count : commandCountOverTime) {
                 totalCount += count;
@@ -291,8 +303,9 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 
         Response::ResponseCode resp = participant->processGameCommand(sc, rc, ges);
 
-        if (resp != Response::RespOk)
+        if (resp != Response::RespOk) {
             finalResponseCode = resp;
+        }
     }
     ges.sendToGame(game);
 
@@ -302,10 +315,12 @@ Response::ResponseCode Server_ProtocolHandler::processGameCommandContainer(const
 Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(const CommandContainer &cont,
                                                                                 ResponseContainer &rc)
 {
-    if (!userInfo)
+    if (!userInfo) {
         return Response::RespLoginNeeded;
-    if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
+    }
+    if (!(userInfo->user_level() & ServerInfo_User::IsModerator)) {
         return Response::RespLoginNeeded;
+    }
 
     resetIdleTimer();
 
@@ -317,8 +332,9 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
         logDebugMessage(getSafeDebugString(sc));
 
         resp = processExtendedModeratorCommand(num, sc, rc);
-        if (resp != Response::RespOk)
+        if (resp != Response::RespOk) {
             finalResponseCode = resp;
+        }
     }
     return finalResponseCode;
 }
@@ -326,10 +342,12 @@ Response::ResponseCode Server_ProtocolHandler::processModeratorCommandContainer(
 Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(const CommandContainer &cont,
                                                                             ResponseContainer &rc)
 {
-    if (!userInfo)
+    if (!userInfo) {
         return Response::RespLoginNeeded;
-    if (!(userInfo->user_level() & ServerInfo_User::IsAdmin))
+    }
+    if (!(userInfo->user_level() & ServerInfo_User::IsAdmin)) {
         return Response::RespLoginNeeded;
+    }
 
     resetIdleTimer();
 
@@ -341,8 +359,9 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
         logDebugMessage(getSafeDebugString(sc));
 
         resp = processExtendedAdminCommand(num, sc, rc);
-        if (resp != Response::RespOk)
+        if (resp != Response::RespOk) {
             finalResponseCode = resp;
+        }
     }
     return finalResponseCode;
 }
@@ -350,29 +369,32 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
 void Server_ProtocolHandler::processCommandContainer(const CommandContainer &cont)
 {
     // Command processing must be disabled after prepareDestroy() has been called.
-    if (deleted)
+    if (deleted) {
         return;
+    }
 
     lastDataReceived = timeRunning;
 
     ResponseContainer responseContainer(cont.has_cmd_id() ? cont.cmd_id() : -1);
     Response::ResponseCode finalResponseCode;
 
-    if (cont.game_command_size())
+    if (cont.game_command_size()) {
         finalResponseCode = processGameCommandContainer(cont, responseContainer);
-    else if (cont.room_command_size())
+    } else if (cont.room_command_size()) {
         finalResponseCode = processRoomCommandContainer(cont, responseContainer);
-    else if (cont.session_command_size())
+    } else if (cont.session_command_size()) {
         finalResponseCode = processSessionCommandContainer(cont, responseContainer);
-    else if (cont.moderator_command_size())
+    } else if (cont.moderator_command_size()) {
         finalResponseCode = processModeratorCommandContainer(cont, responseContainer);
-    else if (cont.admin_command_size())
+    } else if (cont.admin_command_size()) {
         finalResponseCode = processAdminCommandContainer(cont, responseContainer);
-    else
+    } else {
         finalResponseCode = Response::RespInvalidCommand;
+    }
 
-    if ((finalResponseCode != Response::RespNothing))
+    if ((finalResponseCode != Response::RespNothing)) {
         sendResponseContainer(responseContainer, finalResponseCode);
+    }
 }
 
 void Server_ProtocolHandler::pingClockTimeout()
@@ -386,11 +408,13 @@ void Server_ProtocolHandler::pingClockTimeout()
     if (interval > 0) {
         if (pingclockinterval > 0) {
             messageSizeOverTime.prepend(0);
-            if (messageSizeOverTime.size() > (msgcountinterval / pingclockinterval))
+            if (messageSizeOverTime.size() > (msgcountinterval / pingclockinterval)) {
                 messageSizeOverTime.removeLast();
+            }
             messageCountOverTime.prepend(0);
-            if (messageCountOverTime.size() > (msgcountinterval / pingclockinterval))
+            if (messageCountOverTime.size() > (msgcountinterval / pingclockinterval)) {
                 messageCountOverTime.removeLast();
+            }
         }
     }
 
@@ -398,13 +422,15 @@ void Server_ProtocolHandler::pingClockTimeout()
     if (interval > 0) {
         if (pingclockinterval > 0) {
             commandCountOverTime.prepend(0);
-            if (commandCountOverTime.size() > (cmdcountinterval / pingclockinterval))
+            if (commandCountOverTime.size() > (cmdcountinterval / pingclockinterval)) {
                 commandCountOverTime.removeLast();
+            }
         }
     }
 
-    if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime())
+    if (timeRunning - lastDataReceived > server->getMaxPlayerInactivityTime()) {
         prepareDestroy();
+    }
 
     // PrivLevel users, Moderators, and Admins are not subject to the server idle timeout policy
     const bool hasPrivLevel = userInfo && QString::fromStdString(userInfo->privlevel()).toLower() != "none";
@@ -444,8 +470,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QString password;
     bool needsHash = false;
     if (cmd.has_password()) {
-        if (cmd.password().length() > MAX_NAME_LENGTH)
+        if (cmd.password().length() > MAX_NAME_LENGTH) {
             return Response::RespWrongPassword;
+        }
         password = QString::fromStdString(cmd.password());
         needsHash = true;
     } else if (cmd.hashed_password().length() > MAX_NAME_LENGTH) {
@@ -493,8 +520,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         case UserIsBanned: {
             auto *re = new Response_Login;
             re->set_denied_reason_str(reasonStr.toStdString());
-            if (banSecondsLeft != 0)
+            if (banSecondsLeft != 0) {
                 re->set_denied_end_time(QDateTime::currentDateTime().addSecs(banSecondsLeft).toSecsSinceEpoch());
+            }
             rc.setResponseExtension(re);
             return Response::RespUserIsBanned;
         }
@@ -539,19 +567,22 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 
     if (authState == PasswordRight) {
         QMapIterator<QString, ServerInfo_User> buddyIterator(databaseInterface->getBuddyList(userName));
-        while (buddyIterator.hasNext())
+        while (buddyIterator.hasNext()) {
             re->add_buddy_list()->CopyFrom(buddyIterator.next().value());
+        }
 
         QMapIterator<QString, ServerInfo_User> ignoreIterator(databaseInterface->getIgnoreList(userName));
-        while (ignoreIterator.hasNext())
+        while (ignoreIterator.hasNext()) {
             re->add_ignore_list()->CopyFrom(ignoreIterator.next().value());
+        }
     }
 
     // return to client any missing features the server has that the client does not
     if (!missingClientFeatures.isEmpty()) {
         QMap<QString, bool>::iterator i;
-        for (i = missingClientFeatures.begin(); i != missingClientFeatures.end(); ++i)
+        for (i = missingClientFeatures.begin(); i != missingClientFeatures.end(); ++i) {
             re->add_missing_features(i.key().toStdString().c_str());
+        }
     }
 
     joinPersistentGames(rc);
@@ -562,8 +593,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 
 Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message &cmd, ResponseContainer &rc)
 {
-    if (authState == NotLoggedIn)
+    if (authState == NotLoggedIn) {
         return Response::RespLoginNeeded;
+    }
 
     QReadLocker locker(&server->clientsLock);
 
@@ -599,8 +631,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdMessage(const Command_Message 
 Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_GetGamesOfUser &cmd,
                                                                  ResponseContainer &rc)
 {
-    if (authState == NotLoggedIn)
+    if (authState == NotLoggedIn) {
         return Response::RespLoginNeeded;
+    }
 
     // Do not show games to someone on the ignore list of that user, except for mods
     QString target_user = nameFromStdString(cmd.user_name());
@@ -624,8 +657,9 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
         room->gamesLock.lockForRead();
         room->getInfo(*re->add_room_list(), false, true);
         QListIterator<ServerInfo_Game> gameIterator(room->getGamesOfUser(nameFromStdString(cmd.user_name())));
-        while (gameIterator.hasNext())
+        while (gameIterator.hasNext()) {
             re->add_game_list()->CopyFrom(gameIterator.next());
+        }
         room->gamesLock.unlock();
     }
     server->roomsLock.unlock();
@@ -636,14 +670,15 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetGamesOfUser(const Command_G
 
 Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetUserInfo &cmd, ResponseContainer &rc)
 {
-    if (authState == NotLoggedIn)
+    if (authState == NotLoggedIn) {
         return Response::RespLoginNeeded;
+    }
 
     QString userName = nameFromStdString(cmd.user_name());
     auto *re = new Response_GetUserInfo;
-    if (userName.isEmpty())
+    if (userName.isEmpty()) {
         re->mutable_user_info()->CopyFrom(*userInfo);
-    else {
+    } else {
 
         QReadLocker locker(&server->clientsLock);
 
@@ -662,13 +697,15 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
 
 Response::ResponseCode Server_ProtocolHandler::cmdListRooms(const Command_ListRooms & /*cmd*/, ResponseContainer &rc)
 {
-    if (authState == NotLoggedIn)
+    if (authState == NotLoggedIn) {
         return Response::RespLoginNeeded;
+    }
 
     Event_ListRooms event;
     QMapIterator<int, Server_Room *> roomIterator(server->getRooms());
-    while (roomIterator.hasNext())
+    while (roomIterator.hasNext()) {
         roomIterator.next().value()->getInfo(*event.add_room_list(), false);
+    }
     rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 
     acceptsRoomListChanges = true;
@@ -677,20 +714,25 @@ Response::ResponseCode Server_ProtocolHandler::cmdListRooms(const Command_ListRo
 
 Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoom &cmd, ResponseContainer &rc)
 {
-    if (authState == NotLoggedIn)
+    if (authState == NotLoggedIn) {
         return Response::RespLoginNeeded;
+    }
 
-    if (rooms.contains(cmd.room_id()))
+    if (rooms.contains(cmd.room_id())) {
         return Response::RespContextError;
+    }
 
     QReadLocker serverLocker(&server->roomsLock);
     Server_Room *room = server->getRooms().value(cmd.room_id(), 0);
-    if (!room)
+    if (!room) {
         return Response::RespNameNotFound;
+    }
 
-    if (!(userInfo->user_level() & ServerInfo_User::IsModerator))
-        if (!(room->userMayJoin(*userInfo)))
+    if (!(userInfo->user_level() & ServerInfo_User::IsModerator)) {
+        if (!(room->userMayJoin(*userInfo))) {
             return Response::RespUserLevelTooLow;
+        }
+    }
 
     room->addClient(this);
     rooms.insert(room->getId(), room);
@@ -722,17 +764,20 @@ Response::ResponseCode Server_ProtocolHandler::cmdJoinRoom(const Command_JoinRoo
 
 Response::ResponseCode Server_ProtocolHandler::cmdListUsers(const Command_ListUsers & /*cmd*/, ResponseContainer &rc)
 {
-    if (authState == NotLoggedIn)
+    if (authState == NotLoggedIn) {
         return Response::RespLoginNeeded;
+    }
 
     auto *re = new Response_ListUsers;
     server->clientsLock.lockForRead();
     QMapIterator<QString, Server_ProtocolHandler *> userIterator = server->getUsers();
-    while (userIterator.hasNext())
+    while (userIterator.hasNext()) {
         re->add_user_list()->CopyFrom(userIterator.next().value()->copyUserInfo(false));
+    }
     QMapIterator<QString, Server_AbstractUserInterface *> extIterator = server->getExternalUsers();
-    while (extIterator.hasNext())
+    while (extIterator.hasNext()) {
         re->add_user_list()->CopyFrom(extIterator.next().value()->copyUserInfo(false));
+    }
 
     acceptsUserListChanges = true;
     server->clientsLock.unlock();
@@ -799,10 +844,12 @@ Server_ProtocolHandler::cmdRoomSay(const Command_RoomSay &cmd, Server_Room *room
 Response::ResponseCode
 Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room *room, ResponseContainer &rc)
 {
-    if (authState == NotLoggedIn)
+    if (authState == NotLoggedIn) {
         return Response::RespLoginNeeded;
-    if (cmd.password().length() > MAX_NAME_LENGTH)
+    }
+    if (cmd.password().length() > MAX_NAME_LENGTH) {
         return Response::RespContextError;
+    }
 
     auto level = userInfo->user_level();
     bool isJudge = level & ServerInfo_User::IsJudge;
@@ -852,8 +899,9 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
 Response::ResponseCode
 Server_ProtocolHandler::cmdJoinGame(const Command_JoinGame &cmd, Server_Room *room, ResponseContainer &rc)
 {
-    if (authState == NotLoggedIn)
+    if (authState == NotLoggedIn) {
         return Response::RespLoginNeeded;
+    }
 
     return room->processJoinGameCommand(cmd, rc, this);
 }

@@ -13,7 +13,7 @@
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 
-AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, Player *_owner, int _id)
+AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, PlayerLogic *_owner, int _id)
     : ArrowTarget(_owner, parent), id(_id), cardRef(cardRef), tapped(false), facedown(false), tapAngle(0),
       bgColor(Qt::transparent), isHovered(false), realZValue(0)
 {
@@ -85,7 +85,12 @@ const CardInfo &AbstractCardItem::getCardInfo() const
 void AbstractCardItem::setRealZValue(qreal _zValue)
 {
     realZValue = _zValue;
-    setZValue(_zValue);
+    // During hover, zValue is overridden to HOVERED_CARD. Layout operations
+    // like reorganizeCards() call setRealZValue() on all cards including the
+    // hovered one — skip setZValue() here to avoid clobbering the override.
+    if (!isHovered) {
+        setZValue(_zValue);
+    }
 }
 
 QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
@@ -126,8 +131,9 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         // don't even spend time trying to load the picture if our size is too small
         if (translatedSize.width() > 10) {
             CardPictureLoader::getPixmap(translatedPixmap, exactCard, translatedSize.toSize());
-            if (translatedPixmap.isNull())
+            if (translatedPixmap.isNull()) {
                 paintImage = false;
+            }
         } else {
             paintImage = false;
         }
@@ -152,9 +158,9 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         painter->setBackground(Qt::black);
         painter->setBackgroundMode(Qt::OpaqueMode);
         QString nameStr;
-        if (facedown)
+        if (facedown) {
             nameStr = "# " + QString::number(id);
-        else {
+        } else {
             QString prefix = "";
             if (SettingsCache::instance().debug().getShowCardId()) {
                 prefix = "#" + QString::number(id) + " ";
@@ -181,10 +187,12 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
     if (isSelected() || isHovered) {
         QPen pen;
-        if (isHovered)
+        if (isHovered) {
             pen.setColor(Qt::yellow);
-        if (isSelected())
+        }
+        if (isSelected()) {
             pen.setColor(Qt::red);
+        }
         pen.setWidth(0); // Cosmetic pen
         painter->setPen(pen);
         painter->drawPath(shape());
@@ -210,11 +218,20 @@ void AbstractCardItem::setCardRef(const CardRef &_cardRef)
 
 void AbstractCardItem::setHovered(bool _hovered)
 {
-    if (isHovered == _hovered)
+    if (isHovered == _hovered) {
         return;
+    }
 
-    if (_hovered)
+    if (_hovered) {
         processHoverEvent();
+    } else {
+        // Mark the hovered card's current scene footprint dirty so overlapped
+        // sibling zones (e.g. StackZone) repaint after the card moves away.
+        if (scene()) {
+            scene()->update(sceneBoundingRect());
+        }
+    }
+
     isHovered = _hovered;
     setZValue(_hovered ? ZValues::HOVERED_CARD : realZValue);
     setScale(_hovered && SettingsCache::instance().getScaleCards() ? 1.1 : 1);
@@ -265,13 +282,14 @@ void AbstractCardItem::cacheBgColor()
 
 void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
 {
-    if (tapped == _tapped)
+    if (tapped == _tapped) {
         return;
+    }
 
     tapped = _tapped;
-    if (SettingsCache::instance().getTapAnimation() && canAnimate)
+    if (SettingsCache::instance().getTapAnimation() && canAnimate) {
         static_cast<GameScene *>(scene())->registerAnimationItem(this);
-    else {
+    } else {
         tapAngle = tapped ? 90 : 0;
         setTransform(QTransform()
                          .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
@@ -297,17 +315,19 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         scene()->clearSelection();
         setSelected(true);
     }
-    if (event->button() == Qt::LeftButton)
+    if (event->button() == Qt::LeftButton) {
         setCursor(Qt::ClosedHandCursor);
-    else if (event->button() == Qt::MiddleButton)
+    } else if (event->button() == Qt::MiddleButton) {
         emit showCardInfoPopup(event->screenPos(), cardRef);
+    }
     event->accept();
 }
 
 void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (event->button() == Qt::MiddleButton)
+    if (event->button() == Qt::MiddleButton) {
         emit deleteCardInfoPopup(cardRef.name);
+    }
 
     // This function ensures the parent function doesn't mess around with our selection.
     event->accept();
@@ -323,6 +343,7 @@ QVariant AbstractCardItem::itemChange(QGraphicsItem::GraphicsItemChange change, 
     if (change == ItemSelectedHasChanged) {
         update();
         return value;
-    } else
+    } else {
         return ArrowTarget::itemChange(change, value);
+    }
 }

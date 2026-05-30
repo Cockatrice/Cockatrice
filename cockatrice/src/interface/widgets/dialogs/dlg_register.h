@@ -1,8 +1,8 @@
 /**
  * @file dlg_register.h
  * @ingroup AccountDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_REGISTER_H
 #define DLG_REGISTER_H

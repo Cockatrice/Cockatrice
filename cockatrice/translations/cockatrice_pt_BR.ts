@@ -1085,7 +1085,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="177"/>
         <source>Colors</source>
-        <translation type="unfinished"/>
+        <translation>Cores</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="718"/>
@@ -1125,12 +1125,12 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="741"/>
         <source>Group by:</source>
-        <translation type="unfinished"/>
+        <translation>Agrupar por:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="742"/>
         <source>Format:</source>
-        <translation type="unfinished"/>
+        <translation>Formato:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="744"/>
@@ -1258,7 +1258,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/interface/widgets/menus/deck_editor_menu.cpp" line="174"/>
         <source>Load deck from online service...</source>
-        <translation type="unfinished"/>
+        <translation>Carregar baralho de serviço online...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/menus/deck_editor_menu.cpp" line="175"/>
@@ -1471,17 +1471,17 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="56"/>
         <source>Undo</source>
-        <translation type="unfinished"/>
+        <translation>Desfazer</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="57"/>
         <source>Redo</source>
-        <translation type="unfinished"/>
+        <translation>Refazer</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="58"/>
         <source>Undo/Redo history</source>
-        <translation type="unfinished"/>
+        <translation>Histórico Desfazer/Refazer</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="59"/>
@@ -1491,12 +1491,12 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="71"/>
         <source>[redo] </source>
-        <translation type="unfinished"/>
+        <translation>[refazer]</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="88"/>
         <source>[undo] </source>
-        <translation type="unfinished"/>
+        <translation>[desfazer]</translation>
     </message>
 </context>
 <context>
@@ -1601,7 +1601,7 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="107"/>
         <source>Edit default tags</source>
-        <translation type="unfinished"/>
+        <translation>Editar tags padrão</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_dialog.cpp" line="108"/>
@@ -1729,12 +1729,12 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="113"/>
         <source>Rename deck to &quot;%1&quot; from &quot;%2&quot;</source>
-        <translation type="unfinished"/>
+        <translation>Renomear baralho de &quot;%1&quot; para &quot;%2&quot;</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="126"/>
         <source>Updated comments (was %1 chars, now %2 chars)</source>
-        <translation type="unfinished"/>
+        <translation>Comentários atualizados (eram %1 caracteres, agora são %2 caracteres)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="139"/>
@@ -1744,42 +1744,42 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="152"/>
         <source>Tags changed</source>
-        <translation type="unfinished"/>
+        <translation>Tags alteradas</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="164"/>
         <source>Set format to %1</source>
-        <translation type="unfinished"/>
+        <translation>Definir formato para %1</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="182"/>
         <source>Added (%1): %2 (%3) %4</source>
-        <translation type="unfinished"/>
+        <translation>Adicionado (%1): %2 (%3) %4</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="257"/>
         <source>Moved to %1 1 × &quot;%2&quot; (%3)</source>
-        <translation type="unfinished"/>
+        <translation>Movido para %1 1 × &quot;%2&quot; (%3)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="275"/>
         <source>Removed &quot;%1&quot; (all copies)</source>
-        <translation type="unfinished"/>
+        <translation>Removido &quot;%1&quot; (todas as cópias)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="299"/>
         <source>%1 1 × &quot;%2&quot; (%3)</source>
-        <translation type="unfinished"/>
+        <translation>%1 1 × &quot;%2&quot; (%3)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="300"/>
         <source>Added</source>
-        <translation type="unfinished"/>
+        <translation>Adicionado</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="300"/>
         <source>Removed</source>
-        <translation type="unfinished"/>
+        <translation>Removido</translation>
     </message>
 </context>
 <context>
@@ -1811,12 +1811,12 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="125"/>
         <source>Load from clipboard...</source>
-        <translation type="unfinished"/>
+        <translation>Carregado da área de transferência...</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="126"/>
         <source>Load from website...</source>
-        <translation type="unfinished"/>
+        <translation>Carregado do website...</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="127"/>
@@ -1857,13 +1857,14 @@ Isto será visto somente por moderadores e não pode ser visto pela pessoa banid
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="279"/>
         <source>Deck is greater than maximum file size.</source>
-        <translation type="unfinished"/>
+        <translation>O baralho é maior que o tamanho máximo de arquivo.</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="342"/>
         <source>Are you sure you want to force start?
 This will kick all non-ready players from the game.</source>
-        <translation type="unfinished"/>
+        <translation>Tem certeza que deseja forçar o início?
+Isso irá expulsar todos os jogadores não preparados do jogo.</translation>
     </message>
     <message>
         <location filename="src/game/deckview/deck_view_container.cpp" line="344"/>
@@ -2127,12 +2128,12 @@ Deseja converter o deck para .cod?</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="104"/>
         <source>Open decklists in lobby</source>
-        <translation type="unfinished"/>
+        <translation>Abrir lista de baralhos no lobby</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="106"/>
         <source>Create game as judge</source>
-        <translation type="unfinished"/>
+        <translation>Criar jogo como juíz</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_create_game.cpp" line="118"/>
@@ -2268,53 +2269,53 @@ Deseja converter o deck para .cod?</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="47"/>
         <source>Edit Tags</source>
-        <translation type="unfinished"/>
+        <translation>Editar Tags</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="48"/>
         <source>Add</source>
-        <translation type="unfinished"/>
+        <translation>Adicionar</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="49"/>
         <source>Confirm</source>
-        <translation type="unfinished"/>
+        <translation>Confirmar</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="50"/>
         <source>Cancel</source>
-        <translation type="unfinished"/>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="51"/>
         <source>Enter a tag and press Enter</source>
-        <translation type="unfinished"/>
+        <translation>Insira a tag e aperte Enter</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="71"/>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="119"/>
         <source>✖</source>
-        <translation type="unfinished"/>
+        <translation>✖</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="91"/>
         <source>Invalid Input</source>
-        <translation type="unfinished"/>
+        <translation>Valor Inválido</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="91"/>
         <source>Tag name cannot be empty!</source>
-        <translation type="unfinished"/>
+        <translation>Nomes de tags não podem ser vazios!</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="102"/>
         <source>Duplicate Tag</source>
-        <translation type="unfinished"/>
+        <translation>Tag Duplicada</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_default_tags_editor.cpp" line="102"/>
         <source>This tag already exists.</source>
-        <translation type="unfinished"/>
+        <translation>Essa tag já existe.</translation>
     </message>
 </context>
 <context>
@@ -2600,7 +2601,7 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="40"/>
         <source>Hide games not created by buddies</source>
         <oldsource>Hide games not created by buddy</oldsource>
-        <translation type="unfinished"/>
+        <translation>Esconder jogos não criados por amigos</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="43"/>
@@ -2902,7 +2903,7 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="116"/>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="127"/>
         <source>Load Deck from Website</source>
-        <translation type="unfinished"/>
+        <translation>Carregar Baralho de Website</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="65"/>
@@ -2913,7 +2914,7 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="81"/>
         <source>Network error: %1</source>
-        <translation type="unfinished"/>
+        <translation>Erro de rede: %1</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp" line="95"/>
@@ -2950,17 +2951,17 @@ https://tappedout.net/mtg-decks/your-deck-name/</source>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="15"/>
         <source>Players:</source>
-        <translation type="unfinished"/>
+        <translation>Jogadores:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="26"/>
         <source>General</source>
-        <translation type="unfinished"/>
+        <translation>Geral</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="29"/>
         <source>Starting life total:</source>
-        <translation type="unfinished"/>
+        <translation>Vida inicial total:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="40"/>
@@ -2970,12 +2971,12 @@ https://tappedout.net/mtg-decks/your-deck-name/</source>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="43"/>
         <source>Remember settings</source>
-        <translation type="unfinished"/>
+        <translation>Lembrar configurações</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_local_game_options.cpp" line="62"/>
         <source>Local game options</source>
-        <translation type="unfinished"/>
+        <translation>Opções de jogo local</translation>
     </message>
 </context>
 <context>
@@ -3132,12 +3133,12 @@ Seu e-mail será utilizado para verificar sua conta.</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp" line="140"/>
         <source>Unmodified Cards:</source>
-        <translation type="unfinished"/>
+        <translation>Cartas não modificadas:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp" line="141"/>
         <source>Modified Cards:</source>
-        <translation type="unfinished"/>
+        <translation>Cartas Modificadas:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp" line="142"/>
@@ -3318,7 +3319,7 @@ Você gostaria de alterar seu local de configuração do banco de dados?</transl
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_startup_card_check.cpp" line="9"/>
         <source>Card Update Check</source>
-        <translation type="unfinished"/>
+        <translation>Checar Atualização de Carta</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_startup_card_check.cpp" line="17"/>
@@ -3350,7 +3351,7 @@ You can always change this behavior in the &apos;General&apos; settings tab.</so
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_startup_card_check.cpp" line="29"/>
         <source>Don&apos;t run this time</source>
-        <translation type="unfinished"/>
+        <translation>Não executar desta vez</translation>
     </message>
 </context>
 <context>
@@ -3547,7 +3548,7 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_view_log.cpp" line="31"/>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"/>
+        <translation>Copiar para área de transferência</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_view_log.cpp" line="43"/>
@@ -3565,58 +3566,58 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="56"/>
         <source>Criteria:</source>
-        <translation type="unfinished"/>
+        <translation>Critério:</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="57"/>
         <source>Card Name</source>
-        <translation type="unfinished"/>
+        <translation>Nome da Carta</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="58"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="59"/>
         <source>Subtype</source>
-        <translation type="unfinished"/>
+        <translation>Subtipo</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="60"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Valor de mana</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="62"/>
         <source>Exactness:</source>
-        <translation type="unfinished"/>
+        <translation>Exatidão</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="63"/>
         <source>At least</source>
-        <translation type="unfinished"/>
+        <translation>Pelo menos</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="64"/>
         <source>Exactly</source>
-        <translation type="unfinished"/>
+        <translation>Exatamente</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="66"/>
         <source>Quantity (N):</source>
-        <translation type="unfinished"/>
+        <translation>Quantidade (N):</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="67"/>
         <source>Cards drawn (M):</source>
-        <translation type="unfinished"/>
+        <translation>Cartas compradas (M):</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="70"/>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp" line="71"/>
         <source> cards</source>
-        <translation type="unfinished"/>
+        <translation>cartas</translation>
     </message>
 </context>
 <context>
@@ -3624,7 +3625,7 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="100"/>
         <source>Draw Probability</source>
-        <translation type="unfinished"/>
+        <translation>Probabilidade de compra</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="102"/>
@@ -3634,32 +3635,32 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="104"/>
         <source>Card Name</source>
-        <translation type="unfinished"/>
+        <translation>Nome da Carta</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="105"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Tipo</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="106"/>
         <source>Subtype</source>
-        <translation type="unfinished"/>
+        <translation>Subtipo</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="107"/>
         <source>Mana Value</source>
-        <translation type="unfinished"/>
+        <translation>Valor de Mana</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="109"/>
         <source>At least</source>
-        <translation type="unfinished"/>
+        <translation>Pelo menos</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="110"/>
         <source>Exactly</source>
-        <translation type="unfinished"/>
+        <translation>Exatamente</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="112"/>
@@ -3669,22 +3670,22 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="113"/>
         <source>cards</source>
-        <translation type="unfinished"/>
+        <translation>cartas</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="115"/>
         <source>Category</source>
-        <translation type="unfinished"/>
+        <translation>Categoria</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="115"/>
         <source>Qty</source>
-        <translation type="unfinished"/>
+        <translation>Qtd</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp" line="115"/>
         <source>Odds (%)</source>
-        <translation type="unfinished"/>
+        <translation>Chances (%)</translation>
     </message>
 </context>
 <context>
@@ -3715,7 +3716,7 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/interface/widgets/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp" line="59"/>
         <source>Card Market</source>
-        <translation type="unfinished"/>
+        <translation>Mercado de Cartas</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp" line="60"/>
@@ -3769,7 +3770,7 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp" line="40"/>
         <source>Budget</source>
-        <translation type="unfinished"/>
+        <translation>Orçamento</translation>
     </message>
 </context>
 <context>
@@ -3777,7 +3778,7 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp" line="61"/>
         <source>Combos</source>
-        <translation type="unfinished"/>
+        <translation>Combos</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp" line="62"/>
@@ -3806,7 +3807,7 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_filter_display_widget.cpp" line="67"/>
         <source>Confirm Delete</source>
-        <translation type="unfinished"/>
+        <translation>Confirmar Exclusão</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_filter_display_widget.cpp" line="67"/>
@@ -3816,12 +3817,12 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_filter_display_widget.cpp" line="77"/>
         <source>Delete Failed</source>
-        <translation type="unfinished"/>
+        <translation>Falha na Exclusão</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/visual_database_display/visual_database_filter_display_widget.cpp" line="77"/>
         <source>Failed to delete filter &apos;%1&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>Falha ao remover filtro &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
@@ -3834,17 +3835,17 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/game/game_event_handler.cpp" line="415"/>
         <source>player left the game</source>
-        <translation type="unfinished"/>
+        <translation>jogador saiu do jogo</translation>
     </message>
     <message>
         <location filename="src/game/game_event_handler.cpp" line="418"/>
         <source>player disconnected from server</source>
-        <translation type="unfinished"/>
+        <translation>jogador desconectado do servidor</translation>
     </message>
     <message>
         <location filename="src/game/game_event_handler.cpp" line="422"/>
         <source>reason unknown</source>
-        <translation type="unfinished"/>
+        <translation>motivo desconhecido</translation>
     </message>
 </context>
 <context>
@@ -3920,7 +3921,7 @@ Talvez você tenha que baixar a nova versão manualmente.</translation>
     <message>
         <location filename="src/interface/widgets/server/game_selector.cpp" line="317"/>
         <source>Join Game as Judge</source>
-        <translation type="unfinished"/>
+        <translation>Entrar no Jogo como Juíz</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/server/game_selector.cpp" line="322"/>

@@ -1,7 +1,7 @@
 #include "abstract_game.h"
 
 #include "../interface/widgets/tabs/tab_game.h"
-#include "player/player.h"
+#include "player/player_logic.h"
 
 AbstractGame::AbstractGame(TabGame *_tab) : QObject(_tab), tab(_tab)
 {
@@ -24,10 +24,11 @@ AbstractClient *AbstractGame::getClientForPlayer(int playerId) const
         }
 
         return gameState->getClients().at(playerId);
-    } else if (gameState->getClients().isEmpty())
+    } else if (gameState->getClients().isEmpty()) {
         return nullptr;
-    else
+    } else {
         return gameState->getClients().first();
+    }
 }
 
 void AbstractGame::loadReplay(GameReplay *replay)
@@ -43,13 +44,15 @@ void AbstractGame::setActiveCard(CardItem *card)
 
 CardItem *AbstractGame::getCard(int playerId, const QString &zoneName, int cardId) const
 {
-    Player *player = playerManager->getPlayer(playerId);
-    if (!player)
+    PlayerLogic *player = playerManager->getPlayer(playerId);
+    if (!player) {
         return nullptr;
+    }
 
     CardZoneLogic *zone = player->getZones().value(zoneName, 0);
-    if (!zone)
+    if (!zone) {
         return nullptr;
+    }
 
     return zone->getCard(cardId);
 }

@@ -1,8 +1,8 @@
 /**
  * @file shadow_background_label.h
  * @ingroup PrintingWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef STYLEDLABEL_H
 #define STYLEDLABEL_H

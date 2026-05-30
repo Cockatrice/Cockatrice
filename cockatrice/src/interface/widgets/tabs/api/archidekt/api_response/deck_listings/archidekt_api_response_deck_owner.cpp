@@ -7,7 +7,7 @@ void ArchidektApiResponseDeckOwner::fromJson(const QJsonObject &json)
     avatar = QUrl(json.value("avatar").toString());
     moderator = json.value("moderator").toBool();
     pledgeLevel = json.value("pledgeLevel").toInt();
-    // TODO but not really important
+    //! \todo Parse roles field (not really important).
     // roles = {""};
 }
 

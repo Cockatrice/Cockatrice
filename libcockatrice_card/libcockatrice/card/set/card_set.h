@@ -107,31 +107,31 @@ public:
      */
     [[nodiscard]] QString getCorrectedShortName() const;
 
-    /// @return Short identifier of the set.
+    /** @return Short identifier of the set. */
     [[nodiscard]] QString getShortName() const
     {
         return shortName;
     }
 
-    /// @return Descriptive name of the set.
+    /** @return Descriptive name of the set. */
     [[nodiscard]] QString getLongName() const
     {
         return longName;
     }
 
-    /// @return Type/category string of the set.
+    /** @return Type/category string of the set. */
     [[nodiscard]] QString getSetType() const
     {
         return setType;
     }
 
-    /// @return Release date of the set.
+    /** @return Release date of the set. */
     [[nodiscard]] QDate getReleaseDate() const
     {
         return releaseDate;
     }
 
-    /// @return Priority level of the set.
+    /** @return Priority level of the set. */
     [[nodiscard]] Priority getPriority() const
     {
         return priority;
@@ -190,7 +190,7 @@ public:
         enabled = _enabled;
     }
 
-    /// @return The sort key assigned to this set.
+    /** @return The sort key assigned to this set. */
     [[nodiscard]] int getSortKey() const
     {
         return sortKey;
@@ -202,7 +202,7 @@ public:
      */
     void setSortKey(unsigned int _sortKey);
 
-    /// @return True if the set is enabled.
+    /** @return True if the set is enabled. */
     [[nodiscard]] bool getEnabled() const
     {
         return enabled;
@@ -214,7 +214,7 @@ public:
      */
     void setEnabled(bool _enabled);
 
-    /// @return True if the set is considered known.
+    /** @return True if the set is considered known. */
     [[nodiscard]] bool getIsKnown() const
     {
         return isknown;

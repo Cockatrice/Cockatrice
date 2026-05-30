@@ -1,7 +1,7 @@
 #include "player_target.h"
 
 #include "../../interface/pixel_map_generator.h"
-#include "player.h"
+#include "player_logic.h"
 
 #include <QDebug>
 #include <QPainter>
@@ -9,8 +9,8 @@
 #include <QtMath>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
-PlayerCounter::PlayerCounter(Player *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent)
-    : AbstractCounter(_player, _id, _name, false, _value, false, parent)
+PlayerCounter::PlayerCounter(CounterState *state, PlayerLogic *player, QGraphicsItem *parent)
+    : AbstractCounter(state, player, false, false, parent)
 {
 }
 
@@ -47,7 +47,7 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     painter->drawText(translatedRect, Qt::AlignCenter, QString::number(value));
 }
 
-PlayerTarget::PlayerTarget(Player *_owner, QGraphicsItem *parentItem)
+PlayerTarget::PlayerTarget(PlayerLogic *_owner, QGraphicsItem *parentItem)
     : ArrowTarget(_owner, parentItem), playerCounter(nullptr)
 {
     setCacheMode(DeviceCoordinateCache);
@@ -128,8 +128,9 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     resetPainterTransform(painter);
 
     QString name = QString::fromStdString(info->name());
-    if (name.size() > 13)
+    if (name.size() > 13) {
         name = name.mid(0, 10) + "...";
+    }
 
     QFont font;
     font.setPixelSize(qMax(qRound(translatedNameRect.height() / 1.5), 9));
@@ -144,22 +145,21 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     painter->setPen(pen);
     painter->drawRect(boundingRect().adjusted(border / 2, border / 2, -border / 2, -border / 2));
 
-    if (getBeingPointedAt())
+    if (getBeingPointedAt()) {
         painter->fillRect(boundingRect(), QBrush(QColor(255, 0, 0, 100)));
+    }
 }
 
-AbstractCounter *PlayerTarget::addCounter(int _counterId, const QString &_name, int _value)
+AbstractCounter *PlayerTarget::addCounter(CounterState *state)
 {
     if (playerCounter) {
         disconnect(playerCounter, nullptr, this, nullptr);
         playerCounter->delCounter();
     }
-
-    playerCounter = new PlayerCounter(owner, _counterId, _name, _value, this);
+    playerCounter = new PlayerCounter(state, owner, this);
     playerCounter->setPos(boundingRect().width() - playerCounter->boundingRect().width(),
                           boundingRect().height() - playerCounter->boundingRect().height());
     connect(playerCounter, &PlayerCounter::destroyed, this, &PlayerTarget::counterDeleted);
-
     return playerCounter;
 }
 

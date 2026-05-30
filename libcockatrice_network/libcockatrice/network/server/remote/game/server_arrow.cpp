@@ -30,6 +30,7 @@ void Server_Arrow::getInfo(ServerInfo_Arrow *info)
         info->set_target_player_id(targetCard->getZone()->getPlayer()->getPlayerId());
         info->set_target_zone(targetCard->getZone()->getName().toStdString());
         info->set_target_card_id(targetCard->getId());
-    } else
+    } else {
         info->set_target_player_id(static_cast<Server_Player *>(targetItem)->getPlayerId());
+    }
 }

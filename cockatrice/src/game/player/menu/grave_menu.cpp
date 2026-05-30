@@ -1,14 +1,14 @@
 #include "grave_menu.h"
 
 #include "../../abstract_game.h"
-#include "../player.h"
 #include "../player_actions.h"
+#include "../player_logic.h"
 
 #include <QAction>
 #include <QMenu>
 #include <libcockatrice/utility/zone_names.h>
 
-GraveyardMenu::GraveyardMenu(Player *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
+GraveyardMenu::GraveyardMenu(PlayerLogic *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
     createMoveActions();
     createViewActions();
@@ -78,8 +78,9 @@ void GraveyardMenu::populateRevealRandomMenuWithActivePlayers()
 
     const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
     for (auto *other : players) {
-        if (other == player)
+        if (other == player) {
             continue;
+        }
         QAction *a = mRevealRandomGraveyardCard->addAction(other->getPlayerInfo()->getName());
         a->setData(other->getPlayerInfo()->getId());
         connect(a, &QAction::triggered, this, &GraveyardMenu::onRevealRandomTriggered);

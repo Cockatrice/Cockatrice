@@ -82,16 +82,16 @@ public:
     void resizeEvent(QResizeEvent *event) override;
 
 private:
-    /// Slider controlling the scale of card thumbnails in all deck entry widgets.
+    /** @brief Slider controlling the scale of card thumbnails in all deck entry widgets. */
     CardSizeWidget *cardSizeSlider;
 
-    /// Main horizontal layout containing the FlowWidget.
+    /** @brief Main horizontal layout containing the FlowWidget. */
     QHBoxLayout *layout;
 
-    /// Container providing scrollable multi-row flow layout of deck entries.
+    /** @brief Container providing scrollable multi-row flow layout of deck entries. */
     FlowWidget *flowWidget;
 
-    /// Shared network manager used to download card images for all child entry widgets.
+    /** @brief Shared network manager used to download card images for all child entry widgets. */
     QNetworkAccessManager *imageNetworkManager;
 };
 

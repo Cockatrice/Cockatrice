@@ -1,8 +1,8 @@
 /**
  * @file deck_link_to_api_transformer.h
  * @ingroup ApiInterfaces
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DECK_LINK_TO_API_TRANSFORMER_H
 #define DECK_LINK_TO_API_TRANSFORMER_H

@@ -1,8 +1,8 @@
 /**
  * @file tab_visual_database_display.h
  * @ingroup Tabs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_VISUAL_DATABASE_DISPLAY_H
 #define TAB_VISUAL_DATABASE_DISPLAY_H
@@ -23,8 +23,8 @@ public:
     void retranslateUi() override;
     [[nodiscard]] QString getTabText() const override
     {
-        return visualDatabaseDisplayWidget->displayModeButton->isChecked() ? tr("Database Display")
-                                                                           : tr("Visual Database Display");
+        return visualDatabaseDisplayWidget->isVisualDisplayMode() ? tr("Visual Database Display")
+                                                                  : tr("Database Display");
     }
 };
 

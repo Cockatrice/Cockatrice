@@ -1,8 +1,8 @@
 /**
  * @file token_display_model.h
  * @ingroup CardDatabaseModels
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_TOKEN_DISPLAY_MODEL_H
 #define COCKATRICE_TOKEN_DISPLAY_MODEL_H

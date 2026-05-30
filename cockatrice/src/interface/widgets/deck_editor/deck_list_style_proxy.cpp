@@ -8,8 +8,9 @@
 QVariant DeckListStyleProxy::data(const QModelIndex &index, int role) const
 {
     QModelIndex src = mapToSource(index);
-    if (!src.isValid())
+    if (!src.isValid()) {
         return {};
+    }
 
     QVariant value = QIdentityProxyModel::data(index, role);
 

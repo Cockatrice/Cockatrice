@@ -1,42 +1,37 @@
 /**
  * @file card_item.h
  * @ingroup GameGraphicsCards
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARDITEM_H
 #define CARDITEM_H
 
-#include "../zones/logic/card_zone_logic.h"
+#include "../zones/card_zone_logic.h"
 #include "abstract_card_item.h"
+#include "card_state.h"
 
 #include <libcockatrice/network/server/remote/game/server_card.h>
+#include <libcockatrice/utility/trice_limits.h>
 
 class CardDatabase;
 class CardDragItem;
 class CardZone;
 class ServerInfo_Card;
-class Player;
+class PlayerLogic;
 class QAction;
 class QColor;
 
-const int MAX_COUNTERS_ON_CARD = 999;
 const int ROTATION_DEGREES_PER_FRAME = 10;
 
 class CardItem : public AbstractCardItem
 {
     Q_OBJECT
 private:
-    CardZoneLogic *zone;
-    bool attacking;
-    QMap<int, int> counters;
-    QString annotation;
-    QString pt;
-    bool destroyOnZoneChange;
-    bool doesntUntap;
+    CardState *state;
+
     QPoint gridPoint;
     CardDragItem *dragItem;
-    CardItem *attachedTo;
     QList<CardItem *> attachedCards;
 
     void prepareDelete();
@@ -53,16 +48,20 @@ public:
     {
         return Type;
     }
-    explicit CardItem(Player *_owner,
+    explicit CardItem(PlayerLogic *_owner,
                       QGraphicsItem *parent = nullptr,
                       const CardRef &cardRef = {},
                       int _cardid = -1,
                       CardZoneLogic *_zone = nullptr);
 
     void retranslateUi();
+    [[nodiscard]] CardState *getState() const
+    {
+        return state;
+    }
     [[nodiscard]] CardZoneLogic *getZone() const
     {
-        return zone;
+        return state->getZone();
     }
     void setZone(CardZoneLogic *_zone);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -78,50 +77,50 @@ public:
     {
         return gridPoint;
     }
-    [[nodiscard]] Player *getOwner() const
+    [[nodiscard]] PlayerLogic *getOwner() const
     {
         return owner;
     }
-    void setOwner(Player *_owner)
+    void setOwner(PlayerLogic *_owner)
     {
         owner = _owner;
     }
     [[nodiscard]] bool getAttacking() const
     {
-        return attacking;
+        return state->getAttacking();
     }
     void setAttacking(bool _attacking);
     [[nodiscard]] const QMap<int, int> &getCounters() const
     {
-        return counters;
+        return state->getCounters();
     }
     void setCounter(int _id, int _value);
     [[nodiscard]] QString getAnnotation() const
     {
-        return annotation;
+        return state->getAnnotation();
     }
     void setAnnotation(const QString &_annotation);
     [[nodiscard]] bool getDoesntUntap() const
     {
-        return doesntUntap;
+        return state->getDoesntUntap();
     }
     void setDoesntUntap(bool _doesntUntap);
     [[nodiscard]] QString getPT() const
     {
-        return pt;
+        return state->getPT();
     }
     void setPT(const QString &_pt);
     [[nodiscard]] bool getDestroyOnZoneChange() const
     {
-        return destroyOnZoneChange;
+        return state->getDestroyOnZoneChange();
     }
     void setDestroyOnZoneChange(bool _destroy)
     {
-        destroyOnZoneChange = _destroy;
+        state->setDestroyOnZoneChange(_destroy);
     }
     [[nodiscard]] CardItem *getAttachedTo() const
     {
-        return attachedTo;
+        return state->getAttachedTo();
     }
     void setAttachedTo(CardItem *_attachedTo);
     void addAttachedCard(CardItem *card)

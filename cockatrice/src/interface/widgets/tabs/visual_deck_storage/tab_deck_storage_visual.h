@@ -1,8 +1,8 @@
 /**
  * @file tab_deck_storage_visual.h
  * @ingroup Tabs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_DECK_STORAGE_VISUAL_H
 #define TAB_DECK_STORAGE_VISUAL_H

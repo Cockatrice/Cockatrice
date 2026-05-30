@@ -2,8 +2,8 @@
  * @file phases_toolbar.h
  * @ingroup GameGraphics
  * @ingroup GameWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef PHASESTOOLBAR_H
 #define PHASESTOOLBAR_H
@@ -21,7 +21,7 @@ namespace protobuf
 class Message;
 }
 } // namespace google
-class Player;
+class PlayerLogic;
 class GameCommand;
 
 class PhaseButton : public QObject, public QGraphicsItem

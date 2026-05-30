@@ -40,8 +40,9 @@ unsigned int RNG_SFMT::rand(int min, int max)
     }
 
     // For complete fairness and equal timing, this should be a roll, but let's skip it anyway
-    if (min == max)
+    if (min == max) {
         return max;
+    }
 
     // This is actually not used in Cockatrice:
     // Someone wants rand() % -foo, so we should compute -rand(0, +foo)

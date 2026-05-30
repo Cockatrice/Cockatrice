@@ -256,13 +256,15 @@ void TabReplays::actOpenLocalReplay()
 {
     QModelIndexList curLefts = localDirView->selectionModel()->selectedRows();
     for (const auto &curLeft : curLefts) {
-        if (localDirModel->isDir(curLeft))
+        if (localDirModel->isDir(curLeft)) {
             continue;
+        }
         QString filePath = localDirModel->filePath(curLeft);
 
         QFile f(filePath);
-        if (!f.open(QIODevice::ReadOnly))
+        if (!f.open(QIODevice::ReadOnly)) {
             continue;
+        }
         QByteArray _data = f.readAll();
         f.close();
 
@@ -319,8 +321,9 @@ void TabReplays::actNewLocalFolder()
     bool ok;
     QString folderName =
         QInputDialog::getText(this, tr("New folder"), tr("Name of new folder:"), QLineEdit::Normal, "", &ok);
-    if (!ok || folderName.isEmpty())
+    if (!ok || folderName.isEmpty()) {
         return;
+    }
 
     localDirModel->mkdir(dirIndex, folderName);
 }
@@ -378,8 +381,9 @@ void TabReplays::actOpenRemoteReplay()
 
 void TabReplays::openRemoteReplayFinished(const Response &r)
 {
-    if (r.response_code() != Response::RespOk)
+    if (r.response_code() != Response::RespOk) {
         return;
+    }
 
     const Response_ReplayDownload &resp = r.GetExtension(Response_ReplayDownload::ext);
     GameReplay *replay = new GameReplay;
@@ -438,8 +442,9 @@ void TabReplays::downloadFinished(const Response &r,
                                   const CommandContainer & /* commandContainer */,
                                   const QVariant &extraData)
 {
-    if (r.response_code() != Response::RespOk)
+    if (r.response_code() != Response::RespOk) {
         return;
+    }
 
     const Response_ReplayDownload &resp = r.GetExtension(Response_ReplayDownload::ext);
     QString filePath = extraData.toString();
@@ -475,8 +480,9 @@ void TabReplays::actKeepRemoteReplay()
 
 void TabReplays::keepRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer)
 {
-    if (r.response_code() != Response::RespOk)
+    if (r.response_code() != Response::RespOk) {
         return;
+    }
 
     const Command_ReplayModifyMatch &cmd =
         commandContainer.session_command(0).GetExtension(Command_ReplayModifyMatch::ext);
@@ -513,8 +519,9 @@ void TabReplays::actDeleteRemoteReplay()
 
 void TabReplays::deleteRemoteReplayFinished(const Response &r, const CommandContainer &commandContainer)
 {
-    if (r.response_code() != Response::RespOk)
+    if (r.response_code() != Response::RespOk) {
         return;
+    }
 
     const Command_ReplayDeleteMatch &cmd =
         commandContainer.session_command(0).GetExtension(Command_ReplayDeleteMatch::ext);

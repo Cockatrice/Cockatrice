@@ -8,7 +8,7 @@
 #define COCKATRICE_PLAYER_MENU_H
 
 #include "../../../interface/widgets/menus/tearoff_menu.h"
-#include "../player.h"
+#include "../player_logic.h"
 #include "custom_zone_menu.h"
 #include "grave_menu.h"
 #include "hand_menu.h"
@@ -29,6 +29,9 @@ class PlayerMenu : public QObject
 
 signals:
     void cardMenuUpdated(QMenu *cardMenu);
+    void shortcutsActivated();
+    void shortcutsDeactivated();
+    void retranslateRequested();
 
 public slots:
     void setMenusForGraphicItems();
@@ -37,8 +40,8 @@ private slots:
     void refreshShortcuts();
 
 public:
-    explicit PlayerMenu(Player *player);
-    /// Lifecycle methods: delegate to all managedComponents, plus counters separately via player->getCounters().
+    explicit PlayerMenu(PlayerLogic *player);
+    /** @brief Retranslate all user-visible strings. Called on language change. */
     void retranslateUi();
 
     QMenu *updateCardMenu(const CardItem *card);
@@ -68,13 +71,13 @@ public:
         return shortcutsActive;
     }
 
-    /// Delegates to all managedComponents, plus counters separately.
+    /** @brief Bind keyboard shortcuts. Called when this player gains focus. */
     void setShortcutsActive();
-    /// Delegates to all managedComponents, plus counters separately.
+    /** @brief Unbind keyboard shortcuts. Called when this player loses focus. */
     void setShortcutsInactive();
 
 private:
-    Player *player;
+    PlayerLogic *player;
     TearOffMenu *playerMenu;
     QMenu *countersMenu;
     HandMenu *handMenu;
@@ -86,11 +89,13 @@ private:
     SayMenu *sayMenu;
     CustomZoneMenu *customZonesMenu;
 
-    /// Drives AbstractPlayerComponent lifecycle delegation. Counters are iterated separately via player->getCounters().
+    /** @brief Drives AbstractPlayerComponent lifecycle delegation. Counters are iterated separately via
+     * player->getCounters().
+     */
     QList<AbstractPlayerComponent *> managedComponents;
     bool shortcutsActive = false;
 
-    /// Creates component, adds it as a submenu of playerMenu, and registers in managedComponents.
+    /** @brief Creates component, adds it as a submenu of playerMenu, and registers in managedComponents. */
     template <typename MenuT, typename... Args> MenuT *addManagedMenu(Args &&...args)
     {
         auto *menu = new MenuT(std::forward<Args>(args)...);
@@ -99,7 +104,7 @@ private:
         return menu;
     }
 
-    /// Creates component and registers in managedComponents, but does NOT add it as a submenu.
+    /** @brief Creates component and registers in managedComponents, but does NOT add it as a submenu. */
     template <typename ComponentT, typename... Args> ComponentT *createManagedComponent(Args &&...args)
     {
         auto *component = new ComponentT(std::forward<Args>(args)...);

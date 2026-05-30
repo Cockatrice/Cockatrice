@@ -1,8 +1,8 @@
 /**
  * @file spoiler_background_updater.h
  * @ingroup Client
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_SPOILER_DOWNLOADER_H
 #define COCKATRICE_SPOILER_DOWNLOADER_H

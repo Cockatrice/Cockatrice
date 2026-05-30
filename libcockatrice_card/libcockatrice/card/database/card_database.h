@@ -30,27 +30,27 @@ class CardDatabase : public QObject
     Q_OBJECT
 
 protected:
-    /// Controller to determine set priority when choosing preferred printings.
+    /** @brief Controller to determine set priority when choosing preferred printings. */
     ICardSetPriorityController *setPriorityController;
 
-    /// Cards indexed by exact name
+    /** @brief Cards indexed by exact name. */
     CardNameMap cards;
 
-    /// Cards indexed by simplified name (normalized)
+    /** @brief Cards indexed by simplified name (normalized). */
     CardNameMap simpleNameCards;
 
-    /// Sets indexed by short name
+    /** @brief Sets indexed by short name. */
     SetNameMap sets;
 
     FormatRulesNameMap formats;
 
-    /// Loader responsible for file discovery and parsing
+    /** @brief Loader responsible for file discovery and parsing. */
     CardDatabaseLoader *loader;
 
-    /// Current load status of the database
+    /** @brief Current load status of the database. */
     LoadStatus loadStatus;
 
-    /// Querier for higher-level card lookups
+    /** @brief Querier for higher-level card lookups. */
     CardDatabaseQuerier *querier;
 
 private:
@@ -64,7 +64,7 @@ private:
      */
     void refreshCachedReverseRelatedCards();
 
-    /// Mutexes for thread safety
+    /** @brief Mutexes for thread safety. */
     QBasicMutex *clearDatabaseMutex = new QBasicMutex(), *addCardMutex = new QBasicMutex(),
                 *removeCardMutex = new QBasicMutex();
 
@@ -133,7 +133,7 @@ public:
     ICardSetPriorityController *getPriorityController()
     {
         return setPriorityController;
-    };
+    }
 
 public slots:
     /**

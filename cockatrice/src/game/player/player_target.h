@@ -1,8 +1,8 @@
 /**
  * @file player_target.h
  * @ingroup GameGraphicsPlayers
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef PLAYERTARGET_H
 #define PLAYERTARGET_H
@@ -13,13 +13,13 @@
 
 #include <QPixmap>
 
-class Player;
+class PlayerLogic;
 
 class PlayerCounter : public AbstractCounter
 {
     Q_OBJECT
 public:
-    PlayerCounter(Player *_player, int _id, const QString &_name, int _value, QGraphicsItem *parent = nullptr);
+    PlayerCounter(CounterState *state, PlayerLogic *player, QGraphicsItem *parent);
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 };
@@ -43,12 +43,12 @@ public:
         return Type;
     }
 
-    explicit PlayerTarget(Player *_player = nullptr, QGraphicsItem *parentItem = nullptr);
+    explicit PlayerTarget(PlayerLogic *_player = nullptr, QGraphicsItem *parentItem = nullptr);
     ~PlayerTarget() override;
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    AbstractCounter *addCounter(int _counterId, const QString &_name, int _value);
+    AbstractCounter *addCounter(CounterState *state);
 };
 
 #endif

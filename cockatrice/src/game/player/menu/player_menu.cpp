@@ -1,16 +1,16 @@
 #include "player_menu.h"
 
+#include "../../../game_graphics/zones/hand_zone.h"
+#include "../../../game_graphics/zones/pile_zone.h"
+#include "../../../game_graphics/zones/table_zone.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
-#include "../../zones/hand_zone.h"
-#include "../../zones/pile_zone.h"
-#include "../../zones/table_zone.h"
 #include "card_menu.h"
 #include "hand_menu.h"
 
 #include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
 
-PlayerMenu::PlayerMenu(Player *_player) : QObject(_player), player(_player)
+PlayerMenu::PlayerMenu(PlayerLogic *_player) : QObject(_player), player(_player)
 {
     playerMenu = new TearOffMenu();
 
@@ -97,10 +97,7 @@ void PlayerMenu::retranslateUi()
         countersMenu->setTitle(tr("&Counters"));
     }
 
-    QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
-    while (counterIterator.hasNext()) {
-        counterIterator.next().value()->retranslateUi();
-    }
+    emit retranslateRequested();
 }
 
 void PlayerMenu::refreshShortcuts()
@@ -120,30 +117,17 @@ void PlayerMenu::refreshShortcuts()
 void PlayerMenu::setShortcutsActive()
 {
     shortcutsActive = true;
-
-    for (auto *component : managedComponents) {
-        component->setShortcutsActive();
+    for (auto *c : managedComponents) {
+        c->setShortcutsActive();
     }
-
-    // Counters implement AbstractPlayerComponent but are iterated via Player::counters
-    // (the authoritative source) rather than managedComponents to avoid a redundant
-    // list that must stay in sync with the map.
-    QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
-    while (counterIterator.hasNext()) {
-        counterIterator.next().value()->setShortcutsActive();
-    }
+    emit shortcutsActivated();
 }
 
 void PlayerMenu::setShortcutsInactive()
 {
     shortcutsActive = false;
-
-    for (auto *component : managedComponents) {
-        component->setShortcutsInactive();
+    for (auto *c : managedComponents) {
+        c->setShortcutsInactive();
     }
-
-    QMapIterator<int, AbstractCounter *> counterIterator(player->getCounters());
-    while (counterIterator.hasNext()) {
-        counterIterator.next().value()->setShortcutsInactive();
-    }
+    emit shortcutsDeactivated();
 }

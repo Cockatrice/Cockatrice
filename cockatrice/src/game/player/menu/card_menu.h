@@ -1,8 +1,8 @@
 /**
  * @file card_menu.h
  * @ingroup GameMenusCards
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef COCKATRICE_CARD_MENU_H
 #define COCKATRICE_CARD_MENU_H
@@ -10,14 +10,14 @@
 #include <QMenu>
 
 class CardItem;
-class Player;
+class PlayerLogic;
 class CardMenu : public QMenu
 {
     Q_OBJECT
 
 public:
-    explicit CardMenu(Player *player, const CardItem *card, bool shortcutsActive);
-    void removePlayer(Player *playerToRemove);
+    explicit CardMenu(PlayerLogic *player, const CardItem *card, bool shortcutsActive);
+    void removePlayer(PlayerLogic *playerToRemove);
     void createTableMenu(bool canModifyCard);
     void createStackMenu(bool canModifyCard);
     void createGraveyardOrExileMenu(bool canModifyCard);
@@ -36,11 +36,12 @@ public:
     QAction *aFlip, *aPeek;
     QAction *aAttach, *aUnattach;
     QAction *aSetAnnotation;
+    QAction *aReduceLifeByPower;
 
     QList<QAction *> aAddCounter, aSetCounter, aRemoveCounter;
 
 private:
-    Player *player;
+    PlayerLogic *player;
     const CardItem *card;
     QList<QPair<QString, int>> playersInfo;
     bool shortcutsActive;

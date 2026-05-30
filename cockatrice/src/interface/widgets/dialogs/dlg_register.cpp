@@ -311,8 +311,9 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     countryEdit->addItem(QPixmap("theme:countries/zw"), "zw");
     countryEdit->setCurrentIndex(0);
     QStringList countries = SettingsCache::instance().getCountries();
-    for (const QString &c : countries)
+    for (const QString &c : countries) {
         countryEdit->addItem(QPixmap("theme:countries/" + c.toLower()), c);
+    }
 
     realnameLabel = new QLabel(tr("Real name:"));
     realnameEdit = new QLineEdit();
@@ -356,7 +357,7 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 
 void DlgRegister::actOk()
 {
-    //! \todo this stuff should be using qvalidators
+    //! \todo This stuff should be using QValidators.
     if (passwordEdit->text().length() < 8) {
         QMessageBox::critical(this, tr("Registration Warning"), tr("Your password is too short."));
         return;

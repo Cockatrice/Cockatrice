@@ -1,8 +1,8 @@
 /**
  * @file tab_account.h
  * @ingroup AccountTabs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_ACCOUNT_H
 #define TAB_ACCOUNT_H

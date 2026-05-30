@@ -24,8 +24,9 @@ ManaDistributionConfig ManaDistributionConfig::fromJson(const QJsonObject &o)
 
     if (o.contains("filters")) {
         config.filters.clear();
-        for (auto v : o["filters"].toArray())
+        for (auto v : o["filters"].toArray()) {
             config.filters << v.toString();
+        }
     }
 
     if (o.contains("showColorRows")) {

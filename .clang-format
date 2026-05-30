@@ -3,7 +3,9 @@ AccessModifierOffset: -4
 ColumnLimit: 120
 ---
 Language: Cpp
-BreakBeforeBraces: Custom
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortFunctionsOnASingleLine: None
+BinPackParameters: false
 BraceWrapping:
   AfterClass: true
   AfterControlStatement: false
@@ -18,16 +20,14 @@ BraceWrapping:
   SplitEmptyFunction: true
   SplitEmptyRecord: true
   SplitEmptyNamespace: true
-AllowShortFunctionsOnASingleLine: None
-BinPackParameters: false
-AllowAllParametersOfDeclarationOnNextLine: false
-IndentCaseLabels: true
-PointerAlignment: Right
-SortIncludes: true
+BreakBeforeBraces: Custom
 IncludeBlocks: Regroup
+IndentCaseLabels: true
+InsertBraces: true
+PointerAlignment: Right
+RemoveSemicolon: true
+SortIncludes: true
 StatementAttributeLikeMacros: [emit]
-# requires clang-format 16
-# RemoveSemicolon: true
 ---
 Language: Proto
 AllowShortFunctionsOnASingleLine: None

@@ -48,8 +48,9 @@ QString InnerDecklistNode::getVisibleName() const
 
 void InnerDecklistNode::clearTree()
 {
-    for (int i = 0; i < size(); i++)
+    for (int i = 0; i < size(); i++) {
         delete at(i);
+    }
     clear();
 }
 
@@ -154,8 +155,9 @@ bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
                     xml->attributes().value("collectorNumber").toString(), xml->attributes().value("uuid").toString());
                 newCard->readElement(xml);
             }
-        } else if (xml->isEndElement() && (childName == "zone"))
+        } else if (xml->isEndElement() && (childName == "zone")) {
             return false;
+        }
     }
     return true;
 }
@@ -164,8 +166,9 @@ void InnerDecklistNode::writeElement(QXmlStreamWriter *xml)
 {
     xml->writeStartElement("zone");
     xml->writeAttribute("name", name);
-    for (int i = 0; i < size(); i++)
+    for (int i = 0; i < size(); i++) {
         at(i)->writeElement(xml);
+    }
     xml->writeEndElement(); // zone
 }
 

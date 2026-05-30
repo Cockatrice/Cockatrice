@@ -1,8 +1,8 @@
 /**
  * @file visual_database_display_widget.h
  * @ingroup VisualCardDatabaseWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef VISUAL_DATABASE_DISPLAY_WIDGET_H
 #define VISUAL_DATABASE_DISPLAY_WIDGET_H
@@ -62,12 +62,15 @@ public:
         return databaseView;
     }
 
-    QWidget *searchContainer;
-    QHBoxLayout *searchLayout;
-    SearchLineEdit *searchEdit;
-    QPushButton *displayModeButton;
-    FilterTreeModel *filterModel;
-    VisualDatabaseDisplayColorFilterWidget *colorFilterWidget;
+    FilterTreeModel *getFilterModel()
+    {
+        return filterModel;
+    }
+
+    /**
+     * @return False if the widget is in database display mode and true if it's in visual display mode
+     */
+    bool isVisualDisplayMode() const;
 
 public slots:
     void onSearchModelChanged();
@@ -82,12 +85,17 @@ protected slots:
     void onHover(const ExactCard &hoveredCard);
     void addCard(const ExactCard &cardToAdd);
     void databaseDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
-    void wheelEvent(QWheelEvent *event) override;
     void modelDirty() const;
     void updateSearch(const QString &search) const;
     void onDisplayModeChanged(bool checked);
 
 private:
+    FlowWidget *searchContainer;
+    SearchLineEdit *searchEdit;
+    QPushButton *displayModeButton;
+    FilterTreeModel *filterModel;
+    VisualDatabaseDisplayColorFilterWidget *colorFilterWidget;
+
     QLabel *databaseLoadIndicator;
 
     QToolButton *clearFilterWidget;
@@ -111,6 +119,9 @@ private:
     int debounceTime = 300; // in Ms
     int currentPage = 0;    // Current page index
     int cardsPerPage = 100; // Number of cards per page
+
+    void highlightAllSearchEdit();
+    bool nearEndOfPage() const;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

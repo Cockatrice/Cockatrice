@@ -129,8 +129,9 @@ void StableReleaseChannel::releaseListFinished()
         return;
     }
 
-    if (!lastRelease)
+    if (!lastRelease) {
         lastRelease = new Release;
+    }
 
     lastRelease->setName(resultMap["name"].toString());
     lastRelease->setDescriptionUrl(resultMap["html_url"].toString());
@@ -246,8 +247,9 @@ void BetaReleaseChannel::releaseListFinished()
         return;
     }
 
-    if (lastRelease == nullptr)
+    if (lastRelease == nullptr) {
         lastRelease = new Release;
+    }
 
     lastRelease->setCommitHash(resultMap["target_commitish"].toString());
     lastRelease->setPublishDate(resultMap["published_at"].toDate());

@@ -93,10 +93,11 @@ void TabArchidekt::initializeUi()
         colorLayout->addWidget(manaSymbol);
 
         connect(manaSymbol, &ManaSymbolWidget::colorToggled, this, [this](QChar c, bool active) {
-            if (active)
+            if (active) {
                 activeColors.insert(c);
-            else
+            } else {
                 activeColors.remove(c);
+            }
             doSearch();
         });
     }
@@ -298,16 +299,18 @@ void TabArchidekt::setupFilterWidgets()
         searchModel->updateSearchResults(text);
         QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
         proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
-        if (!text.isEmpty())
+        if (!text.isEmpty()) {
             completer->complete();
+        }
     });
 
     connect(commandersField, &QLineEdit::textChanged, this, [=](const QString &text) {
         searchModel->updateSearchResults(text);
         QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
         proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
-        if (!text.isEmpty())
+        if (!text.isEmpty()) {
             completer->complete();
+        }
     });
 
     // Assemble secondary toolbar
@@ -492,12 +495,13 @@ QString TabArchidekt::buildSearchUrl()
 
         QString logic = "GTE";
         QString selected = minDeckSizeLogicCombo->currentText();
-        if (selected == "≥")
+        if (selected == "≥") {
             logic = "GTE";
-        else if (selected == "≤")
+        } else if (selected == "≤") {
             logic = "LTE";
-        else
+        } else {
             logic = "";
+        }
 
         if (!logic.isEmpty()) {
             query.addQueryItem("sizeLogic", logic);

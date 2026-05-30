@@ -20,21 +20,27 @@ static QString timeAgo(const QString &timestamp)
 {
     QDateTime dt = QDateTime::fromString(timestamp, Qt::ISODate);
 
-    if (!dt.isValid())
+    if (!dt.isValid()) {
         return timestamp; // fallback if parsing fails
+    }
 
     qint64 secs = dt.secsTo(QDateTime::currentDateTimeUtc());
 
-    if (secs < 60)
+    if (secs < 60) {
         return QString("%1 seconds ago").arg(secs);
-    if (secs < 3600)
+    }
+    if (secs < 3600) {
         return QString("%1 minutes ago").arg(secs / 60);
-    if (secs < 86400)
+    }
+    if (secs < 86400) {
         return QString("%1 hours ago").arg(secs / 3600);
-    if (secs < 30 * 86400)
+    }
+    if (secs < 30 * 86400) {
         return QString("%1 days ago").arg(secs / 86400);
-    if (secs < 365 * 86400)
+    }
+    if (secs < 365 * 86400) {
         return QString("%1 months ago").arg(secs / (30 * 86400));
+    }
 
     return QString("%1 years ago").arg(secs / (365 * 86400));
 }

@@ -89,8 +89,9 @@ void DeckEditorFilterDockWidget::filterViewCustomContextMenu(const QPoint &point
     QModelIndex idx;
 
     idx = filterView->indexAt(point);
-    if (!idx.isValid())
+    if (!idx.isValid()) {
         return;
+    }
 
     action = menu.addAction(QString("delete"));
     action->setData(point);
@@ -105,8 +106,9 @@ void DeckEditorFilterDockWidget::filterRemove(const QAction *action)
 
     point = action->data().toPoint();
     idx = filterView->indexAt(point);
-    if (!idx.isValid())
+    if (!idx.isValid()) {
         return;
+    }
 
     filterModel->removeRow(idx.row(), idx.parent());
 }

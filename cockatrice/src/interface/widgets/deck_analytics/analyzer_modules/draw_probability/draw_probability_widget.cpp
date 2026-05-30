@@ -20,12 +20,11 @@
 DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatisticsAnalyzer *analyzer)
     : AbstractAnalyticsPanelWidget(parent, analyzer)
 {
-    controls = new QWidget(this);
-    controlLayout = new QHBoxLayout(controls);
-    controlLayout->setContentsMargins(11, 0, 11, 0);
+    controls = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
+    controls->setSpacing(4, 4);
 
     labelPrefix = new QLabel(this);
-    controlLayout->addWidget(labelPrefix);
+    controls->addWidget(labelPrefix);
 
     criteriaCombo = new QComboBox(this);
     // Give these things item-data so we can translate the actual user-facing strings
@@ -33,33 +32,32 @@ DrawProbabilityWidget::DrawProbabilityWidget(QWidget *parent, DeckListStatistics
     criteriaCombo->addItem(QString(), "type");
     criteriaCombo->addItem(QString(), "subtype");
     criteriaCombo->addItem(QString(), "cmc");
-    controlLayout->addWidget(criteriaCombo);
+    controls->addWidget(criteriaCombo);
 
     exactnessCombo = new QComboBox(this);
     exactnessCombo->addItem(QString(), true);  // At least
     exactnessCombo->addItem(QString(), false); // Exactly
-    controlLayout->addWidget(exactnessCombo);
+    controls->addWidget(exactnessCombo);
 
     quantitySpin = new QSpinBox(this);
     quantitySpin->setRange(1, 60);
-    controlLayout->addWidget(quantitySpin);
+    controls->addWidget(quantitySpin);
 
     labelMiddle = new QLabel(this);
-    controlLayout->addWidget(labelMiddle);
+    controls->addWidget(labelMiddle);
 
     drawnSpin = new QSpinBox(this);
     drawnSpin->setRange(1, 60);
     drawnSpin->setValue(7);
-    controlLayout->addWidget(drawnSpin);
+    controls->addWidget(drawnSpin);
 
     labelSuffix = new QLabel(this);
-    controlLayout->addWidget(labelSuffix);
+    controls->addWidget(labelSuffix);
 
     labelPrefix->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     labelMiddle->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     labelSuffix->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
-    controlLayout->addStretch(1);
     layout->addWidget(controls);
 
     // Table

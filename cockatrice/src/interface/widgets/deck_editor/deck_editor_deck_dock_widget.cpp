@@ -314,8 +314,9 @@ void DeckEditorDeckDockWidget::initializeFormats()
 ExactCard DeckEditorDeckDockWidget::getCurrentCard()
 {
     QModelIndex current = deckView->selectionModel()->currentIndex();
-    if (!current.isValid())
+    if (!current.isValid()) {
         return {};
+    }
     const QString cardName = current.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString();
     const QString cardProviderID = current.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data().toString();
     const QModelIndex gparent = current.parent().parent();
@@ -530,7 +531,7 @@ void DeckEditorDeckDockWidget::changeSelectedCard(int changeBy)
     // currentIndex will return an index for the underlying deckModel instead of the proxy.
     // That index will return an invalid index when indexBelow/indexAbove crosses a header node,
     // causing the selection to fail to move down.
-    /// \todo Figure out why it's happening so we can do a proper fix instead of a hacky workaround
+    //! \todo Figure out why it's happening so we can do a proper fix instead of a hacky workaround.
     if (deckViewCurrentIndex.model() == proxy->sourceModel()) {
         deckViewCurrentIndex = proxy->mapFromSource(deckViewCurrentIndex);
     }
@@ -634,8 +635,8 @@ void DeckEditorDeckDockWidget::actSwapSelection()
 {
     auto selectedRows = getSelectedCardNodeSourceIndices();
 
-    // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
-    // TODO: remove the hack and also handle reselection when all rows of a multi-selection gets deleted
+    //! \todo Remove the hack and also handle reselection when all rows of a multi-selection gets deleted.
+    // Hack: maintains old reselection behavior when single-selection row is deleted.
     if (selectedRows.length() == 1) {
         deckView->setSelectionMode(QAbstractItemView::SingleSelection);
     }
@@ -651,10 +652,12 @@ void DeckEditorDeckDockWidget::actSwapSelection()
 
 void DeckEditorDeckDockWidget::actDecrementCard(const ExactCard &card, QString zoneName)
 {
-    if (!card)
+    if (!card) {
         return;
-    if (card.getInfo().getIsToken())
+    }
+    if (card.getInfo().getIsToken()) {
         zoneName = DECK_ZONE_TOKENS;
+    }
 
     deckStateManager->decrementCard(card, zoneName);
 }
@@ -663,8 +666,8 @@ void DeckEditorDeckDockWidget::actDecrementSelection()
 {
     auto selectedRows = getSelectedCardNodeSourceIndices();
 
-    // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
-    // TODO: remove the hack and also handle reselection when all rows of a multi-selection gets deleted
+    //! \todo Remove the hack and also handle reselection when all rows of a multi-selection gets deleted.
+    // Hack: maintains old reselection behavior when single-selection row is deleted.
     if (selectedRows.length() == 1) {
         deckView->setSelectionMode(QAbstractItemView::SingleSelection);
     }
@@ -680,8 +683,8 @@ void DeckEditorDeckDockWidget::actRemoveCard()
 {
     auto selectedRows = getSelectedCardNodeSourceIndices();
 
-    // hack to maintain the old reselection behavior when currently selected row of a single-selection gets deleted
-    // TODO: remove the hack and also handle reselection when all rows of a multi-selection gets deleted
+    //! \todo Remove the hack and also handle reselection when all rows of a multi-selection gets deleted.
+    // Hack: maintains old reselection behavior when single-selection row is deleted.
     if (selectedRows.length() == 1) {
         deckView->setSelectionMode(QAbstractItemView::SingleSelection);
     }

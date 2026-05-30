@@ -1,8 +1,8 @@
 /**
  * @file card_info_display_widget.h
  * @ingroup CardWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef CARDINFOWIDGET_H
 #define CARDINFOWIDGET_H

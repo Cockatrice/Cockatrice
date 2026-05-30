@@ -28,8 +28,8 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
 
     deckLoader = new DeckLoader(this);
     connect(deckLoader, &DeckLoader::loadFinished, this, &DeckPreviewWidget::initializeUi);
-    /* TODO: We shouldn't update the tags on *every* deck load, since it's kinda expensive. We should instead count how
-     many deck loads have finished already and if we've loaded all decks and THEN load all the tags at once. */
+    //! \todo Batch tag refresh: count finished deck loads and refresh tags once all decks are loaded.
+    // Currently expensive: refreshes on each individual deck load instead of once at the end.
     connect(deckLoader, &DeckLoader::loadFinished, visualDeckStorageWidget->tagFilterWidget,
             &VisualDeckStorageTagFilterWidget::refreshTags);
     deckLoader->loadFromFileAsync(filePath, DeckFileFormat::getFormatFromName(filePath), false);

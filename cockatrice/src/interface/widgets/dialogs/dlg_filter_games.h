@@ -1,8 +1,8 @@
 /**
  * @file dlg_filter_games.h
  * @ingroup RoomDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_FILTER_GAMES_H
 #define DLG_FILTER_GAMES_H

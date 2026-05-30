@@ -1,8 +1,8 @@
 /**
  * @file tab_edhrec.h
  * @ingroup Tabs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef TAB_EDHREC_H
 #define TAB_EDHREC_H

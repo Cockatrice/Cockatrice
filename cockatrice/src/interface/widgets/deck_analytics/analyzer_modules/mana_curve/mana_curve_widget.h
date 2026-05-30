@@ -1,8 +1,8 @@
 /**
  * @file mana_curve_widget.h
  * @ingroup DeckEditorAnalyticsWidgets
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef MANA_CURVE_WIDGET_H
 #define MANA_CURVE_WIDGET_H
@@ -37,7 +37,7 @@ public:
     {
         config = ManaCurveConfig::fromJson(o);
         updateDisplay();
-    };
+    }
 
     QJsonObject extractConfigFromDialog(QDialog *dlg) const override;
 

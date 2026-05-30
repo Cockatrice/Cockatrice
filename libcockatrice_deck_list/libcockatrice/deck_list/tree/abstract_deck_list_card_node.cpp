@@ -38,8 +38,9 @@ bool AbstractDecklistCardNode::readElement(QXmlStreamReader *xml)
 {
     while (!xml->atEnd()) {
         xml->readNext();
-        if (xml->isEndElement() && xml->name().toString() == "card")
+        if (xml->isEndElement() && xml->name().toString() == "card") {
             return false;
+        }
     }
     return true;
 }

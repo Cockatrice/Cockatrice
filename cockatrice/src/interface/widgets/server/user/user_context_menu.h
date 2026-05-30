@@ -1,8 +1,8 @@
 /**
  * @file user_context_menu.h
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef USER_CONTEXT_MENU_H
 #define USER_CONTEXT_MENU_H

@@ -205,8 +205,9 @@ bool FilterItem::acceptColor(const CardInfoPtr info) const
      */
     int match_count = 0;
     for (auto &it : converted_term) {
-        if (info->getColors().contains(it, Qt::CaseInsensitive))
+        if (info->getColors().contains(it, Qt::CaseInsensitive)) {
             match_count++;
+        }
     }
 
     return match_count == converted_term.length();
@@ -542,12 +543,14 @@ void FilterTree::removeFilter(const CardFilter *toRemove)
 {
     for (int i = childNodes.size() - 1; i >= 0; --i) {
         auto *logicMap = dynamic_cast<LogicMap *>(childNodes.at(i));
-        if (!logicMap || logicMap->attr != toRemove->attr())
+        if (!logicMap || logicMap->attr != toRemove->attr()) {
             continue;
+        }
 
         FilterItemList *typeList = logicMap->typeList(toRemove->type());
-        if (!typeList)
+        if (!typeList) {
             continue;
+        }
 
         int termIdx = typeList->termIndex(toRemove->term());
         if (termIdx != -1) {

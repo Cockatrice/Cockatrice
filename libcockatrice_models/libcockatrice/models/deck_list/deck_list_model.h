@@ -89,12 +89,15 @@ static inline QString toString(Type t)
 
 static inline Type fromString(const QString &s)
 {
-    if (s == "Main Type")
+    if (s == "Main Type") {
         return MAIN_TYPE;
-    if (s == "Mana Cost")
+    }
+    if (s == "Mana Cost") {
         return MANA_COST;
-    if (s == "Colors")
+    }
+    if (s == "Colors") {
         return COLOR;
+    }
     return MAIN_TYPE; // default
 }
 } // namespace DeckListModelGroupCriteria
@@ -427,8 +430,9 @@ private:
 
     template <typename T> T getNode(const QModelIndex &index) const
     {
-        if (!index.isValid())
+        if (!index.isValid()) {
             return dynamic_cast<T>(root);
+        }
         return dynamic_cast<T>(static_cast<AbstractDecklistNode *>(index.internalPointer()));
     }
 

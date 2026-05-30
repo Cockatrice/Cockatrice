@@ -1,8 +1,8 @@
 /**
  * @file dlg_edit_avatar.h
  * @ingroup AccountDialogs
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DLG_EDITAVATAR_H
 #define DLG_EDITAVATAR_H

@@ -1,8 +1,8 @@
 /**
  * @file overlap_control_widget.h
  * @ingroup UI
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef OVERLAP_CONTROL_WIDGET_H
 #define OVERLAP_CONTROL_WIDGET_H

@@ -101,8 +101,9 @@ DlgCreateToken::DlgCreateToken(const QStringList &_predefinedTokens, QWidget *pa
     chooseTokenView->resizeColumnToContents(0);
     chooseTokenView->setWordWrap(true);
 
-    if (!deckHeaderState.isNull())
+    if (!deckHeaderState.isNull()) {
         chooseTokenView->header()->restoreState(deckHeaderState);
+    }
 
     chooseTokenView->header()->setStretchLastSection(false);
     chooseTokenView->header()->hideSection(1);                                         // Sets
@@ -185,8 +186,9 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         const QChar cardColor = cardInfo->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
         ptEdit->setText(cardInfo->getPowTough());
-        if (SettingsCache::instance().getAnnotateTokens())
+        if (SettingsCache::instance().getAnnotateTokens()) {
             annotationEdit->setText(cardInfo->getText());
+        }
     } else {
         nameEdit->setText("");
         colorEdit->setCurrentIndex(colorEdit->findData(QString(), Qt::UserRole, Qt::MatchFixedString));

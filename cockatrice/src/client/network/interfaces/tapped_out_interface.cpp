@@ -99,14 +99,16 @@ void TappedOutInterface::copyDeckSplitMainAndSide(const DeckList &source, DeckLi
 {
     auto copyMainOrSide = [this, &mainboard, &sideboard](const auto node, const auto card) {
         CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());
-        if (!dbCard || dbCard->getIsToken())
+        if (!dbCard || dbCard->getIsToken()) {
             return;
+        }
 
         DecklistCardNode *addedCard;
-        if (node->getName() == DECK_ZONE_SIDE)
+        if (node->getName() == DECK_ZONE_SIDE) {
             addedCard = sideboard.addCard(card->getName(), node->getName(), -1);
-        else
+        } else {
             addedCard = mainboard.addCard(card->getName(), node->getName(), -1);
+        }
         addedCard->setNumber(card->getNumber());
     };
 

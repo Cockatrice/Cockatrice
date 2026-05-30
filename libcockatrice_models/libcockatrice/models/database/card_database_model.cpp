@@ -31,8 +31,9 @@ int CardDatabaseModel::columnCount(const QModelIndex & /*parent*/) const
 QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() >= cardList.size() || index.column() >= CARDDBMODEL_COLUMNS ||
-        (role != Qt::DisplayRole && role != SortRole))
+        (role != Qt::DisplayRole && role != SortRole)) {
         return QVariant();
+    }
 
     CardInfoPtr card = cardList.at(index.row());
     switch (index.column()) {
@@ -56,10 +57,12 @@ QVariant CardDatabaseModel::data(const QModelIndex &index, int role) const
 
 QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (role != Qt::DisplayRole)
+    if (role != Qt::DisplayRole) {
         return QVariant();
-    if (orientation != Qt::Horizontal)
+    }
+    if (orientation != Qt::Horizontal) {
         return QVariant();
+    }
     switch (section) {
         case NameColumn:
             return QString(tr("Name"));
@@ -78,24 +81,27 @@ QVariant CardDatabaseModel::headerData(int section, Qt::Orientation orientation,
     }
 }
 
-void CardDatabaseModel::cardInfoChanged(CardInfoPtr card)
+void CardDatabaseModel::cardInfoChanged(const CardInfoPtr &card)
 {
     const int row = cardList.indexOf(card);
-    if (row == -1)
+    if (row == -1) {
         return;
+    }
 
     emit dataChanged(index(row, 0), index(row, CARDDBMODEL_COLUMNS - 1));
 }
 
-bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(CardInfoPtr card)
+bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(const CardInfoPtr &card) const
 {
-    if (!showOnlyCardsFromEnabledSets)
+    if (!showOnlyCardsFromEnabledSets) {
         return true;
+    }
 
     for (const auto &printings : card->getSets()) {
         for (const auto &printing : printings) {
-            if (printing.getSet()->getEnabled())
+            if (printing.getSet()->getEnabled()) {
                 return true;
+            }
         }
     }
 
@@ -119,7 +125,7 @@ void CardDatabaseModel::cardDatabaseEnabledSetsChanged()
     }
 }
 
-void CardDatabaseModel::cardAdded(CardInfoPtr card)
+void CardDatabaseModel::cardAdded(const CardInfoPtr &card)
 {
     if (checkCardHasAtLeastOneEnabledSet(card)) {
         // add the card if it's present in at least one enabled set

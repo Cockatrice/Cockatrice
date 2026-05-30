@@ -39,20 +39,23 @@ void ServerLogger::startLog(const QString &logFileName)
             logFile = 0;
             return;
         }
-    } else
+    } else {
         logFile = 0;
+    }
 
     connect(this, SIGNAL(sigFlushBuffer()), this, SLOT(flushBuffer()), Qt::QueuedConnection);
 }
 
 void ServerLogger::logMessage(const QString &message, void *caller)
 {
-    if (!logFile)
+    if (!logFile) {
         return;
+    }
 
     QString callerString;
-    if (caller)
+    if (caller) {
         callerString = QString::number((qulonglong)caller, 16) + " ";
+    }
 
     // filter out all log entries based on values in configuration file
     bool shouldWeWriteLog = settingsCache->value("server/writelog", 1).toBool();
@@ -60,8 +63,9 @@ void ServerLogger::logMessage(const QString &message, void *caller)
     QStringList listlogFilters = logFilters.split(",", Qt::SkipEmptyParts);
     bool shouldWeSkipLine = false;
 
-    if (!shouldWeWriteLog)
+    if (!shouldWeWriteLog) {
         return;
+    }
 
     if (!logFilters.trimmed().isEmpty()) {
         shouldWeSkipLine = true;
@@ -73,8 +77,9 @@ void ServerLogger::logMessage(const QString &message, void *caller)
         }
     }
 
-    if (shouldWeSkipLine)
+    if (shouldWeSkipLine) {
         return;
+    }
 
     bufferMutex.lock();
     buffer.append(QDateTime::currentDateTime().toString() + " " + callerString + message);
@@ -84,8 +89,9 @@ void ServerLogger::logMessage(const QString &message, void *caller)
 
 void ServerLogger::flushBuffer()
 {
-    if (flushRunning)
+    if (flushRunning) {
         return;
+    }
 
     flushRunning = true;
     QTextStream stream(logFile);
@@ -103,15 +109,17 @@ void ServerLogger::flushBuffer()
         stream << message << "\n";
         stream.flush();
 
-        if (logToConsole)
+        if (logToConsole) {
             std::cout << message.toStdString() << std::endl;
+        }
     }
 }
 
 void ServerLogger::rotateLogs()
 {
-    if (!logFile)
+    if (!logFile) {
         return;
+    }
 
     flushBuffer();
 

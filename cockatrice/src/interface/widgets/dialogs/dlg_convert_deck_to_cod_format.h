@@ -2,8 +2,8 @@
  * @file dlg_convert_deck_to_cod_format.h
  * @ingroup LocalDeckStorageDialogs
  * @ingroup Lobby
- * @brief TODO: Document this.
  */
+//! \todo Document this file.
 
 #ifndef DIALOG_CONVERT_DECK_TO_COD_FORMAT_H
 #define DIALOG_CONVERT_DECK_TO_COD_FORMAT_H

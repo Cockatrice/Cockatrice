@@ -18,11 +18,11 @@
 
 #include "abstract_deck_list_node.h"
 
-/// Constant for the "main" deck zone name.
+/** @brief Constant for the "main" deck zone name. */
 #define DECK_ZONE_MAIN "main"
-/// Constant for the "sideboard" zone name.
+/** @brief Constant for the "sideboard" zone name. */
 #define DECK_ZONE_SIDE "side"
-/// Constant for the "tokens" zone name.
+/** @brief Constant for the "tokens" zone name. */
 #define DECK_ZONE_TOKENS "tokens"
 
 /**
@@ -93,13 +93,13 @@ public:
      */
     void setSortMethod(DeckSortMethod method) override;
 
-    /// @return The internal name of this node.
+    /** @return The internal name of this node. */
     [[nodiscard]] QString getName() const override
     {
         return name;
     }
 
-    /// @param _name Set the internal name of this node.
+    /** @param _name Set the internal name of this node. */
     void setName(const QString &_name)
     {
         name = _name;
@@ -122,25 +122,25 @@ public:
      */
     [[nodiscard]] virtual QString getVisibleName() const;
 
-    /// @return Always empty for container nodes.
+    /** @return Always empty for container nodes. */
     [[nodiscard]] QString getCardProviderId() const override
     {
         return "";
     }
 
-    /// @return Always empty for container nodes.
+    /** @return Always empty for container nodes. */
     [[nodiscard]] QString getCardSetShortName() const override
     {
         return "";
     }
 
-    /// @return Always empty for container nodes.
+    /** @return Always empty for container nodes. */
     [[nodiscard]] QString getCardCollectorNumber() const override
     {
         return "";
     }
 
-    /// @return Always true; InnerDecklistNode represents deck structure.
+    /** @return Always true; InnerDecklistNode represents deck structure. */
     [[nodiscard]] bool isDeckHeader() const override
     {
         return true;
@@ -196,10 +196,10 @@ public:
      */
     bool compare(AbstractDecklistNode *other) const override;
 
-    /// @copydoc compare(AbstractDecklistNode*) const
+    /** @copydoc compare(AbstractDecklistNode*) const */
     bool compareNumber(AbstractDecklistNode *other) const;
 
-    /// @copydoc compare(AbstractDecklistNode*) const
+    /** @copydoc compare(AbstractDecklistNode*) const */
     bool compareName(AbstractDecklistNode *other) const;
 
     /**
