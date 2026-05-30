@@ -67,12 +67,8 @@ jobs:
           liblzma-dev \
           libmariadb-dev-compat \
           libprotobuf-dev \
-          libqt6multimedia6 \
-          libqt6sql6-mysql \
           ninja-build \
           protobuf-compiler \
-          qt6-image-formats-plugins \
-          qt6-l10n-tools \
           qt6-multimedia-dev \
           qt6-svg-dev \
           qt6-tools-dev \
@@ -85,7 +81,7 @@ jobs:
     - name: "[C++] Configure CMake"
       if: matrix.build-mode == 'manual' && matrix.language == 'cpp'
       shell: bash
-      run: cmake -B build -S . -G Ninja -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release
+      run: cmake -S . -B build -G Ninja -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release
 
     - name: "[C++] Build application"
       if: matrix.build-mode == 'manual' && matrix.language == 'cpp'
