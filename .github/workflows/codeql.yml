@@ -1,0 +1,98 @@
+# GitHub Docs on Code Scanning:
+# https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning
+# https://docs.github.com/en/code-security/how-tos/find-and-fix-code-vulnerabilities/manage-your-configuration
+# https://docs.github.com/en/code-security/reference/code-scanning/workflow-configuration-options
+#
+# CodeQL Docs:
+# https://codeql.github.com/docs/
+
+name: CodeQL
+
+permissions:
+  security-events: write    # needed to post results
+  contents: read
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**/*.md'
+      - 'doc/**'
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - '**/*.md'
+      - 'doc/**'
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        # https://codeql.github.com/docs/codeql-overview/supported-languages-and-frameworks/
+        - language: cpp
+          build-mode: manual
+        - language: actions
+          build-mode: none
+
+    steps:
+    - name: "Checkout repository"
+      uses: actions/checkout@v6
+
+    - name: "Initialize CodeQL"
+      uses: github/codeql-action/init@v4
+      with:
+        languages: ${{ matrix.language }}
+        build-mode: ${{ matrix.build-mode }}
+        queries: security-and-quality
+        dependency-caching: true
+
+    - name: "[C++] Install dependencies"
+      if: matrix.build-mode == 'manual' && matrix.language == 'cpp'
+      shell: bash
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          cmake \
+          g++ \
+          libgl-dev \
+          liblzma-dev \
+          libmariadb-dev-compat \
+          libprotobuf-dev \
+          libqt6multimedia6 \
+          libqt6sql6-mysql \
+          ninja-build \
+          protobuf-compiler \
+          qt6-image-formats-plugins \
+          qt6-l10n-tools \
+          qt6-multimedia-dev \
+          qt6-svg-dev \
+          qt6-tools-dev \
+          qt6-tools-dev-tools \
+          qt6-websockets-dev
+
+# Minimize dependency install
+# Add ccache usage for faster compilation, (install ccache dep, actions/cache step + append DUSE_CCACHE=1 in cmake config, CCACHE env values)
+
+    - name: "[C++] Configure CMake"
+      if: matrix.build-mode == 'manual' && matrix.language == 'cpp'
+      shell: bash
+      run: cmake -B build -S . -G Ninja -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release
+
+    - name: "[C++] Build application"
+      if: matrix.build-mode == 'manual' && matrix.language == 'cpp'
+      shell: bash
+      run: cmake --build build
+
+    - name: "Perform CodeQL Analysis"
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: "/language:${{ matrix.language }}"
