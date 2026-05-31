@@ -97,9 +97,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
             &DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents);
     connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
 
-    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,
-            &VisualDatabaseDisplayWidget::highlightAllSearchEdit);
-    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToSideboard, this,
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::cardAdded, this,
             &VisualDatabaseDisplayWidget::highlightAllSearchEdit);
 
     databaseView = databaseDisplayWidget->getDatabaseView();

@@ -431,13 +431,13 @@ QMenu *CardInfoPictureWidget::createAddToOpenDeckMenu()
         QAction *addCard = addCardMenu->addAction(tr("Mainboard"));
         connect(addCard, &QAction::triggered, this, [this, deckEditorTab] {
             deckEditorTab->updateCard(exactCard);
-            deckEditorTab->actAddCard(exactCard);
+            deckEditorTab->addCard(exactCard, DECK_ZONE_MAIN);
         });
 
         QAction *addCardSideboard = addCardMenu->addAction(tr("Sideboard"));
         connect(addCardSideboard, &QAction::triggered, this, [this, deckEditorTab] {
             deckEditorTab->updateCard(exactCard);
-            deckEditorTab->actAddCardToSideboard(exactCard);
+            deckEditorTab->addCard(exactCard, DECK_ZONE_SIDE);
         });
     }
 

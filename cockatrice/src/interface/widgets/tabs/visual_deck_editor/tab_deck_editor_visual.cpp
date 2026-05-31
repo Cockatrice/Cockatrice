@@ -168,22 +168,14 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
 
     // Alt + Right-click = decrement
     if (event->button() == Qt::RightButton && event->modifiers().testFlag(Qt::AltModifier)) {
-        if (zoneName == DECK_ZONE_MAIN) {
-            actDecrementCard(card);
-        } else {
-            actDecrementCardFromSideboard(card);
-        }
+        decrementCard(card, zoneName);
         //  Keep selection intact.
         return;
     }
 
     // Alt + Left click = increment
     if (event->button() == Qt::LeftButton && event->modifiers().testFlag(Qt::AltModifier)) {
-        if (zoneName == DECK_ZONE_MAIN) {
-            actAddCard(card);
-        } else {
-            actAddCardToSideboard(card);
-        }
+        addCard(card, zoneName);
         //  Keep selection intact.
         return;
     }
@@ -224,12 +216,12 @@ void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
 {
     if (event->button() == Qt::LeftButton) {
         if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
-            actAddCardToSideboard(instance->getCard());
+            addCard(instance->getCard(), DECK_ZONE_SIDE);
         } else {
-            actAddCard(instance->getCard());
+            addCard(instance->getCard(), DECK_ZONE_MAIN);
         }
     } else if (event->button() == Qt::RightButton) {
-        actDecrementCard(instance->getCard());
+        decrementCard(instance->getCard(), DECK_ZONE_MAIN);
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }

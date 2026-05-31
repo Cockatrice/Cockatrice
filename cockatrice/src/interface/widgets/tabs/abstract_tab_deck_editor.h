@@ -77,8 +77,8 @@ class QAction;
  *
  * **Key Methods:**
  *
- * - actAddCard(const ExactCard &card) — Adds a card to the deck.
- * - actDecrementCard(const ExactCard &card) — Removes a single instance of a card from the deck.
+ * - addCard(const ExactCard &card, const QString &zoneName) — Adds a card to the deck.
+ * - decrementCard(const ExactCard &card, const QString &zoneName) — Removes a single instance of a card from the deck.
  * - actRemoveCard() — Removes the currently selected card from the deck.
  * - actSaveDeckAs() — Performs a "Save As" action for the deck.
  * - updateCard(const ExactCard &card) — Updates the currently displayed card info in the dock.
@@ -162,18 +162,6 @@ public slots:
      * @param zoneName Zone to decrement from.
      */
     void decrementCard(const ExactCard &card, const QString &zoneName);
-
-    /** @brief Adds a card to the main deck or sideboard based on Ctrl key. */
-    void actAddCard(const ExactCard &card);
-
-    /** @brief Adds a card to the sideboard explicitly. */
-    void actAddCardToSideboard(const ExactCard &card);
-
-    /** @brief Decrements a card from the main deck. */
-    void actDecrementCard(const ExactCard &card);
-
-    /** @brief Decrements a card from the sideboard. */
-    void actDecrementCardFromSideboard(const ExactCard &card);
 
     /** @brief Opens a recently opened deck file. */
     void actOpenRecent(const QString &fileName);
