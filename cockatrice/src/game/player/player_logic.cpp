@@ -231,7 +231,8 @@ void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
 
     const int arrowListSize = info.arrow_list_size();
     for (int i = 0; i < arrowListSize; ++i) {
-        emit arrowCreateRequested(ArrowData::fromProto(info.arrow_list(i)));
+        emit arrowCreateRequested(QSharedPointer<ArrowData>::create(
+            ArrowData::fromProto(info.arrow_list(i), getPlayerInfo()->getId(), getPlayerInfo()->getLocal())));
     }
 }
 

@@ -21,12 +21,8 @@
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/zone_names.h>
 
-ArrowItem::ArrowItem(PlayerLogic *_player,
-                     int _id,
-                     ArrowTarget *_startItem,
-                     ArrowTarget *_targetItem,
-                     const QColor &_color)
-    : player(_player), id(_id), startItem(_startItem), targetItem(_targetItem), color(_color)
+ArrowItem::ArrowItem(QSharedPointer<const ArrowData> _data, ArrowTarget *_startItem, ArrowTarget *_targetItem)
+    : data(std::move(_data)), startItem(_startItem), targetItem(_targetItem)
 {
     setZValue(ZValues::ARROWS);
 
@@ -52,7 +48,7 @@ ArrowItem::ArrowItem(PlayerLogic *_player,
 
 void ArrowItem::onTargetDestroyed()
 {
-    emit requestDeletion(id);
+    emit requestDeletion(data->creatorId, data->id);
 }
 
 void ArrowItem::delArrow()
@@ -130,7 +126,7 @@ void ArrowItem::updatePath(const QPointF &endPoint)
 
 void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QColor paintColor(color);
+    QColor paintColor(data->color);
     if (fullColor) {
         paintColor.setAlpha(200);
     } else {
@@ -142,7 +138,7 @@ void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
 void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (!player->getPlayerInfo()->getLocal()) {
+    if (!data->isLocalCreator) {
         event->ignore();
         return;
     }
@@ -156,14 +152,20 @@ void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     event->accept();
     if (event->button() == Qt::RightButton) {
-        emit requestDeletion(id);
+        emit requestDeletion(data->creatorId, data->id);
     }
 }
 
 // ArrowDragItem
 
 ArrowDragItem::ArrowDragItem(PlayerLogic *_owner, ArrowTarget *_startItem, const QColor &_color, int _deleteInPhase)
-    : ArrowItem(_owner, -1, _startItem, nullptr, _color), deleteInPhase(_deleteInPhase)
+    : ArrowItem(QSharedPointer<ArrowData>::create(ArrowData{.creatorId = _owner->getPlayerInfo()->getId(),
+                                                            .isLocalCreator = true,
+                                                            .id = -1,
+                                                            .color = _color}),
+                _startItem,
+                nullptr),
+      player(_owner), deleteInPhase(_deleteInPhase)
 {
 }
 
@@ -238,7 +240,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         CardZoneLogic *startZone = startCard->getZone();
 
         Command_CreateArrow cmd;
-        cmd.mutable_arrow_color()->CopyFrom(convertQColorToColor(color));
+        cmd.mutable_arrow_color()->CopyFrom(convertQColorToColor(data->color));
         cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
         cmd.set_start_zone(startZone->getName().toStdString());
         cmd.set_start_card_id(startCard->getId());
@@ -284,7 +286,14 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 // ArrowAttachItem
 ArrowAttachItem::ArrowAttachItem(ArrowTarget *_startItem)
-    : ArrowItem(_startItem->getOwner(), -1, _startItem, nullptr, Qt::green)
+    : ArrowItem(
+          QSharedPointer<ArrowData>::create(ArrowData{.creatorId = _startItem->getOwner()->getPlayerInfo()->getId(),
+                                                      .isLocalCreator = true,
+                                                      .id = -1,
+                                                      .color = Qt::green}),
+          _startItem,
+          nullptr),
+      player(_startItem->getOwner())
 {
 }
 

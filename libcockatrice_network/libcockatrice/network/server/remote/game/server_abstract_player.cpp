@@ -81,17 +81,6 @@ int Server_AbstractPlayer::newCardId()
     return nextCardId++;
 }
 
-int Server_AbstractPlayer::newArrowId() const
-{
-    int id = 0;
-    for (Server_Arrow *a : arrows) {
-        if (a->getId() > id) {
-            id = a->getId();
-        }
-    }
-    return id + 1;
-}
-
 void Server_AbstractPlayer::setupZones()
 {
     nextCardId = 0;
@@ -1144,7 +1133,7 @@ Server_AbstractPlayer::cmdCreateToken(const Command_CreateToken &cmd, ResponseCo
 
                         Event_CreateArrow createEvent;
                         ServerInfo_Arrow *arrowInfo = createEvent.mutable_arrow_info();
-                        const int newId = player->newArrowId();
+                        const int newId = game->generateArrowId();
                         arrow->setId(newId);
                         arrowInfo->set_id(newId);
                         arrowInfo->set_start_player_id(player->getPlayerId());
@@ -1267,7 +1256,8 @@ Server_AbstractPlayer::cmdCreateArrow(const Command_CreateArrow &cmd, ResponseCo
 
     int currentPhase = game->getActivePhase();
     int deletionPhase = cmd.has_delete_in_phase() ? cmd.delete_in_phase() : currentPhase;
-    auto arrow = new Server_Arrow(newArrowId(), startCard, targetItem, cmd.arrow_color(), currentPhase, deletionPhase);
+    auto arrow = new Server_Arrow(game->generateArrowId(), startCard, targetItem, cmd.arrow_color(), currentPhase,
+                                  deletionPhase);
     addArrow(arrow);
 
     Event_CreateArrow event;

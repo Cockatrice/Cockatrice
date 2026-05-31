@@ -1,6 +1,7 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
 
+#include "arrow_registry.h"
 #include "board/arrow_data.h"
 #include "board/arrow_item.h"
 #include "zones/card_zone_logic.h"
@@ -45,7 +46,7 @@ private:
     PhasesToolbar *phasesToolbar;                       ///< Toolbar showing game phases
     QMap<int, PlayerGraphicsItem *> playerViews;        ///< ID lookup for player graphics items
     QList<QList<PlayerGraphicsItem *>> playersByColumn; ///< Players organized by column
-    QMap<int, ArrowItem *> arrowRegistry;               ///< ID registry for arrow graphics items
+    ArrowRegistry arrowRegistry;                        ///< ID registry for arrow graphics items
     QList<ZoneViewWidget *> zoneViews;                  ///< Active zone view widgets
     QSize viewSize;                                     ///< Current view size
     QPointer<CardItem> hoveredCard;                     ///< Currently hovered card
@@ -202,13 +203,12 @@ public slots:
     QTransform getViewportTransform() const;
 
     /// Directly modifies the scene
-    void addArrow(const ArrowData &data);
-    void deleteArrow(int arrowId);
+    void addArrow(QSharedPointer<ArrowData> data);
+    void deleteArrow(int playerId, int arrowId);
     void clearArrowsForPlayer(int playerId);
 
     /// Queues up arrow deletion but doesn't directly modify the scene
-    void requestArrowDeletion(int arrowId);
-    void requestClearArrowsForPlayer(int playerId);
+    void requestArrowDeletion(int playerId, int arrowId);
 
     void onCardZoneChanged(CardItem *card, bool sameZone);
 
@@ -223,7 +223,7 @@ signals:
     void sigStartRubberBand(const QPointF &selectionOrigin);
     void sigResizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void sigStopRubberBand();
-    void arrowDeletionRequested(int arrowId);
+    void arrowDeletionRequested(int creatorId, int arrowId);
 };
 
 #endif
