@@ -132,7 +132,6 @@ void AbstractTabDeckEditor::onDeckModified()
 void AbstractTabDeckEditor::addCard(const ExactCard &card, const QString &zoneName)
 {
     deckStateManager->addCard(card, zoneName);
-    deckMenu->setSaveStatus(true);
 }
 
 void AbstractTabDeckEditor::decrementCard(const ExactCard &card, const QString &zoneName)
