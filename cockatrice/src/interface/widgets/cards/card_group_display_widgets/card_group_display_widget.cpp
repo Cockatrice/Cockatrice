@@ -58,16 +58,6 @@ void CardGroupDisplayWidget::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void CardGroupDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)
-{
-    emit cardClicked(event, card);
-}
-
-void CardGroupDisplayWidget::onHover(const ExactCard &card)
-{
-    emit cardHovered(card);
-}
-
 void CardGroupDisplayWidget::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
     auto proxyModel = qobject_cast<QAbstractProxyModel *>(selectionModel->model());
@@ -154,8 +144,8 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex i
     widget->setScaleFactor(cardSizeWidget->getSlider()->value());
     widget->setCard(CardDatabaseManager::query()->getCard({cardName, cardProviderId}));
 
-    connect(widget, &CardInfoPictureWithTextOverlayWidget::imageClicked, this, &CardGroupDisplayWidget::onClick);
-    connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &CardGroupDisplayWidget::onHover);
+    connect(widget, &CardInfoPictureWithTextOverlayWidget::cardClicked, this, &CardGroupDisplayWidget::cardClicked);
+    connect(widget, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &CardGroupDisplayWidget::cardHovered);
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, widget, &CardInfoPictureWidget::setScaleFactor);
 
     indexToWidgetMap[index].append(widget);

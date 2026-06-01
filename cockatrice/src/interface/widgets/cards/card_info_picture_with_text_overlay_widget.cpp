@@ -93,7 +93,7 @@ void CardInfoPictureWithTextOverlayWidget::setHighlighted(bool _highlighted)
 
 void CardInfoPictureWithTextOverlayWidget::mousePressEvent(QMouseEvent *event)
 {
-    emit imageClicked(event, this);
+    emit cardClicked(event, getCard());
 }
 
 /**

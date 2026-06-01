@@ -152,19 +152,17 @@ public slots:
     /**
      * @brief Handle card clicks in the mainboard visual deck.
      * @param event Mouse event triggering the action.
-     * @param instance Widget representing the clicked card.
+     * @param card The clicked card.
      * @param zoneName Deck zone of the card.
      */
-    void processMainboardCardClick(QMouseEvent *event,
-                                   CardInfoPictureWithTextOverlayWidget *instance,
-                                   const QString &zoneName);
+    void processMainboardCardClick(const QMouseEvent *event, const ExactCard &card, const QString &zoneName);
 
     /**
      * @brief Handle card clicks in the database visual display.
      * @param event Mouse event triggering the action.
-     * @param instance Widget representing the clicked card.
+     * @param card  The clicked card.
      */
-    void processCardClickDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void processDatabaseCardClick(const QMouseEvent *event, const ExactCard &card);
 
     /**
      * @brief Save the deck under a new name.
