@@ -11,9 +11,9 @@
 #include "../phase.h"
 #include "../player/player_actions.h"
 #include "../player/player_logic.h"
-#include "../zones/view_zone_logic.h"
 #include "../zones/table_zone.h"
 #include "../zones/view_zone.h"
+#include "../zones/view_zone_logic.h"
 #include "arrow_item.h"
 #include "card_drag_item.h"
 
