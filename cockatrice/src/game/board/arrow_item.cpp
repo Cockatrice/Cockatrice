@@ -228,52 +228,9 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     if (targetItem && targetItem != startItem) {
         CardItem *startCard = qgraphicsitem_cast<CardItem *>(startItem);
-        // For now, we can safely assume that the start item is always a card.
-        // The target item can be a player as well.
-        if (!startCard) {
-            delArrow();
-            return;
+        if (startCard) {
+            ArrowItem::sendCreateArrowCommand(player, startCard, targetItem, color, deleteInPhase);
         }
-
-        CardZoneLogic *startZone = startCard->getZone();
-
-        Command_CreateArrow cmd;
-        cmd.mutable_arrow_color()->CopyFrom(convertQColorToColor(color));
-        cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
-        cmd.set_start_zone(startZone->getName().toStdString());
-        cmd.set_start_card_id(startCard->getId());
-
-        if (auto *targetCard = qgraphicsitem_cast<CardItem *>(targetItem)) {
-            CardZoneLogic *targetZone = targetCard->getZone();
-            cmd.set_target_player_id(targetZone->getPlayer()->getPlayerInfo()->getId());
-            cmd.set_target_zone(targetZone->getName().toStdString());
-            cmd.set_target_card_id(targetCard->getId());
-        } else if (auto *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem)) {
-            cmd.set_target_player_id(targetPlayer->getOwner()->getPlayerInfo()->getId());
-        } else {
-            delArrow();
-            return;
-        }
-
-        // if the card is in hand then we will move the card to stack or table as part of drawing the arrow
-        if (startZone->getName() == ZoneNames::HAND) {
-            startCard->playCard(false);
-            CardInfoPtr ci = startCard->getCard().getCardPtr();
-            bool playToStack = SettingsCache::instance().getPlayToStack();
-            if (ci && ((!playToStack && ci->getUiAttributes().tableRow == 3) ||
-                       (playToStack && ci->getUiAttributes().tableRow != 0 &&
-                        startCard->getZone()->getName() != ZoneNames::STACK))) {
-                cmd.set_start_zone(ZoneNames::STACK);
-            } else {
-                cmd.set_start_zone(playToStack ? ZoneNames::STACK : ZoneNames::TABLE);
-            }
-        }
-
-        if (deleteInPhase != 0) {
-            cmd.set_delete_in_phase(deleteInPhase);
-        }
-
-        player->getPlayerActions()->sendGameCommand(cmd);
     }
 
     delArrow();
@@ -282,6 +239,55 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
+void ArrowItem::sendCreateArrowCommand(PlayerLogic *player,
+                                       CardItem *startCard,
+                                       ArrowTarget *targetItem,
+                                       const QColor &color,
+                                       int deleteInPhase)
+{
+    if (!startCard || !targetItem || !player) {
+        return;
+    }
+
+    CardZoneLogic *startZone = startCard->getZone();
+
+    Command_CreateArrow cmd;
+    cmd.mutable_arrow_color()->CopyFrom(convertQColorToColor(color));
+    cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());
+    cmd.set_start_zone(startZone->getName().toStdString());
+    cmd.set_start_card_id(startCard->getId());
+
+    if (auto *targetCard = qgraphicsitem_cast<CardItem *>(targetItem)) {
+        CardZoneLogic *targetZone = targetCard->getZone();
+        cmd.set_target_player_id(targetZone->getPlayer()->getPlayerInfo()->getId());
+        cmd.set_target_zone(targetZone->getName().toStdString());
+        cmd.set_target_card_id(targetCard->getId());
+    } else if (auto *targetPlayer = qgraphicsitem_cast<PlayerTarget *>(targetItem)) {
+        cmd.set_target_player_id(targetPlayer->getOwner()->getPlayerInfo()->getId());
+    } else {
+        return;
+    }
+
+    // if the card is in hand then we will move the card to stack or table as part of drawing the arrow
+    if (startZone->getName() == ZoneNames::HAND) {
+        startCard->playCard(false);
+        CardInfoPtr ci = startCard->getCard().getCardPtr();
+        bool playToStack = SettingsCache::instance().getPlayToStack();
+        if (ci && ((!playToStack && ci->getUiAttributes().tableRow == 3) ||
+                   (playToStack && ci->getUiAttributes().tableRow != 0 &&
+                    startCard->getZone()->getName() != ZoneNames::STACK))) {
+            cmd.set_start_zone(ZoneNames::STACK);
+        } else {
+            cmd.set_start_zone(playToStack ? ZoneNames::STACK : ZoneNames::TABLE);
+        }
+    }
+
+    if (deleteInPhase != 0) {
+        cmd.set_delete_in_phase(deleteInPhase);
+    }
+
+    player->getPlayerActions()->sendGameCommand(cmd);
+}
 // ArrowAttachItem
 ArrowAttachItem::ArrowAttachItem(ArrowTarget *_startItem)
     : ArrowItem(_startItem->getOwner(), -1, _startItem, nullptr, Qt::green)

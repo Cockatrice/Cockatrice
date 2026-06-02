@@ -1,5 +1,6 @@
 #include "key_signals.h"
 
+#include <QApplication>
 #include <QKeyEvent>
 
 bool KeySignals::eventFilter(QObject * /*object*/, QEvent *event)
@@ -26,15 +27,35 @@ bool KeySignals::eventFilter(QObject * /*object*/, QEvent *event)
         case Qt::Key_Right:
             if (kevent->modifiers() & Qt::ShiftModifier) {
                 emit onShiftRight();
+            } else {
+                emit onRightArrow();
+                return true;
             }
 
             break;
         case Qt::Key_Left:
             if (kevent->modifiers() & Qt::ShiftModifier) {
                 emit onShiftLeft();
+            } else {
+                emit onLeftArrow();
+                return true;
             }
 
             break;
+        case Qt::Key_Up:
+            // This check exists so up and down arrows can still navigate all menu boxes while having
+            // normal browsing functionality in game
+            if (qApp->activePopupWidget() != nullptr || qApp->activeModalWidget() != nullptr) {
+                return false;
+            }
+            emit onUpArrow();
+            return true;
+        case Qt::Key_Down:
+            if (qApp->activePopupWidget() != nullptr || qApp->activeModalWidget() != nullptr) {
+                return false;
+            }
+            emit onDownArrow();
+            return true;
         case Qt::Key_Delete:
         case Qt::Key_Backspace:
             emit onDelete();

@@ -23,6 +23,7 @@ class CardItem;
 class ServerInfo_Card;
 class PhasesToolbar;
 class QBasicTimer;
+class KeyboardCardNavigator;
 
 /**
  * @class GameScene
@@ -52,6 +53,7 @@ private:
     QBasicTimer *animationTimer;                        ///< Timer for card animations
     QSet<CardItem *> cardsToAnimate;                    ///< Cards currently animating
     int playerRotation;                                 ///< Rotation offset for player layout
+    KeyboardCardNavigator *cardNavigator;               ///< Handles keyboard-based card navigation
 
     /**
      * @brief Updates which card is currently hovered based on scene coordinates.
@@ -171,6 +173,12 @@ public:
     /** @brief Updates hovered card highlighting. */
     void updateHoveredCard(CardItem *newCard);
 
+    /** @brief Gets the keyboard card navigator. */
+    KeyboardCardNavigator *getCardNavigator() const
+    {
+        return cardNavigator;
+    }
+
     /** @brief Registers a card for animation updates. */
     void registerAnimationItem(AbstractCardItem *card);
 
@@ -205,6 +213,17 @@ public slots:
     void addArrow(const ArrowData &data);
     void deleteArrow(int arrowId);
     void clearArrowsForPlayer(int playerId);
+
+    /** @brief Handles left arrow key for card navigation. */
+    void handleLeftArrow();
+    /** @brief Handles right arrow key for card navigation. */
+    void handleRightArrow();
+    /** @brief Handles up arrow key for zone navigation. */
+    void handleUpArrow();
+    /** @brief Handles down arrow key for zone navigation. */
+    void handleDownArrow();
+    /** @brief Sets the active player for keyboard navigation. */
+    void setActivePlayer(PlayerLogic *player);
 
     /// Queues up arrow deletion but doesn't directly modify the scene
     void requestArrowDeletion(int arrowId);

@@ -127,6 +127,7 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
     QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
     void cacheBgColor();
+    void keyPressEvent(QKeyEvent *event) override;
 };
 
 #endif

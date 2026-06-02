@@ -75,6 +75,7 @@ target_link_libraries(
 )
 
 add_subdirectory(card_zone_algorithms)
+add_subdirectory(keyboard_navigator_tests)
 add_subdirectory(carddatabase)
 add_subdirectory(loading_from_clipboard)
 add_subdirectory(movecard_tests)

@@ -77,6 +77,11 @@ public:
     }
 
     void delArrow();
+    static void sendCreateArrowCommand(PlayerLogic *player,
+                                       CardItem *startCard,
+                                       ArrowTarget *targetItem,
+                                       const QColor &color,
+                                       int deleteInPhase = 0);
 };
 
 class ArrowDragItem : public ArrowItem

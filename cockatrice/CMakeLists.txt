@@ -81,6 +81,7 @@ set(cockatrice_SOURCES
     src/game/game_scene.cpp
     src/game/game_state.cpp
     src/game/game_view.cpp
+    src/game/keyboard_card_navigator.cpp
     src/game/hand_counter.cpp
     src/game/log/message_log_widget.cpp
     src/game/phase.cpp
