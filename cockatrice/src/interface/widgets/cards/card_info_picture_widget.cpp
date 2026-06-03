@@ -345,7 +345,7 @@ void CardInfoPictureWidget::mousePressEvent(QMouseEvent *event)
         createRightClickMenu()->popup(QCursor::pos());
     }
 
-    emit cardClicked(event);
+    emit cardClicked(event, exactCard);
 }
 
 void CardInfoPictureWidget::hideEvent(QHideEvent *event)

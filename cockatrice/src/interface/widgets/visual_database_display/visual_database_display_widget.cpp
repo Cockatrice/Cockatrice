@@ -214,9 +214,9 @@ void VisualDatabaseDisplayWidget::onDisplayModeChanged(bool checked)
     }
 }
 
-void VisualDatabaseDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
+void VisualDatabaseDisplayWidget::onClick(QMouseEvent *event, const ExactCard &card)
 {
-    emit cardClickedDatabaseDisplay(event, instance);
+    emit cardClickedDatabaseDisplay(event, card);
 }
 
 void VisualDatabaseDisplayWidget::onHover(const ExactCard &hoveredCard)
@@ -231,7 +231,7 @@ void VisualDatabaseDisplayWidget::addCard(const ExactCard &cardToAdd)
     display->setScaleFactor(cardSizeWidget->getSlider()->value());
     display->setCard(cardToAdd);
     flowWidget->addWidget(display);
-    connect(display, &CardInfoPictureWithTextOverlayWidget::imageClicked, this, &VisualDatabaseDisplayWidget::onClick);
+    connect(display, &CardInfoPictureWithTextOverlayWidget::cardClicked, this, &VisualDatabaseDisplayWidget::onClick);
     connect(display, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &VisualDatabaseDisplayWidget::onHover);
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, display, &CardInfoPictureWidget::setScaleFactor);
 }

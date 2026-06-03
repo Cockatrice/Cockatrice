@@ -101,23 +101,23 @@ public slots:
     /**
      * @brief Emitted when a card is clicked in the deck view.
      * @param event Mouse event.
-     * @param instance Widget representing the clicked card.
+     * @param card The clicked card.
      * @param zoneName Deck zone of the card.
      */
-    void onCardClickedDeckEditor(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
+    void onCardClickedDeckEditor(QMouseEvent *event, const ExactCard &card, const QString &zoneName);
 
     /**
      * @brief Emitted when a card is clicked in the database display.
      * @param event Mouse event.
-     * @param instance Widget representing the clicked card.
+     * @param card The clicked card.
      */
-    void onCardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void onCardClickedDatabaseDisplay(QMouseEvent *event, const ExactCard &card);
 
 signals:
     void cardChanged(const ExactCard &activeCard);
     void cardChangedDatabaseDisplay(const ExactCard &activeCard);
-    void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
-    void cardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void cardClicked(QMouseEvent *event, const ExactCard &card, const QString &zoneName);
+    void cardClickedDatabaseDisplay(QMouseEvent *event, const ExactCard &card);
 
 private:
     QVBoxLayout *layout;                                ///< Layout for tabs and controls.

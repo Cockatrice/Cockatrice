@@ -74,7 +74,7 @@ void TabDeckEditorVisual::createCentralFrame()
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardClicked, this,
             &TabDeckEditorVisual::processMainboardCardClick);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardClickedDatabaseDisplay, this,
-            &TabDeckEditorVisual::processCardClickDatabaseDisplay);
+            &TabDeckEditorVisual::processDatabaseCardClick);
 
     centralFrame->addWidget(tabContainer);
     setCentralWidget(centralWidget);
@@ -143,12 +143,10 @@ void TabDeckEditorVisual::changeModelIndexToCard(const ExactCard &activeCard)
     }
 }
 
-void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
-                                                    CardInfoPictureWithTextOverlayWidget *instance,
+void TabDeckEditorVisual::processMainboardCardClick(const QMouseEvent *event,
+                                                    const ExactCard &card,
                                                     const QString &zoneName)
 {
-    auto card = instance->getCard();
-
     // Get the model index for the card
     QModelIndex idx = deckStateManager->getModel()->findCard(card.getName(), zoneName);
     if (!idx.isValid()) {
@@ -211,17 +209,16 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
 }
 
 /** @brief Handles clicks on cards in the database display. */
-void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
-                                                          CardInfoPictureWithTextOverlayWidget *instance)
+void TabDeckEditorVisual::processDatabaseCardClick(const QMouseEvent *event, const ExactCard &card)
 {
     if (event->button() == Qt::LeftButton) {
         if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
-            addCard(instance->getCard(), DECK_ZONE_SIDE);
+            addCard(card, DECK_ZONE_SIDE);
         } else {
-            addCard(instance->getCard(), DECK_ZONE_MAIN);
+            addCard(card, DECK_ZONE_MAIN);
         }
     } else if (event->button() == Qt::RightButton) {
-        decrementCard(instance->getCard(), DECK_ZONE_MAIN);
+        decrementCard(card, DECK_ZONE_MAIN);
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
