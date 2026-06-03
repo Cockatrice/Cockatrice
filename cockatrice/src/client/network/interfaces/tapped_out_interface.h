@@ -7,8 +7,8 @@
 #ifndef TAPPEDOUT_INTERFACE_H
 #define TAPPEDOUT_INTERFACE_H
 
-#include <libcockatrice/card/database/card_database.h>
-#include <libcockatrice/deck_list/deck_list.h>
+#include <QLoggingCategory>
+#include <QObject>
 
 inline Q_LOGGING_CATEGORY(TappedOutInterfaceLog, "tapped_out_interface");
 
