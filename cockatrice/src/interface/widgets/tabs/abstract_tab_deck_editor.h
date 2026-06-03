@@ -182,7 +182,11 @@ public slots:
     /** @brief Shows the printing selector dock and updates it with the current card. */
     void showPrintingSelector();
 
-    /** @brief Opens the edhrec tab with the following values */
+    /**
+     * @brief Opens an EDHRec tab for the given card
+     * @param info The card
+     * @param isCommander The type of search
+     */
     void openEdhrecTab(const CardInfoPtr &info, bool isCommander);
 
 signals:
