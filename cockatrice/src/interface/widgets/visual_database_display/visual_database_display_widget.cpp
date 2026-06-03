@@ -225,7 +225,7 @@ void VisualDatabaseDisplayWidget::onHover(const ExactCard &hoveredCard)
     emit cardHoveredDatabaseDisplay(hoveredCard);
 }
 
-void VisualDatabaseDisplayWidget::addCard(const ExactCard &cardToAdd)
+void VisualDatabaseDisplayWidget::addCardToDisplay(const ExactCard &cardToAdd)
 {
     cards->append(cardToAdd);
     auto *display = new CardInfoPictureWithTextOverlayWidget(flowWidget, false);
@@ -334,12 +334,12 @@ void VisualDatabaseDisplayWidget::loadPage(int start, int end)
                 for (const CardFilter *setFilter : setFilters) {
                     if (setMap.contains(setFilter->term())) {
                         for (PrintingInfo printing : setMap[setFilter->term()]) {
-                            addCard(ExactCard(info, printing));
+                            addCardToDisplay(ExactCard(info, printing));
                         }
                     }
                 }
             } else {
-                addCard(CardDatabaseManager::query()->getPreferredCard(info));
+                addCardToDisplay(CardDatabaseManager::query()->getPreferredCard(info));
             }
         } else {
             qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";

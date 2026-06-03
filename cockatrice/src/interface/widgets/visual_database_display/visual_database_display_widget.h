@@ -79,7 +79,7 @@ protected slots:
     void initialize();
     void onClick(QMouseEvent *event, const ExactCard &card);
     void onHover(const ExactCard &hoveredCard);
-    void addCard(const ExactCard &cardToAdd);
+    void addCardToDisplay(const ExactCard &cardToAdd);
     void databaseDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
     void modelDirty() const;
     void updateSearch(const QString &search) const;
