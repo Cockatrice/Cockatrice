@@ -145,11 +145,6 @@ public slots:
     void onDeckChanged() override;
 
     /**
-     * @brief Show the printing selector dock for the currently active card.
-     */
-    void showPrintingSelector() override;
-
-    /**
      * @brief Handle card clicks in the mainboard visual deck.
      * @param event Mouse event triggering the action.
      * @param card The clicked card.

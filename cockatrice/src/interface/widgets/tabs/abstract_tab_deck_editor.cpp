@@ -588,3 +588,10 @@ bool AbstractTabDeckEditor::closeRequest()
     }
     return close();
 }
+
+void AbstractTabDeckEditor::showPrintingSelector()
+{
+    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
+    printingSelectorDockWidget->printingSelector->updateDisplay();
+    printingSelectorDockWidget->setVisible(true);
+}
