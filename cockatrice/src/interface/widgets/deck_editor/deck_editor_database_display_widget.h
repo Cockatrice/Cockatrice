@@ -54,7 +54,7 @@ signals:
 
     void edhrecRequested(const CardInfoPtr &cardInfo, bool isCommander);
     void printingSelectorRequested();
-    void cardInfoRequested(const ExactCard &cardName);
+    void cardInfoRequested(const ExactCard &card);
 
 private:
     KeySignals searchKeySignals;

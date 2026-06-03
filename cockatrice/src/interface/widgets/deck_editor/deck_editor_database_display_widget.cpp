@@ -222,10 +222,11 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
         } else {
             for (const CardRelation *rel : relatedCards) {
                 const QString &relatedCardName = rel->getName();
-                ExactCard exactCard = CardDatabaseManager::query()->getPreferredCard(relatedCardName);
                 QAction *relatedCard = relatedMenu->addAction(relatedCardName);
-                connect(relatedCard, &QAction::triggered, this,
-                        [this, exactCard] { emit cardInfoRequested(exactCard); });
+                connect(relatedCard, &QAction::triggered, this, [this, relatedCardName] {
+                    ExactCard card = CardDatabaseManager::query()->guessCard({relatedCardName});
+                    emit cardInfoRequested(card);
+                });
             }
         }
         menu.exec(databaseView->mapToGlobal(point));
