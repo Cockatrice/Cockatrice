@@ -1012,6 +1012,10 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
     }
     if (!tab) {
+        if (SettingsCache::instance().getIgnoreNonBuddyUserMessages() && !userListManager->isUserBuddy(senderName)) {
+            // When  he is not a buddy and the settings are set to block non friend messages
+            return;
+        }
         const ServerInfo_User *onlineUserInfo = userListManager->getOnlineUser(senderName);
         if (onlineUserInfo) {
             auto userLevel = UserLevelFlags(onlineUserInfo->user_level());

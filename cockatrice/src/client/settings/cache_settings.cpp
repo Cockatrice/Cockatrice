@@ -388,6 +388,7 @@ SettingsCache::SettingsCache()
 
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
     ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
+    ignoreNonBuddyUserMessages = settings->value("chat/ignore_nonbuddy_messages", false).toBool();
 
     scaleCards = settings->value("cards/scaleCards", true).toBool();
     verticalCardOverlapPercent = settings->value("cards/verticalCardOverlapPercent", 33).toInt();
@@ -1115,6 +1116,12 @@ void SettingsCache::setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignore
 {
     ignoreUnregisteredUserMessages = static_cast<bool>(_ignoreUnregisteredUserMessages);
     settings->setValue("chat/ignore_unregistered_messages", ignoreUnregisteredUserMessages);
+}
+
+void SettingsCache::setIgnoreNonBuddyUserMessages(QT_STATE_CHANGED_T _ignoreNonBuddyUserMessages)
+{
+    ignoreNonBuddyUserMessages = static_cast<bool>(_ignoreNonBuddyUserMessages);
+    settings->setValue("chat/ignore_nonbuddy_messages", ignoreNonBuddyUserMessages);
 }
 
 void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
