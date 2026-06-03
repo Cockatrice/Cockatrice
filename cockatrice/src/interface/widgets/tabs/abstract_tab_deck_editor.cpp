@@ -105,14 +105,15 @@ void AbstractTabDeckEditor::registerDockWidget(QMenu *_viewMenu, QDockWidget *wi
     dockToActions.insert(widget, {menu, aVisible, aFloating, defaultSize});
 }
 
-/**
- * @brief Updates the card info dock and printing selector.
- * @param card The card to display.
- */
 void AbstractTabDeckEditor::updateCard(const ExactCard &card)
 {
     cardInfoDockWidget->updateCard(card);
     printingSelectorDockWidget->printingSelector->setCard(card.getCardPtr());
+}
+
+void AbstractTabDeckEditor::updateCardInfo(const ExactCard &card)
+{
+    cardInfoDockWidget->updateCard(card);
 }
 
 /** @brief Placeholder: called when the deck changes. */
@@ -594,4 +595,9 @@ void AbstractTabDeckEditor::showPrintingSelector()
     printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
     printingSelectorDockWidget->printingSelector->updateDisplay();
     printingSelectorDockWidget->setVisible(true);
+}
+
+void AbstractTabDeckEditor::openEdhrecTab(const CardInfoPtr &info, bool isCommander)
+{
+    getTabSupervisor()->addEdhrecTab(info, isCommander);
 }
