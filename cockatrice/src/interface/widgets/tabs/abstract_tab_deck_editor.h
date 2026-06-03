@@ -172,8 +172,8 @@ public slots:
     /** @brief Requests closing the tab. */
     bool closeRequest() override;
 
-    /** @brief Shows the printing selector dock. Pure virtual. */
-    virtual void showPrintingSelector() = 0;
+    /** @brief Shows the printing selector dock and updates it with the current card. */
+    void showPrintingSelector();
 
 signals:
     /** @brief Emitted when a deck should be opened in a new editor tab. */

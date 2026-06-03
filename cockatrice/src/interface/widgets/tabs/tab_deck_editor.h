@@ -83,10 +83,6 @@ public:
 
     /** @brief Creates menus for deck editing and view options. */
     void createMenus() override;
-
-public slots:
-    /** @brief Shows the printing selector dock and updates it with current card. */
-    void showPrintingSelector() override;
 };
 
 #endif
