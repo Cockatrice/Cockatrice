@@ -6,12 +6,12 @@
 #include <QNetworkRequest>
 #include <QRegularExpression>
 #include <QUrlQuery>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <version_string.h>
 
-TappedOutInterface::TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent)
-    : QObject(parent), cardDatabase(_cardDatabase)
+TappedOutInterface::TappedOutInterface(QObject *parent) : QObject(parent)
 {
     manager = new QNetworkAccessManager(this);
     connect(manager, &QNetworkAccessManager::finished, this, &TappedOutInterface::queryFinished);
@@ -97,8 +97,8 @@ void TappedOutInterface::analyzeDeck(const DeckList &deck)
 
 void TappedOutInterface::copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard)
 {
-    auto copyMainOrSide = [this, &mainboard, &sideboard](const auto node, const auto card) {
-        CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());
+    auto copyMainOrSide = [&mainboard, &sideboard](const auto node, const auto card) {
+        CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
         if (!dbCard || dbCard->getIsToken()) {
             return;
         }

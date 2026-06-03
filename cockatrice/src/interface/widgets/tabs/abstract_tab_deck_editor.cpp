@@ -538,14 +538,14 @@ void AbstractTabDeckEditor::actExportDeckDecklistXyz()
 /** @brief Analyzes the deck using DeckStats. */
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
-    auto *interface = new DeckStatsInterface(*cardDatabaseDockWidget->getDatabase(), this);
+    auto *interface = new DeckStatsInterface(this);
     interface->analyzeDeck(deckStateManager->getDeckList());
 }
 
 /** @brief Analyzes the deck using TappedOut. */
 void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
-    auto *interface = new TappedOutInterface(*cardDatabaseDockWidget->getDatabase(), this);
+    auto *interface = new TappedOutInterface(this);
     interface->analyzeDeck(deckStateManager->getDeckList());
 }
 

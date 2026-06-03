@@ -7,7 +7,6 @@
 #ifndef DECKSTATS_INTERFACE_H
 #define DECKSTATS_INTERFACE_H
 
-#include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/deck_list/deck_list.h>
 
 class QByteArray;
@@ -21,8 +20,6 @@ class DeckStatsInterface : public QObject
 private:
     QNetworkAccessManager *manager;
 
-    CardDatabase &cardDatabase;
-
     /**
      * Deckstats doesn't recognize token cards, and instead tries to find the
      * closest non-token card instead. So we construct a new deck which has no
@@ -35,7 +32,7 @@ private slots:
     void getAnalyzeRequestData(const DeckList &deck, QByteArray &data);
 
 public:
-    explicit DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent = nullptr);
+    explicit DeckStatsInterface(QObject *parent = nullptr);
     void analyzeDeck(const DeckList &deck);
 };
 
