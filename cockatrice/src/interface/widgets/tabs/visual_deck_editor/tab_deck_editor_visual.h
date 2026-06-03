@@ -41,7 +41,7 @@
  * - changeModelIndexAndCardInfo(const ExactCard &card) — Updates deck model selection and card info.
  * - changeModelIndexToCard(const ExactCard &card) — Selects the card in the deck view.
  * - processMainboardCardClick(QMouseEvent *event, ...) — Handles clicks on mainboard cards.
- * - processCardClickDatabaseDisplay(QMouseEvent *event, ...) — Handles clicks on database cards.
+ * - processDatabaseCardClick(QMouseEvent *event, ...) — Handles clicks on database cards.
  * - actSaveDeckAs() — Overrides save action with temporary UI adjustments.
  * - showPrintingSelector() — Opens the printing selector dock for the current card.
  * - freeDocksSize() — Frees constraints on dock widget sizes.

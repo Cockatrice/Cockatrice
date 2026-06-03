@@ -401,11 +401,6 @@ void VisualDeckEditorWidget::decklistDataChanged(QModelIndex topLeft, QModelInde
 //                                                 User Interaction
 // =====================================================================================================================
 
-void VisualDeckEditorWidget::onCardClick(QMouseEvent *event, const ExactCard &card, const QString &zoneName)
-{
-    emit cardClicked(event, card, zoneName);
-}
-
 void VisualDeckEditorWidget::onHover(const ExactCard &hoveredCard)
 {
     // If user has any card selected, ignore hover

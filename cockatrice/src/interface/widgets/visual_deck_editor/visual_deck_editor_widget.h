@@ -82,7 +82,6 @@ protected:
 
 protected slots:
     void onHover(const ExactCard &hoveredCard);
-    void onCardClick(QMouseEvent *event, const ExactCard &card, const QString &zoneName);
     void decklistModelReset();
     void resizeEvent(QResizeEvent *event) override;
 
