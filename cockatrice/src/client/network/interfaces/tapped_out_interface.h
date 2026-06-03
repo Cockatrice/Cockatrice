@@ -29,14 +29,13 @@ class TappedOutInterface : public QObject
 private:
     QNetworkAccessManager *manager;
 
-    CardDatabase &cardDatabase;
     void copyDeckSplitMainAndSide(const DeckList &source, DeckList &mainboard, DeckList &sideboard);
 private slots:
     void queryFinished(QNetworkReply *reply);
     void getAnalyzeRequestData(const DeckList &deck, QByteArray &data);
 
 public:
-    explicit TappedOutInterface(CardDatabase &_cardDatabase, QObject *parent = nullptr);
+    explicit TappedOutInterface(QObject *parent = nullptr);
     void analyzeDeck(const DeckList &deck);
 };
 
