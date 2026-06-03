@@ -140,32 +140,6 @@ void AbstractTabDeckEditor::decrementCard(const ExactCard &card, const QString &
 }
 
 /**
- * @brief Adds a card to the main deck or sideboard depending on Ctrl key.
- */
-void AbstractTabDeckEditor::actAddCard(const ExactCard &card)
-{
-    addCard(card, DECK_ZONE_MAIN);
-}
-
-/** @brief Adds a card to the sideboard explicitly. */
-void AbstractTabDeckEditor::actAddCardToSideboard(const ExactCard &card)
-{
-    addCard(card, DECK_ZONE_SIDE);
-}
-
-/** @brief Decrements a card from the main deck. */
-void AbstractTabDeckEditor::actDecrementCard(const ExactCard &card)
-{
-    decrementCard(card, DECK_ZONE_MAIN);
-}
-
-/** @brief Decrements a card from the sideboard. */
-void AbstractTabDeckEditor::actDecrementCardFromSideboard(const ExactCard &card)
-{
-    decrementCard(card, DECK_ZONE_SIDE);
-}
-
-/**
  * @brief Opens a deck in this tab.
  * @param deck The deck
  */

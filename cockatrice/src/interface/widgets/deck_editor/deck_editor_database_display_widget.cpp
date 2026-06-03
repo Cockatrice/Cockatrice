@@ -158,23 +158,23 @@ void DeckEditorDatabaseDisplayWidget::actAddCard()
 void DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck()
 {
     highlightAllSearchEdit();
-    emit addCardToMainDeck(currentCard());
+    emit cardAdded(currentCard(), DECK_ZONE_MAIN);
 }
 
 void DeckEditorDatabaseDisplayWidget::actAddCardToSideboard()
 {
     highlightAllSearchEdit();
-    emit addCardToSideboard(currentCard());
+    emit cardAdded(currentCard(), DECK_ZONE_SIDE);
 }
 
 void DeckEditorDatabaseDisplayWidget::actDecrementCardFromMainDeck()
 {
-    emit decrementCardFromMainDeck(currentCard());
+    emit cardDecremented(currentCard(), DECK_ZONE_MAIN);
 }
 
 void DeckEditorDatabaseDisplayWidget::actDecrementCardFromSideboard()
 {
-    emit decrementCardFromSideboard(currentCard());
+    emit cardDecremented(currentCard(), DECK_ZONE_SIDE);
 }
 
 ExactCard DeckEditorDatabaseDisplayWidget::currentCard() const

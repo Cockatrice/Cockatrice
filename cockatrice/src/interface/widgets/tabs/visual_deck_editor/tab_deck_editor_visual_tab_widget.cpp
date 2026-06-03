@@ -34,8 +34,8 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
             &TabDeckEditorVisualTabWidget::onCardChanged);
     connect(visualDeckView, &VisualDeckEditorWidget::cardClicked, this,
             &TabDeckEditorVisualTabWidget::onCardClickedDeckEditor);
-    connect(visualDeckView, &VisualDeckEditorWidget::cardAdditionRequested, deckEditor,
-            &AbstractTabDeckEditor::actAddCard);
+    connect(visualDeckView, &VisualDeckEditorWidget::cardAdditionRequested, this,
+            &TabDeckEditorVisualTabWidget::actAddCard);
 
     visualDatabaseDisplay =
         new VisualDatabaseDisplayWidget(this, deckEditor, _cardDatabaseModel, _cardDatabaseDisplayModel);
@@ -165,4 +165,16 @@ void TabDeckEditorVisualTabWidget::handleTabClose(int index)
     QWidget *tab = this->widget(index);
     this->removeTab(index);
     delete tab;
+}
+
+void TabDeckEditorVisualTabWidget::actAddCard(const ExactCard &card)
+{
+    QString zoneName;
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
+        zoneName = DECK_ZONE_SIDE;
+    } else {
+        zoneName = DECK_ZONE_MAIN;
+    }
+
+    deckEditor->addCard(card, zoneName);
 }

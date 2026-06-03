@@ -29,14 +29,10 @@ void DeckEditorCardDatabaseDockWidget::createDatabaseDisplayDock(AbstractTabDeck
     // connect signals
     connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::cardChanged, deckEditor,
             &AbstractTabDeckEditor::updateCard);
-    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, deckEditor,
-            &AbstractTabDeckEditor::actAddCard);
-    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToSideboard, deckEditor,
-            &AbstractTabDeckEditor::actAddCardToSideboard);
-    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromMainDeck, deckEditor,
-            &AbstractTabDeckEditor::actDecrementCard);
-    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::decrementCardFromSideboard, deckEditor,
-            &AbstractTabDeckEditor::actDecrementCardFromSideboard);
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::cardAdded, deckEditor,
+            &AbstractTabDeckEditor::addCard);
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::cardDecremented, deckEditor,
+            &AbstractTabDeckEditor::decrementCard);
 }
 
 CardDatabase *DeckEditorCardDatabaseDockWidget::getDatabase() const

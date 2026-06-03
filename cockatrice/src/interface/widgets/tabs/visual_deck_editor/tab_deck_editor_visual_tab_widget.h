@@ -132,6 +132,12 @@ private slots:
      * @param index Index of the tab to close.
      */
     void handleTabClose(int index);
+
+    /**
+     * @brief Adds card to maindeck or side depending on whether ctrl is held
+     * @param card
+     */
+    void actAddCard(const ExactCard &card);
 };
 
 #endif // TAB_DECK_EDITOR_VISUAL_TAB_WIDGET_H
