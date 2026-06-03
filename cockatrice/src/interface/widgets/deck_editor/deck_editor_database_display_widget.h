@@ -52,6 +52,10 @@ signals:
     void cardDecremented(const ExactCard &card, const QString &zoneName);
     void cardChanged(const ExactCard &_card);
 
+    void edhrecRequested(const CardInfoPtr &cardInfo, bool isCommander);
+    void printingSelectorRequested();
+    void cardInfoRequested(const ExactCard &cardName);
+
 private:
     KeySignals searchKeySignals;
     QTreeView *databaseView;

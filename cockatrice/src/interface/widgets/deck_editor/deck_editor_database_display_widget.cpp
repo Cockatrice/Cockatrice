@@ -200,18 +200,18 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
         addToDeck = menu.addAction(tr("Add to Deck"));
         addToSideboard = menu.addAction(tr("Add to Sideboard"));
         selectPrinting = menu.addAction(tr("Select Printing"));
-        connect(selectPrinting, &QAction::triggered, this, [this, card] { deckEditor->showPrintingSelector(); });
+        connect(selectPrinting, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::printingSelectorRequested);
         if (canBeCommander(card.getInfo())) {
             edhRecCommander = menu.addAction(tr("Show on EDHRec (Commander)"));
             connect(edhRecCommander, &QAction::triggered, this,
-                    [this, card] { deckEditor->getTabSupervisor()->addEdhrecTab(card.getCardPtr(), true); });
+                    [this, card] { emit edhrecRequested(card.getCardPtr(), true); });
         }
         edhRecCard = menu.addAction(tr("Show on EDHRec (Card)"));
 
         connect(addToDeck, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
         connect(addToSideboard, &QAction::triggered, this, &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
         connect(edhRecCard, &QAction::triggered, this,
-                [this, card] { deckEditor->getTabSupervisor()->addEdhrecTab(card.getCardPtr()); });
+                [this, card] { emit edhrecRequested(card.getCardPtr(), false); });
 
         // filling out the related cards submenu
         auto *relatedMenu = new QMenu(tr("Show Related cards"));
@@ -222,10 +222,10 @@ void DeckEditorDatabaseDisplayWidget::databaseCustomMenu(QPoint point)
         } else {
             for (const CardRelation *rel : relatedCards) {
                 const QString &relatedCardName = rel->getName();
+                ExactCard exactCard = CardDatabaseManager::query()->getPreferredCard(relatedCardName);
                 QAction *relatedCard = relatedMenu->addAction(relatedCardName);
-                connect(
-                    relatedCard, &QAction::triggered, deckEditor->cardInfoDockWidget->cardInfo,
-                    [this, relatedCardName] { deckEditor->cardInfoDockWidget->cardInfo->setCard(relatedCardName); });
+                connect(relatedCard, &QAction::triggered, this,
+                        [this, exactCard] { emit cardInfoRequested(exactCard); });
             }
         }
         menu.exec(databaseView->mapToGlobal(point));

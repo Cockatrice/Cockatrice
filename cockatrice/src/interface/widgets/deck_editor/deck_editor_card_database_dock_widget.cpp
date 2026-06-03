@@ -33,6 +33,12 @@ void DeckEditorCardDatabaseDockWidget::createDatabaseDisplayDock(AbstractTabDeck
             &AbstractTabDeckEditor::addCard);
     connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::cardDecremented, deckEditor,
             &AbstractTabDeckEditor::decrementCard);
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::edhrecRequested, deckEditor,
+            &AbstractTabDeckEditor::openEdhrecTab);
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::printingSelectorRequested, deckEditor,
+            &AbstractTabDeckEditor::showPrintingSelector);
+    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::cardInfoRequested, deckEditor,
+            &AbstractTabDeckEditor::updateCardInfo);
 }
 
 CardDatabase *DeckEditorCardDatabaseDockWidget::getDatabase() const

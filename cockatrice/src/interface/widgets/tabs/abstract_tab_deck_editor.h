@@ -140,10 +140,17 @@ public slots:
     /** @brief Called when the deck is modified. */
     virtual void onDeckModified();
 
-    /** @brief Updates the card info panel.
-     *  @param card The card to display.
+    /**
+     * @brief Updates the card info dock and printing selector.
+     * @param card The card to display.
      */
     void updateCard(const ExactCard &card);
+
+    /**
+     * @brief Updates just the card info dock
+     * @param card The card to display
+     */
+    void updateCardInfo(const ExactCard &card);
 
     /**
      * @brief Adds a card to the given zone
@@ -174,6 +181,9 @@ public slots:
 
     /** @brief Shows the printing selector dock and updates it with the current card. */
     void showPrintingSelector();
+
+    /** @brief Opens the edhrec tab with the following values */
+    void openEdhrecTab(const CardInfoPtr &info, bool isCommander);
 
 signals:
     /** @brief Emitted when a deck should be opened in a new editor tab. */
