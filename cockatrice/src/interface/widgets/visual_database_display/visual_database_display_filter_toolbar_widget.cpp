@@ -4,9 +4,10 @@
 
 #include <QGroupBox>
 
-VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidget(VisualDatabaseDisplayWidget *_parent)
+VisualDatabaseDisplayFilterToolbarWidget::VisualDatabaseDisplayFilterToolbarWidget(VisualDatabaseDisplayWidget *_parent,
+                                                                                   DeckListModel *deckListModel)
     : FlowWidget(_parent, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff),
-      visualDatabaseDisplay(_parent)
+      visualDatabaseDisplay(_parent), deckListModel(deckListModel)
 {
     connect(this, &VisualDatabaseDisplayFilterToolbarWidget::searchModelChanged, visualDatabaseDisplay,
             &VisualDatabaseDisplayWidget::onSearchModelChanged);
@@ -97,8 +98,7 @@ void VisualDatabaseDisplayFilterToolbarWidget::initialize()
     auto filterModel = visualDatabaseDisplay->getFilterModel();
 
     saveLoadWidget = new VisualDatabaseDisplayFilterSaveLoadWidget(this, filterModel);
-    nameFilterWidget =
-        new VisualDatabaseDisplayNameFilterWidget(this, visualDatabaseDisplay->getDeckEditor(), filterModel);
+    nameFilterWidget = new VisualDatabaseDisplayNameFilterWidget(this, filterModel, deckListModel);
     mainTypeFilterWidget = new VisualDatabaseDisplayMainTypeFilterWidget(this, filterModel);
     formatLegalityWidget = new VisualDatabaseDisplayFormatLegalityFilterWidget(this, filterModel);
     subTypeFilterWidget = new VisualDatabaseDisplaySubTypeFilterWidget(this, filterModel);
