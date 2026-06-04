@@ -87,7 +87,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     databaseView->setVisible(false);
 
     searchEdit->setTreeView(databaseView);
-    searchEdit->installEventFilter(databaseView);
+    searchEdit->installEventFilter(databaseView->getKeySignals());
 
     connect(databaseView, &CardDatabaseView::cardChanged, this, &VisualDatabaseDisplayWidget::onSelectedCardChanged);
     connect(databaseView, &CardDatabaseView::cardAdded, this, &VisualDatabaseDisplayWidget::actAddCard);

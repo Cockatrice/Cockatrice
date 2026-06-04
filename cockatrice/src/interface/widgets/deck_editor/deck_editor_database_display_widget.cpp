@@ -45,7 +45,7 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
     databaseView->setFocusProxy(searchEdit);
 
     searchEdit->setTreeView(databaseView);
-    searchEdit->installEventFilter(databaseView);
+    searchEdit->installEventFilter(databaseView->getKeySignals());
 
     connect(searchEdit, &SearchLineEdit::textChanged, databaseDisplayModel, &CardDatabaseDisplayModel::setStringFilter);
     connect(databaseView, &CardDatabaseView::cardAdded, this, &DeckEditorDatabaseDisplayWidget::addCard);

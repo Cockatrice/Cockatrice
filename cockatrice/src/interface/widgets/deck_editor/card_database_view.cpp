@@ -165,8 +165,3 @@ void CardDatabaseView::openCustomMenu(QPoint point)
 
     menu.exec(mapToGlobal(point));
 }
-
-bool CardDatabaseView::eventFilter(QObject *object, QEvent *event)
-{
-    return searchKeySignals.eventFilter(object, event);
-}

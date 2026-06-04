@@ -24,6 +24,15 @@ public:
 
     QString currentCardName() const;
 
+    /**
+     * @brief Get the KeySignals that are connected to this view.
+     * You can install the KeySignals as an eventFilter to capture keyboard shortcuts for adding and decrementing cards.
+     */
+    KeySignals *getKeySignals()
+    {
+        return &searchKeySignals;
+    }
+
 signals:
     void cardChanged(const QString &cardName);
 
@@ -33,9 +42,6 @@ signals:
     void edhrecClicked(const CardInfoPtr &cardInfo, bool isCommander);
     void selectPrintingClicked();
     void relatedCardClicked(const QString &relatedCard);
-
-protected:
-    bool eventFilter(QObject *, QEvent *event) override;
 
 private slots:
     void actDoubleClick();

@@ -29,7 +29,7 @@ signals:
     void onShiftS();
     void onCtrlC();
 
-public:
+protected:
     bool eventFilter(QObject *, QEvent *event) override;
 };
 
