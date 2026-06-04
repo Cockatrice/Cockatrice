@@ -1012,16 +1012,18 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
     }
     if (!tab) {
-        if (SettingsCache::instance().getIgnoreNonBuddyUserMessages() && !userListManager->isUserBuddy(senderName)) {
-            // When  he is not a buddy and the settings are set to block non friend messages
-            return;
-        }
         const ServerInfo_User *onlineUserInfo = userListManager->getOnlineUser(senderName);
         if (onlineUserInfo) {
             auto userLevel = UserLevelFlags(onlineUserInfo->user_level());
             if (SettingsCache::instance().getIgnoreUnregisteredUserMessages() &&
                 !userLevel.testFlag(ServerInfo_User::IsRegistered)) {
                 // Flags are additive, so reg/mod/admin are all IsRegistered
+                return;
+            } else if (SettingsCache::instance().getIgnoreNonBuddyUserMessages() &&
+                       !userListManager->isUserBuddy(senderName) && !userLevel.testFlag(ServerInfo_User::IsModerator) &&
+                       !userLevel.testFlag(ServerInfo_User::IsAdmin)) {
+                // Ignore private messages from non-buddies
+                // Moderator/Admin messages are exempt to ensure warnings reach users
                 return;
             }
         }
