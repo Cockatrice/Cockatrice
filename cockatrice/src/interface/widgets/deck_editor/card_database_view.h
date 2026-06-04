@@ -2,9 +2,9 @@
 #define COCKATRICE_CARD_DATABASE_VIEW_H
 
 #include "../../key_signals.h"
-#include "libcockatrice/filters/filter_tree.h"
 
 #include <QTreeView>
+#include <libcockatrice/card/card_info.h>
 
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
