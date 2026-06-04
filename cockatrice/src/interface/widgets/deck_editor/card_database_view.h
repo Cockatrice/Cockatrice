@@ -1,5 +1,5 @@
-#ifndef COCKATRICE_CARD_DATABASE_TABLE_WIDGET_H
-#define COCKATRICE_CARD_DATABASE_TABLE_WIDGET_H
+#ifndef COCKATRICE_CARD_DATABASE_VIEW_H
+#define COCKATRICE_CARD_DATABASE_VIEW_H
 
 #include "../../key_signals.h"
 #include "libcockatrice/filters/filter_tree.h"
@@ -50,4 +50,4 @@ private slots:
     void openCustomMenu(QPoint point);
 };
 
-#endif // COCKATRICE_CARD_DATABASE_TABLE_WIDGET_H
+#endif // COCKATRICE_CARD_DATABASE_VIEW_H
