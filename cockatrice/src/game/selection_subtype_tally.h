@@ -1,5 +1,5 @@
-#ifndef SELECTION_SUBTYPE_COUNTER_H
-#define SELECTION_SUBTYPE_COUNTER_H
+#ifndef SELECTION_SUBTYPE_TALLY_H
+#define SELECTION_SUBTYPE_TALLY_H
 
 #include <QList>
 #include <QString>
@@ -20,12 +20,12 @@ struct MainTypeGroup
     QList<SubtypeEntry> subtypes;
 };
 
-namespace SelectionSubtypeCounter
+namespace SelectionSubtypeTally
 {
 QStringList extractSubtypesFromFace(const QString &faceType);
 QList<MainTypeGroup> countSubtypes(const QList<CardItem *> &cards);
 QString formatAsHtml(const QList<MainTypeGroup> &groups);
-QString buildSubtypeCountText(const QList<CardItem *> &cards);
-} // namespace SelectionSubtypeCounter
+QString buildSubtypeTallyText(const QList<CardItem *> &cards);
+} // namespace SelectionSubtypeTally
 
 #endif
