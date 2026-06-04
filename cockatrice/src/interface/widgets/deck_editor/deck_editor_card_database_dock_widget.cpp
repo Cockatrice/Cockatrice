@@ -13,7 +13,7 @@ DeckEditorCardDatabaseDockWidget::DeckEditorCardDatabaseDockWidget(AbstractTabDe
 
 void DeckEditorCardDatabaseDockWidget::createDatabaseDisplayDock(AbstractTabDeckEditor *deckEditor)
 {
-    databaseDisplayWidget = new DeckEditorDatabaseDisplayWidget(this, deckEditor);
+    databaseDisplayWidget = new DeckEditorDatabaseDisplayWidget(this, deckEditor->databaseModel);
 
     auto *frame = new QVBoxLayout;
     frame->setObjectName("databaseDisplayFrame");

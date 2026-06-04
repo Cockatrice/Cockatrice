@@ -21,8 +21,8 @@ static bool canBeCommander(const CardInfo &cardInfo)
            cardInfo.getText().contains("can be your commander", Qt::CaseInsensitive);
 }
 
-DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent, AbstractTabDeckEditor *deckEditor)
-    : QWidget(parent), deckEditor(deckEditor)
+DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent, CardDatabaseModel *databaseModel)
+    : QWidget(parent), databaseModel(databaseModel)
 {
     setObjectName("databaseDisplayWidget");
 
@@ -58,8 +58,6 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
     connect(&searchKeySignals, &KeySignals::onCtrlC, this, &DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents);
     connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
 
-    databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
-    databaseModel->setObjectName("databaseModel");
     databaseDisplayModel = new CardDatabaseDisplayModel(this);
     databaseDisplayModel->setObjectName("databaseDisplayModel");
     databaseDisplayModel->setSourceModel(databaseModel);
