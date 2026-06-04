@@ -1,11 +1,11 @@
-#include "selection_subtype_counter.h"
+#include "selection_subtype_tally.h"
 
 #include "board/card_item.h"
 
 #include <QMap>
 #include <algorithm>
 
-namespace SelectionSubtypeCounter
+namespace SelectionSubtypeTally
 {
 
 QStringList extractSubtypesFromFace(const QString &faceType)
@@ -117,7 +117,7 @@ QString formatAsHtml(const QList<MainTypeGroup> &groups)
            QStringLiteral("</span>");
 }
 
-QString buildSubtypeCountText(const QList<CardItem *> &cards)
+QString buildSubtypeTallyText(const QList<CardItem *> &cards)
 {
     QList<MainTypeGroup> groups = countSubtypes(cards);
     if (groups.isEmpty()) {
@@ -126,4 +126,4 @@ QString buildSubtypeCountText(const QList<CardItem *> &cards)
     return formatAsHtml(groups);
 }
 
-} // namespace SelectionSubtypeCounter
+} // namespace SelectionSubtypeTally

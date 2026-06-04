@@ -24,8 +24,8 @@ private:
     QLabel *subtypeCountLabel; ///< Label displaying subtype breakdown for selected cards
     QPointF selectionOrigin;
 
-    /** @brief Builds formatted text showing subtype counts for all selected cards */
-    QString buildSubtypeCountText() const;
+    /** @brief Builds formatted text showing subtype tally for all selected cards */
+    QString buildSubtypeTallyText() const;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

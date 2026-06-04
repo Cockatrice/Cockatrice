@@ -2,7 +2,7 @@
 
 #include "../client/settings/cache_settings.h"
 #include "game_scene.h"
-#include "selection_subtype_counter.h"
+#include "selection_subtype_tally.h"
 
 #include <QAction>
 #include <QLabel>
@@ -174,13 +174,13 @@ void GameView::refreshShortcuts()
         SettingsCache::instance().shortcuts().getShortcut("Player/aCloseMostRecentZoneView"));
 }
 
-QString GameView::buildSubtypeCountText() const
+QString GameView::buildSubtypeTallyText() const
 {
     GameScene *gameScene = dynamic_cast<GameScene *>(scene());
     if (!gameScene) {
         return QString();
     }
-    return SelectionSubtypeCounter::buildSubtypeCountText(gameScene->selectedCards());
+    return SelectionSubtypeTally::buildSubtypeTallyText(gameScene->selectedCards());
 }
 
 void GameView::updateTotalSelectionCount(const QSize &viewSize)
@@ -210,7 +210,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
         return;
     }
 
-    QString subtypeText = buildSubtypeCountText();
+    QString subtypeText = buildSubtypeTallyText();
 
     if (subtypeText.isEmpty()) {
         subtypeCountLabel->hide();
