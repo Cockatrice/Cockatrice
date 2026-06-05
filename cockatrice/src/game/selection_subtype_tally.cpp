@@ -5,7 +5,7 @@
 #include <QMap>
 #include <algorithm>
 
-namespace SelectionSubtypeTally
+namespace
 {
 
 QStringList extractSubtypesFromFace(const QString &faceType)
@@ -16,6 +16,11 @@ QStringList extractSubtypesFromFace(const QString &faceType)
     }
     return {};
 }
+
+} // anonymous namespace
+
+namespace SelectionSubtypeTally
+{
 
 QList<MainTypeGroup> countSubtypes(const QList<CardItem *> &cards)
 {
@@ -79,51 +84,6 @@ QList<MainTypeGroup> countSubtypes(const QList<CardItem *> &cards)
     });
 
     return groups;
-}
-
-QString formatAsHtml(const QList<MainTypeGroup> &groups)
-{
-    // Flatten to final ordered list
-    QList<SubtypeEntry> sortedEntries;
-    for (const MainTypeGroup &group : groups) {
-        for (const auto &entry : group.subtypes) {
-            sortedEntries.append(entry);
-        }
-    }
-
-    // Calculate padding widths
-    int maxNameLen = 0;
-    int maxCountLen = 0;
-    for (const auto &entry : sortedEntries) {
-        maxNameLen = qMax(maxNameLen, entry.name.length());
-        maxCountLen = qMax(maxCountLen, QString::number(entry.count).length());
-    }
-
-    // Format output
-    QStringList lines;
-    for (const auto &entry : sortedEntries) {
-        QString name = entry.name.toHtmlEscaped();
-        QString count = QString::number(entry.count);
-
-        QString namePadding = QString(QStringLiteral("&nbsp;")).repeated(maxNameLen - entry.name.length());
-        QString countPadding = QString(QStringLiteral("&nbsp;")).repeated(maxCountLen - count.length());
-
-        lines << QStringLiteral(
-                     "%1%2  <span style='font-size:14px;font-weight:bold;vertical-align:middle;'>%3%4</span>")
-                     .arg(namePadding, name, countPadding, count);
-    }
-
-    return QStringLiteral("<span style='font-family: monospace;'>") + lines.join(QStringLiteral("<br>")) +
-           QStringLiteral("</span>");
-}
-
-QString buildSubtypeTallyText(const QList<CardItem *> &cards)
-{
-    QList<MainTypeGroup> groups = countSubtypes(cards);
-    if (groups.isEmpty()) {
-        return QString();
-    }
-    return formatAsHtml(groups);
 }
 
 } // namespace SelectionSubtypeTally

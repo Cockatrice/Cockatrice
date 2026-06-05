@@ -2,10 +2,13 @@
 
 #include "../client/settings/cache_settings.h"
 #include "game_scene.h"
+#include "libcockatrice/utility/qt_utils.h"
 #include "selection_subtype_tally.h"
 
 #include <QAction>
+#include <QGridLayout>
 #include <QLabel>
+#include <QLayout>
 #include <QResizeEvent>
 #include <QRubberBand>
 
@@ -76,10 +79,12 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     totalCountLabel->setStyleSheet(totalCountLabelStyle);
     totalCountLabel->hide();
 
-    subtypeCountLabel = new QLabel(this);
-    subtypeCountLabel->setStyleSheet(subtypeCountLabelStyle);
-    subtypeCountLabel->setTextFormat(Qt::RichText);
-    subtypeCountLabel->hide();
+    subtypeCountContainer = new QWidget(this);
+    subtypeCountContainer->setStyleSheet(subtypeCountLabelStyle);
+    subtypeCountLayout = new QGridLayout(subtypeCountContainer);
+    subtypeCountLayout->setContentsMargins(2, 2, 2, 2);
+    subtypeCountLayout->setSpacing(2);
+    subtypeCountContainer->hide();
 }
 
 void GameView::resizeEvent(QResizeEvent *event)
@@ -174,13 +179,33 @@ void GameView::refreshShortcuts()
         SettingsCache::instance().shortcuts().getShortcut("Player/aCloseMostRecentZoneView"));
 }
 
-QString GameView::buildSubtypeTallyText() const
+void GameView::clearSubtypeLabels()
 {
-    GameScene *gameScene = dynamic_cast<GameScene *>(scene());
-    if (!gameScene) {
-        return QString();
+    QtUtils::clearLayoutRec(subtypeCountLayout);
+}
+
+void GameView::rebuildSubtypeLabels(const QList<SubtypeEntry> &entries)
+{
+    clearSubtypeLabels();
+
+    const QString nameStyle = QStringLiteral("color: white; font-size: 12px; background: transparent;");
+    const QString countStyle =
+        QStringLiteral("color: white; font-size: 14px; font-weight: bold; background: transparent;");
+
+    int row = 0;
+    for (const SubtypeEntry &entry : entries) {
+        auto *nameLabel = new QLabel(entry.name, subtypeCountContainer);
+        nameLabel->setStyleSheet(nameStyle);
+        nameLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        subtypeCountLayout->addWidget(nameLabel, row, 0);
+
+        auto *countLabel = new QLabel(QString::number(entry.count), subtypeCountContainer);
+        countLabel->setStyleSheet(countStyle);
+        countLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        subtypeCountLayout->addWidget(countLabel, row, 1);
+
+        ++row;
     }
-    return SelectionSubtypeTally::buildSubtypeTallyText(gameScene->selectedCards());
 }
 
 void GameView::updateTotalSelectionCount(const QSize &viewSize)
@@ -206,33 +231,48 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
     }
 
     if (!SettingsCache::instance().getShowSubtypeSelectionCount() || count <= 1) {
-        subtypeCountLabel->hide();
+        subtypeCountContainer->hide();
         return;
     }
 
-    QString subtypeText = buildSubtypeTallyText();
-
-    if (subtypeText.isEmpty()) {
-        subtypeCountLabel->hide();
+    GameScene *gameScene = dynamic_cast<GameScene *>(scene());
+    if (!gameScene) {
+        subtypeCountContainer->hide();
         return;
     }
 
-    subtypeCountLabel->setText(subtypeText);
-    subtypeCountLabel->adjustSize();
+    QList<MainTypeGroup> groups = SelectionSubtypeTally::countSubtypes(gameScene->selectedCards());
+    if (groups.isEmpty()) {
+        subtypeCountContainer->hide();
+        return;
+    }
 
-    int x = availableWidth - subtypeCountLabel->width() - kMarginInPixels;
+    QList<SubtypeEntry> entries;
+    for (const MainTypeGroup &group : groups) {
+        entries.append(group.subtypes);
+    }
+
+    if (entries.isEmpty()) {
+        subtypeCountContainer->hide();
+        return;
+    }
+
+    rebuildSubtypeLabels(entries);
+    subtypeCountContainer->adjustSize();
+
+    int x = availableWidth - subtypeCountContainer->width() - kMarginInPixels;
     int y;
 
     if (totalCountLabel->isVisible()) {
-        y = totalCountLabel->y() - subtypeCountLabel->height() - kSpacingBetweenLabels;
+        y = totalCountLabel->y() - subtypeCountContainer->height() - kSpacingBetweenLabels;
     } else {
-        y = availableHeight - subtypeCountLabel->height() - kMarginInPixels;
+        y = availableHeight - subtypeCountContainer->height() - kMarginInPixels;
     }
 
     y = qMax(kMarginInPixels, y);
 
-    subtypeCountLabel->move(x, y);
-    subtypeCountLabel->show();
+    subtypeCountContainer->move(x, y);
+    subtypeCountContainer->show();
 }
 
 /**

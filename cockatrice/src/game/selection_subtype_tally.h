@@ -22,10 +22,7 @@ struct MainTypeGroup
 
 namespace SelectionSubtypeTally
 {
-QStringList extractSubtypesFromFace(const QString &faceType);
 QList<MainTypeGroup> countSubtypes(const QList<CardItem *> &cards);
-QString formatAsHtml(const QList<MainTypeGroup> &groups);
-QString buildSubtypeTallyText(const QList<CardItem *> &cards);
 } // namespace SelectionSubtypeTally
 
 #endif
