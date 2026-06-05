@@ -413,7 +413,7 @@ void GameScene::deleteArrow(int playerId, int arrowId)
 void GameScene::requestArrowDeletion(int playerId, int arrowId)
 {
     if (arrowRegistry.contains(playerId, arrowId)) {
-        emit requestArrowDeletion(playerId, arrowId);
+        emit arrowDeletionRequested(playerId, arrowId);
     }
 }
 
