@@ -10,8 +10,10 @@
 #include <QGraphicsView>
 
 class GameScene;
+class QGridLayout;
 class QLabel;
 class QRubberBand;
+struct SubtypeEntry;
 
 class GameView : public QGraphicsView
 {
@@ -21,11 +23,12 @@ private:
     QRubberBand *rubberBand;
     QLabel *dragCountLabel;
     QLabel *totalCountLabel;
-    QLabel *subtypeCountLabel; ///< Label displaying subtype breakdown for selected cards
+    QWidget *subtypeCountContainer;  ///< Container widget for subtype tally display
+    QGridLayout *subtypeCountLayout; ///< Grid layout for subtype name/count pairs
     QPointF selectionOrigin;
 
-    /** @brief Builds formatted text showing subtype tally for all selected cards */
-    QString buildSubtypeTallyText() const;
+    void rebuildSubtypeLabels(const QList<SubtypeEntry> &entries);
+    void clearSubtypeLabels();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
