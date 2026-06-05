@@ -8,9 +8,9 @@
 #include <QHBoxLayout>
 
 VisualDatabaseDisplayNameFilterWidget::VisualDatabaseDisplayNameFilterWidget(QWidget *parent,
-                                                                             AbstractTabDeckEditor *_deckEditor,
-                                                                             FilterTreeModel *_filterModel)
-    : QWidget(parent), deckEditor(_deckEditor), filterModel(_filterModel)
+                                                                             FilterTreeModel *_filterModel,
+                                                                             DeckListModel *deckListModel)
+    : QWidget(parent), filterModel(_filterModel), deckListModel(deckListModel)
 {
     setMinimumWidth(300);
     setMaximumHeight(300);
@@ -62,8 +62,6 @@ void VisualDatabaseDisplayNameFilterWidget::retranslateUi()
 
 void VisualDatabaseDisplayNameFilterWidget::actLoadFromDeck()
 {
-    DeckListModel *deckListModel = deckEditor->deckStateManager->getModel();
-
     if (!deckListModel) {
         return;
     }

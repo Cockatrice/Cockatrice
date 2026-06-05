@@ -25,7 +25,8 @@
 VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
                                                          AbstractTabDeckEditor *_deckEditor,
                                                          CardDatabaseModel *database_model,
-                                                         CardDatabaseDisplayModel *database_display_model)
+                                                         CardDatabaseDisplayModel *database_display_model,
+                                                         DeckListModel *deckListModel)
     : QWidget(parent), deckEditor(_deckEditor), databaseModel(database_model),
       databaseDisplayModel(database_display_model)
 {
@@ -109,7 +110,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     colorFilterWidget = new VisualDatabaseDisplayColorFilterWidget(this, filterModel);
 
-    filterContainer = new VisualDatabaseDisplayFilterToolbarWidget(this);
+    filterContainer = new VisualDatabaseDisplayFilterToolbarWidget(this, deckListModel);
 
     clearFilterWidget = new QToolButton();
     clearFilterWidget->setFixedSize(32, 32);

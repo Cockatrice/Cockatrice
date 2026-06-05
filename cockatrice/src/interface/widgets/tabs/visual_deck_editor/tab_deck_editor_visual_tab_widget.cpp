@@ -38,7 +38,7 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
             &TabDeckEditorVisualTabWidget::actAddCard);
 
     visualDatabaseDisplay =
-        new VisualDatabaseDisplayWidget(this, deckEditor, _cardDatabaseModel, _cardDatabaseDisplayModel);
+        new VisualDatabaseDisplayWidget(this, deckEditor, _cardDatabaseModel, _cardDatabaseDisplayModel, deckModel);
     visualDatabaseDisplay->setObjectName("visualDatabaseView");
     connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardHoveredDatabaseDisplay, this,
             &TabDeckEditorVisualTabWidget::onCardChangedDatabaseDisplay);
