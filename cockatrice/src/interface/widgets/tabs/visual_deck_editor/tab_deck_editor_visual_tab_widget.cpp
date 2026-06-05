@@ -9,7 +9,6 @@
  * @param _deckEditor Pointer to the associated deck editor.
  * @param _deckModel Pointer to the deck list model.
  * @param _cardDatabaseModel Pointer to the card database model.
- * @param _cardDatabaseDisplayModel Pointer to the card database display model.
  *
  * Initializes all sub-widgets (visual deck view, database display, deck analytics,
  * sample hand) and sets up the tab layout and signal connections.
@@ -17,10 +16,8 @@
 TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
                                                            AbstractTabDeckEditor *_deckEditor,
                                                            DeckListModel *_deckModel,
-                                                           CardDatabaseModel *_cardDatabaseModel,
-                                                           CardDatabaseDisplayModel *_cardDatabaseDisplayModel)
-    : QTabWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), cardDatabaseModel(_cardDatabaseModel),
-      cardDatabaseDisplayModel(_cardDatabaseDisplayModel)
+                                                           CardDatabaseModel *_cardDatabaseModel)
+    : QTabWidget(parent), deckEditor(_deckEditor), deckModel(_deckModel), cardDatabaseModel(_cardDatabaseModel)
 {
     this->setTabsClosable(true); // Enable tab closing
     connect(this, &QTabWidget::tabCloseRequested, this, &TabDeckEditorVisualTabWidget::handleTabClose);
@@ -37,13 +34,22 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     connect(visualDeckView, &VisualDeckEditorWidget::cardAdditionRequested, this,
             &TabDeckEditorVisualTabWidget::actAddCard);
 
-    visualDatabaseDisplay =
-        new VisualDatabaseDisplayWidget(this, deckEditor, _cardDatabaseModel, _cardDatabaseDisplayModel, deckModel);
+    visualDatabaseDisplay = new VisualDatabaseDisplayWidget(this, _cardDatabaseModel, deckModel);
     visualDatabaseDisplay->setObjectName("visualDatabaseView");
     connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardHoveredDatabaseDisplay, this,
             &TabDeckEditorVisualTabWidget::onCardChangedDatabaseDisplay);
     connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardClickedDatabaseDisplay, this,
             &TabDeckEditorVisualTabWidget::onCardClickedDatabaseDisplay);
+    connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardAdded, this,
+            &TabDeckEditorVisualTabWidget::cardAdded);
+    connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardDecremented, this,
+            &TabDeckEditorVisualTabWidget::cardDecremented);
+    connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::edhrecRequested, this,
+            &TabDeckEditorVisualTabWidget::edhrecRequested);
+    connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::printingSelectorRequested, this,
+            &TabDeckEditorVisualTabWidget::printingSelectorRequested);
+    connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardInfoRequested, this,
+            &TabDeckEditorVisualTabWidget::cardInfoRequested);
 
     statsAnalyzer = new DeckListStatisticsAnalyzer(this, deckModel);
     statsAnalyzer->analyze();

@@ -41,11 +41,6 @@ void DeckEditorCardDatabaseDockWidget::createDatabaseDisplayDock(AbstractTabDeck
             &AbstractTabDeckEditor::updateCardInfo);
 }
 
-CardDatabase *DeckEditorCardDatabaseDockWidget::getDatabase() const
-{
-    return databaseDisplayWidget->databaseModel->getDatabase();
-}
-
 void DeckEditorCardDatabaseDockWidget::retranslateUi()
 {
     setWindowTitle(tr("Card Database"));
