@@ -56,6 +56,9 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
 
     deckStateManager = new DeckStateManager(this);
 
+    databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
+    databaseModel->setObjectName("databaseModel");
+
     cardDatabaseDockWidget = new DeckEditorCardDatabaseDockWidget(this);
     deckDockWidget = new DeckEditorDeckDockWidget(this);
     cardInfoDockWidget = new DeckEditorCardInfoDockWidget(this);

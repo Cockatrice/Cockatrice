@@ -126,6 +126,7 @@ public:
 
     // UI Elements
     DeckStateManager *deckStateManager;
+    CardDatabaseModel *databaseModel;                                 ///< Card database
     DeckEditorMenu *deckMenu;                                         ///< Menu for deck operations
     DeckEditorCardDatabaseDockWidget *cardDatabaseDockWidget;         ///< Database dock
     DeckEditorCardInfoDockWidget *cardInfoDockWidget;                 ///< Card info dock
