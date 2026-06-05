@@ -310,9 +310,9 @@ SettingsCache::SettingsCache()
     closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
     focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
 
-    showDragSelectionCount = settings->value("interface/showlassoselectioncount", true).toBool();
-    showTotalSelectionCount = settings->value("interface/showpersistentselectioncount", true).toBool();
-    showSubtypeSelectionCount = settings->value("interface/showsubtypeselectioncount", true).toBool();
+    showDragSelectionTally = settings->value("interface/showlassoselectiontally", true).toBool();
+    showTotalSelectionTally = settings->value("interface/showpersistentselectiontally", true).toBool();
+    showSubtypeSelectionTally = settings->value("interface/showsubtypeselectiontally", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     showGameSelectorFilterToolbar = settings->value("menu/showgameselectorfiltertoolbar", true).toBool();
@@ -1361,22 +1361,22 @@ void SettingsCache::setRoundCardCorners(bool _roundCardCorners)
     emit roundCardCornersChanged(roundCardCorners);
 }
 
-void SettingsCache::setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount)
+void SettingsCache::setShowDragSelectionTally(QT_STATE_CHANGED_T _showDragSelectionTally)
 {
-    showDragSelectionCount = static_cast<bool>(_showDragSelectionCount);
-    settings->setValue("interface/showlassoselectioncount", showDragSelectionCount);
+    showDragSelectionTally = static_cast<bool>(_showDragSelectionTally);
+    settings->setValue("interface/showlassoselectiontally", showDragSelectionTally);
 }
 
-void SettingsCache::setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSelectionCount)
+void SettingsCache::setShowTotalSelectionTally(QT_STATE_CHANGED_T _showTotalSelectionTally)
 {
-    showTotalSelectionCount = static_cast<bool>(_showTotalSelectionCount);
-    settings->setValue("interface/showpersistentselectioncount", showTotalSelectionCount);
+    showTotalSelectionTally = static_cast<bool>(_showTotalSelectionTally);
+    settings->setValue("interface/showpersistentselectiontally", showTotalSelectionTally);
 }
 
-void SettingsCache::setShowSubtypeSelectionCount(QT_STATE_CHANGED_T _showSubtypeSelectionCount)
+void SettingsCache::setShowSubtypeSelectionTally(QT_STATE_CHANGED_T _showSubtypeSelectionTally)
 {
-    showSubtypeSelectionCount = static_cast<bool>(_showSubtypeSelectionCount);
-    settings->setValue("interface/showsubtypeselectioncount", showSubtypeSelectionCount);
+    showSubtypeSelectionTally = static_cast<bool>(_showSubtypeSelectionTally);
+    settings->setValue("interface/showsubtypeselectiontally", showSubtypeSelectionTally);
 }
 
 void SettingsCache::loadPaths()

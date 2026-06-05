@@ -46,7 +46,7 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     connect(scene, &GameScene::sigStartRubberBand, this, &GameView::startRubberBand);
     connect(scene, &GameScene::sigResizeRubberBand, this, &GameView::resizeRubberBand);
     connect(scene, &GameScene::sigStopRubberBand, this, &GameView::stopRubberBand);
-    connect(scene, &QGraphicsScene::selectionChanged, this, [this]() { updateSelectionCount(); });
+    connect(scene, &QGraphicsScene::selectionChanged, this, [this]() { updateSelectionTally(); });
 
     aCloseMostRecentZoneView = new QAction(this);
 
@@ -95,7 +95,7 @@ void GameView::resizeEvent(QResizeEvent *event)
     }
 
     updateSceneRect(scene()->sceneRect());
-    updateSelectionCount(event->size());
+    updateSelectionTally(event->size());
 }
 
 void GameView::updateSceneRect(const QRectF &rect)
@@ -126,7 +126,7 @@ void GameView::resizeRubberBand(const QPointF &cursorPoint, int selectedCount)
     QRect rect = QRect(mapFromScene(selectionOrigin), cursor).normalized();
     rubberBand->setGeometry(rect);
 
-    if (!SettingsCache::instance().getShowDragSelectionCount()) {
+    if (!SettingsCache::instance().getShowDragSelectionTally()) {
         dragCountLabel->hide();
         return;
     }
@@ -206,7 +206,7 @@ void GameView::rebuildSubtypeLabels(const QList<SubtypeEntry> &entries)
     }
 }
 
-void GameView::updateSelectionCount(const QSize &viewSize)
+void GameView::updateSelectionTally(const QSize &viewSize)
 {
     constexpr int kMarginInPixels = 10;
     constexpr int kSpacingBetweenLabels = 4;
@@ -216,7 +216,7 @@ void GameView::updateSelectionCount(const QSize &viewSize)
 
     int count = scene()->selectedItems().count();
 
-    if (!SettingsCache::instance().getShowTotalSelectionCount() || count <= 1) {
+    if (!SettingsCache::instance().getShowTotalSelectionTally() || count <= 1) {
         totalCountLabel->hide();
     } else {
         totalCountLabel->setText(QString::number(count));
@@ -228,7 +228,7 @@ void GameView::updateSelectionCount(const QSize &viewSize)
         totalCountLabel->show();
     }
 
-    if (!SettingsCache::instance().getShowSubtypeSelectionCount() || count <= 1) {
+    if (!SettingsCache::instance().getShowSubtypeSelectionTally() || count <= 1) {
         subtypeCountContainer->hide();
         return;
     }

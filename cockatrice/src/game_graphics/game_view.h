@@ -37,7 +37,7 @@ private slots:
     void resizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void stopRubberBand();
     void refreshShortcuts();
-    void updateSelectionCount(const QSize &viewSize = QSize());
+    void updateSelectionTally(const QSize &viewSize = QSize());
 public slots:
     void updateSceneRect(const QRectF &rect);
 
