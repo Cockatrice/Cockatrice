@@ -1,6 +1,7 @@
 #include "tab_deck_editor_visual.h"
 
 #include "../../../../client/settings/cache_settings.h"
+#include "../../cards/card_info_display_widget.h"
 #include "../../deck_editor/deck_state_manager.h"
 #include "../../filters/filter_builder.h"
 #include "../../interface/pixel_map_generator.h"
@@ -25,6 +26,7 @@
 #include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
@@ -63,9 +65,10 @@ void TabDeckEditorVisual::createCentralFrame()
     centralFrame = new QVBoxLayout;
     centralWidget->setLayout(centralFrame);
 
-    tabContainer = new TabDeckEditorVisualTabWidget(
-        centralWidget, this, deckStateManager->getModel(), cardDatabaseDockWidget->databaseDisplayWidget->databaseModel,
-        cardDatabaseDockWidget->databaseDisplayWidget->databaseDisplayModel);
+    auto databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
+    databaseModel->setObjectName("databaseModel");
+
+    tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this, deckStateManager->getModel(), databaseModel);
 
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChanged, this,
             &TabDeckEditorVisual::changeModelIndexAndCardInfo);
@@ -75,6 +78,13 @@ void TabDeckEditorVisual::createCentralFrame()
             &TabDeckEditorVisual::processMainboardCardClick);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardClickedDatabaseDisplay, this,
             &TabDeckEditorVisual::processDatabaseCardClick);
+
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::cardAdded, this, &TabDeckEditorVisual::addCard);
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::cardDecremented, this, &TabDeckEditorVisual::decrementCard);
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::edhrecRequested, this, &TabDeckEditorVisual::openEdhrecTab);
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::printingSelectorRequested, this,
+            &TabDeckEditorVisual::showPrintingSelector);
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::cardInfoRequested, this, &TabDeckEditorVisual::updateCardInfo);
 
     centralFrame->addWidget(tabContainer);
     setCentralWidget(centralWidget);

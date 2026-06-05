@@ -1,5 +1,6 @@
 #include "visual_database_display_filter_toolbar_widget.h"
 
+#include "../deck_editor/card_database_view.h"
 #include "visual_database_display_widget.h"
 
 #include <QGroupBox>

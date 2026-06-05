@@ -9,7 +9,6 @@
 #define DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H
 
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
-#include "../../key_signals.h"
 #include "../utility/custom_line_edit.h"
 
 #include <QHBoxLayout>
@@ -17,34 +16,31 @@
 #include <libcockatrice/models/database/card_database_display_model.h>
 #include <libcockatrice/models/database/card_database_model.h>
 
+class CardDatabaseView;
 class AbstractTabDeckEditor;
+
 class DeckEditorDatabaseDisplayWidget : public QWidget
 {
 
     Q_OBJECT
 public:
     explicit DeckEditorDatabaseDisplayWidget(QWidget *parent, CardDatabaseModel *databaseModel);
-    CardDatabaseModel *databaseModel;
-    CardDatabaseDisplayModel *databaseDisplayModel;
 
-    QTreeView *getDatabaseView()
+    CardDatabaseView *getDatabaseView() const
     {
         return databaseView;
     }
 
 public slots:
-    ExactCard currentCard() const;
     void setFilterTree(FilterTree *filterTree);
     void clearAllDatabaseFilters();
-    void updateSearch(const QString &search);
-    void updateCard(const QModelIndex &current, const QModelIndex &);
-    void actAddCard();
+
     void actAddCardToMainDeck();
     void actAddCardToSideboard();
-    void actDecrementCardFromMainDeck();
-    void actDecrementCardFromSideboard();
-    void databaseCustomMenu(QPoint point);
-    void copyDatabaseCellContents();
+
+    void addCard(const QString &cardName, const QString &zoneName);
+    void decrementCard(const QString &cardName, const QString &zoneName);
+    void updateCard(const QString &cardName);
 
 signals:
     void cardAdded(const ExactCard &card, const QString &zoneName);
@@ -56,8 +52,8 @@ signals:
     void cardInfoRequested(const ExactCard &card);
 
 private:
-    KeySignals searchKeySignals;
-    QTreeView *databaseView;
+    CardDatabaseDisplayModel *databaseDisplayModel;
+    CardDatabaseView *databaseView;
     QHBoxLayout *searchLayout;
     SearchLineEdit *searchEdit;
     QAction *aAddCard, *aAddCardToSideboard;
@@ -68,7 +64,8 @@ private:
 
 private slots:
     void retranslateUi();
-    void saveDbHeaderState();
+
+    void onRelatedCardClicked(const QString &relatedCard);
 };
 
 #endif // DECK_EDITOR_DATABASE_DISPLAY_WIDGET_H

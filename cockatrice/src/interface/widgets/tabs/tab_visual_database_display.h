@@ -15,8 +15,10 @@ class TabVisualDatabaseDisplay : public Tab
     Q_OBJECT
 
 private:
-    TabDeckEditor *deckEditor;
     VisualDatabaseDisplayWidget *visualDatabaseDisplayWidget;
+
+private slots:
+    void openEdhrecTab(const CardInfoPtr &info, bool isCommander) const;
 
 public:
     TabVisualDatabaseDisplay(TabSupervisor *_tabSupervisor);
