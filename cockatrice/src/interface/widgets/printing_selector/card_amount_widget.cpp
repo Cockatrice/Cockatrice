@@ -11,7 +11,7 @@
  * @param parent The parent widget.
  * @param cardSizeSlider Pointer to the QSlider for adjusting font size.
  * @param rootCard The root card to manage within the widget.
- * @param zoneName The zone name (e.g., DECK_ZONE_MAIN or DECK_ZONE_SIDE).
+ * @param zoneName The zone name (e.g., DECK_ZONE_MAIN , DECK_ZONE_SIDE, or DECK_ZONE_TOKENS).
  */
 CardAmountWidget::CardAmountWidget(QWidget *parent,
                                    DeckStateManager *deckStateManager,
@@ -36,13 +36,16 @@ CardAmountWidget::CardAmountWidget(QWidget *parent,
     incrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
     decrementButton->setFixedSize(parentWidget()->size().width() / 3, parentWidget()->size().height() / 9);
 
-    // Set up connections based on the zone (Mainboard or Sideboard)
+    // Set up connections based on the zone (Mainboard, Sideboard, or Tokensboard)
     if (zoneName == DECK_ZONE_MAIN) {
         connect(incrementButton, &QPushButton::clicked, this, &CardAmountWidget::addPrintingMainboard);
         connect(decrementButton, &QPushButton::clicked, this, &CardAmountWidget::removePrintingMainboard);
     } else if (zoneName == DECK_ZONE_SIDE) {
         connect(incrementButton, &QPushButton::clicked, this, &CardAmountWidget::addPrintingSideboard);
         connect(decrementButton, &QPushButton::clicked, this, &CardAmountWidget::removePrintingSideboard);
+    } else if (zoneName == DECK_ZONE_TOKENS) {
+        connect(incrementButton, &QPushButton::clicked, this, &CardAmountWidget::addPrintingTokensboard);
+        connect(decrementButton, &QPushButton::clicked, this, &CardAmountWidget::removePrintingTokensboard);
     }
 
     cardCountInZone = new QLabel(QString::number(amount), this);
@@ -161,9 +164,9 @@ static QModelIndex addAndReplacePrintings(DeckListModel *model,
 }
 
 /**
- * @brief Adds a printing of the card to the specified zone (Mainboard or Sideboard).
+ * @brief Adds a printing of the card to the specified zone (Mainboard, Sideboard, or Tokensboard).
  *
- * @param zone The zone to add the card to (DECK_ZONE_MAIN or DECK_ZONE_SIDE).
+ * @param zone The zone to add the card to (DECK_ZONE_MAIN, DECK_ZONE_SIDE, or DECK_ZONE_TOKENS).
  */
 void CardAmountWidget::addPrinting(const QString &zone)
 {
@@ -183,14 +186,15 @@ void CardAmountWidget::addPrinting(const QString &zone)
         }
     }
 
-    QString reason = QString("Added %1 copies of '%2 (%3) %4' to %5 [ProviderID: %6]%7")
-                         .arg(1 + extraCopies)
-                         .arg(rootCard.getName())
-                         .arg(rootCard.getPrinting().getSet()->getShortName())
-                         .arg(rootCard.getPrinting().getProperty("num"))
-                         .arg(zone == DECK_ZONE_MAIN ? "mainboard" : "sideboard")
-                         .arg(rootCard.getPrinting().getUuid())
-                         .arg(replacingProviderless ? " (replaced providerless printings)" : "");
+    QString reason =
+        QString("Added %1 copies of '%2 (%3) %4' to %5 [ProviderID: %6]%7")
+            .arg(1 + extraCopies)
+            .arg(rootCard.getName())
+            .arg(rootCard.getPrinting().getSet()->getShortName())
+            .arg(rootCard.getPrinting().getProperty("num"))
+            .arg(zone == DECK_ZONE_MAIN ? "mainboard" : (zone == DECK_ZONE_SIDE ? "sideboard" : "tokensboard"))
+            .arg(rootCard.getPrinting().getUuid())
+            .arg(replacingProviderless ? " (replaced providerless printings)" : "");
 
     // Add the card and expand the list UI
     QModelIndex newCardIndex = deckStateManager->modifyDeck(reason, [&](auto model) {
@@ -219,6 +223,14 @@ void CardAmountWidget::addPrintingSideboard()
 }
 
 /**
+ * @brief Adds a printing to the tokens zone.
+ */
+void CardAmountWidget::addPrintingTokensboard()
+{
+    addPrinting(DECK_ZONE_TOKENS);
+}
+
+/**
  * @brief Removes a printing from the mainboard zone.
  */
 void CardAmountWidget::removePrintingMainboard()
@@ -235,18 +247,27 @@ void CardAmountWidget::removePrintingSideboard()
 }
 
 /**
+ * @brief Removes a printing from the tokens zone.
+ */
+void CardAmountWidget::removePrintingTokensboard()
+{
+    decrementCardHelper(DECK_ZONE_TOKENS);
+}
+
+/**
  * @brief Helper function to decrement the card count for a given zone.
  *
- * @param zone The zone from which to remove the card (DECK_ZONE_MAIN or DECK_ZONE_SIDE).
+ * @param zone The zone from which to remove the card (DECK_ZONE_MAIN, DECK_ZONE_SIDE, or DECK_ZONE_TOKENS).
  */
 void CardAmountWidget::decrementCardHelper(const QString &zone)
 {
-    QString reason = QString("Removed 1 copy of '%1 (%2) %3' from %4 [ProviderID: %5]")
-                         .arg(rootCard.getName())
-                         .arg(rootCard.getPrinting().getSet()->getShortName())
-                         .arg(rootCard.getPrinting().getProperty("num"))
-                         .arg(zone == DECK_ZONE_MAIN ? "mainboard" : "sideboard")
-                         .arg(rootCard.getPrinting().getUuid());
+    QString reason =
+        QString("Removed 1 copy of '%1 (%2) %3' from %4 [ProviderID: %5]")
+            .arg(rootCard.getName())
+            .arg(rootCard.getPrinting().getSet()->getShortName())
+            .arg(rootCard.getPrinting().getProperty("num"))
+            .arg(zone == DECK_ZONE_MAIN ? "mainboard" : (zone == DECK_ZONE_SIDE ? "sideboard" : "tokensboard"))
+            .arg(rootCard.getPrinting().getUuid());
 
     deckStateManager->modifyDeck(reason, [this, &zone](auto model) {
         QModelIndex idx = model->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),

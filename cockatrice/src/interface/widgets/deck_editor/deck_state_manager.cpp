@@ -255,7 +255,10 @@ bool DeckStateManager::swapCardAtIndex(const QModelIndex &idx)
     }
 
     QString zoneName = gparent.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
-    QString otherZoneName = zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN;
+    QString otherZoneName = zoneName == DECK_ZONE_TOKENS
+                                ? DECK_ZONE_TOKENS
+                                : (zoneName == DECK_ZONE_MAIN ? DECK_ZONE_SIDE : DECK_ZONE_MAIN);
+    // if card is Token,it should be swap to DECK_ZONE_TOKENS,not DECK_ZONE_MAIN or DECK_ZONE_SIDE.
 
     QString reason = tr("Moved to %1 1 × \"%2\" (%3)") //
                          .arg(otherZoneName)

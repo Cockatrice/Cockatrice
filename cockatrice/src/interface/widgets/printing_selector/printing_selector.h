@@ -19,6 +19,7 @@
 #include <QWidget>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <tuple>
 
 #define BATCH_SIZE 10
 
@@ -59,9 +60,9 @@ signals:
 
     /**
      * The amounts of the printings in the deck has changed
-     * @param uuidToAmounts Map of uuids to the amounts (maindeck, sideboard) in the deck
+     * @param uuidToAmounts Map of uuids to the amounts (maindeck, sideboard, tokensboard) in the deck
      */
-    void cardAmountsChanged(const QMap<QString, QPair<int, int>> &uuidToAmounts);
+    void cardAmountsChanged(const QMap<QString, std::tuple<int, int, int>> &uuidToAmounts);
 
 private:
     QVBoxLayout *layout;
