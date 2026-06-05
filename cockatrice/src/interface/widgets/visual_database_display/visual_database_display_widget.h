@@ -36,7 +36,8 @@ public:
     explicit VisualDatabaseDisplayWidget(QWidget *parent,
                                          AbstractTabDeckEditor *deckEditor,
                                          CardDatabaseModel *database_model,
-                                         CardDatabaseDisplayModel *database_display_model);
+                                         CardDatabaseDisplayModel *database_display_model,
+                                         DeckListModel *deckListModel = nullptr);
     void retranslateUi();
 
     void adjustCardsPerPage();
@@ -46,11 +47,6 @@ public:
     void loadCurrentPage();
     void sortCardList(const QStringList &properties, Qt::SortOrder order) const;
     void setDeckList(const DeckList &new_deck_list_model);
-
-    AbstractTabDeckEditor *getDeckEditor()
-    {
-        return deckEditor;
-    }
 
     CardDatabaseDisplayModel *getDatabaseDisplayModel()
     {
