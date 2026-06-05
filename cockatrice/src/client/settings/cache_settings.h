@@ -351,9 +351,9 @@ private:
     bool isPortableBuild;
     bool roundCardCorners;
     bool showStatusBar;
-    bool showDragSelectionCount;
-    bool showTotalSelectionCount;
-    bool showSubtypeSelectionCount;
+    bool showDragSelectionTally;
+    bool showTotalSelectionTally;
+    bool showSubtypeSelectionTally;
 
 public:
     SettingsCache();
@@ -469,17 +469,17 @@ public:
     {
         return showStatusBar;
     }
-    [[nodiscard]] bool getShowDragSelectionCount() const
+    [[nodiscard]] bool getShowDragSelectionTally() const
     {
-        return showDragSelectionCount;
+        return showDragSelectionTally;
     }
-    [[nodiscard]] bool getShowTotalSelectionCount() const
+    [[nodiscard]] bool getShowTotalSelectionTally() const
     {
-        return showTotalSelectionCount;
+        return showTotalSelectionTally;
     }
-    [[nodiscard]] bool getShowSubtypeSelectionCount() const
+    [[nodiscard]] bool getShowSubtypeSelectionTally() const
     {
-        return showSubtypeSelectionCount;
+        return showSubtypeSelectionTally;
     }
     [[nodiscard]] bool getNotificationsEnabled() const
     {
@@ -1172,8 +1172,8 @@ public slots:
     void setUpdateReleaseChannelIndex(int value);
     void setMaxFontSize(int _max);
     void setRoundCardCorners(bool _roundCardCorners);
-    void setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount);
-    void setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSelectionCount);
-    void setShowSubtypeSelectionCount(QT_STATE_CHANGED_T _showSubtypeSelectionCount);
+    void setShowDragSelectionTally(QT_STATE_CHANGED_T _showDragSelectionTally);
+    void setShowTotalSelectionTally(QT_STATE_CHANGED_T _showTotalSelectionTally);
+    void setShowSubtypeSelectionTally(QT_STATE_CHANGED_T _showSubtypeSelectionTally);
 };
 #endif

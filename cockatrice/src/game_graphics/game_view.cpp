@@ -128,7 +128,7 @@ void GameView::resizeRubberBand(const QPointF &cursorPoint, int selectedCount)
     QRect rect = QRect(mapFromScene(selectionOrigin), cursor).normalized();
     rubberBand->setGeometry(rect);
 
-    if (!SettingsCache::instance().getShowDragSelectionCount()) {
+    if (!SettingsCache::instance().getShowDragSelectionTally()) {
         dragCountLabel->hide();
         return;
     }
@@ -218,7 +218,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
 
     int count = scene()->selectedItems().count();
 
-    if (!SettingsCache::instance().getShowTotalSelectionCount() || count <= 1) {
+    if (!SettingsCache::instance().getShowTotalSelectionTally() || count <= 1) {
         totalCountLabel->hide();
     } else {
         totalCountLabel->setText(QString::number(count));
@@ -230,7 +230,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
         totalCountLabel->show();
     }
 
-    if (!SettingsCache::instance().getShowSubtypeSelectionCount() || count <= 1) {
+    if (!SettingsCache::instance().getShowSubtypeSelectionTally() || count <= 1) {
         subtypeCountContainer->hide();
         return;
     }

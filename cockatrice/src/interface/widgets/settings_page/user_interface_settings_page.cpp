@@ -60,17 +60,17 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&annotateTokensCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setAnnotateTokens);
 
-    showDragSelectionCountCheckBox.setChecked(SettingsCache::instance().getShowDragSelectionCount());
-    connect(&showDragSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setShowDragSelectionCount);
+    showDragSelectionTallyCheckBox.setChecked(SettingsCache::instance().getShowDragSelectionTally());
+    connect(&showDragSelectionTallyCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setShowDragSelectionTally);
 
-    showTotalSelectionCountCheckBox.setChecked(SettingsCache::instance().getShowTotalSelectionCount());
-    connect(&showTotalSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setShowTotalSelectionCount);
+    showTotalSelectionTallyCheckBox.setChecked(SettingsCache::instance().getShowTotalSelectionTally());
+    connect(&showTotalSelectionTallyCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setShowTotalSelectionTally);
 
-    showSubtypeSelectionCountCheckBox.setChecked(SettingsCache::instance().getShowSubtypeSelectionCount());
-    connect(&showSubtypeSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setShowSubtypeSelectionCount);
+    showSubtypeSelectionTallyCheckBox.setChecked(SettingsCache::instance().getShowSubtypeSelectionTally());
+    connect(&showSubtypeSelectionTallyCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setShowSubtypeSelectionTally);
 
     useTearOffMenusCheckBox.setChecked(SettingsCache::instance().getUseTearOffMenus());
     connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
@@ -88,9 +88,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&closeEmptyCardViewCheckBox, 4, 0);
     generalGrid->addWidget(&focusCardViewSearchBarCheckBox, 5, 0);
     generalGrid->addWidget(&annotateTokensCheckBox, 6, 0);
-    generalGrid->addWidget(&showDragSelectionCountCheckBox, 7, 0);
-    generalGrid->addWidget(&showTotalSelectionCountCheckBox, 8, 0);
-    generalGrid->addWidget(&showSubtypeSelectionCountCheckBox, 9, 0);
+    generalGrid->addWidget(&showDragSelectionTallyCheckBox, 7, 0);
+    generalGrid->addWidget(&showTotalSelectionTallyCheckBox, 8, 0);
+    generalGrid->addWidget(&showSubtypeSelectionTallyCheckBox, 9, 0);
     generalGrid->addWidget(&useTearOffMenusCheckBox, 10, 0);
     generalGrid->addWidget(&keepGameChatFocusCheckBox, 11, 0);
 
@@ -214,9 +214,9 @@ void UserInterfaceSettingsPage::retranslateUi()
     closeEmptyCardViewCheckBox.setText(tr("Close card view window when last card is removed"));
     focusCardViewSearchBarCheckBox.setText(tr("Auto focus search bar when card view window is opened"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
-    showDragSelectionCountCheckBox.setText(tr("Show selection counter during drag selection"));
-    showTotalSelectionCountCheckBox.setText(tr("Show total selection counter"));
-    showSubtypeSelectionCountCheckBox.setText(tr("Show subtype breakdown in selection counter"));
+    showDragSelectionTallyCheckBox.setText(tr("Show selection tally during drag selection"));
+    showTotalSelectionTallyCheckBox.setText(tr("Show total selection tally"));
+    showSubtypeSelectionTallyCheckBox.setText(tr("Show subtype breakdown in selection tally"));
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
     keepGameChatFocusCheckBox.setText(
         tr("Keep game chat focused when clicking in game (Note: disables card view search bar)"));
