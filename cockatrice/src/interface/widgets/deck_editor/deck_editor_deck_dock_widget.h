@@ -10,6 +10,7 @@
 
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../key_signals.h"
+#include "../general/tutorial/tutorial_controller.h"
 #include "../utility/custom_line_edit.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "deck_list_history_manager_widget.h"
@@ -45,6 +46,8 @@ public:
     {
         return deckView->selectionModel();
     }
+
+    TutorialSequence generateTutorialSequence();
 
 public slots:
     void selectPrevCard();

@@ -23,6 +23,11 @@ public:
     void initialize();
     void retranslateUi();
 
+    SettingsButtonWidget *getSetFilterWidget()
+    {
+        return quickFilterSetWidget;
+    }
+
 private:
     VisualDatabaseDisplayWidget *visualDatabaseDisplay;
     DeckListModel *deckListModel;
