@@ -140,6 +140,19 @@ void CardAmountWidget::updateCardCount()
     layout->activate();
 }
 
+static QString zoneLogName(const QString &zone)
+{
+    if (zone == DECK_ZONE_MAIN) {
+        return "mainboard";
+    } else if (zone == DECK_ZONE_SIDE) {
+        return "sideboard";
+    } else if (zone == DECK_ZONE_TOKENS) {
+        return "tokens";
+    } else {
+        return "unknown";
+    }
+}
+
 static QModelIndex addAndReplacePrintings(DeckListModel *model,
                                           const QModelIndex &existing,
                                           const ExactCard &rootCard,
@@ -186,15 +199,15 @@ void CardAmountWidget::addPrinting(const QString &zone)
         }
     }
 
-    QString reason =
-        QString("Added %1 copies of '%2 (%3) %4' to %5 [ProviderID: %6]%7")
-            .arg(1 + extraCopies)
-            .arg(rootCard.getName())
-            .arg(rootCard.getPrinting().getSet()->getShortName())
-            .arg(rootCard.getPrinting().getProperty("num"))
-            .arg(zone == DECK_ZONE_MAIN ? "mainboard" : (zone == DECK_ZONE_SIDE ? "sideboard" : "tokensboard"))
-            .arg(rootCard.getPrinting().getUuid())
-            .arg(replacingProviderless ? " (replaced providerless printings)" : "");
+    QString zoneName = zoneLogName(zone);
+    QString reason = QString("Added %1 copies of '%2 (%3) %4' to %5 [ProviderID: %6]%7")
+                         .arg(1 + extraCopies)
+                         .arg(rootCard.getName())
+                         .arg(rootCard.getPrinting().getSet()->getShortName())
+                         .arg(rootCard.getPrinting().getProperty("num"))
+                         .arg(zoneName)
+                         .arg(rootCard.getPrinting().getUuid())
+                         .arg(replacingProviderless ? " (replaced providerless printings)" : "");
 
     // Add the card and expand the list UI
     QModelIndex newCardIndex = deckStateManager->modifyDeck(reason, [&](auto model) {
@@ -261,13 +274,13 @@ void CardAmountWidget::removePrintingTokensboard()
  */
 void CardAmountWidget::decrementCardHelper(const QString &zone)
 {
-    QString reason =
-        QString("Removed 1 copy of '%1 (%2) %3' from %4 [ProviderID: %5]")
-            .arg(rootCard.getName())
-            .arg(rootCard.getPrinting().getSet()->getShortName())
-            .arg(rootCard.getPrinting().getProperty("num"))
-            .arg(zone == DECK_ZONE_MAIN ? "mainboard" : (zone == DECK_ZONE_SIDE ? "sideboard" : "tokensboard"))
-            .arg(rootCard.getPrinting().getUuid());
+    QString zoneName = zoneLogName(zone);
+    QString reason = QString("Removed 1 copy of '%1 (%2) %3' from %4 [ProviderID: %5]")
+                         .arg(rootCard.getName())
+                         .arg(rootCard.getPrinting().getSet()->getShortName())
+                         .arg(rootCard.getPrinting().getProperty("num"))
+                         .arg(zoneName)
+                         .arg(rootCard.getPrinting().getUuid());
 
     deckStateManager->modifyDeck(reason, [this, &zone](auto model) {
         QModelIndex idx = model->findCard(rootCard.getName(), zone, rootCard.getPrinting().getUuid(),

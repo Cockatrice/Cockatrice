@@ -19,9 +19,15 @@
 #include <QWidget>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <tuple>
 
 #define BATCH_SIZE 10
+
+struct ZoneCounts
+{
+    int mainboard = 0;
+    int sideboard = 0;
+    int tokensboard = 0;
+};
 
 class DeckStateManager;
 class PrintingSelectorCardSearchWidget;
@@ -62,7 +68,7 @@ signals:
      * The amounts of the printings in the deck has changed
      * @param uuidToAmounts Map of uuids to the amounts (maindeck, sideboard, tokensboard) in the deck
      */
-    void cardAmountsChanged(const QMap<QString, std::tuple<int, int, int>> &uuidToAmounts);
+    void cardAmountsChanged(const QMap<QString, ZoneCounts> &uuidToAmounts);
 
 private:
     QVBoxLayout *layout;

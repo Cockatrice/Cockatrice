@@ -31,15 +31,15 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
     buttonBoxMainboard = new CardAmountWidget(this, deckStateManager, cardSizeSlider, rootCard, DECK_ZONE_MAIN);
     zoneLabelSideboard = new ShadowBackgroundLabel(this, tr("Sideboard"));
     buttonBoxSideboard = new CardAmountWidget(this, deckStateManager, cardSizeSlider, rootCard, DECK_ZONE_SIDE);
-    zoneLabelTokensboard = new ShadowBackgroundLabel(this, tr("Tokensboard"));
+    zoneLabelTokensboard = new ShadowBackgroundLabel(this, tr("Tokens"));
     buttonBoxTokensboard = new CardAmountWidget(this, deckStateManager, cardSizeSlider, rootCard, DECK_ZONE_TOKENS);
 
     layout->addWidget(zoneLabelMainboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
     layout->addWidget(buttonBoxMainboard, 0, Qt::AlignHCenter | Qt::AlignTop);
-    layout->addSpacing(12.5);
+    layout->addSpacing(12);
     layout->addWidget(zoneLabelTokensboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
     layout->addWidget(buttonBoxTokensboard, 0, Qt::AlignHCenter | Qt::AlignTop);
-    layout->addSpacing(12.5);
+    layout->addSpacing(13);
     layout->addWidget(zoneLabelSideboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
     layout->addWidget(buttonBoxSideboard, 0, Qt::AlignHCenter | Qt::AlignTop);
 

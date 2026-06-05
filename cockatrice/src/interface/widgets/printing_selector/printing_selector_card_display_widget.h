@@ -13,7 +13,6 @@
 
 #include <QWidget>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <tuple>
 
 class PrintingSelectorCardDisplayWidget : public QWidget
 {
@@ -28,7 +27,7 @@ public:
 
 public slots:
     void clampSetNameToPicture();
-    void updateCardAmounts(const QMap<QString, std::tuple<int, int, int>> &uuidToAmounts);
+    void updateCardAmounts(const QMap<QString, ZoneCounts> &uuidToAmounts);
 
     void resizeEvent(QResizeEvent *event) override;
 
