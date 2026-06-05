@@ -105,14 +105,15 @@ void AbstractTabDeckEditor::registerDockWidget(QMenu *_viewMenu, QDockWidget *wi
     dockToActions.insert(widget, {menu, aVisible, aFloating, defaultSize});
 }
 
-/**
- * @brief Updates the card info dock and printing selector.
- * @param card The card to display.
- */
 void AbstractTabDeckEditor::updateCard(const ExactCard &card)
 {
     cardInfoDockWidget->updateCard(card);
     printingSelectorDockWidget->printingSelector->setCard(card.getCardPtr());
+}
+
+void AbstractTabDeckEditor::updateCardInfo(const ExactCard &card)
+{
+    cardInfoDockWidget->updateCard(card);
 }
 
 /** @brief Placeholder: called when the deck changes. */
@@ -137,32 +138,6 @@ void AbstractTabDeckEditor::addCard(const ExactCard &card, const QString &zoneNa
 void AbstractTabDeckEditor::decrementCard(const ExactCard &card, const QString &zoneName)
 {
     deckStateManager->decrementCard(card, zoneName);
-}
-
-/**
- * @brief Adds a card to the main deck or sideboard depending on Ctrl key.
- */
-void AbstractTabDeckEditor::actAddCard(const ExactCard &card)
-{
-    addCard(card, DECK_ZONE_MAIN);
-}
-
-/** @brief Adds a card to the sideboard explicitly. */
-void AbstractTabDeckEditor::actAddCardToSideboard(const ExactCard &card)
-{
-    addCard(card, DECK_ZONE_SIDE);
-}
-
-/** @brief Decrements a card from the main deck. */
-void AbstractTabDeckEditor::actDecrementCard(const ExactCard &card)
-{
-    decrementCard(card, DECK_ZONE_MAIN);
-}
-
-/** @brief Decrements a card from the sideboard. */
-void AbstractTabDeckEditor::actDecrementCardFromSideboard(const ExactCard &card)
-{
-    decrementCard(card, DECK_ZONE_SIDE);
 }
 
 /**
@@ -564,14 +539,14 @@ void AbstractTabDeckEditor::actExportDeckDecklistXyz()
 /** @brief Analyzes the deck using DeckStats. */
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
-    auto *interface = new DeckStatsInterface(*cardDatabaseDockWidget->getDatabase(), this);
+    auto *interface = new DeckStatsInterface(this);
     interface->analyzeDeck(deckStateManager->getDeckList());
 }
 
 /** @brief Analyzes the deck using TappedOut. */
 void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
-    auto *interface = new TappedOutInterface(*cardDatabaseDockWidget->getDatabase(), this);
+    auto *interface = new TappedOutInterface(this);
     interface->analyzeDeck(deckStateManager->getDeckList());
 }
 
@@ -613,4 +588,16 @@ bool AbstractTabDeckEditor::closeRequest()
         return false;
     }
     return close();
+}
+
+void AbstractTabDeckEditor::showPrintingSelector()
+{
+    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
+    printingSelectorDockWidget->printingSelector->updateDisplay();
+    printingSelectorDockWidget->setVisible(true);
+}
+
+void AbstractTabDeckEditor::openEdhrecTab(const CardInfoPtr &info, bool isCommander)
+{
+    getTabSupervisor()->addEdhrecTab(info, isCommander);
 }

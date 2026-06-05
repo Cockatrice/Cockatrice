@@ -41,7 +41,7 @@
  * - changeModelIndexAndCardInfo(const ExactCard &card) — Updates deck model selection and card info.
  * - changeModelIndexToCard(const ExactCard &card) — Selects the card in the deck view.
  * - processMainboardCardClick(QMouseEvent *event, ...) — Handles clicks on mainboard cards.
- * - processCardClickDatabaseDisplay(QMouseEvent *event, ...) — Handles clicks on database cards.
+ * - processDatabaseCardClick(QMouseEvent *event, ...) — Handles clicks on database cards.
  * - actSaveDeckAs() — Overrides save action with temporary UI adjustments.
  * - showPrintingSelector() — Opens the printing selector dock for the current card.
  * - freeDocksSize() — Frees constraints on dock widget sizes.
@@ -145,26 +145,19 @@ public slots:
     void onDeckChanged() override;
 
     /**
-     * @brief Show the printing selector dock for the currently active card.
-     */
-    void showPrintingSelector() override;
-
-    /**
      * @brief Handle card clicks in the mainboard visual deck.
      * @param event Mouse event triggering the action.
-     * @param instance Widget representing the clicked card.
+     * @param card The clicked card.
      * @param zoneName Deck zone of the card.
      */
-    void processMainboardCardClick(QMouseEvent *event,
-                                   CardInfoPictureWithTextOverlayWidget *instance,
-                                   const QString &zoneName);
+    void processMainboardCardClick(const QMouseEvent *event, const ExactCard &card, const QString &zoneName);
 
     /**
      * @brief Handle card clicks in the database visual display.
      * @param event Mouse event triggering the action.
-     * @param instance Widget representing the clicked card.
+     * @param card  The clicked card.
      */
-    void processCardClickDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void processDatabaseCardClick(const QMouseEvent *event, const ExactCard &card);
 
     /**
      * @brief Save the deck under a new name.

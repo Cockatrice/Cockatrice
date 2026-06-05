@@ -77,8 +77,8 @@ class QAction;
  *
  * **Key Methods:**
  *
- * - actAddCard(const ExactCard &card) — Adds a card to the deck.
- * - actDecrementCard(const ExactCard &card) — Removes a single instance of a card from the deck.
+ * - addCard(const ExactCard &card, const QString &zoneName) — Adds a card to the deck.
+ * - decrementCard(const ExactCard &card, const QString &zoneName) — Removes a single instance of a card from the deck.
  * - actRemoveCard() — Removes the currently selected card from the deck.
  * - actSaveDeckAs() — Performs a "Save As" action for the deck.
  * - updateCard(const ExactCard &card) — Updates the currently displayed card info in the dock.
@@ -140,10 +140,17 @@ public slots:
     /** @brief Called when the deck is modified. */
     virtual void onDeckModified();
 
-    /** @brief Updates the card info panel.
-     *  @param card The card to display.
+    /**
+     * @brief Updates the card info dock and printing selector.
+     * @param card The card to display.
      */
     void updateCard(const ExactCard &card);
+
+    /**
+     * @brief Updates just the card info dock
+     * @param card The card to display
+     */
+    void updateCardInfo(const ExactCard &card);
 
     /**
      * @brief Adds a card to the given zone
@@ -163,18 +170,6 @@ public slots:
      */
     void decrementCard(const ExactCard &card, const QString &zoneName);
 
-    /** @brief Adds a card to the main deck or sideboard based on Ctrl key. */
-    void actAddCard(const ExactCard &card);
-
-    /** @brief Adds a card to the sideboard explicitly. */
-    void actAddCardToSideboard(const ExactCard &card);
-
-    /** @brief Decrements a card from the main deck. */
-    void actDecrementCard(const ExactCard &card);
-
-    /** @brief Decrements a card from the sideboard. */
-    void actDecrementCardFromSideboard(const ExactCard &card);
-
     /** @brief Opens a recently opened deck file. */
     void actOpenRecent(const QString &fileName);
 
@@ -184,8 +179,15 @@ public slots:
     /** @brief Requests closing the tab. */
     bool closeRequest() override;
 
-    /** @brief Shows the printing selector dock. Pure virtual. */
-    virtual void showPrintingSelector() = 0;
+    /** @brief Shows the printing selector dock and updates it with the current card. */
+    void showPrintingSelector();
+
+    /**
+     * @brief Opens an EDHRec tab for the given card
+     * @param info The card
+     * @param isCommander The type of search
+     */
+    void openEdhrecTab(const CardInfoPtr &info, bool isCommander);
 
 signals:
     /** @brief Emitted when a deck should be opened in a new editor tab. */

@@ -48,11 +48,13 @@ public slots:
     void copyDatabaseCellContents();
 
 signals:
-    void addCardToMainDeck(const ExactCard &card);
-    void addCardToSideboard(const ExactCard &card);
-    void decrementCardFromMainDeck(const ExactCard &card);
-    void decrementCardFromSideboard(const ExactCard &card);
+    void cardAdded(const ExactCard &card, const QString &zoneName);
+    void cardDecremented(const ExactCard &card, const QString &zoneName);
     void cardChanged(const ExactCard &_card);
+
+    void edhrecRequested(const CardInfoPtr &cardInfo, bool isCommander);
+    void printingSelectorRequested();
+    void cardInfoRequested(const ExactCard &card);
 
 private:
     KeySignals searchKeySignals;

@@ -121,16 +121,6 @@ void TabDeckEditor::refreshShortcuts()
 }
 
 /**
- * @brief Displays the printing selector dock with the current card.
- */
-void TabDeckEditor::showPrintingSelector()
-{
-    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
-    printingSelectorDockWidget->printingSelector->updateDisplay();
-    printingSelectorDockWidget->setVisible(true);
-}
-
-/**
  * @brief Loads deck editor layout from settings or resets to default.
  */
 void TabDeckEditor::loadLayout()
