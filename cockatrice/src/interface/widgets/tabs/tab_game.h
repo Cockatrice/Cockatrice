@@ -51,6 +51,7 @@ class GameReplay;
 class LineEditCompleter;
 class QDockWidget;
 class QStackedWidget;
+class KeySignals;
 
 class TabGame : public Tab
 {
@@ -73,6 +74,7 @@ private:
     PhasesToolbar *phasesToolbar;
     GameScene *scene;
     GameView *gameView;
+    KeySignals *keySignals;
     QMap<int, TabbedDeckViewContainer *> deckViewContainers;
     QVBoxLayout *deckViewContainerLayout;
     QWidget *gamePlayAreaWidget, *deckViewContainerWidget;

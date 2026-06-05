@@ -5,6 +5,7 @@
 #include "../../game_graphics/zones/view_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../game_scene.h"
+#include "../keyboard_card_navigator.h"
 #include "../phase.h"
 #include "../player/player_actions.h"
 #include "../player/player_logic.h"
@@ -14,7 +15,10 @@
 
 #include <../../client/settings/card_counter_settings.h>
 #include <QApplication>
+#include <QCursor>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsView>
+#include <QKeyEvent>
 #include <QMenu>
 #include <QPainter>
 #include <libcockatrice/card/card_info.h>
@@ -498,6 +502,71 @@ void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
     event->accept();
+}
+
+void CardItem::keyPressEvent(QKeyEvent *event)
+{
+
+    auto *gameScene = static_cast<GameScene *>(scene());
+    KeyboardCardNavigator *navigator = gameScene ? gameScene->getCardNavigator() : nullptr;
+
+    if (event->key() == Qt::Key_Escape && navigator && navigator->isArrowModeActiveVar()) {
+        navigator->cancelArrowMode();
+        event->accept();
+        qWarning() << "Arrow mode cancelled from CardItem with id:" << id;
+        return;
+    }
+
+    if (event->key() == Qt::Key_A && (event->modifiers() & Qt::ShiftModifier) && getIsHovered()) {
+        qWarning() << "Starting arrow mode from CardItem with id:" << id;
+        if (navigator) {
+            qWarning() << "Navigator found, starting arrow mode.";
+            scene()->clearSelection();
+            setSelected(true);
+            navigator->startArrowMode(this);
+            event->accept();
+            return;
+        }
+    }
+
+    if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) && navigator &&
+        navigator->isArrowModeActiveVar() && getIsHovered()) {
+
+        qWarning() << "Finalizing arrow mode from CardItem with id:" << id;
+        navigator->createArrow(this);
+        navigator->cancelArrowMode();
+        event->accept();
+        return;
+    }
+
+    if ((event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) && isSelected() &&
+        SettingsCache::instance().getDoubleClickToPlay()) {
+        handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
+        event->accept();
+    } else if (event->key() == Qt::Key_Space && getIsHovered()) {
+        if (QWidget *popup = QApplication::activePopupWidget()) {
+            popup->close();
+            event->accept();
+            return;
+        }
+
+        if (owner != nullptr) {
+            scene()->clearSelection();
+            setSelected(true);
+            owner->getGame()->setActiveCard(this);
+            if (QMenu *cardMenu = owner->getPlayerMenu()->updateCardMenu(this)) {
+                QPointF scenePos = sceneBoundingRect().center();
+                if (!scene()->views().isEmpty()) {
+                    QGraphicsView *view = scene()->views().first();
+                    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePos));
+                    cardMenu->popup(screenPos);
+                }
+            }
+        }
+        event->accept();
+    } else {
+        AbstractCardItem::keyPressEvent(event);
+    }
 }
 
 bool CardItem::animationEvent()

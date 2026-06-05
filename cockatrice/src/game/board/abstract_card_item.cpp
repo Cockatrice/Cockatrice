@@ -8,6 +8,7 @@
 #include <QCursor>
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
+#include <QKeyEvent>
 #include <QPainter>
 #include <algorithm>
 #include <libcockatrice/card/database/card_database.h>
@@ -19,6 +20,7 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
+    setFlag(ItemIsFocusable);
     setCacheMode(DeviceCoordinateCache);
 
     connect(&SettingsCache::instance(), &SettingsCache::displayCardNamesChanged, this, [this] { update(); });
@@ -345,5 +347,22 @@ QVariant AbstractCardItem::itemChange(QGraphicsItem::GraphicsItemChange change, 
         return value;
     } else {
         return ArrowTarget::itemChange(change, value);
+    }
+}
+
+void AbstractCardItem::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+        if (event->modifiers() & Qt::AltModifier) {
+            emit cardShiftClicked(cardRef.name);
+        } else if (event->modifiers() & Qt::ControlModifier) {
+            setSelected(!isSelected());
+        } else if (!isSelected() && isHovered) {
+            scene()->clearSelection();
+            setSelected(true);
+        }
+        event->accept();
+    } else {
+        ArrowTarget::keyPressEvent(event);
     }
 }

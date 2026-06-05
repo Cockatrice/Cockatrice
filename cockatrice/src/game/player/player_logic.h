@@ -229,6 +229,8 @@ public:
 
     void setZoneId(int _zoneId);
 
+    void hoverFirstCardInHand();
+
 private:
     AbstractGame *game;
     PlayerInfo *playerInfo;

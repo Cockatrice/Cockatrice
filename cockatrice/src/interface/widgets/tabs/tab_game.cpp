@@ -14,6 +14,7 @@
 #include "../game/player/player_logic.h"
 #include "../game/replay.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
+#include "../interface/key_signals.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
@@ -863,6 +864,7 @@ PlayerLogic *TabGame::setActivePlayer(int id)
     }
 
     playerListWidget->setActivePlayer(id);
+    scene->setActivePlayer(player);
     QMapIterator<int, PlayerLogic *> i(game->getPlayerManager()->getPlayers());
     while (i.hasNext()) {
         i.next();
@@ -1153,6 +1155,14 @@ void TabGame::createPlayAreaWidget(bool bReplay)
     connect(scene, &GameScene::arrowDeletionRequested, game->getGameEventHandler(),
             &GameEventHandler::handleArrowDeletion);
     connect(game->getGameEventHandler(), &GameEventHandler::arrowDeleted, scene, &GameScene::deleteArrow);
+
+    keySignals = new KeySignals();
+    qApp->installEventFilter(keySignals);
+    connect(keySignals, &KeySignals::onLeftArrow, scene, &GameScene::handleLeftArrow);
+    connect(keySignals, &KeySignals::onRightArrow, scene, &GameScene::handleRightArrow);
+    connect(keySignals, &KeySignals::onUpArrow, scene, &GameScene::handleUpArrow);
+    connect(keySignals, &KeySignals::onDownArrow, scene, &GameScene::handleDownArrow);
+
     gameView = new GameView(scene);
 
     auto gamePlayAreaVBox = new QVBoxLayout;
