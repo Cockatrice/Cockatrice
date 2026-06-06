@@ -103,37 +103,21 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
 
     // Card counters
     for (int i = 0; i < 6; ++i) {
-        aAddCounter.append(makeAction(this, [actions, sel, i]() { actions->actAddCardCounter(sel(), i); }));
-        aRemoveCounter.append(makeAction(this, [actions, sel, i]() { actions->actRemoveCardCounter(sel(), i); }));
-        aSetCounter.append(makeAction(this, [actions, sel, i]() { actions->actSetCardCounter(sel(), i); }));
-    }
-
-    /*for (int i = 0; i < 6; ++i) {
         QColor color = SettingsCache::instance().cardCounters().color(i);
         QIcon circleIcon = createCircleIcon(color);
 
-        auto *tempAddCounter = new QAction(this);
-        tempAddCounter->setIconVisibleInMenu(true);
-        tempAddCounter->setIcon(circleIcon);
+        auto *addAction = makeAction(this, [actions, sel, i]() { actions->actAddCardCounter(sel(), i); });
+        addAction->setIcon(circleIcon);
+        aAddCounter.append(addAction);
 
-        auto *tempRemoveCounter = new QAction(this);
-        tempRemoveCounter->setIconVisibleInMenu(true);
-        tempRemoveCounter->setIcon(circleIcon);
+        auto *removeAction = makeAction(this, [actions, sel, i]() { actions->actRemoveCardCounter(sel(), i); });
+        removeAction->setIcon(circleIcon);
+        aRemoveCounter.append(removeAction);
 
-        auto *tempSetCounter = new QAction(this);
-        tempSetCounter->setIconVisibleInMenu(true);
-        tempSetCounter->setIcon(circleIcon);
-
-        aAddCounter.append(tempAddCounter);
-        aRemoveCounter.append(tempRemoveCounter);
-        aSetCounter.append(tempSetCounter);
-        connect(tempAddCounter, &QAction::triggered, playerActions,
-                [playerActions, i] { playerActions->actAddCardCounter(i); });
-        connect(tempRemoveCounter, &QAction::triggered, playerActions,
-                [playerActions, i] { playerActions->actRemoveCardCounter(i); });
-        connect(tempSetCounter, &QAction::triggered, playerActions,
-                [playerActions, i] { playerActions->actSetCardCounter(i); });
-    }*/
+        auto *setAction = makeAction(this, [actions, sel, i]() { actions->actSetCardCounter(sel(), i); });
+        setAction->setIcon(circleIcon);
+        aSetCounter.append(setAction);
+    }
 
     setShortcutsActive();
 
