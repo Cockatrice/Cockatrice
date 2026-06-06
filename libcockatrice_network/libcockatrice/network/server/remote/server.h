@@ -90,6 +90,10 @@ public:
     {
         return QString();
     }
+    virtual SessionEvent *getLoginSessionEvent() const
+    {
+        return nullptr;
+    }
     virtual QString getRequiredFeatures() const
     {
         return QString();

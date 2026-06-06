@@ -158,6 +158,7 @@ private:
     Servatrice_IslServer *islServer;
     mutable QMutex loginMessageMutex;
     QString loginMessage;
+    mutable QMutex shutdownStateMutex;
     QString dbPrefix;
     QMap<QString, bool> serverRequiredFeatureList;
     QString officialWarnings;
@@ -216,6 +217,7 @@ public:
         QMutexLocker locker(&loginMessageMutex);
         return loginMessage;
     }
+    SessionEvent *getLoginSessionEvent() const override;
     QString getRequiredFeatures() const override;
     QString getAuthenticationMethodString() const;
     QString getDBTypeString() const;
