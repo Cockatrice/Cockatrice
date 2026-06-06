@@ -203,6 +203,7 @@ void GameScene::removePlayer(PlayerLogic *player)
     }
     auto *view = playerViews.take(player->getPlayerInfo()->getId());
     removeItem(view);
+    view->deleteLater();
     rearrange();
 }
 
