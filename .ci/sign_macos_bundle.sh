@@ -22,23 +22,40 @@ fi
 
 APP_BUNDLE_PATH="$1"
 
-# Verify that the app bundle exists
+# Verify that app bundle exists
 if [[ ! -e "$APP_BUNDLE_PATH" ]]; then
   echo "::error file=$0::App bundle not found at: $APP_BUNDLE_PATH"
+  exit 1
 fi
 
-# Sign the app bundle
+# Configure keychain
+if [[ -n "$MACOS_CERTIFICATE" ]]; then
+  echo "::group::Import certificate"
+  echo "$MACOS_CERTIFICATE" | base64 --decode >"certificate.p12"
+  security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+  security default-keychain -s build.keychain
+  security set-keychain-settings -t 3600 -l build.keychain
+  security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+  security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
+  security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
+  echo "::endgroup::"
+else
+  echo "::error file=$0::MACOS_CERTIFICATE not set. Can not configure keychain."
+  exit 1
+fi
+
+# Sign app bundle
 if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
   echo "::group::Sign app bundle"
   security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
   /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "$APP_BUNDLE_PATH"
   echo "::endgroup::"
 else
-  echo "::error file=$0::MACOS_CERTIFICATE_NAME not set. Can not sign the app bundle."
+  echo "::error file=$0::MACOS_CERTIFICATE_NAME not set. Can not sign app bundle."
   exit 1
 fi
 
-# Notarize the app bundle
+# Notarize app bundle
 if [[ -n "$MACOS_NOTARIZATION_APPLE_ID" ]]; then
   echo "::group::Notarize app bundle"
   # Store the notarization credentials so that we can prevent a UI password dialog from blocking the CI
@@ -47,7 +64,7 @@ if [[ -n "$MACOS_NOTARIZATION_APPLE_ID" ]]; then
   # We can't notarize an app bundle directly, but we need to compress it as an archive.
   # Therefore, we create a zip file containing our app bundle, so that we can send it to the notarization service
   echo ""
-  echo "Creating temp notarization archive"
+  echo "Creating temp notarization archive..."
   ditto -c -k --keepParent "$APP_BUNDLE_PATH" "notarization.zip"
   
   # Here we send the notarization request to the Apple's Notarization service, waiting for the result.
@@ -63,14 +80,14 @@ if [[ -n "$MACOS_NOTARIZATION_APPLE_ID" ]]; then
   echo "Attach staple"
   xcrun stapler staple "$APP_BUNDLE_PATH"
   echo "::endgroup::"
-  
-  echo "::group::Cleanup"
-  # Cleanup keychain and files to avoid leaking credentials
-  echo "Deleting keychain"
-  security delete-keychain build.keychain
-  rm -f certificate.p12 notarization.zip
-  echo "::endgroup::"
 else
-  echo "::error file=$0::MACOS_NOTARIZATION_APPLE_ID not set. Can not notarize the app bundle."
+  echo "::error file=$0::MACOS_NOTARIZATION_APPLE_ID not set. Can not notarize app bundle."
   exit 1
 fi
+
+echo "::group::Cleanup"
+# Cleanup keychain and files to avoid leaking credentials
+echo "Deleting keychain"
+security delete-keychain build.keychain
+rm -f certificate.p12 notarization.zip
+echo "::endgroup::"
