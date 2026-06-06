@@ -59,7 +59,7 @@ endif()
 include_directories(${GTEST_INCLUDE_DIRS})
 target_link_libraries(dummy_test Threads::Threads ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(expression_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
-target_link_libraries(test_age_formatting Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(test_age_formatting libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
 target_link_libraries(
   password_hash_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
