@@ -115,7 +115,7 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
         removeAction->setIcon(circleIcon);
         aRemoveCounter.append(removeAction);
 
-        auto *setAction = makeAction(this, [actions, sel, i]() { actions->actRequestSetCardCounter(sel(), i); });
+        auto *setAction = makeAction(this, [actions, sel, i]() { actions->actRequestSetCardCounterDialog(sel(), i); });
         setAction->setIcon(circleIcon);
         aSetCounter.append(setAction);
     }
