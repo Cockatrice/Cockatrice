@@ -1,7 +1,7 @@
 name: Build Desktop
 
 permissions:
-  actions: write    # needed for ccache action to be able to delete gha caches
+  actions: write    # needed to delete entries in GHA cache (update ccache)
   attestations: write
   contents: write
   id-token: write
@@ -46,7 +46,7 @@ jobs:
       sha: ${{ steps.configure.outputs.sha }}
 
     steps:  
-      - name: Configure
+      - name: "Configure"
         id: configure
         shell: bash
         run: |
@@ -62,13 +62,13 @@ jobs:
           fi
           echo "sha=$sha" >>"$GITHUB_OUTPUT"
 
-      - name: Checkout
+      - name: "Checkout"
         if: steps.configure.outputs.tag != null
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          fetch-depth: 0    # fetch all history for all branches and tags
 
-      - name: Prepare release parameters
+      - name: "Prepare release parameters"
         id: prepare
         if: steps.configure.outputs.tag != null
         shell: bash
@@ -76,7 +76,7 @@ jobs:
           TAG: ${{ steps.configure.outputs.tag }}
         run: .ci/prep_release.sh
 
-      - name: Create release
+      - name: "Create release"
         if: steps.configure.outputs.tag != null
         id: create_release
         shell: bash
@@ -88,54 +88,63 @@ jobs:
           body_path: ${{ steps.prepare.outputs.body_path }}
           prerelease: ${{ steps.prepare.outputs.is_beta }}
         run: |
-          if [[ $prerelease == yes ]]; then
-            args="--prerelease"
-          fi
-          gh release create "$tag_name" --draft --verify-tag $args \
-              --target "$target" --title "$release_name" \
-              --notes-file "$body_path"
+          args=()
+          [[ $prerelease == yes ]] && args+=(--prerelease)
+          
+          gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
+            --target "$target" \
+            --title "$release_name" \
+            --notes-file "$body_path"
 
   build-linux:
     strategy:
       fail-fast: false
       matrix:
-        # These names correspond to the files in ".ci/$distro$version"
+        # The files in ".ci/$distro$version" correspond to the values given here
         include:
           - distro: Arch
-            package: skip    # We are packaged in Arch already
+            
             allow-failure: yes
+            package: skip    # We are packaged in Arch already
 
           - distro: Servatrice_Debian
             version: 12
+            
             package: DEB
-            test: skip
             server_only: yes
+            test: skip
 
           - distro: Debian
             version: 12
+            
             package: DEB
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Debian
             version: 13
+            
             package: DEB
 
           - distro: Fedora
             version: 43
+            
             package: RPM
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Fedora
             version: 44
+            
             package: RPM
 
           - distro: Ubuntu
             version: 24.04
+            
             package: DEB
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 26.04
+            
             package: DEB
 
     name: ${{ matrix.distro }} ${{ matrix.version }}
@@ -144,13 +153,11 @@ jobs:
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
-      NAME: ${{ matrix.distro }}${{ matrix.version }}
-      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}   # directory for caching docker image and ccache
-      # Cache size over the entire repo is 10Gi:
-      # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CCACHE_SIZE: 550M
+      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
+      CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CMAKE_GENERATOR: 'Ninja'
+      NAME: ${{ matrix.distro }}${{ matrix.version }}
 
     steps:
       - name: "Checkout"
@@ -162,8 +169,8 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{ env.CACHE }}
           key: ccache-${{ matrix.distro }}${{ matrix.version }}-${{ env.BRANCH_NAME }}
+          path: ${{ env.CACHE }}
           restore-keys: ccache-${{ matrix.distro }}${{ matrix.version }}-
 
       - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
@@ -176,7 +183,7 @@ jobs:
         run: |
           source .ci/docker.sh
           RUN --server --debug --test --ccache "$CCACHE_SIZE" \
-                  --cmake-generator "$CMAKE_GENERATOR"
+            --cmake-generator "$CMAKE_GENERATOR"
 
       - name: "Build release package"
         id: build
@@ -189,15 +196,12 @@ jobs:
         run: |
           source .ci/docker.sh
           args=()
-          if [[ $server_only == yes ]]; then
-            args+=(--no-client)
-          fi
-          if [[ $GITHUB_REF == "refs/heads/master" ]]; then
-            args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
-          fi
+          [[ $server_only == yes ]] && args+=(--no-client)
+          [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
           args+=(--suffix "$SUFFIX")
+          
           RUN --server --release --package "$package" "${args[@]}"
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
@@ -215,27 +219,27 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@v5
         with:
-          path: ${{ env.CACHE }}
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
+          path: ${{ env.CACHE }}
 
       - name: "Upload artifact"
         id: upload_artifact
         if: matrix.package != 'skip'
         uses: actions/upload-artifact@v7
         with:
-          path: ${{ steps.build.outputs.path }}
           archive: false
           if-no-files-found: error
+          path: ${{ steps.build.outputs.path }}
 
       - name: "Upload to release"
         id: upload_release
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
-          tag_name: ${{ needs.configure.outputs.tag }}
           asset_name: ${{ steps.build.outputs.fullname }}
           asset_path: ${{ steps.build.outputs.path }}
+          GH_TOKEN: ${{ github.token }}
+          tag_name: ${{ needs.configure.outputs.tag }}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
       - name: "Attest binary provenance"
@@ -243,8 +247,8 @@ jobs:
         if: steps.upload_release.outcome == 'success'
         uses: actions/attest@v4
         with:
-          subject-path: ${{ steps.build.outputs.path }}
           show-summary: false
+          subject-path: ${{ steps.build.outputs.path }}
 
       - name: "Verify binary attestation"
         if: steps.attestation.outcome == 'success'
@@ -261,73 +265,78 @@ jobs:
           - os: macOS
             target: 13
             runner: macos-15-intel
-            soc: Intel
-            xcode: "16.4"
-            type: Release
-            override_target: 13
+            
+            ccache_eviction_age: 7d
+            cmake_generator: Ninja
             make_package: 1
+            override_target: 13
             package_suffix: "-macOS13_Intel"
             qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cmake_generator: Ninja
+            soc: Intel
+            type: Release
             use_ccache: 1
-            ccache_eviction_age: 7d
+            xcode: "16.4"
 
           - os: macOS
             target: 14
             runner: macos-14
-            soc: Apple
-            xcode: "15.4"
-            type: Release
+            
+            ccache_eviction_age: 7d
+            cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS14"
             qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cmake_generator: Ninja
+            soc: Apple
+            type: Release
             use_ccache: 1
-            ccache_eviction_age: 7d
+            xcode: "15.4"
 
           - os: macOS
             target: 15
             runner: macos-15
-            soc: Apple
-            xcode: "16.4"
-            type: Release
+            
+            ccache_eviction_age: 7d
+            cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS15"
             qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cmake_generator: Ninja
+            soc: Apple
+            type: Release
             use_ccache: 1
-            ccache_eviction_age: 7d
+            xcode: "16.4"
 
           - os: macOS
             target: 15
             runner: macos-15
-            soc: Apple
-            xcode: "16.4"
-            type: Debug
+            
+            ccache_eviction_age: 7d
+            cmake_generator: Ninja
             qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cmake_generator: Ninja
+            soc: Apple
+            type: Debug
             use_ccache: 1
-            ccache_eviction_age: 7d
+            xcode: "16.4"
 
           - os: Windows
             target: 10
             runner: windows-2025
-            type: Release
+            
+            cmake_generator: "Visual Studio 17 2022"
+            cmake_generator_platform: x64
             make_package: 1
             package_suffix: "-Win10"
             qt_version: 6.11.0
             qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
-            cmake_generator: "Visual Studio 17 2022"
-            cmake_generator_platform: x64
+            type: Release
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure
@@ -335,9 +344,7 @@ jobs:
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
-      # Cache size over the entire repo is 10Gi:
-      # https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CCACHE_SIZE: 550M
+      CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
 
     steps:
       - name: "Checkout"
@@ -363,8 +370,8 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          path: ${{ env.CCACHE_DIR }}
           key: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
+          path: ${{ env.CCACHE_DIR }}
           restore-keys: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-
 
       - name: "Install aqtinstall"
@@ -381,8 +388,8 @@ jobs:
         id: restore_qt
         uses: actions/cache/restore@v5
         with:
-          path: ${{ github.workspace }}/Qt
           key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+          path: ${{ github.workspace }}/Qt
 
       # Using jurplel/install-qt-action to install Qt without using brew
       # Qt build using vcpkg either just fails or takes too long to build
@@ -390,11 +397,11 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
-          version: ${{ steps.resolve_qt_version.outputs.version }}
           arch: ${{ matrix.qt_arch }}
-          modules: ${{ matrix.qt_modules }}
           cache: false
           dir: ${{ github.workspace }}
+          modules: ${{ matrix.qt_modules }}
+          version: ${{ steps.resolve_qt_version.outputs.version }}
 
       - name: "[macOS] Create thin Qt libraries"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
@@ -404,19 +411,19 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: actions/cache/save@v5
         with:
-          path: ${{ github.workspace }}/Qt
           key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+          path: ${{ github.workspace }}/Qt
 
       - name: "[Windows] Install Qt ${{matrix.qt_version}}"
         if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
-          # qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
+          # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
-          version: ${{ steps.resolve_qt_version.outputs.version }}
           arch: ${{ matrix.qt_arch }}
-          modules: ${{ matrix.qt_modules }}
           cache: true
+          modules: ${{ matrix.qt_modules }}
+          version: ${{ steps.resolve_qt_version.outputs.version }}
 
       - name: "[Windows] Install NSIS"
         if: matrix.os == 'Windows'
@@ -429,27 +436,26 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      # uses environment variables, see compile.sh for more details
+      # Uses environment variables, see compile.sh for more details
       - name: "Build Cockatrice"
         id: build
         shell: bash
         env:
           BUILDTYPE: '${{ matrix.type }}'
-          MAKE_PACKAGE: '${{ matrix.make_package }}'
-          PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
+          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
-          USE_CCACHE: ${{ matrix.use_ccache }}
-          VCPKG_DISABLE_METRICS: 1
-          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-          # macOS-specific environment variables, will be ignored on Windows
-          MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
-          MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
-          MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
-          MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
+          MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
+          MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
+          MAKE_PACKAGE: '${{ matrix.make_package }}'
+          PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
-          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
+          USE_CCACHE: ${{ matrix.use_ccache }}
+          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
+          VCPKG_DISABLE_METRICS: 1
         run: .ci/compile.sh --server --test --vcpkg
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
@@ -467,8 +473,8 @@ jobs:
         if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v5
         with:
-          path: ${{ env.CCACHE_DIR }}
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
+          path: ${{ env.CCACHE_DIR }}
 
       - name: "[macOS] Sign app bundle"
         if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
@@ -487,8 +493,8 @@ jobs:
         if: matrix.os == 'macOS' && steps.sign_macos.outcome == 'success'
         env:
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
-          MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
           MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+          MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
         run: |
           if [[ -n "$MACOS_NOTARIZATION_APPLE_ID" ]]
           then
@@ -520,30 +526,30 @@ jobs:
         id: upload_artifact
         uses: actions/upload-artifact@v7
         with:
-          path: ${{ steps.build.outputs.path }}
           archive: false
           if-no-files-found: error
+          path: ${{ steps.build.outputs.path }}
 
       - name: "[Windows] Upload PDBs (Program Databases)"
         if: matrix.os == 'Windows' && github.ref_type != 'tag'
         uses: actions/upload-artifact@v7
         with:
+          if-no-files-found: error
           name: ${{ steps.build.outputs.name }}-PDBs
           path: |
             build/cockatrice/Release/*.pdb
             build/oracle/Release/*.pdb
             build/servatrice/Release/*.pdb
-          if-no-files-found: error
 
       - name: "Upload to release"
         if: needs.configure.outputs.tag != null && matrix.make_package == '1'
         id: upload_release
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
-          tag_name: ${{ needs.configure.outputs.tag }}
           asset_name: ${{ steps.build.outputs.fullname }}
           asset_path: ${{ steps.build.outputs.path }}
+          GH_TOKEN: ${{ github.token }}
+          tag_name: ${{ needs.configure.outputs.tag }}
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
       - name: "Attest binary provenance"
@@ -551,8 +557,8 @@ jobs:
         id: attestation
         uses: actions/attest@v4
         with:
-          subject-path: ${{ steps.build.outputs.path }}
           show-summary: false
+          subject-path: ${{ steps.build.outputs.path }}
 
       - name: "Verify binary attestation"
         if: steps.attestation.outcome == 'success'
