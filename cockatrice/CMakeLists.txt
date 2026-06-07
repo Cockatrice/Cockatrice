@@ -56,6 +56,7 @@ set(cockatrice_SOURCES
     src/filters/filter_tree_model.cpp
     src/filters/syntax_help.cpp
     src/game/abstract_game.cpp
+    src/game/arrow_registry.cpp
     src/game/board/abstract_card_drag_item.cpp
     src/game/board/abstract_card_item.cpp
     src/game/board/abstract_counter.cpp

@@ -697,6 +697,11 @@ void Server_Game::setActivePhase(int newPhase)
     sendGameEventContainer(prepareGameEvent(event, -1));
 }
 
+qint64 Server_Game::generateArrowId()
+{
+    return nextArrowId++;
+}
+
 void Server_Game::removeArrows(int newPhase, bool force)
 {
     QMutexLocker locker(&gameMutex);
