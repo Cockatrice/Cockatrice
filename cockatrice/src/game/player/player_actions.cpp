@@ -988,8 +988,11 @@ void PlayerActions::actCreateAllRelatedCards()
 
     if (relatedCards.length() == 1) {
         cardRelation = relatedCards.at(0);
+        lastRelatedCreationSucceeded = false; // reset before emit
         actRequestCreateRelatedFromRelationDialog(sourceCard, cardRelation);
-        ++tokensTypesCreated;
+        if (lastRelatedCreationSucceeded) {
+            ++tokensTypesCreated;
+        }
     } else {
         QList<CardRelation *> nonExcludedRelatedCards;
         QString dbName;
@@ -999,15 +1002,18 @@ void PlayerActions::actCreateAllRelatedCards()
             }
         }
         switch (nonExcludedRelatedCards.length()) {
-            case 1: // if nonExcludedRelatedCards == 1
+            case 1:
                 cardRelation = nonExcludedRelatedCards.at(0);
+                lastRelatedCreationSucceeded = false; // reset before emit
                 actRequestCreateRelatedFromRelationDialog(sourceCard, cardRelation);
-                ++tokensTypesCreated;
-
+                if (lastRelatedCreationSucceeded) {
+                    ++tokensTypesCreated;
+                }
                 break;
+
             // If all are marked "Exclude", then treat the situation as if none of them are.
             // We won't accept "garbage in, garbage out", here.
-            case 0: // else if nonExcludedRelatedCards == 0
+            case 0:
                 for (CardRelation *cardRelationAll : relatedCards) {
                     if (!cardRelationAll->getDoesAttach() && !cardRelationAll->getIsVariable()) {
                         dbName = cardRelationAll->getName();
@@ -1022,7 +1028,8 @@ void PlayerActions::actCreateAllRelatedCards()
                     }
                 }
                 break;
-            default: // else
+
+            default:
                 for (CardRelation *cardRelationNotExcluded : nonExcludedRelatedCards) {
                     if (!cardRelationNotExcluded->getDoesAttach() && !cardRelationNotExcluded->getIsVariable()) {
                         dbName = cardRelationNotExcluded->getName();
@@ -1056,33 +1063,36 @@ void PlayerActions::actRequestCreateRelatedFromRelationDialog(const CardItem *so
     emit requestCreateRelatedFromRelationDialog(sourceCard, cardRelation);
 }
 
-void PlayerActions::createRelatedFromRelation(const CardItem *sourceCard,
+bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard,
                                               const CardRelation *cardRelation,
                                               int variableCount)
 {
     if (sourceCard == nullptr || cardRelation == nullptr) {
-        return;
+        return false;
     }
 
     const QString dbName = cardRelation->getName();
     const bool persistent = cardRelation->getIsPersistent();
 
-    int count = 1;
-
+    // Variable relations always use DoesNotAttach, regardless of the count the user
+    // entered.
     if (cardRelation->getIsVariable()) {
-        count = variableCount;
-        if (count <= 0) {
-            return;
+        if (variableCount <= 0) {
+            return false;
         }
-    } else {
-        count = cardRelation->getDefaultCount();
+        for (int i = 0; i < variableCount; ++i) {
+            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
+        }
+        return true;
     }
+
+    const int count = cardRelation->getDefaultCount();
 
     if (count > 1) {
         for (int i = 0; i < count; ++i) {
             createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
         }
-        return;
+        return true;
     }
 
     CardRelationType attachType;
@@ -1101,11 +1111,15 @@ void PlayerActions::createRelatedFromRelation(const CardItem *sourceCard,
     }
 
     createCard(sourceCard, dbName, attachType, persistent);
-    return;
+    return true;
 }
 
 void PlayerActions::onRelatedCardCreated(const CardItem *sourceCard, const CardRelation *cardRelation)
 {
+    if (sourceCard == nullptr || cardRelation == nullptr) {
+        return;
+    }
+
     /*
      * If we make a token via "Token: TokenName"
      * then let's allow it to be created via "create another token"

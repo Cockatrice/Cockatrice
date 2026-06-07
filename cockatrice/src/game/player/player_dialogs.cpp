@@ -1,8 +1,8 @@
 #include "player_dialogs.h"
 
+#include "../../client/settings/card_counter_settings.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
 #include "../board/card_item.h"
-#include "../client/settings/card_counter_settings.h"
 #include "../dialogs/dlg_roll_dice.h"
 #include "../player/player_graphics_item.h"
 
@@ -190,6 +190,7 @@ void PlayerDialogs::onCreateRelatedFromRelationDialogRequested(const CardItem *s
                                                                const CardRelation *cardRelation)
 {
     if (sourceCard == nullptr || cardRelation == nullptr) {
+        playerActions->setLastRelatedCreationSucceeded(false);
         return;
     }
 
@@ -206,13 +207,18 @@ void PlayerDialogs::onCreateRelatedFromRelationDialogRequested(const CardItem *s
         emit requestDialogSemaphore(false);
 
         if (!ok) {
+            playerActions->setLastRelatedCreationSucceeded(false); // cancelled
             return;
         }
     }
 
-    playerActions->createRelatedFromRelation(sourceCard, cardRelation, variableCount);
+    const bool succeeded = playerActions->createRelatedFromRelation(sourceCard, cardRelation, variableCount);
 
-    playerActions->onRelatedCardCreated(sourceCard, cardRelation);
+    playerActions->setLastRelatedCreationSucceeded(succeeded);
+
+    if (succeeded) {
+        playerActions->onRelatedCardCreated(sourceCard, cardRelation); // only on confirmed success
+    }
 }
 
 void PlayerDialogs::onCreateTokenDialogRequested(const QStringList &predefinedTokens)

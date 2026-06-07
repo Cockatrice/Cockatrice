@@ -102,8 +102,12 @@ public slots:
     void actCreateToken(TokenInfo tokenToCreate);
     void actCreateAnotherToken();
     void actRequestCreateRelatedFromRelationDialog(const CardItem *sourceCard, const CardRelation *cardRelation);
-    void createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation, int variableCount);
+    bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation, int variableCount);
     void onRelatedCardCreated(const CardItem *sourceCard, const CardRelation *cardRelation);
+    void setLastRelatedCreationSucceeded(bool succeeded)
+    {
+        lastRelatedCreationSucceeded = succeeded;
+    }
     void actShuffle();
     void actRequestShuffleTopDialog();
     void actShuffleTop(int number);
@@ -229,6 +233,8 @@ private:
     FilterString movingCardsUntilFilter;
     int movingCardsUntilCounter = 0;
     MoveTopCardsUntilOptions movingCardsUntilOptions;
+
+    bool lastRelatedCreationSucceeded = false;
 
     void createCard(const CardItem *sourceCard,
                     const QString &dbCardName,
