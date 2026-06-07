@@ -253,7 +253,7 @@ void PlayerDialogs::onSetPTDialogRequested(const QString &oldPT)
                                 oldPT, &ok);
     emit requestDialogSemaphore(false);
 
-    if (!ok) { // player->clearCardsToDelete() ||
+    if (!ok || player->getLogic()->clearCardsToDelete()) {
         return;
     }
 
@@ -270,7 +270,7 @@ void PlayerDialogs::onSetAnnotationDialogRequested(const QString &oldAnnotation)
     dialog->setTextValue(oldAnnotation);
     bool ok = dialog->exec();
     emit requestDialogSemaphore(false);
-    if (!ok) { // player->clearCardsToDelete() ||
+    if (!ok || player->getLogic()->clearCardsToDelete()) {
         return;
     }
     QString annotation = dialog->textValue().left(MAX_NAME_LENGTH);
@@ -288,7 +288,7 @@ void PlayerDialogs::onSetCardCounterDialogRequested(int counterId, const QString
     int ok = dialog.exec();
 
     emit requestDialogSemaphore(false);
-    if (!ok) { // player->clearCardsToDelete() ||
+    if (!ok || player->getLogic()->clearCardsToDelete()) {
         return;
     }
     playerActions->actSetCardCounter(player->getGameScene()->selectedCards(), counterId, dialog.textValue());
