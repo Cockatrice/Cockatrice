@@ -180,6 +180,7 @@ public:
     void connectToGameEventHandler();
     void connectMessageLogToGameEventHandler();
     void connectPlayerListToGameEventHandler();
+
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
     ~TabGame() override;
     void retranslateUi() override;

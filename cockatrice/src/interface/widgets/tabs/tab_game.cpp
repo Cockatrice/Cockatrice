@@ -1169,6 +1169,11 @@ void TabGame::createReplayDock(GameReplay *replay)
                             QDockWidget::DockWidgetMovable);
     replayDock->setWidget(replayManager);
     replayDock->setFloating(false);
+
+    connect(replayManager, &ReplayManager::eventReplayed, game->getGameEventHandler(),
+            [this](auto event, auto options) {
+                game->getGameEventHandler()->processGameEventContainer(event, nullptr, options);
+            });
 }
 
 void TabGame::createDeckViewContainerWidget(bool bReplay)
