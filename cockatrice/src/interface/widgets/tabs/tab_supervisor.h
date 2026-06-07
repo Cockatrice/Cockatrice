@@ -145,7 +145,7 @@ public:
         return userInfo;
     }
     [[nodiscard]] AbstractClient *getClient() const;
-    [[nodiscard]] const UserListManager *getUserListManager() const
+    [[nodiscard]] UserListManager *getUserListManager() const
     {
         return userListManager;
     }

@@ -47,15 +47,17 @@ public:
     explicit UserListManager(AbstractClient *_client, QObject *parent = nullptr);
     ~UserListManager() override;
 
-    [[nodiscard]] QMap<QString, ServerInfo_User> getAllUsersList() const
+    [[nodiscard]] const QMap<QString, ServerInfo_User> &getAllUsersList() const
     {
         return onlineUsers;
     }
-    [[nodiscard]] QMap<QString, ServerInfo_User> getBuddyList() const
+
+    [[nodiscard]] const QMap<QString, ServerInfo_User> &getBuddyList() const
     {
         return buddyUsers;
     }
-    [[nodiscard]] QMap<QString, ServerInfo_User> getIgnoreList() const
+
+    [[nodiscard]] const QMap<QString, ServerInfo_User> &getIgnoreList() const
     {
         return ignoredUsers;
     }
@@ -73,6 +75,7 @@ public slots:
 signals:
     void userLeft(const QString &userName);
     void userJoined(const ServerInfo_User &userInfo);
+    void listsChanged();
 };
 
 #endif // COCKATRICE_USER_LIST_MANAGER_H

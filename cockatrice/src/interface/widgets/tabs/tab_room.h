@@ -56,7 +56,9 @@ private:
     QMap<int, QString> gameTypes;
 
     GameSelector *gameSelector;
+    UserListWidget *friendsList;
     UserListWidget *userList;
+    UserListWidget *ignoreList;
     const UserListProxy *userListProxy;
     ChatView *chatView;
     QLabel *sayLabel;

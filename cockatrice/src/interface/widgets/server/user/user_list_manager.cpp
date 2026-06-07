@@ -42,6 +42,7 @@ void UserListManager::handleDisconnect()
 
     delete ownUserInfo;
     ownUserInfo = nullptr;
+    emit listsChanged();
 }
 
 void UserListManager::setOwnUserInfo(const ServerInfo_User &userInfo)
@@ -66,6 +67,7 @@ void UserListManager::processListUsersResponse(const Response &response)
         const QString &userName = QString::fromStdString(info.name());
         onlineUsers.insert(userName, info);
     }
+    emit listsChanged();
 }
 
 void UserListManager::processUserJoinedEvent(const Event_UserJoined &event)
@@ -73,12 +75,14 @@ void UserListManager::processUserJoinedEvent(const Event_UserJoined &event)
     const auto &info = event.user_info();
     const QString &userName = QString::fromStdString(info.name());
     onlineUsers.insert(userName, info);
+    emit listsChanged();
 }
 
 void UserListManager::processUserLeftEvent(const Event_UserLeft &event)
 {
     const auto &userName = QString::fromStdString(event.name());
     onlineUsers.remove(userName);
+    emit listsChanged();
 }
 
 void UserListManager::buddyListReceived(const QList<ServerInfo_User> &_buddyList)
@@ -86,6 +90,7 @@ void UserListManager::buddyListReceived(const QList<ServerInfo_User> &_buddyList
     for (const auto &user : _buddyList) {
         const auto &userName = QString::fromStdString(user.name());
         buddyUsers.insert(userName, user);
+        emit listsChanged();
     }
 }
 
@@ -94,6 +99,7 @@ void UserListManager::ignoreListReceived(const QList<ServerInfo_User> &_ignoreLi
     for (const auto &user : _ignoreList) {
         const auto &userName = QString::fromStdString(user.name());
         ignoredUsers.insert(userName, user);
+        emit listsChanged();
     }
 }
 
@@ -114,6 +120,7 @@ void UserListManager::processAddToListEvent(const Event_AddToList &event)
     }
 
     userMap->insert(userName, user);
+    emit listsChanged();
 }
 
 void UserListManager::processRemoveFromListEvent(const Event_RemoveFromList &event)
@@ -131,6 +138,7 @@ void UserListManager::processRemoveFromListEvent(const Event_RemoveFromList &eve
     }
 
     userMap->remove(userName);
+    emit listsChanged();
 }
 
 bool UserListManager::isOwnUserRegistered() const
