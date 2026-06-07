@@ -206,6 +206,7 @@ public slots:
     void addArrow(QSharedPointer<ArrowData> data);
     void deleteArrow(int playerId, int arrowId);
     void clearArrowsForPlayer(int playerId);
+    void clearArrowsForPlayerLocally(int playerId);
 
     /// Queues up arrow deletion but doesn't directly modify the scene
     void requestArrowDeletion(int playerId, int arrowId);

@@ -96,8 +96,8 @@ void GameScene::addPlayer(PlayerLogic *player)
     connect(player, &PlayerLogic::arrowDeleted, this, &GameScene::deleteArrow);
     connect(player, &PlayerLogic::arrowCreateRequested, this, &GameScene::addArrow);
     connect(player, &PlayerLogic::arrowDeleteRequested, this, &GameScene::requestArrowDeletion);
-    connect(player, &PlayerLogic::arrowsCleared, this,
-            [this, id = player->getPlayerInfo()->getId()]() { clearArrowsForPlayer(id); });
+    connect(player, &PlayerLogic::arrowsClearedLocally, this,
+            [this, id = player->getPlayerInfo()->getId()]() { clearArrowsForPlayerLocally(id); });
 
     connect(player->getPlayerEventHandler(), &PlayerEventHandler::cardZoneChanged, this, &GameScene::onCardZoneChanged);
 
@@ -438,6 +438,13 @@ void GameScene::clearArrowsForPlayer(int playerId)
 {
     for (int arrowId : arrowRegistry.idsForPlayer(playerId)) {
         emit requestArrowDeletion(playerId, arrowId);
+    }
+}
+
+void GameScene::clearArrowsForPlayerLocally(int playerId)
+{
+    for (int arrowId : arrowRegistry.idsForPlayer(playerId)) {
+        arrowRegistry.take(playerId, arrowId)->delArrow();
     }
 }
 

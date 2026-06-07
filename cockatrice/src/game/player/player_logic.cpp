@@ -74,7 +74,7 @@ PlayerLogic::~PlayerLogic()
 
 void PlayerLogic::clear()
 {
-    emit arrowsCleared();
+    emit arrowsClearedLocally();
 
     QMapIterator<QString, CardZoneLogic *> i(zones);
     while (i.hasNext()) {
@@ -115,7 +115,7 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                                       /* HandZone */
                                       ZoneNames::HAND};
     clearCounters();
-    emit arrowsCleared();
+    emit arrowsClearedLocally();
 
     QMutableMapIterator<QString, CardZoneLogic *> zoneIt(zones);
     while (zoneIt.hasNext()) {
