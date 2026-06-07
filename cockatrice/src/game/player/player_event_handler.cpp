@@ -92,26 +92,24 @@ void PlayerEventHandler::eventRollDie(const Event_RollDie &event)
 
 void PlayerEventHandler::eventCreateArrow(const Event_CreateArrow &event)
 {
-    const ArrowData data = ArrowData::fromProto(event.arrow_info());
+    auto data = QSharedPointer<ArrowData>::create(ArrowData::fromProto(
+        event.arrow_info(), player->getPlayerInfo()->getId(), player->getPlayerInfo()->getLocal()));
 
-    // Resolve names for logging
     const auto &playerList = player->getGame()->getPlayerManager()->getPlayers();
-    PlayerLogic *startPlayer = playerList.value(data.startPlayerId);
-    PlayerLogic *targetPlayer = playerList.value(data.targetPlayerId);
+    PlayerLogic *startPlayer = playerList.value(data->startPlayerId);
+    PlayerLogic *targetPlayer = playerList.value(data->targetPlayerId);
 
     QString startCardName, targetCardName;
     if (startPlayer) {
-        auto *zone = startPlayer->getZones().value(data.startZone);
-        if (zone) {
-            if (auto *card = zone->getCard(data.startCardId)) {
+        if (auto *zone = startPlayer->getZones().value(data->startZone)) {
+            if (auto *card = zone->getCard(data->startCardId)) {
                 startCardName = card->getName();
             }
         }
     }
-    if (!data.isPlayerTargeted() && targetPlayer) {
-        auto *zone = targetPlayer->getZones().value(data.targetZone);
-        if (zone) {
-            if (auto *card = zone->getCard(data.targetCardId)) {
+    if (!data->isPlayerTargeted() && targetPlayer) {
+        if (auto *zone = targetPlayer->getZones().value(data->targetZone)) {
+            if (auto *card = zone->getCard(data->targetCardId)) {
                 targetCardName = card->getName();
             }
         }
@@ -119,16 +117,15 @@ void PlayerEventHandler::eventCreateArrow(const Event_CreateArrow &event)
 
     emit player->arrowCreateRequested(data);
 
-    const bool validForLogging = !startCardName.isEmpty() && (data.isPlayerTargeted() || !targetCardName.isEmpty());
-
-    if (startPlayer && targetPlayer && validForLogging) {
-        emit logCreateArrow(player, startPlayer, startCardName, targetPlayer, targetCardName, data.isPlayerTargeted());
+    if (startPlayer && targetPlayer && !startCardName.isEmpty() &&
+        (data->isPlayerTargeted() || !targetCardName.isEmpty())) {
+        emit logCreateArrow(player, startPlayer, startCardName, targetPlayer, targetCardName, data->isPlayerTargeted());
     }
 }
 
 void PlayerEventHandler::eventDeleteArrow(const Event_DeleteArrow &event)
 {
-    emit player->arrowDeleted(event.arrow_id());
+    emit player->arrowDeleted(player->getPlayerInfo()->getId(), event.arrow_id());
 }
 
 void PlayerEventHandler::eventCreateToken(const Event_CreateToken &event)

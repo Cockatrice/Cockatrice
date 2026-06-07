@@ -78,10 +78,10 @@ signals:
     void clearCustomZonesMenu();
     void addViewCustomZoneActionToCustomZoneMenu(QString zoneName);
     void resetTopCardMenuActions();
-    void arrowCreateRequested(ArrowData data);
-    void arrowDeleteRequested(int arrowId);
-    void arrowDeleted(int arrowId);
-    void arrowsCleared(); // fires on clear() and processPlayerInfo
+    void arrowCreateRequested(QSharedPointer<ArrowData> data);
+    void arrowDeleteRequested(int creatorId, int arrowId);
+    void arrowDeleted(int creatorId, int arrowId);
+    void arrowsClearedLocally(); // fires on clear() and processPlayerInfo
 
 public slots:
     void setActive(bool _active);

@@ -75,7 +75,7 @@ PlayerLogic::~PlayerLogic()
 
 void PlayerLogic::clear()
 {
-    emit arrowsCleared();
+    emit arrowsClearedLocally();
 
     QMapIterator<QString, CardZoneLogic *> i(zones);
     while (i.hasNext()) {
@@ -116,7 +116,7 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                                       /* HandZone */
                                       ZoneNames::HAND};
     clearCounters();
-    emit arrowsCleared();
+    emit arrowsClearedLocally();
 
     QMutableMapIterator<QString, CardZoneLogic *> zoneIt(zones);
     while (zoneIt.hasNext()) {
@@ -232,7 +232,8 @@ void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
 
     const int arrowListSize = info.arrow_list_size();
     for (int i = 0; i < arrowListSize; ++i) {
-        emit arrowCreateRequested(ArrowData::fromProto(info.arrow_list(i)));
+        emit arrowCreateRequested(QSharedPointer<ArrowData>::create(
+            ArrowData::fromProto(info.arrow_list(i), getPlayerInfo()->getId(), getPlayerInfo()->getLocal())));
     }
 }
 

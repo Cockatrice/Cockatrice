@@ -49,6 +49,7 @@ class Server_Game : public QObject
 private:
     Server_Room *room;
     int nextPlayerId;
+    std::atomic<qint64> nextArrowId = 1;
     int hostId;
     ServerInfo_User *creatorInfo;
     QMap<int, Server_AbstractParticipant *> participants;
@@ -196,6 +197,7 @@ public:
     }
     void setActivePlayer(int newPlayer);
     void setActivePhase(int newPhase);
+    qint64 generateArrowId();
     void removeArrows(int newPhase, bool force = false);
     void nextTurn();
     int getSecondsElapsed() const
