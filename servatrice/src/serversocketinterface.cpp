@@ -31,6 +31,8 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QHostAddress>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLoggingCategory>
 #include <QRegularExpression>
 #include <QSqlError>
@@ -59,8 +61,10 @@
 #include <libcockatrice/protocol/pb/event_replay_added.pb.h>
 #include <libcockatrice/protocol/pb/event_server_identification.pb.h>
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>
+#include <libcockatrice/protocol/pb/event_user_joined.pb.h>
 #include <libcockatrice/protocol/pb/event_user_message.pb.h>
 #include <libcockatrice/protocol/pb/response_ban_history.pb.h>
+#include <libcockatrice/protocol/pb/response_card_art_rule_entry.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
@@ -212,6 +216,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdAccountEdit(cmd.GetExtension(Command_AccountEdit::ext), rc);
         case SessionCommand::ACCOUNT_IMAGE:
             return cmdAccountImage(cmd.GetExtension(Command_AccountImage::ext), rc);
+        case SessionCommand::SET_CARD_ART_PARAMS:
+            return cmdSetCardArtParams(cmd.GetExtension(Command_SetCardArtParams::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD:
             return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
         case SessionCommand::REQUEST_PASSWORD_SALT:
@@ -247,6 +253,12 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdGetAdminNotes(cmd.GetExtension(Command_GetAdminNotes::ext), rc);
         case ModeratorCommand::UPDATE_ADMIN_NOTES:
             return cmdUpdateAdminNotes(cmd.GetExtension(Command_UpdateAdminNotes::ext), rc);
+        case ModeratorCommand::ADD_CARD_ART_RULE:
+            return cmdAddCardArtRule(cmd.GetExtension((Command_AddCardArtRule::ext)), rc);
+        case ModeratorCommand::REMOVE_CARD_ART_RULE:
+            return cmdRemoveCardArtRule(cmd.GetExtension((Command_RemoveCardArtRule::ext)), rc);
+        case ModeratorCommand::LIST_CARD_ART_RULES:
+            return cmdListCardArtRules(cmd.GetExtension((Command_ListCardArtRules::ext)), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -1562,6 +1574,146 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
     }
 
     userInfo->set_avatar_bmp(cmd.image().c_str(), length);
+    return Response::RespOk;
+}
+
+bool AbstractServerSocketInterface::isCardNameAllowed(const QString &cardName)
+{
+    QSqlQuery *q =
+        sqlInterface->prepareQuery("SELECT mode FROM cockatrice_card_art_name_rules WHERE card_name = :name");
+
+    q->bindValue(":name", cardName);
+
+    if (!sqlInterface->execSqlQuery(q)) {
+        return true; // fail-open to avoid breaking server
+    }
+
+    if (!q->next()) {
+        return true; // default allow
+    }
+
+    return q->value(0).toString() != "DENY";
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const Command_SetCardArtParams &cmd,
+                                                                          ResponseContainer & /* rc */)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    const QString cardName = QString::fromStdString(cmd.card_name());
+
+    if (cardName.isEmpty()) {
+        // Removal path
+        QSqlQuery *q = sqlInterface->prepareQuery("UPDATE {prefix}_users SET card_art_params = NULL WHERE id = :id");
+        q->bindValue(":id", userInfo->id());
+        if (!sqlInterface->execSqlQuery(q)) {
+            return Response::RespInternalError;
+        }
+        userInfo->clear_card_art_params();
+        server->broadcastUserInfoUpdate(this);
+        return Response::RespOk;
+    }
+
+    if (!isCardNameAllowed(cardName)) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    // Clamp everything to sane ranges server-side so a malicious client
+    // can't store garbage that breaks other clients' rendering.
+    const double marginPctL = qBound(0.0, cmd.margin_pct_l(), 0.95);
+    const double marginPctR = qBound(0.0, cmd.margin_pct_r(), 0.95);
+    const double verticalOffset = qBound(0.0, cmd.vertical_offset(), 1.0);
+    const double zoom = qBound(0.1, cmd.zoom(), 4.0);
+
+    QJsonObject obj;
+    obj["card_name"] = cardName;
+    obj["marginPctL"] = marginPctL;
+    obj["marginPctR"] = marginPctR;
+    obj["verticalOffset"] = verticalOffset;
+    obj["zoom"] = zoom;
+    const QString json = QString::fromUtf8(QJsonDocument(obj).toJson(QJsonDocument::Compact));
+
+    QSqlQuery *query = sqlInterface->prepareQuery("update {prefix}_users set card_art_params=:params where id=:id");
+    query->bindValue(":params", json);
+    query->bindValue(":id", userInfo->id());
+    if (!sqlInterface->execSqlQuery(query)) {
+        return Response::RespInternalError;
+    }
+
+    // Keep the in-memory userInfo in sync
+    auto *cap = userInfo->mutable_card_art_params();
+    cap->set_card_name(cmd.card_name());
+    cap->set_margin_pct_l(marginPctL);
+    cap->set_margin_pct_r(marginPctR);
+    cap->set_vertical_offset(verticalOffset);
+    cap->set_zoom(zoom);
+
+    const QString name = QString::fromStdString(userInfo->name());
+    server->broadcastUserInfoUpdate(this);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdAddCardArtRule(const Command_AddCardArtRule &cmd,
+                                                                        ResponseContainer &)
+{
+    const QString cardName = QString::fromStdString(cmd.card_name());
+    const QString mode = QString::fromStdString(cmd.mode());
+
+    QSqlQuery *q = sqlInterface->prepareQuery("INSERT INTO cockatrice_card_art_name_rules "
+                                              "(card_name, mode, reason, created_by) "
+                                              "VALUES (:name, :mode, :reason, :uid) "
+                                              "ON DUPLICATE KEY UPDATE mode=:mode2, reason=:reason2");
+
+    q->bindValue(":name", cardName);
+    q->bindValue(":mode", mode);
+    q->bindValue(":mode2", mode);
+    q->bindValue(":reason", QString::fromStdString(cmd.reason()));
+    q->bindValue(":reason2", QString::fromStdString(cmd.reason()));
+    q->bindValue(":uid", userInfo->id());
+
+    if (!sqlInterface->execSqlQuery(q)) {
+        return Response::RespInternalError;
+    }
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdRemoveCardArtRule(const Command_RemoveCardArtRule &cmd,
+                                                                           ResponseContainer &)
+{
+    QSqlQuery *q = sqlInterface->prepareQuery("DELETE FROM cockatrice_card_art_name_rules WHERE card_name=:name");
+
+    q->bindValue(":name", QString::fromStdString(cmd.card_name()));
+
+    if (!sqlInterface->execSqlQuery(q)) {
+        return Response::RespInternalError;
+    }
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdListCardArtRules(const Command_ListCardArtRules &,
+                                                                          ResponseContainer &rc)
+{
+    QSqlQuery *q = sqlInterface->prepareQuery("SELECT card_name, mode, reason FROM cockatrice_card_art_name_rules");
+
+    if (!sqlInterface->execSqlQuery(q)) {
+        return Response::RespInternalError;
+    }
+
+    auto *re = new Response_ListCardArtRules;
+
+    while (q->next()) {
+        auto *entry = re->add_entries();
+        entry->set_card_name(q->value(0).toString().toStdString());
+        entry->set_mode(q->value(1).toString().toStdString());
+        entry->set_reason(q->value(2).toString().toStdString());
+    }
+
+    rc.setResponseExtension(re);
     return Response::RespOk;
 }
 

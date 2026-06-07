@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QWidget>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/utility/days_years_between.h>
 
@@ -25,9 +26,11 @@ private:
     bool editable;
     QLabel avatarPic, userLevelIcon, nameLabel, realNameLabel1, realNameLabel2, countryLabel1, countryLabel2,
         countryLabel3, userLevelLabel1, userLevelLabel2, accountAgeLabel1, accountAgeLabel2;
-    QPushButton editButton, passwordButton, avatarButton;
+    QPushButton editButton, passwordButton, avatarButton, bannerCardButton;
     QPixmap avatarPixmap;
     bool hasAvatar;
+    ServerInfo_User currentUserInfo;
+    bool hasUserInfo = false;
     UserLevelFlags userLevel;
     ServerInfo_User::PawnColorsOverride pawnColors;
     QString privLevel;
@@ -47,6 +50,7 @@ private slots:
     void actEditInternal(const Response &r);
     void actPassword();
     void actAvatar();
+    void actBannerCard();
 public slots:
     void updateInfo(const ServerInfo_User &user);
     void updateInfo(const QString &userName);
