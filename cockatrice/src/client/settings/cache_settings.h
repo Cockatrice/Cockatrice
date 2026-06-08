@@ -1112,7 +1112,7 @@ public slots:
     void setAutoRotateSidewaysLayoutCards(QT_STATE_CHANGED_T _autoRotateSidewaysLayoutCards);
     void setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab);
     void setRewindBufferingMs(int _rewindBufferingMs);
-    void setStyleUserList(Qt::CheckState _styleUserList);
+    void setStyleUserList(QT_STATE_CHANGED_T _styleUserList);
     void setChatMention(QT_STATE_CHANGED_T _chatMention);
     void setChatMentionCompleter(QT_STATE_CHANGED_T _chatMentionCompleter);
     void setChatMentionForeground(QT_STATE_CHANGED_T _chatMentionForeground);
