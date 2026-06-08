@@ -310,8 +310,8 @@ SettingsCache::SettingsCache()
     closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
     focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
 
-    showDragSelectionTally = settings->value("interface/showlassoselectiontally", true).toBool();
-    showTotalSelectionTally = settings->value("interface/showpersistentselectiontally", true).toBool();
+    showDragSelectionCount = settings->value("interface/showlassoselectioncount", true).toBool();
+    showTotalSelectionCount = settings->value("interface/showpersistentselectioncount", true).toBool();
     showSubtypeSelectionTally = settings->value("interface/showsubtypeselectiontally", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
@@ -1361,16 +1361,16 @@ void SettingsCache::setRoundCardCorners(bool _roundCardCorners)
     emit roundCardCornersChanged(roundCardCorners);
 }
 
-void SettingsCache::setShowDragSelectionTally(QT_STATE_CHANGED_T _showDragSelectionTally)
+void SettingsCache::setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount)
 {
-    showDragSelectionTally = static_cast<bool>(_showDragSelectionTally);
-    settings->setValue("interface/showlassoselectiontally", showDragSelectionTally);
+    showDragSelectionCount = static_cast<bool>(_showDragSelectionCount);
+    settings->setValue("interface/showlassoselectioncount", showDragSelectionCount);
 }
 
-void SettingsCache::setShowTotalSelectionTally(QT_STATE_CHANGED_T _showTotalSelectionTally)
+void SettingsCache::setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSelectionCount)
 {
-    showTotalSelectionTally = static_cast<bool>(_showTotalSelectionTally);
-    settings->setValue("interface/showpersistentselectiontally", showTotalSelectionTally);
+    showTotalSelectionCount = static_cast<bool>(_showTotalSelectionCount);
+    settings->setValue("interface/showpersistentselectioncount", showTotalSelectionCount);
 }
 
 void SettingsCache::setShowSubtypeSelectionTally(QT_STATE_CHANGED_T _showSubtypeSelectionTally)
