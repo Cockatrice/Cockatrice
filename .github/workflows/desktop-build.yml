@@ -2,9 +2,9 @@ name: Build Desktop
 
 permissions:
   actions: write    # needed to delete entries in GHA cache (update ccache)
-  attestations: write
+  attestations: write    # needed to persist the attestation.
   contents: write
-  id-token: write
+  id-token: write    # needed for signing certificate in attestation
 
 on:
   push:
@@ -19,6 +19,7 @@ on:
       - '.github/workflows/desktop-build.yml'
       - 'CMakeLists.txt'
       - 'vcpkg.json'
+      - 'vcpkg'    # needed to match submodule bumps (gitlink)
     tags:
       - '*'
   pull_request:
@@ -31,6 +32,7 @@ on:
       - '.github/workflows/desktop-build.yml'
       - 'CMakeLists.txt'
       - 'vcpkg.json'
+      - 'vcpkg'    # needed to match submodule bumps (gitlink)
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
@@ -414,7 +416,7 @@ jobs:
           key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
           path: ${{ github.workspace }}/Qt
 
-      - name: "[Windows] Install Qt ${{matrix.qt_version}}"
+      - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
