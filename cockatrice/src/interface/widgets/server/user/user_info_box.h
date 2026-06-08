@@ -40,6 +40,7 @@ private:
 public:
     UserInfoBox(AbstractClient *_client, bool editable, QWidget *parent = nullptr, Qt::WindowFlags flags = {});
     void retranslateUi();
+
 private slots:
     void processResponse(const Response &r);
     void processEditResponse(const Response &r);
