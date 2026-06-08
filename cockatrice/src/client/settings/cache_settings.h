@@ -351,8 +351,8 @@ private:
     bool isPortableBuild;
     bool roundCardCorners;
     bool showStatusBar;
-    bool showDragSelectionTally;
-    bool showTotalSelectionTally;
+    bool showDragSelectionCount;
+    bool showTotalSelectionCount;
     bool showSubtypeSelectionTally;
 
 public:
@@ -469,13 +469,13 @@ public:
     {
         return showStatusBar;
     }
-    [[nodiscard]] bool getShowDragSelectionTally() const
+    [[nodiscard]] bool getShowDragSelectionCount() const
     {
-        return showDragSelectionTally;
+        return showDragSelectionCount;
     }
-    [[nodiscard]] bool getShowTotalSelectionTally() const
+    [[nodiscard]] bool getShowTotalSelectionCount() const
     {
-        return showTotalSelectionTally;
+        return showTotalSelectionCount;
     }
     [[nodiscard]] bool getShowSubtypeSelectionTally() const
     {
@@ -1172,8 +1172,8 @@ public slots:
     void setUpdateReleaseChannelIndex(int value);
     void setMaxFontSize(int _max);
     void setRoundCardCorners(bool _roundCardCorners);
-    void setShowDragSelectionTally(QT_STATE_CHANGED_T _showDragSelectionTally);
-    void setShowTotalSelectionTally(QT_STATE_CHANGED_T _showTotalSelectionTally);
+    void setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount);
+    void setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSelectionCount);
     void setShowSubtypeSelectionTally(QT_STATE_CHANGED_T _showSubtypeSelectionTally);
 };
 #endif

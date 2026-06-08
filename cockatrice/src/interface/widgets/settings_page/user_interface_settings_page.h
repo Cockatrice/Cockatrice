@@ -27,8 +27,8 @@ private:
     QCheckBox closeEmptyCardViewCheckBox;
     QCheckBox focusCardViewSearchBarCheckBox;
     QCheckBox annotateTokensCheckBox;
-    QCheckBox showDragSelectionTallyCheckBox;
-    QCheckBox showTotalSelectionTallyCheckBox;
+    QCheckBox showDragSelectionCountCheckBox;
+    QCheckBox showTotalSelectionCountCheckBox;
     QCheckBox showSubtypeSelectionTallyCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox keepGameChatFocusCheckBox;
