@@ -1,14 +1,14 @@
 name: Update Translations
 
 on:
-  workflow_dispatch:
-  schedule:
-    # runs in the middle of each month starting a quarter (UTC) = two weeks after new strings are built
-    - cron: '0 0 15 1,4,7,10 *'
   pull_request:
     paths:
       - '.tx/**'
       - '.github/workflows/translations-pull.yml'
+  schedule:
+    # Runs in the middle of each month starting a quarter (UTC) = two weeks after new strings are built
+    - cron: '0 0 15 1,4,7,10 *'
+  workflow_dispatch:
 
 jobs:
   translations:
@@ -19,18 +19,18 @@ jobs:
     runs-on: ubuntu-slim
 
     steps:
-      - name: Checkout repo
+      - name: "Checkout repo"
         uses: actions/checkout@v6
 
-      - name: Pull translated strings from Transifex
+      - name: "Pull translated strings from Transifex"
         uses: transifex/cli-action@v2
         with:
-          # used config file: https://github.com/Cockatrice/Cockatrice/blob/master/.tx/config
-          # https://github.com/transifex/cli#pulling-files-from-transifex
-          token: ${{ secrets.TX_TOKEN }}
+          # Used config file: https://github.com/Cockatrice/Cockatrice/blob/master/.tx/config
+          # Docs: https://github.com/transifex/cli#pulling-files-from-transifex
           args: pull --force --all
+          token: ${{ secrets.TX_TOKEN }}
 
-      - name: Create pull request
+      - name: "Create pull request"
         if: github.event_name != 'pull_request'
         id: create_pr
         uses: peter-evans/create-pull-request@v8
@@ -38,12 +38,7 @@ jobs:
           add-paths: |
             cockatrice/translations/*.ts
             oracle/translations/*.ts
-          commit-message: Update translation files
-          # author is the owner of the commit
-          author: github-actions <github-actions@github.com>
-          branch: ci-update_translations
-          delete-branch: true
-          title: 'Update translations'
+          author: github-actions <github-actions@github.com>    # owner of the commit
           body: |
             Pulled all translated strings from [Transifex][1].
             
@@ -53,12 +48,16 @@ jobs:
             
             [1]: https://explore.transifex.com/cockatrice/cockatrice/
             [2]: https://github.com/Cockatrice/Cockatrice/actions/workflows/translations-pull.yml?query=branch%3Amaster
+          branch: ci-update_translations
+          commit-message: Update translation files
+          delete-branch: true
+          draft: false
           labels: |
             CI
             Translation
-          draft: false
+          title: 'Update translations'
 
-      - name: PR Status
+      - name: "PR Status"
         if: github.event_name != 'pull_request'
         shell: bash
         env:
