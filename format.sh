@@ -107,7 +107,7 @@ OPTIONS:
 
     --shell
         Use shellcheck to lint shell files.
-		Not available in the default inline mode.
+        Not available in the default inline mode.
 
     -t, --test
         Do not edit files in place. Set exit code to 1 if changes are required.
