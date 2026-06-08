@@ -1171,7 +1171,7 @@ void TabGame::createReplayDock(GameReplay *replay)
     replayDock->setFloating(false);
 
     connect(replayManager, &ReplayManager::eventReplayed, game->getGameEventHandler(),
-            [this](auto event, auto options) {
+            [this](const auto &event, auto options) {
                 game->getGameEventHandler()->processGameEventContainer(event, nullptr, options);
             });
 }
