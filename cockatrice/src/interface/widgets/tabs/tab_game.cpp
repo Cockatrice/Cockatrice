@@ -13,6 +13,7 @@
 #include "../game/player/player_list_widget.h"
 #include "../game/player/player_logic.h"
 #include "../game/replay.h"
+#include "../game/tally/tally_widget.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
@@ -49,8 +50,11 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     // THIS CTOR IS USED ON REPLAY
     game = new Replay(this, _replay);
 
+    tallyManager = new TallyManager(this);
+
     createCardInfoDock(true);
     createPlayerListDock(true);
+    createTallyDock(true);
     createMessageDock(true);
     createPlayAreaWidget(true);
     createDeckViewContainerWidget(true);
@@ -58,6 +62,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
+    addDockWidget(Qt::RightDockWidgetArea, tallyDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
     addDockWidget(Qt::BottomDockWidgetArea, replayDock);
 
@@ -93,8 +98,11 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     // THIS CTOR IS USED ON GAMES
     game = new Game(this, _clients, event, _roomGameTypes);
 
+    tallyManager = new TallyManager(this);
+
     createCardInfoDock();
     createPlayerListDock();
+    createTallyDock();
     createMessageDock();
     createPlayAreaWidget();
     createDeckViewContainerWidget();
@@ -102,6 +110,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
+    addDockWidget(Qt::RightDockWidgetArea, tallyDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
 
     mainWidget = new QStackedWidget(this);
@@ -282,6 +291,7 @@ void TabGame::retranslateUi()
 
     updatePlayerListDockTitle();
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
+    tallyDock->setWindowTitle(tr("Tally") + (tallyDock->isWindow() ? tabText : QString()));
     messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
     if (replayDock) {
         replayDock->setWindowTitle(tr("Replay Timeline") + (replayDock->isWindow() ? tabText : QString()));
@@ -348,6 +358,7 @@ void TabGame::retranslateUi()
 
     dockToActions[cardInfoDock].menu->setTitle(tr("Card Info"));
     dockToActions[messageLayoutDock].menu->setTitle(tr("Messages"));
+    dockToActions[tallyDock].menu->setTitle(tr("Tally"));
     dockToActions[playerListDock].menu->setTitle(tr("Player List"));
 
     if (replayDock) {
@@ -1048,6 +1059,7 @@ void TabGame::createViewMenuItems()
 
     registerDockWidget(viewMenu, cardInfoDock, {250, 360});
     registerDockWidget(viewMenu, messageLayoutDock, {250, 200});
+    registerDockWidget(viewMenu, tallyDock, {250, 50});
     registerDockWidget(viewMenu, playerListDock, {250, 50});
 
     if (replayDock) {
@@ -1109,29 +1121,24 @@ void TabGame::actResetLayout()
 {
     cardInfoDock->setVisible(true);
     playerListDock->setVisible(true);
+    tallyDock->setVisible(true);
     messageLayoutDock->setVisible(true);
 
     cardInfoDock->setFloating(false);
     playerListDock->setFloating(false);
+    tallyDock->setVisible(false);
     messageLayoutDock->setFloating(false);
 
     addDockWidget(Qt::RightDockWidgetArea, cardInfoDock);
     addDockWidget(Qt::RightDockWidgetArea, playerListDock);
+    addDockWidget(Qt::RightDockWidgetArea, tallyDock);
     addDockWidget(Qt::RightDockWidgetArea, messageLayoutDock);
 
-    if (replayDock) {
-        replayDock->setVisible(true);
-        replayDock->setFloating(false);
-        addDockWidget(Qt::BottomDockWidgetArea, replayDock);
+    for (auto i = dockToActions.cbegin(); i != dockToActions.cend(); ++i) {
+        QDockWidget *dock = i.key();
+        QSize defaultSize = i.value().defaultSize;
 
-        cardInfoDock->resize(250, 360);
-        messageLayoutDock->resize(250, 200);
-        playerListDock->resize(250, 50);
-        replayDock->resize(900, 100);
-    } else {
-        cardInfoDock->resize(250, 360);
-        messageLayoutDock->resize(250, 250);
-        playerListDock->resize(250, 50);
+        dock->resize(defaultSize);
     }
 }
 
@@ -1149,6 +1156,9 @@ void TabGame::createPlayAreaWidget(bool bReplay)
             &GameEventHandler::handleArrowDeletion);
     connect(game->getGameEventHandler(), &GameEventHandler::arrowDeleted, scene, &GameScene::deleteArrow);
     gameView = new GameView(scene);
+
+    connect(scene, &GameScene::selectionChanged, tallyManager,
+            [this] { tallyManager->updateSelection(scene->selectedCards()); });
 
     auto gamePlayAreaVBox = new QVBoxLayout;
     gamePlayAreaVBox->setContentsMargins(0, 0, 0, 0);
@@ -1231,6 +1241,19 @@ void TabGame::createPlayerListDock(bool bReplay)
                                 QDockWidget::DockWidgetMovable);
     playerListDock->setWidget(playerListWidget);
     playerListDock->setFloating(false);
+}
+
+void TabGame::createTallyDock(bool bReplay)
+{
+    Q_UNUSED(bReplay);
+
+    tallyWidget = new TallyWidget(this, tallyManager);
+
+    tallyDock = new QDockWidget(this);
+    tallyDock->setObjectName("tallyDock");
+    tallyDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
+                           QDockWidget::DockWidgetMovable);
+    tallyDock->setWidget(tallyWidget);
 }
 
 void TabGame::createMessageDock(bool bReplay)
