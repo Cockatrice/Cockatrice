@@ -316,13 +316,6 @@ CounterState *PlayerLogic::getLifeCounter() const
     return nullptr;
 }
 
-AbstractCounter *PlayerLogic::getCounterWidget(int counterId) const
-{
-    Q_UNUSED(counterId);
-    return nullptr;
-    // TODO: Do not reach into graphics like this return graphicsItem->getCounterWidget(counterId);
-}
-
 bool PlayerLogic::clearCardsToDelete()
 {
     if (cardsToDelete.isEmpty()) {

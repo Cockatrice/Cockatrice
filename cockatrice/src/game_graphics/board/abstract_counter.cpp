@@ -33,6 +33,11 @@ AbstractCounter::AbstractCounter(CounterState *state,
         update();
     });
 
+    connect(state, &CounterState::activeChanged, this, [this](bool newActive) {
+        setActive(newActive);
+        emit player->rearrangeCounters();
+    });
+
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         menu = new TearOffMenu(TranslateCounterName::getDisplayName(state->getName()));
         aSet = new QAction(this);

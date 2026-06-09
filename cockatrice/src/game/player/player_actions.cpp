@@ -7,6 +7,7 @@
 #include "../../game_graphics/zones/table_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
+#include "../board/counter_state.h"
 #include "../zones/view_zone_logic.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -1664,8 +1665,8 @@ void PlayerActions::actPlayAndIncreaseTax(QList<CardItem *> selectedCards)
 {
     playSelectedCardsImpl(selectedCards, false, [this](CardItem * /*card*/, const QString &originalZone) {
         if (originalZone == ZoneNames::COMMAND) {
-            AbstractCounter *ctr = player->getCounterWidget(CounterIds::CommanderTax);
-            if (ctr && ctr->isActive()) {
+            CounterState *state = player->getCounters().value(CounterIds::CommanderTax, nullptr);
+            if (state && state->isActive()) {
                 sendIncCounter(CounterIds::CommanderTax, 2);
             }
         }
@@ -1676,8 +1677,8 @@ void PlayerActions::actPlayAndIncreasePartnerTax(QList<CardItem *> selectedCards
 {
     playSelectedCardsImpl(selectedCards, false, [this](CardItem * /*card*/, const QString &originalZone) {
         if (originalZone == ZoneNames::COMMAND) {
-            AbstractCounter *ctr = player->getCounterWidget(CounterIds::PartnerTax);
-            if (ctr && ctr->isActive()) {
+            CounterState *state = player->getCounters().value(CounterIds::PartnerTax, nullptr);
+            if (state && state->isActive()) {
                 sendIncCounter(CounterIds::PartnerTax, 2);
             }
         }
@@ -1694,8 +1695,8 @@ void PlayerActions::sendIncCounter(int counterId, int delta)
 
 void PlayerActions::actModifyTaxCounter(int counterId, int delta)
 {
-    AbstractCounter *ctr = player->getCounterWidget(counterId);
-    if (!ctr || !ctr->isActive()) {
+    CounterState *state = player->getCounters().value(counterId, nullptr);
+    if (!state || !state->isActive()) {
         return;
     }
     sendIncCounter(counterId, delta);
@@ -1703,13 +1704,13 @@ void PlayerActions::actModifyTaxCounter(int counterId, int delta)
 
 void PlayerActions::actToggleTaxCounter(int counterId)
 {
-    AbstractCounter *ctr = player->getCounterWidget(counterId);
-    if (!ctr || (ctr->isActive() && ctr->getValue() != 0)) {
+    CounterState *state = player->getCounters().value(counterId, nullptr);
+    if (!state || (state->isActive() && state->getValue() != 0)) {
         return;
     }
     Command_SetCounterActive cmd;
     cmd.set_counter_id(counterId);
-    cmd.set_active(!ctr->isActive());
+    cmd.set_active(!state->isActive());
     sendGameCommand(cmd);
 }
 
