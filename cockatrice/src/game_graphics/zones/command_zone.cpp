@@ -96,7 +96,8 @@ void CommandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 
     // Same-zone no-op: don't move a card onto itself
     const auto &cards = getLogic()->getCards();
-    if (!cards.isEmpty() && startZone == getLogic() && cards.at(index)->getId() == dragItems.at(0)->getId()) {
+    if (!cards.isEmpty() && index < cards.size() && startZone == getLogic() &&
+        cards.at(index)->getId() == dragItems.at(0)->getId()) {
         return;
     }
 

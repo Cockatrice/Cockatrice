@@ -1667,7 +1667,7 @@ void PlayerActions::actPlayAndIncreaseTax(QList<CardItem *> selectedCards)
         if (originalZone == ZoneNames::COMMAND) {
             CounterState *state = player->getCounters().value(CounterIds::CommanderTax, nullptr);
             if (state && state->isActive()) {
-                sendIncCounter(CounterIds::CommanderTax, 2);
+                sendIncCounter(CounterIds::CommanderTax, 1);
             }
         }
     });
@@ -1679,7 +1679,7 @@ void PlayerActions::actPlayAndIncreasePartnerTax(QList<CardItem *> selectedCards
         if (originalZone == ZoneNames::COMMAND) {
             CounterState *state = player->getCounters().value(CounterIds::PartnerTax, nullptr);
             if (state && state->isActive()) {
-                sendIncCounter(CounterIds::PartnerTax, 2);
+                sendIncCounter(CounterIds::PartnerTax, 1);
             }
         }
     });
@@ -1705,6 +1705,7 @@ void PlayerActions::actModifyTaxCounter(int counterId, int delta)
 void PlayerActions::actToggleTaxCounter(int counterId)
 {
     CounterState *state = player->getCounters().value(counterId, nullptr);
+    // Prevent disabling a counter with tax accumulated; player must reset to 0 first
     if (!state || (state->isActive() && state->getValue() != 0)) {
         return;
     }
