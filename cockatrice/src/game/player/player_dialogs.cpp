@@ -248,6 +248,7 @@ void PlayerDialogs::onMoveCardXCardsFromTopDialogRequested(int defaultNumberTopC
 void PlayerDialogs::onSetPTDialogRequested(const QString &oldPT)
 {
     bool ok;
+    auto cards = player->getGameScene()->selectedCards();
     emit requestDialogSemaphore(true);
     QString pt = getTextWithMax(dialogParent(), tr("Change power/toughness"), tr("Change stats to:"), QLineEdit::Normal,
                                 oldPT, &ok);
@@ -257,11 +258,12 @@ void PlayerDialogs::onSetPTDialogRequested(const QString &oldPT)
         return;
     }
 
-    playerActions->actSetPT(player->getGameScene()->selectedCards(), pt);
+    playerActions->actSetPT(cards, pt);
 }
 
 void PlayerDialogs::onSetAnnotationDialogRequested(const QString &oldAnnotation)
 {
+    auto cards = player->getGameScene()->selectedCards();
     emit requestDialogSemaphore(true);
     AnnotationDialog *dialog = new AnnotationDialog(dialogParent());
     dialog->setOptions(QInputDialog::UsePlainTextEditForTextInput);
@@ -274,11 +276,12 @@ void PlayerDialogs::onSetAnnotationDialogRequested(const QString &oldAnnotation)
         return;
     }
     QString annotation = dialog->textValue().left(MAX_NAME_LENGTH);
-    playerActions->actSetAnnotation(player->getGameScene()->selectedCards(), annotation);
+    playerActions->actSetAnnotation(cards, annotation);
 }
 
 void PlayerDialogs::onSetCardCounterDialogRequested(int counterId, const QString &oldValueForDlg)
 {
+    auto cards = player->getGameScene()->selectedCards();
     emit requestDialogSemaphore(true);
 
     auto &cardCounterSettings = SettingsCache::instance().cardCounters();
@@ -291,5 +294,5 @@ void PlayerDialogs::onSetCardCounterDialogRequested(int counterId, const QString
     if (!ok || player->getLogic()->clearCardsToDelete()) {
         return;
     }
-    playerActions->actSetCardCounter(player->getGameScene()->selectedCards(), counterId, dialog.textValue());
+    playerActions->actSetCardCounter(cards, counterId, dialog.textValue());
 }
