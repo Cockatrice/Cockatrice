@@ -476,6 +476,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::RightButton && owner != nullptr) {
         emit rightClicked(this, event->screenPos());
+        return;
     }
     if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
         (!SettingsCache::instance().getDoubleClickToPlay())) {

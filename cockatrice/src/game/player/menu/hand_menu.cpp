@@ -5,16 +5,20 @@
 #include "../../../game_graphics/zones/hand_zone.h"
 #include "../../abstract_game.h"
 #include "../player_actions.h"
+#include "../player_graphics_item.h"
 #include "../player_logic.h"
 
 #include <QAction>
 #include <QMenu>
 #include <libcockatrice/utility/zone_names.h>
 
-HandMenu::HandMenu(PlayerLogic *_player, PlayerActions *actions, QWidget *parent) : TearOffMenu(parent), player(_player)
+HandMenu::HandMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(parent), player(_player)
 {
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+    auto *actions = player->getLogic()->getPlayerActions();
+
+    if (player->getLogic()->getPlayerInfo()->local || player->getLogic()->getPlayerInfo()->judge) {
         aViewHand = new QAction(this);
+
         connect(aViewHand, &QAction::triggered, actions, &PlayerActions::actViewHand);
         addAction(aViewHand);
 
@@ -75,7 +79,7 @@ HandMenu::HandMenu(PlayerLogic *_player, PlayerActions *actions, QWidget *parent
 
     mMoveHandMenu = addTearOffMenu(QString());
 
-    if (player->getPlayerInfo()->local || player->getPlayerInfo()->judge) {
+    if (player->getLogic()->getPlayerInfo()->local || player->getLogic()->getPlayerInfo()->judge) {
         aMoveHandToTopLibrary = new QAction(this);
         aMoveHandToTopLibrary->setData(QList<QVariant>() << ZoneNames::DECK << 0);
         aMoveHandToBottomLibrary = new QAction(this);
@@ -85,7 +89,7 @@ HandMenu::HandMenu(PlayerLogic *_player, PlayerActions *actions, QWidget *parent
         aMoveHandToRfg = new QAction(this);
         aMoveHandToRfg->setData(QList<QVariant>() << ZoneNames::EXILE << 0);
 
-        auto hand = player->getHandZone();
+        auto hand = player->getLogic()->getHandZone();
 
         connect(aMoveHandToTopLibrary, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
         connect(aMoveHandToBottomLibrary, &QAction::triggered, hand, &HandZoneLogic::moveAllToZone);
@@ -107,7 +111,7 @@ void HandMenu::retranslateUi()
 {
     setTitle(tr("&Hand"));
 
-    if (player->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         aViewHand->setText(tr("&View hand"));
 
         mSortHand->setTitle(tr("Sort hand by..."));
@@ -166,9 +170,9 @@ void HandMenu::populateRevealHandMenuWithActivePlayers()
 
     mRevealHand->addSeparator();
 
-    const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    const auto &players = player->getLogic()->getGame()->getPlayerManager()->getPlayers().values();
     for (auto *other : players) {
-        if (other == player) {
+        if (other == player->getLogic()) {
             continue;
         }
         QAction *a = mRevealHand->addAction(other->getPlayerInfo()->getName());
@@ -185,9 +189,9 @@ void HandMenu::populateRevealRandomHandCardMenuWithActivePlayers()
 
     mRevealRandomHandCard->addSeparator();
 
-    const auto &players = player->getGame()->getPlayerManager()->getPlayers().values();
+    const auto &players = player->getLogic()->getGame()->getPlayerManager()->getPlayers().values();
     for (auto *other : players) {
-        if (other == player) {
+        if (other == player->getLogic()) {
             continue;
         }
         QAction *a = mRevealRandomHandCard->addAction(other->getPlayerInfo()->getName());
@@ -204,7 +208,7 @@ void HandMenu::onRevealHandTriggered()
     }
 
     const int targetId = action->data().toInt();
-    player->getPlayerActions()->actRevealHand(targetId);
+    player->getLogic()->getPlayerActions()->actRevealHand(targetId);
 }
 
 void HandMenu::onRevealRandomHandCardTriggered()
@@ -215,5 +219,5 @@ void HandMenu::onRevealRandomHandCardTriggered()
     }
 
     const int targetId = action->data().toInt();
-    player->getPlayerActions()->actRevealRandomHandCard(targetId);
+    player->getLogic()->getPlayerActions()->actRevealRandomHandCard(targetId);
 }
