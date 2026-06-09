@@ -4,7 +4,6 @@
 #include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/zones/view_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
-#include "../board/abstract_counter.h"
 #include "../board/arrow_data.h"
 #include "../board/card_list.h"
 #include "player_actions.h"
@@ -287,11 +286,12 @@ void PlayerEventHandler::eventSetCounterActive(const Event_SetCounterActive &eve
     }
     state->setActive(event.active());
 
-    AbstractCounter *widget = player->getGraphicsItem()->getCounterWidget(event.counter_id());
+    // TODO: The counters data should emit this and the widget hook up to it. Don't reach into graphics like this.
+    /*AbstractCounter *widget = player->getGraphicsItem()->getCounterWidget(event.counter_id());
     if (widget) {
         widget->setActive(event.active());
         emit player->rearrangeCounters();
-    }
+    }*/
 }
 
 void PlayerEventHandler::eventDelCounter(const Event_DelCounter &event)

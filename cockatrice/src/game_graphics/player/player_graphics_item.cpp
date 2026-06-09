@@ -6,6 +6,8 @@
 #include "../board/commander_tax_counter.h"
 #include "../board/counter_general.h"
 #include "../hand_counter.h"
+#include "../z_values.h"
+#include "../zones/command_zone.h"
 #include "../zones/hand_zone.h"
 #include "../zones/pile_zone.h"
 #include "../zones/stack_zone.h"
@@ -14,9 +16,6 @@
 #include "player_dialogs.h"
 
 #include <QGraphicsView>
-#include "../z_values.h"
-#include "../zones/command_zone.h"
-
 #include <libcockatrice/utility/counter_ids.h>
 
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
@@ -66,6 +65,7 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 
     connect(player, &PlayerLogic::addViewCustomZoneActionToCustomZoneMenu, this,
             &PlayerGraphicsItem::onCustomZoneAdded);
+    connect(player, &PlayerLogic::commandZoneSupportChanged, this, &PlayerGraphicsItem::setCommandZoneVisible);
 
     playerMenu->setMenusForGraphicItems();
 

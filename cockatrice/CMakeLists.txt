@@ -87,7 +87,7 @@ set(cockatrice_SOURCES
     src/game_graphics/log/message_log_widget.cpp
     src/game/phase.cpp
     src/game_graphics/phases_toolbar.cpp
-    src/game_graphics/player/menu/card_menu.
+    src/game_graphics/player/menu/card_menu.cpp
     src/game_graphics/player/menu/command_zone_menu.cpp
     src/game_graphics/player/menu/custom_zone_menu.cpp
     src/game_graphics/player/menu/grave_menu.cpp
@@ -112,7 +112,7 @@ set(cockatrice_SOURCES
     src/game_graphics/player/player_target.cpp
     src/game/replay.cpp
     src/game/zones/card_zone_logic.cpp
-    src/game/zones/command_zone.cpp
+    src/game_graphics/zones/command_zone.cpp
     src/game/zones/command_zone_logic.cpp
     src/game/zones/hand_zone_logic.cpp
     src/game/zones/pile_zone_logic.cpp

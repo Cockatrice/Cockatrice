@@ -83,6 +83,8 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     aUnattach = makeAction(this, [actions, sel]() { actions->actUnattach(sel()); });
     aSetAnnotation = makeAction(this, [actions, sel]() { actions->actRequestSetAnnotationDialog(sel()); });
     aPlay = makeAction(this, [actions, sel]() { actions->actPlay(sel()); });
+    aPlayAndIncreaseTax = makeAction(this, [actions, sel]() { actions->actPlayAndIncreaseTax(sel()); });
+    aPlayAndIncreasePartnerTax = makeAction(this, [actions, sel]() { actions->actPlayAndIncreasePartnerTax(sel()); });
     aPlayFacedown = makeAction(this, [actions, sel]() { actions->actPlayFacedown(sel()); });
     aHide = makeAction(this, [actions, sel]() { actions->actHide(sel()); });
     aReduceLifeByPower = makeAction(this, [actions, sel]() { actions->actReduceLifeByPower(sel()); });
@@ -93,12 +95,6 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     aSelectAll = new QAction(this);
     aSelectRow = new QAction(this);
     aSelectColumn = new QAction(this);
-
-    aPlayAndIncreaseTax = new QAction(this);
-    connect(aPlayAndIncreaseTax, &QAction::triggered, playerActions, &PlayerActions::actPlayAndIncreaseTax);
-    aPlayAndIncreasePartnerTax = new QAction(this);
-    connect(aPlayAndIncreasePartnerTax, &QAction::triggered, playerActions,
-            &PlayerActions::actPlayAndIncreasePartnerTax);
 
     connect(aAttach, &QAction::triggered, actions, &PlayerActions::actAttach);
     connect(aDrawArrow, &QAction::triggered, actions, &PlayerActions::actDrawArrow);
