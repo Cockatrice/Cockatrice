@@ -285,13 +285,6 @@ void PlayerEventHandler::eventSetCounterActive(const Event_SetCounterActive &eve
         return;
     }
     state->setActive(event.active());
-
-    // TODO: The counters data should emit this and the widget hook up to it. Don't reach into graphics like this.
-    /*AbstractCounter *widget = player->getGraphicsItem()->getCounterWidget(event.counter_id());
-    if (widget) {
-        widget->setActive(event.active());
-        emit player->rearrangeCounters();
-    }*/
 }
 
 void PlayerEventHandler::eventDelCounter(const Event_DelCounter &event)

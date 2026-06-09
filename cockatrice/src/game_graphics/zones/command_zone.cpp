@@ -4,11 +4,11 @@
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../../interface/theme_manager.h"
+#include "../board/abstract_counter.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
 #include "../board/commander_tax_counter.h"
 #include "../z_values.h"
-#include "select_zone.h"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
@@ -138,18 +138,21 @@ void CommandZone::reorganizeCards()
     update();
 }
 
-void CommandZone::rearrangeTaxCounters()
+void CommandZone::registerTaxCounter(AbstractCounter *counter)
 {
-    // TODO
-    /*bool commandZoneVisible = isVisible();
-    int activeTaxCounterCount = 0;
-
-    auto *graphicsItem = getLogic()->getPlayer()->getGraphicsItem();
-    if (!graphicsItem) {
+    if (!counter || taxCounters.contains(counter)) {
         return;
     }
+    taxCounters.append(counter);
+    connect(counter, &QObject::destroyed, this, [this, counter]() { taxCounters.removeOne(counter); });
+}
 
-    for (AbstractCounter *ctr : graphicsItem->getTaxCounterWidgets()) {
+void CommandZone::rearrangeTaxCounters()
+{
+    bool commandZoneVisible = isVisible();
+    int activeTaxCounterCount = 0;
+
+    for (AbstractCounter *ctr : taxCounters) {
         qreal y = TaxCounterSizes::TAX_COUNTER_MARGIN +
                   activeTaxCounterCount * (TaxCounterSizes::TAX_COUNTER_SIZE + TaxCounterSizes::TAX_COUNTER_MARGIN);
         ctr->setPos(TaxCounterSizes::TAX_COUNTER_MARGIN, y);
@@ -163,7 +166,7 @@ void CommandZone::rearrangeTaxCounters()
 
     int minHeight = activeTaxCounterCount * (TaxCounterSizes::TAX_COUNTER_SIZE + TaxCounterSizes::TAX_COUNTER_MARGIN) +
                     TaxCounterSizes::TAX_COUNTER_MARGIN;
-    setMinimumHeight(minHeight);*/
+    setMinimumHeight(minHeight);
 }
 
 void CommandZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)

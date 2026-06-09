@@ -223,9 +223,6 @@ public:
      */
     CounterState *getLifeCounter() const;
 
-    /** @brief Returns the counter widget for the given ID, or nullptr if not found. */
-    AbstractCounter *getCounterWidget(int counterId) const;
-
     void setConceded(bool _conceded);
     bool getConceded() const
     {

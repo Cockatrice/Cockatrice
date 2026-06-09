@@ -11,7 +11,7 @@
 #include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/zone_names.h>
 
-CommandZoneMenu::CommandZoneMenu(PlayerLogic *_player, QMenu *playerMenu) : QMenu(playerMenu), player(_player)
+CommandZoneMenu::CommandZoneMenu(PlayerGraphicsItem *_player, QMenu *playerMenu) : QMenu(playerMenu), player(_player)
 {
     viewZoneShortcutKey = QStringLiteral("Player/aViewCommandZone");
     incTaxShortcutKey = QStringLiteral("Player/aAddCommanderTax");
@@ -20,14 +20,17 @@ CommandZoneMenu::CommandZoneMenu(PlayerLogic *_player, QMenu *playerMenu) : QMen
     decPartnerTaxShortcutKey = QStringLiteral("Player/aRemovePartnerTax");
 
     aViewZone = new QAction(this);
-    connect(aViewZone, &QAction::triggered, this,
-            [this]() { emit player->requestZoneViewToggle(player, ZoneNames::COMMAND, -1, false); });
+    connect(aViewZone, &QAction::triggered, this, [this]() {
+        if (PlayerLogic *logic = player->getLogic()) {
+            emit logic->requestZoneViewToggle(logic, ZoneNames::COMMAND, -1, false);
+        }
+    });
 
-    if (player->getPlayerInfo()->getLocalOrJudge()) {
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         addAction(aViewZone);
         addSeparator();
 
-        PlayerActions *playerActions = player->getPlayerActions();
+        PlayerActions *playerActions = player->getLogic()->getPlayerActions();
 
         aIncreaseCommanderTax = new QAction(this);
         connect(aIncreaseCommanderTax, &QAction::triggered, this,
@@ -106,20 +109,19 @@ void CommandZoneMenu::retranslateUi()
 
 void CommandZoneMenu::actToggleMinimized()
 {
-    // TODO
-    /*CommandZone *zone = player->getGraphicsItem()->getCommandZoneGraphicsItem();
+    CommandZone *zone = player->getCommandZoneGraphicsItem();
     if (zone) {
         zone->toggleMinimized();
-    }*/
+    }
 }
 
 void CommandZoneMenu::updateTaxCounterActionStates()
 {
     AbstractCounter *cmdTax = player->getCounterWidget(CounterIds::CommanderTax);
-    bool cmdActive = cmdTax && cmdTax->isActive();
+    bool cmdActive = cmdTax != nullptr && cmdTax->isActive();
 
     AbstractCounter *partnerTax = player->getCounterWidget(CounterIds::PartnerTax);
-    bool partnerActive = partnerTax && partnerTax->isActive();
+    bool partnerActive = partnerTax != nullptr && partnerTax->isActive();
 
     if (aIncreaseCommanderTax) {
         aIncreaseCommanderTax->setVisible(cmdActive);
