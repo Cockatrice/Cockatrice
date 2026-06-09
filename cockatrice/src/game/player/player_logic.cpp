@@ -2,11 +2,9 @@
 
 #include "../../game_graphics/board/arrow_item.h"
 #include "../../game_graphics/board/card_item.h"
-#include "../../game_graphics/board/commander_tax_counter.h"
 #include "../../game_graphics/board/counter_general.h"
 #include "../../game_graphics/game_scene.h"
 #include "../../game_graphics/player/player_target.h"
-#include "../../game_graphics/zones/command_zone.h"
 #include "../../game_graphics/zones/hand_zone.h"
 #include "../../game_graphics/zones/pile_zone.h"
 #include "../../game_graphics/zones/stack_zone.h"
