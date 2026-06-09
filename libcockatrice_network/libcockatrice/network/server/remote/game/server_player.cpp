@@ -578,6 +578,10 @@ Response::ResponseCode Server_Player::cmdSetCounterActive(const Command_SetCount
     }
 
     const int counterId = cmd.counter_id();
+    if (isCommandZoneCounterBlocked(counterId)) {
+        return Response::RespContextError;
+    }
+
     Server_Counter *c = counters.value(counterId, nullptr);
     if (!c) {
         return Response::RespNameNotFound;

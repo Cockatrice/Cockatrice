@@ -165,13 +165,11 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
                 if (writeableCard) {
                     addAction(aPlay);
 
-                    AbstractCounter *cmdTax = player->getCounterWidget(CounterIds::CommanderTax);
-                    if (cmdTax && cmdTax->isActive()) {
+                    if (player->getTaxCounterIfActive(CounterIds::CommanderTax)) {
                         addAction(aPlayAndIncreaseTax);
                     }
 
-                    AbstractCounter *partnerTax = player->getCounterWidget(CounterIds::PartnerTax);
-                    if (partnerTax && partnerTax->isActive()) {
+                    if (player->getTaxCounterIfActive(CounterIds::PartnerTax)) {
                         addAction(aPlayAndIncreasePartnerTax);
                     }
 

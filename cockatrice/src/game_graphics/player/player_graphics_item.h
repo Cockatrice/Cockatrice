@@ -125,6 +125,8 @@ public:
     }
     /** @brief Returns all tax counter widgets (commander tax and partner tax). */
     [[nodiscard]] QList<AbstractCounter *> getTaxCounterWidgets() const;
+    /** @brief Returns the tax counter if it exists and is active, or nullptr otherwise. */
+    [[nodiscard]] AbstractCounter *getTaxCounterIfActive(int counterId) const;
 
 public slots:
     void onPlayerActiveChanged(bool _active);

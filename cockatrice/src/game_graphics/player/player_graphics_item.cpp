@@ -143,6 +143,7 @@ void PlayerGraphicsItem::initializeZones()
     zoneGraphicsItems.insert(player->getTableZone()->getName(), tableZoneGraphicsItem);
     zoneGraphicsItems.insert(player->getStackZone()->getName(), stackZoneGraphicsItem);
     zoneGraphicsItems.insert(player->getHandZone()->getName(), handZoneGraphicsItem);
+    zoneGraphicsItems.insert(player->getCommandZone()->getName(), commandZoneGraphicsItem);
 }
 
 void PlayerGraphicsItem::onCustomZoneAdded(QString customZoneName)
@@ -203,6 +204,8 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
             qWarning() << "Cannot create tax counter" << state->getName() << "- command zone not available";
             return;
         }
+        // Qt parent (commandZoneGraphicsItem) owns widget; counterWidgets map holds reference
+        // for lookup; CommandZone::registerTaxCounter connects QObject::destroyed for cleanup
         widget = new CommanderTaxCounter(state, player, commandZoneGraphicsItem);
         widget->setActive(state->isActive());
         commandZoneGraphicsItem->registerTaxCounter(widget);
@@ -265,6 +268,12 @@ QList<AbstractCounter *> PlayerGraphicsItem::getTaxCounterWidgets() const
         }
     }
     return result;
+}
+
+AbstractCounter *PlayerGraphicsItem::getTaxCounterIfActive(int counterId) const
+{
+    AbstractCounter *counter = getCounterWidget(counterId);
+    return (counter && counter->isActive()) ? counter : nullptr;
 }
 
 void PlayerGraphicsItem::rearrangeZones()
