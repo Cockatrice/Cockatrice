@@ -7,7 +7,6 @@
 #include "../../game_graphics/zones/table_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
-
 #include "../zones/view_zone_logic.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -1637,14 +1636,13 @@ static bool isUnwritableRevealZone(CardZoneLogic *zone)
 
 void PlayerActions::playSelectedCards(QList<CardItem *> selectedCards, const bool faceDown)
 {
-    playSelectedCardsImpl(faceDown, nullptr);
+    playSelectedCardsImpl(selectedCards, faceDown, nullptr);
 }
 
-void PlayerActions::playSelectedCardsImpl(bool faceDown,
+void PlayerActions::playSelectedCardsImpl(QList<CardItem *> selectedCards,
+                                          bool faceDown,
                                           const std::function<void(CardItem *, const QString &)> &postPlayCallback)
 {
-    QList<CardItem *> selectedCards = player->getGameScene()->selectedCards();
-
     // CardIds will get shuffled downwards when cards leave the deck.
     // We need to iterate through the cards in reverse order so cardIds don't get changed out from under us as we play
     // out the cards one-by-one.
@@ -1662,9 +1660,9 @@ void PlayerActions::playSelectedCardsImpl(bool faceDown,
     }
 }
 
-void PlayerActions::actPlayAndIncreaseTax()
+void PlayerActions::actPlayAndIncreaseTax(QList<CardItem *> selectedCards)
 {
-    playSelectedCardsImpl(false, [this](CardItem * /*card*/, const QString &originalZone) {
+    playSelectedCardsImpl(selectedCards, false, [this](CardItem * /*card*/, const QString &originalZone) {
         if (originalZone == ZoneNames::COMMAND) {
             AbstractCounter *ctr = player->getCounterWidget(CounterIds::CommanderTax);
             if (ctr && ctr->isActive()) {
@@ -1674,9 +1672,9 @@ void PlayerActions::actPlayAndIncreaseTax()
     });
 }
 
-void PlayerActions::actPlayAndIncreasePartnerTax()
+void PlayerActions::actPlayAndIncreasePartnerTax(QList<CardItem *> selectedCards)
 {
-    playSelectedCardsImpl(false, [this](CardItem * /*card*/, const QString &originalZone) {
+    playSelectedCardsImpl(selectedCards, false, [this](CardItem * /*card*/, const QString &originalZone) {
         if (originalZone == ZoneNames::COMMAND) {
             AbstractCounter *ctr = player->getCounterWidget(CounterIds::PartnerTax);
             if (ctr && ctr->isActive()) {

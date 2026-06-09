@@ -26,6 +26,7 @@
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/protocol/pb/card_attributes.pb.h>
 #include <libcockatrice/protocol/pb/game_event.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 
 inline Q_LOGGING_CATEGORY(PlayerLog, "player");

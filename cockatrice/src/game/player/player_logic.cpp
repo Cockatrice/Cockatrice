@@ -2,9 +2,11 @@
 
 #include "../../game_graphics/board/arrow_item.h"
 #include "../../game_graphics/board/card_item.h"
+#include "../../game_graphics/board/commander_tax_counter.h"
 #include "../../game_graphics/board/counter_general.h"
 #include "../../game_graphics/game_scene.h"
 #include "../../game_graphics/player/player_target.h"
+#include "../../game_graphics/zones/command_zone.h"
 #include "../../game_graphics/zones/hand_zone.h"
 #include "../../game_graphics/zones/pile_zone.h"
 #include "../../game_graphics/zones/stack_zone.h"
@@ -12,10 +14,6 @@
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/card_list.h"
-#include "../board/commander_tax_counter.h"
-#include "../board/counter_general.h"
-#include "../game_scene.h"
-#include "../zones/command_zone.h"
 #include "player_actions.h"
 
 #include <QDebug>
@@ -320,7 +318,9 @@ CounterState *PlayerLogic::getLifeCounter() const
 
 AbstractCounter *PlayerLogic::getCounterWidget(int counterId) const
 {
-    return graphicsItem->getCounterWidget(counterId);
+    Q_UNUSED(counterId);
+    return nullptr;
+    // TODO: Do not reach into graphics like this return graphicsItem->getCounterWidget(counterId);
 }
 
 bool PlayerLogic::clearCardsToDelete()
