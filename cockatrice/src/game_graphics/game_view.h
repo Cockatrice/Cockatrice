@@ -7,13 +7,14 @@
 #ifndef GAMEVIEW_H
 #define GAMEVIEW_H
 
+#include "selection_subtype_tally.h"
+
 #include <QGraphicsView>
 
 class GameScene;
 class QGridLayout;
 class QLabel;
 class QRubberBand;
-struct SubtypeEntry;
 
 class GameView : public QGraphicsView
 {
@@ -23,9 +24,10 @@ private:
     QRubberBand *rubberBand;
     QLabel *dragCountLabel;
     QLabel *totalCountLabel;
-    QWidget *subtypeCountContainer;  ///< Container widget for subtype tally display
-    QGridLayout *subtypeCountLayout; ///< Grid layout for subtype name/count pairs
+    QWidget *subtypeCountContainer;
+    QGridLayout *subtypeCountLayout;
     QPointF selectionOrigin;
+    QList<SubtypeEntry> cachedSubtypeEntries; ///< Cached entries to avoid redundant rebuilds
 
     QSize rebuildSubtypeLabels(const QList<SubtypeEntry> &entries);
     void clearSubtypeLabels();
