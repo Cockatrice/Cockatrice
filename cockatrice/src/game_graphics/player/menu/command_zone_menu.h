@@ -11,7 +11,7 @@
 
 #include <QMenu>
 
-class PlayerLogic;
+class PlayerGraphicsItem;
 
 /**
  * @class CommandZoneMenu
@@ -29,7 +29,7 @@ class CommandZoneMenu : public QMenu, public AbstractPlayerComponent
     Q_OBJECT
 
 public:
-    explicit CommandZoneMenu(PlayerLogic *player, QMenu *playerMenu);
+    explicit CommandZoneMenu(PlayerGraphicsItem *player, QMenu *playerMenu);
     void retranslateUi() override;
     void setShortcutsActive() override;
     void setShortcutsInactive() override;
@@ -50,7 +50,7 @@ private slots:
 
 private:
     void updateTaxCounterActionStates();
-    PlayerLogic *player;
+    PlayerGraphicsItem *player;
 
     QString viewZoneShortcutKey;
     QString incTaxShortcutKey;
