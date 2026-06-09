@@ -9,6 +9,7 @@
 #include <QFutureWatcher>
 #include <QPrinter>
 #include <QRegularExpression>
+#include <QSaveFile>
 #include <QStringList>
 #include <QTextCursor>
 #include <QTextDocument>
@@ -129,7 +130,10 @@ std::optional<LoadedDeck> DeckLoader::loadFromRemote(const QString &nativeString
 std::optional<LoadedDeck::LoadInfo>
 DeckLoader::saveToFile(const DeckList &deck, const QString &fileName, DeckFileFormat::Format fmt)
 {
-    QFile file(fileName);
+    // Use QSaveFile so that a failed write (e.g. a full disk) leaves the existing deck untouched
+    // instead of truncating it to a 0-byte file. The target is only replaced once every byte has
+    // been flushed successfully in commit().
+    QSaveFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qCWarning(DeckLoaderLog) << "Could not create or open file:" << fileName;
         return std::nullopt;
@@ -145,14 +149,18 @@ DeckLoader::saveToFile(const DeckList &deck, const QString &fileName, DeckFileFo
             break;
     }
 
-    file.flush();
-    file.close();
-
-    qCInfo(DeckLoaderLog) << "Saved deck to " << fileName << "with format" << fmt << "-" << success;
-
     if (!success) {
+        file.cancelWriting();
+        qCWarning(DeckLoaderLog) << "Failed to serialize deck for file:" << fileName;
         return std::nullopt;
     }
+
+    if (!file.commit()) {
+        qCWarning(DeckLoaderLog) << "Failed to save deck to " << fileName << ":" << file.errorString();
+        return std::nullopt;
+    }
+
+    qCInfo(DeckLoaderLog) << "Saved deck to " << fileName << "with format" << fmt;
 
     LoadedDeck::LoadInfo lastLoadInfo = {fileName, fmt};
     return lastLoadInfo;
@@ -196,38 +204,44 @@ bool DeckLoader::updateLastLoadedTimestamp(LoadedDeck &deck)
 
     QDateTime originalTimestamp = fileInfo.lastModified();
 
-    // Open the file for writing
-    QFile file(fileName);
+    // Use QSaveFile so that a failed write (e.g. a full disk) cannot truncate an existing deck to a
+    // 0-byte file while merely bumping its timestamp.
+    QSaveFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qCWarning(DeckLoaderLog) << "Failed to open file for writing:" << fileName;
         return false;
     }
 
-    bool result = false;
-
     // Perform file modifications
     deck.deckList.setLastLoadedTimestamp(QDateTime::currentDateTime().toString());
-    result = deck.deckList.saveToFile_Native(&file);
 
-    file.close(); // Close the file to ensure changes are flushed
-
-    if (result) {
-        // Re-open the file and set the original timestamp
-        if (!file.open(QIODevice::ReadWrite)) {
-            qCWarning(DeckLoaderLog) << "Failed to re-open file to set timestamp:" << fileName;
-            return false;
-        }
-
-        if (!file.setFileTime(originalTimestamp, QFileDevice::FileModificationTime)) {
-            qCWarning(DeckLoaderLog) << "Failed to set modification time for file:" << fileName;
-            file.close();
-            return false;
-        }
-
-        file.close();
+    if (!deck.deckList.saveToFile_Native(&file)) {
+        file.cancelWriting();
+        qCWarning(DeckLoaderLog) << "Failed to serialize deck for file:" << fileName;
+        return false;
     }
 
-    return result;
+    if (!file.commit()) {
+        qCWarning(DeckLoaderLog) << "Failed to update timestamp for file:" << fileName << ":" << file.errorString();
+        return false;
+    }
+
+    // Re-open the file and restore the original timestamp, so that updating the lastLoadedTimestamp
+    // does not change the file's modification time.
+    QFile timestampFile(fileName);
+    if (!timestampFile.open(QIODevice::ReadWrite)) {
+        qCWarning(DeckLoaderLog) << "Failed to re-open file to set timestamp:" << fileName;
+        return false;
+    }
+
+    if (!timestampFile.setFileTime(originalTimestamp, QFileDevice::FileModificationTime)) {
+        qCWarning(DeckLoaderLog) << "Failed to set modification time for file:" << fileName;
+        timestampFile.close();
+        return false;
+    }
+
+    timestampFile.close();
+    return true;
 }
 
 static QString getDomainForWebsite(DeckLoader::DecklistWebsite website)
@@ -444,51 +458,54 @@ bool DeckLoader::convertToCockatriceFormat(LoadedDeck &deck)
         return false;
     }
 
+    // Determine the format before touching any file, so an already-converted or
+    // unsupported deck never truncates or deletes anything.
+    switch (DeckFileFormat::getFormatFromName(fileName)) {
+        case DeckFileFormat::PlainText:
+            break;
+        case DeckFileFormat::Cockatrice:
+            qCInfo(DeckLoaderLog) << "File is already in Cockatrice format. No conversion needed.";
+            return true;
+        default:
+            qCWarning(DeckLoaderLog) << "Unsupported file format for conversion:" << fileName;
+            return false;
+    }
+
     // Change the file extension to .cod
     QFileInfo fileInfo(fileName);
     QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
 
-    // Open the new file for writing
-    QFile file(newFileName);
+    // Use QSaveFile so a failed write (e.g. a full disk) cannot leave a 0-byte .cod
+    // behind and then delete the original deck.
+    QSaveFile file(newFileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qCWarning(DeckLoaderLog) << "Failed to open file for writing:" << newFileName;
         return false;
     }
 
-    bool result = false;
-
-    // Perform file modifications based on the detected format
-    switch (DeckFileFormat::getFormatFromName(fileName)) {
-        case DeckFileFormat::PlainText:
-            // Save in Cockatrice's native format
-            result = deck.deckList.saveToFile_Native(&file);
-            break;
-        case DeckFileFormat::Cockatrice:
-            qCInfo(DeckLoaderLog) << "File is already in Cockatrice format. No conversion needed.";
-            result = true;
-            break;
-        default:
-            qCWarning(DeckLoaderLog) << "Unsupported file format for conversion:" << fileName;
-            result = false;
-            break;
+    if (!deck.deckList.saveToFile_Native(&file)) {
+        file.cancelWriting();
+        qCWarning(DeckLoaderLog) << "Failed to serialize deck for file:" << newFileName;
+        return false;
     }
 
-    file.close();
-
-    // Delete the old file if conversion was successful
-    if (result) {
-        if (!QFile::remove(fileName)) {
-            qCWarning(DeckLoaderLog) << "Failed to delete original file:" << fileName;
-        } else {
-            qCInfo(DeckLoaderLog) << "Original file deleted successfully:" << fileName;
-        }
-        deck.lastLoadInfo = {
-            .fileName = newFileName,
-            .fileFormat = DeckFileFormat::Cockatrice,
-        };
+    if (!file.commit()) {
+        qCWarning(DeckLoaderLog) << "Failed to convert deck to " << newFileName << ":" << file.errorString();
+        return false;
     }
 
-    return result;
+    // Conversion succeeded: delete the original file.
+    if (!QFile::remove(fileName)) {
+        qCWarning(DeckLoaderLog) << "Failed to delete original file:" << fileName;
+    } else {
+        qCInfo(DeckLoaderLog) << "Original file deleted successfully:" << fileName;
+    }
+    deck.lastLoadInfo = {
+        .fileName = newFileName,
+        .fileFormat = DeckFileFormat::Cockatrice,
+    };
+
+    return true;
 }
 
 void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node)
