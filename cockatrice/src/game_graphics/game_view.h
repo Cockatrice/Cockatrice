@@ -27,7 +27,7 @@ private:
     QGridLayout *subtypeCountLayout; ///< Grid layout for subtype name/count pairs
     QPointF selectionOrigin;
 
-    void rebuildSubtypeLabels(const QList<SubtypeEntry> &entries);
+    QSize rebuildSubtypeLabels(const QList<SubtypeEntry> &entries);
     void clearSubtypeLabels();
 
 protected:

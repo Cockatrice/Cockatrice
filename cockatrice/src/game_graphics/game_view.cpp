@@ -184,13 +184,17 @@ void GameView::clearSubtypeLabels()
     QtUtils::clearLayoutRec(subtypeCountLayout);
 }
 
-void GameView::rebuildSubtypeLabels(const QList<SubtypeEntry> &entries)
+QSize GameView::rebuildSubtypeLabels(const QList<SubtypeEntry> &entries)
 {
     clearSubtypeLabels();
 
     const QString nameStyle = QStringLiteral("color: white; font-size: 12px; background: transparent;");
     const QString countStyle =
         QStringLiteral("color: white; font-size: 14px; font-weight: bold; background: transparent;");
+
+    int totalHeight = 0;
+    int maxNameWidth = 0;
+    int maxCountWidth = 0;
 
     int row = 0;
     for (const SubtypeEntry &entry : entries) {
@@ -204,8 +208,23 @@ void GameView::rebuildSubtypeLabels(const QList<SubtypeEntry> &entries)
         countLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
         subtypeCountLayout->addWidget(countLabel, row, 1);
 
+        QSize nameSize = nameLabel->sizeHint();
+        QSize countSize = countLabel->sizeHint();
+        maxNameWidth = qMax(maxNameWidth, nameSize.width());
+        maxCountWidth = qMax(maxCountWidth, countSize.width());
+        totalHeight += qMax(nameSize.height(), countSize.height());
+
         ++row;
     }
+
+    int spacing = subtypeCountLayout->spacing();
+    int margins = subtypeCountLayout->contentsMargins().left() + subtypeCountLayout->contentsMargins().right();
+    int verticalMargins = subtypeCountLayout->contentsMargins().top() + subtypeCountLayout->contentsMargins().bottom();
+
+    int width = maxNameWidth + spacing + maxCountWidth + margins;
+    int height = totalHeight + (row - 1) * spacing + verticalMargins;
+
+    return QSize(width, height);
 }
 
 void GameView::updateTotalSelectionCount(const QSize &viewSize)
@@ -257,16 +276,16 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
         return;
     }
 
-    rebuildSubtypeLabels(entries);
-    subtypeCountContainer->adjustSize();
+    QSize containerSize = rebuildSubtypeLabels(entries);
+    subtypeCountContainer->resize(containerSize);
 
-    int x = availableWidth - subtypeCountContainer->width() - kMarginInPixels;
+    int x = availableWidth - containerSize.width() - kMarginInPixels;
     int y;
 
     if (totalCountLabel->isVisible()) {
-        y = totalCountLabel->y() - subtypeCountContainer->height() - kSpacingBetweenLabels;
+        y = totalCountLabel->y() - containerSize.height() - kSpacingBetweenLabels;
     } else {
-        y = availableHeight - subtypeCountContainer->height() - kMarginInPixels;
+        y = availableHeight - containerSize.height() - kMarginInPixels;
     }
 
     y = qMax(kMarginInPixels, y);
