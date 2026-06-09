@@ -26,7 +26,8 @@ CommandZoneMenu::CommandZoneMenu(PlayerGraphicsItem *_player, QMenu *playerMenu)
         }
     });
 
-    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+    PlayerLogic *logic = player->getLogic();
+    if (logic && logic->getPlayerInfo()->getLocalOrJudge()) {
         addAction(aViewZone);
         addSeparator();
 
@@ -117,32 +118,29 @@ void CommandZoneMenu::actToggleMinimized()
 
 void CommandZoneMenu::updateTaxCounterActionStates()
 {
-    AbstractCounter *cmdTax = player->getCounterWidget(CounterIds::CommanderTax);
-    bool cmdActive = cmdTax != nullptr && cmdTax->isActive();
-
-    AbstractCounter *partnerTax = player->getCounterWidget(CounterIds::PartnerTax);
-    bool partnerActive = partnerTax != nullptr && partnerTax->isActive();
+    AbstractCounter *cmdTax = player->getTaxCounterIfActive(CounterIds::CommanderTax);
+    AbstractCounter *partnerTax = player->getTaxCounterIfActive(CounterIds::PartnerTax);
 
     if (aIncreaseCommanderTax) {
-        aIncreaseCommanderTax->setVisible(cmdActive);
+        aIncreaseCommanderTax->setVisible(cmdTax != nullptr);
     }
     if (aDecreaseCommanderTax) {
-        aDecreaseCommanderTax->setVisible(cmdActive);
+        aDecreaseCommanderTax->setVisible(cmdTax != nullptr);
     }
     if (aToggleCommanderTaxCounter) {
-        aToggleCommanderTaxCounter->setText(cmdActive ? tr("&Remove Commander Tax") : tr("&Add Commander Tax"));
-        aToggleCommanderTaxCounter->setVisible(!cmdActive || (cmdTax && cmdTax->getValue() == 0));
+        aToggleCommanderTaxCounter->setText(cmdTax ? tr("&Remove Commander Tax") : tr("&Add Commander Tax"));
+        aToggleCommanderTaxCounter->setVisible(!cmdTax || cmdTax->getValue() == 0);
     }
 
     if (aIncreasePartnerTax) {
-        aIncreasePartnerTax->setVisible(partnerActive);
+        aIncreasePartnerTax->setVisible(partnerTax != nullptr);
     }
     if (aDecreasePartnerTax) {
-        aDecreasePartnerTax->setVisible(partnerActive);
+        aDecreasePartnerTax->setVisible(partnerTax != nullptr);
     }
     if (aTogglePartnerTaxCounter) {
-        aTogglePartnerTaxCounter->setText(partnerActive ? tr("R&emove Partner Tax") : tr("&Add Partner Tax"));
-        aTogglePartnerTaxCounter->setVisible(!partnerActive || (partnerTax && partnerTax->getValue() == 0));
+        aTogglePartnerTaxCounter->setText(partnerTax ? tr("R&emove Partner Tax") : tr("&Add Partner Tax"));
+        aTogglePartnerTaxCounter->setVisible(!partnerTax || partnerTax->getValue() == 0);
     }
 }
 

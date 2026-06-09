@@ -258,9 +258,8 @@ private:
 
     /**
      * @brief Shared implementation for playing selected cards with an optional post-play callback.
-     * @param selectedCards
-     * @param selectedCards
-     * @param selectedCards
+     * @param selectedCards Cards to play
+     * @param faceDown Whether to play cards face-down
      * @param postPlayCallback Called after each card is played, receiving the card and its *original* zone name
      *        (captured before playCard, since playCard sends a move command that may change the card's zone).
      */
