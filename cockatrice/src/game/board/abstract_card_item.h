@@ -44,6 +44,11 @@ signals:
     void deleteCardInfoPopup(QString cardName);
     void sigPixmapUpdated();
     void cardShiftClicked(QString cardName);
+    void rightClicked(AbstractCardItem *card, QPoint screenPos);
+    void playSelected(AbstractCardItem *card);
+    void playSelectedFaceDown(AbstractCardItem *card);
+    void hideSelected(AbstractCardItem *card);
+    void selectionChanged(AbstractCardItem *card, bool selected);
 
 public:
     enum

@@ -9,6 +9,7 @@
 #define COCKATRICE_PLAYER_ACTIONS_H
 #include "../dialogs/dlg_create_token.h"
 #include "../dialogs/dlg_move_top_cards_until.h"
+#include "card_menu_action_type.h"
 #include "event_processing_options.h"
 #include "player_logic.h"
 
@@ -56,15 +57,22 @@ public:
         return movingCardsUntil;
     }
 
+signals:
+    void requestZoneViewToggle(const QString &zoneName, int numberCards, bool isReversed = false);
+    void requestSortHand(const QList<CardList::SortOption> &options);
+    void requestEnableAndSetCreateAnotherTokenAction(const QString &lastTokenName);
+    void requestSetLastToken(CardInfoPtr lastToken);
+
 public slots:
     void setLastToken(CardInfoPtr cardInfo);
+    void setLastTokenInfo(CardInfoPtr cardInfo);
     void playCard(CardItem *c, bool faceDown);
     void playCardToTable(const CardItem *c, bool faceDown);
 
     void actUntapAll();
     void actRollDie();
     void actFlipCoin();
-    void actCreateToken();
+    void actCreateToken(const QStringList &predefinedTokens);
     void actCreateAnotherToken();
     void actShuffle();
     void actShuffleTop();
@@ -77,9 +85,9 @@ public slots:
     void actMulliganMinusOne();
     void doMulligan(int number);
 
-    void actPlay();
-    void actPlayFacedown();
-    void actHide();
+    void actPlay(QList<CardItem *> selectedCards);
+    void actPlayFacedown(QList<CardItem *> selectedCards);
+    void actHide(QList<CardItem *> selectedCards);
 
     void actMoveTopCardToPlay();
     void actMoveTopCardToPlayFaceDown();
@@ -111,8 +119,8 @@ public slots:
     void actViewHand();
     void actViewTopCards();
     void actViewBottomCards();
-    void actAlwaysRevealTopCard();
-    void actAlwaysLookAtTopCard();
+    void actAlwaysRevealTopCard(bool alwaysRevealTopCard);
+    void actAlwaysLookAtTopCard(bool alwaysRevealTopCard);
     void actViewGraveyard();
     void actLendLibrary(int lendToPlayerId);
     void actRevealTopCards(int revealToPlayerId, int amount);
@@ -127,37 +135,37 @@ public slots:
     void actCreateRelatedCard();
     void actCreateAllRelatedCards();
 
-    void actMoveCardXCardsFromTop();
-    void actRemoveCardCounter(int counterId);
-    void actAddCardCounter(int counterId);
-    void actSetCardCounter(int counterId);
-    void actIncrementAllCardCounters();
+    void actMoveCardXCardsFromTop(QList<CardItem *> selectedCards);
+    void actRemoveCardCounter(QList<CardItem *> selectedCards, int counterId);
+    void actAddCardCounter(QList<CardItem *> selectedCards, int counterId);
+    void actSetCardCounter(QList<CardItem *> selectedCards, int counterId);
+    void actIncrementAllCardCounters(QList<CardItem *> cardsToUpdate);
     void actAttach();
-    void actUnattach();
+    void actUnattach(QList<CardItem *> selectedCards);
     void actDrawArrow();
-    void actIncPT(int deltaP, int deltaT);
-    void actResetPT();
-    void actSetPT();
-    void actIncP();
-    void actDecP();
-    void actIncT();
-    void actDecT();
-    void actIncPT();
-    void actDecPT();
-    void actFlowP();
-    void actFlowT();
+    void actIncPT(QList<CardItem *> selectedCards, int deltaP, int deltaT);
+    void actResetPT(QList<CardItem *> selectedCards);
+    void actSetPT(QList<CardItem *> selectedCards);
+    void actIncP(QList<CardItem *> selectedCards);
+    void actDecP(QList<CardItem *> selectedCards);
+    void actIncT(QList<CardItem *> selectedCards);
+    void actDecT(QList<CardItem *> selectedCards);
+    void actIncPT(QList<CardItem *> selectedCards);
+    void actDecPT(QList<CardItem *> selectedCards);
+    void actFlowP(QList<CardItem *> selectedCards);
+    void actFlowT(QList<CardItem *> selectedCards);
 
-    void actReduceLifeByPower();
+    void actReduceLifeByPower(QList<CardItem *> selectedCards);
 
-    void actSetAnnotation();
-    void actReveal(QAction *action);
+    void actSetAnnotation(QList<CardItem *> selectedCards);
+    void actReveal(QList<CardItem *> selectedCards, QAction *action);
     void actRevealHand(int revealToPlayerId);
     void actRevealRandomHandCard(int revealToPlayerId);
     void actRevealLibrary(int revealToPlayerId);
 
     void actSortHand();
 
-    void cardMenuAction();
+    void cardMenuAction(QList<CardItem *> selectedCards, CardMenuActionType type);
 
 private:
     PlayerLogic *player;
@@ -185,12 +193,12 @@ private:
                     bool persistent = false);
     bool createRelatedFromRelation(const CardItem *sourceCard, const CardRelation *cardRelation);
 
-    void playSelectedCards(bool faceDown = false);
+    void playSelectedCards(QList<CardItem *> selectedCards, bool faceDown = false);
 
     void cmdSetTopCard(Command_MoveCard &cmd);
     void cmdSetBottomCard(Command_MoveCard &cmd);
 
-    void offsetCardCounter(int counterId, int offset);
+    void offsetCardCounter(QList<CardItem *> selectedCards, int counterId, int offset);
 };
 
 #endif // COCKATRICE_PLAYER_ACTIONS_H

@@ -8,14 +8,14 @@
 #define COCKATRICE_PT_MENU_H
 #include <QMenu>
 
-class PlayerLogic;
+class PlayerGraphicsItem;
 class PtMenu : public QMenu
 {
 
     Q_OBJECT
 
 public:
-    explicit PtMenu(PlayerLogic *player);
+    explicit PtMenu(PlayerGraphicsItem *player);
     void retranslateUi();
     void setShortcutsActive();
 

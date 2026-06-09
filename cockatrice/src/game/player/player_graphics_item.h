@@ -55,9 +55,14 @@ public:
         return static_cast<GameScene *>(scene());
     }
 
-    PlayerLogic *getPlayer() const
+    PlayerLogic *getLogic() const
     {
         return player;
+    }
+
+    [[nodiscard]] PlayerMenu *getPlayerMenu() const
+    {
+        return playerMenu;
     }
 
     PlayerArea *getPlayerArea() const
@@ -111,9 +116,12 @@ public slots:
 signals:
     void sizeChanged();
     void playerCountChanged();
+    void mirroredChanged(bool isMirrored);
+    void cardInfoRequested(const CardRef &cardRef);
 
 private:
     PlayerLogic *player;
+    PlayerMenu *playerMenu;
     PlayerArea *playerArea;
     PlayerTarget *playerTarget;
     QMap<int, AbstractCounter *> counterWidgets;

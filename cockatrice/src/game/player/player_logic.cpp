@@ -36,14 +36,6 @@ PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool
       conceded(false), zoneId(0), dialogSemaphore(false)
 {
     initializeZones();
-
-    playerMenu = new PlayerMenu(this);
-    graphicsItem = new PlayerGraphicsItem(this);
-    playerMenu->setMenusForGraphicItems();
-
-    connect(this, &PlayerLogic::activeChanged, graphicsItem, &PlayerGraphicsItem::onPlayerActiveChanged);
-
-    connect(this, &PlayerLogic::openDeckEditor, game->getTab(), &TabGame::openDeckEditor);
 }
 
 void PlayerLogic::initializeZones()
@@ -69,7 +61,6 @@ PlayerLogic::~PlayerLogic()
     }
     zones.clear();
 
-    delete playerMenu;
     delete getPlayerInfo()->userInfo;
 }
 
@@ -330,20 +321,14 @@ void PlayerLogic::setActive(bool _active)
     }
     emit activeChanged(active);
 }
+void PlayerLogic::onRequestZoneViewToggle(const QString &zoneName, int numberCards, bool isReversed)
+{
+    emit requestZoneViewToggle(this, zoneName, numberCards, isReversed);
+}
 
 void PlayerLogic::updateZones()
 {
     getTableZone()->reorganizeCards();
-}
-
-PlayerGraphicsItem *PlayerLogic::getGraphicsItem()
-{
-    return graphicsItem;
-}
-
-GameScene *PlayerLogic::getGameScene()
-{
-    return getGraphicsItem()->getGameScene();
 }
 
 void PlayerLogic::setGameStarted()

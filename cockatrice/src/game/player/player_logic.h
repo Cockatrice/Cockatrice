@@ -67,8 +67,14 @@ class PlayerLogic : public QObject
 
 signals:
     void openDeckEditor(const LoadedDeck &deck);
+    void requestZoneViewToggle(PlayerLogic *player, const QString &zoneName, int numberCards, bool isReversed);
+    void requestRevealedZoneView(PlayerLogic *player,
+                                 CardZoneLogic *zone,
+                                 const QList<const ServerInfo_Card *> &cardList,
+                                 bool withWritePermission);
     void deckChanged();
     void newCardAdded(AbstractCardItem *card);
+    void requestCardMenuUpdate(const CardItem *card);
     void counterAdded(CounterState *state);
     void counterRemoved(int counterId);
     void rearrangeCounters();
@@ -85,6 +91,7 @@ signals:
 
 public slots:
     void setActive(bool _active);
+    void onRequestZoneViewToggle(const QString &zoneName, int numberCards, bool isReversed);
 
 public:
     PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent);
@@ -112,10 +119,6 @@ public:
         return game;
     }
 
-    GameScene *getGameScene();
-
-    [[nodiscard]] PlayerGraphicsItem *getGraphicsItem();
-
     [[nodiscard]] PlayerActions *getPlayerActions() const
     {
         return playerActions;
@@ -129,11 +132,6 @@ public:
     [[nodiscard]] PlayerInfo *getPlayerInfo() const
     {
         return playerInfo;
-    }
-
-    [[nodiscard]] PlayerMenu *getPlayerMenu() const
-    {
-        return playerMenu;
     }
 
     void setDeck(const DeckList &_deck);
@@ -236,8 +234,6 @@ private:
     PlayerInfo *playerInfo;
     PlayerEventHandler *playerEventHandler;
     PlayerActions *playerActions;
-    PlayerMenu *playerMenu;
-    PlayerGraphicsItem *graphicsItem;
 
     bool active;
     bool conceded;
