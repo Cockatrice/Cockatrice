@@ -2,7 +2,6 @@
 
 #include "../client/settings/cache_settings.h"
 #include "game_scene.h"
-#include "libcockatrice/utility/qt_utils.h"
 #include "selection_subtype_tally.h"
 
 #include <QAction>
@@ -11,6 +10,7 @@
 #include <QLayout>
 #include <QResizeEvent>
 #include <QRubberBand>
+#include <libcockatrice/utility/qt_utils.h>
 
 // QRubberBand calls raise() in showEvent() and changeEvent() to stay on top of siblings.
 // This subclass disables that behavior so dragCountLabel can appear above it.
@@ -68,7 +68,7 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
 
     const QString dragCountLabelStyle = baseProperties + "font-size: 14px; font-weight: bold;";
     const QString totalCountLabelStyle = baseProperties + "font-size: 16px; font-weight: bold;";
-    const QString subtypeCountLabelStyle = baseProperties + "font-size: 12px;";
+    const QString subtypeTallyLabelStyle = baseProperties + "font-size: 12px;";
 
     dragCountLabel = new QLabel(this);
     dragCountLabel->setStyleSheet(dragCountLabelStyle);
@@ -80,7 +80,7 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     totalCountLabel->hide();
 
     subtypeCountContainer = new QWidget(this);
-    subtypeCountContainer->setStyleSheet(subtypeCountLabelStyle);
+    subtypeCountContainer->setStyleSheet(subtypeTallyLabelStyle);
     subtypeCountLayout = new QGridLayout(subtypeCountContainer);
     subtypeCountLayout->setContentsMargins(2, 2, 2, 2);
     subtypeCountLayout->setSpacing(2);
