@@ -4,7 +4,7 @@
 #include "../player_actions.h"
 #include "../player_logic.h"
 
-SayMenu::SayMenu(PlayerLogic *_player) : player(_player)
+SayMenu::SayMenu(PlayerGraphicsItem *_player) : player(_player)
 {
     connect(&SettingsCache::instance().messages(), &MessageSettings::messageMacrosChanged, this, &SayMenu::initSayMenu);
     initSayMenu();
@@ -44,7 +44,7 @@ void SayMenu::initSayMenu()
 
     for (int i = 0; i < count; ++i) {
         auto *newAction = new QAction(SettingsCache::instance().messages().getMessageAt(i), this);
-        connect(newAction, &QAction::triggered, player->getPlayerActions(), &PlayerActions::actSayMessage);
+        connect(newAction, &QAction::triggered, player->getLogic()->getPlayerActions(), &PlayerActions::actSayMessage);
         addAction(newAction);
     }
 
