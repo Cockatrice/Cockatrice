@@ -7,8 +7,8 @@
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
-#include "../../game/board/abstract_card_item.h"
 #include "../../game/zones/table_zone_logic.h"
+#include "../board/abstract_card_item.h"
 #include "select_zone.h"
 
 /**

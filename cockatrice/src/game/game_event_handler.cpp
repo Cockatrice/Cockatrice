@@ -1,8 +1,8 @@
 #include "game_event_handler.h"
 
+#include "../game_graphics/log/message_log_widget.h"
 #include "../interface/widgets/tabs/tab_game.h"
 #include "abstract_game.h"
-#include "log/message_log_widget.h"
 
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/get_pb_extension.h>

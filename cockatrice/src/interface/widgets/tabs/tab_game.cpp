@@ -1,19 +1,21 @@
 #include "tab_game.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../game/player/menu/card_menu.h"
-#include "../game/board/arrow_item.h"
-#include "../game/board/card_item.h"
-#include "../game/deckview/deck_view_container.h"
-#include "../game/deckview/tabbed_deck_view_container.h"
 #include "../game/game.h"
-#include "../game/game_scene.h"
-#include "../game/game_view.h"
-#include "../game/log/message_log_widget.h"
-#include "../game/phases_toolbar.h"
-#include "../game/player/player_list_widget.h"
 #include "../game/player/player_logic.h"
 #include "../game/replay.h"
+#include "../game_graphics/board/arrow_item.h"
+#include "../game_graphics/board/card_item.h"
+#include "../game_graphics/deckview/deck_view_container.h"
+#include "../game_graphics/deckview/tabbed_deck_view_container.h"
+#include "../game_graphics/game_scene.h"
+#include "../game_graphics/game_view.h"
+#include "../game_graphics/log/message_log_widget.h"
+#include "../game_graphics/phases_toolbar.h"
+#include "../game_graphics/player/menu/card_menu.h"
+#include "../game_graphics/player/menu/player_menu.h"
+#include "../game_graphics/player/player_graphics_item.h"
+#include "../game_graphics/player/player_list_widget.h"
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
@@ -48,7 +50,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
 {
     // THIS CTOR IS USED ON REPLAY
-    game = new Replay(this, _replay);
+    game = new Replay(this, _replay, tabSupervisor->getIsLocalGame());
 
     createCardInfoDock(true);
     createPlayerListDock(true);
@@ -92,7 +94,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     : Tab(_tabSupervisor), userListProxy(_tabSupervisor->getUserListManager())
 {
     // THIS CTOR IS USED ON GAMES
-    game = new Game(this, _clients, event, _roomGameTypes);
+    game = new Game(this, tabSupervisor->getIsLocalGame(), _clients, event, _roomGameTypes);
 
     createCardInfoDock();
     createPlayerListDock();
