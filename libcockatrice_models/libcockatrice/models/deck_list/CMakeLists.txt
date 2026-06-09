@@ -6,8 +6,6 @@ set(HEADERS deck_list_model.h deck_list_sort_filter_proxy_model.h)
 
 if(Qt6_FOUND)
   qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-elseif(Qt5_FOUND)
-  qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
 endif()
 
 add_library(

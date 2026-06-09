@@ -8,8 +8,6 @@ set(SOURCES local_client.cpp)
 
 if(Qt6_FOUND)
   qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-elseif(Qt5_FOUND)
-  qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
 endif()
 
 add_library(libcockatrice_network_client_local STATIC ${MOC_SOURCES} ${SOURCES})

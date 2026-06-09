@@ -529,23 +529,13 @@ void ChatView::showSystemPopup(const QString &userName)
 
 QColor ChatView::getCustomMentionColor()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
     QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
-#else
-    QColor customColor;
-    customColor.setNamedColor("#" + SettingsCache::instance().getChatMentionColor());
-#endif
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
 
 QColor ChatView::getCustomHighlightColor()
 {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
     QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
-#else
-    QColor customColor;
-    customColor.setNamedColor("#" + SettingsCache::instance().getChatMentionColor());
-#endif
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
 
@@ -578,11 +568,7 @@ void ChatView::redactMessages(const QString &userName, int amount)
     }
 }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 void ChatView::enterEvent(QEnterEvent * /*event*/)
-#else
-void ChatView::enterEvent(QEvent * /*event*/)
-#endif
 {
     setMouseTracking(true);
 }
@@ -639,12 +625,9 @@ void ChatView::mousePressEvent(QMouseEvent *event)
 {
     switch (hoveredItemType) {
         case HoveredCard: {
-            if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+            if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton)) {
                 emit showCardInfoPopup(event->globalPosition().toPoint(), {hoveredContent});
-#else
-                emit showCardInfoPopup(event->globalPos(), {hoveredContent});
-#endif
+            }
             break;
         }
         case HoveredUser: {
@@ -654,11 +637,7 @@ void ChatView::mousePressEvent(QMouseEvent *event)
                 switch (event->button()) {
                     case Qt::RightButton: {
                         UserLevelFlags userLevel(hoveredContent.left(delimiterIndex).toInt());
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
                         userContextMenu->showContextMenu(event->globalPosition().toPoint(), userName, userLevel, this);
-#else
-                        userContextMenu->showContextMenu(event->globalPos(), userName, userLevel, this);
-#endif
                         break;
                     }
                     case Qt::LeftButton: {

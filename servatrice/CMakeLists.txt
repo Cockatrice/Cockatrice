@@ -45,8 +45,6 @@ endif(APPLE)
 
 if(Qt6_FOUND)
   qt6_add_resources(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
-elseif(Qt5_FOUND)
-  qt5_add_resources(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
 endif()
 
 set(QT_DONT_USE_QTGUI TRUE)
