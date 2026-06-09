@@ -141,7 +141,7 @@ signals:
 private slots:
     void adminLockChanged(bool lock);
     void newCardAdded(AbstractCardItem *card);
-    void setCardMenu(QMenu *menu);
+    void setCardMenu(CardMenu *menu);
 
     void actGameInfo();
     void actConcede();

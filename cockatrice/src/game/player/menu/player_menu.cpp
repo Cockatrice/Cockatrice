@@ -10,23 +10,26 @@
 
 #include <libcockatrice/protocol/pb/command_reveal_cards.pb.h>
 
-PlayerMenu::PlayerMenu(PlayerLogic *_player) : QObject(_player), player(_player)
+PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_player)
 {
+    connect(player->getLogic(), &PlayerLogic::requestCardMenuUpdate, this, &PlayerMenu::updateCardMenu);
+    connect(this, &PlayerMenu::cardInfoRequested, player, &PlayerGraphicsItem::cardInfoRequested);
+
     playerMenu = new TearOffMenu();
 
-    if (player->getPlayerInfo()->getLocalOrJudge()) {
-        handMenu = addManagedMenu<HandMenu>(player, player->getPlayerActions(), playerMenu);
-        libraryMenu = addManagedMenu<LibraryMenu>(player, playerMenu);
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+        handMenu = addManagedMenu<HandMenu>(player->getLogic(), player->getLogic()->getPlayerActions(), playerMenu);
+        libraryMenu = addManagedMenu<LibraryMenu>(player->getLogic(), playerMenu);
     } else {
         handMenu = nullptr;
         libraryMenu = nullptr;
     }
 
-    graveMenu = addManagedMenu<GraveyardMenu>(player, playerMenu);
-    rfgMenu = addManagedMenu<RfgMenu>(player, playerMenu);
+    graveMenu = addManagedMenu<GraveyardMenu>(player->getLogic(), playerMenu);
+    rfgMenu = addManagedMenu<RfgMenu>(player->getLogic(), playerMenu);
 
-    if (player->getPlayerInfo()->getLocalOrJudge()) {
-        sideboardMenu = addManagedMenu<SideboardMenu>(player, playerMenu);
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+        sideboardMenu = addManagedMenu<SideboardMenu>(player->getLogic(), playerMenu);
         customZonesMenu = addManagedMenu<CustomZoneMenu>(player);
         playerMenu->addSeparator();
 
@@ -40,8 +43,8 @@ PlayerMenu::PlayerMenu(PlayerLogic *_player) : QObject(_player), player(_player)
         utilityMenu = nullptr;
     }
 
-    if (player->getPlayerInfo()->getLocal()) {
-        sayMenu = addManagedMenu<SayMenu>(player);
+    if (player->getLogic()->getPlayerInfo()->getLocal()) {
+        sayMenu = addManagedMenu<SayMenu>(player->getLogic());
     } else {
         sayMenu = nullptr;
     }
@@ -55,13 +58,13 @@ PlayerMenu::PlayerMenu(PlayerLogic *_player) : QObject(_player), player(_player)
 
 void PlayerMenu::setMenusForGraphicItems()
 {
-    player->getGraphicsItem()->getTableZoneGraphicsItem()->setMenu(playerMenu);
-    player->getGraphicsItem()->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, graveMenu->aViewGraveyard);
-    player->getGraphicsItem()->getRfgZoneGraphicsItem()->setMenu(rfgMenu, rfgMenu->aViewRfg);
-    if (player->getPlayerInfo()->getLocalOrJudge()) {
-        player->getGraphicsItem()->getHandZoneGraphicsItem()->setMenu(handMenu);
-        player->getGraphicsItem()->getDeckZoneGraphicsItem()->setMenu(libraryMenu, libraryMenu->aDrawCard);
-        player->getGraphicsItem()->getSideboardZoneGraphicsItem()->setMenu(sideboardMenu);
+    player->getTableZoneGraphicsItem()->setMenu(playerMenu);
+    player->getGraveyardZoneGraphicsItem()->setMenu(graveMenu, graveMenu->aViewGraveyard);
+    player->getRfgZoneGraphicsItem()->setMenu(rfgMenu, rfgMenu->aViewRfg);
+    if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
+        player->getHandZoneGraphicsItem()->setMenu(handMenu);
+        player->getDeckZoneGraphicsItem()->setMenu(libraryMenu, libraryMenu->aDrawCard);
+        player->getSideboardZoneGraphicsItem()->setMenu(sideboardMenu);
     }
 }
 
@@ -74,12 +77,14 @@ QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
 
     // If is spectator (as spectators don't need card menus), return
     // only update the menu if the card is actually selected
-    if ((player->getGame()->getPlayerManager()->isSpectator() && !player->getGame()->getPlayerManager()->isJudge()) ||
-        player->getGame()->getActiveCard() != card) {
+    if ((player->getLogic()->getGame()->getPlayerManager()->isSpectator() &&
+         !player->getLogic()->getGame()->getPlayerManager()->isJudge()) ||
+        player->getLogic()->getGame()->getActiveCard() != card) {
         return nullptr;
     }
 
-    QMenu *menu = new CardMenu(player, card, shortcutsActive);
+    CardMenu *menu = new CardMenu(player, card, shortcutsActive);
+    connect(menu, &CardMenu::cardInfoRequested, this, &PlayerMenu::cardInfoRequested);
     emit cardMenuUpdated(menu);
 
     return menu;
@@ -87,7 +92,7 @@ QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
 
 void PlayerMenu::retranslateUi()
 {
-    playerMenu->setTitle(tr("Player \"%1\"").arg(player->getPlayerInfo()->getName()));
+    playerMenu->setTitle(tr("Player \"%1\"").arg(player->getLogic()->getPlayerInfo()->getName()));
 
     for (auto *component : managedComponents) {
         component->retranslateUi();
@@ -104,7 +109,8 @@ void PlayerMenu::refreshShortcuts()
 {
     if (shortcutsActive) {
         // Judges get access to every player's menus but only want shortcuts to be set for their own.
-        if (player->getPlayerInfo()->getLocalOrJudge() && !player->getPlayerInfo()->getLocal()) {
+        if (player->getLogic()->getPlayerInfo()->getLocalOrJudge() &&
+            !player->getLogic()->getPlayerInfo()->getLocal()) {
             setShortcutsInactive();
         } else {
             setShortcutsActive();
