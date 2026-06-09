@@ -89,10 +89,8 @@ void GameView::resizeEvent(QResizeEvent *event)
 {
     QGraphicsView::resizeEvent(event);
 
-    GameScene *s = dynamic_cast<GameScene *>(scene());
-    if (s) {
-        s->processViewSizeChange(event->size());
-    }
+    GameScene *s = static_cast<GameScene *>(scene());
+    s->processViewSizeChange(event->size());
 
     updateSceneRect(scene()->sceneRect());
     updateSelectionCount(event->size());
@@ -249,33 +247,28 @@ void GameView::updateSelectionCount(const QSize &viewSize)
 
     if (!SettingsCache::instance().getShowSubtypeSelectionTally() || count <= 1) {
         subtypeCountContainer->hide();
+        cachedSubtypeEntries.clear();
         return;
     }
 
-    GameScene *gameScene = dynamic_cast<GameScene *>(scene());
-    if (!gameScene) {
-        subtypeCountContainer->hide();
-        return;
-    }
-
-    QList<MainTypeGroup> groups = SelectionSubtypeTally::countSubtypes(gameScene->selectedCards());
-    if (groups.isEmpty()) {
-        subtypeCountContainer->hide();
-        return;
-    }
-
-    QList<SubtypeEntry> entries;
-    for (const MainTypeGroup &group : groups) {
-        entries.append(group.subtypes);
-    }
+    GameScene *gameScene = static_cast<GameScene *>(scene());
+    QList<SubtypeEntry> entries = SelectionSubtypeTally::countSubtypes(gameScene->selectedCards());
 
     if (entries.isEmpty()) {
         subtypeCountContainer->hide();
+        cachedSubtypeEntries.clear();
         return;
     }
 
-    QSize containerSize = rebuildSubtypeLabels(entries);
-    subtypeCountContainer->resize(containerSize);
+    // Only rebuild labels if entries changed
+    QSize containerSize;
+    if (entries != cachedSubtypeEntries) {
+        cachedSubtypeEntries = entries;
+        containerSize = rebuildSubtypeLabels(entries);
+        subtypeCountContainer->resize(containerSize);
+    } else {
+        containerSize = subtypeCountContainer->size();
+    }
 
     int x = availableWidth - containerSize.width() - kMarginInPixels;
     int y;
