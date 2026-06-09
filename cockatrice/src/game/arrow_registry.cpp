@@ -1,6 +1,6 @@
 #include "arrow_registry.h"
 
-#include "board/arrow_item.h"
+#include "../game_graphics/board/arrow_item.h"
 
 void ArrowRegistry::insert(QSharedPointer<ArrowData> data, ArrowItem *arrow)
 {

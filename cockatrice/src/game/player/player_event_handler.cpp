@@ -1,10 +1,10 @@
 #include "player_event_handler.h"
 
+#include "../../game_graphics/board/arrow_item.h"
+#include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/zones/view_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/arrow_data.h"
-#include "../board/arrow_item.h"
-#include "../board/card_item.h"
 #include "../board/card_list.h"
 #include "player_actions.h"
 #include "player_logic.h"

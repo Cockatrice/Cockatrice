@@ -7,6 +7,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "../../game_graphics/player/player_area.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../board/arrow_data.h"
 #include "../interface/deck_loader/loaded_deck.h"
@@ -14,10 +15,7 @@
 #include "../zones/pile_zone_logic.h"
 #include "../zones/stack_zone_logic.h"
 #include "../zones/table_zone_logic.h"
-#include "menu/player_menu.h"
-#include "player_area.h"
 #include "player_event_handler.h"
-#include "player_graphics_item.h"
 #include "player_info.h"
 
 #include <QInputDialog>
@@ -54,6 +52,7 @@ class PlayerMenu;
 class QAction;
 class QMenu;
 class ServerInfo_Arrow;
+class ServerInfo_Card;
 class ServerInfo_Counter;
 class ServerInfo_Player;
 class ServerInfo_User;

@@ -57,58 +57,58 @@ set(cockatrice_SOURCES
     src/filters/syntax_help.cpp
     src/game/abstract_game.cpp
     src/game/arrow_registry.cpp
-    src/game/board/abstract_card_drag_item.cpp
-    src/game/board/abstract_card_item.cpp
-    src/game/board/abstract_counter.cpp
+    src/game_graphics/board/abstract_card_drag_item.cpp
+    src/game_graphics/board/abstract_card_item.cpp
+    src/game_graphics/board/abstract_counter.cpp
     src/game/board/arrow_data.cpp
-    src/game/board/arrow_item.cpp
-    src/game/board/arrow_target.cpp
-    src/game/board/card_drag_item.cpp
-    src/game/board/card_item.cpp
+    src/game_graphics/board/arrow_item.cpp
+    src/game_graphics/board/arrow_target.cpp
+    src/game_graphics/board/card_drag_item.cpp
+    src/game_graphics/board/card_item.cpp
     src/game/board/card_list.cpp
     src/game/board/card_state.cpp
-    src/game/board/counter_general.cpp
+    src/game_graphics/board/counter_general.cpp
     src/game/board/counter_state.cpp
-    src/game/board/translate_counter_name.cpp
-    src/game/deckview/deck_view.cpp
-    src/game/deckview/deck_view_container.cpp
-    src/game/deckview/tabbed_deck_view_container.cpp
-    src/game/dialogs/dlg_create_token.cpp
-    src/game/dialogs/dlg_move_top_cards_until.cpp
-    src/game/dialogs/dlg_roll_dice.cpp
+    src/game_graphics/board/translate_counter_name.cpp
+    src/game_graphics/deckview/deck_view.cpp
+    src/game_graphics/deckview/deck_view_container.cpp
+    src/game_graphics/deckview/tabbed_deck_view_container.cpp
+    src/game_graphics/dialogs/dlg_create_token.cpp
+    src/game_graphics/dialogs/dlg_move_top_cards_until.cpp
+    src/game_graphics/dialogs/dlg_roll_dice.cpp
     src/game/game.cpp
     src/game/game_event_handler.cpp
     src/game/game_meta_info.cpp
-    src/game/game_scene.cpp
+    src/game_graphics/game_scene.cpp
     src/game/game_state.cpp
-    src/game/game_view.cpp
+    src/game_graphics/game_view.cpp
+    src/game_graphics/hand_counter.cpp
     src/game/keyboard_card_navigator.cpp
-    src/game/hand_counter.cpp
-    src/game/log/message_log_widget.cpp
+    src/game_graphics/log/message_log_widget.cpp
     src/game/phase.cpp
-    src/game/phases_toolbar.cpp
-    src/game/player/menu/card_menu.cpp
-    src/game/player/menu/custom_zone_menu.cpp
-    src/game/player/menu/grave_menu.cpp
-    src/game/player/menu/hand_menu.cpp
-    src/game/player/menu/library_menu.cpp
-    src/game/player/menu/move_menu.cpp
-    src/game/player/menu/player_menu.cpp
-    src/game/player/menu/pt_menu.cpp
-    src/game/player/menu/rfg_menu.cpp
-    src/game/player/menu/say_menu.cpp
-    src/game/player/menu/sideboard_menu.cpp
-    src/game/player/menu/utility_menu.cpp
+    src/game_graphics/phases_toolbar.cpp
+    src/game_graphics/player/menu/card_menu.cpp
+    src/game_graphics/player/menu/custom_zone_menu.cpp
+    src/game_graphics/player/menu/grave_menu.cpp
+    src/game_graphics/player/menu/hand_menu.cpp
+    src/game_graphics/player/menu/library_menu.cpp
+    src/game_graphics/player/menu/move_menu.cpp
+    src/game_graphics/player/menu/player_menu.cpp
+    src/game_graphics/player/menu/pt_menu.cpp
+    src/game_graphics/player/menu/rfg_menu.cpp
+    src/game_graphics/player/menu/say_menu.cpp
+    src/game_graphics/player/menu/sideboard_menu.cpp
+    src/game_graphics/player/menu/utility_menu.cpp
     src/game/player/player_actions.cpp
-    src/game/player/player_area.cpp
-    src/game/player/player_dialogs.cpp
+    src/game_graphics/player/player_area.cpp
+    src/game_graphics/player/player_dialogs.cpp
     src/game/player/player_event_handler.cpp
-    src/game/player/player_graphics_item.cpp
+    src/game_graphics/player/player_graphics_item.cpp
     src/game/player/player_info.cpp
-    src/game/player/player_list_widget.cpp
+    src/game_graphics/player/player_list_widget.cpp
     src/game/player/player_logic.cpp
     src/game/player/player_manager.cpp
-    src/game/player/player_target.cpp
+    src/game_graphics/player/player_target.cpp
     src/game/replay.cpp
     src/game/zones/card_zone_logic.cpp
     src/game/zones/hand_zone_logic.cpp
