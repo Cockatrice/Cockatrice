@@ -66,6 +66,7 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 
     connect(player, &PlayerLogic::addViewCustomZoneActionToCustomZoneMenu, this,
             &PlayerGraphicsItem::onCustomZoneAdded);
+    connect(player, &PlayerLogic::commandZoneSupportChanged, this, &PlayerGraphicsItem::setCommandZoneVisible);
 
     playerMenu->setMenusForGraphicItems();
 

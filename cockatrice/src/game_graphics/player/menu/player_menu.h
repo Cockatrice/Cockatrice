@@ -8,7 +8,7 @@
 #define COCKATRICE_PLAYER_MENU_H
 
 #include "../../../interface/widgets/menus/tearoff_menu.h"
-#include "../player_logic.h"
+#include "../../game/player/player_logic.h"
 #include "command_zone_menu.h"
 #include "custom_zone_menu.h"
 #include "grave_menu.h"

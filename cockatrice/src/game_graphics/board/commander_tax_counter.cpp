@@ -1,6 +1,6 @@
 #include "commander_tax_counter.h"
 
-#include "counter_state.h"
+#include "../../game/board/counter_state.h"
 #include "translate_counter_name.h"
 
 #include <QColor>

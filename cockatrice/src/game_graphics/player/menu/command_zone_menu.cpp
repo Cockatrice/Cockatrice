@@ -2,11 +2,11 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../board/abstract_counter.h"
+#include "../../game/player/player_actions.h"
+#include "../../game/player/player_logic.h"
 #include "../../game_scene.h"
 #include "../../zones/command_zone.h"
-#include "../player_actions.h"
 #include "../player_graphics_item.h"
-#include "../player_logic.h"
 
 #include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/zone_names.h>
@@ -21,7 +21,7 @@ CommandZoneMenu::CommandZoneMenu(PlayerLogic *_player, QMenu *playerMenu) : QMen
 
     aViewZone = new QAction(this);
     connect(aViewZone, &QAction::triggered, this,
-            [this]() { player->getGameScene()->toggleZoneView(player, ZoneNames::COMMAND, -1); });
+            [this]() { emit player->requestZoneViewToggle(player, ZoneNames::COMMAND, -1, false); });
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
         addAction(aViewZone);
@@ -106,10 +106,11 @@ void CommandZoneMenu::retranslateUi()
 
 void CommandZoneMenu::actToggleMinimized()
 {
-    CommandZone *zone = player->getGraphicsItem()->getCommandZoneGraphicsItem();
+    // TODO
+    /*CommandZone *zone = player->getGraphicsItem()->getCommandZoneGraphicsItem();
     if (zone) {
         zone->toggleMinimized();
-    }
+    }*/
 }
 
 void CommandZoneMenu::updateTaxCounterActionStates()

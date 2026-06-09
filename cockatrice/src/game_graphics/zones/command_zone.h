@@ -7,9 +7,9 @@
 #ifndef COCKATRICE_COMMAND_ZONE_H
 #define COCKATRICE_COMMAND_ZONE_H
 
-#include "../../game_graphics/zones/select_zone.h"
+#include "../../game/zones/command_zone_logic.h"
 #include "../card_dimensions.h"
-#include "command_zone_logic.h"
+#include "select_zone.h"
 
 #include <QLoggingCategory>
 

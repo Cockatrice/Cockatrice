@@ -128,9 +128,9 @@ public slots:
     void actPlay(QList<CardItem *> selectedCards);
     void actPlayFacedown(QList<CardItem *> selectedCards);
     /** @brief Plays the selected card and increments the primary commander tax counter. */
-    void actPlayAndIncreaseTax();
+    void actPlayAndIncreaseTax(QList<CardItem *> selectedCards);
     /** @brief Plays the selected card and increments the partner commander tax counter. */
-    void actPlayAndIncreasePartnerTax();
+    void actPlayAndIncreasePartnerTax(QList<CardItem *> selectedCards);
     /** @brief Modifies a tax counter by delta if it is active. */
     void actModifyTaxCounter(int counterId, int delta);
     /** @brief Toggles a tax counter's active state (only if inactive or value is 0). */
@@ -258,10 +258,14 @@ private:
 
     /**
      * @brief Shared implementation for playing selected cards with an optional post-play callback.
+     * @param selectedCards
+     * @param selectedCards
+     * @param selectedCards
      * @param postPlayCallback Called after each card is played, receiving the card and its *original* zone name
      *        (captured before playCard, since playCard sends a move command that may change the card's zone).
      */
-    void playSelectedCardsImpl(bool faceDown,
+    void playSelectedCardsImpl(QList<CardItem *> selectedCards,
+                               bool faceDown,
                                const std::function<void(CardItem *, const QString &)> &postPlayCallback = nullptr);
 
     void cmdSetTopCard(Command_MoveCard &cmd);
