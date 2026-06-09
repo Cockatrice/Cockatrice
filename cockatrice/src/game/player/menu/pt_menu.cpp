@@ -33,7 +33,7 @@ PtMenu::PtMenu(PlayerGraphicsItem *player) : QMenu(tr("Power / toughness"))
             [player, playerActions] { playerActions->actFlowT(player->getGameScene()->selectedCards()); });
     aSetPT = new QAction(this);
     connect(aSetPT, &QAction::triggered, playerActions,
-            [player, playerActions] { playerActions->actSetPT(player->getGameScene()->selectedCards()); });
+            [player, playerActions] { playerActions->actRequestSetPTDialog(player->getGameScene()->selectedCards()); });
     aResetPT = new QAction(this);
     connect(aResetPT, &QAction::triggered, playerActions,
             [player, playerActions] { playerActions->actResetPT(player->getGameScene()->selectedCards()); });

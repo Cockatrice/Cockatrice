@@ -101,13 +101,13 @@ void LibraryMenu::createDrawActions()
         aDrawCard = new QAction(this);
         connect(aDrawCard, &QAction::triggered, playerActions, &PlayerActions::actDrawCard);
         aDrawCards = new QAction(this);
-        connect(aDrawCards, &QAction::triggered, playerActions, &PlayerActions::actDrawCards);
+        connect(aDrawCards, &QAction::triggered, playerActions, &PlayerActions::actRequestDrawCardsDialog);
         aUndoDraw = new QAction(this);
         connect(aUndoDraw, &QAction::triggered, playerActions, &PlayerActions::actUndoDraw);
         aDrawBottomCard = new QAction(this);
         connect(aDrawBottomCard, &QAction::triggered, playerActions, &PlayerActions::actDrawBottomCard);
         aDrawBottomCards = new QAction(this);
-        connect(aDrawBottomCards, &QAction::triggered, playerActions, &PlayerActions::actDrawBottomCards);
+        connect(aDrawBottomCards, &QAction::triggered, playerActions, &PlayerActions::actRequestDrawBottomCardsDialog);
     }
 }
 
@@ -119,9 +119,9 @@ void LibraryMenu::createShuffleActions()
         aShuffle = new QAction(this);
         connect(aShuffle, &QAction::triggered, playerActions, &PlayerActions::actShuffle);
         aShuffleTopCards = new QAction(this);
-        connect(aShuffleTopCards, &QAction::triggered, playerActions, &PlayerActions::actShuffleTop);
+        connect(aShuffleTopCards, &QAction::triggered, playerActions, &PlayerActions::actRequestShuffleTopDialog);
         aShuffleBottomCards = new QAction(this);
-        connect(aShuffleBottomCards, &QAction::triggered, playerActions, &PlayerActions::actShuffleBottom);
+        connect(aShuffleBottomCards, &QAction::triggered, playerActions, &PlayerActions::actRequestShuffleBottomDialog);
     }
 }
 
@@ -150,7 +150,8 @@ void LibraryMenu::createMoveActions()
         connect(aMoveTopCardsToExileFaceDown, &QAction::triggered, playerActions,
                 &PlayerActions::actMoveTopCardsToExileFaceDown);
         aMoveTopCardsUntil = new QAction(this);
-        connect(aMoveTopCardsUntil, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardsUntil);
+        connect(aMoveTopCardsUntil, &QAction::triggered, playerActions,
+                &PlayerActions::actRequestMoveTopCardsUntilDialog);
         aMoveTopCardToBottom = new QAction(this);
         connect(aMoveTopCardToBottom, &QAction::triggered, playerActions, &PlayerActions::actMoveTopCardToBottom);
 
@@ -189,9 +190,9 @@ void LibraryMenu::createViewActions()
         connect(aViewLibrary, &QAction::triggered, playerActions, &PlayerActions::actViewLibrary);
 
         aViewTopCards = new QAction(this);
-        connect(aViewTopCards, &QAction::triggered, playerActions, &PlayerActions::actViewTopCards);
+        connect(aViewTopCards, &QAction::triggered, playerActions, &PlayerActions::actRequestViewTopCardsDialog);
         aViewBottomCards = new QAction(this);
-        connect(aViewBottomCards, &QAction::triggered, playerActions, &PlayerActions::actViewBottomCards);
+        connect(aViewBottomCards, &QAction::triggered, playerActions, &PlayerActions::actRequestViewBottomCardsDialog);
         aAlwaysRevealTopCard = new QAction(this);
         aAlwaysRevealTopCard->setCheckable(true);
         connect(aAlwaysRevealTopCard, &QAction::triggered, playerActions, &PlayerActions::actAlwaysRevealTopCard);

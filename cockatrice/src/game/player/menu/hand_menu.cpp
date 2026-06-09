@@ -62,7 +62,7 @@ HandMenu::HandMenu(PlayerGraphicsItem *_player, QWidget *parent) : TearOffMenu(p
     addSeparator();
 
     aMulligan = new QAction(this);
-    connect(aMulligan, &QAction::triggered, actions, &PlayerActions::actMulligan);
+    connect(aMulligan, &QAction::triggered, actions, &PlayerActions::actRequestMulliganDialog);
     addAction(aMulligan);
 
     // Mulligan same size
