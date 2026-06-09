@@ -1,6 +1,6 @@
 #include "selection_subtype_tally.h"
 
-#include "board/card_item.h"
+#include "../game_graphics/board/card_item.h"
 
 #include <QMap>
 #include <algorithm>
