@@ -33,15 +33,14 @@ PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_
     if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         sideboardMenu = addManagedMenu<SideboardMenu>(player, playerMenu);
 
-        // TODO
-        /*commandZoneMenu = addManagedMenu<CommandZoneMenu>(player, playerMenu);
+        commandZoneMenu = addManagedMenu<CommandZoneMenu>(player, playerMenu);
         auto updateCommandZoneMenuVisibility = [this](bool has) {
             if (commandZoneMenu) {
                 commandZoneMenu->menuAction()->setVisible(has);
             }
         };
-        connect(player, &PlayerLogic::commandZoneSupportChanged, this, updateCommandZoneMenuVisibility);
-        updateCommandZoneMenuVisibility(player->hasServerCommandZone());*/
+        connect(player->getLogic(), &PlayerLogic::commandZoneSupportChanged, this, updateCommandZoneMenuVisibility);
+        updateCommandZoneMenuVisibility(player->getLogic()->hasServerCommandZone());
 
         customZonesMenu = addManagedMenu<CustomZoneMenu>(player);
         playerMenu->addSeparator();

@@ -205,6 +205,7 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
         }
         widget = new CommanderTaxCounter(state, player, commandZoneGraphicsItem);
         widget->setActive(state->isActive());
+        commandZoneGraphicsItem->registerTaxCounter(widget);
     } else {
         widget = new GeneralCounter(state, player, true, this);
     }

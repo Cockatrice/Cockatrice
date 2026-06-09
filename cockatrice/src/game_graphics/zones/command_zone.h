@@ -13,6 +13,8 @@
 
 #include <QLoggingCategory>
 
+class AbstractCounter;
+
 inline Q_LOGGING_CATEGORY(CommandZoneLog, "command_zone");
 
 /**
@@ -50,9 +52,10 @@ public:
 
 private:
     static constexpr double MINIMIZED_HEIGHT_RATIO = 0.25;
-    int zoneHeight;         ///< Full height in pixels when expanded
-    bool minimized = false; ///< Whether zone is at 25% height
-    int minimumHeight = 0;  ///< Floor for minimized height (e.g. to fit tax counters)
+    int zoneHeight;                       ///< Full height in pixels when expanded
+    bool minimized = false;               ///< Whether zone is at 25% height
+    int minimumHeight = 0;                ///< Floor for minimized height (e.g. to fit tax counters)
+    QList<AbstractCounter *> taxCounters; ///< Registered tax counter widgets
 
 public:
     /**
@@ -86,6 +89,8 @@ public:
     [[nodiscard]] qreal currentHeight() const;
     /** @brief Sets the minimum height floor, e.g. to ensure tax counters remain visible. */
     void setMinimumHeight(int height);
+    /** @brief Registers a tax counter widget for layout management. */
+    void registerTaxCounter(AbstractCounter *counter);
     /** @brief Lays out visible tax counters vertically in the top-left corner of the command zone. */
     void rearrangeTaxCounters();
 
