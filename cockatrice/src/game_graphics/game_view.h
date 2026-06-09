@@ -7,7 +7,7 @@
 #ifndef GAMEVIEW_H
 #define GAMEVIEW_H
 
-#include "selection_subtype_tally.h"
+#include "../game/selection_subtype_tally.h"
 
 #include <QGraphicsView>
 

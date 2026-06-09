@@ -1,8 +1,8 @@
 #include "game_view.h"
 
 #include "../client/settings/cache_settings.h"
+#include "../game/selection_subtype_tally.h"
 #include "game_scene.h"
-#include "selection_subtype_tally.h"
 
 #include <QAction>
 #include <QGridLayout>
