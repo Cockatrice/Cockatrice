@@ -39,7 +39,7 @@ signals:
     void cardPreferenceChanged();
 
 public slots:
-    void updateCardAmounts(int mainboardAmount, int sideboardAmount);
+    void updateCardAmounts(int mainboardAmount, int sideboardAmount, int tokensboardAmount);
 
 private slots:
     void updateVisibility();
