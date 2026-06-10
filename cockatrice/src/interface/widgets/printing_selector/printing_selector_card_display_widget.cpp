@@ -67,10 +67,10 @@ void PrintingSelectorCardDisplayWidget::clampSetNameToPicture()
     update();
 }
 
-void PrintingSelectorCardDisplayWidget::updateCardAmounts(const QMap<QString, QPair<int, int>> &uuidToAmounts)
+void PrintingSelectorCardDisplayWidget::updateCardAmounts(const QMap<QString, ZoneCounts> &uuidToAmounts)
 {
-    auto [main, side] = uuidToAmounts.value(rootCard.getPrinting().getUuid());
-    overlayWidget->updateCardAmounts(main, side);
+    auto counts = uuidToAmounts.value(rootCard.getPrinting().getUuid());
+    overlayWidget->updateCardAmounts(counts.mainboard, counts.sideboard, counts.tokensboard);
 }
 
 void PrintingSelectorCardDisplayWidget::resizeEvent(QResizeEvent *event)
