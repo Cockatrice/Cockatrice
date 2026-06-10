@@ -85,24 +85,15 @@ void UserInfoBox::retranslateUi()
     avatarButton.setText(tr("Change avatar"));
 }
 
-/**
- * Creates the default profile pic that is used when the user doesn't have a custom pic
- */
-static QPixmap createDefaultAvatar(int height, const ServerInfo_User &user)
-{
-    return UserLevelPixmapGenerator::generatePixmap(height, UserLevelFlags(user.user_level()), user.pawn_colors(),
-                                                    false, QString::fromStdString(user.privlevel()));
-}
-
 void UserInfoBox::updateInfo(const ServerInfo_User &user)
 {
-    currentUserInfo = &user;
-
-    const UserLevelFlags userLevel(user.user_level());
+    userLevel = UserLevelFlags(user.user_level());
+    pawnColors = user.pawn_colors();
+    privLevel = QString::fromStdString(user.privlevel());
 
     const std::string &bmp = user.avatar_bmp();
     if (!avatarPixmap.loadFromData((const uchar *)bmp.data(), static_cast<uint>(bmp.size()))) {
-        avatarPixmap = createDefaultAvatar(64, user);
+        avatarPixmap = UserLevelPixmapGenerator::generatePixmap(64, userLevel, pawnColors, false, privLevel);
         hasAvatar = false;
     } else {
         hasAvatar = true;
@@ -120,8 +111,7 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
         countryLabel3.setText("");
     }
 
-    userLevelIcon.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, user.pawn_colors(), false,
-                                                                     QString::fromStdString(user.privlevel())));
+    userLevelIcon.setPixmap(UserLevelPixmapGenerator::generatePixmap(15, userLevel, pawnColors, false, privLevel));
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
         userLevelText = tr("Administrator");
@@ -373,7 +363,7 @@ void UserInfoBox::processAvatarResponse(const Response &r)
             break;
         case Response::RespInternalError:
         default:
-            QMessageBox::critical(this, tr("Error"), tr("An error occured while trying to updater your avatar."));
+            QMessageBox::critical(this, tr("Error"), tr("An error occured while trying to update your avatar."));
             break;
     }
 }
@@ -385,7 +375,7 @@ void UserInfoBox::resizeEvent(QResizeEvent *event)
         resizedPixmap = avatarPixmap.scaled(avatarPic.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     } else {
         int height = qMin(avatarPic.size().width(), avatarPic.size().height());
-        resizedPixmap = createDefaultAvatar(height, *currentUserInfo);
+        resizedPixmap = UserLevelPixmapGenerator::generatePixmap(height, userLevel, pawnColors, false, privLevel);
     }
     avatarPic.setPixmap(resizedPixmap);
 
