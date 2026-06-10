@@ -59,6 +59,9 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 
     initializeZones();
 
+    connect(player, &PlayerLogic::addViewCustomZoneActionToCustomZoneMenu, this,
+            &PlayerGraphicsItem::onCustomZoneAdded);
+
     playerMenu->setMenusForGraphicItems();
 
     connect(tableZoneGraphicsItem, &TableZone::sizeChanged, this, &PlayerGraphicsItem::updateBoundingRect);
@@ -121,6 +124,19 @@ void PlayerGraphicsItem::initializeZones()
     connect(handZoneGraphicsItem->getLogic(), &HandZoneLogic::cardCountChanged, handCounter,
             &HandCounter::updateNumber);
     connect(handCounter, &HandCounter::showContextMenu, handZoneGraphicsItem, &HandZone::showContextMenu);
+
+    zoneGraphicsItems.insert(player->getDeckZone()->getName(), deckZoneGraphicsItem);
+    zoneGraphicsItems.insert(player->getGraveZone()->getName(), graveyardZoneGraphicsItem);
+    zoneGraphicsItems.insert(player->getRfgZone()->getName(), rfgZoneGraphicsItem);
+    zoneGraphicsItems.insert(player->getSideboardZone()->getName(), sideboardGraphicsItem);
+    zoneGraphicsItems.insert(player->getTableZone()->getName(), tableZoneGraphicsItem);
+    zoneGraphicsItems.insert(player->getStackZone()->getName(), stackZoneGraphicsItem);
+    zoneGraphicsItems.insert(player->getHandZone()->getName(), handZoneGraphicsItem);
+}
+
+void PlayerGraphicsItem::onCustomZoneAdded(QString customZoneName)
+{
+    zoneGraphicsItems.insert(customZoneName, nullptr); // Custom zone view goes here, if we ever implement it.
 }
 
 QRectF PlayerGraphicsItem::boundingRect() const
