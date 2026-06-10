@@ -183,6 +183,7 @@ signals:
     void soundThemeChanged();
     void ignoreUnregisteredUsersChanged();
     void ignoreUnregisteredUserMessagesChanged();
+    void ignoreNonBuddyUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void networkCacheSizeChanged(int newSizeInMBs);
     void redirectCacheTtlChanged(int newTtl);
@@ -294,6 +295,7 @@ private:
     QString soundThemeName;
     bool ignoreUnregisteredUsers;
     bool ignoreUnregisteredUserMessages;
+    bool ignoreNonBuddyUserMessages;
     QString picUrl;
     QString picUrlFallback;
     QString clientID;
@@ -788,6 +790,10 @@ public:
     {
         return ignoreUnregisteredUserMessages;
     }
+    [[nodiscard]] bool getIgnoreNonBuddyUserMessages() const
+    {
+        return ignoreNonBuddyUserMessages;
+    }
     [[nodiscard]] int getPixmapCacheSize() const
     {
         return pixmapCacheSize;
@@ -1111,6 +1117,7 @@ public slots:
     void setSoundThemeName(const QString &_soundThemeName);
     void setIgnoreUnregisteredUsers(QT_STATE_CHANGED_T _ignoreUnregisteredUsers);
     void setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignoreUnregisteredUserMessages);
+    void setIgnoreNonBuddyUserMessages(QT_STATE_CHANGED_T _ignoreNonBuddyUserMessages);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setCardImageCacheMethod(CardPictureLoaderCacheMethod::CacheMethod _cardImageCachingMethod);
     void setNetworkCacheSizeInMB(const int _networkCacheSize);
