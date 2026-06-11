@@ -331,7 +331,7 @@ jobs:
             target: 10
             runner: windows-2025
             
-            cmake_generator: "Visual Studio 17 2022"
+            cmake_generator: "Visual Studio 18 2026"
             cmake_generator_platform: x64
             make_package: 1
             package_suffix: "-Win10"
