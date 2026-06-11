@@ -11,8 +11,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QWidget>
-#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/network/server/remote/user_level.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/days_years_between.h>
 
 class AbstractClient;
