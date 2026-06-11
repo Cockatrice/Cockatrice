@@ -220,9 +220,8 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 {
     setLabel(tr("Installing..."));
     // Try to open the installer. If it opens, quit Cockatrice
-    if (QProcess::startDetached(filepath.toLocalFile(),
-                                QStringList()
-                                    << "/R" << QString("/D=%1").arg(QCoreApplication::applicationDirPath()))) {
+    if (QProcess::startDetached(
+            QString("\"%1\" /R /D=\"%2\"").arg(filepath.toLocalFile(), QCoreApplication::applicationDirPath()))) {
         QMetaObject::invokeMethod(static_cast<MainWindow *>(parent()), "close", Qt::QueuedConnection);
         qCInfo(DlgUpdateLog) << "Opened downloaded update file successfully - closing Cockatrice";
         close();
