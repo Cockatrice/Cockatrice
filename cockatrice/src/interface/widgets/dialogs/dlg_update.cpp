@@ -224,7 +224,8 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
     setLabel(tr("Installing..."));
 
     const QString installer = filepath.toLocalFile();
-    const QString args = QString("/R /D=\"%1\"").arg(QCoreApplication::applicationDirPath());
+    const QString installDir = QDir::toNativeSeparators(QCoreApplication::applicationDirPath());
+    const QString args = QString("/R /D=\"%1\"").arg(installDir);
 
     bool launched = false;
 
@@ -241,7 +242,7 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
         CloseHandle(sei.hProcess);
     }
 #else
-    launched = QProcess::startDetached(installer, {"/R", QString("/D=%1").arg(QCoreApplication::applicationDirPath())});
+    launched = QProcess::startDetached(installer, {"/R", QString("/D=%1").arg(installDir)});
 #endif
 
     if (launched) {
