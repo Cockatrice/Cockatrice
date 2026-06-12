@@ -13,6 +13,9 @@
 #include <QVBoxLayout>
 #include <QtNetwork>
 #include <version_string.h>
+#if defined(Q_OS_WIN)
+#include <windows.h>
+#endif
 
 DlgUpdate::DlgUpdate(QWidget *parent) : QDialog(parent)
 {
@@ -219,9 +222,29 @@ void DlgUpdate::downloadError(const QString &errorString)
 void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 {
     setLabel(tr("Installing..."));
-    // Try to open the installer. If it opens, quit Cockatrice
-    if (QProcess::startDetached(
-            QString("\"%1\" /R /D=\"%2\"").arg(filepath.toLocalFile(), QCoreApplication::applicationDirPath()))) {
+
+    const QString installer = filepath.toLocalFile();
+    const QString args = QString("/R /D=\"%1\"").arg(QCoreApplication::applicationDirPath());
+
+    bool launched = false;
+
+#if defined(Q_OS_WIN)
+    SHELLEXECUTEINFOW sei = {};
+    sei.cbSize = sizeof(sei);
+    sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+    sei.lpVerb = L"runas";
+    sei.lpFile = reinterpret_cast<LPCWSTR>(installer.utf16());
+    sei.lpParameters = reinterpret_cast<LPCWSTR>(args.utf16());
+    sei.nShow = SW_SHOWNORMAL;
+    launched = ShellExecuteExW(&sei);
+    if (launched && sei.hProcess) {
+        CloseHandle(sei.hProcess);
+    }
+#else
+    launched = QProcess::startDetached(installer, {"/R", QString("/D=%1").arg(QCoreApplication::applicationDirPath())});
+#endif
+
+    if (launched) {
         QMetaObject::invokeMethod(static_cast<MainWindow *>(parent()), "close", Qt::QueuedConnection);
         qCInfo(DlgUpdateLog) << "Opened downloaded update file successfully - closing Cockatrice";
         close();
