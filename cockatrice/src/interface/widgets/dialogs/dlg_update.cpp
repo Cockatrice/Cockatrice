@@ -229,6 +229,10 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 
     bool launched = false;
 
+    qInfo() << installer;
+    qInfo() << installDir;
+    qInfo() << args;
+
 #if defined(Q_OS_WIN)
     SHELLEXECUTEINFOW sei = {};
     sei.cbSize = sizeof(sei);
