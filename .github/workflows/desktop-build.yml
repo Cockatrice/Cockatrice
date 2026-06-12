@@ -53,16 +53,16 @@ jobs:
         shell: bash
         run: |
           tag_regex='^refs/tags/'
-          if [[ $GITHUB_EVENT_NAME == pull-request ]]; then    # pull request
-            sha="${{github.event.pull_request.head.sha}}"
+          if [[ $GITHUB_EVENT_NAME == pull_request ]]; then    # pull request
+            sha="${{ github.event.pull_request.head.sha }}"    # wrong ref? merge commit, not the same which is listed in cmake or in the installer/client logs?
           elif [[ $GITHUB_REF =~ $tag_regex ]]; then    # release
             sha="$GITHUB_SHA"
             tag="${GITHUB_REF/refs\/tags\//}"
-            echo "tag=$tag" >>"$GITHUB_OUTPUT"
+            echo "tag=$tag" >> "$GITHUB_OUTPUT"
           else    # push to branch
             sha="$GITHUB_SHA"
           fi
-          echo "sha=$sha" >>"$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
 
       - name: "Checkout"
         if: steps.configure.outputs.tag != null
