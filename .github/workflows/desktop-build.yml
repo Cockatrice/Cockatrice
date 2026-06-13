@@ -7,6 +7,17 @@ permissions:
   id-token: write    # needed for signing certificate in attestation
 
 on:
+  pull_request:
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.github/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
+      - 'vcpkg'    # needed to match submodule bumps (gitlink)
   push:
     branches:
       - master
@@ -22,30 +33,19 @@ on:
       - 'vcpkg'    # needed to match submodule bumps (gitlink)
     tags:
       - '*'
-  pull_request:
-    paths:
-      - '*/**'    # matches all files not in root
-      - '!**.md'
-      - '!.github/**'
-      - '!.tx/**'
-      - '!doc/**'
-      - '.github/workflows/desktop-build.yml'
-      - 'CMakeLists.txt'
-      - 'vcpkg.json'
-      - 'vcpkg'    # needed to match submodule bumps (gitlink)
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
-  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
+  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
 
 jobs:
   configure:
     name: Configure
     runs-on: ubuntu-slim
     outputs:
-      tag: ${{ steps.configure.outputs.tag }}
       sha: ${{ steps.configure.outputs.sha }}
+      tag: ${{ steps.configure.outputs.tag }}
 
     steps:  
       - name: "Configure"
@@ -54,7 +54,7 @@ jobs:
         run: |
           tag_regex='^refs/tags/'
           if [[ $GITHUB_EVENT_NAME == pull-request ]]; then    # pull request
-            sha="${{github.event.pull_request.head.sha}}"
+            sha="${{ github.event.pull_request.head.sha }}"
           elif [[ $GITHUB_REF =~ $tag_regex ]]; then    # release
             sha="$GITHUB_SHA"
             tag="${GITHUB_REF/refs\/tags\//}"
@@ -71,8 +71,8 @@ jobs:
           fetch-depth: 0    # fetch all history for all branches and tags
 
       - name: "Prepare release parameters"
-        id: prepare
         if: steps.configure.outputs.tag != null
+        id: prepare
         shell: bash
         env:
           TAG: ${{ steps.configure.outputs.tag }}
@@ -83,12 +83,12 @@ jobs:
         id: create_release
         shell: bash
         env:
+          body_path: ${{ steps.prepare.outputs.body_path }}
           GH_TOKEN: ${{ github.token }}
+          prerelease: ${{ steps.prepare.outputs.is_beta }}
+          release_name: ${{ steps.prepare.outputs.title }}
           tag_name: ${{ steps.configure.outputs.tag }}
           target: ${{ steps.configure.outputs.sha }}
-          release_name: ${{ steps.prepare.outputs.title }}
-          body_path: ${{ steps.prepare.outputs.body_path }}
-          prerelease: ${{ steps.prepare.outputs.is_beta }}
         run: |
           args=()
           [[ $prerelease == yes ]] && args+=(--prerelease)
@@ -188,13 +188,13 @@ jobs:
             --cmake-generator "$CMAKE_GENERATOR"
 
       - name: "Build release package"
-        id: build
         if: matrix.package != 'skip'
+        id: build
         shell: bash
         env:
-          SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
           package: '${{ matrix.package }}'
           server_only: '${{ matrix.server_only }}'
+          SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
         run: |
           source .ci/docker.sh
           args=()
@@ -225,8 +225,8 @@ jobs:
           path: ${{ env.CACHE }}
 
       - name: "Upload artifact"
-        id: upload_artifact
         if: matrix.package != 'skip'
+        id: upload_artifact
         uses: actions/upload-artifact@v7
         with:
           archive: false
@@ -234,8 +234,8 @@ jobs:
           path: ${{ steps.build.outputs.path }}
 
       - name: "Upload to release"
-        id: upload_release
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        id: upload_release
         shell: bash
         env:
           asset_name: ${{ steps.build.outputs.fullname }}
@@ -245,8 +245,8 @@ jobs:
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
       - name: "Attest binary provenance"
-        id: attestation
         if: steps.upload_release.outcome == 'success'
+        id: attestation
         uses: actions/attest@v4
         with:
           show-summary: false
@@ -268,7 +268,6 @@ jobs:
             target: 13
             runner: macos-15-intel
             
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
             override_target: 13
@@ -285,7 +284,6 @@ jobs:
             target: 14
             runner: macos-14
             
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS14"
@@ -301,7 +299,6 @@ jobs:
             target: 15
             runner: macos-15
             
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS15"
@@ -317,7 +314,6 @@ jobs:
             target: 15
             runner: macos-15
             
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             qt_version: 6.11.0
             qt_arch: clang_64
@@ -346,6 +342,7 @@ jobs:
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
+      CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
 
     steps:
@@ -443,16 +440,12 @@ jobs:
         id: build
         shell: bash
         env:
-          BUILDTYPE: '${{matrix.type}}'
-          MAKE_PACKAGE: '${{matrix.make_package}}'
-          PACKAGE_SUFFIX: '${{matrix.package_suffix}}'
-          CMAKE_GENERATOR: ${{matrix.cmake_generator}}
-          CMAKE_GENERATOR_PLATFORM: ${{matrix.cmake_generator_platform}}
-          USE_CCACHE: ${{matrix.use_ccache}}
-          VCPKG_DISABLE_METRICS: 1
-          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-          # macOS-specific environment variables, will be ignored on Windows
-          DEVELOPER_DIR: '/Applications/Xcode_${{matrix.xcode}}.app/Contents/Developer'
+          BUILDTYPE: ${{ matrix.type }}
+          CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
+          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
+          DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
+          MAKE_PACKAGE: ${{ matrix.make_package }}
+          PACKAGE_SUFFIX: ${{ matrix.package_suffix }}
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
