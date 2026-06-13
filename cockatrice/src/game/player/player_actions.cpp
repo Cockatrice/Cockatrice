@@ -1017,8 +1017,9 @@ void PlayerActions::actCreateAllRelatedCards()
                     if (!cardRelationAll->getDoesAttach() && !cardRelationAll->getIsVariable()) {
                         dbName = cardRelationAll->getName();
                         bool persistent = cardRelationAll->getIsPersistent();
+                        bool faceDown = cardRelationAll->getIsFaceDown();
                         for (int i = 0; i < cardRelationAll->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
+                            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent, faceDown);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1033,8 +1034,9 @@ void PlayerActions::actCreateAllRelatedCards()
                     if (!cardRelationNotExcluded->getDoesAttach() && !cardRelationNotExcluded->getIsVariable()) {
                         dbName = cardRelationNotExcluded->getName();
                         bool persistent = cardRelationNotExcluded->getIsPersistent();
+                        bool faceDown = cardRelationNotExcluded->getIsFaceDown();
                         for (int i = 0; i < cardRelationNotExcluded->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
+                            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent, faceDown);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1072,6 +1074,7 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard,
 
     const QString dbName = cardRelation->getName();
     const bool persistent = cardRelation->getIsPersistent();
+    const bool faceDown = cardRelation->getIsFaceDown();
 
     // Variable relations always use DoesNotAttach, regardless of the count the user
     // entered.
@@ -1080,7 +1083,7 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard,
             return false;
         }
         for (int i = 0; i < variableCount; ++i) {
-            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
+            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent, faceDown);
         }
         return true;
     }
@@ -1089,7 +1092,7 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard,
 
     if (count > 1) {
         for (int i = 0; i < count; ++i) {
-            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
+            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent, faceDown);
         }
         return true;
     }
@@ -1109,7 +1112,7 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard,
         playCardToTable(sourceCard, false);
     }
 
-    createCard(sourceCard, dbName, attachType, persistent);
+    createCard(sourceCard, dbName, attachType, persistent, faceDown);
     return true;
 }
 
@@ -1136,7 +1139,8 @@ void PlayerActions::onRelatedCardCreated(const CardItem *sourceCard, const CardR
 void PlayerActions::createCard(const CardItem *sourceCard,
                                const QString &dbCardName,
                                CardRelationType attachType,
-                               bool persistent)
+                               bool persistent,
+                               bool faceDown)
 {
     CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(dbCardName);
 
@@ -1171,6 +1175,7 @@ void PlayerActions::createCard(const CardItem *sourceCard,
     cmd.set_destroy_on_zone_change(!persistent);
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
+    cmd.set_face_down(faceDown);
 
     ExactCard relatedCard =
         CardDatabaseManager::query()->getCardFromSameSet(cardInfo->getName(), sourceCard->getCard().getPrinting());
