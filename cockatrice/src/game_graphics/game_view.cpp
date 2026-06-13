@@ -1,7 +1,6 @@
 #include "game_view.h"
 
 #include "../client/settings/cache_settings.h"
-#include "../game/game.h"
 #include "game_scene.h"
 
 #include <QAction>
@@ -196,9 +195,5 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
  */
 void GameView::setFocusDisabled(bool disabled)
 {
-    if (disabled) {
-        setFocusPolicy(Qt::NoFocus);
-    } else {
-        setFocusPolicy(Qt::ClickFocus);
-    }
+    setFocusPolicy(disabled ? Qt::NoFocus : Qt::ClickFocus);
 }
