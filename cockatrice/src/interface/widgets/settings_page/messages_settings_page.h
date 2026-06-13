@@ -36,6 +36,7 @@ private:
     QCheckBox invertHighlightForeground;
     QCheckBox ignoreUnregUsersMainChat;
     QCheckBox ignoreUnregUserMessages;
+    QCheckBox ignoreNonBuddyUserMessages;
     QCheckBox messagePopups;
     QCheckBox mentionPopups;
     QCheckBox roomHistory;

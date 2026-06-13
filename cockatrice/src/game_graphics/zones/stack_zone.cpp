@@ -1,12 +1,12 @@
 #include "stack_zone.h"
 
-#include "../../game/board/card_drag_item.h"
-#include "../../game/board/card_item.h"
-#include "../../game/card_dimensions.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../../game/zones/stack_zone_logic.h"
 #include "../../interface/theme_manager.h"
+#include "../board/card_drag_item.h"
+#include "../board/card_item.h"
+#include "../card_dimensions.h"
 
 #include <QPainter>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>

@@ -23,6 +23,7 @@ public:
                                       const ExactCard &rootCard);
     int getMainboardAmount();
     int getSideboardAmount();
+    int getTokensboardAmount();
     bool isNonZero();
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -33,7 +34,7 @@ public:
 
 public slots:
     void adjustFontSize(int scalePercentage);
-    void setAmounts(int mainboardAmount, int sideboardAmount);
+    void setAmounts(int mainboardAmount, int sideboardAmount, int tokensboardAmount);
 
 private:
     QVBoxLayout *layout;
@@ -42,6 +43,8 @@ private:
     CardAmountWidget *buttonBoxMainboard;
     QLabel *zoneLabelSideboard;
     CardAmountWidget *buttonBoxSideboard;
+    QLabel *zoneLabelTokensboard;
+    CardAmountWidget *buttonBoxTokensboard;
 };
 
 #endif // ALL_ZONES_CARD_AMOUNT_WIDGET_H

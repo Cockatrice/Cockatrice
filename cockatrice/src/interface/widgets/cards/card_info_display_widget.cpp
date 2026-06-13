@@ -1,6 +1,6 @@
 #include "card_info_display_widget.h"
 
-#include "../../../game/board/card_item.h"
+#include "../../../game_graphics/board/card_item.h"
 #include "card_info_picture_widget.h"
 #include "card_info_text_widget.h"
 

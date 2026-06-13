@@ -74,7 +74,6 @@ public:
     }
 
     int newCardId();
-    int newArrowId() const;
 
     void addZone(Server_CardZone *zone);
     void addArrow(Server_Arrow *arrow);

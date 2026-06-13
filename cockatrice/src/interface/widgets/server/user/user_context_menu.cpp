@@ -476,10 +476,15 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
 
         client->sendCommand(client->prepareSessionCommand(cmd));
     } else if (actionClicked == aKick) {
-        Command_KickFromGame cmd;
-        cmd.set_player_id(playerId);
+        auto result = QMessageBox::question(static_cast<QWidget *>(parent()), tr("Kick Player"),
+                                            tr("Are you sure you want to kick this player from the game?"),
+                                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (result == QMessageBox::Yes) {
+            Command_KickFromGame cmd;
+            cmd.set_player_id(playerId);
 
-        game->getGameEventHandler()->sendGameCommand(cmd);
+            game->getGameEventHandler()->sendGameCommand(cmd);
+        }
     } else if (actionClicked == aBan) {
         Command_GetUserInfo cmd;
         cmd.set_user_name(userName.toStdString());

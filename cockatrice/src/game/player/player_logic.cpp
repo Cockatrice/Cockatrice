@@ -1,18 +1,18 @@
 #include "player_logic.h"
 
+#include "../../game_graphics/board/arrow_item.h"
+#include "../../game_graphics/board/card_item.h"
+#include "../../game_graphics/board/counter_general.h"
+#include "../../game_graphics/game_scene.h"
+#include "../../game_graphics/player/player_target.h"
 #include "../../game_graphics/zones/hand_zone.h"
 #include "../../game_graphics/zones/pile_zone.h"
 #include "../../game_graphics/zones/stack_zone.h"
 #include "../../game_graphics/zones/table_zone.h"
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_game.h"
-#include "../board/arrow_item.h"
-#include "../board/card_item.h"
 #include "../board/card_list.h"
-#include "../board/counter_general.h"
-#include "../game_scene.h"
 #include "player_actions.h"
-#include "player_target.h"
 
 #include <QDebug>
 #include <QMenu>
@@ -35,14 +35,6 @@ PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool
       conceded(false), zoneId(0), dialogSemaphore(false)
 {
     initializeZones();
-
-    playerMenu = new PlayerMenu(this);
-    graphicsItem = new PlayerGraphicsItem(this);
-    playerMenu->setMenusForGraphicItems();
-
-    connect(this, &PlayerLogic::activeChanged, graphicsItem, &PlayerGraphicsItem::onPlayerActiveChanged);
-
-    connect(this, &PlayerLogic::openDeckEditor, game->getTab(), &TabGame::openDeckEditor);
 }
 
 void PlayerLogic::initializeZones()
@@ -68,13 +60,12 @@ PlayerLogic::~PlayerLogic()
     }
     zones.clear();
 
-    delete playerMenu;
     delete getPlayerInfo()->userInfo;
 }
 
 void PlayerLogic::clear()
 {
-    emit arrowsCleared();
+    emit arrowsClearedLocally();
 
     QMapIterator<QString, CardZoneLogic *> i(zones);
     while (i.hasNext()) {
@@ -115,7 +106,7 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                                       /* HandZone */
                                       ZoneNames::HAND};
     clearCounters();
-    emit arrowsCleared();
+    emit arrowsClearedLocally();
 
     QMutableMapIterator<QString, CardZoneLogic *> zoneIt(zones);
     while (zoneIt.hasNext()) {
@@ -231,7 +222,8 @@ void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
 
     const int arrowListSize = info.arrow_list_size();
     for (int i = 0; i < arrowListSize; ++i) {
-        emit arrowCreateRequested(ArrowData::fromProto(info.arrow_list(i)));
+        emit arrowCreateRequested(QSharedPointer<ArrowData>::create(
+            ArrowData::fromProto(info.arrow_list(i), getPlayerInfo()->getId(), getPlayerInfo()->getLocal())));
     }
 }
 
@@ -325,20 +317,14 @@ void PlayerLogic::setActive(bool _active)
     active = _active;
     emit activeChanged(active);
 }
+void PlayerLogic::onRequestZoneViewToggle(const QString &zoneName, int numberCards, bool isReversed)
+{
+    emit requestZoneViewToggle(this, zoneName, numberCards, isReversed);
+}
 
 void PlayerLogic::updateZones()
 {
     getTableZone()->reorganizeCards();
-}
-
-PlayerGraphicsItem *PlayerLogic::getGraphicsItem()
-{
-    return graphicsItem;
-}
-
-GameScene *PlayerLogic::getGameScene()
-{
-    return getGraphicsItem()->getGameScene();
 }
 
 void PlayerLogic::setGameStarted()

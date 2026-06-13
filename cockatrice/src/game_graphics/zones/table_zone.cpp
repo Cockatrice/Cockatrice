@@ -1,14 +1,14 @@
 #include "table_zone.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "../../game/board/arrow_item.h"
-#include "../../game/board/card_drag_item.h"
-#include "../../game/board/card_item.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
-#include "../../game/z_values.h"
 #include "../../game/zones/table_zone_logic.h"
 #include "../../interface/theme_manager.h"
+#include "../board/arrow_item.h"
+#include "../board/card_drag_item.h"
+#include "../board/card_item.h"
+#include "../z_values.h"
 
 #include <QGraphicsScene>
 #include <QPainter>
@@ -22,7 +22,8 @@ const QColor TableZone::FADE_MASK = QColor(0, 0, 0, 80);
 const QColor TableZone::GRADIENT_COLOR = QColor(255, 255, 255, 150);
 const QColor TableZone::GRADIENT_COLORLESS = QColor(255, 255, 255, 0);
 
-TableZone::TableZone(TableZoneLogic *_logic, QGraphicsItem *parent) : SelectZone(_logic, parent), active(false)
+TableZone::TableZone(TableZoneLogic *_logic, bool _mirrored, QGraphicsItem *parent)
+    : SelectZone(_logic, parent), active(false), mirrored(_mirrored)
 {
     connect(_logic, &TableZoneLogic::contentSizeChanged, this, &TableZone::resizeToContents);
     connect(_logic, &TableZoneLogic::toggleTapped, this, &TableZone::toggleTapped);
@@ -50,12 +51,16 @@ QRectF TableZone::boundingRect() const
     return QRectF(0, 0, width, height);
 }
 
+void TableZone::setMirrored(bool isMirrored)
+{
+    mirrored = isMirrored;
+    update();
+}
+
 bool TableZone::isInverted() const
 {
-    return ((getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
-             !SettingsCache::instance().getInvertVerticalCoordinate()) ||
-            (!getLogic()->getPlayer()->getGraphicsItem()->getMirrored() &&
-             SettingsCache::instance().getInvertVerticalCoordinate()));
+    return ((mirrored && !SettingsCache::instance().getInvertVerticalCoordinate()) ||
+            (!mirrored && SettingsCache::instance().getInvertVerticalCoordinate()));
 }
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)

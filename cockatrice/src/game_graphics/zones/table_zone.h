@@ -7,8 +7,8 @@
 #ifndef TABLEZONE_H
 #define TABLEZONE_H
 
-#include "../../game/board/abstract_card_item.h"
 #include "../../game/zones/table_zone_logic.h"
+#include "../board/abstract_card_item.h"
 #include "select_zone.h"
 
 /**
@@ -82,6 +82,7 @@ private:
        If this TableZone is currently active
      */
     bool active = false;
+    bool mirrored = false;
 
     [[nodiscard]] bool isInverted() const;
 
@@ -96,6 +97,7 @@ public slots:
        Reorganizes CardItems in the TableZone
      */
     void reorganizeCards() override;
+    void setMirrored(bool isMirrored);
 
 public:
     /**
@@ -104,7 +106,7 @@ public:
        @param _p the Player
        @param parent defaults to null
      */
-    explicit TableZone(TableZoneLogic *_logic, QGraphicsItem *parent = nullptr);
+    explicit TableZone(TableZoneLogic *_logic, bool mirrored, QGraphicsItem *parent = nullptr);
 
     /**
        @return a QRectF of the TableZone bounding box.

@@ -22,10 +22,14 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     ignoreUnregUsersMainChat.setChecked(SettingsCache::instance().getIgnoreUnregisteredUsers());
     ignoreUnregUserMessages.setChecked(SettingsCache::instance().getIgnoreUnregisteredUserMessages());
+    ignoreNonBuddyUserMessages.setChecked(SettingsCache::instance().getIgnoreNonBuddyUserMessages());
+
     connect(&ignoreUnregUsersMainChat, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setIgnoreUnregisteredUsers);
     connect(&ignoreUnregUserMessages, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setIgnoreUnregisteredUserMessages);
+    connect(&ignoreNonBuddyUserMessages, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setIgnoreNonBuddyUserMessages);
 
     invertMentionForeground.setChecked(SettingsCache::instance().getChatMentionForeground());
     connect(&invertMentionForeground, &QCheckBox::QT_STATE_CHANGED, this, &MessagesSettingsPage::updateTextColor);
@@ -62,9 +66,10 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGrid->addWidget(&ignoreUnregUsersMainChat, 2, 0);
     chatGrid->addWidget(&hexLabel, 1, 2);
     chatGrid->addWidget(&ignoreUnregUserMessages, 3, 0);
-    chatGrid->addWidget(&messagePopups, 4, 0);
-    chatGrid->addWidget(&mentionPopups, 5, 0);
-    chatGrid->addWidget(&roomHistory, 6, 0);
+    chatGrid->addWidget(&ignoreNonBuddyUserMessages, 4, 0);
+    chatGrid->addWidget(&messagePopups, 5, 0);
+    chatGrid->addWidget(&mentionPopups, 6, 0);
+    chatGrid->addWidget(&roomHistory, 7, 0);
     chatGroupBox = new QGroupBox;
     chatGroupBox->setLayout(chatGrid);
 
@@ -237,6 +242,7 @@ void MessagesSettingsPage::retranslateUi()
         QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_SHORTCUTS).arg(tr("How to use in-game message macros")));
     ignoreUnregUsersMainChat.setText(tr("Ignore chat room messages sent by unregistered users"));
     ignoreUnregUserMessages.setText(tr("Ignore private messages sent by unregistered users"));
+    ignoreNonBuddyUserMessages.setText(tr("Ignore private messages sent by non-buddy users"));
     invertMentionForeground.setText(tr("Invert text color"));
     invertHighlightForeground.setText(tr("Invert text color"));
     messagePopups.setText(tr("Enable desktop notifications for private messages"));

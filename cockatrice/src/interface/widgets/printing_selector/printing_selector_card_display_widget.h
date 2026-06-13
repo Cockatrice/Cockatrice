@@ -27,7 +27,7 @@ public:
 
 public slots:
     void clampSetNameToPicture();
-    void updateCardAmounts(const QMap<QString, QPair<int, int>> &uuidToAmounts);
+    void updateCardAmounts(const QMap<QString, ZoneCounts> &uuidToAmounts);
 
     void resizeEvent(QResizeEvent *event) override;
 

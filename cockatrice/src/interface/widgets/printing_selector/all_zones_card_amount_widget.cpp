@@ -8,7 +8,7 @@
  * @brief Constructor for the AllZonesCardAmountWidget class.
  *
  * Initializes the widget with its layout and sets up the connections and necessary
- * UI elements for managing card counts in both the mainboard and sideboard zones.
+ * UI elements for managing card counts in all the mainboard, tokensboard and sideboard zones.
  *
  * @param parent The parent widget.
  * @param deckStateManager Pointer to the DeckStateManager
@@ -31,12 +31,27 @@ AllZonesCardAmountWidget::AllZonesCardAmountWidget(QWidget *parent,
     buttonBoxMainboard = new CardAmountWidget(this, deckStateManager, cardSizeSlider, rootCard, DECK_ZONE_MAIN);
     zoneLabelSideboard = new ShadowBackgroundLabel(this, tr("Sideboard"));
     buttonBoxSideboard = new CardAmountWidget(this, deckStateManager, cardSizeSlider, rootCard, DECK_ZONE_SIDE);
+    zoneLabelTokensboard = new ShadowBackgroundLabel(this, tr("Tokens"));
+    buttonBoxTokensboard = new CardAmountWidget(this, deckStateManager, cardSizeSlider, rootCard, DECK_ZONE_TOKENS);
 
     layout->addWidget(zoneLabelMainboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
     layout->addWidget(buttonBoxMainboard, 0, Qt::AlignHCenter | Qt::AlignTop);
-    layout->addSpacing(25);
+    layout->addSpacing(12);
+    layout->addWidget(zoneLabelTokensboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
+    layout->addWidget(buttonBoxTokensboard, 0, Qt::AlignHCenter | Qt::AlignTop);
+    layout->addSpacing(13);
     layout->addWidget(zoneLabelSideboard, 0, Qt::AlignHCenter | Qt::AlignBottom);
     layout->addWidget(buttonBoxSideboard, 0, Qt::AlignHCenter | Qt::AlignTop);
+
+    // Show Tokens buttons for token cards, Mainboard/Sideboard for non-token cards
+    bool isToken = rootCard.getInfo().getIsToken();
+
+    zoneLabelMainboard->setVisible(!isToken);
+    buttonBoxMainboard->setVisible(!isToken);
+    zoneLabelTokensboard->setVisible(isToken);
+    buttonBoxTokensboard->setVisible(isToken);
+    zoneLabelSideboard->setVisible(!isToken);
+    buttonBoxSideboard->setVisible(!isToken);
 
     connect(cardSizeSlider, &QSlider::valueChanged, this, &AllZonesCardAmountWidget::adjustFontSize);
 
@@ -67,15 +82,17 @@ void AllZonesCardAmountWidget::adjustFontSize(int scalePercentage)
     zoneLabelFont.setPointSize(newFontSize);
     zoneLabelMainboard->setFont(zoneLabelFont);
     zoneLabelSideboard->setFont(zoneLabelFont);
+    zoneLabelTokensboard->setFont(zoneLabelFont);
 
     // Repaint the widget (if necessary)
     repaint();
 }
 
-void AllZonesCardAmountWidget::setAmounts(int mainboardAmount, int sideboardAmount)
+void AllZonesCardAmountWidget::setAmounts(int mainboardAmount, int sideboardAmount, int tokensboardAmount)
 {
     buttonBoxMainboard->setAmount(mainboardAmount);
     buttonBoxSideboard->setAmount(sideboardAmount);
+    buttonBoxTokensboard->setAmount(tokensboardAmount);
 }
 
 /**
@@ -99,11 +116,21 @@ int AllZonesCardAmountWidget::getSideboardAmount()
 }
 
 /**
- * @brief Checks if the amount is at least one in either the mainboard or sideboard.
+ * @brief Gets the card count in the tokensboard zone.
+ *
+ * @return The number of cards in the tokensboard.
+ */
+int AllZonesCardAmountWidget::getTokensboardAmount()
+{
+    return buttonBoxTokensboard->getAmount();
+}
+
+/**
+ * @brief Checks if the amount is at least one in either the mainboard or sideboard or tokensboard.
  */
 bool AllZonesCardAmountWidget::isNonZero()
 {
-    return getMainboardAmount() > 0 || getSideboardAmount() > 0;
+    return getMainboardAmount() > 0 || getSideboardAmount() > 0 || getTokensboardAmount() > 0;
 }
 
 /**

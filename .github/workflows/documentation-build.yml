@@ -1,18 +1,18 @@
 name: Generate Docs
 
 on:
-  release:
-    types:
-      - published    # publishing of stable releases and pre-releases
   pull_request:
     paths:
       - 'doc/doxygen/**'
       - '.github/workflows/documentation-build.yml'
       - 'Doxyfile'
+  release:
+    types:
+      - published    # publishing of stable releases and pre-releases
   workflow_dispatch:
 
 env:
-  COCKATRICE_REF: ${{ github.ref_name }}    # Tag name if the commit is tagged, otherwise branch name
+  COCKATRICE_REF: ${{ github.ref_name }}    # tag name if the commit is tagged, otherwise branch name
 
 jobs:
   docs:
@@ -20,22 +20,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: "Checkout code"
         uses: actions/checkout@v6
         with:
           submodules: recursive
 
-      - name: Install Graphviz
+      - name: "Install Graphviz"
         run: |
           sudo apt-get install -y graphviz
           dot -V
 
-      - name: Install Doxygen
+      - name: "Install Doxygen"
         uses: ssciwr/doxygen-install@v2
         with:
           version: "1.16.1"
 
-      - name: Update Doxygen Configuration
+      - name: "Update Doxygen Configuration"
         run: |
           git diff Doxyfile
           doxygen -u Doxyfile
@@ -48,16 +48,16 @@ jobs:
             exit 1
           fi
 
-      - name: Generate Documentation
+      - name: "Generate Documentation"
         if: always()
         run: doxygen Doxyfile
 
-      - name: Deploy to cockatrice.github.io
+      - name: "Deploy to cockatrice.github.io"
         if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
+          destination_dir: docs    # docs will be available at https://cockatrice.github.io/docs/
           external_repository: Cockatrice/cockatrice.github.io
           publish_branch: master
           publish_dir: ./docs/html
-          destination_dir: docs    # Docs will live under https://cockatrice.github.io/docs/
