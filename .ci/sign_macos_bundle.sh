@@ -23,7 +23,7 @@ fi
 APP_BUNDLE_PATH="$1"
 
 # Verify that app bundle exists
-if [[ ! -e "$APP_BUNDLE_PATH" ]]; then
+if [[ ! -f "$APP_BUNDLE_PATH" ]]; then
   echo "::error file=$0::App bundle not found at: $APP_BUNDLE_PATH"
   exit 1
 fi
