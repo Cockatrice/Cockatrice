@@ -376,7 +376,7 @@ jobs:
           path: ${{ env.CCACHE_DIR }}
           restore-keys: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-
 
-      - name: "[macOS] Restore thin Qt ${{ matrix.qt_version }}libraries"
+      - name: "[macOS] Restore thin Qt ${{ matrix.qt_version }} libraries"
         if: matrix.os == 'macOS'
         id: restore_qt
         uses: actions/cache/restore@v5
