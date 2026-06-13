@@ -28,22 +28,6 @@ if [[ ! -e "$APP_BUNDLE_PATH" ]]; then
   exit 1
 fi
 
-# Configure keychain
-if [[ -n "$MACOS_CERTIFICATE" ]]; then
-  echo "::group::Import certificate"
-  echo "$MACOS_CERTIFICATE" | base64 --decode >"certificate.p12"
-  security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-  security default-keychain -s build.keychain
-  security set-keychain-settings -t 3600 -l build.keychain
-  security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-  security import certificate.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PWD" -T /usr/bin/codesign
-  security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-  echo "::endgroup::"
-else
-  echo "::error file=$0::MACOS_CERTIFICATE not set. Can not configure keychain."
-  exit 1
-fi
-
 # Sign app bundle
 if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
   echo "::group::Sign app bundle"
