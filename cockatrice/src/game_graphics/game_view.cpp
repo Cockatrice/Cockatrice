@@ -1,6 +1,7 @@
 #include "game_view.h"
 
 #include "../client/settings/cache_settings.h"
+#include "../game/game.h"
 #include "game_scene.h"
 
 #include <QAction>
@@ -34,7 +35,6 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
 {
     setBackgroundBrush(QBrush(QColor(0, 0, 0)));
     setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing);
-    setFocusPolicy(Qt::ClickFocus);
     setViewportUpdateMode(BoundingRectViewportUpdate);
 
     connect(scene, &GameScene::sceneRectChanged, this, &GameView::updateSceneRect);
@@ -43,6 +43,9 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     connect(scene, &GameScene::sigResizeRubberBand, this, &GameView::resizeRubberBand);
     connect(scene, &GameScene::sigStopRubberBand, this, &GameView::stopRubberBand);
     connect(scene, &QGraphicsScene::selectionChanged, this, [this]() { updateTotalSelectionCount(); });
+
+    setFocusDisabled(SettingsCache::instance().getKeepGameChatFocus());
+    connect(&SettingsCache::instance(), &SettingsCache::keepGameChatFocusChanged, this, &GameView::setFocusDisabled);
 
     aCloseMostRecentZoneView = new QAction(this);
 
@@ -184,5 +187,18 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
         totalCountLabel->show();
     } else {
         totalCountLabel->hide();
+    }
+}
+
+/**
+ * Disabling focus on the game view will allow chat to maintain the autofocusing behavior of pre 2.10.3,
+ * at the cost of disabling the zone view search bar.
+ */
+void GameView::setFocusDisabled(bool disabled)
+{
+    if (disabled) {
+        setFocusPolicy(Qt::NoFocus);
+    } else {
+        setFocusPolicy(Qt::ClickFocus);
     }
 }

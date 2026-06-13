@@ -31,6 +31,7 @@ private slots:
     void stopRubberBand();
     void refreshShortcuts();
     void updateTotalSelectionCount(const QSize &viewSize = QSize());
+    void setFocusDisabled(bool focusEnabled);
 public slots:
     void updateSceneRect(const QRectF &rect);
 
