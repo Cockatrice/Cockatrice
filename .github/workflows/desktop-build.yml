@@ -273,7 +273,7 @@ jobs:
             make_package: 1
             override_target: 13
             package_suffix: "-macOS13_Intel"
-            qt_version: 6.11.0
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Intel
@@ -289,7 +289,7 @@ jobs:
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS14"
-            qt_version: 6.11.0
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
@@ -305,7 +305,7 @@ jobs:
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS15"
-            qt_version: 6.11.0
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
@@ -319,7 +319,7 @@ jobs:
             
             ccache_eviction_age: 7d
             cmake_generator: Ninja
-            qt_version: 6.11.0
+            qt_version: 6.11.*
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
@@ -335,7 +335,7 @@ jobs:
             cmake_generator_platform: x64
             make_package: 1
             package_suffix: "-Win10"
-            qt_version: 6.11.0
+            qt_version: 6.11.*
             qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
@@ -376,26 +376,17 @@ jobs:
           path: ${{ env.CCACHE_DIR }}
           restore-keys: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-
 
-      - name: "Install aqtinstall"
-        run: pipx install aqtinstall
-
-      # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version via aqtinstall to avoid stale caches on new releases
-      - name: "Resolve latest Qt patch version"
-        id: resolve_qt_version
-        shell: bash
-        run: .ci/resolve_latest_aqt_qt_version.sh "${{ matrix.qt_version }}"
-
-      - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries"
+      - name: "[macOS] Restore thin Qt ${{ matrix.qt_version }}libraries"
         if: matrix.os == 'macOS'
         id: restore_qt
         uses: actions/cache/restore@v5
         with:
-          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+          key: thin-qt-macos-${{ matrix.soc }}-${{ matrix.qt_version }}
           path: ${{ github.workspace }}/Qt
 
       # Using jurplel/install-qt-action to install Qt without using brew
       # Qt build using vcpkg either just fails or takes too long to build
-      - name: "[macOS] Install fat Qt ${{ steps.resolve_qt_version.outputs.version }}"
+      - name: "[macOS] Install fat Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
@@ -403,7 +394,7 @@ jobs:
           cache: false
           dir: ${{ github.workspace }}
           modules: ${{ matrix.qt_modules }}
-          version: ${{ steps.resolve_qt_version.outputs.version }}
+          version: ${{ matrix.qt_version }}
 
       - name: "[macOS] Create thin Qt libraries"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
@@ -413,7 +404,7 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: actions/cache/save@v5
         with:
-          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+          key: thin-qt-macos-${{ matrix.soc }}-${{ matrix.qt_version }}
           path: ${{ github.workspace }}/Qt
 
       - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
@@ -425,7 +416,7 @@ jobs:
           arch: ${{ matrix.qt_arch }}
           cache: true
           modules: ${{ matrix.qt_modules }}
-          version: ${{ steps.resolve_qt_version.outputs.version }}
+          version: ${{ matrix.qt_version }}
 
       - name: "[Windows] Install NSIS"
         if: matrix.os == 'Windows'
