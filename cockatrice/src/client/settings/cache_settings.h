@@ -195,6 +195,7 @@ signals:
     void downloadSpoilerStatusChanged();
     void useTearOffMenusChanged(bool state);
     void roundCardCornersChanged(bool roundCardCorners);
+    void keepGameChatFocusChanged(bool value);
 
 private:
     QSettings *settings;
@@ -306,6 +307,7 @@ private:
     int cardViewExpandedRowsMax;
     bool closeEmptyCardView;
     bool focusCardViewSearchBar;
+    bool keepGameChatFocus;
     int pixmapCacheSize;
     int networkCacheSize;
     int redirectCacheTtl;
@@ -935,6 +937,7 @@ public:
     void setCardViewExpandedRowsMax(int value);
     void setCloseEmptyCardView(QT_STATE_CHANGED_T value);
     void setFocusCardViewSearchBar(QT_STATE_CHANGED_T value);
+    void setKeepGameChatFocus(QT_STATE_CHANGED_T value);
     QString getClientID() override
     {
         return clientID;
@@ -966,6 +969,10 @@ public:
     [[nodiscard]] bool getFocusCardViewSearchBar() const
     {
         return focusCardViewSearchBar;
+    }
+    [[nodiscard]] bool getKeepGameChatFocus() const
+    {
+        return keepGameChatFocus;
     }
     [[nodiscard]] ShortcutsSettings &shortcuts() const
     {

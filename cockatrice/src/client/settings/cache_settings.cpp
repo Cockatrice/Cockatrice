@@ -309,6 +309,7 @@ SettingsCache::SettingsCache()
     cardViewExpandedRowsMax = settings->value("interface/cardViewExpandedRowsMax", 20).toInt();
     closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
     focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
+    keepGameChatFocus = settings->value("interface/keepGameChatFocus", false).toBool();
 
     showDragSelectionCount = settings->value("interface/showlassoselectioncount", true).toBool();
     showTotalSelectionCount = settings->value("interface/showpersistentselectioncount", true).toBool();
@@ -455,6 +456,13 @@ void SettingsCache::setFocusCardViewSearchBar(QT_STATE_CHANGED_T value)
 {
     focusCardViewSearchBar = value;
     settings->setValue("interface/focusCardViewSearchBar", focusCardViewSearchBar);
+}
+
+void SettingsCache::setKeepGameChatFocus(QT_STATE_CHANGED_T value)
+{
+    keepGameChatFocus = value;
+    settings->setValue("interface/keepGameChatFocus", keepGameChatFocus);
+    emit keepGameChatFocusChanged(keepGameChatFocus);
 }
 
 void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
