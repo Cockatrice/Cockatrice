@@ -190,6 +190,25 @@ AuthenticationResult Server::loginUser(Server_ProtocolHandler *session,
     return authState;
 }
 
+void Server::broadcastUserInfoUpdate(Server_ProtocolHandler *source)
+{
+    Event_UserJoined event;
+    event.mutable_user_info()->CopyFrom(source->copyUserInfo(false));
+
+    SessionEvent *se = Server_ProtocolHandler::prepareSessionEvent(event);
+
+    clientsLock.lockForRead();
+    for (auto &client : clients) {
+        if (client->getAcceptsUserListChanges()) {
+            client->sendProtocolItem(*se);
+        }
+    }
+    clientsLock.unlock();
+
+    sendIsl_SessionEvent(*se);
+    delete se;
+}
+
 void Server::addPersistentPlayer(const QString &userName, int roomId, int gameId, int playerId)
 {
     QWriteLocker locker(&persistentPlayersLock);

@@ -7,9 +7,16 @@
 #ifndef USERLIST_H
 #define USERLIST_H
 
+#include "../../cards/card_info_picture_art_crop_widget.h"
+#include "user_avatar_provider.h"
+#include "user_card_art_provider.h"
+#include "user_list_manager.h"
+#include "user_list_painter.h"
+
 #include <QComboBox>
 #include <QDialog>
 #include <QGroupBox>
+#include <QQueue>
 #include <QStyledItemDelegate>
 #include <QTextEdit>
 #include <QTreeWidgetItem>
@@ -94,12 +101,21 @@ public:
 
 class UserListItemDelegate : public QStyledItemDelegate
 {
+    const QMap<QString, QPixmap> *avatarCache;
+    const QMap<QString, QPixmap> *cardArtCache;
+    const QMap<QString, CardArtParams> *cardArtParamsMap;
+
 public:
-    explicit UserListItemDelegate(QObject *const parent);
+    explicit UserListItemDelegate(QObject *const parent,
+                                  const QMap<QString, QPixmap> *avatarCache,
+                                  const QMap<QString, QPixmap> *cardArtCache,
+                                  const QMap<QString, CardArtParams> *cardArtParamsMap);
     bool editorEvent(QEvent *event,
                      QAbstractItemModel *model,
                      const QStyleOptionViewItem &option,
                      const QModelIndex &index) override;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
 class UserListTWI : public QTreeWidgetItem
@@ -131,6 +147,11 @@ public:
     };
 
 private:
+    UserListManager *manager = nullptr;
+    UserAvatarProvider *avatarProvider = nullptr;
+    UserCardArtProvider *cardArtProvider = nullptr;
+    QMap<QString, CardArtParams> cardArtParamsMap;
+
     QMap<QString, UserListTWI *> users;
     TabSupervisor *tabSupervisor;
     AbstractClient *client;
@@ -155,7 +176,10 @@ public:
                    AbstractClient *_client,
                    UserListType _type,
                    QWidget *parent = nullptr);
+    void bind(UserListManager *mgr);
+    void applyDisplayMode();
     void retranslateUi();
+    void rebuild();
     void processUserInfo(const ServerInfo_User &user, bool online);
     bool deleteUser(const QString &userName);
     void setUserOnline(const QString &userName, bool online);

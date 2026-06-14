@@ -1,10 +1,13 @@
 #include "user_list_widget.h"
 
+#include "../../../../client/settings/cache_settings.h"
+#include "../../../card_picture_loader/card_picture_loader.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/widgets/tabs/tab_account.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "../game_selector.h"
 #include "user_context_menu.h"
+#include "user_list_painter.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -15,13 +18,18 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QMouseEvent>
+#include <QPainter>
+#include <QPainterPath>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QWidget>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
+#include <libcockatrice/protocol/pb/response_get_user_info.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/trice_limits.h>
 
 BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(parent)
@@ -308,7 +316,18 @@ QString AdminNotesDialog::getNotes() const
     return notes->toPlainText();
 }
 
-UserListItemDelegate::UserListItemDelegate(QObject *const parent) : QStyledItemDelegate(parent)
+namespace UserListRoles
+{
+constexpr int Online = Qt::UserRole + 1;
+constexpr int UserInfo = Qt::UserRole + 2;
+} // namespace UserListRoles
+
+UserListItemDelegate::UserListItemDelegate(QObject *const parent,
+                                           const QMap<QString, QPixmap> *avatarCache,
+                                           const QMap<QString, QPixmap> *cardArtCache,
+                                           const QMap<QString, CardArtParams> *cardArtParamsMap)
+    : QStyledItemDelegate(parent), avatarCache(avatarCache), cardArtCache(cardArtCache),
+      cardArtParamsMap(cardArtParamsMap)
 {
 }
 
@@ -331,6 +350,32 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
     return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
 
+QSize UserListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    if (!SettingsCache::instance().getStyleUserList()) {
+        return QStyledItemDelegate::sizeHint(option, index);
+    }
+    return UserListPainter::sizeHint();
+}
+
+void UserListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    if (!SettingsCache::instance().getStyleUserList()) {
+        QStyledItemDelegate::paint(painter, option, index);
+        return;
+    }
+
+    const QVariant var = index.data(UserListRoles::UserInfo);
+
+    if (!var.isValid()) {
+        QStyledItemDelegate::paint(painter, option, index);
+        return;
+    }
+
+    UserListPainter::paint(painter, option, index, var.value<ServerInfo_User>(), avatarCache, cardArtCache,
+                           cardArtParamsMap);
+}
+
 UserListTWI::UserListTWI(const ServerInfo_User &_userInfo) : QTreeWidgetItem(Type)
 {
     setUserInfo(_userInfo);
@@ -347,11 +392,12 @@ void UserListTWI::setUserInfo(const ServerInfo_User &_userInfo)
     setData(2, Qt::UserRole, QString::fromStdString(userInfo.name()));
     setData(2, Qt::DisplayRole, QString::fromStdString(userInfo.name()));
     setData(3, Qt::InitialSortOrderRole, QString::fromStdString(userInfo.privlevel()));
+    setData(0, UserListRoles::UserInfo, QVariant::fromValue(userInfo));
 }
 
 void UserListTWI::setOnline(bool online)
 {
-    setData(0, Qt::UserRole + 1, online);
+    setData(0, UserListRoles::Online, online);
     setData(2, Qt::ForegroundRole, online ? qApp->palette().brush(QPalette::WindowText) : QBrush(Qt::gray));
 }
 
@@ -370,8 +416,8 @@ void UserListTWI::setOnline(bool online)
 bool UserListTWI::operator<(const QTreeWidgetItem &other) const
 {
     // Sort by online/offline
-    if (data(0, Qt::UserRole + 1) != other.data(0, Qt::UserRole + 1)) {
-        return data(0, Qt::UserRole + 1).toBool();
+    if (data(0, UserListRoles::Online) != other.data(0, UserListRoles::Online)) {
+        return data(0, UserListRoles::Online).toBool();
     }
 
     const auto &lhsUserLevelFlags = UserLevelFlags(data(0, Qt::UserRole).toInt());
@@ -418,20 +464,38 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
                                QWidget *parent)
     : QGroupBox(parent), tabSupervisor(_tabSupervisor), client(_client), type(_type), onlineCount(0)
 {
-    itemDelegate = new UserListItemDelegate(this);
+    avatarProvider = new UserAvatarProvider(client, this);
+    cardArtProvider = new UserCardArtProvider(this);
+
+    itemDelegate =
+        new UserListItemDelegate(this, &avatarProvider->cache(), &cardArtProvider->cache(), &cardArtParamsMap);
+
     userContextMenu = new UserContextMenu(tabSupervisor, this);
     connect(userContextMenu, &UserContextMenu::openMessageDialog, this, &UserListWidget::openMessageDialog);
 
     userTree = new QTreeWidget;
-    userTree->setColumnCount(3);
-    userTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    userTree->setColumnCount(4); // 0=display, 1=flag(hidden), 2=name(hidden), 3=privlevel(hidden)
+    userTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
     userTree->header()->setMinimumSectionSize(0);
     userTree->setHeaderHidden(true);
     userTree->setRootIsDecorated(false);
     userTree->setIconSize(QSize(20, 18));
     userTree->setItemDelegate(itemDelegate);
     userTree->setAlternatingRowColors(true);
+    userTree->hideColumn(1);
+    userTree->hideColumn(2);
+    userTree->hideColumn(3);
     connect(userTree, &QTreeWidget::itemActivated, this, &UserListWidget::userClicked);
+    userTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    userTree->header()->setStretchLastSection(true);
+
+    connect(avatarProvider, &UserAvatarProvider::avatarUpdated, this,
+            [this](const QString &) { userTree->viewport()->update(); });
+    connect(cardArtProvider, &UserCardArtProvider::cardArtUpdated, this,
+            [this](const QString &) { userTree->viewport()->update(); });
+
+    connect(&SettingsCache::instance(), &SettingsCache::styleUserListChanged, this, &UserListWidget::applyDisplayMode);
+    applyDisplayMode();
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(userTree);
@@ -439,6 +503,34 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     setLayout(vbox);
 
     retranslateUi();
+}
+
+void UserListWidget::bind(UserListManager *mgr)
+{
+    manager = mgr;
+
+    connect(manager, &UserListManager::listsChanged, this, &UserListWidget::rebuild);
+
+    rebuild();
+}
+
+void UserListWidget::applyDisplayMode()
+{
+    const bool styled = SettingsCache::instance().getStyleUserList();
+
+    if (styled) {
+        userTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+        userTree->hideColumn(1);
+        userTree->hideColumn(2);
+        userTree->hideColumn(3);
+    } else {
+        userTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        userTree->showColumn(1);
+        userTree->showColumn(2);
+        userTree->hideColumn(3);
+    }
+
+    userTree->viewport()->update();
 }
 
 void UserListWidget::retranslateUi()
@@ -461,9 +553,59 @@ void UserListWidget::retranslateUi()
     updateCount();
 }
 
+void UserListWidget::rebuild()
+{
+    userTree->clear();
+    users.clear();
+    cardArtParamsMap.clear();
+    onlineCount = 0;
+
+    if (!manager) {
+        return;
+    }
+
+    const QMap<QString, ServerInfo_User> *source = nullptr;
+
+    switch (type) {
+        case AllUsersList:
+        case RoomList:
+            source = &manager->getAllUsersList();
+            break;
+        case BuddyList:
+            source = &manager->getBuddyList();
+            break;
+        case IgnoreList:
+            source = &manager->getIgnoreList();
+            break;
+    }
+
+    for (auto it = source->cbegin(); it != source->cend(); ++it) {
+        processUserInfo(it.value(), manager->getOnlineUser(it.key()) != nullptr);
+    }
+
+    sortItems();
+}
+
 void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
 {
     const QString userName = QString::fromStdString(user.name());
+
+    // Always update params from the latest ServerInfo_User, whether the
+    // item is new or existing, so a live server-push refreshes the rendering.
+    if (user.has_card_art_params()) {
+        const auto &cap = user.card_art_params();
+        CardArtParams params;
+        params.cardName = QString::fromStdString(cap.card_name());
+        params.marginPctL = cap.margin_pct_l();
+        params.marginPctR = cap.margin_pct_r();
+        params.verticalOffset = cap.vertical_offset();
+        params.zoom = cap.zoom();
+        cardArtParamsMap.insert(userName, params);
+        cardArtProvider->requestCardArt(userName, params.cardName);
+    } else {
+        cardArtParamsMap.remove(userName); // clear stale params on removal
+    }
+
     UserListTWI *item = users.value(userName);
     if (item) {
         item->setUserInfo(user);
@@ -475,25 +617,27 @@ void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
             ++onlineCount;
         }
         updateCount();
+        avatarProvider->requestAvatar(userName);
     }
     item->setOnline(online);
+    userTree->viewport()->update();
 }
 
 bool UserListWidget::deleteUser(const QString &userName)
 {
     UserListTWI *twi = users.value(userName);
-    if (twi) {
-        users.remove(userName);
-        userTree->takeTopLevelItem(userTree->indexOfTopLevelItem(twi));
-        if (twi->data(0, Qt::UserRole + 1).toBool()) {
-            --onlineCount;
-        }
-        delete twi;
-        updateCount();
-        return true;
+    if (!twi) {
+        return false;
     }
 
-    return false;
+    users.remove(userName);
+    userTree->takeTopLevelItem(userTree->indexOfTopLevelItem(twi));
+    if (twi->data(0, Qt::UserRole + 1).toBool()) {
+        --onlineCount;
+    }
+    delete twi;
+    updateCount();
+    return true;
 }
 
 void UserListWidget::setUserOnline(const QString &userName, bool online)
@@ -537,5 +681,5 @@ void UserListWidget::showContextMenu(const QPoint &pos, const QModelIndex &index
 
 void UserListWidget::sortItems()
 {
-    userTree->sortItems(1, Qt::AscendingOrder);
+    userTree->sortItems(0, Qt::AscendingOrder);
 }

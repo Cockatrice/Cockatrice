@@ -17,6 +17,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/passwordhasher.h
     libcockatrice/utility/trice_limits.h
     libcockatrice/utility/zone_names.h
+    libcockatrice/utility/days_years_between.h
 )
 
 add_library(libcockatrice_utility STATIC ${UTILITY_SOURCES} ${UTILITY_HEADERS})

@@ -1,0 +1,15 @@
+syntax = "proto2";
+import "response.proto";
+
+message Response_CardArtRuleEntry {
+    optional string card_name = 1;
+    optional string mode = 2;
+    optional string reason = 3;
+}
+
+message Response_ListCardArtRules {
+    extend Response {
+        optional Response_ListCardArtRules ext = 1200;
+    }
+    repeated Response_CardArtRuleEntry entries = 1;
+}
