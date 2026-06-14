@@ -83,6 +83,7 @@ set(cockatrice_SOURCES
     src/game/game_state.cpp
     src/game_graphics/game_view.cpp
     src/game_graphics/hand_counter.cpp
+    src/game/selection_subtype_tally.cpp
     src/game_graphics/log/message_log_widget.cpp
     src/game/phase.cpp
     src/game_graphics/phases_toolbar.cpp

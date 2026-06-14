@@ -351,6 +351,7 @@ private:
     bool showStatusBar;
     bool showDragSelectionCount;
     bool showTotalSelectionCount;
+    bool showSubtypeSelectionTally;
 
 public:
     SettingsCache();
@@ -473,6 +474,10 @@ public:
     [[nodiscard]] bool getShowTotalSelectionCount() const
     {
         return showTotalSelectionCount;
+    }
+    [[nodiscard]] bool getShowSubtypeSelectionTally() const
+    {
+        return showSubtypeSelectionTally;
     }
     [[nodiscard]] bool getNotificationsEnabled() const
     {
@@ -1162,5 +1167,6 @@ public slots:
     void setRoundCardCorners(bool _roundCardCorners);
     void setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount);
     void setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSelectionCount);
+    void setShowSubtypeSelectionTally(QT_STATE_CHANGED_T _showSubtypeSelectionTally);
 };
 #endif
