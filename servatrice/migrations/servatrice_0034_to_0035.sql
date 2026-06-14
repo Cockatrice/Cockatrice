@@ -1,4 +1,4 @@
-ALTER TABLE `cockatrice_users` ADD COLUMN `card_art_params` TEXT DEFAULT NULL;
+ALTER TABLE `cockatrice_users` ADD COLUMN `card_art_params` TEXT DEFAULT NULL, ALGORITHM=INSTANT;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_card_art_name_rules` (
     `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
