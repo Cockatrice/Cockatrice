@@ -21,9 +21,10 @@
 #include <libcockatrice/protocol/pb/server_message.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/protocol/protocol_version.h>
 #include <libcockatrice/utility/passwordhasher.h>
 
-static const unsigned int protocolVersion = 14;
+static const unsigned int protocolVersion = COCKATRICE_PROTOCOL_VERSION;
 
 RemoteClient::RemoteClient(QObject *parent, INetworkSettingsProvider *_networkSettingsProvider)
     : AbstractClient(parent), networkSettingsProvider(_networkSettingsProvider), timeRunning(0), lastDataReceived(0),
