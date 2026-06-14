@@ -11,6 +11,7 @@
 #include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../board/arrow_data.h"
 #include "../interface/deck_loader/loaded_deck.h"
+#include "../zones/command_zone_logic.h"
 #include "../zones/hand_zone_logic.h"
 #include "../zones/pile_zone_logic.h"
 #include "../zones/stack_zone_logic.h"
@@ -25,6 +26,7 @@
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/protocol/pb/card_attributes.pb.h>
 #include <libcockatrice/protocol/pb/game_event.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 
 inline Q_LOGGING_CATEGORY(PlayerLog, "player");
@@ -57,6 +59,7 @@ class ServerInfo_Counter;
 class ServerInfo_Player;
 class ServerInfo_User;
 class TabGame;
+class AbstractCounter;
 
 const int MAX_TOKENS_PER_DIALOG = 99;
 
@@ -87,6 +90,7 @@ signals:
     void arrowDeleteRequested(int creatorId, int arrowId);
     void arrowDeleted(int creatorId, int arrowId);
     void arrowsClearedLocally(); // fires on clear() and processPlayerInfo
+    void commandZoneSupportChanged(bool hasCommandZone);
 
 public slots:
     void setActive(bool _active);
@@ -191,8 +195,21 @@ public:
         return qobject_cast<HandZoneLogic *>(zones.value(ZoneNames::HAND));
     }
 
+    /** @brief Returns the command zone logic, or nullptr if not present. */
+    CommandZoneLogic *getCommandZone()
+    {
+        return qobject_cast<CommandZoneLogic *>(zones.value(ZoneNames::COMMAND));
+    }
+
+    /** @brief Whether the server confirmed command zone support for this game. */
+    bool hasServerCommandZone() const
+    {
+        return serverHasCommandZone;
+    }
+
     CounterState *addCounter(const ServerInfo_Counter &counter);
-    CounterState *addCounter(int id, const QString &name, const QColor &color, int radius, int value);
+    CounterState *
+    addCounter(int id, const QString &name, const QColor &color, int radius, int value, bool active = true);
     void delCounter(int counterId);
     void clearCounters();
 
@@ -242,6 +259,7 @@ private:
     QMap<int, CounterState *> counters;
 
     bool dialogSemaphore;
+    bool serverHasCommandZone;
     QList<CardItem *> cardsToDelete;
 };
 

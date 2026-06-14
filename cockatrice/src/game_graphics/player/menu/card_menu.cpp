@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/card_counter_settings.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
+#include "../../board/abstract_counter.h"
 #include "../../board/card_item.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
@@ -14,6 +15,7 @@
 #include <QPainter>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/zone_names.h>
 
 /**
@@ -81,6 +83,8 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     aUnattach = makeAction(this, [actions, sel]() { actions->actUnattach(sel()); });
     aSetAnnotation = makeAction(this, [actions, sel]() { actions->actRequestSetAnnotationDialog(sel()); });
     aPlay = makeAction(this, [actions, sel]() { actions->actPlay(sel()); });
+    aPlayAndIncreaseTax = makeAction(this, [actions, sel]() { actions->actPlayAndIncreaseTax(sel()); });
+    aPlayAndIncreasePartnerTax = makeAction(this, [actions, sel]() { actions->actPlayAndIncreasePartnerTax(sel()); });
     aPlayFacedown = makeAction(this, [actions, sel]() { actions->actPlayFacedown(sel()); });
     aHide = makeAction(this, [actions, sel]() { actions->actHide(sel()); });
     aReduceLifeByPower = makeAction(this, [actions, sel]() { actions->actReduceLifeByPower(sel()); });
@@ -157,6 +161,31 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
             } else if (card->getZone()->getName() == ZoneNames::EXILE ||
                        card->getZone()->getName() == ZoneNames::GRAVE) {
                 createGraveyardOrExileMenu(writeableCard);
+            } else if (card->getZone()->getName() == ZoneNames::COMMAND) {
+                if (writeableCard) {
+                    addAction(aPlay);
+
+                    if (player->getTaxCounterIfActive(CounterIds::CommanderTax)) {
+                        addAction(aPlayAndIncreaseTax);
+                    }
+
+                    if (player->getTaxCounterIfActive(CounterIds::PartnerTax)) {
+                        addAction(aPlayAndIncreasePartnerTax);
+                    }
+
+                    // No reveal submenu - command zone is public
+                    addSeparator();
+                    addAction(aClone);
+                    addMenu(new MoveMenu(player));
+                } else {
+                    addAction(aDrawArrow);
+                    addSeparator();
+                    addAction(aClone);
+                }
+                addSeparator();
+                addAction(aSelectAll);
+                addRelatedCardView();
+                addRelatedCardActions();
             } else {
                 createHandOrCustomZoneMenu(writeableCard);
             }
@@ -487,6 +516,8 @@ void CardMenu::retranslateUi()
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
+    aPlayAndIncreaseTax->setText(tr("Play and &Increase Commander Tax"));
+    aPlayAndIncreasePartnerTax->setText(tr("Play and Increase &Partner Tax"));
     aRevealToAll->setText(tr("&All players"));
     //: Turn sideways or back again
     aTap->setText(tr("&Tap / Untap"));

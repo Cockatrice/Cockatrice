@@ -15,6 +15,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/levenshtein.h
     libcockatrice/utility/macros.h
     libcockatrice/utility/passwordhasher.h
+    libcockatrice/utility/counter_ids.h
     libcockatrice/utility/trice_limits.h
     libcockatrice/utility/zone_names.h
 )

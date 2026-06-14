@@ -69,6 +69,7 @@ private:
     bool spectatorsSeeEverything;
     int startingLifeTotal;
     bool shareDecklistsOnLoad;
+    bool enableCommandZone;
     int inactivityCounter;
     int startTimeOfThisGame, secondsElapsed;
     bool firstGameStarted;
@@ -106,6 +107,7 @@ public:
                 bool _spectatorsSeeEverything,
                 int _startingLifeTotal,
                 bool _shareDecklistsOnLoad,
+                bool _enableCommandZone,
                 Server_Room *parent);
     ~Server_Game() override;
     Server_Room *getRoom() const
@@ -172,6 +174,10 @@ public:
     bool getShareDecklistsOnLoad() const
     {
         return shareDecklistsOnLoad;
+    }
+    bool getEnableCommandZone() const
+    {
+        return enableCommandZone;
     }
     Response::ResponseCode
     checkJoin(ServerInfo_User *user, const QString &_password, bool spectator, bool overrideRestrictions, bool asJudge);

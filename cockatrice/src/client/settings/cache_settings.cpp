@@ -414,6 +414,7 @@ SettingsCache::SettingsCache()
     createGameAsSpectator = settings->value("game/creategameasspectator", false).toBool();
     defaultStartingLifeTotal = settings->value("game/defaultstartinglifetotal", 20).toInt();
     shareDecklistsOnLoad = settings->value("game/sharedecklistsonload", false).toBool();
+    enableCommandZone = settings->value("game/enablecommandzone", false).toBool();
     rememberGameSettings = settings->value("game/remembergamesettings", true).toBool();
 
     // Local game settings use "localgameoptions/" prefix to keep them separate
@@ -421,6 +422,7 @@ SettingsCache::SettingsCache()
     localGameRememberSettings = settings->value("localgameoptions/remembersettings", false).toBool();
     localGameMaxPlayers = settings->value("localgameoptions/maxplayers", 1).toInt();
     localGameStartingLifeTotal = settings->value("localgameoptions/startinglifetotal", 20).toInt();
+    localGameEnableCommandZone = settings->value("localgameoptions/enablecommandzone", false).toBool();
 
     clientID = settings->value("personal/clientid", CLIENT_INFO_NOT_SET).toString();
     clientVersion = settings->value("personal/clientversion", CLIENT_INFO_NOT_SET).toString();
@@ -1265,6 +1267,12 @@ void SettingsCache::setShareDecklistsOnLoad(const bool _shareDecklistsOnLoad)
     settings->setValue("game/sharedecklistsonload", shareDecklistsOnLoad);
 }
 
+void SettingsCache::setEnableCommandZone(const bool _enableCommandZone)
+{
+    enableCommandZone = _enableCommandZone;
+    settings->setValue("game/enablecommandzone", enableCommandZone);
+}
+
 void SettingsCache::setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value)
 {
     checkUpdatesOnStartup = static_cast<bool>(value);
@@ -1323,6 +1331,12 @@ void SettingsCache::setLocalGameStartingLifeTotal(int value)
 {
     localGameStartingLifeTotal = value;
     settings->setValue("localgameoptions/startinglifetotal", value);
+}
+
+void SettingsCache::setLocalGameEnableCommandZone(bool value)
+{
+    localGameEnableCommandZone = value;
+    settings->setValue("localgameoptions/enablecommandzone", value);
 }
 
 void SettingsCache::setNotifyAboutUpdate(QT_STATE_CHANGED_T _notifyaboutupdate)

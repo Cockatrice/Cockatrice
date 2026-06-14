@@ -32,6 +32,9 @@ public:
     QMenu *mCardCounters;
 
     QAction *aPlay, *aPlayFacedown;
+    QAction *
+        aPlayAndIncreaseTax; ///< Plays card and increments the primary commander tax counter (CounterIds::CommanderTax)
+    QAction *aPlayAndIncreasePartnerTax;
     QAction *aRevealToAll;
     QAction *aHide;
     QAction *aClone;

@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "game_event.proto";
+
+message Event_SetCounterActive {
+    extend GameEvent {
+        optional Event_SetCounterActive ext = 2023;
+    }
+    optional sint32 counter_id = 1;
+    optional bool active = 2;
+}

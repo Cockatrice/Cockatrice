@@ -1,6 +1,7 @@
 /**
  * @file abstract_counter.h
  * @ingroup GameGraphicsPlayers
+ * @brief Abstract base for player counters displayed on the game board.
  */
 //! \todo Document this file.
 
@@ -61,6 +62,13 @@ public:
     ~AbstractCounter() override;
 
     void retranslateUi() override;
+
+    /**
+     * @brief Sets the counter value and triggers a visual update.
+     * Virtual to allow subclass display customization (e.g., CommanderTaxCounter tooltip updates).
+     * Overflow protection is handled server-side, not in client counter classes.
+     */
+    virtual void setValue(int _value);
     void setShortcutsActive() override;
     void setShortcutsInactive() override;
     void delCounter();
@@ -93,6 +101,25 @@ public:
     {
         return shownInCounterArea;
     }
+
+    /**
+     * @brief Returns whether this counter is active (visible and interactable).
+     * Inactive counters are hidden and their menu actions should be disabled.
+     */
+    [[nodiscard]] bool isActive() const
+    {
+        return active;
+    }
+
+    /**
+     * @brief Sets the active state of this counter.
+     * When inactive, the counter is hidden via setVisible(false).
+     * @param _active True to show and enable the counter, false to hide it
+     */
+    virtual void setActive(bool _active);
+
+private:
+    bool active = true;
 };
 
 class AbstractCounterDialog : public QInputDialog

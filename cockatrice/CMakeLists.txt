@@ -67,6 +67,7 @@ set(cockatrice_SOURCES
     src/game_graphics/board/card_item.cpp
     src/game/board/card_list.cpp
     src/game/board/card_state.cpp
+    src/game_graphics/board/commander_tax_counter.cpp
     src/game_graphics/board/counter_general.cpp
     src/game/board/counter_state.cpp
     src/game_graphics/board/translate_counter_name.cpp
@@ -87,6 +88,7 @@ set(cockatrice_SOURCES
     src/game/phase.cpp
     src/game_graphics/phases_toolbar.cpp
     src/game_graphics/player/menu/card_menu.cpp
+    src/game_graphics/player/menu/command_zone_menu.cpp
     src/game_graphics/player/menu/custom_zone_menu.cpp
     src/game_graphics/player/menu/grave_menu.cpp
     src/game_graphics/player/menu/hand_menu.cpp
@@ -110,6 +112,8 @@ set(cockatrice_SOURCES
     src/game_graphics/player/player_target.cpp
     src/game/replay.cpp
     src/game/zones/card_zone_logic.cpp
+    src/game_graphics/zones/command_zone.cpp
+    src/game/zones/command_zone_logic.cpp
     src/game/zones/hand_zone_logic.cpp
     src/game/zones/pile_zone_logic.cpp
     src/game/zones/stack_zone_logic.cpp
