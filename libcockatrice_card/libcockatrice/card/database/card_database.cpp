@@ -85,7 +85,8 @@ void CardDatabase::refreshCachedReverseRelatedCards()
         for (auto *rel : card->getReverseRelatedCards()) {
             if (auto target = cards.value(rel->getName())) {
                 auto *newRel = new CardRelation(card->getName(), rel->getAttachType(), rel->getIsCreateAllExclusion(),
-                                                rel->getIsVariable(), rel->getDefaultCount(), rel->getIsPersistent());
+                                                rel->getIsVariable(), rel->getDefaultCount(), rel->getIsPersistent(),
+                                                rel->getIsFaceDown());
                 target->addReverseRelatedCards2Me(newRel);
             }
         }
