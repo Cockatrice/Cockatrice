@@ -36,7 +36,7 @@ on:
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
-  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
+  group: ${{ github.workflow }} @ ${{ github.ref_name }}
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 jobs:
@@ -47,22 +47,24 @@ jobs:
       tag: ${{steps.configure.outputs.tag}}
       sha: ${{steps.configure.outputs.sha}}
 
-    steps:  
+    steps:
       - name: Configure
+        env:
+          RESOLVED_SHA: >-
+            ${{
+              case(
+                github.event_name == 'pull_reuqest',
+                github.event.pull_request.head.sha,
+                github.sha
+              )
+            }}
         id: configure
         shell: bash
         run: |
-          tag_regex='^refs/tags/'
-          if [[ $GITHUB_EVENT_NAME == pull-request ]]; then    # pull request
-            sha="${{github.event.pull_request.head.sha}}"
-          elif [[ $GITHUB_REF =~ $tag_regex ]]; then    # release
-            sha="$GITHUB_SHA"
-            tag="${GITHUB_REF/refs\/tags\//}"
-            echo "tag=$tag" >>"$GITHUB_OUTPUT"
-          else    # push to branch
-            sha="$GITHUB_SHA"
+          if [[ "$GITHUB_REF_TYPE" == 'tag' ]]; then    # release
+            echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
           fi
-          echo "sha=$sha" >>"$GITHUB_OUTPUT"
+          echo "sha=$RESOLVED_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
         if: steps.configure.outputs.tag != null
@@ -83,17 +85,21 @@ jobs:
         id: create_release
         shell: bash
         env:
+          args: >-
+            ${{
+              case(
+                steps.prepare.outputs.is_beta == 'yes',
+                '--prerelease',
+                ''
+              )
+            }}
           GH_TOKEN: ${{github.token}}
           tag_name: ${{steps.configure.outputs.tag}}
           target: ${{steps.configure.outputs.sha}}
           release_name: ${{steps.prepare.outputs.title}}
           body_path: ${{steps.prepare.outputs.body_path}}
-          prerelease: ${{steps.prepare.outputs.is_beta}}
         run: |
-          if [[ $prerelease == yes ]]; then
-            args="--prerelease"
-          fi
-          gh release create "$tag_name" --draft --verify-tag $args \
+          gh release create "$tag_name" --draft --verify-tag "$args" \
               --target "$target" --title "$release_name" \
               --notes-file "$body_path"
 
