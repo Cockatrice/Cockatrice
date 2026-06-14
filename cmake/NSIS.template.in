@@ -89,19 +89,7 @@ ${IfNot} ${Errors}
     Quit
 ${EndIf}
 
-ClearErrors
-${GetOptions} $9 "/PORTABLE" $8
-${IfNot} ${Errors}
-    StrCpy $PortableMode 1
-    StrCpy $0 $PortableDestDir
-${Else}
-    StrCpy $PortableMode 0
-    StrCpy $0 $NormalDestDir
-    ${If} ${Silent}
-        Call RequireAdmin
-    ${EndIf}
-${EndIf}
-
+; Detect reinstall mode first
 ClearErrors
 ${GetOptions} $9 "/R" $8
 ${IfNot} ${Errors}
@@ -112,14 +100,31 @@ ${Else}
     StrCpy $ReinstallMode 0
 ${EndIf}
 
-${If} $InstDir == ""
-    ; User did not use /D to specify a directory,
-    ; we need to set a default based on the install mode
-    StrCpy $InstDir $0
+; Only parse /PORTABLE for fresh installs
+${If} $ReinstallMode = 0
+    ClearErrors
+    ${GetOptions} $9 "/PORTABLE" $8
+    ${IfNot} ${Errors}
+        StrCpy $PortableMode 1
+        StrCpy $0 $PortableDestDir
+    ${Else}
+        StrCpy $PortableMode 0
+        StrCpy $0 $NormalDestDir
+        ${If} ${Silent}
+            Call RequireAdmin
+        ${EndIf}
+    ${EndIf}
 ${EndIf}
-Call SetModeDestinationFromInstdir
 
-; --- Detect portable install when using /R ---
+${If} $InstDir == ""
+    ${If} $ReinstallMode = 1
+        StrCpy $InstDir $NormalDestDir
+    ${Else}
+        StrCpy $InstDir $0
+    ${EndIf}
+${EndIf}
+
+; Detect portable installs during update from portable.dat
 ${If} $ReinstallMode = 1
     IfFileExists "$InstDir\portable.dat" 0 not_portable
         StrCpy $PortableMode 1
@@ -131,7 +136,11 @@ ${If} $ReinstallMode = 1
     portable_done:
 ${EndIf}
 
+Call SetModeDestinationFromInstdir
+
+; Only uninstall registered installs
 ${If} $ReinstallMode = 1
+${AndIf} $PortableMode = 0
     Call AutoUninstallIfNeeded
 ${EndIf}
 
@@ -157,10 +166,10 @@ FunctionEnd
 
 
 Function SetModeDestinationFromInstdir
-${If} $PortableMode = 0
-    StrCpy $NormalDestDir $InstDir
-${Else}
+${If} $PortableMode = 1
     StrCpy $PortableDestDir $InstDir
+${Else}
+    StrCpy $NormalDestDir $InstDir
 ${EndIf}
 FunctionEnd
 
