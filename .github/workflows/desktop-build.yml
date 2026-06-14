@@ -475,8 +475,7 @@ jobs:
           path: ${{ env.CCACHE_DIR }}
 
       - name: "[macOS] Sign & notarize app bundle"
-        # if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
-        if: matrix.os == 'macOS'
+        if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
         shell: bash
         env:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
