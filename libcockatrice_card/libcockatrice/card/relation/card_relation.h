@@ -156,9 +156,9 @@ public:
     }
 
     /**
-     * @brief Returns whether the relation creates the token face-down.
+     * @brief Returns whether the relation creates the token facedown.
      *
-     * @return True if persistent, false otherwise.
+     * @return True if facedown, false otherwise.
      */
     [[nodiscard]] bool getIsFaceDown() const
     {
