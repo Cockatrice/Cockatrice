@@ -112,6 +112,18 @@ ${Else}
     StrCpy $ReinstallMode 0
 ${EndIf}
 
+; When launched with /R by the client, explicitly parse /D= from the raw
+; parameter string. Qt's QProcess::startDetached with a pre-formed command
+; string does not guarantee the NSIS stub's built-in /D= handler sees the
+; value, so we extract it ourselves here where GetOptions is reliable.
+${If} $ReinstallMode = 1
+    ClearErrors
+    ${GetOptions} $9 "/D=" $R1
+    ${IfNot} ${Errors}
+        StrCpy $InstDir $R1
+    ${EndIf}
+${EndIf}
+
 ${If} $InstDir == ""
     ; User did not use /D to specify a directory,
     ; we need to set a default based on the install mode
