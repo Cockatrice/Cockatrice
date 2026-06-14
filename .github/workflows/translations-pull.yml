@@ -41,11 +41,11 @@ jobs:
           author: github-actions <github-actions@github.com>    # owner of the commit
           body: |
             Pulled all translated strings from [Transifex][1].
-            
+
             ---
             *This PR is automatically generated and updated by the workflow at `.github/workflows/translations-pull.yml`. Review [action runs][2].*<br>
             *After merging, all new languages and translations are available in the next build.*
-            
+
             [1]: https://explore.transifex.com/cockatrice/cockatrice/
             [2]: https://github.com/Cockatrice/Cockatrice/actions/workflows/translations-pull.yml?query=branch%3Amaster
           branch: ci-update_translations
@@ -61,11 +61,16 @@ jobs:
         if: github.event_name != 'pull_request'
         shell: bash
         env:
-          STATUS: ${{ steps.create_pr.outputs.pull-request-operation }}
+          PR_NUMBER: ${{ steps.create_pr.outputs.pull-request-number }}
+          PR_URL: ${{ steps.create_pr.outputs.pull-request-url }}
+          STATUS: >-
+            ${{
+              case(
+                steps.create_pr.outputs.pull-request-operation == 'none',
+                'unchanged',
+                steps.create_pr.outputs.pull-request-operation
+              )
+            }}
         run: |
-          if [[ "$STATUS" == "none" ]]; then
-            echo "PR #${{ steps.create_pr.outputs.pull-request-number }} unchanged!" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "PR #${{ steps.create_pr.outputs.pull-request-number }} $STATUS!" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "URL: ${{ steps.create_pr.outputs.pull-request-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "PR #$PR_NUMBER $STATUS!" >> "$GITHUB_STEP_SUMMARY"
+          echo "URL: $PR_URL" >> "$GITHUB_STEP_SUMMARY"
