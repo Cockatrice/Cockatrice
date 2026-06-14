@@ -126,12 +126,19 @@ void PlayerGraphicsItem::initializeZones()
     connect(handCounter, &HandCounter::showContextMenu, handZoneGraphicsItem, &HandZone::showContextMenu);
 
     zoneGraphicsItems.insert(player->getDeckZone()->getName(), deckZoneGraphicsItem);
+    connect(deckZoneGraphicsItem, &CardZone::cardItemAdded, this, &PlayerGraphicsItem::cardItemAdded);
     zoneGraphicsItems.insert(player->getGraveZone()->getName(), graveyardZoneGraphicsItem);
+    connect(graveyardZoneGraphicsItem, &CardZone::cardItemAdded, this, &PlayerGraphicsItem::cardItemAdded);
     zoneGraphicsItems.insert(player->getRfgZone()->getName(), rfgZoneGraphicsItem);
+    connect(rfgZoneGraphicsItem, &CardZone::cardItemAdded, this, &PlayerGraphicsItem::cardItemAdded);
     zoneGraphicsItems.insert(player->getSideboardZone()->getName(), sideboardGraphicsItem);
+    connect(sideboardGraphicsItem, &CardZone::cardItemAdded, this, &PlayerGraphicsItem::cardItemAdded);
     zoneGraphicsItems.insert(player->getTableZone()->getName(), tableZoneGraphicsItem);
+    connect(tableZoneGraphicsItem, &CardZone::cardItemAdded, this, &PlayerGraphicsItem::cardItemAdded);
     zoneGraphicsItems.insert(player->getStackZone()->getName(), stackZoneGraphicsItem);
+    connect(stackZoneGraphicsItem, &CardZone::cardItemAdded, this, &PlayerGraphicsItem::cardItemAdded);
     zoneGraphicsItems.insert(player->getHandZone()->getName(), handZoneGraphicsItem);
+    connect(handZoneGraphicsItem, &CardZone::cardItemAdded, this, &PlayerGraphicsItem::cardItemAdded);
 }
 
 void PlayerGraphicsItem::onCustomZoneAdded(QString customZoneName)

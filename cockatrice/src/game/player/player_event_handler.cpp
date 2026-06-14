@@ -137,7 +137,7 @@ void PlayerEventHandler::eventCreateToken(const Event_CreateToken &event)
     }
 
     CardRef cardRef = {QString::fromStdString(event.card_name()), QString::fromStdString(event.card_provider_id())};
-    CardItem *card = new CardItem(player, nullptr, cardRef, event.card_id());
+    CardState *card = new CardState(player, cardRef, event.card_id(), zone);
     // use db PT if not provided in event and not face-down
     if (!QString::fromStdString(event.pt()).isEmpty()) {
         card->setPT(QString::fromStdString(event.pt()));
@@ -175,7 +175,7 @@ void PlayerEventHandler::eventSetCardAttr(const Event_SetCardAttr &event,
             emit logSetTapped(player, nullptr, event.attr_value() == "1");
         }
     } else {
-        CardItem *card = zone->getCard(event.card_id());
+        CardState *card = zone->getCard(event.card_id());
         if (!card) {
             qWarning() << "PlayerEventHandler::eventSetCardAttr: card id=" << event.card_id() << "not found";
             return;
@@ -185,7 +185,7 @@ void PlayerEventHandler::eventSetCardAttr(const Event_SetCardAttr &event,
 }
 
 void PlayerEventHandler::setCardAttrHelper(const GameEventContext &context,
-                                           CardItem *card,
+                                           CardState *card,
                                            CardAttribute attribute,
                                            const QString &avalue,
                                            bool allCards,
@@ -246,7 +246,7 @@ void PlayerEventHandler::eventSetCardCounter(const Event_SetCardCounter &event)
         return;
     }
 
-    CardItem *card = zone->getCard(event.card_id());
+    CardState *card = zone->getCard(event.card_id());
     if (!card) {
         return;
     }
@@ -322,12 +322,12 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
     if (x == -1) {
         x = 0;
     }
-    CardItem *card = startZone->takeCard(position, event.card_id(), startZone != targetZone);
+    CardState *card = startZone->takeCard(position, event.card_id(), startZone != targetZone);
     if (card == nullptr) {
         return;
     }
     if (startZone != targetZone) {
-        card->deleteCardInfoPopup();
+        // TODO card->deleteCardInfoPopup();
     }
     if (event.has_card_name()) {
         QString name = QString::fromStdString(event.card_name());
@@ -337,22 +337,22 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
     }
 
     if (card->getAttachedTo() && (startZone != targetZone)) {
-        CardItem *parentCard = card->getAttachedTo();
+        CardState *parentCard = card->getAttachedTo();
         card->setAttachedTo(nullptr);
         parentCard->getZone()->reorganizeCards();
     }
 
-    card->deleteDragItem();
+    // TODO: card->deleteDragItem();
 
     card->setId(event.new_card_id());
     card->setFaceDown(event.face_down());
     if (startZone != targetZone) {
-        card->setBeingPointedAt(false);
-        card->setHovered(false);
+        /* TODO card->setBeingPointedAt(false);
+        card->setHovered(false);*/
 
-        const QList<CardItem *> &attachedCards = card->getAttachedCards();
+        const QList<CardState *> &attachedCards = card->getAttachedCards();
         for (auto attachedCard : attachedCards) {
-            emit targetZone->cardAdded(attachedCard);
+            emit targetZone->cardAdded(attachedCard, 0, 0);
         }
 
         if (startZone->getPlayer() != targetZone->getPlayer()) {
@@ -385,7 +385,7 @@ void PlayerEventHandler::eventFlipCard(const Event_FlipCard &event)
     if (!zone) {
         return;
     }
-    CardItem *card = zone->getCard(event.card_id());
+    CardState *card = zone->getCard(event.card_id());
     if (!card) {
         return;
     }
@@ -408,12 +408,12 @@ void PlayerEventHandler::eventDestroyCard(const Event_DestroyCard &event)
         return;
     }
 
-    CardItem *card = zone->getCard(event.card_id());
+    CardState *card = zone->getCard(event.card_id());
     if (!card) {
         return;
     }
 
-    QList<CardItem *> attachedCards = card->getAttachedCards();
+    QList<CardState *> attachedCards = card->getAttachedCards();
     // This list is always empty except for buggy server implementations.
     for (auto &attachedCard : attachedCards) {
         attachedCard->setAttachedTo(nullptr);
@@ -429,7 +429,7 @@ void PlayerEventHandler::eventAttachCard(const Event_AttachCard &event)
     const QMap<int, PlayerLogic *> &playerList = player->getGame()->getPlayerManager()->getPlayers();
     PlayerLogic *targetPlayer = nullptr;
     CardZoneLogic *targetZone = nullptr;
-    CardItem *targetCard = nullptr;
+    CardState *targetCard = nullptr;
     if (event.has_target_player_id()) {
         targetPlayer = playerList.value(event.target_player_id(), 0);
         if (targetPlayer) {
@@ -445,12 +445,12 @@ void PlayerEventHandler::eventAttachCard(const Event_AttachCard &event)
         return;
     }
 
-    CardItem *startCard = startZone->getCard(event.card_id());
+    CardState *startCard = startZone->getCard(event.card_id());
     if (!startCard) {
         return;
     }
 
-    CardItem *oldParent = startCard->getAttachedTo();
+    CardState *oldParent = startCard->getAttachedTo();
 
     startCard->setAttachedTo(targetCard);
 
@@ -479,7 +479,7 @@ void PlayerEventHandler::eventDrawCards(const Event_DrawCards &event)
     if (listSize) {
         for (int i = 0; i < listSize; ++i) {
             const ServerInfo_Card &cardInfo = event.cards(i);
-            CardItem *card = _deck->takeCard(0, cardInfo.id());
+            CardState *card = _deck->takeCard(0, cardInfo.id());
             QString cardName = QString::fromStdString(cardInfo.name());
             QString providerId = QString::fromStdString(cardInfo.provider_id());
             card->setCardRef({cardName, providerId});
@@ -527,7 +527,7 @@ void PlayerEventHandler::eventRevealCards(const Event_RevealCards &event, EventP
         for (const auto &card : cardList) {
             QString cardName = QString::fromStdString(card->name());
             QString providerId = QString::fromStdString(card->provider_id());
-            CardItem *cardItem = zone->getCard(card->id());
+            CardState *cardItem = zone->getCard(card->id());
             if (!cardItem) {
                 continue;
             }

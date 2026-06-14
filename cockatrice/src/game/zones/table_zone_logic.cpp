@@ -12,7 +12,7 @@ TableZoneLogic::TableZoneLogic(PlayerLogic *_player,
 {
 }
 
-void TableZoneLogic::addCardImpl(CardItem *card, int _x, int _y)
+void TableZoneLogic::addCardImpl(CardState *card, int _x, int _y)
 {
     cards.append(card);
     if (!card->getFaceDown() && card->getPT().isEmpty()) {
@@ -21,13 +21,14 @@ void TableZoneLogic::addCardImpl(CardItem *card, int _x, int _y)
     if (card->getCardInfo().getUiAttributes().cipt && card->getCardInfo().getUiAttributes().landscapeOrientation) {
         card->setDoesntUntap(true);
     }
+
     card->setGridPoint(QPoint(_x, _y));
     card->setVisible(true);
 }
 
-CardItem *TableZoneLogic::takeCard(int position, int cardId, bool toNewZone)
+CardState *TableZoneLogic::takeCard(int position, int cardId, bool toNewZone)
 {
-    CardItem *result = CardZoneLogic::takeCard(position, cardId);
+    CardState *result = CardZoneLogic::takeCard(position, cardId);
 
     if (toNewZone) {
         emit contentSizeChanged();

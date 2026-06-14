@@ -76,6 +76,18 @@ QList<CardItem *> GameScene::selectedCards() const
     return selectedCards;
 }
 
+QList<CardState *> GameScene::selectedCardsAsStates() const
+{
+    QList<CardState *> selectedCards;
+    for (auto item : selectedItems()) {
+        if (auto card = qgraphicsitem_cast<CardItem *>(item)) {
+            selectedCards.append(card->getState());
+        }
+    }
+
+    return selectedCards;
+}
+
 void GameScene::onCardSelectionChanged(AbstractCardItem *abstractCard, bool selected)
 {
     CardItem *card = qobject_cast<CardItem *>(abstractCard);
@@ -86,7 +98,7 @@ void GameScene::onCardSelectionChanged(AbstractCardItem *abstractCard, bool sele
     auto *owner = card->getOwner();
 
     if (selected) {
-        owner->requestCardMenuUpdate(card);
+        owner->requestCardMenuUpdate(card->getState());
         return;
     }
 
@@ -112,7 +124,7 @@ void GameScene::onCardRightClicked(AbstractCardItem *abstractCard, QPoint screen
 
     card->getOwner()->getGame()->setActiveCard(card);
 
-    if (auto *menu = view->getPlayerMenu()->updateCardMenu(card)) {
+    if (auto *menu = view->getPlayerMenu()->updateCardMenu(card->getState())) {
         menu->popup(screenPos);
     }
 }
@@ -125,7 +137,7 @@ void GameScene::playSelected(AbstractCardItem *card)
     if (!card->getOwner()) {
         return;
     }
-    card->getOwner()->getPlayerActions()->actPlay(selectedCards());
+    card->getOwner()->getPlayerActions()->actPlay(selectedCardsAsStates());
 }
 
 void GameScene::playSelectedFaceDown(AbstractCardItem *card)
@@ -136,7 +148,7 @@ void GameScene::playSelectedFaceDown(AbstractCardItem *card)
     if (!card->getOwner()) {
         return;
     }
-    card->getOwner()->getPlayerActions()->actPlayFacedown(selectedCards());
+    card->getOwner()->getPlayerActions()->actPlayFacedown(selectedCardsAsStates());
 }
 
 void GameScene::hideSelected(AbstractCardItem *card)
@@ -147,7 +159,7 @@ void GameScene::hideSelected(AbstractCardItem *card)
     if (!card->getOwner()) {
         return;
     }
-    card->getOwner()->getPlayerActions()->actHide(selectedCards());
+    card->getOwner()->getPlayerActions()->actHide(selectedCardsAsStates());
 }
 
 /**
@@ -181,7 +193,8 @@ void GameScene::addPlayer(PlayerLogic *player)
     connect(player, &PlayerLogic::arrowsClearedLocally, this,
             [this, id = player->getPlayerInfo()->getId()]() { clearArrowsForPlayerLocally(id); });
 
-    connect(player->getPlayerEventHandler(), &PlayerEventHandler::cardZoneChanged, this, &GameScene::onCardZoneChanged);
+    // connect(player->getPlayerEventHandler(), &PlayerEventHandler::cardZoneChanged, this,
+    // &GameScene::onCardZoneChanged);
 
     rearrange();
 }
@@ -458,13 +471,12 @@ void GameScene::addArrow(QSharedPointer<ArrowData> data)
         return;
     }
 
-    PlayerLogic *startLogic = startView->getLogic();
-    auto *startZone = startLogic->getZones().value(data->startZone);
-    if (!startZone) {
+    auto *startZoneView = startView->getZoneGraphicsItem(data->startZone);
+    if (!startZoneView) {
         return;
     }
 
-    CardItem *startCard = startZone->getCard(data->startCardId);
+    CardItem *startCard = startZoneView->getCardItemForId(data->startCardId);
     if (!startCard) {
         return;
     }
@@ -473,9 +485,9 @@ void GameScene::addArrow(QSharedPointer<ArrowData> data)
     if (data->isPlayerTargeted()) {
         targetItem = targetView->getPlayerTarget();
     } else {
-        auto *zone = targetView->getLogic()->getZones().value(data->targetZone);
+        auto *zone = targetView->getZoneGraphicsItem(data->targetZone);
         if (zone) {
-            targetItem = zone->getCard(data->targetCardId);
+            targetItem = zone->getCardItemForId(data->targetCardId);
         }
     }
     if (!targetItem) {
@@ -592,11 +604,11 @@ CardItem *GameScene::findTopmostCardInZone(const QList<QGraphicsItem *> &items, 
             continue;
         }
 
-        if (card->getAttachedTo()) {
-            if (card->getAttachedTo()->getZone() != zone->getLogic()) {
+        if (card->getState()->getAttachedTo()) {
+            if (card->getState()->getAttachedTo()->getZone() != zone->getLogic()) {
                 continue;
             }
-        } else if (card->getZone() != zone->getLogic()) {
+        } else if (card->getZone()->getLogic() != zone->getLogic()) {
             continue;
         }
 

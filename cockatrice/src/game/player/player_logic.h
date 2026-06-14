@@ -41,14 +41,12 @@ class AbstractGame;
 class ArrowItem;
 class ArrowTarget;
 class CardDatabase;
-class CardZone;
 class CommandContainer;
 class GameCommand;
 class GameEvent;
 class PlayerInfo;
 class PlayerEventHandler;
 class PlayerActions;
-class PlayerMenu;
 class QAction;
 class QMenu;
 class ServerInfo_Arrow;
@@ -72,8 +70,8 @@ signals:
                                  const QList<const ServerInfo_Card *> &cardList,
                                  bool withWritePermission);
     void deckChanged();
-    void newCardAdded(AbstractCardItem *card);
-    void requestCardMenuUpdate(const CardItem *card);
+    void newCardAdded(AbstractCardState *card);
+    void requestCardMenuUpdate(const CardState *card);
     void counterAdded(CounterState *state);
     void counterRemoved(int counterId);
     void rearrangeCounters();
@@ -103,8 +101,8 @@ public:
     void processPlayerInfo(const ServerInfo_Player &info);
     void processCardAttachment(const ServerInfo_Player &info);
 
-    void addCard(CardItem *c);
-    void deleteCard(CardItem *c);
+    void addCard(CardState *c);
+    void deleteCard(CardState *c);
 
     bool clearCardsToDelete();
 
@@ -242,7 +240,7 @@ private:
     QMap<int, CounterState *> counters;
 
     bool dialogSemaphore;
-    QList<CardItem *> cardsToDelete;
+    QList<CardState *> cardsToDelete;
 };
 
 class AnnotationDialog : public QInputDialog

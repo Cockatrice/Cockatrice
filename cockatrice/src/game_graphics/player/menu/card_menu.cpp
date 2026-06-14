@@ -44,7 +44,7 @@ static QAction *makeAction(QObject *parent, Slot &&slot, bool checkable = false,
     return a;
 }
 
-CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _shortcutsActive)
+CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardState *_card, bool _shortcutsActive)
     : player(_player), card(_card), shortcutsActive(_shortcutsActive)
 {
     const QList<PlayerLogic *> &players = player->getLogic()->getGame()->getPlayerManager()->getPlayers().values();
@@ -63,7 +63,7 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     auto *gameScene = player->getGameScene();
 
     // Single selection resolver used by all lambdas — called at trigger time
-    auto sel = [gameScene]() { return gameScene->selectedCards(); };
+    auto sel = [gameScene]() { return gameScene->selectedCardsAsStates(); };
 
     // Unified dispatcher for card menu actions
     auto invoke = [actions, sel](CardMenuActionType type) {
@@ -314,7 +314,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
     initContextualPlayersMenu(revealMenu, aRevealToAll);
 
     connect(revealMenu, &QMenu::triggered, this, [this](QAction *action) {
-        player->getLogic()->getPlayerActions()->actReveal(player->getGameScene()->selectedCards(), action);
+        player->getLogic()->getPlayerActions()->actReveal(player->getGameScene()->selectedCardsAsStates(), action);
     });
 
     addSeparator();

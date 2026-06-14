@@ -10,34 +10,35 @@ PtMenu::PtMenu(PlayerGraphicsItem *player) : QMenu(tr("Power / toughness"))
 
     aIncP = new QAction(this);
     connect(aIncP, &QAction::triggered, playerActions,
-            [player, playerActions] { playerActions->actIncP(player->getGameScene()->selectedCards()); });
+            [player, playerActions] { playerActions->actIncP(player->getGameScene()->selectedCardsAsStates()); });
     aDecP = new QAction(this);
     connect(aDecP, &QAction::triggered, playerActions,
-            [player, playerActions] { playerActions->actDecP(player->getGameScene()->selectedCards()); });
+            [player, playerActions] { playerActions->actDecP(player->getGameScene()->selectedCardsAsStates()); });
     aIncT = new QAction(this);
     connect(aIncT, &QAction::triggered, playerActions,
-            [player, playerActions] { playerActions->actIncT(player->getGameScene()->selectedCards()); });
+            [player, playerActions] { playerActions->actIncT(player->getGameScene()->selectedCardsAsStates()); });
     aDecT = new QAction(this);
     connect(aDecT, &QAction::triggered, playerActions,
-            [player, playerActions] { playerActions->actDecT(player->getGameScene()->selectedCards()); });
+            [player, playerActions] { playerActions->actDecT(player->getGameScene()->selectedCardsAsStates()); });
     aIncPT = new QAction(this);
     connect(aIncPT, &QAction::triggered, playerActions,
-            [player, playerActions] { playerActions->actIncPT(player->getGameScene()->selectedCards()); });
+            [player, playerActions] { playerActions->actIncPT(player->getGameScene()->selectedCardsAsStates()); });
     aDecPT = new QAction(this);
     connect(aDecPT, &QAction::triggered, playerActions,
-            [player, playerActions] { playerActions->actDecPT(player->getGameScene()->selectedCards()); });
+            [player, playerActions] { playerActions->actDecPT(player->getGameScene()->selectedCardsAsStates()); });
     aFlowP = new QAction(this);
     connect(aFlowP, &QAction::triggered, playerActions,
-            [player, playerActions] { playerActions->actFlowP(player->getGameScene()->selectedCards()); });
+            [player, playerActions] { playerActions->actFlowP(player->getGameScene()->selectedCardsAsStates()); });
     aFlowT = new QAction(this);
     connect(aFlowT, &QAction::triggered, playerActions,
-            [player, playerActions] { playerActions->actFlowT(player->getGameScene()->selectedCards()); });
+            [player, playerActions] { playerActions->actFlowT(player->getGameScene()->selectedCardsAsStates()); });
     aSetPT = new QAction(this);
-    connect(aSetPT, &QAction::triggered, playerActions,
-            [player, playerActions] { playerActions->actRequestSetPTDialog(player->getGameScene()->selectedCards()); });
+    connect(aSetPT, &QAction::triggered, playerActions, [player, playerActions] {
+        playerActions->actRequestSetPTDialog(player->getGameScene()->selectedCardsAsStates());
+    });
     aResetPT = new QAction(this);
     connect(aResetPT, &QAction::triggered, playerActions,
-            [player, playerActions] { playerActions->actResetPT(player->getGameScene()->selectedCards()); });
+            [player, playerActions] { playerActions->actResetPT(player->getGameScene()->selectedCardsAsStates()); });
 
     addAction(aIncP);
     addAction(aDecP);

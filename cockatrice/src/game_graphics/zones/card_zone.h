@@ -9,6 +9,7 @@
 
 #include "../../game/zones/card_zone_logic.h"
 #include "../board/abstract_graphics_item.h"
+#include "../board/card_item.h"
 #include "../board/graphics_item_type.h"
 
 #include <QLoggingCategory>
@@ -26,6 +27,9 @@ class CardZone : public AbstractGraphicsItem
 {
     Q_OBJECT
 protected:
+    CardZoneLogic *logic;
+    QList<CardItem *> cards;
+
     QMenu *menu;
     QAction *doubleClickAction;
 
@@ -46,7 +50,11 @@ public slots:
      * Virtual so subclasses (e.g. SelectZone) can override parenting behavior — the Qt signal
      * connection in CardZone's constructor dispatches through the vtable.
      */
-    virtual void onCardAdded(CardItem *addedCard);
+    virtual void onCardAdded(CardState *addedCard, int x, int y);
+    void onCardRemoved(CardState *toAdd, int x, int y);
+
+signals:
+    void cardItemAdded(CardItem *added);
 
 public:
     enum
@@ -67,14 +75,21 @@ public:
         return logic;
     }
 
+    CardItem *getCardItemForId(int id) const
+    {
+        for (CardItem *card : cards) {
+            if (card->getState()->getId() == id) {
+                return card;
+            }
+        }
+        return nullptr;
+    }
+
     void setMenu(QMenu *_menu, QAction *_doubleClickAction = 0)
     {
         menu = _menu;
         doubleClickAction = _doubleClickAction;
     }
-
-private:
-    CardZoneLogic *logic;
 };
 
 #endif

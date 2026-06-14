@@ -29,7 +29,7 @@ public:
 
     SelectZone(CardZoneLogic *logic, QGraphicsItem *parent = nullptr);
     ~SelectZone() override;
-    void onCardAdded(CardItem *addedCard) override;
+    void onCardAdded(CardState *addedCard, int x, int y) override;
 
     /**
      * @brief Temporarily reparents a card from the clip container to this zone so hover scaling is visible beyond clip

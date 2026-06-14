@@ -25,7 +25,7 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
         setCursor(Qt::ClosedHandCursor);
         setZValue(ZValues::DRAG_ITEM);
     }
-    if (item->getTapped()) {
+    if (item->getState()->getTapped()) {
         setTransform(QTransform()
                          .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
                          .rotate(90)

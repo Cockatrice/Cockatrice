@@ -38,7 +38,7 @@ UtilityMenu::UtilityMenu(PlayerGraphicsItem *_player, QMenu *playerMenu) : QMenu
         aIncrementAllCardCounters = new QAction(this);
         connect(aIncrementAllCardCounters, &QAction::triggered, playerActions, [this]() {
             player->getLogic()->getPlayerActions()->actIncrementAllCardCounters(
-                player->getGameScene()->selectedCards());
+                player->getGameScene()->selectedCardsAsStates());
         });
 
         createPredefinedTokenMenu = new QMenu(QString());

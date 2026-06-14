@@ -168,12 +168,12 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
         const int cardListSize = zoneInfo.card_list_size();
         if (!cardListSize) {
             for (int j = 0; j < zoneInfo.card_count(); ++j) {
-                zone->addCard(new CardItem(this), false, -1);
+                zone->addCard(new CardState(this), false, -1);
             }
         } else {
             for (int j = 0; j < cardListSize; ++j) {
                 const ServerInfo_Card &cardInfo = zoneInfo.card_list(j);
-                auto *card = new CardItem(this);
+                auto *card = new CardState(this);
                 card->processCardInfo(cardInfo);
                 zone->addCard(card, false, cardInfo.x(), cardInfo.y());
             }
@@ -207,8 +207,8 @@ void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
         for (int j = 0; j < cardListSize; ++j) {
             const ServerInfo_Card &cardInfo = zoneInfo.card_list(j);
             if (cardInfo.has_attach_player_id()) {
-                CardItem *startCard = zone->getCard(cardInfo.id());
-                CardItem *targetCard =
+                CardState *startCard = zone->getCard(cardInfo.id());
+                CardState *targetCard =
                     game->getCard(cardInfo.attach_player_id(), QString::fromStdString(cardInfo.attach_zone()),
                                   cardInfo.attach_card_id());
                 if (!targetCard) {
@@ -227,12 +227,12 @@ void PlayerLogic::processCardAttachment(const ServerInfo_Player &info)
     }
 }
 
-void PlayerLogic::addCard(CardItem *card)
+void PlayerLogic::addCard(CardState *card)
 {
     emit newCardAdded(card);
 }
 
-void PlayerLogic::deleteCard(CardItem *card)
+void PlayerLogic::deleteCard(CardState *card)
 {
     if (card == nullptr) {
         return;

@@ -146,7 +146,7 @@ void TableZone::handleDropEventByGrid(const QList<CardDragItem *> &dragItems,
             ctm->set_face_down(true);
         }
         if (startZone->getName() != getLogic()->getName() && !item->isForceFaceDown()) {
-            const auto &card = item->getItem()->getCard();
+            const auto &card = item->getItem()->getState()->getCard();
             if (card) {
                 ctm->set_pt(card.getInfo().getPowTough().toStdString());
             }
@@ -161,8 +161,8 @@ void TableZone::reorganizeCards()
     // Calculate card stack widths so mapping functions work properly
     computeCardStackWidths();
 
-    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
-        QPoint gridPoint = getLogic()->getCards()[i]->getGridPos();
+    for (int i = 0; i < cards.size(); ++i) {
+        QPoint gridPoint = cards[i]->getState()->getGridPos();
         if (gridPoint.x() == -1) {
             continue;
         }
@@ -171,21 +171,22 @@ void TableZone::reorganizeCards()
         qreal x = mapPoint.x();
         qreal y = mapPoint.y();
 
-        int numberAttachedCards = getLogic()->getCards()[i]->getAttachedCards().size();
+        int numberAttachedCards = cards[i]->getState()->getAttachedCards().size();
         qreal actualX = x + numberAttachedCards * STACKED_CARD_OFFSET_X;
         qreal actualY = y;
         if (numberAttachedCards) {
             actualY += 15;
         }
 
-        getLogic()->getCards()[i]->setPos(actualX, actualY);
-        getLogic()->getCards()[i]->setRealZValue(ZValues::tableCardZValue(actualX, actualY));
+        cards[i]->setPos(actualX, actualY);
+        cards[i]->setRealZValue(ZValues::tableCardZValue(actualX, actualY));
 
-        QListIterator<CardItem *> attachedCardIterator(getLogic()->getCards()[i]->getAttachedCards());
+        QListIterator<CardState *> attachedCardIterator(cards[i]->getState()->getAttachedCards());
         int j = 0;
         while (attachedCardIterator.hasNext()) {
             ++j;
-            CardItem *attachedCard = attachedCardIterator.next();
+            CardState *attachedState = attachedCardIterator.next();
+            CardItem *attachedCard = getCardItemForId(attachedState->getId());
             qreal childX = actualX - j * STACKED_CARD_OFFSET_X;
             qreal childY = y + 5;
             attachedCard->setPos(childX, childY);
@@ -204,7 +205,7 @@ void TableZone::toggleTapped()
 
     auto isCardOnTable = [](const QGraphicsItem *item) {
         if (auto card = qgraphicsitem_cast<const CardItem *>(item)) {
-            return card->getZone()->getName() == ZoneNames::TABLE;
+            return card->getState()->getZone()->getName() == ZoneNames::TABLE;
         }
         return false;
     };
@@ -212,15 +213,15 @@ void TableZone::toggleTapped()
     std::copy_if(selectedItemsRaw.begin(), selectedItemsRaw.end(), std::back_inserter(selectedItems), isCardOnTable);
 
     bool tapAll = std::any_of(selectedItems.begin(), selectedItems.end(), [](const QGraphicsItem *item) {
-        return !qgraphicsitem_cast<const CardItem *>(item)->getTapped();
+        return !qgraphicsitem_cast<const CardItem *>(item)->getState()->getTapped();
     });
     QList<const ::google::protobuf::Message *> cmdList;
     for (const auto &selectedItem : selectedItems) {
         CardItem *temp = qgraphicsitem_cast<CardItem *>(selectedItem);
-        if (temp->getTapped() != tapAll) {
+        if (temp->getState()->getTapped() != tapAll) {
             Command_SetCardAttr *cmd = new Command_SetCardAttr;
             cmd->set_zone(getLogic()->getName().toStdString());
-            cmd->set_card_id(temp->getId());
+            cmd->set_card_id(temp->getState()->getId());
             cmd->set_attribute(AttrTapped);
             cmd->set_attr_value(tapAll ? "1" : "0");
             cmdList.append(cmd);
@@ -235,9 +236,9 @@ void TableZone::resizeToContents()
     int xMax = 0;
 
     // Find rightmost card position, which includes the left margin amount.
-    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
-        if (getLogic()->getCards()[i]->pos().x() > xMax) {
-            xMax = (int)getLogic()->getCards()[i]->pos().x();
+    for (int i = 0; i < cards.size(); ++i) {
+        if (cards[i]->pos().x() > xMax) {
+            xMax = (int)cards[i]->pos().x();
         }
     }
 
@@ -258,9 +259,9 @@ void TableZone::resizeToContents()
 
 CardItem *TableZone::getCardFromGrid(const QPoint &gridPoint) const
 {
-    for (int i = 0; i < getLogic()->getCards().size(); i++) {
-        if (getLogic()->getCards().at(i)->getGridPoint() == gridPoint) {
-            return getLogic()->getCards().at(i);
+    for (int i = 0; i < cards.size(); i++) {
+        if (cards.at(i)->getState()->getGridPoint() == gridPoint) {
+            return cards.at(i);
         }
     }
     return 0;
@@ -277,8 +278,8 @@ void TableZone::computeCardStackWidths()
     // Each card stack is three grid points worth of card locations.
     // First pass: compute the number of cards at each card stack.
     QMap<int, int> cardStackCount;
-    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
-        const QPoint &gridPoint = getLogic()->getCards()[i]->getGridPos();
+    for (int i = 0; i < cards.size(); ++i) {
+        const QPoint &gridPoint = cards[i]->getState()->getGridPos();
         if (gridPoint.x() == -1) {
             continue;
         }
@@ -289,8 +290,8 @@ void TableZone::computeCardStackWidths()
 
     // Second pass: compute the width at each card stack.
     cardStackWidth.clear();
-    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
-        const QPoint &gridPoint = getLogic()->getCards()[i]->getGridPos();
+    for (int i = 0; i < cards.size(); ++i) {
+        const QPoint &gridPoint = cards[i]->getState()->getGridPos();
         if (gridPoint.x() == -1) {
             continue;
         }
@@ -298,8 +299,8 @@ void TableZone::computeCardStackWidths()
         const int key = getCardStackMapKey(gridPoint.x() / 3, gridPoint.y());
         const int stackCount = cardStackCount.value(key, 0);
         if (stackCount == 1) {
-            cardStackWidth.insert(key, CardDimensions::WIDTH + getLogic()->getCards()[i]->getAttachedCards().size() *
-                                                                   STACKED_CARD_OFFSET_X);
+            cardStackWidth.insert(key, CardDimensions::WIDTH +
+                                           cards[i]->getState()->getAttachedCards().size() * STACKED_CARD_OFFSET_X);
         } else {
             cardStackWidth.insert(key, CardDimensions::WIDTH + (stackCount - 1) * STACKED_CARD_OFFSET_X);
         }
