@@ -1579,13 +1579,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
 
 bool AbstractServerSocketInterface::isCardNameAllowed(const QString &cardName)
 {
-    QSqlQuery *q =
-        sqlInterface->prepareQuery("SELECT mode FROM cockatrice_card_art_name_rules WHERE card_name = :name");
+    QSqlQuery *q = sqlInterface->prepareQuery("SELECT mode FROM {prefix}_card_art_name_rules WHERE card_name = :name");
 
     q->bindValue(":name", cardName);
 
     if (!sqlInterface->execSqlQuery(q)) {
-        return true; // fail-open to avoid breaking server
+        qWarning() << "Card art rule lookup failed; failing open for" << cardName;
+        return true;
     }
 
     if (!q->next()) {
@@ -1603,6 +1603,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
     }
 
     const QString cardName = QString::fromStdString(cmd.card_name());
+
+    if (cardName.length() > MAX_NAME_LENGTH) {
+        return Response::RespInvalidData;
+    }
 
     if (cardName.isEmpty()) {
         // Removal path
@@ -1662,7 +1666,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddCardArtRule(const Co
     const QString cardName = QString::fromStdString(cmd.card_name());
     const QString mode = QString::fromStdString(cmd.mode());
 
-    QSqlQuery *q = sqlInterface->prepareQuery("INSERT INTO cockatrice_card_art_name_rules "
+    if (mode != "ALLOW" && mode != "DENY") {
+        return Response::RespInvalidData;
+    }
+    if (cardName.isEmpty() || cardName.length() > MAX_NAME_LENGTH) {
+        return Response::RespInvalidData;
+    }
+
+    QSqlQuery *q = sqlInterface->prepareQuery("INSERT INTO {prefix}_card_art_name_rules "
                                               "(card_name, mode, reason, created_by) "
                                               "VALUES (:name, :mode, :reason, :uid) "
                                               "ON DUPLICATE KEY UPDATE mode=:mode2, reason=:reason2");
@@ -1684,9 +1695,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddCardArtRule(const Co
 Response::ResponseCode AbstractServerSocketInterface::cmdRemoveCardArtRule(const Command_RemoveCardArtRule &cmd,
                                                                            ResponseContainer &)
 {
-    QSqlQuery *q = sqlInterface->prepareQuery("DELETE FROM cockatrice_card_art_name_rules WHERE card_name=:name");
+    auto cardName = QString::fromStdString(cmd.card_name());
+    if (cardName.length() > MAX_NAME_LENGTH) {
+        return Response::RespInvalidData;
+    }
+    QSqlQuery *q = sqlInterface->prepareQuery("DELETE FROM {prefix}_card_art_name_rules WHERE card_name=:name");
 
-    q->bindValue(":name", QString::fromStdString(cmd.card_name()));
+    q->bindValue(":name", cardName);
 
     if (!sqlInterface->execSqlQuery(q)) {
         return Response::RespInternalError;
@@ -1698,7 +1713,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveCardArtRule(const
 Response::ResponseCode AbstractServerSocketInterface::cmdListCardArtRules(const Command_ListCardArtRules &,
                                                                           ResponseContainer &rc)
 {
-    QSqlQuery *q = sqlInterface->prepareQuery("SELECT card_name, mode, reason FROM cockatrice_card_art_name_rules");
+    QSqlQuery *q = sqlInterface->prepareQuery("SELECT card_name, mode, reason FROM {prefix}_card_art_name_rules");
 
     if (!sqlInterface->execSqlQuery(q)) {
         return Response::RespInternalError;
