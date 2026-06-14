@@ -41,13 +41,6 @@ void CardItem::prepareDelete()
         }
         owner = nullptr;
     }
-
-    state->prepareDelete();
-
-    if (state->getAttachedTo() != nullptr) {
-        state->getAttachedTo()->removeAttachedCard(getState());
-        state->setAttachedTo(nullptr);
-    }
 }
 
 void CardItem::deleteLater()

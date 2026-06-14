@@ -15,6 +15,17 @@ void CardState::prepareDelete()
         attachedCards.first()->setZone(nullptr); // so that it won't try to call reorganizeCards()
         attachedCards.first()->setAttachedTo(nullptr);
     }
+
+    if (getAttachedTo() != nullptr) {
+        getAttachedTo()->removeAttachedCard(this);
+        setAttachedTo(nullptr);
+    }
+}
+
+void CardState::deleteLater()
+{
+    prepareDelete();
+    QObject::deleteLater();
 }
 
 void CardState::processCardInfo(const ServerInfo_Card &_info)

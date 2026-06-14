@@ -51,6 +51,7 @@ public slots:
      * connection in CardZone's constructor dispatches through the vtable.
      */
     virtual void onCardAdded(CardState *addedCard, int x, int y);
+    void onCardRemoved(CardState *toAdd, int x, int y);
 
 signals:
     void cardItemAdded(CardItem *added);

@@ -29,6 +29,7 @@ class CardZoneLogic : public QObject
 
 signals:
     void cardAdded(CardState *addedCard, int x, int y);
+    void cardRemoved(CardState *removedCard, int x, int y);
     void cardCountChanged();
     void reorganizeCards();
     void updateGraphics();

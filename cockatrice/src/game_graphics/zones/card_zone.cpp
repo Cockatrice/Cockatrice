@@ -11,6 +11,7 @@ CardZone::CardZone(CardZoneLogic *_logic, QGraphicsItem *parent)
 {
     connect(logic, &CardZoneLogic::retranslateUi, this, &CardZone::retranslateUi);
     connect(logic, &CardZoneLogic::cardAdded, this, &CardZone::onCardAdded);
+    connect(logic, &CardZoneLogic::cardRemoved, this, &CardZone::onCardRemoved);
     connect(logic, &CardZoneLogic::setGraphicsVisibility, this, [this](bool v) { this->setVisible(v); });
     connect(logic, &CardZoneLogic::updateGraphics, this, [this]() { update(); });
     connect(logic, &CardZoneLogic::reorganizeCards, this, &CardZone::reorganizeCards);
@@ -25,6 +26,20 @@ void CardZone::onCardAdded(CardState *toAdd, int /*x*/, int /*y*/)
     cards.append(addedCard);
 
     emit cardItemAdded(addedCard);
+}
+
+void CardZone::onCardRemoved(CardState *toRemove, int /*x*/, int /*y*/)
+{
+    CardItem *removedCard = getCardItemForId(toRemove->getId());
+    if (!removedCard) {
+        return;
+    }
+    if (cards.contains(removedCard)) {
+        cards.remove(cards.indexOf(removedCard));
+    }
+    removedCard->setVisible(false);
+    removedCard->setParentItem(nullptr);
+    removedCard->deleteLater();
 }
 
 void CardZone::retranslateUi()

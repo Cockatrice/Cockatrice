@@ -90,6 +90,8 @@ CardState *CardZoneLogic::takeCard(int position, int cardId, bool toNewZone)
 
     c->setId(cardId);
 
+    emit cardRemoved(c, c->getGridPos().x(), c->getGridPos().y());
+
     emit reorganizeCards();
     emit cardCountChanged();
     return c;
@@ -119,6 +121,8 @@ void CardZoneLogic::removeCard(CardState *card)
     }
 
     cards.removeOne(card);
+
+    emit cardRemoved(card, card->getGridPos().x(), card->getGridPos().y());
 
     emit reorganizeCards();
     emit cardCountChanged();

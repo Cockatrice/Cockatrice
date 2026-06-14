@@ -41,6 +41,9 @@ signals:
     void zoneChanged(CardState *changedCard, CardZoneLogic *newZone);
     void visibleChanged(bool visible);
 
+public slots:
+    void deleteLater();
+
 public:
     explicit CardState(PlayerLogic *_owner, const CardRef &cardRef = {}, int _id = -1, CardZoneLogic *_zone = nullptr);
 

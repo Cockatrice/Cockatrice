@@ -76,6 +76,10 @@ QMenu *PlayerMenu::updateCardMenu(const CardState *card)
         return nullptr;
     }
 
+    if (!player->getLogic()->getGame()->getActiveCard()) {
+        return nullptr;
+    }
+
     // If is spectator (as spectators don't need card menus), return
     // only update the menu if the card is actually selected
     if ((player->getLogic()->getGame()->getPlayerManager()->isSpectator() &&
