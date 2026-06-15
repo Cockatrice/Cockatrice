@@ -6,5 +6,5 @@ message Event_SetCounterActive {
         optional Event_SetCounterActive ext = 2023;
     }
     optional sint32 counter_id = 1;
-    optional bool active = 2;
+    optional bool active = 2 [default = true];
 }
