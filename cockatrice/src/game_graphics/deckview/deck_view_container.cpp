@@ -209,6 +209,7 @@ void DeckViewContainer::refreshShortcuts()
     loadLocalButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadLocalButton"));
     loadRemoteButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadRemoteButton"));
     loadFromClipboardButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadFromClipboardButton"));
+    loadFromWebsiteButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadFromWebsiteButton"));
     unloadDeckButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/unloadDeckButton"));
     readyStartButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/readyStartButton"));
     sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));
