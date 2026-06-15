@@ -75,6 +75,11 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
         searchEditProxy->setZValue(ZValues::DRAG_ITEM);
         vbox->addItem(searchEditProxy);
 
+        // hide search bar if chat autofocus setting is enabled, since typing into it will no longer work anyway
+        searchEditProxy->setVisible(!SettingsCache::instance().getKeepGameChatFocus());
+        connect(&SettingsCache::instance(), &SettingsCache::keepGameChatFocusChanged, searchEditProxy,
+                [searchEditProxy](bool keepFocus) { searchEditProxy->setVisible(!keepFocus); });
+
         // top row
         QGraphicsLinearLayout *hTopRow = new QGraphicsLinearLayout(Qt::Horizontal);
 
