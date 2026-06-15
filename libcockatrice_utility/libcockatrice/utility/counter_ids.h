@@ -16,20 +16,16 @@
  * Reserved counter IDs for system counters:
  *   IDs 0-7:  Standard player counters (life, mana colors, storm)
  *   IDs 8-9:  Commander tax counters
- *   IDs 10+:  Available for user-created counters
+ *   IDs 10+:  Available for user-created counters (FirstUserId)
  *
- * The server's newCounterId() starts from the highest existing ID + 1,
- * so these reserved IDs won't conflict as long as they're created first
- * during setupZones(). See server_player.cpp::setupZones() for the
- * authoritative list of reserved IDs.
- *
- * To find all files referencing these IDs, grep for CounterIds::CommanderTax
- * and CounterIds::PartnerTax across the codebase.
+ * newCounterId() always returns >= FirstUserId to prevent user counters
+ * from colliding with reserved IDs, even in non-Commander games.
  */
 namespace CounterIds
 {
-constexpr int CommanderTax = 8;
-constexpr int PartnerTax = 9;
+constexpr int CommanderTax = 8; ///< Primary commander tax counter
+constexpr int PartnerTax = 9;   ///< Partner commander tax counter
+constexpr int FirstUserId = 10; ///< First ID available for user-created counters
 
 inline bool isTaxCounter(int id)
 {

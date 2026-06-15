@@ -74,7 +74,8 @@ int Server_Player::newCounterId() const
             id = c->getId();
         }
     }
-    return id + 1;
+    // Skip reserved IDs 0-9 even in non-Commander games to prevent collision
+    return std::max(id + 1, CounterIds::FirstUserId);
 }
 
 void Server_Player::setupZones()
