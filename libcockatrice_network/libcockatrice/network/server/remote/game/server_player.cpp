@@ -578,7 +578,10 @@ Response::ResponseCode Server_Player::cmdSetCounterActive(const Command_SetCount
     }
 
     const int counterId = cmd.counter_id();
-    if (isCommandZoneCounterBlocked(counterId)) {
+    if (!CounterIds::isTaxCounter(counterId)) {
+        return Response::RespFunctionNotAllowed;
+    }
+    if (!game->getEnableCommandZone()) {
         return Response::RespContextError;
     }
 
