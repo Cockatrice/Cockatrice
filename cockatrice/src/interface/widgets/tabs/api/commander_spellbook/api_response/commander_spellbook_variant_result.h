@@ -1,6 +1,5 @@
 #ifndef COCKATRICE_COMMANDER_SPELLBOOK_VARIANT_RESULT_H
 #define COCKATRICE_COMMANDER_SPELLBOOK_VARIANT_RESULT_H
-#include "commander_spellbook_bracket_tag.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
@@ -30,7 +29,7 @@ public:
     double popularity = 0.0;
 
     bool spoiler = false;
-    CommanderSpellbookBracketTag::BracketTag bracketTag = CommanderSpellbookBracketTag::BracketTag::Unknown;
+    QString bracketTag;
 
     QJsonObject legalities;
     QJsonObject prices;

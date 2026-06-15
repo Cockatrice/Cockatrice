@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../settings_page/user_interface_settings_page.h"
+#include "../tabs/api/commander_spellbook/commander_bracket_service.h"
 #include "../tabs/api/commander_spellbook/commander_spellbook_api_accessor.h"
 #include "../tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.h"
 #include "deck_list_style_proxy.h"
@@ -167,6 +168,9 @@ void DeckEditorDeckDockWidget::createDeckDock()
     bracketValueLabel->setVisible(false);
     bracketInfoButton->setVisible(false);
     bracketRefreshButton->setVisible(false);
+
+    connect(&CommanderBracketService::instance(), &CommanderBracketService::estimateFinished, this,
+            &DeckEditorDeckDockWidget::onEstimateBracketFinished);
 
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
@@ -433,29 +437,25 @@ void DeckEditorDeckDockWidget::requestBracketEstimate()
     bracketInfoButton->setEnabled(false);
     bracketValueLabel->setText(tr("Calculating…"));
 
-    requestId = CommanderSpellbookApiAccessor::instance().estimateBracket(deckStateManager->getDeckList(), this);
-
-    connect(&CommanderSpellbookApiAccessor::instance(), &CommanderSpellbookApiAccessor::estimateBracketFinished, this,
-            &DeckEditorDeckDockWidget::onEstimateBracketFinished);
+    requestId = CommanderBracketService::instance().estimateBracket(deckStateManager->getDeckList(), this);
 }
 
-void DeckEditorDeckDockWidget::onEstimateBracketFinished(CommanderSpellbookApiAccessor::RequestId id,
+void DeckEditorDeckDockWidget::onEstimateBracketFinished(quint64 id,
                                                          QObject *requester,
-                                                         const EstimateBracketResult &result)
+                                                         const CommanderBracketEstimate &result)
 {
-    if (requester != this || static_cast<int>(id) != requestId) {
+    if (requester != this || id != requestId) {
         return;
     }
 
     BracketExplainer explainer;
-    lastBracketExplanation = explainer.explain(result);
+    lastBracketExplanation = explainer.explain(result.rawResult);
 
     // Display bracket
-    if (SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames()) {
-        bracketValueLabel->setText(CommanderSpellbookBracketTag::bracketTagToOfficialString(result.bracketTag));
-    } else {
-        bracketValueLabel->setText(CommanderSpellbookBracketTag::bracketTagToString(result.bracketTag));
-    }
+    bracketValueLabel->setText(
+        SettingsCache::instance().getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames()
+            ? result.officialName
+            : result.displayName);
     bracketRefreshButton->setEnabled(true);
 
     // Build tooltip

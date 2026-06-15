@@ -9,6 +9,7 @@
 
 #include "../../interface/card_picture_loader/card_picture_loader_cache_method.h"
 #include "../../interface/card_picture_loader/card_picture_loader_local_schemes.h"
+#include "../../interface/widgets/tabs/api/commander_spellbook/commander_bracket_definitions.h"
 #include "shortcuts_settings.h"
 
 #include <QDate>
@@ -19,6 +20,7 @@
 #include <libcockatrice/interfaces/interface_network_settings_provider.h>
 #include <libcockatrice/settings/card_database_settings.h>
 #include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/settings/commander_bracket_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/game_filters_settings.h>
@@ -203,6 +205,7 @@ private:
     ShortcutsSettings *shortcutsSettings;
     CardDatabaseSettings *cardDatabaseSettings;
     ServersSettings *serversSettings;
+    CommanderBracketSettings *commanderBracketSettings;
     MessageSettings *messageSettings;
     GameFiltersSettings *gameFiltersSettings;
     LayoutsSettings *layoutsSettings;
@@ -211,6 +214,8 @@ private:
     CardOverrideSettings *cardOverrideSettings;
     DebugSettings *debugSettings;
     CardCounterSettings *cardCounterSettings;
+
+    CommanderBracketDefinitions bracketDefinitions;
 
     QString lang;
     QString deckPath, filtersPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
@@ -990,6 +995,15 @@ public:
     [[nodiscard]] ServersSettings &servers() const
     {
         return *serversSettings;
+    }
+    [[nodiscard]] CommanderBracketSettings &commanderBrackets() const
+    {
+        return *commanderBracketSettings;
+    }
+    void reloadBracketDefinitions(const QVariantList &definitions);
+    CommanderBracketDefinitions &commanderBracketDefs()
+    {
+        return bracketDefinitions;
     }
     [[nodiscard]] MessageSettings &messages() const
     {

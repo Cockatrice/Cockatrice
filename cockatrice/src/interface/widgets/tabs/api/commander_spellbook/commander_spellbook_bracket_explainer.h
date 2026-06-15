@@ -10,7 +10,7 @@ struct BracketExplanationSection
 
 struct BracketExplanation
 {
-    CommanderSpellbookBracketTag::BracketTag bracket;
+    QString bracket;
     QList<BracketExplanationSection> sections;
 
     bool isEmpty() const

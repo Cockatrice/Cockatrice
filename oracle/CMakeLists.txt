@@ -32,6 +32,7 @@ set(oracle_SOURCES
     ../cockatrice/src/interface/theme_manager.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_popup_widget.cpp
+    ../cockatrice/src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_definitions.cpp
     ${VERSION_STRING_CPP}
 )
 

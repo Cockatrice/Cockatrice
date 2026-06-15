@@ -22,7 +22,7 @@
 #include <QTreeView>
 #include <libcockatrice/card/card_info.h>
 
-class EstimateBracketResult;
+struct CommanderBracketEstimate;
 class DeckListModel;
 class AbstractTabDeckEditor;
 class DeckEditorDeckDockWidget : public QDockWidget
@@ -65,7 +65,7 @@ public slots:
     void actRemoveCard();
     void initializeFormats();
     void maybeAutoEstimateBracket();
-    void onEstimateBracketFinished(quint64 id, QObject *requester, const EstimateBracketResult &result);
+    void onEstimateBracketFinished(quint64 id, QObject *requester, const CommanderBracketEstimate &result);
 
 signals:
     void selectedCardChanged(const ExactCard &card);

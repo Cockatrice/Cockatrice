@@ -5,6 +5,7 @@ set(CMAKE_AUTORCC ON)
 set(HEADERS
     libcockatrice/settings/card_database_settings.h
     libcockatrice/settings/card_override_settings.h
+    libcockatrice/settings/commander_bracket_settings.h
     libcockatrice/settings/debug_settings.h
     libcockatrice/settings/download_settings.h
     libcockatrice/settings/game_filters_settings.h
@@ -26,6 +27,7 @@ add_library(
   ${MOC_SOURCES}
   libcockatrice/settings/card_database_settings.cpp
   libcockatrice/settings/card_override_settings.cpp
+  libcockatrice/settings/commander_bracket_settings.cpp
   libcockatrice/settings/debug_settings.cpp
   libcockatrice/settings/download_settings.cpp
   libcockatrice/settings/game_filters_settings.cpp

@@ -350,6 +350,9 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/interface/key_signals.cpp
     src/interface/logger.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_service.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_definitions.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/handle_commander_brackets.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp

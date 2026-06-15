@@ -1,49 +1,107 @@
 #include "commander_spellbook_estimate_bracket_result.h"
 
-static void parseCards(const QJsonObject &json, const QString &key, QVector<CommanderSpellbookCardResult> &out)
-{
-    out.clear();
-    for (const auto &v : json.value(key).toArray()) {
-        if (!v.isObject()) {
-            continue;
-        }
-        CommanderSpellbookCardResult c;
-        c.fromJson(v.toObject());
-        out.append(c);
-    }
-}
-
-static void parseVariants(const QJsonObject &json, const QString &key, QVector<CommanderSpellbookVariantResult> &out)
-{
-    out.clear();
-    for (const auto &v : json.value(key).toArray()) {
-        if (!v.isObject()) {
-            continue;
-        }
-        CommanderSpellbookVariantResult vr;
-        vr.fromJson(v.toObject());
-        out.append(vr);
-    }
-}
-
 void EstimateBracketResult::fromJson(const QJsonObject &json)
 {
-    bracketTag = CommanderSpellbookBracketTag::bracketTagFromString(json.value("bracketTag").toString());
+    bracketTag = json.value("bracketTag").toString();
 
-    parseCards(json, "gameChangerCards", gameChangerCards);
-    parseCards(json, "massLandDenialCards", massLandDenialCards);
-    parseCards(json, "extraTurnCards", extraTurnCards);
-    parseCards(json, "tutorCards", tutorCards);
+    gameChangerCards.clear();
+    massLandDenialCards.clear();
+    extraTurnCards.clear();
 
-    parseVariants(json, "massLandDenialTemplates", massLandDenialTemplates);
-    parseVariants(json, "massLandDenialCombos", massLandDenialCombos);
-    parseVariants(json, "extraTurnTemplates", extraTurnTemplates);
-    parseVariants(json, "extraTurnsCombos", extraTurnsCombos);
-    parseVariants(json, "tutorTemplates", tutorTemplates);
-    parseVariants(json, "lockCombos", lockCombos);
-    parseVariants(json, "skipTurnsCombos", skipTurnsCombos);
-    parseVariants(json, "definitelyEarlyGameTwoCardCombos", definitelyEarlyGameTwoCardCombos);
-    parseVariants(json, "arguablyEarlyGameTwoCardCombos", arguablyEarlyGameTwoCardCombos);
-    parseVariants(json, "definitelyLateGameTwoCardCombos", definitelyLateGameTwoCardCombos);
-    parseVariants(json, "borderlineLateGameTwoCardCombos", borderlineLateGameTwoCardCombos);
+    massLandDenialTemplates.clear();
+    extraTurnTemplates.clear();
+
+    massLandDenialCombos.clear();
+    extraTurnCombos.clear();
+    lockCombos.clear();
+    skipTurnsCombos.clear();
+
+    definitelyTwoCardCombos.clear();
+    arguablyTwoCardCombos.clear();
+
+    //
+    // Cards
+    //
+    for (const auto &value : json.value("cards").toArray()) {
+        if (!value.isObject()) {
+            continue;
+        }
+
+        const QJsonObject obj = value.toObject();
+
+        CommanderSpellbookCardResult card;
+        card.fromJson(obj.value("card").toObject());
+
+        if (obj.value("gameChanger").toBool()) {
+            gameChangerCards.append(card);
+        }
+
+        if (obj.value("massLandDenial").toBool()) {
+            massLandDenialCards.append(card);
+        }
+
+        if (obj.value("extraTurn").toBool()) {
+            extraTurnCards.append(card);
+        }
+    }
+
+    //
+    // Templates
+    //
+    for (const auto &value : json.value("templates").toArray()) {
+        if (!value.isObject()) {
+            continue;
+        }
+
+        const QJsonObject obj = value.toObject();
+
+        CommanderSpellbookVariantResult variant;
+        variant.fromJson(obj);
+
+        if (obj.value("massLandDenial").toBool()) {
+            massLandDenialTemplates.append(variant);
+        }
+
+        if (obj.value("extraTurn").toBool()) {
+            extraTurnTemplates.append(variant);
+        }
+    }
+
+    //
+    // Combos
+    //
+    for (const auto &value : json.value("combos").toArray()) {
+        if (!value.isObject()) {
+            continue;
+        }
+
+        const QJsonObject obj = value.toObject();
+
+        CommanderSpellbookVariantResult combo;
+        combo.fromJson(obj);
+
+        if (obj.value("massLandDenial").toBool()) {
+            massLandDenialCombos.append(combo);
+        }
+
+        if (obj.value("extraTurn").toBool()) {
+            extraTurnCombos.append(combo);
+        }
+
+        if (obj.value("lock").toBool()) {
+            lockCombos.append(combo);
+        }
+
+        if (obj.value("skipTurns").toBool()) {
+            skipTurnsCombos.append(combo);
+        }
+
+        if (obj.value("definitelyTwoCard").toBool()) {
+            definitelyTwoCardCombos.append(combo);
+        }
+
+        if (obj.value("arguablyTwoCard").toBool()) {
+            arguablyTwoCardCombos.append(combo);
+        }
+    }
 }

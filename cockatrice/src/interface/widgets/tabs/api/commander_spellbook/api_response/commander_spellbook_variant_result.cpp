@@ -22,7 +22,7 @@ void CommanderSpellbookVariantResult::fromJson(const QJsonObject &json)
     popularity = json.value("popularity").toDouble();
 
     spoiler = json.value("spoiler").toBool();
-    bracketTag = CommanderSpellbookBracketTag::bracketTagFromString(json.value("bracketTag").toString());
+    bracketTag = json.value("bracketTag").toString();
 
     legalities = json.value("legalities").toObject();
     prices = json.value("prices").toObject();
