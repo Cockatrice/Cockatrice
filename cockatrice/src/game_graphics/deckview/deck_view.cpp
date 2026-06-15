@@ -360,6 +360,16 @@ void DeckViewScene::rebuildTree()
         return;
     }
 
+    QStringList requiredZones = {DECK_ZONE_MAIN, DECK_ZONE_SIDE};
+
+    for (const QString &zoneName : requiredZones) {
+        if (!cardContainers.contains(zoneName)) {
+            auto *container = new DeckViewCardContainer(zoneName);
+            cardContainers.insert(zoneName, container);
+            addItem(container);
+        }
+    }
+
     for (auto *currentZone : deck->getZoneNodes()) {
         DeckViewCardContainer *container = cardContainers.value(currentZone->getName(), 0);
         if (!container) {
