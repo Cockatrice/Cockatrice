@@ -31,40 +31,56 @@ CommandZoneMenu::CommandZoneMenu(PlayerGraphicsItem *_player, QMenu *playerMenu)
         addAction(aViewZone);
         addSeparator();
 
-        PlayerActions *playerActions = player->getLogic()->getPlayerActions();
-
         aIncreaseCommanderTax = new QAction(this);
-        connect(aIncreaseCommanderTax, &QAction::triggered, this,
-                [playerActions]() { playerActions->actModifyTaxCounter(CounterIds::CommanderTax, 1); });
+        connect(aIncreaseCommanderTax, &QAction::triggered, this, [this]() {
+            if (auto *logic = player->getLogic()) {
+                logic->getPlayerActions()->actModifyTaxCounter(CounterIds::CommanderTax, 1);
+            }
+        });
         addAction(aIncreaseCommanderTax);
 
         aDecreaseCommanderTax = new QAction(this);
-        connect(aDecreaseCommanderTax, &QAction::triggered, this,
-                [playerActions]() { playerActions->actModifyTaxCounter(CounterIds::CommanderTax, -1); });
+        connect(aDecreaseCommanderTax, &QAction::triggered, this, [this]() {
+            if (auto *logic = player->getLogic()) {
+                logic->getPlayerActions()->actModifyTaxCounter(CounterIds::CommanderTax, -1);
+            }
+        });
         addAction(aDecreaseCommanderTax);
 
         addSeparator();
 
         aIncreasePartnerTax = new QAction(this);
-        connect(aIncreasePartnerTax, &QAction::triggered, this,
-                [playerActions]() { playerActions->actModifyTaxCounter(CounterIds::PartnerTax, 1); });
+        connect(aIncreasePartnerTax, &QAction::triggered, this, [this]() {
+            if (auto *logic = player->getLogic()) {
+                logic->getPlayerActions()->actModifyTaxCounter(CounterIds::PartnerTax, 1);
+            }
+        });
         addAction(aIncreasePartnerTax);
 
         aDecreasePartnerTax = new QAction(this);
-        connect(aDecreasePartnerTax, &QAction::triggered, this,
-                [playerActions]() { playerActions->actModifyTaxCounter(CounterIds::PartnerTax, -1); });
+        connect(aDecreasePartnerTax, &QAction::triggered, this, [this]() {
+            if (auto *logic = player->getLogic()) {
+                logic->getPlayerActions()->actModifyTaxCounter(CounterIds::PartnerTax, -1);
+            }
+        });
         addAction(aDecreasePartnerTax);
 
         addSeparator();
 
         aToggleCommanderTaxCounter = new QAction(this);
-        connect(aToggleCommanderTaxCounter, &QAction::triggered, this,
-                [playerActions]() { playerActions->actToggleTaxCounter(CounterIds::CommanderTax); });
+        connect(aToggleCommanderTaxCounter, &QAction::triggered, this, [this]() {
+            if (auto *logic = player->getLogic()) {
+                logic->getPlayerActions()->actToggleTaxCounter(CounterIds::CommanderTax);
+            }
+        });
         addAction(aToggleCommanderTaxCounter);
 
         aTogglePartnerTaxCounter = new QAction(this);
-        connect(aTogglePartnerTaxCounter, &QAction::triggered, this,
-                [playerActions]() { playerActions->actToggleTaxCounter(CounterIds::PartnerTax); });
+        connect(aTogglePartnerTaxCounter, &QAction::triggered, this, [this]() {
+            if (auto *logic = player->getLogic()) {
+                logic->getPlayerActions()->actToggleTaxCounter(CounterIds::PartnerTax);
+            }
+        });
         addAction(aTogglePartnerTaxCounter);
 
         addSeparator();
