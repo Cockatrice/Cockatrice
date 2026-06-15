@@ -489,6 +489,59 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     userTree->header()->setStretchLastSection(true);
 
+    // ── Hover popup ───────────────────────────────────────────────────────────
+    m_userInfoPopup = new UserInfoPopup(tabSupervisor, tabSupervisor->getClient(), &avatarProvider->cache(),
+                                        &cardArtProvider->cache(), &cardArtParamsMap,
+                                        window()); // parented to main window so it floats above siblings
+
+    m_userInfoPopup->hide();
+    m_userInfoPopup->setWindowOpacity(0.0);
+    m_userInfoPopup->installEventFilter(this);
+
+    connectPopupSignals();
+
+    m_showPopupTimer = new QTimer(this);
+    m_showPopupTimer->setSingleShot(true);
+    m_showPopupTimer->setInterval(280);
+    connect(m_showPopupTimer, &QTimer::timeout, this, [this] {
+        if (!m_hoveredUser.isEmpty()) {
+            showPopupForUser(m_hoveredUser);
+        }
+    });
+
+    m_hidePopupTimer = new QTimer(this);
+    m_hidePopupTimer->setSingleShot(true);
+    m_hidePopupTimer->setInterval(160);
+    connect(m_hidePopupTimer, &QTimer::timeout, this, [this] {
+        if (!m_popupPinned && !m_userInfoPopup->underMouse() && !userTree->underMouse()) {
+            hidePopup();
+        }
+    });
+
+    userTree->setMouseTracking(true);
+    userTree->viewport()->setMouseTracking(true);
+    userTree->viewport()->installEventFilter(this);
+
+    // Pin on item click
+    connect(userTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item, int) {
+        if (!SettingsCache::instance().getStyleUserList()) {
+            return;
+        }
+        const QString name = static_cast<UserListTWI *>(item)->getUserInfo().name().c_str();
+        m_popupPinned = false; // reset so showPopupForUser can update
+        showPopupForUser(name);
+        m_popupPinned = true; // pin after showing
+    });
+
+    // Unpin when selection cleared
+    connect(userTree->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+            [this](const QItemSelection &sel, const QItemSelection &) {
+                if (sel.isEmpty() && m_popupPinned) {
+                    m_popupPinned = false;
+                    hidePopup();
+                }
+            });
+
     connect(avatarProvider, &UserAvatarProvider::avatarUpdated, this,
             [this](const QString &) { userTree->viewport()->update(); });
     connect(cardArtProvider, &UserCardArtProvider::cardArtUpdated, this,
@@ -531,6 +584,160 @@ void UserListWidget::applyDisplayMode()
     }
 
     userTree->viewport()->update();
+}
+
+void UserListWidget::connectPopupSignals()
+{
+    connect(m_userInfoPopup, &UserInfoPopup::closeRequested, this, [this] {
+        m_popupPinned = false;
+        hidePopup(true);
+    });
+    connect(m_userInfoPopup, &UserInfoPopup::mouseEnteredPopup, m_hidePopupTimer, &QTimer::stop);
+    connect(m_userInfoPopup, &UserInfoPopup::mouseLeftPopup, this, [this] {
+        if (!m_popupPinned) {
+            m_hidePopupTimer->start();
+        }
+    });
+
+    // Wire all action signals to UserContextMenu::exec*()
+    connect(m_userInfoPopup, &UserInfoPopup::chatRequested, userContextMenu, &UserContextMenu::execChat);
+    connect(m_userInfoPopup, &UserInfoPopup::detailsRequested, userContextMenu, &UserContextMenu::execDetails);
+    connect(m_userInfoPopup, &UserInfoPopup::showGamesRequested, userContextMenu, &UserContextMenu::execShowGames);
+    connect(m_userInfoPopup, &UserInfoPopup::addBuddyRequested, userContextMenu, &UserContextMenu::execAddToBuddy);
+    connect(m_userInfoPopup, &UserInfoPopup::removeBuddyRequested, userContextMenu,
+            &UserContextMenu::execRemoveFromBuddy);
+    connect(m_userInfoPopup, &UserInfoPopup::addIgnoreRequested, userContextMenu, &UserContextMenu::execAddToIgnore);
+    connect(m_userInfoPopup, &UserInfoPopup::removeIgnoreRequested, userContextMenu,
+            &UserContextMenu::execRemoveFromIgnore);
+    connect(m_userInfoPopup, &UserInfoPopup::banRequested, userContextMenu, &UserContextMenu::execBan);
+    connect(m_userInfoPopup, &UserInfoPopup::warnRequested, userContextMenu, &UserContextMenu::execWarn);
+    connect(m_userInfoPopup, &UserInfoPopup::banHistoryRequested, userContextMenu, &UserContextMenu::execBanHistory);
+    connect(m_userInfoPopup, &UserInfoPopup::warnHistoryRequested, userContextMenu, &UserContextMenu::execWarnHistory);
+    connect(m_userInfoPopup, &UserInfoPopup::adminNotesRequested, userContextMenu, &UserContextMenu::execAdminNotes);
+    connect(m_userInfoPopup, &UserInfoPopup::promoteToModRequested, this,
+            [this](const QString &n) { userContextMenu->execAdjustMod(n, true, false); });
+    connect(m_userInfoPopup, &UserInfoPopup::demoteFromModRequested, this,
+            [this](const QString &n) { userContextMenu->execAdjustMod(n, false, false); });
+    connect(m_userInfoPopup, &UserInfoPopup::promoteToJudgeRequested, this,
+            [this](const QString &n) { userContextMenu->execAdjustMod(n, false, true); });
+    connect(m_userInfoPopup, &UserInfoPopup::demoteFromJudgeRequested, this,
+            [this](const QString &n) { userContextMenu->execAdjustMod(n, false, false); });
+}
+
+bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == userTree->viewport()) {
+        if (event->type() == QEvent::MouseMove) {
+            if (!SettingsCache::instance().getStyleUserList()) {
+                return QGroupBox::eventFilter(obj, event);
+            }
+            auto *me = static_cast<QMouseEvent *>(event);
+            auto *twi = static_cast<UserListTWI *>(userTree->itemAt(me->pos()));
+            const QString hovName = twi ? QString::fromStdString(twi->getUserInfo().name()) : QString{};
+
+            if (hovName != m_hoveredUser) {
+                m_hoveredUser = hovName;
+                if (!hovName.isEmpty()) {
+                    m_hidePopupTimer->stop();
+                    if (!m_popupPinned) {
+                        m_showPopupTimer->start();
+                    }
+                } else {
+                    m_showPopupTimer->stop();
+                    if (!m_popupPinned) {
+                        m_hidePopupTimer->start();
+                    }
+                }
+            }
+        } else if (event->type() == QEvent::Leave) {
+            m_hoveredUser.clear();
+            m_showPopupTimer->stop();
+            if (!m_popupPinned) {
+                m_hidePopupTimer->start();
+            }
+        }
+    }
+
+    return QGroupBox::eventFilter(obj, event);
+}
+
+void UserListWidget::showPopupForUser(const QString &userName)
+{
+    UserListTWI *item = users.value(userName);
+    if (!item) {
+        return;
+    }
+
+    const ServerInfo_User &info = item->getUserInfo();
+    const bool online = item->data(0, UserListRoles::Online).toBool();
+    const bool isBuddy = userContextMenu->getUserListProxy()->isUserBuddy(userName);
+    const bool isIgn = userContextMenu->getUserListProxy()->isUserIgnored(userName);
+
+    m_userInfoPopup->showForUser(userName, info, online, isBuddy, isIgn);
+
+    positionPopup(userName);
+
+    m_userInfoPopup->show();
+    m_userInfoPopup->raise();
+
+    // Fade in
+    m_userInfoPopup->setWindowOpacity(0.0);
+    auto *fade = new QPropertyAnimation(m_userInfoPopup, "windowOpacity", m_userInfoPopup);
+    fade->setDuration(120);
+    fade->setStartValue(0.0);
+    fade->setEndValue(1.0);
+    fade->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void UserListWidget::positionPopup(const QString &userName)
+{
+    UserListTWI *item = users.value(userName);
+    if (!item) {
+        return;
+    }
+
+    QWidget *vp = userTree->viewport();
+    const QRect itemR = userTree->visualItemRect(item);
+    const QPoint itemTL = vp->mapToGlobal(itemR.topLeft());
+    const QPoint vpTL = vp->mapToGlobal(vp->rect().topLeft());
+
+    const int popW = m_userInfoPopup->width();
+    const int popH = m_userInfoPopup->sizeHint().height();
+    const int margin = 12;
+
+    // Go left of the list if there's room, otherwise right
+    int x =
+        (vpTL.x() >= popW + margin) ? vpTL.x() - popW - margin : vp->mapToGlobal(vp->rect().topRight()).x() + margin;
+
+    // Align top with the hovered row, clamped to available screen space
+    const QRect screen = QGuiApplication::primaryScreen()->availableGeometry();
+    int y = itemTL.y();
+    y = qMin(y, screen.bottom() - popH - margin);
+    y = qMax(y, screen.top() + margin);
+
+    m_userInfoPopup->move(x, y);
+}
+
+void UserListWidget::hidePopup(bool immediate)
+{
+    m_showPopupTimer->stop();
+    m_hidePopupTimer->stop();
+    if (!m_userInfoPopup->isVisible()) {
+        return;
+    }
+
+    if (immediate) {
+        m_userInfoPopup->hide();
+        return;
+    }
+
+    // Fade out
+    auto *fade = new QPropertyAnimation(m_userInfoPopup, "windowOpacity", m_userInfoPopup);
+    fade->setDuration(100);
+    fade->setStartValue(m_userInfoPopup->windowOpacity());
+    fade->setEndValue(0.0);
+    connect(fade, &QPropertyAnimation::finished, m_userInfoPopup, &QWidget::hide);
+    fade->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void UserListWidget::retranslateUi()

@@ -10,6 +10,7 @@
 #include "../../cards/card_info_picture_art_crop_widget.h"
 #include "user_avatar_provider.h"
 #include "user_card_art_provider.h"
+#include "user_info_popup.h"
 #include "user_list_manager.h"
 #include "user_list_painter.h"
 
@@ -151,6 +152,17 @@ private:
     UserAvatarProvider *avatarProvider = nullptr;
     UserCardArtProvider *cardArtProvider = nullptr;
     QMap<QString, CardArtParams> cardArtParamsMap;
+    // ── Hover popup ───────────────────────────────────────────────────────────
+    UserInfoPopup *m_userInfoPopup = nullptr;
+    QTimer *m_showPopupTimer = nullptr;
+    QTimer *m_hidePopupTimer = nullptr;
+    QString m_hoveredUser;
+    bool m_popupPinned = false;
+
+    void showPopupForUser(const QString &userName);
+    void hidePopup(bool immediate = false);
+    void positionPopup(const QString &userName);
+    void connectPopupSignals();
 
     QMap<QString, UserListTWI *> users;
     TabSupervisor *tabSupervisor;
@@ -178,6 +190,7 @@ public:
                    QWidget *parent = nullptr);
     void bind(UserListManager *mgr);
     void applyDisplayMode();
+    bool eventFilter(QObject *obj, QEvent *event) override;
     void retranslateUi();
     void rebuild();
     void processUserInfo(const ServerInfo_User &user, bool online);
