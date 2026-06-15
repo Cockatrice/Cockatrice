@@ -111,6 +111,16 @@ TEST(ServerCounter, CustomBoundsForCommanderTax)
     EXPECT_EQ(taxCounter.getCount(), 0);
 }
 
+TEST(ServerCounter, SetActiveReportsChangeOnce)
+{
+    Server_Counter c(1, "test", color(), 10, 0);
+    EXPECT_TRUE(c.isActive());
+    EXPECT_TRUE(c.setActive(false));
+    EXPECT_FALSE(c.isActive());
+    EXPECT_FALSE(c.setActive(false));
+    EXPECT_TRUE(c.setActive(true));
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
