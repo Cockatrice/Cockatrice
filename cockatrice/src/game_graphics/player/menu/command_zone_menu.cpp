@@ -142,6 +142,11 @@ void CommandZoneMenu::updateTaxCounterActionStates()
         aTogglePartnerTaxCounter->setText(partnerTax ? tr("R&emove Partner Tax") : tr("&Add Partner Tax"));
         aTogglePartnerTaxCounter->setVisible(!partnerTax || partnerTax->getValue() == 0);
     }
+
+    if (aToggleMinimized) {
+        CommandZone *zone = player->getCommandZoneGraphicsItem();
+        aToggleMinimized->setText(zone && zone->isMinimized() ? tr("&Restore") : tr("&Minimize"));
+    }
 }
 
 void CommandZoneMenu::setShortcutsActive()
