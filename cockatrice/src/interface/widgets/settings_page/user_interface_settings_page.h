@@ -30,6 +30,7 @@ private:
     QCheckBox showDragSelectionCountCheckBox;
     QCheckBox showTotalSelectionCountCheckBox;
     QCheckBox useTearOffMenusCheckBox;
+    QCheckBox keepGameChatFocusCheckBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
     QLabel visualDeckStoragePromptForConversionLabel;
