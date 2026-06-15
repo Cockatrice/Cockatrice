@@ -30,6 +30,11 @@ namespace CounterIds
 {
 constexpr int CommanderTax = 8;
 constexpr int PartnerTax = 9;
+
+inline bool isTaxCounter(int id)
+{
+    return id == CommanderTax || id == PartnerTax;
+}
 } // namespace CounterIds
 
 namespace CounterNames
