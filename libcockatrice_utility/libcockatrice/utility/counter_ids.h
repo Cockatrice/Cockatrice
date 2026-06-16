@@ -23,6 +23,7 @@
  */
 namespace CounterIds
 {
+// Tax counters store a cast count (times cast from command zone).
 constexpr int CommanderTax = 8; ///< Primary commander tax counter
 constexpr int PartnerTax = 9;   ///< Partner commander tax counter
 constexpr int FirstUserId = 10; ///< First ID available for user-created counters

@@ -165,11 +165,15 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
                 if (writeableCard) {
                     addAction(aPlay);
 
-                    if (player->getTaxCounterIfActive(CounterIds::CommanderTax)) {
+                    // Only offer for single selection: a multi-select would over-count casts by
+                    // bumping one commander's tax counter once per command-zone card.
+                    const bool singleSelection = gameScene->selectedCards().size() <= 1;
+
+                    if (singleSelection && player->getTaxCounterIfActive(CounterIds::CommanderTax)) {
                         addAction(aPlayAndIncreaseTax);
                     }
 
-                    if (player->getTaxCounterIfActive(CounterIds::PartnerTax)) {
+                    if (singleSelection && player->getTaxCounterIfActive(CounterIds::PartnerTax)) {
                         addAction(aPlayAndIncreasePartnerTax);
                     }
 
