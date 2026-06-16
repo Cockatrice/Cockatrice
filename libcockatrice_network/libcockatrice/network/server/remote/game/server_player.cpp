@@ -538,25 +538,37 @@ Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & 
 }
 
 Response::ResponseCode
-Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::evaluateDelCounter(bool gameStarted, bool playerConceded, int counterId, const Server_Counter *counter)
 {
-    if (!game->getGameStarted()) {
+    if (!gameStarted) {
         return Response::RespGameNotStarted;
     }
-    if (conceded) {
+    if (playerConceded) {
         return Response::RespContextError;
     }
-
-    const int counterId = cmd.counter_id();
-
-    if (isCommandZoneCounterBlocked(counterId)) {
-        return Response::RespContextError;
+    // Reserved tax counters are server-managed system counters and must never be
+    // deleted by a client. When the command zone is disabled they don't exist, so
+    // a lookup would fail anyway; when it's enabled they must persist for the game.
+    if (CounterIds::isTaxCounter(counterId)) {
+        return Response::RespFunctionNotAllowed;
     }
-
-    Server_Counter *counter = counters.value(counterId, nullptr);
     if (!counter) {
         return Response::RespNameNotFound;
     }
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    const int counterId = cmd.counter_id();
+    Server_Counter *counter = counters.value(counterId, nullptr);
+
+    const Response::ResponseCode authResult = evaluateDelCounter(game->getGameStarted(), conceded, counterId, counter);
+    if (authResult != Response::RespOk) {
+        return authResult;
+    }
+
     counters.remove(counterId);
     delete counter;
 
@@ -567,38 +579,49 @@ Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & 
     return Response::RespOk;
 }
 
+Response::ResponseCode Server_Player::evaluateSetCounterActive(bool gameStarted,
+                                                               bool playerConceded,
+                                                               bool commandZoneEnabled,
+                                                               int counterId,
+                                                               const Server_Counter *counter,
+                                                               bool requestedActive)
+{
+    if (!gameStarted) {
+        return Response::RespGameNotStarted;
+    }
+    if (playerConceded) {
+        return Response::RespContextError;
+    }
+    if (!CounterIds::isTaxCounter(counterId)) {
+        return Response::RespFunctionNotAllowed;
+    }
+    if (!commandZoneEnabled) {
+        return Response::RespContextError;
+    }
+    if (!counter) {
+        return Response::RespNameNotFound;
+    }
+    // Prevent disabling a counter with tax accumulated; player must reset to 0 first
+    if (!requestedActive && counter->getCount() != 0) {
+        return Response::RespContextError;
+    }
+    return Response::RespOk;
+}
+
 Response::ResponseCode Server_Player::cmdSetCounterActive(const Command_SetCounterActive &cmd,
                                                           ResponseContainer & /*rc*/,
                                                           GameEventStorage &ges)
 {
-    if (!game->getGameStarted()) {
-        return Response::RespGameNotStarted;
-    }
-    if (conceded) {
-        return Response::RespContextError;
-    }
-
     const int counterId = cmd.counter_id();
-    if (!CounterIds::isTaxCounter(counterId)) {
-        return Response::RespFunctionNotAllowed;
-    }
-    if (!game->getEnableCommandZone()) {
-        return Response::RespContextError;
-    }
-
     Server_Counter *c = counters.value(counterId, nullptr);
-    if (!c) {
-        return Response::RespNameNotFound;
+
+    const Response::ResponseCode authResult = evaluateSetCounterActive(
+        game->getGameStarted(), conceded, game->getEnableCommandZone(), counterId, c, cmd.active());
+    if (authResult != Response::RespOk) {
+        return authResult;
     }
 
-    // Prevent disabling a counter with tax accumulated; player must reset to 0 first
-    if (!cmd.active() && c->getCount() != 0) {
-        return Response::RespContextError;
-    }
-
-    bool didChange = c->setActive(cmd.active());
-
-    if (didChange) {
+    if (c->setActive(cmd.active())) {
         Event_SetCounterActive event;
         event.set_counter_id(c->getId());
         event.set_active(c->isActive());
