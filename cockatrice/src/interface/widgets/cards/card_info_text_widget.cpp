@@ -142,8 +142,8 @@ void CardInfoTextWidget::setCard(const ExactCard &exactCard)
     if (!relatedCards.empty()) {
         text += QString("<tr><td>%1</td><td width=\"5\"></td><td>").arg(tr("Related cards:"));
 
-        for (auto *relatedCard : relatedCards) {
-            QString tmp = relatedCard->getName().toHtmlEscaped();
+        for (auto &relatedCard : relatedCards) {
+            QString tmp = relatedCard.name.toHtmlEscaped();
             text += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
         }
 

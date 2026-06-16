@@ -125,12 +125,9 @@ void CardDatabase::refreshCachedReverseRelatedCards(CardNameMap &cardMap)
     }
 
     for (const auto &card : cardMap) {
-        for (auto *rel : card->getReverseRelatedCards()) {
-            if (auto target = cardMap.value(rel->getName())) {
-                auto *newRel = new CardRelation(card->getName(), rel->getAttachType(), rel->getIsCreateAllExclusion(),
-                                                rel->getIsVariable(), rel->getDefaultCount(), rel->getIsPersistent(),
-                                                rel->getIsFaceDown());
-                target->addReverseRelatedCards2Me(newRel);
+        for (auto rel : card->getReverseRelatedCards()) {
+            if (auto target = cardMap.value(rel.name)) {
+                target->addReverseRelatedCards2Me(rel.copyWithName(card->getName()));
             }
         }
     }
@@ -186,22 +183,6 @@ void CardDatabase::removeCard(const CardInfoPtr &card)
 
 void CardDatabase::unindexCard(const CardInfoPtr &card)
 {
-    for (auto *cardRelation : card->getRelatedCards()) {
-        cardRelation->deleteLater();
-    }
-
-    for (auto *cardRelation : card->getReverseRelatedCards()) {
-        cardRelation->deleteLater();
-    }
-
-    for (auto *cardRelation : card->getReverseRelatedCards2Me()) {
-        cardRelation->deleteLater();
-    }
-
-    // The relations are only scheduled for deletion; the CardInfo may outlive
-    // them through an external shared pointer, so drop the raw pointers now.
-    card->clearDirectRelations();
-
     QMutexLocker locker(removeCardMutex);
     cards.remove(card->getName());
     simpleNameCards.remove(card->getSimpleName());
@@ -295,21 +276,6 @@ void CardDatabase::addFormat(const FormatRulesPtr &format)
 
 void CardDatabase::swapInDatabaseData(CardDatabaseData data)
 {
-    for (const auto &card : cards) {
-        for (auto *rel : card->getRelatedCards()) {
-            rel->deleteLater();
-        }
-        for (auto *rel : card->getReverseRelatedCards()) {
-            rel->deleteLater();
-        }
-        for (auto *rel : card->getReverseRelatedCards2Me()) {
-            rel->deleteLater();
-        }
-        // Replacement cards take over the database; old CardInfo objects may
-        // still be referenced by the UI, so clear their dangling relations.
-        card->clearDirectRelations();
-    }
-
     // Break the CardSet <-> CardInfo cycle before replacing the containers, otherwise the previous
     // snapshot survives the reload through the sets' strong card lists.
     detachSetMembership();

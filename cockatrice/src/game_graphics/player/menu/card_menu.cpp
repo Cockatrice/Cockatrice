@@ -401,9 +401,9 @@ void CardMenu::addRelatedCardView()
     }
 
     bool atLeastOneGoodRelationFound = false;
-    QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
-    for (const CardRelation *cardRelation : relatedCards) {
-        CardInfoPtr relatedCard = CardDatabaseManager::query()->getCardInfo(cardRelation->getName());
+    QList<CardRelation> relatedCards = exactCard.getInfo().getAllRelatedCards();
+    for (const CardRelation &cardRelation : relatedCards) {
+        CardInfoPtr relatedCard = CardDatabaseManager::query()->getCardInfo(cardRelation.name);
         if (relatedCard != nullptr) {
             atLeastOneGoodRelationFound = true;
             break;
@@ -417,8 +417,8 @@ void CardMenu::addRelatedCardView()
     addSeparator();
     auto viewRelatedCards = new QMenu(tr("View related cards"), this);
     addMenu(viewRelatedCards);
-    for (const CardRelation *relatedCard : relatedCards) {
-        QString relatedCardName = relatedCard->getName();
+    for (const CardRelation &relatedCard : relatedCards) {
+        QString relatedCardName = relatedCard.name;
         CardRef cardRef = {relatedCardName, exactCard.getPrinting().getUuid()};
         QAction *viewCard = viewRelatedCards->addAction(relatedCardName);
         Q_UNUSED(viewCard);
@@ -437,7 +437,7 @@ void CardMenu::addRelatedCardActions()
         return;
     }
 
-    QList<CardRelation *> relatedCards = exactCard.getInfo().getAllRelatedCards();
+    const QList<CardRelation> relatedCards = exactCard.getInfo().getAllRelatedCards();
     if (relatedCards.isEmpty()) {
         return;
     }
@@ -446,11 +446,11 @@ void CardMenu::addRelatedCardActions()
     addSeparator();
     int index = 0;
     QAction *createRelatedCards = nullptr;
-    for (const CardRelation *cardRelation : relatedCards) {
+    for (const CardRelation &cardRelation : relatedCards) {
         ExactCard relatedCard =
-            CardDatabaseManager::query()->getCardFromSameSet(cardRelation->getName(), card->getCard().getPrinting());
+            CardDatabaseManager::query()->getCardFromSameSet(cardRelation.name, card->getCard().getPrinting());
         if (!relatedCard) {
-            relatedCard = CardDatabaseManager::query()->getCard({cardRelation->getName()});
+            relatedCard = CardDatabaseManager::query()->getCard({cardRelation.name});
         }
         if (!relatedCard) {
             continue;
@@ -464,13 +464,13 @@ void CardMenu::addRelatedCardActions()
         }
 
         QString text;
-        if (cardRelation->getDoesAttach()) {
-            text = cardRelation->getDoesTransform() ? tr("Token: Transform into \"%1\"").arg(relatedCardName)
-                                                    : tr("Token: Attach to \"%1\"").arg(relatedCardName);
-        } else if (cardRelation->getIsVariable()) {
+        if (cardRelation.doesAttach()) {
+            text = cardRelation.doesTransform() ? tr("Token: Transform into \"%1\"").arg(relatedCardName)
+                                                : tr("Token: Attach to \"%1\"").arg(relatedCardName);
+        } else if (cardRelation.isVariableCount) {
             text = tr("Token: X %1").arg(relatedCardName);
-        } else if (cardRelation->getDefaultCount() != 1) {
-            text = tr("Token: %1x %2").arg(cardRelation->getDefaultCount()).arg(relatedCardName);
+        } else if (cardRelation.defaultCount != 1) {
+            text = tr("Token: %1x %2").arg(cardRelation.defaultCount).arg(relatedCardName);
         } else {
             text = tr("Token: %1").arg(relatedCardName);
         }
