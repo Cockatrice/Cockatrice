@@ -150,7 +150,6 @@ void CommandZone::registerTaxCounter(AbstractCounter *counter)
 
 void CommandZone::rearrangeTaxCounters()
 {
-    bool commandZoneVisible = isVisible();
     int activeTaxCounterCount = 0;
 
     for (AbstractCounter *ctr : taxCounters) {
@@ -158,9 +157,11 @@ void CommandZone::rearrangeTaxCounters()
                   activeTaxCounterCount * (TaxCounterSizes::TAX_COUNTER_SIZE + TaxCounterSizes::TAX_COUNTER_MARGIN);
         ctr->setPos(TaxCounterSizes::TAX_COUNTER_MARGIN, y);
         ctr->setZValue(ZValues::TAX_COUNTERS);
-        bool visible = commandZoneVisible && ctr->isActive();
-        ctr->setVisible(visible);
-        if (visible) {
+        // Visibility is owned solely by AbstractCounter::setActive() (the counter's own flag),
+        // which Qt AND-s with this CommandZone's visibility via child-visibility propagation
+        // (tax counters are graphics children of the zone). This function only handles layout,
+        // so it stacks and measures by isActive() alone.
+        if (ctr->isActive()) {
             ++activeTaxCounterCount;
         }
     }

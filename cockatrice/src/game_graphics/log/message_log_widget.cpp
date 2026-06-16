@@ -680,12 +680,15 @@ void MessageLogWidget::logSetCounter(PlayerLogic *player, QString counterName, i
         QString playerName = sanitizeHtml(player->getPlayerInfo()->getName());
         QString valueStr = QString("<font class=\"blue\">%1</font>").arg(value);
         int delta = value - oldValue;
+        QString deltaStr = QString::number(delta);
         QString counterDisplayName = TranslateCounterName::getDisplayName(counterName);
         QString taxLabel = QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterDisplayName));
         if (value > oldValue) {
-            appendHtmlServerMessage(tr("%1 increases %2 to %3 (+%4).").arg(playerName, taxLabel, valueStr).arg(delta));
+            // delta > 0 here; the format string supplies the leading '+'
+            appendHtmlServerMessage(tr("%1 increases %2 to %3 (+%4).").arg(playerName, taxLabel, valueStr, deltaStr));
         } else {
-            appendHtmlServerMessage(tr("%1 decreases %2 to %3 (%4).").arg(playerName, taxLabel, valueStr).arg(delta));
+            // delta < 0 here; deltaStr already carries the '-' sign
+            appendHtmlServerMessage(tr("%1 decreases %2 to %3 (%4).").arg(playerName, taxLabel, valueStr, deltaStr));
         }
         return;
     }

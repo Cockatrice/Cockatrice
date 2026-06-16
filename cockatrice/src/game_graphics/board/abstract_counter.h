@@ -113,7 +113,13 @@ public:
 
     /**
      * @brief Sets the active state of this counter.
-     * When inactive, the counter is hidden via setVisible(false).
+     *
+     * This is the sole owner of the counter's own visibility flag: active maps directly to
+     * setVisible(_active). For counters nested in another item (e.g. tax counters parented to
+     * the command zone), Qt AND-s this flag with the parent's visibility, so an active counter
+     * inside a hidden zone still does not render. Container layout code must therefore not set
+     * visibility itself; it only positions counters and may read isActive().
+     *
      * @param _active True to show and enable the counter, false to hide it
      */
     virtual void setActive(bool _active);
