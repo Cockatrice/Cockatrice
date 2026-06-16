@@ -113,10 +113,16 @@ public:
         return m_currentUser;
     }
 
+    /** Called when buddy/ignore status changes externally while popup is open. */
+    void updateActionButtons(const ServerInfo_User &userInfo, bool online, bool isBuddy, bool isIgnored);
+
 signals:
     void mouseEnteredPopup();
     void mouseLeftPopup();
     void closeRequested();
+
+    /** Emitted when the user requests joining or spectating a game in the list. */
+    void joinGameRequested(int gameId, int roomId, bool asSpectator);
 
     // ── Action signals — connect to UserContextMenu::exec*() ──────────────────
     void chatRequested(const QString &userName);
@@ -147,6 +153,7 @@ protected:
 private slots:
     void refreshGames();
     void onGamesReceived(const Response &r, const QString &forUser);
+    void onGamesContextMenu(const QPoint &pos);
 
 private:
     void buildUi();

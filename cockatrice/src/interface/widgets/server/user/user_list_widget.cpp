@@ -533,14 +533,23 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
         m_popupPinned = true; // pin after showing
     });
 
-    // Unpin when selection cleared
     connect(userTree->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             [this](const QItemSelection &sel, const QItemSelection &) {
+                // if (m_rebuildingTree) return;
                 if (sel.isEmpty() && m_popupPinned) {
                     m_popupPinned = false;
                     hidePopup();
                 }
             });
+
+    // Hide popup when list scrolls (reference row has moved)
+    connect(userTree->verticalScrollBar(), &QScrollBar::valueChanged, this, [this] {
+        m_showPopupTimer->stop();
+        hidePopup(true);
+    });
+
+    // Forward join requests from popup upward
+    connect(m_userInfoPopup, &UserInfoPopup::joinGameRequested, this, &UserListWidget::joinGameRequested);
 
     connect(avatarProvider, &UserAvatarProvider::avatarUpdated, this,
             [this](const QString &) { userTree->viewport()->update(); });
@@ -562,9 +571,92 @@ void UserListWidget::bind(UserListManager *mgr)
 {
     manager = mgr;
 
-    connect(manager, &UserListManager::listsChanged, this, &UserListWidget::rebuild);
+    // ── Full rebuild: disconnect / reconnect / bulk initial load ──────────────
+    connect(manager, &UserListManager::listReset, this, &UserListWidget::rebuild);
+
+    // ── Online users list (AllUsersList / RoomList) ───────────────────────────
+    if (type == AllUsersList || type == RoomList) {
+        connect(manager, &UserListManager::userJoinedOnline, this,
+                [this](const ServerInfo_User &user) { processUserInfo(user, true); });
+        connect(manager, &UserListManager::userLeftOnline, this, [this](const QString &name) { deleteUser(name); });
+    }
+
+    // ── Buddy list ────────────────────────────────────────────────────────────
+    if (type == BuddyList) {
+        connect(manager, &UserListManager::addedToBuddyList, this, [this](const ServerInfo_User &user) {
+            const QString name = QString::fromStdString(user.name());
+            processUserInfo(user, manager->getOnlineUser(name) != nullptr);
+        });
+        connect(manager, &UserListManager::removedFromBuddyList, this,
+                [this](const QString &name) { deleteUser(name); });
+        // Track online presence changes for buddies already in the tree
+        connect(manager, &UserListManager::userJoinedOnline, this, [this](const ServerInfo_User &user) {
+            const QString name = QString::fromStdString(user.name());
+            if (users.contains(name)) {
+                users[name]->setUserInfo(user);
+                setUserOnline(name, true);
+            }
+        });
+        connect(manager, &UserListManager::userLeftOnline, this, [this](const QString &name) {
+            if (users.contains(name)) {
+                setUserOnline(name, false);
+            }
+        });
+    }
+
+    // ── Ignore list ───────────────────────────────────────────────────────────
+    if (type == IgnoreList) {
+        connect(manager, &UserListManager::addedToIgnoreList, this, [this](const ServerInfo_User &user) {
+            const QString name = QString::fromStdString(user.name());
+            processUserInfo(user, manager->getOnlineUser(name) != nullptr);
+        });
+        connect(manager, &UserListManager::removedFromIgnoreList, this,
+                [this](const QString &name) { deleteUser(name); });
+    }
+
+    // ── Popup button refresh ──────────────────────────────────────────────────
+    // Any buddy/ignore mutation while the popup is open refreshes its buttons
+    auto refreshIfPopupOpen = [this](const QString &name) {
+        if (m_userInfoPopup && m_userInfoPopup->isVisible() && m_userInfoPopup->currentUser() == name) {
+            refreshPopupButtons(name);
+        }
+    };
+    auto refreshCurrentPopup = [refreshIfPopupOpen](const ServerInfo_User &u) {
+        refreshIfPopupOpen(QString::fromStdString(u.name()));
+    };
+
+    connect(manager, &UserListManager::addedToBuddyList, this, refreshCurrentPopup);
+    connect(manager, &UserListManager::removedFromBuddyList, this, refreshIfPopupOpen);
+    connect(manager, &UserListManager::addedToIgnoreList, this, refreshCurrentPopup);
+    connect(manager, &UserListManager::removedFromIgnoreList, this, refreshIfPopupOpen);
+    connect(manager, &UserListManager::userJoinedOnline, this, refreshCurrentPopup);
+    connect(manager, &UserListManager::userLeftOnline, this, refreshIfPopupOpen);
 
     rebuild();
+}
+
+void UserListWidget::refreshPopupButtons(const QString &userName)
+{
+    UserListTWI *item = users.value(userName);
+    if (!item) {
+        return;
+    }
+
+    const UserListProxy *proxy = tabSupervisor->getUserListManager();
+    const bool online = item->data(0, UserListRoles::Online).toBool();
+    const bool isBuddy = proxy->isUserBuddy(userName);
+    const bool isIgn = proxy->isUserIgnored(userName);
+
+    m_userInfoPopup->updateActionButtons(item->getUserInfo(), online, isBuddy, isIgn);
+    positionPopup(userName); // height may have changed — reposition
+}
+
+void UserListWidget::hideEvent(QHideEvent *e)
+{
+    QGroupBox::hideEvent(e);
+    m_showPopupTimer->stop();
+    m_hidePopupTimer->stop();
+    hidePopup(true);
 }
 
 void UserListWidget::applyDisplayMode()
@@ -698,22 +790,31 @@ void UserListWidget::positionPopup(const QString &userName)
 
     QWidget *vp = userTree->viewport();
     const QRect itemR = userTree->visualItemRect(item);
-    const QPoint itemTL = vp->mapToGlobal(itemR.topLeft());
+    const QPoint itemBR = vp->mapToGlobal(itemR.bottomRight());
     const QPoint vpTL = vp->mapToGlobal(vp->rect().topLeft());
+    const QPoint vpTR = vp->mapToGlobal(vp->rect().topRight());
 
+    // Force a fresh size calculation so popH is accurate
+    m_userInfoPopup->adjustSize();
     const int popW = m_userInfoPopup->width();
-    const int popH = m_userInfoPopup->sizeHint().height();
+    const int popH = m_userInfoPopup->height();
     const int margin = 12;
 
-    // Go left of the list if there's room, otherwise right
-    int x =
-        (vpTL.x() >= popW + margin) ? vpTL.x() - popW - margin : vp->mapToGlobal(vp->rect().topRight()).x() + margin;
-
-    // Align top with the hovered row, clamped to available screen space
     const QRect screen = QGuiApplication::primaryScreen()->availableGeometry();
-    int y = itemTL.y();
-    y = qMin(y, screen.bottom() - popH - margin);
+
+    // ── X: left of the list if there's room, otherwise right ─────────────────
+    int x = (vpTL.x() >= popW + margin) ? vpTL.x() - popW - margin : vpTR.x() + margin;
+    x = qBound(screen.left() + margin, x, screen.right() - popW - margin);
+
+    // ── Y: bottom of popup aligns with bottom of hovered row, grows upward ───
+    int y = itemBR.y() - popH;
+
+    // Clamp: never above the screen top
     y = qMax(y, screen.top() + margin);
+
+    // Clamp: never below the screen bottom (e.g. if the popup is taller
+    // than the space above the row, let it spill downward rather than clip)
+    y = qMin(y, screen.bottom() - popH - margin);
 
     m_userInfoPopup->move(x, y);
 }
@@ -827,6 +928,7 @@ void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
         avatarProvider->requestAvatar(userName);
     }
     item->setOnline(online);
+    sortItems();
     userTree->viewport()->update();
 }
 

@@ -174,6 +174,7 @@ private:
     int onlineCount;
     QString titleStr;
     void updateCount();
+    void refreshPopupButtons(const QString &userName);
 private slots:
     void userClicked(QTreeWidgetItem *item, int column);
 signals:
@@ -182,6 +183,7 @@ signals:
     void removeBuddy(const QString &userName);
     void addIgnore(const QString &userName);
     void removeIgnore(const QString &userName);
+    void joinGameRequested(int gameId, int roomId, bool asSpectator);
 
 public:
     UserListWidget(TabSupervisor *_tabSupervisor,
@@ -202,6 +204,9 @@ public:
     }
     void showContextMenu(const QPoint &pos, const QModelIndex &index);
     void sortItems();
+
+protected:
+    void hideEvent(QHideEvent *e) override;
 };
 
 #endif

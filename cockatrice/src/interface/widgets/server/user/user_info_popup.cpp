@@ -329,6 +329,9 @@ void UserInfoPopup::buildUi()
     m_gamesView->setMaximumHeight(220);
     m_gamesView->setStyleSheet(QStringLiteral("QListView{background:#0e1218;border:none;}"
                                               "QListView::item:selected{background:#232e42;}"));
+    m_gamesView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_gamesView, &QListView::customContextMenuRequested, this, &UserInfoPopup::onGamesContextMenu);
+
     root->addWidget(m_gamesView);
 
     // Close button — positioned absolutely in the top-right corner
@@ -477,6 +480,51 @@ void UserInfoPopup::rebuildActionButtons(const ServerInfo_User &userInfo, bool o
     m_actionArea->adjustSize();
 }
 
+void UserInfoPopup::updateActionButtons(const ServerInfo_User &userInfo, bool online, bool isBuddy, bool isIgnored)
+{
+    rebuildActionButtons(userInfo, online, isBuddy, isIgnored);
+    adjustSize();
+}
+
+void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
+{
+    const QModelIndex idx = m_gamesView->indexAt(pos);
+    if (!idx.isValid()) {
+        return;
+    }
+
+    const QVariant var = idx.data(PopupRoles::GameData);
+    if (!var.isValid()) {
+        return;
+    }
+    const ServerInfo_Game game = var.value<ServerInfo_Game>();
+
+    QMenu menu(this);
+    menu.setStyleSheet(
+        QStringLiteral("QMenu{background:#12182a;color:#c8d8ec;border:1px solid #1e2838;border-radius:4px;}"
+                       "QMenu::item:selected{background:#223050;}"));
+
+    const bool canJoin = !game.started() && game.player_count() < game.max_players();
+    QAction *join = menu.addAction(tr("Join game"));
+    join->setEnabled(canJoin);
+
+    QAction *spec = nullptr;
+    if (game.spectators_allowed()) {
+        spec = menu.addAction(tr("Spectate"));
+    }
+
+    const QAction *chosen = menu.exec(m_gamesView->viewport()->mapToGlobal(pos));
+    if (!chosen) {
+        return;
+    }
+
+    if (chosen == join) {
+        emit joinGameRequested(game.game_id(), game.room_id(), false);
+    } else if (spec && chosen == spec) {
+        emit joinGameRequested(game.game_id(), game.room_id(), true);
+    }
+}
+
 // ── showForUser ───────────────────────────────────────────────────────────────
 
 void UserInfoPopup::showForUser(const QString &userName,
@@ -565,6 +613,15 @@ void UserInfoPopup::onGamesReceived(const Response &r, const QString &forUser)
 
     m_gamesStatus->hide();
     m_gamesView->show();
+
+    // Fit exactly to the number of visible rows, scroll when more than 5
+    constexpr int rowH = 38; // must match PopupGameDelegate::sizeHint
+    constexpr int maxRows = 5;
+    const int count = m_gamesModel->rowCount();
+    const int visible = qMin(count, maxRows);
+    m_gamesView->setFixedHeight(visible * rowH + 2);
+    m_gamesView->setVerticalScrollBarPolicy(count > maxRows ? Qt::ScrollBarAlwaysOn : Qt::ScrollBarAlwaysOff);
+
     adjustSize();
 }
 

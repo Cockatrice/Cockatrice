@@ -73,9 +73,26 @@ public slots:
     void handleDisconnect();
 
 signals:
-    void userLeft(const QString &userName);
-    void userJoined(const ServerInfo_User &userInfo);
-    void listsChanged();
+    /**
+     * The entire list needs to be rebuilt from scratch.
+     * Fired on disconnect, reconnect, and initial bulk loads
+     * (Command_ListUsers response, initial buddy/ignore lists).
+     */
+    void listReset();
+
+    // ── Online user presence ──────────────────────────────────────────────────
+    /** A user came online (or joined the room). Full ServerInfo_User available. */
+    void userJoinedOnline(const ServerInfo_User &user);
+    /** A user went offline (or left the room). */
+    void userLeftOnline(const QString &userName);
+
+    // ── Buddy list mutations (individual, post-login) ─────────────────────────
+    void addedToBuddyList(const ServerInfo_User &user);
+    void removedFromBuddyList(const QString &userName);
+
+    // ── Ignore list mutations (individual, post-login) ────────────────────────
+    void addedToIgnoreList(const ServerInfo_User &user);
+    void removedFromIgnoreList(const QString &userName);
 };
 
 #endif // COCKATRICE_USER_LIST_MANAGER_H
