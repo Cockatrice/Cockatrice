@@ -123,8 +123,6 @@ public:
     {
         return counterWidgets.value(counterId, nullptr);
     }
-    /** @brief Returns all tax counter widgets (commander tax and partner tax). */
-    [[nodiscard]] QList<AbstractCounter *> getTaxCounterWidgets() const;
     /** @brief Returns the tax counter if it exists and is active, or nullptr otherwise. */
     [[nodiscard]] AbstractCounter *getTaxCounterIfActive(int counterId) const;
 
@@ -159,7 +157,7 @@ private:
     TableZone *tableZoneGraphicsItem;
     StackZone *stackZoneGraphicsItem;
     HandZone *handZoneGraphicsItem;
-    CommandZone *commandZoneGraphicsItem;
+    CommandZone *commandZoneGraphicsItem = nullptr;
     QRectF bRect;
     bool mirrored;
     bool handVisible = false;

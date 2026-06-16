@@ -591,6 +591,11 @@ Response::ResponseCode Server_Player::cmdSetCounterActive(const Command_SetCount
         return Response::RespNameNotFound;
     }
 
+    // Prevent disabling a counter with tax accumulated; player must reset to 0 first
+    if (!cmd.active() && c->getCount() != 0) {
+        return Response::RespContextError;
+    }
+
     bool didChange = c->setActive(cmd.active());
 
     if (didChange) {
