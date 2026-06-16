@@ -5,6 +5,6 @@ message Event_SetCounterActive {
     extend GameEvent {
         optional Event_SetCounterActive ext = 2023;
     }
-    optional sint32 counter_id = 1;
+    optional sint32 counter_id = 1 [default = -1];
     optional bool active = 2 [default = true];
 }
