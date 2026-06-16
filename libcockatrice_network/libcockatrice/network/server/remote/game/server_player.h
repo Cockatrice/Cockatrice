@@ -25,6 +25,19 @@ public:
     int newCounterId() const;
     void addCounter(Server_Counter *counter);
 
+    // Pure authorization/decision logic extracted from the corresponding cmd* handlers
+    // so it can be unit-tested in isolation. These take all relevant state as parameters
+    // and touch no instance members, hence static. They return RespOk when the command
+    // is permitted, or the appropriate error response otherwise.
+    static Response::ResponseCode
+    evaluateDelCounter(bool gameStarted, bool playerConceded, int counterId, const Server_Counter *counter);
+    static Response::ResponseCode evaluateSetCounterActive(bool gameStarted,
+                                                           bool playerConceded,
+                                                           bool commandZoneEnabled,
+                                                           int counterId,
+                                                           const Server_Counter *counter,
+                                                           bool requestedActive);
+
     void setupZones() override;
     void clearZones() override;
 
