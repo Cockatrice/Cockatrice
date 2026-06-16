@@ -2,14 +2,14 @@
 
 #include <libcockatrice/utility/color.h>
 
-CounterState::CounterState(int id,
-                           const QString &name,
-                           const QColor &color,
-                           int radius,
-                           int value,
-                           bool active,
+CounterState::CounterState(int _id,
+                           const QString &_name,
+                           const QColor &_color,
+                           int _radius,
+                           int _value,
+                           bool _active,
                            QObject *parent)
-    : QObject(parent), id(id), name(name), color(color), radius(radius), value(value), active(active)
+    : QObject(parent), id(_id), name(_name), color(_color), radius(_radius), value(_value), active(_active)
 {
 }
 
