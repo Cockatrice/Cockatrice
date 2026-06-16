@@ -10,12 +10,12 @@ class CounterState : public QObject
 {
     Q_OBJECT
 public:
-    CounterState(int id,
-                 const QString &name,
-                 const QColor &color,
-                 int radius,
-                 int value,
-                 bool active = true,
+    CounterState(int _id,
+                 const QString &_name,
+                 const QColor &_color,
+                 int _radius,
+                 int _value,
+                 bool _active = true,
                  QObject *parent = nullptr);
 
     static CounterState *fromProto(const ServerInfo_Counter &counter, QObject *parent = nullptr);
