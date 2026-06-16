@@ -260,17 +260,6 @@ void PlayerGraphicsItem::rearrangeCounters()
     }
 }
 
-QList<AbstractCounter *> PlayerGraphicsItem::getTaxCounterWidgets() const
-{
-    QList<AbstractCounter *> result;
-    for (AbstractCounter *ctr : counterWidgets.values()) {
-        if (CounterNames::isTaxCounter(ctr->getName())) {
-            result.append(ctr);
-        }
-    }
-    return result;
-}
-
 AbstractCounter *PlayerGraphicsItem::getTaxCounterIfActive(int counterId) const
 {
     AbstractCounter *counter = getCounterWidget(counterId);
