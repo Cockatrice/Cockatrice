@@ -23,6 +23,7 @@
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
+#include "client/url_scheme_event_filter.h"
 #include "database/interface/settings_card_preference_provider.h"
 #include "interface/intents/intent_open_local_deck.h"
 #include "interface/intents/url_parser.h"
