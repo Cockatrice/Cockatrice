@@ -217,27 +217,32 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     // NOTE: attributes must be read before readElementText()
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString setName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
-                    PrintingInfo setInfo(internalAddSet(setName));
-                    if (attrs.hasAttribute("muId")) {
-                        setInfo.setProperty("muid", attrs.value("muId").toString());
-                    }
+                    auto set = internalAddSet(setName);
+                    // Only load printings from sets the user has enabled, matching the v4 loader's
+                    // behaviour. Without this check, disabling a set has no effect on v3 databases.
+                    if (set->getEnabled()) {
+                        PrintingInfo setInfo(set);
+                        if (attrs.hasAttribute("muId")) {
+                            setInfo.setProperty("muid", attrs.value("muId").toString());
+                        }
 
-                    if (attrs.hasAttribute("muId")) {
-                        setInfo.setProperty("uuid", attrs.value("uuId").toString());
-                    }
+                        if (attrs.hasAttribute("uuId")) {
+                            setInfo.setProperty("uuid", attrs.value("uuId").toString());
+                        }
 
-                    if (attrs.hasAttribute("picURL")) {
-                        setInfo.setProperty("picurl", attrs.value("picURL").toString());
-                    }
+                        if (attrs.hasAttribute("picURL")) {
+                            setInfo.setProperty("picurl", attrs.value("picURL").toString());
+                        }
 
-                    if (attrs.hasAttribute("num")) {
-                        setInfo.setProperty("num", attrs.value("num").toString());
-                    }
+                        if (attrs.hasAttribute("num")) {
+                            setInfo.setProperty("num", attrs.value("num").toString());
+                        }
 
-                    if (attrs.hasAttribute("rarity")) {
-                        setInfo.setProperty("rarity", attrs.value("rarity").toString());
+                        if (attrs.hasAttribute("rarity")) {
+                            setInfo.setProperty("rarity", attrs.value("rarity").toString());
+                        }
+                        _sets[setName].append(setInfo);
                     }
-                    _sets[setName].append(setInfo);
                     // related cards
                 } else if (xmlName == "related" || xmlName == "reverse-related") {
                     CardRelationType attach = CardRelationType::DoesNotAttach;
