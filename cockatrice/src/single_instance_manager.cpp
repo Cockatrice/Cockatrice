@@ -59,15 +59,17 @@ void SingleInstanceManager::handleNewConnection()
         while (true) {
             // Step 1: read size
             if (*expectedSize == 0) {
-                if (buffer->size() < static_cast<int>(sizeof(quint32)))
+                if (buffer->size() < static_cast<int>(sizeof(quint32))) {
                     return;
+                }
 
                 stream >> *expectedSize;
             }
 
             // Step 2: wait for full payload
-            if (buffer->size() < static_cast<int>(sizeof(quint32) + *expectedSize))
+            if (buffer->size() < static_cast<int>(sizeof(quint32) + *expectedSize)) {
                 return;
+            }
 
             // Step 3: extract payload
             QByteArray payload = buffer->mid(sizeof(quint32), *expectedSize);

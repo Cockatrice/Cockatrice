@@ -313,8 +313,9 @@ int ServersSettings::findServerIndex(const QString &host, const QString &port) c
 bool ServersSettings::hasUsername(const QString &host, const QString &port) const
 {
     int index = findServerIndex(host, port);
-    if (index < 0)
+    if (index < 0) {
         return false;
+    }
 
     QString user = getValue(QString("username%1").arg(index), "server", "server_details").toString();
     return !user.isEmpty();
@@ -323,8 +324,9 @@ bool ServersSettings::hasUsername(const QString &host, const QString &port) cons
 bool ServersSettings::hasCredentials(const QString &host, const QString &port) const
 {
     int index = findServerIndex(host, port);
-    if (index < 0)
+    if (index < 0) {
         return false;
+    }
 
     bool save = getValue(QString("savePassword%1").arg(index), "server", "server_details").toBool();
     QString password = getValue(QString("password%1").arg(index), "server", "server_details").toString();
