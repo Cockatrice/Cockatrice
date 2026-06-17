@@ -355,6 +355,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/utility/compact_push_button.h
     src/single_instance_manager.cpp
     src/single_instance_manager.h
+    src/client/url_scheme_event_filter.h
     src/interface/intents/intent_connect_to_server.cpp
     src/interface/intents/intent_connect_to_server.h
     src/interface/intents/intent_disconnect_from_server.cpp
