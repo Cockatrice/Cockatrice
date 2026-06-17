@@ -152,7 +152,7 @@ public:
 
     RemoteClient *getRemoteClient() const
     {
-        return client;
+        return connectionController->client();
     }
 
     TabSupervisor *getTabSupervisor() const
