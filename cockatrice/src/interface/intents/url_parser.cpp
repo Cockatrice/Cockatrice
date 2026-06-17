@@ -18,8 +18,9 @@ void IntentUrlParser::handle(const QString &urlStr)
 {
     QUrl url(urlStr);
 
-    if (url.scheme() != "cockatrice")
+    if (url.scheme() != "cockatrice") {
         return;
+    }
 
     const QString action = url.host();
     QUrlQuery query(url);
