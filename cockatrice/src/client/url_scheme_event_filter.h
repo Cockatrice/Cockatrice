@@ -38,12 +38,24 @@ public:
     bool eventFilter(QObject *watched, QEvent *event) override
     {
         if (event->type() == QEvent::FileOpen) {
-            const QString url = static_cast<QFileOpenEvent *>(event)->url().toString();
+            auto *fileEvent = static_cast<QFileOpenEvent *>(event);
+
+            qWarning() << "[MAC][FileOpenEvent] raw url:" << fileEvent->url()
+                       << "toString:" << fileEvent->url().toString() << "schemePrefix:" << m_prefix;
+
+            const QString url = fileEvent->url().toString();
+
+            qWarning() << "[MAC][FileOpenEvent] extracted url:" << url;
+
             if (url.startsWith(m_prefix)) {
+                qWarning() << "[MAC][FileOpenEvent] MATCH prefix → emitting urlReceived";
                 emit urlReceived(url);
                 return true;
+            } else {
+                qWarning() << "[MAC][FileOpenEvent] ignored (wrong scheme)";
             }
         }
+
         return QObject::eventFilter(watched, event);
     }
 
