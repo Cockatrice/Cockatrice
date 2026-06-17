@@ -203,6 +203,18 @@ int main(int argc, char *argv[])
         "endif}%{if-fatal}\033[1;31mF%{endif}\033[0m] [%{function}] - %{message} [%{file}:%{line}]");
     QApplication app(argc, argv);
 
+#ifdef Q_OS_MAC
+    UrlSchemeEventFilter cockatriceFilter(QStringLiteral("cockatrice://"));
+
+    QStringList pendingMacUrls;
+
+    const auto cocoaBufferConn =
+        QObject::connect(&cockatriceFilter, &UrlSchemeEventFilter::urlReceived,
+                         [&pendingMacUrls](const QString &url) { pendingMacUrls.append(url); });
+
+    app.installEventFilter(&cockatriceFilter);
+#endif
+
     QObject::connect(&app, &QApplication::lastWindowClosed, &app, &QApplication::quit);
 
     qInstallMessageHandler(CockatriceLogger);
@@ -265,6 +277,23 @@ int main(int argc, char *argv[])
     qCInfo(MainLog) << "Starting main program";
 
     MainWindow ui;
+
+    auto handleActivation = [&ui](const QString &file) {
+        if (file.startsWith("cockatrice://")) {
+            auto urlParser = new IntentUrlParser(&ui, &ui);
+            urlParser->handle(file);
+        } else if (QFileInfo(file).exists()) {
+            auto openDeckIntent = new IntentOpenLocalDeck(ui.getTabSupervisor(), file);
+            openDeckIntent->execute();
+        }
+    };
+
+#ifdef Q_OS_MAC
+    QObject::disconnect(cocoaBufferConn);
+
+    QObject::connect(&cockatriceFilter, &UrlSchemeEventFilter::urlReceived,
+                     [&handleActivation](const QString &url) { handleActivation(url); });
+#endif
     if (parser.isSet("connect")) {
         ui.setConnectTo(parser.value("connect"));
     }
@@ -318,26 +347,21 @@ int main(int argc, char *argv[])
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
 
+#ifdef Q_OS_MAC
+    for (const QString &url : pendingMacUrls) {
+        handleActivation(url);
+    }
+    pendingMacUrls.clear();
+#endif
+
     for (const QString &file : startupFiles) {
-        if (file.startsWith("cockatrice://")) {
-            auto urlParser = new IntentUrlParser(&ui, &ui);
-            urlParser->handle(file);
-        } else if (QFileInfo(file).exists()) {
-            auto openDeckIntent = new IntentOpenLocalDeck(ui.getTabSupervisor(), file);
-            openDeckIntent->execute();
-        }
+        handleActivation(file);
     }
 
     // Connect to future file/URL events from other instances
-    QObject::connect(&instance, &SingleInstanceManager::filesReceived, [&ui](const QStringList &files) {
+    QObject::connect(&instance, &SingleInstanceManager::filesReceived, [&handleActivation](const QStringList &files) {
         for (const QString &file : files) {
-            if (file.startsWith("cockatrice://")) {
-                auto urlParser = new IntentUrlParser(&ui, &ui);
-                urlParser->handle(file);
-            } else if (QFileInfo(file).exists()) {
-                auto openDeckIntent = new IntentOpenLocalDeck(ui.getTabSupervisor(), file);
-                openDeckIntent->execute();
-            }
+            handleActivation(file);
         }
     });
 
