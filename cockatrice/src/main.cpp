@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
 #ifdef Q_OS_MAC
-    UrlSchemeEventFilter cockatriceFilter(QStringList{QStringLiteral("cockatrice://"), QStringLiteral("file://")});
+    UrlSchemeEventFilter cockatriceFilter(QStringList{QStringLiteral("cockatrice")});
 
     QStringList pendingMacUrls;
 

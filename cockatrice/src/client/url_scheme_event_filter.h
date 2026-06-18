@@ -40,22 +40,19 @@ public:
         if (event->type() == QEvent::FileOpen) {
             auto *fileEvent = static_cast<QFileOpenEvent *>(event);
 
-            qWarning() << "[MAC][FileOpenEvent] raw url:" << fileEvent->url()
-                       << "toString:" << fileEvent->url().toString() << "schemePrefix:" << m_prefixes;
+            const QUrl url = fileEvent->url();
 
-            const QString url = fileEvent->url().toString();
-
-            qWarning() << "[MAC][FileOpenEvent] extracted url:" << url;
-
-            for (auto m_prefix : m_prefixes) {
-                if (url.startsWith(m_prefix)) {
-                    qWarning() << "[MAC][FileOpenEvent] MATCH prefix → emitting urlReceived";
-                    emit urlReceived(url);
+            for (auto prefix : m_prefixes) {
+                if (url.scheme() == prefix) {
+                    emit urlReceived(url.toString());
                     return true;
                 }
             }
 
-            qWarning() << "[MAC][FileOpenEvent] ignored (wrong scheme)";
+            if (url.isLocalFile()) {
+                emit urlReceived(url.toLocalFile());
+                return true;
+            }
         }
 
         return QObject::eventFilter(watched, event);
