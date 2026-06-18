@@ -26,8 +26,8 @@ class UrlSchemeEventFilter : public QObject
     Q_OBJECT
 
 public:
-    explicit UrlSchemeEventFilter(const QString &schemePrefix, QObject *parent = nullptr)
-        : QObject(parent), m_prefix(schemePrefix)
+    explicit UrlSchemeEventFilter(const QStringList &schemePrefix, QObject *parent = nullptr)
+        : QObject(parent), m_prefixes(schemePrefix)
     {
     }
 
@@ -41,26 +41,28 @@ public:
             auto *fileEvent = static_cast<QFileOpenEvent *>(event);
 
             qWarning() << "[MAC][FileOpenEvent] raw url:" << fileEvent->url()
-                       << "toString:" << fileEvent->url().toString() << "schemePrefix:" << m_prefix;
+                       << "toString:" << fileEvent->url().toString() << "schemePrefix:" << m_prefixes;
 
             const QString url = fileEvent->url().toString();
 
             qWarning() << "[MAC][FileOpenEvent] extracted url:" << url;
 
-            if (url.startsWith(m_prefix)) {
-                qWarning() << "[MAC][FileOpenEvent] MATCH prefix → emitting urlReceived";
-                emit urlReceived(url);
-                return true;
-            } else {
-                qWarning() << "[MAC][FileOpenEvent] ignored (wrong scheme)";
+            for (auto m_prefix : m_prefixes) {
+                if (url.startsWith(m_prefix)) {
+                    qWarning() << "[MAC][FileOpenEvent] MATCH prefix → emitting urlReceived";
+                    emit urlReceived(url);
+                    return true;
+                }
             }
+
+            qWarning() << "[MAC][FileOpenEvent] ignored (wrong scheme)";
         }
 
         return QObject::eventFilter(watched, event);
     }
 
 private:
-    QString m_prefix;
+    QStringList m_prefixes;
 };
 
 #endif // COCKATRICE_URL_SCHEME_EVENT_FILTER_H
