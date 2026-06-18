@@ -38,7 +38,7 @@ protected:
 
 private:
     TabSupervisor *tabSupervisor;
-    const QString &file;
+    QString file;
 };
 
 #endif // COCKATRICE_INTENT_OPEN_LOCAL_DECK_H
