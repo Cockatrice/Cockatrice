@@ -103,7 +103,7 @@ private:
 
     BracketExplanation lastBracketExplanation;
 
-    int requestId;
+    quint64 requestId;
 
     DeckListModel *getModel() const;
     [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;
