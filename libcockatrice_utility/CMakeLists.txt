@@ -16,6 +16,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/macros.h
     libcockatrice/utility/passwordhasher.h
     libcockatrice/utility/trice_limits.h
+    libcockatrice/utility/clamped_arithmetic.h
     libcockatrice/utility/zone_names.h
     libcockatrice/utility/days_years_between.h
 )

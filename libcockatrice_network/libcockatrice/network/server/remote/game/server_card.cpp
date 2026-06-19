@@ -26,6 +26,7 @@
 #include <libcockatrice/protocol/pb/event_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
+#include <libcockatrice/utility/clamped_arithmetic.h>
 #include <libcockatrice/utility/trice_limits.h>
 #include <limits>
 
@@ -139,10 +140,8 @@ bool Server_Card::setCounter(int _id, int value, Event_SetCardCounter *event)
 bool Server_Card::incrementCounter(int counterId, int delta, Event_SetCardCounter *event)
 {
     const int oldValue = counters.value(counterId, 0);
-    const auto result = static_cast<int64_t>(oldValue) + static_cast<int64_t>(delta);
     // Clamp to [0, MAX_COUNTERS_ON_CARD] for card counters
-    const int newValue =
-        static_cast<int>(qBound(static_cast<int64_t>(0), result, static_cast<int64_t>(MAX_COUNTERS_ON_CARD)));
+    const int newValue = addClamped(oldValue, delta, 0, MAX_COUNTERS_ON_CARD);
 
     if (newValue == oldValue) {
         return false;

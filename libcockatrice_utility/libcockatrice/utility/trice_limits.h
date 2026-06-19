@@ -1,6 +1,9 @@
 #ifndef TRICE_LIMITS_H
 #define TRICE_LIMITS_H
 
+//! \todo Split trice_limits.h into focused single-purpose headers: string_limits.h,
+//!       dice_limits.h, counter_limits.h.
+
 #include <QString>
 
 // max size for short strings, like names and things that are generally a single phrase
@@ -16,7 +19,9 @@ constexpr uint MINIMUM_DICE_TO_ROLL = 1;
 constexpr uint MAXIMUM_DICE_TO_ROLL = 100;
 
 // Card counter value bounds [0, MAX_COUNTERS_ON_CARD].
-// Counters on cards (e.g., +1/+1 counters, charge counters) are non-negative physical game objects.
+// This caps an individual counter's VALUE (e.g. a +1/+1 counter at 999), not how many counters a card holds.
+// Applies to card counters only; player counters (Server_Counter) are unbounded and may go
+// negative (e.g. life total), saturating only at the int range.
 // The max of 999 is a display constraint (3-digit rendering) and reasonable gameplay limit.
 // Server enforces these bounds; client may also check for UX optimization.
 constexpr int MAX_COUNTERS_ON_CARD = 999;
