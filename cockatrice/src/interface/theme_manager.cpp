@@ -97,6 +97,13 @@ ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
         defaultStyleName = "windowsvista";
     }
     ensureThemeDirectoryExists();
+
+    // Capture the QPA-initialised palette before we ever call qApp->setPalette().
+    // Once setPalette() is called, is_app_palette is locked true and neither
+    // setStyle() nor colorSchemeChanged will update it automatically.
+    // This snapshot is our guaranteed-clean base for applyStyleAndPalette.
+    systemPalette = qApp->palette();
+
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, &ThemeManager::themeChangedSlot);
 #endif
@@ -344,7 +351,7 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         }
 #endif
     } else {
-        base = qApp->palette();
+        base = systemPalette;
     }
 
     // Overlay custom palette colours
@@ -432,6 +439,20 @@ void ThemeManager::themeChangedSlot()
     QPixmapCache::clear();
 
     emit themeChanged();
+}
+
+void ThemeManager::onColorSchemeChanged()
+{
+    // qApp->palette() is locked (is_app_palette = true), so the QPA won't push
+    // the new OS palette through automatically. style->polish(QPalette&) queries
+    // GetSysColor on Windows — adequate for light mode, imperfect for Win11 dark
+    // mode (which uses a different API), but better than a stale light snapshot.
+    QPalette fresh;
+    qApp->style()->polish(fresh);
+    if (fresh.color(QPalette::Window).isValid()) {
+        systemPalette = fresh;
+    }
+    themeChangedSlot();
 }
 
 static QString roleBgName(ThemeManager::Role role)

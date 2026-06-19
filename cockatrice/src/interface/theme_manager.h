@@ -42,6 +42,7 @@ public:
     };
 
 private:
+    QPalette systemPalette;
     QString defaultStyleName;
     QString currentThemePath;
     std::array<QBrush, Role::MaxRole + 1> brushes;
@@ -89,6 +90,7 @@ public:
     QBrush getExtraBgBrush(Role zone, int zoneId = 0);
 protected slots:
     void themeChangedSlot();
+    void onColorSchemeChanged();
 signals:
     void themeChanged();
 };
