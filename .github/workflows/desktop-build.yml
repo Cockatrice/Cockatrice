@@ -480,7 +480,8 @@ jobs:
           path: ${{ env.CCACHE_DIR }}
 
       - name: "[macOS] Sign & notarize app bundle"
-        if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
+        # if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
+        if: matrix.os == 'macOS'
         shell: bash
         env:
           BUILD_PATH: ${{ steps.build.outputs.path }}
