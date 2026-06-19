@@ -322,8 +322,13 @@ void PaletteEditorDialog::onRevertToDefault()
 
     savedConfig[loadedScheme] = def;
     workingConfig[loadedScheme] = def;
-    paletteGrid->loadPalette(def);
-    retranslateUi(); // update button enabled state
+
+    ThemeConfig globalCfg = themeManager->effectiveThemeConfig(themeName);
+    globalCfg.colorScheme = loadedScheme;
+    globalCfg.save(userThemeDirPath);
+
+    themeManager->reloadCurrentTheme();
+    accept();
 }
 
 void PaletteEditorDialog::changeEvent(QEvent *e)
