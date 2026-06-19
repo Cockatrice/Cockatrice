@@ -31,6 +31,7 @@ private slots:
 
 private:
     void setupUi();
+    void updateUserOverrideState();
     void retranslateUi();
     void refreshChromePalettes();
     void loadScheme(const QString &scheme); // snapshot current, switch, load

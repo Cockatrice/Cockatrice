@@ -158,17 +158,22 @@ void PaletteEditorDialog::setupUi()
     });
 }
 
+void PaletteEditorDialog::updateUserOverrideState()
+{
+    const bool hasUserOverride =
+        QFile::exists(QDir(userThemeDirPath).absoluteFilePath(PaletteConfig::fileName(loadedScheme)));
+
+    revertButton->setEnabled(hasUserOverride);
+    revertButton->setToolTip(hasUserOverride ? tr("Delete your custom palette and restore the shipped defaults")
+                                             : tr("No custom palette overrides exist for this scheme"));
+}
+
 void PaletteEditorDialog::retranslateUi()
 {
     setWindowTitle(tr("Palette Editor — %1").arg(themeName));
     titleLabel->setText(tr("<b>Palette Editor</b> &nbsp;·&nbsp; %1").arg(themeName));
 
-    const bool hasUserOverride =
-        QFile::exists(QDir(userThemeDirPath).absoluteFilePath(PaletteConfig::fileName("Light"))) ||
-        QFile::exists(QDir(userThemeDirPath).absoluteFilePath(PaletteConfig::fileName("Dark")));
-    revertButton->setEnabled(hasUserOverride);
-    revertButton->setToolTip(hasUserOverride ? tr("Delete your custom palette and restore the shipped defaults")
-                                             : tr("No custom palette overrides exist for this theme"));
+    updateUserOverrideState();
 
     schemeComboBox->setToolTip(tr("Switch between the light and dark palette files"));
     editingLabel->setText(tr("Editing:"));
@@ -236,6 +241,9 @@ void PaletteEditorDialog::onSchemeChanged(const QString &scheme)
     loadedScheme = scheme;
     paletteGrid->loadPalette(workingConfig.value(scheme));
     seedAccentFromScheme(scheme);
+
+    updateUserOverrideState();
+
     onApply();
 }
 
