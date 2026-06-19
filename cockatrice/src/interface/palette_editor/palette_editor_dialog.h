@@ -54,6 +54,7 @@ private:
     QPushButton *revertButton = nullptr;
 
     // State
+    QString userThemeDirPath;
     QString themeDirPath;
     QString themeName;
     QString loadedScheme;

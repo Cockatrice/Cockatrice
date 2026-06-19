@@ -113,21 +113,26 @@ void ThemeManager::ensureThemeDirectoryExists()
     }
 }
 
-bool ThemeManager::isDarkMode(const QString &themeDirPath)
+bool ThemeManager::isDarkMode(const QString &themeDirPath, const QString &userDirPath)
 {
-    ThemeConfig themeConfig = ThemeConfig::fromThemeDir(themeDirPath);
-    if (themeConfig.colorScheme.compare("Dark", Qt::CaseInsensitive) == 0) {
-        return true;
-    } else if (themeConfig.colorScheme.compare("Light", Qt::CaseInsensitive) == 0) {
-        return false;
-    } else {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-        bool osDark = (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark);
-#else
-        bool osDark = false;
-#endif
-        return osDark;
+    // User override takes precedence over system config
+    for (const QString &path : {userDirPath, themeDirPath}) {
+        if (path.isEmpty()) {
+            continue;
+        }
+        ThemeConfig cfg = ThemeConfig::fromThemeDir(path);
+        if (cfg.colorScheme.compare("Dark", Qt::CaseInsensitive) == 0) {
+            return true;
+        }
+        if (cfg.colorScheme.compare("Light", Qt::CaseInsensitive) == 0) {
+            return false;
+        }
     }
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    return (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark);
+#else
+    return false;
+#endif
 }
 
 bool ThemeManager::isBuiltInTheme()
@@ -137,40 +142,47 @@ bool ThemeManager::isBuiltInTheme()
     return themeName == NONE_THEME_NAME || themeName == FUSION_THEME_NAME;
 }
 
+QString ThemeManager::userThemeDirFor(const QString &themeName)
+{
+    return QDir(SettingsCache::instance().getThemesPath()).absoluteFilePath(themeName);
+}
+
 QStringMap &ThemeManager::getAvailableThemes()
 {
-    QDir dir;
     availableThemes.clear();
 
-    // load themes from user profile dir
-    dir.setPath(SettingsCache::instance().getThemesPath());
-
-    // add default value
-    availableThemes.insert(NONE_THEME_NAME, dir.absoluteFilePath("Default"));
-
-    availableThemes.insert(FUSION_THEME_NAME, dir.absoluteFilePath("Fusion"));
-
-    for (QString themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
-        if (!availableThemes.contains(themeName)) {
-            availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
-        }
-    }
-
-    // load themes from cockatrice system dir
-    dir.setPath(qApp->applicationDirPath() +
+    // ── 1. System themes (read-only, shipped with the application) ──────────
+    QDir sysDir(qApp->applicationDirPath() +
 #ifdef Q_OS_MAC
                 "/../Resources/themes"
 #elif defined(Q_OS_WIN)
                 "/themes"
-#else // linux
+#else
                 "/../share/cockatrice/themes"
 #endif
     );
+    for (const QString &name : sysDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
+        availableThemes.insert(name, sysDir.absoluteFilePath(name));
+    }
 
-    for (QString themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
-        if (!availableThemes.contains(themeName)) {
-            availableThemes.insert(themeName, dir.absoluteFilePath(themeName));
+    // ── 2. User-only themes (AppData) ────────────────────────────────────────
+    // We only add themes that don't already exist in the system directory.
+    // Customisations to system themes are handled via the fallthrough read
+    // logic (userThemeDirFor → system path); we intentionally keep the system
+    // path in the map so shipped assets are always locatable.
+    QDir userDir(SettingsCache::instance().getThemesPath());
+    for (const QString &name : userDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
+        if (!availableThemes.contains(name)) {
+            availableThemes.insert(name, userDir.absoluteFilePath(name));
         }
+    }
+
+    // ── 3. Ensure built-in sentinels always exist (dev builds without install)
+    if (!availableThemes.contains(NONE_THEME_NAME)) {
+        availableThemes.insert(NONE_THEME_NAME, userDir.absoluteFilePath("Default"));
+    }
+    if (!availableThemes.contains(FUSION_THEME_NAME)) {
+        availableThemes.insert(FUSION_THEME_NAME, userDir.absoluteFilePath("Fusion"));
     }
 
     return availableThemes;
@@ -244,12 +256,14 @@ bool ThemeManager::savePaletteConfig(const QString &themeDirPath, const QString 
 
 void ThemeManager::setColorScheme(const QString &scheme)
 {
-    const QString dirPath = getAvailableThemes().value(SettingsCache::instance().getThemeName());
+    const QString themeName = SettingsCache::instance().getThemeName();
+    const QString dirPath = getAvailableThemes().value(themeName);
+    const QString userDirPath = userThemeDirFor(themeName);
+
+    // Read base config from system; write the scheme override to user dir
     ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
-
     cfg.colorScheme = scheme;
-
-    cfg.save(dirPath);
+    cfg.save(userDirPath);
     reloadCurrentTheme();
 }
 
@@ -262,7 +276,13 @@ void ThemeManager::previewPalette(const PaletteConfig &cfg, const QString &schem
 {
     const QString themeName = SettingsCache::instance().getThemeName();
     const QString dirPath = getAvailableThemes().value(themeName);
-    const ThemeConfig themeCfg = ThemeConfig::fromThemeDir(dirPath);
+    const QString userDirPath = userThemeDirFor(themeName);
+
+    ThemeConfig themeCfg = ThemeConfig::fromThemeDir(userDirPath);
+    if (themeCfg.colorScheme.isEmpty() && themeCfg.styleName.isEmpty()) {
+        themeCfg = ThemeConfig::fromThemeDir(dirPath);
+    }
+
     applyStyleAndPalette(themeName, themeCfg, cfg, scheme);
 }
 
@@ -325,50 +345,59 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
     }
 }
 
-void ThemeManager::themeChangedSlot()
+vvoid ThemeManager::themeChangedSlot()
 {
-    QString themeName = SettingsCache::instance().getThemeName();
-    QString dirPath = getAvailableThemes().value(themeName);
+    const QString themeName = SettingsCache::instance().getThemeName();
+    const QString dirPath = getAvailableThemes().value(themeName); // system path
+    const QString userDirPath = userThemeDirFor(themeName);        // user override path
     currentThemePath = dirPath;
-    QDir dir(dirPath);
 
-    // CSS
-    if (!dirPath.isEmpty() && dir.exists(STYLE_CSS_NAME)) {
-        qApp->setStyleSheet("file:///" + dir.absoluteFilePath(STYLE_CSS_NAME));
-    } else {
+    // CSS — user override first, then system
+    const auto tryLoadCss = [](const QString &path) -> bool {
+        QDir d(path);
+        if (!path.isEmpty() && d.exists(STYLE_CSS_NAME)) {
+            qApp->setStyleSheet("file:///" + d.absoluteFilePath(STYLE_CSS_NAME));
+            return true;
+        }
+        return false;
+    };
+    if (!tryLoadCss(userDirPath) && !tryLoadCss(dirPath)) {
         qApp->setStyleSheet("");
     }
 
-    // load theme.cfg for style + scheme preference
-    ThemeConfig themeCfg = ThemeConfig::fromThemeDir(dirPath);
+    // ThemeConfig — user override first, then system
+    ThemeConfig themeCfg = ThemeConfig::fromThemeDir(userDirPath);
+    if (themeCfg.colorScheme.isEmpty() && themeCfg.styleName.isEmpty()) {
+        themeCfg = ThemeConfig::fromThemeDir(dirPath);
+    }
 
-    // Resolve active scheme:
-    // theme.cfg says Dark/Light → use that
-    // theme.cfg says System or is absent → follow the OS
-    QString activeScheme = isDarkMode(dirPath) ? "Dark" : "Light";
+    const QString activeScheme = isDarkMode(dirPath, userDirPath) ? "Dark" : "Light";
 
-    // ── Load palette: custom first, then theme default ────────────────────
-    PaletteConfig palette = PaletteConfig::fromScheme(dirPath, activeScheme);
+    // Palette — user customisation → system palette → system default
+    PaletteConfig palette = PaletteConfig::fromScheme(userDirPath, activeScheme);
+    if (!palette.hasPalette()) {
+        palette = PaletteConfig::fromScheme(dirPath, activeScheme);
+    }
     if (!palette.hasPalette()) {
         palette = PaletteConfig::fromDefault(dirPath, activeScheme);
     }
 
     applyStyleAndPalette(themeName, themeCfg, palette, activeScheme);
 
+    // Search paths — user assets shadow system assets, both fall through to builtins
     QStringList resources;
+    if (QDir(userDirPath).exists()) {
+        resources << userDirPath;
+    }
     if (!dirPath.isEmpty()) {
-        resources << dir.absolutePath();
+        resources << dirPath;
     }
     resources << DEFAULT_RESOURCE_PATHS;
-
     QDir::setSearchPaths("theme", resources);
 
     brushes[Role::Hand] = loadBrush(HANDZONE_BG_NAME, HANDZONE_BG_DEFAULT);
-
     brushes[Role::Table] = loadBrush(TABLEZONE_BG_NAME, TABLEZONE_BG_DEFAULT);
-
     brushes[Role::Player] = loadBrush(PLAYERZONE_BG_NAME, PLAYERZONE_BG_DEFAULT);
-
     brushes[Role::Stack] = loadBrush(STACKZONE_BG_NAME, STACKZONE_BG_DEFAULT);
     for (auto &brushCache : brushesCache) {
         brushCache.clear();

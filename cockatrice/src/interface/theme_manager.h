@@ -63,6 +63,8 @@ protected:
 public:
     bool isBuiltInTheme();
     bool isDarkMode(const QString &themeDirPath);
+    static bool isDarkMode(const QString &themeDirPath, const QString &userDirPath = {});
+    static QString userThemeDirFor(const QString &themeName);
     QStringMap &getAvailableThemes();
     // Returns the path to the currently active theme directory (empty = default)
     QString getCurrentThemePath() const
