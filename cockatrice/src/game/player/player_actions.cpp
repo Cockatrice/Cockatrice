@@ -882,7 +882,8 @@ void PlayerActions::actCreateToken(TokenInfo tokenToCreate)
     ExactCard correctedCard = CardDatabaseManager::query()->guessCard({lastTokenInfo.name, lastTokenInfo.providerId});
     if (correctedCard) {
         lastTokenInfo.name = correctedCard.getName();
-        lastTokenTableRow = TableZone::tableRowToGridY(correctedCard.getInfo().getUiAttributes().tableRow);
+        int tableRow = lastTokenInfo.faceDown ? 2 : correctedCard.getInfo().getUiAttributes().tableRow;
+        lastTokenTableRow = TableZone::tableRowToGridY(tableRow);
         if (lastTokenInfo.pt.isEmpty()) {
             lastTokenInfo.pt = correctedCard.getInfo().getPowTough();
         }

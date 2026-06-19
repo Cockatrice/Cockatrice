@@ -211,9 +211,10 @@ jobs:
         if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
         continue-on-error: true
         env:
+          CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}; then
+          if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
             echo "Cache deleted successfully"
           fi
 
@@ -256,8 +257,9 @@ jobs:
         if: steps.attestation.outcome == 'success'
         shell: bash
         env:
+          BUILD_PATH: ${{ steps.build.outputs.path }}
           GH_TOKEN: ${{ github.token }}
-        run: gh attestation verify "${{ steps.build.outputs.path }}" --repo Cockatrice/Cockatrice
+        run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
 
   build-vcpkg:
     strategy:
@@ -378,9 +380,11 @@ jobs:
 
       # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version via aqtinstall to avoid stale caches on new releases
       - name: "Resolve latest Qt patch version"
+        env:
+          QT_VERSION: ${{ matrix.qt_version }}
         id: resolve_qt_version
         shell: bash
-        run: .ci/resolve_latest_aqt_qt_version.sh "${{ matrix.qt_version }}"
+        run: .ci/resolve_latest_aqt_qt_version.sh "$QT_VERSION"
 
       - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries"
         if: matrix.os == 'macOS'
@@ -461,9 +465,10 @@ jobs:
         if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
         continue-on-error: true
         env:
+          CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}; then
+          if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
             echo "Cache deleted successfully"
           fi
 
@@ -478,12 +483,13 @@ jobs:
         if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
         shell: bash
         env:
+          BUILD_PATH: ${{ steps.build.outputs.path }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
-        run: .ci/sign_macos_bundle.sh "${{ steps.build.outputs.path }}"
+        run: .ci/sign_macos_bundle.sh "$BUILD_PATH"
 
       - name: "Upload artifact"
         if: matrix.make_package
@@ -528,5 +534,6 @@ jobs:
         if: steps.attestation.outcome == 'success'
         shell: bash
         env:
+          BUILD_PATH: ${{ steps.build.outputs.path }}
           GH_TOKEN: ${{ github.token }}
-        run: gh attestation verify "${{ steps.build.outputs.path }}" --repo Cockatrice/Cockatrice
+        run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
