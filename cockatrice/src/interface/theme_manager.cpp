@@ -344,17 +344,7 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         }
 #endif
     } else {
-        // Always start from the style's own standard palette so a previously-applied
-        // theme can never bleed through. qApp->palette() carries the result of the
-        // last theme application and must not be used as a base here — if the current
-        // theme ships no palette file, hasPalette() is false and palCfg.apply() is
-        // skipped, meaning whatever we put in base IS the effective palette.
-        base = style->standardPalette();
-        if (!base.color(QPalette::Window).isValid()) {
-            // Exotic platform style that doesn't implement standardPalette() —
-            // accept the bleed-through risk rather than crash or use garbage.
-            base = qApp->palette();
-        }
+        base = qApp->palette();
     }
 
     // Overlay custom palette colours
