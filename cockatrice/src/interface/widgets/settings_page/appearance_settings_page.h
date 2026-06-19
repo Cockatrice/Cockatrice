@@ -17,6 +17,7 @@ class AppearanceSettingsPage : public AbstractSettingsPage
 private slots:
     void themeBoxChanged(int index);
     void openThemeLocation();
+    void reloadThemeSettings();
     void editPalette();
     void updateHomeTabSettingsVisibility();
     void showShortcutsChanged(QT_STATE_CHANGED_T enabled);
@@ -31,6 +32,8 @@ private:
     QPushButton openThemeButton;
     QLabel schemeComboLabel;
     QComboBox schemeCombo;
+    QLabel styleLabel;
+    QComboBox styleComboBox;
     QPushButton editPaletteButton;
     QLabel homeTabBackgroundSourceLabel;
     QComboBox homeTabBackgroundSourceBox;

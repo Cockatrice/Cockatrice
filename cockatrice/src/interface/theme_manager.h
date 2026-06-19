@@ -66,6 +66,8 @@ public:
     static bool isDarkMode(const QString &themeDirPath, const QString &userDirPath = {});
     static QString userThemeDirFor(const QString &themeName);
     QStringMap &getAvailableThemes();
+    ThemeConfig effectiveThemeConfig(const QString &themeName);
+    void setStyleName(const QString &styleName);
     // Returns the path to the currently active theme directory (empty = default)
     QString getCurrentThemePath() const
     {

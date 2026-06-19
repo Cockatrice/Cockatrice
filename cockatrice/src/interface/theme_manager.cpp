@@ -188,6 +188,41 @@ QStringMap &ThemeManager::getAvailableThemes()
     return availableThemes;
 }
 
+ThemeConfig ThemeManager::effectiveThemeConfig(const QString &themeName)
+{
+    const QString dirPath = ThemeManager().getAvailableThemes().value(themeName);
+    const QString userDirPath = userThemeDirFor(themeName);
+
+    ThemeConfig userCfg = ThemeConfig::fromThemeDir(userDirPath);
+    ThemeConfig systemCfg = ThemeConfig::fromThemeDir(dirPath);
+
+    ThemeConfig result = systemCfg;
+
+    // User values override system values on a per-field basis
+    if (!userCfg.colorScheme.isEmpty()) {
+        result.colorScheme = userCfg.colorScheme;
+    }
+
+    if (!userCfg.styleName.isEmpty()) {
+        result.styleName = userCfg.styleName;
+    }
+
+    return result;
+}
+
+void ThemeManager::setStyleName(const QString &styleName)
+{
+    const QString themeName = SettingsCache::instance().getThemeName();
+    const QString dirPath = getAvailableThemes().value(themeName);
+    const QString userDirPath = userThemeDirFor(themeName);
+
+    ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
+    cfg.styleName = styleName;
+    cfg.save(userDirPath);
+
+    reloadCurrentTheme();
+}
+
 QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 {
     QBrush brush;
