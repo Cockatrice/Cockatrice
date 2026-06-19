@@ -50,7 +50,9 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
-        queries: security-and-quality
+        # https://docs.github.com/en/code-security/reference/code-scanning/codeql/codeql-queries/c-cpp-built-in-queries
+        # https://docs.github.com/en/code-security/reference/code-scanning/codeql/codeql-queries/actions-built-in-queries
+        queries: security-extended
         dependency-caching: true
 
     - name: "[C++] Install dependencies"
