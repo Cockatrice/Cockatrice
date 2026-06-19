@@ -210,14 +210,14 @@ ThemeConfig ThemeManager::effectiveThemeConfig(const QString &themeName)
     return result;
 }
 
-void ThemeManager::setStyleName(const QString &styleName)
+void ThemeManager::setStyleName(const QString &style)
 {
     const QString themeName = SettingsCache::instance().getThemeName();
-    const QString dirPath = getAvailableThemes().value(themeName);
     const QString userDirPath = userThemeDirFor(themeName);
 
-    ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
-    cfg.styleName = styleName;
+    ThemeConfig cfg = effectiveThemeConfig(themeName);
+
+    cfg.styleName = style;
     cfg.save(userDirPath);
 
     reloadCurrentTheme();
@@ -292,13 +292,13 @@ bool ThemeManager::savePaletteConfig(const QString &themeDirPath, const QString 
 void ThemeManager::setColorScheme(const QString &scheme)
 {
     const QString themeName = SettingsCache::instance().getThemeName();
-    const QString dirPath = getAvailableThemes().value(themeName);
     const QString userDirPath = userThemeDirFor(themeName);
 
-    // Read base config from system; write the scheme override to user dir
-    ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
+    ThemeConfig cfg = effectiveThemeConfig(themeName);
+
     cfg.colorScheme = scheme;
     cfg.save(userDirPath);
+
     reloadCurrentTheme();
 }
 
