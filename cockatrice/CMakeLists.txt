@@ -83,7 +83,6 @@ set(cockatrice_SOURCES
     src/game/game_state.cpp
     src/game_graphics/game_view.cpp
     src/game_graphics/hand_counter.cpp
-    src/game/selection_subtype_tally.cpp
     src/game_graphics/log/message_log_widget.cpp
     src/game/phase.cpp
     src/game_graphics/phases_toolbar.cpp
@@ -99,6 +98,8 @@ set(cockatrice_SOURCES
     src/game_graphics/player/menu/say_menu.cpp
     src/game_graphics/player/menu/sideboard_menu.cpp
     src/game_graphics/player/menu/utility_menu.cpp
+    src/game_graphics/tally/subtype_tally.cpp
+    src/game_graphics/tally/tally.cpp
     src/game/player/player_actions.cpp
     src/game_graphics/player/player_area.cpp
     src/game_graphics/player/player_dialogs.cpp
