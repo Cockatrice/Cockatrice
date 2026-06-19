@@ -345,7 +345,7 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
     }
 }
 
-vvoid ThemeManager::themeChangedSlot()
+void ThemeManager::themeChangedSlot()
 {
     const QString themeName = SettingsCache::instance().getThemeName();
     const QString dirPath = getAvailableThemes().value(themeName); // system path
