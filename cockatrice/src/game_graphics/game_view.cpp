@@ -45,6 +45,8 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     connect(scene, &GameScene::sigResizeRubberBand, this, &GameView::resizeRubberBand);
     connect(scene, &GameScene::sigStopRubberBand, this, &GameView::stopRubberBand);
     connect(scene, &QGraphicsScene::selectionChanged, this, [this]() { updateTotalSelectionCount(); });
+    connect(&SettingsCache::instance(), &SettingsCache::tallyTypeChanged, this,
+            [this] { updateTotalSelectionCount(); });
 
     setFocusDisabled(SettingsCache::instance().getKeepGameChatFocus());
     connect(&SettingsCache::instance(), &SettingsCache::keepGameChatFocusChanged, this, &GameView::setFocusDisabled);
@@ -246,8 +248,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
         totalCountLabel->show();
     }
 
-    TallyType tallyType =
-        SettingsCache::instance().getShowSubtypeSelectionTally() ? TallyType::Subtypes : TallyType::None;
+    TallyType tallyType = SettingsCache::instance().getTallyType();
 
     GameScene *gameScene = static_cast<GameScene *>(scene());
     QList<TallyRow> entries = Tally::compute(gameScene->selectedCards(), tallyType);
