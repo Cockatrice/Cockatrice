@@ -267,7 +267,7 @@ void PaletteEditorDialog::onSave()
     }
 
     // Record the active scheme in the user dir — never touch the system (read-only) dir
-    ThemeConfig globalCfg = ThemeConfig::fromThemeDir(themeDirPath);
+    ThemeConfig globalCfg = themeManager->effectiveThemeConfig(themeName);
     globalCfg.colorScheme = loadedScheme;
     globalCfg.save(userThemeDirPath);
 

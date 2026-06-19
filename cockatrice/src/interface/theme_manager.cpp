@@ -190,7 +190,7 @@ QStringMap &ThemeManager::getAvailableThemes()
 
 ThemeConfig ThemeManager::effectiveThemeConfig(const QString &themeName)
 {
-    const QString dirPath = ThemeManager().getAvailableThemes().value(themeName);
+    const QString dirPath = getAvailableThemes().value(themeName);
     const QString userDirPath = userThemeDirFor(themeName);
 
     ThemeConfig userCfg = ThemeConfig::fromThemeDir(userDirPath);
@@ -310,14 +310,8 @@ void ThemeManager::reloadCurrentTheme()
 void ThemeManager::previewPalette(const PaletteConfig &cfg, const QString &scheme)
 {
     const QString themeName = SettingsCache::instance().getThemeName();
-    const QString dirPath = getAvailableThemes().value(themeName);
-    const QString userDirPath = userThemeDirFor(themeName);
 
-    ThemeConfig themeCfg = ThemeConfig::fromThemeDir(userDirPath);
-    if (themeCfg.colorScheme.isEmpty() && themeCfg.styleName.isEmpty()) {
-        themeCfg = ThemeConfig::fromThemeDir(dirPath);
-    }
-
+    ThemeConfig themeCfg = effectiveThemeConfig(themeName);
     applyStyleAndPalette(themeName, themeCfg, cfg, scheme);
 }
 
@@ -401,10 +395,7 @@ void ThemeManager::themeChangedSlot()
     }
 
     // ThemeConfig — user override first, then system
-    ThemeConfig themeCfg = ThemeConfig::fromThemeDir(userDirPath);
-    if (themeCfg.colorScheme.isEmpty() && themeCfg.styleName.isEmpty()) {
-        themeCfg = ThemeConfig::fromThemeDir(dirPath);
-    }
+    ThemeConfig themeCfg = effectiveThemeConfig(themeName);
 
     const QString activeScheme = isDarkMode(dirPath, userDirPath) ? "Dark" : "Light";
 
