@@ -54,7 +54,7 @@ jobs:
         dependency-caching: true
 
     - name: "[C++] Install dependencies"
-      if: matrix.build-mode == 'manual' && matrix.language == 'cpp'
+      if: matrix.language == 'cpp' && matrix.build-mode == 'manual'
       shell: bash
       env:
         DEBIAN_FRONTEND: noninteractive
@@ -79,12 +79,12 @@ jobs:
 # Add ccache usage for faster compilation, (install ccache dep, actions/cache step + append DUSE_CCACHE=1 in cmake config, CCACHE env values)
 
     - name: "[C++] Configure CMake"
-      if: matrix.build-mode == 'manual' && matrix.language == 'cpp'
+      if: matrix.language == 'cpp' && matrix.build-mode == 'manual'
       shell: bash
       run: cmake -S . -B build -G Ninja -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release
 
     - name: "[C++] Build application"
-      if: matrix.build-mode == 'manual' && matrix.language == 'cpp'
+      if: matrix.language == 'cpp' && matrix.build-mode == 'manual'
       shell: bash
       run: cmake --build build
 
