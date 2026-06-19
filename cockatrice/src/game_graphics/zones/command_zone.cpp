@@ -44,15 +44,20 @@ void CommandZone::setMinimumHeight(int height)
     if (minimumHeight == height) {
         return;
     }
+    // Only meaningful while minimized, where currentHeight() depends on minimumHeight.
+    const qreal oldEffectiveHeight = currentHeight();
     minimumHeight = height;
     prepareGeometryChange();
     updateClipRect();
     reorganizeCards();
     update();
-    // NOTE: Do NOT emit minimizedChanged here. The minimized STATE has not changed,
-    // only the minimum height constraint. Emitting here causes an infinite loop:
-    // rearrangeZones -> rearrangeCounters -> rearrangeTaxCounters -> setMinimumHeight
-    // -> minimizedChanged -> rearrangeZones (loop!)
+    // Do NOT emit minimizedChanged: the minimized STATE is unchanged, and that signal
+    // feeds rearrangeZones -> rearrangeCounters -> setMinimumHeight (infinite loop).
+    // effectiveHeightChanged repositions neighbouring zones and converges instead: the
+    // rearrange re-enters setMinimumHeight with the same height and early-returns above.
+    if (!qFuzzyCompare(currentHeight(), oldEffectiveHeight)) {
+        emit effectiveHeightChanged();
+    }
 }
 
 bool CommandZone::isMinimized() const

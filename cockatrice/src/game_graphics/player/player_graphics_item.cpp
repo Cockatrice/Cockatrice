@@ -66,6 +66,8 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
     connect(player, &PlayerLogic::addViewCustomZoneActionToCustomZoneMenu, this,
             &PlayerGraphicsItem::onCustomZoneAdded);
     connect(player, &PlayerLogic::commandZoneSupportChanged, this, &PlayerGraphicsItem::setCommandZoneVisible);
+    // Sync initial state in case processPlayerInfo already ran before this connection.
+    setCommandZoneVisible(player->hasServerCommandZone());
 
     playerMenu->setMenusForGraphicItems();
 
@@ -131,6 +133,7 @@ void PlayerGraphicsItem::initializeZones()
     commandZoneGraphicsItem->setZValue(ZValues::COMMAND_ZONE);
     commandZoneGraphicsItem->setVisible(false);
     connect(commandZoneGraphicsItem, &CommandZone::minimizedChanged, this, &PlayerGraphicsItem::rearrangeZones);
+    connect(commandZoneGraphicsItem, &CommandZone::effectiveHeightChanged, this, &PlayerGraphicsItem::rearrangeZones);
 
     connect(handZoneGraphicsItem->getLogic(), &HandZoneLogic::cardCountChanged, handCounter,
             &HandCounter::updateNumber);

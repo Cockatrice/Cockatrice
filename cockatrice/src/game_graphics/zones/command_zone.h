@@ -95,8 +95,10 @@ public:
     void rearrangeTaxCounters();
 
 signals:
-    /** @brief Emitted when the zone toggles between minimized and expanded states. */
     void minimizedChanged(bool isMinimized);
+    // Displayed height changed without a minimized-state change (e.g. tax counter toggled
+    // while minimized); lets neighbouring zones reposition.
+    void effectiveHeightChanged();
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
