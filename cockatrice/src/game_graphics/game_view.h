@@ -24,8 +24,8 @@ private:
     QRubberBand *rubberBand;
     QLabel *dragCountLabel;
     QLabel *totalCountLabel;
-    QWidget *subtypeCountContainer;
-    QGridLayout *subtypeCountLayout;
+    QWidget *subtypeTallyContainer;
+    QGridLayout *subtypeTallyLayout;
     QPointF selectionOrigin;
     QList<SubtypeEntry> cachedSubtypeEntries; ///< Cached entries to avoid redundant rebuilds
 

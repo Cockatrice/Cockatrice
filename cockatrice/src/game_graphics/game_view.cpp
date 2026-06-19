@@ -79,12 +79,12 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     totalCountLabel->setStyleSheet(totalCountLabelStyle);
     totalCountLabel->hide();
 
-    subtypeCountContainer = new QWidget(this);
-    subtypeCountContainer->setStyleSheet(subtypeTallyLabelStyle);
-    subtypeCountLayout = new QGridLayout(subtypeCountContainer);
-    subtypeCountLayout->setContentsMargins(2, 2, 2, 2);
-    subtypeCountLayout->setSpacing(2);
-    subtypeCountContainer->hide();
+    subtypeTallyContainer = new QWidget(this);
+    subtypeTallyContainer->setStyleSheet(subtypeTallyLabelStyle);
+    subtypeTallyLayout = new QGridLayout(subtypeTallyContainer);
+    subtypeTallyLayout->setContentsMargins(2, 2, 2, 2);
+    subtypeTallyLayout->setSpacing(2);
+    subtypeTallyContainer->hide();
 }
 
 void GameView::resizeEvent(QResizeEvent *event)
@@ -179,7 +179,7 @@ void GameView::refreshShortcuts()
 
 void GameView::clearSubtypeLabels()
 {
-    QtUtils::clearLayoutRec(subtypeCountLayout);
+    QtUtils::clearLayoutRec(subtypeTallyLayout);
 }
 
 QSize GameView::rebuildSubtypeLabels(const QList<SubtypeEntry> &entries)
@@ -196,15 +196,15 @@ QSize GameView::rebuildSubtypeLabels(const QList<SubtypeEntry> &entries)
 
     int row = 0;
     for (const SubtypeEntry &entry : entries) {
-        auto *nameLabel = new QLabel(entry.name, subtypeCountContainer);
+        auto *nameLabel = new QLabel(entry.name, subtypeTallyContainer);
         nameLabel->setStyleSheet(nameStyle);
         nameLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        subtypeCountLayout->addWidget(nameLabel, row, 0);
+        subtypeTallyLayout->addWidget(nameLabel, row, 0);
 
-        auto *countLabel = new QLabel(QString::number(entry.count), subtypeCountContainer);
+        auto *countLabel = new QLabel(QString::number(entry.count), subtypeTallyContainer);
         countLabel->setStyleSheet(countStyle);
         countLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        subtypeCountLayout->addWidget(countLabel, row, 1);
+        subtypeTallyLayout->addWidget(countLabel, row, 1);
 
         QSize nameSize = nameLabel->sizeHint();
         QSize countSize = countLabel->sizeHint();
@@ -215,9 +215,9 @@ QSize GameView::rebuildSubtypeLabels(const QList<SubtypeEntry> &entries)
         ++row;
     }
 
-    int spacing = subtypeCountLayout->spacing();
-    int margins = subtypeCountLayout->contentsMargins().left() + subtypeCountLayout->contentsMargins().right();
-    int verticalMargins = subtypeCountLayout->contentsMargins().top() + subtypeCountLayout->contentsMargins().bottom();
+    int spacing = subtypeTallyLayout->spacing();
+    int margins = subtypeTallyLayout->contentsMargins().left() + subtypeTallyLayout->contentsMargins().right();
+    int verticalMargins = subtypeTallyLayout->contentsMargins().top() + subtypeTallyLayout->contentsMargins().bottom();
 
     int width = maxNameWidth + spacing + maxCountWidth + margins;
     int height = totalHeight + (row - 1) * spacing + verticalMargins;
@@ -248,7 +248,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
     }
 
     if (!SettingsCache::instance().getShowSubtypeSelectionTally() || count <= 1) {
-        subtypeCountContainer->hide();
+        subtypeTallyContainer->hide();
         cachedSubtypeEntries.clear();
         return;
     }
@@ -257,7 +257,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
     QList<SubtypeEntry> entries = SelectionSubtypeTally::countSubtypes(gameScene->selectedCards());
 
     if (entries.isEmpty()) {
-        subtypeCountContainer->hide();
+        subtypeTallyContainer->hide();
         cachedSubtypeEntries.clear();
         return;
     }
@@ -267,9 +267,9 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
     if (entries != cachedSubtypeEntries) {
         cachedSubtypeEntries = entries;
         containerSize = rebuildSubtypeLabels(entries);
-        subtypeCountContainer->resize(containerSize);
+        subtypeTallyContainer->resize(containerSize);
     } else {
-        containerSize = subtypeCountContainer->size();
+        containerSize = subtypeTallyContainer->size();
     }
 
     int x = availableWidth - containerSize.width() - kMarginInPixels;
@@ -283,8 +283,8 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
 
     y = qMax(kMarginInPixels, y);
 
-    subtypeCountContainer->move(x, y);
-    subtypeCountContainer->show();
+    subtypeTallyContainer->move(x, y);
+    subtypeTallyContainer->show();
 }
 
 /**
