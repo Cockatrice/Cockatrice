@@ -85,6 +85,9 @@ public:
     /** @brief Gets all selected CardItems. */
     QList<CardItem *> selectedCards() const;
 
+    /** @brief Gets all selected Cards as states. */
+    QList<CardState *> selectedCardsAsStates() const;
+
     /**
      * @brief Adds a player to the scene and stores their graphics item.
      * @param player Player to add.

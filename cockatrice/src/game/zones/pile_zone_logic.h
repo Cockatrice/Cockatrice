@@ -13,9 +13,6 @@ class PileZoneLogic : public CardZoneLogic
 
     Q_OBJECT
 
-signals:
-    void callUpdate();
-
 public:
     PileZoneLogic(PlayerLogic *_player,
                   const QString &_name,
@@ -25,7 +22,7 @@ public:
                   QObject *parent = nullptr);
 
 protected:
-    void addCardImpl(CardItem *card, int x, int y) override;
+    void addCardImpl(CardState *card, int x, int y) override;
 };
 
 #endif // COCKATRICE_PILE_ZONE_LOGIC_H

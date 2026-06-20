@@ -256,7 +256,7 @@ void MessageLogWidget::logDestroyCard(PlayerLogic *player, QString cardName)
 }
 
 void MessageLogWidget::logMoveCard(PlayerLogic *player,
-                                   CardItem *card,
+                                   CardState *card,
                                    CardZoneLogic *startZone,
                                    int oldX,
                                    CardZoneLogic *targetZone,
@@ -636,7 +636,7 @@ void MessageLogWidget::logSetActivePlayer(PlayerLogic *player)
                QString(tr("%1's turn.")).arg(player->getPlayerInfo()->getName()) + "</b></font><br>");
 }
 
-void MessageLogWidget::logSetAnnotation(PlayerLogic *player, CardItem *card, QString newAnnotation)
+void MessageLogWidget::logSetAnnotation(PlayerLogic *player, CardState *card, QString newAnnotation)
 {
     appendHtmlServerMessage(
         QString(tr("%1 sets annotation of %2 to %3."))
@@ -680,7 +680,7 @@ void MessageLogWidget::logSetCounter(PlayerLogic *player, QString counterName, i
                                 .arg(value - oldValue));
 }
 
-void MessageLogWidget::logSetDoesntUntap(PlayerLogic *player, CardItem *card, bool doesntUntap)
+void MessageLogWidget::logSetDoesntUntap(PlayerLogic *player, CardState *card, bool doesntUntap)
 {
     QString str;
     if (doesntUntap) {
@@ -691,7 +691,7 @@ void MessageLogWidget::logSetDoesntUntap(PlayerLogic *player, CardItem *card, bo
     appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardLink(card->getName())));
 }
 
-void MessageLogWidget::logSetPT(PlayerLogic *player, CardItem *card, QString newPT)
+void MessageLogWidget::logSetPT(PlayerLogic *player, CardState *card, QString newPT)
 {
     if (currentContext == MessageContext_MoveCard) {
         return;
@@ -729,7 +729,7 @@ void MessageLogWidget::logSetSideboardLock(PlayerLogic *player, bool locked)
     }
 }
 
-void MessageLogWidget::logSetTapped(PlayerLogic *player, CardItem *card, bool tapped)
+void MessageLogWidget::logSetTapped(PlayerLogic *player, CardState *card, bool tapped)
 {
     if (currentContext == MessageContext_MoveCard) {
         return;

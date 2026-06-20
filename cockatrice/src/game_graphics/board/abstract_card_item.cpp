@@ -13,16 +13,19 @@
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 
-AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, PlayerLogic *_owner, int _id)
-    : ArrowTarget(_owner, parent), id(_id), cardRef(cardRef), tapped(false), facedown(false), tapAngle(0),
-      bgColor(Qt::transparent), isHovered(false), realZValue(0)
+AbstractCardItem::AbstractCardItem(AbstractCardState *_state, QGraphicsItem *parent)
+    : ArrowTarget(_state->getOwner(), parent), cardState(_state), tapAngle(0), bgColor(Qt::transparent),
+      isHovered(false), realZValue(0)
 {
     setCursor(Qt::OpenHandCursor);
     setFlag(ItemIsSelectable);
     setCacheMode(DeviceCoordinateCache);
 
+    connect(_state, &AbstractCardState::cardInfoRefreshed, this, &AbstractCardItem::onCardInfoRefreshed);
+    connect(_state, &AbstractCardState::colorChanged, this, &AbstractCardItem::onCardColorChanged);
+    connect(_state, &AbstractCardState::faceDownChanged, this, [this]() { update(); });
+
     connect(&SettingsCache::instance(), &SettingsCache::displayCardNamesChanged, this, [this] { update(); });
-    refreshCardInfo();
 
     connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
         Q_UNUSED(_roundCardCorners);
@@ -34,7 +37,7 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef
 
 AbstractCardItem::~AbstractCardItem()
 {
-    emit deleteCardInfoPopup(cardRef.name);
+    // TODO emit deleteCardInfoPopup(cardRef.name);
 }
 
 QRectF AbstractCardItem::boundingRect() const
@@ -54,32 +57,6 @@ void AbstractCardItem::pixmapUpdated()
 {
     update();
     emit sigPixmapUpdated();
-}
-
-void AbstractCardItem::refreshCardInfo()
-{
-    exactCard = CardDatabaseManager::query()->getCard(cardRef);
-
-    if (!exactCard && !cardRef.name.isEmpty()) {
-        CardInfo::UiAttributes attributes = {.tableRow = -1};
-        auto info = CardInfo::newInstance(cardRef.name, "", true, {}, {}, {}, {}, attributes);
-        exactCard = ExactCard(info);
-    }
-    if (exactCard) {
-        connect(exactCard.getCardPtr().data(), &CardInfo::pixmapUpdated, this, &AbstractCardItem::pixmapUpdated);
-    }
-
-    cacheBgColor();
-    update();
-}
-
-/**
- * Convenience method to get the CardInfo of the exactCard
- * @return A const reference to the CardInfo, or an empty CardInfo if card was null
- */
-const CardInfo &AbstractCardItem::getCardInfo() const
-{
-    return exactCard.getInfo();
 }
 
 void AbstractCardItem::setRealZValue(qreal _zValue)
@@ -124,13 +101,13 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
     QPixmap translatedPixmap;
     bool paintImage = true;
 
-    if (facedown || cardRef.name.isEmpty()) {
+    if (getState()->getFaceDown() || getState()->getName().isEmpty()) {
         // never reveal card color, always paint the card back
         CardPictureLoader::getCardBackPixmap(translatedPixmap, translatedSize.toSize());
     } else {
         // don't even spend time trying to load the picture if our size is too small
         if (translatedSize.width() > 10) {
-            CardPictureLoader::getPixmap(translatedPixmap, exactCard, translatedSize.toSize());
+            CardPictureLoader::getPixmap(translatedPixmap, getState()->getCard(), translatedSize.toSize());
             if (translatedPixmap.isNull()) {
                 paintImage = false;
             }
@@ -151,21 +128,21 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         painter->drawPath(shape());
     }
 
-    if (translatedPixmap.isNull() || SettingsCache::instance().getDisplayCardNames() || facedown) {
+    if (translatedPixmap.isNull() || SettingsCache::instance().getDisplayCardNames() || getState()->getFaceDown()) {
         painter->save();
         transformPainter(painter, translatedSize, angle);
         painter->setPen(Qt::white);
         painter->setBackground(Qt::black);
         painter->setBackgroundMode(Qt::OpaqueMode);
         QString nameStr;
-        if (facedown) {
-            nameStr = "# " + QString::number(id);
+        if (getState()->getFaceDown()) {
+            nameStr = "# " + QString::number(getState()->getId());
         } else {
             QString prefix = "";
             if (SettingsCache::instance().debug().getShowCardId()) {
-                prefix = "#" + QString::number(id) + " ";
+                prefix = "#" + QString::number(getState()->getId()) + " ";
             }
-            nameStr = prefix + cardRef.name;
+            nameStr = prefix + getState()->getName();
         }
         painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor,
                                  translatedSize.height() - 6 * scaleFactor),
@@ -201,21 +178,6 @@ void AbstractCardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->restore();
 }
 
-void AbstractCardItem::setCardRef(const CardRef &_cardRef)
-{
-    if (cardRef == _cardRef) {
-        return;
-    }
-
-    emit deleteCardInfoPopup(cardRef.name);
-    if (exactCard) {
-        disconnect(exactCard.getCardPtr().data(), nullptr, this, nullptr);
-    }
-    cardRef = _cardRef;
-
-    refreshCardInfo();
-}
-
 void AbstractCardItem::setHovered(bool _hovered)
 {
     if (isHovered == _hovered) {
@@ -239,9 +201,18 @@ void AbstractCardItem::setHovered(bool _hovered)
     update();
 }
 
-void AbstractCardItem::setColor(const QString &_color)
+void AbstractCardItem::onCardInfoRefreshed()
 {
-    color = _color;
+    if (getState()->getCard()) {
+        connect(getState()->getCard().getCardPtr().data(), &CardInfo::pixmapUpdated, this,
+                &AbstractCardItem::pixmapUpdated);
+    }
+
+    onCardColorChanged();
+}
+
+void AbstractCardItem::onCardColorChanged()
+{
     cacheBgColor();
     update();
 }
@@ -249,10 +220,10 @@ void AbstractCardItem::setColor(const QString &_color)
 void AbstractCardItem::cacheBgColor()
 {
     QChar colorChar;
-    if (color.isEmpty()) {
-        colorChar = exactCard.getInfo().getColorChar();
+    if (getState()->getColor().isEmpty()) {
+        colorChar = getState()->getCard().getInfo().getColorChar();
     } else {
-        colorChar = color.at(0);
+        colorChar = getState()->getColor().at(0);
     }
 
     switch (colorChar.toLower().toLatin1()) {
@@ -280,35 +251,10 @@ void AbstractCardItem::cacheBgColor()
     }
 }
 
-void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
-{
-    if (tapped == _tapped) {
-        return;
-    }
-
-    tapped = _tapped;
-    if (SettingsCache::instance().getTapAnimation() && canAnimate) {
-        static_cast<GameScene *>(scene())->registerAnimationItem(this);
-    } else {
-        tapAngle = tapped ? 90 : 0;
-        setTransform(QTransform()
-                         .translate(CardDimensions::WIDTH_HALF_F, CardDimensions::HEIGHT_HALF_F)
-                         .rotate(tapAngle)
-                         .translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F));
-        update();
-    }
-}
-
-void AbstractCardItem::setFaceDown(bool _facedown)
-{
-    facedown = _facedown;
-    update();
-}
-
 void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if ((event->modifiers() & Qt::AltModifier) && event->button() == Qt::LeftButton) {
-        emit cardShiftClicked(cardRef.name);
+        emit cardShiftClicked(getState()->getName());
     } else if ((event->modifiers() & Qt::ControlModifier)) {
         setSelected(!isSelected());
     } else if (!isSelected()) {
@@ -318,7 +264,7 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         setCursor(Qt::ClosedHandCursor);
     } else if (event->button() == Qt::MiddleButton) {
-        emit showCardInfoPopup(event->screenPos(), cardRef);
+        emit showCardInfoPopup(event->screenPos(), getState()->getCardRef());
     }
     event->accept();
 }
@@ -326,7 +272,7 @@ void AbstractCardItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void AbstractCardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::MiddleButton) {
-        emit deleteCardInfoPopup(cardRef.name);
+        emit deleteCardInfoPopup(getState()->getName());
     }
 
     // This function ensures the parent function doesn't mess around with our selection.

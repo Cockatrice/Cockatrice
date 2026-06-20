@@ -13,7 +13,7 @@ StackZoneLogic::StackZoneLogic(PlayerLogic *_player,
 {
 }
 
-void StackZoneLogic::addCardImpl(CardItem *card, int x, int /*y*/)
+void StackZoneLogic::addCardImpl(CardState *card, int x, int /*y*/)
 {
     CardZoneAlgorithms::addCardToList(cards, card, x, true);
 }

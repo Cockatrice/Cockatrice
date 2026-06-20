@@ -21,7 +21,7 @@
 #include <QMenu>
 #include <QObject>
 
-class CardItem;
+class CardState;
 class CardMenu;
 class PlayerGraphicsItem;
 class PlayerMenu : public QObject
@@ -37,7 +37,7 @@ signals:
 
 public slots:
     void setMenusForGraphicItems();
-    QMenu *updateCardMenu(const CardItem *card);
+    QMenu *updateCardMenu(const CardState *card);
 
 private slots:
     void refreshShortcuts();

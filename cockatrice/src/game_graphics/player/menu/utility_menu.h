@@ -8,6 +8,7 @@
 #define COCKATRICE_UTILITY_MENU_H
 
 #include "abstract_player_component.h"
+#include "libcockatrice/card/card_info.h"
 
 #include <QMenu>
 #include <libcockatrice/card/card_info.h>

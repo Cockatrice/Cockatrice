@@ -35,7 +35,7 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
     int x = -1;
     if (SettingsCache::instance().getHorizontalHand()) {
         for (x = 0; x < getLogic()->getCards().size(); x++) {
-            if (point.x() < static_cast<CardItem *>(getLogic()->getCards().at(x))->scenePos().x()) {
+            if (point.x() < getCardItemForId(getLogic()->getCards().at(x)->getId())->scenePos().x()) {
                 break;
             }
         }
@@ -75,23 +75,23 @@ void HandZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 
 void HandZone::reorganizeCards()
 {
-    if (!getLogic()->getCards().isEmpty()) {
-        const int cardCount = getLogic()->getCards().size();
+    if (!cards.isEmpty()) {
+        const int cardCount = cards.size();
         if (SettingsCache::instance().getHorizontalHand()) {
             bool leftJustified = SettingsCache::instance().getLeftJustified();
-            qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
+            qreal cardWidth = cards.at(0)->boundingRect().width();
             const int xPadding = leftJustified ? cardWidth * 1.4 : 5;
             qreal totalWidth =
                 leftJustified ? boundingRect().width() - (1 * xPadding) - 5 : boundingRect().width() - 2 * xPadding;
 
             if (cardCount == 1) {
-                CardItem *c = getLogic()->getCards().at(0);
+                CardItem *c = cards.at(0);
                 qreal xPosition = leftJustified ? xPadding : xPadding + (totalWidth - cardWidth) / 2;
                 c->setPos(xPosition, 5);
                 c->setRealZValue(0);
             } else {
                 for (int i = 0; i < cardCount; i++) {
-                    CardItem *c = getLogic()->getCards().at(i);
+                    CardItem *c = cards.at(i);
                     // If the total width of the cards is smaller than the available width,
                     // the cards do not need to overlap and are displayed in the center of the area.
                     if (cardWidth * cardCount > totalWidth) {

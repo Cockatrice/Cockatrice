@@ -7,26 +7,45 @@
 #include <QMenu>
 
 CardZone::CardZone(CardZoneLogic *_logic, QGraphicsItem *parent)
-    : AbstractGraphicsItem(parent), menu(nullptr), doubleClickAction(0), logic(_logic)
+    : AbstractGraphicsItem(parent), logic(_logic), menu(nullptr), doubleClickAction(0)
 {
     connect(logic, &CardZoneLogic::retranslateUi, this, &CardZone::retranslateUi);
     connect(logic, &CardZoneLogic::cardAdded, this, &CardZone::onCardAdded);
+    connect(logic, &CardZoneLogic::cardRemoved, this, &CardZone::onCardRemoved);
     connect(logic, &CardZoneLogic::setGraphicsVisibility, this, [this](bool v) { this->setVisible(v); });
     connect(logic, &CardZoneLogic::updateGraphics, this, [this]() { update(); });
     connect(logic, &CardZoneLogic::reorganizeCards, this, &CardZone::reorganizeCards);
 }
 
-void CardZone::onCardAdded(CardItem *addedCard)
+void CardZone::onCardAdded(CardState *toAdd, int /*x*/, int /*y*/)
 {
+    CardItem *addedCard = new CardItem(toAdd, this);
     addedCard->setParentItem(this);
     addedCard->setVisible(true);
     addedCard->update();
+    cards.append(addedCard);
+
+    emit cardItemAdded(addedCard);
+}
+
+void CardZone::onCardRemoved(CardState *toRemove, int /*x*/, int /*y*/)
+{
+    CardItem *removedCard = getCardItemForId(toRemove->getId());
+    if (!removedCard) {
+        return;
+    }
+    if (cards.contains(removedCard)) {
+        cards.remove(cards.indexOf(removedCard));
+    }
+    removedCard->setVisible(false);
+    removedCard->setParentItem(nullptr);
+    removedCard->deleteLater();
 }
 
 void CardZone::retranslateUi()
 {
-    for (int i = 0; i < getLogic()->getCards().size(); ++i) {
-        getLogic()->getCards()[i]->retranslateUi();
+    for (int i = 0; i < cards.size(); ++i) {
+        cards[i]->retranslateUi();
     }
 }
 

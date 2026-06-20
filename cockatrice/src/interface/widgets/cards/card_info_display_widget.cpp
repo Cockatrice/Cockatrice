@@ -65,7 +65,7 @@ void CardInfoDisplayWidget::setCard(const CardRef &cardRef)
 
 void CardInfoDisplayWidget::setCard(AbstractCardItem *card)
 {
-    setCard(card->getCard());
+    setCard(card->getState()->getCard());
 }
 
 void CardInfoDisplayWidget::clear()

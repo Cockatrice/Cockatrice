@@ -17,11 +17,8 @@
 class PileZone : public CardZone
 {
     Q_OBJECT
-private slots:
-    void callUpdate()
-    {
-        update();
-    }
+public slots:
+    void onCardAdded(CardState *toAdd, int, int) override;
 
 public:
     PileZone(PileZoneLogic *_logic, QGraphicsItem *parent);

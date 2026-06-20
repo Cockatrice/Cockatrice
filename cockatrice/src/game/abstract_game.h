@@ -7,6 +7,7 @@
 #ifndef COCKATRICE_ABSTRACT_GAME_H
 #define COCKATRICE_ABSTRACT_GAME_H
 
+#include "board/card_state.h"
 #include "game_event_handler.h"
 #include "game_meta_info.h"
 #include "game_state.h"
@@ -55,7 +56,7 @@ public:
 
     void loadReplay(GameReplay *replay);
 
-    CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
+    CardState *getCard(int playerId, const QString &zoneName, int cardId) const;
 
     void setActiveCard(CardItem *card);
     CardItem *getActiveCard() const
