@@ -47,22 +47,17 @@ jobs:
       tag: ${{ steps.configure.outputs.tag }}
       sha: ${{ steps.configure.outputs.sha }}
 
-    steps:  
+    steps:
       - name: "Configure"
+        env:
+          RESOLVED_SHA: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
         id: configure
         shell: bash
         run: |
-          tag_regex='^refs/tags/'
-          if [[ $GITHUB_EVENT_NAME == pull-request ]]; then    # pull request
-            sha="${{github.event.pull_request.head.sha}}"
-          elif [[ $GITHUB_REF =~ $tag_regex ]]; then    # release
-            sha="$GITHUB_SHA"
-            tag="${GITHUB_REF/refs\/tags\//}"
-            echo "tag=$tag" >>"$GITHUB_OUTPUT"
-          else    # push to branch
-            sha="$GITHUB_SHA"
+          if [[ "$GITHUB_REF_TYPE" == 'tag' ]]; then    # release
+            echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
           fi
-          echo "sha=$sha" >>"$GITHUB_OUTPUT"
+          echo "sha=$RESOLVED_SHA" >> "$GITHUB_OUTPUT"
 
       - name: "Checkout"
         if: steps.configure.outputs.tag != null
@@ -92,7 +87,7 @@ jobs:
         run: |
           args=()
           [[ $prerelease == yes ]] && args+=(--prerelease)
-          
+
           gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
             --target "$target" \
             --title "$release_name" \
@@ -105,48 +100,48 @@ jobs:
         # The files in ".ci/$distro$version" correspond to the values given here
         include:
           - distro: Arch
-            
+
             allow-failure: yes
             package: skip    # We are packaged in Arch already
 
           - distro: Servatrice_Debian
             version: 12
-            
+
             package: DEB
             server_only: yes
             test: skip
 
           - distro: Debian
             version: 12
-            
+
             package: DEB
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Debian
             version: 13
-            
+
             package: DEB
 
           - distro: Fedora
             version: 43
-            
+
             package: RPM
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Fedora
             version: 44
-            
+
             package: RPM
 
           - distro: Ubuntu
             version: 24.04
-            
+
             package: DEB
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 26.04
-            
+
             package: DEB
 
     name: ${{ matrix.distro }} ${{ matrix.version }}
@@ -203,7 +198,7 @@ jobs:
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
           args+=(--suffix "$SUFFIX")
-          
+
           RUN --server --release --package "$package" "${args[@]}"
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
@@ -269,7 +264,7 @@ jobs:
           - os: macOS
             target: 13
             runner: macos-15-intel
-            
+
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
@@ -286,7 +281,7 @@ jobs:
           - os: macOS
             target: 14
             runner: macos-14
-            
+
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
@@ -302,7 +297,7 @@ jobs:
           - os: macOS
             target: 15
             runner: macos-15
-            
+
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
@@ -318,7 +313,7 @@ jobs:
           - os: macOS
             target: 15
             runner: macos-15
-            
+
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             qt_version: 6.11.0
@@ -332,7 +327,7 @@ jobs:
           - os: Windows
             target: 10
             runner: windows-2025
-            
+
             cmake_generator: "Visual Studio 18 2026"
             cmake_generator_platform: x64
             make_package: 1
