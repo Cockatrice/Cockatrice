@@ -33,6 +33,10 @@ if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
   echo "::group::Sign app bundle"
   security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
   /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "$APP_BUNDLE_PATH"
+  
+  # Verify signature
+  codesign --verify --deep --strict --verbose=2 "$APP_BUNDLE_PATH"
+  spctl -a -v --type install "$APP_BUNDLE_PATH"
   echo "::endgroup::"
 else
   echo "::error file=$0::MACOS_CERTIFICATE_NAME not set. Can not sign app bundle."
@@ -63,6 +67,9 @@ if [[ -n "$MACOS_NOTARIZATION_APPLE_ID" ]]; then
   # validated by macOS even when an internet connection is not available.
   echo "Attach staple"
   xcrun stapler staple "$APP_BUNDLE_PATH"
+  
+  # Validate staple
+  xcrun stapler validate "$APP_BUNDLE_PATH"
   echo "::endgroup::"
 else
   echo "::error file=$0::MACOS_NOTARIZATION_APPLE_ID not set. Can not notarize app bundle."
