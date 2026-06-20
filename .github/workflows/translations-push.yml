@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: "Checkout repo"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: "Install lupdate"
         shell: bash
@@ -29,12 +29,13 @@ jobs:
           sudo apt-get install -y --no-install-recommends qttools5-dev-tools
 
       - name: "Update Cockatrice translation source"
+        env:
+          FILE: cockatrice/cockatrice_en@source.ts
         id: cockatrice
         shell: bash
-        run: |
-          FILE="cockatrice/cockatrice_en@source.ts"
-          export DIRS="cockatrice/src $(find . -maxdepth 1 -type d -name 'libcockatrice_*')"
-          FILE="$FILE" DIRS="$DIRS" .ci/update_translation_source_strings.sh
+        run: >
+          DIRS="cockatrice/src $(find . -maxdepth 1 -type d -name 'libcockatrice_*')"
+          .ci/update_translation_source_strings.sh
 
       - name: "Update Oracle translation source"
         id: oracle
@@ -77,11 +78,9 @@ jobs:
         if: github.event_name != 'pull_request'
         shell: bash
         env:
-          STATUS: ${{ steps.create_pr.outputs.pull-request-operation }}
+          PR_NUMBER: ${{ steps.create_pr.outputs.pull-request-number }}
+          PR_URL: ${{ steps.create_pr.outputs.pull-request-url }}
+          STATUS: ${{ case(steps.create_pr.outputs.pull-request-operation == 'none', 'unchanged', steps.create_pr.outputs.pull-request-operation) }}
         run: |
-          if [[ "$STATUS" == "none" ]]; then
-            echo "PR #${{ steps.create_pr.outputs.pull-request-number }} unchanged!" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "PR #${{ steps.create_pr.outputs.pull-request-number }} $STATUS!" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "URL: ${{ steps.create_pr.outputs.pull-request-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "PR #$PR_NUMBER $STATUS!" >> "$GITHUB_STEP_SUMMARY"
+          echo "URL: $PR_URL" >> "$GITHUB_STEP_SUMMARY"
