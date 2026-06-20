@@ -11,10 +11,12 @@ TallyMenu::TallyMenu()
 
     aTallyNone = createTallyAction(TallyType::None);
     aTallySubtypes = createTallyAction(TallyType::Subtypes);
+    aTallyTotalPower = createTallyAction(TallyType::TotalPower);
 
     addAction(aTallyNone);
     addSeparator();
     addAction(aTallySubtypes);
+    addAction(aTallyTotalPower);
 
     retranslateUi();
 }
@@ -51,4 +53,5 @@ void TallyMenu::retranslateUi()
 
     aTallyNone->setText(tr("None"));
     aTallySubtypes->setText(tr("Subtypes"));
+    aTallyTotalPower->setText(tr("Total power"));
 }

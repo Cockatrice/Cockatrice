@@ -1,5 +1,6 @@
 #include "tally.h"
 
+#include "stats_tally.h"
 #include "subtype_tally.h"
 
 TallyType Tally::intToType(int value)
@@ -18,6 +19,8 @@ QList<TallyRow> Tally::compute(const QList<CardItem *> &cards, const TallyType t
             return {};
         case TallyType::Subtypes:
             return SubtypeTally::countSubtypes(cards);
+        case TallyType::TotalPower:
+            return StatsTally::computeTotalPower(cards);
     }
     return {};
 }

@@ -20,7 +20,8 @@ enum class TallyType
 {
     None,
     Subtypes,
-    MaxValue = Subtypes // sentinel value
+    TotalPower,
+    MaxValue = TotalPower // sentinel value
 };
 
 namespace Tally
