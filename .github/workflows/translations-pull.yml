@@ -23,6 +23,8 @@ jobs:
         uses: actions/checkout@v7
 
       - name: "Pull translated strings from Transifex"
+        # Do not run this step for PR's from forks, they don't have access to the secret
+        if: github.event_name != 'pull_request' || github.repository_owner == 'Cockatrice'
         uses: transifex/cli-action@v2
         with:
           # Used config file: https://github.com/Cockatrice/Cockatrice/blob/master/.tx/config
