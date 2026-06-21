@@ -79,19 +79,19 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          tag_name: ${{ steps.configure.outputs.tag }}
-          target: ${{ steps.configure.outputs.sha }}
-          release_name: ${{ steps.prepare.outputs.title }}
-          body_path: ${{ steps.prepare.outputs.body_path }}
-          prerelease: ${{ steps.prepare.outputs.is_beta }}
+          TAG_NAME: ${{ steps.configure.outputs.tag }}
+          TARGET: ${{ steps.configure.outputs.sha }}
+          RELEASE_NAME: ${{ steps.prepare.outputs.title }}
+          BODY_PATH: ${{ steps.prepare.outputs.body_path }}
+          PRERELEASE: ${{ steps.prepare.outputs.is_beta }}
         run: |
           args=()
-          [[ $prerelease == yes ]] && args+=(--prerelease)
+          [[ $PRERELEASE == yes ]] && args+=(--prerelease)
 
-          gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
-            --target "$target" \
-            --title "$release_name" \
-            --notes-file "$body_path"
+          gh release create "$TAG_NAME" --verify-tag --draft "${args[@]}" \
+            --target "$TARGET" \
+            --title "$RELEASE_NAME" \
+            --notes-file "$BODY_PATH"
 
   build-linux:
     strategy:
@@ -188,18 +188,18 @@ jobs:
         shell: bash
         env:
           SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
-          package: '${{ matrix.package }}'
-          server_only: '${{ matrix.server_only }}'
+          PACKAGE: '${{ matrix.package }}'
+          SERVER_ONLY: '${{ matrix.server_only }}'
         run: |
           source .ci/docker.sh
           args=()
-          [[ $server_only == yes ]] && args+=(--no-client)
+          [[ $SERVER_ONLY == yes ]] && args+=(--no-client)
           [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
           args+=(--suffix "$SUFFIX")
 
-          RUN --server --release --package "$package" "${args[@]}"
+          RUN --server --release --package "$PACKAGE" "${args[@]}"
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
@@ -234,11 +234,11 @@ jobs:
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
         env:
-          asset_name: ${{ steps.build.outputs.fullname }}
-          asset_path: ${{ steps.build.outputs.path }}
+          ASSET_NAME: ${{ steps.build.outputs.fullname }}
+          ASSET_PATH: ${{ steps.build.outputs.path }}
           GH_TOKEN: ${{ github.token }}
-          tag_name: ${{ needs.configure.outputs.tag }}
-        run: gh release upload "$tag_name" "$asset_path#$asset_name"
+          TAG_NAME: ${{ needs.configure.outputs.tag }}
+        run: gh release upload "$TAG_NAME" "$ASSET_PATH#$ASSET_NAME"
 
       - name: "Attest binary provenance"
         id: attestation
@@ -550,11 +550,11 @@ jobs:
         id: upload_release
         shell: bash
         env:
-          asset_name: ${{ steps.build.outputs.fullname }}
-          asset_path: ${{ steps.build.outputs.path }}
+          ASSET_NAME: ${{ steps.build.outputs.fullname }}
+          ASSET_PATH: ${{ steps.build.outputs.path }}
           GH_TOKEN: ${{ github.token }}
-          tag_name: ${{ needs.configure.outputs.tag }}
-        run: gh release upload "$tag_name" "$asset_path#$asset_name"
+          TAG_NAME: ${{ needs.configure.outputs.tag }}
+        run: gh release upload "$TAG_NAME" "$ASSET_PATH#$ASSET_NAME"
 
       - name: "Attest binary provenance"
         if: steps.upload_release.outcome == 'success'
