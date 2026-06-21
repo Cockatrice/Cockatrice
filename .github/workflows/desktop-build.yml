@@ -86,7 +86,7 @@ jobs:
           PRERELEASE: ${{ steps.prepare.outputs.is_beta }}
         run: |
           args=()
-          [[ $PRERELEASE == yes ]] && args+=(--prerelease)
+          [[ "$PRERELEASE" == "true" ]] && args+=(--prerelease)
 
           gh release create "$TAG_NAME" --verify-tag --draft "${args[@]}" \
             --target "$TARGET" \
@@ -101,14 +101,14 @@ jobs:
         include:
           - distro: Arch
 
-            allow-failure: yes
+            allow-failure: true
             package: skip    # We are packaged in Arch already
 
           - distro: Servatrice_Debian
             version: 12
 
             package: DEB
-            server_only: yes
+            server_only: true
             test: skip
 
           - distro: Debian
@@ -147,7 +147,7 @@ jobs:
     name: ${{ matrix.distro }} ${{ matrix.version }}
     needs: configure
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.allow-failure == 'yes' }}
+    continue-on-error: ${{ matrix.allow-failure == 'true' }}
     timeout-minutes: 70
     env:
       CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching docker image and ccache
@@ -193,8 +193,8 @@ jobs:
         run: |
           source .ci/docker.sh
           args=()
-          [[ $SERVER_ONLY == yes ]] && args+=(--no-client)
-          [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
+          [[ "$SERVER_ONLY" == "true" ]] && args+=(--no-client)
+          [[ "$GITHUB_REF" == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
           args+=(--suffix "$SUFFIX")
@@ -267,7 +267,7 @@ jobs:
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
-            make_package: 1
+            make_package: true
             override_target: 13
             package_suffix: "-macOS13_Intel"
             qt_version: 6.11.0
@@ -275,7 +275,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Intel
             type: Release
-            use_ccache: 1
+            use_ccache: true
             xcode: "16.4"
 
           - os: macOS
@@ -284,14 +284,14 @@ jobs:
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
-            make_package: 1
+            make_package: true
             package_suffix: "-macOS14"
             qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
-            use_ccache: 1
+            use_ccache: true
             xcode: "15.4"
 
           - os: macOS
@@ -300,14 +300,14 @@ jobs:
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
-            make_package: 1
+            make_package: true
             package_suffix: "-macOS15"
             qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
-            use_ccache: 1
+            use_ccache: true
             xcode: "16.4"
 
           - os: macOS
@@ -321,7 +321,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Debug
-            use_ccache: 1
+            use_ccache: true
             xcode: "16.4"
 
           - os: Windows
@@ -330,7 +330,7 @@ jobs:
 
             cmake_generator: "Visual Studio 18 2026"
             cmake_generator_platform: x64
-            make_package: 1
+            make_package: true
             package_suffix: "-Win10"
             qt_version: 6.11.0
             qt_arch: win64_msvc2022_64
@@ -359,11 +359,11 @@ jobs:
           msbuild-architecture: x64
 
       - name: "[macOS] Setup ccache"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1
+        if: matrix.os == 'macOS' && matrix.use_ccache == 'true'
         run: brew install ccache
 
       - name: "[macOS] Restore compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1
+        if: matrix.os == 'macOS' && matrix.use_ccache == 'true'
         id: ccache_restore
         uses: actions/cache/restore@v5
         env:
@@ -461,7 +461,7 @@ jobs:
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
+        if: matrix.os == 'macOS' && matrix.use_ccache == 'true' && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
         continue-on-error: true
         env:
           CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
@@ -472,7 +472,7 @@ jobs:
           fi
 
       - name: "[macOS] Save updated compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master'
+        if: matrix.os == 'macOS' && matrix.use_ccache == 'true' && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v5
         with:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
@@ -546,7 +546,7 @@ jobs:
             build/servatrice/Release/*.pdb
 
       - name: "Upload to release"
-        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        if: needs.configure.outputs.tag != null && matrix.make_package == 'true'
         id: upload_release
         shell: bash
         env:
