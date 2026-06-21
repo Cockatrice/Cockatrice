@@ -102,20 +102,20 @@ jobs:
           - distro: Arch
 
             allow-failure: true
-            package: skip    # We are packaged in Arch already
+            package: false    # We are packaged in Arch already
 
           - distro: Servatrice_Debian
             version: 12
 
             package: DEB
             server_only: true
-            test: skip
+            test: false
 
           - distro: Debian
             version: 12
 
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
+            test: false    # Running tests on all distros is superfluous
 
           - distro: Debian
             version: 13
@@ -126,7 +126,7 @@ jobs:
             version: 43
 
             package: RPM
-            test: skip    # Running tests on all distros is superfluous
+            test: false    # Running tests on all distros is superfluous
 
           - distro: Fedora
             version: 44
@@ -137,7 +137,7 @@ jobs:
             version: 24.04
 
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
+            test: false    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 26.04
@@ -175,7 +175,7 @@ jobs:
         run: source .ci/docker.sh --build
 
       - name: "Build debug and test"
-        if: matrix.test != 'skip'
+        if: matrix.test != false
         shell: bash
         run: |
           source .ci/docker.sh
@@ -184,7 +184,7 @@ jobs:
 
       - name: "Build release package"
         id: build
-        if: matrix.package != 'skip'
+        if: matrix.package != false
         shell: bash
         env:
           SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
@@ -222,7 +222,7 @@ jobs:
 
       - name: "Upload artifact"
         id: upload_artifact
-        if: matrix.package != 'skip'
+        if: matrix.package != false
         uses: actions/upload-artifact@v7
         with:
           archive: false
@@ -231,7 +231,7 @@ jobs:
 
       - name: "Upload to release"
         id: upload_release
-        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        if: matrix.package != false && needs.configure.outputs.tag != null
         shell: bash
         env:
           ASSET_NAME: ${{ steps.build.outputs.fullname }}
