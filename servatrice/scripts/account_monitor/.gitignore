@@ -1,0 +1,5 @@
+# Local state - never commit these
+state.json
+state.json.tmp
+venv/
+__pycache__/
