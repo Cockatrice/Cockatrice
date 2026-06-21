@@ -5,15 +5,15 @@ permissions:
   packages: write
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
     paths:
       - '.github/workflows/docker-release.yml'
       - 'Dockerfile'
+  push:
+    branches:
+      - master
   release:
     types:
       - released    # publishing of stable releases

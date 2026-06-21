@@ -7,6 +7,17 @@ permissions:
   id-token: write    # needed for signing certificate in attestation
 
 on:
+  pull_request:
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.github/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
+      - 'vcpkg'    # needed to match submodule bumps (gitlink)
   push:
     branches:
       - master
@@ -22,17 +33,6 @@ on:
       - 'vcpkg'    # needed to match submodule bumps (gitlink)
     tags:
       - '*'
-  pull_request:
-    paths:
-      - '*/**'    # matches all files not in root
-      - '!**.md'
-      - '!.github/**'
-      - '!.tx/**'
-      - '!doc/**'
-      - '.github/workflows/desktop-build.yml'
-      - 'CMakeLists.txt'
-      - 'vcpkg.json'
-      - 'vcpkg'    # needed to match submodule bumps (gitlink)
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
