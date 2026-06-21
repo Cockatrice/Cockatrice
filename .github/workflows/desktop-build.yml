@@ -337,7 +337,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
 
-    name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
+    name: ${{ matrix.os }} ${{ matrix.target }}${{ case(matrix.soc == 'Intel', ' Intel', '') }}${{ case(matrix.type == 'Debug', ' Debug', '') }}
     needs: configure
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
