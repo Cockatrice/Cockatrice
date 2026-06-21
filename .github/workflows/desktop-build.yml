@@ -147,7 +147,7 @@ jobs:
     name: ${{ matrix.distro }} ${{ matrix.version }}
     needs: configure
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.allow-failure == 'true' }}
+    continue-on-error: ${{ matrix.allow-failure == true }}
     timeout-minutes: 70
     env:
       CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching docker image and ccache
@@ -359,11 +359,11 @@ jobs:
           msbuild-architecture: x64
 
       - name: "[macOS] Setup ccache"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 'true'
+        if: matrix.os == 'macOS' && matrix.use_ccache == true
         run: brew install ccache
 
       - name: "[macOS] Restore compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 'true'
+        if: matrix.os == 'macOS' && matrix.use_ccache == true
         id: ccache_restore
         uses: actions/cache/restore@v5
         env:
@@ -461,7 +461,7 @@ jobs:
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 'true' && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
+        if: matrix.os == 'macOS' && matrix.use_ccache == true && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
         continue-on-error: true
         env:
           CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
@@ -472,7 +472,7 @@ jobs:
           fi
 
       - name: "[macOS] Save updated compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 'true' && github.ref == 'refs/heads/master'
+        if: matrix.os == 'macOS' && matrix.use_ccache == true && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v5
         with:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
@@ -546,7 +546,7 @@ jobs:
             build/servatrice/Release/*.pdb
 
       - name: "Upload to release"
-        if: needs.configure.outputs.tag != null && matrix.make_package == 'true'
+        if: needs.configure.outputs.tag != null && matrix.make_package == true
         id: upload_release
         shell: bash
         env:
