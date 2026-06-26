@@ -7,8 +7,8 @@
 /**
  * @brief Overflow-safe clamped addition: returns value + delta bounded to [minValue, maxValue].
  *
- * Uses a 64-bit intermediate so the addition itself cannot overflow int. Shared by the
- * counter arithmetic in Server_Card and Server_Counter so both stay in sync.
+ * Uses a 64-bit intermediate so the addition cannot overflow int. Shared by the counter
+ * arithmetic in Server_Card, Server_Counter, and PlayerActions.
  *
  * @note Requires minValue <= maxValue. Bounds come from trusted compile-time call sites;
  *       qBound() asserts this internally in debug builds.
