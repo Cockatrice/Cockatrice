@@ -303,12 +303,14 @@ bool SetsDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex &source
     auto typeIndex = sourceModel()->index(sourceRow, SetsModel::SetTypeCol, sourceParent);
     auto nameIndex = sourceModel()->index(sourceRow, SetsModel::LongNameCol, sourceParent);
     auto shortNameIndex = sourceModel()->index(sourceRow, SetsModel::ShortNameCol, sourceParent);
+    auto dateIndex = sourceModel()->index(sourceRow, SetsModel::ReleaseDateCol, sourceParent);
 
     const auto filter = filterRegularExpression();
 
     return (sourceModel()->data(typeIndex).toString().contains(filter) ||
             sourceModel()->data(nameIndex).toString().contains(filter) ||
-            sourceModel()->data(shortNameIndex).toString().contains(filter));
+            sourceModel()->data(shortNameIndex).toString().contains(filter) ||
+            sourceModel()->data(dateIndex).toString().contains(filter));
 }
 
 bool SetsDisplayModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
