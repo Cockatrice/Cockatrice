@@ -18,13 +18,13 @@ constexpr uint MAXIMUM_DIE_SIDES = 1000000;
 constexpr uint MINIMUM_DICE_TO_ROLL = 1;
 constexpr uint MAXIMUM_DICE_TO_ROLL = 100;
 
-// Card counter value bounds [0, MAX_COUNTERS_ON_CARD].
+// Card counter value bounds [0, MAX_COUNTER_VALUE].
 // This caps an individual counter's VALUE (e.g. a +1/+1 counter at 999), not how many counters a card holds.
 // Applies to card counters only; player counters (Server_Counter) are unbounded and may go
 // negative (e.g. life total), saturating only at the int range.
 // The max of 999 is a display constraint (3-digit rendering) and reasonable gameplay limit.
 // Server enforces these bounds; client may also check for UX optimization.
-constexpr int MAX_COUNTERS_ON_CARD = 999;
+constexpr int MAX_COUNTER_VALUE = 999;
 
 // optimized functions to get qstrings that are at most that long
 static inline QString nameFromStdString(const std::string &_string)

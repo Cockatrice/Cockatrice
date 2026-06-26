@@ -1532,9 +1532,9 @@ void PlayerActions::offsetCardCounter(QList<CardItem *> selectedCards, int count
         int oldValue = card->getCounters().value(counterId, 0);
         int newValue = oldValue + offset;
 
-        // Early exit optimization: server enforces [0, MAX_COUNTERS_ON_CARD].
+        // Early exit optimization: server enforces [0, MAX_COUNTER_VALUE].
         // Compare clamped value to allow recovery from invalid states.
-        int clampedValue = qBound(0, newValue, MAX_COUNTERS_ON_CARD);
+        int clampedValue = qBound(0, newValue, MAX_COUNTER_VALUE);
         if (clampedValue != oldValue) {
             auto *cmd = new Command_SetCardCounter;
             cmd->set_zone(card->getZone()->getName().toStdString());
@@ -1568,7 +1568,7 @@ void PlayerActions::actSetCardCounter(QList<CardItem *> selectedCards, int count
         Expression exp(oldValue);
         double parsed = exp.parse(counterValue);
         // Clamp in double precision first to avoid UB, then cast
-        int number = static_cast<int>(qBound(0.0, parsed, static_cast<double>(MAX_COUNTERS_ON_CARD)));
+        int number = static_cast<int>(qBound(0.0, parsed, static_cast<double>(MAX_COUNTER_VALUE)));
 
         auto *cmd = new Command_SetCardCounter;
         cmd->set_zone(card->getZone()->getName().toStdString());
@@ -1598,7 +1598,7 @@ void PlayerActions::actIncrementAllCardCounters(QList<CardItem *> cardsToUpdate)
             counterIterator.next();
             int counterId = counterIterator.key();
             int currentValue = counterIterator.value();
-            if (currentValue >= MAX_COUNTERS_ON_CARD) {
+            if (currentValue >= MAX_COUNTER_VALUE) {
                 continue;
             }
 

@@ -115,8 +115,8 @@ QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue
 
 bool Server_Card::setCounter(int _id, int value, Event_SetCardCounter *event)
 {
-    // Clamp to valid card counter range [0, MAX_COUNTERS_ON_CARD]
-    value = qBound(0, value, MAX_COUNTERS_ON_CARD);
+    // Clamp to valid card counter range [0, MAX_COUNTER_VALUE]
+    value = qBound(0, value, MAX_COUNTER_VALUE);
 
     const int oldValue = counters.value(_id, 0);
     if (value == oldValue) {
@@ -140,8 +140,8 @@ bool Server_Card::setCounter(int _id, int value, Event_SetCardCounter *event)
 bool Server_Card::incrementCounter(int counterId, int delta, Event_SetCardCounter *event)
 {
     const int oldValue = counters.value(counterId, 0);
-    // Clamp to [0, MAX_COUNTERS_ON_CARD] for card counters
-    const int newValue = addClamped(oldValue, delta, 0, MAX_COUNTERS_ON_CARD);
+    // Clamp to [0, MAX_COUNTER_VALUE] for card counters
+    const int newValue = addClamped(oldValue, delta, 0, MAX_COUNTER_VALUE);
 
     if (newValue == oldValue) {
         return false;
