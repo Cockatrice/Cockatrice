@@ -31,7 +31,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&themeBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &AppearanceSettingsPage::themeBoxChanged);
     connect(&openThemeButton, &QPushButton::clicked, this, &AppearanceSettingsPage::openThemeLocation);
 
-    schemeCombo.addItem(tr("Light"), QStringLiteral("Light"));
+    /*schemeCombo.addItem(tr("Light"), QStringLiteral("Light"));
     schemeCombo.addItem(tr("Dark"), QStringLiteral("Dark"));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     schemeCombo.addItem(tr("System"), QStringLiteral("System"));
@@ -58,15 +58,18 @@ AppearanceSettingsPage::AppearanceSettingsPage()
         schemeCombo.blockSignals(false);
     });
 
-    connect(&editPaletteButton, &QPushButton::clicked, this, &AppearanceSettingsPage::editPalette);
+    connect(&editPaletteButton, &QPushButton::clicked, this, &AppearanceSettingsPage::editPalette);*/
+    schemeComboLabel.setHidden(true);
+    schemeCombo.setHidden(true);
+    editPaletteButton.setHidden(true);
 
     auto *themeGrid = new QGridLayout;
     themeGrid->addWidget(&themeLabel, 0, 0);
     themeGrid->addWidget(&themeBox, 0, 1);
     themeGrid->addWidget(&openThemeButton, 1, 1);
-    themeGrid->addWidget(&schemeComboLabel, 2, 0);
-    themeGrid->addWidget(&schemeCombo, 2, 1);
-    themeGrid->addWidget(&editPaletteButton, 3, 1);
+    //themeGrid->addWidget(&schemeComboLabel, 2, 0);
+    //themeGrid->addWidget(&schemeCombo, 2, 1);
+    //themeGrid->addWidget(&editPaletteButton, 3, 1);
 
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
@@ -322,8 +325,8 @@ void AppearanceSettingsPage::openThemeLocation()
 
 void AppearanceSettingsPage::editPalette()
 {
-    PaletteEditorDialog dlg(themeManager->getCurrentThemePath(), SettingsCache::instance().getThemeName(), this);
-    dlg.exec();
+    //PaletteEditorDialog dlg(themeManager->getCurrentThemePath(), SettingsCache::instance().getThemeName(), this);
+    //dlg.exec();
 }
 
 void AppearanceSettingsPage::updateHomeTabSettingsVisibility()

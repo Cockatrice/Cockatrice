@@ -25,7 +25,7 @@ PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QSt
     // Load both scheme configs upfront so switching is instant
     loadSchemes();
 
-    loadedScheme = themeManager->isDarkMode(themeDirPath) ? "Dark" : "Light";
+    //loadedScheme = themeManager->isDarkMode(themeDirPath) ? "Dark" : "Light";
 
     schemeComboBox->blockSignals(true);
     schemeComboBox->setCurrentText(loadedScheme);
@@ -247,7 +247,7 @@ void PaletteEditorDialog::onGenerateFromAccent(const QColor &accent, int intensi
 
 void PaletteEditorDialog::onApply()
 {
-    themeManager->previewPalette(paletteGrid->currentPaletteConfig(), loadedScheme);
+    //themeManager->previewPalette(paletteGrid->currentPaletteConfig(), loadedScheme);
 }
 
 void PaletteEditorDialog::onSave()
@@ -258,11 +258,11 @@ void PaletteEditorDialog::onSave()
 
     PaletteConfig cfg = paletteGrid->currentPaletteConfig();
 
-    if (!ThemeManager::savePaletteConfig(themeDirPath, loadedScheme, cfg)) {
+    /*if (!ThemeManager::savePaletteConfig(themeDirPath, loadedScheme, cfg)) {
         QMessageBox::warning(this, tr("Save failed"),
                              tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(loadedScheme), themeDirPath));
         return;
-    }
+    }*/
 
     ThemeConfig globalCfg = ThemeConfig::fromThemeDir(themeDirPath);
     globalCfg.colorScheme = loadedScheme;
@@ -270,7 +270,7 @@ void PaletteEditorDialog::onSave()
 
     savedConfig[loadedScheme] = cfg;
     workingConfig[loadedScheme] = cfg;
-    themeManager->reloadCurrentTheme();
+    //themeManager->reloadCurrentTheme();
     accept();
 }
 
