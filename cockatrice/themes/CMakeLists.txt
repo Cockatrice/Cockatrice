@@ -2,7 +2,7 @@
 #
 # add themes subfolders
 
-set(defthemes Default Fabric Fusion Leather Plasma VelvetMarble)
+set(defthemes Fabric Leather Plasma VelvetMarble)
 
 if(UNIX)
   if(APPLE)
