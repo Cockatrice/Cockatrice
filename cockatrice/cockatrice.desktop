@@ -6,3 +6,5 @@ Name=Cockatrice
 Exec=cockatrice
 Icon=cockatrice
 Categories=Game;CardGame;
+MimeType=application/x-cockatrice;
+X-Scheme-Handler/cockatrice=true

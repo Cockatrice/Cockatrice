@@ -23,12 +23,17 @@
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
+#include "client/url_scheme_event_filter.h"
 #include "database/interface/settings_card_preference_provider.h"
+#include "interface/intents/intent_open_local_deck.h"
+#include "interface/intents/url_parser.h"
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
 #include "interface/widgets/dialogs/dlg_settings.h"
+#include "interface/widgets/tabs/tab_supervisor.h"
 #include "interface/window_main.h"
+#include "single_instance_manager.h"
 #include "version_string.h"
 
 #include <QApplication>
@@ -174,6 +179,7 @@ int main(int argc, char *argv[])
     SetUnhandledExceptionFilter(CockatriceUnhandledExceptionFilter);
 #endif
 
+    // Logging setup
 #ifdef Q_OS_APPLE
     // <build>/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
     const QByteArray configPath = "../../../qtlogging.ini";
@@ -191,15 +197,29 @@ int main(int argc, char *argv[])
         // Set the QT_LOGGING_CONF environment variable
         qputenv("QT_LOGGING_CONF", configPath);
     }
+
     qSetMessagePattern(
         "\033[0m[%{time yyyy-MM-dd h:mm:ss.zzz} "
         "%{if-debug}\033[36mD%{endif}%{if-info}\033[32mI%{endif}%{if-warning}\033[33mW%{endif}%{if-critical}\033[31mC%{"
         "endif}%{if-fatal}\033[1;31mF%{endif}\033[0m] [%{function}] - %{message} [%{file}:%{line}]");
     QApplication app(argc, argv);
 
+#ifdef Q_OS_MAC
+    UrlSchemeEventFilter cockatriceFilter(QStringList{QStringLiteral("cockatrice")});
+
+    QStringList pendingMacUrls;
+
+    const auto cocoaBufferConn =
+        QObject::connect(&cockatriceFilter, &UrlSchemeEventFilter::urlReceived,
+                         [&pendingMacUrls](const QString &url) { pendingMacUrls.append(url); });
+
+    app.installEventFilter(&cockatriceFilter);
+#endif
+
     QObject::connect(&app, &QApplication::lastWindowClosed, &app, &QApplication::quit);
 
     qInstallMessageHandler(CockatriceLogger);
+
 #ifdef Q_OS_WIN
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
@@ -215,6 +235,7 @@ int main(int argc, char *argv[])
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
+    // Translations
 #ifdef Q_OS_MAC
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
 #elif defined(Q_OS_WIN)
@@ -223,6 +244,7 @@ int main(int argc, char *argv[])
     translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
 #endif
 
+    // Command-line parser
     QCommandLineParser parser;
     parser.setApplicationDescription("Cockatrice");
     parser.addHelpOption();
@@ -256,6 +278,23 @@ int main(int argc, char *argv[])
     qCInfo(MainLog) << "Starting main program";
 
     MainWindow ui;
+
+    auto handleActivation = [&ui](const QString &file) {
+        if (file.startsWith("cockatrice://")) {
+            auto urlParser = new IntentUrlParser(&ui, &ui);
+            urlParser->handle(file);
+        } else if (QFileInfo(file).exists()) {
+            auto openDeckIntent = new IntentOpenLocalDeck(ui.getTabSupervisor(), file);
+            openDeckIntent->execute();
+        }
+    };
+
+#ifdef Q_OS_MAC
+    QObject::disconnect(cocoaBufferConn);
+
+    QObject::connect(&cockatriceFilter, &UrlSchemeEventFilter::urlReceived,
+                     [&handleActivation](const QString &url) { handleActivation(url); });
+#endif
     if (parser.isSet("connect")) {
         ui.setConnectTo(parser.value("connect"));
     }
@@ -271,6 +310,34 @@ int main(int argc, char *argv[])
     // then reload the DB. otherwise just reload the DB
     SpoilerBackgroundUpdater spoilerBackgroundUpdater;
 
+    // --- Handle files or URLs passed at startup ---
+    QStringList startupFiles;
+    for (int i = 1; i < argc; ++i) {
+        startupFiles.append(QString::fromLocal8Bit(argv[i]));
+    }
+
+    bool hasActivationFiles = !startupFiles.isEmpty();
+
+    SingleInstanceManager instance;
+
+    if (hasActivationFiles) {
+        // Activation launch: try to forward
+        if (!instance.tryRun(startupFiles)) {
+            // Sent successfully → exit
+            return 0;
+        }
+        // No primary instance → become server
+        qInfo() << "No existing instance found, becoming primary instance";
+    } else {
+        // Plain launch: try to start server, but do not connect to any existing
+        if (!instance.tryRun(QStringList())) {
+            // Server already exists → just run independently
+            qInfo() << "Another instance exists, running independently";
+        } else {
+            qInfo() << "No existing instance found, starting server";
+        }
+    }
+
     ui.show();
     qCInfo(MainLog) << "ui.show() finished";
 
@@ -280,7 +347,26 @@ int main(int argc, char *argv[])
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
-    app.exec();
+
+#ifdef Q_OS_MAC
+    for (const QString &url : pendingMacUrls) {
+        handleActivation(url);
+    }
+    pendingMacUrls.clear();
+#endif
+
+    for (const QString &file : startupFiles) {
+        handleActivation(file);
+    }
+
+    // Connect to future file/URL events from other instances
+    QObject::connect(&instance, &SingleInstanceManager::filesReceived, [&handleActivation](const QStringList &files) {
+        for (const QString &file : files) {
+            handleActivation(file);
+        }
+    });
+
+    int ret = app.exec();
 
     qCInfo(MainLog) << "Event loop finished, terminating...";
     delete rng;
@@ -288,5 +374,5 @@ int main(int argc, char *argv[])
     CountryPixmapGenerator::clear();
     UserLevelPixmapGenerator::clear();
 
-    return 0;
+    return ret;
 }
