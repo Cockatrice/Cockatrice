@@ -162,7 +162,7 @@ jobs:
 
       - name: "Restore compiler cache (ccache)"
         id: ccache_restore
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
@@ -215,7 +215,7 @@ jobs:
 
       - name: "Save updated compiler cache (ccache)"
         if: github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
           path: ${{ env.CACHE }}
@@ -365,7 +365,7 @@ jobs:
       - name: "[macOS] Restore compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
         id: ccache_restore
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
@@ -376,7 +376,7 @@ jobs:
       # - name: "[macOS] Restore thin Qt ${{ matrix.qt_version }} libraries"
       #   if: matrix.os == 'macOS'
       #   id: restore_qt
-      #   uses: actions/cache/restore@v5
+      #   uses: actions/cache/restore@v6
       #   with:
       #     key: thin-qt-macos-${{ matrix.soc }}-${{ matrix.qt_version }}
       #     path: ${{ github.workspace }}/Qt
@@ -399,7 +399,7 @@ jobs:
 
       # - name: "[macOS] Cache thin Qt libraries"
       #   if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
-      #   uses: actions/cache/save@v5
+      #   uses: actions/cache/save@v6
       #   with:
       #     key: thin-qt-macos-${{ matrix.soc }}-${{ matrix.qt_version }}
       #     path: ${{ github.workspace }}/Qt
@@ -462,7 +462,7 @@ jobs:
 
       - name: "[macOS] Save updated compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
           path: ${{ env.CCACHE_DIR }}

@@ -693,6 +693,9 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
                 if (obj.contains("card_name")) {
                     cap->set_card_name(obj["card_name"].toString().toStdString());
                 }
+                if (obj.contains("card_provider_id")) {
+                    cap->set_card_provider_id(obj["card_provider_id"].toString().toStdString());
+                }
                 if (obj.contains("marginPctL")) {
                     cap->set_margin_pct_l(obj["marginPctL"].toDouble(0.33));
                 }

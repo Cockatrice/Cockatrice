@@ -14,7 +14,7 @@ class UserCardArtProvider : public QObject
 public:
     explicit UserCardArtProvider(QObject *parent = nullptr);
 
-    void requestCardArt(const QString &userName, const QString &cardName);
+    void requestCardArt(const QString &userName, const QString &cardName, const QString &providerId);
     const QMap<QString, QPixmap> &cache() const;
     static QPixmap cropCardArt(const QPixmap &fullRes);
 

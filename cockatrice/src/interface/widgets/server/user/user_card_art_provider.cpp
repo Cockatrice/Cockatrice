@@ -5,9 +5,9 @@
 #include <QPointer>
 #include <libcockatrice/card/database/card_database_manager.h>
 
-static QString makeKey(const QString &user, const QString &card)
+static QString makeKey(const QString &user, const QString &card, const QString &providerId)
 {
-    return user + u'|' + card;
+    return user + u'|' + card + u'|' + providerId;
 }
 
 UserCardArtProvider::UserCardArtProvider(QObject *parent) : QObject(parent)
@@ -31,13 +31,13 @@ const QMap<QString, QPixmap> &UserCardArtProvider::cache() const
     return cardArtCache;
 }
 
-void UserCardArtProvider::requestCardArt(const QString &userName, const QString &cardName)
+void UserCardArtProvider::requestCardArt(const QString &userName, const QString &cardName, const QString &providerId)
 {
     if (cardName.isEmpty()) {
         return;
     }
 
-    const QString key = makeKey(userName, cardName);
+    const QString key = makeKey(userName, cardName, providerId);
 
     if (cardArtCache.contains(key) || pending.contains(key)) {
         return;
@@ -83,15 +83,16 @@ void UserCardArtProvider::processQueue()
         const QString key = queue.dequeue();
 
         const QStringList parts = key.split(u'|');
-        if (parts.size() != 2) {
+        if (parts.size() != 3) {
             pending.remove(key);
             continue;
         }
 
         const QString userName = parts.at(0);
         const QString cardName = parts.at(1);
+        const QString providerId = parts.at(2);
 
-        ExactCard card = CardDatabaseManager::query()->getCard({cardName});
+        ExactCard card = CardDatabaseManager::query()->getCard({cardName, providerId});
 
         if (!card) {
             pending.remove(key);
