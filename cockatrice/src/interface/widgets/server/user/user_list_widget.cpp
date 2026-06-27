@@ -793,20 +793,20 @@ void UserListWidget::positionPopup(const QString &userName)
     }
 
     QWidget *vp = userTree->viewport();
-    const QRect  itemR  = userTree->visualItemRect(item);
+    const QRect itemR = userTree->visualItemRect(item);
     const QPoint itemTL = vp->mapToGlobal(itemR.topLeft());
-    const QPoint vpTL   = vp->mapToGlobal(vp->rect().topLeft());
-    const QPoint vpTR   = vp->mapToGlobal(vp->rect().topRight());
+    const QPoint vpTL = vp->mapToGlobal(vp->rect().topLeft());
+    const QPoint vpTR = vp->mapToGlobal(vp->rect().topRight());
 
     m_userInfoPopup->adjustSize();
-    const int popW   = m_userInfoPopup->width();
-    const int popH   = m_userInfoPopup->height();
+    const int popW = m_userInfoPopup->width();
+    const int popH = m_userInfoPopup->height();
     const int margin = 12;
 
     const QRect screen = QGuiApplication::primaryScreen()->availableGeometry();
 
     // ── X: prefer the side with more space ───────────────────────────────────
-    const int spaceLeft  = vpTL.x() - screen.left() - margin;
+    const int spaceLeft = vpTL.x() - screen.left() - margin;
     const int spaceRight = screen.right() - vpTR.x() - margin;
     int x;
     if (spaceLeft >= spaceRight) {
@@ -817,13 +817,13 @@ void UserListWidget::positionPopup(const QString &userName)
     x = qBound(screen.left() + margin, x, screen.right() - popW - margin);
 
     // ── Y: grow down if there's room, otherwise grow up ───────────────────────
-    const int itemTopY   = itemTL.y();
+    const int itemTopY = itemTL.y();
     const int spaceBelow = screen.bottom() - itemTopY - margin;
     const int spaceAbove = itemTopY - screen.top() - margin;
 
     int y;
     if (spaceBelow >= popH) {
-        y = itemTopY;        // top edges align, popup grows downward
+        y = itemTopY; // top edges align, popup grows downward
     } else if (spaceAbove >= popH) {
         y = itemTopY - popH; // bottom of popup meets top of item, grows upward
     } else {
