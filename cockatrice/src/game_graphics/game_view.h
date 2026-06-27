@@ -7,9 +7,12 @@
 #ifndef GAMEVIEW_H
 #define GAMEVIEW_H
 
+#include "../game/selection_subtype_tally.h"
+
 #include <QGraphicsView>
 
 class GameScene;
+class QGridLayout;
 class QLabel;
 class QRubberBand;
 
@@ -21,7 +24,13 @@ private:
     QRubberBand *rubberBand;
     QLabel *dragCountLabel;
     QLabel *totalCountLabel;
+    QWidget *subtypeTallyContainer;
+    QGridLayout *subtypeTallyLayout;
     QPointF selectionOrigin;
+    QList<SubtypeEntry> cachedSubtypeEntries; ///< Cached entries to avoid redundant rebuilds
+
+    QSize rebuildSubtypeLabels(const QList<SubtypeEntry> &entries);
+    void clearSubtypeLabels();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

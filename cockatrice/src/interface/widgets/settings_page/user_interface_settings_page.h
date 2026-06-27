@@ -29,6 +29,7 @@ private:
     QCheckBox annotateTokensCheckBox;
     QCheckBox showDragSelectionCountCheckBox;
     QCheckBox showTotalSelectionCountCheckBox;
+    QCheckBox showSubtypeSelectionTallyCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox keepGameChatFocusCheckBox;
     QCheckBox tapAnimationCheckBox;

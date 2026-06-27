@@ -1,12 +1,16 @@
 #include "game_view.h"
 
 #include "../client/settings/cache_settings.h"
+#include "../game/selection_subtype_tally.h"
 #include "game_scene.h"
 
 #include <QAction>
+#include <QGridLayout>
 #include <QLabel>
+#include <QLayout>
 #include <QResizeEvent>
 #include <QRubberBand>
+#include <libcockatrice/utility/qt_utils.h>
 
 // QRubberBand calls raise() in showEvent() and changeEvent() to stay on top of siblings.
 // This subclass disables that behavior so dragCountLabel can appear above it.
@@ -55,31 +59,40 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     refreshShortcuts();
     rubberBand = new SelectionRubberBand(QRubberBand::Rectangle, this);
 
-    const QString countLabelStyle = "color: white; "
-                                    "font-size: 14px; "
-                                    "font-weight: bold; "
-                                    "background-color: rgba(0, 0, 0, 160); "
-                                    "border-radius: 3px; "
-                                    "padding: 1px 2px;";
+    const QString baseProperties = "color: white; "
+                                   "font-family: monospace; "
+                                   "background-color: rgba(0, 0, 0, 160); "
+                                   "border-radius: 3px; "
+                                   "padding: 1px 2px; "
+                                   "white-space: pre;";
+
+    const QString dragCountLabelStyle = baseProperties + "font-size: 14px; font-weight: bold;";
+    const QString totalCountLabelStyle = baseProperties + "font-size: 16px; font-weight: bold;";
+    const QString subtypeTallyLabelStyle = baseProperties + "font-size: 12px;";
 
     dragCountLabel = new QLabel(this);
-    dragCountLabel->setStyleSheet(countLabelStyle);
+    dragCountLabel->setStyleSheet(dragCountLabelStyle);
     dragCountLabel->hide();
     dragCountLabel->raise();
 
     totalCountLabel = new QLabel(this);
-    totalCountLabel->setStyleSheet(countLabelStyle);
+    totalCountLabel->setStyleSheet(totalCountLabelStyle);
     totalCountLabel->hide();
+
+    subtypeTallyContainer = new QWidget(this);
+    subtypeTallyContainer->setStyleSheet(subtypeTallyLabelStyle);
+    subtypeTallyLayout = new QGridLayout(subtypeTallyContainer);
+    subtypeTallyLayout->setContentsMargins(2, 2, 2, 2);
+    subtypeTallyLayout->setSpacing(2);
+    subtypeTallyContainer->hide();
 }
 
 void GameView::resizeEvent(QResizeEvent *event)
 {
     QGraphicsView::resizeEvent(event);
 
-    GameScene *s = dynamic_cast<GameScene *>(scene());
-    if (s) {
-        s->processViewSizeChange(event->size());
-    }
+    GameScene *s = static_cast<GameScene *>(scene());
+    s->processViewSizeChange(event->size());
 
     updateSceneRect(scene()->sceneRect());
     updateTotalSelectionCount(event->size());
@@ -164,29 +177,114 @@ void GameView::refreshShortcuts()
         SettingsCache::instance().shortcuts().getShortcut("Player/aCloseMostRecentZoneView"));
 }
 
+void GameView::clearSubtypeLabels()
+{
+    QtUtils::clearLayoutRec(subtypeTallyLayout);
+}
+
+QSize GameView::rebuildSubtypeLabels(const QList<SubtypeEntry> &entries)
+{
+    clearSubtypeLabels();
+
+    const QString nameStyle = QStringLiteral("color: white; font-size: 12px; background: transparent;");
+    const QString countStyle =
+        QStringLiteral("color: white; font-size: 14px; font-weight: bold; background: transparent;");
+
+    int totalHeight = 0;
+    int maxNameWidth = 0;
+    int maxCountWidth = 0;
+
+    int row = 0;
+    for (const SubtypeEntry &entry : entries) {
+        auto *nameLabel = new QLabel(entry.name, subtypeTallyContainer);
+        nameLabel->setStyleSheet(nameStyle);
+        nameLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        subtypeTallyLayout->addWidget(nameLabel, row, 0);
+
+        auto *countLabel = new QLabel(QString::number(entry.count), subtypeTallyContainer);
+        countLabel->setStyleSheet(countStyle);
+        countLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        subtypeTallyLayout->addWidget(countLabel, row, 1);
+
+        QSize nameSize = nameLabel->sizeHint();
+        QSize countSize = countLabel->sizeHint();
+        maxNameWidth = qMax(maxNameWidth, nameSize.width());
+        maxCountWidth = qMax(maxCountWidth, countSize.width());
+        totalHeight += qMax(nameSize.height(), countSize.height());
+
+        ++row;
+    }
+
+    int spacing = subtypeTallyLayout->spacing();
+    int margins = subtypeTallyLayout->contentsMargins().left() + subtypeTallyLayout->contentsMargins().right();
+    int verticalMargins = subtypeTallyLayout->contentsMargins().top() + subtypeTallyLayout->contentsMargins().bottom();
+
+    int width = maxNameWidth + spacing + maxCountWidth + margins;
+    int height = totalHeight + (row - 1) * spacing + verticalMargins;
+
+    return QSize(width, height);
+}
+
 void GameView::updateTotalSelectionCount(const QSize &viewSize)
 {
-    if (!SettingsCache::instance().getShowTotalSelectionCount()) {
-        totalCountLabel->hide();
-        return;
-    }
+    constexpr int kMarginInPixels = 10;
+    constexpr int kSpacingBetweenLabels = 4;
+
+    int availableWidth = viewSize.isValid() ? viewSize.width() : viewport()->width();
+    int availableHeight = viewSize.isValid() ? viewSize.height() : viewport()->height();
 
     int count = scene()->selectedItems().count();
 
-    if (count > 1) {
+    if (!SettingsCache::instance().getShowTotalSelectionCount() || count <= 1) {
+        totalCountLabel->hide();
+    } else {
         totalCountLabel->setText(QString::number(count));
         totalCountLabel->adjustSize();
 
-        constexpr int kMarginInPixels = 10;
-        int availableWidth = viewSize.isValid() ? viewSize.width() : viewport()->width();
-        int availableHeight = viewSize.isValid() ? viewSize.height() : viewport()->height();
         int x = availableWidth - totalCountLabel->width() - kMarginInPixels;
         int y = availableHeight - totalCountLabel->height() - kMarginInPixels;
         totalCountLabel->move(x, y);
         totalCountLabel->show();
-    } else {
-        totalCountLabel->hide();
     }
+
+    if (!SettingsCache::instance().getShowSubtypeSelectionTally() || count <= 1) {
+        subtypeTallyContainer->hide();
+        cachedSubtypeEntries.clear();
+        return;
+    }
+
+    GameScene *gameScene = static_cast<GameScene *>(scene());
+    QList<SubtypeEntry> entries = SelectionSubtypeTally::countSubtypes(gameScene->selectedCards());
+
+    if (entries.isEmpty()) {
+        subtypeTallyContainer->hide();
+        cachedSubtypeEntries.clear();
+        return;
+    }
+
+    // Only rebuild labels if entries changed
+    QSize containerSize;
+    if (entries != cachedSubtypeEntries) {
+        cachedSubtypeEntries = entries;
+        containerSize = rebuildSubtypeLabels(entries);
+        subtypeTallyContainer->resize(containerSize);
+    } else {
+        containerSize = subtypeTallyContainer->size();
+    }
+
+    int x = availableWidth - containerSize.width() - kMarginInPixels;
+    int y;
+
+    if (totalCountLabel->isVisible()) {
+        y = totalCountLabel->y() - containerSize.height() - kSpacingBetweenLabels;
+    } else {
+        y = availableHeight - containerSize.height() - kMarginInPixels;
+    }
+
+    y = qMax(kMarginInPixels, y);
+
+    subtypeTallyContainer->move(x, y);
+    subtypeTallyContainer->show();
 }
 
 /**
