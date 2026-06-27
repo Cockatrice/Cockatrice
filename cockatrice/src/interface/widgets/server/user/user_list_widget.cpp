@@ -767,13 +767,17 @@ void UserListWidget::showPopupForUser(const QString &userName)
 
     m_userInfoPopup->showForUser(userName, info, online, isBuddy, isIgn);
 
-    positionPopup(userName);
-
+    // Realize the native window at opacity 0 before positioning so that:
+    //   1) move() applies to an existing native handle (not overridden by Qt's
+    //      default centering logic on first show)
+    //   2) adjustSize() inside positionPopup() can measure the final laid-out
+    //      geometry correctly
+    m_userInfoPopup->setWindowOpacity(0.0);
     m_userInfoPopup->show();
     m_userInfoPopup->raise();
 
-    // Fade in
-    m_userInfoPopup->setWindowOpacity(0.0);
+    positionPopup(userName); // geometry is now accurate; move() sticks
+
     auto *fade = new QPropertyAnimation(m_userInfoPopup, "windowOpacity", m_userInfoPopup);
     fade->setDuration(120);
     fade->setStartValue(0.0);
@@ -790,11 +794,10 @@ void UserListWidget::positionPopup(const QString &userName)
 
     QWidget *vp = userTree->viewport();
     const QRect itemR = userTree->visualItemRect(item);
-    const QPoint itemBR = vp->mapToGlobal(itemR.bottomRight());
+    const QPoint itemTL = vp->mapToGlobal(itemR.topLeft());
     const QPoint vpTL = vp->mapToGlobal(vp->rect().topLeft());
     const QPoint vpTR = vp->mapToGlobal(vp->rect().topRight());
 
-    // Force a fresh size calculation so popH is accurate
     m_userInfoPopup->adjustSize();
     const int popW = m_userInfoPopup->width();
     const int popH = m_userInfoPopup->height();
@@ -802,19 +805,32 @@ void UserListWidget::positionPopup(const QString &userName)
 
     const QRect screen = QGuiApplication::primaryScreen()->availableGeometry();
 
-    // ── X: left of the list if there's room, otherwise right ─────────────────
-    int x = (vpTL.x() >= popW + margin) ? vpTL.x() - popW - margin : vpTR.x() + margin;
+    // ── X: prefer the side with more space ───────────────────────────────────
+    const int spaceLeft = vpTL.x() - screen.left() - margin;
+    const int spaceRight = screen.right() - vpTR.x() - margin;
+    int x;
+    if (spaceLeft >= spaceRight) {
+        x = (spaceLeft >= popW) ? (vpTL.x() - margin - popW) : (vpTR.x() + margin);
+    } else {
+        x = (spaceRight >= popW) ? (vpTR.x() + margin) : (vpTL.x() - margin - popW);
+    }
     x = qBound(screen.left() + margin, x, screen.right() - popW - margin);
 
-    // ── Y: bottom of popup aligns with bottom of hovered row, grows upward ───
-    int y = itemBR.y() - popH;
+    // ── Y: grow down if there's room, otherwise grow up ───────────────────────
+    const int itemTopY = itemTL.y();
+    const int spaceBelow = screen.bottom() - itemTopY - margin;
+    const int spaceAbove = itemTopY - screen.top() - margin;
 
-    // Clamp: never above the screen top
-    y = qMax(y, screen.top() + margin);
-
-    // Clamp: never below the screen bottom (e.g. if the popup is taller
-    // than the space above the row, let it spill downward rather than clip)
-    y = qMin(y, screen.bottom() - popH - margin);
+    int y;
+    if (spaceBelow >= popH) {
+        y = itemTopY; // top edges align, popup grows downward
+    } else if (spaceAbove >= popH) {
+        y = itemTopY - popH; // bottom of popup meets top of item, grows upward
+    } else {
+        // Neither side fits cleanly — pick the roomier side and let clamp handle the rest
+        y = (spaceBelow >= spaceAbove) ? itemTopY : (itemTopY - popH);
+    }
+    y = qBound(screen.top() + margin, y, screen.bottom() - popH - margin);
 
     m_userInfoPopup->move(x, y);
 }
