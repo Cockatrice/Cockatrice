@@ -335,6 +335,7 @@ void UserInfoBox::actBannerCard()
     Command_SetCardArtParams cmd;
     cmd.set_card_name(p.cardName.toStdString());
     if (!p.cardName.isEmpty()) {
+        cmd.set_card_provider_id(p.cardProviderId.toStdString());
         cmd.set_margin_pct_l(p.marginPctL);
         cmd.set_margin_pct_r(p.marginPctR);
         cmd.set_vertical_offset(p.verticalOffset);
