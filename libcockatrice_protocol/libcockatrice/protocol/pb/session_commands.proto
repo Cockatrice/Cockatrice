@@ -212,8 +212,9 @@ message Command_SetCardArtParams {
         optional Command_SetCardArtParams ext = 1025;
     }
     optional string card_name = 1;
-    optional double margin_pct_l = 2;
-    optional double margin_pct_r = 3;
-    optional double vertical_offset = 4;
-    optional double zoom = 5;
+    optional string card_provider_id = 2;
+    optional double margin_pct_l = 3;
+    optional double margin_pct_r = 4;
+    optional double vertical_offset = 5;
+    optional double zoom = 6;
 }

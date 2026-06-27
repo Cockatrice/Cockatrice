@@ -542,7 +542,7 @@ void UserInfoPopup::showForUser(const QString &userName,
     const CardArtParams params = (m_cardArtParamsMap && m_cardArtParamsMap->contains(userName))
                                      ? m_cardArtParamsMap->value(userName)
                                      : CardArtParams{};
-    const QString artKey = userName + u'|' + params.cardName;
+    const QString artKey = userName + u'|' + params.cardName + u'|' + params.cardProviderId;
     const QPixmap cardArt = (m_cardArtCache && !params.cardName.isEmpty()) ? m_cardArtCache->value(artKey) : QPixmap{};
     m_header->setUserData(userInfo, online, avatar, cardArt, params);
 

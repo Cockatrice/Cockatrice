@@ -70,7 +70,7 @@ void CardArtPreviewWidget::paintEvent(QPaintEvent *)
                                  QString(), // userName not needed for override path
                                  nullptr,   // no cache
                                  params,
-                                 &sourcePixmap // 👈 direct pixmap
+                                 &sourcePixmap // direct pixmap
     );
 
     // Avatar placeholder so the left-margin interaction is visible
@@ -174,6 +174,13 @@ void UserCardArtSettingsDialog::setupUi()
 {
     initializeSearchBar();
 
+    providerComboBox = new QComboBox;
+    connect(providerComboBox, &QComboBox::currentIndexChanged, this, [this]() {
+        currentParams.cardProviderId = providerComboBox->currentData().toString();
+        reloadPreview();
+        onParamChanged();
+    });
+
     marginLSpin = makeSpinBox(0.0, 0.95, currentParams.marginPctL, 0.01);
     marginRSpin = makeSpinBox(0.0, 0.95, currentParams.marginPctR, 0.01);
     verticalOffsetSpin = makeSpinBox(0.0, 1.0, currentParams.verticalOffset, 0.01);
@@ -181,6 +188,7 @@ void UserCardArtSettingsDialog::setupUi()
 
     auto *form = new QFormLayout;
     form->addRow(tr("Card name:"), searchBar);
+    form->addRow(tr("Card ProviderId:"), providerComboBox);
     form->addRow(tr("Left margin (%):"), marginLSpin);
     form->addRow(tr("Right margin (%):"), marginRSpin);
     form->addRow(tr("Vertical offset:"), verticalOffsetSpin);
@@ -219,6 +227,32 @@ void UserCardArtSettingsDialog::setupUi()
     connect(zoomSpin, &QDoubleSpinBox::valueChanged, this, &UserCardArtSettingsDialog::onParamChanged);
 }
 
+void UserCardArtSettingsDialog::populateProviderCombo(const QString &cardName)
+{
+    providerComboBox->clear();
+
+    auto card = CardDatabaseManager::query()->getCard({cardName});
+
+    const auto &sets = card.getInfo().getSets();
+
+    for (const auto &printings : sets) {
+        for (const auto &p : printings) {
+
+            QString setName = p.getSet()->getLongName();
+            QString collector = p.getProperty("num");
+            QString uuid = p.getUuid();
+
+            QString label = setName;
+
+            if (!collector.isEmpty()) {
+                label += " #" + collector;
+            }
+
+            providerComboBox->addItem(label, uuid);
+        }
+    }
+}
+
 void UserCardArtSettingsDialog::onCardNameChanged(const QString &name)
 {
     if (name.isEmpty()) {
@@ -231,27 +265,68 @@ void UserCardArtSettingsDialog::onCardNameChanged(const QString &name)
     if (!card) {
         currentPixmap = QPixmap();
         preview->setPixmap(currentPixmap);
+        providerComboBox->clear();
         return;
     }
 
     currentParams.cardName = name;
 
+    populateProviderCombo(name);
+
+    if (providerComboBox->count() == 0) {
+        // No printings found for this card; nothing to preview.
+        currentPixmap = QPixmap();
+        preview->setPixmap(currentPixmap);
+        currentParams.cardProviderId.clear();
+        return;
+    }
+
+    currentParams.cardProviderId = providerComboBox->currentData().toString();
+    reloadPreview();
+}
+
+void UserCardArtSettingsDialog::reloadPreview()
+{
+    if (currentParams.cardName.isEmpty()) {
+        return;
+    }
+
+    ExactCard card = CardDatabaseManager::query()->getCard({currentParams.cardName, currentParams.cardProviderId});
+    if (!card) {
+        return;
+    }
+
+    // CardPictureLoader::getPixmap() is async on a cache miss: it enqueues a
+    // background download and returns a null pixmap immediately. When that
+    // download finishes, CardPictureLoader::imageLoaded() caches the result
+    // and calls card.emitPixmapUpdated(), which emits pixmapUpdated() on the
+    // underlying CardInfo (see exact_card.h). Listen for that, scoped to
+    // whichever CardInfo we just asked for, so the preview catches up once
+    // the image actually arrives instead of staying on the placeholder.
+    //
+    // Disconnect any previous listener first -- otherwise switching cards
+    // repeatedly stacks up connections to old CardInfo objects, each of
+    // which would still fire reloadPreview() (harmlessly, but wastefully)
+    // whenever ITS art finishes loading later.
+    disconnect(pixmapUpdatedConnection);
+
     QPixmap fullRes;
     CardPictureLoader::getPixmap(fullRes, card, QSize(745, 1040));
 
     if (fullRes.isNull()) {
-        connect(card.getCardPtr().data(), &CardInfo::pixmapUpdated, this, [this, card](const PrintingInfo &) {
-            disconnect(card.getCardPtr().data(), &CardInfo::pixmapUpdated, this, nullptr);
-            QPixmap loaded;
-            CardPictureLoader::getPixmap(loaded, card, QSize(745, 1040));
-            currentPixmap = UserCardArtProvider::cropCardArt(loaded);
-            preview->setPixmap(currentPixmap);
-        });
+        // Not loaded yet -- wait for the signal instead of giving up.
+        // card.getCardPtr() is a CardInfoPtr (QSharedPointer<CardInfo>);
+        // .data() gives the raw QObject* needed for connect().
+        CardInfo *cardInfo = card.getCardPtr().data();
+        if (cardInfo) {
+            pixmapUpdatedConnection = connect(cardInfo, &CardInfo::pixmapUpdated, this, [this]() { reloadPreview(); });
+        }
         return;
     }
 
     currentPixmap = UserCardArtProvider::cropCardArt(fullRes);
     preview->setPixmap(currentPixmap);
+    preview->setParams(currentParams);
 }
 
 void UserCardArtSettingsDialog::onParamChanged()

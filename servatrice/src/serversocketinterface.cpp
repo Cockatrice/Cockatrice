@@ -1577,11 +1577,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountImage(const Comm
     return Response::RespOk;
 }
 
-bool AbstractServerSocketInterface::isCardNameAllowed(const QString &cardName)
+bool AbstractServerSocketInterface::isCardNameAllowed(const QString &cardName, const QString &cardProviderId)
 {
-    QSqlQuery *q = sqlInterface->prepareQuery("SELECT mode FROM {prefix}_card_art_name_rules WHERE card_name = :name");
+    QSqlQuery *q = sqlInterface->prepareQuery(
+        "SELECT mode FROM {prefix}_card_art_name_rules WHERE card_name = :name AND card_provider_id = :provider");
 
     q->bindValue(":name", cardName);
+    q->bindValue(":provider", cardProviderId);
 
     if (!sqlInterface->execSqlQuery(q)) {
         qWarning() << "Card art rule lookup failed; failing open for" << cardName;
@@ -1603,8 +1605,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
     }
 
     const QString cardName = QString::fromStdString(cmd.card_name());
+    const QString cardProviderId = QString::fromStdString(cmd.card_provider_id());
 
-    if (cardName.length() > MAX_NAME_LENGTH) {
+    if (cardName.length() > MAX_NAME_LENGTH || cardProviderId.length() > MAX_NAME_LENGTH) {
         return Response::RespInvalidData;
     }
 
@@ -1620,7 +1623,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
         return Response::RespOk;
     }
 
-    if (!isCardNameAllowed(cardName)) {
+    if (!isCardNameAllowed(cardName, cardProviderId)) {
         return Response::RespFunctionNotAllowed;
     }
 
@@ -1633,6 +1636,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
 
     QJsonObject obj;
     obj["card_name"] = cardName;
+    obj["card_provider_id"] = cardProviderId;
     obj["marginPctL"] = marginPctL;
     obj["marginPctR"] = marginPctR;
     obj["verticalOffset"] = verticalOffset;
@@ -1649,6 +1653,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdSetCardArtParams(const 
     // Keep the in-memory userInfo in sync
     auto *cap = userInfo->mutable_card_art_params();
     cap->set_card_name(cmd.card_name());
+    cap->set_card_provider_id(cmd.card_provider_id());
     cap->set_margin_pct_l(marginPctL);
     cap->set_margin_pct_r(marginPctR);
     cap->set_vertical_offset(verticalOffset);
@@ -1664,21 +1669,23 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddCardArtRule(const Co
                                                                         ResponseContainer &)
 {
     const QString cardName = QString::fromStdString(cmd.card_name());
+    const QString cardProviderId = QString::fromStdString(cmd.card_provider_id());
     const QString mode = QString::fromStdString(cmd.mode());
 
     if (mode != "ALLOW" && mode != "DENY") {
         return Response::RespInvalidData;
     }
-    if (cardName.isEmpty() || cardName.length() > MAX_NAME_LENGTH) {
+    if (cardName.isEmpty() || cardName.length() > MAX_NAME_LENGTH || cardProviderId.length() > MAX_NAME_LENGTH) {
         return Response::RespInvalidData;
     }
 
     QSqlQuery *q = sqlInterface->prepareQuery("INSERT INTO {prefix}_card_art_name_rules "
-                                              "(card_name, mode, reason, created_by) "
-                                              "VALUES (:name, :mode, :reason, :uid) "
+                                              "(card_name, card_provider_id, mode, reason, created_by) "
+                                              "VALUES (:name, :provider, :mode, :reason, :uid) "
                                               "ON DUPLICATE KEY UPDATE mode=:mode2, reason=:reason2");
 
     q->bindValue(":name", cardName);
+    q->bindValue(":provider", cardProviderId);
     q->bindValue(":mode", mode);
     q->bindValue(":mode2", mode);
     q->bindValue(":reason", QString::fromStdString(cmd.reason()));
@@ -1696,12 +1703,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveCardArtRule(const
                                                                            ResponseContainer &)
 {
     auto cardName = QString::fromStdString(cmd.card_name());
-    if (cardName.length() > MAX_NAME_LENGTH) {
+    auto cardProviderId = QString::fromStdString(cmd.card_provider_id());
+    if (cardName.length() > MAX_NAME_LENGTH || cardProviderId.length() > MAX_NAME_LENGTH) {
         return Response::RespInvalidData;
     }
-    QSqlQuery *q = sqlInterface->prepareQuery("DELETE FROM {prefix}_card_art_name_rules WHERE card_name=:name");
+    QSqlQuery *q = sqlInterface->prepareQuery(
+        "DELETE FROM {prefix}_card_art_name_rules WHERE card_name=:name AND card_provider_id=:provider");
 
     q->bindValue(":name", cardName);
+    q->bindValue(":provider", cardProviderId);
 
     if (!sqlInterface->execSqlQuery(q)) {
         return Response::RespInternalError;
@@ -1713,7 +1723,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRemoveCardArtRule(const
 Response::ResponseCode AbstractServerSocketInterface::cmdListCardArtRules(const Command_ListCardArtRules &,
                                                                           ResponseContainer &rc)
 {
-    QSqlQuery *q = sqlInterface->prepareQuery("SELECT card_name, mode, reason FROM {prefix}_card_art_name_rules");
+    QSqlQuery *q = sqlInterface->prepareQuery(
+        "SELECT card_name, card_provider_id, mode, reason FROM {prefix}_card_art_name_rules");
 
     if (!sqlInterface->execSqlQuery(q)) {
         return Response::RespInternalError;
@@ -1724,8 +1735,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdListCardArtRules(const 
     while (q->next()) {
         auto *entry = re->add_entries();
         entry->set_card_name(q->value(0).toString().toStdString());
-        entry->set_mode(q->value(1).toString().toStdString());
-        entry->set_reason(q->value(2).toString().toStdString());
+        entry->set_card_provider_id(q->value(1).toString().toStdString());
+        entry->set_mode(q->value(2).toString().toStdString());
+        entry->set_reason(q->value(3).toString().toStdString());
     }
 
     rc.setResponseExtension(re);

@@ -27,7 +27,7 @@ int CardArtRulesModel::rowCount(const QModelIndex &parent) const
 int CardArtRulesModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return 3;
+    return 4;
 }
 
 QVariant CardArtRulesModel::data(const QModelIndex &index, int role) const
@@ -43,8 +43,10 @@ QVariant CardArtRulesModel::data(const QModelIndex &index, int role) const
             case 0:
                 return e.cardName;
             case 1:
-                return e.mode;
+                return e.cardProviderId;
             case 2:
+                return e.mode;
+            case 3:
                 return e.reason;
         }
     }
@@ -62,8 +64,10 @@ QVariant CardArtRulesModel::headerData(int section, Qt::Orientation orientation,
         case 0:
             return tr("Card");
         case 1:
-            return tr("Mode");
+            return tr("ProviderId");
         case 2:
+            return tr("Mode");
+        case 3:
             return tr("Reason");
         default:
             return {};
@@ -97,6 +101,15 @@ QString CardArtRulesModel::cardAt(int row) const
     return entries[row].cardName;
 }
 
+const CardArtRulesModel::Entry *CardArtRulesModel::entryAt(int row) const
+{
+    if (row < 0 || row >= static_cast<int>(entries.size())) {
+        return nullptr;
+    }
+
+    return &entries[row];
+}
+
 void CardArtRulesModel::onRefreshFinished(const Response &r)
 {
     if (r.response_code() != Response::RespOk) {
@@ -109,8 +122,8 @@ void CardArtRulesModel::onRefreshFinished(const Response &r)
     entries.clear();
 
     for (const auto &e : resp.entries()) {
-        entries.push_back({QString::fromStdString(e.card_name()), QString::fromStdString(e.mode()),
-                           QString::fromStdString(e.reason())});
+        entries.push_back({QString::fromStdString(e.card_name()), QString::fromStdString(e.card_provider_id()),
+                           QString::fromStdString(e.mode()), QString::fromStdString(e.reason())});
     }
 
     endResetModel();
@@ -128,6 +141,7 @@ void TabCardArtRules::setupUi()
 
     initSearchBar();
 
+    providerComboBox = new QComboBox;
     modeBox = new QComboBox;
     reasonEdit = new QLineEdit;
 
@@ -146,6 +160,7 @@ void TabCardArtRules::setupUi()
 
     auto *form = new QFormLayout;
     form->addRow(tr("Card:"), searchEdit);
+    form->addRow(tr("ProviderId:"), providerComboBox);
     form->addRow(tr("Mode:"), modeBox);
     form->addRow(tr("Reason:"), reasonEdit);
 
@@ -204,6 +219,34 @@ void TabCardArtRules::initSearchBar()
     });
     connect(searchCompleter, static_cast<void (QCompleter::*)(const QString &)>(&QCompleter::activated), this,
             [this](const QString &name) { searchEdit->setText(name); });
+    connect(searchEdit, &QLineEdit::editingFinished, this,
+            [this]() { populateProviderCombo(searchEdit->text().trimmed()); });
+}
+
+void TabCardArtRules::populateProviderCombo(const QString &cardName)
+{
+    providerComboBox->clear();
+
+    auto card = CardDatabaseManager::query()->getCard({cardName});
+
+    const auto &sets = card.getInfo().getSets();
+
+    for (const auto &printings : sets) {
+        for (const auto &p : printings) {
+
+            QString setName = p.getSet()->getLongName();
+            QString collector = p.getProperty("num");
+            QString uuid = p.getUuid();
+
+            QString label = setName;
+
+            if (!collector.isEmpty()) {
+                label += " #" + collector;
+            }
+
+            providerComboBox->addItem(label, uuid);
+        }
+    }
 }
 
 void TabCardArtRules::retranslateUi()
@@ -222,6 +265,7 @@ void TabCardArtRules::addRule()
 {
     Command_AddCardArtRule cmd;
     cmd.set_card_name(searchEdit->text().toStdString());
+    cmd.set_card_provider_id(providerComboBox->currentData().toString().toStdString());
     cmd.set_mode(modeBox->currentText().toStdString());
     cmd.set_reason(reasonEdit->text().toStdString());
 
@@ -238,7 +282,10 @@ void TabCardArtRules::removeSelected()
     }
 
     Command_RemoveCardArtRule cmd;
-    cmd.set_card_name(tableModel->cardAt(idx.row()).toStdString());
+    const auto e = tableModel->entryAt(idx.row());
+
+    cmd.set_card_name(e->cardName.toStdString());
+    cmd.set_card_provider_id(e->cardProviderId.toStdString());
 
     client->sendCommand(client->prepareModeratorCommand(cmd));
 

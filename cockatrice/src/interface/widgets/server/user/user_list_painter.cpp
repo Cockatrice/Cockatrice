@@ -73,9 +73,9 @@ void UserListPainter::drawBackground(QPainter *painter,
     painter->drawRoundedRect(QRectF(cardRect.left(), cardRect.top(), 3, cardRect.height()), 2, 2);
 }
 
-static QString makeKey(const QString &user, const QString &card)
+static QString makeKey(const QString &user, const QString &card, const QString &providerId)
 {
-    return user + u'|' + card;
+    return user + u'|' + card + u'|' + providerId;
 }
 
 void UserListPainter::drawCardArt(QPainter *painter,
@@ -95,7 +95,7 @@ void UserListPainter::drawCardArt(QPainter *painter,
             return;
         }
 
-        const QString key = makeKey(userName, params.cardName);
+        const QString key = makeKey(userName, params.cardName, params.cardProviderId);
 
         if (!cardArtCache->contains(key)) {
             return;
