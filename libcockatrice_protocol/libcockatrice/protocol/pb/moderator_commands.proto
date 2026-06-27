@@ -116,8 +116,9 @@ message Command_AddCardArtRule {
     }
 
     optional string card_name = 1;
-    optional string mode = 2; // "ALLOW" or "DENY"
-    optional string reason = 3;
+    optional string card_provider_id = 2;
+    optional string mode = 3; // "ALLOW" or "DENY"
+    optional string reason = 4;
 }
 
 message Command_RemoveCardArtRule {
@@ -126,6 +127,7 @@ message Command_RemoveCardArtRule {
     }
 
     optional string card_name = 1;
+    optional string card_provider_id = 2;
 }
 
 message Command_ListCardArtRules {

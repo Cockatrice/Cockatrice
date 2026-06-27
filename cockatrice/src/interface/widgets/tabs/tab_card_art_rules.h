@@ -20,6 +20,7 @@ public:
     struct Entry
     {
         QString cardName;
+        QString cardProviderId;
         QString mode;
         QString reason;
     };
@@ -35,6 +36,7 @@ public:
     void clear();
 
     QString cardAt(int row) const;
+    const Entry *entryAt(int row) const;
 
 private slots:
     void onRefreshFinished(const Response &r);
@@ -70,11 +72,13 @@ private:
 
     QLineEdit *searchEdit;
     void initSearchBar();
+    void populateProviderCombo(const QString &cardName);
     QCompleter *searchCompleter;
     CardDatabaseModel *cardDbModel;
     CardDatabaseDisplayModel *cardDbDisplayModel;
     CardSearchModel *cardSearchModel;
     CardCompleterProxyModel *cardProxyModel;
+    QComboBox *providerComboBox;
     QComboBox *modeBox;
     QLineEdit *reasonEdit;
 

@@ -18,6 +18,7 @@ class ServerInfo_User;
 struct CardArtParams
 {
     QString cardName = "";
+    QString cardProviderId = "";
     double marginPctL = 0.33;
     double marginPctR = 0.02;
     double verticalOffset = 0.35;

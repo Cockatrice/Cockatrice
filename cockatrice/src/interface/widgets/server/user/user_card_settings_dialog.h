@@ -3,6 +3,7 @@
 
 #include "user_list_painter.h"
 
+#include <QComboBox>
 #include <QDialog>
 #include <QPixmap>
 
@@ -43,10 +44,12 @@ public:
 
 private slots:
     void onCardNameChanged(const QString &name);
+    void reloadPreview();
     void onParamChanged();
 
 private:
     void setupUi();
+    void populateProviderCombo(const QString &cardName);
     void initializeSearchBar();
     QDoubleSpinBox *makeSpinBox(double min, double max, double value, double step);
 
@@ -56,6 +59,10 @@ private:
     CardDatabaseDisplayModel *cardDatabaseDisplayModel;
     CardSearchModel *searchModel;
     CardCompleterProxyModel *proxyModel;
+
+    QComboBox *providerComboBox;
+
+    QMetaObject::Connection pixmapUpdatedConnection;
 
     QDoubleSpinBox *marginLSpin;
     QDoubleSpinBox *marginRSpin;

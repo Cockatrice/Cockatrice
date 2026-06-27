@@ -904,12 +904,13 @@ void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
         const auto &cap = user.card_art_params();
         CardArtParams params;
         params.cardName = QString::fromStdString(cap.card_name());
+        params.cardProviderId = QString::fromStdString(cap.card_provider_id());
         params.marginPctL = cap.margin_pct_l();
         params.marginPctR = cap.margin_pct_r();
         params.verticalOffset = cap.vertical_offset();
         params.zoom = cap.zoom();
         cardArtParamsMap.insert(userName, params);
-        cardArtProvider->requestCardArt(userName, params.cardName);
+        cardArtProvider->requestCardArt(userName, params.cardName, params.cardProviderId);
     } else {
         cardArtParamsMap.remove(userName); // clear stale params on removal
     }
