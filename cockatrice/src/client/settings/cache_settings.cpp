@@ -309,6 +309,7 @@ SettingsCache::SettingsCache()
     cardViewExpandedRowsMax = settings->value("interface/cardViewExpandedRowsMax", 20).toInt();
     closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
     focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
+    keepGameChatFocus = settings->value("interface/keepGameChatFocus", false).toBool();
 
     showDragSelectionCount = settings->value("interface/showlassoselectioncount", true).toBool();
     showTotalSelectionCount = settings->value("interface/showpersistentselectioncount", true).toBool();
@@ -370,6 +371,7 @@ SettingsCache::SettingsCache()
 
     openDeckInNewTab = settings->value("editor/openDeckInNewTab", false).toBool();
     rewindBufferingMs = settings->value("replay/rewindBufferingMs", 200).toInt();
+    styleUserList = settings->value("appearance/styleUserList", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionCompleter = settings->value("chat/mentioncompleter", true).toBool();
     chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
@@ -455,6 +457,13 @@ void SettingsCache::setFocusCardViewSearchBar(QT_STATE_CHANGED_T value)
 {
     focusCardViewSearchBar = value;
     settings->setValue("interface/focusCardViewSearchBar", focusCardViewSearchBar);
+}
+
+void SettingsCache::setKeepGameChatFocus(QT_STATE_CHANGED_T value)
+{
+    keepGameChatFocus = value;
+    settings->setValue("interface/keepGameChatFocus", keepGameChatFocus);
+    emit keepGameChatFocusChanged(keepGameChatFocus);
 }
 
 void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
@@ -1035,6 +1044,13 @@ void SettingsCache::setRewindBufferingMs(int _rewindBufferingMs)
 {
     rewindBufferingMs = _rewindBufferingMs;
     settings->setValue("replay/rewindBufferingMs", rewindBufferingMs);
+}
+
+void SettingsCache::setStyleUserList(QT_STATE_CHANGED_T _styleUserList)
+{
+    styleUserList = static_cast<bool>(_styleUserList);
+    settings->setValue("appearance/styleUserList", styleUserList);
+    emit styleUserListChanged();
 }
 
 void SettingsCache::setChatMention(QT_STATE_CHANGED_T _chatMention)

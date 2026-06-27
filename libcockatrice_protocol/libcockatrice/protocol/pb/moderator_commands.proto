@@ -11,6 +11,9 @@ message ModeratorCommand {
         FORCE_ACTIVATE_USER = 1007;
         GET_ADMIN_NOTES = 1008;
         UPDATE_ADMIN_NOTES = 1009;
+        ADD_CARD_ART_RULE = 1010;
+        REMOVE_CARD_ART_RULE = 1011;
+        LIST_CARD_ART_RULES = 1012;
     }
     extensions 100 to max;
 }
@@ -105,4 +108,28 @@ message Command_UpdateAdminNotes {
     }
     optional string user_name = 1;
     optional string notes = 2;
+}
+
+message Command_AddCardArtRule {
+    extend ModeratorCommand {
+        optional Command_AddCardArtRule ext = 1010;
+    }
+
+    optional string card_name = 1;
+    optional string mode = 2; // "ALLOW" or "DENY"
+    optional string reason = 3;
+}
+
+message Command_RemoveCardArtRule {
+    extend ModeratorCommand {
+        optional Command_RemoveCardArtRule ext = 1011;
+    }
+
+    optional string card_name = 1;
+}
+
+message Command_ListCardArtRules {
+    extend ModeratorCommand {
+        optional Command_ListCardArtRules ext = 1012;
+    }
 }

@@ -219,9 +219,25 @@ void DlgUpdate::downloadError(const QString &errorString)
 void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 {
     setLabel(tr("Installing..."));
+
+    QString installerPath = filepath.toLocalFile();
+
+    QString appDir = QDir::toNativeSeparators(QCoreApplication::applicationDirPath());
+    QProcess process;
+    process.setProgram(installerPath);
+
+    // NSIS needs the /D= argument to be an UNQUOTED string, even if it contains spaces. Qt likes to quote arguments if
+    // they contain spaces, so we use the windows exclusive QProcess::setNativeArguments in the only case where this is
+    // relevant, which preserves the argument unquoted.
+#ifdef Q_OS_WIN
+    process.setNativeArguments(QString("/R /D=%1").arg(appDir));
+#else
+    // Linux/macOS: normal argument passing (not relevant since they update differently.)
+    process.setArguments({"/R", QString("/D=%1").arg(appDir)});
+#endif
+
     // Try to open the installer. If it opens, quit Cockatrice
-    if (QProcess::startDetached(
-            QString("\"%1\" /R /D=\"%2\"").arg(filepath.toLocalFile(), QCoreApplication::applicationDirPath()))) {
+    if (process.startDetached()) {
         QMetaObject::invokeMethod(static_cast<MainWindow *>(parent()), "close", Qt::QueuedConnection);
         qCInfo(DlgUpdateLog) << "Opened downloaded update file successfully - closing Cockatrice";
         close();

@@ -49,9 +49,24 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     QMap<int, GameTypeMap> tempMap;
     tempMap.insert(info.room_id(), gameTypes);
     gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap, true, true);
+
+    auto *tabs = new QTabWidget(this);
+
+    friendsList = new UserListWidget(tabSupervisor, client, UserListWidget::BuddyList);
+    friendsList->bind(tabSupervisor->getUserListManager());
     userList = new UserListWidget(tabSupervisor, client, UserListWidget::RoomList);
+    userList->bind(tabSupervisor->getUserListManager());
+    ignoreList = new UserListWidget(tabSupervisor, client, UserListWidget::IgnoreList);
+    ignoreList->bind(tabSupervisor->getUserListManager());
+
+    connect(friendsList, SIGNAL(openMessageDialog(const QString &, bool)), this,
+            SIGNAL(openMessageDialog(const QString &, bool)));
     connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this,
             SIGNAL(openMessageDialog(const QString &, bool)));
+
+    tabs->addTab(friendsList, tr("Friends"));
+    tabs->addTab(userList, tr("Online"));
+    tabs->addTab(ignoreList, tr("Ignored"));
 
     chatView = new ChatView(tabSupervisor, nullptr, true, this);
     connect(chatView, &ChatView::showMentionPopup, this, &TabRoom::actShowMentionPopup);
@@ -101,7 +116,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
 
     auto *hbox = new QHBoxLayout;
     hbox->addWidget(splitter, 3);
-    hbox->addWidget(userList, 1);
+    hbox->addWidget(tabs, 1);
 
     aLeaveRoom = new QAction(this);
     connect(aLeaveRoom, &QAction::triggered, this, &TabRoom::closeRequest);
@@ -112,10 +127,8 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
 
     const int userListSize = info.user_list_size();
     for (int i = 0; i < userListSize; ++i) {
-        userList->processUserInfo(info.user_list(i), true);
         autocompleteUserList.append("@" + QString::fromStdString(info.user_list(i).name()));
     }
-    userList->sortItems();
 
     const int gameListSize = info.game_list_size();
     for (int i = 0; i < gameListSize; ++i) {
@@ -269,8 +282,6 @@ void TabRoom::processListGamesEvent(const Event_ListGames &event)
 
 void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)
 {
-    userList->processUserInfo(event.user_info(), true);
-    userList->sortItems();
     if (!autocompleteUserList.contains("@" + QString::fromStdString(event.user_info().name()))) {
         autocompleteUserList << "@" + QString::fromStdString(event.user_info().name());
         sayEdit->setCompletionList(autocompleteUserList);
@@ -279,7 +290,6 @@ void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)
 
 void TabRoom::processLeaveRoomEvent(const Event_LeaveRoom &event)
 {
-    userList->deleteUser(QString::fromStdString(event.name()));
     autocompleteUserList.removeOne("@" + QString::fromStdString(event.name()));
     sayEdit->setCompletionList(autocompleteUserList);
 }

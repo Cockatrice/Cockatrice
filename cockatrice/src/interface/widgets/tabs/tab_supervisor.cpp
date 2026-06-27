@@ -9,6 +9,7 @@
 #include "api/edhrec/tab_edhrec_main.h"
 #include "tab_account.h"
 #include "tab_admin.h"
+#include "tab_card_art_rules.h"
 #include "tab_deck_editor.h"
 #include "tab_deck_storage.h"
 #include "tab_game.h"
@@ -178,6 +179,10 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabAdmin = new QAction(this);
     aTabAdmin->setCheckable(true);
     connect(aTabAdmin, &QAction::triggered, this, &TabSupervisor::actTabAdmin);
+
+    aTabCardArtRules = new QAction(this);
+    aTabCardArtRules->setCheckable(true);
+    connect(aTabCardArtRules, &QAction::triggered, this, &TabSupervisor::actTabCardArtRules);
 
     aTabLog = new QAction(this);
     aTabLog->setCheckable(true);
@@ -435,6 +440,7 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         tabsMenu->addSeparator();
         tabsMenu->addAction(aTabAdmin);
         tabsMenu->addAction(aTabLog);
+        tabsMenu->addAction(aTabCardArtRules);
 
         if (SettingsCache::instance().getTabAdminOpen()) {
             openTabAdmin();
@@ -442,6 +448,7 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         if (SettingsCache::instance().getTabLogOpen()) {
             openTabLog();
         }
+        openTabCardArtRules();
     }
 
     retranslateUi();
@@ -679,6 +686,30 @@ void TabSupervisor::openTabAdmin()
         aTabAdmin->setChecked(false);
     });
     aTabAdmin->setChecked(true);
+}
+
+void TabSupervisor::actTabCardArtRules(bool checked)
+{
+    if (checked && !tabCardArtRules) {
+        openTabCardArtRules();
+        setCurrentWidget(tabCardArtRules);
+    } else if (!checked && tabCardArtRules) {
+        tabCardArtRules->closeRequest();
+    }
+}
+
+void TabSupervisor::openTabCardArtRules()
+{
+    tabCardArtRules = new TabCardArtRules(this, client);
+
+    myAddTab(tabCardArtRules, aTabCardArtRules);
+
+    connect(tabCardArtRules, &QObject::destroyed, this, [this] {
+        tabCardArtRules = nullptr;
+        aTabCardArtRules->setChecked(false);
+    });
+
+    aTabCardArtRules->setChecked(true);
 }
 
 void TabSupervisor::actTabLog(bool checked)
