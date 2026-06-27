@@ -190,6 +190,7 @@ signals:
     void cardPictureLoaderCacheMethodChanged(int cardPictureLoaderCacheMethod);
     void localCardImageStorageNamingSchemeChanged(int localCardImageStorageNamingScheme);
     void masterVolumeChanged(int value);
+    void styleUserListChanged();
     void chatMentionCompleterChanged();
     void downloadSpoilerTimeIndexChanged();
     void downloadSpoilerStatusChanged();
@@ -284,6 +285,7 @@ private:
     bool autoRotateSidewaysLayoutCards;
     bool openDeckInNewTab;
     int rewindBufferingMs;
+    bool styleUserList;
     bool chatMention;
     bool chatMentionCompleter;
     QString chatMentionColor;
@@ -738,6 +740,10 @@ public:
     {
         return rewindBufferingMs;
     }
+    [[nodiscard]] bool getStyleUserList() const
+    {
+        return styleUserList;
+    }
     [[nodiscard]] bool getChatMention() const
     {
         return chatMention;
@@ -1113,6 +1119,7 @@ public slots:
     void setAutoRotateSidewaysLayoutCards(QT_STATE_CHANGED_T _autoRotateSidewaysLayoutCards);
     void setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab);
     void setRewindBufferingMs(int _rewindBufferingMs);
+    void setStyleUserList(QT_STATE_CHANGED_T _styleUserList);
     void setChatMention(QT_STATE_CHANGED_T _chatMention);
     void setChatMentionCompleter(QT_STATE_CHANGED_T _chatMentionCompleter);
     void setChatMentionForeground(QT_STATE_CHANGED_T _chatMentionForeground);

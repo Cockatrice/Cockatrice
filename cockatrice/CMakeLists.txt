@@ -236,10 +236,14 @@ set(cockatrice_SOURCES
     src/interface/widgets/server/handle_public_servers.cpp
     src/interface/widgets/server/remote/remote_decklist_tree_widget.cpp
     src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp
+    src/interface/widgets/server/user/user_avatar_provider.cpp
+    src/interface/widgets/server/user/user_card_art_provider.cpp
+    src/interface/widgets/server/user/user_card_settings_dialog.cpp
     src/interface/widgets/server/user/user_context_menu.cpp
     src/interface/widgets/server/user/user_info_box.cpp
     src/interface/widgets/server/user/user_info_connection.cpp
     src/interface/widgets/server/user/user_list_manager.cpp
+    src/interface/widgets/server/user/user_list_painter.cpp
     src/interface/widgets/server/user/user_list_widget.cpp
     src/interface/widgets/settings_page/appearance_settings_page.cpp
     src/interface/widgets/settings_page/deck_editor_settings_page.cpp
@@ -327,6 +331,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab.cpp
     src/interface/widgets/tabs/tab_account.cpp
     src/interface/widgets/tabs/tab_admin.cpp
+    src/interface/widgets/tabs/tab_card_art_rules.cpp
     src/interface/widgets/tabs/tab_deck_editor.cpp
     src/interface/widgets/tabs/tab_deck_storage.cpp
     src/interface/widgets/tabs/tab_game.cpp
@@ -349,6 +354,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
     src/interface/widgets/utility/compact_push_button.cpp
     src/interface/widgets/utility/compact_push_button.h
+    src/interface/widgets/server/user/user_info_popup.cpp
+    src/interface/widgets/server/user/user_info_popup.h
 )
 
 add_subdirectory(sounds)

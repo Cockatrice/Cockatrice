@@ -42,6 +42,9 @@ void UserListManager::handleDisconnect()
 
     delete ownUserInfo;
     ownUserInfo = nullptr;
+
+    // Full rebuild — all lists are gone
+    emit listReset();
 }
 
 void UserListManager::setOwnUserInfo(const ServerInfo_User &userInfo)
@@ -63,74 +66,77 @@ void UserListManager::processListUsersResponse(const Response &response)
     const int userListSize = resp.user_list_size();
     for (int i = 0; i < userListSize; ++i) {
         const ServerInfo_User &info = resp.user_list(i);
-        const QString &userName = QString::fromStdString(info.name());
-        onlineUsers.insert(userName, info);
+        onlineUsers.insert(QString::fromStdString(info.name()), info);
     }
+
+    // Bulk load complete — widgets rebuild once from the now-populated map
+    emit listReset();
 }
 
 void UserListManager::processUserJoinedEvent(const Event_UserJoined &event)
 {
     const auto &info = event.user_info();
-    const QString &userName = QString::fromStdString(info.name());
-    onlineUsers.insert(userName, info);
+    const QString name = QString::fromStdString(info.name());
+    onlineUsers.insert(name, info);
+
+    emit userJoinedOnline(info);
 }
 
 void UserListManager::processUserLeftEvent(const Event_UserLeft &event)
 {
-    const auto &userName = QString::fromStdString(event.name());
-    onlineUsers.remove(userName);
+    const QString name = QString::fromStdString(event.name());
+    onlineUsers.remove(name);
+
+    emit userLeftOnline(name);
 }
 
 void UserListManager::buddyListReceived(const QList<ServerInfo_User> &_buddyList)
 {
     for (const auto &user : _buddyList) {
-        const auto &userName = QString::fromStdString(user.name());
-        buddyUsers.insert(userName, user);
+        buddyUsers.insert(QString::fromStdString(user.name()), user);
     }
+
+    // Bulk load — one reset covers all newly added entries
+    emit listReset();
 }
 
 void UserListManager::ignoreListReceived(const QList<ServerInfo_User> &_ignoreList)
 {
     for (const auto &user : _ignoreList) {
-        const auto &userName = QString::fromStdString(user.name());
-        ignoredUsers.insert(userName, user);
+        ignoredUsers.insert(QString::fromStdString(user.name()), user);
     }
+
+    // Bulk load — one reset covers all newly added entries
+    emit listReset();
 }
 
 void UserListManager::processAddToListEvent(const Event_AddToList &event)
 {
     const auto &user = event.user_info();
-    const auto &userName = QString::fromStdString(user.name());
+    const QString userName = QString::fromStdString(user.name());
+    const QString listType = QString::fromStdString(event.list_name());
 
-    const auto &userListType = QString::fromStdString(event.list_name());
-
-    QMap<QString, ServerInfo_User> *userMap;
-    if (userListType == "buddy") {
-        userMap = &buddyUsers;
-    } else if (userListType == "ignore") {
-        userMap = &ignoredUsers;
-    } else {
-        return;
+    if (listType == "buddy") {
+        buddyUsers.insert(userName, user);
+        emit addedToBuddyList(user);
+    } else if (listType == "ignore") {
+        ignoredUsers.insert(userName, user);
+        emit addedToIgnoreList(user);
     }
-
-    userMap->insert(userName, user);
 }
 
 void UserListManager::processRemoveFromListEvent(const Event_RemoveFromList &event)
 {
-    const auto &userListType = QString::fromStdString(event.list_name());
-    const auto &userName = QString::fromStdString(event.user_name());
+    const QString listType = QString::fromStdString(event.list_name());
+    const QString userName = QString::fromStdString(event.user_name());
 
-    QMap<QString, ServerInfo_User> *userMap;
-    if (userListType == "buddy") {
-        userMap = &buddyUsers;
-    } else if (userListType == "ignore") {
-        userMap = &ignoredUsers;
-    } else {
-        return;
+    if (listType == "buddy") {
+        buddyUsers.remove(userName);
+        emit removedFromBuddyList(userName);
+    } else if (listType == "ignore") {
+        ignoredUsers.remove(userName);
+        emit removedFromIgnoreList(userName);
     }
-
-    userMap->remove(userName);
 }
 
 bool UserListManager::isOwnUserRegistered() const
@@ -155,16 +161,9 @@ bool UserListManager::isUserIgnored(const QString &userName) const
 
 const ServerInfo_User *UserListManager::getOnlineUser(const QString &userName) const
 {
-    const QString &userNameToMatchLower = userName.toLower();
-
-    const auto it =
-        std::find_if(onlineUsers.begin(), onlineUsers.end(), [&userNameToMatchLower](const ServerInfo_User &user) {
-            return userNameToMatchLower == QString::fromStdString(user.name()).toLower();
-        });
-
-    if (it != onlineUsers.end()) {
-        return &*it;
-    }
-
-    return nullptr;
+    const QString lower = userName.toLower();
+    const auto it = std::find_if(onlineUsers.begin(), onlineUsers.end(), [&lower](const ServerInfo_User &user) {
+        return lower == QString::fromStdString(user.name()).toLower();
+    });
+    return it != onlineUsers.end() ? &*it : nullptr;
 }
