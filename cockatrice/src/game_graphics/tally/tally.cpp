@@ -9,7 +9,6 @@ QList<TallyRow> Tally::compute(const QList<CardItem *> &cards, const TallyType t
             return {};
         case TallyType::Subtypes:
             return SubtypeTally::countSubtypes(cards);
-        default:
-            return {};
     }
+    return {};
 }
