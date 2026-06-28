@@ -246,19 +246,13 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
         totalCountLabel->show();
     }
 
-    if (!SettingsCache::instance().getShowSubtypeSelectionTally() || count <= 1) {
-        tallyContainer->hide();
-        cachedTallyRows.clear();
-        return;
-    }
-
     TallyType tallyType =
         SettingsCache::instance().getShowSubtypeSelectionTally() ? TallyType::Subtypes : TallyType::None;
 
     GameScene *gameScene = static_cast<GameScene *>(scene());
     QList<TallyRow> entries = Tally::compute(gameScene->selectedCards(), tallyType);
 
-    if (entries.isEmpty()) {
+    if (entries.isEmpty() || count <= 1) {
         tallyContainer->hide();
         cachedTallyRows.clear();
         return;
