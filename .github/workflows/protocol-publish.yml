@@ -1,0 +1,89 @@
+name: Publish @cockatrice/protocol
+
+on:
+  release:
+    types:
+      - released    # stable releases only; prereleases intentionally skipped
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/protocol-publish.yml'
+      - 'libcockatrice_protocol/**'
+  workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
+  cancel-in-progress: ${{ github.event_name != 'release' }}
+
+jobs:
+  publish:
+    name: Build and publish protocol package
+    if: ${{ github.repository_owner == 'Cockatrice' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Determine package version
+        id: pkgver
+        shell: bash
+        run: |
+          # Cockatrice stable tags: YYYY-MM-DD-Release-X.Y.Z. Non-release events get a
+          # placeholder version and the publish step is skipped.
+          tag="${{ github.event.release.tag_name }}"
+          if [[ "$GITHUB_EVENT_NAME" == "release" ]]; then
+            if [[ "$tag" =~ Release-([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+              echo "version=${BASH_REMATCH[1]}" >>"$GITHUB_OUTPUT"
+            else
+              echo "::error::Release tag '$tag' does not end in Release-X.Y.Z; refusing to publish."
+              exit 1
+            fi
+          else
+            echo "version=0.0.0-dryrun" >>"$GITHUB_OUTPUT"
+          fi
+
+      - name: Assemble package
+        shell: bash
+        env:
+          PKG_VERSION: ${{ steps.pkgver.outputs.version }}
+        run: |
+          pkg=build/protocol-package
+          rm -rf "$pkg"
+          mkdir -p "$pkg/pb"
+          cp libcockatrice_protocol/libcockatrice/protocol/pb/*.proto "$pkg/pb/"
+          cp libcockatrice_protocol/protocol_version.json "$pkg/"
+          cp libcockatrice_protocol/npm/package.json libcockatrice_protocol/npm/README.md "$pkg/"
+          cp LICENSE "$pkg/"
+          npm --prefix "$pkg" version --no-git-tag-version --allow-same-version "$PKG_VERSION"
+
+      - name: Pack and inspect (dry-run)
+        if: ${{ github.event_name != 'release' }}
+        working-directory: build/protocol-package
+        run: |
+          npm pack
+          ls -la ./*.tgz
+          tar -tzf ./*.tgz | sort
+
+      - name: Publish to GitHub Packages
+        if: ${{ github.event_name == 'release' }}
+        uses: JS-DevTools/npm-publish@v4
+        with:
+          package: build/protocol-package
+          registry: https://npm.pkg.github.com
+          token: ${{ secrets.GITHUB_TOKEN }}
+          access: restricted
+          provenance: true
+          strategy: upgrade

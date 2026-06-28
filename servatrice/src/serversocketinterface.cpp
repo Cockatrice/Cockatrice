@@ -83,6 +83,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_deckstorage.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/protocol/protocol_version.h>
 #include <libcockatrice/utility/trice_limits.h>
 #include <server_response_containers.h>
 #include <server_room.h>
@@ -92,7 +93,7 @@ inline Q_LOGGING_CATEGORY(AbstractServerSocketInterfaceLog, "abstract_server_soc
 inline Q_LOGGING_CATEGORY(TcpServerSocketInterfaceLog, "tcp_server_socket_interface");
 inline Q_LOGGING_CATEGORY(WebsocketServerSocketInterfaceLog, "websocket_server_socket_interface");
 
-static const int protocolVersion = 14;
+static const int protocolVersion = COCKATRICE_PROTOCOL_VERSION;
 
 AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server,
                                                              Servatrice_DatabaseInterface *_databaseInterface,
