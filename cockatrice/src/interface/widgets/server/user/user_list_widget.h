@@ -7,9 +7,17 @@
 #ifndef USERLIST_H
 #define USERLIST_H
 
+#include "../../cards/card_info_picture_art_crop_widget.h"
+#include "user_avatar_provider.h"
+#include "user_card_art_provider.h"
+#include "user_info_popup.h"
+#include "user_list_manager.h"
+#include "user_list_painter.h"
+
 #include <QComboBox>
 #include <QDialog>
 #include <QGroupBox>
+#include <QQueue>
 #include <QStyledItemDelegate>
 #include <QTextEdit>
 #include <QTreeWidgetItem>
@@ -94,12 +102,21 @@ public:
 
 class UserListItemDelegate : public QStyledItemDelegate
 {
+    const QMap<QString, QPixmap> *avatarCache;
+    const QMap<QString, QPixmap> *cardArtCache;
+    const QMap<QString, CardArtParams> *cardArtParamsMap;
+
 public:
-    explicit UserListItemDelegate(QObject *const parent);
+    explicit UserListItemDelegate(QObject *const parent,
+                                  const QMap<QString, QPixmap> *avatarCache,
+                                  const QMap<QString, QPixmap> *cardArtCache,
+                                  const QMap<QString, CardArtParams> *cardArtParamsMap);
     bool editorEvent(QEvent *event,
                      QAbstractItemModel *model,
                      const QStyleOptionViewItem &option,
                      const QModelIndex &index) override;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
 class UserListTWI : public QTreeWidgetItem
@@ -131,6 +148,22 @@ public:
     };
 
 private:
+    UserListManager *manager = nullptr;
+    UserAvatarProvider *avatarProvider = nullptr;
+    UserCardArtProvider *cardArtProvider = nullptr;
+    QMap<QString, CardArtParams> cardArtParamsMap;
+    // ── Hover popup ───────────────────────────────────────────────────────────
+    UserInfoPopup *m_userInfoPopup = nullptr;
+    QTimer *m_showPopupTimer = nullptr;
+    QTimer *m_hidePopupTimer = nullptr;
+    QString m_hoveredUser;
+    bool m_popupPinned = false;
+
+    void showPopupForUser(const QString &userName);
+    void hidePopup(bool immediate = false);
+    void positionPopup(const QString &userName);
+    void connectPopupSignals();
+
     QMap<QString, UserListTWI *> users;
     TabSupervisor *tabSupervisor;
     AbstractClient *client;
@@ -141,6 +174,7 @@ private:
     int onlineCount;
     QString titleStr;
     void updateCount();
+    void refreshPopupButtons(const QString &userName);
 private slots:
     void userClicked(QTreeWidgetItem *item, int column);
 signals:
@@ -149,13 +183,18 @@ signals:
     void removeBuddy(const QString &userName);
     void addIgnore(const QString &userName);
     void removeIgnore(const QString &userName);
+    void joinGameRequested(int gameId, int roomId, bool asSpectator);
 
 public:
     UserListWidget(TabSupervisor *_tabSupervisor,
                    AbstractClient *_client,
                    UserListType _type,
                    QWidget *parent = nullptr);
+    void bind(UserListManager *mgr);
+    void applyDisplayMode();
+    bool eventFilter(QObject *obj, QEvent *event) override;
     void retranslateUi();
+    void rebuild();
     void processUserInfo(const ServerInfo_User &user, bool online);
     bool deleteUser(const QString &userName);
     void setUserOnline(const QString &userName, bool online);
@@ -165,6 +204,9 @@ public:
     }
     void showContextMenu(const QPoint &pos, const QModelIndex &index);
     void sortItems();
+
+protected:
+    void hideEvent(QHideEvent *e) override;
 };
 
 #endif

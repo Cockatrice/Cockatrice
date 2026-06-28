@@ -111,6 +111,15 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     homeTabGroupBox = new QGroupBox;
     homeTabGroupBox->setLayout(homeTabGrid);
 
+    styleUserListCheckBox.setChecked(settings.getStyleUserList());
+    connect(&styleUserListCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setStyleUserList);
+
+    auto stylingTabGrid = new QGridLayout;
+    stylingTabGrid->addWidget(&styleUserListCheckBox, 0, 0, 1, 2);
+
+    stylingGroupBox = new QGroupBox;
+    stylingGroupBox->setLayout(stylingTabGrid);
+
     // Menu settings
     showShortcutsCheckBox.setChecked(settings.getShowShortcuts());
     connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &AppearanceSettingsPage::showShortcutsChanged);
@@ -284,6 +293,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(themeGroupBox);
     mainLayout->addWidget(homeTabGroupBox);
+    mainLayout->addWidget(stylingGroupBox);
     mainLayout->addWidget(menuGroupBox);
     mainLayout->addWidget(printingsGroupBox);
     mainLayout->addWidget(cardsGroupBox);
@@ -397,6 +407,9 @@ void AppearanceSettingsPage::retranslateUi()
     homeTabBackgroundShuffleFrequencyLabel.setText(tr("Home tab background shuffle frequency:"));
     homeTabBackgroundShuffleFrequencySpinBox.setSpecialValueText(tr("Disabled"));
     homeTabDisplayCardNameCheckBox.setText(tr("Display card name of background in bottom right"));
+
+    stylingGroupBox->setTitle(tr("Styling settings"));
+    styleUserListCheckBox.setText(tr("Style user list"));
 
     menuGroupBox->setTitle(tr("Menu settings"));
     showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));

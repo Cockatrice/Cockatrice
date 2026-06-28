@@ -542,3 +542,113 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
 
     delete menu;
 }
+
+void UserContextMenu::execChat(const QString &userName)
+{
+    emit openMessageDialog(userName, true);
+}
+
+void UserContextMenu::execDetails(const QString &userName)
+{
+    auto *w = new UserInfoBox(client, false, static_cast<QWidget *>(parent()),
+                              Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
+    w->setAttribute(Qt::WA_DeleteOnClose);
+    w->updateInfo(userName);
+}
+
+void UserContextMenu::execShowGames(const QString &userName)
+{
+    Command_GetGamesOfUser cmd;
+    cmd.set_user_name(userName.toStdString());
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &UserContextMenu::gamesOfUserReceived);
+    client->sendCommand(pend);
+}
+
+void UserContextMenu::execAddToBuddy(const QString &userName)
+{
+    Command_AddToList cmd;
+    cmd.set_list("buddy");
+    cmd.set_user_name(userName.toStdString());
+    client->sendCommand(client->prepareSessionCommand(cmd));
+}
+
+void UserContextMenu::execRemoveFromBuddy(const QString &userName)
+{
+    Command_RemoveFromList cmd;
+    cmd.set_list("buddy");
+    cmd.set_user_name(userName.toStdString());
+    client->sendCommand(client->prepareSessionCommand(cmd));
+}
+
+void UserContextMenu::execAddToIgnore(const QString &userName)
+{
+    Command_AddToList cmd;
+    cmd.set_list("ignore");
+    cmd.set_user_name(userName.toStdString());
+    client->sendCommand(client->prepareSessionCommand(cmd));
+}
+
+void UserContextMenu::execRemoveFromIgnore(const QString &userName)
+{
+    Command_RemoveFromList cmd;
+    cmd.set_list("ignore");
+    cmd.set_user_name(userName.toStdString());
+    client->sendCommand(client->prepareSessionCommand(cmd));
+}
+
+void UserContextMenu::execBan(const QString &userName)
+{
+    Command_GetUserInfo cmd;
+    cmd.set_user_name(userName.toStdString());
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &UserContextMenu::banUser_processUserInfoResponse);
+    client->sendCommand(pend);
+}
+
+void UserContextMenu::execWarn(const QString &userName)
+{
+    Command_GetUserInfo cmd;
+    cmd.set_user_name(userName.toStdString());
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &UserContextMenu::warnUser_processUserInfoResponse);
+    client->sendCommand(pend);
+}
+
+void UserContextMenu::execBanHistory(const QString &userName)
+{
+    Command_GetBanHistory cmd;
+    cmd.set_user_name(userName.toStdString());
+    PendingCommand *pend = client->prepareModeratorCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &UserContextMenu::banUserHistory_processResponse);
+    client->sendCommand(pend);
+}
+
+void UserContextMenu::execWarnHistory(const QString &userName)
+{
+    Command_GetWarnHistory cmd;
+    cmd.set_user_name(userName.toStdString());
+    PendingCommand *pend = client->prepareModeratorCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &UserContextMenu::warnUserHistory_processResponse);
+    client->sendCommand(pend);
+}
+
+void UserContextMenu::execAdminNotes(const QString &userName)
+{
+    Command_GetAdminNotes cmd;
+    cmd.set_user_name(userName.toStdString());
+    auto *pend = client->prepareModeratorCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &UserContextMenu::getAdminNotes_processResponse);
+    client->sendCommand(pend);
+}
+
+void UserContextMenu::execAdjustMod(const QString &userName, bool shouldBeMod, bool shouldBeJudge)
+{
+    Command_AdjustMod cmd;
+    cmd.set_user_name(userName.toStdString());
+    cmd.set_should_be_mod(shouldBeMod);
+    cmd.set_should_be_judge(shouldBeJudge);
+    PendingCommand *pend = client->prepareAdminCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &UserContextMenu::adjustMod_processUserResponse);
+    client->sendCommand(pend);
+}

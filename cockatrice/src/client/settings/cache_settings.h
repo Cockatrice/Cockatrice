@@ -190,6 +190,7 @@ signals:
     void cardPictureLoaderCacheMethodChanged(int cardPictureLoaderCacheMethod);
     void localCardImageStorageNamingSchemeChanged(int localCardImageStorageNamingScheme);
     void masterVolumeChanged(int value);
+    void styleUserListChanged();
     void chatMentionCompleterChanged();
     void downloadSpoilerTimeIndexChanged();
     void downloadSpoilerStatusChanged();
@@ -284,6 +285,7 @@ private:
     bool autoRotateSidewaysLayoutCards;
     bool openDeckInNewTab;
     int rewindBufferingMs;
+    bool styleUserList;
     bool chatMention;
     bool chatMentionCompleter;
     QString chatMentionColor;
@@ -353,6 +355,7 @@ private:
     bool showStatusBar;
     bool showDragSelectionCount;
     bool showTotalSelectionCount;
+    bool showSubtypeSelectionTally;
 
 public:
     SettingsCache();
@@ -475,6 +478,10 @@ public:
     [[nodiscard]] bool getShowTotalSelectionCount() const
     {
         return showTotalSelectionCount;
+    }
+    [[nodiscard]] bool getShowSubtypeSelectionTally() const
+    {
+        return showSubtypeSelectionTally;
     }
     [[nodiscard]] bool getNotificationsEnabled() const
     {
@@ -737,6 +744,10 @@ public:
     [[nodiscard]] int getRewindBufferingMs() const
     {
         return rewindBufferingMs;
+    }
+    [[nodiscard]] bool getStyleUserList() const
+    {
+        return styleUserList;
     }
     [[nodiscard]] bool getChatMention() const
     {
@@ -1113,6 +1124,7 @@ public slots:
     void setAutoRotateSidewaysLayoutCards(QT_STATE_CHANGED_T _autoRotateSidewaysLayoutCards);
     void setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab);
     void setRewindBufferingMs(int _rewindBufferingMs);
+    void setStyleUserList(QT_STATE_CHANGED_T _styleUserList);
     void setChatMention(QT_STATE_CHANGED_T _chatMention);
     void setChatMentionCompleter(QT_STATE_CHANGED_T _chatMentionCompleter);
     void setChatMentionForeground(QT_STATE_CHANGED_T _chatMentionForeground);
@@ -1169,5 +1181,6 @@ public slots:
     void setRoundCardCorners(bool _roundCardCorners);
     void setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount);
     void setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSelectionCount);
+    void setShowSubtypeSelectionTally(QT_STATE_CHANGED_T _showSubtypeSelectionTally);
 };
 #endif

@@ -5,6 +5,7 @@
 #include "../../interface/widgets/dialogs/dlg_edit_password.h"
 #include "../../interface/widgets/dialogs/dlg_edit_user.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
+#include "user_card_settings_dialog.h"
 
 #include <QDateTime>
 #include <QGridLayout>
@@ -61,11 +62,13 @@ UserInfoBox::UserInfoBox(AbstractClient *_client, bool _editable, QWidget *paren
         buttonsLayout->addWidget(&editButton);
         buttonsLayout->addWidget(&passwordButton);
         buttonsLayout->addWidget(&avatarButton);
+        buttonsLayout->addWidget(&bannerCardButton);
         mainLayout->addLayout(buttonsLayout, 7, 0, 1, 3);
 
         connect(&editButton, &QPushButton::clicked, this, &UserInfoBox::actEdit);
         connect(&passwordButton, &QPushButton::clicked, this, &UserInfoBox::actPassword);
         connect(&avatarButton, &QPushButton::clicked, this, &UserInfoBox::actAvatar);
+        connect(&bannerCardButton, &QPushButton::clicked, this, &UserInfoBox::actBannerCard);
     }
 
     setWindowTitle(tr("User Information"));
@@ -83,11 +86,15 @@ void UserInfoBox::retranslateUi()
     editButton.setText(tr("Edit"));
     passwordButton.setText(tr("Change password"));
     avatarButton.setText(tr("Change avatar"));
+    bannerCardButton.setText(tr("Edit Banner Card"));
 }
 
 void UserInfoBox::updateInfo(const ServerInfo_User &user)
 {
-    userLevel = UserLevelFlags(user.user_level());
+    currentUserInfo = user;
+    hasUserInfo = true;
+
+    const UserLevelFlags userLevel(user.user_level());
     pawnColors = user.pawn_colors();
     privLevel = QString::fromStdString(user.privlevel());
 
@@ -303,6 +310,49 @@ void UserInfoBox::actAvatar()
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &UserInfoBox::processAvatarResponse);
 
+    client->sendCommand(pend);
+}
+
+void UserInfoBox::actBannerCard()
+{
+    CardArtParams initial;
+    if (hasUserInfo && currentUserInfo.has_card_art_params()) {
+        const auto &cap = currentUserInfo.card_art_params();
+        initial.cardName = QString::fromStdString(cap.card_name());
+        initial.marginPctL = cap.margin_pct_l();
+        initial.marginPctR = cap.margin_pct_r();
+        initial.verticalOffset = cap.vertical_offset();
+        initial.zoom = cap.zoom();
+    }
+
+    UserCardArtSettingsDialog dlg(initial, this);
+    if (dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    const CardArtParams p = dlg.params();
+
+    Command_SetCardArtParams cmd;
+    cmd.set_card_name(p.cardName.toStdString());
+    if (!p.cardName.isEmpty()) {
+        cmd.set_card_provider_id(p.cardProviderId.toStdString());
+        cmd.set_margin_pct_l(p.marginPctL);
+        cmd.set_margin_pct_r(p.marginPctR);
+        cmd.set_vertical_offset(p.verticalOffset);
+        cmd.set_zoom(p.zoom);
+    }
+
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, [p, this](const Response &r) {
+        if (r.response_code() != Response::RespOk) {
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("The selected card is blacklisted on this server or another error occurred."));
+        } else {
+            updateInfo(nameLabel.text()); // re-fetch so currentUserInfo reflects the change
+            QMessageBox::information(this, tr("Information"),
+                                     p.cardName.isEmpty() ? tr("Banner card removed.") : tr("Banner card updated."));
+        }
+    });
     client->sendCommand(pend);
 }
 

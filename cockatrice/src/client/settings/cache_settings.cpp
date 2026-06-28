@@ -313,6 +313,7 @@ SettingsCache::SettingsCache()
 
     showDragSelectionCount = settings->value("interface/showlassoselectioncount", true).toBool();
     showTotalSelectionCount = settings->value("interface/showpersistentselectioncount", true).toBool();
+    showSubtypeSelectionTally = settings->value("interface/showsubtypeselectiontally", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     showGameSelectorFilterToolbar = settings->value("menu/showgameselectorfiltertoolbar", true).toBool();
@@ -371,6 +372,7 @@ SettingsCache::SettingsCache()
 
     openDeckInNewTab = settings->value("editor/openDeckInNewTab", false).toBool();
     rewindBufferingMs = settings->value("replay/rewindBufferingMs", 200).toInt();
+    styleUserList = settings->value("appearance/styleUserList", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionCompleter = settings->value("chat/mentioncompleter", true).toBool();
     chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
@@ -1045,6 +1047,13 @@ void SettingsCache::setRewindBufferingMs(int _rewindBufferingMs)
     settings->setValue("replay/rewindBufferingMs", rewindBufferingMs);
 }
 
+void SettingsCache::setStyleUserList(QT_STATE_CHANGED_T _styleUserList)
+{
+    styleUserList = static_cast<bool>(_styleUserList);
+    settings->setValue("appearance/styleUserList", styleUserList);
+    emit styleUserListChanged();
+}
+
 void SettingsCache::setChatMention(QT_STATE_CHANGED_T _chatMention)
 {
     chatMention = static_cast<bool>(_chatMention);
@@ -1385,6 +1394,12 @@ void SettingsCache::setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSele
 {
     showTotalSelectionCount = static_cast<bool>(_showTotalSelectionCount);
     settings->setValue("interface/showpersistentselectioncount", showTotalSelectionCount);
+}
+
+void SettingsCache::setShowSubtypeSelectionTally(QT_STATE_CHANGED_T _showSubtypeSelectionTally)
+{
+    showSubtypeSelectionTally = static_cast<bool>(_showSubtypeSelectionTally);
+    settings->setValue("interface/showsubtypeselectiontally", showSubtypeSelectionTally);
 }
 
 void SettingsCache::loadPaths()

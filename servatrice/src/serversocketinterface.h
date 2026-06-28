@@ -129,6 +129,11 @@ private:
 
     Response::ResponseCode cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc);
+    bool isCardNameAllowed(const QString &cardName, const QString &cardProviderId);
+    Response::ResponseCode cmdSetCardArtParams(const Command_SetCardArtParams &cmd, ResponseContainer &);
+    Response::ResponseCode cmdAddCardArtRule(const Command_AddCardArtRule &cmd, ResponseContainer &);
+    Response::ResponseCode cmdRemoveCardArtRule(const Command_RemoveCardArtRule &cmd, ResponseContainer &);
+    Response::ResponseCode cmdListCardArtRules(const Command_ListCardArtRules &, ResponseContainer &rc);
     Response::ResponseCode cmdAccountPassword(const Command_AccountPassword &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGrantReplayAccess(const Command_GrantReplayAccess &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdForceActivateUser(const Command_ForceActivateUser &cmd, ResponseContainer &rc);

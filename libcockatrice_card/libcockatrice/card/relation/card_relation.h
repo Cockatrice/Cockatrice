@@ -31,6 +31,7 @@ private:
     bool isVariableCount;      ///< True if the number of creations is variable.
     int defaultCount;          ///< Default number of cards created or involved.
     bool isPersistent;         ///< True if this relation persists (i.e. is not destroyed) on zone change.
+    bool isFaceDown;           ///< True if this relation creates the tokens facedown
 
 public:
     /**
@@ -42,13 +43,15 @@ public:
      * @param _isVariableCount Whether the count is variable.
      * @param _defaultCount Default number for creations or transformations.
      * @param _isPersistent Whether the relation persists across zone changes.
+     * @param _isFaceDown Whether the relation creates the token face down
      */
     explicit CardRelation(const QString &_name = QString(),
                           CardRelationType _attachType = CardRelationType::DoesNotAttach,
                           bool _isCreateAllExclusion = false,
                           bool _isVariableCount = false,
                           int _defaultCount = 1,
-                          bool _isPersistent = false);
+                          bool _isPersistent = false,
+                          bool _isFaceDown = false);
 
     /**
      * @brief Returns the name of the related card.
@@ -150,6 +153,16 @@ public:
     [[nodiscard]] bool getIsPersistent() const
     {
         return isPersistent;
+    }
+
+    /**
+     * @brief Returns whether the relation creates the token facedown.
+     *
+     * @return True if facedown, false otherwise.
+     */
+    [[nodiscard]] bool getIsFaceDown() const
+    {
+        return isFaceDown;
     }
 };
 
