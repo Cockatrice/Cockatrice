@@ -28,9 +28,9 @@ TEST(ServerCardCounter, IncrementExistingCounter)
 TEST(ServerCardCounter, IncrementOverflowProtection)
 {
     Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
-    ASSERT_TRUE(card.setCounter(1, MAX_COUNTERS_ON_CARD));
+    ASSERT_TRUE(card.setCounter(1, MAX_COUNTER_VALUE));
     EXPECT_FALSE(card.incrementCounter(1, 1));
-    EXPECT_EQ(card.getCounter(1), MAX_COUNTERS_ON_CARD);
+    EXPECT_EQ(card.getCounter(1), MAX_COUNTER_VALUE);
 }
 
 TEST(ServerCardCounter, DecrementUnderflowProtection)
@@ -113,13 +113,13 @@ TEST(ServerCardCounter, IncrementCounterPopulatesEvent)
 TEST(ServerCardCounter, IncrementCounterEventReflectsClampedValue)
 {
     Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
-    ASSERT_TRUE(card.setCounter(1, MAX_COUNTERS_ON_CARD - 5));
+    ASSERT_TRUE(card.setCounter(1, MAX_COUNTER_VALUE - 5));
 
     Event_SetCardCounter event;
     EXPECT_TRUE(card.incrementCounter(1, 10, &event));
 
     EXPECT_EQ(event.counter_id(), 1);
-    EXPECT_EQ(event.counter_value(), MAX_COUNTERS_ON_CARD);
+    EXPECT_EQ(event.counter_value(), MAX_COUNTER_VALUE);
 }
 
 TEST(ServerCardCounter, IncrementCounterNoEventWhenNullptr)
@@ -133,7 +133,7 @@ TEST(ServerCardCounter, IncrementCounterNoEventWhenNullptr)
 TEST(ServerCardCounter, IncrementCounterEventNotPopulatedWhenUnchanged)
 {
     Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
-    ASSERT_TRUE(card.setCounter(1, MAX_COUNTERS_ON_CARD));
+    ASSERT_TRUE(card.setCounter(1, MAX_COUNTER_VALUE));
 
     Event_SetCardCounter event;
     event.set_counter_id(999);
@@ -156,7 +156,7 @@ TEST(ServerCardCounter, SetCounterClampsAboveMaxToMax)
 {
     Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
     EXPECT_TRUE(card.setCounter(1, 1500));
-    EXPECT_EQ(card.getCounter(1), MAX_COUNTERS_ON_CARD);
+    EXPECT_EQ(card.getCounter(1), MAX_COUNTER_VALUE);
 }
 
 TEST(ServerCardCounter, IncrementDoesNotGoBelowZero)
@@ -171,9 +171,9 @@ TEST(ServerCardCounter, IncrementDoesNotGoBelowZero)
 TEST(ServerCardCounter, IncrementDoesNotExceedMax)
 {
     Server_Card card(CardRef{"TestCard", ""}, 1, 0, 0);
-    ASSERT_TRUE(card.setCounter(1, MAX_COUNTERS_ON_CARD - 5));
+    ASSERT_TRUE(card.setCounter(1, MAX_COUNTER_VALUE - 5));
     EXPECT_TRUE(card.incrementCounter(1, 10));
-    EXPECT_EQ(card.getCounter(1), MAX_COUNTERS_ON_CARD);
+    EXPECT_EQ(card.getCounter(1), MAX_COUNTER_VALUE);
 }
 
 int main(int argc, char **argv)

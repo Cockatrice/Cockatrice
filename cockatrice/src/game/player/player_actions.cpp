@@ -27,6 +27,7 @@
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
+#include <libcockatrice/utility/clamped_arithmetic.h>
 #include <libcockatrice/utility/expression.h>
 #include <libcockatrice/utility/trice_limits.h>
 #include <libcockatrice/utility/zone_names.h>
@@ -1530,12 +1531,15 @@ void PlayerActions::offsetCardCounter(QList<CardItem *> selectedCards, int count
     QList<const ::google::protobuf::Message *> commandList;
     for (auto card : selectedCards) {
         int oldValue = card->getCounters().value(counterId, 0);
-        int newValue = oldValue + offset;
 
-        // Early exit optimization: server enforces [0, MAX_COUNTERS_ON_CARD].
-        // Compare clamped value to allow recovery from invalid states.
-        int clampedValue = qBound(0, newValue, MAX_COUNTERS_ON_CARD);
-        if (clampedValue != oldValue) {
+        // Overflow-safe clamp to the server-enforced range [0, MAX_COUNTER_VALUE];
+        // a result differing from oldValue also corrects an out-of-range cached value.
+        // Callers only ever pass offset == ±1 (actAddCardCounter / actRemoveCardCounter).
+        // This client-side clamp is a defense-in-depth UX check, consistent with
+        // actSetCardCounter and actIncrementAllCardCounters; the server remains the
+        // authoritative enforcer of the bounds.
+        int newValue = addClamped(oldValue, offset, 0, MAX_COUNTER_VALUE);
+        if (newValue != oldValue) {
             auto *cmd = new Command_SetCardCounter;
             cmd->set_zone(card->getZone()->getName().toStdString());
             cmd->set_card_id(card->getId());
@@ -1568,7 +1572,7 @@ void PlayerActions::actSetCardCounter(QList<CardItem *> selectedCards, int count
         Expression exp(oldValue);
         double parsed = exp.parse(counterValue);
         // Clamp in double precision first to avoid UB, then cast
-        int number = static_cast<int>(qBound(0.0, parsed, static_cast<double>(MAX_COUNTERS_ON_CARD)));
+        int number = static_cast<int>(qBound(0.0, parsed, static_cast<double>(MAX_COUNTER_VALUE)));
 
         auto *cmd = new Command_SetCardCounter;
         cmd->set_zone(card->getZone()->getName().toStdString());
@@ -1598,7 +1602,7 @@ void PlayerActions::actIncrementAllCardCounters(QList<CardItem *> cardsToUpdate)
             counterIterator.next();
             int counterId = counterIterator.key();
             int currentValue = counterIterator.value();
-            if (currentValue >= MAX_COUNTERS_ON_CARD) {
+            if (currentValue >= MAX_COUNTER_VALUE) {
                 continue;
             }
 

@@ -4,6 +4,7 @@ enable_testing()
 
 add_test(NAME dummy_test COMMAND dummy_test)
 add_test(NAME expression_test COMMAND expression_test)
+add_test(NAME clamped_arithmetic_test COMMAND clamped_arithmetic_test)
 add_test(NAME test_age_formatting COMMAND test_age_formatting)
 add_test(NAME password_hash_test COMMAND password_hash_test)
 add_test(NAME server_card_counter_test COMMAND server_card_counter_test)
@@ -16,6 +17,7 @@ set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 5)
 
 add_executable(dummy_test dummy_test.cpp)
 add_executable(expression_test expression_test.cpp)
+add_executable(clamped_arithmetic_test clamped_arithmetic_test.cpp)
 add_executable(test_age_formatting test_age_formatting.cpp)
 add_executable(password_hash_test password_hash_test.cpp)
 add_executable(deck_hash_performance_test deck_hash_performance_test.cpp)
@@ -49,6 +51,7 @@ if(NOT GTEST_FOUND)
   set(GTEST_BOTH_LIBRARIES gtest)
   add_dependencies(dummy_test gtest)
   add_dependencies(expression_test gtest)
+  add_dependencies(clamped_arithmetic_test gtest)
   add_dependencies(test_age_formatting gtest)
   add_dependencies(password_hash_test gtest)
   add_dependencies(deck_hash_performance_test gtest)
@@ -59,6 +62,9 @@ endif()
 include_directories(${GTEST_INCLUDE_DIRS})
 target_link_libraries(dummy_test Threads::Threads ${GTEST_BOTH_LIBRARIES})
 target_link_libraries(expression_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(
+  clamped_arithmetic_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+)
 target_link_libraries(
   test_age_formatting libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
