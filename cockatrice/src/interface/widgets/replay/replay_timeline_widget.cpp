@@ -11,6 +11,7 @@ ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
       currentEvent(0)
 {
     replayTimer = new QTimer(this);
+    replayTimer->setInterval(TIMER_INTERVAL_MS);
     connect(replayTimer, &QTimer::timeout, this, &ReplayTimelineWidget::replayTimerTimeout);
 
     rewindBufferingTimer = new QTimer(this);
@@ -186,12 +187,13 @@ void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
 void ReplayTimelineWidget::setTimeScaleFactor(qreal _timeScaleFactor)
 {
     timeScaleFactor = _timeScaleFactor;
-    replayTimer->setInterval(static_cast<int>(TIMER_INTERVAL_MS / timeScaleFactor));
+    int interval = qRound(TIMER_INTERVAL_MS / timeScaleFactor);
+    replayTimer->setInterval(interval);
 }
 
 void ReplayTimelineWidget::startReplay()
 {
-    replayTimer->start(static_cast<int>(TIMER_INTERVAL_MS / timeScaleFactor));
+    replayTimer->start();
 }
 
 void ReplayTimelineWidget::stopReplay()

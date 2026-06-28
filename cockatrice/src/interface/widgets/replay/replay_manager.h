@@ -14,6 +14,7 @@
 #include <QWidget>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 
+class ReplayQuickSettingsWidget;
 class TabGame;
 
 class ReplayManager : public QWidget
@@ -35,13 +36,14 @@ private:
     QList<int> replayTimeline;
     ReplayTimelineWidget *timelineWidget;
     QToolButton *replayPlayButton, *replayFastForwardButton;
+    ReplayQuickSettingsWidget *settingsWidget;
     QAction *aReplaySkipForward, *aReplaySkipBackward, *aReplaySkipForwardBig, *aReplaySkipBackwardBig;
 
 private slots:
     void replayNextEvent(EventProcessingOptions options);
     void replayFinished();
     void replayPlayButtonToggled(bool checked);
-    void replayFastForwardButtonToggled(bool checked);
+    void updateTimeScaleFactor(bool checked);
     void replayRewind();
     void refreshShortcuts();
 };

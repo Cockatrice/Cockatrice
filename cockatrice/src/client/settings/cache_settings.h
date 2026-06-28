@@ -285,6 +285,7 @@ private:
     bool autoRotateSidewaysLayoutCards;
     bool openDeckInNewTab;
     int rewindBufferingMs;
+    qreal fastForwardSpeed;
     bool styleUserList;
     bool chatMention;
     bool chatMentionCompleter;
@@ -745,6 +746,10 @@ public:
     {
         return rewindBufferingMs;
     }
+    [[nodiscard]] qreal getFastForwardSpeed() const
+    {
+        return fastForwardSpeed;
+    }
     [[nodiscard]] bool getStyleUserList() const
     {
         return styleUserList;
@@ -1124,6 +1129,7 @@ public slots:
     void setAutoRotateSidewaysLayoutCards(QT_STATE_CHANGED_T _autoRotateSidewaysLayoutCards);
     void setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab);
     void setRewindBufferingMs(int _rewindBufferingMs);
+    void setFastForwardSpeed(qreal _value);
     void setStyleUserList(QT_STATE_CHANGED_T _styleUserList);
     void setChatMention(QT_STATE_CHANGED_T _chatMention);
     void setChatMentionCompleter(QT_STATE_CHANGED_T _chatMentionCompleter);

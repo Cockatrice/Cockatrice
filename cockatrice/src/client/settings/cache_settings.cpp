@@ -372,6 +372,7 @@ SettingsCache::SettingsCache()
 
     openDeckInNewTab = settings->value("editor/openDeckInNewTab", false).toBool();
     rewindBufferingMs = settings->value("replay/rewindBufferingMs", 200).toInt();
+    fastForwardSpeed = settings->value("replay/fastForwardSpeed", 10).toReal();
     styleUserList = settings->value("appearance/styleUserList", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionCompleter = settings->value("chat/mentioncompleter", true).toBool();
@@ -1045,6 +1046,12 @@ void SettingsCache::setRewindBufferingMs(int _rewindBufferingMs)
 {
     rewindBufferingMs = _rewindBufferingMs;
     settings->setValue("replay/rewindBufferingMs", rewindBufferingMs);
+}
+
+void SettingsCache::setFastForwardSpeed(qreal _value)
+{
+    fastForwardSpeed = _value;
+    settings->setValue("replay/fastForwardSpeed", fastForwardSpeed);
 }
 
 void SettingsCache::setStyleUserList(QT_STATE_CHANGED_T _styleUserList)

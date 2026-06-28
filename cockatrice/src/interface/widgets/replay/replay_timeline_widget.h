@@ -55,7 +55,6 @@ private slots:
 public:
     static constexpr int SMALL_SKIP_MS = 1000;
     static constexpr int BIG_SKIP_MS = 10000;
-    static constexpr qreal FAST_FORWARD_SCALE_FACTOR = 10.0;
 
     explicit ReplayTimelineWidget(QWidget *parent = nullptr);
     void setTimeline(const QList<int> &_replayTimeline);
