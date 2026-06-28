@@ -320,7 +320,7 @@ jobs:
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             qt_arch: clang_64
-            qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools
+            qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools qttranslations
             qt_modules: qtwebsockets
             qt_version: 6.11.0
             soc: Apple
