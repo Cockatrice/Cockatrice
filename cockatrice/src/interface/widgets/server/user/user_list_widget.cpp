@@ -707,13 +707,13 @@ void UserListWidget::connectPopupSignals()
     connect(m_userInfoPopup, &UserInfoPopup::warnHistoryRequested, userContextMenu, &UserContextMenu::execWarnHistory);
     connect(m_userInfoPopup, &UserInfoPopup::adminNotesRequested, userContextMenu, &UserContextMenu::execAdminNotes);
     connect(m_userInfoPopup, &UserInfoPopup::promoteToModRequested, this,
-            [this](const QString &n) { userContextMenu->execAdjustMod(n, true, false); });
+            [this](const QString &n) { userContextMenu->execAdjustMod(n, true); });
     connect(m_userInfoPopup, &UserInfoPopup::demoteFromModRequested, this,
-            [this](const QString &n) { userContextMenu->execAdjustMod(n, false, false); });
+            [this](const QString &n) { userContextMenu->execAdjustMod(n, false); });
     connect(m_userInfoPopup, &UserInfoPopup::promoteToJudgeRequested, this,
-            [this](const QString &n) { userContextMenu->execAdjustMod(n, false, true); });
+            [this](const QString &n) { userContextMenu->execAdjustJudge(n, true); });
     connect(m_userInfoPopup, &UserInfoPopup::demoteFromJudgeRequested, this,
-            [this](const QString &n) { userContextMenu->execAdjustMod(n, false, false); });
+            [this](const QString &n) { userContextMenu->execAdjustJudge(n, false); });
 }
 
 bool UserListWidget::eventFilter(QObject *obj, QEvent *event)

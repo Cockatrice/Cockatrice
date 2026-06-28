@@ -436,103 +436,35 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     QAction *actionClicked = menu->exec(pos);
     if (actionClicked == nullptr) {
     } else if (actionClicked == aDetails) {
-        auto *infoWidget =
-            new UserInfoBox(client, false, static_cast<QWidget *>(parent()),
-                            Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
-        infoWidget->setAttribute(Qt::WA_DeleteOnClose);
-        infoWidget->updateInfo(userName);
+        execDetails(userName);
     } else if (actionClicked == aChat) {
-        emit openMessageDialog(userName, true);
+        execChat(userName);
     } else if (actionClicked == aShowGames) {
-        Command_GetGamesOfUser cmd;
-        cmd.set_user_name(userName.toStdString());
-
-        PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &UserContextMenu::gamesOfUserReceived);
-
-        client->sendCommand(pend);
+        execShowGames(userName);
     } else if (actionClicked == aAddToBuddyList) {
-        Command_AddToList cmd;
-        cmd.set_list("buddy");
-        cmd.set_user_name(userName.toStdString());
-
-        client->sendCommand(client->prepareSessionCommand(cmd));
+        execAddToBuddy(userName);
     } else if (actionClicked == aRemoveFromBuddyList) {
-        Command_RemoveFromList cmd;
-        cmd.set_list("buddy");
-        cmd.set_user_name(userName.toStdString());
-
-        client->sendCommand(client->prepareSessionCommand(cmd));
+        execRemoveFromBuddy(userName);
     } else if (actionClicked == aAddToIgnoreList) {
-        Command_AddToList cmd;
-        cmd.set_list("ignore");
-        cmd.set_user_name(userName.toStdString());
-
-        client->sendCommand(client->prepareSessionCommand(cmd));
+        execAddToIgnore(userName);
     } else if (actionClicked == aRemoveFromIgnoreList) {
-        Command_RemoveFromList cmd;
-        cmd.set_list("ignore");
-        cmd.set_user_name(userName.toStdString());
-
-        client->sendCommand(client->prepareSessionCommand(cmd));
+        execRemoveFromIgnore(userName);
     } else if (actionClicked == aKick) {
-        auto result = QMessageBox::question(static_cast<QWidget *>(parent()), tr("Kick Player"),
-                                            tr("Are you sure you want to kick this player from the game?"),
-                                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if (result == QMessageBox::Yes) {
-            Command_KickFromGame cmd;
-            cmd.set_player_id(playerId);
-
-            game->getGameEventHandler()->sendGameCommand(cmd);
-        }
+        execKick(playerId);
     } else if (actionClicked == aBan) {
-        Command_GetUserInfo cmd;
-        cmd.set_user_name(userName.toStdString());
-
-        PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &UserContextMenu::banUser_processUserInfoResponse);
-        client->sendCommand(pend);
+        execBan(userName);
     } else if (actionClicked == aPromoteToMod || actionClicked == aDemoteFromMod) {
-        Command_AdjustMod cmd;
-        cmd.set_user_name(userName.toStdString());
-        cmd.set_should_be_mod(actionClicked == aPromoteToMod);
-
-        PendingCommand *pend = client->prepareAdminCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &UserContextMenu::adjustMod_processUserResponse);
-        client->sendCommand(pend);
+        execAdjustMod(userName, actionClicked == aPromoteToMod);
     } else if (actionClicked == aPromoteToJudge || actionClicked == aDemoteFromJudge) {
-        Command_AdjustMod cmd;
-        cmd.set_user_name(userName.toStdString());
-        cmd.set_should_be_judge(actionClicked == aPromoteToJudge);
-
-        PendingCommand *pend = client->prepareAdminCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &UserContextMenu::adjustMod_processUserResponse);
-        client->sendCommand(pend);
+        execAdjustJudge(userName, actionClicked == aPromoteToJudge);
     } else if (actionClicked == aBanHistory) {
-        Command_GetBanHistory cmd;
-        cmd.set_user_name(userName.toStdString());
-        PendingCommand *pend = client->prepareModeratorCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &UserContextMenu::banUserHistory_processResponse);
-        client->sendCommand(pend);
+        execBanHistory(userName);
     } else if (actionClicked == aWarnUser) {
-        Command_GetUserInfo cmd;
-        cmd.set_user_name(userName.toStdString());
-        PendingCommand *pend = client->prepareSessionCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &UserContextMenu::warnUser_processUserInfoResponse);
-        client->sendCommand(pend);
+        execWarn(userName);
     } else if (actionClicked == aWarnHistory) {
-        Command_GetWarnHistory cmd;
-        cmd.set_user_name(userName.toStdString());
-        PendingCommand *pend = client->prepareModeratorCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &UserContextMenu::warnUserHistory_processResponse);
-        client->sendCommand(pend);
+        execWarnHistory(userName);
     } else if (actionClicked == aGetAdminNotes) {
-        Command_GetAdminNotes cmd;
-        cmd.set_user_name(userName.toStdString());
-        auto *pend = client->prepareModeratorCommand(cmd);
-        connect(pend, &PendingCommand::finished, this, &UserContextMenu::getAdminNotes_processResponse);
-        client->sendCommand(pend);
-
+        execAdminNotes(userName);
     } else if (actionClicked == aCopyToClipBoard) {
         QClipboard *clipboard = QGuiApplication::clipboard();
         clipboard->setText(deckHash);
@@ -597,6 +529,19 @@ void UserContextMenu::execRemoveFromIgnore(const QString &userName)
     client->sendCommand(client->prepareSessionCommand(cmd));
 }
 
+void UserContextMenu::execKick(int playerId)
+{
+    auto result = QMessageBox::question(static_cast<QWidget *>(parent()), tr("Kick Player"),
+                                        tr("Are you sure you want to kick this player from the game?"),
+                                        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (result == QMessageBox::Yes) {
+        Command_KickFromGame cmd;
+        cmd.set_player_id(playerId);
+
+        game->getGameEventHandler()->sendGameCommand(cmd);
+    }
+}
+
 void UserContextMenu::execBan(const QString &userName)
 {
     Command_GetUserInfo cmd;
@@ -642,11 +587,20 @@ void UserContextMenu::execAdminNotes(const QString &userName)
     client->sendCommand(pend);
 }
 
-void UserContextMenu::execAdjustMod(const QString &userName, bool shouldBeMod, bool shouldBeJudge)
+void UserContextMenu::execAdjustMod(const QString &userName, bool shouldBeMod)
 {
     Command_AdjustMod cmd;
     cmd.set_user_name(userName.toStdString());
     cmd.set_should_be_mod(shouldBeMod);
+    PendingCommand *pend = client->prepareAdminCommand(cmd);
+    connect(pend, &PendingCommand::finished, this, &UserContextMenu::adjustMod_processUserResponse);
+    client->sendCommand(pend);
+}
+
+void UserContextMenu::execAdjustJudge(const QString &userName, bool shouldBeJudge)
+{
+    Command_AdjustMod cmd;
+    cmd.set_user_name(userName.toStdString());
     cmd.set_should_be_judge(shouldBeJudge);
     PendingCommand *pend = client->prepareAdminCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &UserContextMenu::adjustMod_processUserResponse);
