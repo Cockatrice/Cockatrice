@@ -1,7 +1,8 @@
 // Unit tests for the pure authorization logic extracted from the counter command
-// handlers. Server_Player::evaluateDelCounter() and evaluateSetCounterActive() are
-// static and depend only on their arguments, so each guard branch can be exercised
-// directly without a started game, network stack, or player fixture.
+// handlers. Server_Player::evaluateDelCounter(), evaluateSetCounterActive() and
+// evaluateModifyCounter() are static and depend only on their arguments, so each
+// guard branch can be exercised directly without a started game, network stack, or
+// player fixture.
 
 #include "game/server_counter.h"
 #include "game/server_player.h"
@@ -155,6 +156,89 @@ TEST(EvaluateSetCounterActive, AllowsDisablingWhenCounterIsZero)
     Server_Counter counter = makeCounter(CounterIds::CommanderTax, 0);
     EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::CommanderTax, &counter,
                                                       /*requestedActive=*/false),
+              Response::RespOk);
+}
+
+// PartnerTax is the second reserved tax counter and must flow through the same auth
+// path as CommanderTax: enabling is always permitted...
+TEST(EvaluateSetCounterActive, AllowsEnablingPartnerTax)
+{
+    Server_Counter counter = makeCounter(CounterIds::PartnerTax, 0);
+    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::PartnerTax, &counter,
+                                                      /*requestedActive=*/true),
+              Response::RespOk);
+}
+
+// ...and disabling is rejected while it still holds accumulated tax.
+TEST(EvaluateSetCounterActive, RejectsDisablingPartnerTaxWhenAccumulated)
+{
+    Server_Counter counter = makeCounter(CounterIds::PartnerTax, 2);
+    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::PartnerTax, &counter,
+                                                      /*requestedActive=*/false),
+              Response::RespContextError);
+}
+
+// ---------------------------------------------------------------------------
+// evaluateModifyCounter (shared by cmdIncCounter / cmdSetCounter)
+// ---------------------------------------------------------------------------
+
+// No counter may be modified before the game starts.
+TEST(EvaluateModifyCounter, RejectsWhenGameNotStarted)
+{
+    Server_Counter counter = makeCounter(UserCounterId, 0);
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(/*gameStarted=*/false, false, /*commandZoneEnabled=*/true,
+                                                   UserCounterId, &counter),
+              Response::RespGameNotStarted);
+}
+
+// A conceded player may no longer modify counters.
+TEST(EvaluateModifyCounter, RejectsWhenPlayerConceded)
+{
+    Server_Counter counter = makeCounter(UserCounterId, 0);
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, /*playerConceded=*/true, true, UserCounterId, &counter),
+              Response::RespContextError);
+}
+
+// An ordinary user counter can be modified regardless of command-zone state.
+TEST(EvaluateModifyCounter, AllowsUserCounter)
+{
+    Server_Counter counter = makeCounter(UserCounterId, 0);
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/false, UserCounterId, &counter),
+              Response::RespOk);
+}
+
+// A non-existent counter is reported as not found.
+TEST(EvaluateModifyCounter, RejectsMissingCounter)
+{
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, true, UserCounterId, nullptr),
+              Response::RespNameNotFound);
+}
+
+// A tax counter may not be modified outside a Commander game (command zone disabled).
+TEST(EvaluateModifyCounter, RejectsTaxCounterWhenCommandZoneDisabled)
+{
+    Server_Counter counter = makeCounter(CounterIds::CommanderTax, 0);
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/false, CounterIds::CommanderTax,
+                                                   &counter),
+              Response::RespContextError);
+}
+
+// An inactive (hidden) tax counter must not accumulate value behind the scenes.
+TEST(EvaluateModifyCounter, RejectsInactiveTaxCounter)
+{
+    Server_Counter counter = makeCounter(CounterIds::PartnerTax, 0);
+    (void)counter.setActive(false);
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/true, CounterIds::PartnerTax,
+                                                   &counter),
+              Response::RespContextError);
+}
+
+// An active tax counter in a Commander game may be modified.
+TEST(EvaluateModifyCounter, AllowsActiveTaxCounter)
+{
+    Server_Counter counter = makeCounter(CounterIds::CommanderTax, 0);
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/true, CounterIds::CommanderTax,
+                                                   &counter),
               Response::RespOk);
 }
 

@@ -267,6 +267,14 @@ private:
                                bool faceDown,
                                const std::function<void(CardItem *, const QString &)> &postPlayCallback = nullptr);
 
+    /**
+     * @brief Plays the selected cards and, for each that came from the command zone,
+     *        increments the given (active) tax counter by one.
+     * @param selectedCards Cards to play
+     * @param counterId The tax counter to increment (CounterIds::CommanderTax or PartnerTax)
+     */
+    void playAndIncreaseTax(QList<CardItem *> selectedCards, int counterId);
+
     void cmdSetTopCard(Command_MoveCard &cmd);
     void cmdSetBottomCard(Command_MoveCard &cmd);
 
