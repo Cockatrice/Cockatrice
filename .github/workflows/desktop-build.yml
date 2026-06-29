@@ -78,12 +78,12 @@ jobs:
         id: create_release
         shell: bash
         env:
+          BODY_PATH: ${{ steps.prepare.outputs.body_path }}
           GH_TOKEN: ${{ github.token }}
+          PRERELEASE: ${{ steps.prepare.outputs.beta }}
+          RELEASE_NAME: ${{ steps.prepare.outputs.title }}
           TAG_NAME: ${{ steps.configure.outputs.tag }}
           TARGET: ${{ steps.configure.outputs.sha }}
-          RELEASE_NAME: ${{ steps.prepare.outputs.title }}
-          BODY_PATH: ${{ steps.prepare.outputs.body_path }}
-          PRERELEASE: ${{ steps.prepare.outputs.beta }}
         run: |
           args=()
           [[ "$PRERELEASE" == "true" ]] && args+=(--prerelease)
@@ -102,47 +102,46 @@ jobs:
           - distro: Arch
 
             allow-failure: true
-            package: false    # We are packaged in Arch already
+            test: true    # run debug build and tests
 
           - distro: Servatrice_Debian
             version: 12
 
             package: DEB
             server_only: true
-            test: false
 
           - distro: Debian
             version: 12
 
             package: DEB
-            test: false    # Running tests on all distros is superfluous
 
           - distro: Debian
             version: 13
 
             package: DEB
+            test: true    # run debug build and tests on newest distro version
 
           - distro: Fedora
             version: 43
 
             package: RPM
-            test: false    # Running tests on all distros is superfluous
 
           - distro: Fedora
             version: 44
 
             package: RPM
+            test: true    # run debug build and tests on newest distro version
 
           - distro: Ubuntu
             version: 24.04
 
             package: DEB
-            test: false    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 26.04
 
             package: DEB
+            test: true    # run debug build and tests on newest distro version
 
     name: ${{ matrix.distro }} ${{ matrix.version }}
     needs: configure
@@ -150,7 +149,7 @@ jobs:
     continue-on-error: ${{ matrix.allow-failure == true }}
     timeout-minutes: 70
     env:
-      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching docker image and ccache
+      CACHE_DIR: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CMAKE_GENERATOR: 'Ninja'
@@ -167,7 +166,7 @@ jobs:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           key: ccache-${{ matrix.distro }}${{ matrix.version }}-${{ env.BRANCH_NAME }}
-          path: ${{ env.CACHE }}
+          path: ${{ env.CACHE_DIR }}
           restore-keys: ccache-${{ matrix.distro }}${{ matrix.version }}-
 
       - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
@@ -175,7 +174,7 @@ jobs:
         run: source .ci/docker.sh --build
 
       - name: "Build debug and test"
-        if: matrix.test != false
+        if: matrix.test == true
         shell: bash
         run: |
           source .ci/docker.sh
@@ -184,12 +183,12 @@ jobs:
 
       - name: "Build release package"
         id: build
-        if: matrix.package != false
+        if: ${{ matrix.package != '' }}
         shell: bash
         env:
-          SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
           PACKAGE: '${{ matrix.package }}'
           SERVER_ONLY: '${{ matrix.server_only }}'
+          SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
         run: |
           source .ci/docker.sh
           args=()
@@ -218,7 +217,7 @@ jobs:
         uses: actions/cache/save@v6
         with:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
-          path: ${{ env.CACHE }}
+          path: ${{ env.CACHE_DIR }}
 
       - name: "Upload artifact"
         id: upload_artifact
@@ -265,7 +264,6 @@ jobs:
             target: 13
             runner: macos-15-intel
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: true
             override_target: 13
@@ -282,7 +280,6 @@ jobs:
             target: 14
             runner: macos-14
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: true
             package_suffix: "-macOS14"
@@ -298,7 +295,6 @@ jobs:
             target: 15
             runner: macos-15
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: true
             package_suffix: "-macOS15"
@@ -314,7 +310,6 @@ jobs:
             target: 15
             runner: macos-15
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             qt_version: 6.11.0
             qt_arch: clang_64
@@ -343,6 +338,7 @@ jobs:
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
+      CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
 
     steps:
