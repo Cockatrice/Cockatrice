@@ -28,7 +28,7 @@ jobs:
     name: amd64 & arm64
     if: ${{ github.repository_owner == 'Cockatrice' }}
     runs-on: ubuntu-latest
-  
+
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7
