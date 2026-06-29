@@ -48,7 +48,7 @@
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 Server_AbstractParticipant::Server_AbstractParticipant(Server_Game *_game,
                                                        int _playerId,

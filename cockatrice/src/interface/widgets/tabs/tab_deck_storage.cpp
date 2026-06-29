@@ -28,6 +28,7 @@
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/utility/string_limits.h>
 
 TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
                                AbstractClient *_client,

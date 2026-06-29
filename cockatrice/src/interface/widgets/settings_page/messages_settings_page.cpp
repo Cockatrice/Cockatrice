@@ -6,6 +6,7 @@
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QToolBar>
+#include <libcockatrice/utility/string_limits.h>
 
 MessagesSettingsPage::MessagesSettingsPage()
 {

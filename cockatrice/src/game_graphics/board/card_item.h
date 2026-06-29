@@ -12,7 +12,6 @@
 #include "abstract_card_item.h"
 
 #include <libcockatrice/network/server/remote/game/server_card.h>
-#include <libcockatrice/utility/trice_limits.h>
 
 class CardDatabase;
 class CardDragItem;

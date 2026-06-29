@@ -12,7 +12,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
 {

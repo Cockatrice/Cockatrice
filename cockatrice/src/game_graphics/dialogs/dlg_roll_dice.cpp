@@ -5,7 +5,7 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/dice_limits.h>
 
 DlgRollDice::DlgRollDice(QWidget *parent) : QDialog(parent)
 {

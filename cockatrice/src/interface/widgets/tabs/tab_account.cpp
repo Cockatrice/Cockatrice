@@ -17,7 +17,7 @@
 #include <libcockatrice/protocol/pb/response_list_users.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 TabAccount::TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo)
     : Tab(_tabSupervisor), client(_client)

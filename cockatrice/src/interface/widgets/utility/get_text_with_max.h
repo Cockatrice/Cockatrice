@@ -9,7 +9,7 @@
 
 #include <QLineEdit>
 #include <QWidget>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 QString getTextWithMax(QWidget *parent,
                        const QString &title,
