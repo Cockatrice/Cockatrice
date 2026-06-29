@@ -59,7 +59,6 @@ class ServerInfo_Counter;
 class ServerInfo_Player;
 class ServerInfo_User;
 class TabGame;
-class AbstractCounter;
 
 const int MAX_TOKENS_PER_DIALOG = 99;
 

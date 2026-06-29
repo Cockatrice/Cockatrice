@@ -441,10 +441,33 @@ Server_Player::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, ResponseContainer &
     return retVal;
 }
 
-bool Server_Player::isCommandZoneCounterBlocked(int counterId) const
+Response::ResponseCode Server_Player::evaluateModifyCounter(bool gameStarted,
+                                                            bool playerConceded,
+                                                            bool commandZoneEnabled,
+                                                            int counterId,
+                                                            const Server_Counter *counter)
 {
-    return (counterId == CounterIds::CommanderTax || counterId == CounterIds::PartnerTax) &&
-           !game->getEnableCommandZone();
+    if (!gameStarted) {
+        return Response::RespGameNotStarted;
+    }
+    if (playerConceded) {
+        return Response::RespContextError;
+    }
+    if (CounterIds::isTaxCounter(counterId)) {
+        // Tax counters are server-managed: they only exist in Commander games, and an
+        // inactive (hidden) tax counter must stay at zero. Block modification in either
+        // case so the value can never diverge from what players can see.
+        if (!commandZoneEnabled) {
+            return Response::RespContextError;
+        }
+        if (counter && !counter->isActive()) {
+            return Response::RespContextError;
+        }
+    }
+    if (!counter) {
+        return Response::RespNameNotFound;
+    }
+    return Response::RespOk;
 }
 
 Response::ResponseCode
@@ -458,14 +481,12 @@ Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & 
     }
 
     const int counterId = cmd.counter_id();
-
-    if (isCommandZoneCounterBlocked(counterId)) {
-        return Response::RespContextError;
-    }
-
     Server_Counter *c = counters.value(counterId, nullptr);
-    if (!c) {
-        return Response::RespNameNotFound;
+
+    const Response::ResponseCode authResult =
+        evaluateModifyCounter(game->getGameStarted(), conceded, game->getEnableCommandZone(), counterId, c);
+    if (authResult != Response::RespOk) {
+        return authResult;
     }
 
     bool didChange = c->incrementCount(cmd.delta());
@@ -489,8 +510,15 @@ Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContai
         return Response::RespContextError;
     }
 
-    auto *c = new Server_Counter(newCounterId(), nameFromStdString(cmd.counter_name()), cmd.counter_color(),
-                                 cmd.radius(), cmd.value());
+    const QString counterName = nameFromStdString(cmd.counter_name());
+    // Reserved system counter names (commander/partner tax) are how clients identify
+    // server-managed tax counters for rendering and logging; a client must not be able
+    // to spoof one via a user-created counter.
+    if (CounterNames::isTaxCounter(counterName)) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    auto *c = new Server_Counter(newCounterId(), counterName, cmd.counter_color(), cmd.radius(), cmd.value());
     addCounter(c);
 
     Event_CreateCounter event;
@@ -516,14 +544,12 @@ Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & 
     }
 
     const int counterId = cmd.counter_id();
-
-    if (isCommandZoneCounterBlocked(counterId)) {
-        return Response::RespContextError;
-    }
-
     Server_Counter *c = counters.value(counterId, nullptr);
-    if (!c) {
-        return Response::RespNameNotFound;
+
+    const Response::ResponseCode authResult =
+        evaluateModifyCounter(game->getGameStarted(), conceded, game->getEnableCommandZone(), counterId, c);
+    if (authResult != Response::RespOk) {
+        return authResult;
     }
 
     bool didChange = c->setCount(cmd.value());

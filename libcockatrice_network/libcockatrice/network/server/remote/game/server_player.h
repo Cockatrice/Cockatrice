@@ -9,7 +9,6 @@ class Server_Player : public Server_AbstractPlayer
 private:
     QMap<int, Server_Counter *> counters;
     QList<int> lastDrawList;
-    bool isCommandZoneCounterBlocked(int counterId) const;
 
 public:
     Server_Player(Server_Game *_game,
@@ -37,6 +36,14 @@ public:
                                                            int counterId,
                                                            const Server_Counter *counter,
                                                            bool requestedActive);
+    // Authorization shared by cmdIncCounter and cmdSetCounter. Reserved tax counters
+    // may only be modified inside a Commander game and only while active, so that an
+    // inactive (hidden) tax counter can never accumulate a value behind the scenes.
+    static Response::ResponseCode evaluateModifyCounter(bool gameStarted,
+                                                        bool playerConceded,
+                                                        bool commandZoneEnabled,
+                                                        int counterId,
+                                                        const Server_Counter *counter);
 
     void setupZones() override;
     void clearZones() override;
