@@ -5,22 +5,24 @@
 #include <algorithm>
 #include <string>
 
-// max size for short strings, like names and things that are generally a single phrase
+/** @brief Max size for short strings, like names and things that are generally a single phrase. */
 constexpr int MAX_NAME_LENGTH = 0xff;
-// max size for chat messages and text contents
+/** @brief Max size for chat messages and text contents. */
 constexpr int MAX_TEXT_LENGTH = 0xfff;
-// max size for deck files and pictures
-constexpr int MAX_FILE_LENGTH = 0x1fffff; // about 2 megabytes
+/** @brief Max size for deck files and pictures (about 2 megabytes). */
+constexpr int MAX_FILE_LENGTH = 0x1fffff;
 
-// optimized functions to get qstrings that are at most that long
+/** @brief Returns a QString from a std::string, truncated to at most MAX_NAME_LENGTH bytes. */
 inline QString nameFromStdString(const std::string &_string)
 {
     return QString::fromUtf8(_string.data(), std::min(int(_string.size()), MAX_NAME_LENGTH));
 }
+/** @brief Returns a QString from a std::string, truncated to at most MAX_TEXT_LENGTH bytes. */
 inline QString textFromStdString(const std::string &_string)
 {
     return QString::fromUtf8(_string.data(), std::min(int(_string.size()), MAX_TEXT_LENGTH));
 }
+/** @brief Returns a QString from a std::string, truncated to at most MAX_FILE_LENGTH bytes. */
 inline QString fileFromStdString(const std::string &_string)
 {
     return QString::fromUtf8(_string.data(), std::min(int(_string.size()), MAX_FILE_LENGTH));
