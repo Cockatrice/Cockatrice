@@ -130,7 +130,7 @@ public:
     [[nodiscard]] bool incrementCount(int delta)
     {
         const int oldCount = count;
-        count = addClamped(count, delta, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+        count = addClamped(count, delta, minValue, maxValue);
         return count != oldCount;
     }
 
