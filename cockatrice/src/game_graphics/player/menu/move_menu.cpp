@@ -39,6 +39,7 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     connect(aMoveToHand, &QAction::triggered, actions, invoke(cmMoveToHand));
     connect(aMoveToGraveyard, &QAction::triggered, actions, invoke(cmMoveToGraveyard));
     connect(aMoveToExile, &QAction::triggered, actions, invoke(cmMoveToExile));
+    connect(aMoveToCommandZone, &QAction::triggered, actions, invoke(cmMoveToCommandZone));
 
     addAction(aMoveToTopLibrary);
     addAction(aMoveToXfromTopOfLibrary);

@@ -47,9 +47,6 @@ constexpr qreal COMMAND_ZONE_WIDTH = CardDimensions::WIDTH_F * 1.5;
 class CommandZone : public SelectZone
 {
     Q_OBJECT
-public:
-    static constexpr qreal MINIMUM_STACKING_HEIGHT = 50.0;
-
 private:
     static constexpr double MINIMIZED_HEIGHT_RATIO = 0.25;
     int zoneHeight;                       ///< Full height in pixels when expanded

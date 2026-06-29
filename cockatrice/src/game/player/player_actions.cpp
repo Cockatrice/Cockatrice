@@ -1663,23 +1663,21 @@ void PlayerActions::playSelectedCardsImpl(QList<CardItem *> selectedCards,
 
 void PlayerActions::actPlayAndIncreaseTax(QList<CardItem *> selectedCards)
 {
-    playSelectedCardsImpl(selectedCards, false, [this](CardItem * /*card*/, const QString &originalZone) {
-        if (originalZone == ZoneNames::COMMAND) {
-            CounterState *state = player->getCounters().value(CounterIds::CommanderTax, nullptr);
-            if (state && state->isActive()) {
-                sendIncCounter(CounterIds::CommanderTax, 1);
-            }
-        }
-    });
+    playAndIncreaseTax(selectedCards, CounterIds::CommanderTax);
 }
 
 void PlayerActions::actPlayAndIncreasePartnerTax(QList<CardItem *> selectedCards)
 {
-    playSelectedCardsImpl(selectedCards, false, [this](CardItem * /*card*/, const QString &originalZone) {
+    playAndIncreaseTax(selectedCards, CounterIds::PartnerTax);
+}
+
+void PlayerActions::playAndIncreaseTax(QList<CardItem *> selectedCards, int counterId)
+{
+    playSelectedCardsImpl(selectedCards, false, [this, counterId](CardItem * /*card*/, const QString &originalZone) {
         if (originalZone == ZoneNames::COMMAND) {
-            CounterState *state = player->getCounters().value(CounterIds::PartnerTax, nullptr);
+            CounterState *state = player->getCounters().value(counterId, nullptr);
             if (state && state->isActive()) {
-                sendIncCounter(CounterIds::PartnerTax, 1);
+                sendIncCounter(counterId, 1);
             }
         }
     });

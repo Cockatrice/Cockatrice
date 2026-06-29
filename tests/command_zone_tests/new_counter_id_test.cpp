@@ -41,13 +41,15 @@ TEST(NewCounterId, ReturnsFirstUserIdWhenNoCounters)
     EXPECT_EQ(f.player.newCounterId(), CounterIds::FirstUserId);
 }
 
-// Reserved ids 0-9 (standard player counters and the commander tax counters) must
-// not drag a new user counter down into the reserved range.
+// Reserved ids must not drag a new user counter down into the reserved range. The
+// ids here (3 and 5) are chosen so a naive "highest id + 1" implementation would
+// return 6 (inside the reserved range) and fail this test; only the FirstUserId
+// floor yields the correct 10, so this pins the floor against regression.
 TEST(NewCounterId, SkipsReservedRangeWhenOnlyReservedCountersExist)
 {
     PlayerFixture f;
     f.player.addCounter(new Server_Counter(3, "g", color(), 20, 0));
-    f.player.addCounter(new Server_Counter(CounterIds::PartnerTax, CounterNames::PartnerTax, color(), 20, 0));
+    f.player.addCounter(new Server_Counter(5, "h", color(), 20, 0));
     EXPECT_EQ(f.player.newCounterId(), CounterIds::FirstUserId);
 }
 
