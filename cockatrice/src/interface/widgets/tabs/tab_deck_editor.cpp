@@ -21,7 +21,6 @@
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/trice_limits.h>
 
 /**
  * @brief Constructs a new TabDeckEditor object.
