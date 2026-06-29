@@ -83,7 +83,7 @@ jobs:
           TARGET: ${{ steps.configure.outputs.sha }}
           RELEASE_NAME: ${{ steps.prepare.outputs.title }}
           BODY_PATH: ${{ steps.prepare.outputs.body_path }}
-          PRERELEASE: ${{ steps.prepare.outputs.is_beta }}
+          PRERELEASE: ${{ steps.prepare.outputs.beta }}
         run: |
           args=()
           [[ "$PRERELEASE" == "true" ]] && args+=(--prerelease)
