@@ -272,6 +272,8 @@ private:
      *        increments the given (active) tax counter by one.
      * @param selectedCards Cards to play
      * @param counterId The tax counter to increment (CounterIds::CommanderTax or PartnerTax)
+     * @note The increment is sent optimistically, not gated on the move succeeding; a rejected
+     *       move can leave the tax incremented without a card being cast.
      */
     void playAndIncreaseTax(QList<CardItem *> selectedCards, int counterId);
 
