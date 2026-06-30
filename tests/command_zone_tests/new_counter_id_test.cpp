@@ -1,3 +1,8 @@
+/** @file new_counter_id_test.cpp
+ *  @brief Tests for Server_Player::newCounterId() id allocation.
+ *  @ingroup Tests
+ */
+
 #include "../movecard_tests/server_test_helpers.h"
 #include "game/server_counter.h"
 #include "game/server_game.h"
@@ -14,10 +19,6 @@ RNG_Abstract *rng = nullptr; // required by linked server code
 
 namespace
 {
-// Wires up a Server_Player backed by a minimal fake game so that counters can be
-// added directly via addCounter() to exercise newCounterId() in isolation.
-// newCounterId() depends only on the player's counter map, not on game state,
-// so the game never needs to be started.
 struct PlayerFixture
 {
     ServerInfo_User user;
@@ -34,17 +35,12 @@ struct PlayerFixture
 };
 } // namespace
 
-// With no counters at all, the first allocated id must be FirstUserId, never 0.
 TEST(NewCounterId, ReturnsFirstUserIdWhenNoCounters)
 {
     PlayerFixture f;
     EXPECT_EQ(f.player.newCounterId(), CounterIds::FirstUserId);
 }
 
-// Reserved ids must not drag a new user counter down into the reserved range. The
-// ids here (3 and 5) are chosen so a naive "highest id + 1" implementation would
-// return 6 (inside the reserved range) and fail this test; only the FirstUserId
-// floor yields the correct 10, so this pins the floor against regression.
 TEST(NewCounterId, SkipsReservedRangeWhenOnlyReservedCountersExist)
 {
     PlayerFixture f;
@@ -53,7 +49,6 @@ TEST(NewCounterId, SkipsReservedRangeWhenOnlyReservedCountersExist)
     EXPECT_EQ(f.player.newCounterId(), CounterIds::FirstUserId);
 }
 
-// Once user counters exist, the next id is one above the highest of them.
 TEST(NewCounterId, ReturnsNextIdAboveHighestUserCounter)
 {
     PlayerFixture f;
@@ -62,7 +57,6 @@ TEST(NewCounterId, ReturnsNextIdAboveHighestUserCounter)
     EXPECT_EQ(f.player.newCounterId(), 16);
 }
 
-// A reserved counter present alongside user counters must not affect the result.
 TEST(NewCounterId, IgnoresReservedCountersWhenUserCountersPresent)
 {
     PlayerFixture f;
