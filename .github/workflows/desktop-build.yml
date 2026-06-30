@@ -97,7 +97,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The files in ".ci/$distro$version" correspond to the values given here
+        # The files in ".ci/$distro$distro_version" correspond to the values given here
         include:
           - distro: Arch
 
@@ -105,55 +105,55 @@ jobs:
             test: true    # run debug build and tests
 
           - distro: Servatrice_Debian
-            version: 12
+            distro_version: 12
 
             package: DEB
             server_only: true
 
           - distro: Debian
-            version: 12
+            distro_version: 12
 
             package: DEB
 
           - distro: Debian
-            version: 13
+            distro_version: 13
 
             package: DEB
             test: true    # run debug build and tests on newest distro version
 
           - distro: Fedora
-            version: 43
+            distro_version: 43
 
             package: RPM
 
           - distro: Fedora
-            version: 44
+            distro_version: 44
 
             package: RPM
             test: true    # run debug build and tests on newest distro version
 
           - distro: Ubuntu
-            version: 24.04
+            distro_version: 24.04
 
             package: DEB
 
           - distro: Ubuntu
-            version: 26.04
+            distro_version: 26.04
 
             package: DEB
             test: true    # run debug build and tests on newest distro version
 
-    name: ${{ matrix.distro }} ${{ matrix.version }}
+    name: ${{ matrix.distro }} ${{ matrix.distro_version }}
     needs: configure
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.allow-failure == true }}
     timeout-minutes: 70
     env:
-      CACHE_DIR: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching docker image and ccache
+      CACHE_DIR: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.distro_version }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CMAKE_GENERATOR: 'Ninja'
-      NAME: ${{ matrix.distro }}${{ matrix.version }}
+      NAME: ${{ matrix.distro }}${{ matrix.distro_version }}
 
     steps:
       - name: "Checkout"
@@ -165,11 +165,11 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          key: ccache-${{ matrix.distro }}${{ matrix.version }}-${{ env.BRANCH_NAME }}
+          key: ccache-${{ matrix.distro }}${{ matrix.distro_version }}-${{ env.BRANCH_NAME }}
           path: ${{ env.CACHE_DIR }}
-          restore-keys: ccache-${{ matrix.distro }}${{ matrix.version }}-
+          restore-keys: ccache-${{ matrix.distro }}${{ matrix.distro_version }}-
 
-      - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
+      - name: "Build ${{ matrix.distro }} ${{ matrix.distro_version }} Docker image"
         shell: bash
         run: source .ci/docker.sh --build
 
@@ -188,7 +188,7 @@ jobs:
         env:
           PACKAGE: '${{ matrix.package }}'
           SERVER_ONLY: '${{ matrix.server_only }}'
-          SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
+          SUFFIX: '-${{ matrix.distro }}${{ matrix.distro_version }}'
         run: |
           source .ci/docker.sh
           args=()
@@ -261,7 +261,7 @@ jobs:
       matrix:
         include:
           - os: macOS
-            target: 13
+            os_target_version: 13
             runner: macos-15-intel
 
             cmake_generator: Ninja
@@ -277,7 +277,7 @@ jobs:
             xcode: "16.4"
 
           - os: macOS
-            target: 14
+            os_target_version: 14
             runner: macos-14
 
             cmake_generator: Ninja
@@ -292,7 +292,7 @@ jobs:
             xcode: "15.4"
 
           - os: macOS
-            target: 15
+            os_target_version: 15
             runner: macos-15
 
             cmake_generator: Ninja
@@ -307,7 +307,7 @@ jobs:
             xcode: "16.4"
 
           - os: macOS
-            target: 15
+            os_target_version: 15
             runner: macos-15
 
             cmake_generator: Ninja
@@ -320,7 +320,7 @@ jobs:
             xcode: "16.4"
 
           - os: Windows
-            target: 10
+            os_target_version: 10
             runner: windows-2025
 
             cmake_generator: "Visual Studio 18 2026"
@@ -332,7 +332,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
 
-    name: ${{ matrix.os }} ${{ matrix.target }}${{ case(matrix.soc == 'Intel', ' Intel', '') }}${{ case(matrix.type == 'Debug', ' Debug', '') }}
+    name: ${{ matrix.os }} ${{ matrix.os_target_version }}${{ case(matrix.soc == 'Intel', ' Intel', '') }}${{ case(matrix.type == 'Debug', ' Debug', '') }}
     needs: configure
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
@@ -439,7 +439,6 @@ jobs:
         shell: bash
         env:
           BUILDTYPE: '${{ matrix.type }}'
-          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
