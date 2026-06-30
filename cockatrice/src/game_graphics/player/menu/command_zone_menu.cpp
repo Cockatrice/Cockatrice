@@ -9,7 +9,7 @@
 #include "../player_graphics_item.h"
 
 #include <libcockatrice/utility/counter_ids.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/counter_limits.h>
 #include <libcockatrice/utility/zone_names.h>
 
 CommandZoneMenu::CommandZoneMenu(PlayerGraphicsItem *_player, QMenu *playerMenu) : QMenu(playerMenu), player(_player)
