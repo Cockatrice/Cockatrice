@@ -11,7 +11,7 @@
 
 /**
  * Shared counter IDs used by both client and server.
- * These must match between server_player.cpp and player_event_handler.cpp.
+ * Single source of truth: included directly by both sides, so they cannot drift.
  *
  * Reserved counter IDs for system counters:
  *   IDs 0-7:  Standard player counters (life, mana colors, storm)
