@@ -1,19 +1,19 @@
-name: Build Docker Image
+name: Build Docker
 
 permissions:
   contents: read
   packages: write
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
     paths:
       - '.github/workflows/docker-release.yml'
       - 'Dockerfile'
+  push:
+    branches:
+      - master
   release:
     types:
       - released    # publishing of stable releases
@@ -28,7 +28,7 @@ jobs:
     name: amd64 & arm64
     if: ${{ github.repository_owner == 'Cockatrice' }}
     runs-on: ubuntu-latest
-  
+
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7

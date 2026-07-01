@@ -7,6 +7,17 @@ permissions:
   id-token: write    # needed for signing certificate in attestation
 
 on:
+  pull_request:
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.github/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
+      - 'vcpkg'    # needed to match submodule bumps (gitlink)
   push:
     branches:
       - master
@@ -22,17 +33,6 @@ on:
       - 'vcpkg'    # needed to match submodule bumps (gitlink)
     tags:
       - '*'
-  pull_request:
-    paths:
-      - '*/**'    # matches all files not in root
-      - '!**.md'
-      - '!.github/**'
-      - '!.tx/**'
-      - '!doc/**'
-      - '.github/workflows/desktop-build.yml'
-      - 'CMakeLists.txt'
-      - 'vcpkg.json'
-      - 'vcpkg'    # needed to match submodule bumps (gitlink)
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
@@ -78,83 +78,82 @@ jobs:
         id: create_release
         shell: bash
         env:
+          BODY_PATH: ${{ steps.prepare.outputs.body_path }}
           GH_TOKEN: ${{ github.token }}
-          tag_name: ${{ steps.configure.outputs.tag }}
-          target: ${{ steps.configure.outputs.sha }}
-          release_name: ${{ steps.prepare.outputs.title }}
-          body_path: ${{ steps.prepare.outputs.body_path }}
-          prerelease: ${{ steps.prepare.outputs.is_beta }}
+          PRERELEASE: ${{ steps.prepare.outputs.beta }}
+          RELEASE_NAME: ${{ steps.prepare.outputs.title }}
+          TAG_NAME: ${{ steps.configure.outputs.tag }}
+          TARGET: ${{ steps.configure.outputs.sha }}
         run: |
           args=()
-          [[ $prerelease == yes ]] && args+=(--prerelease)
+          [[ "$PRERELEASE" == "true" ]] && args+=(--prerelease)
 
-          gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
-            --target "$target" \
-            --title "$release_name" \
-            --notes-file "$body_path"
+          gh release create "$TAG_NAME" --verify-tag --draft "${args[@]}" \
+            --target "$TARGET" \
+            --title "$RELEASE_NAME" \
+            --notes-file "$BODY_PATH"
 
   build-linux:
     strategy:
       fail-fast: false
       matrix:
-        # The files in ".ci/$distro$version" correspond to the values given here
+        # The files in ".ci/$distro$distro_version" correspond to the values given here
         include:
           - distro: Arch
 
-            allow-failure: yes
-            package: skip    # We are packaged in Arch already
+            allow-failure: true
+            test: true    # run debug build and tests
 
           - distro: Servatrice_Debian
-            version: 12
+            distro_version: 12
 
             package: DEB
-            server_only: yes
-            test: skip
+            server_only: true
 
           - distro: Debian
-            version: 12
+            distro_version: 12
 
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
 
           - distro: Debian
-            version: 13
+            distro_version: 13
 
             package: DEB
+            test: true    # run debug build and tests on newest distro version
 
           - distro: Fedora
-            version: 43
-
-            package: RPM
-            test: skip    # Running tests on all distros is superfluous
-
-          - distro: Fedora
-            version: 44
+            distro_version: 43
 
             package: RPM
 
+          - distro: Fedora
+            distro_version: 44
+
+            package: RPM
+            test: true    # run debug build and tests on newest distro version
+
           - distro: Ubuntu
-            version: 24.04
+            distro_version: 24.04
 
             package: DEB
-            test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
-            version: 26.04
+            distro_version: 26.04
 
             package: DEB
+            test: true    # run debug build and tests on newest distro version
 
-    name: ${{ matrix.distro }} ${{ matrix.version }}
+    name: ${{ matrix.distro }} ${{ matrix.distro_version }}
     needs: configure
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.allow-failure == 'yes' }}
+    continue-on-error: ${{ matrix.allow-failure == true }}
     timeout-minutes: 70
     env:
-      CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching docker image and ccache
+      CACHE_DIR: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.distro_version }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CMAKE_GENERATOR: 'Ninja'
-      NAME: ${{ matrix.distro }}${{ matrix.version }}
+      NAME: ${{ matrix.distro }}${{ matrix.distro_version }}
 
     steps:
       - name: "Checkout"
@@ -166,16 +165,16 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          key: ccache-${{ matrix.distro }}${{ matrix.version }}-${{ env.BRANCH_NAME }}
-          path: ${{ env.CACHE }}
-          restore-keys: ccache-${{ matrix.distro }}${{ matrix.version }}-
+          key: ccache-${{ matrix.distro }}${{ matrix.distro_version }}-${{ env.BRANCH_NAME }}
+          path: ${{ env.CACHE_DIR }}
+          restore-keys: ccache-${{ matrix.distro }}${{ matrix.distro_version }}-
 
-      - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
+      - name: "Build ${{ matrix.distro }} ${{ matrix.distro_version }} Docker image"
         shell: bash
         run: source .ci/docker.sh --build
 
       - name: "Build debug and test"
-        if: matrix.test != 'skip'
+        if: matrix.test == true
         shell: bash
         run: |
           source .ci/docker.sh
@@ -184,22 +183,22 @@ jobs:
 
       - name: "Build release package"
         id: build
-        if: matrix.package != 'skip'
+        if: ${{ matrix.package != '' }}
         shell: bash
         env:
-          SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
-          package: '${{ matrix.package }}'
-          server_only: '${{ matrix.server_only }}'
+          PACKAGE: '${{ matrix.package }}'
+          SERVER_ONLY: '${{ matrix.server_only }}'
+          SUFFIX: '-${{ matrix.distro }}${{ matrix.distro_version }}'
         run: |
           source .ci/docker.sh
           args=()
-          [[ $server_only == yes ]] && args+=(--no-client)
-          [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
+          [[ "$SERVER_ONLY" == "true" ]] && args+=(--no-client)
+          [[ "$GITHUB_REF" == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
           args+=(--suffix "$SUFFIX")
 
-          RUN --server --release --package "$package" "${args[@]}"
+          RUN --server --release --package "$PACKAGE" "${args[@]}"
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
@@ -218,11 +217,11 @@ jobs:
         uses: actions/cache/save@v6
         with:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
-          path: ${{ env.CACHE }}
+          path: ${{ env.CACHE_DIR }}
 
       - name: "Upload artifact"
         id: upload_artifact
-        if: matrix.package != 'skip'
+        if: matrix.package != false
         uses: actions/upload-artifact@v7
         with:
           archive: false
@@ -231,14 +230,14 @@ jobs:
 
       - name: "Upload to release"
         id: upload_release
-        if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        if: matrix.package != false && needs.configure.outputs.tag != null
         shell: bash
         env:
-          asset_name: ${{ steps.build.outputs.fullname }}
-          asset_path: ${{ steps.build.outputs.path }}
+          ASSET_NAME: ${{ steps.build.outputs.fullname }}
+          ASSET_PATH: ${{ steps.build.outputs.path }}
           GH_TOKEN: ${{ github.token }}
-          tag_name: ${{ needs.configure.outputs.tag }}
-        run: gh release upload "$tag_name" "$asset_path#$asset_name"
+          TAG_NAME: ${{ needs.configure.outputs.tag }}
+        run: gh release upload "$TAG_NAME" "$ASSET_PATH#$ASSET_NAME"
 
       - name: "Attest binary provenance"
         id: attestation
@@ -262,12 +261,11 @@ jobs:
       matrix:
         include:
           - os: macOS
-            target: 13
+            os_target_version: 13
             runner: macos-15-intel
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
-            make_package: 1
+            make_package: true
             override_target: 13
             package_suffix: "-macOS13_Intel"
             qt_version: 6.11.0
@@ -275,74 +273,72 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Intel
             type: Release
-            use_ccache: 1
+            use_ccache: true
             xcode: "16.4"
 
           - os: macOS
-            target: 14
+            os_target_version: 14
             runner: macos-14
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
-            make_package: 1
+            make_package: true
             package_suffix: "-macOS14"
             qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
-            use_ccache: 1
+            use_ccache: true
             xcode: "15.4"
 
           - os: macOS
-            target: 15
+            os_target_version: 15
             runner: macos-15
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
-            make_package: 1
+            make_package: true
             package_suffix: "-macOS15"
             qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
-            use_ccache: 1
+            use_ccache: true
             xcode: "16.4"
 
           - os: macOS
-            target: 15
+            os_target_version: 15
             runner: macos-15
 
-            ccache_eviction_age: 7d
             cmake_generator: Ninja
             qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Debug
-            use_ccache: 1
+            use_ccache: true
             xcode: "16.4"
 
           - os: Windows
-            target: 10
+            os_target_version: 10
             runner: windows-2025
 
             cmake_generator: "Visual Studio 18 2026"
             cmake_generator_platform: x64
-            make_package: 1
+            make_package: true
             package_suffix: "-Win10"
             qt_version: 6.11.0
             qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
 
-    name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
+    name: ${{ matrix.os }} ${{ matrix.os_target_version }}${{ case(matrix.soc == 'Intel', ' Intel', '') }}${{ case(matrix.type == 'Debug', ' Debug', '') }}
     needs: configure
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
+      CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
 
     steps:
@@ -359,11 +355,11 @@ jobs:
           msbuild-architecture: x64
 
       - name: "[macOS] Setup ccache"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1
+        if: matrix.os == 'macOS' && matrix.use_ccache == true
         run: brew install ccache
 
       - name: "[macOS] Restore compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1
+        if: matrix.os == 'macOS' && matrix.use_ccache == true
         id: ccache_restore
         uses: actions/cache/restore@v6
         env:
@@ -443,7 +439,6 @@ jobs:
         shell: bash
         env:
           BUILDTYPE: '${{ matrix.type }}'
-          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
@@ -456,12 +451,12 @@ jobs:
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-          VCPKG_DISABLE_METRICS: 1
+          VCPKG_DISABLE_METRICS: true
         run: .ci/compile.sh --server --test --vcpkg
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
+        if: matrix.os == 'macOS' && matrix.use_ccache == true && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
         continue-on-error: true
         env:
           CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
@@ -472,7 +467,7 @@ jobs:
           fi
 
       - name: "[macOS] Save updated compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master'
+        if: matrix.os == 'macOS' && matrix.use_ccache == true && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v6
         with:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
@@ -546,15 +541,15 @@ jobs:
             build/servatrice/Release/*.pdb
 
       - name: "Upload to release"
-        if: needs.configure.outputs.tag != null && matrix.make_package == '1'
+        if: needs.configure.outputs.tag != null && matrix.make_package == true
         id: upload_release
         shell: bash
         env:
-          asset_name: ${{ steps.build.outputs.fullname }}
-          asset_path: ${{ steps.build.outputs.path }}
+          ASSET_NAME: ${{ steps.build.outputs.fullname }}
+          ASSET_PATH: ${{ steps.build.outputs.path }}
           GH_TOKEN: ${{ github.token }}
-          tag_name: ${{ needs.configure.outputs.tag }}
-        run: gh release upload "$tag_name" "$asset_path#$asset_name"
+          TAG_NAME: ${{ needs.configure.outputs.tag }}
+        run: gh release upload "$TAG_NAME" "$ASSET_PATH#$ASSET_NAME"
 
       - name: "Attest binary provenance"
         if: steps.upload_release.outcome == 'success'
