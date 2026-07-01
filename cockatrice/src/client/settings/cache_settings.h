@@ -336,6 +336,7 @@ private:
     bool createGameAsSpectator;
     int defaultStartingLifeTotal;
     bool shareDecklistsOnLoad;
+    bool enableCommandZone;
     int keepalive;
     int timeout;
     void translateLegacySettings();
@@ -348,6 +349,7 @@ private:
     bool localGameRememberSettings;
     int localGameMaxPlayers;
     int localGameStartingLifeTotal;
+    bool localGameEnableCommandZone;
 
     QList<ReleaseChannel *> releaseChannels;
     bool isPortableBuild;
@@ -908,6 +910,10 @@ public:
     {
         return shareDecklistsOnLoad;
     }
+    [[nodiscard]] bool getEnableCommandZone() const
+    {
+        return enableCommandZone;
+    }
     [[nodiscard]] bool getCreateGameAsSpectator() const
     {
         return createGameAsSpectator;
@@ -927,6 +933,10 @@ public:
     [[nodiscard]] int getLocalGameStartingLifeTotal() const
     {
         return localGameStartingLifeTotal;
+    }
+    [[nodiscard]] bool getLocalGameEnableCommandZone() const
+    {
+        return localGameEnableCommandZone;
     }
     [[nodiscard]] int getKeepAlive() const override
     {
@@ -1164,10 +1174,12 @@ public slots:
     void setCreateGameAsSpectator(const bool _createGameAsSpectator);
     void setDefaultStartingLifeTotal(const int _defaultStartingLifeTotal);
     void setShareDecklistsOnLoad(const bool _shareDecklistsOnLoad);
+    void setEnableCommandZone(const bool _enableCommandZone);
     void setRememberGameSettings(const bool _rememberGameSettings);
     void setLocalGameRememberSettings(bool value);
     void setLocalGameMaxPlayers(int value);
     void setLocalGameStartingLifeTotal(int value);
+    void setLocalGameEnableCommandZone(bool value);
     void setCheckUpdatesOnStartup(QT_STATE_CHANGED_T value);
     void setStartupCardUpdateCheckPromptForUpdate(bool value);
     void setStartupCardUpdateCheckAlwaysUpdate(bool value);

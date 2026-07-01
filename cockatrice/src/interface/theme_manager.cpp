@@ -25,10 +25,12 @@
 #define PLAYERZONE_BG_NAME "playerzone"
 #define STACKZONE_BG_NAME "stackzone"
 #define TABLEZONE_BG_NAME "tablezone"
+#define COMMANDZONE_BG_NAME "commandzone"
 static const QColor HANDZONE_BG_DEFAULT = QColor(80, 100, 50);
 static const QColor TABLEZONE_BG_DEFAULT = QColor(70, 50, 100);
 static const QColor PLAYERZONE_BG_DEFAULT = QColor(200, 200, 200);
 static const QColor STACKZONE_BG_DEFAULT = QColor(113, 43, 43);
+static const QColor COMMANDZONE_BG_DEFAULT = QColor(50, 60, 80);
 static const QStringList DEFAULT_RESOURCE_PATHS = {":/resources"};
 
 struct PaletteColorInfo
@@ -373,6 +375,8 @@ void ThemeManager::themeChangedSlot()
     brushes[Role::Player] = loadBrush(PLAYERZONE_BG_NAME, PLAYERZONE_BG_DEFAULT);
 
     brushes[Role::Stack] = loadBrush(STACKZONE_BG_NAME, STACKZONE_BG_DEFAULT);
+
+    brushes[Role::Command] = loadBrush(COMMANDZONE_BG_NAME, COMMANDZONE_BG_DEFAULT);
     for (auto &brushCache : brushesCache) {
         brushCache.clear();
     }
@@ -396,6 +400,9 @@ static QString roleBgName(ThemeManager::Role role)
 
         case ThemeManager::Table:
             return TABLEZONE_BG_NAME;
+
+        case ThemeManager::Command:
+            return COMMANDZONE_BG_NAME;
 
         default:
             Q_ASSERT(false);

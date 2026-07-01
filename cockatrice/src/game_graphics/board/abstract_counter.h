@@ -1,6 +1,7 @@
 /**
  * @file abstract_counter.h
  * @ingroup GameGraphicsPlayers
+ * @brief Abstract base for player counters displayed on the game board.
  */
 //! \todo Document this file.
 
@@ -61,6 +62,13 @@ public:
     ~AbstractCounter() override;
 
     void retranslateUi() override;
+
+    /**
+     * @brief Sets the counter value and triggers a visual update.
+     * Virtual to allow subclass display customization (e.g., CommanderTaxCounter tooltip updates).
+     * Overflow protection is handled server-side, not in client counter classes.
+     */
+    virtual void setValue(int _value);
     void setShortcutsActive() override;
     void setShortcutsInactive() override;
     void delCounter();
@@ -93,6 +101,31 @@ public:
     {
         return shownInCounterArea;
     }
+
+    /**
+     * @brief Returns whether this counter is active (visible and interactable).
+     * Inactive counters are hidden and their menu actions should be disabled.
+     */
+    [[nodiscard]] bool isActive() const
+    {
+        return active;
+    }
+
+    /**
+     * @brief Sets the active state of this counter.
+     *
+     * This is the sole owner of the counter's own visibility flag: active maps directly to
+     * setVisible(_active). For counters nested in another item (e.g. tax counters parented to
+     * the command zone), Qt AND-s this flag with the parent's visibility, so an active counter
+     * inside a hidden zone still does not render. Container layout code must therefore not set
+     * visibility itself; it only positions counters and may read isActive().
+     *
+     * @param _active True to show and enable the counter, false to hide it
+     */
+    virtual void setActive(bool _active);
+
+private:
+    bool active = true;
 };
 
 class AbstractCounterDialog : public QInputDialog

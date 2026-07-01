@@ -20,6 +20,8 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     aMoveToGraveyard->setData(cmMoveToGraveyard);
     aMoveToExile = new QAction(this);
     aMoveToExile->setData(cmMoveToExile);
+    aMoveToCommandZone = new QAction(this);
+    aMoveToCommandZone->setData(cmMoveToCommandZone);
 
     auto *actions = player->getLogic()->getPlayerActions();
 
@@ -37,6 +39,7 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     connect(aMoveToHand, &QAction::triggered, actions, invoke(cmMoveToHand));
     connect(aMoveToGraveyard, &QAction::triggered, actions, invoke(cmMoveToGraveyard));
     connect(aMoveToExile, &QAction::triggered, actions, invoke(cmMoveToExile));
+    connect(aMoveToCommandZone, &QAction::triggered, actions, invoke(cmMoveToCommandZone));
 
     addAction(aMoveToTopLibrary);
     addAction(aMoveToXfromTopOfLibrary);
@@ -49,6 +52,13 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     addAction(aMoveToGraveyard);
     addSeparator();
     addAction(aMoveToExile);
+    addSeparator();
+    addAction(aMoveToCommandZone);
+
+    auto *playerLogic = player->getLogic();
+    auto updateCommandZoneVisibility = [this](bool has) { aMoveToCommandZone->setVisible(has); };
+    connect(playerLogic, &PlayerLogic::commandZoneSupportChanged, this, updateCommandZoneVisibility);
+    updateCommandZoneVisibility(playerLogic->hasServerCommandZone());
 
     setShortcutsActive();
 
@@ -65,6 +75,7 @@ void MoveMenu::setShortcutsActive()
     aMoveToHand->setShortcuts(shortcuts.getShortcut("Player/aMoveToHand"));
     aMoveToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveToGraveyard"));
     aMoveToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveToExile"));
+    aMoveToCommandZone->setShortcuts(shortcuts.getShortcut("Player/aMoveToCommandZone"));
 }
 
 void MoveMenu::retranslateUi()
@@ -76,4 +87,5 @@ void MoveMenu::retranslateUi()
     aMoveToHand->setText(tr("&Hand"));
     aMoveToGraveyard->setText(tr("&Graveyard"));
     aMoveToExile->setText(tr("&Exile"));
+    aMoveToCommandZone->setText(tr("&Command Zone"));
 }

@@ -22,7 +22,8 @@ enum CardMenuActionType
     cmMoveToHand,
     cmMoveToGraveyard,
     cmMoveToExile,
-    cmMoveToTable
+    cmMoveToTable,
+    cmMoveToCommandZone
 };
 
 #endif // COCKATRICE_CARD_MENU_ACTION_TYPE_H

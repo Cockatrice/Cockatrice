@@ -16,6 +16,7 @@ struct LocalGameOptions
 {
     int numberPlayers = 1;
     int startingLifeTotal = 20;
+    bool enableCommandZone = false;
 };
 
 class QCheckBox;
@@ -45,6 +46,7 @@ private:
     QLabel *startingLifeTotalLabel;
     QSpinBox *startingLifeTotalEdit;
 
+    QCheckBox *enableCommandZoneCheckBox;
     QCheckBox *rememberSettingsCheckBox;
 
     QDialogButtonBox *buttonBox;

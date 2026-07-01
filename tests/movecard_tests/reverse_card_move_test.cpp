@@ -22,7 +22,8 @@ TEST(ReverseCardMoveTest, MoveCardFromBottomTest)
     // instantiate a fake server instance
     FakeServer server;
     Server_Room room(0, 0, "", "", "", "", false, "", {}, &server);
-    Server_Game game(user, 1, "", "", 2, QList<int>(), false, false, false, false, false, false, 20, false, &room);
+    Server_Game game(user, 1, "", "", 2, QList<int>(), false, false, false, false, false, false, 20, false, false,
+                     &room);
     Server_AbstractPlayer player(&game, 1, user, false, nullptr);
     Server_CardZone deckZone(&player, ZoneNames::DECK, true, ServerInfo_Zone::PublicZone);
     Server_CardZone exileZone(&player, ZoneNames::EXILE, true, ServerInfo_Zone::PublicZone);

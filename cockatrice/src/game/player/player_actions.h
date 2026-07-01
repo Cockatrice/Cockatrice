@@ -17,6 +17,7 @@
 
 #include <QMenu>
 #include <QObject>
+#include <functional>
 #include <libcockatrice/card/relation/card_relation_type.h>
 #include <libcockatrice/filters/filter_string.h>
 
@@ -126,6 +127,14 @@ public slots:
 
     void actPlay(QList<CardItem *> selectedCards);
     void actPlayFacedown(QList<CardItem *> selectedCards);
+    /** @brief Plays the selected card and increments the primary commander tax counter. */
+    void actPlayAndIncreaseTax(QList<CardItem *> selectedCards);
+    /** @brief Plays the selected card and increments the partner commander tax counter. */
+    void actPlayAndIncreasePartnerTax(QList<CardItem *> selectedCards);
+    /** @brief Modifies a tax counter by delta if it is active. */
+    void actModifyTaxCounter(int counterId, int delta);
+    /** @brief Toggles a tax counter's active state (only if inactive or value is 0). */
+    void actToggleTaxCounter(int counterId);
     void actHide(QList<CardItem *> selectedCards);
 
     void actMoveTopCardToPlay();
@@ -219,6 +228,8 @@ public slots:
     void cardMenuAction(QList<CardItem *> selectedCards, CardMenuActionType type);
 
 private:
+    void sendIncCounter(int counterId, int delta);
+
     PlayerLogic *player;
 
     int defaultNumberTopCards = 1;
@@ -244,6 +255,27 @@ private:
                     bool faceDown = false);
 
     void playSelectedCards(QList<CardItem *> selectedCards, bool faceDown = false);
+
+    /**
+     * @brief Shared implementation for playing selected cards with an optional post-play callback.
+     * @param selectedCards Cards to play
+     * @param faceDown Whether to play cards face-down
+     * @param postPlayCallback Called after each card is played, receiving the card and its *original* zone name
+     *        (captured before playCard, since playCard sends a move command that may change the card's zone).
+     */
+    void playSelectedCardsImpl(QList<CardItem *> selectedCards,
+                               bool faceDown,
+                               const std::function<void(CardItem *, const QString &)> &postPlayCallback = nullptr);
+
+    /**
+     * @brief Plays the selected cards and, for each that came from the command zone,
+     *        increments the given (active) tax counter by one.
+     * @param selectedCards Cards to play
+     * @param counterId The tax counter to increment (CounterIds::CommanderTax or PartnerTax)
+     * @note The increment is sent optimistically, not gated on the move succeeding; a rejected
+     *       move can leave the tax incremented without a card being cast.
+     */
+    void playAndIncreaseTax(QList<CardItem *> selectedCards, int counterId);
 
     void cmdSetTopCard(Command_MoveCard &cmd);
     void cmdSetBottomCard(Command_MoveCard &cmd);
