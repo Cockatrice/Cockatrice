@@ -1,11 +1,24 @@
 /**
  * @file player_event_handler.h
  * @ingroup GameLogicPlayers
+ * @brief Player-scoped game event handler.
+ *
+ * PlayerEventHandler applies game events that affect a single Player’s
+ * board state, zones, cards, counters, arrows, and related UI/log output.
+ *
+ * It is invoked by GameEventHandler after basic routing and validation.
+ * Each instance is bound 1:1 to a Player and must never mutate state
+ * belonging to other players except where explicitly required by events
+ * (e.g. moving cards between players, attaching cards, arrows).
+ *
+ * This class is intentionally stateful and tightly coupled to Player,
+ * PlayerActions, and the board/zones implementation. It performs both
+ * model mutation and UI-side bookkeeping (zone views, arrows, menus).
  */
-//! \todo Document this file.
 
 #ifndef COCKATRICE_PLAYER_EVENT_HANDLER_H
 #define COCKATRICE_PLAYER_EVENT_HANDLER_H
+
 #include "event_processing_options.h"
 
 #include <QObject>
@@ -16,6 +29,7 @@
 class CardItem;
 class CardZoneLogic;
 class PlayerLogic;
+
 class Event_AttachCard;
 class Event_ChangeZoneProperties;
 class Event_CreateArrow;
@@ -37,11 +51,177 @@ class Event_SetCounter;
 class Event_Shuffle;
 class Event_GameLogNotice;
 
+
+/**
+ * @class PlayerEventHandler
+ * @brief Applies player-specific game events and emits corresponding log signals.
+ *
+ * Design notes:
+ * - All event handlers assume events are authoritative and already validated
+ *   by the server.
+ * - Most handlers mutate both logical state (CardItem, CardZoneLogic, counters)
+ *   and visual/UI state (views, arrows, menus).
+ * - Logging signals are emitted *after* or *during* state mutation, depending
+ *   on whether later mutations would invalidate log data.
+ */
 class PlayerEventHandler : public QObject
 {
-
     Q_OBJECT
+
+public:
+    /**
+     * @brief Construct a PlayerEventHandler bound to a Player.
+     * @param player Owning player instance.
+     */
+    explicit PlayerEventHandler(PlayerLogic *player);
+
+       /** @name Event dispatch
+     *  @{
+     */
+
+    /**
+     * @brief Dispatch a generic GameEvent to the appropriate handler.
+     *
+     * This is the single entry point used by GameEventHandler. It extracts
+     * the correct protobuf extension and forwards the event to a typed
+     * handler method.
+     *
+     * @param type Game event type enum.
+     * @param event Generic protobuf container.
+     * @param context Additional context (undo, judge, etc.).
+     * @param options Processing options (UI suppression, reveal behavior).
+     */
+    void processGameEvent(GameEvent::GameEventType type,
+                          const GameEvent &event,
+                          const GameEventContext &context,
+                          EventProcessingOptions options);
+
+    /** @} */
+
+    /** @name Chat and randomization events
+     *  @{
+     */
+
+    /// Handle in-game chat messages from this player.
+    void eventGameSay(const Event_GameSay &event);
+
+    /// Handle zone shuffle events (typically libraries).
+    void eventShuffle(const Event_Shuffle &event);
+
+    /// Handle die roll events.
+    void eventRollDie(const Event_RollDie &event);
+
+    /** @} */
+
+    /** @name Arrow and targeting events
+     *  @{
+     */
+
+    /// Create a visual arrow between cards or players.
+    void eventCreateArrow(const Event_CreateArrow &event);
+
+    /// Delete an existing arrow.
+    void eventDeleteArrow(const Event_DeleteArrow &event);
+
+    /** @} */
+
+    /** @name Token and card creation
+     *  @{
+     */
+
+    /// Create a token card in a target zone.
+    void eventCreateToken(const Event_CreateToken &event);
+
+    /** @} */
+
+    /** @name Card attribute and counter updates
+     *  @{
+     */
+
+    /**
+     * @brief Set a card attribute (tapped, PT, annotation, etc.).
+     *
+     * May apply to a single card or all cards in a zone if no card ID
+     * is provided by the event.
+     */
+    void
+    eventSetCardAttr(const Event_SetCardAttr &event, const GameEventContext &context, EventProcessingOptions options);
+
+    /// Update a counter attached to a card.
+    void eventSetCardCounter(const Event_SetCardCounter &event);
+
+    /// Create a player-level counter.
+    void eventCreateCounter(const Event_CreateCounter &event);
+
+    /// Set a player-level counter value.
+    void eventSetCounter(const Event_SetCounter &event);
+
+    /// Delete a player-level counter.
+    void eventDelCounter(const Event_DelCounter &event);
+
+    /** @} */
+
+    /** @name Zone-level operations
+     *  @{
+     */
+
+    /// Log a zone dump (e.g. reveal graveyard/library contents).
+    void eventDumpZone(const Event_DumpZone &event);
+
+    /**
+     * @brief Move a card between zones and/or players.
+     *
+     * This is one of the most complex handlers:
+     * - Removes the card from the start zone
+     * - Updates card identity and ownership if needed
+     * - Handles attachments and arrows
+     * - Emits appropriate move or undo-draw logs
+     * - Inserts the card into the target zone
+     */
+    void eventMoveCard(const Event_MoveCard &event, const GameEventContext &context);
+
+    /// Flip a card face up or face down.
+    void eventFlipCard(const Event_FlipCard &event);
+
+    /// Destroy a card and clean up attachments.
+    void eventDestroyCard(const Event_DestroyCard &event);
+
+    /// Attach or detach a card to/from another card.
+    void eventAttachCard(const Event_AttachCard &event);
+
+    /** @} */
+
+    /** @name Draw and reveal operations
+     *  @{
+     */
+
+    /// Draw one or more cards from the deck.
+    void eventDrawCards(const Event_DrawCards &event);
+
+    /**
+     * @brief Reveal cards from a zone.
+     *
+     * Handles peeking, in-place top-card reveals, full reveal windows,
+     * and write-access granting.
+     */
+    void eventRevealCards(const Event_RevealCards &event, EventProcessingOptions options);
+
+    /** @} */
+
+    /** @name Zone configuration
+     *  @{
+     */
+
+    /// Update zone visibility and reveal behavior.
+    void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
+
+    /** @} */
+
+    void eventGameLogNotice(const Event_GameLogNotice &event);
 signals:
+    /** @name Logging signals
+ *  @{
+ */
     void logSay(PlayerLogic *player, QString message);
     void logShuffle(PlayerLogic *player, CardZoneLogic *zone, int start, int end);
     void logRollDie(PlayerLogic *player, int sides, const QList<uint> &rolls);
@@ -82,40 +262,13 @@ signals:
                         bool isLentToAnotherPlayer = false);
     void logAlwaysRevealTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
     void logAlwaysLookAtTopCard(PlayerLogic *player, CardZoneLogic *zone, bool reveal);
+    /** @} */
+
     void cardZoneChanged(CardItem *card, bool sameZone);
     void requestCardMenuUpdate(const CardItem *card);
 
-public:
-    PlayerEventHandler(PlayerLogic *player);
-
-    void processGameEvent(GameEvent::GameEventType type,
-                          const GameEvent &event,
-                          const GameEventContext &context,
-                          EventProcessingOptions options);
-
-    void eventGameSay(const Event_GameSay &event);
-    void eventShuffle(const Event_Shuffle &event);
-    void eventRollDie(const Event_RollDie &event);
-    void eventCreateArrow(const Event_CreateArrow &event);
-    void eventDeleteArrow(const Event_DeleteArrow &event);
-    void eventCreateToken(const Event_CreateToken &event);
-    void
-    eventSetCardAttr(const Event_SetCardAttr &event, const GameEventContext &context, EventProcessingOptions options);
-    void eventSetCardCounter(const Event_SetCardCounter &event);
-    void eventCreateCounter(const Event_CreateCounter &event);
-    void eventSetCounter(const Event_SetCounter &event);
-    void eventDelCounter(const Event_DelCounter &event);
-    void eventDumpZone(const Event_DumpZone &event);
-    void eventMoveCard(const Event_MoveCard &event, const GameEventContext &context);
-    void eventFlipCard(const Event_FlipCard &event);
-    void eventDestroyCard(const Event_DestroyCard &event);
-    void eventAttachCard(const Event_AttachCard &event);
-    void eventDrawCards(const Event_DrawCards &event);
-    void eventRevealCards(const Event_RevealCards &event, EventProcessingOptions options);
-    void eventChangeZoneProperties(const Event_ChangeZoneProperties &event);
-    void eventGameLogNotice(const Event_GameLogNotice &event);
-
 private:
+    /** Owning player instance. */
     PlayerLogic *player;
 
     void setCardAttrHelper(const GameEventContext &context,

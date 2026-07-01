@@ -1,56 +1,197 @@
 syntax = "proto2";
 
-// Commands that are sent during a game to change the game state
+/// Commands that are sent during a game to change the game state
 message GameCommand {
+
+    /// Identifies the concrete game command to execute
     enum GameCommandType {
+
+        /// Kick a player from the game.
+        /// Server: Server_Game::handleKickFromGame
+        /// Client: reflected via game state events
         KICK_FROM_GAME = 1000;
+
+        /// Leave the current game voluntarily.
+        /// Server: Server_Game::handleLeaveGame
+        /// Client: reflected via game state events
         LEAVE_GAME = 1001;
+
+        /// Send an in-game chat message.
+        /// Server: Server_Game::handleGameSay
+        /// Client: PlayerEventHandler::eventGameSay
         GAME_SAY = 1002;
+
+        /// Shuffle a zone (typically the library).
+        /// Server: Server_Game::handleShuffle
+        /// Client: PlayerEventHandler::eventShuffle
         SHUFFLE = 1003;
+
+        /// Take a mulligan at game start.
+        /// Server: Server_Game::handleMulligan
+        /// Client: reflected via game state events
         MULLIGAN = 1004;
+
+        /// Roll one or more dice.
+        /// Server: Server_Game::handleRollDie
+        /// Client: PlayerEventHandler::eventRollDie
         ROLL_DIE = 1005;
+
+        /// Draw cards from the deck.
+        /// Server: Server_Game::handleDrawCards
+        /// Client: PlayerEventHandler::eventDrawCards
         DRAW_CARDS = 1006;
+
+        /// Undo a previous draw action.
+        /// Server: Server_Game::handleUndoDraw
+        /// Client: PlayerEventHandler::eventMoveCard (Context_UndoDraw)
         UNDO_DRAW = 1007;
+
+        /// Flip a card face up or face down.
+        /// Server: Server_Game::handleFlipCard
+        /// Client: PlayerEventHandler::eventFlipCard
         FLIP_CARD = 1008;
+
+        /// Attach one card to another.
+        /// Server: Server_Game::handleAttachCard
+        /// Client: PlayerEventHandler::eventAttachCard
         ATTACH_CARD = 1009;
+
+        /// Create a token card.
+        /// Server: Server_Game::handleCreateToken
+        /// Client: PlayerEventHandler::eventCreateToken
         CREATE_TOKEN = 1010;
+
+        /// Create a visual arrow between objects.
+        /// Server: Server_Game::handleCreateArrow
+        /// Client: PlayerEventHandler::eventCreateArrow
         CREATE_ARROW = 1011;
+
+        /// Delete a visual arrow.
+        /// Server: Server_Game::handleDeleteArrow
+        /// Client: PlayerEventHandler::eventDeleteArrow
         DELETE_ARROW = 1012;
+
+        /// Set a card attribute (e.g. tapped, flipped).
+        /// Server: Server_Game::handleSetCardAttr
+        /// Client: PlayerEventHandler::eventSetCardAttr
         SET_CARD_ATTR = 1013;
+
+        /// Set a counter value on a card.
+        /// Server: Server_Game::handleSetCardCounter
+        /// Client: PlayerEventHandler::eventSetCardCounter
         SET_CARD_COUNTER = 1014;
+
+        /// Increment a counter on a card.
+        /// Server: Server_Game::handleIncCardCounter
+        /// Client: PlayerEventHandler::eventSetCardCounter
         INC_CARD_COUNTER = 1015;
+
+        /// Mark the player as ready to start the game.
+        /// Server: Server_Game::handleReadyStart
+        /// Client: reflected via game state events
         READY_START = 1016;
+
+        /// Concede the game.
+        /// Server: Server_Game::handleConcede
+        /// Client: reflected via game state events
         CONCEDE = 1017;
+
+        /// Increment a global (non-card) counter.
+        /// Server: Server_Game::handleIncCounter
+        /// Client: PlayerEventHandler::eventSetCounter
         INC_COUNTER = 1018;
+
+        /// Create a new global counter.
+        /// Server: Server_Game::handleCreateCounter
+        /// Client: PlayerEventHandler::eventCreateCounter
         CREATE_COUNTER = 1019;
+
+        /// Set a global counter value.
+        /// Server: Server_Game::handleSetCounter
+        /// Client: PlayerEventHandler::eventSetCounter
         SET_COUNTER = 1020;
+
+        /// Delete a global counter.
+        /// Server: Server_Game::handleDelCounter
+        /// Client: PlayerEventHandler::eventDelCounter
         DEL_COUNTER = 1021;
+
+        /// Advance to the next turn.
+        /// Server: Server_Game::handleNextTurn
+        /// Client: reflected via active player / phase events
         NEXT_TURN = 1022;
+
+        /// Set the active phase of the turn.
+        /// Server: Server_Game::handleSetActivePhase
+        /// Client: reflected via game state events
         SET_ACTIVE_PHASE = 1023;
+
+        /// Dump the contents of a zone.
+        /// Server: Server_Game::handleDumpZone
+        /// Client: PlayerEventHandler::eventDumpZone
         DUMP_ZONE = 1024;
-        // STOP_DUMP_ZONE = 1025; // obsolete
+
+        /// Reveal specific cards to players.
+        /// Server: Server_Game::handleRevealCards
+        /// Client: PlayerEventHandler::eventRevealCards
         REVEAL_CARDS = 1026;
+
+        /// Move a card between zones.
+        /// Server: Server_Game::handleMoveCard
+        /// Client: PlayerEventHandler::eventMoveCard
         MOVE_CARD = 1027;
+
+        /// Set the sideboard plan for the game.
+        /// Server: Server_Game::handleSetSideboardPlan
+        /// Client: not forwarded as a game event
         SET_SIDEBOARD_PLAN = 1028;
+
+        /// Select a deck for the game.
+        /// Server: Server_Game::handleDeckSelect
+        /// Client: reflected via lobby / game state
         DECK_SELECT = 1029;
+
+        /// Lock or unlock sideboarding.
+        /// Server: Server_Game::handleSetSideboardLock
+        /// Client: reflected via game state
         SET_SIDEBOARD_LOCK = 1030;
+
+        /// Change zone properties (visibility, reveal-top, etc.).
+        /// Server: Server_Game::handleChangeZoneProperties
+        /// Client: PlayerEventHandler::eventChangeZoneProperties
         CHANGE_ZONE_PROPERTIES = 1031;
+
+        /// Undo a previous concede.
+        /// Server: Server_Game::handleUnconcede
+        /// Client: reflected via game state
         UNCONCEDE = 1032;
+
+        /// Execute a command on behalf of another player.
+        /// Server: Server_Game::handleJudge
+        /// Client: transparent (wrapped commands handled normally)
         JUDGE = 1033;
+
+        /// Reverse the current turn order.
+        /// Server: Server_Game::handleReverseTurn
+        /// Client: reflected via subsequent turn events
         REVERSE_TURN = 1034;
     }
+
     extensions 100 to max;
 }
 
-// A wrapper around a normal game command that allows a privileged user to send a command on behalf of another player
+/// A wrapper around a normal game command that allows a privileged user
+/// to send a command on behalf of another player.
 message Command_Judge {
+
     extend GameCommand {
+        /// Judge command extension payload
         optional Command_Judge ext = 1033;
     }
 
-    // The player on whose behalf this command is sent
+    /// The player on whose behalf this command is sent.
     optional sint32 target_id = 1 [default = -1];
 
-    // The wrapped game command
+    /// One or more wrapped game commands to execute.
     repeated GameCommand game_command = 2;
 }
