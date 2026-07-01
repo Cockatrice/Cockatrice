@@ -7,6 +7,17 @@ permissions:
   id-token: write    # needed for signing certificate in attestation
 
 on:
+  pull_request:
+    paths:
+      - '*/**'    # matches all files not in root
+      - '!**.md'
+      - '!.github/**'
+      - '!.tx/**'
+      - '!doc/**'
+      - '.github/workflows/desktop-build.yml'
+      - 'CMakeLists.txt'
+      - 'vcpkg.json'
+      - 'vcpkg'    # needed to match submodule bumps (gitlink)
   push:
     branches:
       - master
@@ -22,30 +33,19 @@ on:
       - 'vcpkg'    # needed to match submodule bumps (gitlink)
     tags:
       - '*'
-  pull_request:
-    paths:
-      - '*/**'    # matches all files not in root
-      - '!**.md'
-      - '!.github/**'
-      - '!.tx/**'
-      - '!doc/**'
-      - '.github/workflows/desktop-build.yml'
-      - 'CMakeLists.txt'
-      - 'vcpkg.json'
-      - 'vcpkg'    # needed to match submodule bumps (gitlink)
 
 # Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
 concurrency:
-  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
   cancel-in-progress: ${{ github.ref_type != 'tag' }}
+  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
 
 jobs:
   configure:
     name: Configure
     runs-on: ubuntu-slim
     outputs:
-      tag: ${{ steps.configure.outputs.tag }}
       sha: ${{ steps.configure.outputs.sha }}
+      tag: ${{ steps.configure.outputs.tag }}
 
     steps:
       - name: "Configure"
@@ -66,8 +66,8 @@ jobs:
           fetch-depth: 0    # fetch all history for all branches and tags
 
       - name: "Prepare release parameters"
-        id: prepare
         if: steps.configure.outputs.tag != null
+        id: prepare
         shell: bash
         env:
           TAG: ${{ steps.configure.outputs.tag }}
@@ -78,12 +78,12 @@ jobs:
         id: create_release
         shell: bash
         env:
+          body_path: ${{ steps.prepare.outputs.body_path }}
           GH_TOKEN: ${{ github.token }}
+          prerelease: ${{ steps.prepare.outputs.is_beta }}
+          release_name: ${{ steps.prepare.outputs.title }}
           tag_name: ${{ steps.configure.outputs.tag }}
           target: ${{ steps.configure.outputs.sha }}
-          release_name: ${{ steps.prepare.outputs.title }}
-          body_path: ${{ steps.prepare.outputs.body_path }}
-          prerelease: ${{ steps.prepare.outputs.is_beta }}
         run: |
           args=()
           [[ $prerelease == yes ]] && args+=(--prerelease)
@@ -183,13 +183,13 @@ jobs:
             --cmake-generator "$CMAKE_GENERATOR"
 
       - name: "Build release package"
-        id: build
         if: matrix.package != 'skip'
+        id: build
         shell: bash
         env:
-          SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
           package: '${{ matrix.package }}'
           server_only: '${{ matrix.server_only }}'
+          SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
         run: |
           source .ci/docker.sh
           args=()
@@ -221,8 +221,8 @@ jobs:
           path: ${{ env.CACHE }}
 
       - name: "Upload artifact"
-        id: upload_artifact
         if: matrix.package != 'skip'
+        id: upload_artifact
         uses: actions/upload-artifact@v7
         with:
           archive: false
@@ -230,8 +230,8 @@ jobs:
           path: ${{ steps.build.outputs.path }}
 
       - name: "Upload to release"
-        id: upload_release
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
+        id: upload_release
         shell: bash
         env:
           asset_name: ${{ steps.build.outputs.fullname }}
@@ -241,8 +241,8 @@ jobs:
         run: gh release upload "$tag_name" "$asset_path#$asset_name"
 
       - name: "Attest binary provenance"
-        id: attestation
         if: steps.upload_release.outcome == 'success'
+        id: attestation
         uses: actions/attest@v4
         with:
           show-summary: false
@@ -264,8 +264,7 @@ jobs:
           - os: macOS
             target: 13
             runner: macos-15-intel
-
-            ccache_eviction_age: 7d
+            
             cmake_generator: Ninja
             make_package: 1
             override_target: 13
@@ -281,8 +280,7 @@ jobs:
           - os: macOS
             target: 14
             runner: macos-14
-
-            ccache_eviction_age: 7d
+            
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS14"
@@ -297,8 +295,7 @@ jobs:
           - os: macOS
             target: 15
             runner: macos-15
-
-            ccache_eviction_age: 7d
+            
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS15"
@@ -313,8 +310,7 @@ jobs:
           - os: macOS
             target: 15
             runner: macos-15
-
-            ccache_eviction_age: 7d
+            
             cmake_generator: Ninja
             qt_version: 6.11.0
             qt_arch: clang_64
@@ -343,6 +339,7 @@ jobs:
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
+      CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
 
     steps:
@@ -442,8 +439,7 @@ jobs:
         id: build
         shell: bash
         env:
-          BUILDTYPE: '${{ matrix.type }}'
-          CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
+          BUILDTYPE: ${{ matrix.type }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
@@ -451,8 +447,8 @@ jobs:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
-          MAKE_PACKAGE: '${{ matrix.make_package }}'
-          PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
+          MAKE_PACKAGE: ${{ matrix.make_package }}
+          PACKAGE_SUFFIX: ${{ matrix.package_suffix }}
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
@@ -478,52 +474,18 @@ jobs:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
           path: ${{ env.CCACHE_DIR }}
 
-      - name: "[macOS] Sign app bundle"
-        if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
-        id: sign_macos
+      - name: "[macOS] Sign & notarize app bundle"
+        # if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
+        if: matrix.os == 'macOS' 
+        shell: bash
         env:
           BUILD_PATH: ${{ steps.build.outputs.path }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
-        run: |
-          if [[ -n "$MACOS_CERTIFICATE_NAME" ]]
-          then
-            security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-            /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "$BUILD_PATH"
-          fi
-
-      - name: "[macOS] Notarize app bundle"
-        if: matrix.os == 'macOS' && steps.sign_macos.outcome == 'success'
-        env:
-          BUILD_PATH: ${{ steps.build.outputs.path }}
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
-        run: |
-          if [[ -n "$MACOS_NOTARIZATION_APPLE_ID" ]]
-          then
-            # Store the notarization credentials so that we can prevent a UI password dialog from blocking the CI
-            echo "Create keychain profile"
-            xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MACOS_NOTARIZATION_APPLE_ID" --team-id "$MACOS_NOTARIZATION_TEAM_ID" --password "$MACOS_NOTARIZATION_PWD"
-
-            # We can't notarize an app bundle directly, but we need to compress it as an archive.
-            # Therefore, we create a zip file containing our app bundle, so that we can send it to the
-            # notarization service
-            echo "Creating temp notarization archive"
-            ditto -c -k --keepParent "$BUILD_PATH" "notarization.zip"
-
-            # Here we send the notarization request to the Apple's Notarization service, waiting for the result.
-            # This typically takes a few seconds inside a CI environment, but it might take more depending on the App
-            # characteristics. Visit the Notarization docs for more information and strategies on how to optimize it if
-            # you're curious
-            echo "Notarize app"
-            xcrun notarytool submit "notarization.zip" --keychain-profile "notarytool-profile" --wait
-
-            # Finally, we need to "attach the staple" to our executable, which will allow our app to be
-            # validated by macOS even when an internet connection is not available.
-            echo "Attach staple"
-            xcrun stapler staple "$BUILD_PATH"
-          fi
+        run: .ci/sign_macos_bundle.sh "$BUILD_PATH"
 
       - name: "Upload artifact"
         if: matrix.make_package
