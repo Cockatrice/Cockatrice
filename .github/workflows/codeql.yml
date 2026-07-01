@@ -1,0 +1,96 @@
+# GitHub Docs on Code Scanning:
+# https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning
+# https://docs.github.com/en/code-security/how-tos/find-and-fix-code-vulnerabilities/manage-your-configuration
+# https://docs.github.com/en/code-security/reference/code-scanning/workflow-configuration-options
+#
+# CodeQL Docs:
+# https://codeql.github.com/docs/
+
+name: CodeQL
+
+permissions:
+  security-events: write    # needed to post results
+  contents: read
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**/*.md'
+      - 'doc/**'
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - '**/*.md'
+      - 'doc/**'
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        # https://codeql.github.com/docs/codeql-overview/supported-languages-and-frameworks/
+        - language: cpp
+          build-mode: manual
+        - language: actions
+          build-mode: none
+
+    steps:
+    - name: "Checkout repository"
+      uses: actions/checkout@v6
+
+    - name: "Initialize CodeQL"
+      uses: github/codeql-action/init@v4
+      with:
+        languages: ${{ matrix.language }}
+        build-mode: ${{ matrix.build-mode }}
+        # https://docs.github.com/en/code-security/reference/code-scanning/codeql/codeql-queries/c-cpp-built-in-queries
+        # https://docs.github.com/en/code-security/reference/code-scanning/codeql/codeql-queries/actions-built-in-queries
+        queries: security-extended
+        dependency-caching: true
+
+    - name: "[C++] Install dependencies"
+      if: matrix.language == 'cpp' && matrix.build-mode == 'manual'
+      shell: bash
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          cmake \
+          g++ \
+          libgl-dev \
+          liblzma-dev \
+          libmariadb-dev-compat \
+          libprotobuf-dev \
+          ninja-build \
+          protobuf-compiler \
+          qt6-multimedia-dev \
+          qt6-svg-dev \
+          qt6-tools-dev \
+          qt6-tools-dev-tools \
+          qt6-websockets-dev
+
+# Minimize dependency install
+# Add ccache usage for faster compilation, (install ccache dep, actions/cache step + append DUSE_CCACHE=1 in cmake config, CCACHE env values)
+
+    - name: "[C++] Configure CMake"
+      if: matrix.language == 'cpp' && matrix.build-mode == 'manual'
+      shell: bash
+      run: cmake -S . -B build -G Ninja -DWITH_SERVER=1 -DCMAKE_BUILD_TYPE=Release
+
+    - name: "[C++] Build application"
+      if: matrix.language == 'cpp' && matrix.build-mode == 'manual'
+      shell: bash
+      run: cmake --build build
+
+    - name: "Perform CodeQL Analysis"
+      uses: github/codeql-action/analyze@v4
+      with:
+        category: "/language:${{ matrix.language }}"
