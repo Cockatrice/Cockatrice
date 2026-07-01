@@ -248,10 +248,6 @@ PaletteConfig PaletteConfig::fromDefault(const QString &themeDirPath, const QStr
     PaletteConfig cfg =
         fromFile(dir.absoluteFilePath(wantDark ? "palette-default-dark.toml" : "palette-default-light.toml"));
 
-    if (!cfg.hasPalette()) {
-        cfg = fromFile(dir.absoluteFilePath(wantDark ? "palette-default-light.toml" : "palette-default-dark.toml"));
-    }
-
     return cfg;
 }
 

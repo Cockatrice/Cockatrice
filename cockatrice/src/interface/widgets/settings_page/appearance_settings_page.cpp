@@ -11,6 +11,7 @@
 #include <QDesktopServices>
 #include <QGridLayout>
 #include <QMessageBox>
+#include <QStyleFactory>
 #include <QTimer>
 
 AppearanceSettingsPage::AppearanceSettingsPage()
@@ -31,32 +32,33 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&themeBox, qOverload<int>(&QComboBox::currentIndexChanged), this, &AppearanceSettingsPage::themeBoxChanged);
     connect(&openThemeButton, &QPushButton::clicked, this, &AppearanceSettingsPage::openThemeLocation);
 
+    // Populate Scheme
+
     schemeCombo.addItem(tr("Light"), QStringLiteral("Light"));
     schemeCombo.addItem(tr("Dark"), QStringLiteral("Dark"));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     schemeCombo.addItem(tr("System"), QStringLiteral("System"));
 #endif
 
-    // Seed from whatever the current theme already has saved
-    const QString dirPath = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
-    const ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
-    const QString current = cfg.colorScheme;
-    const int seedIdx = schemeCombo.findData(current);
-    schemeCombo.setCurrentIndex(seedIdx >= 0 ? seedIdx : 0);
-
     connect(&schemeCombo, &QComboBox::currentIndexChanged, this,
             [this] { themeManager->setColorScheme(schemeCombo.currentData().toString()); });
 
-    connect(themeManager, &ThemeManager::themeChanged, this, [this, dirPath] {
-        const QString newDir = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
-        const ThemeConfig cfg = ThemeConfig::fromThemeDir(newDir);
-        const QString current = cfg.colorScheme;
+    // Populate Style
 
-        schemeCombo.blockSignals(true);
-        const int idx = schemeCombo.findData(current);
-        schemeCombo.setCurrentIndex(idx >= 0 ? idx : 0);
-        schemeCombo.blockSignals(false);
-    });
+    styleComboBox.addItem(tr("Default"), QString());
+
+    for (const QString &style : QStyleFactory::keys()) {
+        styleComboBox.addItem(style, style);
+    }
+
+    connect(&styleComboBox, &QComboBox::currentIndexChanged, this,
+            [this] { themeManager->setStyleName(styleComboBox.currentData().toString()); });
+
+    // Refresh theme and style
+
+    reloadThemeSettings();
+
+    connect(themeManager, &ThemeManager::themeChanged, this, &AppearanceSettingsPage::reloadThemeSettings);
 
     connect(&editPaletteButton, &QPushButton::clicked, this, &AppearanceSettingsPage::editPalette);
 
@@ -66,7 +68,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGrid->addWidget(&openThemeButton, 1, 1);
     themeGrid->addWidget(&schemeComboLabel, 2, 0);
     themeGrid->addWidget(&schemeCombo, 2, 1);
-    themeGrid->addWidget(&editPaletteButton, 3, 1);
+    themeGrid->addWidget(&styleLabel, 3, 0);
+    themeGrid->addWidget(&styleComboBox, 3, 1);
+    themeGrid->addWidget(&editPaletteButton, 4, 1);
 
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
@@ -330,6 +334,19 @@ void AppearanceSettingsPage::openThemeLocation()
     }
 }
 
+void AppearanceSettingsPage::reloadThemeSettings()
+{
+    const ThemeConfig cfg = themeManager->effectiveThemeConfig(SettingsCache::instance().getThemeName());
+
+    schemeCombo.blockSignals(true);
+    schemeCombo.setCurrentIndex(std::max(0, schemeCombo.findData(cfg.colorScheme)));
+    schemeCombo.blockSignals(false);
+
+    styleComboBox.blockSignals(true);
+    styleComboBox.setCurrentIndex(qMax(0, styleComboBox.findData(cfg.styleName)));
+    styleComboBox.blockSignals(false);
+}
+
 void AppearanceSettingsPage::editPalette()
 {
     PaletteEditorDialog dlg(themeManager->getCurrentThemePath(), SettingsCache::instance().getThemeName(), this);
@@ -400,6 +417,7 @@ void AppearanceSettingsPage::retranslateUi()
     themeLabel.setText(tr("Current theme:"));
     openThemeButton.setText(tr("Open themes folder"));
     schemeComboLabel.setText(tr("Active theme palette:"));
+    styleLabel.setText(tr("Active theme style:"));
     editPaletteButton.setText(tr("Edit theme palette"));
 
     homeTabGroupBox->setTitle(tr("Home tab settings"));

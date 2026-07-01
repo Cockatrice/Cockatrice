@@ -1,0 +1,63 @@
+[Palette]
+WindowText           = #ffffffff
+Button               = #ff383838
+Light                = #ff737373
+Midlight             = #ff525252
+Dark                 = #ff161616
+Mid                  = #ff252525
+Text                 = #ffffffff
+BrightText           = #ffb4dd8b
+ButtonText           = #ffffffff
+Base                 = #ff2b2b2b
+Window               = #ff1c1c1c
+Shadow               = #ff000000
+HighlightedText      = #ff000000
+Link                 = #ffcde4b6
+LinkVisited          = #ff99d999
+AlternateBase        = #ff242424
+ToolTipBase          = #ffffffdc
+ToolTipText          = #ff000000
+PlaceholderText      = #6effffff
+
+[Palette.Disabled]
+WindowText           = #ff9d9d9d
+Button               = #ff1c1c1c
+Light                = #ff737373
+Midlight             = #ff525252
+Dark                 = #ff161616
+Mid                  = #ff252525
+Text                 = #ff9d9d9d
+BrightText           = #ffb4dd8b
+ButtonText           = #ff787878
+Base                 = #ff1c1c1c
+Window               = #ff1c1c1c
+Shadow               = #ff000000
+HighlightedText      = #ff9d9d9d
+Link                 = #ff308cc6
+LinkVisited          = #ffb450ff
+AlternateBase        = #ff242424
+ToolTipBase          = #ffffffdc
+ToolTipText          = #ff000000
+PlaceholderText      = #46ffffff
+
+[Palette.Inactive]
+WindowText           = #ffffffff
+Button               = #ff383838
+Light                = #ff737373
+Midlight             = #ff525252
+Dark                 = #ff161616
+Mid                  = #ff252525
+Text                 = #ffffffff
+BrightText           = #ffb4dd8b
+ButtonText           = #ffffffff
+Base                 = #ff2b2b2b
+Window               = #ff1c1c1c
+Shadow               = #ff000000
+HighlightedText      = #ffffffff
+Link                 = #ffcde4b6
+LinkVisited          = #ff99d999
+AlternateBase        = #ff242424
+ToolTipBase          = #ffffffdc
+ToolTipText          = #ff000000
+PlaceholderText      = #6effffff
+

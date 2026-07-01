@@ -19,13 +19,15 @@
 PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QString &_themeName, QWidget *parent)
     : QDialog(parent), themeDirPath(_themeDirPath), themeName(_themeName)
 {
+    userThemeDirPath = ThemeManager::userThemeDirFor(themeName);
+
     setMinimumSize(740, 220);
     setupUi();
 
     // Load both scheme configs upfront so switching is instant
     loadSchemes();
 
-    loadedScheme = themeManager->isDarkMode(themeDirPath) ? "Dark" : "Light";
+    loadedScheme = themeManager->isDarkMode(themeDirPath, userThemeDirPath) ? "Dark" : "Light";
 
     schemeComboBox->blockSignals(true);
     schemeComboBox->setCurrentText(loadedScheme);
@@ -33,7 +35,6 @@ PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QSt
 
     paletteGrid->loadPalette(workingConfig[loadedScheme]);
     seedAccentFromScheme(loadedScheme);
-
     retranslateUi();
 }
 
@@ -157,20 +158,22 @@ void PaletteEditorDialog::setupUi()
     });
 }
 
+void PaletteEditorDialog::updateUserOverrideState()
+{
+    const bool hasUserOverride =
+        QFile::exists(QDir(userThemeDirPath).absoluteFilePath(PaletteConfig::fileName(loadedScheme)));
+
+    revertButton->setEnabled(hasUserOverride);
+    revertButton->setToolTip(hasUserOverride ? tr("Delete your custom palette and restore the shipped defaults")
+                                             : tr("No custom palette overrides exist for this scheme"));
+}
+
 void PaletteEditorDialog::retranslateUi()
 {
     setWindowTitle(tr("Palette Editor — %1").arg(themeName));
     titleLabel->setText(tr("<b>Palette Editor</b> &nbsp;·&nbsp; %1").arg(themeName));
 
-    // Revert button only makes sense when the theme ships default palette files
-    const bool hasDefault = PaletteConfig::fromDefault(themeDirPath, "Light").hasPalette() ||
-                            PaletteConfig::fromDefault(themeDirPath, "Dark").hasPalette();
-    revertButton->setEnabled(hasDefault);
-    if (!hasDefault) {
-        revertButton->setToolTip(tr("This theme ships no default palette files"));
-    } else {
-        revertButton->setToolTip(tr("Replace current colours with the theme author's defaults"));
-    }
+    updateUserOverrideState();
 
     schemeComboBox->setToolTip(tr("Switch between the light and dark palette files"));
     editingLabel->setText(tr("Editing:"));
@@ -195,8 +198,11 @@ void PaletteEditorDialog::loadSchemes()
 {
     const QStringList schemes = {"Light", "Dark"};
     for (const QString &scheme : schemes) {
-        PaletteConfig cfg = PaletteConfig::fromScheme(themeDirPath, scheme);
-
+        // user customisation → system palette → system default → app palette
+        PaletteConfig cfg = PaletteConfig::fromScheme(userThemeDirPath, scheme);
+        if (!cfg.hasPalette()) {
+            cfg = PaletteConfig::fromScheme(themeDirPath, scheme);
+        }
         if (!cfg.hasPalette()) {
             cfg = PaletteConfig::fromDefault(themeDirPath, scheme);
         }
@@ -235,6 +241,9 @@ void PaletteEditorDialog::onSchemeChanged(const QString &scheme)
     loadedScheme = scheme;
     paletteGrid->loadPalette(workingConfig.value(scheme));
     seedAccentFromScheme(scheme);
+
+    updateUserOverrideState();
+
     onApply();
 }
 
@@ -258,15 +267,17 @@ void PaletteEditorDialog::onSave()
 
     PaletteConfig cfg = paletteGrid->currentPaletteConfig();
 
-    if (!ThemeManager::savePaletteConfig(themeDirPath, loadedScheme, cfg)) {
-        QMessageBox::warning(this, tr("Save failed"),
-                             tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(loadedScheme), themeDirPath));
+    if (!ThemeManager::savePaletteConfig(userThemeDirPath, loadedScheme, cfg)) {
+        QMessageBox::warning(
+            this, tr("Save failed"),
+            tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(loadedScheme), userThemeDirPath));
         return;
     }
 
-    ThemeConfig globalCfg = ThemeConfig::fromThemeDir(themeDirPath);
+    // Record the active scheme in the user dir — never touch the system (read-only) dir
+    ThemeConfig globalCfg = themeManager->effectiveThemeConfig(themeName);
     globalCfg.colorScheme = loadedScheme;
-    globalCfg.save(themeDirPath);
+    globalCfg.save(userThemeDirPath);
 
     savedConfig[loadedScheme] = cfg;
     workingConfig[loadedScheme] = cfg;
@@ -282,14 +293,50 @@ void PaletteEditorDialog::onReset()
 
 void PaletteEditorDialog::onRevertToDefault()
 {
-    PaletteConfig def = PaletteConfig::fromDefault(themeDirPath, loadedScheme);
-    if (!def.hasPalette()) {
-        QMessageBox::information(this, tr("No default found"),
-                                 tr("No default palette file found for the \"%1\" scheme.").arg(loadedScheme));
+    const QString filePath = QDir(userThemeDirPath).absoluteFilePath(PaletteConfig::fileName(loadedScheme));
+
+    if (!QFile::exists(filePath)) {
+        // Button should already be disabled in this state, but be defensive
         return;
     }
+
+    const auto reply =
+        QMessageBox::question(this, tr("Revert to default?"),
+                              tr("This will permanently delete your custom \"%1\" palette for \"%2\".\n\nContinue?")
+                                  .arg(loadedScheme, themeName),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (reply != QMessageBox::Yes) {
+        return;
+    }
+
+    QFile::remove(filePath);
+
+    // Reload via fallthrough: system palette → system default → app palette
+    PaletteConfig def = PaletteConfig::fromScheme(themeDirPath, loadedScheme);
+    if (!def.hasPalette()) {
+        def = PaletteConfig::fromDefault(themeDirPath, loadedScheme);
+    }
+    if (!def.hasPalette()) {
+        const QPalette appPal = qApp->palette();
+        for (auto group : {QPalette::Active, QPalette::Disabled, QPalette::Inactive}) {
+            for (int i = 0; i < QPalette::NColorRoles; ++i) {
+                auto role = static_cast<QPalette::ColorRole>(i);
+                if (role != QPalette::NoRole) {
+                    def.colors[group][role] = appPal.color(group, role);
+                }
+            }
+        }
+    }
+
+    savedConfig[loadedScheme] = def;
     workingConfig[loadedScheme] = def;
-    paletteGrid->loadPalette(def);
+
+    ThemeConfig globalCfg = themeManager->effectiveThemeConfig(themeName);
+    globalCfg.colorScheme = loadedScheme;
+    globalCfg.save(userThemeDirPath);
+
+    themeManager->reloadCurrentTheme();
+    accept();
 }
 
 void PaletteEditorDialog::changeEvent(QEvent *e)
