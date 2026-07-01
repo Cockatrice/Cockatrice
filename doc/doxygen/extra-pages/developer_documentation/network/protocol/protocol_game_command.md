@@ -9,7 +9,7 @@ Flow overview:
 
 Client
 → GameCommand
-→ Server_Game::handle*
+→ Server command handler (`Server_Player`, `Server_AbstractParticipant`, or `Server_Game`)
 → GameEvent(s)
 → PlayerEventHandler::event*
 
@@ -20,11 +20,15 @@ Client
 **Purpose:** Send a chat message during a game.
 
 **Server:**
-- `Server_Game::handleGameSay`
+- `Server_AbstractParticipant::cmdGameSay`
+- Validates spectator chat permissions
+- Applies chat flood protection
 - Emits `Event_GameSay`
+- Logs the message to the server database
 
 **Client:**
 - `PlayerEventHandler::eventGameSay`
+- Adds the chat message to the game log
 
 ---
 
@@ -33,14 +37,19 @@ Client
 **Purpose:** Shuffle a card zone (usually library).
 
 **Server:**
-- `Server_Game::handleShuffle`
-- Reorders cards in zone
+- `Server_Player::cmdShuffle`
+- Only allows shuffling the deck zone
+- Rejects if the game has not started or the player has conceded
+- Supports partial-range shuffles (`start` / `end`)
 - Emits `Event_Shuffle`
+- Re-reveals the top card if the deck is being tracked
 
 **Client:**
 - `PlayerEventHandler::eventShuffle`
-- Clears revealed top cards
-- Closes affected zone views
+- Closes affected library views
+- Clears any revealed top card if necessary
+- Updates deck graphics
+- Logs the shuffle
 
 ---
 
@@ -49,12 +58,12 @@ Client
 **Purpose:** Roll one or more dice.
 
 **Server:**
-- `Server_Game::handleRollDie`
-- Computes random values
+- Computes random die results
 - Emits `Event_RollDie`
 
 **Client:**
 - `PlayerEventHandler::eventRollDie`
+- Displays the sorted roll results in the game log
 
 ---
 
@@ -63,12 +72,21 @@ Client
 **Purpose:** Draw cards from deck.
 
 **Server:**
-- `Server_Game::handleDrawCards`
-- Moves cards from deck → hand
+- `Server_Player::cmdDrawCards`
+- Rejects if the game has not started or the player has conceded
+- Moves cards from deck to hand
+- Sends full card information privately to the drawing player
+- Sends only the draw count to all other players
+- Tracks drawn cards for undo
+- Updates revealed-top-card state when necessary
 - Emits `Event_DrawCards`
 
 **Client:**
 - `PlayerEventHandler::eventDrawCards`
+- Moves cards from library to hand
+- Reveals card identities only when included in the event
+- Updates both zones
+- Logs the draw
 
 ---
 
@@ -77,13 +95,16 @@ Client
 **Purpose:** Undo a previous draw.
 
 **Server:**
-- `Server_Game::handleUndoDraw`
-- Uses `Context_UndoDraw`
-- Moves card(s) back to deck
+- `Server_Player::cmdUndoDraw`
+- Rejects if the game has not started or the player has conceded
+- Uses the tracked draw history (`lastDrawList`)
+- Moves the most recently drawable card from hand back to the top of the deck
+- Emits `Event_GameLogNotice` if undo is no longer possible
 
 **Client:**
-- Handled via `PlayerEventHandler::eventMoveCard`
-- Logged as undo-draw context
+- Processed as a normal `MOVE_CARD`
+- Detects `Context_UndoDraw`
+- Logs the undo draw instead of a normal move
 
 ---
 
@@ -92,12 +113,16 @@ Client
 **Purpose:** Flip a card face up or face down.
 
 **Server:**
-- `Server_Game::handleFlipCard`
-- Updates card visibility
+- Updates the card's face-down state
+- Reveals identity when turning face up
 - Emits `Event_FlipCard`
 
 **Client:**
 - `PlayerEventHandler::eventFlipCard`
+- Updates the card identity when revealed
+- Changes face-up / face-down state
+- Updates card menus
+- Logs the flip
 
 ---
 
@@ -106,12 +131,15 @@ Client
 **Purpose:** Attach one card to another.
 
 **Server:**
-- `Server_Game::handleAttachCard`
-- Updates attachment graph
+- Updates attachment relationships
 - Emits `Event_AttachCard`
 
 **Client:**
 - `PlayerEventHandler::eventAttachCard`
+- Updates parent/child attachment links
+- Reorganizes affected zones
+- Logs attach or detach operations
+- Refreshes card actions
 
 ---
 
@@ -120,12 +148,15 @@ Client
 **Purpose:** Create a token card.
 
 **Server:**
-- `Server_Game::handleCreateToken`
-- Allocates new card instance
+- Creates a new token card
 - Emits `Event_CreateToken`
 
 **Client:**
 - `PlayerEventHandler::eventCreateToken`
+- Creates the token object
+- Applies token properties (PT, color, annotation, face-down state)
+- Adds it to the requested zone
+- Logs token creation
 
 ---
 
@@ -134,12 +165,14 @@ Client
 **Purpose:** Create a visual arrow.
 
 **Server:**
-- `Server_Game::handleCreateArrow`
-- Registers arrow ownership
+- Creates a visual arrow
 - Emits `Event_CreateArrow`
 
 **Client:**
 - `PlayerEventHandler::eventCreateArrow`
+- Creates the arrow graphics
+- Resolves endpoint card names
+- Logs arrow creation
 
 ---
 
@@ -148,12 +181,12 @@ Client
 **Purpose:** Remove a visual arrow.
 
 **Server:**
-- `Server_Game::handleDeleteArrow`
-- Removes arrow
+- Removes an existing arrow
 - Emits `Event_DeleteArrow`
 
 **Client:**
 - `PlayerEventHandler::eventDeleteArrow`
+- Removes the arrow graphics
 
 ---
 
@@ -162,11 +195,13 @@ Client
 **Purpose:** Set a card attribute.
 
 **Server:**
-- `Server_Game::handleSetCardAttr`
+- Updates one or more card attributes
 - Emits `Event_SetCardAttr`
 
 **Client:**
 - `PlayerEventHandler::eventSetCardAttr`
+- Updates tapped state, color, annotation, power/toughness, face-down state, attacking state, and related visuals
+- Logs attribute changes where appropriate
 
 ---
 
@@ -175,11 +210,14 @@ Client
 **Purpose:** Set a card counter.
 
 **Server:**
-- `Server_Game::handleSetCardCounter`
+- Updates the specified card counter
 - Emits `Event_SetCardCounter`
 
 **Client:**
 - `PlayerEventHandler::eventSetCardCounter`
+- Updates the displayed counter value
+- Refreshes card actions
+- Logs the counter change
 
 ---
 
@@ -188,12 +226,11 @@ Client
 **Purpose:** Increment a card counter.
 
 **Server:**
-- `Server_Game::handleIncCardCounter`
-- Normalized to set-counter
+- Normalizes to a set-counter operation
 - Emits `Event_SetCardCounter`
 
 **Client:**
-- `PlayerEventHandler::eventSetCardCounter`
+- Processed identically to `SET_CARD_COUNTER`
 
 ---
 
@@ -202,11 +239,11 @@ Client
 **Purpose:** Mark player as ready.
 
 **Server:**
-- `Server_Game::handleReadyStart`
-- May call `doStartGameIfReady`
+- Marks the player as ready
+- Starts the game once all required players are ready
 
 **Client:**
-- Reflected via `Event_GameStateChanged`
+- Reflected through updated game state events
 
 ---
 
@@ -215,64 +252,79 @@ Client
 **Purpose:** Concede the game.
 
 **Server:**
-- `Server_Game::handleConcede`
-- Updates player state
-- May end game
+- Marks the player as conceded
+- Returns borrowed cards where appropriate
+- Ends the game if only one player remains
 
 **Client:**
-- Reflected via game state events
+- Reflected through updated game state events
 
 ---
 
 ### `INC_COUNTER` (1018)
 
-**Purpose:** Increment a global counter.
+**Purpose:** Increment a player counter.
 
 **Server:**
-- `Server_Game::handleIncCounter`
-- Emits `Event_SetCounter`
+- `Server_Player::cmdIncCounter`
+- Rejects if the game has not started or the player has conceded
+- Updates the counter value
+- Emits `Event_SetCounter` only if the value changed
 
 **Client:**
 - `PlayerEventHandler::eventSetCounter`
+- Updates the displayed player counter
+- Logs the change
 
 ---
 
 ### `CREATE_COUNTER` (1019)
 
-**Purpose:** Create a global counter.
+**Purpose:** Create a player counter.
 
 **Server:**
-- `Server_Game::handleCreateCounter`
+- `Server_Player::cmdCreateCounter`
+- Rejects if the game has not started or the player has conceded
+- Allocates a new counter ID
+- Creates the counter
 - Emits `Event_CreateCounter`
 
 **Client:**
 - `PlayerEventHandler::eventCreateCounter`
+- Creates the local player counter
 
 ---
 
 ### `SET_COUNTER` (1020)
 
-**Purpose:** Set a global counter value.
+**Purpose:** Set a player counter value.
 
 **Server:**
-- `Server_Game::handleSetCounter`
-- Emits `Event_SetCounter`
+- `Server_Player::cmdSetCounter`
+- Rejects if the game has not started or the player has conceded
+- Updates the counter value
+- Emits `Event_SetCounter` only if the value changed
 
 **Client:**
 - `PlayerEventHandler::eventSetCounter`
+- Updates the counter value
+- Logs the change
 
 ---
 
 ### `DEL_COUNTER` (1021)
 
-**Purpose:** Delete a global counter.
+**Purpose:** Delete a player counter.
 
 **Server:**
-- `Server_Game::handleDelCounter`
+- `Server_Player::cmdDelCounter`
+- Rejects if the game has not started or the player has conceded
+- Deletes the counter
 - Emits `Event_DelCounter`
 
 **Client:**
 - `PlayerEventHandler::eventDelCounter`
+- Removes the counter
 
 ---
 
@@ -281,13 +333,13 @@ Client
 **Purpose:** Advance to the next turn.
 
 **Server:**
-- `Server_Game::handleNextTurn`
-- Emits:
-  - `Event_SetActivePlayer`
-  - `Event_SetActivePhase`
+- `Server_Player::cmdNextTurn`
+- Rejects if the game has not started
+- Conceded players cannot advance turns unless acting as a judge
+- Calls `Server_Game::nextTurn()`
 
 **Client:**
-- Reflected via game state events
+- Reflected through subsequent active-player and active-phase events
 
 ---
 
@@ -296,11 +348,14 @@ Client
 **Purpose:** Set active phase.
 
 **Server:**
-- `Server_Game::handleSetActivePhase`
-- Emits `Event_SetActivePhase`
+- `Server_Player::cmdSetActivePhase`
+- Rejects if the game has not started
+- Judges may change the phase at any time
+- Normal players may only change the phase during their own active turn
+- Calls `Server_Game::setActivePhase()`
 
 **Client:**
-- Reflected via game state events
+- Reflected through updated phase events
 
 ---
 
@@ -309,11 +364,12 @@ Client
 **Purpose:** Dump zone contents.
 
 **Server:**
-- `Server_Game::handleDumpZone`
+- Generates a zone summary
 - Emits `Event_DumpZone`
 
 **Client:**
 - `PlayerEventHandler::eventDumpZone`
+- Logs the zone contents summary
 
 ---
 
@@ -322,11 +378,15 @@ Client
 **Purpose:** Reveal specific cards.
 
 **Server:**
-- `Server_Game::handleRevealCards`
+- Reveals cards to one or more players
 - Emits `Event_RevealCards`
 
 **Client:**
 - `PlayerEventHandler::eventRevealCards`
+- Reveals cards in-place or in a reveal window
+- Supports temporary peeks
+- Updates revealed top cards
+- Logs the reveal
 
 ---
 
@@ -335,12 +395,17 @@ Client
 **Purpose:** Move a card between zones.
 
 **Server:**
-- `Server_Game::handleMoveCard`
+- Moves cards between zones
+- Updates ownership and attachments as needed
 - Emits `Event_MoveCard`
-- May emit arrow cleanup events
 
 **Client:**
 - `PlayerEventHandler::eventMoveCard`
+- Moves the card between zones
+- Updates ownership, attachments, IDs and revealed information
+- Handles undo-draw context
+- Refreshes menus and zone layouts
+- Logs the move
 
 ---
 
@@ -349,11 +414,14 @@ Client
 **Purpose:** Set sideboard configuration.
 
 **Server:**
-- `Server_Game::handleSetSideboardPlan`
-- Stored server-side only
+- `Server_Player::cmdSetSideboardPlan`
+- Allowed only before readying for the game
+- Requires a loaded deck
+- Requires sideboarding to be unlocked
+- Stores the current sideboard plan
 
 **Client:**
-- Not forwarded as a game event
+- No game event is generated
 
 ---
 
@@ -362,10 +430,17 @@ Client
 **Purpose:** Select a deck.
 
 **Server:**
-- `Server_Game::handleDeckSelect`
+- `Server_Player::cmdDeckSelect`
+- Allowed only before the game starts
+- Loads a deck from either the database or serialized deck data
+- Locks sideboarding
+- Updates player properties
+- Emits `Event_PlayerPropertiesChanged`
+- Attaches `Context_DeckSelect`
+- Returns the selected deck in the command response
 
 **Client:**
-- Reflected via lobby / game state
+- Reflected through updated player properties and command response
 
 ---
 
@@ -374,10 +449,15 @@ Client
 **Purpose:** Lock or unlock sideboarding.
 
 **Server:**
-- `Server_Game::handleSetSideboardLock`
+- `Server_Player::cmdSetSideboardLock`
+- Allowed only before readying
+- Toggles sideboard locking
+- Clears pending sideboard plans when locking
+- Emits `Event_PlayerPropertiesChanged`
+- Attaches `Context_SetSideboardLock`
 
 **Client:**
-- Reflected via game state
+- Reflected through updated player properties
 
 ---
 
@@ -386,11 +466,15 @@ Client
 **Purpose:** Change zone properties.
 
 **Server:**
-- `Server_Game::handleChangeZoneProperties`
+- `Server_Player::cmdChangeZoneProperties`
+- Delegates to the abstract implementation
+- Updates top-card revelation if required
 - Emits `Event_ChangeZoneProperties`
 
 **Client:**
 - `PlayerEventHandler::eventChangeZoneProperties`
+- Updates always-reveal-top-card and always-look-at-top-card settings
+- Logs property changes
 
 ---
 
@@ -399,24 +483,25 @@ Client
 **Purpose:** Undo a concede.
 
 **Server:**
-- `Server_Game::handleUnconcede`
+- Restores the player's active status
 
 **Client:**
-- Reflected via game state
+- Reflected through updated game state events
 
 ---
 
 ### `JUDGE` (1033)
 
-**Purpose:** Execute a command on behalf of another player.
+**Purpose:** Execute commands on behalf of another player.
 
 **Server:**
-- `Server_Game::handleJudge`
-- Unwraps `Command_Judge`
-- Dispatches embedded `GameCommand`
+- `Server_AbstractParticipant::cmdJudge`
+- Requires judge privileges
+- Executes embedded commands as the selected player
+- Marks resulting events as judge-forced
 
 **Client:**
-- Transparent; handled as normal commands
+- Transparent; resulting events are processed normally
 
 ---
 
@@ -425,16 +510,20 @@ Client
 **Purpose:** Reverse turn order.
 
 **Server:**
-- `Server_Game::handleReverseTurn`
-- Toggles turn order flag
+- `Server_Player::cmdReverseTurn`
+- Conceded non-judge players cannot use the command
+- Delegates to `Server_AbstractParticipant::cmdReverseTurn`
+- Toggles turn order
+- Emits `Event_ReverseTurn`
 
 **Client:**
-- Reflected via subsequent turn events
+- Reflected by subsequent active-player progression
 
 ---
 
 ## Notes
 
-- Only commands emitting `GameEvent`s appear in `PlayerEventHandler`
-- Some commands affect game state without direct client events
-- Judge commands are transport-level wrappers, not gameplay primitives
+- Game commands are handled by `Server_Player`, `Server_AbstractParticipant`, or `Server_Game`, depending on the command.
+- Only commands that emit `GameEvent`s produce corresponding `PlayerEventHandler` callbacks.
+- Some commands modify server state without generating a dedicated client event.
+- Judge commands are transport wrappers that execute other game commands on behalf of another player.
