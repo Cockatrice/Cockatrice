@@ -92,6 +92,7 @@ private slots:
     void cardDatabaseAllNewSetsEnabled();
 
     void checkClientUpdatesFinished(bool needToUpdate, bool isCompatible, Release *release);
+    void actCheckCommanderBracketDefinitionUpdates();
 
     void actOpenCustomFolder();
     void actOpenCustomsetsFolder();

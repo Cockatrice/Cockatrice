@@ -9,6 +9,7 @@
 
 #include "../../interface/card_picture_loader/card_picture_loader_cache_method.h"
 #include "../../interface/card_picture_loader/card_picture_loader_local_schemes.h"
+#include "../../interface/widgets/tabs/api/commander_spellbook/commander_bracket_definitions.h"
 #include "shortcuts_settings.h"
 
 #include <QDate>
@@ -19,6 +20,7 @@
 #include <libcockatrice/interfaces/interface_network_settings_provider.h>
 #include <libcockatrice/settings/card_database_settings.h>
 #include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/settings/commander_bracket_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/game_filters_settings.h>
@@ -158,6 +160,8 @@ signals:
     void printingSelectorNavigationButtonsVisibleChanged();
     void deckEditorBannerCardComboBoxVisibleChanged(bool _visible);
     void deckEditorTagsWidgetVisibleChanged(bool _visible);
+    void deckEditorCommanderSpellbookIntegrationEnabledChanged(int _enabled);
+    void deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesChanged(bool _useOfficialBracketNames);
     void visualDeckStorageShowTagFilterChanged(bool _visible);
     void visualDeckStorageDefaultTagsListChanged();
     void visualDeckStorageShowColorIdentityChanged(bool _visible);
@@ -203,6 +207,7 @@ private:
     ShortcutsSettings *shortcutsSettings;
     CardDatabaseSettings *cardDatabaseSettings;
     ServersSettings *serversSettings;
+    CommanderBracketSettings *commanderBracketSettings;
     MessageSettings *messageSettings;
     GameFiltersSettings *gameFiltersSettings;
     LayoutsSettings *layoutsSettings;
@@ -211,6 +216,8 @@ private:
     CardOverrideSettings *cardOverrideSettings;
     DebugSettings *debugSettings;
     CardCounterSettings *cardCounterSettings;
+
+    CommanderBracketDefinitions bracketDefinitions;
 
     QString lang;
     QString deckPath, filtersPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
@@ -254,6 +261,8 @@ private:
     bool printingSelectorNavigationButtonsVisible;
     bool deckEditorBannerCardComboBoxVisible;
     bool deckEditorTagsWidgetVisible;
+    int deckEditorCommanderSpellbookIntegrationEnabled;
+    bool deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames;
     int visualDeckStorageSortingOrder;
     bool visualDeckStorageShowFolders;
     bool visualDeckStorageShowColorIdentity;
@@ -741,6 +750,14 @@ public:
     {
         return openDeckInNewTab;
     }
+    [[nodiscard]] int getDeckEditorCommanderSpellbookIntegrationEnabled() const
+    {
+        return deckEditorCommanderSpellbookIntegrationEnabled;
+    }
+    [[nodiscard]] bool getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames() const
+    {
+        return deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames;
+    }
     [[nodiscard]] int getRewindBufferingMs() const
     {
         return rewindBufferingMs;
@@ -997,6 +1014,15 @@ public:
     {
         return *serversSettings;
     }
+    [[nodiscard]] CommanderBracketSettings &commanderBrackets() const
+    {
+        return *commanderBracketSettings;
+    }
+    void reloadBracketDefinitions(const QVariantList &definitions);
+    CommanderBracketDefinitions &commanderBracketDefs()
+    {
+        return bracketDefinitions;
+    }
     [[nodiscard]] MessageSettings &messages() const
     {
         return *messageSettings;
@@ -1093,6 +1119,9 @@ public slots:
     void setPrintingSelectorNavigationButtonsVisible(QT_STATE_CHANGED_T _navigationButtonsVisible);
     void setDeckEditorBannerCardComboBoxVisible(QT_STATE_CHANGED_T _deckEditorBannerCardComboBoxVisible);
     void setDeckEditorTagsWidgetVisible(QT_STATE_CHANGED_T _deckEditorTagsWidgetVisible);
+    void setDeckEditorCommanderSpellbookIntegrationEnabled(int _deckEditorCommanderSpellbookIntegrationEnabled);
+    void setDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames(
+        bool _deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames);
     void setVisualDeckStorageSortingOrder(int _visualDeckStorageSortingOrder);
     void setVisualDeckStorageShowFolders(QT_STATE_CHANGED_T value);
     void setVisualDeckStorageShowTagFilter(QT_STATE_CHANGED_T _showTags);
