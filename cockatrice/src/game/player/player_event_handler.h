@@ -51,7 +51,6 @@ class Event_SetCounter;
 class Event_Shuffle;
 class Event_GameLogNotice;
 
-
 /**
  * @class PlayerEventHandler
  * @brief Applies player-specific game events and emits corresponding log signals.
@@ -75,7 +74,7 @@ public:
      */
     explicit PlayerEventHandler(PlayerLogic *player);
 
-       /** @name Event dispatch
+    /** @name Event dispatch
      *  @{
      */
 
@@ -220,8 +219,8 @@ public:
     void eventGameLogNotice(const Event_GameLogNotice &event);
 signals:
     /** @name Logging signals
- *  @{
- */
+     *  @{
+     */
     void logSay(PlayerLogic *player, QString message);
     void logShuffle(PlayerLogic *player, CardZoneLogic *zone, int start, int end);
     void logRollDie(PlayerLogic *player, int sides, const QList<uint> &rolls);
