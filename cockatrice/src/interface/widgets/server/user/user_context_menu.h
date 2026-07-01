@@ -89,12 +89,14 @@ public:
     void execRemoveFromBuddy(const QString &userName);
     void execAddToIgnore(const QString &userName);
     void execRemoveFromIgnore(const QString &userName);
+    void execKick(int playerId);
     void execBan(const QString &userName);
     void execWarn(const QString &userName);
     void execBanHistory(const QString &userName);
     void execWarnHistory(const QString &userName);
     void execAdminNotes(const QString &userName);
-    void execAdjustMod(const QString &userName, bool shouldBeMod, bool shouldBeJudge);
+    void execAdjustMod(const QString &userName, bool shouldBeMod);
+    void execAdjustJudge(const QString &userName, bool shouldBeJudge);
 };
 
 #endif
