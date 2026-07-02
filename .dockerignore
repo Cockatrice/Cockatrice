@@ -1,8 +1,9 @@
-.git/
-build/
-.github/
-.tx/
-cockatrice/
-doc/
-oracle/
-Dockerfile
+# Add (Ignore) everything in root for minimum image
+/*
+
+# Exclude (Allow) only folder & files required for building Servatrice
+!cmake/
+!libcockatrice_*/
+!servatrice/
+!CMakeLists.txt
+!LICENSE
