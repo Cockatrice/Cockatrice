@@ -27,9 +27,11 @@ CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
         connect(p, &ICardDatabaseParser::addFormat, database, &CardDatabase::addFormat, Qt::DirectConnection);
     }
 
+    // TODO: PathSettings can't double inherit from a QObject ICardDatabasePathProvider and a QObject SettingsManager.
+    // ICardDatabasePathProvider was only a QObject for this single signal.
     // when SettingsCache's path changes, trigger reloads
-    connect(pathProvider, &ICardDatabasePathProvider::cardDatabasePathChanged, this,
-            &CardDatabaseLoader::loadCardDatabases);
+    /*connect(pathProvider, &ICardDatabasePathProvider::cardDatabasePathChanged, this,
+            &CardDatabaseLoader::loadCardDatabases);*/
 }
 
 CardDatabaseLoader::~CardDatabaseLoader()

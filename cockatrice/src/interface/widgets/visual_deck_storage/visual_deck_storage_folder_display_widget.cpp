@@ -43,7 +43,7 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
 void VisualDeckStorageFolderDisplayWidget::refreshUi()
 {
     QString bannerText = tr("Deck Storage");
-    QString deckPath = SettingsCache::instance().getDeckPath();
+    QString deckPath = SettingsCache::instance().paths().getDeckPath();
     if (filePath != deckPath) {
         QString relativePath = filePath;
 

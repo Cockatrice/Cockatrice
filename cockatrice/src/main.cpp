@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
 
     // Dependency Injections
     CardDatabaseManager::setCardPreferenceProvider(new SettingsCardPreferenceProvider());
-    CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance());
+    CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance().paths());
     CardDatabaseManager::setCardSetPriorityController(SettingsCache::instance().cardDatabase());
 
     qCInfo(MainLog) << "Starting main program";

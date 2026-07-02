@@ -142,7 +142,7 @@ void VisualDeckStorageWidget::reapplySortAndFilters()
 
 void VisualDeckStorageWidget::createRootFolderWidget()
 {
-    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false,
+    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().paths().getDeckPath(), false,
                                                             quickSettingsWidget->getShowFolders());
 
     scrollArea->setWidget(folderWidget); // this automatically destroys the old folderWidget

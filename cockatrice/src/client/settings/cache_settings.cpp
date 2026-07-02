@@ -150,31 +150,6 @@ void SettingsCache::translateLegacySettings()
     }
 }
 
-QString SettingsCache::getSafeConfigPath(QString configEntry, QString defaultPath) const
-{
-    QString tmp = settings->value(configEntry).toString();
-    // if the config settings is empty or refers to a not-existing folder,
-    // ensure that the defaut path exists and return it
-    if (tmp.isEmpty() || !QDir(tmp).exists()) {
-        if (!QDir().mkpath(defaultPath)) {
-            qCInfo(SettingsCacheLog) << "[SettingsCache] Could not create folder:" << defaultPath;
-        }
-        tmp = defaultPath;
-    }
-    return tmp;
-}
-
-QString SettingsCache::getSafeConfigFilePath(QString configEntry, QString defaultPath) const
-{
-    QString tmp = settings->value(configEntry).toString();
-    // if the config settings is empty or refers to a not-existing file,
-    // return the default Path
-    if (!QFile::exists(tmp) || tmp.isEmpty()) {
-        tmp = std::move(defaultPath);
-    }
-    return tmp;
-}
-
 SettingsCache::SettingsCache()
 {
     // first, figure out if we are running in portable mode
@@ -188,6 +163,8 @@ SettingsCache::SettingsCache()
 
     QString settingsPath = getSettingsPath();
     settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
+    pathsSettings = new PathSettings(settingsPath, this);
+    pathsSettings->load(getDataPath(), getCachePath());
     shortcutsSettings = new ShortcutsSettings(settingsPath, this);
     cardDatabaseSettings = new CardDatabaseSettings(settingsPath, this);
     serversSettings = new ServersSettings(settingsPath, this);
@@ -246,8 +223,6 @@ SettingsCache::SettingsCache()
     for (const auto &tipNumber : settings->value("tipOfDay/seenTips").toList()) {
         seenTips.append(tipNumber.toInt());
     }
-
-    loadPaths();
 
     themeName = settings->value("theme/name").toString();
 
@@ -550,72 +525,6 @@ void SettingsCache::setSeenTips(const QList<int> &_seenTips)
         storedTipList.append(tipNumber);
     }
     settings->setValue("tipOfDay/seenTips", storedTipList);
-}
-
-void SettingsCache::setDeckPath(const QString &_deckPath)
-{
-    deckPath = _deckPath;
-    settings->setValue("paths/decks", deckPath);
-}
-
-void SettingsCache::setFiltersPath(const QString &_filtersPath)
-{
-    filtersPath = _filtersPath;
-    settings->setValue("paths/filters", filtersPath);
-}
-
-void SettingsCache::setReplaysPath(const QString &_replaysPath)
-{
-    replaysPath = _replaysPath;
-    settings->setValue("paths/replays", replaysPath);
-}
-
-void SettingsCache::setThemesPath(const QString &_themesPath)
-{
-    themesPath = _themesPath;
-    settings->setValue("paths/themes", themesPath);
-    emit themeChanged();
-}
-
-void SettingsCache::setCustomCardDatabasePath(const QString &_customCardDatabasePath)
-{
-    customCardDatabasePath = _customCardDatabasePath;
-    settings->setValue("paths/customsets", customCardDatabasePath);
-    emit cardDatabasePathChanged();
-}
-
-void SettingsCache::setPicsPath(const QString &_picsPath)
-{
-    picsPath = _picsPath;
-    settings->setValue("paths/pics", picsPath);
-    // get a new value for customPicsPath, currently derived from picsPath
-    if (picsPath.endsWith("/")) {
-        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");
-    } else {
-        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
-    }
-    emit picsPathChanged();
-}
-
-void SettingsCache::setCardDatabasePath(const QString &_cardDatabasePath)
-{
-    cardDatabasePath = _cardDatabasePath;
-    settings->setValue("paths/carddatabase", cardDatabasePath);
-    emit cardDatabasePathChanged();
-}
-
-void SettingsCache::setSpoilerDatabasePath(const QString &_spoilerDatabasePath)
-{
-    spoilerDatabasePath = _spoilerDatabasePath;
-    settings->setValue("paths/spoilerdatabase", spoilerDatabasePath);
-    emit cardDatabasePathChanged();
-}
-
-void SettingsCache::setTokenDatabasePath(const QString &_tokenDatabasePath)
-{
-    tokenDatabasePath = _tokenDatabasePath;
-    settings->setValue("paths/tokendatabase", tokenDatabasePath);
-    emit cardDatabasePathChanged();
 }
 
 void SettingsCache::setThemeName(const QString &_themeName)
@@ -1400,43 +1309,6 @@ void SettingsCache::setShowSubtypeSelectionTally(QT_STATE_CHANGED_T _showSubtype
 {
     showSubtypeSelectionTally = static_cast<bool>(_showSubtypeSelectionTally);
     settings->setValue("interface/showsubtypeselectiontally", showSubtypeSelectionTally);
-}
-
-void SettingsCache::loadPaths()
-{
-    QString dataPath = getDataPath();
-    deckPath = getSafeConfigPath("paths/decks", dataPath + "/decks/");
-    filtersPath = getSafeConfigPath("paths/filters", dataPath + "/filters/");
-    replaysPath = getSafeConfigPath("paths/replays", dataPath + "/replays/");
-    themesPath = getSafeConfigPath("paths/themes", dataPath + "/themes/");
-    picsPath = getSafeConfigPath("paths/pics", dataPath + "/pics/");
-    redirectCachePath = getSafeConfigPath("paths/redirects", getCachePath() + "/redirects/");
-    // this has never been exposed as an user-configurable setting
-    if (picsPath.endsWith("/")) {
-        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "CUSTOM/");
-    } else {
-        customPicsPath = getSafeConfigPath("paths/custompics", picsPath + "/CUSTOM/");
-    }
-    customCardDatabasePath = getSafeConfigPath("paths/customsets", dataPath + "/customsets/");
-
-    cardDatabasePath = getSafeConfigFilePath("paths/carddatabase", dataPath + "/cards.xml");
-    tokenDatabasePath = getSafeConfigFilePath("paths/tokendatabase", dataPath + "/tokens.xml");
-    spoilerDatabasePath = getSafeConfigFilePath("paths/spoilerdatabase", dataPath + "/spoiler.xml");
-}
-
-void SettingsCache::resetPaths()
-{
-    QStringList databasePaths{customCardDatabasePath, cardDatabasePath, spoilerDatabasePath, tokenDatabasePath};
-    QString picsPath_ = picsPath;
-    settings->remove("paths"); // removes all keys in paths/*
-    loadPaths();
-    if (databasePaths !=
-        QStringList{customCardDatabasePath, cardDatabasePath, spoilerDatabasePath, tokenDatabasePath}) {
-        emit cardDatabasePathChanged();
-    }
-    if (picsPath_ != picsPath) {
-        emit picsPathChanged();
-    }
 }
 
 CardCounterSettings &SettingsCache::cardCounters() const

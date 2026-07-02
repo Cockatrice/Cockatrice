@@ -39,7 +39,7 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
 
-    cacheFilePath = SettingsCache::instance().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
+    cacheFilePath = SettingsCache::instance().paths().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
     loadRedirectCache();
     cleanStaleEntries();
 

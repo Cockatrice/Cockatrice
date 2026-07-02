@@ -34,6 +34,8 @@ add_library(
   libcockatrice/settings/recents_settings.cpp
   libcockatrice/settings/servers_settings.cpp
   libcockatrice/settings/settings_manager.cpp
+        libcockatrice/settings/path_settings.cpp
+        libcockatrice/settings/path_settings.h
 )
 
 target_include_directories(

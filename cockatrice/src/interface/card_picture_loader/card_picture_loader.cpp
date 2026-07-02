@@ -189,7 +189,7 @@ void CardPictureLoader::saveCardImageToLocalStorage(const ExactCard &card, const
         return;
     }
 
-    const QString picsRoot = SettingsCache::instance().getPicsPath();
+    const QString picsRoot = SettingsCache::instance().paths().getPicsPath();
     CardPictureLoaderLocalSchemes::NamingScheme scheme =
         SettingsCache::instance().getLocalCardImageStorageNamingScheme();
 
@@ -306,7 +306,7 @@ void CardPictureLoader::picsPathChanged()
 
 bool CardPictureLoader::hasCustomArt()
 {
-    auto picsPath = SettingsCache::instance().getPicsPath();
+    auto picsPath = SettingsCache::instance().paths().getPicsPath();
     QDirIterator it(picsPath, QDir::Dirs | QDir::NoDotAndDotDot);
 
     // Check if there is at least one non-directory file in the pics path, other

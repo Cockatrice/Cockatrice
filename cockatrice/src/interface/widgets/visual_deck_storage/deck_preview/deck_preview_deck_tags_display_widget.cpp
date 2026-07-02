@@ -74,7 +74,7 @@ static QStringList getAllFiles(const QString &filePath)
  */
 static QStringList findAllKnownTags()
 {
-    QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath());
+    QStringList allFiles = getAllFiles(SettingsCache::instance().paths().getDeckPath());
 
     QStringList knownTags;
     for (const QString &file : allFiles) {
