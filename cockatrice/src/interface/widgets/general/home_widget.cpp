@@ -88,7 +88,7 @@ void HomeWidget::initializeBackgroundFromSource()
 void HomeWidget::loadBackgroundSourceDeck()
 {
     std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(
-        SettingsCache::instance().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice, false);
+        SettingsCache::instance().paths().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice, false);
     backgroundSourceDeck = deckOpt.has_value() ? deckOpt.value().deckList : DeckList();
 }
 

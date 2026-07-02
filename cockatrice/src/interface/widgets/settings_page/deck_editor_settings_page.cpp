@@ -27,7 +27,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     mcDownloadSpoilersCheckBox.setChecked(SettingsCache::instance().getDownloadSpoilersStatus());
 
-    mpSpoilerSavePathLineEdit = new QLineEdit(SettingsCache::instance().getSpoilerCardDatabasePath());
+    mpSpoilerSavePathLineEdit = new QLineEdit(SettingsCache::instance().paths().getSpoilerCardDatabasePath());
     mpSpoilerSavePathLineEdit->setReadOnly(true);
     mpSpoilerPathButton = new QPushButton("...");
     connect(mpSpoilerPathButton, &QPushButton::clicked, this, &DeckEditorSettingsPage::spoilerPathButtonClicked);
@@ -183,7 +183,7 @@ void DeckEditorSettingsPage::unlockSettings()
 
 QString DeckEditorSettingsPage::getLastUpdateTime()
 {
-    QString fileName = SettingsCache::instance().getSpoilerCardDatabasePath();
+    QString fileName = SettingsCache::instance().paths().getSpoilerCardDatabasePath();
     QFileInfo fi(fileName);
     QDir fileDir(fi.path());
     QFile file(fileName);
@@ -203,7 +203,7 @@ void DeckEditorSettingsPage::spoilerPathButtonClicked()
     }
 
     mpSpoilerSavePathLineEdit->setText(lsPath + "/spoiler.xml");
-    SettingsCache::instance().setSpoilerDatabasePath(lsPath + "/spoiler.xml");
+    SettingsCache::instance().paths().setSpoilerDatabasePath(lsPath + "/spoiler.xml");
 }
 
 void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)

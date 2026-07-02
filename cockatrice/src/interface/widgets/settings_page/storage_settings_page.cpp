@@ -180,7 +180,7 @@ void StorageSettingsPage::clearDownloadedPicsButtonClicked()
 
 void StorageSettingsPage::clearImageBackupsButtonClicked()
 {
-    QString picsPath = SettingsCache::instance().getPicsPath() + "/downloadedPics";
+    QString picsPath = SettingsCache::instance().paths().getPicsPath() + "/downloadedPics";
 
     QDir dir(picsPath);
     bool success = dir.removeRecursively();

@@ -123,38 +123,38 @@ GeneralSettingsPage::GeneralSettingsPage()
     startupGroupBox->setLayout(startupGrid);
 
     // paths settings
-    deckPathEdit = new QLineEdit(settings.getDeckPath());
+    deckPathEdit = new QLineEdit(settings.paths().getDeckPath());
     deckPathEdit->setReadOnly(true);
     auto *deckPathButton = new QPushButton("...");
     connect(deckPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::deckPathButtonClicked);
 
-    filtersPathEdit = new QLineEdit(settings.getFiltersPath());
+    filtersPathEdit = new QLineEdit(settings.paths().getFiltersPath());
     filtersPathEdit->setReadOnly(true);
     auto *filtersPathButton = new QPushButton("...");
     connect(filtersPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::filtersPathButtonClicked);
 
-    replaysPathEdit = new QLineEdit(settings.getReplaysPath());
+    replaysPathEdit = new QLineEdit(settings.paths().getReplaysPath());
     replaysPathEdit->setReadOnly(true);
     auto *replaysPathButton = new QPushButton("...");
     connect(replaysPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::replaysPathButtonClicked);
 
-    picsPathEdit = new QLineEdit(settings.getPicsPath());
+    picsPathEdit = new QLineEdit(settings.paths().getPicsPath());
     picsPathEdit->setReadOnly(true);
     auto *picsPathButton = new QPushButton("...");
     connect(picsPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::picsPathButtonClicked);
 
-    cardDatabasePathEdit = new QLineEdit(settings.getCardDatabasePath());
+    cardDatabasePathEdit = new QLineEdit(settings.paths().getCardDatabasePath());
     cardDatabasePathEdit->setReadOnly(true);
     auto *cardDatabasePathButton = new QPushButton("...");
     connect(cardDatabasePathButton, &QPushButton::clicked, this, &GeneralSettingsPage::cardDatabasePathButtonClicked);
 
-    customCardDatabasePathEdit = new QLineEdit(settings.getCustomCardDatabasePath());
+    customCardDatabasePathEdit = new QLineEdit(settings.paths().getCustomCardDatabasePath());
     customCardDatabasePathEdit->setReadOnly(true);
     auto *customCardDatabasePathButton = new QPushButton("...");
     connect(customCardDatabasePathButton, &QPushButton::clicked, this,
             &GeneralSettingsPage::customCardDatabaseButtonClicked);
 
-    tokenDatabasePathEdit = new QLineEdit(settings.getTokenDatabasePath());
+    tokenDatabasePathEdit = new QLineEdit(settings.paths().getTokenDatabasePath());
     tokenDatabasePathEdit->setReadOnly(true);
     auto *tokenDatabasePathButton = new QPushButton("...");
     connect(tokenDatabasePathButton, &QPushButton::clicked, this, &GeneralSettingsPage::tokenDatabasePathButtonClicked);
@@ -264,7 +264,7 @@ void GeneralSettingsPage::deckPathButtonClicked()
     }
 
     deckPathEdit->setText(path);
-    SettingsCache::instance().setDeckPath(path);
+    SettingsCache::instance().paths().setDeckPath(path);
 }
 
 void GeneralSettingsPage::filtersPathButtonClicked()
@@ -275,7 +275,7 @@ void GeneralSettingsPage::filtersPathButtonClicked()
     }
 
     filtersPathEdit->setText(path);
-    SettingsCache::instance().setFiltersPath(path);
+    SettingsCache::instance().paths().setFiltersPath(path);
 }
 
 void GeneralSettingsPage::replaysPathButtonClicked()
@@ -286,7 +286,7 @@ void GeneralSettingsPage::replaysPathButtonClicked()
     }
 
     replaysPathEdit->setText(path);
-    SettingsCache::instance().setReplaysPath(path);
+    SettingsCache::instance().paths().setReplaysPath(path);
 }
 
 void GeneralSettingsPage::picsPathButtonClicked()
@@ -297,7 +297,7 @@ void GeneralSettingsPage::picsPathButtonClicked()
     }
 
     picsPathEdit->setText(path);
-    SettingsCache::instance().setPicsPath(path);
+    SettingsCache::instance().paths().setPicsPath(path);
 }
 
 void GeneralSettingsPage::cardDatabasePathButtonClicked()
@@ -308,7 +308,7 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
     }
 
     cardDatabasePathEdit->setText(path);
-    SettingsCache::instance().setCardDatabasePath(path);
+    SettingsCache::instance().paths().setCardDatabasePath(path);
 }
 
 void GeneralSettingsPage::customCardDatabaseButtonClicked()
@@ -319,7 +319,7 @@ void GeneralSettingsPage::customCardDatabaseButtonClicked()
     }
 
     customCardDatabasePathEdit->setText(path);
-    SettingsCache::instance().setCustomCardDatabasePath(path);
+    SettingsCache::instance().paths().setCustomCardDatabasePath(path);
 }
 
 void GeneralSettingsPage::tokenDatabasePathButtonClicked()
@@ -330,19 +330,19 @@ void GeneralSettingsPage::tokenDatabasePathButtonClicked()
     }
 
     tokenDatabasePathEdit->setText(path);
-    SettingsCache::instance().setTokenDatabasePath(path);
+    SettingsCache::instance().paths().setTokenDatabasePath(path);
 }
 
 void GeneralSettingsPage::resetAllPathsClicked()
 {
     SettingsCache &settings = SettingsCache::instance();
-    settings.resetPaths();
-    deckPathEdit->setText(settings.getDeckPath());
-    replaysPathEdit->setText(settings.getReplaysPath());
-    picsPathEdit->setText(settings.getPicsPath());
-    cardDatabasePathEdit->setText(settings.getCardDatabasePath());
-    customCardDatabasePathEdit->setText(settings.getCustomCardDatabasePath());
-    tokenDatabasePathEdit->setText(settings.getTokenDatabasePath());
+    settings.paths().reset(settings.getDataPath(), settings.getCachePath());
+    deckPathEdit->setText(settings.paths().getDeckPath());
+    replaysPathEdit->setText(settings.paths().getReplaysPath());
+    picsPathEdit->setText(settings.paths().getPicsPath());
+    cardDatabasePathEdit->setText(settings.paths().getCardDatabasePath());
+    customCardDatabasePathEdit->setText(settings.paths().getCustomCardDatabasePath());
+    tokenDatabasePathEdit->setText(settings.paths().getTokenDatabasePath());
     allPathsResetLabel->setVisible(true);
 }
 

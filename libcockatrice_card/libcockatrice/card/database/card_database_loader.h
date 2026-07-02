@@ -4,6 +4,7 @@
 #include <QBasicMutex>
 #include <QList>
 #include <QLoggingCategory>
+#include <QObject>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/interfaces/interface_card_preference_provider.h>
 #include <libcockatrice/interfaces/interface_card_set_priority_controller.h>

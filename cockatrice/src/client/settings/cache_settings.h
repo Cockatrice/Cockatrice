@@ -24,6 +24,7 @@
 #include <libcockatrice/settings/game_filters_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
 #include <libcockatrice/settings/message_settings.h>
+#include <libcockatrice/settings/path_settings.h>
 #include <libcockatrice/settings/recents_settings.h>
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/macros.h>
@@ -135,7 +136,7 @@ inline QStringList defaultTags = {
 class QSettings;
 class CardCounterSettings;
 
-class SettingsCache : public ICardDatabasePathProvider, public INetworkSettingsProvider
+class SettingsCache : public QObject, public INetworkSettingsProvider
 {
     Q_OBJECT
 
@@ -211,10 +212,10 @@ private:
     CardOverrideSettings *cardOverrideSettings;
     DebugSettings *debugSettings;
     CardCounterSettings *cardCounterSettings;
+    PathSettings *pathsSettings;
 
     QString lang;
-    QString deckPath, filtersPath, replaysPath, picsPath, redirectCachePath, customPicsPath, cardDatabasePath,
-        customCardDatabasePath, themesPath, spoilerDatabasePath, tokenDatabasePath, themeName, homeTabBackgroundSource;
+    QString themeName, homeTabBackgroundSource;
     bool tabVisualDeckStorageOpen, tabServerOpen, tabAccountOpen, tabDeckStorageOpen, tabReplaysOpen, tabAdminOpen,
         tabLogOpen;
     bool checkUpdatesOnStartup;
@@ -339,9 +340,6 @@ private:
     int keepalive;
     int timeout;
     void translateLegacySettings();
-    [[nodiscard]] QString getSafeConfigPath(QString configEntry, QString defaultPath) const;
-    [[nodiscard]] QString getSafeConfigFilePath(QString configEntry, QString defaultPath) const;
-    void loadPaths();
     bool rememberGameSettings;
 
     // Local game settings (separate from server game settings in game/*)
@@ -366,50 +364,6 @@ public:
     [[nodiscard]] QString getLang() const
     {
         return lang;
-    }
-    [[nodiscard]] QString getDeckPath() const
-    {
-        return deckPath;
-    }
-    [[nodiscard]] QString getFiltersPath() const
-    {
-        return filtersPath;
-    }
-    [[nodiscard]] QString getReplaysPath() const
-    {
-        return replaysPath;
-    }
-    [[nodiscard]] QString getThemesPath() const
-    {
-        return themesPath;
-    }
-    [[nodiscard]] QString getPicsPath() const
-    {
-        return picsPath;
-    }
-    [[nodiscard]] QString getRedirectCachePath() const
-    {
-        return redirectCachePath;
-    }
-    [[nodiscard]] QString getCustomPicsPath() const
-    {
-        return customPicsPath;
-    }
-    [[nodiscard]] QString getCustomCardDatabasePath() const override
-    {
-        return customCardDatabasePath;
-    }
-    [[nodiscard]] QString getCardDatabasePath() const override
-    {
-        return cardDatabasePath;
-    }
-    [[nodiscard]] QString getSpoilerCardDatabasePath() const override
-    {
-        return spoilerDatabasePath;
-    }
-    [[nodiscard]] QString getTokenDatabasePath() const override
-    {
-        return tokenDatabasePath;
     }
     [[nodiscard]] QString getThemeName() const
     {
@@ -985,6 +939,10 @@ public:
     {
         return keepGameChatFocus;
     }
+    [[nodiscard]] PathSettings &paths() const
+    {
+        return *pathsSettings;
+    }
     [[nodiscard]] ShortcutsSettings &shortcuts() const
     {
         return *shortcutsSettings;
@@ -1049,15 +1007,6 @@ public slots:
     void setLang(const QString &_lang);
     void setShowTipsOnStartup(bool _showTipsOnStartup);
     void setSeenTips(const QList<int> &_seenTips);
-    void setDeckPath(const QString &_deckPath);
-    void setFiltersPath(const QString &_filtersPath);
-    void setReplaysPath(const QString &_replaysPath);
-    void setThemesPath(const QString &_themesPath);
-    void setCustomCardDatabasePath(const QString &_customCardDatabasePath);
-    void setPicsPath(const QString &_picsPath);
-    void setCardDatabasePath(const QString &_cardDatabasePath);
-    void setSpoilerDatabasePath(const QString &_spoilerDatabasePath);
-    void setTokenDatabasePath(const QString &_tokenDatabasePath);
     void setThemeName(const QString &_themeName);
     void setHomeTabBackgroundSource(const QString &_backgroundSource);
     void setHomeTabBackgroundShuffleFrequency(int _frequency);

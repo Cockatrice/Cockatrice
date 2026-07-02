@@ -177,7 +177,7 @@ void MainWindow::startLocalGame(const LocalGameOptions &options)
 void MainWindow::actWatchReplay()
 {
     QFileDialog dlg(this, tr("Load replay"));
-    dlg.setDirectory(SettingsCache::instance().getReplaysPath());
+    dlg.setDirectory(SettingsCache::instance().paths().getReplaysPath());
     dlg.setNameFilters(QStringList() << QObject::tr("Cockatrice replays (*.cor)"));
     if (!dlg.exec()) {
         return;
@@ -1004,13 +1004,13 @@ void MainWindow::refreshShortcuts()
 
 void MainWindow::actOpenCustomFolder()
 {
-    QString dir = SettingsCache::instance().getCustomPicsPath();
+    QString dir = SettingsCache::instance().paths().getCustomPicsPath();
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
 void MainWindow::actOpenCustomsetsFolder()
 {
-    QString dir = SettingsCache::instance().getCustomCardDatabasePath();
+    QString dir = SettingsCache::instance().paths().getCustomCardDatabasePath();
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
@@ -1035,7 +1035,7 @@ void MainWindow::actAddCustomSet()
         return;
     }
 
-    QDir dir = SettingsCache::instance().getCustomCardDatabasePath();
+    QDir dir = SettingsCache::instance().paths().getCustomCardDatabasePath();
     int nextPrefix = getNextCustomSetPrefix(dir);
 
     bool res;

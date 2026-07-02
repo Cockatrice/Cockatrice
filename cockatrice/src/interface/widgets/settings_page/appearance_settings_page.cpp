@@ -319,7 +319,7 @@ void AppearanceSettingsPage::themeBoxChanged(int index)
 
 void AppearanceSettingsPage::openThemeLocation()
 {
-    QString dir = SettingsCache::instance().getThemesPath();
+    QString dir = SettingsCache::instance().paths().getThemesPath();
     QDir dirDir = dir;
     dirDir.cdUp();
     // open if dir exists, create if parent dir does exist
