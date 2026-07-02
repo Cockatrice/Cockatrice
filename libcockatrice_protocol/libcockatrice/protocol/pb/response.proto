@@ -79,7 +79,7 @@ message Response {
         REPLAY_LIST = 1100;             // Response listing replays
         REPLAY_DOWNLOAD = 1101;         // Response for replay download
         REPLAY_GET_CODE = 1102;         // Response containing replay code
-        CARD_ART_RULE_LIST = 1200;
+        CARD_ART_RULE_LIST = 1200;      // Response containing a list of card art rules
     }
 
     required uint64 cmd_id = 1;              // Command ID that this response corresponds to
