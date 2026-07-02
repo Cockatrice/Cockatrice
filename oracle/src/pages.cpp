@@ -581,7 +581,7 @@ void SaveSetsPage::retranslateUi()
 
     saveLabel->setText(tr("Press \"Save\" to store the imported cards in the Cockatrice database."));
     pathLabel->setText(tr("The card database will be saved at the following location:") + "<br>" +
-                       SettingsCache::instance().getCardDatabasePath());
+                       SettingsCache::instance().paths().getCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 
     setButtonText(QWizard::NextButton, tr("&Save"));
@@ -601,7 +601,7 @@ void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, co
 
 bool SaveSetsPage::validatePage()
 {
-    QString defaultPath = SettingsCache::instance().getCardDatabasePath();
+    QString defaultPath = SettingsCache::instance().paths().getCardDatabasePath();
     QString windowName = tr("Save card database");
     QString fileType = tr("XML; card database (*.xml)");
 
@@ -663,7 +663,7 @@ QString LoadTokensPage::getCustomUrlSettingsKey()
 
 QString LoadTokensPage::getDefaultSavePath()
 {
-    return SettingsCache::instance().getTokenDatabasePath();
+    return SettingsCache::instance().paths().getTokenDatabasePath();
 }
 
 QString LoadTokensPage::getWindowTitle()
@@ -692,7 +692,7 @@ void LoadTokensPage::retranslateUi()
     fileButton->setText(tr("Choose file..."));
 
     pathLabel->setText(tr("The token database will be saved at the following location:") + "<br>" +
-                       SettingsCache::instance().getTokenDatabasePath());
+                       SettingsCache::instance().paths().getTokenDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }
 
@@ -708,7 +708,7 @@ QString LoadSpoilersPage::getCustomUrlSettingsKey()
 
 QString LoadSpoilersPage::getDefaultSavePath()
 {
-    return SettingsCache::instance().getTokenDatabasePath();
+    return SettingsCache::instance().paths().getTokenDatabasePath();
 }
 
 QString LoadSpoilersPage::getWindowTitle()
@@ -737,6 +737,6 @@ void LoadSpoilersPage::retranslateUi()
     fileButton->setText(tr("Choose file..."));
 
     pathLabel->setText(tr("The spoiler database will be saved at the following location:") + "<br>" +
-                       SettingsCache::instance().getSpoilerCardDatabasePath());
+                       SettingsCache::instance().paths().getSpoilerCardDatabasePath());
     defaultPathCheckBox->setText(tr("Save to a custom path (not recommended)"));
 }
