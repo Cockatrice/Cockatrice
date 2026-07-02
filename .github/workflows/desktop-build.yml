@@ -347,27 +347,9 @@ jobs:
         with:
           submodules: recursive
 
-      - name: "[Windows] Add msbuild to PATH"
-        if: matrix.os == 'Windows'
-        id: add-msbuild
-        uses: microsoft/setup-msbuild@v3
-        with:
-          msbuild-architecture: x64
-
-      - name: "[macOS] Setup ccache"
+      - name: "[macOS] Install ccache"
         if: matrix.os == 'macOS' && matrix.use_ccache == true
         run: brew install ccache
-
-      - name: "[macOS] Restore compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == true
-        id: ccache_restore
-        uses: actions/cache/restore@v6
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-        with:
-          key: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
-          path: ${{ env.CCACHE_DIR }}
-          restore-keys: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-
 
       - name: "Install aqtinstall"
         run: pipx install aqtinstall
@@ -411,6 +393,11 @@ jobs:
           key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
           path: ${{ github.workspace }}/Qt
 
+      - name: "[Windows] Install NSIS"
+        if: matrix.os == 'Windows'
+        shell: bash
+        run: choco install nsis
+
       - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'Windows'
         uses: jurplel/install-qt-action@v4
@@ -422,16 +409,29 @@ jobs:
           modules: ${{ matrix.qt_modules }}
           version: ${{ steps.resolve_qt_version.outputs.version }}
 
-      - name: "[Windows] Install NSIS"
+      - name: "[Windows] Setup MSBuild"
         if: matrix.os == 'Windows'
-        shell: bash
-        run: choco install nsis
+        id: add-msbuild
+        uses: microsoft/setup-msbuild@v3
+        with:
+          msbuild-architecture: x64
 
       - name: "Setup vcpkg cache"
         id: vcpkg-cache
         uses: TAServers/vcpkg-cache@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "[macOS] Restore compiler cache (ccache)"
+        if: matrix.os == 'macOS' && matrix.use_ccache == true
+        id: ccache_restore
+        uses: actions/cache/restore@v6
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        with:
+          key: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
+          path: ${{ env.CCACHE_DIR }}
+          restore-keys: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-
 
       # Uses environment variables, see compile.sh for more details
       - name: "Build Cockatrice"
