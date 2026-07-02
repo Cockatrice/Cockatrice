@@ -205,7 +205,8 @@ void DlgSettings::closeEvent(QCloseEvent *event)
         }
     }
 
-    if (!QDir(SettingsCache::instance().paths().getDeckPath()).exists() || SettingsCache::instance().paths().getDeckPath().isEmpty()) {
+    if (!QDir(SettingsCache::instance().paths().getDeckPath()).exists() ||
+        SettingsCache::instance().paths().getDeckPath().isEmpty()) {
         //! \todo Prompt to create the deck directory.
         if (QMessageBox::critical(
                 this, tr("Error"),
@@ -216,7 +217,8 @@ void DlgSettings::closeEvent(QCloseEvent *event)
         }
     }
 
-    if (!QDir(SettingsCache::instance().paths().getPicsPath()).exists() || SettingsCache::instance().paths().getPicsPath().isEmpty()) {
+    if (!QDir(SettingsCache::instance().paths().getPicsPath()).exists() ||
+        SettingsCache::instance().paths().getPicsPath().isEmpty()) {
         //! \todo Prompt to create the pictures directory.
         if (QMessageBox::critical(this, tr("Error"),
                                   tr("The path to your card pictures directory is invalid. Would you like to go back "

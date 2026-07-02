@@ -8,10 +8,10 @@
 //! \todo Document this file.
 
 #include "settings_manager.h"
-#include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 
 #include <QLoggingCategory>
 #include <QString>
+#include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 
 inline Q_LOGGING_CATEGORY(PathSettingsLog, "path_settings");
 
@@ -26,7 +26,7 @@ class PathSettings : public SettingsManager, public ICardDatabasePathProvider
 {
     Q_OBJECT
 
-    signals:
+signals:
     void cardDatabasePathChanged();
 
 public:
@@ -108,5 +108,4 @@ private:
     void recomputeCustomPicsPath();
 };
 
-
-#endif //COCKATRICE_PATH_SETTINGS_H
+#endif // COCKATRICE_PATH_SETTINGS_H

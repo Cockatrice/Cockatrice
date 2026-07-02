@@ -10,7 +10,6 @@
 #include "../../interface/card_picture_loader/card_picture_loader_cache_method.h"
 #include "../../interface/card_picture_loader/card_picture_loader_local_schemes.h"
 #include "shortcuts_settings.h"
-#include <libcockatrice/settings/path_settings.h>
 
 #include <QDate>
 #include <QLoggingCategory>
@@ -25,6 +24,7 @@
 #include <libcockatrice/settings/game_filters_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
 #include <libcockatrice/settings/message_settings.h>
+#include <libcockatrice/settings/path_settings.h>
 #include <libcockatrice/settings/recents_settings.h>
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/macros.h>
