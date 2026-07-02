@@ -1103,8 +1103,8 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = build/ \
-                         cmake-build-debug/ \
                          cmake/ \
+                         cmake-build-debug/ \
                          doc/doxygen/theme/docs/ \
                          doc/doxygen/theme/include/ \
                          vcpkg/
