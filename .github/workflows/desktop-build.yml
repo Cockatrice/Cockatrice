@@ -416,7 +416,7 @@ jobs:
         id: vcpkg-cache
         uses: TAServers/vcpkg-cache@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
 
       - name: "[macOS] Restore compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == true
