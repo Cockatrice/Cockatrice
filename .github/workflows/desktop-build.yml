@@ -60,21 +60,21 @@ jobs:
           echo "sha=$RESOLVED_SHA" >> "$GITHUB_OUTPUT"
 
       - name: "Checkout"
-        if: steps.configure.outputs.tag != null
+        if: steps.configure.outputs.tag
         uses: actions/checkout@v7
         with:
           fetch-depth: 0    # fetch all history for all branches and tags
 
       - name: "Prepare release parameters"
         id: prepare
-        if: steps.configure.outputs.tag != null
+        if: steps.configure.outputs.tag
         shell: bash
         env:
           TAG: ${{ steps.configure.outputs.tag }}
         run: .ci/prep_release.sh
 
       - name: "Create release"
-        if: steps.configure.outputs.tag != null
+        if: steps.configure.outputs.tag
         id: create_release
         shell: bash
         env:
@@ -202,7 +202,7 @@ jobs:
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
-        if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
+        if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit == 'true'
         continue-on-error: true
         env:
           CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
@@ -230,7 +230,7 @@ jobs:
 
       - name: "Upload to release"
         id: upload_release
-        if: matrix.package && needs.configure.outputs.tag != null
+        if: matrix.package && needs.configure.outputs.tag
         shell: bash
         env:
           ASSET_NAME: ${{ steps.build.outputs.fullname }}
@@ -452,7 +452,7 @@ jobs:
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == true && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
+        if: matrix.os == 'macOS' && matrix.use_ccache == true && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit == 'true'
         continue-on-error: true
         env:
           CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
@@ -470,7 +470,7 @@ jobs:
           path: ${{ env.CCACHE_DIR }}
 
       - name: "[macOS] Sign app bundle"
-        if: matrix.os == 'macOS' && matrix.make_package == true && needs.configure.outputs.tag != null
+        if: matrix.os == 'macOS' && matrix.make_package == true && needs.configure.outputs.tag
         id: sign_macos
         env:
           BUILD_PATH: ${{ steps.build.outputs.path }}
@@ -537,7 +537,7 @@ jobs:
             build/servatrice/Release/*.pdb
 
       - name: "Upload to release"
-        if: matrix.make_package == true && needs.configure.outputs.tag != null
+        if: matrix.make_package == true && needs.configure.outputs.tag
         id: upload_release
         shell: bash
         env:
