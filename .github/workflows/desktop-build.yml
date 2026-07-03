@@ -149,11 +149,11 @@ jobs:
     continue-on-error: ${{ matrix.allow-failure == true }}
     timeout-minutes: 70
     env:
+      BUILD_REFERENCE: ${{ matrix.distro }}${{ matrix.distro_version }}
       CACHE_DIR: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.distro_version }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CMAKE_GENERATOR: Ninja
-      BUILD_REFERENCE: ${{ matrix.distro }}${{ matrix.distro_version }}
 
     steps:
       - name: "Checkout"
@@ -273,7 +273,7 @@ jobs:
             soc: Intel
             type: Release
             use_ccache: true
-            xcode: "16.4"
+            xcode: 16.4
 
           - os: macOS
             os_target_version: 14
@@ -287,7 +287,7 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: true
-            xcode: "15.4"
+            xcode: 15.4
 
           - os: macOS
             os_target_version: 15
@@ -301,7 +301,7 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: true
-            xcode: "16.4"
+            xcode: 16.4
 
           - os: macOS
             os_target_version: 15
@@ -314,13 +314,13 @@ jobs:
             soc: Apple
             type: Debug
             use_ccache: true
-            xcode: "16.4"
+            xcode: 16.4
 
           - os: Windows
             os_target_version: 10
             runner: windows-2025
 
-            cmake_generator: "Visual Studio 18 2026"
+            cmake_generator: Visual Studio 18 2026
             cmake_generator_platform: x64
             make_package: true
             qt_version: 6.11.0
