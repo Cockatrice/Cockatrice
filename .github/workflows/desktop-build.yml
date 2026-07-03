@@ -368,7 +368,7 @@ jobs:
       # Using jurplel/install-qt-action to install Qt without using brew
       # Qt build using vcpkg either just fails or takes too long to build
       - name: "[macOS] Install fat Qt ${{ steps.resolve_qt_version.outputs.version }}"
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit == ''
         uses: jurplel/install-qt-action@v4
         with:
           arch: ${{ matrix.qt_arch }}
@@ -378,11 +378,11 @@ jobs:
           version: ${{ steps.resolve_qt_version.outputs.version }}
 
       - name: "[macOS] Create thin Qt libraries"
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit == ''
         run: .ci/thin_macos_qtlib.sh
 
       - name: "[macOS] Cache thin Qt libraries"
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit == ''
         uses: actions/cache/save@v6
         with:
           key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
