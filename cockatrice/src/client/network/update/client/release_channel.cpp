@@ -27,6 +27,8 @@
 #define GIT_SHORT_HASH_LEN 7
 
 ReleaseChannel::ReleaseChannel() : netMan(new QNetworkAccessManager(this)), response(nullptr), lastRelease(nullptr)
+{
+}
 
 ReleaseChannel::~ReleaseChannel()
 {
@@ -74,7 +76,7 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 #elif defined(Q_OS_WIN)
 #if Q_PROCESSOR_WORDSIZE == 8 // 64-bit
     const QString &version = QSysInfo::productVersion();
-    if (version.startsWith("10") {
+    if (version.startsWith("10")) {
         return fileName.contains("Win10");
     }
 #else
