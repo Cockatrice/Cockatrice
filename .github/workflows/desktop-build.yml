@@ -187,7 +187,7 @@ jobs:
         shell: bash
         env:
           PACKAGE: ${{ matrix.package }}
-          PACKAGE_SUFFIX: -${{ matrix.distro }}${{ matrix.distro_version }}
+          PACKAGE_SUFFIX: "-${{ matrix.distro }}${{ matrix.distro_version }}"
           SERVER_ONLY: ${{ matrix.server_only }}
         run: |
           source .ci/docker.sh
@@ -437,16 +437,16 @@ jobs:
           BUILDTYPE: ${{ matrix.type }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
-          DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
+          DEVELOPER_DIR: "/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer"
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           MAKE_PACKAGE: ${{ matrix.make_package }}
-          PACKAGE_SUFFIX: '-${{ matrix.os }}${{ matrix.os_target_version }}${{ case(matrix.soc == 'Intel', '_Intel', '') }}'
+          PACKAGE_SUFFIX: "-${{ matrix.os }}${{ matrix.os_target_version }}${{ case(matrix.soc == 'Intel', '_Intel', '') }}"
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           USE_CCACHE: ${{ matrix.use_ccache }}
-          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
+          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite"
           VCPKG_DISABLE_METRICS: true
         run: .ci/compile.sh --server --test --vcpkg
 
