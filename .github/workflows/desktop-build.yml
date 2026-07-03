@@ -97,7 +97,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The files in ".ci/$distro$distro_version" correspond to the values given here
+        # The files in ".ci/$BUILD_REFERENCE" correspond to the values given here
         include:
           - distro: Arch
 
@@ -153,7 +153,7 @@ jobs:
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
       CMAKE_GENERATOR: Ninja
-      NAME: ${{ matrix.distro }}${{ matrix.distro_version }}
+      BUILD_REFERENCE: ${{ matrix.distro }}${{ matrix.distro_version }}
 
     steps:
       - name: "Checkout"
