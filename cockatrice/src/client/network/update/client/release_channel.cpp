@@ -27,8 +27,6 @@
 #define GIT_SHORT_HASH_LEN 7
 
 ReleaseChannel::ReleaseChannel() : netMan(new QNetworkAccessManager(this)), response(nullptr), lastRelease(nullptr)
-{
-}
 
 ReleaseChannel::~ReleaseChannel()
 {
@@ -59,7 +57,7 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
         char arch[255];
         size_t len = sizeof(arch);
         if (sysctlbyname("machdep.cpu.brand_string", arch, &len, nullptr, 0) == 0) {
-            // Intel mac is only supported on macOS 13 versions
+            // Intel Mac is only supported on macOS 13 versions
             if (QString::fromUtf8(arch).contains("Intel")) {
                 return 13;
             }
@@ -74,13 +72,9 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
     return rel_maj == sys_maj;
 
 #elif defined(Q_OS_WIN)
-#if Q_PROCESSOR_WORDSIZE == 4
-    return fileName.contains("32bit");
-#elif Q_PROCESSOR_WORDSIZE == 8
+#if Q_PROCESSOR_WORDSIZE == 8 // 64-bit
     const QString &version = QSysInfo::productVersion();
-    if (version.startsWith("7") || version.startsWith("8")) {
-        return fileName.contains("Win7");
-    } else {
+    if (version.startsWith("10") {
         return fileName.contains("Win10");
     }
 #else
