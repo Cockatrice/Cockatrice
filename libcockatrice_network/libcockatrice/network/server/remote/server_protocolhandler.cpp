@@ -26,7 +26,7 @@
 #include <libcockatrice/protocol/pb/response_list_users.pb.h>
 #include <libcockatrice/protocol/pb/response_login.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
                                                Server_DatabaseInterface *_databaseInterface,

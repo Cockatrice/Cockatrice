@@ -281,7 +281,7 @@ void VisualDeckEditorWidget::constructZoneWidgetForIndex(QPersistentModelIndex p
         displayOptionsWidget->getActiveGroupCriteria(), displayOptionsWidget->getActiveSortCriteria(),
         displayOptionsWidget->getDisplayType(), 20, 10, cardSizeWidget);
     connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardHovered, this, &VisualDeckEditorWidget::onHover);
-    connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::onCardClick);
+    connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::cardClicked, this, &VisualDeckEditorWidget::cardClicked);
     connect(zoneDisplayWidget, &DeckCardZoneDisplayWidget::requestCleanup, this,
             &VisualDeckEditorWidget::cleanupInvalidZones);
     connect(this, &VisualDeckEditorWidget::activeSortCriteriaChanged, zoneDisplayWidget,
@@ -400,13 +400,6 @@ void VisualDeckEditorWidget::decklistDataChanged(QModelIndex topLeft, QModelInde
 // =====================================================================================================================
 //                                                 User Interaction
 // =====================================================================================================================
-
-void VisualDeckEditorWidget::onCardClick(QMouseEvent *event,
-                                         CardInfoPictureWithTextOverlayWidget *instance,
-                                         QString zoneName)
-{
-    emit cardClicked(event, instance, zoneName);
-}
 
 void VisualDeckEditorWidget::onHover(const ExactCard &hoveredCard)
 {

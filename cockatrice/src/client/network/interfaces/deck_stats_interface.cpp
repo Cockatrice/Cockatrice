@@ -6,12 +6,12 @@
 #include <QNetworkRequest>
 #include <QRegularExpression>
 #include <QUrlQuery>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <version_string.h>
 
-DeckStatsInterface::DeckStatsInterface(CardDatabase &_cardDatabase, QObject *parent)
-    : QObject(parent), cardDatabase(_cardDatabase)
+DeckStatsInterface::DeckStatsInterface(QObject *parent) : QObject(parent)
 {
     manager = new QNetworkAccessManager(this);
     connect(manager, &QNetworkAccessManager::finished, this, &DeckStatsInterface::queryFinished);
@@ -70,8 +70,8 @@ void DeckStatsInterface::analyzeDeck(const DeckList &deck)
 
 void DeckStatsInterface::copyDeckWithoutTokens(const DeckList &source, DeckList &destination)
 {
-    auto copyIfNotAToken = [this, &destination](const auto node, const auto card) {
-        CardInfoPtr dbCard = cardDatabase.query()->getCardInfo(card->getName());
+    auto copyIfNotAToken = [&destination](const auto node, const auto card) {
+        CardInfoPtr dbCard = CardDatabaseManager::query()->getCardInfo(card->getName());
         if (dbCard && !dbCard->getIsToken()) {
             DecklistCardNode *addedCard = destination.addCard(card->getName(), node->getName(), -1);
             addedCard->setNumber(card->getNumber());

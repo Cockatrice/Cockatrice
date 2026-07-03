@@ -85,14 +85,15 @@ void CardDatabase::refreshCachedReverseRelatedCards()
         for (auto *rel : card->getReverseRelatedCards()) {
             if (auto target = cards.value(rel->getName())) {
                 auto *newRel = new CardRelation(card->getName(), rel->getAttachType(), rel->getIsCreateAllExclusion(),
-                                                rel->getIsVariable(), rel->getDefaultCount(), rel->getIsPersistent());
+                                                rel->getIsVariable(), rel->getDefaultCount(), rel->getIsPersistent(),
+                                                rel->getIsFaceDown());
                 target->addReverseRelatedCards2Me(newRel);
             }
         }
     }
 }
 
-void CardDatabase::addCard(CardInfoPtr card)
+void CardDatabase::addCard(const CardInfoPtr &card)
 {
     if (card == nullptr) {
         qCWarning(CardDatabaseLog) << "CardDatabase::addCard(nullptr)";
@@ -118,7 +119,7 @@ void CardDatabase::addCard(CardInfoPtr card)
     emit cardAdded(card);
 }
 
-void CardDatabase::removeCard(CardInfoPtr card)
+void CardDatabase::removeCard(const CardInfoPtr &card)
 {
     if (card.isNull()) {
         qCWarning(CardDatabaseLog) << "CardDatabase::removeCard(nullptr)";
@@ -143,7 +144,7 @@ void CardDatabase::removeCard(CardInfoPtr card)
     emit cardRemoved(card);
 }
 
-void CardDatabase::addSet(CardSetPtr set)
+void CardDatabase::addSet(const CardSetPtr &set)
 {
     sets.insert(set->getShortName(), set);
 }
@@ -215,7 +216,7 @@ void CardDatabase::notifyEnabledSetsChanged()
     emit cardDatabaseEnabledSetsChanged();
 }
 
-void CardDatabase::addFormat(FormatRulesPtr format)
+void CardDatabase::addFormat(const FormatRulesPtr &format)
 {
     formats.insert(format->formatName.toLower(), format);
 }

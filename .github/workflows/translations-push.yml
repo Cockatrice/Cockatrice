@@ -1,14 +1,14 @@
 name: Update Translation Source
 
 on:
-  workflow_dispatch:
-  schedule:
-    # runs at the start of each quarter (UTC)
-    - cron: '0 0 1 1,4,7,10 *'
   pull_request:
     paths:
       - '.ci/update_translation_source_strings.sh'
       - '.github/workflows/translations-push.yml'
+  schedule:
+    # Runs at the start of each quarter (UTC)
+    - cron: '0 0 1 1,4,7,10 *'
+  workflow_dispatch:
 
 jobs:
   translations:
@@ -19,34 +19,33 @@ jobs:
     runs-on: ubuntu-slim
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v6
+      - name: "Checkout repo"
+        uses: actions/checkout@v7
 
-      - name: Install lupdate
+      - name: "Install lupdate"
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends qt6-l10n-tools
 
-      - name: Update Cockatrice translation source
+      - name: "Update Cockatrice translation source"
         id: cockatrice
         shell: bash
         env:
-          FILE: 'cockatrice/cockatrice_en@source.ts'
-        run: |
+          FILE: cockatrice/cockatrice_en@source.ts
+        run: >
           DIRS="cockatrice/src $(find . -maxdepth 1 -type d -name 'libcockatrice_*')"
-          export DIRS
           .ci/update_translation_source_strings.sh
 
-      - name: Update Oracle translation source
+      - name: "Update Oracle translation source"
         id: oracle
         shell: bash
         env:
-          FILE: 'oracle/oracle_en@source.ts'
           DIRS: 'oracle/src'
+          FILE: 'oracle/oracle_en@source.ts'
         run: .ci/update_translation_source_strings.sh
 
-      - name: Render template
+      - name: "Render template"
         id: template
         uses: chuhlomin/render-template/binary@v1
         with:
@@ -56,7 +55,7 @@ jobs:
             oracle_output: ${{ steps.oracle.outputs.output }}
             commit: ${{ github.sha }}
 
-      - name: Create pull request
+      - name: "Create pull request"
         if: github.event_name != 'pull_request'
         id: create_pr
         uses: peter-evans/create-pull-request@v8
@@ -64,27 +63,24 @@ jobs:
           add-paths: |
             cockatrice/cockatrice_en@source.ts
             oracle/oracle_en@source.ts
-          commit-message: Update translation source strings
-          # author is the owner of the commit
-          author: github-actions <github-actions@github.com>
-          branch: ci-update_translation_source
-          delete-branch: true
-          title: 'Update source strings'
+          author: github-actions <github-actions@github.com>    # owner of the commit
           body: ${{ steps.template.outputs.result }}
+          branch: ci-update_translation_source
+          commit-message: Update translation source strings
+          delete-branch: true
+          draft: false
           labels: |
             CI
             Translation
-          draft: false
+          title: 'Update source strings'
 
-      - name: PR Status
+      - name: "PR Status"
         if: github.event_name != 'pull_request'
         shell: bash
         env:
-          STATUS: ${{ steps.create_pr.outputs.pull-request-operation }}
+          PR_NUMBER: ${{ steps.create_pr.outputs.pull-request-number }}
+          PR_URL: ${{ steps.create_pr.outputs.pull-request-url }}
+          STATUS: ${{ case(steps.create_pr.outputs.pull-request-operation == 'none', 'unchanged', steps.create_pr.outputs.pull-request-operation) }}
         run: |
-          if [[ "$STATUS" == "none" ]]; then
-            echo "PR #${{ steps.create_pr.outputs.pull-request-number }} unchanged!" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "PR #${{ steps.create_pr.outputs.pull-request-number }} $STATUS!" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "URL: ${{ steps.create_pr.outputs.pull-request-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "PR #$PR_NUMBER $STATUS!" >> "$GITHUB_STEP_SUMMARY"
+          echo "URL: $PR_URL" >> "$GITHUB_STEP_SUMMARY"

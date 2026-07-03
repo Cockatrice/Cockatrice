@@ -193,6 +193,8 @@ void DeckEditorMenu::refreshShortcuts()
     aEditDeckInClipboardRaw->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboardRaw"));
     aPrintDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aPrintDeck"));
 
+    aLoadDeckFromWebsite->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeckFromWebsite"));
+
     aExportDeckDecklist->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklist"));
     aExportDeckDecklistXyz->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklistXyz"));
     aAnalyzeDeckDeckstats->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aAnalyzeDeck"));

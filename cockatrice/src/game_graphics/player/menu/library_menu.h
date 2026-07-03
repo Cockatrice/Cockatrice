@@ -1,0 +1,118 @@
+/**
+ * @file library_menu.h
+ * @ingroup GameMenusZones
+ */
+//! \todo Document this file.
+
+#ifndef COCKATRICE_LIBRARY_MENU_H
+#define COCKATRICE_LIBRARY_MENU_H
+
+#include "../../../interface/widgets/menus/tearoff_menu.h"
+#include "abstract_player_component.h"
+
+#include <QAction>
+#include <QMenu>
+
+class PlayerGraphicsItem;
+class PlayerLogic;
+class PlayerActions;
+
+class LibraryMenu : public TearOffMenu, public AbstractPlayerComponent
+{
+    Q_OBJECT
+public slots:
+    void enableOpenInDeckEditorAction() const;
+    void resetTopCardMenuActions();
+
+public:
+    LibraryMenu(PlayerGraphicsItem *player, QWidget *parent = nullptr);
+    void createDrawActions();
+    void createShuffleActions();
+    void createMoveActions();
+    void createViewActions();
+    void retranslateUi() override;
+    void populateRevealLibraryMenuWithActivePlayers();
+    void populateLendLibraryMenuWithActivePlayers();
+    void populateRevealTopCardMenuWithActivePlayers();
+    void onRevealLibraryTriggered();
+    void onLendLibraryTriggered();
+    void onRevealTopCardTriggered();
+    void setShortcutsActive() override;
+    void setShortcutsInactive() override;
+
+    [[nodiscard]] bool isAlwaysRevealTopCardChecked() const
+    {
+        return aAlwaysRevealTopCard->isChecked();
+    }
+
+    [[nodiscard]] bool isAlwaysLookAtTopCardChecked() const
+    {
+        return aAlwaysLookAtTopCard->isChecked();
+    }
+
+    // expose useful actions/menus if PlayerMenu needs them
+    [[nodiscard]] QMenu *revealLibrary() const
+    {
+        return mRevealLibrary;
+    }
+    [[nodiscard]] QMenu *lendLibraryMenu() const
+    {
+        return mLendLibrary;
+    }
+    [[nodiscard]] QMenu *revealTopCardMenu() const
+    {
+        return mRevealTopCard;
+    }
+
+    QMenu *topLibraryMenu = nullptr;
+    QMenu *bottomLibraryMenu = nullptr;
+
+    // Expose submenus that PlayerMenu tracks in its lists
+    QMenu *mRevealLibrary = nullptr;
+    QMenu *mLendLibrary = nullptr;
+    QMenu *mRevealTopCard = nullptr;
+
+    QAction *aDrawCard = nullptr;
+    QAction *aDrawCards = nullptr;
+    QAction *aUndoDraw = nullptr;
+
+    QAction *aShuffle = nullptr;
+    QAction *aViewLibrary = nullptr;
+    QAction *aViewTopCards = nullptr;
+    QAction *aViewBottomCards = nullptr;
+    QAction *aAlwaysRevealTopCard = nullptr;
+    QAction *aAlwaysLookAtTopCard = nullptr;
+    QAction *aOpenDeckInDeckEditor = nullptr;
+
+    QAction *aMoveTopToPlay = nullptr;
+    QAction *aMoveTopToPlayFaceDown = nullptr;
+    QAction *aMoveTopCardToBottom = nullptr;
+    QAction *aMoveTopCardToGraveyard = nullptr;
+    QAction *aMoveTopCardToExile = nullptr;
+    QAction *aMoveTopCardsToGraveyard = nullptr;
+    QAction *aMoveTopCardsToGraveyardFaceDown = nullptr;
+    QAction *aMoveTopCardsToExile = nullptr;
+    QAction *aMoveTopCardsToExileFaceDown = nullptr;
+    QAction *aMoveTopCardsUntil = nullptr;
+    QAction *aShuffleTopCards = nullptr;
+
+    QAction *aDrawBottomCard = nullptr;
+    QAction *aDrawBottomCards = nullptr;
+    QAction *aMoveBottomToPlay = nullptr;
+    QAction *aMoveBottomToPlayFaceDown = nullptr;
+    QAction *aMoveBottomCardToTop = nullptr;
+    QAction *aMoveBottomCardToGraveyard = nullptr;
+    QAction *aMoveBottomCardToExile = nullptr;
+    QAction *aMoveBottomCardsToGraveyard = nullptr;
+    QAction *aMoveBottomCardsToGraveyardFaceDown = nullptr;
+    QAction *aMoveBottomCardsToExile = nullptr;
+    QAction *aMoveBottomCardsToExileFaceDown = nullptr;
+    QAction *aShuffleBottomCards = nullptr;
+
+    int defaultNumberTopCards = 1;
+
+private:
+    PlayerGraphicsItem *player;
+};
+
+#endif // COCKATRICE_LIBRARY_MENU_H

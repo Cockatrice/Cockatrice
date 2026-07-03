@@ -10,8 +10,8 @@
 #define TAB_GAME_H
 
 #include "../game/abstract_game.h"
-#include "../game/log/message_log_widget.h"
 #include "../game/player/player_logic.h"
+#include "../game_graphics/log/message_log_widget.h"
 #include "../interface/widgets/menus/tearoff_menu.h"
 #include "../interface/widgets/replay/replay_manager.h"
 #include "tab.h"
@@ -20,6 +20,7 @@
 #include <QLoggingCategory>
 #include <QMap>
 
+class CardMenu;
 class ServerInfo_PlayerProperties;
 class TabbedDeckViewContainer;
 inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
@@ -141,7 +142,7 @@ signals:
 private slots:
     void adminLockChanged(bool lock);
     void newCardAdded(AbstractCardItem *card);
-    void setCardMenu(QMenu *menu);
+    void setCardMenu(CardMenu *menu);
 
     void actGameInfo();
     void actConcede();

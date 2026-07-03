@@ -69,7 +69,7 @@ signals:
     void activeCardChanged(const ExactCard &activeCard);
     void activeGroupCriteriaChanged(QString activeGroupCriteria);
     void activeSortCriteriaChanged(QStringList activeSortCriteria);
-    void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
+    void cardClicked(QMouseEvent *event, const ExactCard &card, const QString &zoneName);
     void cardAdditionRequested(const ExactCard &card);
     void displayTypeChanged(DisplayType displayType);
 
@@ -82,7 +82,6 @@ protected:
 
 protected slots:
     void onHover(const ExactCard &hoveredCard);
-    void onCardClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
     void decklistModelReset();
     void resizeEvent(QResizeEvent *event) override;
 

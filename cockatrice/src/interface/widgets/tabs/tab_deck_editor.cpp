@@ -21,7 +21,6 @@
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/trice_limits.h>
 
 /**
  * @brief Constructs a new TabDeckEditor object.
@@ -118,16 +117,6 @@ void TabDeckEditor::refreshShortcuts()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     aResetLayout->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aResetLayout"));
-}
-
-/**
- * @brief Displays the printing selector dock with the current card.
- */
-void TabDeckEditor::showPrintingSelector()
-{
-    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
-    printingSelectorDockWidget->printingSelector->updateDisplay();
-    printingSelectorDockWidget->setVisible(true);
 }
 
 /**

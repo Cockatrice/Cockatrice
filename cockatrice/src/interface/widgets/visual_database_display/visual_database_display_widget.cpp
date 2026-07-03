@@ -5,7 +5,7 @@
 #include "../../../filters/syntax_help.h"
 #include "../../pixel_map_generator.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
-#include "../quick_settings/settings_button_widget.h"
+#include "../deck_editor/card_database_view.h"
 #include "../utility/custom_line_edit.h"
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_filter_save_load_widget.h"
@@ -23,16 +23,20 @@
 #include <utility>
 
 VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
-                                                         AbstractTabDeckEditor *_deckEditor,
                                                          CardDatabaseModel *database_model,
-                                                         CardDatabaseDisplayModel *database_display_model)
-    : QWidget(parent), deckEditor(_deckEditor), databaseModel(database_model),
-      databaseDisplayModel(database_display_model)
+                                                         DeckListModel *deckListModel)
+    : QWidget(parent)
 {
     debounceTimer = new QTimer(this);
     debounceTimer->setSingleShot(true); // Ensure it only fires once after the timeout
 
     connect(debounceTimer, &QTimer::timeout, this, &VisualDatabaseDisplayWidget::onSearchModelChanged);
+
+    // Create display model
+    databaseDisplayModel = new CardDatabaseDisplayModel(this);
+    databaseDisplayModel->setObjectName("databaseDisplayModel");
+    databaseDisplayModel->setSourceModel(database_model);
+    databaseDisplayModel->setFilterKeyColumn(0);
 
     cards = new QList<ExactCard>;
     connect(databaseDisplayModel, &CardDatabaseDisplayModel::modelDirty, this,
@@ -60,7 +64,6 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
     auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
     connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
-    searchEdit->installEventFilter(&searchKeySignals);
 
     setFocusProxy(searchEdit);
     setFocusPolicy(Qt::ClickFocus);
@@ -75,43 +78,29 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     filterModel = new FilterTreeModel();
     filterModel->setObjectName("filterModel");
 
-    searchKeySignals.setObjectName("searchKeySignals");
-    connect(searchEdit, &SearchLineEdit::textChanged, this, &VisualDatabaseDisplayWidget::updateSearch);
+    connect(searchEdit, &SearchLineEdit::textChanged, databaseDisplayModel, &CardDatabaseDisplayModel::setStringFilter);
 
-    DeckEditorDatabaseDisplayWidget *databaseDisplayWidget = deckEditor->cardDatabaseDockWidget->databaseDisplayWidget;
-    connect(&searchKeySignals, &KeySignals::onEnter, databaseDisplayWidget,
-            &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltEqual, databaseDisplayWidget,
-            &DeckEditorDatabaseDisplayWidget::actAddCardToMainDeck);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltRBracket, databaseDisplayWidget,
-            &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltMinus, databaseDisplayWidget,
-            &DeckEditorDatabaseDisplayWidget::actDecrementCardFromMainDeck);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltLBracket, databaseDisplayWidget,
-            &DeckEditorDatabaseDisplayWidget::actDecrementCardFromSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlAltEnter, databaseDisplayWidget,
-            &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlEnter, databaseDisplayWidget,
-            &DeckEditorDatabaseDisplayWidget::actAddCardToSideboard);
-    connect(&searchKeySignals, &KeySignals::onCtrlC, databaseDisplayWidget,
-            &DeckEditorDatabaseDisplayWidget::copyDatabaseCellContents);
-    connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
-
-    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToMainDeck, this,
-            &VisualDatabaseDisplayWidget::highlightAllSearchEdit);
-    connect(databaseDisplayWidget, &DeckEditorDatabaseDisplayWidget::addCardToSideboard, this,
-            &VisualDatabaseDisplayWidget::highlightAllSearchEdit);
-
-    databaseView = databaseDisplayWidget->getDatabaseView();
+    databaseView = new CardDatabaseView(this, databaseDisplayModel);
+    databaseView->setObjectName("databaseView");
     databaseView->setFocusProxy(searchEdit);
     databaseView->setItemDelegate(nullptr);
     databaseView->setVisible(false);
 
     searchEdit->setTreeView(databaseView);
+    searchEdit->installEventFilter(databaseView->getKeySignals());
+
+    connect(databaseView, &CardDatabaseView::cardChanged, this, &VisualDatabaseDisplayWidget::onSelectedCardChanged);
+    connect(databaseView, &CardDatabaseView::cardAdded, this, &VisualDatabaseDisplayWidget::actAddCard);
+    connect(databaseView, &CardDatabaseView::cardDecremented, this, &VisualDatabaseDisplayWidget::actDecrementCard);
+    connect(databaseView, &CardDatabaseView::edhrecClicked, this, &VisualDatabaseDisplayWidget::edhrecRequested);
+    connect(databaseView, &CardDatabaseView::selectPrintingClicked, this,
+            &VisualDatabaseDisplayWidget::printingSelectorRequested);
+    connect(databaseView, &CardDatabaseView::relatedCardClicked, this,
+            &VisualDatabaseDisplayWidget::onRelatedCardClicked);
 
     colorFilterWidget = new VisualDatabaseDisplayColorFilterWidget(this, filterModel);
 
-    filterContainer = new VisualDatabaseDisplayFilterToolbarWidget(this);
+    filterContainer = new VisualDatabaseDisplayFilterToolbarWidget(this, deckListModel);
 
     clearFilterWidget = new QToolButton();
     clearFilterWidget->setFixedSize(32, 32);
@@ -216,9 +205,9 @@ void VisualDatabaseDisplayWidget::onDisplayModeChanged(bool checked)
     }
 }
 
-void VisualDatabaseDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance)
+void VisualDatabaseDisplayWidget::onClick(QMouseEvent *event, const ExactCard &card)
 {
-    emit cardClickedDatabaseDisplay(event, instance);
+    emit cardClickedDatabaseDisplay(event, card);
 }
 
 void VisualDatabaseDisplayWidget::onHover(const ExactCard &hoveredCard)
@@ -226,26 +215,16 @@ void VisualDatabaseDisplayWidget::onHover(const ExactCard &hoveredCard)
     emit cardHoveredDatabaseDisplay(hoveredCard);
 }
 
-void VisualDatabaseDisplayWidget::addCard(const ExactCard &cardToAdd)
+void VisualDatabaseDisplayWidget::addCardToDisplay(const ExactCard &cardToAdd)
 {
     cards->append(cardToAdd);
     auto *display = new CardInfoPictureWithTextOverlayWidget(flowWidget, false);
     display->setScaleFactor(cardSizeWidget->getSlider()->value());
     display->setCard(cardToAdd);
     flowWidget->addWidget(display);
-    connect(display, &CardInfoPictureWithTextOverlayWidget::imageClicked, this, &VisualDatabaseDisplayWidget::onClick);
+    connect(display, &CardInfoPictureWithTextOverlayWidget::cardClicked, this, &VisualDatabaseDisplayWidget::onClick);
     connect(display, &CardInfoPictureWithTextOverlayWidget::hoveredOnCard, this, &VisualDatabaseDisplayWidget::onHover);
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, display, &CardInfoPictureWidget::setScaleFactor);
-}
-
-void VisualDatabaseDisplayWidget::updateSearch(const QString &search) const
-{
-    databaseDisplayModel->setStringFilter(search);
-    QModelIndexList sel = databaseView->selectionModel()->selectedRows();
-    if (sel.isEmpty() && databaseDisplayModel->rowCount()) {
-        databaseView->selectionModel()->setCurrentIndex(databaseDisplayModel->index(0, 0),
-                                                        QItemSelectionModel::SelectCurrent | QItemSelectionModel::Rows);
-    }
 }
 
 bool VisualDatabaseDisplayWidget::isVisualDisplayMode() const
@@ -267,6 +246,30 @@ void VisualDatabaseDisplayWidget::onSearchModelChanged()
         loadCurrentPage();
         qCDebug(VisualDatabaseDisplayLog) << "Search model changed";
     }
+}
+
+void VisualDatabaseDisplayWidget::onSelectedCardChanged(const QString &cardName)
+{
+    emit cardHoveredDatabaseDisplay(CardDatabaseManager::query()->getPreferredCard(cardName));
+}
+
+void VisualDatabaseDisplayWidget::actAddCard(const QString &cardName, const QString &zoneName)
+{
+    highlightAllSearchEdit();
+    ExactCard exactCard = CardDatabaseManager::query()->getPreferredCard(cardName);
+    emit cardAdded(exactCard, zoneName);
+}
+
+void VisualDatabaseDisplayWidget::actDecrementCard(const QString &cardName, const QString &zoneName)
+{
+    ExactCard exactCard = CardDatabaseManager::query()->getPreferredCard(cardName);
+    emit cardDecremented(exactCard, zoneName);
+}
+
+void VisualDatabaseDisplayWidget::onRelatedCardClicked(const QString &relatedCard)
+{
+    ExactCard exactCard = CardDatabaseManager::query()->guessCard({relatedCard});
+    emit cardInfoRequested(exactCard);
 }
 
 bool VisualDatabaseDisplayWidget::nearEndOfPage() const
@@ -335,12 +338,12 @@ void VisualDatabaseDisplayWidget::loadPage(int start, int end)
                 for (const CardFilter *setFilter : setFilters) {
                     if (setMap.contains(setFilter->term())) {
                         for (PrintingInfo printing : setMap[setFilter->term()]) {
-                            addCard(ExactCard(info, printing));
+                            addCardToDisplay(ExactCard(info, printing));
                         }
                     }
                 }
             } else {
-                addCard(CardDatabaseManager::query()->getPreferredCard(info));
+                addCardToDisplay(CardDatabaseManager::query()->getPreferredCard(info));
             }
         } else {
             qCDebug(VisualDatabaseDisplayLog) << "Card not found in database!";

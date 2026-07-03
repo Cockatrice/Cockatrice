@@ -16,25 +16,18 @@
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 
 class CardItem;
-class TabGame;
 class AbstractGame : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit AbstractGame(TabGame *tab);
+    explicit AbstractGame(QObject *parent);
 
-    TabGame *tab;
     GameMetaInfo *gameMetaInfo;
     GameState *gameState;
     GameEventHandler *gameEventHandler;
     PlayerManager *playerManager;
     CardItem *activeCard;
-
-    TabGame *getTab() const
-    {
-        return tab;
-    }
 
     GameMetaInfo *getGameMetaInfo()
     {

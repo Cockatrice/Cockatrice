@@ -8,16 +8,18 @@
 
 struct ArrowData
 {
-    int id;
-    int startPlayerId;
-    QString startZone;
-    int startCardId;
-    int targetPlayerId;
-    QString targetZone;    // empty = targeting a player
-    int targetCardId = -1; // -1 = targeting a player
-    QColor color;
+    int creatorId = -1;
+    bool isLocalCreator = false;
+    int id = -1;
+    int startPlayerId = -1;
+    QString startZone = "";
+    int startCardId = -1;
+    int targetPlayerId = -1;
+    QString targetZone = "";
+    int targetCardId = -1;
+    QColor color = "";
 
-    static ArrowData fromProto(const ServerInfo_Arrow &arrow);
+    static ArrowData fromProto(const ServerInfo_Arrow &arrow, int creatorId, bool isLocalCreator);
 
     bool isPlayerTargeted() const
     {

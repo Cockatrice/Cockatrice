@@ -56,56 +56,59 @@ set(cockatrice_SOURCES
     src/filters/filter_tree_model.cpp
     src/filters/syntax_help.cpp
     src/game/abstract_game.cpp
-    src/game/board/abstract_card_drag_item.cpp
-    src/game/board/abstract_card_item.cpp
-    src/game/board/abstract_counter.cpp
+    src/game/arrow_registry.cpp
+    src/game_graphics/board/abstract_card_drag_item.cpp
+    src/game_graphics/board/abstract_card_item.cpp
+    src/game_graphics/board/abstract_counter.cpp
     src/game/board/arrow_data.cpp
-    src/game/board/arrow_item.cpp
-    src/game/board/arrow_target.cpp
-    src/game/board/card_drag_item.cpp
-    src/game/board/card_item.cpp
+    src/game_graphics/board/arrow_item.cpp
+    src/game_graphics/board/arrow_target.cpp
+    src/game_graphics/board/card_drag_item.cpp
+    src/game_graphics/board/card_item.cpp
     src/game/board/card_list.cpp
     src/game/board/card_state.cpp
-    src/game/board/counter_general.cpp
+    src/game_graphics/board/counter_general.cpp
     src/game/board/counter_state.cpp
-    src/game/board/translate_counter_name.cpp
-    src/game/deckview/deck_view.cpp
-    src/game/deckview/deck_view_container.cpp
-    src/game/deckview/tabbed_deck_view_container.cpp
-    src/game/dialogs/dlg_create_token.cpp
-    src/game/dialogs/dlg_move_top_cards_until.cpp
-    src/game/dialogs/dlg_roll_dice.cpp
+    src/game_graphics/board/translate_counter_name.cpp
+    src/game_graphics/deckview/deck_view.cpp
+    src/game_graphics/deckview/deck_view_container.cpp
+    src/game_graphics/deckview/tabbed_deck_view_container.cpp
+    src/game_graphics/dialogs/dlg_create_token.cpp
+    src/game_graphics/dialogs/dlg_move_top_cards_until.cpp
+    src/game_graphics/dialogs/dlg_roll_dice.cpp
     src/game/game.cpp
     src/game/game_event_handler.cpp
     src/game/game_meta_info.cpp
-    src/game/game_scene.cpp
+    src/game_graphics/game_scene.cpp
     src/game/game_state.cpp
-    src/game/game_view.cpp
-    src/game/hand_counter.cpp
-    src/game/log/message_log_widget.cpp
+    src/game_graphics/game_view.cpp
+    src/game_graphics/hand_counter.cpp
+    src/game/selection_subtype_tally.cpp
+    src/game_graphics/log/message_log_widget.cpp
     src/game/phase.cpp
-    src/game/phases_toolbar.cpp
-    src/game/player/menu/card_menu.cpp
-    src/game/player/menu/custom_zone_menu.cpp
-    src/game/player/menu/grave_menu.cpp
-    src/game/player/menu/hand_menu.cpp
-    src/game/player/menu/library_menu.cpp
-    src/game/player/menu/move_menu.cpp
-    src/game/player/menu/player_menu.cpp
-    src/game/player/menu/pt_menu.cpp
-    src/game/player/menu/rfg_menu.cpp
-    src/game/player/menu/say_menu.cpp
-    src/game/player/menu/sideboard_menu.cpp
-    src/game/player/menu/utility_menu.cpp
+    src/game_graphics/phases_toolbar.cpp
+    src/game_graphics/player/menu/card_menu.cpp
+    src/game_graphics/player/menu/custom_zone_menu.cpp
+    src/game_graphics/player/menu/grave_menu.cpp
+    src/game_graphics/player/menu/hand_menu.cpp
+    src/game_graphics/player/menu/library_menu.cpp
+    src/game_graphics/player/menu/move_menu.cpp
+    src/game_graphics/player/menu/player_menu.cpp
+    src/game_graphics/player/menu/pt_menu.cpp
+    src/game_graphics/player/menu/rfg_menu.cpp
+    src/game_graphics/player/menu/say_menu.cpp
+    src/game_graphics/player/menu/sideboard_menu.cpp
+    src/game_graphics/player/menu/utility_menu.cpp
     src/game/player/player_actions.cpp
-    src/game/player/player_area.cpp
+    src/game_graphics/player/player_area.cpp
+    src/game_graphics/player/player_dialogs.cpp
     src/game/player/player_event_handler.cpp
-    src/game/player/player_graphics_item.cpp
+    src/game_graphics/player/player_graphics_item.cpp
     src/game/player/player_info.cpp
-    src/game/player/player_list_widget.cpp
+    src/game_graphics/player/player_list_widget.cpp
     src/game/player/player_logic.cpp
     src/game/player/player_manager.cpp
-    src/game/player/player_target.cpp
+    src/game_graphics/player/player_target.cpp
     src/game/replay.cpp
     src/game/zones/card_zone_logic.cpp
     src/game/zones/hand_zone_logic.cpp
@@ -181,6 +184,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_single_display_widget.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_total_widget.cpp
     src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_category_widget.cpp
+    src/interface/widgets/deck_editor/card_database_view.cpp
     src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_card_database_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp
@@ -233,10 +237,14 @@ set(cockatrice_SOURCES
     src/interface/widgets/server/handle_public_servers.cpp
     src/interface/widgets/server/remote/remote_decklist_tree_widget.cpp
     src/interface/widgets/server/remote/remote_replay_list_tree_widget.cpp
+    src/interface/widgets/server/user/user_avatar_provider.cpp
+    src/interface/widgets/server/user/user_card_art_provider.cpp
+    src/interface/widgets/server/user/user_card_settings_dialog.cpp
     src/interface/widgets/server/user/user_context_menu.cpp
     src/interface/widgets/server/user/user_info_box.cpp
     src/interface/widgets/server/user/user_info_connection.cpp
     src/interface/widgets/server/user/user_list_manager.cpp
+    src/interface/widgets/server/user/user_list_painter.cpp
     src/interface/widgets/server/user/user_list_widget.cpp
     src/interface/widgets/settings_page/appearance_settings_page.cpp
     src/interface/widgets/settings_page/deck_editor_settings_page.cpp
@@ -324,6 +332,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab.cpp
     src/interface/widgets/tabs/tab_account.cpp
     src/interface/widgets/tabs/tab_admin.cpp
+    src/interface/widgets/tabs/tab_card_art_rules.cpp
     src/interface/widgets/tabs/tab_deck_editor.cpp
     src/interface/widgets/tabs/tab_deck_storage.cpp
     src/interface/widgets/tabs/tab_game.cpp
@@ -346,6 +355,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
     src/interface/widgets/utility/compact_push_button.cpp
     src/interface/widgets/utility/compact_push_button.h
+    src/interface/widgets/server/user/user_info_popup.cpp
+    src/interface/widgets/server/user/user_info_popup.h
 )
 
 add_subdirectory(sounds)

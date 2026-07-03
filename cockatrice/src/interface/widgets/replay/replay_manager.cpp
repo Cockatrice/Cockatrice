@@ -98,8 +98,7 @@ ReplayManager::ReplayManager(TabGame *parent, GameReplay *_replay)
 
 void ReplayManager::replayNextEvent(EventProcessingOptions options)
 {
-    game->getGame()->getGameEventHandler()->processGameEventContainer(
-        replay->event_list(timelineWidget->getCurrentEvent()), nullptr, options);
+    emit eventReplayed(replay->event_list(timelineWidget->getCurrentEvent()), options);
 }
 
 void ReplayManager::replayFinished()

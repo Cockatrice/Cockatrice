@@ -17,7 +17,6 @@ public:
 
     DeckEditorDatabaseDisplayWidget *databaseDisplayWidget;
 
-    CardDatabase *getDatabase() const;
     void setFilterTree(FilterTree *filterTree);
 
 public slots:

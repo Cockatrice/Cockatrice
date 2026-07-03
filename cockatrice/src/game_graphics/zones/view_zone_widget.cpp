@@ -2,12 +2,12 @@
 
 #include "../../client/settings/cache_settings.h"
 #include "../../filters/syntax_help.h"
-#include "../../game/board/card_item.h"
-#include "../../game/game_scene.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
-#include "../../game/z_values.h"
 #include "../../interface/pixel_map_generator.h"
+#include "../board/card_item.h"
+#include "../game_scene.h"
+#include "../z_values.h"
 #include "view_zone.h"
 
 #include <QCheckBox>
@@ -74,6 +74,11 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
         searchEditProxy->setWidget(&searchEdit);
         searchEditProxy->setZValue(ZValues::DRAG_ITEM);
         vbox->addItem(searchEditProxy);
+
+        // hide search bar if chat autofocus setting is enabled, since typing into it will no longer work anyway
+        searchEditProxy->setVisible(!SettingsCache::instance().getKeepGameChatFocus());
+        connect(&SettingsCache::instance(), &SettingsCache::keepGameChatFocusChanged, searchEditProxy,
+                [searchEditProxy](bool keepFocus) { searchEditProxy->setVisible(!keepFocus); });
 
         // top row
         QGraphicsLinearLayout *hTopRow = new QGraphicsLinearLayout(Qt::Horizontal);

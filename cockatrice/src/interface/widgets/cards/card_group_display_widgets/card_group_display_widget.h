@@ -48,8 +48,6 @@ public:
 
 public slots:
     void mousePressEvent(QMouseEvent *event) override;
-    void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
-    void onHover(const ExactCard &card);
     virtual QWidget *constructWidgetForIndex(QPersistentModelIndex index);
     virtual void updateCardDisplays();
     virtual void onCardAddition(const QModelIndex &parent, int first, int last);
@@ -59,7 +57,7 @@ public slots:
     void resizeEvent(QResizeEvent *event) override;
 
 signals:
-    void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
+    void cardClicked(QMouseEvent *event, const ExactCard &card);
     void cardHovered(const ExactCard &card);
     void cleanupRequested(CardGroupDisplayWidget *cardGroupDisplayWidget);
 

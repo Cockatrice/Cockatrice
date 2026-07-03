@@ -11,7 +11,7 @@
 #include <QSplitter>
 #include <QTextEdit>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 static int findRestoreIndex(const CardRef &wanted, const QComboBox *combo)
 {

@@ -51,7 +51,7 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
 //                                                    User Interaction
 // =====================================================================================================================
 
-void DeckCardZoneDisplayWidget::onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card)
+void DeckCardZoneDisplayWidget::onClick(QMouseEvent *event, const ExactCard &card)
 {
     emit cardClicked(event, card, zoneName);
 }

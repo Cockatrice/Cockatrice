@@ -7,6 +7,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "../../game_graphics/player/player_area.h"
 #include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../board/arrow_data.h"
 #include "../interface/deck_loader/loaded_deck.h"
@@ -14,10 +15,7 @@
 #include "../zones/pile_zone_logic.h"
 #include "../zones/stack_zone_logic.h"
 #include "../zones/table_zone_logic.h"
-#include "menu/player_menu.h"
-#include "player_area.h"
 #include "player_event_handler.h"
-#include "player_graphics_item.h"
 #include "player_info.h"
 
 #include <QInputDialog>
@@ -54,6 +52,7 @@ class PlayerMenu;
 class QAction;
 class QMenu;
 class ServerInfo_Arrow;
+class ServerInfo_Card;
 class ServerInfo_Counter;
 class ServerInfo_Player;
 class ServerInfo_User;
@@ -67,8 +66,14 @@ class PlayerLogic : public QObject
 
 signals:
     void openDeckEditor(const LoadedDeck &deck);
+    void requestZoneViewToggle(PlayerLogic *player, const QString &zoneName, int numberCards, bool isReversed);
+    void requestRevealedZoneView(PlayerLogic *player,
+                                 CardZoneLogic *zone,
+                                 const QList<const ServerInfo_Card *> &cardList,
+                                 bool withWritePermission);
     void deckChanged();
     void newCardAdded(AbstractCardItem *card);
+    void requestCardMenuUpdate(const CardItem *card);
     void counterAdded(CounterState *state);
     void counterRemoved(int counterId);
     void rearrangeCounters();
@@ -78,13 +83,14 @@ signals:
     void clearCustomZonesMenu();
     void addViewCustomZoneActionToCustomZoneMenu(QString zoneName);
     void resetTopCardMenuActions();
-    void arrowCreateRequested(ArrowData data);
-    void arrowDeleteRequested(int arrowId);
-    void arrowDeleted(int arrowId);
-    void arrowsCleared(); // fires on clear() and processPlayerInfo
+    void arrowCreateRequested(QSharedPointer<ArrowData> data);
+    void arrowDeleteRequested(int creatorId, int arrowId);
+    void arrowDeleted(int creatorId, int arrowId);
+    void arrowsClearedLocally(); // fires on clear() and processPlayerInfo
 
 public slots:
     void setActive(bool _active);
+    void onRequestZoneViewToggle(const QString &zoneName, int numberCards, bool isReversed);
 
 public:
     PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent);
@@ -112,10 +118,6 @@ public:
         return game;
     }
 
-    GameScene *getGameScene();
-
-    [[nodiscard]] PlayerGraphicsItem *getGraphicsItem();
-
     [[nodiscard]] PlayerActions *getPlayerActions() const
     {
         return playerActions;
@@ -129,11 +131,6 @@ public:
     [[nodiscard]] PlayerInfo *getPlayerInfo() const
     {
         return playerInfo;
-    }
-
-    [[nodiscard]] PlayerMenu *getPlayerMenu() const
-    {
-        return playerMenu;
     }
 
     void setDeck(const DeckList &_deck);
@@ -234,8 +231,6 @@ private:
     PlayerInfo *playerInfo;
     PlayerEventHandler *playerEventHandler;
     PlayerActions *playerActions;
-    PlayerMenu *playerMenu;
-    PlayerGraphicsItem *graphicsItem;
 
     bool active;
     bool conceded;

@@ -105,23 +105,30 @@ void PrintingSelector::printingsInDeckChanged()
 }
 
 /**
- * @return A map of uuid to amounts (main, side).
+ * @return A map of uuid to amounts (main, side, tokens).
  */
-static QMap<QString, QPair<int, int>> tallyUuidCounts(const DeckListModel *model, const QString &cardName)
+static QMap<QString, ZoneCounts> tallyUuidCounts(const DeckListModel *model, const QString &cardName)
 {
-    QMap<QString, QPair<int, int>> map;
+    QMap<QString, ZoneCounts> map;
 
     auto mainNodes = model->getCardNodesForZone(DECK_ZONE_MAIN);
     for (auto &node : mainNodes) {
         if (node->getName() == cardName) {
-            map[node->getCardProviderId()].first += node->getNumber();
+            map[node->getCardProviderId()].mainboard += node->getNumber();
         }
     }
 
     auto sideNodes = model->getCardNodesForZone(DECK_ZONE_SIDE);
     for (auto &node : sideNodes) {
         if (node->getName() == cardName) {
-            map[node->getCardProviderId()].second += node->getNumber();
+            map[node->getCardProviderId()].sideboard += node->getNumber();
+        }
+    }
+
+    auto tokensNodes = model->getCardNodesForZone(DECK_ZONE_TOKENS);
+    for (auto &node : tokensNodes) {
+        if (node->getName() == cardName) {
+            map[node->getCardProviderId()].tokensboard += node->getNumber();
         }
     }
 

@@ -183,17 +183,20 @@ signals:
     void soundThemeChanged();
     void ignoreUnregisteredUsersChanged();
     void ignoreUnregisteredUserMessagesChanged();
+    void ignoreNonBuddyUserMessagesChanged();
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void networkCacheSizeChanged(int newSizeInMBs);
     void redirectCacheTtlChanged(int newTtl);
     void cardPictureLoaderCacheMethodChanged(int cardPictureLoaderCacheMethod);
     void localCardImageStorageNamingSchemeChanged(int localCardImageStorageNamingScheme);
     void masterVolumeChanged(int value);
+    void styleUserListChanged();
     void chatMentionCompleterChanged();
     void downloadSpoilerTimeIndexChanged();
     void downloadSpoilerStatusChanged();
     void useTearOffMenusChanged(bool state);
     void roundCardCornersChanged(bool roundCardCorners);
+    void keepGameChatFocusChanged(bool value);
 
 private:
     QSettings *settings;
@@ -282,6 +285,7 @@ private:
     bool autoRotateSidewaysLayoutCards;
     bool openDeckInNewTab;
     int rewindBufferingMs;
+    bool styleUserList;
     bool chatMention;
     bool chatMentionCompleter;
     QString chatMentionColor;
@@ -294,6 +298,7 @@ private:
     QString soundThemeName;
     bool ignoreUnregisteredUsers;
     bool ignoreUnregisteredUserMessages;
+    bool ignoreNonBuddyUserMessages;
     QString picUrl;
     QString picUrlFallback;
     QString clientID;
@@ -304,6 +309,7 @@ private:
     int cardViewExpandedRowsMax;
     bool closeEmptyCardView;
     bool focusCardViewSearchBar;
+    bool keepGameChatFocus;
     int pixmapCacheSize;
     int networkCacheSize;
     int redirectCacheTtl;
@@ -349,6 +355,7 @@ private:
     bool showStatusBar;
     bool showDragSelectionCount;
     bool showTotalSelectionCount;
+    bool showSubtypeSelectionTally;
 
 public:
     SettingsCache();
@@ -471,6 +478,10 @@ public:
     [[nodiscard]] bool getShowTotalSelectionCount() const
     {
         return showTotalSelectionCount;
+    }
+    [[nodiscard]] bool getShowSubtypeSelectionTally() const
+    {
+        return showSubtypeSelectionTally;
     }
     [[nodiscard]] bool getNotificationsEnabled() const
     {
@@ -734,6 +745,10 @@ public:
     {
         return rewindBufferingMs;
     }
+    [[nodiscard]] bool getStyleUserList() const
+    {
+        return styleUserList;
+    }
     [[nodiscard]] bool getChatMention() const
     {
         return chatMention;
@@ -787,6 +802,10 @@ public:
     [[nodiscard]] bool getIgnoreUnregisteredUserMessages() const
     {
         return ignoreUnregisteredUserMessages;
+    }
+    [[nodiscard]] bool getIgnoreNonBuddyUserMessages() const
+    {
+        return ignoreNonBuddyUserMessages;
     }
     [[nodiscard]] int getPixmapCacheSize() const
     {
@@ -929,6 +948,7 @@ public:
     void setCardViewExpandedRowsMax(int value);
     void setCloseEmptyCardView(QT_STATE_CHANGED_T value);
     void setFocusCardViewSearchBar(QT_STATE_CHANGED_T value);
+    void setKeepGameChatFocus(QT_STATE_CHANGED_T value);
     QString getClientID() override
     {
         return clientID;
@@ -960,6 +980,10 @@ public:
     [[nodiscard]] bool getFocusCardViewSearchBar() const
     {
         return focusCardViewSearchBar;
+    }
+    [[nodiscard]] bool getKeepGameChatFocus() const
+    {
+        return keepGameChatFocus;
     }
     [[nodiscard]] ShortcutsSettings &shortcuts() const
     {
@@ -1100,6 +1124,7 @@ public slots:
     void setAutoRotateSidewaysLayoutCards(QT_STATE_CHANGED_T _autoRotateSidewaysLayoutCards);
     void setOpenDeckInNewTab(QT_STATE_CHANGED_T _openDeckInNewTab);
     void setRewindBufferingMs(int _rewindBufferingMs);
+    void setStyleUserList(QT_STATE_CHANGED_T _styleUserList);
     void setChatMention(QT_STATE_CHANGED_T _chatMention);
     void setChatMentionCompleter(QT_STATE_CHANGED_T _chatMentionCompleter);
     void setChatMentionForeground(QT_STATE_CHANGED_T _chatMentionForeground);
@@ -1111,6 +1136,7 @@ public slots:
     void setSoundThemeName(const QString &_soundThemeName);
     void setIgnoreUnregisteredUsers(QT_STATE_CHANGED_T _ignoreUnregisteredUsers);
     void setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignoreUnregisteredUserMessages);
+    void setIgnoreNonBuddyUserMessages(QT_STATE_CHANGED_T _ignoreNonBuddyUserMessages);
     void setPixmapCacheSize(const int _pixmapCacheSize);
     void setCardImageCacheMethod(CardPictureLoaderCacheMethod::CacheMethod _cardImageCachingMethod);
     void setNetworkCacheSizeInMB(const int _networkCacheSize);
@@ -1155,5 +1181,6 @@ public slots:
     void setRoundCardCorners(bool _roundCardCorners);
     void setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount);
     void setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSelectionCount);
+    void setShowSubtypeSelectionTally(QT_STATE_CHANGED_T _showSubtypeSelectionTally);
 };
 #endif

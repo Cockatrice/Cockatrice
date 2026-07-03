@@ -3,7 +3,7 @@
 #include "../interface/widgets/tabs/tab_game.h"
 #include "player/player_logic.h"
 
-AbstractGame::AbstractGame(TabGame *_tab) : QObject(_tab), tab(_tab)
+AbstractGame::AbstractGame(QObject *_parent) : QObject(_parent)
 {
     gameMetaInfo = new GameMetaInfo(this);
     gameEventHandler = new GameEventHandler(this);

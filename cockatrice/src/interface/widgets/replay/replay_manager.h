@@ -27,6 +27,7 @@ public:
 
 signals:
     void requestChatAndPhaseReset();
+    void eventReplayed(const GameEventContainer &cont, EventProcessingOptions options);
 
 private:
     // Replay related members

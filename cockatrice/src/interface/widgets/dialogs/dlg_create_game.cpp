@@ -17,7 +17,7 @@
 #include <QSpinBox>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 void DlgCreateGame::sharedCtor()
 {

@@ -1,7 +1,7 @@
 #include "card_zone_logic.h"
 
+#include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/zones/view_zone.h"
-#include "../board/card_item.h"
 #include "../player/player_actions.h"
 #include "../player/player_logic.h"
 #include "view_zone_logic.h"

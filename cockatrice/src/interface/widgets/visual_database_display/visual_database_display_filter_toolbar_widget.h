@@ -18,12 +18,14 @@ signals:
     void searchModelChanged();
 
 public:
-    explicit VisualDatabaseDisplayFilterToolbarWidget(VisualDatabaseDisplayWidget *parent);
+    explicit VisualDatabaseDisplayFilterToolbarWidget(VisualDatabaseDisplayWidget *parent,
+                                                      DeckListModel *deckListModel = nullptr);
     void initialize();
     void retranslateUi();
 
 private:
     VisualDatabaseDisplayWidget *visualDatabaseDisplay;
+    DeckListModel *deckListModel;
 
     QGroupBox *sortGroupBox;
     QLabel *sortByLabel;

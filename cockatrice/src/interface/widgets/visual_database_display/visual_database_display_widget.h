@@ -34,9 +34,8 @@ class VisualDatabaseDisplayWidget : public QWidget
 
 public:
     explicit VisualDatabaseDisplayWidget(QWidget *parent,
-                                         AbstractTabDeckEditor *deckEditor,
                                          CardDatabaseModel *database_model,
-                                         CardDatabaseDisplayModel *database_display_model);
+                                         DeckListModel *deckListModel = nullptr);
     void retranslateUi();
 
     void adjustCardsPerPage();
@@ -47,17 +46,12 @@ public:
     void sortCardList(const QStringList &properties, Qt::SortOrder order) const;
     void setDeckList(const DeckList &new_deck_list_model);
 
-    AbstractTabDeckEditor *getDeckEditor()
-    {
-        return deckEditor;
-    }
-
     CardDatabaseDisplayModel *getDatabaseDisplayModel()
     {
         return databaseDisplayModel;
     }
 
-    QTreeView *getDatabaseView()
+    CardDatabaseView *getDatabaseView()
     {
         return databaseView;
     }
@@ -76,18 +70,28 @@ public slots:
     void onSearchModelChanged();
 
 signals:
-    void cardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void cardClickedDatabaseDisplay(QMouseEvent *event, const ExactCard &card);
     void cardHoveredDatabaseDisplay(const ExactCard &hoveredCard);
+
+    void cardAdded(const ExactCard &card, const QString &zoneName);
+    void cardDecremented(const ExactCard &card, const QString &zoneName);
+    void edhrecRequested(const CardInfoPtr &cardInfo, bool isCommander);
+    void printingSelectorRequested();
+    void cardInfoRequested(const ExactCard &cardName);
 
 protected slots:
     void initialize();
-    void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void onClick(QMouseEvent *event, const ExactCard &card);
     void onHover(const ExactCard &hoveredCard);
-    void addCard(const ExactCard &cardToAdd);
+    void addCardToDisplay(const ExactCard &cardToAdd);
     void databaseDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
     void modelDirty() const;
-    void updateSearch(const QString &search) const;
     void onDisplayModeChanged(bool checked);
+
+    void onSelectedCardChanged(const QString &cardName);
+    void actAddCard(const QString &cardName, const QString &zoneName);
+    void actDecrementCard(const QString &cardName, const QString &zoneName);
+    void onRelatedCardClicked(const QString &relatedCard);
 
 private:
     FlowWidget *searchContainer;
@@ -100,11 +104,8 @@ private:
 
     QToolButton *clearFilterWidget;
     VisualDatabaseDisplayFilterToolbarWidget *filterContainer;
-    KeySignals searchKeySignals;
-    AbstractTabDeckEditor *deckEditor;
-    CardDatabaseModel *databaseModel;
     CardDatabaseDisplayModel *databaseDisplayModel;
-    QTreeView *databaseView;
+    CardDatabaseView *databaseView;
     QList<ExactCard> *cards;
     QVBoxLayout *mainLayout;
     QScrollArea *scrollArea;

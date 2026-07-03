@@ -1,6 +1,7 @@
 #include "tab_deck_editor_visual.h"
 
 #include "../../../../client/settings/cache_settings.h"
+#include "../../cards/card_info_display_widget.h"
 #include "../../deck_editor/deck_state_manager.h"
 #include "../../filters/filter_builder.h"
 #include "../../interface/pixel_map_generator.h"
@@ -25,6 +26,7 @@
 #include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
@@ -63,9 +65,10 @@ void TabDeckEditorVisual::createCentralFrame()
     centralFrame = new QVBoxLayout;
     centralWidget->setLayout(centralFrame);
 
-    tabContainer = new TabDeckEditorVisualTabWidget(
-        centralWidget, this, deckStateManager->getModel(), cardDatabaseDockWidget->databaseDisplayWidget->databaseModel,
-        cardDatabaseDockWidget->databaseDisplayWidget->databaseDisplayModel);
+    auto databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
+    databaseModel->setObjectName("databaseModel");
+
+    tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this, deckStateManager->getModel(), databaseModel);
 
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChanged, this,
             &TabDeckEditorVisual::changeModelIndexAndCardInfo);
@@ -74,7 +77,14 @@ void TabDeckEditorVisual::createCentralFrame()
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardClicked, this,
             &TabDeckEditorVisual::processMainboardCardClick);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardClickedDatabaseDisplay, this,
-            &TabDeckEditorVisual::processCardClickDatabaseDisplay);
+            &TabDeckEditorVisual::processDatabaseCardClick);
+
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::cardAdded, this, &TabDeckEditorVisual::addCard);
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::cardDecremented, this, &TabDeckEditorVisual::decrementCard);
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::edhrecRequested, this, &TabDeckEditorVisual::openEdhrecTab);
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::printingSelectorRequested, this,
+            &TabDeckEditorVisual::showPrintingSelector);
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::cardInfoRequested, this, &TabDeckEditorVisual::updateCardInfo);
 
     centralFrame->addWidget(tabContainer);
     setCentralWidget(centralWidget);
@@ -143,12 +153,10 @@ void TabDeckEditorVisual::changeModelIndexToCard(const ExactCard &activeCard)
     }
 }
 
-void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
-                                                    CardInfoPictureWithTextOverlayWidget *instance,
+void TabDeckEditorVisual::processMainboardCardClick(const QMouseEvent *event,
+                                                    const ExactCard &card,
                                                     const QString &zoneName)
 {
-    auto card = instance->getCard();
-
     // Get the model index for the card
     QModelIndex idx = deckStateManager->getModel()->findCard(card.getName(), zoneName);
     if (!idx.isValid()) {
@@ -168,22 +176,14 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
 
     // Alt + Right-click = decrement
     if (event->button() == Qt::RightButton && event->modifiers().testFlag(Qt::AltModifier)) {
-        if (zoneName == DECK_ZONE_MAIN) {
-            actDecrementCard(card);
-        } else {
-            actDecrementCardFromSideboard(card);
-        }
+        decrementCard(card, zoneName);
         //  Keep selection intact.
         return;
     }
 
     // Alt + Left click = increment
     if (event->button() == Qt::LeftButton && event->modifiers().testFlag(Qt::AltModifier)) {
-        if (zoneName == DECK_ZONE_MAIN) {
-            actAddCard(card);
-        } else {
-            actAddCardToSideboard(card);
-        }
+        addCard(card, zoneName);
         //  Keep selection intact.
         return;
     }
@@ -219,13 +219,16 @@ void TabDeckEditorVisual::processMainboardCardClick(QMouseEvent *event,
 }
 
 /** @brief Handles clicks on cards in the database display. */
-void TabDeckEditorVisual::processCardClickDatabaseDisplay(QMouseEvent *event,
-                                                          CardInfoPictureWithTextOverlayWidget *instance)
+void TabDeckEditorVisual::processDatabaseCardClick(const QMouseEvent *event, const ExactCard &card)
 {
     if (event->button() == Qt::LeftButton) {
-        actAddCard(instance->getCard());
+        if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
+            addCard(card, DECK_ZONE_SIDE);
+        } else {
+            addCard(card, DECK_ZONE_MAIN);
+        }
     } else if (event->button() == Qt::RightButton) {
-        actDecrementCard(instance->getCard());
+        decrementCard(card, DECK_ZONE_MAIN);
     } else if (event->button() == Qt::MiddleButton) {
         deckDockWidget->actRemoveCard();
     }
@@ -238,14 +241,6 @@ bool TabDeckEditorVisual::actSaveDeckAs()
     auto result = AbstractTabDeckEditor::actSaveDeckAs();
     tabContainer->visualDeckView->searchBar->setEnabled(true);
     return result;
-}
-
-/** @brief Shows the printing selector dock and updates it with the current card. */
-void TabDeckEditorVisual::showPrintingSelector()
-{
-    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
-    printingSelectorDockWidget->printingSelector->updateDisplay();
-    printingSelectorDockWidget->setVisible(true);
 }
 
 /** @brief Refreshes keyboard shortcuts for this tab from settings. */

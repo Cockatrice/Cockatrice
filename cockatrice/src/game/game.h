@@ -16,7 +16,8 @@ class Game : public AbstractGame
     Q_OBJECT
 
 public:
-    Game(TabGame *tab,
+    Game(QObject *parent,
+         bool isLocalGame,
          QList<AbstractClient *> &_clients,
          const Event_GameJoined &event,
          const QMap<int, QString> &_roomGameTypes);

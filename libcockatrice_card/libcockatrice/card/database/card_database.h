@@ -88,7 +88,7 @@ public:
      * @brief Removes a card from the database.
      * @param card Pointer to the card to remove.
      */
-    void removeCard(CardInfoPtr card);
+    void removeCard(const CardInfoPtr &card);
 
     /** @brief Clears all cards, sets, and internal state. */
     void clear();
@@ -140,15 +140,15 @@ public slots:
      * @brief Adds a card to the database.
      * @param card CardInfoPtr to add.
      */
-    void addCard(CardInfoPtr card);
+    void addCard(const CardInfoPtr &card);
 
     /**
      * @brief Adds a set to the database.
      * @param set Pointer to CardSet to add.
      */
-    void addSet(CardSetPtr set);
+    void addSet(const CardSetPtr &set);
 
-    void addFormat(FormatRulesPtr format);
+    void addFormat(const FormatRulesPtr &format);
 
     /** @brief Loads card databases from configured paths. */
     void loadCardDatabases();

@@ -42,7 +42,7 @@ public:
     void addCardsToOverlapWidget();
 
 public slots:
-    void onClick(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card);
+    void onClick(QMouseEvent *event, const ExactCard &card);
     void onHover(const ExactCard &card);
     void cleanupInvalidCardGroup(CardGroupDisplayWidget *displayWidget);
     void constructAppropriateWidget(QPersistentModelIndex index);
@@ -55,7 +55,7 @@ public slots:
     void onCategoryRemoval(const QModelIndex &parent, int first, int last);
 
 signals:
-    void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *card, QString zoneName);
+    void cardClicked(QMouseEvent *event, const ExactCard &card, const QString &zoneName);
     void cardHovered(const ExactCard &card);
     void activeSortCriteriaChanged(QStringList activeSortCriteria);
     void requestCleanup(DeckCardZoneDisplayWidget *displayWidget);

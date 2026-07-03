@@ -68,9 +68,17 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&showTotalSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             &SettingsCache::setShowTotalSelectionCount);
 
+    showSubtypeSelectionTallyCheckBox.setChecked(SettingsCache::instance().getShowSubtypeSelectionTally());
+    connect(&showSubtypeSelectionTallyCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setShowSubtypeSelectionTally);
+
     useTearOffMenusCheckBox.setChecked(SettingsCache::instance().getUseTearOffMenus());
     connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
             [](const QT_STATE_CHANGED_T state) { SettingsCache::instance().setUseTearOffMenus(state == Qt::Checked); });
+
+    keepGameChatFocusCheckBox.setChecked(SettingsCache::instance().getKeepGameChatFocus());
+    connect(&keepGameChatFocusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
+            &SettingsCache::setKeepGameChatFocus);
 
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
@@ -82,7 +90,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&annotateTokensCheckBox, 6, 0);
     generalGrid->addWidget(&showDragSelectionCountCheckBox, 7, 0);
     generalGrid->addWidget(&showTotalSelectionCountCheckBox, 8, 0);
-    generalGrid->addWidget(&useTearOffMenusCheckBox, 9, 0);
+    generalGrid->addWidget(&showSubtypeSelectionTallyCheckBox, 9, 0);
+    generalGrid->addWidget(&useTearOffMenusCheckBox, 10, 0);
+    generalGrid->addWidget(&keepGameChatFocusCheckBox, 11, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -204,9 +214,13 @@ void UserInterfaceSettingsPage::retranslateUi()
     closeEmptyCardViewCheckBox.setText(tr("Close card view window when last card is removed"));
     focusCardViewSearchBarCheckBox.setText(tr("Auto focus search bar when card view window is opened"));
     annotateTokensCheckBox.setText(tr("Annotate card text on tokens"));
-    showDragSelectionCountCheckBox.setText(tr("Show selection counter during drag selection"));
-    showTotalSelectionCountCheckBox.setText(tr("Show total selection counter"));
+    showDragSelectionCountCheckBox.setText(tr("Show selection count during drag selection"));
+    showTotalSelectionCountCheckBox.setText(tr("Show total selection count"));
+    showSubtypeSelectionTallyCheckBox.setText(tr("Show subtype breakdown in selection tally"));
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
+    keepGameChatFocusCheckBox.setText(
+        tr("Keep game chat focused when clicking in game (Note: disables card view search bar)"));
+
     notificationsGroupBox->setTitle(tr("Notifications settings"));
     notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
     specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));

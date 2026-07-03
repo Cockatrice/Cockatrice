@@ -55,13 +55,11 @@ public:
      * @param _deckEditor Pointer to the deck editor instance.
      * @param _deckModel Deck list model.
      * @param _cardDatabaseModel Card database model.
-     * @param _cardDatabaseDisplayModel Database display model.
      */
     explicit TabDeckEditorVisualTabWidget(QWidget *parent,
                                           AbstractTabDeckEditor *_deckEditor,
                                           DeckListModel *_deckModel,
-                                          CardDatabaseModel *_cardDatabaseModel,
-                                          CardDatabaseDisplayModel *_cardDatabaseDisplayModel);
+                                          CardDatabaseModel *_cardDatabaseModel);
 
     /** @brief Add a new tab with a widget and title. */
     void addNewTab(QWidget *widget, const QString &title);
@@ -101,30 +99,35 @@ public slots:
     /**
      * @brief Emitted when a card is clicked in the deck view.
      * @param event Mouse event.
-     * @param instance Widget representing the clicked card.
+     * @param card The clicked card.
      * @param zoneName Deck zone of the card.
      */
-    void onCardClickedDeckEditor(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
+    void onCardClickedDeckEditor(QMouseEvent *event, const ExactCard &card, const QString &zoneName);
 
     /**
      * @brief Emitted when a card is clicked in the database display.
      * @param event Mouse event.
-     * @param instance Widget representing the clicked card.
+     * @param card The clicked card.
      */
-    void onCardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void onCardClickedDatabaseDisplay(QMouseEvent *event, const ExactCard &card);
 
 signals:
     void cardChanged(const ExactCard &activeCard);
     void cardChangedDatabaseDisplay(const ExactCard &activeCard);
-    void cardClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance, QString zoneName);
-    void cardClickedDatabaseDisplay(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
+    void cardClicked(QMouseEvent *event, const ExactCard &card, const QString &zoneName);
+    void cardClickedDatabaseDisplay(QMouseEvent *event, const ExactCard &card);
+
+    void cardAdded(const ExactCard &card, const QString &zoneName);
+    void cardDecremented(const ExactCard &card, const QString &zoneName);
+    void edhrecRequested(const CardInfoPtr &cardInfo, bool isCommander);
+    void printingSelectorRequested();
+    void cardInfoRequested(const ExactCard &cardName);
 
 private:
-    QVBoxLayout *layout;                                ///< Layout for tabs and controls.
-    AbstractTabDeckEditor *deckEditor;                  ///< Reference to the deck editor.
-    DeckListModel *deckModel;                           ///< Deck list model.
-    CardDatabaseModel *cardDatabaseModel;               ///< Card database model.
-    CardDatabaseDisplayModel *cardDatabaseDisplayModel; ///< Card database display model.
+    QVBoxLayout *layout;                  ///< Layout for tabs and controls.
+    AbstractTabDeckEditor *deckEditor;    ///< Reference to the deck editor.
+    DeckListModel *deckModel;             ///< Deck list model.
+    CardDatabaseModel *cardDatabaseModel; ///< Card database model.
 
 private slots:
     /**
@@ -132,6 +135,12 @@ private slots:
      * @param index Index of the tab to close.
      */
     void handleTabClose(int index);
+
+    /**
+     * @brief Adds card to maindeck or side depending on whether ctrl is held
+     * @param card
+     */
+    void actAddCard(const ExactCard &card);
 };
 
 #endif // TAB_DECK_EDITOR_VISUAL_TAB_WIDGET_H

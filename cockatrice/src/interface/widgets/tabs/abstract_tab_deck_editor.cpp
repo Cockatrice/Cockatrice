@@ -43,7 +43,7 @@
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 /**
  * @brief Constructs the AbstractTabDeckEditor.
@@ -55,6 +55,9 @@ AbstractTabDeckEditor::AbstractTabDeckEditor(TabSupervisor *_tabSupervisor) : Ta
     setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 
     deckStateManager = new DeckStateManager(this);
+
+    databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
+    databaseModel->setObjectName("databaseModel");
 
     cardDatabaseDockWidget = new DeckEditorCardDatabaseDockWidget(this);
     deckDockWidget = new DeckEditorDeckDockWidget(this);
@@ -105,14 +108,15 @@ void AbstractTabDeckEditor::registerDockWidget(QMenu *_viewMenu, QDockWidget *wi
     dockToActions.insert(widget, {menu, aVisible, aFloating, defaultSize});
 }
 
-/**
- * @brief Updates the card info dock and printing selector.
- * @param card The card to display.
- */
 void AbstractTabDeckEditor::updateCard(const ExactCard &card)
 {
     cardInfoDockWidget->updateCard(card);
     printingSelectorDockWidget->printingSelector->setCard(card.getCardPtr());
+}
+
+void AbstractTabDeckEditor::updateCardInfo(const ExactCard &card)
+{
+    cardInfoDockWidget->updateCard(card);
 }
 
 /** @brief Placeholder: called when the deck changes. */
@@ -129,47 +133,14 @@ void AbstractTabDeckEditor::onDeckModified()
     emit tabTextChanged(this, getTabText());
 }
 
-/**
- * @brief Helper for adding a card to a deck zone.
- * @param card Card to add.
- * @param zoneName Zone to add the card to.
- */
-void AbstractTabDeckEditor::addCardHelper(const ExactCard &card, const QString &zoneName)
+void AbstractTabDeckEditor::addCard(const ExactCard &card, const QString &zoneName)
 {
     deckStateManager->addCard(card, zoneName);
 }
 
-/**
- * @brief Adds a card to the main deck or sideboard depending on Ctrl key.
- */
-void AbstractTabDeckEditor::actAddCard(const ExactCard &card)
+void AbstractTabDeckEditor::decrementCard(const ExactCard &card, const QString &zoneName)
 {
-    if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
-        actAddCardToSideboard(card);
-    } else {
-        addCardHelper(card, DECK_ZONE_MAIN);
-    }
-
-    deckMenu->setSaveStatus(true);
-}
-
-/** @brief Adds a card to the sideboard explicitly. */
-void AbstractTabDeckEditor::actAddCardToSideboard(const ExactCard &card)
-{
-    addCardHelper(card, DECK_ZONE_SIDE);
-    deckMenu->setSaveStatus(true);
-}
-
-/** @brief Decrements a card from the main deck. */
-void AbstractTabDeckEditor::actDecrementCard(const ExactCard &card)
-{
-    deckStateManager->decrementCard(card, DECK_ZONE_MAIN);
-}
-
-/** @brief Decrements a card from the sideboard. */
-void AbstractTabDeckEditor::actDecrementCardFromSideboard(const ExactCard &card)
-{
-    deckStateManager->decrementCard(card, DECK_ZONE_SIDE);
+    deckStateManager->decrementCard(card, zoneName);
 }
 
 /**
@@ -571,14 +542,14 @@ void AbstractTabDeckEditor::actExportDeckDecklistXyz()
 /** @brief Analyzes the deck using DeckStats. */
 void AbstractTabDeckEditor::actAnalyzeDeckDeckstats()
 {
-    auto *interface = new DeckStatsInterface(*cardDatabaseDockWidget->getDatabase(), this);
+    auto *interface = new DeckStatsInterface(this);
     interface->analyzeDeck(deckStateManager->getDeckList());
 }
 
 /** @brief Analyzes the deck using TappedOut. */
 void AbstractTabDeckEditor::actAnalyzeDeckTappedout()
 {
-    auto *interface = new TappedOutInterface(*cardDatabaseDockWidget->getDatabase(), this);
+    auto *interface = new TappedOutInterface(this);
     interface->analyzeDeck(deckStateManager->getDeckList());
 }
 
@@ -620,4 +591,16 @@ bool AbstractTabDeckEditor::closeRequest()
         return false;
     }
     return close();
+}
+
+void AbstractTabDeckEditor::showPrintingSelector()
+{
+    printingSelectorDockWidget->printingSelector->setCard(cardInfoDockWidget->cardInfo->getCard().getCardPtr());
+    printingSelectorDockWidget->printingSelector->updateDisplay();
+    printingSelectorDockWidget->setVisible(true);
+}
+
+void AbstractTabDeckEditor::openEdhrecTab(const CardInfoPtr &info, bool isCommander)
+{
+    getTabSupervisor()->addEdhrecTab(info, isCommander);
 }

@@ -63,7 +63,7 @@
         <location filename="src/pages.cpp" line="228"/>
         <source>Sets file (%1)</source>
         <oldsource>Sets JSON file (%1)</oldsource>
-        <translation type="unfinished"/>
+        <translation>Archivo de ediciones (%1)</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="258"/>
@@ -172,7 +172,7 @@
     <message>
         <location filename="src/pages.cpp" line="726"/>
         <source>spoiler</source>
-        <translation type="unfinished"/>
+        <translation>spoiler</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="731"/>
@@ -192,7 +192,7 @@
     <message>
         <location filename="src/pages.cpp" line="735"/>
         <source>Local file:</source>
-        <translation type="unfinished"/>
+        <translation>Archivo local:</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="736"/>
@@ -202,7 +202,7 @@
     <message>
         <location filename="src/pages.cpp" line="737"/>
         <source>Choose file...</source>
-        <translation type="unfinished"/>
+        <translation>Elegir archivo...</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="739"/>
@@ -230,7 +230,7 @@
     <message>
         <location filename="src/pages.cpp" line="681"/>
         <source>tokens</source>
-        <translation type="unfinished"/>
+        <translation>fichas</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="686"/>
@@ -250,7 +250,7 @@
     <message>
         <location filename="src/pages.cpp" line="690"/>
         <source>Local file:</source>
-        <translation type="unfinished"/>
+        <translation>Archivo local:</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="691"/>
@@ -260,7 +260,7 @@
     <message>
         <location filename="src/pages.cpp" line="692"/>
         <source>Choose file...</source>
-        <translation type="unfinished"/>
+        <translation>Elegir archivo...</translation>
     </message>
     <message>
         <location filename="src/pages.cpp" line="694"/>
@@ -391,12 +391,12 @@
     <message>
         <location filename="src/pagetemplates.cpp" line="72"/>
         <source>Load %1 file</source>
-        <translation type="unfinished"/>
+        <translation>Cargar archivo de %1</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="82"/>
         <source>%1 file (%1)</source>
-        <translation type="unfinished"/>
+        <translation>archivo de %1 (%1)</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="111"/>
@@ -420,12 +420,12 @@
     <message>
         <location filename="src/pagetemplates.cpp" line="129"/>
         <source>Please choose a file.</source>
-        <translation type="unfinished"/>
+        <translation>Por favor elija un archivo.</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="134"/>
         <source>Cannot open file &apos;%1&apos;.</source>
-        <translation type="unfinished"/>
+        <translation>No se puede abrir el archivo &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="src/pagetemplates.cpp" line="159"/>
@@ -602,7 +602,7 @@
     <message>
         <location filename="src/main.cpp" line="63"/>
         <source>Run in no-confirm background mode</source>
-        <translation type="unfinished"/>
+        <translation>Ejecutar en modo del segundo plano sin confirmación</translation>
     </message>
 </context>
 </TS>

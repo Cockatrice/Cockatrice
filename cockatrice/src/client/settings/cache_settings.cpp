@@ -309,9 +309,11 @@ SettingsCache::SettingsCache()
     cardViewExpandedRowsMax = settings->value("interface/cardViewExpandedRowsMax", 20).toInt();
     closeEmptyCardView = settings->value("interface/closeEmptyCardView", true).toBool();
     focusCardViewSearchBar = settings->value("interface/focusCardViewSearchBar", true).toBool();
+    keepGameChatFocus = settings->value("interface/keepGameChatFocus", false).toBool();
 
     showDragSelectionCount = settings->value("interface/showlassoselectioncount", true).toBool();
     showTotalSelectionCount = settings->value("interface/showpersistentselectioncount", true).toBool();
+    showSubtypeSelectionTally = settings->value("interface/showsubtypeselectiontally", true).toBool();
 
     showShortcuts = settings->value("menu/showshortcuts", true).toBool();
     showGameSelectorFilterToolbar = settings->value("menu/showgameselectorfiltertoolbar", true).toBool();
@@ -370,6 +372,7 @@ SettingsCache::SettingsCache()
 
     openDeckInNewTab = settings->value("editor/openDeckInNewTab", false).toBool();
     rewindBufferingMs = settings->value("replay/rewindBufferingMs", 200).toInt();
+    styleUserList = settings->value("appearance/styleUserList", true).toBool();
     chatMention = settings->value("chat/mention", true).toBool();
     chatMentionCompleter = settings->value("chat/mentioncompleter", true).toBool();
     chatMentionForeground = settings->value("chat/mentionforeground", true).toBool();
@@ -388,6 +391,7 @@ SettingsCache::SettingsCache()
 
     ignoreUnregisteredUsers = settings->value("chat/ignore_unregistered", false).toBool();
     ignoreUnregisteredUserMessages = settings->value("chat/ignore_unregistered_messages", false).toBool();
+    ignoreNonBuddyUserMessages = settings->value("chat/ignore_nonbuddy_messages", false).toBool();
 
     scaleCards = settings->value("cards/scaleCards", true).toBool();
     verticalCardOverlapPercent = settings->value("cards/verticalCardOverlapPercent", 33).toInt();
@@ -454,6 +458,13 @@ void SettingsCache::setFocusCardViewSearchBar(QT_STATE_CHANGED_T value)
 {
     focusCardViewSearchBar = value;
     settings->setValue("interface/focusCardViewSearchBar", focusCardViewSearchBar);
+}
+
+void SettingsCache::setKeepGameChatFocus(QT_STATE_CHANGED_T value)
+{
+    keepGameChatFocus = value;
+    settings->setValue("interface/keepGameChatFocus", keepGameChatFocus);
+    emit keepGameChatFocusChanged(keepGameChatFocus);
 }
 
 void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
@@ -1036,6 +1047,13 @@ void SettingsCache::setRewindBufferingMs(int _rewindBufferingMs)
     settings->setValue("replay/rewindBufferingMs", rewindBufferingMs);
 }
 
+void SettingsCache::setStyleUserList(QT_STATE_CHANGED_T _styleUserList)
+{
+    styleUserList = static_cast<bool>(_styleUserList);
+    settings->setValue("appearance/styleUserList", styleUserList);
+    emit styleUserListChanged();
+}
+
 void SettingsCache::setChatMention(QT_STATE_CHANGED_T _chatMention)
 {
     chatMention = static_cast<bool>(_chatMention);
@@ -1115,6 +1133,12 @@ void SettingsCache::setIgnoreUnregisteredUserMessages(QT_STATE_CHANGED_T _ignore
 {
     ignoreUnregisteredUserMessages = static_cast<bool>(_ignoreUnregisteredUserMessages);
     settings->setValue("chat/ignore_unregistered_messages", ignoreUnregisteredUserMessages);
+}
+
+void SettingsCache::setIgnoreNonBuddyUserMessages(QT_STATE_CHANGED_T _ignoreNonBuddyUserMessages)
+{
+    ignoreNonBuddyUserMessages = static_cast<bool>(_ignoreNonBuddyUserMessages);
+    settings->setValue("chat/ignore_nonbuddy_messages", ignoreNonBuddyUserMessages);
 }
 
 void SettingsCache::setPixmapCacheSize(const int _pixmapCacheSize)
@@ -1370,6 +1394,12 @@ void SettingsCache::setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSele
 {
     showTotalSelectionCount = static_cast<bool>(_showTotalSelectionCount);
     settings->setValue("interface/showpersistentselectioncount", showTotalSelectionCount);
+}
+
+void SettingsCache::setShowSubtypeSelectionTally(QT_STATE_CHANGED_T _showSubtypeSelectionTally)
+{
+    showSubtypeSelectionTally = static_cast<bool>(_showSubtypeSelectionTally);
+    settings->setValue("interface/showsubtypeselectiontally", showSubtypeSelectionTally);
 }
 
 void SettingsCache::loadPaths()

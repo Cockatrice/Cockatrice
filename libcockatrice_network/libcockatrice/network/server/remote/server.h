@@ -64,6 +64,7 @@ public:
                                    QString &clientid,
                                    QString &clientVersion,
                                    QString &connectionType);
+    void broadcastUserInfoUpdate(Server_ProtocolHandler *source);
 
     const QMap<int, Server_Room *> &getRooms()
     {

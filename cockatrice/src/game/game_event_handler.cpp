@@ -1,8 +1,8 @@
 #include "game_event_handler.h"
 
+#include "../game_graphics/log/message_log_widget.h"
 #include "../interface/widgets/tabs/tab_game.h"
 #include "abstract_game.h"
-#include "log/message_log_widget.h"
 
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
@@ -213,23 +213,24 @@ void GameEventHandler::handleChatMessageSent(const QString &chatMessage)
     sendGameCommand(cmd);
 }
 
-void GameEventHandler::handleArrowDeletion(int arrowId)
+void GameEventHandler::handleArrowDeletion(int creatorId, int arrowId)
 {
     Command_DeleteArrow cmd;
     cmd.set_arrow_id(arrowId);
 
     auto preparedCommand = prepareGameCommand(cmd);
 
-    connect(preparedCommand, &PendingCommand::finished, this,
-            [arrowId, this](const Response &response) { handleArrowDeletionFinished(response, arrowId); });
+    connect(preparedCommand, &PendingCommand::finished, this, [creatorId, arrowId, this](const Response &response) {
+        handleArrowDeletionFinished(response, creatorId, arrowId);
+    });
 
     sendGameCommand(preparedCommand);
 }
 
-void GameEventHandler::handleArrowDeletionFinished(const Response &response, int arrowId)
+void GameEventHandler::handleArrowDeletionFinished(const Response &response, int creatorId, int arrowId)
 {
     if (response.response_code() == Response::RespNameNotFound) {
-        emit arrowDeleted(arrowId);
+        emit arrowDeleted(creatorId, arrowId);
     }
 }
 

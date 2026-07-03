@@ -329,6 +329,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     bool exclude = false;
                     bool variable = false;
                     bool persistent = false;
+                    bool facedown = false;
                     int count = 1;
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString cardName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
@@ -360,7 +361,12 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         persistent = true;
                     }
 
-                    auto *relation = new CardRelation(cardName, attachType, exclude, variable, count, persistent);
+                    if (attrs.hasAttribute("facedown")) {
+                        facedown = true;
+                    }
+
+                    auto *relation =
+                        new CardRelation(cardName, attachType, exclude, variable, count, persistent, facedown);
                     if (xmlName == "reverse-related") {
                         reverseRelatedCards << relation;
                     } else {
@@ -509,6 +515,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
         }
         if (i->getIsPersistent()) {
             xml.writeAttribute("persistent", "persistent");
+        }
+        if (i->getIsFaceDown()) {
+            xml.writeAttribute("facedown", "facedown");
         }
         if (i->getIsVariable()) {
             if (1 == i->getDefaultCount()) {

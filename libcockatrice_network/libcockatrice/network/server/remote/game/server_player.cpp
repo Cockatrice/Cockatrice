@@ -47,7 +47,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/color.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
 
 Server_Player::Server_Player(Server_Game *_game,

@@ -1,10 +1,10 @@
 #include "view_zone.h"
 
-#include "../../game/board/card_drag_item.h"
-#include "../../game/board/card_item.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../../game/zones/view_zone_logic.h"
+#include "../board/card_drag_item.h"
+#include "../board/card_item.h"
 
 #include <QBrush>
 #include <QDebug>

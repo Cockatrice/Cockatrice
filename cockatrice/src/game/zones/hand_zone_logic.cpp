@@ -1,6 +1,6 @@
 #include "hand_zone_logic.h"
 
-#include "../board/card_item.h"
+#include "../../game_graphics/board/card_item.h"
 #include "card_zone_algorithms.h"
 
 HandZoneLogic::HandZoneLogic(PlayerLogic *_player,

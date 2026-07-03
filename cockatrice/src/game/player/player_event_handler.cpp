@@ -1,12 +1,11 @@
 #include "player_event_handler.h"
 
+#include "../../game_graphics/board/arrow_item.h"
+#include "../../game_graphics/board/card_item.h"
 #include "../../game_graphics/zones/view_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/arrow_data.h"
-#include "../board/arrow_item.h"
-#include "../board/card_item.h"
 #include "../board/card_list.h"
-#include "libcockatrice/utility/color.h"
 #include "player_actions.h"
 #include "player_logic.h"
 
@@ -33,10 +32,12 @@
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
+#include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/zone_names.h>
 
 PlayerEventHandler::PlayerEventHandler(PlayerLogic *_player) : QObject(_player), player(_player)
 {
+    connect(this, &PlayerEventHandler::requestCardMenuUpdate, player, &PlayerLogic::requestCardMenuUpdate);
 }
 
 void PlayerEventHandler::eventGameSay(const Event_GameSay &event)
@@ -92,26 +93,24 @@ void PlayerEventHandler::eventRollDie(const Event_RollDie &event)
 
 void PlayerEventHandler::eventCreateArrow(const Event_CreateArrow &event)
 {
-    const ArrowData data = ArrowData::fromProto(event.arrow_info());
+    auto data = QSharedPointer<ArrowData>::create(ArrowData::fromProto(
+        event.arrow_info(), player->getPlayerInfo()->getId(), player->getPlayerInfo()->getLocal()));
 
-    // Resolve names for logging
     const auto &playerList = player->getGame()->getPlayerManager()->getPlayers();
-    PlayerLogic *startPlayer = playerList.value(data.startPlayerId);
-    PlayerLogic *targetPlayer = playerList.value(data.targetPlayerId);
+    PlayerLogic *startPlayer = playerList.value(data->startPlayerId);
+    PlayerLogic *targetPlayer = playerList.value(data->targetPlayerId);
 
     QString startCardName, targetCardName;
     if (startPlayer) {
-        auto *zone = startPlayer->getZones().value(data.startZone);
-        if (zone) {
-            if (auto *card = zone->getCard(data.startCardId)) {
+        if (auto *zone = startPlayer->getZones().value(data->startZone)) {
+            if (auto *card = zone->getCard(data->startCardId)) {
                 startCardName = card->getName();
             }
         }
     }
-    if (!data.isPlayerTargeted() && targetPlayer) {
-        auto *zone = targetPlayer->getZones().value(data.targetZone);
-        if (zone) {
-            if (auto *card = zone->getCard(data.targetCardId)) {
+    if (!data->isPlayerTargeted() && targetPlayer) {
+        if (auto *zone = targetPlayer->getZones().value(data->targetZone)) {
+            if (auto *card = zone->getCard(data->targetCardId)) {
                 targetCardName = card->getName();
             }
         }
@@ -119,16 +118,15 @@ void PlayerEventHandler::eventCreateArrow(const Event_CreateArrow &event)
 
     emit player->arrowCreateRequested(data);
 
-    const bool validForLogging = !startCardName.isEmpty() && (data.isPlayerTargeted() || !targetCardName.isEmpty());
-
-    if (startPlayer && targetPlayer && validForLogging) {
-        emit logCreateArrow(player, startPlayer, startCardName, targetPlayer, targetCardName, data.isPlayerTargeted());
+    if (startPlayer && targetPlayer && !startCardName.isEmpty() &&
+        (data->isPlayerTargeted() || !targetCardName.isEmpty())) {
+        emit logCreateArrow(player, startPlayer, startCardName, targetPlayer, targetCardName, data->isPlayerTargeted());
     }
 }
 
 void PlayerEventHandler::eventDeleteArrow(const Event_DeleteArrow &event)
 {
-    emit player->arrowDeleted(event.arrow_id());
+    emit player->arrowDeleted(player->getPlayerInfo()->getId(), event.arrow_id());
 }
 
 void PlayerEventHandler::eventCreateToken(const Event_CreateToken &event)
@@ -255,7 +253,7 @@ void PlayerEventHandler::eventSetCardCounter(const Event_SetCardCounter &event)
 
     int oldValue = card->getCounters().value(event.counter_id(), 0);
     card->setCounter(event.counter_id(), event.counter_value());
-    player->getPlayerMenu()->updateCardMenu(card);
+    emit requestCardMenuUpdate(card);
     emit logSetCardCounter(player, card->getName(), event.counter_id(), event.counter_value(), oldValue);
 }
 
@@ -373,7 +371,7 @@ void PlayerEventHandler::eventMoveCard(const Event_MoveCard &event, const GameEv
     targetZone->addCard(card, true, x, y);
 
     emit cardZoneChanged(card, startZone == targetZone);
-    player->getPlayerMenu()->updateCardMenu(card);
+    emit requestCardMenuUpdate(card);
 
     if (player->getPlayerActions()->isMovingCardsUntil() && startZoneString == ZoneNames::DECK &&
         targetZone->getName() == ZoneNames::STACK) {
@@ -400,7 +398,7 @@ void PlayerEventHandler::eventFlipCard(const Event_FlipCard &event)
 
     emit logFlipCard(player, card->getName(), event.face_down());
     card->setFaceDown(event.face_down());
-    player->getPlayerMenu()->updateCardMenu(card);
+    emit requestCardMenuUpdate(card);
 }
 
 void PlayerEventHandler::eventDestroyCard(const Event_DestroyCard &event)
@@ -469,7 +467,7 @@ void PlayerEventHandler::eventAttachCard(const Event_AttachCard &event)
     } else {
         emit logUnattachCard(player, startCard->getName());
     }
-    player->getPlayerMenu()->updateCardMenu(startCard);
+    emit requestCardMenuUpdate(startCard);
 }
 
 void PlayerEventHandler::eventDrawCards(const Event_DrawCards &event)
@@ -555,7 +553,7 @@ void PlayerEventHandler::eventRevealCards(const Event_RevealCards &event, EventP
         }
 
         if (!options.testFlag(SKIP_REVEAL_WINDOW) && showZoneView && !cardList.isEmpty()) {
-            player->getGameScene()->addRevealedZoneView(player, zone, cardList, event.grant_write_access());
+            emit player->requestRevealedZoneView(player, zone, cardList, event.grant_write_access());
         }
 
         emit logRevealCards(player, zone, cardId, cardName, otherPlayer, false,

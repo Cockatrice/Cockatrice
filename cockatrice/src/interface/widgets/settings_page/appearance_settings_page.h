@@ -37,6 +37,7 @@ private:
     QLabel homeTabBackgroundShuffleFrequencyLabel;
     QSpinBox homeTabBackgroundShuffleFrequencySpinBox;
     QCheckBox homeTabDisplayCardNameCheckBox;
+    QCheckBox styleUserListCheckBox;
     QLabel minPlayersForMultiColumnLayoutLabel;
     QLabel maxFontSizeForCardsLabel;
     QCheckBox showShortcutsCheckBox;
@@ -58,6 +59,7 @@ private:
     QCheckBox invertVerticalCoordinateCheckBox;
     QGroupBox *themeGroupBox;
     QGroupBox *homeTabGroupBox;
+    QGroupBox *stylingGroupBox;
     QGroupBox *menuGroupBox;
     QGroupBox *printingsGroupBox;
     QGroupBox *cardsGroupBox;

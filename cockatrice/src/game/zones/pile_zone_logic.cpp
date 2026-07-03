@@ -1,6 +1,6 @@
 #include "pile_zone_logic.h"
 
-#include "../board/card_item.h"
+#include "../../game_graphics/board/card_item.h"
 
 PileZoneLogic::PileZoneLogic(PlayerLogic *_player,
                              const QString &_name,

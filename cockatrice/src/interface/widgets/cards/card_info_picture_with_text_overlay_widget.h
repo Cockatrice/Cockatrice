@@ -35,8 +35,6 @@ public:
     void setHighlighted(bool _highlighted);
 
     [[nodiscard]] QSize sizeHint() const override;
-signals:
-    void imageClicked(QMouseEvent *event, CardInfoPictureWithTextOverlayWidget *instance);
 
 protected:
     void paintEvent(QPaintEvent *event) override;

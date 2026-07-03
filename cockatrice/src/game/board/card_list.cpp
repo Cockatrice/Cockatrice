@@ -1,6 +1,6 @@
 #include "card_list.h"
 
-#include "card_item.h"
+#include "../../game_graphics/board/card_item.h"
 
 #include <QDebug>
 #include <algorithm>
