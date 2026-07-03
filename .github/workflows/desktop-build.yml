@@ -152,7 +152,7 @@ jobs:
       CACHE_DIR: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.distro_version }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CMAKE_GENERATOR: 'Ninja'
+      CMAKE_GENERATOR: Ninja
       NAME: ${{ matrix.distro }}${{ matrix.distro_version }}
 
     steps:
@@ -186,17 +186,17 @@ jobs:
         if: matrix.package
         shell: bash
         env:
-          PACKAGE: '${{ matrix.package }}'
-          SERVER_ONLY: '${{ matrix.server_only }}'
-          SUFFIX: '-${{ matrix.distro }}${{ matrix.distro_version }}'
+          PACKAGE: ${{ matrix.package }}
+          PACKAGE_SUFFIX: -${{ matrix.distro }}${{ matrix.distro_version }}
+          SERVER_ONLY: ${{ matrix.server_only }}
         run: |
           source .ci/docker.sh
           args=()
-          [[ "$SERVER_ONLY" == "true" ]] && args+=(--no-client)
           [[ "$GITHUB_REF" == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
+          [[ "$SERVER_ONLY" == "true" ]] && args+=(--no-client)
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
-          args+=(--suffix "$SUFFIX")
+          args+=(--suffix "$PACKAGE_SUFFIX")
 
           RUN --server --release --package "$PACKAGE" "${args[@]}"
 
@@ -438,7 +438,7 @@ jobs:
         id: build
         shell: bash
         env:
-          BUILDTYPE: '${{ matrix.type }}'
+          BUILDTYPE: ${{ matrix.type }}
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
@@ -446,8 +446,8 @@ jobs:
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
-          MAKE_PACKAGE: '${{ matrix.make_package }}'
-          PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
+          MAKE_PACKAGE: ${{ matrix.make_package }}
+          PACKAGE_SUFFIX: ${{ matrix.package_suffix }}
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
