@@ -266,7 +266,6 @@ jobs:
 
             cmake_generator: Ninja
             make_package: true
-            override_target: 13
             qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
@@ -444,7 +443,7 @@ jobs:
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           MAKE_PACKAGE: ${{ matrix.make_package }}
           PACKAGE_SUFFIX: "-${{ matrix.os }}${{ matrix.os_target_version }}${{ case(matrix.soc == 'Intel', '_Intel', '') }}"
-          TARGET_MACOS_VERSION: ${{ matrix.override_target }}
+          TARGET_MACOS_VERSION: ${{ matrix.os_target_version }}
           USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite"
           VCPKG_DISABLE_METRICS: true
