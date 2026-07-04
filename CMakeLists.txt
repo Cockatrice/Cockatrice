@@ -51,21 +51,20 @@ if(WIN32 OR USE_VCPKG)
   # Use vcpkg toolchain on Windows (and on macOS in CI)
   set(CMAKE_TOOLCHAIN_FILE
       ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
-      CACHE STRING "Vcpkg toolchain file"
-  )
-  # Qt path set by user or env var
-  if(QTDIR
-     OR DEFINED ENV{QTDIR}
-     OR DEFINED ENV{QTDIR64}
+      CACHE FILEPATH "Vcpkg toolchain file"
   )
 
-  else()
+  # Show warning if QTDIR is NOT defined
+  if(NOT QTDIR
+     AND NOT DEFINED ENV{QTDIR}
+     AND NOT DEFINED ENV{QTDIR64}
+  )
     set(QTDIR
         ""
         CACHE PATH "Path to Qt (e.g. C:/Qt/5.7/msvc2015_64)"
     )
     message(
-      WARNING "QTDIR variable is missing.  Please set this variable to specify path to Qt (e.g. C:/Qt/5.7/msvc2015_64)"
+      WARNING "QTDIR variable is missing. Please set this variable to specify path to Qt (e.g. C:/Qt/5.7/msvc2015_64)"
     )
   endif()
 endif()
@@ -196,16 +195,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   add_definitions("-DSFMT_MEXP=19937")
 endif()
 
-find_package(Qt6 6.4 REQUIRED)
-
 find_package(Threads REQUIRED)
 
-if(DEFINED QTDIR${_lib_suffix})
-  list(APPEND CMAKE_PREFIX_PATH "${QTDIR${_lib_suffix}}")
-elseif(DEFINED QTDIR)
+if(DEFINED QTDIR)
   list(APPEND CMAKE_PREFIX_PATH "${QTDIR}")
-elseif(DEFINED ENV{QTDIR${_lib_suffix}})
-  list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR${_lib_suffix}}")
 elseif(DEFINED ENV{QTDIR})
   list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
 endif()
@@ -213,6 +206,8 @@ endif()
 message(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
 
 include(FindQtRuntime)
+
+find_package(Qt6 6.4 REQUIRED)
 
 set(CMAKE_AUTOMOC TRUE)
 

@@ -57,7 +57,7 @@ Page Custom PortableModePageCreate PortableModePageLeave
 
 Function .onInit
 
-${If} ${NSIS_IS_64_BIT} == 1    #NSIS 64bit
+${If} ${NSIS_IS_64_BIT} == 1    # NSIS 64bit
     ${IfNot} ${RunningX64}
         MessageBox MB_OK|MB_ICONSTOP "This version of Cockatrice requires a 64-bit Windows system."
         Abort
@@ -148,7 +148,6 @@ ${If} $8 != "admin"
 ${EndIf}
 FunctionEnd
 
-
 Function SetModeDestinationFromInstdir
 ${If} $PortableMode = 0
     StrCpy $NormalDestDir $InstDir
@@ -171,7 +170,7 @@ SetRegView 64
 ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString"
 
 StrCmp $R0 "" done64
-DetailPrint "Removing previous version (64-bit)..."
+DetailPrint "Removing previous version..."
 ExecWait '$R0'
 
 done64:
@@ -223,23 +222,23 @@ ${EndIf}
 ${If} $PortableMode = 0
     SetShellVarContext all
 
-	SetRegView 64
+    SetRegView 64
 
-	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
-	StrCmp $R0 "" done64
+    ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString"
+    StrCmp $R0 "" done64
 
-	${If} $ReinstallMode = 0
+    ${If} $ReinstallMode = 0
         MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "A previous version of Cockatrice must be uninstalled before installing the new one." IDOK uninst64
         Abort
     ${Else}
         Goto uninst64
     ${EndIf}
 
-	uninst64:
-	ClearErrors
-	ExecWait "$R0"
+    uninst64:
+    ClearErrors
+    ExecWait "$R0"
 
-	done64:
+    done64:
 
 ${Else}
     Abort
@@ -253,70 +252,62 @@ SetOutPath "$INSTDIR"
 
 ${If} $PortableMode = 1
 ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
-	; upgrade portable mode
-	RMDir /r "$INSTDIR\plugins"
-	RMDir /r "$INSTDIR\sounds"
-	RMDir /r "$INSTDIR\themes"
-	RMDir /r "$INSTDIR\translations"
-	Delete "$INSTDIR\uninstall.exe"
-	Delete "$INSTDIR\cockatrice.exe"
-	Delete "$INSTDIR\oracle.exe"
-	Delete "$INSTDIR\servatrice.exe"
-	Delete "$INSTDIR\Qt*.dll"
-	Delete "$INSTDIR\libmysql.dll"
-	Delete "$INSTDIR\icu*.dll"
-	Delete "$INSTDIR\libeay32.dll"
-	Delete "$INSTDIR\ssleay32.dll"
-	Delete "$INSTDIR\qt.conf"
-	Delete "$INSTDIR\qdebug.txt"
-	Delete "$INSTDIR\servatrice.sql"
-	Delete "$INSTDIR\servatrice.ini.example"
-	Delete "$INSTDIR\zlib*.dll"
-	RMDir "$INSTDIR"
+    ; upgrade portable mode
+    RMDir /r "$INSTDIR\plugins"
+    RMDir /r "$INSTDIR\sounds"
+    RMDir /r "$INSTDIR\themes"
+    RMDir /r "$INSTDIR\translations"
+    Delete "$INSTDIR\uninstall.exe"
+    Delete "$INSTDIR\cockatrice.exe"
+    Delete "$INSTDIR\oracle.exe"
+    Delete "$INSTDIR\servatrice.exe"
+    Delete "$INSTDIR\Qt*.dll"
+    Delete "$INSTDIR\libmysql.dll"
+    Delete "$INSTDIR\icu*.dll"
+    Delete "$INSTDIR\libeay32.dll"
+    Delete "$INSTDIR\ssleay32.dll"
+    Delete "$INSTDIR\qt.conf"
+    Delete "$INSTDIR\qdebug.txt"
+    Delete "$INSTDIR\servatrice.sql"
+    Delete "$INSTDIR\servatrice.ini.example"
+    Delete "$INSTDIR\zlib*.dll"
+    RMDir "$INSTDIR"
 ${EndIf}
 
 @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
 @CPACK_NSIS_FULL_INSTALL@
 
 ${If} $PortableMode = 0
-	WriteUninstaller "$INSTDIR\uninstall.exe"
-	${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
-	IntFmt $0 "0x%08X" $0
+    WriteUninstaller "$INSTDIR\uninstall.exe"
+    ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+    IntFmt $0 "0x%08X" $0
 
-	; Enable Windows User-Mode Dumps
-	; https://learn.microsoft.com/en-us/windows/win32/wer/collecting-user-mode-dumps
-	WriteRegExpandStr HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpFolder" "%LOCALAPPDATA%\CrashDumps\Cockatrice"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpCount" "5"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpType" "2"
+    ; Enable Windows User-Mode Dumps
+    ; https://learn.microsoft.com/en-us/windows/win32/wer/collecting-user-mode-dumps
+    WriteRegExpandStr HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpFolder" "%LOCALAPPDATA%\CrashDumps\Cockatrice"
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpCount" "5"
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\Windows Error Reporting\LocalDumps\cockatrice.exe" "DumpType" "2"
 
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayIcon" "$INSTDIR\cockatrice.exe"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayName" "Cockatrice"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayVersion" "@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "EstimatedSize" "$0"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "InstallLocation" "$INSTDIR"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "NoModify" "1"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "NoRepair" "1"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "Publisher" "Cockatrice team"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMajor" "@CPACK_PACKAGE_VERSION_MAJOR@"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMinor" "@CPACK_PACKAGE_VERSION_MINOR@"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayIcon" "$INSTDIR\cockatrice.exe"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayName" "Cockatrice"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "DisplayVersion" "@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@"
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "EstimatedSize" "$0"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "InstallLocation" "$INSTDIR"
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "NoModify" "1"
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "NoRepair" "1"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "Publisher" "Cockatrice team"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMajor" "@CPACK_PACKAGE_VERSION_MAJOR@"
+    WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice" "VersionMinor" "@CPACK_PACKAGE_VERSION_MINOR@"
 
-	IfFileExists "$INSTDIR\vc_redist.x86.exe" VcRedist86Exists PastVcRedist86Check
-	VcRedist86Exists:
-		ExecWait '"$INSTDIR\vc_redist.x86.exe" /passive /norestart'
-		DetailPrint "Wait to ensure unlock of vc_redist file after installation..."
-		Sleep 3000
-		Delete "$INSTDIR\vc_redist.x86.exe"
-	PastVcRedist86Check:
-
-	IfFileExists "$INSTDIR\vc_redist.x64.exe" VcRedist64Exists PastVcRedist64Check
-	VcRedist64Exists:
-		ExecWait '"$INSTDIR\vc_redist.x64.exe" /passive /norestart'
-		DetailPrint "Sleep to ensure unlock of vc_redist file after installation..."
-		Sleep 3000
-		Delete "$INSTDIR\vc_redist.x64.exe"
-	PastVcRedist64Check:
+    IfFileExists "$INSTDIR\vc_redist.x64.exe" VcRedist64Exists PastVcRedist64Check
+    VcRedist64Exists:
+        ExecWait '"$INSTDIR\vc_redist.x64.exe" /passive /norestart'
+        DetailPrint "Sleep to ensure unlock of vc_redist file after installation..."
+        Sleep 3000
+        Delete "$INSTDIR\vc_redist.x64.exe"
+    PastVcRedist64Check:
 
 ${Else}
     ; Create the file the application uses to detect portable mode
@@ -334,51 +325,51 @@ SectionEnd
 
 Section "Start menu item" SecStartMenu
 ${If} $PortableMode = 0
-	SetShellVarContext all
-	createDirectory "$SMPROGRAMS\Cockatrice"
-	createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe"
-	createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
-	createShortCut "$SMPROGRAMS\Cockatrice\Servatrice.lnk" "$INSTDIR\servatrice.exe"
+    SetShellVarContext all
+    createDirectory "$SMPROGRAMS\Cockatrice"
+    createShortCut "$SMPROGRAMS\Cockatrice\Cockatrice.lnk" "$INSTDIR\cockatrice.exe"
+    createShortCut "$SMPROGRAMS\Cockatrice\Oracle.lnk" "$INSTDIR\oracle.exe"
+    createShortCut "$SMPROGRAMS\Cockatrice\Servatrice.lnk" "$INSTDIR\servatrice.exe"
 ${EndIf}
 SectionEnd
 
 Section "un.Application" UnSecApplication
-	SetShellVarContext all
-	RMDir /r "$INSTDIR\plugins"
-	RMDir /r "$INSTDIR\sounds"
-	RMDir /r "$INSTDIR\themes"
-	RMDir /r "$INSTDIR\translations"
-	Delete "$INSTDIR\*.exe"
-	Delete "$INSTDIR\*.dll"
-	Delete "$INSTDIR\qt.conf"
-	Delete "$INSTDIR\qdebug.txt"
-	Delete "$INSTDIR\servatrice.sql"
-	Delete "$INSTDIR\servatrice.ini.example"
-	RMDir "$INSTDIR"
+    SetShellVarContext all
+    RMDir /r "$INSTDIR\plugins"
+    RMDir /r "$INSTDIR\sounds"
+    RMDir /r "$INSTDIR\themes"
+    RMDir /r "$INSTDIR\translations"
+    Delete "$INSTDIR\*.exe"
+    Delete "$INSTDIR\*.dll"
+    Delete "$INSTDIR\qt.conf"
+    Delete "$INSTDIR\qdebug.txt"
+    Delete "$INSTDIR\servatrice.sql"
+    Delete "$INSTDIR\servatrice.ini.example"
+    RMDir "$INSTDIR"
 
-	RMDir "$SMPROGRAMS\Cockatrice"
+    RMDir "$SMPROGRAMS\Cockatrice"
 
-	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
+    DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
 SectionEnd
 
 ; unselected because it is /o
 Section /o "un.Configurations, decks, cards, pics" UnSecConfiguration
-	SetShellVarContext current
-	DeleteRegKey HKCU "Software\Cockatrice"
+    SetShellVarContext current
+    DeleteRegKey HKCU "Software\Cockatrice"
 
-	RMDir /r "$LOCALAPPDATA\Cockatrice"
+    RMDir /r "$LOCALAPPDATA\Cockatrice"
 SectionEnd
 
 LangString DESC_SecApplication ${LANG_ENGLISH} "Cockatrice program files"
 LangString DESC_SecStartMenu ${LANG_ENGLISH} "Create start menu items for Cockatrice and Oracle."
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-	!insertmacro MUI_DESCRIPTION_TEXT ${SecApplication} $(DESC_SecApplication)
-	!insertmacro MUI_DESCRIPTION_TEXT ${SecStartMenu} $(DESC_SecStartMenu)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecApplication} $(DESC_SecApplication)
+    !insertmacro MUI_DESCRIPTION_TEXT ${SecStartMenu} $(DESC_SecStartMenu)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 LangString DESC_UnSecApplication ${LANG_ENGLISH} "Cockatrice program files and start menu items"
 LangString DESC_UnSecConfiguration ${LANG_ENGLISH} "Configurations, decks, card database, pictures"
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
-	!insertmacro MUI_DESCRIPTION_TEXT ${UnSecApplication} $(DESC_UnSecApplication)
-	!insertmacro MUI_DESCRIPTION_TEXT ${UnSecConfiguration} $(DESC_UnSecConfiguration)
+   !insertmacro MUI_DESCRIPTION_TEXT ${UnSecApplication} $(DESC_UnSecApplication)
+   !insertmacro MUI_DESCRIPTION_TEXT ${UnSecConfiguration} $(DESC_UnSecConfiguration)
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_END
