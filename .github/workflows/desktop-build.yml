@@ -276,7 +276,7 @@ jobs:
             soc: Intel
             type: Release
             use_ccache: 1
-            xcode: "26.3"
+            xcode: "26.6"
 
           - os: macOS
             target: 13
@@ -294,7 +294,7 @@ jobs:
             soc: Intel
             type: Release
             use_ccache: 1
-            xcode: "26.3"
+            xcode: "26.6"
 
           - os: macOS
             target: 14
@@ -311,7 +311,7 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: 1
-            xcode: "26.3"
+            xcode: "26.6"
 
           - os: macOS
             target: 15
@@ -328,7 +328,7 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: 1
-            xcode: "26.3"
+            xcode: "26.6"
 
           - os: macOS
             target: 26
@@ -344,7 +344,7 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: 1
-            xcode: "26.3"
+            xcode: "26.6"
 
           - os: Windows
             target: 10
