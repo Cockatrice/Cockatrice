@@ -87,6 +87,7 @@ jobs:
         run: |
           args=()
           [[ "$PRERELEASE" == "true" ]] && args+=(--prerelease)
+          [[ "$PRERELEASE" == "false" ]] && args+=(--latest)
 
           gh release create "$TAG_NAME" --verify-tag --draft "${args[@]}" \
             --target "$TARGET" \
