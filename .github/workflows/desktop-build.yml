@@ -42,7 +42,7 @@ concurrency:
 jobs:
   configure:
     name: Configure
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
     outputs:
       tag: ${{ steps.configure.outputs.tag }}
       sha: ${{ steps.configure.outputs.sha }}
@@ -146,7 +146,7 @@ jobs:
 
     name: ${{ matrix.distro }} ${{ matrix.distro_version }}
     needs: configure
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest    # https://github.com/actions/runner-images/tree/main#available-images
     continue-on-error: ${{ matrix.allow-failure == true }}
     timeout-minutes: 70
     env:
@@ -201,7 +201,7 @@ jobs:
 
           RUN --server --release --package "$PACKAGE" "${args[@]}"
 
-      # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
+      # Delete used cache on exact hit (true) to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
         if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit == 'true'
         continue-on-error: true
@@ -263,7 +263,7 @@ jobs:
         include:
           - os: macOS
             os_target_version: 13
-            runner: macos-15-intel
+            runner: macos-15-intel    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md
 
             cmake_generator: Ninja
             make_package: true
@@ -273,11 +273,11 @@ jobs:
             soc: Intel
             type: Release
             use_ccache: true
-            xcode: 16.4
+            xcode: 26.3
 
           - os: macOS
             os_target_version: 14
-            runner: macos-14
+            runner: macos-14    # https://github.com/actions/runner-images/blob/main/images/macos/macos-14-arm64-Readme.md
 
             cmake_generator: Ninja
             make_package: true
@@ -287,11 +287,11 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: true
-            xcode: 15.4
+            xcode: 16.2
 
           - os: macOS
             os_target_version: 15
-            runner: macos-15
+            runner: macos-15    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
 
             cmake_generator: Ninja
             make_package: true
@@ -301,11 +301,11 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: true
-            xcode: 16.4
+            xcode: 26.3
 
           - os: macOS
             os_target_version: 15
-            runner: macos-15
+            runner: macos-15    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
 
             cmake_generator: Ninja
             qt_version: 6.11.0
@@ -314,11 +314,11 @@ jobs:
             soc: Apple
             type: Debug
             use_ccache: true
-            xcode: 16.4
+            xcode: 26.3
 
           - os: Windows
             os_target_version: 10
-            runner: windows-2025
+            runner: windows-2025    # https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-Readme.md
 
             cmake_generator: Visual Studio 18 2026
             cmake_generator_platform: x64
@@ -363,7 +363,7 @@ jobs:
         id: restore_qt
         uses: actions/cache/restore@v6
         with:
-          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS${{ case(matrix.soc == 'Intel', '-Intel', '') }}-thin
           path: ${{ github.workspace }}/Qt
 
       # Using jurplel/install-qt-action to install Qt without using brew
@@ -386,7 +386,7 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit == ''
         uses: actions/cache/save@v6
         with:
-          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS${{ case(matrix.soc == 'Intel', '-Intel', '') }}-thin
           path: ${{ github.workspace }}/Qt
 
       - name: "[Windows] Install NSIS"
@@ -425,9 +425,9 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          key: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
+          key: ccache-${{ matrix.os }}${{ matrix.os_target_version }}${{ case(matrix.soc == 'Intel', '-Intel', '') }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
           path: ${{ env.CCACHE_DIR }}
-          restore-keys: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-
+          restore-keys: ccache-${{ matrix.os }}${{ matrix.os_target_version }}${{ case(matrix.soc == 'Intel', '-Intel', '') }}-${{ matrix.type }}-
 
       # Uses environment variables, see compile.sh for more details
       - name: "Build Cockatrice"
