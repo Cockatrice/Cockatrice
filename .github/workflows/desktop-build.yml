@@ -270,9 +270,10 @@ jobs:
             make_package: 1
             override_target: 13
             package_suffix: "-macOS13_Intel"
-            qt_version: 6.11.0
             qt_arch: clang_64
-            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools qttranslations
+            qt_modules: qtwebsockets
+            qt_version: 6.11.0
             soc: Intel
             type: Release
             use_ccache: 1
@@ -286,9 +287,10 @@ jobs:
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS14"
-            qt_version: 6.11.0
             qt_arch: clang_64
-            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools qttranslations
+            qt_modules: qtwebsockets
+            qt_version: 6.11.0
             soc: Apple
             type: Release
             use_ccache: 1
@@ -302,9 +304,10 @@ jobs:
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS15"
-            qt_version: 6.11.0
             qt_arch: clang_64
-            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools qttranslations
+            qt_modules: qtwebsockets
+            qt_version: 6.11.0
             soc: Apple
             type: Release
             use_ccache: 1
@@ -316,9 +319,10 @@ jobs:
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
-            qt_version: 6.11.0
             qt_arch: clang_64
-            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools qttranslations
+            qt_modules: qtwebsockets
+            qt_version: 6.11.0
             soc: Apple
             type: Debug
             use_ccache: 1
@@ -332,9 +336,10 @@ jobs:
             cmake_generator_platform: x64
             make_package: 1
             package_suffix: "-Win10"
-            qt_version: 6.11.0
             qt_arch: win64_msvc2022_64
-            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools qttranslations
+            qt_modules: qtwebsockets
+            qt_version: 6.11.0
             type: Release
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
@@ -399,6 +404,7 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           arch: ${{ matrix.qt_arch }}
+          archives: ${{ matrix.qt_archives }}
           cache: false
           dir: ${{ github.workspace }}
           modules: ${{ matrix.qt_modules }}
@@ -422,6 +428,7 @@ jobs:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
           arch: ${{ matrix.qt_arch }}
+          archives: ${{ matrix.qt_archives }}
           cache: true
           modules: ${{ matrix.qt_modules }}
           version: ${{ steps.resolve_qt_version.outputs.version }}
