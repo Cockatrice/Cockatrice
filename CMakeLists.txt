@@ -47,7 +47,7 @@ if(USE_CCACHE)
   endif()
 endif()
 
-if(WIN32 OR USE_VCPKG)
+if(WIN32 OR USE_VCPKG) # Windows (including 64bit) or USE_VCPKG set
   # Use vcpkg toolchain on Windows (and on macOS in CI)
   set(CMAKE_TOOLCHAIN_FILE
       ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
