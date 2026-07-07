@@ -49,6 +49,8 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
 {
 #if defined(Q_OS_MACOS)
     const bool isIntel = [] {
+        // QSysInfo does not go through translation layers
+        // We need to use sysctl to reliably detect the underlying architecture
         char arch[255];
         size_t len = sizeof(arch);
         if (sysctlbyname("machdep.cpu.brand_string", arch, &len, nullptr, 0) == 0) {
@@ -56,48 +58,32 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
         }
         return false;
     }();
-    const int systemVersion = QSysInfo::productVersion().split(".")[0].toInt();
-    if (isIntel) {
-        static QRegularExpression regex(R"(macOS(\d+)_Intel)");
-        auto match = regex.match(fileName);
-        if (!match.hasMatch()) {
-            return std::nullopt;
-        }
-        int version = match.captured(1).toInt();
-        if (version <= systemVersion) {
-            return version;
-        }
-        return std::nullopt;
-    }
-    static QRegularExpression regex(R"(macOS(\d+)(?!_Intel))");
-    auto match = regex.match(fileName);
-    if (!match.hasMatch()) {
-        return std::nullopt;
-    }
-    int version = match.captured(1).toInt();
-    if (version <= systemVersion) {
-        return version;
-    }
-    return std::nullopt;
+    static const QRegularExpression macIntelRegex(R"(macOS(\d+)_Intel\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression macArmRegex(R"(macOS(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
+    const QRegularExpression &regex = isIntel ? macIntelRegex : macArmRegex;
 
 #elif defined(Q_OS_WIN)
-#if Q_PROCESSOR_WORDSIZE == 8
-    const int systemVersion = QSysInfo::productVersion().split(".")[0].toInt();
-    static QRegularExpression regex(R"(Windows(\d+))");
-    auto match = regex.match(fileName);
-    if (!match.hasMatch()) {
-        return std::nullopt;
-    }
-    int version = match.captured(1).toInt();
-    if (version <= systemVersion) {
-        return version;
-    }
-#endif
-    return std::nullopt;
-#else
+#if Q_PROCESSOR_WORDSIZE != 8 // non 64-bit host
     Q_UNUSED(fileName);
     return std::nullopt;
 #endif
+    static const QRegularExpression regex(R"(Win(?:dows)?(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
+
+#else // if the OS doesn't fit one of the above #defines, then it will never match
+    Q_UNUSED(fileName);
+    return std::nullopt;
+#endif
+
+    const int systemVersion = QSysInfo::productVersion().split('.').first().toInt();
+    auto match = regex.match(fileName);
+    if (!match.hasMatch()) {
+        return std::nullopt;
+    }
+    const int targetVersion = match.captured(1).toInt();
+    if (targetVersion > systemVersion) {
+        return std::nullopt;
+    }
+    return targetVersion;
 }
 
 QString ReleaseChannel::findBestDownloadUrl(const QVariantList &assets)
@@ -119,8 +105,7 @@ QString ReleaseChannel::findBestDownloadUrl(const QVariantList &assets)
     }
     if (!bestUrl.isEmpty()) {
         qCInfo(ReleaseChannelLog)
-            << "Selected compatible asset version=" << bestVersion
-            << "url=" << bestUrl;
+            << "Best compatible asset=" << bestUrl;
     }
     return bestUrl;
 }
