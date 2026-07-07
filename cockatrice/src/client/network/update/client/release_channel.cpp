@@ -2,6 +2,7 @@
 
 #include "version_string.h"
 
+#include <optional>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -44,54 +45,84 @@ void ReleaseChannel::checkForUpdates()
 }
 
 // Different release channel checking functions for different operating systems
-bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
+std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &fileName)
 {
 #if defined(Q_OS_MACOS)
-    static QRegularExpression version_regex("macOS(\\d+)");
-    auto match = version_regex.match(fileName);
-    if (!match.hasMatch()) {
-        return false;
-    }
-
-    auto getSystemVersion = [] {
-        // QSysInfo does not go through translation layers
-        // We need to use sysctl to reliably detect the underlying architecture
+    const bool isIntel = [] {
         char arch[255];
         size_t len = sizeof(arch);
         if (sysctlbyname("machdep.cpu.brand_string", arch, &len, nullptr, 0) == 0) {
-            // Intel mac is only supported on macOS 13 versions
-            if (QString::fromUtf8(arch).contains("Intel")) {
-                return 13;
-            }
+            return QString::fromUtf8(arch).contains("Intel");
         }
-
-        return QSysInfo::productVersion().split(".")[0].toInt();
-    };
-
-    // older(smaller) releases are compatible with a newer or the same system version
-    int sys_maj = getSystemVersion();
-    int rel_maj = match.captured(1).toInt();
-    return rel_maj == sys_maj;
+        return false;
+    }();
+    const int systemVersion = QSysInfo::productVersion().split(".")[0].toInt();
+    if (isIntel) {
+        static QRegularExpression regex(R"(macOS(\d+)_Intel)");
+        auto match = regex.match(fileName);
+        if (!match.hasMatch()) {
+            return std::nullopt;
+        }
+        int version = match.captured(1).toInt();
+        if (version <= systemVersion) {
+            return version;
+        }
+        return std::nullopt;
+    }
+    static QRegularExpression regex(R"(macOS(\d+)(?!_Intel))");
+    auto match = regex.match(fileName);
+    if (!match.hasMatch()) {
+        return std::nullopt;
+    }
+    int version = match.captured(1).toInt();
+    if (version <= systemVersion) {
+        return version;
+    }
+    return std::nullopt;
 
 #elif defined(Q_OS_WIN)
-#if Q_PROCESSOR_WORDSIZE == 4
-    return fileName.contains("32bit");
-#elif Q_PROCESSOR_WORDSIZE == 8
-    const QString &version = QSysInfo::productVersion();
-    if (version.startsWith("7") || version.startsWith("8")) {
-        return fileName.contains("Win7");
-    } else {
-        return fileName.contains("Win10");
+#if Q_PROCESSOR_WORDSIZE == 8
+    const int systemVersion = QSysInfo::productVersion().split(".")[0].toInt();
+    static QRegularExpression regex(R"(Windows(\d+))");
+    auto match = regex.match(fileName);
+    if (!match.hasMatch()) {
+        return std::nullopt;
     }
+    int version = match.captured(1).toInt();
+    if (version <= systemVersion) {
+        return version;
+    }
+#endif
+    return std::nullopt;
 #else
     Q_UNUSED(fileName);
-    return false;
+    return std::nullopt;
 #endif
+}
 
-#else // If the OS doesn't fit one of the above #defines, then it will never match
-    Q_UNUSED(fileName);
-    return false;
-#endif
+QString ReleaseChannel::findBestDownloadUrl(const QVariantList &assets)
+{
+    QString bestUrl;
+    int bestVersion = -1;
+    for (const auto &rawAsset : assets) {
+        QVariantMap asset = rawAsset.toMap();
+        QString name = asset["name"].toString();
+        QString url = asset["browser_download_url"].toString();
+        auto version = getTargetVersionForCurrentOS(name);
+        if (!version) {
+            continue;
+        }
+        if (*version > bestVersion) {
+            bestVersion = *version;
+            bestUrl = url;
+        }
+    }
+    if (!bestUrl.isEmpty()) {
+        qCInfo(ReleaseChannelLog)
+            << "Selected compatible asset version=" << bestVersion
+            << "url=" << bestUrl;
+    }
+    return bestUrl;
 }
 
 QString StableReleaseChannel::getManualDownloadUrl() const
@@ -138,16 +169,9 @@ void StableReleaseChannel::releaseListFinished()
     lastRelease->setPublishDate(resultMap["published_at"].toDate());
 
     if (resultMap.contains("assets")) {
-        auto rawAssets = resultMap["assets"].toList();
-        for (const auto &rawAsset : rawAssets) {
-            QVariantMap asset = rawAsset.toMap();
-            QString name = asset["name"].toString();
-            QString url = asset["browser_download_url"].toString();
-
-            if (downloadMatchesCurrentOS(name)) {
-                lastRelease->setDownloadUrl(url);
-                break;
-            }
+        auto url = findBestDownloadUrl(resultMap["assets"].toList());
+        if (!url.isEmpty()) {
+          lastRelease->setDownloadUrl(url);
         }
     }
 
@@ -289,21 +313,10 @@ void BetaReleaseChannel::fileListFinished()
     bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
     bool compatibleVersion = false;
 
-    QStringList resultUrlList{};
-    for (QVariant file : resultList) {
-        QVariantMap map = file.toMap();
-        resultUrlList << map["browser_download_url"].toString();
-    }
-
-    resultUrlList.sort();
-    // iterate in reverse so the first item is the latest os version
-    for (auto url = resultUrlList.rbegin(); url < resultUrlList.rend(); ++url) {
-        if (downloadMatchesCurrentOS(*url)) {
-            compatibleVersion = true;
-            lastRelease->setDownloadUrl(*url);
-            qCInfo(ReleaseChannelLog) << "Found compatible version url=" << *url;
-            break;
-        }
+    QString downloadUrl = findBestDownloadUrl(resultList);
+    if (!downloadUrl.isEmpty()) {
+        compatibleVersion = true;
+        lastRelease->setDownloadUrl(downloadUrl);
     }
 
     emit finishedCheck(needToUpdate, compatibleVersion, lastRelease);

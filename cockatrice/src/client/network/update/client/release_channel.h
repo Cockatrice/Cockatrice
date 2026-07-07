@@ -7,6 +7,7 @@
 #ifndef RELEASECHANNEL_H
 #define RELEASECHANNEL_H
 
+#include <optional>
 #include <QDate>
 #include <QLoggingCategory>
 #include <QObject>
@@ -96,7 +97,8 @@ protected:
     Release *lastRelease;
 
 protected:
-    static bool downloadMatchesCurrentOS(const QString &fileName);
+    std::optional<int> getTargetVersionForCurrentOS(const QString &fileName);
+    QString findBestDownloadUrl(const QVariantList &assets);
     [[nodiscard]] virtual QString getReleaseChannelUrl() const = 0;
 
 public:
