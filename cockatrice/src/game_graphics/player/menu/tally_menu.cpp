@@ -5,11 +5,11 @@
 TallyMenu::TallyMenu()
 {
     aTallyNone = createTallyAction(TallyType::None);
-    aTallySubtype = createTallyAction(TallyType::Subtypes);
+    aTallySubtypes = createTallyAction(TallyType::Subtypes);
 
     addAction(aTallyNone);
     addSeparator();
-    addAction(aTallySubtype);
+    addAction(aTallySubtypes);
 
     retranslateUi();
 }
@@ -45,5 +45,5 @@ void TallyMenu::retranslateUi()
     setTitle(tr("Tally"));
 
     aTallyNone->setText(tr("None"));
-    aTallySubtype->setText(tr("Subtype"));
+    aTallySubtypes->setText(tr("Subtypes"));
 }

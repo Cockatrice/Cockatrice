@@ -20,7 +20,7 @@ public:
 
 private:
     QAction *aTallyNone = nullptr;
-    QAction *aTallySubtype = nullptr;
+    QAction *aTallySubtypes = nullptr;
 
     QAction *createTallyAction(TallyType tallyType);
 };
