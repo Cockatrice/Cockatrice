@@ -63,10 +63,6 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
     const QRegularExpression &regex = isIntel ? macIntelRegex : macArmRegex;
 
 #elif defined(Q_OS_WIN)
-#if Q_PROCESSOR_WORDSIZE != 8 // non 64-bit host
-    Q_UNUSED(fileName);
-    return std::nullopt;
-#endif
     static const QRegularExpression regex(R"(Win(?:dows)?(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
 
 #else // if the OS doesn't fit one of the above #defines, then it will never match
