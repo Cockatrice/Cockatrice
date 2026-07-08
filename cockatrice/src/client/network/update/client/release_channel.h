@@ -7,12 +7,12 @@
 #ifndef RELEASECHANNEL_H
 #define RELEASECHANNEL_H
 
-#include <optional>
 #include <QDate>
 #include <QLoggingCategory>
 #include <QObject>
 #include <QString>
 #include <QVariantMap>
+#include <optional>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(ReleaseChannelLog, "release_channel");

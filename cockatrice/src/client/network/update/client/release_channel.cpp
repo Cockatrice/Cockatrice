@@ -2,7 +2,6 @@
 
 #include "version_string.h"
 
-#include <optional>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -11,6 +10,7 @@
 #include <QRegularExpression>
 #include <QSysInfo>
 #include <QtGlobal>
+#include <optional>
 
 #if defined(Q_OS_MACOS)
 #include <sys/sysctl.h>
@@ -47,6 +47,8 @@ void ReleaseChannel::checkForUpdates()
 // Different release channel checking functions for different operating systems
 std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &fileName)
 {
+    const QRegularExpression *regex = nullptr;
+
 #if defined(Q_OS_MACOS)
     const bool isIntel = [] {
         // QSysInfo does not go through translation layers
@@ -58,12 +60,14 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
         }
         return false;
     }();
-    static const QRegularExpression macIntelRegex(R"(macOS(\d+)_Intel\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression macIntelRegex(R"(macOS(\d+)_Intel\.[^.]+$)",
+                                                  QRegularExpression::CaseInsensitiveOption);
     static const QRegularExpression macArmRegex(R"(macOS(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
-    const QRegularExpression &regex = isIntel ? macIntelRegex : macArmRegex;
+    regex = isIntel ? &macIntelRegex : &macArmRegex;
 
 #elif defined(Q_OS_WIN)
-    static const QRegularExpression regex(R"(Win(?:dows)?(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression winRegex(R"(Win(?:dows)?(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
+    regex = &winRegex;
 
 #else // if the OS doesn't fit one of the above #defines, then it will never match
     Q_UNUSED(fileName);
@@ -71,7 +75,7 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
 #endif
 
     const int systemVersion = QSysInfo::productVersion().split('.').first().toInt();
-    auto match = regex.match(fileName);
+    auto match = regex->match(fileName);
     if (!match.hasMatch()) {
         return std::nullopt;
     }
@@ -100,8 +104,7 @@ QString ReleaseChannel::findBestDownloadUrl(const QVariantList &assets)
         }
     }
     if (!bestUrl.isEmpty()) {
-        qCInfo(ReleaseChannelLog)
-            << "Best compatible asset=" << bestUrl;
+        qCInfo(ReleaseChannelLog) << "Best compatible asset=" << bestUrl;
     }
     return bestUrl;
 }
@@ -152,7 +155,7 @@ void StableReleaseChannel::releaseListFinished()
     if (resultMap.contains("assets")) {
         auto url = findBestDownloadUrl(resultMap["assets"].toList());
         if (!url.isEmpty()) {
-          lastRelease->setDownloadUrl(url);
+            lastRelease->setDownloadUrl(url);
         }
     }
 
