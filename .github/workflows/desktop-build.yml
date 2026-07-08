@@ -443,7 +443,7 @@ jobs:
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
           MAKE_PACKAGE: ${{ matrix.make_package }}
-          PACKAGE_SUFFIX: "-${{ matrix.os }}${{ matrix.os_target_version }}${{ case(matrix.soc == 'Intel', '_Intel', '') }}"
+          PACKAGE_SUFFIX: "-${{ matrix.os }}${{ matrix.os_target_version }}${{ case(matrix.soc == 'Intel', '_Intel', '') }}+"
           TARGET_MACOS_VERSION: ${{ matrix.os_target_version }}
           USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite"
