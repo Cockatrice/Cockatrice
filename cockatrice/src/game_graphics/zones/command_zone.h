@@ -89,6 +89,13 @@ public:
     void setMinimumHeight(int height);
     /** @brief Registers a tax counter widget for layout management. */
     void registerTaxCounter(AbstractCounter *counter);
+    /**
+     * @brief Unregisters a tax counter widget from layout management.
+     *
+     * Call on removal: the widget outlives it via deleteLater(), so unregister synchronously
+     * to keep it out of the next layout pass.
+     */
+    void unregisterTaxCounter(AbstractCounter *counter);
     /** @brief Lays out visible tax counters vertically in the top-left corner of the command zone. */
     void rearrangeTaxCounters();
 

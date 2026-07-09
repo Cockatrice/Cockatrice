@@ -242,6 +242,9 @@ void PlayerGraphicsItem::onCounterRemoved(int counterId)
     if (playerMenu->getCountersMenu() && widget->getMenu()) {
         playerMenu->getCountersMenu()->removeAction(widget->getMenu()->menuAction());
     }
+    if (commandZoneGraphicsItem && CounterNames::isTaxCounter(widget->getName())) {
+        commandZoneGraphicsItem->unregisterTaxCounter(widget);
+    }
     widget->delCounter();
     rearrangeCounters();
 }

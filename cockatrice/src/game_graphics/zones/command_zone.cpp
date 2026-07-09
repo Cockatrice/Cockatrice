@@ -160,6 +160,15 @@ void CommandZone::registerTaxCounter(AbstractCounter *counter)
     connect(counter, &QObject::destroyed, this, [this, counter]() { taxCounters.removeOne(counter); });
 }
 
+void CommandZone::unregisterTaxCounter(AbstractCounter *counter)
+{
+    if (!counter) {
+        return;
+    }
+    disconnect(counter, &QObject::destroyed, this, nullptr);
+    taxCounters.removeOne(counter);
+}
+
 void CommandZone::rearrangeTaxCounters()
 {
     int activeTaxCounterCount = 0;
