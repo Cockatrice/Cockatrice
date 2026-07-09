@@ -24,6 +24,13 @@ CommandZone::CommandZone(CommandZoneLogic *_logic, int _zoneHeight, QGraphicsIte
     setupClipContainer(ZValues::CARD_BASE);
 }
 
+CommandZone::~CommandZone()
+{
+    for (AbstractCounter *ctr : taxCounters) {
+        disconnect(ctr, &QObject::destroyed, this, nullptr);
+    }
+}
+
 void CommandZone::updateBg()
 {
     update();

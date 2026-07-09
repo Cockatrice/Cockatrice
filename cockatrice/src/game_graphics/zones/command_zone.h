@@ -62,6 +62,7 @@ public:
      * @param parent Parent graphics item
      */
     CommandZone(CommandZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent);
+    ~CommandZone() override;
 
     /**
      * @brief Handles card drops, calculating insertion position from drop point.
