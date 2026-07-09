@@ -150,6 +150,25 @@ TEST(EvaluateSetCounterActive, RejectsDisablingPartnerTaxWhenAccumulated)
               Response::RespContextError);
 }
 
+// CounterNames::isTaxCounter (guards cmdCreateCounter against reserved names)
+
+TEST(CounterNamesIsTaxCounter, RejectsCommanderTaxName)
+{
+    EXPECT_TRUE(CounterNames::isTaxCounter(CounterNames::CommanderTax));
+}
+
+TEST(CounterNamesIsTaxCounter, RejectsPartnerTaxName)
+{
+    EXPECT_TRUE(CounterNames::isTaxCounter(CounterNames::PartnerTax));
+}
+
+TEST(CounterNamesIsTaxCounter, AllowsOrdinaryName)
+{
+    EXPECT_FALSE(CounterNames::isTaxCounter("life"));
+    EXPECT_FALSE(CounterNames::isTaxCounter("poison"));
+    EXPECT_FALSE(CounterNames::isTaxCounter(""));
+}
+
 // evaluateModifyCounter (shared by cmdIncCounter / cmdSetCounter)
 
 TEST(EvaluateModifyCounter, RejectsWhenGameNotStarted)
