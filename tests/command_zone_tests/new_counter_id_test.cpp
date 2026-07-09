@@ -49,6 +49,14 @@ TEST(NewCounterId, SkipsReservedRangeWhenOnlyReservedCountersExist)
     EXPECT_EQ(f.player.newCounterId(), CounterIds::FirstUserId);
 }
 
+TEST(NewCounterId, SkipsTaxCounterIds)
+{
+    PlayerFixture f;
+    f.player.addCounter(new Server_Counter(CounterIds::CommanderTax, "tax1", color(), 0, 0));
+    f.player.addCounter(new Server_Counter(CounterIds::PartnerTax, "tax2", color(), 0, 0));
+    EXPECT_EQ(f.player.newCounterId(), CounterIds::FirstUserId);
+}
+
 TEST(NewCounterId, ReturnsNextIdAboveHighestUserCounter)
 {
     PlayerFixture f;
