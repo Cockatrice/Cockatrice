@@ -101,7 +101,7 @@ Vérifiez que le répertoire ne soit pas en lecture seule et réessayez.</transl
     <message>
         <location filename="src/interface/widgets/deck_analytics/add_analytics_panel_dialog.cpp" line="10"/>
         <source>Add Analytics Panel</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un panneau d'analyse</translation>
     </message>
 </context>
 <context>
@@ -180,7 +180,7 @@ Vérifiez que le répertoire ne soit pas en lecture seule et réessayez.</transl
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="730"/>
         <source>Display card name of background in bottom right:</source>
-        <translation type="unfinished"/>
+        <translation>Afficher le nom de la carte d'arrière-plan en bas à droite :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_settings.cpp" line="732"/>
@@ -304,12 +304,12 @@ Vérifiez que le répertoire ne soit pas en lecture seule et réessayez.</transl
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp" line="92"/>
         <source>Back to results</source>
-        <translation type="unfinished"/>
+        <translation>Retour aux résultats</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp" line="93"/>
         <source>Open Deck in Deck Editor</source>
-        <translation type="unfinished"/>
+        <translation>Ouvrir le deck dans l'éditeur de deck</translation>
     </message>
 </context>
 <context>
@@ -533,7 +533,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="../libcockatrice_filters/libcockatrice/filters/filter_card.cpp" line="64"/>
         <source>Name (Exact)</source>
-        <translation type="unfinished"/>
+        <translation>Nom (Exact)</translation>
     </message>
     <message>
         <location filename="../libcockatrice_filters/libcockatrice/filters/filter_card.cpp" line="66"/>
@@ -657,12 +657,12 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="69"/>
         <source>Set:</source>
-        <translation type="unfinished"/>
+        <translation>Édition :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="71"/>
         <source>Collector Number:</source>
-        <translation type="unfinished"/>
+        <translation>Numéro de collection :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/cards/card_info_text_widget.cpp" line="85"/>
@@ -978,22 +978,22 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="65"/>
         <source>Add Panel</source>
-        <translation type="unfinished"/>
+        <translation>Ajouter un panneau</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="66"/>
         <source>Remove Panel</source>
-        <translation type="unfinished"/>
+        <translation>Supprimer le panneau</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="67"/>
         <source>Save Layout</source>
-        <translation type="unfinished"/>
+        <translation>Enregistrer la disposition</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_analytics/deck_analytics_widget.cpp" line="68"/>
         <source>Load Layout</source>
-        <translation type="unfinished"/>
+        <translation>Charger une disposition</translation>
     </message>
 </context>
 <context>
@@ -1001,7 +1001,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_card_database_dock_widget.cpp" line="49"/>
         <source>Card Database</source>
-        <translation type="unfinished"/>
+        <translation>Base de données de cartes</translation>
     </message>
 </context>
 <context>
@@ -1065,7 +1065,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="131"/>
         <source>Loading Database...</source>
-        <translation type="unfinished"/>
+        <translation>Chargement de la base de données...</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="153"/>
@@ -1130,7 +1130,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="742"/>
         <source>Format:</source>
-        <translation type="unfinished"/>
+        <translation>Format :</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp" line="744"/>
@@ -1471,7 +1471,7 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="56"/>
         <source>Undo</source>
-        <translation type="unfinished"/>
+        <translation>Annuler</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="57"/>
@@ -1481,22 +1481,22 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="58"/>
         <source>Undo/Redo history</source>
-        <translation type="unfinished"/>
+        <translation>Historique Annuler/Rétablir</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="59"/>
         <source>Click on an entry to revert to that point in the history.</source>
-        <translation type="unfinished"/>
+        <translation>Cliquez sur une entrée pour revenir à ce point dans l'historique.</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="71"/>
         <source>[redo] </source>
-        <translation type="unfinished"/>
+        <translation>[rétablir] </translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp" line="88"/>
         <source>[undo] </source>
-        <translation type="unfinished"/>
+        <translation>[annuler] </translation>
     </message>
 </context>
 <context>
@@ -1729,22 +1729,22 @@ Cette information sera consultable uniquement par les modérateurs et ne sera pa
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="113"/>
         <source>Rename deck to &quot;%1&quot; from &quot;%2&quot;</source>
-        <translation type="unfinished"/>
+        <translation>Renommer le deck de « %2 » à « %1 »</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="126"/>
         <source>Updated comments (was %1 chars, now %2 chars)</source>
-        <translation type="unfinished"/>
+        <translation>Commentaires mis à jour (%1 caractères avant, %2 maintenant)</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="139"/>
         <source>Set banner card to %1 (%2)</source>
-        <translation type="unfinished"/>
+        <translation>Définir %1 (%2) comme carte bannière</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="152"/>
         <source>Tags changed</source>
-        <translation type="unfinished"/>
+        <translation>Étiquettes modifiées</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/deck_editor/deck_state_manager.cpp" line="164"/>
