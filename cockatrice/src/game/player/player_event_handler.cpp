@@ -34,7 +34,6 @@
 #include <libcockatrice/protocol/pb/event_set_counter_active.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
 #include <libcockatrice/utility/color.h>
-#include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/zone_names.h>
 
 PlayerEventHandler::PlayerEventHandler(PlayerLogic *_player) : QObject(_player), player(_player)
