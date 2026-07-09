@@ -29,6 +29,7 @@
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/card_override_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/clamped_arithmetic.h>
@@ -51,10 +52,10 @@ PlayerActions::PlayerActions(PlayerLogic *_player)
     connect(moveTopCardTimer, &QTimer::timeout, [this]() { actMoveTopCardToPlay(); });
 }
 
-void PlayerActions::playCard(CardItem *card, bool faceDown)
+PendingCommand *PlayerActions::prepareCardMove(CardItem *card, bool faceDown)
 {
     if (card == nullptr) {
-        return;
+        return nullptr;
     }
 
     Command_MoveCard cmd;
@@ -66,7 +67,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
 
     ExactCard exactCard = card->getCard();
     if (!exactCard) {
-        return;
+        return nullptr;
     }
 
     const CardInfo &info = exactCard.getInfo();
@@ -97,7 +98,14 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
         cmd.set_x(gridPoint.x());
         cmd.set_y(gridPoint.y());
     }
-    sendGameCommand(cmd);
+    return prepareGameCommand(cmd);
+}
+
+void PlayerActions::playCard(CardItem *card, bool faceDown)
+{
+    if (PendingCommand *pend = prepareCardMove(card, faceDown)) {
+        sendGameCommand(pend);
+    }
 }
 
 /**
@@ -1642,9 +1650,10 @@ void PlayerActions::playSelectedCards(QList<CardItem *> selectedCards, const boo
     playSelectedCardsImpl(selectedCards, faceDown, nullptr);
 }
 
-void PlayerActions::playSelectedCardsImpl(QList<CardItem *> selectedCards,
-                                          bool faceDown,
-                                          const std::function<void(CardItem *, const QString &)> &postPlayCallback)
+void PlayerActions::playSelectedCardsImpl(
+    QList<CardItem *> selectedCards,
+    bool faceDown,
+    const std::function<void(PendingCommand *, const QString &)> &postPlayCallback)
 {
     // CardIds will get shuffled downwards when cards leave the deck.
     // We need to iterate through the cards in reverse order so cardIds don't get changed out from under us as we play
@@ -1655,10 +1664,16 @@ void PlayerActions::playSelectedCardsImpl(QList<CardItem *> selectedCards,
     for (auto &card : selectedCards) {
         if (card && !isUnwritableRevealZone(card->getZone()) && card->getZone()->getName() != ZoneNames::TABLE) {
             const QString originalZone = card->getZone()->getName();
-            playCard(card, faceDown);
-            if (postPlayCallback) {
-                postPlayCallback(card, originalZone);
+            PendingCommand *pend = prepareCardMove(card, faceDown);
+            if (pend == nullptr) {
+                continue;
             }
+            // Connect before send: a local game processes the command synchronously inside
+            // sendGameCommand, firing the pend's finished signal before this call returns.
+            if (postPlayCallback) {
+                postPlayCallback(pend, originalZone);
+            }
+            sendGameCommand(pend);
         }
     }
 }
@@ -1675,13 +1690,22 @@ void PlayerActions::actPlayAndIncreasePartnerTax(QList<CardItem *> selectedCards
 
 void PlayerActions::playAndIncreaseTax(QList<CardItem *> selectedCards, int counterId)
 {
-    playSelectedCardsImpl(selectedCards, false, [this, counterId](CardItem * /*card*/, const QString &originalZone) {
-        if (originalZone == ZoneNames::COMMAND) {
-            CounterState *state = player->getCounters().value(counterId, nullptr);
-            if (state && state->isActive()) {
-                sendIncCounter(counterId, 1);
-            }
+    playSelectedCardsImpl(selectedCards, false, [this, counterId](PendingCommand *pend, const QString &originalZone) {
+        if (originalZone != ZoneNames::COMMAND || pend == nullptr) {
+            return;
         }
+        // Gate the tax increment on the server accepting the move, so a rejected move
+        // (the card couldn't legally leave the command zone) never inflates the tax.
+        connect(pend, &PendingCommand::finished, this,
+                [this, counterId](const Response &response, const CommandContainer &, const QVariant &) {
+                    if (response.response_code() != Response::RespOk) {
+                        return;
+                    }
+                    CounterState *state = player->getCounters().value(counterId, nullptr);
+                    if (state && state->isActive()) {
+                        sendIncCounter(counterId, 1);
+                    }
+                });
     });
 }
 

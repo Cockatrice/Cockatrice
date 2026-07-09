@@ -257,23 +257,29 @@ private:
     void playSelectedCards(QList<CardItem *> selectedCards, bool faceDown = false);
 
     /**
-     * @brief Shared implementation for playing selected cards with an optional post-play callback.
-     * @param selectedCards Cards to play
-     * @param faceDown Whether to play cards face-down
-     * @param postPlayCallback Called after each card is played, receiving the card and its *original* zone name
-     *        (captured before playCard, since playCard sends a move command that may change the card's zone).
+     * @brief Builds the move command for playing a card, returning the prepared (unsent) PendingCommand.
+     * @return The prepared command, or nullptr if the card cannot be played.
      */
-    void playSelectedCardsImpl(QList<CardItem *> selectedCards,
-                               bool faceDown,
-                               const std::function<void(CardItem *, const QString &)> &postPlayCallback = nullptr);
+    PendingCommand *prepareCardMove(CardItem *card, bool faceDown);
 
     /**
-     * @brief Plays the selected cards and, for each that came from the command zone,
-     *        increments the given (active) tax counter by one.
+     * @brief Shared implementation for playing selected cards with an optional per-card callback.
+     * @param selectedCards Cards to play
+     * @param faceDown Whether to play cards face-down
+     * @param postPlayCallback Called for each card once its move is prepared but before it is sent,
+     *        receiving the move's PendingCommand and the card's *original* zone name (the move may
+     *        change the card's zone). Connect response handling here so it is attached before send.
+     */
+    void
+    playSelectedCardsImpl(QList<CardItem *> selectedCards,
+                          bool faceDown,
+                          const std::function<void(PendingCommand *, const QString &)> &postPlayCallback = nullptr);
+
+    /**
+     * @brief Plays the selected cards and, for each that came from the command zone and whose move
+     *        the server accepts, increments the given (active) tax counter by one.
      * @param selectedCards Cards to play
      * @param counterId The tax counter to increment (CounterIds::CommanderTax or PartnerTax)
-     * @note The increment is sent optimistically, not gated on the move succeeding; a rejected
-     *       move can leave the tax incremented without a card being cast.
      */
     void playAndIncreaseTax(QList<CardItem *> selectedCards, int counterId);
 
