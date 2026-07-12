@@ -639,7 +639,7 @@ void TabArchidekt::processDeckResponse(QJsonObject reply)
 
     auto display = new ArchidektApiResponseDeckDisplayWidget(resultsContainer, deckData, cardSizeSlider);
     connect(display, &ArchidektApiResponseDeckDisplayWidget::requestNavigation, this, &TabArchidekt::actNavigatePage);
-    connect(display, &ArchidektApiResponseDeckDisplayWidget::requestSearch, this, &TabArchidekt::doSearchImmediate);
+    connect(display, &ArchidektApiResponseDeckDisplayWidget::requestSearch, this, &TabArchidekt::doSearch);
     connect(display, &ArchidektApiResponseDeckDisplayWidget::openInDeckEditor, tabSupervisor,
             &TabSupervisor::openDeckInNewTab);
     resultsLayout->addWidget(display);
