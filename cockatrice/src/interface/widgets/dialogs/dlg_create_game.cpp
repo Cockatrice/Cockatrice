@@ -111,9 +111,9 @@ void DlgCreateGame::sharedCtor()
     gameSetupOptionsLayout->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupOptionsLayout->addWidget(startingLifeTotalEdit, 0, 1);
     gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadCheckBox, 1, 0);
-    gameSetupOptionsLayout->addWidget(enableCommandZoneCheckBox, 1, 1);
+    gameSetupOptionsLayout->addWidget(enableCommandZoneCheckBox, 2, 0);
     if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
-        gameSetupOptionsLayout->addWidget(createGameAsJudgeCheckBox, 2, 0);
+        gameSetupOptionsLayout->addWidget(createGameAsJudgeCheckBox, 3, 0);
     } else {
         createGameAsJudgeCheckBox->setChecked(false);
         createGameAsJudgeCheckBox->setHidden(true);
