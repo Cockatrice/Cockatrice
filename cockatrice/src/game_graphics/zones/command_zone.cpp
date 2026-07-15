@@ -51,20 +51,21 @@ void CommandZone::setMinimumHeight(int height)
     if (minimumHeight == height) {
         return;
     }
-    // Only meaningful while minimized, where currentHeight() depends on minimumHeight.
+    // The floor only affects height while minimized; skip relayout if the displayed
+    // height is unchanged (e.g. a tax counter toggled while expanded).
     const qreal oldEffectiveHeight = currentHeight();
     minimumHeight = height;
+    if (qFuzzyCompare(currentHeight(), oldEffectiveHeight)) {
+        return;
+    }
+
     prepareGeometryChange();
     updateClipRect();
     reorganizeCards();
     update();
-    // Do NOT emit minimizedChanged: the minimized STATE is unchanged, and that signal
-    // feeds rearrangeZones -> rearrangeCounters -> setMinimumHeight (infinite loop).
-    // effectiveHeightChanged repositions neighbouring zones and converges instead: the
-    // rearrange re-enters setMinimumHeight with the same height and early-returns above.
-    if (!qFuzzyCompare(currentHeight(), oldEffectiveHeight)) {
-        emit effectiveHeightChanged();
-    }
+    // effectiveHeightChanged repositions neighbouring zones; that path re-enters with the
+    // same floor and early-returns above, so it converges.
+    emit effectiveHeightChanged();
 }
 
 bool CommandZone::isMinimized() const
