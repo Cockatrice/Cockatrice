@@ -14,7 +14,10 @@ on:
       - master
     paths:
       - '.github/workflows/docker-release.yml'
+      - '.dockerignore'
       - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'docker-compose.yml.windows'
   release:
     types:
       - released    # publishing of stable releases
@@ -25,26 +28,30 @@ concurrency:
   cancel-in-progress: ${{ github.event_name != 'release' }}
 
 env:
-  IMAGE_NAME: ghcr.io/cockatrice/servatrice
+  GHCR_IMAGE: ghcr.io/cockatrice/servatrice
   OCI_DESCRIPTION: Server for Cockatrice, a cross-platform virtual tabletop for multiplayer card games
+  OCI_SOURCE: https://github.com/Cockatrice/Cockatrice
   OCI_TITLE: Servatrice
   OCI_URL: https://cockatrice.github.io/
+  OCI_VERSION: ${{ github.ref_name }}
 
 jobs:
   build:
+    name: "${{ matrix.label }}"
+    if: github.repository_owner == 'Cockatrice'
+    runs-on: ${{ matrix.runner }}
+
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: linux/amd64
+          - label: x86
+            platform: linux/amd64
             runner: ubuntu-latest
 
-          - platform: linux/arm64
-            runner: ubuntu-24.04-arm
-
-    name: "Build (${{ matrix.platform }})"
-    if: github.repository_owner == 'Cockatrice'
-    runs-on: ${{ matrix.runner }}
+          - label: arm
+            platform: linux/arm64
+            runner: ubuntu-24.04-arm    # to be replaced with "ubuntu-latest-arm" once available
 
     steps:
       - name: "Checkout"
@@ -58,36 +65,40 @@ jobs:
         id: login
         uses: docker/login-action@v4
         with:
-          password: ${{ github.token }}
           registry: ghcr.io
           username: ${{ github.actor }}
+          password: ${{ github.token }}
 
-      - name: "Build Docker image and push by digest"
-        if: steps.login.outcome == 'success'
-        id: build
-        uses: docker/build-push-action@v7
-        with:
-          cache-from: type=gha,scope=servatrice-${{ matrix.platform }}
-          cache-to: type=gha,mode=max,scope=servatrice-${{ matrix.platform }}
-          context: .
-          labels: |
-            org.opencontainers.image.description=${{ env.OCI_DESCRIPTION }}
-            org.opencontainers.image.title=${{ env.OCI_TITLE }}
-            org.opencontainers.image.url=${{ env.OCI_URL }}
-          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
-          platforms: ${{ matrix.platform }}
-
-      - name: "Build Docker image"
+      - name: "Build image"
         if: steps.login.outcome != 'success'
         uses: docker/build-push-action@v7
         with:
-          cache-from: type=gha,scope=servatrice-${{ matrix.platform }}
-          cache-to: type=gha,mode=max,scope=servatrice-${{ matrix.platform }}
+          cache-from: type=gha,scope=servatrice-${{ matrix.label }}
+          cache-to: type=gha,mode=max,scope=servatrice-${{ matrix.label }}
           context: .
           platforms: ${{ matrix.platform }}
           push: false
 
-      - name: Export digest
+      - name: "Build image and push by digest"
+        if: steps.login.outcome == 'success'
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          cache-from: type=gha,scope=servatrice-${{ matrix.label }}
+          cache-to: type=gha,mode=max,scope=servatrice-${{ matrix.label }}
+          context: .
+          labels: |
+            org.opencontainers.image.description=${{ env.OCI_DESCRIPTION }}
+            org.opencontainers.image.source=${{ env.OCI_SOURCE }}
+            org.opencontainers.image.title=${{ env.OCI_TITLE }}
+            org.opencontainers.image.url=${{ env.OCI_URL }}
+            org.opencontainers.image.version=${{ env.OCI_VERSION }}
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          platforms: ${{ matrix.platform }}
+          provenance: mode=max
+          sbom: true
+
+      - name: "Export digest"
         if: steps.login.outcome == 'success'
         env:
           DIGEST: ${{ steps.build.outputs.digest }}
@@ -95,22 +106,25 @@ jobs:
           mkdir -p $RUNNER_TEMP/digests
           touch "$RUNNER_TEMP/digests/${DIGEST#sha256:}"
 
-      - uses: actions/upload-artifact@v7
+      - name: "Upload digest"
         if: steps.login.outcome == 'success'
+        uses: actions/upload-artifact@v7
         with:
+          if-no-files-found: error
           name: digest-${{ matrix.platform }}
           path: $RUNNER_TEMP/digests/*
           retention-days: 1
 
 
   merge:
-    needs: build
-    name: "Publish manifest"
+    name: "Publish multi-arch manifest"
     if: github.repository_owner == 'Cockatrice' && github.event_name == 'release' && github.event.release.prerelease == false
+    needs: build
     runs-on: ubuntu-slim
 
     steps:
-      - uses: actions/download-artifact@v4
+      - name: "Download digests"
+        uses: actions/download-artifact@v4
         with:
           path: $RUNNER_TEMP/digests
           pattern: digest-*
@@ -122,15 +136,15 @@ jobs:
       - name: "Login to GitHub Container Registry (GHCR)"
         uses: docker/login-action@v4
         with:
-          password: ${{ github.token }}
           registry: ghcr.io
           username: ${{ github.actor }}
+          password: ${{ github.token }}
 
       - name: "Docker metadata"
         id: metadata
         uses: docker/metadata-action@v6
         with:
-          images: ${{ env.IMAGE_NAME }}
+          images: ${{ env.GHCR_IMAGE }}
           tags: |
             type=raw,value=latest
             type=ref,event=tag
@@ -147,10 +161,14 @@ jobs:
 
           docker buildx imagetools create \
             --annotation "index:org.opencontainers.image.description=$OCI_DESCRIPTION" \
+            --annotation "index:org.opencontainers.image.source=$OCI_SOURCE" \
             --annotation "index:org.opencontainers.image.title=$OCI_TITLE" \
             --annotation "index:org.opencontainers.image.url=$OCI_URL" \
+            --annotation "index:org.opencontainers.image.version=$OCI_VERSION" \
             $TAG_ARGS \
-            $(printf '%s@sha256:%s ' "$IMAGE_NAME" *)
+            $(printf '%s@sha256:%s ' "$GHCR_IMAGE" *)
 
-      - name: "Inspect image"
-        run: docker buildx imagetools inspect "$IMAGE_NAME:latest"
+      - name: "Inspect image via tags"
+        run: |
+          docker buildx imagetools inspect "$GHCR_IMAGE:latest"
+          docker buildx imagetools inspect "$GHCR_IMAGE:$OCI_VERSION"
