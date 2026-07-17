@@ -1,6 +1,7 @@
-name: Build Docker Image
+name: Build Docker
 
 permissions:
+  actions: read
   contents: read
   packages: write
 
@@ -23,35 +24,31 @@ concurrency:
   group: "${{ github.workflow }} @ ${{ github.ref_name }}"
   cancel-in-progress: ${{ github.event_name != 'release' }}
 
+env:
+  IMAGE_NAME: ghcr.io/cockatrice/servatrice
+  OCI_DESCRIPTION: Server for Cockatrice, a cross-platform virtual tabletop for multiplayer card games
+  OCI_TITLE: Servatrice
+  OCI_URL: https://cockatrice.github.io/
+
 jobs:
-  docker:
-    name: amd64 & arm64
-    if: ${{ github.repository_owner == 'Cockatrice' }}
-    runs-on: ubuntu-latest
-  
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+
+    name: "Build (${{ matrix.platform }})"
+    if: github.repository_owner == 'Cockatrice'
+    runs-on: ${{ matrix.runner }}
+
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7
-
-      - name: "Docker metadata"
-        id: metadata
-        uses: docker/metadata-action@v6
-        env:
-          DOCKER_METADATA_ANNOTATIONS_LEVELS: index    # needed for GHCR
-        with:
-          annotations: |
-            org.opencontainers.image.title=Servatrice
-            org.opencontainers.image.url=https://cockatrice.github.io/
-            org.opencontainers.image.description=Server for Cockatrice, a cross-platform virtual tabletop for multiplayer card games
-          images: |
-            ghcr.io/cockatrice/servatrice
-          labels: |
-            org.opencontainers.image.title=Servatrice
-            org.opencontainers.image.url=https://cockatrice.github.io/
-            org.opencontainers.image.description=Server for Cockatrice, a cross-platform virtual tabletop for multiplayer card games
-
-      - name: "Set up QEMU"
-        uses: docker/setup-qemu-action@v4
 
       - name: "Set up Docker buildx"
         uses: docker/setup-buildx-action@v4
@@ -65,14 +62,95 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
 
-      - name: "Build and push Docker image"
+      - name: "Build Docker image and push by digest"
+        if: steps.login.outcome == 'success'
+        id: build
         uses: docker/build-push-action@v7
         with:
-          annotations: ${{ steps.metadata.outputs.annotations }}
-          cache-from: type=gha,scope=servatrice
-          cache-to: type=gha,mode=max,scope=servatrice
+          cache-from: type=gha,scope=servatrice-${{ matrix.platform }}
+          cache-to: type=gha,mode=max,scope=servatrice-${{ matrix.platform }}
           context: .
-          labels: ${{ steps.metadata.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
-          push: ${{ steps.login.outcome == 'success' }}
-          tags: ${{ steps.metadata.outputs.tags }}
+          labels: |
+            org.opencontainers.image.description=${{ env.OCI_DESCRIPTION }}
+            org.opencontainers.image.title=${{ env.OCI_TITLE }}
+            org.opencontainers.image.url=${{ env.OCI_URL }}
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          platforms: ${{ matrix.platform }}
+
+      - name: "Build Docker image"
+        if: steps.login.outcome != 'success'
+        uses: docker/build-push-action@v7
+        with:
+          cache-from: type=gha,scope=servatrice-${{ matrix.platform }}
+          cache-to: type=gha,mode=max,scope=servatrice-${{ matrix.platform }}
+          context: .
+          platforms: ${{ matrix.platform }}
+          push: false
+
+      - name: Export digest
+        if: steps.login.outcome == 'success'
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p $RUNNER_TEMP/digests
+          touch "$RUNNER_TEMP/digests/${DIGEST#sha256:}"
+
+      - uses: actions/upload-artifact@v7
+        if: steps.login.outcome == 'success'
+        with:
+          name: digest-${{ matrix.platform }}
+          path: $RUNNER_TEMP/digests/*
+          retention-days: 1
+
+
+  merge:
+    needs: build
+    name: "Publish manifest"
+    if: github.repository_owner == 'Cockatrice' && github.event_name == 'release' && github.event.release.prerelease == false
+    runs-on: ubuntu-slim
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: $RUNNER_TEMP/digests
+          pattern: digest-*
+          merge-multiple: true
+
+      - name: "Set up Docker buildx"
+        uses: docker/setup-buildx-action@v4
+
+      - name: "Login to GitHub Container Registry (GHCR)"
+        uses: docker/login-action@v4
+        with:
+          password: ${{ github.token }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+
+      - name: "Docker metadata"
+        id: metadata
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=ref,event=tag
+
+      - name: "Create manifest"
+        env:
+          TAGS: ${{ steps.metadata.outputs.tags }}
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          TAG_ARGS=""
+          for tag in $TAGS; do
+            TAG_ARGS="$TAG_ARGS -t $tag"
+          done
+
+          docker buildx imagetools create \
+            --annotation "index:org.opencontainers.image.description=$OCI_DESCRIPTION" \
+            --annotation "index:org.opencontainers.image.title=$OCI_TITLE" \
+            --annotation "index:org.opencontainers.image.url=$OCI_URL" \
+            $TAG_ARGS \
+            $(printf '%s@sha256:%s ' "$IMAGE_NAME" *)
+
+      - name: "Inspect image"
+        run: docker buildx imagetools inspect "$IMAGE_NAME:latest"
