@@ -44,7 +44,7 @@ void ReleaseChannel::checkForUpdates()
     connect(response, &QNetworkReply::finished, this, &ReleaseChannel::releaseListFinished);
 }
 
-// Different release channel checking functions for different operating systems
+// Find compatible assets for host platform (Linux is not supported by in-client updater)
 std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &fileName)
 {
     const QRegularExpression *regex = nullptr;
@@ -75,6 +75,7 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
     return std::nullopt;
 #endif
 
+    // Any asset targeting an OS version smaller or equal to the current host works
     const int systemVersion = QSysInfo::productVersion().split('.').first().toInt();
     auto match = regex->match(fileName);
     if (!match.hasMatch()) {
@@ -87,6 +88,7 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
     return targetVersion;
 }
 
+// Pick newest targeted version (highest number) amongst all compatible ones
 QString ReleaseChannel::findBestDownloadUrl(const QVariantList &assets)
 {
     QString bestUrl;
