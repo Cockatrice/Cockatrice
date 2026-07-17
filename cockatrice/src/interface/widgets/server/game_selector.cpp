@@ -78,11 +78,13 @@ GameSelector::GameSelector(AbstractClient *_client,
     if (showFilters && restoresettings) {
         quickFilterToolBar = new GameSelectorQuickFilterToolBar(this, tabSupervisor, gameListProxyModel, gameTypeMap);
         quickFilterToolBar->setVisible(showFilters && restoresettings &&
-                                       SettingsCache::instance().getShowGameSelectorFilterToolbar());
+                                       SettingsCache::instance().cardsDisplay().getShowGameSelectorFilterToolbar());
 
-        connect(&SettingsCache::instance(), &SettingsCache::showGameSelectorFilterToolbarChanged, this, [this] {
-            quickFilterToolBar->setVisible(SettingsCache::instance().getShowGameSelectorFilterToolbar());
-        });
+        connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::showGameSelectorFilterToolbarChanged,
+                this, [this] {
+                    quickFilterToolBar->setVisible(
+                        SettingsCache::instance().cardsDisplay().getShowGameSelectorFilterToolbar());
+                });
     } else {
         quickFilterToolBar = nullptr;
     }

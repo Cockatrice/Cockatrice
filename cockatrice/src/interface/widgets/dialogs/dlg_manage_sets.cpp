@@ -153,7 +153,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     sortWarning->setLayout(sortWarningLayout);
     sortWarning->setVisible(false);
 
-    includeRebalancedCards = SettingsCache::instance().getIncludeRebalancedCards();
+    includeRebalancedCards = SettingsCache::instance().cardsDisplay().getIncludeRebalancedCards();
     QCheckBox *includeRebalancedCardsCheckBox =
         new QCheckBox(tr("Include cards rebalanced for Alchemy [requires restart]"));
     includeRebalancedCardsCheckBox->setChecked(includeRebalancedCards);
@@ -253,7 +253,7 @@ void WndSets::includeRebalancedCardsChanged(bool _includeRebalancedCards)
 void WndSets::actSave()
 {
     model->save(CardDatabaseManager::getInstance());
-    SettingsCache::instance().setIncludeRebalancedCards(includeRebalancedCards);
+    SettingsCache::instance().cardsDisplay().setIncludeRebalancedCards(includeRebalancedCards);
     CardPictureLoader::clearPixmapCache();
     const auto reloadOk1 = QtConcurrent::run([] {
         CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify();

@@ -36,7 +36,7 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 {
     animationTimer = new QBasicTimer;
     addItem(phasesToolbar);
-    connect(&SettingsCache::instance(), &SettingsCache::minPlayersForMultiColumnLayoutChanged, this,
+    connect(&SettingsCache::instance().interface(), &InterfaceSettings::minPlayersForMultiColumnLayoutChanged, this,
             &GameScene::rearrange);
 
     rearrange();
@@ -324,7 +324,7 @@ QList<PlayerLogic *> GameScene::rotatePlayers(const QList<PlayerLogic *> &active
 
 int GameScene::determineColumnCount(int playerCount)
 {
-    return playerCount < SettingsCache::instance().getMinPlayersForMultiColumnLayout() ? 1 : 2;
+    return playerCount < SettingsCache::instance().interface().getMinPlayersForMultiColumnLayout() ? 1 : 2;
 }
 
 /**

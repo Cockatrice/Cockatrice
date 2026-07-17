@@ -1,5 +1,6 @@
 #include "pile_zone.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../../game/zones/pile_zone_logic.h"
@@ -23,12 +24,13 @@ PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_log
                      .rotate(90)
                      .translate(-CardDimensions::WIDTH_HALF_F, -CardDimensions::HEIGHT_HALF_F));
 
-    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
-        Q_UNUSED(_roundCardCorners);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::roundCardCornersChanged, this,
+            [this](bool _roundCardCorners) {
+                Q_UNUSED(_roundCardCorners);
 
-        prepareGeometryChange();
-        update();
-    });
+                prepareGeometryChange();
+                update();
+            });
 }
 
 QRectF PileZone::boundingRect() const
@@ -39,7 +41,8 @@ QRectF PileZone::boundingRect() const
 QPainterPath PileZone::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CardDimensions::WIDTH_F : 0.0;
+    qreal cardCornerRadius =
+        SettingsCache::instance().cardsDisplay().getRoundCardCorners() ? 0.05 * CardDimensions::WIDTH_F : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }

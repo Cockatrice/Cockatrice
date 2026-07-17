@@ -126,7 +126,7 @@ void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
     if (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this)) {
         soundEngine->playSound("private_message");
     }
-    if (SettingsCache::instance().getShowMessagePopup() && shouldShowSystemPopup(event)) {
+    if (SettingsCache::instance().chat().getShowMessagePopup() && shouldShowSystemPopup(event)) {
         showSystemPopup(event);
     }
     if (QString::fromStdString(event.sender_name()).toLower().simplified() == "servatrice") {

@@ -34,7 +34,7 @@ QList<CardSetPtr> CardPictureToLoad::extractSetsSorted(const ExactCard &card)
     std::sort(sortedSets.begin(), sortedSets.end(), SetPriorityComparator());
 
     // If the user hasn't disabled arts other than their personal preference...
-    if (!SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference()) {
+    if (!SettingsCache::instance().cardsDisplay().getOverrideAllCardArtWithPersonalPreference()) {
         // If the pixmapCacheKey corresponds to a specific set, we have to try to load it first.
         qsizetype setIndex = sortedSets.indexOf(card.getPrinting().getSet());
         if (setIndex > 0) { // we don't need to move the set if it's already first

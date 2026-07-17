@@ -78,7 +78,8 @@ ShortcutSettingsPage::ShortcutSettingsPage()
 
     connect(shortcutsTable, &ShortcutTreeView::currentItemChanged, this, &ShortcutSettingsPage::currentItemChanged);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &ShortcutSettingsPage::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
+            &ShortcutSettingsPage::retranslateUi);
     retranslateUi();
 }
 

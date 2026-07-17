@@ -27,7 +27,7 @@ bool OverridePrintingWarning::execMessageBox(QWidget *parent, bool enable)
         QMessageBox::question(parent, QObject::tr("Confirm Change"), message, QMessageBox::Yes | QMessageBox::No);
 
     if (result == QMessageBox::Yes) {
-        SettingsCache::instance().setOverrideAllCardArtWithPersonalPreference(static_cast<Qt::CheckState>(enable));
+        SettingsCache::instance().cardsDisplay().setOverrideAllCardArtWithPersonalPreference(enable);
         // Caches are now invalid.
         CardPictureLoader::clearPixmapCache();
         CardPictureLoader::clearNetworkCache();

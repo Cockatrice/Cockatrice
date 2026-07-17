@@ -186,7 +186,7 @@ void DlgCreateToken::tokenSelectionChanged(const QModelIndex &current, const QMo
         const QChar cardColor = cardInfo->getColorChar();
         colorEdit->setCurrentIndex(colorEdit->findData(cardColor, Qt::UserRole, Qt::MatchFixedString));
         ptEdit->setText(cardInfo->getPowTough());
-        if (SettingsCache::instance().getAnnotateTokens()) {
+        if (SettingsCache::instance().interface().getAnnotateTokens()) {
             annotationEdit->setText(cardInfo->getText());
         }
     } else {

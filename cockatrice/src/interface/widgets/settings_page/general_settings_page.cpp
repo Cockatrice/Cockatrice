@@ -9,6 +9,9 @@
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QTranslator>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/settings/updates_settings.h>
 
 enum startupCardUpdateCheckBehaviorIndex
 {
@@ -50,17 +53,18 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     // version settings
     SettingsCache &settings = SettingsCache::instance();
-    startupUpdateCheckCheckBox.setChecked(settings.getCheckUpdatesOnStartup());
+    startupUpdateCheckCheckBox.setChecked(settings.updates().getCheckUpdatesOnStartup());
 
-    connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setCheckUpdatesOnStartup);
+    connect(&startupUpdateCheckCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.updates(),
+            &UpdatesSettings::setCheckUpdatesOnStartup);
 
     updateNotificationCheckBox.setChecked(settings.getNotifyAboutUpdates());
 
-    connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings, &SettingsCache::setNotifyAboutUpdate);
+    connect(&updateNotificationCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.updates(),
+            &UpdatesSettings::setNotifyAboutUpdates);
 
-    connect(&newVersionOracleCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings,
-            &SettingsCache::setNotifyAboutNewVersion);
+    connect(&newVersionOracleCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.updates(),
+            &UpdatesSettings::setNotifyAboutNewVersion);
 
     auto *versionGrid = new QGridLayout;
     versionGrid->addWidget(&updateReleaseChannelLabel, 0, 0);
@@ -76,9 +80,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     startupCardUpdateCheckBehaviorSelector.addItem(""); // these will be set in retranslateUI
     startupCardUpdateCheckBehaviorSelector.addItem("");
     startupCardUpdateCheckBehaviorSelector.addItem("");
-    if (SettingsCache::instance().getStartupCardUpdateCheckPromptForUpdate()) {
+    if (SettingsCache::instance().updates().getStartupCardUpdateCheckPromptForUpdate()) {
         startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexPrompt);
-    } else if (SettingsCache::instance().getStartupCardUpdateCheckAlwaysUpdate()) {
+    } else if (SettingsCache::instance().updates().getStartupCardUpdateCheckAlwaysUpdate()) {
         startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexAlways);
     } else {
         startupCardUpdateCheckBehaviorSelector.setCurrentIndex(startupCardUpdateCheckBehaviorIndexNone);
@@ -86,20 +90,20 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     connect(&startupCardUpdateCheckBehaviorSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             [](int index) {
-                SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(
+                SettingsCache::instance().updates().setStartupCardUpdateCheckPromptForUpdate(
                     index == startupCardUpdateCheckBehaviorIndexPrompt);
-                SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(
+                SettingsCache::instance().updates().setStartupCardUpdateCheckAlwaysUpdate(
                     index == startupCardUpdateCheckBehaviorIndexAlways);
             });
 
     cardUpdateCheckIntervalSpinBox.setMinimum(1);
     cardUpdateCheckIntervalSpinBox.setMaximum(30);
-    cardUpdateCheckIntervalSpinBox.setValue(settings.getCardUpdateCheckInterval());
+    cardUpdateCheckIntervalSpinBox.setValue(settings.updates().getCardUpdateCheckInterval());
 
-    connect(&cardUpdateCheckIntervalSpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings,
-            &SettingsCache::setCardUpdateCheckInterval);
+    connect(&cardUpdateCheckIntervalSpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings.updates(),
+            &UpdatesSettings::setCardUpdateCheckInterval);
 
-    newVersionOracleCheckBox.setChecked(settings.getNotifyAboutNewVersion());
+    newVersionOracleCheckBox.setChecked(settings.updates().getNotifyAboutNewVersion());
 
     auto *cardDatabaseGrid = new QGridLayout;
     cardDatabaseGrid->addWidget(&startupCardUpdateCheckBehaviorLabel, 0, 0);
@@ -112,9 +116,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     cardDatabaseGroupBox->setLayout(cardDatabaseGrid);
 
     // startup settings
-    showTipsOnStartup.setChecked(settings.getShowTipsOnStartup());
+    showTipsOnStartup.setChecked(settings.personal().getShowTipsOnStartup());
 
-    connect(&showTipsOnStartup, &QCheckBox::clicked, &settings, &SettingsCache::setShowTipsOnStartup);
+    connect(&showTipsOnStartup, &QCheckBox::clicked, &settings.personal(), &PersonalSettings::setShowTipsOnStartup);
 
     auto *startupGrid = new QGridLayout;
     startupGrid->addWidget(&showTipsOnStartup, 0, 0, 1, 2);
@@ -123,22 +127,22 @@ GeneralSettingsPage::GeneralSettingsPage()
     startupGroupBox->setLayout(startupGrid);
 
     // paths settings
-    deckPathEdit = new QLineEdit(settings.getDeckPath());
+    deckPathEdit = new QLineEdit(settings.paths().getDeckPath());
     deckPathEdit->setReadOnly(true);
     auto *deckPathButton = new QPushButton("...");
     connect(deckPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::deckPathButtonClicked);
 
-    filtersPathEdit = new QLineEdit(settings.getFiltersPath());
+    filtersPathEdit = new QLineEdit(settings.paths().getFiltersPath());
     filtersPathEdit->setReadOnly(true);
     auto *filtersPathButton = new QPushButton("...");
     connect(filtersPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::filtersPathButtonClicked);
 
-    replaysPathEdit = new QLineEdit(settings.getReplaysPath());
+    replaysPathEdit = new QLineEdit(settings.paths().getReplaysPath());
     replaysPathEdit->setReadOnly(true);
     auto *replaysPathButton = new QPushButton("...");
     connect(replaysPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::replaysPathButtonClicked);
 
-    picsPathEdit = new QLineEdit(settings.getPicsPath());
+    picsPathEdit = new QLineEdit(settings.paths().getPicsPath());
     picsPathEdit->setReadOnly(true);
     auto *picsPathButton = new QPushButton("...");
     connect(picsPathButton, &QPushButton::clicked, this, &GeneralSettingsPage::picsPathButtonClicked);
@@ -224,13 +228,14 @@ GeneralSettingsPage::GeneralSettingsPage()
     GeneralSettingsPage::retranslateUi();
 
     // connect the ReleaseChannel combo box only after the entries are inserted in retranslateUi
-    connect(&updateReleaseChannelBox, qOverload<int>(&QComboBox::currentIndexChanged), &settings,
-            &SettingsCache::setUpdateReleaseChannelIndex);
+    connect(&updateReleaseChannelBox, qOverload<int>(&QComboBox::currentIndexChanged), &settings.updates(),
+            &UpdatesSettings::setUpdateReleaseChannelIndex);
     updateReleaseChannelBox.setCurrentIndex(settings.getUpdateReleaseChannelIndex());
 
     setLayout(mainLayout);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &GeneralSettingsPage::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
+            &GeneralSettingsPage::retranslateUi);
     retranslateUi();
 }
 
@@ -264,7 +269,7 @@ void GeneralSettingsPage::deckPathButtonClicked()
     }
 
     deckPathEdit->setText(path);
-    SettingsCache::instance().setDeckPath(path);
+    SettingsCache::instance().paths().setDeckPath(path);
 }
 
 void GeneralSettingsPage::filtersPathButtonClicked()
@@ -275,7 +280,7 @@ void GeneralSettingsPage::filtersPathButtonClicked()
     }
 
     filtersPathEdit->setText(path);
-    SettingsCache::instance().setFiltersPath(path);
+    SettingsCache::instance().paths().setFiltersPath(path);
 }
 
 void GeneralSettingsPage::replaysPathButtonClicked()
@@ -286,7 +291,7 @@ void GeneralSettingsPage::replaysPathButtonClicked()
     }
 
     replaysPathEdit->setText(path);
-    SettingsCache::instance().setReplaysPath(path);
+    SettingsCache::instance().paths().setReplaysPath(path);
 }
 
 void GeneralSettingsPage::picsPathButtonClicked()
@@ -297,7 +302,7 @@ void GeneralSettingsPage::picsPathButtonClicked()
     }
 
     picsPathEdit->setText(path);
-    SettingsCache::instance().setPicsPath(path);
+    SettingsCache::instance().paths().setPicsPath(path);
 }
 
 void GeneralSettingsPage::cardDatabasePathButtonClicked()
@@ -308,7 +313,7 @@ void GeneralSettingsPage::cardDatabasePathButtonClicked()
     }
 
     cardDatabasePathEdit->setText(path);
-    SettingsCache::instance().setCardDatabasePath(path);
+    SettingsCache::instance().paths().setCardDatabasePath(path);
 }
 
 void GeneralSettingsPage::customCardDatabaseButtonClicked()
@@ -319,7 +324,7 @@ void GeneralSettingsPage::customCardDatabaseButtonClicked()
     }
 
     customCardDatabasePathEdit->setText(path);
-    SettingsCache::instance().setCustomCardDatabasePath(path);
+    SettingsCache::instance().paths().setCustomCardDatabasePath(path);
 }
 
 void GeneralSettingsPage::tokenDatabasePathButtonClicked()
@@ -330,16 +335,16 @@ void GeneralSettingsPage::tokenDatabasePathButtonClicked()
     }
 
     tokenDatabasePathEdit->setText(path);
-    SettingsCache::instance().setTokenDatabasePath(path);
+    SettingsCache::instance().paths().setTokenDatabasePath(path);
 }
 
 void GeneralSettingsPage::resetAllPathsClicked()
 {
     SettingsCache &settings = SettingsCache::instance();
     settings.resetPaths();
-    deckPathEdit->setText(settings.getDeckPath());
-    replaysPathEdit->setText(settings.getReplaysPath());
-    picsPathEdit->setText(settings.getPicsPath());
+    deckPathEdit->setText(settings.paths().getDeckPath());
+    replaysPathEdit->setText(settings.paths().getReplaysPath());
+    picsPathEdit->setText(settings.paths().getPicsPath());
     cardDatabasePathEdit->setText(settings.getCardDatabasePath());
     customCardDatabasePathEdit->setText(settings.getCustomCardDatabasePath());
     tokenDatabasePathEdit->setText(settings.getTokenDatabasePath());
@@ -348,7 +353,7 @@ void GeneralSettingsPage::resetAllPathsClicked()
 
 void GeneralSettingsPage::languageBoxChanged(int index)
 {
-    SettingsCache::instance().setLang(languageBox.itemData(index).toString());
+    SettingsCache::instance().personal().setLang(languageBox.itemData(index).toString());
 }
 
 void GeneralSettingsPage::retranslateUi()
@@ -391,7 +396,7 @@ void GeneralSettingsPage::retranslateUi()
 
     const auto &settings = SettingsCache::instance();
 
-    QDate lastCheckDate = settings.getLastCardUpdateCheck();
+    QDate lastCheckDate = settings.updates().getLastCardUpdateCheck();
     int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
 
     lastCardUpdateCheckDateLabel.setText(

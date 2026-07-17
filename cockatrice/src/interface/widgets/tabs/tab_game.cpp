@@ -252,8 +252,8 @@ void TabGame::resetChatAndPhase()
 
 void TabGame::emitUserEvent()
 {
-    bool globalEvent =
-        !game->getPlayerManager()->isSpectator() || SettingsCache::instance().getSpectatorNotificationsEnabled();
+    bool globalEvent = !game->getPlayerManager()->isSpectator() ||
+                       SettingsCache::instance().interface().getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
     updatePlayerListDockTitle();
 }
@@ -626,8 +626,8 @@ void TabGame::actRotateViewCCW()
 
 void TabGame::actCompleterChanged()
 {
-    SettingsCache::instance().getChatMentionCompleter() ? completer->setCompletionRole(2)
-                                                        : completer->setCompletionRole(1);
+    SettingsCache::instance().chat().getChatMentionCompleter() ? completer->setCompletionRole(2)
+                                                               : completer->setCompletionRole(1);
 }
 
 void TabGame::notifyPlayerJoin(QString playerName)
@@ -1265,7 +1265,7 @@ void TabGame::createMessageDock(bool bReplay)
     if (!bReplay) {
         connect(messageLog, &MessageLogWidget::openMessageDialog, this, &TabGame::openMessageDialog);
         connect(messageLog, &MessageLogWidget::addMentionTag, this, &TabGame::addMentionTag);
-        connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
+        connect(&SettingsCache::instance().chat(), &ChatSettings::chatMentionCompleterChanged, this,
                 &TabGame::actCompleterChanged);
     }
 

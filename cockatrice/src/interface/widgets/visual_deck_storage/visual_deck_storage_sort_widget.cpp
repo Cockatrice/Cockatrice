@@ -28,7 +28,7 @@ VisualDeckStorageSortWidget::VisualDeckStorageSortWidget(VisualDeckStorageWidget
     retranslateUi();
 
     // Set the current sort order
-    sortComboBox->setCurrentIndex(SettingsCache::instance().getVisualDeckStorageSortingOrder());
+    sortComboBox->setCurrentIndex(SettingsCache::instance().visualDeckStorage().getVisualDeckStorageSortingOrder());
     sortOrder = static_cast<SortOrder>(sortComboBox->currentIndex());
 
     // Connect sorting change signal to refresh the file list
@@ -61,7 +61,7 @@ void VisualDeckStorageSortWidget::retranslateUi()
 void VisualDeckStorageSortWidget::updateSortOrder()
 {
     sortOrder = static_cast<SortOrder>(sortComboBox->currentIndex());
-    SettingsCache::instance().setVisualDeckStorageSortingOrder(sortComboBox->currentIndex());
+    SettingsCache::instance().visualDeckStorage().setVisualDeckStorageSortingOrder(sortComboBox->currentIndex());
     emit sortOrderChanged();
 }
 

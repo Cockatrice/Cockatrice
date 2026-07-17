@@ -261,7 +261,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         if (startZone->getName() == ZoneNames::HAND) {
             startCard->playCard(false);
             CardInfoPtr ci = startCard->getCard().getCardPtr();
-            bool playToStack = SettingsCache::instance().getPlayToStack();
+            bool playToStack = SettingsCache::instance().interface().getPlayToStack();
             if (ci && ((!playToStack && ci->getUiAttributes().tableRow == 3) ||
                        (playToStack && ci->getUiAttributes().tableRow != 0 &&
                         startCard->getZone()->getName() != ZoneNames::STACK))) {

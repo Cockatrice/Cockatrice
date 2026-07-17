@@ -10,54 +10,56 @@
 
 MessagesSettingsPage::MessagesSettingsPage()
 {
-    chatMentionCheckBox.setChecked(SettingsCache::instance().getChatMention());
-    connect(&chatMentionCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setChatMention);
+    chatMentionCheckBox.setChecked(SettingsCache::instance().chat().getChatMention());
+    connect(&chatMentionCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
+            &ChatSettings::setChatMention);
 
-    chatMentionCompleterCheckbox.setChecked(SettingsCache::instance().getChatMentionCompleter());
-    connect(&chatMentionCompleterCheckbox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setChatMentionCompleter);
+    chatMentionCompleterCheckbox.setChecked(SettingsCache::instance().chat().getChatMentionCompleter());
+    connect(&chatMentionCompleterCheckbox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
+            &ChatSettings::setChatMentionCompleter);
 
     explainMessagesLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     explainMessagesLabel.setOpenExternalLinks(true);
 
-    ignoreUnregUsersMainChat.setChecked(SettingsCache::instance().getIgnoreUnregisteredUsers());
-    ignoreUnregUserMessages.setChecked(SettingsCache::instance().getIgnoreUnregisteredUserMessages());
-    ignoreNonBuddyUserMessages.setChecked(SettingsCache::instance().getIgnoreNonBuddyUserMessages());
+    ignoreUnregUsersMainChat.setChecked(SettingsCache::instance().chat().getIgnoreUnregisteredUsers());
+    ignoreUnregUserMessages.setChecked(SettingsCache::instance().chat().getIgnoreUnregisteredUserMessages());
+    ignoreNonBuddyUserMessages.setChecked(SettingsCache::instance().chat().getIgnoreNonBuddyUserMessages());
 
-    connect(&ignoreUnregUsersMainChat, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setIgnoreUnregisteredUsers);
-    connect(&ignoreUnregUserMessages, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setIgnoreUnregisteredUserMessages);
-    connect(&ignoreNonBuddyUserMessages, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setIgnoreNonBuddyUserMessages);
+    connect(&ignoreUnregUsersMainChat, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
+            &ChatSettings::setIgnoreUnregisteredUsers);
+    connect(&ignoreUnregUserMessages, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
+            &ChatSettings::setIgnoreUnregisteredUserMessages);
+    connect(&ignoreNonBuddyUserMessages, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
+            &ChatSettings::setIgnoreNonBuddyUserMessages);
 
-    invertMentionForeground.setChecked(SettingsCache::instance().getChatMentionForeground());
+    invertMentionForeground.setChecked(SettingsCache::instance().chat().getChatMentionForeground());
     connect(&invertMentionForeground, &QCheckBox::QT_STATE_CHANGED, this, &MessagesSettingsPage::updateTextColor);
 
-    invertHighlightForeground.setChecked(SettingsCache::instance().getChatHighlightForeground());
+    invertHighlightForeground.setChecked(SettingsCache::instance().chat().getChatHighlightForeground());
     connect(&invertHighlightForeground, &QCheckBox::QT_STATE_CHANGED, this,
             &MessagesSettingsPage::updateTextHighlightColor);
 
     mentionColor = new QLineEdit();
-    mentionColor->setText(SettingsCache::instance().getChatMentionColor());
+    mentionColor->setText(SettingsCache::instance().chat().getChatMentionColor());
     updateMentionPreview();
     connect(mentionColor, &QLineEdit::textChanged, this, &MessagesSettingsPage::updateColor);
 
-    messagePopups.setChecked(SettingsCache::instance().getShowMessagePopup());
-    connect(&messagePopups, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setShowMessagePopups);
+    messagePopups.setChecked(SettingsCache::instance().chat().getShowMessagePopup());
+    connect(&messagePopups, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
+            &ChatSettings::setShowMessagePopups);
 
-    mentionPopups.setChecked(SettingsCache::instance().getShowMentionPopup());
-    connect(&mentionPopups, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setShowMentionPopups);
+    mentionPopups.setChecked(SettingsCache::instance().chat().getShowMentionPopup());
+    connect(&mentionPopups, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
+            &ChatSettings::setShowMentionPopups);
 
-    roomHistory.setChecked(SettingsCache::instance().getRoomHistory());
-    connect(&roomHistory, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(), &SettingsCache::setRoomHistory);
+    roomHistory.setChecked(SettingsCache::instance().chat().getRoomHistory());
+    connect(&roomHistory, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().chat(),
+            &ChatSettings::setRoomHistory);
 
     customAlertString = new QLineEdit();
-    customAlertString->setText(SettingsCache::instance().getHighlightWords());
-    connect(customAlertString, &QLineEdit::textChanged, &SettingsCache::instance(), &SettingsCache::setHighlightWords);
+    customAlertString->setText(SettingsCache::instance().chat().getHighlightWords());
+    connect(customAlertString, &QLineEdit::textChanged, &SettingsCache::instance().chat(),
+            &ChatSettings::setHighlightWords);
 
     auto *chatGrid = new QGridLayout;
     chatGrid->addWidget(&chatMentionCheckBox, 0, 0);
@@ -75,7 +77,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     chatGroupBox->setLayout(chatGrid);
 
     highlightColor = new QLineEdit();
-    highlightColor->setText(SettingsCache::instance().getChatHighlightColor());
+    highlightColor->setText(SettingsCache::instance().chat().getChatHighlightColor());
     updateHighlightPreview();
     connect(highlightColor, &QLineEdit::textChanged, this, &MessagesSettingsPage::updateHighlightColor);
 
@@ -132,7 +134,8 @@ MessagesSettingsPage::MessagesSettingsPage()
 
     setLayout(mainLayout);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &MessagesSettingsPage::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
+            &MessagesSettingsPage::retranslateUi);
     retranslateUi();
 }
 
@@ -145,7 +148,7 @@ void MessagesSettingsPage::updateColor(const QString &value)
     colorToSet.setNamedColor("#" + value);
 #endif
     if (colorToSet.isValid()) {
-        SettingsCache::instance().setChatMentionColor(value);
+        SettingsCache::instance().chat().setChatMentionColor(value);
         updateMentionPreview();
     }
 }
@@ -159,35 +162,35 @@ void MessagesSettingsPage::updateHighlightColor(const QString &value)
     colorToSet.setNamedColor("#" + value);
 #endif
     if (colorToSet.isValid()) {
-        SettingsCache::instance().setChatHighlightColor(value);
+        SettingsCache::instance().chat().setChatHighlightColor(value);
         updateHighlightPreview();
     }
 }
 
 void MessagesSettingsPage::updateTextColor(QT_STATE_CHANGED_T value)
 {
-    SettingsCache::instance().setChatMentionForeground(value);
+    SettingsCache::instance().chat().setChatMentionForeground(value);
     updateMentionPreview();
 }
 
 void MessagesSettingsPage::updateTextHighlightColor(QT_STATE_CHANGED_T value)
 {
-    SettingsCache::instance().setChatHighlightForeground(value);
+    SettingsCache::instance().chat().setChatHighlightForeground(value);
     updateHighlightPreview();
 }
 
 void MessagesSettingsPage::updateMentionPreview()
 {
     mentionColor->setStyleSheet(
-        "QLineEdit{background:#" + SettingsCache::instance().getChatMentionColor() +
-        ";color: " + (SettingsCache::instance().getChatMentionForeground() ? "white" : "black") + ";}");
+        "QLineEdit{background:#" + SettingsCache::instance().chat().getChatMentionColor() +
+        ";color: " + (SettingsCache::instance().chat().getChatMentionForeground() ? "white" : "black") + ";}");
 }
 
 void MessagesSettingsPage::updateHighlightPreview()
 {
     highlightColor->setStyleSheet(
-        "QLineEdit{background:#" + SettingsCache::instance().getChatHighlightColor() +
-        ";color: " + (SettingsCache::instance().getChatHighlightForeground() ? "white" : "black") + ";}");
+        "QLineEdit{background:#" + SettingsCache::instance().chat().getChatHighlightColor() +
+        ";color: " + (SettingsCache::instance().chat().getChatHighlightForeground() ? "white" : "black") + ";}");
 }
 
 void MessagesSettingsPage::storeSettings()

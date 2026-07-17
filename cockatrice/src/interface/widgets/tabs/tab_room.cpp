@@ -75,7 +75,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabRoom::showCardInfoPopup);
     connect(chatView, &ChatView::deleteCardInfoPopup, this, &TabRoom::deleteCardInfoPopup);
     connect(chatView, &ChatView::addMentionTag, this, &TabRoom::addMentionTag);
-    connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
+    connect(&SettingsCache::instance().chat(), &ChatSettings::chatMentionCompleterChanged, this,
             &TabRoom::actCompleterChanged);
     sayLabel = new QLabel;
     sayEdit = new LineEditCompleter;
@@ -246,8 +246,8 @@ void TabRoom::actOpenChatSettings()
 
 void TabRoom::actCompleterChanged()
 {
-    SettingsCache::instance().getChatMentionCompleter() ? completer->setCompletionRole(2)
-                                                        : completer->setCompletionRole(1);
+    SettingsCache::instance().chat().getChatMentionCompleter() ? completer->setCompletionRole(2)
+                                                               : completer->setCompletionRole(1);
 }
 
 void TabRoom::processRoomEvent(const RoomEvent &event)
@@ -307,13 +307,13 @@ void TabRoom::processRoomSayEvent(const Event_RoomSay &event)
     ServerInfo_User userInfo = {};
     if (twi) {
         userInfo = twi->getUserInfo();
-        if (SettingsCache::instance().getIgnoreUnregisteredUsers() &&
+        if (SettingsCache::instance().chat().getIgnoreUnregisteredUsers() &&
             !UserLevelFlags(userInfo.user_level()).testFlag(ServerInfo_User::IsRegistered)) {
             return;
         }
     }
 
-    if (event.message_type() == Event_RoomSay::ChatHistory && !SettingsCache::instance().getRoomHistory()) {
+    if (event.message_type() == Event_RoomSay::ChatHistory && !SettingsCache::instance().chat().getRoomHistory()) {
         return;
     }
 

@@ -131,7 +131,8 @@ void TabArchidekt::initializeUi()
 
     // Settings
     settingsButton = new SettingsButtonWidget(primaryToolbar);
-    cardSizeSlider = new CardSizeWidget(primaryToolbar, nullptr, SettingsCache::instance().getArchidektPreviewSize());
+    cardSizeSlider = new CardSizeWidget(primaryToolbar, nullptr,
+                                        SettingsCache::instance().visualDeckStorage().getArchidektPreviewSize());
     settingsButton->addSettingsWidget(cardSizeSlider);
 
     // Assemble primary toolbar
@@ -337,8 +338,8 @@ void TabArchidekt::connectSignals()
         doSearch();
     });
 
-    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
-            &SettingsCache::setArchidektPreviewCardSize);
+    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::setArchidektPreviewCardSize);
 
     // Search button triggers immediate search
     connect(searchButton, &QPushButton::clicked, this, &TabArchidekt::doSearchImmediate);

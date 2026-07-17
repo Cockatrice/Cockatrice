@@ -15,16 +15,16 @@ class TearOffMenu : public QMenu
 public:
     explicit TearOffMenu(const QString &title, QWidget *parent = nullptr) : QMenu(title, parent)
     {
-        connect(&SettingsCache::instance(), &SettingsCache::useTearOffMenusChanged, this,
+        connect(&SettingsCache::instance().interface(), &InterfaceSettings::useTearOffMenusChanged, this,
                 [this](const bool state) { setTearOffEnabled(state); });
-        setTearOffEnabled(SettingsCache::instance().getUseTearOffMenus());
+        setTearOffEnabled(SettingsCache::instance().interface().getUseTearOffMenus());
     }
 
     explicit TearOffMenu(QWidget *parent = nullptr) : QMenu(parent)
     {
-        connect(&SettingsCache::instance(), &SettingsCache::useTearOffMenusChanged, this,
+        connect(&SettingsCache::instance().interface(), &InterfaceSettings::useTearOffMenusChanged, this,
                 [this](const bool state) { setTearOffEnabled(state); });
-        setTearOffEnabled(SettingsCache::instance().getUseTearOffMenus());
+        setTearOffEnabled(SettingsCache::instance().interface().getUseTearOffMenus());
     }
 
     TearOffMenu *addTearOffMenu(const QString &title)

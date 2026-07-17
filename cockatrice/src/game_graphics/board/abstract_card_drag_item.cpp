@@ -34,12 +34,13 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
 
     setCacheMode(DeviceCoordinateCache);
 
-    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
-        Q_UNUSED(_roundCardCorners);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::roundCardCornersChanged, this,
+            [this](bool _roundCardCorners) {
+                Q_UNUSED(_roundCardCorners);
 
-        prepareGeometryChange();
-        update();
-    });
+                prepareGeometryChange();
+                update();
+            });
 
     connect(item, &QObject::destroyed, this, &AbstractCardDragItem::deleteLater);
 }
@@ -47,7 +48,8 @@ AbstractCardDragItem::AbstractCardDragItem(AbstractCardItem *_item,
 QPainterPath AbstractCardDragItem::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CardDimensions::WIDTH_F : 0.0;
+    qreal cardCornerRadius =
+        SettingsCache::instance().cardsDisplay().getRoundCardCorners() ? 0.05 * CardDimensions::WIDTH_F : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }

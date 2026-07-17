@@ -51,9 +51,10 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
-    cardSizeWidget = new CardSizeWidget(this, flowWidget, SettingsCache::instance().getVisualDatabaseDisplayCardSize());
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
-            &SettingsCache::setVisualDatabaseDisplayCardSize);
+    cardSizeWidget = new CardSizeWidget(
+        this, flowWidget, SettingsCache::instance().visualDeckStorage().getVisualDatabaseDisplayCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::setVisualDatabaseDisplayCardSize);
 
     searchContainer = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 

@@ -26,7 +26,7 @@ PrintingSelectorCardSortingWidget::PrintingSelectorCardSortingWidget(PrintingSel
     sortOptionsSelector = new QComboBox(this);
     sortOptionsSelector->setFocusPolicy(Qt::StrongFocus);
     sortOptionsSelector->addItems(SORT_OPTIONS);
-    sortOptionsSelector->setCurrentIndex(SettingsCache::instance().getPrintingSelectorSortOrder());
+    sortOptionsSelector->setCurrentIndex(SettingsCache::instance().cardsDisplay().getPrintingSelectorSortOrder());
     connect(sortOptionsSelector, &QComboBox::currentTextChanged, this,
             &PrintingSelectorCardSortingWidget::updateSortSetting);
     connect(sortOptionsSelector, &QComboBox::currentTextChanged, parent, &PrintingSelector::updateDisplay);
@@ -62,7 +62,7 @@ void PrintingSelectorCardSortingWidget::updateSortOrder()
  */
 void PrintingSelectorCardSortingWidget::updateSortSetting()
 {
-    SettingsCache::instance().setPrintingSelectorSortOrder(sortOptionsSelector->currentIndex());
+    SettingsCache::instance().cardsDisplay().setPrintingSelectorSortOrder(sortOptionsSelector->currentIndex());
 }
 
 /**
@@ -90,7 +90,7 @@ QList<PrintingInfo> PrintingSelectorCardSortingWidget::sortSets(const SetToPrint
     }
 
     if (sortedSets.empty()) {
-        sortedSets << CardSet::newInstance(SettingsCache::instance().cardDatabase(), "", "", "", QDate());
+        sortedSets << CardSet::newInstance(&SettingsCache::instance().cardDatabase(), "", "", "", QDate());
     }
 
     if (sortOptionsSelector->currentText() == SORT_OPTIONS_PREFERENCE) {

@@ -59,7 +59,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
 QGroupBox *TabReplays::createLeftLayout()
 {
     localDirModel = new QFileSystemModel(this);
-    localDirModel->setRootPath(SettingsCache::instance().getReplaysPath());
+    localDirModel->setRootPath(SettingsCache::instance().paths().getReplaysPath());
     localDirModel->sort(0, Qt::AscendingOrder);
 
     localDirView = new QTreeView;

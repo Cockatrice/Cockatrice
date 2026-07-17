@@ -33,7 +33,7 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
         migrateOracleSettings();
     }
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &OracleWizard::updateLanguage);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &OracleWizard::updateLanguage);
 
     importer = new OracleImporter(this);
 

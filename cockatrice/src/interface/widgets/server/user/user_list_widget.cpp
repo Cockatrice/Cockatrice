@@ -352,7 +352,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
 
 QSize UserListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (!SettingsCache::instance().getStyleUserList()) {
+    if (!SettingsCache::instance().interface().getStyleUserList()) {
         return QStyledItemDelegate::sizeHint(option, index);
     }
     return UserListPainter::sizeHint();
@@ -360,7 +360,7 @@ QSize UserListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const Q
 
 void UserListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (!SettingsCache::instance().getStyleUserList()) {
+    if (!SettingsCache::instance().interface().getStyleUserList()) {
         QStyledItemDelegate::paint(painter, option, index);
         return;
     }
@@ -524,7 +524,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
 
     // Pin on item click
     connect(userTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item, int) {
-        if (!SettingsCache::instance().getStyleUserList()) {
+        if (!SettingsCache::instance().interface().getStyleUserList()) {
             return;
         }
         const QString name = static_cast<UserListTWI *>(item)->getUserInfo().name().c_str();
@@ -556,7 +556,8 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     connect(cardArtProvider, &UserCardArtProvider::cardArtUpdated, this,
             [this](const QString &) { userTree->viewport()->update(); });
 
-    connect(&SettingsCache::instance(), &SettingsCache::styleUserListChanged, this, &UserListWidget::applyDisplayMode);
+    connect(&SettingsCache::instance().interface(), &InterfaceSettings::styleUserListChanged, this,
+            &UserListWidget::applyDisplayMode);
     applyDisplayMode();
 
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -661,7 +662,7 @@ void UserListWidget::hideEvent(QHideEvent *e)
 
 void UserListWidget::applyDisplayMode()
 {
-    const bool styled = SettingsCache::instance().getStyleUserList();
+    const bool styled = SettingsCache::instance().interface().getStyleUserList();
 
     if (styled) {
         userTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -720,7 +721,7 @@ bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj == userTree->viewport()) {
         if (event->type() == QEvent::MouseMove) {
-            if (!SettingsCache::instance().getStyleUserList()) {
+            if (!SettingsCache::instance().interface().getStyleUserList()) {
                 return QGroupBox::eventFilter(obj, event);
             }
             auto *me = static_cast<QMouseEvent *>(event);

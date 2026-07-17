@@ -143,7 +143,7 @@ QStringMap &ThemeManager::getAvailableThemes()
     availableThemes.clear();
 
     // load themes from user profile dir
-    dir.setPath(SettingsCache::instance().getThemesPath());
+    dir.setPath(SettingsCache::instance().paths().getThemesPath());
 
     // add default value
     availableThemes.insert(NONE_THEME_NAME, dir.absoluteFilePath("Default"));

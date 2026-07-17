@@ -21,14 +21,14 @@ TallyMenu::TallyMenu()
 
 QAction *TallyMenu::createTallyAction(TallyType tallyType)
 {
-    TallyType currentType = Tally::intToType(SettingsCache::instance().getTallyType());
+    TallyType currentType = Tally::intToType(SettingsCache::instance().interface().getTallyType());
 
     QAction *action = new QAction(this);
     action->setCheckable(true);
     action->setChecked(tallyType == currentType);
 
-    connect(action, &QAction::triggered, &SettingsCache::instance(),
-            [tallyType] { SettingsCache::instance().setTallyType(static_cast<int>(tallyType)); });
+    connect(action, &QAction::triggered, &SettingsCache::instance().interface(),
+            [tallyType] { SettingsCache::instance().interface().setTallyType(static_cast<int>(tallyType)); });
 
     actionGroup->addAction(action);
 

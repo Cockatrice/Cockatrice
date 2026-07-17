@@ -95,8 +95,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
             &DeckViewContainer::refreshShortcuts);
     refreshShortcuts();
 
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageInGameChanged, this,
-            &DeckViewContainer::setVisualDeckStorageExists);
+    connect(&SettingsCache::instance().visualDeckStorage(), &VisualDeckStorageSettings::visualDeckStorageInGameChanged,
+            this, &DeckViewContainer::setVisualDeckStorageExists);
 
     switchToDeckSelectView();
 }
@@ -138,7 +138,7 @@ static void setVisibility(QPushButton *button, bool visible)
 
 void DeckViewContainer::switchToDeckSelectView()
 {
-    if (SettingsCache::instance().getVisualDeckStorageInGame()) {
+    if (SettingsCache::instance().visualDeckStorage().getVisualDeckStorageInGame()) {
         deckView->setHidden(true);
 
         tryCreateVisualDeckStorageWidget();

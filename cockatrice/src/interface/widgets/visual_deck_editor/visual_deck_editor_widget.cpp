@@ -43,9 +43,10 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
 
     initializeScrollAreaAndZoneContainer();
 
-    cardSizeWidget = new CardSizeWidget(this, nullptr, SettingsCache::instance().getVisualDeckEditorCardSize());
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckEditorCardSize);
+    cardSizeWidget =
+        new CardSizeWidget(this, nullptr, SettingsCache::instance().visualDeckStorage().getVisualDeckEditorCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::setVisualDeckEditorCardSize);
 
     mainLayout->addWidget(displayOptionsAndSearch);
     mainLayout->addWidget(scrollArea);

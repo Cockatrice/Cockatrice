@@ -199,7 +199,7 @@ void AbstractTabDeckEditor::cleanDeckAndResetModified()
  */
 AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const bool openInSameTabIfBlank)
 {
-    if (SettingsCache::instance().getOpenDeckInNewTab()) {
+    if (SettingsCache::instance().interface().getOpenDeckInNewTab()) {
         if (openInSameTabIfBlank && deckStateManager->isBlankNewDeck()) {
             return SAME_TAB;
         } else {
@@ -350,7 +350,7 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     DeckList deckList = deckStateManager->getDeckList();
 
     QFileDialog dialog(this, tr("Save deck"));
-    dialog.setDirectory(SettingsCache::instance().getDeckPath());
+    dialog.setDirectory(SettingsCache::instance().paths().getDeckPath());
     dialog.setAcceptMode(QFileDialog::AcceptSave);
     dialog.setDefaultSuffix("cod");
     dialog.setNameFilters(DeckLoader::FILE_NAME_FILTERS);

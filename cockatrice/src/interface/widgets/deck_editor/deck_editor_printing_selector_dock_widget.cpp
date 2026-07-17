@@ -18,8 +18,9 @@ DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(Abstr
     createPrintingSelectorDock();
     printingDisabledInfoWidget = new PrintingDisabledInfoWidget(this);
 
-    setVisibleWidget(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
-    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
+    setVisibleWidget(SettingsCache::instance().cardsDisplay().getOverrideAllCardArtWithPersonalPreference());
+    connect(&SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::overrideAllCardArtWithPersonalPreferenceChanged, this,
             &DeckEditorPrintingSelectorDockWidget::setVisibleWidget);
 
     retranslateUi();

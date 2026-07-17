@@ -14,7 +14,7 @@ public:
 
     [[nodiscard]] bool getIncludeRebalancedCards() const override
     {
-        return SettingsCache::instance().getIncludeRebalancedCards();
+        return SettingsCache::instance().cardsDisplay().getIncludeRebalancedCards();
     }
 };
 

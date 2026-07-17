@@ -94,9 +94,10 @@ TabEdhRecMain::TabEdhRecMain(TabSupervisor *_tabSupervisor) : Tab(_tabSupervisor
 
     settingsButton = new SettingsButtonWidget(this);
 
-    cardSizeSlider = new CardSizeWidget(this, nullptr, SettingsCache::instance().getEDHRecCardSize());
-    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
-            &SettingsCache::setEDHRecCardSize);
+    cardSizeSlider =
+        new CardSizeWidget(this, nullptr, SettingsCache::instance().visualDeckStorage().getEDHRecCardSize());
+    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::setEDHRecCardSize);
 
     settingsButton->addSettingsWidget(cardSizeSlider);
 

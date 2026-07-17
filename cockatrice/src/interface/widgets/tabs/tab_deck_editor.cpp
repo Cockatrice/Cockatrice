@@ -59,7 +59,8 @@ void TabDeckEditor::createMenus()
     registerDockWidget(viewMenu, filterDockWidget, {250, 250});
     registerDockWidget(viewMenu, printingSelectorDockWidget, {525, 250});
 
-    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
+    connect(&SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::overrideAllCardArtWithPersonalPreferenceChanged, this,
             [this](bool enabled) { dockToActions[printingSelectorDockWidget].menu->setEnabled(!enabled); });
 
     viewMenu->addSeparator();

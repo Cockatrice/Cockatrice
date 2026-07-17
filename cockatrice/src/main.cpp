@@ -125,7 +125,7 @@ LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *exceptionPoin
 
 void installNewTranslator()
 {
-    QString lang = SettingsCache::instance().getLang();
+    QString lang = SettingsCache::instance().personal().getLang();
 
     QString qtNameHint = "qt_" + lang;
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
     // Dependency Injections
     CardDatabaseManager::setCardPreferenceProvider(new SettingsCardPreferenceProvider());
     CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance());
-    CardDatabaseManager::setCardSetPriorityController(SettingsCache::instance().cardDatabase());
+    CardDatabaseManager::setCardSetPriorityController(&SettingsCache::instance().cardDatabase());
 
     qCInfo(MainLog) << "Starting main program";
 
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
     // set name of the app desktop file; used by wayland to load the window icon
     QGuiApplication::setDesktopFileName("cockatrice");
 
-    SettingsCache::instance().setClientID(generateClientID());
+    SettingsCache::instance().personal().setClientID(generateClientID());
 
     // If spoiler mode is enabled, we will download the spoilers
     // then reload the DB. otherwise just reload the DB
@@ -275,7 +275,8 @@ int main(int argc, char *argv[])
     qCInfo(MainLog) << "ui.show() finished";
 
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
-    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, !SettingsCache::instance().getShowShortcuts());
+    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus,
+                       !SettingsCache::instance().cardsDisplay().getShowShortcuts());
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);

@@ -13,6 +13,7 @@
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), folderWidget(nullptr)
 {
@@ -54,10 +55,12 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     // tag filter box
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
-    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagFilter());
+    updateTagsVisibility(SettingsCache::instance().visualDeckStorage().getVisualDeckStorageShowTagFilter());
 
-    deckPreviewSelectionAnimationEnabled = SettingsCache::instance().getVisualDeckStorageSelectionAnimation();
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageSelectionAnimationChanged, this,
+    deckPreviewSelectionAnimationEnabled =
+        SettingsCache::instance().visualDeckStorage().getVisualDeckStorageSelectionAnimation();
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDeckStorageSelectionAnimationChanged, this,
             &VisualDeckStorageWidget::updateSelectionAnimationEnabled);
 
     // deck area
@@ -142,8 +145,8 @@ void VisualDeckStorageWidget::reapplySortAndFilters()
 
 void VisualDeckStorageWidget::createRootFolderWidget()
 {
-    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().getDeckPath(), false,
-                                                            quickSettingsWidget->getShowFolders());
+    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().paths().getDeckPath(),
+                                                            false, quickSettingsWidget->getShowFolders());
 
     scrollArea->setWidget(folderWidget); // this automatically destroys the old folderWidget
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());

@@ -21,7 +21,8 @@ ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_colorI
 
     populateManaSymbolWidgets();
 
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDeckStorageDrawUnusedColorIdentitiesChanged, this,
             &ColorIdentityWidget::toggleUnusedVisibility);
 }
 
@@ -40,7 +41,7 @@ void ColorIdentityWidget::populateManaSymbolWidgets()
     QtUtils::clearLayoutRec(layout);
 
     // populate mana symbols
-    if (SettingsCache::instance().getVisualDeckStorageDrawUnusedColorIdentities()) {
+    if (SettingsCache::instance().visualDeckStorage().getVisualDeckStorageDrawUnusedColorIdentities()) {
         for (const QString symbol : fullColorIdentity) {
             auto *manaSymbol = new ManaSymbolWidget(this, symbol, symbols.contains(symbol));
             layout->addWidget(manaSymbol);

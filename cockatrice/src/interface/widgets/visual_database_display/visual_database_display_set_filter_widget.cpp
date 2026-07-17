@@ -21,17 +21,19 @@ VisualDatabaseDisplayRecentSetFilterSettingsWidget::VisualDatabaseDisplayRecentS
 
     filterToMostRecentSetsCheckBox = new QCheckBox(this);
     filterToMostRecentSetsCheckBox->setChecked(
-        SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsEnabled());
-    connect(filterToMostRecentSetsCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled);
+        SettingsCache::instance().visualDeckStorage().getVisualDatabaseDisplayFilterToMostRecentSetsEnabled());
+    connect(filterToMostRecentSetsCheckBox, &QCheckBox::QT_STATE_CHANGED,
+            &SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::setVisualDatabaseDisplayFilterToMostRecentSetsEnabled);
 
     filterToMostRecentSetsAmount = new QSpinBox(this);
     filterToMostRecentSetsAmount->setMinimum(1);
     filterToMostRecentSetsAmount->setMaximum(100);
     filterToMostRecentSetsAmount->setValue(
-        SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsAmount());
-    connect(filterToMostRecentSetsAmount, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
-            &SettingsCache::setVisualDatabaseDisplayFilterToMostRecentSetsAmount);
+        SettingsCache::instance().visualDeckStorage().getVisualDatabaseDisplayFilterToMostRecentSetsAmount());
+    connect(filterToMostRecentSetsAmount, qOverload<int>(&QSpinBox::valueChanged),
+            &SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::setVisualDatabaseDisplayFilterToMostRecentSetsAmount);
 
     layout->addWidget(filterToMostRecentSetsCheckBox);
     layout->addWidget(filterToMostRecentSetsAmount);
@@ -66,9 +68,11 @@ VisualDatabaseDisplaySetFilterWidget::VisualDatabaseDisplaySetFilterWidget(QWidg
     recentSetsSettingsWidget = new VisualDatabaseDisplayRecentSetFilterSettingsWidget(this);
     layout->addWidget(recentSetsSettingsWidget);
 
-    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged, this,
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged, this,
             &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
-    connect(&SettingsCache::instance(), &SettingsCache::visualDatabaseDisplayFilterToMostRecentSetsAmountChanged, this,
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDatabaseDisplayFilterToMostRecentSetsAmountChanged, this,
             &VisualDatabaseDisplaySetFilterWidget::filterToRecentSets);
 
     // Create the toggle button for Exact Match/Includes mode
@@ -118,7 +122,7 @@ void VisualDatabaseDisplaySetFilterWidget::createSetButtons()
 
 void VisualDatabaseDisplaySetFilterWidget::filterToRecentSets()
 {
-    if (SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsEnabled()) {
+    if (SettingsCache::instance().visualDeckStorage().getVisualDatabaseDisplayFilterToMostRecentSetsEnabled()) {
         for (auto set : activeSets.keys()) {
             activeSets[set] = false;
         }
@@ -129,7 +133,8 @@ void VisualDatabaseDisplaySetFilterWidget::filterToRecentSets()
         std::sort(allSets.begin(), allSets.end(),
                   [](const auto &a, const auto &b) { return a->getReleaseDate() > b->getReleaseDate(); });
 
-        int setsToPreactivate = SettingsCache::instance().getVisualDatabaseDisplayFilterToMostRecentSetsAmount();
+        int setsToPreactivate =
+            SettingsCache::instance().visualDeckStorage().getVisualDatabaseDisplayFilterToMostRecentSetsAmount();
         int setsActivated = 0;
 
         for (const auto &set : allSets) {

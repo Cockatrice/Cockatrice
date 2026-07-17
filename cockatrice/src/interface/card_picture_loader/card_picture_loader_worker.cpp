@@ -1,6 +1,7 @@
 #include "card_picture_loader_worker.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "card_picture_loader_cache_method.h"
 #include "card_picture_loader_local.h"
 #include "card_picture_loader_worker_work.h"
 
@@ -15,7 +16,8 @@
 static constexpr int MAX_REQUESTS_PER_SEC = 10;
 
 CardPictureLoaderWorker::CardPictureLoaderWorker()
-    : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload()), requestQuota(MAX_REQUESTS_PER_SEC)
+    : QObject(nullptr), picDownload(SettingsCache::instance().personal().getPicDownload()),
+      requestQuota(MAX_REQUESTS_PER_SEC)
 {
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
@@ -25,13 +27,14 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     cache = new QNetworkDiskCache(this);
     cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
     cache->setMaximumCacheSize(1024L * 1024L *
-                               static_cast<qint64>(SettingsCache::instance().getNetworkCacheSizeInMB()));
+                               static_cast<qint64>(SettingsCache::instance().cacheStorage().getNetworkCacheSizeInMB()));
 
-    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, cache, [this](int newSizeInMB) {
-        if (cache) {
-            cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB));
-        }
-    });
+    connect(&SettingsCache::instance().cacheStorage(), &CacheStorageSettings::networkCacheSizeChanged, cache,
+            [this](int newSizeInMB) {
+                if (cache) {
+                    cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB));
+                }
+            });
 
     networkManager->setCache(cache);
 
@@ -39,7 +42,7 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
 
-    cacheFilePath = SettingsCache::instance().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
+    cacheFilePath = SettingsCache::instance().paths().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
     loadRedirectCache();
     cleanStaleEntries();
 
@@ -72,7 +75,8 @@ void CardPictureLoaderWorker::queueRequest(const QUrl &url, CardPictureLoaderWor
         queueRequest(cachedRedirect, worker);
         return;
     }
-    if (SettingsCache::instance().getCardPictureLoaderCacheMethod() ==
+    if (static_cast<CardPictureLoaderCacheMethod::CacheMethod>(
+            SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
             CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE &&
         cache->metaData(url).isValid()) {
         // If we hit a cached url, we get to make the request for free, since it won't contribute towards the
@@ -98,8 +102,10 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
     req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     req.setRawHeader("Accept", "image/avif,image/webp,image/apng,image/,/*;q=0.8");
 
-    bool useNetworkCache = !picDownload && SettingsCache::instance().getCardPictureLoaderCacheMethod() ==
-                                               CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE;
+    bool useNetworkCache =
+        !picDownload && static_cast<CardPictureLoaderCacheMethod::CacheMethod>(
+                            SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
+                            CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE;
 
     req.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
                      useNetworkCache ? QNetworkRequest::AlwaysCache : QNetworkRequest::AlwaysNetwork);
@@ -229,7 +235,7 @@ void CardPictureLoaderWorker::cleanStaleEntries()
 
     auto it = redirectCache.begin();
     while (it != redirectCache.end()) {
-        if (it.value().second.addDays(SettingsCache::instance().getRedirectCacheTtl()) < now) {
+        if (it.value().second.addDays(SettingsCache::instance().cacheStorage().getRedirectCacheTtl()) < now) {
             it = redirectCache.erase(it); // Remove stale entry
         } else {
             ++it;

@@ -279,7 +279,7 @@ void CardItem::drawArrow(const QColor &arrowColor)
     auto *game = owner->getGame();
     PlayerLogic *arrowOwner = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
     int phase = 0; // 0 means to not set the phase
-    if (SettingsCache::instance().getDoNotDeleteArrowsInSubPhases()) {
+    if (SettingsCache::instance().interface().getDoNotDeleteArrowsInSubPhases()) {
         int currentPhase = game->getGameState()->getCurrentPhase();
         phase = Phases::getLastSubphase(currentPhase) + 1;
     }
@@ -398,7 +398,7 @@ void CardItem::playCard(bool faceDown)
     if (tz) {
         emit tz->toggleTapped();
     } else {
-        if (SettingsCache::instance().getClickPlaysAllSelected()) {
+        if (SettingsCache::instance().interface().getClickPlaysAllSelected()) {
             if (faceDown) {
                 emit playSelectedFaceDown(this);
             } else {
@@ -462,7 +462,7 @@ static bool isUnwritableRevealZone(CardZoneLogic *zone)
 void CardItem::handleClickedToPlay(bool shiftHeld)
 {
     if (isUnwritableRevealZone(state->getZone())) {
-        if (SettingsCache::instance().getClickPlaysAllSelected()) {
+        if (SettingsCache::instance().interface().getClickPlaysAllSelected()) {
             emit hideSelected(this);
         } else {
             state->getZone()->removeCard(this);
@@ -479,7 +479,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         return;
     }
     if ((event->modifiers() != Qt::AltModifier) && (event->button() == Qt::LeftButton) &&
-        (!SettingsCache::instance().getDoubleClickToPlay())) {
+        (!SettingsCache::instance().interface().getDoubleClickToPlay())) {
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
     if (owner != nullptr) {
@@ -491,7 +491,7 @@ void CardItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void CardItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     if ((event->modifiers() != Qt::AltModifier) && (event->buttons() == Qt::LeftButton) &&
-        (SettingsCache::instance().getDoubleClickToPlay())) {
+        (SettingsCache::instance().interface().getDoubleClickToPlay())) {
         handleClickedToPlay(event->modifiers().testFlag(Qt::ShiftModifier));
     }
     event->accept();
