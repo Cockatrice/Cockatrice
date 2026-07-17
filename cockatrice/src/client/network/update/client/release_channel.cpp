@@ -60,13 +60,14 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
         }
         return false;
     }();
-    static const QRegularExpression macIntelRegex(R"(macOS(\d+)_Intel\.[^.]+$)",
+    static const QRegularExpression macIntelRegex(R"(-macOS(\d+)_Intel\.[^.]+$)",
                                                   QRegularExpression::CaseInsensitiveOption);
-    static const QRegularExpression macArmRegex(R"(macOS(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression macArmRegex(R"(-macOS(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
     regex = isIntel ? &macIntelRegex : &macArmRegex;
 
 #elif defined(Q_OS_WIN)
-    static const QRegularExpression winRegex(R"(Win(?:dows)?(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression winRegex(R"(-(?:Win|Windows)(\d+)\.[^.]+$)",
+                                             QRegularExpression::CaseInsensitiveOption);
     regex = &winRegex;
 
 #else // if the OS doesn't fit one of the above #defines, then it will never match
