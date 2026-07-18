@@ -6,6 +6,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential \
   cmake \
+  ninja-build \
   file \
   g++ \
   git \
@@ -19,10 +20,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /src
 COPY . .
-RUN mkdir build && cd build && \
-    cmake .. -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0 && \
-    make -j$(nproc) && \
-    make install
+RUN cmake -S . -B build \
+  -G Ninja \
+  -DWITH_SERVER=1 \
+  -DWITH_CLIENT=0 \
+  -DWITH_ORACLE=0 \
+    && cmake --build build \
+    && cmake --install build
 
 
 # -------- Runtime Stage (clean) --------
