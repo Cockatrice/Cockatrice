@@ -6,7 +6,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
       build-essential \
-      ccache \
       cmake \
       ninja-build \
       file \
@@ -20,24 +19,17 @@ RUN apt-get update \
       qt6-tools-dev \
       qt6-tools-dev-tools
 
-ENV CCACHE_DIR=/root/.ccache
-ENV CCACHE_MAXSIZE=550M
 WORKDIR /src
 COPY . .
-RUN --mount=type=cache,id=ccache,target=/root/.ccache \
-    cmake \
-	  -S . \
+RUN cmake \
+      -S . \
 	  -B build \
       -G Ninja \
-      -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-      -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
       -DWITH_SERVER=1 \
       -DWITH_CLIENT=0 \
       -DWITH_ORACLE=0 \
     && cmake --build build \
-    && cmake --install build \
-	&& ccache --show-config \
-    && ccache --show-stats
+    && cmake --install build
 
 
 # -------- Runtime Stage (clean) --------
