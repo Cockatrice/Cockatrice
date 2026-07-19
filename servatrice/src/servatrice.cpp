@@ -46,9 +46,6 @@
 #include <libcockatrice/protocol/pb/event_server_shutdown.pb.h>
 #include <server_room.h>
 
-
-/* test */
-
 Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
                                              int _numberPools,
                                              const QSqlDatabase &_sqlDatabase,
