@@ -57,6 +57,9 @@ private:
     QString themeDirPath;
     QString themeName;
     QString loadedScheme;
+    // Directory writes are directed to; may differ from themeDirPath when the
+    // latter is read-only (e.g. a built-in / system theme directory).
+    QString saveDir;
 
     QMap<QString, PaletteConfig> workingConfig;
     QMap<QString, PaletteConfig> savedConfig;
