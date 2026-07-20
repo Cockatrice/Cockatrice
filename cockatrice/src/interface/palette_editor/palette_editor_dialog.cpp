@@ -10,6 +10,7 @@
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QFrame>
 #include <QGuiApplication>
@@ -175,15 +176,8 @@ void PaletteEditorDialog::retranslateUi()
     setWindowTitle(tr("Palette Editor — %1").arg(themeName));
     titleLabel->setText(tr("<b>Palette Editor</b> &nbsp;·&nbsp; %1").arg(themeName));
 
-    // Revert button only makes sense when the theme ships default palette files
-    const bool hasDefault = ThemeManager::loadDefaultPaletteConfig(themeDirPath, themeName, "Light").hasPalette() ||
-                            ThemeManager::loadDefaultPaletteConfig(themeDirPath, themeName, "Dark").hasPalette();
-    revertButton->setEnabled(hasDefault);
-    if (!hasDefault) {
-        revertButton->setToolTip(tr("This theme ships no default palette files"));
-    } else {
-        revertButton->setToolTip(tr("Replace current colours with the theme author's defaults"));
-    }
+    revertButton->setToolTip(
+        tr("Delete this scheme's custom palette and revert to the theme default (or the application palette)"));
 
     schemeComboBox->setToolTip(tr("Switch between the light and dark palette files"));
     editingLabel->setText(tr("Editing:"));
@@ -309,12 +303,33 @@ void PaletteEditorDialog::onReset()
 
 void PaletteEditorDialog::onRevertToDefault()
 {
+    // Delete this scheme's custom palette file so the theme falls back to its
+    // default (or, when it ships none, the application palette).
+    const QString fileName = PaletteConfig::fileName(loadedScheme);
+    QFile::remove(QDir(saveDir).absoluteFilePath(fileName));
+    if (!themeDirPath.isEmpty() && themeDirPath != saveDir) {
+        QFile::remove(QDir(themeDirPath).absoluteFilePath(fileName));
+    }
+
+    // Reload the live theme so the revert takes effect immediately.
+    themeManager->reloadCurrentTheme();
+
+    // Reflect the resolved palette (theme default, else current app palette) in
+    // the editor so it no longer shows the deleted custom colours.
     PaletteConfig def = ThemeManager::loadDefaultPaletteConfig(themeDirPath, themeName, loadedScheme);
     if (!def.hasPalette()) {
-        QMessageBox::information(this, tr("No default found"),
-                                 tr("No default palette file found for the \"%1\" scheme.").arg(loadedScheme));
-        return;
+        const QPalette appPal = qApp->palette();
+        for (auto group : {QPalette::Active, QPalette::Disabled, QPalette::Inactive}) {
+            for (int i = 0; i < QPalette::NColorRoles; ++i) {
+                auto role = static_cast<QPalette::ColorRole>(i);
+                if (role != QPalette::NoRole) {
+                    def.colors[group][role] = appPal.color(group, role);
+                }
+            }
+        }
     }
+
+    savedConfig[loadedScheme] = def;
     workingConfig[loadedScheme] = def;
     paletteGrid->loadPalette(def);
 }
