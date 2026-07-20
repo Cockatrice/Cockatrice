@@ -81,6 +81,7 @@ public:
     static PaletteConfig
     loadDefaultPaletteConfig(const QString &themeDirPath, const QString &themeName, const QString &colorScheme);
     void setColorScheme(const QString &scheme);
+    void setStyleName(const QString &styleName);
 
     void reloadCurrentTheme();
     void previewPalette(const PaletteConfig &cfg, const QString &scheme);

@@ -92,9 +92,12 @@ struct PaletteColorInfo
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     defaultStyleName = qApp->style()->objectName();
-    //! \todo Workaround for windows11 style being broken.
-    if (defaultStyleName == "windows11") {
-        defaultStyleName = "windowsvista";
+    // On Windows, Qt may report the legacy "windowsvista" style as the default.
+    // Prefer the modern "windows11" style when it is available; "windowsvista"
+    // remains selectable through the per-theme style setting.
+    if (defaultStyleName.compare("windowsvista", Qt::CaseInsensitive) == 0 &&
+        QStyleFactory::keys().contains("windows11", Qt::CaseInsensitive)) {
+        defaultStyleName = "windows11";
     }
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
@@ -268,6 +271,17 @@ void ThemeManager::setColorScheme(const QString &scheme)
     ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
 
     cfg.colorScheme = scheme;
+
+    cfg.save(dirPath);
+    reloadCurrentTheme();
+}
+
+void ThemeManager::setStyleName(const QString &styleName)
+{
+    const QString dirPath = getAvailableThemes().value(SettingsCache::instance().getThemeName());
+    ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
+
+    cfg.styleName = styleName;
 
     cfg.save(dirPath);
     reloadCurrentTheme();
