@@ -99,6 +99,8 @@ ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
         QStyleFactory::keys().contains("windows11", Qt::CaseInsensitive)) {
         defaultStyleName = "windows11";
     }
+    // Capture the untouched application palette before any theme is applied.
+    defaultPalette = qApp->palette();
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, &ThemeManager::themeChangedSlot);
@@ -332,7 +334,11 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         }
 #endif
     } else {
-        base = qApp->palette();
+        // Use the pristine startup palette rather than qApp->palette(): the
+        // latter may already carry a previously-applied custom (e.g. dark)
+        // palette, which would otherwise persist when switching to a scheme
+        // that supplies no palette of its own.
+        base = defaultPalette;
     }
 
     // Overlay custom palette colours

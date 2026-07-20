@@ -43,6 +43,10 @@ public:
 
 private:
     QString defaultStyleName;
+    // Pristine application palette captured at startup, before any custom theme
+    // palette is applied. Used as the base when a theme supplies no palette, so
+    // switching away from a custom palette restores the original colours.
+    QPalette defaultPalette;
     QString currentThemePath;
     std::array<QBrush, Role::MaxRole + 1> brushes;
     QStringMap availableThemes;
