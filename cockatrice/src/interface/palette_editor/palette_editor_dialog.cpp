@@ -176,8 +176,8 @@ void PaletteEditorDialog::retranslateUi()
     titleLabel->setText(tr("<b>Palette Editor</b> &nbsp;·&nbsp; %1").arg(themeName));
 
     // Revert button only makes sense when the theme ships default palette files
-    const bool hasDefault = PaletteConfig::fromDefault(themeDirPath, "Light").hasPalette() ||
-                            PaletteConfig::fromDefault(themeDirPath, "Dark").hasPalette();
+    const bool hasDefault = ThemeManager::loadDefaultPaletteConfig(themeDirPath, themeName, "Light").hasPalette() ||
+                            ThemeManager::loadDefaultPaletteConfig(themeDirPath, themeName, "Dark").hasPalette();
     revertButton->setEnabled(hasDefault);
     if (!hasDefault) {
         revertButton->setToolTip(tr("This theme ships no default palette files"));
@@ -211,7 +211,7 @@ void PaletteEditorDialog::loadSchemes()
         PaletteConfig cfg = PaletteConfig::fromScheme(themeDirPath, scheme);
 
         if (!cfg.hasPalette()) {
-            cfg = PaletteConfig::fromDefault(themeDirPath, scheme);
+            cfg = ThemeManager::loadDefaultPaletteConfig(themeDirPath, themeName, scheme);
         }
 
         if (!cfg.hasPalette()) {
@@ -309,7 +309,7 @@ void PaletteEditorDialog::onReset()
 
 void PaletteEditorDialog::onRevertToDefault()
 {
-    PaletteConfig def = PaletteConfig::fromDefault(themeDirPath, loadedScheme);
+    PaletteConfig def = ThemeManager::loadDefaultPaletteConfig(themeDirPath, themeName, loadedScheme);
     if (!def.hasPalette()) {
         QMessageBox::information(this, tr("No default found"),
                                  tr("No default palette file found for the \"%1\" scheme.").arg(loadedScheme));

@@ -137,6 +137,20 @@ bool ThemeManager::isBuiltInTheme()
     return themeName == NONE_THEME_NAME || themeName == FUSION_THEME_NAME;
 }
 
+// System (read-only) themes location, relative to the application binary.
+static QString systemThemesBasePath()
+{
+    QString base = qApp->applicationDirPath();
+#ifdef Q_OS_MAC
+    base += "/../Resources/themes";
+#elif defined(Q_OS_WIN)
+    base += "/themes";
+#else // linux
+    base += "/../share/cockatrice/themes";
+#endif
+    return base;
+}
+
 QStringMap &ThemeManager::getAvailableThemes()
 {
     QDir dir;
@@ -157,15 +171,7 @@ QStringMap &ThemeManager::getAvailableThemes()
     }
 
     // load themes from cockatrice system dir
-    dir.setPath(qApp->applicationDirPath() +
-#ifdef Q_OS_MAC
-                "/../Resources/themes"
-#elif defined(Q_OS_WIN)
-                "/themes"
-#else // linux
-                "/../share/cockatrice/themes"
-#endif
-    );
+    dir.setPath(systemThemesBasePath());
 
     for (QString themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
         if (!availableThemes.contains(themeName)) {
@@ -240,6 +246,20 @@ bool ThemeManager::savePaletteConfig(const QString &themeDirPath, const QString 
 
     QTextStream(&f) << cfg.toToml();
     return true;
+}
+
+PaletteConfig ThemeManager::loadDefaultPaletteConfig(const QString &themeDirPath,
+                                                     const QString &themeName,
+                                                     const QString &colorScheme)
+{
+    PaletteConfig cfg = PaletteConfig::fromDefault(themeDirPath, colorScheme);
+    if (!cfg.hasPalette()) {
+        // The shipped default may live in the system theme directory rather
+        // than the resolved (user) theme directory, so built-in themes still
+        // get their curated defaults.
+        cfg = PaletteConfig::fromDefault(QDir(systemThemesBasePath()).absoluteFilePath(themeName), colorScheme);
+    }
+    return cfg;
 }
 
 void ThemeManager::setColorScheme(const QString &scheme)
@@ -353,7 +373,7 @@ void ThemeManager::themeChangedSlot()
     // ── Load palette: custom first, then theme default ────────────────────
     PaletteConfig palette = PaletteConfig::fromScheme(dirPath, activeScheme);
     if (!palette.hasPalette()) {
-        palette = PaletteConfig::fromDefault(dirPath, activeScheme);
+        palette = ThemeManager::loadDefaultPaletteConfig(dirPath, themeName, activeScheme);
     }
 
     applyStyleAndPalette(themeName, themeCfg, palette, activeScheme);

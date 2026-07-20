@@ -76,6 +76,10 @@ public:
     // Load/save per-scheme palette colors
     static PaletteConfig loadPaletteConfig(const QString &themeDirPath, const QString &colorScheme);
     static bool savePaletteConfig(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg);
+    // Load the theme's shipped default palette, falling back to the system
+    // theme directory when it is absent from the resolved (user) directory.
+    static PaletteConfig
+    loadDefaultPaletteConfig(const QString &themeDirPath, const QString &themeName, const QString &colorScheme);
     void setColorScheme(const QString &scheme);
 
     void reloadCurrentTheme();
