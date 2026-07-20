@@ -82,6 +82,10 @@ while [[ $# != 0 ]]; do
       CCACHE_EVICTION_AGE=$1
       shift
       ;;
+    '--lld')
+      USE_LLD=1
+      shift
+      ;;
     '--vcpkg')
       USE_VCPKG=1
       shift
@@ -159,6 +163,10 @@ if [[ $PACKAGE_TYPE ]]; then
 fi
 if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
+fi
+if [[ $USE_LLD ]]; then
+  flags+=("-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=lld")
+  flags+=("-DCMAKE_SHARED_LINKER_FLAGS=-fuse-ld=lld")
 fi
 
 # Add cmake --build flags

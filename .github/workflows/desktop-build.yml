@@ -180,7 +180,7 @@ jobs:
         run: |
           source .ci/docker.sh
           RUN --server --debug --test --ccache "$CCACHE_SIZE" \
-            --cmake-generator "$CMAKE_GENERATOR"
+            --cmake-generator "$CMAKE_GENERATOR" --lld
 
       - name: "Build release package"
         id: build
@@ -198,6 +198,7 @@ jobs:
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
           args+=(--suffix "$SUFFIX")
+          args+=(--lld)
 
           RUN --server --release --package "$package" "${args[@]}"
 

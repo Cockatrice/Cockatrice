@@ -5,6 +5,7 @@ RUN dnf install -y \
         cmake \
         gcc-c++ \
         git \
+		lld \
         mariadb-devel \
         ninja-build \
         protobuf-devel \

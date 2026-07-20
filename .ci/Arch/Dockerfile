@@ -6,6 +6,7 @@ RUN pacman --sync --refresh --sysupgrade --needed --noconfirm \
         cmake \
         git \
         gtest \
+		lld \
         mariadb-libs \
         ninja \
         protobuf \

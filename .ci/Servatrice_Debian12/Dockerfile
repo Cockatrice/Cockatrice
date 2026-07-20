@@ -12,6 +12,7 @@ RUN apt-get update && \
         libmariadb-dev-compat \
         libprotobuf-dev \
         libqt6sql6-mysql \
+		lld \
         ninja-build \
         protobuf-compiler \
         qt6-tools-dev \
