@@ -3,7 +3,6 @@
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QPushButton>
 #include <QSlider>
 
 QuickSetupPanel::QuickSetupPanel(QWidget *parent) : QWidget(parent)
@@ -41,8 +40,6 @@ QuickSetupPanel::QuickSetupPanel(QWidget *parent) : QWidget(parent)
     intensityPercentageLabel->setFixedWidth(34);
     intensityPercentageLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
-    generateButton = new QPushButton(this);
-
     layout->addWidget(heading);
     layout->addSpacing(6);
     layout->addWidget(accentLabel);
@@ -54,12 +51,13 @@ QuickSetupPanel::QuickSetupPanel(QWidget *parent) : QWidget(parent)
     layout->addWidget(labelHigh);
     layout->addWidget(intensityPercentageLabel);
     layout->addStretch();
-    layout->addWidget(generateButton);
 
-    connect(intensitySlider, &QSlider::valueChanged, this,
-            [this](int v) { intensityPercentageLabel->setText(tr("%1%").arg(v)); });
-    connect(generateButton, &QPushButton::clicked, this,
-            [this] { emit generateRequested(accentButton->getColor(), intensitySlider->value()); });
+    connect(intensitySlider, &QSlider::valueChanged, this, [this](int v) {
+        intensityPercentageLabel->setText(tr("%1%").arg(v));
+        emit valueChanged(accentButton->getColor(), v);
+    });
+    connect(accentButton, &ColorButton::colorChanged, this,
+            [this](const QColor &c) { emit valueChanged(c, intensitySlider->value()); });
     retranslateUi();
 }
 
@@ -77,10 +75,6 @@ void QuickSetupPanel::retranslateUi()
                                    "30–70  Accented — buttons, tooltips, and borders join in\n"
                                    "70–100 Full colour — backgrounds, everything"));
     intensityPercentageLabel->setText(tr("70%"));
-
-    generateButton->setText(tr("Generate ↓"));
-    generateButton->setToolTip(tr("Derive all palette roles from the accent colour above.\n"
-                                  "Fine-tune individual colours in the grid afterwards."));
 }
 
 QColor QuickSetupPanel::accentColor() const

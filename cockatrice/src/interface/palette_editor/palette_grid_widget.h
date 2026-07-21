@@ -22,6 +22,9 @@ public:
     void loadPalette(const PaletteConfig &cfg);
     PaletteConfig currentPaletteConfig() const;
 
+signals:
+    void paletteChanged();
+
 private:
     void buildGrid(QWidget *host);
     void changeEvent(QEvent *e);

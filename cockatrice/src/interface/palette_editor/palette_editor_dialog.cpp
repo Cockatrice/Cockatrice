@@ -138,8 +138,7 @@ void PaletteEditorDialog::setupUi()
 
     buttonBox = new QDialogButtonBox;
     resetBtn = buttonBox->addButton(tr("Reset"), QDialogButtonBox::ResetRole);
-    applyBtn = buttonBox->addButton(tr("Apply"), QDialogButtonBox::ApplyRole);
-    saveBtn = buttonBox->addButton(tr("Save && Apply"), QDialogButtonBox::AcceptRole);
+    saveBtn = buttonBox->addButton(tr("Save"), QDialogButtonBox::AcceptRole);
     closeBtn = buttonBox->addButton(QDialogButtonBox::Close);
 
     footerLayout->addWidget(revertButton);
@@ -149,10 +148,14 @@ void PaletteEditorDialog::setupUi()
 
     // Connections
     connect(schemeComboBox, &QComboBox::currentTextChanged, this, &PaletteEditorDialog::onSchemeChanged);
-    connect(quickSetupPanel, &QuickSetupPanel::generateRequested, this, &PaletteEditorDialog::onGenerateFromAccent);
+    autoApplyTimer = new QTimer(this);
+    autoApplyTimer->setSingleShot(true);
+    autoApplyTimer->setInterval(150);
+    connect(autoApplyTimer, &QTimer::timeout, this, &PaletteEditorDialog::onApply);
+    connect(quickSetupPanel, &QuickSetupPanel::valueChanged, this, &PaletteEditorDialog::onGenerateFromAccent);
+    connect(paletteGrid, &PaletteGridWidget::paletteChanged, this, [this] { autoApplyTimer->start(); });
     connect(revertButton, &QPushButton::clicked, this, &PaletteEditorDialog::onRevertToDefault);
     connect(resetBtn, &QPushButton::clicked, this, &PaletteEditorDialog::onReset);
-    connect(applyBtn, &QPushButton::clicked, this, &PaletteEditorDialog::onApply);
     connect(saveBtn, &QPushButton::clicked, this, &PaletteEditorDialog::onSave);
     connect(closeBtn, &QPushButton::clicked, this, &QDialog::reject);
 
@@ -186,10 +189,8 @@ void PaletteEditorDialog::retranslateUi()
     revertButton->setText(tr("↺  Revert to theme default"));
 
     resetBtn->setText(tr("Reset"));
-    applyBtn->setText(tr("Apply"));
-    saveBtn->setText(tr("Save && Apply"));
+    saveBtn->setText(tr("Save"));
     resetBtn->setToolTip(tr("Discard unsaved edits and restore the last saved palette"));
-    applyBtn->setToolTip(tr("Preview this palette without saving to disk"));
     saveBtn->setToolTip(tr("Write palette-%1.toml and reload the theme").arg(loadedScheme.toLower()));
 
     if (saveDir.isEmpty() || !QFileInfo(saveDir).isWritable()) {
@@ -242,7 +243,6 @@ void PaletteEditorDialog::onSchemeChanged(const QString &scheme)
     loadedScheme = scheme;
     paletteGrid->loadPalette(workingConfig.value(scheme));
     seedAccentFromScheme(scheme);
-    onApply();
 }
 
 void PaletteEditorDialog::onGenerateFromAccent(const QColor &accent, int intensity)

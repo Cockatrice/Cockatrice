@@ -7,6 +7,8 @@
 #include <QFrame>
 #include <QMap>
 
+class QTimer;
+
 class QLabel;
 class QComboBox;
 class QDialogButtonBox;
@@ -48,7 +50,6 @@ private:
     QComboBox *schemeComboBox = nullptr;
     QDialogButtonBox *buttonBox = nullptr;
     QPushButton *resetBtn = nullptr;
-    QPushButton *applyBtn = nullptr;
     QPushButton *saveBtn = nullptr;
     QPushButton *closeBtn = nullptr;
     QPushButton *revertButton = nullptr;
@@ -63,6 +64,8 @@ private:
 
     QMap<QString, PaletteConfig> workingConfig;
     QMap<QString, PaletteConfig> savedConfig;
+
+    QTimer *autoApplyTimer = nullptr;
 
 protected:
     void changeEvent(QEvent *e) override;
