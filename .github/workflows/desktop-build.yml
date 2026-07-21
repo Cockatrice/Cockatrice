@@ -341,12 +341,11 @@ jobs:
         with:
           submodules: recursive
 
-      - name: "[Windows] Add msbuild to PATH"
+      - name: "[Windows] Setup MSVC"
         if: matrix.os == 'Windows'
-        id: add-msbuild
-        uses: microsoft/setup-msbuild@v3
+        uses: TheMrMilchmann/setup-msvc-dev@v4
         with:
-          msbuild-architecture: x64
+          arch: x64
 
       - name: "[macOS] Setup ccache"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
