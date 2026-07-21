@@ -147,14 +147,16 @@ fi
 if [[ $MAKE_TEST ]]; then
   flags+=("-DTEST=1")
 fi
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == "1" ]]; then
   flags+=("-DUSE_CCACHE=1")
-  if [[ $CCACHE_SIZE ]]; then
+  if [[ -n $CCACHE_SIZE ]]; then
     # note, this setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
   fi
+else
+  flags+=("-DUSE_CCACHE=0")
 fi
-if [[ $PACKAGE_TYPE ]]; then
+if [[ -n $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 if [[ $USE_VCPKG ]]; then
@@ -252,7 +254,7 @@ if [[ $RUNNER_OS == macOS ]]; then
   fi
 fi
 
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == "1" ]]; then
   echo "::group::Show ccache stats"
   ccachestatsverbose
   echo "::endgroup::"
@@ -290,8 +292,8 @@ echo "Running cmake --build with flags: ${buildflags[*]}"
 cmake --build . "${buildflags[@]}" --verbose
 echo "::endgroup::"
 
-if [[ $USE_CCACHE ]]; then
-  if [[ $CCACHE_EVICTION_AGE ]]; then
+if [[ $USE_CCACHE == "1" ]]; then
+  if [[ -n $CCACHE_EVICTION_AGE ]]; then
     echo "::group::evict ccache files older than $CCACHE_EVICTION_AGE"
     ccache --evict-older-than "$CCACHE_EVICTION_AGE"
     echo "::endgroup::"
@@ -333,7 +335,7 @@ if [[ $MAKE_PACKAGE ]]; then
   cmake --build . --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 
-  if [[ $PACKAGE_SUFFIX ]]; then
+  if [[ -n $PACKAGE_SUFFIX ]]; then
     echo "::group::Update package name"
     cd ..
     BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
