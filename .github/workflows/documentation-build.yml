@@ -11,10 +11,10 @@ on:
       - published    # publishing of stable releases and pre-releases
   workflow_dispatch:
     inputs:
-      evict_cache:
-        description: "Evict Doxygen graph cache"
+      graph_cache:
+        description: "Use Doxygen graph cache? (Disabling will rebuild the GH Pages folder from scratch)"
         type: boolean
-        default: false
+        default: true
 
 env:
   COCKATRICE_REF: ${{ github.ref_name }}    # tag name if the commit is tagged, otherwise branch name
@@ -54,7 +54,7 @@ jobs:
           fi
 
       - name: "Restore graph cache from GH Pages repo"
-        if: github.event_name != 'workflow_dispatch' || inputs.evict_cache == false
+        if: github.event_name != 'workflow_dispatch' || inputs.graph_cache == true
         continue-on-error: true
         uses: actions/checkout@v7
         with:
