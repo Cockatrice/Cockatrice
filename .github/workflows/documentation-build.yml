@@ -1,4 +1,4 @@
-name: Generate Docs
+name: Build Docs
 
 on:
   pull_request:
@@ -10,6 +10,11 @@ on:
     types:
       - published    # publishing of stable releases and pre-releases
   workflow_dispatch:
+    inputs:
+      evict_cache:
+        description: "Evict Doxygen graph cache"
+        type: boolean
+        default: false
 
 env:
   COCKATRICE_REF: ${{ github.ref_name }}    # tag name if the commit is tagged, otherwise branch name
@@ -20,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: "Checkout code"
+      - name: "Checkout source code"
         uses: actions/checkout@v7
         with:
           submodules: recursive
@@ -48,16 +53,29 @@ jobs:
             exit 1
           fi
 
+      - name: "Restore graph cache from GH Pages repo"
+        if: github.event_name != 'workflow_dispatch' || inputs.evict_cache == false
+        continue-on-error: true
+        uses: actions/checkout@v7
+        with:
+          repository: Cockatrice/cockatrice.github.io
+          path: doxygen-output    # where GH pages root will be placed, needs to match Doxygen OUTPUT_DIRECTORY
+          token: ${{ github.token }}
+          sparse-checkout: |
+            docs/**/*.md5
+            docs/**/*.svg    # Doxygen DOT_IMAGE_FORMAT
+          sparse-checkout-cone-mode: false
+
       - name: "Generate Documentation"
         if: always()
         run: doxygen Doxyfile
 
       - name: "Deploy to cockatrice.github.io"
-        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.DOCS_DEPLOY_KEY }}
-          destination_dir: docs    # docs will be available at https://cockatrice.github.io/docs/
+          destination_dir: docs    # path where the documentation will live (https://cockatrice.github.io/docs/)
           external_repository: Cockatrice/cockatrice.github.io
           publish_branch: master
-          publish_dir: ./docs/html
+          publish_dir: ./doxygen-output/docs/    # needs to match Doxygen "./OUTPUT_DIRECTORY/HTML_OUTPUT/"
