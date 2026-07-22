@@ -59,5 +59,4 @@ target_link_libraries(
   PUBLIC libcockatrice_interfaces
   PUBLIC libcockatrice_utility
   PUBLIC ${QT_CORE_MODULE}
-  PUBLIC ${COCKATRICE_QT_VERSION_NAME}::Concurrent
 )
