@@ -1,12 +1,16 @@
 #include "card_database_loader.h"
 
 #include "card_database.h"
+#include "card_database_cache.h"
 #include "parser/cockatrice_xml_3.h"
 #include "parser/cockatrice_xml_4.h"
 
+#include <QByteArray>
+#include <QCryptographicHash>
 #include <QDebug>
 #include <QDirIterator>
 #include <QFile>
+#include <QFileInfo>
 #include <QTime>
 
 CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
@@ -14,18 +18,14 @@ CardDatabaseLoader::CardDatabaseLoader(QObject *parent,
                                        ICardDatabasePathProvider *_pathProvider,
                                        ICardPreferenceProvider *_preferenceProvider,
                                        ICardSetPriorityController *_priorityController)
-    : QObject(parent), database(db), pathProvider(_pathProvider)
+    : QObject(parent), database(db), pathProvider(_pathProvider), priorityController(_priorityController)
 {
-    // instantiate available parsers here and connect them to the database
+    // instantiate available parsers here
     availableParsers << new CockatriceXml4Parser(_preferenceProvider, _priorityController);
     availableParsers << new CockatriceXml3Parser(_priorityController);
 
-    for (auto *p : availableParsers) {
-        // connect parser outputs to the database adders
-        connect(p, &ICardDatabaseParser::addCard, database, &CardDatabase::addCard, Qt::DirectConnection);
-        connect(p, &ICardDatabaseParser::addSet, database, &CardDatabase::addSet, Qt::DirectConnection);
-        connect(p, &ICardDatabaseParser::addFormat, database, &CardDatabase::addFormat, Qt::DirectConnection);
-    }
+    // The load path parses into a snapshot and never emits per-card signals;
+    // the finished snapshot is swapped into the live database on the GUI thread.
 
     // when SettingsCache's path changes, trigger reloads
     connect(pathProvider, &ICardDatabasePathProvider::cardDatabasePathChanged, this,
@@ -38,7 +38,7 @@ CardDatabaseLoader::~CardDatabaseLoader()
     availableParsers.clear();
 }
 
-LoadStatus CardDatabaseLoader::loadFromFile(const QString &fileName)
+LoadStatus CardDatabaseLoader::loadFromFile(const QString &fileName, CardDatabaseData &data)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) {
@@ -49,7 +49,7 @@ LoadStatus CardDatabaseLoader::loadFromFile(const QString &fileName)
         file.reset();
         if (parser->getCanParseFile(fileName, file)) {
             file.reset();
-            parser->parseFile(file);
+            parser->parseFileInto(file, data);
             return Ok;
         }
     }
@@ -57,24 +57,29 @@ LoadStatus CardDatabaseLoader::loadFromFile(const QString &fileName)
     return Invalid;
 }
 
-LoadStatus CardDatabaseLoader::loadCardDatabase(const QString &path)
+LoadStatus CardDatabaseLoader::loadCardDatabase(const QString &path, CardDatabaseData &data)
 {
     auto startTime = QTime::currentTime();
     LoadStatus tempLoadStatus = NotLoaded;
     if (!path.isEmpty()) {
         QMutexLocker locker(loadFromFileMutex);
-        tempLoadStatus = loadFromFile(path);
+        tempLoadStatus = loadFromFile(path, data);
     }
 
     int msecs = startTime.msecsTo(QTime::currentTime());
     qCInfo(CardDatabaseLoadingLog) << "Loaded card database: Path =" << path << "Status =" << tempLoadStatus
-                                   << "Cards =" << (database ? database->cards.size() : 0)
-                                   << "Sets =" << (database ? database->sets.size() : 0) << QString("%1ms").arg(msecs);
+                                   << "Cards =" << data.cards.size() << "Sets =" << data.sets.size()
+                                   << QString("%1ms").arg(msecs);
 
     return tempLoadStatus;
 }
 
 LoadStatus CardDatabaseLoader::loadCardDatabases()
+{
+    return doLoadCardDatabases();
+}
+
+LoadStatus CardDatabaseLoader::doLoadCardDatabases()
 {
     QMutexLocker locker(reloadDatabaseMutex);
 
@@ -86,30 +91,39 @@ LoadStatus CardDatabaseLoader::loadCardDatabases()
     emit loadingStarted();
     qCInfo(CardDatabaseLoadingLog) << "Card Database Loading Started";
 
-    database->clear(); // remove old db
+    CardDatabaseData data;
+    LoadStatus loadStatus = NotLoaded;
 
-    LoadStatus loadStatus = loadCardDatabase(pathProvider->getCardDatabasePath()); // load main card database
-    loadCardDatabase(pathProvider->getTokenDatabasePath());                        // load tokens database
-    loadCardDatabase(pathProvider->getSpoilerCardDatabasePath());                  // load spoilers database
+    // Try the binary cache first: a cache hit avoids re-parsing the (large) XML.
+    if (loadFromCache(data)) {
+        qCInfo(CardDatabaseLoadingLog) << "Loaded card database from binary cache";
+        loadStatus = Ok;
+    } else {
+        loadStatus = loadCardDatabase(pathProvider->getCardDatabasePath(), data); // main card database
+        if (loadStatus == Ok) {
+            loadCardDatabase(pathProvider->getTokenDatabasePath(), data);       // tokens database
+            loadCardDatabase(pathProvider->getSpoilerCardDatabasePath(), data); // spoilers database
 
-    // find all custom card databases, recursively & following symlinks
-    // then load them alphabetically
-    const QStringList customPaths = collectCustomDatabasePaths();
-    for (int i = 0; i < customPaths.size(); ++i) {
-        const auto &p = customPaths.at(i);
-        qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << p << ")";
-        loadCardDatabase(p);
+            // find all custom card databases, recursively & following symlinks
+            // then load them alphabetically
+            const QStringList customPaths = collectCustomDatabasePaths();
+            for (int i = 0; i < customPaths.size(); ++i) {
+                const auto &p = customPaths.at(i);
+                qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << p << ")";
+                loadCardDatabase(p, data);
+            }
+
+            saveToCache(data);
+        }
     }
 
-    // AFTER all the cards have been loaded
-
-    // resolve the reverse-related tags
-
-    database->refreshCachedReverseRelatedCards();
+    // AFTER all the cards have been loaded: resolve the reverse-related tags
+    // against the fully-built snapshot (off the GUI thread).
+    database->refreshCachedReverseRelatedCards(data.cards);
 
     if (loadStatus == Ok) {
-        database->checkUnknownSets(); // update deck editors, etc
         qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Success";
+        emit databaseDataReady(std::move(data));
         emit loadingFinished();
     } else {
         qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Failed";
@@ -117,6 +131,48 @@ LoadStatus CardDatabaseLoader::loadCardDatabases()
     }
 
     return loadStatus;
+}
+
+QString CardDatabaseLoader::cachePath() const
+{
+    return pathProvider->getCardDatabasePath() + ".cache";
+}
+
+QByteArray CardDatabaseLoader::computeSourceHash() const
+{
+    // Hash over the paths, sizes and modification times of every input file so
+    // the cache invalidates when any source changes. Cheap (no content read).
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+    const QStringList inputs = QStringList()
+                               << pathProvider->getCardDatabasePath() << pathProvider->getTokenDatabasePath()
+                               << pathProvider->getSpoilerCardDatabasePath() << collectCustomDatabasePaths();
+    for (const QString &path : inputs) {
+        QFileInfo info(path);
+        if (info.exists()) {
+            hash.addData(path.toUtf8());
+            hash.addData(QByteArray::number(info.size()));
+            hash.addData(QByteArray::number(info.lastModified().toSecsSinceEpoch()));
+        }
+    }
+    return hash.result();
+}
+
+bool CardDatabaseLoader::loadFromCache(CardDatabaseData &data)
+{
+    const QByteArray sourceHash = computeSourceHash();
+    if (sourceHash.isEmpty()) {
+        return false;
+    }
+    return CardDatabaseCache::read(cachePath(), data, sourceHash, priorityController);
+}
+
+void CardDatabaseLoader::saveToCache(const CardDatabaseData &data)
+{
+    const QByteArray sourceHash = computeSourceHash();
+    if (sourceHash.isEmpty()) {
+        return;
+    }
+    CardDatabaseCache::write(cachePath(), data, sourceHash);
 }
 
 QStringList CardDatabaseLoader::collectCustomDatabasePaths() const

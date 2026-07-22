@@ -2,8 +2,25 @@
 
 #include "../set/card_set.h"
 
+#include <QDataStream>
+
 PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
 {
+}
+
+void PrintingInfo::ensurePropertiesLoaded() const
+{
+    QMutexLocker lock(propertiesMutex.data());
+    if (propertiesLoaded) {
+        return;
+    }
+    propertiesCache.clear();
+    if (!propertiesBlob.isEmpty()) {
+        QDataStream in(propertiesBlob);
+        in.setVersion(QDataStream::Qt_6_5);
+        in >> propertiesCache;
+    }
+    propertiesLoaded = true;
 }
 
 /**
@@ -11,10 +28,10 @@ PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
  */
 QString PrintingInfo::getUuid() const
 {
-    return properties.value("uuid").toString();
+    return getPropertiesHash().value("uuid").toString();
 }
 
 QString PrintingInfo::getFlavorName() const
 {
-    return properties.value("flavorName").toString();
+    return getPropertiesHash().value("flavorName").toString();
 }

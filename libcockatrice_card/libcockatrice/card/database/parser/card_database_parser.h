@@ -2,6 +2,7 @@
 #define CARDDATABASE_PARSER_H
 
 #include "../../card_info.h"
+#include "../card_database_data.h"
 
 #include <QIODevice>
 #include <QString>
@@ -38,6 +39,15 @@ public:
     virtual void parseFile(QIODevice &device) = 0;
 
     /**
+     * @brief Parses a database file into the given snapshot, without emitting
+     *        any signals. Used for background loads that swap the snapshot into
+     *        the live database once complete.
+     * @param device QIODevice representing the file content.
+     * @param data Target snapshot to populate.
+     */
+    virtual void parseFileInto(QIODevice &device, CardDatabaseData &data) = 0;
+
+    /**
      * @brief Saves card and set data to a file.
      * @param _formats
      * @param sets Map of sets to save.
@@ -61,6 +71,9 @@ protected:
     /** @brief Cached global list of sets shared between all parsers. */
     static SetNameMap sets;
     ICardSetPriorityController *cardSetPriorityController;
+
+    /** @brief Snapshot the current parse is filling, or nullptr when emitting signals. */
+    CardDatabaseData *targetData = nullptr;
 
     /**
      * @brief Internal helper to add a set to the global set cache.

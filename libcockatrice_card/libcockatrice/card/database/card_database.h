@@ -2,6 +2,7 @@
 #define CARDDATABASE_H
 
 #include "../set/card_set_list.h"
+#include "card_database_data.h"
 #include "card_database_loader.h"
 #include "card_database_querier.h"
 
@@ -63,6 +64,12 @@ private:
      * @brief Refreshes the cached reverse-related cards for all cards.
      */
     void refreshCachedReverseRelatedCards();
+
+    /**
+     * @brief Refreshes the cached reverse-related cards for the given card map.
+     * @param cardMap Map of cards to process.
+     */
+    void refreshCachedReverseRelatedCards(CardNameMap &cardMap);
 
     /** @brief Mutexes for thread safety. */
     QBasicMutex *clearDatabaseMutex = new QBasicMutex(), *addCardMutex = new QBasicMutex(),
@@ -127,8 +134,14 @@ public:
     /** @brief Marks all sets as known. */
     void markAllSetsAsKnown();
 
-    /** @brief Notifies listeners that enabled sets changed. */
-    void notifyEnabledSetsChanged();
+    /**
+     * @brief Notifies listeners that enabled sets changed.
+     * @param recomputeCachedSets When true, every card's cached set-name / alt-name
+     *        data is recomputed (needed only when enabled-set state actually
+     *        changed). Pass false after a plain reload, where enabled-set state is
+     *        unchanged and the cached data is still valid.
+     */
+    void notifyEnabledSetsChanged(bool recomputeCachedSets = true);
 
     ICardSetPriorityController *getPriorityController()
     {
@@ -159,9 +172,25 @@ public slots:
      */
     bool saveCustomTokensToFile();
 
+    /**
+     * @brief Replaces the entire contents of the database with the provided
+     *        snapshot in a single operation. Intended to be called once a
+     *        background load has finished building a CardDatabaseData, so that
+     *        observers never see a partially-populated database.
+     * @param data The fully-built snapshot to adopt.
+     */
+    void swapInDatabaseData(CardDatabaseData data);
+
 signals:
     /** @brief Emitted when the card database has finished loading successfully. */
     void cardDatabaseLoadingFinished();
+
+    /**
+     * @brief Emitted once after the live database contents have been replaced
+     *        by a freshly loaded snapshot. Models should rebuild from the
+     *        database in a single batch rather than reacting to per-card adds.
+     */
+    void cardDatabaseReset();
 
     /** @brief Emitted when the card database fails to load. */
     void cardDatabaseLoadingFailed();

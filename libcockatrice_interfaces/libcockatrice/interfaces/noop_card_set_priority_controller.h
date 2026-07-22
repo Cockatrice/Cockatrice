@@ -29,6 +29,11 @@ public:
         return true;
     }
 
+    SetOptions getSetOptions(QString /* shortName */) const override
+    {
+        return {};
+    }
+
     void saveSets(const QVector<SetSaveData> & /* data */) override
     {
     }

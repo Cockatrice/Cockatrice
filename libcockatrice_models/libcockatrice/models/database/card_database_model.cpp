@@ -12,6 +12,7 @@ CardDatabaseModel::CardDatabaseModel(CardDatabase *_db, bool _showOnlyCardsFromE
     connect(db, &CardDatabase::cardRemoved, this, &CardDatabaseModel::cardRemoved);
     connect(db, &CardDatabase::cardDatabaseEnabledSetsChanged, this,
             &CardDatabaseModel::cardDatabaseEnabledSetsChanged);
+    connect(db, &CardDatabase::cardDatabaseReset, this, &CardDatabaseModel::resetCardList);
 
     cardDatabaseEnabledSetsChanged();
 }
@@ -150,4 +151,19 @@ void CardDatabaseModel::cardRemoved(CardInfoPtr card)
     card.clear();
     cardList.removeAt(row);
     endRemoveRows();
+}
+
+void CardDatabaseModel::resetCardList()
+{
+    beginResetModel();
+    cardList.clear();
+    cardListSet.clear();
+    for (const CardInfoPtr &card : db->getCardList()) {
+        if (checkCardHasAtLeastOneEnabledSet(card)) {
+            cardList.append(card);
+            cardListSet.insert(card);
+            connect(card.data(), &CardInfo::cardInfoChanged, this, &CardDatabaseModel::cardInfoChanged);
+        }
+    }
+    endResetModel();
 }

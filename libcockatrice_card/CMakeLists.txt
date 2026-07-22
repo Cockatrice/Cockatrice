@@ -31,6 +31,7 @@ add_library(
   libcockatrice/card/card_info.cpp
   libcockatrice/card/card_info_comparator.cpp
   libcockatrice/card/database/card_database.cpp
+  libcockatrice/card/database/card_database_cache.cpp
   libcockatrice/card/database/card_database_loader.cpp
   libcockatrice/card/database/card_database_manager.cpp
   libcockatrice/card/database/card_database_querier.cpp
@@ -58,4 +59,5 @@ target_link_libraries(
   PUBLIC libcockatrice_interfaces
   PUBLIC libcockatrice_utility
   PUBLIC ${QT_CORE_MODULE}
+  PUBLIC ${COCKATRICE_QT_VERSION_NAME}::Concurrent
 )

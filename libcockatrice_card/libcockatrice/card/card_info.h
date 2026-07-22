@@ -10,6 +10,7 @@
 #include <QLoggingCategory>
 #include <QMap>
 #include <QMetaType>
+#include <QMutex>
 #include <QSharedPointer>
 #include <QVariant>
 #include <utility>
@@ -69,12 +70,25 @@ private:
      *  @anchor PrivateCardProperties
      */
     ///@{
-    CardInfoPtr smartThis;                         ///< Smart pointer to self for safe cross-references.
-    QString name;                                  ///< Full name of the card.
-    QString simpleName;                            ///< Simplified name for fuzzy matching.
-    QString text;                                  ///< Text description or rules text of the card.
-    bool isToken;                                  ///< Whether this card is a token or not.
-    QVariantHash properties;                       ///< Key-value store of dynamic card properties.
+    CardInfoPtr smartThis; ///< Smart pointer to self for safe cross-references.
+    QString name;          ///< Full name of the card.
+    QString simpleName;    ///< Simplified name for fuzzy matching.
+    QString text;          ///< Text description or rules text of the card.
+    bool isToken;          ///< Whether this card is a token or not.
+    // Properties are stored as a pre-serialized blob (cheap to load) and the
+    // QVariantHash is materialized on first query, so database load avoids
+    // constructing thousands of QVariants per card.
+    mutable QByteArray propertiesBlob;     ///< Serialized properties (load form).
+    mutable QVariantHash propertiesCache;  ///< Materialized properties (query form).
+    mutable bool propertiesLoaded = false; ///< Whether propertiesCache is valid.
+    mutable QMutex propertiesMutex;        ///< Guards lazy materialization.
+
+    /**
+     * @brief Materializes propertiesCache from propertiesBlob if not already done.
+     *        Safe to call from const getters (members are mutable).
+     */
+    void ensurePropertiesLoaded() const;
+
     QList<CardRelation *> relatedCards;            ///< Forward references to related cards.
     QList<CardRelation *> reverseRelatedCards;     ///< Cards that refer back to this card.
     QList<CardRelation *> reverseRelatedCardsToMe; ///< Cards that consider this card as related.
@@ -107,6 +121,38 @@ public:
                       UiAttributes _uiAttributes);
 
     /**
+     * @brief Constructs a CardInfo from a cache snapshot with precomputed derived
+     *        state.
+     *
+     * Used by the binary cache reader to skip recomputing @p _simpleName and
+     * @p _altNames (which otherwise require a Unicode normalization and a full
+     * printing scan). Properties are supplied as a pre-serialized @p _propertiesBlob
+     * so the QVariantHash is not built at load time (it is materialized on first
+     * query).
+     *
+     * @param _name The card name.
+     * @param _text Rules text or description of the card.
+     * @param _isToken Token flag.
+     * @param _propertiesBlob Pre-serialized properties blob (as written by the cache).
+     * @param _relatedCards Forward relationships.
+     * @param _reverseRelatedCards Reverse relationships.
+     * @param _sets Printing information per set.
+     * @param _uiAttributes Attributes that affect display and game logic.
+     * @param _simpleName Precomputed simplified name.
+     * @param _altNames Precomputed alternate names.
+     */
+    explicit CardInfo(const QString &_name,
+                      const QString &_text,
+                      bool _isToken,
+                      QByteArray _propertiesBlob,
+                      const QList<CardRelation *> &_relatedCards,
+                      const QList<CardRelation *> &_reverseRelatedCards,
+                      SetToPrintingsMap _sets,
+                      UiAttributes _uiAttributes,
+                      QString _simpleName,
+                      QSet<QString> _altNames);
+
+    /**
      * @brief Copy constructor for CardInfo.
      *
      * Performs a deep copy of properties, sets, and related card lists.
@@ -115,7 +161,7 @@ public:
      */
     CardInfo(const CardInfo &other)
         : QObject(other.parent()), name(other.name), simpleName(other.simpleName), text(other.text),
-          isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
+          isToken(other.isToken), propertiesBlob(other.propertiesBlob), relatedCards(other.relatedCards),
           reverseRelatedCards(other.reverseRelatedCards), reverseRelatedCardsToMe(other.reverseRelatedCardsToMe),
           setsToPrintings(other.setsToPrintings), uiAttributes(other.uiAttributes), setsNames(other.setsNames),
           altNames(other.altNames)
@@ -153,6 +199,38 @@ public:
                                    const QList<CardRelation *> &_reverseRelatedCards,
                                    SetToPrintingsMap _sets,
                                    UiAttributes _uiAttributes);
+
+    /**
+     * @brief Creates a new instance from a cache snapshot with precomputed
+     *        derived state.
+     *
+     * @param _name Name of the card.
+     * @param _text Rules text or description.
+     * @param _isToken Token flag.
+     * @param _propertiesBlob Pre-serialized properties blob (as written by the cache).
+     * @param _relatedCards Forward relationships.
+     * @param _reverseRelatedCards Reverse relationships.
+     * @param _sets Printing information per set.
+     * @param _uiAttributes Attributes that affect display and game logic.
+     * @param _simpleName Precomputed simplified name.
+     * @param _altNames Precomputed alternate names.
+     * @param _appendToSets When true (default), the card is appended to each of
+     *        its CardSets. Pass false when building cards in parallel so the
+     *        (non-thread-safe) set membership is populated in a later
+     *        single-threaded pass.
+     * @return Shared pointer to the new CardInfo instance.
+     */
+    static CardInfoPtr newInstance(const QString &_name,
+                                   const QString &_text,
+                                   bool _isToken,
+                                   QByteArray _propertiesBlob,
+                                   const QList<CardRelation *> &_relatedCards,
+                                   const QList<CardRelation *> &_reverseRelatedCards,
+                                   SetToPrintingsMap _sets,
+                                   UiAttributes _uiAttributes,
+                                   QString _simpleName,
+                                   QSet<QString> _altNames,
+                                   bool _appendToSets = true);
 
     /**
      * @brief Clones the current CardInfo instance.
@@ -208,20 +286,31 @@ public:
     }
     [[nodiscard]] QStringList getProperties() const
     {
-        return properties.keys();
+        return getPropertiesHash().keys();
+    }
+    [[nodiscard]] const QVariantHash &getPropertiesHash() const;
+
+    /**
+     * @brief Stores the pre-serialized properties blob and invalidates the
+     *        materialized cache. Used by the binary cache reader so the
+     *        QVariantHash is not built at load time.
+     * @param _blob The serialized properties (as written by the cache writer).
+     */
+    void setPropertiesBlob(QByteArray _blob) const
+    {
+        QMutexLocker lock(&propertiesMutex);
+        propertiesBlob = std::move(_blob);
+        propertiesLoaded = false;
+        propertiesCache.clear();
     }
     [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
-        return properties.value(propertyName).toString();
+        return getPropertiesHash().value(propertyName).toString();
     }
-    void setProperty(const QString &_name, const QString &_value)
-    {
-        properties.insert(_name, _value);
-        emit cardInfoChanged(smartThis);
-    }
+    void setProperty(const QString &_name, const QString &_value);
     [[nodiscard]] bool hasProperty(const QString &propertyName) const
     {
-        return properties.contains(propertyName);
+        return getPropertiesHash().contains(propertyName);
     }
     [[nodiscard]] const SetToPrintingsMap &getSets() const
     {
