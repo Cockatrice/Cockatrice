@@ -543,9 +543,9 @@ jobs:
           if-no-files-found: error
           name: ${{ steps.build.outputs.name }}-PDBs
           path: |
-            build/cockatrice/Release/*.pdb
-            build/oracle/Release/*.pdb
-            build/servatrice/Release/*.pdb
+            build/cockatrice/*.pdb
+            build/oracle/*.pdb
+            build/servatrice/*.pdb
 
       - name: "Upload to release"
         if: needs.configure.outputs.tag != null && matrix.make_package == '1'
