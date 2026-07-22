@@ -157,7 +157,7 @@ jobs:
         run: |
           TAG_ARGS=""
           for tag in $TAGS; do
-            TAG_ARGS="$TAG_ARGS -t $tag"
+            TAG_ARGS="$TAG_ARGS --tag $tag"
           done
 
           docker buildx imagetools create \
