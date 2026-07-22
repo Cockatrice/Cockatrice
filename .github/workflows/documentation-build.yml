@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       graph_cache:
-        description: "Use Doxygen graph cache? (Disabling will rebuild the GH Pages folder from scratch)"
+        description: "Use cached graphs? (Disabling will rebuild the GH Pages folder from scratch)"
         type: boolean
         default: true
 
