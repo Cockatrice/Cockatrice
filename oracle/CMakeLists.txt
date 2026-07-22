@@ -233,6 +233,7 @@ if(WIN32)
   set(plugin_dest_dir Plugins)
   set(qtconf_dest_dir .)
   list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
+  list(APPEND libSearchDirs "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/bin")
 
   install(
     DIRECTORY "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${CMAKE_BUILD_TYPE}/"
