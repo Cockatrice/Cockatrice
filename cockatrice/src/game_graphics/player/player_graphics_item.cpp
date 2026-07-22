@@ -13,6 +13,7 @@
 #include "player_dialogs.h"
 
 #include <QGraphicsView>
+#include <libcockatrice/settings/interface_settings.h>
 
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 {

@@ -3,6 +3,8 @@
 #include "../../client/settings/cache_settings.h"
 
 #include <libcockatrice/interfaces/interface_card_preference_provider.h>
+#include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 class SettingsCardPreferenceProvider : public ICardPreferenceProvider
 {

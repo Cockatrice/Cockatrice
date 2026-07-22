@@ -8,6 +8,7 @@
 #include <QRegularExpression>
 #include <QResizeEvent>
 #include <QSize>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
 
 ColorIdentityWidget::ColorIdentityWidget(QWidget *parent, const QString &_colorIdentity)

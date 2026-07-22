@@ -2,11 +2,13 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcut_treeview.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 #include "../interface/widgets/utility/sequence_edit.h"
 
 #include <QAbstractItemView>
 #include <QMessageBox>
+#include <libcockatrice/settings/personal_settings.h>
 
 ShortcutSettingsPage::ShortcutSettingsPage()
 {

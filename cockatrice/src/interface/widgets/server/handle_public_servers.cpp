@@ -5,6 +5,7 @@
 #include <QJsonDocument>
 #include <QNetworkReply>
 #include <QUrl>
+#include <libcockatrice/settings/servers_settings.h>
 
 #define PUBLIC_SERVERS_JSON "https://cockatrice.github.io/public-servers.json"
 

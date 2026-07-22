@@ -17,6 +17,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor,

@@ -10,6 +10,7 @@
 #include "abstract_tab_deck_editor.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../client/network/interfaces/deck_stats_interface.h"
 #include "../client/network/interfaces/tapped_out_interface.h"
 #include "../deck_editor/deck_state_manager.h"
@@ -43,6 +44,9 @@
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/recents_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 /**

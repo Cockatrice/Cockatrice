@@ -10,6 +10,7 @@
 #include <QNetworkReply>
 #include <QThread>
 #include <QThreadPool>
+#include <libcockatrice/settings/personal_settings.h>
 
 // Card back returned by gatherer when card is not found
 static const QStringList MD5_BLACKLIST = {

@@ -6,6 +6,9 @@
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QToolBar>
+#include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/message_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 MessagesSettingsPage::MessagesSettingsPage()

@@ -12,6 +12,7 @@
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
+#include <libcockatrice/utility/macros.h>
 
 enum startupCardUpdateCheckBehaviorIndex
 {

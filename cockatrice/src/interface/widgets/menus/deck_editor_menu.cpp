@@ -4,6 +4,7 @@
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../tabs/abstract_tab_deck_editor.h"
 
+#include <libcockatrice/settings/recents_settings.h>
 DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), deckEditor(parent)
 {
     aNewDeck = new QAction(QString(), this);

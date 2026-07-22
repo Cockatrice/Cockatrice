@@ -3,6 +3,7 @@
 #include "../../card_picture_loader/card_picture_loader.h"
 #include "../../client/settings/cache_settings.h"
 
+#include <libcockatrice/settings/cards_display_settings.h>
 bool OverridePrintingWarning::execMessageBox(QWidget *parent, bool enable)
 {
     QString message;

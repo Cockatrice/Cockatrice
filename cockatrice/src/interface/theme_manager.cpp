@@ -17,6 +17,7 @@
 #include <QStyleHints>
 #include <QWidget>
 #include <Qt>
+#include <libcockatrice/settings/paths_settings.h>
 
 #define NONE_THEME_NAME "Default"
 #define FUSION_THEME_NAME "Fusion"

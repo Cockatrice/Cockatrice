@@ -15,6 +15,7 @@
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 
 const QColor TableZone::BACKGROUND_COLOR = QColor(100, 100, 100);

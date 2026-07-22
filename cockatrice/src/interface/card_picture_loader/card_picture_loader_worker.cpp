@@ -10,6 +10,9 @@
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QThread>
+#include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 #include <utility>
 #include <version_string.h>
 

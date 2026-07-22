@@ -29,6 +29,7 @@
 #include <libcockatrice/protocol/pb/response_replay_download.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/paths_settings.h>
 
 inline Q_LOGGING_CATEGORY(TabReplaysLog, "replays_tab");
 

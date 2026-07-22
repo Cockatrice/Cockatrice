@@ -14,6 +14,7 @@
 #include <QThread>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
+#include <libcockatrice/settings/servers_settings.h>
 
 ConnectionController::ConnectionController(QWidget *dialogParent, QObject *parent)
     : QObject(parent), dialogParent(dialogParent)

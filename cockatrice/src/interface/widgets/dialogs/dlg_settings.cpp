@@ -24,6 +24,8 @@
 #include <QScrollBar>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 
 static QScrollArea *makeScrollable(QWidget *widget)
 {

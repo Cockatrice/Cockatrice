@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 const QColor GHOST_MASK = QColor(255, 255, 255, 50);
 

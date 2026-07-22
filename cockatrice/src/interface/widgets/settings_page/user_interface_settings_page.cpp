@@ -4,6 +4,9 @@
 #include "../interface/widgets/tabs/tab_supervisor.h"
 
 #include <QGridLayout>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 enum visualDeckStoragePromptForConversionIndex

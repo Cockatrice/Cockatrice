@@ -20,6 +20,9 @@
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_set/card_sets_model.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
 
 WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 {

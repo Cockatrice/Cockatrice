@@ -6,6 +6,7 @@
 
 #include <QDirIterator>
 #include <QMouseEvent>
+#include <libcockatrice/settings/paths_settings.h>
 
 VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     QWidget *parent,

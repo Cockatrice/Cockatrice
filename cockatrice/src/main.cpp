@@ -41,6 +41,9 @@
 #include <QTranslator>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
+#include <libcockatrice/settings/card_database_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;

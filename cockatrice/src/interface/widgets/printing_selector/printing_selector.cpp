@@ -12,6 +12,8 @@
 
 #include <QBoxLayout>
 #include <QScrollBar>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/macros.h>
 
 /**
  * @brief Constructs a PrintingSelector widget to display and manage card printings.

@@ -10,6 +10,10 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QToolBar>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/macros.h>
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {

@@ -18,6 +18,7 @@
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_create_arrow.pb.h>
 #include <libcockatrice/protocol/pb/command_delete_arrow.pb.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/zone_names.h>
 

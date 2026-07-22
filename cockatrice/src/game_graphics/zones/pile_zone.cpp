@@ -12,6 +12,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 PileZone::PileZone(PileZoneLogic *_logic, QGraphicsItem *parent) : CardZone(_logic, parent)
 {

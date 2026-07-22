@@ -4,6 +4,7 @@
 #include "../../client/settings/cache_settings.h"
 
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
+#include <libcockatrice/settings/paths_settings.h>
 
 class SettingsCardDatabasePathProvider : public ICardDatabasePathProvider
 {

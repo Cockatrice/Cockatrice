@@ -1,17 +1,23 @@
 #include "appearance_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/card_counter_settings.h"
 #include "../../client/settings/card_counter_settings.h"
 #include "../../palette_editor/palette_editor_dialog.h"
 #include "../dialogs/override_printing_warning.h"
 #include "../interface/theme_manager.h"
 #include "../interface/widgets/general/background_sources.h"
 
+#include <QApplication>
 #include <QColorDialog>
 #include <QDesktopServices>
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QTimer>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 
 AppearanceSettingsPage::AppearanceSettingsPage()
 {

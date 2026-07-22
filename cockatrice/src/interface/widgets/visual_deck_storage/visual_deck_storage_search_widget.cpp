@@ -7,6 +7,7 @@
 
 #include <QAction>
 #include <QFileInfo>
+#include <libcockatrice/settings/paths_settings.h>
 
 /**
  * @brief Constructs a PrintingSelectorCardSearchWidget for searching cards by set name or set code.

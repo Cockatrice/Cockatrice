@@ -8,6 +8,7 @@
 
 #include <QSplitter>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <random>
 
 VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *parent,

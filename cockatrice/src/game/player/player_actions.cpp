@@ -27,6 +27,8 @@
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
+#include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/clamped_arithmetic.h>
 #include <libcockatrice/utility/counter_limits.h>
 #include <libcockatrice/utility/expression.h>

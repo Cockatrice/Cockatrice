@@ -12,6 +12,8 @@
 #include <QDirIterator>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, const QStringList &_tags)
     : QWidget(_parent), currentTags(_tags)

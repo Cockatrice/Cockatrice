@@ -19,6 +19,7 @@
 #include <QGraphicsView>
 #include <QSet>
 #include <QtMath>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <numeric>
 

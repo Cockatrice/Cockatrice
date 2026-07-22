@@ -3,6 +3,7 @@
 #include "../../../../client/settings/cache_settings.h"
 
 #include <QResizeEvent>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 ManaSymbolWidget::ManaSymbolWidget(QWidget *parent, QString _symbol, bool _isActive, bool _mayBeToggled)
     : QLabel(parent), symbol(_symbol), isActive(_isActive), mayBeToggled(_mayBeToggled)

@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QPainterPath>
 #include <QStylePainter>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 /**
  * @brief Constructs a CardPictureWithTextOverlay widget.

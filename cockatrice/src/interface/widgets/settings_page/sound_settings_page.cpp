@@ -4,6 +4,9 @@
 #include "../client/sound_engine.h"
 
 #include <QGridLayout>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/settings/sound_settings.h>
+#include <libcockatrice/utility/macros.h>
 
 SoundSettingsPage::SoundSettingsPage()
 {

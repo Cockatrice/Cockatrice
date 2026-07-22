@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QVBoxLayout>
+#include <libcockatrice/settings/game_settings.h>
 
 DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
 {

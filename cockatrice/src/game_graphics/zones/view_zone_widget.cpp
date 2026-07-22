@@ -21,6 +21,7 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
+#include <libcockatrice/settings/interface_settings.h>
 
 namespace
 {

@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QTimer>
+#include <libcockatrice/settings/interface_settings.h>
 
 ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
     : QWidget(parent), maxBinValue(1), maxTime(1), timeScaleFactor(1.0), currentVisualTime(0), currentProcessedTime(0),

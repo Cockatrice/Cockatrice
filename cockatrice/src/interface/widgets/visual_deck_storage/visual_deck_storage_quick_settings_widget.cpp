@@ -6,6 +6,8 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QSpinBox>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidget *parent)
     : SettingsButtonWidget(parent)

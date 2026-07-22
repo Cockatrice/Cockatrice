@@ -5,6 +5,7 @@
 
 #include <QPainterPath>
 #include <QStylePainter>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 /**
  * @brief Constructs a CardPictureEnlargedWidget.

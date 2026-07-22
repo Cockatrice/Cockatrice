@@ -25,6 +25,7 @@
 #include <libcockatrice/models/database/card/card_search_model.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <qscrollarea.h>
 
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,

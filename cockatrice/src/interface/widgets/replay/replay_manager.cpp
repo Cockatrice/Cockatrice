@@ -1,5 +1,6 @@
 #include "replay_manager.h"
 
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../interface/widgets/tabs/tab_game.h"
 #include "replay_quick_settings_widget.h"
 

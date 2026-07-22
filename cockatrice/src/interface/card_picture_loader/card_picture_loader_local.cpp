@@ -7,6 +7,7 @@
 #include <QDirIterator>
 #include <QMovie>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/paths_settings.h>
 
 static constexpr int REFRESH_INTERVAL_MS = 10 * 1000;
 

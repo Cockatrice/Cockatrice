@@ -5,6 +5,7 @@
 #include "printing_disabled_info_widget.h"
 
 #include <QVBoxLayout>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(AbstractTabDeckEditor *parent)
     : QDockWidget(parent), deckEditor(parent)

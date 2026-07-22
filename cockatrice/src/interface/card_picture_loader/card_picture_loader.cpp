@@ -18,6 +18,9 @@
 #include <QStatusBar>
 #include <QThread>
 #include <algorithm>
+#include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 #include <utility>
 
 // never cache more than 300 cards at once for a single deck

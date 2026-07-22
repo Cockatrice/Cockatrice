@@ -14,6 +14,7 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <libcockatrice/network/server/remote/user_level.h>
+#include <libcockatrice/settings/chat_settings.h>
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
 

@@ -7,32 +7,10 @@
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 
-#include "shortcuts_settings.h"
-
 #include <QLoggingCategory>
 #include <QStringList>
 #include <libcockatrice/interfaces/interface_card_database_path_provider.h>
 #include <libcockatrice/interfaces/interface_network_settings_provider.h>
-#include <libcockatrice/settings/cache_storage_settings.h>
-#include <libcockatrice/settings/card_database_settings.h>
-#include <libcockatrice/settings/card_override_settings.h>
-#include <libcockatrice/settings/cards_display_settings.h>
-#include <libcockatrice/settings/chat_settings.h>
-#include <libcockatrice/settings/debug_settings.h>
-#include <libcockatrice/settings/download_settings.h>
-#include <libcockatrice/settings/game_filters_settings.h>
-#include <libcockatrice/settings/game_settings.h>
-#include <libcockatrice/settings/interface_settings.h>
-#include <libcockatrice/settings/layouts_settings.h>
-#include <libcockatrice/settings/message_settings.h>
-#include <libcockatrice/settings/paths_settings.h>
-#include <libcockatrice/settings/personal_settings.h>
-#include <libcockatrice/settings/recents_settings.h>
-#include <libcockatrice/settings/servers_settings.h>
-#include <libcockatrice/settings/sound_settings.h>
-#include <libcockatrice/settings/tabs_settings.h>
-#include <libcockatrice/settings/updates_settings.h>
-#include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <libcockatrice/utility/macros.h>
 
 inline Q_LOGGING_CATEGORY(SettingsCacheLog, "settings_cache");
@@ -44,8 +22,29 @@ class ReleaseChannel;
 
 #define DEFAULT_FONT_SIZE 12
 
-class QSettings;
+class CacheStorageSettings;
 class CardCounterSettings;
+class CardDatabaseSettings;
+class CardOverrideSettings;
+class CardsDisplaySettings;
+class ChatSettings;
+class DebugSettings;
+class DownloadSettings;
+class GameFiltersSettings;
+class GameSettings;
+class InterfaceSettings;
+class LayoutsSettings;
+class MessageSettings;
+class PathsSettings;
+class PersonalSettings;
+class RecentsSettings;
+class ServersSettings;
+class ShortcutsSettings;
+class SoundSettings;
+class TabsSettings;
+class UpdatesSettings;
+class VisualDeckStorageSettings;
+class QSettings;
 
 class SettingsCache : public ICardDatabasePathProvider, public INetworkSettingsProvider
 {
@@ -96,154 +95,52 @@ public:
     [[nodiscard]] QString getNetworkCachePath() const;
 
     // ICardDatabasePathProvider - delegate to pathsSettings
-    [[nodiscard]] QString getCustomCardDatabasePath() const override
-    {
-        return pathsSettings->getCustomCardDatabasePath();
-    }
-    [[nodiscard]] QString getCardDatabasePath() const override
-    {
-        return pathsSettings->getCardDatabasePath();
-    }
-    [[nodiscard]] QString getSpoilerCardDatabasePath() const override
-    {
-        return pathsSettings->getSpoilerCardDatabasePath();
-    }
-    [[nodiscard]] QString getTokenDatabasePath() const override
-    {
-        return pathsSettings->getTokenDatabasePath();
-    }
+    [[nodiscard]] QString getCustomCardDatabasePath() const override;
+    [[nodiscard]] QString getCardDatabasePath() const override;
+    [[nodiscard]] QString getSpoilerCardDatabasePath() const override;
+    [[nodiscard]] QString getTokenDatabasePath() const override;
 
     // INetworkSettingsProvider - delegate to sub-objects
-    [[nodiscard]] int getKeepAlive() const override
-    {
-        return personalSettings->getKeepAlive();
-    }
-    [[nodiscard]] int getTimeOut() const override
-    {
-        return personalSettings->getTimeOut();
-    }
-    [[nodiscard]] bool getNotifyAboutUpdates() const override
-    {
-        return updatesSettings->getNotifyAboutUpdates();
-    }
-    void setKnownMissingFeatures(const QString &_knownMissingFeatures) override
-    {
-        interfaceSettings->setKnownMissingFeatures(_knownMissingFeatures);
-    }
-    [[nodiscard]] QString getKnownMissingFeatures() override
-    {
-        return interfaceSettings->getKnownMissingFeatures();
-    }
-    QString getClientID() override
-    {
-        return personalSettings->getClientID();
-    }
+    [[nodiscard]] int getKeepAlive() const override;
+    [[nodiscard]] int getTimeOut() const override;
+    [[nodiscard]] bool getNotifyAboutUpdates() const override;
+    void setKnownMissingFeatures(const QString &_knownMissingFeatures) override;
+    [[nodiscard]] QString getKnownMissingFeatures() override;
+    QString getClientID() override;
 
     [[nodiscard]] QString getThemeName() const
     {
         return themeName;
     }
 
-    [[nodiscard]] ReleaseChannel *getUpdateReleaseChannel() const
-    {
-        return releaseChannels.at(qMax(0, updatesSettings->getUpdateReleaseChannelIndex()));
-    }
-    [[nodiscard]] QList<ReleaseChannel *> getUpdateReleaseChannels() const
-    {
-        return releaseChannels;
-    }
-    [[nodiscard]] int getUpdateReleaseChannelIndex() const
-    {
-        return updatesSettings->getUpdateReleaseChannelIndex();
-    }
+    [[nodiscard]] ReleaseChannel *getUpdateReleaseChannel() const;
+    [[nodiscard]] QList<ReleaseChannel *> getUpdateReleaseChannels() const;
+    [[nodiscard]] int getUpdateReleaseChannelIndex() const;
 
     [[nodiscard]] QStringList getCountries() const;
 
-    [[nodiscard]] ShortcutsSettings &shortcuts() const
-    {
-        return *shortcutsSettings;
-    }
-    [[nodiscard]] CardDatabaseSettings &cardDatabase() const
-    {
-        return *cardDatabaseSettings;
-    }
-    [[nodiscard]] ServersSettings &servers() const
-    {
-        return *serversSettings;
-    }
-    [[nodiscard]] MessageSettings &messages() const
-    {
-        return *messageSettings;
-    }
-    [[nodiscard]] GameFiltersSettings &gameFilters() const
-    {
-        return *gameFiltersSettings;
-    }
-    [[nodiscard]] LayoutsSettings &layouts() const
-    {
-        return *layoutsSettings;
-    }
-    [[nodiscard]] DownloadSettings &downloads() const
-    {
-        return *downloadSettings;
-    }
-    [[nodiscard]] RecentsSettings &recents() const
-    {
-        return *recentsSettings;
-    }
-    [[nodiscard]] CardOverrideSettings &cardOverrides() const
-    {
-        return *cardOverrideSettings;
-    }
-    [[nodiscard]] DebugSettings &debug() const
-    {
-        return *debugSettings;
-    }
+    [[nodiscard]] ShortcutsSettings &shortcuts() const;
+    [[nodiscard]] CardDatabaseSettings &cardDatabase() const;
+    [[nodiscard]] ServersSettings &servers() const;
+    [[nodiscard]] MessageSettings &messages() const;
+    [[nodiscard]] GameFiltersSettings &gameFilters() const;
+    [[nodiscard]] LayoutsSettings &layouts() const;
+    [[nodiscard]] DownloadSettings &downloads() const;
+    [[nodiscard]] RecentsSettings &recents() const;
+    [[nodiscard]] CardOverrideSettings &cardOverrides() const;
+    [[nodiscard]] DebugSettings &debug() const;
     [[nodiscard]] CardCounterSettings &cardCounters() const;
-    [[nodiscard]] TabsSettings &tabs() const
-    {
-        return *tabsSettings;
-    }
-    [[nodiscard]] SoundSettings &sound() const
-    {
-        return *soundSettings;
-    }
-    [[nodiscard]] GameSettings &game() const
-    {
-        return *gameSettings;
-    }
-    [[nodiscard]] ChatSettings &chat() const
-    {
-        return *chatSettings;
-    }
-    [[nodiscard]] CacheStorageSettings &cacheStorage() const
-    {
-        return *cacheStorageSettings;
-    }
-    [[nodiscard]] UpdatesSettings &updates() const
-    {
-        return *updatesSettings;
-    }
-    [[nodiscard]] PersonalSettings &personal() const
-    {
-        return *personalSettings;
-    }
-    [[nodiscard]] CardsDisplaySettings &cardsDisplay() const
-    {
-        return *cardsDisplaySettings;
-    }
-    [[nodiscard]] InterfaceSettings &interface() const
-    {
-        return *interfaceSettings;
-    }
-    [[nodiscard]] PathsSettings &paths() const
-    {
-        return *pathsSettings;
-    }
-    [[nodiscard]] VisualDeckStorageSettings &visualDeckStorage() const
-    {
-        return *visualDeckStorageSettings;
-    }
+    [[nodiscard]] TabsSettings &tabs() const;
+    [[nodiscard]] SoundSettings &sound() const;
+    [[nodiscard]] GameSettings &game() const;
+    [[nodiscard]] ChatSettings &chat() const;
+    [[nodiscard]] CacheStorageSettings &cacheStorage() const;
+    [[nodiscard]] UpdatesSettings &updates() const;
+    [[nodiscard]] PersonalSettings &personal() const;
+    [[nodiscard]] CardsDisplaySettings &cardsDisplay() const;
+    [[nodiscard]] InterfaceSettings &interface() const;
+    [[nodiscard]] PathsSettings &paths() const;
+    [[nodiscard]] VisualDeckStorageSettings &visualDeckStorage() const;
 
     [[nodiscard]] bool getIsPortableBuild() const
     {

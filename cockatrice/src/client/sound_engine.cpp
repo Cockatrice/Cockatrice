@@ -6,7 +6,9 @@
 #include <QMediaPlayer>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#include <QApplication>
 #include <QAudioOutput>
+#include <libcockatrice/settings/sound_settings.h>
 #endif
 
 #define DEFAULT_THEME_NAME "Default"

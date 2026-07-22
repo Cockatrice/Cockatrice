@@ -21,6 +21,7 @@
 #include <QList>
 #include <QMenu>
 #include <QObject>
+#include <libcockatrice/utility/card_ref.h>
 
 class CardItem;
 class CardMenu;

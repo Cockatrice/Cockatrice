@@ -7,6 +7,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <libcockatrice/filters/filter_tree.h>
+#include <libcockatrice/settings/paths_settings.h>
 
 VisualDatabaseDisplayFilterSaveLoadWidget::VisualDatabaseDisplayFilterSaveLoadWidget(QWidget *parent,
                                                                                      FilterTreeModel *_filterModel)

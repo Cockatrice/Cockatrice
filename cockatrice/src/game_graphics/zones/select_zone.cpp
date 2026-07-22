@@ -7,6 +7,7 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QtMath>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 static qreal stackingOffset(qreal cardHeight)
 {

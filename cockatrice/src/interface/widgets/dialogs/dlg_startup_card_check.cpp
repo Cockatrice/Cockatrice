@@ -3,6 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 
 #include <QDate>
+#include <libcockatrice/settings/updates_settings.h>
 
 DlgStartupCardCheck::DlgStartupCardCheck(QWidget *parent) : QDialog(parent)
 {

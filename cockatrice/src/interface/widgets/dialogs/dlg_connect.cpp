@@ -12,6 +12,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
+#include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)

@@ -9,6 +9,7 @@
 
 #include <QPainter>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <libcockatrice/settings/interface_settings.h>
 
 HandZone::HandZone(HandZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_logic, parent), zoneHeight(_zoneHeight)

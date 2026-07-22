@@ -1,6 +1,7 @@
 #include "game_view.h"
 
 #include "../client/settings/cache_settings.h"
+#include "../client/settings/shortcuts_settings.h"
 #include "game_scene.h"
 
 #include <QAction>
@@ -9,6 +10,7 @@
 #include <QLayout>
 #include <QResizeEvent>
 #include <QRubberBand>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
 
 // QRubberBand calls raise() in showEvent() and changeEvent() to stay on top of siblings.

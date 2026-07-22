@@ -2,6 +2,7 @@
 
 #include "../network/update/client/release_channel.h"
 #include "card_counter_settings.h"
+#include "shortcuts_settings.h"
 #include "version_string.h"
 
 #include <QDebug>
@@ -10,8 +11,27 @@
 #include <QGlobalStatic>
 #include <QSettings>
 #include <QStandardPaths>
+#include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/card_database_settings.h>
 #include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/debug_settings.h>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/game_filters_settings.h>
+#include <libcockatrice/settings/game_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/settings/message_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/settings/recents_settings.h>
+#include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/settings/settings_migration.h>
+#include <libcockatrice/settings/sound_settings.h>
+#include <libcockatrice/settings/tabs_settings.h>
+#include <libcockatrice/settings/updates_settings.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <utility>
 
 Q_GLOBAL_STATIC(SettingsCache, settingsCache)
@@ -228,7 +248,181 @@ void SettingsCache::resetPaths()
     }
 }
 
+// ICardDatabasePathProvider - delegate to pathsSettings
+QString SettingsCache::getCustomCardDatabasePath() const
+{
+    return pathsSettings->getCustomCardDatabasePath();
+}
+
+QString SettingsCache::getCardDatabasePath() const
+{
+    return pathsSettings->getCardDatabasePath();
+}
+
+QString SettingsCache::getSpoilerCardDatabasePath() const
+{
+    return pathsSettings->getSpoilerCardDatabasePath();
+}
+
+QString SettingsCache::getTokenDatabasePath() const
+{
+    return pathsSettings->getTokenDatabasePath();
+}
+
+// INetworkSettingsProvider - delegate to sub-objects
+int SettingsCache::getKeepAlive() const
+{
+    return personalSettings->getKeepAlive();
+}
+
+int SettingsCache::getTimeOut() const
+{
+    return personalSettings->getTimeOut();
+}
+
+bool SettingsCache::getNotifyAboutUpdates() const
+{
+    return updatesSettings->getNotifyAboutUpdates();
+}
+
+void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
+{
+    interfaceSettings->setKnownMissingFeatures(_knownMissingFeatures);
+}
+
+QString SettingsCache::getKnownMissingFeatures()
+{
+    return interfaceSettings->getKnownMissingFeatures();
+}
+
+QString SettingsCache::getClientID()
+{
+    return personalSettings->getClientID();
+}
+
+// Release channels
+ReleaseChannel *SettingsCache::getUpdateReleaseChannel() const
+{
+    return releaseChannels.at(qMax(0, updatesSettings->getUpdateReleaseChannelIndex()));
+}
+
+QList<ReleaseChannel *> SettingsCache::getUpdateReleaseChannels() const
+{
+    return releaseChannels;
+}
+
+int SettingsCache::getUpdateReleaseChannelIndex() const
+{
+    return updatesSettings->getUpdateReleaseChannelIndex();
+}
+
+// Sub-settings accessors
+ShortcutsSettings &SettingsCache::shortcuts() const
+{
+    return *shortcutsSettings;
+}
+
+CardDatabaseSettings &SettingsCache::cardDatabase() const
+{
+    return *cardDatabaseSettings;
+}
+
+ServersSettings &SettingsCache::servers() const
+{
+    return *serversSettings;
+}
+
+MessageSettings &SettingsCache::messages() const
+{
+    return *messageSettings;
+}
+
+GameFiltersSettings &SettingsCache::gameFilters() const
+{
+    return *gameFiltersSettings;
+}
+
+LayoutsSettings &SettingsCache::layouts() const
+{
+    return *layoutsSettings;
+}
+
+DownloadSettings &SettingsCache::downloads() const
+{
+    return *downloadSettings;
+}
+
+RecentsSettings &SettingsCache::recents() const
+{
+    return *recentsSettings;
+}
+
+CardOverrideSettings &SettingsCache::cardOverrides() const
+{
+    return *cardOverrideSettings;
+}
+
+DebugSettings &SettingsCache::debug() const
+{
+    return *debugSettings;
+}
+
 CardCounterSettings &SettingsCache::cardCounters() const
 {
     return *cardCounterSettings;
+}
+
+TabsSettings &SettingsCache::tabs() const
+{
+    return *tabsSettings;
+}
+
+SoundSettings &SettingsCache::sound() const
+{
+    return *soundSettings;
+}
+
+GameSettings &SettingsCache::game() const
+{
+    return *gameSettings;
+}
+
+ChatSettings &SettingsCache::chat() const
+{
+    return *chatSettings;
+}
+
+CacheStorageSettings &SettingsCache::cacheStorage() const
+{
+    return *cacheStorageSettings;
+}
+
+UpdatesSettings &SettingsCache::updates() const
+{
+    return *updatesSettings;
+}
+
+PersonalSettings &SettingsCache::personal() const
+{
+    return *personalSettings;
+}
+
+CardsDisplaySettings &SettingsCache::cardsDisplay() const
+{
+    return *cardsDisplaySettings;
+}
+
+InterfaceSettings &SettingsCache::interface() const
+{
+    return *interfaceSettings;
+}
+
+PathsSettings &SettingsCache::paths() const
+{
+    return *pathsSettings;
+}
+
+VisualDeckStorageSettings &SettingsCache::visualDeckStorage() const
+{
+    return *visualDeckStorageSettings;
 }
