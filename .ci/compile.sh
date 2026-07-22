@@ -330,12 +330,6 @@ if [[ $MAKE_INSTALL ]]; then
   echo "::endgroup::"
 fi
 
-if [[ $RUNNER_OS == Windows ]]; then
-  echo "::group::Find DLLs"
-  find vcpkg_installed -name "*.dll"
-  echo "::endgroup::"
-fi
-
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
   cmake --build . --target package --config "$BUILDTYPE"
