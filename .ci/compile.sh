@@ -146,6 +146,7 @@ if [[ $MAKE_TEST ]]; then
 fi
 if [[ $USE_CCACHE == "1" ]]; then
   flags+=("-DUSE_CCACHE=1")
+  ccache --version
   if [[ -n $CCACHE_SIZE ]]; then
     # note, this setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
@@ -176,7 +177,7 @@ function ccachestatsverbose() {
   fi
 }
 
-# Compile
+# Prepare
 if [[ $RUNNER_OS == macOS ]]; then
   # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action,
   # which sets a few environment variables
@@ -252,6 +253,13 @@ if [[ $RUNNER_OS == macOS ]]; then
     chmod +x "$hdiutil_script"
     flags+=(-DCPACK_COMMAND_HDIUTIL="$hdiutil_script")
   fi
+
+elif [[ $RUNNER_OS == Windows ]]; then
+  if [[ "$CMAKE_GENERATOR" =~ ^Visual\ Studio ]]; then
+  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
+  buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
+  fi
 fi
 
 if [[ $USE_CCACHE == "1" ]]; then
@@ -260,12 +268,14 @@ if [[ $USE_CCACHE == "1" ]]; then
   echo "::endgroup::"
 fi
 
+# Configure CMake
 echo "::group::Configure cmake"
 cmake --version
 echo "Running cmake with flags: ${flags[*]}"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
 
+# Build
 echo "::group::Build project"
 echo "Running cmake --build with flags: ${buildflags[*]}"
 cmake --build . "${buildflags[@]}" --verbose
@@ -298,8 +308,35 @@ if [[ $RUNNER_OS == macOS ]]; then
 fi
 
 if [[ $MAKE_TEST ]]; then
+  if [[ $RUNNER_OS == Windows ]]; then
+    echo "::group::Run dummy_test manually"
+
+	echo "dir"
+	pwd
+    ls -la
+
+    echo ""
+    echo "find"
+	find . -name "dummy_test.exe"
+	find tests -maxdepth 1 -type f \( -name "*.dll" -o -name "*.exe" \)
+
+    echo ""
+    echo "dependencies"
+	dumpbin //DEPENDENTS tests/dummy_test.exe
+
+    echo ""
+    echo "dummy_test"
+    ./tests/dummy_test.exe --gtest_list_tests
+    echo "Exit code: $?"
+
+    echo "::endgroup::"
+  fi
+
   echo "::group::Run tests"
-  ctest -C "$BUILDTYPE" --output-on-failure
+  ctest -N -V
+  echo ""
+  ctest --version
+  ctest -C "$BUILDTYPE" -VV --output-on-failure
   echo "::endgroup::"
 fi
 
