@@ -10,6 +10,18 @@
 namespace
 {
 
+static bool nativeSettingsAvailable()
+{
+    QSettings probe;
+    probe.setValue("_migration_native_probe", "ok");
+    probe.sync();
+    QSettings read;
+    bool ok = read.value("_migration_native_probe").toString() == "ok";
+    QSettings().clear();
+    QSettings().sync();
+    return ok;
+}
+
 class SettingsMigrationTest : public ::testing::Test
 {
 protected:
@@ -19,9 +31,6 @@ protected:
     void SetUp() override
     {
         settingsPath = tempDir.path() + "/";
-        QSettings nativeSettings;
-        nativeSettings.clear();
-        nativeSettings.sync();
     }
 
     bool fileExists(const QString &name) const
@@ -320,6 +329,10 @@ TEST_F(SettingsMigrationTest, CardsKeysKeepGroupPrefix)
 
 TEST_F(SettingsMigrationTest, LegacyMigratesServersMessagesAndFilters)
 {
+    if (!nativeSettingsAvailable()) {
+        GTEST_SKIP() << "NativeFormat QSettings not available in this environment";
+    }
+
     {
         QSettings nativeSettings;
         nativeSettings.setValue("server/previoushostlogin", "test_user");
@@ -350,6 +363,10 @@ TEST_F(SettingsMigrationTest, LegacyMigratesServersMessagesAndFilters)
 
 TEST_F(SettingsMigrationTest, LegacyMigratesSets)
 {
+    if (!nativeSettingsAvailable()) {
+        GTEST_SKIP() << "NativeFormat QSettings not available in this environment";
+    }
+
     {
         QSettings nativeSettings;
         nativeSettings.beginGroup("sets");
@@ -372,6 +389,10 @@ TEST_F(SettingsMigrationTest, LegacyMigratesSets)
 
 TEST_F(SettingsMigrationTest, LegacyMigrationIsIdempotent)
 {
+    if (!nativeSettingsAvailable()) {
+        GTEST_SKIP() << "NativeFormat QSettings not available in this environment";
+    }
+
     {
         QSettings nativeSettings;
         nativeSettings.setValue("server/previoushostlogin", "test_user");
