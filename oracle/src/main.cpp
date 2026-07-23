@@ -10,6 +10,7 @@
 #include <QLibraryInfo>
 #include <QTimer>
 #include <QTranslator>
+#include <libcockatrice/settings/personal_settings.h>
 
 QTranslator *translator, *qtTranslator;
 ThemeManager *themeManager;

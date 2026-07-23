@@ -15,6 +15,7 @@
 #include <QScrollBar>
 #include <QtConcurrent>
 #include <QtGui>
+#include <libcockatrice/settings/personal_settings.h>
 
 OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 {

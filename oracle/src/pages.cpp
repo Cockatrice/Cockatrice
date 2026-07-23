@@ -28,6 +28,7 @@
 #include <QTextEdit>
 #include <QtConcurrent>
 #include <QtGui>
+#include <libcockatrice/settings/personal_settings.h>
 
 #ifdef HAS_LZMA
 #include "lzma/decompress.h"
