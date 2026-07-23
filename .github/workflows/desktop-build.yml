@@ -425,22 +425,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "[Windows] Debug PATH (bash)"
-        if: matrix.os == 'Windows'
-        shell: bash
-        run: |
-          where ninja
-          where cl
-          where link
-
-      - name: "[Windows] Debug PATH (cmd)"
-        if: matrix.os == 'Windows'
-        shell: cmd
-        run: |
-          where ninja
-          where cl
-          where link
-
       # Uses environment variables, see compile.sh for more details
       - name: "Build Cockatrice"
         id: build

@@ -261,27 +261,6 @@ if [[ $USE_CCACHE == "1" ]]; then
   echo "::endgroup::"
 fi
 
-if [[ $RUNNER_OS == Windows ]]; then
-  echo "::group::Debug tools"
-  echo "where ccache"
-  where ccache
-  ccache --version
-  echo "where ninja"
-  where ninja
-  ninja --version
-  echo "NUMBER_OF_PROCESSORS=$NUMBER_OF_PROCESSORS"
-  echo "where cl"
-  where cl
-  cl
-  echo "where link"
-  where link
-  link --version || link
-  echo "where rc"
-  where rc
-  rc
-  echo "::endgroup::"
-fi
-
 echo "::group::Configure cmake"
 cmake --version
 echo "Running cmake with flags: ${flags[*]}"
