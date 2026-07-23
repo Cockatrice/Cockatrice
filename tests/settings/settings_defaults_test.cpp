@@ -61,7 +61,7 @@ TEST_F(SettingsDefaultsTest, CacheStorage_CardPictureLoaderCacheMethod_Default)
 TEST_F(SettingsDefaultsTest, CacheStorage_LocalCardImageStorageNamingScheme_Default)
 {
     CacheStorageSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getLocalCardImageStorageNamingScheme(), 0);
+    ASSERT_EQ(s.getLocalCardImageStorageNamingScheme(), LOCAL_CARD_IMAGE_NAMING_SCHEME_DEFAULT);
 }
 
 // --- GameSettings ---
@@ -255,7 +255,7 @@ TEST_F(SettingsDefaultsTest, Chat_RoomHistory_Default)
 TEST_F(SettingsDefaultsTest, Personal_Lang_Default)
 {
     PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getLang(), QString("English"));
+    ASSERT_EQ(s.getLang(), QString(""));
 }
 
 TEST_F(SettingsDefaultsTest, Personal_ClientID_Default)

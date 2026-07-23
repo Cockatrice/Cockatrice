@@ -107,7 +107,7 @@ SettingsCache::SettingsCache()
     settings = new QSettings(settingsPath + "global.ini", QSettings::IniFormat, this);
 
     // Migrate from legacy NativeFormat settings to per-class INI files (runs at most once)
-    if (!isPortableBuild && !QFile(settingsPath + "global.ini").exists()) {
+    if (!isPortableBuild) {
         SettingsMigration::migrateLegacySettings(settingsPath);
     }
 

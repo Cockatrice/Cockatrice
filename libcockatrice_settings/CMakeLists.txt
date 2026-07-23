@@ -67,3 +67,7 @@ target_include_directories(
 )
 
 target_link_libraries(libcockatrice_settings PUBLIC libcockatrice_card libcockatrice_utility ${QT_CORE_MODULE})
+
+if(TEST)
+  target_compile_definitions(libcockatrice_settings PRIVATE SETTINGS_UNIT_TEST)
+endif()

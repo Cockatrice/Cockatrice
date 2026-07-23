@@ -61,6 +61,9 @@ static void migrateGameSettings(const QString &settingsPath, QSettings &globalIn
 
     QSettings gameIni(settingsPath + "game.ini", QSettings::IniFormat);
     for (const auto &key : gameKeys) {
+        if (key == "maxfontsize") {
+            continue;
+        }
         gameIni.setValue("game/" + key, globalIni.value("game/" + key));
     }
     for (const auto &key : localGameKeys) {
@@ -460,10 +463,18 @@ static void migrateLegacyGameFilters(const QString &settingsPath)
 
 bool SettingsMigration::migrateLegacySettings(const QString &settingsPath)
 {
+    QSettings personalIni(settingsPath + "personal.ini", QSettings::IniFormat);
+    if (personalIni.value("migration/legacy_complete", false).toBool()) {
+        return false;
+    }
+
     migrateLegacySets(settingsPath);
     migrateLegacyServers(settingsPath);
     migrateLegacyMessages(settingsPath);
     migrateLegacyGameFilters(settingsPath);
+
+    personalIni.setValue("migration/legacy_complete", true);
+    personalIni.sync();
     return true;
 }
 
@@ -475,7 +486,14 @@ bool SettingsMigration::migrateSettingsFromGlobalIni(const QString &settingsPath
 
     QSettings globalIni(settingsPath + "global.ini", QSettings::IniFormat);
     if (globalIni.value(MIGRATION_SENTINEL_KEY, false).toBool()) {
-        return false;
+        // If a user runs an older Cockatrice build that writes to global.ini (non-sentinel keys)
+        // and then upgrades back, those new keys will be silently ignored. Re-migrate them.
+        globalIni.sync();
+        auto allKeys = globalIni.allKeys();
+        allKeys.removeAll(MIGRATION_SENTINEL_KEY);
+        if (allKeys.isEmpty()) {
+            return false;
+        }
     }
 
     migrateTabsSettings(settingsPath, globalIni);
@@ -490,9 +508,8 @@ bool SettingsMigration::migrateSettingsFromGlobalIni(const QString &settingsPath
     migratePathsSettings(settingsPath, globalIni);
     migrateVisualDeckStorageSettings(settingsPath, globalIni);
 
-    if (!QFile::rename(settingsPath + "global.ini", settingsPath + "global.ini.old")) {
-        return false;
-    }
+    QFile::remove(settingsPath + "global.ini.old");
+    QFile::rename(settingsPath + "global.ini", settingsPath + "global.ini.old");
 
     QSettings newGlobalIni(settingsPath + "global.ini", QSettings::IniFormat);
     newGlobalIni.setValue(MIGRATION_SENTINEL_KEY, true);

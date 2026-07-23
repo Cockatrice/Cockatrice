@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QSettings>
@@ -18,6 +19,9 @@ protected:
     void SetUp() override
     {
         settingsPath = tempDir.path() + "/";
+        QSettings nativeSettings;
+        nativeSettings.clear();
+        nativeSettings.sync();
     }
 
     bool fileExists(const QString &name) const
@@ -312,10 +316,139 @@ TEST_F(SettingsMigrationTest, CardsKeysKeepGroupPrefix)
     ASSERT_EQ(readFromIni("cards.ini", "interface/deckeditorbannercardcomboboxvisible"), QVariant(true));
 }
 
+// --- migrateLegacySettings tests ---
+
+TEST_F(SettingsMigrationTest, LegacyMigratesServersMessagesAndFilters)
+{
+    {
+        QSettings nativeSettings;
+        nativeSettings.setValue("server/previoushostlogin", "test_user");
+        nativeSettings.setValue("server/auto_connect", true);
+        nativeSettings.beginGroup("messages");
+        nativeSettings.setValue("count", 1);
+        nativeSettings.setValue("message0", "hello");
+        nativeSettings.endGroup();
+        nativeSettings.beginGroup("filter_games");
+        nativeSettings.setValue("show_empty", true);
+        nativeSettings.endGroup();
+        nativeSettings.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateLegacySettings(settingsPath));
+
+    ASSERT_TRUE(fileExists("servers.ini"));
+    ASSERT_EQ(readFromIni("servers.ini", "server/previoushostlogin"), QVariant("test_user"));
+    ASSERT_EQ(readFromIni("servers.ini", "server/auto_connect"), QVariant(true));
+
+    ASSERT_TRUE(fileExists("messages.ini"));
+    ASSERT_EQ(readFromIni("messages.ini", "messages/count"), QVariant(1));
+    ASSERT_EQ(readFromIni("messages.ini", "messages/message0"), QVariant("hello"));
+
+    ASSERT_TRUE(fileExists("gamefilters.ini"));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/show_empty"), QVariant(true));
+}
+
+TEST_F(SettingsMigrationTest, LegacyMigratesSets)
+{
+    {
+        QSettings nativeSettings;
+        nativeSettings.beginGroup("sets");
+        nativeSettings.beginGroup("set1");
+        nativeSettings.setValue("sortkey", "001");
+        nativeSettings.setValue("enabled", true);
+        nativeSettings.setValue("isknown", false);
+        nativeSettings.endGroup();
+        nativeSettings.endGroup();
+        nativeSettings.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateLegacySettings(settingsPath));
+
+    ASSERT_TRUE(fileExists("cardDatabase.ini"));
+    ASSERT_EQ(readFromIni("cardDatabase.ini", "sets/set1/sortkey"), QVariant("001"));
+    ASSERT_EQ(readFromIni("cardDatabase.ini", "sets/set1/enabled"), QVariant(true));
+    ASSERT_EQ(readFromIni("cardDatabase.ini", "sets/set1/isknown"), QVariant(false));
+}
+
+TEST_F(SettingsMigrationTest, LegacyMigrationIsIdempotent)
+{
+    {
+        QSettings nativeSettings;
+        nativeSettings.setValue("server/previoushostlogin", "test_user");
+        nativeSettings.setValue("server/auto_connect", true);
+        nativeSettings.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateLegacySettings(settingsPath));
+
+    // Change the migrated value
+    {
+        QSettings serversIni(settingsPath + "servers.ini", QSettings::IniFormat);
+        serversIni.setValue("server/previoushostlogin", "modified_user");
+        serversIni.sync();
+    }
+
+    // Second migration should NOT overwrite the change
+    ASSERT_FALSE(SettingsMigration::migrateLegacySettings(settingsPath));
+    ASSERT_EQ(readFromIni("servers.ini", "server/previoushostlogin"), QVariant("modified_user"));
+}
+
+TEST_F(SettingsMigrationTest, LegacyMigrationEmptyNativeFormatWritesSentinel)
+{
+    ASSERT_TRUE(SettingsMigration::migrateLegacySettings(settingsPath));
+    ASSERT_TRUE(fileExists("personal.ini"));
+    ASSERT_EQ(readFromIni("personal.ini", "migration/legacy_complete"), QVariant(true));
+    ASSERT_FALSE(fileExists("messages.ini"));
+    ASSERT_FALSE(fileExists("gamefilters.ini"));
+    ASSERT_FALSE(fileExists("cardDatabase.ini"));
+
+    // Second call should be a no-op
+    ASSERT_FALSE(SettingsMigration::migrateLegacySettings(settingsPath));
+}
+
+// --- migrateSettingsFromGlobalIni rename-failure test ---
+
+TEST_F(SettingsMigrationTest, RenameFailureWithExistingBackup)
+{
+    {
+        QSettings g(settingsPath + "global.ini", QSettings::IniFormat);
+        g.setValue("tabs/visualDeckStorage", true);
+        g.setValue("sound/enabled", true);
+        g.sync();
+    }
+
+    // Create a stale backup
+    {
+        QFile oldBackup(settingsPath + "global.ini.old");
+        ASSERT_TRUE(oldBackup.open(QIODevice::WriteOnly));
+        oldBackup.close();
+    }
+
+    // Migration should still succeed
+    ASSERT_TRUE(SettingsMigration::migrateSettingsFromGlobalIni(settingsPath));
+
+    // Per-file INIs should be created
+    ASSERT_TRUE(fileExists("tabs.ini"));
+    ASSERT_TRUE(fileExists("sound.ini"));
+
+    // Sentinel should be set in the new global.ini
+    ASSERT_EQ(readFromIni("global.ini", "migration/perfile_complete"), QVariant(true));
+
+    // Original data should be backed up (stale backup was replaced)
+    ASSERT_TRUE(fileExists("global.ini.old"));
+    ASSERT_EQ(readFromIni("global.ini.old", "tabs/visualDeckStorage"), QVariant(true));
+
+    // Second call should be a no-op
+    ASSERT_FALSE(SettingsMigration::migrateSettingsFromGlobalIni(settingsPath));
+}
+
 } // namespace
 
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
+    QCoreApplication app(argc, argv);
+    app.setOrganizationName("CockatriceTest");
+    app.setApplicationName("SettingsMigrationTest");
     return RUN_ALL_TESTS();
 }

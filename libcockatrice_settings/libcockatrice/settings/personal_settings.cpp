@@ -7,7 +7,7 @@ PersonalSettings::PersonalSettings(const QString &settingPath, QObject *parent)
 
 QString PersonalSettings::getLang() const
 {
-    return getValue("lang", QString(), QString(), "English").toString();
+    return getValue("lang", QString(), QString(), QString()).toString();
 }
 
 QString PersonalSettings::getClientID()

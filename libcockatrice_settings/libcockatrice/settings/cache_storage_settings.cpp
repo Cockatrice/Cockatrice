@@ -27,7 +27,8 @@ int CacheStorageSettings::getCardPictureLoaderCacheMethod() const
 
 int CacheStorageSettings::getLocalCardImageStorageNamingScheme() const
 {
-    return getValue("localCardImageStorageNamingScheme", QString(), QString(), 0).toInt();
+    return getValue("localCardImageStorageNamingScheme", QString(), QString(), LOCAL_CARD_IMAGE_NAMING_SCHEME_DEFAULT)
+        .toInt();
 }
 
 void CacheStorageSettings::setPixmapCacheSize(int _pixmapCacheSize)
