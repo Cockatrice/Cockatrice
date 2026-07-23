@@ -27,15 +27,10 @@ option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
-if(DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE
-      ${CMAKE_BUILD_TYPE}
-      CACHE STRING "Type of build"
-  )
-else()
+if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE
       Release
-      CACHE STRING "Type of build"
+      CACHE STRING "Build type"
   )
 endif()
 
@@ -87,6 +82,7 @@ set(CMAKE_CXX_STANDARD
     CACHE STRING "C++ ISO Standard"
 )
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set conventional loops
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
@@ -102,8 +98,7 @@ include(createversionfile)
 
 # Define a proper install path
 if(UNIX)
-  if(APPLE)
-    # macOS
+  if(APPLE) # macOS
     # Due to the special bundle structure ignore
     # the prefix eventually set by the user.
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
@@ -139,12 +134,25 @@ elseif(WIN32)
 endif()
 
 # Define proper compilation flags
-if(MSVC)
-  # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
-  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi")
-  # Visual Studio: Maximum Optimization, Multi-threaded DLL
+if(MSVC) # MS Visual C++ compiler
+  # /wd4251          Suppress C4251 (DLL interface) warnings
+  # /W4              Enable warning level 4
+  # /EHsc            Enable standard C++ exception handling
+  # /Zi              Generate debugging information (Program Database, PDB)
+  set(CMAKE_CXX_FLAGS "/wd4251 /W4 /EHsc /Zi")
+
+  # Visual Studio generator: Append parallelisation flag (not needed with Ninja)
+  # /MP              Enable parallel compilation
+  if(CMAKE_GENERATOR MATCHES "^Visual Studio")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  endif()
+
+  # /Ox              Enable maximum optimization
+  # /MD              Link against the multi-threaded DLL runtime library (Release CRT)
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
-  # Visual Studio: No Optimization, Multi-threaded Debug DLL
+
+  # /Od              Disable optimization
+  # /MDd             Link against the multi-threaded Debug DLL runtime library (Debug CRT)
   set(CMAKE_CXX_FLAGS_DEBUG "/Od /MDd")
 
   # Generate PDB, even when in release (So developers can better analyze crash logs)
