@@ -44,13 +44,28 @@ void ReleaseChannel::checkForUpdates()
     connect(response, &QNetworkReply::finished, this, &ReleaseChannel::releaseListFinished);
 }
 
-// Find compatible assets for host platform (Linux is not supported by in-client updater)
+// Find assets compatible with host platform (Linux is not supported by in-client updater)
 std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &fileName)
 {
     const QRegularExpression *regex = nullptr;
 
+    static const std::optional<int> systemVersion = [] {
+        bool ok = false;
+        const QString versionString = QSysInfo::productVersion();
+        const int version = versionString.split('.').first().toInt(&ok);
+        if (!ok) {
+            qCWarning(ReleaseChannelLog) << "Unable to determine OS version from" << versionString;
+            return std::optional<int>();
+        }
+        return std::optional<int>{version};
+    }();
+
+    if (!systemVersion) {
+        return std::nullopt;
+    }
+
 #if defined(Q_OS_MACOS)
-    const bool isIntel = [] {
+    static const bool isIntel = [] {
         // QSysInfo does not go through translation layers
         // We need to use sysctl to reliably detect the underlying architecture
         char arch[255];
@@ -60,12 +75,16 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
         }
         return false;
     }();
+
+    // Apple (ARM) --> Cockatrice-3.0.0-macOS15.dmg
+    // Apple (x86) --> Cockatrice-3.0.0-macOS15_Intel.dmg
     static const QRegularExpression macIntelRegex(R"(-macOS(\d+)_Intel\.[^.]+$)",
                                                   QRegularExpression::CaseInsensitiveOption);
-    static const QRegularExpression macArmRegex(R"(-macOS(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
-    regex = isIntel ? &macIntelRegex : &macArmRegex;
+    static const QRegularExpression macRegex(R"(-macOS(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
+    regex = isIntel ? &macIntelRegex : &macRegex;
 
 #elif defined(Q_OS_WIN)
+    // Windows (x86) --> Cockatrice-3.0.0-Windows10.exe
     static const QRegularExpression winRegex(R"(-(?:Win|Windows)(\d+)\.[^.]+$)",
                                              QRegularExpression::CaseInsensitiveOption);
     regex = &winRegex;
@@ -75,14 +94,13 @@ std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &f
     return std::nullopt;
 #endif
 
-    // Any asset targeting an OS version smaller or equal to the current host works
-    const int systemVersion = QSysInfo::productVersion().split('.').first().toInt();
+    // Any asset targeting an OS version up to the current host version works
     auto match = regex->match(fileName);
     if (!match.hasMatch()) {
         return std::nullopt;
     }
     const int targetVersion = match.captured(1).toInt();
-    if (targetVersion > systemVersion) {
+    if (targetVersion > *systemVersion) {
         return std::nullopt;
     }
     return targetVersion;
