@@ -1,13 +1,17 @@
 #include "replay_quick_settings_widget.h"
 
-#include "../../client/settings/cache_settings.h"
+#include "../../../client/settings/cache_settings.h"
+
+#include <QGridLayout>
+#include <QLabel>
+#include <QWidget>
 
 ReplayQuickSettingsWidget::ReplayQuickSettingsWidget(QWidget *parent) : SettingsButtonWidget(parent)
 {
     // fast forward speed
     fastForwardSpeedBox.setMinimum(1);
     fastForwardSpeedBox.setValue(SettingsCache::instance().getFastForwardSpeed());
-    connect(&fastForwardSpeedBox, &QDoubleSpinBox::valueChanged, this,
+    connect(&fastForwardSpeedBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
             &ReplayQuickSettingsWidget::actUpdateFastForwardSpeed);
 
     // putting it all together
@@ -19,6 +23,7 @@ ReplayQuickSettingsWidget::ReplayQuickSettingsWidget(QWidget *parent) : Settings
 
     this->addSettingsWidget(widget);
 
+    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &ReplayQuickSettingsWidget::retranslateUi);
     retranslateUi();
 }
 
