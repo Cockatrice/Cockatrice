@@ -144,7 +144,7 @@ jobs:
             package: DEB
             test: true    # run debug build and tests on newest distro version
 
-    name: Linux / ${{ matrix.distro }} / ${{ matrix.distro_version }}
+    name: "Linux / ${{ matrix.distro }} / ${{ matrix.distro_version }}"
     needs: configure
     runs-on: ubuntu-latest    # https://github.com/actions/runner-images/tree/main#available-images
     continue-on-error: ${{ matrix.allow-failure == true }}
@@ -328,7 +328,7 @@ jobs:
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
 
-    name: ${{ matrix.os }} / ${{ matrix.os_target_version }}${{ case(matrix.soc == 'Intel', ' Intel', '') }}${{ case(matrix.type == 'Debug', ' Debug', '') }}
+    name: "${{ matrix.os }} / ${{ matrix.os_target_version }}${{ case(matrix.soc == 'Intel', ' Intel', '') }}${{ case(matrix.type == 'Debug', ' Debug', '') }}"
     needs: configure
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
