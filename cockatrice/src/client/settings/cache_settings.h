@@ -7,7 +7,6 @@
 #ifndef SETTINGSCACHE_H
 #define SETTINGSCACHE_H
 
-#include "../../game_graphics/tally/tally.h"
 #include "../../interface/card_picture_loader/card_picture_loader_cache_method.h"
 #include "../../interface/card_picture_loader/card_picture_loader_local_schemes.h"
 #include "shortcuts_settings.h"
@@ -198,7 +197,7 @@ signals:
     void useTearOffMenusChanged(bool state);
     void roundCardCornersChanged(bool roundCardCorners);
     void keepGameChatFocusChanged(bool value);
-    void tallyTypeChanged(TallyType type);
+    void tallyTypeChanged(int type);
 
 private:
     QSettings *settings;
@@ -481,9 +480,9 @@ public:
     {
         return showTotalSelectionCount;
     }
-    [[nodiscard]] TallyType getTallyType() const
+    [[nodiscard]] int getTallyType() const
     {
-        return static_cast<TallyType>(tallyType);
+        return tallyType;
     }
     [[nodiscard]] bool getNotificationsEnabled() const
     {
@@ -1183,6 +1182,6 @@ public slots:
     void setRoundCardCorners(bool _roundCardCorners);
     void setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount);
     void setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSelectionCount);
-    void setTallyType(TallyType value);
+    void setTallyType(int value);
 };
 #endif

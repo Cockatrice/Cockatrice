@@ -248,7 +248,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
         totalCountLabel->show();
     }
 
-    TallyType tallyType = SettingsCache::instance().getTallyType();
+    TallyType tallyType = Tally::intToType(SettingsCache::instance().getTallyType());
 
     GameScene *gameScene = static_cast<GameScene *>(scene());
     QList<TallyRow> entries = Tally::compute(gameScene->selectedCards(), tallyType);

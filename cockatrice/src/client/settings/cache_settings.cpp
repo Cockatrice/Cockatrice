@@ -1396,10 +1396,14 @@ void SettingsCache::setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSele
     settings->setValue("interface/showpersistentselectioncount", showTotalSelectionCount);
 }
 
-void SettingsCache::setTallyType(TallyType value)
+void SettingsCache::setTallyType(int value)
 {
-    tallyType = static_cast<int>(value);
-    settings->setValue("interface/tallyType", tallyType);
+    if (tallyType == value) {
+        return;
+    }
+
+    tallyType = value;
+    settings->setValue("interface/tallyType", value);
     emit tallyTypeChanged(value);
 }
 
