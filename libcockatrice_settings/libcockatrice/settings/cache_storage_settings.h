@@ -53,6 +53,7 @@ public:
 private:
 #endif
     explicit CacheStorageSettings(const QString &settingPath, QObject *parent = nullptr);
+
 private:
     CacheStorageSettings(const CacheStorageSettings & /*other*/);
 };
