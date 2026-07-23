@@ -45,7 +45,9 @@ PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QSt
     schemeComboBox->setCurrentText(loadedScheme);
     schemeComboBox->blockSignals(false);
 
+    paletteGrid->blockSignals(true);
     paletteGrid->loadPalette(workingConfig[loadedScheme]);
+    paletteGrid->blockSignals(false);
     seedAccentFromScheme(loadedScheme);
 
     retranslateUi();
