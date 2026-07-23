@@ -51,6 +51,8 @@ public:
 private:
 #endif
     explicit GameSettings(const QString &settingPath, QObject *parent = nullptr);
+
+private:
     GameSettings(const GameSettings & /*other*/);
 };
 

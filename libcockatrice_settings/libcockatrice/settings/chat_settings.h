@@ -48,6 +48,8 @@ public:
 private:
 #endif
     explicit ChatSettings(const QString &settingPath, QObject *parent = nullptr);
+
+private:
     ChatSettings(const ChatSettings & /*other*/);
 };
 

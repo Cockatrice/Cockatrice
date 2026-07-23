@@ -61,6 +61,8 @@ public:
 private:
 #endif
     explicit PersonalSettings(const QString &settingPath, QObject *parent = nullptr);
+
+private:
     PersonalSettings(const PersonalSettings & /*other*/);
 };
 

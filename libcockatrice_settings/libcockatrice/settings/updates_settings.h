@@ -39,6 +39,8 @@ public:
 private:
 #endif
     explicit UpdatesSettings(const QString &settingPath, QObject *parent = nullptr);
+
+private:
     UpdatesSettings(const UpdatesSettings & /*other*/);
 };
 

@@ -87,6 +87,8 @@ public:
 private:
 #endif
     explicit VisualDeckStorageSettings(const QString &settingPath, QObject *parent = nullptr);
+
+private:
     VisualDeckStorageSettings(const VisualDeckStorageSettings & /*other*/);
 };
 

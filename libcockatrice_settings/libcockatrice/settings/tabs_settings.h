@@ -33,6 +33,8 @@ public:
 private:
 #endif
     explicit TabsSettings(const QString &settingPath, QObject *parent = nullptr);
+
+private:
     TabsSettings(const TabsSettings & /*other*/);
 };
 

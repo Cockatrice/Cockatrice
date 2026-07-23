@@ -30,6 +30,8 @@ public:
 private:
 #endif
     explicit SoundSettings(const QString &settingPath, QObject *parent = nullptr);
+
+private:
     SoundSettings(const SoundSettings & /*other*/);
 };
 
