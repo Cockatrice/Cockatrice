@@ -89,5 +89,7 @@ int QuickSetupPanel::intensity() const
 
 void QuickSetupPanel::setAccentColor(const QColor &c)
 {
+    accentButton->blockSignals(true);
     accentButton->setColor(c);
+    accentButton->blockSignals(false);
 }

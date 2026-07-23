@@ -15,10 +15,26 @@
 #include <QFrame>
 #include <QGuiApplication>
 #include <QLabel>
+#include <QLoggingCategory>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QStyleHints>
 #include <QTimer>
+
+// Probe whether a directory is truly writable by trying to create and remove a
+// temporary file. QFileInfo::isWritable() on a directory is unreliable (notably
+// on Windows where UAC VirtualStore can make a system dir appear writable).
+static bool isDirReallyWritable(const QString &dirPath)
+{
+    const QString probe = QDir(dirPath).absoluteFilePath(".cockatrice_write_test");
+    QFile f(probe);
+    if (!f.open(QIODevice::WriteOnly)) {
+        return false;
+    }
+    f.close();
+    f.remove();
+    return true;
+}
 
 PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QString &_themeName, QWidget *parent)
     : QDialog(parent), themeDirPath(_themeDirPath), themeName(_themeName)
@@ -29,11 +45,13 @@ PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QSt
     // Resolve a writable directory for saving. Built-in (Default / Fusion) and
     // other read-only theme directories must be customised in the user-writable
     // themes directory; otherwise the write would fail or be lost on upgrade.
-    if (!themeDirPath.isEmpty() && QFileInfo(themeDirPath).isWritable()) {
+    if (!themeDirPath.isEmpty() && isDirReallyWritable(themeDirPath)) {
         saveDir = themeDirPath;
     } else {
         saveDir = QDir(SettingsCache::instance().getThemesPath()).absoluteFilePath(themeName);
-        QDir().mkpath(saveDir);
+        if (!QDir().mkpath(saveDir)) {
+            qWarning() << "Failed to create palette save directory:" << saveDir;
+        }
     }
 
     // Load both scheme configs upfront so switching is instant
@@ -195,7 +213,7 @@ void PaletteEditorDialog::retranslateUi()
     resetBtn->setToolTip(tr("Discard unsaved edits and restore the last saved palette"));
     saveBtn->setToolTip(tr("Write palette-%1.toml and reload the theme").arg(loadedScheme.toLower()));
 
-    if (saveDir.isEmpty() || !QFileInfo(saveDir).isWritable()) {
+    if (saveDir.isEmpty() || !isDirReallyWritable(saveDir)) {
         saveBtn->setEnabled(false);
         saveBtn->setToolTip(tr("Cannot save: this theme has no writable directory"));
     }
@@ -307,11 +325,10 @@ void PaletteEditorDialog::onRevertToDefault()
 {
     // Delete this scheme's custom palette file so the theme falls back to its
     // default (or, when it ships none, the application palette).
-    const QString fileName = PaletteConfig::fileName(loadedScheme);
-    QFile::remove(QDir(saveDir).absoluteFilePath(fileName));
-    if (!themeDirPath.isEmpty() && themeDirPath != saveDir) {
-        QFile::remove(QDir(themeDirPath).absoluteFilePath(fileName));
-    }
+    // Note: shipped defaults use palette-default-<scheme>.toml so this only
+    // removes user-written custom palette files; the theme author's defaults
+    // are left untouched.
+    QFile::remove(QDir(saveDir).absoluteFilePath(PaletteConfig::fileName(loadedScheme)));
 
     // Reload the live theme so the revert takes effect immediately.
     themeManager->reloadCurrentTheme();

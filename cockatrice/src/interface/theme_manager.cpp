@@ -92,18 +92,18 @@ struct PaletteColorInfo
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
     defaultStyleName = qApp->style()->objectName();
-    // On Windows, Qt may report the legacy "windowsvista" style as the default.
-    // Prefer the modern "windows11" style when it is available; "windowsvista"
-    // remains selectable through the per-theme style setting.
-    if (defaultStyleName.compare("windowsvista", Qt::CaseInsensitive) == 0 &&
-        QStyleFactory::keys().contains("windows11", Qt::CaseInsensitive)) {
-        defaultStyleName = "windows11";
+    //! \todo Workaround for windows11 style being broken.
+    if (defaultStyleName == "windows11") {
+        defaultStyleName = "windowsvista";
     }
     // Capture the untouched application palette before any theme is applied.
     defaultPalette = qApp->palette();
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
-    connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, &ThemeManager::themeChangedSlot);
+    connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this] {
+        defaultPalette = qApp->palette();
+        themeChangedSlot();
+    });
 #endif
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, &ThemeManager::themeChangedSlot);
     themeChangedSlot();
@@ -402,6 +402,16 @@ void ThemeManager::themeChangedSlot()
     if (!dirPath.isEmpty()) {
         resources << dir.absolutePath();
     }
+
+    // When the resolved dir is a user copy (e.g. user/<theme>), also
+    // include the system theme dir as a fallback so shipped assets like
+    // zones/*.png and style.css still resolve for themes that ship only
+    // those files (e.g. Leather, Plasma, Fabric, VelvetMarble).
+    const QString sysPath = QDir(systemThemesBasePath()).absoluteFilePath(themeName);
+    if (sysPath != dirPath && QDir(sysPath).exists()) {
+        resources << sysPath;
+    }
+
     resources << DEFAULT_RESOURCE_PATHS;
 
     QDir::setSearchPaths("theme", resources);
