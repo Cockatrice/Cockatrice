@@ -12,13 +12,15 @@ class TallyMenu : public TearOffMenu, public AbstractPlayerComponent
     Q_OBJECT
 
 public:
-    explicit TallyMenu();
+    TallyMenu();
 
     void setShortcutsActive() override;
     void setShortcutsInactive() override;
     void retranslateUi() override;
 
 private:
+    QActionGroup *actionGroup = nullptr;
+
     QAction *aTallyNone = nullptr;
     QAction *aTallySubtypes = nullptr;
 

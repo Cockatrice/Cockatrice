@@ -2,8 +2,13 @@
 
 #include "../../../client/settings/cache_settings.h"
 
+#include <QActionGroup>
+
 TallyMenu::TallyMenu()
 {
+    actionGroup = new QActionGroup(this);
+    actionGroup->setExclusive(true);
+
     aTallyNone = createTallyAction(TallyType::None);
     aTallySubtypes = createTallyAction(TallyType::Subtypes);
 
@@ -24,8 +29,8 @@ QAction *TallyMenu::createTallyAction(TallyType tallyType)
 
     connect(action, &QAction::triggered, &SettingsCache::instance(),
             [tallyType] { SettingsCache::instance().setTallyType(tallyType); });
-    connect(&SettingsCache::instance(), &SettingsCache::tallyTypeChanged, action,
-            [action, tallyType](TallyType type) { action->setChecked(type == tallyType); });
+
+    actionGroup->addAction(action);
 
     return action;
 }
