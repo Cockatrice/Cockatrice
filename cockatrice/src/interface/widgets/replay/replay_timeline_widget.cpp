@@ -187,7 +187,7 @@ void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
 void ReplayTimelineWidget::setTimeScaleFactor(qreal _timeScaleFactor)
 {
     timeScaleFactor = _timeScaleFactor;
-    int interval = qRound(TIMER_INTERVAL_MS / timeScaleFactor);
+    int interval = std::max(1, qRound(TIMER_INTERVAL_MS / timeScaleFactor));
     replayTimer->setInterval(interval);
 }
 
