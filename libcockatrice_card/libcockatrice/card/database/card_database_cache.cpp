@@ -40,7 +40,7 @@ void writeHashBlob(QDataStream &out, const QVariantHash &h)
 {
     QByteArray blob;
     QDataStream blobOut(&blob, QIODevice::WriteOnly);
-    blobOut.setVersion(QDataStream::Qt_6_3);
+    blobOut.setVersion(QDataStream::Qt_6_4);
     blobOut << h;
     out << static_cast<quint32>(blob.size());
     out.writeRawData(blob.constData(), blob.size());
@@ -329,7 +329,7 @@ bool CardDatabaseCache::write(const QString &cachePath, const CardDatabaseData &
     }
 
     QDataStream out(&file);
-    out.setVersion(QDataStream::Qt_6_3);
+    out.setVersion(QDataStream::Qt_6_4);
 
     // Header
     out << CACHE_MAGIC;
@@ -379,7 +379,7 @@ bool CardDatabaseCache::read(const QString &cachePath,
     QBuffer buffer(const_cast<QByteArray *>(&raw));
     buffer.open(QIODevice::ReadOnly);
     QDataStream in(&buffer);
-    in.setVersion(QDataStream::Qt_6_3);
+    in.setVersion(QDataStream::Qt_6_4);
 
     quint32 magic = 0;
     quint32 version = 0;

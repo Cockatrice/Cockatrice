@@ -17,7 +17,7 @@ void PrintingInfo::ensurePropertiesLoaded() const
     propertiesCache.clear();
     if (!propertiesBlob.isEmpty()) {
         QDataStream in(propertiesBlob);
-        in.setVersion(QDataStream::Qt_6_3);
+        in.setVersion(QDataStream::Qt_6_4);
         in >> propertiesCache;
     }
     propertiesLoaded = true;
