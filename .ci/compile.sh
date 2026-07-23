@@ -161,7 +161,9 @@ if [[ -n $PACKAGE_TYPE ]]; then
 fi
 if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
-  flags+=("-DVCPKG_APPLOCAL_DEPS=OFF")    # disable copying of runtime DLLs into build output on Windows
+  if [[ $RUNNER_OS == Windows ]]; then
+    flags+=("-DVCPKG_APPLOCAL_DEPS=OFF")    # disable copying of runtime DLLs into build output
+  fi
 fi
 
 # Add cmake --build flags
