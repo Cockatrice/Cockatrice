@@ -541,6 +541,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
+    // Signals for unknown/failed DB were emitted during the front-loaded parse
+    // before MainWindow existed.  Drive the UX now that receivers are connected.
+    CardDatabaseManager::getInstance()->checkUnknownSets();
+
     if (SettingsCache::instance().debug().getLocalGameOnStartup()) {
         LocalGameOptions options;
         options.numberPlayers = SettingsCache::instance().debug().getLocalGamePlayerCount();

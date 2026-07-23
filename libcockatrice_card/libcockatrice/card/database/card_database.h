@@ -54,12 +54,13 @@ protected:
     /** @brief Querier for higher-level card lookups. */
     CardDatabaseQuerier *querier;
 
-private:
+public:
     /**
      * @brief Check for sets that are unknown and emit signals if needed.
      */
     void checkUnknownSets();
 
+private:
     /**
      * @brief Refreshes the cached reverse-related cards for all cards.
      */

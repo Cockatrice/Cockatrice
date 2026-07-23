@@ -25,8 +25,8 @@ public:
     struct SetOptions
     {
         unsigned int sortKey = 0;
-        bool enabled = true;
-        bool isKnown = true;
+        bool enabled = false;
+        bool isKnown = false;
     };
 
     virtual ~ICardSetPriorityController() = default;

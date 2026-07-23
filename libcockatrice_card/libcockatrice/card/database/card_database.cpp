@@ -248,9 +248,6 @@ void CardDatabase::swapInDatabaseData(CardDatabaseData data)
 
     loadStatus = cards.isEmpty() ? NotLoaded : Ok;
 
-    // Detect newly-encountered sets now that the live data is populated.
-    checkUnknownSets();
-
     // inform listeners that the whole database was replaced; they should
     // rebuild from the live containers in a single batch instead of reacting
     // to individual card additions.

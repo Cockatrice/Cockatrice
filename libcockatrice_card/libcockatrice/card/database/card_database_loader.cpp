@@ -6,6 +6,7 @@
 #include "parser/cockatrice_xml_4.h"
 
 #include <QByteArray>
+#include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDirIterator>
@@ -118,7 +119,7 @@ LoadStatus CardDatabaseLoader::doLoadCardDatabases()
     }
 
     // AFTER all the cards have been loaded: resolve the reverse-related tags
-    // against the fully-built snapshot (off the GUI thread).
+    // against the fully-built snapshot.
     database->refreshCachedReverseRelatedCards(data.cards);
 
     if (loadStatus == Ok) {
@@ -143,6 +144,12 @@ QByteArray CardDatabaseLoader::computeSourceHash() const
     // Hash over the paths, sizes and modification times of every input file so
     // the cache invalidates when any source changes. Cheap (no content read).
     QCryptographicHash hash(QCryptographicHash::Sha256);
+
+    // Include the application version so parser changes automatically invalidate
+    // old caches even when the XML files are byte-identical.
+    hash.addData(QCoreApplication::applicationVersion().toUtf8());
+    hash.addData(QByteArray(1, '\0'));
+
     const QStringList inputs = QStringList()
                                << pathProvider->getCardDatabasePath() << pathProvider->getTokenDatabasePath()
                                << pathProvider->getSpoilerCardDatabasePath() << collectCustomDatabasePaths();
@@ -150,8 +157,11 @@ QByteArray CardDatabaseLoader::computeSourceHash() const
         QFileInfo info(path);
         if (info.exists()) {
             hash.addData(path.toUtf8());
+            hash.addData(QByteArray(1, '\0'));
             hash.addData(QByteArray::number(info.size()));
+            hash.addData(QByteArray(1, '\0'));
             hash.addData(QByteArray::number(info.lastModified().toSecsSinceEpoch()));
+            hash.addData(QByteArray(1, '\0'));
         }
     }
     return hash.result();

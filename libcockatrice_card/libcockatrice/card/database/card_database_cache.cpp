@@ -6,11 +6,13 @@
 #include "../relation/card_relation.h"
 #include "../relation/card_relation_type.h"
 #include "../set/card_set.h"
+#include "card_database_loader.h"
 
 #include <QBuffer>
 #include <QDataStream>
 #include <QElapsedTimer>
 #include <QFile>
+#include <QSaveFile>
 #include <QVariantHash>
 
 namespace
@@ -50,6 +52,9 @@ QByteArray readHashBlob(QDataStream &in)
 {
     quint32 len = 0;
     in >> len;
+    if (in.status() != QDataStream::Ok || static_cast<qint64>(len) > in.device()->bytesAvailable()) {
+        return {};
+    }
     QByteArray blob(len, Qt::Uninitialized);
     in.readRawData(blob.data(), static_cast<int>(len));
     return blob;
@@ -72,7 +77,7 @@ QDate readDate(QDataStream &in)
 void writeRelation(QDataStream &out, const CardRelation *rel)
 {
     writeString(out, rel->getName());
-    out << static_cast<quint32>(static_cast<quint32>(rel->getAttachType()));
+    out << static_cast<quint32>(rel->getAttachType());
     out << rel->getIsCreateAllExclusion();
     out << rel->getIsVariable();
     out << rel->getDefaultCount();
@@ -323,7 +328,7 @@ FormatRulesPtr readFormat(QDataStream &in)
 
 bool CardDatabaseCache::write(const QString &cachePath, const CardDatabaseData &data, const QByteArray &sourceHash)
 {
-    QFile file(cachePath);
+    QSaveFile file(cachePath);
     if (!file.open(QIODevice::WriteOnly)) {
         return false;
     }
@@ -355,8 +360,7 @@ bool CardDatabaseCache::write(const QString &cachePath, const CardDatabaseData &
         writeFormat(out, format);
     }
 
-    file.close();
-    return file.error() == QFile::NoError;
+    return file.commit();
 }
 
 bool CardDatabaseCache::read(const QString &cachePath,
@@ -371,12 +375,12 @@ bool CardDatabaseCache::read(const QString &cachePath,
 
     // Read the whole cache into memory up front; deserialization then works on an
     // in-memory buffer with no further disk I/O.
-    const QByteArray raw = file.readAll();
+    QByteArray raw = file.readAll();
     if (raw.isEmpty()) {
         return false;
     }
 
-    QBuffer buffer(const_cast<QByteArray *>(&raw));
+    QBuffer buffer(&raw);
     buffer.open(QIODevice::ReadOnly);
     QDataStream in(&buffer);
     in.setVersion(QDataStream::Qt_6_4);
@@ -416,6 +420,7 @@ bool CardDatabaseCache::read(const QString &cachePath,
                 for (const PrintingInfo &printing : printings) {
                     if (auto set = printing.getSet()) {
                         set->append(card);
+                        break;
                     }
                 }
             }
@@ -430,7 +435,12 @@ bool CardDatabaseCache::read(const QString &cachePath,
         data.formats.insert(format->formatName.toLower(), format);
     }
 
-    qInfo() << "[cache] read + deserialize" << deserializeTimer.elapsed() << "ms for" << cardCount << "cards";
+    qCInfo(CardDatabaseLoadingLog) << "[cache] read + deserialize" << deserializeTimer.elapsed() << "ms for"
+                                   << cardCount << "cards";
+
+    if (in.status() != QDataStream::Ok) {
+        return false;
+    }
 
     return file.error() == QFile::NoError;
 }

@@ -64,8 +64,8 @@ public slots:
     /**
      * @brief Loads all configured card databases.
      *
-     * The heavy work runs on a dedicated high-priority thread so it is not
-     * starved by the GUI thread's startup work on low-core machines.
+     * Runs synchronously on the calling thread.  The caller should ensure
+     * that any signal receivers are already connected before invoking this.
      * @return Status of the main database load.
      */
     LoadStatus loadCardDatabases();
@@ -120,7 +120,7 @@ private:
     LoadStatus loadFromFile(const QString &fileName, CardDatabaseData &data);
 
     /**
-     * @brief Performs the actual load work on the dedicated loader thread.
+     * @brief Performs the actual load work synchronously on the calling thread.
      * @return Status of the main database load.
      */
     LoadStatus doLoadCardDatabases();
