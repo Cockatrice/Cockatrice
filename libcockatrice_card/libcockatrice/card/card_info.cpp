@@ -28,7 +28,7 @@ QByteArray serializeProperties(const QVariantHash &props)
 {
     QByteArray blob;
     QDataStream out(&blob, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_5);
+    out.setVersion(QDataStream::Qt_6_3);
     out << props;
     return blob;
 }
@@ -42,7 +42,7 @@ void CardInfo::ensurePropertiesLoaded() const
     }
     if (!propertiesBlob.isEmpty()) {
         QDataStream in(propertiesBlob);
-        in.setVersion(QDataStream::Qt_6_5);
+        in.setVersion(QDataStream::Qt_6_3);
         in >> propertiesCache;
     }
     propertiesLoaded = true;
