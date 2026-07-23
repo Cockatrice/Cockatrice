@@ -1,6 +1,6 @@
 #include "tally_menu.h"
 
-#include "../../client/settings/cache_settings.h"
+#include "../../../client/settings/cache_settings.h"
 
 TallyMenu::TallyMenu()
 {
