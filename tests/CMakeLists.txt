@@ -9,6 +9,7 @@ add_test(NAME test_age_formatting COMMAND test_age_formatting)
 add_test(NAME password_hash_test COMMAND password_hash_test)
 add_test(NAME server_card_counter_test COMMAND server_card_counter_test)
 add_test(NAME server_counter_test COMMAND server_counter_test)
+add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
 set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 5)
@@ -23,6 +24,7 @@ add_executable(password_hash_test password_hash_test.cpp)
 add_executable(deck_hash_performance_test deck_hash_performance_test.cpp)
 add_executable(server_card_counter_test server_card_counter_test.cpp)
 add_executable(server_counter_test server_counter_test.cpp)
+add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
 
 find_package(GTest)
 
@@ -57,6 +59,7 @@ if(NOT GTEST_FOUND)
   add_dependencies(deck_hash_performance_test gtest)
   add_dependencies(server_card_counter_test gtest)
   add_dependencies(server_counter_test gtest)
+  add_dependencies(server_rate_limiter_test gtest)
 endif()
 
 include_directories(${GTEST_INCLUDE_DIRS})
@@ -80,6 +83,9 @@ target_link_libraries(
 )
 target_link_libraries(
   server_counter_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+)
+target_link_libraries(
+  server_rate_limiter_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
 
 add_subdirectory(card_zone_algorithms)

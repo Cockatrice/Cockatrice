@@ -3,6 +3,7 @@
 #include "settings_manager.h"
 
 const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {
+    "https://cards.scryfall.io/large/!prop:side!/!set:uuid_substr_0_1!/!set:uuid_substr_1_1!/!set:uuid!.jpg",
     "https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!",
     "https://api.scryfall.com/cards/multiverse/!set:muid!?format=image",
     "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card",

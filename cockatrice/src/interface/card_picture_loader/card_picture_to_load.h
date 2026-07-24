@@ -25,6 +25,8 @@ private:
     QList<QString> currentSetUrls; ///< URLs for the current set being attempted
     QString currentUrl;            ///< Currently active URL to download
     CardSetPtr currentSet;         ///< Currently active set
+    int currentSetIndex = 0;       ///< Current position in sortedSets
+    int currentUrlIndex = 0;       ///< Current position in currentSetUrls
 
 public:
     /**
@@ -55,6 +57,9 @@ public:
 
     /** @return The short name of the current set, or empty string if no set. */
     [[nodiscard]] QString getSetName() const;
+
+    /** @return The next URL in the current set's list without advancing, or empty if at end. */
+    [[nodiscard]] QString peekNextUrl() const;
 
     /**
      * @brief Transforms a URL template into a concrete URL for this card/set.
@@ -87,6 +92,14 @@ public:
      * Includes custom URLs first, followed by template-based URLs.
      */
     void populateSetUrls();
+
+    /**
+     * @brief Resets iteration indices to the beginning.
+     *
+     * Restarts URL/set iteration from the first set and first URL.
+     * Used for deferred retry after server backoff expires.
+     */
+    void resetIndices();
 
     /**
      * @brief Extract all sets from the card and sort them by priority.

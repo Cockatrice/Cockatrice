@@ -4,6 +4,8 @@
 #include "card_picture_loader_status_bar.h"
 #include "card_picture_loader_worker.h"
 
+#include <QDateTime>
+#include <QHash>
 #include <QLoggingCategory>
 
 inline Q_LOGGING_CATEGORY(CardPictureLoaderLog, "card_picture_loader");
@@ -56,6 +58,7 @@ private:
 
     CardPictureLoaderWorker *worker;       ///< Worker thread for async image loading
     CardPictureLoaderStatusBar *statusBar; ///< Status bar widget showing load progress
+    QHash<QString, QDateTime> failedAt;    ///< Timestamp of the last failed load attempt per pixmap cache key
 
 public:
     /**
