@@ -27,15 +27,10 @@ option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
-if(DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE
-      ${CMAKE_BUILD_TYPE}
-      CACHE STRING "Type of build"
-  )
-else()
+if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE
       Release
-      CACHE STRING "Type of build"
+      CACHE STRING "Build type"
   )
 endif()
 
@@ -87,6 +82,7 @@ set(CMAKE_CXX_STANDARD
     CACHE STRING "C++ ISO Standard"
 )
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set conventional loops
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
@@ -140,11 +136,11 @@ endif()
 
 # Define proper compilation flags
 if(MSVC)
-  # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
-  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi")
-  # Visual Studio: Maximum Optimization, Multi-threaded DLL
+  # Disable Warning C4251, Enable Warning Level 4, Multi-threaded Builds, xx, Debug Symbols
+  set(CMAKE_CXX_FLAGS "/wd4251 /W4 /MP /EHsc /Zi")
+  # Maximum Optimization, Multi-threaded DLL
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
-  # Visual Studio: No Optimization, Multi-threaded Debug DLL
+  # No Optimization, Multi-threaded Debug DLL
   set(CMAKE_CXX_FLAGS_DEBUG "/Od /MDd")
 
   # Generate PDB, even when in release (So developers can better analyze crash logs)
@@ -312,7 +308,7 @@ if(UNIX)
   endif()
 elseif(WIN32)
   set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
-  if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "(x64)")
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(TRICE_IS_64_BIT 1)
   else()
     set(TRICE_IS_64_BIT 0)
