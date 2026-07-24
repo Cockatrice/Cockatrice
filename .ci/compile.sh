@@ -130,13 +130,14 @@ fi
 if [[ ! $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
+# TODO check BUILD_DIR logic
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
 # Set minimum CMake Version
 export CMAKE_POLICY_VERSION_MINIMUM=3.10
 
-# Add cmake flags
+# Add CMake flags
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
 if [[ $MAKE_SERVER ]]; then
   flags+=("-DWITH_SERVER=1")
@@ -150,7 +151,7 @@ fi
 if [[ $USE_CCACHE ]]; then
   flags+=("-DUSE_CCACHE=1")
   if [[ $CCACHE_SIZE ]]; then
-    # note, this setting persists after running the script
+    # Note, this setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
   fi
 fi
@@ -161,11 +162,12 @@ if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
 fi
 
-# Add cmake --build flags
+# Add CMake --build flags
 buildflags=(--config "$BUILDTYPE")
 
-# Compile
+# Prepare compilation
 if [[ $RUNNER_OS == macOS ]]; then
+# TODO qtdir
   # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action,
   # which sets a few environment variables
   if QTDIR=$(find "$GITHUB_WORKSPACE/Qt" -depth -maxdepth 2 -name macos -type d -print -quit); then
@@ -174,17 +176,17 @@ if [[ $RUNNER_OS == macOS ]]; then
     echo "could not find QTDIR!"
     exit 2
   fi
-  # the qtdir is located at Qt/[qtversion]/macos
-  # we use find to get the first subfolder with the name "macos"
-  # this works independent of the qt version as there should be only one version installed on the runner at a time
+  # The qtdir is located at Qt/<qtversion>/macos
+  # We use "find" to get the first subfolder with the name "macos"
+  # This works independent of the Qt version as there should be only one version installed on the runner at a time
   export QTDIR
 
   if [[ $TARGET_MACOS_VERSION ]]; then
-    # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla cmake flag needed to compile to target macOS version
+    # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla CMake flag needed to compile to target macOS version
     flags+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=$TARGET_MACOS_VERSION")
 
     # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
-    # an easy way is to copy the x64-osx.cmake file and modify it
+    # An easy way is to copy the x64-osx.cmake file and modify it
     triplets_dir="/tmp/cmake/triplets"
     triplet_version="custom-triplet"
     triplet_file="$triplets_dir/$triplet_version.cmake"
@@ -225,7 +227,7 @@ if [[ $RUNNER_OS == macOS ]]; then
 
   if [[ $MAKE_PACKAGE ]]; then
     # Workaround https://github.com/actions/runner-images/issues/7522
-    # have hdiutil repeat the command 10 times in hope of success
+    # Have hdiutil repeat the command 10 times in hope of success
     hdiutil_script="/tmp/hdiutil.sh"
     # shellcheck disable=SC2016
     echo '#!/bin/bash
@@ -242,11 +244,12 @@ if [[ $RUNNER_OS == macOS ]]; then
   fi
 
 elif [[ $RUNNER_OS == Windows ]]; then
-  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+  # Enable MSBuild switches for MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
   # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
   buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
 fi
 
+# Pre-build ccache
 if [[ $USE_CCACHE ]]; then
   echo "::group::Clear ccache stats"
   # https://ccache.dev/manual/4.13.6.html#_command_line_options
@@ -259,17 +262,20 @@ if [[ $USE_CCACHE ]]; then
   echo "::endgroup::"
 fi
 
-echo "::group::Configure cmake"
+# Configure CMake
+echo "::group::Configure CMake"
 cmake --version
-echo "Running cmake with flags: ${flags[*]}"
+echo "Running CMake configuration with following flags: ${flags[*]}"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
 
+# Build
 echo "::group::Build project"
-echo "Running cmake --build with flags: ${buildflags[*]}"
+echo "Running CMake with following build flags: ${buildflags[*]}"
 cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
+# Post-build ccache
 if [[ $USE_CCACHE ]]; then
   if [[ $CCACHE_EVICTION_AGE ]]; then
     echo "::group::evict ccache files older than $CCACHE_EVICTION_AGE"
@@ -285,6 +291,7 @@ elif [[ $CCACHE_EVICTION_AGE ]]; then
   echo "::error file=$0::ccache eviction is enabled while ccache is disabled!"
 fi
 
+# [macOS] Inspect binaries
 if [[ $RUNNER_OS == macOS ]]; then
   echo "::group::Inspect Mach-O binaries"
   for app in cockatrice oracle servatrice; do
@@ -298,18 +305,21 @@ if [[ $RUNNER_OS == macOS ]]; then
   echo "::endgroup::"
 fi
 
+ # Test
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
   ctest -C "$BUILDTYPE" --output-on-failure
   echo "::endgroup::"
 fi
 
+# Install
 if [[ $MAKE_INSTALL ]]; then
   echo "::group::Install"
   cmake --build . --target install --config "$BUILDTYPE"
   echo "::endgroup::"
 fi
 
+# Package
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
   cmake --build . --target package --config "$BUILDTYPE"
