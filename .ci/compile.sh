@@ -1,22 +1,45 @@
 #!/bin/bash
 
-# This script is to be used by the ci environment from the project root directory, do not use it from somewhere else.
+# This script is to be used by the CI environment from the project root directory, do not use it from somewhere else.
 
-# Compiles cockatrice inside of a ci environment
-# --install runs make install
-# --package [<package type>] runs make package, optionally force the type
-# --suffix <suffix> renames package with this suffix, requires arg
-# --server compiles servatrice
-# --test runs tests
-# --debug or --release sets the build type ie CMAKE_BUILD_TYPE
-# --ccache [<size>] uses ccache and shows stats, optionally provide size
-# --evict-ccache <age> runs ccache eviction based on given age after build
-# --dir <dir> sets the name of the build dir, default is "build"
-# --cmake-generator <generator> sets CMAKE_GENERATOR as used by cmake
-# --target-macos-version <version> sets the min os version - only used for macOS builds
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION
-# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
-# exitcode: 1 for failure, 3 for invalid arguments
+# Compiles Cockatrice inside a CI environment
+#
+# Supported arguments:
+#  --install                           Runs cmake install
+#  --package [<package type>]          Runs cmake package (optionally: define the type)
+#  --suffix <suffix>                   Renames package with provided suffix
+#  --server                            Compiles Servatrice
+#  --test                              Runs tests
+#  --debug / --release                 Sets the build type (CMAKE_BUILD_TYPE)
+#  --ccache [<size>]                   Uses ccache and shows stats, optionally provide size
+#  --evict-ccache <age>                Runs ccache eviction based on given age after build
+#  --dir <dir>                         Sets the name of the build dir, default is "build"
+#  --cmake-generator <generator>       Sets the CMake generator (CMAKE_GENERATOR)
+#  --target-macos-version <version>    Sets the min OS version - only used for macOS builds
+#
+# Used environment variables:
+#  BUILDTYPE
+#  MAKE_INSTALL
+#  MAKE_PACKAGE
+#  PACKAGE_TYPE
+#  PACKAGE_SUFFIX
+#  MAKE_SERVER
+#  MAKE_NO_CLIENT
+#  MAKE_TEST
+#  USE_CCACHE
+#  CCACHE_SIZE
+#  CCACHE_EVICTION_AGE
+#  BUILD_DIR
+#  CMAKE_GENERATOR
+#  TARGET_MACOS_VERSION
+#
+# Exitcodes:
+#  1 --> Failure
+#  3 --> Invalid argument(s)
+
+#TODO order above comment, check & add
+# there are also missing ones like "--no-client" and "--vcpkg"
+# arguments and env variables are doubled and are not used uniformly between Linux and macOS/Windows builds which adds complexity
 
 # Read arguments
 while [[ $# != 0 ]]; do
