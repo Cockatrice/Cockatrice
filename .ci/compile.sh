@@ -132,9 +132,6 @@ if [[ ! $BUILD_DIR ]]; then
 fi
 # TODO check BUILD_DIR logic
 
-# Set minimum CMake Version
-export CMAKE_POLICY_VERSION_MINIMUM=3.10
-
 # Add CMake flags
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
 if [[ $MAKE_SERVER ]]; then
