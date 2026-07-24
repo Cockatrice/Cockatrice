@@ -5,40 +5,41 @@
 # Compiles Cockatrice inside a CI environment
 #
 # Supported arguments:
-#  --install                           Runs cmake install
-#  --package [<package type>]          Runs cmake package (optionally: define the type)
-#  --suffix <suffix>                   Renames package with provided suffix
-#  --server                            Compiles Servatrice
-#  --test                              Runs tests
-#  --debug / --release                 Sets the build type (CMAKE_BUILD_TYPE)
 #  --ccache [<size>]                   Uses ccache and shows stats, optionally provide size
-#  --evict-ccache <age>                Runs ccache eviction based on given age after build
-#  --dir <dir>                         Sets the name of the build dir, default is "build"
 #  --cmake-generator <generator>       Sets the CMake generator (CMAKE_GENERATOR)
+#  --debug / --release                 Sets the build type (CMAKE_BUILD_TYPE)
+#  --dir <dir>                         Sets the name of the build dir, default is "build"
+#  --evict-ccache <age>                Runs ccache eviction based on given age after build
+#  --install                           Runs cmake install
+#  --no-client                         x
+#  --package [<package type>]          Runs cmake package (optionally: define the type)
+#  --server                            Compiles Servatrice
+#  --suffix <suffix>                   Renames package with provided suffix
 #  --target-macos-version <version>    Sets the min OS version - only used for macOS builds
+#  --test                              Runs tests
+#  --vcpkg                             x
 #
 # Used environment variables:
-#  BUILDTYPE
-#  MAKE_INSTALL
-#  MAKE_PACKAGE
-#  PACKAGE_TYPE
-#  PACKAGE_SUFFIX
-#  MAKE_SERVER
-#  MAKE_NO_CLIENT
-#  MAKE_TEST
-#  USE_CCACHE
-#  CCACHE_SIZE
-#  CCACHE_EVICTION_AGE
-#  BUILD_DIR
-#  CMAKE_GENERATOR
-#  TARGET_MACOS_VERSION
+#  BUILDTYPE                           x
+#  BUILD_DIR                           x
+#  CCACHE_EVICTION_AGE                 x
+#  CCACHE_SIZE                         x
+#  CMAKE_GENERATOR                     x
+#  MAKE_INSTALL                        x
+#  MAKE_NO_CLIENT                      x
+#  MAKE_PACKAGE                        x
+#  MAKE_SERVER                         x
+#  MAKE_TEST                           x
+#  PACKAGE_SUFFIX                      x
+#  PACKAGE_TYPE                        x
+#  TARGET_MACOS_VERSION                x
+#  USE_CCACHE                          x
 #
-# Exitcodes:
+# Exit codes:
 #  1 --> Failure
 #  3 --> Invalid argument(s)
 
-#TODO order above comment, check & add
-# there are also missing ones like "--no-client" and "--vcpkg"
+#TODO check & add missing arguments/variables above
 # arguments and env variables are doubled and are not used uniformly between Linux and macOS/Windows builds which adds complexity
 
 # Read arguments
