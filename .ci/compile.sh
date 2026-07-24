@@ -133,7 +133,7 @@ fi
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-# Add cmake flags
+# Add CMake flags
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
 if [[ $MAKE_SERVER ]]; then
   flags+=("-DWITH_SERVER=1")
@@ -146,9 +146,8 @@ if [[ $MAKE_TEST ]]; then
 fi
 if [[ $USE_CCACHE == "1" ]]; then
   flags+=("-DUSE_CCACHE=1")
-  ccache --version
   if [[ -n $CCACHE_SIZE ]]; then
-    # note, this setting persists after running the script
+    # Note, this setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
   fi
 else
@@ -159,15 +158,16 @@ if [[ -n $PACKAGE_TYPE ]]; then
 fi
 if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
-  if [[ $RUNNER_OS == Windows ]]; then
-    flags+=("-DVCPKG_APPLOCAL_DEPS=OFF")    # disable copying of runtime DLLs into build output
-  fi
+#  if [[ $MAKE_PACKAGE && $RUNNER_OS == Windows ]]; then
+#      flags+=("-DVCPKG_APPLOCAL_DEPS=OFF")    # disable copying of runtime DLLs into build output
+#  fi
 fi
 
-# Add cmake --build flags
+# Add CMake --build flags
 buildflags=(--config "$BUILDTYPE")
 
 function ccachestatsverbose() {
+  ccache --version
   # note, verbose only works on newer ccache, discard the error
   local got
   if got="$(ccache --show-stats --verbose 2>/dev/null)"; then
@@ -269,7 +269,7 @@ if [[ $USE_CCACHE == "1" ]]; then
 fi
 
 # Configure CMake
-echo "::group::Configure cmake"
+echo "::group::Configure CMake"
 cmake --version
 echo "Running cmake with flags: ${flags[*]}"
 cmake .. "${flags[@]}"
@@ -308,35 +308,9 @@ if [[ $RUNNER_OS == macOS ]]; then
 fi
 
 if [[ $MAKE_TEST ]]; then
-  if [[ $RUNNER_OS == Windows ]]; then
-    echo "::group::Run dummy_test manually"
-
-	echo "dir"
-	pwd
-    ls -la
-
-    echo ""
-    echo "find"
-	find . -name "dummy_test.exe"
-	find tests -maxdepth 1 -type f \( -name "*.dll" -o -name "*.exe" \)
-
-    echo ""
-    echo "dependencies"
-	dumpbin //DEPENDENTS tests/dummy_test.exe
-
-    echo ""
-    echo "dummy_test"
-    ./tests/dummy_test.exe --gtest_list_tests
-    echo "Exit code: $?"
-
-    echo "::endgroup::"
-  fi
-
   echo "::group::Run tests"
-  ctest -N -V
-  echo ""
   ctest --version
-  ctest -C "$BUILDTYPE" -VV --output-on-failure
+  ctest -C "$BUILDTYPE" --output-on-failure
   echo "::endgroup::"
 fi
 
