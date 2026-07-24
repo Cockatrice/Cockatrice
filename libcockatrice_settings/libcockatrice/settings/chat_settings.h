@@ -42,11 +42,7 @@ public:
 signals:
     void chatMentionCompleterChanged();
 
-#ifdef SETTINGS_UNIT_TEST
 public:
-#else
-private:
-#endif
     explicit ChatSettings(const QString &settingPath, QObject *parent = nullptr);
 
 private:

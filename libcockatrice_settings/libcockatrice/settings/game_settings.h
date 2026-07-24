@@ -45,11 +45,7 @@ public:
     void setLocalGameMaxPlayers(int value);
     void setLocalGameStartingLifeTotal(int value);
 
-#ifdef SETTINGS_UNIT_TEST
 public:
-#else
-private:
-#endif
     explicit GameSettings(const QString &settingPath, QObject *parent = nullptr);
 
 private:

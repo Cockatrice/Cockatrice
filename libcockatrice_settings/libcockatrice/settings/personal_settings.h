@@ -55,11 +55,7 @@ signals:
     void homeTabDisplayCardNameChanged();
     void downloadSpoilerStatusChanged();
 
-#ifdef SETTINGS_UNIT_TEST
 public:
-#else
-private:
-#endif
     explicit PersonalSettings(const QString &settingPath, QObject *parent = nullptr);
 
 private:

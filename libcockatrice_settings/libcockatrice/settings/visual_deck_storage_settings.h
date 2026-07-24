@@ -81,11 +81,7 @@ signals:
     void edhRecCardSizeChanged();
     void archidektPreviewSizeChanged();
 
-#ifdef SETTINGS_UNIT_TEST
 public:
-#else
-private:
-#endif
     explicit VisualDeckStorageSettings(const QString &settingPath, QObject *parent = nullptr);
 
 private:

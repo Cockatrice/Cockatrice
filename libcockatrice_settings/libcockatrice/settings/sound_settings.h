@@ -24,11 +24,7 @@ signals:
     void soundThemeChanged();
     void masterVolumeChanged(int value);
 
-#ifdef SETTINGS_UNIT_TEST
 public:
-#else
-private:
-#endif
     explicit SoundSettings(const QString &settingPath, QObject *parent = nullptr);
 
 private:

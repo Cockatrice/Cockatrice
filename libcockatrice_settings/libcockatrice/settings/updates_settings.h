@@ -33,11 +33,7 @@ public:
     void setNotifyAboutNewVersion(bool _notifyaboutnewversion);
     void setUpdateReleaseChannelIndex(int value);
 
-#ifdef SETTINGS_UNIT_TEST
 public:
-#else
-private:
-#endif
     explicit UpdatesSettings(const QString &settingPath, QObject *parent = nullptr);
 
 private:

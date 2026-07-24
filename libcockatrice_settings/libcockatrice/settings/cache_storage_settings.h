@@ -47,11 +47,7 @@ signals:
     void cardPictureLoaderCacheMethodChanged(int cardPictureLoaderCacheMethod);
     void localCardImageStorageNamingSchemeChanged(int localCardImageStorageNamingScheme);
 
-#ifdef SETTINGS_UNIT_TEST
 public:
-#else
-private:
-#endif
     explicit CacheStorageSettings(const QString &settingPath, QObject *parent = nullptr);
 
 private:

@@ -27,11 +27,7 @@ public:
     void setTabAdminOpen(bool value);
     void setTabLogOpen(bool value);
 
-#ifdef SETTINGS_UNIT_TEST
 public:
-#else
-private:
-#endif
     explicit TabsSettings(const QString &settingPath, QObject *parent = nullptr);
 
 private:
