@@ -266,6 +266,7 @@ jobs:
             runner: macos-15-intel
 
             ccache_eviction_age: 7d
+            cmake_generator: Ninja
             make_package: 1
             override_target: 13
             package_suffix: "-macOS13_Intel"
@@ -281,6 +282,7 @@ jobs:
             runner: macos-14
 
             ccache_eviction_age: 7d
+            cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS14"
             qt_version: 6.11.0
@@ -295,6 +297,7 @@ jobs:
             runner: macos-15
 
             ccache_eviction_age: 7d
+            cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS15"
             qt_version: 6.11.0
@@ -309,6 +312,7 @@ jobs:
             runner: macos-15
 
             ccache_eviction_age: 7d
+            cmake_generator: Ninja
             qt_version: 6.11.0
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
@@ -320,20 +324,32 @@ jobs:
             target: 10
             runner: windows-2025
 
+            cmake_generator: Ninja
             make_package: 1
             package_suffix: "-Win10"
             qt_version: 6.11.0
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
 
-    name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
+          - os: Windows
+            target: 10
+            runner: windows-2025
+
+            cmake_generator: "Visual Studio 18 2026"
+            cmake_generator_platform: x64
+            make_package: 1
+            package_suffix: "-Win10"
+            qt_version: 6.11.0
+            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            type: Release
+
+    name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}${{ matrix.cmake_generator != 'Ninja' && ' VS' || '' }}
     needs: configure
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
     env:
       CCACHE_DIR: ${{ github.workspace }}/.cache/
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CMAKE_GENERATOR: 'Ninja'
 
     steps:
       - name: "Checkout"
@@ -431,6 +447,8 @@ jobs:
         env:
           BUILDTYPE: '${{ matrix.type }}'
           CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
+          CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
+          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}

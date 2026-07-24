@@ -274,6 +274,9 @@ fi
 # Configure CMake
 echo "::group::Configure CMake"
 cmake --version
+  if [[ "$CMAKE_GENERATOR" =~ ^Ninja ]]; then
+  ninja --version
+  fi
 echo "Running cmake with flags: ${flags[*]}"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
@@ -281,7 +284,7 @@ echo "::endgroup::"
 # Build
 echo "::group::Build project"
 echo "Running cmake --build with flags: ${buildflags[*]}"
-cmake --build . "${buildflags[@]}" --verbose
+cmake --build . --verbose "${buildflags[@]}"
 echo "::endgroup::"
 
 if [[ $USE_CCACHE == "1" ]]; then
