@@ -325,7 +325,6 @@ jobs:
             qt_version: 6.11.0
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
-            use_ccache: 0
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
     needs: configure

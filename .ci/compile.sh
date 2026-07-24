@@ -124,6 +124,9 @@ set -e
 
 # Setup
 ./servatrice/check_schema_version.sh
+if [[ ! $USE_CCACHE ]]; then
+  USE_CCACHE=0
+fi
 if [[ ! $BUILDTYPE ]]; then
   BUILDTYPE=Release
 fi
