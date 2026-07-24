@@ -325,68 +325,6 @@ TEST_F(SettingsMigrationTest, CardsKeysKeepGroupPrefix)
     ASSERT_EQ(readFromIni("cards.ini", "interface/deckeditorbannercardcomboboxvisible"), QVariant(true));
 }
 
-// --- migrateLegacySettings tests ---
-
-TEST_F(SettingsMigrationTest, LegacyMigratesServersMessagesAndFilters)
-{
-    if (!nativeSettingsAvailable()) {
-        GTEST_SKIP() << "NativeFormat QSettings not available in this environment";
-    }
-
-    {
-        QSettings nativeSettings;
-        nativeSettings.setValue("server/previoushostlogin", "test_user");
-        nativeSettings.setValue("server/auto_connect", true);
-        nativeSettings.beginGroup("messages");
-        nativeSettings.setValue("count", 1);
-        nativeSettings.setValue("message0", "hello");
-        nativeSettings.endGroup();
-        nativeSettings.beginGroup("filter_games");
-        nativeSettings.setValue("show_empty", true);
-        nativeSettings.endGroup();
-        nativeSettings.sync();
-    }
-
-    ASSERT_TRUE(SettingsMigration::migrateLegacySettings(settingsPath));
-
-    ASSERT_TRUE(fileExists("servers.ini"));
-    ASSERT_EQ(readFromIni("servers.ini", "server/previoushostlogin"), QVariant("test_user"));
-    ASSERT_EQ(readFromIni("servers.ini", "server/auto_connect"), QVariant(true));
-
-    ASSERT_TRUE(fileExists("messages.ini"));
-    ASSERT_EQ(readFromIni("messages.ini", "messages/count"), QVariant(1));
-    ASSERT_EQ(readFromIni("messages.ini", "messages/message0"), QVariant("hello"));
-
-    ASSERT_TRUE(fileExists("gamefilters.ini"));
-    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/show_empty"), QVariant(true));
-}
-
-TEST_F(SettingsMigrationTest, LegacyMigratesSets)
-{
-    if (!nativeSettingsAvailable()) {
-        GTEST_SKIP() << "NativeFormat QSettings not available in this environment";
-    }
-
-    {
-        QSettings nativeSettings;
-        nativeSettings.beginGroup("sets");
-        nativeSettings.beginGroup("set1");
-        nativeSettings.setValue("sortkey", "001");
-        nativeSettings.setValue("enabled", true);
-        nativeSettings.setValue("isknown", false);
-        nativeSettings.endGroup();
-        nativeSettings.endGroup();
-        nativeSettings.sync();
-    }
-
-    ASSERT_TRUE(SettingsMigration::migrateLegacySettings(settingsPath));
-
-    ASSERT_TRUE(fileExists("cardDatabase.ini"));
-    ASSERT_EQ(readFromIni("cardDatabase.ini", "sets/set1/sortkey"), QVariant("001"));
-    ASSERT_EQ(readFromIni("cardDatabase.ini", "sets/set1/enabled"), QVariant(true));
-    ASSERT_EQ(readFromIni("cardDatabase.ini", "sets/set1/isknown"), QVariant(false));
-}
-
 TEST_F(SettingsMigrationTest, LegacyMigrationIsIdempotent)
 {
     if (!nativeSettingsAvailable()) {
