@@ -133,6 +133,14 @@ fi
 if [[ ! $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
+
+# Can be omitted when using modern CMake config commands below for config and build (chceck BUILD_DIR logic above as well)
+# cmake -S . -B "$BUILD_DIR" "${flags[@]}"
+# cmake --build "$BUILD_DIR" "${buildflags[@]}"
+# Required to update other commands with build folder as well:
+# ctest --build-config "$BUILDTYPE" --test-dir "$BUILD_DIR" --output-on-failure
+# cmake --build "$BUILD_DIR" --target install --config "$BUILDTYPE"
+# cmake --build "$BUILD_DIR" --target package --config "$BUILDTYPE" (remove cd from renaming)
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
@@ -180,7 +188,7 @@ function ccachestatsverbose() {
   fi
 }
 
-# Prepare
+# Prepare compilation
 if [[ $RUNNER_OS == macOS ]]; then
   # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action,
   # which sets a few environment variables
@@ -278,6 +286,7 @@ cmake --version
   echo "ninja $(ninja --version)"
   fi
 echo "Running CMake with these flags: ${flags[*]}"
+# Equivalent to modern and more explicit "cmake -S .. -B build"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
 
@@ -313,21 +322,26 @@ if [[ $RUNNER_OS == macOS ]]; then
   echo "::endgroup::"
 fi
 
+# Test
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
   ctest --version
-  ctest -C "$BUILDTYPE" --output-on-failure
+  ctest --build-config "$BUILDTYPE" --output-on-failure
   echo "::endgroup::"
 fi
 
+# Install
 if [[ $MAKE_INSTALL ]]; then
   echo "::group::Install"
+  # Equivalent to modern "cmake --install ."
   cmake --build . --target install --config "$BUILDTYPE"
   echo "::endgroup::"
 fi
 
+# Package
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
+  cpack --version
   cmake --build . --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 
