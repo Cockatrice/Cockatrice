@@ -127,6 +127,7 @@ set -e
 if [[ ! $BUILDTYPE ]]; then
   BUILDTYPE=Release
 fi
+
 if [[ ! $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
@@ -137,12 +138,15 @@ flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
 if [[ $MAKE_SERVER ]]; then
   flags+=("-DWITH_SERVER=1")
 fi
+
 if [[ $MAKE_NO_CLIENT ]]; then
   flags+=("-DWITH_CLIENT=0" "-DWITH_ORACLE=0")
 fi
+
 if [[ $MAKE_TEST ]]; then
   flags+=("-DTEST=1")
 fi
+
 if [[ $USE_CCACHE ]]; then
   flags+=("-DUSE_CCACHE=1")
   if [[ $CCACHE_SIZE ]]; then
@@ -150,9 +154,11 @@ if [[ $USE_CCACHE ]]; then
     ccache --max-size "$CCACHE_SIZE"
   fi
 fi
+
 if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
+
 if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
 fi
@@ -163,6 +169,7 @@ buildflags=(--config "$BUILDTYPE")
 # Prepare compilation
 if [[ $RUNNER_OS == macOS ]]; then
 # TODO qtdir
+
   # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action,
   # which sets a few environment variables
   if QTDIR=$(find "$GITHUB_WORKSPACE/Qt" -depth -maxdepth 2 -name macos -type d -print -quit); then
@@ -171,6 +178,7 @@ if [[ $RUNNER_OS == macOS ]]; then
     echo "could not find QTDIR!"
     exit 2
   fi
+
   # The qtdir is located at Qt/<qtversion>/macos
   # We use "find" to get the first subfolder with the name "macos"
   # This works independent of the Qt version as there should be only one version installed on the runner at a time
@@ -186,14 +194,18 @@ if [[ $RUNNER_OS == macOS ]]; then
     triplet_version="custom-triplet"
     triplet_file="$triplets_dir/$triplet_version.cmake"
     arch=$(uname -m)
+
     if [[ $arch == x86_64 ]]; then
       arch="x64"
     fi
+
     mkdir -p "$triplets_dir"
     triplet_source="../vcpkg/triplets/$arch-osx.cmake"
+
     if [[ ! -f "$triplet_source" ]]; then
       triplet_source="../vcpkg/triplets/community/$arch-osx.cmake"
     fi
+
     cp "$triplet_source" "$triplet_file"
     echo "set(VCPKG_CMAKE_SYSTEM_VERSION $TARGET_MACOS_VERSION)" >>"$triplet_file"
     echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $TARGET_MACOS_VERSION)" >>"$triplet_file"
@@ -206,6 +218,7 @@ if [[ $RUNNER_OS == macOS ]]; then
   fi
 
   echo "::group::Signing Certificate"
+
   if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
     echo "$MACOS_CERTIFICATE" | base64 --decode >"certificate.p12"
     security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
@@ -218,6 +231,7 @@ if [[ $RUNNER_OS == macOS ]]; then
   else
     echo "No signing certificate configured. Skipping set up of keychain in macOS environment."
   fi
+
   echo "::endgroup::"
 
   if [[ $MAKE_PACKAGE ]]; then
@@ -273,23 +287,28 @@ echo "::endgroup::"
 
 # Post-build ccache
 if [[ $USE_CCACHE ]]; then
+
   if [[ $CCACHE_EVICTION_AGE ]]; then
     echo "::group::evict ccache files older than $CCACHE_EVICTION_AGE"
     ccache --evict-older-than "$CCACHE_EVICTION_AGE"
     echo "::endgroup::"
   fi
+
   echo "::group::Show ccache stats"
   ccache --verify    # remove again
   ccache --show-stats --verbose    # too verbose?
   ccache --show-compression    # helpful?
   echo "::endgroup::"
+
 elif [[ $CCACHE_EVICTION_AGE ]]; then
   echo "::error file=$0::ccache eviction is enabled while ccache is disabled!"
 fi
 
 # [macOS] Inspect binaries
 if [[ $RUNNER_OS == macOS ]]; then
+
   echo "::group::Inspect Mach-O binaries"
+
   for app in cockatrice oracle servatrice; do
     binary="$GITHUB_WORKSPACE/build/$app/$app.app/Contents/MacOS/$app"
     echo "Inspecting $app..."
@@ -297,6 +316,7 @@ if [[ $RUNNER_OS == macOS ]]; then
     file "$binary"
     lipo -info "$binary"
     echo ""
+
   done
   echo "::endgroup::"
 fi
