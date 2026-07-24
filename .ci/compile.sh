@@ -284,7 +284,7 @@ echo "::endgroup::"
 # Build
 echo "::group::Build project"
 echo "Running CMake with these build flags: ${buildflags[*]}"
-cmake --build . --verbose "${buildflags[@]}"
+cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
 if [[ $USE_CCACHE == "1" ]]; then
