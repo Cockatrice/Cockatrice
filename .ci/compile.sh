@@ -131,8 +131,6 @@ if [[ ! $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
 # TODO check BUILD_DIR logic
-mkdir -p "$BUILD_DIR"
-cd "$BUILD_DIR"
 
 # Set minimum CMake Version
 export CMAKE_POLICY_VERSION_MINIMUM=3.10
@@ -266,13 +264,14 @@ fi
 echo "::group::Configure CMake"
 cmake --version
 echo "Running CMake configuration with following flags: ${flags[*]}"
-cmake .. "${flags[@]}"
+cmake -S . -B "$BUILD_DIR" "${flags[@]}"
+# cmake -S .. -B "$BUILD_DIR" "${flags[@]}"
 echo "::endgroup::"
 
 # Build
 echo "::group::Build project"
 echo "Running CMake with following build flags: ${buildflags[*]}"
-cmake --build . "${buildflags[@]}"
+cmake --build "$BUILD_DIR" "${buildflags[@]}"
 echo "::endgroup::"
 
 # Post-build ccache
@@ -308,26 +307,28 @@ fi
  # Test
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
-  ctest -C "$BUILDTYPE" --output-on-failure
+  ctest --version
+  ctest --build-config "$BUILDTYPE" --test-dir "$BUILD_DIR" --output-on-failure
   echo "::endgroup::"
 fi
 
 # Install
 if [[ $MAKE_INSTALL ]]; then
   echo "::group::Install"
-  cmake --build . --target install --config "$BUILDTYPE"
+  cmake --build "$BUILD_DIR" --target install --config "$BUILDTYPE"
+  # cmake --install "$BUILD_DIR" --config "$BUILDTYPE"
   echo "::endgroup::"
 fi
 
 # Package
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
-  cmake --build . --target package --config "$BUILDTYPE"
+  cpack --version
+  cmake --build "$BUILD_DIR" --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 
   if [[ $PACKAGE_SUFFIX ]]; then
     echo "::group::Update package name"
-    cd ..
     BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
     echo "::endgroup::"
   fi
