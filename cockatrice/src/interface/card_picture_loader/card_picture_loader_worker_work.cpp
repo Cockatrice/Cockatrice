@@ -10,6 +10,7 @@
 #include <QNetworkReply>
 #include <QThread>
 #include <QThreadPool>
+#include <QTimer>
 
 // Card back returned by gatherer when card is not found
 static const QStringList MD5_BLACKLIST = {
@@ -107,7 +108,15 @@ static bool imageIsBlackListed(const QByteArray &picData)
 void CardPictureLoaderWorkerWork::handleFailedReply(const QNetworkReply *reply)
 {
     if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 429) {
-        qCWarning(CardPictureLoaderWorkerWorkLog) << "Too many requests.";
+        qCWarning(CardPictureLoaderWorkerWorkLog).nospace()
+            << "PictureLoader: [card: " << cardToDownload.getCard().getName() << " set: " << cardToDownload.getSetName()
+            << "]: Too many requests, retry " << (retryCount + 1) << "/" << MAX_RETRIES;
+
+        if (retryCount < MAX_RETRIES) {
+            scheduleRetry(reply->url());
+        } else {
+            picDownloadFailed();
+        }
     } else {
         bool isFromCache = reply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
 
@@ -200,6 +209,21 @@ QImage CardPictureLoaderWorkerWork::tryLoadImageFromReply(QNetworkReply *reply)
     imgReader.setDevice(reply);
 
     return imgReader.read();
+}
+
+void CardPictureLoaderWorkerWork::scheduleRetry(const QUrl &failedUrl)
+{
+    retryCount++;
+    int delay = BASE_BACKOFF_MS * (1 << (retryCount - 1));
+    delay += QRandomGenerator::global()->bounded(delay / 2) - delay / 4;
+    delay = qMin(delay, 30000);
+
+    QTimer::singleShot(delay, this, [this, failedUrl] {
+        qCDebug(CardPictureLoaderWorkerWorkLog).nospace()
+            << "PictureLoader: [card: " << cardToDownload.getCard().getName() << " set: " << cardToDownload.getSetName()
+            << "]: Retrying fetch after backoff (attempt " << retryCount << "/" << MAX_RETRIES << ")";
+        emit requestImageDownload(failedUrl, this);
+    });
 }
 
 void CardPictureLoaderWorkerWork::concludeImageLoad(const QImage &image)
