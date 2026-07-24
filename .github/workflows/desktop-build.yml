@@ -338,7 +338,7 @@ jobs:
             cmake_generator: "Visual Studio 18 2026"
             cmake_generator_platform: x64
             make_package: 1
-            package_suffix: "-Win10"
+            package_suffix: "-Win10_VS"
             qt_version: 6.11.0
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
@@ -538,7 +538,7 @@ jobs:
           path: ${{ steps.build.outputs.path }}
 
       - name: "[Windows] Upload PDBs (Program Databases)"
-        if: matrix.os == 'Windows' && github.ref_type != 'tag'
+        if: matrix.os == 'Windows' && github.ref_type != 'tag' && matrix.cmake_generator == 'Ninja'
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error

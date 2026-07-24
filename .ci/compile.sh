@@ -259,7 +259,7 @@ if [[ $RUNNER_OS == macOS ]]; then
 
 elif [[ $RUNNER_OS == Windows ]]; then
   if [[ "$CMAKE_GENERATOR" =~ ^Visual\ Studio ]]; then
-  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+  # Enable MSBuild switches for MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
   # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
   buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
   fi
@@ -275,15 +275,15 @@ fi
 echo "::group::Configure CMake"
 cmake --version
   if [[ "$CMAKE_GENERATOR" =~ ^Ninja ]]; then
-  ninja --version
+  echo "ninja $(ninja --version)"
   fi
-echo "Running cmake with flags: ${flags[*]}"
+echo "Running CMake with these flags: ${flags[*]}"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
 
 # Build
 echo "::group::Build project"
-echo "Running cmake --build with flags: ${buildflags[*]}"
+echo "Running CMake with these build flags: ${buildflags[*]}"
 cmake --build . --verbose "${buildflags[@]}"
 echo "::endgroup::"
 
