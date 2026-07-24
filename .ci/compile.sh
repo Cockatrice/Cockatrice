@@ -164,16 +164,6 @@ fi
 # Add cmake --build flags
 buildflags=(--config "$BUILDTYPE")
 
-function ccachestatsverbose() {
-  # note, verbose only works on newer ccache, discard the error
-  local got
-  if got="$(ccache --show-stats --verbose 2>/dev/null)"; then
-    echo "$got"
-  else
-    ccache --show-stats
-  fi
-}
-
 # Compile
 if [[ $RUNNER_OS == macOS ]]; then
   # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action,
@@ -258,8 +248,14 @@ elif [[ $RUNNER_OS == Windows ]]; then
 fi
 
 if [[ $USE_CCACHE ]]; then
-  echo "::group::Show ccache stats"
-  ccachestatsverbose
+  echo "::group::Clear ccache stats"
+  # https://ccache.dev/manual/4.13.6.html#_command_line_options
+  ccache --version
+  ccache --show-config
+  ccache --show-stats    # remove again
+  ccache --show-log-stats    # helpful?
+  ccache --zero-stats    # zero former cache statistics (but not the configuration options)
+  ccache --show-stats    # helpful?
   echo "::endgroup::"
 fi
 
@@ -280,8 +276,10 @@ if [[ $USE_CCACHE ]]; then
     ccache --evict-older-than "$CCACHE_EVICTION_AGE"
     echo "::endgroup::"
   fi
-  echo "::group::Show ccache stats again"
-  ccachestatsverbose
+  echo "::group::Show ccache stats"
+  ccache --verify    # remove again
+  ccache --show-stats --verbose    # too verbose?
+  ccache --show-compression    # helpful?
   echo "::endgroup::"
 elif [[ $CCACHE_EVICTION_AGE ]]; then
   echo "::error file=$0::ccache eviction is enabled while ccache is disabled!"
