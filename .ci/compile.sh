@@ -11,7 +11,7 @@
 #  --dir <dir>                         Sets the name of the build dir (BUILD_DIR)
 #  --evict-ccache <age>                Evicts compiler cache older than <age> after build (CCACHE_EVICTION_AGE), e.g. "7d"
 #  --install                           Runs cmake install (MAKE_INSTALL)
-#  --no-client                         Compiles without Cockatrice (MAKE_NO_CLIENT)
+#  --no-client                         Compiles without Cockatrice and Oracle (MAKE_NO_CLIENT)
 #  --package [<package type>]          Runs cmake package (MAKE_PACKAGE) (optionally: define type (PACKAGE_TYPE)), e.g. "DEB" [Linux only?]
 #  --release                           Sets the build type (BUILDTYPE --> CMAKE_BUILD_TYPE)
 #  --server                            Compiles Servatrice (MAKE_SERVER)
@@ -154,12 +154,14 @@ done
 
 
 ## Set defaults
+#TODO comment on script
 ./servatrice/check_schema_version.sh
-if [[ ! $BUILDTYPE ]]; then
+
+if [[ -z $BUILDTYPE ]]; then
   BUILDTYPE="Release"
 fi
 
-if [[ ! $BUILD_DIR ]]; then
+if [[ -z $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
 
@@ -167,43 +169,39 @@ fi
 ## Prepare compilation
 
 # Prepare CMake options
-if [[ $BUILDTYPE ]]; then
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
-fi
 
-if [[ $MAKE_NO_CLIENT ]]; then
+if [[ $MAKE_NO_CLIENT == 1 ]]; then
   flags+=("-DWITH_CLIENT=0" "-DWITH_ORACLE=0")
 fi
 
-if [[ $MAKE_SERVER ]]; then
+if [[ $MAKE_SERVER == 1 ]]; then
   flags+=("-DWITH_SERVER=1")
 fi
 
-if [[ $MAKE_TEST ]]; then
+if [[ $MAKE_TEST == 1 ]]; then
   flags+=("-DTEST=1")
 fi
 
-if [[ $PACKAGE_TYPE ]]; then
+if [[ -n $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == 1]]; then
   flags+=("-DUSE_CCACHE=1")
 
-  if [[ $CCACHE_SIZE ]]; then
+  if [[ -n $CCACHE_SIZE ]]; then
     # Note: Setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
   fi
 fi
 
-if [[ $USE_VCPKG ]]; then
+if [[ $USE_VCPKG == 1 ]]; then
   flags+=("-DUSE_VCPKG=1")
 fi
 
 # Prepare CMake --build options
-if [[ $BUILDTYPE ]]; then
-  buildflags=(--config "$BUILDTYPE")
-fi
+buildflags=(--config "$BUILDTYPE")
 
 if [[ $RUNNER_OS == Windows ]]; then
   # Enable MSBuild switches for MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
@@ -228,11 +226,11 @@ if [[ $RUNNER_OS == macOS ]]; then
   # This works independent of the Qt version as there should be only one version installed on the runner at a time
   export QTDIR
 
-  if [[ $TARGET_MACOS_VERSION ]]; then
+  if [[ -n $TARGET_MACOS_VERSION ]]; then
     # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla CMake option needed to compile to target macOS version
     flags+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=$TARGET_MACOS_VERSION")
 
-    if [[ $USE_VCPKG ]]; then
+    if [[ $USE_VCPKG == 1 ]]; then
 	  echo "vcpkg triplet"
       # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
       # An easy way is to copy the x64-osx.cmake file and modify it
@@ -283,7 +281,7 @@ if [[ $RUNNER_OS == macOS ]]; then
 
   echo "::endgroup::"
 
-  if [[ $MAKE_PACKAGE ]]; then
+  if [[ $MAKE_PACKAGE == 1 ]]; then
     # Workaround https://github.com/actions/runner-images/issues/7522
     # Have hdiutil repeat the command 10 times in hope of success
     hdiutil_script="/tmp/hdiutil.sh"
@@ -313,7 +311,7 @@ fi
 ## Pre-build
 
 # ccache
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == 1 ]]; then
   echo "::group::Clear ccache stats"
   # https://ccache.dev/manual/4.13.6.html#_command_line_options
   ccache --version
@@ -346,9 +344,9 @@ echo "::endgroup::"
 ## Post-build
 
 # ccache
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == 1 ]]; then
 
-  if [[ $CCACHE_EVICTION_AGE ]]; then
+  if [[ -n $CCACHE_EVICTION_AGE ]]; then
     echo "::group::evict ccache files older than $CCACHE_EVICTION_AGE"
     ccache --evict-older-than "$CCACHE_EVICTION_AGE"
     echo "::endgroup::"
@@ -360,7 +358,7 @@ if [[ $USE_CCACHE ]]; then
   ccache --show-compression    # helpful?
   echo "::endgroup::"
 
-elif [[ $CCACHE_EVICTION_AGE ]]; then
+elif [[ -n $CCACHE_EVICTION_AGE ]]; then
   echo "::error file=$0::ccache eviction is enabled while ccache is disabled!"
 fi
 
@@ -382,7 +380,7 @@ fi
 
 
 # Test
-if [[ $MAKE_TEST ]]; then
+if [[ $MAKE_TEST == 1 ]]; then
   echo "::group::Run tests"
   ctest --version
   ctest --build-config "$BUILDTYPE" --test-dir "$BUILD_DIR" --output-on-failure
@@ -390,7 +388,7 @@ if [[ $MAKE_TEST ]]; then
 fi
 
 # Install
-if [[ $MAKE_INSTALL ]]; then
+if [[ $MAKE_INSTALL == 1 ]]; then
   echo "::group::Install"
   cmake --build "$BUILD_DIR" --target install --config "$BUILDTYPE"
   # cmake --install "$BUILD_DIR" --config "$BUILDTYPE"
@@ -398,13 +396,13 @@ if [[ $MAKE_INSTALL ]]; then
 fi
 
 # Package
-if [[ $MAKE_PACKAGE ]]; then
+if [[ $MAKE_PACKAGE == 1 ]]; then
   echo "::group::Create package"
   cpack --version
   cmake --build "$BUILD_DIR" --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 
-  if [[ $PACKAGE_SUFFIX ]]; then
+  if [[ -n $PACKAGE_SUFFIX ]]; then
     echo "::group::Update package name"
     BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
     echo "::endgroup::"
