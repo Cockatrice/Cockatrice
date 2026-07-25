@@ -1,55 +1,120 @@
 #!/bin/bash
 
-# This script is to be used by the CI environment from the project root directory, do not use it from somewhere else.
+## This script is to be used by the CI environment from the project root directory, do not use it from somewhere else
 
 # Compiles Cockatrice inside a CI environment
 #
-# Supported arguments:
-#  --ccache [<size>]                   Uses ccache and shows stats, optionally provide size
-#  --cmake-generator <generator>       Sets the CMake generator (CMAKE_GENERATOR)
-#  --debug / --release                 Sets the build type (CMAKE_BUILD_TYPE)
-#  --dir <dir>                         Sets the name of the build dir, default is "build"
-#  --evict-ccache <age>                Runs ccache eviction based on given age after build
-#  --install                           Runs cmake install
-#  --no-client                         x
-#  --package [<package type>]          Runs cmake package (optionally: define the type)
-#  --server                            Compiles Servatrice
-#  --suffix <suffix>                   Renames package with provided suffix
-#  --target-macos-version <version>    Sets the min OS version - only used for macOS builds
-#  --test                              Runs tests
-#  --vcpkg                             x
+# Supported options:
+#  --ccache [<size>]                   Use ccache (USE_CCACHE) (optionally: provide cache size, e.g. "500M" or "1G" (CCACHE_SIZE))
+#  --cmake-generator <generator>       Sets the CMake generator (CMAKE_GENERATOR), e.g. "Ninja", "Visual Studio 18 2026"
+#  --debug / --release                 Sets the build type (BUILDTYPE --> CMAKE_BUILD_TYPE)
+#  --dir <dir>                         Sets the name of the build dir (BUILD_DIR)
+#  --evict-ccache <age>                Evicts compiler cache older than <age> after build (CCACHE_EVICTION_AGE), e.g. "7d"
+#  --install                           Runs cmake install (MAKE_INSTALL)
+#  --no-client                         Compiles without Cockatrice (MAKE_NO_CLIENT)
+#  --package [<package type>]          Runs cmake package (MAKE_PACKAGE) (optionally: define type (PACKAGE_TYPE)), e.g. "DEB" [Linux only?]
+#  --release                           Sets the build type (BUILDTYPE --> CMAKE_BUILD_TYPE)
+#  --server                            Compiles Servatrice (MAKE_SERVER)
+#  --suffix <suffix>                   Renames package with provided suffix (PACKAGE_SUFFIX), e.g. "-macOS15"
+#  --target-macos-version <version>    Sets the min OS version (TARGET_MACOS_VERSION), e.g. "14" [macOS only]
+#  --test                              Runs tests (MAKE_TEST)
+#  --vcpkg                             Use vcpkg package manager to resolve dependencies (USE_VCPKG)
 #
 # Used environment variables:
-#  BUILDTYPE                           x
-#  BUILD_DIR                           x
-#  CCACHE_EVICTION_AGE                 x
-#  CCACHE_SIZE                         x
-#  CMAKE_GENERATOR                     x
-#  MAKE_INSTALL                        x
-#  MAKE_NO_CLIENT                      x
-#  MAKE_PACKAGE                        x
-#  MAKE_SERVER                         x
-#  MAKE_TEST                           x
-#  PACKAGE_SUFFIX                      x
-#  PACKAGE_TYPE                        x
-#  TARGET_MACOS_VERSION                x
-#  USE_CCACHE                          x
+#  BUILDTYPE                           Build type to be used by CMake and buildsystem (defaults to "Release" if omitted)
+#                                      See "--debug" and "--release" flags
+#  BUILD_DIR                           See value for "--dir" option (defaults to "build" if omitted)
+#  CCACHE_EVICTION_AGE                 See value for "--evict-ccache" option
+#  CCACHE_SIZE                         See value for "--ccache" option
+#  CMAKE_GENERATOR                     See "--cmake-generator" option
+#  MAKE_INSTALL                        See "--install" flag
+#  MAKE_NO_CLIENT                      See "--no-client" flag
+#  MAKE_PACKAGE                        See "--package" option
+#  MAKE_SERVER                         See "--server" flag
+#  MAKE_TEST                           See "--test" flag
+#  PACKAGE_SUFFIX                      See "--suffix" option
+#  PACKAGE_TYPE                        See value for "--package" option
+#  TARGET_MACOS_VERSION                See "--target-macos-version" option
+#  USE_CCACHE                          See "--ccache" option
+#  USE_VCPKG                           See "--vcpkg" flag
 #
 # Exit codes:
 #  1 --> Failure
 #  3 --> Invalid argument(s)
 
-#TODO check & add missing arguments/variables above
-# arguments and env variables are doubled and are not used uniformly between Linux and macOS/Windows builds which adds complexity
+# TODO flags/options and env variables are doubled (and just proxying some tool variables) and are not used uniformly between Linux and macOS/Windows builds which adds complexity
 
-# Read arguments
+set -e
+
+## Read options
+#TODO group only alphabetically and put flag/option to comments above with no "argument"/"boolean flag" and "accept an argument"/"options with values"?
 while [[ $# != 0 ]]; do
   case "$1" in
-    '--')
+
+    # Flags (no argument)
+    '--debug')
+      BUILDTYPE="Debug"
       shift
       ;;
     '--install')
       MAKE_INSTALL=1
+      shift
+      ;;
+    '--no-client')
+      MAKE_NO_CLIENT=1
+      shift
+      ;;
+    '--release')
+      BUILDTYPE="Release"
+      shift
+      ;;
+    '--server')
+      MAKE_SERVER=1
+      shift
+      ;;
+    '--test')
+      MAKE_TEST=1
+      shift
+      ;;
+    '--vcpkg')
+      USE_VCPKG=1
+      shift
+      ;;
+
+    # Options (accept an argument)
+    '--ccache')
+      USE_CCACHE=1
+      shift
+      if [[ $# != 0 && ${1:0:1} != - ]]; then
+        CCACHE_SIZE="$1"
+        shift
+      fi
+      ;;
+    '--cmake-generator')
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--cmake-generator expects an argument"
+        exit 3
+      fi
+      export CMAKE_GENERATOR=$1
+      shift
+      ;;
+    '--dir')
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--dir expects an argument"
+        exit 3
+      fi
+      BUILD_DIR="$1"
+      shift
+      ;;
+    '--evict-ccache')
+      shift
+      if [[ $# == 0 ]]; then
+        echo "::error file=$0::--evict-ccache expects an argument"
+        exit 3
+      fi
+      CCACHE_EVICTION_AGE=$1
       shift
       ;;
     '--package')
@@ -69,65 +134,6 @@ while [[ $# != 0 ]]; do
       PACKAGE_SUFFIX="$1"
       shift
       ;;
-    '--server')
-      MAKE_SERVER=1
-      shift
-      ;;
-    '--no-client')
-      MAKE_NO_CLIENT=1
-      shift
-      ;;
-    '--test')
-      MAKE_TEST=1
-      shift
-      ;;
-    '--debug')
-      BUILDTYPE="Debug"
-      shift
-      ;;
-    '--release')
-      BUILDTYPE="Release"
-      shift
-      ;;
-    '--ccache')
-      USE_CCACHE=1
-      shift
-      if [[ $# != 0 && ${1:0:1} != - ]]; then
-        CCACHE_SIZE="$1"
-        shift
-      fi
-      ;;
-    '--evict-ccache')
-      shift
-      if [[ $# == 0 ]]; then
-        echo "::error file=$0::--evict-ccache expects an argument"
-        exit 3
-      fi
-      CCACHE_EVICTION_AGE=$1
-      shift
-      ;;
-    '--vcpkg')
-      USE_VCPKG=1
-      shift
-      ;;
-    '--dir')
-      shift
-      if [[ $# == 0 ]]; then
-        echo "::error file=$0::--dir expects an argument"
-        exit 3
-      fi
-      BUILD_DIR="$1"
-      shift
-      ;;
-    '--cmake-generator')
-      shift
-      if [[ $# == 0 ]]; then
-        echo "::error file=$0::--cmake-generator expects an argument"
-        exit 3
-      fi
-      export CMAKE_GENERATOR=$1
-      shift
-      ;;
     '--target-macos-version')
       shift
       if [[ $# == 0 ]]; then
@@ -137,6 +143,8 @@ while [[ $# != 0 ]]; do
       TARGET_MACOS_VERSION="$1"
       shift
       ;;
+
+    # Unknown options
     *)
       echo "::error file=$0::unrecognized option: $1"
       exit 3
@@ -144,56 +152,68 @@ while [[ $# != 0 ]]; do
   esac
 done
 
-set -e
 
-# Setup
+## Set defaults
 ./servatrice/check_schema_version.sh
 if [[ ! $BUILDTYPE ]]; then
-  BUILDTYPE=Release
+  BUILDTYPE="Release"
 fi
 
 if [[ ! $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
-# TODO check BUILD_DIR logic
 
-# Add CMake flags
+
+## Prepare compilation
+
+# Prepare CMake options
+if [[ $BUILDTYPE ]]; then
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
-if [[ $MAKE_SERVER ]]; then
-  flags+=("-DWITH_SERVER=1")
 fi
 
 if [[ $MAKE_NO_CLIENT ]]; then
   flags+=("-DWITH_CLIENT=0" "-DWITH_ORACLE=0")
 fi
 
-if [[ $MAKE_TEST ]]; then
-  flags+=("-DTEST=1")
+if [[ $MAKE_SERVER ]]; then
+  flags+=("-DWITH_SERVER=1")
 fi
 
-if [[ $USE_CCACHE ]]; then
-  flags+=("-DUSE_CCACHE=1")
-  if [[ $CCACHE_SIZE ]]; then
-    # Note, this setting persists after running the script
-    ccache --max-size "$CCACHE_SIZE"
-  fi
+if [[ $MAKE_TEST ]]; then
+  flags+=("-DTEST=1")
 fi
 
 if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 
+if [[ $USE_CCACHE ]]; then
+  flags+=("-DUSE_CCACHE=1")
+
+  if [[ $CCACHE_SIZE ]]; then
+    # Note: Setting persists after running the script
+    ccache --max-size "$CCACHE_SIZE"
+  fi
+fi
+
 if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
 fi
 
-# Add CMake --build flags
-buildflags=(--config "$BUILDTYPE")
+# Prepare CMake --build options
+if [[ $BUILDTYPE ]]; then
+  buildflags=(--config "$BUILDTYPE")
+fi
 
-# Prepare compilation
+if [[ $RUNNER_OS == Windows ]]; then
+  # Enable MSBuild switches for MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
+  buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
+fi
+
+# Other OS-specific configuration (GitHub runner)
 if [[ $RUNNER_OS == macOS ]]; then
 # TODO qtdir
-
   # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action,
   # which sets a few environment variables
   if QTDIR=$(find "$GITHUB_WORKSPACE/Qt" -depth -maxdepth 2 -name macos -type d -print -quit); then
@@ -209,36 +229,41 @@ if [[ $RUNNER_OS == macOS ]]; then
   export QTDIR
 
   if [[ $TARGET_MACOS_VERSION ]]; then
-    # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla CMake flag needed to compile to target macOS version
+    # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla CMake option needed to compile to target macOS version
     flags+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=$TARGET_MACOS_VERSION")
 
-    # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
-    # An easy way is to copy the x64-osx.cmake file and modify it
-    triplets_dir="/tmp/cmake/triplets"
-    triplet_version="custom-triplet"
-    triplet_file="$triplets_dir/$triplet_version.cmake"
-    arch=$(uname -m)
+    if [[ $USE_VCPKG ]]; then
+	  echo "vcpkg triplet"
+      # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
+      # An easy way is to copy the x64-osx.cmake file and modify it
+      triplets_dir="/tmp/cmake/triplets"
+      triplet_version="custom-triplet"
+      triplet_file="$triplets_dir/$triplet_version.cmake"
+      arch=$(uname -m)
 
-    if [[ $arch == x86_64 ]]; then
-      arch="x64"
+      if [[ $arch == x86_64 ]]; then
+        arch="x64"
+      fi
+
+      mkdir -p "$triplets_dir"
+	  triplet_source="../vcpkg/triplets/$arch-osx.cmake"
+
+      if [[ ! -f "$triplet_source" ]]; then
+        triplet_source="../vcpkg/triplets/community/$arch-osx.cmake"
+      fi
+
+      cp "$triplet_source" "$triplet_file"
+      echo "set(VCPKG_CMAKE_SYSTEM_VERSION $TARGET_MACOS_VERSION)" >>"$triplet_file"
+      echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $TARGET_MACOS_VERSION)" >>"$triplet_file"
+      flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
+      flags+=("-DVCPKG_HOST_TRIPLET=$triplet_version")
+      flags+=("-DVCPKG_TARGET_TRIPLET=$triplet_version")
+      echo "::endgroup::"
+
+	  echo "::group::Generated triplet $triplet_file"
+      cat "$triplet_file"
+      echo "::endgroup::"
     fi
-
-    mkdir -p "$triplets_dir"
-    triplet_source="../vcpkg/triplets/$arch-osx.cmake"
-
-    if [[ ! -f "$triplet_source" ]]; then
-      triplet_source="../vcpkg/triplets/community/$arch-osx.cmake"
-    fi
-
-    cp "$triplet_source" "$triplet_file"
-    echo "set(VCPKG_CMAKE_SYSTEM_VERSION $TARGET_MACOS_VERSION)" >>"$triplet_file"
-    echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $TARGET_MACOS_VERSION)" >>"$triplet_file"
-    flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
-    flags+=("-DVCPKG_HOST_TRIPLET=$triplet_version")
-    flags+=("-DVCPKG_TARGET_TRIPLET=$triplet_version")
-    echo "::group::Generated triplet $triplet_file"
-    cat "$triplet_file"
-    echo "::endgroup::"
   fi
 
   echo "::group::Signing Certificate"
@@ -277,12 +302,17 @@ if [[ $RUNNER_OS == macOS ]]; then
   fi
 
 elif [[ $RUNNER_OS == Windows ]]; then
-  # Enable MSBuild switches for MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
-  # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
-  buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
+  :
+
+elif [[ $RUNNER_OS == Linux ]]; then
+  :
+
 fi
 
-# Pre-build ccache
+
+## Pre-build
+
+# ccache
 if [[ $USE_CCACHE ]]; then
   echo "::group::Clear ccache stats"
   # https://ccache.dev/manual/4.13.6.html#_command_line_options
@@ -295,6 +325,9 @@ if [[ $USE_CCACHE ]]; then
   echo "::endgroup::"
 fi
 
+
+## Build
+
 # Configure CMake
 echo "::group::Configure CMake"
 cmake --version
@@ -303,13 +336,16 @@ cmake -S . -B "$BUILD_DIR" "${flags[@]}"
 # cmake -S .. -B "$BUILD_DIR" "${flags[@]}"
 echo "::endgroup::"
 
-# Build
+# Compile
 echo "::group::Build project"
 echo "Running CMake with following build flags: ${buildflags[*]}"
 cmake --build "$BUILD_DIR" "${buildflags[@]}"
 echo "::endgroup::"
 
-# Post-build ccache
+
+## Post-build
+
+# ccache
 if [[ $USE_CCACHE ]]; then
 
   if [[ $CCACHE_EVICTION_AGE ]]; then
@@ -328,9 +364,8 @@ elif [[ $CCACHE_EVICTION_AGE ]]; then
   echo "::error file=$0::ccache eviction is enabled while ccache is disabled!"
 fi
 
-# [macOS] Inspect binaries
+# Inspect binaries
 if [[ $RUNNER_OS == macOS ]]; then
-
   echo "::group::Inspect Mach-O binaries"
 
   for app in cockatrice oracle servatrice; do
@@ -340,12 +375,13 @@ if [[ $RUNNER_OS == macOS ]]; then
     file "$binary"
     lipo -info "$binary"
     echo ""
-
   done
+
   echo "::endgroup::"
 fi
 
- # Test
+
+# Test
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
   ctest --version
