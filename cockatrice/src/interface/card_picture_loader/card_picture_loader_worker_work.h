@@ -8,6 +8,7 @@
 #include <QMutex>
 #include <QNetworkAccessManager>
 #include <QObject>
+#include <QRandomGenerator>
 #include <QThread>
 #include <libcockatrice/card/database/card_database.h>
 
@@ -40,6 +41,9 @@ public:
 
     CardPictureToLoad cardToDownload; ///< The card and associated URLs to try downloading
 
+    static constexpr int MAX_RETRIES = 5;        ///< Max number of retries on HTTP 429
+    static constexpr int BASE_BACKOFF_MS = 1000; ///< Base delay for exponential backoff (ms)
+
 public slots:
     /**
      * @brief Handles a finished network reply for the card image.
@@ -48,7 +52,8 @@ public slots:
     void handleNetworkReply(QNetworkReply *reply);
 
 private:
-    bool picDownload; ///< Whether network downloading is enabled
+    int retryCount = 0; ///< Number of retries attempted for HTTP 429
+    bool picDownload;   ///< Whether network downloading is enabled
 
     /** @brief Starts downloading the next URL for this card. */
     void startNextPicDownload();
@@ -76,6 +81,9 @@ private:
      * Emits imageLoaded() and deletes this object.
      */
     void concludeImageLoad(const QImage &image);
+
+    /** @brief Schedules a retry for a failed request with exponential backoff. */
+    void scheduleRetry(const QUrl &failedUrl);
 
 private slots:
     /** @brief Updates the picDownload setting when it changes. */
