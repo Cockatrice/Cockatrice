@@ -319,6 +319,7 @@ void PaletteEditorDialog::onReset()
 {
     workingConfig[loadedScheme] = savedConfig[loadedScheme];
     paletteGrid->loadPalette(savedConfig[loadedScheme]);
+    seedAccentFromScheme(loadedScheme);
 }
 
 void PaletteEditorDialog::onRevertToDefault()
@@ -351,6 +352,7 @@ void PaletteEditorDialog::onRevertToDefault()
     savedConfig[loadedScheme] = def;
     workingConfig[loadedScheme] = def;
     paletteGrid->loadPalette(def);
+    seedAccentFromScheme(loadedScheme);
 }
 
 void PaletteEditorDialog::changeEvent(QEvent *e)
