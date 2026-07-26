@@ -227,18 +227,18 @@ jobs:
         with:
           archive: false
           if-no-files-found: error
-          path: ${{ steps.build.outputs.path }}
+          path: ${{ steps.build.outputs.package_path }}
 
       - name: "Upload to release"
         id: upload_release
         if: matrix.package != 'skip' && needs.configure.outputs.tag != null
         shell: bash
         env:
-          asset_name: ${{ steps.build.outputs.fullname }}
-          asset_path: ${{ steps.build.outputs.path }}
+          package: ${{ steps.build.outputs.package }}
+          package_path: ${{ steps.build.outputs.package_path }}
           GH_TOKEN: ${{ github.token }}
           tag_name: ${{ needs.configure.outputs.tag }}
-        run: gh release upload "$tag_name" "$asset_path#$asset_name"
+        run: gh release upload "$tag_name" "$package_path#$package"
 
       - name: "Attest binary provenance"
         id: attestation
@@ -246,15 +246,15 @@ jobs:
         uses: actions/attest@v4
         with:
           show-summary: false
-          subject-path: ${{ steps.build.outputs.path }}
+          subject-path: ${{ steps.build.outputs.package_path }}
 
       - name: "Verify binary attestation"
         if: steps.attestation.outcome == 'success'
         shell: bash
         env:
-          BUILD_PATH: ${{ steps.build.outputs.path }}
+          PACKAGE_PATH: ${{ steps.build.outputs.package_path }}
           GH_TOKEN: ${{ github.token }}
-        run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
+        run: gh attestation verify "$PACKAGE_PATH" --repo Cockatrice/Cockatrice
 
   build-vcpkg:
     strategy:
@@ -475,20 +475,20 @@ jobs:
         if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
         id: sign_macos
         env:
-          BUILD_PATH: ${{ steps.build.outputs.path }}
+          PACKAGE_PATH: ${{ steps.build.outputs.package_path }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
         run: |
           if [[ -n "$MACOS_CERTIFICATE_NAME" ]]
           then
             security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-            /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "$BUILD_PATH"
+            /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "$PACKAGE_PATH"
           fi
 
       - name: "[macOS] Notarize app bundle"
         if: matrix.os == 'macOS' && steps.sign_macos.outcome == 'success'
         env:
-          BUILD_PATH: ${{ steps.build.outputs.path }}
+          PACKAGE_PATH: ${{ steps.build.outputs.package_path }}
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
@@ -503,7 +503,7 @@ jobs:
             # Therefore, we create a zip file containing our app bundle, so that we can send it to the
             # notarization service
             echo "Creating temp notarization archive"
-            ditto -c -k --keepParent "$BUILD_PATH" "notarization.zip"
+            ditto -c -k --keepParent "$PACKAGE_PATH" "notarization.zip"
 
             # Here we send the notarization request to the Apple's Notarization service, waiting for the result.
             # This typically takes a few seconds inside a CI environment, but it might take more depending on the App
@@ -515,7 +515,7 @@ jobs:
             # Finally, we need to "attach the staple" to our executable, which will allow our app to be
             # validated by macOS even when an internet connection is not available.
             echo "Attach staple"
-            xcrun stapler staple "$BUILD_PATH"
+            xcrun stapler staple "$PACKAGE_PATH"
           fi
 
       - name: "Upload artifact"
@@ -525,14 +525,14 @@ jobs:
         with:
           archive: false
           if-no-files-found: error
-          path: ${{ steps.build.outputs.path }}
+          path: ${{ steps.build.outputs.package_path }}
 
       - name: "[Windows] Upload PDBs (Program Databases)"
         if: matrix.os == 'Windows' && github.ref_type != 'tag'
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error
-          name: ${{ steps.build.outputs.name }}-PDBs
+          name: ${{ steps.build.outputs.filename }}-PDBs
           path: |
             build/cockatrice/Release/*.pdb
             build/oracle/Release/*.pdb
@@ -543,11 +543,11 @@ jobs:
         id: upload_release
         shell: bash
         env:
-          asset_name: ${{ steps.build.outputs.fullname }}
-          asset_path: ${{ steps.build.outputs.path }}
+          package: ${{ steps.build.outputs.package }}
+          package_path: ${{ steps.build.outputs.package_path }}
           GH_TOKEN: ${{ github.token }}
           tag_name: ${{ needs.configure.outputs.tag }}
-        run: gh release upload "$tag_name" "$asset_path#$asset_name"
+        run: gh release upload "$tag_name" "$package_path#$package"
 
       - name: "Attest binary provenance"
         if: steps.upload_release.outcome == 'success'
@@ -555,12 +555,12 @@ jobs:
         uses: actions/attest@v4
         with:
           show-summary: false
-          subject-path: ${{ steps.build.outputs.path }}
+          subject-path: ${{ steps.build.outputs.package_path }}
 
       - name: "Verify binary attestation"
         if: steps.attestation.outcome == 'success'
         shell: bash
         env:
-          BUILD_PATH: ${{ steps.build.outputs.path }}
+          PACKAGE_PATH: ${{ steps.build.outputs.package_path }}
           GH_TOKEN: ${{ github.token }}
-        run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
+        run: gh attestation verify "$PACKAGE_PATH" --repo Cockatrice/Cockatrice

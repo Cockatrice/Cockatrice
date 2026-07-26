@@ -1,49 +1,52 @@
-#!/bin/bash
-# used by the ci to rename build artifacts
-# renames the file to [original name][SUFFIX].[original extension]
-# where SUFFIX is either available in the environment or as the first arg
-# expected to be run in the build directory unless BUILD_DIR is set
-# adds output to GITHUB_OUTPUT
-builddir="${BUILD_DIR:=.}"
-findrx="Cockatrice-*.*"
+#!/usr/bin/env bash
 
-if [[ $1 ]]; then
-  SUFFIX="$1"
-fi
+set -euo pipefail
 
-# check env
-if [[ ! $SUFFIX ]]; then
-  echo "::error file=$0::SUFFIX is missing"
+# Used by the CI build script to rename package artifacts
+#
+# Appends PACKAGE_SUFFIX to the package's filename
+#  <package>     = <filename><extension>
+#  <package_new> = <filename><PACKAGE_SUFFIX><extension>
+# PACKAGE_SUFFIX must be passed as the first argument to the script
+# Adds output to GITHUB_OUTPUT
+#
+# Expected to be run in the repository root where CPack executes from and places its output binary
+# Expects a single binary for package_pattern and picks the first match
+# Expects <extension> to be e.g. ".dmg", ".deb" or ".exe" (".tar.gz" etc. with more than one dot will break)
+
+# Initialize PACKAGE_SUFFIX from positional argument
+PACKAGE_SUFFIX="${1:-}"
+
+# Check variable
+if [[ -z $PACKAGE_SUFFIX ]]; then
+  echo "::error file=$0::Missing required argument: PACKAGE_SUFFIX"
   exit 2
 fi
 
-set -e
+package_pattern="Cockatrice-*.*"
 
-# find file
-found="$(find "$builddir" -maxdepth 1 -type f -name "$findrx" -print -quit)"
-path="${found%/*}"    # remove all including first "/" from right side
-file="${found##*/}"    # remove all including last "/" from left side
-if [[ ! $file ]]; then
-  echo "::error file=$0::could not find package"
-  exit 1
-fi
-oldpwd="$PWD"
-if ! cd "$path"; then
-  echo "::error file=$0::could not get file path"
+# Find package in current directory
+package_path="$(find "$PWD" -maxdepth 1 -type f -name "$package_pattern" -print -quit)"
+
+if [[ -z "$package_path" ]]; then
+  echo "::error file=$0::Could not find package"
   exit 1
 fi
 
-# set filename
-name="${file%.*}"    # remove all including first "." from right side
-new_name="$name$SUFFIX"
-extension="${file##*.}"    # remove all including last "." from left side
-filename="$new_name.$extension"
-echo "renaming '$file' to '$filename'"
-mv "$file" "$filename"
+# <package> = <filename><extension>
+package="${package_path##*/}"  # remove folder path (keep e.g. "Cockatrice-3.0.0.deb")
+filename="${package%.*}"       # remove extension (keep e.g. "Cockatrice-3.0.0")
+extension=".${package##*.}"    # remove filename (keep e.g. ".deb")
 
-cd "$oldpwd"
-relative_path="$path/$filename"
-ls -l "$relative_path"
-echo "path=$relative_path" >>"$GITHUB_OUTPUT"
-echo "name=$new_name" >>"$GITHUB_OUTPUT"
-echo "fullname=$filename" >>"$GITHUB_OUTPUT"
+# Rename package (build artifact)
+filename_new="$filename$PACKAGE_SUFFIX"
+package_new="$filename_new$extension"
+package_path_new="$PWD/$package_new"
+
+echo "Renaming '$package' to '$package_new'"
+mv "$package_path" "$package_path_new"
+du -h "$package_path_new"
+
+echo "package_path=$package_path_new" >>"$GITHUB_OUTPUT"
+echo "package=$package_new" >>"$GITHUB_OUTPUT"
+echo "filename=$filename_new" >>"$GITHUB_OUTPUT"

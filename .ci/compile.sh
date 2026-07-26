@@ -171,7 +171,7 @@ done
 
 # CI context (GitHub Actions provided environment variable)
 if [[ -z ${RUNNER_OS:-} ]]; then
-  echo "::notice::RUNNER_OS (GitHub Actions CI environment variable) is not available and OS-specific configuration will be skipped."
+  echo "::notice::RUNNER_OS (GitHub Actions CI environment variable) is not available and OS-specific build configuration will be skipped"
 fi
 
 # Schema version consistency
@@ -320,15 +320,15 @@ fi
 
 # ccache
 if [[ $USE_CCACHE == 1 ]]; then
-  echo "::group::Clear ccache stats"
+  echo "::group::Show ccache configuration"
   ccache --version
   ccache --show-config
   echo "---"
-  ccache --show-stats --verbose
+  ccache --show-stats
   echo "---"
-  ccache --zero-stats    # zero former cache statistics (but not the configuration options or the cache itself)
+  ccache --zero-stats
   echo "---"
-  ccache --show-stats --verbose
+  ccache --show-stats
   echo "::endgroup::"
 fi
 
@@ -360,10 +360,10 @@ if [[ $USE_CCACHE == 1 ]]; then
     echo "::endgroup::"
   fi
 
-  echo "::group::Show ccache stats"
-  ccache --show-stats
-  ccache --show-stats --verbose    # too verbose?
-  ccache --show-compression    # helpful?
+  echo "::group::Show ccache statistics"
+  ccache --show-stats --verbose
+  echo "---"
+  ccache --show-compression
   echo "::endgroup::"
 
 elif [[ -n $CCACHE_EVICTION_AGE ]]; then
@@ -410,7 +410,7 @@ if [[ $MAKE_PACKAGE == 1 ]]; then
 
   if [[ -n $PACKAGE_SUFFIX ]]; then
     echo "::group::Update package name"
-    BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
+    .ci/name_build.sh "$PACKAGE_SUFFIX"
     echo "::endgroup::"
   fi
 fi
