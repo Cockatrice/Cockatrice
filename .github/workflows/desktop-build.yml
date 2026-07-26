@@ -227,7 +227,7 @@ jobs:
         with:
           archive: false
           if-no-files-found: error
-          path: ${{ steps.build.outputs.package_path }}
+          path: ${{ steps.build.outputs.package }}    # package is resolved against workspace (container path /= host path)
 
       - name: "Upload to release"
         id: upload_release

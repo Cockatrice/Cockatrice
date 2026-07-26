@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-
-### Compiles Cockatrice inside GitHub Actions CI, run only from project root directory (GITHUB_WORKSPACE)
+# Compiles Cockatrice inside GitHub Actions CI, run only from project root directory (GITHUB_WORKSPACE)
 #
 # Build flow and script structure:
 #  - Read options
@@ -11,8 +9,8 @@ set -euo pipefail
 #  - Pre-buld (ccache)
 #  - Build (Configure, Compile)
 #  - Post-build (ccache, Inspect, Test, Install, Package)
-
-### Supported command-line options:
+#
+# Supported command-line options:
 #  --ccache [<size>]                   Use ccache (USE_CCACHE) (optionally: provide cache size, e.g. "500M" or "1G" (CCACHE_SIZE))
 #  --cmake-generator <generator>       Sets the CMake generator (CMAKE_GENERATOR), e.g. "Ninja", "Visual Studio 18 2026"
 #  --debug                             Sets the build type (BUILDTYPE --> CMAKE_BUILD_TYPE)
@@ -27,6 +25,13 @@ set -euo pipefail
 #  --target-macos-version <version>    Sets the min OS version (TARGET_MACOS_VERSION), e.g. "14" [macOS only]
 #  --test                              Runs tests (MAKE_TEST)
 #  --vcpkg                             Use vcpkg package manager to resolve dependencies (USE_VCPKG)
+#
+# Exit codes:
+#  1 --> Failure
+#  3 --> Invalid argument(s)
+
+set -euo pipefail
+
 
 ### Initialize configuration variables:
 # Precedence: command-line options > environment variables > built-in script defaults
@@ -45,10 +50,6 @@ PACKAGE_TYPE="${PACKAGE_TYPE:-}"                    # See value for "--package" 
 TARGET_MACOS_VERSION="${TARGET_MACOS_VERSION:-}"    # See "--target-macos-version" option
 USE_CCACHE="${USE_CCACHE:-0}"                       # See "--ccache" option
 USE_VCPKG="${USE_VCPKG:-0}"                         # See "--vcpkg" flag
-
-### Exit codes:
-#  1 --> Failure
-#  3 --> Invalid argument(s)
 
 
 ### Read options

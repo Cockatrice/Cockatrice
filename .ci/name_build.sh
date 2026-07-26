@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-
 # Used by the CI build script to rename package artifacts
 #
 # Appends PACKAGE_SUFFIX to the package's filename
@@ -13,6 +11,8 @@ set -euo pipefail
 # Expected to be run in the repository root where CPack executes from and places its output binary
 # Expects <extension> to be e.g. ".dmg", ".deb" or ".exe" (".tar.gz" etc. with more than one dot will break)
 # If multiple packages match <package_pattern>, the first match is used
+
+set -euo pipefail
 
 # Initialize PACKAGE_SUFFIX from positional argument
 PACKAGE_SUFFIX="${1:-}"
