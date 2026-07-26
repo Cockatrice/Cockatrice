@@ -16,6 +16,7 @@ private:
     QString annotation;
     QString pt;
     bool doesntUntap = false;
+    bool doesntUntapOnce = false;
     bool destroyOnZoneChange = false;
 
     CardItem *attachedTo = nullptr;
