@@ -327,8 +327,9 @@ case $mode in
     done
     if (( code>0 )); then
       echo "$sep"
+	  echo "Affected file(s):"
       for name in "${files_to_format[@]}"; do
-        echo "$name"
+        echo " $name"
       done
     fi
     exit $code

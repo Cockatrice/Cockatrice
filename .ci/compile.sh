@@ -171,8 +171,7 @@ done
 
 # CI context (GitHub Actions provided environment variable)
 if [[ -z ${RUNNER_OS:-} ]]; then
-  echo "This script requires GitHub Actions environment variable RUNNER_OS"
-  exit 1
+  echo "::notice::RUNNER_OS (GitHub Actions CI environment variable) is not available and OS-specific configuration will be skipped."
 fi
 
 # Schema version consistency
@@ -255,10 +254,10 @@ if [[ ${RUNNER_OS:-} == "macOS" ]]; then
       fi
 
       mkdir -p "$triplets_dir"
-	  triplet_source="../vcpkg/triplets/$arch-osx.cmake"
+	  triplet_source="./vcpkg/triplets/$arch-osx.cmake"
 
       if [[ ! -f "$triplet_source" ]]; then
-        triplet_source="../vcpkg/triplets/community/$arch-osx.cmake"
+        triplet_source="./vcpkg/triplets/community/$arch-osx.cmake"
       fi
 
       cp "$triplet_source" "$triplet_file"
@@ -322,13 +321,14 @@ fi
 # ccache
 if [[ $USE_CCACHE == 1 ]]; then
   echo "::group::Clear ccache stats"
-  # https://ccache.dev/manual/4.13.6.html#_command_line_options
   ccache --version
   ccache --show-config
-  ccache --show-stats    # remove again
-  ccache --show-log-stats    # helpful?
-  ccache --zero-stats    # zero former cache statistics (but not the configuration options)
-  ccache --show-stats    # helpful?
+  echo "---"
+  ccache --show-stats --verbose
+  echo "---"
+  ccache --zero-stats    # zero former cache statistics (but not the configuration options or the cache itself)
+  echo "---"
+  ccache --show-stats --verbose
   echo "::endgroup::"
 fi
 
@@ -361,7 +361,7 @@ if [[ $USE_CCACHE == 1 ]]; then
   fi
 
   echo "::group::Show ccache stats"
-  ccache --verify    # remove again
+  ccache --show-stats
   ccache --show-stats --verbose    # too verbose?
   ccache --show-compression    # helpful?
   echo "::endgroup::"
