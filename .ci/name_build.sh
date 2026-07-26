@@ -11,8 +11,8 @@ set -euo pipefail
 # Adds output to GITHUB_OUTPUT
 #
 # Expected to be run in the repository root where CPack executes from and places its output binary
-# Expects a single binary for package_pattern and picks the first match
 # Expects <extension> to be e.g. ".dmg", ".deb" or ".exe" (".tar.gz" etc. with more than one dot will break)
+# If multiple packages match <package_pattern>, the first match is used
 
 # Initialize PACKAGE_SUFFIX from positional argument
 PACKAGE_SUFFIX="${1:-}"
@@ -34,9 +34,9 @@ if [[ -z "$package_path" ]]; then
 fi
 
 # <package> = <filename><extension>
-package="${package_path##*/}"  # remove folder path (keep e.g. "Cockatrice-3.0.0.deb")
-filename="${package%.*}"       # remove extension (keep e.g. "Cockatrice-3.0.0")
-extension=".${package##*.}"    # remove filename (keep e.g. ".deb")
+package="${package_path##*/}"  # e.g. "Cockatrice-3.0.0.deb"
+filename="${package%.*}"       # e.g. "Cockatrice-3.0.0"
+extension=".${package##*.}"    # e.g. ".deb"
 
 # Rename package (build artifact)
 filename_new="$filename$PACKAGE_SUFFIX"
@@ -47,6 +47,8 @@ echo "Renaming '$package' to '$package_new'"
 mv "$package_path" "$package_path_new"
 du -h "$package_path_new"
 
-echo "package_path=$package_path_new" >>"$GITHUB_OUTPUT"
-echo "package=$package_new" >>"$GITHUB_OUTPUT"
-echo "filename=$filename_new" >>"$GITHUB_OUTPUT"
+{
+  echo "package_path=$package_path_new" >> "$GITHUB_OUTPUT"
+  echo "package=$package_new" >> "$GITHUB_OUTPUT"
+  echo "filename=$filename_new" >> "$GITHUB_OUTPUT"
+} >> "$GITHUB_OUTPUT"

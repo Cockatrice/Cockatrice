@@ -1,30 +1,30 @@
 #!/bin/bash
 
-# This script will run clang-format on all modified, non-3rd-party C++/Header files.
+# This script will run Clang-Format on all modified, non-3rd-party C++/Header files.
 # Optionally runs cmake-format on all modified cmake files.
-# Optionally runs shellcheck on all modified shell files.
+# Optionally runs ShellCheck on all modified shell files.
 # Uses clang-format, cmake-format, git, diff, find and shellcheck
 # Never, ever, should this receive a path with a newline in it. Don't bother proofing it for that.
 
 set -o pipefail
 
-# go to the project root directory, this file should be located in the project root directory
+# Go to the project root directory, this file should be located in the project root directory
 olddir="$PWD"
 cd "${BASH_SOURCE%/*}/" || exit 2 # could not find path, this could happen with special links etc.
 
-# defaults
+# Defaults
 include=("cockatrice/src" \
 libcockatrice_* \
-"oracle/src" \
-"servatrice/src" \
-"tests")
+  "oracle/src" \
+  "servatrice/src" \
+  "tests")
 exclude=("libcockatrice_rng/libcockatrice/rng/sfmt/" \
-"libcockatrice_utility/libcockatrice/utility/peglib.h" \
-"oracle/src/lzma/" \
-"oracle/src/qt-json/" \
-"oracle/src/zip/" \
-"servatrice/src/smtp/")
-exts=("cpp" "h" "proto")
+  "libcockatrice_utility/libcockatrice/utility/peglib.h" \
+  "oracle/src/lzma/" \
+  "oracle/src/qt-json/" \
+  "oracle/src/zip/" \
+  "servatrice/src/smtp/")
+extensions=("cpp" "h" "proto")
 cf_cmd="clang-format"
 branch="origin/master"
 cmakefile="CMakeLists.txt"
@@ -33,9 +33,9 @@ cmakeinclude=("cmake/gtest-CMakeLists.txt.in")
 scripts="*.sh"
 color="--"
 verbosity=0
-sep="----------"
+separator="----------"
 
-# parse options
+# Parse options
 while [[ $* ]]; do
   case "$1" in
     '-b'|'--branch')
@@ -58,7 +58,7 @@ while [[ $* ]]; do
       ;;
     '-h'|'--help')
       cat <<EOM
-A bash script to automatically format your code using clang-format.
+A bash script to automatically format your code using Clang-Format.
 
 If no options are given, all dirty source files are edited in place.
 If <dir>s are given, all source files in those directories of the project root
@@ -165,7 +165,7 @@ EOM
       ;;
     *)
       if [[ ! $dashdash && $1 =~ ^-- ]]; then
-        echo "error in parsing arguments of $0: $1 is an unrecognized option" >&2
+        echo "Error in parsing arguments of $0: $1 is an unrecognized option" >&2
         exit 2 # input error
       fi
       if [[ ! $1 ]] || next_dir=$(cd "$olddir" && cd -- "$1" && pwd); then
@@ -175,13 +175,13 @@ EOM
         fi
         if [[ $1 ]]; then
           if [[ $next_dir != $PWD/* ]]; then
-            echo "error in parsing arguments of $0: $next_dir is not in $PWD" >&2
+            echo "Error in parsing arguments of $0: $next_dir is not in $PWD" >&2
             exit 2 # input error
           fi
           include+=("$next_dir")
         fi
       else
-        echo "error in parsing arguments of $0: $1 is not a directory" >&2
+        echo "Error in parsing arguments of $0: $1 is not a directory" >&2
         exit 2 # input error
       fi
       if ! [[ $set_branch ]]; then
@@ -192,39 +192,39 @@ EOM
   esac
 done
 
-# check availability of clang-format
+# Check availability of Clang-Format
 if ! hash $cf_cmd 2>/dev/null; then
   echo "could not find $cf_cmd" >&2
-  # find any clang-format-x.x in /usr/bin
+  # Find any "clang-format-x.x" in /usr/bin
   cf_cmd=$(find /usr/bin -regex '.*/clang-format-[0-9]+\.[0-9]+' -print -quit)
   if [[ $cf_cmd ]]; then
-    echo "found $cf_cmd instead" >&2
+    echo "Found $cf_cmd instead" >&2
   else
     exit 3 # special exit code for missing dependency
   fi
 fi
 
-# check availability of cmake-format
+# Check availability of cmake-format
 if [[ $do_cmake ]] && ! hash cmake-format 2>/dev/null; then
-  echo "could not find cmake-format" >&2
+  echo "Could not find cmake-format" >&2
   exit 3
 fi
 
-# check availability of shellcheck
+# Check availability of ShellCheck
 if [[ $do_shell ]] && ! hash shellcheck 2>/dev/null; then
-  echo "could not find shellcheck" >&2
+  echo "Could not find shellcheck" >&2
   exit 3
 fi
 
 if [[ $branch ]]; then
-  # get all dirty files through git
+  # Get all dirty files through git
   if ! base=$(git merge-base "$branch" HEAD); then
-    echo "could not find git merge base" >&2
+    echo "Could not find git merge base" >&2
     exit 2 # input error
   fi
   mapfile -t basenames < <(git diff --diff-filter=d --name-only "$base")
   names=()
-  for ex in "${exts[@]}"; do
+  for ex in "${extensions[@]}"; do
     for path in "${include[@]}"; do
       for name in "${basenames[@]}"; do
         rx="^$path/.*\\.$ex$"
@@ -260,7 +260,7 @@ if [[ $branch ]]; then
   fi
 else
   exts_o=()
-  for ext in "${exts[@]}"; do
+  for ext in "${extensions[@]}"; do
     exts_o+=(-o -name "*\\.$ext")
   done
   unset "exts_o[0]" # remove first -o
@@ -274,7 +274,7 @@ else
   fi
 fi
 
-# filter excludes
+# Filter excludes
 for path in "${exclude[@]}"; do
   for i in "${!names[@]}"; do
     rx="^$path"
@@ -284,12 +284,12 @@ for path in "${exclude[@]}"; do
   done
 done
 
-# optionally print version
+# Optionally print version
 if [[ $print_version ]]; then
   $cf_cmd -version
   [[ $do_cmake ]] && echo "cmake-format version $(cmake-format --version)"
-  [[ $do_shell ]] && echo "shellcheck $(shellcheck --version | grep "version:")"
-  echo "$sep"
+  [[ $do_shell ]] && echo "ShellCheck $(shellcheck --version | grep "version:")"
+  echo "$separator"
 fi
 
 if [[ ! ${cmake_names[*]} ]]; then
@@ -302,7 +302,7 @@ if [[ ! ( ${names[*]} || $do_cmake || $do_shell ) ]]; then
   exit 0 # nothing to format means format is successful!
 fi
 
-# format
+# Format
 case $mode in
   diff)
     declare -i code=0
@@ -326,7 +326,7 @@ case $mode in
       fi
     done
     if (( code>0 )); then
-      echo "$sep"
+      echo "$separator"
 	  echo "Affected file(s):"
       for name in "${files_to_format[@]}"; do
         echo " $name"
@@ -375,15 +375,15 @@ case $mode in
       cmake-format -i "${cmake_names[@]}"
     fi
     if [[ $do_shell ]]; then
-      echo "warning: --shell is not compatible with the current mode but shell files were modified!" >&2
-      echo "recommendation: try $0 --diff --shell" >&2
+      echo "Warning: --shell is not compatible with the current mode but shell files were modified!" >&2
+      echo "Recommendation: try $0 --diff --shell" >&2
     fi
     if (( verbosity>0 )); then
       count="${#names[*]}"
       if [[ $do_cmake ]]; then
         (( count+=${#cmake_names[*]} ))
       fi
-      echo "parsed $count files that differ from base $branch"
+      echo "Parsed $count files that differ from base $branch"
     fi
     ;;
 esac

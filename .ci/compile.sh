@@ -323,11 +323,11 @@ if [[ $USE_CCACHE == 1 ]]; then
   echo "::group::Show ccache configuration"
   ccache --version
   ccache --show-config
-  echo "---"
+  echo " -----"
   ccache --show-stats
-  echo "---"
+  echo " -----"
   ccache --zero-stats
-  echo "---"
+  echo " -----"
   ccache --show-stats
   echo "::endgroup::"
 fi
@@ -362,7 +362,6 @@ if [[ $USE_CCACHE == 1 ]]; then
 
   echo "::group::Show ccache statistics"
   ccache --show-stats --verbose
-  echo "---"
   ccache --show-compression
   echo "::endgroup::"
 
