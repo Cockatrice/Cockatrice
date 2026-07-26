@@ -227,7 +227,7 @@ jobs:
         with:
           archive: false
           if-no-files-found: error
-          path: ${{ steps.build.outputs.package }}    # package is resolved against workspace (container path /= host path)
+          path: ${{ steps.build.outputs.package }}    # package is resolved against github.workspace
 
       - name: "Upload to release"
         id: upload_release
@@ -235,10 +235,10 @@ jobs:
         shell: bash
         env:
           package: ${{ steps.build.outputs.package }}
-          package_path: ${{ steps.build.outputs.package_path }}
+          package_path: ${{ steps.build.outputs.package_path }}    # <-- to check
           GH_TOKEN: ${{ github.token }}
           tag_name: ${{ needs.configure.outputs.tag }}
-        run: gh release upload "$tag_name" "$package_path#$package"
+        run: gh release upload "$tag_name" "$package_path#$package"    # <-- to check
 
       - name: "Attest binary provenance"
         id: attestation
@@ -246,13 +246,13 @@ jobs:
         uses: actions/attest@v4
         with:
           show-summary: false
-          subject-path: ${{ steps.build.outputs.package_path }}
+          subject-path: ${{ steps.build.outputs.package_path }}    # <-- to check
 
       - name: "Verify binary attestation"
         if: steps.attestation.outcome == 'success'
         shell: bash
         env:
-          PACKAGE_PATH: ${{ steps.build.outputs.package_path }}
+          PACKAGE_PATH: ${{ steps.build.outputs.package_path }}    # <-- to check
           GH_TOKEN: ${{ github.token }}
         run: gh attestation verify "$PACKAGE_PATH" --repo Cockatrice/Cockatrice
 
@@ -451,6 +451,11 @@ jobs:
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           VCPKG_DISABLE_METRICS: 1
         run: .ci/compile.sh --server --test --vcpkg
+        continue-on-error: true
+
+      - name: "[Windows] DEBUG: Print NSIS log output"
+        if: matrix.os == 'Windows'
+        run: cat "_CPack_Packages/win64/NSIS/NSISOutput.log"
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"

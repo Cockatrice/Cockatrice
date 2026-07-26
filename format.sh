@@ -33,7 +33,7 @@ cmakeinclude=("cmake/gtest-CMakeLists.txt.in")
 scripts="*.sh"
 color="--"
 verbosity=0
-separator="----------"
+separator=" ----------"
 
 # Parse options
 while [[ $* ]]; do

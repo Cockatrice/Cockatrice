@@ -326,10 +326,12 @@ if [[ $USE_CCACHE == 1 ]]; then
   ccache --show-config
   echo " -----"
   ccache --show-stats
+  ccache --show-compression
   echo " -----"
   ccache --zero-stats
   echo " -----"
   ccache --show-stats
+  ccache --show-compression
   echo "::endgroup::"
 fi
 

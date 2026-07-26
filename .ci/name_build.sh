@@ -47,6 +47,7 @@ echo "Renaming '$package' to '$package_new'"
 mv "$package_path" "$package_path_new"
 du -h "$package_path_new"
 
+#TODO remove package_path as it's default working direcotry / repo root?
 {
   echo "package_path=$package_path_new" >> "$GITHUB_OUTPUT"
   echo "package=$package_new" >> "$GITHUB_OUTPUT"
