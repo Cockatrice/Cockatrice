@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# fetch master branch
+# Fetch master branch
 git fetch origin master
 
-# unshallow if needed
+# Unshallow if needed
 echo "Finding merge base"
 if ! git merge-base origin/master HEAD; then
   echo "Could not find merge base, unshallowing repo"

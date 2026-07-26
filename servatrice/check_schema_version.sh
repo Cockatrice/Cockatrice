@@ -7,8 +7,7 @@ version_line="$(grep 'INSERT INTO cockatrice_schema_version' servatrice/servatri
 version_line="${version_line#*VALUES(}"
 declare -i schema_ver="${version_line%%)*}"
 
-# shellcheck disable=2012
-latest_migration="$(ls -1 servatrice/migrations/ | tail -n1)"
+latest_migration="$(printf '%s\n' servatrice/migrations/*.sql | sed 's#.*/##' | sort | tail -n1)"
 xtoysql="${latest_migration#servatrice_}"
 xtoy="${xtoysql%.sql}"
 declare -i old_ver="10#${xtoy%_to_*}" # declare as integer with base 10, numbers with a leading 0 are normally interpreted as base 16
@@ -40,4 +39,4 @@ if ! grep -q "$expected_define" servatrice/src/servatrice_database_interface.h; 
 fi
 
 echo " ✓ Database schema version is consistent"
-echo "::endgroup::
+echo "::endgroup::"
