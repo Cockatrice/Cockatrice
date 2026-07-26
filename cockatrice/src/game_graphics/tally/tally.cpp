@@ -4,8 +4,7 @@
 
 TallyType Tally::intToType(int value)
 {
-    // remember to change this whenever you add a new member
-    if (value < static_cast<int>(TallyType::None) || value >= static_cast<int>(TallyType::Subtypes)) {
+    if (value < static_cast<int>(TallyType::None) || value > static_cast<int>(TallyType::MaxValue)) {
         return TallyType::None;
     }
 
