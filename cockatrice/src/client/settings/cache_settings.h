@@ -197,6 +197,7 @@ signals:
     void useTearOffMenusChanged(bool state);
     void roundCardCornersChanged(bool roundCardCorners);
     void keepGameChatFocusChanged(bool value);
+    void tallyTypeChanged(int type);
 
 private:
     QSettings *settings;
@@ -356,7 +357,7 @@ private:
     bool showStatusBar;
     bool showDragSelectionCount;
     bool showTotalSelectionCount;
-    bool showSubtypeSelectionTally;
+    int tallyType;
 
 public:
     SettingsCache();
@@ -480,9 +481,9 @@ public:
     {
         return showTotalSelectionCount;
     }
-    [[nodiscard]] bool getShowSubtypeSelectionTally() const
+    [[nodiscard]] int getTallyType() const
     {
-        return showSubtypeSelectionTally;
+        return tallyType;
     }
     [[nodiscard]] bool getNotificationsEnabled() const
     {
@@ -1187,6 +1188,6 @@ public slots:
     void setRoundCardCorners(bool _roundCardCorners);
     void setShowDragSelectionCount(QT_STATE_CHANGED_T _showDragSelectionCount);
     void setShowTotalSelectionCount(QT_STATE_CHANGED_T _showTotalSelectionCount);
-    void setShowSubtypeSelectionTally(QT_STATE_CHANGED_T _showSubtypeSelectionTally);
+    void setTallyType(int value);
 };
 #endif

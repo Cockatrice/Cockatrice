@@ -15,6 +15,7 @@
 #include "rfg_menu.h"
 #include "say_menu.h"
 #include "sideboard_menu.h"
+#include "tally_menu.h"
 #include "utility_menu.h"
 
 #include <QList>
@@ -87,6 +88,7 @@ private:
     GraveyardMenu *graveMenu;
     RfgMenu *rfgMenu;
     UtilityMenu *utilityMenu;
+    TallyMenu *tallyMenu;
     SayMenu *sayMenu;
     CustomZoneMenu *customZonesMenu;
 

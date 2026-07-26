@@ -44,6 +44,8 @@ PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_
         utilityMenu = nullptr;
     }
 
+    tallyMenu = addManagedMenu<TallyMenu>();
+
     if (player->getLogic()->getPlayerInfo()->getLocal()) {
         sayMenu = addManagedMenu<SayMenu>(player);
     } else {
