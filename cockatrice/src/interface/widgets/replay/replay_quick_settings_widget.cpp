@@ -18,7 +18,7 @@ ReplayQuickSettingsWidget::ReplayQuickSettingsWidget(QWidget *parent) : Settings
     connect(&fastForwardSpeedBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
             &ReplayQuickSettingsWidget::actUpdateFastForwardSpeed);
 
-    skipEmptyCheckBox.setChecked(SettingsCache::instance().interface().getSkipEmptySections());
+    skipEmptyCheckBox.setChecked(SettingsCache::instance().userInterface().getSkipEmptySections());
     connect(&skipEmptyCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &ReplayQuickSettingsWidget::actUpdateSkipEmptySections);
 
@@ -53,6 +53,6 @@ void ReplayQuickSettingsWidget::actUpdateFastForwardSpeed(qreal value)
 
 void ReplayQuickSettingsWidget::actUpdateSkipEmptySections(QT_STATE_CHANGED_T value)
 {
-    SettingsCache::instance().interface().setSkipEmptySections(value);
+    SettingsCache::instance().userInterface().setSkipEmptySections(value);
     emit skipEmptySectionsChanged(value);
 }
