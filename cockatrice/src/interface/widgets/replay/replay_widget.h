@@ -1,12 +1,12 @@
 /**
- * @file replay_manager.h
+ * @file replay_widget.h
  * @ingroup Core
  * @ingroup Replay
  */
 //! \todo Document this file.
 
-#ifndef REPLAY_MANAGER_H
-#define REPLAY_MANAGER_H
+#ifndef REPLAY_WIDGET_H
+#define REPLAY_WIDGET_H
 
 #include "replay_timeline_widget.h"
 
@@ -17,12 +17,16 @@
 class ReplayQuickSettingsWidget;
 class TabGame;
 
-class ReplayManager : public QWidget
+/**
+ * @brief The top-level that is put in the replay dock widget.
+ * Contains the replay timeline as well as the buttons.
+ */
+class ReplayWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    ReplayManager(TabGame *parent, GameReplay *replay);
+    ReplayWidget(TabGame *parent, GameReplay *replay);
     TabGame *game;
     GameReplay *replay;
 
@@ -48,4 +52,4 @@ private slots:
     void refreshShortcuts();
 };
 
-#endif // REPLAY_MANAGER_H
+#endif // REPLAY_WIDGET_H

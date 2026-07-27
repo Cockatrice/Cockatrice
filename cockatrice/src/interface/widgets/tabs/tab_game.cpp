@@ -265,8 +265,8 @@ void TabGame::emitUserEvent()
 
 TabGame::~TabGame()
 {
-    if (replayManager) {
-        delete replayManager->replay;
+    if (replayWidget) {
+        delete replayWidget->replay;
     }
     for (auto &player : game->getPlayerManager()->getPlayers()) {
         player->clear();
@@ -1174,16 +1174,16 @@ void TabGame::createPlayAreaWidget(bool bReplay)
 
 void TabGame::createReplayDock(GameReplay *replay)
 {
-    replayManager = new ReplayManager(this, replay);
+    replayWidget = new ReplayWidget(this, replay);
 
     replayDock = new QDockWidget(this);
     replayDock->setObjectName("replayDock");
     replayDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
                             QDockWidget::DockWidgetMovable);
-    replayDock->setWidget(replayManager);
+    replayDock->setWidget(replayWidget);
     replayDock->setFloating(false);
 
-    connect(replayManager, &ReplayManager::eventReplayed, game->getGameEventHandler(),
+    connect(replayWidget, &ReplayWidget::eventReplayed, game->getGameEventHandler(),
             [this](const auto &event, auto options) {
                 game->getGameEventHandler()->processGameEventContainer(event, nullptr, options);
             });
