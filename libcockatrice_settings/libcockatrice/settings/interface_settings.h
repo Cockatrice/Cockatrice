@@ -34,6 +34,7 @@ public:
     [[nodiscard]] int getMinPlayersForMultiColumnLayout() const override;
     [[nodiscard]] int getRewindBufferingMs() const override;
     [[nodiscard]] qreal getFastForwardSpeed() const override;
+    [[nodiscard]] bool getSkipEmptySections() const override;
     [[nodiscard]] bool getLeftJustified() const override;
     [[nodiscard]] int getZoneViewGroupByIndex() const override;
     [[nodiscard]] int getZoneViewSortByIndex() const override;
@@ -65,6 +66,7 @@ public:
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
     void setRewindBufferingMs(int _rewindBufferingMs);
     void setFastForwardSpeed(qreal _value);
+    void setSkipEmptySections(bool _value);
     void setLeftJustified(bool _leftJustified);
     void setZoneViewGroupByIndex(int _zoneViewGroupByIndex);
     void setZoneViewSortByIndex(int _zoneViewSortByIndex);

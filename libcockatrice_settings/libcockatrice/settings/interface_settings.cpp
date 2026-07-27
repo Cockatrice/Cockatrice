@@ -120,6 +120,11 @@ qreal InterfaceSettings::getFastForwardSpeed() const
     return getValue("fastForwardSpeed", "replay", QString(), 10).toReal();
 }
 
+bool InterfaceSettings::getSkipEmptySections() const
+{
+    return getValue("skipEmptySections", "replay", QString(), false).toBool();
+}
+
 bool InterfaceSettings::getLeftJustified() const
 {
     return getValue("leftJustified", QString(), QString(), false).toBool();
@@ -277,6 +282,11 @@ void InterfaceSettings::setRewindBufferingMs(int _rewindBufferingMs)
 void InterfaceSettings::setFastForwardSpeed(qreal _value)
 {
     setValue(_value, "fastForwardSpeed", "replay");
+}
+
+void InterfaceSettings::setSkipEmptySections(bool _value)
+{
+    setValue(_value, "skipEmptySections", "replay");
 }
 
 void InterfaceSettings::setLeftJustified(bool _leftJustified)
