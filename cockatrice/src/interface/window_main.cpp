@@ -541,8 +541,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
-    // Signals for unknown/failed DB were emitted during the front-loaded parse
-    // before MainWindow existed.  Drive the UX now that receivers are connected.
+    // checkUnknownSets() is intentionally deferred from the card database load
+    // (which runs in main() before MainWindow exists) so that
+    // cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled have live
+    // receivers when emitted.
     CardDatabaseManager::getInstance()->checkUnknownSets();
 
     if (SettingsCache::instance().debug().getLocalGameOnStartup()) {

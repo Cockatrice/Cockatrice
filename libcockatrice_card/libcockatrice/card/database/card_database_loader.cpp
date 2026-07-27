@@ -129,7 +129,11 @@ LoadStatus CardDatabaseLoader::doLoadCardDatabases()
         qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Success";
         emit databaseDataReady(std::move(data));
         emit loadingFinished();
-        database->checkUnknownSets();
+        // NOTE: checkUnknownSets() is intentionally NOT called here.  During
+        // the front-loaded parse in main() this runs before MainWindow exists,
+        // so cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled would be
+        // emitted with no receivers.  MainWindow::startupConfigCheck() calls
+        // checkUnknownSets() once its signal connections are live.
     } else {
         qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Failed";
         emit loadingFailed(); // bring up the settings dialog

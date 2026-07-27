@@ -264,8 +264,9 @@ int main(int argc, char *argv[])
     // contention that happens when the load runs alongside window construction.
     // The CardDatabaseModel populates from the already-loaded data in its
     // constructor, so the window appears fully populated with no startup lag.
-    // Note: unknown-set / failure signals are deferred; MainWindow triggers
-    // checkUnknownSets() in startupConfigCheck() once receivers are connected.
+    // Note: checkUnknownSets() is deferred until MainWindow::startupConfigCheck()
+    // so that cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled have live
+    // receivers when emitted.
     CardDatabaseManager::getInstance()->loadCardDatabases();
 
     MainWindow ui;

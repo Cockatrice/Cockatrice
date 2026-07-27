@@ -72,7 +72,19 @@ protected:
     static SetNameMap sets;
     ICardSetPriorityController *cardSetPriorityController;
 
-    /** @brief Snapshot the current parse is filling, or nullptr when emitting signals. */
+    /**
+     * @brief Snapshot the current parse is filling, or nullptr when emitting signals.
+     *
+     * This is an implicit-inheritance-via-member-variable pattern: parseFileInto()
+     * sets this before delegating to parseFile(), and loadCardsFromXml() /
+     * loadFormats() check it to decide between direct insertion and signal
+     * emission.  Safe under the current model because loadFromFileMutex serialises
+     * all parser access and parseFile() is never re-entered.  If a future change
+     * adds parallel parsing or a second parseFileInto() call within parseFile(),
+     * this pointer would race -- at that point refactor to pass CardDatabaseData*
+     * through the call chain instead. However, we are mostly RAM, not CPU bound on
+     * DB startup at this point so there's not much point to parallel parsing.
+     */
     CardDatabaseData *targetData = nullptr;
 
     /**
