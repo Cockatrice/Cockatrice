@@ -66,6 +66,10 @@ ReplayWidget::ReplayWidget(QWidget *parent, GameReplay *replay)
     settingsWidget->setFixedSize(QSize(32, 32));
     connect(settingsWidget, &ReplayQuickSettingsWidget::fastForwardSpeedChanged, this,
             [this] { updateTimeScaleFactor(replayFastForwardButton->isChecked()); });
+    connect(settingsWidget, &ReplayQuickSettingsWidget::skipEmptySectionsChanged, replayManager,
+            &ReplayManager::setSkipEmptySections);
+
+    replayManager->setSkipEmptySections(SettingsCache::instance().interface().getSkipEmptySections());
 
     // putting everything together
     auto replayControlLayout = new QHBoxLayout;
