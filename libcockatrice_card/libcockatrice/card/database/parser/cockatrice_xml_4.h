@@ -48,6 +48,13 @@ public:
     void parseFile(QIODevice &device) override;
 
     /**
+     * @brief Parse the XML database into the given snapshot.
+     * @param device Open QIODevice positioned at start of file.
+     * @param data Target snapshot to populate.
+     */
+    void parseFileInto(QIODevice &device, CardDatabaseData &data) override;
+
+    /**
      * @brief Save sets and cards back to an XML4 file.
      */
     bool saveToFile(FormatRulesNameMap _formats,

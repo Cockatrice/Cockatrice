@@ -541,6 +541,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::startupConfigCheck()
 {
+    // checkUnknownSets() is intentionally deferred from the card database load
+    // (which runs in main() before MainWindow exists) so that
+    // cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled have live
+    // receivers when emitted.
+    CardDatabaseManager::getInstance()->checkUnknownSets();
+
     if (SettingsCache::instance().debug().getLocalGameOnStartup()) {
         LocalGameOptions options;
         options.numberPlayers = SettingsCache::instance().debug().getLocalGamePlayerCount();
@@ -571,8 +577,6 @@ void MainWindow::startupConfigCheck()
             << "differs, assuming first start after update";
         if (SettingsCache::instance().updates().getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
-        } else {
-            const auto reloadOk0 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
         }
 
         qCInfo(WindowMainStartupShortcutsLog) << "Migrating shortcuts after update detected.";
@@ -628,8 +632,6 @@ void MainWindow::startupConfigCheck()
                 actCheckCardUpdatesBackground();
             }
         }
-
-        const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
 
         // Run the tips dialog only on subsequent startups.
         // On the first run after an install/update the startup is already crowded enough

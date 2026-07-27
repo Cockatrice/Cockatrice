@@ -258,6 +258,19 @@ int main(int argc, char *argv[])
 
     qCInfo(MainLog) << "Starting main program";
 
+    // Front-load the card database before constructing the main window. The
+    // binary-cache read is cheap when uncontended (~1s); doing it here -- while no
+    // GUI work yet competes for CPU -- avoids the multi-second, GUI-freezing
+    // contention that happens when the load runs alongside window construction.
+    // The CardDatabaseModel populates from the already-loaded data in its
+    // constructor, so the window appears fully populated with no startup lag.
+    // Note: checkUnknownSets() is deferred from the initial load to
+    // MainWindow::startupConfigCheck() so that
+    // cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled have live
+    // receivers when emitted.  Subsequent reloads (e.g. path changes) call
+    // checkUnknownSets() directly from the loader after the first load.
+    CardDatabaseManager::getInstance()->loadCardDatabases();
+
     MainWindow ui;
     if (parser.isSet("connect")) {
         ui.setConnectTo(parser.value("connect"));
