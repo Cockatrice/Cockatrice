@@ -245,14 +245,11 @@ PaletteConfig PaletteConfig::fromDefault(const QString &themeDirPath, const QStr
 
     bool wantDark = colorScheme.compare("Dark", Qt::CaseInsensitive) == 0;
 
-    PaletteConfig cfg =
-        fromFile(dir.absoluteFilePath(wantDark ? "palette-default-dark.toml" : "palette-default-light.toml"));
-
-    if (!cfg.hasPalette()) {
-        cfg = fromFile(dir.absoluteFilePath(wantDark ? "palette-default-light.toml" : "palette-default-dark.toml"));
-    }
-
-    return cfg;
+    // Only the default file matching the requested scheme is used. Falling back
+    // to the opposite scheme's default would silently apply dark colours to a
+    // "Light" scheme (or vice versa). Callers already fall back to the OS /
+    // application palette when no default palette is available.
+    return fromFile(dir.absoluteFilePath(wantDark ? "palette-default-dark.toml" : "palette-default-light.toml"));
 }
 
 QPalette PaletteConfig::apply(QPalette base) const

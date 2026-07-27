@@ -11,6 +11,7 @@
 #include <QDesktopServices>
 #include <QGridLayout>
 #include <QMessageBox>
+#include <QStyleFactory>
 #include <QTimer>
 
 AppearanceSettingsPage::AppearanceSettingsPage()
@@ -47,6 +48,19 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&schemeCombo, &QComboBox::currentIndexChanged, this,
             [this] { themeManager->setColorScheme(schemeCombo.currentData().toString()); });
 
+    // Qt widget style; "Default" lets the application decide
+    styleCombo.addItem(tr("Default"), QStringLiteral("Default"));
+    for (const QString &key : QStyleFactory::keys()) {
+        styleCombo.addItem(key, key);
+    }
+
+    const QString currentStyle = cfg.styleName;
+    const int styleSeedIdx = currentStyle.isEmpty() ? 0 : styleCombo.findData(currentStyle);
+    styleCombo.setCurrentIndex(styleSeedIdx >= 0 ? styleSeedIdx : 0);
+
+    connect(&styleCombo, &QComboBox::currentIndexChanged, this,
+            [this] { themeManager->setStyleName(styleCombo.currentData().toString()); });
+
     connect(themeManager, &ThemeManager::themeChanged, this, [this, dirPath] {
         const QString newDir = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
         const ThemeConfig cfg = ThemeConfig::fromThemeDir(newDir);
@@ -56,6 +70,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
         const int idx = schemeCombo.findData(current);
         schemeCombo.setCurrentIndex(idx >= 0 ? idx : 0);
         schemeCombo.blockSignals(false);
+
+        styleCombo.blockSignals(true);
+        const QString currentStyle = cfg.styleName;
+        const int styleIdx = currentStyle.isEmpty() ? 0 : styleCombo.findData(currentStyle);
+        styleCombo.setCurrentIndex(styleIdx >= 0 ? styleIdx : 0);
+        styleCombo.blockSignals(false);
     });
 
     connect(&editPaletteButton, &QPushButton::clicked, this, &AppearanceSettingsPage::editPalette);
@@ -66,7 +86,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     themeGrid->addWidget(&openThemeButton, 1, 1);
     themeGrid->addWidget(&schemeComboLabel, 2, 0);
     themeGrid->addWidget(&schemeCombo, 2, 1);
-    themeGrid->addWidget(&editPaletteButton, 3, 1);
+    themeGrid->addWidget(&styleComboLabel, 3, 0);
+    themeGrid->addWidget(&styleCombo, 3, 1);
+    themeGrid->addWidget(&editPaletteButton, 4, 1);
 
     themeGroupBox = new QGroupBox;
     themeGroupBox->setLayout(themeGrid);
@@ -400,6 +422,8 @@ void AppearanceSettingsPage::retranslateUi()
     themeLabel.setText(tr("Current theme:"));
     openThemeButton.setText(tr("Open themes folder"));
     schemeComboLabel.setText(tr("Active theme palette:"));
+    styleComboLabel.setText(tr("Active theme style:"));
+    styleCombo.setToolTip(tr("Qt widget style saved to this theme (\"Default\" lets the application decide)"));
     editPaletteButton.setText(tr("Edit theme palette"));
 
     homeTabGroupBox->setTitle(tr("Home tab settings"));

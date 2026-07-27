@@ -1,5 +1,6 @@
 #include "palette_editor_dialog.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../theme_manager.h"
 #include "palette_generator.h"
 #include "palette_grid_widget.h"
@@ -8,19 +9,50 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QDialogButtonBox>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QFrame>
 #include <QGuiApplication>
 #include <QLabel>
+#include <QLoggingCategory>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QStyleHints>
 #include <QTimer>
+
+// Probe whether a directory is truly writable by trying to create and remove a
+// temporary file. QFileInfo::isWritable() on a directory is unreliable (notably
+// on Windows where UAC VirtualStore can make a system dir appear writable).
+static bool isDirReallyWritable(const QString &dirPath)
+{
+    const QString probe = QDir(dirPath).absoluteFilePath(".cockatrice_write_test");
+    QFile f(probe);
+    if (!f.open(QIODevice::WriteOnly)) {
+        return false;
+    }
+    f.close();
+    f.remove();
+    return true;
+}
 
 PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QString &_themeName, QWidget *parent)
     : QDialog(parent), themeDirPath(_themeDirPath), themeName(_themeName)
 {
     setMinimumSize(740, 220);
     setupUi();
+
+    // Resolve a writable directory for saving. Built-in (Default / Fusion) and
+    // other read-only theme directories must be customised in the user-writable
+    // themes directory; otherwise the write would fail or be lost on upgrade.
+    if (!themeDirPath.isEmpty() && isDirReallyWritable(themeDirPath)) {
+        saveDir = themeDirPath;
+    } else {
+        saveDir = QDir(SettingsCache::instance().getThemesPath()).absoluteFilePath(themeName);
+        if (!QDir().mkpath(saveDir)) {
+            qWarning() << "Failed to create palette save directory:" << saveDir;
+        }
+    }
 
     // Load both scheme configs upfront so switching is instant
     loadSchemes();
@@ -31,7 +63,9 @@ PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QSt
     schemeComboBox->setCurrentText(loadedScheme);
     schemeComboBox->blockSignals(false);
 
+    paletteGrid->blockSignals(true);
     paletteGrid->loadPalette(workingConfig[loadedScheme]);
+    paletteGrid->blockSignals(false);
     seedAccentFromScheme(loadedScheme);
 
     retranslateUi();
@@ -124,8 +158,7 @@ void PaletteEditorDialog::setupUi()
 
     buttonBox = new QDialogButtonBox;
     resetBtn = buttonBox->addButton(tr("Reset"), QDialogButtonBox::ResetRole);
-    applyBtn = buttonBox->addButton(tr("Apply"), QDialogButtonBox::ApplyRole);
-    saveBtn = buttonBox->addButton(tr("Save && Apply"), QDialogButtonBox::AcceptRole);
+    saveBtn = buttonBox->addButton(tr("Save"), QDialogButtonBox::AcceptRole);
     closeBtn = buttonBox->addButton(QDialogButtonBox::Close);
 
     footerLayout->addWidget(revertButton);
@@ -135,10 +168,14 @@ void PaletteEditorDialog::setupUi()
 
     // Connections
     connect(schemeComboBox, &QComboBox::currentTextChanged, this, &PaletteEditorDialog::onSchemeChanged);
-    connect(quickSetupPanel, &QuickSetupPanel::generateRequested, this, &PaletteEditorDialog::onGenerateFromAccent);
+    autoApplyTimer = new QTimer(this);
+    autoApplyTimer->setSingleShot(true);
+    autoApplyTimer->setInterval(150);
+    connect(autoApplyTimer, &QTimer::timeout, this, &PaletteEditorDialog::onApply);
+    connect(quickSetupPanel, &QuickSetupPanel::valueChanged, this, &PaletteEditorDialog::onGenerateFromAccent);
+    connect(paletteGrid, &PaletteGridWidget::paletteChanged, this, [this] { autoApplyTimer->start(); });
     connect(revertButton, &QPushButton::clicked, this, &PaletteEditorDialog::onRevertToDefault);
     connect(resetBtn, &QPushButton::clicked, this, &PaletteEditorDialog::onReset);
-    connect(applyBtn, &QPushButton::clicked, this, &PaletteEditorDialog::onApply);
     connect(saveBtn, &QPushButton::clicked, this, &PaletteEditorDialog::onSave);
     connect(closeBtn, &QPushButton::clicked, this, &QDialog::reject);
 
@@ -162,15 +199,8 @@ void PaletteEditorDialog::retranslateUi()
     setWindowTitle(tr("Palette Editor — %1").arg(themeName));
     titleLabel->setText(tr("<b>Palette Editor</b> &nbsp;·&nbsp; %1").arg(themeName));
 
-    // Revert button only makes sense when the theme ships default palette files
-    const bool hasDefault = PaletteConfig::fromDefault(themeDirPath, "Light").hasPalette() ||
-                            PaletteConfig::fromDefault(themeDirPath, "Dark").hasPalette();
-    revertButton->setEnabled(hasDefault);
-    if (!hasDefault) {
-        revertButton->setToolTip(tr("This theme ships no default palette files"));
-    } else {
-        revertButton->setToolTip(tr("Replace current colours with the theme author's defaults"));
-    }
+    revertButton->setToolTip(
+        tr("Delete this scheme's custom palette and revert to the theme default (or the application palette)"));
 
     schemeComboBox->setToolTip(tr("Switch between the light and dark palette files"));
     editingLabel->setText(tr("Editing:"));
@@ -179,15 +209,13 @@ void PaletteEditorDialog::retranslateUi()
     revertButton->setText(tr("↺  Revert to theme default"));
 
     resetBtn->setText(tr("Reset"));
-    applyBtn->setText(tr("Apply"));
-    saveBtn->setText(tr("Save && Apply"));
+    saveBtn->setText(tr("Save"));
     resetBtn->setToolTip(tr("Discard unsaved edits and restore the last saved palette"));
-    applyBtn->setToolTip(tr("Preview this palette without saving to disk"));
     saveBtn->setToolTip(tr("Write palette-%1.toml and reload the theme").arg(loadedScheme.toLower()));
 
-    if (themeDirPath.isEmpty()) {
+    if (saveDir.isEmpty() || !isDirReallyWritable(saveDir)) {
         saveBtn->setEnabled(false);
-        saveBtn->setToolTip(tr("Cannot save: this theme has no directory on disk"));
+        saveBtn->setToolTip(tr("Cannot save: this theme has no writable directory"));
     }
 }
 
@@ -198,7 +226,7 @@ void PaletteEditorDialog::loadSchemes()
         PaletteConfig cfg = PaletteConfig::fromScheme(themeDirPath, scheme);
 
         if (!cfg.hasPalette()) {
-            cfg = PaletteConfig::fromDefault(themeDirPath, scheme);
+            cfg = ThemeManager::loadDefaultPaletteConfig(themeDirPath, themeName, scheme);
         }
 
         if (!cfg.hasPalette()) {
@@ -235,7 +263,6 @@ void PaletteEditorDialog::onSchemeChanged(const QString &scheme)
     loadedScheme = scheme;
     paletteGrid->loadPalette(workingConfig.value(scheme));
     seedAccentFromScheme(scheme);
-    onApply();
 }
 
 void PaletteEditorDialog::onGenerateFromAccent(const QColor &accent, int intensity)
@@ -256,20 +283,34 @@ void PaletteEditorDialog::onSave()
         return;
     }
 
-    PaletteConfig cfg = paletteGrid->currentPaletteConfig();
+    // Snapshot the currently displayed scheme so unsaved edits are not lost.
+    workingConfig[loadedScheme] = paletteGrid->currentPaletteConfig();
 
-    if (!ThemeManager::savePaletteConfig(themeDirPath, loadedScheme, cfg)) {
-        QMessageBox::warning(this, tr("Save failed"),
-                             tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(loadedScheme), themeDirPath));
-        return;
+    // Persist every scheme that changed, not just the one on screen. Each scheme
+    // has its own file, so edits to the non-active scheme would otherwise be
+    // silently discarded when the dialog closes.
+    for (auto it = workingConfig.begin(); it != workingConfig.end(); ++it) {
+        const QString &scheme = it.key();
+        if (it.value().colors == savedConfig.value(scheme).colors) {
+            continue; // unchanged — leave the on-disk file alone
+        }
+
+        if (!ThemeManager::savePaletteConfig(saveDir, scheme, it.value())) {
+            QMessageBox::warning(this, tr("Save failed"),
+                                 tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(scheme), saveDir));
+            return;
+        }
     }
 
-    ThemeConfig globalCfg = ThemeConfig::fromThemeDir(themeDirPath);
-    globalCfg.colorScheme = loadedScheme;
-    globalCfg.save(themeDirPath);
+    // Keep the saved snapshot in sync so Reset behaves correctly afterwards.
+    for (auto it = workingConfig.begin(); it != workingConfig.end(); ++it) {
+        savedConfig[it.key()] = it.value();
+    }
 
-    savedConfig[loadedScheme] = cfg;
-    workingConfig[loadedScheme] = cfg;
+    ThemeConfig globalCfg = ThemeConfig::fromThemeDir(saveDir);
+    globalCfg.colorScheme = loadedScheme;
+    globalCfg.save(saveDir);
+
     themeManager->reloadCurrentTheme();
     accept();
 }
@@ -278,18 +319,40 @@ void PaletteEditorDialog::onReset()
 {
     workingConfig[loadedScheme] = savedConfig[loadedScheme];
     paletteGrid->loadPalette(savedConfig[loadedScheme]);
+    seedAccentFromScheme(loadedScheme);
 }
 
 void PaletteEditorDialog::onRevertToDefault()
 {
-    PaletteConfig def = PaletteConfig::fromDefault(themeDirPath, loadedScheme);
+    // Delete this scheme's custom palette file so the theme falls back to its
+    // default (or, when it ships none, the application palette).
+    // Note: shipped defaults use palette-default-<scheme>.toml so this only
+    // removes user-written custom palette files; the theme author's defaults
+    // are left untouched.
+    QFile::remove(QDir(saveDir).absoluteFilePath(PaletteConfig::fileName(loadedScheme)));
+
+    // Reload the live theme so the revert takes effect immediately.
+    themeManager->reloadCurrentTheme();
+
+    // Reflect the resolved palette (theme default, else current app palette) in
+    // the editor so it no longer shows the deleted custom colours.
+    PaletteConfig def = ThemeManager::loadDefaultPaletteConfig(themeDirPath, themeName, loadedScheme);
     if (!def.hasPalette()) {
-        QMessageBox::information(this, tr("No default found"),
-                                 tr("No default palette file found for the \"%1\" scheme.").arg(loadedScheme));
-        return;
+        const QPalette appPal = qApp->palette();
+        for (auto group : {QPalette::Active, QPalette::Disabled, QPalette::Inactive}) {
+            for (int i = 0; i < QPalette::NColorRoles; ++i) {
+                auto role = static_cast<QPalette::ColorRole>(i);
+                if (role != QPalette::NoRole) {
+                    def.colors[group][role] = appPal.color(group, role);
+                }
+            }
+        }
     }
+
+    savedConfig[loadedScheme] = def;
     workingConfig[loadedScheme] = def;
     paletteGrid->loadPalette(def);
+    seedAccentFromScheme(loadedScheme);
 }
 
 void PaletteEditorDialog::changeEvent(QEvent *e)
