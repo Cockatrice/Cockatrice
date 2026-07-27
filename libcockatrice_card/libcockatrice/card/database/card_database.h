@@ -54,18 +54,6 @@ protected:
     /** @brief Querier for higher-level card lookups. */
     CardDatabaseQuerier *querier;
 
-public:
-    /**
-     * @brief Check for sets that are unknown and emit signals if needed.
-     *
-     * Called from MainWindow::startupConfigCheck() after signal connections are
-     * live (the front-loaded parse in main() runs before MainWindow exists, so
-     * signals emitted there would have no receivers).  May also be called by
-     * the loader via the friend declaration.  Has side effects: enables all
-     * sets when none are enabled (first-run), marks all sets as known.
-     */
-    void checkUnknownSets();
-
 private:
     /**
      * @brief Refreshes the cached reverse-related cards for all cards.
@@ -149,6 +137,17 @@ public:
      *        unchanged and the cached data is still valid.
      */
     void notifyEnabledSetsChanged(bool recomputeCachedSets = true);
+
+    /**
+     * @brief Check for sets that are unknown and emit signals if needed.
+     *
+     * Called from MainWindow::startupConfigCheck() after signal connections are
+     * live (the front-loaded parse in main() runs before MainWindow exists, so
+     * signals emitted there would have no receivers).  May also be called by
+     * the loader via the friend declaration.  Has side effects: enables all
+     * sets when none are enabled (first-run), marks all sets as known.
+     */
+    void checkUnknownSets();
 
     ICardSetPriorityController *getPriorityController()
     {
