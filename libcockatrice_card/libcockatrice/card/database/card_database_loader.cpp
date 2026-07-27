@@ -2,6 +2,7 @@
 
 #include "card_database.h"
 #include "card_database_cache.h"
+#include "parser/card_database_parser.h"
 #include "parser/cockatrice_xml_3.h"
 #include "parser/cockatrice_xml_4.h"
 
@@ -92,6 +93,8 @@ LoadStatus CardDatabaseLoader::doLoadCardDatabases()
     emit loadingStarted();
     qCInfo(CardDatabaseLoadingLog) << "Card Database Loading Started";
 
+    ICardDatabaseParser::clearSetlist();
+
     CardDatabaseData data;
     LoadStatus loadStatus = NotLoaded;
 
@@ -126,6 +129,7 @@ LoadStatus CardDatabaseLoader::doLoadCardDatabases()
         qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Success";
         emit databaseDataReady(std::move(data));
         emit loadingFinished();
+        database->checkUnknownSets();
     } else {
         qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Failed";
         emit loadingFailed(); // bring up the settings dialog

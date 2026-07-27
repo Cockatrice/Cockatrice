@@ -241,6 +241,18 @@ void CardDatabase::addFormat(const FormatRulesPtr &format)
 
 void CardDatabase::swapInDatabaseData(CardDatabaseData data)
 {
+    for (const auto &card : cards) {
+        for (auto *rel : card->getRelatedCards()) {
+            rel->deleteLater();
+        }
+        for (auto *rel : card->getReverseRelatedCards()) {
+            rel->deleteLater();
+        }
+        for (auto *rel : card->getReverseRelatedCards2Me()) {
+            rel->deleteLater();
+        }
+    }
+
     cards = std::move(data.cards);
     simpleNameCards = std::move(data.simpleNameCards);
     sets = std::move(data.sets);
