@@ -3,6 +3,7 @@
 #include "../../card_picture_loader/card_picture_loader.h"
 #include "../../client/settings/cache_settings.h"
 
+#include <libcockatrice/settings/cards_display_settings.h>
 bool OverridePrintingWarning::execMessageBox(QWidget *parent, bool enable)
 {
     QString message;
@@ -27,7 +28,7 @@ bool OverridePrintingWarning::execMessageBox(QWidget *parent, bool enable)
         QMessageBox::question(parent, QObject::tr("Confirm Change"), message, QMessageBox::Yes | QMessageBox::No);
 
     if (result == QMessageBox::Yes) {
-        SettingsCache::instance().setOverrideAllCardArtWithPersonalPreference(static_cast<Qt::CheckState>(enable));
+        SettingsCache::instance().cardsDisplay().setOverrideAllCardArtWithPersonalPreference(enable);
         // Caches are now invalid.
         CardPictureLoader::clearPixmapCache();
         CardPictureLoader::clearNetworkCache();

@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QTimer>
+#include <libcockatrice/settings/interface_settings.h>
 
 ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
     : QWidget(parent), maxBinValue(1), maxTime(1), timeScaleFactor(1.0), currentVisualTime(0), currentProcessedTime(0),
@@ -117,7 +118,7 @@ void ReplayTimelineWidget::handleBackwardsSkip(bool doRewindBuffering)
         // The rewind only happens once the timer runs out.
         // If another backwards skip happens, the timer will just get reset instead of rewinding.
         rewindBufferingTimer->stop();
-        rewindBufferingTimer->start(SettingsCache::instance().getRewindBufferingMs());
+        rewindBufferingTimer->start(SettingsCache::instance().interface().getRewindBufferingMs());
     } else {
         // otherwise, process the rewind immediately
         processRewind();

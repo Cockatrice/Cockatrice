@@ -1,5 +1,6 @@
 #include "player_menu.h"
 
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../../game_graphics/zones/hand_zone.h"
 #include "../../../game_graphics/zones/pile_zone.h"
 #include "../../../game_graphics/zones/table_zone.h"

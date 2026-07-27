@@ -10,12 +10,16 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QToolBar>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/macros.h>
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
-    picDownloadCheckBox.setChecked(SettingsCache::instance().getPicDownload());
-    connect(&picDownloadCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setPicDownload);
+    picDownloadCheckBox.setChecked(SettingsCache::instance().personal().getPicDownload());
+    connect(&picDownloadCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().personal(),
+            &PersonalSettings::setPicDownload);
 
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     urlLinkLabel.setOpenExternalLinks(true);
@@ -25,7 +29,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     auto *lpGeneralGrid = new QGridLayout;
     auto *lpSpoilerGrid = new QGridLayout;
 
-    mcDownloadSpoilersCheckBox.setChecked(SettingsCache::instance().getDownloadSpoilersStatus());
+    mcDownloadSpoilersCheckBox.setChecked(SettingsCache::instance().personal().getDownloadSpoilersStatus());
 
     mpSpoilerSavePathLineEdit = new QLineEdit(SettingsCache::instance().getSpoilerCardDatabasePath());
     mpSpoilerSavePathLineEdit->setReadOnly(true);
@@ -87,8 +91,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
 
     // On a change to the checkbox, hide/un-hide the other fields
-    connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, &SettingsCache::instance(),
-            &SettingsCache::setDownloadSpoilerStatus);
+    connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, &SettingsCache::instance().personal(),
+            &PersonalSettings::setDownloadSpoilerStatus);
     connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, this, &DeckEditorSettingsPage::setSpoilersEnabled);
 
     mpGeneralGroupBox = new QGroupBox;
@@ -103,7 +107,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     setLayout(lpMainLayout);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &DeckEditorSettingsPage::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
+            &DeckEditorSettingsPage::retranslateUi);
     retranslateUi();
 }
 
@@ -203,7 +208,7 @@ void DeckEditorSettingsPage::spoilerPathButtonClicked()
     }
 
     mpSpoilerSavePathLineEdit->setText(lsPath + "/spoiler.xml");
-    SettingsCache::instance().setSpoilerDatabasePath(lsPath + "/spoiler.xml");
+    SettingsCache::instance().paths().setSpoilerDatabasePath(lsPath + "/spoiler.xml");
 }
 
 void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)

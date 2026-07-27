@@ -20,6 +20,7 @@
 #include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <utility>
 
 VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
@@ -51,9 +52,10 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
-    cardSizeWidget = new CardSizeWidget(this, flowWidget, SettingsCache::instance().getVisualDatabaseDisplayCardSize());
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
-            &SettingsCache::setVisualDatabaseDisplayCardSize);
+    cardSizeWidget = new CardSizeWidget(
+        this, flowWidget, SettingsCache::instance().visualDeckStorage().getVisualDatabaseDisplayCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::setVisualDatabaseDisplayCardSize);
 
     searchContainer = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 

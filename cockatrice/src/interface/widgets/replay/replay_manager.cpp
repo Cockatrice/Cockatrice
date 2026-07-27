@@ -1,5 +1,6 @@
 #include "replay_manager.h"
 
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../interface/widgets/tabs/tab_game.h"
 #include "replay_quick_settings_widget.h"
 
@@ -124,7 +125,7 @@ void ReplayManager::replayPlayButtonToggled(bool checked)
 
 void ReplayManager::updateTimeScaleFactor(bool isFastForward)
 {
-    qreal factor = isFastForward ? SettingsCache::instance().getFastForwardSpeed() : 1.0;
+    qreal factor = isFastForward ? SettingsCache::instance().interface().getFastForwardSpeed() : 1.0;
     timelineWidget->setTimeScaleFactor(factor);
 }
 

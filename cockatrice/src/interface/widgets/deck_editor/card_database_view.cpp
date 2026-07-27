@@ -11,6 +11,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
+#include <libcockatrice/settings/layouts_settings.h>
 
 static bool canBeCommander(const CardInfo &cardInfo)
 {

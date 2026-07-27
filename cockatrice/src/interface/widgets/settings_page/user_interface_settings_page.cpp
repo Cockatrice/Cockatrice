@@ -4,6 +4,10 @@
 #include "../interface/widgets/tabs/tab_supervisor.h"
 
 #include <QGridLayout>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 enum visualDeckStoragePromptForConversionIndex
 {
@@ -15,66 +19,71 @@ enum visualDeckStoragePromptForConversionIndex
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
     // general settings and notification settings
-    notificationsEnabledCheckBox.setChecked(SettingsCache::instance().getNotificationsEnabled());
-    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setNotificationsEnabled);
+    notificationsEnabledCheckBox.setChecked(SettingsCache::instance().interface().getNotificationsEnabled());
+    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setNotificationsEnabled);
     connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &UserInterfaceSettingsPage::setNotificationEnabled);
 
-    specNotificationsEnabledCheckBox.setChecked(SettingsCache::instance().getSpectatorNotificationsEnabled());
-    specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().getNotificationsEnabled());
-    connect(&specNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setSpectatorNotificationsEnabled);
+    specNotificationsEnabledCheckBox.setChecked(
+        SettingsCache::instance().interface().getSpectatorNotificationsEnabled());
+    specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().interface().getNotificationsEnabled());
+    connect(&specNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setSpectatorNotificationsEnabled);
 
     buddyConnectNotificationsEnabledCheckBox.setChecked(
-        SettingsCache::instance().getBuddyConnectNotificationsEnabled());
-    buddyConnectNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().getNotificationsEnabled());
-    connect(&buddyConnectNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setBuddyConnectNotificationsEnabled);
+        SettingsCache::instance().interface().getBuddyConnectNotificationsEnabled());
+    buddyConnectNotificationsEnabledCheckBox.setEnabled(
+        SettingsCache::instance().interface().getNotificationsEnabled());
+    connect(&buddyConnectNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED,
+            &SettingsCache::instance().interface(), &InterfaceSettings::setBuddyConnectNotificationsEnabled);
 
-    doubleClickToPlayCheckBox.setChecked(SettingsCache::instance().getDoubleClickToPlay());
-    connect(&doubleClickToPlayCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setDoubleClickToPlay);
+    doubleClickToPlayCheckBox.setChecked(SettingsCache::instance().interface().getDoubleClickToPlay());
+    connect(&doubleClickToPlayCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setDoubleClickToPlay);
 
-    clickPlaysAllSelectedCheckBox.setChecked(SettingsCache::instance().getClickPlaysAllSelected());
-    connect(&clickPlaysAllSelectedCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setClickPlaysAllSelected);
+    clickPlaysAllSelectedCheckBox.setChecked(SettingsCache::instance().interface().getClickPlaysAllSelected());
+    connect(&clickPlaysAllSelectedCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setClickPlaysAllSelected);
 
-    playToStackCheckBox.setChecked(SettingsCache::instance().getPlayToStack());
-    connect(&playToStackCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setPlayToStack);
+    playToStackCheckBox.setChecked(SettingsCache::instance().interface().getPlayToStack());
+    connect(&playToStackCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setPlayToStack);
 
-    doNotDeleteArrowsInSubPhasesCheckBox.setChecked(SettingsCache::instance().getDoNotDeleteArrowsInSubPhases());
-    connect(&doNotDeleteArrowsInSubPhasesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setDoNotDeleteArrowsInSubPhases);
+    doNotDeleteArrowsInSubPhasesCheckBox.setChecked(
+        SettingsCache::instance().interface().getDoNotDeleteArrowsInSubPhases());
+    connect(&doNotDeleteArrowsInSubPhasesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setDoNotDeleteArrowsInSubPhases);
 
-    closeEmptyCardViewCheckBox.setChecked(SettingsCache::instance().getCloseEmptyCardView());
-    connect(&closeEmptyCardViewCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setCloseEmptyCardView);
+    closeEmptyCardViewCheckBox.setChecked(SettingsCache::instance().interface().getCloseEmptyCardView());
+    connect(&closeEmptyCardViewCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setCloseEmptyCardView);
 
-    focusCardViewSearchBarCheckBox.setChecked(SettingsCache::instance().getFocusCardViewSearchBar());
-    connect(&focusCardViewSearchBarCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setFocusCardViewSearchBar);
+    focusCardViewSearchBarCheckBox.setChecked(SettingsCache::instance().interface().getFocusCardViewSearchBar());
+    connect(&focusCardViewSearchBarCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setFocusCardViewSearchBar);
 
-    annotateTokensCheckBox.setChecked(SettingsCache::instance().getAnnotateTokens());
-    connect(&annotateTokensCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setAnnotateTokens);
+    annotateTokensCheckBox.setChecked(SettingsCache::instance().interface().getAnnotateTokens());
+    connect(&annotateTokensCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setAnnotateTokens);
 
-    showDragSelectionCountCheckBox.setChecked(SettingsCache::instance().getShowDragSelectionCount());
-    connect(&showDragSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setShowDragSelectionCount);
+    showDragSelectionCountCheckBox.setChecked(SettingsCache::instance().interface().getShowDragSelectionCount());
+    connect(&showDragSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setShowDragSelectionCount);
 
-    showTotalSelectionCountCheckBox.setChecked(SettingsCache::instance().getShowTotalSelectionCount());
-    connect(&showTotalSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setShowTotalSelectionCount);
+    showTotalSelectionCountCheckBox.setChecked(SettingsCache::instance().interface().getShowTotalSelectionCount());
+    connect(&showTotalSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setShowTotalSelectionCount);
 
-    useTearOffMenusCheckBox.setChecked(SettingsCache::instance().getUseTearOffMenus());
-    connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            [](const QT_STATE_CHANGED_T state) { SettingsCache::instance().setUseTearOffMenus(state == Qt::Checked); });
+    useTearOffMenusCheckBox.setChecked(SettingsCache::instance().interface().getUseTearOffMenus());
+    connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            [](const QT_STATE_CHANGED_T state) {
+                SettingsCache::instance().interface().setUseTearOffMenus(state == Qt::Checked);
+            });
 
-    keepGameChatFocusCheckBox.setChecked(SettingsCache::instance().getKeepGameChatFocus());
-    connect(&keepGameChatFocusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setKeepGameChatFocus);
+    keepGameChatFocusCheckBox.setChecked(SettingsCache::instance().interface().getKeepGameChatFocus());
+    connect(&keepGameChatFocusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setKeepGameChatFocus);
 
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
@@ -101,9 +110,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     notificationsGroupBox->setLayout(notificationsGrid);
 
     // animation settings
-    tapAnimationCheckBox.setChecked(SettingsCache::instance().getTapAnimation());
-    connect(&tapAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setTapAnimation);
+    tapAnimationCheckBox.setChecked(SettingsCache::instance().cardsDisplay().getTapAnimation());
+    connect(&tapAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setTapAnimation);
 
     auto *animationGrid = new QGridLayout;
     animationGrid->addWidget(&tapAnimationCheckBox, 0, 0);
@@ -112,42 +121,45 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     animationGroupBox->setLayout(animationGrid);
 
     // deck editor settings
-    openDeckInNewTabCheckBox.setChecked(SettingsCache::instance().getOpenDeckInNewTab());
-    connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setOpenDeckInNewTab);
+    openDeckInNewTabCheckBox.setChecked(SettingsCache::instance().interface().getOpenDeckInNewTab());
+    connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setOpenDeckInNewTab);
 
-    visualDeckStorageInGameCheckBox.setChecked(SettingsCache::instance().getVisualDeckStorageInGame());
-    connect(&visualDeckStorageInGameCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckStorageInGame);
+    visualDeckStorageInGameCheckBox.setChecked(
+        SettingsCache::instance().visualDeckStorage().getVisualDeckStorageInGame());
+    connect(&visualDeckStorageInGameCheckBox, &QCheckBox::QT_STATE_CHANGED,
+            &SettingsCache::instance().visualDeckStorage(), &VisualDeckStorageSettings::setVisualDeckStorageInGame);
 
     visualDeckStorageSelectionAnimationCheckBox.setChecked(
-        SettingsCache::instance().getVisualDeckStorageSelectionAnimation());
-    connect(&visualDeckStorageSelectionAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setVisualDeckStorageSelectionAnimation);
+        SettingsCache::instance().visualDeckStorage().getVisualDeckStorageSelectionAnimation());
+    connect(&visualDeckStorageSelectionAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED,
+            &SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::setVisualDeckStorageSelectionAnimation);
 
     visualDeckStoragePromptForConversionSelector.addItem(""); // these will be set in retranslateUI
     visualDeckStoragePromptForConversionSelector.addItem("");
     visualDeckStoragePromptForConversionSelector.addItem("");
-    if (SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
+    if (SettingsCache::instance().visualDeckStorage().getVisualDeckStoragePromptForConversion()) {
         visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexPrompt);
-    } else if (SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
+    } else if (SettingsCache::instance().visualDeckStorage().getVisualDeckStorageAlwaysConvert()) {
         visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexAlways);
     } else {
         visualDeckStoragePromptForConversionSelector.setCurrentIndex(visualDeckStoragePromptForConversionIndexNone);
     }
     connect(&visualDeckStoragePromptForConversionSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             [](int index) {
-                SettingsCache::instance().setVisualDeckStoragePromptForConversion(
+                SettingsCache::instance().visualDeckStorage().setVisualDeckStoragePromptForConversion(
                     index == visualDeckStoragePromptForConversionIndexPrompt);
-                SettingsCache::instance().setVisualDeckStorageAlwaysConvert(
+                SettingsCache::instance().visualDeckStorage().setVisualDeckStorageAlwaysConvert(
                     index == visualDeckStoragePromptForConversionIndexAlways);
             });
 
     defaultDeckEditorTypeSelector.addItem(""); // these will be set in retranslateUI
     defaultDeckEditorTypeSelector.addItem("");
-    defaultDeckEditorTypeSelector.setCurrentIndex(SettingsCache::instance().getDefaultDeckEditorType());
+    defaultDeckEditorTypeSelector.setCurrentIndex(
+        SettingsCache::instance().visualDeckStorage().getDefaultDeckEditorType());
     connect(&defaultDeckEditorTypeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            &SettingsCache::instance(), &SettingsCache::setDefaultDeckEditorType);
+            &SettingsCache::instance().visualDeckStorage(), &VisualDeckStorageSettings::setDefaultDeckEditorType);
 
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
@@ -163,9 +175,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     // replay settings
     rewindBufferingMsBox.setRange(0, 9999);
-    rewindBufferingMsBox.setValue(SettingsCache::instance().getRewindBufferingMs());
-    connect(&rewindBufferingMsBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance(),
-            &SettingsCache::setRewindBufferingMs);
+    rewindBufferingMsBox.setValue(SettingsCache::instance().interface().getRewindBufferingMs());
+    connect(&rewindBufferingMsBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().interface(),
+            &InterfaceSettings::setRewindBufferingMs);
 
     auto *replayGrid = new QGridLayout;
     replayGrid->addWidget(&rewindBufferingMsLabel, 0, 0, 1, 1);
@@ -185,7 +197,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     setLayout(mainLayout);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &UserInterfaceSettingsPage::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
+            &UserInterfaceSettingsPage::retranslateUi);
     retranslateUi();
 }
 

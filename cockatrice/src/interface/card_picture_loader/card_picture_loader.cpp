@@ -1,6 +1,8 @@
 #include "card_picture_loader.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "card_picture_loader_cache_method.h"
+#include "card_picture_loader_local_schemes.h"
 
 #include <QApplication>
 #include <QBuffer>
@@ -16,6 +18,9 @@
 #include <QStatusBar>
 #include <QThread>
 #include <algorithm>
+#include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 #include <utility>
 
 // never cache more than 300 cards at once for a single deck
@@ -24,8 +29,9 @@
 CardPictureLoader::CardPictureLoader() : QObject(nullptr)
 {
     worker = new CardPictureLoaderWorker;
-    connect(&SettingsCache::instance(), &SettingsCache::picsPathChanged, this, &CardPictureLoader::picsPathChanged);
-    connect(&SettingsCache::instance(), &SettingsCache::picDownloadChanged, this,
+    connect(&SettingsCache::instance().paths(), &PathsSettings::picsPathChanged, this,
+            &CardPictureLoader::picsPathChanged);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::picDownloadChanged, this,
             &CardPictureLoader::picDownloadChanged);
 
     qRegisterMetaType<ExactCard>();
@@ -169,7 +175,8 @@ void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
 
     QPixmapCache::insert(card.getPixmapCacheKey(), finalPixmap);
 
-    if (SettingsCache::instance().getCardPictureLoaderCacheMethod() ==
+    if (static_cast<CardPictureLoaderCacheMethod::CacheMethod>(
+            SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
         CardPictureLoaderCacheMethod::CacheMethod::FILESYSTEM_CACHE) {
         saveCardImageToLocalStorage(card, finalPixmap);
     }
@@ -189,9 +196,9 @@ void CardPictureLoader::saveCardImageToLocalStorage(const ExactCard &card, const
         return;
     }
 
-    const QString picsRoot = SettingsCache::instance().getPicsPath();
-    CardPictureLoaderLocalSchemes::NamingScheme scheme =
-        SettingsCache::instance().getLocalCardImageStorageNamingScheme();
+    const QString picsRoot = SettingsCache::instance().paths().getPicsPath();
+    CardPictureLoaderLocalSchemes::NamingScheme scheme = static_cast<CardPictureLoaderLocalSchemes::NamingScheme>(
+        SettingsCache::instance().cacheStorage().getLocalCardImageStorageNamingScheme());
 
     QString pattern;
 
@@ -306,7 +313,7 @@ void CardPictureLoader::picsPathChanged()
 
 bool CardPictureLoader::hasCustomArt()
 {
-    auto picsPath = SettingsCache::instance().getPicsPath();
+    auto picsPath = SettingsCache::instance().paths().getPicsPath();
     QDirIterator it(picsPath, QDir::Dirs | QDir::NoDotAndDotDot);
 
     // Check if there is at least one non-directory file in the pics path, other

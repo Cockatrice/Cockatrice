@@ -12,6 +12,8 @@
 
 #include <QBoxLayout>
 #include <QScrollBar>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/macros.h>
 
 /**
  * @brief Constructs a PrintingSelector widget to display and manage card printings.
@@ -45,16 +47,17 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
 
     // Create the checkbox for navigation buttons visibility
     navigationCheckBox = new QCheckBox(this);
-    navigationCheckBox->setChecked(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
+    navigationCheckBox->setChecked(
+        SettingsCache::instance().cardsDisplay().getPrintingSelectorNavigationButtonsVisible());
     connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &PrintingSelector::toggleVisibilityNavigationButtons);
-    connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setPrintingSelectorNavigationButtonsVisible);
+    connect(navigationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setPrintingSelectorNavigationButtonsVisible);
 
-    cardSizeWidget =
-        new CardSizeWidget(displayOptionsWidget, flowWidget, SettingsCache::instance().getPrintingSelectorCardSize());
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
-            &SettingsCache::setPrintingSelectorCardSize);
+    cardSizeWidget = new CardSizeWidget(displayOptionsWidget, flowWidget,
+                                        SettingsCache::instance().cardsDisplay().getPrintingSelectorCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setPrintingSelectorCardSize);
 
     displayOptionsWidget->addSettingsWidget(sortToolBar);
     displayOptionsWidget->addSettingsWidget(navigationCheckBox);
@@ -81,7 +84,8 @@ PrintingSelector::PrintingSelector(QWidget *parent, AbstractTabDeckEditor *_deck
     flowWidget->setVisible(false);
 
     cardSelectionBar = new PrintingSelectorCardSelectionWidget(this, deckStateManager);
-    cardSelectionBar->setVisible(SettingsCache::instance().getPrintingSelectorNavigationButtonsVisible());
+    cardSelectionBar->setVisible(
+        SettingsCache::instance().cardsDisplay().getPrintingSelectorNavigationButtonsVisible());
     layout->addWidget(cardSelectionBar);
 
     // Connect deck model data change signal to update display
@@ -98,7 +102,7 @@ void PrintingSelector::retranslateUi()
 
 void PrintingSelector::printingsInDeckChanged()
 {
-    if (SettingsCache::instance().getBumpSetsWithCardsInDeckToTop()) {
+    if (SettingsCache::instance().cardsDisplay().getBumpSetsWithCardsInDeckToTop()) {
         // Delay the update to avoid race conditions
         QTimer::singleShot(100, this, &PrintingSelector::updateDisplay);
     }
@@ -211,7 +215,7 @@ void PrintingSelector::getAllSetsForCurrentCard()
         sortToolBar->filterSets(sortedPrintings, searchBar->getSearchText().trimmed().toLower());
     QList<PrintingInfo> printingsToUse;
 
-    if (SettingsCache::instance().getBumpSetsWithCardsInDeckToTop()) {
+    if (SettingsCache::instance().cardsDisplay().getBumpSetsWithCardsInDeckToTop()) {
         printingsToUse =
             sortToolBar->prependPrintingsInDeck(filteredPrintings, selectedCard, deckStateManager->getModel());
     } else {

@@ -7,10 +7,11 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QtMath>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 static qreal stackingOffset(qreal cardHeight)
 {
-    const qreal overlapPercent = SettingsCache::instance().getStackCardOverlapPercent();
+    const qreal overlapPercent = SettingsCache::instance().cardsDisplay().getStackCardOverlapPercent();
     return cardHeight * (100.0 - overlapPercent) / 100.0;
 }
 

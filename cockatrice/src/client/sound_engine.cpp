@@ -6,7 +6,9 @@
 #include <QMediaPlayer>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#include <QApplication>
 #include <QAudioOutput>
+#include <libcockatrice/settings/sound_settings.h>
 #endif
 
 #define DEFAULT_THEME_NAME "Default"
@@ -15,8 +17,10 @@
 SoundEngine::SoundEngine(QObject *parent) : QObject(parent), audioOutput(nullptr), player(nullptr)
 {
     ensureThemeDirectoryExists();
-    connect(&SettingsCache::instance(), &SettingsCache::soundThemeChanged, this, &SoundEngine::themeChangedSlot);
-    connect(&SettingsCache::instance(), &SettingsCache::soundEnabledChanged, this, &SoundEngine::soundEnabledChanged);
+    connect(&SettingsCache::instance().sound(), &SoundSettings::soundThemeChanged, this,
+            &SoundEngine::themeChangedSlot);
+    connect(&SettingsCache::instance().sound(), &SoundSettings::soundEnabledChanged, this,
+            &SoundEngine::soundEnabledChanged);
 
     soundEnabledChanged();
     themeChangedSlot();
@@ -36,7 +40,7 @@ SoundEngine::~SoundEngine()
 
 void SoundEngine::soundEnabledChanged()
 {
-    if (SettingsCache::instance().getSoundEnabled()) {
+    if (SettingsCache::instance().sound().getSoundEnabled()) {
         qCInfo(SoundEngineLog) << "SoundEngine: enabling sound with" << audioData.size() << "sounds";
         if (!player) {
             player = new QMediaPlayer;
@@ -70,7 +74,7 @@ void SoundEngine::playSound(const QString &fileName)
     }
 
     player->stop();
-    int volumeSliderValue = SettingsCache::instance().getMasterVolume();
+    int volumeSliderValue = SettingsCache::instance().sound().getMasterVolume();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     player->audioOutput()->setVolume(qreal(volumeSliderValue) / 100);
     player->setSource(QUrl::fromLocalFile(audioData[fileName]));
@@ -88,10 +92,10 @@ void SoundEngine::testSound()
 
 void SoundEngine::ensureThemeDirectoryExists()
 {
-    if (SettingsCache::instance().getSoundThemeName().isEmpty() ||
-        !getAvailableThemes().contains(SettingsCache::instance().getSoundThemeName())) {
+    if (SettingsCache::instance().sound().getSoundThemeName().isEmpty() ||
+        !getAvailableThemes().contains(SettingsCache::instance().sound().getSoundThemeName())) {
         qCInfo(SoundEngineLog) << "Sounds theme name not set, setting default value";
-        SettingsCache::instance().setSoundThemeName(DEFAULT_THEME_NAME);
+        SettingsCache::instance().sound().setSoundThemeName(DEFAULT_THEME_NAME);
     }
 }
 
@@ -132,7 +136,7 @@ QStringMap &SoundEngine::getAvailableThemes()
 
 void SoundEngine::themeChangedSlot()
 {
-    QString themeName = SettingsCache::instance().getSoundThemeName();
+    QString themeName = SettingsCache::instance().sound().getSoundThemeName();
     qCInfo(SoundEngineLog) << "Sound theme changed:" << themeName;
 
     QDir dir = getAvailableThemes().value(themeName);

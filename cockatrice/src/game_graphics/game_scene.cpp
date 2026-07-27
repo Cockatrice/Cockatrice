@@ -19,6 +19,7 @@
 #include <QGraphicsView>
 #include <QSet>
 #include <QtMath>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <numeric>
 
@@ -36,7 +37,7 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 {
     animationTimer = new QBasicTimer;
     addItem(phasesToolbar);
-    connect(&SettingsCache::instance(), &SettingsCache::minPlayersForMultiColumnLayoutChanged, this,
+    connect(&SettingsCache::instance().interface(), &InterfaceSettings::minPlayersForMultiColumnLayoutChanged, this,
             &GameScene::rearrange);
 
     rearrange();
@@ -324,7 +325,7 @@ QList<PlayerLogic *> GameScene::rotatePlayers(const QList<PlayerLogic *> &active
 
 int GameScene::determineColumnCount(int playerCount)
 {
-    return playerCount < SettingsCache::instance().getMinPlayersForMultiColumnLayout() ? 1 : 2;
+    return playerCount < SettingsCache::instance().interface().getMinPlayersForMultiColumnLayout() ? 1 : 2;
 }
 
 /**

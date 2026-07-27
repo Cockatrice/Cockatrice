@@ -22,6 +22,7 @@
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/network/update/client/release_channel.h"
 #include "../client/settings/cache_settings.h"
+#include "../client/settings/shortcuts_settings.h"
 #include "../interface/widgets/dialogs/dlg_edit_tokens.h"
 #include "../interface/widgets/dialogs/dlg_local_game_options.h"
 #include "../interface/widgets/dialogs/dlg_manage_sets.h"
@@ -66,6 +67,14 @@
 #include <libcockatrice/network/server/local/local_server_interface.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
+#include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/debug_settings.h>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/settings/servers_settings.h>
+#include <libcockatrice/settings/updates_settings.h>
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
 #define GITHUB_CONTRIBUTORS_URL "https://github.com/Cockatrice/Cockatrice/graphs/contributors?type=c"
@@ -177,7 +186,7 @@ void MainWindow::startLocalGame(const LocalGameOptions &options)
 void MainWindow::actWatchReplay()
 {
     QFileDialog dlg(this, tr("Load replay"));
-    dlg.setDirectory(SettingsCache::instance().getReplaysPath());
+    dlg.setDirectory(SettingsCache::instance().paths().getReplaysPath());
     dlg.setNameFilters(QStringList() << QObject::tr("Cockatrice replays (*.cor)"));
     if (!dlg.exec()) {
         return;
@@ -382,8 +391,9 @@ void MainWindow::createActions()
     connect(aCheckCardUpdatesBackground, &QAction::triggered, this, &MainWindow::actCheckCardUpdatesBackground);
     aStatusBar = new QAction(this);
     aStatusBar->setCheckable(true);
-    aStatusBar->setChecked(SettingsCache::instance().getShowStatusBar());
-    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance(), &SettingsCache::setShowStatusBar);
+    aStatusBar->setChecked(SettingsCache::instance().personal().getShowStatusBar());
+    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance().personal(),
+            &PersonalSettings::setShowStatusBar);
     aViewLog = new QAction(this);
     connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
     aOpenSettingsFolder = new QAction(this);
@@ -472,9 +482,9 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), localServer(nullptr), bHasActivated(false), askedForDbUpdater(false),
       cardUpdateProcess(nullptr), logviewDialog(nullptr)
 {
-    connect(&SettingsCache::instance(), &SettingsCache::pixmapCacheSizeChanged, this,
+    connect(&SettingsCache::instance().cacheStorage(), &CacheStorageSettings::pixmapCacheSizeChanged, this,
             &MainWindow::pixmapCacheSizeChanged);
-    pixmapCacheSizeChanged(SettingsCache::instance().getPixmapCacheSize());
+    pixmapCacheSizeChanged(SettingsCache::instance().cacheStorage().getPixmapCacheSize());
 
     connectionController = new ConnectionController(this, this);
 
@@ -508,9 +518,9 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // status bar
-    connect(&SettingsCache::instance(), &SettingsCache::showStatusBarChanged, this,
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::showStatusBarChanged, this,
             [this](bool show) { statusBar()->setVisible(show); });
-    statusBar()->setVisible(SettingsCache::instance().getShowStatusBar());
+    statusBar()->setVisible(SettingsCache::instance().personal().getShowStatusBar());
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &MainWindow::refreshShortcuts);
@@ -537,23 +547,29 @@ void MainWindow::startupConfigCheck()
         startLocalGame(options);
     }
 
-    if (SettingsCache::instance().getCheckUpdatesOnStartup()) {
+    if (SettingsCache::instance().updates().getCheckUpdatesOnStartup()) {
         actCheckClientUpdates();
     }
 
-    if (SettingsCache::instance().getClientVersion() == CLIENT_INFO_NOT_SET) {
+    if (SettingsCache::instance().personal().getClientVersion() == CLIENT_INFO_NOT_SET) {
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
             << "Startup: old client version empty, assuming first start after clean install";
         alertForcedOracleRun(VERSION_STRING, false);
         SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
-        SettingsCache::instance().setClientVersion(VERSION_STRING);
-    } else if (SettingsCache::instance().getClientVersion() != VERSION_STRING) {
+        SettingsCache::instance().personal().setClientVersion(VERSION_STRING);
+
+        if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
+            SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
+        } else if (QString(VERSION_STRING).contains("beta", Qt::CaseInsensitive)) {
+            SettingsCache::instance().updates().setUpdateReleaseChannelIndex(1);
+        }
+    } else if (SettingsCache::instance().personal().getClientVersion() != VERSION_STRING) {
         // config found, from another (presumably older) version
         qCInfo(WindowMainStartupVersionLog)
-            << "Startup: old client version" << SettingsCache::instance().getClientVersion()
+            << "Startup: old client version" << SettingsCache::instance().personal().getClientVersion()
             << "differs, assuming first start after update";
-        if (SettingsCache::instance().getNotifyAboutNewVersion()) {
+        if (SettingsCache::instance().updates().getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
         } else {
             const auto reloadOk0 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
@@ -562,10 +578,10 @@ void MainWindow::startupConfigCheck()
         qCInfo(WindowMainStartupShortcutsLog) << "Migrating shortcuts after update detected.";
         SettingsCache::instance().shortcuts().migrateShortcuts();
 
-        if (SettingsCache::instance().getCheckUpdatesOnStartup()) {
+        if (SettingsCache::instance().updates().getCheckUpdatesOnStartup()) {
             if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
                 qCInfo(WindowMainStartupShortcutsLog) << "Update has changed to custom version, disabling auto update";
-                SettingsCache::instance().setCheckUpdatesOnStartup(Qt::Unchecked);
+                SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
             } else {
                 int channel = 0;
                 if (QString(VERSION_STRING).contains("beta", Qt::CaseInsensitive)) {
@@ -573,18 +589,18 @@ void MainWindow::startupConfigCheck()
                 }
                 if (SettingsCache::instance().getUpdateReleaseChannelIndex() != channel) {
                     qCInfo(WindowMainStartupShortcutsLog) << "Update has changed beta state, updating release channel.";
-                    SettingsCache::instance().setUpdateReleaseChannelIndex(channel);
+                    SettingsCache::instance().updates().setUpdateReleaseChannelIndex(channel);
                 }
             }
         }
 
-        SettingsCache::instance().setClientVersion(VERSION_STRING);
+        SettingsCache::instance().personal().setClientVersion(VERSION_STRING);
     } else {
         // previous config from this version found
         qCInfo(WindowMainStartupVersionLog) << "Startup: found config with current version";
 
-        if (SettingsCache::instance().getCardUpdateCheckRequired()) {
-            if (SettingsCache::instance().getStartupCardUpdateCheckPromptForUpdate()) {
+        if (SettingsCache::instance().updates().getCardUpdateCheckRequired()) {
+            if (SettingsCache::instance().updates().getStartupCardUpdateCheckPromptForUpdate()) {
                 auto startupCardCheckDialog = new DlgStartupCardCheck(this);
 
                 if (startupCardCheckDialog->exec() == QDialog::Accepted) {
@@ -596,19 +612,19 @@ void MainWindow::startupConfigCheck()
                             actCheckCardUpdatesBackground();
                             break;
                         case 2: // background + always
-                            SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(false);
-                            SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(true);
+                            SettingsCache::instance().updates().setStartupCardUpdateCheckPromptForUpdate(false);
+                            SettingsCache::instance().updates().setStartupCardUpdateCheckAlwaysUpdate(true);
                             actCheckCardUpdatesBackground();
                             break;
                         case 3: // don't prompt again + don't run
-                            SettingsCache::instance().setStartupCardUpdateCheckPromptForUpdate(false);
-                            SettingsCache::instance().setStartupCardUpdateCheckAlwaysUpdate(false);
+                            SettingsCache::instance().updates().setStartupCardUpdateCheckPromptForUpdate(false);
+                            SettingsCache::instance().updates().setStartupCardUpdateCheckAlwaysUpdate(false);
                             break;
                         default:
                             break;
                     }
                 }
-            } else if (SettingsCache::instance().getStartupCardUpdateCheckAlwaysUpdate()) {
+            } else if (SettingsCache::instance().updates().getStartupCardUpdateCheckAlwaysUpdate()) {
                 actCheckCardUpdatesBackground();
             }
         }
@@ -617,7 +633,8 @@ void MainWindow::startupConfigCheck()
 
         // Run the tips dialog only on subsequent startups.
         // On the first run after an install/update the startup is already crowded enough
-        if (tip->successfulInit && SettingsCache::instance().getShowTipsOnStartup() && tip->newTipsAvailable) {
+        if (tip->successfulInit && SettingsCache::instance().personal().getShowTipsOnStartup() &&
+            tip->newTipsAvailable) {
             tip->raise();
             tip->show();
         }
@@ -780,7 +797,7 @@ void MainWindow::cardDatabaseLoadingFailed()
 
 void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames)
 {
-    if (SettingsCache::instance().getAlwaysEnableNewSets()) {
+    if (SettingsCache::instance().updates().getAlwaysEnableNewSets()) {
         CardDatabaseManager::getInstance()->enableAllUnknownSets();
         const auto reloadOk1 =
             QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
@@ -812,7 +829,7 @@ void MainWindow::cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknow
         CardDatabaseManager::getInstance()->enableAllUnknownSets();
         const auto reloadOk1 =
             QtConcurrent::run([] { CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify(); });
-        SettingsCache::instance().setAlwaysEnableNewSets(true);
+        SettingsCache::instance().updates().setAlwaysEnableNewSets(true);
     } else if (msgBox.clickedButton() == noButton) {
         CardDatabaseManager::getInstance()->markAllSetsAsKnown();
     } else if (msgBox.clickedButton() == settingsButton) {
@@ -957,7 +974,7 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
 void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus exitStatus)
 {
     if (exitStatus == QProcess::NormalExit) {
-        SettingsCache::instance().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
+        SettingsCache::instance().updates().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
     }
     exitCardDatabaseUpdate();
 }
@@ -1004,7 +1021,7 @@ void MainWindow::refreshShortcuts()
 
 void MainWindow::actOpenCustomFolder()
 {
-    QString dir = SettingsCache::instance().getCustomPicsPath();
+    QString dir = SettingsCache::instance().paths().getCustomPicsPath();
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
