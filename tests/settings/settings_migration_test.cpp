@@ -206,9 +206,9 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_EQ(readFromIni("personal.ini", "home/background"), QVariant("custom_bg"));
     ASSERT_EQ(readFromIni("personal.ini", "tipOfDay/showTips"), QVariant(false));
 
-    ASSERT_TRUE(fileExists("cards.ini"));
-    ASSERT_EQ(readFromIni("cards.ini", "cards/displaycardnames"), QVariant(false));
-    ASSERT_EQ(readFromIni("cards.ini", "cards/tapanimation"), QVariant(true));
+    ASSERT_TRUE(fileExists("cards_display.ini"));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/displaycardnames"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/tapanimation"), QVariant(true));
 
     ASSERT_TRUE(fileExists("interface.ini"));
     ASSERT_EQ(readFromIni("interface.ini", "interface/usetearoffmenus"), QVariant(true));
@@ -318,11 +318,11 @@ TEST_F(SettingsMigrationTest, CardsKeysKeepGroupPrefix)
     ASSERT_TRUE(SettingsMigration::migrateSettingsFromGlobalIni(settingsPath));
 
     ASSERT_TRUE(fileExists("global.ini.old"));
-    ASSERT_TRUE(fileExists("cards.ini"));
+    ASSERT_TRUE(fileExists("cards_display.ini"));
     // "cards/displaycardnames" should be stored with its group prefix
-    ASSERT_EQ(readFromIni("cards.ini", "cards/displaycardnames"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/displaycardnames"), QVariant(false));
     // "interface/..." keys should keep their full path
-    ASSERT_EQ(readFromIni("cards.ini", "interface/deckeditorbannercardcomboboxvisible"), QVariant(true));
+    ASSERT_EQ(readFromIni("cards_display.ini", "interface/deckeditorbannercardcomboboxvisible"), QVariant(true));
 }
 
 TEST_F(SettingsMigrationTest, LegacyMigrationIsIdempotent)

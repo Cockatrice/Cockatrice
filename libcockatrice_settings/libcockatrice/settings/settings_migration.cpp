@@ -249,7 +249,7 @@ static void migrateCardsDisplaySettings(const QString &settingsPath, QSettings &
         return;
     }
 
-    QSettings cardsIni(settingsPath + "cards.ini", QSettings::IniFormat);
+    QSettings cardsIni(settingsPath + "cards_display.ini", QSettings::IniFormat);
     for (const auto &key : cardsRootKeys) {
         if (globalIni.contains(key)) {
             cardsIni.setValue(key, globalIni.value(key));

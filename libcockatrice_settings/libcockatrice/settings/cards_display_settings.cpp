@@ -1,7 +1,7 @@
 #include "cards_display_settings.h"
 
 CardsDisplaySettings::CardsDisplaySettings(const QString &settingPath, QObject *parent)
-    : SettingsManager(settingPath + "cards.ini", "cards", QString(), parent)
+    : SettingsManager(settingPath + "cards_display.ini", "cards", QString(), parent)
 {
 }
 
