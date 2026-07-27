@@ -120,6 +120,11 @@ int InterfaceSettings::getRewindBufferingMs() const
     return getValue("rewindBufferingMs", "replay", QString(), 200).toInt();
 }
 
+qreal InterfaceSettings::getFastForwardSpeed() const
+{
+    return getValue("fastForwardSpeed", "replay", QString(), 10).toReal();
+}
+
 bool InterfaceSettings::getStyleUserList() const
 {
     return getValue("styleUserList", "appearance", QString(), true).toBool();
@@ -272,6 +277,11 @@ void InterfaceSettings::setOpenDeckInNewTab(bool _openDeckInNewTab)
 void InterfaceSettings::setRewindBufferingMs(int _rewindBufferingMs)
 {
     setValue(_rewindBufferingMs, "rewindBufferingMs", "replay");
+}
+
+void InterfaceSettings::setFastForwardSpeed(qreal _value)
+{
+    setValue(_value, "fastForwardSpeed", "replay");
 }
 
 void InterfaceSettings::setStyleUserList(bool _styleUserList)

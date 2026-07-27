@@ -5,6 +5,8 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QWidget>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 
 ReplayQuickSettingsWidget::ReplayQuickSettingsWidget(QWidget *parent) : SettingsButtonWidget(parent)
 {
@@ -12,7 +14,7 @@ ReplayQuickSettingsWidget::ReplayQuickSettingsWidget(QWidget *parent) : Settings
     fastForwardSpeedBox.setMinimum(1);
     fastForwardSpeedBox.setMaximum(99.9);
     fastForwardSpeedBox.setDecimals(1);
-    fastForwardSpeedBox.setValue(SettingsCache::instance().getFastForwardSpeed());
+    fastForwardSpeedBox.setValue(SettingsCache::instance().interface().getFastForwardSpeed());
     connect(&fastForwardSpeedBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
             &ReplayQuickSettingsWidget::actUpdateFastForwardSpeed);
 
@@ -25,7 +27,8 @@ ReplayQuickSettingsWidget::ReplayQuickSettingsWidget(QWidget *parent) : Settings
 
     this->addSettingsWidget(widget);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &ReplayQuickSettingsWidget::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
+            &ReplayQuickSettingsWidget::retranslateUi);
     retranslateUi();
 }
 
@@ -37,6 +40,6 @@ void ReplayQuickSettingsWidget::retranslateUi()
 
 void ReplayQuickSettingsWidget::actUpdateFastForwardSpeed(qreal value)
 {
-    SettingsCache::instance().setFastForwardSpeed(value);
+    SettingsCache::instance().interface().setFastForwardSpeed(value);
     emit fastForwardSpeedChanged(value);
 }
