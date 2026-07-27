@@ -1,6 +1,7 @@
 #include "command_zone_menu.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../board/abstract_counter.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
