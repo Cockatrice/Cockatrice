@@ -20,6 +20,7 @@
 #include <QPushButton>
 #include <QStyleHints>
 #include <QTimer>
+#include <libcockatrice/settings/paths_settings.h>
 
 // Probe whether a directory is truly writable by trying to create and remove a
 // temporary file. QFileInfo::isWritable() on a directory is unreliable (notably
@@ -48,7 +49,7 @@ PaletteEditorDialog::PaletteEditorDialog(const QString &_themeDirPath, const QSt
     if (!themeDirPath.isEmpty() && isDirReallyWritable(themeDirPath)) {
         saveDir = themeDirPath;
     } else {
-        saveDir = QDir(SettingsCache::instance().getThemesPath()).absoluteFilePath(themeName);
+        saveDir = QDir(SettingsCache::instance().paths().getThemesPath()).absoluteFilePath(themeName);
         if (!QDir().mkpath(saveDir)) {
             qWarning() << "Failed to create palette save directory:" << saveDir;
         }
