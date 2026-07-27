@@ -127,6 +127,7 @@ public:
      * @param _value The string value to assign.
      */
     void setProperty(const QString &_name, const QString &_value);
+    void setProperties(const QVariantHash &_props);
 
     /**
      * @brief Stores the pre-serialized properties blob and marks the materialized

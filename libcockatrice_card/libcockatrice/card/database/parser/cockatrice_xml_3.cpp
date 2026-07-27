@@ -229,25 +229,27 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     // behaviour. Without this check, disabling a set has no effect on v3 databases.
                     if (set->getEnabled()) {
                         PrintingInfo setInfo(set);
+                        QVariantHash printingProps;
                         if (attrs.hasAttribute("muId")) {
-                            setInfo.setProperty("muid", attrs.value("muId").toString());
+                            printingProps.insert("muid", attrs.value("muId").toString());
                         }
 
                         if (attrs.hasAttribute("uuId")) {
-                            setInfo.setProperty("uuid", attrs.value("uuId").toString());
+                            printingProps.insert("uuid", attrs.value("uuId").toString());
                         }
 
                         if (attrs.hasAttribute("picURL")) {
-                            setInfo.setProperty("picurl", attrs.value("picURL").toString());
+                            printingProps.insert("picurl", attrs.value("picURL").toString());
                         }
 
                         if (attrs.hasAttribute("num")) {
-                            setInfo.setProperty("num", attrs.value("num").toString());
+                            printingProps.insert("num", attrs.value("num").toString());
                         }
 
                         if (attrs.hasAttribute("rarity")) {
-                            setInfo.setProperty("rarity", attrs.value("rarity").toString());
+                            printingProps.insert("rarity", attrs.value("rarity").toString());
                         }
+                        setInfo.setProperties(printingProps);
                         _sets[setName].append(setInfo);
                     }
                     // related cards

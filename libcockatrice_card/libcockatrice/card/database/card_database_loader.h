@@ -135,7 +135,7 @@ private:
      * @brief Computes a hash identifying the current set of input database files.
      * @return Hash over the paths, sizes and modification times of all inputs.
      */
-    [[nodiscard]] QByteArray computeSourceHash() const;
+    [[nodiscard]] QByteArray computeSourceHash(const QStringList &customPaths) const;
 
     /**
      * @brief Path of the binary cache file derived from the main card database path.
@@ -146,15 +146,18 @@ private:
     /**
      * @brief Attempts to populate the snapshot from the binary cache.
      * @param data Snapshot to populate.
+     * @param sourceHash Pre-computed hash identifying the current input files.
      * @return True if a valid, up-to-date cache was read.
      */
-    bool loadFromCache(CardDatabaseData &data);
+    bool loadFromCache(CardDatabaseData &data, const QByteArray &sourceHash);
 
     /**
      * @brief Writes the snapshot to the binary cache for the current inputs.
      * @param data Snapshot to serialize.
+     * @param sourceHash Pre-computed hash identifying the current input files.
+     * @return True if the cache was written successfully.
      */
-    void saveToCache(const CardDatabaseData &data);
+    bool saveToCache(const CardDatabaseData &data, const QByteArray &sourceHash);
 
 private:
     CardDatabase *database;                         /**< Non-owning pointer to the target CardDatabase. */
@@ -164,6 +167,7 @@ private:
 
     QBasicMutex *loadFromFileMutex = new QBasicMutex();   /**< Mutex for single-file loading. */
     QBasicMutex *reloadDatabaseMutex = new QBasicMutex(); /**< Mutex for reloading entire database. */
+    bool initialLoadComplete = false;                     /**< Set after the first successful load. */
 };
 
 #endif // COCKATRICE_CARD_DATABASE_LOADER_H

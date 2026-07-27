@@ -92,6 +92,7 @@ void CardDatabaseSettings::saveSets(const QVector<ICardSetPriorityController::Se
     });
 
     QMutexLocker lock(&setOptionsMutex);
+    ensureSetOptionsLoaded();
     for (const auto &entry : data) {
         SetOptions &o = setOptionsCache[entry.shortName];
         o.sortKey = entry.sortKey;

@@ -57,7 +57,18 @@ const QVariantHash &CardInfo::getPropertiesHash() const
 void CardInfo::setProperty(const QString &_name, const QString &_value)
 {
     ensurePropertiesLoaded();
+    if (propertiesCache.value(_name).toString() == _value) {
+        return;
+    }
     propertiesCache.insert(_name, _value);
+    propertiesBlob = serializeProperties(propertiesCache);
+    emit cardInfoChanged(smartThis);
+}
+
+void CardInfo::setProperties(const QVariantHash &_props)
+{
+    ensurePropertiesLoaded();
+    propertiesCache = _props;
     propertiesBlob = serializeProperties(propertiesCache);
     emit cardInfoChanged(smartThis);
 }
@@ -201,13 +212,16 @@ void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo &_info)
 
 void CardInfo::combineLegalities(const QVariantHash &props)
 {
+    ensurePropertiesLoaded();
     QHashIterator<QString, QVariant> it(props);
     while (it.hasNext()) {
         it.next();
         if (it.key().startsWith("format-")) {
-            smartThis->setProperty(it.key(), it.value().toString());
+            propertiesCache.insert(it.key(), it.value());
         }
     }
+    propertiesBlob = serializeProperties(propertiesCache);
+    emit cardInfoChanged(smartThis);
 }
 
 void CardInfo::refreshCachedSets()

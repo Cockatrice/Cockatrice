@@ -308,6 +308,7 @@ public:
         return getPropertiesHash().value(propertyName).toString();
     }
     void setProperty(const QString &_name, const QString &_value);
+    void setProperties(const QVariantHash &_props);
     [[nodiscard]] bool hasProperty(const QString &propertyName) const
     {
         return getPropertiesHash().contains(propertyName);

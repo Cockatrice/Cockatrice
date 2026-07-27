@@ -315,13 +315,15 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     auto set = internalAddSet(setName);
                     if (set->getEnabled()) {
                         PrintingInfo printingInfo(set);
+                        QVariantHash printingProps;
                         for (QXmlStreamAttribute attr : attrs) {
                             QString attrName = attr.name().toString();
                             if (attrName == "picURL") {
                                 attrName = "picurl";
                             }
-                            printingInfo.setProperty(attrName, attr.value().toString());
+                            printingProps.insert(attrName, attr.value().toString());
                         }
+                        printingInfo.setProperties(printingProps);
 
                         // This is very much a hack and not the right place to
                         // put this check, as it requires a reload of Cockatrice

@@ -27,7 +27,17 @@ void PrintingInfo::ensurePropertiesLoaded() const
 void PrintingInfo::setProperty(const QString &_name, const QString &_value)
 {
     ensurePropertiesLoaded();
+    if (propertiesCache.value(_name).toString() == _value) {
+        return;
+    }
     propertiesCache.insert(_name, _value);
+    setProperties(propertiesCache);
+}
+
+void PrintingInfo::setProperties(const QVariantHash &_props)
+{
+    ensurePropertiesLoaded();
+    propertiesCache = _props;
     QDataStream out(&propertiesBlob, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_4);
     out << propertiesCache;

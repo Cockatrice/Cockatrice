@@ -99,7 +99,9 @@ LoadStatus CardDatabaseLoader::doLoadCardDatabases()
     LoadStatus loadStatus = NotLoaded;
 
     // Try the binary cache first: a cache hit avoids re-parsing the (large) XML.
-    if (loadFromCache(data)) {
+    const QStringList customPaths = collectCustomDatabasePaths();
+    const QByteArray sourceHash = computeSourceHash(customPaths);
+    if (loadFromCache(data, sourceHash)) {
         qCInfo(CardDatabaseLoadingLog) << "Loaded card database from binary cache";
         loadStatus = Ok;
     } else {
@@ -110,30 +112,36 @@ LoadStatus CardDatabaseLoader::doLoadCardDatabases()
 
             // find all custom card databases, recursively & following symlinks
             // then load them alphabetically
-            const QStringList customPaths = collectCustomDatabasePaths();
             for (int i = 0; i < customPaths.size(); ++i) {
                 const auto &p = customPaths.at(i);
                 qCInfo(CardDatabaseLoadingLog) << "Loading Custom Set" << i << "(" << p << ")";
                 loadCardDatabase(p, data);
             }
 
-            saveToCache(data);
+            if (!saveToCache(data, sourceHash)) {
+                qCWarning(CardDatabaseLoadingLog) << "Failed to write binary cache to" << cachePath();
+            }
         }
     }
 
     // AFTER all the cards have been loaded: resolve the reverse-related tags
     // against the fully-built snapshot.
-    database->refreshCachedReverseRelatedCards(data.cards);
-
     if (loadStatus == Ok) {
+        database->refreshCachedReverseRelatedCards(data.cards);
+
         qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Success";
         emit databaseDataReady(std::move(data));
         emit loadingFinished();
-        // NOTE: checkUnknownSets() is intentionally NOT called here.  During
-        // the front-loaded parse in main() this runs before MainWindow exists,
-        // so cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled would be
-        // emitted with no receivers.  MainWindow::startupConfigCheck() calls
-        // checkUnknownSets() once its signal connections are live.
+        // During the front-loaded parse in main() this runs before MainWindow
+        // exists, so cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled
+        // would be emitted with no receivers.  Skip the check on the first load;
+        // MainWindow::startupConfigCheck() calls checkUnknownSets() once its
+        // signal connections are live.  On subsequent reloads (e.g. path change)
+        // MainWindow exists and signals have live receivers.
+        if (initialLoadComplete) {
+            database->checkUnknownSets();
+        }
+        initialLoadComplete = true;
     } else {
         qCInfo(CardDatabaseLoadingSuccessOrFailureLog) << "Card Database Loading Failed";
         emit loadingFailed(); // bring up the settings dialog
@@ -147,7 +155,7 @@ QString CardDatabaseLoader::cachePath() const
     return pathProvider->getCardDatabasePath() + ".cache";
 }
 
-QByteArray CardDatabaseLoader::computeSourceHash() const
+QByteArray CardDatabaseLoader::computeSourceHash(const QStringList &customPaths) const
 {
     // Hash over the paths, sizes and modification times of every input file so
     // the cache invalidates when any source changes. Cheap (no content read).
@@ -160,7 +168,7 @@ QByteArray CardDatabaseLoader::computeSourceHash() const
 
     const QStringList inputs = QStringList()
                                << pathProvider->getCardDatabasePath() << pathProvider->getTokenDatabasePath()
-                               << pathProvider->getSpoilerCardDatabasePath() << collectCustomDatabasePaths();
+                               << pathProvider->getSpoilerCardDatabasePath() << customPaths;
     for (const QString &path : inputs) {
         QFileInfo info(path);
         if (info.exists()) {
@@ -175,22 +183,20 @@ QByteArray CardDatabaseLoader::computeSourceHash() const
     return hash.result();
 }
 
-bool CardDatabaseLoader::loadFromCache(CardDatabaseData &data)
+bool CardDatabaseLoader::loadFromCache(CardDatabaseData &data, const QByteArray &sourceHash)
 {
-    const QByteArray sourceHash = computeSourceHash();
     if (sourceHash.isEmpty()) {
         return false;
     }
     return CardDatabaseCache::read(cachePath(), data, sourceHash, priorityController);
 }
 
-void CardDatabaseLoader::saveToCache(const CardDatabaseData &data)
+bool CardDatabaseLoader::saveToCache(const CardDatabaseData &data, const QByteArray &sourceHash)
 {
-    const QByteArray sourceHash = computeSourceHash();
     if (sourceHash.isEmpty()) {
-        return;
+        return false;
     }
-    CardDatabaseCache::write(cachePath(), data, sourceHash);
+    return CardDatabaseCache::write(cachePath(), data, sourceHash);
 }
 
 QStringList CardDatabaseLoader::collectCustomDatabasePaths() const
