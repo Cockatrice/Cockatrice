@@ -221,6 +221,9 @@ CardInfoPtr readCard(QDataStream &in, const SetNameMap &sets)
     QSet<QString> altNames;
     quint32 altNameCount = 0;
     in >> altNameCount;
+    if (in.status() != QDataStream::Ok) {
+        return nullptr;
+    }
     altNames.reserve(altNameCount);
     for (quint32 i = 0; i < altNameCount; ++i) {
         altNames.insert(readString(in));
@@ -229,10 +232,16 @@ CardInfoPtr readCard(QDataStream &in, const SetNameMap &sets)
     SetToPrintingsMap cardSets;
     quint32 setCount = 0;
     in >> setCount;
+    if (in.status() != QDataStream::Ok) {
+        return nullptr;
+    }
     for (quint32 i = 0; i < setCount; ++i) {
         QString setName = readString(in);
         quint32 printingCount = 0;
         in >> printingCount;
+        if (in.status() != QDataStream::Ok) {
+            return nullptr;
+        }
         QList<PrintingInfo> printings;
         printings.reserve(printingCount);
         for (quint32 j = 0; j < printingCount; ++j) {
@@ -244,6 +253,9 @@ CardInfoPtr readCard(QDataStream &in, const SetNameMap &sets)
     QList<CardRelation *> related;
     quint32 relatedCount = 0;
     in >> relatedCount;
+    if (in.status() != QDataStream::Ok) {
+        return nullptr;
+    }
     related.reserve(relatedCount);
     for (quint32 i = 0; i < relatedCount; ++i) {
         related.append(readRelation(in));
@@ -252,6 +264,9 @@ CardInfoPtr readCard(QDataStream &in, const SetNameMap &sets)
     QList<CardRelation *> reverse;
     quint32 reverseCount = 0;
     in >> reverseCount;
+    if (in.status() != QDataStream::Ok) {
+        return nullptr;
+    }
     reverse.reserve(reverseCount);
     for (quint32 i = 0; i < reverseCount; ++i) {
         reverse.append(readRelation(in));
@@ -298,6 +313,9 @@ FormatRulesPtr readFormat(QDataStream &in)
 
     quint32 allowedCount = 0;
     in >> allowedCount;
+    if (in.status() != QDataStream::Ok) {
+        return nullptr;
+    }
     for (quint32 i = 0; i < allowedCount; ++i) {
         AllowedCount ac;
         in >> ac.max;
@@ -307,10 +325,16 @@ FormatRulesPtr readFormat(QDataStream &in)
 
     quint32 exceptionCount = 0;
     in >> exceptionCount;
+    if (in.status() != QDataStream::Ok) {
+        return nullptr;
+    }
     for (quint32 i = 0; i < exceptionCount; ++i) {
         ExceptionRule ex;
         quint32 condCount = 0;
         in >> condCount;
+        if (in.status() != QDataStream::Ok) {
+            return nullptr;
+        }
         for (quint32 j = 0; j < condCount; ++j) {
             CardCondition cond;
             cond.field = readString(in);
@@ -399,6 +423,9 @@ bool CardDatabaseCache::read(const QString &cachePath,
     // Sets
     quint32 setCount = 0;
     in >> setCount;
+    if (in.status() != QDataStream::Ok) {
+        return false;
+    }
     for (quint32 i = 0; i < setCount; ++i) {
         CardSetPtr set = readSet(in, priorityController);
         data.sets.insert(set->getShortName(), set);
@@ -407,10 +434,16 @@ bool CardDatabaseCache::read(const QString &cachePath,
     // Cards
     quint32 cardCount = 0;
     in >> cardCount;
+    if (in.status() != QDataStream::Ok) {
+        return false;
+    }
     if (cardCount > 0) {
         data.cards.reserve(static_cast<int>(cardCount));
         for (quint32 i = 0; i < cardCount; ++i) {
             CardInfoPtr card = readCard(in, data.sets);
+            if (card == nullptr) {
+                return false;
+            }
             data.cards.insert(card->getName(), card);
             data.simpleNameCards.insert(card->getSimpleName(), card);
         }
@@ -430,8 +463,14 @@ bool CardDatabaseCache::read(const QString &cachePath,
     // Formats
     quint32 formatCount = 0;
     in >> formatCount;
+    if (in.status() != QDataStream::Ok) {
+        return false;
+    }
     for (quint32 i = 0; i < formatCount; ++i) {
         FormatRulesPtr format = readFormat(in);
+        if (format == nullptr) {
+            return false;
+        }
         data.formats.insert(format->formatName.toLower(), format);
     }
 

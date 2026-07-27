@@ -3,6 +3,7 @@
 #include "../set/card_set.h"
 
 #include <QDataStream>
+#include <QIODevice>
 
 PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
 {
@@ -21,6 +22,15 @@ void PrintingInfo::ensurePropertiesLoaded() const
         in >> propertiesCache;
     }
     propertiesLoaded = true;
+}
+
+void PrintingInfo::setProperty(const QString &_name, const QString &_value)
+{
+    ensurePropertiesLoaded();
+    propertiesCache.insert(_name, _value);
+    QDataStream out(&propertiesBlob, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_4);
+    out << propertiesCache;
 }
 
 /**

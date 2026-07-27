@@ -71,6 +71,7 @@ void CardDatabase::reloadCardDatabasesAndNotify()
     loadCardDatabases();
 
     if (loadStatus == Ok) {
+        checkUnknownSets();
         // A reload reconstructs the exact same enabled-set state, so the cached
         // set-name / alt-name data computed during construction is still valid.
         // Skipping the per-card refresh avoids a full 36k-card recompute that

@@ -126,11 +126,7 @@ public:
      * @param _name The name of the property.
      * @param _value The string value to assign.
      */
-    void setProperty(const QString &_name, const QString &_value)
-    {
-        ensurePropertiesLoaded();
-        propertiesCache.insert(_name, _value);
-    }
+    void setProperty(const QString &_name, const QString &_value);
 
     /**
      * @brief Stores the pre-serialized properties blob and marks the materialized
