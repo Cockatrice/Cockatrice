@@ -6,7 +6,7 @@
 #include <QScreen>
 
 SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
-    : QWidget(parent), button(new QToolButton(this)), popup(new SettingsPopupWidget(this))
+    : QWidget(parent), button(new QToolButton(this)), popup(new SettingsPopupWidget(nullptr))
 {
     button->setIcon(QPixmap("theme:icons/cogwheel"));
     button->setCheckable(true);
@@ -18,6 +18,13 @@ SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
     layout->addWidget(button);
     layout->setContentsMargins(0, 0, 0, 0);
     setLayout(layout);
+}
+
+SettingsButtonWidget::~SettingsButtonWidget()
+{
+    // We don't parent the popup because it might lead to better behavior on certain window managers.
+    // So we have to manually delete it
+    popup->deleteLater();
 }
 
 void SettingsButtonWidget::addSettingsWidget(QWidget *toAdd) const
