@@ -328,10 +328,14 @@ if [[ $USE_CCACHE == 1 ]]; then
   ccache --show-stats
   ccache --show-compression
   echo " -----"
+  ccache --show-stats --verbose
+  ccache --show-compression
+  echo " -----"
   ccache --zero-stats
   echo " -----"
   ccache --show-stats
-  ccache --show-compression
+  echo " -----"
+  ccache --show-stats --verbose
   echo "::endgroup::"
 fi
 
@@ -339,7 +343,7 @@ fi
 ### Build
 
 # Configure CMake
-echo "::group::Configure CMake"
+echo "::group::Generate buildsystem"
 cmake --version
 echo "Running CMake configuration with following flags: ${flags[*]}"
 cmake -S . -B "$BUILD_DIR" "${flags[@]}"
@@ -405,9 +409,23 @@ fi
 
 # Package
 if [[ $MAKE_PACKAGE == 1 ]]; then
+  echo "::group::Debug NSIS / CPack"
+  cat "_CPack_Packages/win64/NSIS/NSISOutput.log"
+  echo " -----"
+  find . -name "NSIS.definitions.nsh"
+  find "$BUILD_DIR" -name "NSIS.definitions.nsh"
+  ls -l "$BUILD_DIR/NSIS.definitions.nsh"
+  echo "::endgroup:"
+  
   echo "::group::Create package"
   cpack --version
-  cpack --config "$BUILD_DIR/CPackConfig.cmake"
+  (
+    cd "$BUILD_DIR"
+    cpack
+  )
+  # cpack --config "$BUILD_DIR/CPackConfig.cmake"
+  # cmake --build "$BUILD_DIR" --target package
+  #TODO included --config? compare with former isntall and other --target variants used
   echo "::endgroup::"
 
   if [[ -n $PACKAGE_SUFFIX ]]; then

@@ -14,7 +14,7 @@ cd "${BASH_SOURCE%/*}/" || exit 2 # could not find path, this could happen with 
 
 # Defaults
 include=("cockatrice/src" \
-libcockatrice_* \
+  libcockatrice_* \
   "oracle/src" \
   "servatrice/src" \
   "tests")
