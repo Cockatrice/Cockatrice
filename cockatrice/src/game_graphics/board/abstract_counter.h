@@ -102,25 +102,20 @@ public:
         return shownInCounterArea;
     }
 
-    /**
-     * @brief Returns whether this counter is active (visible and interactable).
-     * Inactive counters are hidden and their menu actions should be disabled.
-     */
+    /** @brief Returns whether this counter is shown and can be modified. */
     [[nodiscard]] bool isActive() const
     {
         return active;
     }
 
     /**
-     * @brief Sets the active state of this counter.
+     * @brief Shows or hides the counter and enables or disables its menu.
      *
-     * This is the sole owner of the counter's own visibility flag: active maps directly to
-     * setVisible(_active). For counters nested in another item (e.g. tax counters parented to
-     * the command zone), Qt AND-s this flag with the parent's visibility, so an active counter
-     * inside a hidden zone still does not render. Container layout code must therefore not set
-     * visibility itself; it only positions counters and may read isActive().
+     * Sole owner of both, so container layout code only positions counters and may read
+     * isActive(). Qt AND-s visibility with the parent item's, so an active counter nested in a
+     * hidden zone (e.g. a tax counter in the command zone) still does not render.
      *
-     * @param _active True to show and enable the counter, false to hide it
+     * @param _active True to show and enable the counter, false to hide and disable it
      */
     virtual void setActive(bool _active);
 
