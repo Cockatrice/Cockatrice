@@ -202,6 +202,36 @@ void PlayerGraphicsItem::setMirrored(bool _mirrored)
     }
 }
 
+QAction *PlayerGraphicsItem::counterMenuInsertAnchor(int counterId) const
+{
+    QMenu *countersMenu = playerMenu->getCountersMenu();
+    if (!countersMenu) {
+        return nullptr;
+    }
+    const QList<QAction *> inMenu = countersMenu->actions();
+    // QMap iterates in ascending key order, so this finds the lowest id above counterId.
+    for (auto it = counterWidgets.upperBound(counterId); it != counterWidgets.constEnd(); ++it) {
+        QMenu *menu = it.value()->getMenu();
+        if (menu && inMenu.contains(menu->menuAction())) {
+            return menu->menuAction();
+        }
+    }
+    return nullptr;
+}
+
+void PlayerGraphicsItem::setCounterMenuRegistered(AbstractCounter *widget, bool registered)
+{
+    QMenu *countersMenu = playerMenu->getCountersMenu();
+    if (!widget || !countersMenu || !widget->getMenu()) {
+        return;
+    }
+    if (registered) {
+        countersMenu->insertMenu(counterMenuInsertAnchor(widget->getId()), widget->getMenu());
+    } else {
+        countersMenu->removeAction(widget->getMenu()->menuAction());
+    }
+}
+
 void PlayerGraphicsItem::onCounterAdded(CounterState *state)
 {
     AbstractCounter *widget;
@@ -222,9 +252,14 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
     }
     counterWidgets.insert(state->getId(), widget);
 
-    if (playerMenu->getCountersMenu() && widget->getMenu()) {
-        playerMenu->getCountersMenu()->addMenu(widget->getMenu());
-    }
+    // A counter's submenu follows its isActive() state: while inactive the counter is hidden and
+    // the server rejects every modification. Only tax counters go inactive today.
+    setCounterMenuRegistered(widget, state->isActive());
+    connect(state, &CounterState::activeChanged, this, [this, counterId = state->getId()](bool newActive) {
+        if (AbstractCounter *counter = getCounterWidget(counterId)) {
+            setCounterMenuRegistered(counter, newActive);
+        }
+    });
 
     if (playerMenu->getShortcutsActive()) {
         widget->setShortcutsActive();
@@ -239,9 +274,7 @@ void PlayerGraphicsItem::onCounterRemoved(int counterId)
     if (!widget) {
         return;
     }
-    if (playerMenu->getCountersMenu() && widget->getMenu()) {
-        playerMenu->getCountersMenu()->removeAction(widget->getMenu()->menuAction());
-    }
+    setCounterMenuRegistered(widget, false);
     if (commandZoneGraphicsItem && CounterNames::isTaxCounter(widget->getName())) {
         commandZoneGraphicsItem->unregisterTaxCounter(widget);
     }

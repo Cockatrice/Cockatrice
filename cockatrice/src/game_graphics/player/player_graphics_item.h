@@ -162,6 +162,13 @@ private:
     bool mirrored;
     bool handVisible = false;
 
+    /**
+     * @brief Returns the menu action a counter's submenu is inserted before to keep the
+     * Player -> Counters menu ordered by counter id, or nullptr to append.
+     */
+    [[nodiscard]] QAction *counterMenuInsertAnchor(int counterId) const;
+    /** @brief Adds or removes a counter's submenu in the Player -> Counters menu. */
+    void setCounterMenuRegistered(AbstractCounter *widget, bool registered);
     /** @brief Returns the command zone's display height, or 0 if hidden. */
     [[nodiscard]] qreal totalCommandZoneHeight() const;
     /** @brief Positions the command and stack zones vertically starting from base, updating base.y. */
