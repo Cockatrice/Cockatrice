@@ -47,6 +47,17 @@ GameScene::~GameScene()
 {
     delete animationTimer;
 
+    // Delete all ArrowItems before QGraphicsScene's base destructor runs.
+    // QGraphicsScene::~QGraphicsScene() destroys items in arbitrary order.
+    // If a PlayerTarget is destroyed before an ArrowItem pointing to it,
+    // ArrowItem::onTargetDestroyed fires and emits on the partially-destroyed
+    // GameScene, causing a segfault.
+    for (auto *item : items()) {
+        if (auto *arrow = qgraphicsitem_cast<ArrowItem *>(item)) {
+            delete arrow;
+        }
+    }
+
     // DO NOT call clearViews() here
     // clearViews calls close() on the zoneViews, which sends signals; sending signals in destructors leads to segfaults
     // deleteLater() deletes the zoneView without allowing it to send signals
@@ -530,7 +541,9 @@ void GameScene::clearArrowsForPlayer(int playerId)
 void GameScene::clearArrowsForPlayerLocally(int playerId)
 {
     for (int arrowId : arrowRegistry.idsForPlayer(playerId)) {
-        arrowRegistry.take(playerId, arrowId)->delArrow();
+        if (auto *arrow = arrowRegistry.take(playerId, arrowId)) {
+            arrow->delArrow();
+        }
     }
 }
 
