@@ -4,7 +4,6 @@
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../deck_loader/card_node_function.h"
 #include "../../deck_loader/deck_loader.h"
-#include "dlg_settings.h"
 
 #include <QApplication>
 #include <QCheckBox>

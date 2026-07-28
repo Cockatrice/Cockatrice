@@ -249,10 +249,13 @@ set(cockatrice_SOURCES
     src/interface/widgets/server/user/user_list_manager.cpp
     src/interface/widgets/server/user/user_list_painter.cpp
     src/interface/widgets/server/user/user_list_widget.cpp
+    src/interface/widgets/settings_page/abstract_settings_page.cpp
     src/interface/widgets/settings_page/appearance_settings_page.cpp
     src/interface/widgets/settings_page/deck_editor_settings_page.cpp
     src/interface/widgets/settings_page/general_settings_page.cpp
     src/interface/widgets/settings_page/messages_settings_page.cpp
+    src/interface/widgets/settings_page/settings_search_delegate.cpp
+    src/interface/widgets/settings_page/settings_search_model.cpp
     src/interface/widgets/settings_page/shortcut_settings_page.cpp
     src/interface/widgets/settings_page/sound_settings_page.cpp
     src/interface/widgets/settings_page/storage_settings_page.cpp
