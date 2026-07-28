@@ -13,7 +13,6 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QSaveFile>
-#include <QVariantHash>
 
 namespace
 {
@@ -34,11 +33,11 @@ QString readString(QDataStream &in)
     return s;
 }
 
-// Stores a QVariantHash as a single pre-serialized blob. The reader keeps the
-// blob as-is and materializes the QVariantHash lazily on first query, which is
+// Stores a QHash<QString, QString> as a single pre-serialized blob. The reader keeps the
+// blob as-is and materializes the QHash<QString, QString> lazily on first query, which is
 // what removes the allocation storm from database load (see card_info.cpp /
 // printing_info.cpp).
-void writeHashBlob(QDataStream &out, const QVariantHash &h)
+void writeHashBlob(QDataStream &out, const QHash<QString, QString> &h)
 {
     QByteArray blob;
     QDataStream blobOut(&blob, QIODevice::WriteOnly);

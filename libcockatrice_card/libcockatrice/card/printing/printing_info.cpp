@@ -27,14 +27,14 @@ void PrintingInfo::ensurePropertiesLoaded() const
 void PrintingInfo::setProperty(const QString &_name, const QString &_value)
 {
     ensurePropertiesLoaded();
-    if (propertiesCache.value(_name).toString() == _value) {
+    if (propertiesCache.value(_name) == _value) {
         return;
     }
     propertiesCache.insert(_name, _value);
     setProperties(propertiesCache);
 }
 
-void PrintingInfo::setProperties(const QVariantHash &_props)
+void PrintingInfo::setProperties(const QHash<QString, QString> &_props)
 {
     ensurePropertiesLoaded();
     propertiesCache = _props;
@@ -48,10 +48,10 @@ void PrintingInfo::setProperties(const QVariantHash &_props)
  */
 QString PrintingInfo::getUuid() const
 {
-    return getPropertiesHash().value("uuid").toString();
+    return getPropertiesHash().value("uuid");
 }
 
 QString PrintingInfo::getFlavorName() const
 {
-    return getPropertiesHash().value("flavorName").toString();
+    return getPropertiesHash().value("flavorName");
 }
