@@ -24,26 +24,58 @@ public:
     int newCounterId() const;
     void addCounter(Server_Counter *counter);
 
-    // Pure authorization/decision logic extracted from the corresponding cmd* handlers
-    // so it can be unit-tested in isolation. These take all relevant state as parameters
-    // and touch no instance members, hence static. They return RespOk when the command
-    // is permitted, or the appropriate error response otherwise.
+    /** @name Counter command authorization
+     *  Decision logic extracted from the corresponding cmd* handlers so it can be unit-tested
+     *  in isolation. Each function takes all relevant state as parameters and touches no
+     *  instance members, hence static.
+     *  @{
+     */
+
+    /**
+     * @brief Decide whether a client may delete a counter.
+     *
+     * Reserved tax counters are server-managed and may never be deleted by a client.
+     *
+     * @param counter Counter with id counterId, or nullptr if the player has no such counter.
+     * @return Response::RespOk if permitted, otherwise the error response for the client.
+     */
     static Response::ResponseCode
     evaluateDelCounter(bool gameStarted, bool playerConceded, int counterId, const Server_Counter *counter);
+
+    /**
+     * @brief Decide whether a client may change a counter's active (visible) state.
+     *
+     * Only reserved tax counters can be toggled, and one holding a non-zero value must be reset
+     * to zero before it can be deactivated.
+     *
+     * @param counter Counter with id counterId, or nullptr if the player has no such counter.
+     * @param requestedActive Active state the client asked for.
+     * @return Response::RespOk if permitted, otherwise the error response for the client.
+     */
     static Response::ResponseCode evaluateSetCounterActive(bool gameStarted,
                                                            bool playerConceded,
                                                            bool commandZoneEnabled,
                                                            int counterId,
                                                            const Server_Counter *counter,
                                                            bool requestedActive);
-    // Authorization shared by cmdIncCounter and cmdSetCounter. Reserved tax counters
-    // may only be modified inside a Commander game and only while active, so that an
-    // inactive (hidden) tax counter can never accumulate a value behind the scenes.
+
+    /**
+     * @brief Decide whether a client may change a counter's value.
+     *
+     * Shared by cmdIncCounter and cmdSetCounter. Reserved tax counters may only be modified
+     * inside a Commander game and only while active, so an inactive (hidden) tax counter can
+     * never accumulate a value behind the scenes.
+     *
+     * @param counter Counter with id counterId, or nullptr if the player has no such counter.
+     * @return Response::RespOk if permitted, otherwise the error response for the client.
+     */
     static Response::ResponseCode evaluateModifyCounter(bool gameStarted,
                                                         bool playerConceded,
                                                         bool commandZoneEnabled,
                                                         int counterId,
                                                         const Server_Counter *counter);
+
+    /** @} */
 
     void setupZones() override;
     void clearZones() override;
