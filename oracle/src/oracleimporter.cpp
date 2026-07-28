@@ -316,7 +316,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
             }
         }
 
-        PrintingInfo printingInfo(currentSet, printingProps);
+        PrintingInfo printingInfo(currentSet, LazyPropertiesHash(printingProps));
 
         QString numComponent;
         const QString numProperty = printingInfo.getProperty("num");

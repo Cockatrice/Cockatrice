@@ -5,37 +5,14 @@
 #include <QDataStream>
 #include <QIODevice>
 
-PrintingInfo::PrintingInfo(const CardSetPtr &_set, const QHash<QString, QString> &_properties)
-    : set(_set), propertiesCache(_properties), propertiesLoaded(true)
+PrintingInfo::PrintingInfo(const CardSetPtr &_set, const LazyPropertiesHash &_properties)
+    : set(_set), properties(_properties)
 {
-}
-
-PrintingInfo::PrintingInfo(const CardSetPtr &_set, const QByteArray &_blob) : set(_set), propertiesBlob(_blob)
-{
-}
-
-void PrintingInfo::ensurePropertiesLoaded() const
-{
-    QMutexLocker lock(propertiesMutex.data());
-    if (propertiesLoaded) {
-        return;
-    }
-    propertiesCache.clear();
-    if (!propertiesBlob.isEmpty()) {
-        QDataStream in(propertiesBlob);
-        in.setVersion(QDataStream::Qt_6_4);
-        in >> propertiesCache;
-    }
-    propertiesLoaded = true;
 }
 
 void PrintingInfo::setProperty(const QString &_name, const QString &_value)
 {
-    ensurePropertiesLoaded();
-    if (propertiesCache.value(_name) == _value) {
-        return;
-    }
-    propertiesCache.insert(_name, _value);
+    properties.insert(_name, _value);
 }
 
 /**
