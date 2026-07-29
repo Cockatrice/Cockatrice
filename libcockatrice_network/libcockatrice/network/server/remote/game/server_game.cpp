@@ -53,34 +53,22 @@
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 
-Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
-                         int _gameId,
-                         const QString &_description,
-                         const QString &_password,
-                         int _maxPlayers,
-                         const QList<int> &_gameTypes,
-                         bool _onlyBuddies,
-                         bool _onlyRegistered,
-                         bool _spectatorsAllowed,
-                         bool _spectatorsNeedPassword,
-                         bool _spectatorsCanTalk,
-                         bool _spectatorsSeeEverything,
-                         int _startingLifeTotal,
-                         bool _shareDecklistsOnLoad,
-                         Server_Room *_room)
-    : QObject(), room(_room), nextPlayerId(0), hostId(0), creatorInfo(new ServerInfo_User(_creatorInfo)),
-      gameStarted(false), gameClosed(false), gameId(_gameId), password(_password), maxPlayers(_maxPlayers),
-      gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies),
-      onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed),
-      spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk),
-      spectatorsSeeEverything(_spectatorsSeeEverything), startingLifeTotal(_startingLifeTotal),
-      shareDecklistsOnLoad(_shareDecklistsOnLoad), inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0),
-      firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
+Server_Game::Server_Game(const GameConfig &config, Server_Room *_room)
+    : QObject(), room(_room), nextPlayerId(0), hostId(0), creatorInfo(new ServerInfo_User(config.creatorInfo)),
+      gameStarted(false), gameClosed(false), gameId(config.gameId), description(config.description.simplified()),
+      password(config.password), maxPlayers(config.maxPlayers), gameTypes(config.gameTypes), activePlayer(-1),
+      activePhase(-1), onlyBuddies(config.onlyBuddies), onlyRegistered(config.onlyRegistered),
+      spectatorsAllowed(config.spectatorsAllowed), spectatorsNeedPassword(config.spectatorsNeedPassword),
+      spectatorsCanTalk(config.spectatorsCanTalk), spectatorsSeeEverything(config.spectatorsSeeEverything),
+      startingLifeTotal(config.startingLifeTotal), shareDecklistsOnLoad(config.shareDecklistsOnLoad),
+      inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false),
+      turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
+      deckValidationStrategy(new Server_DefaultDeckValidationStrategy),
+      matchResultStrategy(new Server_NullMatchResultStrategy), lifecycleStrategy(new Server_DefaultLifecycleStrategy),
       gameMutex()
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
-    description = _description.simplified();
 
     connect(this, &Server_Game::sigStartGameIfReady, this, &Server_Game::doStartGameIfReady, Qt::QueuedConnection);
 
@@ -118,6 +106,10 @@ Server_Game::~Server_Game()
     for (auto *replay : replayList) {
         delete replay;
     }
+
+    delete deckValidationStrategy;
+    delete matchResultStrategy;
+    delete lifecycleStrategy;
     replayList.clear();
 
     room = nullptr;
@@ -343,6 +335,13 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
     }
 
     players = getPlayers(); // players could have been kicked, get new list of players
+
+    // Delegate pre-start logic (draft/tournament) to lifecycle strategy
+    if (lifecycleStrategy->onGameStarting(this) == Server_GameLifecycleStrategy::StartAction::Handled) {
+        locker.unlock();
+        return;
+    }
+
     for (Server_AbstractPlayer *player : players.values()) {
         player->setupZones();
     }
@@ -400,10 +399,12 @@ void Server_Game::stopGameIfFinished()
     QMutexLocker locker(&gameMutex);
 
     int playing = 0;
+    Server_AbstractPlayer *lastPlayer = nullptr;
     auto players = getPlayers();
     for (auto *player : players.values()) {
         if (!player->getConceded()) {
             ++playing;
+            lastPlayer = player;
         }
     }
     if (playing > 1) {
@@ -418,6 +419,17 @@ void Server_Game::stopGameIfFinished()
     }
 
     sendGameStateToPlayers();
+
+    // Delegate post-game actions (e.g., tournament reporting) to the match result strategy
+    bool matchDecided = matchResultStrategy->onGameFinished(this, playing, lastPlayer);
+    if (matchDecided) {
+        locker.unlock();
+
+        sendGameEventContainer(prepareGameEvent(Event_GameClosed(), -1));
+        gameClosed = true;
+        deleteLater();
+        return;
+    }
 
     locker.unlock();
 
@@ -900,4 +912,12 @@ void Server_Game::returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPl
             break;
         }
     }
+}
+
+void Server_Game::setDeckValidationStrategy(Server_DeckValidationStrategy *strategy)
+{
+    if (deckValidationStrategy) {
+        delete deckValidationStrategy;
+    }
+    deckValidationStrategy = strategy;
 }

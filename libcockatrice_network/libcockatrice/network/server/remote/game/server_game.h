@@ -21,6 +21,10 @@
 #define SERVERGAME_H
 
 #include "../server_response_containers.h"
+#include "game_config.h"
+#include "server_deck_validation_strategy.h"
+#include "server_game_lifecycle_strategy.h"
+#include "server_match_result_strategy.h"
 
 #include <QDateTime>
 #include <QMap>
@@ -78,6 +82,10 @@ private:
     QList<GameReplay *> replayList;
     GameReplay *currentReplay;
 
+    Server_DeckValidationStrategy *deckValidationStrategy;
+    Server_MatchResultStrategy *matchResultStrategy;
+    Server_GameLifecycleStrategy *lifecycleStrategy;
+
     void createGameStateChangedEvent(Event_GameStateChanged *event,
                                      Server_AbstractParticipant *recipient,
                                      bool omniscient,
@@ -92,21 +100,7 @@ private slots:
 
 public:
     mutable QRecursiveMutex gameMutex;
-    Server_Game(const ServerInfo_User &_creatorInfo,
-                int _gameId,
-                const QString &_description,
-                const QString &_password,
-                int _maxPlayers,
-                const QList<int> &_gameTypes,
-                bool _onlyBuddies,
-                bool _onlyRegistered,
-                bool _spectatorsAllowed,
-                bool _spectatorsNeedPassword,
-                bool _spectatorsCanTalk,
-                bool _spectatorsSeeEverything,
-                int _startingLifeTotal,
-                bool _shareDecklistsOnLoad,
-                Server_Room *parent);
+    Server_Game(const GameConfig &config, Server_Room *parent);
     ~Server_Game() override;
     Server_Room *getRoom() const
     {
@@ -221,6 +215,16 @@ public:
                                                                                    GameEventStorageItem::SendToOthers,
                                 int privatePlayerId = -1);
     void returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPlayer *player);
+
+    Server_DeckValidationStrategy *getDeckValidationStrategy() const
+    {
+        return deckValidationStrategy;
+    }
+    Server_GameLifecycleStrategy *getLifecycleStrategy() const
+    {
+        return lifecycleStrategy;
+    }
+    void setDeckValidationStrategy(Server_DeckValidationStrategy *strategy);
 };
 
 #endif

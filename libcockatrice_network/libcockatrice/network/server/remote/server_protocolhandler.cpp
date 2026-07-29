@@ -1,5 +1,6 @@
 #include "server_protocolhandler.h"
 
+#include "game/game_config.h"
 #include "game/server_game.h"
 #include "game/server_player.h"
 #include "server_database_interface.h"
@@ -885,10 +886,23 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
     bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
-    auto *game = new Server_Game(copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()),
-                                 cmd.max_players(), gameTypes, cmd.only_buddies(), onlyRegisteredUsers,
-                                 cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(),
-                                 cmd.spectators_see_everything(), startingLifeTotal, shareDecklistsOnLoad, room);
+    GameConfig config;
+    config.creatorInfo = copyUserInfo(false);
+    config.gameId = gameId;
+    config.description = description;
+    config.password = QString::fromStdString(cmd.password());
+    config.maxPlayers = cmd.max_players();
+    config.gameTypes = gameTypes;
+    config.onlyBuddies = cmd.only_buddies();
+    config.onlyRegistered = onlyRegisteredUsers;
+    config.spectatorsAllowed = cmd.spectators_allowed();
+    config.spectatorsNeedPassword = cmd.spectators_need_password();
+    config.spectatorsCanTalk = cmd.spectators_can_talk();
+    config.spectatorsSeeEverything = cmd.spectators_see_everything();
+    config.startingLifeTotal = startingLifeTotal;
+    config.shareDecklistsOnLoad = shareDecklistsOnLoad;
+
+    auto *game = new Server_Game(config, room);
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);
