@@ -1,18 +1,62 @@
 #include "dlg_register.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../server/handle_public_servers.h"
+#include "../server/user/user_info_connection.h"
 
-#include <QCheckBox>
+#include <QComboBox>
 #include <QDialogButtonBox>
 #include <QGridLayout>
+#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QVBoxLayout>
 #include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
 {
+    // ── Server picker ──────────────────────────────────────────────────
+    previousHostButton = new QRadioButton(tr("Known Hosts"), this);
+    previousHosts = new QComboBox(this);
+
+    btnDeleteServer = new QPushButton(this);
+    btnDeleteServer->setIcon(QPixmap("theme:icons/remove_row"));
+    btnDeleteServer->setToolTip(tr("Delete the currently selected saved server"));
+    btnDeleteServer->setFixedWidth(30);
+
+    connect(btnDeleteServer, &QPushButton::clicked, this, &DlgRegister::actRemoveSavedServer);
+
+    hps = new HandlePublicServers(this);
+    btnRefreshServers = new QPushButton(this);
+    btnRefreshServers->setIcon(QPixmap("theme:icons/sync"));
+    btnRefreshServers->setToolTip(tr("Refresh the server list with known public servers"));
+    btnRefreshServers->setFixedWidth(30);
+
+    connect(hps, &HandlePublicServers::sigPublicServersDownloadedSuccessfully, this, [this] { rebuildComboBoxList(); });
+    connect(hps, &HandlePublicServers::sigPublicServersDownloadedUnsuccessfully, this,
+            &DlgRegister::rebuildComboBoxList);
+    connect(btnRefreshServers, &QPushButton::released, this, &DlgRegister::downloadThePublicServers);
+
+    newHostButton = new QRadioButton(tr("New Host"), this);
+
+    auto *serverPickerRow = new QHBoxLayout;
+    serverPickerRow->addWidget(previousHosts);
+    serverPickerRow->addWidget(btnDeleteServer);
+    serverPickerRow->addWidget(btnRefreshServers);
+
+    auto *serverGroupLayout = new QVBoxLayout;
+    serverGroupLayout->addWidget(previousHostButton);
+    serverGroupLayout->addLayout(serverPickerRow);
+    serverGroupLayout->addWidget(newHostButton);
+
+    auto *serverGroupBox = new QGroupBox(tr("Server"));
+    serverGroupBox->setLayout(serverGroupLayout);
+
+    // ── Registration fields ────────────────────────────────────────────
     ServersSettings &servers = SettingsCache::instance().servers();
     infoLabel = new QLabel(tr("Enter your information and the information of the server you'd like to register to.\n"
                               "Your email will be used to verify your account."));
@@ -321,26 +365,28 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     realnameEdit->setMaxLength(MAX_NAME_LENGTH);
     realnameLabel->setBuddy(realnameEdit);
 
+    // ── Layout ─────────────────────────────────────────────────────────
     auto *grid = new QGridLayout;
-    grid->addWidget(infoLabel, 0, 0, 1, 2);
-    grid->addWidget(hostLabel, 1, 0);
-    grid->addWidget(hostEdit, 1, 1);
-    grid->addWidget(portLabel, 2, 0);
-    grid->addWidget(portEdit, 2, 1);
-    grid->addWidget(playernameLabel, 3, 0);
-    grid->addWidget(playernameEdit, 3, 1);
-    grid->addWidget(passwordLabel, 4, 0);
-    grid->addWidget(passwordEdit, 4, 1);
-    grid->addWidget(passwordConfirmationLabel, 5, 0);
-    grid->addWidget(passwordConfirmationEdit, 5, 1);
-    grid->addWidget(emailLabel, 6, 0);
-    grid->addWidget(emailEdit, 6, 1);
-    grid->addWidget(emailConfirmationLabel, 7, 0);
-    grid->addWidget(emailConfirmationEdit, 7, 1);
-    grid->addWidget(countryLabel, 9, 0);
-    grid->addWidget(countryEdit, 9, 1);
-    grid->addWidget(realnameLabel, 10, 0);
-    grid->addWidget(realnameEdit, 10, 1);
+    grid->addWidget(serverGroupBox, 0, 0, 1, 2);
+    grid->addWidget(infoLabel, 1, 0, 1, 2);
+    grid->addWidget(hostLabel, 2, 0);
+    grid->addWidget(hostEdit, 2, 1);
+    grid->addWidget(portLabel, 3, 0);
+    grid->addWidget(portEdit, 3, 1);
+    grid->addWidget(playernameLabel, 4, 0);
+    grid->addWidget(playernameEdit, 4, 1);
+    grid->addWidget(passwordLabel, 5, 0);
+    grid->addWidget(passwordEdit, 5, 1);
+    grid->addWidget(passwordConfirmationLabel, 6, 0);
+    grid->addWidget(passwordConfirmationEdit, 6, 1);
+    grid->addWidget(emailLabel, 7, 0);
+    grid->addWidget(emailEdit, 7, 1);
+    grid->addWidget(emailConfirmationLabel, 8, 0);
+    grid->addWidget(emailConfirmationEdit, 8, 1);
+    grid->addWidget(countryLabel, 10, 0);
+    grid->addWidget(countryEdit, 10, 1);
+    grid->addWidget(realnameLabel, 11, 0);
+    grid->addWidget(realnameEdit, 11, 1);
 
     auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgRegister::actOk);
@@ -352,13 +398,111 @@ DlgRegister::DlgRegister(QWidget *parent) : QDialog(parent)
     setLayout(mainLayout);
 
     setWindowTitle(tr("Register to server"));
-    setFixedHeight(sizeHint().height());
-    setMinimumWidth(300);
+    setMinimumWidth(360);
+
+    connect(previousHostButton, &QRadioButton::toggled, this, &DlgRegister::previousHostSelected);
+    connect(newHostButton, &QRadioButton::toggled, this, &DlgRegister::newHostSelected);
+    connect(previousHosts, &QComboBox::currentTextChanged, this, &DlgRegister::updateDisplayInfo);
+
+    previousHostButton->setChecked(true);
+
+    preRebuildComboBoxList();
+}
+
+DlgRegister::~DlgRegister() = default;
+
+void DlgRegister::downloadThePublicServers()
+{
+    btnRefreshServers->setDisabled(true);
+    previousHosts->clear();
+    previousHosts->addItem(placeHolderText);
+    hps->downloadPublicServers();
+}
+
+void DlgRegister::preRebuildComboBoxList()
+{
+    UserConnection_Information uci;
+    savedHostList = uci.getServerInfo();
+
+    if (savedHostList.size() == 1) {
+        downloadThePublicServers();
+    } else {
+        rebuildComboBoxList();
+    }
+}
+
+void DlgRegister::rebuildComboBoxList(int failure)
+{
+    Q_UNUSED(failure);
+
+    previousHosts->clear();
+
+    UserConnection_Information uci;
+    savedHostList = uci.getServerInfo();
+
+    auto &servers = SettingsCache::instance().servers();
+    QString previousHostName = servers.getPrevioushostName();
+
+    for (const auto &pair : savedHostList) {
+        const auto &tmp = pair.second;
+        QString saveName = tmp.getSaveName();
+        if (saveName.size()) {
+            previousHosts->addItem(saveName);
+            if (saveName.compare(previousHostName) == 0) {
+                previousHosts->setCurrentIndex(previousHosts->count() - 1);
+            }
+        }
+    }
+
+    btnRefreshServers->setDisabled(false);
+}
+
+void DlgRegister::previousHostSelected(bool state)
+{
+    if (state) {
+        previousHosts->setDisabled(false);
+        btnRefreshServers->setDisabled(false);
+        hostEdit->setDisabled(true);
+        portEdit->setDisabled(true);
+    }
+}
+
+void DlgRegister::newHostSelected(bool state)
+{
+    if (state) {
+        previousHosts->setDisabled(true);
+        btnRefreshServers->setDisabled(true);
+        hostEdit->setDisabled(false);
+        hostEdit->clear();
+        hostEdit->setPlaceholderText(tr("Server URL"));
+        portEdit->setDisabled(false);
+        portEdit->clear();
+        portEdit->setPlaceholderText(tr("Communication Port"));
+        playernameEdit->setDisabled(false);
+        playernameEdit->clear();
+    }
+}
+
+void DlgRegister::updateDisplayInfo(const QString &saveName)
+{
+    if (saveName.isEmpty() || saveName == placeHolderText) {
+        return;
+    }
+
+    UserConnection_Information uci;
+    QStringList _data = uci.getServerInfo(saveName);
+
+    if (_data.size() < 7) {
+        return;
+    }
+
+    hostEdit->setText(_data.at(1));
+    portEdit->setText(_data.at(2));
+    playernameEdit->setText(_data.at(3));
 }
 
 void DlgRegister::actOk()
 {
-    //! \todo This stuff should be using QValidators.
     if (passwordEdit->text().length() < 8) {
         QMessageBox::critical(this, tr("Registration Warning"), tr("Your password is too short."));
         return;
@@ -376,4 +520,10 @@ void DlgRegister::actOk()
     }
 
     accept();
+}
+
+void DlgRegister::actRemoveSavedServer()
+{
+    SettingsCache::instance().servers().removeServer(hostEdit->text());
+    previousHosts->removeItem(previousHosts->currentIndex());
 }
