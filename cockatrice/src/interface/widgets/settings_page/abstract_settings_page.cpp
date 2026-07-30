@@ -60,6 +60,20 @@ QList<SettingsSearchEntry> AbstractSettingsPage::autoDetectSearchEntries(QWidget
                 }
 
                 if (!label.isEmpty()) {
+                    // Skip QLabels that are not setting names: HTML, path values, or excessively long
+                    if (qobject_cast<QLabel *>(widget)) {
+                        auto *labelWidget = static_cast<QLabel *>(widget);
+                        if (labelWidget->textFormat() != Qt::PlainText) {
+                            continue;
+                        }
+                        if (label.contains(QLatin1Char('/')) || label.contains(QLatin1Char('\\'))) {
+                            continue;
+                        }
+                        if (label.size() > 60) {
+                            continue;
+                        }
+                    }
+
                     // Strip accelerator markers (&) for search
                     QString cleanLabel = label;
                     cleanLabel.remove(QLatin1Char('&'));
@@ -96,6 +110,20 @@ QList<SettingsSearchEntry> AbstractSettingsPage::autoDetectSearchEntries(QWidget
                     }
 
                     if (!label.isEmpty()) {
+                        // Skip QLabels that are not setting names: HTML, path values, or excessively long
+                        if (qobject_cast<QLabel *>(nestedWidget)) {
+                            auto *labelWidget = static_cast<QLabel *>(nestedWidget);
+                            if (labelWidget->textFormat() != Qt::PlainText) {
+                                continue;
+                            }
+                            if (label.contains(QLatin1Char('/')) || label.contains(QLatin1Char('\\'))) {
+                                continue;
+                            }
+                            if (label.size() > 60) {
+                                continue;
+                            }
+                        }
+
                         QString cleanLabel = label;
                         cleanLabel.remove(QLatin1Char('&'));
 

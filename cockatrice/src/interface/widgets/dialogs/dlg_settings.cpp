@@ -50,7 +50,7 @@
  * @param widget The widget to wrap
  * @return The scroll area containing the widget
  */
-static QScrollArea *makeScrollableModern(QWidget *widget)
+static QScrollArea *makeScrollable(QWidget *widget)
 {
     widget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
 
@@ -74,6 +74,8 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent), currentTabIndex(0),
 
     connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &DlgSettings::retranslateUi);
     retranslateUi();
+
+    searchEdit->setFocus();
 
     adjustSize();
 }
@@ -114,14 +116,14 @@ void DlgSettings::setupUi()
     pages.append(soundPage);
     pages.append(shortcutsPage);
 
-    pagesWidget->addWidget(makeScrollableModern(generalPage));
-    pagesWidget->addWidget(makeScrollableModern(appearancePage));
-    pagesWidget->addWidget(makeScrollableModern(userInterfacePage));
-    pagesWidget->addWidget(makeScrollableModern(deckEditorPage));
-    pagesWidget->addWidget(makeScrollableModern(storagePage));
-    pagesWidget->addWidget(makeScrollableModern(messagesPage));
-    pagesWidget->addWidget(makeScrollableModern(soundPage));
-    pagesWidget->addWidget(makeScrollableModern(shortcutsPage));
+    pagesWidget->addWidget(makeScrollable(generalPage));
+    pagesWidget->addWidget(makeScrollable(appearancePage));
+    pagesWidget->addWidget(makeScrollable(userInterfacePage));
+    pagesWidget->addWidget(makeScrollable(deckEditorPage));
+    pagesWidget->addWidget(makeScrollable(storagePage));
+    pagesWidget->addWidget(makeScrollable(messagesPage));
+    pagesWidget->addWidget(makeScrollable(soundPage));
+    pagesWidget->addWidget(makeScrollable(shortcutsPage));
 
     // Search results view (hidden by default)
     searchResultsView = new QListView;
@@ -388,7 +390,6 @@ void DlgSettings::navigateToSearchResult(const QModelIndex &index)
         if (scrollArea) {
             scrollArea->ensureWidgetVisible(entry.widget);
         }
-        entry.widget->setFocus();
         flashWidget(entry.widget);
     }
 }
