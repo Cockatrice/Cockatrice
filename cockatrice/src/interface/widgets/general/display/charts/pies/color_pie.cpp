@@ -82,11 +82,9 @@ void ColorPie::paintEvent(QPaintEvent *)
         QString label = QString("%1%").arg(int(ratio * 100 + 0.5));
 
         QFontMetrics fm(p.font());
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+
         int labelWidth = fm.horizontalAdvance(label);
-#else
-        int labelWidth = fm.width(label);
-#endif
+
         QRectF textRect(labelPos.x() - labelWidth / 2.0, labelPos.y() - fm.height() / 2.0, labelWidth, fm.height());
 
         p.setPen(Qt::black);
@@ -96,19 +94,11 @@ void ColorPie::paintEvent(QPaintEvent *)
     }
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void ColorPie::enterEvent(QEnterEvent *event)
 {
     Q_UNUSED(event);
     isHovered = true;
 }
-#else
-void ColorPie::enterEvent(QEvent *event)
-{
-    Q_UNUSED(event);
-    isHovered = true;
-}
-#endif
 
 void ColorPie::leaveEvent(QEvent *)
 {
@@ -121,13 +111,8 @@ void ColorPie::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QPoint p = event->position().toPoint();
     QPoint gp = event->globalPosition().toPoint();
-#else
-    QPoint p = event->pos();
-    QPoint gp = event->globalPos();
-#endif
 
     QString text = tooltipForPoint(p);
     if (!text.isEmpty()) {

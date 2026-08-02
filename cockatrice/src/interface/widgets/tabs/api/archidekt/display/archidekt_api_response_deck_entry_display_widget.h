@@ -97,12 +97,7 @@ public slots:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    void enterEvent(QEnterEvent *event) override; ///< Qt6 hover enter
-#else
-    void enterEvent(QEvent *event) override; ///< Qt5 hover enter
-#endif
+    void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
 
 private:

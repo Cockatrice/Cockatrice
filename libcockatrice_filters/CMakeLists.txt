@@ -8,8 +8,6 @@ set(HEADERS libcockatrice/filters/filter_card.h libcockatrice/filters/filter_str
 
 if(Qt6_FOUND)
   qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-elseif(Qt5_FOUND)
-  qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
 endif()
 
 add_library(

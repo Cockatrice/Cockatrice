@@ -47,7 +47,7 @@ else()
   file(GLOB oracle_TS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
 endif(UPDATE_TRANSLATIONS)
 
-if(WIN32)
+if(WIN32) # Windows (including 64bit)
   set(oracle_SOURCES ${oracle_SOURCES} oracle.rc)
 endif(WIN32)
 
@@ -66,8 +66,6 @@ set(oracle_RESOURCES oracle.qrc)
 # ------------------------
 if(Qt6_FOUND)
   qt6_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
-elseif(Qt5_FOUND)
-  qt5_add_resources(oracle_RESOURCES_RCC ${oracle_RESOURCES})
 endif()
 
 # ------------------------
@@ -117,25 +115,6 @@ if(Qt6_FOUND)
     ${oracle_MOC_SRCS}
     MANUAL_FINALIZATION
   )
-elseif(Qt5_FOUND)
-  # Qt5 Translations need to be linked at executable creation time
-  if(Qt5LinguistTools_FOUND)
-    if(UPDATE_TRANSLATIONS)
-      qt5_create_translation(oracle_QM ${translate_SRCS} ${oracle_TS})
-    else()
-      qt5_add_translation(oracle_QM ${oracle_TS})
-    endif()
-  endif()
-  add_executable(oracle WIN32 MACOSX_BUNDLE ${oracle_MOC_SRCS} ${oracle_QM} ${oracle_RESOURCES_RCC} ${oracle_SOURCES})
-  if(UNIX)
-    if(APPLE)
-      install(FILES ${oracle_QM} DESTINATION ${ORACLE_MAC_QM_INSTALL_DIR})
-    else()
-      install(FILES ${oracle_QM} DESTINATION ${ORACLE_UNIX_QM_INSTALL_DIR})
-    endif()
-  elseif(WIN32)
-    install(FILES ${oracle_QM} DESTINATION ${ORACLE_WIN32_QM_INSTALL_DIR})
-  endif()
 endif()
 
 # ------------------------
@@ -172,12 +151,12 @@ if(UNIX)
 
     install(TARGETS oracle BUNDLE DESTINATION ./)
   else()
-    # Assume linux
+    # Assume Linux
     install(TARGETS oracle RUNTIME DESTINATION bin/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/oracle.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
   endif()
-elseif(WIN32)
+elseif(WIN32) # Windows (including 64bit)
   install(TARGETS oracle RUNTIME DESTINATION ./)
 endif()
 
@@ -189,7 +168,7 @@ endif(NOT WIN32 AND NOT APPLE)
 # Qt plugin handling
 # ------------------------
 if(APPLE)
-  # these needs to be relative to CMAKE_INSTALL_PREFIX
+  # These needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir oracle.app/Contents/Plugins)
   set(qtconf_dest_dir oracle.app/Contents/Resources)
 
@@ -228,8 +207,8 @@ Translations = Resources/translations\")
   )
 endif()
 
-if(WIN32)
-  # these needs to be relative to CMAKE_INSTALL_PREFIX
+if(WIN32) # Windows (including 64bit)
+  # These needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir Plugins)
   set(qtconf_dest_dir .)
   list(APPEND libSearchDirs ${QT_LIBRARY_DIR})
@@ -286,7 +265,7 @@ endif()
 # Qt translations
 # ------------------------
 if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
-  #Qt6 Translations happen after the executable is built up
+  # Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
     qt6_add_translations(
       oracle
@@ -307,7 +286,7 @@ if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
     else()
       install(FILES ${oracle_QM} DESTINATION ${ORACLE_UNIX_QM_INSTALL_DIR})
     endif()
-  elseif(WIN32)
+  elseif(WIN32) # Windows (including 64bit)
     install(FILES ${oracle_QM} DESTINATION ${ORACLE_WIN32_QM_INSTALL_DIR})
   endif()
 endif()

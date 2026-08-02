@@ -2,14 +2,11 @@
 
 #include "settings/cache_settings.h"
 
-#include <QDir>
-#include <QMediaPlayer>
-
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 #include <QApplication>
 #include <QAudioOutput>
+#include <QDir>
+#include <QMediaPlayer>
 #include <libcockatrice/settings/sound_settings.h>
-#endif
 
 #define DEFAULT_THEME_NAME "Default"
 #define TEST_SOUND_FILENAME "player_join"
@@ -44,10 +41,8 @@ void SoundEngine::soundEnabledChanged()
         qCInfo(SoundEngineLog) << "SoundEngine: enabling sound with" << audioData.size() << "sounds";
         if (!player) {
             player = new QMediaPlayer;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
             audioOutput = new QAudioOutput(player);
             player->setAudioOutput(audioOutput);
-#endif
         }
     } else {
         qCInfo(SoundEngineLog) << "SoundEngine: disabling sound";
@@ -75,13 +70,8 @@ void SoundEngine::playSound(const QString &fileName)
 
     player->stop();
     int volumeSliderValue = SettingsCache::instance().sound().getMasterVolume();
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     player->audioOutput()->setVolume(qreal(volumeSliderValue) / 100);
     player->setSource(QUrl::fromLocalFile(audioData[fileName]));
-#else
-    player->setVolume(volumeSliderValue);
-    player->setMedia(QUrl::fromLocalFile(audioData[fileName]));
-#endif
     player->play();
 }
 

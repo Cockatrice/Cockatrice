@@ -109,12 +109,8 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
     {
         str = "null";
     }
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if ((data.typeId() == QMetaType::Type::QVariantList) ||
              (data.typeId() == QMetaType::Type::QStringList)) // variant is a list?
-#else
-    else if ((data.type() == QVariant::List) || (data.type() == QVariant::StringList))  // variant is a list?
-#endif
     {
         QList<QByteArray> values;
         const QVariantList list = data.toList();
@@ -129,11 +125,7 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
 
         str = "[ " + join(values, ", ") + " ]";
     }
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if ((data.typeId() == QMetaType::Type::QVariantHash)) // variant is a list?
-#else
-    else if (data.type() == QVariant::Hash)                                             // variant is a hash?
-#endif
     {
         const QVariantHash vhash = data.toHash();
         QHashIterator<QString, QVariant> it(vhash);
@@ -155,11 +147,7 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
         str += join(pairs, ", ");
         str += " }";
     }
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if ((data.typeId() == QMetaType::Type::QVariantMap)) // variant is a list?
-#else
-    else if (data.type() == QVariant::Map)                                              // variant is a map?
-#endif
     {
         const QVariantMap vmap = data.toMap();
         QMapIterator<QString, QVariant> it(vmap);
@@ -177,39 +165,23 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
         str += join(pairs, ", ");
         str += " }";
     }
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if ((data.typeId() == QMetaType::Type::QString) ||
              (data.typeId() == QMetaType::Type::QByteArray)) // variant is a list?
-#else
-    else if ((data.type() == QVariant::String) || (data.type() == QVariant::ByteArray)) // a string or a byte array?
-#endif
     {
         str = sanitizeString(data.toString()).toUtf8();
     }
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if (data.typeId() == QMetaType::Type::Double)
-#else
-    else if (data.type() == QVariant::Double)                                           // double?
-#endif
     {
         str = QByteArray::number(data.toDouble(), 'g', 20);
         if (!str.contains(".") && !str.contains("e")) {
             str += ".0";
         }
     }
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if (data.typeId() == QMetaType::Type::Bool)
-#else
-    else if (data.type() == QVariant::Bool)                                             // boolean value?
-#endif
     {
         str = data.toBool() ? "true" : "false";
     }
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     else if (data.typeId() == QMetaType::Type::ULongLong)
-#else
-    else if (data.type() == QVariant::ULongLong)                                        // large unsigned number?
-#endif
     {
         str = QByteArray::number(data.value<qulonglong>());
     } else if (data.canConvert<qlonglong>()) // any signed number?
