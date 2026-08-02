@@ -18,6 +18,7 @@
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_create_arrow.pb.h>
 #include <libcockatrice/protocol/pb/command_delete_arrow.pb.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/color.h>
 #include <libcockatrice/utility/zone_names.h>
 
@@ -261,7 +262,7 @@ void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         if (startZone->getName() == ZoneNames::HAND) {
             startCard->playCard(false);
             CardInfoPtr ci = startCard->getCard().getCardPtr();
-            bool playToStack = SettingsCache::instance().getPlayToStack();
+            bool playToStack = SettingsCache::instance().interface().getPlayToStack();
             if (ci && ((!playToStack && ci->getUiAttributes().tableRow == 3) ||
                        (playToStack && ci->getUiAttributes().tableRow != 0 &&
                         startCard->getZone()->getName() != ZoneNames::STACK))) {

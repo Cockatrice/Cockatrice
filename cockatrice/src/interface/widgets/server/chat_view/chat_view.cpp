@@ -14,6 +14,7 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <libcockatrice/network/server/remote/user_level.h>
+#include <libcockatrice/settings/chat_settings.h>
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
 
@@ -292,8 +293,8 @@ void ChatView::appendMessage(QString message,
     }
     cursor.setCharFormat(defaultFormat);
 
-    bool mentionEnabled = SettingsCache::instance().getChatMention();
-    highlightedWords = SettingsCache::instance().getHighlightWords().split(' ', Qt::SkipEmptyParts);
+    bool mentionEnabled = SettingsCache::instance().chat().getChatMention();
+    highlightedWords = SettingsCache::instance().chat().getHighlightWords().split(' ', Qt::SkipEmptyParts);
 
     // parse the message
     while (message.size()) {
@@ -395,8 +396,9 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString
                 // You have received a valid mention!!
                 soundEngine->playSound("chat_mention");
                 mentionFormat.setBackground(QBrush(getCustomMentionColor()));
-                mentionFormat.setForeground(SettingsCache::instance().getChatMentionForeground() ? QBrush(Qt::white)
-                                                                                                 : QBrush(Qt::black));
+                mentionFormat.setForeground(SettingsCache::instance().chat().getChatMentionForeground()
+                                                ? QBrush(Qt::white)
+                                                : QBrush(Qt::black));
                 cursor.insertText(mention, mentionFormat);
                 message = message.mid(mention.size());
                 showSystemPopup(userName);
@@ -417,8 +419,8 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString
             // Moderator Sending Global Message
             soundEngine->playSound("all_mention");
             mentionFormat.setBackground(QBrush(getCustomMentionColor()));
-            mentionFormat.setForeground(SettingsCache::instance().getChatMentionForeground() ? QBrush(Qt::white)
-                                                                                             : QBrush(Qt::black));
+            mentionFormat.setForeground(
+                SettingsCache::instance().chat().getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
             cursor.insertText("@" + fullMentionUpToSpaceOrEnd, mentionFormat);
             message = message.mid(fullMentionUpToSpaceOrEnd.size() + 1);
             showSystemPopup(userName);
@@ -465,8 +467,8 @@ void ChatView::checkWord(QTextCursor &cursor, QString &message)
         if (fullWordUpToSpaceOrEnd.compare(word, Qt::CaseInsensitive) == 0) {
             // You have received a valid mention of custom word!!
             highlightFormat.setBackground(QBrush(getCustomHighlightColor()));
-            highlightFormat.setForeground(SettingsCache::instance().getChatHighlightForeground() ? QBrush(Qt::white)
-                                                                                                 : QBrush(Qt::black));
+            highlightFormat.setForeground(
+                SettingsCache::instance().chat().getChatHighlightForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
             cursor.insertText(fullWordUpToSpaceOrEnd, highlightFormat);
             cursor.insertText(rest, defaultFormat);
             QApplication::alert(this);
@@ -522,20 +524,20 @@ void ChatView::actMessageClicked()
 void ChatView::showSystemPopup(const QString &userName)
 {
     QApplication::alert(this);
-    if (SettingsCache::instance().getShowMentionPopup()) {
+    if (SettingsCache::instance().chat().getShowMentionPopup()) {
         emit showMentionPopup(userName);
     }
 }
 
 QColor ChatView::getCustomMentionColor()
 {
-    QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
+    QColor customColor = QColor::fromString("#" + SettingsCache::instance().chat().getChatMentionColor());
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
 
 QColor ChatView::getCustomHighlightColor()
 {
-    QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
+    QColor customColor = QColor::fromString("#" + SettingsCache::instance().chat().getChatMentionColor());
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
 

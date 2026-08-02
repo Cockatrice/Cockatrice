@@ -30,6 +30,10 @@ CardSetPtr ICardDatabaseParser::internalAddSet(const QString &setName,
     newSet->setPriority(priority);
 
     sets.insert(setName, newSet);
-    emit addSet(newSet);
+    if (targetData) {
+        targetData->sets.insert(setName, newSet);
+    } else {
+        emit addSet(newSet);
+    }
     return newSet;
 }

@@ -12,6 +12,9 @@
 #include <algorithm>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/debug_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, PlayerLogic *_owner, int _id)
     : ArrowTarget(_owner, parent), id(_id), cardRef(cardRef), tapped(false), facedown(false), tapAngle(0),
@@ -21,15 +24,17 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef
     setFlag(ItemIsSelectable);
     setCacheMode(DeviceCoordinateCache);
 
-    connect(&SettingsCache::instance(), &SettingsCache::displayCardNamesChanged, this, [this] { update(); });
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::displayCardNamesChanged, this,
+            [this] { update(); });
     refreshCardInfo();
 
-    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
-        Q_UNUSED(_roundCardCorners);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::roundCardCornersChanged, this,
+            [this](bool _roundCardCorners) {
+                Q_UNUSED(_roundCardCorners);
 
-        prepareGeometryChange();
-        update();
-    });
+                prepareGeometryChange();
+                update();
+            });
 }
 
 AbstractCardItem::~AbstractCardItem()
@@ -45,7 +50,8 @@ QRectF AbstractCardItem::boundingRect() const
 QPainterPath AbstractCardItem::shape() const
 {
     QPainterPath shape;
-    qreal cardCornerRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * CardDimensions::WIDTH_F : 0.0;
+    qreal cardCornerRadius =
+        SettingsCache::instance().cardsDisplay().getRoundCardCorners() ? 0.05 * CardDimensions::WIDTH_F : 0.0;
     shape.addRoundedRect(boundingRect(), cardCornerRadius, cardCornerRadius);
     return shape;
 }
@@ -101,7 +107,7 @@ QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
 
 void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
-    const int MAX_FONT_SIZE = SettingsCache::instance().getMaxFontSize();
+    const int MAX_FONT_SIZE = SettingsCache::instance().personal().getMaxFontSize();
     const int fontSize = std::max(9, MAX_FONT_SIZE);
 
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());
@@ -151,7 +157,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
         painter->drawPath(shape());
     }
 
-    if (translatedPixmap.isNull() || SettingsCache::instance().getDisplayCardNames() || facedown) {
+    if (translatedPixmap.isNull() || SettingsCache::instance().cardsDisplay().getDisplayCardNames() || facedown) {
         painter->save();
         transformPainter(painter, translatedSize, angle);
         painter->setPen(Qt::white);
@@ -234,7 +240,7 @@ void AbstractCardItem::setHovered(bool _hovered)
 
     isHovered = _hovered;
     setZValue(_hovered ? ZValues::HOVERED_CARD : realZValue);
-    setScale(_hovered && SettingsCache::instance().getScaleCards() ? 1.1 : 1);
+    setScale(_hovered && SettingsCache::instance().cardsDisplay().getScaleCards() ? 1.1 : 1);
     setTransformOriginPoint(_hovered ? CardDimensions::WIDTH_HALF_F : 0, _hovered ? CardDimensions::HEIGHT_HALF_F : 0);
     update();
 }
@@ -287,7 +293,7 @@ void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
     }
 
     tapped = _tapped;
-    if (SettingsCache::instance().getTapAnimation() && canAnimate) {
+    if (SettingsCache::instance().cardsDisplay().getTapAnimation() && canAnimate) {
         static_cast<GameScene *>(scene())->registerAnimationItem(this);
     } else {
         tapAngle = tapped ? 90 : 0;

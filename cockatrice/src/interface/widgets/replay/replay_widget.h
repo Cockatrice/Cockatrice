@@ -1,12 +1,12 @@
 /**
- * @file replay_manager.h
+ * @file replay_widget.h
  * @ingroup Core
  * @ingroup Replay
  */
 //! \todo Document this file.
 
-#ifndef REPLAY_MANAGER_H
-#define REPLAY_MANAGER_H
+#ifndef REPLAY_WIDGET_H
+#define REPLAY_WIDGET_H
 
 #include "replay_timeline_widget.h"
 
@@ -14,14 +14,19 @@
 #include <QWidget>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 
+class ReplayQuickSettingsWidget;
 class TabGame;
 
-class ReplayManager : public QWidget
+/**
+ * @brief The top-level that is put in the replay dock widget.
+ * Contains the replay timeline as well as the buttons.
+ */
+class ReplayWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    ReplayManager(TabGame *parent, GameReplay *replay);
+    ReplayWidget(TabGame *parent, GameReplay *replay);
     TabGame *game;
     GameReplay *replay;
 
@@ -35,15 +40,16 @@ private:
     QList<int> replayTimeline;
     ReplayTimelineWidget *timelineWidget;
     QToolButton *replayPlayButton, *replayFastForwardButton;
+    ReplayQuickSettingsWidget *settingsWidget;
     QAction *aReplaySkipForward, *aReplaySkipBackward, *aReplaySkipForwardBig, *aReplaySkipBackwardBig;
 
 private slots:
     void replayNextEvent(EventProcessingOptions options);
     void replayFinished();
     void replayPlayButtonToggled(bool checked);
-    void replayFastForwardButtonToggled(bool checked);
+    void updateTimeScaleFactor(bool checked);
     void replayRewind();
     void refreshShortcuts();
 };
 
-#endif // REPLAY_MANAGER_H
+#endif // REPLAY_WIDGET_H

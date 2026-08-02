@@ -13,6 +13,7 @@
 #include <QWidget>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <utility>
 
 static constexpr qreal MTG_CARD_ASPECT_RATIO = 1.396;
@@ -66,11 +67,12 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverT
     animation->setStartValue(originalPos);
     animation->setEndValue(originalPos - QPoint(0, ANIMATION_OFFSET));
 
-    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
-        Q_UNUSED(_roundCardCorners);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::roundCardCornersChanged, this,
+            [this](bool _roundCardCorners) {
+                Q_UNUSED(_roundCardCorners);
 
-        update();
-    });
+                update();
+            });
 }
 
 /**
@@ -190,7 +192,7 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
     }
 
     QPixmap transformedPixmap = resizedPixmap; // Default pixmap
-    if (SettingsCache::instance().getAutoRotateSidewaysLayoutCards()) {
+    if (SettingsCache::instance().cardsDisplay().getAutoRotateSidewaysLayoutCards()) {
         if (exactCard.getInfo().getUiAttributes().landscapeOrientation) {
             // Rotate pixmap 90 degrees to the left
             QTransform transform;
@@ -220,7 +222,9 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 
     // Compute rounded corner radius
     // Ensure consistent rounding
-    qreal radius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * static_cast<qreal>(targetRect.width()) : 0.;
+    qreal radius = SettingsCache::instance().cardsDisplay().getRoundCardCorners()
+                       ? 0.05 * static_cast<qreal>(targetRect.width())
+                       : 0.;
 
     // Draw the pixmap with rounded corners
     QStylePainter painter(this);

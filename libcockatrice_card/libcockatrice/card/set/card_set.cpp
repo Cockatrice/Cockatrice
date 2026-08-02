@@ -42,9 +42,10 @@ QString CardSet::getCorrectedShortName() const
 
 void CardSet::loadSetOptions()
 {
-    sortKey = priorityController->getSortKey(shortName);
-    enabled = priorityController->isEnabled(shortName);
-    isknown = priorityController->isKnown(shortName);
+    const ICardSetPriorityController::SetOptions options = priorityController->getSetOptions(shortName);
+    sortKey = options.sortKey;
+    enabled = options.enabled;
+    isknown = options.isKnown;
 }
 
 void CardSet::setSortKey(unsigned int _sortKey)

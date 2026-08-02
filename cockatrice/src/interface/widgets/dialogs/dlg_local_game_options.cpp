@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QVBoxLayout>
+#include <libcockatrice/settings/game_settings.h>
 
 DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
 {
@@ -53,10 +54,10 @@ DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    rememberSettingsCheckBox->setChecked(SettingsCache::instance().getLocalGameRememberSettings());
+    rememberSettingsCheckBox->setChecked(SettingsCache::instance().game().getLocalGameRememberSettings());
     if (rememberSettingsCheckBox->isChecked()) {
-        numberPlayersEdit->setValue(SettingsCache::instance().getLocalGameMaxPlayers());
-        startingLifeTotalEdit->setValue(SettingsCache::instance().getLocalGameStartingLifeTotal());
+        numberPlayersEdit->setValue(SettingsCache::instance().game().getLocalGameMaxPlayers());
+        startingLifeTotalEdit->setValue(SettingsCache::instance().game().getLocalGameStartingLifeTotal());
     }
 
     setWindowTitle(tr("Local game options"));
@@ -67,10 +68,10 @@ DlgLocalGameOptions::DlgLocalGameOptions(QWidget *parent) : QDialog(parent)
 
 void DlgLocalGameOptions::actOK()
 {
-    SettingsCache::instance().setLocalGameRememberSettings(rememberSettingsCheckBox->isChecked());
+    SettingsCache::instance().game().setLocalGameRememberSettings(rememberSettingsCheckBox->isChecked());
     if (rememberSettingsCheckBox->isChecked()) {
-        SettingsCache::instance().setLocalGameMaxPlayers(numberPlayersEdit->value());
-        SettingsCache::instance().setLocalGameStartingLifeTotal(startingLifeTotalEdit->value());
+        SettingsCache::instance().game().setLocalGameMaxPlayers(numberPlayersEdit->value());
+        SettingsCache::instance().game().setLocalGameStartingLifeTotal(startingLifeTotalEdit->value());
     }
 
     accept();

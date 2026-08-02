@@ -10,6 +10,7 @@
 #include <QIcon>
 #include <QTimeZone>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
+#include <libcockatrice/settings/game_filters_settings.h>
 
 enum GameListColumn
 {

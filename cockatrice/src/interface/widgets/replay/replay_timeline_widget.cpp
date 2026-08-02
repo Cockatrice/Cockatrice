@@ -5,12 +5,14 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QTimer>
+#include <libcockatrice/settings/interface_settings.h>
 
 ReplayTimelineWidget::ReplayTimelineWidget(QWidget *parent)
     : QWidget(parent), maxBinValue(1), maxTime(1), timeScaleFactor(1.0), currentVisualTime(0), currentProcessedTime(0),
       currentEvent(0)
 {
     replayTimer = new QTimer(this);
+    replayTimer->setInterval(TIMER_INTERVAL_MS);
     connect(replayTimer, &QTimer::timeout, this, &ReplayTimelineWidget::replayTimerTimeout);
 
     rewindBufferingTimer = new QTimer(this);
@@ -112,7 +114,7 @@ void ReplayTimelineWidget::handleBackwardsSkip(bool doRewindBuffering)
         // The rewind only happens once the timer runs out.
         // If another backwards skip happens, the timer will just get reset instead of rewinding.
         rewindBufferingTimer->stop();
-        rewindBufferingTimer->start(SettingsCache::instance().getRewindBufferingMs());
+        rewindBufferingTimer->start(SettingsCache::instance().interface().getRewindBufferingMs());
     } else {
         // otherwise, process the rewind immediately
         processRewind();
@@ -182,12 +184,13 @@ void ReplayTimelineWidget::processNewEvents(PlaybackMode playbackMode)
 void ReplayTimelineWidget::setTimeScaleFactor(qreal _timeScaleFactor)
 {
     timeScaleFactor = _timeScaleFactor;
-    replayTimer->setInterval(static_cast<int>(TIMER_INTERVAL_MS / timeScaleFactor));
+    int interval = std::max(1, qRound(TIMER_INTERVAL_MS / timeScaleFactor));
+    replayTimer->setInterval(interval);
 }
 
 void ReplayTimelineWidget::startReplay()
 {
-    replayTimer->start(static_cast<int>(TIMER_INTERVAL_MS / timeScaleFactor));
+    replayTimer->start();
 }
 
 void ReplayTimelineWidget::stopReplay()

@@ -1,6 +1,7 @@
 #include "tab_game.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../game/game.h"
 #include "../game/player/player_logic.h"
 #include "../game/replay.h"
@@ -44,6 +45,10 @@
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/debug_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
@@ -252,16 +257,16 @@ void TabGame::resetChatAndPhase()
 
 void TabGame::emitUserEvent()
 {
-    bool globalEvent =
-        !game->getPlayerManager()->isSpectator() || SettingsCache::instance().getSpectatorNotificationsEnabled();
+    bool globalEvent = !game->getPlayerManager()->isSpectator() ||
+                       SettingsCache::instance().interface().getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
     updatePlayerListDockTitle();
 }
 
 TabGame::~TabGame()
 {
-    if (replayManager) {
-        delete replayManager->replay;
+    if (replayWidget) {
+        delete replayWidget->replay;
     }
     for (auto &player : game->getPlayerManager()->getPlayers()) {
         player->clear();
@@ -626,8 +631,8 @@ void TabGame::actRotateViewCCW()
 
 void TabGame::actCompleterChanged()
 {
-    SettingsCache::instance().getChatMentionCompleter() ? completer->setCompletionRole(2)
-                                                        : completer->setCompletionRole(1);
+    SettingsCache::instance().chat().getChatMentionCompleter() ? completer->setCompletionRole(2)
+                                                               : completer->setCompletionRole(1);
 }
 
 void TabGame::notifyPlayerJoin(QString playerName)
@@ -1169,16 +1174,16 @@ void TabGame::createPlayAreaWidget(bool bReplay)
 
 void TabGame::createReplayDock(GameReplay *replay)
 {
-    replayManager = new ReplayManager(this, replay);
+    replayWidget = new ReplayWidget(this, replay);
 
     replayDock = new QDockWidget(this);
     replayDock->setObjectName("replayDock");
     replayDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
                             QDockWidget::DockWidgetMovable);
-    replayDock->setWidget(replayManager);
+    replayDock->setWidget(replayWidget);
     replayDock->setFloating(false);
 
-    connect(replayManager, &ReplayManager::eventReplayed, game->getGameEventHandler(),
+    connect(replayWidget, &ReplayWidget::eventReplayed, game->getGameEventHandler(),
             [this](const auto &event, auto options) {
                 game->getGameEventHandler()->processGameEventContainer(event, nullptr, options);
             });
@@ -1265,7 +1270,7 @@ void TabGame::createMessageDock(bool bReplay)
     if (!bReplay) {
         connect(messageLog, &MessageLogWidget::openMessageDialog, this, &TabGame::openMessageDialog);
         connect(messageLog, &MessageLogWidget::addMentionTag, this, &TabGame::addMentionTag);
-        connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
+        connect(&SettingsCache::instance().chat(), &ChatSettings::chatMentionCompleterChanged, this,
                 &TabGame::actCompleterChanged);
     }
 

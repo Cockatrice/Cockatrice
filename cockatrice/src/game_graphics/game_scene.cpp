@@ -19,6 +19,7 @@
 #include <QGraphicsView>
 #include <QSet>
 #include <QtMath>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <numeric>
 
@@ -36,7 +37,7 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 {
     animationTimer = new QBasicTimer;
     addItem(phasesToolbar);
-    connect(&SettingsCache::instance(), &SettingsCache::minPlayersForMultiColumnLayoutChanged, this,
+    connect(&SettingsCache::instance().interface(), &InterfaceSettings::minPlayersForMultiColumnLayoutChanged, this,
             &GameScene::rearrange);
 
     rearrange();
@@ -45,6 +46,17 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 GameScene::~GameScene()
 {
     delete animationTimer;
+
+    // Delete all ArrowItems before QGraphicsScene's base destructor runs.
+    // QGraphicsScene::~QGraphicsScene() destroys items in arbitrary order.
+    // If a PlayerTarget is destroyed before an ArrowItem pointing to it,
+    // ArrowItem::onTargetDestroyed fires and emits on the partially-destroyed
+    // GameScene, causing a segfault.
+    for (auto *item : items()) {
+        if (auto *arrow = qgraphicsitem_cast<ArrowItem *>(item)) {
+            delete arrow;
+        }
+    }
 
     // DO NOT call clearViews() here
     // clearViews calls close() on the zoneViews, which sends signals; sending signals in destructors leads to segfaults
@@ -324,7 +336,7 @@ QList<PlayerLogic *> GameScene::rotatePlayers(const QList<PlayerLogic *> &active
 
 int GameScene::determineColumnCount(int playerCount)
 {
-    return playerCount < SettingsCache::instance().getMinPlayersForMultiColumnLayout() ? 1 : 2;
+    return playerCount < SettingsCache::instance().interface().getMinPlayersForMultiColumnLayout() ? 1 : 2;
 }
 
 /**
@@ -529,7 +541,9 @@ void GameScene::clearArrowsForPlayer(int playerId)
 void GameScene::clearArrowsForPlayerLocally(int playerId)
 {
     for (int arrowId : arrowRegistry.idsForPlayer(playerId)) {
-        arrowRegistry.take(playerId, arrowId)->delArrow();
+        if (auto *arrow = arrowRegistry.take(playerId, arrowId)) {
+            arrow->delArrow();
+        }
     }
 }
 

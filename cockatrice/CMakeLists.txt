@@ -97,6 +97,7 @@ set(cockatrice_SOURCES
     src/game_graphics/player/menu/rfg_menu.cpp
     src/game_graphics/player/menu/say_menu.cpp
     src/game_graphics/player/menu/sideboard_menu.cpp
+    src/game_graphics/player/menu/tally_menu.cpp
     src/game_graphics/player/menu/utility_menu.cpp
     src/game_graphics/tally/subtype_tally.cpp
     src/game_graphics/tally/tally.cpp
@@ -228,8 +229,9 @@ set(cockatrice_SOURCES
     src/interface/widgets/printing_selector/set_name_and_collectors_number_display_widget.cpp
     src/interface/widgets/quick_settings/settings_button_widget.cpp
     src/interface/widgets/quick_settings/settings_popup_widget.cpp
-    src/interface/widgets/replay/replay_manager.cpp
+    src/interface/widgets/replay/replay_quick_settings_widget.cpp
     src/interface/widgets/replay/replay_timeline_widget.cpp
+    src/interface/widgets/replay/replay_widget.cpp
     src/interface/widgets/server/chat_view/chat_view.cpp
     src/interface/widgets/server/game_filter_configs.cpp
     src/interface/widgets/server/game_selector.cpp

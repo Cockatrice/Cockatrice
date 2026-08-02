@@ -12,6 +12,8 @@
 #include <QDirIterator>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 DeckPreviewDeckTagsDisplayWidget::DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, const QStringList &_tags)
     : QWidget(_parent), currentTags(_tags)
@@ -74,7 +76,7 @@ static QStringList getAllFiles(const QString &filePath)
  */
 static QStringList findAllKnownTags()
 {
-    QStringList allFiles = getAllFiles(SettingsCache::instance().getDeckPath());
+    QStringList allFiles = getAllFiles(SettingsCache::instance().paths().getDeckPath());
 
     QStringList knownTags;
     for (const QString &file : allFiles) {
@@ -141,8 +143,8 @@ bool DeckPreviewDeckTagsDisplayWidget::promptFileConversionIfRequired(DeckPrevie
     }
 
     // Retrieve saved preference if the prompt is disabled
-    if (!SettingsCache::instance().getVisualDeckStoragePromptForConversion()) {
-        if (!SettingsCache::instance().getVisualDeckStorageAlwaysConvert()) {
+    if (!SettingsCache::instance().visualDeckStorage().getVisualDeckStoragePromptForConversion()) {
+        if (!SettingsCache::instance().visualDeckStorage().getVisualDeckStorageAlwaysConvert()) {
             return false;
         }
 
@@ -157,8 +159,9 @@ bool DeckPreviewDeckTagsDisplayWidget::promptFileConversionIfRequired(DeckPrevie
     // Show the dialog to the user
     DialogConvertDeckToCodFormat conversionDialog(parentWidget());
     if (conversionDialog.exec() != QDialog::Accepted) {
-        SettingsCache::instance().setVisualDeckStoragePromptForConversion(!conversionDialog.dontAskAgain());
-        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(false);
+        SettingsCache::instance().visualDeckStorage().setVisualDeckStoragePromptForConversion(
+            !conversionDialog.dontAskAgain());
+        SettingsCache::instance().visualDeckStorage().setVisualDeckStorageAlwaysConvert(false);
 
         return false;
     }
@@ -171,8 +174,8 @@ bool DeckPreviewDeckTagsDisplayWidget::promptFileConversionIfRequired(DeckPrevie
     convertFileToCockatriceFormat(deckPreviewWidget);
 
     if (conversionDialog.dontAskAgain()) {
-        SettingsCache::instance().setVisualDeckStoragePromptForConversion(false);
-        SettingsCache::instance().setVisualDeckStorageAlwaysConvert(true);
+        SettingsCache::instance().visualDeckStorage().setVisualDeckStoragePromptForConversion(false);
+        SettingsCache::instance().visualDeckStorage().setVisualDeckStorageAlwaysConvert(true);
     }
 
     return true;

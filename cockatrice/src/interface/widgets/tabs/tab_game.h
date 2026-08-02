@@ -13,7 +13,7 @@
 #include "../game/player/player_logic.h"
 #include "../game_graphics/log/message_log_widget.h"
 #include "../interface/widgets/menus/tearoff_menu.h"
-#include "../interface/widgets/replay/replay_manager.h"
+#include "../interface/widgets/replay/replay_widget.h"
 #include "tab.h"
 
 #include <QCompleter>
@@ -31,7 +31,7 @@ class AbstractClient;
 class CardDatabase;
 class GameView;
 class GameScene;
-class ReplayManager;
+class ReplayWidget;
 class CardInfoFrameWidget;
 class QTimer;
 class QSplitter;
@@ -59,7 +59,7 @@ class TabGame : public Tab
 private:
     AbstractGame *game;
     const UserListProxy *userListProxy;
-    ReplayManager *replayManager = nullptr;
+    ReplayWidget *replayWidget = nullptr;
     QStringList gameTypes;
     QCompleter *completer;
     QStringList autocompleteUserList;

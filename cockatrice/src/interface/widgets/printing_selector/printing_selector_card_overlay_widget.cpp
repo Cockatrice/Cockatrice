@@ -11,6 +11,7 @@
 #include <QtMath>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/settings/card_override_settings.h>
 #include <utility>
 
 /**

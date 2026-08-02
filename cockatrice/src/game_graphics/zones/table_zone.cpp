@@ -15,6 +15,7 @@
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 
 const QColor TableZone::BACKGROUND_COLOR = QColor(100, 100, 100);
@@ -28,7 +29,7 @@ TableZone::TableZone(TableZoneLogic *_logic, bool _mirrored, QGraphicsItem *pare
     connect(_logic, &TableZoneLogic::contentSizeChanged, this, &TableZone::resizeToContents);
     connect(_logic, &TableZoneLogic::toggleTapped, this, &TableZone::toggleTapped);
     connect(themeManager, &ThemeManager::themeChanged, this, &TableZone::updateBg);
-    connect(&SettingsCache::instance(), &SettingsCache::invertVerticalCoordinateChanged, this,
+    connect(&SettingsCache::instance().interface(), &InterfaceSettings::invertVerticalCoordinateChanged, this,
             &TableZone::reorganizeCards);
 
     updateBg();
@@ -59,8 +60,8 @@ void TableZone::setMirrored(bool isMirrored)
 
 bool TableZone::isInverted() const
 {
-    return ((mirrored && !SettingsCache::instance().getInvertVerticalCoordinate()) ||
-            (!mirrored && SettingsCache::instance().getInvertVerticalCoordinate()));
+    return ((mirrored && !SettingsCache::instance().interface().getInvertVerticalCoordinate()) ||
+            (!mirrored && SettingsCache::instance().interface().getInvertVerticalCoordinate()));
 }
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)

@@ -291,12 +291,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
         // per-set properties
         PrintingInfo printingInfo = PrintingInfo(currentSet);
+        QVariantHash printingProps;
         for (auto i = setInfoProperties.cbegin(), end = setInfoProperties.cend(); i != end; ++i) {
             QString mtgjsonProperty = i.key();
             QString xmlPropertyName = i.value();
             QString propertyValue = getStringPropertyFromMap(card, mtgjsonProperty);
             if (!propertyValue.isEmpty()) {
-                printingInfo.setProperty(xmlPropertyName, propertyValue);
+                printingProps.insert(xmlPropertyName, propertyValue);
             }
         }
 
@@ -304,7 +305,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         QString faceFlavorName = getStringPropertyFromMap(card, "faceFlavorName");
         QString flavorName = !faceFlavorName.isEmpty() ? faceFlavorName : getStringPropertyFromMap(card, "flavorName");
         if (!flavorName.isEmpty()) {
-            printingInfo.setProperty("flavorName", flavorName);
+            printingProps.insert("flavorName", flavorName);
         }
 
         // Identifiers
@@ -313,9 +314,11 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
             QString xmlPropertyName = i.value();
             QString propertyValue = getStringPropertyFromMap(card.value("identifiers").toMap(), mtgjsonProperty);
             if (!propertyValue.isEmpty()) {
-                printingInfo.setProperty(xmlPropertyName, propertyValue);
+                printingProps.insert(xmlPropertyName, propertyValue);
             }
         }
+
+        printingInfo.setProperties(printingProps);
 
         QString numComponent;
         const QString numProperty = printingInfo.getProperty("num");

@@ -3,6 +3,7 @@
 #include "../../client/settings/cache_settings.h"
 #include "../../game_graphics/board/card_item.h"
 
+#include <libcockatrice/settings/interface_settings.h>
 /**
  * @param _player the player that the cards are revealed to.
  * @param _origZone the zone the cards were revealed from.
@@ -57,7 +58,7 @@ bool ZoneViewZoneLogic::prepareAddCard(int x)
 
     // autoclose check is done both here and in removeCard
 
-    if (cards.isEmpty() && !doInsert && SettingsCache::instance().getCloseEmptyCardView()) {
+    if (cards.isEmpty() && !doInsert && SettingsCache::instance().interface().getCloseEmptyCardView()) {
         emit closeView();
     }
 
@@ -144,7 +145,7 @@ void ZoneViewZoneLogic::removeCard(int position, bool toNewZone)
     // card gets dragged within the view.
     // Another autoclose check is done in prepareAddCard so that the view autocloses if the last card was moved to an
     // unrevealed portion of the same zone.
-    if (cards.isEmpty() && SettingsCache::instance().getCloseEmptyCardView() && toNewZone) {
+    if (cards.isEmpty() && SettingsCache::instance().interface().getCloseEmptyCardView() && toNewZone) {
         emit closeView();
         return;
     }

@@ -10,6 +10,7 @@
 #include <QLibraryInfo>
 #include <QTimer>
 #include <QTranslator>
+#include <libcockatrice/settings/personal_settings.h>
 
 QTranslator *translator, *qtTranslator;
 ThemeManager *themeManager;
@@ -21,7 +22,7 @@ bool isBackgrounded;
 
 void installNewTranslator()
 {
-    QString lang = SettingsCache::instance().getLang();
+    QString lang = SettingsCache::instance().personal().getLang();
 
     QString qtNameHint = "qt_" + lang;
     QString qtTranslationPath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);

@@ -20,6 +20,13 @@ SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
     setLayout(layout);
 }
 
+SettingsButtonWidget::~SettingsButtonWidget()
+{
+    // We don't parent the popup because it might lead to better behavior on certain window managers.
+    // So we have to manually delete it
+    popup->deleteLater();
+}
+
 void SettingsButtonWidget::addSettingsWidget(QWidget *toAdd) const
 {
     popup->addSettingsWidget(toAdd);

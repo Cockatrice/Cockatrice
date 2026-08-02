@@ -1,6 +1,7 @@
 #include "game_view.h"
 
 #include "../client/settings/cache_settings.h"
+#include "../client/settings/shortcuts_settings.h"
 #include "game_scene.h"
 
 #include <QAction>
@@ -9,6 +10,7 @@
 #include <QLayout>
 #include <QResizeEvent>
 #include <QRubberBand>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/qt_utils.h>
 
 // QRubberBand calls raise() in showEvent() and changeEvent() to stay on top of siblings.
@@ -45,9 +47,12 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     connect(scene, &GameScene::sigResizeRubberBand, this, &GameView::resizeRubberBand);
     connect(scene, &GameScene::sigStopRubberBand, this, &GameView::stopRubberBand);
     connect(scene, &QGraphicsScene::selectionChanged, this, [this]() { updateTotalSelectionCount(); });
+    connect(&SettingsCache::instance().interface(), &InterfaceSettings::tallyTypeChanged, this,
+            [this] { updateTotalSelectionCount(); });
 
-    setFocusDisabled(SettingsCache::instance().getKeepGameChatFocus());
-    connect(&SettingsCache::instance(), &SettingsCache::keepGameChatFocusChanged, this, &GameView::setFocusDisabled);
+    setFocusDisabled(SettingsCache::instance().interface().getKeepGameChatFocus());
+    connect(&SettingsCache::instance().interface(), &InterfaceSettings::keepGameChatFocusChanged, this,
+            &GameView::setFocusDisabled);
 
     aCloseMostRecentZoneView = new QAction(this);
 
@@ -125,7 +130,7 @@ void GameView::resizeRubberBand(const QPointF &cursorPoint, int selectedCount)
     QRect rect = QRect(mapFromScene(selectionOrigin), cursor).normalized();
     rubberBand->setGeometry(rect);
 
-    if (!SettingsCache::instance().getShowDragSelectionCount()) {
+    if (!SettingsCache::instance().interface().getShowDragSelectionCount()) {
         dragCountLabel->hide();
         return;
     }
@@ -234,7 +239,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
 
     int count = scene()->selectedItems().count();
 
-    if (!SettingsCache::instance().getShowTotalSelectionCount() || count <= 1) {
+    if (!SettingsCache::instance().interface().getShowTotalSelectionCount() || count <= 1) {
         totalCountLabel->hide();
     } else {
         totalCountLabel->setText(QString::number(count));
@@ -246,8 +251,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
         totalCountLabel->show();
     }
 
-    TallyType tallyType =
-        SettingsCache::instance().getShowSubtypeSelectionTally() ? TallyType::Subtypes : TallyType::None;
+    TallyType tallyType = Tally::intToType(SettingsCache::instance().interface().getTallyType());
 
     GameScene *gameScene = static_cast<GameScene *>(scene());
     QList<TallyRow> entries = Tally::compute(gameScene->selectedCards(), tallyType);

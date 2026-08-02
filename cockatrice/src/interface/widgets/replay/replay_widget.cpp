@@ -1,11 +1,13 @@
-#include "replay_manager.h"
+#include "replay_widget.h"
 
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../interface/widgets/tabs/tab_game.h"
+#include "replay_quick_settings_widget.h"
 
 #include <QHBoxLayout>
 #include <QToolButton>
 
-ReplayManager::ReplayManager(TabGame *parent, GameReplay *_replay)
+ReplayWidget::ReplayWidget(TabGame *parent, GameReplay *_replay)
     : QWidget(parent), game(parent), replay(_replay), replayPlayButton(nullptr), replayFastForwardButton(nullptr),
       aReplaySkipForward(nullptr), aReplaySkipBackward(nullptr), aReplaySkipForwardBig(nullptr),
       aReplaySkipBackwardBig(nullptr)
@@ -39,9 +41,9 @@ ReplayManager::ReplayManager(TabGame *parent, GameReplay *_replay)
     // timeline widget
     timelineWidget = new ReplayTimelineWidget;
     timelineWidget->setTimeline(replayTimeline);
-    connect(timelineWidget, &ReplayTimelineWidget::processNextEvent, this, &ReplayManager::replayNextEvent);
-    connect(timelineWidget, &ReplayTimelineWidget::replayFinished, this, &ReplayManager::replayFinished);
-    connect(timelineWidget, &ReplayTimelineWidget::rewound, this, &ReplayManager::replayRewind);
+    connect(timelineWidget, &ReplayTimelineWidget::processNextEvent, this, &ReplayWidget::replayNextEvent);
+    connect(timelineWidget, &ReplayTimelineWidget::replayFinished, this, &ReplayWidget::replayFinished);
+    connect(timelineWidget, &ReplayTimelineWidget::rewound, this, &ReplayWidget::replayRewind);
 
     // timeline skip shortcuts
     aReplaySkipForward = new QAction(timelineWidget);
@@ -72,41 +74,47 @@ ReplayManager::ReplayManager(TabGame *parent, GameReplay *_replay)
     playButtonIcon.addPixmap(QPixmap("theme:replay/pause"), QIcon::Normal, QIcon::On);
     replayPlayButton->setIcon(playButtonIcon);
     replayPlayButton->setCheckable(true);
-    connect(replayPlayButton, &QToolButton::toggled, this, &ReplayManager::replayPlayButtonToggled);
+    connect(replayPlayButton, &QToolButton::toggled, this, &ReplayWidget::replayPlayButtonToggled);
 
     replayFastForwardButton = new QToolButton;
     replayFastForwardButton->setIconSize(QSize(32, 32));
     replayFastForwardButton->setIcon(QPixmap("theme:replay/fastforward"));
     replayFastForwardButton->setCheckable(true);
-    connect(replayFastForwardButton, &QToolButton::toggled, this, &ReplayManager::replayFastForwardButtonToggled);
+    connect(replayFastForwardButton, &QToolButton::toggled, this, &ReplayWidget::updateTimeScaleFactor);
+
+    settingsWidget = new ReplayQuickSettingsWidget(this);
+    settingsWidget->setFixedSize(QSize(32, 32));
+    connect(settingsWidget, &ReplayQuickSettingsWidget::fastForwardSpeedChanged, this,
+            [this] { updateTimeScaleFactor(replayFastForwardButton->isChecked()); });
 
     // putting everything together
     auto replayControlLayout = new QHBoxLayout;
     replayControlLayout->addWidget(timelineWidget, 10);
     replayControlLayout->addWidget(replayPlayButton);
     replayControlLayout->addWidget(replayFastForwardButton);
+    replayControlLayout->addWidget(settingsWidget);
 
     setObjectName("replayControlWidget");
     setLayout(replayControlLayout);
 
-    connect(this, &ReplayManager::requestChatAndPhaseReset, game, &TabGame::resetChatAndPhase);
+    connect(this, &ReplayWidget::requestChatAndPhaseReset, game, &TabGame::resetChatAndPhase);
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
-            &ReplayManager::refreshShortcuts);
+            &ReplayWidget::refreshShortcuts);
     refreshShortcuts();
 }
 
-void ReplayManager::replayNextEvent(EventProcessingOptions options)
+void ReplayWidget::replayNextEvent(EventProcessingOptions options)
 {
     emit eventReplayed(replay->event_list(timelineWidget->getCurrentEvent()), options);
 }
 
-void ReplayManager::replayFinished()
+void ReplayWidget::replayFinished()
 {
     replayPlayButton->setChecked(false);
 }
 
-void ReplayManager::replayPlayButtonToggled(bool checked)
+void ReplayWidget::replayPlayButtonToggled(bool checked)
 {
     if (checked) { // start replay
         timelineWidget->startReplay();
@@ -115,20 +123,21 @@ void ReplayManager::replayPlayButtonToggled(bool checked)
     }
 }
 
-void ReplayManager::replayFastForwardButtonToggled(bool checked)
+void ReplayWidget::updateTimeScaleFactor(bool isFastForward)
 {
-    timelineWidget->setTimeScaleFactor(checked ? ReplayTimelineWidget::FAST_FORWARD_SCALE_FACTOR : 1.0);
+    qreal factor = isFastForward ? SettingsCache::instance().interface().getFastForwardSpeed() : 1.0;
+    timelineWidget->setTimeScaleFactor(factor);
 }
 
 /**
  * @brief Handles everything that needs to be reset when doing a replay rewind.
  */
-void ReplayManager::replayRewind()
+void ReplayWidget::replayRewind()
 {
     emit requestChatAndPhaseReset();
 }
 
-void ReplayManager::refreshShortcuts()
+void ReplayWidget::refreshShortcuts()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
     if (aReplaySkipForward) {

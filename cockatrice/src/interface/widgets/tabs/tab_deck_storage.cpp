@@ -28,6 +28,7 @@
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
@@ -36,7 +37,7 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     : Tab(_tabSupervisor), client(_client)
 {
     localDirModel = new QFileSystemModel(this);
-    localDirModel->setRootPath(SettingsCache::instance().getDeckPath());
+    localDirModel->setRootPath(SettingsCache::instance().paths().getDeckPath());
     localDirModel->sort(0, Qt::AscendingOrder);
 
     localDirView = new QTreeView;
