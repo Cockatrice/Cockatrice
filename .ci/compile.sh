@@ -14,8 +14,8 @@
 # --dir <dir> sets the name of the build dir, default is "build"
 # --cmake-generator <generator> sets CMAKE_GENERATOR as used by cmake
 # --target-macos-version <version> sets the min os version - only used for macOS builds
-# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_SERVER MAKE_NO_CLIENT MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION
-# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --server --test --ccache <ccache_size> --dir <dir>)
+# uses env: BUILDTYPE MAKE_INSTALL MAKE_PACKAGE PACKAGE_TYPE PACKAGE_SUFFIX MAKE_TEST USE_CCACHE CCACHE_SIZE CCACHE_EVICTION_AGE BUILD_DIR CMAKE_GENERATOR TARGET_MACOS_VERSION
+# (correspond to args: --debug/--release --install --package <package type> --suffix <suffix> --test --ccache <ccache_size> --dir <dir>)
 # exitcode: 1 for failure, 3 for invalid arguments
 
 # Read arguments
@@ -45,14 +45,6 @@ while [[ $# != 0 ]]; do
       PACKAGE_SUFFIX="$1"
       shift
       ;;
-    '--server')
-      MAKE_SERVER=1
-      shift
-      ;;
-    '--no-client')
-      MAKE_NO_CLIENT=1
-      shift
-      ;;
     '--test')
       MAKE_TEST=1
       shift
@@ -80,10 +72,6 @@ while [[ $# != 0 ]]; do
         exit 3
       fi
       CCACHE_EVICTION_AGE=$1
-      shift
-      ;;
-    '--vcpkg')
-      USE_VCPKG=1
       shift
       ;;
     '--dir')
@@ -138,12 +126,6 @@ export CMAKE_POLICY_VERSION_MINIMUM=3.10
 
 # Add cmake flags
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
-if [[ $MAKE_SERVER ]]; then
-  flags+=("-DWITH_SERVER=1")
-fi
-if [[ $MAKE_NO_CLIENT ]]; then
-  flags+=("-DWITH_CLIENT=0" "-DWITH_ORACLE=0")
-fi
 if [[ $MAKE_TEST ]]; then
   flags+=("-DTEST=1")
 fi
@@ -156,9 +138,6 @@ if [[ $USE_CCACHE ]]; then
 fi
 if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
-fi
-if [[ $USE_VCPKG ]]; then
-  flags+=("-DUSE_VCPKG=1")
 fi
 
 # Add cmake --build flags

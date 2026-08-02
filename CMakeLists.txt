@@ -48,12 +48,7 @@ if(USE_CCACHE)
   endif()
 endif()
 
-if(WIN32 OR USE_VCPKG)
-  # Use vcpkg toolchain on Windows (and on macOS in CI)
-  set(CMAKE_TOOLCHAIN_FILE
-      ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
-      CACHE STRING "Vcpkg toolchain file"
-  )
+if(WIN32 or APPLE)
   # Qt path set by user or env var
   if(QTDIR
      OR DEFINED ENV{QTDIR}

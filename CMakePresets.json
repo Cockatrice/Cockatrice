@@ -1,0 +1,137 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+
+  "configurePresets": [
+    {
+      "name": "ci-base",
+	  "description": "",
+      "hidden": true,
+	  "binaryDir": "${sourceDir}/build",
+      "environment": {
+      },
+      "cacheVariables": {
+      }
+    },
+
+    {
+      "name": "linux-release",
+	  "description": "",
+      "inherits": "ci-base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "WITH_CLIENT": "1",
+        "WITH_ORACLE": "1",
+        "WITH_SERVER": "1",
+        "USE_CCACHE": "1"
+      }
+    },
+
+    {
+      "name": "linux-debug",
+	  "description": "",
+      "inherits": "ci-base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "WITH_CLIENT": "1",
+        "WITH_ORACLE": "1",
+        "WITH_SERVER": "1",
+        "TEST": "1",
+        "USE_CCACHE": "1"
+      }
+    },
+
+    {
+      "name": "linux-servatrice",
+	  "description": "",
+      "inherits": "ci-base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "WITH_CLIENT": "0",
+        "WITH_ORACLE": "0",
+        "WITH_SERVER": "1",
+        "USE_CCACHE": "1"
+      }
+    },
+
+    {
+      "name": "ci-base-vcpkg",
+	  "description": "",
+      "hidden": true,
+	  "binaryDir": "${sourceDir}/build",
+      "environment": {
+        "VCPKG_DISABLE_METRICS": "1"
+      },
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_INSTALL_OPTIONS": "--x-abi-tools-use-exact-versions"
+      }
+    },
+
+    {
+      "name": "macos-release",
+	  "description": "",
+      "inherits": "ci-base-vcpkg",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "WITH_CLIENT": "1",
+        "WITH_ORACLE": "1",
+        "WITH_SERVER": "1",
+        "USE_CCACHE": "1"
+      }
+    },
+
+    {
+      "name": "macos-debug",
+	  "description": "",
+      "inherits": "ci-base-vcpkg",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "WITH_CLIENT": "1",
+        "WITH_ORACLE": "1",
+        "WITH_SERVER": "1",
+        "TEST": "1",
+        "USE_CCACHE": "1"
+      }
+    },
+
+    {
+      "name": "windows-release",
+	  "description": "",
+      "inherits": "ci-base-vcpkg",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "WITH_CLIENT": "1",
+        "WITH_ORACLE": "1",
+        "WITH_SERVER": "1"
+      }
+    }
+
+    {
+      "name": "windows-debug",
+	  "description": "",
+      "inherits": "ci-base-vcpkg",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_GENERATOR_PLATFORM": "x64"
+        "WITH_CLIENT": "1",
+        "WITH_ORACLE": "1",
+        "WITH_SERVER": "1",
+        "TEST": "1"
+      }
+    }
+  ]
+}

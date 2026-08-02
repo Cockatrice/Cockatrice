@@ -153,7 +153,6 @@ jobs:
       CACHE: ${{ github.workspace }}/.cache/${{ matrix.distro }}${{ matrix.version }}    # directory for caching docker image and ccache
       CCACHE_EVICTION_AGE: 7d
       CCACHE_SIZE: 550M    # space of all repo is 10Gi: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#usage-limits-and-eviction-policy
-      CMAKE_GENERATOR: 'Ninja'
       NAME: ${{ matrix.distro }}${{ matrix.version }}
 
     steps:
@@ -179,8 +178,7 @@ jobs:
         shell: bash
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE" \
-            --cmake-generator "$CMAKE_GENERATOR"
+          RUN --server --debug --test --ccache "$CCACHE_SIZE"
 
       - name: "Build release package"
         id: build
@@ -189,14 +187,11 @@ jobs:
         env:
           SUFFIX: '-${{ matrix.distro }}${{ matrix.version }}'
           package: '${{ matrix.package }}'
-          server_only: '${{ matrix.server_only }}'
         run: |
           source .ci/docker.sh
           args=()
-          [[ $server_only == yes ]] && args+=(--no-client)
           [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
           args+=(--ccache "$CCACHE_SIZE")
-          args+=(--cmake-generator "$CMAKE_GENERATOR")
           args+=(--suffix "$SUFFIX")
 
           RUN --server --release --package "$package" "${args[@]}"
@@ -266,7 +261,6 @@ jobs:
             runner: macos-15-intel
 
             ccache_eviction_age: 7d
-            cmake_generator: Ninja
             make_package: 1
             override_target: 13
             package_suffix: "-macOS13_Intel"
@@ -282,7 +276,6 @@ jobs:
             runner: macos-14
 
             ccache_eviction_age: 7d
-            cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS14"
             qt_version: 6.11.0
@@ -297,7 +290,6 @@ jobs:
             runner: macos-15
 
             ccache_eviction_age: 7d
-            cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS15"
             qt_version: 6.11.0
@@ -312,7 +304,6 @@ jobs:
             runner: macos-15
 
             ccache_eviction_age: 7d
-            cmake_generator: Ninja
             qt_version: 6.11.0
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
@@ -324,8 +315,6 @@ jobs:
             target: 10
             runner: windows-2025
 
-            cmake_generator: "Visual Studio 18 2026"
-            cmake_generator_platform: x64
             make_package: 1
             package_suffix: "-Win10"
             qt_version: 6.11.0
@@ -437,8 +426,6 @@ jobs:
         env:
           BUILDTYPE: '${{ matrix.type }}'
           CCACHE_EVICTION_AGE: ${{ matrix.ccache_eviction_age }}
-          CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
-          CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
@@ -447,9 +434,7 @@ jobs:
           MAKE_PACKAGE: '${{ matrix.make_package }}'
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
-          USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
-          VCPKG_DISABLE_METRICS: 1
         run: .ci/compile.sh --server --test --vcpkg
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
