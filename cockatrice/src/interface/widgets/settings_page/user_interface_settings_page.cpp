@@ -241,11 +241,11 @@ void UserInterfaceSettingsPage::retranslateUi()
     visualDeckStoragePromptForConversionLabel.setText(
         tr("When adding a tag in the visual deck storage to a .txt deck:"));
     visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexNone,
-                                                             tr("do nothing"));
+                                                             tr("Do nothing"));
     visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexPrompt,
-                                                             tr("ask to convert to .cod"));
+                                                             tr("Ask to convert to .cod"));
     visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexAlways,
-                                                             tr("always convert to .cod"));
+                                                             tr("Always convert to .cod"));
     defaultDeckEditorTypeLabel.setText(tr("Default deck editor type"));
     defaultDeckEditorTypeSelector.setItemText(TabSupervisor::ClassicDeckEditor, tr("Classic Deck Editor"));
     defaultDeckEditorTypeSelector.setItemText(TabSupervisor::VisualDeckEditor, tr("Visual Deck Editor"));
