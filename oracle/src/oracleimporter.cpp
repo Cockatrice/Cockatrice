@@ -289,7 +289,6 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         }
 
         // per-set properties
-        PrintingInfo printingInfo = PrintingInfo(currentSet);
         QHash<QString, QString> printingProps;
         for (auto i = setInfoProperties.cbegin(), end = setInfoProperties.cend(); i != end; ++i) {
             QString mtgjsonProperty = i.key();
@@ -317,7 +316,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
             }
         }
 
-        printingInfo.setProperties(printingProps);
+        PrintingInfo printingInfo(currentSet, printingProps);
 
         QString numComponent;
         const QString numProperty = printingInfo.getProperty("num");

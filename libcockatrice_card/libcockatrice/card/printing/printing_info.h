@@ -32,8 +32,17 @@ public:
      * @brief Constructs a PrintingInfo associated with a specific set.
      *
      * @param _set The set this printing belongs to (defaults to null).
+     * @param _properties The printing properties (defaults to empty)
      */
-    explicit PrintingInfo(const CardSetPtr &_set = nullptr);
+    explicit PrintingInfo(const CardSetPtr &_set = nullptr, const QHash<QString, QString> &_properties = {});
+
+    /**
+     * @brief Constructs a PrintingInfo associated with a specific set.
+     *
+     * @param _set The set this printing belongs to (defaults to null).
+     * @param _blob The serialized properties (as written by the cache writer).
+     */
+    explicit PrintingInfo(const CardSetPtr &_set, const QByteArray &_blob);
 
     /**
      * @brief Destroys the PrintingInfo.
@@ -127,21 +136,6 @@ public:
      * @param _value The string value to assign.
      */
     void setProperty(const QString &_name, const QString &_value);
-    void setProperties(const QHash<QString, QString> &_props);
-
-    /**
-     * @brief Stores the pre-serialized properties blob and marks the materialized
-     *        cache as invalid. Used by the binary cache reader to avoid building a
-     *        QHash<QString, QString> at load time.
-     * @param _blob The serialized properties (as written by the cache writer).
-     */
-    void setPropertiesBlob(QByteArray _blob) const
-    {
-        QMutexLocker lock(propertiesMutex.data());
-        propertiesBlob = std::move(_blob);
-        propertiesLoaded = false;
-        propertiesCache.clear();
-    }
 
     /**
      * @brief Returns the providerID for this printing.
