@@ -6,11 +6,7 @@ set(HEADERS libcockatrice/filters/filter_card.h libcockatrice/filters/filter_str
             libcockatrice/filters/filter_tree.h
 )
 
-if(Qt6_FOUND)
-  qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-elseif(Qt5_FOUND)
-  qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
-endif()
+qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
 
 add_library(
   libcockatrice_filters STATIC ${MOC_SOURCES} libcockatrice/filters/filter_card.cpp

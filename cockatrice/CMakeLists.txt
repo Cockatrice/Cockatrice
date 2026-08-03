@@ -403,11 +403,7 @@ if(APPLE)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
-if(Qt6_FOUND)
-  qt6_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
-elseif(Qt5_FOUND)
-  qt5_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
-endif()
+qt6_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 
 # Declare path variables
 set(ICONDIR
@@ -423,67 +419,28 @@ set(COCKATRICE_MAC_QM_INSTALL_DIR "cockatrice.app/Contents/Resources/translation
 set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/cockatrice/translations")
 set(COCKATRICE_WIN32_QM_INSTALL_DIR "translations")
 
-if(Qt6_FOUND)
-  qt6_add_executable(
-    cockatrice
-    WIN32
-    MACOSX_BUNDLE
-    ${cockatrice_SOURCES}
-    ${cockatrice_RESOURCES_RCC}
-    ${cockatrice_MOC_SRCS}
-    MANUAL_FINALIZATION
-  )
-elseif(Qt5_FOUND)
-  # Qt5 Translations need to be linked at executable creation time
-  if(Qt5LinguistTools_FOUND)
-    if(UPDATE_TRANSLATIONS)
-      qt5_create_translation(cockatrice_QM ${translate_SRCS} ${cockatrice_TS})
-    else()
-      qt5_add_translation(cockatrice_QM ${cockatrice_TS})
-    endif()
-  endif()
-  add_executable(
-    cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_MOC_SRCS} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC}
-                                   ${cockatrice_SOURCES}
-  )
-  if(UNIX)
-    if(APPLE)
-      install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_MAC_QM_INSTALL_DIR})
-    else()
-      install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_UNIX_QM_INSTALL_DIR})
-    endif()
-  elseif(WIN32)
-    install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_WIN32_QM_INSTALL_DIR})
-  endif()
-endif()
+qt6_add_executable(
+  cockatrice
+  WIN32
+  MACOSX_BUNDLE
+  ${cockatrice_SOURCES}
+  ${cockatrice_RESOURCES_RCC}
+  ${cockatrice_MOC_SRCS}
+  MANUAL_FINALIZATION
+)
 
-if(Qt5_FOUND)
-  target_link_libraries(
-    cockatrice
-    libcockatrice_card
-    libcockatrice_deck_list
-    libcockatrice_filters
-    libcockatrice_utility
-    libcockatrice_network
-    libcockatrice_models
-    libcockatrice_rng
-    libcockatrice_settings
-    ${COCKATRICE_QT_MODULES}
-  )
-else()
-  target_link_libraries(
-    cockatrice
-    PUBLIC libcockatrice_card
-           libcockatrice_deck_list
-           libcockatrice_filters
-           libcockatrice_utility
-           libcockatrice_network
-           libcockatrice_models
-           libcockatrice_rng
-           libcockatrice_settings
-           ${COCKATRICE_QT_MODULES}
-  )
-endif()
+target_link_libraries(
+  cockatrice
+  PUBLIC libcockatrice_card
+         libcockatrice_deck_list
+         libcockatrice_filters
+         libcockatrice_utility
+         libcockatrice_network
+         libcockatrice_models
+         libcockatrice_rng
+         libcockatrice_settings
+         ${COCKATRICE_QT_MODULES}
+)
 
 if(UNIX)
   if(APPLE)
@@ -513,7 +470,7 @@ if(APPLE)
   set(plugin_dest_dir cockatrice.app/Contents/Plugins)
   set(qtconf_dest_dir cockatrice.app/Contents/Resources)
 
-  # Qt plugins: audio (Qt5), iconengines, imageformats, multimedia (Qt6), platforms, printsupport (Qt5), styles, tls (Qt6)
+  # Qt plugins: audio, iconengines, imageformats, multimedia, platforms, printsupport, styles, tls
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -580,7 +537,7 @@ if(WIN32)
     PATTERN "*.ini"
   )
 
-  # Qt plugins: audio (Qt5), iconengines, imageformats, multimedia (Qt6) platforms, printsupport (Qt5), styles, tls (Qt6)
+  # Qt plugins: audio, iconengines, imageformats, multimedia, platforms, printsupport, styles, tls
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -636,7 +593,7 @@ Data = Resources\")
   endif()
 endif()
 
-if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
+if(Qt6LinguistTools_FOUND)
   #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
     qt6_add_translations(
@@ -663,6 +620,4 @@ if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
   endif()
 endif()
 
-if(Qt6_FOUND)
-  qt6_finalize_target(cockatrice)
-endif()
+qt6_finalize_target(cockatrice)
