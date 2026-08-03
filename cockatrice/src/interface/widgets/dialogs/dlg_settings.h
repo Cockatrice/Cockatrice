@@ -33,14 +33,32 @@ class DlgSettings : public QDialog
 {
     Q_OBJECT
 public:
+    /**
+     * @brief Page order in the tab bar, matching the order pages are added in setupUi()
+     *
+     * Use these values instead of raw indices so reordering pages never silently
+     * breaks external callers like tab_room.cpp.
+     */
+    enum SettingsPage
+    {
+        GeneralPage = 0,
+        AppearancePage,
+        UserInterfacePage,
+        DeckEditorPage,
+        StoragePage,
+        MessagesPage,
+        SoundPage,
+        ShortcutsPage,
+        NumPages
+    };
+
     explicit DlgSettings(QWidget *parent = nullptr);
     void setTab(int index);
 
 private slots:
     void onTabClicked(int index);
     void onSearchTextChanged(const QString &text);
-    void onSearchResultActivated(const QModelIndex &index);
-    void onResetDefaultsClicked();
+    void onSearchResultClicked(const QModelIndex &index);
     void updateLanguage();
 
 private:
@@ -51,7 +69,6 @@ private:
     QStackedWidget *pagesWidget;     ///< Stacked widget containing settings pages
     QListView *searchResultsView;    ///< Search results list view
     QWidget *pagesContainer;         ///< Container stacking pages and search results
-    QPushButton *resetButton;        ///< Button to reset current page to defaults
     QPushButton *okButton;           ///< Button to close the dialog
 
     // Data
@@ -60,7 +77,6 @@ private:
     SettingsSearchDelegate *searchDelegate; ///< Delegate for search result rendering
     int currentTabIndex;                    ///< Currently active tab index
     bool searchActive;                      ///< Whether search mode is active
-    QStringList pageNames;                  ///< Translated page names for breadcrumb display
 
     void setupUi();
     void setupTabBar();
@@ -69,7 +85,8 @@ private:
     void switchToSearchMode();
     void navigateToSearchResult(const QModelIndex &index);
     void setActiveTab(int index);
-    void flashWidget(QWidget *widget);
+    static void flashWidget(QWidget *widget);
+    static QStringList translatedPageNames();
 
     void retranslateUi();
     void retranslateTabNames();

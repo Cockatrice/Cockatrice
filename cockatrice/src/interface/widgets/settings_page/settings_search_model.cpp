@@ -5,7 +5,8 @@
  */
 #include "settings_search_model.h"
 
-#include <QSet>
+#include <QPair>
+#include <algorithm>
 
 SettingsSearchModel::SettingsSearchModel(QObject *parent) : QAbstractListModel(parent)
 {
@@ -88,7 +89,12 @@ void SettingsSearchModel::rebuildFilter()
     } else {
         QList<QPair<int, int>> scored; // <score, index>
         for (int i = 0; i < sourceEntries.size(); ++i) {
-            int score = relevanceScore(sourceEntries[i], filterQuery, filterRegex);
+            const SettingsSearchEntry &entry = sourceEntries[i];
+            // Skip conditional settings that are currently disabled or hidden
+            if (entry.widget && (!entry.widget->isEnabled() || entry.widget->isHidden())) {
+                continue;
+            }
+            int score = relevanceScore(entry, filterQuery, filterRegex);
             if (score > 0) {
                 scored.append({-score, i}); // negative for descending sort
             }
@@ -120,12 +126,6 @@ QVariant SettingsSearchModel::data(const QModelIndex &index, int role) const
     switch (role) {
         case EntryRole:
             return QVariant::fromValue(entry);
-        case PageIndexRole:
-            return entry.pageIndex;
-        case GroupTitleRole:
-            return entry.groupTitle;
-        case WidgetLabelRole:
-            return entry.widgetLabel;
         case Qt::DisplayRole:
             return entry.widgetLabel;
         case Qt::ToolTipRole:
@@ -142,15 +142,4 @@ SettingsSearchEntry SettingsSearchModel::entryForIndex(const QModelIndex &index)
         return {};
     }
     return sourceEntries[filteredIndices[index.row()]];
-}
-
-QList<int> SettingsSearchModel::filteredPageIndices() const
-{
-    QSet<int> pages;
-    for (int idx : filteredIndices) {
-        pages.insert(sourceEntries[idx].pageIndex);
-    }
-    QList<int> result = pages.values();
-    std::sort(result.begin(), result.end());
-    return result;
 }

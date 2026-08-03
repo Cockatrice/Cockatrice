@@ -6,6 +6,7 @@
 #ifndef COCKATRICE_SETTINGS_SEARCH_DELEGATE_H
 #define COCKATRICE_SETTINGS_SEARCH_DELEGATE_H
 
+#include <QPixmap>
 #include <QStyledItemDelegate>
 
 /**
@@ -26,8 +27,12 @@ public:
     /** @brief Sets the translated page names for breadcrumb display */
     void setPageNames(const QStringList &names);
 
+    /** @brief Sets the icons shown in front of results, indexed by page position */
+    void setPageIcons(const QStringList &iconResources);
+
 private:
-    QStringList pageNames; ///< Translated page names indexed by page position
+    QStringList pageNames;    ///< Translated page names indexed by page position
+    QList<QPixmap> pageIcons; ///< Icons of the related settings pages
 };
 
 #endif // COCKATRICE_SETTINGS_SEARCH_DELEGATE_H

@@ -22,7 +22,7 @@ struct SettingsSearchEntry
     int pageIndex;          ///< Index of the settings page this entry belongs to
     QString groupTitle;     ///< Title of the group/section within the page
     QString widgetLabel;    ///< Display label for the setting widget
-    QString fullSearchText; ///< Extended search text for full-text matching
+    QString fullSearchText; ///< Extended search text (label, control text, tooltip) for full-text matching
     QWidget *widget;        ///< Pointer to the setting widget for focus/scrolling
 };
 
@@ -38,16 +38,11 @@ class SettingsSearchModel : public QAbstractListModel
     Q_OBJECT
 public:
     /**
-     * @brief Custom data roles for accessing entry fields
+     * @brief Custom data role for accessing the full entry
      */
     enum Roles
     {
         EntryRole = Qt::UserRole + 1, ///< Full SettingsSearchEntry object
-        PageIndexRole,                ///< Entry's page index (int)
-        GroupTitleRole,               ///< Entry's group title (QString)
-        WidgetLabelRole,              ///< Entry's widget label (QString)
-        HighlightStartRole,           ///< Start of highlight range
-        HighlightEndRole,             ///< End of highlight range
     };
 
     explicit SettingsSearchModel(QObject *parent = nullptr);
@@ -64,8 +59,6 @@ public:
 
     /** @brief Returns the full entry for a given model index */
     SettingsSearchEntry entryForIndex(const QModelIndex &index) const;
-    /** @brief Returns sorted list of page indices present in filtered results */
-    QList<int> filteredPageIndices() const;
 
 private:
     QList<SettingsSearchEntry> sourceEntries; ///< Complete unfiltered entry list

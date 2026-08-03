@@ -17,7 +17,6 @@
 #include "../settings_page/sound_settings_page.h"
 #include "../settings_page/storage_settings_page.h"
 #include "../settings_page/user_interface_settings_page.h"
-#include "../utility/custom_line_edit.h"
 #include "libcockatrice/card/database/card_database_loader.h"
 #include "libcockatrice/card/database/card_database_manager.h"
 
@@ -29,6 +28,7 @@
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QLineEdit>
 #include <QListView>
 #include <QMessageBox>
 #include <QPropertyAnimation>
@@ -61,6 +61,17 @@ static QScrollArea *makeScrollable(QWidget *widget)
     scrollArea->horizontalScrollBar()->setEnabled(false);
     scrollArea->setWidget(widget);
     return scrollArea;
+}
+
+/**
+ * @brief Returns the theme icon resources for each settings page, indexed by SettingsPage order
+ */
+static QStringList pageIconResources()
+{
+    return {QStringLiteral("theme:config/general"),   QStringLiteral("theme:config/appearance"),
+            QStringLiteral("theme:config/interface"), QStringLiteral("theme:config/deckeditor"),
+            QStringLiteral("theme:config/storage"),   QStringLiteral("theme:config/messages"),
+            QStringLiteral("theme:config/sound"),     QStringLiteral("theme:config/shorcuts")};
 }
 
 DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent), currentTabIndex(0), searchActive(false)
@@ -121,9 +132,11 @@ void DlgSettings::setupUi()
     pagesWidget->addWidget(makeScrollable(userInterfacePage));
     pagesWidget->addWidget(makeScrollable(deckEditorPage));
     pagesWidget->addWidget(makeScrollable(storagePage));
-    pagesWidget->addWidget(makeScrollable(messagesPage));
-    pagesWidget->addWidget(makeScrollable(soundPage));
-    pagesWidget->addWidget(makeScrollable(shortcutsPage));
+    pagesWidget->addWidget(messagesPage);
+    pagesWidget->addWidget(soundPage);
+    pagesWidget->addWidget(shortcutsPage);
+
+    Q_ASSERT(pages.size() == NumPages);
 
     // Search results view (hidden by default)
     searchResultsView = new QListView;
@@ -138,7 +151,12 @@ void DlgSettings::setupUi()
     searchDelegate = new SettingsSearchDelegate(this);
     searchResultsView->setModel(searchModel);
     searchResultsView->setItemDelegate(searchDelegate);
-    connect(searchResultsView, &QListView::activated, this, &DlgSettings::onSearchResultActivated);
+    connect(searchResultsView, &QListView::clicked, this, &DlgSettings::onSearchResultClicked);
+
+    connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, [this] {
+        searchDelegate->setPageIcons(pageIconResources());
+        searchResultsView->viewport()->update();
+    });
 
     // Build search index after pages are created
     buildSearchIndex();
@@ -152,13 +170,10 @@ void DlgSettings::setupUi()
     pagesContainer->setLayout(containerLayout);
 
     // Bottom buttons
-    resetButton = new QPushButton;
-    connect(resetButton, &QPushButton::clicked, this, &DlgSettings::onResetDefaultsClicked);
-
     auto *buttonBox = new QHBoxLayout;
-    buttonBox->addWidget(resetButton);
     buttonBox->addStretch();
     okButton = new QPushButton;
+    okButton->setDefault(true);
     connect(okButton, &QPushButton::clicked, this, &DlgSettings::close);
     buttonBox->addWidget(okButton);
 
@@ -202,28 +217,19 @@ void DlgSettings::setupTabBar()
     tabLayout->setContentsMargins(0, 0, 0, 0);
     tabLayout->setSpacing(2);
 
-    struct TabInfo
-    {
-        QString iconResource;
-        int pageIndex;
-    };
+    const QStringList iconResources = pageIconResources();
 
-    const TabInfo tabInfos[] = {{"theme:config/general", 0},   {"theme:config/appearance", 1},
-                                {"theme:config/interface", 2}, {"theme:config/deckeditor", 3},
-                                {"theme:config/storage", 4},   {"theme:config/messages", 5},
-                                {"theme:config/sound", 6},     {"theme:config/shorcuts", 7}};
-
-    for (const auto &info : tabInfos) {
+    for (int i = 0; i < iconResources.size(); ++i) {
         auto *tabButton = new QToolButton;
         tabButton->setCheckable(true);
-        tabButton->setIcon(QPixmap(info.iconResource));
+        tabButton->setIcon(QPixmap(iconResources[i]));
         tabButton->setIconSize(QSize(48, 48));
         tabButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
         tabButton->setAutoExclusive(true);
         tabButton->setMinimumHeight(85);
         tabButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-        connect(tabButton, &QToolButton::clicked, this, [this, idx = info.pageIndex] { onTabClicked(idx); });
+        connect(tabButton, &QToolButton::clicked, this, [this, idx = i] { onTabClicked(idx); });
 
         tabButtons.append(tabButton);
         tabLayout->addWidget(tabButton);
@@ -236,11 +242,9 @@ void DlgSettings::buildSearchIndex()
 {
     QList<SettingsSearchEntry> allEntries;
 
-    if (pageNames.isEmpty()) {
-        pageNames << tr("General") << tr("Appearance") << tr("User Interface") << tr("Card Sources") << tr("Storage")
-                  << tr("Chat") << tr("Sound") << tr("Shortcuts");
-    }
+    const QStringList pageNames = translatedPageNames();
     searchDelegate->setPageNames(pageNames);
+    searchDelegate->setPageIcons(pageIconResources());
 
     for (int i = 0; i < pages.size(); ++i) {
         QList<SettingsSearchEntry> pageEntries = pages[i]->getSearchEntries();
@@ -321,7 +325,7 @@ void DlgSettings::flashWidget(QWidget *widget)
     fadeOut->setEndValue(0.0);
     fadeOut->setEasingCurve(QEasingCurve::InCubic);
 
-    auto *group = new QSequentialAnimationGroup;
+    auto *group = new QSequentialAnimationGroup(overlay);
     group->addAnimation(flashIn);
     group->addAnimation(fadeOut);
 
@@ -338,10 +342,11 @@ void DlgSettings::onSearchTextChanged(const QString &text)
         if (!searchActive) {
             switchToSearchMode();
         }
-    } else {
-        if (searchActive) {
-            switchToTabMode();
+        if (searchModel->rowCount(QModelIndex()) > 0) {
+            searchResultsView->setCurrentIndex(searchModel->index(0));
         }
+    } else if (searchActive) {
+        switchToTabMode();
     }
 }
 
@@ -368,7 +373,7 @@ void DlgSettings::switchToTabMode()
     setActiveTab(currentTabIndex);
 }
 
-void DlgSettings::onSearchResultActivated(const QModelIndex &index)
+void DlgSettings::onSearchResultClicked(const QModelIndex &index)
 {
     navigateToSearchResult(index);
 }
@@ -390,24 +395,9 @@ void DlgSettings::navigateToSearchResult(const QModelIndex &index)
         if (scrollArea) {
             scrollArea->ensureWidgetVisible(entry.widget);
         }
+        entry.widget->setFocus();
         flashWidget(entry.widget);
     }
-}
-
-void DlgSettings::onResetDefaultsClicked()
-{
-    if (QMessageBox::question(this, tr("Reset to Defaults"),
-                              tr("Are you sure you want to reset all settings on this page to their defaults?")) !=
-        QMessageBox::Yes) {
-        return;
-    }
-
-    if (currentTabIndex >= 0 && currentTabIndex < pages.size()) {
-        pages[currentTabIndex]->resetToDefaults();
-    }
-
-    // Rebuild search index after reset
-    buildSearchIndex();
 }
 
 void DlgSettings::setTab(int index)
@@ -546,20 +536,21 @@ void DlgSettings::retranslateUi()
     retranslateTabNames();
 
     searchEdit->setPlaceholderText(tr("Search settings..."));
-    resetButton->setText(tr("Reset to Defaults"));
     okButton->setText(tr("OK"));
 
     // Rebuild search index for translated text
     buildSearchIndex();
 }
 
+QStringList DlgSettings::translatedPageNames()
+{
+    return {tr("General"), tr("Appearance"), tr("User Interface"), tr("Card Sources"),
+            tr("Storage"), tr("Chat"),       tr("Sound"),          tr("Shortcuts")};
+}
+
 void DlgSettings::retranslateTabNames()
 {
-    pageNames.clear();
-    pageNames << tr("General") << tr("Appearance") << tr("User Interface") << tr("Card Sources") << tr("Storage")
-              << tr("Chat") << tr("Sound") << tr("Shortcuts");
-
-    const QStringList tabLabels = pageNames;
+    const QStringList tabLabels = translatedPageNames();
 
     for (int i = 0; i < tabButtons.size() && i < tabLabels.size(); ++i) {
         tabButtons[i]->setText(tabLabels[i]);
