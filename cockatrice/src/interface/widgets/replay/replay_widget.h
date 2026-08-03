@@ -14,11 +14,12 @@
 #include <QWidget>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 
+class ReplayManager;
 class ReplayQuickSettingsWidget;
 class TabGame;
 
 /**
- * @brief The top-level that is put in the replay dock widget.
+ * @brief The top-level widget that is put in the replay dock widget.
  * Contains the replay timeline as well as the buttons.
  */
 class ReplayWidget : public QWidget
@@ -26,29 +27,28 @@ class ReplayWidget : public QWidget
     Q_OBJECT
 
 public:
-    ReplayWidget(TabGame *parent, GameReplay *replay);
-    TabGame *game;
-    GameReplay *replay;
+    /**
+     * @param parent The parent widget
+     * @param replay Cannot be null. Takes ownership of the replay.
+     */
+    ReplayWidget(QWidget *parent, GameReplay *replay);
 
 signals:
-    void requestChatAndPhaseReset();
+    void rewound();
     void eventReplayed(const GameEventContainer &cont, EventProcessingOptions options);
 
 private:
-    // Replay related members
-    int currentReplayStep = 0;
-    QList<int> replayTimeline;
+    ReplayManager *replayManager;
+
     ReplayTimelineWidget *timelineWidget;
     QToolButton *replayPlayButton, *replayFastForwardButton;
     ReplayQuickSettingsWidget *settingsWidget;
     QAction *aReplaySkipForward, *aReplaySkipBackward, *aReplaySkipForwardBig, *aReplaySkipBackwardBig;
 
 private slots:
-    void replayNextEvent(EventProcessingOptions options);
     void replayFinished();
     void replayPlayButtonToggled(bool checked);
     void updateTimeScaleFactor(bool checked);
-    void replayRewind();
     void refreshShortcuts();
 };
 

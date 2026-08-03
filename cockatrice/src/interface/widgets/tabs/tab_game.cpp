@@ -265,9 +265,6 @@ void TabGame::emitUserEvent()
 
 TabGame::~TabGame()
 {
-    if (replayWidget) {
-        delete replayWidget->replay;
-    }
     for (auto &player : game->getPlayerManager()->getPlayers()) {
         player->clear();
     }
@@ -1183,6 +1180,7 @@ void TabGame::createReplayDock(GameReplay *replay)
     replayDock->setWidget(replayWidget);
     replayDock->setFloating(false);
 
+    connect(replayWidget, &ReplayWidget::rewound, this, &TabGame::resetChatAndPhase);
     connect(replayWidget, &ReplayWidget::eventReplayed, game->getGameEventHandler(),
             [this](const auto &event, auto options) {
                 game->getGameEventHandler()->processGameEventContainer(event, nullptr, options);
