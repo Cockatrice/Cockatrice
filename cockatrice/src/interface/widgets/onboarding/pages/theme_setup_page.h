@@ -14,9 +14,11 @@ class QuickSetupPanel;
  *
  * Behavior specific to this page (deliberately not pushed down into
  * ThemeManager, to avoid changing app-wide behaviour for existing installs):
- *  - If the selected theme+scheme has no saved palette and no shipped
+ *  - Opening the page never changes the running palette; previews and
+ *    auto-generation only happen when the user actually changes a control.
+ *  - If a theme+scheme the user selects has no saved palette and no shipped
  *    default, one is generated from the QuickSetupPanel's current accent so
- *    onboarding never shows a flat, unstyled look. */
+ *    the preview doesn't fall back to a flat, unstyled look. */
 class ThemeSetupPage : public FirstRunWizardPage
 {
     Q_OBJECT
@@ -41,6 +43,7 @@ private:
     QString currentScheme() const;
     QString resolvedScheme() const; // "System" -> actual Light/Dark
     void maybeAutoGeneratePalette();
+    QString writableThemeDir() const;
 
     QComboBox *themeCombo;
     QComboBox *schemeCombo;
