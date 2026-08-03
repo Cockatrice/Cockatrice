@@ -27,11 +27,7 @@ set(HEADERS
     libcockatrice/settings/visual_deck_storage_settings.h
 )
 
-if(Qt6_FOUND)
-  qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-elseif(Qt5_FOUND)
-  qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
-endif()
+qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
 
 add_library(
   libcockatrice_settings STATIC

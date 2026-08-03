@@ -636,19 +636,11 @@ void UserInfoPopup::refreshGames()
 
 // ── Mouse events ──────────────────────────────────────────────────────────────
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void UserInfoPopup::enterEvent(QEnterEvent *e)
 {
     QFrame::enterEvent(e);
     emit mouseEnteredPopup();
 }
-#else
-void UserInfoPopup::enterEvent(QEvent *e)
-{
-    QFrame::enterEvent(e);
-    emit mouseEnteredPopup();
-}
-#endif
 void UserInfoPopup::leaveEvent(QEvent *e)
 {
     QFrame::leaveEvent(e);

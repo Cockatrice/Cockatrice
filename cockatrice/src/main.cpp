@@ -137,11 +137,7 @@ void installNewTranslator()
     QString lang = SettingsCache::instance().personal().getLang();
 
     QString qtNameHint = "qt_" + lang;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     QString qtTranslationPath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
-#else
-    QString qtTranslationPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
-#endif
 
     bool qtTranslationLoaded = qtTranslator->load(qtNameHint, qtTranslationPath);
     if (!qtTranslationLoaded) {
@@ -365,10 +361,6 @@ int main(int argc, char *argv[])
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus,
                        !SettingsCache::instance().cardsDisplay().getShowShortcuts());
-
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    app.setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
 
 #ifdef Q_OS_MAC
     for (const QString &url : pendingMacUrls) {

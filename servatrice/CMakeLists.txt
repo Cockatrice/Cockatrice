@@ -43,11 +43,7 @@ if(APPLE)
   set(servatrice_SOURCES ${servatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
-if(Qt6_FOUND)
-  qt6_add_resources(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
-elseif(Qt5_FOUND)
-  qt5_add_resources(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
-endif()
+qt6_add_resources(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
 
 set(QT_DONT_USE_QTGUI TRUE)
 
