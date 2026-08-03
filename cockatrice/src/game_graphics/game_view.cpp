@@ -256,7 +256,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
     GameScene *gameScene = static_cast<GameScene *>(scene());
     QList<TallyRow> entries = Tally::compute(gameScene->selectedCards(), tallyType);
 
-    if (entries.isEmpty() || count <= 1) {
+    if (entries.isEmpty()) {
         tallyContainer->hide();
         cachedTallyRows.clear();
         return;
