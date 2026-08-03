@@ -53,5 +53,5 @@ void TallyMenu::retranslateUi()
 
     aTallyNone->setText(tr("None"));
     aTallySubtypes->setText(tr("Subtypes"));
-    aTallyTotalPower->setText(tr("Total power"));
+    aTallyTotalPower->setText(tr("Total Power"));
 }

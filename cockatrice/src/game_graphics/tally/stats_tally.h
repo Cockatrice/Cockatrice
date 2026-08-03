@@ -1,5 +1,5 @@
-#ifndef COCKATRICE_POWER_TALLY_H
-#define COCKATRICE_POWER_TALLY_H
+#ifndef COCKATRICE_STATS_TALLY_H
+#define COCKATRICE_STATS_TALLY_H
 #include "tally.h"
 
 /**
@@ -18,4 +18,4 @@ QList<TallyRow> computeTotalPower(const QList<CardItem *> &cards);
 
 } // namespace StatsTally
 
-#endif // COCKATRICE_POWER_TALLY_H
+#endif // COCKATRICE_STATS_TALLY_H
