@@ -7,10 +7,14 @@
 #include "../../interface/widgets/general/background_sources.h"
 
 #include <QComboBox>
+#include <QDir>
+#include <QFile>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QMessageBox>
 #include <QVBoxLayout>
+#include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 
 ThemeSetupPage::ThemeSetupPage(QWidget *parent) : FirstRunWizardPage(parent)
@@ -96,8 +100,10 @@ void ThemeSetupPage::initializePage()
     homeTabBackgroundCombo->setCurrentIndex(homeTabIdx >= 0 ? homeTabIdx : 0);
     homeTabBackgroundCombo->blockSignals(false);
 
+    // Opening the page must not touch the running application's palette:
+    // previews and auto-generation only happen in response to the user
+    // actually changing a control, never on mere page visibility.
     paletteDirty = false;
-    maybeAutoGeneratePalette();
 }
 
 QString ThemeSetupPage::currentScheme() const
@@ -156,11 +162,12 @@ void ThemeSetupPage::maybeAutoGeneratePalette()
         return; // theme already has something real to show -- leave it alone
     }
 
-    // Nothing saved, nothing shipped. Rather than showing flat native Qt
-    // colours during the very first thing a new user sees, seed one from
-    // whatever accent QuickSetupPanel currently holds (its own built-in
-    // default the first time through), and mark it dirty so it's written to
-    // disk if the user moves on without touching the accent controls.
+    // The theme+scheme combination has nothing saved and nothing shipped, and
+    // the user just switched to it. Rather than leaving a flat, unstyled look,
+    // seed one from whatever accent QuickSetupPanel currently holds and mark
+    // it dirty so it's written to disk if the user moves on. Only ever reached
+    // through user interaction (theme/scheme change, accent drag) -- never on
+    // page open.
     PaletteConfig generated =
         PaletteGenerator::fromAccent(quickSetupPanel->accentColor(), quickSetupPanel->intensity(), scheme);
     themeManager->previewPalette(generated, scheme);
@@ -170,14 +177,36 @@ void ThemeSetupPage::maybeAutoGeneratePalette()
 bool ThemeSetupPage::validatePage()
 {
     if (paletteDirty) {
-        const QString dirPath = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
         const QString scheme = resolvedScheme();
         PaletteConfig cfg =
             PaletteGenerator::fromAccent(quickSetupPanel->accentColor(), quickSetupPanel->intensity(), scheme);
-        ThemeManager::commitPalette(dirPath, scheme, cfg);
+        if (!ThemeManager::commitPalette(writableThemeDir(), scheme, cfg)) {
+            QMessageBox::warning(this, tr("Save failed"),
+                                 tr("Could not write the theme palette to:\n%1").arg(writableThemeDir()));
+            return false;
+        }
         themeManager->reloadCurrentTheme();
     }
     return true;
+}
+
+QString ThemeSetupPage::writableThemeDir() const
+{
+    // Built-in themes resolve to the read-only system themes directory;
+    // palette edits must go to the user themes directory instead, exactly
+    // as PaletteEditorDialog does.
+    const QString dirPath = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
+    if (!dirPath.isEmpty()) {
+        const QString probe = QDir(dirPath).absoluteFilePath(".cockatrice_write_test");
+        QFile f(probe);
+        if (f.open(QIODevice::WriteOnly)) {
+            f.close();
+            f.remove();
+            return dirPath;
+        }
+    }
+    return QDir(SettingsCache::instance().paths().getThemesPath())
+        .absoluteFilePath(SettingsCache::instance().getThemeName());
 }
 
 bool ThemeSetupPage::isSkippable() const

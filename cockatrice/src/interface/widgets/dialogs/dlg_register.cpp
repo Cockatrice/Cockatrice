@@ -480,6 +480,10 @@ void DlgRegister::newHostSelected(bool state)
         portEdit->setPlaceholderText(tr("Communication Port"));
         playernameEdit->setDisabled(false);
         playernameEdit->clear();
+    } else {
+        // Rebuild the list so the previously selected host's details are
+        // repopulated (mirrors DlgConnect::newHostSelected).
+        preRebuildComboBoxList();
     }
 }
 
@@ -517,6 +521,24 @@ void DlgRegister::actOk()
     if (playernameEdit->text().isEmpty()) {
         QMessageBox::critical(this, tr("Registration Warning"), tr("The player name can't be empty."));
         return;
+    }
+
+    ServersSettings &servers = SettingsCache::instance().servers();
+
+    if (newHostButton->isChecked()) {
+        // Persist the new host so it shows up in the Connect dialog later.
+        // The password is never stored: the account is not verified yet.
+        const QString host = hostEdit->text().trimmed();
+        if (!host.isEmpty()) {
+            servers.addNewServer(host, host, portEdit->text().trimmed(), playernameEdit->text().trimmed(), QString(),
+                                 false);
+            servers.setPrevioushostName(host);
+        }
+    } else {
+        const QString saveName = previousHosts->currentText();
+        if (!saveName.isEmpty() && saveName != placeHolderText) {
+            servers.setPrevioushostName(saveName);
+        }
     }
 
     accept();
