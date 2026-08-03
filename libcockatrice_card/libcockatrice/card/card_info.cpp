@@ -12,7 +12,6 @@
 #include <QRegularExpression>
 #include <QSharedPointer>
 #include <QString>
-#include <QVariant>
 #include <algorithm>
 #include <utility>
 
