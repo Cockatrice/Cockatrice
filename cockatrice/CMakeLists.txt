@@ -136,8 +136,11 @@ set(cockatrice_SOURCES
     src/interface/card_picture_loader/card_picture_loader_worker_work.cpp
     src/interface/card_picture_loader/card_picture_to_load.cpp
     src/interface/intents/intent.cpp
+    src/interface/intents/intent.h
     src/interface/intents/intent_open_local_deck.cpp
+    src/interface/intents/intent_open_local_deck.h
     src/interface/intents/intent_wait_for_database_load.cpp
+    src/interface/intents/intent_wait_for_database_load.h
     src/interface/layouts/flow_layout.cpp
     src/interface/layouts/overlap_layout.cpp
     src/interface/widgets/utility/line_edit_completer.cpp
@@ -364,7 +367,6 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
     src/interface/widgets/utility/compact_push_button.cpp
     src/interface/widgets/utility/compact_push_button.h
-    src/single_instance_manager.cpp
     src/single_instance_manager.h
     src/client/url_scheme_event_filter.h
     src/interface/intents/intent_connect_to_server.cpp
@@ -372,12 +374,13 @@ set(cockatrice_SOURCES
     src/interface/intents/intent_disconnect_from_server.cpp
     src/interface/intents/intent_disconnect_from_server.h
     src/interface/intents/intent_join_server_game.cpp
+    src/interface/intents/intent_join_server_game.h
     src/interface/intents/intent_join_server_room.cpp
     src/interface/intents/intent_join_server_room.h
-    src/interface/intents/url_parser.cpp
-    src/interface/intents/url_parser.h
     src/interface/intents/intent_login.cpp
     src/interface/intents/intent_login.h
+    src/interface/intents/url_parser.cpp
+    src/interface/intents/url_parser.h
     src/interface/widgets/server/user/user_info_popup.cpp
     src/interface/widgets/server/user/user_info_popup.h
 )

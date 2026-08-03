@@ -78,6 +78,7 @@ signals:
     void openMessageDialog(const QString &userName, bool focus);
     void maximizeClient();
     void notIdle();
+    void gameListUpdated();
 private slots:
     void sendMessage();
     void sayFinished(const Response &response);

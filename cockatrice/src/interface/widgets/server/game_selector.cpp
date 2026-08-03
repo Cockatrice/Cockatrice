@@ -310,7 +310,6 @@ void GameSelector::customContextMenu(const QPoint &point)
     connect(&getGameInfo, &QAction::triggered, this, [=, this]() {
         const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
         const QMap<int, QString> &gameTypes = gameListModel->getGameTypes().value(gameInfo.room_id());
-        qWarning() << "Game Id: " << gameInfo.game_id();
 
         DlgCreateGame dlg(gameInfo, gameTypes, this);
         dlg.exec();

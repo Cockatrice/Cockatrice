@@ -587,6 +587,10 @@ void TabSupervisor::actTabServer(bool checked)
 
 void TabSupervisor::openTabServer()
 {
+    if (tabServer) {
+        return;
+    }
+
     tabServer = new TabServer(this, client);
     connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
     myAddTab(tabServer, aTabServer);

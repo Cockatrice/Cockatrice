@@ -1,9 +1,8 @@
 #include "url_parser.h"
 
 #include "../window_main.h"
-#include "contexts/context_join_room.h"
+#include "contexts/context_join_game.h"
 #include "intent_join_server_game.h"
-#include "intent_join_server_room.h"
 #include "intent_login.h"
 
 #include <QDebug>
@@ -46,6 +45,7 @@ void IntentUrlParser::handleJoinGame(const QUrlQuery &query)
 
     if (!ok) {
         qWarning() << "Invalid or missing roomId";
+        delete ctx;
         return;
     }
 
@@ -54,15 +54,20 @@ void IntentUrlParser::handleJoinGame(const QUrlQuery &query)
 
     if (!ok) {
         qWarning() << "Invalid or missing gameId";
+        delete ctx;
         return;
     }
 
-    auto getLoginCredentialsIntent =
-        new IntentGetLoginCredentials(mainWindow->getRemoteClient(), &ctx->roomContext.serverContext);
-
+    // The join game intent owns the context and the credential lookup; once the
+    // chain finishes (or fails) it deletes the whole tree.
     auto joinGameIntent = new IntentJoinServerGame(mainWindow->getTabSupervisor(), mainWindow->getRemoteClient(), ctx);
+    joinGameIntent->setParent(this);
+
+    auto getLoginCredentialsIntent = new IntentGetLoginCredentials(&ctx->roomContext.serverContext);
+    getLoginCredentialsIntent->setParent(joinGameIntent);
 
     connect(getLoginCredentialsIntent, &Intent::finished, joinGameIntent, &Intent::execute);
+    connect(getLoginCredentialsIntent, &Intent::failed, joinGameIntent, &Intent::failed);
 
     getLoginCredentialsIntent->execute();
 }

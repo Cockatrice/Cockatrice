@@ -8,53 +8,74 @@ bool SingleInstanceManager::tryRun(const QStringList &filesToSend)
 {
     serverName = "CockatriceSingleInstance";
 
-    // Attempt to connect only if we have files to send
-    if (!filesToSend.isEmpty()) {
-        QLocalSocket socket;
-        socket.connectToServer(serverName);
-        if (socket.waitForConnected(200)) {
-            // Serialize payload with length prefix
-            QByteArray payload;
-            QDataStream out(&payload, QIODevice::WriteOnly);
-            out << filesToSend;
-
-            QByteArray message;
-            QDataStream msgStream(&message, QIODevice::WriteOnly);
-            msgStream << quint32(payload.size());
-            message.append(payload);
-
-            socket.write(message);
-            socket.flush();
-            socket.waitForBytesWritten(1000);
-
-            return false; // Sent successfully → exit
-        }
+    // Hand off to an already-running primary instance if one exists.
+    if (forwardToPrimary(filesToSend)) {
+        return false;
     }
 
-    // Otherwise, start server
+    // No primary instance is currently reachable, so become the primary.
     server = new QLocalServer(this);
     connect(server, &QLocalServer::newConnection, this, &SingleInstanceManager::handleNewConnection);
 
-    if (!server->listen(serverName)) {
-        QLocalServer::removeServer(serverName);
-        server->listen(serverName);
+    if (server->listen(serverName)) {
+        return true;
     }
 
-    return true; // This process is now primary server
+    // Another instance may have started while we were probing; hand off to it
+    // instead of stealing its socket.
+    if (forwardToPrimary(filesToSend)) {
+        return false;
+    }
+
+    // The socket is stale (left over by a crashed instance): remove it and
+    // retry. If that still fails, another instance just took the name.
+    QLocalServer::removeServer(serverName);
+    if (server->listen(serverName)) {
+        return true;
+    }
+
+    forwardToPrimary(filesToSend);
+    return false;
+}
+
+bool SingleInstanceManager::forwardToPrimary(const QStringList &filesToSend)
+{
+    QLocalSocket socket;
+    socket.connectToServer(serverName);
+    if (!socket.waitForConnected(200)) {
+        return false;
+    }
+
+    // Serialize payload with length prefix
+    QByteArray payload;
+    QDataStream out(&payload, QIODevice::WriteOnly);
+    out << filesToSend;
+
+    QByteArray message;
+    QDataStream msgStream(&message, QIODevice::WriteOnly);
+    msgStream << quint32(payload.size());
+    message.append(payload);
+
+    socket.write(message);
+    socket.flush();
+    socket.waitForBytesWritten(1000);
+
+    return true;
 }
 
 void SingleInstanceManager::handleNewConnection()
 {
     QLocalSocket *socket = server->nextPendingConnection();
 
-    // Per-connection state
-    auto buffer = new QByteArray();
-    auto expectedSize = new quint32(0);
+    // Per-connection state. QSharedPointer keeps the buffers alive for as long
+    // as the connection handler is attached to the socket.
+    auto buffer = QSharedPointer<QByteArray>::create();
+    auto expectedSize = QSharedPointer<quint32>::create(0);
 
     connect(socket, &QLocalSocket::readyRead, this, [this, socket, buffer, expectedSize]() {
         buffer->append(socket->readAll());
 
-        QDataStream stream(buffer, QIODevice::ReadOnly);
+        QDataStream stream(buffer.data(), QIODevice::ReadOnly);
 
         while (true) {
             // Step 1: read size

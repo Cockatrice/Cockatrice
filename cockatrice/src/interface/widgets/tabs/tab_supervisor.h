@@ -187,6 +187,7 @@ public slots:
     void maximizeMainWindow();
     void actTabVisualDeckStorage(bool checked);
     void actTabReplays(bool checked);
+    void openTabServer();
 private slots:
     void refreshShortcuts();
 
@@ -199,7 +200,6 @@ private slots:
 
     void openTabVisualDeckStorage();
     void openTabHome();
-    void openTabServer();
     void openTabAccount();
     void openTabDeckStorage();
     void openTabReplays();

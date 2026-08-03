@@ -345,9 +345,10 @@ int main(int argc, char *argv[])
         // No primary instance → become server
         qInfo() << "No existing instance found, becoming primary instance";
     } else {
-        // Plain launch: try to start server, but do not connect to any existing
+        // Plain launch: if another instance is running, run independently
+        // instead of handing off and exiting.
         if (!instance.tryRun(QStringList())) {
-            // Server already exists → just run independently
+            // Another instance is already running → just run independently
             qInfo() << "Another instance exists, running independently";
         } else {
             qInfo() << "No existing instance found, starting server";

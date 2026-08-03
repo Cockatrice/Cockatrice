@@ -12,6 +12,8 @@ class SingleInstanceManager : public QObject
 public:
     explicit SingleInstanceManager(QObject *parent = nullptr);
 
+    // Returns true if this process became the primary instance, false if
+    // another instance is already running (and received our files).
     bool tryRun(const QStringList &initialFiles);
 
 signals:
@@ -21,6 +23,8 @@ private slots:
     void handleNewConnection();
 
 private:
+    bool forwardToPrimary(const QStringList &filesToSend);
+
     QString serverName;
     QLocalServer *server = nullptr;
 };

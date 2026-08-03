@@ -8,19 +8,10 @@ class Intent : public QObject
     Q_OBJECT
 
 public:
-    explicit Intent(QObject *parent = nullptr) : QObject(parent)
-    {
-    }
-    virtual ~Intent() = default;
+    explicit Intent(QObject *parent = nullptr);
+    ~Intent() override;
 
-    void execute()
-    {
-        if (checkPrecondition()) {
-            onPreconditionSatisfied();
-        } else {
-            onPreconditionNotSatisfied();
-        }
-    }
+    void execute();
 
 signals:
     void finished();
@@ -33,17 +24,7 @@ protected:
     virtual void onPreconditionNotSatisfied() = 0;
 
     // Helper to chain another intent
-    void runDependency(Intent *dependency)
-    {
-        connect(dependency, &Intent::finished, this, [this]() {
-            // Re-check after dependency finishes
-            this->execute();
-        });
-
-        connect(dependency, &Intent::failed, this, &Intent::failed);
-
-        dependency->execute();
-    }
+    void runDependency(Intent *dependency);
 };
 
 #endif // COCKATRICE_INTENT_H
