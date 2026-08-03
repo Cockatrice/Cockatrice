@@ -242,7 +242,7 @@ void TabRoom::actClearChat()
 void TabRoom::actOpenChatSettings()
 {
     DlgSettings settings(this);
-    settings.setTab(5);
+    settings.setTab(DlgSettings::MessagesPage);
     settings.exec();
 }
 

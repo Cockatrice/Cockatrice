@@ -16,7 +16,6 @@ class AbstractSettingsPage : public QWidget
 public:
     virtual void retranslateUi() = 0;
     virtual QList<SettingsSearchEntry> getSearchEntries();
-    virtual void resetToDefaults();
 
 protected:
     static QList<SettingsSearchEntry> autoDetectSearchEntries(QWidget *page, int pageIndex);
