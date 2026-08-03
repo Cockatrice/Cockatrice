@@ -95,7 +95,7 @@ class SplitCardPart
 public:
     SplitCardPart(const QString &_name,
                   const QString &_text,
-                  const QVariantHash &_properties,
+                  const QHash<QString, QString> &_properties,
                   const PrintingInfo &_printingInfo);
     inline const QString &getName() const
     {
@@ -105,7 +105,7 @@ public:
     {
         return text;
     }
-    inline const QVariantHash &getProperties() const
+    inline const QHash<QString, QString> &getProperties() const
     {
         return properties;
     }
@@ -117,7 +117,7 @@ public:
 private:
     QString name;
     QString text;
-    QVariantHash properties;
+    QHash<QString, QString> properties;
     PrintingInfo printingInfo;
 };
 
@@ -142,7 +142,7 @@ private:
     CardInfoPtr addCard(QString name,
                         const QString &text,
                         bool isToken,
-                        QVariantHash properties,
+                        QHash<QString, QString> properties,
                         const QList<CardRelation *> &relatedCards,
                         const PrintingInfo &printingInfo);
 signals:

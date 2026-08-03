@@ -172,7 +172,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
         if (xmlName == "card") {
             QString name = QString("");
             QString text = QString("");
-            QVariantHash properties = QVariantHash();
+            QHash<QString, QString> properties;
             QString colors = QString("");
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             auto _sets = SetToPrintingsMap();
@@ -229,7 +229,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     // behaviour. Without this check, disabling a set has no effect on v3 databases.
                     if (set->getEnabled()) {
                         PrintingInfo setInfo(set);
-                        QVariantHash printingProps;
+                        QHash<QString, QString> printingProps;
                         if (attrs.hasAttribute("muId")) {
                             printingProps.insert("muid", attrs.value("muId").toString());
                         }
