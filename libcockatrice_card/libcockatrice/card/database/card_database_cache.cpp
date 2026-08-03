@@ -17,7 +17,7 @@
 namespace
 {
 constexpr quint32 CACHE_MAGIC = 0x43445243; // "CDRC"
-constexpr quint32 CACHE_VERSION = 1;
+constexpr quint32 CACHE_VERSION = 2;
 
 // ---- Primitives -----------------------------------------------------------
 
