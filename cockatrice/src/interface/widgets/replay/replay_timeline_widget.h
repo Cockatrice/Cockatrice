@@ -25,7 +25,7 @@ signals:
 private:
     QList<int> histogram;
     int maxBinValue = 1;
-    int maxTime = 0;
+    int maxTime = 1;
 
     int currentTime = 0;
 

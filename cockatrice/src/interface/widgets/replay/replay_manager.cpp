@@ -25,7 +25,7 @@ static QList<int> createReplayTimeline(const GameReplay *replay)
         const int numberEventsThisSecond = nextSecondIndex - i;
         for (int k = 0; k < numberEventsThisSecond; ++k) {
             int eventMs = replay->event_list(i + k).seconds_elapsed() * 1000;
-            int distributionMs = static_cast<int>(static_cast<qreal>(k) / numberEventsThisSecond) * 1000;
+            int distributionMs = static_cast<int>(static_cast<qreal>(k) / numberEventsThisSecond * 1000);
             replayTimeline.append(eventMs + distributionMs);
         }
 
