@@ -21,6 +21,7 @@
 #define SERVATRICE_H
 
 #include "metrics_registry.h"
+#include "ratelimiter.h"
 #include "smtpclient.h"
 
 #include <QByteArray>
@@ -204,6 +205,8 @@ private:
     std::shared_ptr<const Response_ReportStats> reportStatsCache;
     static constexpr int reportStatsCacheTtlSeconds = 60;
 
+    RateLimiter rateLimiter;
+
     mutable QMutex serverListMutex;
     QList<ServerProperties> serverList;
     void updateServerList();
@@ -361,6 +364,19 @@ public:
      * thread right after it starts.
      */
     void watchWorkerThread(QThread *thread);
+
+    RateLimiter *getRateLimiter()
+    {
+        return &rateLimiter;
+    }
+    bool recordFailedLogin(const QString &ipAddress) override;
+    void clearFailedLogins(const QString &ipAddress) override;
+    int getMaxLoginAttemptsPerIp() const;
+    int getLoginAttemptWindowSeconds() const;
+    int getMaxRegistrationsPerIp() const;
+    int getRegistrationWindowSeconds() const;
+    int getMaxForgotPasswordRequestsPerIp() const;
+    int getForgotPasswordWindowSeconds() const;
 
     bool islConnectionExists(int _serverId) const;
     void addIslInterface(int _serverId, IslInterface *interface);
