@@ -94,6 +94,9 @@ inline Q_LOGGING_CATEGORY(WebsocketServerSocketInterfaceLog, "websocket_server_s
 
 static const int protocolVersion = 14;
 
+// Maximum size of a single TCP protocol message. Matches the websocket limit.
+static const int MAX_TCP_MESSAGE_SIZE = 1500000;
+
 AbstractServerSocketInterface::AbstractServerSocketInterface(Servatrice *_server,
                                                              Servatrice_DatabaseInterface *_databaseInterface,
                                                              QObject *parent)
@@ -2306,13 +2309,21 @@ void TcpServerSocketInterface::readClient()
                                 (((quint32)(unsigned char)inputBuffer[1]) << 16) +
                                 (((quint32)(unsigned char)inputBuffer[2]) << 8) +
                                 ((quint32)(unsigned char)inputBuffer[3]);
+                // Reject implausible lengths instead of buffering until they arrive.
+                // This also handles lengths that overflow into negative int values.
+                if (messageLength < 0 || messageLength > MAX_TCP_MESSAGE_SIZE) {
+                    qCWarning(TcpServerSocketInterfaceLog)
+                        << "Invalid message length" << messageLength << "from" << getAddress();
+                    prepareDestroy();
+                    return;
+                }
                 inputBuffer.remove(0, 4);
                 messageInProgress = true;
             } else {
                 return;
             }
         }
-        if (inputBuffer.size() < messageLength || messageLength < 0) {
+        if (inputBuffer.size() < messageLength) {
             return;
         }
 
@@ -2418,10 +2429,15 @@ void WebsocketServerSocketInterface::initConnection(void *_socket)
 
     QByteArray websocketIPHeader = settingsCache->value("server/web_socket_ip_header", "").toByteArray();
     if (websocketIPHeader.length() > 0 && socket->request().hasRawHeader(websocketIPHeader)) {
-        QString header(socket->request().rawHeader(websocketIPHeader));
-        QHostAddress parsed(header);
-        if (!parsed.isNull()) {
-            address = parsed;
+        // Only trust the forwarded header if the connection itself comes from a trusted proxy,
+        // otherwise a client could spoof its address to bypass bans and rate limits.
+        QString trustedSources = settingsCache->value("security/trusted_sources", "127.0.0.1,::1").toString();
+        if (trustedSources.contains(socket->peerAddress().toString(), Qt::CaseInsensitive)) {
+            QString header(socket->request().rawHeader(websocketIPHeader));
+            QHostAddress parsed(header);
+            if (!parsed.isNull()) {
+                address = parsed;
+            }
         }
     }
 
