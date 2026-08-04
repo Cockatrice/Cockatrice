@@ -133,6 +133,22 @@ void Server_ProtocolHandler::sendProtocolItem(const RoomEvent &item)
 Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(const CommandContainer &cont,
                                                                               ResponseContainer &rc)
 {
+    const auto isPreAuthSessionCommand = [](SessionCommand::SessionCommandType type) {
+        switch (type) {
+            case SessionCommand::PING:
+            case SessionCommand::LOGIN:
+            case SessionCommand::REGISTER:
+            case SessionCommand::ACTIVATE:
+            case SessionCommand::FORGOT_PASSWORD_REQUEST:
+            case SessionCommand::FORGOT_PASSWORD_RESET:
+            case SessionCommand::FORGOT_PASSWORD_CHALLENGE:
+            case SessionCommand::REQUEST_PASSWORD_SALT:
+                return true;
+            default:
+                return false;
+        }
+    };
+
     Response::ResponseCode finalResponseCode = Response::RespOk;
     for (int i = cont.session_command_size() - 1; i >= 0; --i) {
         Response::ResponseCode resp = Response::RespInvalidCommand;
@@ -141,33 +157,38 @@ Response::ResponseCode Server_ProtocolHandler::processSessionCommandContainer(co
         if (num != SessionCommand::PING) { // don't log ping commands
             logDebugMessage(getSafeDebugString(sc));
         }
-        switch ((SessionCommand::SessionCommandType)num) {
-            case SessionCommand::PING:
-                resp = cmdPing(sc.GetExtension(Command_Ping::ext), rc);
-                break;
-            case SessionCommand::LOGIN:
-                resp = cmdLogin(sc.GetExtension(Command_Login::ext), rc);
-                break;
-            case SessionCommand::MESSAGE:
-                resp = cmdMessage(sc.GetExtension(Command_Message::ext), rc);
-                break;
-            case SessionCommand::GET_GAMES_OF_USER:
-                resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), rc);
-                break;
-            case SessionCommand::GET_USER_INFO:
-                resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), rc);
-                break;
-            case SessionCommand::LIST_ROOMS:
-                resp = cmdListRooms(sc.GetExtension(Command_ListRooms::ext), rc);
-                break;
-            case SessionCommand::JOIN_ROOM:
-                resp = cmdJoinRoom(sc.GetExtension(Command_JoinRoom::ext), rc);
-                break;
-            case SessionCommand::LIST_USERS:
-                resp = cmdListUsers(sc.GetExtension(Command_ListUsers::ext), rc);
-                break;
-            default:
-                resp = processExtendedSessionCommand(num, sc, rc);
+        const auto commandType = static_cast<SessionCommand::SessionCommandType>(num);
+        if (authState == NotLoggedIn && !isPreAuthSessionCommand(commandType)) {
+            resp = Response::RespLoginNeeded;
+        } else {
+            switch (commandType) {
+                case SessionCommand::PING:
+                    resp = cmdPing(sc.GetExtension(Command_Ping::ext), rc);
+                    break;
+                case SessionCommand::LOGIN:
+                    resp = cmdLogin(sc.GetExtension(Command_Login::ext), rc);
+                    break;
+                case SessionCommand::MESSAGE:
+                    resp = cmdMessage(sc.GetExtension(Command_Message::ext), rc);
+                    break;
+                case SessionCommand::GET_GAMES_OF_USER:
+                    resp = cmdGetGamesOfUser(sc.GetExtension(Command_GetGamesOfUser::ext), rc);
+                    break;
+                case SessionCommand::GET_USER_INFO:
+                    resp = cmdGetUserInfo(sc.GetExtension(Command_GetUserInfo::ext), rc);
+                    break;
+                case SessionCommand::LIST_ROOMS:
+                    resp = cmdListRooms(sc.GetExtension(Command_ListRooms::ext), rc);
+                    break;
+                case SessionCommand::JOIN_ROOM:
+                    resp = cmdJoinRoom(sc.GetExtension(Command_JoinRoom::ext), rc);
+                    break;
+                case SessionCommand::LIST_USERS:
+                    resp = cmdListUsers(sc.GetExtension(Command_ListUsers::ext), rc);
+                    break;
+                default:
+                    resp = processExtendedSessionCommand(num, sc, rc);
+            }
         }
         if (resp != Response::RespOk) {
             finalResponseCode = resp;
