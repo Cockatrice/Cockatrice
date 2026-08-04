@@ -95,7 +95,7 @@ jobs:
             org.opencontainers.image.description=${{ env.OCI_DESCRIPTION }}
             org.opencontainers.image.title=${{ env.OCI_TITLE }}
             org.opencontainers.image.url=${{ env.OCI_URL }}
-          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.GHCR_IMAGE }},name-canonical=true,push=true,push-by-digest=true
           platforms: ${{ matrix.platform }}
           provenance: mode=max    # Do not pass secrets as build arguments with this option
           sbom: true
@@ -113,7 +113,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error
-          name: digest-${{ matrix.platform }}
+          name: digest-${{ matrix.label }}
           path: $RUNNER_TEMP/digests/*
           retention-days: 1
 
@@ -127,7 +127,7 @@ jobs:
 
     steps:
       - name: "Download digests"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: $RUNNER_TEMP/digests
           pattern: digest-*
@@ -152,11 +152,12 @@ jobs:
       # Add OCI annotations to image index and publish tags
       - name: "Create image index"
         env:
-          TAGS: ${{ steps.metadata.outputs.tags }}
+          DOCKER_TAGS: ${{ steps.metadata.outputs.tags }}
+          GITHUB_TAG: ${{ github.ref_name }}
         working-directory: ${{ runner.temp }}/digests
         run: |
           TAG_ARGS=""
-          for tag in $TAGS; do
+          for tag in $DOCKER_TAGS; do
             TAG_ARGS="$TAG_ARGS --tag $tag"
           done
 
@@ -171,4 +172,4 @@ jobs:
       - name: "Inspect images"
         run: |
           docker buildx imagetools inspect "$GHCR_IMAGE:latest"
-          docker buildx imagetools inspect "$GHCR_IMAGE:$OCI_VERSION"
+          docker buildx imagetools inspect "$GHCR_IMAGE:$GITHUB_TAG"
