@@ -23,6 +23,11 @@ class OracleWizard : public QWizard
 public:
     explicit OracleWizard(QWidget *parent = nullptr);
     void accept() override;
+    void reject() override;
+    bool wasCancelled()
+    {
+        return cancelled;
+    }
     void enableButtons();
     void disableButtons();
     void retranslateUi();
@@ -74,6 +79,7 @@ private:
     QByteArray tokensData;
     QString cardSourceUrl;
     QString cardSourceVersion;
+    bool cancelled = false;
 
     void migrateOracleSettings();
 
