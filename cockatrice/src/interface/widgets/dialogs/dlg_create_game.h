@@ -51,6 +51,7 @@ private:
     QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox,
         *spectatorsSeeEverythingCheckBox, *createGameAsJudgeCheckBox, *createGameAsSpectatorCheckBox;
     QCheckBox *shareDecklistsOnLoadCheckBox;
+    QCheckBox *shufflePlayersCheckBox;
     QDialogButtonBox *buttonBox;
     QPushButton *clearButton;
     QCheckBox *rememberGameSettings;
