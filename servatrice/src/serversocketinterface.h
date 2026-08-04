@@ -90,6 +90,7 @@ protected:
     void logDebugMessage(const QString &message) override;
     bool tooManyRegistrationAttempts(const QString &ipAddress);
     void processCommandContainer(const CommandContainer &cont) override;
+    bool acceptsCredentialFormat(bool passwordNeedsHash, const QString &password) const;
 
     virtual void writeToSocket(QByteArray &data) = 0;
     virtual void flushSocket() = 0;
@@ -170,6 +171,7 @@ private:
     Response::ResponseCode cmdReportDetails(const Command_ReportDetails &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportAddComment(const Command_ReportAddComment &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayDownloadByGameId(const Command_ReplayDownloadByGameId &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdSubmitPasswordVerifier(const Command_SubmitPasswordVerifier &cmd, ResponseContainer &rc);
     Response::ResponseCode
     processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc) override;
     Response::ResponseCode
