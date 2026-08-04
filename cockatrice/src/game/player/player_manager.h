@@ -42,6 +42,11 @@ public:
         return localPlayerId;
     }
 
+    void setLocalPlayerId(int _localPlayerId)
+    {
+        localPlayerId = _localPlayerId;
+    }
+
     [[nodiscard]] const QMap<int, PlayerLogic *> &getPlayers() const
     {
         return players;

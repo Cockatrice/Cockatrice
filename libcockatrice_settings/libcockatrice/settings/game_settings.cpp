@@ -65,6 +65,11 @@ bool GameSettings::getShareDecklistsOnLoad() const
     return getValue("shareDecklistsOnLoad", "game").toBool();
 }
 
+bool GameSettings::getShufflePlayers() const
+{
+    return getValue("shuffleplayers", "game").toBool();
+}
+
 bool GameSettings::getRememberGameSettings() const
 {
     return getValue("rememberGameSettings", "game", QString(), true).toBool();
@@ -143,6 +148,11 @@ void GameSettings::setDefaultStartingLifeTotal(int _defaultStartingLifeTotal)
 void GameSettings::setShareDecklistsOnLoad(bool _shareDecklistsOnLoad)
 {
     setValue(_shareDecklistsOnLoad, "shareDecklistsOnLoad", "game");
+}
+
+void GameSettings::setShufflePlayers(bool _shufflePlayers)
+{
+    setValue(_shufflePlayers, "shuffleplayers", "game");
 }
 
 void GameSettings::setRememberGameSettings(bool _rememberGameSettings)

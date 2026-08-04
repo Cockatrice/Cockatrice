@@ -86,7 +86,8 @@ private:
     QMenu *gameMenu, *viewMenu;
     TearOffMenu *phasesMenu;
     QAction *aGameInfo, *aConcede, *aCopyGameLink, *aLeaveGame, *aNextPhase, *aNextPhaseAction, *aNextTurn,
-        *aReverseTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
+        *aReverseTurn, *aTurnOrder, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout,
+        *aResetReplayLayout;
     QAction *aFocusChat;
     QAction *aInviteToGame = nullptr;
     QList<QAction *> phaseActions;
@@ -154,6 +155,7 @@ private slots:
     void actInviteToGame();
     void actConcede();
     void actCopyGameLink();
+    void actTurnOrder();
     void actRemoveLocalArrows();
     void actRotateViewCW();
     void actRotateViewCCW();
