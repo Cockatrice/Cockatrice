@@ -283,7 +283,9 @@ void UserInfoBox::changePassword(const QString &oldPassword, const QString &newP
 {
     Command_AccountPassword cmd;
     cmd.set_old_password(oldPassword.toStdString());
-    if (client->getServerSupportsPasswordHash()) {
+    if (client->getServerSupportsChallengeResponse()) {
+        cmd.set_hashed_new_password(PasswordHasher::generatePasswordVerifier(newPassword).toStdString());
+    } else if (client->getServerSupportsPasswordHash()) {
         auto passwordSalt = PasswordHasher::generateRandomSalt();
         QString hashedPassword = PasswordHasher::computeHash(newPassword, passwordSalt);
         cmd.set_hashed_new_password(hashedPassword.toStdString());
