@@ -234,7 +234,7 @@ QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, in
         case DESCRIPTION:
             return tr("Description");
         case CREATOR:
-            return tr("Creator");
+            return tr("Host");
         case GAME_TYPE:
             return tr("Type");
         case RESTRICTIONS:
