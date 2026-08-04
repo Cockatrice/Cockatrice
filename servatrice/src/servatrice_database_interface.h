@@ -21,7 +21,7 @@
 
 class QSqlQuery;
 
-#define DATABASE_SCHEMA_VERSION 39
+#define DATABASE_SCHEMA_VERSION 40
 
 class Servatrice;
 
@@ -96,6 +96,8 @@ public:
     bool activeUserExists(const QString &user) override;
     bool userExists(const QString &user) override;
     QString getUserSalt(const QString &user) override;
+    QString getUserPasswordData(const QString &user) override;
+    bool submitPasswordVerifier(const QString &user, const QString &passwordVerifier) override;
     int getUserIdInDB(const QString &name);
     QMap<QString, ServerInfo_User> getBuddyList(const QString &name) override;
     QMap<QString, ServerInfo_User> getIgnoreList(const QString &name) override;
