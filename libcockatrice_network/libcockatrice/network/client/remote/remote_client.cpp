@@ -27,7 +27,8 @@ static const unsigned int protocolVersion = 14;
 
 RemoteClient::RemoteClient(QObject *parent, INetworkSettingsProvider *_networkSettingsProvider)
     : AbstractClient(parent), networkSettingsProvider(_networkSettingsProvider), timeRunning(0), lastDataReceived(0),
-      messageInProgress(false), handshakeStarted(false), usingWebSocket(false), messageLength(0), hashedPassword()
+      messageInProgress(false), handshakeStarted(false), usingWebSocket(false), messageLength(0), hashedPassword(),
+      passwordNeedsMigration(false)
 {
 
     clearNewClientFeatures();
@@ -114,6 +115,8 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         return;
     }
     serverSupportsPasswordHash = event.server_options() & Event_ServerIdentification::SupportsPasswordHash;
+    serverSupportsChallengeResponse =
+        event.server_options() & Event_ServerIdentification::SupportsChallengeResponseAuth;
 
     if (getStatus() == StatusRequestingForgotPassword) {
         Command_ForgotPasswordRequest cmdForgotPasswordRequest;
@@ -130,7 +133,10 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
         cmdForgotPasswordReset.set_user_name(userName.toStdString());
         cmdForgotPasswordReset.set_clientid(getSrvClientID(lastHostname).toStdString());
         cmdForgotPasswordReset.set_token(token.toStdString());
-        if (!password.isEmpty() && serverSupportsPasswordHash) {
+        if (!password.isEmpty() && serverSupportsChallengeResponse) {
+            hashedPassword = PasswordHasher::generatePasswordVerifier(password);
+            cmdForgotPasswordReset.set_hashed_new_password(hashedPassword.toStdString());
+        } else if (!password.isEmpty() && serverSupportsPasswordHash) {
             auto passwordSalt = PasswordHasher::generateRandomSalt();
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdForgotPasswordReset.set_hashed_new_password(hashedPassword.toStdString());
@@ -158,7 +164,10 @@ void RemoteClient::processServerIdentificationEvent(const Event_ServerIdentifica
     if (getStatus() == StatusRegistering) {
         Command_Register cmdRegister;
         cmdRegister.set_user_name(userName.toStdString());
-        if (!password.isEmpty() && serverSupportsPasswordHash) {
+        if (!password.isEmpty() && serverSupportsChallengeResponse) {
+            hashedPassword = PasswordHasher::generatePasswordVerifier(password);
+            cmdRegister.set_hashed_password(hashedPassword.toStdString());
+        } else if (!password.isEmpty() && serverSupportsPasswordHash) {
             auto passwordSalt = PasswordHasher::generateRandomSalt();
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             cmdRegister.set_hashed_password(hashedPassword.toStdString());
@@ -223,7 +232,9 @@ Command_Login RemoteClient::generateCommandLogin()
 
 void RemoteClient::doLogin()
 {
-    if (!password.isEmpty() && serverSupportsPasswordHash) {
+    if ((!password.isEmpty() || !storedVerifier.isEmpty()) && serverSupportsChallengeResponse) {
+        doRequestPasswordSalt(); // ask salt + nonce to build the challenge response
+    } else if (!password.isEmpty() && serverSupportsPasswordHash) {
         //! \todo Store and log in using stored hashed password.
         if (hashedPassword.isEmpty()) {
             doRequestPasswordSalt(); // ask salt to create hashedPassword, then log in
@@ -257,6 +268,30 @@ void RemoteClient::doHashedLogin()
     sendCommand(pend);
 }
 
+void RemoteClient::doSubmitPasswordVerifier()
+{
+    pendingVerifier = PasswordHasher::generatePasswordVerifier(password);
+    Command_SubmitPasswordVerifier cmdSubmitVerifier;
+    cmdSubmitVerifier.set_password_verifier(pendingVerifier.toStdString());
+
+    PendingCommand *pend = prepareSessionCommand(cmdSubmitVerifier);
+    connect(pend, &PendingCommand::finished, this, &RemoteClient::submitPasswordVerifierResponse);
+    sendCommand(pend);
+}
+
+void RemoteClient::submitPasswordVerifierResponse(const Response &response)
+{
+    if (response.response_code() == Response::RespOk) {
+        qCDebug(RemoteClientLog) << "Password verifier migrated successfully";
+        if (!pendingVerifier.isEmpty()) {
+            emit sigPasswordVerifierReady(lastHostname, userName, pendingVerifier);
+            pendingVerifier.clear();
+        }
+    } else {
+        qCWarning(RemoteClientLog) << "Failed to migrate password verifier:" << response.response_code();
+    }
+}
+
 void RemoteClient::processConnectionClosedEvent(const Event_ConnectionClosed & /*event*/)
 {
     doDisconnectFromServer();
@@ -269,7 +304,47 @@ void RemoteClient::passwordSaltResponse(const Response &response)
         auto passwordSalt = QString::fromStdString(resp.password_salt());
         if (passwordSalt.isEmpty()) { // the server does not recognize the user but allows them to enter unregistered
             password.clear();         // the password will not be used
+            storedVerifier.clear();
             doLogin();
+        } else if (serverSupportsChallengeResponse && resp.has_nonce()) {
+            const QByteArray nonce = QByteArray::fromStdString(resp.nonce());
+            QByteArray key;
+            if (resp.needs_migration()) {
+                // The account still uses the legacy format; the legacy full hash
+                // is only derivable from the plaintext password.
+                if (password.isEmpty()) {
+                    emit loginError(Response::RespClientUpdateRequired,
+                                    QStringLiteral("This account must be logged in with its password once."), 0, {});
+                    return;
+                }
+                key = PasswordHasher::computeHash(password, passwordSalt).toUtf8();
+            } else if (!password.isEmpty()) {
+                const int n = resp.has_n() ? resp.n() : SCRYPT_N;
+                const int r = resp.has_r() ? resp.r() : SCRYPT_R;
+                const int p = resp.has_p() ? resp.p() : SCRYPT_P;
+                key = PasswordHasher::deriveKey(password, QByteArray::fromBase64(passwordSalt.toUtf8()), n, r, p);
+                derivedVerifier = QString("$scrypt$%1$%2$%3$%4$%5")
+                                      .arg(n)
+                                      .arg(r)
+                                      .arg(p)
+                                      .arg(passwordSalt)
+                                      .arg(QString(key.toBase64()));
+            } else if (!storedVerifier.isEmpty()) {
+                const PasswordVerifier verifier = PasswordHasher::parsePasswordVerifier(storedVerifier);
+                if (!verifier.isValid) {
+                    emit loginError(Response::RespClientUpdateRequired, QStringLiteral("Stored verifier is invalid."),
+                                    0, {});
+                    return;
+                }
+                key = verifier.verifier;
+            } else {
+                emit loginError(Response::RespLoginNeeded, {}, 0, {});
+                return;
+            }
+            passwordNeedsMigration = resp.needs_migration();
+            const QByteArray responseBytes = PasswordHasher::computeResponse(key, nonce);
+            hashedPassword = "$challenge$" + QString(nonce.toBase64()) + "$" + QString(responseBytes.toBase64());
+            doHashedLogin();
         } else {
             hashedPassword = PasswordHasher::computeHash(password, passwordSalt);
             doHashedLogin();
@@ -293,6 +368,14 @@ void RemoteClient::loginResponse(const Response &response)
     if (response.response_code() == Response::RespOk) {
         setStatus(StatusLoggedIn);
         emit userInfoChanged(resp.user_info());
+
+        if (passwordNeedsMigration) {
+            // The account still used the legacy password format; upgrade it to scrypt.
+            doSubmitPasswordVerifier();
+        } else if (!derivedVerifier.isEmpty()) {
+            emit sigPasswordVerifierReady(lastHostname, userName, derivedVerifier);
+            derivedVerifier.clear();
+        }
 
         QList<ServerInfo_User> buddyList;
         for (int i = resp.buddy_list_size() - 1; i >= 0; --i) {
@@ -549,6 +632,8 @@ void RemoteClient::doDisconnectFromServer()
         websocket->close();
     }
     socket->close();
+    derivedVerifier.clear();
+    pendingVerifier.clear();
 }
 
 void RemoteClient::ping()
@@ -711,6 +796,9 @@ void RemoteClient::submitForgotPasswordResetResponse(const Response &response)
 {
     if (response.response_code() == Response::RespOk) {
         emit sigForgotPasswordSuccess();
+        if (!hashedPassword.isEmpty()) {
+            emit sigPasswordVerifierReady(lastHostname, userName, hashedPassword);
+        }
     } else {
         emit sigForgotPasswordError();
     }

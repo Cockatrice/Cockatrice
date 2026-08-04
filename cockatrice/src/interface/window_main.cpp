@@ -753,8 +753,9 @@ void MainWindow::changeEvent(QEvent *event)
                        !SettingsCache::instance().debug().getLocalGameOnStartup()) {
                 qCInfo(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
                 DlgConnect dlg(this);
-                connectionController->connectToServerDirect(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
-                                                            dlg.getPlayerName(), dlg.getPassword());
+                connectionController->connectToServerDirect(
+                    dlg.getHost(), static_cast<unsigned int>(dlg.getPort()), dlg.getPlayerName(), dlg.getPassword(),
+                    dlg.getStoredVerifier(), dlg.getSaveName(), dlg.getSavePassword());
             }
         }
     }
