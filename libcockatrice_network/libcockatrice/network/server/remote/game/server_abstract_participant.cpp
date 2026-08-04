@@ -37,6 +37,7 @@
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_set_player_order.pb.h>
 #include <libcockatrice/protocol/pb/command_set_playmat.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
@@ -427,6 +428,33 @@ Response::ResponseCode Server_AbstractParticipant::cmdReverseTurn(const Command_
     return Response::RespOk;
 }
 
+Response::ResponseCode Server_AbstractParticipant::cmdSetPlayerOrder(const Command_SetPlayerOrder &cmd,
+                                                                     ResponseContainer & /*rc*/,
+                                                                     GameEventStorage & /*ges*/)
+{
+    if ((game->getHostId() != playerId) && !(userInfo->user_level() & ServerInfo_User::IsModerator)) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    if (game->getGameStarted()) {
+        return Response::RespContextError;
+    }
+
+    if (cmd.randomize()) {
+        game->shufflePlayerSeats();
+    } else {
+        QList<QString> playerNames;
+        for (int i = 0; i < cmd.player_names_size(); ++i) {
+            playerNames.append(QString::fromStdString(cmd.player_names(i)));
+        }
+        game->reorderPlayerSeats(playerNames);
+    }
+
+    game->sendGameStateToPlayers();
+
+    return Response::RespOk;
+}
+
 Response::ResponseCode
 Server_AbstractParticipant::processGameCommand(const GameCommand &command, ResponseContainer &rc, GameEventStorage &ges)
 {
@@ -535,6 +563,9 @@ Server_AbstractParticipant::processGameCommand(const GameCommand &command, Respo
             break;
         case GameCommand::SET_PLAYMAT:
             return cmdSetPlaymat(command.GetExtension(Command_SetPlaymat::ext), rc, ges);
+            break;
+        case GameCommand::SET_PLAYER_ORDER:
+            return cmdSetPlayerOrder(command.GetExtension(Command_SetPlayerOrder::ext), rc, ges);
             break;
         default:
             return Response::RespInvalidCommand;

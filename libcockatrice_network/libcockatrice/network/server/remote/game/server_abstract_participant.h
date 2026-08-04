@@ -53,6 +53,7 @@ class Command_DeckSelect;
 class Command_SetSideboardLock;
 class Command_ChangeZoneProperties;
 class Command_SetPlaymat;
+class Command_SetPlayerOrder;
 
 class Server_AbstractParticipant : public Server_ArrowTarget, public ServerInfo_User_Container
 {
@@ -89,6 +90,10 @@ public:
     int getPlayerId() const
     {
         return playerId;
+    }
+    void setPlayerId(int _playerId)
+    {
+        playerId = _playerId;
     }
     bool isSpectator() const
     {
@@ -173,6 +178,8 @@ public:
     cmdRevealCards(const Command_RevealCards &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges);
+    virtual Response::ResponseCode
+    cmdSetPlayerOrder(const Command_SetPlayerOrder &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd, ResponseContainer &rc, GameEventStorage &ges);
 
