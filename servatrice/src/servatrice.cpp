@@ -1075,6 +1075,46 @@ int Servatrice::getForgotPasswordTokenLife() const
     return settingsCache->value("forgotpassword/tokenlife", 60).toInt();
 }
 
+bool Servatrice::recordFailedLogin(const QString &ipAddress)
+{
+    return rateLimiter.recordAttempt("login:" + ipAddress, getMaxLoginAttemptsPerIp(), getLoginAttemptWindowSeconds());
+}
+
+void Servatrice::clearFailedLogins(const QString &ipAddress)
+{
+    rateLimiter.clearAttempts("login:" + ipAddress);
+}
+
+int Servatrice::getMaxLoginAttemptsPerIp() const
+{
+    return settingsCache->value("security/max_login_attempts_per_ip", 5).toInt();
+}
+
+int Servatrice::getLoginAttemptWindowSeconds() const
+{
+    return settingsCache->value("security/login_attempt_window_seconds", 900).toInt();
+}
+
+int Servatrice::getMaxRegistrationsPerIp() const
+{
+    return settingsCache->value("security/max_registrations_per_ip", 2).toInt();
+}
+
+int Servatrice::getRegistrationWindowSeconds() const
+{
+    return settingsCache->value("security/registration_window_seconds", 3600).toInt();
+}
+
+int Servatrice::getMaxForgotPasswordRequestsPerIp() const
+{
+    return settingsCache->value("security/max_forgot_password_requests_per_ip", 3).toInt();
+}
+
+int Servatrice::getForgotPasswordWindowSeconds() const
+{
+    return settingsCache->value("security/forgot_password_window_seconds", 3600).toInt();
+}
+
 bool Servatrice::getEnableForgotPasswordChallenge() const
 {
     return settingsCache->value("forgotpassword/enablechallenge", false).toBool();
