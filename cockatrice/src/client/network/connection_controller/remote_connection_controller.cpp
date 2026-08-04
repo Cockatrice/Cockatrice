@@ -81,6 +81,9 @@ void ConnectionController::wireClientSignals()
 
     connect(remoteClient, &RemoteClient::sigPromptForForgotPasswordChallenge, this,
             &ConnectionController::onPromptForgotPasswordChallenge);
+
+    connect(remoteClient, &RemoteClient::sigPasswordVerifierReady, this,
+            &ConnectionController::onPasswordVerifierReady);
 }
 
 void ConnectionController::connectToServer()
@@ -89,16 +92,36 @@ void ConnectionController::connectToServer()
     connect(dlgConnect, &DlgConnect::sigStartForgotPasswordRequest, this, &ConnectionController::forgotPasswordRequest);
 
     if (dlgConnect->exec()) {
+        pendingSaveName = dlgConnect->getSaveName();
+        pendingSavePassword = dlgConnect->getSavePassword();
+        remoteClient->setStoredVerifier(dlgConnect->getStoredVerifier());
         remoteClient->connectToServer(dlgConnect->getHost(), static_cast<unsigned int>(dlgConnect->getPort()),
                                       dlgConnect->getPlayerName(), dlgConnect->getPassword());
+    }
+}
+
+void ConnectionController::onPasswordVerifierReady(const QString &hostname,
+                                                   const QString &userName,
+                                                   const QString &verifier)
+{
+    Q_UNUSED(hostname);
+    Q_UNUSED(userName);
+    if (pendingSavePassword) {
+        SettingsCache::instance().servers().setServerPassword(pendingSaveName, verifier);
     }
 }
 
 void ConnectionController::connectToServerDirect(const QString &host,
                                                  unsigned int port,
                                                  const QString &playerName,
-                                                 const QString &password)
+                                                 const QString &password,
+                                                 const QString &storedVerifier,
+                                                 const QString &saveName,
+                                                 bool savePassword)
 {
+    pendingSaveName = saveName;
+    pendingSavePassword = savePassword;
+    remoteClient->setStoredVerifier(storedVerifier);
     remoteClient->connectToServer(host, port, playerName, password);
 }
 

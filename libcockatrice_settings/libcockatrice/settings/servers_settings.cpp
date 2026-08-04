@@ -146,6 +146,14 @@ void ServersSettings::setFPPlayerName(QString playerName)
     setValue(playerName, "fpplayername");
 }
 
+void ServersSettings::setServerPassword(const QString &saveName, const QString &password)
+{
+    const int index = getPrevioushostindex(saveName);
+    if (index >= 0) {
+        setValue(password, QString("password%1").arg(index), "server", "server_details");
+    }
+}
+
 QString ServersSettings::getFPPlayerName(QString defaultName) const
 {
     QVariant name = getValue("fpplayername");
