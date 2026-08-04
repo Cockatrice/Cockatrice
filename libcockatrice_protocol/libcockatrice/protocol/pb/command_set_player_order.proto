@@ -1,0 +1,15 @@
+syntax = "proto2";
+import "game_commands.proto";
+message Command_SetPlayerOrder {
+    extend GameCommand {
+        optional Command_SetPlayerOrder ext = 1206;
+    }
+
+    // The desired seating order, expressed as player names. Only used when
+    // randomize is false.
+    repeated string player_names = 1;
+
+    // When set, the server shuffles the seating order instead of using
+    // player_names.
+    optional bool randomize = 2;
+}
