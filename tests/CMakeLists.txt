@@ -198,6 +198,17 @@ cockatrice_add_test(
 )
 cockatrice_add_test(
   NAME
+  rate_limiter_test
+  SOURCES
+  ${CMAKE_SOURCE_DIR}/servatrice/src/ratelimiter.cpp
+  rate_limiter_test.cpp
+  INCLUDE_DIRS
+  ${CMAKE_SOURCE_DIR}/servatrice/src
+  LABELS
+  server
+)
+cockatrice_add_test(
+  NAME
   server_card_counter_test
   SOURCES
   server_card_counter_test.cpp
