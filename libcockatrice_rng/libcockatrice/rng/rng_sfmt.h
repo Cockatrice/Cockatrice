@@ -37,6 +37,7 @@ private:
 
 public:
     explicit RNG_SFMT(QObject *parent = nullptr);
+    explicit RNG_SFMT(uint64_t seed, QObject *parent = nullptr);
     unsigned int rand(int min, int max) override;
 };
 

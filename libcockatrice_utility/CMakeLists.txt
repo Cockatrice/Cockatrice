@@ -5,12 +5,13 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(UTILITY_SOURCES libcockatrice/utility/expression.cpp libcockatrice/utility/levenshtein.cpp
-                    libcockatrice/utility/passwordhasher.cpp
+set(UTILITY_SOURCES libcockatrice/utility/cryptoutil.cpp libcockatrice/utility/expression.cpp
+                    libcockatrice/utility/levenshtein.cpp libcockatrice/utility/passwordhasher.cpp
 )
 
 set(UTILITY_HEADERS
     libcockatrice/utility/color.h
+    libcockatrice/utility/cryptoutil.h
     libcockatrice/utility/expression.h
     libcockatrice/utility/levenshtein.h
     libcockatrice/utility/macros.h
@@ -27,7 +28,9 @@ add_library(libcockatrice_utility STATIC ${UTILITY_SOURCES} ${UTILITY_HEADERS})
 
 target_include_directories(libcockatrice_utility PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(libcockatrice_utility PUBLIC libcockatrice_rng ${QT_CORE_MODULE})
+find_package(OpenSSL REQUIRED)
+
+target_link_libraries(libcockatrice_utility PUBLIC libcockatrice_rng OpenSSL::Crypto ${QT_CORE_MODULE})
 
 set(ORACLE_LIBS)
 
