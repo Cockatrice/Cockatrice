@@ -13,6 +13,7 @@
 #include <QDesktopServices>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/settings/chat_settings.h>
 
@@ -172,6 +173,11 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 
 void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 {
+    if (!CardDatabaseManager::query()->lookupCardByName(cardName)) {
+        cursor.insertText(cardName);
+        return;
+    }
+
     QTextCharFormat oldFormat = cursor.charFormat();
     QTextCharFormat anchorFormat = oldFormat;
     anchorFormat.setForeground(linkColor);
