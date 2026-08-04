@@ -65,6 +65,7 @@ set(PROTO_FILES
     command_set_card_attr.proto
     command_set_card_counter.proto
     command_set_counter.proto
+    command_set_player_order.proto
     command_set_playmat.proto
     command_set_sideboard_lock.proto
     command_set_sideboard_plan.proto
@@ -109,6 +110,7 @@ set(PROTO_FILES
     event_list_rooms.proto
     event_move_card.proto
     event_notify_user.proto
+    event_player_order_changed.proto
     event_player_properties_changed.proto
     event_remove_from_list.proto
     event_remove_messages.proto
