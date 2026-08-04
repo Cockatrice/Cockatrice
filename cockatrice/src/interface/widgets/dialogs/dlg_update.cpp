@@ -156,6 +156,8 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
 
         if (reply == QMessageBox::Yes) {
             downloadUpdate(release->getName());
+        } else {
+            closeDialog();
         }
     } else {
         QMessageBox::information(
