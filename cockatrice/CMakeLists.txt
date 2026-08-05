@@ -83,7 +83,6 @@ set(cockatrice_SOURCES
     src/game/game_state.cpp
     src/game_graphics/game_view.cpp
     src/game_graphics/hand_counter.cpp
-    src/game/selection_subtype_tally.cpp
     src/game_graphics/log/message_log_widget.cpp
     src/game/phase.cpp
     src/game_graphics/phases_toolbar.cpp
@@ -98,7 +97,11 @@ set(cockatrice_SOURCES
     src/game_graphics/player/menu/rfg_menu.cpp
     src/game_graphics/player/menu/say_menu.cpp
     src/game_graphics/player/menu/sideboard_menu.cpp
+    src/game_graphics/player/menu/tally_menu.cpp
     src/game_graphics/player/menu/utility_menu.cpp
+    src/game_graphics/tally/stats_tally.cpp
+    src/game_graphics/tally/subtype_tally.cpp
+    src/game_graphics/tally/tally.cpp
     src/game/player/player_actions.cpp
     src/game_graphics/player/player_area.cpp
     src/game_graphics/player/player_dialogs.cpp
@@ -228,7 +231,9 @@ set(cockatrice_SOURCES
     src/interface/widgets/quick_settings/settings_button_widget.cpp
     src/interface/widgets/quick_settings/settings_popup_widget.cpp
     src/interface/widgets/replay/replay_manager.cpp
+    src/interface/widgets/replay/replay_quick_settings_widget.cpp
     src/interface/widgets/replay/replay_timeline_widget.cpp
+    src/interface/widgets/replay/replay_widget.cpp
     src/interface/widgets/server/chat_view/chat_view.cpp
     src/interface/widgets/server/game_filter_configs.cpp
     src/interface/widgets/server/game_selector.cpp

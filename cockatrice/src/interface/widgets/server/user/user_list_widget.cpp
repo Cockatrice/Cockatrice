@@ -30,6 +30,7 @@
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
 #include <libcockatrice/protocol/pb/response_get_user_info.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(parent)
@@ -352,7 +353,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
 
 QSize UserListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (!SettingsCache::instance().getStyleUserList()) {
+    if (!SettingsCache::instance().interface().getStyleUserList()) {
         return QStyledItemDelegate::sizeHint(option, index);
     }
     return UserListPainter::sizeHint();
@@ -360,7 +361,7 @@ QSize UserListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const Q
 
 void UserListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (!SettingsCache::instance().getStyleUserList()) {
+    if (!SettingsCache::instance().interface().getStyleUserList()) {
         QStyledItemDelegate::paint(painter, option, index);
         return;
     }
@@ -524,7 +525,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
 
     // Pin on item click
     connect(userTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item, int) {
-        if (!SettingsCache::instance().getStyleUserList()) {
+        if (!SettingsCache::instance().interface().getStyleUserList()) {
             return;
         }
         const QString name = static_cast<UserListTWI *>(item)->getUserInfo().name().c_str();
@@ -556,7 +557,8 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     connect(cardArtProvider, &UserCardArtProvider::cardArtUpdated, this,
             [this](const QString &) { userTree->viewport()->update(); });
 
-    connect(&SettingsCache::instance(), &SettingsCache::styleUserListChanged, this, &UserListWidget::applyDisplayMode);
+    connect(&SettingsCache::instance().interface(), &InterfaceSettings::styleUserListChanged, this,
+            &UserListWidget::applyDisplayMode);
     applyDisplayMode();
 
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -661,7 +663,7 @@ void UserListWidget::hideEvent(QHideEvent *e)
 
 void UserListWidget::applyDisplayMode()
 {
-    const bool styled = SettingsCache::instance().getStyleUserList();
+    const bool styled = SettingsCache::instance().interface().getStyleUserList();
 
     if (styled) {
         userTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -707,20 +709,20 @@ void UserListWidget::connectPopupSignals()
     connect(m_userInfoPopup, &UserInfoPopup::warnHistoryRequested, userContextMenu, &UserContextMenu::execWarnHistory);
     connect(m_userInfoPopup, &UserInfoPopup::adminNotesRequested, userContextMenu, &UserContextMenu::execAdminNotes);
     connect(m_userInfoPopup, &UserInfoPopup::promoteToModRequested, this,
-            [this](const QString &n) { userContextMenu->execAdjustMod(n, true, false); });
+            [this](const QString &n) { userContextMenu->execAdjustMod(n, true); });
     connect(m_userInfoPopup, &UserInfoPopup::demoteFromModRequested, this,
-            [this](const QString &n) { userContextMenu->execAdjustMod(n, false, false); });
+            [this](const QString &n) { userContextMenu->execAdjustMod(n, false); });
     connect(m_userInfoPopup, &UserInfoPopup::promoteToJudgeRequested, this,
-            [this](const QString &n) { userContextMenu->execAdjustMod(n, false, true); });
+            [this](const QString &n) { userContextMenu->execAdjustJudge(n, true); });
     connect(m_userInfoPopup, &UserInfoPopup::demoteFromJudgeRequested, this,
-            [this](const QString &n) { userContextMenu->execAdjustMod(n, false, false); });
+            [this](const QString &n) { userContextMenu->execAdjustJudge(n, false); });
 }
 
 bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj == userTree->viewport()) {
         if (event->type() == QEvent::MouseMove) {
-            if (!SettingsCache::instance().getStyleUserList()) {
+            if (!SettingsCache::instance().interface().getStyleUserList()) {
                 return QGroupBox::eventFilter(obj, event);
             }
             auto *me = static_cast<QMouseEvent *>(event);

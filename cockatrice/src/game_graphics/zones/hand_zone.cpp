@@ -9,6 +9,7 @@
 
 #include <QPainter>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
+#include <libcockatrice/settings/interface_settings.h>
 
 HandZone::HandZone(HandZoneLogic *_logic, int _zoneHeight, QGraphicsItem *parent)
     : SelectZone(_logic, parent), zoneHeight(_zoneHeight)
@@ -33,7 +34,7 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 
     QPoint point = dropPoint + scenePos().toPoint();
     int x = -1;
-    if (SettingsCache::instance().getHorizontalHand()) {
+    if (SettingsCache::instance().interface().getHorizontalHand()) {
         for (x = 0; x < getLogic()->getCards().size(); x++) {
             if (point.x() < static_cast<CardItem *>(getLogic()->getCards().at(x))->scenePos().x()) {
                 break;
@@ -60,7 +61,7 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
 
 QRectF HandZone::boundingRect() const
 {
-    if (SettingsCache::instance().getHorizontalHand()) {
+    if (SettingsCache::instance().interface().getHorizontalHand()) {
         return QRectF(0, 0, width, CardDimensions::HEIGHT_F + 10);
     } else {
         return QRectF(0, 0, CardDimensions::WIDTH_F * 1.5, zoneHeight);
@@ -77,8 +78,8 @@ void HandZone::reorganizeCards()
 {
     if (!getLogic()->getCards().isEmpty()) {
         const int cardCount = getLogic()->getCards().size();
-        if (SettingsCache::instance().getHorizontalHand()) {
-            bool leftJustified = SettingsCache::instance().getLeftJustified();
+        if (SettingsCache::instance().interface().getHorizontalHand()) {
+            bool leftJustified = SettingsCache::instance().interface().getLeftJustified();
             qreal cardWidth = getLogic()->getCards().at(0)->boundingRect().width();
             const int xPadding = leftJustified ? cardWidth * 1.4 : 5;
             qreal totalWidth =
@@ -126,7 +127,7 @@ void HandZone::sortHand(const QList<CardList::SortOption> &options)
 
 void HandZone::setWidth(qreal _width)
 {
-    if (SettingsCache::instance().getHorizontalHand()) {
+    if (SettingsCache::instance().interface().getHorizontalHand()) {
         prepareGeometryChange();
         width = _width;
         reorganizeCards();

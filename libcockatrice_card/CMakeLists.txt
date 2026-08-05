@@ -31,6 +31,7 @@ add_library(
   libcockatrice/card/card_info.cpp
   libcockatrice/card/card_info_comparator.cpp
   libcockatrice/card/database/card_database.cpp
+  libcockatrice/card/database/card_database_cache.cpp
   libcockatrice/card/database/card_database_loader.cpp
   libcockatrice/card/database/card_database_manager.cpp
   libcockatrice/card/database/card_database_querier.cpp

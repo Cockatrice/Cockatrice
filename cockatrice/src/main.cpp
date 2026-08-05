@@ -41,6 +41,9 @@
 #include <QTranslator>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
+#include <libcockatrice/settings/card_database_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
@@ -125,7 +128,7 @@ LONG WINAPI CockatriceUnhandledExceptionFilter(EXCEPTION_POINTERS *exceptionPoin
 
 void installNewTranslator()
 {
-    QString lang = SettingsCache::instance().getLang();
+    QString lang = SettingsCache::instance().personal().getLang();
 
     QString qtNameHint = "qt_" + lang;
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
@@ -251,9 +254,22 @@ int main(int argc, char *argv[])
     // Dependency Injections
     CardDatabaseManager::setCardPreferenceProvider(new SettingsCardPreferenceProvider());
     CardDatabaseManager::setCardDatabasePathProvider(&SettingsCache::instance());
-    CardDatabaseManager::setCardSetPriorityController(SettingsCache::instance().cardDatabase());
+    CardDatabaseManager::setCardSetPriorityController(&SettingsCache::instance().cardDatabase());
 
     qCInfo(MainLog) << "Starting main program";
+
+    // Front-load the card database before constructing the main window. The
+    // binary-cache read is cheap when uncontended (~1s); doing it here -- while no
+    // GUI work yet competes for CPU -- avoids the multi-second, GUI-freezing
+    // contention that happens when the load runs alongside window construction.
+    // The CardDatabaseModel populates from the already-loaded data in its
+    // constructor, so the window appears fully populated with no startup lag.
+    // Note: checkUnknownSets() is deferred from the initial load to
+    // MainWindow::startupConfigCheck() so that
+    // cardDatabaseNewSetsFound / cardDatabaseAllNewSetsEnabled have live
+    // receivers when emitted.  Subsequent reloads (e.g. path changes) call
+    // checkUnknownSets() directly from the loader after the first load.
+    CardDatabaseManager::getInstance()->loadCardDatabases();
 
     MainWindow ui;
     if (parser.isSet("connect")) {
@@ -265,7 +281,7 @@ int main(int argc, char *argv[])
     // set name of the app desktop file; used by wayland to load the window icon
     QGuiApplication::setDesktopFileName("cockatrice");
 
-    SettingsCache::instance().setClientID(generateClientID());
+    SettingsCache::instance().personal().setClientID(generateClientID());
 
     // If spoiler mode is enabled, we will download the spoilers
     // then reload the DB. otherwise just reload the DB
@@ -275,7 +291,8 @@ int main(int argc, char *argv[])
     qCInfo(MainLog) << "ui.show() finished";
 
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
-    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, !SettingsCache::instance().getShowShortcuts());
+    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus,
+                       !SettingsCache::instance().cardsDisplay().getShowShortcuts());
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);

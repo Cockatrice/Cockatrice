@@ -15,11 +15,13 @@
 #include "rfg_menu.h"
 #include "say_menu.h"
 #include "sideboard_menu.h"
+#include "tally_menu.h"
 #include "utility_menu.h"
 
 #include <QList>
 #include <QMenu>
 #include <QObject>
+#include <libcockatrice/utility/card_ref.h>
 
 class CardItem;
 class CardMenu;
@@ -87,6 +89,7 @@ private:
     GraveyardMenu *graveMenu;
     RfgMenu *rfgMenu;
     UtilityMenu *utilityMenu;
+    TallyMenu *tallyMenu;
     SayMenu *sayMenu;
     CustomZoneMenu *customZonesMenu;
 

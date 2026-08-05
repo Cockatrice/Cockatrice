@@ -1,6 +1,7 @@
 #include "abstract_counter.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../client/settings/shortcuts_settings.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../../game_graphics/board/translate_counter_name.h"

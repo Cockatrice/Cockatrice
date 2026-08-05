@@ -3,6 +3,7 @@
 #include "../../../../client/settings/cache_settings.h"
 
 #include <QResizeEvent>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 ManaSymbolWidget::ManaSymbolWidget(QWidget *parent, QString _symbol, bool _isActive, bool _mayBeToggled)
     : QLabel(parent), symbol(_symbol), isActive(_isActive), mayBeToggled(_mayBeToggled)
@@ -16,7 +17,8 @@ ManaSymbolWidget::ManaSymbolWidget(QWidget *parent, QString _symbol, bool _isAct
     setGraphicsEffect(opacityEffect);
     updateOpacity();
 
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageUnusedColorIdentitiesOpacityChanged, this,
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDeckStorageUnusedColorIdentitiesOpacityChanged, this,
             &ManaSymbolWidget::updateOpacity);
 }
 
@@ -42,7 +44,11 @@ void ManaSymbolWidget::updateOpacity()
         opacity = isActive ? 1.0 : 0.5;
     } else {
         // It's just for display, they can do whatever they want.
-        opacity = isActive ? 1.0 : SettingsCache::instance().getVisualDeckStorageUnusedColorIdentitiesOpacity() / 100.0;
+        opacity =
+            isActive
+                ? 1.0
+                : SettingsCache::instance().visualDeckStorage().getVisualDeckStorageUnusedColorIdentitiesOpacity() /
+                      100.0;
     }
     opacityEffect->setOpacity(opacity);
 }

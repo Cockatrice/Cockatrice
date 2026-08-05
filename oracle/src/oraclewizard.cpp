@@ -15,6 +15,7 @@
 #include <QScrollBar>
 #include <QtConcurrent>
 #include <QtGui>
+#include <libcockatrice/settings/personal_settings.h>
 
 OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
 {
@@ -33,7 +34,7 @@ OracleWizard::OracleWizard(QWidget *parent) : QWizard(parent)
         migrateOracleSettings();
     }
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &OracleWizard::updateLanguage);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &OracleWizard::updateLanguage);
 
     importer = new OracleImporter(this);
 

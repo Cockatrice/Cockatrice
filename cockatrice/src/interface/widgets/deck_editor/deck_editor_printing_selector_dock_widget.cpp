@@ -5,6 +5,7 @@
 #include "printing_disabled_info_widget.h"
 
 #include <QVBoxLayout>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(AbstractTabDeckEditor *parent)
     : QDockWidget(parent), deckEditor(parent)
@@ -18,8 +19,9 @@ DeckEditorPrintingSelectorDockWidget::DeckEditorPrintingSelectorDockWidget(Abstr
     createPrintingSelectorDock();
     printingDisabledInfoWidget = new PrintingDisabledInfoWidget(this);
 
-    setVisibleWidget(SettingsCache::instance().getOverrideAllCardArtWithPersonalPreference());
-    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
+    setVisibleWidget(SettingsCache::instance().cardsDisplay().getOverrideAllCardArtWithPersonalPreference());
+    connect(&SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::overrideAllCardArtWithPersonalPreferenceChanged, this,
             &DeckEditorPrintingSelectorDockWidget::setVisibleWidget);
 
     retranslateUi();

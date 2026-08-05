@@ -27,6 +27,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <version_string.h>
 
 TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor)
@@ -131,7 +132,8 @@ void TabArchidekt::initializeUi()
 
     // Settings
     settingsButton = new SettingsButtonWidget(primaryToolbar);
-    cardSizeSlider = new CardSizeWidget(primaryToolbar, nullptr, SettingsCache::instance().getArchidektPreviewSize());
+    cardSizeSlider = new CardSizeWidget(primaryToolbar, nullptr,
+                                        SettingsCache::instance().visualDeckStorage().getArchidektPreviewSize());
     settingsButton->addSettingsWidget(cardSizeSlider);
 
     // Assemble primary toolbar
@@ -337,8 +339,8 @@ void TabArchidekt::connectSignals()
         doSearch();
     });
 
-    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
-            &SettingsCache::setArchidektPreviewCardSize);
+    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::setArchidektPreviewCardSize);
 
     // Search button triggers immediate search
     connect(searchButton, &QPushButton::clicked, this, &TabArchidekt::doSearchImmediate);
@@ -639,7 +641,7 @@ void TabArchidekt::processDeckResponse(QJsonObject reply)
 
     auto display = new ArchidektApiResponseDeckDisplayWidget(resultsContainer, deckData, cardSizeSlider);
     connect(display, &ArchidektApiResponseDeckDisplayWidget::requestNavigation, this, &TabArchidekt::actNavigatePage);
-    connect(display, &ArchidektApiResponseDeckDisplayWidget::requestSearch, this, &TabArchidekt::doSearchImmediate);
+    connect(display, &ArchidektApiResponseDeckDisplayWidget::requestSearch, this, &TabArchidekt::doSearch);
     connect(display, &ArchidektApiResponseDeckDisplayWidget::openInDeckEditor, tabSupervisor,
             &TabSupervisor::openDeckInNewTab);
     resultsLayout->addWidget(display);

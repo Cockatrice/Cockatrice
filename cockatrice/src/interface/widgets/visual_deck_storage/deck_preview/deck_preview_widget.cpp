@@ -16,6 +16,7 @@
 #include <QStandardItemModel>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
                                      VisualDeckStorageWidget *_visualDeckStorageWidget,
@@ -42,11 +43,14 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     connect(bannerCardDisplayWidget, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
             &DeckPreviewWidget::imageDoubleClickedEvent);
 
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowColorIdentityChanged, this,
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDeckStorageShowColorIdentityChanged, this,
             &DeckPreviewWidget::updateColorIdentityVisibility);
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowTagsOnDeckPreviewsChanged, this,
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDeckStorageShowTagsOnDeckPreviewsChanged, this,
             &DeckPreviewWidget::updateTagsVisibility);
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageShowBannerCardComboBoxChanged, this,
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDeckStorageShowBannerCardComboBoxChanged, this,
             &DeckPreviewWidget::updateBannerCardComboBoxVisibility);
     connect(visualDeckStorageWidget->settings(), &VisualDeckStorageQuickSettingsWidget::deckPreviewTooltipChanged, this,
             &DeckPreviewWidget::refreshBannerCardToolTip);
@@ -128,9 +132,11 @@ void DeckPreviewWidget::initializeUi(const bool deckLoadSuccess)
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckPreviewWidget::setBannerCard);
 
-    updateColorIdentityVisibility(SettingsCache::instance().getVisualDeckStorageShowColorIdentity());
-    updateBannerCardComboBoxVisibility(SettingsCache::instance().getVisualDeckStorageShowBannerCardComboBox());
-    updateTagsVisibility(SettingsCache::instance().getVisualDeckStorageShowTagsOnDeckPreviews());
+    updateColorIdentityVisibility(
+        SettingsCache::instance().visualDeckStorage().getVisualDeckStorageShowColorIdentity());
+    updateBannerCardComboBoxVisibility(
+        SettingsCache::instance().visualDeckStorage().getVisualDeckStorageShowBannerCardComboBox());
+    updateTagsVisibility(SettingsCache::instance().visualDeckStorage().getVisualDeckStorageShowTagsOnDeckPreviews());
 
     layout->addWidget(colorIdentityWidget);
     layout->addWidget(deckTagsDisplayWidget);

@@ -1,6 +1,6 @@
-#include "selection_subtype_tally.h"
+#include "subtype_tally.h"
 
-#include "../game_graphics/board/card_item.h"
+#include "../board/card_item.h"
 
 #include <QMap>
 #include <algorithm>
@@ -19,12 +19,19 @@ QStringList extractSubtypesFromFace(const QString &faceType)
     return {};
 }
 
+/** @brief A single subtype (e.g., "Goblin", "Warrior") with its occurrence count. */
+struct SubtypeEntry
+{
+    QString name;
+    int count;
+};
+
 } // anonymous namespace
 
-namespace SelectionSubtypeTally
+namespace SubtypeTally
 {
 
-QList<SubtypeEntry> countSubtypes(const QList<CardItem *> &cards)
+QList<TallyRow> countSubtypes(const QList<CardItem *> &cards)
 {
     QMap<QString, int> subtypeCounts;
 
@@ -58,7 +65,13 @@ QList<SubtypeEntry> countSubtypes(const QList<CardItem *> &cards)
         return a.name < b.name;
     });
 
-    return entries;
+    // convert entries into TallyRows
+    QList<TallyRow> rows;
+    rows.reserve(entries.size()); // for backwards compatibility with Qt5
+    std::transform(entries.begin(), entries.end(), std::back_inserter(rows),
+                   [](const SubtypeEntry &e) { return TallyRow{e.name, QString::number(e.count)}; });
+
+    return rows;
 }
 
-} // namespace SelectionSubtypeTally
+} // namespace SubtypeTally

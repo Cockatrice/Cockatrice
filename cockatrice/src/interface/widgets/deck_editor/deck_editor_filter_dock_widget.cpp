@@ -1,6 +1,7 @@
 #include "deck_editor_filter_dock_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../../filters/filter_builder.h"
 #include "../../../filters/filter_tree_model.h"
 

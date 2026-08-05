@@ -1,6 +1,7 @@
 #include "deck_editor_deck_dock_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "deck_list_style_proxy.h"
 #include "deck_state_manager.h"
 
@@ -11,6 +12,8 @@
 #include <QSplitter>
 #include <QTextEdit>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/macros.h>
 #include <libcockatrice/utility/string_limits.h>
 
 static int findRestoreIndex(const CardRef &wanted, const QComboBox *combo)
@@ -108,18 +111,20 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     showBannerCardCheckBox = new QCheckBox();
     showBannerCardCheckBox->setObjectName("showBannerCardCheckBox");
-    showBannerCardCheckBox->setChecked(SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
-    connect(showBannerCardCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setDeckEditorBannerCardComboBoxVisible);
-    connect(&SettingsCache::instance(), &SettingsCache::deckEditorBannerCardComboBoxVisibleChanged, this,
+    showBannerCardCheckBox->setChecked(
+        SettingsCache::instance().cardsDisplay().getDeckEditorBannerCardComboBoxVisible());
+    connect(showBannerCardCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setDeckEditorBannerCardComboBoxVisible);
+    connect(&SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::deckEditorBannerCardComboBoxVisibleChanged, this,
             &DeckEditorDeckDockWidget::updateShowBannerCardComboBox);
 
     showTagsWidgetCheckBox = new QCheckBox();
     showTagsWidgetCheckBox->setObjectName("showTagsWidgetCheckBox");
-    showTagsWidgetCheckBox->setChecked(SettingsCache::instance().getDeckEditorTagsWidgetVisible());
-    connect(showTagsWidgetCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setDeckEditorTagsWidgetVisible);
-    connect(&SettingsCache::instance(), &SettingsCache::deckEditorTagsWidgetVisibleChanged, this,
+    showTagsWidgetCheckBox->setChecked(SettingsCache::instance().cardsDisplay().getDeckEditorTagsWidgetVisible());
+    connect(showTagsWidgetCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setDeckEditorTagsWidgetVisible);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::deckEditorTagsWidgetVisibleChanged, this,
             &DeckEditorDeckDockWidget::updateShowTagsWidget);
 
     quickSettingsWidget->addSettingsWidget(showBannerCardCheckBox);
@@ -151,7 +156,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardLabel->setText(tr("Banner Card"));
-    bannerCardLabel->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
+    bannerCardLabel->setHidden(!SettingsCache::instance().cardsDisplay().getDeckEditorBannerCardComboBoxVisible());
     bannerCardComboBox = new QComboBox(this);
     connect(getModel(), &DeckListModel::cardNodesChanged, this, [this]() {
         // Delay the update to avoid race conditions
@@ -162,10 +167,10 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckEditorDeckDockWidget::writeBannerCard);
-    bannerCardComboBox->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
+    bannerCardComboBox->setHidden(!SettingsCache::instance().cardsDisplay().getDeckEditorBannerCardComboBoxVisible());
 
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, {});
-    deckTagsDisplayWidget->setHidden(!SettingsCache::instance().getDeckEditorTagsWidgetVisible());
+    deckTagsDisplayWidget->setHidden(!SettingsCache::instance().cardsDisplay().getDeckEditorTagsWidgetVisible());
     connect(deckTagsDisplayWidget, &DeckPreviewDeckTagsDisplayWidget::tagsChanged, deckStateManager,
             &DeckStateManager::setTags);
 

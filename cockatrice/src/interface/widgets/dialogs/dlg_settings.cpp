@@ -24,6 +24,8 @@
 #include <QScrollBar>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <libcockatrice/settings/paths_settings.h>
+#include <libcockatrice/settings/personal_settings.h>
 
 static QScrollArea *makeScrollable(QWidget *widget)
 {
@@ -43,7 +45,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     auto rec = QGuiApplication::primaryScreen()->availableGeometry();
     this->setMinimumSize(qMin(700, rec.width()), qMin(700, rec.height()));
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &DlgSettings::updateLanguage);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &DlgSettings::updateLanguage);
 
     contentsWidget = new QListWidget;
     contentsWidget->setViewMode(QListView::IconMode);
@@ -79,7 +81,7 @@ DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &DlgSettings::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &DlgSettings::retranslateUi);
     retranslateUi();
 
     adjustSize();
@@ -205,7 +207,8 @@ void DlgSettings::closeEvent(QCloseEvent *event)
         }
     }
 
-    if (!QDir(SettingsCache::instance().getDeckPath()).exists() || SettingsCache::instance().getDeckPath().isEmpty()) {
+    if (!QDir(SettingsCache::instance().paths().getDeckPath()).exists() ||
+        SettingsCache::instance().paths().getDeckPath().isEmpty()) {
         //! \todo Prompt to create the deck directory.
         if (QMessageBox::critical(
                 this, tr("Error"),
@@ -216,7 +219,8 @@ void DlgSettings::closeEvent(QCloseEvent *event)
         }
     }
 
-    if (!QDir(SettingsCache::instance().getPicsPath()).exists() || SettingsCache::instance().getPicsPath().isEmpty()) {
+    if (!QDir(SettingsCache::instance().paths().getPicsPath()).exists() ||
+        SettingsCache::instance().paths().getPicsPath().isEmpty()) {
         //! \todo Prompt to create the pictures directory.
         if (QMessageBox::critical(this, tr("Error"),
                                   tr("The path to your card pictures directory is invalid. Would you like to go back "

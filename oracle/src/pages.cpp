@@ -28,6 +28,7 @@
 #include <QTextEdit>
 #include <QtConcurrent>
 #include <QtGui>
+#include <libcockatrice/settings/personal_settings.h>
 
 #ifdef HAS_LZMA
 #include "lzma/decompress.h"
@@ -119,7 +120,7 @@ QString IntroPage::languageName(const QString &lang)
 
 void IntroPage::languageBoxChanged(int index)
 {
-    SettingsCache::instance().setLang(languageBox->itemData(index).toString());
+    SettingsCache::instance().personal().setLang(languageBox->itemData(index).toString());
 }
 
 void IntroPage::retranslateUi()

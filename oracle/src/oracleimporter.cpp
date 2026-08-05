@@ -18,7 +18,7 @@ static const QList<AllowedCount> kSingletonCounts = {{1, "legal"}, {0, "banned"}
 
 SplitCardPart::SplitCardPart(const QString &_name,
                              const QString &_text,
-                             const QVariantHash &_properties,
+                             const QHash<QString, QString> &_properties,
                              const PrintingInfo &_printingInfo)
     : name(_name), text(_text), properties(_properties), printingInfo(_printingInfo)
 {
@@ -135,7 +135,7 @@ static void sortAndReduceColors(QString &colors)
 CardInfoPtr OracleImporter::addCard(QString name,
                                     const QString &text,
                                     bool isToken,
-                                    QVariantHash properties,
+                                    QHash<QString, QString> properties,
                                     const QList<CardRelation *> &relatedCards,
                                     const PrintingInfo &printingInfo)
 {
@@ -152,7 +152,7 @@ CardInfoPtr OracleImporter::addCard(QString name,
     }
 
     // Remove {} around mana costs, except if it's split cost
-    QString manacost = properties.value("manacost").toString();
+    QString manacost = properties.value("manacost");
     if (!manacost.isEmpty()) {
         QStringList symbols = manacost.split("}");
         QString formattedCardCost;
@@ -169,12 +169,12 @@ CardInfoPtr OracleImporter::addCard(QString name,
     }
 
     // fix colors
-    QString allColors = properties.value("colors").toString();
+    QString allColors = properties.value("colors");
     if (allColors.size() > 1) {
         sortAndReduceColors(allColors);
         properties.insert("colors", allColors);
     }
-    QString allColorIdent = properties.value("coloridentity").toString();
+    QString allColorIdent = properties.value("coloridentity");
     if (allColorIdent.size() > 1) {
         sortAndReduceColors(allColorIdent);
         properties.insert("coloridentity", allColorIdent);
@@ -182,16 +182,15 @@ CardInfoPtr OracleImporter::addCard(QString name,
 
     // DETECT CARD POSITIONING INFO
 
-    bool landscapeOrientation = properties.value("maintype").toString() == "Battle" ||
-                                properties.value("layout").toString() == "split" ||
-                                properties.value("layout").toString() == "planar";
+    bool landscapeOrientation = properties.value("maintype") == "Battle" || properties.value("layout") == "split" ||
+                                properties.value("layout") == "planar";
 
     // cards that enter the field tapped
     bool cipt = parseCipt(name, text) || landscapeOrientation;
 
     // table row
     int tableRow = 1;
-    QString mainCardType = properties.value("maintype").toString();
+    QString mainCardType = properties.value("maintype");
     if (mainCardType == "Land") {
         tableRow = 0;
     } else if (mainCardType == "Sorcery" || mainCardType == "Instant") {
@@ -201,11 +200,11 @@ CardInfoPtr OracleImporter::addCard(QString name,
     }
 
     // card side
-    QString side = properties.value("side").toString() == "b" ? "back" : "front";
+    QString side = properties.value("side") == "b" ? "back" : "front";
     properties.insert("side", side);
 
     // upsideDown (flip cards)
-    QString layout = properties.value("layout").toString();
+    QString layout = properties.value("layout");
     bool upsideDown = layout == "flip" && side == "back";
 
     // insert the card and its properties
@@ -279,7 +278,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         }
 
         // card properties
-        QVariantHash properties;
+        QHash<QString, QString> properties;
         for (auto i = cardProperties.cbegin(), end = cardProperties.cend(); i != end; ++i) {
             QString mtgjsonProperty = i.key();
             QString xmlPropertyName = i.value();
@@ -291,12 +290,13 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
 
         // per-set properties
         PrintingInfo printingInfo = PrintingInfo(currentSet);
+        QHash<QString, QString> printingProps;
         for (auto i = setInfoProperties.cbegin(), end = setInfoProperties.cend(); i != end; ++i) {
             QString mtgjsonProperty = i.key();
             QString xmlPropertyName = i.value();
             QString propertyValue = getStringPropertyFromMap(card, mtgjsonProperty);
             if (!propertyValue.isEmpty()) {
-                printingInfo.setProperty(xmlPropertyName, propertyValue);
+                printingProps.insert(xmlPropertyName, propertyValue);
             }
         }
 
@@ -304,7 +304,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
         QString faceFlavorName = getStringPropertyFromMap(card, "faceFlavorName");
         QString flavorName = !faceFlavorName.isEmpty() ? faceFlavorName : getStringPropertyFromMap(card, "flavorName");
         if (!flavorName.isEmpty()) {
-            printingInfo.setProperty("flavorName", flavorName);
+            printingProps.insert("flavorName", flavorName);
         }
 
         // Identifiers
@@ -313,9 +313,11 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
             QString xmlPropertyName = i.value();
             QString propertyValue = getStringPropertyFromMap(card.value("identifiers").toMap(), mtgjsonProperty);
             if (!propertyValue.isEmpty()) {
-                printingInfo.setProperty(xmlPropertyName, propertyValue);
+                printingProps.insert(xmlPropertyName, propertyValue);
             }
         }
+
+        printingInfo.setProperties(printingProps);
 
         QString numComponent;
         const QString numProperty = printingInfo.getProperty("num");
@@ -428,7 +430,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     QList<QPair<QList<SplitCardPart>, QString>> partsAndNames = splitCards.values();
     for (auto [splitCardParts, name] : partsAndNames) {
         QString text;
-        QVariantHash properties;
+        QHash<QString, QString> properties;
         PrintingInfo printingInfo;
 
         for (const SplitCardPart &tmp : splitCardParts) {
@@ -441,11 +443,11 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
                 properties = tmp.getProperties();
                 printingInfo = tmp.getPrintingInfo();
             } else {
-                const QVariantHash &tmpProps = tmp.getProperties();
+                const QHash<QString, QString> &tmpProps = tmp.getProperties();
                 for (auto i = tmpProps.cbegin(), end = tmpProps.cend(); i != end; ++i) {
                     QString prop = i.key();
-                    QString originalPropertyValue = properties.value(prop).toString();
-                    QString thisCardPropertyValue = i.value().toString();
+                    QString originalPropertyValue = properties.value(prop);
+                    QString thisCardPropertyValue = i.value();
                     if (!thisCardPropertyValue.isEmpty() && originalPropertyValue != thisCardPropertyValue) {
                         if (originalPropertyValue.isEmpty()) { // don't create //es if one field is empty
                             properties.insert(prop, thisCardPropertyValue);

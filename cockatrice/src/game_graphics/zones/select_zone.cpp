@@ -7,10 +7,11 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QtMath>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 static qreal stackingOffset(qreal cardHeight)
 {
-    const qreal overlapPercent = SettingsCache::instance().getStackCardOverlapPercent();
+    const qreal overlapPercent = SettingsCache::instance().cardsDisplay().getStackCardOverlapPercent();
     return cardHeight * (100.0 - overlapPercent) / 100.0;
 }
 
@@ -21,40 +22,32 @@ SelectZone::ZoneLayout SelectZone::computeZoneLayout(const StackLayoutParams &pa
     }
     qreal effectiveOffset = params.desiredOffset;
     if (params.cardCount > 1) {
-        qreal fitOffset;
-        if (params.totalHeight < params.cardHeight && params.minOffset > 0.0) {
-            // Zone is shorter than a card (e.g. minimized). Compress offsets so
-            // every card has at least minOffset pixels of its top visible.
-            fitOffset = (params.totalHeight - params.minOffset) / (params.cardCount - 1);
-            effectiveOffset = qMax(0.0, qMin(params.desiredOffset, fitOffset));
+        qreal reservedForBottomCard;
+        if (params.allowBottomOverflow) {
+            // Allow the bottom card to partially overflow in tight zones, scaling the
+            // overflow allowance by sqrt(cardCount-1) so offsets decrease smoothly
+            // as cards are added rather than dropping by 1/(n-1) each time.
+            // The 0.75 ratio was tuned experimentally to balance card visibility vs. overflow.
+            constexpr qreal bottomCardZoneRatio = 0.75;
+            const qreal adjustedRatio = bottomCardZoneRatio / qSqrt(static_cast<qreal>(params.cardCount - 1));
+            reservedForBottomCard = qMin(params.cardHeight, params.totalHeight * adjustedRatio);
         } else {
-            qreal reservedForBottomCard;
-            if (params.allowBottomOverflow) {
-                // Allow the bottom card to partially overflow in tight zones, scaling the
-                // overflow allowance by sqrt(cardCount-1) so offsets decrease smoothly
-                // as cards are added rather than dropping by 1/(n-1) each time.
-                // The 0.75 ratio was tuned experimentally to balance card visibility vs. overflow.
-                constexpr qreal bottomCardZoneRatio = 0.75;
-                const qreal adjustedRatio = bottomCardZoneRatio / qSqrt(static_cast<qreal>(params.cardCount - 1));
-                reservedForBottomCard = qMin(params.cardHeight, params.totalHeight * adjustedRatio);
-            } else {
-                // No overflow: reserve full card height for the bottom card
-                reservedForBottomCard = params.cardHeight;
-            }
-            fitOffset = (params.totalHeight - reservedForBottomCard) / (params.cardCount - 1);
+            // No overflow: reserve full card height for the bottom card
+            reservedForBottomCard = params.cardHeight;
+        }
+        qreal fitOffset = (params.totalHeight - reservedForBottomCard) / (params.cardCount - 1);
 
-            if (!params.allowBottomOverflow) {
-                // Constrain offset so all card tops remain within zone bounds.
-                // With start=0, last card top at (cardCount-1) * effectiveOffset must be < totalHeight.
-                qreal maxOffsetForTops = params.totalHeight / (params.cardCount - 1);
-                fitOffset = qMin(fitOffset, maxOffsetForTops);
-            }
+        if (!params.allowBottomOverflow) {
+            // Constrain offset so all card tops remain within zone bounds.
+            // With start=0, last card top at (cardCount-1) * effectiveOffset must be < totalHeight.
+            qreal maxOffsetForTops = params.totalHeight / (params.cardCount - 1);
+            fitOffset = qMin(fitOffset, maxOffsetForTops);
+        }
 
-            // Apply minOffset only if it fits; otherwise compress further to keep all card tops visible.
-            effectiveOffset = qMin(params.desiredOffset, fitOffset);
-            if (fitOffset >= params.minOffset) {
-                effectiveOffset = qMax(params.minOffset, effectiveOffset);
-            }
+        // Apply minOffset only if it fits; otherwise compress further to keep all card tops visible.
+        effectiveOffset = qMin(params.desiredOffset, fitOffset);
+        if (fitOffset >= params.minOffset) {
+            effectiveOffset = qMax(params.minOffset, effectiveOffset);
         }
     }
     qreal stackHeight = (params.cardCount - 1) * effectiveOffset + params.cardHeight;

@@ -79,6 +79,13 @@ void CockatriceXml3Parser::parseFile(QIODevice &device)
     }
 }
 
+void CockatriceXml3Parser::parseFileInto(QIODevice &device, CardDatabaseData &data)
+{
+    targetData = &data;
+    parseFile(device);
+    targetData = nullptr;
+}
+
 void CockatriceXml3Parser::loadSetsFromXml(QXmlStreamReader &xml)
 {
     while (!xml.atEnd()) {
@@ -165,7 +172,7 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
         if (xmlName == "card") {
             QString name = QString("");
             QString text = QString("");
-            QVariantHash properties = QVariantHash();
+            QHash<QString, QString> properties;
             QString colors = QString("");
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             auto _sets = SetToPrintingsMap();
@@ -222,25 +229,27 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     // behaviour. Without this check, disabling a set has no effect on v3 databases.
                     if (set->getEnabled()) {
                         PrintingInfo setInfo(set);
+                        QHash<QString, QString> printingProps;
                         if (attrs.hasAttribute("muId")) {
-                            setInfo.setProperty("muid", attrs.value("muId").toString());
+                            printingProps.insert("muid", attrs.value("muId").toString());
                         }
 
                         if (attrs.hasAttribute("uuId")) {
-                            setInfo.setProperty("uuid", attrs.value("uuId").toString());
+                            printingProps.insert("uuid", attrs.value("uuId").toString());
                         }
 
                         if (attrs.hasAttribute("picURL")) {
-                            setInfo.setProperty("picurl", attrs.value("picURL").toString());
+                            printingProps.insert("picurl", attrs.value("picURL").toString());
                         }
 
                         if (attrs.hasAttribute("num")) {
-                            setInfo.setProperty("num", attrs.value("num").toString());
+                            printingProps.insert("num", attrs.value("num").toString());
                         }
 
                         if (attrs.hasAttribute("rarity")) {
-                            setInfo.setProperty("rarity", attrs.value("rarity").toString());
+                            printingProps.insert("rarity", attrs.value("rarity").toString());
                         }
+                        setInfo.setProperties(printingProps);
                         _sets[setName].append(setInfo);
                     }
                     // related cards
@@ -299,7 +308,20 @@ void CockatriceXml3Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                                  .upsideDownArt = upsideDown};
             CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
                                                         reverseRelatedCards, _sets, attributes);
-            emit addCard(newCard);
+            if (targetData) {
+                if (auto existing = targetData->cards.value(name)) {
+                    for (const auto &printings : newCard->getSets()) {
+                        for (const auto &printing : printings) {
+                            existing->addToSet(printing.getSet(), printing);
+                        }
+                    }
+                } else {
+                    targetData->cards.insert(name, newCard);
+                    targetData->simpleNameCards.insert(newCard->getSimpleName(), newCard);
+                }
+            } else {
+                emit addCard(newCard);
+            }
         }
     }
 }
