@@ -27,7 +27,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
-#include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <version_string.h>
 
 TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor)
@@ -132,8 +132,8 @@ void TabArchidekt::initializeUi()
 
     // Settings
     settingsButton = new SettingsButtonWidget(primaryToolbar);
-    cardSizeSlider = new CardSizeWidget(primaryToolbar, nullptr,
-                                        SettingsCache::instance().visualDeckStorage().getArchidektPreviewSize());
+    cardSizeSlider =
+        new CardSizeWidget(primaryToolbar, nullptr, SettingsCache::instance().cardsDisplay().getArchidektPreviewSize());
     settingsButton->addSettingsWidget(cardSizeSlider);
 
     // Assemble primary toolbar
@@ -339,8 +339,8 @@ void TabArchidekt::connectSignals()
         doSearch();
     });
 
-    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().visualDeckStorage(),
-            &VisualDeckStorageSettings::setArchidektPreviewCardSize);
+    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setArchidektPreviewCardSize);
 
     // Search button triggers immediate search
     connect(searchButton, &QPushButton::clicked, this, &TabArchidekt::doSearchImmediate);

@@ -44,7 +44,7 @@
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/recents_settings.h>
 #include <libcockatrice/utility/string_limits.h>
@@ -203,7 +203,7 @@ void AbstractTabDeckEditor::cleanDeckAndResetModified()
  */
 AbstractTabDeckEditor::DeckOpenLocation AbstractTabDeckEditor::confirmOpen(const bool openInSameTabIfBlank)
 {
-    if (SettingsCache::instance().interface().getOpenDeckInNewTab()) {
+    if (SettingsCache::instance().deckEditor().getOpenDeckInNewTab()) {
         if (openInSameTabIfBlank && deckStateManager->isBlankNewDeck()) {
             return SAME_TAB;
         } else {

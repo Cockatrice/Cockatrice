@@ -12,9 +12,9 @@
 #include <algorithm>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
-#include <libcockatrice/settings/personal_settings.h>
 
 AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef, PlayerLogic *_owner, int _id)
     : ArrowTarget(_owner, parent), id(_id), cardRef(cardRef), tapped(false), facedown(false), tapAngle(0),
@@ -107,7 +107,7 @@ QSizeF AbstractCardItem::getTranslatedSize(QPainter *painter) const
 
 void AbstractCardItem::transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle)
 {
-    const int MAX_FONT_SIZE = SettingsCache::instance().personal().getMaxFontSize();
+    const int MAX_FONT_SIZE = SettingsCache::instance().appearance().getMaxFontSize();
     const int fontSize = std::max(9, MAX_FONT_SIZE);
 
     QRectF totalBoundingRect = painter->combinedTransform().mapRect(boundingRect());

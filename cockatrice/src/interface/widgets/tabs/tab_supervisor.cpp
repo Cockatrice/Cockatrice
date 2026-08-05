@@ -39,9 +39,9 @@
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
-#include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
@@ -910,7 +910,7 @@ void TabSupervisor::talkLeft(TabMessage *tab)
  */
 void TabSupervisor::openDeckInNewTab(const LoadedDeck &deckToOpen)
 {
-    int type = SettingsCache::instance().visualDeckStorage().getDefaultDeckEditorType();
+    int type = SettingsCache::instance().deckEditor().getDefaultDeckEditorType();
     switch (type) {
         case ClassicDeckEditor:
             addDeckEditorTab(deckToOpen);

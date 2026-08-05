@@ -15,6 +15,7 @@
 #include <QMessageBox>
 #include <QStyleFactory>
 #include <QTimer>
+#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
@@ -104,7 +105,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
         homeTabBackgroundSourceBox.addItem(QObject::tr(entry.trKey), QVariant::fromValue(entry.type));
     }
 
-    QString homeTabBackgroundSource = SettingsCache::instance().personal().getHomeTabBackgroundSource();
+    QString homeTabBackgroundSource = settings.appearance().getHomeTabBackgroundSource();
     int homeTabBackgroundSourceId =
         homeTabBackgroundSourceBox.findData(BackgroundSources::fromId(homeTabBackgroundSource));
     if (homeTabBackgroundSourceId != -1) {
@@ -113,20 +114,19 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     connect(&homeTabBackgroundSourceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
         auto type = homeTabBackgroundSourceBox.currentData().value<BackgroundSources::Type>();
-        SettingsCache::instance().personal().setHomeTabBackgroundSource(BackgroundSources::toId(type));
+        SettingsCache::instance().appearance().setHomeTabBackgroundSource(BackgroundSources::toId(type));
         updateHomeTabSettingsVisibility();
     });
 
     homeTabBackgroundShuffleFrequencySpinBox.setRange(0, 3600);
     homeTabBackgroundShuffleFrequencySpinBox.setSuffix(tr(" seconds"));
-    homeTabBackgroundShuffleFrequencySpinBox.setValue(
-        SettingsCache::instance().personal().getHomeTabBackgroundShuffleFrequency());
-    connect(&homeTabBackgroundShuffleFrequencySpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings.personal(),
-            &PersonalSettings::setHomeTabBackgroundShuffleFrequency);
+    homeTabBackgroundShuffleFrequencySpinBox.setValue(settings.appearance().getHomeTabBackgroundShuffleFrequency());
+    connect(&homeTabBackgroundShuffleFrequencySpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings.appearance(),
+            &AppearanceSettings::setHomeTabBackgroundShuffleFrequency);
 
-    homeTabDisplayCardNameCheckBox.setChecked(settings.personal().getHomeTabDisplayCardName());
-    connect(&homeTabDisplayCardNameCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.personal(),
-            &PersonalSettings::setHomeTabDisplayCardName);
+    homeTabDisplayCardNameCheckBox.setChecked(settings.appearance().getHomeTabDisplayCardName());
+    connect(&homeTabDisplayCardNameCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.appearance(),
+            &AppearanceSettings::setHomeTabDisplayCardName);
 
     updateHomeTabSettingsVisibility();
 
@@ -140,30 +140,15 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     homeTabGroupBox = new QGroupBox;
     homeTabGroupBox->setLayout(homeTabGrid);
 
-    styleUserListCheckBox.setChecked(settings.interface().getStyleUserList());
-    connect(&styleUserListCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.interface(),
-            &InterfaceSettings::setStyleUserList);
+    styleUserListCheckBox.setChecked(settings.appearance().getStyleUserList());
+    connect(&styleUserListCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.appearance(),
+            &AppearanceSettings::setStyleUserList);
 
     auto stylingTabGrid = new QGridLayout;
     stylingTabGrid->addWidget(&styleUserListCheckBox, 0, 0, 1, 2);
 
     stylingGroupBox = new QGroupBox;
     stylingGroupBox->setLayout(stylingTabGrid);
-
-    // Menu settings
-    showShortcutsCheckBox.setChecked(settings.cardsDisplay().getShowShortcuts());
-    connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &AppearanceSettingsPage::showShortcutsChanged);
-
-    showGameSelectorFilterToolbarCheckBox.setChecked(settings.cardsDisplay().getShowGameSelectorFilterToolbar());
-    connect(&showGameSelectorFilterToolbarCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.cardsDisplay(),
-            &CardsDisplaySettings::setShowGameSelectorFilterToolbar);
-
-    auto *menuGrid = new QGridLayout;
-    menuGrid->addWidget(&showShortcutsCheckBox, 0, 0);
-    menuGrid->addWidget(&showGameSelectorFilterToolbarCheckBox, 1, 0);
-
-    menuGroupBox = new QGroupBox;
-    menuGroupBox->setLayout(menuGrid);
 
     // Printings settings
     overrideAllCardArtWithPersonalPreferenceCheckBox.setChecked(
@@ -199,9 +184,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&roundCardCornersCheckBox, &QAbstractButton::toggled, &settings.cardsDisplay(),
             &CardsDisplaySettings::setRoundCardCorners);
 
-    connect(&maxFontSizeForCardsEdit, qOverload<int>(&QSpinBox::valueChanged), &settings.personal(),
-            &PersonalSettings::setMaxFontSize);
-    maxFontSizeForCardsEdit.setValue(settings.personal().getMaxFontSize());
+    connect(&maxFontSizeForCardsEdit, qOverload<int>(&QSpinBox::valueChanged), &settings.appearance(),
+            &AppearanceSettings::setMaxFontSize);
+    maxFontSizeForCardsEdit.setValue(settings.appearance().getMaxFontSize());
     maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
     maxFontSizeForCardsEdit.setMinimum(9);
     maxFontSizeForCardsEdit.setMaximum(100);
@@ -330,7 +315,6 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     mainLayout->addWidget(themeGroupBox);
     mainLayout->addWidget(homeTabGroupBox);
     mainLayout->addWidget(stylingGroupBox);
-    mainLayout->addWidget(menuGroupBox);
     mainLayout->addWidget(printingsGroupBox);
     mainLayout->addWidget(cardsGroupBox);
     mainLayout->addWidget(cardLayoutGroupBox);
@@ -375,18 +359,12 @@ void AppearanceSettingsPage::editPalette()
 
 void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
 {
-    bool visible = SettingsCache::instance().personal().getHomeTabBackgroundSource() !=
+    bool visible = SettingsCache::instance().appearance().getHomeTabBackgroundSource() !=
                    BackgroundSources::toId(BackgroundSources::Theme);
 
     homeTabBackgroundShuffleFrequencyLabel.setVisible(visible);
     homeTabBackgroundShuffleFrequencySpinBox.setVisible(visible);
     homeTabDisplayCardNameCheckBox.setVisible(visible);
-}
-
-void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
-{
-    SettingsCache::instance().cardsDisplay().setShowShortcuts(value);
-    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, value == 0); // 0 = unchecked
 }
 
 void AppearanceSettingsPage::overrideAllCardArtWithPersonalPreferenceToggled(QT_STATE_CHANGED_T value)
@@ -449,10 +427,6 @@ void AppearanceSettingsPage::retranslateUi()
 
     stylingGroupBox->setTitle(tr("Styling settings"));
     styleUserListCheckBox.setText(tr("Style user list"));
-
-    menuGroupBox->setTitle(tr("Menu settings"));
-    showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));
-    showGameSelectorFilterToolbarCheckBox.setText(tr("Show game filter toolbar above list in room tab"));
 
     printingsGroupBox->setTitle(tr("Card printings"));
     overrideAllCardArtWithPersonalPreferenceCheckBox.setText(

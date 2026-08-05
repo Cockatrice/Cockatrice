@@ -19,8 +19,8 @@
 #include <QThread>
 #include <algorithm>
 #include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
-#include <libcockatrice/settings/personal_settings.h>
 #include <utility>
 
 // never cache more than 300 cards at once for a single deck
@@ -31,7 +31,7 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
     worker = new CardPictureLoaderWorker;
     connect(&SettingsCache::instance().paths(), &PathsSettings::picsPathChanged, this,
             &CardPictureLoader::picsPathChanged);
-    connect(&SettingsCache::instance().personal(), &PersonalSettings::picDownloadChanged, this,
+    connect(&SettingsCache::instance().downloads(), &DownloadSettings::picDownloadChanged, this,
             &CardPictureLoader::picDownloadChanged);
 
     qRegisterMetaType<ExactCard>();

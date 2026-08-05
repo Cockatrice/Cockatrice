@@ -37,17 +37,17 @@ bool InterfaceSettings::getKeepGameChatFocus() const
 
 bool InterfaceSettings::getNotificationsEnabled() const
 {
-    return getValue("notificationsenabled", QString(), QString(), true).toBool();
+    return getValue("enabled", "interface", "notifications", true).toBool();
 }
 
 bool InterfaceSettings::getSpectatorNotificationsEnabled() const
 {
-    return getValue("specnotificationsenabled", QString(), QString(), false).toBool();
+    return getValue("spectatorsEnabled", "interface", "notifications", false).toBool();
 }
 
 bool InterfaceSettings::getBuddyConnectNotificationsEnabled() const
 {
-    return getValue("buddyconnectnotificationsenabled", QString(), QString(), true).toBool();
+    return getValue("buddyConnectEnabled", "interface", "notifications", true).toBool();
 }
 
 bool InterfaceSettings::getDoubleClickToPlay() const
@@ -110,11 +110,6 @@ int InterfaceSettings::getMinPlayersForMultiColumnLayout() const
     return getValue("min_players_multicolumn", QString(), QString(), 4).toInt();
 }
 
-bool InterfaceSettings::getOpenDeckInNewTab() const
-{
-    return getValue("openDeckInNewTab", "editor", QString(), false).toBool();
-}
-
 int InterfaceSettings::getRewindBufferingMs() const
 {
     return getValue("rewindBufferingMs", "replay", QString(), 200).toInt();
@@ -123,11 +118,6 @@ int InterfaceSettings::getRewindBufferingMs() const
 qreal InterfaceSettings::getFastForwardSpeed() const
 {
     return getValue("fastForwardSpeed", "replay", QString(), 10).toReal();
-}
-
-bool InterfaceSettings::getStyleUserList() const
-{
-    return getValue("styleUserList", "appearance", QString(), true).toBool();
 }
 
 bool InterfaceSettings::getLeftJustified() const
@@ -150,9 +140,19 @@ bool InterfaceSettings::getZoneViewPileView() const
     return getValue("pileview", "zoneview", QString(), true).toBool();
 }
 
-QString InterfaceSettings::getKnownMissingFeatures()
+bool InterfaceSettings::getShowStatusBar() const
 {
-    return getValue("knownmissingfeatures", QString(), QString(), "").toString();
+    return getValue("showStatusBar", QString(), QString(), false).toBool();
+}
+
+bool InterfaceSettings::getShowShortcuts() const
+{
+    return getValue("showShortcuts", QString(), QString(), true).toBool();
+}
+
+bool InterfaceSettings::getShowGameSelectorFilterToolbar() const
+{
+    return getValue("showGameSelectorFilterToolbar", QString(), QString(), true).toBool();
 }
 
 void InterfaceSettings::setUseTearOffMenus(bool _useTearOffMenus)
@@ -189,17 +189,17 @@ void InterfaceSettings::setKeepGameChatFocus(bool value)
 
 void InterfaceSettings::setNotificationsEnabled(bool _notificationsEnabled)
 {
-    setValue(_notificationsEnabled, "notificationsenabled");
+    setValue(_notificationsEnabled, "enabled", "interface", "notifications");
 }
 
 void InterfaceSettings::setSpectatorNotificationsEnabled(bool _spectatorNotificationsEnabled)
 {
-    setValue(_spectatorNotificationsEnabled, "specnotificationsenabled");
+    setValue(_spectatorNotificationsEnabled, "spectatorsEnabled", "interface", "notifications");
 }
 
 void InterfaceSettings::setBuddyConnectNotificationsEnabled(bool _buddyConnectNotificationsEnabled)
 {
-    setValue(_buddyConnectNotificationsEnabled, "buddyconnectnotificationsenabled");
+    setValue(_buddyConnectNotificationsEnabled, "buddyConnectEnabled", "interface", "notifications");
 }
 
 void InterfaceSettings::setDoubleClickToPlay(bool _doubleClickToPlay)
@@ -269,11 +269,6 @@ void InterfaceSettings::setMinPlayersForMultiColumnLayout(int _minPlayersForMult
     emit minPlayersForMultiColumnLayoutChanged();
 }
 
-void InterfaceSettings::setOpenDeckInNewTab(bool _openDeckInNewTab)
-{
-    setValue(_openDeckInNewTab, "openDeckInNewTab", "editor");
-}
-
 void InterfaceSettings::setRewindBufferingMs(int _rewindBufferingMs)
 {
     setValue(_rewindBufferingMs, "rewindBufferingMs", "replay");
@@ -282,12 +277,6 @@ void InterfaceSettings::setRewindBufferingMs(int _rewindBufferingMs)
 void InterfaceSettings::setFastForwardSpeed(qreal _value)
 {
     setValue(_value, "fastForwardSpeed", "replay");
-}
-
-void InterfaceSettings::setStyleUserList(bool _styleUserList)
-{
-    setValue(_styleUserList, "styleUserList", "appearance");
-    emit styleUserListChanged();
 }
 
 void InterfaceSettings::setLeftJustified(bool _leftJustified)
@@ -311,7 +300,19 @@ void InterfaceSettings::setZoneViewPileView(bool _zoneViewPileView)
     setValue(_zoneViewPileView, "pileview", "zoneview");
 }
 
-void InterfaceSettings::setKnownMissingFeatures(const QString &_knownMissingFeatures)
+void InterfaceSettings::setShowStatusBar(bool _showStatusBar)
 {
-    setValue(_knownMissingFeatures, "knownmissingfeatures");
+    setValue(_showStatusBar, "showStatusBar");
+    emit showStatusBarChanged(_showStatusBar);
+}
+
+void InterfaceSettings::setShowShortcuts(bool _showShortcuts)
+{
+    setValue(_showShortcuts, "showShortcuts");
+}
+
+void InterfaceSettings::setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar)
+{
+    setValue(_showGameSelectorFilterToolbar, "showGameSelectorFilterToolbar");
+    emit showGameSelectorFilterToolbarChanged(_showGameSelectorFilterToolbar);
 }

@@ -5,6 +5,7 @@
 
 #include <QGridLayout>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
@@ -85,6 +86,15 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&keepGameChatFocusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
             &InterfaceSettings::setKeepGameChatFocus);
 
+    showShortcutsCheckBox.setChecked(SettingsCache::instance().interface().getShowShortcuts());
+    connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &UserInterfaceSettingsPage::showShortcutsChanged);
+
+    showGameSelectorFilterToolbarCheckBox.setChecked(
+        SettingsCache::instance().interface().getShowGameSelectorFilterToolbar());
+    connect(&showGameSelectorFilterToolbarCheckBox, &QCheckBox::QT_STATE_CHANGED,
+            &SettingsCache::instance().interface(), &InterfaceSettings::setShowGameSelectorFilterToolbar);
+
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
     generalGrid->addWidget(&clickPlaysAllSelectedCheckBox, 1, 0);
@@ -97,6 +107,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&showTotalSelectionCountCheckBox, 8, 0);
     generalGrid->addWidget(&useTearOffMenusCheckBox, 9, 0);
     generalGrid->addWidget(&keepGameChatFocusCheckBox, 10, 0);
+    generalGrid->addWidget(&showShortcutsCheckBox, 11, 0);
+    generalGrid->addWidget(&showGameSelectorFilterToolbarCheckBox, 12, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -121,9 +133,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     animationGroupBox->setLayout(animationGrid);
 
     // deck editor settings
-    openDeckInNewTabCheckBox.setChecked(SettingsCache::instance().interface().getOpenDeckInNewTab());
-    connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
-            &InterfaceSettings::setOpenDeckInNewTab);
+    openDeckInNewTabCheckBox.setChecked(SettingsCache::instance().deckEditor().getOpenDeckInNewTab());
+    connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().deckEditor(),
+            &DeckEditorSettings::setOpenDeckInNewTab);
 
     visualDeckStorageInGameCheckBox.setChecked(
         SettingsCache::instance().visualDeckStorage().getVisualDeckStorageInGame());
@@ -156,10 +168,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     defaultDeckEditorTypeSelector.addItem(""); // these will be set in retranslateUI
     defaultDeckEditorTypeSelector.addItem("");
-    defaultDeckEditorTypeSelector.setCurrentIndex(
-        SettingsCache::instance().visualDeckStorage().getDefaultDeckEditorType());
+    defaultDeckEditorTypeSelector.setCurrentIndex(SettingsCache::instance().deckEditor().getDefaultDeckEditorType());
     connect(&defaultDeckEditorTypeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            &SettingsCache::instance().visualDeckStorage(), &VisualDeckStorageSettings::setDefaultDeckEditorType);
+            &SettingsCache::instance().deckEditor(), &DeckEditorSettings::setDefaultDeckEditorType);
 
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
@@ -212,6 +223,12 @@ void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
     }
 }
 
+void UserInterfaceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
+{
+    SettingsCache::instance().interface().setShowShortcuts(value);
+    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, value == 0); // 0 = unchecked
+}
+
 void UserInterfaceSettingsPage::retranslateUi()
 {
     generalGroupBox->setTitle(tr("General interface settings"));
@@ -227,6 +244,8 @@ void UserInterfaceSettingsPage::retranslateUi()
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
     keepGameChatFocusCheckBox.setText(
         tr("Keep game chat focused when clicking in game (Note: disables card view search bar)"));
+    showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));
+    showGameSelectorFilterToolbarCheckBox.setText(tr("Show game filter toolbar above list in room tab"));
 
     notificationsGroupBox->setTitle(tr("Notifications settings"));
     notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));

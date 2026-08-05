@@ -77,7 +77,10 @@ static void migrateChatSettings(const QString &settingsPath, QSettings &globalIn
     QStringList chatKeys = globalIni.childKeys();
     globalIni.endGroup();
 
-    if (chatKeys.isEmpty()) {
+    // Legacy highlight words lived under [personal], but the chat settings
+    // class reads them from [chat]
+    bool hasHighlightWords = globalIni.contains("personal/highlightWords");
+    if (chatKeys.isEmpty() && !hasHighlightWords) {
         return;
     }
 
@@ -85,16 +88,23 @@ static void migrateChatSettings(const QString &settingsPath, QSettings &globalIn
     for (const auto &key : chatKeys) {
         chatIni.setValue("chat/" + key, globalIni.value("chat/" + key));
     }
+    if (hasHighlightWords) {
+        chatIni.setValue("chat/highlightwords", globalIni.value("personal/highlightWords"));
+    }
 }
 
 static void migrateCacheStorageSettings(const QString &settingsPath, QSettings &globalIni)
 {
-    const QStringList cacheKeys = {"personal/pixmapCacheSize", "personal/networkCacheSize", "personal/redirectCacheTtl",
-                                   "personal/cardPictureLoaderCacheMethod",
-                                   "personal/localCardImageStorageNamingScheme"};
+    const QMap<QString, QString> cacheStorageKeyMap = {
+        {"personal/pixmapCacheSize", "cache_storage/pixmapCacheSize"},
+        {"personal/networkCacheSize", "cache_storage/networkCacheSize"},
+        {"personal/redirectCacheTtl", "cache_storage/redirectCacheTtl"},
+        {"personal/cardPictureLoaderCacheMethod", "cache_storage/cardPictureLoaderCacheMethod"},
+        {"personal/localCardImageStorageNamingScheme", "cache_storage/localCardImageStorageNamingScheme"},
+    };
     bool hasAny = false;
-    for (const auto &key : cacheKeys) {
-        if (globalIni.contains(key)) {
+    for (auto it = cacheStorageKeyMap.constBegin(); it != cacheStorageKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
             hasAny = true;
             break;
         }
@@ -104,9 +114,9 @@ static void migrateCacheStorageSettings(const QString &settingsPath, QSettings &
     }
 
     QSettings cacheStorageIni(settingsPath + "cache_storage.ini", QSettings::IniFormat);
-    for (const auto &key : cacheKeys) {
-        if (globalIni.contains(key)) {
-            cacheStorageIni.setValue(key, globalIni.value(key));
+    for (auto it = cacheStorageKeyMap.constBegin(); it != cacheStorageKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            cacheStorageIni.setValue(it.value(), globalIni.value(it.key()));
         }
     }
 }
@@ -145,33 +155,11 @@ static void migrateUpdatesSettings(const QString &settingsPath, QSettings &globa
 
 static void migratePersonalSettings(const QString &settingsPath, QSettings &globalIni)
 {
-    const QStringList personalRootKeys = {"personal/lang", "personal/highlightWords"};
-    const QMap<QString, QString> personalKeyMap = {
-        {"theme/name", "personal/themeName"},
-        {"personal/clientid", "personal/clientid"},
-        {"personal/clientversion", "personal/clientversion"},
-        {"personal/keepalive", "personal/keepalive"},
-        {"personal/timeout", "personal/timeout"},
-        {"personal/picturedownload", "personal/picturedownload"},
-        {"personal/showStatusBar", "personal/showStatusBar"},
-        {"game/maxfontsize", "game/maxfontsize"},
-        {"personal/downloadspoilers", "personal/downloadspoilers"},
-    };
-    const QStringList homeKeys = {"home/background", "home/background/shuffleTimer", "home/background/displayCardName"};
+    const QStringList personalRootKeys = {"personal/lang"};
     const QStringList tipKeys = {"tipOfDay/showTips", "tipOfDay/seenTips"};
 
     bool hasAny = false;
     for (const auto &key : personalRootKeys) {
-        if (globalIni.contains(key)) {
-            hasAny = true;
-        }
-    }
-    for (auto it = personalKeyMap.constBegin(); it != personalKeyMap.constEnd(); ++it) {
-        if (globalIni.contains(it.key())) {
-            hasAny = true;
-        }
-    }
-    for (const auto &key : homeKeys) {
         if (globalIni.contains(key)) {
             hasAny = true;
         }
@@ -191,16 +179,6 @@ static void migratePersonalSettings(const QString &settingsPath, QSettings &glob
             personalIni.setValue(key, globalIni.value(key));
         }
     }
-    for (auto it = personalKeyMap.constBegin(); it != personalKeyMap.constEnd(); ++it) {
-        if (globalIni.contains(it.key())) {
-            personalIni.setValue(it.value(), globalIni.value(it.key()));
-        }
-    }
-    for (const auto &key : homeKeys) {
-        if (globalIni.contains(key)) {
-            personalIni.setValue(key, globalIni.value(key));
-        }
-    }
     for (const auto &key : tipKeys) {
         if (globalIni.contains(key)) {
             personalIni.setValue(key, globalIni.value(key));
@@ -215,19 +193,24 @@ static void migrateCardsDisplaySettings(const QString &settingsPath, QSettings &
         "cards/roundcardcorners",
         "cards/overrideallcardartwithpersonalpreference",
         "cards/bumpsetswithcardsindecktotop",
-        "cards/printingselectorsortorder",
-        "cards/printingselectorcardsize",
         "cards/includerebalancedcards",
-        "cards/printingselectornavigationbuttonsvisible",
         "cards/tapanimation",
         "cards/autorotatesidewayslayoutcards",
         "cards/scaleCards",
         "cards/verticalCardOverlapPercent",
         "cards/cardinfoviewmode",
     };
-    const QStringList cardsInterfaceKeys = {"interface/deckeditorbannercardcomboboxvisible",
-                                            "interface/deckeditortagswidgetvisible"};
-    const QStringList menuKeys = {"menu/showshortcuts", "menu/showgameselectorfiltertoolbar"};
+    const QMap<QString, QString> cardsKeyMap = {
+        {"cards/printingselectorsortorder", "cards/printingSelector/sortOrder"},
+        {"cards/printingselectornavigationbuttonsvisible", "cards/printingSelector/navigationButtonsVisible"},
+        {"cards/printingselectorcardsize", "cards/cardSize/printingSelector"},
+        {"interface/visualdeckstoragecardsize", "cards/cardSize/visualDeckStorage"},
+        {"interface/visualdatabasedisplaycardsize", "cards/cardSize/visualDatabaseDisplay"},
+        {"interface/visualdeckeditorcardsize", "cards/cardSize/visualDeckEditor"},
+        {"interface/edhreccardsize", "cards/cardSize/edhrec"},
+        {"interface/archidektpreviewsize", "cards/cardSize/archidektPreview"},
+        {"interface/visualdeckeditorsamplehandsize", "cards/cardSize/sampleHandSize"},
+    };
 
     bool hasAny = false;
     for (const auto &key : cardsRootKeys) {
@@ -235,13 +218,8 @@ static void migrateCardsDisplaySettings(const QString &settingsPath, QSettings &
             hasAny = true;
         }
     }
-    for (const auto &key : cardsInterfaceKeys) {
-        if (globalIni.contains(key)) {
-            hasAny = true;
-        }
-    }
-    for (const auto &key : menuKeys) {
-        if (globalIni.contains(key)) {
+    for (auto it = cardsKeyMap.constBegin(); it != cardsKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
             hasAny = true;
         }
     }
@@ -255,14 +233,9 @@ static void migrateCardsDisplaySettings(const QString &settingsPath, QSettings &
             cardsIni.setValue(key, globalIni.value(key));
         }
     }
-    for (const auto &key : cardsInterfaceKeys) {
-        if (globalIni.contains(key)) {
-            cardsIni.setValue(key, globalIni.value(key));
-        }
-    }
-    for (const auto &key : menuKeys) {
-        if (globalIni.contains(key)) {
-            cardsIni.setValue(key, globalIni.value(key));
+    for (auto it = cardsKeyMap.constBegin(); it != cardsKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            cardsIni.setValue(it.value(), globalIni.value(it.key()));
         }
     }
 }
@@ -276,9 +249,6 @@ static void migrateInterfaceSettings(const QString &settingsPath, QSettings &glo
         "interface/closeEmptyCardView",
         "interface/focusCardViewSearchBar",
         "interface/keepGameChatFocus",
-        "interface/notificationsenabled",
-        "interface/specnotificationsenabled",
-        "interface/buddyconnectnotificationsenabled",
         "interface/doubleclicktoplay",
         "interface/clickPlaysAllSelected",
         "interface/playtostack",
@@ -287,14 +257,21 @@ static void migrateInterfaceSettings(const QString &settingsPath, QSettings &glo
         "interface/annotatetokens",
         "interface/showlassoselectioncount",
         "interface/showpersistentselectioncount",
-        "interface/showsubtypeselectiontally",
+        "interface/tallyType",
         "interface/leftjustified",
         "interface/min_players_multicolumn",
-        "interface/knownmissingfeatures",
     };
     const QStringList interfaceSubKeys = {
-        "hand/horizontal",          "table/invert_vertical", "editor/openDeckInNewTab", "replay/rewindBufferingMs",
-        "appearance/styleUserList", "zoneview/groupby",      "zoneview/sortby",         "zoneview/pileview"};
+        "hand/horizontal",  "table/invert_vertical", "replay/rewindBufferingMs", "replay/fastForwardSpeed",
+        "zoneview/groupby", "zoneview/sortby",       "zoneview/pileview"};
+    const QMap<QString, QString> interfaceKeyMap = {
+        {"personal/showStatusBar", "interface/showStatusBar"},
+        {"menu/showshortcuts", "interface/showShortcuts"},
+        {"menu/showgameselectorfiltertoolbar", "interface/showGameSelectorFilterToolbar"},
+        {"interface/notificationsenabled", "interface/notifications/enabled"},
+        {"interface/specnotificationsenabled", "interface/notifications/spectatorsEnabled"},
+        {"interface/buddyconnectnotificationsenabled", "interface/notifications/buddyConnectEnabled"},
+    };
     bool hasAny = false;
     for (const auto &key : interfaceRootKeys) {
         if (globalIni.contains(key)) {
@@ -303,6 +280,11 @@ static void migrateInterfaceSettings(const QString &settingsPath, QSettings &glo
     }
     for (const auto &key : interfaceSubKeys) {
         if (globalIni.contains(key)) {
+            hasAny = true;
+        }
+    }
+    for (auto it = interfaceKeyMap.constBegin(); it != interfaceKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
             hasAny = true;
         }
     }
@@ -319,6 +301,93 @@ static void migrateInterfaceSettings(const QString &settingsPath, QSettings &glo
     for (const auto &key : interfaceSubKeys) {
         if (globalIni.contains(key)) {
             interfaceIni.setValue(key, globalIni.value(key));
+        }
+    }
+    for (auto it = interfaceKeyMap.constBegin(); it != interfaceKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            interfaceIni.setValue(it.value(), globalIni.value(it.key()));
+        }
+    }
+}
+
+static void migrateDownloadSettings(const QString &settingsPath, QSettings &globalIni)
+{
+    const QMap<QString, QString> downloadKeyMap = {
+        {"personal/picturedownload", "downloads/picturedownload"},
+        {"personal/downloadspoilers", "downloads/downloadspoilers"},
+    };
+    bool hasAny = false;
+    for (auto it = downloadKeyMap.constBegin(); it != downloadKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            hasAny = true;
+            break;
+        }
+    }
+    if (!hasAny) {
+        return;
+    }
+
+    QSettings downloadsIni(settingsPath + "downloads.ini", QSettings::IniFormat);
+    for (auto it = downloadKeyMap.constBegin(); it != downloadKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            downloadsIni.setValue(it.value(), globalIni.value(it.key()));
+        }
+    }
+}
+
+static void migrateAppearanceSettings(const QString &settingsPath, QSettings &globalIni)
+{
+    const QMap<QString, QString> appearanceKeyMap = {
+        {"theme/name", "appearance/themeName"},
+        {"game/maxfontsize", "appearance/maxFontSize"},
+        {"home/background", "appearance/homeTabBackgroundSource"},
+        {"home/background/shuffleTimer", "appearance/homeTabBackgroundShuffleFrequency"},
+        {"home/background/displayCardName", "appearance/homeTabDisplayCardName"},
+        {"appearance/styleUserList", "appearance/styleUserList"},
+    };
+    bool hasAny = false;
+    for (auto it = appearanceKeyMap.constBegin(); it != appearanceKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            hasAny = true;
+            break;
+        }
+    }
+    if (!hasAny) {
+        return;
+    }
+
+    QSettings appearanceIni(settingsPath + "appearance.ini", QSettings::IniFormat);
+    for (auto it = appearanceKeyMap.constBegin(); it != appearanceKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            appearanceIni.setValue(it.value(), globalIni.value(it.key()));
+        }
+    }
+}
+
+static void migrateNetworkSettings(const QString &settingsPath, QSettings &globalIni)
+{
+    const QMap<QString, QString> networkKeyMap = {
+        {"personal/clientid", "network/clientid"},
+        {"personal/clientversion", "network/clientversion"},
+        {"personal/keepalive", "network/keepalive"},
+        {"personal/timeout", "network/timeout"},
+        {"interface/knownmissingfeatures", "network/knownmissingfeatures"},
+    };
+    bool hasAny = false;
+    for (auto it = networkKeyMap.constBegin(); it != networkKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            hasAny = true;
+            break;
+        }
+    }
+    if (!hasAny) {
+        return;
+    }
+
+    QSettings networkIni(settingsPath + "network.ini", QSettings::IniFormat);
+    for (auto it = networkKeyMap.constBegin(); it != networkKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            networkIni.setValue(it.value(), globalIni.value(it.key()));
         }
     }
 }
@@ -340,33 +409,32 @@ static void migratePathsSettings(const QString &settingsPath, QSettings &globalI
 
 static void migrateVisualDeckStorageSettings(const QString &settingsPath, QSettings &globalIni)
 {
-    const QStringList vdsKeys = {"interface/visualdeckstoragecardsize",
-                                 "interface/visualdeckstoragesortingorder",
-                                 "interface/visualdeckstorageshowfolders",
-                                 "interface/visualdeckstorageshowtagfilter",
-                                 "interface/visualdeckstoragedefaulttagslist",
-                                 "interface/visualdeckstoragesearchfoldernames",
-                                 "interface/visualdeckstorageshowcoloridentity",
-                                 "interface/visualdeckstorageshowbannercardcombobox",
-                                 "interface/visualdeckstorageshowtagsondeckpreviews",
-                                 "interface/visualdeckstoragedrawunusedcoloridentities",
-                                 "interface/visualdeckstorageunusedcoloridentitiesopacity",
-                                 "interface/visualdeckstoragetooltiptype",
-                                 "interface/visualdeckstoragepromptforconversion",
-                                 "interface/visualdeckstoragealwaysconvert",
-                                 "interface/visualdeckstorageingame",
-                                 "interface/visualdeckstorageselectionanimation",
-                                 "interface/defaultDeckEditorType",
-                                 "interface/visualdatabasedisplayfiltertomostrecentsetsenabled",
-                                 "interface/visualdatabasedisplayfiltertomostrecentsetsamount",
-                                 "interface/visualdeckeditorsamplehandsize",
-                                 "interface/visualdeckeditorcardsize",
-                                 "interface/visualdatabasedisplaycardsize",
-                                 "interface/edhreccardsize",
-                                 "interface/archidektpreviewsize"};
+    const QMap<QString, QString> vdsKeyMap = {
+        {"interface/visualdeckstoragesortingorder", "interface/visualDeckStorage/sortingOrder"},
+        {"interface/visualdeckstorageshowfolders", "interface/visualDeckStorage/showFolders"},
+        {"interface/visualdeckstorageshowtagfilter", "interface/visualDeckStorage/showTagFilter"},
+        {"interface/visualdeckstoragedefaulttagslist", "interface/visualDeckStorage/defaultTagsList"},
+        {"interface/visualdeckstoragesearchfoldernames", "interface/visualDeckStorage/searchFolderNames"},
+        {"interface/visualdeckstorageshowcoloridentity", "interface/visualDeckStorage/showColorIdentity"},
+        {"interface/visualdeckstorageshowbannercardcombobox", "interface/visualDeckStorage/showBannerCardComboBox"},
+        {"interface/visualdeckstorageshowtagsondeckpreviews", "interface/visualDeckStorage/showTagsOnDeckPreviews"},
+        {"interface/visualdeckstoragedrawunusedcoloridentities",
+         "interface/visualDeckStorage/drawUnusedColorIdentities"},
+        {"interface/visualdeckstorageunusedcoloridentitiesopacity",
+         "interface/visualDeckStorage/unusedColorIdentitiesOpacity"},
+        {"interface/visualdeckstoragetooltiptype", "interface/visualDeckStorage/tooltipType"},
+        {"interface/visualdeckstoragepromptforconversion", "interface/visualDeckStorage/promptForConversion"},
+        {"interface/visualdeckstoragealwaysconvert", "interface/visualDeckStorage/alwaysConvert"},
+        {"interface/visualdeckstorageingame", "interface/visualDeckStorage/inGame"},
+        {"interface/visualdeckstorageselectionanimation", "interface/visualDeckStorage/selectionAnimation"},
+        {"interface/visualdatabasedisplayfiltertomostrecentsetsenabled",
+         "interface/visualDatabaseDisplay/filterToMostRecentSetsEnabled"},
+        {"interface/visualdatabasedisplayfiltertomostrecentsetsamount",
+         "interface/visualDatabaseDisplay/filterToMostRecentSetsAmount"},
+    };
     bool hasAny = false;
-    for (const auto &key : vdsKeys) {
-        if (globalIni.contains(key)) {
+    for (auto it = vdsKeyMap.constBegin(); it != vdsKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
             hasAny = true;
         }
     }
@@ -375,9 +443,36 @@ static void migrateVisualDeckStorageSettings(const QString &settingsPath, QSetti
     }
 
     QSettings vdsIni(settingsPath + "visual_deck_storage.ini", QSettings::IniFormat);
-    for (const auto &key : vdsKeys) {
-        if (globalIni.contains(key)) {
-            vdsIni.setValue(key, globalIni.value(key));
+    for (auto it = vdsKeyMap.constBegin(); it != vdsKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            vdsIni.setValue(it.value(), globalIni.value(it.key()));
+        }
+    }
+}
+
+static void migrateDeckEditorSettings(const QString &settingsPath, QSettings &globalIni)
+{
+    const QMap<QString, QString> deckEditorKeyMap = {
+        {"editor/openDeckInNewTab", "deckeditor/openDeckInNewTab"},
+        {"interface/deckeditorbannercardcomboboxvisible", "deckeditor/bannerCardComboBoxVisible"},
+        {"interface/deckeditortagswidgetvisible", "deckeditor/tagsWidgetVisible"},
+        {"interface/defaultDeckEditorType", "deckeditor/defaultDeckEditorType"},
+    };
+    bool hasAny = false;
+    for (auto it = deckEditorKeyMap.constBegin(); it != deckEditorKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            hasAny = true;
+            break;
+        }
+    }
+    if (!hasAny) {
+        return;
+    }
+
+    QSettings deckEditorIni(settingsPath + "deck_editor.ini", QSettings::IniFormat);
+    for (auto it = deckEditorKeyMap.constBegin(); it != deckEditorKeyMap.constEnd(); ++it) {
+        if (globalIni.contains(it.key())) {
+            deckEditorIni.setValue(it.value(), globalIni.value(it.key()));
         }
     }
 }
@@ -503,10 +598,14 @@ bool SettingsMigration::migrateSettingsFromGlobalIni(const QString &settingsPath
     migrateCacheStorageSettings(settingsPath, globalIni);
     migrateUpdatesSettings(settingsPath, globalIni);
     migratePersonalSettings(settingsPath, globalIni);
+    migrateDownloadSettings(settingsPath, globalIni);
     migrateCardsDisplaySettings(settingsPath, globalIni);
     migrateInterfaceSettings(settingsPath, globalIni);
+    migrateAppearanceSettings(settingsPath, globalIni);
+    migrateNetworkSettings(settingsPath, globalIni);
     migratePathsSettings(settingsPath, globalIni);
     migrateVisualDeckStorageSettings(settingsPath, globalIni);
+    migrateDeckEditorSettings(settingsPath, globalIni);
 
     QFile::remove(settingsPath + "global.ini.old");
     QFile::rename(settingsPath + "global.ini", settingsPath + "global.ini.old");

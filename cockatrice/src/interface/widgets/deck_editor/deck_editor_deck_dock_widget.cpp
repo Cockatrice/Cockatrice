@@ -12,7 +12,7 @@
 #include <QSplitter>
 #include <QTextEdit>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/utility/macros.h>
 #include <libcockatrice/utility/string_limits.h>
 
@@ -111,20 +111,18 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     showBannerCardCheckBox = new QCheckBox();
     showBannerCardCheckBox->setObjectName("showBannerCardCheckBox");
-    showBannerCardCheckBox->setChecked(
-        SettingsCache::instance().cardsDisplay().getDeckEditorBannerCardComboBoxVisible());
-    connect(showBannerCardCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
-            &CardsDisplaySettings::setDeckEditorBannerCardComboBoxVisible);
-    connect(&SettingsCache::instance().cardsDisplay(),
-            &CardsDisplaySettings::deckEditorBannerCardComboBoxVisibleChanged, this,
+    showBannerCardCheckBox->setChecked(SettingsCache::instance().deckEditor().getBannerCardComboBoxVisible());
+    connect(showBannerCardCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().deckEditor(),
+            &DeckEditorSettings::setBannerCardComboBoxVisible);
+    connect(&SettingsCache::instance().deckEditor(), &DeckEditorSettings::bannerCardComboBoxVisibleChanged, this,
             &DeckEditorDeckDockWidget::updateShowBannerCardComboBox);
 
     showTagsWidgetCheckBox = new QCheckBox();
     showTagsWidgetCheckBox->setObjectName("showTagsWidgetCheckBox");
-    showTagsWidgetCheckBox->setChecked(SettingsCache::instance().cardsDisplay().getDeckEditorTagsWidgetVisible());
-    connect(showTagsWidgetCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
-            &CardsDisplaySettings::setDeckEditorTagsWidgetVisible);
-    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::deckEditorTagsWidgetVisibleChanged, this,
+    showTagsWidgetCheckBox->setChecked(SettingsCache::instance().deckEditor().getTagsWidgetVisible());
+    connect(showTagsWidgetCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().deckEditor(),
+            &DeckEditorSettings::setTagsWidgetVisible);
+    connect(&SettingsCache::instance().deckEditor(), &DeckEditorSettings::tagsWidgetVisibleChanged, this,
             &DeckEditorDeckDockWidget::updateShowTagsWidget);
 
     quickSettingsWidget->addSettingsWidget(showBannerCardCheckBox);
@@ -156,7 +154,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardLabel->setText(tr("Banner Card"));
-    bannerCardLabel->setHidden(!SettingsCache::instance().cardsDisplay().getDeckEditorBannerCardComboBoxVisible());
+    bannerCardLabel->setHidden(!SettingsCache::instance().deckEditor().getBannerCardComboBoxVisible());
     bannerCardComboBox = new QComboBox(this);
     connect(getModel(), &DeckListModel::cardNodesChanged, this, [this]() {
         // Delay the update to avoid race conditions
@@ -167,10 +165,10 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckEditorDeckDockWidget::writeBannerCard);
-    bannerCardComboBox->setHidden(!SettingsCache::instance().cardsDisplay().getDeckEditorBannerCardComboBoxVisible());
+    bannerCardComboBox->setHidden(!SettingsCache::instance().deckEditor().getBannerCardComboBoxVisible());
 
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, {});
-    deckTagsDisplayWidget->setHidden(!SettingsCache::instance().cardsDisplay().getDeckEditorTagsWidgetVisible());
+    deckTagsDisplayWidget->setHidden(!SettingsCache::instance().deckEditor().getTagsWidgetVisible());
     connect(deckTagsDisplayWidget, &DeckPreviewDeckTagsDisplayWidget::tagsChanged, deckStateManager,
             &DeckStateManager::setTags);
 

@@ -32,15 +32,15 @@ public:
     [[nodiscard]] bool getHorizontalHand() const override;
     [[nodiscard]] bool getInvertVerticalCoordinate() const override;
     [[nodiscard]] int getMinPlayersForMultiColumnLayout() const override;
-    [[nodiscard]] bool getOpenDeckInNewTab() const override;
     [[nodiscard]] int getRewindBufferingMs() const override;
     [[nodiscard]] qreal getFastForwardSpeed() const override;
-    [[nodiscard]] bool getStyleUserList() const override;
     [[nodiscard]] bool getLeftJustified() const override;
     [[nodiscard]] int getZoneViewGroupByIndex() const override;
     [[nodiscard]] int getZoneViewSortByIndex() const override;
     [[nodiscard]] bool getZoneViewPileView() const override;
-    [[nodiscard]] QString getKnownMissingFeatures() override;
+    [[nodiscard]] bool getShowStatusBar() const override;
+    [[nodiscard]] bool getShowShortcuts() const override;
+    [[nodiscard]] bool getShowGameSelectorFilterToolbar() const override;
 
     void setUseTearOffMenus(bool _useTearOffMenus);
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
@@ -63,15 +63,15 @@ public:
     void setHorizontalHand(bool _horizontalHand);
     void setInvertVerticalCoordinate(bool _invertVerticalCoordinate);
     void setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout);
-    void setOpenDeckInNewTab(bool _openDeckInNewTab);
     void setRewindBufferingMs(int _rewindBufferingMs);
     void setFastForwardSpeed(qreal _value);
-    void setStyleUserList(bool _styleUserList);
     void setLeftJustified(bool _leftJustified);
     void setZoneViewGroupByIndex(int _zoneViewGroupByIndex);
     void setZoneViewSortByIndex(int _zoneViewSortByIndex);
     void setZoneViewPileView(bool _zoneViewPileView);
-    void setKnownMissingFeatures(const QString &_knownMissingFeatures);
+    void setShowStatusBar(bool _showStatusBar);
+    void setShowShortcuts(bool _showShortcuts);
+    void setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar);
 
 signals:
     void useTearOffMenusChanged(bool state);
@@ -79,12 +79,15 @@ signals:
     void horizontalHandChanged();
     void invertVerticalCoordinateChanged();
     void minPlayersForMultiColumnLayoutChanged();
-    void styleUserListChanged();
     void handJustificationChanged();
     void tallyTypeChanged(int type);
+    void showStatusBarChanged(bool state);
+    void showGameSelectorFilterToolbarChanged(bool state);
+
+public:
+    explicit InterfaceSettings(const QString &settingPath, QObject *parent = nullptr);
 
 private:
-    explicit InterfaceSettings(const QString &settingPath, QObject *parent = nullptr);
     InterfaceSettings(const InterfaceSettings & /*other*/);
 };
 

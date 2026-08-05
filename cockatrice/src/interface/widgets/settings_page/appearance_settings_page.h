@@ -19,7 +19,6 @@ private slots:
     void openThemeLocation();
     void editPalette();
     void updateHomeTabSettingsVisibility();
-    void showShortcutsChanged(QT_STATE_CHANGED_T enabled);
     void overrideAllCardArtWithPersonalPreferenceToggled(QT_STATE_CHANGED_T enabled);
 
     void cardViewInitialRowsMaxChanged(int value);
@@ -42,8 +41,6 @@ private:
     QCheckBox styleUserListCheckBox;
     QLabel minPlayersForMultiColumnLayoutLabel;
     QLabel maxFontSizeForCardsLabel;
-    QCheckBox showShortcutsCheckBox;
-    QCheckBox showGameSelectorFilterToolbarCheckBox;
     QCheckBox overrideAllCardArtWithPersonalPreferenceCheckBox;
     QCheckBox bumpSetsWithCardsInDeckToTopCheckBox;
     QCheckBox displayCardNamesCheckBox;
@@ -62,7 +59,6 @@ private:
     QGroupBox *themeGroupBox;
     QGroupBox *homeTabGroupBox;
     QGroupBox *stylingGroupBox;
-    QGroupBox *menuGroupBox;
     QGroupBox *printingsGroupBox;
     QGroupBox *cardsGroupBox;
     QGroupBox *cardLayoutGroupBox;

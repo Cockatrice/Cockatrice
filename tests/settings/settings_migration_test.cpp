@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include <QCoreApplication>
+#include <QDate>
 #include <QDir>
 #include <QFile>
 #include <QSettings>
@@ -95,6 +96,8 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
         g.setValue("maxplayers", 4);
         g.setValue("gamedescription", "test game");
         g.setValue("remembergamesettings", false);
+        g.setValue("gametypes", "commander");
+        g.setValue("onlybuddies", true);
         g.endGroup();
 
         // localgameoptions
@@ -108,23 +111,56 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
         g.setValue("mention", false);
         g.setValue("mentioncolor", "FF0000");
         g.setValue("showmessagepopups", false);
+        g.setValue("mentioncompleter", false);
+        g.setValue("roomhistory", false);
+        g.setValue("highlightcolor", "00FF00");
         g.endGroup();
+
+        // legacy highlight words (under [personal])
+        g.setValue("personal/highlightWords", "alpha beta");
 
         // cache storage (under [personal] group)
         g.setValue("personal/pixmapCacheSize", 1024);
         g.setValue("personal/networkCacheSize", 2048);
+        g.setValue("personal/redirectCacheTtl", 5);
+        g.setValue("personal/cardPictureLoaderCacheMethod", 1);
+        g.setValue("personal/localCardImageStorageNamingScheme", 2);
 
         // updates (under [personal] group)
         g.setValue("personal/startupUpdateCheck", false);
+        g.setValue("personal/startupCardUpdateCheckPromptForUpdate", false);
+        g.setValue("personal/startupCardUpdateCheckAlwaysUpdate", true);
         g.setValue("personal/cardUpdateCheckInterval", 14);
+        g.setValue("personal/lastCardUpdateCheck", QDate(2024, 1, 1));
+        g.setValue("personal/alwaysEnableNewSets", true);
+        g.setValue("personal/updatenotification", false);
+        g.setValue("personal/newversionnotification", false);
 
         // personal
         g.setValue("personal/lang", "de");
-        g.setValue("personal/keepalive", 10);
-        g.setValue("personal/timeout", 30);
-        g.setValue("personal/clientid", "test-client-id");
+
+        // downloads (previously under [personal])
         g.setValue("personal/picturedownload", true);
+        g.setValue("personal/downloadspoilers", true);
+
+        // interface (previously under [personal])
         g.setValue("personal/showStatusBar", true);
+
+        // theme
+        g.setValue("theme/name", "custom_theme");
+        g.setValue("game/maxfontsize", 14);
+
+        // appearance
+        g.setValue("appearance/styleUserList", false);
+        g.setValue("home/background/displayCardName", false);
+        g.setValue("menu/showshortcuts", false);
+        g.setValue("menu/showgameselectorfiltertoolbar", false);
+
+        // deck editor
+        g.setValue("editor/openDeckInNewTab", false);
+        g.setValue("interface/deckeditortagswidgetvisible", false);
+        g.setValue("interface/defaultDeckEditorType", 0);
+        g.setValue("interface/visualdeckeditorsamplehandsize", 5);
 
         // personal home
         g.setValue("home/background", "custom_bg");
@@ -132,20 +168,60 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
 
         // personal tipOfDay
         g.setValue("tipOfDay/showTips", false);
+        g.setValue("tipOfDay/seenTips", QStringList{"1", "2", "3"});
+
+        // network
+        g.setValue("personal/keepalive", 10);
+        g.setValue("personal/timeout", 30);
+        g.setValue("personal/clientid", "test-client-id");
+        g.setValue("personal/clientversion", "test-client-version");
+        g.setValue("interface/knownmissingfeatures", "feature1,feature2");
 
         // cards
         g.setValue("cards/displaycardnames", false);
+        g.setValue("cards/roundcardcorners", false);
+        g.setValue("cards/overrideallcardartwithpersonalpreference", true);
+        g.setValue("cards/bumpsetswithcardsindecktotop", false);
+        g.setValue("cards/includerebalancedcards", false);
+        g.setValue("cards/autorotatesidewayslayoutcards", false);
         g.setValue("cards/tapanimation", true);
         g.setValue("cards/scaleCards", false);
+        g.setValue("cards/verticalCardOverlapPercent", 42);
+        g.setValue("cards/cardinfoviewmode", 1);
+        g.setValue("cards/printingselectorcardsize", 90);
+        g.setValue("cards/printingselectorsortorder", 3);
+        g.setValue("cards/printingselectornavigationbuttonsvisible", false);
 
         // interface
         g.setValue("interface/usetearoffmenus", true);
+        g.setValue("interface/cardViewInitialRowsMax", 8);
+        g.setValue("interface/cardViewExpandedRowsMax", 12);
+        g.setValue("interface/closeEmptyCardView", false);
+        g.setValue("interface/focusCardViewSearchBar", false);
+        g.setValue("interface/keepGameChatFocus", true);
         g.setValue("interface/notificationsenabled", false);
+        g.setValue("interface/specnotificationsenabled", true);
+        g.setValue("interface/buddyconnectnotificationsenabled", false);
+        g.setValue("interface/doubleclicktoplay", false);
+        g.setValue("interface/clickPlaysAllSelected", false);
+        g.setValue("interface/playtostack", false);
+        g.setValue("interface/doNotDeleteArrowsInSubPhases", false);
         g.setValue("interface/startinghandsize", 5);
-
-        // hand/table
+        g.setValue("interface/annotatetokens", true);
+        g.setValue("interface/showlassoselectioncount", false);
+        g.setValue("interface/showpersistentselectioncount", false);
+        g.setValue("interface/tallyType", 2);
+        g.setValue("interface/leftjustified", true);
+        g.setValue("interface/min_players_multicolumn", 6);
+        g.setValue("interface/deckeditorbannercardcomboboxvisible", false);
+        // hand/table/replay/zoneview
         g.setValue("hand/horizontal", true);
         g.setValue("table/invert_vertical", true);
+        g.setValue("replay/rewindBufferingMs", 6000);
+        g.setValue("replay/fastForwardSpeed", 5);
+        g.setValue("zoneview/groupby", 2);
+        g.setValue("zoneview/sortby", 1);
+        g.setValue("zoneview/pileview", false);
 
         // paths
         g.beginGroup("paths");
@@ -155,8 +231,29 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
 
         // visual deck storage (under [interface] group)
         g.setValue("interface/visualdeckstoragecardsize", 150);
+        g.setValue("interface/visualdeckstoragesortingorder", 2);
         g.setValue("interface/visualdeckstorageshowfolders", false);
         g.setValue("interface/visualdeckstorageshowtagfilter", false);
+        g.setValue("interface/visualdeckstoragedefaulttagslist", QStringList{"Alpha", "Beta"});
+        g.setValue("interface/visualdeckstoragesearchfoldernames", false);
+        g.setValue("interface/visualdeckstorageshowcoloridentity", false);
+        g.setValue("interface/visualdeckstorageshowbannercardcombobox", false);
+        g.setValue("interface/visualdeckstorageshowtagsondeckpreviews", false);
+        g.setValue("interface/visualdeckstoragedrawunusedcoloridentities", false);
+        g.setValue("interface/visualdeckstorageunusedcoloridentitiesopacity", 35);
+        g.setValue("interface/visualdeckstoragetooltiptype", 1);
+        g.setValue("interface/visualdeckstoragepromptforconversion", false);
+        g.setValue("interface/visualdeckstoragealwaysconvert", true);
+        g.setValue("interface/visualdeckstorageingame", false);
+        g.setValue("interface/visualdeckstorageselectionanimation", false);
+        g.setValue("interface/visualdatabasedisplayfiltertomostrecentsetsenabled", true);
+        g.setValue("interface/visualdatabasedisplayfiltertomostrecentsetsamount", 25);
+
+        // card sizes (migrate into cards_display.ini)
+        g.setValue("interface/visualdatabasedisplaycardsize", 80);
+        g.setValue("interface/visualdeckeditorcardsize", 70);
+        g.setValue("interface/edhreccardsize", 60);
+        g.setValue("interface/archidektpreviewsize", 50);
 
         g.sync();
     }
@@ -182,6 +279,8 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_EQ(readFromIni("game.ini", "game/maxplayers"), QVariant(4));
     ASSERT_EQ(readFromIni("game.ini", "game/gamedescription"), QVariant("test game"));
     ASSERT_EQ(readFromIni("game.ini", "game/remembergamesettings"), QVariant(false));
+    ASSERT_EQ(readFromIni("game.ini", "game/gametypes"), QVariant("commander"));
+    ASSERT_EQ(readFromIni("game.ini", "game/onlybuddies"), QVariant(true));
     ASSERT_EQ(readFromIni("game.ini", "localgameoptions/maxplayers"), QVariant(2));
     ASSERT_EQ(readFromIni("game.ini", "localgameoptions/startinglifetotal"), QVariant(40));
 
@@ -189,41 +288,151 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_EQ(readFromIni("chat.ini", "chat/mention"), QVariant(false));
     ASSERT_EQ(readFromIni("chat.ini", "chat/mentioncolor"), QVariant("FF0000"));
     ASSERT_EQ(readFromIni("chat.ini", "chat/showmessagepopups"), QVariant(false));
+    ASSERT_EQ(readFromIni("chat.ini", "chat/mentioncompleter"), QVariant(false));
+    ASSERT_EQ(readFromIni("chat.ini", "chat/roomhistory"), QVariant(false));
+    ASSERT_EQ(readFromIni("chat.ini", "chat/highlightcolor"), QVariant("00FF00"));
+    ASSERT_EQ(readFromIni("chat.ini", "chat/highlightwords"), QVariant("alpha beta"));
 
     ASSERT_TRUE(fileExists("cache_storage.ini"));
-    ASSERT_EQ(readFromIni("cache_storage.ini", "personal/pixmapCacheSize"), QVariant(1024));
-    ASSERT_EQ(readFromIni("cache_storage.ini", "personal/networkCacheSize"), QVariant(2048));
+    ASSERT_EQ(readFromIni("cache_storage.ini", "cache_storage/pixmapCacheSize"), QVariant(1024));
+    ASSERT_EQ(readFromIni("cache_storage.ini", "cache_storage/networkCacheSize"), QVariant(2048));
+    ASSERT_EQ(readFromIni("cache_storage.ini", "cache_storage/redirectCacheTtl"), QVariant(5));
+    ASSERT_EQ(readFromIni("cache_storage.ini", "cache_storage/cardPictureLoaderCacheMethod"), QVariant(1));
+    ASSERT_EQ(readFromIni("cache_storage.ini", "cache_storage/localCardImageStorageNamingScheme"), QVariant(2));
 
     ASSERT_TRUE(fileExists("updates.ini"));
     ASSERT_EQ(readFromIni("updates.ini", "updates/startupUpdateCheck"), QVariant(false));
+    ASSERT_EQ(readFromIni("updates.ini", "updates/startupCardUpdateCheckPromptForUpdate"), QVariant(false));
+    ASSERT_EQ(readFromIni("updates.ini", "updates/startupCardUpdateCheckAlwaysUpdate"), QVariant(true));
     ASSERT_EQ(readFromIni("updates.ini", "updates/cardUpdateCheckInterval"), QVariant(14));
+    ASSERT_EQ(readFromIni("updates.ini", "updates/lastCardUpdateCheck"), QVariant(QDate(2024, 1, 1)));
+    ASSERT_EQ(readFromIni("updates.ini", "updates/alwaysEnableNewSets"), QVariant(true));
+    ASSERT_EQ(readFromIni("updates.ini", "updates/updatenotification"), QVariant(false));
+    ASSERT_EQ(readFromIni("updates.ini", "updates/newversionnotification"), QVariant(false));
 
     ASSERT_TRUE(fileExists("personal.ini"));
     ASSERT_EQ(readFromIni("personal.ini", "personal/lang"), QVariant("de"));
-    ASSERT_EQ(readFromIni("personal.ini", "personal/keepalive"), QVariant(10));
-    ASSERT_EQ(readFromIni("personal.ini", "personal/clientid"), QVariant("test-client-id"));
-    ASSERT_EQ(readFromIni("personal.ini", "personal/showStatusBar"), QVariant(true));
-    ASSERT_EQ(readFromIni("personal.ini", "home/background"), QVariant("custom_bg"));
     ASSERT_EQ(readFromIni("personal.ini", "tipOfDay/showTips"), QVariant(false));
+    ASSERT_EQ(readFromIni("personal.ini", "tipOfDay/seenTips"), QVariant(QStringList{"1", "2", "3"}));
+
+    ASSERT_TRUE(fileExists("downloads.ini"));
+    ASSERT_EQ(readFromIni("downloads.ini", "downloads/picturedownload"), QVariant(true));
+    ASSERT_EQ(readFromIni("downloads.ini", "downloads/downloadspoilers"), QVariant(true));
+
+    ASSERT_TRUE(fileExists("appearance.ini"));
+    ASSERT_EQ(readFromIni("appearance.ini", "appearance/themeName"), QVariant("custom_theme"));
+    ASSERT_EQ(readFromIni("appearance.ini", "appearance/maxFontSize"), QVariant(14));
+    ASSERT_EQ(readFromIni("appearance.ini", "appearance/styleUserList"), QVariant(false));
+    ASSERT_EQ(readFromIni("appearance.ini", "appearance/homeTabBackgroundSource"), QVariant("custom_bg"));
+    ASSERT_EQ(readFromIni("appearance.ini", "appearance/homeTabBackgroundShuffleFrequency"), QVariant(30));
+    ASSERT_EQ(readFromIni("appearance.ini", "appearance/homeTabDisplayCardName"), QVariant(false));
+
+    ASSERT_TRUE(fileExists("network.ini"));
+    ASSERT_EQ(readFromIni("network.ini", "network/keepalive"), QVariant(10));
+    ASSERT_EQ(readFromIni("network.ini", "network/timeout"), QVariant(30));
+    ASSERT_EQ(readFromIni("network.ini", "network/clientid"), QVariant("test-client-id"));
+    ASSERT_EQ(readFromIni("network.ini", "network/clientversion"), QVariant("test-client-version"));
+    ASSERT_EQ(readFromIni("network.ini", "network/knownmissingfeatures"), QVariant("feature1,feature2"));
 
     ASSERT_TRUE(fileExists("cards_display.ini"));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/displaycardnames"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/roundcardcorners"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/overrideallcardartwithpersonalpreference"), QVariant(true));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/bumpsetswithcardsindecktotop"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/includerebalancedcards"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/autorotatesidewayslayoutcards"), QVariant(false));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/tapanimation"), QVariant(true));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/scaleCards"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/verticalCardOverlapPercent"), QVariant(42));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardinfoviewmode"), QVariant(1));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/printingSelector"), QVariant(90));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/printingSelector/sortOrder"), QVariant(3));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/printingSelector/navigationButtonsVisible"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/visualDeckStorage"), QVariant(150));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/visualDatabaseDisplay"), QVariant(80));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/visualDeckEditor"), QVariant(70));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/edhrec"), QVariant(60));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/archidektPreview"), QVariant(50));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/sampleHandSize"), QVariant(5));
 
     ASSERT_TRUE(fileExists("interface.ini"));
     ASSERT_EQ(readFromIni("interface.ini", "interface/usetearoffmenus"), QVariant(true));
-    ASSERT_EQ(readFromIni("interface.ini", "interface/notificationsenabled"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/cardViewInitialRowsMax"), QVariant(8));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/cardViewExpandedRowsMax"), QVariant(12));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/closeEmptyCardView"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/focusCardViewSearchBar"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/keepGameChatFocus"), QVariant(true));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/notifications/enabled"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/notifications/spectatorsEnabled"), QVariant(true));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/notifications/buddyConnectEnabled"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/doubleclicktoplay"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/clickPlaysAllSelected"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/playtostack"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/doNotDeleteArrowsInSubPhases"), QVariant(false));
     ASSERT_EQ(readFromIni("interface.ini", "interface/startinghandsize"), QVariant(5));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/annotatetokens"), QVariant(true));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/showlassoselectioncount"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/showpersistentselectioncount"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/tallyType"), QVariant(2));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/leftjustified"), QVariant(true));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/min_players_multicolumn"), QVariant(6));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/showStatusBar"), QVariant(true));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/showShortcuts"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/showGameSelectorFilterToolbar"), QVariant(false));
     ASSERT_EQ(readFromIni("interface.ini", "hand/horizontal"), QVariant(true));
     ASSERT_EQ(readFromIni("interface.ini", "table/invert_vertical"), QVariant(true));
+    ASSERT_EQ(readFromIni("interface.ini", "replay/rewindBufferingMs"), QVariant(6000));
+    ASSERT_EQ(readFromIni("interface.ini", "replay/fastForwardSpeed"), QVariant(5));
+    ASSERT_EQ(readFromIni("interface.ini", "zoneview/groupby"), QVariant(2));
+    ASSERT_EQ(readFromIni("interface.ini", "zoneview/sortby"), QVariant(1));
+    ASSERT_EQ(readFromIni("interface.ini", "zoneview/pileview"), QVariant(false));
+
+    ASSERT_TRUE(fileExists("deck_editor.ini"));
+    ASSERT_EQ(readFromIni("deck_editor.ini", "deckeditor/openDeckInNewTab"), QVariant(false));
+    ASSERT_EQ(readFromIni("deck_editor.ini", "deckeditor/bannerCardComboBoxVisible"), QVariant(false));
+    ASSERT_EQ(readFromIni("deck_editor.ini", "deckeditor/tagsWidgetVisible"), QVariant(false));
+    ASSERT_EQ(readFromIni("deck_editor.ini", "deckeditor/defaultDeckEditorType"), QVariant(0));
 
     ASSERT_TRUE(fileExists("paths.ini"));
     ASSERT_EQ(readFromIni("paths.ini", "paths/decks"), QVariant("/custom/decks"));
     ASSERT_EQ(readFromIni("paths.ini", "paths/pics"), QVariant("/custom/pics"));
 
     ASSERT_TRUE(fileExists("visual_deck_storage.ini"));
-    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualdeckstoragecardsize"), QVariant(150));
-    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualdeckstorageshowfolders"), QVariant(false));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/sortingOrder"), QVariant(2));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/showFolders"), QVariant(false));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/showTagFilter"), QVariant(false));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/defaultTagsList"),
+              QVariant(QStringList{"Alpha", "Beta"}));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/searchFolderNames"), QVariant(false));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/showColorIdentity"), QVariant(false));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/showBannerCardComboBox"),
+              QVariant(false));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/showTagsOnDeckPreviews"),
+              QVariant(false));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/drawUnusedColorIdentities"),
+              QVariant(false));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/unusedColorIdentitiesOpacity"),
+              QVariant(35));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/tooltipType"), QVariant(1));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/promptForConversion"),
+              QVariant(false));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/alwaysConvert"), QVariant(true));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/inGame"), QVariant(false));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDeckStorage/selectionAnimation"),
+              QVariant(false));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDatabaseDisplay/filterToMostRecentSetsEnabled"),
+              QVariant(true));
+    ASSERT_EQ(readFromIni("visual_deck_storage.ini", "interface/visualDatabaseDisplay/filterToMostRecentSetsAmount"),
+              QVariant(25));
+
+    // No legacy flat keys should remain in the per-file INIs
+    ASSERT_FALSE(readFromIni("visual_deck_storage.ini", "interface/visualdeckstorageshowfolders").isValid());
+    ASSERT_FALSE(readFromIni("visual_deck_storage.ini", "interface/visualdeckstoragecardsize").isValid());
+    ASSERT_FALSE(readFromIni("deck_editor.ini", "deckeditor/sampleHandSize").isValid());
+    ASSERT_FALSE(readFromIni("deck_editor.ini", "deckeditor/cardSize").isValid());
+    ASSERT_FALSE(readFromIni("interface.ini", "interface/notificationsenabled").isValid());
+    ASSERT_FALSE(readFromIni("cards_display.ini", "cards/printingselectorsortorder").isValid());
+    ASSERT_FALSE(readFromIni("cards_display.ini", "cards/visualDeckStorage/cardSize").isValid());
 
     // Verify sentinel was written
     ASSERT_EQ(readFromIni("global.ini", "migration/perfile_complete"), QVariant(true));
@@ -319,10 +528,11 @@ TEST_F(SettingsMigrationTest, CardsKeysKeepGroupPrefix)
 
     ASSERT_TRUE(fileExists("global.ini.old"));
     ASSERT_TRUE(fileExists("cards_display.ini"));
+    ASSERT_TRUE(fileExists("deck_editor.ini"));
     // "cards/displaycardnames" should be stored with its group prefix
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/displaycardnames"), QVariant(false));
-    // "interface/..." keys should keep their full path
-    ASSERT_EQ(readFromIni("cards_display.ini", "interface/deckeditorbannercardcomboboxvisible"), QVariant(true));
+    // deck editor keys belong to the deck editor settings now
+    ASSERT_EQ(readFromIni("deck_editor.ini", "deckeditor/bannerCardComboBoxVisible"), QVariant(true));
 }
 
 TEST_F(SettingsMigrationTest, LegacyMigrationIsIdempotent)

@@ -41,8 +41,11 @@
 #include <QTranslator>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
+#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/card_database_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 
 QTranslator *translator, *qtTranslator;
@@ -281,7 +284,7 @@ int main(int argc, char *argv[])
     // set name of the app desktop file; used by wayland to load the window icon
     QGuiApplication::setDesktopFileName("cockatrice");
 
-    SettingsCache::instance().personal().setClientID(generateClientID());
+    SettingsCache::instance().network().setClientID(generateClientID());
 
     // If spoiler mode is enabled, we will download the spoilers
     // then reload the DB. otherwise just reload the DB
@@ -292,7 +295,7 @@ int main(int argc, char *argv[])
 
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus,
-                       !SettingsCache::instance().cardsDisplay().getShowShortcuts());
+                       !SettingsCache::instance().interface().getShowShortcuts());
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);

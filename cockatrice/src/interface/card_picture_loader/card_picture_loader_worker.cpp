@@ -11,15 +11,15 @@
 #include <QNetworkReply>
 #include <QThread>
 #include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
-#include <libcockatrice/settings/personal_settings.h>
 #include <utility>
 #include <version_string.h>
 
 static constexpr int MAX_REQUESTS_PER_SEC = 10;
 
 CardPictureLoaderWorker::CardPictureLoaderWorker()
-    : QObject(nullptr), picDownload(SettingsCache::instance().personal().getPicDownload()),
+    : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload()),
       requestQuota(MAX_REQUESTS_PER_SEC)
 {
     networkManager = new QNetworkAccessManager(this);

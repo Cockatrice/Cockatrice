@@ -70,7 +70,9 @@
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
 #include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/servers_settings.h>
@@ -391,9 +393,9 @@ void MainWindow::createActions()
     connect(aCheckCardUpdatesBackground, &QAction::triggered, this, &MainWindow::actCheckCardUpdatesBackground);
     aStatusBar = new QAction(this);
     aStatusBar->setCheckable(true);
-    aStatusBar->setChecked(SettingsCache::instance().personal().getShowStatusBar());
-    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance().personal(),
-            &PersonalSettings::setShowStatusBar);
+    aStatusBar->setChecked(SettingsCache::instance().interface().getShowStatusBar());
+    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance().interface(),
+            &InterfaceSettings::setShowStatusBar);
     aViewLog = new QAction(this);
     connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
     aOpenSettingsFolder = new QAction(this);
@@ -518,9 +520,9 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // status bar
-    connect(&SettingsCache::instance().personal(), &PersonalSettings::showStatusBarChanged, this,
+    connect(&SettingsCache::instance().interface(), &InterfaceSettings::showStatusBarChanged, this,
             [this](bool show) { statusBar()->setVisible(show); });
-    statusBar()->setVisible(SettingsCache::instance().personal().getShowStatusBar());
+    statusBar()->setVisible(SettingsCache::instance().interface().getShowStatusBar());
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &MainWindow::refreshShortcuts);
@@ -557,23 +559,23 @@ void MainWindow::startupConfigCheck()
         actCheckClientUpdates();
     }
 
-    if (SettingsCache::instance().personal().getClientVersion() == CLIENT_INFO_NOT_SET) {
+    if (SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET) {
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
             << "Startup: old client version empty, assuming first start after clean install";
         alertForcedOracleRun(VERSION_STRING, false);
         SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
-        SettingsCache::instance().personal().setClientVersion(VERSION_STRING);
+        SettingsCache::instance().network().setClientVersion(VERSION_STRING);
 
         if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
             SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
         } else if (QString(VERSION_STRING).contains("beta", Qt::CaseInsensitive)) {
             SettingsCache::instance().updates().setUpdateReleaseChannelIndex(1);
         }
-    } else if (SettingsCache::instance().personal().getClientVersion() != VERSION_STRING) {
+    } else if (SettingsCache::instance().network().getClientVersion() != VERSION_STRING) {
         // config found, from another (presumably older) version
         qCInfo(WindowMainStartupVersionLog)
-            << "Startup: old client version" << SettingsCache::instance().personal().getClientVersion()
+            << "Startup: old client version" << SettingsCache::instance().network().getClientVersion()
             << "differs, assuming first start after update";
         if (SettingsCache::instance().updates().getNotifyAboutNewVersion()) {
             alertForcedOracleRun(VERSION_STRING, true);
@@ -598,7 +600,7 @@ void MainWindow::startupConfigCheck()
             }
         }
 
-        SettingsCache::instance().personal().setClientVersion(VERSION_STRING);
+        SettingsCache::instance().network().setClientVersion(VERSION_STRING);
     } else {
         // previous config from this version found
         qCInfo(WindowMainStartupVersionLog) << "Startup: found config with current version";
