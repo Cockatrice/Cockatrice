@@ -222,15 +222,15 @@ void SettingsCache::loadPaths()
     // customPicsPath derived from picsPath
     QString picsPath = pathsIni.value("paths/pics").toString();
     if (picsPath.endsWith("/")) {
-        computePath("custompics", picsPath + "CUSTOM/");
+        computePath("customPics", picsPath + "CUSTOM/");
     } else {
-        computePath("custompics", picsPath + "/CUSTOM/");
+        computePath("customPics", picsPath + "/CUSTOM/");
     }
 
-    computePath("customsets", dataPath + "/customsets/");
-    computeFilePath("carddatabase", dataPath + "/cards.xml");
-    computeFilePath("tokendatabase", dataPath + "/tokens.xml");
-    computeFilePath("spoilerdatabase", dataPath + "/spoiler.xml");
+    computePath("customSets", dataPath + "/customsets/");
+    computeFilePath("cardDatabase", dataPath + "/cards.xml");
+    computeFilePath("tokenDatabase", dataPath + "/tokens.xml");
+    computeFilePath("spoilerDatabase", dataPath + "/spoiler.xml");
 }
 
 void SettingsCache::resetPaths()

@@ -7,7 +7,7 @@ InterfaceSettings::InterfaceSettings(const QString &settingPath, QObject *parent
 
 bool InterfaceSettings::getUseTearOffMenus() const
 {
-    return getValue("usetearoffmenus", QString(), QString(), true).toBool();
+    return getValue("useTearOffMenus", QString(), QString(), true).toBool();
 }
 
 int InterfaceSettings::getCardViewInitialRowsMax() const
@@ -52,7 +52,7 @@ bool InterfaceSettings::getBuddyConnectNotificationsEnabled() const
 
 bool InterfaceSettings::getDoubleClickToPlay() const
 {
-    return getValue("doubleclicktoplay", QString(), QString(), true).toBool();
+    return getValue("doubleClickToPlay", QString(), QString(), true).toBool();
 }
 
 bool InterfaceSettings::getClickPlaysAllSelected() const
@@ -62,7 +62,7 @@ bool InterfaceSettings::getClickPlaysAllSelected() const
 
 bool InterfaceSettings::getPlayToStack() const
 {
-    return getValue("playtostack", QString(), QString(), true).toBool();
+    return getValue("playToStack", QString(), QString(), true).toBool();
 }
 
 bool InterfaceSettings::getDoNotDeleteArrowsInSubPhases() const
@@ -72,22 +72,22 @@ bool InterfaceSettings::getDoNotDeleteArrowsInSubPhases() const
 
 int InterfaceSettings::getStartingHandSize() const
 {
-    return getValue("startinghandsize", QString(), QString(), 7).toInt();
+    return getValue("startingHandSize", QString(), QString(), 7).toInt();
 }
 
 bool InterfaceSettings::getAnnotateTokens() const
 {
-    return getValue("annotatetokens", QString(), QString(), false).toBool();
+    return getValue("annotateTokens", QString(), QString(), false).toBool();
 }
 
 bool InterfaceSettings::getShowDragSelectionCount() const
 {
-    return getValue("showlassoselectioncount", QString(), QString(), true).toBool();
+    return getValue("showLassoSelectionCount", QString(), QString(), true).toBool();
 }
 
 bool InterfaceSettings::getShowTotalSelectionCount() const
 {
-    return getValue("showpersistentselectioncount", QString(), QString(), true).toBool();
+    return getValue("showPersistentSelectionCount", QString(), QString(), true).toBool();
 }
 
 int InterfaceSettings::getTallyType() const
@@ -102,12 +102,12 @@ bool InterfaceSettings::getHorizontalHand() const
 
 bool InterfaceSettings::getInvertVerticalCoordinate() const
 {
-    return getValue("invert_vertical", "table", QString(), false).toBool();
+    return getValue("invertVertical", "table", QString(), false).toBool();
 }
 
 int InterfaceSettings::getMinPlayersForMultiColumnLayout() const
 {
-    return getValue("min_players_multicolumn", QString(), QString(), 4).toInt();
+    return getValue("minPlayersMulticolumn", QString(), QString(), 4).toInt();
 }
 
 int InterfaceSettings::getRewindBufferingMs() const
@@ -122,22 +122,22 @@ qreal InterfaceSettings::getFastForwardSpeed() const
 
 bool InterfaceSettings::getLeftJustified() const
 {
-    return getValue("leftjustified", QString(), QString(), false).toBool();
+    return getValue("leftJustified", QString(), QString(), false).toBool();
 }
 
 int InterfaceSettings::getZoneViewGroupByIndex() const
 {
-    return getValue("groupby", "zoneview", QString(), 1).toInt();
+    return getValue("groupBy", "zoneview", QString(), 1).toInt();
 }
 
 int InterfaceSettings::getZoneViewSortByIndex() const
 {
-    return getValue("sortby", "zoneview", QString(), 1).toInt();
+    return getValue("sortBy", "zoneview", QString(), 1).toInt();
 }
 
 bool InterfaceSettings::getZoneViewPileView() const
 {
-    return getValue("pileview", "zoneview", QString(), true).toBool();
+    return getValue("pileView", "zoneview", QString(), true).toBool();
 }
 
 bool InterfaceSettings::getShowStatusBar() const
@@ -157,7 +157,7 @@ bool InterfaceSettings::getShowGameSelectorFilterToolbar() const
 
 void InterfaceSettings::setUseTearOffMenus(bool _useTearOffMenus)
 {
-    setValue(_useTearOffMenus, "usetearoffmenus");
+    setValue(_useTearOffMenus, "useTearOffMenus");
     emit useTearOffMenusChanged(_useTearOffMenus);
 }
 
@@ -204,7 +204,7 @@ void InterfaceSettings::setBuddyConnectNotificationsEnabled(bool _buddyConnectNo
 
 void InterfaceSettings::setDoubleClickToPlay(bool _doubleClickToPlay)
 {
-    setValue(_doubleClickToPlay, "doubleclicktoplay");
+    setValue(_doubleClickToPlay, "doubleClickToPlay");
 }
 
 void InterfaceSettings::setClickPlaysAllSelected(bool _clickPlaysAllSelected)
@@ -214,7 +214,7 @@ void InterfaceSettings::setClickPlaysAllSelected(bool _clickPlaysAllSelected)
 
 void InterfaceSettings::setPlayToStack(bool _playToStack)
 {
-    setValue(_playToStack, "playtostack");
+    setValue(_playToStack, "playToStack");
 }
 
 void InterfaceSettings::setDoNotDeleteArrowsInSubPhases(bool _doNotDeleteArrowsInSubPhases)
@@ -224,22 +224,22 @@ void InterfaceSettings::setDoNotDeleteArrowsInSubPhases(bool _doNotDeleteArrowsI
 
 void InterfaceSettings::setStartingHandSize(int _startingHandSize)
 {
-    setValue(_startingHandSize, "startinghandsize");
+    setValue(_startingHandSize, "startingHandSize");
 }
 
 void InterfaceSettings::setAnnotateTokens(bool _annotateTokens)
 {
-    setValue(_annotateTokens, "annotatetokens");
+    setValue(_annotateTokens, "annotateTokens");
 }
 
 void InterfaceSettings::setShowDragSelectionCount(bool _showDragSelectionCount)
 {
-    setValue(_showDragSelectionCount, "showlassoselectioncount");
+    setValue(_showDragSelectionCount, "showLassoSelectionCount");
 }
 
 void InterfaceSettings::setShowTotalSelectionCount(bool _showTotalSelectionCount)
 {
-    setValue(_showTotalSelectionCount, "showpersistentselectioncount");
+    setValue(_showTotalSelectionCount, "showPersistentSelectionCount");
 }
 
 void InterfaceSettings::setTallyType(int value)
@@ -259,13 +259,13 @@ void InterfaceSettings::setHorizontalHand(bool _horizontalHand)
 
 void InterfaceSettings::setInvertVerticalCoordinate(bool _invertVerticalCoordinate)
 {
-    setValue(_invertVerticalCoordinate, "invert_vertical", "table");
+    setValue(_invertVerticalCoordinate, "invertVertical", "table");
     emit invertVerticalCoordinateChanged();
 }
 
 void InterfaceSettings::setMinPlayersForMultiColumnLayout(int _minPlayersForMultiColumnLayout)
 {
-    setValue(_minPlayersForMultiColumnLayout, "min_players_multicolumn");
+    setValue(_minPlayersForMultiColumnLayout, "minPlayersMulticolumn");
     emit minPlayersForMultiColumnLayoutChanged();
 }
 
@@ -281,23 +281,23 @@ void InterfaceSettings::setFastForwardSpeed(qreal _value)
 
 void InterfaceSettings::setLeftJustified(bool _leftJustified)
 {
-    setValue(_leftJustified, "leftjustified");
+    setValue(_leftJustified, "leftJustified");
     emit handJustificationChanged();
 }
 
 void InterfaceSettings::setZoneViewGroupByIndex(int _zoneViewGroupByIndex)
 {
-    setValue(_zoneViewGroupByIndex, "groupby", "zoneview");
+    setValue(_zoneViewGroupByIndex, "groupBy", "zoneview");
 }
 
 void InterfaceSettings::setZoneViewSortByIndex(int _zoneViewSortByIndex)
 {
-    setValue(_zoneViewSortByIndex, "sortby", "zoneview");
+    setValue(_zoneViewSortByIndex, "sortBy", "zoneview");
 }
 
 void InterfaceSettings::setZoneViewPileView(bool _zoneViewPileView)
 {
-    setValue(_zoneViewPileView, "pileview", "zoneview");
+    setValue(_zoneViewPileView, "pileView", "zoneview");
 }
 
 void InterfaceSettings::setShowStatusBar(bool _showStatusBar)

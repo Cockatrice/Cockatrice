@@ -7,22 +7,22 @@ CardsDisplaySettings::CardsDisplaySettings(const QString &settingPath, QObject *
 
 bool CardsDisplaySettings::getDisplayCardNames() const
 {
-    return getValue("displaycardnames", QString(), QString(), true).toBool();
+    return getValue("displayCardNames", QString(), QString(), true).toBool();
 }
 
 bool CardsDisplaySettings::getRoundCardCorners() const
 {
-    return getValue("roundcardcorners", QString(), QString(), true).toBool();
+    return getValue("roundCardCorners", QString(), QString(), true).toBool();
 }
 
 bool CardsDisplaySettings::getOverrideAllCardArtWithPersonalPreference() const
 {
-    return getValue("overrideallcardartwithpersonalpreference", QString(), QString(), false).toBool();
+    return getValue("overrideAllCardArtWithPersonalPreference", QString(), QString(), false).toBool();
 }
 
 bool CardsDisplaySettings::getBumpSetsWithCardsInDeckToTop() const
 {
-    return getValue("bumpsetswithcardsindecktotop", QString(), QString(), true).toBool();
+    return getValue("bumpSetsWithCardsInDeckToTop", QString(), QString(), true).toBool();
 }
 
 int CardsDisplaySettings::getPrintingSelectorSortOrder() const
@@ -47,12 +47,12 @@ bool CardsDisplaySettings::getPrintingSelectorNavigationButtonsVisible() const
 
 bool CardsDisplaySettings::getTapAnimation() const
 {
-    return getValue("tapanimation", QString(), QString(), true).toBool();
+    return getValue("tapAnimation", QString(), QString(), true).toBool();
 }
 
 bool CardsDisplaySettings::getAutoRotateSidewaysLayoutCards() const
 {
-    return getValue("autorotatesidewayslayoutcards", QString(), QString(), true).toBool();
+    return getValue("autoRotateSidewaysLayoutCards", QString(), QString(), true).toBool();
 }
 
 bool CardsDisplaySettings::getScaleCards() const
@@ -67,7 +67,7 @@ int CardsDisplaySettings::getStackCardOverlapPercent() const
 
 int CardsDisplaySettings::getCardInfoViewMode() const
 {
-    return getValue("cardinfoviewmode", QString(), QString(), 0).toInt();
+    return getValue("cardInfoViewMode", QString(), QString(), 0).toInt();
 }
 
 int CardsDisplaySettings::getVisualDeckStorageCardSize() const
@@ -102,7 +102,7 @@ int CardsDisplaySettings::getSampleHandSize() const
 
 void CardsDisplaySettings::setDisplayCardNames(bool _displayCardNames)
 {
-    setValue(_displayCardNames, "displaycardnames");
+    setValue(_displayCardNames, "displayCardNames");
     emit displayCardNamesChanged();
 }
 
@@ -111,19 +111,19 @@ void CardsDisplaySettings::setRoundCardCorners(bool _roundCardCorners)
     if (_roundCardCorners == getRoundCardCorners()) {
         return;
     }
-    setValue(_roundCardCorners, "roundcardcorners");
+    setValue(_roundCardCorners, "roundCardCorners");
     emit roundCardCornersChanged(_roundCardCorners);
 }
 
 void CardsDisplaySettings::setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArt)
 {
-    setValue(_overrideAllCardArt, "overrideallcardartwithpersonalpreference");
+    setValue(_overrideAllCardArt, "overrideAllCardArtWithPersonalPreference");
     emit overrideAllCardArtWithPersonalPreferenceChanged(_overrideAllCardArt);
 }
 
 void CardsDisplaySettings::setBumpSetsWithCardsInDeckToTop(bool _bumpSetsWithCardsInDeckToTop)
 {
-    setValue(_bumpSetsWithCardsInDeckToTop, "bumpsetswithcardsindecktotop");
+    setValue(_bumpSetsWithCardsInDeckToTop, "bumpSetsWithCardsInDeckToTop");
     emit bumpSetsWithCardsInDeckToTopChanged();
 }
 
@@ -156,12 +156,12 @@ void CardsDisplaySettings::setPrintingSelectorNavigationButtonsVisible(bool _nav
 
 void CardsDisplaySettings::setTapAnimation(bool _tapAnimation)
 {
-    setValue(_tapAnimation, "tapanimation");
+    setValue(_tapAnimation, "tapAnimation");
 }
 
 void CardsDisplaySettings::setAutoRotateSidewaysLayoutCards(bool _autoRotateSidewaysLayoutCards)
 {
-    setValue(_autoRotateSidewaysLayoutCards, "autorotatesidewayslayoutcards");
+    setValue(_autoRotateSidewaysLayoutCards, "autoRotateSidewaysLayoutCards");
 }
 
 void CardsDisplaySettings::setCardScaling(bool _scaleCards)
@@ -176,7 +176,7 @@ void CardsDisplaySettings::setStackCardOverlapPercent(int _verticalCardOverlapPe
 
 void CardsDisplaySettings::setCardInfoViewMode(int _viewMode)
 {
-    setValue(_viewMode, "cardinfoviewmode");
+    setValue(_viewMode, "cardInfoViewMode");
 }
 
 void CardsDisplaySettings::setVisualDeckStorageCardSize(int _cardSize)

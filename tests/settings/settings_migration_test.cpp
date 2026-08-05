@@ -273,25 +273,25 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_TRUE(fileExists("sound.ini"));
     ASSERT_EQ(readFromIni("sound.ini", "sound/enabled"), QVariant(true));
     ASSERT_EQ(readFromIni("sound.ini", "sound/theme"), QVariant("custom_theme"));
-    ASSERT_EQ(readFromIni("sound.ini", "sound/mastervolume"), QVariant(75));
+    ASSERT_EQ(readFromIni("sound.ini", "sound/masterVolume"), QVariant(75));
 
     ASSERT_TRUE(fileExists("game.ini"));
-    ASSERT_EQ(readFromIni("game.ini", "game/maxplayers"), QVariant(4));
-    ASSERT_EQ(readFromIni("game.ini", "game/gamedescription"), QVariant("test game"));
-    ASSERT_EQ(readFromIni("game.ini", "game/remembergamesettings"), QVariant(false));
-    ASSERT_EQ(readFromIni("game.ini", "game/gametypes"), QVariant("commander"));
-    ASSERT_EQ(readFromIni("game.ini", "game/onlybuddies"), QVariant(true));
-    ASSERT_EQ(readFromIni("game.ini", "localgameoptions/maxplayers"), QVariant(2));
-    ASSERT_EQ(readFromIni("game.ini", "localgameoptions/startinglifetotal"), QVariant(40));
+    ASSERT_EQ(readFromIni("game.ini", "game/maxPlayers"), QVariant(4));
+    ASSERT_EQ(readFromIni("game.ini", "game/gameDescription"), QVariant("test game"));
+    ASSERT_EQ(readFromIni("game.ini", "game/rememberGameSettings"), QVariant(false));
+    ASSERT_EQ(readFromIni("game.ini", "game/gameTypes"), QVariant("commander"));
+    ASSERT_EQ(readFromIni("game.ini", "game/onlyBuddies"), QVariant(true));
+    ASSERT_EQ(readFromIni("game.ini", "localgameoptions/maxPlayers"), QVariant(2));
+    ASSERT_EQ(readFromIni("game.ini", "localgameoptions/startingLifeTotal"), QVariant(40));
 
     ASSERT_TRUE(fileExists("chat.ini"));
     ASSERT_EQ(readFromIni("chat.ini", "chat/mention"), QVariant(false));
-    ASSERT_EQ(readFromIni("chat.ini", "chat/mentioncolor"), QVariant("FF0000"));
-    ASSERT_EQ(readFromIni("chat.ini", "chat/showmessagepopups"), QVariant(false));
-    ASSERT_EQ(readFromIni("chat.ini", "chat/mentioncompleter"), QVariant(false));
-    ASSERT_EQ(readFromIni("chat.ini", "chat/roomhistory"), QVariant(false));
-    ASSERT_EQ(readFromIni("chat.ini", "chat/highlightcolor"), QVariant("00FF00"));
-    ASSERT_EQ(readFromIni("chat.ini", "chat/highlightwords"), QVariant("alpha beta"));
+    ASSERT_EQ(readFromIni("chat.ini", "chat/mentionColor"), QVariant("FF0000"));
+    ASSERT_EQ(readFromIni("chat.ini", "chat/showMessagePopups"), QVariant(false));
+    ASSERT_EQ(readFromIni("chat.ini", "chat/mentionCompleter"), QVariant(false));
+    ASSERT_EQ(readFromIni("chat.ini", "chat/roomHistory"), QVariant(false));
+    ASSERT_EQ(readFromIni("chat.ini", "chat/highlightColor"), QVariant("00FF00"));
+    ASSERT_EQ(readFromIni("chat.ini", "chat/highlightWords"), QVariant("alpha beta"));
 
     ASSERT_TRUE(fileExists("cache_storage.ini"));
     ASSERT_EQ(readFromIni("cache_storage.ini", "cache_storage/pixmapCacheSize"), QVariant(1024));
@@ -307,8 +307,8 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_EQ(readFromIni("updates.ini", "updates/cardUpdateCheckInterval"), QVariant(14));
     ASSERT_EQ(readFromIni("updates.ini", "updates/lastCardUpdateCheck"), QVariant(QDate(2024, 1, 1)));
     ASSERT_EQ(readFromIni("updates.ini", "updates/alwaysEnableNewSets"), QVariant(true));
-    ASSERT_EQ(readFromIni("updates.ini", "updates/updatenotification"), QVariant(false));
-    ASSERT_EQ(readFromIni("updates.ini", "updates/newversionnotification"), QVariant(false));
+    ASSERT_EQ(readFromIni("updates.ini", "updates/updateNotification"), QVariant(false));
+    ASSERT_EQ(readFromIni("updates.ini", "updates/newVersionNotification"), QVariant(false));
 
     ASSERT_TRUE(fileExists("personal.ini"));
     ASSERT_EQ(readFromIni("personal.ini", "personal/lang"), QVariant("de"));
@@ -316,8 +316,8 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_EQ(readFromIni("personal.ini", "tipOfDay/seenTips"), QVariant(QStringList{"1", "2", "3"}));
 
     ASSERT_TRUE(fileExists("downloads.ini"));
-    ASSERT_EQ(readFromIni("downloads.ini", "downloads/picturedownload"), QVariant(true));
-    ASSERT_EQ(readFromIni("downloads.ini", "downloads/downloadspoilers"), QVariant(true));
+    ASSERT_EQ(readFromIni("downloads.ini", "downloads/pictureDownload"), QVariant(true));
+    ASSERT_EQ(readFromIni("downloads.ini", "downloads/downloadSpoilers"), QVariant(true));
 
     ASSERT_TRUE(fileExists("appearance.ini"));
     ASSERT_EQ(readFromIni("appearance.ini", "appearance/themeName"), QVariant("custom_theme"));
@@ -328,23 +328,23 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_EQ(readFromIni("appearance.ini", "appearance/homeTabDisplayCardName"), QVariant(false));
 
     ASSERT_TRUE(fileExists("network.ini"));
-    ASSERT_EQ(readFromIni("network.ini", "network/keepalive"), QVariant(10));
+    ASSERT_EQ(readFromIni("network.ini", "network/keepAlive"), QVariant(10));
     ASSERT_EQ(readFromIni("network.ini", "network/timeout"), QVariant(30));
-    ASSERT_EQ(readFromIni("network.ini", "network/clientid"), QVariant("test-client-id"));
-    ASSERT_EQ(readFromIni("network.ini", "network/clientversion"), QVariant("test-client-version"));
-    ASSERT_EQ(readFromIni("network.ini", "network/knownmissingfeatures"), QVariant("feature1,feature2"));
+    ASSERT_EQ(readFromIni("network.ini", "network/clientId"), QVariant("test-client-id"));
+    ASSERT_EQ(readFromIni("network.ini", "network/clientVersion"), QVariant("test-client-version"));
+    ASSERT_EQ(readFromIni("network.ini", "network/knownMissingFeatures"), QVariant("feature1,feature2"));
 
     ASSERT_TRUE(fileExists("cards_display.ini"));
-    ASSERT_EQ(readFromIni("cards_display.ini", "cards/displaycardnames"), QVariant(false));
-    ASSERT_EQ(readFromIni("cards_display.ini", "cards/roundcardcorners"), QVariant(false));
-    ASSERT_EQ(readFromIni("cards_display.ini", "cards/overrideallcardartwithpersonalpreference"), QVariant(true));
-    ASSERT_EQ(readFromIni("cards_display.ini", "cards/bumpsetswithcardsindecktotop"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/displayCardNames"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/roundCardCorners"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/overrideAllCardArtWithPersonalPreference"), QVariant(true));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/bumpSetsWithCardsInDeckToTop"), QVariant(false));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/includerebalancedcards"), QVariant(false));
-    ASSERT_EQ(readFromIni("cards_display.ini", "cards/autorotatesidewayslayoutcards"), QVariant(false));
-    ASSERT_EQ(readFromIni("cards_display.ini", "cards/tapanimation"), QVariant(true));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/autoRotateSidewaysLayoutCards"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/tapAnimation"), QVariant(true));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/scaleCards"), QVariant(false));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/verticalCardOverlapPercent"), QVariant(42));
-    ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardinfoviewmode"), QVariant(1));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardInfoViewMode"), QVariant(1));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/printingSelector"), QVariant(90));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/printingSelector/sortOrder"), QVariant(3));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/printingSelector/navigationButtonsVisible"), QVariant(false));
@@ -356,7 +356,7 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/sampleHandSize"), QVariant(5));
 
     ASSERT_TRUE(fileExists("interface.ini"));
-    ASSERT_EQ(readFromIni("interface.ini", "interface/usetearoffmenus"), QVariant(true));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/useTearOffMenus"), QVariant(true));
     ASSERT_EQ(readFromIni("interface.ini", "interface/cardViewInitialRowsMax"), QVariant(8));
     ASSERT_EQ(readFromIni("interface.ini", "interface/cardViewExpandedRowsMax"), QVariant(12));
     ASSERT_EQ(readFromIni("interface.ini", "interface/closeEmptyCardView"), QVariant(false));
@@ -365,27 +365,27 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_EQ(readFromIni("interface.ini", "interface/notifications/enabled"), QVariant(false));
     ASSERT_EQ(readFromIni("interface.ini", "interface/notifications/spectatorsEnabled"), QVariant(true));
     ASSERT_EQ(readFromIni("interface.ini", "interface/notifications/buddyConnectEnabled"), QVariant(false));
-    ASSERT_EQ(readFromIni("interface.ini", "interface/doubleclicktoplay"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/doubleClickToPlay"), QVariant(false));
     ASSERT_EQ(readFromIni("interface.ini", "interface/clickPlaysAllSelected"), QVariant(false));
-    ASSERT_EQ(readFromIni("interface.ini", "interface/playtostack"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/playToStack"), QVariant(false));
     ASSERT_EQ(readFromIni("interface.ini", "interface/doNotDeleteArrowsInSubPhases"), QVariant(false));
-    ASSERT_EQ(readFromIni("interface.ini", "interface/startinghandsize"), QVariant(5));
-    ASSERT_EQ(readFromIni("interface.ini", "interface/annotatetokens"), QVariant(true));
-    ASSERT_EQ(readFromIni("interface.ini", "interface/showlassoselectioncount"), QVariant(false));
-    ASSERT_EQ(readFromIni("interface.ini", "interface/showpersistentselectioncount"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/startingHandSize"), QVariant(5));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/annotateTokens"), QVariant(true));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/showLassoSelectionCount"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/showPersistentSelectionCount"), QVariant(false));
     ASSERT_EQ(readFromIni("interface.ini", "interface/tallyType"), QVariant(2));
-    ASSERT_EQ(readFromIni("interface.ini", "interface/leftjustified"), QVariant(true));
-    ASSERT_EQ(readFromIni("interface.ini", "interface/min_players_multicolumn"), QVariant(6));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/leftJustified"), QVariant(true));
+    ASSERT_EQ(readFromIni("interface.ini", "interface/minPlayersMulticolumn"), QVariant(6));
     ASSERT_EQ(readFromIni("interface.ini", "interface/showStatusBar"), QVariant(true));
     ASSERT_EQ(readFromIni("interface.ini", "interface/showShortcuts"), QVariant(false));
     ASSERT_EQ(readFromIni("interface.ini", "interface/showGameSelectorFilterToolbar"), QVariant(false));
     ASSERT_EQ(readFromIni("interface.ini", "hand/horizontal"), QVariant(true));
-    ASSERT_EQ(readFromIni("interface.ini", "table/invert_vertical"), QVariant(true));
+    ASSERT_EQ(readFromIni("interface.ini", "table/invertVertical"), QVariant(true));
     ASSERT_EQ(readFromIni("interface.ini", "replay/rewindBufferingMs"), QVariant(6000));
     ASSERT_EQ(readFromIni("interface.ini", "replay/fastForwardSpeed"), QVariant(5));
-    ASSERT_EQ(readFromIni("interface.ini", "zoneview/groupby"), QVariant(2));
-    ASSERT_EQ(readFromIni("interface.ini", "zoneview/sortby"), QVariant(1));
-    ASSERT_EQ(readFromIni("interface.ini", "zoneview/pileview"), QVariant(false));
+    ASSERT_EQ(readFromIni("interface.ini", "zoneview/groupBy"), QVariant(2));
+    ASSERT_EQ(readFromIni("interface.ini", "zoneview/sortBy"), QVariant(1));
+    ASSERT_EQ(readFromIni("interface.ini", "zoneview/pileView"), QVariant(false));
 
     ASSERT_TRUE(fileExists("deck_editor.ini"));
     ASSERT_EQ(readFromIni("deck_editor.ini", "deckeditor/openDeckInNewTab"), QVariant(false));
@@ -433,6 +433,25 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_FALSE(readFromIni("interface.ini", "interface/notificationsenabled").isValid());
     ASSERT_FALSE(readFromIni("cards_display.ini", "cards/printingselectorsortorder").isValid());
     ASSERT_FALSE(readFromIni("cards_display.ini", "cards/visualDeckStorage/cardSize").isValid());
+
+    // No legacy non-camelCase keys should remain in the per-file INIs
+    ASSERT_FALSE(readFromIni("game.ini", "game/gamedescription").isValid());
+    ASSERT_FALSE(readFromIni("game.ini", "localgameoptions/maxplayers").isValid());
+    ASSERT_FALSE(readFromIni("chat.ini", "chat/roomhistory").isValid());
+    ASSERT_FALSE(readFromIni("chat.ini", "chat/highlightwords").isValid());
+    ASSERT_FALSE(readFromIni("sound.ini", "sound/mastervolume").isValid());
+    ASSERT_FALSE(readFromIni("downloads.ini", "downloads/picturedownload").isValid());
+    ASSERT_FALSE(readFromIni("network.ini", "network/keepalive").isValid());
+    ASSERT_FALSE(readFromIni("network.ini", "network/knownmissingfeatures").isValid());
+    ASSERT_FALSE(readFromIni("updates.ini", "updates/updatenotification").isValid());
+    ASSERT_FALSE(readFromIni("cards_display.ini", "cards/displaycardnames").isValid());
+    ASSERT_FALSE(readFromIni("cards_display.ini", "cards/cardinfoviewmode").isValid());
+    ASSERT_FALSE(readFromIni("interface.ini", "interface/usetearoffmenus").isValid());
+    ASSERT_FALSE(readFromIni("interface.ini", "interface/doubleclicktoplay").isValid());
+    ASSERT_FALSE(readFromIni("interface.ini", "interface/min_players_multicolumn").isValid());
+    ASSERT_FALSE(readFromIni("interface.ini", "table/invert_vertical").isValid());
+    ASSERT_FALSE(readFromIni("interface.ini", "zoneview/groupby").isValid());
+    ASSERT_FALSE(readFromIni("interface.ini", "zoneview/pileview").isValid());
 
     // Verify sentinel was written
     ASSERT_EQ(readFromIni("global.ini", "migration/perfile_complete"), QVariant(true));
@@ -512,7 +531,7 @@ TEST_F(SettingsMigrationTest, KeyMapTranslationIsCorrect)
     ASSERT_TRUE(fileExists("updates.ini"));
     // The key should be translated from "personal/cardUpdateCheckInterval" to "updates/cardUpdateCheckInterval"
     ASSERT_EQ(readFromIni("updates.ini", "updates/cardUpdateCheckInterval"), QVariant(30));
-    ASSERT_EQ(readFromIni("updates.ini", "updates/updatereleasechannel"), QVariant(1));
+    ASSERT_EQ(readFromIni("updates.ini", "updates/updateReleaseChannel"), QVariant(1));
 }
 
 TEST_F(SettingsMigrationTest, CardsKeysKeepGroupPrefix)
@@ -530,7 +549,7 @@ TEST_F(SettingsMigrationTest, CardsKeysKeepGroupPrefix)
     ASSERT_TRUE(fileExists("cards_display.ini"));
     ASSERT_TRUE(fileExists("deck_editor.ini"));
     // "cards/displaycardnames" should be stored with its group prefix
-    ASSERT_EQ(readFromIni("cards_display.ini", "cards/displaycardnames"), QVariant(false));
+    ASSERT_EQ(readFromIni("cards_display.ini", "cards/displayCardNames"), QVariant(false));
     // deck editor keys belong to the deck editor settings now
     ASSERT_EQ(readFromIni("deck_editor.ini", "deckeditor/bannerCardComboBoxVisible"), QVariant(true));
 }
@@ -553,17 +572,68 @@ TEST_F(SettingsMigrationTest, LegacyMigrationIsIdempotent)
     // Change the migrated value
     {
         QSettings serversIni(settingsPath + "servers.ini", QSettings::IniFormat);
-        serversIni.setValue("server/previoushostlogin", "modified_user");
+        serversIni.setValue("server/previousHostLogin", "modified_user");
         serversIni.sync();
     }
 
     // Second migration should NOT overwrite the change
     ASSERT_FALSE(SettingsMigration::migrateLegacySettings(settingsPath));
-    ASSERT_EQ(readFromIni("servers.ini", "server/previoushostlogin"), QVariant("modified_user"));
+    ASSERT_EQ(readFromIni("servers.ini", "server/previousHostLogin"), QVariant("modified_user"));
+}
+
+TEST_F(SettingsMigrationTest, LegacyMigrationCamelCasesKeys)
+{
+    if (!nativeSettingsAvailable()) {
+        GTEST_SKIP() << "NativeFormat QSettings not available in this environment";
+    }
+
+    {
+        QSettings nativeSettings;
+        nativeSettings.setValue("sets/AAA/sortkey", 2);
+        nativeSettings.setValue("sets/AAA/enabled", false);
+        nativeSettings.setValue("sets/AAA/isknown", false);
+        nativeSettings.setValue("server/previoushostlogin", "legacy_user");
+        nativeSettings.setValue("server/auto_connect", 1);
+        nativeSettings.setValue("server/fpport", "5080");
+        nativeSettings.setValue("messages/count", 1);
+        nativeSettings.setValue("messages/msg0", "hello");
+        nativeSettings.setValue("filter_games/hide_full_games", true);
+        nativeSettings.setValue("filter_games/min_players", 3);
+        nativeSettings.setValue("filter_games/max_players", 5);
+        nativeSettings.setValue("filter_games/game_type/deadbeef", true);
+        nativeSettings.sync();
+    }
+
+    ASSERT_TRUE(SettingsMigration::migrateLegacySettings(settingsPath));
+
+    ASSERT_TRUE(fileExists("cardDatabase.ini"));
+    ASSERT_EQ(readFromIni("cardDatabase.ini", "sets/AAA/sortKey"), QVariant(2));
+    ASSERT_EQ(readFromIni("cardDatabase.ini", "sets/AAA/enabled"), QVariant(false));
+    ASSERT_EQ(readFromIni("cardDatabase.ini", "sets/AAA/isKnown"), QVariant(false));
+
+    ASSERT_TRUE(fileExists("servers.ini"));
+    ASSERT_EQ(readFromIni("servers.ini", "server/previousHostLogin"), QVariant("legacy_user"));
+    ASSERT_EQ(readFromIni("servers.ini", "server/autoConnect"), QVariant(1));
+    ASSERT_EQ(readFromIni("servers.ini", "server/fpPort"), QVariant("5080"));
+
+    ASSERT_TRUE(fileExists("messages.ini"));
+    ASSERT_EQ(readFromIni("messages.ini", "messages/count"), QVariant(1));
+    ASSERT_EQ(readFromIni("messages.ini", "messages/msg0"), QVariant("hello"));
+
+    ASSERT_TRUE(fileExists("gamefilters.ini"));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/hideFullGames"), QVariant(true));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/minPlayers"), QVariant(3));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/maxPlayers"), QVariant(5));
+    ASSERT_EQ(readFromIni("gamefilters.ini", "filter_games/gameType/deadbeef"), QVariant(true));
 }
 
 TEST_F(SettingsMigrationTest, LegacyMigrationEmptyNativeFormatWritesSentinel)
 {
+    if (nativeSettingsAvailable()) {
+        QSettings().clear();
+        QSettings().sync();
+    }
+
     ASSERT_TRUE(SettingsMigration::migrateLegacySettings(settingsPath));
     ASSERT_TRUE(fileExists("personal.ini"));
     ASSERT_EQ(readFromIni("personal.ini", "migration/legacy_complete"), QVariant(true));

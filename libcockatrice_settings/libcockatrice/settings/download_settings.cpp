@@ -30,22 +30,22 @@ void DownloadSettings::resetToDefaultURLs()
 
 bool DownloadSettings::getPicDownload() const
 {
-    return getValue("picturedownload", QString(), QString(), true).toBool();
+    return getValue("pictureDownload", QString(), QString(), true).toBool();
 }
 
 void DownloadSettings::setPicDownload(bool _picDownload)
 {
-    setValue(_picDownload, "picturedownload");
+    setValue(_picDownload, "pictureDownload");
     emit picDownloadChanged();
 }
 
 bool DownloadSettings::getDownloadSpoilersStatus() const
 {
-    return getValue("downloadspoilers", QString(), QString(), false).toBool();
+    return getValue("downloadSpoilers", QString(), QString(), false).toBool();
 }
 
 void DownloadSettings::setDownloadSpoilerStatus(bool _spoilerStatus)
 {
-    setValue(_spoilerStatus, "downloadspoilers");
+    setValue(_spoilerStatus, "downloadSpoilers");
     emit downloadSpoilerStatusChanged();
 }

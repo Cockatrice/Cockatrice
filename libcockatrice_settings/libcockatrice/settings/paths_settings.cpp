@@ -30,7 +30,7 @@ QString PathsSettings::getPicsPath() const
 
 QString PathsSettings::getCustomPicsPath() const
 {
-    return getValue("custompics").toString();
+    return getValue("customPics").toString();
 }
 
 QString PathsSettings::getThemesPath() const
@@ -40,22 +40,22 @@ QString PathsSettings::getThemesPath() const
 
 QString PathsSettings::getCardDatabasePath() const
 {
-    return getValue("carddatabase").toString();
+    return getValue("cardDatabase").toString();
 }
 
 QString PathsSettings::getCustomCardDatabasePath() const
 {
-    return getValue("customsets").toString();
+    return getValue("customSets").toString();
 }
 
 QString PathsSettings::getTokenDatabasePath() const
 {
-    return getValue("tokendatabase").toString();
+    return getValue("tokenDatabase").toString();
 }
 
 QString PathsSettings::getSpoilerCardDatabasePath() const
 {
-    return getValue("spoilerdatabase").toString();
+    return getValue("spoilerDatabase").toString();
 }
 
 QString PathsSettings::getRedirectCachePath() const
@@ -86,7 +86,7 @@ void PathsSettings::setPicsPath(const QString &_picsPath)
 
 void PathsSettings::setCustomPicsPath(const QString &_customPicsPath)
 {
-    setValue(_customPicsPath, "custompics");
+    setValue(_customPicsPath, "customPics");
 }
 
 void PathsSettings::setThemesPath(const QString &_themesPath)
@@ -97,24 +97,24 @@ void PathsSettings::setThemesPath(const QString &_themesPath)
 
 void PathsSettings::setCardDatabasePath(const QString &_cardDatabasePath)
 {
-    setValue(_cardDatabasePath, "carddatabase");
+    setValue(_cardDatabasePath, "cardDatabase");
     emit cardDatabasePathChanged();
 }
 
 void PathsSettings::setCustomCardDatabasePath(const QString &_customCardDatabasePath)
 {
-    setValue(_customCardDatabasePath, "customsets");
+    setValue(_customCardDatabasePath, "customSets");
     emit cardDatabasePathChanged();
 }
 
 void PathsSettings::setTokenDatabasePath(const QString &_tokenDatabasePath)
 {
-    setValue(_tokenDatabasePath, "tokendatabase");
+    setValue(_tokenDatabasePath, "tokenDatabase");
     emit cardDatabasePathChanged();
 }
 
 void PathsSettings::setSpoilerDatabasePath(const QString &_spoilerDatabasePath)
 {
-    setValue(_spoilerDatabasePath, "spoilerdatabase");
+    setValue(_spoilerDatabasePath, "spoilerDatabase");
     emit cardDatabasePathChanged();
 }
