@@ -324,15 +324,26 @@ jobs:
             target: 10
             runner: windows-2025
 
-            cmake_generator: "Visual Studio 18 2026"
-            cmake_generator_platform: x64
+            cmake_generator: Ninja
             make_package: 1
             package_suffix: "-Win10"
             qt_version: 6.11.0
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
 
-    name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
+          - os: Windows
+            target: 10
+            runner: windows-2025
+
+            cmake_generator: "Visual Studio 18 2026"
+            cmake_generator_platform: x64
+            make_package: 1
+            package_suffix: "-Win10_VS"
+            qt_version: 6.11.0
+            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            type: Release
+
+    name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}${{ matrix.cmake_generator != 'Ninja' && ' VS' || '' }}
     needs: configure
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 100
@@ -346,12 +357,11 @@ jobs:
         with:
           submodules: recursive
 
-      - name: "[Windows] Add msbuild to PATH"
+      - name: "[Windows] Setup MSVC"
         if: matrix.os == 'Windows'
-        id: add-msbuild
-        uses: microsoft/setup-msbuild@v3
+        uses: TheMrMilchmann/setup-msvc-dev@v4
         with:
-          msbuild-architecture: x64
+          arch: x64
 
       - name: "[macOS] Setup ccache"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
@@ -422,7 +432,7 @@ jobs:
       - name: "[Windows] Install NSIS"
         if: matrix.os == 'Windows'
         shell: bash
-        run: choco install nsis
+        run: choco install nsis --no-progress
 
       - name: "Setup vcpkg cache"
         id: vcpkg-cache
@@ -528,15 +538,15 @@ jobs:
           path: ${{ steps.build.outputs.path }}
 
       - name: "[Windows] Upload PDBs (Program Databases)"
-        if: matrix.os == 'Windows' && github.ref_type != 'tag'
+        if: matrix.os == 'Windows' && github.ref_type != 'tag' && matrix.cmake_generator == 'Ninja'
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error
           name: ${{ steps.build.outputs.name }}-PDBs
           path: |
-            build/cockatrice/Release/*.pdb
-            build/oracle/Release/*.pdb
-            build/servatrice/Release/*.pdb
+            build/cockatrice/*.pdb
+            build/oracle/*.pdb
+            build/servatrice/*.pdb
 
       - name: "Upload to release"
         if: needs.configure.outputs.tag != null && matrix.make_package == '1'

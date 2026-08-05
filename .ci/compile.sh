@@ -124,19 +124,27 @@ set -e
 
 # Setup
 ./servatrice/check_schema_version.sh
+if [[ ! $USE_CCACHE ]]; then
+  USE_CCACHE=0
+fi
 if [[ ! $BUILDTYPE ]]; then
   BUILDTYPE=Release
 fi
 if [[ ! $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
+
+# Can be omitted when using modern CMake config commands below for config and build (chceck BUILD_DIR logic above as well)
+# cmake -S . -B "$BUILD_DIR" "${flags[@]}"
+# cmake --build "$BUILD_DIR" "${buildflags[@]}"
+# Required to update other commands with build folder as well:
+# ctest --build-config "$BUILDTYPE" --test-dir "$BUILD_DIR" --output-on-failure
+# cmake --build "$BUILD_DIR" --target install --config "$BUILDTYPE"
+# cmake --build "$BUILD_DIR" --target package --config "$BUILDTYPE" (remove cd from renaming)
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-# Set minimum CMake Version
-export CMAKE_POLICY_VERSION_MINIMUM=3.10
-
-# Add cmake flags
+# Add CMake flags
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
 if [[ $MAKE_SERVER ]]; then
   flags+=("-DWITH_SERVER=1")
@@ -147,24 +155,30 @@ fi
 if [[ $MAKE_TEST ]]; then
   flags+=("-DTEST=1")
 fi
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == "1" ]]; then
   flags+=("-DUSE_CCACHE=1")
-  if [[ $CCACHE_SIZE ]]; then
-    # note, this setting persists after running the script
+  if [[ -n $CCACHE_SIZE ]]; then
+    # Note, this setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
   fi
+else
+  flags+=("-DUSE_CCACHE=0")
 fi
-if [[ $PACKAGE_TYPE ]]; then
+if [[ -n $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
 if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
+#  if [[ $MAKE_PACKAGE && $RUNNER_OS == Windows ]]; then
+#      flags+=("-DVCPKG_APPLOCAL_DEPS=OFF")    # disable copying of runtime DLLs into build output
+#  fi
 fi
 
-# Add cmake --build flags
+# Add CMake --build flags
 buildflags=(--config "$BUILDTYPE")
 
 function ccachestatsverbose() {
+  ccache --version
   # note, verbose only works on newer ccache, discard the error
   local got
   if got="$(ccache --show-stats --verbose 2>/dev/null)"; then
@@ -174,7 +188,7 @@ function ccachestatsverbose() {
   fi
 }
 
-# Compile
+# Prepare compilation
 if [[ $RUNNER_OS == macOS ]]; then
   # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action,
   # which sets a few environment variables
@@ -252,30 +266,38 @@ if [[ $RUNNER_OS == macOS ]]; then
   fi
 
 elif [[ $RUNNER_OS == Windows ]]; then
-  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+  if [[ "$CMAKE_GENERATOR" =~ ^Visual\ Studio ]]; then
+  # Enable MSBuild switches for MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
   # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
   buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
+  fi
 fi
 
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == "1" ]]; then
   echo "::group::Show ccache stats"
   ccachestatsverbose
   echo "::endgroup::"
 fi
 
-echo "::group::Configure cmake"
+# Configure CMake
+echo "::group::Configure CMake"
 cmake --version
-echo "Running cmake with flags: ${flags[*]}"
+  if [[ "$CMAKE_GENERATOR" =~ ^Ninja ]]; then
+  echo "ninja $(ninja --version)"
+  fi
+echo "Running CMake with these flags: ${flags[*]}"
+# Equivalent to modern and more explicit "cmake -S .. -B build"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
 
+# Build
 echo "::group::Build project"
-echo "Running cmake --build with flags: ${buildflags[*]}"
+echo "Running CMake with these build flags: ${buildflags[*]}"
 cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
-if [[ $USE_CCACHE ]]; then
-  if [[ $CCACHE_EVICTION_AGE ]]; then
+if [[ $USE_CCACHE == "1" ]]; then
+  if [[ -n $CCACHE_EVICTION_AGE ]]; then
     echo "::group::evict ccache files older than $CCACHE_EVICTION_AGE"
     ccache --evict-older-than "$CCACHE_EVICTION_AGE"
     echo "::endgroup::"
@@ -300,24 +322,30 @@ if [[ $RUNNER_OS == macOS ]]; then
   echo "::endgroup::"
 fi
 
+# Test
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
-  ctest -C "$BUILDTYPE" --output-on-failure
+  ctest --version
+  ctest --build-config "$BUILDTYPE" --output-on-failure
   echo "::endgroup::"
 fi
 
+# Install
 if [[ $MAKE_INSTALL ]]; then
   echo "::group::Install"
+  # Equivalent to modern "cmake --install ."
   cmake --build . --target install --config "$BUILDTYPE"
   echo "::endgroup::"
 fi
 
+# Package
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
+  cpack --version
   cmake --build . --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 
-  if [[ $PACKAGE_SUFFIX ]]; then
+  if [[ -n $PACKAGE_SUFFIX ]]; then
     echo "::group::Update package name"
     cd ..
     BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
