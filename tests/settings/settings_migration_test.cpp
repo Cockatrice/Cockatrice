@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <QColor>
 #include <QCoreApplication>
 #include <QDate>
 #include <QDir>
@@ -191,6 +192,8 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
         g.setValue("cards/printingselectorcardsize", 90);
         g.setValue("cards/printingselectorsortorder", 3);
         g.setValue("cards/printingselectornavigationbuttonsvisible", false);
+        // card counters (migrate into card_counters.ini)
+        g.setValue("cards/counters/0/color", QColor(Qt::red));
 
         // interface
         g.setValue("interface/usetearoffmenus", true);
@@ -354,6 +357,10 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/edhrec"), QVariant(60));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/archidektPreview"), QVariant(50));
     ASSERT_EQ(readFromIni("cards_display.ini", "cards/cardSize/sampleHandSize"), QVariant(5));
+
+    ASSERT_TRUE(fileExists("card_counters.ini"));
+    ASSERT_EQ(readFromIni("card_counters.ini", "cards/counters/0/color").toString(), QColor(Qt::red).name());
+    ASSERT_FALSE(readFromIni("global.ini", "cards/counters/0/color").isValid());
 
     ASSERT_TRUE(fileExists("interface.ini"));
     ASSERT_EQ(readFromIni("interface.ini", "interface/useTearOffMenus"), QVariant(true));

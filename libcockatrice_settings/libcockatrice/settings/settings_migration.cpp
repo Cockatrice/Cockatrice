@@ -253,6 +253,25 @@ static void migrateCardsDisplaySettings(const QString &settingsPath, QSettings &
     }
 }
 
+static void migrateCardCounterSettings(const QString &settingsPath, QSettings &globalIni)
+{
+    QStringList counterKeys;
+    const QStringList allKeys = globalIni.allKeys();
+    for (const auto &key : allKeys) {
+        if (key.startsWith("cards/counters/")) {
+            counterKeys.append(key);
+        }
+    }
+    if (counterKeys.isEmpty()) {
+        return;
+    }
+
+    QSettings countersIni(settingsPath + "card_counters.ini", QSettings::IniFormat);
+    for (const auto &key : counterKeys) {
+        countersIni.setValue(key, globalIni.value(key));
+    }
+}
+
 static void migrateInterfaceSettings(const QString &settingsPath, QSettings &globalIni)
 {
     const QMap<QString, QString> interfaceKeyMap = {
@@ -451,6 +470,7 @@ static void migrateVisualDeckStorageSettings(const QString &settingsPath, QSetti
     for (auto it = vdsKeyMap.constBegin(); it != vdsKeyMap.constEnd(); ++it) {
         if (globalIni.contains(it.key())) {
             hasAny = true;
+            break;
         }
     }
     if (!hasAny) {
@@ -659,6 +679,7 @@ bool SettingsMigration::migrateSettingsFromGlobalIni(const QString &settingsPath
     migratePersonalSettings(settingsPath, globalIni);
     migrateDownloadSettings(settingsPath, globalIni);
     migrateCardsDisplaySettings(settingsPath, globalIni);
+    migrateCardCounterSettings(settingsPath, globalIni);
     migrateInterfaceSettings(settingsPath, globalIni);
     migrateAppearanceSettings(settingsPath, globalIni);
     migrateNetworkSettings(settingsPath, globalIni);
