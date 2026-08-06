@@ -33,6 +33,13 @@ protected:
     void SetUp() override
     {
         settingsPath = tempDir.path() + "/";
+
+        // Isolate native-format QSettings (used by the legacy migration tests) inside the
+        // temporary directory so the tests never read or write the real user config,
+        // which would otherwise be shared across CI jobs and flaky.
+        const QString configDir = tempDir.path() + "/config";
+        QDir().mkpath(configDir);
+        qputenv("XDG_CONFIG_HOME", configDir.toUtf8());
     }
 
     bool fileExists(const QString &name) const
