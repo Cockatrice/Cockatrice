@@ -12,18 +12,6 @@
 namespace
 {
 
-static bool nativeSettingsAvailable()
-{
-    QSettings probe;
-    probe.setValue("_migration_native_probe", "ok");
-    probe.sync();
-    QSettings read;
-    bool ok = read.value("_migration_native_probe").toString() == "ok";
-    QSettings().clear();
-    QSettings().sync();
-    return ok;
-}
-
 class SettingsMigrationTest : public ::testing::Test
 {
 protected:
@@ -34,12 +22,16 @@ protected:
     {
         settingsPath = tempDir.path() + "/";
 
-        // Isolate native-format QSettings (used by the legacy migration tests) inside the
-        // temporary directory so the tests never read or write the real user config,
-        // which would otherwise be shared across CI jobs and flaky.
+        // Isolate the settings used by the legacy migration tests inside the temporary
+        // directory so the tests never read or write the real user config (registry on
+        // Windows, plist on macOS, .conf on Linux), which would otherwise be shared
+        // across CI jobs and flaky. Default-format QSettings is forced to IniFormat and
+        // its UserScope path is redirected here; setPath wins over the XDG_CONFIG_HOME
+        // default on Unix, so every platform resolves to <tempDir>/config/...
         const QString configDir = tempDir.path() + "/config";
         QDir().mkpath(configDir);
         qputenv("XDG_CONFIG_HOME", configDir.toUtf8());
+        QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, configDir);
     }
 
     bool fileExists(const QString &name) const
@@ -51,6 +43,26 @@ protected:
     {
         QSettings ini(settingsPath + fileName, QSettings::IniFormat);
         return ini.value(key);
+    }
+
+    // Checks for the exact legacy key in the raw INI content. On Windows, INI keys are
+    // case-insensitive, so reading back a lower-case legacy key would match its migrated
+    // camelCase counterpart and hide regressions. Checking the file bytes directly keeps
+    // the comparison case-sensitive on every platform.
+    bool iniFileHasKeyCaseSensitive(const QString &fileName, const QString &key) const
+    {
+        QFile f(settingsPath + fileName);
+        if (!f.open(QIODevice::ReadOnly)) {
+            return false;
+        }
+        const QString valueName = key.section('/', -1);
+        const QStringList lines = QString::fromUtf8(f.readAll()).split('\n');
+        for (const auto &line : lines) {
+            if (line.startsWith(valueName + '=')) {
+                return true;
+            }
+        }
+        return false;
     }
 };
 
@@ -440,32 +452,32 @@ TEST_F(SettingsMigrationTest, MigratesAllSettingsGroups)
               QVariant(25));
 
     // No legacy flat keys should remain in the per-file INIs
-    ASSERT_FALSE(readFromIni("visual_deck_storage.ini", "interface/visualdeckstorageshowfolders").isValid());
-    ASSERT_FALSE(readFromIni("visual_deck_storage.ini", "interface/visualdeckstoragecardsize").isValid());
-    ASSERT_FALSE(readFromIni("deck_editor.ini", "deckeditor/sampleHandSize").isValid());
-    ASSERT_FALSE(readFromIni("deck_editor.ini", "deckeditor/cardSize").isValid());
-    ASSERT_FALSE(readFromIni("interface.ini", "interface/notificationsenabled").isValid());
-    ASSERT_FALSE(readFromIni("cards_display.ini", "cards/printingselectorsortorder").isValid());
-    ASSERT_FALSE(readFromIni("cards_display.ini", "cards/visualDeckStorage/cardSize").isValid());
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("visual_deck_storage.ini", "interface/visualdeckstorageshowfolders"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("visual_deck_storage.ini", "interface/visualdeckstoragecardsize"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("deck_editor.ini", "deckeditor/sampleHandSize"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("deck_editor.ini", "deckeditor/cardSize"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("interface.ini", "interface/notificationsenabled"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("cards_display.ini", "cards/printingselectorsortorder"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("cards_display.ini", "cards/visualDeckStorage/cardSize"));
 
     // No legacy non-camelCase keys should remain in the per-file INIs
-    ASSERT_FALSE(readFromIni("game.ini", "game/gamedescription").isValid());
-    ASSERT_FALSE(readFromIni("game.ini", "localgameoptions/maxplayers").isValid());
-    ASSERT_FALSE(readFromIni("chat.ini", "chat/roomhistory").isValid());
-    ASSERT_FALSE(readFromIni("chat.ini", "chat/highlightwords").isValid());
-    ASSERT_FALSE(readFromIni("sound.ini", "sound/mastervolume").isValid());
-    ASSERT_FALSE(readFromIni("downloads.ini", "downloads/picturedownload").isValid());
-    ASSERT_FALSE(readFromIni("network.ini", "network/keepalive").isValid());
-    ASSERT_FALSE(readFromIni("network.ini", "network/knownmissingfeatures").isValid());
-    ASSERT_FALSE(readFromIni("updates.ini", "updates/updatenotification").isValid());
-    ASSERT_FALSE(readFromIni("cards_display.ini", "cards/displaycardnames").isValid());
-    ASSERT_FALSE(readFromIni("cards_display.ini", "cards/cardinfoviewmode").isValid());
-    ASSERT_FALSE(readFromIni("interface.ini", "interface/usetearoffmenus").isValid());
-    ASSERT_FALSE(readFromIni("interface.ini", "interface/doubleclicktoplay").isValid());
-    ASSERT_FALSE(readFromIni("interface.ini", "interface/min_players_multicolumn").isValid());
-    ASSERT_FALSE(readFromIni("interface.ini", "table/invert_vertical").isValid());
-    ASSERT_FALSE(readFromIni("interface.ini", "zoneview/groupby").isValid());
-    ASSERT_FALSE(readFromIni("interface.ini", "zoneview/pileview").isValid());
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("game.ini", "game/gamedescription"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("game.ini", "localgameoptions/maxplayers"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("chat.ini", "chat/roomhistory"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("chat.ini", "chat/highlightwords"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("sound.ini", "sound/mastervolume"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("downloads.ini", "downloads/picturedownload"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("network.ini", "network/keepalive"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("network.ini", "network/knownmissingfeatures"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("updates.ini", "updates/updatenotification"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("cards_display.ini", "cards/displaycardnames"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("cards_display.ini", "cards/cardinfoviewmode"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("interface.ini", "interface/usetearoffmenus"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("interface.ini", "interface/doubleclicktoplay"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("interface.ini", "interface/min_players_multicolumn"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("interface.ini", "table/invert_vertical"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("interface.ini", "zoneview/groupby"));
+    ASSERT_FALSE(iniFileHasKeyCaseSensitive("interface.ini", "zoneview/pileview"));
 
     // Verify sentinel was written
     ASSERT_EQ(readFromIni("global.ini", "migration/perfile_complete"), QVariant(true));
@@ -570,10 +582,6 @@ TEST_F(SettingsMigrationTest, CardsKeysKeepGroupPrefix)
 
 TEST_F(SettingsMigrationTest, LegacyMigrationIsIdempotent)
 {
-    if (!nativeSettingsAvailable()) {
-        GTEST_SKIP() << "NativeFormat QSettings not available in this environment";
-    }
-
     {
         QSettings nativeSettings;
         nativeSettings.setValue("server/previoushostlogin", "test_user");
@@ -597,10 +605,6 @@ TEST_F(SettingsMigrationTest, LegacyMigrationIsIdempotent)
 
 TEST_F(SettingsMigrationTest, LegacyMigrationCamelCasesKeys)
 {
-    if (!nativeSettingsAvailable()) {
-        GTEST_SKIP() << "NativeFormat QSettings not available in this environment";
-    }
-
     {
         QSettings nativeSettings;
         nativeSettings.setValue("sets/AAA/sortkey", 2);
@@ -643,10 +647,8 @@ TEST_F(SettingsMigrationTest, LegacyMigrationCamelCasesKeys)
 
 TEST_F(SettingsMigrationTest, LegacyMigrationEmptyNativeFormatWritesSentinel)
 {
-    if (nativeSettingsAvailable()) {
-        QSettings().clear();
-        QSettings().sync();
-    }
+    QSettings().clear();
+    QSettings().sync();
 
     ASSERT_TRUE(SettingsMigration::migrateLegacySettings(settingsPath));
     ASSERT_TRUE(fileExists("personal.ini"));
@@ -703,5 +705,6 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
     app.setOrganizationName("CockatriceTest");
     app.setApplicationName("SettingsMigrationTest");
+    QSettings::setDefaultFormat(QSettings::IniFormat);
     return RUN_ALL_TESTS();
 }
