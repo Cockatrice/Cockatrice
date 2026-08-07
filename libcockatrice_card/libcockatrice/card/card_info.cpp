@@ -64,14 +64,6 @@ void CardInfo::setProperty(const QString &_name, const QString &_value)
     emit cardInfoChanged(smartThis);
 }
 
-void CardInfo::setProperties(const QHash<QString, QString> &_props)
-{
-    ensurePropertiesLoaded();
-    propertiesCache = _props;
-    propertiesBlob = serializeProperties(propertiesCache);
-    emit cardInfoChanged(smartThis);
-}
-
 CardInfo::CardInfo(const QString &_name,
                    const QString &_text,
                    bool _isToken,

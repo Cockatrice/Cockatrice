@@ -5,7 +5,12 @@
 #include <QDataStream>
 #include <QIODevice>
 
-PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
+PrintingInfo::PrintingInfo(const CardSetPtr &_set, const QHash<QString, QString> &_properties)
+    : set(_set), propertiesCache(_properties), propertiesLoaded(true)
+{
+}
+
+PrintingInfo::PrintingInfo(const CardSetPtr &_set, const QByteArray &_blob) : set(_set), propertiesBlob(_blob)
 {
 }
 
@@ -31,16 +36,6 @@ void PrintingInfo::setProperty(const QString &_name, const QString &_value)
         return;
     }
     propertiesCache.insert(_name, _value);
-    setProperties(propertiesCache);
-}
-
-void PrintingInfo::setProperties(const QHash<QString, QString> &_props)
-{
-    ensurePropertiesLoaded();
-    propertiesCache = _props;
-    QDataStream out(&propertiesBlob, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_4);
-    out << propertiesCache;
 }
 
 /**

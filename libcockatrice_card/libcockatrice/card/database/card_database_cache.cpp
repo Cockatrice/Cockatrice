@@ -117,12 +117,9 @@ PrintingInfo readPrinting(QDataStream &in, const SetNameMap &sets)
 {
     QString setName = readString(in);
     QByteArray propsBlob = readHashBlob(in);
-    PrintingInfo p;
-    if (auto set = sets.value(setName)) {
-        p = PrintingInfo(set);
-    }
-    p.setPropertiesBlob(propsBlob);
-    return p;
+    auto set = sets.value(setName);
+
+    return PrintingInfo(set, propsBlob);
 }
 
 // ---- CardSet ---------------------------------------------------------------

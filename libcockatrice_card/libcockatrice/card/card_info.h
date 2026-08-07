@@ -290,25 +290,11 @@ public:
     }
     [[nodiscard]] const QHash<QString, QString> &getPropertiesHash() const;
 
-    /**
-     * @brief Stores the pre-serialized properties blob and invalidates the
-     *        materialized cache. Used by the binary cache reader so the
-     *        QHash<QString, QString> is not built at load time.
-     * @param _blob The serialized properties (as written by the cache writer).
-     */
-    void setPropertiesBlob(QByteArray _blob) const
-    {
-        QMutexLocker lock(&propertiesMutex);
-        propertiesBlob = std::move(_blob);
-        propertiesLoaded = false;
-        propertiesCache.clear();
-    }
     [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
         return getPropertiesHash().value(propertyName);
     }
     void setProperty(const QString &_name, const QString &_value);
-    void setProperties(const QHash<QString, QString> &_props);
     [[nodiscard]] bool hasProperty(const QString &propertyName) const
     {
         return getPropertiesHash().contains(propertyName);
