@@ -474,13 +474,6 @@ Response::ResponseCode Server_Player::evaluateModifyCounter(bool gameStarted,
 Response::ResponseCode
 Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (!game->getGameStarted()) {
-        return Response::RespGameNotStarted;
-    }
-    if (conceded) {
-        return Response::RespContextError;
-    }
-
     const int counterId = cmd.counter_id();
     Server_Counter *c = counters.value(counterId, nullptr);
 
@@ -537,13 +530,6 @@ Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContai
 Response::ResponseCode
 Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (!game->getGameStarted()) {
-        return Response::RespGameNotStarted;
-    }
-    if (conceded) {
-        return Response::RespContextError;
-    }
-
     const int counterId = cmd.counter_id();
     Server_Counter *c = counters.value(counterId, nullptr);
 
