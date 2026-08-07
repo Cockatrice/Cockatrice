@@ -32,6 +32,7 @@ public:
     [[nodiscard]] virtual bool getOpenDeckInNewTab() const = 0;
     [[nodiscard]] virtual int getRewindBufferingMs() const = 0;
     [[nodiscard]] virtual qreal getFastForwardSpeed() const = 0;
+    [[nodiscard]] virtual bool getSkipEmptySections() const = 0;
     [[nodiscard]] virtual bool getStyleUserList() const = 0;
     [[nodiscard]] virtual bool getLeftJustified() const = 0;
     [[nodiscard]] virtual int getZoneViewGroupByIndex() const = 0;

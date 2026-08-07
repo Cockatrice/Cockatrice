@@ -35,6 +35,7 @@ public:
     [[nodiscard]] bool getOpenDeckInNewTab() const override;
     [[nodiscard]] int getRewindBufferingMs() const override;
     [[nodiscard]] qreal getFastForwardSpeed() const override;
+    [[nodiscard]] bool getSkipEmptySections() const override;
     [[nodiscard]] bool getStyleUserList() const override;
     [[nodiscard]] bool getLeftJustified() const override;
     [[nodiscard]] int getZoneViewGroupByIndex() const override;
@@ -66,6 +67,7 @@ public:
     void setOpenDeckInNewTab(bool _openDeckInNewTab);
     void setRewindBufferingMs(int _rewindBufferingMs);
     void setFastForwardSpeed(qreal _value);
+    void setSkipEmptySections(bool _value);
     void setStyleUserList(bool _styleUserList);
     void setLeftJustified(bool _leftJustified);
     void setZoneViewGroupByIndex(int _zoneViewGroupByIndex);
