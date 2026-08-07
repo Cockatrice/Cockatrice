@@ -55,7 +55,7 @@ void CommandZone::setMinimumHeight(int height)
     // height is unchanged (e.g. a tax counter toggled while expanded).
     const qreal oldEffectiveHeight = currentHeight();
     minimumHeight = height;
-    if (qFuzzyCompare(currentHeight(), oldEffectiveHeight)) {
+    if (qFuzzyCompare(1.0 + currentHeight(), 1.0 + oldEffectiveHeight)) {
         return;
     }
 
