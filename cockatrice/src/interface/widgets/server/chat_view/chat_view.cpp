@@ -326,7 +326,7 @@ void ChatView::appendMessage(QString message,
         }
     }
 
-    if (atBottom) {
+    if (atBottom || messageType.testFlag(Event_RoomSay::ChatHistory)) {
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
     }
 }
