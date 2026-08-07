@@ -350,6 +350,10 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
 {
     // check for a reply
     auto *reply = dynamic_cast<QNetworkReply *>(sender());
+    if (wizard()->wasCancelled()) {
+        reply->deleteLater();
+        return;
+    }
     auto errorCode = reply->error();
     if (errorCode != QNetworkReply::NoError) {
         QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));

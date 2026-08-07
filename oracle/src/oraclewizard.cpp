@@ -110,6 +110,18 @@ void OracleWizard::accept()
     QDialog::accept();
 }
 
+void OracleWizard::reject()
+{
+    cancelled = true;
+
+    const auto replies = nam->findChildren<QNetworkReply *>();
+    for (QNetworkReply *reply : replies) {
+        reply->abort();
+    }
+
+    QDialog::reject();
+}
+
 void OracleWizard::enableButtons()
 {
     button(QWizard::NextButton)->setDisabled(false);
