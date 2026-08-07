@@ -855,6 +855,7 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
         result.set_spectators_can_chat(spectatorsCanTalk);
         result.set_spectators_omniscient(spectatorsSeeEverything);
         result.set_share_decklists_on_load(shareDecklistsOnLoad);
+        result.set_enable_command_zone(enableCommandZone);
         result.set_spectators_count(getSpectatorCount());
         result.set_start_time(startTime.toSecsSinceEpoch());
     }
