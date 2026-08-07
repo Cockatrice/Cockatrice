@@ -45,6 +45,9 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     hideOpenDecklistGames = new QCheckBox(tr("Hide games with forced open decklists"));
     hideOpenDecklistGames->setChecked(filters.hideOpenDecklistGames);
 
+    hideCommandZoneGames = new QCheckBox(tr("Hide games with command zone enabled"));
+    hideCommandZoneGames->setChecked(filters.hideCommandZoneGames);
+
     maxGameAgeComboBox = new QComboBox();
     maxGameAgeComboBox->setEditable(false);
     maxGameAgeComboBox->addItems(gameAgeMap.values());
@@ -122,6 +125,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     restrictionsLayout->addWidget(hideIgnoredUserGames, 4, 0);
     restrictionsLayout->addWidget(hideNotBuddyCreatedGames, 5, 0);
     restrictionsLayout->addWidget(hideOpenDecklistGames, 6, 0);
+    restrictionsLayout->addWidget(hideCommandZoneGames, 7, 0);
 
     auto *restrictionsGroupBox = new QGroupBox(tr("Restrictions"));
     restrictionsGroupBox->setLayout(restrictionsLayout);
@@ -192,6 +196,7 @@ GameFilterConfigs DlgFilterGames::getFilters() const
             hidePasswordProtectedGames->isChecked(),
             hideNotBuddyCreatedGames->isChecked(),
             hideOpenDecklistGames->isChecked(),
+            hideCommandZoneGames->isChecked(),
             gameNameFilterEdit->text(),
             getCreatorNameFilters(),
             getGameTypeFilter(),

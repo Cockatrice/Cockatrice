@@ -34,6 +34,7 @@ private:
     QCheckBox *hideIgnoredUserGames;
     QCheckBox *hideNotBuddyCreatedGames;
     QCheckBox *hideOpenDecklistGames;
+    QCheckBox *hideCommandZoneGames;
     QLineEdit *gameNameFilterEdit;
     QLineEdit *creatorNameFilterEdit;
     QMap<int, QCheckBox *> gameTypeFilterCheckBoxes;
