@@ -393,8 +393,8 @@ void MainWindow::createActions()
     connect(aCheckCardUpdatesBackground, &QAction::triggered, this, &MainWindow::actCheckCardUpdatesBackground);
     aStatusBar = new QAction(this);
     aStatusBar->setCheckable(true);
-    aStatusBar->setChecked(SettingsCache::instance().interface().getShowStatusBar());
-    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance().interface(),
+    aStatusBar->setChecked(SettingsCache::instance().userInterface().getShowStatusBar());
+    connect(aStatusBar, &QAction::triggered, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setShowStatusBar);
     aViewLog = new QAction(this);
     connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
@@ -520,9 +520,9 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // status bar
-    connect(&SettingsCache::instance().interface(), &InterfaceSettings::showStatusBarChanged, this,
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::showStatusBarChanged, this,
             [this](bool show) { statusBar()->setVisible(show); });
-    statusBar()->setVisible(SettingsCache::instance().interface().getShowStatusBar());
+    statusBar()->setVisible(SettingsCache::instance().userInterface().getShowStatusBar());
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &MainWindow::refreshShortcuts);

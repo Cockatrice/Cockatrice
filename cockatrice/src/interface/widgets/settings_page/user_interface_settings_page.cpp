@@ -20,80 +20,80 @@ enum visualDeckStoragePromptForConversionIndex
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
     // general settings and notification settings
-    notificationsEnabledCheckBox.setChecked(SettingsCache::instance().interface().getNotificationsEnabled());
-    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    notificationsEnabledCheckBox.setChecked(SettingsCache::instance().userInterface().getNotificationsEnabled());
+    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setNotificationsEnabled);
     connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &UserInterfaceSettingsPage::setNotificationEnabled);
 
     specNotificationsEnabledCheckBox.setChecked(
-        SettingsCache::instance().interface().getSpectatorNotificationsEnabled());
-    specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().interface().getNotificationsEnabled());
-    connect(&specNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+        SettingsCache::instance().userInterface().getSpectatorNotificationsEnabled());
+    specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().userInterface().getNotificationsEnabled());
+    connect(&specNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setSpectatorNotificationsEnabled);
 
     buddyConnectNotificationsEnabledCheckBox.setChecked(
-        SettingsCache::instance().interface().getBuddyConnectNotificationsEnabled());
+        SettingsCache::instance().userInterface().getBuddyConnectNotificationsEnabled());
     buddyConnectNotificationsEnabledCheckBox.setEnabled(
-        SettingsCache::instance().interface().getNotificationsEnabled());
+        SettingsCache::instance().userInterface().getNotificationsEnabled());
     connect(&buddyConnectNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED,
-            &SettingsCache::instance().interface(), &InterfaceSettings::setBuddyConnectNotificationsEnabled);
+            &SettingsCache::instance().userInterface(), &InterfaceSettings::setBuddyConnectNotificationsEnabled);
 
-    doubleClickToPlayCheckBox.setChecked(SettingsCache::instance().interface().getDoubleClickToPlay());
-    connect(&doubleClickToPlayCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    doubleClickToPlayCheckBox.setChecked(SettingsCache::instance().userInterface().getDoubleClickToPlay());
+    connect(&doubleClickToPlayCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setDoubleClickToPlay);
 
-    clickPlaysAllSelectedCheckBox.setChecked(SettingsCache::instance().interface().getClickPlaysAllSelected());
-    connect(&clickPlaysAllSelectedCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    clickPlaysAllSelectedCheckBox.setChecked(SettingsCache::instance().userInterface().getClickPlaysAllSelected());
+    connect(&clickPlaysAllSelectedCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setClickPlaysAllSelected);
 
-    playToStackCheckBox.setChecked(SettingsCache::instance().interface().getPlayToStack());
-    connect(&playToStackCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    playToStackCheckBox.setChecked(SettingsCache::instance().userInterface().getPlayToStack());
+    connect(&playToStackCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setPlayToStack);
 
     doNotDeleteArrowsInSubPhasesCheckBox.setChecked(
-        SettingsCache::instance().interface().getDoNotDeleteArrowsInSubPhases());
-    connect(&doNotDeleteArrowsInSubPhasesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
-            &InterfaceSettings::setDoNotDeleteArrowsInSubPhases);
+        SettingsCache::instance().userInterface().getDoNotDeleteArrowsInSubPhases());
+    connect(&doNotDeleteArrowsInSubPhasesCheckBox, &QCheckBox::QT_STATE_CHANGED,
+            &SettingsCache::instance().userInterface(), &InterfaceSettings::setDoNotDeleteArrowsInSubPhases);
 
-    closeEmptyCardViewCheckBox.setChecked(SettingsCache::instance().interface().getCloseEmptyCardView());
-    connect(&closeEmptyCardViewCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    closeEmptyCardViewCheckBox.setChecked(SettingsCache::instance().userInterface().getCloseEmptyCardView());
+    connect(&closeEmptyCardViewCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setCloseEmptyCardView);
 
-    focusCardViewSearchBarCheckBox.setChecked(SettingsCache::instance().interface().getFocusCardViewSearchBar());
-    connect(&focusCardViewSearchBarCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    focusCardViewSearchBarCheckBox.setChecked(SettingsCache::instance().userInterface().getFocusCardViewSearchBar());
+    connect(&focusCardViewSearchBarCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setFocusCardViewSearchBar);
 
-    annotateTokensCheckBox.setChecked(SettingsCache::instance().interface().getAnnotateTokens());
-    connect(&annotateTokensCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    annotateTokensCheckBox.setChecked(SettingsCache::instance().userInterface().getAnnotateTokens());
+    connect(&annotateTokensCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setAnnotateTokens);
 
-    showDragSelectionCountCheckBox.setChecked(SettingsCache::instance().interface().getShowDragSelectionCount());
-    connect(&showDragSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    showDragSelectionCountCheckBox.setChecked(SettingsCache::instance().userInterface().getShowDragSelectionCount());
+    connect(&showDragSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setShowDragSelectionCount);
 
-    showTotalSelectionCountCheckBox.setChecked(SettingsCache::instance().interface().getShowTotalSelectionCount());
-    connect(&showTotalSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    showTotalSelectionCountCheckBox.setChecked(SettingsCache::instance().userInterface().getShowTotalSelectionCount());
+    connect(&showTotalSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setShowTotalSelectionCount);
 
-    useTearOffMenusCheckBox.setChecked(SettingsCache::instance().interface().getUseTearOffMenus());
-    connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    useTearOffMenusCheckBox.setChecked(SettingsCache::instance().userInterface().getUseTearOffMenus());
+    connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             [](const QT_STATE_CHANGED_T state) {
-                SettingsCache::instance().interface().setUseTearOffMenus(state == Qt::Checked);
+                SettingsCache::instance().userInterface().setUseTearOffMenus(state == Qt::Checked);
             });
 
-    keepGameChatFocusCheckBox.setChecked(SettingsCache::instance().interface().getKeepGameChatFocus());
-    connect(&keepGameChatFocusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    keepGameChatFocusCheckBox.setChecked(SettingsCache::instance().userInterface().getKeepGameChatFocus());
+    connect(&keepGameChatFocusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setKeepGameChatFocus);
 
-    showShortcutsCheckBox.setChecked(SettingsCache::instance().interface().getShowShortcuts());
+    showShortcutsCheckBox.setChecked(SettingsCache::instance().userInterface().getShowShortcuts());
     connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &UserInterfaceSettingsPage::showShortcutsChanged);
 
     showGameSelectorFilterToolbarCheckBox.setChecked(
-        SettingsCache::instance().interface().getShowGameSelectorFilterToolbar());
+        SettingsCache::instance().userInterface().getShowGameSelectorFilterToolbar());
     connect(&showGameSelectorFilterToolbarCheckBox, &QCheckBox::QT_STATE_CHANGED,
-            &SettingsCache::instance().interface(), &InterfaceSettings::setShowGameSelectorFilterToolbar);
+            &SettingsCache::instance().userInterface(), &InterfaceSettings::setShowGameSelectorFilterToolbar);
 
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
@@ -186,8 +186,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     // replay settings
     rewindBufferingMsBox.setRange(0, 9999);
-    rewindBufferingMsBox.setValue(SettingsCache::instance().interface().getRewindBufferingMs());
-    connect(&rewindBufferingMsBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().interface(),
+    rewindBufferingMsBox.setValue(SettingsCache::instance().userInterface().getRewindBufferingMs());
+    connect(&rewindBufferingMsBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setRewindBufferingMs);
 
     auto *replayGrid = new QGridLayout;
@@ -225,7 +225,7 @@ void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
 
 void UserInterfaceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
 {
-    SettingsCache::instance().interface().setShowShortcuts(value);
+    SettingsCache::instance().userInterface().setShowShortcuts(value);
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, value == 0); // 0 = unchecked
 }
 

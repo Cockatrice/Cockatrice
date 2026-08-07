@@ -14,7 +14,7 @@ ReplayQuickSettingsWidget::ReplayQuickSettingsWidget(QWidget *parent) : Settings
     fastForwardSpeedBox.setMinimum(1);
     fastForwardSpeedBox.setMaximum(99.9);
     fastForwardSpeedBox.setDecimals(1);
-    fastForwardSpeedBox.setValue(SettingsCache::instance().interface().getFastForwardSpeed());
+    fastForwardSpeedBox.setValue(SettingsCache::instance().userInterface().getFastForwardSpeed());
     connect(&fastForwardSpeedBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
             &ReplayQuickSettingsWidget::actUpdateFastForwardSpeed);
 
@@ -40,6 +40,6 @@ void ReplayQuickSettingsWidget::retranslateUi()
 
 void ReplayQuickSettingsWidget::actUpdateFastForwardSpeed(qreal value)
 {
-    SettingsCache::instance().interface().setFastForwardSpeed(value);
+    SettingsCache::instance().userInterface().setFastForwardSpeed(value);
     emit fastForwardSpeedChanged(value);
 }

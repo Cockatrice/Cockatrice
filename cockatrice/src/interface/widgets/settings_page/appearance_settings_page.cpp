@@ -209,12 +209,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
             &CardsDisplaySettings::setStackCardOverlapPercent);
 
     cardViewInitialRowsMaxBox.setRange(1, 999);
-    cardViewInitialRowsMaxBox.setValue(SettingsCache::instance().interface().getCardViewInitialRowsMax());
+    cardViewInitialRowsMaxBox.setValue(SettingsCache::instance().userInterface().getCardViewInitialRowsMax());
     connect(&cardViewInitialRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &AppearanceSettingsPage::cardViewInitialRowsMaxChanged);
 
     cardViewExpandedRowsMaxBox.setRange(1, 999);
-    cardViewExpandedRowsMaxBox.setValue(SettingsCache::instance().interface().getCardViewExpandedRowsMax());
+    cardViewExpandedRowsMaxBox.setValue(SettingsCache::instance().userInterface().getCardViewExpandedRowsMax());
     connect(&cardViewExpandedRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &AppearanceSettingsPage::cardViewExpandedRowsMaxChanged);
 
@@ -276,12 +276,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardCountersGroupBox->setLayout(cardCountersLayout);
 
     // Hand layout
-    horizontalHandCheckBox.setChecked(settings.interface().getHorizontalHand());
-    connect(&horizontalHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.interface(),
+    horizontalHandCheckBox.setChecked(settings.userInterface().getHorizontalHand());
+    connect(&horizontalHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.userInterface(),
             &InterfaceSettings::setHorizontalHand);
 
-    leftJustifiedHandCheckBox.setChecked(settings.interface().getLeftJustified());
-    connect(&leftJustifiedHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.interface(),
+    leftJustifiedHandCheckBox.setChecked(settings.userInterface().getLeftJustified());
+    connect(&leftJustifiedHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.userInterface(),
             &InterfaceSettings::setLeftJustified);
 
     auto *handGrid = new QGridLayout;
@@ -292,13 +292,13 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     handGroupBox->setLayout(handGrid);
 
     // table grid layout
-    invertVerticalCoordinateCheckBox.setChecked(settings.interface().getInvertVerticalCoordinate());
-    connect(&invertVerticalCoordinateCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.interface(),
+    invertVerticalCoordinateCheckBox.setChecked(settings.userInterface().getInvertVerticalCoordinate());
+    connect(&invertVerticalCoordinateCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.userInterface(),
             &InterfaceSettings::setInvertVerticalCoordinate);
 
     minPlayersForMultiColumnLayoutEdit.setMinimum(2);
-    minPlayersForMultiColumnLayoutEdit.setValue(settings.interface().getMinPlayersForMultiColumnLayout());
-    connect(&minPlayersForMultiColumnLayoutEdit, qOverload<int>(&QSpinBox::valueChanged), &settings.interface(),
+    minPlayersForMultiColumnLayoutEdit.setValue(settings.userInterface().getMinPlayersForMultiColumnLayout());
+    connect(&minPlayersForMultiColumnLayoutEdit, qOverload<int>(&QSpinBox::valueChanged), &settings.userInterface(),
             &InterfaceSettings::setMinPlayersForMultiColumnLayout);
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
@@ -390,7 +390,7 @@ void AppearanceSettingsPage::overrideAllCardArtWithPersonalPreferenceToggled(QT_
  */
 void AppearanceSettingsPage::cardViewInitialRowsMaxChanged(int value)
 {
-    SettingsCache::instance().interface().setCardViewInitialRowsMax(value);
+    SettingsCache::instance().userInterface().setCardViewInitialRowsMax(value);
     if (cardViewExpandedRowsMaxBox.value() < value) {
         cardViewExpandedRowsMaxBox.setValue(value);
     }
@@ -403,7 +403,7 @@ void AppearanceSettingsPage::cardViewInitialRowsMaxChanged(int value)
  */
 void AppearanceSettingsPage::cardViewExpandedRowsMaxChanged(int value)
 {
-    SettingsCache::instance().interface().setCardViewExpandedRowsMax(value);
+    SettingsCache::instance().userInterface().setCardViewExpandedRowsMax(value);
     if (cardViewInitialRowsMaxBox.value() > value) {
         cardViewInitialRowsMaxBox.setValue(value);
     }

@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
 
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus,
-                       !SettingsCache::instance().interface().getShowShortcuts());
+                       !SettingsCache::instance().userInterface().getShowShortcuts());
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);

@@ -418,7 +418,7 @@ CardsDisplaySettings &SettingsCache::cardsDisplay() const
     return *cardsDisplaySettings;
 }
 
-InterfaceSettings &SettingsCache::interface() const
+InterfaceSettings &SettingsCache::userInterface() const
 {
     return *interfaceSettings;
 }

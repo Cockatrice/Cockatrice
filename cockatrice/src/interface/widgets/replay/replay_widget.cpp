@@ -98,7 +98,7 @@ void ReplayWidget::replayPlayButtonToggled(bool checked)
 
 void ReplayWidget::updateTimeScaleFactor(bool isFastForward)
 {
-    qreal factor = isFastForward ? SettingsCache::instance().interface().getFastForwardSpeed() : 1.0;
+    qreal factor = isFastForward ? SettingsCache::instance().userInterface().getFastForwardSpeed() : 1.0;
     replayManager->setTimeScaleFactor(factor);
 }
 

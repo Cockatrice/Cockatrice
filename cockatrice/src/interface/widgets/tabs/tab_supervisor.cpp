@@ -1009,7 +1009,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
         tab->setContentsChanged(true);
         setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
     }
-    if (globalEvent && SettingsCache::instance().interface().getNotificationsEnabled()) {
+    if (globalEvent && SettingsCache::instance().userInterface().getNotificationsEnabled()) {
         QApplication::alert(this);
     }
 }
@@ -1104,7 +1104,7 @@ void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
             }
         }
 
-        if (SettingsCache::instance().interface().getBuddyConnectNotificationsEnabled()) {
+        if (SettingsCache::instance().userInterface().getBuddyConnectNotificationsEnabled()) {
             QApplication::alert(this);
             this->actShowPopup(tr("Your buddy %1 has signed on!").arg(userName));
         }

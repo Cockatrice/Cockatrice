@@ -80,12 +80,12 @@ GameSelector::GameSelector(AbstractClient *_client,
     if (showFilters && restoresettings) {
         quickFilterToolBar = new GameSelectorQuickFilterToolBar(this, tabSupervisor, gameListProxyModel, gameTypeMap);
         quickFilterToolBar->setVisible(showFilters && restoresettings &&
-                                       SettingsCache::instance().interface().getShowGameSelectorFilterToolbar());
+                                       SettingsCache::instance().userInterface().getShowGameSelectorFilterToolbar());
 
-        connect(&SettingsCache::instance().interface(), &InterfaceSettings::showGameSelectorFilterToolbarChanged, this,
-                [this] {
+        connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::showGameSelectorFilterToolbarChanged,
+                this, [this] {
                     quickFilterToolBar->setVisible(
-                        SettingsCache::instance().interface().getShowGameSelectorFilterToolbar());
+                        SettingsCache::instance().userInterface().getShowGameSelectorFilterToolbar());
                 });
     } else {
         quickFilterToolBar = nullptr;

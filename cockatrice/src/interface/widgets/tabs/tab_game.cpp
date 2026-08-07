@@ -258,7 +258,7 @@ void TabGame::resetChatAndPhase()
 void TabGame::emitUserEvent()
 {
     bool globalEvent = !game->getPlayerManager()->isSpectator() ||
-                       SettingsCache::instance().interface().getSpectatorNotificationsEnabled();
+                       SettingsCache::instance().userInterface().getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
     updatePlayerListDockTitle();
 }

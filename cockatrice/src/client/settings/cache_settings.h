@@ -144,7 +144,7 @@ public:
     [[nodiscard]] UpdatesSettings &updates() const;
     [[nodiscard]] PersonalSettings &personal() const;
     [[nodiscard]] CardsDisplaySettings &cardsDisplay() const;
-    [[nodiscard]] InterfaceSettings &interface() const;
+    [[nodiscard]] InterfaceSettings &userInterface() const;
     [[nodiscard]] DeckEditorSettings &deckEditor() const;
     [[nodiscard]] PathsSettings &paths() const;
     [[nodiscard]] VisualDeckStorageSettings &visualDeckStorage() const;

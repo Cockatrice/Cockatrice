@@ -47,11 +47,11 @@ GameView::GameView(GameScene *scene, QWidget *parent) : QGraphicsView(scene, par
     connect(scene, &GameScene::sigResizeRubberBand, this, &GameView::resizeRubberBand);
     connect(scene, &GameScene::sigStopRubberBand, this, &GameView::stopRubberBand);
     connect(scene, &QGraphicsScene::selectionChanged, this, [this]() { updateTotalSelectionCount(); });
-    connect(&SettingsCache::instance().interface(), &InterfaceSettings::tallyTypeChanged, this,
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::tallyTypeChanged, this,
             [this] { updateTotalSelectionCount(); });
 
-    setFocusDisabled(SettingsCache::instance().interface().getKeepGameChatFocus());
-    connect(&SettingsCache::instance().interface(), &InterfaceSettings::keepGameChatFocusChanged, this,
+    setFocusDisabled(SettingsCache::instance().userInterface().getKeepGameChatFocus());
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::keepGameChatFocusChanged, this,
             &GameView::setFocusDisabled);
 
     aCloseMostRecentZoneView = new QAction(this);
@@ -130,7 +130,7 @@ void GameView::resizeRubberBand(const QPointF &cursorPoint, int selectedCount)
     QRect rect = QRect(mapFromScene(selectionOrigin), cursor).normalized();
     rubberBand->setGeometry(rect);
 
-    if (!SettingsCache::instance().interface().getShowDragSelectionCount()) {
+    if (!SettingsCache::instance().userInterface().getShowDragSelectionCount()) {
         dragCountLabel->hide();
         return;
     }
@@ -239,7 +239,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
 
     int count = scene()->selectedItems().count();
 
-    if (!SettingsCache::instance().interface().getShowTotalSelectionCount() || count <= 1) {
+    if (!SettingsCache::instance().userInterface().getShowTotalSelectionCount() || count <= 1) {
         totalCountLabel->hide();
     } else {
         totalCountLabel->setText(QString::number(count));
@@ -251,7 +251,7 @@ void GameView::updateTotalSelectionCount(const QSize &viewSize)
         totalCountLabel->show();
     }
 
-    TallyType tallyType = Tally::intToType(SettingsCache::instance().interface().getTallyType());
+    TallyType tallyType = Tally::intToType(SettingsCache::instance().userInterface().getTallyType());
 
     GameScene *gameScene = static_cast<GameScene *>(scene());
     QList<TallyRow> entries = Tally::compute(gameScene->selectedCards(), tallyType);
