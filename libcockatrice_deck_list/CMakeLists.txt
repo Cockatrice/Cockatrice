@@ -14,11 +14,7 @@ set(HEADERS
     libcockatrice/deck_list/sideboard_plan.h
 )
 
-if(Qt6_FOUND)
-  qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-elseif(Qt5_FOUND)
-  qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
-endif()
+qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
 
 add_library(
   libcockatrice_deck_list STATIC
