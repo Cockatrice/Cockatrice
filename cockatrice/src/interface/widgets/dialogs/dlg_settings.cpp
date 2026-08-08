@@ -1,3 +1,8 @@
+/**
+ * @file dlg_settings.cpp
+ * @brief Implementation of the main settings dialog
+ * @ingroup Dialogs
+ */
 #include "dlg_settings.h"
 
 #include "../../../client/settings/cache_settings.h"
@@ -6,6 +11,8 @@
 #include "../settings_page/deck_editor_settings_page.h"
 #include "../settings_page/general_settings_page.h"
 #include "../settings_page/messages_settings_page.h"
+#include "../settings_page/settings_search_delegate.h"
+#include "../settings_page/settings_search_model.h"
 #include "../settings_page/shortcut_settings_page.h"
 #include "../settings_page/sound_settings_page.h"
 #include "../settings_page/storage_settings_page.h"
@@ -13,20 +20,36 @@
 #include "libcockatrice/card/database/card_database_loader.h"
 #include "libcockatrice/card/database/card_database_manager.h"
 
+#include <QAbstractItemView>
 #include <QCloseEvent>
-#include <QDialogButtonBox>
 #include <QDir>
+#include <QFrame>
+#include <QGraphicsOpacityEffect>
 #include <QGuiApplication>
-#include <QListWidget>
+#include <QHBoxLayout>
+#include <QKeyEvent>
+#include <QLineEdit>
+#include <QListView>
 #include <QMessageBox>
+#include <QPropertyAnimation>
+#include <QPushButton>
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QSequentialAnimationGroup>
+#include <QShortcut>
+#include <QStackedLayout>
 #include <QStackedWidget>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 
+/**
+ * @brief Wraps a widget in a scroll area for long settings pages
+ * @param widget The widget to wrap
+ * @return The scroll area containing the widget
+ */
 static QScrollArea *makeScrollable(QWidget *widget)
 {
     widget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
@@ -40,112 +63,355 @@ static QScrollArea *makeScrollable(QWidget *widget)
     return scrollArea;
 }
 
-DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent)
+/**
+ * @brief Returns the theme icon resources for each settings page, indexed by SettingsPage order
+ */
+static QStringList pageIconResources()
+{
+    return {QStringLiteral("theme:config/general"),   QStringLiteral("theme:config/appearance"),
+            QStringLiteral("theme:config/interface"), QStringLiteral("theme:config/deckeditor"),
+            QStringLiteral("theme:config/storage"),   QStringLiteral("theme:config/messages"),
+            QStringLiteral("theme:config/sound"),     QStringLiteral("theme:config/shorcuts")};
+}
+
+DlgSettings::DlgSettings(QWidget *parent) : QDialog(parent), currentTabIndex(0), searchActive(false)
 {
     auto rec = QGuiApplication::primaryScreen()->availableGeometry();
-    this->setMinimumSize(qMin(700, rec.width()), qMin(700, rec.height()));
+    setMinimumSize(qMin(750, rec.width()), qMin(700, rec.height()));
 
     connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &DlgSettings::updateLanguage);
 
-    contentsWidget = new QListWidget;
-    contentsWidget->setViewMode(QListView::IconMode);
-    contentsWidget->setIconSize(QSize(58, 50));
-    contentsWidget->setMovement(QListView::Static);
-    contentsWidget->setMinimumHeight(85);
-    contentsWidget->setMaximumHeight(85);
-    contentsWidget->setSpacing(5);
-
-    pagesWidget = new QStackedWidget;
-    pagesWidget->addWidget(makeScrollable(new GeneralSettingsPage));
-    pagesWidget->addWidget(makeScrollable(new AppearanceSettingsPage));
-    pagesWidget->addWidget(makeScrollable(new UserInterfaceSettingsPage));
-    pagesWidget->addWidget(new DeckEditorSettingsPage);
-    pagesWidget->addWidget(makeScrollable(new StorageSettingsPage));
-    pagesWidget->addWidget(new MessagesSettingsPage);
-    pagesWidget->addWidget(new SoundSettingsPage);
-    pagesWidget->addWidget(new ShortcutSettingsPage);
-
-    createIcons();
-    contentsWidget->setCurrentRow(0);
-
-    auto *vboxLayout = new QVBoxLayout;
-    vboxLayout->addWidget(contentsWidget);
-    vboxLayout->addWidget(pagesWidget);
-
-    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgSettings::close);
-
-    auto *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout(vboxLayout);
-    mainLayout->addSpacing(2);
-    mainLayout->addWidget(buttonBox);
-    setLayout(mainLayout);
+    setupUi();
 
     connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this, &DlgSettings::retranslateUi);
     retranslateUi();
 
+    searchEdit->setFocus();
+
     adjustSize();
 }
 
-void DlgSettings::createIcons()
+void DlgSettings::setupUi()
 {
-    generalButton = new QListWidgetItem(contentsWidget);
-    generalButton->setTextAlignment(Qt::AlignHCenter);
-    generalButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    generalButton->setIcon(QPixmap("theme:config/general"));
+    // Search bar
+    searchEdit = new QLineEdit;
+    searchEdit->setClearButtonEnabled(true);
+    searchEdit->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+    searchEdit->installEventFilter(this);
+    connect(searchEdit, &QLineEdit::textChanged, this, &DlgSettings::onSearchTextChanged);
 
-    appearanceButton = new QListWidgetItem(contentsWidget);
-    appearanceButton->setTextAlignment(Qt::AlignHCenter);
-    appearanceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    appearanceButton->setIcon(QPixmap("theme:config/appearance"));
+    auto *searchLayout = new QHBoxLayout;
+    searchLayout->addWidget(searchEdit);
 
-    userInterfaceButton = new QListWidgetItem(contentsWidget);
-    userInterfaceButton->setTextAlignment(Qt::AlignHCenter);
-    userInterfaceButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    userInterfaceButton->setIcon(QPixmap("theme:config/interface"));
+    // Tab bar (built in setupTabBar)
+    setupTabBar();
 
-    deckEditorButton = new QListWidgetItem(contentsWidget);
-    deckEditorButton->setTextAlignment(Qt::AlignHCenter);
-    deckEditorButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    deckEditorButton->setIcon(QPixmap("theme:config/deckeditor"));
+    // Pages stacked widget
+    pagesWidget = new QStackedWidget;
 
-    storageButton = new QListWidgetItem(contentsWidget);
-    storageButton->setTextAlignment(Qt::AlignHCenter);
-    storageButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    storageButton->setIcon(QPixmap("theme:config/storage"));
+    auto *generalPage = new GeneralSettingsPage;
+    auto *appearancePage = new AppearanceSettingsPage;
+    auto *userInterfacePage = new UserInterfaceSettingsPage;
+    auto *deckEditorPage = new DeckEditorSettingsPage;
+    auto *storagePage = new StorageSettingsPage;
+    auto *messagesPage = new MessagesSettingsPage;
+    auto *soundPage = new SoundSettingsPage;
+    auto *shortcutsPage = new ShortcutSettingsPage;
 
-    messagesButton = new QListWidgetItem(contentsWidget);
-    messagesButton->setTextAlignment(Qt::AlignHCenter);
-    messagesButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    messagesButton->setIcon(QPixmap("theme:config/messages"));
+    pages.append(generalPage);
+    pages.append(appearancePage);
+    pages.append(userInterfacePage);
+    pages.append(deckEditorPage);
+    pages.append(storagePage);
+    pages.append(messagesPage);
+    pages.append(soundPage);
+    pages.append(shortcutsPage);
 
-    soundButton = new QListWidgetItem(contentsWidget);
-    soundButton->setTextAlignment(Qt::AlignHCenter);
-    soundButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    soundButton->setIcon(QPixmap("theme:config/sound"));
+    pagesWidget->addWidget(makeScrollable(generalPage));
+    pagesWidget->addWidget(makeScrollable(appearancePage));
+    pagesWidget->addWidget(makeScrollable(userInterfacePage));
+    pagesWidget->addWidget(makeScrollable(deckEditorPage));
+    pagesWidget->addWidget(makeScrollable(storagePage));
+    pagesWidget->addWidget(messagesPage);
+    pagesWidget->addWidget(soundPage);
+    pagesWidget->addWidget(shortcutsPage);
 
-    shortcutsButton = new QListWidgetItem(contentsWidget);
-    shortcutsButton->setTextAlignment(Qt::AlignHCenter);
-    shortcutsButton->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    shortcutsButton->setIcon(QPixmap("theme:config/shorcuts"));
+    Q_ASSERT(pages.size() == NumPages);
 
-    connect(contentsWidget, &QListWidget::currentItemChanged, this, &DlgSettings::changePage);
+    // Search results view (hidden by default)
+    searchResultsView = new QListView;
+    searchResultsView->setUniformItemSizes(false);
+    searchResultsView->setSelectionMode(QAbstractItemView::SingleSelection);
+    searchResultsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    searchResultsView->setVisible(false);
+    searchResultsView->setStyleSheet(
+        "QListView::item:selected { background: palette(highlight); color: palette(highlighted-text); }");
+
+    searchModel = new SettingsSearchModel(this);
+    searchDelegate = new SettingsSearchDelegate(this);
+    searchResultsView->setModel(searchModel);
+    searchResultsView->setItemDelegate(searchDelegate);
+    connect(searchResultsView, &QListView::clicked, this, &DlgSettings::onSearchResultClicked);
+
+    connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, [this] {
+        const QStringList icons = pageIconResources();
+        for (int i = 0; i < tabButtons.size() && i < icons.size(); ++i) {
+            tabButtons[i]->setIcon(QPixmap(icons[i]));
+        }
+        searchDelegate->setPageIcons(icons);
+        searchResultsView->viewport()->update();
+    });
+
+    // Build search index after pages are created
+    buildSearchIndex();
+
+    // Pages container (stacked widget + search results overlay)
+    pagesContainer = new QWidget;
+    auto *containerLayout = new QStackedLayout;
+    containerLayout->setStackingMode(QStackedLayout::StackAll);
+    containerLayout->addWidget(pagesWidget);
+    containerLayout->addWidget(searchResultsView);
+    pagesContainer->setLayout(containerLayout);
+
+    // Bottom buttons
+    auto *buttonBox = new QHBoxLayout;
+    buttonBox->addStretch();
+    okButton = new QPushButton;
+    okButton->setDefault(true);
+    connect(okButton, &QPushButton::clicked, this, &DlgSettings::close);
+    buttonBox->addWidget(okButton);
+
+    // Main layout
+    auto *mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(searchLayout);
+    mainLayout->addWidget(tabBarWidget);
+    auto *separator = new QFrame;
+    separator->setFrameShape(QFrame::HLine);
+    separator->setFrameShadow(QFrame::Sunken);
+    mainLayout->addWidget(separator);
+    mainLayout->addWidget(pagesContainer);
+    mainLayout->addSpacing(4);
+    mainLayout->addLayout(buttonBox);
+    setLayout(mainLayout);
+
+    // Keyboard shortcuts
+    auto *searchShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F), this);
+    connect(searchShortcut, &QShortcut::activated, searchEdit, qOverload<>(&QLineEdit::setFocus));
+
+    auto *nextTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab), this);
+    connect(nextTabShortcut, &QShortcut::activated, this, [this] {
+        int next = (currentTabIndex + 1) % tabButtons.size();
+        setActiveTab(next);
+    });
+
+    auto *prevTabShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab), this);
+    connect(prevTabShortcut, &QShortcut::activated, this, [this] {
+        int prev = (currentTabIndex - 1 + tabButtons.size()) % tabButtons.size();
+        setActiveTab(prev);
+    });
+
+    // Initialize to first tab
+    setActiveTab(0);
 }
 
-void DlgSettings::changePage(QListWidgetItem *current, QListWidgetItem *previous)
+void DlgSettings::setupTabBar()
 {
-    if (!current) {
-        current = previous;
+    tabBarWidget = new QWidget;
+    auto *tabLayout = new QHBoxLayout;
+    tabLayout->setContentsMargins(0, 0, 0, 0);
+    tabLayout->setSpacing(2);
+
+    const QStringList iconResources = pageIconResources();
+
+    for (int i = 0; i < iconResources.size(); ++i) {
+        auto *tabButton = new QToolButton;
+        tabButton->setCheckable(true);
+        tabButton->setIcon(QPixmap(iconResources[i]));
+        tabButton->setIconSize(QSize(48, 48));
+        tabButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        tabButton->setAutoExclusive(true);
+        tabButton->setMinimumHeight(85);
+        tabButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+        connect(tabButton, &QToolButton::clicked, this, [this, idx = i] { onTabClicked(idx); });
+
+        tabButtons.append(tabButton);
+        tabLayout->addWidget(tabButton);
     }
 
-    pagesWidget->setCurrentIndex(contentsWidget->row(current));
+    tabBarWidget->setLayout(tabLayout);
+}
+
+void DlgSettings::buildSearchIndex()
+{
+    QList<SettingsSearchEntry> allEntries;
+
+    const QStringList pageNames = translatedPageNames();
+    searchDelegate->setPageNames(pageNames);
+    searchDelegate->setPageIcons(pageIconResources());
+
+    for (int i = 0; i < pages.size(); ++i) {
+        QList<SettingsSearchEntry> pageEntries = pages[i]->getSearchEntries();
+        for (auto &entry : pageEntries) {
+            if (entry.pageIndex == -1) {
+                entry.pageIndex = i;
+            }
+        }
+        allEntries.append(pageEntries);
+    }
+
+    searchModel->setSourceEntries(allEntries);
+}
+
+void DlgSettings::onTabClicked(int index)
+{
+    if (searchActive) {
+        switchToTabMode();
+    }
+    setActiveTab(index);
+}
+
+void DlgSettings::setActiveTab(int index)
+{
+    if (index < 0 || index >= tabButtons.size()) {
+        return;
+    }
+
+    currentTabIndex = index;
+    pagesWidget->setCurrentIndex(index);
+
+    for (int i = 0; i < tabButtons.size(); ++i) {
+        tabButtons[i]->setChecked(i == index);
+    }
+
+    // Style active tab with a thick accent border + subtle background tint
+    for (int i = 0; i < tabButtons.size(); ++i) {
+        if (i == index) {
+            tabButtons[i]->setStyleSheet("QToolButton { border: none; border-bottom: 3px solid palette(highlight); "
+                                         "border-top-left-radius: 4px; border-top-right-radius: 4px; "
+                                         "background: palette(window); padding-bottom: 1px; }");
+        } else {
+            tabButtons[i]->setStyleSheet("QToolButton { border: none; border-bottom: 1px solid transparent; "
+                                         "border-top-left-radius: 4px; border-top-right-radius: 4px; "
+                                         "background: transparent; }");
+        }
+    }
+}
+
+void DlgSettings::flashWidget(QWidget *widget)
+{
+    auto *overlay = new QWidget(widget);
+    overlay->setGeometry(widget->rect());
+    overlay->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+
+    QPalette pal = overlay->palette();
+    QColor flashColor = pal.color(QPalette::Highlight);
+    flashColor.setAlpha(100);
+    pal.setBrush(QPalette::Window, flashColor);
+    overlay->setPalette(pal);
+    overlay->setAutoFillBackground(true);
+
+    auto *effect = new QGraphicsOpacityEffect(overlay);
+    effect->setOpacity(0.0);
+    overlay->setGraphicsEffect(effect);
+    overlay->show();
+    overlay->raise();
+
+    auto *flashIn = new QPropertyAnimation(effect, "opacity");
+    flashIn->setDuration(120);
+    flashIn->setStartValue(0.0);
+    flashIn->setEndValue(0.6);
+    flashIn->setEasingCurve(QEasingCurve::OutCubic);
+
+    auto *fadeOut = new QPropertyAnimation(effect, "opacity");
+    fadeOut->setDuration(900);
+    fadeOut->setStartValue(0.6);
+    fadeOut->setEndValue(0.0);
+    fadeOut->setEasingCurve(QEasingCurve::InCubic);
+
+    auto *group = new QSequentialAnimationGroup(overlay);
+    group->addAnimation(flashIn);
+    group->addAnimation(fadeOut);
+
+    connect(group, &QSequentialAnimationGroup::finished, overlay, &QWidget::deleteLater);
+
+    group->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void DlgSettings::onSearchTextChanged(const QString &text)
+{
+    searchModel->setFilterString(text);
+
+    if (searchModel->isFilterActive() && !text.trimmed().isEmpty()) {
+        if (!searchActive) {
+            switchToSearchMode();
+        }
+        if (searchModel->rowCount(QModelIndex()) > 0) {
+            searchResultsView->setCurrentIndex(searchModel->index(0));
+        }
+    } else if (searchActive) {
+        switchToTabMode();
+    }
+}
+
+void DlgSettings::switchToSearchMode()
+{
+    searchActive = true;
+    tabBarWidget->setVisible(false);
+    pagesWidget->setVisible(false);
+    searchResultsView->setVisible(true);
+    if (searchModel->rowCount(QModelIndex()) > 0) {
+        searchResultsView->setCurrentIndex(searchModel->index(0));
+    }
+}
+
+void DlgSettings::switchToTabMode()
+{
+    searchActive = false;
+    tabBarWidget->setVisible(true);
+    pagesWidget->setVisible(true);
+    searchResultsView->setVisible(false);
+    searchEdit->blockSignals(true);
+    searchEdit->clear();
+    searchEdit->blockSignals(false);
+    setActiveTab(currentTabIndex);
+}
+
+void DlgSettings::onSearchResultClicked(const QModelIndex &index)
+{
+    navigateToSearchResult(index);
+}
+
+void DlgSettings::navigateToSearchResult(const QModelIndex &index)
+{
+    SettingsSearchEntry entry = searchModel->entryForIndex(index);
+    if (entry.pageIndex < 0 || entry.pageIndex >= pages.size()) {
+        return;
+    }
+
+    // Switch to the page
+    switchToTabMode();
+    setActiveTab(entry.pageIndex);
+
+    // Scroll to the widget, focus it, and flash to highlight it
+    if (entry.widget) {
+        QWidget *widget = entry.widget;
+        while (widget) {
+            if (auto *scrollArea = qobject_cast<QScrollArea *>(widget)) {
+                scrollArea->ensureWidgetVisible(entry.widget);
+                break;
+            }
+            widget = widget->parentWidget();
+        }
+        entry.widget->setFocus();
+        flashWidget(entry.widget);
+    }
 }
 
 void DlgSettings::setTab(int index)
 {
-    if (index <= contentsWidget->count() - 1 && index >= 0) {
-        changePage(contentsWidget->item(index), contentsWidget->currentItem());
-        contentsWidget->setCurrentRow(index);
+    if (index >= 0 && index < tabButtons.size()) {
+        setActiveTab(index);
     }
 }
 
@@ -153,6 +419,49 @@ void DlgSettings::updateLanguage()
 {
     qApp->removeTranslator(translator); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
     installNewTranslator();
+}
+
+bool DlgSettings::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == searchEdit && event->type() == QEvent::KeyPress) {
+        auto *keyEvent = static_cast<QKeyEvent *>(event);
+        if (keyEvent->key() == Qt::Key_Escape) {
+            if (searchActive) {
+                switchToTabMode();
+                return true;
+            }
+        } else if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
+            if (searchActive) {
+                if (searchResultsView->currentIndex().isValid()) {
+                    navigateToSearchResult(searchResultsView->currentIndex());
+                }
+                return true;
+            }
+        } else if (keyEvent->key() == Qt::Key_Down) {
+            if (searchActive) {
+                int nextRow = searchResultsView->currentIndex().row() + 1;
+                if (nextRow >= searchModel->rowCount()) {
+                    nextRow = 0;
+                }
+                searchResultsView->setCurrentIndex(searchModel->index(nextRow));
+                searchResultsView->scrollTo(searchModel->index(nextRow));
+                return true;
+            }
+        } else if (keyEvent->key() == Qt::Key_Up) {
+            if (searchActive) {
+                int prevRow = searchResultsView->currentIndex().row() - 1;
+                if (prevRow < 0) {
+                    prevRow = searchModel->rowCount() - 1;
+                }
+                if (prevRow >= 0) {
+                    searchResultsView->setCurrentIndex(searchModel->index(prevRow));
+                    searchResultsView->scrollTo(searchModel->index(prevRow));
+                }
+                return true;
+            }
+        }
+    }
+    return QDialog::eventFilter(watched, event);
 }
 
 void DlgSettings::closeEvent(QCloseEvent *event)
@@ -209,7 +518,6 @@ void DlgSettings::closeEvent(QCloseEvent *event)
 
     if (!QDir(SettingsCache::instance().paths().getDeckPath()).exists() ||
         SettingsCache::instance().paths().getDeckPath().isEmpty()) {
-        //! \todo Prompt to create the deck directory.
         if (QMessageBox::critical(
                 this, tr("Error"),
                 tr("The path to your deck directory is invalid. Would you like to go back and set the correct path?"),
@@ -221,7 +529,6 @@ void DlgSettings::closeEvent(QCloseEvent *event)
 
     if (!QDir(SettingsCache::instance().paths().getPicsPath()).exists() ||
         SettingsCache::instance().paths().getPicsPath().isEmpty()) {
-        //! \todo Prompt to create the pictures directory.
         if (QMessageBox::critical(this, tr("Error"),
                                   tr("The path to your card pictures directory is invalid. Would you like to go back "
                                      "and set the correct path?"),
@@ -236,15 +543,26 @@ void DlgSettings::closeEvent(QCloseEvent *event)
 void DlgSettings::retranslateUi()
 {
     setWindowTitle(tr("Settings"));
+    retranslateTabNames();
 
-    generalButton->setText(tr("General"));
-    appearanceButton->setText(tr("Appearance"));
-    userInterfaceButton->setText(tr("User Interface"));
-    storageButton->setText(tr("Storage"));
-    deckEditorButton->setText(tr("Card Sources"));
-    messagesButton->setText(tr("Chat"));
-    soundButton->setText(tr("Sound"));
-    shortcutsButton->setText(tr("Shortcuts"));
+    searchEdit->setPlaceholderText(tr("Search settings..."));
+    okButton->setText(tr("OK"));
 
-    contentsWidget->reset();
+    // Rebuild search index for translated text
+    buildSearchIndex();
+}
+
+QStringList DlgSettings::translatedPageNames()
+{
+    return {tr("General"), tr("Appearance"), tr("User Interface"), tr("Card Sources"),
+            tr("Storage"), tr("Chat"),       tr("Sound"),          tr("Shortcuts")};
+}
+
+void DlgSettings::retranslateTabNames()
+{
+    const QStringList tabLabels = translatedPageNames();
+
+    for (int i = 0; i < tabButtons.size() && i < tabLabels.size(); ++i) {
+        tabButtons[i]->setText(tabLabels[i]);
+    }
 }
