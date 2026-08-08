@@ -46,3 +46,27 @@ void DeckEditorSettings::setDefaultDeckEditorType(int _defaultDeckEditorType)
 {
     setValue(_defaultDeckEditorType, "defaultDeckEditorType");
 }
+
+int DeckEditorSettings::getCommanderSpellbookIntegrationEnabled() const
+{
+    return getValue("commanderspellbookintegrationenabled", QString(), QString(),
+                    commanderSpellbookIntegrationEnabledIndexUnprompted)
+        .toInt();
+}
+
+bool DeckEditorSettings::getCommanderSpellbookIntegrationUseOfficialBracketNames() const
+{
+    return getValue("commanderspellbookintegrationuseofficialbracketnames", QString(), QString(), false).toBool();
+}
+
+void DeckEditorSettings::setCommanderSpellbookIntegrationEnabled(int _commanderSpellbookIntegrationEnabled)
+{
+    setValue(_commanderSpellbookIntegrationEnabled, "commanderspellbookintegrationenabled");
+    emit commanderSpellbookIntegrationEnabledChanged(_commanderSpellbookIntegrationEnabled);
+}
+
+void DeckEditorSettings::setCommanderSpellbookIntegrationUseOfficialBracketNames(bool _useOfficialBracketNames)
+{
+    setValue(_useOfficialBracketNames, "commanderspellbookintegrationuseofficialbracketnames");
+    emit commanderSpellbookIntegrationUseOfficialBracketNamesChanged(_useOfficialBracketNames);
+}
