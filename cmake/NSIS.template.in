@@ -294,20 +294,6 @@ Section "Application" SecApplication
 SetShellVarContext all
 SetOutPath "$INSTDIR"
 
-${If} $PortableMode = 0
-
-    ; --- Register .cod file type ---
-    WriteRegStr HKCR ".cod" "" "Cockatrice"
-    WriteRegStr HKCR "Cockatrice" "" "Cockatrice Deck File"
-    WriteRegStr HKCR "Cockatrice\shell\open\command" "" '"$INSTDIR\cockatrice.exe" "%1"'
-
-    ; --- Register custom URI protocol ---
-    WriteRegStr HKCR "cockatrice" "" "URL: Cockatrice Protocol"
-    WriteRegStr HKCR "cockatrice" "URL Protocol" ""
-    WriteRegStr HKCR "cockatrice\shell\open\command" "" '"$INSTDIR\cockatrice.exe" "%1"'
-
-${EndIf}
-
 ${If} $PortableMode = 1
 ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	; upgrade portable mode
@@ -416,18 +402,6 @@ Section "un.Application" UnSecApplication
 	RMDir "$SMPROGRAMS\Cockatrice"
 
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
-
-	; Only remove the file/protocol associations if we registered them (i.e. the
-	; install was not portable) and .cod is still owned by Cockatrice, so we don't
-	; clobber a .cod association installed by another application.
-	${If} Not ${FileExists} "$INSTDIR\portable.dat"
-		ReadRegStr $0 HKCR ".cod" ""
-		${If} $0 == "Cockatrice"
-			DeleteRegKey HKCR ".cod"
-			DeleteRegKey HKCR "Cockatrice"
-			DeleteRegKey HKCR "cockatrice"
-		${EndIf}
-	${EndIf}
 SectionEnd
 
 ; unselected because it is /o
