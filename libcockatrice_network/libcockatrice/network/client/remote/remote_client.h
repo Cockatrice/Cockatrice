@@ -131,6 +131,22 @@ public:
             return socket->peerName();
         }
     }
+    quint16 peerPort() const
+    {
+        if (usingWebSocket) {
+            return websocket->peerPort();
+        } else {
+            return socket->peerPort();
+        }
+    }
+    QString serverName() const override
+    {
+        return lastHostname;
+    }
+    quint16 serverPort() const override
+    {
+        return static_cast<quint16>(lastPort);
+    }
     void
     connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
     void registerToServer(const QString &hostname,

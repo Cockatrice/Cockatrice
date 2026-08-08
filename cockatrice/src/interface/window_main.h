@@ -150,6 +150,11 @@ public:
     }
     ~MainWindow() override;
 
+    RemoteClient *getRemoteClient() const
+    {
+        return connectionController->client();
+    }
+
     TabSupervisor *getTabSupervisor() const
     {
         return tabSupervisor;

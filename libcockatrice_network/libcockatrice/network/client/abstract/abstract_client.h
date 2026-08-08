@@ -122,6 +122,20 @@ public:
         return userName;
     }
 
+    /**
+     * @brief Returns the server address configured for the current connection.
+     *
+     * May be empty for clients that have no server counterpart (e.g. local test clients).
+     */
+    virtual QString serverName() const
+    {
+        return {};
+    }
+    virtual quint16 serverPort() const
+    {
+        return 0;
+    }
+
     static PendingCommand *prepareSessionCommand(const ::google::protobuf::Message &cmd);
     static PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd, int roomId);
     static PendingCommand *prepareModeratorCommand(const ::google::protobuf::Message &cmd);

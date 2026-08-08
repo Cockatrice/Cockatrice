@@ -191,7 +191,10 @@ void TabServer::joinRoom(int id, bool setCurrent)
 
         PendingCommand *pend = client->prepareSessionCommand(cmd);
         pend->setExtraData(setCurrent);
-        connect(pend, &PendingCommand::finished, this, &TabServer::joinRoomFinished);
+        connect(pend, &PendingCommand::finished, this,
+                [this, id](const Response &r, const CommandContainer &c, const QVariant &v) {
+                    joinRoomFinished(r, c, v, id);
+                });
 
         client->sendCommand(pend);
 
@@ -205,7 +208,8 @@ void TabServer::joinRoom(int id, bool setCurrent)
 
 void TabServer::joinRoomFinished(const Response &r,
                                  const CommandContainer & /*commandContainer*/,
-                                 const QVariant &extraData)
+                                 const QVariant &extraData,
+                                 int roomId)
 {
     switch (r.response_code()) {
         case Response::RespOk:
@@ -213,21 +217,25 @@ void TabServer::joinRoomFinished(const Response &r,
         case Response::RespNameNotFound:
             QMessageBox::critical(this, tr("Error"),
                                   tr("Failed to join the server room: it doesn't exist on the server."));
+            emit roomJoinFailed(roomId);
             return;
         case Response::RespContextError:
             QMessageBox::critical(
                 this, tr("Error"),
                 tr("The server thinks you are in the server room but your client is unable to display it. "
                    "Try restarting your client."));
+            emit roomJoinFailed(roomId);
             return;
         case Response::RespUserLevelTooLow:
             QMessageBox::critical(this, tr("Error"),
                                   tr("You do not have the required permission to join this server room."));
+            emit roomJoinFailed(roomId);
             return;
         default:
             QMessageBox::critical(
                 this, tr("Error"),
                 tr("Failed to join the server room due to an unknown error: %1.").arg(r.response_code()));
+            emit roomJoinFailed(roomId);
             return;
     }
 
