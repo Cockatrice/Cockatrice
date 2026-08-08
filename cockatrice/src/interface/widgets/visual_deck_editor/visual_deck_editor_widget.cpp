@@ -25,7 +25,7 @@
 #include <libcockatrice/models/database/card/card_search_model.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <qscrollarea.h>
 
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
@@ -45,9 +45,9 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     initializeScrollAreaAndZoneContainer();
 
     cardSizeWidget =
-        new CardSizeWidget(this, nullptr, SettingsCache::instance().visualDeckStorage().getVisualDeckEditorCardSize());
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().visualDeckStorage(),
-            &VisualDeckStorageSettings::setVisualDeckEditorCardSize);
+        new CardSizeWidget(this, nullptr, SettingsCache::instance().cardsDisplay().getVisualDeckEditorCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setVisualDeckEditorCardSize);
 
     mainLayout->addWidget(displayOptionsAndSearch);
     mainLayout->addWidget(scrollArea);

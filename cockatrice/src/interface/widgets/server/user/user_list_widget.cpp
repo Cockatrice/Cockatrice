@@ -30,7 +30,7 @@
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
 #include <libcockatrice/protocol/pb/response_get_user_info.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(parent)
@@ -353,7 +353,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
 
 QSize UserListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (!SettingsCache::instance().interface().getStyleUserList()) {
+    if (!SettingsCache::instance().appearance().getStyleUserList()) {
         return QStyledItemDelegate::sizeHint(option, index);
     }
     return UserListPainter::sizeHint();
@@ -361,7 +361,7 @@ QSize UserListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const Q
 
 void UserListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (!SettingsCache::instance().interface().getStyleUserList()) {
+    if (!SettingsCache::instance().appearance().getStyleUserList()) {
         QStyledItemDelegate::paint(painter, option, index);
         return;
     }
@@ -525,7 +525,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
 
     // Pin on item click
     connect(userTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item, int) {
-        if (!SettingsCache::instance().interface().getStyleUserList()) {
+        if (!SettingsCache::instance().appearance().getStyleUserList()) {
             return;
         }
         const QString name = static_cast<UserListTWI *>(item)->getUserInfo().name().c_str();
@@ -557,7 +557,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     connect(cardArtProvider, &UserCardArtProvider::cardArtUpdated, this,
             [this](const QString &) { userTree->viewport()->update(); });
 
-    connect(&SettingsCache::instance().interface(), &InterfaceSettings::styleUserListChanged, this,
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::styleUserListChanged, this,
             &UserListWidget::applyDisplayMode);
     applyDisplayMode();
 
@@ -663,7 +663,7 @@ void UserListWidget::hideEvent(QHideEvent *e)
 
 void UserListWidget::applyDisplayMode()
 {
-    const bool styled = SettingsCache::instance().interface().getStyleUserList();
+    const bool styled = SettingsCache::instance().appearance().getStyleUserList();
 
     if (styled) {
         userTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -722,7 +722,7 @@ bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj == userTree->viewport()) {
         if (event->type() == QEvent::MouseMove) {
-            if (!SettingsCache::instance().interface().getStyleUserList()) {
+            if (!SettingsCache::instance().appearance().getStyleUserList()) {
                 return QGroupBox::eventFilter(obj, event);
             }
             auto *me = static_cast<QMouseEvent *>(event);

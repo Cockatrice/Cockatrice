@@ -45,17 +45,17 @@ bool UpdatesSettings::getAlwaysEnableNewSets() const
 
 bool UpdatesSettings::getNotifyAboutUpdates() const
 {
-    return getValue("updatenotification", QString(), QString(), true).toBool();
+    return getValue("updateNotification", QString(), QString(), true).toBool();
 }
 
 bool UpdatesSettings::getNotifyAboutNewVersion() const
 {
-    return getValue("newversionnotification", QString(), QString(), true).toBool();
+    return getValue("newVersionNotification", QString(), QString(), true).toBool();
 }
 
 int UpdatesSettings::getUpdateReleaseChannelIndex() const
 {
-    return getValue("updatereleasechannel", QString(), QString(), 0).toInt();
+    return getValue("updateReleaseChannel", QString(), QString(), 0).toInt();
 }
 
 void UpdatesSettings::setCheckUpdatesOnStartup(bool value)
@@ -90,15 +90,15 @@ void UpdatesSettings::setAlwaysEnableNewSets(bool value)
 
 void UpdatesSettings::setNotifyAboutUpdates(bool _notifyaboutupdate)
 {
-    setValue(_notifyaboutupdate, "updatenotification");
+    setValue(_notifyaboutupdate, "updateNotification");
 }
 
 void UpdatesSettings::setNotifyAboutNewVersion(bool _notifyaboutnewversion)
 {
-    setValue(_notifyaboutnewversion, "newversionnotification");
+    setValue(_notifyaboutnewversion, "newVersionNotification");
 }
 
 void UpdatesSettings::setUpdateReleaseChannelIndex(int value)
 {
-    setValue(value, "updatereleasechannel");
+    setValue(value, "updateReleaseChannel");
 }
