@@ -896,6 +896,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplayGetCode(const Com
 Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const Command_ReplaySubmitCode &cmd,
                                                                           ResponseContainer & /*rc*/)
 {
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
     // code is of the form <game-id>-<hash>
     QString code = QString::fromStdString(cmd.replay_code());
     QStringList split = code.split("-");
