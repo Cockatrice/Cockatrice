@@ -89,6 +89,7 @@ signals:
     void arrowDeleteRequested(int creatorId, int arrowId);
     void arrowDeleted(int creatorId, int arrowId);
     void arrowsClearedLocally(); // fires on clear() and processPlayerInfo
+    /** @brief Emitted when server command zone support is detected or lost (e.g. on game join or reconnect). */
     void commandZoneSupportChanged(bool hasCommandZone);
 
 public slots:

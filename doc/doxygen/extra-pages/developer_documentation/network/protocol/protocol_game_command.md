@@ -268,7 +268,10 @@ Client
 **Server:**
 - `Server_Player::cmdIncCounter`
 - Rejects if the game has not started or the player has conceded
-- Updates the counter value
+- Rejects tax counters when command zone is disabled (`RespContextError`)
+- Rejects inactive tax counters (`RespContextError`)
+- Rejects if counter doesn't exist (`RespNameNotFound`)
+- Updates the counter value (clamped to `[minValue, maxValue]`)
 - Emits `Event_SetCounter` only if the value changed
 
 **Client:**
@@ -285,7 +288,8 @@ Client
 **Server:**
 - `Server_Player::cmdCreateCounter`
 - Rejects if the game has not started or the player has conceded
-- Allocates a new counter ID
+- Rejects reserved tax counter names (`RespFunctionNotAllowed`)
+- Allocates a new counter ID (starting at `CounterIds::FirstUserId`)
 - Creates the counter
 - Emits `Event_CreateCounter`
 
@@ -302,7 +306,10 @@ Client
 **Server:**
 - `Server_Player::cmdSetCounter`
 - Rejects if the game has not started or the player has conceded
-- Updates the counter value
+- Rejects tax counters when command zone is disabled (`RespContextError`)
+- Rejects inactive tax counters (`RespContextError`)
+- Rejects if counter doesn't exist (`RespNameNotFound`)
+- Updates the counter value (clamped to `[minValue, maxValue]`)
 - Emits `Event_SetCounter` only if the value changed
 
 **Client:**
@@ -319,6 +326,8 @@ Client
 **Server:**
 - `Server_Player::cmdDelCounter`
 - Rejects if the game has not started or the player has conceded
+- Rejects tax counters (`RespFunctionNotAllowed`)
+- Rejects if counter doesn't exist (`RespNameNotFound`)
 - Deletes the counter
 - Emits `Event_DelCounter`
 
@@ -518,6 +527,26 @@ Client
 
 **Client:**
 - Reflected by subsequent active-player progression
+
+---
+
+### `SET_COUNTER_ACTIVE` (1035)
+
+**Purpose:** Show or hide a reserved tax counter without deleting it.
+
+**Server:**
+- `Server_Player::cmdSetCounterActive`
+- Rejects if game not started (`RespGameNotStarted`)
+- Rejects if player has conceded (`RespContextError`)
+- Rejects for non-tax counters (`RespFunctionNotAllowed`)
+- Rejects if command zone is disabled (`RespContextError`)
+- Rejects if counter doesn't exist (`RespNameNotFound`)
+- Rejects deactivation when counter has non-zero value (`RespContextError`)
+- Emits `Event_SetCounterActive` only if the active state changed
+
+**Client:**
+- `PlayerEventHandler::eventSetCounterActive`
+- Updates the counter's active state in the UI
 
 ---
 

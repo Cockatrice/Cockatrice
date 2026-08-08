@@ -156,7 +156,7 @@ public:
     /// Set a player-level counter value.
     void eventSetCounter(const Event_SetCounter &event);
 
-    /// Show or hide a player-level counter without deleting it.
+    /** @brief Show or hide a player-level counter without deleting it. */
     void eventSetCounterActive(const Event_SetCounterActive &event);
 
     /// Delete a player-level counter.

@@ -40,16 +40,19 @@ public:
     {
         return value;
     }
+    /** @brief Returns whether this counter is active (visible and modifiable). */
     bool isActive() const
     {
         return active;
     }
 
     void setValue(int newValue);
+    /** @brief Sets the active (visible) state and emits activeChanged if it changed. */
     void setActive(bool newActive);
 
 signals:
     void valueChanged(int oldValue, int newValue);
+    /** @brief Emitted when the counter's active state changes. */
     void activeChanged(bool newActive);
 
 private:
@@ -58,7 +61,7 @@ private:
     QColor color;
     int radius;
     int value;
-    bool active;
+    bool active; ///< Inactive counters are hidden; server rejects modification attempts
 };
 
 #endif // COCKATRICE_COUNTER_STATE_H

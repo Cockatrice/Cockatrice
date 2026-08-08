@@ -36,6 +36,9 @@ public:
      *
      * Reserved tax counters are server-managed and may never be deleted by a client.
      *
+     * @param gameStarted Whether the game has started
+     * @param playerConceded Whether the player has conceded
+     * @param counterId ID of the counter to delete
      * @param counter Counter with id counterId, or nullptr if the player has no such counter.
      * @return Response::RespOk if permitted, otherwise the error response for the client.
      */
@@ -48,6 +51,10 @@ public:
      * Only reserved tax counters can be toggled, and one holding a non-zero value must be reset
      * to zero before it can be deactivated.
      *
+     * @param gameStarted Whether the game has started
+     * @param playerConceded Whether the player has conceded
+     * @param commandZoneEnabled Whether command zone is enabled for this game
+     * @param counterId ID of the counter to toggle
      * @param counter Counter with id counterId, or nullptr if the player has no such counter.
      * @param requestedActive Active state the client asked for.
      * @return Response::RespOk if permitted, otherwise the error response for the client.
@@ -66,6 +73,10 @@ public:
      * inside a Commander game and only while active, so an inactive (hidden) tax counter can
      * never accumulate a value behind the scenes.
      *
+     * @param gameStarted Whether the game has started
+     * @param playerConceded Whether the player has conceded
+     * @param commandZoneEnabled Whether command zone is enabled for this game
+     * @param counterId ID of the counter to modify
      * @param counter Counter with id counterId, or nullptr if the player has no such counter.
      * @return Response::RespOk if permitted, otherwise the error response for the client.
      */

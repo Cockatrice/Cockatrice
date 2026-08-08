@@ -28,9 +28,10 @@ constexpr int TAX_COUNTER_MARGIN = 2;
  * @class CommanderTaxCounter
  * @brief Counter for tracking commander tax in Commander format.
  *
- * Displays cumulative cost increase for casting a commander. The counter
- * is manually adjusted by the player to track their commander tax. Values
- * are clamped to >= 0.
+ * Displays the number of times the commander has been cast from the command
+ * zone. Can be adjusted manually via +1/-1 menu actions, or automatically
+ * incremented when using "Play and Increase Tax" on an accepted cast from
+ * the command zone. Values are clamped to >= 0.
  *
  * Appearance: square with rounded corners, semi-transparent background,
  * positioned at top-left of command zone.
@@ -48,7 +49,7 @@ class CommanderTaxCounter : public AbstractCounter
 {
     Q_OBJECT
 private:
-    int size;
+    int size; ///< Width and height of the counter in pixels
 
 public:
     /**
