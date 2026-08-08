@@ -1,11 +1,11 @@
 # Cockatrice's main CMakeLists.txt
 #
 # This is basically a wrapper to enable/disable the compilation
-# of the different projects: servatrice, cockatrice, test
+# of the different projects: cockatrice, servatrice, test
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-# cmake 3.16 is required if using qt6
+# CMake 3.16 is required if using Qt6
 cmake_minimum_required(VERSION 3.10)
 
 # Early detect ccache
@@ -27,20 +27,16 @@ option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
-if(DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE
-      ${CMAKE_BUILD_TYPE}
-      CACHE STRING "Type of build"
-  )
-else()
+if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE
       Release
-      CACHE STRING "Type of build"
+      CACHE STRING "Build type"
   )
 endif()
 
 if(USE_CCACHE)
   find_program(CCACHE_PROGRAM ccache)
+
   if(CCACHE_PROGRAM)
     # Support Unix Makefiles and Ninja
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
@@ -54,6 +50,7 @@ if(WIN32 OR USE_VCPKG)
       ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
       CACHE STRING "Vcpkg toolchain file"
   )
+
   # Qt path set by user or env var
   if(QTDIR
      OR DEFINED ENV{QTDIR}
@@ -76,22 +73,23 @@ endif()
 # Version can be overriden by git tags, see cmake/getversion.cmake
 project("Cockatrice" VERSION 3.1.0)
 
-# Set release name if not provided via env/cmake var
+# Set release name if not provided via ENV/CMake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
   set(GIT_TAG_RELEASENAME "Graduation Day")
 endif()
 
-# Use c++20 for all targets
+# Use C++20 for all targets
 set(CMAKE_CXX_STANDARD
     20
     CACHE STRING "C++ ISO Standard"
 )
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set conventional loops
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
-# Search path for cmake modules
+# Search path for CMake modules
 set(COCKATRICE_CMAKE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 list(INSERT CMAKE_MODULE_PATH 0 "${COCKATRICE_CMAKE_PATH}")
 
@@ -102,14 +100,14 @@ include(createversionfile)
 
 # Define a proper install path
 if(UNIX)
-  if(APPLE)
-    # macOS
-    # Due to the special bundle structure ignore
-    # the prefix eventually set by the user.
+
+  if(APPLE) # macOS
+    # Due to the special bundle structure ignore the prefix eventually set by the user
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
 
     # Force ccache usage if available
     get_property(RULE_LAUNCH_COMPILE GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
+
     if(RULE_LAUNCH_COMPILE)
       message(STATUS "Force enabling CCache usage under macOS")
       # Set up wrapper scripts
@@ -123,39 +121,52 @@ if(UNIX)
       set(CMAKE_XCODE_ATTRIBUTE_LD "${CMAKE_BINARY_DIR}/launch-c")
       set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS "${CMAKE_BINARY_DIR}/launch-cxx")
     endif()
-  else()
-    # Linux / BSD
+
+  else() # Linux / BSD
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-      #fix package build
+
+      # Fix package build
       if(PREFIX)
         set(CMAKE_INSTALL_PREFIX ${PREFIX})
       else()
         set(CMAKE_INSTALL_PREFIX /usr/local)
       endif()
+
     endif()
   endif()
-elseif(WIN32)
+
+elseif(WIN32) # Windows
   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
 endif()
 
 # Define proper compilation flags
-if(MSVC)
-  # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
-  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi")
-  # Visual Studio: Maximum Optimization, Multi-threaded DLL
+if(MSVC) # Microsoft Visual C++ compiler
+  # /wd4251    Suppress C4251 (DLL interface) warnings
+  # /W4        Enable warning level 4
+  # /MP        Enable multi-threaded building
+  # /EHsc      Enable standard C++ exception handling
+  # /Zi        Generate debugging information (Program Databases, PDBs)
+  set(CMAKE_CXX_FLAGS "/wd4251 /W4 /MP /EHsc /Zi")
+
+  # /Ox        Enable maximum optimization
+  # /MD        Link against the multi-threaded DLL runtime library (Release CRT)
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
-  # Visual Studio: No Optimization, Multi-threaded Debug DLL
+
+  # /Od        Disable optimization
+  # /MDd       Link against the multi-threaded Debug DLL runtime library (Debug CRT)
   set(CMAKE_CXX_FLAGS_DEBUG "/Od /MDd")
 
-  # Generate PDB, even when in release (So developers can better analyze crash logs)
+  # Generate PDBs, even when in release (Allow developers to better analyze crash logs)
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 
   add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
+
 elseif(CMAKE_COMPILER_IS_GNUCXX)
-  # linux/gcc, bsd/gcc, windows/mingw
+  # Linux/GCC, BSD/GCC, Windows/MinGW
   include(CheckCXXCompilerFlag)
 
   set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
+
   if(WARNING_AS_ERROR)
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -Werror")
   else()
@@ -174,23 +185,26 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
       -Wno-error=delete-non-virtual-dtor
       -Wno-error=sign-compare
       -Wno-error=missing-declarations
-      -Wno-error=sfinae-incomplete  # GCC 16+: Qt MOC + protobuf forward decls trigger this
+      -Wno-error=sfinae-incomplete # GCC 16+: Qt MOC + protobuf forward declarations trigger this
   )
 
   foreach(FLAG ${ADDITIONAL_DEBUG_FLAGS})
     check_cxx_compiler_flag("${FLAG}" CXX_HAS_WARNING_${FLAG})
+
     if(CXX_HAS_WARNING_${FLAG})
       set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FLAG}")
     endif()
   endforeach()
-else()
-  # other: osx/llvm, bsd/llvm
+
+else() # Other: macOS/LLVM, BSD/LLVM
   set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+
   if(WARNING_AS_ERROR)
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror -Wno-unused-parameter")
   else()
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
   endif()
+
 endif()
 
 # GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
@@ -225,6 +239,7 @@ set(CMAKE_AUTOMOC TRUE)
 
 # Find other needed libraries
 find_package(Protobuf CONFIG)
+
 if(NOT Protobuf_FOUND)
   find_package(Protobuf REQUIRED)
 endif()
@@ -233,9 +248,11 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0" AND NOT EXISTS "${Protobuf_PROTOC
   message(FATAL_ERROR "No protoc command found!")
 endif()
 
-#Find OpenSSL
+# Find OpenSSL
 if(WIN32)
+
   find_package(OpenSSL REQUIRED)
+
   if(OPENSSL_FOUND)
     include_directories(${OPENSSL_INCLUDE_DIRS})
   else()
@@ -246,7 +263,7 @@ if(WIN32)
   endif()
 endif()
 
-#Find VCredist
+# Find Visual C++ Redistributable
 if(MSVC)
   find_package(VCredistRuntime)
 endif()
@@ -256,7 +273,9 @@ set(CPACK_PACKAGE_CONTACT "Zach Halpern <zach@cockatrice.us>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
 set(CPACK_PACKAGE_DESCRIPTION
-    "Cockatrice is an open-source, multiplatform application for playing tabletop card games over a network. The program's server design prevents users from manipulating the game for unfair advantage. The client also provides a single-player mode, which allows users to brew while offline."
+    "Cockatrice is an open-source, multiplatform application for playing tabletop card games over a network. \
+	 The program's server design prevents users from manipulating the game for unfair advantage. \
+	 The client also provides a single-player mode, which allows users to brew while offline."
 )
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
@@ -265,7 +284,8 @@ set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_VERSION_FILENAME}")
 
 if(UNIX)
-  if(APPLE)
+
+  if(APPLE) # macOS
     set(CPACK_GENERATOR DragNDrop ${CPACK_GENERATOR})
     set(CPACK_GENERATOR "DragNDrop")
     set(CPACK_DMG_FORMAT "UDBZ")
@@ -275,8 +295,8 @@ if(UNIX)
     set(CPACK_DMG_DS_STORE_SETUP_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeDMGSetup.script")
     set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/dmgBackground.tif")
     set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SignMacApplications.cmake")
-  else()
-    # linux
+
+  else() # Linux
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
@@ -287,7 +307,7 @@ if(UNIX)
       endif()
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
       set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
-      # stop directories from making package conflicts
+      # Stop directories from creating package conflicts
       set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
           /usr/share/applications
           /usr/share/icons
@@ -304,24 +324,25 @@ if(UNIX)
       set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
       if(Qt6_FOUND)
         set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
-        set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
+        set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting Servatrice to a MySQL DB
       elseif(Qt5_FOUND)
         set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
       endif()
     endif()
   endif()
-elseif(WIN32)
+
+elseif(WIN32) # Windows
   set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
-  if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "(x64)")
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(TRICE_IS_64_BIT 1)
   else()
     set(TRICE_IS_64_BIT 0)
   endif()
 
-  # Configure file with custom definitions for NSIS.
+  # Configure file with custom definitions for NSIS
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
 
-  # include vcredist into the package; NSIS will take care of running it
+  # Include vcredist into the package, NSIS will take care of running it
   if(VCREDISTRUNTIME_FOUND)
     install(FILES "${VCREDISTRUNTIME_FILE}" DESTINATION ./)
   endif()
@@ -368,6 +389,6 @@ if(TEST)
 endif()
 
 if(Qt6_FOUND AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
-  # Qt6.3+ requires project finalization to support translations
+  # Qt 6.3+ requires project finalization to support translations
   qt6_finalize_project()
 endif()

@@ -11,9 +11,8 @@ add_test(NAME server_card_counter_test COMMAND server_card_counter_test)
 add_test(NAME server_counter_test COMMAND server_counter_test)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
+set_tests_properties(dummy_test PROPERTIES TIMEOUT 5)
 set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 5)
-
-# Find GTest
 
 add_executable(dummy_test dummy_test.cpp)
 add_executable(expression_test expression_test.cpp)
@@ -24,6 +23,7 @@ add_executable(deck_hash_performance_test deck_hash_performance_test.cpp)
 add_executable(server_card_counter_test server_card_counter_test.cpp)
 add_executable(server_counter_test server_counter_test.cpp)
 
+# Find GTest
 find_package(GTest)
 
 if(NOT GTEST_FOUND)
