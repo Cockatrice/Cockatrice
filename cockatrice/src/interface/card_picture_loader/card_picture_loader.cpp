@@ -26,6 +26,9 @@
 // never cache more than 300 cards at once for a single deck
 #define CACHED_CARD_PER_DECK_MAX 300
 
+// wait at least this long before retrying a card whose picture failed to load
+static constexpr int RETRY_FAILED_CARDS_SECS = 300;
+
 CardPictureLoader::CardPictureLoader() : QObject(nullptr)
 {
     worker = new CardPictureLoaderWorker;
@@ -135,7 +138,14 @@ void CardPictureLoader::getPixmap(QPixmap &pixmap, const ExactCard &card, QSize 
     QPixmap bigPixmap;
     if (QPixmapCache::find(key, &bigPixmap)) {
         if (bigPixmap.isNull()) {
-            qCDebug(CardPictureLoaderLog) << "Cached pixmap for key" << key << "is NULL!";
+            getCardBackLoadingFailedPixmap(pixmap, size);
+            QDateTime failedAtTime = getInstance().failedAt.value(key);
+            if (!failedAtTime.isValid() ||
+                failedAtTime.addSecs(RETRY_FAILED_CARDS_SECS) < QDateTime::currentDateTime()) {
+                getInstance().failedAt.remove(key);
+                QPixmapCache::remove(key);
+                getInstance().worker->enqueueImageLoad(card);
+            }
             return;
         }
 
@@ -159,8 +169,10 @@ void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
     QPixmap finalPixmap;
 
     if (image.isNull()) {
+        getInstance().failedAt.insert(card.getPixmapCacheKey(), QDateTime::currentDateTime());
         qCDebug(CardPictureLoaderLog) << "Caching NULL pixmap for" << card.getName();
     } else {
+        getInstance().failedAt.remove(card.getPixmapCacheKey());
         if (card.getInfo().getUiAttributes().upsideDownArt) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
             QImage mirrorImage = image.flipped(Qt::Horizontal | Qt::Vertical);
@@ -184,8 +196,10 @@ void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
     // imageLoaded should only be reached if the exactCard isn't already in cache.
     // (plus there's a deduplication mechanism in CardPictureLoaderWorker)
     // It should be safe to connect the CardInfo here without worrying about redundant connections.
-    connect(card.getCardPtr().data(), &QObject::destroyed, this,
-            [cacheKey = card.getPixmapCacheKey()] { QPixmapCache::remove(cacheKey); });
+    connect(card.getCardPtr().data(), &QObject::destroyed, this, [cacheKey = card.getPixmapCacheKey()] {
+        QPixmapCache::remove(cacheKey);
+        getInstance().failedAt.remove(cacheKey);
+    });
 
     card.emitPixmapUpdated();
 }

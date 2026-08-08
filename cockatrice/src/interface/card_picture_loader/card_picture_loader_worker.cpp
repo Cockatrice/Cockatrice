@@ -17,6 +17,8 @@
 #include <version_string.h>
 
 static constexpr int MAX_REQUESTS_PER_SEC = 10;
+static constexpr int MIN_HOST_QUOTA = 1;          ///< Floor for the per-host request allowance
+static constexpr qint64 QUOTA_RECOVER_MS = 60000; ///< Idle time before a reduced quota starts recovering
 
 CardPictureLoaderWorker::CardPictureLoaderWorker()
     : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload()),
@@ -124,6 +126,19 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
 void CardPictureLoaderWorker::resetRequestQuota()
 {
     requestQuota = MAX_REQUESTS_PER_SEC;
+
+    QDateTime now = QDateTime::currentDateTime();
+    for (auto it = hostRequestQuota.begin(); it != hostRequestQuota.end(); ++it) {
+        if (!hostLast429.contains(it.key()) || now.msecsTo(hostLast429.value(it.key())) < -QUOTA_RECOVER_MS) {
+            it.value() = qMin(MAX_REQUESTS_PER_SEC, it.value() + 1);
+        }
+    }
+
+    for (const auto &request : requestLoadQueue) {
+        const QString host = request.first.host();
+        hostQuotaRemaining.insert(host, hostRequestQuota.value(host, MAX_REQUESTS_PER_SEC));
+    }
+
     processQueuedRequests();
 }
 
@@ -136,12 +151,24 @@ void CardPictureLoaderWorker::processQueuedRequests()
 
 bool CardPictureLoaderWorker::processSingleRequest()
 {
-    if (!requestLoadQueue.isEmpty()) {
-        auto request = requestLoadQueue.takeFirst();
-        makeRequest(request.first, request.second);
-        return true;
+    for (int i = 0; i < requestLoadQueue.size(); ++i) {
+        const auto &request = requestLoadQueue.at(i);
+        QString host = request.first.host();
+        int allowance = hostQuotaRemaining.value(host, MAX_REQUESTS_PER_SEC);
+        if (allowance > 0) {
+            hostQuotaRemaining.insert(host, allowance - 1);
+            makeRequest(request.first, request.second);
+            requestLoadQueue.removeAt(i);
+            return true;
+        }
     }
     return false;
+}
+
+void CardPictureLoaderWorker::onHostRateLimited(const QString &host)
+{
+    hostRequestQuota.insert(host, qMax(MIN_HOST_QUOTA, hostRequestQuota.value(host, MAX_REQUESTS_PER_SEC) / 2));
+    hostLast429.insert(host, QDateTime::currentDateTime());
 }
 
 void CardPictureLoaderWorker::enqueueImageLoad(const ExactCard &card)
