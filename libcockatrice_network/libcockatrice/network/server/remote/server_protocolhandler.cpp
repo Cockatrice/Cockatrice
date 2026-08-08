@@ -562,6 +562,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     event.set_message(server->getLoginMessage().toStdString());
     rc.enqueuePostResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 
+    SessionEvent *loginEvent = server->getLoginSessionEvent();
+    if (loginEvent) {
+        rc.enqueuePostResponseItem(ServerMessage::SESSION_EVENT, loginEvent);
+    }
+
     auto *re = new Response_Login;
     re->mutable_user_info()->CopyFrom(copyUserInfo(true));
 
