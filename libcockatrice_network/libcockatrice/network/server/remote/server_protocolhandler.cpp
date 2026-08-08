@@ -685,6 +685,15 @@ Response::ResponseCode Server_ProtocolHandler::cmdGetUserInfo(const Command_GetU
         ServerInfo_User_Container *infoSource = server->findUser(userName);
         if (!infoSource) {
             re->mutable_user_info()->CopyFrom(databaseInterface->getUserData(userName, true));
+            // The user is not currently online. Mirror the redaction that
+            // copyUserInfo() applies to online users: the id and email address
+            // are only ever visible to the account owner, and the client id
+            // only to moderators.
+            re->mutable_user_info()->clear_id();
+            re->mutable_user_info()->clear_email();
+            if (!(userInfo->user_level() & ServerInfo_User::IsModerator)) {
+                re->mutable_user_info()->clear_clientid();
+            }
         } else {
             re->mutable_user_info()->CopyFrom(
                 infoSource->copyUserInfo(true, false, userInfo->user_level() & ServerInfo_User::IsModerator));
