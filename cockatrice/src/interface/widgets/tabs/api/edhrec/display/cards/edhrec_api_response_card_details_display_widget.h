@@ -39,7 +39,7 @@ private:
 protected slots:
     void mousePressEvent(QMouseEvent *event) override;
 
-    void enterEvent(QEnterEvent *event) override; ///< Qt6 hover enter
+    void enterEvent(QEnterEvent *event) override; ///< Hover enter
     void leaveEvent(QEvent *event) override;
 };
 
