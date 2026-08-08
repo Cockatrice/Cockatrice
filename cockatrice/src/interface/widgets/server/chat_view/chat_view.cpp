@@ -63,14 +63,14 @@ void ChatView::adjustColorsToPalette()
         serverMessageColor = QColor(0xFF, 0x73, 0x83);
         otherUserColor = otherUserColor.lighter(150);
         linkColor = QColor(71, 158, 252);
-        unresolvedCardTagColor = QColor(0xFF, 0x73, 0x83);
+        unresolvedCardTagColor = QColor(0xFF, 0xA5, 0x00);
     } else {
         document()->setDefaultStyleSheet(R"(
             a { text-decoration: none; color: blue; }
             .blue { color: blue }
         )");
         linkColor = palette().link().color();
-        unresolvedCardTagColor = QColor(0x85, 0x15, 0x15);
+        unresolvedCardTagColor = QColor(0xA0, 0x52, 0x2D);
     }
 
     QTimer::singleShot(0, this, &ChatView::refreshBlockColors);
