@@ -27,3 +27,25 @@ void DownloadSettings::resetToDefaultURLs()
 {
     setValue(QVariant::fromValue(DEFAULT_DOWNLOAD_URLS), "urls");
 }
+
+bool DownloadSettings::getPicDownload() const
+{
+    return getValue("pictureDownload", QString(), QString(), true).toBool();
+}
+
+void DownloadSettings::setPicDownload(bool _picDownload)
+{
+    setValue(_picDownload, "pictureDownload");
+    emit picDownloadChanged();
+}
+
+bool DownloadSettings::getDownloadSpoilersStatus() const
+{
+    return getValue("downloadSpoilers", QString(), QString(), false).toBool();
+}
+
+void DownloadSettings::setDownloadSpoilerStatus(bool _spoilerStatus)
+{
+    setValue(_spoilerStatus, "downloadSpoilers");
+    emit downloadSpoilerStatusChanged();
+}

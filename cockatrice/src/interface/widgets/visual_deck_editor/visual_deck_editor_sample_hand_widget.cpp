@@ -8,7 +8,7 @@
 
 #include <QSplitter>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <random>
 
 VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *parent,
@@ -34,10 +34,10 @@ VisualDeckEditorSampleHandWidget::VisualDeckEditorSampleHandWidget(QWidget *pare
     resetAndHandSizeLayout->addWidget(resetButton);
 
     handSizeSpinBox = new QSpinBox(this);
-    handSizeSpinBox->setValue(SettingsCache::instance().visualDeckStorage().getVisualDeckEditorSampleHandSize());
+    handSizeSpinBox->setValue(SettingsCache::instance().cardsDisplay().getSampleHandSize());
     handSizeSpinBox->setMinimum(1);
-    connect(handSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().visualDeckStorage(),
-            &VisualDeckStorageSettings::setVisualDeckEditorSampleHandSize);
+    connect(handSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setSampleHandSize);
     connect(handSizeSpinBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &VisualDeckEditorSampleHandWidget::updateDisplay);
     resetAndHandSizeLayout->addWidget(handSizeSpinBox);

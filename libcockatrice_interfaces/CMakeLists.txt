@@ -9,6 +9,7 @@ set(HEADERS
     libcockatrice/interfaces/interface_card_set_priority_controller.h
     libcockatrice/interfaces/interface_cards_display_settings_provider.h
     libcockatrice/interfaces/interface_chat_settings_provider.h
+    libcockatrice/interfaces/interface_deck_editor_settings_provider.h
     libcockatrice/interfaces/interface_game_settings_provider.h
     libcockatrice/interfaces/interface_interface_settings_provider.h
     libcockatrice/interfaces/interface_network_settings_provider.h

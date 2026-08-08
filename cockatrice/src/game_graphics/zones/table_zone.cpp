@@ -29,7 +29,7 @@ TableZone::TableZone(TableZoneLogic *_logic, bool _mirrored, QGraphicsItem *pare
     connect(_logic, &TableZoneLogic::contentSizeChanged, this, &TableZone::resizeToContents);
     connect(_logic, &TableZoneLogic::toggleTapped, this, &TableZone::toggleTapped);
     connect(themeManager, &ThemeManager::themeChanged, this, &TableZone::updateBg);
-    connect(&SettingsCache::instance().interface(), &InterfaceSettings::invertVerticalCoordinateChanged, this,
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::invertVerticalCoordinateChanged, this,
             &TableZone::reorganizeCards);
 
     updateBg();
@@ -60,8 +60,8 @@ void TableZone::setMirrored(bool isMirrored)
 
 bool TableZone::isInverted() const
 {
-    return ((mirrored && !SettingsCache::instance().interface().getInvertVerticalCoordinate()) ||
-            (!mirrored && SettingsCache::instance().interface().getInvertVerticalCoordinate()));
+    return ((mirrored && !SettingsCache::instance().userInterface().getInvertVerticalCoordinate()) ||
+            (!mirrored && SettingsCache::instance().userInterface().getInvertVerticalCoordinate()));
 }
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)

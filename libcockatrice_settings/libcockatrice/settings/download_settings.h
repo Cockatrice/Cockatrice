@@ -22,6 +22,14 @@ public:
     QStringList getAllURLs() const;
     void setDownloadUrls(const QStringList &downloadURLs);
     void resetToDefaultURLs();
+    [[nodiscard]] bool getPicDownload() const;
+    void setPicDownload(bool _picDownload);
+    [[nodiscard]] bool getDownloadSpoilersStatus() const;
+    void setDownloadSpoilerStatus(bool _spoilerStatus);
+
+signals:
+    void picDownloadChanged();
+    void downloadSpoilerStatusChanged();
 };
 
 #endif // COCKATRICE_DOWNLOADSETTINGS_H

@@ -15,6 +15,7 @@
 #include <QMessageBox>
 #include <QStyleFactory>
 #include <QTimer>
+#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
@@ -104,7 +105,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
         homeTabBackgroundSourceBox.addItem(QObject::tr(entry.trKey), QVariant::fromValue(entry.type));
     }
 
-    QString homeTabBackgroundSource = SettingsCache::instance().personal().getHomeTabBackgroundSource();
+    QString homeTabBackgroundSource = settings.appearance().getHomeTabBackgroundSource();
     int homeTabBackgroundSourceId =
         homeTabBackgroundSourceBox.findData(BackgroundSources::fromId(homeTabBackgroundSource));
     if (homeTabBackgroundSourceId != -1) {
@@ -113,20 +114,19 @@ AppearanceSettingsPage::AppearanceSettingsPage()
 
     connect(&homeTabBackgroundSourceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
         auto type = homeTabBackgroundSourceBox.currentData().value<BackgroundSources::Type>();
-        SettingsCache::instance().personal().setHomeTabBackgroundSource(BackgroundSources::toId(type));
+        SettingsCache::instance().appearance().setHomeTabBackgroundSource(BackgroundSources::toId(type));
         updateHomeTabSettingsVisibility();
     });
 
     homeTabBackgroundShuffleFrequencySpinBox.setRange(0, 3600);
     homeTabBackgroundShuffleFrequencySpinBox.setSuffix(tr(" seconds"));
-    homeTabBackgroundShuffleFrequencySpinBox.setValue(
-        SettingsCache::instance().personal().getHomeTabBackgroundShuffleFrequency());
-    connect(&homeTabBackgroundShuffleFrequencySpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings.personal(),
-            &PersonalSettings::setHomeTabBackgroundShuffleFrequency);
+    homeTabBackgroundShuffleFrequencySpinBox.setValue(settings.appearance().getHomeTabBackgroundShuffleFrequency());
+    connect(&homeTabBackgroundShuffleFrequencySpinBox, qOverload<int>(&QSpinBox::valueChanged), &settings.appearance(),
+            &AppearanceSettings::setHomeTabBackgroundShuffleFrequency);
 
-    homeTabDisplayCardNameCheckBox.setChecked(settings.personal().getHomeTabDisplayCardName());
-    connect(&homeTabDisplayCardNameCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.personal(),
-            &PersonalSettings::setHomeTabDisplayCardName);
+    homeTabDisplayCardNameCheckBox.setChecked(settings.appearance().getHomeTabDisplayCardName());
+    connect(&homeTabDisplayCardNameCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.appearance(),
+            &AppearanceSettings::setHomeTabDisplayCardName);
 
     updateHomeTabSettingsVisibility();
 
@@ -140,9 +140,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     homeTabGroupBox = new QGroupBox;
     homeTabGroupBox->setLayout(homeTabGrid);
 
-    styleUserListCheckBox.setChecked(settings.interface().getStyleUserList());
-    connect(&styleUserListCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.interface(),
-            &InterfaceSettings::setStyleUserList);
+    styleUserListCheckBox.setChecked(settings.appearance().getStyleUserList());
+    connect(&styleUserListCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.appearance(),
+            &AppearanceSettings::setStyleUserList);
 
     auto stylingTabGrid = new QGridLayout;
     stylingTabGrid->addWidget(&styleUserListCheckBox, 0, 0, 1, 2);
@@ -151,12 +151,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     stylingGroupBox->setLayout(stylingTabGrid);
 
     // Menu settings
-    showShortcutsCheckBox.setChecked(settings.cardsDisplay().getShowShortcuts());
+    showShortcutsCheckBox.setChecked(settings.userInterface().getShowShortcuts());
     connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &AppearanceSettingsPage::showShortcutsChanged);
 
-    showGameSelectorFilterToolbarCheckBox.setChecked(settings.cardsDisplay().getShowGameSelectorFilterToolbar());
-    connect(&showGameSelectorFilterToolbarCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.cardsDisplay(),
-            &CardsDisplaySettings::setShowGameSelectorFilterToolbar);
+    showGameSelectorFilterToolbarCheckBox.setChecked(settings.userInterface().getShowGameSelectorFilterToolbar());
+    connect(&showGameSelectorFilterToolbarCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.userInterface(),
+            &InterfaceSettings::setShowGameSelectorFilterToolbar);
 
     auto *menuGrid = new QGridLayout;
     menuGrid->addWidget(&showShortcutsCheckBox, 0, 0);
@@ -199,9 +199,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&roundCardCornersCheckBox, &QAbstractButton::toggled, &settings.cardsDisplay(),
             &CardsDisplaySettings::setRoundCardCorners);
 
-    connect(&maxFontSizeForCardsEdit, qOverload<int>(&QSpinBox::valueChanged), &settings.personal(),
-            &PersonalSettings::setMaxFontSize);
-    maxFontSizeForCardsEdit.setValue(settings.personal().getMaxFontSize());
+    connect(&maxFontSizeForCardsEdit, qOverload<int>(&QSpinBox::valueChanged), &settings.appearance(),
+            &AppearanceSettings::setMaxFontSize);
+    maxFontSizeForCardsEdit.setValue(settings.appearance().getMaxFontSize());
     maxFontSizeForCardsLabel.setBuddy(&maxFontSizeForCardsEdit);
     maxFontSizeForCardsEdit.setMinimum(9);
     maxFontSizeForCardsEdit.setMaximum(100);
@@ -224,12 +224,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
             &CardsDisplaySettings::setStackCardOverlapPercent);
 
     cardViewInitialRowsMaxBox.setRange(1, 999);
-    cardViewInitialRowsMaxBox.setValue(SettingsCache::instance().interface().getCardViewInitialRowsMax());
+    cardViewInitialRowsMaxBox.setValue(SettingsCache::instance().userInterface().getCardViewInitialRowsMax());
     connect(&cardViewInitialRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &AppearanceSettingsPage::cardViewInitialRowsMaxChanged);
 
     cardViewExpandedRowsMaxBox.setRange(1, 999);
-    cardViewExpandedRowsMaxBox.setValue(SettingsCache::instance().interface().getCardViewExpandedRowsMax());
+    cardViewExpandedRowsMaxBox.setValue(SettingsCache::instance().userInterface().getCardViewExpandedRowsMax());
     connect(&cardViewExpandedRowsMaxBox, qOverload<int>(&QSpinBox::valueChanged), this,
             &AppearanceSettingsPage::cardViewExpandedRowsMaxChanged);
 
@@ -291,12 +291,12 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     cardCountersGroupBox->setLayout(cardCountersLayout);
 
     // Hand layout
-    horizontalHandCheckBox.setChecked(settings.interface().getHorizontalHand());
-    connect(&horizontalHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.interface(),
+    horizontalHandCheckBox.setChecked(settings.userInterface().getHorizontalHand());
+    connect(&horizontalHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.userInterface(),
             &InterfaceSettings::setHorizontalHand);
 
-    leftJustifiedHandCheckBox.setChecked(settings.interface().getLeftJustified());
-    connect(&leftJustifiedHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.interface(),
+    leftJustifiedHandCheckBox.setChecked(settings.userInterface().getLeftJustified());
+    connect(&leftJustifiedHandCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.userInterface(),
             &InterfaceSettings::setLeftJustified);
 
     auto *handGrid = new QGridLayout;
@@ -307,13 +307,13 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     handGroupBox->setLayout(handGrid);
 
     // table grid layout
-    invertVerticalCoordinateCheckBox.setChecked(settings.interface().getInvertVerticalCoordinate());
-    connect(&invertVerticalCoordinateCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.interface(),
+    invertVerticalCoordinateCheckBox.setChecked(settings.userInterface().getInvertVerticalCoordinate());
+    connect(&invertVerticalCoordinateCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.userInterface(),
             &InterfaceSettings::setInvertVerticalCoordinate);
 
     minPlayersForMultiColumnLayoutEdit.setMinimum(2);
-    minPlayersForMultiColumnLayoutEdit.setValue(settings.interface().getMinPlayersForMultiColumnLayout());
-    connect(&minPlayersForMultiColumnLayoutEdit, qOverload<int>(&QSpinBox::valueChanged), &settings.interface(),
+    minPlayersForMultiColumnLayoutEdit.setValue(settings.userInterface().getMinPlayersForMultiColumnLayout());
+    connect(&minPlayersForMultiColumnLayoutEdit, qOverload<int>(&QSpinBox::valueChanged), &settings.userInterface(),
             &InterfaceSettings::setMinPlayersForMultiColumnLayout);
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
@@ -375,7 +375,7 @@ void AppearanceSettingsPage::editPalette()
 
 void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
 {
-    bool visible = SettingsCache::instance().personal().getHomeTabBackgroundSource() !=
+    bool visible = SettingsCache::instance().appearance().getHomeTabBackgroundSource() !=
                    BackgroundSources::toId(BackgroundSources::Theme);
 
     homeTabBackgroundShuffleFrequencyLabel.setVisible(visible);
@@ -385,7 +385,7 @@ void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
 
 void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
 {
-    SettingsCache::instance().cardsDisplay().setShowShortcuts(value);
+    SettingsCache::instance().userInterface().setShowShortcuts(value);
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, value == 0); // 0 = unchecked
 }
 
@@ -412,7 +412,7 @@ void AppearanceSettingsPage::overrideAllCardArtWithPersonalPreferenceToggled(QT_
  */
 void AppearanceSettingsPage::cardViewInitialRowsMaxChanged(int value)
 {
-    SettingsCache::instance().interface().setCardViewInitialRowsMax(value);
+    SettingsCache::instance().userInterface().setCardViewInitialRowsMax(value);
     if (cardViewExpandedRowsMaxBox.value() < value) {
         cardViewExpandedRowsMaxBox.setValue(value);
     }
@@ -425,7 +425,7 @@ void AppearanceSettingsPage::cardViewInitialRowsMaxChanged(int value)
  */
 void AppearanceSettingsPage::cardViewExpandedRowsMaxChanged(int value)
 {
-    SettingsCache::instance().interface().setCardViewExpandedRowsMax(value);
+    SettingsCache::instance().userInterface().setCardViewExpandedRowsMax(value);
     if (cardViewInitialRowsMaxBox.value() > value) {
         cardViewInitialRowsMaxBox.setValue(value);
     }

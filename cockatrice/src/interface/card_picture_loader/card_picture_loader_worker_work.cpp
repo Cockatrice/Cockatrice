@@ -10,7 +10,7 @@
 #include <QNetworkReply>
 #include <QThread>
 #include <QThreadPool>
-#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/settings/download_settings.h>
 
 // Card back returned by gatherer when card is not found
 static const QStringList MD5_BLACKLIST = {
@@ -20,7 +20,7 @@ static const QStringList MD5_BLACKLIST = {
 
 CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(const CardPictureLoaderWorker *worker, const ExactCard &toLoad)
     : QObject(nullptr), cardToDownload(CardPictureToLoad(toLoad)),
-      picDownload(SettingsCache::instance().personal().getPicDownload())
+      picDownload(SettingsCache::instance().downloads().getPicDownload())
 {
     // Hook up signals to the orchestrator
     connect(this, &CardPictureLoaderWorkerWork::requestImageDownload, worker, &CardPictureLoaderWorker::queueRequest);
@@ -32,7 +32,7 @@ CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(const CardPictureLoader
             &CardPictureLoaderWorker::imageRequestSucceeded);
 
     // Hook up signals to settings
-    connect(&SettingsCache::instance().personal(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
+    connect(&SettingsCache::instance().downloads(), SIGNAL(picDownloadChanged()), this, SLOT(picDownloadChanged()));
 
     startNextPicDownload();
 }
@@ -211,5 +211,5 @@ void CardPictureLoaderWorkerWork::concludeImageLoad(const QImage &image)
 
 void CardPictureLoaderWorkerWork::picDownloadChanged()
 {
-    picDownload = SettingsCache::instance().personal().getPicDownload();
+    picDownload = SettingsCache::instance().downloads().getPicDownload();
 }

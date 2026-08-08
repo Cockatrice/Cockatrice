@@ -12,62 +12,62 @@ bool ChatSettings::getChatMention() const
 
 bool ChatSettings::getChatMentionCompleter() const
 {
-    return getValue("mentioncompleter", QString(), QString(), true).toBool();
+    return getValue("mentionCompleter", QString(), QString(), true).toBool();
 }
 
 QString ChatSettings::getChatMentionColor() const
 {
-    return getValue("mentioncolor", QString(), QString(), "A6120D").toString();
+    return getValue("mentionColor", QString(), QString(), "A6120D").toString();
 }
 
 QString ChatSettings::getChatHighlightColor() const
 {
-    return getValue("highlightcolor", QString(), QString(), "A6120D").toString();
+    return getValue("highlightColor", QString(), QString(), "A6120D").toString();
 }
 
 bool ChatSettings::getChatMentionForeground() const
 {
-    return getValue("mentionforeground", QString(), QString(), true).toBool();
+    return getValue("mentionForeground", QString(), QString(), true).toBool();
 }
 
 bool ChatSettings::getChatHighlightForeground() const
 {
-    return getValue("highlightforeground", QString(), QString(), true).toBool();
+    return getValue("highlightForeground", QString(), QString(), true).toBool();
 }
 
 bool ChatSettings::getIgnoreUnregisteredUsers() const
 {
-    return getValue("ignore_unregistered").toBool();
+    return getValue("ignoreUnregistered").toBool();
 }
 
 bool ChatSettings::getIgnoreUnregisteredUserMessages() const
 {
-    return getValue("ignore_unregistered_messages").toBool();
+    return getValue("ignoreUnregisteredMessages").toBool();
 }
 
 bool ChatSettings::getIgnoreNonBuddyUserMessages() const
 {
-    return getValue("ignore_nonbuddy_messages").toBool();
+    return getValue("ignoreNonBuddyMessages").toBool();
 }
 
 bool ChatSettings::getShowMessagePopup() const
 {
-    return getValue("showmessagepopups", QString(), QString(), true).toBool();
+    return getValue("showMessagePopups", QString(), QString(), true).toBool();
 }
 
 bool ChatSettings::getShowMentionPopup() const
 {
-    return getValue("showmentionpopups", QString(), QString(), true).toBool();
+    return getValue("showMentionPopups", QString(), QString(), true).toBool();
 }
 
 bool ChatSettings::getRoomHistory() const
 {
-    return getValue("roomhistory", QString(), QString(), true).toBool();
+    return getValue("roomHistory", QString(), QString(), true).toBool();
 }
 
 QString ChatSettings::getHighlightWords() const
 {
-    return getValue("highlightwords").toString();
+    return getValue("highlightWords").toString();
 }
 
 void ChatSettings::setChatMention(bool _chatMention)
@@ -77,61 +77,61 @@ void ChatSettings::setChatMention(bool _chatMention)
 
 void ChatSettings::setChatMentionCompleter(bool _chatMentionCompleter)
 {
-    setValue(_chatMentionCompleter, "mentioncompleter");
+    setValue(_chatMentionCompleter, "mentionCompleter");
     emit chatMentionCompleterChanged();
 }
 
 void ChatSettings::setChatMentionColor(const QString &_chatMentionColor)
 {
-    setValue(_chatMentionColor, "mentioncolor");
+    setValue(_chatMentionColor, "mentionColor");
 }
 
 void ChatSettings::setChatHighlightColor(const QString &_chatHighlightColor)
 {
-    setValue(_chatHighlightColor, "highlightcolor");
+    setValue(_chatHighlightColor, "highlightColor");
 }
 
 void ChatSettings::setChatMentionForeground(bool _chatMentionForeground)
 {
-    setValue(_chatMentionForeground, "mentionforeground");
+    setValue(_chatMentionForeground, "mentionForeground");
 }
 
 void ChatSettings::setChatHighlightForeground(bool _chatHighlightForeground)
 {
-    setValue(_chatHighlightForeground, "highlightforeground");
+    setValue(_chatHighlightForeground, "highlightForeground");
 }
 
 void ChatSettings::setIgnoreUnregisteredUsers(bool _ignoreUnregisteredUsers)
 {
-    setValue(_ignoreUnregisteredUsers, "ignore_unregistered");
+    setValue(_ignoreUnregisteredUsers, "ignoreUnregistered");
 }
 
 void ChatSettings::setIgnoreUnregisteredUserMessages(bool _ignoreUnregisteredUserMessages)
 {
-    setValue(_ignoreUnregisteredUserMessages, "ignore_unregistered_messages");
+    setValue(_ignoreUnregisteredUserMessages, "ignoreUnregisteredMessages");
 }
 
 void ChatSettings::setIgnoreNonBuddyUserMessages(bool _ignoreNonBuddyUserMessages)
 {
-    setValue(_ignoreNonBuddyUserMessages, "ignore_nonbuddy_messages");
+    setValue(_ignoreNonBuddyUserMessages, "ignoreNonBuddyMessages");
 }
 
 void ChatSettings::setShowMessagePopups(bool _showMessagePopups)
 {
-    setValue(_showMessagePopups, "showmessagepopups");
+    setValue(_showMessagePopups, "showMessagePopups");
 }
 
 void ChatSettings::setShowMentionPopups(bool _showMentionPopups)
 {
-    setValue(_showMentionPopups, "showmentionpopups");
+    setValue(_showMentionPopups, "showMentionPopups");
 }
 
 void ChatSettings::setRoomHistory(bool _roomHistory)
 {
-    setValue(_roomHistory, "roomhistory");
+    setValue(_roomHistory, "roomHistory");
 }
 
 void ChatSettings::setHighlightWords(const QString &_highlightWords)
 {
-    setValue(_highlightWords, "highlightwords");
+    setValue(_highlightWords, "highlightWords");
 }
