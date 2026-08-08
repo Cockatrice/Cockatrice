@@ -154,7 +154,11 @@ void DlgSettings::setupUi()
     connect(searchResultsView, &QListView::clicked, this, &DlgSettings::onSearchResultClicked);
 
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this, [this] {
-        searchDelegate->setPageIcons(pageIconResources());
+        const QStringList icons = pageIconResources();
+        for (int i = 0; i < tabButtons.size() && i < icons.size(); ++i) {
+            tabButtons[i]->setIcon(QPixmap(icons[i]));
+        }
+        searchDelegate->setPageIcons(icons);
         searchResultsView->viewport()->update();
     });
 
@@ -391,9 +395,13 @@ void DlgSettings::navigateToSearchResult(const QModelIndex &index)
 
     // Scroll to the widget, focus it, and flash to highlight it
     if (entry.widget) {
-        QScrollArea *scrollArea = qobject_cast<QScrollArea *>(pagesWidget->currentWidget());
-        if (scrollArea) {
-            scrollArea->ensureWidgetVisible(entry.widget);
+        QWidget *widget = entry.widget;
+        while (widget) {
+            if (auto *scrollArea = qobject_cast<QScrollArea *>(widget)) {
+                scrollArea->ensureWidgetVisible(entry.widget);
+                break;
+            }
+            widget = widget->parentWidget();
         }
         entry.widget->setFocus();
         flashWidget(entry.widget);
@@ -423,8 +431,10 @@ bool DlgSettings::eventFilter(QObject *watched, QEvent *event)
                 return true;
             }
         } else if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
-            if (searchActive && searchResultsView->currentIndex().isValid()) {
-                navigateToSearchResult(searchResultsView->currentIndex());
+            if (searchActive) {
+                if (searchResultsView->currentIndex().isValid()) {
+                    navigateToSearchResult(searchResultsView->currentIndex());
+                }
                 return true;
             }
         } else if (keyEvent->key() == Qt::Key_Down) {

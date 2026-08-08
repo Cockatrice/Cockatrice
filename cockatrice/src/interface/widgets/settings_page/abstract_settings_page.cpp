@@ -3,7 +3,6 @@
 #include "settings_search_model.h"
 
 #include <QCheckBox>
-#include <QComboBox>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
@@ -56,8 +55,8 @@ static bool isValidSettingLabel(const QLabel *label)
  * @brief Finds the control associated with a setting label
  *
  * Uses the explicit buddy if set, otherwise the widget in the cell (or slot)
- * immediately following the label within the same layout. Falls back to the
- * label itself when no obvious control is found.
+ * immediately following the label within the same layout. Returns nullptr when
+ * no obvious control is found.
  */
 static QWidget *controlForLabel(QLabel *label, QLayout *containingLayout)
 {
@@ -92,14 +91,16 @@ static QWidget *controlForLabel(QLabel *label, QLayout *containingLayout)
         }
     }
 
-    return label;
+    return nullptr;
 }
 
 /**
  * @brief Builds the extended search text for an entry
  *
  * Combines the group title, label, and any extra searchable text derived from
- * the associated control (tooltip, placeholder, prefix/suffix, combo text).
+ * the associated control (placeholder, prefix/suffix, tooltip). Combo values
+ * and numeric tooltips are excluded since they change at runtime and would
+ * make the search index stale.
  */
 static QString buildFullSearchText(const QString &groupTitle, const QString &cleanLabel, QWidget *control)
 {
@@ -110,11 +111,13 @@ static QString buildFullSearchText(const QString &groupTitle, const QString &cle
         } else if (auto *spinBox = qobject_cast<QSpinBox *>(control)) {
             parts.append(spinBox->prefix());
             parts.append(spinBox->suffix());
-        } else if (auto *comboBox = qobject_cast<QComboBox *>(control)) {
-            parts.append(comboBox->currentText());
         }
         if (!control->toolTip().isEmpty()) {
-            parts.append(control->toolTip());
+            bool isNumeric = false;
+            control->toolTip().toInt(&isNumeric);
+            if (!isNumeric) {
+                parts.append(control->toolTip());
+            }
         }
     }
     parts.removeAll(QString());
@@ -176,15 +179,16 @@ QList<SettingsSearchEntry> AbstractSettingsPage::autoDetectSearchEntries(QWidget
             QWidget *control = widget;
             if (auto *labelWidget = qobject_cast<QLabel *>(widget)) {
                 control = controlForLabel(labelWidget, pair.second);
+                if (!control) {
+                    continue;
+                }
             }
 
-            SettingsSearchEntry entry;
-            entry.pageIndex = pageIndex;
-            entry.groupTitle = groupTitle;
-            entry.widgetLabel = cleanLabel;
-            entry.widget = control;
-            entry.fullSearchText = buildFullSearchText(groupTitle, cleanLabel, control);
-            entries.append(entry);
+            entries.append(SettingsSearchEntry{.pageIndex = pageIndex,
+                                               .groupTitle = groupTitle,
+                                               .widgetLabel = cleanLabel,
+                                               .fullSearchText = buildFullSearchText(groupTitle, cleanLabel, control),
+                                               .widget = control});
         }
     }
 
