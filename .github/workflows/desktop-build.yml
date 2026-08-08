@@ -263,7 +263,7 @@ jobs:
         include:
           - os: macOS
             target: 13
-            runner: macos-15-intel
+            runner: macos-26-intel
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
@@ -275,50 +275,72 @@ jobs:
             soc: Intel
             type: Release
             use_ccache: 1
-            xcode: "16.4"
+            xcode: "26.6"
 
           - os: macOS
-            target: 14
-            runner: macos-14
+            target: 13
+            runner: macos-26
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
+            override_target: 13
+            override_arch: x86_64
+            package_suffix: "-macOS13_Intel2"
+            qt_version: 6.11.0
+            qt_arch: clang_64
+            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            soc: Intel
+            type: Release
+            use_ccache: 1
+            xcode: "26.6"
+
+          - os: macOS
+            target: 14
+            runner: macos-26
+
+            ccache_eviction_age: 7d
+            cmake_generator: Ninja
+            make_package: 1
+            override_target: 14
             package_suffix: "-macOS14"
             qt_version: 6.11.0
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
             use_ccache: 1
-            xcode: "15.4"
+            xcode: "26.6"
 
           - os: macOS
             target: 15
-            runner: macos-15
+            runner: macos-26
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
+            override_target: 15
             package_suffix: "-macOS15"
             qt_version: 6.11.0
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
             use_ccache: 1
-            xcode: "16.4"
+            xcode: "26.6"
 
           - os: macOS
-            target: 15
-            runner: macos-15
+            target: 26
+            runner: macos-26
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
+            make_package: 1
+            package_suffix: "-macOS26"
             qt_version: 6.11.0
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
-            type: Debug
+            type: Release
             use_ccache: 1
-            xcode: "16.4"
+            xcode: "26.6"
 
           - os: Windows
             target: 10
@@ -447,6 +469,7 @@ jobs:
           MAKE_PACKAGE: '${{ matrix.make_package }}'
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
+          CMAKE_OSX_ARCHITECTURES: ${{ matrix.override_arch }}
           USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           VCPKG_DISABLE_METRICS: 1
