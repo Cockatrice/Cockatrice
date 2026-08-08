@@ -1,21 +1,19 @@
-FROM debian:12
+FROM debian:12-slim
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        build-essential \
-        ccache \
-        clang-format \
-        cmake \
-        file \
-        g++ \
-        git \
-        libmariadb-dev-compat \
-        libprotobuf-dev \
-        libqt6sql6-mysql \
-        ninja-build \
-        protobuf-compiler \
-        qt6-tools-dev \
-        qt6-tools-dev-tools \
-        qt6-websockets-dev \
-    && apt-get clean \
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      ccache \
+      cmake \
+	  file \
+      g++ \
+      libmariadb-dev-compat \
+      libprotobuf-dev \
+      libqt6sql6-mysql \
+      ninja-build \
+      protobuf-compiler \
+      qt6-tools-dev \
+      qt6-tools-dev-tools \
+      qt6-websockets-dev \
     && rm -rf /var/lib/apt/lists/*
