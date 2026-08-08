@@ -175,6 +175,15 @@ public:
     {
         return false;
     }
+    /** @brief Record a failed login attempt from the given address; returns true if the address is now locked out. */
+    virtual bool recordFailedLogin(const QString & /*ipAddress*/)
+    {
+        return false;
+    }
+    /** @brief Clear any failed-login lockout for the given address, e.g. after a successful login. */
+    virtual void clearFailedLogins(const QString & /*ipAddress*/)
+    {
+    }
 
     Server_DatabaseInterface *getDatabaseInterface() const;
     int getNextLocalGameId()
