@@ -122,6 +122,7 @@ private:
     Response::ResponseCode cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd,
                                                       ResponseContainer &rc);
     Response::ResponseCode cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdSubmitPasswordVerifier(const Command_SubmitPasswordVerifier &cmd, ResponseContainer &rc);
     Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
     Response::ResponseCode
     processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);

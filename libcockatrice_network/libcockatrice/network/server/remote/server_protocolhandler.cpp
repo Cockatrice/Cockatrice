@@ -43,6 +43,22 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 {
 }
 
+void Server_ProtocolHandler::setAuthNonce(const QByteArray &nonce)
+{
+    authNonce = nonce;
+    authNonceCreated = QDateTime::currentDateTimeUtc();
+}
+
+bool Server_ProtocolHandler::isAuthNonceValid(const QByteArray &nonce) const
+{
+    return !authNonce.isEmpty() && authNonce == nonce && authNonceCreated.secsTo(QDateTime::currentDateTimeUtc()) < 60;
+}
+
+void Server_ProtocolHandler::clearAuthNonce()
+{
+    authNonce.clear();
+}
+
 // This function must only be called from the thread this object lives in.
 // Except when the server is shutting down.
 // The thread must not hold any server locks when calling this (e.g. clientsLock, roomsLock).
@@ -483,6 +499,16 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 
     if (userInfo != 0) {
         return Response::RespContextError;
+    }
+
+    // In strict mode only challenge-response logins are accepted.
+    if (server->requiresChallengeResponseAuth() &&
+        (!cmd.has_hashed_password() || cmd.hashed_password().rfind("$challenge$", 0) != 0)) {
+        auto *re = new Response_Login;
+        re->set_denied_reason_str("Client upgrade required");
+        re->add_missing_features("challenge_response_auth");
+        rc.setResponseExtension(re);
+        return Response::RespClientUpdateRequired;
     }
 
     // check client feature set against server feature set

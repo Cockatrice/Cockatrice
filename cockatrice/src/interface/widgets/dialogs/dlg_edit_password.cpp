@@ -18,7 +18,10 @@ DlgEditPassword::DlgEditPassword(QWidget *parent) : QDialog(parent)
 
     auto &servers = SettingsCache::instance().servers();
     if (servers.getSavePassword()) {
-        oldPasswordEdit->setText(servers.getPassword());
+        const QString stored = servers.getPassword();
+        if (!stored.startsWith("$")) {
+            oldPasswordEdit->setText(stored);
+        }
     }
 
     oldPasswordLabel->setBuddy(oldPasswordEdit);

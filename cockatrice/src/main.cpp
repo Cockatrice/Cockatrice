@@ -44,6 +44,7 @@
 #include <libcockatrice/settings/card_database_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/cryptoutil.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
@@ -241,7 +242,7 @@ int main(int argc, char *argv[])
         Logger::getInstance().logToFile(true);
     }
 
-    rng = new RNG_SFMT;
+    rng = new RNG_SFMT(CryptoUtil::randomUInt64());
     themeManager = new ThemeManager;
     soundEngine = new SoundEngine;
 
