@@ -79,9 +79,9 @@ bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
 #elif Q_PROCESSOR_WORDSIZE == 8
     const QString &version = QSysInfo::productVersion();
     if (version.startsWith("7") || version.startsWith("8")) {
-        return fileName.contains("Win7");
+        return fileName.contains("Win7") || fileName.contains("Windows7");
     } else {
-        return fileName.contains("Win10");
+        return fileName.contains("Win10") || fileName.contains("Windows10");
     }
 #else
     Q_UNUSED(fileName);
