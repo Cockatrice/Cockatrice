@@ -59,6 +59,10 @@ class DlgTipOfTheDay;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+signals:
+    /** @brief Emitted after the background card-database update subprocess exits. */
+    void cardDatabaseUpdateFinished(bool success);
+
 public slots:
     void actCheckCardUpdates();
     void actCheckCardUpdatesBackground();
@@ -113,6 +117,9 @@ private:
 
     void createTrayIcon();
     int getNextCustomSetPrefix(QDir dataDir);
+
+    void runFirstRunWizard();
+
     inline QString getCardUpdaterBinaryName()
     {
         return "oracle";
@@ -128,8 +135,8 @@ private:
     QAction *aConnect, *aDisconnect, *aRegister, *aForgotPassword, *aSinglePlayer, *aWatchReplay, *aFullScreen;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
         *aReloadCardDatabase;
-    QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aStatusBar, *aViewLog,
-        *aOpenSettingsFolder;
+    QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aFirstRunWizard, *aStatusBar,
+        *aViewLog, *aOpenSettingsFolder;
 
     TabSupervisor *tabSupervisor;
     WndSets *wndSets;

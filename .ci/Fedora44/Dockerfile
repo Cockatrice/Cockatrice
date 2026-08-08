@@ -8,7 +8,7 @@ RUN dnf install -y \
         mariadb-devel \
         ninja-build \
         protobuf-devel \
-        qt6-{qttools,qtsvg,qtmultimedia,qtwebsockets}-devel \
+        qt6-{qtdeclarative,qtshadertools,qttools,qtsvg,qtmultimedia,qtwebsockets}-devel \
         qt6-qtimageformats \
         rpm-build \
         xz-devel \

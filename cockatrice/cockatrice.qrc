@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>resources/cardback.svg</file>
         <file>resources/cockatrice.svg</file>
+        <file>resources/cockatrice-logo-white.svg</file>
         <file>resources/hand.svg</file>
         <file>resources/hr.jpg</file>
 
