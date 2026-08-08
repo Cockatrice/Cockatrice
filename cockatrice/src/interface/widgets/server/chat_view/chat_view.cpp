@@ -13,6 +13,7 @@
 #include <QDesktopServices>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QTimer>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/settings/chat_settings.h>
 
@@ -327,7 +328,20 @@ void ChatView::appendMessage(QString message,
     }
 
     if (atBottom || messageType.testFlag(Event_RoomSay::ChatHistory)) {
-        verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+        scrollToBottom();
+    }
+}
+
+void ChatView::scrollToBottom()
+{
+    verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+
+    if (!scrollToBottomPending) {
+        scrollToBottomPending = true;
+        QTimer::singleShot(0, this, [this] {
+            scrollToBottomPending = false;
+            verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+        });
     }
 }
 

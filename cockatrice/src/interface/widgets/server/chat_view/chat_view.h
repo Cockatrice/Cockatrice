@@ -60,6 +60,7 @@ private:
     QStringList highlightedWords;
     bool evenNumber;
     bool showTimestamps;
+    bool scrollToBottomPending = false;
     HoveredItemType hoveredItemType;
     QString hoveredContent;
     QAction *messageClicked;
@@ -67,6 +68,7 @@ private:
 
     [[nodiscard]] QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
     QTextCursor prepareBlock(bool same = false);
+    void scrollToBottom();
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
     static QColor getCustomMentionColor();
