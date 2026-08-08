@@ -8,6 +8,7 @@ set(HEADERS
     libcockatrice/settings/card_override_settings.h
     libcockatrice/settings/cards_display_settings.h
     libcockatrice/settings/chat_settings.h
+    libcockatrice/settings/commander_bracket_settings.h
     libcockatrice/settings/debug_settings.h
     libcockatrice/settings/download_settings.h
     libcockatrice/settings/game_filters_settings.h
@@ -39,6 +40,7 @@ add_library(
   libcockatrice/settings/cache_storage_settings.cpp
   libcockatrice/settings/card_database_settings.cpp
   libcockatrice/settings/card_override_settings.cpp
+  libcockatrice/settings/commander_bracket_settings.cpp
   libcockatrice/settings/cards_display_settings.cpp
   libcockatrice/settings/chat_settings.cpp
   libcockatrice/settings/debug_settings.cpp
