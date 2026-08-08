@@ -17,6 +17,13 @@ RNG_SFMT::RNG_SFMT(QObject *parent) : RNG_Abstract(parent)
     sfmt_init_gen_rand(&sfmt, QDateTime::currentDateTime().toSecsSinceEpoch());
 }
 
+RNG_SFMT::RNG_SFMT(uint64_t seed, QObject *parent) : RNG_Abstract(parent)
+{
+    // initialize the random number generator with a 64bit seed, e.g. from a CSPRNG
+    uint32_t seedArray[2] = {static_cast<uint32_t>(seed), static_cast<uint32_t>(seed >> 32)};
+    sfmt_init_by_array(&sfmt, seedArray, 2);
+}
+
 /**
  * This method is the rand() equivalent which calls the cdf with proper bounds.
  *
