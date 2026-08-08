@@ -36,11 +36,11 @@ constexpr qreal COMMAND_ZONE_WIDTH = CardDimensions::WIDTH_F * 1.5;
  * @class CommandZone
  * @brief Graphics layer for the command zone in Commander format games.
  *
- * Always visible when enabled. Supports multiple cards using a zigzag
- * horizontal stacking pattern: single cards display centered, multiple
- * cards alternate left-right with vertical overlap compression.
- * Can be minimized to 25% height via double-click.
+ * Always visible when enabled. Uses the generic vertical stacking layout
+ * with bottom overflow enabled. Can be minimized via double-click (25% height,
+ * or the tax-counter floor if higher).
  *
+ * @see SelectZone::layoutCardsVertically for the stacking algorithm
  * @see CommandZoneLogic for card data management
  * @see CommanderTaxCounter for the tax counter overlay
  */
@@ -50,7 +50,7 @@ class CommandZone : public SelectZone
 private:
     static constexpr double MINIMIZED_HEIGHT_RATIO = 0.25;
     int zoneHeight;                       ///< Full height in pixels when expanded
-    bool minimized = false;               ///< Whether zone is at 25% height
+    bool minimized = false;               ///< Whether zone is collapsed (25% height, or the tax-counter floor)
     int minimumHeight = 0;                ///< Floor for minimized height (e.g. to fit tax counters)
     QList<AbstractCounter *> taxCounters; ///< Registered tax counter widgets
 
@@ -77,11 +77,12 @@ public:
     [[nodiscard]] QRectF boundingRect() const override;
     /** @brief Paints the zone background using the Commander theme brush. */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-    /** @brief Repositions cards using zigzag horizontal stacking with overlap compression. */
+    /** @brief Repositions cards using vertical stacking with bottom overflow. */
     void reorganizeCards() override;
 
-    /** @brief Toggles between full and 25% minimized height. */
+    /** @brief Toggles between full and minimized height. */
     void toggleMinimized();
+    /** @brief Returns whether the zone is currently minimized. */
     [[nodiscard]] bool isMinimized() const;
     /** @brief Returns the current display height (full or minimized). */
     [[nodiscard]] qreal currentHeight() const;
@@ -100,9 +101,10 @@ public:
     void rearrangeTaxCounters();
 
 signals:
+    /** @brief Emitted when the zone's minimized state changes. */
     void minimizedChanged(bool isMinimized);
-    // Displayed height changed without a minimized-state change (e.g. tax counter toggled
-    // while minimized); lets neighbouring zones reposition.
+    /** @brief Emitted when display height changes without a minimized-state change (e.g. tax counter toggled while
+     * minimized). */
     void effectiveHeightChanged();
 
 protected:

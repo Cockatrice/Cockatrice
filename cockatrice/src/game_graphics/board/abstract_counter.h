@@ -3,7 +3,6 @@
  * @ingroup GameGraphicsPlayers
  * @brief Abstract base for player counters displayed on the game board.
  */
-//! \todo Document this file.
 
 #ifndef COUNTER_H
 #define COUNTER_H
@@ -21,6 +20,7 @@ class QKeyEvent;
 class QMenu;
 class QString;
 
+//! \todo Document AbstractCounter class members.
 class AbstractCounter : public QObject, public QGraphicsItem, public AbstractPlayerComponent
 {
     Q_OBJECT
@@ -65,8 +65,11 @@ public:
 
     /**
      * @brief Sets the counter value and triggers a visual update.
+     *
      * Virtual to allow subclass display customization (e.g., CommanderTaxCounter tooltip updates).
      * Overflow protection is handled server-side, not in client counter classes.
+     *
+     * @param _value The new counter value
      */
     virtual void setValue(int _value);
     void setShortcutsActive() override;
@@ -120,7 +123,7 @@ public:
     virtual void setActive(bool _active);
 
 private:
-    bool active = true;
+    bool active = true; ///< Whether the counter is shown and modifiable
 };
 
 class AbstractCounterDialog : public QInputDialog

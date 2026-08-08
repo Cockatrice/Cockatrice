@@ -171,7 +171,7 @@ private:
     void setCounterMenuRegistered(AbstractCounter *widget, bool registered);
     /** @brief Returns the command zone's display height, or 0 if hidden. */
     [[nodiscard]] qreal totalCommandZoneHeight() const;
-    /** @brief Positions the command and stack zones vertically starting from base, updating base.y. */
+    /** @brief Positions the command and stack zones vertically starting from base. */
     void positionCommandAndStackZones(const QPointF &base);
 private slots:
     void updateBoundingRect();

@@ -1,6 +1,6 @@
 /**
  * @file counter_ids.h
- * @ingroup GameLogic
+ * @ingroup Core
  * @brief Shared counter IDs and names for system counters (e.g. commander tax).
  */
 
@@ -10,7 +10,9 @@
 #include <QString>
 
 /**
- * Shared counter IDs used by both client and server.
+ * @namespace CounterIds
+ * @brief Shared counter IDs used by both client and server.
+ *
  * Single source of truth: included directly by both sides, so they cannot drift.
  *
  * Reserved counter IDs for system counters:
@@ -28,17 +30,25 @@ constexpr int CommanderTax = 8; ///< Primary commander tax counter
 constexpr int PartnerTax = 9;   ///< Partner commander tax counter
 constexpr int FirstUserId = 10; ///< First ID available for user-created counters
 
+/** @brief Returns true if the given ID is a reserved tax counter. */
 inline bool isTaxCounter(int id)
 {
     return id == CommanderTax || id == PartnerTax;
 }
 } // namespace CounterIds
 
+/**
+ * @namespace CounterNames
+ * @brief Reserved counter names for server-managed tax counters.
+ *
+ * Used to reject user-created counters that would spoof system counters.
+ */
 namespace CounterNames
 {
 constexpr const char *CommanderTax = "commander_tax_counter";
 constexpr const char *PartnerTax = "partner_tax_counter";
 
+/** @brief Returns true if the given name is a reserved tax counter name. */
 inline bool isTaxCounter(const QString &name)
 {
     return name == CommanderTax || name == PartnerTax;

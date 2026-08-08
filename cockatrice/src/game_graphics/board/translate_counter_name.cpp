@@ -1,5 +1,7 @@
 #include "translate_counter_name.h"
 
+#include <libcockatrice/utility/counter_ids.h>
+
 const QMap<QString, QString> TranslateCounterName::translated = {
     {"life", QT_TRANSLATE_NOOP("TranslateCounterName", "Life")},
     {"w", QT_TRANSLATE_NOOP("TranslateCounterName", "White")},
@@ -9,5 +11,5 @@ const QMap<QString, QString> TranslateCounterName::translated = {
     {"g", QT_TRANSLATE_NOOP("TranslateCounterName", "Green")},
     {"x", QT_TRANSLATE_NOOP("TranslateCounterName", "Colorless")},
     {"storm", QT_TRANSLATE_NOOP("TranslateCounterName", "Other")},
-    {"commander_tax_counter", QT_TRANSLATE_NOOP("TranslateCounterName", "Commander Tax")},
-    {"partner_tax_counter", QT_TRANSLATE_NOOP("TranslateCounterName", "Partner Tax")}};
+    {CounterNames::CommanderTax, QT_TRANSLATE_NOOP("TranslateCounterName", "Commander Tax")},
+    {CounterNames::PartnerTax, QT_TRANSLATE_NOOP("TranslateCounterName", "Partner Tax")}};

@@ -175,6 +175,10 @@ message GameCommand {
         /// Server: Server_Player::cmdReverseTurn
         /// Client: reflected via subsequent turn events
         REVERSE_TURN = 1034;
+
+        /// Show or hide a reserved tax counter without deleting it.
+        /// Server: Server_Player::cmdSetCounterActive
+        /// Client: PlayerEventHandler::eventSetCounterActive
         SET_COUNTER_ACTIVE = 1035;
     }
 

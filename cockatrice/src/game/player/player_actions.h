@@ -228,6 +228,7 @@ public slots:
     void cardMenuAction(QList<CardItem *> selectedCards, CardMenuActionType type);
 
 private:
+    /** @brief Sends an increment command for the specified counter. */
     void sendIncCounter(int counterId, int delta);
 
     PlayerLogic *player;
@@ -258,6 +259,8 @@ private:
 
     /**
      * @brief Builds the move command for playing a card, returning the prepared (unsent) PendingCommand.
+     * @param card The card to play
+     * @param faceDown Whether to play the card face-down
      * @return The prepared command, or nullptr if the card cannot be played.
      */
     PendingCommand *prepareCardMove(CardItem *card, bool faceDown);
