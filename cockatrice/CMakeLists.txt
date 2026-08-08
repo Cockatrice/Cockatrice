@@ -530,6 +530,22 @@ if(UNIX)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION ${DESKTOPDIR})
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice-cod.xml DESTINATION ${MIMEDIR})
+
+    # Refresh the freedesktop databases so the file associations and scheme
+    # handler register without requiring the user to run them manually. The
+    # tools may be missing on minimal systems; that is fine, packaging systems
+    # usually refresh these databases through their own triggers.
+    find_program(UPDATE_MIME_DATABASE update-mime-database)
+    if(UPDATE_MIME_DATABASE)
+      install(CODE "execute_process(COMMAND \"${UPDATE_MIME_DATABASE}\" \"${CMAKE_INSTALL_PREFIX}/share/mime\")")
+    endif()
+
+    find_program(UPDATE_DESKTOP_DATABASE update-desktop-database)
+    if(UPDATE_DESKTOP_DATABASE)
+      install(
+        CODE "execute_process(COMMAND \"${UPDATE_DESKTOP_DATABASE}\" \"${CMAKE_INSTALL_PREFIX}/share/applications\")"
+      )
+    endif()
   endif()
 elseif(WIN32)
   install(TARGETS cockatrice RUNTIME DESTINATION ./)

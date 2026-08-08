@@ -10,12 +10,16 @@
 #include "games_model.h"
 #include "user/user_list_manager.h"
 
+#include <QClipboard>
 #include <QDebug>
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTreeView>
+#include <QUrl>
+#include <QUrlQuery>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
@@ -315,6 +319,21 @@ void GameSelector::customContextMenu(const QPoint &point)
         dlg.exec();
     });
 
+    QAction copyLink(tr("Copy Game Link"));
+    connect(&copyLink, &QAction::triggered, this, [=, this]() {
+        const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
+        QUrl url;
+        url.setScheme("cockatrice");
+        url.setHost("joingame");
+        QUrlQuery query;
+        query.addQueryItem("hostname", client->serverName());
+        query.addQueryItem("port", QString::number(client->serverPort()));
+        query.addQueryItem("roomid", QString::number(gameInfo.room_id()));
+        query.addQueryItem("gameid", QString::number(gameInfo.game_id()));
+        url.setQuery(query);
+        QGuiApplication::clipboard()->setText(url.toString(QUrl::FullyEncoded));
+    });
+
     QMenu menu;
     menu.addAction(&joinGame);
 
@@ -332,6 +351,11 @@ void GameSelector::customContextMenu(const QPoint &point)
 
     menu.addAction(&spectateGame);
     menu.addAction(&getGameInfo);
+
+    if (!client->serverName().isEmpty()) {
+        menu.addAction(&copyLink);
+    }
+
     menu.exec(gameListView->mapToGlobal(point));
 }
 

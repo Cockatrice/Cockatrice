@@ -30,3 +30,19 @@ void Intent::runDependency(Intent *dependency)
 
     dependency->execute();
 }
+
+void Intent::emitFinished()
+{
+    if (!completed) {
+        completed = true;
+        emit finished();
+    }
+}
+
+void Intent::emitFailed(const QString &reason)
+{
+    if (!completed) {
+        completed = true;
+        emit failed(reason);
+    }
+}

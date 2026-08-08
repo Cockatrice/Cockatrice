@@ -9,11 +9,11 @@ bool IntentWaitForDatabaseLoad::checkPrecondition() const
 
 void IntentWaitForDatabaseLoad::onPreconditionSatisfied()
 {
-    emit finished();
+    emitFinished();
 }
 
 void IntentWaitForDatabaseLoad::onPreconditionNotSatisfied()
 {
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
-            [this]() { emit finished(); });
+            [this]() { emitFinished(); });
 }

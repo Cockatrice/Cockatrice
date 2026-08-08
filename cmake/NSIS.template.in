@@ -416,9 +416,18 @@ Section "un.Application" UnSecApplication
 	RMDir "$SMPROGRAMS\Cockatrice"
 
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Cockatrice"
-	DeleteRegKey HKCR ".cod"
-    DeleteRegKey HKCR "Cockatrice"
-    DeleteRegKey HKCR "cockatrice"
+
+	; Only remove the file/protocol associations if we registered them (i.e. the
+	; install was not portable) and .cod is still owned by Cockatrice, so we don't
+	; clobber a .cod association installed by another application.
+	${If} Not ${FileExists} "$INSTDIR\portable.dat"
+		ReadRegStr $0 HKCR ".cod" ""
+		${If} $0 == "Cockatrice"
+			DeleteRegKey HKCR ".cod"
+			DeleteRegKey HKCR "Cockatrice"
+			DeleteRegKey HKCR "cockatrice"
+		${EndIf}
+	${EndIf}
 SectionEnd
 
 ; unselected because it is /o

@@ -12,7 +12,7 @@ bool IntentDisconnectFromServer::checkPrecondition() const
 
 void IntentDisconnectFromServer::onPreconditionSatisfied()
 {
-    emit finished();
+    emitFinished();
 }
 
 void IntentDisconnectFromServer::onPreconditionNotSatisfied()
@@ -24,6 +24,6 @@ void IntentDisconnectFromServer::onPreconditionNotSatisfied()
 void IntentDisconnectFromServer::onStatusChanged(ClientStatus status)
 {
     if (status == ClientStatus::StatusDisconnected) {
-        emit finished();
+        emitFinished();
     }
 }

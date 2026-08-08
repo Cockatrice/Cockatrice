@@ -1,12 +1,24 @@
 #include "single_instance_manager.h"
 
+#include <QDir>
+
 SingleInstanceManager::SingleInstanceManager(QObject *parent) : QObject(parent)
 {
 }
 
 bool SingleInstanceManager::tryRun(const QStringList &filesToSend)
 {
-    serverName = "CockatriceSingleInstance";
+    // Scope the socket name to the current user. On Linux the default abstract
+    // namespace is system-wide, so a plain name would let one user's instance
+    // hijack another user's session.
+    QString userName = qEnvironmentVariable("USER");
+    if (userName.isEmpty()) {
+        userName = qEnvironmentVariable("USERNAME");
+    }
+    if (userName.isEmpty()) {
+        userName = QDir::home().dirName();
+    }
+    serverName = QStringLiteral("CockatriceSingleInstance-%1").arg(userName);
 
     // Hand off to an already-running primary instance if one exists.
     if (forwardToPrimary(filesToSend)) {

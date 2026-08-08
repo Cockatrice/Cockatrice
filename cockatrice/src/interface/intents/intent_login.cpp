@@ -21,13 +21,13 @@ void IntentGetLoginCredentials::onPreconditionSatisfied()
     if (index >= 0) {
         context->username = servers.getValue(QString("username%1").arg(index), "server", "server_details").toString();
         context->password = servers.getValue(QString("password%1").arg(index), "server", "server_details").toString();
-        emit finished();
+        emitFinished();
     } else {
-        emit failed(tr("No saved credentials for this server"));
+        emitFailed(tr("No saved credentials for this server"));
     }
 }
 
 void IntentGetLoginCredentials::onPreconditionNotSatisfied()
 {
-    emit failed(tr("No saved credentials for this server"));
+    emitFailed(tr("No saved credentials for this server"));
 }

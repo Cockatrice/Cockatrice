@@ -6,6 +6,7 @@
 #include "remote_client.h"
 
 #include <QScopedPointer>
+#include <memory>
 
 class TabRoom;
 class TabSupervisor;
@@ -15,7 +16,9 @@ class IntentJoinServerGame : public Intent
     Q_OBJECT
 
 public:
-    IntentJoinServerGame(TabSupervisor *_tabSupervisor, RemoteClient *_remoteClient, ContextJoinGame *_context);
+    IntentJoinServerGame(TabSupervisor *_tabSupervisor,
+                         RemoteClient *_remoteClient,
+                         std::unique_ptr<ContextJoinGame> _context);
 
 protected:
     bool checkPrecondition() const override;
@@ -29,7 +32,6 @@ private:
     TabSupervisor *tabSupervisor;
     RemoteClient *remoteClient;
     QScopedPointer<ContextJoinGame> context;
-    bool joined = false;
 };
 
 #endif // COCKATRICE_INTENT_JOIN_SERVER_GAME_H

@@ -2,6 +2,8 @@
 
 #include "intent_disconnect_from_server.h"
 
+#include <QTimer>
+
 IntentConnectToServer::IntentConnectToServer(RemoteClient *_remoteClient, ContextConnectToServer *_context)
     : Intent(), remoteClient(_remoteClient), context(_context)
 {
@@ -16,10 +18,14 @@ void IntentConnectToServer::onPreconditionSatisfied()
 {
     remoteClient->connectToServer(context->hostname, context->port.toUInt(), context->username, context->password);
     connect(remoteClient, &RemoteClient::statusChanged, this, &IntentConnectToServer::onStatusChanged);
-    connect(remoteClient, &RemoteClient::loginError, this,
-            [this](Response::ResponseCode, const QString &reason, quint32, const QList<QString> &) {
-                emit failed(reason);
-            });
+    connect(remoteClient, &RemoteClient::socketError, this, &IntentConnectToServer::onSocketError);
+    connect(
+        remoteClient, &RemoteClient::loginError, this,
+        [this](Response::ResponseCode, const QString &reason, quint32, const QList<QString> &) { emitFailed(reason); });
+
+    QTimer::singleShot(15000, this, [this]() {
+        emitFailed(tr("Timed out while connecting to %1:%2").arg(context->hostname, context->port));
+    });
 }
 
 void IntentConnectToServer::onPreconditionNotSatisfied()
@@ -30,6 +36,11 @@ void IntentConnectToServer::onPreconditionNotSatisfied()
 void IntentConnectToServer::onStatusChanged(ClientStatus status)
 {
     if (status == ClientStatus::StatusLoggedIn) {
-        emit finished();
+        emitFinished();
     }
+}
+
+void IntentConnectToServer::onSocketError(const QString &errorString)
+{
+    emitFailed(tr("Failed to connect to %1:%2: %3").arg(context->hostname, context->port, errorString));
 }

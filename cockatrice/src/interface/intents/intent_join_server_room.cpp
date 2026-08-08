@@ -5,6 +5,9 @@
 #include "../widgets/tabs/tab_supervisor.h"
 #include "intent_connect_to_server.h"
 
+#include <QTimer>
+#include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
+
 IntentJoinServerRoom::IntentJoinServerRoom(TabSupervisor *_tabSupervisor,
                                            RemoteClient *_remoteClient,
                                            ContextJoinRoom *_context)
@@ -23,6 +26,9 @@ bool IntentJoinServerRoom::checkPrecondition() const
     if (remoteClient->peerName() != context->serverContext.hostname) {
         return false;
     }
+    if (QString::number(remoteClient->peerPort()) != context->serverContext.port) {
+        return false;
+    }
 
     return true;
 }
@@ -31,7 +37,7 @@ void IntentJoinServerRoom::onPreconditionSatisfied()
 {
     if (tabSupervisor->getRoomTabs().contains(context->roomId)) {
         tabSupervisor->setCurrentWidget(tabSupervisor->getRoomTabs().value(context->roomId));
-        emit finished();
+        emitFinished();
         return;
     }
 
@@ -41,12 +47,25 @@ void IntentJoinServerRoom::onPreconditionSatisfied()
         tabServer = tabSupervisor->getTabServer();
     }
     if (!tabServer) {
-        emit failed(tr("No server tab available"));
+        emitFailed(tr("No server tab available"));
         return;
     }
 
-    tabServer->joinRoom(context->roomId, true);
-    connect(tabServer, &TabServer::roomJoined, this, &IntentJoinServerRoom::finished);
+    const int roomId = context->roomId;
+    tabServer->joinRoom(roomId, true);
+    connect(tabServer, &TabServer::roomJoined, this, [this, roomId](const ServerInfo_Room &info, bool) {
+        if (info.room_id() == roomId) {
+            emitFinished();
+        }
+    });
+    connect(tabServer, &TabServer::roomJoinFailed, this, [this, roomId](int failedRoomId) {
+        if (failedRoomId == roomId) {
+            emitFailed(tr("Failed to join the server room %1").arg(roomId));
+        }
+    });
+
+    QTimer::singleShot(15000, this,
+                       [this, roomId]() { emitFailed(tr("Timed out while joining the server room %1").arg(roomId)); });
 }
 
 void IntentJoinServerRoom::onPreconditionNotSatisfied()

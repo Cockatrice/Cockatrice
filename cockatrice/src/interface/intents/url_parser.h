@@ -13,8 +13,6 @@ public:
     void handle(const QString &urlStr);
     void handleJoinGame(const QUrlQuery &query);
 
-    void parse(QString url);
-
 private:
     MainWindow *mainWindow;
 };

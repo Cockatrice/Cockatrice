@@ -23,6 +23,7 @@ private:
 
 private slots:
     void onStatusChanged(ClientStatus status);
+    void onSocketError(const QString &errorString);
 };
 
 #endif // COCKATRICE_INTENT_CONNECT_TO_SERVER_H

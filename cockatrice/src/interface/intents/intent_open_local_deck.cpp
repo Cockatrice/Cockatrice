@@ -22,8 +22,10 @@ void IntentOpenLocalDeck::onPreconditionSatisfied()
     std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(file, DeckFileFormat::getFormatFromName(file), true);
     if (deckOpt) {
         tabSupervisor->openDeckInNewTab(deckOpt.value());
+        emitFinished();
+    } else {
+        emitFailed(tr("Unable to load deck file %1").arg(file));
     }
-    emit finished();
 }
 
 void IntentOpenLocalDeck::onPreconditionNotSatisfied()

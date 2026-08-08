@@ -5,29 +5,33 @@
 #include <QFileOpenEvent>
 #include <QObject>
 #include <QString>
+#include <QUrl>
 
 /**
- * @brief Event filter that catches QFileOpenEvent URLs matching a scheme
- *        prefix and re-emits them as urlReceived().
+ * @brief Event filter that catches QFileOpenEvent URLs matching a scheme and
+ *        re-emits them as urlReceived().
  *
  * On macOS, when the application is registered as a URL scheme handler, the
  * OS delivers incoming URLs via QFileOpenEvent on the QApplication object.
  * Install this filter on QApplication to intercept them:
  *
  * @code
- *   UrlSchemeEventFilter filter(QStringLiteral("cockatrice://"));
+ *   UrlSchemeEventFilter filter(QStringList{QStringLiteral("cockatrice")});
  *   QObject::connect(&filter, &UrlSchemeEventFilter::urlReceived,
  *                    &mainWindow, &MainWindow::handleUrl);
  *   app.installEventFilter(&filter);
  * @endcode
+ *
+ * Note: the strings are compared against QUrl::scheme(), so they must be
+ * written without the "://" suffix (e.g. "cockatrice", not "cockatrice://").
  */
 class UrlSchemeEventFilter : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit UrlSchemeEventFilter(const QStringList &schemePrefix, QObject *parent = nullptr)
-        : QObject(parent), m_prefixes(schemePrefix)
+    explicit UrlSchemeEventFilter(const QStringList &schemes, QObject *parent = nullptr)
+        : QObject(parent), prefixes(schemes)
     {
     }
 
@@ -42,7 +46,7 @@ public:
 
             const QUrl url = fileEvent->url();
 
-            for (auto prefix : m_prefixes) {
+            for (const auto &prefix : prefixes) {
                 if (url.scheme() == prefix) {
                     emit urlReceived(url.toString());
                     return true;
@@ -59,7 +63,7 @@ public:
     }
 
 private:
-    QStringList m_prefixes;
+    QStringList prefixes;
 };
 
 #endif // COCKATRICE_URL_SCHEME_EVENT_FILTER_H

@@ -9,8 +9,8 @@
 
 IntentJoinServerGame::IntentJoinServerGame(TabSupervisor *_tabSupervisor,
                                            RemoteClient *_remoteClient,
-                                           ContextJoinGame *_context)
-    : Intent(), tabSupervisor(_tabSupervisor), remoteClient(_remoteClient), context(_context)
+                                           std::unique_ptr<ContextJoinGame> _context)
+    : Intent(), tabSupervisor(_tabSupervisor), remoteClient(_remoteClient), context(_context.release())
 {
 }
 
@@ -23,6 +23,9 @@ bool IntentJoinServerGame::checkPrecondition() const
     // configured server port (e.g. when connecting through a proxy), so only
     // the hostname is compared here.
     if (remoteClient->peerName() != context->roomContext.serverContext.hostname) {
+        return false;
+    }
+    if (QString::number(remoteClient->peerPort()) != context->roomContext.serverContext.port) {
         return false;
     }
 
@@ -53,8 +56,7 @@ bool IntentJoinServerGame::tryJoinGame(TabRoom *room)
     }
 
     if (room->getGameSelector()->joinGameById(context->gameId)) {
-        joined = true;
-        emit finished();
+        emitFinished();
         return true;
     }
 
@@ -70,9 +72,5 @@ void IntentJoinServerGame::waitForGame(TabRoom *room)
         }
     });
 
-    QTimer::singleShot(15000, this, [this]() {
-        if (!joined) {
-            emit failed(tr("Game %1 not found in the room").arg(context->gameId));
-        }
-    });
+    QTimer::singleShot(15000, this, [this]() { emitFailed(tr("Game %1 not found in the room").arg(context->gameId)); });
 }

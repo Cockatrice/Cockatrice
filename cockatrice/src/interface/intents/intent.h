@@ -25,6 +25,13 @@ protected:
 
     // Helper to chain another intent
     void runDependency(Intent *dependency);
+
+    // Emit the outcome exactly once; ignore late signals after the intent is done.
+    void emitFinished();
+    void emitFailed(const QString &reason);
+
+private:
+    bool completed = false;
 };
 
 #endif // COCKATRICE_INTENT_H

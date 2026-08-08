@@ -42,6 +42,7 @@
 #include <QDebug>
 #include <QLibraryInfo>
 #include <QLocale>
+#include <QMessageBox>
 #include <QSystemTrayIcon>
 #include <QTranslator>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -263,6 +264,35 @@ int main(int argc, char *argv[])
         Logger::getInstance().logToFile(true);
     }
 
+    // --- Handle files or URLs passed at startup ---
+    // Only positional arguments are treated as files/URLs, so options like
+    // --connect are never handed off to another instance.
+    const QStringList startupFiles = parser.positionalArguments();
+    const bool hasActivationFiles = !startupFiles.isEmpty();
+
+    SingleInstanceManager instance;
+
+    if (hasActivationFiles) {
+        // Activation launch: hand off to the primary instance if one is
+        // running, otherwise become the primary ourselves. Do this before
+        // constructing the main window so a hand-off exits cheaply.
+        if (!instance.tryRun(startupFiles)) {
+            // Sent successfully → exit
+            return 0;
+        }
+        // No primary instance → become server
+        qInfo() << "No existing instance found, becoming primary instance";
+    } else {
+        // Plain launch: if another instance is running, run independently
+        // instead of handing off and exiting.
+        if (!instance.tryRun(QStringList())) {
+            // Another instance is already running → just run independently
+            qInfo() << "Another instance exists, running independently";
+        } else {
+            qInfo() << "No existing instance found, starting server";
+        }
+    }
+
     rng = new RNG_SFMT;
     themeManager = new ThemeManager;
     soundEngine = new SoundEngine;
@@ -301,6 +331,9 @@ int main(int argc, char *argv[])
             urlParser->handle(file);
         } else if (QFileInfo(file).exists()) {
             auto openDeckIntent = new IntentOpenLocalDeck(ui.getTabSupervisor(), file);
+            QObject::connect(openDeckIntent, &Intent::failed, &ui, [&ui](const QString &reason) {
+                QMessageBox::warning(&ui, QObject::tr("Open deck"), reason);
+            });
             openDeckIntent->execute();
         }
     };
@@ -325,35 +358,6 @@ int main(int argc, char *argv[])
     // If spoiler mode is enabled, we will download the spoilers
     // then reload the DB. otherwise just reload the DB
     SpoilerBackgroundUpdater spoilerBackgroundUpdater;
-
-    // --- Handle files or URLs passed at startup ---
-    QStringList startupFiles;
-    for (int i = 1; i < argc; ++i) {
-        startupFiles.append(QString::fromLocal8Bit(argv[i]));
-    }
-
-    bool hasActivationFiles = !startupFiles.isEmpty();
-
-    SingleInstanceManager instance;
-
-    if (hasActivationFiles) {
-        // Activation launch: try to forward
-        if (!instance.tryRun(startupFiles)) {
-            // Sent successfully → exit
-            return 0;
-        }
-        // No primary instance → become server
-        qInfo() << "No existing instance found, becoming primary instance";
-    } else {
-        // Plain launch: if another instance is running, run independently
-        // instead of handing off and exiting.
-        if (!instance.tryRun(QStringList())) {
-            // Another instance is already running → just run independently
-            qInfo() << "Another instance exists, running independently";
-        } else {
-            qInfo() << "No existing instance found, starting server";
-        }
-    }
 
     ui.show();
     qCInfo(MainLog) << "ui.show() finished";
