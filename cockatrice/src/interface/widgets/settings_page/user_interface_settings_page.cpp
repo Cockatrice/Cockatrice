@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
+#include "../tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.h"
 
 #include <QGridLayout>
 #include <libcockatrice/settings/cards_display_settings.h>
@@ -161,56 +162,53 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&defaultDeckEditorTypeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
             &SettingsCache::instance().deckEditor(), &DeckEditorSettings::setDefaultDeckEditorType);
 
-    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setText("?");
-    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setAutoRaise(true);
-    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setEnabled(false);
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setText("?");
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setAutoRaise(true);
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setEnabled(false);
 
     // Add items with userData = internal enum
-    deckEditorCommanderSpellbookIntegrationEnabledSelector.addItem(
-        tr("Disabled"), deckEditorCommanderSpellbookIntegrationEnabledIndexDisabled);
-    deckEditorCommanderSpellbookIntegrationEnabledSelector.addItem(
-        tr("Enabled"), deckEditorCommanderSpellbookIntegrationEnabledIndexEnabled);
-    deckEditorCommanderSpellbookIntegrationEnabledSelector.addItem(
-        tr("Automatic"), deckEditorCommanderSpellbookIntegrationEnabledIndexAutomatic);
+    commanderSpellbookIntegrationEnabledSelector.addItem(tr("Disabled"),
+                                                         commanderSpellbookIntegrationEnabledIndexDisabled);
+    commanderSpellbookIntegrationEnabledSelector.addItem(tr("Enabled"),
+                                                         commanderSpellbookIntegrationEnabledIndexEnabled);
+    commanderSpellbookIntegrationEnabledSelector.addItem(tr("Automatic"),
+                                                         commanderSpellbookIntegrationEnabledIndexAutomatic);
 
-    int storedMode = SettingsCache::instance().cardsDisplay().getDeckEditorCommanderSpellbookIntegrationEnabled();
-    for (int i = 0; i < deckEditorCommanderSpellbookIntegrationEnabledSelector.count(); ++i) {
-        if (deckEditorCommanderSpellbookIntegrationEnabledSelector.itemData(i).toInt() == storedMode) {
-            deckEditorCommanderSpellbookIntegrationEnabledSelector.setCurrentIndex(i);
+    int storedMode = SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationEnabled();
+    for (int i = 0; i < commanderSpellbookIntegrationEnabledSelector.count(); ++i) {
+        if (commanderSpellbookIntegrationEnabledSelector.itemData(i).toInt() == storedMode) {
+            commanderSpellbookIntegrationEnabledSelector.setCurrentIndex(i);
             break;
         }
     }
 
-    connect(&deckEditorCommanderSpellbookIntegrationEnabledSelector,
-            QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
-                int mode = deckEditorCommanderSpellbookIntegrationEnabledSelector.itemData(index).toInt();
-                SettingsCache::instance().cardsDisplay().setDeckEditorCommanderSpellbookIntegrationEnabled(mode);
+    connect(&commanderSpellbookIntegrationEnabledSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [this](int index) {
+                int mode = commanderSpellbookIntegrationEnabledSelector.itemData(index).toInt();
+                SettingsCache::instance().deckEditor().setCommanderSpellbookIntegrationEnabled(mode);
                 updateCommanderSpellbookUiState();
             });
 
-    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.addItem(
+    commanderSpellbookIntegrationBracketNamingSelector.addItem(
         tr("CommanderSpellbook bracket names")); // index 0 = false
-    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.addItem(
+    commanderSpellbookIntegrationBracketNamingSelector.addItem(
         tr("Official Commander bracket names (approximate)")); // index 1 = true
 
-    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setCurrentIndex(
-        SettingsCache::instance().cardsDisplay().getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames()
-            ? 1
-            : 0);
+    commanderSpellbookIntegrationBracketNamingSelector.setCurrentIndex(
+        SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationUseOfficialBracketNames() ? 1 : 0);
 
-    connect(
-        &deckEditorCommanderSpellbookIntegrationBracketNamingSelector,
-        QOverload<int>::of(&QComboBox::currentIndexChanged), &SettingsCache::instance(), [](int index) {
-            SettingsCache::instance().cardsDisplay().setDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames(
-                index == 1);
-        });
+    connect(&commanderSpellbookIntegrationBracketNamingSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            &SettingsCache::instance(), [](int index) {
+                SettingsCache::instance().deckEditor().setCommanderSpellbookIntegrationUseOfficialBracketNames(index ==
+                                                                                                               1);
+            });
 
     updateCommanderSpellbookUiState();
 
     auto *labelLayout = new QHBoxLayout;
     labelLayout->setContentsMargins(0, 0, 0, 0);
-    labelLayout->addWidget(&deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesLabel);
-    labelLayout->addWidget(&deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer);
+    labelLayout->addWidget(&commanderSpellbookIntegrationUseOfficialBracketNamesLabel);
+    labelLayout->addWidget(&commanderSpellbookIntegrationUseOfficialBracketNamesExplainer);
 
     auto *labelWidget = new QWidget;
     labelWidget->setLayout(labelLayout);
@@ -223,10 +221,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 3, 1);
     deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 4, 0);
     deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 4, 1);
-    deckEditorGrid->addWidget(&deckEditorCommanderSpellbookIntegrationEnabledLabel, 5, 0);
-    deckEditorGrid->addWidget(&deckEditorCommanderSpellbookIntegrationEnabledSelector, 5, 1);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledLabel, 5, 0);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledSelector, 5, 1);
     deckEditorGrid->addWidget(labelWidget, 6, 0);
-    deckEditorGrid->addWidget(&deckEditorCommanderSpellbookIntegrationBracketNamingSelector);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationBracketNamingSelector, 6, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -272,23 +270,22 @@ void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
 
 void UserInterfaceSettingsPage::updateCommanderSpellbookUiState()
 {
-    const int mode = SettingsCache::instance().cardsDisplay().getDeckEditorCommanderSpellbookIntegrationEnabled();
+    const int mode = SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationEnabled();
 
-    const bool enabled = mode != deckEditorCommanderSpellbookIntegrationEnabledIndexDisabled &&
-                         mode != deckEditorCommanderSpellbookIntegrationEnabledIndexUnprompted;
+    const bool enabled = mode != commanderSpellbookIntegrationEnabledIndexDisabled &&
+                         mode != commanderSpellbookIntegrationEnabledIndexUnprompted;
 
-    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setEnabled(enabled);
-    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setEnabled(enabled);
-    deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesLabel.setVisible(enabled);
-    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setVisible(enabled);
-    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setVisible(enabled);
+    commanderSpellbookIntegrationBracketNamingSelector.setEnabled(enabled);
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setEnabled(enabled);
+    commanderSpellbookIntegrationUseOfficialBracketNamesLabel.setVisible(enabled);
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setVisible(enabled);
+    commanderSpellbookIntegrationBracketNamingSelector.setVisible(enabled);
 
     if (enabled) {
         // Sync selector with the current stored bool
-        const bool useOfficial = SettingsCache::instance()
-                                     .cardsDisplay()
-                                     .getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames();
-        deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setCurrentIndex(useOfficial ? 1 : 0);
+        const bool useOfficial =
+            SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationUseOfficialBracketNames();
+        commanderSpellbookIntegrationBracketNamingSelector.setCurrentIndex(useOfficial ? 1 : 0);
     }
 }
 
@@ -330,22 +327,21 @@ void UserInterfaceSettingsPage::retranslateUi()
     defaultDeckEditorTypeSelector.setItemText(TabSupervisor::ClassicDeckEditor, tr("Classic Deck Editor"));
     defaultDeckEditorTypeSelector.setItemText(TabSupervisor::VisualDeckEditor, tr("Visual Deck Editor"));
 
-    deckEditorCommanderSpellbookIntegrationEnabledLabel.setText(
+    commanderSpellbookIntegrationEnabledLabel.setText(
         tr("CommanderSpellbook integration to estimate commander bracket"));
-    deckEditorCommanderSpellbookIntegrationEnabledSelector.setItemText(
-        deckEditorCommanderSpellbookIntegrationEnabledIndexDisabled, tr("Disabled"));
-    deckEditorCommanderSpellbookIntegrationEnabledSelector.setItemText(
-        deckEditorCommanderSpellbookIntegrationEnabledIndexEnabled, tr("Enabled"));
-    deckEditorCommanderSpellbookIntegrationEnabledSelector.setItemText(
-        deckEditorCommanderSpellbookIntegrationEnabledIndexAutomatic, tr("Automatic"));
-    deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesLabel.setText(tr("Bracket naming"));
-    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setItemText(
+    commanderSpellbookIntegrationEnabledSelector.setItemText(commanderSpellbookIntegrationEnabledIndexDisabled,
+                                                             tr("Disabled"));
+    commanderSpellbookIntegrationEnabledSelector.setItemText(commanderSpellbookIntegrationEnabledIndexEnabled,
+                                                             tr("Enabled"));
+    commanderSpellbookIntegrationEnabledSelector.setItemText(commanderSpellbookIntegrationEnabledIndexAutomatic,
+                                                             tr("Automatic"));
+    commanderSpellbookIntegrationUseOfficialBracketNamesLabel.setText(tr("Bracket naming"));
+    commanderSpellbookIntegrationBracketNamingSelector.setItemText(
         0, CommanderBracketNames::CommanderSpellbookBracketNames);
-    deckEditorCommanderSpellbookIntegrationBracketNamingSelector.setItemText(
+    commanderSpellbookIntegrationBracketNamingSelector.setItemText(
         1, CommanderBracketNames::OfficialCommanderBracketNames);
 
-    deckEditorCommanderSpellBookIntegrationUseOfficialBracketNamesExplainer.setToolTip(
-        CommanderBracketNames::Explainer);
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setToolTip(CommanderBracketNames::Explainer);
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(" ms");

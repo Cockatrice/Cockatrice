@@ -3,10 +3,9 @@
 #include <QJsonObject>
 #include <QString>
 
-class CommanderSpellbookCardResult
+struct CommanderSpellbookCardResult
 {
-public:
-    void fromJson(const QJsonObject &json);
+    static CommanderSpellbookCardResult fromJson(const QJsonObject &json);
 
     QString id;
     QString name;

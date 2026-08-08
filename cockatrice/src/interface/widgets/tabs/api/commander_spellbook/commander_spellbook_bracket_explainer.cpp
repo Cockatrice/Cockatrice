@@ -1,6 +1,6 @@
 #include "commander_spellbook_bracket_explainer.h"
 
-static QString cardList(const QVector<CommanderSpellbookCardResult> &cards, int max = 5)
+static QString cardList(const QList<CommanderSpellbookCardResult> &cards, int max = 5)
 {
     QStringList names;
     for (int i = 0; i < cards.size() && i < max; ++i) {
@@ -14,7 +14,7 @@ static QString cardList(const QVector<CommanderSpellbookCardResult> &cards, int 
     return names.join(", ");
 }
 
-static QString comboCount(const QVector<CommanderSpellbookVariantResult> &variants)
+static QString comboCount(const QList<CommanderSpellbookVariantResult> &variants)
 {
     return QString::number(variants.size());
 }

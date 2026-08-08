@@ -214,29 +214,3 @@ void CardsDisplaySettings::setSampleHandSize(int _sampleHandSize)
     setValue(_sampleHandSize, "sampleHandSize", "cards", "cardSize");
     emit sampleHandSizeChanged(_sampleHandSize);
 }
-
-int CardsDisplaySettings::getDeckEditorCommanderSpellbookIntegrationEnabled() const
-{
-    return getValue("deckeditorcommanderspellbookintegrationenabled", "interface", QString(),
-                    deckEditorCommanderSpellbookIntegrationEnabledIndexUnprompted)
-        .toInt();
-}
-
-bool CardsDisplaySettings::getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames() const
-{
-    return getValue("deckeditorcommanderspellbookintegrationuseofficialbracketnames", "interface", QString(), false)
-        .toBool();
-}
-
-void CardsDisplaySettings::setDeckEditorCommanderSpellbookIntegrationEnabled(int _enabled)
-{
-    setValue(_enabled, "deckeditorcommanderspellbookintegrationenabled", "interface");
-    emit deckEditorCommanderSpellbookIntegrationEnabledChanged(_enabled);
-}
-
-void CardsDisplaySettings::setDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames(
-    bool _useOfficialBracketNames)
-{
-    setValue(_useOfficialBracketNames, "deckeditorcommanderspellbookintegrationuseofficialbracketnames", "interface");
-    emit deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesChanged(_useOfficialBracketNames);
-}

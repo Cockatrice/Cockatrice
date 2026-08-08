@@ -372,6 +372,7 @@ set(cockatrice_SOURCES
     src/interface/key_signals.cpp
     src/interface/logger.cpp
     src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_service.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_widget.cpp
     src/interface/widgets/tabs/api/commander_spellbook/handle_commander_brackets.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h

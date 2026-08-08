@@ -4,31 +4,16 @@
 #include "libcockatrice/deck_list/deck_list.h"
 
 #include <QJsonObject>
-#include <QVector>
+#include <QList>
 
-class CommanderSpellbookDeckRequest
+struct CommanderSpellbookDeckRequest
 {
-public:
-    CommanderSpellbookDeckRequest() = default;
-
-    void fromJson(const QJsonObject &json);
+    static CommanderSpellbookDeckRequest fromJson(const QJsonObject &json);
+    static CommanderSpellbookDeckRequest fromDeckList(const DeckList &deck);
     QJsonObject toJson() const;
-    void fromDeckList(const DeckList &deck);
 
-    void debugPrint() const;
-
-    const QVector<CardInDeckRequest> &main() const
-    {
-        return mainDeck;
-    }
-    const QVector<CardInDeckRequest> &commanders() const
-    {
-        return commanderDeck;
-    }
-
-private:
-    QVector<CardInDeckRequest> mainDeck;      // maxItems: 600
-    QVector<CardInDeckRequest> commanderDeck; // maxItems: 12
+    QList<CardInDeckRequest> mainDeck;      // maxItems: 600
+    QList<CardInDeckRequest> commanderDeck; // maxItems: 12
 };
 
 #endif // COCKATRICE_COMMANDER_SPELLBOOK_DECK_REQUEST_H

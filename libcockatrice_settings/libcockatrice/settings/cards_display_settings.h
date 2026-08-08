@@ -5,14 +5,6 @@
 
 #include <libcockatrice/interfaces/interface_cards_display_settings_provider.h>
 
-enum deckEditorCommanderSpellbookIntegrationEnabledIndex
-{
-    deckEditorCommanderSpellbookIntegrationEnabledIndexDisabled,
-    deckEditorCommanderSpellbookIntegrationEnabledIndexEnabled,
-    deckEditorCommanderSpellbookIntegrationEnabledIndexAutomatic,
-    deckEditorCommanderSpellbookIntegrationEnabledIndexUnprompted,
-};
-
 class CardsDisplaySettings : public SettingsManager, public ICardsDisplaySettingsProvider
 {
     Q_OBJECT
@@ -38,12 +30,6 @@ public:
     [[nodiscard]] int getEDHRecCardSize() const override;
     [[nodiscard]] int getArchidektPreviewSize() const override;
     [[nodiscard]] int getSampleHandSize() const override;
-
-    [[nodiscard]] int getDeckEditorCommanderSpellbookIntegrationEnabled() const;
-    [[nodiscard]] bool getDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames() const;
-    void setDeckEditorCommanderSpellbookIntegrationEnabled(int _deckEditorCommanderSpellbookIntegrationEnabled);
-    void setDeckEditorCommanderSpellbookIntegrationUseOfficialBracketNames(
-        bool _deckEditorCommanderSpellbookIntegrationUseOfficialBracketNames);
 
     void setDisplayCardNames(bool _displayCardNames);
     void setRoundCardCorners(bool _roundCardCorners);
@@ -80,8 +66,6 @@ signals:
     void edhRecCardSizeChanged();
     void archidektPreviewSizeChanged();
     void sampleHandSizeChanged(int amount);
-    void deckEditorCommanderSpellbookIntegrationEnabledChanged(int _enabled);
-    void deckEditorCommanderSpellbookIntegrationUseOfficialBracketNamesChanged(bool _useOfficialBracketNames);
 
 public:
     explicit CardsDisplaySettings(const QString &settingPath, QObject *parent = nullptr);

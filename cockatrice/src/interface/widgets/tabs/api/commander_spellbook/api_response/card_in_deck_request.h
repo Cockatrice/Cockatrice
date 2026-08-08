@@ -2,20 +2,11 @@
 #define COCKATRICE_CARD_IN_DECK_REQUEST_H
 #include <QJsonObject>
 
-class CardInDeckRequest
+struct CardInDeckRequest
 {
-public:
-    // Constructor
-    CardInDeckRequest() = default;
-
-    // Parse deck-related data from JSON
-    void fromJson(const QJsonObject &json);
+    static CardInDeckRequest fromJson(const QJsonObject &json);
     QJsonObject toJson() const;
 
-    // Debug method for logging
-    void debugPrint() const;
-
-private:
     QString card;
     int quantity;
 };

@@ -10,7 +10,6 @@
 
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "../../key_signals.h"
-#include "../tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.h"
 #include "../utility/custom_line_edit.h"
 #include "../visual_deck_storage/deck_preview/deck_preview_deck_tags_display_widget.h"
 #include "deck_list_history_manager_widget.h"
@@ -22,7 +21,7 @@
 #include <QTreeView>
 #include <libcockatrice/card/card_info.h>
 
-struct CommanderBracketEstimate;
+class CommanderBracketWidget;
 class DeckListModel;
 class AbstractTabDeckEditor;
 class DeckEditorDeckDockWidget : public QDockWidget
@@ -35,9 +34,6 @@ public:
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
     void createDeckDock();
-    bool promptCommanderSpellbookIntegration();
-    void updateBracketVisibility(bool visible);
-    void requestBracketEstimate();
     ExactCard getCurrentCard();
     void retranslateUi();
 
@@ -64,8 +60,6 @@ public slots:
     void actSwapSelection();
     void actRemoveCard();
     void initializeFormats();
-    void maybeAutoEstimateBracket();
-    void onEstimateBracketFinished(quint64 id, QObject *requester, const CommanderBracketEstimate &result);
 
 signals:
     void selectedCardChanged(const ExactCard &card);
@@ -96,14 +90,7 @@ private:
 
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
-    QLabel *bracketLabel;
-    QLabel *bracketValueLabel;
-    QToolButton *bracketInfoButton;
-    QToolButton *bracketRefreshButton;
-
-    BracketExplanation lastBracketExplanation;
-
-    quint64 requestId;
+    CommanderBracketWidget *commanderBracketWidget;
 
     DeckListModel *getModel() const;
     [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;

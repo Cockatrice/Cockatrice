@@ -1,14 +1,11 @@
 #include "commander_spellbook_deck_request.h"
 
-#include <QDebug>
 #include <QJsonArray>
-#include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 
-void CommanderSpellbookDeckRequest::fromJson(const QJsonObject &json)
+CommanderSpellbookDeckRequest CommanderSpellbookDeckRequest::fromJson(const QJsonObject &json)
 {
-    mainDeck.clear();
-    commanderDeck.clear();
+    CommanderSpellbookDeckRequest request;
 
     // Main deck
     const QJsonArray mainArray = json.value("main").toArray();
@@ -17,12 +14,10 @@ void CommanderSpellbookDeckRequest::fromJson(const QJsonObject &json)
             continue;
         }
 
-        CardInDeckRequest card;
-        card.fromJson(value.toObject());
-        mainDeck.append(card);
+        request.mainDeck.append(CardInDeckRequest::fromJson(value.toObject()));
 
         // Max size allowed by commanderspellbook
-        if (mainDeck.size() >= 600) {
+        if (request.mainDeck.size() >= 600) {
             break;
         }
     }
@@ -34,15 +29,15 @@ void CommanderSpellbookDeckRequest::fromJson(const QJsonObject &json)
             continue;
         }
 
-        CardInDeckRequest card;
-        card.fromJson(value.toObject());
-        commanderDeck.append(card);
+        request.commanderDeck.append(CardInDeckRequest::fromJson(value.toObject()));
 
         // Max size allowed by commanderspellbook
-        if (commanderDeck.size() >= 12) {
+        if (request.commanderDeck.size() >= 12) {
             break;
         }
     }
+
+    return request;
 }
 
 QJsonObject CommanderSpellbookDeckRequest::toJson() const
@@ -65,10 +60,9 @@ QJsonObject CommanderSpellbookDeckRequest::toJson() const
     return json;
 }
 
-void CommanderSpellbookDeckRequest::fromDeckList(const DeckList &deck)
+CommanderSpellbookDeckRequest CommanderSpellbookDeckRequest::fromDeckList(const DeckList &deck)
 {
-    mainDeck.clear();
-    commanderDeck.clear();
+    CommanderSpellbookDeckRequest request;
 
     // --- Mainboard ---
     const auto mainCards = deck.getCardNodes({DECK_ZONE_MAIN});
@@ -77,16 +71,13 @@ void CommanderSpellbookDeckRequest::fromDeckList(const DeckList &deck)
             continue;
         }
 
-        CardInDeckRequest req;
         QJsonObject json;
         json.insert("card", node->getName());
         json.insert("quantity", node->getNumber());
-        req.fromJson(json);
-
-        mainDeck.append(req);
+        request.mainDeck.append(CardInDeckRequest::fromJson(json));
 
         // Max size allowed by commanderspellbook
-        if (mainDeck.size() >= 600) {
+        if (request.mainDeck.size() >= 600) {
             break;
         }
     }
@@ -94,25 +85,11 @@ void CommanderSpellbookDeckRequest::fromDeckList(const DeckList &deck)
     // --- Commander (bannerCard) ---
     const auto &metadata = deck.getMetadata();
     if (!metadata.bannerCard.name.isEmpty()) {
-        CardInDeckRequest commander;
         QJsonObject json;
         json.insert("card", metadata.bannerCard.name);
         json.insert("quantity", 1);
-        commander.fromJson(json);
-
-        commanderDeck.append(commander);
-    }
-}
-
-void CommanderSpellbookDeckRequest::debugPrint() const
-{
-    qDebug() << "Main deck:";
-    for (const CardInDeckRequest &card : mainDeck) {
-        card.debugPrint();
+        request.commanderDeck.append(CardInDeckRequest::fromJson(json));
     }
 
-    qDebug() << "Commanders:";
-    for (const CardInDeckRequest &card : commanderDeck) {
-        card.debugPrint();
-    }
+    return request;
 }

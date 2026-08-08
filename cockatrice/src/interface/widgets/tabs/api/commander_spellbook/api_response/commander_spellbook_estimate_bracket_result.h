@@ -4,29 +4,29 @@
 #include "commander_spellbook_card_result.h"
 #include "commander_spellbook_variant_result.h"
 
-#include <QVector>
+#include <QJsonObject>
+#include <QList>
 
-class EstimateBracketResult
+struct EstimateBracketResult
 {
-public:
-    void fromJson(const QJsonObject &json);
+    static EstimateBracketResult fromJson(const QJsonObject &json);
 
     QString bracketTag;
 
-    QVector<CommanderSpellbookCardResult> gameChangerCards;
-    QVector<CommanderSpellbookCardResult> massLandDenialCards;
-    QVector<CommanderSpellbookCardResult> extraTurnCards;
+    QList<CommanderSpellbookCardResult> gameChangerCards;
+    QList<CommanderSpellbookCardResult> massLandDenialCards;
+    QList<CommanderSpellbookCardResult> extraTurnCards;
 
-    QVector<CommanderSpellbookVariantResult> massLandDenialTemplates;
-    QVector<CommanderSpellbookVariantResult> extraTurnTemplates;
+    QList<CommanderSpellbookVariantResult> massLandDenialTemplates;
+    QList<CommanderSpellbookVariantResult> extraTurnTemplates;
 
-    QVector<CommanderSpellbookVariantResult> massLandDenialCombos;
-    QVector<CommanderSpellbookVariantResult> extraTurnCombos;
-    QVector<CommanderSpellbookVariantResult> lockCombos;
-    QVector<CommanderSpellbookVariantResult> skipTurnsCombos;
+    QList<CommanderSpellbookVariantResult> massLandDenialCombos;
+    QList<CommanderSpellbookVariantResult> extraTurnCombos;
+    QList<CommanderSpellbookVariantResult> lockCombos;
+    QList<CommanderSpellbookVariantResult> skipTurnsCombos;
 
-    QVector<CommanderSpellbookVariantResult> definitelyTwoCardCombos;
-    QVector<CommanderSpellbookVariantResult> arguablyTwoCardCombos;
+    QList<CommanderSpellbookVariantResult> definitelyTwoCardCombos;
+    QList<CommanderSpellbookVariantResult> arguablyTwoCardCombos;
 };
 
-#endif
+#endif // COCKATRICE_COMMANDER_SPELLBOOK_ESTIMATE_BRACKET_RESULT_H

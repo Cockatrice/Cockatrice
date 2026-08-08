@@ -7,7 +7,7 @@
 #include <QUrl>
 #include <libcockatrice/settings/commander_bracket_settings.h>
 
-#define COMMANDER_BRACKET_JSON "https://cockatrice.github.io/commander-brackets.json"
+static const QUrl COMMANDER_BRACKET_JSON_URL(QStringLiteral("https://cockatrice.github.io/commander-brackets.json"));
 
 HandleCommanderBrackets::HandleCommanderBrackets(QObject *parent)
     : QObject(parent), nam(new QNetworkAccessManager(this)), reply(nullptr)
@@ -16,7 +16,11 @@ HandleCommanderBrackets::HandleCommanderBrackets(QObject *parent)
 
 void HandleCommanderBrackets::downloadBracketDefinitions()
 {
-    reply = nam->get(QNetworkRequest(QUrl(COMMANDER_BRACKET_JSON)));
+    if (reply) {
+        return;
+    }
+
+    reply = nam->get(QNetworkRequest(COMMANDER_BRACKET_JSON_URL));
 
     connect(reply, &QNetworkReply::finished, this, &HandleCommanderBrackets::actFinishParsingDownloadedData);
 }

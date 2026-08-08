@@ -1,31 +1,35 @@
 #include "commander_spellbook_variant_result.h"
 
-void CommanderSpellbookVariantResult::fromJson(const QJsonObject &json)
+CommanderSpellbookVariantResult CommanderSpellbookVariantResult::fromJson(const QJsonObject &json)
 {
-    id = json.value("id").toString();
-    status = json.value("status").toString();
+    CommanderSpellbookVariantResult result;
 
-    uses = json.value("uses").toArray();
-    cardRequires = json.value("requires").toArray();
-    produces = json.value("produces").toArray();
-    of = json.value("of").toArray();
-    includes = json.value("includes").toArray();
+    result.id = json.value("id").toString();
+    result.status = json.value("status").toString();
 
-    manaNeeded = json.value("manaNeeded").toArray();
-    manaValueNeeded = json.value("manaValueNeeded").toArray();
+    result.uses = json.value("uses").toArray();
+    result.cardRequires = json.value("requires").toArray();
+    result.produces = json.value("produces").toArray();
+    result.of = json.value("of").toArray();
+    result.includes = json.value("includes").toArray();
 
-    easyPrerequisites = json.value("easyPrerequisites").toArray();
-    notablePrerequisites = json.value("notablePrerequisites").toArray();
+    result.manaNeeded = json.value("manaNeeded").toArray();
+    result.manaValueNeeded = json.value("manaValueNeeded").toArray();
 
-    description = json.value("description").toString();
-    notes = json.value("notes").toString();
-    popularity = json.value("popularity").toDouble();
+    result.easyPrerequisites = json.value("easyPrerequisites").toArray();
+    result.notablePrerequisites = json.value("notablePrerequisites").toArray();
 
-    spoiler = json.value("spoiler").toBool();
-    bracketTag = json.value("bracketTag").toString();
+    result.description = json.value("description").toString();
+    result.notes = json.value("notes").toString();
+    result.popularity = json.value("popularity").toDouble();
 
-    legalities = json.value("legalities").toObject();
-    prices = json.value("prices").toObject();
+    result.spoiler = json.value("spoiler").toBool();
+    result.bracketTag = json.value("bracketTag").toString();
 
-    variantCount = json.value("variantCount").toInt();
+    result.legalities = json.value("legalities").toObject();
+    result.prices = json.value("prices").toObject();
+
+    result.variantCount = json.value("variantCount").toInt();
+
+    return result;
 }

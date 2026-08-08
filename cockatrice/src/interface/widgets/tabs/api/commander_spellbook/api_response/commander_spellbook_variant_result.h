@@ -4,10 +4,9 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-class CommanderSpellbookVariantResult
+struct CommanderSpellbookVariantResult
 {
-public:
-    void fromJson(const QJsonObject &json);
+    static CommanderSpellbookVariantResult fromJson(const QJsonObject &json);
 
     QString id;
     QString status;

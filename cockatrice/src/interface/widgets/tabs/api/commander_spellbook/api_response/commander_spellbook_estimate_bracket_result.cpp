@@ -1,23 +1,10 @@
 #include "commander_spellbook_estimate_bracket_result.h"
 
-void EstimateBracketResult::fromJson(const QJsonObject &json)
+EstimateBracketResult EstimateBracketResult::fromJson(const QJsonObject &json)
 {
-    bracketTag = json.value("bracketTag").toString();
+    EstimateBracketResult result;
 
-    gameChangerCards.clear();
-    massLandDenialCards.clear();
-    extraTurnCards.clear();
-
-    massLandDenialTemplates.clear();
-    extraTurnTemplates.clear();
-
-    massLandDenialCombos.clear();
-    extraTurnCombos.clear();
-    lockCombos.clear();
-    skipTurnsCombos.clear();
-
-    definitelyTwoCardCombos.clear();
-    arguablyTwoCardCombos.clear();
+    result.bracketTag = json.value("bracketTag").toString();
 
     //
     // Cards
@@ -29,19 +16,18 @@ void EstimateBracketResult::fromJson(const QJsonObject &json)
 
         const QJsonObject obj = value.toObject();
 
-        CommanderSpellbookCardResult card;
-        card.fromJson(obj.value("card").toObject());
+        CommanderSpellbookCardResult card = CommanderSpellbookCardResult::fromJson(obj.value("card").toObject());
 
         if (obj.value("gameChanger").toBool()) {
-            gameChangerCards.append(card);
+            result.gameChangerCards.append(card);
         }
 
         if (obj.value("massLandDenial").toBool()) {
-            massLandDenialCards.append(card);
+            result.massLandDenialCards.append(card);
         }
 
         if (obj.value("extraTurn").toBool()) {
-            extraTurnCards.append(card);
+            result.extraTurnCards.append(card);
         }
     }
 
@@ -55,15 +41,14 @@ void EstimateBracketResult::fromJson(const QJsonObject &json)
 
         const QJsonObject obj = value.toObject();
 
-        CommanderSpellbookVariantResult variant;
-        variant.fromJson(obj);
+        CommanderSpellbookVariantResult variant = CommanderSpellbookVariantResult::fromJson(obj);
 
         if (obj.value("massLandDenial").toBool()) {
-            massLandDenialTemplates.append(variant);
+            result.massLandDenialTemplates.append(variant);
         }
 
         if (obj.value("extraTurn").toBool()) {
-            extraTurnTemplates.append(variant);
+            result.extraTurnTemplates.append(variant);
         }
     }
 
@@ -77,31 +62,32 @@ void EstimateBracketResult::fromJson(const QJsonObject &json)
 
         const QJsonObject obj = value.toObject();
 
-        CommanderSpellbookVariantResult combo;
-        combo.fromJson(obj);
+        CommanderSpellbookVariantResult combo = CommanderSpellbookVariantResult::fromJson(obj);
 
         if (obj.value("massLandDenial").toBool()) {
-            massLandDenialCombos.append(combo);
+            result.massLandDenialCombos.append(combo);
         }
 
         if (obj.value("extraTurn").toBool()) {
-            extraTurnCombos.append(combo);
+            result.extraTurnCombos.append(combo);
         }
 
         if (obj.value("lock").toBool()) {
-            lockCombos.append(combo);
+            result.lockCombos.append(combo);
         }
 
         if (obj.value("skipTurns").toBool()) {
-            skipTurnsCombos.append(combo);
+            result.skipTurnsCombos.append(combo);
         }
 
         if (obj.value("definitelyTwoCard").toBool()) {
-            definitelyTwoCardCombos.append(combo);
+            result.definitelyTwoCardCombos.append(combo);
         }
 
         if (obj.value("arguablyTwoCard").toBool()) {
-            arguablyTwoCardCombos.append(combo);
+            result.arguablyTwoCardCombos.append(combo);
         }
     }
+
+    return result;
 }

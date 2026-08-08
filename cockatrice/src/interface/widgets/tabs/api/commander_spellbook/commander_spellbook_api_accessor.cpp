@@ -23,8 +23,7 @@ CommanderSpellbookApiAccessor::CommanderSpellbookApiAccessor(QObject *parent) : 
 CommanderSpellbookApiAccessor::RequestId CommanderSpellbookApiAccessor::estimateBracket(const DeckList &deck,
                                                                                         QObject *requester)
 {
-    CommanderSpellbookDeckRequest deckRequest;
-    deckRequest.fromDeckList(deck);
+    CommanderSpellbookDeckRequest deckRequest = CommanderSpellbookDeckRequest::fromDeckList(deck);
 
     QJsonDocument doc(deckRequest.toJson());
     QByteArray body = doc.toJson(QJsonDocument::Compact);
@@ -70,8 +69,7 @@ void CommanderSpellbookApiAccessor::onEstimateReplyFinished(QNetworkReply *reply
         return;
     }
 
-    EstimateBracketResult result;
-    result.fromJson(doc.object());
+    EstimateBracketResult result = EstimateBracketResult::fromJson(doc.object());
 
     emit estimateBracketFinished(id, requester, result);
 }

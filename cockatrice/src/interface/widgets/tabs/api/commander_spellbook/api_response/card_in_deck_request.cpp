@@ -1,9 +1,11 @@
 #include "card_in_deck_request.h"
 
-void CardInDeckRequest::fromJson(const QJsonObject &json)
+CardInDeckRequest CardInDeckRequest::fromJson(const QJsonObject &json)
 {
-    card = json.value("card").toString();
-    quantity = json.value("quantity").toInt();
+    CardInDeckRequest request;
+    request.card = json.value("card").toString();
+    request.quantity = json.value("quantity").toInt();
+    return request;
 }
 
 QJsonObject CardInDeckRequest::toJson() const
@@ -12,10 +14,4 @@ QJsonObject CardInDeckRequest::toJson() const
     json.insert("card", card);
     json.insert("quantity", quantity);
     return json;
-}
-
-void CardInDeckRequest::debugPrint() const
-{
-    qDebug() << "Card:" << card;
-    qDebug() << "Quantity:" << quantity;
 }

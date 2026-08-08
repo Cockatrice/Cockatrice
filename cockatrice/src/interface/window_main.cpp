@@ -560,6 +560,8 @@ void MainWindow::startupConfigCheck()
         actCheckClientUpdates();
     }
 
+    actCheckCommanderBracketDefinitionUpdates();
+
     if (SettingsCache::instance().network().getClientVersion() == CLIENT_INFO_NOT_SET) {
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
