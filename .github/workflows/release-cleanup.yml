@@ -1,0 +1,112 @@
+name: Cleanup Beta Releases
+
+on:
+  release:
+    types: [released]    # triggers only on published stable releases
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/release-cleanup.yml'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run in dry mode"
+        required: true
+        type: choice
+        options:
+        - true
+        - false
+        default: 'true'
+
+jobs:
+  Deletion:
+    if: >
+      github.repository_owner == 'Cockatrice' &&
+      (
+        (github.event_name == 'release' && github.event.release.target_commitish == 'master') ||
+        (github.event_name == 'pull_request') ||
+        (github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/'))
+      )
+    runs-on: ubuntu-slim
+    
+    permissions:
+      contents: write    # required to delete releases
+    
+    concurrency:
+      group: cleanup-beta-releases @ ${{ github.ref_name }}
+      cancel-in-progress: false
+    
+    env:
+      DRY_RUN: ${{ inputs.dry_run || 'true' }}
+    
+    steps:
+      - name: Print release information
+        run: |
+          echo "Release Tag: ${{ github.event.release.tag_name }}"
+          echo "Release Name: ${{ github.event.release.name }}"
+          echo "Target Branch: ${{ github.event.release.target_commitish }}${{ github.base_ref }}"
+          echo ""
+          echo "Dry Run: ${{ env.DRY_RUN }}"
+
+      - name: Delete pre-releases
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const deleteReleases = process.env.DRY_RUN === 'false';
+
+            core.startGroup('Fetching all releases...');
+            const releases = await github.paginate(
+              github.rest.repos.listReleases,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              }
+            );
+            
+            console.log(`Fetched ${releases.length} release(s):`);
+            releases.forEach(r => console.log(r.prerelease ? `${r.tag_name}` : `${r.tag_name} (${r.name})`));
+            core.endGroup();
+
+            core.startGroup('Filtering for published pre-releases...');
+            const prereleases = releases
+              .filter(r => r.published_at && r.prerelease && r.tag_name.includes('-beta'))
+              .sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
+            
+            console.log(`Filtered ${prereleases.length} pre-release(s):`);
+            prereleases.forEach(r => console.log(`${r.published_at.split('T')[0]}: ${r.tag_name}`));
+            core.endGroup();
+
+            core.startGroup('Deleting pre-releases...');
+            console.log(`${prereleases.length} pre-release(s) marked for deletion:`);
+            
+            let deletedReleasesCount = 0;
+            
+            for (const rel of [...prereleases].reverse()) {
+              
+              console.log(`Processing release: ${rel.name}`);
+              if (deleteReleases) {
+                try {
+                  await github.rest.repos.deleteRelease({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    release_id: rel.id,
+                  });
+                  console.log(`  Release deleted.`);
+                  deletedReleasesCount++;
+                } catch (err) {
+                  console.log(`  Release deletion failed: ${err.message}`);
+                  }
+              } else {
+                console.log(`  [DRY RUN] Release would be deleted.`);
+              }
+            }
+
+            console.log();
+            console.log(`Total releases deleted: ${deletedReleasesCount}`);
+            core.endGroup();
+
+            await core.summary
+              .addRaw(`${prereleases.length} pre-release(s) marked for deletion:`)
+              .addCodeBlock(`Total releases deleted: ${deletedReleasesCount}`)
+              .write();
