@@ -150,6 +150,21 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     stylingGroupBox = new QGroupBox;
     stylingGroupBox->setLayout(stylingTabGrid);
 
+    // Menu settings
+    showShortcutsCheckBox.setChecked(settings.userInterface().getShowShortcuts());
+    connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &AppearanceSettingsPage::showShortcutsChanged);
+
+    showGameSelectorFilterToolbarCheckBox.setChecked(settings.userInterface().getShowGameSelectorFilterToolbar());
+    connect(&showGameSelectorFilterToolbarCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.userInterface(),
+            &InterfaceSettings::setShowGameSelectorFilterToolbar);
+
+    auto *menuGrid = new QGridLayout;
+    menuGrid->addWidget(&showShortcutsCheckBox, 0, 0);
+    menuGrid->addWidget(&showGameSelectorFilterToolbarCheckBox, 1, 0);
+
+    menuGroupBox = new QGroupBox;
+    menuGroupBox->setLayout(menuGrid);
+
     // Printings settings
     overrideAllCardArtWithPersonalPreferenceCheckBox.setChecked(
         settings.cardsDisplay().getOverrideAllCardArtWithPersonalPreference());
@@ -315,6 +330,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     mainLayout->addWidget(themeGroupBox);
     mainLayout->addWidget(homeTabGroupBox);
     mainLayout->addWidget(stylingGroupBox);
+    mainLayout->addWidget(menuGroupBox);
     mainLayout->addWidget(printingsGroupBox);
     mainLayout->addWidget(cardsGroupBox);
     mainLayout->addWidget(cardLayoutGroupBox);
@@ -365,6 +381,12 @@ void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
     homeTabBackgroundShuffleFrequencyLabel.setVisible(visible);
     homeTabBackgroundShuffleFrequencySpinBox.setVisible(visible);
     homeTabDisplayCardNameCheckBox.setVisible(visible);
+}
+
+void AppearanceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
+{
+    SettingsCache::instance().userInterface().setShowShortcuts(value);
+    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, value == 0); // 0 = unchecked
 }
 
 void AppearanceSettingsPage::overrideAllCardArtWithPersonalPreferenceToggled(QT_STATE_CHANGED_T value)
@@ -427,6 +449,10 @@ void AppearanceSettingsPage::retranslateUi()
 
     stylingGroupBox->setTitle(tr("Styling settings"));
     styleUserListCheckBox.setText(tr("Style user list"));
+
+    menuGroupBox->setTitle(tr("Menu settings"));
+    showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));
+    showGameSelectorFilterToolbarCheckBox.setText(tr("Show game filter toolbar above list in room tab"));
 
     printingsGroupBox->setTitle(tr("Card printings"));
     overrideAllCardArtWithPersonalPreferenceCheckBox.setText(

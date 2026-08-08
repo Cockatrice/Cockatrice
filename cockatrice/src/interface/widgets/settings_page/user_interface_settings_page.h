@@ -15,7 +15,6 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage
     Q_OBJECT
 private slots:
     void setNotificationEnabled(QT_STATE_CHANGED_T);
-    void showShortcutsChanged(QT_STATE_CHANGED_T);
 
 private:
     QCheckBox notificationsEnabledCheckBox;
@@ -32,8 +31,6 @@ private:
     QCheckBox showTotalSelectionCountCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox keepGameChatFocusCheckBox;
-    QCheckBox showShortcutsCheckBox;
-    QCheckBox showGameSelectorFilterToolbarCheckBox;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
     QLabel visualDeckStoragePromptForConversionLabel;

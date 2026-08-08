@@ -86,15 +86,6 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&keepGameChatFocusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setKeepGameChatFocus);
 
-    showShortcutsCheckBox.setChecked(SettingsCache::instance().userInterface().getShowShortcuts());
-    connect(&showShortcutsCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
-            &UserInterfaceSettingsPage::showShortcutsChanged);
-
-    showGameSelectorFilterToolbarCheckBox.setChecked(
-        SettingsCache::instance().userInterface().getShowGameSelectorFilterToolbar());
-    connect(&showGameSelectorFilterToolbarCheckBox, &QCheckBox::QT_STATE_CHANGED,
-            &SettingsCache::instance().userInterface(), &InterfaceSettings::setShowGameSelectorFilterToolbar);
-
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(&doubleClickToPlayCheckBox, 0, 0);
     generalGrid->addWidget(&clickPlaysAllSelectedCheckBox, 1, 0);
@@ -107,8 +98,6 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     generalGrid->addWidget(&showTotalSelectionCountCheckBox, 8, 0);
     generalGrid->addWidget(&useTearOffMenusCheckBox, 9, 0);
     generalGrid->addWidget(&keepGameChatFocusCheckBox, 10, 0);
-    generalGrid->addWidget(&showShortcutsCheckBox, 11, 0);
-    generalGrid->addWidget(&showGameSelectorFilterToolbarCheckBox, 12, 0);
 
     generalGroupBox = new QGroupBox;
     generalGroupBox->setLayout(generalGrid);
@@ -223,12 +212,6 @@ void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
     }
 }
 
-void UserInterfaceSettingsPage::showShortcutsChanged(QT_STATE_CHANGED_T value)
-{
-    SettingsCache::instance().userInterface().setShowShortcuts(value);
-    qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus, value == 0); // 0 = unchecked
-}
-
 void UserInterfaceSettingsPage::retranslateUi()
 {
     generalGroupBox->setTitle(tr("General interface settings"));
@@ -244,8 +227,6 @@ void UserInterfaceSettingsPage::retranslateUi()
     useTearOffMenusCheckBox.setText(tr("Use tear-off menus, allowing right click menus to persist on screen"));
     keepGameChatFocusCheckBox.setText(
         tr("Keep game chat focused when clicking in game (Note: disables card view search bar)"));
-    showShortcutsCheckBox.setText(tr("Show keyboard shortcuts in right-click menus"));
-    showGameSelectorFilterToolbarCheckBox.setText(tr("Show game filter toolbar above list in room tab"));
 
     notificationsGroupBox->setTitle(tr("Notifications settings"));
     notificationsEnabledCheckBox.setText(tr("Enable notifications in taskbar"));
