@@ -583,6 +583,7 @@ void TabSupervisor::actTabServer(bool checked)
 
 void TabSupervisor::openTabServer()
 {
+    SettingsCache::instance().tabs().setTabServerOpen(true);
     if (tabServer) {
         return;
     }
