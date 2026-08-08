@@ -1,8 +1,9 @@
-name: Build Docker Image
+name: Build Docker
 
 permissions:
-  contents: read
-  packages: write
+  contents: read    # needed to checkout repo
+  id-token: write    # needed for signing attestations (SBOM & provenance) with GitHub OIDC
+  packages: write    # needed for interacting with GHCR
 
 on:
   push:
@@ -13,7 +14,10 @@ on:
       - master
     paths:
       - '.github/workflows/docker-release.yml'
+      - '.dockerignore'
       - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'docker-compose.yml.windows'
   release:
     types:
       - released    # publishing of stable releases
@@ -23,35 +27,37 @@ concurrency:
   group: "${{ github.workflow }} @ ${{ github.ref_name }}"
   cancel-in-progress: ${{ github.event_name != 'release' }}
 
+env:
+  GHCR_IMAGE: ghcr.io/cockatrice/servatrice
+  OCI_DESCRIPTION: Server for Cockatrice, a cross-platform virtual tabletop for multiplayer card games
+  OCI_TITLE: Servatrice
+  OCI_URL: https://cockatrice.github.io/
+
 jobs:
-  docker:
-    name: amd64 & arm64
-    if: ${{ github.repository_owner == 'Cockatrice' }}
-    runs-on: ubuntu-latest
-  
+  # Create one platform-specific image and publish its OCI image manifest per matrix job
+  build:
+    name: "${{ matrix.label }}"
+    if: github.repository_owner == 'Cockatrice'
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: x86
+            platform: linux/amd64
+            runner: ubuntu-latest
+
+          - label: arm
+            platform: linux/arm64
+            runner: ubuntu-24.04-arm    # to be replaced with "ubuntu-latest-arm" once available
+
+    env:
+      CACHE_SCOPE: servatrice-${{ matrix.label }}
+
     steps:
       - name: "Checkout"
         uses: actions/checkout@v7
-
-      - name: "Docker metadata"
-        id: metadata
-        uses: docker/metadata-action@v6
-        env:
-          DOCKER_METADATA_ANNOTATIONS_LEVELS: index    # needed for GHCR
-        with:
-          annotations: |
-            org.opencontainers.image.title=Servatrice
-            org.opencontainers.image.url=https://cockatrice.github.io/
-            org.opencontainers.image.description=Server for Cockatrice, a cross-platform virtual tabletop for multiplayer card games
-          images: |
-            ghcr.io/cockatrice/servatrice
-          labels: |
-            org.opencontainers.image.title=Servatrice
-            org.opencontainers.image.url=https://cockatrice.github.io/
-            org.opencontainers.image.description=Server for Cockatrice, a cross-platform virtual tabletop for multiplayer card games
-
-      - name: "Set up QEMU"
-        uses: docker/setup-qemu-action@v4
 
       - name: "Set up Docker buildx"
         uses: docker/setup-buildx-action@v4
@@ -61,18 +67,109 @@ jobs:
         id: login
         uses: docker/login-action@v4
         with:
-          password: ${{ github.token }}
           registry: ghcr.io
           username: ${{ github.actor }}
+          password: ${{ github.token }}
 
-      - name: "Build and push Docker image"
+      # Don't push for non-release triggers
+      - name: "Build image"
+        if: steps.login.outcome != 'success'
         uses: docker/build-push-action@v7
         with:
-          annotations: ${{ steps.metadata.outputs.annotations }}
-          cache-from: type=gha,scope=servatrice
-          cache-to: type=gha,mode=max,scope=servatrice
+          cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
+          cache-to: type=gha,mode=max,scope=${{ env.CACHE_SCOPE }}
           context: .
-          labels: ${{ steps.metadata.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
-          push: ${{ steps.login.outcome == 'success' }}
-          tags: ${{ steps.metadata.outputs.tags }}
+          platforms: ${{ matrix.platform }}
+          push: false
+
+      # Add OCI labels and push single-platform image by digest (without tags)
+      - name: "Build image and push by digest"
+        if: steps.login.outcome == 'success'
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
+          cache-to: type=gha,mode=max,scope=${{ env.CACHE_SCOPE }}
+          context: .
+          labels: |
+            org.opencontainers.image.description=${{ env.OCI_DESCRIPTION }}
+            org.opencontainers.image.title=${{ env.OCI_TITLE }}
+            org.opencontainers.image.url=${{ env.OCI_URL }}
+          outputs: type=image,name=${{ env.GHCR_IMAGE }},name-canonical=true,push=true,push-by-digest=true
+          platforms: ${{ matrix.platform }}
+          provenance: mode=max    # Do not pass secrets as build arguments with this option
+          sbom: true
+
+      - name: "Export digest"
+        if: steps.login.outcome == 'success'
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p $RUNNER_TEMP/digests
+          touch "$RUNNER_TEMP/digests/${DIGEST#sha256:}"
+
+      - name: "Upload digest"
+        if: steps.login.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error
+          name: digest-${{ matrix.label }}
+          path: $RUNNER_TEMP/digests/*
+          retention-days: 1
+
+
+  # Create an OCI image index from the platform-specific image manifests
+  index:
+    name: "Publish multi-platform image"
+    if: github.repository_owner == 'Cockatrice' && github.event_name == 'release' && github.event.release.prerelease == false
+    needs: build
+    runs-on: ubuntu-slim
+
+    steps:
+      - name: "Download digests"
+        uses: actions/download-artifact@v7
+        with:
+          path: $RUNNER_TEMP/digests
+          pattern: digest-*
+          merge-multiple: true
+
+      - name: "Login to GitHub Container Registry (GHCR)"
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: "Docker metadata"
+        id: metadata
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.GHCR_IMAGE }}
+          tags: |
+            type=raw,value=latest
+            type=ref,event=tag
+
+      # Add OCI annotations to image index and publish tags
+      - name: "Create image index"
+        env:
+          DOCKER_TAGS: ${{ steps.metadata.outputs.tags }}
+          GITHUB_TAG: ${{ github.ref_name }}
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          TAG_ARGS=""
+          for tag in $DOCKER_TAGS; do
+            TAG_ARGS="$TAG_ARGS --tag $tag"
+          done
+
+          docker buildx imagetools create \
+            --prefer-index=true \
+            --annotation "index:org.opencontainers.image.description=$OCI_DESCRIPTION" \
+            --annotation "index:org.opencontainers.image.title=$OCI_TITLE" \
+            --annotation "index:org.opencontainers.image.url=$OCI_URL" \
+            $TAG_ARGS \
+            $(printf '%s@sha256:%s ' "$GHCR_IMAGE" *)
+
+      - name: "Inspect images"
+        run: |
+          docker buildx imagetools inspect "$GHCR_IMAGE:latest"
+          docker buildx imagetools inspect "$GHCR_IMAGE:$GITHUB_TAG"
