@@ -63,12 +63,14 @@ void ChatView::adjustColorsToPalette()
         serverMessageColor = QColor(0xFF, 0x73, 0x83);
         otherUserColor = otherUserColor.lighter(150);
         linkColor = QColor(71, 158, 252);
+        unresolvedCardTagColor = QColor(0xFF, 0x73, 0x83);
     } else {
         document()->setDefaultStyleSheet(R"(
             a { text-decoration: none; color: blue; }
             .blue { color: blue }
         )");
         linkColor = palette().link().color();
+        unresolvedCardTagColor = QColor(0x85, 0x15, 0x15);
     }
 
     QTimer::singleShot(0, this, &ChatView::refreshBlockColors);
@@ -173,19 +175,23 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 
 void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 {
+    QTextCharFormat oldFormat = cursor.charFormat();
+    QTextCharFormat cardFormat = oldFormat;
+    cardFormat.setFontItalic(true);
+
     if (!CardDatabaseManager::query()->lookupCardByName(cardName)) {
+        cardFormat.setForeground(unresolvedCardTagColor);
+        cursor.setCharFormat(cardFormat);
         cursor.insertText(cardName);
+        cursor.setCharFormat(oldFormat);
         return;
     }
 
-    QTextCharFormat oldFormat = cursor.charFormat();
-    QTextCharFormat anchorFormat = oldFormat;
-    anchorFormat.setForeground(linkColor);
-    anchorFormat.setAnchor(true);
-    anchorFormat.setAnchorHref("card://" + cardName);
-    anchorFormat.setFontItalic(true);
+    cardFormat.setForeground(linkColor);
+    cardFormat.setAnchor(true);
+    cardFormat.setAnchorHref("card://" + cardName);
 
-    cursor.setCharFormat(anchorFormat);
+    cursor.setCharFormat(cardFormat);
     cursor.insertText(cardName);
     cursor.setCharFormat(oldFormat);
 }
