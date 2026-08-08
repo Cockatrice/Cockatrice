@@ -885,10 +885,11 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
 
     // When server doesn't permit registered users to exist, do not honor only-reg setting
     bool onlyRegisteredUsers = cmd.only_registered() && (server->permitUnregisteredUsers());
-    auto *game = new Server_Game(copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()),
-                                 cmd.max_players(), gameTypes, cmd.only_buddies(), onlyRegisteredUsers,
-                                 cmd.spectators_allowed(), cmd.spectators_need_password(), cmd.spectators_can_talk(),
-                                 cmd.spectators_see_everything(), startingLifeTotal, shareDecklistsOnLoad, room);
+    auto *game =
+        new Server_Game(copyUserInfo(false), gameId, description, QString::fromStdString(cmd.password()),
+                        cmd.max_players(), gameTypes, cmd.only_buddies(), onlyRegisteredUsers, cmd.spectators_allowed(),
+                        cmd.spectators_need_password(), cmd.spectators_can_talk(), cmd.spectators_see_everything(),
+                        startingLifeTotal, shareDecklistsOnLoad, cmd.enable_command_zone(), room);
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);

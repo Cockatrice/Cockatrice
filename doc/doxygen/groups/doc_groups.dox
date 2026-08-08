@@ -476,8 +476,7 @@
  * @ingroup GameMenus
  * @brief Menus for interacting with zones.
  *
- * Provides contextual options for a CardZone such as the hand,
- * library, graveyard, and battlefield.
+ * Provides contextual options for card zones.
  */
 
 /**
@@ -512,8 +511,7 @@
  * @ingroup GameGraphics
  * @brief Graphical representations of zones.
  *
- * Provides layout, visuals, and animations for a CardZone like the hand,
- * library, battlefield, and graveyard.
+ * Provides layout, visuals, and animations for card zones.
  */
 
 /**
@@ -548,8 +546,7 @@
  * @ingroup GameLogic
  * @brief Logical handling of CardZones during a Game.
  *
- * Defines the rules and behaviors of zones such as the hand,
- * battlefield, library, and graveyard.
+ * Defines the rules and behaviors of card zones.
  */
 
 /**

@@ -17,6 +17,7 @@
 
 #include <QMenu>
 #include <QObject>
+#include <functional>
 #include <libcockatrice/card/relation/card_relation_type.h>
 #include <libcockatrice/filters/filter_string.h>
 
@@ -126,6 +127,14 @@ public slots:
 
     void actPlay(QList<CardItem *> selectedCards);
     void actPlayFacedown(QList<CardItem *> selectedCards);
+    /** @brief Plays the selected card and increments the primary commander tax counter. */
+    void actPlayAndIncreaseTax(QList<CardItem *> selectedCards);
+    /** @brief Plays the selected card and increments the partner commander tax counter. */
+    void actPlayAndIncreasePartnerTax(QList<CardItem *> selectedCards);
+    /** @brief Modifies a tax counter by delta if it is active. */
+    void actModifyTaxCounter(int counterId, int delta);
+    /** @brief Toggles a tax counter's active state (only if inactive or value is 0). */
+    void actToggleTaxCounter(int counterId);
     void actHide(QList<CardItem *> selectedCards);
 
     void actMoveTopCardToPlay();
@@ -219,6 +228,9 @@ public slots:
     void cardMenuAction(QList<CardItem *> selectedCards, CardMenuActionType type);
 
 private:
+    /** @brief Sends an increment command for the specified counter. */
+    void sendIncCounter(int counterId, int delta);
+
     PlayerLogic *player;
 
     int defaultNumberTopCards = 1;
@@ -244,6 +256,35 @@ private:
                     bool faceDown = false);
 
     void playSelectedCards(QList<CardItem *> selectedCards, bool faceDown = false);
+
+    /**
+     * @brief Builds the move command for playing a card, returning the prepared (unsent) PendingCommand.
+     * @param card The card to play
+     * @param faceDown Whether to play the card face-down
+     * @return The prepared command, or nullptr if the card cannot be played.
+     */
+    PendingCommand *prepareCardMove(CardItem *card, bool faceDown);
+
+    /**
+     * @brief Shared implementation for playing selected cards with an optional per-card callback.
+     * @param selectedCards Cards to play
+     * @param faceDown Whether to play cards face-down
+     * @param postPlayCallback Called for each card once its move is prepared but before it is sent,
+     *        receiving the move's PendingCommand and the card's *original* zone name (the move may
+     *        change the card's zone). Connect response handling here so it is attached before send.
+     */
+    void
+    playSelectedCardsImpl(QList<CardItem *> selectedCards,
+                          bool faceDown,
+                          const std::function<void(PendingCommand *, const QString &)> &postPlayCallback = nullptr);
+
+    /**
+     * @brief Plays the selected cards and, for each that came from the command zone and whose move
+     *        the server accepts, increments the given (active) tax counter by one.
+     * @param selectedCards Cards to play
+     * @param counterId The tax counter to increment (CounterIds::CommanderTax or PartnerTax)
+     */
+    void playAndIncreaseTax(QList<CardItem *> selectedCards, int counterId);
 
     void cmdSetTopCard(Command_MoveCard &cmd);
     void cmdSetBottomCard(Command_MoveCard &cmd);

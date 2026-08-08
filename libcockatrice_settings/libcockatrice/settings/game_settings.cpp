@@ -70,6 +70,11 @@ bool GameSettings::getRememberGameSettings() const
     return getValue("remembergamesettings", "game", QString(), true).toBool();
 }
 
+bool GameSettings::getEnableCommandZone() const
+{
+    return getValue("enablecommandzone", "game").toBool();
+}
+
 bool GameSettings::getLocalGameRememberSettings() const
 {
     return getValue("remembersettings", "localgameoptions").toBool();
@@ -83,6 +88,11 @@ int GameSettings::getLocalGameMaxPlayers() const
 int GameSettings::getLocalGameStartingLifeTotal() const
 {
     return getValue("startinglifetotal", "localgameoptions", QString(), 20).toInt();
+}
+
+bool GameSettings::getLocalGameEnableCommandZone() const
+{
+    return getValue("enablecommandzone", "localgameoptions").toBool();
 }
 
 void GameSettings::setGameDescription(const QString &_gameDescription)
@@ -150,6 +160,11 @@ void GameSettings::setRememberGameSettings(bool _rememberGameSettings)
     setValue(_rememberGameSettings, "remembergamesettings", "game");
 }
 
+void GameSettings::setEnableCommandZone(bool _enableCommandZone)
+{
+    setValue(_enableCommandZone, "enablecommandzone", "game");
+}
+
 void GameSettings::setLocalGameRememberSettings(bool value)
 {
     setValue(value, "remembersettings", "localgameoptions");
@@ -163,4 +178,9 @@ void GameSettings::setLocalGameMaxPlayers(int value)
 void GameSettings::setLocalGameStartingLifeTotal(int value)
 {
     setValue(value, "startinglifetotal", "localgameoptions");
+}
+
+void GameSettings::setLocalGameEnableCommandZone(bool value)
+{
+    setValue(value, "enablecommandzone", "localgameoptions");
 }

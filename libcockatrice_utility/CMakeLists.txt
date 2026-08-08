@@ -18,6 +18,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/string_limits.h
     libcockatrice/utility/dice_limits.h
     libcockatrice/utility/counter_limits.h
+    libcockatrice/utility/counter_ids.h
     libcockatrice/utility/clamped_arithmetic.h
     libcockatrice/utility/zone_names.h
     libcockatrice/utility/days_years_between.h

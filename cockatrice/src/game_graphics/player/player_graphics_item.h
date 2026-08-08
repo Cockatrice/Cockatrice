@@ -12,6 +12,7 @@
 
 #include <QGraphicsObject>
 
+class CommandZone;
 class HandZone;
 class PileZone;
 class PlayerDialogs;
@@ -112,6 +113,18 @@ public:
     {
         return handZoneGraphicsItem;
     }
+    /** @brief Returns the command zone graphics item. */
+    [[nodiscard]] CommandZone *getCommandZoneGraphicsItem() const
+    {
+        return commandZoneGraphicsItem;
+    }
+    /** @brief Returns the counter widget for the given counter ID, or nullptr if not found. */
+    [[nodiscard]] AbstractCounter *getCounterWidget(int counterId) const
+    {
+        return counterWidgets.value(counterId, nullptr);
+    }
+    /** @brief Returns the tax counter if it exists and is active, or nullptr otherwise. */
+    [[nodiscard]] AbstractCounter *getTaxCounterIfActive(int counterId) const;
 
 public slots:
     void onPlayerActiveChanged(bool _active);
@@ -120,6 +133,8 @@ public slots:
     void onCounterRemoved(int counterId);
     void rearrangeCounters();
     void retranslateUi();
+    /** @brief Shows or hides the command zone and rearranges dependent zones. */
+    void setCommandZoneVisible(bool visible);
 
 signals:
     void sizeChanged();
@@ -142,10 +157,22 @@ private:
     TableZone *tableZoneGraphicsItem;
     StackZone *stackZoneGraphicsItem;
     HandZone *handZoneGraphicsItem;
+    CommandZone *commandZoneGraphicsItem = nullptr;
     QRectF bRect;
     bool mirrored;
     bool handVisible = false;
 
+    /**
+     * @brief Returns the menu action a counter's submenu is inserted before to keep the
+     * Player -> Counters menu ordered by counter id, or nullptr to append.
+     */
+    [[nodiscard]] QAction *counterMenuInsertAnchor(int counterId) const;
+    /** @brief Adds or removes a counter's submenu in the Player -> Counters menu. */
+    void setCounterMenuRegistered(AbstractCounter *widget, bool registered);
+    /** @brief Returns the command zone's display height, or 0 if hidden. */
+    [[nodiscard]] qreal totalCommandZoneHeight() const;
+    /** @brief Positions the command and stack zones vertically starting from base. */
+    void positionCommandAndStackZones(const QPointF &base);
 private slots:
     void updateBoundingRect();
     void rearrangeZones();

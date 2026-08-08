@@ -29,9 +29,13 @@ AbstractCounter::AbstractCounter(CounterState *state,
 {
     setAcceptHoverEvents(true);
 
-    connect(state, &CounterState::valueChanged, this, [this](int, int newValue) {
-        value = newValue;
-        update();
+    // Route through the (possibly overridden) virtual setValue so subclasses such as
+    // CommanderTaxCounter can clamp and refresh their tooltip on every value change.
+    connect(state, &CounterState::valueChanged, this, [this](int, int newValue) { setValue(newValue); });
+
+    connect(state, &CounterState::activeChanged, this, [this](bool newActive) {
+        setActive(newActive);
+        emit player->rearrangeCounters();
     });
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
@@ -78,6 +82,25 @@ void AbstractCounter::delCounter()
     } else {
         deleteLater();
     }
+}
+
+void AbstractCounter::setValue(int _value)
+{
+    value = _value;
+    update();
+}
+
+void AbstractCounter::setActive(bool _active)
+{
+    active = _active;
+    setVisible(_active);
+    if (menu) {
+        menu->setEnabled(_active);
+        if (!_active) {
+            menu->hideTearOffMenu();
+        }
+    }
+    update();
 }
 
 void AbstractCounter::retranslateUi()
@@ -159,6 +182,10 @@ void AbstractCounter::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 
 void AbstractCounter::incrementCounter()
 {
+    if (!active) {
+        return;
+    }
+
     Command_IncCounter cmd;
     cmd.set_counter_id(id);
     cmd.set_delta(static_cast<QAction *>(sender())->data().toInt());
@@ -167,6 +194,10 @@ void AbstractCounter::incrementCounter()
 
 void AbstractCounter::setCounter()
 {
+    if (!active) {
+        return;
+    }
+
     QWidget *parent = nullptr;
     if (auto *view = scene() ? scene()->views().value(0) : nullptr) {
         parent = view->window();
@@ -181,7 +212,8 @@ void AbstractCounter::setCounter()
         deleteLater();
         return;
     }
-    if (!ok) {
+    // Re-check active: exec() spins the event loop in case the counter was deactivated.
+    if (!ok || !active) {
         return;
     }
 

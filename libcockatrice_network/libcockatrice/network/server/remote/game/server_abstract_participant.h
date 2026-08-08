@@ -41,6 +41,7 @@ class Command_Judge;
 class Command_IncCounter;
 class Command_CreateCounter;
 class Command_SetCounter;
+class Command_SetCounterActive;
 class Command_DelCounter;
 class Command_NextTurn;
 class Command_SetActivePhase;
@@ -160,6 +161,8 @@ public:
     cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    virtual Response::ResponseCode
+    cmdSetCounterActive(const Command_SetCounterActive &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdNextTurn(const Command_NextTurn &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode

@@ -29,11 +29,16 @@
 namespace ZValues
 {
 
+/** @brief Command zone sits at standard zone level */
+constexpr qreal COMMAND_ZONE = 1.0;
+
 // Expose base for callers that need it
 constexpr qreal OVERLAY_BASE = ZValueLayerManager::OVERLAY_BASE;
 
 // Overlay layer Z-values for items that should appear above normal cards
 constexpr qreal HOVERED_CARD = ZValueLayerManager::overlayZValue(1.0);
+/** @brief Commander tax counter overlay */
+constexpr qreal TAX_COUNTERS = ZValueLayerManager::overlayZValue(2.0);
 constexpr qreal ARROWS = ZValueLayerManager::overlayZValue(3.0);
 constexpr qreal ZONE_VIEW_WIDGET = ZValueLayerManager::overlayZValue(4.0);
 constexpr qreal DRAG_ITEM = ZValueLayerManager::overlayZValue(5.0);

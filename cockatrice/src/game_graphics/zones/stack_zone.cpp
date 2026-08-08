@@ -32,6 +32,10 @@ QRectF StackZone::boundingRect() const
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, getLogic()->getPlayer()->getZoneId());
+
+    QPointF scenePos = mapToScene(QPointF(0, 0));
+    painter->setBrushOrigin(-scenePos);
+
     painter->fillRect(boundingRect(), brush);
 }
 

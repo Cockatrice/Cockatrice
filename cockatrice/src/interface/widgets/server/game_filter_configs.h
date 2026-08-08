@@ -18,6 +18,7 @@ struct GameFilterConfigs
     bool hidePasswordProtectedGames = false;
     bool hideNotBuddyCreatedGames = false;
     bool hideOpenDecklistGames = false;
+    bool hideCommandZoneGames = false;
     QString gameNameFilter = "";
     QStringList creatorNameFilters = {};
     QSet<int> gameTypeFilter = {};
