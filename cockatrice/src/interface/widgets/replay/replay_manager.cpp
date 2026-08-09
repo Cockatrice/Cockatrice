@@ -177,7 +177,7 @@ void ReplayManager::handleSkipEmptySection()
     }
 
     // find most recent meaningful event
-    int prevEvent = currentEvent;
+    int prevEvent = std::max(0, currentEvent - 1);
     for (; prevEvent > 0 && !hasMeaningfulEvent(replay->event_list(prevEvent)); --prevEvent) {
     }
 
@@ -187,7 +187,7 @@ void ReplayManager::handleSkipEmptySection()
     }
 
     // find next earliest meaningful event
-    int nextEvent = currentEvent + 1;
+    int nextEvent = currentEvent;
     for (; nextEvent < replayTimeline.size() - 1 && !hasMeaningfulEvent(replay->event_list(nextEvent)); ++nextEvent) {
     }
 
