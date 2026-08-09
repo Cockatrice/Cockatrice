@@ -26,14 +26,6 @@ public:
     HomeWidget(QWidget *parent, TabSupervisor *tabSupervisor);
     void updateRandomCard();
     QPair<QColor, QColor> extractDominantColors(const QPixmap &pixmap);
-    HomeStyledButton *connectButton;
-    HomeStyledButton *visualDeckEditorButton;
-    HomeStyledButton *visualDeckStorageButton;
-    HomeStyledButton *visualDatabaseDisplayButton;
-    HomeStyledButton *edhrecButton;
-    HomeStyledButton *archidektButton;
-    HomeStyledButton *replaybutton;
-    HomeStyledButton *exitButton;
 
 public slots:
     void paintEvent(QPaintEvent *event) override;
@@ -56,6 +48,15 @@ private:
     DeckList backgroundSourceDeck;
     QPixmap overlay;
     QPair<QColor, QColor> gradientColors;
+
+    HomeStyledButton *connectButton;
+    HomeStyledButton *visualDeckEditorButton;
+    HomeStyledButton *visualDeckStorageButton;
+    HomeStyledButton *visualDatabaseDisplayButton;
+    HomeStyledButton *edhrecButton;
+    HomeStyledButton *archidektButton;
+    HomeStyledButton *replaybutton;
+    HomeStyledButton *exitButton;
 
     void setRandomCard(ExactCard &newCard);
     void loadBackgroundSourceDeck();
