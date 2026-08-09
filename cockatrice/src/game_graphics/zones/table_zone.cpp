@@ -92,14 +92,19 @@ bool TableZone::isInverted() const
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Table, getLogic()->getPlayer()->getZoneId());
-    painter->fillRect(boundingRect(), brush);
+    if (playmatActive) {
+        // Subtle overlay to distinguish table zone from stack zone
+        painter->fillRect(boundingRect(), QColor(0, 0, 0, 60));
+    } else {
+        QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Table, getLogic()->getPlayer()->getZoneId());
+        painter->fillRect(boundingRect(), brush);
+    }
 
     if (active) {
         paintZoneOutline(painter);
     } else {
         // inactive player gets a darker table zone with a semi transparent black mask
-        // this means if the user provides a custom background it will fade
+        // this means if the user provides a custom background or playmat it will fade
         painter->fillRect(boundingRect(), FADE_MASK);
     }
 
@@ -111,6 +116,12 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
     }
 
     paintLandDivider(painter);
+}
+
+void TableZone::onPlaymatChanged(bool active)
+{
+    playmatActive = active;
+    update();
 }
 
 /**

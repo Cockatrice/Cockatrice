@@ -31,8 +31,19 @@ QRectF StackZone::boundingRect() const
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, getLogic()->getPlayer()->getZoneId());
-    painter->fillRect(boundingRect(), brush);
+    if (playmatActive) {
+        // Subtle overlay to distinguish stack zone from table zone (slightly darker)
+        painter->fillRect(boundingRect(), QColor(0, 0, 0, 80));
+    } else {
+        QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, getLogic()->getPlayer()->getZoneId());
+        painter->fillRect(boundingRect(), brush);
+    }
+}
+
+void StackZone::onPlaymatChanged(bool active)
+{
+    playmatActive = active;
+    update();
 }
 
 void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,

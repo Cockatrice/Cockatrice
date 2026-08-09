@@ -43,6 +43,7 @@ public:
     [[nodiscard]] virtual bool getLifeCounterAnimationsEnabled() const = 0;
     [[nodiscard]] virtual bool getBattlefieldFlashEnabled() const = 0;
     [[nodiscard]] virtual QStringList getUserListExpandedSections() const = 0;
+    [[nodiscard]] virtual int getPlaymatVisibility() const = 0;
 };
 
 #endif // COCKATRICE_INTERFACE_INTERFACE_SETTINGS_PROVIDER_H

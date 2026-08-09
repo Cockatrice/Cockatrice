@@ -28,6 +28,34 @@ class QTextStream;
 class InnerDecklistNode;
 
 /**
+ * @struct PlaymatParams
+ * @ingroup Decks
+ * @brief Positioning parameters for a playmat card image.
+ *
+ * Controls how the cropped card art is positioned within the
+ * combined table+stack play area. The coordinate system is
+ * relative to the cropped art source image.
+ */
+struct PlaymatParams
+{
+    double marginPctL = 0.07;     ///< Left margin as fraction of card width (0.0–0.95).
+    double marginPctR = 0.07;     ///< Right margin as fraction of card width (0.0–0.95).
+    double verticalOffset = 0.33; ///< Vertical position within card (0.0=top, 1.0=bottom).
+    double zoom = 1.0;            ///< Scale factor (0.1–4.0).
+
+    bool operator==(const PlaymatParams &other) const
+    {
+        return qFuzzyCompare(marginPctL, other.marginPctL) && qFuzzyCompare(marginPctR, other.marginPctR) &&
+               qFuzzyCompare(verticalOffset, other.verticalOffset) && qFuzzyCompare(zoom, other.zoom);
+    }
+
+    bool operator!=(const PlaymatParams &other) const
+    {
+        return !(*this == other);
+    }
+};
+
+/**
  * @class DeckList
  * @ingroup Decks
  * @brief Represents a complete deck, including metadata, zones, cards,
@@ -70,6 +98,8 @@ public:
         CardRef bannerCard;          ///< Optional representative card for the deck.
         QStringList tags;            ///< User-defined tags for deck classification.
         QString lastLoadedTimestamp; ///< Timestamp string of last load.
+        CardRef playmatCard;         ///< Optional card used as playmat background for table+stack zones.
+        PlaymatParams playmatParams; ///< Positioning parameters for the playmat card image.
 
         /**
          * @brief Checks if all values (except for lastLoadedTimestamp) in the metadata is empty.
@@ -114,6 +144,14 @@ public:
     void setBannerCard(const CardRef &_bannerCard = {})
     {
         metadata.bannerCard = _bannerCard;
+    }
+    void setPlaymatCard(const CardRef &_playmatCard = {})
+    {
+        metadata.playmatCard = _playmatCard;
+    }
+    void setPlaymatParams(const PlaymatParams &_playmatParams = {})
+    {
+        metadata.playmatParams = _playmatParams;
     }
     void setLastLoadedTimestamp(const QString &_lastLoadedTimestamp = QString())
     {
@@ -169,6 +207,14 @@ public:
     CardRef getBannerCard() const
     {
         return metadata.bannerCard;
+    }
+    CardRef getPlaymatCard() const
+    {
+        return metadata.playmatCard;
+    }
+    PlaymatParams getPlaymatParams() const
+    {
+        return metadata.playmatParams;
     }
     QString getLastLoadedTimestamp() const
     {

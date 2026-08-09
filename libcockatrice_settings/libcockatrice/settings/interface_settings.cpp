@@ -160,6 +160,11 @@ bool InterfaceSettings::getShowGameSelectorFilterToolbar() const
     return getValue("showGameSelectorFilterToolbar", QString(), QString(), true).toBool();
 }
 
+int InterfaceSettings::getPlaymatVisibility() const
+{
+    return getValue("playmatvisibility", QString(), QString(), 2).toInt();
+}
+
 bool InterfaceSettings::getLifeCounterAnimationsEnabled() const
 {
     return getValue("lifeCounterAnimationsEnabled", QString(), QString(), true).toBool();
@@ -341,6 +346,15 @@ void InterfaceSettings::setShowGameSelectorFilterToolbar(bool _showGameSelectorF
 {
     setValue(_showGameSelectorFilterToolbar, "showGameSelectorFilterToolbar");
     emit showGameSelectorFilterToolbarChanged(_showGameSelectorFilterToolbar);
+}
+
+void InterfaceSettings::setPlaymatVisibility(int _visibility)
+{
+    if (getPlaymatVisibility() == _visibility) {
+        return;
+    }
+    setValue(_visibility, "playmatvisibility");
+    emit playmatVisibilityChanged(_visibility);
 }
 
 void InterfaceSettings::setLifeCounterAnimationsEnabled(bool _lifeCounterAnimationsEnabled)

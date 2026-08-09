@@ -285,6 +285,10 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
                 emit playerJoined(prop);
             }
             player->processPlayerInfo(playerInfo);
+            // Extract playmat from player properties for opponent display
+            if (prop.has_playmat_card_name()) {
+                player->setPlaymatFromProperties(prop);
+            }
             if (player->getPlayerInfo()->getLocal()) {
                 emit localPlayerDeckSelected(player, playerId, playerInfo);
             } else {
@@ -350,6 +354,11 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
     }
     const ServerInfo_PlayerProperties &prop = event.player_properties();
     emit playerPropertiesChanged(prop, eventPlayerId);
+
+    // Update playmat from player properties
+    if (prop.has_playmat_card_name()) {
+        player->setPlaymatFromProperties(prop);
+    }
 
     const auto contextType = static_cast<GameEventContext::ContextType>(getPbExtension(context));
     switch (contextType) {

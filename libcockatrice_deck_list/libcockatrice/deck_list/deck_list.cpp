@@ -25,7 +25,7 @@ static const QString CURRENT_SIDEBOARD_PLAN_KEY = "";
 
 bool DeckList::Metadata::isEmpty() const
 {
-    return name.isEmpty() && comments.isEmpty() && bannerCard.isEmpty() && tags.isEmpty();
+    return name.isEmpty() && comments.isEmpty() && bannerCard.isEmpty() && tags.isEmpty() && playmatCard.isEmpty();
 }
 
 DeckList::DeckList()
@@ -74,6 +74,36 @@ bool DeckList::readElement(QXmlStreamReader *xml)
             QString providerId = xml->attributes().value("providerId").toString();
             QString cardName = xml->readElementText();
             metadata.bannerCard = {cardName, providerId};
+        } else if (childName == "playmatCard") {
+            QString providerId = xml->attributes().value("providerId").toString();
+            bool ok;
+            QString marginLStr = xml->attributes().value("marginPctL").toString();
+            QString marginRStr = xml->attributes().value("marginPctR").toString();
+            QString vOffStr = xml->attributes().value("verticalOffset").toString();
+            QString zoomStr = xml->attributes().value("zoom").toString();
+            QString cardName = xml->readElementText();
+            metadata.playmatCard = {cardName, providerId};
+            PlaymatParams params;
+            // Clamp to the same ranges as the settings dialog and the remote
+            // player-properties path so malformed deck files cannot produce
+            // degenerate art rectangles (e.g. a zoom of 0 dividing by zero).
+            params.marginPctL = qBound(0.0, marginLStr.toDouble(&ok), 0.95);
+            if (!ok) {
+                params.marginPctL = 0.07;
+            }
+            params.marginPctR = qBound(0.0, marginRStr.toDouble(&ok), 0.95);
+            if (!ok) {
+                params.marginPctR = 0.07;
+            }
+            params.verticalOffset = qBound(0.0, vOffStr.toDouble(&ok), 1.0);
+            if (!ok) {
+                params.verticalOffset = 0.33;
+            }
+            params.zoom = qBound(0.1, zoomStr.toDouble(&ok), 4.0);
+            if (!ok) {
+                params.zoom = 1.0;
+            }
+            metadata.playmatParams = params;
         } else if (childName == "tags") {
             metadata.tags.clear(); // Clear existing tags
             while (xml->readNextStartElement()) {
@@ -104,6 +134,16 @@ static void writeMetadata(QXmlStreamWriter *xml, const DeckList::Metadata &metad
     xml->writeAttribute("providerId", metadata.bannerCard.providerId);
     xml->writeCharacters(metadata.bannerCard.name);
     xml->writeEndElement();
+    if (!metadata.playmatCard.isEmpty()) {
+        xml->writeStartElement("playmatCard");
+        xml->writeAttribute("providerId", metadata.playmatCard.providerId);
+        xml->writeAttribute("marginPctL", QString::number(metadata.playmatParams.marginPctL, 'f', 4));
+        xml->writeAttribute("marginPctR", QString::number(metadata.playmatParams.marginPctR, 'f', 4));
+        xml->writeAttribute("verticalOffset", QString::number(metadata.playmatParams.verticalOffset, 'f', 4));
+        xml->writeAttribute("zoom", QString::number(metadata.playmatParams.zoom, 'f', 4));
+        xml->writeCharacters(metadata.playmatCard.name);
+        xml->writeEndElement();
+    }
     xml->writeTextElement("comments", metadata.comments);
 
     // Write tags

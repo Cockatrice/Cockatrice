@@ -317,10 +317,24 @@ AppearanceSettingsPage::AppearanceSettingsPage()
             &InterfaceSettings::setMinPlayersForMultiColumnLayout);
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
+    playmatVisibilityCombo.addItem(tr("Show all playmats"), 2);
+    playmatVisibilityCombo.addItem(tr("Show own playmat only"), 1);
+    playmatVisibilityCombo.addItem(tr("Don't use playmats"), 0);
+    int visIdx = playmatVisibilityCombo.findData(settings.userInterface().getPlaymatVisibility());
+    if (visIdx >= 0) {
+        playmatVisibilityCombo.setCurrentIndex(visIdx);
+    }
+    connect(&playmatVisibilityCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+        SettingsCache::instance().userInterface().setPlaymatVisibility(playmatVisibilityCombo.itemData(index).toInt());
+    });
+    playmatVisibilityLabel.setBuddy(&playmatVisibilityCombo);
+
     auto *tableGrid = new QGridLayout;
     tableGrid->addWidget(&invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
     tableGrid->addWidget(&minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
     tableGrid->addWidget(&minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
+    tableGrid->addWidget(&playmatVisibilityLabel, 2, 0, 1, 1);
+    tableGrid->addWidget(&playmatVisibilityCombo, 2, 1, 1, 1);
 
     tableGroupBox = new QGroupBox;
     tableGroupBox->setLayout(tableGrid);
@@ -489,4 +503,5 @@ void AppearanceSettingsPage::retranslateUi()
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
+    playmatVisibilityLabel.setText(tr("Playmat visibility:"));
 }

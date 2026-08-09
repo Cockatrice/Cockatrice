@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../playmat/playmat_settings_dialog.h"
 #include "../settings_page/user_interface_settings_page.h"
 #include "../tabs/api/commander_spellbook/commander_bracket_widget.h"
 #include "deck_list_style_proxy.h"
@@ -11,6 +12,7 @@
 #include <QDockWidget>
 #include <QHeaderView>
 #include <QLabel>
+#include <QPushButton>
 #include <QSplitter>
 #include <QTextEdit>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -228,10 +230,18 @@ void DeckEditorDeckDockWidget::createDeckDock()
     upperLayout->addWidget(bannerCardLabel, 4, 0);
     upperLayout->addWidget(bannerCardComboBox, 4, 1);
 
-    upperLayout->addWidget(deckTagsDisplayWidget, 5, 1);
+    playmatLabel = new QLabel();
+    playmatLabel->setObjectName("playmatLabel");
+    playmatLabel->setText(tr("Playmat"));
+    playmatSettingsButton = new QPushButton(tr("Edit Playmat..."));
+    connect(playmatSettingsButton, &QPushButton::clicked, this, &DeckEditorDeckDockWidget::openPlaymatSettings);
+    upperLayout->addWidget(playmatLabel, 5, 0);
+    upperLayout->addWidget(playmatSettingsButton, 5, 1);
 
-    upperLayout->addWidget(activeGroupCriteriaLabel, 6, 0);
-    upperLayout->addWidget(activeGroupCriteriaComboBox, 6, 1);
+    upperLayout->addWidget(deckTagsDisplayWidget, 6, 1);
+
+    upperLayout->addWidget(activeGroupCriteriaLabel, 7, 0);
+    upperLayout->addWidget(activeGroupCriteriaComboBox, 7, 1);
 
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
@@ -440,6 +450,38 @@ void DeckEditorDeckDockWidget::writeBannerCard(int index)
     deckStateManager->setBannerCard(bannerCard);
 }
 
+void DeckEditorDeckDockWidget::openPlaymatSettings()
+{
+    CardRef currentCard = deckStateManager->getMetadata().playmatCard;
+    PlaymatParams currentParams = deckStateManager->getMetadata().playmatParams;
+
+    PlaymatSettingsDialog dialog(currentCard, currentParams, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        CardRef newCard = dialog.card();
+        PlaymatParams newParams = dialog.params();
+
+        if (newCard.isEmpty()) {
+            // User clicked "Remove Playmat"
+            deckStateManager->setPlaymatCard(CardRef{});
+            deckStateManager->setPlaymatParams(PlaymatParams{});
+        } else {
+            deckStateManager->setPlaymatCard(newCard);
+            deckStateManager->setPlaymatParams(newParams);
+        }
+        updatePlaymatLabel();
+    }
+}
+
+void DeckEditorDeckDockWidget::updatePlaymatLabel()
+{
+    CardRef playmat = deckStateManager->getMetadata().playmatCard;
+    if (playmat.isEmpty()) {
+        playmatSettingsButton->setText(tr("Edit Playmat..."));
+    } else {
+        playmatSettingsButton->setText(tr("Edit Playmat (%1)").arg(playmat.name));
+    }
+}
+
 void DeckEditorDeckDockWidget::applyActiveGroupCriteria()
 {
     getModel()->setActiveGroupCriteria(
@@ -497,6 +539,7 @@ void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()
     syncBannerCardComboBoxSelectionWithDeck();
     updateBannerCardComboBox();
     bannerCardComboBox->blockSignals(false);
+    updatePlaymatLabel();
     updateHash();
 
     formatComboBox->blockSignals(true);

@@ -11,6 +11,7 @@
 #include "../game_scene.h"
 
 #include <QGraphicsObject>
+#include <libcockatrice/deck_list/deck_list.h>
 
 class HandZone;
 class PileZone;
@@ -126,6 +127,7 @@ signals:
     void playerCountChanged();
     void mirroredChanged(bool isMirrored);
     void cardInfoRequested(const CardRef &cardRef);
+    void playmatChanged(bool hasPlaymat);
 
 private:
     PlayerLogic *player;
@@ -146,9 +148,18 @@ private:
     bool mirrored;
     bool handVisible = false;
 
+    QPixmap playmatPixmap;
+    PlaymatParams playmatParams;
+    QString playmatAttribution;
+    bool hasPlaymat = false;
+    QMetaObject::Connection playmatPixmapConnection;
+
 private slots:
     void updateBoundingRect();
     void rearrangeZones();
+    void clearPlaymat();
+    void updatePlaymat();
+    void onPlaymatPixmapReady();
 };
 
 #endif // COCKATRICE_PLAYER_GRAPHICS_ITEM_H

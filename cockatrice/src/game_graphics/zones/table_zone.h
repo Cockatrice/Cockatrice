@@ -86,6 +86,7 @@ private:
      */
     bool active = false;
     bool mirrored = false;
+    bool playmatActive = false;
 
     [[nodiscard]] bool isInverted() const;
 
@@ -94,6 +95,9 @@ private slots:
        Loads in any found custom background and updates
      */
     void updateBg();
+
+public slots:
+    void onPlaymatChanged(bool active);
 
 public slots:
     /**

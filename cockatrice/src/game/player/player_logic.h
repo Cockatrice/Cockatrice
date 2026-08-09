@@ -17,6 +17,7 @@
 #include "../zones/table_zone_logic.h"
 #include "player_event_handler.h"
 #include "player_info.h"
+#include "player_manager.h"
 
 #include <QInputDialog>
 #include <QLoggingCategory>
@@ -72,6 +73,8 @@ signals:
                                  const QList<const ServerInfo_Card *> &cardList,
                                  bool withWritePermission);
     void deckChanged();
+    /** @brief Emitted when the remote playmat (card/params) is updated from player properties. */
+    void playmatChanged();
     void newCardAdded(AbstractCardItem *card);
     void requestCardMenuUpdate(const CardItem *card);
     void counterAdded(CounterState *state);
@@ -226,6 +229,20 @@ public:
 
     void setZoneId(int _zoneId);
 
+    void setPlaymatFromProperties(const ServerInfo_PlayerProperties &props);
+    const CardRef &getRemotePlaymatCard() const
+    {
+        return remotePlaymatCard;
+    }
+    const PlaymatParams &getRemotePlaymatParams() const
+    {
+        return remotePlaymatParams;
+    }
+    bool getHasRemotePlaymat() const
+    {
+        return hasRemotePlaymat;
+    }
+
 private:
     AbstractGame *game;
     PlayerInfo *playerInfo;
@@ -243,6 +260,11 @@ private:
 
     bool dialogSemaphore;
     QList<CardItem *> cardsToDelete;
+
+    // Playmat from player properties (for opponent display)
+    CardRef remotePlaymatCard;
+    PlaymatParams remotePlaymatParams;
+    bool hasRemotePlaymat = false;
 };
 
 class AnnotationDialog : public QInputDialog

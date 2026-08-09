@@ -59,6 +59,8 @@ private:
     QCheckBox horizontalHandCheckBox;
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
+    QLabel playmatVisibilityLabel;
+    QComboBox playmatVisibilityCombo;
     QGroupBox *themeGroupBox;
     QGroupBox *homeTabGroupBox;
     QGroupBox *stylingGroupBox;

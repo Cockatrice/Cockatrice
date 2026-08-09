@@ -42,6 +42,7 @@ public:
     [[nodiscard]] bool getShowStatusBar() const override;
     [[nodiscard]] bool getShowShortcuts() const override;
     [[nodiscard]] bool getShowGameSelectorFilterToolbar() const override;
+    [[nodiscard]] int getPlaymatVisibility() const override;
     [[nodiscard]] bool getLifeCounterAnimationsEnabled() const override;
     [[nodiscard]] bool getBattlefieldFlashEnabled() const override;
     [[nodiscard]] QStringList getUserListExpandedSections() const override;
@@ -77,6 +78,7 @@ public:
     void setShowStatusBar(bool _showStatusBar);
     void setShowShortcuts(bool _showShortcuts);
     void setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar);
+    void setPlaymatVisibility(int _visibility);
     void setLifeCounterAnimationsEnabled(bool _lifeCounterAnimationsEnabled);
     void setBattlefieldFlashEnabled(bool _battlefieldFlashEnabled);
     void setUserListExpandedSections(const QStringList &sections);
@@ -91,6 +93,7 @@ signals:
     void tallyTypeChanged(int type);
     void showStatusBarChanged(bool state);
     void showGameSelectorFilterToolbarChanged(bool state);
+    void playmatVisibilityChanged(int visibility);
     void lifeCounterAnimationsEnabledChanged(bool state);
     void battlefieldFlashEnabledChanged(bool state);
 
