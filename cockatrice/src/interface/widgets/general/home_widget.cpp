@@ -60,8 +60,10 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     vdeStep.validationTiming = ValidationTiming::OnSignal;
     vdeStep.autoAdvanceOnValid = true;
     vdeStep.validator = []() { return true; };
-    vdeStep.signalSource = visualDeckEditorButton;
-    vdeStep.signalName = SIGNAL(clicked());
+    vdeStep.signalHook = [this](TutorialController *controller) {
+        return connect(visualDeckEditorButton, &QAbstractButton::clicked, controller,
+                       &TutorialController::checkValidation);
+    };
 
     sequence.addStep(vdeStep);
     sequence.addStep({visualDeckStorageButton, "Browse the decks in your local collection."});

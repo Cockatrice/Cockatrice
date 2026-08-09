@@ -186,8 +186,10 @@ void TabGame::finishTutorialInitialization()
     loadDeckStep.requiresInteraction = true;
     loadDeckStep.autoAdvanceOnValid = true;
     loadDeckStep.validationTiming = ValidationTiming::OnSignal;
-    loadDeckStep.signalSource = game->getGameEventHandler();
-    loadDeckStep.signalName = SIGNAL(logDeckSelect(PlayerLogic *, QString, int));
+    loadDeckStep.signalHook = [this](TutorialController *controller) {
+        return connect(game->getGameEventHandler(), &GameEventHandler::logDeckSelect, controller,
+                       &TutorialController::checkValidation);
+    };
     loadDeckStep.validator = [] { return true; };
 
     deckSelectSequence.addStep(loadDeckStep);
@@ -199,8 +201,9 @@ void TabGame::finishTutorialInitialization()
     readyUpStep.requiresInteraction = true;
     readyUpStep.autoAdvanceOnValid = true;
     readyUpStep.validationTiming = ValidationTiming::OnSignal;
-    readyUpStep.signalSource = this;
-    readyUpStep.signalName = SIGNAL(localPlayerReadyStateChanged(bool));
+    readyUpStep.signalHook = [this](TutorialController *controller) {
+        return connect(this, &TabGame::localPlayerReadyStateChanged, controller, &TutorialController::checkValidation);
+    };
     readyUpStep.validator = [] { return true; };
 
     deckSelectSequence.addStep(readyUpStep);
@@ -256,10 +259,12 @@ void TabGame::finishTutorialInitialization()
     lifeCounterStep.allowClickThrough = true;
     lifeCounterStep.autoAdvanceOnValid = true;
     lifeCounterStep.validationTiming = ValidationTiming::OnSignal;
-    lifeCounterStep.signalSource = game->getPlayerManager()
-                                       ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
-                                       ->getPlayerEventHandler();
-    lifeCounterStep.signalName = SIGNAL(logSetCounter(PlayerLogic *, QString, int, int));
+    lifeCounterStep.signalHook = [this](TutorialController *controller) {
+        return connect(game->getPlayerManager()
+                           ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
+                           ->getPlayerEventHandler(),
+                       &PlayerEventHandler::logSetCounter, controller, &TutorialController::checkValidation);
+    };
     lifeCounterStep.validator = [this] {
         auto counters =
             game->getPlayerManager()->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())->getCounters();
@@ -283,10 +288,12 @@ void TabGame::finishTutorialInitialization()
     diceRollStep.allowClickThrough = true;
     diceRollStep.autoAdvanceOnValid = true;
     diceRollStep.validationTiming = ValidationTiming::OnSignal;
-    diceRollStep.signalSource = game->getPlayerManager()
-                                    ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
-                                    ->getPlayerEventHandler();
-    diceRollStep.signalName = SIGNAL(logRollDie(PlayerLogic *, int, const QList<uint> &));
+    diceRollStep.signalHook = [this](TutorialController *controller) {
+        return connect(game->getPlayerManager()
+                           ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
+                           ->getPlayerEventHandler(),
+                       &PlayerEventHandler::logRollDie, controller, &TutorialController::checkValidation);
+    };
     diceRollStep.validator = [] { return true; };
     diceRollStep.validationHint = tr("Roll a dice using any of these methods.");
 
@@ -302,10 +309,12 @@ void TabGame::finishTutorialInitialization()
     mulliganStep.allowClickThrough = true;
     mulliganStep.autoAdvanceOnValid = true;
     mulliganStep.validationTiming = ValidationTiming::OnSignal;
-    mulliganStep.signalSource = game->getPlayerManager()
-                                    ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
-                                    ->getPlayerEventHandler();
-    mulliganStep.signalName = SIGNAL(logDrawCards(PlayerLogic *, int, bool));
+    mulliganStep.signalHook = [this](TutorialController *controller) {
+        return connect(game->getPlayerManager()
+                           ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
+                           ->getPlayerEventHandler(),
+                       &PlayerEventHandler::logDrawCards, controller, &TutorialController::checkValidation);
+    };
     mulliganStep.validator = [this] {
         return game->getPlayerManager()
                    ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())

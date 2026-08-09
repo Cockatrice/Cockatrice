@@ -145,8 +145,9 @@ TutorialSequence VisualDeckDisplayOptionsWidget::generateTutorialSequence(Tutori
     displayTypeStep.allowClickThrough = true;
     displayTypeStep.requiresInteraction = true;
     displayTypeStep.validationTiming = ValidationTiming::OnSignal;
-    displayTypeStep.signalSource = displayTypeButton;
-    displayTypeStep.signalName = SIGNAL(clicked());
+    displayTypeStep.signalHook = [this](TutorialController *controller) {
+        return connect(displayTypeButton, &QAbstractButton::clicked, controller, &TutorialController::checkValidation);
+    };
     displayTypeStep.autoAdvanceOnValid = true;
     displayTypeStep.validator = [] { return true; };
 
@@ -175,8 +176,10 @@ TutorialSequence VisualDeckDisplayOptionsWidget::generateTutorialSequence(Tutori
     sortStep.requiresInteraction = true;
     sortStep.autoAdvanceOnValid = true;
     sortStep.validationTiming = ValidationTiming::OnSignal;
-    sortStep.signalSource = this;
-    sortStep.signalName = SIGNAL(sortCriteriaChanged(const QStringList &));
+    sortStep.signalHook = [this](TutorialController *controller) {
+        return connect(this, &VisualDeckDisplayOptionsWidget::sortCriteriaChanged, controller,
+                       &TutorialController::checkValidation);
+    };
     sortStep.validator = []() { return true; };
 
     sequence.addStep(sortStep);

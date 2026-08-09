@@ -156,8 +156,9 @@ TutorialSequence VisualDatabaseDisplayWidget::addTutorialSteps()
     setFilterStep.requiresInteraction = true;
     setFilterStep.autoAdvanceOnValid = true;
     setFilterStep.validationTiming = ValidationTiming::OnSignal;
-    setFilterStep.signalSource = filterModel;
-    setFilterStep.signalName = SIGNAL(layoutChanged());
+    setFilterStep.signalHook = [this](TutorialController *controller) {
+        return connect(filterModel, &FilterTreeModel::layoutChanged, controller, &TutorialController::checkValidation);
+    };
     setFilterStep.validator = [] { return true; };
     sequence.addStep(setFilterStep);
 
@@ -177,9 +178,11 @@ TutorialSequence VisualDatabaseDisplayWidget::addTutorialSteps()
                 deckEditor->deckStateManager->clearDeck();
             }
         };
-        explorationStep.signalSource =
-            QtUtils::findParentOfType<TabDeckEditorVisual>(this)->deckStateManager->getModel();
-        explorationStep.signalName = SIGNAL(cardNodesChanged());
+        auto deckModel = QtUtils::findParentOfType<TabDeckEditorVisual>(this)->deckStateManager->getModel();
+        explorationStep.signalHook = [deckModel](TutorialController *controller) {
+            return connect(deckModel, &DeckListModel::cardNodesChanged, controller,
+                           &TutorialController::checkValidation);
+        };
         explorationStep.validator = [this] {
             if (QtUtils::findParentOfType<TabDeckEditorVisual>(this)) {
                 return QtUtils::findParentOfType<TabDeckEditorVisual>(this)

@@ -495,8 +495,9 @@ TutorialSequence VisualDeckEditorWidget::addTutorialSteps()
     addStep.requiresInteraction = true;
     addStep.autoAdvanceOnValid = true;
     addStep.validationTiming = ValidationTiming::OnSignal;
-    addStep.signalSource = deckListModel;
-    addStep.signalName = SIGNAL(cardAddedAt(const QModelIndex &));
+    addStep.signalHook = [this](TutorialController *controller) {
+        return connect(deckListModel, &DeckListModel::cardAddedAt, controller, &TutorialController::checkValidation);
+    };
     addStep.validator = [this]() { return deckListModel->getCardNodes().size() >= 1; };
 
     sequence.addStep(addStep);
