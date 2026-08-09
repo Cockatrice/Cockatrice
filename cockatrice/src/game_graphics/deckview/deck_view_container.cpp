@@ -112,7 +112,7 @@ TutorialSequence DeckViewContainer::generateTutorialSequence()
         {this, tr("There are multiple ways to select a deck:\n\n- From a local file"
                   "\n- From the contents of your clipboard\nFrom an external online service")});
 
-    deckViewContainerSequence = visualDeckStorageWidget->generateTutorialSequence(deckViewContainerSequence);
+    visualDeckStorageWidget->generateTutorialSequence(deckViewContainerSequence);
 
     return deckViewContainerSequence;
 }

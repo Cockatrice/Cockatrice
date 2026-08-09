@@ -33,7 +33,7 @@ public:
     explicit VisualDeckStorageWidget(QWidget *parent);
     void refreshIfPossible();
     void retranslateUi();
-    TutorialSequence generateTutorialSequence(TutorialSequence vdsSequence);
+    void generateTutorialSequence(TutorialSequence &vdsSequence);
 
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
     bool deckPreviewSelectionAnimationEnabled;

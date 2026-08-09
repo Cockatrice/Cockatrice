@@ -93,7 +93,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     }
 }
 
-TutorialSequence VisualDeckStorageWidget::generateTutorialSequence(TutorialSequence vdsSequence)
+void VisualDeckStorageWidget::generateTutorialSequence(TutorialSequence &vdsSequence)
 {
     vdsSequence.addStep(
         {this, tr("This is the visual deck storage. It displays all the files and folders located in "
@@ -113,8 +113,6 @@ TutorialSequence VisualDeckStorageWidget::generateTutorialSequence(TutorialSeque
     vdsSequence.addStep({scrollArea, tr("This is where all your local decks will be displayed. You can customize their "
                                         "display status using the cogwheel in the top right.\nYou can select a deck by "
                                         "double-clicking it.\n\nRight-click a deck for more options.")});
-
-    return vdsSequence;
 }
 
 void VisualDeckStorageWidget::refreshIfPossible()
