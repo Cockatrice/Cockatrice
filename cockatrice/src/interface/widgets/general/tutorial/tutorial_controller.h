@@ -55,6 +55,11 @@ struct TutorialSequence
     {
         steps.append(step);
     }
+
+    void addSteps(const TutorialSequence &sequence)
+    {
+        steps.append(sequence.steps);
+    }
 };
 
 class TutorialController : public QObject
