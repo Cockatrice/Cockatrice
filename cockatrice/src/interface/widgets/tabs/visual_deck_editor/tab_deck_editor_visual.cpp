@@ -33,6 +33,7 @@
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
 
 /**
@@ -73,8 +74,6 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
                       "The cards in your deck will be displayed here, allowing for an easy overview.\n\nLet's try "
                       "adding some now, so you can see it in action!",
                       [this]() { tabContainer->setCurrentWidget(tabContainer->visualDeckView); }});
-
-    // sequence.addStep({printingSelectorDockWidget, "Change the printings in your deck here."});
 
     tutorialController->addSequence(sequence);
 
@@ -130,7 +129,7 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
 void TabDeckEditorVisual::showEvent(QShowEvent *ev)
 {
     QWidget::showEvent(ev);
-    if (!tutorialStarted) {
+    if (!tutorialStarted && !SettingsCache::instance().userInterface().getTutorialCompleted()) {
         tutorialStarted = true;
         // Start on next event loop iteration so everything is fully painted
         QTimer::singleShot(0, tutorialController, [this] { tutorialController->start(); });

@@ -163,15 +163,19 @@ TutorialSequence VisualDatabaseDisplayWidget::addTutorialSteps()
 
     TutorialStep explorationStep;
     explorationStep.targetWidget = this;
-    explorationStep.text = tr(
-        "Try it out!\n\nWe've cleared the previous deck. Add 5 different new cards to the deck by clicking on them!");
+    explorationStep.text = tr("Try it out!\n\nAdd 5 different new cards to the deck by clicking on them!");
     explorationStep.allowClickThrough = true;
     explorationStep.requiresInteraction = true;
     explorationStep.autoAdvanceOnValid = true;
     explorationStep.validationTiming = ValidationTiming::OnSignal;
     if (QtUtils::findParentOfType<TabDeckEditorVisual>(this)) {
         explorationStep.onEnter = [this] {
-            QtUtils::findParentOfType<TabDeckEditorVisual>(this)->deckStateManager->clearDeck();
+            auto deckEditor = QtUtils::findParentOfType<TabDeckEditorVisual>(this);
+            // Only clear an empty starter deck; never destroy a deck the user may
+            // have opened with existing cards.
+            if (deckEditor->deckStateManager->getModel()->getDeckList()->getCardList().isEmpty()) {
+                deckEditor->deckStateManager->clearDeck();
+            }
         };
         explorationStep.signalSource =
             QtUtils::findParentOfType<TabDeckEditorVisual>(this)->deckStateManager->getModel();
@@ -202,19 +206,6 @@ TutorialSequence VisualDatabaseDisplayWidget::addTutorialSteps()
     };
 
     sequence.addStep(conclusionStep);
-
-    /*sequence.addStep(
-        {quickFilterSaveLoadWidget, "This button will let you save and load all currently applied filters to files."});
-    sequence.addStep({quickFilterNameWidget,
-                      "This button will let you apply name filters. Optionally, you can import every card in "
-                      "your deck as a name filter and then save this as a filter using the save/load button "
-                      "to make your own quick access collections!"});
-    sequence.addStep({mainTypeFilterWidget, "Use these buttons to quickly filter by card types."});
-    sequence.addStep({quickFilterSubTypeWidget, "This button will let you apply filters for card sub-types."});
-    sequence.addStep(
-        {quickFilterSetWidget,
-         "This button will let you apply filters for card sets. You can also filter to the X most recent sets. "
-         "Filtering to a set will display all printings of a card within that set."});*/
 
     return sequence;
 }

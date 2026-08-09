@@ -28,6 +28,7 @@ inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
 class UserListProxy;
 class DeckViewContainer;
 class AbstractClient;
+class TutorialController;
 class CardDatabase;
 class GameView;
 class GameScene;
@@ -58,7 +59,7 @@ class TabGame : public Tab
     Q_OBJECT
 private:
     AbstractGame *game;
-    TutorialController *tutorialController;
+    TutorialController *tutorialController = nullptr;
     bool tutorialStarted = false;
     bool tutorialInitialized = false;
     const UserListProxy *userListProxy;
@@ -130,7 +131,6 @@ private:
     void createDeckViewContainerWidget(bool bReplay = false);
     void createReplayDock(GameReplay *replay);
 signals:
-    void localPlayerDeckSelected();
     void localPlayerReadyStateChanged(bool ready);
     void gameClosing(TabGame *tab);
     void containerProcessingStarted(const GameEventContext &context);

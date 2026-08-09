@@ -57,6 +57,7 @@ class TutorialController : public QObject
 
 public:
     explicit TutorialController(QWidget *_tutorializedWidget);
+    ~TutorialController() override;
 
     void addSequence(const TutorialSequence &seq);
     void start();
@@ -95,6 +96,10 @@ private:
 
     // For OnChange validation monitoring
     QMetaObject::Connection validationConnection;
+
+    // True while an auto-advance timer is pending, so repeated signal emissions
+    // can't queue more than one advance.
+    bool advanceScheduled = false;
 };
 
 #endif // COCKATRICE_TUTORIAL_CONTROLLER_H

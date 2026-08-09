@@ -15,6 +15,8 @@
 #include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 
+class TutorialController;
+
 class HomeWidget : public QWidget
 {
 

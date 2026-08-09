@@ -479,7 +479,7 @@ TutorialSequence VisualDeckEditorWidget::addTutorialSteps()
     searchStep.allowClickThrough = true;
     searchStep.requiresInteraction = true;
     searchStep.autoAdvanceOnValid = true;
-    searchStep.validationTiming = ValidationTiming::OnChange; // Make sure this is set!
+    searchStep.validationTiming = ValidationTiming::OnChange;
     searchStep.validator = [this]() {
         return CardDatabaseManager::query()->getCard({searchBar->text()}) != ExactCard();
     };

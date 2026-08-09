@@ -16,8 +16,8 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
 #include <libcockatrice/settings/appearance_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
-#include <libcockatrice/utility/qt_utils.h>
 
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     : QWidget(parent), tabSupervisor(_tabSupervisor), background("theme:backgrounds/home"), overlay("theme:cockatrice")
@@ -50,13 +50,7 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabBackgroundShuffleFrequencyChanged,
             this, &HomeWidget::onBackgroundShuffleFrequencyChanged);
 
-    auto mainWindow = QtUtils::findParentOfType<QMainWindow>(this);
-
-    if (mainWindow) {
-        tutorialController = new TutorialController(mainWindow);
-    } else {
-        tutorialController = new TutorialController(this);
-    }
+    tutorialController = new TutorialController(this);
     auto sequence = TutorialSequence();
     sequence.addStep({connectButton, "Connect to a server to play here!"});
     auto vdeStep = TutorialStep{visualDeckEditorButton, "Create a new deck from cards in the database here!"};
@@ -92,7 +86,7 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
 void HomeWidget::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-    if (!tutorialStarted) {
+    if (!tutorialStarted && !SettingsCache::instance().userInterface().getTutorialCompleted()) {
         tutorialStarted = true;
         // Start on next event loop iteration so everything is fully painted
         QTimer::singleShot(3, tutorialController, [this] { tutorialController->start(); });

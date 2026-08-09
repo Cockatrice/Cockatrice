@@ -6,6 +6,7 @@
 
 #ifndef TABBED_DECK_VIEW_CONTAINER_H
 #define TABBED_DECK_VIEW_CONTAINER_H
+#include "../../interface/widgets/general/tutorial/tutorial_controller.h"
 #include "deck_view_container.h"
 
 #include <QTabWidget>

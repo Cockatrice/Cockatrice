@@ -1,12 +1,14 @@
 #include "tutorial_controller.h"
 
+#include "../../../../client/settings/cache_settings.h"
+
 #include <QComboBox>
-#include <QDebug>
 #include <QLineEdit>
 #include <QMainWindow>
 #include <QPlainTextEdit>
 #include <QTextEdit>
 #include <QTimer>
+#include <libcockatrice/settings/interface_settings.h>
 
 TutorialController::TutorialController(QWidget *_tutorializedWidget)
     : QObject(_tutorializedWidget), tutorializedWidget(_tutorializedWidget)
@@ -22,6 +24,18 @@ TutorialController::TutorialController(QWidget *_tutorializedWidget)
     connect(tutorialOverlay, &TutorialOverlay::prevSequence, this, &TutorialController::prevSequence);
     connect(tutorialOverlay, &TutorialOverlay::skipTutorial, this, &TutorialController::exitTutorial);
     connect(tutorialOverlay, &TutorialOverlay::targetClicked, this, &TutorialController::handleTargetClicked);
+}
+
+TutorialController::~TutorialController()
+{
+    // The overlay is parented to the top-level window, which outlives the widget
+    // this controller is attached to (e.g. a closed tab), so it must be cleaned
+    // up explicitly when the controller goes away without exitTutorial().
+    if (tutorialOverlay) {
+        tutorialOverlay->hide();
+        tutorialOverlay->deleteLater();
+    }
+    tutorialOverlay = nullptr;
 }
 
 void TutorialController::addSequence(const TutorialSequence &seq)
@@ -172,12 +186,15 @@ void TutorialController::prevSequence()
 void TutorialController::exitTutorial()
 {
     cleanupValidationMonitoring();
-    tutorialOverlay->hide();
-    // TODO Maybe not the best idea:
-    tutorialOverlay->deleteLater();
+    if (tutorialOverlay) {
+        tutorialOverlay->hide();
+        tutorialOverlay->deleteLater();
+    }
+    tutorialOverlay = nullptr;
     currentSequence = -1;
     currentStep = -1;
     tutorialCompleted = true;
+    SettingsCache::instance().userInterface().setTutorialCompleted(true);
     deleteLater();
 }
 
@@ -237,6 +254,7 @@ void TutorialController::showStep()
     }
 
     cleanupValidationMonitoring();
+    advanceScheduled = false;
 
     const auto &step = seq.steps[currentStep];
 
@@ -278,13 +296,7 @@ void TutorialController::setupValidationMonitoring()
     // Handle OnSignal validation - connect to any custom signal
     if (step.validationTiming == ValidationTiming::OnSignal && step.validator) {
         if (step.signalSource && step.signalName) {
-            qInfo() << "Setting up signal-based validation for signal:" << step.signalName;
             validationConnection = connect(step.signalSource, step.signalName, this, SLOT(checkValidation()));
-            if (!validationConnection) {
-                qInfo() << "Warning: Failed to connect to signal" << step.signalName;
-            }
-        } else {
-            qInfo() << "Warning: OnSignal validation timing set but signalSource or signalName is null";
         }
         return;
     }
@@ -292,24 +304,17 @@ void TutorialController::setupValidationMonitoring()
     // Handle OnChange validation - widget-specific
     if (step.validationTiming == ValidationTiming::OnChange && step.validator) {
         if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(step.targetWidget)) {
-            qInfo() << "Setting up validation monitoring for QLineEdit";
             validationConnection =
                 connect(lineEdit, &QLineEdit::textChanged, this, &TutorialController::checkValidation);
         } else if (QTextEdit *textEdit = qobject_cast<QTextEdit *>(step.targetWidget)) {
-            qInfo() << "Setting up validation monitoring for QTextEdit";
             validationConnection =
                 connect(textEdit, &QTextEdit::textChanged, this, &TutorialController::checkValidation);
         } else if (QPlainTextEdit *plainText = qobject_cast<QPlainTextEdit *>(step.targetWidget)) {
-            qInfo() << "Setting up validation monitoring for QPlainTextEdit";
             validationConnection =
                 connect(plainText, &QPlainTextEdit::textChanged, this, &TutorialController::checkValidation);
         } else if (QComboBox *combo = qobject_cast<QComboBox *>(step.targetWidget)) {
-            qInfo() << "Setting up validation monitoring for QComboBox";
             validationConnection = connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
                                            &TutorialController::checkValidation);
-        } else {
-            qInfo() << "Warning: OnChange validation timing set but widget type not supported:"
-                    << (step.targetWidget ? step.targetWidget->metaObject()->className() : "null");
         }
     }
 }
@@ -317,7 +322,6 @@ void TutorialController::setupValidationMonitoring()
 void TutorialController::cleanupValidationMonitoring()
 {
     if (validationConnection) {
-        qInfo() << "Cleaning up validation connection";
         disconnect(validationConnection);
         validationConnection = QMetaObject::Connection();
     }
@@ -325,8 +329,6 @@ void TutorialController::cleanupValidationMonitoring()
 
 void TutorialController::checkValidation()
 {
-    qInfo() << "checkValidation() called";
-
     if (currentSequence < 0 || currentSequence >= sequences.size()) {
         return;
     }
@@ -338,16 +340,18 @@ void TutorialController::checkValidation()
 
     if (step.validator) {
         bool isValid = step.validator();
-        qInfo() << "Validation result:" << isValid;
 
         if (isValid) {
             // Clear any validation hints
             tutorialOverlay->showValidationHint("");
 
             // Auto-advance if enabled
-            if (step.autoAdvanceOnValid) {
-                qInfo() << "Auto-advancing to next step";
-                QTimer::singleShot(500, this, &TutorialController::nextStep);
+            if (step.autoAdvanceOnValid && !advanceScheduled) {
+                advanceScheduled = true;
+                QTimer::singleShot(500, this, [this]() {
+                    advanceScheduled = false;
+                    nextStep();
+                });
             }
         }
     }

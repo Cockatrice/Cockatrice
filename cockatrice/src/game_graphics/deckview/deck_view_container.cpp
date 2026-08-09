@@ -101,7 +101,6 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
             this, &DeckViewContainer::setVisualDeckStorageExists);
 
     switchToDeckSelectView();
-    generateTutorialSequence();
 }
 
 TutorialSequence DeckViewContainer::generateTutorialSequence()

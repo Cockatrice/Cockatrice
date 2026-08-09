@@ -25,7 +25,6 @@
 #include "../interface/window_main.h"
 #include "../main.h"
 #include "../utility/visibility_change_listener.h"
-#include "libcockatrice/utility/qt_utils.h"
 #include "tab_supervisor.h"
 
 #include <QAction>
@@ -140,13 +139,7 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
 
-    auto mainWindow = QtUtils::findParentOfType<QMainWindow>(this);
-
-    if (mainWindow) {
-        tutorialController = new TutorialController(mainWindow);
-    } else {
-        tutorialController = new TutorialController(this);
-    }
+    tutorialController = new TutorialController(this);
 
     TutorialSequence lobbySequence;
 
@@ -159,7 +152,12 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
 void TabGame::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
-    if (!tutorialStarted) {
+    if (!tutorialController || tutorialStarted || SettingsCache::instance().userInterface().getTutorialCompleted()) {
+        return;
+    }
+    // Only start once all sequences are registered so advancing can't run past the
+    // end of an incomplete sequence list.
+    if (tutorialInitialized) {
         tutorialStarted = true;
         // Start on next event loop iteration so everything is fully painted
         QTimer::singleShot(3, tutorialController, [this] { tutorialController->start(); });
@@ -189,7 +187,7 @@ void TabGame::finishTutorialInitialization()
     loadDeckStep.autoAdvanceOnValid = true;
     loadDeckStep.validationTiming = ValidationTiming::OnSignal;
     loadDeckStep.signalSource = game->getGameEventHandler();
-    loadDeckStep.signalName = SIGNAL(logDeckSelect(Player *, QString, int));
+    loadDeckStep.signalName = SIGNAL(logDeckSelect(PlayerLogic *, QString, int));
     loadDeckStep.validator = [] { return true; };
 
     deckSelectSequence.addStep(loadDeckStep);
@@ -212,9 +210,6 @@ void TabGame::finishTutorialInitialization()
     TutorialSequence gamePlaySequence;
     gamePlaySequence.name = tr("Gameplay");
 
-    gamePlaySequence.addStep(
-        {gamePlayAreaWidget,
-         tr("Welcome to your first game! It's just a singleplayer game for now to teach you the controls.")});
     gamePlaySequence.addStep(
         {gamePlayAreaWidget,
          tr("Welcome to your first game! It's just a singleplayer game for now to teach you the controls.")});
@@ -264,7 +259,7 @@ void TabGame::finishTutorialInitialization()
     lifeCounterStep.signalSource = game->getPlayerManager()
                                        ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
                                        ->getPlayerEventHandler();
-    lifeCounterStep.signalName = SIGNAL(logSetCounter(Player *, QString, int, int));
+    lifeCounterStep.signalName = SIGNAL(logSetCounter(PlayerLogic *, QString, int, int));
     lifeCounterStep.validator = [this] {
         auto counters =
             game->getPlayerManager()->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())->getCounters();
@@ -291,7 +286,7 @@ void TabGame::finishTutorialInitialization()
     diceRollStep.signalSource = game->getPlayerManager()
                                     ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
                                     ->getPlayerEventHandler();
-    diceRollStep.signalName = SIGNAL(logRollDie(Player *, int, const QList<uint> &));
+    diceRollStep.signalName = SIGNAL(logRollDie(PlayerLogic *, int, const QList<uint> &));
     diceRollStep.validator = [] { return true; };
     diceRollStep.validationHint = tr("Roll a dice using any of these methods.");
 
@@ -310,7 +305,7 @@ void TabGame::finishTutorialInitialization()
     mulliganStep.signalSource = game->getPlayerManager()
                                     ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
                                     ->getPlayerEventHandler();
-    mulliganStep.signalName = SIGNAL(logDrawCards(Player *, int, bool));
+    mulliganStep.signalName = SIGNAL(logDrawCards(PlayerLogic *, int, bool));
     mulliganStep.validator = [this] {
         return game->getPlayerManager()
                    ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
@@ -322,11 +317,17 @@ void TabGame::finishTutorialInitialization()
 
     gamePlaySequence.addStep(mulliganStep);
 
-    gamePlaySequence.addStep({gamePlayAreaWidget, tr("")});
-    gamePlaySequence.addStep({gamePlayAreaWidget, tr("")});
-
-    gamePlaySequence.addStep({gamePlayAreaWidget, tr("")});
     tutorialController->addSequence(gamePlaySequence);
+
+    if (tutorialStarted || SettingsCache::instance().userInterface().getTutorialCompleted()) {
+        return;
+    }
+    // The tab may have been shown before the local player joined; start now that
+    // the full sequence list is registered.
+    if (isVisible()) {
+        tutorialStarted = true;
+        QTimer::singleShot(3, tutorialController, [this] { tutorialController->start(); });
+    }
 }
 
 void TabGame::connectToGameState()
@@ -953,8 +954,6 @@ void TabGame::loadDeckForLocalPlayer(PlayerLogic *localPlayer, int playerId, Ser
         CardPictureLoader::cacheCardPixmaps(CardDatabaseManager::query()->getCards(deckList.getCardRefList()));
         deckViewContainer->playerDeckView->setDeck(deckList);
         localPlayer->setDeck(deckList);
-
-        emit localPlayerDeckSelected();
     }
 }
 
