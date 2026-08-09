@@ -26,8 +26,6 @@ class QTimer;
 class TabSupervisor;
 class TutorialController;
 
-class TutorialController;
-
 class HomeWidget : public QWidget
 {
 

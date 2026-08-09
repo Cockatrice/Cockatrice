@@ -120,7 +120,7 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
         {edhrecButton, "Browse EDHRec, an external service designed to provide card recommendations for decks."});
     sequence.addStep({archidektButton, "Browse Archidekt, an external service that allows users to store "
                                        "decklists and import them to your local collection."});
-    sequence.addStep({replaybutton, "View replays of your past games here."});
+    sequence.addStep({replayButton, "View replays of your past games here."});
     sequence.addStep({exitButton, "Exit the application."});
     tutorialController->addSequence(sequence);
 
