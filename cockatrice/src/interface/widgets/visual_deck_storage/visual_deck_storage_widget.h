@@ -44,7 +44,7 @@ public:
     void setShareSelectedFiles(const QStringList &paths);
     void clearShareSelection();
     void setShareAvailable(bool available);
-    TutorialSequence generateTutorialSequence(TutorialSequence vdsSequence);
+    void generateTutorialSequence(TutorialSequence &vdsSequence);
 
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
     bool deckPreviewSelectionAnimationEnabled;
