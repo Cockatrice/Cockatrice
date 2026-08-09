@@ -5,6 +5,7 @@
 
 #include <QList>
 #include <QObject>
+#include <QPointer>
 #include <functional>
 
 enum class ValidationTiming
@@ -19,7 +20,8 @@ class TutorialController;
 
 struct TutorialStep
 {
-    QWidget *targetWidget = nullptr;
+    // QPointer so a destroyed widget is detected instead of dereferencing a dangling pointer.
+    QPointer<QWidget> targetWidget;
     QString text;
     std::function<void()> onEnter = nullptr;
     std::function<void()> onExit = nullptr;
