@@ -3045,7 +3045,7 @@ Assurez-vous d&apos;activer l&apos;édition « Fausse édition contenant les je
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="33"/>
-        <source>Hide games that have started</source>
+        <source>Hide started games</source>
         <translation>Cacher les parties qui ont commencées</translation>
     </message>
     <message>

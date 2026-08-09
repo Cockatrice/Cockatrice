@@ -3045,7 +3045,7 @@ Assicurati di abilitare il set &quot;Pedine&quot; nella finestra &quot;Gestisci 
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="33"/>
-        <source>Hide games that have started</source>
+        <source>Hide started games</source>
         <translation>Nascondi partite iniziate</translation>
     </message>
     <message>

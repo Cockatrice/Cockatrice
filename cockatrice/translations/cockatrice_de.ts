@@ -3045,7 +3045,7 @@ Aktivieren Sie die Edition „Token&quot; im „Editionen verwalten...“ Menü 
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="33"/>
-        <source>Hide games that have started</source>
+        <source>Hide started games</source>
         <translation>Bereits begonnene Spiele ausblenden</translation>
     </message>
     <message>

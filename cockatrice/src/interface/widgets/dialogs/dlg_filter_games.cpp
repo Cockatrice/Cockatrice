@@ -30,7 +30,7 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     hideFullGames = new QCheckBox(tr("Hide full games"));
     hideFullGames->setChecked(filters.hideFullGames);
 
-    hideGamesThatStarted = new QCheckBox(tr("Hide games that have started"));
+    hideGamesThatStarted = new QCheckBox(tr("Hide started games"));
     hideGamesThatStarted->setChecked(filters.hideGamesThatStarted);
 
     hidePasswordProtectedGames = new QCheckBox(tr("Hide password protected games"));

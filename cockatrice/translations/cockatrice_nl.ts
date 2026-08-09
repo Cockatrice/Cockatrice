@@ -3045,7 +3045,7 @@ Zorg ervoor dat u de &apos;Token&apos; set in het &quot; Beheer sets&quot; dialo
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="33"/>
-        <source>Hide games that have started</source>
+        <source>Hide started games</source>
         <translation>Verberg spellen die al begonnen zijn</translation>
     </message>
     <message>

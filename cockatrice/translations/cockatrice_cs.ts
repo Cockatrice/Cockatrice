@@ -3040,7 +3040,7 @@ Pro správné zobrazení si aktivujte si edici &apos;Token&apos; v &quot;Nastavi
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="33"/>
-        <source>Hide games that have started</source>
+        <source>Hide started games</source>
         <translation type="unfinished"/>
     </message>
     <message>
