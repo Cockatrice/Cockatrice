@@ -57,7 +57,7 @@ QVariant CardInfoComparator::getProperty(const CardInfoPtr &card, const QString 
         return card->getIsToken();
     }
 
-    // Otherwise, check if it's a custom property in the QVariantHash
+    // Otherwise, check if it's a custom property in the properties hash
     if (card->hasProperty(property)) {
         return card->getProperty(property);
     }

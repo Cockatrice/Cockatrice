@@ -2,9 +2,11 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
+#include "../tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.h"
 
 #include <QGridLayout>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
@@ -19,70 +21,70 @@ enum visualDeckStoragePromptForConversionIndex
 UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 {
     // general settings and notification settings
-    notificationsEnabledCheckBox.setChecked(SettingsCache::instance().interface().getNotificationsEnabled());
-    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    notificationsEnabledCheckBox.setChecked(SettingsCache::instance().userInterface().getNotificationsEnabled());
+    connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setNotificationsEnabled);
     connect(&notificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
             &UserInterfaceSettingsPage::setNotificationEnabled);
 
     specNotificationsEnabledCheckBox.setChecked(
-        SettingsCache::instance().interface().getSpectatorNotificationsEnabled());
-    specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().interface().getNotificationsEnabled());
-    connect(&specNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+        SettingsCache::instance().userInterface().getSpectatorNotificationsEnabled());
+    specNotificationsEnabledCheckBox.setEnabled(SettingsCache::instance().userInterface().getNotificationsEnabled());
+    connect(&specNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setSpectatorNotificationsEnabled);
 
     buddyConnectNotificationsEnabledCheckBox.setChecked(
-        SettingsCache::instance().interface().getBuddyConnectNotificationsEnabled());
+        SettingsCache::instance().userInterface().getBuddyConnectNotificationsEnabled());
     buddyConnectNotificationsEnabledCheckBox.setEnabled(
-        SettingsCache::instance().interface().getNotificationsEnabled());
+        SettingsCache::instance().userInterface().getNotificationsEnabled());
     connect(&buddyConnectNotificationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED,
-            &SettingsCache::instance().interface(), &InterfaceSettings::setBuddyConnectNotificationsEnabled);
+            &SettingsCache::instance().userInterface(), &InterfaceSettings::setBuddyConnectNotificationsEnabled);
 
-    doubleClickToPlayCheckBox.setChecked(SettingsCache::instance().interface().getDoubleClickToPlay());
-    connect(&doubleClickToPlayCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    doubleClickToPlayCheckBox.setChecked(SettingsCache::instance().userInterface().getDoubleClickToPlay());
+    connect(&doubleClickToPlayCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setDoubleClickToPlay);
 
-    clickPlaysAllSelectedCheckBox.setChecked(SettingsCache::instance().interface().getClickPlaysAllSelected());
-    connect(&clickPlaysAllSelectedCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    clickPlaysAllSelectedCheckBox.setChecked(SettingsCache::instance().userInterface().getClickPlaysAllSelected());
+    connect(&clickPlaysAllSelectedCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setClickPlaysAllSelected);
 
-    playToStackCheckBox.setChecked(SettingsCache::instance().interface().getPlayToStack());
-    connect(&playToStackCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    playToStackCheckBox.setChecked(SettingsCache::instance().userInterface().getPlayToStack());
+    connect(&playToStackCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setPlayToStack);
 
     doNotDeleteArrowsInSubPhasesCheckBox.setChecked(
-        SettingsCache::instance().interface().getDoNotDeleteArrowsInSubPhases());
-    connect(&doNotDeleteArrowsInSubPhasesCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
-            &InterfaceSettings::setDoNotDeleteArrowsInSubPhases);
+        SettingsCache::instance().userInterface().getDoNotDeleteArrowsInSubPhases());
+    connect(&doNotDeleteArrowsInSubPhasesCheckBox, &QCheckBox::QT_STATE_CHANGED,
+            &SettingsCache::instance().userInterface(), &InterfaceSettings::setDoNotDeleteArrowsInSubPhases);
 
-    closeEmptyCardViewCheckBox.setChecked(SettingsCache::instance().interface().getCloseEmptyCardView());
-    connect(&closeEmptyCardViewCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    closeEmptyCardViewCheckBox.setChecked(SettingsCache::instance().userInterface().getCloseEmptyCardView());
+    connect(&closeEmptyCardViewCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setCloseEmptyCardView);
 
-    focusCardViewSearchBarCheckBox.setChecked(SettingsCache::instance().interface().getFocusCardViewSearchBar());
-    connect(&focusCardViewSearchBarCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    focusCardViewSearchBarCheckBox.setChecked(SettingsCache::instance().userInterface().getFocusCardViewSearchBar());
+    connect(&focusCardViewSearchBarCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setFocusCardViewSearchBar);
 
-    annotateTokensCheckBox.setChecked(SettingsCache::instance().interface().getAnnotateTokens());
-    connect(&annotateTokensCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    annotateTokensCheckBox.setChecked(SettingsCache::instance().userInterface().getAnnotateTokens());
+    connect(&annotateTokensCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setAnnotateTokens);
 
-    showDragSelectionCountCheckBox.setChecked(SettingsCache::instance().interface().getShowDragSelectionCount());
-    connect(&showDragSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    showDragSelectionCountCheckBox.setChecked(SettingsCache::instance().userInterface().getShowDragSelectionCount());
+    connect(&showDragSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setShowDragSelectionCount);
 
-    showTotalSelectionCountCheckBox.setChecked(SettingsCache::instance().interface().getShowTotalSelectionCount());
-    connect(&showTotalSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    showTotalSelectionCountCheckBox.setChecked(SettingsCache::instance().userInterface().getShowTotalSelectionCount());
+    connect(&showTotalSelectionCountCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setShowTotalSelectionCount);
 
-    useTearOffMenusCheckBox.setChecked(SettingsCache::instance().interface().getUseTearOffMenus());
-    connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    useTearOffMenusCheckBox.setChecked(SettingsCache::instance().userInterface().getUseTearOffMenus());
+    connect(&useTearOffMenusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             [](const QT_STATE_CHANGED_T state) {
-                SettingsCache::instance().interface().setUseTearOffMenus(state == Qt::Checked);
+                SettingsCache::instance().userInterface().setUseTearOffMenus(state == Qt::Checked);
             });
 
-    keepGameChatFocusCheckBox.setChecked(SettingsCache::instance().interface().getKeepGameChatFocus());
-    connect(&keepGameChatFocusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
+    keepGameChatFocusCheckBox.setChecked(SettingsCache::instance().userInterface().getKeepGameChatFocus());
+    connect(&keepGameChatFocusCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setKeepGameChatFocus);
 
     auto *generalGrid = new QGridLayout;
@@ -121,9 +123,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     animationGroupBox->setLayout(animationGrid);
 
     // deck editor settings
-    openDeckInNewTabCheckBox.setChecked(SettingsCache::instance().interface().getOpenDeckInNewTab());
-    connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().interface(),
-            &InterfaceSettings::setOpenDeckInNewTab);
+    openDeckInNewTabCheckBox.setChecked(SettingsCache::instance().deckEditor().getOpenDeckInNewTab());
+    connect(&openDeckInNewTabCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().deckEditor(),
+            &DeckEditorSettings::setOpenDeckInNewTab);
 
     visualDeckStorageInGameCheckBox.setChecked(
         SettingsCache::instance().visualDeckStorage().getVisualDeckStorageInGame());
@@ -156,10 +158,60 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
 
     defaultDeckEditorTypeSelector.addItem(""); // these will be set in retranslateUI
     defaultDeckEditorTypeSelector.addItem("");
-    defaultDeckEditorTypeSelector.setCurrentIndex(
-        SettingsCache::instance().visualDeckStorage().getDefaultDeckEditorType());
+    defaultDeckEditorTypeSelector.setCurrentIndex(SettingsCache::instance().deckEditor().getDefaultDeckEditorType());
     connect(&defaultDeckEditorTypeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            &SettingsCache::instance().visualDeckStorage(), &VisualDeckStorageSettings::setDefaultDeckEditorType);
+            &SettingsCache::instance().deckEditor(), &DeckEditorSettings::setDefaultDeckEditorType);
+
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setText("?");
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setAutoRaise(true);
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setEnabled(false);
+
+    // Add items with userData = internal enum
+    commanderSpellbookIntegrationEnabledSelector.addItem(tr("Disabled"),
+                                                         commanderSpellbookIntegrationEnabledIndexDisabled);
+    commanderSpellbookIntegrationEnabledSelector.addItem(tr("Enabled"),
+                                                         commanderSpellbookIntegrationEnabledIndexEnabled);
+    commanderSpellbookIntegrationEnabledSelector.addItem(tr("Automatic"),
+                                                         commanderSpellbookIntegrationEnabledIndexAutomatic);
+
+    int storedMode = SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationEnabled();
+    for (int i = 0; i < commanderSpellbookIntegrationEnabledSelector.count(); ++i) {
+        if (commanderSpellbookIntegrationEnabledSelector.itemData(i).toInt() == storedMode) {
+            commanderSpellbookIntegrationEnabledSelector.setCurrentIndex(i);
+            break;
+        }
+    }
+
+    connect(&commanderSpellbookIntegrationEnabledSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            [this](int index) {
+                int mode = commanderSpellbookIntegrationEnabledSelector.itemData(index).toInt();
+                SettingsCache::instance().deckEditor().setCommanderSpellbookIntegrationEnabled(mode);
+                updateCommanderSpellbookUiState();
+            });
+
+    commanderSpellbookIntegrationBracketNamingSelector.addItem(
+        tr("CommanderSpellbook bracket names")); // index 0 = false
+    commanderSpellbookIntegrationBracketNamingSelector.addItem(
+        tr("Official Commander bracket names (approximate)")); // index 1 = true
+
+    commanderSpellbookIntegrationBracketNamingSelector.setCurrentIndex(
+        SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationUseOfficialBracketNames() ? 1 : 0);
+
+    connect(&commanderSpellbookIntegrationBracketNamingSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            &SettingsCache::instance(), [](int index) {
+                SettingsCache::instance().deckEditor().setCommanderSpellbookIntegrationUseOfficialBracketNames(index ==
+                                                                                                               1);
+            });
+
+    updateCommanderSpellbookUiState();
+
+    auto *labelLayout = new QHBoxLayout;
+    labelLayout->setContentsMargins(0, 0, 0, 0);
+    labelLayout->addWidget(&commanderSpellbookIntegrationUseOfficialBracketNamesLabel);
+    labelLayout->addWidget(&commanderSpellbookIntegrationUseOfficialBracketNamesExplainer);
+
+    auto *labelWidget = new QWidget;
+    labelWidget->setLayout(labelLayout);
 
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
@@ -169,14 +221,18 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 3, 1);
     deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 4, 0);
     deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 4, 1);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledLabel, 5, 0);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledSelector, 5, 1);
+    deckEditorGrid->addWidget(labelWidget, 6, 0);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationBracketNamingSelector, 6, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
 
     // replay settings
     rewindBufferingMsBox.setRange(0, 9999);
-    rewindBufferingMsBox.setValue(SettingsCache::instance().interface().getRewindBufferingMs());
-    connect(&rewindBufferingMsBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().interface(),
+    rewindBufferingMsBox.setValue(SettingsCache::instance().userInterface().getRewindBufferingMs());
+    connect(&rewindBufferingMsBox, qOverload<int>(&QSpinBox::valueChanged), &SettingsCache::instance().userInterface(),
             &InterfaceSettings::setRewindBufferingMs);
 
     auto *replayGrid = new QGridLayout;
@@ -212,6 +268,27 @@ void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
     }
 }
 
+void UserInterfaceSettingsPage::updateCommanderSpellbookUiState()
+{
+    const int mode = SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationEnabled();
+
+    const bool enabled = mode != commanderSpellbookIntegrationEnabledIndexDisabled &&
+                         mode != commanderSpellbookIntegrationEnabledIndexUnprompted;
+
+    commanderSpellbookIntegrationBracketNamingSelector.setEnabled(enabled);
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setEnabled(enabled);
+    commanderSpellbookIntegrationUseOfficialBracketNamesLabel.setVisible(enabled);
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setVisible(enabled);
+    commanderSpellbookIntegrationBracketNamingSelector.setVisible(enabled);
+
+    if (enabled) {
+        // Sync selector with the current stored bool
+        const bool useOfficial =
+            SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationUseOfficialBracketNames();
+        commanderSpellbookIntegrationBracketNamingSelector.setCurrentIndex(useOfficial ? 1 : 0);
+    }
+}
+
 void UserInterfaceSettingsPage::retranslateUi()
 {
     generalGroupBox->setTitle(tr("General interface settings"));
@@ -241,14 +318,30 @@ void UserInterfaceSettingsPage::retranslateUi()
     visualDeckStoragePromptForConversionLabel.setText(
         tr("When adding a tag in the visual deck storage to a .txt deck:"));
     visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexNone,
-                                                             tr("do nothing"));
+                                                             tr("Do nothing"));
     visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexPrompt,
-                                                             tr("ask to convert to .cod"));
+                                                             tr("Ask to convert to .cod"));
     visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexAlways,
-                                                             tr("always convert to .cod"));
+                                                             tr("Always convert to .cod"));
     defaultDeckEditorTypeLabel.setText(tr("Default deck editor type"));
     defaultDeckEditorTypeSelector.setItemText(TabSupervisor::ClassicDeckEditor, tr("Classic Deck Editor"));
     defaultDeckEditorTypeSelector.setItemText(TabSupervisor::VisualDeckEditor, tr("Visual Deck Editor"));
+
+    commanderSpellbookIntegrationEnabledLabel.setText(
+        tr("CommanderSpellbook integration to estimate commander bracket"));
+    commanderSpellbookIntegrationEnabledSelector.setItemText(commanderSpellbookIntegrationEnabledIndexDisabled,
+                                                             tr("Disabled"));
+    commanderSpellbookIntegrationEnabledSelector.setItemText(commanderSpellbookIntegrationEnabledIndexEnabled,
+                                                             tr("Enabled"));
+    commanderSpellbookIntegrationEnabledSelector.setItemText(commanderSpellbookIntegrationEnabledIndexAutomatic,
+                                                             tr("Automatic"));
+    commanderSpellbookIntegrationUseOfficialBracketNamesLabel.setText(tr("Bracket naming"));
+    commanderSpellbookIntegrationBracketNamingSelector.setItemText(
+        0, CommanderBracketNames::CommanderSpellbookBracketNames);
+    commanderSpellbookIntegrationBracketNamingSelector.setItemText(
+        1, CommanderBracketNames::OfficialCommanderBracketNames);
+
+    commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setToolTip(CommanderBracketNames::Explainer);
     replayGroupBox->setTitle(tr("Replay settings"));
     rewindBufferingMsLabel.setText(tr("Buffer time for backwards skip via shortcut:"));
     rewindBufferingMsBox.setSuffix(" ms");

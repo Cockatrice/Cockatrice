@@ -61,10 +61,11 @@ if(WIN32 OR USE_VCPKG) # Windows (including 64bit) or USE_VCPKG set
   )
     set(QTDIR
         ""
-        CACHE PATH "Path to Qt (e.g. C:/Qt/5.7/msvc2015_64)"
+        CACHE PATH "Path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
     )
     message(
-      WARNING "QTDIR variable is missing. Please set this variable to specify path to Qt (e.g. C:/Qt/5.7/msvc2015_64)"
+      WARNING
+        "QTDIR variable is missing.  Please set this variable to specify path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
     )
   endif()
 endif()
@@ -99,8 +100,7 @@ include(createversionfile)
 
 # Define a proper install path
 if(UNIX)
-  if(APPLE)
-    # macOS
+  if(APPLE) # macOS
     # Due to the special bundle structure ignore
     # the prefix eventually set by the user.
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
@@ -120,8 +120,7 @@ if(UNIX)
       set(CMAKE_XCODE_ATTRIBUTE_LD "${CMAKE_BINARY_DIR}/launch-c")
       set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS "${CMAKE_BINARY_DIR}/launch-cxx")
     endif()
-  else()
-    # Linux / BSD
+  else() # Linux / BSD
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
       #fix package build
       if(PREFIX)
@@ -131,7 +130,7 @@ if(UNIX)
       endif()
     endif()
   endif()
-elseif(WIN32)
+elseif(WIN32) # Windows, including 64 bit
   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
 endif()
 
@@ -254,7 +253,7 @@ set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_VERSION_FILENAME}")
 
 if(UNIX)
-  if(APPLE)
+  if(APPLE) #macOS
     set(CPACK_GENERATOR DragNDrop ${CPACK_GENERATOR})
     set(CPACK_GENERATOR "DragNDrop")
     set(CPACK_DMG_FORMAT "UDBZ")
@@ -264,14 +263,11 @@ if(UNIX)
     set(CPACK_DMG_DS_STORE_SETUP_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeDMGSetup.script")
     set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/dmgBackground.tif")
     set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SignMacApplications.cmake")
-  else()
-    # linux
+  else() # Linux
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
-      if(Qt6_FOUND)
-        set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
-      endif()
+      set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
       set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
       # stop directories from making package conflicts
@@ -289,13 +285,11 @@ if(UNIX)
       set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
       set(CPACK_DEBIAN_PACKAGE_SECTION "games")
       set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
-      if(Qt6_FOUND)
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
-        set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
-      endif()
+      set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
+      set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
     endif()
   endif()
-elseif(WIN32)
+elseif(WIN32) # Windows, including 64 bit
   set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
   if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "(x64)")
     set(TRICE_IS_64_BIT 1)
@@ -352,6 +346,4 @@ if(TEST)
   add_subdirectory(tests)
 endif()
 
-if(Qt6_FOUND)
-  qt6_finalize_project()
-endif()
+qt6_finalize_project()

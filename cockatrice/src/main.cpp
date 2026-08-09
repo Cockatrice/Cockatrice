@@ -23,12 +23,17 @@
 #include "client/network/update/card_spoiler/spoiler_background_updater.h"
 #include "client/settings/cache_settings.h"
 #include "client/sound_engine.h"
+#include "client/url_scheme_event_filter.h"
 #include "database/interface/settings_card_preference_provider.h"
+#include "interface/intents/intent_open_local_deck.h"
+#include "interface/intents/url_parser.h"
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
 #include "interface/widgets/dialogs/dlg_settings.h"
+#include "interface/widgets/tabs/tab_supervisor.h"
 #include "interface/window_main.h"
+#include "single_instance_manager.h"
 #include "version_string.h"
 
 #include <QApplication>
@@ -37,12 +42,16 @@
 #include <QDebug>
 #include <QLibraryInfo>
 #include <QLocale>
+#include <QMessageBox>
 #include <QSystemTrayIcon>
 #include <QTranslator>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
+#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/card_database_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 
 QTranslator *translator, *qtTranslator;
@@ -173,6 +182,7 @@ int main(int argc, char *argv[])
     SetUnhandledExceptionFilter(CockatriceUnhandledExceptionFilter);
 #endif
 
+    // Logging setup
 #ifdef Q_OS_APPLE
     // <build>/cockatrice/cockatrice.app/Contents/MacOS/cockatrice
     const QByteArray configPath = "../../../qtlogging.ini";
@@ -190,15 +200,29 @@ int main(int argc, char *argv[])
         // Set the QT_LOGGING_CONF environment variable
         qputenv("QT_LOGGING_CONF", configPath);
     }
+
     qSetMessagePattern(
         "\033[0m[%{time yyyy-MM-dd h:mm:ss.zzz} "
         "%{if-debug}\033[36mD%{endif}%{if-info}\033[32mI%{endif}%{if-warning}\033[33mW%{endif}%{if-critical}\033[31mC%{"
         "endif}%{if-fatal}\033[1;31mF%{endif}\033[0m] [%{function}] - %{message} [%{file}:%{line}]");
     QApplication app(argc, argv);
 
+#ifdef Q_OS_MAC
+    UrlSchemeEventFilter cockatriceFilter(QStringList{QStringLiteral("cockatrice")});
+
+    QStringList pendingMacUrls;
+
+    const auto cocoaBufferConn =
+        QObject::connect(&cockatriceFilter, &UrlSchemeEventFilter::urlReceived,
+                         [&pendingMacUrls](const QString &url) { pendingMacUrls.append(url); });
+
+    app.installEventFilter(&cockatriceFilter);
+#endif
+
     QObject::connect(&app, &QApplication::lastWindowClosed, &app, &QApplication::quit);
 
     qInstallMessageHandler(CockatriceLogger);
+
 #ifdef Q_OS_WIN
     app.addLibraryPath(app.applicationDirPath() + "/plugins");
 #endif
@@ -214,6 +238,7 @@ int main(int argc, char *argv[])
     qApp->setAttribute(Qt::AA_DontShowIconsInMenus, true);
 #endif
 
+    // Translations
 #ifdef Q_OS_MAC
     translationPath = qApp->applicationDirPath() + "/../Resources/translations";
 #elif defined(Q_OS_WIN)
@@ -222,6 +247,7 @@ int main(int argc, char *argv[])
     translationPath = qApp->applicationDirPath() + "/../share/cockatrice/translations";
 #endif
 
+    // Command-line parser
     QCommandLineParser parser;
     parser.setApplicationDescription("Cockatrice");
     parser.addHelpOption();
@@ -235,6 +261,35 @@ int main(int argc, char *argv[])
 
     if (parser.isSet("debug-output")) {
         Logger::getInstance().logToFile(true);
+    }
+
+    // --- Handle files or URLs passed at startup ---
+    // Only positional arguments are treated as files/URLs, so options like
+    // --connect are never handed off to another instance.
+    const QStringList startupFiles = parser.positionalArguments();
+    const bool hasActivationFiles = !startupFiles.isEmpty();
+
+    SingleInstanceManager instance;
+
+    if (hasActivationFiles) {
+        // Activation launch: hand off to the primary instance if one is
+        // running, otherwise become the primary ourselves. Do this before
+        // constructing the main window so a hand-off exits cheaply.
+        if (!instance.tryRun(startupFiles)) {
+            // Sent successfully → exit
+            return 0;
+        }
+        // No primary instance → become server
+        qInfo() << "No existing instance found, becoming primary instance";
+    } else {
+        // Plain launch: if another instance is running, run independently
+        // instead of handing off and exiting.
+        if (!instance.tryRun(QStringList())) {
+            // Another instance is already running → just run independently
+            qInfo() << "Another instance exists, running independently";
+        } else {
+            qInfo() << "No existing instance found, starting server";
+        }
     }
 
     rng = new RNG_SFMT;
@@ -268,6 +323,26 @@ int main(int argc, char *argv[])
     CardDatabaseManager::getInstance()->loadCardDatabases();
 
     MainWindow ui;
+
+    auto handleActivation = [&ui](const QString &file) {
+        if (file.startsWith("cockatrice://")) {
+            auto urlParser = new IntentUrlParser(&ui, &ui);
+            urlParser->handle(file);
+        } else if (QFileInfo(file).exists()) {
+            auto openDeckIntent = new IntentOpenLocalDeck(ui.getTabSupervisor(), file);
+            QObject::connect(openDeckIntent, &Intent::failed, &ui, [&ui](const QString &reason) {
+                QMessageBox::warning(&ui, QObject::tr("Open deck"), reason);
+            });
+            openDeckIntent->execute();
+        }
+    };
+
+#ifdef Q_OS_MAC
+    QObject::disconnect(cocoaBufferConn);
+
+    QObject::connect(&cockatriceFilter, &UrlSchemeEventFilter::urlReceived,
+                     [&handleActivation](const QString &url) { handleActivation(url); });
+#endif
     if (parser.isSet("connect")) {
         ui.setConnectTo(parser.value("connect"));
     }
@@ -277,7 +352,7 @@ int main(int argc, char *argv[])
     // set name of the app desktop file; used by wayland to load the window icon
     QGuiApplication::setDesktopFileName("cockatrice");
 
-    SettingsCache::instance().personal().setClientID(generateClientID());
+    SettingsCache::instance().network().setClientID(generateClientID());
 
     // If spoiler mode is enabled, we will download the spoilers
     // then reload the DB. otherwise just reload the DB
@@ -288,9 +363,27 @@ int main(int argc, char *argv[])
 
     // force shortcuts to be shown/hidden in right-click menus, regardless of system defaults
     qApp->setAttribute(Qt::AA_DontShowShortcutsInContextMenus,
-                       !SettingsCache::instance().cardsDisplay().getShowShortcuts());
+                       !SettingsCache::instance().userInterface().getShowShortcuts());
 
-    app.exec();
+#ifdef Q_OS_MAC
+    for (const QString &url : pendingMacUrls) {
+        handleActivation(url);
+    }
+    pendingMacUrls.clear();
+#endif
+
+    for (const QString &file : startupFiles) {
+        handleActivation(file);
+    }
+
+    // Connect to future file/URL events from other instances
+    QObject::connect(&instance, &SingleInstanceManager::filesReceived, [&handleActivation](const QStringList &files) {
+        for (const QString &file : files) {
+            handleActivation(file);
+        }
+    });
+
+    int ret = app.exec();
 
     qCInfo(MainLog) << "Event loop finished, terminating...";
     delete rng;
@@ -298,5 +391,5 @@ int main(int argc, char *argv[])
     CountryPixmapGenerator::clear();
     UserLevelPixmapGenerator::clear();
 
-    return 0;
+    return ret;
 }

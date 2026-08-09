@@ -76,12 +76,12 @@ private:
     QString text;          ///< Text description or rules text of the card.
     bool isToken;          ///< Whether this card is a token or not.
     // Properties are stored as a pre-serialized blob (cheap to load) and the
-    // QVariantHash is materialized on first query, so database load avoids
-    // constructing thousands of QVariants per card.
-    mutable QByteArray propertiesBlob;     ///< Serialized properties (load form).
-    mutable QVariantHash propertiesCache;  ///< Materialized properties (query form).
-    mutable bool propertiesLoaded = false; ///< Whether propertiesCache is valid.
-    mutable QMutex propertiesMutex;        ///< Guards lazy materialization.
+    // QHash<QString, QString> is materialized on first query, so database load avoids
+    // constructing thousands of QStrings per card.
+    mutable QByteArray propertiesBlob;               ///< Serialized properties (load form).
+    mutable QHash<QString, QString> propertiesCache; ///< Materialized properties (query form).
+    mutable bool propertiesLoaded = false;           ///< Whether propertiesCache is valid.
+    mutable QMutex propertiesMutex;                  ///< Guards lazy materialization.
 
     /**
      * @brief Materializes propertiesCache from propertiesBlob if not already done.
@@ -114,7 +114,7 @@ public:
     explicit CardInfo(const QString &_name,
                       const QString &_text,
                       bool _isToken,
-                      QVariantHash _properties,
+                      QHash<QString, QString> _properties,
                       const QList<CardRelation *> &_relatedCards,
                       const QList<CardRelation *> &_reverseRelatedCards,
                       SetToPrintingsMap _sets,
@@ -127,7 +127,7 @@ public:
      * Used by the binary cache reader to skip recomputing @p _simpleName and
      * @p _altNames (which otherwise require a Unicode normalization and a full
      * printing scan). Properties are supplied as a pre-serialized @p _propertiesBlob
-     * so the QVariantHash is not built at load time (it is materialized on first
+     * so the QHash<QString, QString> is not built at load time (it is materialized on first
      * query).
      *
      * @param _name The card name.
@@ -194,7 +194,7 @@ public:
     static CardInfoPtr newInstance(const QString &_name,
                                    const QString &_text,
                                    bool _isToken,
-                                   QVariantHash _properties,
+                                   QHash<QString, QString> _properties,
                                    const QList<CardRelation *> &_relatedCards,
                                    const QList<CardRelation *> &_reverseRelatedCards,
                                    SetToPrintingsMap _sets,
@@ -288,27 +288,13 @@ public:
     {
         return getPropertiesHash().keys();
     }
-    [[nodiscard]] const QVariantHash &getPropertiesHash() const;
+    [[nodiscard]] const QHash<QString, QString> &getPropertiesHash() const;
 
-    /**
-     * @brief Stores the pre-serialized properties blob and invalidates the
-     *        materialized cache. Used by the binary cache reader so the
-     *        QVariantHash is not built at load time.
-     * @param _blob The serialized properties (as written by the cache writer).
-     */
-    void setPropertiesBlob(QByteArray _blob) const
-    {
-        QMutexLocker lock(&propertiesMutex);
-        propertiesBlob = std::move(_blob);
-        propertiesLoaded = false;
-        propertiesCache.clear();
-    }
     [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
-        return getPropertiesHash().value(propertyName).toString();
+        return getPropertiesHash().value(propertyName);
     }
     void setProperty(const QString &_name, const QString &_value);
-    void setProperties(const QVariantHash &_props);
     [[nodiscard]] bool hasProperty(const QString &propertyName) const
     {
         return getPropertiesHash().contains(propertyName);
@@ -415,7 +401,7 @@ public:
      *
      * @param props Key-value mapping of format legalities.
      */
-    void combineLegalities(const QVariantHash &props);
+    void combineLegalities(const QHash<QString, QString> &props);
 
     /**
      * @brief Refreshes all cached fields that are calculated from the contained sets and printings.

@@ -11,18 +11,22 @@
 #include <QGlobalStatic>
 #include <QSettings>
 #include <QStandardPaths>
+#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cache_storage_settings.h>
 #include <libcockatrice/settings/card_database_settings.h>
 #include <libcockatrice/settings/card_override_settings.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/commander_bracket_settings.h>
 #include <libcockatrice/settings/debug_settings.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/game_filters_settings.h>
 #include <libcockatrice/settings/game_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/layouts_settings.h>
 #include <libcockatrice/settings/message_settings.h>
+#include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/recents_settings.h>
@@ -135,8 +139,12 @@ SettingsCache::SettingsCache()
     personalSettings = new PersonalSettings(settingsPath, this);
     cardsDisplaySettings = new CardsDisplaySettings(settingsPath, this);
     interfaceSettings = new InterfaceSettings(settingsPath, this);
+    deckEditorSettings = new DeckEditorSettings(settingsPath, this);
     pathsSettings = new PathsSettings(settingsPath, this);
     visualDeckStorageSettings = new VisualDeckStorageSettings(settingsPath, this);
+    appearanceSettings = new AppearanceSettings(settingsPath, this);
+    networkSettings = new NetworkSettings(settingsPath, this);
+    commanderBracketSettings = new CommanderBracketSettings(settingsPath, this);
 
     // Forward ICardDatabasePathProvider signal from PathsSettings
     connect(pathsSettings, &PathsSettings::cardDatabasePathChanged, this,
@@ -147,7 +155,13 @@ SettingsCache::SettingsCache()
     releaseChannels << new StableReleaseChannel();
     releaseChannels << new BetaReleaseChannel();
 
-    themeName = personalSettings->getThemeName();
+    themeName = appearanceSettings->getThemeName();
+
+    auto definitions = commanderBracketSettings->loadDefinitions();
+    if (definitions.isEmpty()) {
+        definitions = CommanderBracketSettings::defaultDefinitions();
+    }
+    commanderBracketSettings->reloadDefinitions(definitions);
 
     loadPaths();
 }
@@ -155,7 +169,7 @@ SettingsCache::SettingsCache()
 void SettingsCache::setThemeName(const QString &_themeName)
 {
     themeName = _themeName;
-    personalSettings->setThemeName(themeName);
+    appearanceSettings->setThemeName(themeName);
     emit themeChanged();
 }
 
@@ -216,15 +230,15 @@ void SettingsCache::loadPaths()
     // customPicsPath derived from picsPath
     QString picsPath = pathsIni.value("paths/pics").toString();
     if (picsPath.endsWith("/")) {
-        computePath("custompics", picsPath + "CUSTOM/");
+        computePath("customPics", picsPath + "CUSTOM/");
     } else {
-        computePath("custompics", picsPath + "/CUSTOM/");
+        computePath("customPics", picsPath + "/CUSTOM/");
     }
 
-    computePath("customsets", dataPath + "/customsets/");
-    computeFilePath("carddatabase", dataPath + "/cards.xml");
-    computeFilePath("tokendatabase", dataPath + "/tokens.xml");
-    computeFilePath("spoilerdatabase", dataPath + "/spoiler.xml");
+    computePath("customSets", dataPath + "/customsets/");
+    computeFilePath("cardDatabase", dataPath + "/cards.xml");
+    computeFilePath("tokenDatabase", dataPath + "/tokens.xml");
+    computeFilePath("spoilerDatabase", dataPath + "/spoiler.xml");
 }
 
 void SettingsCache::resetPaths()
@@ -272,12 +286,12 @@ QString SettingsCache::getTokenDatabasePath() const
 // INetworkSettingsProvider - delegate to sub-objects
 int SettingsCache::getKeepAlive() const
 {
-    return personalSettings->getKeepAlive();
+    return networkSettings->getKeepAlive();
 }
 
 int SettingsCache::getTimeOut() const
 {
-    return personalSettings->getTimeOut();
+    return networkSettings->getTimeOut();
 }
 
 bool SettingsCache::getNotifyAboutUpdates() const
@@ -287,17 +301,17 @@ bool SettingsCache::getNotifyAboutUpdates() const
 
 void SettingsCache::setKnownMissingFeatures(const QString &_knownMissingFeatures)
 {
-    interfaceSettings->setKnownMissingFeatures(_knownMissingFeatures);
+    networkSettings->setKnownMissingFeatures(_knownMissingFeatures);
 }
 
 QString SettingsCache::getKnownMissingFeatures()
 {
-    return interfaceSettings->getKnownMissingFeatures();
+    return networkSettings->getKnownMissingFeatures();
 }
 
 QString SettingsCache::getClientID()
 {
-    return personalSettings->getClientID();
+    return networkSettings->getClientID();
 }
 
 // Release channels
@@ -412,7 +426,7 @@ CardsDisplaySettings &SettingsCache::cardsDisplay() const
     return *cardsDisplaySettings;
 }
 
-InterfaceSettings &SettingsCache::interface() const
+InterfaceSettings &SettingsCache::userInterface() const
 {
     return *interfaceSettings;
 }
@@ -422,7 +436,22 @@ PathsSettings &SettingsCache::paths() const
     return *pathsSettings;
 }
 
+DeckEditorSettings &SettingsCache::deckEditor() const
+{
+    return *deckEditorSettings;
+}
+
 VisualDeckStorageSettings &SettingsCache::visualDeckStorage() const
 {
     return *visualDeckStorageSettings;
+}
+
+AppearanceSettings &SettingsCache::appearance() const
+{
+    return *appearanceSettings;
+}
+
+NetworkSettings &SettingsCache::network() const
+{
+    return *networkSettings;
 }

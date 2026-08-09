@@ -9,6 +9,7 @@ set(HEADERS
     libcockatrice/interfaces/interface_card_set_priority_controller.h
     libcockatrice/interfaces/interface_cards_display_settings_provider.h
     libcockatrice/interfaces/interface_chat_settings_provider.h
+    libcockatrice/interfaces/interface_deck_editor_settings_provider.h
     libcockatrice/interfaces/interface_game_settings_provider.h
     libcockatrice/interfaces/interface_interface_settings_provider.h
     libcockatrice/interfaces/interface_network_settings_provider.h
@@ -23,9 +24,7 @@ set(HEADERS
     libcockatrice/interfaces/noop_card_set_priority_controller.h
 )
 
-if(Qt6_FOUND)
-  qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-endif()
+qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
 
 add_library(libcockatrice_interfaces STATIC ${MOC_SOURCES})
 

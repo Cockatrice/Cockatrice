@@ -14,8 +14,8 @@
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/remote/remote_client.h>
+#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
-#include <libcockatrice/settings/personal_settings.h>
 
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     : QWidget(parent), tabSupervisor(_tabSupervisor), background("theme:backgrounds/home"), overlay("theme:cockatrice")
@@ -43,12 +43,12 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     updateConnectButton(tabSupervisor->getClient()->getStatus());
 
     connect(tabSupervisor->getClient(), &RemoteClient::statusChanged, this, &HomeWidget::updateConnectButton);
-    connect(&SettingsCache::instance().personal(), &PersonalSettings::homeTabBackgroundSourceChanged, this,
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabBackgroundSourceChanged, this,
             &HomeWidget::initializeBackgroundFromSource);
-    connect(&SettingsCache::instance().personal(), &PersonalSettings::homeTabBackgroundShuffleFrequencyChanged, this,
-            &HomeWidget::onBackgroundShuffleFrequencyChanged);
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabBackgroundShuffleFrequencyChanged,
+            this, &HomeWidget::onBackgroundShuffleFrequencyChanged);
     // Lambda is cleaner to read than overloading this
-    connect(&SettingsCache::instance().personal(), &PersonalSettings::homeTabDisplayCardNameChanged, this,
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabDisplayCardNameChanged, this,
             [this] { repaint(); });
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
             &HomeWidget::initializeBackgroundFromSource);
@@ -65,7 +65,7 @@ void HomeWidget::initializeBackgroundFromSource()
     }
 
     auto backgroundSourceType =
-        BackgroundSources::fromId(SettingsCache::instance().personal().getHomeTabBackgroundSource());
+        BackgroundSources::fromId(SettingsCache::instance().appearance().getHomeTabBackgroundSource());
 
     switch (backgroundSourceType) {
         case BackgroundSources::Theme:
@@ -113,7 +113,7 @@ void HomeWidget::setRandomCard(ExactCard &newCard)
 void HomeWidget::updateRandomCard()
 {
     auto backgroundSourceType =
-        BackgroundSources::fromId(SettingsCache::instance().personal().getHomeTabBackgroundSource());
+        BackgroundSources::fromId(SettingsCache::instance().appearance().getHomeTabBackgroundSource());
 
     ExactCard newCard;
 
@@ -156,8 +156,8 @@ void HomeWidget::updateRandomCard()
 void HomeWidget::onBackgroundShuffleFrequencyChanged()
 {
     cardChangeTimer->stop();
-    if (SettingsCache::instance().personal().getHomeTabBackgroundShuffleFrequency() > 0) {
-        cardChangeTimer->start(SettingsCache::instance().personal().getHomeTabBackgroundShuffleFrequency() * 1000);
+    if (SettingsCache::instance().appearance().getHomeTabBackgroundShuffleFrequency() > 0) {
+        cardChangeTimer->start(SettingsCache::instance().appearance().getHomeTabBackgroundShuffleFrequency() * 1000);
     }
 }
 
@@ -265,7 +265,7 @@ void HomeWidget::updateConnectButton(const ClientStatus status)
 
 QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)
 {
-    if (themeManager->isBuiltInTheme() && SettingsCache::instance().personal().getHomeTabBackgroundSource() ==
+    if (themeManager->isBuiltInTheme() && SettingsCache::instance().appearance().getHomeTabBackgroundSource() ==
                                               BackgroundSources::toId(BackgroundSources::Theme)) {
         return QPair<QColor, QColor>(QColor::fromRgb(20, 140, 60), QColor::fromRgb(120, 200, 80));
     }
@@ -352,7 +352,7 @@ void HomeWidget::paintEvent(QPaintEvent *event)
         }
     }
 
-    if (!cardName.isEmpty() && SettingsCache::instance().personal().getHomeTabDisplayCardName()) {
+    if (!cardName.isEmpty() && SettingsCache::instance().appearance().getHomeTabDisplayCardName()) {
         QFont font = painter.font();
         font.setPointSize(14);
         font.setBold(true);

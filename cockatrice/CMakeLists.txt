@@ -99,6 +99,7 @@ set(cockatrice_SOURCES
     src/game_graphics/player/menu/sideboard_menu.cpp
     src/game_graphics/player/menu/tally_menu.cpp
     src/game_graphics/player/menu/utility_menu.cpp
+    src/game_graphics/tally/stats_tally.cpp
     src/game_graphics/tally/subtype_tally.cpp
     src/game_graphics/tally/tally.cpp
     src/game/player/player_actions.cpp
@@ -134,6 +135,12 @@ set(cockatrice_SOURCES
     src/interface/card_picture_loader/card_picture_loader_worker.cpp
     src/interface/card_picture_loader/card_picture_loader_worker_work.cpp
     src/interface/card_picture_loader/card_picture_to_load.cpp
+    src/interface/intents/intent.cpp
+    src/interface/intents/intent.h
+    src/interface/intents/intent_open_local_deck.cpp
+    src/interface/intents/intent_open_local_deck.h
+    src/interface/intents/intent_wait_for_database_load.cpp
+    src/interface/intents/intent_wait_for_database_load.h
     src/interface/layouts/flow_layout.cpp
     src/interface/layouts/overlap_layout.cpp
     src/interface/widgets/utility/line_edit_completer.cpp
@@ -229,6 +236,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/printing_selector/set_name_and_collectors_number_display_widget.cpp
     src/interface/widgets/quick_settings/settings_button_widget.cpp
     src/interface/widgets/quick_settings/settings_popup_widget.cpp
+    src/interface/widgets/replay/replay_manager.cpp
     src/interface/widgets/replay/replay_quick_settings_widget.cpp
     src/interface/widgets/replay/replay_timeline_widget.cpp
     src/interface/widgets/replay/replay_widget.cpp
@@ -249,10 +257,13 @@ set(cockatrice_SOURCES
     src/interface/widgets/server/user/user_list_manager.cpp
     src/interface/widgets/server/user/user_list_painter.cpp
     src/interface/widgets/server/user/user_list_widget.cpp
+    src/interface/widgets/settings_page/abstract_settings_page.cpp
     src/interface/widgets/settings_page/appearance_settings_page.cpp
     src/interface/widgets/settings_page/deck_editor_settings_page.cpp
     src/interface/widgets/settings_page/general_settings_page.cpp
     src/interface/widgets/settings_page/messages_settings_page.cpp
+    src/interface/widgets/settings_page/settings_search_delegate.cpp
+    src/interface/widgets/settings_page/settings_search_model.cpp
     src/interface/widgets/settings_page/shortcut_settings_page.cpp
     src/interface/widgets/settings_page/sound_settings_page.cpp
     src/interface/widgets/settings_page/storage_settings_page.cpp
@@ -291,6 +302,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
     src/main.cpp
+    src/single_instance_manager.cpp
     src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
     src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp
     src/interface/widgets/tabs/api/archidekt/api_response/archidekt_deck_listing_api_response.cpp
@@ -306,6 +318,13 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_entry_display_widget.cpp
     src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_listings_display_widget.cpp
     src/interface/widgets/tabs/api/archidekt/display/archidekt_deck_preview_image_display_widget.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/card_in_deck_request.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_deck_request.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_card_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_variant_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_estimate_bracket_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_spellbook_api_accessor.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/archidekt_links/edhrec_api_response_archidekt_links.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_average_deck_api_response.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_deck_api_response.cpp
@@ -352,12 +371,29 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/interface/key_signals.cpp
     src/interface/logger.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_service.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_widget.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/handle_commander_brackets.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
     src/interface/widgets/utility/compact_push_button.cpp
     src/interface/widgets/utility/compact_push_button.h
+    src/single_instance_manager.h
+    src/client/url_scheme_event_filter.h
+    src/interface/intents/intent_connect_to_server.cpp
+    src/interface/intents/intent_connect_to_server.h
+    src/interface/intents/intent_disconnect_from_server.cpp
+    src/interface/intents/intent_disconnect_from_server.h
+    src/interface/intents/intent_join_server_game.cpp
+    src/interface/intents/intent_join_server_game.h
+    src/interface/intents/intent_join_server_room.cpp
+    src/interface/intents/intent_join_server_room.h
+    src/interface/intents/intent_login.cpp
+    src/interface/intents/intent_login.h
+    src/interface/intents/url_parser.cpp
+    src/interface/intents/url_parser.h
     src/interface/widgets/server/user/user_info_popup.cpp
     src/interface/widgets/server/user/user_info_popup.h
 )
@@ -401,9 +437,7 @@ if(APPLE)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
-if(Qt6_FOUND)
-  qt6_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
-endif()
+qt6_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 
 # Declare path variables
 set(ICONDIR
@@ -415,34 +449,37 @@ set(DESKTOPDIR
     CACHE STRING "desktop file destination"
 )
 
+set(MIMEDIR
+    share/mime/packages
+    CACHE STRING "mime file destination"
+)
+
 set(COCKATRICE_MAC_QM_INSTALL_DIR "cockatrice.app/Contents/Resources/translations")
 set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/cockatrice/translations")
 set(COCKATRICE_WIN32_QM_INSTALL_DIR "translations")
 
-if(Qt6_FOUND)
-  qt6_add_executable(
-    cockatrice
-    WIN32
-    MACOSX_BUNDLE
-    ${cockatrice_SOURCES}
-    ${cockatrice_RESOURCES_RCC}
-    ${cockatrice_MOC_SRCS}
-    MANUAL_FINALIZATION
-  )
+qt6_add_executable(
+  cockatrice
+  WIN32
+  MACOSX_BUNDLE
+  ${cockatrice_SOURCES}
+  ${cockatrice_RESOURCES_RCC}
+  ${cockatrice_MOC_SRCS}
+  MANUAL_FINALIZATION
+)
 
-  target_link_libraries(
-    cockatrice
-    PUBLIC libcockatrice_card
-           libcockatrice_deck_list
-           libcockatrice_filters
-           libcockatrice_utility
-           libcockatrice_network
-           libcockatrice_models
-           libcockatrice_rng
-           libcockatrice_settings
-           ${COCKATRICE_QT_MODULES}
-  )
-endif()
+target_link_libraries(
+  cockatrice
+  PUBLIC libcockatrice_card
+         libcockatrice_deck_list
+         libcockatrice_filters
+         libcockatrice_utility
+         libcockatrice_network
+         libcockatrice_models
+         libcockatrice_rng
+         libcockatrice_settings
+         ${COCKATRICE_QT_MODULES}
+)
 
 if(UNIX)
   if(APPLE)
@@ -462,6 +499,23 @@ if(UNIX)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION ${DESKTOPDIR})
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice-cod.xml DESTINATION ${MIMEDIR})
+
+    # Refresh the freedesktop databases so the file associations and scheme
+    # handler register without requiring the user to run them manually. The
+    # tools may be missing on minimal systems; that is fine, packaging systems
+    # usually refresh these databases through their own triggers.
+    find_program(UPDATE_MIME_DATABASE update-mime-database)
+    if(UPDATE_MIME_DATABASE)
+      install(CODE "execute_process(COMMAND \"${UPDATE_MIME_DATABASE}\" \"${CMAKE_INSTALL_PREFIX}/share/mime\")")
+    endif()
+
+    find_program(UPDATE_DESKTOP_DATABASE update-desktop-database)
+    if(UPDATE_DESKTOP_DATABASE)
+      install(
+        CODE "execute_process(COMMAND \"${UPDATE_DESKTOP_DATABASE}\" \"${CMAKE_INSTALL_PREFIX}/share/applications\")"
+      )
+    endif()
   endif()
 elseif(WIN32)
   install(TARGETS cockatrice RUNTIME DESTINATION ./)
@@ -590,7 +644,7 @@ Data = Resources\")
   endif()
 endif()
 
-if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
+if(Qt6LinguistTools_FOUND)
   #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
     qt6_add_translations(
@@ -617,6 +671,4 @@ if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
   endif()
 endif()
 
-if(Qt6_FOUND)
-  qt6_finalize_target(cockatrice)
-endif()
+qt6_finalize_target(cockatrice)

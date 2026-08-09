@@ -159,6 +159,7 @@ if [[ $PACKAGE_TYPE ]]; then
 fi
 if [[ $USE_VCPKG ]]; then
   flags+=("-DUSE_VCPKG=1")
+  flags+=("-DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions")
 fi
 
 # Add CMake --build flags

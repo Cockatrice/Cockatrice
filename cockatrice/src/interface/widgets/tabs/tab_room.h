@@ -78,6 +78,7 @@ signals:
     void openMessageDialog(const QString &userName, bool focus);
     void maximizeClient();
     void notIdle();
+    void gameListUpdated();
 private slots:
     void sendMessage();
     void sayFinished(const Response &response);
@@ -126,6 +127,10 @@ public:
     [[nodiscard]] const ServerInfo_User *getUserInfo() const
     {
         return ownUser;
+    }
+    [[nodiscard]] GameSelector *getGameSelector() const
+    {
+        return gameSelector;
     }
 
     PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd);

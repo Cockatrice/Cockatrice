@@ -12,7 +12,6 @@
 #include <QRegularExpression>
 #include <QSharedPointer>
 #include <QString>
-#include <QVariant>
 #include <algorithm>
 #include <utility>
 
@@ -24,7 +23,7 @@ using CardInfoPtr = QSharedPointer<CardInfo>;
 
 namespace
 {
-QByteArray serializeProperties(const QVariantHash &props)
+QByteArray serializeProperties(const QHash<QString, QString> &props)
 {
     QByteArray blob;
     QDataStream out(&blob, QIODevice::WriteOnly);
@@ -48,7 +47,7 @@ void CardInfo::ensurePropertiesLoaded() const
     propertiesLoaded = true;
 }
 
-const QVariantHash &CardInfo::getPropertiesHash() const
+const QHash<QString, QString> &CardInfo::getPropertiesHash() const
 {
     ensurePropertiesLoaded();
     return propertiesCache;
@@ -57,7 +56,7 @@ const QVariantHash &CardInfo::getPropertiesHash() const
 void CardInfo::setProperty(const QString &_name, const QString &_value)
 {
     ensurePropertiesLoaded();
-    if (propertiesCache.value(_name).toString() == _value) {
+    if (propertiesCache.value(_name) == _value) {
         return;
     }
     propertiesCache.insert(_name, _value);
@@ -65,18 +64,10 @@ void CardInfo::setProperty(const QString &_name, const QString &_value)
     emit cardInfoChanged(smartThis);
 }
 
-void CardInfo::setProperties(const QVariantHash &_props)
-{
-    ensurePropertiesLoaded();
-    propertiesCache = _props;
-    propertiesBlob = serializeProperties(propertiesCache);
-    emit cardInfoChanged(smartThis);
-}
-
 CardInfo::CardInfo(const QString &_name,
                    const QString &_text,
                    bool _isToken,
-                   QVariantHash _properties,
+                   QHash<QString, QString> _properties,
                    const QList<CardRelation *> &_relatedCards,
                    const QList<CardRelation *> &_reverseRelatedCards,
                    SetToPrintingsMap _sets,
@@ -122,7 +113,7 @@ CardInfoPtr CardInfo::newInstance(const QString &_name)
 CardInfoPtr CardInfo::newInstance(const QString &_name,
                                   const QString &_text,
                                   bool _isToken,
-                                  QVariantHash _properties,
+                                  QHash<QString, QString> _properties,
                                   const QList<CardRelation *> &_relatedCards,
                                   const QList<CardRelation *> &_reverseRelatedCards,
                                   SetToPrintingsMap _sets,
@@ -210,10 +201,10 @@ void CardInfo::addToSet(const CardSetPtr &_set, const PrintingInfo &_info)
     refreshCachedSets();
 }
 
-void CardInfo::combineLegalities(const QVariantHash &props)
+void CardInfo::combineLegalities(const QHash<QString, QString> &props)
 {
     ensurePropertiesLoaded();
-    QHashIterator<QString, QVariant> it(props);
+    QHashIterator it(props);
     while (it.hasNext()) {
         it.next();
         if (it.key().startsWith("format-")) {

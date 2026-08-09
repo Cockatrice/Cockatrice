@@ -10,18 +10,23 @@
 #include "games_model.h"
 #include "user/user_list_manager.h"
 
+#include <QClipboard>
 #include <QDebug>
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTreeView>
+#include <QUrl>
+#include <QUrlQuery>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
 
 GameSelector::GameSelector(AbstractClient *_client,
                            TabSupervisor *_tabSupervisor,
@@ -79,12 +84,12 @@ GameSelector::GameSelector(AbstractClient *_client,
     if (showFilters && restoresettings) {
         quickFilterToolBar = new GameSelectorQuickFilterToolBar(this, tabSupervisor, gameListProxyModel, gameTypeMap);
         quickFilterToolBar->setVisible(showFilters && restoresettings &&
-                                       SettingsCache::instance().cardsDisplay().getShowGameSelectorFilterToolbar());
+                                       SettingsCache::instance().userInterface().getShowGameSelectorFilterToolbar());
 
-        connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::showGameSelectorFilterToolbarChanged,
+        connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::showGameSelectorFilterToolbarChanged,
                 this, [this] {
                     quickFilterToolBar->setVisible(
-                        SettingsCache::instance().cardsDisplay().getShowGameSelectorFilterToolbar());
+                        SettingsCache::instance().userInterface().getShowGameSelectorFilterToolbar());
                 });
     } else {
         quickFilterToolBar = nullptr;
@@ -315,6 +320,21 @@ void GameSelector::customContextMenu(const QPoint &point)
         dlg.exec();
     });
 
+    QAction copyLink(tr("Copy Game Link"));
+    connect(&copyLink, &QAction::triggered, this, [=, this]() {
+        const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
+        QUrl url;
+        url.setScheme("cockatrice");
+        url.setHost("joingame");
+        QUrlQuery query;
+        query.addQueryItem("hostname", client->serverName());
+        query.addQueryItem("port", QString::number(client->serverPort()));
+        query.addQueryItem("roomid", QString::number(gameInfo.room_id()));
+        query.addQueryItem("gameid", QString::number(gameInfo.game_id()));
+        url.setQuery(query);
+        QGuiApplication::clipboard()->setText(url.toString(QUrl::FullyEncoded));
+    });
+
     QMenu menu;
     menu.addAction(&joinGame);
 
@@ -332,6 +352,11 @@ void GameSelector::customContextMenu(const QPoint &point)
 
     menu.addAction(&spectateGame);
     menu.addAction(&getGameInfo);
+
+    if (!client->serverName().isEmpty()) {
+        menu.addAction(&copyLink);
+    }
+
     menu.exec(gameListView->mapToGlobal(point));
 }
 
@@ -377,6 +402,24 @@ void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
     r->sendRoomCommand(pend);
 
     disableButtons();
+}
+
+bool GameSelector::joinGameById(int gameId)
+{
+    auto *model = gameListView->model();
+
+    for (int row = 0; row < model->rowCount(); ++row) {
+        QModelIndex idx = model->index(row, 0);
+        const ServerInfo_Game &game = gameListModel->getGame(idx.data(Qt::UserRole).toInt());
+        if (game.game_id() == gameId) {
+            gameListView->setCurrentIndex(idx);
+            joinGame();
+            return true;
+        }
+    }
+
+    qWarning() << "Game" << gameId << "not found";
+    return false;
 }
 
 void GameSelector::disableButtons()

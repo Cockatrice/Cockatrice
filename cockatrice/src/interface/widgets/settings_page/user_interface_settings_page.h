@@ -8,6 +8,8 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QSpinBox>
+#include <QToolButton>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/utility/macros.h>
 
 class UserInterfaceSettingsPage : public AbstractSettingsPage
@@ -15,6 +17,7 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage
     Q_OBJECT
 private slots:
     void setNotificationEnabled(QT_STATE_CHANGED_T);
+    void updateCommanderSpellbookUiState();
 
 private:
     QCheckBox notificationsEnabledCheckBox;
@@ -39,6 +42,11 @@ private:
     QCheckBox visualDeckStorageSelectionAnimationCheckBox;
     QLabel defaultDeckEditorTypeLabel;
     QComboBox defaultDeckEditorTypeSelector;
+    QLabel commanderSpellbookIntegrationEnabledLabel;
+    QComboBox commanderSpellbookIntegrationEnabledSelector;
+    QLabel commanderSpellbookIntegrationUseOfficialBracketNamesLabel;
+    QToolButton commanderSpellbookIntegrationUseOfficialBracketNamesExplainer;
+    QComboBox commanderSpellbookIntegrationBracketNamingSelector;
     QLabel rewindBufferingMsLabel;
     QSpinBox rewindBufferingMsBox;
     QGroupBox *generalGroupBox;

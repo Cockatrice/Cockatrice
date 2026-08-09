@@ -14,9 +14,13 @@ ReplayQuickSettingsWidget::ReplayQuickSettingsWidget(QWidget *parent) : Settings
     fastForwardSpeedBox.setMinimum(1);
     fastForwardSpeedBox.setMaximum(99.9);
     fastForwardSpeedBox.setDecimals(1);
-    fastForwardSpeedBox.setValue(SettingsCache::instance().interface().getFastForwardSpeed());
+    fastForwardSpeedBox.setValue(SettingsCache::instance().userInterface().getFastForwardSpeed());
     connect(&fastForwardSpeedBox, qOverload<double>(&QDoubleSpinBox::valueChanged), this,
             &ReplayQuickSettingsWidget::actUpdateFastForwardSpeed);
+
+    skipEmptyCheckBox.setChecked(SettingsCache::instance().userInterface().getSkipEmptySections());
+    connect(&skipEmptyCheckBox, &QCheckBox::QT_STATE_CHANGED, this,
+            &ReplayQuickSettingsWidget::actUpdateSkipEmptySections);
 
     // putting it all together
     auto *widget = new QWidget;
@@ -24,6 +28,7 @@ ReplayQuickSettingsWidget::ReplayQuickSettingsWidget(QWidget *parent) : Settings
     grid->setContentsMargins(0, 0, 0, 0);
     grid->addWidget(&fastForwardSpeedLabel, 0, 0, 1, 1);
     grid->addWidget(&fastForwardSpeedBox, 0, 1, 1, 1);
+    grid->addWidget(&skipEmptyCheckBox, 1, 0, 1, 2);
 
     this->addSettingsWidget(widget);
 
@@ -36,10 +41,18 @@ void ReplayQuickSettingsWidget::retranslateUi()
 {
     fastForwardSpeedLabel.setText(tr("Fast forward speed:"));
     fastForwardSpeedBox.setSuffix("x");
+
+    skipEmptyCheckBox.setText(tr("Skip empty sections"));
 }
 
 void ReplayQuickSettingsWidget::actUpdateFastForwardSpeed(qreal value)
 {
-    SettingsCache::instance().interface().setFastForwardSpeed(value);
+    SettingsCache::instance().userInterface().setFastForwardSpeed(value);
     emit fastForwardSpeedChanged(value);
+}
+
+void ReplayQuickSettingsWidget::actUpdateSkipEmptySections(QT_STATE_CHANGED_T value)
+{
+    SettingsCache::instance().userInterface().setSkipEmptySections(value);
+    emit skipEmptySectionsChanged(value);
 }

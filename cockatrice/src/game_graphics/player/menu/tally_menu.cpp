@@ -11,24 +11,26 @@ TallyMenu::TallyMenu()
 
     aTallyNone = createTallyAction(TallyType::None);
     aTallySubtypes = createTallyAction(TallyType::Subtypes);
+    aTallyTotalPower = createTallyAction(TallyType::TotalPower);
 
     addAction(aTallyNone);
     addSeparator();
     addAction(aTallySubtypes);
+    addAction(aTallyTotalPower);
 
     retranslateUi();
 }
 
 QAction *TallyMenu::createTallyAction(TallyType tallyType)
 {
-    TallyType currentType = Tally::intToType(SettingsCache::instance().interface().getTallyType());
+    TallyType currentType = Tally::intToType(SettingsCache::instance().userInterface().getTallyType());
 
     QAction *action = new QAction(this);
     action->setCheckable(true);
     action->setChecked(tallyType == currentType);
 
-    connect(action, &QAction::triggered, &SettingsCache::instance().interface(),
-            [tallyType] { SettingsCache::instance().interface().setTallyType(static_cast<int>(tallyType)); });
+    connect(action, &QAction::triggered, &SettingsCache::instance().userInterface(),
+            [tallyType] { SettingsCache::instance().userInterface().setTallyType(static_cast<int>(tallyType)); });
 
     actionGroup->addAction(action);
 
@@ -51,4 +53,5 @@ void TallyMenu::retranslateUi()
 
     aTallyNone->setText(tr("None"));
     aTallySubtypes->setText(tr("Subtypes"));
+    aTallyTotalPower->setText(tr("Total Power"));
 }

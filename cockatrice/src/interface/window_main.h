@@ -92,6 +92,7 @@ private slots:
     void cardDatabaseAllNewSetsEnabled();
 
     void checkClientUpdatesFinished(bool needToUpdate, bool isCompatible, Release *release);
+    void actCheckCommanderBracketDefinitionUpdates();
 
     void actOpenCustomFolder();
     void actOpenCustomsetsFolder();
@@ -149,6 +150,11 @@ public:
         connectTo = QUrl(QString("cockatrice://%1").arg(url));
     }
     ~MainWindow() override;
+
+    RemoteClient *getRemoteClient() const
+    {
+        return connectionController->client();
+    }
 
     TabSupervisor *getTabSupervisor() const
     {

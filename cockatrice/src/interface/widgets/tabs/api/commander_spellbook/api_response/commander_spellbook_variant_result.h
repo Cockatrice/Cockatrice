@@ -1,0 +1,39 @@
+#ifndef COCKATRICE_COMMANDER_SPELLBOOK_VARIANT_RESULT_H
+#define COCKATRICE_COMMANDER_SPELLBOOK_VARIANT_RESULT_H
+
+#include <QJsonArray>
+#include <QJsonObject>
+
+struct CommanderSpellbookVariantResult
+{
+    static CommanderSpellbookVariantResult fromJson(const QJsonObject &json);
+
+    QString id;
+    QString status;
+
+    QJsonArray uses;
+    QJsonArray cardRequires;
+    QJsonArray produces;
+    QJsonArray of;
+    QJsonArray includes;
+
+    QJsonArray manaNeeded;
+    QJsonArray manaValueNeeded;
+
+    QJsonArray easyPrerequisites;
+    QJsonArray notablePrerequisites;
+
+    QString description;
+    QString notes;
+    double popularity = 0.0;
+
+    bool spoiler = false;
+    QString bracketTag;
+
+    QJsonObject legalities;
+    QJsonObject prices;
+
+    int variantCount = 0;
+};
+
+#endif // COCKATRICE_COMMANDER_SPELLBOOK_VARIANT_RESULT_H

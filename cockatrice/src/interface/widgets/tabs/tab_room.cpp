@@ -242,7 +242,7 @@ void TabRoom::actClearChat()
 void TabRoom::actOpenChatSettings()
 {
     DlgSettings settings(this);
-    settings.setTab(4);
+    settings.setTab(DlgSettings::MessagesPage);
     settings.exec();
 }
 
@@ -280,6 +280,7 @@ void TabRoom::processListGamesEvent(const Event_ListGames &event)
     for (int i = 0; i < gameListSize; ++i) {
         gameSelector->processGameInfo(event.game_list(i));
     }
+    emit gameListUpdated();
 }
 
 void TabRoom::processJoinRoomEvent(const Event_JoinRoom &event)

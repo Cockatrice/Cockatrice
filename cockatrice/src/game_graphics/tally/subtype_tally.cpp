@@ -66,8 +66,9 @@ QList<TallyRow> countSubtypes(const QList<CardItem *> &cards)
     });
 
     // convert entries into TallyRows
-    QList<TallyRow> rows = QList<TallyRow>(entries.size());
-    std::transform(entries.begin(), entries.end(), rows.begin(),
+    QList<TallyRow> rows;
+    rows.reserve(entries.size());
+    std::transform(entries.begin(), entries.end(), std::back_inserter(rows),
                    [](const SubtypeEntry &e) { return TallyRow{e.name, QString::number(e.count)}; });
 
     return rows;

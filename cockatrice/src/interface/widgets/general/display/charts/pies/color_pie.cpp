@@ -82,9 +82,7 @@ void ColorPie::paintEvent(QPaintEvent *)
         QString label = QString("%1%").arg(int(ratio * 100 + 0.5));
 
         QFontMetrics fm(p.font());
-
         int labelWidth = fm.horizontalAdvance(label);
-
         QRectF textRect(labelPos.x() - labelWidth / 2.0, labelPos.y() - fm.height() / 2.0, labelWidth, fm.height());
 
         p.setPen(Qt::black);

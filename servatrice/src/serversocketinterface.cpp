@@ -325,6 +325,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAddToList(const Command
     Event_AddToList event;
     event.set_list_name(cmd.list());
     event.mutable_user_info()->CopyFrom(databaseInterface->getUserData(user));
+    // The buddy/ignore list entry is only used to display the user's basic
+    // profile: never leak the target's email address or client id.
+    event.mutable_user_info()->clear_email();
+    event.mutable_user_info()->clear_clientid();
     rc.enqueuePreResponseItem(ServerMessage::SESSION_EVENT, prepareSessionEvent(event));
 
     return Response::RespOk;

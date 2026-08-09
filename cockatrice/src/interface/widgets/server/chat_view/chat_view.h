@@ -81,6 +81,7 @@ private:
     QColor otherUserColor = QColor(0, 65, 255); // dark blue
     QColor serverMessageColor = QColor(0x85, 0x15, 0x15);
     QColor linkColor;
+    QColor unresolvedCardTagColor;
 
 private slots:
     void openLink(const QUrl &link);

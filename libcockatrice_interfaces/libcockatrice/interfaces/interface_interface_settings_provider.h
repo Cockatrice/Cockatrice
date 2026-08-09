@@ -29,15 +29,16 @@ public:
     [[nodiscard]] virtual bool getHorizontalHand() const = 0;
     [[nodiscard]] virtual bool getInvertVerticalCoordinate() const = 0;
     [[nodiscard]] virtual int getMinPlayersForMultiColumnLayout() const = 0;
-    [[nodiscard]] virtual bool getOpenDeckInNewTab() const = 0;
     [[nodiscard]] virtual int getRewindBufferingMs() const = 0;
     [[nodiscard]] virtual qreal getFastForwardSpeed() const = 0;
-    [[nodiscard]] virtual bool getStyleUserList() const = 0;
+    [[nodiscard]] virtual bool getSkipEmptySections() const = 0;
     [[nodiscard]] virtual bool getLeftJustified() const = 0;
     [[nodiscard]] virtual int getZoneViewGroupByIndex() const = 0;
     [[nodiscard]] virtual int getZoneViewSortByIndex() const = 0;
     [[nodiscard]] virtual bool getZoneViewPileView() const = 0;
-    [[nodiscard]] virtual QString getKnownMissingFeatures() = 0;
+    [[nodiscard]] virtual bool getShowStatusBar() const = 0;
+    [[nodiscard]] virtual bool getShowShortcuts() const = 0;
+    [[nodiscard]] virtual bool getShowGameSelectorFilterToolbar() const = 0;
 };
 
 #endif // COCKATRICE_INTERFACE_INTERFACE_SETTINGS_PROVIDER_H

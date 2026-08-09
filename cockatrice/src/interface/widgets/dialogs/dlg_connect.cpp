@@ -271,6 +271,7 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     hostEdit->setText(_data.at(1));
     portEdit->setText(_data.at(2));
     playernameEdit->setText(_data.at(3));
+    playernameEdit->setFocus();
     savePasswordCheckBox->setChecked(savePasswordStatus);
 
     if (savePasswordStatus) {

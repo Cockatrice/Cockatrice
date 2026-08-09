@@ -243,9 +243,9 @@ void CockatriceXml4Parser::loadSetsFromXml(QXmlStreamReader &xml)
     }
 }
 
-QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &xml)
+QHash<QString, QString> CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &xml)
 {
-    QVariantHash properties = QVariantHash();
+    QHash<QString, QString> properties;
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
@@ -272,7 +272,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
         if (xmlName == "card") {
             QString name = QString("");
             QString text = QString("");
-            QVariantHash properties = QVariantHash();
+            QHash<QString, QString> properties;
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             auto _sets = SetToPrintingsMap();
             int tableRow = 0;
@@ -314,8 +314,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     QString setName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                     auto set = internalAddSet(setName);
                     if (set->getEnabled()) {
-                        PrintingInfo printingInfo(set);
-                        QVariantHash printingProps;
+                        QHash<QString, QString> printingProps;
                         for (QXmlStreamAttribute attr : attrs) {
                             QString attrName = attr.name().toString();
                             if (attrName == "picURL") {
@@ -323,7 +322,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                             }
                             printingProps.insert(attrName, attr.value().toString());
                         }
-                        printingInfo.setProperties(printingProps);
+                        PrintingInfo printingInfo(set, printingProps);
 
                         // This is very much a hack and not the right place to
                         // put this check, as it requires a reload of Cockatrice

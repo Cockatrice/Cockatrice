@@ -38,44 +38,38 @@ set(REQUIRED_QT_COMPONENTS ${REQUIRED_QT_COMPONENTS} ${_SERVATRICE_NEEDED} ${_CO
 )
 list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
 
-# Find Qt and all required components, as well as Linguist
+# Find Qt and all required components including Linguist
 find_package(
   Qt6
   COMPONENTS ${REQUIRED_QT_COMPONENTS} Linguist
   QUIET HINTS ${Qt6_DIR}
 )
 
-if(Qt6_FOUND)
-  set(COCKATRICE_QT_VERSION_NAME Qt6)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-  if(Qt6LinguistTools_FOUND)
-    list(FIND Qt6LinguistTools_TARGETS Qt6::lrelease QT6_LRELEASE_INDEX)
-    if(QT6_LRELEASE_INDEX EQUAL -1)
-      message(WARNING "Qt6 lrelease not found.")
-    endif()
-
-    list(FIND Qt6LinguistTools_TARGETS Qt6::lupdate QT6_LUPDATE_INDEX)
-    if(QT6_LUPDATE_INDEX EQUAL -1)
-      message(WARNING "Qt6 lupdate not found.")
-    endif()
-  else()
-    message(WARNING "Linguist Tools not found, cannot handle translations")
-  endif()
-else()
-  message(FATAL_ERROR "Qt6 not found")
+if(NOT Qt6_FOUND)
+  message(FATAL_ERROR "No suitable version of Qt was found")
 endif()
+set(COCKATRICE_QT_VERSION_NAME Qt6)
+
+list(FIND Qt6LinguistTools_TARGETS Qt6::lrelease QT6_LRELEASE_INDEX)
+if(QT6_LRELEASE_INDEX EQUAL -1)
+  message(WARNING "Qt6 lrelease not found.")
+endif()
+
+list(FIND Qt6LinguistTools_TARGETS Qt6::lupdate QT6_LUPDATE_INDEX)
+if(QT6_LUPDATE_INDEX EQUAL -1)
+  message(WARNING "Qt6 lupdate not found.")
+endif()
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Establish Qt Plugins directory & Library directories
 get_target_property(QT_LIBRARY_DIR ${COCKATRICE_QT_VERSION_NAME}::Core LOCATION)
 get_filename_component(QT_LIBRARY_DIR ${QT_LIBRARY_DIR} DIRECTORY)
-if(Qt6_FOUND)
-  get_filename_component(QT_PLUGINS_DIR "${Qt6Core_DIR}/../../../${QT6_INSTALL_PLUGINS}" ABSOLUTE)
-  get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/../../.." ABSOLUTE)
-  if(UNIX AND APPLE)
-    # Mac needs a bit more help finding all necessary components
-    list(APPEND QT_LIBRARY_DIR "/usr/local/lib")
-  endif()
+get_filename_component(QT_PLUGINS_DIR "${Qt6Core_DIR}/../../../${QT6_INSTALL_PLUGINS}" ABSOLUTE)
+get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/../../.." ABSOLUTE)
+if(UNIX AND APPLE)
+  # Mac needs a bit more help finding all necessary components
+  list(APPEND QT_LIBRARY_DIR "/usr/local/lib")
 endif()
 message(DEBUG "QT_PLUGINS_DIR = ${QT_PLUGINS_DIR}")
 message(DEBUG "QT_LIBRARY_DIR = ${QT_LIBRARY_DIR}")

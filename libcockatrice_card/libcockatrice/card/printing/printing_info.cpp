@@ -5,7 +5,12 @@
 #include <QDataStream>
 #include <QIODevice>
 
-PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
+PrintingInfo::PrintingInfo(const CardSetPtr &_set, const QHash<QString, QString> &_properties)
+    : set(_set), propertiesCache(_properties), propertiesLoaded(true)
+{
+}
+
+PrintingInfo::PrintingInfo(const CardSetPtr &_set, const QByteArray &_blob) : set(_set), propertiesBlob(_blob)
 {
 }
 
@@ -27,20 +32,10 @@ void PrintingInfo::ensurePropertiesLoaded() const
 void PrintingInfo::setProperty(const QString &_name, const QString &_value)
 {
     ensurePropertiesLoaded();
-    if (propertiesCache.value(_name).toString() == _value) {
+    if (propertiesCache.value(_name) == _value) {
         return;
     }
     propertiesCache.insert(_name, _value);
-    setProperties(propertiesCache);
-}
-
-void PrintingInfo::setProperties(const QVariantHash &_props)
-{
-    ensurePropertiesLoaded();
-    propertiesCache = _props;
-    QDataStream out(&propertiesBlob, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_4);
-    out << propertiesCache;
 }
 
 /**
@@ -48,10 +43,10 @@ void PrintingInfo::setProperties(const QVariantHash &_props)
  */
 QString PrintingInfo::getUuid() const
 {
-    return getPropertiesHash().value("uuid").toString();
+    return getPropertiesHash().value("uuid");
 }
 
 QString PrintingInfo::getFlavorName() const
 {
-    return getPropertiesHash().value("flavorName").toString();
+    return getPropertiesHash().value("flavorName");
 }

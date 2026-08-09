@@ -9,7 +9,7 @@ CardDatabaseSettings::CardDatabaseSettings(const QString &settingPath, QObject *
 
 void CardDatabaseSettings::setSortKey(QString shortName, unsigned int sortKey)
 {
-    setValue(sortKey, "sortkey", "sets", shortName);
+    setValue(sortKey, "sortKey", "sets", shortName);
     QMutexLocker lock(&setOptionsMutex);
     ensureSetOptionsLoaded();
     setOptionsCache[shortName].sortKey = sortKey;
@@ -25,7 +25,7 @@ void CardDatabaseSettings::setEnabled(QString shortName, bool enabled)
 
 void CardDatabaseSettings::setIsKnown(QString shortName, bool isknown)
 {
-    setValue(isknown, "isknown", "sets", shortName);
+    setValue(isknown, "isKnown", "sets", shortName);
     QMutexLocker lock(&setOptionsMutex);
     ensureSetOptionsLoaded();
     setOptionsCache[shortName].isKnown = isknown;
@@ -42,9 +42,9 @@ void CardDatabaseSettings::ensureSetOptionsLoaded() const
     for (const QString &group : groups) {
         settings.beginGroup(group);
         SetOptions &o = setOptionsCache[group];
-        o.sortKey = settings.value("sortkey", 0).toUInt();
+        o.sortKey = settings.value("sortKey", 0).toUInt();
         o.enabled = settings.value("enabled", true).toBool();
-        o.isKnown = settings.value("isknown", true).toBool();
+        o.isKnown = settings.value("isKnown", true).toBool();
         settings.endGroup();
     }
     setOptionsLoaded = true;
@@ -84,7 +84,7 @@ void CardDatabaseSettings::saveSets(const QVector<ICardSetPriorityController::Se
         s.beginGroup("sets");
         for (const auto &entry : data) {
             s.beginGroup(entry.shortName);
-            s.setValue("sortkey", entry.sortKey);
+            s.setValue("sortKey", entry.sortKey);
             s.setValue("enabled", entry.enabled);
             s.endGroup();
         }

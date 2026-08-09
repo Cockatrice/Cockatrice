@@ -58,7 +58,7 @@ bool ZoneViewZoneLogic::prepareAddCard(int x)
 
     // autoclose check is done both here and in removeCard
 
-    if (cards.isEmpty() && !doInsert && SettingsCache::instance().interface().getCloseEmptyCardView()) {
+    if (cards.isEmpty() && !doInsert && SettingsCache::instance().userInterface().getCloseEmptyCardView()) {
         emit closeView();
     }
 
@@ -145,7 +145,7 @@ void ZoneViewZoneLogic::removeCard(int position, bool toNewZone)
     // card gets dragged within the view.
     // Another autoclose check is done in prepareAddCard so that the view autocloses if the last card was moved to an
     // unrevealed portion of the same zone.
-    if (cards.isEmpty() && SettingsCache::instance().interface().getCloseEmptyCardView() && toNewZone) {
+    if (cards.isEmpty() && SettingsCache::instance().userInterface().getCloseEmptyCardView() && toNewZone) {
         emit closeView();
         return;
     }

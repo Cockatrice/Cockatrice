@@ -32,8 +32,17 @@ public:
      * @brief Constructs a PrintingInfo associated with a specific set.
      *
      * @param _set The set this printing belongs to (defaults to null).
+     * @param _properties The printing properties (defaults to empty)
      */
-    explicit PrintingInfo(const CardSetPtr &_set = nullptr);
+    explicit PrintingInfo(const CardSetPtr &_set = nullptr, const QHash<QString, QString> &_properties = {});
+
+    /**
+     * @brief Constructs a PrintingInfo associated with a specific set.
+     *
+     * @param _set The set this printing belongs to (defaults to null).
+     * @param _blob The serialized properties (as written by the cache writer).
+     */
+    explicit PrintingInfo(const CardSetPtr &_set, const QByteArray &_blob);
 
     /**
      * @brief Destroys the PrintingInfo.
@@ -70,11 +79,11 @@ private:
     CardSetPtr set; ///< The set this variation belongs to.
 
     // Properties are stored as a pre-serialized blob (cheap to load) and the
-    // QVariantHash is materialized on first query. This avoids constructing
-    // thousands of QVariants per card at database-load time.
-    mutable QByteArray propertiesBlob;     ///< Serialized properties (load form).
-    mutable QVariantHash propertiesCache;  ///< Materialized properties (query form).
-    mutable bool propertiesLoaded = false; ///< Whether propertiesCache is valid.
+    // QHash<QString, QString> is materialized on first query. This avoids constructing
+    // thousands of QStrings per card at database-load time.
+    mutable QByteArray propertiesBlob;               ///< Serialized properties (load form).
+    mutable QHash<QString, QString> propertiesCache; ///< Materialized properties (query form).
+    mutable bool propertiesLoaded = false;           ///< Whether propertiesCache is valid.
     mutable QSharedPointer<QBasicMutex> propertiesMutex =
         QSharedPointer<QBasicMutex>::create(); ///< Guards lazy materialization.
 
@@ -101,7 +110,7 @@ public:
         return getPropertiesHash().keys();
     }
 
-    [[nodiscard]] const QVariantHash &getPropertiesHash() const
+    [[nodiscard]] const QHash<QString, QString> &getPropertiesHash() const
     {
         ensurePropertiesLoaded();
         return propertiesCache;
@@ -115,7 +124,7 @@ public:
      */
     [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
-        return getPropertiesHash().value(propertyName).toString();
+        return getPropertiesHash().value(propertyName);
     }
 
     /**
@@ -127,21 +136,6 @@ public:
      * @param _value The string value to assign.
      */
     void setProperty(const QString &_name, const QString &_value);
-    void setProperties(const QVariantHash &_props);
-
-    /**
-     * @brief Stores the pre-serialized properties blob and marks the materialized
-     *        cache as invalid. Used by the binary cache reader to avoid building a
-     *        QVariantHash at load time.
-     * @param _blob The serialized properties (as written by the cache writer).
-     */
-    void setPropertiesBlob(QByteArray _blob) const
-    {
-        QMutexLocker lock(propertiesMutex.data());
-        propertiesBlob = std::move(_blob);
-        propertiesLoaded = false;
-        propertiesCache.clear();
-    }
 
     /**
      * @brief Returns the providerID for this printing.

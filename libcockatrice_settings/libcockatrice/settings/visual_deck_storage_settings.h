@@ -20,7 +20,6 @@ public:
     [[nodiscard]] bool getVisualDeckStorageShowColorIdentity() const override;
     [[nodiscard]] bool getVisualDeckStorageShowBannerCardComboBox() const override;
     [[nodiscard]] bool getVisualDeckStorageShowTagsOnDeckPreviews() const override;
-    [[nodiscard]] int getVisualDeckStorageCardSize() const override;
     [[nodiscard]] bool getVisualDeckStorageDrawUnusedColorIdentities() const override;
     [[nodiscard]] int getVisualDeckStorageUnusedColorIdentitiesOpacity() const override;
     [[nodiscard]] int getVisualDeckStorageTooltipType() const override;
@@ -28,14 +27,8 @@ public:
     [[nodiscard]] bool getVisualDeckStorageAlwaysConvert() const override;
     [[nodiscard]] bool getVisualDeckStorageInGame() const override;
     [[nodiscard]] bool getVisualDeckStorageSelectionAnimation() const override;
-    [[nodiscard]] int getVisualDeckEditorCardSize() const override;
-    [[nodiscard]] int getVisualDeckEditorSampleHandSize() const override;
-    [[nodiscard]] int getVisualDatabaseDisplayCardSize() const override;
     [[nodiscard]] bool getVisualDatabaseDisplayFilterToMostRecentSetsEnabled() const override;
     [[nodiscard]] int getVisualDatabaseDisplayFilterToMostRecentSetsAmount() const override;
-    [[nodiscard]] int getEDHRecCardSize() const override;
-    [[nodiscard]] int getArchidektPreviewSize() const override;
-    [[nodiscard]] int getDefaultDeckEditorType() const override;
 
     void setVisualDeckStorageSortingOrder(int _sortingOrder);
     void setVisualDeckStorageShowFolders(bool value);
@@ -45,7 +38,6 @@ public:
     void setVisualDeckStorageShowColorIdentity(bool value);
     void setVisualDeckStorageShowBannerCardComboBox(bool _showBannerCardComboBox);
     void setVisualDeckStorageShowTagsOnDeckPreviews(bool _showTags);
-    void setVisualDeckStorageCardSize(int _cardSize);
     void setVisualDeckStorageDrawUnusedColorIdentities(bool _draw);
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _opacity);
     void setVisualDeckStorageTooltipType(int value);
@@ -53,14 +45,8 @@ public:
     void setVisualDeckStorageAlwaysConvert(bool _always);
     void setVisualDeckStorageInGame(bool enabled);
     void setVisualDeckStorageSelectionAnimation(bool enabled);
-    void setVisualDeckEditorCardSize(int _cardSize);
-    void setVisualDeckEditorSampleHandSize(int _amount);
-    void setVisualDatabaseDisplayCardSize(int _cardSize);
     void setVisualDatabaseDisplayFilterToMostRecentSetsEnabled(bool _enabled);
     void setVisualDatabaseDisplayFilterToMostRecentSetsAmount(int _amount);
-    void setEDHRecCardSize(int _edhrecCardSize);
-    void setArchidektPreviewCardSize(int _archidektPreviewCardSize);
-    void setDefaultDeckEditorType(int value);
 
 signals:
     void visualDeckStorageShowTagFilterChanged(bool _visible);
@@ -68,18 +54,12 @@ signals:
     void visualDeckStorageShowColorIdentityChanged(bool _visible);
     void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
-    void visualDeckStorageCardSizeChanged();
     void visualDeckStorageDrawUnusedColorIdentitiesChanged(bool _visible);
     void visualDeckStorageUnusedColorIdentitiesOpacityChanged(bool value);
     void visualDeckStorageInGameChanged(bool enabled);
     void visualDeckStorageSelectionAnimationChanged(bool enabled);
     void visualDatabaseDisplayFilterToMostRecentSetsEnabledChanged(bool enabled);
     void visualDatabaseDisplayFilterToMostRecentSetsAmountChanged(int amount);
-    void visualDeckEditorSampleHandSizeAmountChanged(int amount);
-    void visualDeckEditorCardSizeChanged();
-    void visualDatabaseDisplayCardSizeChanged();
-    void edhRecCardSizeChanged();
-    void archidektPreviewSizeChanged();
 
 public:
     explicit VisualDeckStorageSettings(const QString &settingPath, QObject *parent = nullptr);

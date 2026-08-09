@@ -1,7 +1,7 @@
 #include "cache_storage_settings.h"
 
 CacheStorageSettings::CacheStorageSettings(const QString &settingPath, QObject *parent)
-    : SettingsManager(settingPath + "cache_storage.ini", "personal", QString(), parent)
+    : SettingsManager(settingPath + "cache_storage.ini", "cache_storage", QString(), parent)
 {
 }
 

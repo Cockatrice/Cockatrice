@@ -39,9 +39,21 @@
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
-#include <libcockatrice/settings/visual_deck_storage_settings.h>
+
+QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
+{
+    if (element != SE_TabBarTabText) {
+        return QProxyStyle::subElementRect(element, option, widget);
+    }
+
+    // Skip over QProxyStyle handling subElementRect,
+    // This fixes an issue on OSX where the labels for tabs with a button and an icon
+    // get cut-off too early
+    return QCommonStyle::subElementRect(element, option, widget);
+}
 
 CloseButton::CloseButton(QWidget *parent) : QAbstractButton(parent)
 {
@@ -105,6 +117,12 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     setElideMode(Qt::ElideRight);
     setMovable(true);
     setIconSize(QSize(15, 15));
+
+#if defined(Q_OS_MAC)
+    // This is necessary to fix an issue on macOS,
+    // where tabs with icons and buttons get drawn incorrectly
+    tabBar()->setStyle(new MacOSTabFixStyle);
+#endif
 
     userListManager = new UserListManager(client, this);
 
@@ -565,6 +583,11 @@ void TabSupervisor::actTabServer(bool checked)
 
 void TabSupervisor::openTabServer()
 {
+    SettingsCache::instance().tabs().setTabServerOpen(true);
+    if (tabServer) {
+        return;
+    }
+
     tabServer = new TabServer(this, client);
     connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
     myAddTab(tabServer, aTabServer);
@@ -888,7 +911,7 @@ void TabSupervisor::talkLeft(TabMessage *tab)
  */
 void TabSupervisor::openDeckInNewTab(const LoadedDeck &deckToOpen)
 {
-    int type = SettingsCache::instance().visualDeckStorage().getDefaultDeckEditorType();
+    int type = SettingsCache::instance().deckEditor().getDefaultDeckEditorType();
     switch (type) {
         case ClassicDeckEditor:
             addDeckEditorTab(deckToOpen);
@@ -987,7 +1010,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
         tab->setContentsChanged(true);
         setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
     }
-    if (globalEvent && SettingsCache::instance().interface().getNotificationsEnabled()) {
+    if (globalEvent && SettingsCache::instance().userInterface().getNotificationsEnabled()) {
         QApplication::alert(this);
     }
 }
@@ -1082,7 +1105,7 @@ void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
             }
         }
 
-        if (SettingsCache::instance().interface().getBuddyConnectNotificationsEnabled()) {
+        if (SettingsCache::instance().userInterface().getBuddyConnectNotificationsEnabled()) {
             QApplication::alert(this);
             this->actShowPopup(tr("Your buddy %1 has signed on!").arg(userName));
         }

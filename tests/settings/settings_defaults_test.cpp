@@ -1,9 +1,15 @@
 #include "gtest/gtest.h"
 #include <QSettings>
 #include <QTemporaryDir>
+#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
+#include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/game_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/sound_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
@@ -258,64 +264,216 @@ TEST_F(SettingsDefaultsTest, Personal_Lang_Default)
     ASSERT_EQ(s.getLang(), QString(""));
 }
 
-TEST_F(SettingsDefaultsTest, Personal_ClientID_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getClientID(), QString("notset"));
-}
-
-TEST_F(SettingsDefaultsTest, Personal_KeepAlive_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getKeepAlive(), 3);
-}
-
-TEST_F(SettingsDefaultsTest, Personal_TimeOut_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getTimeOut(), 5);
-}
-
-TEST_F(SettingsDefaultsTest, Personal_PicDownload_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getPicDownload(), true);
-}
-
-TEST_F(SettingsDefaultsTest, Personal_ShowStatusBar_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getShowStatusBar(), false);
-}
-
-TEST_F(SettingsDefaultsTest, Personal_MaxFontSize_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getMaxFontSize(), 12);
-}
-
-TEST_F(SettingsDefaultsTest, Personal_HomeTabBackgroundSource_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getHomeTabBackgroundSource(), QString("themed"));
-}
-
-TEST_F(SettingsDefaultsTest, Personal_HomeTabDisplayCardName_Default)
-{
-    PersonalSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getHomeTabDisplayCardName(), true);
-}
-
 TEST_F(SettingsDefaultsTest, Personal_ShowTipsOnStartup_Default)
 {
     PersonalSettings s(settingsPath, nullptr);
     ASSERT_EQ(s.getShowTipsOnStartup(), true);
 }
 
-TEST_F(SettingsDefaultsTest, Personal_DownloadSpoilersStatus_Default)
+// --- DownloadSettings ---
+
+TEST_F(SettingsDefaultsTest, Download_PicDownload_Default)
 {
-    PersonalSettings s(settingsPath, nullptr);
+    DownloadSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getPicDownload(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Download_DownloadSpoilersStatus_Default)
+{
+    DownloadSettings s(settingsPath, nullptr);
     ASSERT_EQ(s.getDownloadSpoilersStatus(), false);
+}
+
+// --- AppearanceSettings ---
+
+TEST_F(SettingsDefaultsTest, Appearance_ThemeName_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getThemeName(), QString(""));
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_ThemeName_SetAndGet)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    s.setThemeName("my_theme");
+    ASSERT_EQ(s.getThemeName(), QString("my_theme"));
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_StyleUserList_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getStyleUserList(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_MaxFontSize_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getMaxFontSize(), 12);
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_MaxFontSize_SetAndGet)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    s.setMaxFontSize(14);
+    ASSERT_EQ(s.getMaxFontSize(), 14);
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_HomeTabBackgroundSource_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHomeTabBackgroundSource(), QString("themed"));
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_HomeTabBackgroundShuffleFrequency_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHomeTabBackgroundShuffleFrequency(), 0);
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_HomeTabDisplayCardName_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHomeTabDisplayCardName(), true);
+}
+
+// --- InterfaceSettings ---
+
+TEST_F(SettingsDefaultsTest, Interface_ShowStatusBar_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getShowStatusBar(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_ShowShortcuts_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getShowShortcuts(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_ShowGameSelectorFilterToolbar_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getShowGameSelectorFilterToolbar(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_NotificationsEnabled_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getNotificationsEnabled(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_SpectatorNotificationsEnabled_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getSpectatorNotificationsEnabled(), false);
+}
+
+TEST_F(SettingsDefaultsTest, Interface_BuddyConnectNotificationsEnabled_Default)
+{
+    InterfaceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getBuddyConnectNotificationsEnabled(), true);
+}
+
+// --- DeckEditorSettings ---
+
+TEST_F(SettingsDefaultsTest, DeckEditor_OpenDeckInNewTab_Default)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getOpenDeckInNewTab(), false);
+}
+
+TEST_F(SettingsDefaultsTest, DeckEditor_BannerCardComboBoxVisible_Default)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getBannerCardComboBoxVisible(), true);
+}
+
+TEST_F(SettingsDefaultsTest, DeckEditor_TagsWidgetVisible_Default)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getTagsWidgetVisible(), true);
+}
+
+TEST_F(SettingsDefaultsTest, DeckEditor_DefaultDeckEditorType_Default)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getDefaultDeckEditorType(), 1);
+}
+
+// --- NetworkSettings ---
+
+TEST_F(SettingsDefaultsTest, Network_ClientID_Default)
+{
+    NetworkSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getClientID(), QString("notset"));
+}
+
+TEST_F(SettingsDefaultsTest, Network_ClientVersion_Default)
+{
+    NetworkSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getClientVersion(), QString("notset"));
+}
+
+TEST_F(SettingsDefaultsTest, Network_KeepAlive_Default)
+{
+    NetworkSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getKeepAlive(), 3);
+}
+
+TEST_F(SettingsDefaultsTest, Network_TimeOut_Default)
+{
+    NetworkSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getTimeOut(), 5);
+}
+
+TEST_F(SettingsDefaultsTest, Network_KnownMissingFeatures_Default)
+{
+    NetworkSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getKnownMissingFeatures(), QString(""));
+}
+
+// --- CardsDisplaySettings ---
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_PrintingSelectorCardSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getPrintingSelectorCardSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckStorageCardSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDeckStorageCardSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDatabaseDisplayCardSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDatabaseDisplayCardSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_VisualDeckEditorCardSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDeckEditorCardSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_EDHRecCardSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getEDHRecCardSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_ArchidektPreviewSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getArchidektPreviewSize(), 100);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_SampleHandSize_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getSampleHandSize(), 7);
 }
 
 // --- VisualDeckStorageSettings ---

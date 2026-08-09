@@ -7,160 +7,160 @@ GameSettings::GameSettings(const QString &settingPath, QObject *parent)
 
 QString GameSettings::getGameDescription() const
 {
-    return getValue("gamedescription", "game").toString();
+    return getValue("gameDescription", "game").toString();
 }
 
 int GameSettings::getMaxPlayers() const
 {
-    return getValue("maxplayers", "game", QString(), 2).toInt();
+    return getValue("maxPlayers", "game", QString(), 2).toInt();
 }
 
 QString GameSettings::getGameTypes() const
 {
-    return getValue("gametypes", "game").toString();
+    return getValue("gameTypes", "game").toString();
 }
 
 bool GameSettings::getOnlyBuddies() const
 {
-    return getValue("onlybuddies", "game").toBool();
+    return getValue("onlyBuddies", "game").toBool();
 }
 
 bool GameSettings::getOnlyRegistered() const
 {
-    return getValue("onlyregistered", "game").toBool();
+    return getValue("onlyRegistered", "game").toBool();
 }
 
 bool GameSettings::getSpectatorsAllowed() const
 {
-    return getValue("spectatorsallowed", "game").toBool();
+    return getValue("spectatorsAllowed", "game").toBool();
 }
 
 bool GameSettings::getSpectatorsNeedPassword() const
 {
-    return getValue("spectatorsneedpassword", "game").toBool();
+    return getValue("spectatorsNeedPassword", "game").toBool();
 }
 
 bool GameSettings::getSpectatorsCanTalk() const
 {
-    return getValue("spectatorscantalk", "game").toBool();
+    return getValue("spectatorsCanTalk", "game").toBool();
 }
 
 bool GameSettings::getSpectatorsCanSeeEverything() const
 {
-    return getValue("spectatorscanseeeverything", "game").toBool();
+    return getValue("spectatorsCanSeeEverything", "game").toBool();
 }
 
 bool GameSettings::getCreateGameAsSpectator() const
 {
-    return getValue("creategameasspectator", "game").toBool();
+    return getValue("createGameAsSpectator", "game").toBool();
 }
 
 int GameSettings::getDefaultStartingLifeTotal() const
 {
-    return getValue("defaultstartinglifetotal", "game", QString(), 20).toInt();
+    return getValue("defaultStartingLifeTotal", "game", QString(), 20).toInt();
 }
 
 bool GameSettings::getShareDecklistsOnLoad() const
 {
-    return getValue("sharedecklistsonload", "game").toBool();
+    return getValue("shareDecklistsOnLoad", "game").toBool();
 }
 
 bool GameSettings::getRememberGameSettings() const
 {
-    return getValue("remembergamesettings", "game", QString(), true).toBool();
+    return getValue("rememberGameSettings", "game", QString(), true).toBool();
 }
 
 bool GameSettings::getLocalGameRememberSettings() const
 {
-    return getValue("remembersettings", "localgameoptions").toBool();
+    return getValue("rememberSettings", "localgameoptions").toBool();
 }
 
 int GameSettings::getLocalGameMaxPlayers() const
 {
-    return getValue("maxplayers", "localgameoptions", QString(), 1).toInt();
+    return getValue("maxPlayers", "localgameoptions", QString(), 1).toInt();
 }
 
 int GameSettings::getLocalGameStartingLifeTotal() const
 {
-    return getValue("startinglifetotal", "localgameoptions", QString(), 20).toInt();
+    return getValue("startingLifeTotal", "localgameoptions", QString(), 20).toInt();
 }
 
 void GameSettings::setGameDescription(const QString &_gameDescription)
 {
-    setValue(_gameDescription, "gamedescription", "game");
+    setValue(_gameDescription, "gameDescription", "game");
 }
 
 void GameSettings::setMaxPlayers(int _maxPlayers)
 {
-    setValue(_maxPlayers, "maxplayers", "game");
+    setValue(_maxPlayers, "maxPlayers", "game");
 }
 
 void GameSettings::setGameTypes(const QString &_gameTypes)
 {
-    setValue(_gameTypes, "gametypes", "game");
+    setValue(_gameTypes, "gameTypes", "game");
 }
 
 void GameSettings::setOnlyBuddies(bool _onlyBuddies)
 {
-    setValue(_onlyBuddies, "onlybuddies", "game");
+    setValue(_onlyBuddies, "onlyBuddies", "game");
 }
 
 void GameSettings::setOnlyRegistered(bool _onlyRegistered)
 {
-    setValue(_onlyRegistered, "onlyregistered", "game");
+    setValue(_onlyRegistered, "onlyRegistered", "game");
 }
 
 void GameSettings::setSpectatorsAllowed(bool _spectatorsAllowed)
 {
-    setValue(_spectatorsAllowed, "spectatorsallowed", "game");
+    setValue(_spectatorsAllowed, "spectatorsAllowed", "game");
 }
 
 void GameSettings::setSpectatorsNeedPassword(bool _spectatorsNeedPassword)
 {
-    setValue(_spectatorsNeedPassword, "spectatorsneedpassword", "game");
+    setValue(_spectatorsNeedPassword, "spectatorsNeedPassword", "game");
 }
 
 void GameSettings::setSpectatorsCanTalk(bool _spectatorsCanTalk)
 {
-    setValue(_spectatorsCanTalk, "spectatorscantalk", "game");
+    setValue(_spectatorsCanTalk, "spectatorsCanTalk", "game");
 }
 
 void GameSettings::setSpectatorsCanSeeEverything(bool _spectatorsCanSeeEverything)
 {
-    setValue(_spectatorsCanSeeEverything, "spectatorscanseeeverything", "game");
+    setValue(_spectatorsCanSeeEverything, "spectatorsCanSeeEverything", "game");
 }
 
 void GameSettings::setCreateGameAsSpectator(bool _createGameAsSpectator)
 {
-    setValue(_createGameAsSpectator, "creategameasspectator", "game");
+    setValue(_createGameAsSpectator, "createGameAsSpectator", "game");
 }
 
 void GameSettings::setDefaultStartingLifeTotal(int _defaultStartingLifeTotal)
 {
-    setValue(_defaultStartingLifeTotal, "defaultstartinglifetotal", "game");
+    setValue(_defaultStartingLifeTotal, "defaultStartingLifeTotal", "game");
 }
 
 void GameSettings::setShareDecklistsOnLoad(bool _shareDecklistsOnLoad)
 {
-    setValue(_shareDecklistsOnLoad, "sharedecklistsonload", "game");
+    setValue(_shareDecklistsOnLoad, "shareDecklistsOnLoad", "game");
 }
 
 void GameSettings::setRememberGameSettings(bool _rememberGameSettings)
 {
-    setValue(_rememberGameSettings, "remembergamesettings", "game");
+    setValue(_rememberGameSettings, "rememberGameSettings", "game");
 }
 
 void GameSettings::setLocalGameRememberSettings(bool value)
 {
-    setValue(value, "remembersettings", "localgameoptions");
+    setValue(value, "rememberSettings", "localgameoptions");
 }
 
 void GameSettings::setLocalGameMaxPlayers(int value)
 {
-    setValue(value, "maxplayers", "localgameoptions");
+    setValue(value, "maxPlayers", "localgameoptions");
 }
 
 void GameSettings::setLocalGameStartingLifeTotal(int value)
 {
-    setValue(value, "startinglifetotal", "localgameoptions");
+    setValue(value, "startingLifeTotal", "localgameoptions");
 }
