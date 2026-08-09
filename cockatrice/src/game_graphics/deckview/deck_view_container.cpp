@@ -124,7 +124,6 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
             &DeckViewContainer::onPlaymatSettingsChanged);
 
     switchToDeckSelectView();
-    generateTutorialSequence();
 }
 
 TutorialSequence DeckViewContainer::generateTutorialSequence()

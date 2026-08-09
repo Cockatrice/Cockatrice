@@ -300,7 +300,9 @@ void TutorialOverlay::recomputeLayout()
         return;
     }
 
-    resize(parentWidget()->window()->geometry().size());
+    // The overlay is parented to the top-level window; its client size (rect())
+    // is the visible area, whereas window()->geometry() includes the frame.
+    resize(parentWidget()->size());
 
     bubble->adjustSize();
 
