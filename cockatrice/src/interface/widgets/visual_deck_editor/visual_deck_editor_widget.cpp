@@ -525,7 +525,7 @@ TutorialSequence VisualDeckEditorWidget::addTutorialSteps()
 
     sequence.addStep(hoverStep);
 
-    sequence = displayOptionsWidget->generateTutorialSequence(sequence);
+    displayOptionsWidget->generateTutorialSequence(sequence);
 
     TutorialStep conclusionStep;
     conclusionStep.targetWidget = this;

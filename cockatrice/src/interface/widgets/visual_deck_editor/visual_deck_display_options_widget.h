@@ -89,7 +89,7 @@ public:
         return activeSortCriteria;
     }
 
-    TutorialSequence generateTutorialSequence(TutorialSequence sequence);
+    void generateTutorialSequence(TutorialSequence &sequence);
 
 private slots:
     /**
