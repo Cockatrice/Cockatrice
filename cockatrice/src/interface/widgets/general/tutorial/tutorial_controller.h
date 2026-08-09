@@ -15,6 +15,8 @@ enum class ValidationTiming
     Manual     // Only validate when explicitly triggered
 };
 
+class TutorialController;
+
 struct TutorialStep
 {
     QWidget *targetWidget = nullptr;
@@ -35,9 +37,11 @@ struct TutorialStep
     // Custom interaction hint (overrides default "Click to continue")
     QString customInteractionHint = nullptr;
 
-    // Signal-based validation (for ValidationTiming::OnSignal)
-    QObject *signalSource = nullptr;  // Object that emits the signal
-    const char *signalName = nullptr; // Signal to connect to (use SIGNAL() macro)
+    // Establishes the connection used for signal-based validation (ValidationTiming::OnSignal).
+    // Called with the controller so call sites can connect a specific signal to
+    // TutorialController::checkValidation using pointer-to-member, which is checked at
+    // compile time unlike string-based SIGNAL() connections.
+    std::function<QMetaObject::Connection(TutorialController *)> signalHook = nullptr;
 };
 
 struct TutorialSequence

@@ -294,10 +294,8 @@ void TutorialController::setupValidationMonitoring()
     const auto &step = sequences[currentSequence].steps[currentStep];
 
     // Handle OnSignal validation - connect to any custom signal
-    if (step.validationTiming == ValidationTiming::OnSignal && step.validator) {
-        if (step.signalSource && step.signalName) {
-            validationConnection = connect(step.signalSource, step.signalName, this, SLOT(checkValidation()));
-        }
+    if (step.validationTiming == ValidationTiming::OnSignal && step.signalHook) {
+        validationConnection = step.signalHook(this);
         return;
     }
 
