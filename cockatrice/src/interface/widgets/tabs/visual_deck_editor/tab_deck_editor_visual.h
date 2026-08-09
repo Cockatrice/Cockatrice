@@ -60,6 +60,11 @@ private:
     TutorialController *tutorialController = nullptr;
     bool tutorialStarted = false;
 
+    /**
+     * @brief Build and register all tutorial sequences for this tab.
+     */
+    void createTutorialSequences();
+
 protected slots:
     void showEvent(QShowEvent *ev) override;
     /**

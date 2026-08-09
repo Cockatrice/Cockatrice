@@ -60,7 +60,11 @@ TabDeckEditorVisual::TabDeckEditorVisual(TabSupervisor *_tabSupervisor) : Abstra
     filterDockWidget->setHidden(true);
     cardDatabaseDockWidget->setHidden(true);
     tutorialController = new TutorialController(this);
+    createTutorialSequences();
+}
 
+void TabDeckEditorVisual::createTutorialSequences()
+{
     auto deckDockSequence = deckDockWidget->generateTutorialSequence();
 
     tutorialController->addSequence(deckDockSequence);
