@@ -157,7 +157,7 @@ void VisualDeckDisplayOptionsWidget::updateDisplayType()
     emit displayTypeChanged(currentDisplayType);
 }
 
-TutorialSequence VisualDeckDisplayOptionsWidget::generateTutorialSequence(TutorialSequence sequence)
+void VisualDeckDisplayOptionsWidget::generateTutorialSequence(TutorialSequence &sequence)
 {
     TutorialStep introStep;
     introStep.targetWidget = this;
@@ -213,8 +213,6 @@ TutorialSequence VisualDeckDisplayOptionsWidget::generateTutorialSequence(Tutori
     sortStep.validator = []() { return true; };
 
     sequence.addStep(sortStep);
-
-    return sequence;
 }
 
 void VisualDeckDisplayOptionsWidget::updateCompactMode(bool mode)

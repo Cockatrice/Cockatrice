@@ -97,7 +97,7 @@ public:
         return activeSortCriteria;
     }
 
-    TutorialSequence generateTutorialSequence(TutorialSequence sequence);
+    void generateTutorialSequence(TutorialSequence &sequence);
 
 protected:
     /** @brief Retranslates on QEvent::LanguageChange. */
