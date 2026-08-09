@@ -3,9 +3,11 @@
 #include "../../../client/settings/cache_settings.h"
 
 #include <QTimer>
+#include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/settings/interface_settings.h>
 
 static constexpr int TIMER_INTERVAL_MS = 200;
+static constexpr int EMPTY_SECTION_MARGIN_MS = 500;
 
 static QList<int> createReplayTimeline(const GameReplay *replay)
 {
@@ -119,6 +121,10 @@ void ReplayManager::replayTimerTimeout()
     processNewEvents(NORMAL_PLAYBACK);
 
     timeChanged(currentVisualTime);
+
+    if (skipEmptySections) {
+        handleSkipEmptySection();
+    }
 }
 
 /** @brief Processes all unprocessed events up to the current time. */
@@ -149,11 +155,61 @@ void ReplayManager::processNewEvents(PlaybackMode playbackMode)
     }
 }
 
+static bool hasMeaningfulEvent(const GameEventContainer &cont)
+{
+    const int eventListSize = cont.event_list_size();
+    for (int i = 0; i < eventListSize; ++i) {
+        const GameEvent &event = cont.event_list(i);
+        const auto eventType = static_cast<GameEvent::GameEventType>(getPbExtension(event));
+
+        if (eventType != GameEvent::PLAYER_PROPERTIES_CHANGED) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void ReplayManager::handleSkipEmptySection()
+{
+    if (currentEvent == replayTimeline.size()) {
+        return;
+    }
+
+    // find most recent meaningful event
+    int prevEvent = std::max(0, currentEvent - 1);
+    for (; prevEvent > 0 && !hasMeaningfulEvent(replay->event_list(prevEvent)); --prevEvent) {
+    }
+
+    int prevEventTime = replayTimeline.value(prevEvent);
+    if (currentVisualTime - prevEventTime <= EMPTY_SECTION_MARGIN_MS) {
+        return;
+    }
+
+    // find next earliest meaningful event
+    int nextEvent = currentEvent;
+    for (; nextEvent < replayTimeline.size() - 1 && !hasMeaningfulEvent(replay->event_list(nextEvent)); ++nextEvent) {
+    }
+
+    int nextEventTime = replayTimeline.value(nextEvent);
+    if (nextEventTime - currentVisualTime <= EMPTY_SECTION_MARGIN_MS) {
+        return;
+    }
+
+    // skip forward if we're not within margin of either event
+    skipToTime(nextEventTime - EMPTY_SECTION_MARGIN_MS, false);
+}
+
 void ReplayManager::setTimeScaleFactor(qreal _timeScaleFactor)
 {
     timeScaleFactor = _timeScaleFactor;
     int interval = std::max(1, qRound(TIMER_INTERVAL_MS / timeScaleFactor));
     replayTimer->setInterval(interval);
+}
+
+void ReplayManager::setSkipEmptySections(bool value)
+{
+    skipEmptySections = value;
 }
 
 void ReplayManager::startReplay()
