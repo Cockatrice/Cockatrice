@@ -2,6 +2,7 @@
 
 #include "../../../../client/settings/cache_settings.h"
 #include "../../../card_picture_loader/card_picture_loader.h"
+#include "../../cards/art_crop_attribution.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_account.h"

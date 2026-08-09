@@ -95,6 +95,7 @@ private:
     QPixmap avatar;
     QPixmap cardArt;
     CardArtParams params;
+    QString attribution;
 };
 
 // ── Main popup ────────────────────────────────────────────────────────────────

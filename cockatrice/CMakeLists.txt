@@ -160,6 +160,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
     src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
     src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
+    src/interface/widgets/cards/art_crop_attribution.cpp
     src/interface/widgets/cards/card_group_display_widgets/card_group_display_widget.cpp
     src/interface/widgets/cards/card_group_display_widgets/flat_card_group_display_widget.cpp
     src/interface/widgets/cards/card_group_display_widgets/overlapped_card_group_display_widget.cpp
