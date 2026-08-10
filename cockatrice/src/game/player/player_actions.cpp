@@ -1716,7 +1716,7 @@ void PlayerActions::sendIncCounter(int counterId, int delta)
 void PlayerActions::actModifyTaxCounter(int counterId, int delta)
 {
     CounterState *state = player->getCounters().value(counterId, nullptr);
-    if (!state || !state->isActive() || !CounterNames::isTaxCounter(state->getName())) {
+    if (!state || !state->isActive() || !CounterIds::isTaxCounter(counterId)) {
         return;
     }
     sendIncCounter(counterId, delta);
@@ -1725,7 +1725,7 @@ void PlayerActions::actModifyTaxCounter(int counterId, int delta)
 void PlayerActions::actToggleTaxCounter(int counterId)
 {
     CounterState *state = player->getCounters().value(counterId, nullptr);
-    if (!state || !CounterNames::isTaxCounter(state->getName())) {
+    if (!state || !CounterIds::isTaxCounter(counterId)) {
         return;
     }
     // Prevent disabling a counter with tax accumulated; player must reset to 0 first
