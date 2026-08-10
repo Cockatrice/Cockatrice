@@ -1291,13 +1291,13 @@ void TabGame::createMessageDock(bool bReplay)
         connect(this, &TabGame::chatMessageSent, game->getGameEventHandler(), &GameEventHandler::handleChatMessageSent);
         mentionModel = new QStringListModel(autocompleteUserList, sayEdit);
         mentionCompleter = createMentionCompleter(mentionModel, sayEdit);
-        sayEdit->addCompleter(mentionCompleter, "@");
+        sayEdit->addCompleter(mentionCompleter, CompleterTrigger::Mention);
 
         auto *cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, sayEdit);
         auto *displayModel = new CardDatabaseDisplayModel(sayEdit);
         displayModel->setSourceModel(cardDatabaseModel);
         const CardCompleterSetup cardSetup = createCardCompleter(displayModel, sayEdit);
-        sayEdit->addCompleter(cardSetup.completer, "[[");
+        sayEdit->addCompleter(cardSetup.completer, CompleterTrigger::Card);
 
         connect(sayEdit, &LineEditCompleter::cardPartialChanged, this, [this, cardSetup](const QString &text) {
             cardSetup.searchModel->updateSearchResults(text);

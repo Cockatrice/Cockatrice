@@ -17,10 +17,16 @@
 #include <QString>
 #include <QVector>
 
+enum class CompleterTrigger
+{
+    Mention, // "@" prefix, replaced in place with a trailing space.
+    Card     // "[[" prefix, replaced with the completion plus a closing "]] ".
+};
+
 struct CompleterInfo
 {
     QCompleter *completer;
-    QString trigger; // e.g., "@" or "[["
+    CompleterTrigger trigger;
 };
 
 class LineEditCompleter : public LineEditUnfocusable
@@ -43,7 +49,7 @@ protected:
 
 public:
     explicit LineEditCompleter(QWidget *parent = nullptr);
-    void addCompleter(QCompleter *c, const QString &trigger);
+    void addCompleter(QCompleter *c, CompleterTrigger trigger);
 
     bool hasVisibleCompleterPopup() const;
     void hideCompleterPopups();

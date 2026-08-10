@@ -25,7 +25,7 @@ struct ManaColor
     QColor text;
 };
 
-ManaColor manaColour(QChar symbol)
+ManaColor manaColor(QChar symbol)
 {
     switch (symbol.unicode()) {
         case 'W':
@@ -74,7 +74,7 @@ QColor CardCompleterDelegate::accentForColors(const QString &colors)
         return QColor(100, 115, 135);
     }
 
-    return manaColour(*seen.begin()).fill;
+    return manaColor(*seen.begin()).fill;
 }
 
 // ---------------------------------------------------------------------------
@@ -144,7 +144,7 @@ void CardCompleterDelegate::drawManaSymbol(QPainter *p, QPoint centre, const QSt
     const QString label = isNumeric ? QString::number(numVal) : symbol;
 
     const ManaColor mc =
-        (symbol.length() == 1 && QString("WUBRG").contains(symbol)) ? manaColour(symbol[0]) : manaColour(QChar('X'));
+        (symbol.length() == 1 && QString("WUBRG").contains(symbol)) ? manaColor(symbol[0]) : manaColor(QChar('X'));
 
     QPainterPath circle;
     circle.addEllipse(pip);

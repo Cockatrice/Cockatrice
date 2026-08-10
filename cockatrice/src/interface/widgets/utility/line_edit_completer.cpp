@@ -8,7 +8,7 @@ LineEditCompleter::LineEditCompleter(QWidget *parent) : LineEditUnfocusable(pare
 {
 }
 
-void LineEditCompleter::addCompleter(QCompleter *c, const QString &trigger)
+void LineEditCompleter::addCompleter(QCompleter *c, CompleterTrigger trigger)
 {
     c->setWidget(this);
     c->setCompletionMode(QCompleter::PopupCompletion);
@@ -40,7 +40,14 @@ void LineEditCompleter::focusOutEvent(QFocusEvent *e)
 {
     LineEditUnfocusable::focusOutEvent(e);
 
-    // Commit the highlighted completion so that tabbing away still applies it
+    // Only commit the highlighted completion when focus moves away via Tab.
+    // Other focus losses (e.g. the unfocus shortcut / Escape) must simply close
+    // the popup without inserting anything.
+    if (e->reason() != Qt::TabFocusReason) {
+        hideCompleterPopups();
+        return;
+    }
+
     for (auto &info : completers) {
         if (!info.completer->popup()->isVisible()) {
             continue;
@@ -71,21 +78,31 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
     QString prefix;
 
     for (auto &info : completers) {
-        if (info.trigger == "@") {
-            int triggerPos = textValue.lastIndexOf("@", cursorPos - 1);
-            if (triggerPos != -1 && (triggerPos == 0 || textValue[triggerPos - 1].isSpace())) {
-                active = &info;
-                prefix = textValue.mid(triggerPos + 1, cursorPos - (triggerPos + 1));
+        bool triggered = false;
+        switch (info.trigger) {
+            case CompleterTrigger::Mention: {
+                int triggerPos = textValue.lastIndexOf("@", cursorPos - 1);
+                if (triggerPos != -1 && (triggerPos == 0 || textValue[triggerPos - 1].isSpace())) {
+                    triggered = true;
+                    // Keep the "@" so the prefix matches the "@"-prefixed mention model entries.
+                    prefix = textValue.mid(triggerPos, cursorPos - triggerPos);
+                }
                 break;
             }
-        } else if (info.trigger == "[[") {
-            int triggerPos = textValue.lastIndexOf("[[", cursorPos - 1);
-            int closePos = textValue.indexOf("]]", triggerPos + 2);
-            if (triggerPos != -1 && (closePos == -1 || closePos >= cursorPos)) {
-                active = &info;
-                prefix = textValue.mid(triggerPos + 2, cursorPos - (triggerPos + 2));
+            case CompleterTrigger::Card: {
+                int triggerPos = textValue.lastIndexOf("[[", cursorPos - 1);
+                int closePos = textValue.indexOf("]]", triggerPos + 2);
+                if (triggerPos != -1 && (closePos == -1 || closePos >= cursorPos)) {
+                    triggered = true;
+                    prefix = textValue.mid(triggerPos + 2, cursorPos - (triggerPos + 2));
+                }
                 break;
             }
+        }
+
+        if (triggered) {
+            active = &info;
+            break;
         }
     }
 
@@ -98,9 +115,12 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
 
     active->completer->setCompletionPrefix(prefix);
 
-    if (active->trigger == "[[") {
-        emit cardPartialChanged(prefix);
-        return;
+    switch (active->trigger) {
+        case CompleterTrigger::Card:
+            emit cardPartialChanged(prefix);
+            return;
+        case CompleterTrigger::Mention:
+            break;
     }
 
     active->completer->complete();
@@ -126,51 +146,54 @@ void LineEditCompleter::insertCompletion(QCompleter *completer, const QString &c
             continue;
         }
 
-        if (info.trigger == "[[") {
-            int triggerPos = t.lastIndexOf("[[", pos - 1);
-            if (triggerPos == -1) {
+        switch (info.trigger) {
+            case CompleterTrigger::Card: {
+                int triggerPos = t.lastIndexOf("[[", pos - 1);
+                if (triggerPos == -1) {
+                    return;
+                }
+
+                // If an earlier "[[" is still open it also encloses the cursor, so
+                // replace from its start. Otherwise completing in text such as
+                // "[[Opt[[Amok" would leave a stray "[[" behind.
+                int startPos = triggerPos;
+                for (int searchFrom = triggerPos; searchFrom > 0;) {
+                    const int earlier = t.lastIndexOf("[[", searchFrom - 1);
+                    if (earlier == -1) {
+                        break;
+                    }
+                    const int earlierClose = t.indexOf("]]", earlier + 2);
+                    if (earlierClose != -1 && earlierClose < pos) {
+                        break;
+                    }
+                    startPos = earlier;
+                    searchFrom = earlier;
+                }
+
+                // If the cursor sits inside an already-closed [[...]] pair, replace
+                // the whole construct instead of leaving a duplicate closing bracket
+                // behind.
+                int insertEnd = pos;
+                const int closePos = t.indexOf("]]", startPos + 2);
+                if (closePos != -1 && closePos >= pos) {
+                    insertEnd = closePos + 2;
+                }
+
+                QString after = t.mid(insertEnd);
+                QString replaced = t.left(startPos + 2) + completion + "]] ";
+                setText(replaced + after);
+                setCursorPosition(replaced.length());
                 return;
             }
-
-            // If an earlier "[[" is still open it also encloses the cursor, so
-            // replace from its start. Otherwise completing in text such as
-            // "[[Opt[[Amok" would leave a stray "[[" behind.
-            int startPos = triggerPos;
-            for (int searchFrom = triggerPos; searchFrom > 0;) {
-                const int earlier = t.lastIndexOf("[[", searchFrom - 1);
-                if (earlier == -1) {
-                    break;
+            case CompleterTrigger::Mention: {
+                int triggerPos = t.lastIndexOf("@", pos - 1);
+                if (triggerPos == -1) {
+                    return;
                 }
-                const int earlierClose = t.indexOf("]]", earlier + 2);
-                if (earlierClose != -1 && earlierClose < pos) {
-                    break;
-                }
-                startPos = earlier;
-                searchFrom = earlier;
+                setText(t.replace(triggerPos, pos - triggerPos, completion + " "));
+                setCursorPosition(triggerPos + completion.length() + 1);
+                return;
             }
-
-            // If the cursor sits inside an already-closed [[...]] pair, replace
-            // the whole construct instead of leaving a duplicate closing bracket
-            // behind.
-            int insertEnd = pos;
-            const int closePos = t.indexOf("]]", startPos + 2);
-            if (closePos != -1 && closePos >= pos) {
-                insertEnd = closePos + 2;
-            }
-
-            QString after = t.mid(insertEnd);
-            QString replaced = t.left(startPos + 2) + completion + "]] ";
-            setText(replaced + after);
-            setCursorPosition(replaced.length());
-            return;
         }
-
-        int triggerPos = t.lastIndexOf("@", pos - 1);
-        if (triggerPos == -1) {
-            return;
-        }
-        setText(t.replace(triggerPos, pos - triggerPos, completion + " "));
-        setCursorPosition(triggerPos + completion.length() + 1);
-        return;
     }
 }
