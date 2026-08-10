@@ -19,8 +19,8 @@
 
 enum class CompleterTrigger
 {
-    Mention, // "@" prefix, replaced in place with a trailing space.
-    Card     // "[[" prefix, replaced with the completion plus a closing "]] ".
+    Mention, //< "@" prefix, replaced in place with a trailing space.
+    Card     //< "[[" prefix, replaced with the completion plus a closing "]] ".
 };
 
 struct CompleterInfo
