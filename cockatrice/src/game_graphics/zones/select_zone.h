@@ -103,7 +103,7 @@ protected:
 
     /**
      * @brief Computes the card index at a given y-coordinate within the zone's vertical layout.
-     * Returns 0 if the zone has no cards or the offset is zero.
+     * Returns 0..cardCount (inclusive), where cardCount means append after the last card.
      */
     int calcDropIndexFromY(qreal dropY, qreal minOffset = 0.0) const;
 

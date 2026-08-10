@@ -94,7 +94,7 @@ int SelectZone::calcDropIndexFromY(qreal dropY, qreal minOffset) const
     if (effectiveOffset <= 0.0) {
         return 0;
     }
-    return qBound(0, qRound((dropY - start) / effectiveOffset), params.cardCount - 1);
+    return qBound(0, qRound((dropY - start) / effectiveOffset), params.cardCount);
 }
 
 void SelectZone::restoreStaleEscapedCards()
