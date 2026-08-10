@@ -131,7 +131,6 @@ void PlayerGraphicsItem::initializeZones()
 
     // Command zone
     commandZoneGraphicsItem = new CommandZone(player->getCommandZone(), ZoneSizes::COMMAND_ZONE_HEIGHT, this);
-    commandZoneGraphicsItem->setZValue(ZValues::COMMAND_ZONE);
     commandZoneGraphicsItem->setVisible(false);
     connect(commandZoneGraphicsItem, &CommandZone::minimizedChanged, this, &PlayerGraphicsItem::rearrangeZones);
     connect(commandZoneGraphicsItem, &CommandZone::effectiveHeightChanged, this, &PlayerGraphicsItem::rearrangeZones);

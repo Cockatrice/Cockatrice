@@ -29,9 +29,6 @@
 namespace ZValues
 {
 
-/** @brief Command zone sits at standard zone level */
-constexpr qreal COMMAND_ZONE = 1.0;
-
 // Expose base for callers that need it
 constexpr qreal OVERLAY_BASE = ZValueLayerManager::OVERLAY_BASE;
 
