@@ -24,8 +24,6 @@ Server_Counter makeCounter(int id, int count)
 }
 } // namespace
 
-// evaluateDelCounter
-
 TEST(EvaluateDelCounter, RejectsWhenGameNotStarted)
 {
     Server_Counter counter = makeCounter(UserCounterId, 0);
@@ -69,8 +67,6 @@ TEST(EvaluateDelCounter, GameNotStartedTakesPrecedenceOverTaxGuard)
     EXPECT_EQ(Server_Player::evaluateDelCounter(false, false, CounterIds::CommanderTax, &commander),
               Response::RespGameNotStarted);
 }
-
-// evaluateSetCounterActive
 
 TEST(EvaluateSetCounterActive, RejectsWhenGameNotStarted)
 {
@@ -150,8 +146,6 @@ TEST(EvaluateSetCounterActive, RejectsDisablingPartnerTaxWhenAccumulated)
               Response::RespContextError);
 }
 
-// evaluateCreateCounter
-
 TEST(EvaluateCreateCounter, RejectsWhenGameNotStarted)
 {
     EXPECT_EQ(Server_Player::evaluateCreateCounter(/*gameStarted=*/false, /*playerConceded=*/false, "mycounter"),
@@ -182,8 +176,6 @@ TEST(EvaluateCreateCounter, AllowsOrdinaryNames)
     EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, "poison"), Response::RespOk);
     EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, ""), Response::RespOk);
 }
-
-// evaluateModifyCounter (shared by cmdIncCounter / cmdSetCounter)
 
 TEST(EvaluateModifyCounter, RejectsWhenGameNotStarted)
 {
@@ -236,6 +228,13 @@ TEST(EvaluateModifyCounter, AllowsActiveTaxCounter)
     EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/true, CounterIds::CommanderTax,
                                                    &counter),
               Response::RespOk);
+}
+
+TEST(EvaluateModifyCounter, RejectsMissingTaxCounter)
+{
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/true, CounterIds::CommanderTax,
+                                                   /*counter=*/nullptr),
+              Response::RespNameNotFound);
 }
 
 int main(int argc, char **argv)
