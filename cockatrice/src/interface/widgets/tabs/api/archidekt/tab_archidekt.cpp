@@ -2,7 +2,7 @@
 
 #include "../../../../../client/settings/cache_settings.h"
 #include "../../../cards/additional_info/mana_symbol_widget.h"
-#include "../../../utility/card_completer_utils.h"
+#include "../../../utility/completer_utils.h"
 #include "../../tab_supervisor.h"
 #include "api_response/archidekt_deck_listing_api_response.h"
 #include "display/archidekt_api_response_deck_display_widget.h"

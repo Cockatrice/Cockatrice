@@ -1,7 +1,7 @@
 #include "user_card_settings_dialog.h"
 
 #include "../../../card_picture_loader/card_picture_loader.h"
-#include "../../utility/card_completer_utils.h"
+#include "../../utility/completer_utils.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
 #include "user_card_art_provider.h"

@@ -2,9 +2,10 @@
 
 #include "../cards/card_info_picture_enlarged_widget.h"
 #include "card_completer_delegate.h"
+#include "reversed_completer_model.h"
 
+#include <QAbstractItemModel>
 #include <QAbstractItemView>
-#include <QAbstractProxyModel>
 #include <QCompleter>
 #include <QEvent>
 #include <QKeyEvent>
@@ -22,124 +23,6 @@ const QSize PreviewSize(300, 419);
 const int PreviewMargin = 16;
 const int FadeDuration = 120;
 } // namespace
-
-// ---------------------------------------------------------------------------
-
-/**
- * @brief A completer model that can present its rows bottom-to-top.
- *
- * The original row order is kept intact in the source model (row 0 is always the
- * closest match). When enabled, the proxy maps the source rows in reverse so the
- * popup shows the closest match in the row nearest to the text edit. Any change
- * in the source model is forwarded as a full reset, which is all QCompleter
- * needs to rebuild its completion list.
- */
-class ReversedCompleterModel : public QAbstractProxyModel
-{
-public:
-    using QAbstractProxyModel::QAbstractProxyModel;
-
-    void setSourceModel(QAbstractItemModel *sourceModel) override
-    {
-        if (sourceModel == this->sourceModel()) {
-            return;
-        }
-
-        if (QAbstractItemModel *old = this->sourceModel()) {
-            disconnect(old, nullptr, this, nullptr);
-        }
-
-        QAbstractProxyModel::setSourceModel(sourceModel);
-
-        if (sourceModel) {
-            connect(sourceModel, &QAbstractItemModel::modelReset, this, &ReversedCompleterModel::invalidate);
-            connect(sourceModel, &QAbstractItemModel::rowsInserted, this, &ReversedCompleterModel::invalidate);
-            connect(sourceModel, &QAbstractItemModel::rowsRemoved, this, &ReversedCompleterModel::invalidate);
-            connect(sourceModel, &QAbstractItemModel::rowsMoved, this, &ReversedCompleterModel::invalidate);
-            connect(sourceModel, &QAbstractItemModel::columnsInserted, this, &ReversedCompleterModel::invalidate);
-            connect(sourceModel, &QAbstractItemModel::columnsRemoved, this, &ReversedCompleterModel::invalidate);
-            connect(sourceModel, &QAbstractItemModel::dataChanged, this, &ReversedCompleterModel::invalidate);
-            connect(sourceModel, &QAbstractItemModel::layoutChanged, this, &ReversedCompleterModel::invalidate);
-        }
-
-        invalidate();
-    }
-
-    void setEnabled(bool enabled)
-    {
-        if (enabled == isEnabled) {
-            return;
-        }
-        isEnabled = enabled;
-        invalidate();
-    }
-
-    QModelIndex mapToSource(const QModelIndex &proxyIndex) const override
-    {
-        if (!proxyIndex.isValid() || !sourceModel()) {
-            return {};
-        }
-        const int sourceRow = isEnabled ? sourceRowCount() - 1 - proxyIndex.row() : proxyIndex.row();
-        return sourceModel()->index(sourceRow, proxyIndex.column());
-    }
-
-    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override
-    {
-        if (!sourceIndex.isValid() || !sourceModel()) {
-            return {};
-        }
-        const int proxyRow = isEnabled ? sourceRowCount() - 1 - sourceIndex.row() : sourceIndex.row();
-        return index(proxyRow, sourceIndex.column());
-    }
-
-    QModelIndex index(int row, int column, const QModelIndex &parent = {}) const override
-    {
-        if (parent.isValid() || !sourceModel() || row < 0 || row >= rowCount() || column < 0 ||
-            column >= columnCount()) {
-            return {};
-        }
-        return createIndex(row, column);
-    }
-
-    QModelIndex parent(const QModelIndex &) const override
-    {
-        return {};
-    }
-
-    int rowCount(const QModelIndex &parent = {}) const override
-    {
-        return parent.isValid() || !sourceModel() ? 0 : sourceModel()->rowCount();
-    }
-
-    int columnCount(const QModelIndex &parent = {}) const override
-    {
-        return parent.isValid() || !sourceModel() ? 0 : sourceModel()->columnCount();
-    }
-
-    QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const override
-    {
-        return sourceModel() ? sourceModel()->data(mapToSource(proxyIndex), role) : QVariant();
-    }
-
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override
-    {
-        return sourceModel() ? sourceModel()->headerData(section, orientation, role) : QVariant();
-    }
-
-private:
-    int sourceRowCount() const
-    {
-        return sourceModel() ? sourceModel()->rowCount() : 0;
-    }
-
-    void invalidate()
-    {
-        beginResetModel();
-        endResetModel();
-    }
-
-    bool isEnabled = false;
-};
 
 // ---------------------------------------------------------------------------
 
@@ -179,6 +62,13 @@ CardCompleterStyler::CardCompleterStyler(QCompleter *completer, QObject *parent)
     connect(completer, qOverload<const QString &>(&QCompleter::activated), this, &CardCompleterStyler::hidePreview);
     connect(completer->completionModel(), &QAbstractItemModel::modelReset, this,
             &CardCompleterStyler::onCompletionReset);
+}
+
+CardCompleterStyler::~CardCompleterStyler()
+{
+    if (preview) {
+        preview->deleteLater();
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -360,6 +250,8 @@ void CardCompleterStyler::showPreview()
         return;
     }
 
+    stopPreviewFade();
+
     preview->show();
     preview->raise();
 
@@ -379,15 +271,23 @@ void CardCompleterStyler::hidePreview()
         return;
     }
 
-    auto *fade = new QPropertyAnimation(preview, "windowOpacity", preview);
+    // Stop any in-flight fade first so a stale one cannot keep the preview visible
+    stopPreviewFade();
+    preview->hide();
+}
 
-    fade->setDuration(FadeDuration);
-    fade->setStartValue(preview->windowOpacity());
-    fade->setEndValue(0.0);
+// ---------------------------------------------------------------------------
 
-    connect(fade, &QPropertyAnimation::finished, preview, &QWidget::hide);
+void CardCompleterStyler::stopPreviewFade()
+{
+    if (!preview) {
+        return;
+    }
 
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
+    const auto animations = preview->findChildren<QPropertyAnimation *>();
+    for (auto *animation : animations) {
+        animation->stop();
+    }
 }
 
 // ---------------------------------------------------------------------------

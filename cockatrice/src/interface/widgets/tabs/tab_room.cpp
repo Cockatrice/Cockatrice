@@ -8,7 +8,7 @@
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
-#include "../utility/card_completer_utils.h"
+#include "../utility/completer_utils.h"
 #include "card/card_completer_proxy_model.h"
 #include "card/card_search_model.h"
 #include "card_database_display_model.h"

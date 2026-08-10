@@ -9,8 +9,8 @@
 #include "../general/layout_containers/flow_widget.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
-#include "../utility/card_completer_utils.h"
 #include "../utility/compact_push_button.h"
+#include "../utility/completer_utils.h"
 #include "visual_deck_display_options_widget.h"
 
 #include <QCheckBox>

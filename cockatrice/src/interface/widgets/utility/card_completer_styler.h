@@ -44,9 +44,11 @@ private slots:
 
 private:
     explicit CardCompleterStyler(QCompleter *completer, QObject *parent = nullptr);
+    ~CardCompleterStyler() override;
 
     void showPreview();
     void hidePreview();
+    void stopPreviewFade();
     void reposition();
 
     void updateOrientation();

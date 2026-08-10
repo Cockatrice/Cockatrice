@@ -18,14 +18,14 @@
 namespace
 {
 
-struct ManaColour
+struct ManaColor
 {
     QColor fill;
     QColor rim;
     QColor text;
 };
 
-ManaColour manaColour(QChar symbol)
+ManaColor manaColour(QChar symbol)
 {
     switch (symbol.unicode()) {
         case 'W':
@@ -143,7 +143,7 @@ void CardCompleterDelegate::drawManaSymbol(QPainter *p, QPoint centre, const QSt
 
     const QString label = isNumeric ? QString::number(numVal) : symbol;
 
-    const ManaColour mc =
+    const ManaColor mc =
         (symbol.length() == 1 && QString("WUBRG").contains(symbol)) ? manaColour(symbol[0]) : manaColour(QChar('X'));
 
     QPainterPath circle;

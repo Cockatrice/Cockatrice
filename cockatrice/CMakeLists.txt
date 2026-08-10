@@ -145,9 +145,9 @@ set(cockatrice_SOURCES
     src/interface/layouts/overlap_layout.cpp
     src/interface/widgets/utility/card_completer_delegate.cpp
     src/interface/widgets/utility/card_completer_styler.cpp
-    src/interface/widgets/utility/card_completer_utils.cpp
-    src/interface/widgets/utility/card_completer_utils.h
+    src/interface/widgets/utility/completer_utils.cpp
     src/interface/widgets/utility/line_edit_completer.cpp
+    src/interface/widgets/utility/reversed_completer_model.cpp
     src/interface/pixel_map_generator.cpp
     src/interface/theme_config.cpp
     src/interface/theme_manager.cpp

@@ -1,6 +1,6 @@
 #include "tab_card_art_rules.h"
 
-#include "../utility/card_completer_utils.h"
+#include "../utility/completer_utils.h"
 #include "libcockatrice/card/database/card_database_manager.h"
 
 #include <QCompleter>

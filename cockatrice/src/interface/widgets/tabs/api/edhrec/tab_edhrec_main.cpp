@@ -1,7 +1,7 @@
 #include "tab_edhrec_main.h"
 
 #include "../../../../../client/settings/cache_settings.h"
-#include "../../../utility/card_completer_utils.h"
+#include "../../../utility/completer_utils.h"
 #include "../../tab_supervisor.h"
 #include "api_response/average_deck/edhrec_average_deck_api_response.h"
 #include "api_response/commander/edhrec_commander_api_response.h"

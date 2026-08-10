@@ -1,11 +1,11 @@
 /**
- * @file card_completer_utils.h
+ * @file completer_utils.h
  * @ingroup UtilityWidgets
  */
 //! \todo Document this file.
 
-#ifndef CARD_COMPLETER_UTILS_H
-#define CARD_COMPLETER_UTILS_H
+#ifndef COMPLETER_UTILS_H
+#define COMPLETER_UTILS_H
 
 class CardCompleterProxyModel;
 class CardDatabaseDisplayModel;

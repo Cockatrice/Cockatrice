@@ -13,7 +13,8 @@ void LineEditCompleter::addCompleter(QCompleter *c, const QString &trigger)
     c->setWidget(this);
     c->setCompletionMode(QCompleter::PopupCompletion);
     c->setCaseSensitivity(Qt::CaseInsensitive);
-    connect(c, qOverload<const QString &>(&QCompleter::activated), this, &LineEditCompleter::insertCompletion);
+    connect(c, qOverload<const QString &>(&QCompleter::activated), this,
+            qOverload<const QString &>(&LineEditCompleter::insertCompletion));
 
     completers.append({c, trigger});
 }
@@ -39,12 +40,29 @@ void LineEditCompleter::focusOutEvent(QFocusEvent *e)
 {
     LineEditUnfocusable::focusOutEvent(e);
 
+    // Commit the highlighted completion so that tabbing away still applies it
+    for (auto &info : completers) {
+        if (!info.completer->popup()->isVisible()) {
+            continue;
+        }
+
+        const QModelIndex currentIndex = info.completer->popup()->currentIndex();
+        if (currentIndex.isValid()) {
+            insertCompletion(info.completer, currentIndex.data().toString());
+        }
+    }
+
     hideCompleterPopups();
 }
 
 void LineEditCompleter::keyPressEvent(QKeyEvent *event)
 {
     LineEditUnfocusable::keyPressEvent(event);
+
+    if (event->key() == Qt::Key_Escape) {
+        hideCompleterPopups();
+        return;
+    }
 
     QString textValue = text();
     int cursorPos = cursorPosition();
@@ -90,36 +108,69 @@ void LineEditCompleter::keyPressEvent(QKeyEvent *event)
 
 void LineEditCompleter::insertCompletion(const QString &completion)
 {
+    for (auto &info : completers) {
+        if (info.completer == sender()) {
+            insertCompletion(info.completer, completion);
+            return;
+        }
+    }
+}
+
+void LineEditCompleter::insertCompletion(QCompleter *completer, const QString &completion)
+{
     QString t = text();
     int pos = cursorPosition();
 
-    CompleterInfo *active = nullptr;
-    for (auto &info : completers) {
-        if (info.completer == sender()) {
-            active = &info;
-            break;
+    for (const auto &info : completers) {
+        if (info.completer != completer) {
+            continue;
         }
-    }
-    if (!active) {
-        return;
-    }
 
-    if (active->trigger == "[[") {
-        int triggerPos = t.lastIndexOf("[[", pos - 1);
+        if (info.trigger == "[[") {
+            int triggerPos = t.lastIndexOf("[[", pos - 1);
+            if (triggerPos == -1) {
+                return;
+            }
+
+            // If an earlier "[[" is still open it also encloses the cursor, so
+            // replace from its start. Otherwise completing in text such as
+            // "[[Opt[[Amok" would leave a stray "[[" behind.
+            int startPos = triggerPos;
+            for (int searchFrom = triggerPos; searchFrom > 0;) {
+                const int earlier = t.lastIndexOf("[[", searchFrom - 1);
+                if (earlier == -1) {
+                    break;
+                }
+                const int earlierClose = t.indexOf("]]", earlier + 2);
+                if (earlierClose != -1 && earlierClose < pos) {
+                    break;
+                }
+                startPos = earlier;
+                searchFrom = earlier;
+            }
+
+            // If the cursor sits inside an already-closed [[...]] pair, replace
+            // the whole construct instead of leaving a duplicate closing bracket
+            // behind.
+            int insertEnd = pos;
+            const int closePos = t.indexOf("]]", startPos + 2);
+            if (closePos != -1 && closePos >= pos) {
+                insertEnd = closePos + 2;
+            }
+
+            QString after = t.mid(insertEnd);
+            QString replaced = t.left(startPos + 2) + completion + "]] ";
+            setText(replaced + after);
+            setCursorPosition(replaced.length());
+            return;
+        }
+
+        int triggerPos = t.lastIndexOf("@", pos - 1);
         if (triggerPos == -1) {
             return;
         }
-        QString after = t.mid(pos);
-        QString replaced = t.left(triggerPos + 2) + completion + "]] ";
-        setText(replaced + after);
-        setCursorPosition(replaced.length());
+        setText(t.replace(triggerPos, pos - triggerPos, completion + " "));
+        setCursorPosition(triggerPos + completion.length() + 1);
         return;
     }
-
-    int triggerPos = t.lastIndexOf("@", pos - 1);
-    if (triggerPos == -1) {
-        return;
-    }
-    setText(t.replace(triggerPos, pos - triggerPos, completion + " "));
-    setCursorPosition(triggerPos + completion.length() + 1);
 }

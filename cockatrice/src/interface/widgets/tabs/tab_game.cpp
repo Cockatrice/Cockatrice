@@ -21,7 +21,7 @@
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
-#include "../interface/widgets/utility/card_completer_utils.h"
+#include "../interface/widgets/utility/completer_utils.h"
 #include "../interface/widgets/utility/line_edit_completer.h"
 #include "../interface/window_main.h"
 #include "../main.h"

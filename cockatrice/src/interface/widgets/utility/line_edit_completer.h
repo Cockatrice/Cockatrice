@@ -32,6 +32,8 @@ signals:
 private:
     QList<CompleterInfo> completers;
 
+    void insertCompletion(QCompleter *completer, const QString &completion);
+
 private slots:
     void insertCompletion(const QString &text);
 
