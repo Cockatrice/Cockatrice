@@ -66,9 +66,6 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 
     connect(player, &PlayerLogic::addViewCustomZoneActionToCustomZoneMenu, this,
             &PlayerGraphicsItem::onCustomZoneAdded);
-    connect(player, &PlayerLogic::commandZoneSupportChanged, this, &PlayerGraphicsItem::setCommandZoneVisible);
-    // Sync initial state in case processPlayerInfo already ran before this connection.
-    setCommandZoneVisible(player->hasServerCommandZone());
 
     playerMenu->setMenusForGraphicItems();
 
@@ -129,11 +126,14 @@ void PlayerGraphicsItem::initializeZones()
         new HandZone(player->getHandZone(), static_cast<int>(tableZoneGraphicsItem->boundingRect().height()), this);
     connect(player->getPlayerActions(), &PlayerActions::requestSortHand, handZoneGraphicsItem, &HandZone::sortHand);
 
-    // Command zone
-    commandZoneGraphicsItem = new CommandZone(player->getCommandZone(), ZoneSizes::COMMAND_ZONE_HEIGHT, this);
-    commandZoneGraphicsItem->setVisible(false);
-    connect(commandZoneGraphicsItem, &CommandZone::minimizedChanged, this, &PlayerGraphicsItem::rearrangeZones);
-    connect(commandZoneGraphicsItem, &CommandZone::effectiveHeightChanged, this, &PlayerGraphicsItem::rearrangeZones);
+    // Command zone (only created for commander games)
+    if (auto *commandZoneLogic = player->getCommandZone()) {
+        commandZoneGraphicsItem = new CommandZone(commandZoneLogic, ZoneSizes::COMMAND_ZONE_HEIGHT, this);
+        connect(commandZoneGraphicsItem, &CommandZone::minimizedChanged, this, &PlayerGraphicsItem::rearrangeZones);
+        connect(commandZoneGraphicsItem, &CommandZone::effectiveHeightChanged, this,
+                &PlayerGraphicsItem::rearrangeZones);
+        zoneGraphicsItems.insert(commandZoneLogic->getName(), commandZoneGraphicsItem);
+    }
 
     connect(handZoneGraphicsItem->getLogic(), &HandZoneLogic::cardCountChanged, handCounter,
             &HandCounter::updateNumber);
@@ -146,7 +146,6 @@ void PlayerGraphicsItem::initializeZones()
     zoneGraphicsItems.insert(player->getTableZone()->getName(), tableZoneGraphicsItem);
     zoneGraphicsItems.insert(player->getStackZone()->getName(), stackZoneGraphicsItem);
     zoneGraphicsItems.insert(player->getHandZone()->getName(), handZoneGraphicsItem);
-    zoneGraphicsItems.insert(player->getCommandZone()->getName(), commandZoneGraphicsItem);
 }
 
 void PlayerGraphicsItem::onCustomZoneAdded(QString customZoneName)
@@ -396,12 +395,4 @@ void PlayerGraphicsItem::positionCommandAndStackZones(const QPointF &base)
         commandZoneGraphicsItem->setPos(base);
     }
     stackZoneGraphicsItem->setPos(base.x(), base.y() + (commandZoneVisible ? totalCommandZoneHeight() : 0));
-}
-
-void PlayerGraphicsItem::setCommandZoneVisible(bool visible)
-{
-    if (commandZoneGraphicsItem) {
-        commandZoneGraphicsItem->setVisible(visible);
-    }
-    rearrangeZones();
 }

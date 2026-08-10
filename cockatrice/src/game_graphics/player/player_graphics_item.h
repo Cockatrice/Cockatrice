@@ -133,8 +133,6 @@ public slots:
     void onCounterRemoved(int counterId);
     void rearrangeCounters();
     void retranslateUi();
-    /** @brief Shows or hides the command zone and rearranges dependent zones. */
-    void setCommandZoneVisible(bool visible);
 
 signals:
     void sizeChanged();

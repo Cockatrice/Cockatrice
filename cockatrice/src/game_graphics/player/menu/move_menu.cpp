@@ -55,11 +55,7 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player, QWidget *parent) : QMenu(tr("Move
     addAction(aMoveToExile);
     addSeparator();
     addAction(aMoveToCommandZone);
-
-    auto *playerLogic = player->getLogic();
-    auto updateCommandZoneVisibility = [this](bool has) { aMoveToCommandZone->setVisible(has); };
-    connect(playerLogic, &PlayerLogic::commandZoneSupportChanged, this, updateCommandZoneVisibility);
-    updateCommandZoneVisibility(playerLogic->hasServerCommandZone());
+    aMoveToCommandZone->setVisible(player->getLogic()->hasCommandZone());
 
     setShortcutsActive();
 

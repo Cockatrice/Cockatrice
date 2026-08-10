@@ -89,8 +89,6 @@ signals:
     void arrowDeleteRequested(int creatorId, int arrowId);
     void arrowDeleted(int creatorId, int arrowId);
     void arrowsClearedLocally(); // fires on clear() and processPlayerInfo
-    /** @brief Emitted when server command zone support is detected or lost (e.g. on game join or reconnect). */
-    void commandZoneSupportChanged(bool hasCommandZone);
 
 public slots:
     void setActive(bool _active);
@@ -200,15 +198,15 @@ public:
     }
 
     /** @brief Returns the command zone logic, or nullptr if not present. */
-    CommandZoneLogic *getCommandZone()
+    CommandZoneLogic *getCommandZone() const
     {
         return qobject_cast<CommandZoneLogic *>(zones.value(ZoneNames::COMMAND));
     }
 
-    /** @brief Whether the server confirmed command zone support for this game. */
-    bool hasServerCommandZone() const
+    /** @brief Whether this game has command zone support (determined at game creation). */
+    bool hasCommandZone() const
     {
-        return serverHasCommandZone;
+        return getCommandZone() != nullptr;
     }
 
     CounterState *addCounter(const ServerInfo_Counter &counter);
@@ -263,7 +261,6 @@ private:
     QMap<int, CounterState *> counters;
 
     bool dialogSemaphore;
-    bool serverHasCommandZone;
     QList<CardItem *> cardsToDelete;
 };
 

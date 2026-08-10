@@ -33,7 +33,7 @@
 PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
       playerEventHandler(new PlayerEventHandler(this)), playerActions(new PlayerActions(this)), active(false),
-      conceded(false), zoneId(0), dialogSemaphore(false), serverHasCommandZone(false)
+      conceded(false), zoneId(0), dialogSemaphore(false)
 {
     initializeZones();
 }
@@ -49,7 +49,9 @@ void PlayerLogic::initializeZones()
     bool visibleHand = playerInfo->getLocalOrJudge() ||
                        (game->getPlayerManager()->isSpectator() && game->getGameMetaInfo()->spectatorsOmniscient());
     addZone(new HandZoneLogic(this, ZoneNames::HAND, false, false, visibleHand, this));
-    addZone(new CommandZoneLogic(this, ZoneNames::COMMAND, true, false, true, this));
+    if (game->getGameMetaInfo()->proto().enable_command_zone()) {
+        addZone(new CommandZoneLogic(this, ZoneNames::COMMAND, true, false, true, this));
+    }
 }
 
 PlayerLogic::~PlayerLogic()
@@ -123,19 +125,7 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
 
     emit clearCustomZonesMenu();
 
-    // Check if server has command zone by scanning the zone list
     const int zoneListSize = info.zone_list_size();
-    bool foundCommandZone = false;
-    for (int i = 0; i < zoneListSize; ++i) {
-        if (QString::fromStdString(info.zone_list(i).name()) == ZoneNames::COMMAND) {
-            foundCommandZone = true;
-            break;
-        }
-    }
-    if (serverHasCommandZone != foundCommandZone) {
-        serverHasCommandZone = foundCommandZone;
-        emit commandZoneSupportChanged(foundCommandZone);
-    }
     for (int i = 0; i < zoneListSize; ++i) {
         const ServerInfo_Zone &zoneInfo = info.zone_list(i);
 
