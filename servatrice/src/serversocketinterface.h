@@ -78,7 +78,7 @@ signals:
     void incTxBytes(qint64 amount);
 
 protected:
-    void logDebugMessage(const QString &message);
+    void logDebugMessage(const QString &message) override;
     bool tooManyRegistrationAttempts(const QString &ipAddress);
 
     virtual void writeToSocket(QByteArray &data) = 0;
@@ -145,10 +145,12 @@ private:
     Response::ResponseCode cmdReportDetails(const Command_ReportDetails &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportAddComment(const Command_ReportAddComment &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayDownloadByGameId(const Command_ReplayDownloadByGameId &cmd, ResponseContainer &rc);
-    Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
     Response::ResponseCode
-    processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
-    Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc);
+    processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc) override;
+    Response::ResponseCode
+    processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc) override;
+    Response::ResponseCode
+    processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc) override;
 
     Response::ResponseCode cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc);
@@ -180,9 +182,9 @@ public:
     bool initSession();
 
     virtual QHostAddress getPeerAddress() const = 0;
-    virtual QString getAddress() const = 0;
+    QString getAddress() const override = 0;
 
-    void transmitProtocolItem(const ServerMessage &item);
+    void transmitProtocolItem(const ServerMessage &item) override;
 };
 
 class TcpServerSocketInterface : public AbstractServerSocketInterface
