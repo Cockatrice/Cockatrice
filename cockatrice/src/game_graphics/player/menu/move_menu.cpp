@@ -10,7 +10,7 @@
 #include <libcockatrice/game/player/player_actions.h>
 #include <libcockatrice/game/player/player_logic.h>
 
-MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
+MoveMenu::MoveMenu(PlayerGraphicsItem *player, QWidget *parent) : QMenu(tr("Move to"), parent)
 {
     aMoveToTopLibrary = new QAction(this);
     aMoveToTopLibrary->setData(cmMoveToTopLibrary);
