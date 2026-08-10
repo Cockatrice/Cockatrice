@@ -182,6 +182,9 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
                     addSeparator();
                     addAction(aClone);
                     addMenu(new MoveMenu(player));
+                    addSeparator();
+                    addAction(aAttach);
+                    addAction(aDrawArrow);
                 } else {
                     addAction(aDrawArrow);
                     addSeparator();
