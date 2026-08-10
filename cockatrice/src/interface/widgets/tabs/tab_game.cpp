@@ -330,6 +330,9 @@ void TabGame::emitUserEvent()
 
 TabGame::~TabGame()
 {
+    if (aCardMenu && aCardMenu->menu() && aCardMenu->menu() != emptyCardMenu) {
+        delete aCardMenu->menu();
+    }
     for (auto &player : game->getPlayerManager()->getPlayers()) {
         player->clear();
     }
@@ -1158,10 +1161,16 @@ QString TabGame::getTabText() const
 
 /**
  * @param menu The menu to set. Pass in nullptr to set the menu to empty.
+ *
+ * The previous card menu is deleted here: QAction::setMenu() does not take ownership, so whoever installs the menu
+ * (this widget) has to dispose of the one it replaces. The empty placeholder menu is reused instead of deleted.
  */
 void TabGame::setCardMenu(CardMenu *menu)
 {
-    if (!aCardMenu) {
+    if (!aCardMenu || !emptyCardMenu) {
+        if (menu) {
+            menu->deleteLater();
+        }
         return;
     }
 
@@ -1171,10 +1180,11 @@ void TabGame::setCardMenu(CardMenu *menu)
             gameView->viewport()->update();
         }
     }
-    if (menu) {
-        aCardMenu->setMenu(menu);
-    } else {
-        aCardMenu->setMenu(new QMenu);
+
+    QMenu *previousMenu = aCardMenu->menu();
+    aCardMenu->setMenu(menu ? menu : emptyCardMenu);
+    if (previousMenu && previousMenu != emptyCardMenu && previousMenu != menu) {
+        previousMenu->deleteLater();
     }
 }
 
@@ -1258,7 +1268,8 @@ void TabGame::createMenuItems()
 
     gameMenu->addSeparator();
 
-    aCardMenu = gameMenu->addMenu(new QMenu(this));
+    emptyCardMenu = new QMenu(this);
+    aCardMenu = gameMenu->addMenu(emptyCardMenu);
 
     // Sync the new action with the same state the dock button already shows.
     updateInviteButtonState();
@@ -1290,6 +1301,7 @@ void TabGame::createReplayMenuItems()
     gameMenu->addAction(aLeaveGame);
 
     aCardMenu = nullptr;
+    emptyCardMenu = nullptr;
 
     addTabMenu(gameMenu);
 }
