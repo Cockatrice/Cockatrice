@@ -151,7 +151,7 @@ void AbstractCounter::refreshShortcuts()
 
 void AbstractCounter::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (!isUnderMouse() || !player->getPlayerInfo()->getLocalOrJudge()) {
+    if (!active || !isUnderMouse() || !player->getPlayerInfo()->getLocalOrJudge()) {
         event->ignore();
         return;
     }
