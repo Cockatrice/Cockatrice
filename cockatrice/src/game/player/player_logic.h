@@ -95,6 +95,10 @@ signals:
 public slots:
     void setActive(bool _active);
     void onRequestZoneViewToggle(const QString &zoneName, int numberCards, bool isReversed);
+    void requestRearrangeCounters()
+    {
+        emit rearrangeCounters();
+    }
 
 public:
     PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent);

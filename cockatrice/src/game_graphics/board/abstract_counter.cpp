@@ -35,7 +35,7 @@ AbstractCounter::AbstractCounter(CounterState *state,
 
     connect(state, &CounterState::activeChanged, this, [this](bool newActive) {
         setActive(newActive);
-        emit player->rearrangeCounters();
+        player->requestRearrangeCounters();
     });
 
     if (player->getPlayerInfo()->getLocalOrJudge()) {
