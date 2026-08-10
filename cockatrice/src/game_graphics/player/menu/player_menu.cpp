@@ -74,6 +74,11 @@ void PlayerMenu::setMenusForGraphicItems()
 
 QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
 {
+    if (cardMenu) {
+        cardMenu->deleteLater();
+        cardMenu = nullptr;
+    }
+
     if (!card) {
         emit cardMenuUpdated(nullptr);
         return nullptr;
@@ -87,11 +92,11 @@ QMenu *PlayerMenu::updateCardMenu(const CardItem *card)
         return nullptr;
     }
 
-    CardMenu *menu = new CardMenu(player, card, shortcutsActive);
-    connect(menu, &CardMenu::cardInfoRequested, this, &PlayerMenu::cardInfoRequested);
-    emit cardMenuUpdated(menu);
+    cardMenu = new CardMenu(player, card, shortcutsActive);
+    connect(cardMenu, &CardMenu::cardInfoRequested, this, &PlayerMenu::cardInfoRequested);
+    emit cardMenuUpdated(cardMenu);
 
-    return menu;
+    return cardMenu;
 }
 
 void PlayerMenu::retranslateUi()
