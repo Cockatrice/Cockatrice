@@ -495,21 +495,31 @@ Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & 
 }
 
 Response::ResponseCode
-Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::evaluateCreateCounter(bool gameStarted, bool playerConceded, const QString &counterName)
 {
-    if (!game->getGameStarted()) {
+    if (!gameStarted) {
         return Response::RespGameNotStarted;
     }
-    if (conceded) {
+    if (playerConceded) {
         return Response::RespContextError;
     }
-
-    const QString counterName = nameFromStdString(cmd.counter_name());
     // Reserved system counter names (commander/partner tax) are how clients identify
     // server-managed tax counters for rendering and logging; a client must not be able
     // to spoof one via a user-created counter.
     if (CounterNames::isTaxCounter(counterName)) {
         return Response::RespFunctionNotAllowed;
+    }
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    const QString counterName = nameFromStdString(cmd.counter_name());
+
+    const Response::ResponseCode authResult = evaluateCreateCounter(game->getGameStarted(), conceded, counterName);
+    if (authResult != Response::RespOk) {
+        return authResult;
     }
 
     auto *c = new Server_Counter(newCounterId(), counterName, cmd.counter_color(), cmd.radius(), cmd.value());

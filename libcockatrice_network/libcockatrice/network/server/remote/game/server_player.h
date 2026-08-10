@@ -86,6 +86,20 @@ public:
                                                         int counterId,
                                                         const Server_Counter *counter);
 
+    /**
+     * @brief Decide whether a client may create a counter with the given name.
+     *
+     * Reserved system counter names (commander/partner tax) are rejected to prevent
+     * clients from spoofing server-managed tax counters.
+     *
+     * @param gameStarted Whether the game has started
+     * @param playerConceded Whether the player has conceded
+     * @param counterName Name requested for the new counter
+     * @return Response::RespOk if permitted, otherwise the error response for the client.
+     */
+    static Response::ResponseCode
+    evaluateCreateCounter(bool gameStarted, bool playerConceded, const QString &counterName);
+
     /** @} */
 
     void setupZones() override;

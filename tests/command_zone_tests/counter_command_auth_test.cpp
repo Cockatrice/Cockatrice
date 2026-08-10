@@ -150,23 +150,37 @@ TEST(EvaluateSetCounterActive, RejectsDisablingPartnerTaxWhenAccumulated)
               Response::RespContextError);
 }
 
-// CounterNames::isTaxCounter (guards cmdCreateCounter against reserved names)
+// evaluateCreateCounter
 
-TEST(CounterNamesIsTaxCounter, RejectsCommanderTaxName)
+TEST(EvaluateCreateCounter, RejectsWhenGameNotStarted)
 {
-    EXPECT_TRUE(CounterNames::isTaxCounter(CounterNames::CommanderTax));
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(/*gameStarted=*/false, /*playerConceded=*/false, "mycounter"),
+              Response::RespGameNotStarted);
 }
 
-TEST(CounterNamesIsTaxCounter, RejectsPartnerTaxName)
+TEST(EvaluateCreateCounter, RejectsWhenPlayerConceded)
 {
-    EXPECT_TRUE(CounterNames::isTaxCounter(CounterNames::PartnerTax));
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(/*gameStarted=*/true, /*playerConceded=*/true, "mycounter"),
+              Response::RespContextError);
 }
 
-TEST(CounterNamesIsTaxCounter, AllowsOrdinaryName)
+TEST(EvaluateCreateCounter, RejectsCommanderTaxName)
 {
-    EXPECT_FALSE(CounterNames::isTaxCounter("life"));
-    EXPECT_FALSE(CounterNames::isTaxCounter("poison"));
-    EXPECT_FALSE(CounterNames::isTaxCounter(""));
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, CounterNames::CommanderTax),
+              Response::RespFunctionNotAllowed);
+}
+
+TEST(EvaluateCreateCounter, RejectsPartnerTaxName)
+{
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, CounterNames::PartnerTax),
+              Response::RespFunctionNotAllowed);
+}
+
+TEST(EvaluateCreateCounter, AllowsOrdinaryNames)
+{
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, "life"), Response::RespOk);
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, "poison"), Response::RespOk);
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, ""), Response::RespOk);
 }
 
 // evaluateModifyCounter (shared by cmdIncCounter / cmdSetCounter)
