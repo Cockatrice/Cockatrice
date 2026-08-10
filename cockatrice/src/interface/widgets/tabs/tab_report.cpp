@@ -810,7 +810,7 @@ void TabReport::userInfoResponse(const Response &response)
 
     const Response_ReportUserInfo &resp = response.GetExtension(Response_ReportUserInfo::ext);
 
-    if (resp.has_user_name() && resp.user_name() != lastRequestedUser) {
+    if (resp.has_user_name() && QString::fromStdString(resp.user_name()) != lastRequestedUser) {
         return;
     }
 
