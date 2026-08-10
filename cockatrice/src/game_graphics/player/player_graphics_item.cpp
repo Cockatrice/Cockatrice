@@ -19,10 +19,6 @@
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/counter_ids.h>
 
-// Minimum height the stack zone keeps when the command zone shares its vertical space,
-// so the stack remains usable. Owned by this layout code, the sole consumer.
-static constexpr qreal MINIMUM_STACKING_HEIGHT = 50.0;
-
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 {
     connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::horizontalHandChanged, this,
@@ -319,9 +315,6 @@ void PlayerGraphicsItem::rearrangeZones()
     qreal stackHeight = tableHeight;
     if (commandZoneVisible) {
         stackHeight = tableHeight - totalCommandZoneHeight();
-        if (stackHeight < MINIMUM_STACKING_HEIGHT) {
-            stackHeight = MINIMUM_STACKING_HEIGHT;
-        }
     }
     stackZoneGraphicsItem->setHeight(stackHeight);
 
