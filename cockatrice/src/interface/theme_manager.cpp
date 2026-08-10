@@ -99,6 +99,8 @@ ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
     }
     // Capture the untouched application palette before any theme is applied.
     defaultPalette = qApp->palette();
+    // Capture the untouched application font before any theme is applied.
+    defaultFont = qApp->font();
     ensureThemeDirectoryExists();
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
     connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this] {
@@ -352,6 +354,16 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
     // widget gets polished against the stale colours, requiring a second apply
     // to fully resolve. Setting palette first means setStyle's repolish cascade
     // already sees the correct colours.
+    // The body font is applied on the same pass, before the repolish, so
+    // widgets are polished with the theme's typeface.
+    currentThemeConfig = themeCfg;
+    if (!themeCfg.bodyFont.isEmpty()) {
+        QFont bodyFont(themeCfg.bodyFont);
+        bodyFont.setStyleHint(QFont::SansSerif);
+        qApp->setFont(bodyFont);
+    } else {
+        qApp->setFont(defaultFont);
+    }
     qApp->setPalette(base);
     qApp->setStyle(style);
 
@@ -474,4 +486,51 @@ QBrush ThemeManager::getExtraBgBrush(Role role, int zoneId)
     }
 
     return brushCache.value(zoneId);
+}
+
+QFont ThemeManager::cardTitleFont() const
+{
+    QFont font;
+    if (currentThemeConfig.cardTitleFont.isEmpty()) {
+        // Classic behaviour: the platform serif, echoing printed cardstock.
+        font.setFamily(QStringLiteral("Serif"));
+        font.setStyleHint(QFont::Serif);
+    } else {
+        font.setFamily(currentThemeConfig.cardTitleFont);
+    }
+    return font;
+}
+
+QFont ThemeManager::monoFont() const
+{
+    QFont font;
+    if (currentThemeConfig.monoFont.isEmpty()) {
+        // Classic behaviour: serif numerals on counters and the card back.
+        font.setFamily(QStringLiteral("Serif"));
+        font.setStyleHint(QFont::Serif);
+    } else {
+        font.setFamily(currentThemeConfig.monoFont);
+        font.setStyleHint(QFont::Monospace);
+    }
+    return font;
+}
+
+QFont ThemeManager::displayFont() const
+{
+    QFont font;
+    if (currentThemeConfig.displayFont.isEmpty()) {
+        font.setFamily(QStringLiteral("sans-serif"));
+        font.setStyleHint(QFont::SansSerif);
+    } else {
+        font.setFamily(currentThemeConfig.displayFont);
+    }
+    return font;
+}
+
+QString ThemeManager::monoFontFamily() const
+{
+    if (!currentThemeConfig.monoFont.isEmpty()) {
+        return currentThemeConfig.monoFont;
+    }
+    return QStringLiteral("monospace");
 }

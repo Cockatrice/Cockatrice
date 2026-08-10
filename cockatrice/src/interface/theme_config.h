@@ -11,6 +11,13 @@ struct ThemeConfig
     QString colorScheme;
     QString styleName;
 
+    // Optional per-theme font families (see design-game.md). Empty = use the
+    // application default / the classic "Serif" hint for card titles.
+    QString displayFont;
+    QString bodyFont;
+    QString cardTitleFont;
+    QString monoFont;
+
     bool isEmpty() const;
     QString toIni() const;
 

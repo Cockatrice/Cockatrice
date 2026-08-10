@@ -14,10 +14,22 @@
 #include <QPixmap>
 
 class PlayerLogic;
+class QTimer;
 
 class PlayerCounter : public AbstractCounter
 {
     Q_OBJECT
+protected:
+    void onValueChanged(int oldValue, int newValue) override;
+
+private:
+    QTimer *flashTimer = nullptr;
+    qreal flashAlpha = 0.0;
+    int flashDelta = 0;
+
+private slots:
+    void flashTick();
+
 public:
     PlayerCounter(CounterState *state, PlayerLogic *player, QGraphicsItem *parent);
     QRectF boundingRect() const override;

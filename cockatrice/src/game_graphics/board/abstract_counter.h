@@ -35,6 +35,9 @@ protected:
     bool hovered = false;
     bool useNameForShortcut;
 
+    // Hook for subclasses that need per-value-change feedback (e.g. life-total flash).
+    virtual void onValueChanged(int oldValue, int newValue);
+
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;

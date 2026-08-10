@@ -1,11 +1,15 @@
 #include "player_target.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../game/player/player_logic.h"
 #include "../../interface/pixel_map_generator.h"
+#include "../../interface/theme_manager.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QPainter>
 #include <QPixmapCache>
+#include <QTimer>
 #include <QtMath>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 
@@ -21,8 +25,10 @@ QRectF PlayerCounter::boundingRect() const
 
 void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    const int radius = 8;
-    const qreal border = 1;
+    // design-game: life totals live in a fully-rounded translucent HUD pill
+    // with an accent (Mana Green) border and mono numerals.
+    const int radius = 15;
+    const qreal border = 1.5;
     QPainterPath path(QPointF(50 - border / 2, border / 2));
     path.lineTo(radius, border / 2);
     path.arcTo(border / 2, border / 2, 2 * radius, 2 * radius, 90, 90);
@@ -30,21 +36,64 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     path.lineTo(50 - border / 2, 30 - border / 2);
     path.closeSubpath();
 
-    QPen pen(QColor(100, 100, 100));
-    pen.setWidth(border);
+    QPen pen(qApp->palette().highlight().color());
+    pen.setWidthF(border);
     painter->setPen(pen);
-    painter->setBrush(hovered ? QColor(50, 50, 50, 160) : QColor(0, 0, 0, 160));
+    painter->setBrush(hovered ? QColor(18, 24, 38, 200) : QColor(11, 14, 20, 184));
 
     painter->drawPath(path);
 
     QRectF translatedRect = path.controlPointRect();
     QSize translatedSize = translatedRect.size().toSize();
-    QFont font("Serif");
+    QFont font = themeManager->monoFont();
     font.setWeight(QFont::Bold);
     font.setPixelSize(qMax(qRound(translatedSize.height() / 1.3), 9));
     painter->setFont(font);
     painter->setPen(Qt::white);
     painter->drawText(translatedRect, Qt::AlignCenter, QString::number(value));
+
+    // Life-change flash: emerald on gain, red on loss, decaying over a few ticks.
+    if (flashAlpha > 0) {
+        painter->save();
+        QColor flashColor = flashDelta > 0 ? QColor(52, 224, 122) : QColor(239, 68, 68);
+        flashColor.setAlphaF(0.45 * flashAlpha);
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(flashColor);
+        painter->setOpacity(0.85);
+        painter->drawPath(path);
+        painter->restore();
+    }
+}
+
+void PlayerCounter::onValueChanged(int oldValue, int newValue)
+{
+    flashDelta = newValue - oldValue;
+    if (flashDelta == 0) {
+        return;
+    }
+
+    if (!SettingsCache::instance().userInterface().getAnimationsEnabled() ||
+        !SettingsCache::instance().userInterface().getLifeCounterAnimationsEnabled()) {
+        flashAlpha = 0.0;
+        return;
+    }
+
+    flashAlpha = 1.0;
+    if (flashTimer == nullptr) {
+        flashTimer = new QTimer(this);
+        connect(flashTimer, &QTimer::timeout, this, &PlayerCounter::flashTick);
+    }
+    flashTimer->start(50);
+}
+
+void PlayerCounter::flashTick()
+{
+    flashAlpha -= 0.12;
+    if (flashAlpha <= 0.0) {
+        flashAlpha = 0.0;
+        flashTimer->stop();
+    }
+    update();
 }
 
 PlayerTarget::PlayerTarget(PlayerLogic *_owner, QGraphicsItem *parentItem)

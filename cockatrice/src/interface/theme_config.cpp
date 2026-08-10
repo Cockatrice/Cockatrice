@@ -7,7 +7,8 @@
 
 bool ThemeConfig::isEmpty() const
 {
-    return colorScheme.isEmpty() && styleName.isEmpty();
+    return colorScheme.isEmpty() && styleName.isEmpty() && displayFont.isEmpty() && bodyFont.isEmpty() &&
+           cardTitleFont.isEmpty() && monoFont.isEmpty();
 }
 
 QString ThemeConfig::toIni() const
@@ -17,6 +18,21 @@ QString ThemeConfig::toIni() const
     out += QString("ColorScheme = %1\n").arg(colorScheme.isEmpty() ? "System" : colorScheme);
     out += "\n[Style]\n";
     out += QString("Name = %1\n").arg(styleName.isEmpty() ? "Default" : styleName);
+    if (!displayFont.isEmpty() || !bodyFont.isEmpty() || !cardTitleFont.isEmpty() || !monoFont.isEmpty()) {
+        out += "\n[Typography]\n";
+        if (!displayFont.isEmpty()) {
+            out += QString("DisplayFont = %1\n").arg(displayFont);
+        }
+        if (!bodyFont.isEmpty()) {
+            out += QString("BodyFont = %1\n").arg(bodyFont);
+        }
+        if (!cardTitleFont.isEmpty()) {
+            out += QString("CardTitleFont = %1\n").arg(cardTitleFont);
+        }
+        if (!monoFont.isEmpty()) {
+            out += QString("MonoFont = %1\n").arg(monoFont);
+        }
+    }
     return out;
 }
 
@@ -64,6 +80,16 @@ ThemeConfig ThemeConfig::fromThemeDir(const QString &themeDirPath)
         } else if (currentSection.compare("Style", Qt::CaseInsensitive) == 0) {
             if (key.compare("Name", Qt::CaseInsensitive) == 0) {
                 cfg.styleName = value;
+            }
+        } else if (currentSection.compare("Typography", Qt::CaseInsensitive) == 0) {
+            if (key.compare("DisplayFont", Qt::CaseInsensitive) == 0) {
+                cfg.displayFont = value;
+            } else if (key.compare("BodyFont", Qt::CaseInsensitive) == 0) {
+                cfg.bodyFont = value;
+            } else if (key.compare("CardTitleFont", Qt::CaseInsensitive) == 0) {
+                cfg.cardTitleFont = value;
+            } else if (key.compare("MonoFont", Qt::CaseInsensitive) == 0) {
+                cfg.monoFont = value;
             }
         }
     }

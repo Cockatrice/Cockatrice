@@ -11,6 +11,7 @@
 
 #include <QBrush>
 #include <QDir>
+#include <QFont>
 #include <QLoggingCategory>
 #include <QMap>
 #include <QObject>
@@ -47,6 +48,12 @@ private:
     // palette is applied. Used as the base when a theme supplies no palette, so
     // switching away from a custom palette restores the original colours.
     QPalette defaultPalette;
+    // Pristine application font captured at startup, restored when the active
+    // theme declares no body font of its own.
+    QFont defaultFont;
+    // ThemeConfig of the currently applied theme, used to resolve per-theme
+    // typography tokens.
+    ThemeConfig currentThemeConfig;
     QString currentThemePath;
     std::array<QBrush, Role::MaxRole + 1> brushes;
     QStringMap availableThemes;
@@ -92,6 +99,14 @@ public:
 
     QBrush &getBgBrush(Role zone);
     QBrush getExtraBgBrush(Role zone, int zoneId = 0);
+
+    // Per-theme typography helpers (see design-game.md). Falls back to the
+    // classic app defaults when the active theme declares no fonts, so
+    // non-CockatriceNG themes keep their current look.
+    QFont cardTitleFont() const;
+    QFont monoFont() const;
+    QFont displayFont() const;
+    QString monoFontFamily() const;
 protected slots:
     void themeChangedSlot();
 signals:

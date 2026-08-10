@@ -188,6 +188,12 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
     AbstractCounter *widget;
     if (state->getName() == "life") {
         widget = playerTarget->addCounter(state);
+        // design-game: taking damage shimmers the player's table zone crimson.
+        connect(state, &CounterState::valueChanged, this, [this](int oldValue, int newValue) {
+            if (newValue < oldValue) {
+                tableZoneGraphicsItem->triggerDamageShimmer();
+            }
+        });
     } else {
         widget = new GeneralCounter(state, player, true, this);
     }

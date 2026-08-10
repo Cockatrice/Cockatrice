@@ -11,6 +11,8 @@
 #include "../board/abstract_card_item.h"
 #include "select_zone.h"
 
+class QTimer;
+
 /**
  * @brief TableZone is the grid based rect where CardItems may be placed.
  *
@@ -184,9 +186,20 @@ public:
         update();
     }
 
+    /**
+       Flashes the table surface after a player loses life.
+
+       Wired up through AbstractCounter so the life total on the battlefield
+       glows when it changes.
+     */
+    void triggerDamageShimmer();
+
 private:
     void paintZoneOutline(QPainter *painter);
     void paintLandDivider(QPainter *painter);
+
+    QTimer *damageShimmerTimer = nullptr;
+    qreal damageShimmerAlpha = 0.0;
 
     /*
     Calculates card stack widths so mapping functions work properly

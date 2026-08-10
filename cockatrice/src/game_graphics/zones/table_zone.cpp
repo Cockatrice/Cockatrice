@@ -12,6 +12,7 @@
 
 #include <QGraphicsScene>
 #include <QPainter>
+#include <QTimer>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
@@ -47,6 +48,31 @@ void TableZone::updateBg()
     update();
 }
 
+void TableZone::triggerDamageShimmer()
+{
+    // design-game: damage pulses the affected zone with a brief crimson
+    // shimmer so a hit reads as an event, not a dialog.
+    if (!SettingsCache::instance().userInterface().getAnimationsEnabled() ||
+        !SettingsCache::instance().userInterface().getBattlefieldFlashEnabled()) {
+        damageShimmerAlpha = 0.0;
+        return;
+    }
+
+    damageShimmerAlpha = 1.0;
+    if (damageShimmerTimer == nullptr) {
+        damageShimmerTimer = new QTimer(this);
+        connect(damageShimmerTimer, &QTimer::timeout, this, [this] {
+            damageShimmerAlpha -= 0.12;
+            if (damageShimmerAlpha <= 0.0) {
+                damageShimmerAlpha = 0.0;
+                damageShimmerTimer->stop();
+            }
+            update();
+        });
+    }
+    damageShimmerTimer->start(50);
+}
+
 QRectF TableZone::boundingRect() const
 {
     return QRectF(0, 0, width, height);
@@ -75,6 +101,13 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         // inactive player gets a darker table zone with a semi transparent black mask
         // this means if the user provides a custom background it will fade
         painter->fillRect(boundingRect(), FADE_MASK);
+    }
+
+    // Decaying crimson wash from taking damage.
+    if (damageShimmerAlpha > 0.0) {
+        QColor shimmerColor(239, 68, 68);
+        shimmerColor.setAlphaF(0.22 * damageShimmerAlpha);
+        painter->fillRect(boundingRect(), shimmerColor);
     }
 
     paintLandDivider(painter);
