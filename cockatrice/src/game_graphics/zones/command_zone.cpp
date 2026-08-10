@@ -165,11 +165,9 @@ void CommandZone::unregisterTaxCounter(AbstractCounter *counter)
 
 void CommandZone::rearrangeTaxCounters()
 {
-    int activeTaxCounterCount = 0;
+    qreal y = TaxCounterSizes::TAX_COUNTER_MARGIN;
 
     for (AbstractCounter *ctr : taxCounters) {
-        qreal y = TaxCounterSizes::TAX_COUNTER_MARGIN +
-                  activeTaxCounterCount * (TaxCounterSizes::TAX_COUNTER_SIZE + TaxCounterSizes::TAX_COUNTER_MARGIN);
         ctr->setPos(TaxCounterSizes::TAX_COUNTER_MARGIN, y);
         ctr->setZValue(ZValues::TAX_COUNTERS);
         // Visibility is owned solely by AbstractCounter::setActive() (the counter's own flag),
@@ -177,13 +175,11 @@ void CommandZone::rearrangeTaxCounters()
         // (tax counters are graphics children of the zone). This function only handles layout,
         // so it stacks and measures by isActive() alone.
         if (ctr->isActive()) {
-            ++activeTaxCounterCount;
+            y += ctr->getRadius() + TaxCounterSizes::TAX_COUNTER_MARGIN;
         }
     }
 
-    int minHeight = activeTaxCounterCount * (TaxCounterSizes::TAX_COUNTER_SIZE + TaxCounterSizes::TAX_COUNTER_MARGIN) +
-                    TaxCounterSizes::TAX_COUNTER_MARGIN;
-    setMinimumHeight(minHeight);
+    setMinimumHeight(static_cast<int>(y));
 }
 
 void CommandZone::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)

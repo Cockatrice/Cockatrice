@@ -11,13 +11,10 @@
 
 /**
  * @namespace TaxCounterSizes
- * @brief Size constants for commander tax counter layout.
+ * @brief Layout constants for commander tax counters.
  */
 namespace TaxCounterSizes
 {
-
-/** @brief Size of commander tax counter icons (width and height) */
-constexpr int TAX_COUNTER_SIZE = 24;
 
 /** @brief Margin around and between tax counter icons */
 constexpr int TAX_COUNTER_MARGIN = 2;

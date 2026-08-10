@@ -9,12 +9,9 @@
 
 static constexpr qreal CORNER_RADIUS = 4.0;
 static constexpr qreal FONT_SIZE_RATIO = 0.6;
-static constexpr int OVERLAY_ALPHA = 191;
-static const QColor OVERLAY_BG_NORMAL{40, 40, 40, OVERLAY_ALPHA};
-static const QColor OVERLAY_BG_HOVERED{70, 70, 70, OVERLAY_ALPHA};
 
 CommanderTaxCounter::CommanderTaxCounter(CounterState *state, PlayerLogic *player, QGraphicsItem *parent)
-    : AbstractCounter(state, player, false, false, parent), size(TaxCounterSizes::TAX_COUNTER_SIZE)
+    : AbstractCounter(state, player, false, false, parent), size(state->getRadius())
 {
     setCacheMode(DeviceCoordinateCache);
     setAcceptHoverEvents(true);
@@ -36,10 +33,8 @@ void CommanderTaxCounter::paint(QPainter *painter,
 
     QRectF rect = boundingRect().adjusted(1, 1, -1, -1);
 
-    QColor bgColor = hovered ? OVERLAY_BG_HOVERED : OVERLAY_BG_NORMAL;
-
     painter->setPen(Qt::NoPen);
-    painter->setBrush(bgColor);
+    painter->setBrush(getOverlayColor());
     painter->drawRoundedRect(rect, CORNER_RADIUS, CORNER_RADIUS);
 
     QFont f = QFontDatabase::systemFont(QFontDatabase::GeneralFont);

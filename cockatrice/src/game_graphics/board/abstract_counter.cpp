@@ -90,6 +90,19 @@ void AbstractCounter::setValue(int _value)
     update();
 }
 
+static constexpr int OVERLAY_ALPHA = 191;
+static constexpr int HOVER_LIGHTEN_PERCENT = 130;
+
+QColor AbstractCounter::getOverlayColor() const
+{
+    QColor result = color;
+    result.setAlpha(OVERLAY_ALPHA);
+    if (hovered) {
+        result = result.lighter(HOVER_LIGHTEN_PERCENT);
+    }
+    return result;
+}
+
 void AbstractCounter::setActive(bool _active)
 {
     active = _active;

@@ -36,6 +36,14 @@ protected:
     bool hovered = false;
     bool useNameForShortcut;
 
+    /**
+     * @brief Returns the counter's color adjusted for overlay rendering.
+     *
+     * Applies semi-transparency and lightens the color when hovered.
+     * Use this for fill-based counters; SVG-based counters (GeneralCounter) bypass this.
+     */
+    [[nodiscard]] QColor getOverlayColor() const;
+
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
