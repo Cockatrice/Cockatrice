@@ -142,7 +142,7 @@ void CommandZoneMenu::updateTaxCounterActionStates()
     }
     if (aToggleCommanderTaxCounter) {
         aToggleCommanderTaxCounter->setText(cmdTax ? tr("&Remove Commander Tax") : tr("&Add Commander Tax"));
-        aToggleCommanderTaxCounter->setVisible(!cmdTax || cmdTax->getValue() == 0);
+        aToggleCommanderTaxCounter->setVisible(!cmdTax || (cmdTax->getValue() == 0 && !partnerTax));
     }
 
     if (aIncreasePartnerTax) {
