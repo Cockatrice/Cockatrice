@@ -116,8 +116,13 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&tapAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
             &CardsDisplaySettings::setTapAnimation);
 
+    animationsEnabledCheckBox.setChecked(SettingsCache::instance().userInterface().getAnimationsEnabled());
+    connect(&animationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
+            &InterfaceSettings::setAnimationsEnabled);
+
     auto *animationGrid = new QGridLayout;
-    animationGrid->addWidget(&tapAnimationCheckBox, 0, 0);
+    animationGrid->addWidget(&animationsEnabledCheckBox, 0, 0);
+    animationGrid->addWidget(&tapAnimationCheckBox, 1, 0);
 
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
@@ -310,6 +315,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));
     buddyConnectNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar when users in your buddy list connect"));
     animationGroupBox->setTitle(tr("Animation settings"));
+    animationsEnabledCheckBox.setText(tr("Enable game &animations"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));

@@ -42,6 +42,7 @@ public:
     [[nodiscard]] bool getShowStatusBar() const override;
     [[nodiscard]] bool getShowShortcuts() const override;
     [[nodiscard]] bool getShowGameSelectorFilterToolbar() const override;
+    [[nodiscard]] bool getAnimationsEnabled() const override;
 
     void setUseTearOffMenus(bool _useTearOffMenus);
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
@@ -74,6 +75,7 @@ public:
     void setShowStatusBar(bool _showStatusBar);
     void setShowShortcuts(bool _showShortcuts);
     void setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar);
+    void setAnimationsEnabled(bool _animationsEnabled);
 
 signals:
     void useTearOffMenusChanged(bool state);
@@ -85,6 +87,7 @@ signals:
     void tallyTypeChanged(int type);
     void showStatusBarChanged(bool state);
     void showGameSelectorFilterToolbarChanged(bool state);
+    void animationsEnabledChanged(bool state);
 
 public:
     explicit InterfaceSettings(const QString &settingPath, QObject *parent = nullptr);
