@@ -369,7 +369,6 @@ void PlayerGraphicsItem::rearrangeZones()
     handZoneGraphicsItem->updateOrientation();
     tableZoneGraphicsItem->reorganizeCards();
     updateBoundingRect();
-    rearrangeCounters();
 }
 
 void PlayerGraphicsItem::updateBoundingRect()
