@@ -273,7 +273,7 @@ void PlayerEventHandler::eventSetCounter(const Event_SetCounter &event)
     state->setValue(event.value());
 
     if (event.value() != oldValue) {
-        emit logSetCounter(player, state->getName(), event.value(), oldValue);
+        emit logSetCounter(player, state->getId(), state->getName(), event.value(), oldValue);
     }
 }
 

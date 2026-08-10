@@ -237,7 +237,7 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
     AbstractCounter *widget;
     if (state->getName() == "life") {
         widget = playerTarget->addCounter(state);
-    } else if (CounterNames::isTaxCounter(state->getName())) {
+    } else if (CounterIds::isTaxCounter(state->getId())) {
         if (!commandZoneGraphicsItem) {
             qWarning() << "Cannot create tax counter" << state->getName() << "- command zone not available";
             return;
@@ -275,7 +275,7 @@ void PlayerGraphicsItem::onCounterRemoved(int counterId)
         return;
     }
     setCounterMenuRegistered(widget, false);
-    if (commandZoneGraphicsItem && CounterNames::isTaxCounter(widget->getName())) {
+    if (commandZoneGraphicsItem && CounterIds::isTaxCounter(widget->getId())) {
         commandZoneGraphicsItem->unregisterTaxCounter(widget);
     }
     widget->delCounter();
@@ -291,7 +291,7 @@ void PlayerGraphicsItem::rearrangeCounters()
     qreal ySize = boundingRect().y() + 80;
     constexpr qreal padding = 5;
     for (auto *ctr : counterWidgets.values()) {
-        if (CounterNames::isTaxCounter(ctr->getName())) {
+        if (CounterIds::isTaxCounter(ctr->getId())) {
             continue;
         }
         if (!ctr->getShownInCounterArea()) {

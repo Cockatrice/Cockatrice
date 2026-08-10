@@ -670,13 +670,13 @@ void MessageLogWidget::logSetCardCounter(PlayerLogic *player, QString cardName, 
                                 .arg(value));
 }
 
-void MessageLogWidget::logSetCounter(PlayerLogic *player, QString counterName, int value, int oldValue)
+void MessageLogWidget::logSetCounter(PlayerLogic *player, int counterId, QString counterName, int value, int oldValue)
 {
     if (counterName == "life") {
         soundEngine->playSound("life_change");
     }
 
-    if (counterName == CounterNames::CommanderTax || counterName == CounterNames::PartnerTax) {
+    if (CounterIds::isTaxCounter(counterId)) {
         QString playerName = sanitizeHtml(player->getPlayerInfo()->getName());
         QString valueStr = QString("<font class=\"blue\">%1</font>").arg(value);
         int delta = value - oldValue;
