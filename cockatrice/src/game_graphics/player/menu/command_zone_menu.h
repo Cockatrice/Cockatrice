@@ -42,11 +42,13 @@ private:
     QAction *aTogglePartnerTaxCounter = nullptr;   ///< Toggles partner commander tax counter visibility
     QAction *aToggleMinimized = nullptr;           ///< Toggles command zone minimized state
 
+public slots:
+    void updateTaxCounterActionStates();
+
 private slots:
     void actToggleMinimized();
 
 private:
-    void updateTaxCounterActionStates();
     PlayerGraphicsItem *player;
 
     QString incTaxShortcutKey;

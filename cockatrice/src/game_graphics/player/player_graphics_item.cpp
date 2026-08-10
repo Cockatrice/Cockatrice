@@ -241,6 +241,11 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
         widget = new CommanderTaxCounter(state, player, commandZoneGraphicsItem);
         widget->setActive(state->isActive());
         commandZoneGraphicsItem->registerTaxCounter(widget);
+
+        if (auto *menu = playerMenu->getCommandZoneMenu()) {
+            connect(state, &CounterState::activeChanged, menu, &CommandZoneMenu::updateTaxCounterActionStates);
+            connect(state, &CounterState::valueChanged, menu, &CommandZoneMenu::updateTaxCounterActionStates);
+        }
     } else {
         widget = new GeneralCounter(state, player, true, this);
     }

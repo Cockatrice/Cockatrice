@@ -71,6 +71,11 @@ public:
         return utilityMenu;
     }
 
+    [[nodiscard]] CommandZoneMenu *getCommandZoneMenu() const
+    {
+        return commandZoneMenu;
+    }
+
     [[nodiscard]] bool getShortcutsActive() const
     {
         return shortcutsActive;
