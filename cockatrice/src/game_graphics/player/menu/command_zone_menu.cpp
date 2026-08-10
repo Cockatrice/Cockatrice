@@ -11,28 +11,16 @@
 
 #include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/counter_limits.h>
-#include <libcockatrice/utility/zone_names.h>
 
 CommandZoneMenu::CommandZoneMenu(PlayerGraphicsItem *_player, QMenu *playerMenu) : QMenu(playerMenu), player(_player)
 {
-    viewZoneShortcutKey = QStringLiteral("Player/aViewCommandZone");
     incTaxShortcutKey = QStringLiteral("Player/aAddCommanderTax");
     decTaxShortcutKey = QStringLiteral("Player/aRemoveCommanderTax");
     incPartnerTaxShortcutKey = QStringLiteral("Player/aAddPartnerTax");
     decPartnerTaxShortcutKey = QStringLiteral("Player/aRemovePartnerTax");
 
-    aViewZone = new QAction(this);
-    connect(aViewZone, &QAction::triggered, this, [this]() {
-        if (PlayerLogic *logic = player->getLogic()) {
-            emit logic->requestZoneViewToggle(logic, ZoneNames::COMMAND, -1, false);
-        }
-    });
-
     PlayerLogic *logic = player->getLogic();
     if (logic && logic->getPlayerInfo()->getLocalOrJudge()) {
-        addAction(aViewZone);
-        addSeparator();
-
         aIncreaseCommanderTax = new QAction(this);
         connect(aIncreaseCommanderTax, &QAction::triggered, this, [this]() {
             if (auto *logic = player->getLogic()) {
@@ -100,9 +88,6 @@ CommandZoneMenu::CommandZoneMenu(PlayerGraphicsItem *_player, QMenu *playerMenu)
 void CommandZoneMenu::retranslateUi()
 {
     setTitle(tr("Co&mmander"));
-    if (aViewZone) {
-        aViewZone->setText(tr("&View command zone"));
-    }
     if (aIncreaseCommanderTax) {
         aIncreaseCommanderTax->setText(tr("&Increase Commander Tax (+1)"));
     }
@@ -166,9 +151,6 @@ void CommandZoneMenu::setShortcutsActive()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
-    if (aViewZone) {
-        aViewZone->setShortcuts(shortcuts.getShortcut(viewZoneShortcutKey));
-    }
     if (aIncreaseCommanderTax) {
         aIncreaseCommanderTax->setShortcuts(shortcuts.getShortcut(incTaxShortcutKey));
     }
@@ -185,9 +167,6 @@ void CommandZoneMenu::setShortcutsActive()
 
 void CommandZoneMenu::setShortcutsInactive()
 {
-    if (aViewZone) {
-        aViewZone->setShortcut(QKeySequence());
-    }
     if (aIncreaseCommanderTax) {
         aIncreaseCommanderTax->setShortcut(QKeySequence());
     }

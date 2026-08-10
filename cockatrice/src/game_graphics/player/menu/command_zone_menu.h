@@ -18,8 +18,7 @@ class PlayerGraphicsItem;
  * @brief Context menu for the command zone.
  *
  * Appears when right-clicking on the command zone. Provides actions for
- * viewing zone contents, adjusting the commander tax counter, and
- * toggling minimized state.
+ * adjusting the commander tax counter and toggling minimized state.
  *
  * @see PlayerMenu
  * @see CommandZone
@@ -33,8 +32,6 @@ public:
     void retranslateUi() override;
     void setShortcutsActive() override;
     void setShortcutsInactive() override;
-
-    QAction *aViewZone = nullptr; ///< Opens a zone viewer for the command zone
 
 private:
     QAction *aIncreaseCommanderTax = nullptr;      ///< Increments the primary commander tax counter
@@ -52,7 +49,6 @@ private:
     void updateTaxCounterActionStates();
     PlayerGraphicsItem *player;
 
-    QString viewZoneShortcutKey;
     QString incTaxShortcutKey;
     QString decTaxShortcutKey;
     QString incPartnerTaxShortcutKey;

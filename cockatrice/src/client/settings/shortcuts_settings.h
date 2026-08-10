@@ -597,8 +597,6 @@ private:
         {"Player/aViewBottomCards", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Bottom Cards of Library"),
                                                 parseSequenceString("Ctrl+Shift+W"),
                                                 ShortcutGroup::View)},
-        {"Player/aViewCommandZone",
-         ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Command Zone"), parseSequenceString(""), ShortcutGroup::View)},
         {"Player/aAddCommanderTax", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Increase Commander Tax"),
                                                 parseSequenceString(""),
                                                 ShortcutGroup::Player_Counters)},

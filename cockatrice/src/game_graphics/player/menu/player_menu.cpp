@@ -83,7 +83,7 @@ void PlayerMenu::setMenusForGraphicItems()
         player->getSideboardZoneGraphicsItem()->setMenu(sideboardMenu);
 
         if (auto *commandZone = player->getCommandZoneGraphicsItem()) {
-            commandZone->setMenu(commandZoneMenu, commandZoneMenu->aViewZone);
+            commandZone->setMenu(commandZoneMenu);
         }
     }
 }
