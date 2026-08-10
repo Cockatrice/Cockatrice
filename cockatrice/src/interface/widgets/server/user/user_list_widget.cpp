@@ -550,18 +550,8 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     // Forward join requests from popup upward
     connect(m_userInfoPopup, &UserInfoPopup::joinGameRequested, this, &UserListWidget::joinGameRequested);
 
-    connect(avatarProvider, &UserAvatarProvider::avatarUpdated, this, [this](const QString &name) {
-        userTree->viewport()->update();
-        if (m_userInfoPopup->isVisible() && m_userInfoPopup->currentUser() == name) {
-            m_userInfoPopup->refreshHeader();
-        }
-    });
-    connect(cardArtProvider, &UserCardArtProvider::cardArtUpdated, this, [this](const QString &name) {
-        userTree->viewport()->update();
-        if (m_userInfoPopup->isVisible() && m_userInfoPopup->currentUser() == name) {
-            m_userInfoPopup->refreshHeader();
-        }
-    });
+    connect(avatarProvider, &UserAvatarProvider::avatarUpdated, this, &UserListWidget::refreshVisibleUserHeader);
+    connect(cardArtProvider, &UserCardArtProvider::cardArtUpdated, this, &UserListWidget::refreshVisibleUserHeader);
 
     connect(&SettingsCache::instance().appearance(), &AppearanceSettings::styleUserListChanged, this,
             &UserListWidget::applyDisplayMode);
@@ -641,6 +631,14 @@ void UserListWidget::bind(UserListManager *mgr)
     connect(manager, &UserListManager::userLeftOnline, this, refreshIfPopupOpen);
 
     rebuild();
+}
+
+void UserListWidget::refreshVisibleUserHeader(const QString &name)
+{
+    userTree->viewport()->update();
+    if (m_userInfoPopup->isVisible() && m_userInfoPopup->currentUser() == name) {
+        m_userInfoPopup->refreshHeader();
+    }
 }
 
 void UserListWidget::refreshPopupButtons(const QString &userName)

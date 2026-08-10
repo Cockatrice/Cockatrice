@@ -181,6 +181,7 @@ private:
     void refreshPopupButtons(const QString &userName);
 private slots:
     void userClicked(QTreeWidgetItem *item, int column);
+    void refreshVisibleUserHeader(const QString &name);
 signals:
     void openMessageDialog(const QString &userName, bool focus);
     void addBuddy(const QString &userName);
