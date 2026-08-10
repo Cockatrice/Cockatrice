@@ -138,6 +138,205 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     }
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
+
+    tutorialController = new TutorialController(this);
+
+    TutorialSequence lobbySequence;
+
+    TutorialStep introStep{deckViewContainerWidget, tr("Let's try this out.")};
+    lobbySequence.addStep(introStep);
+
+    tutorialController->addSequence(lobbySequence);
+}
+
+void TabGame::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    if (!tutorialController || tutorialStarted || SettingsCache::instance().userInterface().getTutorialCompleted()) {
+        return;
+    }
+    // Only start once all sequences are registered so advancing can't run past the
+    // end of an incomplete sequence list.
+    if (tutorialInitialized) {
+        tutorialStarted = true;
+        // Start on next event loop iteration so everything is fully painted
+        QTimer::singleShot(3, tutorialController, [this] { tutorialController->start(); });
+    }
+}
+
+void TabGame::finishTutorialInitialization()
+{
+    if (tutorialInitialized) {
+        return;
+    } else {
+        tutorialInitialized = true;
+    }
+
+    auto deckViewSequence = deckViewContainers.first()->generateTutorialSequence();
+
+    tutorialController->addSequence(deckViewSequence);
+
+    TutorialSequence deckSelectSequence;
+    deckSelectSequence.name = tr("Deck selection and readying up");
+
+    TutorialStep loadDeckStep;
+    loadDeckStep.targetWidget = deckViewContainers.first();
+    loadDeckStep.text = tr("Let's load a deck now.");
+    loadDeckStep.allowClickThrough = true;
+    loadDeckStep.requiresInteraction = true;
+    loadDeckStep.autoAdvanceOnValid = true;
+    loadDeckStep.validationTiming = ValidationTiming::OnSignal;
+    loadDeckStep.signalHook = [this](TutorialController *controller) {
+        return connect(game->getGameEventHandler(), &GameEventHandler::logDeckSelect, controller,
+                       &TutorialController::checkValidation);
+    };
+    loadDeckStep.validator = [] { return true; };
+
+    deckSelectSequence.addStep(loadDeckStep);
+
+    TutorialStep readyUpStep;
+    readyUpStep.targetWidget = deckViewContainers.first();
+    readyUpStep.text = tr("Let's ready up now.");
+    readyUpStep.allowClickThrough = true;
+    readyUpStep.requiresInteraction = true;
+    readyUpStep.autoAdvanceOnValid = true;
+    readyUpStep.validationTiming = ValidationTiming::OnSignal;
+    readyUpStep.signalHook = [this](TutorialController *controller) {
+        return connect(this, &TabGame::localPlayerReadyStateChanged, controller, &TutorialController::checkValidation);
+    };
+    readyUpStep.validator = [] { return true; };
+
+    deckSelectSequence.addStep(readyUpStep);
+
+    tutorialController->addSequence(deckSelectSequence);
+
+    TutorialSequence gamePlaySequence;
+    gamePlaySequence.name = tr("Gameplay");
+
+    gamePlaySequence.addStep(
+        {gamePlayAreaWidget,
+         tr("Welcome to your first game! It's just a singleplayer game for now to teach you the controls.")});
+    gamePlaySequence.addStep(
+        {gamePlayAreaWidget,
+         tr("Unfortunately, due to the way the game tab works, we can't highlight any specific gameplay elements but "
+            "we're confident you'll be able to spot all the relevant elements on-screen.")});
+    gamePlaySequence.addStep(
+        {gamePlayAreaWidget,
+         tr("Let's go over them quickly, left-to-right.\n\nThe phase toolbar\nThe player area\nThe battlefield")});
+    gamePlaySequence.addStep(
+        {gamePlayAreaWidget,
+         tr("First up, is the phase toolbar. This toolbar shows the current phase of the turn. You can advance it by "
+            "pressing\n\n"
+            "- Tab (simply advances the phase)\n"
+            "- Ctrl+Space (advances the phase and performes any associated actions)\n"
+            "- Clicking directly on the phase you want to change to.\n\n"
+            "You can also pass the turn here, although, you should note that most players prefer you simply leave your "
+            "turn on the end step and allow them to 'take' the turn from you by pressing 'Next turn' themselves.")});
+    gamePlaySequence.addStep({gamePlayAreaWidget, tr("Next up, is your player area.\n\nHere you can find:\n\n- Your "
+                                                     "avatar\n- Your life-counter\n- Various counters you can use to "
+                                                     "track temporary resources (i.e. mana)\n- Your "
+                                                     "library,\n- Your hand\n- Your graveyard\n- Your exile")});
+    gamePlaySequence.addStep(
+        {gamePlayAreaWidget,
+         tr("To the right of your player area, and taking up most of the screen, is your battlefield.\nThe relevant "
+            "zones here are, left-to-right, top-to-bottom:\n- The Stack\n- The Battlefield (Currently highlighted "
+            "because it is your turn)\n- Your Hand")});
+    gamePlaySequence.addStep(
+        {gamePlayAreaWidget,
+         tr("Before we dive any deeper into the actual controls, remember this:\n\nYou can perform almost "
+            "EVERY action by right-clicking the relevant object or zone!")});
+    gamePlaySequence.addStep(
+        {gamePlayAreaWidget, tr("However, there are shortcuts and conveniences to speed up your games and make your "
+                                "life easier.\n\nLet's run through a typical game start now to get you up to speed.")});
+
+    TutorialStep lifeCounterStep;
+    lifeCounterStep.targetWidget = gamePlayAreaWidget;
+    lifeCounterStep.text =
+        tr("To control your life total, you can:\n\nSet it directly using Ctrl+L\nLeft-click the "
+           "number on your avatar to increment it.\nRight-click the number on your avatar to decrement "
+           "it.\nMiddle-click the number on your avatar to open up an interval menu up to +-10.");
+    lifeCounterStep.requiresInteraction = true;
+    lifeCounterStep.allowClickThrough = true;
+    lifeCounterStep.autoAdvanceOnValid = true;
+    lifeCounterStep.validationTiming = ValidationTiming::OnSignal;
+    lifeCounterStep.signalHook = [this](TutorialController *controller) {
+        return connect(game->getPlayerManager()
+                           ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
+                           ->getPlayerEventHandler(),
+                       &PlayerEventHandler::logSetCounter, controller, &TutorialController::checkValidation);
+    };
+    lifeCounterStep.validator = [this] {
+        auto counters =
+            game->getPlayerManager()->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())->getCounters();
+        for (auto counter : counters) {
+            if (counter->getName() == "life") {
+                return counter->getValue() == 10;
+            }
+        }
+        return false;
+    };
+    lifeCounterStep.validationHint = tr("Set your life total to 10 using any of these methods.");
+
+    gamePlaySequence.addStep(lifeCounterStep);
+
+    TutorialStep diceRollStep;
+    diceRollStep.targetWidget = gamePlayAreaWidget;
+    diceRollStep.text = tr("Fantastic! Let's roll a dice now. Many players use this to determine the initial turn "
+                           "order.\nYou can right-click the battlefield and choose the menu "
+                           "option or use the shortcut (Default Ctrl+I).");
+    diceRollStep.requiresInteraction = true;
+    diceRollStep.allowClickThrough = true;
+    diceRollStep.autoAdvanceOnValid = true;
+    diceRollStep.validationTiming = ValidationTiming::OnSignal;
+    diceRollStep.signalHook = [this](TutorialController *controller) {
+        return connect(game->getPlayerManager()
+                           ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
+                           ->getPlayerEventHandler(),
+                       &PlayerEventHandler::logRollDie, controller, &TutorialController::checkValidation);
+    };
+    diceRollStep.validator = [] { return true; };
+    diceRollStep.validationHint = tr("Roll a dice using any of these methods.");
+
+    gamePlaySequence.addStep(diceRollStep);
+
+    TutorialStep mulliganStep;
+    mulliganStep.targetWidget = gamePlayAreaWidget;
+    mulliganStep.text =
+        tr("Alright, with that out of the way, we can get down to business:\n\nDrawing cards!\n\nTo draw your initial "
+           "hand:\n\n- Right-click your hand in the player area and select 'Take mulligan'\n-n Right-click your hand "
+           "zone on the battlefield and select 'Take mulligan'\n- Use the default shortcut (Ctrl+M)");
+    mulliganStep.requiresInteraction = true;
+    mulliganStep.allowClickThrough = true;
+    mulliganStep.autoAdvanceOnValid = true;
+    mulliganStep.validationTiming = ValidationTiming::OnSignal;
+    mulliganStep.signalHook = [this](TutorialController *controller) {
+        return connect(game->getPlayerManager()
+                           ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
+                           ->getPlayerEventHandler(),
+                       &PlayerEventHandler::logDrawCards, controller, &TutorialController::checkValidation);
+    };
+    mulliganStep.validator = [this] {
+        return game->getPlayerManager()
+                   ->getActiveLocalPlayer(game->getPlayerManager()->getLocalPlayerId())
+                   ->getHandZone()
+                   ->getCards()
+                   .size() == 7;
+    };
+    mulliganStep.validationHint = tr("Mulligan to 7 cards using any of these methods.");
+
+    gamePlaySequence.addStep(mulliganStep);
+
+    tutorialController->addSequence(gamePlaySequence);
+
+    if (tutorialStarted || SettingsCache::instance().userInterface().getTutorialCompleted()) {
+        return;
+    }
+    // The tab may have been shown before the local player joined; start now that
+    // the full sequence list is registered.
+    if (isVisible()) {
+        tutorialStarted = true;
+        QTimer::singleShot(3, tutorialController, [this] { tutorialController->start(); });
+    }
 }
 
 void TabGame::connectToGameState()
@@ -702,6 +901,8 @@ void TabGame::addLocalPlayer(PlayerLogic *newPlayer, int playerId)
             deckView->playerDeckView->readyAndUpdate();
         });
     }
+
+    finishTutorialInitialization();
 }
 
 void TabGame::processPlayerLeave(PlayerLogic *leavingPlayer)
@@ -779,6 +980,7 @@ void TabGame::processLocalPlayerSideboardLocked(int playerId, bool sideboardLock
 void TabGame::processLocalPlayerReadyStateChanged(int playerId, bool ready)
 {
     deckViewContainers.value(playerId)->playerDeckView->setReadyStart(ready);
+    emit localPlayerReadyStateChanged(ready);
 }
 
 void TabGame::createZoneForPlayer(PlayerLogic *newPlayer, int playerId)

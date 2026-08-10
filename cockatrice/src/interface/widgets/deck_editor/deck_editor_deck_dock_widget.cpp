@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../general/tutorial/tutorial_controller.h"
 #include "../settings_page/user_interface_settings_page.h"
 #include "../tabs/api/commander_spellbook/commander_bracket_widget.h"
 #include "deck_list_style_proxy.h"
@@ -287,6 +288,22 @@ void DeckEditorDeckDockWidget::createDeckDock()
     if (CardDatabaseManager::getInstance()->getLoadStatus() == LoadStatus::Ok) {
         initializeFormats();
     }
+}
+
+TutorialSequence DeckEditorDeckDockWidget::generateTutorialSequence()
+{
+    TutorialSequence sequence;
+    sequence.name = tr("The Deck Info Widget");
+
+    TutorialStep introStep;
+    introStep.targetWidget = this;
+    introStep.text = tr("This is the deck info widget.\n\nHere, you can adjust all kinds of metadata such as the name, "
+                        "the comments, or the tags of a deck.\nIt also displays the contents of your deck in a list "
+                        "and provides buttons to manipulate the decklist.");
+
+    sequence.addStep(introStep);
+
+    return sequence;
 }
 
 void DeckEditorDeckDockWidget::initializeFormats()

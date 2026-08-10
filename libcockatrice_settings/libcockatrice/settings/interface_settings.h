@@ -42,6 +42,7 @@ public:
     [[nodiscard]] bool getShowStatusBar() const override;
     [[nodiscard]] bool getShowShortcuts() const override;
     [[nodiscard]] bool getShowGameSelectorFilterToolbar() const override;
+    [[nodiscard]] bool getTutorialCompleted() const;
 
     void setUseTearOffMenus(bool _useTearOffMenus);
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
@@ -74,6 +75,7 @@ public:
     void setShowStatusBar(bool _showStatusBar);
     void setShowShortcuts(bool _showShortcuts);
     void setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar);
+    void setTutorialCompleted(bool value);
 
 signals:
     void useTearOffMenusChanged(bool state);

@@ -8,6 +8,7 @@
 #define DECK_VIEW_CONTAINER_H
 
 #include "../../interface/deck_loader/deck_loader.h"
+#include "../../interface/widgets/general/tutorial/tutorial_controller.h"
 
 #include <QPushButton>
 
@@ -82,6 +83,7 @@ signals:
 public:
     DeckViewContainer(int _playerId, TabGame *parent);
     void retranslateUi();
+    TutorialSequence generateTutorialSequence();
     void setReadyStart(bool ready);
     void readyAndUpdate();
     void setSideboardLocked(bool locked);

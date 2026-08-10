@@ -15,6 +15,8 @@
 #include <QWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 
+class TutorialController;
+
 class HomeWidget : public QWidget
 {
 
@@ -27,6 +29,7 @@ public:
 
 public slots:
     void paintEvent(QPaintEvent *event) override;
+    void showEvent(QShowEvent *event) override;
     void initializeBackgroundFromSource();
     void onBackgroundShuffleFrequencyChanged();
     void updateBackgroundProperties();
@@ -39,11 +42,21 @@ private:
     QTimer *cardChangeTimer;
     TabSupervisor *tabSupervisor;
     QPixmap background;
+    TutorialController *tutorialController;
+    bool tutorialStarted = false;
     CardInfoPictureArtCropWidget *backgroundSourceCard = nullptr;
     DeckList backgroundSourceDeck;
     QPixmap overlay;
     QPair<QColor, QColor> gradientColors;
+
     HomeStyledButton *connectButton;
+    HomeStyledButton *visualDeckEditorButton;
+    HomeStyledButton *visualDeckStorageButton;
+    HomeStyledButton *visualDatabaseDisplayButton;
+    HomeStyledButton *edhrecButton;
+    HomeStyledButton *archidektButton;
+    HomeStyledButton *replaybutton;
+    HomeStyledButton *exitButton;
 
     void setRandomCard(ExactCard &newCard);
     void loadBackgroundSourceDeck();

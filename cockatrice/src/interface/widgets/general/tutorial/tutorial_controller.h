@@ -1,0 +1,116 @@
+#ifndef COCKATRICE_TUTORIAL_CONTROLLER_H
+#define COCKATRICE_TUTORIAL_CONTROLLER_H
+
+#include "tutorial_overlay.h"
+
+#include <QList>
+#include <QObject>
+#include <QPointer>
+#include <functional>
+
+enum class ValidationTiming
+{
+    OnAdvance, // Validate when user clicks next/clicks target (default)
+    OnChange,  // Validate whenever target widget changes (for text input)
+    OnSignal,  // Validate when a specific signal is emitted
+    Manual     // Only validate when explicitly triggered
+};
+
+class TutorialController;
+
+struct TutorialStep
+{
+    // QPointer so a destroyed widget is detected instead of dereferencing a dangling pointer.
+    QPointer<QWidget> targetWidget;
+    QString text;
+    std::function<void()> onEnter = nullptr;
+    std::function<void()> onExit = nullptr;
+
+    // Interactive features
+    bool requiresInteraction = false;          // Must click target to advance
+    bool allowClickThrough = false;            // Clicks pass through to target widget
+    std::function<bool()> validator = nullptr; // Check if task completed
+    QString validationHint = "";               // Show if validation fails
+    ValidationTiming validationTiming = ValidationTiming::OnAdvance;
+
+    // Auto-advance when validation passes (useful for text input)
+    bool autoAdvanceOnValid = false;
+
+    // Custom interaction hint (overrides default "Click to continue")
+    QString customInteractionHint = nullptr;
+
+    // Establishes the connection used for signal-based validation (ValidationTiming::OnSignal).
+    // Called with the controller so call sites can connect a specific signal to
+    // TutorialController::checkValidation using pointer-to-member, which is checked at
+    // compile time unlike string-based SIGNAL() connections.
+    std::function<QMetaObject::Connection(TutorialController *)> signalHook = nullptr;
+};
+
+struct TutorialSequence
+{
+    QString name;
+    QList<TutorialStep> steps;
+
+    void addStep(const TutorialStep &step)
+    {
+        steps.append(step);
+    }
+
+    void addSteps(const TutorialSequence &sequence)
+    {
+        steps.append(sequence.steps);
+    }
+};
+
+class TutorialController : public QObject
+{
+    Q_OBJECT
+
+public:
+    explicit TutorialController(QWidget *_tutorializedWidget);
+    ~TutorialController() override;
+
+    void addSequence(const TutorialSequence &seq);
+    void start();
+
+    TutorialOverlay *getOverlay()
+    {
+        return tutorialOverlay;
+    }
+
+public slots:
+    void nextStep();
+    void prevStep();
+    void nextSequence();
+    void prevSequence();
+    void runExitForCurrentStep();
+    void exitTutorial();
+    void handleTargetClicked(); // Handle clicks on highlighted widget
+    void attemptAdvance();      // Try to advance with validation
+    void checkValidation();     // Check validation for OnChange timing
+
+private:
+    void showStep();
+    void updateProgress();              // Update progress indicators
+    bool validateCurrentStep();         // Check if step requirements met
+    void setupValidationMonitoring();   // Setup automatic validation checking
+    void cleanupValidationMonitoring(); // Cleanup validation watchers
+
+    QWidget *tutorializedWidget;
+    TutorialOverlay *tutorialOverlay;
+    QVector<TutorialSequence> sequences;
+
+    bool tutorialCompleted = false;
+
+    int currentSequence = -1;
+    int currentStep = -1;
+
+    // For OnChange validation monitoring
+    QMetaObject::Connection validationConnection;
+
+    // True while an auto-advance timer is pending, so repeated signal emissions
+    // can't queue more than one advance.
+    bool advanceScheduled = false;
+};
+
+#endif // COCKATRICE_TUTORIAL_CONTROLLER_H

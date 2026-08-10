@@ -6,13 +6,14 @@
 #include "../../pixel_map_generator.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../deck_editor/card_database_view.h"
+#include "../deck_editor/deck_state_manager.h"
+#include "../general/tutorial/tutorial_controller.h"
+#include "../quick_settings/settings_button_widget.h"
+#include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
 #include "../utility/custom_line_edit.h"
 #include "visual_database_display_color_filter_widget.h"
 #include "visual_database_display_filter_save_load_widget.h"
-#include "visual_database_display_main_type_filter_widget.h"
-#include "visual_database_display_name_filter_widget.h"
 #include "visual_database_display_set_filter_widget.h"
-#include "visual_database_display_sub_type_filter_widget.h"
 
 #include <QHeaderView>
 #include <QScrollBar>
@@ -21,6 +22,7 @@
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/utility/qt_utils.h>
 #include <utility>
 
 VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
@@ -134,6 +136,81 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     QScrollBar *scrollBar = flowWidget->scrollArea->verticalScrollBar();
     connect(scrollBar, &QScrollBar::valueChanged, [this](int /*value*/) { loadCurrentPage(); });
     retranslateUi();
+}
+
+TutorialSequence VisualDatabaseDisplayWidget::addTutorialSteps()
+{
+    auto sequence = TutorialSequence();
+    sequence.addStep({colorFilterWidget, "Filter the database by colors with these controls"});
+    TutorialStep displayModeStep;
+    displayModeStep.targetWidget = displayModeButton;
+    displayModeStep.text = tr("You can change back to the old table display-style with this button.");
+    displayModeStep.allowClickThrough = true;
+    sequence.addStep(displayModeStep);
+    sequence.addStep({filterContainer, "Use these controls for quick access to common filters."});
+
+    TutorialStep setFilterStep;
+    setFilterStep.targetWidget = filterContainer->getSetFilterWidget();
+    setFilterStep.text = tr("Let's try it out now by selecting a set filter!");
+    setFilterStep.allowClickThrough = true;
+    setFilterStep.requiresInteraction = true;
+    setFilterStep.autoAdvanceOnValid = true;
+    setFilterStep.validationTiming = ValidationTiming::OnSignal;
+    setFilterStep.signalHook = [this](TutorialController *controller) {
+        return connect(filterModel, &FilterTreeModel::layoutChanged, controller, &TutorialController::checkValidation);
+    };
+    setFilterStep.validator = [] { return true; };
+    sequence.addStep(setFilterStep);
+
+    TutorialStep explorationStep;
+    explorationStep.targetWidget = this;
+    explorationStep.text = tr("Try it out!\n\nAdd 5 different new cards to the deck by clicking on them!");
+    explorationStep.allowClickThrough = true;
+    explorationStep.requiresInteraction = true;
+    explorationStep.autoAdvanceOnValid = true;
+    explorationStep.validationTiming = ValidationTiming::OnSignal;
+    if (QtUtils::findParentOfType<TabDeckEditorVisual>(this)) {
+        explorationStep.onEnter = [this] {
+            auto deckEditor = QtUtils::findParentOfType<TabDeckEditorVisual>(this);
+            // Only clear an empty starter deck; never destroy a deck the user may
+            // have opened with existing cards.
+            if (deckEditor->deckStateManager->getModel()->getDeckList()->getCardList().isEmpty()) {
+                deckEditor->deckStateManager->clearDeck();
+            }
+        };
+        auto deckModel = QtUtils::findParentOfType<TabDeckEditorVisual>(this)->deckStateManager->getModel();
+        explorationStep.signalHook = [deckModel](TutorialController *controller) {
+            return connect(deckModel, &DeckListModel::cardNodesChanged, controller,
+                           &TutorialController::checkValidation);
+        };
+        explorationStep.validator = [this] {
+            if (QtUtils::findParentOfType<TabDeckEditorVisual>(this)) {
+                return QtUtils::findParentOfType<TabDeckEditorVisual>(this)
+                           ->deckStateManager->getModel()
+                           ->getDeckList()
+                           ->getCardList()
+                           .size() >= 5;
+            }
+            return true;
+        };
+    }
+
+    sequence.addStep(explorationStep);
+
+    TutorialStep conclusionStep;
+    conclusionStep.targetWidget = this;
+    conclusionStep.text = tr(
+        "Great!\n\nLet's look at them in the deck view before we conclude this tutorial with the analytics widgets.");
+    conclusionStep.onExit = [this]() {
+        auto tabWidget = QtUtils::findParentOfType<TabDeckEditorVisualTabWidget>(this);
+        if (tabWidget) {
+            tabWidget->setCurrentWidget(tabWidget->visualDeckView);
+        }
+    };
+
+    sequence.addStep(conclusionStep);
+
+    return sequence;
 }
 
 void VisualDatabaseDisplayWidget::initialize()
