@@ -116,6 +116,15 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&tapAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
             &CardsDisplaySettings::setTapAnimation);
 
+    lifeCounterAnimationsCheckBox.setChecked(
+        SettingsCache::instance().userInterface().getLifeCounterAnimationsEnabled());
+    connect(&lifeCounterAnimationsCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
+            &InterfaceSettings::setLifeCounterAnimationsEnabled);
+
+    battlefieldFlashCheckBox.setChecked(SettingsCache::instance().userInterface().getBattlefieldFlashEnabled());
+    connect(&battlefieldFlashCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
+            &InterfaceSettings::setBattlefieldFlashEnabled);
+
     connect(&enableAllAnimationsButton, &QPushButton::clicked, this, &UserInterfaceSettingsPage::enableAllAnimations);
     connect(&disableAllAnimationsButton, &QPushButton::clicked, this, &UserInterfaceSettingsPage::disableAllAnimations);
 
@@ -123,6 +132,8 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     animationGrid->addWidget(&enableAllAnimationsButton, 0, 0);
     animationGrid->addWidget(&disableAllAnimationsButton, 0, 1);
     animationGrid->addWidget(&tapAnimationCheckBox, 1, 0);
+    animationGrid->addWidget(&lifeCounterAnimationsCheckBox, 2, 0);
+    animationGrid->addWidget(&battlefieldFlashCheckBox, 3, 0);
 
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
@@ -276,11 +287,17 @@ void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
 void UserInterfaceSettingsPage::enableAllAnimations()
 {
     tapAnimationCheckBox.setChecked(true);
+    lifeCounterAnimationsCheckBox.setChecked(true);
+    battlefieldFlashCheckBox.setChecked(true);
+    visualDeckStorageSelectionAnimationCheckBox.setChecked(true);
 }
 
 void UserInterfaceSettingsPage::disableAllAnimations()
 {
     tapAnimationCheckBox.setChecked(false);
+    lifeCounterAnimationsCheckBox.setChecked(false);
+    battlefieldFlashCheckBox.setChecked(false);
+    visualDeckStorageSelectionAnimationCheckBox.setChecked(false);
 }
 
 void UserInterfaceSettingsPage::updateCommanderSpellbookUiState()
@@ -328,6 +345,8 @@ void UserInterfaceSettingsPage::retranslateUi()
     enableAllAnimationsButton.setText(tr("&Enable all animations"));
     disableAllAnimationsButton.setText(tr("&Disable all animations"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
+    lifeCounterAnimationsCheckBox.setText(tr("Life counter flash"));
+    battlefieldFlashCheckBox.setText(tr("Battlefield flash on damage"));
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
     visualDeckStorageInGameCheckBox.setText(tr("Use visual deck storage in game lobby"));
