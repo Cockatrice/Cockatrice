@@ -116,8 +116,37 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&tapAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
             &CardsDisplaySettings::setTapAnimation);
 
+    animationsEnabledCheckBox.setChecked(SettingsCache::instance().userInterface().getAnimationsEnabled());
+    connect(&animationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
+            &InterfaceSettings::setAnimationsEnabled);
+
+    lifeCounterAnimationsCheckBox.setChecked(
+        SettingsCache::instance().userInterface().getLifeCounterAnimationsEnabled());
+    connect(&lifeCounterAnimationsCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
+            &InterfaceSettings::setLifeCounterAnimationsEnabled);
+
+    battlefieldFlashCheckBox.setChecked(SettingsCache::instance().userInterface().getBattlefieldFlashEnabled());
+    connect(&battlefieldFlashCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
+            &InterfaceSettings::setBattlefieldFlashEnabled);
+
     auto *animationGrid = new QGridLayout;
-    animationGrid->addWidget(&tapAnimationCheckBox, 0, 0);
+    animationGrid->addWidget(&animationsEnabledCheckBox, 0, 0);
+    animationGrid->addWidget(&tapAnimationCheckBox, 1, 0);
+
+    // Subgroup for per-effect toggles, active only while the blanket "enable all" is on.
+    auto *animationDetailGrid = new QGridLayout;
+    animationDetailGrid->addWidget(&lifeCounterAnimationsCheckBox, 0, 0);
+    animationDetailGrid->addWidget(&battlefieldFlashCheckBox, 1, 0);
+    animationDetailGroupBox = new QGroupBox;
+    animationDetailGroupBox->setLayout(animationDetailGrid);
+    animationGrid->addWidget(animationDetailGroupBox, 2, 0);
+
+    const auto syncAnimationDetailEnabled = [this] {
+        animationDetailGroupBox->setEnabled(SettingsCache::instance().userInterface().getAnimationsEnabled());
+    };
+    syncAnimationDetailEnabled();
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::animationsEnabledChanged, this,
+            syncAnimationDetailEnabled);
 
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
@@ -310,7 +339,11 @@ void UserInterfaceSettingsPage::retranslateUi()
     specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));
     buddyConnectNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar when users in your buddy list connect"));
     animationGroupBox->setTitle(tr("Animation settings"));
+    animationsEnabledCheckBox.setText(tr("Enable game &animations"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
+    animationDetailGroupBox->setTitle(tr("Individual animations"));
+    lifeCounterAnimationsCheckBox.setText(tr("Life counter flash"));
+    battlefieldFlashCheckBox.setText(tr("Battlefield flash on damage"));
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
     visualDeckStorageInGameCheckBox.setText(tr("Use visual deck storage in game lobby"));

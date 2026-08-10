@@ -35,6 +35,9 @@ private:
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox keepGameChatFocusCheckBox;
     QCheckBox tapAnimationCheckBox;
+    QCheckBox animationsEnabledCheckBox;
+    QCheckBox lifeCounterAnimationsCheckBox;
+    QCheckBox battlefieldFlashCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
     QLabel visualDeckStoragePromptForConversionLabel;
     QComboBox visualDeckStoragePromptForConversionSelector;
@@ -52,6 +55,7 @@ private:
     QGroupBox *generalGroupBox;
     QGroupBox *notificationsGroupBox;
     QGroupBox *animationGroupBox;
+    QGroupBox *animationDetailGroupBox;
     QGroupBox *deckEditorGroupBox;
     QGroupBox *replayGroupBox;
 
