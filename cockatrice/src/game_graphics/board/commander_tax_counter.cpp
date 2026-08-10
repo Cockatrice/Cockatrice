@@ -15,7 +15,6 @@ CommanderTaxCounter::CommanderTaxCounter(CounterState *state, PlayerLogic *playe
 {
     setCacheMode(DeviceCoordinateCache);
     setAcceptHoverEvents(true);
-    setCursor(Qt::ArrowCursor);
 
     setToolTip(tr("%1: %2").arg(TranslateCounterName::getDisplayName(getName())).arg(getValue()));
 }
