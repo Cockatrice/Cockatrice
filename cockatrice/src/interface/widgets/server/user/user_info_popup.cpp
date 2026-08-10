@@ -527,6 +527,21 @@ void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
 
 // ── showForUser ───────────────────────────────────────────────────────────────
 
+void UserInfoPopup::refreshHeader()
+{
+    if (m_currentUser.isEmpty()) {
+        return;
+    }
+
+    const QPixmap avatar = m_avatarCache ? m_avatarCache->value(m_currentUser) : QPixmap{};
+    const CardArtParams params = (m_cardArtParamsMap && m_cardArtParamsMap->contains(m_currentUser))
+                                     ? m_cardArtParamsMap->value(m_currentUser)
+                                     : CardArtParams{};
+    const QString artKey = m_currentUser + u'|' + params.cardName + u'|' + params.cardProviderId;
+    const QPixmap cardArt = (m_cardArtCache && !params.cardName.isEmpty()) ? m_cardArtCache->value(artKey) : QPixmap{};
+    m_header->setUserData(m_currentUserInfo, m_currentOnline, avatar, cardArt, params);
+}
+
 void UserInfoPopup::showForUser(const QString &userName,
                                 const ServerInfo_User &userInfo,
                                 bool online,
@@ -538,13 +553,7 @@ void UserInfoPopup::showForUser(const QString &userName,
     m_currentOnline = online;
 
     // Header
-    const QPixmap avatar = m_avatarCache ? m_avatarCache->value(userName) : QPixmap{};
-    const CardArtParams params = (m_cardArtParamsMap && m_cardArtParamsMap->contains(userName))
-                                     ? m_cardArtParamsMap->value(userName)
-                                     : CardArtParams{};
-    const QString artKey = userName + u'|' + params.cardName + u'|' + params.cardProviderId;
-    const QPixmap cardArt = (m_cardArtCache && !params.cardName.isEmpty()) ? m_cardArtCache->value(artKey) : QPixmap{};
-    m_header->setUserData(userInfo, online, avatar, cardArt, params);
+    refreshHeader();
 
     // Actions
     rebuildActionButtons(userInfo, online, isBuddy, isIgnored);

@@ -36,6 +36,7 @@ class QPlainTextEdit;
 class Response;
 class CommandContainer;
 class UserContextMenu;
+class QShowEvent;
 
 class BanDialog : public QDialog
 {
@@ -158,11 +159,14 @@ private:
     QTimer *m_hidePopupTimer = nullptr;
     QString m_hoveredUser;
     bool m_popupPinned = false;
+    bool m_bulkLoading = false;
 
     void showPopupForUser(const QString &userName);
     void hidePopup(bool immediate = false);
     void positionPopup(const QString &userName);
     void connectPopupSignals();
+    bool isItemNearViewport(const UserListTWI *item) const;
+    void requestAvatarsForVisibleItems();
 
     QMap<QString, UserListTWI *> users;
     TabSupervisor *tabSupervisor;
@@ -177,6 +181,7 @@ private:
     void refreshPopupButtons(const QString &userName);
 private slots:
     void userClicked(QTreeWidgetItem *item, int column);
+    void refreshVisibleUserHeader(const QString &name);
 signals:
     void openMessageDialog(const QString &userName, bool focus);
     void addBuddy(const QString &userName);
@@ -192,6 +197,8 @@ public:
                    QWidget *parent = nullptr);
     void bind(UserListManager *mgr);
     void applyDisplayMode();
+    void beginBulkLoad();
+    void endBulkLoad();
     bool eventFilter(QObject *obj, QEvent *event) override;
     void retranslateUi();
     void rebuild();
@@ -207,6 +214,7 @@ public:
 
 protected:
     void hideEvent(QHideEvent *e) override;
+    void showEvent(QShowEvent *e) override;
 };
 
 #endif
