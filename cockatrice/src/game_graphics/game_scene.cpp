@@ -495,6 +495,7 @@ void GameScene::addArrow(QSharedPointer<ArrowData> data)
     }
 
     auto *arrow = new ArrowItem(data, startCard, targetItem);
+    arrow->startDrawAnimation();
     addItem(arrow);
     arrowRegistry.insert(data, arrow);
     connect(arrow, &ArrowItem::requestDeletion, this, &GameScene::requestArrowDeletion);

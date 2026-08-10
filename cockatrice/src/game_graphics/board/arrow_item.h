@@ -11,6 +11,7 @@
 class CardItem;
 class QGraphicsSceneMouseEvent;
 class PlayerLogic;
+class QTimer;
 
 class ArrowItem : public QObject, public QGraphicsItem
 {
@@ -21,6 +22,9 @@ signals:
 
 private:
     QPainterPath path;
+    QPainterPath centerLine;
+    qreal drawProgress = 1.0;
+    QTimer *drawTimer = nullptr;
 
 protected:
     QSharedPointer<const ArrowData> data;
@@ -38,6 +42,7 @@ public:
     void delArrow();
     void updatePath();
     void updatePath(const QPointF &endPoint);
+    void startDrawAnimation();
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     [[nodiscard]] QRectF boundingRect() const override

@@ -13,6 +13,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QTimer>
 #include <QtMath>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
@@ -91,10 +92,11 @@ void ArrowItem::updatePath(const QPointF &endPoint)
     prepareGeometryChange();
     if (lineLength < 30) {
         path = QPainterPath();
+        centerLine = QPainterPath();
     } else {
         QPointF c(lineLength / 2, qTan(phi * M_PI / 180) * lineLength);
 
-        QPainterPath centerLine;
+        centerLine = QPainterPath();
         centerLine.moveTo(0, 0);
         centerLine.quadTo(c, QPointF(lineLength, 0));
 
@@ -125,6 +127,32 @@ void ArrowItem::updatePath(const QPointF &endPoint)
     setTransform(QTransform().rotate(-line.angle()));
 }
 
+void ArrowItem::startDrawAnimation()
+{
+    if (!SettingsCache::instance().userInterface().getAnimationsEnabled() || centerLine.isEmpty()) {
+        return;
+    }
+
+    drawProgress = 0.0;
+    if (drawTimer == nullptr) {
+        drawTimer = new QTimer(this);
+        connect(drawTimer, &QTimer::timeout, this, [this] {
+            if (!SettingsCache::instance().userInterface().getAnimationsEnabled()) {
+                drawProgress = 1.0;
+                drawTimer->stop();
+            } else {
+                drawProgress += 0.08;
+                if (drawProgress >= 1.0) {
+                    drawProgress = 1.0;
+                    drawTimer->stop();
+                }
+            }
+            update();
+        });
+    }
+    drawTimer->start(20);
+}
+
 void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     QColor paintColor(data->color);
@@ -133,8 +161,29 @@ void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
     } else {
         paintColor.setAlpha(150);
     }
+
+    painter->save();
+    if (drawProgress < 1.0 && !path.isEmpty()) {
+        QRectF pr = path.boundingRect();
+        qreal revealX = pr.left() + pr.width() * drawProgress;
+        QPainterPath clip;
+        clip.addRect(QRectF(pr.left() - 100, pr.top() - 100, revealX - pr.left() + 200, pr.height() + 200));
+        painter->setClipPath(clip);
+    }
     painter->setBrush(paintColor);
     painter->drawPath(path);
+
+    if (drawProgress < 1.0 && !centerLine.isEmpty()) {
+        const QPointF impulse = centerLine.pointAtPercent(drawProgress);
+        QRadialGradient glow(impulse, 10);
+        glow.setColorAt(0, QColor(255, 255, 255, 230));
+        glow.setColorAt(0.4, paintColor);
+        glow.setColorAt(1, QColor(paintColor.red(), paintColor.green(), paintColor.blue(), 0));
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(glow);
+        painter->drawEllipse(impulse, 8, 8);
+    }
+    painter->restore();
 }
 
 void ArrowItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
