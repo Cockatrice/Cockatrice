@@ -7,7 +7,8 @@ set(CMAKE_AUTORCC ON)
 
 set(UTILITY_SOURCES
     libcockatrice/utility/cryptoutil.cpp libcockatrice/utility/expression.cpp libcockatrice/utility/levenshtein.cpp
-    libcockatrice/utility/passwordhasher.cpp libcockatrice/utility/server_rate_limiter.cpp libcockatrice/utility/warning_categories.cpp
+    libcockatrice/utility/passwordhasher.cpp libcockatrice/utility/server_rate_limiter.cpp
+    libcockatrice/utility/warning_categories.cpp
 )
 
 set(UTILITY_HEADERS
