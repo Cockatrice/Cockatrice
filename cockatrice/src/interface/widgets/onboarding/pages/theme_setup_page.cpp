@@ -5,6 +5,7 @@
 #include "../../interface/palette_editor/quick_setup_panel.h"
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/general/background_sources.h"
+#include "libcockatrice/settings/appearance_settings.h"
 
 #include <QComboBox>
 #include <QDir>
@@ -95,7 +96,7 @@ void ThemeSetupPage::initializePage()
     schemeCombo->blockSignals(false);
 
     homeTabBackgroundCombo->blockSignals(true);
-    QString homeTabSource = SettingsCache::instance().personal().getHomeTabBackgroundSource();
+    QString homeTabSource = SettingsCache::instance().appearance().getHomeTabBackgroundSource();
     int homeTabIdx = homeTabBackgroundCombo->findData(BackgroundSources::fromId(homeTabSource));
     homeTabBackgroundCombo->setCurrentIndex(homeTabIdx >= 0 ? homeTabIdx : 0);
     homeTabBackgroundCombo->blockSignals(false);
@@ -142,7 +143,7 @@ void ThemeSetupPage::onHomeTabBackgroundChanged(int index)
         return;
     }
     auto type = homeTabBackgroundCombo->currentData().value<BackgroundSources::Type>();
-    SettingsCache::instance().personal().setHomeTabBackgroundSource(BackgroundSources::toId(type));
+    SettingsCache::instance().appearance().setHomeTabBackgroundSource(BackgroundSources::toId(type));
 }
 
 void ThemeSetupPage::onGenerateFromAccent(const QColor &accent, int intensity)

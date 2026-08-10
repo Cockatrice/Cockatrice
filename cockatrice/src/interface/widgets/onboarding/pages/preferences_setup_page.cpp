@@ -1,6 +1,9 @@
 #include "preferences_setup_page.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "libcockatrice/settings/appearance_settings.h"
+#include "libcockatrice/settings/download_settings.h"
+#include "libcockatrice/settings/network_settings.h"
 
 #include <QCheckBox>
 #include <QGroupBox>
@@ -80,7 +83,7 @@ PreferencesSetupPage::PreferencesSetupPage(QWidget *parent) : FirstRunWizardPage
 
     SettingsCache &settings = SettingsCache::instance();
 
-    connect(styleUserListCheckBox, &QCheckBox::toggled, &settings.interface(), &InterfaceSettings::setStyleUserList);
+    connect(styleUserListCheckBox, &QCheckBox::toggled, &settings.appearance(), &AppearanceSettings::setStyleUserList);
     connect(cardScalingCheckBox, &QCheckBox::toggled, &settings.cardsDisplay(), &CardsDisplaySettings::setCardScaling);
     connect(roundCardCornersCheckBox, &QCheckBox::toggled, &settings.cardsDisplay(),
             &CardsDisplaySettings::setRoundCardCorners);
@@ -91,19 +94,20 @@ PreferencesSetupPage::PreferencesSetupPage(QWidget *parent) : FirstRunWizardPage
     connect(tapAnimationCheckBox, &QCheckBox::toggled, &settings.cardsDisplay(),
             &CardsDisplaySettings::setTapAnimation);
 
-    connect(notificationsEnabledCheckBox, &QCheckBox::toggled, &settings.interface(),
+    connect(notificationsEnabledCheckBox, &QCheckBox::toggled, &settings.userInterface(),
             &InterfaceSettings::setNotificationsEnabled);
     connect(soundEnabledCheckBox, &QCheckBox::toggled, &settings.sound(), &SoundSettings::setSoundEnabled);
 
-    connect(doubleClickToPlayCheckBox, &QCheckBox::toggled, &settings.interface(),
+    connect(doubleClickToPlayCheckBox, &QCheckBox::toggled, &settings.userInterface(),
             &InterfaceSettings::setDoubleClickToPlay);
-    connect(horizontalHandCheckBox, &QCheckBox::toggled, &settings.interface(), &InterfaceSettings::setHorizontalHand);
-    connect(playToStackCheckBox, &QCheckBox::toggled, &settings.interface(), &InterfaceSettings::setPlayToStack);
+    connect(horizontalHandCheckBox, &QCheckBox::toggled, &settings.userInterface(),
+            &InterfaceSettings::setHorizontalHand);
+    connect(playToStackCheckBox, &QCheckBox::toggled, &settings.userInterface(), &InterfaceSettings::setPlayToStack);
 
-    connect(showShortcutsCheckBox, &QCheckBox::toggled, &settings.cardsDisplay(),
-            &CardsDisplaySettings::setShowShortcuts);
+    connect(showShortcutsCheckBox, &QCheckBox::toggled, &settings.userInterface(),
+            &InterfaceSettings::setShowShortcuts);
 
-    connect(picDownloadCheckBox, &QCheckBox::toggled, &settings.personal(), &PersonalSettings::setPicDownload);
+    connect(picDownloadCheckBox, &QCheckBox::toggled, &settings.downloads(), &DownloadSettings::setPicDownload);
     connect(checkUpdatesOnStartupCheckBox, &QCheckBox::toggled, &settings.updates(),
             &UpdatesSettings::setCheckUpdatesOnStartup);
     connect(showTipsOnStartupCheckBox, &QCheckBox::toggled, &settings.personal(),
@@ -116,23 +120,23 @@ void PreferencesSetupPage::initializePage()
 {
     SettingsCache &settings = SettingsCache::instance();
 
-    styleUserListCheckBox->setChecked(settings.interface().getStyleUserList());
+    styleUserListCheckBox->setChecked(settings.appearance().getStyleUserList());
     cardScalingCheckBox->setChecked(settings.cardsDisplay().getScaleCards());
     roundCardCornersCheckBox->setChecked(settings.cardsDisplay().getRoundCardCorners());
     displayCardNamesCheckBox->setChecked(settings.cardsDisplay().getDisplayCardNames());
     autoRotateCardsCheckBox->setChecked(settings.cardsDisplay().getAutoRotateSidewaysLayoutCards());
     tapAnimationCheckBox->setChecked(settings.cardsDisplay().getTapAnimation());
 
-    notificationsEnabledCheckBox->setChecked(settings.interface().getNotificationsEnabled());
+    notificationsEnabledCheckBox->setChecked(settings.userInterface().getNotificationsEnabled());
     soundEnabledCheckBox->setChecked(settings.sound().getSoundEnabled());
 
-    doubleClickToPlayCheckBox->setChecked(settings.interface().getDoubleClickToPlay());
-    horizontalHandCheckBox->setChecked(settings.interface().getHorizontalHand());
-    playToStackCheckBox->setChecked(settings.interface().getPlayToStack());
+    doubleClickToPlayCheckBox->setChecked(settings.userInterface().getDoubleClickToPlay());
+    horizontalHandCheckBox->setChecked(settings.userInterface().getHorizontalHand());
+    playToStackCheckBox->setChecked(settings.userInterface().getPlayToStack());
 
-    showShortcutsCheckBox->setChecked(settings.cardsDisplay().getShowShortcuts());
+    showShortcutsCheckBox->setChecked(settings.userInterface().getShowShortcuts());
 
-    picDownloadCheckBox->setChecked(settings.personal().getPicDownload());
+    picDownloadCheckBox->setChecked(settings.downloads().getPicDownload());
     checkUpdatesOnStartupCheckBox->setChecked(settings.updates().getCheckUpdatesOnStartup());
     showTipsOnStartupCheckBox->setChecked(settings.personal().getShowTipsOnStartup());
 }

@@ -503,25 +503,25 @@ qt6_add_executable(
 )
 
 qt6_add_shaders(
-    cockatrice
-    "onboarding_shaders"
-    PREFIX
-    "/onboarding/shaders"
-    BASE
-    "src/interface/widgets/onboarding/shaders"
-    FILES
-    src/interface/widgets/onboarding/shaders/brand_banner.frag
+  cockatrice
+  "onboarding_shaders"
+  PREFIX
+  "/onboarding/shaders"
+  BASE
+  "src/interface/widgets/onboarding/shaders"
+  FILES
+  src/interface/widgets/onboarding/shaders/brand_banner.frag
 )
 
 qt6_add_resources(
-    cockatrice
-    "onboarding_qml"
-    PREFIX
-    "/onboarding/qml"
-    BASE
-    "src/interface/widgets/onboarding/qml"
-    FILES
-    src/interface/widgets/onboarding/qml/BrandBanner.qml
+  cockatrice
+  "onboarding_qml"
+  PREFIX
+  "/onboarding/qml"
+  BASE
+  "src/interface/widgets/onboarding/qml"
+  FILES
+  src/interface/widgets/onboarding/qml/BrandBanner.qml
 )
 
 target_link_libraries(
