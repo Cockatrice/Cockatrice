@@ -3045,8 +3045,8 @@ Make sure to enable the &apos;Token&apos; set in the &quot;Manage sets&quot; dia
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="33"/>
-        <source>Hide started games</source>
-        <translation>Hide started games</translation>
+        <source>Hide games that have started</source>
+        <translation>Hide games that have started</translation>
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="36"/>

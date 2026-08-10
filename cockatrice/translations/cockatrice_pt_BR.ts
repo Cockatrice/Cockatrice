@@ -3045,7 +3045,7 @@ Certifique-se de habilitar a expansão &apos;Fichas&apos; em &quot;Gerenciar exp
     </message>
     <message>
         <location filename="src/interface/widgets/dialogs/dlg_filter_games.cpp" line="33"/>
-        <source>Hide started games</source>
+        <source>Hide games that have started</source>
         <translation>Ocultar jogos já iniciados</translation>
     </message>
     <message>
