@@ -356,12 +356,21 @@ void HomeWidget::paintEvent(QPaintEvent *event)
     }
 
     // Scryfall requires artist attribution wherever card art is shown cropped.
-    // Pin it to the bottom-right corner, using the same font as the card name pill.
+    // Pin it to the bottom-right corner, using the same font as the card name pill,
+    // and align its right edge with the card name pill's right edge.
+    constexpr int margin = 15;
+    constexpr qreal attributionMargin = 4.0;
+
     QFont attributionFont = painter.font();
     attributionFont.setPointSize(14);
     attributionFont.setBold(true);
     painter.setFont(attributionFont);
-    const QRectF attributionRect = paintArtAttribution(painter, rect(), attribution);
+
+    // paintArtAttribution insets the pill 4px from the given rect's right edge,
+    // so nudge the rect's right edge to land exactly on the pill's right edge.
+    QRectF attributionArea = rect();
+    attributionArea.setRight(width() - margin + attributionMargin);
+    const QRectF attributionRect = paintArtAttribution(painter, attributionArea, attribution);
 
     // Card name bubble above the attribution (when enabled).
     if (!cardName.isEmpty() && SettingsCache::instance().appearance().getHomeTabDisplayCardName()) {
@@ -372,7 +381,6 @@ void HomeWidget::paintEvent(QPaintEvent *event)
 
         QFontMetrics fm(font);
         constexpr int padding = 10;
-        constexpr int margin = 15;
 
         QRect textRect = fm.boundingRect(cardName);
 
