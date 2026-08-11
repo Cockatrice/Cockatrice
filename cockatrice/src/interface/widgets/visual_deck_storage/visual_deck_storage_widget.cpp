@@ -212,7 +212,8 @@ void VisualDeckStorageWidget::updateTagsVisibility(const bool visible)
     }
 }
 
-void VisualDeckStorageWidget::updateSelectionAnimationEnabled(const bool enabled)
+void VisualDeckStorageWidget::updateSelectionAnimationEnabled()
 {
-    deckPreviewSelectionAnimationEnabled = enabled;
+    deckPreviewSelectionAnimationEnabled =
+        SettingsCache::instance().visualDeckStorage().getVisualDeckStorageSelectionAnimation();
 }

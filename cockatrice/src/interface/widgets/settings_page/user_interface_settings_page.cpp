@@ -116,13 +116,25 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&tapAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
             &CardsDisplaySettings::setTapAnimation);
 
-    animationsEnabledCheckBox.setChecked(SettingsCache::instance().userInterface().getAnimationsEnabled());
-    connect(&animationsEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
-            &InterfaceSettings::setAnimationsEnabled);
+    arrowDrawAnimationCheckBox.setChecked(SettingsCache::instance().cardsDisplay().getArrowDrawAnimation());
+    connect(&arrowDrawAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setArrowDrawAnimation);
+
+    visualDeckStorageSelectionAnimationCheckBox.setChecked(
+        SettingsCache::instance().visualDeckStorage().getVisualDeckStorageSelectionAnimation());
+    connect(&visualDeckStorageSelectionAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED,
+            &SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::setVisualDeckStorageSelectionAnimation);
+
+    connect(&enableAllAnimationsButton, &QPushButton::clicked, this, &UserInterfaceSettingsPage::enableAllAnimations);
+    connect(&disableAllAnimationsButton, &QPushButton::clicked, this, &UserInterfaceSettingsPage::disableAllAnimations);
 
     auto *animationGrid = new QGridLayout;
-    animationGrid->addWidget(&animationsEnabledCheckBox, 0, 0);
+    animationGrid->addWidget(&enableAllAnimationsButton, 0, 0);
+    animationGrid->addWidget(&disableAllAnimationsButton, 0, 1);
     animationGrid->addWidget(&tapAnimationCheckBox, 1, 0);
+    animationGrid->addWidget(&arrowDrawAnimationCheckBox, 2, 0);
+    animationGrid->addWidget(&visualDeckStorageSelectionAnimationCheckBox, 3, 0);
 
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
@@ -136,12 +148,6 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
         SettingsCache::instance().visualDeckStorage().getVisualDeckStorageInGame());
     connect(&visualDeckStorageInGameCheckBox, &QCheckBox::QT_STATE_CHANGED,
             &SettingsCache::instance().visualDeckStorage(), &VisualDeckStorageSettings::setVisualDeckStorageInGame);
-
-    visualDeckStorageSelectionAnimationCheckBox.setChecked(
-        SettingsCache::instance().visualDeckStorage().getVisualDeckStorageSelectionAnimation());
-    connect(&visualDeckStorageSelectionAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED,
-            &SettingsCache::instance().visualDeckStorage(),
-            &VisualDeckStorageSettings::setVisualDeckStorageSelectionAnimation);
 
     visualDeckStoragePromptForConversionSelector.addItem(""); // these will be set in retranslateUI
     visualDeckStoragePromptForConversionSelector.addItem("");
@@ -221,15 +227,14 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     auto *deckEditorGrid = new QGridLayout;
     deckEditorGrid->addWidget(&openDeckInNewTabCheckBox, 0, 0);
     deckEditorGrid->addWidget(&visualDeckStorageInGameCheckBox, 1, 0);
-    deckEditorGrid->addWidget(&visualDeckStorageSelectionAnimationCheckBox, 2, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 3, 0);
-    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 3, 1);
-    deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 4, 0);
-    deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 4, 1);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledLabel, 5, 0);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledSelector, 5, 1);
-    deckEditorGrid->addWidget(labelWidget, 6, 0);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationBracketNamingSelector, 6, 1);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionLabel, 2, 0);
+    deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 2, 1);
+    deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 3, 0);
+    deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 3, 1);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledLabel, 4, 0);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledSelector, 4, 1);
+    deckEditorGrid->addWidget(labelWidget, 5, 0);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationBracketNamingSelector, 5, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -271,6 +276,20 @@ void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
         specNotificationsEnabledCheckBox.setChecked(false);
         buddyConnectNotificationsEnabledCheckBox.setChecked(false);
     }
+}
+
+void UserInterfaceSettingsPage::enableAllAnimations()
+{
+    tapAnimationCheckBox.setChecked(true);
+    arrowDrawAnimationCheckBox.setChecked(true);
+    visualDeckStorageSelectionAnimationCheckBox.setChecked(true);
+}
+
+void UserInterfaceSettingsPage::disableAllAnimations()
+{
+    tapAnimationCheckBox.setChecked(false);
+    arrowDrawAnimationCheckBox.setChecked(false);
+    visualDeckStorageSelectionAnimationCheckBox.setChecked(false);
 }
 
 void UserInterfaceSettingsPage::updateCommanderSpellbookUiState()
@@ -315,12 +334,14 @@ void UserInterfaceSettingsPage::retranslateUi()
     specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));
     buddyConnectNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar when users in your buddy list connect"));
     animationGroupBox->setTitle(tr("Animation settings"));
-    animationsEnabledCheckBox.setText(tr("Enable game &animations"));
+    enableAllAnimationsButton.setText(tr("&Enable all animations"));
+    disableAllAnimationsButton.setText(tr("&Disable all animations"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
+    arrowDrawAnimationCheckBox.setText(tr("&Arrow draw animation"));
+    visualDeckStorageSelectionAnimationCheckBox.setText(tr("Use selection animation for Visual Deck Storage"));
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));
     visualDeckStorageInGameCheckBox.setText(tr("Use visual deck storage in game lobby"));
-    visualDeckStorageSelectionAnimationCheckBox.setText(tr("Use selection animation for Visual Deck Storage"));
     visualDeckStoragePromptForConversionLabel.setText(
         tr("When adding a tag in the visual deck storage to a .txt deck:"));
     visualDeckStoragePromptForConversionSelector.setItemText(visualDeckStoragePromptForConversionIndexNone,

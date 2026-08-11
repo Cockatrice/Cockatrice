@@ -45,18 +45,19 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 
 GameScene::~GameScene()
 {
-    delete animationTimer;
-
     // Delete all ArrowItems before QGraphicsScene's base destructor runs.
     // QGraphicsScene::~QGraphicsScene() destroys items in arbitrary order.
     // If a PlayerTarget is destroyed before an ArrowItem pointing to it,
     // ArrowItem::onTargetDestroyed fires and emits on the partially-destroyed
     // GameScene, causing a segfault.
+    // The arrows must also be deleted before animationTimer so their
+    // destructors can unregister from the still-valid timer.
     for (auto *item : items()) {
         if (auto *arrow = qgraphicsitem_cast<ArrowItem *>(item)) {
             delete arrow;
         }
     }
+    delete animationTimer;
 
     // DO NOT call clearViews() here
     // clearViews calls close() on the zoneViews, which sends signals; sending signals in destructors leads to segfaults
@@ -495,8 +496,8 @@ void GameScene::addArrow(QSharedPointer<ArrowData> data)
     }
 
     auto *arrow = new ArrowItem(data, startCard, targetItem);
-    arrow->startDrawAnimation();
     addItem(arrow);
+    arrow->startDrawAnimation();
     arrowRegistry.insert(data, arrow);
     connect(arrow, &ArrowItem::requestDeletion, this, &GameScene::requestArrowDeletion);
 }
@@ -744,7 +745,14 @@ void GameScene::timerEvent(QTimerEvent * /*event*/)
             i.remove();
         }
     }
-    if (cardsToAnimate.isEmpty()) {
+    QMutableSetIterator<ArrowItem *> j(arrowsToAnimate);
+    while (j.hasNext()) {
+        j.next();
+        if (!j.value()->animationEvent()) {
+            j.remove();
+        }
+    }
+    if (cardsToAnimate.isEmpty() && arrowsToAnimate.isEmpty()) {
         animationTimer->stop();
     }
 }
@@ -760,7 +768,23 @@ void GameScene::registerAnimationItem(AbstractCardItem *card)
 void GameScene::unregisterAnimationItem(AbstractCardItem *card)
 {
     cardsToAnimate.remove(static_cast<CardItem *>(card));
-    if (cardsToAnimate.isEmpty()) {
+    if (cardsToAnimate.isEmpty() && arrowsToAnimate.isEmpty()) {
+        animationTimer->stop();
+    }
+}
+
+void GameScene::registerAnimationItem(ArrowItem *arrow)
+{
+    arrowsToAnimate.insert(arrow);
+    if (!animationTimer->isActive()) {
+        animationTimer->start(10, this);
+    }
+}
+
+void GameScene::unregisterAnimationItem(ArrowItem *arrow)
+{
+    arrowsToAnimate.remove(arrow);
+    if (cardsToAnimate.isEmpty() && arrowsToAnimate.isEmpty()) {
         animationTimer->stop();
     }
 }

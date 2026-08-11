@@ -160,11 +160,6 @@ bool InterfaceSettings::getShowGameSelectorFilterToolbar() const
     return getValue("showGameSelectorFilterToolbar", QString(), QString(), true).toBool();
 }
 
-bool InterfaceSettings::getAnimationsEnabled() const
-{
-    return getValue("animationsEnabled", QString(), QString(), true).toBool();
-}
-
 void InterfaceSettings::setUseTearOffMenus(bool _useTearOffMenus)
 {
     setValue(_useTearOffMenus, "useTearOffMenus");
@@ -330,10 +325,4 @@ void InterfaceSettings::setShowGameSelectorFilterToolbar(bool _showGameSelectorF
 {
     setValue(_showGameSelectorFilterToolbar, "showGameSelectorFilterToolbar");
     emit showGameSelectorFilterToolbarChanged(_showGameSelectorFilterToolbar);
-}
-
-void InterfaceSettings::setAnimationsEnabled(bool _animationsEnabled)
-{
-    setValue(_animationsEnabled, "animationsEnabled");
-    emit animationsEnabledChanged(_animationsEnabled);
 }

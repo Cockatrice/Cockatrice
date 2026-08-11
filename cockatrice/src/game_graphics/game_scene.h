@@ -52,6 +52,7 @@ private:
     QPointer<CardItem> hoveredCard;                     ///< Currently hovered card
     QBasicTimer *animationTimer;                        ///< Timer for card animations
     QSet<CardItem *> cardsToAnimate;                    ///< Cards currently animating
+    QSet<ArrowItem *> arrowsToAnimate;                  ///< Arrows currently animating
     int playerRotation;                                 ///< Rotation offset for player layout
 
     /**
@@ -187,6 +188,12 @@ public:
 
     /** @brief Unregisters a card from animation updates. */
     void unregisterAnimationItem(AbstractCardItem *card);
+
+    /** @brief Registers an arrow for animation updates. */
+    void registerAnimationItem(ArrowItem *arrow);
+
+    /** @brief Unregisters an arrow from animation updates. */
+    void unregisterAnimationItem(ArrowItem *arrow);
     void startRubberBand(const QPointF &selectionOrigin);
     void resizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void stopRubberBand();

@@ -45,7 +45,7 @@ public slots:
     void updateColorFilter();
     void updateSearchFilter();
     void updateTagsVisibility(bool visible);
-    void updateSelectionAnimationEnabled(bool enabled);
+    void updateSelectionAnimationEnabled();
     void updateSortOrder();
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;

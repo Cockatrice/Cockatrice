@@ -4,14 +4,15 @@
 #include "../../game/board/arrow_data.h"
 #include "arrow_target.h"
 
+#include <QElapsedTimer>
 #include <QGraphicsItem>
+#include <QPainterPath>
 #include <QPointer>
 #include <QSharedPointer>
 
 class CardItem;
 class QGraphicsSceneMouseEvent;
 class PlayerLogic;
-class QTimer;
 
 class ArrowItem : public QObject, public QGraphicsItem
 {
@@ -22,9 +23,17 @@ signals:
 
 private:
     QPainterPath path;
+    QPainterPath bodyPath;
+    QPainterPath headPath;
     QPainterPath centerLine;
+    qreal headBaseFraction = 1.0;
+    QElapsedTimer animationClock;
+    qreal strokeDurationMs = 0;
+    qreal glowFadeDurationMs = 0;
     qreal drawProgress = 1.0;
-    QTimer *drawTimer = nullptr;
+    qreal glowAlpha = 0.0;
+
+    static constexpr qreal glowExtent = 12.0;
 
 protected:
     QSharedPointer<const ArrowData> data;
@@ -37,17 +46,19 @@ protected:
 
 public:
     ArrowItem(QSharedPointer<const ArrowData> _data, ArrowTarget *_startItem, ArrowTarget *_targetItem);
+    ~ArrowItem() override;
 
     void onTargetDestroyed();
     void delArrow();
     void updatePath();
     void updatePath(const QPointF &endPoint);
     void startDrawAnimation();
+    bool animationEvent();
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     [[nodiscard]] QRectF boundingRect() const override
     {
-        return path.boundingRect();
+        return path.boundingRect().adjusted(-glowExtent, -glowExtent, glowExtent, glowExtent);
     }
     [[nodiscard]] QPainterPath shape() const override
     {
