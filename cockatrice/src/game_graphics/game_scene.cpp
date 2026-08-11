@@ -17,7 +17,6 @@
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
-#include <QSet>
 #include <QtMath>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
@@ -45,7 +44,14 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 
 GameScene::~GameScene()
 {
+    // Sever all incoming connections (animated item destroy-tracking) before the
+    // members below are destroyed: the base QGraphicsScene destructor destroys the
+    // remaining items, and their destroyed() signals must not reach slots that
+    // reference members that no longer exist.
+    disconnect(this);
+
     delete animationTimer;
+    animationTimer = nullptr;
 
     // Delete all ArrowItems before QGraphicsScene's base destructor runs.
     // QGraphicsScene::~QGraphicsScene() destroys items in arbitrary order.
@@ -736,30 +742,45 @@ bool GameScene::event(QEvent *event)
 
 void GameScene::timerEvent(QTimerEvent * /*event*/)
 {
-    QMutableSetIterator<CardItem *> i(cardsToAnimate);
+    QMutableHashIterator<QObject *, IAnimatedItem *> i(animatedItems);
     while (i.hasNext()) {
         i.next();
         if (!i.value()->animationEvent()) {
             i.remove();
         }
     }
-    if (cardsToAnimate.isEmpty()) {
+    if (animatedItems.isEmpty()) {
         animationTimer->stop();
     }
 }
 
-void GameScene::registerAnimationItem(AbstractCardItem *card)
+void GameScene::registerAnimationItem(IAnimatedItem *item)
 {
-    cardsToAnimate.insert(static_cast<CardItem *>(card));
-    if (!animationTimer->isActive()) {
+    auto *object = dynamic_cast<QObject *>(item);
+    if (!object) {
+        return;
+    }
+    if (!animatedItems.contains(object)) {
+        connect(object, &QObject::destroyed, this, &GameScene::removeAnimatedItem);
+    }
+    animatedItems.insert(object, item);
+    if (animationTimer && !animationTimer->isActive()) {
         animationTimer->start(10, this);
     }
 }
 
-void GameScene::unregisterAnimationItem(AbstractCardItem *card)
+void GameScene::unregisterAnimationItem(IAnimatedItem *item)
 {
-    cardsToAnimate.remove(static_cast<CardItem *>(card));
-    if (cardsToAnimate.isEmpty()) {
+    animatedItems.remove(dynamic_cast<QObject *>(item));
+    if (animationTimer && animatedItems.isEmpty()) {
+        animationTimer->stop();
+    }
+}
+
+void GameScene::removeAnimatedItem(QObject *item)
+{
+    animatedItems.remove(item);
+    if (animationTimer && animatedItems.isEmpty()) {
         animationTimer->stop();
     }
 }

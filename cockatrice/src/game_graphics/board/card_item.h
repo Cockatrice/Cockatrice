@@ -137,7 +137,7 @@ public:
     void resetState(bool keepAnnotations = false);
     void processCardInfo(const ServerInfo_Card &_info);
 
-    bool animationEvent();
+    bool animationEvent() override;
     CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool forceFaceDown);
     void deleteDragItem();
     void drawArrow(const QColor &arrowColor);
