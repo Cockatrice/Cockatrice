@@ -43,7 +43,8 @@ private:
     // Draw a single mana symbol pip at centre point
     void drawManaSymbol(QPainter *p, QPoint centre, const QString &symbol, int radius) const;
 
-    // Draw all mana pips for a cost string like "2RG" or "{2}{R}{G}"; returns the left-most x used
+    // Draw all mana pips for a cost string like "2RG" or "{2}{R}{G}"; split and
+    // adventure costs ("1W // W") are drawn as separate groups. Returns the left-most x used
     int drawManaCost(QPainter *p, const QRect &row, const QString &manaCost, int radius) const;
 
     // Load (or return cached) a mana icon pixmap; falls back to painted circle
@@ -56,6 +57,7 @@ private:
     static constexpr int AccentBarWidth = 5;
     static constexpr int SymbolRadius = 9;
     static constexpr int SymbolSpacing = 2;
+    static constexpr int PartGap = 14;
 };
 
 #endif // CARD_COMPLETER_DELEGATE_H

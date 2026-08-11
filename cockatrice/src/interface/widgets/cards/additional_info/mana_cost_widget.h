@@ -17,7 +17,7 @@ class ManaCostWidget : public QWidget
 public:
     explicit ManaCostWidget(QWidget *parent, CardInfoPtr card);
 
-    QStringList parseManaCost(const QString &manaString);
+    static QStringList parseManaCost(const QString &manaString);
 public slots:
     void resizeEvent(QResizeEvent *event) override;
 

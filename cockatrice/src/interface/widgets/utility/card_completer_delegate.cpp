@@ -1,9 +1,12 @@
 #include "card_completer_delegate.h"
 
+#include "../cards/additional_info/mana_cost_widget.h"
+
 #include <QFontMetrics>
 #include <QLinearGradient>
 #include <QPainter>
 #include <QPainterPath>
+#include <QRegularExpression>
 #include <QSet>
 #include <QStyleOptionViewItem>
 #include <libcockatrice/card/card_info.h>
@@ -175,36 +178,31 @@ int CardCompleterDelegate::drawManaCost(QPainter *p, const QRect &row, const QSt
         return row.right();
     }
 
-    QStringList symbols;
+    const int diam = radius * 2;
 
-    if (manaCost.contains('{')) {
-        for (const QString &tok : manaCost.split('}', Qt::SkipEmptyParts)) {
-            symbols << tok.mid(tok.indexOf('{') + 1);
-        }
-    } else {
-        QString cur;
+    // Split, adventure, aftermath and prepare cards store both halves of the
+    // cost joined by "//" (e.g. "1W // W"); draw each half as its own group.
+    static const QRegularExpression splitRegex("\\s*//\\s*");
 
-        for (const QChar c : manaCost) {
-            if (c.isDigit()) {
-                cur += c;
-            } else {
-                if (!cur.isEmpty()) {
-                    symbols << cur;
-                    cur.clear();
-                }
+    QList<QStringList> parts;
 
-                symbols << QString(c);
-            }
-        }
+    for (const QString &part : manaCost.split(splitRegex, Qt::SkipEmptyParts)) {
+        const QStringList symbols = ManaCostWidget::parseManaCost(part);
 
-        if (!cur.isEmpty()) {
-            symbols << cur;
+        if (!symbols.isEmpty()) {
+            parts.append(symbols);
         }
     }
 
-    const int diam = radius * 2;
+    int totalW = 0;
 
-    const int totalW = symbols.size() * diam + (symbols.size() - 1) * SymbolSpacing;
+    for (int i = 0; i < parts.size(); ++i) {
+        if (i > 0) {
+            totalW += PartGap;
+        }
+
+        totalW += parts.at(i).size() * diam + qMax(0, parts.at(i).size() - 1) * SymbolSpacing;
+    }
 
     const int rightPad = 14;
 
@@ -212,9 +210,17 @@ int CardCompleterDelegate::drawManaCost(QPainter *p, const QRect &row, const QSt
 
     const int cy = row.center().y();
 
-    for (const QString &sym : symbols) {
-        drawManaSymbol(p, {x, cy}, sym, radius);
-        x += diam + SymbolSpacing;
+    for (int i = 0; i < parts.size(); ++i) {
+        const QStringList &symbols = parts.at(i);
+
+        for (const QString &sym : symbols) {
+            drawManaSymbol(p, {x, cy}, sym, radius);
+            x += diam + SymbolSpacing;
+        }
+
+        if (i < parts.size() - 1) {
+            x += PartGap - SymbolSpacing;
+        }
     }
 
     return row.right() - rightPad - totalW - 10;
@@ -301,6 +307,9 @@ void CardCompleterDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     QPainterPath path;
     path.addRoundedRect(cardRect, 7, 7);
 
+    painter->save();
+    painter->setClipPath(path);
+
     QLinearGradient bodyGrad(cardRect.topLeft(), cardRect.bottomLeft());
 
     bodyGrad.setColorAt(0.0, blend(tinted, Qt::white, 0.10));
@@ -333,6 +342,8 @@ void CardCompleterDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     manaGrad.setColorAt(1, QColor(0, 0, 0, 42));
 
     painter->fillRect(manaZone, manaGrad);
+
+    painter->restore();
 
     // -----------------------------------------------------------------------
     // Border
