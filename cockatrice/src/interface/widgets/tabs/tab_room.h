@@ -14,6 +14,7 @@
 #include <QFocusEvent>
 #include <QGroupBox>
 #include <QMap>
+#include <QStringListModel>
 
 class UserListProxy;
 class UserListManager;
@@ -63,6 +64,7 @@ private:
     ChatView *chatView;
     QLabel *sayLabel;
     LineEditCompleter *sayEdit;
+    QStringListModel *mentionModel;
     QGroupBox *chatGroupBox;
 
     QMenu *roomMenu;
@@ -72,7 +74,7 @@ private:
     [[nodiscard]] QString sanitizeHtml(QString dirty) const;
 
     QStringList autocompleteUserList;
-    QCompleter *completer;
+    QCompleter *mentionCompleter;
 signals:
     void roomClosing(TabRoom *tab);
     void openMessageDialog(const QString &userName, bool focus);
