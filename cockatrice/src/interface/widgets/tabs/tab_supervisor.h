@@ -41,6 +41,7 @@ class TabReplays;
 class TabAdmin;
 class TabMessage;
 class TabReport;
+class TabModeration;
 class TabAccount;
 class TabDeckEditor;
 class TabLog;
@@ -105,6 +106,7 @@ private:
     TabCardArtRules *tabCardArtRules;
     TabLog *tabLog;
     TabReport *tabReport;
+    TabModeration *tabModeration;
     QMap<int, TabRoom *> roomTabs;
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
@@ -114,7 +116,7 @@ private:
 
     QAction *aTabHome, *aTabDeckEditor, *aTabVisualDeckEditor, *aTabEdhRec, *aTabArchidekt, *aTabVisualDeckStorage,
         *aTabVisualDatabaseDisplay, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays, *aTabAdmin,
-        *aTabCardArtRules, *aTabLog, *aTabReport;
+        *aTabCardArtRules, *aTabLog, *aTabReport, *aTabModeration;
 
     int myAddTab(Tab *tab, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
@@ -186,6 +188,7 @@ public slots:
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
     void joinReportGame(int gameId, int roomId);
+    void openTabModeration(const QString &userName = {});
     void switchToFirstAvailableNetworkTab();
     void maximizeMainWindow();
     void actTabVisualDeckStorage(bool checked);
@@ -202,6 +205,7 @@ private slots:
     void actTabAdmin(bool checked);
     void actTabLog(bool checked);
     void actTabReport(bool checked);
+    void actTabModeration(bool checked);
 
     void openTabVisualDeckStorage();
     void openTabHome();

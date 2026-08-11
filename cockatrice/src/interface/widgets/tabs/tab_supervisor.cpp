@@ -19,6 +19,7 @@
 #include "tab_home.h"
 #include "tab_logs.h"
 #include "tab_message.h"
+#include "tab_moderation.h"
 #include "tab_replays.h"
 #include "tab_report.h"
 #include "tab_room.h"
@@ -117,7 +118,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
     : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr),
       tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr),
-      tabLog(nullptr), tabReport(nullptr), isLocalGame(false)
+      tabLog(nullptr), tabReport(nullptr), tabModeration(nullptr), isLocalGame(false)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -198,6 +199,10 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabReport->setCheckable(true);
     connect(aTabReport, &QAction::triggered, this, &TabSupervisor::actTabReport);
 
+    aTabModeration = new QAction(this);
+    aTabModeration->setCheckable(true);
+    connect(aTabModeration, &QAction::triggered, this, &TabSupervisor::actTabModeration);
+
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabSupervisor::refreshShortcuts);
     refreshShortcuts();
@@ -238,6 +243,7 @@ void TabSupervisor::retranslateUi()
     aTabAdmin->setText(tr("Administration"));
     aTabLog->setText(tr("Logs"));
     aTabReport->setText(tr("Report Queue"));
+    aTabModeration->setText(tr("Moderation"));
 
     // tabs
     QList<Tab *> tabs;
@@ -248,6 +254,7 @@ void TabSupervisor::retranslateUi()
     tabs.append(tabAccount);
     tabs.append(tabLog);
     tabs.append(tabReport);
+    tabs.append(tabModeration);
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext()) {
         tabs.append(roomIterator.next().value());
@@ -295,6 +302,7 @@ void TabSupervisor::refreshShortcuts()
     aTabAdmin->setShortcuts(shortcuts.getShortcut("Tabs/aTabAdmin"));
     aTabLog->setShortcuts(shortcuts.getShortcut("Tabs/aTabLog"));
     aTabReport->setShortcuts(shortcuts.getShortcut("Tabs/aTabReport"));
+    aTabModeration->setShortcuts(shortcuts.getShortcut("Tabs/aTabModeration"));
 }
 
 void TabSupervisor::closeEvent(QCloseEvent *event)
@@ -497,6 +505,7 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         tabsMenu->addAction(aTabLog);
         tabsMenu->addAction(aTabCardArtRules);
         tabsMenu->addAction(aTabReport);
+        tabsMenu->addAction(aTabModeration);
 
         if (SettingsCache::instance().tabs().getTabAdminOpen()) {
             openTabAdmin();
@@ -506,6 +515,9 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         }
         if (SettingsCache::instance().tabs().getTabReportOpen()) {
             openTabReport();
+        }
+        if (SettingsCache::instance().tabs().getTabModerationOpen()) {
+            openTabModeration();
         }
         openTabCardArtRules();
     }
@@ -521,6 +533,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     tabAdmin = nullptr;
     tabLog = nullptr;
     tabReport = nullptr;
+    tabModeration = nullptr;
     isLocalGame = true;
     userInfo = new ServerInfo_User;
     localClients = _clients;
@@ -564,6 +577,9 @@ void TabSupervisor::stop()
         }
         if (tabReport) {
             tabReport->close();
+        }
+        if (tabModeration) {
+            tabModeration->close();
         }
     }
 
@@ -824,6 +840,35 @@ void TabSupervisor::openTabReport()
         aTabReport->setChecked(false);
     });
     aTabReport->setChecked(true);
+}
+
+void TabSupervisor::actTabModeration(bool checked)
+{
+    SettingsCache::instance().tabs().setTabModerationOpen(checked);
+    if (checked && !tabModeration) {
+        openTabModeration();
+        setCurrentWidget(tabModeration);
+    } else if (!checked && tabModeration) {
+        tabModeration->closeRequest();
+    }
+}
+
+void TabSupervisor::openTabModeration(const QString &userName)
+{
+    if (tabModeration) {
+        setCurrentWidget(tabModeration);
+        if (!userName.isEmpty()) {
+            tabModeration->investigate(userName);
+        }
+        return;
+    }
+    tabModeration = new TabModeration(this, client, userName);
+    myAddTab(tabModeration, aTabModeration);
+    connect(tabModeration, &QObject::destroyed, this, [this] {
+        tabModeration = nullptr;
+        aTabModeration->setChecked(false);
+    });
+    aTabModeration->setChecked(true);
 }
 
 void TabSupervisor::updatePingTime(int value, int max)

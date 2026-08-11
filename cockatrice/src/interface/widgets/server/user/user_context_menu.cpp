@@ -52,6 +52,7 @@ UserContextMenu::UserContextMenu(TabSupervisor *_tabSupervisor, QWidget *parent,
     aPromoteToJudge = new QAction(QString(), this);
     aDemoteFromJudge = new QAction(QString(), this);
     aGetAdminNotes = new QAction(QString(), this);
+    aInvestigateUser = new QAction(QString(), this);
 
     retranslateUi();
 }
@@ -76,6 +77,7 @@ void UserContextMenu::retranslateUi()
     aPromoteToJudge->setText(tr("Promote user to &judge"));
     aDemoteFromJudge->setText(tr("Demote user from judge"));
     aGetAdminNotes->setText(tr("View admin notes"));
+    aInvestigateUser->setText(tr("Investigate user"));
 }
 
 void UserContextMenu::gamesOfUserReceived(const Response &resp, const CommandContainer &commandContainer)
@@ -147,7 +149,8 @@ void UserContextMenu::warnUser_processGetWarningsListResponse(const Response &r)
 
     if (response.warning_size() > 0) {
         for (int i = 0; i < response.warning_size(); ++i) {
-            dlg->addWarningOption(QString::fromStdString(response.warning(i)).simplified());
+            int startingIl = i < response.warning_il_size() ? response.warning_il(i) : 1;
+            dlg->addWarningOption(QString::fromStdString(response.warning(i)).simplified(), startingIl);
         }
     }
     dlg->show();
@@ -414,6 +417,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         menu->addAction(aBanHistory);
         menu->addSeparator();
         menu->addAction(aGetAdminNotes);
+        menu->addAction(aInvestigateUser);
 
         menu->addSeparator();
         if (userLevel.testFlag(ServerInfo_User::IsModerator) &&
@@ -448,6 +452,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     aBan->setEnabled(anotherUser);
     aBanHistory->setEnabled(anotherUser);
     aGetAdminNotes->setEnabled(anotherUser);
+    aInvestigateUser->setEnabled(anotherUser);
     aPromoteToMod->setEnabled(anotherUser);
     aDemoteFromMod->setEnabled(anotherUser);
 
@@ -492,6 +497,8 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         execWarnHistory(userName);
     } else if (actionClicked == aGetAdminNotes) {
         execAdminNotes(userName);
+    } else if (actionClicked == aInvestigateUser) {
+        execInvestigateUser(userName);
     } else if (actionClicked == aCopyToClipBoard) {
         QClipboard *clipboard = QGuiApplication::clipboard();
         clipboard->setText(deckHash);
@@ -666,6 +673,11 @@ void UserContextMenu::execAdminNotes(const QString &userName)
     auto *pend = client->prepareModeratorCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &UserContextMenu::getAdminNotes_processResponse);
     client->sendCommand(pend);
+}
+
+void UserContextMenu::execInvestigateUser(const QString &userName)
+{
+    tabSupervisor->openTabModeration(userName);
 }
 
 void UserContextMenu::execAdjustMod(const QString &userName, bool shouldBeMod)

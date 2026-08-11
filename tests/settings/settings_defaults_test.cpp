@@ -232,6 +232,12 @@ TEST_F(SettingsDefaultsTest, Tabs_AllTabsOpen_Default)
     ASSERT_EQ(s.getTabLogOpen(), true);
 }
 
+TEST_F(SettingsDefaultsTest, Tabs_ModerationOpen_Default)
+{
+    TabsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getTabModerationOpen(), false);
+}
+
 // --- ChatSettings ---
 
 TEST_F(SettingsDefaultsTest, Chat_Mention_Default)

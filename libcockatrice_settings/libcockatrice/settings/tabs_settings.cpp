@@ -101,6 +101,11 @@ bool TabsSettings::getTabReportOpen() const
     return getValue("report", QString(), QString(), false).toBool();
 }
 
+bool TabsSettings::getTabModerationOpen() const
+{
+    return getValue("moderation", QString(), QString(), false).toBool();
+}
+
 void TabsSettings::setTabVisualDeckStorageOpen(bool value)
 {
     setValue(value, "visualDeckStorage");
@@ -139,4 +144,9 @@ void TabsSettings::setTabLogOpen(bool value)
 void TabsSettings::setTabReportOpen(bool value)
 {
     setValue(value, "report");
+}
+
+void TabsSettings::setTabModerationOpen(bool value)
+{
+    setValue(value, "moderation");
 }

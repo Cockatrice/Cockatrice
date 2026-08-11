@@ -213,9 +213,13 @@ int WarningDialog::getDeleteMessages() const
     return deleteMessages->isChecked() ? -1 : 0;
 }
 
-void WarningDialog::addWarningOption(const QString warning)
+void WarningDialog::addWarningOption(const QString warning, int startingIl)
 {
-    warningOption->addItem(warning);
+    if (startingIl > 1) {
+        warningOption->addItem(tr("%1 (IL %2)").arg(warning).arg(startingIl));
+    } else {
+        warningOption->addItem(warning);
+    }
 }
 
 void BanDialog::okClicked()

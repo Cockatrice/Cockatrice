@@ -48,6 +48,7 @@ private:
     QAction *aWarnUser, *aWarnHistory;
     QAction *aGetAdminNotes;
     std::function<QList<GameInviteOption>()> gameInviteLinkProvider;
+    QAction *aInvestigateUser;
 signals:
     void openMessageDialog(const QString &userName, bool focus);
 private slots:
@@ -119,6 +120,7 @@ public:
     void execBanHistory(const QString &userName);
     void execWarnHistory(const QString &userName);
     void execAdminNotes(const QString &userName);
+    void execInvestigateUser(const QString &userName);
     void execAdjustMod(const QString &userName, bool shouldBeMod);
     void execAdjustJudge(const QString &userName, bool shouldBeJudge);
 
