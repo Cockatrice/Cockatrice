@@ -130,7 +130,7 @@ if(UNIX)
       endif()
     endif()
   endif()
-elseif(WIN32) # Windows, including 64 bit
+elseif(WIN32) # Windows (including 64bit)
   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
 endif()
 
@@ -289,7 +289,7 @@ if(UNIX)
       set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
     endif()
   endif()
-elseif(WIN32) # Windows, including 64 bit
+elseif(WIN32) # Windows (including 64bit)
   set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
   if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "(x64)")
     set(TRICE_IS_64_BIT 1)

@@ -7,9 +7,7 @@ if(WIN32) # Windows (including 64bit)
     set(REDIST_ARCH x64)
   endif()
 
-  #  <VS 2017 uses vcredist_ARCH.exe
-  # >=VS 2017 uses vc_redist.ARCH.exe
-  set(REDIST_FILE_NAMES vcredist_${REDIST_ARCH}.exe vc_redist.${REDIST_ARCH}.exe)
+  set(REDIST_FILE_NAMES vc_redist.${REDIST_ARCH}.exe)
 
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include(InstallRequiredSystemLibraries)
