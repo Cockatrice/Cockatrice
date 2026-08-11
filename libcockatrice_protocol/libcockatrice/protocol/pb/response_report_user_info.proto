@@ -16,4 +16,6 @@ message Response_ReportUserInfo {
     optional bool is_active = 7;
     optional string admin_notes = 8;
     repeated ServerInfo_Report recent_reports = 9;
+    // Last known login of the user, epoch seconds; 0 = unknown.
+    optional int64 last_login = 10;
 }

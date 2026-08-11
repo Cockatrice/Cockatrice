@@ -8,4 +8,7 @@ message Response_WarnList {
     repeated string warning = 1;
     optional string user_name = 2;
     optional string user_clientid = 3;
+    // Recommended starting intervention level per warning category,
+    // aligned by index with `warning`. Absent or shorter lists default to 1.
+    repeated uint32 warning_il = 4;
 }

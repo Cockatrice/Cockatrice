@@ -156,6 +156,11 @@ set(PROTO_FILES
     response_report_my_list.proto
     response_report_stats.proto
     response_report_user_info.proto
+    response_moderator_last_logins.proto
+    response_remove_user_avatar.proto
+    response_reset_user_password.proto
+    response_user_alts.proto
+    response_user_sessions.proto
     response_viewlog_history.proto
     response_warn_history.proto
     response_warn_list.proto
@@ -171,6 +176,7 @@ set(PROTO_FILES
     serverinfo_deckstorage.proto
     serverinfo_game.proto
     serverinfo_gametype.proto
+    serverinfo_moderator_login.proto
     serverinfo_player.proto
     serverinfo_playerping.proto
     serverinfo_playerproperties.proto
@@ -179,6 +185,8 @@ set(PROTO_FILES
     serverinfo_report.proto
     serverinfo_room.proto
     serverinfo_user.proto
+    serverinfo_user_alt.proto
+    serverinfo_user_session.proto
     serverinfo_warning.proto
     serverinfo_zone.proto
     session_commands.proto
