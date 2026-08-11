@@ -80,8 +80,10 @@
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response_forgotpasswordrequest.pb.h>
 #include <libcockatrice/protocol/pb/response_get_admin_notes.pb.h>
+#include <libcockatrice/protocol/pb/response_moderator_last_logins.pb.h>
 #include <libcockatrice/protocol/pb/response_password_salt.pb.h>
 #include <libcockatrice/protocol/pb/response_register.pb.h>
+#include <libcockatrice/protocol/pb/response_remove_user_avatar.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_download.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_download_by_game_id.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
@@ -91,15 +93,23 @@
 #include <libcockatrice/protocol/pb/response_report_my_list.pb.h>
 #include <libcockatrice/protocol/pb/response_report_stats.pb.h>
 #include <libcockatrice/protocol/pb/response_report_user_info.pb.h>
+#include <libcockatrice/protocol/pb/response_reset_user_password.pb.h>
+#include <libcockatrice/protocol/pb/response_user_alts.pb.h>
+#include <libcockatrice/protocol/pb/response_user_sessions.pb.h>
 #include <libcockatrice/protocol/pb/response_viewlog_history.pb.h>
 #include <libcockatrice/protocol/pb/response_warn_history.pb.h>
 #include <libcockatrice/protocol/pb/response_warn_list.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_ban.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_chat_message.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_deckstorage.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_moderator_login.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user_alt.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user_session.pb.h>
+#include <libcockatrice/utility/passwordhasher.h>
 #include <libcockatrice/utility/string_limits.h>
+#include <libcockatrice/utility/warning_categories.h>
 #include <server_response_containers.h>
 #include <server_room.h>
 #include <string>
@@ -295,6 +305,16 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdReportUserInfo(cmd.GetExtension(Command_ReportUserInfo::ext), rc);
         case ModeratorCommand::REPORT_STATS:
             return cmdReportStats(cmd.GetExtension(Command_ReportStats::ext), rc);
+        case ModeratorCommand::GET_USER_SESSIONS:
+            return cmdGetUserSessions(cmd.GetExtension(Command_GetUserSessions::ext), rc);
+        case ModeratorCommand::GET_USER_ALTS:
+            return cmdGetUserAlts(cmd.GetExtension(Command_GetUserAlts::ext), rc);
+        case ModeratorCommand::GET_MODERATOR_LAST_LOGINS:
+            return cmdGetModeratorLastLogins(cmd.GetExtension(Command_GetModeratorLastLogins::ext), rc);
+        case ModeratorCommand::RESET_USER_PASSWORD:
+            return cmdResetUserPassword(cmd.GetExtension(Command_ResetUserPassword::ext), rc);
+        case ModeratorCommand::REMOVE_USER_AVATAR:
+            return cmdRemoveUserAvatar(cmd.GetExtension(Command_RemoveUserAvatar::ext), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -1103,9 +1123,10 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetWarnList(const Comma
     Response_WarnList *re = new Response_WarnList;
 
     QString officialWarnings = settingsCache->value("server/officialwarnings").toString();
-    QStringList warningsList = officialWarnings.split(",", Qt::SkipEmptyParts);
-    for (const QString &warning : warningsList) {
-        re->add_warning(warning.toStdString());
+    const QList<WarningCategory> categories = parseWarningCategories(officialWarnings);
+    for (const WarningCategory &category : categories) {
+        re->add_warning(category.name.toStdString());
+        re->add_warning_il(category.startingIl);
     }
     re->set_user_name(nameFromStdString(cmd.user_name()).toStdString());
     re->set_user_clientid(nameFromStdString(cmd.user_clientid()).toStdString());
@@ -1550,6 +1571,15 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportUserInfo(const Co
         re->set_total_warns(warnCountQuery->value(0).toInt());
     }
 
+    QSqlQuery *lastLoginQuery = sqlInterface->prepareQuery("SELECT UNIX_TIMESTAMP(a.last_login) "
+                                                           "FROM {prefix}_user_analytics a "
+                                                           "JOIN {prefix}_users u ON u.id = a.id "
+                                                           "WHERE u.name = :name");
+    lastLoginQuery->bindValue(":name", userName);
+    if (sqlInterface->execSqlQuery(lastLoginQuery) && lastLoginQuery->next() && !lastLoginQuery->value(0).isNull()) {
+        re->set_last_login(lastLoginQuery->value(0).toLongLong());
+    }
+
     QSqlQuery *recentQuery =
         sqlInterface->prepareQuery("SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
                                    "r.category, r.description, r.created_at, r.status, "
@@ -1693,6 +1723,116 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportStats(const Comma
         servatrice->cacheReportStats(*re);
     }
 
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdGetUserSessions(const Command_GetUserSessions &cmd,
+                                                                         ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    const QString userName = nameFromStdString(cmd.user_name());
+    if (userName.isEmpty()) {
+        return Response::RespContextError;
+    }
+
+    Response_UserSessions *re = new Response_UserSessions;
+    const QList<ServerInfo_UserSession> sessions = sqlInterface->getUserSessions(userName, cmd.limit());
+    for (const ServerInfo_UserSession &session : sessions) {
+        re->add_sessions()->CopyFrom(session);
+    }
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdGetUserAlts(const Command_GetUserAlts &cmd,
+                                                                     ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    const QString userName = nameFromStdString(cmd.user_name());
+    if (userName.isEmpty()) {
+        return Response::RespContextError;
+    }
+
+    Response_UserAlts *re = new Response_UserAlts;
+    const QList<ServerInfo_UserAlt> alts = sqlInterface->getUserAlts(userName);
+    for (const ServerInfo_UserAlt &alt : alts) {
+        re->add_alts()->CopyFrom(alt);
+    }
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdGetModeratorLastLogins(const Command_GetModeratorLastLogins &,
+                                                                                ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    Response_ModeratorLastLogins *re = new Response_ModeratorLastLogins;
+    const QList<ServerInfo_ModeratorLogin> logins = sqlInterface->getModeratorLastLogins();
+    for (const ServerInfo_ModeratorLogin &login : logins) {
+        re->add_logins()->CopyFrom(login);
+    }
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const Command_ResetUserPassword &cmd,
+                                                                           ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    const QString userName = nameFromStdString(cmd.user_name()).simplified();
+    if (userName.isEmpty()) {
+        return Response::RespContextError;
+    }
+
+    const QString tempPassword = PasswordHasher::generateRandomSalt();
+    if (!sqlInterface->changeUserPassword(userName, tempPassword, true)) {
+        return Response::RespInternalError;
+    }
+
+    sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
+                                 "PASSWORD_RESET", "Moderator password reset", true);
+
+    Response_ResetUserPassword *re = new Response_ResetUserPassword;
+    re->set_user_name(userName.toStdString());
+    re->set_temporary_password(tempPassword.toStdString());
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdRemoveUserAvatar(const Command_RemoveUserAvatar &cmd,
+                                                                          ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    const QString userName = nameFromStdString(cmd.user_name()).simplified();
+    if (userName.isEmpty()) {
+        return Response::RespContextError;
+    }
+
+    if (!sqlInterface->removeUserAvatar(userName)) {
+        return Response::RespInternalError;
+    }
+
+    sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
+                                 "REMOVE_USER_AVATAR", "Moderator removed user avatar", true);
+
+    Response_RemoveUserAvatar *re = new Response_RemoveUserAvatar;
+    re->set_user_name(userName.toStdString());
     rc.setResponseExtension(re);
     return Response::RespOk;
 }

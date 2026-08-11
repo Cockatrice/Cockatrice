@@ -166,6 +166,12 @@ private:
     Response::ResponseCode cmdGetAdminNotes(const Command_GetAdminNotes &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdUpdateAdminNotes(const Command_UpdateAdminNotes &cmd, ResponseContainer &rc);
 
+    Response::ResponseCode cmdGetUserSessions(const Command_GetUserSessions &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdGetUserAlts(const Command_GetUserAlts &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdGetModeratorLastLogins(const Command_GetModeratorLastLogins &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdResetUserPassword(const Command_ResetUserPassword &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdRemoveUserAvatar(const Command_RemoveUserAvatar &cmd, ResponseContainer &rc);
+
     bool addAdminFlagToUser(const QString &user, int flag);
     bool removeAdminFlagFromUser(const QString &user, int flag);
 

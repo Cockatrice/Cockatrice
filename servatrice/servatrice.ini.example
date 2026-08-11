@@ -79,8 +79,10 @@ requiredfeatures=""
 
 ; You can define custom warnings that users are sent when the moderation staff uses the right client warn user
 ; menu option.  This list is comma seperated that each item will appear in the drop down list for staff members
-; to choose from.  Example: "Flaming,Foul Language"
-officialwarnings="Flaming,Spamming,Causing Drama,Abusive Language"
+; to choose from.  Each entry may optionally carry a recommended starting intervention level (see the moderator
+; guide) by appending "|" and the level number.  Entries without an explicit level default to intervention
+; level 1.  Example: "Flaming,Foul Language"
+officialwarnings="Abusive Language|1,Calling Out User|1,Causing Drama|1,Cheating|2,Disrespecting Staff|1,Disrupting a Draft|1,Inappropriate Avatar|3,Inappropriate Game Name|1,Kicking Without Valid Reason|1,Spamming|1,Targeted Harassment|2"
 
 ; Maximum time in seconds a player can stay connected but idle.  Default is 3600 (0 = disabled)
 ; Clients will be notified at the 90% time period of pending disconnection if they do not take action.
