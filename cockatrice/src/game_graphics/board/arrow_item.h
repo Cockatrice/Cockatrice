@@ -33,6 +33,7 @@ private:
     qreal glowFadeDurationMs = 0;
     qreal drawProgress = 1.0;
     qreal glowAlpha = 0.0;
+    bool animationStarted = false;
 
     static constexpr qreal glowExtent = 12.0;
 

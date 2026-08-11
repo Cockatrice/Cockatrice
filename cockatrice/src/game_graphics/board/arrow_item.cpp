@@ -178,7 +178,12 @@ void ArrowItem::startDrawAnimation()
 
     strokeDurationMs = qBound(kMinStrokeDurationMs, centerLine.length() * kMsPerPixel, kMaxStrokeDurationMs);
     glowFadeDurationMs = kGlowFadeDurationMs;
-    animationClock.start();
+    // The clock is started on the first animationEvent() tick so that t=0
+    // corresponds to the first rendered frame. Starting it here would count
+    // the time spent before the item's first paint (event-loop delays, bursts
+    // of arrows created together), making the arrow appear already partway
+    // drawn when it first shows up.
+    animationStarted = false;
     drawProgress = 0.0;
     glowAlpha = 1.0;
     update();
@@ -189,6 +194,11 @@ void ArrowItem::startDrawAnimation()
 
 bool ArrowItem::animationEvent()
 {
+    if (!animationStarted) {
+        animationClock.start();
+        animationStarted = true;
+    }
+
     const qint64 elapsed = animationClock.elapsed();
     if (elapsed >= strokeDurationMs + glowFadeDurationMs) {
         drawProgress = 1.0;
