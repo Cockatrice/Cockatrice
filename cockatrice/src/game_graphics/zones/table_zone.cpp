@@ -8,6 +8,7 @@
 #include "../board/arrow_item.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
+#include "../game_scene.h"
 #include "../z_values.h"
 
 #include <QGraphicsScene>
@@ -47,6 +48,31 @@ void TableZone::updateBg()
     update();
 }
 
+void TableZone::triggerDamageShimmer()
+{
+    if (!SettingsCache::instance().userInterface().getBattlefieldFlashEnabled()) {
+        damageShimmerAlpha = 0.0;
+        return;
+    }
+
+    damageShimmerAlpha = 1.0;
+    shimmerClock.start();
+    if (scene()) {
+        static_cast<GameScene *>(scene())->registerAnimationItem(this);
+    }
+}
+
+bool TableZone::animationEvent()
+{
+    damageShimmerAlpha = 1.0 - shimmerClock.elapsed() / shimmerDurationMs;
+    if (damageShimmerAlpha <= 0.0) {
+        damageShimmerAlpha = 0.0;
+        return false;
+    }
+    update();
+    return true;
+}
+
 QRectF TableZone::boundingRect() const
 {
     return QRectF(0, 0, width, height);
@@ -75,6 +101,13 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         // inactive player gets a darker table zone with a semi transparent black mask
         // this means if the user provides a custom background it will fade
         painter->fillRect(boundingRect(), FADE_MASK);
+    }
+
+    // Decaying crimson wash from taking damage.
+    if (damageShimmerAlpha > 0.0) {
+        QColor shimmerColor(239, 68, 68);
+        shimmerColor.setAlphaF(0.22 * damageShimmerAlpha);
+        painter->fillRect(boundingRect(), shimmerColor);
     }
 
     paintLandDivider(painter);

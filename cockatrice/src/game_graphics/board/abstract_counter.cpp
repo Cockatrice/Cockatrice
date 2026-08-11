@@ -29,8 +29,9 @@ AbstractCounter::AbstractCounter(CounterState *state,
 {
     setAcceptHoverEvents(true);
 
-    connect(state, &CounterState::valueChanged, this, [this](int, int newValue) {
+    connect(state, &CounterState::valueChanged, this, [this](int oldValue, int newValue) {
         value = newValue;
+        onValueChanged(oldValue, newValue);
         update();
     });
 
@@ -227,4 +228,10 @@ void AbstractCounterDialog::changeValue(int diff)
     }
     curValue += diff;
     setTextValue(QString::number(curValue));
+}
+
+void AbstractCounter::onValueChanged(int /*oldValue*/, int /*newValue*/)
+{
+    // Default: no feedback. Subclasses such as PlayerCounter override this to
+    // flash the counter on meaningful changes (life gain/loss).
 }
