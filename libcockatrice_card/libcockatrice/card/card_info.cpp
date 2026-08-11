@@ -25,7 +25,11 @@ const QHash<QString, QString> &CardInfo::getPropertiesHash() const
 
 void CardInfo::setProperty(const QString &_name, const QString &_value)
 {
-    properties.insert(_name, _value);
+    bool changed = properties.insert(_name, _value);
+    if (!changed) {
+        return;
+    }
+
     emit cardInfoChanged(smartThis);
 }
 

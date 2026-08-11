@@ -76,10 +76,16 @@ QString LazyPropertiesHash::value(const QString &key) const
     return properties.value(key);
 }
 
-void LazyPropertiesHash::insert(const QString &key, const QString &value)
+bool LazyPropertiesHash::insert(const QString &key, const QString &value)
 {
     ensureMaterialized();
+
+    if (value == properties.value(key)) {
+        return false;
+    }
+
     properties.insert(key, value);
+    return true;
 }
 
 const QHash<QString, QString> &LazyPropertiesHash::getProperties() const

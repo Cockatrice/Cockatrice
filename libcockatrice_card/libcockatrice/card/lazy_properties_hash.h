@@ -60,8 +60,9 @@ public:
      * @brief Inserts a value into the materialized properties hash
      * @param key The key
      * @param value The value to insert
+     * @return True if a new value was inserted; false if the new value is the same as the existing value
      */
-    void insert(const QString &key, const QString &value);
+    bool insert(const QString &key, const QString &value);
 
     /**
      * @brief Gets a view of the materialized properties hash.
