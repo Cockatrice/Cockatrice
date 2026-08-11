@@ -2,6 +2,7 @@
 #define CARD_INFO_H
 
 #include "format/format_legality_rules.h"
+#include "lazy_properties_hash.h"
 #include "printing/printing_info.h"
 
 #include <QDate>
@@ -75,19 +76,8 @@ private:
     QString simpleName;    ///< Simplified name for fuzzy matching.
     QString text;          ///< Text description or rules text of the card.
     bool isToken;          ///< Whether this card is a token or not.
-    // Properties are stored as a pre-serialized blob (cheap to load) and the
-    // QHash<QString, QString> is materialized on first query, so database load avoids
-    // constructing thousands of QStrings per card.
-    mutable QByteArray propertiesBlob;               ///< Serialized properties (load form).
-    mutable QHash<QString, QString> propertiesCache; ///< Materialized properties (query form).
-    mutable bool propertiesLoaded = false;           ///< Whether propertiesCache is valid.
-    mutable QMutex propertiesMutex;                  ///< Guards lazy materialization.
 
-    /**
-     * @brief Materializes propertiesCache from propertiesBlob if not already done.
-     *        Safe to call from const getters (members are mutable).
-     */
-    void ensurePropertiesLoaded() const;
+    LazyPropertiesHash properties; ///< Key-value store of dynamic card properties.
 
     QList<CardRelation *> relatedCards;            ///< Forward references to related cards.
     QList<CardRelation *> reverseRelatedCards;     ///< Cards that refer back to this card.
@@ -114,7 +104,7 @@ public:
     explicit CardInfo(const QString &_name,
                       const QString &_text,
                       bool _isToken,
-                      QHash<QString, QString> _properties,
+                      const QHash<QString, QString> &_properties,
                       const QList<CardRelation *> &_relatedCards,
                       const QList<CardRelation *> &_reverseRelatedCards,
                       SetToPrintingsMap _sets,
@@ -144,7 +134,7 @@ public:
     explicit CardInfo(const QString &_name,
                       const QString &_text,
                       bool _isToken,
-                      QByteArray _propertiesBlob,
+                      const QByteArray &_propertiesBlob,
                       const QList<CardRelation *> &_relatedCards,
                       const QList<CardRelation *> &_reverseRelatedCards,
                       SetToPrintingsMap _sets,
@@ -161,7 +151,7 @@ public:
      */
     CardInfo(const CardInfo &other)
         : QObject(other.parent()), name(other.name), simpleName(other.simpleName), text(other.text),
-          isToken(other.isToken), propertiesBlob(other.propertiesBlob), relatedCards(other.relatedCards),
+          isToken(other.isToken), properties(other.properties), relatedCards(other.relatedCards),
           reverseRelatedCards(other.reverseRelatedCards), reverseRelatedCardsToMe(other.reverseRelatedCardsToMe),
           setsToPrintings(other.setsToPrintings), uiAttributes(other.uiAttributes), setsNames(other.setsNames),
           altNames(other.altNames)
@@ -194,7 +184,7 @@ public:
     static CardInfoPtr newInstance(const QString &_name,
                                    const QString &_text,
                                    bool _isToken,
-                                   QHash<QString, QString> _properties,
+                                   const QHash<QString, QString> &_properties,
                                    const QList<CardRelation *> &_relatedCards,
                                    const QList<CardRelation *> &_reverseRelatedCards,
                                    SetToPrintingsMap _sets,

@@ -2,12 +2,11 @@
 #define COCKATRICE_PRINTING_INFO_H
 
 #include "../set/card_set.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
 
 #include <QList>
 #include <QMap>
-#include <QMutex>
 #include <QSharedPointer>
-#include <QVariant>
 
 class PrintingInfo;
 
@@ -34,15 +33,7 @@ public:
      * @param _set The set this printing belongs to (defaults to null).
      * @param _properties The printing properties (defaults to empty)
      */
-    explicit PrintingInfo(const CardSetPtr &_set = nullptr, const QHash<QString, QString> &_properties = {});
-
-    /**
-     * @brief Constructs a PrintingInfo associated with a specific set.
-     *
-     * @param _set The set this printing belongs to (defaults to null).
-     * @param _blob The serialized properties (as written by the cache writer).
-     */
-    explicit PrintingInfo(const CardSetPtr &_set, const QByteArray &_blob);
+    explicit PrintingInfo(const CardSetPtr &_set = nullptr, const LazyPropertiesHash &_properties = {});
 
     /**
      * @brief Destroys the PrintingInfo.
@@ -76,18 +67,8 @@ public:
     }
 
 private:
-    CardSetPtr set; ///< The set this variation belongs to.
-
-    // Properties are stored as a pre-serialized blob (cheap to load) and the
-    // QHash<QString, QString> is materialized on first query. This avoids constructing
-    // thousands of QStrings per card at database-load time.
-    mutable QByteArray propertiesBlob;               ///< Serialized properties (load form).
-    mutable QHash<QString, QString> propertiesCache; ///< Materialized properties (query form).
-    mutable bool propertiesLoaded = false;           ///< Whether propertiesCache is valid.
-    mutable QSharedPointer<QBasicMutex> propertiesMutex =
-        QSharedPointer<QBasicMutex>::create(); ///< Guards lazy materialization.
-
-    void ensurePropertiesLoaded() const;
+    CardSetPtr set;                ///< The set this variation belongs to.
+    LazyPropertiesHash properties; ///< Key-value store for variation-specific attributes.
 
 public:
     /**
@@ -112,8 +93,7 @@ public:
 
     [[nodiscard]] const QHash<QString, QString> &getPropertiesHash() const
     {
-        ensurePropertiesLoaded();
-        return propertiesCache;
+        return properties.getProperties();
     }
 
     /**
@@ -124,7 +104,7 @@ public:
      */
     [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
-        return getPropertiesHash().value(propertyName);
+        return properties.value(propertyName);
     }
 
     /**
