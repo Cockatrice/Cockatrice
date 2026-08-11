@@ -32,7 +32,7 @@ ManaColor manaColor(QChar symbol)
 {
     switch (symbol.unicode()) {
         case 'W':
-            return {QColor(246, 224, 130), QColor(200, 170, 60), QColor(100, 60, 0)};
+            return {QColor(248, 248, 246), QColor(190, 180, 160), QColor(80, 70, 50)};
         case 'U':
             return {QColor(55, 130, 210), QColor(30, 90, 160), QColor(255, 255, 255)};
         case 'B':
@@ -70,7 +70,7 @@ QColor CardCompleterDelegate::accentForColors(const QString &colors)
     }
 
     if (seen.size() > 1) {
-        return QColor(190, 130, 25);
+        return QColor(205, 145, 25);
     }
 
     if (seen.isEmpty()) {
@@ -292,7 +292,7 @@ void CardCompleterDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     const QColor textColor = pal.color(QPalette::Text);
     const QColor secondaryColor = pal.color(QPalette::PlaceholderText);
 
-    QColor tinted = blend(base, accent, 0.18);
+    QColor tinted = blend(base, accent, 0.40);
 
     if (hovered) {
         tinted = blend(tinted, Qt::white, 0.05);
@@ -364,7 +364,7 @@ void CardCompleterDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
     if (selected) {
         QColor glow = pal.color(QPalette::Highlight);
-        glow.setAlpha(55);
+        glow.setAlpha(30);
 
         painter->fillPath(path, glow);
 
