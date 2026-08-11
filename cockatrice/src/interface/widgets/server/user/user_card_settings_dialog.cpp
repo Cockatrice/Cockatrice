@@ -1,8 +1,8 @@
 #include "user_card_settings_dialog.h"
 
 #include "../../../card_picture_loader/card_picture_loader.h"
-#include "../../utility/completer_utils.h"
 #include "../../cards/art_crop_attribution.h"
+#include "../../utility/completer_utils.h"
 #include "card/card_search_model.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
