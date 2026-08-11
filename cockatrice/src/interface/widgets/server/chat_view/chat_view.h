@@ -60,7 +60,7 @@ private:
     QStringList highlightedWords;
     bool evenNumber;
     bool showTimestamps;
-    bool scrollToBottomPending = false;
+    bool stickToBottom = false;
     HoveredItemType hoveredItemType;
     QString hoveredContent;
     QAction *messageClicked;
@@ -89,6 +89,8 @@ private slots:
     void actMessageClicked();
     void adjustColorsToPalette();
     void refreshBlockColors();
+    void onScrollBarRangeChanged();
+    void onScrollBarValueChanged(int value);
 
 public:
     ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _showTimestamps, QWidget *parent = nullptr);
