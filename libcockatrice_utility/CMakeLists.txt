@@ -5,8 +5,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(UTILITY_SOURCES libcockatrice/utility/expression.cpp libcockatrice/utility/levenshtein.cpp
-                    libcockatrice/utility/passwordhasher.cpp libcockatrice/utility/server_rate_limiter.cpp
+set(UTILITY_SOURCES
+    libcockatrice/utility/expression.cpp libcockatrice/utility/levenshtein.cpp libcockatrice/utility/passwordhasher.cpp
+    libcockatrice/utility/server_rate_limiter.cpp libcockatrice/utility/warning_categories.cpp
 )
 
 set(UTILITY_HEADERS
@@ -24,6 +25,7 @@ set(UTILITY_HEADERS
     libcockatrice/utility/zone_names.h
     libcockatrice/utility/days_years_between.h
     libcockatrice/utility/server_rate_limiter.h
+    libcockatrice/utility/warning_categories.h
 )
 
 add_library(libcockatrice_utility STATIC ${UTILITY_SOURCES} ${UTILITY_HEADERS})
