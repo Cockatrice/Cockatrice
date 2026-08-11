@@ -11,5 +11,8 @@ const QMap<QString, QString> TranslateCounterName::translated = {
     {"g", QT_TRANSLATE_NOOP("TranslateCounterName", "Green")},
     {"x", QT_TRANSLATE_NOOP("TranslateCounterName", "Colorless")},
     {"storm", QT_TRANSLATE_NOOP("TranslateCounterName", "Other")},
-    {CounterNames::CommanderTax, QT_TRANSLATE_NOOP("TranslateCounterName", "Commander Tax")},
-    {CounterNames::PartnerTax, QT_TRANSLATE_NOOP("TranslateCounterName", "Partner Tax")}};
+    {CounterNames::TaxCounter1, QT_TRANSLATE_NOOP("TranslateCounterName", "1st Tax")},
+    {CounterNames::TaxCounter2, QT_TRANSLATE_NOOP("TranslateCounterName", "2nd Tax")},
+    {CounterNames::TaxCounter3, QT_TRANSLATE_NOOP("TranslateCounterName", "3rd Tax")},
+    {CounterNames::TaxCounter4, QT_TRANSLATE_NOOP("TranslateCounterName", "4th Tax")},
+    {CounterNames::TaxCounter5, QT_TRANSLATE_NOOP("TranslateCounterName", "5th Tax")}};

@@ -14,66 +14,45 @@
 
 CommandZoneMenu::CommandZoneMenu(PlayerGraphicsItem *_player, QMenu *playerMenu) : QMenu(playerMenu), player(_player)
 {
-    incTaxShortcutKey = QStringLiteral("Player/aAddCommanderTax");
-    decTaxShortcutKey = QStringLiteral("Player/aRemoveCommanderTax");
-    incPartnerTaxShortcutKey = QStringLiteral("Player/aAddPartnerTax");
-    decPartnerTaxShortcutKey = QStringLiteral("Player/aRemovePartnerTax");
+    // Shortcuts only for first two tax counters (matching legacy behavior)
+    incTax1ShortcutKey = QStringLiteral("Player/aAddCommanderTax");
+    decTax1ShortcutKey = QStringLiteral("Player/aRemoveCommanderTax");
+    incTax2ShortcutKey = QStringLiteral("Player/aAddPartnerTax");
+    decTax2ShortcutKey = QStringLiteral("Player/aRemovePartnerTax");
 
     PlayerLogic *logic = player->getLogic();
     if (logic && logic->getPlayerInfo()->getLocalOrJudge()) {
-        aIncreaseCommanderTax = new QAction(this);
-        connect(aIncreaseCommanderTax, &QAction::triggered, this, [this]() {
-            if (auto *logic = player->getLogic()) {
-                logic->getPlayerActions()->actModifyTaxCounter(CounterIds::CommanderTax, 1);
-            }
-        });
-        addAction(aIncreaseCommanderTax);
+        for (int i = 0; i < TaxCounterCount; ++i) {
+            int counterId = CounterIds::taxCounterIdFromIndex(i);
 
-        aDecreaseCommanderTax = new QAction(this);
-        connect(aDecreaseCommanderTax, &QAction::triggered, this, [this]() {
-            if (auto *logic = player->getLogic()) {
-                logic->getPlayerActions()->actModifyTaxCounter(CounterIds::CommanderTax, -1);
-            }
-        });
-        addAction(aDecreaseCommanderTax);
+            aIncreaseTax[i] = new QAction(this);
+            connect(aIncreaseTax[i], &QAction::triggered, this, [this, counterId]() {
+                if (auto *l = player->getLogic()) {
+                    l->getPlayerActions()->actModifyTaxCounter(counterId, 1);
+                }
+            });
+            addAction(aIncreaseTax[i]);
 
-        addSeparator();
+            aDecreaseTax[i] = new QAction(this);
+            connect(aDecreaseTax[i], &QAction::triggered, this, [this, counterId]() {
+                if (auto *l = player->getLogic()) {
+                    l->getPlayerActions()->actModifyTaxCounter(counterId, -1);
+                }
+            });
+            addAction(aDecreaseTax[i]);
 
-        aIncreasePartnerTax = new QAction(this);
-        connect(aIncreasePartnerTax, &QAction::triggered, this, [this]() {
-            if (auto *logic = player->getLogic()) {
-                logic->getPlayerActions()->actModifyTaxCounter(CounterIds::PartnerTax, 1);
-            }
-        });
-        addAction(aIncreasePartnerTax);
+            addSeparator();
 
-        aDecreasePartnerTax = new QAction(this);
-        connect(aDecreasePartnerTax, &QAction::triggered, this, [this]() {
-            if (auto *logic = player->getLogic()) {
-                logic->getPlayerActions()->actModifyTaxCounter(CounterIds::PartnerTax, -1);
-            }
-        });
-        addAction(aDecreasePartnerTax);
+            aToggleTax[i] = new QAction(this);
+            connect(aToggleTax[i], &QAction::triggered, this, [this, counterId]() {
+                if (auto *l = player->getLogic()) {
+                    l->getPlayerActions()->actToggleTaxCounter(counterId);
+                }
+            });
+            addAction(aToggleTax[i]);
 
-        addSeparator();
-
-        aToggleCommanderTaxCounter = new QAction(this);
-        connect(aToggleCommanderTaxCounter, &QAction::triggered, this, [this]() {
-            if (auto *logic = player->getLogic()) {
-                logic->getPlayerActions()->actToggleTaxCounter(CounterIds::CommanderTax);
-            }
-        });
-        addAction(aToggleCommanderTaxCounter);
-
-        aTogglePartnerTaxCounter = new QAction(this);
-        connect(aTogglePartnerTaxCounter, &QAction::triggered, this, [this]() {
-            if (auto *logic = player->getLogic()) {
-                logic->getPlayerActions()->actToggleTaxCounter(CounterIds::PartnerTax);
-            }
-        });
-        addAction(aTogglePartnerTaxCounter);
-
-        addSeparator();
+            addSeparator();
+        }
 
         aToggleMinimized = new QAction(this);
         connect(aToggleMinimized, &QAction::triggered, this, &CommandZoneMenu::actToggleMinimized);
@@ -88,19 +67,19 @@ CommandZoneMenu::CommandZoneMenu(PlayerGraphicsItem *_player, QMenu *playerMenu)
 void CommandZoneMenu::retranslateUi()
 {
     setTitle(tr("Co&mmander"));
-    if (aIncreaseCommanderTax) {
-        aIncreaseCommanderTax->setText(tr("&Increase Commander Tax (+1)"));
+
+    static const char *ordinals[] = {"1st", "2nd", "3rd", "4th", "5th"};
+
+    for (int i = 0; i < TaxCounterCount; ++i) {
+        if (aIncreaseTax[i]) {
+            aIncreaseTax[i]->setText(tr("&Increase %1 Tax (+1)").arg(ordinals[i]));
+        }
+        if (aDecreaseTax[i]) {
+            aDecreaseTax[i]->setText(tr("&Decrease %1 Tax (-1)").arg(ordinals[i]));
+        }
+        // Toggle action labels are derived dynamically in updateTaxCounterActionStates()
     }
-    if (aDecreaseCommanderTax) {
-        aDecreaseCommanderTax->setText(tr("&Decrease Commander Tax (-1)"));
-    }
-    if (aIncreasePartnerTax) {
-        aIncreasePartnerTax->setText(tr("Increase &Partner Tax (+1)"));
-    }
-    if (aDecreasePartnerTax) {
-        aDecreasePartnerTax->setText(tr("Decrease P&artner Tax (-1)"));
-    }
-    // Toggle action labels are derived dynamically in updateTaxCounterActionStates()
+
     if (aToggleMinimized) {
         aToggleMinimized->setText(tr("&Minimize"));
     }
@@ -116,29 +95,43 @@ void CommandZoneMenu::actToggleMinimized()
 
 void CommandZoneMenu::updateTaxCounterActionStates()
 {
-    AbstractCounter *cmdTax = player->getTaxCounterIfActive(CounterIds::CommanderTax);
-    AbstractCounter *partnerTax = player->getTaxCounterIfActive(CounterIds::PartnerTax);
+    static const char *ordinals[] = {"1st", "2nd", "3rd", "4th", "5th"};
 
-    if (aIncreaseCommanderTax) {
-        aIncreaseCommanderTax->setVisible(cmdTax && cmdTax->getValue() < MAX_COUNTER_VALUE);
-    }
-    if (aDecreaseCommanderTax) {
-        aDecreaseCommanderTax->setVisible(cmdTax && cmdTax->getValue() > 0);
-    }
-    if (aToggleCommanderTaxCounter) {
-        aToggleCommanderTaxCounter->setText(cmdTax ? tr("&Remove Commander Tax") : tr("&Add Commander Tax"));
-        aToggleCommanderTaxCounter->setVisible(!cmdTax || (cmdTax->getValue() == 0 && !partnerTax));
+    // Collect all tax counter states
+    std::array<AbstractCounter *, TaxCounterCount> taxCounters{};
+    for (int i = 0; i < TaxCounterCount; ++i) {
+        taxCounters[i] = player->getTaxCounterIfActive(CounterIds::taxCounterIdFromIndex(i));
     }
 
-    if (aIncreasePartnerTax) {
-        aIncreasePartnerTax->setVisible(partnerTax && partnerTax->getValue() < MAX_COUNTER_VALUE);
+    // Find highest active tax counter index
+    int highestActive = -1;
+    for (int i = TaxCounterCount - 1; i >= 0; --i) {
+        if (taxCounters[i]) {
+            highestActive = i;
+            break;
+        }
     }
-    if (aDecreasePartnerTax) {
-        aDecreasePartnerTax->setVisible(partnerTax && partnerTax->getValue() > 0);
-    }
-    if (aTogglePartnerTaxCounter) {
-        aTogglePartnerTaxCounter->setText(partnerTax ? tr("R&emove Partner Tax") : tr("&Add Partner Tax"));
-        aTogglePartnerTaxCounter->setVisible(!partnerTax || partnerTax->getValue() == 0);
+
+    for (int i = 0; i < TaxCounterCount; ++i) {
+        AbstractCounter *counter = taxCounters[i];
+
+        if (aIncreaseTax[i]) {
+            aIncreaseTax[i]->setVisible(counter && counter->getValue() < MAX_COUNTER_VALUE);
+        }
+        if (aDecreaseTax[i]) {
+            aDecreaseTax[i]->setVisible(counter && counter->getValue() > 0);
+        }
+        if (aToggleTax[i]) {
+            aToggleTax[i]->setText(counter ? tr("&Remove %1 Tax").arg(ordinals[i])
+                                           : tr("&Add %1 Tax").arg(ordinals[i]));
+
+            // Toggle visible if:
+            // - Counter doesn't exist and previous counter is active (can add next in sequence)
+            // - Counter exists with value 0 and is the highest active (can remove last in sequence)
+            bool canAdd = !counter && (i == 0 || taxCounters[i - 1]);
+            bool canRemove = counter && counter->getValue() == 0 && i == highestActive;
+            aToggleTax[i]->setVisible(canAdd || canRemove);
+        }
     }
 
     if (aToggleMinimized) {
@@ -151,32 +144,34 @@ void CommandZoneMenu::setShortcutsActive()
 {
     ShortcutsSettings &shortcuts = SettingsCache::instance().shortcuts();
 
-    if (aIncreaseCommanderTax) {
-        aIncreaseCommanderTax->setShortcuts(shortcuts.getShortcut(incTaxShortcutKey));
+    // Only first two tax counters have shortcuts
+    if (aIncreaseTax[0]) {
+        aIncreaseTax[0]->setShortcuts(shortcuts.getShortcut(incTax1ShortcutKey));
     }
-    if (aDecreaseCommanderTax) {
-        aDecreaseCommanderTax->setShortcuts(shortcuts.getShortcut(decTaxShortcutKey));
+    if (aDecreaseTax[0]) {
+        aDecreaseTax[0]->setShortcuts(shortcuts.getShortcut(decTax1ShortcutKey));
     }
-    if (aIncreasePartnerTax) {
-        aIncreasePartnerTax->setShortcuts(shortcuts.getShortcut(incPartnerTaxShortcutKey));
+    if (aIncreaseTax[1]) {
+        aIncreaseTax[1]->setShortcuts(shortcuts.getShortcut(incTax2ShortcutKey));
     }
-    if (aDecreasePartnerTax) {
-        aDecreasePartnerTax->setShortcuts(shortcuts.getShortcut(decPartnerTaxShortcutKey));
+    if (aDecreaseTax[1]) {
+        aDecreaseTax[1]->setShortcuts(shortcuts.getShortcut(decTax2ShortcutKey));
     }
 }
 
 void CommandZoneMenu::setShortcutsInactive()
 {
-    if (aIncreaseCommanderTax) {
-        aIncreaseCommanderTax->setShortcut(QKeySequence());
+    // Only first two tax counters have shortcuts
+    if (aIncreaseTax[0]) {
+        aIncreaseTax[0]->setShortcut(QKeySequence());
     }
-    if (aDecreaseCommanderTax) {
-        aDecreaseCommanderTax->setShortcut(QKeySequence());
+    if (aDecreaseTax[0]) {
+        aDecreaseTax[0]->setShortcut(QKeySequence());
     }
-    if (aIncreasePartnerTax) {
-        aIncreasePartnerTax->setShortcut(QKeySequence());
+    if (aIncreaseTax[1]) {
+        aIncreaseTax[1]->setShortcut(QKeySequence());
     }
-    if (aDecreasePartnerTax) {
-        aDecreasePartnerTax->setShortcut(QKeySequence());
+    if (aDecreaseTax[1]) {
+        aDecreaseTax[1]->setShortcut(QKeySequence());
     }
 }

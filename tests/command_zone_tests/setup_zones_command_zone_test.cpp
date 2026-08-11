@@ -86,34 +86,40 @@ struct SetupFixture
 };
 } // namespace
 
-TEST(SetupZonesCommandZone, CreatesTaxCountersWhenEnabled)
+TEST(SetupZonesCommandZone, CreatesAllTaxCountersWhenEnabled)
 {
     SetupFixture f(true);
     const QMap<int, Server_Counter *> &counters = f.player.getCounters();
 
     EXPECT_TRUE(f.player.getZones().contains(ZoneNames::COMMAND));
-    ASSERT_TRUE(counters.contains(CounterIds::CommanderTax));
-    ASSERT_TRUE(counters.contains(CounterIds::PartnerTax));
 
-    const Server_Counter *commander = counters.value(CounterIds::CommanderTax);
-    const Server_Counter *partner = counters.value(CounterIds::PartnerTax);
+    for (int i = 0; i < CounterIds::TaxCounterCount; ++i) {
+        int id = CounterIds::taxCounterIdFromIndex(i);
+        ASSERT_TRUE(counters.contains(id));
+    }
 
-    EXPECT_TRUE(commander->isActive());
-    EXPECT_FALSE(partner->isActive());
-    EXPECT_EQ(commander->getCount(), 0);
-    EXPECT_EQ(partner->getCount(), 0);
+    const Server_Counter *tax1 = counters.value(CounterIds::TaxCounter1);
+    EXPECT_TRUE(tax1->isActive());
+    EXPECT_EQ(tax1->getCount(), 0);
+
+    for (int i = 1; i < CounterIds::TaxCounterCount; ++i) {
+        int id = CounterIds::taxCounterIdFromIndex(i);
+        const Server_Counter *counter = counters.value(id);
+        EXPECT_FALSE(counter->isActive());
+        EXPECT_EQ(counter->getCount(), 0);
+    }
 }
 
-TEST(SetupZonesCommandZone, TaxCountersUseCommanderBounds)
+TEST(SetupZonesCommandZone, TaxCountersUseBounds)
 {
     SetupFixture f(true);
-    Server_Counter *commander = f.player.getCounters().value(CounterIds::CommanderTax);
-    ASSERT_NE(commander, nullptr);
+    Server_Counter *tax1 = f.player.getCounters().value(CounterIds::TaxCounter1);
+    ASSERT_NE(tax1, nullptr);
 
-    EXPECT_TRUE(commander->setCount(MAX_COUNTER_VALUE + 1000));
-    EXPECT_EQ(commander->getCount(), MAX_COUNTER_VALUE);
-    EXPECT_TRUE(commander->setCount(-1));
-    EXPECT_EQ(commander->getCount(), 0);
+    EXPECT_TRUE(tax1->setCount(MAX_COUNTER_VALUE + 1000));
+    EXPECT_EQ(tax1->getCount(), MAX_COUNTER_VALUE);
+    EXPECT_TRUE(tax1->setCount(-1));
+    EXPECT_EQ(tax1->getCount(), 0);
 }
 
 TEST(SetupZonesCommandZone, NoTaxCountersWhenDisabled)
@@ -122,8 +128,12 @@ TEST(SetupZonesCommandZone, NoTaxCountersWhenDisabled)
     const QMap<int, Server_Counter *> &counters = f.player.getCounters();
 
     EXPECT_FALSE(f.player.getZones().contains(ZoneNames::COMMAND));
-    EXPECT_FALSE(counters.contains(CounterIds::CommanderTax));
-    EXPECT_FALSE(counters.contains(CounterIds::PartnerTax));
+
+    for (int i = 0; i < CounterIds::TaxCounterCount; ++i) {
+        int id = CounterIds::taxCounterIdFromIndex(i);
+        EXPECT_FALSE(counters.contains(id));
+    }
+
     EXPECT_TRUE(counters.contains(0));
 }
 

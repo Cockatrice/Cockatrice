@@ -1674,14 +1674,14 @@ void PlayerActions::playSelectedCardsImpl(
     }
 }
 
-void PlayerActions::actPlayAndIncreaseTax(QList<CardItem *> selectedCards)
+void PlayerActions::actPlayAndIncrease1stTax(QList<CardItem *> selectedCards)
 {
-    playAndIncreaseTax(selectedCards, CounterIds::CommanderTax);
+    playAndIncreaseTax(selectedCards, CounterIds::TaxCounter1);
 }
 
-void PlayerActions::actPlayAndIncreasePartnerTax(QList<CardItem *> selectedCards)
+void PlayerActions::actPlayAndIncrease2ndTax(QList<CardItem *> selectedCards)
 {
-    playAndIncreaseTax(selectedCards, CounterIds::PartnerTax);
+    playAndIncreaseTax(selectedCards, CounterIds::TaxCounter2);
 }
 
 void PlayerActions::playAndIncreaseTax(QList<CardItem *> selectedCards, int counterId)

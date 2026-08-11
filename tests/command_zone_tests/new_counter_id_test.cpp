@@ -52,25 +52,25 @@ TEST(NewCounterId, SkipsReservedRangeWhenOnlyReservedCountersExist)
 TEST(NewCounterId, SkipsTaxCounterIds)
 {
     PlayerFixture f;
-    f.player.addCounter(new Server_Counter(CounterIds::CommanderTax, "tax1", color(), 0, 0));
-    f.player.addCounter(new Server_Counter(CounterIds::PartnerTax, "tax2", color(), 0, 0));
+    f.player.addCounter(new Server_Counter(CounterIds::TaxCounter1, "tax1", color(), 0, 0));
+    f.player.addCounter(new Server_Counter(CounterIds::TaxCounter2, "tax2", color(), 0, 0));
     EXPECT_EQ(f.player.newCounterId(), CounterIds::FirstUserId);
 }
 
 TEST(NewCounterId, ReturnsNextIdAboveHighestUserCounter)
 {
     PlayerFixture f;
-    f.player.addCounter(new Server_Counter(CounterIds::FirstUserId, "a", color(), 20, 0)); // 10
-    f.player.addCounter(new Server_Counter(15, "b", color(), 20, 0));
-    EXPECT_EQ(f.player.newCounterId(), 16);
+    f.player.addCounter(new Server_Counter(CounterIds::FirstUserId, "a", color(), 20, 0));
+    f.player.addCounter(new Server_Counter(CounterIds::FirstUserId + 2, "b", color(), 20, 0));
+    EXPECT_EQ(f.player.newCounterId(), CounterIds::FirstUserId + 3);
 }
 
 TEST(NewCounterId, IgnoresReservedCountersWhenUserCountersPresent)
 {
     PlayerFixture f;
-    f.player.addCounter(new Server_Counter(5, "r", color(), 20, 0));     // reserved range
-    f.player.addCounter(new Server_Counter(11, "user", color(), 20, 0)); // user range
-    EXPECT_EQ(f.player.newCounterId(), 12);
+    f.player.addCounter(new Server_Counter(5, "r", color(), 20, 0));                          // reserved range
+    f.player.addCounter(new Server_Counter(CounterIds::FirstUserId, "user", color(), 20, 0)); // user range
+    EXPECT_EQ(f.player.newCounterId(), CounterIds::FirstUserId + 1);
 }
 
 int main(int argc, char **argv)

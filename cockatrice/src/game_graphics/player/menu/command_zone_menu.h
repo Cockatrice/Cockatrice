@@ -10,6 +10,8 @@
 #include "abstract_player_component.h"
 
 #include <QMenu>
+#include <array>
+#include <libcockatrice/utility/counter_ids.h>
 
 class PlayerGraphicsItem;
 
@@ -18,7 +20,7 @@ class PlayerGraphicsItem;
  * @brief Context menu for the command zone.
  *
  * Appears when right-clicking on the command zone. Provides actions for
- * adjusting the commander tax counter and toggling minimized state.
+ * adjusting tax counters (up to 5) and toggling minimized state.
  *
  * @see PlayerMenu
  * @see CommandZone
@@ -34,13 +36,12 @@ public:
     void setShortcutsInactive() override;
 
 private:
-    QAction *aIncreaseCommanderTax = nullptr;      ///< Increments the primary commander tax counter
-    QAction *aDecreaseCommanderTax = nullptr;      ///< Decrements the primary commander tax counter
-    QAction *aToggleCommanderTaxCounter = nullptr; ///< Toggles primary commander tax counter visibility
-    QAction *aIncreasePartnerTax = nullptr;        ///< Increments the partner commander tax counter
-    QAction *aDecreasePartnerTax = nullptr;        ///< Decrements the partner commander tax counter
-    QAction *aTogglePartnerTaxCounter = nullptr;   ///< Toggles partner commander tax counter visibility
-    QAction *aToggleMinimized = nullptr;           ///< Toggles command zone minimized state
+    static constexpr int TaxCounterCount = CounterIds::TaxCounterCount;
+
+    std::array<QAction *, TaxCounterCount> aIncreaseTax{};
+    std::array<QAction *, TaxCounterCount> aDecreaseTax{};
+    std::array<QAction *, TaxCounterCount> aToggleTax{};
+    QAction *aToggleMinimized = nullptr;
 
 public slots:
     void updateTaxCounterActionStates();
@@ -51,10 +52,11 @@ private slots:
 private:
     PlayerGraphicsItem *player;
 
-    QString incTaxShortcutKey;
-    QString decTaxShortcutKey;
-    QString incPartnerTaxShortcutKey;
-    QString decPartnerTaxShortcutKey;
+    // Shortcuts only for first two tax counters
+    QString incTax1ShortcutKey;
+    QString decTax1ShortcutKey;
+    QString incTax2ShortcutKey;
+    QString decTax2ShortcutKey;
 };
 
 #endif // COCKATRICE_COMMAND_ZONE_MENU_H

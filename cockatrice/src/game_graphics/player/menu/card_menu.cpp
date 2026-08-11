@@ -84,8 +84,8 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     aUnattach = makeAction(this, [actions, sel]() { actions->actUnattach(sel()); });
     aSetAnnotation = makeAction(this, [actions, sel]() { actions->actRequestSetAnnotationDialog(sel()); });
     aPlay = makeAction(this, [actions, sel]() { actions->actPlay(sel()); });
-    aPlayAndIncreaseTax = makeAction(this, [actions, sel]() { actions->actPlayAndIncreaseTax(sel()); });
-    aPlayAndIncreasePartnerTax = makeAction(this, [actions, sel]() { actions->actPlayAndIncreasePartnerTax(sel()); });
+    aPlayAndIncrease1stTax = makeAction(this, [actions, sel]() { actions->actPlayAndIncrease1stTax(sel()); });
+    aPlayAndIncrease2ndTax = makeAction(this, [actions, sel]() { actions->actPlayAndIncrease2ndTax(sel()); });
     aPlayFacedown = makeAction(this, [actions, sel]() { actions->actPlayFacedown(sel()); });
     aHide = makeAction(this, [actions, sel]() { actions->actHide(sel()); });
     aReduceLifeByPower = makeAction(this, [actions, sel]() { actions->actReduceLifeByPower(sel()); });
@@ -170,12 +170,12 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
                     // bumping one commander's tax counter once per command-zone card.
                     const bool singleSelection = gameScene->selectedCards().size() <= 1;
 
-                    if (singleSelection && player->getTaxCounterIfActive(CounterIds::CommanderTax)) {
-                        addAction(aPlayAndIncreaseTax);
+                    if (singleSelection && player->getTaxCounterIfActive(CounterIds::TaxCounter1)) {
+                        addAction(aPlayAndIncrease1stTax);
                     }
 
-                    if (singleSelection && player->getTaxCounterIfActive(CounterIds::PartnerTax)) {
-                        addAction(aPlayAndIncreasePartnerTax);
+                    if (singleSelection && player->getTaxCounterIfActive(CounterIds::TaxCounter2)) {
+                        addAction(aPlayAndIncrease2ndTax);
                     }
 
                     // No reveal submenu - command zone is public
@@ -524,8 +524,8 @@ void CardMenu::retranslateUi()
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
-    aPlayAndIncreaseTax->setText(tr("Play and &Increase Commander Tax"));
-    aPlayAndIncreasePartnerTax->setText(tr("Play and Increase &Partner Tax"));
+    aPlayAndIncrease1stTax->setText(tr("Play and &Increase 1st Tax"));
+    aPlayAndIncrease2ndTax->setText(tr("Play and Increase &2nd Tax"));
     aRevealToAll->setText(tr("&All players"));
     //: Turn sideways or back again
     aTap->setText(tr("&Tap / Untap"));

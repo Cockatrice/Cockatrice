@@ -109,12 +109,15 @@ void Server_Player::setupZones()
     // Command zone for Commander format
     if (game->getEnableCommandZone()) {
         addZone(new Server_CardZone(this, ZoneNames::COMMAND, false, ServerInfo_Zone::PublicZone));
-        addCounter(new Server_Counter(CounterIds::CommanderTax, CounterNames::CommanderTax, makeColor(128, 128, 128),
-                                      20, 0, 0, MAX_COUNTER_VALUE));
-        auto *partnerTax = new Server_Counter(CounterIds::PartnerTax, CounterNames::PartnerTax,
-                                              makeColor(128, 128, 128), 20, 0, 0, MAX_COUNTER_VALUE);
-        (void)partnerTax->setActive(false);
-        addCounter(partnerTax);
+        for (int i = 0; i < CounterIds::TaxCounterCount; ++i) {
+            int id = CounterIds::taxCounterIdFromIndex(i);
+            const char *name = CounterNames::forId(id);
+            auto *counter = new Server_Counter(id, name, makeColor(128, 128, 128), 20, 0, 0, MAX_COUNTER_VALUE);
+            if (i > 0) {
+                (void)counter->setActive(false);
+            }
+            addCounter(counter);
+        }
     }
 
     // ------------------------------------------------------------------
@@ -607,7 +610,9 @@ Response::ResponseCode Server_Player::evaluateSetCounterActive(bool gameStarted,
                                                                bool commandZoneEnabled,
                                                                int counterId,
                                                                const Server_Counter *counter,
-                                                               bool requestedActive)
+                                                               bool requestedActive,
+                                                               const Server_Counter *predecessorCounter,
+                                                               const Server_Counter *successorCounter)
 {
     if (!gameStarted) {
         return Response::RespGameNotStarted;
@@ -628,6 +633,14 @@ Response::ResponseCode Server_Player::evaluateSetCounterActive(bool gameStarted,
     if (!requestedActive && counter->getCount() != 0) {
         return Response::RespContextError;
     }
+    // Enforce ordering: can only activate if predecessor is active
+    if (requestedActive && predecessorCounter && !predecessorCounter->isActive()) {
+        return Response::RespContextError;
+    }
+    // Enforce ordering: can only deactivate if successor is inactive
+    if (!requestedActive && successorCounter && successorCounter->isActive()) {
+        return Response::RespContextError;
+    }
     return Response::RespOk;
 }
 
@@ -638,8 +651,14 @@ Response::ResponseCode Server_Player::cmdSetCounterActive(const Command_SetCount
     const int counterId = cmd.counter_id();
     Server_Counter *c = counters.value(counterId, nullptr);
 
-    const Response::ResponseCode authResult = evaluateSetCounterActive(
-        game->getGameStarted(), conceded, game->getEnableCommandZone(), counterId, c, cmd.active());
+    int predecessorId = CounterIds::taxCounterIdFromIndex(CounterIds::taxCounterIndex(counterId) - 1);
+    int successorId = CounterIds::taxCounterIdFromIndex(CounterIds::taxCounterIndex(counterId) + 1);
+    Server_Counter *predecessor = predecessorId >= 0 ? counters.value(predecessorId, nullptr) : nullptr;
+    Server_Counter *successor = successorId >= 0 ? counters.value(successorId, nullptr) : nullptr;
+
+    const Response::ResponseCode authResult =
+        evaluateSetCounterActive(game->getGameStarted(), conceded, game->getEnableCommandZone(), counterId, c,
+                                 cmd.active(), predecessor, successor);
     if (authResult != Response::RespOk) {
         return authResult;
     }

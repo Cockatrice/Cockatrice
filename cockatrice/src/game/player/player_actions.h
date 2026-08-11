@@ -127,10 +127,10 @@ public slots:
 
     void actPlay(QList<CardItem *> selectedCards);
     void actPlayFacedown(QList<CardItem *> selectedCards);
-    /** @brief Plays the selected card and increments the primary commander tax counter. */
-    void actPlayAndIncreaseTax(QList<CardItem *> selectedCards);
-    /** @brief Plays the selected card and increments the partner commander tax counter. */
-    void actPlayAndIncreasePartnerTax(QList<CardItem *> selectedCards);
+    /** @brief Plays the selected card and increments the 1st tax counter. */
+    void actPlayAndIncrease1stTax(QList<CardItem *> selectedCards);
+    /** @brief Plays the selected card and increments the 2nd tax counter. */
+    void actPlayAndIncrease2ndTax(QList<CardItem *> selectedCards);
     /** @brief Modifies a tax counter by delta if it is active. */
     void actModifyTaxCounter(int counterId, int delta);
     /** @brief Toggles a tax counter's active state (only if inactive or value is 0). */
@@ -282,7 +282,7 @@ private:
      * @brief Plays the selected cards and, for each that came from the command zone and whose move
      *        the server accepts, increments the given (active) tax counter by one.
      * @param selectedCards Cards to play
-     * @param counterId The tax counter to increment (CounterIds::CommanderTax or PartnerTax)
+     * @param counterId The tax counter to increment (CounterIds::TaxCounter1 through TaxCounter5)
      */
     void playAndIncreaseTax(QList<CardItem *> selectedCards, int counterId);
 

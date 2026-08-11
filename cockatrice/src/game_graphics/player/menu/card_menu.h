@@ -33,7 +33,7 @@ public:
 
     QAction *aPlay, *aPlayFacedown;
     /** @brief Play actions that also increment the corresponding tax counter. */
-    QAction *aPlayAndIncreaseTax, *aPlayAndIncreasePartnerTax;
+    QAction *aPlayAndIncrease1stTax, *aPlayAndIncrease2ndTax;
     QAction *aRevealToAll;
     QAction *aHide;
     QAction *aClone;

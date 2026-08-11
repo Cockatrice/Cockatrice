@@ -18,9 +18,11 @@ namespace
 {
 constexpr int UserCounterId = CounterIds::FirstUserId;
 
-Server_Counter makeCounter(int id, int count)
+Server_Counter makeCounter(int id, int count, bool active = true)
 {
-    return Server_Counter(id, "c", color(), 20, count);
+    Server_Counter c(id, "c", color(), 20, count);
+    (void)c.setActive(active);
+    return c;
 }
 } // namespace
 
@@ -41,12 +43,12 @@ TEST(EvaluateDelCounter, RejectsWhenPlayerConceded)
 
 TEST(EvaluateDelCounter, RejectsTaxCounters)
 {
-    Server_Counter commander = makeCounter(CounterIds::CommanderTax, 0);
-    EXPECT_EQ(Server_Player::evaluateDelCounter(true, false, CounterIds::CommanderTax, &commander),
+    Server_Counter tax1 = makeCounter(CounterIds::TaxCounter1, 0);
+    EXPECT_EQ(Server_Player::evaluateDelCounter(true, false, CounterIds::TaxCounter1, &tax1),
               Response::RespFunctionNotAllowed);
 
-    Server_Counter partner = makeCounter(CounterIds::PartnerTax, 0);
-    EXPECT_EQ(Server_Player::evaluateDelCounter(true, false, CounterIds::PartnerTax, &partner),
+    Server_Counter tax2 = makeCounter(CounterIds::TaxCounter2, 0);
+    EXPECT_EQ(Server_Player::evaluateDelCounter(true, false, CounterIds::TaxCounter2, &tax2),
               Response::RespFunctionNotAllowed);
 }
 
@@ -63,125 +65,146 @@ TEST(EvaluateDelCounter, AllowsDeletingUserCounter)
 
 TEST(EvaluateDelCounter, GameNotStartedTakesPrecedenceOverTaxGuard)
 {
-    Server_Counter commander = makeCounter(CounterIds::CommanderTax, 0);
-    EXPECT_EQ(Server_Player::evaluateDelCounter(false, false, CounterIds::CommanderTax, &commander),
+    Server_Counter tax1 = makeCounter(CounterIds::TaxCounter1, 0);
+    EXPECT_EQ(Server_Player::evaluateDelCounter(false, false, CounterIds::TaxCounter1, &tax1),
               Response::RespGameNotStarted);
 }
 
 TEST(EvaluateSetCounterActive, RejectsWhenGameNotStarted)
 {
-    Server_Counter counter = makeCounter(CounterIds::CommanderTax, 0);
+    Server_Counter counter = makeCounter(CounterIds::TaxCounter1, 0);
     EXPECT_EQ(Server_Player::evaluateSetCounterActive(/*gameStarted=*/false, /*playerConceded=*/false,
-                                                      /*commandZoneEnabled=*/true, CounterIds::CommanderTax, &counter,
-                                                      /*requestedActive=*/true),
+                                                      /*commandZoneEnabled=*/true, CounterIds::TaxCounter1, &counter,
+                                                      /*requestedActive=*/true, nullptr, nullptr),
               Response::RespGameNotStarted);
 }
 
 TEST(EvaluateSetCounterActive, RejectsWhenPlayerConceded)
 {
-    Server_Counter counter = makeCounter(CounterIds::CommanderTax, 0);
-    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, /*playerConceded=*/true, true, CounterIds::CommanderTax,
-                                                      &counter, true),
+    Server_Counter counter = makeCounter(CounterIds::TaxCounter1, 0);
+    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, /*playerConceded=*/true, true, CounterIds::TaxCounter1,
+                                                      &counter, true, nullptr, nullptr),
               Response::RespContextError);
 }
 
 TEST(EvaluateSetCounterActive, RejectsNonTaxCounter)
 {
     Server_Counter counter = makeCounter(UserCounterId, 0);
-    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, UserCounterId, &counter, true),
-              Response::RespFunctionNotAllowed);
+    EXPECT_EQ(
+        Server_Player::evaluateSetCounterActive(true, false, true, UserCounterId, &counter, true, nullptr, nullptr),
+        Response::RespFunctionNotAllowed);
 }
 
 TEST(EvaluateSetCounterActive, RejectsWhenCommandZoneDisabled)
 {
-    Server_Counter counter = makeCounter(CounterIds::CommanderTax, 0);
+    Server_Counter counter = makeCounter(CounterIds::TaxCounter1, 0);
     EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, /*commandZoneEnabled=*/false,
-                                                      CounterIds::CommanderTax, &counter, true),
+                                                      CounterIds::TaxCounter1, &counter, true, nullptr, nullptr),
               Response::RespContextError);
 }
 
 TEST(EvaluateSetCounterActive, RejectsMissingCounter)
 {
-    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::CommanderTax, nullptr, true),
+    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::TaxCounter1, nullptr, true,
+                                                      nullptr, nullptr),
               Response::RespNameNotFound);
 }
 
 TEST(EvaluateSetCounterActive, RejectsDisablingWhenTaxAccumulated)
 {
-    Server_Counter counter = makeCounter(CounterIds::CommanderTax, 3);
-    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::CommanderTax, &counter,
-                                                      /*requestedActive=*/false),
+    Server_Counter counter = makeCounter(CounterIds::TaxCounter1, 3);
+    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::TaxCounter1, &counter,
+                                                      /*requestedActive=*/false, nullptr, nullptr),
               Response::RespContextError);
 }
 
 TEST(EvaluateSetCounterActive, AllowsEnablingWithAccumulatedTax)
 {
-    Server_Counter counter = makeCounter(CounterIds::CommanderTax, 3);
-    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::CommanderTax, &counter,
-                                                      /*requestedActive=*/true),
+    Server_Counter counter = makeCounter(CounterIds::TaxCounter1, 3);
+    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::TaxCounter1, &counter,
+                                                      /*requestedActive=*/true, nullptr, nullptr),
               Response::RespOk);
 }
 
 TEST(EvaluateSetCounterActive, AllowsDisablingWhenCounterIsZero)
 {
-    Server_Counter counter = makeCounter(CounterIds::CommanderTax, 0);
-    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::CommanderTax, &counter,
-                                                      /*requestedActive=*/false),
+    Server_Counter counter = makeCounter(CounterIds::TaxCounter1, 0);
+    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::TaxCounter1, &counter,
+                                                      /*requestedActive=*/false, nullptr, nullptr),
               Response::RespOk);
 }
 
-TEST(EvaluateSetCounterActive, AllowsEnablingPartnerTax)
+TEST(EvaluateSetCounterActive, AllowsEnabling2ndTaxWhen1stIsActive)
 {
-    Server_Counter counter = makeCounter(CounterIds::PartnerTax, 0);
-    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::PartnerTax, &counter,
-                                                      /*requestedActive=*/true),
+    Server_Counter tax1 = makeCounter(CounterIds::TaxCounter1, 0, true);
+    Server_Counter tax2 = makeCounter(CounterIds::TaxCounter2, 0, false);
+    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::TaxCounter2, &tax2,
+                                                      /*requestedActive=*/true, &tax1, nullptr),
               Response::RespOk);
 }
 
-TEST(EvaluateSetCounterActive, RejectsDisablingPartnerTaxWhenAccumulated)
+TEST(EvaluateSetCounterActive, RejectsEnabling2ndTaxWhen1stIsInactive)
 {
-    Server_Counter counter = makeCounter(CounterIds::PartnerTax, 2);
-    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::PartnerTax, &counter,
-                                                      /*requestedActive=*/false),
+    Server_Counter tax1 = makeCounter(CounterIds::TaxCounter1, 0, false);
+    Server_Counter tax2 = makeCounter(CounterIds::TaxCounter2, 0, false);
+    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::TaxCounter2, &tax2,
+                                                      /*requestedActive=*/true, &tax1, nullptr),
+              Response::RespContextError);
+}
+
+TEST(EvaluateSetCounterActive, AllowsDisabling1stTaxWhen2ndIsInactive)
+{
+    Server_Counter tax1 = makeCounter(CounterIds::TaxCounter1, 0, true);
+    Server_Counter tax2 = makeCounter(CounterIds::TaxCounter2, 0, false);
+    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::TaxCounter1, &tax1,
+                                                      /*requestedActive=*/false, nullptr, &tax2),
+              Response::RespOk);
+}
+
+TEST(EvaluateSetCounterActive, RejectsDisabling1stTaxWhen2ndIsActive)
+{
+    Server_Counter tax1 = makeCounter(CounterIds::TaxCounter1, 0, true);
+    Server_Counter tax2 = makeCounter(CounterIds::TaxCounter2, 0, true);
+    EXPECT_EQ(Server_Player::evaluateSetCounterActive(true, false, true, CounterIds::TaxCounter1, &tax1,
+                                                      /*requestedActive=*/false, nullptr, &tax2),
               Response::RespContextError);
 }
 
 TEST(EvaluateCreateCounter, RejectsWhenGameNotStarted)
 {
-    EXPECT_EQ(Server_Player::evaluateCreateCounter(/*gameStarted=*/false, /*playerConceded=*/false, "mycounter"),
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(/*gameStarted=*/false, /*playerConceded=*/false, "test"),
               Response::RespGameNotStarted);
 }
 
 TEST(EvaluateCreateCounter, RejectsWhenPlayerConceded)
 {
-    EXPECT_EQ(Server_Player::evaluateCreateCounter(/*gameStarted=*/true, /*playerConceded=*/true, "mycounter"),
-              Response::RespContextError);
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, /*playerConceded=*/true, "test"), Response::RespContextError);
 }
 
-TEST(EvaluateCreateCounter, RejectsCommanderTaxName)
+TEST(EvaluateCreateCounter, RejectsTaxCounterNames)
 {
-    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, CounterNames::CommanderTax),
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, CounterNames::TaxCounter1),
+              Response::RespFunctionNotAllowed);
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, CounterNames::TaxCounter2),
+              Response::RespFunctionNotAllowed);
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, CounterNames::TaxCounter3),
+              Response::RespFunctionNotAllowed);
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, CounterNames::TaxCounter4),
+              Response::RespFunctionNotAllowed);
+    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, CounterNames::TaxCounter5),
               Response::RespFunctionNotAllowed);
 }
 
-TEST(EvaluateCreateCounter, RejectsPartnerTaxName)
+TEST(EvaluateCreateCounter, AllowsUserCounterName)
 {
-    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, CounterNames::PartnerTax),
-              Response::RespFunctionNotAllowed);
-}
-
-TEST(EvaluateCreateCounter, AllowsOrdinaryNames)
-{
-    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, "life"), Response::RespOk);
     EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, "poison"), Response::RespOk);
-    EXPECT_EQ(Server_Player::evaluateCreateCounter(true, false, ""), Response::RespOk);
 }
 
 TEST(EvaluateModifyCounter, RejectsWhenGameNotStarted)
 {
     Server_Counter counter = makeCounter(UserCounterId, 0);
-    EXPECT_EQ(Server_Player::evaluateModifyCounter(/*gameStarted=*/false, false, /*commandZoneEnabled=*/true,
-                                                   UserCounterId, &counter),
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(/*gameStarted=*/false, /*playerConceded=*/false, true, UserCounterId,
+                                                   &counter),
               Response::RespGameNotStarted);
 }
 
@@ -192,48 +215,46 @@ TEST(EvaluateModifyCounter, RejectsWhenPlayerConceded)
               Response::RespContextError);
 }
 
-TEST(EvaluateModifyCounter, AllowsUserCounter)
-{
-    Server_Counter counter = makeCounter(UserCounterId, 0);
-    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/false, UserCounterId, &counter),
-              Response::RespOk);
-}
-
 TEST(EvaluateModifyCounter, RejectsMissingCounter)
 {
     EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, true, UserCounterId, nullptr),
               Response::RespNameNotFound);
 }
 
+TEST(EvaluateModifyCounter, AllowsUserCounter)
+{
+    Server_Counter counter = makeCounter(UserCounterId, 5);
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, true, UserCounterId, &counter), Response::RespOk);
+}
+
 TEST(EvaluateModifyCounter, RejectsTaxCounterWhenCommandZoneDisabled)
 {
-    Server_Counter counter = makeCounter(CounterIds::CommanderTax, 0);
-    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/false, CounterIds::CommanderTax,
+    Server_Counter counter = makeCounter(CounterIds::TaxCounter1, 0);
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/false, CounterIds::TaxCounter1,
                                                    &counter),
               Response::RespContextError);
 }
 
 TEST(EvaluateModifyCounter, RejectsInactiveTaxCounter)
 {
-    Server_Counter counter = makeCounter(CounterIds::PartnerTax, 0);
-    (void)counter.setActive(false);
-    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/true, CounterIds::PartnerTax,
+    Server_Counter counter = makeCounter(CounterIds::TaxCounter2, 0, false);
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/true, CounterIds::TaxCounter2,
                                                    &counter),
               Response::RespContextError);
 }
 
 TEST(EvaluateModifyCounter, AllowsActiveTaxCounter)
 {
-    Server_Counter counter = makeCounter(CounterIds::CommanderTax, 0);
-    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/true, CounterIds::CommanderTax,
+    Server_Counter counter = makeCounter(CounterIds::TaxCounter1, 0, true);
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/true, CounterIds::TaxCounter1,
                                                    &counter),
               Response::RespOk);
 }
 
 TEST(EvaluateModifyCounter, RejectsMissingTaxCounter)
 {
-    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/true, CounterIds::CommanderTax,
-                                                   /*counter=*/nullptr),
+    EXPECT_EQ(Server_Player::evaluateModifyCounter(true, false, /*commandZoneEnabled=*/true, CounterIds::TaxCounter1,
+                                                   nullptr),
               Response::RespNameNotFound);
 }
 

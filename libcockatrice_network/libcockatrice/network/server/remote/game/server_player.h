@@ -57,6 +57,8 @@ public:
      * @param counterId ID of the counter to toggle
      * @param counter Counter with id counterId, or nullptr if the player has no such counter.
      * @param requestedActive Active state the client asked for.
+     * @param predecessorCounter Tax counter that must be active before this one can be activated (nullptr if none).
+     * @param successorCounter Tax counter that must be inactive before this one can be deactivated (nullptr if none).
      * @return Response::RespOk if permitted, otherwise the error response for the client.
      */
     static Response::ResponseCode evaluateSetCounterActive(bool gameStarted,
@@ -64,7 +66,9 @@ public:
                                                            bool commandZoneEnabled,
                                                            int counterId,
                                                            const Server_Counter *counter,
-                                                           bool requestedActive);
+                                                           bool requestedActive,
+                                                           const Server_Counter *predecessorCounter,
+                                                           const Server_Counter *successorCounter);
 
     /**
      * @brief Decide whether a client may change a counter's value.
