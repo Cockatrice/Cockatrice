@@ -116,8 +116,13 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&tapAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
             &CardsDisplaySettings::setTapAnimation);
 
+    connect(&enableAllAnimationsButton, &QPushButton::clicked, this, &UserInterfaceSettingsPage::enableAllAnimations);
+    connect(&disableAllAnimationsButton, &QPushButton::clicked, this, &UserInterfaceSettingsPage::disableAllAnimations);
+
     auto *animationGrid = new QGridLayout;
-    animationGrid->addWidget(&tapAnimationCheckBox, 0, 0);
+    animationGrid->addWidget(&enableAllAnimationsButton, 0, 0);
+    animationGrid->addWidget(&disableAllAnimationsButton, 0, 1);
+    animationGrid->addWidget(&tapAnimationCheckBox, 1, 0);
 
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
@@ -268,6 +273,16 @@ void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
     }
 }
 
+void UserInterfaceSettingsPage::enableAllAnimations()
+{
+    tapAnimationCheckBox.setChecked(true);
+}
+
+void UserInterfaceSettingsPage::disableAllAnimations()
+{
+    tapAnimationCheckBox.setChecked(false);
+}
+
 void UserInterfaceSettingsPage::updateCommanderSpellbookUiState()
 {
     const int mode = SettingsCache::instance().deckEditor().getCommanderSpellbookIntegrationEnabled();
@@ -310,6 +325,8 @@ void UserInterfaceSettingsPage::retranslateUi()
     specNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar for game events while you are spectating"));
     buddyConnectNotificationsEnabledCheckBox.setText(tr("Notify in the taskbar when users in your buddy list connect"));
     animationGroupBox->setTitle(tr("Animation settings"));
+    enableAllAnimationsButton.setText(tr("&Enable all animations"));
+    disableAllAnimationsButton.setText(tr("&Disable all animations"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
     openDeckInNewTabCheckBox.setText(tr("Open deck in new tab by default"));

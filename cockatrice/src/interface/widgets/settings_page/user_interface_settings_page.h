@@ -7,6 +7,7 @@
 #include <QComboBox>
 #include <QGroupBox>
 #include <QLabel>
+#include <QPushButton>
 #include <QSpinBox>
 #include <QToolButton>
 #include <libcockatrice/settings/cards_display_settings.h>
@@ -17,6 +18,8 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage
     Q_OBJECT
 private slots:
     void setNotificationEnabled(QT_STATE_CHANGED_T);
+    void enableAllAnimations();
+    void disableAllAnimations();
     void updateCommanderSpellbookUiState();
 
 private:
@@ -34,6 +37,8 @@ private:
     QCheckBox showTotalSelectionCountCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox keepGameChatFocusCheckBox;
+    QPushButton enableAllAnimationsButton;
+    QPushButton disableAllAnimationsButton;
     QCheckBox tapAnimationCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
     QLabel visualDeckStoragePromptForConversionLabel;
