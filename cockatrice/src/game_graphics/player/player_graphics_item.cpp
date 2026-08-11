@@ -3,7 +3,7 @@
 #include "../../game/player/player_actions.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/abstract_card_item.h"
-#include "../board/commander_tax_counter.h"
+#include "../board/cast_count_widget.h"
 #include "../board/counter_general.h"
 #include "../hand_counter.h"
 #include "../z_values.h"
@@ -32,6 +32,8 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 
     connect(player, &PlayerLogic::counterAdded, this, &PlayerGraphicsItem::onCounterAdded);
     connect(player, &PlayerLogic::counterRemoved, this, &PlayerGraphicsItem::onCounterRemoved);
+    connect(player, &PlayerLogic::castCountAdded, this, &PlayerGraphicsItem::onCastCountAdded);
+    connect(player, &PlayerLogic::castCountRemoved, this, &PlayerGraphicsItem::onCastCountRemoved);
 
     playerMenu = new PlayerMenu(this);
 
@@ -231,37 +233,34 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
     AbstractCounter *widget;
     if (state->getName() == "life") {
         widget = playerTarget->addCounter(state);
-    } else if (CounterIds::isTaxCounter(state->getId())) {
-        if (!commandZoneGraphicsItem) {
-            qWarning() << "Cannot create tax counter" << state->getName() << "- command zone not available";
-            return;
-        }
-        // Qt parent (commandZoneGraphicsItem) owns widget; counterWidgets map holds reference
-        // for lookup; CommandZone::registerTaxCounter connects QObject::destroyed for cleanup
-        widget = new CommanderTaxCounter(state, player, commandZoneGraphicsItem);
-        widget->setActive(state->isActive());
-        commandZoneGraphicsItem->registerTaxCounter(widget);
-
-        if (auto *menu = playerMenu->getCommandZoneMenu()) {
-            connect(state, &CounterState::activeChanged, menu, &CommandZoneMenu::updateTaxCounterActionStates);
-            connect(state, &CounterState::valueChanged, menu, &CommandZoneMenu::updateTaxCounterActionStates);
-        }
     } else {
         widget = new GeneralCounter(state, player, true, this);
     }
     counterWidgets.insert(state->getId(), widget);
 
-    // A counter's submenu follows its isActive() state: while inactive the counter is hidden and
-    // the server rejects every modification. Only tax counters go inactive today.
     setCounterMenuRegistered(widget, state->isActive());
-    connect(state, &CounterState::activeChanged, this, [this, counterId = state->getId()](bool newActive) {
-        if (AbstractCounter *counter = getCounterWidget(counterId)) {
-            setCounterMenuRegistered(counter, newActive);
-        }
-    });
 
     if (playerMenu->getShortcutsActive()) {
         widget->setShortcutsActive();
+    }
+
+    rearrangeCounters();
+}
+
+void PlayerGraphicsItem::onCastCountAdded(int index, CounterState *state)
+{
+    if (!commandZoneGraphicsItem) {
+        qWarning() << "Cannot create cast count" << index << "- command zone not available";
+        return;
+    }
+
+    auto *widget = new CastCountWidget(state, player, commandZoneGraphicsItem);
+    commandZoneGraphicsItem->registerCastCount(widget);
+    castCountWidgets.insert(index, widget);
+
+    if (auto *menu = playerMenu->getCommandZoneMenu()) {
+        menu->updateCastCountActionStates();
+        connect(state, &CounterState::valueChanged, menu, &CommandZoneMenu::updateCastCountActionStates);
     }
 
     rearrangeCounters();
@@ -274,25 +273,37 @@ void PlayerGraphicsItem::onCounterRemoved(int counterId)
         return;
     }
     setCounterMenuRegistered(widget, false);
-    if (commandZoneGraphicsItem && CounterIds::isTaxCounter(widget->getId())) {
-        commandZoneGraphicsItem->unregisterTaxCounter(widget);
+    widget->delCounter();
+    rearrangeCounters();
+}
+
+void PlayerGraphicsItem::onCastCountRemoved(int index)
+{
+    auto *widget = castCountWidgets.take(index);
+    if (!widget) {
+        return;
+    }
+    if (commandZoneGraphicsItem) {
+        commandZoneGraphicsItem->unregisterCastCount(widget);
     }
     widget->delCounter();
+
+    if (auto *menu = playerMenu->getCommandZoneMenu()) {
+        menu->updateCastCountActionStates();
+    }
+
     rearrangeCounters();
 }
 
 void PlayerGraphicsItem::rearrangeCounters()
 {
     if (commandZoneGraphicsItem) {
-        commandZoneGraphicsItem->rearrangeTaxCounters();
+        commandZoneGraphicsItem->rearrangeCastCounts();
     }
 
     qreal ySize = boundingRect().y() + 80;
     constexpr qreal padding = 5;
     for (auto *ctr : counterWidgets.values()) {
-        if (CounterIds::isTaxCounter(ctr->getId())) {
-            continue;
-        }
         if (!ctr->getShownInCounterArea()) {
             continue;
         }
@@ -302,10 +313,9 @@ void PlayerGraphicsItem::rearrangeCounters()
     }
 }
 
-AbstractCounter *PlayerGraphicsItem::getTaxCounterIfActive(int counterId) const
+AbstractCounter *PlayerGraphicsItem::getCastCountWidget(int index) const
 {
-    AbstractCounter *counter = getCounterWidget(counterId);
-    return (counter && counter->isActive()) ? counter : nullptr;
+    return castCountWidgets.value(index, nullptr);
 }
 
 void PlayerGraphicsItem::rearrangeZones()

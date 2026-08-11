@@ -102,13 +102,13 @@ TEST(ServerCounter, IncrementClampsToCustomBounds)
     EXPECT_EQ(c.getCount(), 0);
 }
 
-TEST(ServerCounter, CustomBoundsForCommanderTax)
+TEST(ServerCounter, CustomBoundsForCastCount)
 {
-    Server_Counter taxCounter(1, "tax", color(), 20, 0, 0, MAX_COUNTER_VALUE);
-    EXPECT_TRUE(taxCounter.setCount(1000));
-    EXPECT_EQ(taxCounter.getCount(), MAX_COUNTER_VALUE);
-    EXPECT_TRUE(taxCounter.setCount(-5));
-    EXPECT_EQ(taxCounter.getCount(), 0);
+    Server_Counter castCount(1, "cast_count", color(), 20, 0, 0, MAX_COUNTER_VALUE);
+    EXPECT_TRUE(castCount.setCount(1000));
+    EXPECT_EQ(castCount.getCount(), MAX_COUNTER_VALUE);
+    EXPECT_TRUE(castCount.setCount(-5));
+    EXPECT_EQ(castCount.getCount(), 0);
 }
 
 TEST(ServerCounter, SetActiveReportsChangeOnce)

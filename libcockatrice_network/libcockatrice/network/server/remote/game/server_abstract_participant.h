@@ -41,7 +41,6 @@ class Command_Judge;
 class Command_IncCounter;
 class Command_CreateCounter;
 class Command_SetCounter;
-class Command_SetCounterActive;
 class Command_DelCounter;
 class Command_NextTurn;
 class Command_SetActivePhase;
@@ -53,6 +52,10 @@ class Command_SetSideboardPlan;
 class Command_DeckSelect;
 class Command_SetSideboardLock;
 class Command_ChangeZoneProperties;
+class Command_CreateCastCount;
+class Command_DeleteCastCount;
+class Command_IncCastCount;
+class Command_SetCastCount;
 
 class Server_AbstractParticipant : public Server_ArrowTarget, public ServerInfo_User_Container
 {
@@ -162,8 +165,6 @@ public:
     virtual Response::ResponseCode
     cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
-    cmdSetCounterActive(const Command_SetCounterActive &cmd, ResponseContainer &rc, GameEventStorage &ges);
-    virtual Response::ResponseCode
     cmdNextTurn(const Command_NextTurn &cmd, ResponseContainer &rc, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdSetActivePhase(const Command_SetActivePhase &cmd, ResponseContainer &rc, GameEventStorage &ges);
@@ -175,6 +176,14 @@ public:
     cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges);
     virtual Response::ResponseCode
     cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    virtual Response::ResponseCode
+    cmdCreateCastCount(const Command_CreateCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    virtual Response::ResponseCode
+    cmdDeleteCastCount(const Command_DeleteCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    virtual Response::ResponseCode
+    cmdIncCastCount(const Command_IncCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges);
+    virtual Response::ResponseCode
+    cmdSetCastCount(const Command_SetCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges);
 
     Response::ResponseCode processGameCommand(const GameCommand &command, ResponseContainer &rc, GameEventStorage &ges);
     void sendGameEvent(const GameEventContainer &event);

@@ -14,10 +14,13 @@
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
+#include <libcockatrice/protocol/pb/command_create_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_create_token.pb.h>
+#include <libcockatrice/protocol/pb/command_delete_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_flip_card.pb.h>
 #include <libcockatrice/protocol/pb/command_game_say.pb.h>
+#include <libcockatrice/protocol/pb/command_inc_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_mulligan.pb.h>
@@ -25,7 +28,6 @@
 #include <libcockatrice/protocol/pb/command_roll_die.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
-#include <libcockatrice/protocol/pb/command_set_counter_active.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
@@ -1674,32 +1676,34 @@ void PlayerActions::playSelectedCardsImpl(
     }
 }
 
-void PlayerActions::actPlayAndIncrease1stTax(QList<CardItem *> selectedCards)
+void PlayerActions::actPlayAndIncrease1stCastCount(QList<CardItem *> selectedCards)
 {
-    playAndIncreaseTax(selectedCards, CounterIds::TaxCounter1);
+    playAndIncreaseCastCount(selectedCards, 1);
 }
 
-void PlayerActions::actPlayAndIncrease2ndTax(QList<CardItem *> selectedCards)
+void PlayerActions::actPlayAndIncrease2ndCastCount(QList<CardItem *> selectedCards)
 {
-    playAndIncreaseTax(selectedCards, CounterIds::TaxCounter2);
+    playAndIncreaseCastCount(selectedCards, 2);
 }
 
-void PlayerActions::playAndIncreaseTax(QList<CardItem *> selectedCards, int counterId)
+void PlayerActions::playAndIncreaseCastCount(QList<CardItem *> selectedCards, int index)
 {
-    playSelectedCardsImpl(selectedCards, false, [this, counterId](PendingCommand *pend, const QString &originalZone) {
+    playSelectedCardsImpl(selectedCards, false, [this, index](PendingCommand *pend, const QString &originalZone) {
         if (originalZone != ZoneNames::COMMAND || pend == nullptr) {
             return;
         }
-        // Gate the tax increment on the server accepting the move, so a rejected move
-        // (the card couldn't legally leave the command zone) never inflates the tax.
+        // Gate the increment on the server accepting the move
         connect(pend, &PendingCommand::finished, this,
-                [this, counterId](const Response &response, const CommandContainer &, const QVariant &) {
+                [this, index](const Response &response, const CommandContainer &, const QVariant &) {
                     if (response.response_code() != Response::RespOk) {
                         return;
                     }
-                    CounterState *state = player->getCounters().value(counterId, nullptr);
-                    if (state && state->isActive()) {
-                        sendIncCounter(counterId, 1);
+                    CounterState *state = player->getCastCount(index);
+                    if (state) {
+                        Command_IncCastCount cmd;
+                        cmd.set_index(index);
+                        cmd.set_delta(1);
+                        sendGameCommand(cmd);
                     }
                 });
     });
@@ -1713,29 +1717,40 @@ void PlayerActions::sendIncCounter(int counterId, int delta)
     sendGameCommand(cmd);
 }
 
-void PlayerActions::actModifyTaxCounter(int counterId, int delta)
+void PlayerActions::actModifyCastCount(int index, int delta)
 {
-    CounterState *state = player->getCounters().value(counterId, nullptr);
-    if (!state || !state->isActive() || !CounterIds::isTaxCounter(counterId)) {
+    if (!CastCountIds::isValidIndex(index)) {
         return;
     }
-    sendIncCounter(counterId, delta);
+    CounterState *state = player->getCastCount(index);
+    if (!state) {
+        return;
+    }
+    Command_IncCastCount cmd;
+    cmd.set_index(index);
+    cmd.set_delta(delta);
+    sendGameCommand(cmd);
 }
 
-void PlayerActions::actToggleTaxCounter(int counterId)
+void PlayerActions::actToggleCastCount(int index)
 {
-    CounterState *state = player->getCounters().value(counterId, nullptr);
-    if (!state || !CounterIds::isTaxCounter(counterId)) {
+    if (!CastCountIds::isValidIndex(index)) {
         return;
     }
-    // Prevent disabling a counter with tax accumulated; player must reset to 0 first
-    if (state->isActive() && state->getValue() != 0) {
-        return;
+    CounterState *state = player->getCastCount(index);
+    if (state) {
+        // Delete only allowed when value is 0
+        if (state->getValue() != 0) {
+            return;
+        }
+        Command_DeleteCastCount cmd;
+        cmd.set_index(index);
+        sendGameCommand(cmd);
+    } else {
+        Command_CreateCastCount cmd;
+        cmd.set_index(index);
+        sendGameCommand(cmd);
     }
-    Command_SetCounterActive cmd;
-    cmd.set_counter_id(counterId);
-    cmd.set_active(!state->isActive());
-    sendGameCommand(cmd);
 }
 
 void PlayerActions::actPlay(QList<CardItem *> selectedCards)

@@ -67,7 +67,7 @@ set(cockatrice_SOURCES
     src/game_graphics/board/card_item.cpp
     src/game/board/card_list.cpp
     src/game/board/card_state.cpp
-    src/game_graphics/board/commander_tax_counter.cpp
+    src/game_graphics/board/cast_count_widget.cpp
     src/game_graphics/board/counter_general.cpp
     src/game/board/counter_state.cpp
     src/game_graphics/board/translate_counter_name.cpp

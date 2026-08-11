@@ -8,6 +8,7 @@ class Server_Player : public Server_AbstractPlayer
     Q_OBJECT
 private:
     QMap<int, Server_Counter *> counters;
+    QMap<int, int> castCounts; // index (1-5) -> value
     QList<int> lastDrawList;
 
 public:
@@ -21,90 +22,40 @@ public:
     {
         return counters;
     }
+    const QMap<int, int> &getCastCounts() const
+    {
+        return castCounts;
+    }
     int newCounterId() const;
     void addCounter(Server_Counter *counter);
 
-    /** @name Counter command authorization
-     *  Decision logic extracted from the corresponding cmd* handlers so it can be unit-tested
-     *  in isolation. Each function takes all relevant state as parameters and touches no
-     *  instance members, hence static.
-     *  @{
-     */
-
-    /**
-     * @brief Decide whether a client may delete a counter.
-     *
-     * Reserved tax counters are server-managed and may never be deleted by a client.
-     *
-     * @param gameStarted Whether the game has started
-     * @param playerConceded Whether the player has conceded
-     * @param counterId ID of the counter to delete
-     * @param counter Counter with id counterId, or nullptr if the player has no such counter.
-     * @return Response::RespOk if permitted, otherwise the error response for the client.
-     */
     static Response::ResponseCode
-    evaluateDelCounter(bool gameStarted, bool playerConceded, int counterId, const Server_Counter *counter);
+    evaluateDelCounter(bool gameStarted, bool playerConceded, const Server_Counter *counter);
 
-    /**
-     * @brief Decide whether a client may change a counter's active (visible) state.
-     *
-     * Only reserved tax counters can be toggled, and one holding a non-zero value must be reset
-     * to zero before it can be deactivated.
-     *
-     * @param gameStarted Whether the game has started
-     * @param playerConceded Whether the player has conceded
-     * @param commandZoneEnabled Whether command zone is enabled for this game
-     * @param counterId ID of the counter to toggle
-     * @param counter Counter with id counterId, or nullptr if the player has no such counter.
-     * @param requestedActive Active state the client asked for.
-     * @param predecessorCounter Tax counter that must be active before this one can be activated (nullptr if none).
-     * @param successorCounter Tax counter that must be inactive before this one can be deactivated (nullptr if none).
-     * @return Response::RespOk if permitted, otherwise the error response for the client.
-     */
-    static Response::ResponseCode evaluateSetCounterActive(bool gameStarted,
-                                                           bool playerConceded,
-                                                           bool commandZoneEnabled,
-                                                           int counterId,
-                                                           const Server_Counter *counter,
-                                                           bool requestedActive,
-                                                           const Server_Counter *predecessorCounter,
-                                                           const Server_Counter *successorCounter);
+    static Response::ResponseCode
+    evaluateModifyCounter(bool gameStarted, bool playerConceded, const Server_Counter *counter);
 
-    /**
-     * @brief Decide whether a client may change a counter's value.
-     *
-     * Shared by cmdIncCounter and cmdSetCounter. Reserved tax counters may only be modified
-     * inside a Commander game and only while active, so an inactive (hidden) tax counter can
-     * never accumulate a value behind the scenes.
-     *
-     * @param gameStarted Whether the game has started
-     * @param playerConceded Whether the player has conceded
-     * @param commandZoneEnabled Whether command zone is enabled for this game
-     * @param counterId ID of the counter to modify
-     * @param counter Counter with id counterId, or nullptr if the player has no such counter.
-     * @return Response::RespOk if permitted, otherwise the error response for the client.
-     */
-    static Response::ResponseCode evaluateModifyCounter(bool gameStarted,
-                                                        bool playerConceded,
-                                                        bool commandZoneEnabled,
-                                                        int counterId,
-                                                        const Server_Counter *counter);
-
-    /**
-     * @brief Decide whether a client may create a counter with the given name.
-     *
-     * Reserved system counter names (commander/partner tax) are rejected to prevent
-     * clients from spoofing server-managed tax counters.
-     *
-     * @param gameStarted Whether the game has started
-     * @param playerConceded Whether the player has conceded
-     * @param counterName Name requested for the new counter
-     * @return Response::RespOk if permitted, otherwise the error response for the client.
-     */
     static Response::ResponseCode
     evaluateCreateCounter(bool gameStarted, bool playerConceded, const QString &counterName);
 
-    /** @} */
+    // Cast count validation
+    static Response::ResponseCode evaluateCreateCastCount(bool gameStarted,
+                                                          bool playerConceded,
+                                                          bool commandZoneEnabled,
+                                                          int index,
+                                                          bool exists,
+                                                          bool predecessorExists);
+
+    static Response::ResponseCode evaluateDeleteCastCount(bool gameStarted,
+                                                          bool playerConceded,
+                                                          bool commandZoneEnabled,
+                                                          int index,
+                                                          bool exists,
+                                                          int value,
+                                                          bool successorExists);
+
+    static Response::ResponseCode
+    evaluateModifyCastCount(bool gameStarted, bool playerConceded, bool commandZoneEnabled, int index, bool exists);
 
     void setupZones() override;
     void clearZones() override;
@@ -139,8 +90,6 @@ public:
     Response::ResponseCode
     cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     Response::ResponseCode
-    cmdSetCounterActive(const Command_SetCounterActive &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
-    Response::ResponseCode
     cmdNextTurn(const Command_NextTurn &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     Response::ResponseCode
     cmdSetActivePhase(const Command_SetActivePhase &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
@@ -149,6 +98,16 @@ public:
     Response::ResponseCode cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd,
                                                    ResponseContainer &rc,
                                                    GameEventStorage &ges) override;
+
+    // Cast count commands
+    Response::ResponseCode
+    cmdCreateCastCount(const Command_CreateCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
+    Response::ResponseCode
+    cmdDeleteCastCount(const Command_DeleteCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
+    Response::ResponseCode
+    cmdIncCastCount(const Command_IncCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
+    Response::ResponseCode
+    cmdSetCastCount(const Command_SetCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
 
     void getInfo(ServerInfo_Player *info,
                  Server_AbstractParticipant *playerWhosAsking,

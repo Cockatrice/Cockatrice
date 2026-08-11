@@ -74,7 +74,7 @@ public:
     /**
      * @brief Sets the counter value and triggers a visual update.
      *
-     * Virtual to allow subclass display customization (e.g., CommanderTaxCounter tooltip updates).
+     * Virtual to allow subclass display customization (e.g., CastCountWidget tooltip updates).
      * Overflow protection is handled server-side, not in client counter classes.
      *
      * @param _value The new counter value
@@ -122,9 +122,9 @@ public:
     /**
      * @brief Shows or hides the counter and enables or disables its menu.
      *
-     * Sole owner of both, so container layout code only positions counters and may read
-     * isActive(). Qt AND-s visibility with the parent item's, so an active counter nested in a
-     * hidden zone (e.g. a tax counter in the command zone) still does not render.
+     * Sole owner of both visibility and menu state, so container layout code only positions
+     * counters and may read isActive(). Note that Qt AND-s visibility with the parent item's,
+     * so an active counter nested in a hidden parent still does not render.
      *
      * @param _active True to show and enable the counter, false to hide and disable it
      */

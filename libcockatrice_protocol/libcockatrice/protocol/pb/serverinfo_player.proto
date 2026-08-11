@@ -3,6 +3,7 @@ import "serverinfo_zone.proto";
 import "serverinfo_counter.proto";
 import "serverinfo_arrow.proto";
 import "serverinfo_playerproperties.proto";
+import "serverinfo_cast_count.proto";
 
 message ServerInfo_Player {
     optional ServerInfo_PlayerProperties properties = 1;
@@ -10,4 +11,5 @@ message ServerInfo_Player {
     repeated ServerInfo_Zone zone_list = 3;
     repeated ServerInfo_Counter counter_list = 4;
     repeated ServerInfo_Arrow arrow_list = 5;
+    repeated ServerInfo_CastCount cast_count_list = 6;
 }

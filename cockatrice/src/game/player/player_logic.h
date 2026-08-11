@@ -79,6 +79,9 @@ signals:
     void counterAdded(CounterState *state);
     void counterRemoved(int counterId);
     void rearrangeCounters();
+    void castCountAdded(int index, CounterState *state);
+    void castCountRemoved(int index);
+    void castCountValueChanged(int index, int value);
     void activeChanged(bool active);
     void zoneIdChanged(int zoneId);
     void concededChanged(int playerId, bool conceded);
@@ -225,6 +228,16 @@ public:
      */
     CounterState *getLifeCounter() const;
 
+    // Cast count management
+    CounterState *addCastCount(int index);
+    void delCastCount(int index);
+    void setCastCountValue(int index, int value);
+    CounterState *getCastCount(int index) const;
+    const QMap<int, CounterState *> &getCastCounts() const
+    {
+        return castCounts;
+    }
+
     void setConceded(bool _conceded);
     bool getConceded() const
     {
@@ -259,6 +272,7 @@ private:
     int zoneId;
     QMap<QString, CardZoneLogic *> zones;
     QMap<int, CounterState *> counters;
+    QMap<int, CounterState *> castCounts; // index (1-5) -> state
 
     bool dialogSemaphore;
     QList<CardItem *> cardsToDelete;

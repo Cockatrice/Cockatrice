@@ -292,6 +292,49 @@ void PlayerLogic::clearCounters()
     }
     qDeleteAll(counters);
     counters.clear();
+
+    for (int index : castCounts.keys()) {
+        emit castCountRemoved(index);
+    }
+    qDeleteAll(castCounts);
+    castCounts.clear();
+}
+
+CounterState *PlayerLogic::addCastCount(int index)
+{
+    if (castCounts.contains(index)) {
+        return nullptr;
+    }
+    QString name = CastCountIds::nameForIndex(index);
+    auto *state = new CounterState(index, name, QColor(128, 128, 128), 20, 0, true, this);
+    castCounts.insert(index, state);
+    emit castCountAdded(index, state);
+    return state;
+}
+
+void PlayerLogic::delCastCount(int index)
+{
+    auto *state = castCounts.take(index);
+    if (!state) {
+        return;
+    }
+    emit castCountRemoved(index);
+    state->deleteLater();
+}
+
+void PlayerLogic::setCastCountValue(int index, int value)
+{
+    auto *state = castCounts.value(index, nullptr);
+    if (!state) {
+        return;
+    }
+    state->setValue(value);
+    emit castCountValueChanged(index, value);
+}
+
+CounterState *PlayerLogic::getCastCount(int index) const
+{
+    return castCounts.value(index, nullptr);
 }
 
 CounterState *PlayerLogic::getLifeCounter() const

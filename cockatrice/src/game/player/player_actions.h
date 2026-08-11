@@ -127,14 +127,14 @@ public slots:
 
     void actPlay(QList<CardItem *> selectedCards);
     void actPlayFacedown(QList<CardItem *> selectedCards);
-    /** @brief Plays the selected card and increments the 1st tax counter. */
-    void actPlayAndIncrease1stTax(QList<CardItem *> selectedCards);
-    /** @brief Plays the selected card and increments the 2nd tax counter. */
-    void actPlayAndIncrease2ndTax(QList<CardItem *> selectedCards);
-    /** @brief Modifies a tax counter by delta if it is active. */
-    void actModifyTaxCounter(int counterId, int delta);
-    /** @brief Toggles a tax counter's active state (only if inactive or value is 0). */
-    void actToggleTaxCounter(int counterId);
+    /** @brief Plays the selected card and increments the 1st cast count. */
+    void actPlayAndIncrease1stCastCount(QList<CardItem *> selectedCards);
+    /** @brief Plays the selected card and increments the 2nd cast count. */
+    void actPlayAndIncrease2ndCastCount(QList<CardItem *> selectedCards);
+    /** @brief Modifies a cast count by delta. */
+    void actModifyCastCount(int index, int delta);
+    /** @brief Toggles a cast count's existence (create if missing, delete if value is 0). */
+    void actToggleCastCount(int index);
     void actHide(QList<CardItem *> selectedCards);
 
     void actMoveTopCardToPlay();
@@ -280,11 +280,11 @@ private:
 
     /**
      * @brief Plays the selected cards and, for each that came from the command zone and whose move
-     *        the server accepts, increments the given (active) tax counter by one.
+     *        the server accepts, increments the given cast count by one.
      * @param selectedCards Cards to play
-     * @param counterId The tax counter to increment (CounterIds::TaxCounter1 through TaxCounter5)
+     * @param index The cast count index (1-5)
      */
-    void playAndIncreaseTax(QList<CardItem *> selectedCards, int counterId);
+    void playAndIncreaseCastCount(QList<CardItem *> selectedCards, int index);
 
     void cmdSetTopCard(Command_MoveCard &cmd);
     void cmdSetBottomCard(Command_MoveCard &cmd);

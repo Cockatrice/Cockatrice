@@ -1,7 +1,7 @@
 /**
  * @file command_zone_menu.h
- * @ingroup GameMenusZones
- * @brief Context menu for command zone right-click actions.
+ * @ingroup GameGraphicsPlayers
+ * @brief Submenu for command zone actions (cast counts, minimize/restore).
  */
 
 #ifndef COCKATRICE_COMMAND_ZONE_MENU_H
@@ -17,10 +17,10 @@ class PlayerGraphicsItem;
 
 /**
  * @class CommandZoneMenu
- * @brief Context menu for the command zone.
+ * @brief Player submenu for managing cast counts and command zone display.
  *
- * Appears when right-clicking on the command zone. Provides actions for
- * adjusting tax counters (up to 5) and toggling minimized state.
+ * Provides actions to increment/decrement each cast count, toggle cast counts
+ * on/off, and minimize/restore the command zone display.
  *
  * @see PlayerMenu
  * @see CommandZone
@@ -36,15 +36,15 @@ public:
     void setShortcutsInactive() override;
 
 private:
-    static constexpr int TaxCounterCount = CounterIds::TaxCounterCount;
+    static constexpr int CastCountCount = CastCountIds::Count;
 
-    std::array<QAction *, TaxCounterCount> aIncreaseTax{};
-    std::array<QAction *, TaxCounterCount> aDecreaseTax{};
-    std::array<QAction *, TaxCounterCount> aToggleTax{};
+    std::array<QAction *, CastCountCount> aIncrease{};
+    std::array<QAction *, CastCountCount> aDecrease{};
+    std::array<QAction *, CastCountCount> aToggle{};
     QAction *aToggleMinimized = nullptr;
 
 public slots:
-    void updateTaxCounterActionStates();
+    void updateCastCountActionStates();
 
 private slots:
     void actToggleMinimized();
@@ -52,11 +52,10 @@ private slots:
 private:
     PlayerGraphicsItem *player;
 
-    // Shortcuts only for first two tax counters
-    QString incTax1ShortcutKey;
-    QString decTax1ShortcutKey;
-    QString incTax2ShortcutKey;
-    QString decTax2ShortcutKey;
+    QString inc1ShortcutKey;
+    QString dec1ShortcutKey;
+    QString inc2ShortcutKey;
+    QString dec2ShortcutKey;
 };
 
 #endif // COCKATRICE_COMMAND_ZONE_MENU_H

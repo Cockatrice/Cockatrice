@@ -30,7 +30,7 @@ AbstractCounter::AbstractCounter(CounterState *state,
     setAcceptHoverEvents(true);
 
     // Route through the (possibly overridden) virtual setValue so subclasses such as
-    // CommanderTaxCounter can clamp and refresh their tooltip on every value change.
+    // CastCountWidget can clamp and refresh their tooltip on every value change.
     connect(state, &CounterState::valueChanged, this, [this](int, int newValue) { setValue(newValue); });
 
     connect(state, &CounterState::activeChanged, this, [this](bool newActive) {

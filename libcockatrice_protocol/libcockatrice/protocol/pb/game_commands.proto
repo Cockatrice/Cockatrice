@@ -176,10 +176,25 @@ message GameCommand {
         /// Client: reflected via subsequent turn events
         REVERSE_TURN = 1034;
 
-        /// Show or hide a reserved tax counter without deleting it.
-        /// Server: Server_Player::cmdSetCounterActive
-        /// Client: PlayerEventHandler::eventSetCounterActive
-        SET_COUNTER_ACTIVE = 1035;
+        /// Create a cast count at the specified index.
+        /// Server: Server_Player::cmdCreateCastCount
+        /// Client: PlayerEventHandler::eventCreateCastCount
+        CREATE_CAST_COUNT = 1036;
+
+        /// Delete a cast count at the specified index.
+        /// Server: Server_Player::cmdDeleteCastCount
+        /// Client: PlayerEventHandler::eventDeleteCastCount
+        DELETE_CAST_COUNT = 1037;
+
+        /// Increment or decrement a cast count.
+        /// Server: Server_Player::cmdIncCastCount
+        /// Client: PlayerEventHandler::eventSetCastCount
+        INC_CAST_COUNT = 1038;
+
+        /// Set a cast count to a specific value.
+        /// Server: Server_Player::cmdSetCastCount
+        /// Client: PlayerEventHandler::eventSetCastCount
+        SET_CAST_COUNT = 1039;
     }
 
     extensions 100 to max;

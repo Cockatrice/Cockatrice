@@ -7,7 +7,7 @@
 #include "../board/abstract_counter.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
-#include "../board/commander_tax_counter.h"
+#include "../board/cast_count_widget.h"
 #include "../z_values.h"
 
 #include <QGraphicsSceneMouseEvent>
@@ -26,7 +26,7 @@ CommandZone::CommandZone(CommandZoneLogic *_logic, int _zoneHeight, QGraphicsIte
 
 CommandZone::~CommandZone()
 {
-    for (AbstractCounter *ctr : taxCounters) {
+    for (AbstractCounter *ctr : castCounts) {
         disconnect(ctr, &QObject::destroyed, this, nullptr);
     }
 }
@@ -52,7 +52,7 @@ void CommandZone::setMinimumHeight(int height)
         return;
     }
     // The floor only affects height while minimized; skip relayout if the displayed
-    // height is unchanged (e.g. a tax counter toggled while expanded).
+    // height is unchanged (e.g. a cast count toggled while expanded).
     const qreal oldEffectiveHeight = currentHeight();
     minimumHeight = height;
     if (qFuzzyCompare(1.0 + currentHeight(), 1.0 + oldEffectiveHeight)) {
@@ -145,38 +145,32 @@ void CommandZone::reorganizeCards()
     update();
 }
 
-void CommandZone::registerTaxCounter(AbstractCounter *counter)
+void CommandZone::registerCastCount(AbstractCounter *counter)
 {
-    if (!counter || taxCounters.contains(counter)) {
+    if (!counter || castCounts.contains(counter)) {
         return;
     }
-    taxCounters.append(counter);
-    connect(counter, &QObject::destroyed, this, [this, counter]() { taxCounters.removeOne(counter); });
+    castCounts.append(counter);
+    connect(counter, &QObject::destroyed, this, [this, counter]() { castCounts.removeOne(counter); });
 }
 
-void CommandZone::unregisterTaxCounter(AbstractCounter *counter)
+void CommandZone::unregisterCastCount(AbstractCounter *counter)
 {
     if (!counter) {
         return;
     }
     disconnect(counter, &QObject::destroyed, this, nullptr);
-    taxCounters.removeOne(counter);
+    castCounts.removeOne(counter);
 }
 
-void CommandZone::rearrangeTaxCounters()
+void CommandZone::rearrangeCastCounts()
 {
-    qreal y = TaxCounterSizes::TAX_COUNTER_MARGIN;
+    qreal y = CastCountSizes::MARGIN;
 
-    for (AbstractCounter *ctr : taxCounters) {
-        ctr->setPos(TaxCounterSizes::TAX_COUNTER_MARGIN, y);
-        ctr->setZValue(ZValues::TAX_COUNTERS);
-        // Visibility is owned solely by AbstractCounter::setActive() (the counter's own flag),
-        // which Qt AND-s with this CommandZone's visibility via child-visibility propagation
-        // (tax counters are graphics children of the zone). This function only handles layout,
-        // so it stacks and measures by isActive() alone.
-        if (ctr->isActive()) {
-            y += ctr->getRadius() + TaxCounterSizes::TAX_COUNTER_MARGIN;
-        }
+    for (AbstractCounter *ctr : castCounts) {
+        ctr->setPos(CastCountSizes::MARGIN, y);
+        ctr->setZValue(ZValues::CAST_COUNTS);
+        y += ctr->getRadius() + CastCountSizes::MARGIN;
     }
 
     setMinimumHeight(static_cast<int>(y));

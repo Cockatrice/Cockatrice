@@ -47,7 +47,7 @@ struct CommandZoneTestPlayer : Server_Player
 
 /**
  * @brief Builds a Server_Player on a minimal fake game whose command zone is toggled by the
- *        constructor argument, then runs setupZones() so getCounters() reflects the result.
+ *        constructor argument, then runs setupZones() so getCastCounts() reflects the result.
  */
 struct SetupFixture
 {
@@ -86,55 +86,27 @@ struct SetupFixture
 };
 } // namespace
 
-TEST(SetupZonesCommandZone, CreatesAllTaxCountersWhenEnabled)
+TEST(SetupZonesCommandZone, CreatesFirstCastCountWhenEnabled)
 {
     SetupFixture f(true);
-    const QMap<int, Server_Counter *> &counters = f.player.getCounters();
+    const QMap<int, int> &castCounts = f.player.getCastCounts();
 
     EXPECT_TRUE(f.player.getZones().contains(ZoneNames::COMMAND));
 
-    for (int i = 0; i < CounterIds::TaxCounterCount; ++i) {
-        int id = CounterIds::taxCounterIdFromIndex(i);
-        ASSERT_TRUE(counters.contains(id));
-    }
-
-    const Server_Counter *tax1 = counters.value(CounterIds::TaxCounter1);
-    EXPECT_TRUE(tax1->isActive());
-    EXPECT_EQ(tax1->getCount(), 0);
-
-    for (int i = 1; i < CounterIds::TaxCounterCount; ++i) {
-        int id = CounterIds::taxCounterIdFromIndex(i);
-        const Server_Counter *counter = counters.value(id);
-        EXPECT_FALSE(counter->isActive());
-        EXPECT_EQ(counter->getCount(), 0);
-    }
+    EXPECT_EQ(castCounts.size(), 1);
+    EXPECT_TRUE(castCounts.contains(1));
+    EXPECT_EQ(castCounts.value(1), 0);
 }
 
-TEST(SetupZonesCommandZone, TaxCountersUseBounds)
-{
-    SetupFixture f(true);
-    Server_Counter *tax1 = f.player.getCounters().value(CounterIds::TaxCounter1);
-    ASSERT_NE(tax1, nullptr);
-
-    EXPECT_TRUE(tax1->setCount(MAX_COUNTER_VALUE + 1000));
-    EXPECT_EQ(tax1->getCount(), MAX_COUNTER_VALUE);
-    EXPECT_TRUE(tax1->setCount(-1));
-    EXPECT_EQ(tax1->getCount(), 0);
-}
-
-TEST(SetupZonesCommandZone, NoTaxCountersWhenDisabled)
+TEST(SetupZonesCommandZone, NoCastCountsWhenDisabled)
 {
     SetupFixture f(false);
-    const QMap<int, Server_Counter *> &counters = f.player.getCounters();
+    const QMap<int, int> &castCounts = f.player.getCastCounts();
 
     EXPECT_FALSE(f.player.getZones().contains(ZoneNames::COMMAND));
+    EXPECT_TRUE(castCounts.isEmpty());
 
-    for (int i = 0; i < CounterIds::TaxCounterCount; ++i) {
-        int id = CounterIds::taxCounterIdFromIndex(i);
-        EXPECT_FALSE(counters.contains(id));
-    }
-
-    EXPECT_TRUE(counters.contains(0));
+    EXPECT_TRUE(f.player.getCounters().contains(0));
 }
 
 int main(int argc, char **argv)

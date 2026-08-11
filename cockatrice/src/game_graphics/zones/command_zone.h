@@ -38,21 +38,21 @@ constexpr qreal COMMAND_ZONE_WIDTH = CardDimensions::WIDTH_F * 1.5;
  *
  * Always visible when enabled. Uses the generic vertical stacking layout
  * with bottom overflow enabled. Can be minimized via double-click (25% height,
- * or the tax-counter floor if higher).
+ * or the cast count floor if higher).
  *
  * @see SelectZone::layoutCardsVertically for the stacking algorithm
  * @see CommandZoneLogic for card data management
- * @see CommanderTaxCounter for the tax counter overlay
+ * @see CastCountWidget for the cast count overlay
  */
 class CommandZone : public SelectZone
 {
     Q_OBJECT
 private:
     static constexpr double MINIMIZED_HEIGHT_RATIO = 0.25;
-    int zoneHeight;                       ///< Full height in pixels when expanded
-    bool minimized = false;               ///< Whether zone is collapsed (25% height, or the tax-counter floor)
-    int minimumHeight = 0;                ///< Floor for minimized height (e.g. to fit tax counters)
-    QList<AbstractCounter *> taxCounters; ///< Registered tax counter widgets
+    int zoneHeight;                      ///< Full height in pixels when expanded
+    bool minimized = false;              ///< Whether zone is collapsed (25% height, or the cast count floor)
+    int minimumHeight = 0;               ///< Floor for minimized height (e.g. to fit cast counts)
+    QList<AbstractCounter *> castCounts; ///< Registered cast count widgets
 
 public:
     /**
@@ -86,24 +86,24 @@ public:
     [[nodiscard]] bool isMinimized() const;
     /** @brief Returns the current display height (full or minimized). */
     [[nodiscard]] qreal currentHeight() const;
-    /** @brief Sets the minimum height floor, e.g. to ensure tax counters remain visible. */
+    /** @brief Sets the minimum height floor, e.g. to ensure cast counts remain visible. */
     void setMinimumHeight(int height);
-    /** @brief Registers a tax counter widget for layout management. */
-    void registerTaxCounter(AbstractCounter *counter);
+    /** @brief Registers a cast count widget for layout management. */
+    void registerCastCount(AbstractCounter *counter);
     /**
-     * @brief Unregisters a tax counter widget from layout management.
+     * @brief Unregisters a cast count widget from layout management.
      *
      * Call on removal: the widget outlives it via deleteLater(), so unregister synchronously
      * to keep it out of the next layout pass.
      */
-    void unregisterTaxCounter(AbstractCounter *counter);
-    /** @brief Lays out visible tax counters vertically in the top-left corner of the command zone. */
-    void rearrangeTaxCounters();
+    void unregisterCastCount(AbstractCounter *counter);
+    /** @brief Lays out visible cast counts vertically in the top-left corner of the command zone. */
+    void rearrangeCastCounts();
 
 signals:
     /** @brief Emitted when the zone's minimized state changes. */
     void minimizedChanged(bool isMinimized);
-    /** @brief Emitted when display height changes without a minimized-state change (e.g. tax counter toggled while
+    /** @brief Emitted when display height changes without a minimized-state change (e.g. cast count toggled while
      * minimized). */
     void effectiveHeightChanged();
 

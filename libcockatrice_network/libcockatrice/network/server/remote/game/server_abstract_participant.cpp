@@ -13,16 +13,19 @@
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/command_concede.pb.h>
 #include <libcockatrice/protocol/pb/command_create_arrow.pb.h>
+#include <libcockatrice/protocol/pb/command_create_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_create_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_create_token.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/command_del_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_delete_arrow.pb.h>
+#include <libcockatrice/protocol/pb/command_delete_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_dump_zone.pb.h>
 #include <libcockatrice/protocol/pb/command_flip_card.pb.h>
 #include <libcockatrice/protocol/pb/command_game_say.pb.h>
 #include <libcockatrice/protocol/pb/command_inc_card_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_inc_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_kick_from_game.pb.h>
 #include <libcockatrice/protocol/pb/command_leave_game.pb.h>
@@ -36,8 +39,8 @@
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_set_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
-#include <libcockatrice/protocol/pb/command_set_counter_active.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
@@ -343,9 +346,30 @@ Response::ResponseCode Server_AbstractParticipant::cmdDelCounter(const Command_D
     return Response::RespFunctionNotAllowed;
 }
 
-Response::ResponseCode Server_AbstractParticipant::cmdSetCounterActive(const Command_SetCounterActive & /*cmd*/,
-                                                                       ResponseContainer & /*rc*/,
-                                                                       GameEventStorage & /*ges*/)
+Response::ResponseCode Server_AbstractParticipant::cmdCreateCastCount(const Command_CreateCastCount & /*cmd*/,
+                                                                      ResponseContainer & /*rc*/,
+                                                                      GameEventStorage & /*ges*/)
+{
+    return Response::RespFunctionNotAllowed;
+}
+
+Response::ResponseCode Server_AbstractParticipant::cmdDeleteCastCount(const Command_DeleteCastCount & /*cmd*/,
+                                                                      ResponseContainer & /*rc*/,
+                                                                      GameEventStorage & /*ges*/)
+{
+    return Response::RespFunctionNotAllowed;
+}
+
+Response::ResponseCode Server_AbstractParticipant::cmdIncCastCount(const Command_IncCastCount & /*cmd*/,
+                                                                   ResponseContainer & /*rc*/,
+                                                                   GameEventStorage & /*ges*/)
+{
+    return Response::RespFunctionNotAllowed;
+}
+
+Response::ResponseCode Server_AbstractParticipant::cmdSetCastCount(const Command_SetCastCount & /*cmd*/,
+                                                                   ResponseContainer & /*rc*/,
+                                                                   GameEventStorage & /*ges*/)
 {
     return Response::RespFunctionNotAllowed;
 }
@@ -533,8 +557,17 @@ Server_AbstractParticipant::processGameCommand(const GameCommand &command, Respo
         case GameCommand::REVERSE_TURN:
             return cmdReverseTurn(command.GetExtension(Command_ReverseTurn::ext), rc, ges);
             break;
-        case GameCommand::SET_COUNTER_ACTIVE:
-            return cmdSetCounterActive(command.GetExtension(Command_SetCounterActive::ext), rc, ges);
+        case GameCommand::CREATE_CAST_COUNT:
+            return cmdCreateCastCount(command.GetExtension(Command_CreateCastCount::ext), rc, ges);
+            break;
+        case GameCommand::DELETE_CAST_COUNT:
+            return cmdDeleteCastCount(command.GetExtension(Command_DeleteCastCount::ext), rc, ges);
+            break;
+        case GameCommand::INC_CAST_COUNT:
+            return cmdIncCastCount(command.GetExtension(Command_IncCastCount::ext), rc, ges);
+            break;
+        case GameCommand::SET_CAST_COUNT:
+            return cmdSetCastCount(command.GetExtension(Command_SetCastCount::ext), rc, ges);
             break;
         default:
             return Response::RespInvalidCommand;

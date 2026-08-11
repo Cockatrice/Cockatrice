@@ -672,25 +672,9 @@ void MessageLogWidget::logSetCardCounter(PlayerLogic *player, QString cardName, 
 
 void MessageLogWidget::logSetCounter(PlayerLogic *player, int counterId, QString counterName, int value, int oldValue)
 {
+    Q_UNUSED(counterId);
     if (counterName == "life") {
         soundEngine->playSound("life_change");
-    }
-
-    if (CounterIds::isTaxCounter(counterId)) {
-        QString playerName = sanitizeHtml(player->getPlayerInfo()->getName());
-        QString valueStr = QString("<font class=\"blue\">%1</font>").arg(value);
-        int delta = value - oldValue;
-        QString deltaStr = QString::number(delta);
-        QString counterDisplayName = TranslateCounterName::getDisplayName(counterName);
-        QString taxLabel = QString("<font class=\"blue\">%1</font>").arg(sanitizeHtml(counterDisplayName));
-        if (value > oldValue) {
-            // delta > 0 here; the format string supplies the leading '+'
-            appendHtmlServerMessage(tr("%1 increases %2 to %3 (+%4).").arg(playerName, taxLabel, valueStr, deltaStr));
-        } else {
-            // delta < 0 here; deltaStr already carries the '-' sign
-            appendHtmlServerMessage(tr("%1 decreases %2 to %3 (%4).").arg(playerName, taxLabel, valueStr, deltaStr));
-        }
-        return;
     }
 
     QString counterDisplayName = TranslateCounterName::getDisplayName(counterName);

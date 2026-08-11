@@ -1,32 +1,30 @@
-#include "commander_tax_counter.h"
+#include "cast_count_widget.h"
 
 #include "../../game/board/counter_state.h"
 #include "translate_counter_name.h"
 
-#include <QColor>
 #include <QFontDatabase>
 #include <QPainter>
 
 static constexpr qreal CORNER_RADIUS = 4.0;
 static constexpr qreal FONT_SIZE_RATIO = 0.6;
 
-CommanderTaxCounter::CommanderTaxCounter(CounterState *state, PlayerLogic *player, QGraphicsItem *parent)
+CastCountWidget::CastCountWidget(CounterState *state, PlayerLogic *player, QGraphicsItem *parent)
     : AbstractCounter(state, player, false, false, parent), size(state->getRadius())
 {
     setCacheMode(DeviceCoordinateCache);
     setAcceptHoverEvents(true);
-
     setToolTip(tr("%1: %2").arg(TranslateCounterName::getDisplayName(getName())).arg(getValue()));
 }
 
-QRectF CommanderTaxCounter::boundingRect() const
+QRectF CastCountWidget::boundingRect() const
 {
     return QRectF(0, 0, size, size);
 }
 
-void CommanderTaxCounter::paint(QPainter *painter,
-                                [[maybe_unused]] const QStyleOptionGraphicsItem *option,
-                                [[maybe_unused]] QWidget *widget)
+void CastCountWidget::paint(QPainter *painter,
+                            [[maybe_unused]] const QStyleOptionGraphicsItem *option,
+                            [[maybe_unused]] QWidget *widget)
 {
     painter->save();
 
@@ -46,7 +44,7 @@ void CommanderTaxCounter::paint(QPainter *painter,
     painter->restore();
 }
 
-void CommanderTaxCounter::setValue(int _value)
+void CastCountWidget::setValue(int _value)
 {
     int clampedValue = qMax(0, _value);
     AbstractCounter::setValue(clampedValue);

@@ -123,14 +123,16 @@ public:
     {
         return counterWidgets.value(counterId, nullptr);
     }
-    /** @brief Returns the tax counter if it exists and is active, or nullptr otherwise. */
-    [[nodiscard]] AbstractCounter *getTaxCounterIfActive(int counterId) const;
+    /** @brief Returns the cast count widget for the given index (1-5), or nullptr if not found. */
+    [[nodiscard]] AbstractCounter *getCastCountWidget(int index) const;
 
 public slots:
     void onPlayerActiveChanged(bool _active);
     void onCustomZoneAdded(QString customZoneName);
     void onCounterAdded(CounterState *state);
     void onCounterRemoved(int counterId);
+    void onCastCountAdded(int index, CounterState *state);
+    void onCastCountRemoved(int index);
     void rearrangeCounters();
     void retranslateUi();
 
@@ -147,6 +149,7 @@ private:
     PlayerArea *playerArea;
     PlayerTarget *playerTarget;
     QMap<int, AbstractCounter *> counterWidgets;
+    QMap<int, AbstractCounter *> castCountWidgets;
     QMap<QString, CardZone *> zoneGraphicsItems;
     PileZone *deckZoneGraphicsItem;
     PileZone *sideboardGraphicsItem;
