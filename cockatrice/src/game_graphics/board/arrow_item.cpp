@@ -256,7 +256,8 @@ void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         painter->setBrush(sheen);
         painter->setOpacity(glowAlpha * anticipation);
         painter->drawRect(QRectF(sweep.x() - kSheenHalfWidth - glowExtent, path.boundingRect().top() - glowExtent,
-                                 (kSheenHalfWidth + glowExtent) * 2.0, path.boundingRect().height() + glowExtent * 2.0));
+                                 (kSheenHalfWidth + glowExtent) * 2.0,
+                                 path.boundingRect().height() + glowExtent * 2.0));
         painter->restore();
     }
     painter->restore();
