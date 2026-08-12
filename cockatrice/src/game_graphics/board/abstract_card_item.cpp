@@ -305,6 +305,11 @@ void AbstractCardItem::setTapped(bool _tapped, bool canAnimate)
     }
 }
 
+bool AbstractCardItem::animationEvent()
+{
+    return false;
+}
+
 void AbstractCardItem::setFaceDown(bool _facedown)
 {
     facedown = _facedown;
