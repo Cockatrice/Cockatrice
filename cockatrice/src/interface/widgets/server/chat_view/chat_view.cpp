@@ -13,6 +13,7 @@
 #include <QDesktopServices>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QTimer>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/settings/chat_settings.h>
@@ -51,6 +52,9 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _sho
     setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
     setOpenLinks(false);
     connect(this, &ChatView::anchorClicked, this, &ChatView::openLink);
+
+    connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &ChatView::onScrollBarRangeChanged);
+    connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &ChatView::onScrollBarValueChanged);
 }
 
 void ChatView::adjustColorsToPalette()
@@ -151,7 +155,7 @@ void ChatView::appendHtml(const QString &html)
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     prepareBlock().insertHtml(html);
     if (atBottom) {
-        verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+        scrollToBottom();
     }
 }
 
@@ -169,7 +173,7 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 
     prepareBlock().insertHtml(htmlText);
     if (atBottom) {
-        verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+        scrollToBottom();
     }
 }
 
@@ -338,8 +342,33 @@ void ChatView::appendMessage(QString message,
         }
     }
 
-    if (atBottom) {
+    // ChatHistory messages are only ever sent once per room, right after joining, before the user can
+    // interact with the view. Always scroll to the bottom so the whole history is visible on join.
+    if (atBottom || messageType.testFlag(Event_RoomSay::ChatHistory)) {
+        scrollToBottom();
+    }
+}
+
+void ChatView::scrollToBottom()
+{
+    // The document layout, and therefore the scrollbar range, may be updated asynchronously (e.g. while
+    // the chat history is loaded into a view that has not been laid out yet). Setting the value once is
+    // not enough: keep stickToBottom set so any later range change scrolls to the new maximum as well.
+    stickToBottom = true;
+    verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+void ChatView::onScrollBarRangeChanged()
+{
+    if (stickToBottom) {
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+    }
+}
+
+void ChatView::onScrollBarValueChanged(int value)
+{
+    if (value < verticalScrollBar()->maximum()) {
+        stickToBottom = false;
     }
 }
 
