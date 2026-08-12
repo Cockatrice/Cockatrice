@@ -146,6 +146,20 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->restore();
     }
 
+    if (state->getDoesntUntapOnce()) {
+        painter->save();
+
+        painter->setRenderHint(QPainter::Antialiasing, false);
+
+        QPen pen;
+        pen.setColor(Qt::red);
+        pen.setWidth(0); // Cosmetic pen
+        painter->setPen(pen);
+        painter->drawPath(shape());
+
+        painter->restore();
+    }
+
     painter->restore();
 }
 

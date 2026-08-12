@@ -62,6 +62,7 @@ void Server_Card::resetState(bool keepAnnotations)
         setAnnotation(QString());
     }
     setDoesntUntap(false);
+    setDoesntUntapOnce(false);
 }
 
 QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue, bool allCards)

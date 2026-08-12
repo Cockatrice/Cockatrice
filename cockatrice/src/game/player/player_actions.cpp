@@ -1777,6 +1777,15 @@ void PlayerActions::cardMenuAction(QList<CardItem *> selectedCards, CardMenuActi
                     commandList.append(cmd);
                     break;
                 }
+                case cmDoesntUntapOnce: {
+                    auto *cmd = new Command_SetCardAttr;
+                    cmd->set_zone(card->getZone()->getName().toStdString());
+                    cmd->set_card_id(card->getId());
+                    cmd->set_attribute(AttrDoesntUntapOnce);
+                    cmd->set_attr_value(card->getDoesntUntapOnce() ? "0" : "1");
+                    commandList.append(cmd);
+                    break;
+                }
                 case cmFlip: {
                     auto *cmd = new Command_FlipCard;
                     cmd->set_zone(card->getZone()->getName().toStdString());
