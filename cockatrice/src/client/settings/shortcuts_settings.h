@@ -504,7 +504,7 @@ private:
         {"Player/aDoesntUntap", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Toggle Skip Untapping"),
                                             parseSequenceString("Alt+U"),
                                             ShortcutGroup::Playing_Area)},
-        {"Player/aDoesntUntapOnce", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Toggle Skip (One Turn)"),
+        {"Player/aDoesntUntapOnce", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Toggle Skip Untapping (One Turn)"),
                                             parseSequenceString(""),
                                             ShortcutGroup::Playing_Area)},
         {"Player/aFlip", ShortcutKey(QT_TRANSLATE_NOOP("shortcutsTab", "Turn Card Over"),
