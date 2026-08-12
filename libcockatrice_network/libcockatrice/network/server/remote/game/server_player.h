@@ -8,6 +8,7 @@ class Server_Player : public Server_AbstractPlayer
     Q_OBJECT
 private:
     QMap<int, Server_Counter *> counters;
+    QMap<int, int> castCounts; // index (1-5) -> value
     QList<int> lastDrawList;
 
 public:
@@ -21,8 +22,40 @@ public:
     {
         return counters;
     }
+    const QMap<int, int> &getCastCounts() const
+    {
+        return castCounts;
+    }
     int newCounterId() const;
     void addCounter(Server_Counter *counter);
+
+    static Response::ResponseCode
+    evaluateDelCounter(bool gameStarted, bool playerConceded, const Server_Counter *counter);
+
+    static Response::ResponseCode
+    evaluateModifyCounter(bool gameStarted, bool playerConceded, const Server_Counter *counter);
+
+    static Response::ResponseCode
+    evaluateCreateCounter(bool gameStarted, bool playerConceded, const QString &counterName);
+
+    // Cast count validation
+    static Response::ResponseCode evaluateCreateCastCount(bool gameStarted,
+                                                          bool playerConceded,
+                                                          bool commandZoneEnabled,
+                                                          int index,
+                                                          bool exists,
+                                                          bool predecessorExists);
+
+    static Response::ResponseCode evaluateDeleteCastCount(bool gameStarted,
+                                                          bool playerConceded,
+                                                          bool commandZoneEnabled,
+                                                          int index,
+                                                          bool exists,
+                                                          int value,
+                                                          bool successorExists);
+
+    static Response::ResponseCode
+    evaluateModifyCastCount(bool gameStarted, bool playerConceded, bool commandZoneEnabled, int index, bool exists);
 
     void setupZones() override;
     void clearZones() override;
@@ -65,6 +98,16 @@ public:
     Response::ResponseCode cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd,
                                                    ResponseContainer &rc,
                                                    GameEventStorage &ges) override;
+
+    // Cast count commands
+    Response::ResponseCode
+    cmdCreateCastCount(const Command_CreateCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
+    Response::ResponseCode
+    cmdDeleteCastCount(const Command_DeleteCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
+    Response::ResponseCode
+    cmdIncCastCount(const Command_IncCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
+    Response::ResponseCode
+    cmdSetCastCount(const Command_SetCastCount &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
 
     void getInfo(ServerInfo_Player *info,
                  Server_AbstractParticipant *playerWhosAsking,

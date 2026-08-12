@@ -94,6 +94,17 @@ bool GameFiltersSettings::isHideOpenDecklistGames() const
     return previous == QVariant() ? false : previous.toBool();
 }
 
+void GameFiltersSettings::setHideCommandZoneGames(bool hide)
+{
+    setValue(hide, "hide_command_zone_games");
+}
+
+bool GameFiltersSettings::isHideCommandZoneGames() const
+{
+    QVariant previous = getValue("hide_command_zone_games");
+    return previous == QVariant() ? false : previous.toBool();
+}
+
 void GameFiltersSettings::setGameNameFilter(QString gameName)
 {
     setValue(gameName, "gameNameFilter");

@@ -6,6 +6,7 @@
 #include "../../../game_graphics/zones/table_zone.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
+#include "../../zones/command_zone.h"
 #include "../player_graphics_item.h"
 #include "card_menu.h"
 #include "hand_menu.h"
@@ -32,6 +33,13 @@ PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_
 
     if (player->getLogic()->getPlayerInfo()->getLocalOrJudge()) {
         sideboardMenu = addManagedMenu<SideboardMenu>(player, playerMenu);
+
+        if (player->getLogic()->hasCommandZone()) {
+            commandZoneMenu = addManagedMenu<CommandZoneMenu>(player, playerMenu);
+        } else {
+            commandZoneMenu = nullptr;
+        }
+
         customZonesMenu = addManagedMenu<CustomZoneMenu>(player);
         playerMenu->addSeparator();
 
@@ -40,6 +48,7 @@ PlayerMenu::PlayerMenu(PlayerGraphicsItem *_player) : QObject(_player), player(_
         utilityMenu = createManagedComponent<UtilityMenu>(player, playerMenu);
     } else {
         sideboardMenu = nullptr;
+        commandZoneMenu = nullptr;
         customZonesMenu = nullptr;
         countersMenu = nullptr;
         utilityMenu = nullptr;
@@ -69,6 +78,10 @@ void PlayerMenu::setMenusForGraphicItems()
         player->getHandZoneGraphicsItem()->setMenu(handMenu);
         player->getDeckZoneGraphicsItem()->setMenu(libraryMenu, libraryMenu->aDrawCard);
         player->getSideboardZoneGraphicsItem()->setMenu(sideboardMenu);
+
+        if (auto *commandZone = player->getCommandZoneGraphicsItem()) {
+            commandZone->setMenu(commandZoneMenu);
+        }
     }
 }
 

@@ -11,6 +11,7 @@
 #include "../../interface/widgets/menus/tearoff_menu.h"
 #include "../board/arrow_data.h"
 #include "../interface/deck_loader/loaded_deck.h"
+#include "../zones/command_zone_logic.h"
 #include "../zones/hand_zone_logic.h"
 #include "../zones/pile_zone_logic.h"
 #include "../zones/stack_zone_logic.h"
@@ -25,6 +26,7 @@
 #include <libcockatrice/filters/filter_string.h>
 #include <libcockatrice/protocol/pb/card_attributes.pb.h>
 #include <libcockatrice/protocol/pb/game_event.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_card.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 
 inline Q_LOGGING_CATEGORY(PlayerLog, "player");
@@ -77,6 +79,9 @@ signals:
     void counterAdded(CounterState *state);
     void counterRemoved(int counterId);
     void rearrangeCounters();
+    void castCountAdded(int index, CounterState *state);
+    void castCountRemoved(int index);
+    void castCountValueChanged(int index, int value);
     void activeChanged(bool active);
     void zoneIdChanged(int zoneId);
     void concededChanged(int playerId, bool conceded);
@@ -91,6 +96,10 @@ signals:
 public slots:
     void setActive(bool _active);
     void onRequestZoneViewToggle(const QString &zoneName, int numberCards, bool isReversed);
+    void requestRearrangeCounters()
+    {
+        emit rearrangeCounters();
+    }
 
 public:
     PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent);
@@ -191,8 +200,21 @@ public:
         return qobject_cast<HandZoneLogic *>(zones.value(ZoneNames::HAND));
     }
 
+    /** @brief Returns the command zone logic, or nullptr if not present. */
+    CommandZoneLogic *getCommandZone() const
+    {
+        return qobject_cast<CommandZoneLogic *>(zones.value(ZoneNames::COMMAND));
+    }
+
+    /** @brief Whether this game has command zone support (determined at game creation). */
+    bool hasCommandZone() const
+    {
+        return getCommandZone() != nullptr;
+    }
+
     CounterState *addCounter(const ServerInfo_Counter &counter);
-    CounterState *addCounter(int id, const QString &name, const QColor &color, int radius, int value);
+    CounterState *
+    addCounter(int id, const QString &name, const QColor &color, int radius, int value, bool active = true);
     void delCounter(int counterId);
     void clearCounters();
 
@@ -205,6 +227,16 @@ public:
      * Gets the counter that represents the life total.
      */
     CounterState *getLifeCounter() const;
+
+    // Cast count management
+    CounterState *addCastCount(int index);
+    void delCastCount(int index);
+    void setCastCountValue(int index, int value);
+    CounterState *getCastCount(int index) const;
+    const QMap<int, CounterState *> &getCastCounts() const
+    {
+        return castCounts;
+    }
 
     void setConceded(bool _conceded);
     bool getConceded() const
@@ -240,6 +272,7 @@ private:
     int zoneId;
     QMap<QString, CardZoneLogic *> zones;
     QMap<int, CounterState *> counters;
+    QMap<int, CounterState *> castCounts; // index (1-5) -> state
 
     bool dialogSemaphore;
     QList<CardItem *> cardsToDelete;

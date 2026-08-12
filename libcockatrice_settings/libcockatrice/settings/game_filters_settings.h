@@ -23,6 +23,7 @@ public:
     bool isHideIgnoredUserGames() const;
     bool isHideNotBuddyCreatedGames() const;
     bool isHideOpenDecklistGames() const;
+    bool isHideCommandZoneGames() const;
     QString getGameNameFilter() const;
     QStringList getCreatorNameFilters() const;
     int getMinPlayers() const;
@@ -37,6 +38,7 @@ public:
     void setHideBuddiesOnlyGames(bool hide);
     void setHideIgnoredUserGames(bool hide);
     void setHideOpenDecklistGames(bool hide);
+    void setHideCommandZoneGames(bool hide);
     void setHideFullGames(bool hide);
     void setHideGamesThatStarted(bool hide);
     void setHidePasswordProtectedGames(bool hide);

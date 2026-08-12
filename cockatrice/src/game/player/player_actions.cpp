@@ -7,16 +7,20 @@
 #include "../../game_graphics/zones/table_zone.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../../interface/widgets/utility/get_text_with_max.h"
+#include "../board/counter_state.h"
 #include "../zones/view_zone_logic.h"
 
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
+#include <libcockatrice/protocol/pb/command_create_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_create_token.pb.h>
+#include <libcockatrice/protocol/pb/command_delete_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/command_flip_card.pb.h>
 #include <libcockatrice/protocol/pb/command_game_say.pb.h>
+#include <libcockatrice/protocol/pb/command_inc_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_mulligan.pb.h>
@@ -27,9 +31,11 @@
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
+#include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/card_override_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/clamped_arithmetic.h>
+#include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/counter_limits.h>
 #include <libcockatrice/utility/expression.h>
 #include <libcockatrice/utility/zone_names.h>
@@ -48,10 +54,10 @@ PlayerActions::PlayerActions(PlayerLogic *_player)
     connect(moveTopCardTimer, &QTimer::timeout, [this]() { actMoveTopCardToPlay(); });
 }
 
-void PlayerActions::playCard(CardItem *card, bool faceDown)
+PendingCommand *PlayerActions::prepareCardMove(CardItem *card, bool faceDown)
 {
     if (card == nullptr) {
-        return;
+        return nullptr;
     }
 
     Command_MoveCard cmd;
@@ -63,7 +69,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
 
     ExactCard exactCard = card->getCard();
     if (!exactCard) {
-        return;
+        return nullptr;
     }
 
     const CardInfo &info = exactCard.getInfo();
@@ -94,7 +100,14 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
         cmd.set_x(gridPoint.x());
         cmd.set_y(gridPoint.y());
     }
-    sendGameCommand(cmd);
+    return prepareGameCommand(cmd);
+}
+
+void PlayerActions::playCard(CardItem *card, bool faceDown)
+{
+    if (PendingCommand *pend = prepareCardMove(card, faceDown)) {
+        sendGameCommand(pend);
+    }
 }
 
 /**
@@ -1632,6 +1645,14 @@ static bool isUnwritableRevealZone(CardZoneLogic *zone)
 
 void PlayerActions::playSelectedCards(QList<CardItem *> selectedCards, const bool faceDown)
 {
+    playSelectedCardsImpl(selectedCards, faceDown, nullptr);
+}
+
+void PlayerActions::playSelectedCardsImpl(
+    QList<CardItem *> selectedCards,
+    bool faceDown,
+    const std::function<void(PendingCommand *, const QString &)> &postPlayCallback)
+{
     // CardIds will get shuffled downwards when cards leave the deck.
     // We need to iterate through the cards in reverse order so cardIds don't get changed out from under us as we play
     // out the cards one-by-one.
@@ -1640,8 +1661,95 @@ void PlayerActions::playSelectedCards(QList<CardItem *> selectedCards, const boo
 
     for (auto &card : selectedCards) {
         if (card && !isUnwritableRevealZone(card->getZone()) && card->getZone()->getName() != ZoneNames::TABLE) {
-            playCard(card, faceDown);
+            const QString originalZone = card->getZone()->getName();
+            PendingCommand *pend = prepareCardMove(card, faceDown);
+            if (pend == nullptr) {
+                continue;
+            }
+            // Connect before send: a local game processes the command synchronously inside
+            // sendGameCommand, firing the pend's finished signal before this call returns.
+            if (postPlayCallback) {
+                postPlayCallback(pend, originalZone);
+            }
+            sendGameCommand(pend);
         }
+    }
+}
+
+void PlayerActions::actPlayAndIncrease1stCastCount(QList<CardItem *> selectedCards)
+{
+    playAndIncreaseCastCount(selectedCards, 1);
+}
+
+void PlayerActions::actPlayAndIncrease2ndCastCount(QList<CardItem *> selectedCards)
+{
+    playAndIncreaseCastCount(selectedCards, 2);
+}
+
+void PlayerActions::playAndIncreaseCastCount(QList<CardItem *> selectedCards, int index)
+{
+    playSelectedCardsImpl(selectedCards, false, [this, index](PendingCommand *pend, const QString &originalZone) {
+        if (originalZone != ZoneNames::COMMAND || pend == nullptr) {
+            return;
+        }
+        // Gate the increment on the server accepting the move
+        connect(pend, &PendingCommand::finished, this,
+                [this, index](const Response &response, const CommandContainer &, const QVariant &) {
+                    if (response.response_code() != Response::RespOk) {
+                        return;
+                    }
+                    CounterState *state = player->getCastCount(index);
+                    if (state) {
+                        Command_IncCastCount cmd;
+                        cmd.set_index(index);
+                        cmd.set_delta(1);
+                        sendGameCommand(cmd);
+                    }
+                });
+    });
+}
+
+void PlayerActions::sendIncCounter(int counterId, int delta)
+{
+    Command_IncCounter cmd;
+    cmd.set_counter_id(counterId);
+    cmd.set_delta(delta);
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::actModifyCastCount(int index, int delta)
+{
+    if (!CastCountIds::isValidIndex(index)) {
+        return;
+    }
+    CounterState *state = player->getCastCount(index);
+    if (!state) {
+        return;
+    }
+    Command_IncCastCount cmd;
+    cmd.set_index(index);
+    cmd.set_delta(delta);
+    sendGameCommand(cmd);
+}
+
+void PlayerActions::actToggleCastCount(int index)
+{
+    if (!CastCountIds::isValidIndex(index)) {
+        return;
+    }
+    CounterState *state = player->getCastCount(index);
+    if (state) {
+        // Delete only allowed when value is 0
+        if (state->getValue() != 0) {
+            return;
+        }
+        Command_DeleteCastCount cmd;
+        cmd.set_index(index);
+        sendGameCommand(cmd);
+    } else {
+        Command_CreateCastCount cmd;
+        cmd.set_index(index);
+        sendGameCommand(cmd);
     }
 }
 
@@ -1920,6 +2028,18 @@ void PlayerActions::cardMenuAction(QList<CardItem *> selectedCards, CardMenuActi
                 cmd->mutable_cards_to_move()->CopyFrom(idList);
                 cmd->set_target_player_id(player->getPlayerInfo()->getId());
                 cmd->set_target_zone(ZoneNames::EXILE);
+                cmd->set_x(0);
+                cmd->set_y(0);
+                commandList.append(cmd);
+                break;
+            }
+            case cmMoveToCommandZone: {
+                auto *cmd = new Command_MoveCard;
+                cmd->set_start_player_id(startPlayerId);
+                cmd->set_start_zone(startZone.toStdString());
+                cmd->mutable_cards_to_move()->CopyFrom(idList);
+                cmd->set_target_player_id(player->getPlayerInfo()->getId());
+                cmd->set_target_zone(ZoneNames::COMMAND);
                 cmd->set_x(0);
                 cmd->set_y(0);
                 commandList.append(cmd);

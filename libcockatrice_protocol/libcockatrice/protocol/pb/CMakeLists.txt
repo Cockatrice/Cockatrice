@@ -10,6 +10,7 @@ set(PROTO_FILES
     command_change_zone_properties.proto
     command_concede.proto
     command_create_arrow.proto
+    command_create_cast_count.proto
     command_create_counter.proto
     command_create_token.proto
     command_deck_del.proto
@@ -21,11 +22,13 @@ set(PROTO_FILES
     command_deck_upload.proto
     command_del_counter.proto
     command_delete_arrow.proto
+    command_delete_cast_count.proto
     command_draw_cards.proto
     command_dump_zone.proto
     command_flip_card.proto
     command_game_say.proto
     command_inc_card_counter.proto
+    command_inc_cast_count.proto
     command_inc_counter.proto
     command_kick_from_game.proto
     command_leave_game.proto
@@ -45,6 +48,7 @@ set(PROTO_FILES
     command_set_active_phase.proto
     command_set_card_attr.proto
     command_set_card_counter.proto
+    command_set_cast_count.proto
     command_set_counter.proto
     command_set_sideboard_lock.proto
     command_set_sideboard_plan.proto
@@ -65,10 +69,12 @@ set(PROTO_FILES
     event_change_zone_properties.proto
     event_connection_closed.proto
     event_create_arrow.proto
+    event_create_cast_count.proto
     event_create_counter.proto
     event_create_token.proto
     event_del_counter.proto
     event_delete_arrow.proto
+    event_delete_cast_count.proto
     event_destroy_card.proto
     event_draw_cards.proto
     event_dump_zone.proto
@@ -105,6 +111,7 @@ set(PROTO_FILES
     event_set_active_player.proto
     event_set_card_attr.proto
     event_set_card_counter.proto
+    event_set_cast_count.proto
     event_set_counter.proto
     event_shuffle.proto
     event_user_joined.proto
@@ -147,6 +154,7 @@ set(PROTO_FILES
     server_message.proto
     serverinfo_arrow.proto
     serverinfo_ban.proto
+    serverinfo_cast_count.proto
     serverinfo_card.proto
     serverinfo_cardcounter.proto
     serverinfo_chat_message.proto

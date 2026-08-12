@@ -1,0 +1,6 @@
+syntax = "proto2";
+
+message ServerInfo_CastCount {
+    optional sint32 index = 1;
+    optional sint32 value = 2;
+}

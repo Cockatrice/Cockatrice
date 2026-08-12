@@ -48,6 +48,9 @@ class Event_RollDie;
 class Event_SetCardAttr;
 class Event_SetCardCounter;
 class Event_SetCounter;
+class Event_CreateCastCount;
+class Event_DeleteCastCount;
+class Event_SetCastCount;
 class Event_Shuffle;
 class Event_GameLogNotice;
 
@@ -158,6 +161,15 @@ public:
     /// Delete a player-level counter.
     void eventDelCounter(const Event_DelCounter &event);
 
+    /// Create a cast count.
+    void eventCreateCastCount(const Event_CreateCastCount &event);
+
+    /// Delete a cast count.
+    void eventDeleteCastCount(const Event_DeleteCastCount &event);
+
+    /// Set a cast count value.
+    void eventSetCastCount(const Event_SetCastCount &event);
+
     /** @} */
 
     /** @name Zone-level operations
@@ -246,7 +258,7 @@ signals:
     void logUnattachCard(PlayerLogic *player, QString cardName);
     void logSetCardCounter(PlayerLogic *player, QString cardName, int counterId, int value, int oldValue);
     void logSetTapped(PlayerLogic *player, CardItem *card, bool tapped);
-    void logSetCounter(PlayerLogic *player, QString counterName, int value, int oldValue);
+    void logSetCounter(PlayerLogic *player, int counterId, QString counterName, int value, int oldValue);
     void logSetDoesntUntap(PlayerLogic *player, CardItem *card, bool doesntUntap);
     void logSetPT(PlayerLogic *player, CardItem *card, QString newPT);
     void logSetAnnotation(PlayerLogic *player, CardItem *card, QString newAnnotation);

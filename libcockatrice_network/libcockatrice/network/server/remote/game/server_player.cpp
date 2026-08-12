@@ -18,14 +18,18 @@
 #include <libcockatrice/protocol/pb/command_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/command_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/command_concede.pb.h>
+#include <libcockatrice/protocol/pb/command_create_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_create_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/command_del_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_delete_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_draw_cards.pb.h>
+#include <libcockatrice/protocol/pb/command_inc_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_inc_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_mulligan.pb.h>
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
+#include <libcockatrice/protocol/pb/command_set_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
@@ -33,20 +37,26 @@
 #include <libcockatrice/protocol/pb/context_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
 #include <libcockatrice/protocol/pb/context_set_sideboard_lock.pb.h>
+#include <libcockatrice/protocol/pb/event_create_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/event_create_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_del_counter.pb.h>
+#include <libcockatrice/protocol/pb/event_delete_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/event_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/event_game_log_notice.pb.h>
 #include <libcockatrice/protocol/pb/event_player_properties_changed.pb.h>
+#include <libcockatrice/protocol/pb/event_set_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/response_dump_zone.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/color.h>
+#include <libcockatrice/utility/counter_ids.h>
+#include <libcockatrice/utility/counter_limits.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
 
@@ -71,7 +81,7 @@ int Server_Player::newCounterId() const
             id = c->getId();
         }
     }
-    return id + 1;
+    return std::max(id + 1, CounterIds::FirstUserId);
 }
 
 void Server_Player::setupZones()
@@ -100,6 +110,12 @@ void Server_Player::setupZones()
     addCounter(new Server_Counter(5, "g", makeColor(150, 255, 150), 20, 0));
     addCounter(new Server_Counter(6, "x", makeColor(255, 255, 255), 20, 0));
     addCounter(new Server_Counter(7, "storm", makeColor(255, 150, 30), 20, 0));
+
+    // Command zone for Commander format
+    if (game->getEnableCommandZone()) {
+        addZone(new Server_CardZone(this, ZoneNames::COMMAND, false, ServerInfo_Zone::PublicZone));
+        castCounts.insert(1, 0);
+    }
 
     // ------------------------------------------------------------------
 
@@ -155,6 +171,7 @@ void Server_Player::clearZones()
         delete counter;
     }
     counters.clear();
+    castCounts.clear();
 
     lastDrawList.clear();
 }
@@ -427,19 +444,29 @@ Server_Player::cmdUndoDraw(const Command_UndoDraw & /*cmd*/, ResponseContainer &
 }
 
 Response::ResponseCode
-Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::evaluateModifyCounter(bool gameStarted, bool playerConceded, const Server_Counter *counter)
 {
-    if (!game->getGameStarted()) {
+    if (!gameStarted) {
         return Response::RespGameNotStarted;
     }
-    if (conceded) {
+    if (playerConceded) {
         return Response::RespContextError;
     }
+    if (!counter) {
+        return Response::RespNameNotFound;
+    }
+    return Response::RespOk;
+}
 
+Response::ResponseCode
+Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
     const int counterId = cmd.counter_id();
     Server_Counter *c = counters.value(counterId, nullptr);
-    if (!c) {
-        return Response::RespNameNotFound;
+
+    const Response::ResponseCode authResult = evaluateModifyCounter(game->getGameStarted(), conceded, c);
+    if (authResult != Response::RespOk) {
+        return authResult;
     }
 
     bool didChange = c->incrementCount(cmd.delta());
@@ -454,17 +481,28 @@ Server_Player::cmdIncCounter(const Command_IncCounter &cmd, ResponseContainer & 
 }
 
 Response::ResponseCode
-Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::evaluateCreateCounter(bool gameStarted, bool playerConceded, const QString & /*counterName*/)
 {
-    if (!game->getGameStarted()) {
+    if (!gameStarted) {
         return Response::RespGameNotStarted;
     }
-    if (conceded) {
+    if (playerConceded) {
         return Response::RespContextError;
     }
+    return Response::RespOk;
+}
 
-    auto *c = new Server_Counter(newCounterId(), nameFromStdString(cmd.counter_name()), cmd.counter_color(),
-                                 cmd.radius(), cmd.value());
+Response::ResponseCode
+Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    const QString counterName = nameFromStdString(cmd.counter_name());
+
+    const Response::ResponseCode authResult = evaluateCreateCounter(game->getGameStarted(), conceded, counterName);
+    if (authResult != Response::RespOk) {
+        return authResult;
+    }
+
+    auto *c = new Server_Counter(newCounterId(), counterName, cmd.counter_color(), cmd.radius(), cmd.value());
     addCounter(c);
 
     Event_CreateCounter event;
@@ -482,17 +520,12 @@ Server_Player::cmdCreateCounter(const Command_CreateCounter &cmd, ResponseContai
 Response::ResponseCode
 Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
 {
-    if (!game->getGameStarted()) {
-        return Response::RespGameNotStarted;
-    }
-    if (conceded) {
-        return Response::RespContextError;
-    }
-
     const int counterId = cmd.counter_id();
     Server_Counter *c = counters.value(counterId, nullptr);
-    if (!c) {
-        return Response::RespNameNotFound;
+
+    const Response::ResponseCode authResult = evaluateModifyCounter(game->getGameStarted(), conceded, c);
+    if (authResult != Response::RespOk) {
+        return authResult;
     }
 
     bool didChange = c->setCount(cmd.value());
@@ -507,26 +540,218 @@ Server_Player::cmdSetCounter(const Command_SetCounter &cmd, ResponseContainer & 
 }
 
 Response::ResponseCode
-Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+Server_Player::evaluateDelCounter(bool gameStarted, bool playerConceded, const Server_Counter *counter)
 {
-    if (!game->getGameStarted()) {
+    if (!gameStarted) {
         return Response::RespGameNotStarted;
     }
-    if (conceded) {
+    if (playerConceded) {
         return Response::RespContextError;
     }
-
-    const int counterId = cmd.counter_id();
-    Server_Counter *counter = counters.value(counterId, nullptr);
     if (!counter) {
         return Response::RespNameNotFound;
     }
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+Server_Player::cmdDelCounter(const Command_DelCounter &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    const int counterId = cmd.counter_id();
+    Server_Counter *counter = counters.value(counterId, nullptr);
+
+    const Response::ResponseCode authResult = evaluateDelCounter(game->getGameStarted(), conceded, counter);
+    if (authResult != Response::RespOk) {
+        return authResult;
+    }
+
     counters.remove(counterId);
     delete counter;
 
     Event_DelCounter event;
     event.set_counter_id(counterId);
     ges.enqueueGameEvent(event, playerId);
+
+    return Response::RespOk;
+}
+
+// Cast count validation and command handlers
+
+Response::ResponseCode Server_Player::evaluateCreateCastCount(bool gameStarted,
+                                                              bool playerConceded,
+                                                              bool commandZoneEnabled,
+                                                              int index,
+                                                              bool exists,
+                                                              bool predecessorExists)
+{
+    if (!gameStarted) {
+        return Response::RespGameNotStarted;
+    }
+    if (playerConceded) {
+        return Response::RespContextError;
+    }
+    if (!commandZoneEnabled) {
+        return Response::RespContextError;
+    }
+    if (!CastCountIds::isValidIndex(index)) {
+        return Response::RespContextError;
+    }
+    if (exists) {
+        return Response::RespContextError;
+    }
+    if (index > 1 && !predecessorExists) {
+        return Response::RespContextError;
+    }
+    return Response::RespOk;
+}
+
+Response::ResponseCode Server_Player::evaluateDeleteCastCount(bool gameStarted,
+                                                              bool playerConceded,
+                                                              bool commandZoneEnabled,
+                                                              int index,
+                                                              bool exists,
+                                                              int value,
+                                                              bool successorExists)
+{
+    if (!gameStarted) {
+        return Response::RespGameNotStarted;
+    }
+    if (playerConceded) {
+        return Response::RespContextError;
+    }
+    if (!commandZoneEnabled) {
+        return Response::RespContextError;
+    }
+    if (!CastCountIds::isValidIndex(index)) {
+        return Response::RespContextError;
+    }
+    if (!exists) {
+        return Response::RespNameNotFound;
+    }
+    if (value != 0) {
+        return Response::RespContextError;
+    }
+    if (successorExists) {
+        return Response::RespContextError;
+    }
+    return Response::RespOk;
+}
+
+Response::ResponseCode Server_Player::evaluateModifyCastCount(bool gameStarted,
+                                                              bool playerConceded,
+                                                              bool commandZoneEnabled,
+                                                              int index,
+                                                              bool exists)
+{
+    if (!gameStarted) {
+        return Response::RespGameNotStarted;
+    }
+    if (playerConceded) {
+        return Response::RespContextError;
+    }
+    if (!commandZoneEnabled) {
+        return Response::RespContextError;
+    }
+    if (!CastCountIds::isValidIndex(index)) {
+        return Response::RespContextError;
+    }
+    if (!exists) {
+        return Response::RespNameNotFound;
+    }
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+Server_Player::cmdCreateCastCount(const Command_CreateCastCount &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    const int index = cmd.index();
+    bool exists = castCounts.contains(index);
+    bool predecessorExists = (index == 1) || castCounts.contains(index - 1);
+
+    const Response::ResponseCode authResult = evaluateCreateCastCount(
+        game->getGameStarted(), conceded, game->getEnableCommandZone(), index, exists, predecessorExists);
+    if (authResult != Response::RespOk) {
+        return authResult;
+    }
+
+    castCounts.insert(index, 0);
+
+    Event_CreateCastCount event;
+    event.set_index(index);
+    ges.enqueueGameEvent(event, playerId);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+Server_Player::cmdDeleteCastCount(const Command_DeleteCastCount &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    const int index = cmd.index();
+    bool exists = castCounts.contains(index);
+    int value = exists ? castCounts.value(index) : 0;
+    bool successorExists = castCounts.contains(index + 1);
+
+    const Response::ResponseCode authResult = evaluateDeleteCastCount(
+        game->getGameStarted(), conceded, game->getEnableCommandZone(), index, exists, value, successorExists);
+    if (authResult != Response::RespOk) {
+        return authResult;
+    }
+
+    castCounts.remove(index);
+
+    Event_DeleteCastCount event;
+    event.set_index(index);
+    ges.enqueueGameEvent(event, playerId);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+Server_Player::cmdIncCastCount(const Command_IncCastCount &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    const int index = cmd.index();
+    bool exists = castCounts.contains(index);
+
+    const Response::ResponseCode authResult =
+        evaluateModifyCastCount(game->getGameStarted(), conceded, game->getEnableCommandZone(), index, exists);
+    if (authResult != Response::RespOk) {
+        return authResult;
+    }
+
+    int oldValue = castCounts.value(index);
+    int newValue = qBound(0, oldValue + cmd.delta(), MAX_COUNTER_VALUE);
+    if (newValue != oldValue) {
+        castCounts.insert(index, newValue);
+        Event_SetCastCount event;
+        event.set_index(index);
+        event.set_value(newValue);
+        ges.enqueueGameEvent(event, playerId);
+    }
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+Server_Player::cmdSetCastCount(const Command_SetCastCount &cmd, ResponseContainer & /*rc*/, GameEventStorage &ges)
+{
+    const int index = cmd.index();
+    bool exists = castCounts.contains(index);
+
+    const Response::ResponseCode authResult =
+        evaluateModifyCastCount(game->getGameStarted(), conceded, game->getEnableCommandZone(), index, exists);
+    if (authResult != Response::RespOk) {
+        return authResult;
+    }
+
+    int oldValue = castCounts.value(index);
+    int newValue = qBound(0, cmd.value(), MAX_COUNTER_VALUE);
+    if (newValue != oldValue) {
+        castCounts.insert(index, newValue);
+        Event_SetCastCount event;
+        event.set_index(index);
+        event.set_value(newValue);
+        ges.enqueueGameEvent(event, playerId);
+    }
 
     return Response::RespOk;
 }
@@ -603,5 +828,11 @@ void Server_Player::getInfo(ServerInfo_Player *info,
 
     for (Server_Counter *counter : counters) {
         counter->getInfo(info->add_counter_list());
+    }
+
+    for (auto it = castCounts.constBegin(); it != castCounts.constEnd(); ++it) {
+        auto *castCount = info->add_cast_count_list();
+        castCount->set_index(it.key());
+        castCount->set_value(it.value());
     }
 }

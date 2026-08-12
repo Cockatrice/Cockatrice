@@ -8,6 +8,8 @@
 #define COCKATRICE_PLAYER_MENU_H
 
 #include "../../../interface/widgets/menus/tearoff_menu.h"
+#include "../../game/player/player_logic.h"
+#include "command_zone_menu.h"
 #include "custom_zone_menu.h"
 #include "grave_menu.h"
 #include "hand_menu.h"
@@ -69,6 +71,11 @@ public:
         return utilityMenu;
     }
 
+    [[nodiscard]] CommandZoneMenu *getCommandZoneMenu() const
+    {
+        return commandZoneMenu;
+    }
+
     [[nodiscard]] bool getShortcutsActive() const
     {
         return shortcutsActive;
@@ -91,6 +98,7 @@ private:
     UtilityMenu *utilityMenu;
     TallyMenu *tallyMenu;
     SayMenu *sayMenu;
+    CommandZoneMenu *commandZoneMenu;
     CustomZoneMenu *customZonesMenu;
 
     /** @brief Drives AbstractPlayerComponent lifecycle delegation. Counters are iterated separately via

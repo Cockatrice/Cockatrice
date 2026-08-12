@@ -90,7 +90,7 @@ public slots:
     void logSetActivePlayer(PlayerLogic *player);
     void logSetAnnotation(PlayerLogic *player, CardItem *card, QString newAnnotation);
     void logSetCardCounter(PlayerLogic *player, QString cardName, int counterId, int value, int oldValue);
-    void logSetCounter(PlayerLogic *player, QString counterName, int value, int oldValue);
+    void logSetCounter(PlayerLogic *player, int counterId, QString counterName, int value, int oldValue);
     void logSetDoesntUntap(PlayerLogic *player, CardItem *card, bool doesntUntap);
     void logSetPT(PlayerLogic *player, CardItem *card, QString newPT);
     void logSetSideboardLock(PlayerLogic *player, bool locked);

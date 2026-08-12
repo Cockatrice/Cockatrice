@@ -32,6 +32,10 @@ QRectF StackZone::boundingRect() const
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, getLogic()->getPlayer()->getZoneId());
+
+    QPointF scenePos = mapToScene(QPointF(0, 0));
+    painter->setBrushOrigin(-scenePos);
+
     painter->fillRect(boundingRect(), brush);
 }
 
@@ -43,19 +47,7 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
         return;
     }
 
-    const auto &cards = getLogic()->getCards();
-    int index;
-    if (startZone == getLogic()) {
-        // Reordering within the zone: use drop position
-        index = calcDropIndexFromY(dropPoint.y(), MIN_CARD_VISIBLE);
-        // Same-zone no-op: don't move a card onto itself
-        if (!cards.isEmpty() && cards.at(index)->getId() == dragItems.at(0)->getId()) {
-            return;
-        }
-    } else {
-        // Coming from another zone: append at end (top of stack, rendered on top)
-        index = static_cast<int>(cards.size());
-    }
+    int index = calcDropIndexFromY(dropPoint.y(), MIN_CARD_VISIBLE);
 
     Command_MoveCard cmd;
     cmd.set_start_player_id(startZone->getPlayer()->getPlayerInfo()->getId());

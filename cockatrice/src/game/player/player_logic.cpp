@@ -28,6 +28,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_zone.pb.h>
 #include <libcockatrice/utility/color.h>
+#include <libcockatrice/utility/counter_ids.h>
 
 PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent)
     : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
@@ -48,6 +49,9 @@ void PlayerLogic::initializeZones()
     bool visibleHand = playerInfo->getLocalOrJudge() ||
                        (game->getPlayerManager()->isSpectator() && game->getGameMetaInfo()->spectatorsOmniscient());
     addZone(new HandZoneLogic(this, ZoneNames::HAND, false, false, visibleHand, this));
+    if (game->getGameMetaInfo()->proto().enable_command_zone()) {
+        addZone(new CommandZoneLogic(this, ZoneNames::COMMAND, true, false, true, this));
+    }
 }
 
 PlayerLogic::~PlayerLogic()
@@ -104,7 +108,9 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                                       /* StackZone */
                                       ZoneNames::STACK,
                                       /* HandZone */
-                                      ZoneNames::HAND};
+                                      ZoneNames::HAND,
+                                      /* CommandZone */
+                                      ZoneNames::COMMAND};
     clearCounters();
     emit arrowsClearedLocally();
 
@@ -253,15 +259,17 @@ void PlayerLogic::setDeck(const DeckList &_deck)
 CounterState *PlayerLogic::addCounter(const ServerInfo_Counter &counter)
 {
     return addCounter(counter.id(), QString::fromStdString(counter.name()),
-                      convertColorToQColor(counter.counter_color()), counter.radius(), counter.count());
+                      convertColorToQColor(counter.counter_color()), counter.radius(), counter.count(),
+                      counter.active());
 }
 
-CounterState *PlayerLogic::addCounter(int id, const QString &name, const QColor &color, int radius, int value)
+CounterState *
+PlayerLogic::addCounter(int id, const QString &name, const QColor &color, int radius, int value, bool active)
 {
     if (counters.contains(id)) {
         return nullptr;
     }
-    auto *state = new CounterState(id, name, color, radius, value, this);
+    auto *state = new CounterState(id, name, color, radius, value, active, this);
     counters.insert(id, state);
     emit counterAdded(state);
     return state;
@@ -284,6 +292,49 @@ void PlayerLogic::clearCounters()
     }
     qDeleteAll(counters);
     counters.clear();
+
+    for (int index : castCounts.keys()) {
+        emit castCountRemoved(index);
+    }
+    qDeleteAll(castCounts);
+    castCounts.clear();
+}
+
+CounterState *PlayerLogic::addCastCount(int index)
+{
+    if (castCounts.contains(index)) {
+        return nullptr;
+    }
+    QString name = CastCountIds::nameForIndex(index);
+    auto *state = new CounterState(index, name, QColor(128, 128, 128), 20, 0, true, this);
+    castCounts.insert(index, state);
+    emit castCountAdded(index, state);
+    return state;
+}
+
+void PlayerLogic::delCastCount(int index)
+{
+    auto *state = castCounts.take(index);
+    if (!state) {
+        return;
+    }
+    emit castCountRemoved(index);
+    state->deleteLater();
+}
+
+void PlayerLogic::setCastCountValue(int index, int value)
+{
+    auto *state = castCounts.value(index, nullptr);
+    if (!state) {
+        return;
+    }
+    state->setValue(value);
+    emit castCountValueChanged(index, value);
+}
+
+CounterState *PlayerLogic::getCastCount(int index) const
+{
+    return castCounts.value(index, nullptr);
 }
 
 CounterState *PlayerLogic::getLifeCounter() const

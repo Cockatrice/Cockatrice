@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "game_event.proto";
+
+message Event_CreateCastCount {
+    extend GameEvent {
+        optional Event_CreateCastCount ext = 2024;
+    }
+    optional sint32 index = 1 [default = 1];
+}

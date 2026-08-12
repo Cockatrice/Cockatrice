@@ -48,6 +48,9 @@ message ServerInfo_Game {
     // decklists are sent to all players when loaded
     optional bool share_decklists_on_load = 15;
 
+    // command zone is enabled for Commander format
+    optional bool enable_command_zone = 16;
+
     // the current player count
     optional uint32 player_count = 30;
 

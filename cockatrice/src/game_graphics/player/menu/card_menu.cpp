@@ -3,6 +3,7 @@
 #include "../../../client/settings/card_counter_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
+#include "../../board/abstract_counter.h"
 #include "../../board/card_item.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
@@ -15,6 +16,7 @@
 #include <QPainter>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/zone_names.h>
 
 /**
@@ -82,6 +84,10 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     aUnattach = makeAction(this, [actions, sel]() { actions->actUnattach(sel()); });
     aSetAnnotation = makeAction(this, [actions, sel]() { actions->actRequestSetAnnotationDialog(sel()); });
     aPlay = makeAction(this, [actions, sel]() { actions->actPlay(sel()); });
+    aPlayAndIncrease1stCastCount =
+        makeAction(this, [actions, sel]() { actions->actPlayAndIncrease1stCastCount(sel()); });
+    aPlayAndIncrease2ndCastCount =
+        makeAction(this, [actions, sel]() { actions->actPlayAndIncrease2ndCastCount(sel()); });
     aPlayFacedown = makeAction(this, [actions, sel]() { actions->actPlayFacedown(sel()); });
     aHide = makeAction(this, [actions, sel]() { actions->actHide(sel()); });
     aReduceLifeByPower = makeAction(this, [actions, sel]() { actions->actReduceLifeByPower(sel()); });
@@ -158,6 +164,37 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
             } else if (card->getZone()->getName() == ZoneNames::EXILE ||
                        card->getZone()->getName() == ZoneNames::GRAVE) {
                 createGraveyardOrExileMenu(writeableCard);
+            } else if (card->getZone()->getName() == ZoneNames::COMMAND) {
+                if (writeableCard) {
+                    addAction(aPlay);
+
+                    // Only offer for single selection: a multi-select would over-count casts
+                    const bool singleSelection = gameScene->selectedCards().size() <= 1;
+
+                    if (singleSelection && player->getCastCountWidget(1)) {
+                        addAction(aPlayAndIncrease1stCastCount);
+                    }
+
+                    if (singleSelection && player->getCastCountWidget(2)) {
+                        addAction(aPlayAndIncrease2ndCastCount);
+                    }
+
+                    // No reveal submenu - command zone is public
+                    addSeparator();
+                    addAction(aClone);
+                    addMenu(new MoveMenu(player, this));
+                    addSeparator();
+                    addAction(aAttach);
+                    addAction(aDrawArrow);
+                } else {
+                    addAction(aDrawArrow);
+                    addSeparator();
+                    addAction(aClone);
+                }
+                addSeparator();
+                addAction(aSelectAll);
+                addRelatedCardView();
+                addRelatedCardActions();
             } else {
                 createHandOrCustomZoneMenu(writeableCard);
             }
@@ -203,7 +240,7 @@ void CardMenu::createTableMenu(bool canModifyCard)
     }
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     if (card->getAttachedTo()) {
@@ -253,7 +290,7 @@ void CardMenu::createStackMenu(bool canModifyCard)
     addAction(aPlayFacedown);
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     addAction(aDrawArrow);
@@ -282,7 +319,7 @@ void CardMenu::createGraveyardOrExileMenu(bool canModifyCard)
     addAction(aPlayFacedown);
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
     addSeparator();
     addAction(aAttach);
     addAction(aDrawArrow);
@@ -320,7 +357,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
 
     addSeparator();
     addAction(aClone);
-    addMenu(new MoveMenu(player));
+    addMenu(new MoveMenu(player, this));
 
     // actions that are really wonky when done from deck or sideboard
     if (card->getZone()->getName() == ZoneNames::HAND) {
@@ -344,7 +381,7 @@ void CardMenu::createHandOrCustomZoneMenu(bool canModifyCard)
 void CardMenu::createZonelessMenu(bool canModifyCard)
 {
     if (canModifyCard) {
-        addMenu(new MoveMenu(player));
+        addMenu(new MoveMenu(player, this));
     }
 }
 
@@ -488,6 +525,8 @@ void CardMenu::retranslateUi()
     aPlay->setText(tr("&Play"));
     aHide->setText(tr("&Hide"));
     aPlayFacedown->setText(tr("Play &Face Down"));
+    aPlayAndIncrease1stCastCount->setText(tr("Play and &Increase 1st Cast Count"));
+    aPlayAndIncrease2ndCastCount->setText(tr("Play and Increase &2nd Cast Count"));
     aRevealToAll->setText(tr("&All players"));
     //: Turn sideways or back again
     aTap->setText(tr("&Tap / Untap"));

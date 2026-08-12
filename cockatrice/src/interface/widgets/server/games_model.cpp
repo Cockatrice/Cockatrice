@@ -158,6 +158,9 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                     if (gameentry.share_decklists_on_load()) {
                         result.append(tr("open decklists"));
                     }
+                    if (gameentry.enable_command_zone()) {
+                        result.append(tr("command zone"));
+                    }
                     return result.join(", ");
                 }
                 case Qt::DecorationRole: {
@@ -346,9 +349,9 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
     setGameFilters({gameFilters.isHideBuddiesOnlyGames(), gameFilters.isHideIgnoredUserGames(),
                     gameFilters.isHideFullGames(), gameFilters.isHideGamesThatStarted(),
                     gameFilters.isHidePasswordProtectedGames(), gameFilters.isHideNotBuddyCreatedGames(),
-                    gameFilters.isHideOpenDecklistGames(), gameFilters.getGameNameFilter(),
-                    gameFilters.getCreatorNameFilters(), newGameTypeFilter, gameFilters.getMinPlayers(),
-                    gameFilters.getMaxPlayers(), gameFilters.getMaxGameAge(),
+                    gameFilters.isHideOpenDecklistGames(), gameFilters.isHideCommandZoneGames(),
+                    gameFilters.getGameNameFilter(), gameFilters.getCreatorNameFilters(), newGameTypeFilter,
+                    gameFilters.getMinPlayers(), gameFilters.getMaxPlayers(), gameFilters.getMaxGameAge(),
                     gameFilters.isShowOnlyIfSpectatorsCanWatch(), gameFilters.isShowSpectatorPasswordProtected(),
                     gameFilters.isShowOnlyIfSpectatorsCanChat(), gameFilters.isShowOnlyIfSpectatorsCanSeeHands()});
 }
@@ -363,6 +366,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     gameFilters.setHideIgnoredUserGames(filters.hideIgnoredUserGames);
     gameFilters.setHideNotBuddyCreatedGames(filters.hideNotBuddyCreatedGames);
     gameFilters.setHideOpenDecklistGames(filters.hideOpenDecklistGames);
+    gameFilters.setHideCommandZoneGames(filters.hideCommandZoneGames);
     gameFilters.setGameNameFilter(filters.gameNameFilter);
     gameFilters.setCreatorNameFilters(filters.creatorNameFilters);
 
@@ -406,6 +410,9 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
         return false;
     }
     if (filters.hideOpenDecklistGames && game.share_decklists_on_load()) {
+        return false;
+    }
+    if (filters.hideCommandZoneGames && game.enable_command_zone()) {
         return false;
     }
     if (filters.hideIgnoredUserGames &&

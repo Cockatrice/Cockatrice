@@ -15,10 +15,12 @@
 #include <libcockatrice/protocol/pb/event_attach_card.pb.h>
 #include <libcockatrice/protocol/pb/event_change_zone_properties.pb.h>
 #include <libcockatrice/protocol/pb/event_create_arrow.pb.h>
+#include <libcockatrice/protocol/pb/event_create_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/event_create_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_create_token.pb.h>
 #include <libcockatrice/protocol/pb/event_del_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_delete_arrow.pb.h>
+#include <libcockatrice/protocol/pb/event_delete_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/event_destroy_card.pb.h>
 #include <libcockatrice/protocol/pb/event_draw_cards.pb.h>
 #include <libcockatrice/protocol/pb/event_dump_zone.pb.h>
@@ -30,6 +32,7 @@
 #include <libcockatrice/protocol/pb/event_roll_die.pb.h>
 #include <libcockatrice/protocol/pb/event_set_card_attr.pb.h>
 #include <libcockatrice/protocol/pb/event_set_card_counter.pb.h>
+#include <libcockatrice/protocol/pb/event_set_cast_count.pb.h>
 #include <libcockatrice/protocol/pb/event_set_counter.pb.h>
 #include <libcockatrice/protocol/pb/event_shuffle.pb.h>
 #include <libcockatrice/utility/color.h>
@@ -264,18 +267,36 @@ void PlayerEventHandler::eventCreateCounter(const Event_CreateCounter &event)
 
 void PlayerEventHandler::eventSetCounter(const Event_SetCounter &event)
 {
-    CounterState *ctr = player->getCounters().value(event.counter_id(), nullptr);
-    if (!ctr) {
+    CounterState *state = player->getCounters().value(event.counter_id(), nullptr);
+    if (!state) {
         return;
     }
-    int oldValue = ctr->getValue();
-    ctr->setValue(event.value());
-    emit logSetCounter(player, ctr->getName(), event.value(), oldValue);
+    int oldValue = state->getValue();
+    state->setValue(event.value());
+
+    if (event.value() != oldValue) {
+        emit logSetCounter(player, state->getId(), state->getName(), event.value(), oldValue);
+    }
 }
 
 void PlayerEventHandler::eventDelCounter(const Event_DelCounter &event)
 {
     player->delCounter(event.counter_id());
+}
+
+void PlayerEventHandler::eventCreateCastCount(const Event_CreateCastCount &event)
+{
+    player->addCastCount(event.index());
+}
+
+void PlayerEventHandler::eventDeleteCastCount(const Event_DeleteCastCount &event)
+{
+    player->delCastCount(event.index());
+}
+
+void PlayerEventHandler::eventSetCastCount(const Event_SetCastCount &event)
+{
+    player->setCastCountValue(event.index(), event.value());
 }
 
 void PlayerEventHandler::eventDumpZone(const Event_DumpZone &event)
@@ -629,6 +650,15 @@ void PlayerEventHandler::processGameEvent(GameEvent::GameEventType type,
             break;
         case GameEvent::DEL_COUNTER:
             eventDelCounter(event.GetExtension(Event_DelCounter::ext));
+            break;
+        case GameEvent::CREATE_CAST_COUNT:
+            eventCreateCastCount(event.GetExtension(Event_CreateCastCount::ext));
+            break;
+        case GameEvent::DELETE_CAST_COUNT:
+            eventDeleteCastCount(event.GetExtension(Event_DeleteCastCount::ext));
+            break;
+        case GameEvent::SET_CAST_COUNT:
+            eventSetCastCount(event.GetExtension(Event_SetCastCount::ext));
             break;
         case GameEvent::DUMP_ZONE:
             eventDumpZone(event.GetExtension(Event_DumpZone::ext));

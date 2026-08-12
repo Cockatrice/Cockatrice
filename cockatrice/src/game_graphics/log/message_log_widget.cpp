@@ -10,6 +10,7 @@
 
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
+#include <libcockatrice/utility/counter_ids.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <utility>
 
@@ -80,6 +81,8 @@ MessageLogWidget::getFromStr(CardZoneLogic *zone, QString cardName, int position
         fromStr = tr(" from sideboard");
     } else if (zoneName == ZoneNames::STACK) {
         fromStr = tr(" from the stack");
+    } else if (zoneName == ZoneNames::COMMAND) {
+        fromStr = tr(" from the command zone");
     } else {
         fromStr = tr(" from custom zone '%1'").arg(zoneName);
     }
@@ -344,6 +347,8 @@ void MessageLogWidget::logMoveCard(PlayerLogic *player,
         } else {
             finalStr = tr("%1 plays %2%3.");
         }
+    } else if (targetZoneName == ZoneNames::COMMAND) {
+        finalStr = tr("%1 moves %2%3 to the command zone.");
     } else {
         fourthArg = targetZoneName;
         if (card->getFaceDown()) {
@@ -665,8 +670,9 @@ void MessageLogWidget::logSetCardCounter(PlayerLogic *player, QString cardName, 
                                 .arg(value));
 }
 
-void MessageLogWidget::logSetCounter(PlayerLogic *player, QString counterName, int value, int oldValue)
+void MessageLogWidget::logSetCounter(PlayerLogic *player, int counterId, QString counterName, int value, int oldValue)
 {
+    Q_UNUSED(counterId);
     if (counterName == "life") {
         soundEngine->playSound("life_change");
     }

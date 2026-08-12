@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "game_commands.proto";
+
+message Command_IncCastCount {
+    extend GameCommand {
+        optional Command_IncCastCount ext = 1038;
+    }
+    optional sint32 index = 1 [default = 1];
+    optional sint32 delta = 2 [default = 1];
+}

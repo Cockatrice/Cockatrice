@@ -6,7 +6,7 @@
 #include "../card_menu_action_type.h"
 #include "../player_graphics_item.h"
 
-MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
+MoveMenu::MoveMenu(PlayerGraphicsItem *player, QWidget *parent) : QMenu(tr("Move to"), parent)
 {
     aMoveToTopLibrary = new QAction(this);
     aMoveToTopLibrary->setData(cmMoveToTopLibrary);
@@ -21,6 +21,8 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     aMoveToGraveyard->setData(cmMoveToGraveyard);
     aMoveToExile = new QAction(this);
     aMoveToExile->setData(cmMoveToExile);
+    aMoveToCommandZone = new QAction(this);
+    aMoveToCommandZone->setData(cmMoveToCommandZone);
 
     auto *actions = player->getLogic()->getPlayerActions();
 
@@ -38,6 +40,7 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     connect(aMoveToHand, &QAction::triggered, actions, invoke(cmMoveToHand));
     connect(aMoveToGraveyard, &QAction::triggered, actions, invoke(cmMoveToGraveyard));
     connect(aMoveToExile, &QAction::triggered, actions, invoke(cmMoveToExile));
+    connect(aMoveToCommandZone, &QAction::triggered, actions, invoke(cmMoveToCommandZone));
 
     addAction(aMoveToTopLibrary);
     addAction(aMoveToXfromTopOfLibrary);
@@ -50,6 +53,9 @@ MoveMenu::MoveMenu(PlayerGraphicsItem *player) : QMenu(tr("Move to"))
     addAction(aMoveToGraveyard);
     addSeparator();
     addAction(aMoveToExile);
+    addSeparator();
+    addAction(aMoveToCommandZone);
+    aMoveToCommandZone->setVisible(player->getLogic()->hasCommandZone());
 
     setShortcutsActive();
 
@@ -66,6 +72,7 @@ void MoveMenu::setShortcutsActive()
     aMoveToHand->setShortcuts(shortcuts.getShortcut("Player/aMoveToHand"));
     aMoveToGraveyard->setShortcuts(shortcuts.getShortcut("Player/aMoveToGraveyard"));
     aMoveToExile->setShortcuts(shortcuts.getShortcut("Player/aMoveToExile"));
+    aMoveToCommandZone->setShortcuts(shortcuts.getShortcut("Player/aMoveToCommandZone"));
 }
 
 void MoveMenu::retranslateUi()
@@ -77,4 +84,5 @@ void MoveMenu::retranslateUi()
     aMoveToHand->setText(tr("&Hand"));
     aMoveToGraveyard->setText(tr("&Graveyard"));
     aMoveToExile->setText(tr("&Exile"));
+    aMoveToCommandZone->setText(tr("&Command Zone"));
 }
