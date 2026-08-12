@@ -199,13 +199,15 @@ void PlayerEventHandler::setCardAttrHelper(const GameEventContext &context,
     switch (attribute) {
         case AttrTapped: {
             bool tapped = avalue == "1";
-            if (!(!tapped && card->getDoesntUntap() && allCards)) {
+            if (!(!tapped && card->getDoesntUntap() && allCards) && !(!tapped && card->getDoesntUntapOnce() && allCards)) {
                 if (!allCards) {
                     emit logSetTapped(player, card, tapped);
                 }
                 bool canAnimate = !options.testFlag(SKIP_TAP_ANIMATION) && !moveCardContext;
                 card->setTapped(tapped, canAnimate);
-            }
+            } else if (!tapped && card->getDoesntUntapOnce() && allCards) {
+				card->setDoesntUntapOnce(false);
+			}
             break;
         }
         case AttrAttacking: {
