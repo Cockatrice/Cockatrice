@@ -90,6 +90,7 @@ MessagesSettingsPage::MessagesSettingsPage()
     highlightNotice->addWidget(&hexHighlightLabel, 1, 2);
     highlightNotice->addWidget(customAlertString, 0, 0);
     highlightNotice->addWidget(&customAlertStringLabel, 1, 0);
+    customAlertStringLabel.setBuddy(customAlertString);
     highlightGroupBox = new QGroupBox;
     highlightGroupBox->setLayout(highlightNotice);
 

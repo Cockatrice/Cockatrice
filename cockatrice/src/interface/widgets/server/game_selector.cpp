@@ -26,6 +26,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
 
 GameSelector::GameSelector(AbstractClient *_client,
                            TabSupervisor *_tabSupervisor,
@@ -83,12 +84,12 @@ GameSelector::GameSelector(AbstractClient *_client,
     if (showFilters && restoresettings) {
         quickFilterToolBar = new GameSelectorQuickFilterToolBar(this, tabSupervisor, gameListProxyModel, gameTypeMap);
         quickFilterToolBar->setVisible(showFilters && restoresettings &&
-                                       SettingsCache::instance().cardsDisplay().getShowGameSelectorFilterToolbar());
+                                       SettingsCache::instance().userInterface().getShowGameSelectorFilterToolbar());
 
-        connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::showGameSelectorFilterToolbarChanged,
+        connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::showGameSelectorFilterToolbarChanged,
                 this, [this] {
                     quickFilterToolBar->setVisible(
-                        SettingsCache::instance().cardsDisplay().getShowGameSelectorFilterToolbar());
+                        SettingsCache::instance().userInterface().getShowGameSelectorFilterToolbar());
                 });
     } else {
         quickFilterToolBar = nullptr;

@@ -23,6 +23,7 @@
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QScreen>
 #include <QSpinBox>
 #include <QWidget>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -30,7 +31,7 @@
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
 #include <libcockatrice/protocol/pb/response_get_user_info.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/appearance_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(parent)
@@ -349,7 +350,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
 
 QSize UserListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (!SettingsCache::instance().interface().getStyleUserList()) {
+    if (!SettingsCache::instance().appearance().getStyleUserList()) {
         return QStyledItemDelegate::sizeHint(option, index);
     }
     return UserListPainter::sizeHint();
@@ -357,7 +358,7 @@ QSize UserListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const Q
 
 void UserListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (!SettingsCache::instance().interface().getStyleUserList()) {
+    if (!SettingsCache::instance().appearance().getStyleUserList()) {
         QStyledItemDelegate::paint(painter, option, index);
         return;
     }
@@ -495,8 +496,6 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     m_userInfoPopup->setWindowOpacity(0.0);
     m_userInfoPopup->installEventFilter(this);
 
-    connectPopupSignals();
-
     m_showPopupTimer = new QTimer(this);
     m_showPopupTimer->setSingleShot(true);
     m_showPopupTimer->setInterval(280);
@@ -515,13 +514,15 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
         }
     });
 
+    connectPopupSignals();
+
     userTree->setMouseTracking(true);
     userTree->viewport()->setMouseTracking(true);
     userTree->viewport()->installEventFilter(this);
 
     // Pin on item click
     connect(userTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item, int) {
-        if (!SettingsCache::instance().interface().getStyleUserList()) {
+        if (!SettingsCache::instance().appearance().getStyleUserList()) {
             return;
         }
         const QString name = static_cast<UserListTWI *>(item)->getUserInfo().name().c_str();
@@ -543,17 +544,16 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     connect(userTree->verticalScrollBar(), &QScrollBar::valueChanged, this, [this] {
         m_showPopupTimer->stop();
         hidePopup(true);
+        requestAvatarsForVisibleItems();
     });
 
     // Forward join requests from popup upward
     connect(m_userInfoPopup, &UserInfoPopup::joinGameRequested, this, &UserListWidget::joinGameRequested);
 
-    connect(avatarProvider, &UserAvatarProvider::avatarUpdated, this,
-            [this](const QString &) { userTree->viewport()->update(); });
-    connect(cardArtProvider, &UserCardArtProvider::cardArtUpdated, this,
-            [this](const QString &) { userTree->viewport()->update(); });
+    connect(avatarProvider, &UserAvatarProvider::avatarUpdated, this, &UserListWidget::refreshVisibleUserHeader);
+    connect(cardArtProvider, &UserCardArtProvider::cardArtUpdated, this, &UserListWidget::refreshVisibleUserHeader);
 
-    connect(&SettingsCache::instance().interface(), &InterfaceSettings::styleUserListChanged, this,
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::styleUserListChanged, this,
             &UserListWidget::applyDisplayMode);
     applyDisplayMode();
 
@@ -633,6 +633,14 @@ void UserListWidget::bind(UserListManager *mgr)
     rebuild();
 }
 
+void UserListWidget::refreshVisibleUserHeader(const QString &name)
+{
+    userTree->viewport()->update();
+    if (m_userInfoPopup->isVisible() && m_userInfoPopup->currentUser() == name) {
+        m_userInfoPopup->refreshHeader();
+    }
+}
+
 void UserListWidget::refreshPopupButtons(const QString &userName)
 {
     UserListTWI *item = users.value(userName);
@@ -657,9 +665,15 @@ void UserListWidget::hideEvent(QHideEvent *e)
     hidePopup(true);
 }
 
+void UserListWidget::showEvent(QShowEvent *e)
+{
+    QGroupBox::showEvent(e);
+    requestAvatarsForVisibleItems();
+}
+
 void UserListWidget::applyDisplayMode()
 {
-    const bool styled = SettingsCache::instance().interface().getStyleUserList();
+    const bool styled = SettingsCache::instance().appearance().getStyleUserList();
 
     if (styled) {
         userTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -718,7 +732,7 @@ bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj == userTree->viewport()) {
         if (event->type() == QEvent::MouseMove) {
-            if (!SettingsCache::instance().interface().getStyleUserList()) {
+            if (!SettingsCache::instance().appearance().getStyleUserList()) {
                 return QGroupBox::eventFilter(obj, event);
             }
             auto *me = static_cast<QMouseEvent *>(event);
@@ -757,6 +771,8 @@ void UserListWidget::showPopupForUser(const QString &userName)
     if (!item) {
         return;
     }
+
+    avatarProvider->requestAvatar(userName); // ensure the hovered user's avatar is fetched promptly
 
     const ServerInfo_User &info = item->getUserInfo();
     const bool online = item->data(0, UserListRoles::Online).toBool();
@@ -801,7 +817,12 @@ void UserListWidget::positionPopup(const QString &userName)
     const int popH = m_userInfoPopup->height();
     const int margin = 12;
 
-    const QRect screen = QGuiApplication::primaryScreen()->availableGeometry();
+    QScreen *activeScreen = QGuiApplication::screenAt(itemTL);
+    if (!activeScreen) {
+        activeScreen = window()->screen();
+    }
+    const QRect screen =
+        activeScreen ? activeScreen->availableGeometry() : QGuiApplication::primaryScreen()->availableGeometry();
 
     // ── X: prefer the side with more space ───────────────────────────────────
     const int spaceLeft = vpTL.x() - screen.left() - margin;
@@ -875,6 +896,38 @@ void UserListWidget::retranslateUi()
     updateCount();
 }
 
+void UserListWidget::beginBulkLoad()
+{
+    m_bulkLoading = true;
+}
+
+void UserListWidget::endBulkLoad()
+{
+    m_bulkLoading = false;
+    sortItems();
+    requestAvatarsForVisibleItems();
+    userTree->viewport()->update();
+}
+
+bool UserListWidget::isItemNearViewport(const UserListTWI *item) const
+{
+    // Prefetch a full viewport of rows above and below so scrolling never shows
+    // an unloaded row.
+    const QRect nearView =
+        userTree->viewport()->rect().adjusted(0, -userTree->viewport()->height(), 0, userTree->viewport()->height());
+    return userTree->visualItemRect(item).intersects(nearView);
+}
+
+void UserListWidget::requestAvatarsForVisibleItems()
+{
+    for (int i = 0; i < userTree->topLevelItemCount(); ++i) {
+        auto *twi = static_cast<UserListTWI *>(userTree->topLevelItem(i));
+        if (isItemNearViewport(twi)) {
+            avatarProvider->requestAvatar(QString::fromStdString(twi->getUserInfo().name()));
+        }
+    }
+}
+
 void UserListWidget::rebuild()
 {
     userTree->clear();
@@ -901,11 +954,11 @@ void UserListWidget::rebuild()
             break;
     }
 
+    beginBulkLoad();
     for (auto it = source->cbegin(); it != source->cend(); ++it) {
         processUserInfo(it.value(), manager->getOnlineUser(it.key()) != nullptr);
     }
-
-    sortItems();
+    endBulkLoad();
 }
 
 void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
@@ -940,11 +993,15 @@ void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
             ++onlineCount;
         }
         updateCount();
-        avatarProvider->requestAvatar(userName);
+        if (!m_bulkLoading && isItemNearViewport(item)) {
+            avatarProvider->requestAvatar(userName);
+        }
     }
     item->setOnline(online);
-    sortItems();
-    userTree->viewport()->update();
+    if (!m_bulkLoading) {
+        sortItems();
+        userTree->viewport()->update();
+    }
 }
 
 bool UserListWidget::deleteUser(const QString &userName)

@@ -28,7 +28,9 @@ class CardDatabaseSettings;
 class CardOverrideSettings;
 class CardsDisplaySettings;
 class ChatSettings;
+class CommanderBracketSettings;
 class DebugSettings;
+class DeckEditorSettings;
 class DownloadSettings;
 class GameFiltersSettings;
 class GameSettings;
@@ -44,6 +46,8 @@ class SoundSettings;
 class TabsSettings;
 class UpdatesSettings;
 class VisualDeckStorageSettings;
+class AppearanceSettings;
+class NetworkSettings;
 class QSettings;
 
 class SettingsCache : public ICardDatabasePathProvider, public INetworkSettingsProvider
@@ -75,8 +79,12 @@ private:
     PersonalSettings *personalSettings;
     CardsDisplaySettings *cardsDisplaySettings;
     InterfaceSettings *interfaceSettings;
+    DeckEditorSettings *deckEditorSettings;
     PathsSettings *pathsSettings;
     VisualDeckStorageSettings *visualDeckStorageSettings;
+    AppearanceSettings *appearanceSettings;
+    NetworkSettings *networkSettings;
+    CommanderBracketSettings *commanderBracketSettings;
 
     QString themeName;
 
@@ -138,9 +146,16 @@ public:
     [[nodiscard]] UpdatesSettings &updates() const;
     [[nodiscard]] PersonalSettings &personal() const;
     [[nodiscard]] CardsDisplaySettings &cardsDisplay() const;
-    [[nodiscard]] InterfaceSettings &interface() const;
+    [[nodiscard]] InterfaceSettings &userInterface() const;
+    [[nodiscard]] DeckEditorSettings &deckEditor() const;
     [[nodiscard]] PathsSettings &paths() const;
     [[nodiscard]] VisualDeckStorageSettings &visualDeckStorage() const;
+    [[nodiscard]] AppearanceSettings &appearance() const;
+    [[nodiscard]] NetworkSettings &network() const;
+    [[nodiscard]] CommanderBracketSettings &commanderBrackets() const
+    {
+        return *commanderBracketSettings;
+    }
 
     [[nodiscard]] bool getIsPortableBuild() const
     {

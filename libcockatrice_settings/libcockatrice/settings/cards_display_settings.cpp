@@ -7,32 +7,32 @@ CardsDisplaySettings::CardsDisplaySettings(const QString &settingPath, QObject *
 
 bool CardsDisplaySettings::getDisplayCardNames() const
 {
-    return getValue("displaycardnames", QString(), QString(), true).toBool();
+    return getValue("displayCardNames", QString(), QString(), true).toBool();
 }
 
 bool CardsDisplaySettings::getRoundCardCorners() const
 {
-    return getValue("roundcardcorners", QString(), QString(), true).toBool();
+    return getValue("roundCardCorners", QString(), QString(), true).toBool();
 }
 
 bool CardsDisplaySettings::getOverrideAllCardArtWithPersonalPreference() const
 {
-    return getValue("overrideallcardartwithpersonalpreference", QString(), QString(), false).toBool();
+    return getValue("overrideAllCardArtWithPersonalPreference", QString(), QString(), false).toBool();
 }
 
 bool CardsDisplaySettings::getBumpSetsWithCardsInDeckToTop() const
 {
-    return getValue("bumpsetswithcardsindecktotop", QString(), QString(), true).toBool();
+    return getValue("bumpSetsWithCardsInDeckToTop", QString(), QString(), true).toBool();
 }
 
 int CardsDisplaySettings::getPrintingSelectorSortOrder() const
 {
-    return getValue("printingselectorsortorder", QString(), QString(), 1).toInt();
+    return getValue("sortOrder", "cards", "printingSelector", 1).toInt();
 }
 
 int CardsDisplaySettings::getPrintingSelectorCardSize() const
 {
-    return getValue("printingselectorcardsize", QString(), QString(), 100).toInt();
+    return getValue("printingSelector", "cards", "cardSize", 100).toInt();
 }
 
 bool CardsDisplaySettings::getIncludeRebalancedCards() const
@@ -42,27 +42,17 @@ bool CardsDisplaySettings::getIncludeRebalancedCards() const
 
 bool CardsDisplaySettings::getPrintingSelectorNavigationButtonsVisible() const
 {
-    return getValue("printingselectornavigationbuttonsvisible", QString(), QString(), true).toBool();
-}
-
-bool CardsDisplaySettings::getDeckEditorBannerCardComboBoxVisible() const
-{
-    return getValue("deckeditorbannercardcomboboxvisible", "interface", QString(), true).toBool();
-}
-
-bool CardsDisplaySettings::getDeckEditorTagsWidgetVisible() const
-{
-    return getValue("deckeditortagswidgetvisible", "interface", QString(), true).toBool();
+    return getValue("navigationButtonsVisible", "cards", "printingSelector", true).toBool();
 }
 
 bool CardsDisplaySettings::getTapAnimation() const
 {
-    return getValue("tapanimation", QString(), QString(), true).toBool();
+    return getValue("tapAnimation", QString(), QString(), true).toBool();
 }
 
 bool CardsDisplaySettings::getAutoRotateSidewaysLayoutCards() const
 {
-    return getValue("autorotatesidewayslayoutcards", QString(), QString(), true).toBool();
+    return getValue("autoRotateSidewaysLayoutCards", QString(), QString(), true).toBool();
 }
 
 bool CardsDisplaySettings::getScaleCards() const
@@ -77,22 +67,42 @@ int CardsDisplaySettings::getStackCardOverlapPercent() const
 
 int CardsDisplaySettings::getCardInfoViewMode() const
 {
-    return getValue("cardinfoviewmode", QString(), QString(), 0).toInt();
+    return getValue("cardInfoViewMode", QString(), QString(), 0).toInt();
 }
 
-bool CardsDisplaySettings::getShowShortcuts() const
+int CardsDisplaySettings::getVisualDeckStorageCardSize() const
 {
-    return getValue("showshortcuts", "menu", QString(), true).toBool();
+    return getValue("visualDeckStorage", "cards", "cardSize", 100).toInt();
 }
 
-bool CardsDisplaySettings::getShowGameSelectorFilterToolbar() const
+int CardsDisplaySettings::getVisualDatabaseDisplayCardSize() const
 {
-    return getValue("showgameselectorfiltertoolbar", "menu", QString(), true).toBool();
+    return getValue("visualDatabaseDisplay", "cards", "cardSize", 100).toInt();
+}
+
+int CardsDisplaySettings::getVisualDeckEditorCardSize() const
+{
+    return getValue("visualDeckEditor", "cards", "cardSize", 100).toInt();
+}
+
+int CardsDisplaySettings::getEDHRecCardSize() const
+{
+    return getValue("edhrec", "cards", "cardSize", 100).toInt();
+}
+
+int CardsDisplaySettings::getArchidektPreviewSize() const
+{
+    return getValue("archidektPreview", "cards", "cardSize", 100).toInt();
+}
+
+int CardsDisplaySettings::getSampleHandSize() const
+{
+    return getValue("sampleHandSize", "cards", "cardSize", 7).toInt();
 }
 
 void CardsDisplaySettings::setDisplayCardNames(bool _displayCardNames)
 {
-    setValue(_displayCardNames, "displaycardnames");
+    setValue(_displayCardNames, "displayCardNames");
     emit displayCardNamesChanged();
 }
 
@@ -101,31 +111,31 @@ void CardsDisplaySettings::setRoundCardCorners(bool _roundCardCorners)
     if (_roundCardCorners == getRoundCardCorners()) {
         return;
     }
-    setValue(_roundCardCorners, "roundcardcorners");
+    setValue(_roundCardCorners, "roundCardCorners");
     emit roundCardCornersChanged(_roundCardCorners);
 }
 
 void CardsDisplaySettings::setOverrideAllCardArtWithPersonalPreference(bool _overrideAllCardArt)
 {
-    setValue(_overrideAllCardArt, "overrideallcardartwithpersonalpreference");
+    setValue(_overrideAllCardArt, "overrideAllCardArtWithPersonalPreference");
     emit overrideAllCardArtWithPersonalPreferenceChanged(_overrideAllCardArt);
 }
 
 void CardsDisplaySettings::setBumpSetsWithCardsInDeckToTop(bool _bumpSetsWithCardsInDeckToTop)
 {
-    setValue(_bumpSetsWithCardsInDeckToTop, "bumpsetswithcardsindecktotop");
+    setValue(_bumpSetsWithCardsInDeckToTop, "bumpSetsWithCardsInDeckToTop");
     emit bumpSetsWithCardsInDeckToTopChanged();
 }
 
 void CardsDisplaySettings::setPrintingSelectorSortOrder(int _printingSelectorSortOrder)
 {
-    setValue(_printingSelectorSortOrder, "printingselectorsortorder");
+    setValue(_printingSelectorSortOrder, "sortOrder", "cards", "printingSelector");
     emit printingSelectorSortOrderChanged();
 }
 
 void CardsDisplaySettings::setPrintingSelectorCardSize(int _printingSelectorCardSize)
 {
-    setValue(_printingSelectorCardSize, "printingselectorcardsize");
+    setValue(_printingSelectorCardSize, "printingSelector", "cards", "cardSize");
     emit printingSelectorCardSizeChanged();
 }
 
@@ -140,30 +150,18 @@ void CardsDisplaySettings::setIncludeRebalancedCards(bool _includeRebalancedCard
 
 void CardsDisplaySettings::setPrintingSelectorNavigationButtonsVisible(bool _navigationButtonsVisible)
 {
-    setValue(_navigationButtonsVisible, "printingselectornavigationbuttonsvisible");
+    setValue(_navigationButtonsVisible, "navigationButtonsVisible", "cards", "printingSelector");
     emit printingSelectorNavigationButtonsVisibleChanged();
-}
-
-void CardsDisplaySettings::setDeckEditorBannerCardComboBoxVisible(bool _deckEditorBannerCardComboBoxVisible)
-{
-    setValue(_deckEditorBannerCardComboBoxVisible, "deckeditorbannercardcomboboxvisible", "interface");
-    emit deckEditorBannerCardComboBoxVisibleChanged(_deckEditorBannerCardComboBoxVisible);
-}
-
-void CardsDisplaySettings::setDeckEditorTagsWidgetVisible(bool _deckEditorTagsWidgetVisible)
-{
-    setValue(_deckEditorTagsWidgetVisible, "deckeditortagswidgetvisible", "interface");
-    emit deckEditorTagsWidgetVisibleChanged(_deckEditorTagsWidgetVisible);
 }
 
 void CardsDisplaySettings::setTapAnimation(bool _tapAnimation)
 {
-    setValue(_tapAnimation, "tapanimation");
+    setValue(_tapAnimation, "tapAnimation");
 }
 
 void CardsDisplaySettings::setAutoRotateSidewaysLayoutCards(bool _autoRotateSidewaysLayoutCards)
 {
-    setValue(_autoRotateSidewaysLayoutCards, "autorotatesidewayslayoutcards");
+    setValue(_autoRotateSidewaysLayoutCards, "autoRotateSidewaysLayoutCards");
 }
 
 void CardsDisplaySettings::setCardScaling(bool _scaleCards)
@@ -178,16 +176,41 @@ void CardsDisplaySettings::setStackCardOverlapPercent(int _verticalCardOverlapPe
 
 void CardsDisplaySettings::setCardInfoViewMode(int _viewMode)
 {
-    setValue(_viewMode, "cardinfoviewmode");
+    setValue(_viewMode, "cardInfoViewMode");
 }
 
-void CardsDisplaySettings::setShowShortcuts(bool _showShortcuts)
+void CardsDisplaySettings::setVisualDeckStorageCardSize(int _cardSize)
 {
-    setValue(_showShortcuts, "showshortcuts", "menu");
+    setValue(_cardSize, "visualDeckStorage", "cards", "cardSize");
+    emit visualDeckStorageCardSizeChanged();
 }
 
-void CardsDisplaySettings::setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar)
+void CardsDisplaySettings::setVisualDatabaseDisplayCardSize(int _cardSize)
 {
-    setValue(_showGameSelectorFilterToolbar, "showgameselectorfiltertoolbar", "menu");
-    emit showGameSelectorFilterToolbarChanged(_showGameSelectorFilterToolbar);
+    setValue(_cardSize, "visualDatabaseDisplay", "cards", "cardSize");
+    emit visualDatabaseDisplayCardSizeChanged();
+}
+
+void CardsDisplaySettings::setVisualDeckEditorCardSize(int _cardSize)
+{
+    setValue(_cardSize, "visualDeckEditor", "cards", "cardSize");
+    emit visualDeckEditorCardSizeChanged();
+}
+
+void CardsDisplaySettings::setEDHRecCardSize(int _edhrecCardSize)
+{
+    setValue(_edhrecCardSize, "edhrec", "cards", "cardSize");
+    emit edhRecCardSizeChanged();
+}
+
+void CardsDisplaySettings::setArchidektPreviewCardSize(int _archidektPreviewCardSize)
+{
+    setValue(_archidektPreviewCardSize, "archidektPreview", "cards", "cardSize");
+    emit archidektPreviewSizeChanged();
+}
+
+void CardsDisplaySettings::setSampleHandSize(int _sampleHandSize)
+{
+    setValue(_sampleHandSize, "sampleHandSize", "cards", "cardSize");
+    emit sampleHandSizeChanged(_sampleHandSize);
 }

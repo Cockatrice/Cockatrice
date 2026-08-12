@@ -116,6 +116,9 @@ public:
     /** Called when buddy/ignore status changes externally while popup is open. */
     void updateActionButtons(const ServerInfo_User &userInfo, bool online, bool isBuddy, bool isIgnored);
 
+    /** Re-pulls the avatar/card art for the currently shown user (e.g. after it loads). */
+    void refreshHeader();
+
 signals:
     void mouseEnteredPopup();
     void mouseLeftPopup();

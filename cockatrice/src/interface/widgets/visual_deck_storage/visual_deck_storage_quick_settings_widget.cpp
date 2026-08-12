@@ -6,6 +6,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QSpinBox>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 
@@ -115,11 +116,11 @@ VisualDeckStorageQuickSettingsWidget::VisualDeckStorageQuickSettingsWidget(QWidg
 
     // card size slider
     cardSizeWidget =
-        new CardSizeWidget(this, nullptr, SettingsCache::instance().visualDeckStorage().getVisualDeckStorageCardSize());
+        new CardSizeWidget(this, nullptr, SettingsCache::instance().cardsDisplay().getVisualDeckStorageCardSize());
     connect(cardSizeWidget->getSlider(), &QSlider::valueChanged, this,
             &VisualDeckStorageQuickSettingsWidget::cardSizeChanged);
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().visualDeckStorage(),
-            &VisualDeckStorageSettings::setVisualDeckStorageCardSize);
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setVisualDeckStorageCardSize);
 
     // putting everything together
     this->addSettingsWidget(showFoldersCheckBox);

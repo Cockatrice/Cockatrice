@@ -17,9 +17,9 @@
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
-    picDownloadCheckBox.setChecked(SettingsCache::instance().personal().getPicDownload());
-    connect(&picDownloadCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().personal(),
-            &PersonalSettings::setPicDownload);
+    picDownloadCheckBox.setChecked(SettingsCache::instance().downloads().getPicDownload());
+    connect(&picDownloadCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().downloads(),
+            &DownloadSettings::setPicDownload);
 
     urlLinkLabel.setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     urlLinkLabel.setOpenExternalLinks(true);
@@ -29,7 +29,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     auto *lpGeneralGrid = new QGridLayout;
     auto *lpSpoilerGrid = new QGridLayout;
 
-    mcDownloadSpoilersCheckBox.setChecked(SettingsCache::instance().personal().getDownloadSpoilersStatus());
+    mcDownloadSpoilersCheckBox.setChecked(SettingsCache::instance().downloads().getDownloadSpoilersStatus());
 
     mpSpoilerSavePathLineEdit = new QLineEdit(SettingsCache::instance().getSpoilerCardDatabasePath());
     mpSpoilerSavePathLineEdit->setReadOnly(true);
@@ -91,8 +91,8 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     lpSpoilerGrid->addWidget(&infoOnSpoilersLabel, 3, 0, 1, 3, Qt::AlignTop);
 
     // On a change to the checkbox, hide/un-hide the other fields
-    connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, &SettingsCache::instance().personal(),
-            &PersonalSettings::setDownloadSpoilerStatus);
+    connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, &SettingsCache::instance().downloads(),
+            &DownloadSettings::setDownloadSpoilerStatus);
     connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, this, &DeckEditorSettingsPage::setSpoilersEnabled);
 
     mpGeneralGroupBox = new QGroupBox;

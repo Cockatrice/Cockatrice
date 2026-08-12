@@ -52,11 +52,28 @@ void CardInfoPictureEnlargedWidget::loadPixmap(const QSize &size)
  * @param size The desired size for the pixmap.
  *
  * Sets the widget's pixmap to the card image and resizes the widget to match the specified size. Triggers a repaint.
+ *
+ * When the image is not yet cached, the pixmap is cleared (instead of showing a stale previous card) and the widget
+ * refreshes automatically once the card image finishes loading.
  */
 void CardInfoPictureEnlargedWidget::setCardPixmap(const ExactCard &_card, const QSize size)
 {
+    if (card.getCardPtr()) {
+        disconnect(card.getCardPtr().data(), nullptr, this, nullptr);
+    }
+
     card = _card;
+
+    // Clear any previous card's art so we never paint a stale pixmap while the new image loads
+    enlargedPixmap = QPixmap();
     loadPixmap(size);
+
+    if (card.getCardPtr()) {
+        connect(card.getCardPtr().data(), &CardInfo::pixmapUpdated, this, [this]() {
+            loadPixmap(this->size());
+            update();
+        });
+    }
 
     setFixedSize(size); // Set the widget size to the enlarged size
 

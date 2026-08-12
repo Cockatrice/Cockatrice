@@ -287,6 +287,9 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
                 if (!game->getGameMetaInfo()->proto().share_decklists_on_load()) {
                     continue;
                 }
+                if (!playerInfo.has_deck_list()) {
+                    continue;
+                }
 
                 opponentDecksToDisplay.append(
                     qMakePair(playerId, qMakePair(playerName, QString::fromStdString(playerInfo.deck_list()))));

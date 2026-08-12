@@ -123,6 +123,7 @@ void ShortcutSettingsPage::retranslateUi()
     currentActionGroupLabel->setText(tr("Section:"));
     currentActionLabel->setText(tr("Action:"));
     currentShortcutLabel->setText(tr("Shortcut:"));
+    editShortcutGroupBox->setTitle(tr("Shortcut editor"));
     editTextBox->retranslateUi();
     faqLabel->setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_SHORTCUTS).arg(tr("How to set custom shortcuts")));
     btnResetAll->setText(tr("Restore all default shortcuts"));

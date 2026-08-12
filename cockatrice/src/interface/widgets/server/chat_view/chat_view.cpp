@@ -14,6 +14,7 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <QTimer>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/settings/chat_settings.h>
 
@@ -66,12 +67,14 @@ void ChatView::adjustColorsToPalette()
         serverMessageColor = QColor(0xFF, 0x73, 0x83);
         otherUserColor = otherUserColor.lighter(150);
         linkColor = QColor(71, 158, 252);
+        unresolvedCardTagColor = QColor(0xFF, 0xA5, 0x00);
     } else {
         document()->setDefaultStyleSheet(R"(
             a { text-decoration: none; color: blue; }
             .blue { color: blue }
         )");
         linkColor = palette().link().color();
+        unresolvedCardTagColor = QColor(0xA0, 0x52, 0x2D);
     }
 
     QTimer::singleShot(0, this, &ChatView::refreshBlockColors);
@@ -177,13 +180,22 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 {
     QTextCharFormat oldFormat = cursor.charFormat();
-    QTextCharFormat anchorFormat = oldFormat;
-    anchorFormat.setForeground(linkColor);
-    anchorFormat.setAnchor(true);
-    anchorFormat.setAnchorHref("card://" + cardName);
-    anchorFormat.setFontItalic(true);
+    QTextCharFormat cardFormat = oldFormat;
+    cardFormat.setFontItalic(true);
 
-    cursor.setCharFormat(anchorFormat);
+    if (!CardDatabaseManager::query()->lookupCardByName(cardName)) {
+        cardFormat.setForeground(unresolvedCardTagColor);
+        cursor.setCharFormat(cardFormat);
+        cursor.insertText(cardName);
+        cursor.setCharFormat(oldFormat);
+        return;
+    }
+
+    cardFormat.setForeground(linkColor);
+    cardFormat.setAnchor(true);
+    cardFormat.setAnchorHref("card://" + cardName);
+
+    cursor.setCharFormat(cardFormat);
     cursor.insertText(cardName);
     cursor.setCharFormat(oldFormat);
 }

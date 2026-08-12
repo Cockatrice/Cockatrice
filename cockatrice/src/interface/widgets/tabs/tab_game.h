@@ -19,6 +19,7 @@
 #include <QCompleter>
 #include <QLoggingCategory>
 #include <QMap>
+#include <QStringListModel>
 
 class CardMenu;
 class ServerInfo_PlayerProperties;
@@ -61,7 +62,8 @@ private:
     const UserListProxy *userListProxy;
     ReplayWidget *replayWidget = nullptr;
     QStringList gameTypes;
-    QCompleter *completer;
+    QCompleter *mentionCompleter;
+    QStringListModel *mentionModel;
     QStringList autocompleteUserList;
     QStackedWidget *mainWidget;
 

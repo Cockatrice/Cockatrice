@@ -322,7 +322,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                             }
                             printingProps.insert(attrName, attr.value().toString());
                         }
-                        PrintingInfo printingInfo(set, printingProps);
+                        PrintingInfo printingInfo(set, LazyPropertiesHash(printingProps));
 
                         // This is very much a hack and not the right place to
                         // put this check, as it requires a reload of Cockatrice

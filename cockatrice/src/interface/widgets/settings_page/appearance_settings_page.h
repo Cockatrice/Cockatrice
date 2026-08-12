@@ -40,10 +40,10 @@ private:
     QSpinBox homeTabBackgroundShuffleFrequencySpinBox;
     QCheckBox homeTabDisplayCardNameCheckBox;
     QCheckBox styleUserListCheckBox;
-    QLabel minPlayersForMultiColumnLayoutLabel;
-    QLabel maxFontSizeForCardsLabel;
     QCheckBox showShortcutsCheckBox;
     QCheckBox showGameSelectorFilterToolbarCheckBox;
+    QLabel minPlayersForMultiColumnLayoutLabel;
+    QLabel maxFontSizeForCardsLabel;
     QCheckBox overrideAllCardArtWithPersonalPreferenceCheckBox;
     QCheckBox bumpSetsWithCardsInDeckToTopCheckBox;
     QCheckBox displayCardNamesCheckBox;

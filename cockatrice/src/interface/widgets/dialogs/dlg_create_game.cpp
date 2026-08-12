@@ -214,6 +214,7 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
     spectatorsNeedPasswordCheckBox->setChecked(gameInfo.spectators_need_password());
     spectatorsCanTalkCheckBox->setChecked(gameInfo.spectators_can_chat());
     spectatorsSeeEverythingCheckBox->setChecked(gameInfo.spectators_omniscient());
+    shareDecklistsOnLoadCheckBox->setChecked(gameInfo.share_decklists_on_load());
 
     QSet<int> types;
     for (int i = 0; i < gameInfo.game_types_size(); ++i) {

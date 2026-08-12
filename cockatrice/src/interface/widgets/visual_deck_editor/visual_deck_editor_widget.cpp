@@ -10,6 +10,7 @@
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual.h"
 #include "../tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.h"
 #include "../utility/compact_push_button.h"
+#include "../utility/completer_utils.h"
 #include "visual_deck_display_options_widget.h"
 
 #include <QCheckBox>
@@ -21,11 +22,9 @@
 #include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/models/database/card/card_completer_proxy_model.h>
-#include <libcockatrice/models/database/card/card_search_model.h>
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
-#include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <qscrollarea.h>
 
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
@@ -45,9 +44,9 @@ VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
     initializeScrollAreaAndZoneContainer();
 
     cardSizeWidget =
-        new CardSizeWidget(this, nullptr, SettingsCache::instance().visualDeckStorage().getVisualDeckEditorCardSize());
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().visualDeckStorage(),
-            &VisualDeckStorageSettings::setVisualDeckEditorCardSize);
+        new CardSizeWidget(this, nullptr, SettingsCache::instance().cardsDisplay().getVisualDeckEditorCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setVisualDeckEditorCardSize);
 
     mainLayout->addWidget(displayOptionsAndSearch);
     mainLayout->addWidget(scrollArea);
@@ -98,32 +97,14 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
     cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
-    CardSearchModel *searchModel = new CardSearchModel(cardDatabaseDisplayModel, this);
 
-    proxyModel = new CardCompleterProxyModel(this);
-    proxyModel->setSourceModel(searchModel);
-    proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    proxyModel->setFilterRole(Qt::DisplayRole);
-
-    completer = new QCompleter(proxyModel, this);
-    completer->setCompletionRole(Qt::DisplayRole);
-    completer->setCompletionMode(QCompleter::PopupCompletion);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setFilterMode(Qt::MatchContains);
-    completer->setMaxVisibleItems(15);
+    const CardCompleterSetup cardSetup = createCardCompleter(cardDatabaseDisplayModel, this, 15);
+    proxyModel = cardSetup.proxyModel;
+    completer = cardSetup.completer;
     searchBar->setCompleter(completer);
 
     // Update suggestions dynamically
-    connect(searchBar, &QLineEdit::textEdited, searchModel, &CardSearchModel::updateSearchResults);
-    connect(searchBar, &QLineEdit::textEdited, this, [=, this](const QString &text) {
-        // Ensure substring matching
-        QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
-        proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
-
-        if (!text.isEmpty()) {
-            completer->complete(); // Force the dropdown to appear
-        }
-    });
+    connectCardCompleterSearch(searchBar, cardSetup);
 
     connect(completer, static_cast<void (QCompleter::*)(const QString &)>(&QCompleter::activated), this,
             [=, this](const QString &completion) {
