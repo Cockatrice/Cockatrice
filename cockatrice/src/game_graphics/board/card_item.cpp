@@ -152,7 +152,7 @@ void CardItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         painter->setRenderHint(QPainter::Antialiasing, false);
 
         QPen pen;
-        pen.setColor(Qt::red);
+        pen.setColor(Qt::cyan);
         pen.setWidth(0); // Cosmetic pen
         painter->setPen(pen);
         painter->drawPath(shape());
