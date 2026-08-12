@@ -69,6 +69,7 @@ signals:
     void logSetTapped(PlayerLogic *player, CardItem *card, bool tapped);
     void logSetCounter(PlayerLogic *player, QString counterName, int value, int oldValue);
     void logSetDoesntUntap(PlayerLogic *player, CardItem *card, bool doesntUntap);
+    void logSetDoesntUntapOnce(PlayerLogic *player, CardItem *card, bool doesntUntapOnce);
     void logSetPT(PlayerLogic *player, CardItem *card, QString newPT);
     void logSetAnnotation(PlayerLogic *player, CardItem *card, QString newAnnotation);
     void logDumpZone(PlayerLogic *player, CardZoneLogic *zone, int numberCards, bool isReversed = false);

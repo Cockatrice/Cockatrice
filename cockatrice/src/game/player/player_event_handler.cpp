@@ -231,6 +231,12 @@ void PlayerEventHandler::setCardAttrHelper(const GameEventContext &context,
             card->setDoesntUntap(value);
             break;
         }
+        case AttrDoesntUntapOnce: {
+            bool value = (avalue == "1");
+            emit logSetDoesntUntapOnce(player, card, value);
+            card->setDoesntUntapOnce(value);
+            break;
+        }
         case AttrPT: {
             emit logSetPT(player, card, avalue);
             card->setPT(avalue);

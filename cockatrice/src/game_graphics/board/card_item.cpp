@@ -173,6 +173,12 @@ void CardItem::setDoesntUntap(bool _doesntUntap)
     update();
 }
 
+void CardItem::setDoesntUntapOnce(bool _doesntUntapOnce)
+{
+    state->setDoesntUntapOnce(_doesntUntapOnce);
+    update();
+}
+
 void CardItem::setPT(const QString &_pt)
 {
     state->setPT(_pt);
@@ -223,6 +229,7 @@ void CardItem::resetState(bool keepAnnotations)
     attachedCards.clear();
     setTapped(false, false);
     setDoesntUntap(false);
+	setDoesntUntapOnce(false);
     if (scene()) {
         static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
     }
@@ -248,6 +255,7 @@ void CardItem::processCardInfo(const ServerInfo_Card &_info)
     setTapped(_info.tapped());
     setDestroyOnZoneChange(_info.destroy_on_zone_change());
     setDoesntUntap(_info.doesnt_untap());
+    setDoesntUntapOnce(_info.doesnt_untap_once());
 }
 
 CardDragItem *CardItem::createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool forceFaceDown)

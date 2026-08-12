@@ -493,7 +493,7 @@ void CardMenu::retranslateUi()
     //: Turn sideways or back again
     aTap->setText(tr("&Tap / Untap"));
     aDoesntUntap->setText(tr("Skip &untapping"));
-    aDoesntUntapOnce->setText(tr("Skip &untapping once"));
+    aDoesntUntapOnce->setText(tr("Skip &Untapping (One Turn)"));
     //: Turn face up/face down
     aFlip->setText(tr("T&urn Over")); // Only the user facing names in client got renamed to "turn over"
     // All code and proto bits are still unchanged (flip) for compatibility reasons
