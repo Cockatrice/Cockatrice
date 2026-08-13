@@ -2,17 +2,15 @@
  * @file visual_deck_storage_search_widget.h
  * @ingroup VisualDeckStorageWidgets
  */
-//! \todo Document this file.
 
 #ifndef VISUAL_DECK_STORAGE_SEARCH_WIDGET_H
 #define VISUAL_DECK_STORAGE_SEARCH_WIDGET_H
-
-#include "deck_preview/deck_preview_widget.h"
 
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QWidget>
 
+class QTimer;
 class VisualDeckStorageWidget;
 class VisualDeckStorageSearchWidget : public QWidget
 {
@@ -20,8 +18,6 @@ class VisualDeckStorageSearchWidget : public QWidget
 
 public:
     explicit VisualDeckStorageSearchWidget(VisualDeckStorageWidget *parent);
-    QString getSearchText();
-    void filterWidgets(QList<DeckPreviewWidget *> widgets, const QString &searchText);
 
 private:
     QHBoxLayout *layout;

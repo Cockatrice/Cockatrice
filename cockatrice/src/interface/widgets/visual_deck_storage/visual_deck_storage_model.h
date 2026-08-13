@@ -1,0 +1,158 @@
+/**
+ * @file visual_deck_storage_model.h
+ * @ingroup VisualDeckStorageWidgets
+ * @brief Source model for the Visual Deck Storage: the deck files on disk.
+ *
+ * The model owns the deck metadata (name, tags, color identity, banner card,
+ * modification times) and the parsed deck list, loading each deck file in the
+ * background. Views read through the roles or the direct accessors, and all
+ * mutations (rename, tags, banner card, delete, conversion) go through this
+ * class so the view layer never touches the filesystem directly.
+ */
+
+#ifndef VISUAL_DECK_STORAGE_MODEL_H
+#define VISUAL_DECK_STORAGE_MODEL_H
+
+#include "../../deck_loader/loaded_deck.h"
+
+#include <QAbstractListModel>
+#include <QDateTime>
+#include <QList>
+#include <QStringList>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <optional>
+
+namespace VisualDeckStorageRoles
+{
+/**
+ * @brief Custom roles exposed by the VisualDeckStorageModel.
+ */
+enum
+{
+    FilePathRole = Qt::UserRole + 1, /**< Absolute file path of the deck. */
+    RelativeFilePathRole,            /**< File path relative to the deck folder. */
+    FolderPathRole,                  /**< Directory of the deck relative to the deck folder ("" for root). */
+    DisplayNameRole,                 /**< Deck name, or the file name if the deck has no name. */
+    TagsRole,                        /**< The deck's tags. */
+    ColorIdentityRole,               /**< The deck's color identity (WUBRG order). */
+    LastModifiedRole,                /**< QDateTime of the deck file's last modification. */
+    LastLoadedRole,                  /**< QDateTime when the deck was last loaded from the file. */
+    BannerCardNameRole,              /**< Name of the deck's banner card. */
+    BannerCardProviderIdRole         /**< Provider id of the deck's banner card. */
+};
+} // namespace VisualDeckStorageRoles
+
+/**
+ * @brief One deck file as seen by the Visual Deck Storage.
+ *
+ * The metadata is computed once when the deck loads and refreshed on reloads
+ * and mutations, so filters and sorts never re-read the file from disk.
+ */
+struct DeckPreviewData
+{
+    QString filePath;             ///< Absolute file path.
+    QString relativeFilePath;     ///< File path relative to the deck folder.
+    QString folderPath;           ///< Directory relative to the deck folder ("" for the deck folder itself).
+    QString deckName;             ///< The deck name as stored in the file (may be empty).
+    QString displayName;          ///< Deck name, or the file name if the deck has no name.
+    QStringList tags;             ///< The deck's tags.
+    QString colorIdentity;        ///< The deck's color identity in WUBRG order.
+    QDateTime lastModified;       ///< File modification time at last check.
+    QDateTime lastLoaded;         ///< When the deck was last loaded from the file.
+    QString bannerCardName;       ///< Name of the deck's banner card.
+    QString bannerCardProviderId; ///< Provider id of the deck's banner card.
+    LoadedDeck deck;              ///< The parsed deck; empty until the file has been loaded.
+    bool loadSucceeded = false;   ///< Whether the deck file finished loading successfully.
+    bool loadInProgress = false;  ///< Whether the deck file is currently being loaded.
+};
+
+/**
+ * @brief The list model backing the Visual Deck Storage widget tree.
+ *
+ * Rows are in filesystem scan order; ordering and filtering are handled by
+ * VisualDeckStorageSortFilterProxyModel on top of this model.
+ */
+class VisualDeckStorageModel : public QAbstractListModel
+{
+    Q_OBJECT
+public:
+    explicit VisualDeckStorageModel(QObject *parent = nullptr);
+
+    /// @name Qt model overrides
+    ///@{
+    [[nodiscard]] int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
+    ///@}
+
+    /**
+     * @brief Sets the folder to scan for deck files and starts (re)loading.
+     * Emits modelReset once the scan finishes and deck loads begin.
+     */
+    void setDeckPath(const QString &deckPath);
+
+    /**
+     * @brief Re-scans the current deck folder, reloading every deck file.
+     */
+    void refresh();
+
+    [[nodiscard]] QString deckPath() const
+    {
+        return deckPath_;
+    }
+
+    /**
+     * @brief The relative paths of all subdirectories of the deck folder, one level at a time.
+     * Used by the view to build the folder tree. Sorted for deterministic order.
+     */
+    [[nodiscard]] QStringList folderPaths() const
+    {
+        return folderPaths_;
+    }
+
+    /// @name Data accessors
+    ///@{
+    [[nodiscard]] const DeckPreviewData &dataForRow(int row) const;
+    [[nodiscard]] const LoadedDeck &deckForRow(int row) const;
+    [[nodiscard]] int rowForFilePath(const QString &filePath) const;
+    ///@}
+
+    /// @name Mutations (persist to disk and update the row)
+    ///@{
+    bool renameDeck(int row, const QString &newName);
+    bool renameFile(int row, const QString &newBaseName);
+    bool deleteFile(int row);
+    bool setTags(int row, const QStringList &tags);
+    bool setBannerCard(int row, const CardRef &cardRef);
+    bool convertToCockatriceFormat(int row);
+    bool reloadIfModified(int row);
+    ///@}
+
+signals:
+    /**
+     * @brief Emitted when a deck file finishes loading.
+     * @param row The row of the deck that finished loading.
+     */
+    void deckLoaded(int row);
+
+    /**
+     * @brief Emitted when a deck's file path changes (rename file, conversion).
+     * @param oldFilePath The previous file path.
+     * @param newFilePath The new file path.
+     */
+    void deckFilePathChanged(const QString &oldFilePath, const QString &newFilePath);
+
+private:
+    void startScan();
+    void beginLoad(int row);
+    void computeDeckMetadata(DeckPreviewData &data) const;
+    void setFilePathForRow(int row, const QString &newFilePath);
+    [[nodiscard]] static QString relativeFilePathFor(const QString &filePath, const QString &deckPath);
+    [[nodiscard]] static QString folderPathFor(const QString &filePath, const QString &deckPath);
+
+    QString deckPath_;
+    QList<DeckPreviewData> decks_;
+    QStringList folderPaths_; ///< All subdirectories of the deck folder, sorted.
+    int scanGeneration_ = 0;  ///< Bumped on every scan so stale results are ignored.
+};
+
+#endif // VISUAL_DECK_STORAGE_MODEL_H
