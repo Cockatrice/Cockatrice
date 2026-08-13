@@ -7,13 +7,13 @@
 # usage: source <script> <name> [--get] [--build] [--save] [--interactive] [--set-cache <location>]
 # <name> sets the name of the docker image, these correspond to directories in .ci
 # --get loads the image from a previously saved image cache, will build if no image is found
-# --build builds the image from the Dockerfile in .ci/$NAME
+# --build builds the image from the Dockerfile in .ci/$BUILD_REFERENCE
 # --save stores the image, if an image was loaded it will not be stored
 # --interactive immediately starts the image interactively for debugging
 # --set-cache <location> sets the location to cache the image or for ccache
 #
 # requires: docker
-# uses env: NAME CACHE BUILD GET SAVE INTERACTIVE
+# uses env: BUILD_REFERENCE CACHE BUILD GET SAVE INTERACTIVE
 # (correspond to args: <name> --set-cache <cache> --build --get --save --interactive)
 # sets env: RUN CCACHE_DIR IMAGE_NAME RUN_ARGS RUN_OPTS BUILD_SCRIPT
 # exitcode: 1 for failure, 2 for missing dockerfile, 3 for invalid arguments
@@ -69,21 +69,21 @@ while [[ $# != 0 ]]; do
         echo "unrecognized option: $1"
         return 3
       fi
-      NAME="$1"
+      BUILD_REFERENCE="$1"
       shift
       ;;
   esac
 done
 
 # Setup
-if ! [[ $NAME ]]; then
+if ! [[ $BUILD_REFERENCE ]]; then
   echo "no build name given" >&2
   return 3
 fi
 
-export IMAGE_NAME="${project_name,,}_${NAME,,}" # lower case
+export IMAGE_NAME="${project_name,,}_${BUILD_REFERENCE,,}" # lower case
 
-docker_dir=".ci/$NAME"
+docker_dir=".ci/$BUILD_REFERENCE"
 if ! [[ -r $docker_dir/Dockerfile ]]; then
   echo "could not find Dockerfile in $docker_dir" >&2
   return 2 # even if the image is cached, we do not want to run if there is no way to build this image
