@@ -26,12 +26,19 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
 {
     const int radius = 15;
     const qreal border = 1.5;
-    QPainterPath path(QPointF(50 - border / 2, border / 2));
-    path.lineTo(radius, border / 2);
-    path.arcTo(border / 2, border / 2, 2 * radius, 2 * radius, 90, 90);
-    path.lineTo(border / 2, 30 - border / 2);
-    path.lineTo(50 - border / 2, 30 - border / 2);
-    path.closeSubpath();
+    // The box is drawn with a border-wide stroke straddling the path, so the
+    // visible outline spans [inset, inset + border]. Fills that must not cover
+    // the outline (e.g. the life-change flash) use a path inset by `border`.
+    const auto makePath = [radius](qreal inset) {
+        QPainterPath path(QPointF(50 - inset, inset));
+        path.lineTo(radius, inset);
+        path.arcTo(inset, inset, 2 * radius, 2 * radius, 90, 90);
+        path.lineTo(inset, 30 - inset);
+        path.lineTo(50 - inset, 30 - inset);
+        path.closeSubpath();
+        return path;
+    };
+    QPainterPath path = makePath(border / 2);
 
     QPen pen(QColor(100, 100, 100));
     pen.setWidthF(border);
@@ -57,7 +64,7 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
         painter->setPen(Qt::NoPen);
         painter->setBrush(flashColor);
         painter->setOpacity(0.85);
-        painter->drawPath(path);
+        painter->drawPath(makePath(border));
         painter->restore();
     }
 }
