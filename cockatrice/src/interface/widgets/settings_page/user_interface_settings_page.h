@@ -40,6 +40,8 @@ private:
     QPushButton enableAllAnimationsButton;
     QPushButton disableAllAnimationsButton;
     QCheckBox tapAnimationCheckBox;
+    QCheckBox lifeCounterAnimationsCheckBox;
+    QCheckBox battlefieldFlashCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
     QLabel visualDeckStoragePromptForConversionLabel;
     QComboBox visualDeckStoragePromptForConversionSelector;

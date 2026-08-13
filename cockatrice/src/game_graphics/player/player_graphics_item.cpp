@@ -188,6 +188,11 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
     AbstractCounter *widget;
     if (state->getName() == "life") {
         widget = playerTarget->addCounter(state);
+        connect(state, &CounterState::valueChanged, this, [this](int oldValue, int newValue) {
+            if (newValue < oldValue) {
+                tableZoneGraphicsItem->triggerDamageShimmer();
+            }
+        });
     } else {
         widget = new GeneralCounter(state, player, true, this);
     }
