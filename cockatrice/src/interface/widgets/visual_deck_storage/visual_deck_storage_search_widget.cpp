@@ -1,21 +1,19 @@
 #include "visual_deck_storage_search_widget.h"
 
-#include "../../../client/settings/cache_settings.h"
-#include "../../../filters/deck_filter_string.h"
 #include "../../../filters/syntax_help.h"
 #include "../../pixel_map_generator.h"
+#include "visual_deck_storage_widget.h"
 
 #include <QAction>
-#include <QFileInfo>
-#include <libcockatrice/settings/paths_settings.h>
+#include <QTimer>
 
 /**
- * @brief Constructs a PrintingSelectorCardSearchWidget for searching cards by set name or set code.
+ * @brief Constructs a search bar for filtering decks in the Visual Deck Storage.
  *
- * This widget provides a search bar that allows users to search for cards by either their set name
- * or set code. It uses a debounced timer to trigger the search action after the user stops typing.
+ * Provides a search bar that allows users to search decks by filename or search
+ * expression, with a debounced timer to trigger the search after the user stops typing.
  *
- * @param parent The parent PrintingSelector widget that will handle the search results.
+ * @param parent The VisualDeckStorageWidget owning the search.
  */
 VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(VisualDeckStorageWidget *parent) : parent(parent)
 {
@@ -40,43 +38,6 @@ VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(VisualDeckStorageWi
         searchDebounceTimer->start(300); // 300ms debounce
     });
 
-    connect(searchDebounceTimer, &QTimer::timeout, parent, &VisualDeckStorageWidget::updateSearchFilter);
-}
-
-/**
- * @brief Retrieves the current text in the search bar.
- *
- * @return The text entered by the user in the search bar.
- */
-QString VisualDeckStorageSearchWidget::getSearchText()
-{
-    return searchBar->text();
-}
-
-/**
- * Converts the filepath into a relative filepath starting from the deck folder.
- * If the file isn't in the deck folder, then this will just return the filename.
- *
- * @param filePath The filepath to convert into a relative filepath
- */
-static QString toRelativeFilepath(const QString &filePath)
-{
-    QString deckPath = SettingsCache::instance().paths().getDeckPath();
-    if (filePath.startsWith(deckPath)) {
-        return filePath.mid(deckPath.length());
-    }
-
-    QFileInfo fileInfo(filePath);
-    QString fileName = fileInfo.fileName();
-    return fileName;
-}
-
-void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> widgets, const QString &searchText)
-{
-    auto filterString = DeckFilterString(searchText);
-
-    for (auto widget : widgets) {
-        QString relativeFilePath = toRelativeFilepath(widget->filePath);
-        widget->filteredBySearch = !filterString.check(widget, {relativeFilePath});
-    }
+    connect(searchDebounceTimer, &QTimer::timeout, this,
+            [this] { this->parent->proxyModel()->setSearchText(searchBar->text()); });
 }
