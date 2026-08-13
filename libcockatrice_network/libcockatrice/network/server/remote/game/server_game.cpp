@@ -526,10 +526,7 @@ void Server_Game::addPlayer(Server_AbstractUserInterface *userInterface,
 
     if (broadcastUpdate) {
         ServerInfo_Game gameInfo;
-        gameInfo.set_room_id(room->getId());
-        gameInfo.set_game_id(gameId);
-        gameInfo.set_player_count(getPlayerCount());
-        gameInfo.set_spectators_count(getSpectatorCount());
+        getInfo(gameInfo);
         emit gameInfoChanged(gameInfo);
     }
 
@@ -588,10 +585,7 @@ void Server_Game::removeParticipant(Server_AbstractParticipant *participant, Eve
     }
 
     ServerInfo_Game gameInfo;
-    gameInfo.set_room_id(room->getId());
-    gameInfo.set_game_id(gameId);
-    gameInfo.set_player_count(getPlayerCount());
-    gameInfo.set_spectators_count(getSpectatorCount());
+    getInfo(gameInfo);
     emit gameInfoChanged(gameInfo);
 }
 
@@ -847,6 +841,12 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
         result.set_player_count(getPlayerCount());
         result.set_started(gameStarted);
         result.mutable_creator_info()->CopyFrom(*getCreatorInfo());
+        const Server_AbstractParticipant *host = participants.value(hostId, nullptr);
+        if (host != nullptr) {
+            result.mutable_host_info()->CopyFrom(*host->getUserInfo());
+        } else {
+            result.mutable_host_info()->CopyFrom(*getCreatorInfo());
+        }
         result.set_only_buddies(onlyBuddies);
         result.set_only_registered(onlyRegistered);
         result.set_spectators_allowed(getSpectatorsAllowed());

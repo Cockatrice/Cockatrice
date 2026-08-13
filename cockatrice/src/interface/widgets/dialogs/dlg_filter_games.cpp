@@ -57,16 +57,16 @@ DlgFilterGames::DlgFilterGames(const QMap<int, QString> &_allGameTypes,
     gameNameFilterEdit->setText(filters.gameNameFilter);
     auto *gameNameFilterLabel = new QLabel(tr("Game &description:"));
     gameNameFilterLabel->setBuddy(gameNameFilterEdit);
-    creatorNameFilterEdit = new QLineEdit;
-    creatorNameFilterEdit->setText(filters.creatorNameFilters.join(", "));
-    auto *creatorNameFilterLabel = new QLabel(tr("&Creator name:"));
-    creatorNameFilterLabel->setBuddy(creatorNameFilterEdit);
+    hostNameFilterEdit = new QLineEdit;
+    hostNameFilterEdit->setText(filters.hostNameFilters.join(", "));
+    auto *hostNameFilterLabel = new QLabel(tr("&Host name:"));
+    hostNameFilterLabel->setBuddy(hostNameFilterEdit);
 
     auto *generalGrid = new QGridLayout;
     generalGrid->addWidget(gameNameFilterLabel, 0, 0);
     generalGrid->addWidget(gameNameFilterEdit, 0, 1);
-    generalGrid->addWidget(creatorNameFilterLabel, 1, 0);
-    generalGrid->addWidget(creatorNameFilterEdit, 1, 1);
+    generalGrid->addWidget(hostNameFilterLabel, 1, 0);
+    generalGrid->addWidget(hostNameFilterEdit, 1, 1);
     generalGrid->addWidget(maxGameAgeLabel, 2, 0);
     generalGrid->addWidget(maxGameAgeComboBox, 2, 1);
     generalGroupBox = new QGroupBox(tr("General"));
@@ -193,7 +193,7 @@ GameFilterConfigs DlgFilterGames::getFilters() const
             hideNotBuddyCreatedGames->isChecked(),
             hideOpenDecklistGames->isChecked(),
             gameNameFilterEdit->text(),
-            getCreatorNameFilters(),
+            getHostNameFilters(),
             getGameTypeFilter(),
             maxPlayersFilterMinSpinBox->value(),
             maxPlayersFilterMaxSpinBox->value(),
@@ -216,9 +216,9 @@ void DlgFilterGames::toggleSpectatorCheckboxEnabledness(bool spectatorsEnabled)
     showOnlyIfSpectatorsCanSeeHands->setDisabled(!spectatorsEnabled);
 }
 
-QStringList DlgFilterGames::getCreatorNameFilters() const
+QStringList DlgFilterGames::getHostNameFilters() const
 {
-    return creatorNameFilterEdit->text().split(",", Qt::SkipEmptyParts);
+    return hostNameFilterEdit->text().split(",", Qt::SkipEmptyParts);
 }
 
 QSet<int> DlgFilterGames::getGameTypeFilter() const

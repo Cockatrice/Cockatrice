@@ -35,7 +35,7 @@ private:
     QCheckBox *hideNotBuddyCreatedGames;
     QCheckBox *hideOpenDecklistGames;
     QLineEdit *gameNameFilterEdit;
-    QLineEdit *creatorNameFilterEdit;
+    QLineEdit *hostNameFilterEdit;
     QMap<int, QCheckBox *> gameTypeFilterCheckBoxes;
     QSpinBox *maxPlayersFilterMinSpinBox;
     QSpinBox *maxPlayersFilterMaxSpinBox;
@@ -50,7 +50,7 @@ private:
     const GamesProxyModel *gamesProxyModel;
     const QMap<QTime, QString> gameAgeMap;
 
-    [[nodiscard]] QStringList getCreatorNameFilters() const;
+    [[nodiscard]] QStringList getHostNameFilters() const;
     [[nodiscard]] QSet<int> getGameTypeFilter() const;
     [[nodiscard]] QTime getMaxGameAge() const;
     [[nodiscard]] bool getShowSpectatorPasswordProtected() const;
