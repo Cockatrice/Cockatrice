@@ -2,16 +2,12 @@
  * @file deck_preview_widget.h
  * @ingroup VisualDeckPreviewWidgets
  */
-//! \todo Document this file.
 
 #ifndef DECK_PREVIEW_WIDGET_H
 #define DECK_PREVIEW_WIDGET_H
 
-#include "../../../deck_loader/deck_loader.h"
-#include "../../cards/additional_info/color_identity_widget.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
-#include "../visual_deck_storage_widget.h"
-#include "deck_preview_deck_tags_display_widget.h"
+#include "../visual_deck_storage_model.h"
 
 #include <QAbstractItemView>
 #include <QApplication>
@@ -20,72 +16,80 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+class QEnterEvent;
+class QLabel;
 class QMenu;
-class VisualDeckStorageWidget;
+class QMouseEvent;
+class ColorIdentityWidget;
+class DeckPreviewCardPictureWidget;
 class DeckPreviewDeckTagsDisplayWidget;
+class VisualDeckStorageModel;
+class VisualDeckStorageWidget;
 
 class DeckPreviewWidget final : public QWidget
 {
     Q_OBJECT
 public:
-    explicit DeckPreviewWidget(QWidget *_parent,
+    explicit DeckPreviewWidget(QWidget *parent,
                                VisualDeckStorageWidget *_visualDeckStorageWidget,
+                               VisualDeckStorageModel *model,
                                const QString &_filePath);
     void retranslateUi();
-    QString getColorIdentity();
-    [[nodiscard]] QString getDisplayName() const;
 
-    VisualDeckStorageWidget *visualDeckStorageWidget;
-    QVBoxLayout *layout;
-    QString filePath;
-    QDateTime lastModifiedTime;
-    DeckLoader *deckLoader;
-    DeckPreviewCardPictureWidget *bannerCardDisplayWidget = nullptr;
-    ColorIdentityWidget *colorIdentityWidget = nullptr;
-    DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget = nullptr;
-    QLabel *bannerCardLabel = nullptr;
-    QComboBox *bannerCardComboBox = nullptr;
-    bool filteredBySearch = false;
-    bool filteredByColor = false;
-    bool filteredByTags = false;
-    [[nodiscard]] bool checkVisibility() const;
+    /**
+     * @brief The banner card picture; the parent widget wires its size to the card size setting.
+     */
+    DeckPreviewCardPictureWidget *bannerCardDisplayWidget;
 
 signals:
     void deckLoadRequested(const QString &filePath);
     void openDeckEditor(const LoadedDeck &deck);
 
 public slots:
-    void setFilePath(const QString &filePath);
-    void refreshBannerCardText();
-    void refreshBannerCardToolTip();
-    void updateBannerCardComboBox(const QString &currentText);
-    void setBannerCard(int);
-    void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
-    void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
-    void initializeUi(bool deckLoadSuccess);
-    void resyncWidgets();
+    /**
+     * @brief Re-reads the row's data from the model and syncs every child widget.
+     * Connected to the model's dataChanged signal.
+     */
+    void syncFromModel();
+
+    /**
+     * @brief Reloads the deck file if its modification time is newer than the stored one.
+     */
     void reloadIfModified();
-    void updateVisibility();
+    void refreshBannerCardToolTip();
     void updateColorIdentityVisibility(bool visible);
     void updateBannerCardComboBoxVisibility(bool visible);
     void updateTagsVisibility(bool visible);
-    void resizeEvent(QResizeEvent *event) override;
+    void setBannerCard(int);
+    void setTags(const QStringList &tags);
 
 protected:
     void enterEvent(QEnterEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
-    void updateLastModifiedTime();
-    void writeDeckToFile();
+    [[nodiscard]] int row() const;
+    [[nodiscard]] QString getDisplayName() const;
+    void refreshBannerCardText();
+    void updateBannerCardComboBox(const QString &currentText);
+    bool promptFileConversionIfRequired();
     QMenu *createRightClickMenu();
     void addSetBannerCardMenu(QMenu *menu);
-
-private slots:
-    void setTags(const QStringList &tags);
+    void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
+    void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
 
     void actRenameDeck();
     void actRenameFile();
     void actDeleteFile();
+
+    VisualDeckStorageWidget *visualDeckStorageWidget;
+    VisualDeckStorageModel *model_;
+    QString filePath;
+    QVBoxLayout *layout;
+    ColorIdentityWidget *colorIdentityWidget;
+    DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
+    QLabel *bannerCardLabel;
+    QComboBox *bannerCardComboBox;
 };
 
 class NoScrollFilter : public QObject
