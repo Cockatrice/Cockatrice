@@ -78,6 +78,7 @@ private:
     QGroupBox *cardsGroupBox;
     QGroupBox *cardLayoutGroupBox;
     QGroupBox *handGroupBox;
+    QGroupBox *playmatGroupBox;
     QGroupBox *tableGroupBox;
     QGroupBox *cardCountersGroupBox;
     QList<QLabel *> cardCounterNames;

@@ -321,6 +321,15 @@ AppearanceSettingsPage::AppearanceSettingsPage()
             &InterfaceSettings::setMinPlayersForMultiColumnLayout);
     minPlayersForMultiColumnLayoutLabel.setBuddy(&minPlayersForMultiColumnLayoutEdit);
 
+    auto *tableGrid = new QGridLayout;
+    tableGrid->addWidget(&invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
+    tableGrid->addWidget(&minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
+    tableGrid->addWidget(&minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
+
+    tableGroupBox = new QGroupBox;
+    tableGroupBox->setLayout(tableGrid);
+
+    // Playmat settings
     playmatVisibilityCombo.addItem(tr("Show all playmats"), 2);
     playmatVisibilityCombo.addItem(tr("Show own playmat only"), 1);
     playmatVisibilityCombo.addItem(tr("Don't use playmats"), 0);
@@ -344,19 +353,16 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     overrideButtons->addWidget(&playmatOverrideEditButton);
     overrideButtons->addWidget(&playmatOverrideClearButton);
 
-    auto *tableGrid = new QGridLayout;
-    tableGrid->addWidget(&invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
-    tableGrid->addWidget(&minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
-    tableGrid->addWidget(&minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
-    tableGrid->addWidget(&playmatVisibilityLabel, 2, 0, 1, 1);
-    tableGrid->addWidget(&playmatVisibilityCombo, 2, 1, 1, 1);
-    tableGrid->addWidget(&playmatOverrideLabel, 3, 0, 1, 1);
-    tableGrid->addLayout(overrideButtons, 3, 1, 1, 1);
-    tableGrid->addWidget(&playmatDefaultLabel, 4, 0, 1, 1);
-    tableGrid->addWidget(&playmatDefaultEditButton, 4, 1, 1, 1);
+    auto *playmatGrid = new QGridLayout;
+    playmatGrid->addWidget(&playmatVisibilityLabel, 0, 0, 1, 1);
+    playmatGrid->addWidget(&playmatVisibilityCombo, 0, 1, 1, 1);
+    playmatGrid->addWidget(&playmatOverrideLabel, 1, 0, 1, 1);
+    playmatGrid->addLayout(overrideButtons, 1, 1, 1, 1);
+    playmatGrid->addWidget(&playmatDefaultLabel, 2, 0, 1, 1);
+    playmatGrid->addWidget(&playmatDefaultEditButton, 2, 1, 1, 1);
 
-    tableGroupBox = new QGroupBox;
-    tableGroupBox->setLayout(tableGrid);
+    playmatGroupBox = new QGroupBox;
+    playmatGroupBox->setLayout(playmatGrid);
 
     // putting it all together
     auto *mainLayout = new QVBoxLayout;
@@ -369,6 +375,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     mainLayout->addWidget(cardLayoutGroupBox);
     mainLayout->addWidget(cardCountersGroupBox);
     mainLayout->addWidget(handGroupBox);
+    mainLayout->addWidget(playmatGroupBox);
     mainLayout->addWidget(tableGroupBox);
     mainLayout->addStretch();
 
@@ -558,6 +565,7 @@ void AppearanceSettingsPage::retranslateUi()
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
+    playmatGroupBox->setTitle(tr("Playmat settings"));
     playmatVisibilityLabel.setText(tr("Playmat visibility:"));
     playmatOverrideLabel.setText(tr("Force playmat for all decks:"));
     playmatOverrideClearButton.setText(tr("Clear"));
