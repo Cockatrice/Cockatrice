@@ -29,7 +29,7 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     // The box is drawn with a border-wide stroke straddling the path, so the
     // visible outline spans [inset, inset + border]. Fills that must not cover
     // the outline (e.g. the life-change flash) use a path inset by `border`.
-    const auto makePath = [radius](qreal inset) {
+    const auto makePath = [](qreal inset) {
         QPainterPath path(QPointF(50 - inset, inset));
         path.lineTo(radius, inset);
         path.arcTo(inset, inset, 2 * radius, 2 * radius, 90, 90);
