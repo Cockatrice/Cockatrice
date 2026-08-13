@@ -27,7 +27,6 @@
 #include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
-#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
@@ -66,9 +65,6 @@ void TabDeckEditorVisual::createCentralFrame()
 
     centralFrame = new QVBoxLayout;
     centralWidget->setLayout(centralFrame);
-
-    auto databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
-    databaseModel->setObjectName("databaseModel");
 
     tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this, deckStateManager->getModel(), databaseModel);
 
