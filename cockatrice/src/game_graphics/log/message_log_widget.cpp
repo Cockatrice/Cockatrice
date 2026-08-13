@@ -695,7 +695,7 @@ void MessageLogWidget::logSetDoesntUntapOnce(PlayerLogic *player, CardItem *card
 {
     QString str;
     if (doesntUntapOnce) {
-        str = tr("%1 sets %2 to not untap during the next untap step.");
+        str = tr("%1 sets %2 to not untap during its controller's next untap step.");
     } else {
         str = tr("%1 sets %2 to untap normally.");
     }
