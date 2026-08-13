@@ -7,7 +7,7 @@
 #ifndef DECK_FILTER_STRING_H
 #define DECK_FILTER_STRING_H
 
-#include "../interface/widgets/visual_deck_storage/deck_preview/deck_preview_widget.h"
+#include "../interface/deck_loader/loaded_deck.h"
 
 #include <QLoggingCategory>
 #include <QString>
@@ -16,26 +16,29 @@
 inline Q_LOGGING_CATEGORY(DeckFilterStringLog, "deck_filter_string");
 
 /**
- * Extra info relevant to filtering that isn't present in the DeckPreviewWidget
+ * The data a deck search expression is evaluated against.
+ *
+ * This is a data view rather than a widget pointer, so the same filter
+ * expression can be evaluated against a model or a live widget.
  */
-struct ExtraDeckSearchInfo
+struct DeckSearchData
 {
-    /**
-     * The relative filepath starting from the deck folder
-     */
-    QString relativeFilePath;
+    const LoadedDeck *deck = nullptr; ///< The loaded deck. Must not be null.
+    QString filePath;                 ///< Absolute path of the deck file.
+    QString displayName;              ///< Deck name, or the file name if the deck has no name.
+    QString relativeFilePath;         ///< File path relative to the deck folder.
 };
 
-typedef std::function<bool(const DeckPreviewWidget *, const ExtraDeckSearchInfo &)> DeckFilter;
+typedef std::function<bool(const DeckSearchData &data)> DeckFilter;
 
 class DeckFilterString
 {
 public:
     DeckFilterString();
     explicit DeckFilterString(const QString &expr);
-    bool check(const DeckPreviewWidget *deck, const ExtraDeckSearchInfo &info) const
+    bool check(const DeckSearchData &data) const
     {
-        return filter(deck, info);
+        return filter(data);
     }
 
     [[nodiscard]] bool valid() const

@@ -73,10 +73,14 @@ static QString toRelativeFilepath(const QString &filePath)
 
 void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> widgets, const QString &searchText)
 {
-    auto filterString = DeckFilterString(searchText);
+    const auto filterString = DeckFilterString(searchText);
 
     for (auto widget : widgets) {
-        QString relativeFilePath = toRelativeFilepath(widget->filePath);
-        widget->filteredBySearch = !filterString.check(widget, {relativeFilePath});
+        const DeckSearchData searchData{.deck = &widget->deckLoader->getDeck(),
+                                        .filePath = widget->filePath,
+                                        .displayName = widget->getDisplayName(),
+                                        .relativeFilePath = toRelativeFilepath(widget->filePath)};
+
+        widget->filteredBySearch = !filterString.check(searchData);
     }
 }
