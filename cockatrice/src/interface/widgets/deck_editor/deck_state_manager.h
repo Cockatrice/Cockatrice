@@ -117,6 +117,15 @@ public:
     void clearDeck();
 
     /**
+     * @brief Gets the lastLoadInfo.
+     * @return The lastLoadInfo
+     */
+    const LoadedDeck::LoadInfo &getLastLoadInfo() const
+    {
+        return lastLoadInfo;
+    }
+
+    /**
      * @brief Sets the lastLoadInfo.
      * @param loadInfo The lastLoadInfo
      */

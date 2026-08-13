@@ -2,6 +2,8 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../deck_loader/deck_loader.h"
+#include "../dialogs/dlg_convert_deck_to_cod_format.h"
 #include "../settings_page/user_interface_settings_page.h"
 #include "../tabs/api/commander_spellbook/commander_bracket_widget.h"
 #include "deck_list_style_proxy.h"
@@ -175,6 +177,23 @@ void DeckEditorDeckDockWidget::createDeckDock()
     deckTagsDisplayWidget->setHidden(!SettingsCache::instance().deckEditor().getTagsWidgetVisible());
     connect(deckTagsDisplayWidget, &DeckPreviewDeckTagsDisplayWidget::tagsChanged, deckStateManager,
             &DeckStateManager::setTags);
+
+    // Local deck files in non-Cockatrice formats (e.g. .txt) can't store tags.
+    // Offer to convert the file to .cod before the user opens the tag dialog.
+    deckTagsDisplayWidget->setConversionPromptHandler([this] {
+        const LoadedDeck::LoadInfo &loadInfo = deckStateManager->getLastLoadInfo();
+        if (loadInfo.fileName.isEmpty()) {
+            return true; // A new, unsaved deck can hold tags in memory.
+        }
+        return promptFileConversionIfRequired(this, loadInfo.fileName, [this] {
+            LoadedDeck deck = deckStateManager->toLoadedDeck();
+            if (!DeckLoader::convertToCockatriceFormat(deck)) {
+                return false;
+            }
+            deckStateManager->setLastLoadInfo(deck.lastLoadInfo);
+            return true;
+        });
+    });
 
     activeGroupCriteriaLabel = new QLabel(this);
 
