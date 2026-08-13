@@ -1,5 +1,34 @@
 #include "interface_settings.h"
 
+namespace
+{
+const QChar PLAYMAT_FIELD_SEP = QChar(0x1F); ///< Separator between StoredPlaymat fields.
+
+QString encodeStoredPlaymat(const StoredPlaymat &stored)
+{
+    return stored.name + PLAYMAT_FIELD_SEP + stored.providerId + PLAYMAT_FIELD_SEP +
+           QString::number(stored.marginPctL, 'f', 4) + PLAYMAT_FIELD_SEP + QString::number(stored.marginPctR, 'f', 4) +
+           PLAYMAT_FIELD_SEP + QString::number(stored.verticalOffset, 'f', 4) + PLAYMAT_FIELD_SEP +
+           QString::number(stored.zoom, 'f', 4);
+}
+
+StoredPlaymat decodeStoredPlaymat(const QString &encoded)
+{
+    const QStringList fields = encoded.split(PLAYMAT_FIELD_SEP);
+    if (fields.size() != 6) {
+        return {};
+    }
+    StoredPlaymat stored;
+    stored.name = fields.at(0);
+    stored.providerId = fields.at(1);
+    stored.marginPctL = fields.at(2).toDouble();
+    stored.marginPctR = fields.at(3).toDouble();
+    stored.verticalOffset = fields.at(4).toDouble();
+    stored.zoom = fields.at(5).toDouble();
+    return stored;
+}
+} // namespace
+
 InterfaceSettings::InterfaceSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "interface.ini", "interface", QString(), parent)
 {
@@ -163,6 +192,30 @@ bool InterfaceSettings::getShowGameSelectorFilterToolbar() const
 int InterfaceSettings::getPlaymatVisibility() const
 {
     return getValue("playmatvisibility", QString(), QString(), 2).toInt();
+}
+
+QList<StoredPlaymat> InterfaceSettings::getPlaymatFallbackList() const
+{
+    const QStringList entries = getValue("playmatFallbackList", QString(), QString(), QStringList()).toStringList();
+    QList<StoredPlaymat> result;
+    result.reserve(entries.size());
+    for (const QString &entry : entries) {
+        const StoredPlaymat stored = decodeStoredPlaymat(entry);
+        if (!stored.isEmpty()) {
+            result.append(stored);
+        }
+    }
+    return result;
+}
+
+StoredPlaymat InterfaceSettings::getPlaymatOverride() const
+{
+    return decodeStoredPlaymat(getValue("playmatOverride", QString(), QString(), QString()).toString());
+}
+
+int InterfaceSettings::getPlaymatFallbackMode() const
+{
+    return qBound(0, getValue("playmatFallbackMode", QString(), QString(), 1).toInt(), 2);
 }
 
 bool InterfaceSettings::getLifeCounterAnimationsEnabled() const
@@ -355,6 +408,33 @@ void InterfaceSettings::setPlaymatVisibility(int _visibility)
     }
     setValue(_visibility, "playmatvisibility");
     emit playmatVisibilityChanged(_visibility);
+}
+
+void InterfaceSettings::setPlaymatFallbackList(const QList<StoredPlaymat> &_fallbackList)
+{
+    QStringList entries;
+    entries.reserve(_fallbackList.size());
+    for (const StoredPlaymat &stored : _fallbackList) {
+        entries.append(encodeStoredPlaymat(stored));
+    }
+    setValue(entries, "playmatFallbackList");
+    emit playmatSettingsChanged();
+}
+
+void InterfaceSettings::setPlaymatOverride(const StoredPlaymat &_override)
+{
+    setValue(_override.isEmpty() ? QString() : encodeStoredPlaymat(_override), "playmatOverride");
+    emit playmatSettingsChanged();
+}
+
+void InterfaceSettings::setPlaymatFallbackMode(int _fallbackMode)
+{
+    const int mode = qBound(0, _fallbackMode, 2);
+    if (getPlaymatFallbackMode() == mode) {
+        return;
+    }
+    setValue(mode, "playmatFallbackMode");
+    emit playmatSettingsChanged();
 }
 
 void InterfaceSettings::setLifeCounterAnimationsEnabled(bool _lifeCounterAnimationsEnabled)

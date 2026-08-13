@@ -5,10 +5,14 @@
 #include <QPixmap>
 #include <libcockatrice/deck_list/deck_list.h>
 
+class QCheckBox;
 class QComboBox;
 class QCompleter;
-class QLineEdit;
 class QDoubleSpinBox;
+class QGroupBox;
+class QLabel;
+class QLineEdit;
+class QPushButton;
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 class CardSearchModel;
@@ -35,6 +39,12 @@ public:
     CardRef card() const;
     PlaymatParams params() const;
 
+    /**
+     * @brief Whether the user also wants the configured playmat saved as the
+     *        user-level default (fallback for decks without one).
+     */
+    bool useAsDefault() const;
+
 private slots:
     void onCardNameChanged(const QString &name);
     void reloadPreview();
@@ -44,6 +54,7 @@ private:
     void setupUi();
     void populateProviderCombo(const QString &cardName);
     void initializeSearchBar();
+    void retranslateUi();
     QDoubleSpinBox *makeSpinBox(double min, double max, double value, double step);
 
     QLineEdit *searchBar;
@@ -56,6 +67,18 @@ private:
     QComboBox *providerComboBox;
 
     QMetaObject::Connection pixmapUpdatedConnection;
+
+    QCheckBox *useAsDefaultCheckBox;
+
+    QLabel *cardNameLabel;
+    QLabel *printingLabel;
+    QLabel *leftMarginLabel;
+    QLabel *rightMarginLabel;
+    QLabel *verticalOffsetLabel;
+    QLabel *zoomLabel;
+    QGroupBox *controlsGroup;
+    QGroupBox *previewGroup;
+    QPushButton *removeButton;
 
     QDoubleSpinBox *marginLSpin;
     QDoubleSpinBox *marginRSpin;

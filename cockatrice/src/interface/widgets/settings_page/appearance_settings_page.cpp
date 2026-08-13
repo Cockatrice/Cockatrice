@@ -7,11 +7,15 @@
 #include "../dialogs/override_printing_warning.h"
 #include "../interface/theme_manager.h"
 #include "../interface/widgets/general/background_sources.h"
+#include "../playmat/playmat_collection_dialog.h"
+#include "../playmat/playmat_settings_dialog.h"
+#include "../playmat/playmat_settings_utils.h"
 
 #include <QApplication>
 #include <QColorDialog>
 #include <QDesktopServices>
 #include <QGridLayout>
+#include <QHBoxLayout>
 #include <QMessageBox>
 #include <QStyleFactory>
 #include <QTimer>
@@ -329,12 +333,27 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     });
     playmatVisibilityLabel.setBuddy(&playmatVisibilityCombo);
 
+    // User-level playmat settings: override (force all decks) and fallback collection.
+    connect(&playmatOverrideEditButton, &QPushButton::clicked, this,
+            &AppearanceSettingsPage::openOverridePlaymatSettings);
+    connect(&playmatOverrideClearButton, &QPushButton::clicked, this, &AppearanceSettingsPage::clearOverridePlaymat);
+    connect(&playmatDefaultEditButton, &QPushButton::clicked, this,
+            &AppearanceSettingsPage::openPlaymatCollectionDialog);
+
+    auto *overrideButtons = new QHBoxLayout;
+    overrideButtons->addWidget(&playmatOverrideEditButton);
+    overrideButtons->addWidget(&playmatOverrideClearButton);
+
     auto *tableGrid = new QGridLayout;
     tableGrid->addWidget(&invertVerticalCoordinateCheckBox, 0, 0, 1, 2);
     tableGrid->addWidget(&minPlayersForMultiColumnLayoutLabel, 1, 0, 1, 1);
     tableGrid->addWidget(&minPlayersForMultiColumnLayoutEdit, 1, 1, 1, 1);
     tableGrid->addWidget(&playmatVisibilityLabel, 2, 0, 1, 1);
     tableGrid->addWidget(&playmatVisibilityCombo, 2, 1, 1, 1);
+    tableGrid->addWidget(&playmatOverrideLabel, 3, 0, 1, 1);
+    tableGrid->addLayout(overrideButtons, 3, 1, 1, 1);
+    tableGrid->addWidget(&playmatDefaultLabel, 4, 0, 1, 1);
+    tableGrid->addWidget(&playmatDefaultEditButton, 4, 1, 1, 1);
 
     tableGroupBox = new QGroupBox;
     tableGroupBox->setLayout(tableGrid);
@@ -445,6 +464,42 @@ void AppearanceSettingsPage::cardViewExpandedRowsMaxChanged(int value)
     }
 }
 
+void AppearanceSettingsPage::openOverridePlaymatSettings()
+{
+    auto &interfaceSettings = SettingsCache::instance().userInterface();
+    const PlaymatResolution current = resolutionFromStoredPlaymat(interfaceSettings.getPlaymatOverride());
+    PlaymatSettingsDialog dialog(current.card, current.params, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        const CardRef card = dialog.card();
+        if (card.isEmpty()) {
+            interfaceSettings.setPlaymatOverride(StoredPlaymat{});
+        } else {
+            interfaceSettings.setPlaymatOverride(storedFromResolution({card, dialog.params()}));
+        }
+        updatePlaymatSummary();
+    }
+}
+
+void AppearanceSettingsPage::clearOverridePlaymat()
+{
+    SettingsCache::instance().userInterface().setPlaymatOverride(StoredPlaymat{});
+    updatePlaymatSummary();
+}
+
+void AppearanceSettingsPage::openPlaymatCollectionDialog()
+{
+    PlaymatCollectionDialog dialog(this);
+    dialog.exec();
+    updatePlaymatSummary();
+}
+
+void AppearanceSettingsPage::updatePlaymatSummary()
+{
+    const StoredPlaymat overridePlaymat = SettingsCache::instance().userInterface().getPlaymatOverride();
+    playmatOverrideEditButton.setText(overridePlaymat.isEmpty() ? tr("Set...")
+                                                                : tr("Change (%1)").arg(overridePlaymat.name));
+}
+
 void AppearanceSettingsPage::retranslateUi()
 {
     themeGroupBox->setTitle(tr("Theme settings"));
@@ -504,4 +559,9 @@ void AppearanceSettingsPage::retranslateUi()
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
     playmatVisibilityLabel.setText(tr("Playmat visibility:"));
+    playmatOverrideLabel.setText(tr("Force playmat for all decks:"));
+    playmatOverrideClearButton.setText(tr("Clear"));
+    playmatDefaultLabel.setText(tr("Default playmats (when a deck has none):"));
+    playmatDefaultEditButton.setText(tr("Edit..."));
+    updatePlaymatSummary();
 }

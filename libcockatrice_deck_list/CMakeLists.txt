@@ -11,6 +11,7 @@ set(HEADERS
     libcockatrice/deck_list/deck_list_history_manager.h
     libcockatrice/deck_list/deck_list_node_tree.h
     libcockatrice/deck_list/deck_list_memento.h
+    libcockatrice/deck_list/playmat_resolver.h
     libcockatrice/deck_list/sideboard_plan.h
 )
 
@@ -26,6 +27,7 @@ add_library(
   libcockatrice/deck_list/deck_list.cpp
   libcockatrice/deck_list/deck_list_history_manager.cpp
   libcockatrice/deck_list/deck_list_node_tree.cpp
+  libcockatrice/deck_list/playmat_resolver.cpp
   libcockatrice/deck_list/sideboard_plan.cpp
 )
 

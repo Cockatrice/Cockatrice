@@ -24,6 +24,10 @@ private slots:
 
     void cardViewInitialRowsMaxChanged(int value);
     void cardViewExpandedRowsMaxChanged(int value);
+    void openOverridePlaymatSettings();
+    void clearOverridePlaymat();
+    void openPlaymatCollectionDialog();
+    void updatePlaymatSummary();
 
 private:
     QLabel themeLabel;
@@ -61,6 +65,11 @@ private:
     QCheckBox invertVerticalCoordinateCheckBox;
     QLabel playmatVisibilityLabel;
     QComboBox playmatVisibilityCombo;
+    QLabel playmatOverrideLabel;
+    QPushButton playmatOverrideEditButton;
+    QPushButton playmatOverrideClearButton;
+    QLabel playmatDefaultLabel;
+    QPushButton playmatDefaultEditButton;
     QGroupBox *themeGroupBox;
     QGroupBox *homeTabGroupBox;
     QGroupBox *stylingGroupBox;

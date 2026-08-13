@@ -7,6 +7,7 @@
 #include "card_database_model.h"
 #include "playmat_preview_widget.h"
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QCompleter>
 #include <QDialogButtonBox>
@@ -27,7 +28,6 @@ PlaymatSettingsDialog::PlaymatSettingsDialog(const CardRef &initialCard,
                                              QWidget *parent)
     : QDialog(parent), currentCard(initialCard), currentParams(initialParams)
 {
-    setWindowTitle(tr("Playmat Settings"));
     setMinimumWidth(500);
     setupUi();
 
@@ -53,6 +53,8 @@ PlaymatSettingsDialog::PlaymatSettingsDialog(const CardRef &initialCard,
     marginRSpin->setValue(initialParams.marginPctR);
     verticalOffsetSpin->setValue(initialParams.verticalOffset);
     zoomSpin->setValue(initialParams.zoom);
+
+    retranslateUi();
 }
 
 CardRef PlaymatSettingsDialog::card() const
@@ -63,6 +65,11 @@ CardRef PlaymatSettingsDialog::card() const
 PlaymatParams PlaymatSettingsDialog::params() const
 {
     return currentParams;
+}
+
+bool PlaymatSettingsDialog::useAsDefault() const
+{
+    return useAsDefaultCheckBox->isChecked();
 }
 
 QDoubleSpinBox *PlaymatSettingsDialog::makeSpinBox(double min, double max, double value, double step)
@@ -78,7 +85,6 @@ QDoubleSpinBox *PlaymatSettingsDialog::makeSpinBox(double min, double max, doubl
 void PlaymatSettingsDialog::initializeSearchBar()
 {
     searchBar = new QLineEdit;
-    searchBar->setPlaceholderText(tr("Type a card name..."));
 
     cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
@@ -121,36 +127,46 @@ void PlaymatSettingsDialog::setupUi()
     zoomSpin = makeSpinBox(0.1, 4.0, currentParams.zoom, 0.05);
 
     auto *form = new QFormLayout;
-    form->addRow(tr("Card name:"), searchBar);
-    form->addRow(tr("Printing:"), providerComboBox);
-    form->addRow(tr("Left margin (%):"), marginLSpin);
-    form->addRow(tr("Right margin (%):"), marginRSpin);
-    form->addRow(tr("Vertical offset:"), verticalOffsetSpin);
-    form->addRow(tr("Zoom:"), zoomSpin);
+    cardNameLabel = new QLabel;
+    printingLabel = new QLabel;
+    leftMarginLabel = new QLabel;
+    rightMarginLabel = new QLabel;
+    verticalOffsetLabel = new QLabel;
+    zoomLabel = new QLabel;
+    form->addRow(cardNameLabel, searchBar);
+    form->addRow(printingLabel, providerComboBox);
+    form->addRow(leftMarginLabel, marginLSpin);
+    form->addRow(rightMarginLabel, marginRSpin);
+    form->addRow(verticalOffsetLabel, verticalOffsetSpin);
+    form->addRow(zoomLabel, zoomSpin);
 
-    auto *controlsGroup = new QGroupBox(tr("Parameters"));
+    controlsGroup = new QGroupBox;
     controlsGroup->setLayout(form);
+
+    useAsDefaultCheckBox = new QCheckBox;
+    useAsDefaultCheckBox->setEnabled(false);
 
     preview = new PlaymatPreviewWidget;
 
     auto *previewLayout = new QVBoxLayout;
     previewLayout->addWidget(preview);
-    auto *previewGroup = new QGroupBox(tr("Preview"));
+    previewGroup = new QGroupBox;
     previewGroup->setLayout(previewLayout);
 
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    auto *removeBtn = new QPushButton(tr("Remove Playmat"));
-    buttons->addButton(removeBtn, QDialogButtonBox::ResetRole);
+    removeButton = new QPushButton;
+    buttons->addButton(removeButton, QDialogButtonBox::ResetRole);
 
     connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
-    connect(removeBtn, &QPushButton::clicked, this, [this]() {
+    connect(removeButton, &QPushButton::clicked, this, [this]() {
         currentCard = CardRef{}; // empty signals removal
         accept();
     });
 
     auto *root = new QVBoxLayout;
     root->addWidget(controlsGroup);
+    root->addWidget(useAsDefaultCheckBox);
     root->addWidget(previewGroup);
     root->addWidget(buttons);
     setLayout(root);
@@ -190,6 +206,8 @@ void PlaymatSettingsDialog::onCardNameChanged(const QString &name)
     if (name.isEmpty()) {
         currentPixmap = QPixmap();
         preview->setPixmap(currentPixmap);
+        useAsDefaultCheckBox->setChecked(false);
+        useAsDefaultCheckBox->setEnabled(false);
         return;
     }
 
@@ -198,10 +216,13 @@ void PlaymatSettingsDialog::onCardNameChanged(const QString &name)
         currentPixmap = QPixmap();
         preview->setPixmap(currentPixmap);
         providerComboBox->clear();
+        useAsDefaultCheckBox->setChecked(false);
+        useAsDefaultCheckBox->setEnabled(false);
         return;
     }
 
     currentCard.name = name;
+    useAsDefaultCheckBox->setEnabled(true);
 
     populateProviderCombo(name);
 
@@ -253,4 +274,20 @@ void PlaymatSettingsDialog::onParamChanged()
     currentParams.verticalOffset = verticalOffsetSpin->value();
     currentParams.zoom = zoomSpin->value();
     preview->setParams(currentParams);
+}
+
+void PlaymatSettingsDialog::retranslateUi()
+{
+    setWindowTitle(tr("Playmat Settings"));
+    searchBar->setPlaceholderText(tr("Type a card name..."));
+    cardNameLabel->setText(tr("Card name:"));
+    printingLabel->setText(tr("Printing:"));
+    leftMarginLabel->setText(tr("Left margin (%):"));
+    rightMarginLabel->setText(tr("Right margin (%):"));
+    verticalOffsetLabel->setText(tr("Vertical offset:"));
+    zoomLabel->setText(tr("Zoom:"));
+    controlsGroup->setTitle(tr("Parameters"));
+    useAsDefaultCheckBox->setText(tr("Also set as my default playmat (for decks without one)"));
+    previewGroup->setTitle(tr("Preview"));
+    removeButton->setText(tr("Remove Playmat"));
 }

@@ -8,6 +8,7 @@
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_website.h"
 #include "../../interface/widgets/dialogs/dlg_load_remote_deck.h"
+#include "../../interface/widgets/playmat/playmat_settings_utils.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "deck_view.h"
 
@@ -277,7 +278,11 @@ void DeckViewContainer::loadDeckFromFile(const QString &filePath)
 
 void DeckViewContainer::loadDeckFromDeckList(const DeckList &deck)
 {
-    QString deckString = deck.writeToString_Native();
+    // Bake the user-level playmat resolution (override > deck > fallback list)
+    // into the uploaded deck so the server, local and remote players, and
+    // replays all derive the same effective playmat.
+    const DeckList effectiveDeck = applyUserPlaymatSettings(deck, SettingsCache::instance().userInterface());
+    QString deckString = effectiveDeck.writeToString_Native();
 
     if (deckString.length() > MAX_FILE_LENGTH) {
         QMessageBox::critical(this, tr("Error"), tr("Deck is greater than maximum file size."));

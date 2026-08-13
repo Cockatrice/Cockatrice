@@ -3,6 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../playmat/playmat_settings_dialog.h"
+#include "../playmat/playmat_settings_utils.h"
 #include "../settings_page/user_interface_settings_page.h"
 #include "../tabs/api/commander_spellbook/commander_bracket_widget.h"
 #include "deck_list_style_proxy.h"
@@ -17,6 +18,7 @@
 #include <QTextEdit>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/macros.h>
 #include <libcockatrice/utility/string_limits.h>
 
@@ -467,6 +469,14 @@ void DeckEditorDeckDockWidget::openPlaymatSettings()
         } else {
             deckStateManager->setPlaymatCard(newCard);
             deckStateManager->setPlaymatParams(newParams);
+        }
+
+        // "Also set as my default playmat": make this the fixed user-level
+        // fallback, so decks without a playmat of their own use it.
+        if (dialog.useAsDefault() && !newCard.isEmpty()) {
+            auto &interfaceSettings = SettingsCache::instance().userInterface();
+            interfaceSettings.setPlaymatFallbackList({storedFromResolution({newCard, newParams})});
+            interfaceSettings.setPlaymatFallbackMode(0); // PlaymatFallbackMode::Fixed
         }
         updatePlaymatLabel();
     }
