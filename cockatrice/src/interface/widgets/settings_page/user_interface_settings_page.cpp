@@ -289,7 +289,6 @@ void UserInterfaceSettingsPage::enableAllAnimations()
     tapAnimationCheckBox.setChecked(true);
     lifeCounterAnimationsCheckBox.setChecked(true);
     battlefieldFlashCheckBox.setChecked(true);
-    visualDeckStorageSelectionAnimationCheckBox.setChecked(true);
 }
 
 void UserInterfaceSettingsPage::disableAllAnimations()
@@ -297,7 +296,6 @@ void UserInterfaceSettingsPage::disableAllAnimations()
     tapAnimationCheckBox.setChecked(false);
     lifeCounterAnimationsCheckBox.setChecked(false);
     battlefieldFlashCheckBox.setChecked(false);
-    visualDeckStorageSelectionAnimationCheckBox.setChecked(false);
 }
 
 void UserInterfaceSettingsPage::updateCommanderSpellbookUiState()

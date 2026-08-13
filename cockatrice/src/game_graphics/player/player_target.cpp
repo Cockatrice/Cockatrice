@@ -33,10 +33,10 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     path.lineTo(50 - border / 2, 30 - border / 2);
     path.closeSubpath();
 
-    QPen pen(qApp->palette().highlight().color());
+    QPen pen(QColor(100, 100, 100));
     pen.setWidthF(border);
     painter->setPen(pen);
-    painter->setBrush(hovered ? QColor(18, 24, 38, 200) : QColor(11, 14, 20, 184));
+    painter->setBrush(hovered ? QColor(50, 50, 50, 160) : QColor(0, 0, 0, 160));
 
     painter->drawPath(path);
 
