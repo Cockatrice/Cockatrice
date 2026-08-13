@@ -76,7 +76,11 @@ void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> wid
     auto filterString = DeckFilterString(searchText);
 
     for (auto widget : widgets) {
-        QString relativeFilePath = toRelativeFilepath(widget->filePath);
-        widget->filteredBySearch = !filterString.check(widget, {relativeFilePath});
+        DeckSearchData searchData;
+        searchData.deck = &widget->deckLoader->getDeck();
+        searchData.filePath = widget->filePath;
+        searchData.displayName = widget->getDisplayName();
+        searchData.relativeFilePath = toRelativeFilepath(widget->filePath);
+        widget->filteredBySearch = !filterString.check(searchData);
     }
 }
