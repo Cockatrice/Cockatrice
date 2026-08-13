@@ -11,8 +11,10 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QWidget>
+#include <libcockatrice/network/server/remote/user_level.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/utility/days_years_between.h>
 
-class ServerInfo_User;
 class AbstractClient;
 class Response;
 
@@ -24,10 +26,14 @@ private:
     bool editable;
     QLabel avatarPic, userLevelIcon, nameLabel, realNameLabel1, realNameLabel2, countryLabel1, countryLabel2,
         countryLabel3, userLevelLabel1, userLevelLabel2, accountAgeLabel1, accountAgeLabel2;
-    QPushButton editButton, passwordButton, avatarButton;
+    QPushButton editButton, passwordButton, avatarButton, bannerCardButton;
     QPixmap avatarPixmap;
     bool hasAvatar;
-    const ServerInfo_User *currentUserInfo;
+    ServerInfo_User currentUserInfo;
+    bool hasUserInfo = false;
+    UserLevelFlags userLevel;
+    ServerInfo_User::PawnColorsOverride pawnColors;
+    QString privLevel;
 
     static QString getAgeString(int ageSeconds);
 
@@ -35,12 +41,6 @@ public:
     UserInfoBox(AbstractClient *_client, bool editable, QWidget *parent = nullptr, Qt::WindowFlags flags = {});
     void retranslateUi();
 
-    inline static QPair<int, int> getDaysAndYearsBetween(const QDate &then, const QDate &now)
-    {
-        int years = now.addDays(1 - then.dayOfYear()).year() - then.year(); // there is no yearsTo
-        int days = then.addYears(years).daysTo(now);
-        return {days, years};
-    }
 private slots:
     void processResponse(const Response &r);
     void processEditResponse(const Response &r);
@@ -51,6 +51,7 @@ private slots:
     void actEditInternal(const Response &r);
     void actPassword();
     void actAvatar();
+    void actBannerCard();
 public slots:
     void updateInfo(const ServerInfo_User &user);
     void updateInfo(const QString &userName);

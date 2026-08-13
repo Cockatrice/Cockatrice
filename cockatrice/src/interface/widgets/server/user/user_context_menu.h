@@ -74,6 +74,29 @@ public:
                          int playerId,
                          const QString &deckHash,
                          ChatView *chatView = nullptr);
+
+    const UserListProxy *getUserListProxy() const
+    {
+        return userListProxy;
+    }
+
+    // Individual action entry points — used by UserInfoPopup to trigger
+    // actions without re-running the full context menu flow.
+    void execChat(const QString &userName);
+    void execDetails(const QString &userName);
+    void execShowGames(const QString &userName);
+    void execAddToBuddy(const QString &userName);
+    void execRemoveFromBuddy(const QString &userName);
+    void execAddToIgnore(const QString &userName);
+    void execRemoveFromIgnore(const QString &userName);
+    void execKick(int playerId);
+    void execBan(const QString &userName);
+    void execWarn(const QString &userName);
+    void execBanHistory(const QString &userName);
+    void execWarnHistory(const QString &userName);
+    void execAdminNotes(const QString &userName);
+    void execAdjustMod(const QString &userName, bool shouldBeMod);
+    void execAdjustJudge(const QString &userName, bool shouldBeJudge);
 };
 
 #endif

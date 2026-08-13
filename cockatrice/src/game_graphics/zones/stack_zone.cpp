@@ -43,12 +43,18 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
         return;
     }
 
-    int index = calcDropIndexFromY(dropPoint.y(), MIN_CARD_VISIBLE);
-
-    // Same-zone no-op: don't move a card onto itself
     const auto &cards = getLogic()->getCards();
-    if (!cards.isEmpty() && startZone == getLogic() && cards.at(index)->getId() == dragItems.at(0)->getId()) {
-        return;
+    int index;
+    if (startZone == getLogic()) {
+        // Reordering within the zone: use drop position
+        index = calcDropIndexFromY(dropPoint.y(), MIN_CARD_VISIBLE);
+        // Same-zone no-op: don't move a card onto itself
+        if (!cards.isEmpty() && cards.at(index)->getId() == dragItems.at(0)->getId()) {
+            return;
+        }
+    } else {
+        // Coming from another zone: append at end (top of stack, rendered on top)
+        index = static_cast<int>(cards.size());
     }
 
     Command_MoveCard cmd;

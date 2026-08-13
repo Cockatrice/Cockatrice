@@ -117,6 +117,7 @@ void PaletteGridWidget::buildGrid(QWidget *host)
         for (int col = 0; col < 3; ++col) {
             auto group = ALL_GROUPS[col];
             auto *btn = new ColorButton(host);
+            connect(btn, &ColorButton::colorChanged, this, [this] { emit paletteChanged(); });
             colorButtons[group][role] = btn;
             grid->addWidget(btn, row + 1, col + 1, Qt::AlignHCenter | Qt::AlignVCenter);
         }

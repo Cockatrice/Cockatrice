@@ -24,6 +24,7 @@
 #include <QProxyStyle>
 #include <QTabWidget>
 
+class TabCardArtRules;
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
 
 class UserListManager;
@@ -70,11 +71,7 @@ public:
     }
 
 protected:
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     void enterEvent(QEnterEvent *event) override;
-#else
-    void enterEvent(QEvent *event) override;
-#endif
     void leaveEvent(QEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 };
@@ -103,6 +100,7 @@ private:
     TabDeckStorage *tabDeckStorage;
     TabReplays *tabReplays;
     TabAdmin *tabAdmin;
+    TabCardArtRules *tabCardArtRules;
     TabLog *tabLog;
     QMap<int, TabRoom *> roomTabs;
     QMap<int, TabGame *> gameTabs;
@@ -112,7 +110,8 @@ private:
     bool isLocalGame;
 
     QAction *aTabHome, *aTabDeckEditor, *aTabVisualDeckEditor, *aTabEdhRec, *aTabArchidekt, *aTabVisualDeckStorage,
-        *aTabVisualDatabaseDisplay, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays, *aTabAdmin, *aTabLog;
+        *aTabVisualDatabaseDisplay, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays, *aTabAdmin,
+        *aTabCardArtRules, *aTabLog;
 
     int myAddTab(Tab *tab, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
@@ -145,9 +144,13 @@ public:
         return userInfo;
     }
     [[nodiscard]] AbstractClient *getClient() const;
-    [[nodiscard]] const UserListManager *getUserListManager() const
+    [[nodiscard]] UserListManager *getUserListManager() const
     {
         return userListManager;
+    }
+    [[nodiscard]] TabServer *getTabServer() const
+    {
+        return tabServer;
     }
     [[nodiscard]] const QMap<int, TabRoom *> &getRoomTabs() const
     {
@@ -180,6 +183,7 @@ public slots:
     void maximizeMainWindow();
     void actTabVisualDeckStorage(bool checked);
     void actTabReplays(bool checked);
+    void openTabServer();
 private slots:
     void refreshShortcuts();
 
@@ -192,11 +196,12 @@ private slots:
 
     void openTabVisualDeckStorage();
     void openTabHome();
-    void openTabServer();
     void openTabAccount();
     void openTabDeckStorage();
     void openTabReplays();
     void openTabAdmin();
+    void actTabCardArtRules(bool checked);
+    void openTabCardArtRules();
     void openTabLog();
 
     void updateCurrent(int index);

@@ -49,10 +49,13 @@ class TabServer : public Tab
     Q_OBJECT
 signals:
     void roomJoined(const ServerInfo_Room &info, bool setCurrent);
+    void roomJoinFailed(int roomId);
 private slots:
     void processServerMessageEvent(const Event_ServerMessage &event);
-    void joinRoom(int id, bool setCurrent);
-    void joinRoomFinished(const Response &resp, const CommandContainer &commandContainer, const QVariant &extraData);
+    void joinRoomFinished(const Response &resp,
+                          const CommandContainer &commandContainer,
+                          const QVariant &extraData,
+                          int roomId);
 
 private:
     AbstractClient *client;
@@ -62,6 +65,7 @@ private:
 
 public:
     TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client);
+    void joinRoom(int id, bool setCurrent);
     void retranslateUi() override;
     [[nodiscard]] QString getTabText() const override
     {

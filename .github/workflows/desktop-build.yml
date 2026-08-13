@@ -3,7 +3,7 @@ name: Build Desktop
 permissions:
   actions: write    # needed to delete entries in GHA cache (update ccache)
   attestations: write    # needed to persist the attestation.
-  contents: write
+  contents: write    # needed for e.g. vcpkg dependency graph updates
   id-token: write    # needed for signing certificate in attestation
 
 on:
@@ -47,26 +47,21 @@ jobs:
       tag: ${{ steps.configure.outputs.tag }}
       sha: ${{ steps.configure.outputs.sha }}
 
-    steps:  
+    steps:
       - name: "Configure"
+        env:
+          RESOLVED_SHA: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
         id: configure
         shell: bash
         run: |
-          tag_regex='^refs/tags/'
-          if [[ $GITHUB_EVENT_NAME == pull-request ]]; then    # pull request
-            sha="${{github.event.pull_request.head.sha}}"
-          elif [[ $GITHUB_REF =~ $tag_regex ]]; then    # release
-            sha="$GITHUB_SHA"
-            tag="${GITHUB_REF/refs\/tags\//}"
-            echo "tag=$tag" >>"$GITHUB_OUTPUT"
-          else    # push to branch
-            sha="$GITHUB_SHA"
+          if [[ "$GITHUB_REF_TYPE" == 'tag' ]]; then    # release
+            echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
           fi
-          echo "sha=$sha" >>"$GITHUB_OUTPUT"
+          echo "sha=$RESOLVED_SHA" >> "$GITHUB_OUTPUT"
 
       - name: "Checkout"
         if: steps.configure.outputs.tag != null
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0    # fetch all history for all branches and tags
 
@@ -92,7 +87,7 @@ jobs:
         run: |
           args=()
           [[ $prerelease == yes ]] && args+=(--prerelease)
-          
+
           gh release create "$tag_name" --verify-tag --draft "${args[@]}" \
             --target "$target" \
             --title "$release_name" \
@@ -105,48 +100,48 @@ jobs:
         # The files in ".ci/$distro$version" correspond to the values given here
         include:
           - distro: Arch
-            
+
             allow-failure: yes
             package: skip    # We are packaged in Arch already
 
           - distro: Servatrice_Debian
             version: 12
-            
+
             package: DEB
             server_only: yes
             test: skip
 
           - distro: Debian
             version: 12
-            
+
             package: DEB
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Debian
             version: 13
-            
+
             package: DEB
 
           - distro: Fedora
             version: 43
-            
+
             package: RPM
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Fedora
             version: 44
-            
+
             package: RPM
 
           - distro: Ubuntu
             version: 24.04
-            
+
             package: DEB
             test: skip    # Running tests on all distros is superfluous
 
           - distro: Ubuntu
             version: 26.04
-            
+
             package: DEB
 
     name: ${{ matrix.distro }} ${{ matrix.version }}
@@ -163,11 +158,11 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: "Restore compiler cache (ccache)"
         id: ccache_restore
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
@@ -203,7 +198,7 @@ jobs:
           args+=(--ccache "$CCACHE_SIZE")
           args+=(--cmake-generator "$CMAKE_GENERATOR")
           args+=(--suffix "$SUFFIX")
-          
+
           RUN --server --release --package "$package" "${args[@]}"
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
@@ -211,15 +206,16 @@ jobs:
         if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
         continue-on-error: true
         env:
+          CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}; then
+          if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
             echo "Cache deleted successfully"
           fi
 
       - name: "Save updated compiler cache (ccache)"
         if: github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
           path: ${{ env.CACHE }}
@@ -256,8 +252,9 @@ jobs:
         if: steps.attestation.outcome == 'success'
         shell: bash
         env:
+          BUILD_PATH: ${{ steps.build.outputs.path }}
           GH_TOKEN: ${{ github.token }}
-        run: gh attestation verify "${{ steps.build.outputs.path }}" --repo Cockatrice/Cockatrice
+        run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice
 
   build-vcpkg:
     strategy:
@@ -267,14 +264,13 @@ jobs:
           - os: macOS
             target: 13
             runner: macos-15-intel
-            
+
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
             override_target: 13
             package_suffix: "-macOS13_Intel"
             qt_version: 6.11.0
-            qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Intel
             type: Release
@@ -284,13 +280,12 @@ jobs:
           - os: macOS
             target: 14
             runner: macos-14
-            
+
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS14"
             qt_version: 6.11.0
-            qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
@@ -300,13 +295,12 @@ jobs:
           - os: macOS
             target: 15
             runner: macos-15
-            
+
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS15"
             qt_version: 6.11.0
-            qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
@@ -316,11 +310,10 @@ jobs:
           - os: macOS
             target: 15
             runner: macos-15
-            
+
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             qt_version: 6.11.0
-            qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Debug
@@ -330,13 +323,12 @@ jobs:
           - os: Windows
             target: 10
             runner: windows-2025
-            
-            cmake_generator: "Visual Studio 17 2022"
+
+            cmake_generator: "Visual Studio 18 2026"
             cmake_generator_platform: x64
             make_package: 1
             package_suffix: "-Win10"
             qt_version: 6.11.0
-            qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
 
@@ -350,7 +342,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -368,7 +360,7 @@ jobs:
       - name: "[macOS] Restore compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
         id: ccache_restore
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
@@ -381,14 +373,16 @@ jobs:
 
       # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version via aqtinstall to avoid stale caches on new releases
       - name: "Resolve latest Qt patch version"
+        env:
+          QT_VERSION: ${{ matrix.qt_version }}
         id: resolve_qt_version
         shell: bash
-        run: .ci/resolve_latest_aqt_qt_version.sh "${{ matrix.qt_version }}"
+        run: .ci/resolve_latest_aqt_qt_version.sh "$QT_VERSION"
 
       - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries"
         if: matrix.os == 'macOS'
         id: restore_qt
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
           path: ${{ github.workspace }}/Qt
@@ -399,7 +393,6 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
-          arch: ${{ matrix.qt_arch }}
           cache: false
           dir: ${{ github.workspace }}
           modules: ${{ matrix.qt_modules }}
@@ -411,7 +404,7 @@ jobs:
 
       - name: "[macOS] Cache thin Qt libraries"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
           path: ${{ github.workspace }}/Qt
@@ -422,7 +415,6 @@ jobs:
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
-          arch: ${{ matrix.qt_arch }}
           cache: true
           modules: ${{ matrix.qt_modules }}
           version: ${{ steps.resolve_qt_version.outputs.version }}
@@ -448,6 +440,7 @@ jobs:
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
+          GITHUB_TOKEN: ${{ github.token }}    # needed for vcpkg dependency graph updates, see VCPKG_FEATURE_FLAGS
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
@@ -458,6 +451,7 @@ jobs:
           USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           VCPKG_DISABLE_METRICS: 1
+          VCPKG_FEATURE_FLAGS: dependencygraph
         run: .ci/compile.sh --server --test --vcpkg
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
@@ -465,15 +459,16 @@ jobs:
         if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
         continue-on-error: true
         env:
+          CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh cache delete --repo ${{ github.repository }} ${{ steps.ccache_restore.outputs.cache-primary-key }}; then
+          if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
             echo "Cache deleted successfully"
           fi
 
       - name: "[macOS] Save updated compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master'
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
           path: ${{ env.CCACHE_DIR }}
@@ -482,18 +477,20 @@ jobs:
         if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
         id: sign_macos
         env:
+          BUILD_PATH: ${{ steps.build.outputs.path }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CI_KEYCHAIN_PWD: ${{ secrets.PROD_MACOS_CI_KEYCHAIN_PWD }}
         run: |
           if [[ -n "$MACOS_CERTIFICATE_NAME" ]]
           then
             security unlock-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
-            /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "${{ steps.build.outputs.path }}"
+            /usr/bin/codesign --sign="$MACOS_CERTIFICATE_NAME" --entitlements=".ci/macos.entitlements" --options=runtime --force --deep --timestamp --verbose "$BUILD_PATH"
           fi
 
       - name: "[macOS] Notarize app bundle"
         if: matrix.os == 'macOS' && steps.sign_macos.outcome == 'success'
         env:
+          BUILD_PATH: ${{ steps.build.outputs.path }}
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
           MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
           MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
@@ -508,7 +505,7 @@ jobs:
             # Therefore, we create a zip file containing our app bundle, so that we can send it to the
             # notarization service
             echo "Creating temp notarization archive"
-            ditto -c -k --keepParent "${{ steps.build.outputs.path }}" "notarization.zip"
+            ditto -c -k --keepParent "$BUILD_PATH" "notarization.zip"
 
             # Here we send the notarization request to the Apple's Notarization service, waiting for the result.
             # This typically takes a few seconds inside a CI environment, but it might take more depending on the App
@@ -520,7 +517,7 @@ jobs:
             # Finally, we need to "attach the staple" to our executable, which will allow our app to be
             # validated by macOS even when an internet connection is not available.
             echo "Attach staple"
-            xcrun stapler staple "${{ steps.build.outputs.path }}"
+            xcrun stapler staple "$BUILD_PATH"
           fi
 
       - name: "Upload artifact"
@@ -566,5 +563,6 @@ jobs:
         if: steps.attestation.outcome == 'success'
         shell: bash
         env:
+          BUILD_PATH: ${{ steps.build.outputs.path }}
           GH_TOKEN: ${{ github.token }}
-        run: gh attestation verify "${{ steps.build.outputs.path }}" --repo Cockatrice/Cockatrice
+        run: gh attestation verify "$BUILD_PATH" --repo Cockatrice/Cockatrice

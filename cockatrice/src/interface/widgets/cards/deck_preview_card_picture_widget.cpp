@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QPainterPath>
 #include <QStylePainter>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 /**
  * @brief Constructs a CardPictureWithTextOverlay widget.
@@ -38,7 +39,8 @@ DeckPreviewCardPictureWidget::DeckPreviewCardPictureWidget(QWidget *parent,
     singleClickTimer = new QTimer(this);
     singleClickTimer->setSingleShot(true);
     connect(singleClickTimer, &QTimer::timeout, this, [this]() { emit imageClicked(lastMouseEvent, this); });
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageSelectionAnimationChanged, this,
+    connect(&SettingsCache::instance().visualDeckStorage(),
+            &VisualDeckStorageSettings::visualDeckStorageSelectionAnimationChanged, this,
             &CardInfoPictureWidget::setRaiseOnEnterEnabled);
 }
 

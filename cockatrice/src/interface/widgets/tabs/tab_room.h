@@ -14,6 +14,7 @@
 #include <QFocusEvent>
 #include <QGroupBox>
 #include <QMap>
+#include <QStringListModel>
 
 class UserListProxy;
 class UserListManager;
@@ -56,11 +57,14 @@ private:
     QMap<int, QString> gameTypes;
 
     GameSelector *gameSelector;
+    UserListWidget *friendsList;
     UserListWidget *userList;
+    UserListWidget *ignoreList;
     const UserListProxy *userListProxy;
     ChatView *chatView;
     QLabel *sayLabel;
     LineEditCompleter *sayEdit;
+    QStringListModel *mentionModel;
     QGroupBox *chatGroupBox;
 
     QMenu *roomMenu;
@@ -70,12 +74,13 @@ private:
     [[nodiscard]] QString sanitizeHtml(QString dirty) const;
 
     QStringList autocompleteUserList;
-    QCompleter *completer;
+    QCompleter *mentionCompleter;
 signals:
     void roomClosing(TabRoom *tab);
     void openMessageDialog(const QString &userName, bool focus);
     void maximizeClient();
     void notIdle();
+    void gameListUpdated();
 private slots:
     void sendMessage();
     void sayFinished(const Response &response);
@@ -124,6 +129,10 @@ public:
     [[nodiscard]] const ServerInfo_User *getUserInfo() const
     {
         return ownUser;
+    }
+    [[nodiscard]] GameSelector *getGameSelector() const
+    {
+        return gameSelector;
     }
 
     PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd);

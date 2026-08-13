@@ -17,7 +17,7 @@
 #include <libcockatrice/protocol/pb/response_list_users.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 
 TabAccount::TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, const ServerInfo_User &userInfo)
     : Tab(_tabSupervisor), client(_client)
@@ -135,6 +135,7 @@ void TabAccount::retranslateUi()
 void TabAccount::processListUsersResponse(const Response &response)
 {
     const Response_ListUsers &resp = response.GetExtension(Response_ListUsers::ext);
+    allUsersList->beginBulkLoad();
     for (int i = 0; i < resp.user_list_size(); ++i) {
         const ServerInfo_User &info = resp.user_list(i);
         const QString &userName = QString::fromStdString(info.name());
@@ -142,8 +143,8 @@ void TabAccount::processListUsersResponse(const Response &response)
         ignoreList->setUserOnline(userName, true);
         buddyList->setUserOnline(userName, true);
     }
+    allUsersList->endBulkLoad();
 
-    allUsersList->sortItems();
     ignoreList->sortItems();
     buddyList->sortItems();
 }
@@ -188,18 +189,20 @@ void TabAccount::processUserLeftEvent(const Event_UserLeft &event)
 
 void TabAccount::buddyListReceived(const QList<ServerInfo_User> &_buddyList)
 {
+    buddyList->beginBulkLoad();
     for (const auto &user : _buddyList) {
         buddyList->processUserInfo(user, false);
     }
-    buddyList->sortItems();
+    buddyList->endBulkLoad();
 }
 
 void TabAccount::ignoreListReceived(const QList<ServerInfo_User> &_ignoreList)
 {
+    ignoreList->beginBulkLoad();
     for (const auto &user : _ignoreList) {
         ignoreList->processUserInfo(user, false);
     }
-    ignoreList->sortItems();
+    ignoreList->endBulkLoad();
 }
 
 void TabAccount::processAddToListEvent(const Event_AddToList &event)

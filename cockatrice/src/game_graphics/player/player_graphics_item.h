@@ -77,6 +77,11 @@ public:
         return playerTarget;
     }
 
+    CardZone *getZoneGraphicsItem(const QString &name) const
+    {
+        return zoneGraphicsItems.value(name, nullptr);
+    }
+
     [[nodiscard]] PileZone *getDeckZoneGraphicsItem() const
     {
         return deckZoneGraphicsItem;
@@ -110,6 +115,7 @@ public:
 
 public slots:
     void onPlayerActiveChanged(bool _active);
+    void onCustomZoneAdded(QString customZoneName);
     void onCounterAdded(CounterState *state);
     void onCounterRemoved(int counterId);
     void rearrangeCounters();
@@ -128,6 +134,7 @@ private:
     PlayerArea *playerArea;
     PlayerTarget *playerTarget;
     QMap<int, AbstractCounter *> counterWidgets;
+    QMap<QString, CardZone *> zoneGraphicsItems;
     PileZone *deckZoneGraphicsItem;
     PileZone *sideboardGraphicsItem;
     PileZone *graveyardZoneGraphicsItem;

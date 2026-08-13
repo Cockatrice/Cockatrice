@@ -27,8 +27,11 @@
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
 #include <libcockatrice/protocol/pb/command_undo_draw.pb.h>
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
+#include <libcockatrice/settings/card_override_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/utility/clamped_arithmetic.h>
+#include <libcockatrice/utility/counter_limits.h>
 #include <libcockatrice/utility/expression.h>
-#include <libcockatrice/utility/trice_limits.h>
 #include <libcockatrice/utility/zone_names.h>
 
 // milliseconds in between triggers of the move top cards until action
@@ -66,7 +69,7 @@ void PlayerActions::playCard(CardItem *card, bool faceDown)
     const CardInfo &info = exactCard.getInfo();
 
     int tableRow = info.getUiAttributes().tableRow;
-    bool playToStack = SettingsCache::instance().getPlayToStack();
+    bool playToStack = SettingsCache::instance().userInterface().getPlayToStack();
     QString currentZone = card->getZone()->getName();
     if (!faceDown && currentZone == ZoneNames::STACK && tableRow == 3) {
         cmd.set_target_zone(ZoneNames::GRAVE);
@@ -309,7 +312,7 @@ void PlayerActions::actDrawCard()
 
 void PlayerActions::actRequestMulliganDialog()
 {
-    int startSize = SettingsCache::instance().getStartingHandSize();
+    int startSize = SettingsCache::instance().userInterface().getStartingHandSize();
     int handSize = player->getHandZone()->getCards().size();
     int deckSize = player->getDeckZone()->getCards().size() + handSize;
 
@@ -325,7 +328,7 @@ void PlayerActions::actMulligan(int number)
     }
 
     doMulligan(number);
-    SettingsCache::instance().setStartingHandSize(number);
+    SettingsCache::instance().userInterface().setStartingHandSize(number);
 }
 
 void PlayerActions::actMulliganSameSize()
@@ -882,7 +885,8 @@ void PlayerActions::actCreateToken(TokenInfo tokenToCreate)
     ExactCard correctedCard = CardDatabaseManager::query()->guessCard({lastTokenInfo.name, lastTokenInfo.providerId});
     if (correctedCard) {
         lastTokenInfo.name = correctedCard.getName();
-        lastTokenTableRow = TableZone::tableRowToGridY(correctedCard.getInfo().getUiAttributes().tableRow);
+        int tableRow = lastTokenInfo.faceDown ? 2 : correctedCard.getInfo().getUiAttributes().tableRow;
+        lastTokenTableRow = TableZone::tableRowToGridY(tableRow);
         if (lastTokenInfo.pt.isEmpty()) {
             lastTokenInfo.pt = correctedCard.getInfo().getPowTough();
         }
@@ -928,13 +932,13 @@ void PlayerActions::setLastTokenInfo(CardInfoPtr cardInfo)
         return;
     }
 
-    lastTokenInfo = {.name = cardInfo->getName(),
-                     .color = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().left(1).toLower(),
-                     .pt = cardInfo->getPowTough(),
-                     .annotation = SettingsCache::instance().getAnnotateTokens() ? cardInfo->getText() : "",
-                     .destroy = true,
-                     .providerId =
-                         SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName())};
+    lastTokenInfo = {
+        .name = cardInfo->getName(),
+        .color = cardInfo->getColors().isEmpty() ? QString() : cardInfo->getColors().left(1).toLower(),
+        .pt = cardInfo->getPowTough(),
+        .annotation = SettingsCache::instance().userInterface().getAnnotateTokens() ? cardInfo->getText() : "",
+        .destroy = true,
+        .providerId = SettingsCache::instance().cardOverrides().getCardPreferenceOverride(cardInfo->getName())};
 
     lastTokenTableRow = TableZone::tableRowToGridY(cardInfo->getUiAttributes().tableRow);
 
@@ -1017,8 +1021,9 @@ void PlayerActions::actCreateAllRelatedCards()
                     if (!cardRelationAll->getDoesAttach() && !cardRelationAll->getIsVariable()) {
                         dbName = cardRelationAll->getName();
                         bool persistent = cardRelationAll->getIsPersistent();
+                        bool faceDown = cardRelationAll->getIsFaceDown();
                         for (int i = 0; i < cardRelationAll->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
+                            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent, faceDown);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1033,8 +1038,9 @@ void PlayerActions::actCreateAllRelatedCards()
                     if (!cardRelationNotExcluded->getDoesAttach() && !cardRelationNotExcluded->getIsVariable()) {
                         dbName = cardRelationNotExcluded->getName();
                         bool persistent = cardRelationNotExcluded->getIsPersistent();
+                        bool faceDown = cardRelationNotExcluded->getIsFaceDown();
                         for (int i = 0; i < cardRelationNotExcluded->getDefaultCount(); ++i) {
-                            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
+                            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent, faceDown);
                         }
                         ++tokensTypesCreated;
                         if (tokensTypesCreated == 1) {
@@ -1072,6 +1078,7 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard,
 
     const QString dbName = cardRelation->getName();
     const bool persistent = cardRelation->getIsPersistent();
+    const bool faceDown = cardRelation->getIsFaceDown();
 
     // Variable relations always use DoesNotAttach, regardless of the count the user
     // entered.
@@ -1080,7 +1087,7 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard,
             return false;
         }
         for (int i = 0; i < variableCount; ++i) {
-            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
+            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent, faceDown);
         }
         return true;
     }
@@ -1089,7 +1096,7 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard,
 
     if (count > 1) {
         for (int i = 0; i < count; ++i) {
-            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent);
+            createCard(sourceCard, dbName, CardRelationType::DoesNotAttach, persistent, faceDown);
         }
         return true;
     }
@@ -1109,7 +1116,7 @@ bool PlayerActions::createRelatedFromRelation(const CardItem *sourceCard,
         playCardToTable(sourceCard, false);
     }
 
-    createCard(sourceCard, dbName, attachType, persistent);
+    createCard(sourceCard, dbName, attachType, persistent, faceDown);
     return true;
 }
 
@@ -1136,7 +1143,8 @@ void PlayerActions::onRelatedCardCreated(const CardItem *sourceCard, const CardR
 void PlayerActions::createCard(const CardItem *sourceCard,
                                const QString &dbCardName,
                                CardRelationType attachType,
-                               bool persistent)
+                               bool persistent,
+                               bool faceDown)
 {
     CardInfoPtr cardInfo = CardDatabaseManager::query()->getCardInfo(dbCardName);
 
@@ -1163,7 +1171,7 @@ void PlayerActions::createCard(const CardItem *sourceCard,
     }
 
     cmd.set_pt(cardInfo->getPowTough().toStdString());
-    if (SettingsCache::instance().getAnnotateTokens()) {
+    if (SettingsCache::instance().userInterface().getAnnotateTokens()) {
         cmd.set_annotation(cardInfo->getText().toStdString());
     } else {
         cmd.set_annotation("");
@@ -1171,6 +1179,7 @@ void PlayerActions::createCard(const CardItem *sourceCard,
     cmd.set_destroy_on_zone_change(!persistent);
     cmd.set_x(gridPoint.x());
     cmd.set_y(gridPoint.y());
+    cmd.set_face_down(faceDown);
 
     ExactCard relatedCard =
         CardDatabaseManager::query()->getCardFromSameSet(cardInfo->getName(), sourceCard->getCard().getPrinting());
@@ -1345,11 +1354,7 @@ void PlayerActions::actSetPT(QList<CardItem *> selectedCards, const QString &pt)
             const auto oldpt = CardItem::parsePT(card->getPT());
             int ptIter = 0;
             for (const auto &_item : ptList) {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
                 if (_item.typeId() == QMetaType::Type::Int) {
-#else
-                if (_item.type() == QVariant::Int) {
-#endif
                     int oldItem = ptIter < oldpt.size() ? oldpt.at(ptIter).toInt() : 0;
                     newpt += '/' + QString::number(oldItem + _item.toInt());
                 } else {
@@ -1524,12 +1529,15 @@ void PlayerActions::offsetCardCounter(QList<CardItem *> selectedCards, int count
     QList<const ::google::protobuf::Message *> commandList;
     for (auto card : selectedCards) {
         int oldValue = card->getCounters().value(counterId, 0);
-        int newValue = oldValue + offset;
 
-        // Early exit optimization: server enforces [0, MAX_COUNTERS_ON_CARD].
-        // Compare clamped value to allow recovery from invalid states.
-        int clampedValue = qBound(0, newValue, MAX_COUNTERS_ON_CARD);
-        if (clampedValue != oldValue) {
+        // Overflow-safe clamp to the server-enforced range [0, MAX_COUNTER_VALUE];
+        // a result differing from oldValue also corrects an out-of-range cached value.
+        // Callers only ever pass offset == ±1 (actAddCardCounter / actRemoveCardCounter).
+        // This client-side clamp is a defense-in-depth UX check, consistent with
+        // actSetCardCounter and actIncrementAllCardCounters; the server remains the
+        // authoritative enforcer of the bounds.
+        int newValue = addClamped(oldValue, offset, 0, MAX_COUNTER_VALUE);
+        if (newValue != oldValue) {
             auto *cmd = new Command_SetCardCounter;
             cmd->set_zone(card->getZone()->getName().toStdString());
             cmd->set_card_id(card->getId());
@@ -1562,7 +1570,7 @@ void PlayerActions::actSetCardCounter(QList<CardItem *> selectedCards, int count
         Expression exp(oldValue);
         double parsed = exp.parse(counterValue);
         // Clamp in double precision first to avoid UB, then cast
-        int number = static_cast<int>(qBound(0.0, parsed, static_cast<double>(MAX_COUNTERS_ON_CARD)));
+        int number = static_cast<int>(qBound(0.0, parsed, static_cast<double>(MAX_COUNTER_VALUE)));
 
         auto *cmd = new Command_SetCardCounter;
         cmd->set_zone(card->getZone()->getName().toStdString());
@@ -1592,7 +1600,7 @@ void PlayerActions::actIncrementAllCardCounters(QList<CardItem *> cardsToUpdate)
             counterIterator.next();
             int counterId = counterIterator.key();
             int currentValue = counterIterator.value();
-            if (currentValue >= MAX_COUNTERS_ON_CARD) {
+            if (currentValue >= MAX_COUNTER_VALUE) {
                 continue;
             }
 

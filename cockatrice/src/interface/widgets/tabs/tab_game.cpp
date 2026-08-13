@@ -1,6 +1,7 @@
 #include "tab_game.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../game/game.h"
 #include "../game/player/player_logic.h"
 #include "../game/replay.h"
@@ -20,10 +21,15 @@
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
+#include "../interface/widgets/utility/completer_utils.h"
 #include "../interface/widgets/utility/line_edit_completer.h"
 #include "../interface/window_main.h"
 #include "../main.h"
 #include "../utility/visibility_change_listener.h"
+#include "card/card_completer_proxy_model.h"
+#include "card/card_search_model.h"
+#include "card_database_display_model.h"
+#include "card_database_model.h"
 #include "tab_supervisor.h"
 
 #include <QAction>
@@ -34,7 +40,9 @@
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
+#include <QRegularExpression>
 #include <QStackedWidget>
+#include <QStringListModel>
 #include <QTimer>
 #include <QWidget>
 #include <libcockatrice/card/database/card_database.h>
@@ -44,7 +52,11 @@
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/debug_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/utility/string_limits.h>
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
@@ -252,17 +264,14 @@ void TabGame::resetChatAndPhase()
 
 void TabGame::emitUserEvent()
 {
-    bool globalEvent =
-        !game->getPlayerManager()->isSpectator() || SettingsCache::instance().getSpectatorNotificationsEnabled();
+    bool globalEvent = !game->getPlayerManager()->isSpectator() ||
+                       SettingsCache::instance().userInterface().getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
     updatePlayerListDockTitle();
 }
 
 TabGame::~TabGame()
 {
-    if (replayManager) {
-        delete replayManager->replay;
-    }
     for (auto &player : game->getPlayerManager()->getPlayers()) {
         player->clear();
     }
@@ -536,7 +545,8 @@ bool TabGame::leaveGame()
 
 void TabGame::actSay()
 {
-    if (completer->popup()->isVisible()) {
+    if (sayEdit->hasVisibleCompleterPopup()) {
+        sayEdit->hideCompleterPopups();
         return;
     }
 
@@ -556,14 +566,14 @@ void TabGame::addPlayerToAutoCompleteList(QString playerName)
 {
     if (sayEdit && !autocompleteUserList.contains(playerName)) {
         autocompleteUserList << playerName;
-        sayEdit->setCompletionList(autocompleteUserList);
+        mentionModel->setStringList(autocompleteUserList);
     }
 }
 
 void TabGame::removePlayerFromAutoCompleteList(QString playerName)
 {
     if (sayEdit && autocompleteUserList.removeOne(playerName)) {
-        sayEdit->setCompletionList(autocompleteUserList);
+        mentionModel->setStringList(autocompleteUserList);
     }
 }
 
@@ -626,8 +636,8 @@ void TabGame::actRotateViewCCW()
 
 void TabGame::actCompleterChanged()
 {
-    SettingsCache::instance().getChatMentionCompleter() ? completer->setCompletionRole(2)
-                                                        : completer->setCompletionRole(1);
+    SettingsCache::instance().chat().getChatMentionCompleter() ? mentionCompleter->setCompletionRole(2)
+                                                               : mentionCompleter->setCompletionRole(1);
 }
 
 void TabGame::notifyPlayerJoin(QString playerName)
@@ -1169,16 +1179,17 @@ void TabGame::createPlayAreaWidget(bool bReplay)
 
 void TabGame::createReplayDock(GameReplay *replay)
 {
-    replayManager = new ReplayManager(this, replay);
+    replayWidget = new ReplayWidget(this, replay);
 
     replayDock = new QDockWidget(this);
     replayDock->setObjectName("replayDock");
     replayDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
                             QDockWidget::DockWidgetMovable);
-    replayDock->setWidget(replayManager);
+    replayDock->setWidget(replayWidget);
     replayDock->setFloating(false);
 
-    connect(replayManager, &ReplayManager::eventReplayed, game->getGameEventHandler(),
+    connect(replayWidget, &ReplayWidget::rewound, this, &TabGame::resetChatAndPhase);
+    connect(replayWidget, &ReplayWidget::eventReplayed, game->getGameEventHandler(),
             [this](const auto &event, auto options) {
                 game->getGameEventHandler()->processGameEventContainer(event, nullptr, options);
             });
@@ -1265,7 +1276,7 @@ void TabGame::createMessageDock(bool bReplay)
     if (!bReplay) {
         connect(messageLog, &MessageLogWidget::openMessageDialog, this, &TabGame::openMessageDialog);
         connect(messageLog, &MessageLogWidget::addMentionTag, this, &TabGame::addMentionTag);
-        connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
+        connect(&SettingsCache::instance().chat(), &ChatSettings::chatMentionCompleterChanged, this,
                 &TabGame::actCompleterChanged);
     }
 
@@ -1278,12 +1289,25 @@ void TabGame::createMessageDock(bool bReplay)
         sayEdit->setMaxLength(MAX_TEXT_LENGTH);
         sayLabel->setBuddy(sayEdit);
         connect(this, &TabGame::chatMessageSent, game->getGameEventHandler(), &GameEventHandler::handleChatMessageSent);
-        completer = new QCompleter(autocompleteUserList, sayEdit);
-        completer->setCaseSensitivity(Qt::CaseInsensitive);
-        completer->setMaxVisibleItems(5);
-        completer->setFilterMode(Qt::MatchStartsWith);
+        mentionModel = new QStringListModel(autocompleteUserList, sayEdit);
+        mentionCompleter = createMentionCompleter(mentionModel, sayEdit);
+        sayEdit->addCompleter(mentionCompleter, CompleterTrigger::Mention);
 
-        sayEdit->setCompleter(completer);
+        auto *cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, sayEdit);
+        auto *displayModel = new CardDatabaseDisplayModel(sayEdit);
+        displayModel->setSourceModel(cardDatabaseModel);
+        const CardCompleterSetup cardSetup = createCardCompleter(displayModel, sayEdit);
+        sayEdit->addCompleter(cardSetup.completer, CompleterTrigger::Card);
+
+        connect(sayEdit, &LineEditCompleter::cardPartialChanged, this, [this, cardSetup](const QString &text) {
+            cardSetup.searchModel->updateSearchResults(text);
+            cardSetup.proxyModel->setFilterRegularExpression(
+                QRegularExpression(QRegularExpression::escape(text), QRegularExpression::CaseInsensitiveOption));
+            if (sayEdit->hasFocus()) {
+                cardSetup.completer->complete();
+            }
+        });
+
         actCompleterChanged();
 
         if (game->getPlayerManager()->isSpectator()) {

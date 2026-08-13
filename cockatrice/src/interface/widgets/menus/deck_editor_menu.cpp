@@ -4,6 +4,7 @@
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../tabs/abstract_tab_deck_editor.h"
 
+#include <libcockatrice/settings/recents_settings.h>
 DeckEditorMenu::DeckEditorMenu(AbstractTabDeckEditor *parent) : QMenu(parent), deckEditor(parent)
 {
     aNewDeck = new QAction(QString(), this);
@@ -192,6 +193,8 @@ void DeckEditorMenu::refreshShortcuts()
     aEditDeckInClipboard->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboard"));
     aEditDeckInClipboardRaw->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aEditDeckInClipboardRaw"));
     aPrintDeck->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aPrintDeck"));
+
+    aLoadDeckFromWebsite->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aLoadDeckFromWebsite"));
 
     aExportDeckDecklist->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklist"));
     aExportDeckDecklistXyz->setShortcuts(shortcuts.getShortcut("TabDeckEditor/aExportDeckDecklistXyz"));

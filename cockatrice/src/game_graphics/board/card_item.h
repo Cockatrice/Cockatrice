@@ -12,7 +12,6 @@
 #include "abstract_card_item.h"
 
 #include <libcockatrice/network/server/remote/game/server_card.h>
-#include <libcockatrice/utility/trice_limits.h>
 
 class CardDatabase;
 class CardDragItem;
@@ -143,7 +142,7 @@ public:
     void resetState(bool keepAnnotations = false);
     void processCardInfo(const ServerInfo_Card &_info);
 
-    bool animationEvent();
+    bool animationEvent() override;
     CardDragItem *createDragItem(int _id, const QPointF &_pos, const QPointF &_scenePos, bool forceFaceDown);
     void deleteDragItem();
     void drawArrow(const QColor &arrowColor);

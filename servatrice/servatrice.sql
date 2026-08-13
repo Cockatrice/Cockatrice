@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_schema_version` (
   PRIMARY KEY  (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
-INSERT INTO cockatrice_schema_version VALUES(34);
+INSERT INTO cockatrice_schema_version VALUES(35);
 
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `passwordLastChangedDate` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `leftPawnColorOverride` varchar(255),
   `rightPawnColorOverride` varchar(255),
+  `card_art_params` TEXT DEFAULT NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `token` (`token`),
@@ -300,3 +301,19 @@ CREATE TABLE IF NOT EXISTS `cockatrice_audit` (
   PRIMARY KEY  (`id`),
   KEY `user_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `cockatrice_card_art_name_rules` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `card_name` varchar(255) NOT NULL,
+  `card_provider_id` varchar(255) NOT NULL,
+  `mode` enum('ALLOW','DENY') NOT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  `created_by` int(7) unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_provider_card_name` (`card_provider_id`, `card_name`),
+  KEY `idx_mode` (`mode`),
+  FOREIGN KEY (`created_by`) REFERENCES `cockatrice_users`(`id`)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;

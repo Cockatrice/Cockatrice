@@ -2,8 +2,17 @@
 
 #include "../set/card_set.h"
 
-PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
+#include <QDataStream>
+#include <QIODevice>
+
+PrintingInfo::PrintingInfo(const CardSetPtr &_set, const LazyPropertiesHash &_properties)
+    : set(_set), properties(_properties)
 {
+}
+
+void PrintingInfo::setProperty(const QString &_name, const QString &_value)
+{
+    properties.insert(_name, _value);
 }
 
 /**
@@ -11,10 +20,10 @@ PrintingInfo::PrintingInfo(const CardSetPtr &_set) : set(_set)
  */
 QString PrintingInfo::getUuid() const
 {
-    return properties.value("uuid").toString();
+    return getPropertiesHash().value("uuid");
 }
 
 QString PrintingInfo::getFlavorName() const
 {
-    return properties.value("flavorName").toString();
+    return getPropertiesHash().value("flavorName");
 }

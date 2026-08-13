@@ -9,6 +9,7 @@
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QPushButton>
+#include <libcockatrice/settings/personal_settings.h>
 
 #define MIN_TIP_IMAGE_HEIGHT 200
 #define MIN_TIP_IMAGE_WIDTH 200
@@ -41,7 +42,7 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     tipNumber = new QLabel();
     tipNumber->setAlignment(Qt::AlignCenter);
 
-    QList<int> seenTips = SettingsCache::instance().getSeenTips();
+    QList<int> seenTips = SettingsCache::instance().personal().getSeenTips();
     newTipsAvailable = false;
     currentTip = 0;
     for (int i = 0; i < tipDatabase->rowCount(); i++) {
@@ -73,9 +74,9 @@ DlgTipOfTheDay::DlgTipOfTheDay(QWidget *parent) : QDialog(parent)
     connect(previousButton, &QPushButton::clicked, this, &DlgTipOfTheDay::previousClicked);
 
     showTipsOnStartupCheck = new QCheckBox("Show tips on startup");
-    showTipsOnStartupCheck->setChecked(SettingsCache::instance().getShowTipsOnStartup());
-    connect(showTipsOnStartupCheck, &QCheckBox::clicked, &SettingsCache::instance(),
-            &SettingsCache::setShowTipsOnStartup);
+    showTipsOnStartupCheck->setChecked(SettingsCache::instance().personal().getShowTipsOnStartup());
+    connect(showTipsOnStartupCheck, &QCheckBox::clicked, &SettingsCache::instance().personal(),
+            &PersonalSettings::setShowTipsOnStartup);
     buttonBar = new QHBoxLayout();
     buttonBar->addWidget(showTipsOnStartupCheck);
     buttonBar->addWidget(tipNumber);
@@ -130,10 +131,10 @@ void DlgTipOfTheDay::updateTip(int tipId)
     }
 
     // Store tip id as seen
-    QList<int> seenTips = SettingsCache::instance().getSeenTips();
+    QList<int> seenTips = SettingsCache::instance().personal().getSeenTips();
     if (!seenTips.contains(tipId)) {
         seenTips.append(tipId);
-        SettingsCache::instance().setSeenTips(seenTips);
+        SettingsCache::instance().personal().setSeenTips(seenTips);
     }
 
     TipOfTheDay tip = tipDatabase->getTip(tipId);

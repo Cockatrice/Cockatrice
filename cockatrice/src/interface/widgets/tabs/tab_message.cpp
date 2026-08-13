@@ -17,7 +17,8 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/utility/string_limits.h>
 
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
                        AbstractClient *_client,
@@ -126,7 +127,7 @@ void TabMessage::processUserMessageEvent(const Event_UserMessage &event)
     if (tabSupervisor->currentIndex() != tabSupervisor->indexOf(this)) {
         soundEngine->playSound("private_message");
     }
-    if (SettingsCache::instance().getShowMessagePopup() && shouldShowSystemPopup(event)) {
+    if (SettingsCache::instance().chat().getShowMessagePopup() && shouldShowSystemPopup(event)) {
         showSystemPopup(event);
     }
     if (QString::fromStdString(event.sender_name()).toLower().simplified() == "servatrice") {

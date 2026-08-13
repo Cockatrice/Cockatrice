@@ -21,6 +21,7 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
+#include <libcockatrice/settings/interface_settings.h>
 
 namespace
 {
@@ -65,7 +66,7 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
 
         connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(&searchEdit); });
 
-        if (SettingsCache::instance().getFocusCardViewSearchBar()) {
+        if (SettingsCache::instance().userInterface().getFocusCardViewSearchBar()) {
             this->setActive(true);
             searchEdit.setFocus();
         }
@@ -74,6 +75,11 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
         searchEditProxy->setWidget(&searchEdit);
         searchEditProxy->setZValue(ZValues::DRAG_ITEM);
         vbox->addItem(searchEditProxy);
+
+        // hide search bar if chat autofocus setting is enabled, since typing into it will no longer work anyway
+        searchEditProxy->setVisible(!SettingsCache::instance().userInterface().getKeepGameChatFocus());
+        connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::keepGameChatFocusChanged,
+                searchEditProxy, [searchEditProxy](bool keepFocus) { searchEditProxy->setVisible(!keepFocus); });
 
         // top row
         QGraphicsLinearLayout *hTopRow = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -153,9 +159,9 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
         connect(&sortBySelector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
                 &ZoneViewWidget::processSortBy);
         connect(&pileViewCheckBox, &QCheckBox::QT_STATE_CHANGED, this, &ZoneViewWidget::processSetPileView);
-        groupBySelector.setCurrentIndex(SettingsCache::instance().getZoneViewGroupByIndex());
-        sortBySelector.setCurrentIndex(SettingsCache::instance().getZoneViewSortByIndex());
-        pileViewCheckBox.setChecked(SettingsCache::instance().getZoneViewPileView());
+        groupBySelector.setCurrentIndex(SettingsCache::instance().userInterface().getZoneViewGroupByIndex());
+        sortBySelector.setCurrentIndex(SettingsCache::instance().userInterface().getZoneViewSortByIndex());
+        pileViewCheckBox.setChecked(SettingsCache::instance().userInterface().getZoneViewPileView());
 
         if (CardList::NoSort == static_cast<CardList::SortOption>(groupBySelector.currentData().toInt())) {
             pileViewCheckBox.setEnabled(false);
@@ -185,7 +191,7 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
 void ZoneViewWidget::processGroupBy(int index)
 {
     auto option = static_cast<CardList::SortOption>(groupBySelector.itemData(index).toInt());
-    SettingsCache::instance().setZoneViewGroupByIndex(index);
+    SettingsCache::instance().userInterface().setZoneViewGroupByIndex(index);
     zone->setGroupBy(option);
 
     // disable pile view checkbox if we're not grouping by anything
@@ -209,13 +215,13 @@ void ZoneViewWidget::processSortBy(int index)
         return;
     }
 
-    SettingsCache::instance().setZoneViewSortByIndex(index);
+    SettingsCache::instance().userInterface().setZoneViewSortByIndex(index);
     zone->setSortBy(option);
 }
 
 void ZoneViewWidget::processSetPileView(QT_STATE_CHANGED_T value)
 {
-    SettingsCache::instance().setZoneViewPileView(value);
+    SettingsCache::instance().userInterface().setZoneViewPileView(value);
     zone->setPileView(value);
 }
 
@@ -472,7 +478,7 @@ static qreal rowsToHeight(int rows)
  **/
 static qreal calcMaxInitialHeight()
 {
-    return rowsToHeight(SettingsCache::instance().getCardViewInitialRowsMax());
+    return rowsToHeight(SettingsCache::instance().userInterface().getCardViewInitialRowsMax());
 }
 
 /**
@@ -554,7 +560,7 @@ void ZoneViewWidget::initStyleOption(QStyleOption *option) const
 void ZoneViewWidget::expandWindow()
 {
     qreal maxInitialHeight = calcMaxInitialHeight();
-    qreal maxExpandedHeight = rowsToHeight(SettingsCache::instance().getCardViewExpandedRowsMax());
+    qreal maxExpandedHeight = rowsToHeight(SettingsCache::instance().userInterface().getCardViewExpandedRowsMax());
     qreal height = rect().height() - extraHeight - 10;
     qreal maxHeight = maximumHeight() - extraHeight - 10;
 

@@ -64,6 +64,7 @@ public:
                                    QString &clientid,
                                    QString &clientVersion,
                                    QString &connectionType);
+    void broadcastUserInfoUpdate(Server_ProtocolHandler *source);
 
     const QMap<int, Server_Room *> &getRooms()
     {
@@ -89,6 +90,10 @@ public:
     virtual QString getLoginMessage() const
     {
         return QString();
+    }
+    virtual SessionEvent *getLoginSessionEvent() const
+    {
+        return nullptr;
     }
     virtual QString getRequiredFeatures() const
     {

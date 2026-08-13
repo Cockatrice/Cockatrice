@@ -20,6 +20,9 @@
 #include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card_set/card_sets_model.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
 
 WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
 {
@@ -62,7 +65,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     // search field
     searchField = new LineEditUnfocusable;
     searchField->setObjectName("searchEdit");
-    searchField->setPlaceholderText(tr("Search by set name, code, or type"));
+    searchField->setPlaceholderText(tr("Search by set name, code, type, or release date"));
     searchField->addAction(QPixmap("theme:icons/search"), LineEditUnfocusable::LeadingPosition);
     searchField->setClearButtonEnabled(true);
     setFocusProxy(searchField);
@@ -153,7 +156,7 @@ WndSets::WndSets(QWidget *parent) : QMainWindow(parent)
     sortWarning->setLayout(sortWarningLayout);
     sortWarning->setVisible(false);
 
-    includeRebalancedCards = SettingsCache::instance().getIncludeRebalancedCards();
+    includeRebalancedCards = SettingsCache::instance().cardsDisplay().getIncludeRebalancedCards();
     QCheckBox *includeRebalancedCardsCheckBox =
         new QCheckBox(tr("Include cards rebalanced for Alchemy [requires restart]"));
     includeRebalancedCardsCheckBox->setChecked(includeRebalancedCards);
@@ -253,7 +256,7 @@ void WndSets::includeRebalancedCardsChanged(bool _includeRebalancedCards)
 void WndSets::actSave()
 {
     model->save(CardDatabaseManager::getInstance());
-    SettingsCache::instance().setIncludeRebalancedCards(includeRebalancedCards);
+    SettingsCache::instance().cardsDisplay().setIncludeRebalancedCards(includeRebalancedCards);
     CardPictureLoader::clearPixmapCache();
     const auto reloadOk1 = QtConcurrent::run([] {
         CardDatabaseManager::getInstance()->reloadCardDatabasesAndNotify();

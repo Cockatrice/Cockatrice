@@ -7,8 +7,10 @@ CardRelation::CardRelation(const QString &_name,
                            bool _isCreateAllExclusion,
                            bool _isVariableCount,
                            int _defaultCount,
-                           bool _isPersistent)
+                           bool _isPersistent,
+                           bool _isFaceDown)
     : name(_name), attachType(_attachType), isCreateAllExclusion(_isCreateAllExclusion),
-      isVariableCount(_isVariableCount), defaultCount(_defaultCount), isPersistent(_isPersistent)
+      isVariableCount(_isVariableCount), defaultCount(_defaultCount), isPersistent(_isPersistent),
+      isFaceDown(_isFaceDown)
 {
 }

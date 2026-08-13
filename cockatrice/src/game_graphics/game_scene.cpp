@@ -17,8 +17,8 @@
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
-#include <QSet>
 #include <QtMath>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <numeric>
 
@@ -36,7 +36,7 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 {
     animationTimer = new QBasicTimer;
     addItem(phasesToolbar);
-    connect(&SettingsCache::instance(), &SettingsCache::minPlayersForMultiColumnLayoutChanged, this,
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::minPlayersForMultiColumnLayoutChanged, this,
             &GameScene::rearrange);
 
     rearrange();
@@ -44,7 +44,25 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 
 GameScene::~GameScene()
 {
+    // Sever all incoming connections (animated item destroy-tracking) before the
+    // members below are destroyed: the base QGraphicsScene destructor destroys the
+    // remaining items, and their destroyed() signals must not reach slots that
+    // reference members that no longer exist.
+    disconnect(this);
+
     delete animationTimer;
+    animationTimer = nullptr;
+
+    // Delete all ArrowItems before QGraphicsScene's base destructor runs.
+    // QGraphicsScene::~QGraphicsScene() destroys items in arbitrary order.
+    // If a PlayerTarget is destroyed before an ArrowItem pointing to it,
+    // ArrowItem::onTargetDestroyed fires and emits on the partially-destroyed
+    // GameScene, causing a segfault.
+    for (auto *item : items()) {
+        if (auto *arrow = qgraphicsitem_cast<ArrowItem *>(item)) {
+            delete arrow;
+        }
+    }
 
     // DO NOT call clearViews() here
     // clearViews calls close() on the zoneViews, which sends signals; sending signals in destructors leads to segfaults
@@ -324,7 +342,7 @@ QList<PlayerLogic *> GameScene::rotatePlayers(const QList<PlayerLogic *> &active
 
 int GameScene::determineColumnCount(int playerCount)
 {
-    return playerCount < SettingsCache::instance().getMinPlayersForMultiColumnLayout() ? 1 : 2;
+    return playerCount < SettingsCache::instance().userInterface().getMinPlayersForMultiColumnLayout() ? 1 : 2;
 }
 
 /**
@@ -529,7 +547,9 @@ void GameScene::clearArrowsForPlayer(int playerId)
 void GameScene::clearArrowsForPlayerLocally(int playerId)
 {
     for (int arrowId : arrowRegistry.idsForPlayer(playerId)) {
-        arrowRegistry.take(playerId, arrowId)->delArrow();
+        if (auto *arrow = arrowRegistry.take(playerId, arrowId)) {
+            arrow->delArrow();
+        }
     }
 }
 
@@ -722,30 +742,45 @@ bool GameScene::event(QEvent *event)
 
 void GameScene::timerEvent(QTimerEvent * /*event*/)
 {
-    QMutableSetIterator<CardItem *> i(cardsToAnimate);
+    QMutableHashIterator<QObject *, IAnimatedItem *> i(animatedItems);
     while (i.hasNext()) {
         i.next();
         if (!i.value()->animationEvent()) {
             i.remove();
         }
     }
-    if (cardsToAnimate.isEmpty()) {
+    if (animatedItems.isEmpty()) {
         animationTimer->stop();
     }
 }
 
-void GameScene::registerAnimationItem(AbstractCardItem *card)
+void GameScene::registerAnimationItem(IAnimatedItem *item)
 {
-    cardsToAnimate.insert(static_cast<CardItem *>(card));
-    if (!animationTimer->isActive()) {
+    auto *object = dynamic_cast<QObject *>(item);
+    if (!object) {
+        return;
+    }
+    if (!animatedItems.contains(object)) {
+        connect(object, &QObject::destroyed, this, &GameScene::removeAnimatedItem);
+    }
+    animatedItems.insert(object, item);
+    if (animationTimer && !animationTimer->isActive()) {
         animationTimer->start(10, this);
     }
 }
 
-void GameScene::unregisterAnimationItem(AbstractCardItem *card)
+void GameScene::unregisterAnimationItem(IAnimatedItem *item)
 {
-    cardsToAnimate.remove(static_cast<CardItem *>(card));
-    if (cardsToAnimate.isEmpty()) {
+    animatedItems.remove(dynamic_cast<QObject *>(item));
+    if (animationTimer && animatedItems.isEmpty()) {
+        animationTimer->stop();
+    }
+}
+
+void GameScene::removeAnimatedItem(QObject *item)
+{
+    animatedItems.remove(item);
+    if (animationTimer && animatedItems.isEmpty()) {
         animationTimer->stop();
     }
 }

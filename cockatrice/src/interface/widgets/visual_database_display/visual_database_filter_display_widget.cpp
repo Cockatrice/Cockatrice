@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include <QPushButton>
+#include <libcockatrice/settings/paths_settings.h>
 
 FilterDisplayWidget::FilterDisplayWidget(QWidget *parent, const QString &filename, FilterTreeModel *_filterModel)
     : QWidget(parent), filterFilename(filename), filterModel(_filterModel)
@@ -68,7 +69,7 @@ void FilterDisplayWidget::deleteFilter()
         QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         // If confirmed, delete the filter
-        QString filePath = SettingsCache::instance().getFiltersPath() + QDir::separator() + filterFilename;
+        QString filePath = SettingsCache::instance().paths().getFiltersPath() + QDir::separator() + filterFilename;
         QFile file(filePath);
         if (file.remove()) {
             emit filterDeleted(filterFilename); // Emit signal for deletion

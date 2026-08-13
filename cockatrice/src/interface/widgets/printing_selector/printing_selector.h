@@ -22,6 +22,13 @@
 
 #define BATCH_SIZE 10
 
+struct ZoneCounts
+{
+    int mainboard = 0;
+    int sideboard = 0;
+    int tokensboard = 0;
+};
+
 class DeckStateManager;
 class PrintingSelectorCardSearchWidget;
 class PrintingSelectorCardSelectionWidget;
@@ -59,9 +66,9 @@ signals:
 
     /**
      * The amounts of the printings in the deck has changed
-     * @param uuidToAmounts Map of uuids to the amounts (maindeck, sideboard) in the deck
+     * @param uuidToAmounts Map of uuids to the amounts (maindeck, sideboard, tokensboard) in the deck
      */
-    void cardAmountsChanged(const QMap<QString, QPair<int, int>> &uuidToAmounts);
+    void cardAmountsChanged(const QMap<QString, ZoneCounts> &uuidToAmounts);
 
 private:
     QVBoxLayout *layout;

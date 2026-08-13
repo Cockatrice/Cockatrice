@@ -1,6 +1,9 @@
 #include "deck_editor_deck_dock_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
+#include "../settings_page/user_interface_settings_page.h"
+#include "../tabs/api/commander_spellbook/commander_bracket_widget.h"
 #include "deck_list_style_proxy.h"
 #include "deck_state_manager.h"
 
@@ -11,7 +14,9 @@
 #include <QSplitter>
 #include <QTextEdit>
 #include <libcockatrice/card/database/card_database_manager.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
+#include <libcockatrice/utility/macros.h>
+#include <libcockatrice/utility/string_limits.h>
 
 static int findRestoreIndex(const CardRef &wanted, const QComboBox *combo)
 {
@@ -108,18 +113,18 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     showBannerCardCheckBox = new QCheckBox();
     showBannerCardCheckBox->setObjectName("showBannerCardCheckBox");
-    showBannerCardCheckBox->setChecked(SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
-    connect(showBannerCardCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setDeckEditorBannerCardComboBoxVisible);
-    connect(&SettingsCache::instance(), &SettingsCache::deckEditorBannerCardComboBoxVisibleChanged, this,
+    showBannerCardCheckBox->setChecked(SettingsCache::instance().deckEditor().getBannerCardComboBoxVisible());
+    connect(showBannerCardCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().deckEditor(),
+            &DeckEditorSettings::setBannerCardComboBoxVisible);
+    connect(&SettingsCache::instance().deckEditor(), &DeckEditorSettings::bannerCardComboBoxVisibleChanged, this,
             &DeckEditorDeckDockWidget::updateShowBannerCardComboBox);
 
     showTagsWidgetCheckBox = new QCheckBox();
     showTagsWidgetCheckBox->setObjectName("showTagsWidgetCheckBox");
-    showTagsWidgetCheckBox->setChecked(SettingsCache::instance().getDeckEditorTagsWidgetVisible());
-    connect(showTagsWidgetCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setDeckEditorTagsWidgetVisible);
-    connect(&SettingsCache::instance(), &SettingsCache::deckEditorTagsWidgetVisibleChanged, this,
+    showTagsWidgetCheckBox->setChecked(SettingsCache::instance().deckEditor().getTagsWidgetVisible());
+    connect(showTagsWidgetCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().deckEditor(),
+            &DeckEditorSettings::setTagsWidgetVisible);
+    connect(&SettingsCache::instance().deckEditor(), &DeckEditorSettings::tagsWidgetVisibleChanged, this,
             &DeckEditorDeckDockWidget::updateShowTagsWidget);
 
     quickSettingsWidget->addSettingsWidget(showBannerCardCheckBox);
@@ -130,6 +135,8 @@ void DeckEditorDeckDockWidget::createDeckDock()
     formatComboBox = new QComboBox(this);
     formatComboBox->addItem(tr("Loading Database..."));
     formatComboBox->setEnabled(false); // Disable until loaded
+
+    commanderBracketWidget = new CommanderBracketWidget(this);
 
     commentsLabel = new QLabel();
     commentsLabel->setObjectName("commentsLabel");
@@ -151,7 +158,7 @@ void DeckEditorDeckDockWidget::createDeckDock()
     bannerCardLabel = new QLabel();
     bannerCardLabel->setObjectName("bannerCardLabel");
     bannerCardLabel->setText(tr("Banner Card"));
-    bannerCardLabel->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
+    bannerCardLabel->setHidden(!SettingsCache::instance().deckEditor().getBannerCardComboBoxVisible());
     bannerCardComboBox = new QComboBox(this);
     connect(getModel(), &DeckListModel::cardNodesChanged, this, [this]() {
         // Delay the update to avoid race conditions
@@ -162,10 +169,10 @@ void DeckEditorDeckDockWidget::createDeckDock()
 
     connect(bannerCardComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &DeckEditorDeckDockWidget::writeBannerCard);
-    bannerCardComboBox->setHidden(!SettingsCache::instance().getDeckEditorBannerCardComboBoxVisible());
+    bannerCardComboBox->setHidden(!SettingsCache::instance().deckEditor().getBannerCardComboBoxVisible());
 
     deckTagsDisplayWidget = new DeckPreviewDeckTagsDisplayWidget(this, {});
-    deckTagsDisplayWidget->setHidden(!SettingsCache::instance().getDeckEditorTagsWidgetVisible());
+    deckTagsDisplayWidget->setHidden(!SettingsCache::instance().deckEditor().getTagsWidgetVisible());
     connect(deckTagsDisplayWidget, &DeckPreviewDeckTagsDisplayWidget::tagsChanged, deckStateManager,
             &DeckStateManager::setTags);
 
@@ -216,13 +223,15 @@ void DeckEditorDeckDockWidget::createDeckDock()
     upperLayout->addWidget(formatLabel, 2, 0);
     upperLayout->addWidget(formatComboBox, 2, 1);
 
-    upperLayout->addWidget(bannerCardLabel, 3, 0);
-    upperLayout->addWidget(bannerCardComboBox, 3, 1);
+    upperLayout->addWidget(commanderBracketWidget, 3, 0, 1, 2);
 
-    upperLayout->addWidget(deckTagsDisplayWidget, 4, 1);
+    upperLayout->addWidget(bannerCardLabel, 4, 0);
+    upperLayout->addWidget(bannerCardComboBox, 4, 1);
 
-    upperLayout->addWidget(activeGroupCriteriaLabel, 5, 0);
-    upperLayout->addWidget(activeGroupCriteriaComboBox, 5, 1);
+    upperLayout->addWidget(deckTagsDisplayWidget, 5, 1);
+
+    upperLayout->addWidget(activeGroupCriteriaLabel, 6, 0);
+    upperLayout->addWidget(activeGroupCriteriaComboBox, 6, 1);
 
     hashLabel1 = new QLabel();
     hashLabel1->setObjectName("hashLabel1");
@@ -300,15 +309,19 @@ void DeckEditorDeckDockWidget::initializeFormats()
         // Ensure no selection is visible initially
         formatComboBox->setCurrentIndex(-1);
     }
-
     connect(formatComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+        QString formatKey;
         if (index >= 0) {
-            QString formatKey = formatComboBox->itemData(index).toString();
+            formatKey = formatComboBox->itemData(index).toString();
             deckStateManager->setFormat(formatKey);
         } else {
             deckStateManager->setFormat(""); // clear format if deselected
         }
+
+        commanderBracketWidget->setDeck(deckStateManager->getDeckListShared());
     });
+
+    commanderBracketWidget->setDeck(deckStateManager->getDeckListShared());
 }
 
 ExactCard DeckEditorDeckDockWidget::getCurrentCard()
@@ -489,6 +502,8 @@ void DeckEditorDeckDockWidget::syncDisplayWidgetsToModel()
     formatComboBox->blockSignals(true);
     formatComboBox->setCurrentIndex(formatComboBox->findData(deckStateManager->getMetadata().gameFormat));
     formatComboBox->blockSignals(false);
+
+    commanderBracketWidget->setDeck(deckStateManager->getDeckListShared());
 
     deckTagsDisplayWidget->blockSignals(true);
     deckTagsDisplayWidget->setTags(deckStateManager->getMetadata().tags);
@@ -743,6 +758,7 @@ void DeckEditorDeckDockWidget::retranslateUi()
     commentsLabel->setText(tr("&Comments:"));
     activeGroupCriteriaLabel->setText(tr("Group by:"));
     formatLabel->setText(tr("Format:"));
+    commanderBracketWidget->retranslateUi();
 
     hashLabel1->setText(tr("Hash:"));
 

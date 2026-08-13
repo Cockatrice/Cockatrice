@@ -122,6 +122,7 @@ set(PROTO_FILES
     response_activate.proto
     response_adjust_mod.proto
     response_ban_history.proto
+    response_card_art_rule_entry.proto
     response_deck_download.proto
     response_deck_list.proto
     response_deck_upload.proto

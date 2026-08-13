@@ -82,6 +82,13 @@ void CockatriceXml4Parser::parseFile(QIODevice &device)
     }
 }
 
+void CockatriceXml4Parser::parseFileInto(QIODevice &device, CardDatabaseData &data)
+{
+    targetData = &data;
+    parseFile(device);
+    targetData = nullptr;
+}
+
 static QSharedPointer<FormatRules> parseFormat(QXmlStreamReader &xml)
 {
     auto rulesPtr = FormatRulesPtr(new FormatRules());
@@ -187,7 +194,11 @@ void CockatriceXml4Parser::loadFormats(QXmlStreamReader &xml)
 
         if (xml.name().toString() == "format") {
             auto rulesPtr = parseFormat(xml);
-            emit addFormat(rulesPtr);
+            if (targetData) {
+                targetData->formats.insert(rulesPtr->formatName.toLower(), rulesPtr);
+            } else {
+                emit addFormat(rulesPtr);
+            }
         }
     }
 }
@@ -232,9 +243,9 @@ void CockatriceXml4Parser::loadSetsFromXml(QXmlStreamReader &xml)
     }
 }
 
-QVariantHash CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &xml)
+QHash<QString, QString> CockatriceXml4Parser::loadCardPropertiesFromXml(QXmlStreamReader &xml)
 {
-    QVariantHash properties = QVariantHash();
+    QHash<QString, QString> properties;
     while (!xml.atEnd()) {
         if (xml.readNext() == QXmlStreamReader::EndElement) {
             break;
@@ -261,7 +272,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
         if (xmlName == "card") {
             QString name = QString("");
             QString text = QString("");
-            QVariantHash properties = QVariantHash();
+            QHash<QString, QString> properties;
             QList<CardRelation *> relatedCards, reverseRelatedCards;
             auto _sets = SetToPrintingsMap();
             int tableRow = 0;
@@ -303,14 +314,15 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     QString setName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
                     auto set = internalAddSet(setName);
                     if (set->getEnabled()) {
-                        PrintingInfo printingInfo(set);
+                        QHash<QString, QString> printingProps;
                         for (QXmlStreamAttribute attr : attrs) {
                             QString attrName = attr.name().toString();
                             if (attrName == "picURL") {
                                 attrName = "picurl";
                             }
-                            printingInfo.setProperty(attrName, attr.value().toString());
+                            printingProps.insert(attrName, attr.value().toString());
                         }
+                        PrintingInfo printingInfo(set, LazyPropertiesHash(printingProps));
 
                         // This is very much a hack and not the right place to
                         // put this check, as it requires a reload of Cockatrice
@@ -329,6 +341,7 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                     bool exclude = false;
                     bool variable = false;
                     bool persistent = false;
+                    bool facedown = false;
                     int count = 1;
                     QXmlStreamAttributes attrs = xml.attributes();
                     QString cardName = xml.readElementText(QXmlStreamReader::IncludeChildElements);
@@ -360,7 +373,12 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                         persistent = true;
                     }
 
-                    auto *relation = new CardRelation(cardName, attachType, exclude, variable, count, persistent);
+                    if (attrs.hasAttribute("facedown")) {
+                        facedown = true;
+                    }
+
+                    auto *relation =
+                        new CardRelation(cardName, attachType, exclude, variable, count, persistent, facedown);
                     if (xmlName == "reverse-related") {
                         reverseRelatedCards << relation;
                     } else {
@@ -383,7 +401,22 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                                  .upsideDownArt = upsideDown};
             CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
                                                         reverseRelatedCards, _sets, attributes);
-            emit addCard(newCard);
+            if (targetData) {
+                // Mirror CardDatabase::addCard: if a card with this name already
+                // exists, merge the new printings into it instead of replacing.
+                if (auto existing = targetData->cards.value(name)) {
+                    for (const auto &printings : newCard->getSets()) {
+                        for (const auto &printing : printings) {
+                            existing->addToSet(printing.getSet(), printing);
+                        }
+                    }
+                } else {
+                    targetData->cards.insert(name, newCard);
+                    targetData->simpleNameCards.insert(newCard->getSimpleName(), newCard);
+                }
+            } else {
+                emit addCard(newCard);
+            }
         }
     }
 }
@@ -509,6 +542,9 @@ static QXmlStreamWriter &operator<<(QXmlStreamWriter &xml, const CardInfoPtr &in
         }
         if (i->getIsPersistent()) {
             xml.writeAttribute("persistent", "persistent");
+        }
+        if (i->getIsFaceDown()) {
+            xml.writeAttribute("facedown", "facedown");
         }
         if (i->getIsVariable()) {
             if (1 == i->getDefaultCount()) {

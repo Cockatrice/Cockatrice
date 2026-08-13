@@ -47,7 +47,8 @@
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/dice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <limits>
 #include <ranges>
@@ -1636,10 +1637,11 @@ void Server_AbstractPlayer::getInfo(ServerInfo_Player *info,
                                     bool withUserInfo)
 {
     getProperties(*info->mutable_properties(), withUserInfo);
-    if (recipient == this) {
-        if (deck) {
-            info->set_deck_list(deck->writeToString_Native().toStdString());
-        }
+
+    // Deck lists are only shared with other players when the game is in Open Decklists mode,
+    // so a player joining an open lobby can see every deck that was loaded before they joined.
+    if (deck && (recipient == this || game->getShareDecklistsOnLoad())) {
+        info->set_deck_list(deck->writeToString_Native().toStdString());
     }
 
     for (Server_Arrow *arrow : arrows) {

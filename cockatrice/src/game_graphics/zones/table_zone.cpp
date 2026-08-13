@@ -8,6 +8,7 @@
 #include "../board/arrow_item.h"
 #include "../board/card_drag_item.h"
 #include "../board/card_item.h"
+#include "../game_scene.h"
 #include "../z_values.h"
 
 #include <QGraphicsScene>
@@ -15,6 +16,7 @@
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/protocol/pb/command_move_card.pb.h>
 #include <libcockatrice/protocol/pb/command_set_card_attr.pb.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 
 const QColor TableZone::BACKGROUND_COLOR = QColor(100, 100, 100);
@@ -28,7 +30,7 @@ TableZone::TableZone(TableZoneLogic *_logic, bool _mirrored, QGraphicsItem *pare
     connect(_logic, &TableZoneLogic::contentSizeChanged, this, &TableZone::resizeToContents);
     connect(_logic, &TableZoneLogic::toggleTapped, this, &TableZone::toggleTapped);
     connect(themeManager, &ThemeManager::themeChanged, this, &TableZone::updateBg);
-    connect(&SettingsCache::instance(), &SettingsCache::invertVerticalCoordinateChanged, this,
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::invertVerticalCoordinateChanged, this,
             &TableZone::reorganizeCards);
 
     updateBg();
@@ -46,6 +48,31 @@ void TableZone::updateBg()
     update();
 }
 
+void TableZone::triggerDamageShimmer()
+{
+    if (!SettingsCache::instance().userInterface().getBattlefieldFlashEnabled()) {
+        damageShimmerAlpha = 0.0;
+        return;
+    }
+
+    damageShimmerAlpha = 1.0;
+    shimmerClock.start();
+    if (scene()) {
+        static_cast<GameScene *>(scene())->registerAnimationItem(this);
+    }
+}
+
+bool TableZone::animationEvent()
+{
+    damageShimmerAlpha = 1.0 - shimmerClock.elapsed() / shimmerDurationMs;
+    if (damageShimmerAlpha <= 0.0) {
+        damageShimmerAlpha = 0.0;
+        return false;
+    }
+    update();
+    return true;
+}
+
 QRectF TableZone::boundingRect() const
 {
     return QRectF(0, 0, width, height);
@@ -59,8 +86,8 @@ void TableZone::setMirrored(bool isMirrored)
 
 bool TableZone::isInverted() const
 {
-    return ((mirrored && !SettingsCache::instance().getInvertVerticalCoordinate()) ||
-            (!mirrored && SettingsCache::instance().getInvertVerticalCoordinate()));
+    return ((mirrored && !SettingsCache::instance().userInterface().getInvertVerticalCoordinate()) ||
+            (!mirrored && SettingsCache::instance().userInterface().getInvertVerticalCoordinate()));
 }
 
 void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
@@ -74,6 +101,13 @@ void TableZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         // inactive player gets a darker table zone with a semi transparent black mask
         // this means if the user provides a custom background it will fade
         painter->fillRect(boundingRect(), FADE_MASK);
+    }
+
+    // Decaying crimson wash from taking damage.
+    if (damageShimmerAlpha > 0.0) {
+        QColor shimmerColor(239, 68, 68);
+        shimmerColor.setAlphaF(0.22 * damageShimmerAlpha);
+        painter->fillRect(boundingRect(), shimmerColor);
     }
 
     paintLandDivider(painter);

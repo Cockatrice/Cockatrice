@@ -65,11 +65,7 @@ void EdhrecApiResponseCardDetailsDisplayWidget::mousePressEvent(QMouseEvent *eve
     }
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void EdhrecApiResponseCardDetailsDisplayWidget::enterEvent(QEnterEvent *event)
-#else
-void EdhrecApiResponseCardDetailsDisplayWidget::enterEvent(QEvent *event)
-#endif
 {
     QWidget::enterEvent(event);
     backgroundPlateWidget->setFocused(true);

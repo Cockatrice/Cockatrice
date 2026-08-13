@@ -11,6 +11,7 @@
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
                                            const QPointF &_hotSpot,
@@ -77,11 +78,12 @@ DeckViewCard::DeckViewCard(QGraphicsItem *parent, const CardRef &cardRef, const 
 {
     setAcceptHoverEvents(true);
 
-    connect(&SettingsCache::instance(), &SettingsCache::roundCardCornersChanged, this, [this](bool _roundCardCorners) {
-        Q_UNUSED(_roundCardCorners);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::roundCardCornersChanged, this,
+            [this](bool _roundCardCorners) {
+                Q_UNUSED(_roundCardCorners);
 
-        update();
-    });
+                update();
+            });
 }
 
 DeckViewCard::~DeckViewCard()
@@ -99,7 +101,8 @@ void DeckViewCard::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     pen.setJoinStyle(Qt::MiterJoin);
     pen.setColor(originZone == DECK_ZONE_MAIN ? Qt::green : Qt::red);
     painter->setPen(pen);
-    qreal cardRadius = SettingsCache::instance().getRoundCardCorners() ? 0.05 * (CardDimensions::WIDTH_F - 3) : 0.0;
+    qreal cardRadius =
+        SettingsCache::instance().cardsDisplay().getRoundCardCorners() ? 0.05 * (CardDimensions::WIDTH_F - 3) : 0.0;
     painter->drawRoundedRect(QRectF(1.5, 1.5, CardDimensions::WIDTH_F - 3, CardDimensions::HEIGHT_F - 3), cardRadius,
                              cardRadius);
     painter->restore();
@@ -358,6 +361,16 @@ void DeckViewScene::rebuildTree()
 
     if (!deck) {
         return;
+    }
+
+    QStringList requiredZones = {DECK_ZONE_MAIN, DECK_ZONE_SIDE};
+
+    for (const QString &zoneName : requiredZones) {
+        if (!cardContainers.contains(zoneName)) {
+            auto *container = new DeckViewCardContainer(zoneName);
+            cardContainers.insert(zoneName, container);
+            addItem(container);
+        }
     }
 
     for (auto *currentZone : deck->getZoneNodes()) {

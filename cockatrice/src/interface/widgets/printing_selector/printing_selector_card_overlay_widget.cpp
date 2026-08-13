@@ -11,6 +11,7 @@
 #include <QtMath>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/settings/card_override_settings.h>
 #include <utility>
 
 /**
@@ -105,20 +106,18 @@ void PrintingSelectorCardOverlayWidget::resizeEvent(QResizeEvent *event)
  *
  * @param event The event triggered when the mouse enters the widget.
  */
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void PrintingSelectorCardOverlayWidget::enterEvent(QEnterEvent *event)
-#else
-void PrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
-#endif
 {
     QWidget::enterEvent(event);
     deckEditor->updateCard(rootCard);
     updateVisibility();
 }
 
-void PrintingSelectorCardOverlayWidget::updateCardAmounts(int mainboardAmount, int sideboardAmount)
+void PrintingSelectorCardOverlayWidget::updateCardAmounts(int mainboardAmount,
+                                                          int sideboardAmount,
+                                                          int tokensboardAmount)
 {
-    allZonesCardAmountWidget->setAmounts(mainboardAmount, sideboardAmount);
+    allZonesCardAmountWidget->setAmounts(mainboardAmount, sideboardAmount, tokensboardAmount);
     updateVisibility();
 }
 
@@ -173,8 +172,8 @@ void PrintingSelectorCardOverlayWidget::updatePinBadgeVisibility()
 /**
  * @brief Handles the mouse leave event when the cursor leaves the overlay widget area.
  *
- * When the cursor leaves the widget, the card amount widget is hidden if both the mainboard and sideboard
- * amounts are zero.
+ * When the cursor leaves the widget, the card amount widget is hidden if all of the mainboard, sideboard, and
+ * tokensboard amounts are zero.
  *
  * @param event The event triggered when the mouse leaves the widget.
  */

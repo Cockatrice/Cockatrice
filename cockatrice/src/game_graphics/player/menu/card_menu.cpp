@@ -1,6 +1,7 @@
 #include "card_menu.h"
 
 #include "../../../client/settings/card_counter_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../../interface/widgets/tabs/tab_game.h"
 #include "../../board/card_item.h"
 #include "../../game/player/player_actions.h"

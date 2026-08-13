@@ -1,6 +1,7 @@
 #include "deck_view_container.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../client/settings/shortcuts_settings.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../interface/deck_loader/deck_loader.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck.h"
@@ -19,7 +20,8 @@
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/settings/visual_deck_storage_settings.h>
+#include <libcockatrice/utility/string_limits.h>
 
 ToggleButton::ToggleButton(QWidget *parent) : QPushButton(parent), state(false)
 {
@@ -95,8 +97,8 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
             &DeckViewContainer::refreshShortcuts);
     refreshShortcuts();
 
-    connect(&SettingsCache::instance(), &SettingsCache::visualDeckStorageInGameChanged, this,
-            &DeckViewContainer::setVisualDeckStorageExists);
+    connect(&SettingsCache::instance().visualDeckStorage(), &VisualDeckStorageSettings::visualDeckStorageInGameChanged,
+            this, &DeckViewContainer::setVisualDeckStorageExists);
 
     switchToDeckSelectView();
 }
@@ -138,7 +140,7 @@ static void setVisibility(QPushButton *button, bool visible)
 
 void DeckViewContainer::switchToDeckSelectView()
 {
-    if (SettingsCache::instance().getVisualDeckStorageInGame()) {
+    if (SettingsCache::instance().visualDeckStorage().getVisualDeckStorageInGame()) {
         deckView->setHidden(true);
 
         tryCreateVisualDeckStorageWidget();
@@ -209,6 +211,7 @@ void DeckViewContainer::refreshShortcuts()
     loadLocalButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadLocalButton"));
     loadRemoteButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadRemoteButton"));
     loadFromClipboardButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadFromClipboardButton"));
+    loadFromWebsiteButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/loadFromWebsiteButton"));
     unloadDeckButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/unloadDeckButton"));
     readyStartButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/readyStartButton"));
     sideboardLockButton->setShortcut(shortcuts.getSingleShortcut("DeckViewContainer/sideboardLockButton"));

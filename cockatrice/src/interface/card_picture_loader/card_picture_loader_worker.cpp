@@ -1,6 +1,7 @@
 #include "card_picture_loader_worker.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "card_picture_loader_cache_method.h"
 #include "card_picture_loader_local.h"
 #include "card_picture_loader_worker_work.h"
 
@@ -9,13 +10,19 @@
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QThread>
+#include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/download_settings.h>
+#include <libcockatrice/settings/paths_settings.h>
 #include <utility>
 #include <version_string.h>
 
 static constexpr int MAX_REQUESTS_PER_SEC = 10;
+static constexpr int MIN_HOST_QUOTA = 1;          ///< Floor for the per-host request allowance
+static constexpr qint64 QUOTA_RECOVER_MS = 60000; ///< Idle time before a reduced quota starts recovering
 
 CardPictureLoaderWorker::CardPictureLoaderWorker()
-    : QObject(nullptr), picDownload(SettingsCache::instance().getPicDownload()), requestQuota(MAX_REQUESTS_PER_SEC)
+    : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload()),
+      requestQuota(MAX_REQUESTS_PER_SEC)
 {
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
@@ -25,13 +32,14 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     cache = new QNetworkDiskCache(this);
     cache->setCacheDirectory(SettingsCache::instance().getNetworkCachePath());
     cache->setMaximumCacheSize(1024L * 1024L *
-                               static_cast<qint64>(SettingsCache::instance().getNetworkCacheSizeInMB()));
+                               static_cast<qint64>(SettingsCache::instance().cacheStorage().getNetworkCacheSizeInMB()));
 
-    connect(&SettingsCache::instance(), &SettingsCache::networkCacheSizeChanged, cache, [this](int newSizeInMB) {
-        if (cache) {
-            cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB));
-        }
-    });
+    connect(&SettingsCache::instance().cacheStorage(), &CacheStorageSettings::networkCacheSizeChanged, cache,
+            [this](int newSizeInMB) {
+                if (cache) {
+                    cache->setMaximumCacheSize(1024L * 1024L * static_cast<qint64>(newSizeInMB));
+                }
+            });
 
     networkManager->setCache(cache);
 
@@ -39,7 +47,7 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     // We can't use NoLessSafeRedirectPolicy because it is not applied with AlwaysCache
     networkManager->setRedirectPolicy(QNetworkRequest::ManualRedirectPolicy);
 
-    cacheFilePath = SettingsCache::instance().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
+    cacheFilePath = SettingsCache::instance().paths().getRedirectCachePath() + REDIRECT_CACHE_FILENAME;
     loadRedirectCache();
     cleanStaleEntries();
 
@@ -72,7 +80,8 @@ void CardPictureLoaderWorker::queueRequest(const QUrl &url, CardPictureLoaderWor
         queueRequest(cachedRedirect, worker);
         return;
     }
-    if (SettingsCache::instance().getCardPictureLoaderCacheMethod() ==
+    if (static_cast<CardPictureLoaderCacheMethod::CacheMethod>(
+            SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
             CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE &&
         cache->metaData(url).isValid()) {
         // If we hit a cached url, we get to make the request for free, since it won't contribute towards the
@@ -98,8 +107,10 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
     req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     req.setRawHeader("Accept", "image/avif,image/webp,image/apng,image/,/*;q=0.8");
 
-    bool useNetworkCache = !picDownload && SettingsCache::instance().getCardPictureLoaderCacheMethod() ==
-                                               CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE;
+    bool useNetworkCache =
+        !picDownload && static_cast<CardPictureLoaderCacheMethod::CacheMethod>(
+                            SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
+                            CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE;
 
     req.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
                      useNetworkCache ? QNetworkRequest::AlwaysCache : QNetworkRequest::AlwaysNetwork);
@@ -115,6 +126,19 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
 void CardPictureLoaderWorker::resetRequestQuota()
 {
     requestQuota = MAX_REQUESTS_PER_SEC;
+
+    QDateTime now = QDateTime::currentDateTime();
+    for (auto it = hostRequestQuota.begin(); it != hostRequestQuota.end(); ++it) {
+        if (!hostLast429.contains(it.key()) || now.msecsTo(hostLast429.value(it.key())) < -QUOTA_RECOVER_MS) {
+            it.value() = qMin(MAX_REQUESTS_PER_SEC, it.value() + 1);
+        }
+    }
+
+    for (const auto &request : requestLoadQueue) {
+        const QString host = request.first.host();
+        hostQuotaRemaining.insert(host, hostRequestQuota.value(host, MAX_REQUESTS_PER_SEC));
+    }
+
     processQueuedRequests();
 }
 
@@ -127,12 +151,24 @@ void CardPictureLoaderWorker::processQueuedRequests()
 
 bool CardPictureLoaderWorker::processSingleRequest()
 {
-    if (!requestLoadQueue.isEmpty()) {
-        auto request = requestLoadQueue.takeFirst();
-        makeRequest(request.first, request.second);
-        return true;
+    for (int i = 0; i < requestLoadQueue.size(); ++i) {
+        const auto &request = requestLoadQueue.at(i);
+        QString host = request.first.host();
+        int allowance = hostQuotaRemaining.value(host, MAX_REQUESTS_PER_SEC);
+        if (allowance > 0) {
+            hostQuotaRemaining.insert(host, allowance - 1);
+            makeRequest(request.first, request.second);
+            requestLoadQueue.removeAt(i);
+            return true;
+        }
     }
     return false;
+}
+
+void CardPictureLoaderWorker::onHostRateLimited(const QString &host)
+{
+    hostRequestQuota.insert(host, qMax(MIN_HOST_QUOTA, hostRequestQuota.value(host, MAX_REQUESTS_PER_SEC) / 2));
+    hostLast429.insert(host, QDateTime::currentDateTime());
 }
 
 void CardPictureLoaderWorker::enqueueImageLoad(const ExactCard &card)
@@ -229,7 +265,7 @@ void CardPictureLoaderWorker::cleanStaleEntries()
 
     auto it = redirectCache.begin();
     while (it != redirectCache.end()) {
-        if (it.value().second.addDays(SettingsCache::instance().getRedirectCacheTtl()) < now) {
+        if (it.value().second.addDays(SettingsCache::instance().cacheStorage().getRedirectCacheTtl()) < now) {
             it = redirectCache.erase(it); // Remove stale entry
         } else {
             ++it;

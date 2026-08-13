@@ -22,6 +22,8 @@
 
 #include <QString>
 #include <libcockatrice/protocol/pb/color.pb.h>
+#include <libcockatrice/utility/clamped_arithmetic.h>
+#include <limits>
 
 class ServerInfo_Counter;
 
@@ -92,7 +94,12 @@ public:
      * @return true if the value changed, false otherwise.
      * @note Clamps result to [INT_MIN, INT_MAX] to prevent overflow.
      */
-    [[nodiscard]] bool incrementCount(int delta);
+    [[nodiscard]] bool incrementCount(int delta)
+    {
+        const int oldCount = count;
+        count = addClamped(count, delta, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+        return count != oldCount;
+    }
 
     /**
      * @brief Populates info with this counter's current state for network serialization.

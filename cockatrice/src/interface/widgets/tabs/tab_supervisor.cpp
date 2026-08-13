@@ -1,6 +1,7 @@
 #include "tab_supervisor.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../interface/pixel_map_generator.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
@@ -9,6 +10,7 @@
 #include "api/edhrec/tab_edhrec_main.h"
 #include "tab_account.h"
 #include "tab_admin.h"
+#include "tab_card_art_rules.h"
 #include "tab_deck_editor.h"
 #include "tab_deck_storage.h"
 #include "tab_game.h"
@@ -36,6 +38,10 @@
 #include <libcockatrice/protocol/pb/room_event.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_room.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/tabs_settings.h>
 
 QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *option, const QWidget *widget) const
 {
@@ -44,7 +50,7 @@ QRect MacOSTabFixStyle::subElementRect(SubElement element, const QStyleOption *o
     }
 
     // Skip over QProxyStyle handling subElementRect,
-    // This fixes an issue with Qt 5.10 on OSX where the labels for tabs with a button and an icon
+    // This fixes an issue on OSX where the labels for tabs with a button and an icon
     // get cut-off too early
     return QCommonStyle::subElementRect(element, option, widget);
 }
@@ -64,11 +70,7 @@ QSize CloseButton::sizeHint() const
     return {width, height};
 }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 void CloseButton::enterEvent(QEnterEvent *event)
-#else
-void CloseButton::enterEvent(QEvent *event)
-#endif
 {
     update();
     QAbstractButton::enterEvent(event);
@@ -117,7 +119,7 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     setIconSize(QSize(15, 15));
 
 #if defined(Q_OS_MAC)
-    // This is necessary to fix an issue on macOS with qt5.10,
+    // This is necessary to fix an issue on macOS,
     // where tabs with icons and buttons get drawn incorrectly
     tabBar()->setStyle(new MacOSTabFixStyle);
 #endif
@@ -178,6 +180,10 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabAdmin = new QAction(this);
     aTabAdmin->setCheckable(true);
     connect(aTabAdmin, &QAction::triggered, this, &TabSupervisor::actTabAdmin);
+
+    aTabCardArtRules = new QAction(this);
+    aTabCardArtRules->setCheckable(true);
+    connect(aTabCardArtRules, &QAction::triggered, this, &TabSupervisor::actTabCardArtRules);
 
     aTabLog = new QAction(this);
     aTabLog->setCheckable(true);
@@ -336,13 +342,13 @@ void TabSupervisor::initStartupTabs()
     openTabHome();
     setCurrentWidget(tabHome);
 
-    if (SettingsCache::instance().getTabVisualDeckStorageOpen()) {
+    if (SettingsCache::instance().tabs().getTabVisualDeckStorageOpen()) {
         openTabVisualDeckStorage();
     }
-    if (SettingsCache::instance().getTabDeckStorageOpen()) {
+    if (SettingsCache::instance().tabs().getTabDeckStorageOpen()) {
         openTabDeckStorage();
     }
-    if (SettingsCache::instance().getTabReplaysOpen()) {
+    if (SettingsCache::instance().tabs().getTabReplaysOpen()) {
         openTabReplays();
     }
 }
@@ -422,10 +428,10 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
     tabsMenu->addAction(aTabServer);
     tabsMenu->addAction(aTabAccount);
 
-    if (SettingsCache::instance().getTabServerOpen()) {
+    if (SettingsCache::instance().tabs().getTabServerOpen()) {
         openTabServer();
     }
-    if (SettingsCache::instance().getTabAccountOpen()) {
+    if (SettingsCache::instance().tabs().getTabAccountOpen()) {
         openTabAccount();
     }
 
@@ -435,13 +441,15 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         tabsMenu->addSeparator();
         tabsMenu->addAction(aTabAdmin);
         tabsMenu->addAction(aTabLog);
+        tabsMenu->addAction(aTabCardArtRules);
 
-        if (SettingsCache::instance().getTabAdminOpen()) {
+        if (SettingsCache::instance().tabs().getTabAdminOpen()) {
             openTabAdmin();
         }
-        if (SettingsCache::instance().getTabLogOpen()) {
+        if (SettingsCache::instance().tabs().getTabLogOpen()) {
             openTabLog();
         }
+        openTabCardArtRules();
     }
 
     retranslateUi();
@@ -540,7 +548,7 @@ void TabSupervisor::openTabHome()
 
 void TabSupervisor::actTabVisualDeckStorage(bool checked)
 {
-    SettingsCache::instance().setTabVisualDeckStorageOpen(checked);
+    SettingsCache::instance().tabs().setTabVisualDeckStorageOpen(checked);
     if (checked && !tabVisualDeckStorage) {
         openTabVisualDeckStorage();
         setCurrentWidget(tabVisualDeckStorage);
@@ -564,7 +572,7 @@ void TabSupervisor::openTabVisualDeckStorage()
 
 void TabSupervisor::actTabServer(bool checked)
 {
-    SettingsCache::instance().setTabServerOpen(checked);
+    SettingsCache::instance().tabs().setTabServerOpen(checked);
     if (checked && !tabServer) {
         openTabServer();
         setCurrentWidget(tabServer);
@@ -575,6 +583,11 @@ void TabSupervisor::actTabServer(bool checked)
 
 void TabSupervisor::openTabServer()
 {
+    SettingsCache::instance().tabs().setTabServerOpen(true);
+    if (tabServer) {
+        return;
+    }
+
     tabServer = new TabServer(this, client);
     connect(tabServer, &TabServer::roomJoined, this, &TabSupervisor::addRoomTab);
     myAddTab(tabServer, aTabServer);
@@ -587,7 +600,7 @@ void TabSupervisor::openTabServer()
 
 void TabSupervisor::actTabAccount(bool checked)
 {
-    SettingsCache::instance().setTabAccountOpen(checked);
+    SettingsCache::instance().tabs().setTabAccountOpen(checked);
     if (checked && !tabAccount) {
         openTabAccount();
         setCurrentWidget(tabAccount);
@@ -612,7 +625,7 @@ void TabSupervisor::openTabAccount()
 
 void TabSupervisor::actTabDeckStorage(bool checked)
 {
-    SettingsCache::instance().setTabDeckStorageOpen(checked);
+    SettingsCache::instance().tabs().setTabDeckStorageOpen(checked);
     if (checked && !tabDeckStorage) {
         openTabDeckStorage();
         setCurrentWidget(tabDeckStorage);
@@ -635,7 +648,7 @@ void TabSupervisor::openTabDeckStorage()
 
 void TabSupervisor::actTabReplays(bool checked)
 {
-    SettingsCache::instance().setTabReplaysOpen(checked);
+    SettingsCache::instance().tabs().setTabReplaysOpen(checked);
     if (checked && !tabReplays) {
         openTabReplays();
         setCurrentWidget(tabReplays);
@@ -660,7 +673,7 @@ void TabSupervisor::openTabReplays()
 
 void TabSupervisor::actTabAdmin(bool checked)
 {
-    SettingsCache::instance().setTabAdminOpen(checked);
+    SettingsCache::instance().tabs().setTabAdminOpen(checked);
     if (checked && !tabAdmin) {
         openTabAdmin();
         setCurrentWidget(tabAdmin);
@@ -681,9 +694,33 @@ void TabSupervisor::openTabAdmin()
     aTabAdmin->setChecked(true);
 }
 
+void TabSupervisor::actTabCardArtRules(bool checked)
+{
+    if (checked && !tabCardArtRules) {
+        openTabCardArtRules();
+        setCurrentWidget(tabCardArtRules);
+    } else if (!checked && tabCardArtRules) {
+        tabCardArtRules->closeRequest();
+    }
+}
+
+void TabSupervisor::openTabCardArtRules()
+{
+    tabCardArtRules = new TabCardArtRules(this, client);
+
+    myAddTab(tabCardArtRules, aTabCardArtRules);
+
+    connect(tabCardArtRules, &QObject::destroyed, this, [this] {
+        tabCardArtRules = nullptr;
+        aTabCardArtRules->setChecked(false);
+    });
+
+    aTabCardArtRules->setChecked(true);
+}
+
 void TabSupervisor::actTabLog(bool checked)
 {
-    SettingsCache::instance().setTabLogOpen(checked);
+    SettingsCache::instance().tabs().setTabLogOpen(checked);
     if (checked && !tabLog) {
         openTabLog();
         setCurrentWidget(tabLog);
@@ -874,7 +911,7 @@ void TabSupervisor::talkLeft(TabMessage *tab)
  */
 void TabSupervisor::openDeckInNewTab(const LoadedDeck &deckToOpen)
 {
-    int type = SettingsCache::instance().getDefaultDeckEditorType();
+    int type = SettingsCache::instance().deckEditor().getDefaultDeckEditorType();
     switch (type) {
         case ClassicDeckEditor:
             addDeckEditorTab(deckToOpen);
@@ -973,7 +1010,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
         tab->setContentsChanged(true);
         setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
     }
-    if (globalEvent && SettingsCache::instance().getNotificationsEnabled()) {
+    if (globalEvent && SettingsCache::instance().userInterface().getNotificationsEnabled()) {
         QApplication::alert(this);
     }
 }
@@ -1015,9 +1052,15 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
         const ServerInfo_User *onlineUserInfo = userListManager->getOnlineUser(senderName);
         if (onlineUserInfo) {
             auto userLevel = UserLevelFlags(onlineUserInfo->user_level());
-            if (SettingsCache::instance().getIgnoreUnregisteredUserMessages() &&
+            if (SettingsCache::instance().chat().getIgnoreUnregisteredUserMessages() &&
                 !userLevel.testFlag(ServerInfo_User::IsRegistered)) {
                 // Flags are additive, so reg/mod/admin are all IsRegistered
+                return;
+            } else if (SettingsCache::instance().chat().getIgnoreNonBuddyUserMessages() &&
+                       !userListManager->isUserBuddy(senderName) && !userLevel.testFlag(ServerInfo_User::IsModerator) &&
+                       !userLevel.testFlag(ServerInfo_User::IsAdmin)) {
+                // Ignore private messages from non-buddies
+                // Moderator/Admin messages are exempt to ensure warnings reach users
                 return;
             }
         }
@@ -1062,7 +1105,7 @@ void TabSupervisor::processUserJoined(const ServerInfo_User &userInfoJoined)
             }
         }
 
-        if (SettingsCache::instance().getBuddyConnectNotificationsEnabled()) {
+        if (SettingsCache::instance().userInterface().getBuddyConnectNotificationsEnabled()) {
             QApplication::alert(this);
             this->actShowPopup(tr("Your buddy %1 has signed on!").arg(userName));
         }

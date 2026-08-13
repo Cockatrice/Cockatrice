@@ -1,5 +1,6 @@
 #include "grave_menu.h"
 
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../game/abstract_game.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"

@@ -7,6 +7,8 @@
 #include <QChar>
 #include <QDateTime>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLoggingCategory>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -681,6 +683,33 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
         if (!clientid.isEmpty()) {
             result.set_clientid(clientid.toStdString());
         }
+
+        const QString cardArtParamsJson = query->value(12).toString();
+        if (!cardArtParamsJson.isEmpty()) {
+            const QJsonDocument doc = QJsonDocument::fromJson(cardArtParamsJson.toUtf8());
+            if (doc.isObject()) {
+                const QJsonObject obj = doc.object();
+                auto *cap = result.mutable_card_art_params();
+                if (obj.contains("card_name")) {
+                    cap->set_card_name(obj["card_name"].toString().toStdString());
+                }
+                if (obj.contains("card_provider_id")) {
+                    cap->set_card_provider_id(obj["card_provider_id"].toString().toStdString());
+                }
+                if (obj.contains("marginPctL")) {
+                    cap->set_margin_pct_l(obj["marginPctL"].toDouble(0.33));
+                }
+                if (obj.contains("marginPctR")) {
+                    cap->set_margin_pct_r(obj["marginPctR"].toDouble(0.02));
+                }
+                if (obj.contains("verticalOffset")) {
+                    cap->set_vertical_offset(obj["verticalOffset"].toDouble(0.35));
+                }
+                if (obj.contains("zoom")) {
+                    cap->set_zoom(obj["zoom"].toDouble(1.0));
+                }
+            }
+        }
     }
     return result;
 }
@@ -698,7 +727,7 @@ ServerInfo_User Servatrice_DatabaseInterface::getUserData(const QString &name, b
 
         QSqlQuery *query = prepareQuery("select id, name, admin, country, privlevel, leftPawnColorOverride, "
                                         "rightPawnColorOverride, realname, avatar_bmp, registrationDate, "
-                                        "email, clientid from {prefix}_users where "
+                                        "email, clientid, card_art_params from {prefix}_users where "
                                         "name = :name and active = 1");
         query->bindValue(":name", name);
         if (!execSqlQuery(query)) {

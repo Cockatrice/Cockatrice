@@ -60,8 +60,10 @@ private:
 private slots:
     void addPrintingMainboard();
     void addPrintingSideboard();
+    void addPrintingTokensboard();
     void removePrintingMainboard();
     void removePrintingSideboard();
+    void removePrintingTokensboard();
     void adjustFontSize(int scalePercentage);
 };
 

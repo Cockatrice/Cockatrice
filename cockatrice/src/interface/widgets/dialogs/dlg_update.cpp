@@ -134,7 +134,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
         // If there's no need to update, tell them that. However we still allow them to run the
         // downloader themselves if there's a compatible build
         QMessageBox::information(
-            this, tr("No Update Available"),
+            window(), tr("No Update Available"),
             tr("Cockatrice is up to date!") + "<br><br>" +
                 tr("You are already running the latest version available in the chosen release channel.") + "<br>" +
                 "<b>" + tr("Current version") + QString(":</b> %1<br>").arg(VERSION_STRING) + "<b>" +
@@ -147,7 +147,7 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
     if (isCompatible) {
         int reply;
         reply = QMessageBox::question(
-            this, tr("Update Available"),
+            window(), tr("Update Available"),
             tr("A new version of Cockatrice is available!") + "<br><br>" + "<b>" + tr("New version") +
                 QString(":</b> %1<br>").arg(release->getName()) + "<b>" + tr("Released") +
                 QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") +
@@ -156,10 +156,12 @@ void DlgUpdate::finishedUpdateCheck(bool needToUpdate, bool isCompatible, Releas
 
         if (reply == QMessageBox::Yes) {
             downloadUpdate(release->getName());
+        } else {
+            closeDialog();
         }
     } else {
         QMessageBox::information(
-            this, tr("Update Available"),
+            window(), tr("Update Available"),
             tr("A new version of Cockatrice is available!") + "<br><br>" + "<b>" + tr("New version") +
                 QString(":</b> %1<br>").arg(release->getName()) + "<b>" + tr("Released") +
                 QString(":</b> %1 (<a href=\"%2\">").arg(publishDate, release->getDescriptionUrl()) + tr("Changelog") +
@@ -219,10 +221,25 @@ void DlgUpdate::downloadError(const QString &errorString)
 void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 {
     setLabel(tr("Installing..."));
+
+    QString installerPath = filepath.toLocalFile();
+
+    QString appDir = QDir::toNativeSeparators(QCoreApplication::applicationDirPath());
+    QProcess process;
+    process.setProgram(installerPath);
+
+    // NSIS needs the /D= argument to be an UNQUOTED string, even if it contains spaces. Qt likes to quote arguments if
+    // they contain spaces, so we use the windows exclusive QProcess::setNativeArguments in the only case where this is
+    // relevant, which preserves the argument unquoted.
+#ifdef Q_OS_WIN
+    process.setNativeArguments(QString("/R /D=%1").arg(appDir));
+#else
+    // Linux/macOS: normal argument passing (not relevant since they update differently.)
+    process.setArguments({"/R", QString("/D=%1").arg(appDir)});
+#endif
+
     // Try to open the installer. If it opens, quit Cockatrice
-    if (QProcess::startDetached(filepath.toLocalFile(),
-                                QStringList()
-                                    << "/R" << QString("/D=%1").arg(QCoreApplication::applicationDirPath()))) {
+    if (process.startDetached()) {
         QMetaObject::invokeMethod(static_cast<MainWindow *>(parent()), "close", Qt::QueuedConnection);
         qCInfo(DlgUpdateLog) << "Opened downloaded update file successfully - closing Cockatrice";
         close();

@@ -7,7 +7,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMessageBox>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/settings/servers_settings.h>
+#include <libcockatrice/utility/string_limits.h>
 
 DlgForgotPasswordRequest::DlgForgotPasswordRequest(QWidget *parent) : QDialog(parent)
 {

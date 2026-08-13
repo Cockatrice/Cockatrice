@@ -117,21 +117,22 @@ ${If} $InstDir == ""
     ; we need to set a default based on the install mode
     StrCpy $InstDir $0
 ${EndIf}
-Call SetModeDestinationFromInstdir
 
-; --- Detect portable install when using /R ---
+; --- Detect portable install when using /R (must come BEFORE SetModeDestinationFromInstdir) ---
 ${If} $ReinstallMode = 1
     IfFileExists "$InstDir\portable.dat" 0 not_portable
         StrCpy $PortableMode 1
         Goto portable_done
-
     not_portable:
         StrCpy $PortableMode 0
-
     portable_done:
 ${EndIf}
 
+; Now that $PortableMode reflects reality, commit InstDir into the correct slot
+Call SetModeDestinationFromInstdir
+
 ${If} $ReinstallMode = 1
+${AndIf} $PortableMode = 0
     Call AutoUninstallIfNeeded
 ${EndIf}
 
