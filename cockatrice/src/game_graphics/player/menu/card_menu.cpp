@@ -73,7 +73,8 @@ CardMenu::CardMenu(PlayerGraphicsItem *_player, const CardItem *_card, bool _sho
     // Actions using invoke (type dispatch, need selection)
     aTap = makeAction(this, invoke(cmTap));
     aDoesntUntap = makeAction(this, invoke(cmDoesntUntap), /*checkable=*/true, card && card->getDoesntUntap());
-    aDoesntUntapOnce = makeAction(this, invoke(cmDoesntUntapOnce), /*checkable=*/true, card && card->getDoesntUntapOnce());
+    aDoesntUntapOnce =
+        makeAction(this, invoke(cmDoesntUntapOnce), /*checkable=*/true, card && card->getDoesntUntapOnce());
     aFlip = makeAction(this, invoke(cmFlip));
     aPeek = makeAction(this, invoke(cmPeek));
     aClone = makeAction(this, invoke(cmClone));

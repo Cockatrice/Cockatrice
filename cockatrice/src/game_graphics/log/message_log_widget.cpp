@@ -848,7 +848,8 @@ void MessageLogWidget::connectToPlayerEventHandler(PlayerEventHandler *playerEve
     connect(playerEventHandler, &PlayerEventHandler::logSetCardCounter, this, &MessageLogWidget::logSetCardCounter);
     connect(playerEventHandler, &PlayerEventHandler::logSetTapped, this, &MessageLogWidget::logSetTapped);
     connect(playerEventHandler, &PlayerEventHandler::logSetDoesntUntap, this, &MessageLogWidget::logSetDoesntUntap);
-    connect(playerEventHandler, &PlayerEventHandler::logSetDoesntUntapOnce, this, &MessageLogWidget::logSetDoesntUntapOnce);
+    connect(playerEventHandler, &PlayerEventHandler::logSetDoesntUntapOnce, this,
+            &MessageLogWidget::logSetDoesntUntapOnce);
     connect(playerEventHandler, &PlayerEventHandler::logSetPT, this, &MessageLogWidget::logSetPT);
     connect(playerEventHandler, &PlayerEventHandler::logSetAnnotation, this, &MessageLogWidget::logSetAnnotation);
     connect(playerEventHandler, &PlayerEventHandler::logMoveCard, this, &MessageLogWidget::logMoveCard);

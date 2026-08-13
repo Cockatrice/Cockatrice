@@ -1550,7 +1550,7 @@ Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseCo
         cardInfo->set_annotation(card->getAnnotation().toStdString());
         cardInfo->set_destroy_on_zone_change(card->getDestroyOnZoneChange());
         cardInfo->set_doesnt_untap(card->getDoesntUntap());
-		cardInfo->set_doesnt_untap_once(card->getDoesntUntapOnce());
+        cardInfo->set_doesnt_untap_once(card->getDoesntUntapOnce());
 
         QMapIterator<int, int> cardCounterIterator(card->getCounters());
         while (cardCounterIterator.hasNext()) {

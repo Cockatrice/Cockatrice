@@ -243,7 +243,7 @@ void CardItem::resetState(bool keepAnnotations)
     attachedCards.clear();
     setTapped(false, false);
     setDoesntUntap(false);
-	setDoesntUntapOnce(false);
+    setDoesntUntapOnce(false);
     if (scene()) {
         static_cast<GameScene *>(scene())->unregisterAnimationItem(this);
     }

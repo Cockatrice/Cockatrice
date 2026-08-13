@@ -91,12 +91,12 @@ void CardState::setDoesntUntap(bool _doesntUntap)
 
 void CardState::setDoesntUntapOnce(bool _doesntUntapOnce)
 {
-	if (doesntUntapOnce == _doesntUntapOnce) {
-		return;
-	}
-	doesntUntapOnce = _doesntUntapOnce;
-	emit doesntUntapOnceChanged(_doesntUntapOnce);
-	emit stateChanged();
+    if (doesntUntapOnce == _doesntUntapOnce) {
+        return;
+    }
+    doesntUntapOnce = _doesntUntapOnce;
+    emit doesntUntapOnceChanged(_doesntUntapOnce);
+    emit stateChanged();
 }
 
 void CardState::setDestroyOnZoneChange(bool _destroyOnZoneChange)
