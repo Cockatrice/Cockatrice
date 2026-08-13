@@ -51,6 +51,7 @@ private:
     void stopPreviewFade();
     void reposition();
 
+    void applyPopupWidth();
     void updateOrientation();
     void ensureClosestSelected();
 
