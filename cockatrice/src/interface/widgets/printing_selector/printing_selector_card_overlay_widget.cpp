@@ -1,6 +1,7 @@
 #include "printing_selector_card_overlay_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../cards/card_info_picture_widget.h"
 #include "printing_selector_card_display_widget.h"
 
 #include <QImageReader>
