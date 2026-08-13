@@ -149,6 +149,8 @@ private:
     bool handVisible = false;
 
     QPixmap playmatPixmap;
+    QPixmap scaledPlaymatPixmap; // down-scaled copy of playmatPixmap for the current render size
+    QSize scaledPlaymatKey;      // size bucket scaledPlaymatPixmap was rendered for
     PlaymatParams playmatParams;
     QString playmatAttribution;
     bool hasPlaymat = false;
@@ -160,6 +162,9 @@ private slots:
     void clearPlaymat();
     void updatePlaymat();
     void onPlaymatPixmapReady();
+
+private:
+    QPixmap scaledPlaymatFor(const QRectF &srcRect, const QSizeF &deviceDstSize);
 };
 
 #endif // COCKATRICE_PLAYER_GRAPHICS_ITEM_H

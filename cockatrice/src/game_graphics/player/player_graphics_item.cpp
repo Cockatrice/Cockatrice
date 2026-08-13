@@ -190,13 +190,38 @@ void PlayerGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     const QRectF srcRect = computeArtSourceRect(playmatPixmap.size(), playmatParams);
     const QRectF dstRect = coverFitRect(combinedArea, srcRect.size());
 
+    painter->save();
     painter->setClipRect(combinedArea);
-    painter->drawPixmap(dstRect, playmatPixmap, srcRect);
-    painter->setClipping(false);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+
+    // Render from a down-scaled copy of the art so the full-resolution source
+    // pixmap is never re-sampled at a tiny device size (also much cheaper than
+    // scaling it on every frame).
+    const QPixmap scaledPixmap = scaledPlaymatFor(srcRect, painter->worldTransform().mapRect(dstRect).size());
+    painter->drawPixmap(dstRect, scaledPixmap, QRectF(scaledPixmap.rect()));
+
+    painter->restore();
 
     if (!playmatAttribution.isEmpty()) {
         paintArtAttribution(*painter, combinedArea, playmatAttribution, Qt::AlignRight | Qt::AlignBottom, 0.8);
     }
+}
+
+QPixmap PlayerGraphicsItem::scaledPlaymatFor(const QRectF &srcRect, const QSizeF &deviceDstSize)
+{
+    // Bucket the render size so the source pixmap is re-scaled at most once per
+    // zoom step instead of once per frame.
+    constexpr int bucketSize = 32;
+    const QSize target = QSize(qMax(1, qRound(deviceDstSize.width() / bucketSize) * bucketSize),
+                               qMax(1, qRound(deviceDstSize.height() / bucketSize) * bucketSize))
+                             .boundedTo(srcRect.toAlignedRect().size());
+
+    if (scaledPlaymatKey != target) {
+        const QPixmap crop = playmatPixmap.copy(srcRect.toAlignedRect());
+        scaledPlaymatPixmap = crop.scaled(target, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        scaledPlaymatKey = target;
+    }
+    return scaledPlaymatPixmap;
 }
 
 void PlayerGraphicsItem::processSceneSizeChange(int newPlayerWidth)
@@ -372,6 +397,7 @@ void PlayerGraphicsItem::updatePlaymat()
     }
 
     playmatParams = params;
+    scaledPlaymatKey = QSize(); // the art crop depends on the params, drop any cached scale
 
     ExactCard card = CardDatabaseManager::query()->getCard(playmatCard);
     if (!card) {
@@ -409,6 +435,7 @@ void PlayerGraphicsItem::clearPlaymat()
     if (hasPlaymat) {
         hasPlaymat = false;
         playmatPixmap = QPixmap();
+        scaledPlaymatKey = QSize();
         emit playmatChanged(false);
         update();
     }

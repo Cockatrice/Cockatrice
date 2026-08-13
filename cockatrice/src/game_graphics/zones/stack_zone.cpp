@@ -43,6 +43,9 @@ void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 void StackZone::onPlaymatChanged(bool active)
 {
     playmatActive = active;
+    // See TableZone::onPlaymatChanged for the rationale. Translucent overlay
+    // over a dynamic playmat should not be held in the device cache.
+    setCacheMode(active ? QGraphicsItem::NoCache : QGraphicsItem::DeviceCoordinateCache);
     update();
 }
 
