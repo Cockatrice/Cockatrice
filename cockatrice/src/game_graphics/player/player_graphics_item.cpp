@@ -124,7 +124,6 @@ void PlayerGraphicsItem::initializeZones()
     rfgZoneGraphicsItem->setPos(base + QPointF(0, 2 * h + h2 + 10));
 
     tableZoneGraphicsItem = new TableZone(player->getTableZone(), mirrored, this);
-    connect(tableZoneGraphicsItem, &TableZone::sizeChanged, this, &PlayerGraphicsItem::updateBoundingRect);
     connect(this, &PlayerGraphicsItem::mirroredChanged, tableZoneGraphicsItem, &TableZone::setMirrored);
 
     stackZoneGraphicsItem =

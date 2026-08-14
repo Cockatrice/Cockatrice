@@ -188,8 +188,17 @@ public:
     }
     void setWidth(qreal _width)
     {
+        // The width is stored as an int; truncate to match the previous implicit conversion.
+        const int newWidth = static_cast<int>(_width);
+        if (width == newWidth) {
+            return;
+        }
         prepareGeometryChange();
-        width = _width;
+        width = newWidth;
+        // The parent player item's boundingRect (which clips the playmat painting) is
+        // derived from this zone's size. Without this signal the playmat is cut off at
+        // the stale boundingRect edge whenever the scene is resized wider.
+        emit sizeChanged();
     }
     [[nodiscard]] qreal getWidth() const
     {

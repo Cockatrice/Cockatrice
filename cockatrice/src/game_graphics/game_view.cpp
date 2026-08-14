@@ -129,14 +129,13 @@ void GameView::resizeRubberBand(const QPointF &cursorPoint, int selectedCount)
     QPoint cursor = cursorPoint.toPoint();
     QRect rect = QRect(mapFromScene(selectionOrigin), cursor).normalized();
 
-    // Explicitly repaint the strip the band just vacated. When the band is a
-    // child widget, the viewport does not reliably receive the exposed region
-    // on all platforms (notably macOS), which would leave stale band pixels on
-    // screen until the next unrelated repaint.
-    const QRect previousGeometry = rubberBand->geometry();
     rubberBand->setGeometry(rect);
     if (viewport()) {
-        viewport()->update(previousGeometry.united(rect));
+        // Repaint the whole viewport rather than just the band's old area: the
+        // vacated strip of a child widget is not reliably invalidated on all
+        // platforms (notably macOS), leaving stale pixels — including black
+        // scene background where the playmat should show — under the selection.
+        viewport()->update();
     }
 
     if (!SettingsCache::instance().userInterface().getShowDragSelectionCount()) {
@@ -180,13 +179,12 @@ void GameView::stopRubberBand()
         return;
     }
 
-    // Same rationale as resizeRubberBand. Make sure the area under the band is
-    // repainted, since some platforms skip the exposed-region update of a
-    // hidden child widget.
-    const QRect bandGeometry = rubberBand->geometry();
+    // Same rationale as resizeRubberBand: make sure the whole viewport is
+    // repainted once the band is gone, since some platforms skip the exposed
+    // region update of a hidden child widget.
     rubberBand->hide();
     if (viewport()) {
-        viewport()->update(bandGeometry);
+        viewport()->update();
     }
     dragCountLabel->hide();
 }
