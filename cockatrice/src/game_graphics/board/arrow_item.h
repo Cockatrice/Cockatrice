@@ -26,6 +26,7 @@ private:
     QPainterPath path;
     QPainterPath bodyPath;
     QPainterPath headPath;
+    QPainterPath shaftOutlinePath;
     QPainterPath centerLine;
     qreal headBaseFraction = 1.0;
     QElapsedTimer animationClock;

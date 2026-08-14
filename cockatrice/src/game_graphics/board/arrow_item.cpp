@@ -119,6 +119,7 @@ void ArrowItem::updatePath(const QPointF &endPoint)
         path = QPainterPath();
         bodyPath = QPainterPath();
         headPath = QPainterPath();
+        shaftOutlinePath = QPainterPath();
         centerLine = QPainterPath();
         headBaseFraction = 1.0;
     } else {
@@ -164,6 +165,12 @@ void ArrowItem::updatePath(const QPointF &endPoint)
         headPath.lineTo(QPointF(lineLength, 0));
         headPath.lineTo(point2);
         headPath.lineTo(endPoint2);
+
+        shaftOutlinePath = QPainterPath(start1);
+        shaftOutlinePath.quadTo(c, endPoint1);
+        shaftOutlinePath.moveTo(endPoint2);
+        shaftOutlinePath.quadTo(c, start2);
+        shaftOutlinePath.lineTo(start1);
     }
 
     setPos(startPoint);
@@ -228,7 +235,17 @@ void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
     }
 
     painter->save();
+    const QPen outlinePen = painter->pen();
     painter->setBrush(paintColor);
+
+    const auto drawShaft = [this, painter, &outlinePen, paintColor]() {
+        painter->setPen(Qt::NoPen);
+        painter->drawPath(bodyPath);
+        painter->setPen(outlinePen);
+        painter->setBrush(Qt::NoBrush);
+        painter->drawPath(shaftOutlinePath);
+        painter->setBrush(paintColor);
+    };
 
     if (drawProgress >= 1.0 || path.isEmpty()) {
         painter->drawPath(path);
@@ -240,15 +257,20 @@ void ArrowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         clip.addRect(QRectF(-glowExtent, path.boundingRect().top() - glowExtent, revealX + glowExtent,
                             path.boundingRect().height() + 2 * glowExtent));
         painter->setClipPath(clip);
-        painter->drawPath(bodyPath);
+        drawShaft();
     } else {
         // Once the reveal reaches the head base, pop the whole head in with a fade
         // instead of slicing the triangle into a growing stub.
-        painter->drawPath(bodyPath);
+        drawShaft();
         const qreal headFadeIn = (drawProgress - headBaseFraction) / (1.0 - headBaseFraction);
         painter->setOpacity(headFadeIn);
+        painter->setPen(Qt::NoPen);
+        painter->drawPath(headPath);
+        painter->setPen(outlinePen);
+        painter->setBrush(Qt::NoBrush);
         painter->drawPath(headPath);
         painter->setOpacity(1.0);
+        painter->setBrush(paintColor);
     }
 
     if (glowAlpha > 0.0 && !centerLine.isEmpty()) {
