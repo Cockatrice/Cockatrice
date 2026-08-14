@@ -114,7 +114,7 @@ jobs:
         with:
           if-no-files-found: error
           name: digest-${{ matrix.label }}
-          path: $RUNNER_TEMP/digests/*
+          path: ${{ runner.temp }}/digests/*
           retention-days: 1
 
 
@@ -129,7 +129,7 @@ jobs:
       - name: "Download digests"
         uses: actions/download-artifact@v7
         with:
-          path: $RUNNER_TEMP/digests
+          path: ${{ runner.temp }}/digests
           pattern: digest-*
           merge-multiple: true
 
