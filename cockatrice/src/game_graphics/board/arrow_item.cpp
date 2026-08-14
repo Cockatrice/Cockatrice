@@ -75,6 +75,14 @@ ArrowItem::~ArrowItem()
 
 void ArrowItem::onTargetDestroyed()
 {
+    if (data->id == -1) {
+        // Drag and attach arrows are never inserted into the arrow registry and
+        // have no server-side counterpart, so no deletion event can clean them
+        // up. Delete them locally when either endpoint is destroyed.
+        delArrow();
+        return;
+    }
+
     emit requestDeletion(data->creatorId, data->id);
 }
 
@@ -384,6 +392,12 @@ void ArrowDragItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void ArrowDragItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!startItem) {
+        // The source card was destroyed while the arrow was being drawn.
+        // Clean up the arrow and its children instead of leaking them.
+        delArrow();
+        for (auto *child : childArrows) {
+            child->mouseReleaseEvent(event);
+        }
         return;
     }
 
@@ -507,6 +521,12 @@ void ArrowAttachItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 void ArrowAttachItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!startItem) {
+        // The source card was destroyed while the arrow was being drawn.
+        // Clean up the arrow and its children instead of leaking them.
+        delArrow();
+        for (auto *child : childArrows) {
+            child->mouseReleaseEvent(event);
+        }
         return;
     }
 
