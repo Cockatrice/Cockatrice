@@ -90,13 +90,17 @@ struct PaletteColorInfo
     }
 }
 
+static QString usableDefaultStyle(const QString &style)
+{
+    // The Windows 11 native style is broken: when the OS default
+    // ("Default" theme selection) would use it, fall back to the Vista style.
+    // Explicitly choosing "windows11" in a theme is still honored.
+    return style.compare("windows11", Qt::CaseInsensitive) == 0 ? QStringLiteral("windowsvista") : style;
+}
+
 ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 {
-    defaultStyleName = qApp->style()->objectName();
-    //! \todo Workaround for windows11 style being broken.
-    if (defaultStyleName == "windows11") {
-        defaultStyleName = "windowsvista";
-    }
+    defaultStyleName = usableDefaultStyle(qApp->style()->objectName());
     // Capture the untouched application palette before any theme is applied.
     defaultPalette = qApp->palette();
     ensureThemeDirectoryExists();
@@ -316,13 +320,13 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         if (themeName == FUSION_THEME_NAME) {
             styleName = "Fusion";
         } else {
-            styleName = defaultStyleName;
+            styleName = usableDefaultStyle(defaultStyleName);
         }
     }
 
     QStyle *style = QStyleFactory::create(styleName);
     if (!style) {
-        style = QStyleFactory::create(defaultStyleName);
+        style = QStyleFactory::create(usableDefaultStyle(defaultStyleName));
     }
 
     // Base palette
