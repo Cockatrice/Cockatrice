@@ -111,19 +111,50 @@ bool CardDatabaseModel::checkCardHasAtLeastOneEnabledSet(const CardInfoPtr &card
 
 void CardDatabaseModel::cardDatabaseEnabledSetsChanged()
 {
-    // remove all the cards no more present in at least one enabled set
+    // Build the new card list in a single pass.
+    QList<CardInfoPtr> newCardList;
+    newCardList.reserve(cardList.size());
     for (const CardInfoPtr &card : cardList) {
-        if (!checkCardHasAtLeastOneEnabledSet(card)) {
-            cardRemoved(card);
+        if (checkCardHasAtLeastOneEnabledSet(card)) {
+            newCardList.append(card);
+        }
+    }
+    for (const CardInfoPtr &card : db->getCardList()) {
+        if (!cardListSet.contains(card) && checkCardHasAtLeastOneEnabledSet(card)) {
+            newCardList.append(card);
         }
     }
 
-    // re-check all the card currently not shown, maybe their part of a newly-enabled set
-    for (const CardInfoPtr &card : db->getCardList()) {
-        if (!cardListSet.contains(card)) {
-            cardAdded(card);
+    if (newCardList == cardList) {
+        return;
+    }
+
+    // Rebuild the whole list inside a single model reset instead of emitting
+    // per-card insert/remove notifications. With tens of thousands of cards the
+    // per-card path is the dominant cost of constructing a CardDatabaseModel.
+    QSet<CardInfoPtr> oldCardListSet = cardListSet;
+    QSet<CardInfoPtr> newCardListSet(newCardList.begin(), newCardList.end());
+
+    beginResetModel();
+
+    // Disconnect cards that are no longer shown.
+    for (const CardInfoPtr &card : cardList) {
+        if (!newCardListSet.contains(card)) {
+            disconnect(card.data(), nullptr, this, nullptr);
         }
     }
+
+    cardList = newCardList;
+    cardListSet = newCardListSet;
+
+    // Connect cards that are now shown for the first time.
+    for (const CardInfoPtr &card : cardList) {
+        if (!oldCardListSet.contains(card)) {
+            connect(card.data(), &CardInfo::cardInfoChanged, this, &CardDatabaseModel::cardInfoChanged);
+        }
+    }
+
+    endResetModel();
 }
 
 void CardDatabaseModel::cardAdded(const CardInfoPtr &card)
