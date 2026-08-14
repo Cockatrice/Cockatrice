@@ -167,7 +167,7 @@ jobs:
             --annotation "index:org.opencontainers.image.title=$OCI_TITLE" \
             --annotation "index:org.opencontainers.image.url=$OCI_URL" \
             $TAG_ARGS \
-            $(printf '%s@sha256:%s ' "$GHCR_IMAGE" *)
+            $(printf "$GHCR_IMAGE@sha256:%s " *)
 
       - name: "Inspect images"
         run: |
