@@ -476,6 +476,12 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_SampleHandSize_Default)
     ASSERT_EQ(s.getSampleHandSize(), 7);
 }
 
+TEST_F(SettingsDefaultsTest, CardsDisplay_ArrowDrawAnimation_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getArrowDrawAnimation(), true);
+}
+
 // --- VisualDeckStorageSettings ---
 
 TEST_F(SettingsDefaultsTest, VisualDeckStorage_SortingOrder_Default)

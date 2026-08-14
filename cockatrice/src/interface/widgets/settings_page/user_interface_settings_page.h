@@ -40,6 +40,7 @@ private:
     QPushButton enableAllAnimationsButton;
     QPushButton disableAllAnimationsButton;
     QCheckBox tapAnimationCheckBox;
+    QCheckBox arrowDrawAnimationCheckBox;
     QCheckBox lifeCounterAnimationsCheckBox;
     QCheckBox battlefieldFlashCheckBox;
     QCheckBox openDeckInNewTabCheckBox;

@@ -50,6 +50,11 @@ bool CardsDisplaySettings::getTapAnimation() const
     return getValue("tapAnimation", QString(), QString(), true).toBool();
 }
 
+bool CardsDisplaySettings::getArrowDrawAnimation() const
+{
+    return getValue("arrowDrawAnimation", QString(), QString(), true).toBool();
+}
+
 bool CardsDisplaySettings::getAutoRotateSidewaysLayoutCards() const
 {
     return getValue("autoRotateSidewaysLayoutCards", QString(), QString(), true).toBool();
@@ -157,6 +162,11 @@ void CardsDisplaySettings::setPrintingSelectorNavigationButtonsVisible(bool _nav
 void CardsDisplaySettings::setTapAnimation(bool _tapAnimation)
 {
     setValue(_tapAnimation, "tapAnimation");
+}
+
+void CardsDisplaySettings::setArrowDrawAnimation(bool _arrowDrawAnimation)
+{
+    setValue(_arrowDrawAnimation, "arrowDrawAnimation");
 }
 
 void CardsDisplaySettings::setAutoRotateSidewaysLayoutCards(bool _autoRotateSidewaysLayoutCards)

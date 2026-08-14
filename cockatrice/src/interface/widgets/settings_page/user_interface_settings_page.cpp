@@ -116,6 +116,10 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&tapAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
             &CardsDisplaySettings::setTapAnimation);
 
+    arrowDrawAnimationCheckBox.setChecked(SettingsCache::instance().cardsDisplay().getArrowDrawAnimation());
+    connect(&arrowDrawAnimationCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setArrowDrawAnimation);
+
     lifeCounterAnimationsCheckBox.setChecked(
         SettingsCache::instance().userInterface().getLifeCounterAnimationsEnabled());
     connect(&lifeCounterAnimationsCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().userInterface(),
@@ -132,8 +136,9 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     animationGrid->addWidget(&enableAllAnimationsButton, 0, 0);
     animationGrid->addWidget(&disableAllAnimationsButton, 0, 1);
     animationGrid->addWidget(&tapAnimationCheckBox, 1, 0);
-    animationGrid->addWidget(&lifeCounterAnimationsCheckBox, 2, 0);
-    animationGrid->addWidget(&battlefieldFlashCheckBox, 3, 0);
+    animationGrid->addWidget(&arrowDrawAnimationCheckBox, 2, 0);
+    animationGrid->addWidget(&lifeCounterAnimationsCheckBox, 3, 0);
+    animationGrid->addWidget(&battlefieldFlashCheckBox, 4, 0);
 
     animationGroupBox = new QGroupBox;
     animationGroupBox->setLayout(animationGrid);
@@ -287,6 +292,7 @@ void UserInterfaceSettingsPage::setNotificationEnabled(QT_STATE_CHANGED_T i)
 void UserInterfaceSettingsPage::enableAllAnimations()
 {
     tapAnimationCheckBox.setChecked(true);
+    arrowDrawAnimationCheckBox.setChecked(true);
     lifeCounterAnimationsCheckBox.setChecked(true);
     battlefieldFlashCheckBox.setChecked(true);
 }
@@ -294,6 +300,7 @@ void UserInterfaceSettingsPage::enableAllAnimations()
 void UserInterfaceSettingsPage::disableAllAnimations()
 {
     tapAnimationCheckBox.setChecked(false);
+    arrowDrawAnimationCheckBox.setChecked(false);
     lifeCounterAnimationsCheckBox.setChecked(false);
     battlefieldFlashCheckBox.setChecked(false);
 }
@@ -343,6 +350,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     enableAllAnimationsButton.setText(tr("&Enable all animations"));
     disableAllAnimationsButton.setText(tr("&Disable all animations"));
     tapAnimationCheckBox.setText(tr("&Tap/untap animation"));
+    arrowDrawAnimationCheckBox.setText(tr("&Arrow draw animation"));
     lifeCounterAnimationsCheckBox.setText(tr("Life counter flash"));
     battlefieldFlashCheckBox.setText(tr("Battlefield flash on damage"));
     deckEditorGroupBox->setTitle(tr("Deck editor/storage settings"));
