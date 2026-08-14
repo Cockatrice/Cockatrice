@@ -115,17 +115,20 @@ private:
     OverlapControlWidget *overlapControlWidget;
     CardSizeWidget *cardSizeWidget;
     QTimer *debounceTimer;
-    QTimer *loadCardsTimer;
 
     int debounceTime = 300; // in Ms
     int currentPage = 0;    // Current page index
     int cardsPerPage = 100; // Number of cards per page
+    bool filtersInitialized = false;
+    bool initialLoadScheduled = false;
 
+    void initializeFilters();
     void highlightAllSearchEdit();
     bool nearEndOfPage() const;
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void showEvent(QShowEvent *event) override;
 };
 
 #endif // VISUAL_DATABASE_DISPLAY_WIDGET_H
