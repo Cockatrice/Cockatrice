@@ -29,8 +29,10 @@
 
 VisualDeckEditorWidget::VisualDeckEditorWidget(QWidget *parent,
                                                DeckListModel *_deckListModel,
-                                               QItemSelectionModel *_selectionModel)
-    : QWidget(parent), deckListModel(_deckListModel), selectionModel(_selectionModel)
+                                               QItemSelectionModel *_selectionModel,
+                                               CardDatabaseModel *_cardDatabaseModel)
+    : QWidget(parent), deckListModel(_deckListModel), selectionModel(_selectionModel),
+      cardDatabaseModel(_cardDatabaseModel)
 {
     // The Main Widget and Main Layout, which contain a single Widget: The Scroll Area
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -94,7 +96,9 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
     setFocusProxy(searchBar);
     setFocusPolicy(Qt::ClickFocus);
 
-    cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
+    if (!cardDatabaseModel) {
+        cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
+    }
     cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
 
