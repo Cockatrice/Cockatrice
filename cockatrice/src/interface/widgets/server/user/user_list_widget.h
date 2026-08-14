@@ -18,6 +18,8 @@
 #include <QDialog>
 #include <QGroupBox>
 #include <QQueue>
+#include <QSet>
+#include <QStringList>
 #include <QStyledItemDelegate>
 #include <QTextEdit>
 #include <QTreeWidgetItem>
@@ -168,6 +170,25 @@ private:
     bool isItemNearViewport(const UserListTWI *item) const;
     void requestAvatarsForVisibleItems();
 
+    // ── Sectioned mode (single tree with inline dividers) ────────────────────
+    bool sectioned = false;
+    QStringList sectionIds;
+    QMap<QString, QTreeWidgetItem *> sectionItems;
+    QSet<QString> expandedSections;
+    void createSectionItems();
+    QTreeWidgetItem *createSectionItem(const QString &sectionId);
+    [[nodiscard]] QString sectionTitle(const QString &sectionId) const;
+    void updateSectionDivider(const QString &sectionId);
+    void handleSectionExpansion(QTreeWidgetItem *item, bool expanded);
+    void setExpandedProgrammatically(QTreeWidgetItem *item, bool expanded);
+    void handleOnlineChange(const ServerInfo_User &user, bool online);
+    void handleOnlineChangeLeft(const QString &userName);
+    void handleListAdd(const QString &sectionId, const ServerInfo_User &user);
+    void handleListRemove(const QString &sectionId, const QString &userName);
+    void moveToSection(const QString &sectionId, const QString &userName);
+    void updateCardArtParams(const ServerInfo_User &user, const QString &userName);
+    void processUserInfo(const QString &sectionId, const ServerInfo_User &user, bool online);
+
     QMap<QString, UserListTWI *> users;
     TabSupervisor *tabSupervisor;
     AbstractClient *client;
@@ -177,7 +198,10 @@ private:
     UserContextMenu *userContextMenu;
     int onlineCount;
     QString titleStr;
+    QString filterText;
+    bool showTitle = true;
     void updateCount();
+    void applyFilter();
     void refreshPopupButtons(const QString &userName);
 private slots:
     void userClicked(QTreeWidgetItem *item, int column);
@@ -189,6 +213,7 @@ signals:
     void addIgnore(const QString &userName);
     void removeIgnore(const QString &userName);
     void joinGameRequested(int gameId, int roomId, bool asSpectator);
+    void sectionExpanded(const QString &sectionId, bool expanded);
 
 public:
     UserListWidget(TabSupervisor *_tabSupervisor,
@@ -205,6 +230,14 @@ public:
     void processUserInfo(const ServerInfo_User &user, bool online);
     bool deleteUser(const QString &userName);
     void setUserOnline(const QString &userName, bool online);
+    void setFilterText(const QString &text);
+    void setShowTitle(bool showTitle);
+    void setSectioned(const QStringList &ids);
+    void setSectionExpanded(const QString &sectionId, bool expanded);
+    [[nodiscard]] const QStringList &getSectionIds() const
+    {
+        return sectionIds;
+    }
     [[nodiscard]] const QMap<QString, UserListTWI *> &getUsers() const
     {
         return users;

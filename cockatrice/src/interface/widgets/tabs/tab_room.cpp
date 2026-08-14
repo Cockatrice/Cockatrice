@@ -6,6 +6,7 @@
 #include "../interface/widgets/server/chat_view/chat_view.h"
 #include "../interface/widgets/server/game_selector.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
+#include "../interface/widgets/server/user/user_list_panel_widget.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
 #include "../utility/completer_utils.h"
@@ -60,23 +61,10 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     tempMap.insert(info.room_id(), gameTypes);
     gameSelector = new GameSelector(client, tabSupervisor, this, QMap<int, QString>(), tempMap, true, true);
 
-    auto *tabs = new QTabWidget(this);
-
-    friendsList = new UserListWidget(tabSupervisor, client, UserListWidget::BuddyList);
-    friendsList->bind(tabSupervisor->getUserListManager());
-    userList = new UserListWidget(tabSupervisor, client, UserListWidget::RoomList);
-    userList->bind(tabSupervisor->getUserListManager());
-    ignoreList = new UserListWidget(tabSupervisor, client, UserListWidget::IgnoreList);
-    ignoreList->bind(tabSupervisor->getUserListManager());
-
-    connect(friendsList, SIGNAL(openMessageDialog(const QString &, bool)), this,
-            SIGNAL(openMessageDialog(const QString &, bool)));
-    connect(userList, SIGNAL(openMessageDialog(const QString &, bool)), this,
-            SIGNAL(openMessageDialog(const QString &, bool)));
-
-    tabs->addTab(friendsList, tr("Friends"));
-    tabs->addTab(userList, tr("Online"));
-    tabs->addTab(ignoreList, tr("Ignored"));
+    userListPanel = new UserListPanelWidget(tabSupervisor, client, this);
+    userListPanel->bind(tabSupervisor->getUserListManager());
+    userList = userListPanel->getUserList();
+    connect(userListPanel, &UserListPanelWidget::openMessageDialog, this, &TabRoom::openMessageDialog);
 
     chatView = new ChatView(tabSupervisor, nullptr, true, this);
     connect(chatView, &ChatView::showMentionPopup, this, &TabRoom::actShowMentionPopup);
@@ -126,7 +114,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
 
     auto *hbox = new QHBoxLayout;
     hbox->addWidget(splitter, 3);
-    hbox->addWidget(tabs, 1);
+    hbox->addWidget(userListPanel, 1);
 
     aLeaveRoom = new QAction(this);
     connect(aLeaveRoom, &QAction::triggered, this, &TabRoom::closeRequest);
@@ -181,7 +169,7 @@ void TabRoom::retranslateUi()
 {
     gameSelector->retranslateUi();
     chatView->retranslateUi();
-    userList->retranslateUi();
+    userListPanel->retranslateUi();
     sayLabel->setText(tr("&Say:"));
     chatGroupBox->setTitle(tr("Chat"));
     roomMenu->setTitle(tr("&Room"));
