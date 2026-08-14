@@ -163,7 +163,7 @@ void VisualDatabaseDisplayWidget::initialize()
 
 void VisualDatabaseDisplayWidget::initializeFilters()
 {
-    if (filtersInitialized || !isVisible()) {
+    if (filtersInitialized || !isVisible() || CardDatabaseManager::getInstance()->getLoadStatus() != LoadStatus::Ok) {
         return;
     }
 
@@ -172,7 +172,9 @@ void VisualDatabaseDisplayWidget::initializeFilters()
     // The filter toolbar builds its widgets by iterating the entire card database
     // (per-set, per-main-type, per-sub-type and per-format buttons). Building it
     // inside showEvent would block the tab switch, so keep it hidden and defer the
-    // build to the next event loop turn, letting the tab paint first.
+    // build to the next event loop turn, letting the tab paint first. The toolbar
+    // then appears one event loop turn later, shifting the grid down by the toolbar
+    // height -- the intended tradeoff of an responsive tab switch.
     filterContainer->setVisible(false);
 
     QTimer::singleShot(0, this, [this] {
@@ -181,11 +183,7 @@ void VisualDatabaseDisplayWidget::initializeFilters()
 
         databaseDisplayModel->setFilterTree(filterModel->filterTree());
 
-        loadCardsTimer = new QTimer(this);
-        loadCardsTimer->setSingleShot(true); // Ensure it only fires once after the timeout
-
-        connect(loadCardsTimer, &QTimer::timeout, this, [this]() { loadCurrentPage(); });
-        loadCardsTimer->start(5000);
+        QTimer::singleShot(5000, this, [this] { loadCurrentPage(); });
 
         retranslateUi();
     });
@@ -322,7 +320,8 @@ void VisualDatabaseDisplayWidget::loadCurrentPage()
             initialLoadScheduled = true;
             qCDebug(VisualDatabaseDisplayLog) << "Loading the first page";
             // Defer the first page so the tab switch stays responsive. The card
-            // grid builds one event loop turn later.
+            // grid builds one event loop turn later. This also applies to
+            // search-driven reloads, which reset currentPage back to 0.
             QTimer::singleShot(0, this, [this] {
                 initialLoadScheduled = false;
                 populateCards();

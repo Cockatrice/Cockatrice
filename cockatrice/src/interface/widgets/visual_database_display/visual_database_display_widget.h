@@ -115,7 +115,6 @@ private:
     OverlapControlWidget *overlapControlWidget;
     CardSizeWidget *cardSizeWidget;
     QTimer *debounceTimer;
-    QTimer *loadCardsTimer;
 
     int debounceTime = 300; // in Ms
     int currentPage = 0;    // Current page index
