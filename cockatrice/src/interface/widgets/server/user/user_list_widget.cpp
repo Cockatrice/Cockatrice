@@ -1638,14 +1638,26 @@ void UserListWidget::updateSectionDivider(Section section)
         return;
     }
     int visible = 0;
+    int online = 0;
     for (int i = 0; i < divider->childCount(); ++i) {
-        if (!divider->child(i)->isHidden()) {
+        QTreeWidgetItem *child = divider->child(i);
+        if (!child->isHidden()) {
             ++visible;
+            if (child->data(0, UserListRoles::Online).toBool()) {
+                ++online;
+            }
         }
     }
     // The tree draws no branches (rows are flush), so the divider carries its
     // own collapse arrow glyph.
     const QString arrow = divider->isExpanded() ? QStringLiteral("\u25BE") : QStringLiteral("\u25B8");
+    if (section == Section::Buddy) {
+        // The buddy divider reports how many of the shown buddies are online,
+        // mirroring the "Buddies online: %1 / %2" title of the non-sectioned
+        // buddy list.
+        divider->setText(0, tr("%1 %2 (%3/%4)").arg(arrow, sectionTitle(section)).arg(online).arg(visible));
+        return;
+    }
     divider->setText(0, tr("%1 %2 (%3)").arg(arrow, sectionTitle(section)).arg(visible));
 }
 
