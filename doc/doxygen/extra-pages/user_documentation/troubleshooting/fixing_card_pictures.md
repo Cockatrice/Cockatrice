@@ -28,7 +28,8 @@ valid URLs. If you suspect the list has been modified or corrupted, press 'Reset
 defaults.
 
 For information on how to add your own custom URL templates, see the 'How to add a custom URL' link in the same
-settings section.
+settings section, or @subpage custom_card_pictures for a full reference of the URL reference points, the CUSTOM
+pictures folder, and custom card databases.
 
 # Check Your Local Picture Folder
 
