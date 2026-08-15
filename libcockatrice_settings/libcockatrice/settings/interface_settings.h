@@ -44,6 +44,7 @@ public:
     [[nodiscard]] bool getShowGameSelectorFilterToolbar() const override;
     [[nodiscard]] bool getLifeCounterAnimationsEnabled() const override;
     [[nodiscard]] bool getBattlefieldFlashEnabled() const override;
+    [[nodiscard]] QStringList getUserListExpandedSections() const override;
 
     void setUseTearOffMenus(bool _useTearOffMenus);
     void setCardViewInitialRowsMax(int _cardViewInitialRowsMax);
@@ -78,6 +79,7 @@ public:
     void setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar);
     void setLifeCounterAnimationsEnabled(bool _lifeCounterAnimationsEnabled);
     void setBattlefieldFlashEnabled(bool _battlefieldFlashEnabled);
+    void setUserListExpandedSections(const QStringList &sections);
 
 signals:
     void useTearOffMenusChanged(bool state);

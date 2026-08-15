@@ -260,6 +260,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/server/user/user_info_connection.cpp
     src/interface/widgets/server/user/user_list_manager.cpp
     src/interface/widgets/server/user/user_list_painter.cpp
+    src/interface/widgets/server/user/user_list_panel_widget.cpp
     src/interface/widgets/server/user/user_list_widget.cpp
     src/interface/widgets/settings_page/abstract_settings_page.cpp
     src/interface/widgets/settings_page/appearance_settings_page.cpp

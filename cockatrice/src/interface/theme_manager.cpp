@@ -123,7 +123,7 @@ void ThemeManager::ensureThemeDirectoryExists()
     }
 }
 
-bool ThemeManager::isDarkMode(const QString &themeDirPath)
+bool ThemeManager::isDarkMode(const QString &themeDirPath) const
 {
     ThemeConfig themeConfig = ThemeConfig::fromThemeDir(themeDirPath);
     if (themeConfig.colorScheme.compare("Dark", Qt::CaseInsensitive) == 0) {

@@ -170,6 +170,12 @@ bool InterfaceSettings::getBattlefieldFlashEnabled() const
     return getValue("battlefieldFlashEnabled", QString(), QString(), true).toBool();
 }
 
+QStringList InterfaceSettings::getUserListExpandedSections() const
+{
+    return getValue("userListExpandedSections", QString(), QString(), QStringList({"buddy", "online", "ignore"}))
+        .toStringList();
+}
+
 void InterfaceSettings::setUseTearOffMenus(bool _useTearOffMenus)
 {
     setValue(_useTearOffMenus, "useTearOffMenus");
@@ -347,4 +353,9 @@ void InterfaceSettings::setBattlefieldFlashEnabled(bool _battlefieldFlashEnabled
 {
     setValue(_battlefieldFlashEnabled, "battlefieldFlashEnabled");
     emit battlefieldFlashEnabledChanged(_battlefieldFlashEnabled);
+}
+
+void InterfaceSettings::setUserListExpandedSections(const QStringList &sections)
+{
+    setValue(sections, "userListExpandedSections");
 }

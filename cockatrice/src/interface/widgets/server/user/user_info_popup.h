@@ -26,6 +26,35 @@ namespace PopupRoles
 constexpr int GameData = Qt::UserRole + 10;
 }
 
+// Popup theme
+
+/**
+ * Palette-derived colors for the popup chrome. Both color schemes read from
+ * the active QPalette so custom palettes are respected. @c dark only tunes the
+ * blend strengths.
+ */
+struct PopupTheme
+{
+    bool dark = false;
+    QColor bg;
+    QColor border;
+    QColor text;
+    QColor subText;
+    QColor buttonBg;
+    QColor buttonBorder;
+    QColor buttonHover;
+    QColor buttonPressed;
+    QColor buttonDisabled;
+    QColor closeBg;
+    QColor closeHover;
+    QColor gamesRow;
+    QColor gamesSelected;
+    QColor gamesSeparator;
+    QColor statusText;
+
+    static PopupTheme fromPalette(const QPalette &palette, bool dark);
+};
+
 // ── Header widget ─────────────────────────────────────────────────────────────
 
 /**
@@ -51,21 +80,21 @@ class UserInfoHeaderWidget : public QWidget
 public:
     explicit UserInfoHeaderWidget(QWidget *parent = nullptr);
 
-    void setUserData(const ServerInfo_User &user,
-                     bool online,
-                     const QPixmap &avatar,
-                     const QPixmap &cardArt,
-                     const CardArtParams &params);
+    void setUserData(const ServerInfo_User &_user,
+                     bool _online,
+                     const QPixmap &_avatar,
+                     const QPixmap &_cardArt,
+                     const CardArtParams &_params);
 
 protected:
     void paintEvent(QPaintEvent *e) override;
 
 private:
-    ServerInfo_User m_user;
-    bool m_online = false;
-    QPixmap m_avatar;
-    QPixmap m_cardArt;
-    CardArtParams m_params;
+    ServerInfo_User user;
+    bool online = false;
+    QPixmap avatar;
+    QPixmap cardArt;
+    CardArtParams params;
 };
 
 // ── Main popup ────────────────────────────────────────────────────────────────
@@ -93,11 +122,11 @@ class UserInfoPopup : public QFrame
     static constexpr int PopupWidth = 316;
 
 public:
-    explicit UserInfoPopup(TabSupervisor *tabSupervisor,
-                           AbstractClient *client,
-                           const QMap<QString, QPixmap> *avatarCache,
-                           const QMap<QString, QPixmap> *cardArtCache,
-                           const QMap<QString, CardArtParams> *cardArtParamsMap,
+    explicit UserInfoPopup(TabSupervisor *_ts,
+                           AbstractClient *_client,
+                           const QMap<QString, QPixmap> *_avatarCache,
+                           const QMap<QString, QPixmap> *_cardArtCache,
+                           const QMap<QString, CardArtParams> *_cardArtParamsMap,
                            QWidget *parent);
 
     /**
@@ -108,9 +137,9 @@ public:
     showForUser(const QString &userName, const ServerInfo_User &userInfo, bool online, bool isBuddy, bool isIgnored);
     void fetchGames();
 
-    [[nodiscard]] QString currentUser() const
+    [[nodiscard]] QString getCurrentUser() const
     {
-        return m_currentUser;
+        return currentUser;
     }
 
     /** Called when buddy/ignore status changes externally while popup is open. */
@@ -156,25 +185,30 @@ private slots:
 
 private:
     void buildUi();
+    void applyTheme();
     void rebuildActionButtons(const ServerInfo_User &userInfo, bool online, bool isBuddy, bool isIgnored);
 
-    TabSupervisor *m_ts;
-    AbstractClient *m_client;
-    const QMap<QString, QPixmap> *m_avatarCache;
-    const QMap<QString, QPixmap> *m_cardArtCache;
-    const QMap<QString, CardArtParams> *m_cardArtParamsMap;
+    TabSupervisor *ts;
+    AbstractClient *client;
+    const QMap<QString, QPixmap> *avatarCache;
+    const QMap<QString, QPixmap> *cardArtCache;
+    const QMap<QString, CardArtParams> *cardArtParamsMap;
 
-    QString m_currentUser;
-    ServerInfo_User m_currentUserInfo;
-    bool m_currentOnline = false;
+    PopupTheme theme;
 
-    UserInfoHeaderWidget *m_header;
-    QWidget *m_actionArea; ///< rebuilt per user
-    QListView *m_gamesView;
-    QStandardItemModel *m_gamesModel;
-    QLabel *m_gamesStatus;
-    QPushButton *m_closeBtn;
-    QPushButton *m_refreshBtn;
+    QString currentUser;
+    ServerInfo_User currentUserInfo;
+    bool currentOnline = false;
+
+    UserInfoHeaderWidget *header;
+    QWidget *actionArea; ///< rebuilt per user
+    QLabel *gamesLabel;
+    QFrame *separator;
+    QListView *gamesView;
+    QStandardItemModel *gamesModel;
+    QLabel *gamesStatus;
+    QPushButton *closeBtn;
+    QPushButton *refreshBtn;
 };
 
 #endif // COCKATRICE_USER_INFO_POPUP_H
