@@ -164,6 +164,15 @@ public slots:
      * @return true if successful, false otherwise.
      */
     bool actSaveDeckAs() override;
+
+private:
+    /**
+     * @brief Sets the deck for this tab and selects the sub-tab to open on
+     * startup, per the "Visual deck editor startup tab" setting (Context /
+     * Deck display / Database display).
+     * @param _deck The deck object.
+     */
+    void setDeck(const LoadedDeck &_deck) override;
 };
 
 #endif

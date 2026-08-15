@@ -263,12 +263,12 @@ protected slots:
     /** @brief Handles dock close events. */
     void closeEvent(QCloseEvent *event) override;
 
-private:
     /** @brief Sets the deck for this tab.
      *  @param _deck The deck object.
      */
     virtual void setDeck(const LoadedDeck &_deck);
 
+private:
     /** @brief Helper for editing decks from the clipboard. */
     void editDeckInClipboard(bool annotated);
 

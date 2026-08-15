@@ -183,6 +183,13 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     connect(&defaultDeckEditorTypeSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
             &SettingsCache::instance().deckEditor(), &DeckEditorSettings::setDefaultDeckEditorType);
 
+    vdeStartupTabSelector.addItem(""); // these will be set in retranslateUI
+    vdeStartupTabSelector.addItem("");
+    vdeStartupTabSelector.addItem("");
+    vdeStartupTabSelector.setCurrentIndex(SettingsCache::instance().deckEditor().getVdeStartupTab());
+    connect(&vdeStartupTabSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            &SettingsCache::instance().deckEditor(), &DeckEditorSettings::setVdeStartupTab);
+
     commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setText("?");
     commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setAutoRaise(true);
     commanderSpellbookIntegrationUseOfficialBracketNamesExplainer.setEnabled(false);
@@ -242,10 +249,12 @@ UserInterfaceSettingsPage::UserInterfaceSettingsPage()
     deckEditorGrid->addWidget(&visualDeckStoragePromptForConversionSelector, 3, 1);
     deckEditorGrid->addWidget(&defaultDeckEditorTypeLabel, 4, 0);
     deckEditorGrid->addWidget(&defaultDeckEditorTypeSelector, 4, 1);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledLabel, 5, 0);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledSelector, 5, 1);
-    deckEditorGrid->addWidget(labelWidget, 6, 0);
-    deckEditorGrid->addWidget(&commanderSpellbookIntegrationBracketNamingSelector, 6, 1);
+    deckEditorGrid->addWidget(&vdeStartupTabLabel, 5, 0);
+    deckEditorGrid->addWidget(&vdeStartupTabSelector, 5, 1);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledLabel, 6, 0);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationEnabledSelector, 6, 1);
+    deckEditorGrid->addWidget(labelWidget, 7, 0);
+    deckEditorGrid->addWidget(&commanderSpellbookIntegrationBracketNamingSelector, 7, 1);
 
     deckEditorGroupBox = new QGroupBox;
     deckEditorGroupBox->setLayout(deckEditorGrid);
@@ -368,6 +377,12 @@ void UserInterfaceSettingsPage::retranslateUi()
     defaultDeckEditorTypeLabel.setText(tr("Default deck editor type"));
     defaultDeckEditorTypeSelector.setItemText(TabSupervisor::ClassicDeckEditor, tr("Classic Deck Editor"));
     defaultDeckEditorTypeSelector.setItemText(TabSupervisor::VisualDeckEditor, tr("Visual Deck Editor"));
+    vdeStartupTabLabel.setText(tr("Visual deck editor startup tab"));
+    vdeStartupTabSelector.setItemText(VdeStartupTabContext, tr("Context"));
+    vdeStartupTabSelector.setItemText(VdeStartupTabDeckDisplay, tr("Deck display"));
+    vdeStartupTabSelector.setItemText(VdeStartupTabDatabaseDisplay, tr("Database display"));
+    vdeStartupTabSelector.setToolTip(
+        tr("New decks open on the database display; existing decks open on the deck view."));
 
     commanderSpellbookIntegrationEnabledLabel.setText(
         tr("CommanderSpellbook integration to estimate commander bracket"));
