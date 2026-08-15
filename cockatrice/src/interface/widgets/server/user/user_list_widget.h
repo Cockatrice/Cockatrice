@@ -19,7 +19,6 @@
 #include <QGroupBox>
 #include <QQueue>
 #include <QSet>
-#include <QStringList>
 #include <QStyledItemDelegate>
 #include <QTextEdit>
 #include <QTreeWidgetItem>
@@ -150,6 +149,12 @@ public:
         BuddyList,
         IgnoreList
     };
+    enum class Section
+    {
+        Buddy,
+        Online,
+        Ignore
+    };
 
 private:
     UserListManager *manager = nullptr;
@@ -181,31 +186,31 @@ private:
 
     // Sectioned mode (single tree with inline dividers)
     bool sectioned = false;
-    QStringList sectionIds;
-    QMap<QString, QTreeWidgetItem *> sectionItems;
+    QList<Section> sectionIds;
+    QMap<Section, QTreeWidgetItem *> sectionItems;
     // One row per (section, user): a user that is online AND a buddy appears in
     // both the "Online" and the "Buddies" sections, so the same user can own
     // several rows, each hanging off its section's divider.
-    QMap<QString, QMap<QString, UserListTWI *>> sectionUsers;
-    QSet<QString> expandedSections;
+    QMap<Section, QMap<QString, UserListTWI *>> sectionUsers;
+    QSet<Section> expandedSections;
     void createSectionItems();
-    QTreeWidgetItem *createSectionItem(const QString &sectionId);
-    [[nodiscard]] QString sectionTitle(const QString &sectionId) const;
-    void updateSectionDivider(const QString &sectionId);
+    QTreeWidgetItem *createSectionItem(Section section);
+    [[nodiscard]] QString sectionTitle(Section section) const;
+    void updateSectionDivider(Section section);
     void handleSectionExpansion(QTreeWidgetItem *item, bool expanded);
     void setExpandedProgrammatically(QTreeWidgetItem *item, bool expanded);
     void handleOnlineChange(const ServerInfo_User &user);
     void handleOnlineChangeLeft(const QString &userName);
-    void handleListAdd(const QString &sectionId, const ServerInfo_User &user);
-    void handleListRemove(const QString &sectionId, const QString &userName);
-    /** Creates or updates the row for @p user in @p sectionId. */
-    UserListTWI *ensureSectionMembership(const QString &sectionId, const ServerInfo_User &user, bool online);
-    /** Removes and deletes the row for @p userName in @p sectionId. */
-    bool dropSectionMembership(const QString &sectionId, const QString &userName);
+    void handleListAdd(Section section, const ServerInfo_User &user);
+    void handleListRemove(Section section, const QString &userName);
+    /** Creates or updates the row for @p user in @p section. */
+    UserListTWI *ensureSectionMembership(Section section, const ServerInfo_User &user, bool online);
+    /** Removes and deletes the row for @p userName in @p section. */
+    bool dropSectionMembership(Section section, const QString &userName);
     /** Sorts, refilters and repaints after a sectioned mode mutation. */
     void finishSectionedMutation();
     void updateCardArtParams(const ServerInfo_User &user, const QString &userName);
-    void processUserInfo(const QString &sectionId, const ServerInfo_User &user, bool online);
+    void processUserInfo(Section section, const ServerInfo_User &user, bool online);
 
     QMap<QString, UserListTWI *> users;
     TabSupervisor *tabSupervisor;
@@ -231,7 +236,7 @@ signals:
     void addIgnore(const QString &userName);
     void removeIgnore(const QString &userName);
     void joinGameRequested(int gameId, int roomId, bool asSpectator);
-    void sectionExpanded(const QString &sectionId, bool expanded);
+    void sectionExpanded(Section section, bool expanded);
 
 public:
     UserListWidget(TabSupervisor *_tabSupervisor,
@@ -251,9 +256,9 @@ public:
     void setUserOnline(const QString &userName, bool online);
     void setFilterText(const QString &text);
     void setShowTitle(bool showTitle);
-    void setSectioned(const QStringList &ids);
-    void setSectionExpanded(const QString &sectionId, bool expanded);
-    [[nodiscard]] const QStringList &getSectionIds() const
+    void setSectioned(const QList<Section> &ids);
+    void setSectionExpanded(Section section, bool expanded);
+    [[nodiscard]] const QList<Section> &getSectionIds() const
     {
         return sectionIds;
     }

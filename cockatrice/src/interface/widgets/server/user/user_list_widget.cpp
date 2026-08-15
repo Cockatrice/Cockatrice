@@ -805,13 +805,13 @@ void UserListWidget::bind(UserListManager *mgr)
         connect(manager, &UserListManager::userLeftOnline, this,
                 [this](const QString &name) { handleOnlineChangeLeft(name); });
         connect(manager, &UserListManager::addedToBuddyList, this,
-                [this](const ServerInfo_User &user) { handleListAdd(QStringLiteral("buddy"), user); });
+                [this](const ServerInfo_User &user) { handleListAdd(Section::Buddy, user); });
         connect(manager, &UserListManager::removedFromBuddyList, this,
-                [this](const QString &name) { handleListRemove(QStringLiteral("buddy"), name); });
+                [this](const QString &name) { handleListRemove(Section::Buddy, name); });
         connect(manager, &UserListManager::addedToIgnoreList, this,
-                [this](const ServerInfo_User &user) { handleListAdd(QStringLiteral("ignore"), user); });
+                [this](const ServerInfo_User &user) { handleListAdd(Section::Ignore, user); });
         connect(manager, &UserListManager::removedFromIgnoreList, this,
-                [this](const QString &name) { handleListRemove(QStringLiteral("ignore"), name); });
+                [this](const QString &name) { handleListRemove(Section::Ignore, name); });
     }
 
     // ── Popup button refresh ──────────────────────────────────────────────────
@@ -1201,8 +1201,8 @@ void UserListWidget::requestAvatarsForVisibleItems()
 {
     if (sectioned) {
         // Top level items are dividers, user rows hang below them.
-        for (const QString &sectionId : sectionIds) {
-            QTreeWidgetItem *divider = sectionItems.value(sectionId);
+        for (const Section section : sectionIds) {
+            QTreeWidgetItem *divider = sectionItems.value(section);
             if (!divider) {
                 continue;
             }
@@ -1247,15 +1247,15 @@ void UserListWidget::rebuild()
         beginBulkLoad();
         const auto &onlineUsers = manager->getAllUsersList();
         for (auto it = onlineUsers.cbegin(); it != onlineUsers.cend(); ++it) {
-            processUserInfo(QStringLiteral("online"), it.value(), true);
+            processUserInfo(Section::Online, it.value(), true);
         }
         const auto &buddyUsers = manager->getBuddyList();
         for (auto it = buddyUsers.cbegin(); it != buddyUsers.cend(); ++it) {
-            processUserInfo(QStringLiteral("buddy"), it.value(), manager->getOnlineUser(it.key()) != nullptr);
+            processUserInfo(Section::Buddy, it.value(), manager->getOnlineUser(it.key()) != nullptr);
         }
         const auto &ignoreUsers = manager->getIgnoreList();
         for (auto it = ignoreUsers.cbegin(); it != ignoreUsers.cend(); ++it) {
-            processUserInfo(QStringLiteral("ignore"), it.value(), manager->getOnlineUser(it.key()) != nullptr);
+            processUserInfo(Section::Ignore, it.value(), manager->getOnlineUser(it.key()) != nullptr);
         }
         endBulkLoad();
         applyFilter();
@@ -1334,9 +1334,9 @@ void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
     }
 }
 
-void UserListWidget::processUserInfo(const QString &sectionId, const ServerInfo_User &user, bool online)
+void UserListWidget::processUserInfo(Section section, const ServerInfo_User &user, bool online)
 {
-    ensureSectionMembership(sectionId, user, online);
+    ensureSectionMembership(section, user, online);
     if (!bulkLoading) {
         sortItems();
         applyFilter();
@@ -1349,9 +1349,9 @@ bool UserListWidget::deleteUser(const QString &userName)
     if (sectioned) {
         // The user may own several rows (one per section). Drop them all.
         bool removed = false;
-        const QStringList sections = sectionUsers.keys(); // snapshot: maps mutate
-        for (const QString &sectionId : sections) {
-            removed = dropSectionMembership(sectionId, userName) || removed;
+        const QList<Section> sections = sectionUsers.keys(); // snapshot: maps mutate
+        for (const Section section : sections) {
+            removed = dropSectionMembership(section, userName) || removed;
         }
         if (removed && !bulkLoading) {
             sortItems();
@@ -1430,8 +1430,8 @@ void UserListWidget::updateCount()
     if (sectioned) {
         // The dividers carry the section titles
         setTitle(QString());
-        for (const QString &sectionId : sectionIds) {
-            updateSectionDivider(sectionId);
+        for (const Section section : sectionIds) {
+            updateSectionDivider(section);
         }
         return;
     }
@@ -1467,8 +1467,8 @@ void UserListWidget::applyFilter()
     if (sectioned) {
         const bool searching = !filterText.isEmpty();
         const QString lower = filterText.toLower();
-        for (const QString &sectionId : sectionIds) {
-            QTreeWidgetItem *divider = sectionItems.value(sectionId);
+        for (const Section section : sectionIds) {
+            QTreeWidgetItem *divider = sectionItems.value(section);
             if (!divider) {
                 continue;
             }
@@ -1490,9 +1490,9 @@ void UserListWidget::applyFilter()
                 setExpandedProgrammatically(divider, visible > 0);
             } else {
                 divider->setHidden(false);
-                setExpandedProgrammatically(divider, expandedSections.contains(sectionId));
+                setExpandedProgrammatically(divider, expandedSections.contains(section));
             }
-            updateSectionDivider(sectionId);
+            updateSectionDivider(section);
         }
         requestAvatarsForVisibleItems();
         userTree->viewport()->update();
@@ -1552,7 +1552,7 @@ void UserListWidget::sortItems()
 
 // Sectioned mode
 
-void UserListWidget::setSectioned(const QStringList &ids)
+void UserListWidget::setSectioned(const QList<Section> &ids)
 {
     if (sectioned || ids.isEmpty()) {
         return;
@@ -1561,8 +1561,8 @@ void UserListWidget::setSectioned(const QStringList &ids)
     sectioned = true;
     sectionIds = ids;
     expandedSections.clear();
-    for (const QString &sectionId : sectionIds) {
-        expandedSections.insert(sectionId); // everything starts expanded
+    for (const Section section : sectionIds) {
+        expandedSections.insert(section); // everything starts expanded
     }
 
     // The single tree owns scrolling and the dividers carry the section titles,
@@ -1587,16 +1587,16 @@ void UserListWidget::createSectionItems()
 {
     sectionItems.clear();
     QSignalBlocker blocker(userTree); // no expansion signals while building
-    for (const QString &sectionId : sectionIds) {
-        QTreeWidgetItem *divider = createSectionItem(sectionId);
-        sectionItems.insert(sectionId, divider);
-        divider->setExpanded(expandedSections.contains(sectionId));
+    for (const Section section : sectionIds) {
+        QTreeWidgetItem *divider = createSectionItem(section);
+        sectionItems.insert(section, divider);
+        divider->setExpanded(expandedSections.contains(section));
     }
 }
 
-QTreeWidgetItem *UserListWidget::createSectionItem(const QString &sectionId)
+QTreeWidgetItem *UserListWidget::createSectionItem(Section section)
 {
-    Q_UNUSED(sectionId);
+    Q_UNUSED(section);
     auto *divider = new QTreeWidgetItem(SectionItemType);
     // Selectable so keyboard navigation (Up/Down) can land on the dividers.
     // They act as collapsible section headers once they have focus.
@@ -1618,23 +1618,22 @@ QTreeWidgetItem *UserListWidget::createSectionItem(const QString &sectionId)
     return divider;
 }
 
-QString UserListWidget::sectionTitle(const QString &sectionId) const
+QString UserListWidget::sectionTitle(Section section) const
 {
-    if (sectionId == QLatin1String("buddy")) {
-        return tr("Buddies");
+    switch (section) {
+        case Section::Buddy:
+            return tr("Buddies");
+        case Section::Online:
+            return tr("Online");
+        case Section::Ignore:
+            return tr("Ignored");
     }
-    if (sectionId == QLatin1String("online")) {
-        return tr("Online");
-    }
-    if (sectionId == QLatin1String("ignore")) {
-        return tr("Ignored");
-    }
-    return sectionId;
+    return {};
 }
 
-void UserListWidget::updateSectionDivider(const QString &sectionId)
+void UserListWidget::updateSectionDivider(Section section)
 {
-    QTreeWidgetItem *divider = sectionItems.value(sectionId);
+    QTreeWidgetItem *divider = sectionItems.value(section);
     if (!divider) {
         return;
     }
@@ -1647,7 +1646,7 @@ void UserListWidget::updateSectionDivider(const QString &sectionId)
     // The tree draws no branches (rows are flush), so the divider carries its
     // own collapse arrow glyph.
     const QString arrow = divider->isExpanded() ? QStringLiteral("\u25BE") : QStringLiteral("\u25B8");
-    divider->setText(0, tr("%1 %2 (%3)").arg(arrow, sectionTitle(sectionId)).arg(visible));
+    divider->setText(0, tr("%1 %2 (%3)").arg(arrow, sectionTitle(section)).arg(visible));
 }
 
 void UserListWidget::handleSectionExpansion(QTreeWidgetItem *item, bool expanded)
@@ -1655,17 +1654,23 @@ void UserListWidget::handleSectionExpansion(QTreeWidgetItem *item, bool expanded
     if (!sectioned || item->type() != SectionItemType) {
         return;
     }
-    const QString sectionId = sectionItems.key(item);
-    if (sectionId.isEmpty()) {
+    // Reverse lookup. Only three dividers exist, so a linear scan over the
+    // section map is cheaper than caching the section on each divider.
+    auto dividerIt = sectionItems.constBegin();
+    while (dividerIt != sectionItems.constEnd() && dividerIt.value() != item) {
+        ++dividerIt;
+    }
+    if (dividerIt == sectionItems.constEnd()) {
         return;
     }
+    const Section section = dividerIt.key();
     if (expanded) {
-        expandedSections.insert(sectionId);
+        expandedSections.insert(section);
     } else {
-        expandedSections.remove(sectionId);
+        expandedSections.remove(section);
     }
-    updateSectionDivider(sectionId); // the arrow glyph follows the state
-    emit sectionExpanded(sectionId, expanded);
+    updateSectionDivider(section); // the arrow glyph follows the state
+    emit sectionExpanded(section, expanded);
 }
 
 void UserListWidget::setExpandedProgrammatically(QTreeWidgetItem *item, bool expanded)
@@ -1674,23 +1679,23 @@ void UserListWidget::setExpandedProgrammatically(QTreeWidgetItem *item, bool exp
     item->setExpanded(expanded);
 }
 
-void UserListWidget::setSectionExpanded(const QString &sectionId, bool expanded)
+void UserListWidget::setSectionExpanded(Section section, bool expanded)
 {
     if (!sectioned) {
         return;
     }
     if (expanded) {
-        expandedSections.insert(sectionId);
+        expandedSections.insert(section);
     } else {
-        expandedSections.remove(sectionId);
+        expandedSections.remove(section);
     }
-    QTreeWidgetItem *divider = sectionItems.value(sectionId);
+    QTreeWidgetItem *divider = sectionItems.value(section);
     if (!divider) {
         return;
     }
     QSignalBlocker blocker(userTree);
     divider->setExpanded(expanded);
-    updateSectionDivider(sectionId); // the arrow glyph follows the state
+    updateSectionDivider(section); // the arrow glyph follows the state
     userTree->viewport()->update();
 }
 
@@ -1699,12 +1704,12 @@ void UserListWidget::handleOnlineChange(const ServerInfo_User &user)
     // A user came online: they get a row in the "Online" section, plus (if
     // applicable) a row in the buddy/ignore sections, which flip to online.
     const QString name = QString::fromStdString(user.name());
-    ensureSectionMembership(QStringLiteral("online"), user, true);
+    ensureSectionMembership(Section::Online, user, true);
     if (manager->isUserBuddy(name)) {
-        ensureSectionMembership(QStringLiteral("buddy"), user, true);
+        ensureSectionMembership(Section::Buddy, user, true);
     }
     if (manager->isUserIgnored(name)) {
-        ensureSectionMembership(QStringLiteral("ignore"), user, true);
+        ensureSectionMembership(Section::Ignore, user, true);
     }
     finishSectionedMutation();
 }
@@ -1714,7 +1719,7 @@ void UserListWidget::handleOnlineChangeLeft(const QString &userName)
     // The user is no longer online: their "Online" row disappears. Buddies and
     // ignored users keep their own section's row, marked offline. A plain user
     // has no rows left.
-    const bool dropped = dropSectionMembership(QStringLiteral("online"), userName);
+    const bool dropped = dropSectionMembership(Section::Online, userName);
     const bool kept = manager->isUserBuddy(userName) || manager->isUserIgnored(userName);
     if (kept) {
         setUserOnline(userName, false);
@@ -1724,40 +1729,40 @@ void UserListWidget::handleOnlineChangeLeft(const QString &userName)
     }
 }
 
-void UserListWidget::handleListAdd(const QString &sectionId, const ServerInfo_User &user)
+void UserListWidget::handleListAdd(Section section, const ServerInfo_User &user)
 {
     const QString name = QString::fromStdString(user.name());
     const bool online = manager->getOnlineUser(name) != nullptr;
-    ensureSectionMembership(sectionId, user, online);
+    ensureSectionMembership(section, user, online);
     if (online) {
         // The user belongs to the "Online" section as well. Make sure the row
         // exists even if the join event raced ahead of the list mutation.
-        ensureSectionMembership(QStringLiteral("online"), user, true);
+        ensureSectionMembership(Section::Online, user, true);
     }
     finishSectionedMutation();
 }
 
-void UserListWidget::handleListRemove(const QString &sectionId, const QString &userName)
+void UserListWidget::handleListRemove(Section section, const QString &userName)
 {
     // Only the row of the removed section disappears: an online user keeps
     // their "Online" row, and other list memberships keep theirs.
-    if (dropSectionMembership(sectionId, userName)) {
+    if (dropSectionMembership(section, userName)) {
         finishSectionedMutation();
     }
 }
 
-UserListTWI *UserListWidget::ensureSectionMembership(const QString &sectionId, const ServerInfo_User &user, bool online)
+UserListTWI *UserListWidget::ensureSectionMembership(Section section, const ServerInfo_User &user, bool online)
 {
     const QString userName = QString::fromStdString(user.name());
 
     updateCardArtParams(user, userName);
 
-    QTreeWidgetItem *divider = sectionItems.value(sectionId);
+    QTreeWidgetItem *divider = sectionItems.value(section);
     if (!divider) {
         return nullptr;
     }
 
-    QMap<QString, UserListTWI *> &sectionMap = sectionUsers[sectionId];
+    QMap<QString, UserListTWI *> &sectionMap = sectionUsers[section];
     UserListTWI *item = sectionMap.value(userName);
     if (!item) {
         item = new UserListTWI(user);
@@ -1781,9 +1786,9 @@ UserListTWI *UserListWidget::ensureSectionMembership(const QString &sectionId, c
     return item;
 }
 
-bool UserListWidget::dropSectionMembership(const QString &sectionId, const QString &userName)
+bool UserListWidget::dropSectionMembership(Section section, const QString &userName)
 {
-    QMap<QString, UserListTWI *> &sectionMap = sectionUsers[sectionId];
+    QMap<QString, UserListTWI *> &sectionMap = sectionUsers[section];
     UserListTWI *item = sectionMap.take(userName);
     if (!item) {
         return false;

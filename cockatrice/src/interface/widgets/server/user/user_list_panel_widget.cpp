@@ -9,6 +9,24 @@
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/settings/interface_settings.h>
 
+namespace
+{
+// The persisted section keys are the serialization contract with the user's
+// settings file, so the values must stay stable across versions.
+QString sectionKey(UserListWidget::Section section)
+{
+    switch (section) {
+        case UserListWidget::Section::Buddy:
+            return QStringLiteral("buddy");
+        case UserListWidget::Section::Online:
+            return QStringLiteral("online");
+        case UserListWidget::Section::Ignore:
+            return QStringLiteral("ignore");
+    }
+    return {};
+}
+} // namespace
+
 UserListPanelWidget::UserListPanelWidget(TabSupervisor *_tabSupervisor, AbstractClient *_client, QWidget *parent)
     : QWidget(parent)
 {
@@ -21,7 +39,8 @@ UserListPanelWidget::UserListPanelWidget(TabSupervisor *_tabSupervisor, Abstract
     mainLayout->addWidget(searchBar);
 
     userList = new UserListWidget(_tabSupervisor, _client, UserListWidget::RoomList, this);
-    userList->setSectioned({QStringLiteral("buddy"), QStringLiteral("online"), QStringLiteral("ignore")});
+    userList->setSectioned(
+        {UserListWidget::Section::Buddy, UserListWidget::Section::Online, UserListWidget::Section::Ignore});
     mainLayout->addWidget(userList, 1);
 
     connect(searchBar, &QLineEdit::textChanged, userList, &UserListWidget::setFilterText);
@@ -31,8 +50,8 @@ UserListPanelWidget::UserListPanelWidget(TabSupervisor *_tabSupervisor, Abstract
 
     // Restore the persisted expansion state, then apply it to the tree.
     const QStringList expandedSections = SettingsCache::instance().userInterface().getUserListExpandedSections();
-    for (const QString &sectionId : userList->getSectionIds()) {
-        userList->setSectionExpanded(sectionId, expandedSections.contains(sectionId));
+    for (const UserListWidget::Section section : userList->getSectionIds()) {
+        userList->setSectionExpanded(section, expandedSections.contains(sectionKey(section)));
     }
 
     retranslateUi();
@@ -43,15 +62,16 @@ void UserListPanelWidget::bind(UserListManager *manager)
     userList->bind(manager);
 }
 
-void UserListPanelWidget::persistExpandedSections(const QString &sectionId, bool expanded)
+void UserListPanelWidget::persistExpandedSections(UserListWidget::Section section, bool expanded)
 {
+    const QString key = sectionKey(section);
     QStringList expandedSections = SettingsCache::instance().userInterface().getUserListExpandedSections();
     if (expanded) {
-        if (!expandedSections.contains(sectionId)) {
-            expandedSections.append(sectionId);
+        if (!expandedSections.contains(key)) {
+            expandedSections.append(key);
         }
     } else {
-        expandedSections.removeAll(sectionId);
+        expandedSections.removeAll(key);
     }
     SettingsCache::instance().userInterface().setUserListExpandedSections(expandedSections);
 }

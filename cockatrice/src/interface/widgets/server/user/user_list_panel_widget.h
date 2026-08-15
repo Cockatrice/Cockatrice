@@ -6,13 +6,14 @@
 #ifndef COCKATRICE_USER_LIST_PANEL_WIDGET_H
 #define COCKATRICE_USER_LIST_PANEL_WIDGET_H
 
+#include "user_list_widget.h"
+
 #include <QWidget>
 
 class AbstractClient;
 class QLineEdit;
 class TabSupervisor;
 class UserListManager;
-class UserListWidget;
 
 /**
  * A unified user list: a search bar above a single tree whose section headers
@@ -33,7 +34,7 @@ signals:
     void openMessageDialog(const QString &userName, bool focus);
 
 private:
-    void persistExpandedSections(const QString &sectionId, bool expanded);
+    void persistExpandedSections(UserListWidget::Section section, bool expanded);
 
     QLineEdit *searchBar = nullptr;
     UserListWidget *userList = nullptr;
