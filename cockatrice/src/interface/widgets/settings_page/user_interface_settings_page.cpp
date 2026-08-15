@@ -382,7 +382,7 @@ void UserInterfaceSettingsPage::retranslateUi()
     vdeStartupTabSelector.setItemText(VdeStartupTabDeckDisplay, tr("Deck display"));
     vdeStartupTabSelector.setItemText(VdeStartupTabDatabaseDisplay, tr("Database display"));
     vdeStartupTabSelector.setToolTip(
-        tr("New decks open on the database display; existing decks open on the deck view."));
+        tr("Context mode: New decks open on the database display, existing decks open on the deck view."));
 
     commanderSpellbookIntegrationEnabledLabel.setText(
         tr("CommanderSpellbook integration to estimate commander bracket"));
