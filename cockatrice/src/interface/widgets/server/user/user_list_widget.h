@@ -164,9 +164,14 @@ private:
     bool popupPinned = false;
     bool bulkLoading = false;
 
-    void showPopupForUser(const QString &userName);
+    /**
+     * Popup functions are anchored on the row, not the user name: in sectioned
+     * mode a user can own several rows (online + buddy), and the popup must
+     * follow the hovered/selected row rather than a name-based lookup.
+     */
+    void showPopupForUser(UserListTWI *item);
     void hidePopup(bool immediate = false);
-    void positionPopup(const QString &userName);
+    void positionPopup(UserListTWI *item);
     void connectPopupSignals();
     bool isItemNearViewport(const UserListTWI *item) const;
     void requestAvatarsForVisibleItems();

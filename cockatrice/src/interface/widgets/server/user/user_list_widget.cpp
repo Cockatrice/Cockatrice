@@ -12,12 +12,14 @@
 
 #include <QApplication>
 #include <QCheckBox>
+#include <QCursor>
 #include <QFont>
 #include <QFontMetrics>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -614,8 +616,17 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     showPopupTimer->setSingleShot(true);
     showPopupTimer->setInterval(280);
     connect(showPopupTimer, &QTimer::timeout, this, [this] {
-        if (!hoveredUser.isEmpty()) {
-            showPopupForUser(hoveredUser);
+        if (hoveredUser.isEmpty()) {
+            return;
+        }
+        // Re-resolve the row under the cursor: in sectioned mode a user can own
+        // several rows (online + buddy), so the popup must anchor to the exact
+        // hovered row instead of a name-based lookup.
+        const QPoint viewportPos = userTree->viewport()->mapFromGlobal(QCursor::pos());
+        QTreeWidgetItem *item = userTree->itemAt(viewportPos);
+        if (item && item->type() == QTreeWidgetItem::Type &&
+            QString::fromStdString(static_cast<UserListTWI *>(item)->getUserInfo().name()) == hoveredUser) {
+            showPopupForUser(static_cast<UserListTWI *>(item));
         }
     });
 
@@ -633,6 +644,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->setMouseTracking(true);
     userTree->viewport()->setMouseTracking(true);
     userTree->viewport()->installEventFilter(this);
+    userTree->installEventFilter(this); // keyboard handling for section dividers
 
     // Pin on item click
     connect(userTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item, int) {
@@ -648,9 +660,8 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
         if (item->type() != QTreeWidgetItem::Type) {
             return; // divider rows have no user popup
         }
-        const QString name = static_cast<UserListTWI *>(item)->getUserInfo().name().c_str();
         popupPinned = false; // reset so showPopupForUser can update
-        showPopupForUser(name);
+        showPopupForUser(static_cast<UserListTWI *>(item));
         popupPinned = true; // pin after showing
     });
 
@@ -662,6 +673,22 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
                     hidePopup();
                 }
             });
+
+    // Keyboard selection: show the popup for the current row and hide it when
+    // the focus moves to a section divider or leaves the list entirely. The
+    // popup therefore follows arrow-key navigation exactly like mouse hover.
+    // When it was pinned by a click it stays open and follows the selection.
+    connect(userTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem *current, QTreeWidgetItem *) {
+        if (!isVisible() || !SettingsCache::instance().appearance().getStyleUserList()) {
+            return;
+        }
+        if (current && current->type() == QTreeWidgetItem::Type) {
+            showPopupForUser(static_cast<UserListTWI *>(current));
+        } else {
+            popupPinned = false;
+            hidePopup();
+        }
+    });
 
     // Section dividers can be collapsed/expanded by the user. Surface those
     // changes (only from real user interaction — programmatic expansion is
@@ -760,9 +787,8 @@ void UserListWidget::bind(UserListManager *mgr)
         // currently online user, the "Buddy"/"Ignore" sections hold those
         // lists. A user can therefore appear in several sections at once (an
         // online buddy gets one row in each).
-        connect(manager, &UserListManager::userJoinedOnline, this, [this](const ServerInfo_User &user) {
-            handleOnlineChange(user);
-        });
+        connect(manager, &UserListManager::userJoinedOnline, this,
+                [this](const ServerInfo_User &user) { handleOnlineChange(user); });
         connect(manager, &UserListManager::userLeftOnline, this,
                 [this](const QString &name) { handleOnlineChangeLeft(name); });
         connect(manager, &UserListManager::addedToBuddyList, this,
@@ -817,7 +843,7 @@ void UserListWidget::refreshPopupButtons(const QString &userName)
     const bool isIgn = proxy->isUserIgnored(userName);
 
     userInfoPopup->updateActionButtons(item->getUserInfo(), online, isBuddy, isIgn);
-    positionPopup(userName); // height may have changed — reposition
+    positionPopup(item); // height may have changed — reposition
 }
 
 void UserListWidget::hideEvent(QHideEvent *e)
@@ -893,6 +919,27 @@ void UserListWidget::connectPopupSignals()
 
 bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
 {
+    // ── Keyboard navigation of the section dividers ──────────────────────────
+    // The dividers are selectable so arrow keys land on them; when one is the
+    // current item, Enter/Space toggle it (like a button) and Left/Right follow
+    // the tree convention (Left collapses, Right expands).
+    if (obj == userTree && event->type() == QEvent::KeyPress) {
+        auto *keyEvent = static_cast<QKeyEvent *>(event);
+        QTreeWidgetItem *current = userTree->currentItem();
+        if (sectioned && current && current->type() == SectionItemType) {
+            const bool toggle = keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter ||
+                                keyEvent->key() == Qt::Key_Space;
+            const bool collapse = keyEvent->key() == Qt::Key_Left && current->isExpanded();
+            const bool expand = keyEvent->key() == Qt::Key_Right && !current->isExpanded();
+            if (toggle || collapse || expand) {
+                const bool expanded = toggle ? !current->isExpanded() : expand;
+                setExpandedProgrammatically(current, expanded);
+                handleSectionExpansion(current, expanded);
+                return true;
+            }
+        }
+    }
+
     if (obj == userTree->viewport()) {
         if (event->type() == QEvent::MouseMove) {
             if (!SettingsCache::instance().appearance().getStyleUserList()) {
@@ -931,13 +978,13 @@ bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
     return QGroupBox::eventFilter(obj, event);
 }
 
-void UserListWidget::showPopupForUser(const QString &userName)
+void UserListWidget::showPopupForUser(UserListTWI *item)
 {
-    UserListTWI *item = users.value(userName);
     if (!item) {
         return;
     }
 
+    const QString userName = QString::fromStdString(item->getUserInfo().name());
     avatarProvider->requestAvatar(userName); // ensure the hovered user's avatar is fetched promptly
 
     const ServerInfo_User &info = item->getUserInfo();
@@ -945,18 +992,41 @@ void UserListWidget::showPopupForUser(const QString &userName)
     const bool isBuddy = userContextMenu->getUserListProxy()->isUserBuddy(userName);
     const bool isIgn = userContextMenu->getUserListProxy()->isUserIgnored(userName);
 
+    // The popup is already showing this user (e.g. arrow-key navigation between
+    // the online/buddy rows of the same user): just re-anchor it.
+    if (userInfoPopup->isVisible() && userInfoPopup->getCurrentUser() == userName) {
+        positionPopup(item);
+        return;
+    }
+
+    // Cancel any pending show/hide so a hover timer that armed before a
+    // keyboard-selected row cannot override it, and a pending hide cannot kill
+    // the popup right after it appears.
+    showPopupTimer->stop();
+    hidePopupTimer->stop();
+
     userInfoPopup->showForUser(userName, info, online, isBuddy, isIgn);
 
-    // Realize the native window at opacity 0 before positioning so that:
-    //   1) move() applies to an existing native handle (not overridden by Qt's
-    //      default centering logic on first show)
-    //   2) adjustSize() inside positionPopup() can measure the final laid-out
-    //      geometry correctly
-    userInfoPopup->setWindowOpacity(0.0);
+    const bool wasVisible = userInfoPopup->isVisible();
+    if (!wasVisible) {
+        // Realize the native window at opacity 0 before positioning so that:
+        //   1) move() applies to an existing native handle (not overridden by
+        //      Qt's default centering logic on first show)
+        //   2) adjustSize() inside positionPopup() can measure the final
+        //      laid-out geometry correctly
+        userInfoPopup->setWindowOpacity(0.0);
+    }
     userInfoPopup->show();
     userInfoPopup->raise();
 
-    positionPopup(userName); // geometry is now accurate; move() sticks
+    positionPopup(item); // geometry is now accurate; move() sticks
+
+    if (wasVisible) {
+        // Content swap while already open (hover/arrow-key navigation): keep
+        // the popup opaque instead of flashing through a fade on every step.
+        userInfoPopup->setWindowOpacity(1.0);
+        return;
+    }
 
     auto *fade = new QPropertyAnimation(userInfoPopup, "windowOpacity", userInfoPopup);
     fade->setDuration(120);
@@ -965,9 +1035,8 @@ void UserListWidget::showPopupForUser(const QString &userName)
     fade->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void UserListWidget::positionPopup(const QString &userName)
+void UserListWidget::positionPopup(UserListTWI *item)
 {
-    UserListTWI *item = users.value(userName);
     if (!item) {
         return;
     }
@@ -1071,6 +1140,7 @@ void UserListWidget::endBulkLoad()
 {
     bulkLoading = false;
     sortItems();
+    updateCount(); // divider counts were deferred during the bulk build
     requestAvatarsForVisibleItems();
     userTree->viewport()->update();
 }
@@ -1486,7 +1556,9 @@ QTreeWidgetItem *UserListWidget::createSectionItem(const QString &sectionId)
 {
     Q_UNUSED(sectionId);
     auto *divider = new QTreeWidgetItem(SectionItemType);
-    divider->setFlags(Qt::ItemIsEnabled);
+    // Selectable so keyboard navigation (Up/Down) can land on the dividers;
+    // they act as collapsible section headers once they have focus.
+    divider->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
     QFont font = userTree->font();
     font.setBold(true);
@@ -1600,11 +1672,14 @@ void UserListWidget::handleOnlineChangeLeft(const QString &userName)
     // The user is no longer online: their "Online" row disappears. Buddies and
     // ignored users keep their own section's row, marked offline; a plain user
     // has no rows left.
-    dropSectionMembership(QStringLiteral("online"), userName);
-    if (manager->isUserBuddy(userName) || manager->isUserIgnored(userName)) {
+    const bool dropped = dropSectionMembership(QStringLiteral("online"), userName);
+    const bool kept = manager->isUserBuddy(userName) || manager->isUserIgnored(userName);
+    if (kept) {
         setUserOnline(userName, false);
     }
-    finishSectionedMutation();
+    if (dropped || kept) {
+        finishSectionedMutation();
+    }
 }
 
 void UserListWidget::handleListAdd(const QString &sectionId, const ServerInfo_User &user)
@@ -1624,8 +1699,9 @@ void UserListWidget::handleListRemove(const QString &sectionId, const QString &u
 {
     // Only the row of the removed section disappears: an online user keeps
     // their "Online" row, and other list memberships keep theirs.
-    dropSectionMembership(sectionId, userName);
-    finishSectionedMutation();
+    if (dropSectionMembership(sectionId, userName)) {
+        finishSectionedMutation();
+    }
 }
 
 UserListTWI *UserListWidget::ensureSectionMembership(const QString &sectionId, const ServerInfo_User &user, bool online)
@@ -1648,7 +1724,11 @@ UserListTWI *UserListWidget::ensureSectionMembership(const QString &sectionId, c
         if (!users.contains(userName)) {
             users.insert(userName, item); // primary row for name-based lookups
         }
-        updateCount(); // a new row changes the divider's count
+        // The divider counts are refreshed once in endBulkLoad(); per-row
+        // updateCount() during a large rebuild would be quadratic.
+        if (!bulkLoading) {
+            updateCount(); // a new row changes the divider's count
+        }
         if (!bulkLoading && isItemNearViewport(item)) {
             avatarProvider->requestAvatar(userName);
         }
