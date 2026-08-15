@@ -173,6 +173,9 @@ private:
     void hidePopup(bool immediate = false);
     void positionPopup(UserListTWI *item);
     void connectPopupSignals();
+    /** True when @p widget is the tree, the popup or an open menu. */
+    bool isPressInsideListUi(const QWidget *widget) const;
+    void clearSelectionAndClosePopup();
     bool isItemNearViewport(const UserListTWI *item) const;
     void requestAvatarsForVisibleItems();
 
@@ -235,6 +238,7 @@ public:
                    AbstractClient *_client,
                    UserListType _type,
                    QWidget *parent = nullptr);
+    ~UserListWidget() override;
     void bind(UserListManager *mgr);
     void applyDisplayMode();
     void beginBulkLoad();

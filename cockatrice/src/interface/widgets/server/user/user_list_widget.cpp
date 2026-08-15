@@ -22,6 +22,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
@@ -634,7 +635,10 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     hidePopupTimer->setSingleShot(true);
     hidePopupTimer->setInterval(160);
     connect(hidePopupTimer, &QTimer::timeout, this, [this] {
-        if (!popupPinned && !userInfoPopup->underMouse() && !userTree->underMouse()) {
+        // The hover ends when the cursor leaves the user row. Empty list
+        // space, a section divider and anything outside the tree all close
+        // the popup, while the popup itself keeps it alive.
+        if (!popupPinned && !userInfoPopup->underMouse() && (hoveredUser.isEmpty() || !userTree->underMouse())) {
             hidePopup();
         }
     });
@@ -645,6 +649,11 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->viewport()->setMouseTracking(true);
     userTree->viewport()->installEventFilter(this);
     userTree->installEventFilter(this); // keyboard handling for section dividers
+
+    // Clicking anywhere outside the list clears its selection and closes the
+    // popup. The filter watches all widgets because the press can land on any
+    // part of the window, on another list or on the popup itself.
+    qApp->installEventFilter(this);
 
     // Pin on item click
     connect(userTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item, int) {
@@ -731,6 +740,11 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     setLayout(vbox);
 
     retranslateUi();
+}
+
+UserListWidget::~UserListWidget()
+{
+    qApp->removeEventFilter(this);
 }
 
 void UserListWidget::bind(UserListManager *mgr)
@@ -918,6 +932,16 @@ void UserListWidget::connectPopupSignals()
 
 bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
 {
+    // A press outside the tree, the popup and any open menu deselects the
+    // list and closes the popup. The filter is installed application-wide, so
+    // the target can be any widget in the window or another list.
+    if (event->type() == QEvent::MouseButtonPress) {
+        auto *pressTarget = qobject_cast<QWidget *>(obj);
+        if (pressTarget && !isPressInsideListUi(pressTarget)) {
+            clearSelectionAndClosePopup();
+        }
+    }
+
     // Keyboard navigation of the section dividers.
     // The dividers are selectable so arrow keys land on them. When one is the
     // current item, Enter/Space toggle it (like a button) and Left/Right follow
@@ -1109,6 +1133,25 @@ void UserListWidget::hidePopup(bool immediate)
     fade->setEndValue(0.0);
     connect(fade, &QPropertyAnimation::finished, userInfoPopup, &QWidget::hide);
     fade->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+bool UserListWidget::isPressInsideListUi(const QWidget *widget) const
+{
+    const QWidget *w = widget;
+    while (w) {
+        if (w == userTree || w == userInfoPopup || qobject_cast<const QMenu *>(w)) {
+            return true;
+        }
+        w = w->parentWidget();
+    }
+    return false;
+}
+
+void UserListWidget::clearSelectionAndClosePopup()
+{
+    popupPinned = false;
+    hidePopup(true);
+    userTree->clearSelection();
 }
 
 void UserListWidget::retranslateUi()
