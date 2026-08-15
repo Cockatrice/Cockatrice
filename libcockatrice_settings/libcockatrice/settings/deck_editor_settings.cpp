@@ -25,6 +25,11 @@ int DeckEditorSettings::getDefaultDeckEditorType() const
     return getValue("defaultDeckEditorType", QString(), QString(), 1).toInt();
 }
 
+int DeckEditorSettings::getVdeStartupTab() const
+{
+    return getValue("vdeStartupTab", QString(), QString(), VdeStartupTabContext).toInt();
+}
+
 void DeckEditorSettings::setOpenDeckInNewTab(bool _openDeckInNewTab)
 {
     setValue(_openDeckInNewTab, "openDeckInNewTab");
@@ -45,6 +50,12 @@ void DeckEditorSettings::setTagsWidgetVisible(bool _tagsWidgetVisible)
 void DeckEditorSettings::setDefaultDeckEditorType(int _defaultDeckEditorType)
 {
     setValue(_defaultDeckEditorType, "defaultDeckEditorType");
+}
+
+void DeckEditorSettings::setVdeStartupTab(int _vdeStartupTab)
+{
+    setValue(_vdeStartupTab, "vdeStartupTab");
+    emit vdeStartupTabChanged(_vdeStartupTab);
 }
 
 int DeckEditorSettings::getCommanderSpellbookIntegrationEnabled() const

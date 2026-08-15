@@ -400,6 +400,23 @@ TEST_F(SettingsDefaultsTest, DeckEditor_DefaultDeckEditorType_Default)
     ASSERT_EQ(s.getDefaultDeckEditorType(), 1);
 }
 
+TEST_F(SettingsDefaultsTest, DeckEditor_VdeStartupTab_Default)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabContext);
+}
+
+TEST_F(SettingsDefaultsTest, DeckEditor_VdeStartupTab_SetAndGet)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    s.setVdeStartupTab(VdeStartupTabDeckDisplay);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabDeckDisplay);
+    s.setVdeStartupTab(VdeStartupTabDatabaseDisplay);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabDatabaseDisplay);
+    s.setVdeStartupTab(VdeStartupTabContext);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabContext);
+}
+
 // --- NetworkSettings ---
 
 TEST_F(SettingsDefaultsTest, Network_ClientID_Default)

@@ -50,6 +50,8 @@ private:
     QCheckBox visualDeckStorageSelectionAnimationCheckBox;
     QLabel defaultDeckEditorTypeLabel;
     QComboBox defaultDeckEditorTypeSelector;
+    QLabel vdeStartupTabLabel;
+    QComboBox vdeStartupTabSelector;
     QLabel commanderSpellbookIntegrationEnabledLabel;
     QComboBox commanderSpellbookIntegrationEnabledSelector;
     QLabel commanderSpellbookIntegrationUseOfficialBracketNamesLabel;
