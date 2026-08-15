@@ -396,6 +396,8 @@ set(cockatrice_SOURCES
     src/interface/intents/intent_join_server_room.h
     src/interface/intents/intent_login.cpp
     src/interface/intents/intent_login.h
+    src/interface/intents/intent_open_server_room_by_name.cpp
+    src/interface/intents/intent_open_server_room_by_name.h
     src/interface/intents/url_parser.cpp
     src/interface/intents/url_parser.h
     src/interface/widgets/server/user/user_info_popup.cpp

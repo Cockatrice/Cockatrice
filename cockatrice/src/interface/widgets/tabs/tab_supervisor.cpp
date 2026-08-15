@@ -335,7 +335,12 @@ static void checkAndTrigger(QAction *checkableAction, bool checked)
 }
 
 /**
- * Opens the always-available tabs, depending on settings.
+ * Opens the always-available tabs, depending on settings, and lands on the configured startup tab.
+ *
+ * The startup destination is a request: tabs that were not open before (deck editors, storage
+ * tabs disabled in the Tabs menu) are opened as part of the startup flow. Destinations that
+ * require a server connection (Server, Server Room) are handled asynchronously by MainWindow
+ * through the intent system, since this class has no RemoteClient.
  */
 void TabSupervisor::initStartupTabs()
 {
@@ -350,6 +355,42 @@ void TabSupervisor::initStartupTabs()
     }
     if (SettingsCache::instance().tabs().getTabReplaysOpen()) {
         openTabReplays();
+    }
+
+    switch (SettingsCache::instance().tabs().getStartupTabIndex()) {
+        case StartupTab::StartupTabVisualDeckStorage:
+            if (!tabVisualDeckStorage) {
+                openTabVisualDeckStorage();
+            }
+            setCurrentWidget(tabVisualDeckStorage);
+            break;
+        case StartupTab::StartupTabDeckStorage:
+            if (!tabDeckStorage) {
+                openTabDeckStorage();
+            }
+            setCurrentWidget(tabDeckStorage);
+            break;
+        case StartupTab::StartupTabReplays:
+            if (!tabReplays) {
+                openTabReplays();
+            }
+            setCurrentWidget(tabReplays);
+            break;
+        case StartupTab::StartupTabDeckEditor:
+            addDeckEditorTab(LoadedDeck());
+            break;
+        case StartupTab::StartupTabVisualDeckEditor:
+            addVisualDeckEditorTab(LoadedDeck());
+            break;
+        case StartupTab::StartupTabServer:
+        case StartupTab::StartupTabServerRoom:
+            // Handled asynchronously by MainWindow::applyStartupDestination(); Home stays selected
+            // until the server connection succeeds.
+            break;
+        case StartupTab::StartupTabHome:
+        default:
+            setCurrentWidget(tabHome);
+            break;
     }
 }
 

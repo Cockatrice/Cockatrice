@@ -184,6 +184,7 @@ public slots:
     void actTabVisualDeckStorage(bool checked);
     void actTabReplays(bool checked);
     void openTabServer();
+    void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
 private slots:
     void refreshShortcuts();
 
@@ -209,7 +210,6 @@ private slots:
     void gameJoined(const Event_GameJoined &event);
     void localGameJoined(const Event_GameJoined &event);
     void gameLeft(TabGame *tab);
-    void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
     void roomLeft(TabRoom *tab);
     TabMessage *addMessageTab(const QString &userName, bool focus);
     void replayLeft(TabGame *tab);
