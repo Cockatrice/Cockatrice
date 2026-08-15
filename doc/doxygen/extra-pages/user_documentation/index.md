@@ -11,6 +11,10 @@
 
 - @subpage beta_release
 
+## Card Pictures
+
+- @subpage custom_card_pictures
+
 ## Troubleshooting
 
 - @subpage fixing_card_pictures
