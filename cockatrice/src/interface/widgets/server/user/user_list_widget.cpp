@@ -373,7 +373,7 @@ QSize UserListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const Q
 void UserListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     const bool styled = SettingsCache::instance().appearance().getStyleUserList();
-    // UserInfo/Online are stored on column 0 only; the name lives on column 2,
+    // UserInfo/Online are stored on column 0 only. The name lives on column 2,
     // so resolve the user data against column 0 no matter which cell is painted.
     const QModelIndex userIndex = index.siblingAtColumn(0).isValid() ? index.siblingAtColumn(0) : index;
     const QVariant var = userIndex.data(UserListRoles::UserInfo);
@@ -391,9 +391,9 @@ void UserListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     }
 
     // Unstyled rows and section dividers are painted manually so every color
-    // is derived from the current application palette at paint time: the widget
-    // palette, the view's alternation, and the stored per-item brushes all go
-    // stale after a runtime theme change.
+    // is derived from the current application palette at paint time. The widget
+    // palette, the view's alternation, and the stored brushes (one per item)
+    // all go stale after a runtime theme change.
     const QPalette appPal = qApp->palette();
     const bool selected = option.state & QStyle::State_Selected;
     const bool hovered = option.state & QStyle::State_MouseOver;
@@ -405,11 +405,11 @@ void UserListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
     } else if (hovered) {
         bg = UserListPainter::blend(appPal.color(QPalette::Base), appPal.color(QPalette::Highlight), 0.12);
     } else if (var.isValid()) {
-        // Zebra with per-section parity: the dividers are top-level rows too,
+        // Zebra alternation per section. The dividers are top level rows too,
         // so the view's own alternation would drift across sections. Count the
         // visible user rows back to the previous divider within the same parent
         // (sectioned mode stores users as children of the dividers, flat mode
-        // as top-level rows), so the stripe restarts at every divider and at
+        // as top level rows), so the stripe restarts at every divider and at
         // the tree top. Hidden filter matches are skipped the same way the view
         // skips them, so adjacent visible rows always alternate.
         int usersSinceDivider = 0;
@@ -429,9 +429,9 @@ void UserListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &
             bg = appPal.color(QPalette::AlternateBase);
         }
     }
-    // Paint the row background. In the column-0 pass the fill spans the full
+    // Paint the row background. In the column 0 pass the fill spans the full
     // viewport width so stripes, hover and selection cover the whole row (the
-    // name column is content-sized in unstyled mode); later column passes fill
+    // name column is content sized in unstyled mode). Later column passes fill
     // only their own cell, which is the same color and cannot cover the icons.
     QRect bgRect = option.rect;
     if (index.column() == 0) {
@@ -619,9 +619,9 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
         if (hoveredUser.isEmpty()) {
             return;
         }
-        // Re-resolve the row under the cursor: in sectioned mode a user can own
-        // several rows (online + buddy), so the popup must anchor to the exact
-        // hovered row instead of a name-based lookup.
+        // Resolve the row under the cursor again. In sectioned mode a user can
+        // own several rows (online + buddy), so the popup must anchor to the
+        // exact hovered row instead of a lookup by name.
         const QPoint viewportPos = userTree->viewport()->mapFromGlobal(QCursor::pos());
         QTreeWidgetItem *item = userTree->itemAt(viewportPos);
         if (item && item->type() == QTreeWidgetItem::Type &&
@@ -667,7 +667,6 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
 
     connect(userTree->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             [this](const QItemSelection &sel, const QItemSelection &) {
-                // if (m_rebuildingTree) return;
                 if (sel.isEmpty() && popupPinned) {
                     popupPinned = false;
                     hidePopup();
@@ -676,7 +675,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
 
     // Keyboard selection: show the popup for the current row and hide it when
     // the focus moves to a section divider or leaves the list entirely. The
-    // popup therefore follows arrow-key navigation exactly like mouse hover.
+    // popup therefore follows arrow key navigation exactly like mouse hover.
     // When it was pinned by a click it stays open and follows the selection.
     connect(userTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem *current, QTreeWidgetItem *) {
         if (!isVisible() || !SettingsCache::instance().appearance().getStyleUserList()) {
@@ -691,8 +690,8 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     });
 
     // Section dividers can be collapsed/expanded by the user. Surface those
-    // changes (only from real user interaction — programmatic expansion is
-    // applied through setSectionExpanded() / setExpandedProgrammatically()).
+    // changes only from real user interaction. Programmatic expansion is
+    // applied through setSectionExpanded() / setExpandedProgrammatically().
     connect(userTree, &QTreeWidget::itemExpanded, this,
             [this](QTreeWidgetItem *item) { handleSectionExpansion(item, true); });
     connect(userTree, &QTreeWidget::itemCollapsed, this,
@@ -742,14 +741,14 @@ void UserListWidget::bind(UserListManager *mgr)
     connect(manager, &UserListManager::listReset, this, &UserListWidget::rebuild);
 
     if (!sectioned) {
-        // ── Online users list (AllUsersList / RoomList) ───────────────────────
+        // Online users list (AllUsersList / RoomList)
         if (type == AllUsersList || type == RoomList) {
             connect(manager, &UserListManager::userJoinedOnline, this,
                     [this](const ServerInfo_User &user) { processUserInfo(user, true); });
             connect(manager, &UserListManager::userLeftOnline, this, [this](const QString &name) { deleteUser(name); });
         }
 
-        // ── Buddy list ────────────────────────────────────────────────────────
+        // Buddy list
         if (type == BuddyList) {
             connect(manager, &UserListManager::addedToBuddyList, this, [this](const ServerInfo_User &user) {
                 const QString name = QString::fromStdString(user.name());
@@ -772,7 +771,7 @@ void UserListWidget::bind(UserListManager *mgr)
             });
         }
 
-        // ── Ignore list ───────────────────────────────────────────────────────
+        // Ignore list
         if (type == IgnoreList) {
             connect(manager, &UserListManager::addedToIgnoreList, this, [this](const ServerInfo_User &user) {
                 const QString name = QString::fromStdString(user.name());
@@ -782,7 +781,7 @@ void UserListWidget::bind(UserListManager *mgr)
                     [this](const QString &name) { deleteUser(name); });
         }
     } else {
-        // ── Sectioned mode: one tree, every source feeds its own section. ─────
+        // Sectioned mode: one tree, every source feeds its own section.
         // Sections are pure membership views: the "Online" section holds every
         // currently online user, the "Buddy"/"Ignore" sections hold those
         // lists. A user can therefore appear in several sections at once (an
@@ -843,7 +842,7 @@ void UserListWidget::refreshPopupButtons(const QString &userName)
     const bool isIgn = proxy->isUserIgnored(userName);
 
     userInfoPopup->updateActionButtons(item->getUserInfo(), online, isBuddy, isIgn);
-    positionPopup(item); // height may have changed — reposition
+    positionPopup(item); // height may have changed, reposition
 }
 
 void UserListWidget::hideEvent(QHideEvent *e)
@@ -919,8 +918,8 @@ void UserListWidget::connectPopupSignals()
 
 bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
 {
-    // ── Keyboard navigation of the section dividers ──────────────────────────
-    // The dividers are selectable so arrow keys land on them; when one is the
+    // Keyboard navigation of the section dividers.
+    // The dividers are selectable so arrow keys land on them. When one is the
     // current item, Enter/Space toggle it (like a button) and Left/Right follow
     // the tree convention (Left collapses, Right expands).
     if (obj == userTree && event->type() == QEvent::KeyPress) {
@@ -992,16 +991,16 @@ void UserListWidget::showPopupForUser(UserListTWI *item)
     const bool isBuddy = userContextMenu->getUserListProxy()->isUserBuddy(userName);
     const bool isIgn = userContextMenu->getUserListProxy()->isUserIgnored(userName);
 
-    // The popup is already showing this user (e.g. arrow-key navigation between
-    // the online/buddy rows of the same user): just re-anchor it.
+    // The popup is already showing this user (e.g. arrow key navigation between
+    // the online/buddy rows of the same user): just reposition it.
     if (userInfoPopup->isVisible() && userInfoPopup->getCurrentUser() == userName) {
         positionPopup(item);
         return;
     }
 
-    // Cancel any pending show/hide so a hover timer that armed before a
-    // keyboard-selected row cannot override it, and a pending hide cannot kill
-    // the popup right after it appears.
+    // Cancel any pending show/hide so a hover timer that armed before a row
+    // selected via the keyboard cannot override it, and a pending hide cannot
+    // kill the popup right after it appears.
     showPopupTimer->stop();
     hidePopupTimer->stop();
 
@@ -1013,17 +1012,18 @@ void UserListWidget::showPopupForUser(UserListTWI *item)
         //   1) move() applies to an existing native handle (not overridden by
         //      Qt's default centering logic on first show)
         //   2) adjustSize() inside positionPopup() can measure the final
-        //      laid-out geometry correctly
+        //      laid out geometry correctly
         userInfoPopup->setWindowOpacity(0.0);
     }
     userInfoPopup->show();
     userInfoPopup->raise();
 
-    positionPopup(item); // geometry is now accurate; move() sticks
+    positionPopup(item); // geometry is accurate after show, so move() is not overridden
 
     if (wasVisible) {
-        // Content swap while already open (hover/arrow-key navigation): keep
-        // the popup opaque instead of flashing through a fade on every step.
+        // Content swap while already open (hover or arrow key navigation):
+        // keep the popup opaque instead of flashing through a fade on every
+        // step.
         userInfoPopup->setWindowOpacity(1.0);
         return;
     }
@@ -1157,7 +1157,7 @@ bool UserListWidget::isItemNearViewport(const UserListTWI *item) const
 void UserListWidget::requestAvatarsForVisibleItems()
 {
     if (sectioned) {
-        // Top-level items are dividers, user rows hang below them.
+        // Top level items are dividers, user rows hang below them.
         for (const QString &sectionId : sectionIds) {
             QTreeWidgetItem *divider = sectionItems.value(sectionId);
             if (!divider) {
@@ -1198,7 +1198,7 @@ void UserListWidget::rebuild()
     }
 
     if (sectioned) {
-        // Every source feeds its own section; users that belong to several
+        // Every source feeds its own section. Users that belong to several
         // sources (an online buddy) get one row per section because
         // ensureSectionMembership() creates the row when it is missing.
         beginBulkLoad();
@@ -1245,7 +1245,7 @@ void UserListWidget::rebuild()
 void UserListWidget::updateCardArtParams(const ServerInfo_User &user, const QString &userName)
 {
     // Always update params from the latest ServerInfo_User, whether the
-    // item is new or existing, so a live server-push refreshes the rendering.
+    // item is new or existing, so a live server push refreshes the rendering.
     if (user.has_card_art_params()) {
         const auto &cap = user.card_art_params();
         CardArtParams params;
@@ -1304,7 +1304,7 @@ void UserListWidget::processUserInfo(const QString &sectionId, const ServerInfo_
 bool UserListWidget::deleteUser(const QString &userName)
 {
     if (sectioned) {
-        // The user may own several rows (one per section); drop them all.
+        // The user may own several rows (one per section). Drop them all.
         bool removed = false;
         const QStringList sections = sectionUsers.keys(); // snapshot: maps mutate
         for (const QString &sectionId : sections) {
@@ -1342,7 +1342,7 @@ void UserListWidget::setUserOnline(const QString &userName, bool online)
 {
     if (sectioned) {
         // The rows in the "Online" section are created/removed by the presence
-        // handlers; this only keeps the presence flag of the surviving rows
+        // handlers. This only keeps the presence flag of the surviving rows
         // (e.g. a buddy row after the user went offline) in sync.
         for (auto it = sectionUsers.cbegin(); it != sectionUsers.cend(); ++it) {
             UserListTWI *item = it.value().value(userName);
@@ -1358,9 +1358,9 @@ void UserListWidget::setUserOnline(const QString &userName, bool online)
         return;
     }
 
-    // No state change: nothing to re-sort. This also keeps the per-user
-    // presence broadcasts (userJoinedOnline fires for every online user) cheap
-    // when the row already carries the right flag.
+    // No state change: nothing to resort. This also keeps the presence
+    // broadcasts cheap (userJoinedOnline fires once per online user) when the
+    // row already carries the right flag.
     if (twi->data(0, UserListRoles::Online).toBool() == online) {
         return;
     }
@@ -1374,8 +1374,7 @@ void UserListWidget::setUserOnline(const QString &userName, bool online)
     updateCount();
 
     // Online users sort above offline users (UserListTWI::operator<), so a
-    // flag change moves the row: re-sort so e.g. a buddy who went offline no
-    // longer stays pinned at the top of the list.
+    // flag change moves the row. Resort to place the user by the new state.
     if (!bulkLoading) {
         sortItems();
         applyFilter();
@@ -1499,7 +1498,7 @@ void UserListWidget::sortItems()
 {
     if (sectioned) {
         // Sorting must stay inside each section so the dividers keep their
-        // places as top-level items.
+        // places as top level items.
         for (auto it = sectionItems.cbegin(); it != sectionItems.cend(); ++it) {
             it.value()->sortChildren(0, Qt::AscendingOrder);
         }
@@ -1508,7 +1507,7 @@ void UserListWidget::sortItems()
     userTree->sortItems(0, Qt::AscendingOrder);
 }
 
-// ── Sectioned mode ──────────────────────────────────────────────────────────
+// Sectioned mode
 
 void UserListWidget::setSectioned(const QStringList &ids)
 {
@@ -1556,19 +1555,19 @@ QTreeWidgetItem *UserListWidget::createSectionItem(const QString &sectionId)
 {
     Q_UNUSED(sectionId);
     auto *divider = new QTreeWidgetItem(SectionItemType);
-    // Selectable so keyboard navigation (Up/Down) can land on the dividers;
-    // they act as collapsible section headers once they have focus.
+    // Selectable so keyboard navigation (Up/Down) can land on the dividers.
+    // They act as collapsible section headers once they have focus.
     divider->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
     QFont font = userTree->font();
     font.setBold(true);
     divider->setFont(0, font);
     // A little taller than a plain text row so the header reads as a section
-    // separator without matching the full user-row height.
+    // separator without matching the full user row height.
     divider->setSizeHint(0, QSize(0, QFontMetrics(font).height() + 16));
 
     userTree->addTopLevelItem(divider);
-    // QTreeWidgetItem::setFirstColumnSpanned() is a no-op while the item is
+    // QTreeWidgetItem::setFirstColumnSpanned() does nothing while the item is
     // detached from the tree (Qt returns early when treeModel() is null), so it
     // must be called after addTopLevelItem(). Without the span the divider text
     // is confined to column 0 and gets elided in unstyled mode.
@@ -1670,7 +1669,7 @@ void UserListWidget::handleOnlineChange(const ServerInfo_User &user)
 void UserListWidget::handleOnlineChangeLeft(const QString &userName)
 {
     // The user is no longer online: their "Online" row disappears. Buddies and
-    // ignored users keep their own section's row, marked offline; a plain user
+    // ignored users keep their own section's row, marked offline. A plain user
     // has no rows left.
     const bool dropped = dropSectionMembership(QStringLiteral("online"), userName);
     const bool kept = manager->isUserBuddy(userName) || manager->isUserIgnored(userName);
@@ -1688,7 +1687,7 @@ void UserListWidget::handleListAdd(const QString &sectionId, const ServerInfo_Us
     const bool online = manager->getOnlineUser(name) != nullptr;
     ensureSectionMembership(sectionId, user, online);
     if (online) {
-        // The user belongs to the "Online" section as well; make sure the row
+        // The user belongs to the "Online" section as well. Make sure the row
         // exists even if the join event raced ahead of the list mutation.
         ensureSectionMembership(QStringLiteral("online"), user, true);
     }
@@ -1722,10 +1721,10 @@ UserListTWI *UserListWidget::ensureSectionMembership(const QString &sectionId, c
         sectionMap.insert(userName, item);
         divider->addChild(item);
         if (!users.contains(userName)) {
-            users.insert(userName, item); // primary row for name-based lookups
+            users.insert(userName, item); // primary row for lookups by name
         }
-        // The divider counts are refreshed once in endBulkLoad(); per-row
-        // updateCount() during a large rebuild would be quadratic.
+        // The divider counts are refreshed once in endBulkLoad(). Calling
+        // updateCount() per row during a large rebuild would be quadratic.
         if (!bulkLoading) {
             updateCount(); // a new row changes the divider's count
         }

@@ -165,9 +165,9 @@ private:
     bool bulkLoading = false;
 
     /**
-     * Popup functions are anchored on the row, not the user name: in sectioned
+     * Popup functions are anchored on the row, not the user name. In sectioned
      * mode a user can own several rows (online + buddy), and the popup must
-     * follow the hovered/selected row rather than a name-based lookup.
+     * follow the hovered/selected row rather than a lookup by name.
      */
     void showPopupForUser(UserListTWI *item);
     void hidePopup(bool immediate = false);
@@ -176,7 +176,7 @@ private:
     bool isItemNearViewport(const UserListTWI *item) const;
     void requestAvatarsForVisibleItems();
 
-    // ── Sectioned mode (single tree with inline dividers) ────────────────────
+    // Sectioned mode (single tree with inline dividers)
     bool sectioned = false;
     QStringList sectionIds;
     QMap<QString, QTreeWidgetItem *> sectionItems;
@@ -199,7 +199,7 @@ private:
     UserListTWI *ensureSectionMembership(const QString &sectionId, const ServerInfo_User &user, bool online);
     /** Removes and deletes the row for @p userName in @p sectionId. */
     bool dropSectionMembership(const QString &sectionId, const QString &userName);
-    /** Sorts, re-filters and repaints after a sectioned-mode mutation. */
+    /** Sorts, refilters and repaints after a sectioned mode mutation. */
     void finishSectionedMutation();
     void updateCardArtParams(const ServerInfo_User &user, const QString &userName);
     void processUserInfo(const QString &sectionId, const ServerInfo_User &user, bool online);

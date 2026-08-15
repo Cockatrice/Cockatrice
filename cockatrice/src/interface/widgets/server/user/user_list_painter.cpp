@@ -84,28 +84,40 @@ void UserListPainter::drawBackground(QPainter *painter,
                                      const QRectF &cardRect,
                                      const QColor &accentColor,
                                      bool selected,
-                                     const Style &style)
+                                     const Style &style,
+                                     bool hasRole)
 {
     QLinearGradient bg(cardRect.topLeft(), cardRect.topRight());
-    if (selected) {
-        bg.setColorAt(0, blend(style.cardStart, accentColor, 0.20));
-        bg.setColorAt(1, blend(style.cardEnd, accentColor, 0.13));
+    if (style.dark) {
+        // Dark mode darkens the role color to fit the dark surface and fades
+        // it into the deep navy surface on the right. The text drop shadow
+        // keeps the username legible over the colored edge.
+        bg.setColorAt(0, selected ? accentColor.darker(130) : accentColor.darker(320));
+        bg.setColorAt(1, selected ? QColor(40, 48, 60) : QColor(18, 22, 30));
+    } else if (hasRole) {
+        // Light mode pegs the role color on the left at near full strength
+        // and fades it into the white surface on the right. The tint stays
+        // bright enough that the dark text remains legible without a shadow.
+        bg.setColorAt(0, blend(style.cardStart, accentColor, selected ? 0.75 : 0.65));
+        bg.setColorAt(1, blend(style.cardEnd, accentColor, selected ? 0.18 : 0.10));
     } else {
-        // Gentle accent tint so a role's color stays visible on unselected
-        // cards without shouting over the list. Light cards need a slightly
-        // stronger blend because the base is near-white.
-        const qreal startT = style.dark ? 0.12 : 0.16;
-        const qreal endT = style.dark ? 0.08 : 0.10;
-        bg.setColorAt(0, blend(style.cardStart, accentColor, startT));
-        bg.setColorAt(1, blend(style.cardEnd, accentColor, endT));
+        // Regular users are the light theme's neutral paper cards. A flat
+        // warm card fill (the normal row surface, slightly deepened) keeps
+        // every row clearly visible without borrowing a role color. Selection
+        // shifts the fill toward a soft slate so the highlight still reads.
+        const QColor paper = style.cardEnd.darker(108);
+        bg.setColorAt(0, blend(paper, accentColor, selected ? 0.35 : 0.0));
+        bg.setColorAt(1, blend(paper, accentColor, selected ? 0.25 : 0.0));
     }
 
     painter->setPen(Qt::NoPen);
     painter->setBrush(bg);
     painter->drawRoundedRect(cardRect, 6, 6);
 
-    painter->setBrush(accentColor);
-    painter->drawRoundedRect(QRectF(cardRect.left(), cardRect.top(), 3, cardRect.height()), 2, 2);
+    if (style.dark || hasRole || selected) {
+        painter->setBrush(accentColor);
+        painter->drawRoundedRect(QRectF(cardRect.left(), cardRect.top(), 3, cardRect.height()), 2, 2);
+    }
 }
 
 static QString makeKey(const QString &user, const QString &card, const QString &providerId)
@@ -353,7 +365,7 @@ void UserListPainter::paint(QPainter *painter,
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::TextAntialiasing);
 
     // The delegate supplies the application palette in option.palette, which
-    // always reflects the active theme — the widget palette can be stale after
+    // always reflects the active theme. The widget palette can be stale after
     // a runtime theme change, so it is only used as a defensive fallback.
     const QPalette pal =
         option.palette == QPalette() ? (option.widget ? option.widget->palette() : qApp->palette()) : option.palette;
@@ -366,6 +378,9 @@ void UserListPainter::paint(QPainter *painter,
     const QString userName = QString::fromStdString(userInfo.name());
     const QString privLevel = QString::fromStdString(userInfo.privlevel());
     const QColor accentColor = getAccentColor(userLevel, online);
+    const bool hasRole = userLevel.testFlag(ServerInfo_User::IsAdmin) ||
+                         userLevel.testFlag(ServerInfo_User::IsModerator) ||
+                         userLevel.testFlag(ServerInfo_User::IsJudge);
     const QRectF cardRect = QRectF(rect).adjusted(3, 2, -3, -2);
     const int cardRight = getCardRight(option, rect);
 
@@ -373,7 +388,7 @@ void UserListPainter::paint(QPainter *painter,
                                      ? cardArtParamsMap->value(userName)
                                      : CardArtParams{};
 
-    drawBackground(painter, cardRect, accentColor, selected, style);
+    drawBackground(painter, cardRect, accentColor, selected, style, hasRole);
     drawCardArt(painter, rect, cardRight, userName, cardArtCache, params);
 
     const QRect avatarRect = getAvatarRect(rect);

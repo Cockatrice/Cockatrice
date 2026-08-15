@@ -32,7 +32,7 @@ public:
     /**
      * Palette-derived surface colors for the current color scheme. Both the
      * light and the dark scheme read from the active QPalette so custom
-     * palettes are respected; @c dark only tunes the blend strengths (and
+     * palettes are respected. @c dark only tunes the blend strengths (and
      * whether the name text keeps its drop shadow).
      */
     struct Style
@@ -83,7 +83,8 @@ private:
                                const QRectF &cardRect,
                                const QColor &accentColor,
                                bool selected,
-                               const Style &style);
+                               const Style &style,
+                               bool hasRole);
     static QRect getAvatarRect(const QRect &rect);
     static void drawAvatar(QPainter *painter,
                            const QRect &avatarRect,

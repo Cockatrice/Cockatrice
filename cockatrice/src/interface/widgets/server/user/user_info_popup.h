@@ -26,11 +26,11 @@ namespace PopupRoles
 constexpr int GameData = Qt::UserRole + 10;
 }
 
-// ── Popup theme ───────────────────────────────────────────────────────────────
+// Popup theme
 
 /**
  * Palette-derived colors for the popup chrome. Both color schemes read from
- * the active QPalette so custom palettes are respected; @c dark only tunes the
+ * the active QPalette so custom palettes are respected. @c dark only tunes the
  * blend strengths.
  */
 struct PopupTheme

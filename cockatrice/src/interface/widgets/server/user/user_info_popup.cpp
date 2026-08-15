@@ -322,7 +322,7 @@ UserInfoPopup::UserInfoPopup(TabSupervisor *_ts,
     setFrameShape(QFrame::NoFrame);
     buildUi();
 
-    // Re-theme the popup chrome when the theme or its color scheme changes.
+    // Restyle the popup chrome when the theme or its color scheme changes.
     if (themeManager) {
         connect(themeManager, &ThemeManager::themeChanged, this, &UserInfoPopup::applyTheme);
     }
