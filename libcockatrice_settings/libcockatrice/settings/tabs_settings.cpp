@@ -7,7 +7,7 @@ TabsSettings::TabsSettings(const QString &settingPath, QObject *parent)
 
 int TabsSettings::getStartupTabIndex() const
 {
-    return getValue("startupTab", QString(), QString(), StartupTabHome).toInt();
+    return getValue("startupTab", QString(), QString(), StartupTab::StartupTabHome).toInt();
 }
 
 QString TabsSettings::getStartupServerHost() const

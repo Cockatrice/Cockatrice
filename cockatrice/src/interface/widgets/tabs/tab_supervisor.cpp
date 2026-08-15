@@ -358,36 +358,36 @@ void TabSupervisor::initStartupTabs()
     }
 
     switch (SettingsCache::instance().tabs().getStartupTabIndex()) {
-        case StartupTabVisualDeckStorage:
+        case StartupTab::StartupTabVisualDeckStorage:
             if (!tabVisualDeckStorage) {
                 openTabVisualDeckStorage();
             }
             setCurrentWidget(tabVisualDeckStorage);
             break;
-        case StartupTabDeckStorage:
+        case StartupTab::StartupTabDeckStorage:
             if (!tabDeckStorage) {
                 openTabDeckStorage();
             }
             setCurrentWidget(tabDeckStorage);
             break;
-        case StartupTabReplays:
+        case StartupTab::StartupTabReplays:
             if (!tabReplays) {
                 openTabReplays();
             }
             setCurrentWidget(tabReplays);
             break;
-        case StartupTabDeckEditor:
+        case StartupTab::StartupTabDeckEditor:
             addDeckEditorTab(LoadedDeck());
             break;
-        case StartupTabVisualDeckEditor:
+        case StartupTab::StartupTabVisualDeckEditor:
             addVisualDeckEditorTab(LoadedDeck());
             break;
-        case StartupTabServer:
-        case StartupTabServerRoom:
+        case StartupTab::StartupTabServer:
+        case StartupTab::StartupTabServerRoom:
             // Handled asynchronously by MainWindow::applyStartupDestination(); Home stays selected
             // until the server connection succeeds.
             break;
-        case StartupTabHome:
+        case StartupTab::StartupTabHome:
         default:
             setCurrentWidget(tabHome);
             break;

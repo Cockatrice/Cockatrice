@@ -162,6 +162,9 @@ GeneralSettingsPage::GeneralSettingsPage()
     });
 
     startupRoomNameEdit = new QLineEdit(settings.tabs().getStartupRoomName());
+    // Default (Expanding) would stretch the whole controls column when this row becomes visible,
+    // so size it like the combo boxes instead: fills the column, never widens it.
+    startupRoomNameEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     connect(startupRoomNameEdit, &QLineEdit::editingFinished, this,
             [this] { SettingsCache::instance().tabs().setStartupRoomName(startupRoomNameEdit->text().trimmed()); });
 
@@ -412,8 +415,8 @@ void GeneralSettingsPage::languageBoxChanged(int index)
 void GeneralSettingsPage::updateStartupServerControlsVisibility()
 {
     const int index = startupTabSelector.currentIndex();
-    const bool serverNeeded = index == StartupTabServer || index == StartupTabServerRoom;
-    const bool roomNeeded = index == StartupTabServerRoom;
+    const bool serverNeeded = index == StartupTab::StartupTabServer || index == StartupTab::StartupTabServerRoom;
+    const bool roomNeeded = index == StartupTab::StartupTabServerRoom;
     startupServerLabel.setVisible(serverNeeded);
     startupServerSelector.setVisible(serverNeeded);
     startupRoomLabel.setVisible(roomNeeded);
@@ -457,14 +460,14 @@ void GeneralSettingsPage::retranslateUi()
     newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
     startupTabLabel.setText(tr("Startup tab:"));
-    startupTabSelector.setItemText(StartupTabHome, tr("Home"));
-    startupTabSelector.setItemText(StartupTabVisualDeckStorage, tr("Visual Deck Storage"));
-    startupTabSelector.setItemText(StartupTabDeckStorage, tr("Deck Storage"));
-    startupTabSelector.setItemText(StartupTabReplays, tr("Game Replays"));
-    startupTabSelector.setItemText(StartupTabDeckEditor, tr("Deck Editor"));
-    startupTabSelector.setItemText(StartupTabVisualDeckEditor, tr("Visual Deck Editor"));
-    startupTabSelector.setItemText(StartupTabServer, tr("Server"));
-    startupTabSelector.setItemText(StartupTabServerRoom, tr("Server Room"));
+    startupTabSelector.setItemText(StartupTab::StartupTabHome, tr("Home"));
+    startupTabSelector.setItemText(StartupTab::StartupTabVisualDeckStorage, tr("Visual Deck Storage"));
+    startupTabSelector.setItemText(StartupTab::StartupTabDeckStorage, tr("Deck Storage"));
+    startupTabSelector.setItemText(StartupTab::StartupTabReplays, tr("Game Replays"));
+    startupTabSelector.setItemText(StartupTab::StartupTabDeckEditor, tr("Deck Editor"));
+    startupTabSelector.setItemText(StartupTab::StartupTabVisualDeckEditor, tr("Visual Deck Editor"));
+    startupTabSelector.setItemText(StartupTab::StartupTabServer, tr("Server"));
+    startupTabSelector.setItemText(StartupTab::StartupTabServerRoom, tr("Server Room"));
     startupTabSelector.setToolTip(
         tr("The tab shown when Cockatrice starts. If the chosen tab is not open yet, it is opened."));
     startupServerLabel.setText(tr("Server:"));

@@ -669,7 +669,7 @@ void MainWindow::applyStartupDestination()
     }
 
     const int destination = SettingsCache::instance().tabs().getStartupTabIndex();
-    if (destination != StartupTabServer && destination != StartupTabServerRoom) {
+    if (destination != StartupTab::StartupTabServer && destination != StartupTab::StartupTabServerRoom) {
         return;
     }
 
@@ -703,7 +703,7 @@ void MainWindow::onStartupDestinationConnected(int destination, const ContextCon
         tabSupervisor->openTabServer();
     }
 
-    if (destination == StartupTabServerRoom) {
+    if (destination == StartupTab::StartupTabServerRoom) {
         auto roomContext = std::make_unique<ContextJoinRoom>();
         roomContext->serverContext = serverContext;
         auto *roomIntent = new IntentOpenServerRoomByName(tabSupervisor, getRemoteClient(), std::move(roomContext),
@@ -729,7 +729,7 @@ void MainWindow::startupDestinationFailed(const QString &reason)
 bool MainWindow::startupDestinationConnectsToServer() const
 {
     const int destination = SettingsCache::instance().tabs().getStartupTabIndex();
-    return destination == StartupTabServer || destination == StartupTabServerRoom;
+    return destination == StartupTab::StartupTabServer || destination == StartupTab::StartupTabServerRoom;
 }
 
 void MainWindow::alertForcedOracleRun(const QString &version, bool isUpdate)

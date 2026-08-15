@@ -191,14 +191,14 @@ TEST_F(SettingsDefaultsTest, Sound_MasterVolume_SetAndGet)
 TEST_F(SettingsDefaultsTest, Tabs_StartupTab_Default)
 {
     TabsSettings s(settingsPath, nullptr);
-    ASSERT_EQ(s.getStartupTabIndex(), static_cast<int>(StartupTabHome));
+    ASSERT_EQ(s.getStartupTabIndex(), static_cast<int>(StartupTab::StartupTabHome));
 }
 
 TEST_F(SettingsDefaultsTest, Tabs_StartupTab_SetAndGet)
 {
     TabsSettings s(settingsPath, nullptr);
-    s.setStartupTabIndex(StartupTabServerRoom);
-    ASSERT_EQ(s.getStartupTabIndex(), static_cast<int>(StartupTabServerRoom));
+    s.setStartupTabIndex(StartupTab::StartupTabServerRoom);
+    ASSERT_EQ(s.getStartupTabIndex(), static_cast<int>(StartupTab::StartupTabServerRoom));
 }
 
 TEST_F(SettingsDefaultsTest, Tabs_StartupServer_Default)
