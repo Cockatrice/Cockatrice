@@ -66,7 +66,14 @@ protected:
 
 public:
     bool isBuiltInTheme();
-    bool isDarkMode(const QString &themeDirPath);
+    // Explicit color scheme of the theme: theme.cfg's ColorScheme setting
+    // (Dark/Light), falling back to the OS color scheme when it is "System".
+    bool isDarkMode(const QString &themeDirPath) const;
+    // The resolved scheme of the currently active theme.
+    bool isDarkModeActive() const
+    {
+        return isDarkMode(currentThemePath);
+    }
     QStringMap &getAvailableThemes();
     // Returns the path to the currently active theme directory (empty = default)
     QString getCurrentThemePath() const

@@ -3,6 +3,7 @@
 #include "../../interface/pixel_map_generator.h"
 
 #include <QAbstractScrollArea>
+#include <QApplication>
 #include <QPainter>
 #include <QPainterPath>
 #include <QScrollBar>
@@ -17,6 +18,29 @@ static constexpr int TextSpacing = 10;
 QSize UserListPainter::sizeHint()
 {
     return QSize(0, RowHeight);
+}
+
+UserListPainter::Style UserListPainter::resolveStyle(const QPalette &palette, bool dark)
+{
+    Style style;
+    style.dark = dark;
+    const QColor base = palette.color(QPalette::Base);
+    const QColor alt = palette.color(QPalette::AlternateBase);
+    style.cardStart = base;
+    style.cardEnd = (alt != base) ? alt : palette.color(QPalette::Midlight);
+    style.base = base;
+    style.textOnline = palette.color(QPalette::Text);
+    style.textOffline = palette.color(QPalette::Disabled, QPalette::Text);
+    style.ringOffline = palette.color(QPalette::Disabled, QPalette::Text);
+    style.dropShadow = dark;
+    return style;
+}
+
+QColor UserListPainter::blend(const QColor &a, const QColor &b, qreal t)
+{
+    const qreal u = 1.0 - t;
+    return QColor(qRound(a.red() * u + b.red() * t), qRound(a.green() * u + b.green() * t),
+                  qRound(a.blue() * u + b.blue() * t), qRound(a.alpha() * u + b.alpha() * t));
 }
 
 QColor UserListPainter::getAccentColor(const UserLevelFlags &userLevel, bool online)
@@ -59,11 +83,22 @@ int UserListPainter::getCardRight(const QStyleOptionViewItem &option, const QRec
 void UserListPainter::drawBackground(QPainter *painter,
                                      const QRectF &cardRect,
                                      const QColor &accentColor,
-                                     bool selected)
+                                     bool selected,
+                                     const Style &style)
 {
     QLinearGradient bg(cardRect.topLeft(), cardRect.topRight());
-    bg.setColorAt(0, selected ? accentColor.darker(130) : accentColor.darker(320));
-    bg.setColorAt(1, selected ? QColor(40, 48, 60) : QColor(18, 22, 30));
+    if (selected) {
+        bg.setColorAt(0, blend(style.cardStart, accentColor, 0.20));
+        bg.setColorAt(1, blend(style.cardEnd, accentColor, 0.13));
+    } else {
+        // Gentle accent tint so a role's color stays visible on unselected
+        // cards without shouting over the list. Light cards need a slightly
+        // stronger blend because the base is near-white.
+        const qreal startT = style.dark ? 0.12 : 0.16;
+        const qreal endT = style.dark ? 0.08 : 0.10;
+        bg.setColorAt(0, blend(style.cardStart, accentColor, startT));
+        bg.setColorAt(1, blend(style.cardEnd, accentColor, endT));
+    }
 
     painter->setPen(Qt::NoPen);
     painter->setBrush(bg);
@@ -163,7 +198,8 @@ void UserListPainter::drawAvatar(QPainter *painter,
                                  const UserLevelFlags &userLevel,
                                  const ServerInfo_User &userInfo,
                                  const QString &privLevel,
-                                 const QMap<QString, QPixmap> *avatarCache)
+                                 const QMap<QString, QPixmap> *avatarCache,
+                                 const Style &style)
 {
     QPainterPath clipPath;
     clipPath.addEllipse(avatarRect);
@@ -183,7 +219,7 @@ void UserListPainter::drawAvatar(QPainter *painter,
     }
 
     if (!drewAvatar) {
-        painter->setBrush(accentColor.darker(200));
+        painter->setBrush(blend(accentColor, style.base, style.dark ? 0.45 : 0.72));
         painter->setPen(Qt::NoPen);
         painter->drawEllipse(avatarRect);
 
@@ -196,9 +232,9 @@ void UserListPainter::drawAvatar(QPainter *painter,
     painter->restore();
 }
 
-void UserListPainter::drawStatusRing(QPainter *painter, const QRect &avatarRect, bool online)
+void UserListPainter::drawStatusRing(QPainter *painter, const QRect &avatarRect, bool online, const Style &style)
 {
-    const QColor statusColor = online ? QColor(34, 197, 94) : QColor(70, 80, 95);
+    const QColor statusColor = online ? QColor(34, 197, 94) : style.ringOffline;
 
     painter->setPen(QPen(statusColor, 2));
     painter->setBrush(Qt::NoBrush);
@@ -212,7 +248,7 @@ void UserListPainter::drawUserName(QPainter *painter,
                                    int textX,
                                    const QString &userName,
                                    bool online,
-                                   bool selected)
+                                   const Style &style)
 {
     QFont nameFont = option.font;
     nameFont.setBold(true);
@@ -221,10 +257,12 @@ void UserListPainter::drawUserName(QPainter *painter,
     const QRect nameRect(textX, rect.top() + 8, cardRight - textX - 10, 20);
     const QString elidedName = QFontMetrics(nameFont).elidedText(userName, Qt::ElideRight, cardRight - textX - 10);
 
-    painter->setPen(QColor(0, 0, 0, 200));
-    painter->drawText(nameRect.translated(1, 1), Qt::AlignVCenter | Qt::AlignLeft, elidedName);
+    if (style.dropShadow) {
+        painter->setPen(QColor(0, 0, 0, 200));
+        painter->drawText(nameRect.translated(1, 1), Qt::AlignVCenter | Qt::AlignLeft, elidedName);
+    }
 
-    painter->setPen(online ? (selected ? Qt::white : QColor(226, 232, 240)) : QColor(90, 100, 115));
+    painter->setPen(online ? style.textOnline : style.textOffline);
     painter->drawText(nameRect, Qt::AlignVCenter | Qt::AlignLeft, elidedName);
 }
 
@@ -262,7 +300,8 @@ void UserListPainter::drawBadges(QPainter *painter,
                                  const QRect &rect,
                                  int cardRight,
                                  const QList<Badge> &badges,
-                                 bool online)
+                                 bool online,
+                                 const Style &style)
 {
     if (badges.isEmpty()) {
         return;
@@ -284,15 +323,17 @@ void UserListPainter::drawBadges(QPainter *painter,
     int bx = cardRight - 6 - totalBadgeW;
 
     for (const Badge &b : badges) {
-        const QColor col = online ? b.color : b.color.darker(180);
+        const QColor col = online ? b.color : blend(b.color, style.base, 0.55);
+        const QColor surface = blend(col, style.base, style.dark ? 0.55 : 0.78);
+        const QColor text = style.dark ? blend(col, Qt::white, 0.5) : blend(col, Qt::black, 0.35);
         const int bw = fm.horizontalAdvance(b.text) + 8;
         const QRect br(bx, rect.top() + 44, bw, 13);
 
         painter->setPen(Qt::NoPen);
-        painter->setBrush(col.darker(online ? 160 : 220));
+        painter->setBrush(surface);
         painter->drawRoundedRect(br, 3, 3);
 
-        painter->setPen(col.lighter(online ? 160 : 100));
+        painter->setPen(text);
         painter->drawText(br, Qt::AlignCenter, b.text);
 
         bx += bw + 4;
@@ -305,10 +346,18 @@ void UserListPainter::paint(QPainter *painter,
                             const ServerInfo_User &userInfo,
                             const QMap<QString, QPixmap> *avatarCache,
                             const QMap<QString, QPixmap> *cardArtCache,
-                            const QMap<QString, CardArtParams> *cardArtParamsMap)
+                            const QMap<QString, CardArtParams> *cardArtParamsMap,
+                            bool dark)
 {
     painter->save();
     painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::TextAntialiasing);
+
+    // The delegate supplies the application palette in option.palette, which
+    // always reflects the active theme — the widget palette can be stale after
+    // a runtime theme change, so it is only used as a defensive fallback.
+    const QPalette pal =
+        option.palette == QPalette() ? (option.widget ? option.widget->palette() : qApp->palette()) : option.palette;
+    const Style style = resolveStyle(pal, dark);
 
     const QRect rect = option.rect;
     const bool online = index.data(Qt::UserRole + 1).toBool();
@@ -324,19 +373,19 @@ void UserListPainter::paint(QPainter *painter,
                                      ? cardArtParamsMap->value(userName)
                                      : CardArtParams{};
 
-    drawBackground(painter, cardRect, accentColor, selected);
+    drawBackground(painter, cardRect, accentColor, selected, style);
     drawCardArt(painter, rect, cardRight, userName, cardArtCache, params);
 
     const QRect avatarRect = getAvatarRect(rect);
-    drawAvatar(painter, avatarRect, userName, accentColor, userLevel, userInfo, privLevel, avatarCache);
-    drawStatusRing(painter, avatarRect, online);
+    drawAvatar(painter, avatarRect, userName, accentColor, userLevel, userInfo, privLevel, avatarCache, style);
+    drawStatusRing(painter, avatarRect, online, style);
 
     const int textX = avatarRect.right() + TextSpacing;
-    drawUserName(painter, option, rect, cardRight, textX, userName, online, selected);
+    drawUserName(painter, option, rect, cardRight, textX, userName, online, style);
     drawCountryFlag(painter, rect, textX, userInfo);
 
     const QList<Badge> badges = buildBadges(userLevel, privLevel);
-    drawBadges(painter, option, rect, cardRight, badges, online);
+    drawBadges(painter, option, rect, cardRight, badges, online, style);
 
     painter->restore();
 }

@@ -105,12 +105,13 @@ public:
 
 class UserListItemDelegate : public QStyledItemDelegate
 {
+    QTreeWidget *tree;
     const QMap<QString, QPixmap> *avatarCache;
     const QMap<QString, QPixmap> *cardArtCache;
     const QMap<QString, CardArtParams> *cardArtParamsMap;
 
 public:
-    explicit UserListItemDelegate(QObject *const parent,
+    explicit UserListItemDelegate(QTreeWidget *tree,
                                   const QMap<QString, QPixmap> *avatarCache,
                                   const QMap<QString, QPixmap> *cardArtCache,
                                   const QMap<QString, CardArtParams> *cardArtParamsMap);
@@ -156,12 +157,12 @@ private:
     UserCardArtProvider *cardArtProvider = nullptr;
     QMap<QString, CardArtParams> cardArtParamsMap;
     // ── Hover popup ───────────────────────────────────────────────────────────
-    UserInfoPopup *m_userInfoPopup = nullptr;
-    QTimer *m_showPopupTimer = nullptr;
-    QTimer *m_hidePopupTimer = nullptr;
-    QString m_hoveredUser;
-    bool m_popupPinned = false;
-    bool m_bulkLoading = false;
+    UserInfoPopup *userInfoPopup = nullptr;
+    QTimer *showPopupTimer = nullptr;
+    QTimer *hidePopupTimer = nullptr;
+    QString hoveredUser;
+    bool popupPinned = false;
+    bool bulkLoading = false;
 
     void showPopupForUser(const QString &userName);
     void hidePopup(bool immediate = false);
@@ -193,7 +194,7 @@ private:
     TabSupervisor *tabSupervisor;
     AbstractClient *client;
     UserListType type;
-    QTreeWidget *userTree;
+    QTreeWidget *userTree = nullptr;
     UserListItemDelegate *itemDelegate;
     UserContextMenu *userContextMenu;
     int onlineCount;

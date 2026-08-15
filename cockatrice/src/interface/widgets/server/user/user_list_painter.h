@@ -6,6 +6,7 @@
 #include <QColor>
 #include <QList>
 #include <QMap>
+#include <QPalette>
 #include <QPixmap>
 #include <QRect>
 #include <QSize>
@@ -28,13 +29,36 @@ struct CardArtParams
 class UserListPainter
 {
 public:
+    /**
+     * Palette-derived surface colors for the current color scheme. Both the
+     * light and the dark scheme read from the active QPalette so custom
+     * palettes are respected; @c dark only tunes the blend strengths (and
+     * whether the name text keeps its drop shadow).
+     */
+    struct Style
+    {
+        bool dark = true;
+        QColor cardStart; ///< row fill, left edge (normal)
+        QColor cardEnd;   ///< row fill, right edge (normal)
+        QColor base;      ///< lightest surface, used for blending accent hues
+        QColor textOnline;
+        QColor textOffline;
+        QColor ringOffline;
+        bool dropShadow = false;
+    };
+
+    static Style resolveStyle(const QPalette &palette, bool dark);
+    /// Linear interpolation: @p t = 0 returns @p a, @p t = 1 returns @p b.
+    static QColor blend(const QColor &a, const QColor &b, qreal t);
+
     static void paint(QPainter *painter,
                       const QStyleOptionViewItem &option,
                       const QModelIndex &index,
                       const ServerInfo_User &userInfo,
                       const QMap<QString, QPixmap> *avatarCache,
                       const QMap<QString, QPixmap> *cardArtCache,
-                      const QMap<QString, CardArtParams> *cardArtParamsMap);
+                      const QMap<QString, CardArtParams> *cardArtParamsMap,
+                      bool dark);
 
     static QSize sizeHint();
 
@@ -55,7 +79,11 @@ private:
 
     static QColor getAccentColor(const UserLevelFlags &userLevel, bool online);
     static int getCardRight(const QStyleOptionViewItem &option, const QRect &rect);
-    static void drawBackground(QPainter *painter, const QRectF &cardRect, const QColor &accentColor, bool selected);
+    static void drawBackground(QPainter *painter,
+                               const QRectF &cardRect,
+                               const QColor &accentColor,
+                               bool selected,
+                               const Style &style);
     static QRect getAvatarRect(const QRect &rect);
     static void drawAvatar(QPainter *painter,
                            const QRect &avatarRect,
@@ -64,8 +92,9 @@ private:
                            const UserLevelFlags &userLevel,
                            const ServerInfo_User &userInfo,
                            const QString &privLevel,
-                           const QMap<QString, QPixmap> *avatarCache);
-    static void drawStatusRing(QPainter *painter, const QRect &avatarRect, bool online);
+                           const QMap<QString, QPixmap> *avatarCache,
+                           const Style &style);
+    static void drawStatusRing(QPainter *painter, const QRect &avatarRect, bool online, const Style &style);
     static void drawUserName(QPainter *painter,
                              const QStyleOptionViewItem &option,
                              const QRect &rect,
@@ -73,7 +102,7 @@ private:
                              int textX,
                              const QString &userName,
                              bool online,
-                             bool selected);
+                             const Style &style);
     static void drawCountryFlag(QPainter *painter, const QRect &rect, int textX, const ServerInfo_User &userInfo);
     static QList<Badge> buildBadges(const UserLevelFlags &userLevel, const QString &privLevel);
     static void drawBadges(QPainter *painter,
@@ -81,7 +110,8 @@ private:
                            const QRect &rect,
                            int cardRight,
                            const QList<Badge> &badges,
-                           bool online);
+                           bool online,
+                           const Style &style);
 };
 
 #endif // COCKATRICE_USER_LIST_PAINTER_H

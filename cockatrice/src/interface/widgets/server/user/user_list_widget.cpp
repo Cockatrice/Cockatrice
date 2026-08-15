@@ -3,6 +3,7 @@
 #include "../../../../client/settings/cache_settings.h"
 #include "../../../card_picture_loader/card_picture_loader.h"
 #include "../../interface/pixel_map_generator.h"
+#include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_account.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "../game_selector.h"
@@ -332,11 +333,11 @@ constexpr int UserInfo = Qt::UserRole + 2;
 // rows (UserListTWI, which uses QTreeWidgetItem::Type) by this item type.
 constexpr int SectionItemType = QTreeWidgetItem::UserType + 1;
 
-UserListItemDelegate::UserListItemDelegate(QObject *const parent,
+UserListItemDelegate::UserListItemDelegate(QTreeWidget *tree,
                                            const QMap<QString, QPixmap> *avatarCache,
                                            const QMap<QString, QPixmap> *cardArtCache,
                                            const QMap<QString, CardArtParams> *cardArtParamsMap)
-    : QStyledItemDelegate(parent), avatarCache(avatarCache), cardArtCache(cardArtCache),
+    : QStyledItemDelegate(tree), tree(tree), avatarCache(avatarCache), cardArtCache(cardArtCache),
       cardArtParamsMap(cardArtParamsMap)
 {
 }
@@ -369,20 +370,121 @@ QSize UserListItemDelegate::sizeHint(const QStyleOptionViewItem &option, const Q
 
 void UserListItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (!SettingsCache::instance().appearance().getStyleUserList()) {
-        QStyledItemDelegate::paint(painter, option, index);
+    const bool styled = SettingsCache::instance().appearance().getStyleUserList();
+    // UserInfo/Online are stored on column 0 only; the name lives on column 2,
+    // so resolve the user data against column 0 no matter which cell is painted.
+    const QModelIndex userIndex = index.siblingAtColumn(0).isValid() ? index.siblingAtColumn(0) : index;
+    const QVariant var = userIndex.data(UserListRoles::UserInfo);
+
+    if (styled && var.isValid()) {
+        // Styled card rows: the tree's cached palette can be stale after a
+        // runtime theme change, so paint from the application palette (always
+        // current) instead of option.palette (frozen at the last style switch).
+        QStyleOptionViewItem opt = option;
+        opt.palette = qApp->palette();
+
+        UserListPainter::paint(painter, opt, index, var.value<ServerInfo_User>(), avatarCache, cardArtCache,
+                               cardArtParamsMap, themeManager && themeManager->isDarkModeActive());
         return;
     }
 
-    const QVariant var = index.data(UserListRoles::UserInfo);
+    // Unstyled rows and section dividers are painted manually so every color
+    // is derived from the current application palette at paint time: the widget
+    // palette, the view's alternation, and the stored per-item brushes all go
+    // stale after a runtime theme change.
+    const QPalette appPal = qApp->palette();
+    const bool selected = option.state & QStyle::State_Selected;
+    const bool hovered = option.state & QStyle::State_MouseOver;
 
-    if (!var.isValid()) {
-        QStyledItemDelegate::paint(painter, option, index);
-        return;
+    // Row background: selection, hover, zebra striping, plain base.
+    QColor bg = appPal.color(QPalette::Base);
+    if (selected) {
+        bg = appPal.color(QPalette::Highlight);
+    } else if (hovered) {
+        bg = UserListPainter::blend(appPal.color(QPalette::Base), appPal.color(QPalette::Highlight), 0.12);
+    } else if (var.isValid()) {
+        // Zebra with per-section parity: the dividers are top-level rows too,
+        // so the view's own alternation would drift across sections. Count the
+        // visible user rows back to the previous divider within the same parent
+        // (sectioned mode stores users as children of the dividers, flat mode
+        // as top-level rows), so the stripe restarts at every divider and at
+        // the tree top. Hidden filter matches are skipped the same way the view
+        // skips them, so adjacent visible rows always alternate.
+        int usersSinceDivider = 0;
+        const QModelIndex parent = userIndex.parent();
+        for (int r = userIndex.row() - 1; r >= 0; --r) {
+            if (tree->isRowHidden(r, parent)) {
+                continue;
+            }
+            const QModelIndex above = userIndex.model()->index(r, 0, parent);
+            if (above.isValid() && above.data(UserListRoles::UserInfo).isValid()) {
+                ++usersSinceDivider;
+            } else {
+                break;
+            }
+        }
+        if (usersSinceDivider % 2 == 1) {
+            bg = appPal.color(QPalette::AlternateBase);
+        }
+    }
+    // Paint the row background. In the column-0 pass the fill spans the full
+    // viewport width so stripes, hover and selection cover the whole row (the
+    // name column is content-sized in unstyled mode); later column passes fill
+    // only their own cell, which is the same color and cannot cover the icons.
+    QRect bgRect = option.rect;
+    if (index.column() == 0) {
+        bgRect = QRect(0, option.rect.top(), tree->viewport()->width(), option.rect.height());
+    }
+    painter->fillRect(bgRect, bg);
+
+    // Text color.
+    QColor fg = appPal.color(QPalette::Text);
+    if (selected) {
+        fg = appPal.color(QPalette::HighlightedText);
+    } else if (!var.isValid()) {
+        // Section divider: muted application text color.
+        fg = appPal.color(QPalette::WindowText);
+        fg.setAlpha(170);
+    } else if (index.column() == 2) {
+        // Name column: online/offline color recomputed at paint time instead
+        // of trusting the brush stored at login time.
+        QTreeWidgetItem *item = tree->itemFromIndex(index);
+        const bool online = item && item->data(0, UserListRoles::Online).toBool();
+        if (online) {
+            fg = appPal.color(QPalette::WindowText);
+        } else {
+            fg = (themeManager && themeManager->isDarkModeActive())
+                     ? QColor(Qt::gray)
+                     : UserListPainter::blend(appPal.color(QPalette::Text), appPal.color(QPalette::Mid), 0.5);
+        }
     }
 
-    UserListPainter::paint(painter, option, index, var.value<ServerInfo_User>(), avatarCache, cardArtCache,
-                           cardArtParamsMap);
+    // Icon (level badge in column 0, country flag in column 1).
+    QRect textRect = option.rect;
+    const QIcon icon = index.data(Qt::DecorationRole).value<QIcon>();
+    if (!icon.isNull()) {
+        const QSize iconSize = icon.actualSize(QSize(18, 18));
+        const QRect iconRect(option.rect.left() + 2, option.rect.center().y() - iconSize.height() / 2, iconSize.width(),
+                             iconSize.height());
+        icon.paint(painter, iconRect);
+        textRect.setLeft(iconRect.right() + 4);
+    }
+
+    // Text (name column / divider title), elided to the row width.
+    painter->save();
+    painter->setPen(fg);
+    const QFont itemFont = index.data(Qt::FontRole).value<QFont>();
+    painter->setFont(itemFont.isCopyOf(QFont()) ? option.font : itemFont);
+    const QString text = index.data(Qt::DisplayRole).toString();
+    const QString elided = painter->fontMetrics().elidedText(text, Qt::ElideRight, textRect.width() - 4);
+    painter->drawText(textRect.adjusted(2, 0, -2, 0), Qt::AlignLeft | Qt::AlignVCenter, elided);
+    painter->restore();
+
+    // Focus indicator for the current item.
+    if (option.state & QStyle::State_HasFocus) {
+        painter->setPen(appPal.color(QPalette::Highlight));
+        painter->drawRect(option.rect.adjusted(0, 0, -1, -1));
+    }
 }
 
 UserListTWI::UserListTWI(const ServerInfo_User &_userInfo) : QTreeWidgetItem(Type)
@@ -406,8 +508,10 @@ void UserListTWI::setUserInfo(const ServerInfo_User &_userInfo)
 
 void UserListTWI::setOnline(bool online)
 {
+    // Only the online state is stored here: the delegate derives the
+    // online/offline text color at paint time from the current application
+    // palette, so no brush is cached (it would go stale on theme change).
     setData(0, UserListRoles::Online, online);
-    setData(2, Qt::ForegroundRole, online ? qApp->palette().brush(QPalette::WindowText) : QBrush(Qt::gray));
 }
 
 /**
@@ -476,9 +580,6 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     avatarProvider = new UserAvatarProvider(client, this);
     cardArtProvider = new UserCardArtProvider(this);
 
-    itemDelegate =
-        new UserListItemDelegate(this, &avatarProvider->cache(), &cardArtProvider->cache(), &cardArtParamsMap);
-
     userContextMenu = new UserContextMenu(tabSupervisor, this);
     connect(userContextMenu, &UserContextMenu::openMessageDialog, this, &UserListWidget::openMessageDialog);
 
@@ -489,6 +590,8 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->setHeaderHidden(true);
     userTree->setRootIsDecorated(false);
     userTree->setIconSize(QSize(20, 18));
+    itemDelegate =
+        new UserListItemDelegate(userTree, &avatarProvider->cache(), &cardArtProvider->cache(), &cardArtParamsMap);
     userTree->setItemDelegate(itemDelegate);
     userTree->setAlternatingRowColors(true);
     userTree->hideColumn(1);
@@ -499,28 +602,28 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->header()->setStretchLastSection(true);
 
     // ── Hover popup ───────────────────────────────────────────────────────────
-    m_userInfoPopup = new UserInfoPopup(tabSupervisor, tabSupervisor->getClient(), &avatarProvider->cache(),
-                                        &cardArtProvider->cache(), &cardArtParamsMap,
-                                        window()); // parented to main window so it floats above siblings
+    userInfoPopup = new UserInfoPopup(tabSupervisor, tabSupervisor->getClient(), &avatarProvider->cache(),
+                                      &cardArtProvider->cache(), &cardArtParamsMap,
+                                      window()); // parented to main window so it floats above siblings
 
-    m_userInfoPopup->hide();
-    m_userInfoPopup->setWindowOpacity(0.0);
-    m_userInfoPopup->installEventFilter(this);
+    userInfoPopup->hide();
+    userInfoPopup->setWindowOpacity(0.0);
+    userInfoPopup->installEventFilter(this);
 
-    m_showPopupTimer = new QTimer(this);
-    m_showPopupTimer->setSingleShot(true);
-    m_showPopupTimer->setInterval(280);
-    connect(m_showPopupTimer, &QTimer::timeout, this, [this] {
-        if (!m_hoveredUser.isEmpty()) {
-            showPopupForUser(m_hoveredUser);
+    showPopupTimer = new QTimer(this);
+    showPopupTimer->setSingleShot(true);
+    showPopupTimer->setInterval(280);
+    connect(showPopupTimer, &QTimer::timeout, this, [this] {
+        if (!hoveredUser.isEmpty()) {
+            showPopupForUser(hoveredUser);
         }
     });
 
-    m_hidePopupTimer = new QTimer(this);
-    m_hidePopupTimer->setSingleShot(true);
-    m_hidePopupTimer->setInterval(160);
-    connect(m_hidePopupTimer, &QTimer::timeout, this, [this] {
-        if (!m_popupPinned && !m_userInfoPopup->underMouse() && !userTree->underMouse()) {
+    hidePopupTimer = new QTimer(this);
+    hidePopupTimer->setSingleShot(true);
+    hidePopupTimer->setInterval(160);
+    connect(hidePopupTimer, &QTimer::timeout, this, [this] {
+        if (!popupPinned && !userInfoPopup->underMouse() && !userTree->underMouse()) {
             hidePopup();
         }
     });
@@ -546,16 +649,16 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
             return; // divider rows have no user popup
         }
         const QString name = static_cast<UserListTWI *>(item)->getUserInfo().name().c_str();
-        m_popupPinned = false; // reset so showPopupForUser can update
+        popupPinned = false; // reset so showPopupForUser can update
         showPopupForUser(name);
-        m_popupPinned = true; // pin after showing
+        popupPinned = true; // pin after showing
     });
 
     connect(userTree->selectionModel(), &QItemSelectionModel::selectionChanged, this,
             [this](const QItemSelection &sel, const QItemSelection &) {
                 // if (m_rebuildingTree) return;
-                if (sel.isEmpty() && m_popupPinned) {
-                    m_popupPinned = false;
+                if (sel.isEmpty() && popupPinned) {
+                    popupPinned = false;
                     hidePopup();
                 }
             });
@@ -570,13 +673,13 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
 
     // Hide popup when list scrolls (reference row has moved)
     connect(userTree->verticalScrollBar(), &QScrollBar::valueChanged, this, [this] {
-        m_showPopupTimer->stop();
+        showPopupTimer->stop();
         hidePopup(true);
         requestAvatarsForVisibleItems();
     });
 
     // Forward join requests from popup upward
-    connect(m_userInfoPopup, &UserInfoPopup::joinGameRequested, this, &UserListWidget::joinGameRequested);
+    connect(userInfoPopup, &UserInfoPopup::joinGameRequested, this, &UserListWidget::joinGameRequested);
 
     connect(avatarProvider, &UserAvatarProvider::avatarUpdated, this, &UserListWidget::refreshVisibleUserHeader);
     connect(cardArtProvider, &UserCardArtProvider::cardArtUpdated, this, &UserListWidget::refreshVisibleUserHeader);
@@ -584,6 +687,17 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     connect(&SettingsCache::instance().appearance(), &AppearanceSettings::styleUserListChanged, this,
             &UserListWidget::applyDisplayMode);
     applyDisplayMode();
+
+    // The tree's cached palette can go stale after a runtime theme change (Qt
+    // freezes widget palettes when the style is switched), so rows and dividers
+    // derive all colors from the application palette at paint time. The theme
+    // change only needs a repaint to pick them up.
+    if (themeManager) {
+        connect(themeManager, &ThemeManager::themeChanged, this, [this] {
+            userTree->viewport()->update();
+            userTree->update();
+        });
+    }
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(userTree);
@@ -662,7 +776,7 @@ void UserListWidget::bind(UserListManager *mgr)
     // ── Popup button refresh ──────────────────────────────────────────────────
     // Any buddy/ignore mutation while the popup is open refreshes its buttons
     auto refreshIfPopupOpen = [this](const QString &name) {
-        if (m_userInfoPopup && m_userInfoPopup->isVisible() && m_userInfoPopup->currentUser() == name) {
+        if (userInfoPopup && userInfoPopup->isVisible() && userInfoPopup->getCurrentUser() == name) {
             refreshPopupButtons(name);
         }
     };
@@ -683,8 +797,8 @@ void UserListWidget::bind(UserListManager *mgr)
 void UserListWidget::refreshVisibleUserHeader(const QString &name)
 {
     userTree->viewport()->update();
-    if (m_userInfoPopup->isVisible() && m_userInfoPopup->currentUser() == name) {
-        m_userInfoPopup->refreshHeader();
+    if (userInfoPopup->isVisible() && userInfoPopup->getCurrentUser() == name) {
+        userInfoPopup->refreshHeader();
     }
 }
 
@@ -700,15 +814,15 @@ void UserListWidget::refreshPopupButtons(const QString &userName)
     const bool isBuddy = proxy->isUserBuddy(userName);
     const bool isIgn = proxy->isUserIgnored(userName);
 
-    m_userInfoPopup->updateActionButtons(item->getUserInfo(), online, isBuddy, isIgn);
+    userInfoPopup->updateActionButtons(item->getUserInfo(), online, isBuddy, isIgn);
     positionPopup(userName); // height may have changed — reposition
 }
 
 void UserListWidget::hideEvent(QHideEvent *e)
 {
     QGroupBox::hideEvent(e);
-    m_showPopupTimer->stop();
-    m_hidePopupTimer->stop();
+    showPopupTimer->stop();
+    hidePopupTimer->stop();
     hidePopup(true);
 }
 
@@ -739,39 +853,39 @@ void UserListWidget::applyDisplayMode()
 
 void UserListWidget::connectPopupSignals()
 {
-    connect(m_userInfoPopup, &UserInfoPopup::closeRequested, this, [this] {
-        m_popupPinned = false;
+    connect(userInfoPopup, &UserInfoPopup::closeRequested, this, [this] {
+        popupPinned = false;
         hidePopup(true);
     });
-    connect(m_userInfoPopup, &UserInfoPopup::mouseEnteredPopup, m_hidePopupTimer, &QTimer::stop);
-    connect(m_userInfoPopup, &UserInfoPopup::mouseLeftPopup, this, [this] {
-        if (!m_popupPinned) {
-            m_hidePopupTimer->start();
+    connect(userInfoPopup, &UserInfoPopup::mouseEnteredPopup, hidePopupTimer, &QTimer::stop);
+    connect(userInfoPopup, &UserInfoPopup::mouseLeftPopup, this, [this] {
+        if (!popupPinned) {
+            hidePopupTimer->start();
         }
     });
 
     // Wire all action signals to UserContextMenu::exec*()
-    connect(m_userInfoPopup, &UserInfoPopup::chatRequested, userContextMenu, &UserContextMenu::execChat);
-    connect(m_userInfoPopup, &UserInfoPopup::detailsRequested, userContextMenu, &UserContextMenu::execDetails);
-    connect(m_userInfoPopup, &UserInfoPopup::showGamesRequested, userContextMenu, &UserContextMenu::execShowGames);
-    connect(m_userInfoPopup, &UserInfoPopup::addBuddyRequested, userContextMenu, &UserContextMenu::execAddToBuddy);
-    connect(m_userInfoPopup, &UserInfoPopup::removeBuddyRequested, userContextMenu,
+    connect(userInfoPopup, &UserInfoPopup::chatRequested, userContextMenu, &UserContextMenu::execChat);
+    connect(userInfoPopup, &UserInfoPopup::detailsRequested, userContextMenu, &UserContextMenu::execDetails);
+    connect(userInfoPopup, &UserInfoPopup::showGamesRequested, userContextMenu, &UserContextMenu::execShowGames);
+    connect(userInfoPopup, &UserInfoPopup::addBuddyRequested, userContextMenu, &UserContextMenu::execAddToBuddy);
+    connect(userInfoPopup, &UserInfoPopup::removeBuddyRequested, userContextMenu,
             &UserContextMenu::execRemoveFromBuddy);
-    connect(m_userInfoPopup, &UserInfoPopup::addIgnoreRequested, userContextMenu, &UserContextMenu::execAddToIgnore);
-    connect(m_userInfoPopup, &UserInfoPopup::removeIgnoreRequested, userContextMenu,
+    connect(userInfoPopup, &UserInfoPopup::addIgnoreRequested, userContextMenu, &UserContextMenu::execAddToIgnore);
+    connect(userInfoPopup, &UserInfoPopup::removeIgnoreRequested, userContextMenu,
             &UserContextMenu::execRemoveFromIgnore);
-    connect(m_userInfoPopup, &UserInfoPopup::banRequested, userContextMenu, &UserContextMenu::execBan);
-    connect(m_userInfoPopup, &UserInfoPopup::warnRequested, userContextMenu, &UserContextMenu::execWarn);
-    connect(m_userInfoPopup, &UserInfoPopup::banHistoryRequested, userContextMenu, &UserContextMenu::execBanHistory);
-    connect(m_userInfoPopup, &UserInfoPopup::warnHistoryRequested, userContextMenu, &UserContextMenu::execWarnHistory);
-    connect(m_userInfoPopup, &UserInfoPopup::adminNotesRequested, userContextMenu, &UserContextMenu::execAdminNotes);
-    connect(m_userInfoPopup, &UserInfoPopup::promoteToModRequested, this,
+    connect(userInfoPopup, &UserInfoPopup::banRequested, userContextMenu, &UserContextMenu::execBan);
+    connect(userInfoPopup, &UserInfoPopup::warnRequested, userContextMenu, &UserContextMenu::execWarn);
+    connect(userInfoPopup, &UserInfoPopup::banHistoryRequested, userContextMenu, &UserContextMenu::execBanHistory);
+    connect(userInfoPopup, &UserInfoPopup::warnHistoryRequested, userContextMenu, &UserContextMenu::execWarnHistory);
+    connect(userInfoPopup, &UserInfoPopup::adminNotesRequested, userContextMenu, &UserContextMenu::execAdminNotes);
+    connect(userInfoPopup, &UserInfoPopup::promoteToModRequested, this,
             [this](const QString &n) { userContextMenu->execAdjustMod(n, true); });
-    connect(m_userInfoPopup, &UserInfoPopup::demoteFromModRequested, this,
+    connect(userInfoPopup, &UserInfoPopup::demoteFromModRequested, this,
             [this](const QString &n) { userContextMenu->execAdjustMod(n, false); });
-    connect(m_userInfoPopup, &UserInfoPopup::promoteToJudgeRequested, this,
+    connect(userInfoPopup, &UserInfoPopup::promoteToJudgeRequested, this,
             [this](const QString &n) { userContextMenu->execAdjustJudge(n, true); });
-    connect(m_userInfoPopup, &UserInfoPopup::demoteFromJudgeRequested, this,
+    connect(userInfoPopup, &UserInfoPopup::demoteFromJudgeRequested, this,
             [this](const QString &n) { userContextMenu->execAdjustJudge(n, false); });
 }
 
@@ -789,25 +903,25 @@ bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
                 hovName = QString::fromStdString(static_cast<UserListTWI *>(hoveredItem)->getUserInfo().name());
             }
 
-            if (hovName != m_hoveredUser) {
-                m_hoveredUser = hovName;
+            if (hovName != hoveredUser) {
+                hoveredUser = hovName;
                 if (!hovName.isEmpty()) {
-                    m_hidePopupTimer->stop();
-                    if (!m_popupPinned) {
-                        m_showPopupTimer->start();
+                    hidePopupTimer->stop();
+                    if (!popupPinned) {
+                        showPopupTimer->start();
                     }
                 } else {
-                    m_showPopupTimer->stop();
-                    if (!m_popupPinned) {
-                        m_hidePopupTimer->start();
+                    showPopupTimer->stop();
+                    if (!popupPinned) {
+                        hidePopupTimer->start();
                     }
                 }
             }
         } else if (event->type() == QEvent::Leave) {
-            m_hoveredUser.clear();
-            m_showPopupTimer->stop();
-            if (!m_popupPinned) {
-                m_hidePopupTimer->start();
+            hoveredUser.clear();
+            showPopupTimer->stop();
+            if (!popupPinned) {
+                hidePopupTimer->start();
             }
         }
     }
@@ -829,20 +943,20 @@ void UserListWidget::showPopupForUser(const QString &userName)
     const bool isBuddy = userContextMenu->getUserListProxy()->isUserBuddy(userName);
     const bool isIgn = userContextMenu->getUserListProxy()->isUserIgnored(userName);
 
-    m_userInfoPopup->showForUser(userName, info, online, isBuddy, isIgn);
+    userInfoPopup->showForUser(userName, info, online, isBuddy, isIgn);
 
     // Realize the native window at opacity 0 before positioning so that:
     //   1) move() applies to an existing native handle (not overridden by Qt's
     //      default centering logic on first show)
     //   2) adjustSize() inside positionPopup() can measure the final laid-out
     //      geometry correctly
-    m_userInfoPopup->setWindowOpacity(0.0);
-    m_userInfoPopup->show();
-    m_userInfoPopup->raise();
+    userInfoPopup->setWindowOpacity(0.0);
+    userInfoPopup->show();
+    userInfoPopup->raise();
 
     positionPopup(userName); // geometry is now accurate; move() sticks
 
-    auto *fade = new QPropertyAnimation(m_userInfoPopup, "windowOpacity", m_userInfoPopup);
+    auto *fade = new QPropertyAnimation(userInfoPopup, "windowOpacity", userInfoPopup);
     fade->setDuration(120);
     fade->setStartValue(0.0);
     fade->setEndValue(1.0);
@@ -862,9 +976,9 @@ void UserListWidget::positionPopup(const QString &userName)
     const QPoint vpTL = vp->mapToGlobal(vp->rect().topLeft());
     const QPoint vpTR = vp->mapToGlobal(vp->rect().topRight());
 
-    m_userInfoPopup->adjustSize();
-    const int popW = m_userInfoPopup->width();
-    const int popH = m_userInfoPopup->height();
+    userInfoPopup->adjustSize();
+    const int popW = userInfoPopup->width();
+    const int popH = userInfoPopup->height();
     const int margin = 12;
 
     QScreen *activeScreen = QGuiApplication::screenAt(itemTL);
@@ -901,28 +1015,28 @@ void UserListWidget::positionPopup(const QString &userName)
     }
     y = qBound(screen.top() + margin, y, screen.bottom() - popH - margin);
 
-    m_userInfoPopup->move(x, y);
+    userInfoPopup->move(x, y);
 }
 
 void UserListWidget::hidePopup(bool immediate)
 {
-    m_showPopupTimer->stop();
-    m_hidePopupTimer->stop();
-    if (!m_userInfoPopup->isVisible()) {
+    showPopupTimer->stop();
+    hidePopupTimer->stop();
+    if (!userInfoPopup->isVisible()) {
         return;
     }
 
     if (immediate) {
-        m_userInfoPopup->hide();
+        userInfoPopup->hide();
         return;
     }
 
     // Fade out
-    auto *fade = new QPropertyAnimation(m_userInfoPopup, "windowOpacity", m_userInfoPopup);
+    auto *fade = new QPropertyAnimation(userInfoPopup, "windowOpacity", userInfoPopup);
     fade->setDuration(100);
-    fade->setStartValue(m_userInfoPopup->windowOpacity());
+    fade->setStartValue(userInfoPopup->windowOpacity());
     fade->setEndValue(0.0);
-    connect(fade, &QPropertyAnimation::finished, m_userInfoPopup, &QWidget::hide);
+    connect(fade, &QPropertyAnimation::finished, userInfoPopup, &QWidget::hide);
     fade->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
@@ -948,12 +1062,12 @@ void UserListWidget::retranslateUi()
 
 void UserListWidget::beginBulkLoad()
 {
-    m_bulkLoading = true;
+    bulkLoading = true;
 }
 
 void UserListWidget::endBulkLoad()
 {
-    m_bulkLoading = false;
+    bulkLoading = false;
     sortItems();
     requestAvatarsForVisibleItems();
     userTree->viewport()->update();
@@ -1095,12 +1209,12 @@ void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
             ++onlineCount;
         }
         updateCount();
-        if (!m_bulkLoading && isItemNearViewport(item)) {
+        if (!bulkLoading && isItemNearViewport(item)) {
             avatarProvider->requestAvatar(userName);
         }
     }
     item->setOnline(online);
-    if (!m_bulkLoading) {
+    if (!bulkLoading) {
         sortItems();
         applyFilter();
         userTree->viewport()->update();
@@ -1132,12 +1246,12 @@ void UserListWidget::processUserInfo(const QString &sectionId, const ServerInfo_
             ++onlineCount;
         }
         updateCount();
-        if (!m_bulkLoading && isItemNearViewport(item)) {
+        if (!bulkLoading && isItemNearViewport(item)) {
             avatarProvider->requestAvatar(userName);
         }
     }
     item->setOnline(online);
-    if (!m_bulkLoading) {
+    if (!bulkLoading) {
         sortItems();
         applyFilter();
         userTree->viewport()->update();
@@ -1363,9 +1477,6 @@ QTreeWidgetItem *UserListWidget::createSectionItem(const QString &sectionId)
     // A little taller than a plain text row so the header reads as a section
     // separator without matching the full user-row height.
     divider->setSizeHint(0, QSize(0, QFontMetrics(font).height() + 16));
-    QColor muted = palette().color(QPalette::WindowText);
-    muted.setAlpha(170);
-    divider->setForeground(0, QBrush(muted));
 
     userTree->addTopLevelItem(divider);
     // QTreeWidgetItem::setFirstColumnSpanned() is a no-op while the item is
@@ -1534,7 +1645,7 @@ void UserListWidget::moveToSection(const QString &sectionId, const QString &user
         return;
     }
     target->addChild(item); // reparents: the item leaves its old section
-    if (!m_bulkLoading) {
+    if (!bulkLoading) {
         sortItems();
         applyFilter();
         userTree->viewport()->update();
