@@ -756,11 +756,13 @@ void UserListWidget::bind(UserListManager *mgr)
         }
     } else {
         // ── Sectioned mode: one tree, every source feeds its own section. ─────
-        // Presence drives the "online" section and the online state of buddies
-        // and ignored users. Buddy/ignore mutations move users between sections
-        // (priority: ignored > buddy > online).
-        connect(manager, &UserListManager::userJoinedOnline, this,
-                [this](const ServerInfo_User &user) { handleOnlineChange(user, true); });
+        // Sections are pure membership views: the "Online" section holds every
+        // currently online user, the "Buddy"/"Ignore" sections hold those
+        // lists. A user can therefore appear in several sections at once (an
+        // online buddy gets one row in each).
+        connect(manager, &UserListManager::userJoinedOnline, this, [this](const ServerInfo_User &user) {
+            handleOnlineChange(user);
+        });
         connect(manager, &UserListManager::userLeftOnline, this,
                 [this](const QString &name) { handleOnlineChangeLeft(name); });
         connect(manager, &UserListManager::addedToBuddyList, this,
@@ -1113,6 +1115,7 @@ void UserListWidget::rebuild()
 {
     userTree->clear();
     users.clear();
+    sectionUsers.clear();
     cardArtParamsMap.clear();
     onlineCount = 0;
 
@@ -1125,9 +1128,9 @@ void UserListWidget::rebuild()
     }
 
     if (sectioned) {
-        // Feed the sections in priority order (online first, then buddy, then
-        // ignore): users present in several sources end up in the highest
-        // priority section because processUserInfo() reparents existing items.
+        // Every source feeds its own section; users that belong to several
+        // sources (an online buddy) get one row per section because
+        // ensureSectionMembership() creates the row when it is missing.
         beginBulkLoad();
         const auto &onlineUsers = manager->getAllUsersList();
         for (auto it = onlineUsers.cbegin(); it != onlineUsers.cend(); ++it) {
@@ -1135,9 +1138,6 @@ void UserListWidget::rebuild()
         }
         const auto &buddyUsers = manager->getBuddyList();
         for (auto it = buddyUsers.cbegin(); it != buddyUsers.cend(); ++it) {
-            if (manager->isUserIgnored(it.key())) {
-                continue; // handled by the ignore pass below
-            }
             processUserInfo(QStringLiteral("buddy"), it.value(), manager->getOnlineUser(it.key()) != nullptr);
         }
         const auto &ignoreUsers = manager->getIgnoreList();
@@ -1223,34 +1223,7 @@ void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
 
 void UserListWidget::processUserInfo(const QString &sectionId, const ServerInfo_User &user, bool online)
 {
-    const QString userName = QString::fromStdString(user.name());
-
-    updateCardArtParams(user, userName);
-
-    QTreeWidgetItem *sectionItem = sectionItems.value(sectionId);
-    if (!sectionItem) {
-        return;
-    }
-
-    UserListTWI *item = users.value(userName);
-    if (item) {
-        item->setUserInfo(user);
-        if (item->parent() != sectionItem) {
-            sectionItem->addChild(item); // reparent to the section it now belongs to
-        }
-    } else {
-        item = new UserListTWI(user);
-        users.insert(userName, item);
-        sectionItem->addChild(item);
-        if (online) {
-            ++onlineCount;
-        }
-        updateCount();
-        if (!bulkLoading && isItemNearViewport(item)) {
-            avatarProvider->requestAvatar(userName);
-        }
-    }
-    item->setOnline(online);
+    ensureSectionMembership(sectionId, user, online);
     if (!bulkLoading) {
         sortItems();
         applyFilter();
@@ -1260,6 +1233,21 @@ void UserListWidget::processUserInfo(const QString &sectionId, const ServerInfo_
 
 bool UserListWidget::deleteUser(const QString &userName)
 {
+    if (sectioned) {
+        // The user may own several rows (one per section); drop them all.
+        bool removed = false;
+        const QStringList sections = sectionUsers.keys(); // snapshot: maps mutate
+        for (const QString &sectionId : sections) {
+            removed = dropSectionMembership(sectionId, userName) || removed;
+        }
+        if (removed && !bulkLoading) {
+            sortItems();
+            applyFilter();
+            userTree->viewport()->update();
+        }
+        return removed;
+    }
+
     UserListTWI *twi = users.value(userName);
     if (!twi) {
         return false;
@@ -1282,6 +1270,19 @@ bool UserListWidget::deleteUser(const QString &userName)
 
 void UserListWidget::setUserOnline(const QString &userName, bool online)
 {
+    if (sectioned) {
+        // The rows in the "Online" section are created/removed by the presence
+        // handlers; this only keeps the presence flag of the surviving rows
+        // (e.g. a buddy row after the user went offline) in sync.
+        for (auto it = sectionUsers.cbegin(); it != sectionUsers.cend(); ++it) {
+            UserListTWI *item = it.value().value(userName);
+            if (item) {
+                item->setOnline(online);
+            }
+        }
+        return;
+    }
+
     UserListTWI *twi = users.value(userName);
     if (!twi) {
         return;
@@ -1579,91 +1580,121 @@ void UserListWidget::setSectionExpanded(const QString &sectionId, bool expanded)
     userTree->viewport()->update();
 }
 
-void UserListWidget::handleOnlineChange(const ServerInfo_User &user, bool online)
+void UserListWidget::handleOnlineChange(const ServerInfo_User &user)
 {
+    // A user came online: they get a row in the "Online" section, plus (if
+    // applicable) a row in the buddy/ignore sections, which flip to online.
     const QString name = QString::fromStdString(user.name());
-    UserListTWI *item = users.value(name);
-    if (item) {
-        item->setUserInfo(user);
-        setUserOnline(name, online);
-        return;
+    ensureSectionMembership(QStringLiteral("online"), user, true);
+    if (manager->isUserBuddy(name)) {
+        ensureSectionMembership(QStringLiteral("buddy"), user, true);
     }
-
-    // A brand-new user lands in the highest-priority section they belong to.
-    QString sectionId = QStringLiteral("online");
     if (manager->isUserIgnored(name)) {
-        sectionId = QStringLiteral("ignore");
-    } else if (manager->isUserBuddy(name)) {
-        sectionId = QStringLiteral("buddy");
+        ensureSectionMembership(QStringLiteral("ignore"), user, true);
     }
-    processUserInfo(sectionId, user, online);
+    finishSectionedMutation();
 }
 
 void UserListWidget::handleOnlineChangeLeft(const QString &userName)
 {
-    if (!users.contains(userName)) {
-        return;
-    }
-    // Buddies and ignored users persist as offline. Pain room members leave
-    // the list entirely.
+    // The user is no longer online: their "Online" row disappears. Buddies and
+    // ignored users keep their own section's row, marked offline; a plain user
+    // has no rows left.
+    dropSectionMembership(QStringLiteral("online"), userName);
     if (manager->isUserBuddy(userName) || manager->isUserIgnored(userName)) {
         setUserOnline(userName, false);
-    } else {
-        deleteUser(userName);
     }
+    finishSectionedMutation();
 }
 
 void UserListWidget::handleListAdd(const QString &sectionId, const ServerInfo_User &user)
 {
     const QString name = QString::fromStdString(user.name());
-    // Ignored status outranks buddy status in the single list.
-    if (sectionId == QLatin1String("buddy") && manager->isUserIgnored(name)) {
-        processUserInfo(QStringLiteral("ignore"), user, manager->getOnlineUser(name) != nullptr);
-        return;
+    const bool online = manager->getOnlineUser(name) != nullptr;
+    ensureSectionMembership(sectionId, user, online);
+    if (online) {
+        // The user belongs to the "Online" section as well; make sure the row
+        // exists even if the join event raced ahead of the list mutation.
+        ensureSectionMembership(QStringLiteral("online"), user, true);
     }
-    processUserInfo(sectionId, user, manager->getOnlineUser(name) != nullptr);
+    finishSectionedMutation();
 }
 
 void UserListWidget::handleListRemove(const QString &sectionId, const QString &userName)
 {
-    // A user leaving one list may still belong elsewhere:
-    // ignored > buddy > online.
-    if (sectionId == QLatin1String("buddy")) {
-        if (manager->isUserIgnored(userName)) {
-            moveToSection(QStringLiteral("ignore"), userName);
-            return;
-        }
-        if (manager->getOnlineUser(userName)) {
-            moveToSection(QStringLiteral("online"), userName);
-            return;
-        }
-        deleteUser(userName);
-        return;
-    }
-    if (sectionId == QLatin1String("ignore")) {
-        if (manager->isUserBuddy(userName)) {
-            moveToSection(QStringLiteral("buddy"), userName);
-            return;
-        }
-        if (manager->getOnlineUser(userName)) {
-            moveToSection(QStringLiteral("online"), userName);
-            return;
-        }
-        deleteUser(userName);
-    }
+    // Only the row of the removed section disappears: an online user keeps
+    // their "Online" row, and other list memberships keep theirs.
+    dropSectionMembership(sectionId, userName);
+    finishSectionedMutation();
 }
 
-void UserListWidget::moveToSection(const QString &sectionId, const QString &userName)
+UserListTWI *UserListWidget::ensureSectionMembership(const QString &sectionId, const ServerInfo_User &user, bool online)
 {
-    UserListTWI *item = users.value(userName);
-    QTreeWidgetItem *target = sectionItems.value(sectionId);
-    if (!item || !target || item->parent() == target) {
+    const QString userName = QString::fromStdString(user.name());
+
+    updateCardArtParams(user, userName);
+
+    QTreeWidgetItem *divider = sectionItems.value(sectionId);
+    if (!divider) {
+        return nullptr;
+    }
+
+    QMap<QString, UserListTWI *> &sectionMap = sectionUsers[sectionId];
+    UserListTWI *item = sectionMap.value(userName);
+    if (!item) {
+        item = new UserListTWI(user);
+        sectionMap.insert(userName, item);
+        divider->addChild(item);
+        if (!users.contains(userName)) {
+            users.insert(userName, item); // primary row for name-based lookups
+        }
+        updateCount(); // a new row changes the divider's count
+        if (!bulkLoading && isItemNearViewport(item)) {
+            avatarProvider->requestAvatar(userName);
+        }
+    } else {
+        item->setUserInfo(user);
+    }
+    item->setOnline(online);
+    return item;
+}
+
+bool UserListWidget::dropSectionMembership(const QString &sectionId, const QString &userName)
+{
+    QMap<QString, UserListTWI *> &sectionMap = sectionUsers[sectionId];
+    UserListTWI *item = sectionMap.take(userName);
+    if (!item) {
+        return false;
+    }
+
+    if (item->parent()) {
+        item->parent()->removeChild(item);
+    } else {
+        userTree->takeTopLevelItem(userTree->indexOfTopLevelItem(item));
+    }
+    if (users.value(userName) == item) {
+        // Repoint the primary row at another surviving row, if any.
+        UserListTWI *replacement = nullptr;
+        for (auto it = sectionUsers.cbegin(); it != sectionUsers.cend() && !replacement; ++it) {
+            replacement = it.value().value(userName);
+        }
+        if (replacement) {
+            users.insert(userName, replacement);
+        } else {
+            users.remove(userName);
+        }
+    }
+    delete item;
+    updateCount();
+    return true;
+}
+
+void UserListWidget::finishSectionedMutation()
+{
+    if (bulkLoading) {
         return;
     }
-    target->addChild(item); // reparents: the item leaves its old section
-    if (!bulkLoading) {
-        sortItems();
-        applyFilter();
-        userTree->viewport()->update();
-    }
+    sortItems();
+    applyFilter();
+    userTree->viewport()->update();
 }

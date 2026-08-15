@@ -175,6 +175,10 @@ private:
     bool sectioned = false;
     QStringList sectionIds;
     QMap<QString, QTreeWidgetItem *> sectionItems;
+    // One row per (section, user): a user that is online AND a buddy appears in
+    // both the "Online" and the "Buddies" sections, so the same user can own
+    // several rows, each hanging off its section's divider.
+    QMap<QString, QMap<QString, UserListTWI *>> sectionUsers;
     QSet<QString> expandedSections;
     void createSectionItems();
     QTreeWidgetItem *createSectionItem(const QString &sectionId);
@@ -182,11 +186,16 @@ private:
     void updateSectionDivider(const QString &sectionId);
     void handleSectionExpansion(QTreeWidgetItem *item, bool expanded);
     void setExpandedProgrammatically(QTreeWidgetItem *item, bool expanded);
-    void handleOnlineChange(const ServerInfo_User &user, bool online);
+    void handleOnlineChange(const ServerInfo_User &user);
     void handleOnlineChangeLeft(const QString &userName);
     void handleListAdd(const QString &sectionId, const ServerInfo_User &user);
     void handleListRemove(const QString &sectionId, const QString &userName);
-    void moveToSection(const QString &sectionId, const QString &userName);
+    /** Creates or updates the row for @p user in @p sectionId. */
+    UserListTWI *ensureSectionMembership(const QString &sectionId, const ServerInfo_User &user, bool online);
+    /** Removes and deletes the row for @p userName in @p sectionId. */
+    bool dropSectionMembership(const QString &sectionId, const QString &userName);
+    /** Sorts, re-filters and repaints after a sectioned-mode mutation. */
+    void finishSectionedMutation();
     void updateCardArtParams(const ServerInfo_User &user, const QString &userName);
     void processUserInfo(const QString &sectionId, const ServerInfo_User &user, bool online);
 
