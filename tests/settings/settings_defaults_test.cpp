@@ -188,6 +188,38 @@ TEST_F(SettingsDefaultsTest, Sound_MasterVolume_SetAndGet)
 
 // --- TabsSettings ---
 
+TEST_F(SettingsDefaultsTest, Tabs_StartupTab_Default)
+{
+    TabsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getStartupTabIndex(), static_cast<int>(StartupTabHome));
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_StartupTab_SetAndGet)
+{
+    TabsSettings s(settingsPath, nullptr);
+    s.setStartupTabIndex(StartupTabServerRoom);
+    ASSERT_EQ(s.getStartupTabIndex(), static_cast<int>(StartupTabServerRoom));
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_StartupServer_Default)
+{
+    TabsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getStartupServerHost(), QString());
+    ASSERT_EQ(s.getStartupServerPort(), QString());
+    ASSERT_EQ(s.getStartupRoomName(), QString());
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_StartupServer_SetAndGet)
+{
+    TabsSettings s(settingsPath, nullptr);
+    s.setStartupServerHost("server.cockatrice.us");
+    s.setStartupServerPort("4748");
+    s.setStartupRoomName("General");
+    ASSERT_EQ(s.getStartupServerHost(), QString("server.cockatrice.us"));
+    ASSERT_EQ(s.getStartupServerPort(), QString("4748"));
+    ASSERT_EQ(s.getStartupRoomName(), QString("General"));
+}
+
 TEST_F(SettingsDefaultsTest, Tabs_AllTabsOpen_Default)
 {
     TabsSettings s(settingsPath, nullptr);

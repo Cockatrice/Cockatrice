@@ -55,6 +55,7 @@ class ServerInfo_User;
 class TabSupervisor;
 class WndSets;
 class DlgTipOfTheDay;
+struct ContextConnectToServer;
 
 class MainWindow : public QMainWindow
 {
@@ -104,6 +105,11 @@ private slots:
 
     void startupConfigCheck();
     void alertForcedOracleRun(const QString &version, bool isUpdate);
+
+    void applyStartupDestination();
+    void onStartupDestinationConnected(int destination, const ContextConnectToServer &serverContext);
+    void startupDestinationFailed(const QString &reason);
+    [[nodiscard]] bool startupDestinationConnectsToServer() const;
 
 private:
     static const QString appName;

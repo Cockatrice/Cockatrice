@@ -114,6 +114,10 @@ public:
     {
         return roomId;
     }
+    [[nodiscard]] QString getRoomName() const
+    {
+        return roomName;
+    }
     [[nodiscard]] const QMap<int, QString> &getGameTypes() const
     {
         return gameTypes;

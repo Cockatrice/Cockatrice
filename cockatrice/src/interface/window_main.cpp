@@ -32,8 +32,14 @@
 #include "../interface/widgets/dialogs/dlg_update.h"
 #include "../interface/widgets/dialogs/dlg_view_log.h"
 #include "../interface/widgets/tabs/tab_game.h"
+#include "../interface/widgets/tabs/tab_server.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
+#include "intents/contexts/context_connect_to_server.h"
+#include "intents/contexts/context_join_room.h"
+#include "intents/intent_connect_to_server.h"
+#include "intents/intent_login.h"
+#include "intents/intent_open_server_room_by_name.h"
 #include "logger.h"
 #include "version_string.h"
 #include "widgets/dialogs/dlg_connect.h"
@@ -77,6 +83,7 @@
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/servers_settings.h>
+#include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
@@ -540,6 +547,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // run startup check async
     QTimer::singleShot(0, this, &MainWindow::startupConfigCheck);
+    QTimer::singleShot(0, this, &MainWindow::applyStartupDestination);
 }
 
 void MainWindow::startupConfigCheck()
@@ -648,6 +656,82 @@ void MainWindow::startupConfigCheck()
     }
 }
 
+/**
+ * Drives the server-based startup destinations (Server lobby, Server Room) through the intent
+ * system: fetch saved credentials, connect to the configured server, then land on the Lobby or
+ * join the configured room by name.
+ */
+void MainWindow::applyStartupDestination()
+{
+    // An explicit command-line connect takes precedence over the startup destination.
+    if (!connectTo.isEmpty()) {
+        return;
+    }
+
+    const int destination = SettingsCache::instance().tabs().getStartupTabIndex();
+    if (destination != StartupTabServer && destination != StartupTabServerRoom) {
+        return;
+    }
+
+    const QString host = SettingsCache::instance().tabs().getStartupServerHost();
+    const QString port = SettingsCache::instance().tabs().getStartupServerPort();
+    if (host.isEmpty() || port.isEmpty()) {
+        qCWarning(WindowMainStartupLog) << "Startup destination needs a configured server";
+        return;
+    }
+
+    auto serverContext = std::make_shared<ContextConnectToServer>();
+    serverContext->hostname = host;
+    serverContext->port = port;
+
+    auto *credentials = new IntentGetLoginCredentials(serverContext.get());
+    auto *connector = new IntentConnectToServer(getRemoteClient(), serverContext.get());
+
+    connect(credentials, &Intent::finished, connector, &Intent::execute);
+    connect(credentials, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+    connect(connector, &Intent::finished, this,
+            [this, destination, serverContext]() { onStartupDestinationConnected(destination, *serverContext); });
+    connect(connector, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+
+    credentials->execute();
+}
+
+void MainWindow::onStartupDestinationConnected(int destination, const ContextConnectToServer &serverContext)
+{
+    // The server tab must exist: it is what requests the room list.
+    if (!tabSupervisor->getTabServer()) {
+        tabSupervisor->openTabServer();
+    }
+
+    if (destination == StartupTabServerRoom) {
+        auto roomContext = std::make_unique<ContextJoinRoom>();
+        roomContext->serverContext = serverContext;
+        auto *roomIntent = new IntentOpenServerRoomByName(tabSupervisor, getRemoteClient(), std::move(roomContext),
+                                                          SettingsCache::instance().tabs().getStartupRoomName());
+        roomIntent->setParent(this);
+        connect(roomIntent, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+        roomIntent->execute();
+        return;
+    }
+
+    if (tabSupervisor->getTabServer()) {
+        tabSupervisor->setCurrentWidget(tabSupervisor->getTabServer());
+    } else {
+        qCWarning(WindowMainStartupLog) << "Startup destination: server tab could not be opened";
+    }
+}
+
+void MainWindow::startupDestinationFailed(const QString &reason)
+{
+    qCWarning(WindowMainStartupLog) << "Startup destination failed:" << reason;
+}
+
+bool MainWindow::startupDestinationConnectsToServer() const
+{
+    const int destination = SettingsCache::instance().tabs().getStartupTabIndex();
+    return destination == StartupTabServer || destination == StartupTabServerRoom;
+}
+
 void MainWindow::alertForcedOracleRun(const QString &version, bool isUpdate)
 {
     if (isUpdate) {
@@ -750,7 +834,8 @@ void MainWindow::changeEvent(QEvent *event)
                 connectionController->connectToServerDirect(connectTo.host(), connectTo.port(), connectTo.userName(),
                                                             connectTo.password());
             } else if (SettingsCache::instance().servers().getAutoConnect() &&
-                       !SettingsCache::instance().debug().getLocalGameOnStartup()) {
+                       !SettingsCache::instance().debug().getLocalGameOnStartup() &&
+                       !startupDestinationConnectsToServer()) {
                 qCInfo(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
                 DlgConnect dlg(this);
                 connectionController->connectToServerDirect(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
