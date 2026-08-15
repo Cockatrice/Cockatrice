@@ -1287,6 +1287,13 @@ void UserListWidget::setUserOnline(const QString &userName, bool online)
         return;
     }
 
+    // No state change: nothing to re-sort. This also keeps the per-user
+    // presence broadcasts (userJoinedOnline fires for every online user) cheap
+    // when the row already carries the right flag.
+    if (twi->data(0, UserListRoles::Online).toBool() == online) {
+        return;
+    }
+
     twi->setOnline(online);
     if (online) {
         ++onlineCount;
@@ -1294,6 +1301,15 @@ void UserListWidget::setUserOnline(const QString &userName, bool online)
         --onlineCount;
     }
     updateCount();
+
+    // Online users sort above offline users (UserListTWI::operator<), so a
+    // flag change moves the row: re-sort so e.g. a buddy who went offline no
+    // longer stays pinned at the top of the list.
+    if (!bulkLoading) {
+        sortItems();
+        applyFilter();
+        userTree->viewport()->update();
+    }
 }
 
 void UserListWidget::updateCount()
