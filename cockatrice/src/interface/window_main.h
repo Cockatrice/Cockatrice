@@ -56,6 +56,7 @@ class TabSupervisor;
 class WndSets;
 class DlgTipOfTheDay;
 struct ContextConnectToServer;
+class IntentUrlParser;
 
 class MainWindow : public QMainWindow
 {
@@ -140,6 +141,7 @@ private:
         *aOpenSettingsFolder;
 
     TabSupervisor *tabSupervisor;
+    IntentUrlParser *urlParser;
     WndSets *wndSets;
     ConnectionController *connectionController;
     LocalServer *localServer;

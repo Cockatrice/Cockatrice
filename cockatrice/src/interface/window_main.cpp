@@ -498,6 +498,7 @@ MainWindow::MainWindow(QWidget *parent)
     pixmapCacheSizeChanged(SettingsCache::instance().cacheStorage().getPixmapCacheSize());
 
     connectionController = new ConnectionController(this, this);
+    urlParser = new IntentUrlParser(this, this);
 
     createActions();
     createMenus();
@@ -865,7 +866,6 @@ void MainWindow::showWindowIfHidden()
 
 void MainWindow::handleCockatriceLink(const QString &url)
 {
-    auto urlParser = new IntentUrlParser(this, this);
     urlParser->handle(url);
 }
 
