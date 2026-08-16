@@ -64,6 +64,8 @@ public:
     void processUserLeft();
     void processUserJoined(const ServerInfo_User &_userInfo);
 
+    void sendInviteMessage(const QString &text);
+
 private:
     bool shouldShowSystemPopup(const Event_UserMessage &event);
     void showSystemPopup(const Event_UserMessage &event);

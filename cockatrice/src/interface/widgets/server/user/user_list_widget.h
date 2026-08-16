@@ -8,6 +8,7 @@
 #define USERLIST_H
 
 #include "../../cards/card_info_picture_art_crop_widget.h"
+#include "../../interface/widgets/server/game_link.h"
 #include "user_avatar_provider.h"
 #include "user_card_art_provider.h"
 #include "user_info_popup.h"
@@ -22,6 +23,7 @@
 #include <QStyledItemDelegate>
 #include <QTextEdit>
 #include <QTreeWidgetItem>
+#include <functional>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 
@@ -271,6 +273,7 @@ public:
     }
     void showContextMenu(const QPoint &pos, const QModelIndex &index);
     void sortItems();
+    void setGameInviteLinkProvider(std::function<QList<GameInviteOption>()> provider);
 
 protected:
     void hideEvent(QHideEvent *e) override;
