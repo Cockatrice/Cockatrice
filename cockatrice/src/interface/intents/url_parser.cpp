@@ -74,37 +74,8 @@ void IntentUrlParser::handleJoinGame(const QUrlQuery &query)
         return;
     }
 
-    const QString hostname = ctx->roomContext.serverContext.hostname;
-    const QString port = ctx->roomContext.serverContext.port;
-    const int roomId = ctx->roomContext.roomId;
-    const int gameId = ctx->gameId;
-    const QString server = QStringLiteral("%1:%2").arg(hostname, port);
-
-    // Prefer the room name over the raw numeric id: it means something to the
-    // user. The name is only known when we are already connected to the same
-    // server and sitting in that room — otherwise fall back to a plain prompt.
-    AbstractClient *client = mainWindow->getTabSupervisor()->getClient();
-    const bool sameServer = client != nullptr && client->getStatus() == StatusLoggedIn &&
-                            hostname.compare(client->serverName(), Qt::CaseInsensitive) == 0 &&
-                            QString::number(client->serverPort()) == port;
-    TabRoom *roomTab = sameServer ? mainWindow->getTabSupervisor()->getRoomTabs().value(roomId) : nullptr;
-
-    // Links built by newer clients embed the game description ("game" item);
-    // restate it in the confirm so it matches what the chat anchor showed.
-    // Unknown query items are ignored, so old links without it keep working.
-    // The multi-arg .arg() overloads replace in a single pass, so a description
-    // containing "%…" cannot corrupt later placeholders.
-    // FullyDecoded undoes every %XX escape and must match the chat anchor's
-    // decode mode, so a description containing "%" reads identically in both.
     const QString gameDescription = query.queryItemValue("game", QUrl::FullyDecoded);
-    const QString gameIdStr = QString::number(gameId);
-    const QString message =
-        gameDescription.isEmpty()
-            ? (roomTab ? tr("Join game #%1 in \"%2\" on %3?").arg(gameIdStr, roomTab->getRoomName(), server)
-                       : tr("Join game #%1 on %2?").arg(gameIdStr, server))
-            : (roomTab ? tr("Join game \"%1\" (#%2) in \"%3\" on %4?")
-                             .arg(gameDescription, gameIdStr, roomTab->getRoomName(), server)
-                       : tr("Join game \"%1\" (#%2) on %3?").arg(gameDescription, gameIdStr, server));
+    const QString message = generateJoinGameMessage(*ctx, gameDescription);
 
     const QMessageBox::StandardButton answer = QMessageBox::question(
         mainWindow, tr("Join game"), message, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
@@ -127,4 +98,39 @@ void IntentUrlParser::handleJoinGame(const QUrlQuery &query)
     connect(joinGameIntent, &Intent::failed, this, [showError](const QString &reason) { showError(reason); });
 
     getLoginCredentialsIntent->execute();
+}
+
+QString IntentUrlParser::generateJoinGameMessage(const ContextJoinGame &context, const QString &gameDescription)
+{
+    const QString hostname = context.roomContext.serverContext.hostname;
+    const QString port = context.roomContext.serverContext.port;
+    const int roomId = context.roomContext.roomId;
+    const int gameId = context.gameId;
+    const QString server = QStringLiteral("%1:%2").arg(hostname, port);
+
+    // Prefer the room name over the raw numeric id: it means something to the
+    // user. The name is only known when we are already connected to the same
+    // server and sitting in that room — otherwise fall back to a plain prompt.
+    AbstractClient *client = mainWindow->getTabSupervisor()->getClient();
+    const bool sameServer = client != nullptr && client->getStatus() == StatusLoggedIn &&
+                            hostname.compare(client->serverName(), Qt::CaseInsensitive) == 0 &&
+                            QString::number(client->serverPort()) == port;
+    TabRoom *roomTab = sameServer ? mainWindow->getTabSupervisor()->getRoomTabs().value(roomId) : nullptr;
+
+    const QString gameIdStr = QString::number(gameId);
+    // Links built by newer clients embed the game description ("game" item);
+    // restate it in the confirm so it matches what the chat anchor showed.
+    // Unknown query items are ignored, so old links without it keep working.
+    // The multi-arg .arg() overloads replace in a single pass, so a description
+    // containing "%…" cannot corrupt later placeholders.
+    // FullyDecoded undoes every %XX escape and must match the chat anchor's
+    // decode mode, so a description containing "%" reads identically in both.
+    if (gameDescription.isEmpty()) {
+        return roomTab ? tr("Join game #%1 in \"%2\" on %3?").arg(gameIdStr, roomTab->getRoomName(), server)
+                       : tr("Join game #%1 on %2?").arg(gameIdStr, server);
+    }
+
+    return roomTab ? tr("Join game \"%1\" (#%2) in \"%3\" on %4?")
+                         .arg(gameDescription, gameIdStr, roomTab->getRoomName(), server)
+                   : tr("Join game \"%1\" (#%2) on %3?").arg(gameDescription, gameIdStr, server);
 }

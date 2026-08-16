@@ -4,6 +4,7 @@
 #include <QUrlQuery>
 
 class MainWindow;
+class ContextJoinGame;
 class IntentUrlParser : public QObject
 {
     Q_OBJECT
@@ -14,6 +15,8 @@ public:
     void handleJoinGame(const QUrlQuery &query);
 
 private:
+    QString generateJoinGameMessage(const ContextJoinGame &context, const QString &gameDescription);
+
     MainWindow *mainWindow;
 };
 
