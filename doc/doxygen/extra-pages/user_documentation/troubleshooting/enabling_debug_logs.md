@@ -104,18 +104,18 @@ Every message Cockatrice logs belongs to a category. The following table lists t
 grouped by area. Enable a category by adding a line like `category = true` to your `qtlogging.ini` file (or use a `.*`
 suffix, e.g. `card_picture_loader.*`, to include all sub categories).
 
-| What you want to see | Categories |
-|----------------------|------------|
-| Card picture loading (URLs, local file hits/misses, downloads, redirects) | `card_picture_loader.*` |
-| Card database loading and parsing | `card_database`, `card_database.loading`, `card_database.loading.success_or_failure`, `cockatrice_xml.*` |
-| Card, set, and deck information | `card_info`, `card_list`, `deck_loader` |
-| Startup sequence and update checks | `window_main.startup.*`, `release_channel`, `spoiler_background_updater` |
-| User interface and themes | `theme_manager`, `sound_engine`, `flow_layout`, `flow_widget.*`, `pixel_map_generator`, `card_info_picture_widget` |
-| Networking and servers | `local_client`, `remote_client`, `tapped_out_interface`, `servers_settings` |
-| In-game logic | `player`, `game_scene.*`, `card_zone.*`, `view_zone`, `game_event_handler` |
-| Dialogs and tabs | `dlg_settings`, `dlg_update`, `dlg_tip_of_the_day`, `tab_game`, `tab_message`, `tab_supervisor` |
-| Settings and shortcuts | `settings_cache`, `shortcuts_settings` |
-| Deck and card filtering | `filter_string`, `deck_filter_string`, `syntax_help` |
+| What you want to see                                                      | Categories                                                                                                         |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Card picture loading (URLs, local file hits/misses, downloads, redirects) | `card_picture_loader.*`                                                                                            |
+| Card database loading and parsing                                         | `card_database`, `card_database.loading`, `card_database.loading.success_or_failure`, `cockatrice_xml.*`           |
+| Card, set, and deck information                                           | `card_info`, `card_list`, `deck_loader`                                                                            |
+| Startup sequence and update checks                                        | `window_main.startup.*`, `release_channel`, `spoiler_background_updater`                                           |
+| User interface and themes                                                 | `theme_manager`, `sound_engine`, `flow_layout`, `flow_widget.*`, `pixel_map_generator`, `card_info_picture_widget` |
+| Networking and servers                                                    | `local_client`, `remote_client`, `tapped_out_interface`, `servers_settings`                                        |
+| In-game logic                                                             | `player`, `game_scene.*`, `card_zone.*`, `view_zone`, `game_event_handler`                                         |
+| Dialogs and tabs                                                          | `dlg_settings`, `dlg_update`, `dlg_tip_of_the_day`, `tab_game`, `tab_message`, `tab_supervisor`                    |
+| Settings and shortcuts                                                    | `settings_cache`, `shortcuts_settings`                                                                             |
+| Deck and card filtering                                                   | `filter_string`, `deck_filter_string`, `syntax_help`                                                               |
 
 For example, to investigate why a card database update seems to fail, enable the card database categories:
 
