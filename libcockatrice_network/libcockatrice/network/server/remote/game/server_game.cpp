@@ -62,7 +62,8 @@ Server_Game::Server_Game(const GameConfig &config, Server_Room *_room)
       spectatorsCanTalk(config.spectatorsCanTalk), spectatorsSeeEverything(config.spectatorsSeeEverything),
       startingLifeTotal(config.startingLifeTotal), shareDecklistsOnLoad(config.shareDecklistsOnLoad),
       inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false),
-      turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr), gameMutex()
+      turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
+      lifecycleStrategy(new Server_DefaultLifecycleStrategy), gameMutex()
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
@@ -328,6 +329,11 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
     }
 
     players = getPlayers(); // players could have been kicked, get new list of players
+    if (lifecycleStrategy->onGameStarting(this) == Server_GameLifecycleStrategy::StartAction::Handled) {
+        locker.unlock();
+        return;
+    }
+
     for (Server_AbstractPlayer *player : players.values()) {
         player->setupZones();
     }
