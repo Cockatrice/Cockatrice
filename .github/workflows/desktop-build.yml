@@ -263,7 +263,7 @@ jobs:
         include:
           - os: macOS
             target: 13
-            runner: macos-26-intel
+            runner: macos-26-intel    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
@@ -279,26 +279,8 @@ jobs:
             xcode: "26.6"
 
           - os: macOS
-            target: 13
-            runner: macos-26
-
-            ccache_eviction_age: 7d
-            cmake_generator: Ninja
-            make_package: 1
-            override_target: 13
-            override_arch: x86_64
-            package_suffix: "-macOS13_Intel2"
-            qt_version: 6.11.0
-            qt_arch: clang_64
-            qt_modules: qtimageformats qtmultimedia qtwebsockets
-            soc: Intel
-            type: Release
-            use_ccache: 1
-            xcode: "26.6"
-
-          - os: macOS
             target: 14
-            runner: macos-26
+            runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
@@ -315,7 +297,7 @@ jobs:
 
           - os: macOS
             target: 15
-            runner: macos-26
+            runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
@@ -332,7 +314,7 @@ jobs:
 
           - os: macOS
             target: 26
-            runner: macos-26
+            runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
@@ -348,7 +330,7 @@ jobs:
 
           - os: Windows
             target: 10
-            runner: windows-2025
+            runner: windows-2025    # https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-VS2026-Readme.md
 
             cmake_generator: "Visual Studio 18 2026"
             cmake_generator_platform: x64
@@ -476,7 +458,6 @@ jobs:
           MAKE_PACKAGE: '${{ matrix.make_package }}'
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
-          CMAKE_OSX_ARCHITECTURES: ${{ matrix.override_arch }}
           USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           VCPKG_DISABLE_METRICS: 1
