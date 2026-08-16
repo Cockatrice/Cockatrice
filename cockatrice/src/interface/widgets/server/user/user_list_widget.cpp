@@ -336,11 +336,12 @@ constexpr int UserInfo = Qt::UserRole + 2;
 // rows (UserListTWI, which uses QTreeWidgetItem::Type) by this item type.
 constexpr int SectionItemType = QTreeWidgetItem::UserType + 1;
 
-UserListItemDelegate::UserListItemDelegate(QTreeWidget *tree,
+UserListItemDelegate::UserListItemDelegate(UserListWidget *owner,
+                                           QTreeWidget *tree,
                                            const QMap<QString, QPixmap> *avatarCache,
                                            const QMap<QString, QPixmap> *cardArtCache,
                                            const QMap<QString, CardArtParams> *cardArtParamsMap)
-    : QStyledItemDelegate(tree), tree(tree), avatarCache(avatarCache), cardArtCache(cardArtCache),
+    : QStyledItemDelegate(tree), tree(tree), owner(owner), avatarCache(avatarCache), cardArtCache(cardArtCache),
       cardArtParamsMap(cardArtParamsMap)
 {
 }
@@ -353,7 +354,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
     if ((event->type() == QEvent::MouseButtonPress) && index.isValid()) {
         QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
         if (mouseEvent->button() == Qt::RightButton) {
-            static_cast<UserListWidget *>(parent())->showContextMenu(mouseEvent->globalPosition().toPoint(), index);
+            owner->showContextMenu(mouseEvent->globalPosition().toPoint(), index);
             return true;
         }
     }
@@ -593,8 +594,8 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->setHeaderHidden(true);
     userTree->setRootIsDecorated(false);
     userTree->setIconSize(QSize(20, 18));
-    itemDelegate =
-        new UserListItemDelegate(userTree, &avatarProvider->cache(), &cardArtProvider->cache(), &cardArtParamsMap);
+    itemDelegate = new UserListItemDelegate(this, userTree, &avatarProvider->cache(), &cardArtProvider->cache(),
+                                            &cardArtParamsMap);
     userTree->setItemDelegate(itemDelegate);
     userTree->setAlternatingRowColors(true);
     userTree->hideColumn(1);

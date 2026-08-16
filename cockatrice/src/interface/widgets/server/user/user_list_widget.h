@@ -37,6 +37,7 @@ class QPlainTextEdit;
 class Response;
 class CommandContainer;
 class UserContextMenu;
+class UserListWidget;
 class QShowEvent;
 
 class BanDialog : public QDialog
@@ -105,12 +106,14 @@ public:
 class UserListItemDelegate : public QStyledItemDelegate
 {
     QTreeWidget *tree;
+    UserListWidget *owner;
     const QMap<QString, QPixmap> *avatarCache;
     const QMap<QString, QPixmap> *cardArtCache;
     const QMap<QString, CardArtParams> *cardArtParamsMap;
 
 public:
-    explicit UserListItemDelegate(QTreeWidget *tree,
+    explicit UserListItemDelegate(UserListWidget *owner,
+                                  QTreeWidget *tree,
                                   const QMap<QString, QPixmap> *avatarCache,
                                   const QMap<QString, QPixmap> *cardArtCache,
                                   const QMap<QString, CardArtParams> *cardArtParamsMap);
