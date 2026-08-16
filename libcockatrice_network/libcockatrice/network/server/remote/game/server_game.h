@@ -22,6 +22,7 @@
 
 #include "../server_response_containers.h"
 #include "game_config.h"
+#include "server_match_result_strategy.h"
 #include "server_deck_validation_strategy.h"
 #include "server_game_lifecycle_strategy.h"
 
@@ -81,6 +82,8 @@ private:
     QTimer *pingClock;
     QList<GameReplay *> replayList;
     GameReplay *currentReplay;
+
+    QScopedPointer<Server_MatchResultStrategy> matchResultStrategy;
 
     QScopedPointer<Server_DeckValidationStrategy> deckValidationStrategy;
 
