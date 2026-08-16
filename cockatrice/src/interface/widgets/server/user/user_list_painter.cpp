@@ -101,23 +101,21 @@ void UserListPainter::drawBackground(QPainter *painter,
         bg.setColorAt(0, blend(style.cardStart, accentColor, selected ? 0.75 : 0.65));
         bg.setColorAt(1, blend(style.cardEnd, accentColor, selected ? 0.18 : 0.10));
     } else {
-        // Regular users are the light theme's neutral paper cards. A flat
-        // warm card fill (the normal row surface, slightly deepened) keeps
-        // every row clearly visible without borrowing a role color. Selection
-        // shifts the fill toward a soft slate so the highlight still reads.
-        const QColor paper = style.cardEnd.darker(108);
-        bg.setColorAt(0, blend(paper, accentColor, selected ? 0.35 : 0.0));
-        bg.setColorAt(1, blend(paper, accentColor, selected ? 0.25 : 0.0));
+        // Regular users keep a scaled-down accent tint so the banner card art
+        // stays legible over a colored backdrop (the pre-branch painter was
+        // always dark-styled) while the role hierarchy still reads.
+        bg.setColorAt(0, blend(style.cardStart, accentColor, (selected ? 0.75 : 0.65) * 0.7));
+        bg.setColorAt(1, blend(style.cardEnd, accentColor, (selected ? 0.18 : 0.10) * 0.7));
     }
 
     painter->setPen(Qt::NoPen);
     painter->setBrush(bg);
     painter->drawRoundedRect(cardRect, 6, 6);
 
-    if (style.dark || hasRole || selected) {
-        painter->setBrush(accentColor);
-        painter->drawRoundedRect(QRectF(cardRect.left(), cardRect.top(), 3, cardRect.height()), 2, 2);
-    }
+    // The 3px accent bar anchors every row so the banner card art reads as a
+    // consistent strip in either scheme (pre-branch parity).
+    painter->setBrush(accentColor);
+    painter->drawRoundedRect(QRectF(cardRect.left(), cardRect.top(), 3, cardRect.height()), 2, 2);
 }
 
 static QString makeKey(const QString &user, const QString &card, const QString &providerId)
