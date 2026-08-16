@@ -22,11 +22,13 @@
 
 #include "../server_response_containers.h"
 #include "game_config.h"
+#include "server_game_lifecycle_strategy.h"
 
 #include <QDateTime>
 #include <QMap>
 #include <QMutex>
 #include <QObject>
+#include <QScopedPointer>
 #include <QSet>
 #include <QStringList>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
@@ -78,6 +80,8 @@ private:
     QTimer *pingClock;
     QList<GameReplay *> replayList;
     GameReplay *currentReplay;
+
+    QScopedPointer<Server_GameLifecycleStrategy> lifecycleStrategy;
 
     void createGameStateChangedEvent(Event_GameStateChanged *event,
                                      Server_AbstractParticipant *recipient,
@@ -208,6 +212,12 @@ public:
                                                                                    GameEventStorageItem::SendToOthers,
                                 int privatePlayerId = -1);
     void returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPlayer *player);
+
+    /** @brief Get the current game lifecycle strategy (non-owning). */
+    Server_GameLifecycleStrategy *getLifecycleStrategy() const
+    {
+        return lifecycleStrategy.data();
+    }
 };
 
 #endif
