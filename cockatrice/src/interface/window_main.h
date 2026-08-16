@@ -56,6 +56,7 @@ class TabSupervisor;
 class WndSets;
 class DlgTipOfTheDay;
 struct ContextConnectToServer;
+class IntentUrlParser;
 
 class MainWindow : public QMainWindow
 {
@@ -84,6 +85,7 @@ private slots:
     void actOpenSettingsFolder();
     void actShow();
     void showWindowIfHidden();
+    void handleCockatriceLink(const QString &url);
 
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -139,6 +141,7 @@ private:
         *aOpenSettingsFolder;
 
     TabSupervisor *tabSupervisor;
+    IntentUrlParser *urlParser;
     WndSets *wndSets;
     ConnectionController *connectionController;
     LocalServer *localServer;

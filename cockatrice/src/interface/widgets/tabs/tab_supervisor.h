@@ -169,6 +169,7 @@ signals:
     void localGameEnded();
     void adminLockChanged(bool lock);
     void showWindowIfHidden();
+    void cockatriceLinkActivated(const QString &url);
 
 public slots:
     void openDeckInNewTab(const LoadedDeck &deckToOpen);

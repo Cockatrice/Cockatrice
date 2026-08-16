@@ -32,6 +32,7 @@ TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabMessage::showCardInfoPopup);
     connect(chatView, &ChatView::deleteCardInfoPopup, this, &TabMessage::deleteCardInfoPopup);
     connect(chatView, &ChatView::addMentionTag, this, &TabMessage::addMentionTag);
+    connect(chatView, &ChatView::cockatriceLinkActivated, this, &TabMessage::cockatriceLinkActivated);
     sayEdit = new LineEditUnfocusable;
     sayEdit->setMaxLength(MAX_TEXT_LENGTH);
     connect(sayEdit, &LineEditUnfocusable::returnPressed, this, &TabMessage::sendMessage);

@@ -406,6 +406,7 @@ int TabSupervisor::myAddTab(Tab *tab, QAction *manager)
 {
     connect(tab, &TabGame::userEvent, this, &TabSupervisor::tabUserEvent);
     connect(tab, &TabGame::tabTextChanged, this, &TabSupervisor::updateTabText);
+    connect(tab, &TabGame::cockatriceLinkActivated, this, &TabSupervisor::cockatriceLinkActivated);
 
     QString tabText = tab->getTabText();
     int idx = addTab(tab, sanitizeTabName(tabText));
@@ -851,6 +852,7 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
     connect(tab, &TabRoom::openMessageDialog, this, &TabSupervisor::addMessageTab);
+    connect(tab, &TabRoom::cockatriceLinkActivated, this, &TabSupervisor::cockatriceLinkActivated);
     myAddTab(tab);
     roomTabs.insert(info.room_id(), tab);
     if (setCurrent) {
@@ -924,6 +926,7 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     tab = new TabMessage(this, client, *userInfo, otherUser, userOnline);
     connect(tab, &TabMessage::talkClosing, this, &TabSupervisor::talkLeft);
     connect(tab, &TabMessage::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
+    connect(tab, &TabMessage::cockatriceLinkActivated, this, &TabSupervisor::cockatriceLinkActivated);
     myAddTab(tab);
     messageTabs.insert(receiverName, tab);
     if (focus) {
