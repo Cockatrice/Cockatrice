@@ -4,10 +4,12 @@
 #include "../server/user/user_list_widget.h"
 #include "../tabs/tab_supervisor.h"
 
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QScreen>
 #include <QUrl>
 #include <QUrlQuery>
 #include <QVBoxLayout>
@@ -21,7 +23,6 @@ DlgInviteToGame::DlgInviteToGame(TabSupervisor *_tabSupervisor,
       excludeUserNames(_excludeUserNames)
 {
     setModal(true);
-    setMinimumWidth(320);
 
     searchEdit = new QLineEdit(this);
     searchEdit->setClearButtonEnabled(true);
@@ -76,6 +77,12 @@ DlgInviteToGame::DlgInviteToGame(TabSupervisor *_tabSupervisor,
 
     updateEmptyLabel();
     retranslateUi();
+
+    // Default to a comfortably tall dialog so the list has room to breathe,
+    // capped by the available screen. No minimum is enforced: small screens
+    // and manual resizing can go shorter than this.
+    const QRect availableScreen = QGuiApplication::primaryScreen()->availableGeometry();
+    resize(sizeHint().width(), qMin(sizeHint().height() * 3, availableScreen.height() * 4 / 5));
 }
 
 void DlgInviteToGame::searchTextChanged(const QString &text)
