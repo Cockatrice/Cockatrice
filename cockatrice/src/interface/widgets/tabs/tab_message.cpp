@@ -96,7 +96,15 @@ void TabMessage::closeEvent(QCloseEvent *event)
 
 void TabMessage::sendMessage()
 {
-    if (sayEdit->text().isEmpty() || !userOnline) {
+    if (sayEdit->text().isEmpty()) {
+        return;
+    }
+
+    if (!userOnline) {
+        // Keep the draft: the user may be back momentarily, and the typed text
+        // should not be lost to a transient offline spell.
+        chatView->appendMessage(
+            tr("Message not sent — %1 is offline.").arg(QString::fromStdString(otherUserInfo->name())));
         return;
     }
 
