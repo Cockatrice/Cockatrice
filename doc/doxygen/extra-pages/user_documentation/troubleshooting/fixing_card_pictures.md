@@ -55,13 +55,13 @@ Cockatrice checks the following locations, in order:
 
 The following import naming schemes are recognized (using both `_` and `-` as separators):
 
-| Scheme                | Pattern                    |
-|-----------------------|----------------------------|
-| Card Name + Provider ID | `{name}_{providerId}`    |
+| Scheme                      | Pattern                    |
+| --------------------------- | -------------------------- |
+| Card Name + Provider ID     | `{name}_{providerId}`      |
 | Card Name + Set + Collector | `{name}_{set}_{collector}` |
 | Set + Collector + Card Name | `{set}_{collector}_{name}` |
-| Card Name + Set       | `{name}_{set}`             |
-| Card Name             | `{name}`                   |
+| Card Name + Set             | `{name}_{set}`             |
+| Card Name                   | `{name}`                   |
 
 If a picture you downloaded or placed manually is wrong, stale, or corrupted, delete the offending file. Pay special
 attention to the `downloadedPics` subfolder: this is where the filesystem caching method writes downloaded images, and
