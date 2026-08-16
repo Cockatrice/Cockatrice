@@ -319,7 +319,7 @@ void GameSelector::customContextMenu(const QPoint &point)
         dlg.exec();
     });
 
-    QAction copyLink(tr("Copy Game Link"));
+    QAction copyLink(tr("Cop&y game link"));
     connect(&copyLink, &QAction::triggered, this, [=, this]() {
         const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
         QGuiApplication::clipboard()->setText(makeGameJoinLink(client->serverName(), client->serverPort(),
