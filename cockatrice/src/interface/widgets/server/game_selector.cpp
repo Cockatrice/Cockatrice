@@ -364,9 +364,22 @@ void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
         return;
     }
 
-    bool spectator = asSpectator || game.player_count() == game.max_players();
-
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
+
+    // Joining a full game without override privileges silently becomes a
+    // spectator join, so ask first instead of surprising the player.
+    const bool gameFull = game.player_count() == game.max_players();
+    if (gameFull && !asSpectator && !asJudge && !overrideRestrictions) {
+        const QMessageBox::StandardButton answer =
+            QMessageBox::question(this, tr("Join game"), tr("The game is full. Join as a spectator instead?"),
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (answer != QMessageBox::Yes) {
+            return;
+        }
+    }
+
+    bool spectator = asSpectator || gameFull;
+
     QString password;
     if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
         bool ok;
