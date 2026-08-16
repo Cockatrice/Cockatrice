@@ -406,6 +406,7 @@ int TabSupervisor::myAddTab(Tab *tab, QAction *manager)
 {
     connect(tab, &TabGame::userEvent, this, &TabSupervisor::tabUserEvent);
     connect(tab, &TabGame::tabTextChanged, this, &TabSupervisor::updateTabText);
+    connect(tab, &TabGame::cockatriceLinkActivated, this, &TabSupervisor::cockatriceLinkActivated);
 
     QString tabText = tab->getTabText();
     int idx = addTab(tab, sanitizeTabName(tabText));

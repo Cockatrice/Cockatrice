@@ -1292,6 +1292,7 @@ void TabGame::createMessageDock(bool bReplay)
             qOverload<const QString &>(&CardInfoFrameWidget::setCard));
     connect(messageLog, &MessageLogWidget::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
     connect(messageLog, &MessageLogWidget::deleteCardInfoPopup, this, &TabGame::deleteCardInfoPopup);
+    connect(messageLog, &MessageLogWidget::cockatriceLinkActivated, this, &TabGame::cockatriceLinkActivated);
 
     if (!bReplay) {
         connect(messageLog, &MessageLogWidget::openMessageDialog, this, &TabGame::openMessageDialog);
