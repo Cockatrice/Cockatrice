@@ -7,6 +7,7 @@
 #include "../interface/widgets/tabs/tab_room.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
+#include "game_link.h"
 #include "games_model.h"
 #include "user/user_list_manager.h"
 
@@ -18,8 +19,6 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTreeView>
-#include <QUrl>
-#include <QUrlQuery>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
@@ -323,16 +322,9 @@ void GameSelector::customContextMenu(const QPoint &point)
     QAction copyLink(tr("Copy Game Link"));
     connect(&copyLink, &QAction::triggered, this, [=, this]() {
         const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
-        QUrl url;
-        url.setScheme("cockatrice");
-        url.setHost("joingame");
-        QUrlQuery query;
-        query.addQueryItem("hostname", client->serverName());
-        query.addQueryItem("port", QString::number(client->serverPort()));
-        query.addQueryItem("roomid", QString::number(gameInfo.room_id()));
-        query.addQueryItem("gameid", QString::number(gameInfo.game_id()));
-        url.setQuery(query);
-        QGuiApplication::clipboard()->setText(url.toString(QUrl::FullyEncoded));
+        QGuiApplication::clipboard()->setText(makeGameJoinLink(client->serverName(), client->serverPort(),
+                                                               gameInfo.room_id(), gameInfo.game_id(),
+                                                               QString::fromStdString(gameInfo.description())));
     });
 
     QMenu menu;

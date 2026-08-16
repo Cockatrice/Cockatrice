@@ -246,6 +246,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/replay/replay_widget.cpp
     src/interface/widgets/server/chat_view/chat_view.cpp
     src/interface/widgets/server/game_filter_configs.cpp
+    src/interface/widgets/server/game_link.cpp
     src/interface/widgets/server/game_selector.cpp
     src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp
     src/interface/widgets/server/games_model.cpp
