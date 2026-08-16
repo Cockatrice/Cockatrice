@@ -12,6 +12,7 @@ set(HEADERS
     game/server_counter.h
     game/game_config.h
     game/server_game.h
+    game/server_match_result_strategy.h
     game/server_player.h
     game/server_spectator.h
     server.h

@@ -22,11 +22,13 @@
 
 #include "../server_response_containers.h"
 #include "game_config.h"
+#include "server_match_result_strategy.h"
 
 #include <QDateTime>
 #include <QMap>
 #include <QMutex>
 #include <QObject>
+#include <QScopedPointer>
 #include <QSet>
 #include <QStringList>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
@@ -78,6 +80,8 @@ private:
     QTimer *pingClock;
     QList<GameReplay *> replayList;
     GameReplay *currentReplay;
+
+    QScopedPointer<Server_MatchResultStrategy> matchResultStrategy;
 
     void createGameStateChangedEvent(Event_GameStateChanged *event,
                                      Server_AbstractParticipant *recipient,
