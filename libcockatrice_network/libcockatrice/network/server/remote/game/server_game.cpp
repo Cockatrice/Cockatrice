@@ -53,34 +53,19 @@
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/utility/zone_names.h>
 
-Server_Game::Server_Game(const ServerInfo_User &_creatorInfo,
-                         int _gameId,
-                         const QString &_description,
-                         const QString &_password,
-                         int _maxPlayers,
-                         const QList<int> &_gameTypes,
-                         bool _onlyBuddies,
-                         bool _onlyRegistered,
-                         bool _spectatorsAllowed,
-                         bool _spectatorsNeedPassword,
-                         bool _spectatorsCanTalk,
-                         bool _spectatorsSeeEverything,
-                         int _startingLifeTotal,
-                         bool _shareDecklistsOnLoad,
-                         Server_Room *_room)
-    : QObject(), room(_room), nextPlayerId(0), hostId(0), creatorInfo(new ServerInfo_User(_creatorInfo)),
-      gameStarted(false), gameClosed(false), gameId(_gameId), password(_password), maxPlayers(_maxPlayers),
-      gameTypes(_gameTypes), activePlayer(-1), activePhase(-1), onlyBuddies(_onlyBuddies),
-      onlyRegistered(_onlyRegistered), spectatorsAllowed(_spectatorsAllowed),
-      spectatorsNeedPassword(_spectatorsNeedPassword), spectatorsCanTalk(_spectatorsCanTalk),
-      spectatorsSeeEverything(_spectatorsSeeEverything), startingLifeTotal(_startingLifeTotal),
-      shareDecklistsOnLoad(_shareDecklistsOnLoad), inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0),
-      firstGameStarted(false), turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
-      gameMutex()
+Server_Game::Server_Game(const GameConfig &config, Server_Room *_room)
+    : QObject(), room(_room), nextPlayerId(0), hostId(0), creatorInfo(new ServerInfo_User(config.creatorInfo)),
+      gameStarted(false), gameClosed(false), gameId(config.gameId), description(config.description.simplified()),
+      password(config.password), maxPlayers(config.maxPlayers), gameTypes(config.gameTypes), activePlayer(-1),
+      activePhase(-1), onlyBuddies(config.onlyBuddies), onlyRegistered(config.onlyRegistered),
+      spectatorsAllowed(config.spectatorsAllowed), spectatorsNeedPassword(config.spectatorsNeedPassword),
+      spectatorsCanTalk(config.spectatorsCanTalk), spectatorsSeeEverything(config.spectatorsSeeEverything),
+      startingLifeTotal(config.startingLifeTotal), shareDecklistsOnLoad(config.shareDecklistsOnLoad),
+      inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false),
+      turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr), gameMutex()
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
-    description = _description.simplified();
 
     connect(this, &Server_Game::sigStartGameIfReady, this, &Server_Game::doStartGameIfReady, Qt::QueuedConnection);
 
