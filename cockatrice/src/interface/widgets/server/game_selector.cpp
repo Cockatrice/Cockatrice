@@ -370,7 +370,12 @@ void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
     QString password;
     if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
         bool ok;
-        password = getTextWithMax(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
+        // Games without a description have no sensible label — fall back to the
+        // game id so the prompt still tells the user which game they're entering.
+        const QString gameLabel = QString::fromStdString(game.description());
+        const QString prompt = gameLabel.isEmpty() ? tr("Password for game #%1:").arg(game.game_id())
+                                                   : tr("Password for \"%1\":").arg(gameLabel);
+        password = getTextWithMax(this, tr("Join game"), prompt, QLineEdit::Password, QString(), &ok);
         if (!ok) {
             return;
         }
