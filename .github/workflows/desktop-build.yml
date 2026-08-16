@@ -278,8 +278,8 @@ jobs:
             xcode: "16.4"
 
           - os: macOS
-            target: 14
-            runner: macos-15
+            target: 14    # EOL Apple 2026-??
+            runner: macos-15    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
@@ -291,7 +291,7 @@ jobs:
             soc: Apple
             type: Release
             use_ccache: 1
-            xcode: "15.4"
+            xcode: "16.4"
 
           - os: macOS
             target: 15
