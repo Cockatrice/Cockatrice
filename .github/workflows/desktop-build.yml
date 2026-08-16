@@ -318,13 +318,12 @@ jobs:
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
-            make_package: 1
             package_suffix: "-macOS26"
             qt_version: 6.11.0
             qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
-            type: Release
+            type: Debug
             use_ccache: 1
             xcode: "26.6"
 
@@ -373,9 +372,9 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          key: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
+          key: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}-${{ matrix.soc }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
           path: ${{ env.CCACHE_DIR }}
-          restore-keys: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-
+          restore-keys: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}-${{ matrix.soc }}-${{ matrix.type }}-
 
       - name: "Install aqtinstall"
         run: pipx install aqtinstall
