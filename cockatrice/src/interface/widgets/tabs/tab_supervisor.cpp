@@ -851,6 +851,7 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
     connect(tab, &TabRoom::openMessageDialog, this, &TabSupervisor::addMessageTab);
+    connect(tab, &TabRoom::cockatriceLinkActivated, this, &TabSupervisor::cockatriceLinkActivated);
     myAddTab(tab);
     roomTabs.insert(info.room_id(), tab);
     if (setCurrent) {
@@ -924,6 +925,7 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     tab = new TabMessage(this, client, *userInfo, otherUser, userOnline);
     connect(tab, &TabMessage::talkClosing, this, &TabSupervisor::talkLeft);
     connect(tab, &TabMessage::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
+    connect(tab, &TabMessage::cockatriceLinkActivated, this, &TabSupervisor::cockatriceLinkActivated);
     myAddTab(tab);
     messageTabs.insert(receiverName, tab);
     if (focus) {

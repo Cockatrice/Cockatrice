@@ -84,6 +84,7 @@ private slots:
     void actOpenSettingsFolder();
     void actShow();
     void showWindowIfHidden();
+    void handleCockatriceLink(const QString &url);
 
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);

@@ -122,6 +122,7 @@ signals:
     void addMentionTag(QString mentionTag);
     void messageClickedSignal();
     void showMentionPopup(const QString &userName);
+    void cockatriceLinkActivated(const QString &url);
 };
 
 #endif

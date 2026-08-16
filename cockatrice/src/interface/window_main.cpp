@@ -40,6 +40,7 @@
 #include "intents/intent_connect_to_server.h"
 #include "intents/intent_login.h"
 #include "intents/intent_open_server_room_by_name.h"
+#include "intents/url_parser.h"
 #include "logger.h"
 #include "version_string.h"
 #include "widgets/dialogs/dlg_connect.h"
@@ -508,6 +509,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(tabSupervisor, &TabSupervisor::setMenu, this, &MainWindow::updateTabMenu);
     connect(tabSupervisor, &TabSupervisor::localGameEnded, this, &MainWindow::localGameEnded);
     connect(tabSupervisor, &TabSupervisor::showWindowIfHidden, this, &MainWindow::showWindowIfHidden);
+    connect(tabSupervisor, &TabSupervisor::cockatriceLinkActivated, this, &MainWindow::handleCockatriceLink);
     connect(connectionController, &ConnectionController::tabSupervisorStartRequested, tabSupervisor,
             &TabSupervisor::start);
     connect(connectionController, &ConnectionController::tabSupervisorStopRequested, tabSupervisor,
@@ -859,6 +861,12 @@ void MainWindow::showWindowIfHidden()
     // keep the previous window state
     setWindowState(windowState() & ~Qt::WindowMinimized);
     show();
+}
+
+void MainWindow::handleCockatriceLink(const QString &url)
+{
+    auto urlParser = new IntentUrlParser(this, this);
+    urlParser->handle(url);
 }
 
 void MainWindow::cardDatabaseLoadingFailed()

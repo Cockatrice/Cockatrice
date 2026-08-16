@@ -777,6 +777,11 @@ void ChatView::mouseReleaseEvent(QMouseEvent *event)
 
 void ChatView::openLink(const QUrl &link)
 {
+    if (link.scheme() == "cockatrice") {
+        emit cockatriceLinkActivated(link.toString(QUrl::FullyEncoded));
+        return;
+    }
+
     if ((link.scheme() == "card") || (link.scheme() == "user")) {
         return;
     }

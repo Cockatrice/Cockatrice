@@ -70,6 +70,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     connect(chatView, &ChatView::showMentionPopup, this, &TabRoom::actShowMentionPopup);
     connect(chatView, &ChatView::messageClickedSignal, this, &TabRoom::focusTab);
     connect(chatView, &ChatView::openMessageDialog, this, &TabRoom::openMessageDialog);
+    connect(chatView, &ChatView::cockatriceLinkActivated, this, &TabRoom::cockatriceLinkActivated);
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabRoom::showCardInfoPopup);
     connect(chatView, &ChatView::deleteCardInfoPopup, this, &TabRoom::deleteCardInfoPopup);
     connect(chatView, &ChatView::addMentionTag, this, &TabRoom::addMentionTag);
