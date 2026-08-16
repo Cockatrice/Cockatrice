@@ -226,7 +226,9 @@ void ChatView::appendGameLinkTag(QTextCursor &cursor, const QString &url)
     const QUrl gameUrl(url);
     const QUrlQuery query(gameUrl);
     const QString hostname = query.queryItemValue("hostname");
-    const QString description = query.queryItemValue("game");
+    // FullyDecoded undoes every %XX escape, so a description that itself
+    // contains "%" cannot end up displayed as "%25" in the label.
+    const QString description = query.queryItemValue("game", QUrl::FullyDecoded);
     const int gameId = query.queryItemValue("gameid").toInt();
 
     QString label;
@@ -544,9 +546,14 @@ void ChatView::checkWord(QTextCursor &cursor, QString &message)
     }
 
     if (fullWordUpToSpaceOrEnd.startsWith("cockatrice://", Qt::CaseInsensitive)) {
-        appendGameLinkTag(cursor, fullWordUpToSpaceOrEnd);
-        cursor.insertText(rest, defaultFormat);
-        return;
+        // Only links to a game (cockatrice://joingame) become invite buttons;
+        // any other cockatrice:// scheme falls through to plain text below.
+        const QUrl gameLink(fullWordUpToSpaceOrEnd);
+        if (gameLink.host().compare("joingame", Qt::CaseInsensitive) == 0) {
+            appendGameLinkTag(cursor, fullWordUpToSpaceOrEnd);
+            cursor.insertText(rest, defaultFormat);
+            return;
+        }
     }
 
     // check word mentions
