@@ -19,6 +19,7 @@ class LineEditUnfocusable;
 class Event_UserMessage;
 class Response;
 class ServerInfo_User;
+class CommandContainer;
 
 class TabMessage : public Tab
 {
@@ -39,7 +40,7 @@ signals:
     void maximizeClient();
 private slots:
     void sendMessage();
-    void messageSent(const Response &response);
+    void messageSent(const Response &response, const CommandContainer &commandContainer, const QVariant &extraData);
     void addMentionTag(QString mentionTag);
     void messageClicked();
 
@@ -50,7 +51,8 @@ public:
     TabMessage(TabSupervisor *_tabSupervisor,
                AbstractClient *_client,
                const ServerInfo_User &_ownUserInfo,
-               const ServerInfo_User &_otherUserInfo);
+               const ServerInfo_User &_otherUserInfo,
+               bool _userOnline);
     ~TabMessage() override;
     void retranslateUi() override;
     void tabActivated() override;
@@ -65,6 +67,7 @@ public:
 private:
     bool shouldShowSystemPopup(const Event_UserMessage &event);
     void showSystemPopup(const Event_UserMessage &event);
+    void notifyUserOffline();
 };
 
 #endif

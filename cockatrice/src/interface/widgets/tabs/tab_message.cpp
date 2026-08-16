@@ -23,9 +23,10 @@
 TabMessage::TabMessage(TabSupervisor *_tabSupervisor,
                        AbstractClient *_client,
                        const ServerInfo_User &_ownUserInfo,
-                       const ServerInfo_User &_otherUserInfo)
+                       const ServerInfo_User &_otherUserInfo,
+                       bool _userOnline)
     : Tab(_tabSupervisor), client(_client), ownUserInfo(new ServerInfo_User(_ownUserInfo)),
-      otherUserInfo(new ServerInfo_User(_otherUserInfo)), userOnline(true)
+      otherUserInfo(new ServerInfo_User(_otherUserInfo)), userOnline(_userOnline)
 {
     chatView = new ChatView(tabSupervisor, 0, true);
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabMessage::showCardInfoPopup);
@@ -103,8 +104,7 @@ void TabMessage::sendMessage()
     if (!userOnline) {
         // Keep the draft: the user may be back momentarily, and the typed text
         // should not be lost to a transient offline spell.
-        chatView->appendMessage(
-            tr("Message not sent — %1 is offline.").arg(QString::fromStdString(otherUserInfo->name())));
+        notifyUserOffline();
         return;
     }
 
@@ -113,17 +113,27 @@ void TabMessage::sendMessage()
     cmd.set_message(sayEdit->text().toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
+    pend->setExtraData(sayEdit->text());
     connect(pend, &PendingCommand::finished, this, &TabMessage::messageSent);
     client->sendCommand(pend);
 
     sayEdit->clear();
 }
 
-void TabMessage::messageSent(const Response &response)
+void TabMessage::messageSent(const Response &response,
+                             const CommandContainer & /*commandContainer*/,
+                             const QVariant &extraData)
 {
     if (response.response_code() == Response::RespInIgnoreList) {
         chatView->appendMessage(tr(
             "This user is ignoring you, they cannot see your messages in main chat and you cannot join their games."));
+    } else if (response.response_code() == Response::RespNameNotFound) {
+        // The recipient went offline before the command reached the server: restore the draft.
+        userOnline = false;
+        if (sayEdit->text().isEmpty()) {
+            sayEdit->setText(extraData.toString());
+        }
+        notifyUserOffline();
     }
 }
 
@@ -182,4 +192,9 @@ void TabMessage::processUserJoined(const ServerInfo_User &_userInfo)
     chatView->appendMessage(tr("%1 has joined the server.").arg(QString::fromStdString(otherUserInfo->name())));
     userOnline = true;
     *otherUserInfo = _userInfo;
+}
+
+void TabMessage::notifyUserOffline()
+{
+    chatView->appendMessage(tr("Message not sent — %1 is offline.").arg(QString::fromStdString(otherUserInfo->name())));
 }

@@ -904,8 +904,10 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     }
 
     ServerInfo_User otherUser;
+    bool userOnline = false;
     if (auto user = userListManager->getOnlineUser(receiverName)) {
         otherUser = ServerInfo_User(*user);
+        userOnline = true;
     } else {
         otherUser.set_name(receiverName.toStdString());
     }
@@ -919,7 +921,7 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
         return tab;
     }
 
-    tab = new TabMessage(this, client, *userInfo, otherUser);
+    tab = new TabMessage(this, client, *userInfo, otherUser, userOnline);
     connect(tab, &TabMessage::talkClosing, this, &TabSupervisor::talkLeft);
     connect(tab, &TabMessage::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     myAddTab(tab);
