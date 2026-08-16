@@ -616,6 +616,11 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
                                           &cardArtProvider->cache(), &cardArtParamsMap,
                                           window()); // parented to main window so it floats above siblings
 
+        // The invite availability is scoped to the room this list belongs to,
+        // and gated on the room's buddy-only setting for the hovered user.
+        userInfoPopup->setGameInviteAvailable(
+            [this](const QString &userName) { return userContextMenu->hasGameInviteLink(userName); });
+
         userInfoPopup->hide();
         userInfoPopup->setWindowOpacity(0.0);
         userInfoPopup->installEventFilter(this);
@@ -944,6 +949,8 @@ void UserListWidget::connectPopupSignals()
 
     // Wire all action signals to UserContextMenu::exec*()
     connect(userInfoPopup, &UserInfoPopup::chatRequested, userContextMenu, &UserContextMenu::execChat);
+    connect(userInfoPopup, &UserInfoPopup::inviteRequested, this,
+            [this](const QString &userName) { userContextMenu->execInvite(userName); });
     connect(userInfoPopup, &UserInfoPopup::detailsRequested, userContextMenu, &UserContextMenu::execDetails);
     connect(userInfoPopup, &UserInfoPopup::showGamesRequested, userContextMenu, &UserContextMenu::execShowGames);
     connect(userInfoPopup, &UserInfoPopup::addBuddyRequested, userContextMenu, &UserContextMenu::execAddToBuddy);
