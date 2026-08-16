@@ -10,6 +10,7 @@ set(HEADERS
     game/server_card.h
     game/server_cardzone.h
     game/server_counter.h
+    game/game_config.h
     game/server_game.h
     game/server_player.h
     game/server_spectator.h
