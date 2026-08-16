@@ -11,6 +11,7 @@
 #include <QtMath>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/settings/card_override_settings.h>
 #include <utility>
 
 /**
@@ -105,11 +106,7 @@ void PrintingSelectorCardOverlayWidget::resizeEvent(QResizeEvent *event)
  *
  * @param event The event triggered when the mouse enters the widget.
  */
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void PrintingSelectorCardOverlayWidget::enterEvent(QEnterEvent *event)
-#else
-void PrintingSelectorCardOverlayWidget::enterEvent(QEvent *event)
-#endif
 {
     QWidget::enterEvent(event);
     deckEditor->updateCard(rootCard);

@@ -1,9 +1,9 @@
 #include "dlg_load_deck_from_clipboard.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../../deck_loader/card_node_function.h"
 #include "../../deck_loader/deck_loader.h"
-#include "dlg_settings.h"
 
 #include <QApplication>
 #include <QCheckBox>

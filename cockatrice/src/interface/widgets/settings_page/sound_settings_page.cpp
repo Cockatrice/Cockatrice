@@ -4,14 +4,17 @@
 #include "../client/sound_engine.h"
 
 #include <QGridLayout>
+#include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/settings/sound_settings.h>
+#include <libcockatrice/utility/macros.h>
 
 SoundSettingsPage::SoundSettingsPage()
 {
-    soundEnabledCheckBox.setChecked(SettingsCache::instance().getSoundEnabled());
-    connect(&soundEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance(),
-            &SettingsCache::setSoundEnabled);
+    soundEnabledCheckBox.setChecked(SettingsCache::instance().sound().getSoundEnabled());
+    connect(&soundEnabledCheckBox, &QCheckBox::QT_STATE_CHANGED, &SettingsCache::instance().sound(),
+            &SoundSettings::setSoundEnabled);
 
-    QString themeName = SettingsCache::instance().getSoundThemeName();
+    QString themeName = SettingsCache::instance().sound().getSoundThemeName();
 
     QStringList themeDirs = soundEngine->getAvailableThemes().keys();
     for (int i = 0; i < themeDirs.size(); i++) {
@@ -27,17 +30,18 @@ SoundSettingsPage::SoundSettingsPage()
     masterVolumeSlider = new QSlider(Qt::Horizontal);
     masterVolumeSlider->setMinimum(0);
     masterVolumeSlider->setMaximum(100);
-    masterVolumeSlider->setValue(SettingsCache::instance().getMasterVolume());
-    masterVolumeSlider->setToolTip(QString::number(SettingsCache::instance().getMasterVolume()));
-    connect(&SettingsCache::instance(), &SettingsCache::masterVolumeChanged, this,
+    masterVolumeSlider->setValue(SettingsCache::instance().sound().getMasterVolume());
+    masterVolumeSlider->setToolTip(QString::number(SettingsCache::instance().sound().getMasterVolume()));
+    connect(&SettingsCache::instance().sound(), &SoundSettings::masterVolumeChanged, this,
             &SoundSettingsPage::masterVolumeChanged);
     connect(masterVolumeSlider, &QSlider::sliderReleased, soundEngine, &SoundEngine::testSound);
-    connect(masterVolumeSlider, &QSlider::valueChanged, &SettingsCache::instance(), &SettingsCache::setMasterVolume);
+    connect(masterVolumeSlider, &QSlider::valueChanged, &SettingsCache::instance().sound(),
+            &SoundSettings::setMasterVolume);
 
     masterVolumeSpinBox = new QSpinBox();
     masterVolumeSpinBox->setMinimum(0);
     masterVolumeSpinBox->setMaximum(100);
-    masterVolumeSpinBox->setValue(SettingsCache::instance().getMasterVolume());
+    masterVolumeSpinBox->setValue(SettingsCache::instance().sound().getMasterVolume());
     connect(masterVolumeSlider, &QSlider::valueChanged, masterVolumeSpinBox, &QSpinBox::setValue);
     connect(masterVolumeSpinBox, qOverload<int>(&QSpinBox::valueChanged), masterVolumeSlider, &QSlider::setValue);
 
@@ -59,7 +63,8 @@ SoundSettingsPage::SoundSettingsPage()
 
     setLayout(mainLayout);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &SoundSettingsPage::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
+            &SoundSettingsPage::retranslateUi);
     retranslateUi();
 }
 
@@ -67,7 +72,7 @@ void SoundSettingsPage::themeBoxChanged(int index)
 {
     QStringList themeDirs = soundEngine->getAvailableThemes().keys();
     if (index >= 0 && index < themeDirs.count()) {
-        SettingsCache::instance().setSoundThemeName(themeDirs.at(index));
+        SettingsCache::instance().sound().setSoundThemeName(themeDirs.at(index));
     }
 }
 

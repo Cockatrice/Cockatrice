@@ -55,6 +55,7 @@ class ServerInfo_User;
 class TabSupervisor;
 class WndSets;
 class DlgTipOfTheDay;
+struct ContextConnectToServer;
 
 class MainWindow : public QMainWindow
 {
@@ -92,6 +93,7 @@ private slots:
     void cardDatabaseAllNewSetsEnabled();
 
     void checkClientUpdatesFinished(bool needToUpdate, bool isCompatible, Release *release);
+    void actCheckCommanderBracketDefinitionUpdates();
 
     void actOpenCustomFolder();
     void actOpenCustomsetsFolder();
@@ -103,6 +105,11 @@ private slots:
 
     void startupConfigCheck();
     void alertForcedOracleRun(const QString &version, bool isUpdate);
+
+    void applyStartupDestination();
+    void onStartupDestinationConnected(int destination, const ContextConnectToServer &serverContext);
+    void startupDestinationFailed(const QString &reason);
+    [[nodiscard]] bool startupDestinationConnectsToServer() const;
 
 private:
     static const QString appName;
@@ -149,6 +156,11 @@ public:
         connectTo = QUrl(QString("cockatrice://%1").arg(url));
     }
     ~MainWindow() override;
+
+    RemoteClient *getRemoteClient() const
+    {
+        return connectionController->client();
+    }
 
     TabSupervisor *getTabSupervisor() const
     {

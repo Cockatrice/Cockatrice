@@ -1630,10 +1630,11 @@ void Server_AbstractPlayer::getInfo(ServerInfo_Player *info,
                                     bool withUserInfo)
 {
     getProperties(*info->mutable_properties(), withUserInfo);
-    if (recipient == this) {
-        if (deck) {
-            info->set_deck_list(deck->writeToString_Native().toStdString());
-        }
+
+    // Deck lists are only shared with other players when the game is in Open Decklists mode,
+    // so a player joining an open lobby can see every deck that was loaded before they joined.
+    if (deck && (recipient == this || game->getShareDecklistsOnLoad())) {
+        info->set_deck_list(deck->writeToString_Native().toStdString());
     }
 
     for (Server_Arrow *arrow : arrows) {

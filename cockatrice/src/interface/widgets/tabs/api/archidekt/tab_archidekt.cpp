@@ -2,12 +2,12 @@
 
 #include "../../../../../client/settings/cache_settings.h"
 #include "../../../cards/additional_info/mana_symbol_widget.h"
+#include "../../../utility/completer_utils.h"
 #include "../../tab_supervisor.h"
 #include "api_response/archidekt_deck_listing_api_response.h"
 #include "display/archidekt_api_response_deck_display_widget.h"
 #include "display/archidekt_api_response_deck_listings_display_widget.h"
 
-#include <QCompleter>
 #include <QDebug>
 #include <QFormLayout>
 #include <QGridLayout>
@@ -19,7 +19,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QPushButton>
-#include <QRegularExpression>
 #include <QResizeEvent>
 #include <QScrollArea>
 #include <QScrollBar>
@@ -27,6 +26,7 @@
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/database/card/card_completer_proxy_model.h>
 #include <libcockatrice/models/database/card/card_search_model.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <version_string.h>
 
 TabArchidekt::TabArchidekt(TabSupervisor *_tabSupervisor)
@@ -131,7 +131,8 @@ void TabArchidekt::initializeUi()
 
     // Settings
     settingsButton = new SettingsButtonWidget(primaryToolbar);
-    cardSizeSlider = new CardSizeWidget(primaryToolbar, nullptr, SettingsCache::instance().getArchidektPreviewSize());
+    cardSizeSlider =
+        new CardSizeWidget(primaryToolbar, nullptr, SettingsCache::instance().cardsDisplay().getArchidektPreviewSize());
     settingsButton->addSettingsWidget(cardSizeSlider);
 
     // Assemble primary toolbar
@@ -277,41 +278,14 @@ void TabArchidekt::setupFilterWidgets()
     auto cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     auto displayModel = new CardDatabaseDisplayModel(this);
     displayModel->setSourceModel(cardDatabaseModel);
-    auto *searchModel = new CardSearchModel(displayModel, this);
 
-    auto *proxyModel = new CardCompleterProxyModel(this);
-    proxyModel->setSourceModel(searchModel);
-    proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    proxyModel->setFilterRole(Qt::DisplayRole);
-
-    auto *completer = new QCompleter(proxyModel, this);
-    completer->setCompletionRole(Qt::DisplayRole);
-    completer->setCompletionMode(QCompleter::PopupCompletion);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setFilterMode(Qt::MatchContains);
-    completer->setMaxVisibleItems(10);
-
-    cardsField->setCompleter(completer);
-    commandersField->setCompleter(completer);
+    const CardCompleterSetup cardSetup = createCardCompleter(displayModel, this);
+    cardsField->setCompleter(cardSetup.completer);
+    commandersField->setCompleter(cardSetup.completer);
 
     // Keep autocomplete working for both fields
-    connect(cardsField, &QLineEdit::textChanged, this, [=](const QString &text) {
-        searchModel->updateSearchResults(text);
-        QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
-        proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
-        if (!text.isEmpty()) {
-            completer->complete();
-        }
-    });
-
-    connect(commandersField, &QLineEdit::textChanged, this, [=](const QString &text) {
-        searchModel->updateSearchResults(text);
-        QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
-        proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
-        if (!text.isEmpty()) {
-            completer->complete();
-        }
-    });
+    connectCardCompleterSearch(cardsField, cardSetup);
+    connectCardCompleterSearch(commandersField, cardSetup);
 
     // Assemble secondary toolbar
     secondaryToolbarLayout->addWidget(bracketLabel);
@@ -337,8 +311,8 @@ void TabArchidekt::connectSignals()
         doSearch();
     });
 
-    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
-            &SettingsCache::setArchidektPreviewCardSize);
+    connect(cardSizeSlider, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setArchidektPreviewCardSize);
 
     // Search button triggers immediate search
     connect(searchButton, &QPushButton::clicked, this, &TabArchidekt::doSearchImmediate);
@@ -639,7 +613,7 @@ void TabArchidekt::processDeckResponse(QJsonObject reply)
 
     auto display = new ArchidektApiResponseDeckDisplayWidget(resultsContainer, deckData, cardSizeSlider);
     connect(display, &ArchidektApiResponseDeckDisplayWidget::requestNavigation, this, &TabArchidekt::actNavigatePage);
-    connect(display, &ArchidektApiResponseDeckDisplayWidget::requestSearch, this, &TabArchidekt::doSearchImmediate);
+    connect(display, &ArchidektApiResponseDeckDisplayWidget::requestSearch, this, &TabArchidekt::doSearch);
     connect(display, &ArchidektApiResponseDeckDisplayWidget::openInDeckEditor, tabSupervisor,
             &TabSupervisor::openDeckInNewTab);
     resultsLayout->addWidget(display);

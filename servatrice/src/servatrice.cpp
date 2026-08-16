@@ -673,8 +673,27 @@ void Servatrice::statusUpdate()
     }
 }
 
+SessionEvent *Servatrice::makeShutdownEvent() const
+{
+    Event_ServerShutdown event;
+    event.set_reason(shutdownReason.toStdString());
+    event.set_minutes(static_cast<google::protobuf::uint32>(shutdownMinutes));
+    return Server_ProtocolHandler::prepareSessionEvent(event);
+}
+
+SessionEvent *Servatrice::getLoginSessionEvent() const
+{
+    // Notify newly logged-in users of a pending server shutdown
+    QMutexLocker locker(&shutdownStateMutex);
+    if (shutdownTimer && shutdownMinutes > 0) {
+        return makeShutdownEvent();
+    }
+    return nullptr;
+}
+
 void Servatrice::scheduleShutdown(const QString &reason, int minutes)
 {
+    shutdownStateMutex.lock();
     shutdownReason = reason;
     shutdownMinutes = minutes;
     nextShutdownMessageMinutes = shutdownMinutes;
@@ -683,6 +702,7 @@ void Servatrice::scheduleShutdown(const QString &reason, int minutes)
         connect(shutdownTimer, SIGNAL(timeout()), this, SLOT(shutdownTimeout()));
         shutdownTimer->start(60000);
     }
+    shutdownStateMutex.unlock();
     shutdownTimeout();
 }
 
@@ -702,6 +722,7 @@ void Servatrice::incRxBytes(quint64 num)
 
 void Servatrice::shutdownTimeout()
 {
+    QMutexLocker locker(&shutdownStateMutex);
     // Show every time counter cut in half & every minute for last 5 minutes
     if (shutdownMinutes <= 5 || shutdownMinutes == nextShutdownMessageMinutes) {
         if (shutdownMinutes == nextShutdownMessageMinutes) {
@@ -710,10 +731,7 @@ void Servatrice::shutdownTimeout()
 
         SessionEvent *se;
         if (shutdownMinutes) {
-            Event_ServerShutdown event;
-            event.set_reason(shutdownReason.toStdString());
-            event.set_minutes(static_cast<google::protobuf::uint32>(shutdownMinutes));
-            se = Server_ProtocolHandler::prepareSessionEvent(event);
+            se = makeShutdownEvent();
         } else {
             Event_ConnectionClosed event;
             event.set_reason(Event_ConnectionClosed::SERVER_SHUTDOWN);

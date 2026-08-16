@@ -1,6 +1,7 @@
 #include "tab_deck_editor_visual.h"
 
 #include "../../../../client/settings/cache_settings.h"
+#include "../../../../client/settings/shortcuts_settings.h"
 #include "../../cards/card_info_display_widget.h"
 #include "../../deck_editor/deck_state_manager.h"
 #include "../../filters/filter_builder.h"
@@ -26,10 +27,11 @@
 #include <QTimer>
 #include <QTreeView>
 #include <QVBoxLayout>
-#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/deck_editor_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
 
 /**
  * @brief Constructs the TabDeckEditorVisual instance.
@@ -65,9 +67,6 @@ void TabDeckEditorVisual::createCentralFrame()
     centralFrame = new QVBoxLayout;
     centralWidget->setLayout(centralFrame);
 
-    auto databaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), true, this);
-    databaseModel->setObjectName("databaseModel");
-
     tabContainer = new TabDeckEditorVisualTabWidget(centralWidget, this, deckStateManager->getModel(), databaseModel);
 
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardChanged, this,
@@ -98,6 +97,33 @@ void TabDeckEditorVisual::onDeckChanged()
     tabContainer->visualDeckView->constructZoneWidgetsFromDeckListModel();
     tabContainer->deckAnalytics->updateDisplays();
     tabContainer->sampleHandWidget->setDeckModel(deckStateManager->getModel());
+}
+
+/** @brief Sets the deck and selects the startup sub-tab matching the context. */
+void TabDeckEditorVisual::setDeck(const LoadedDeck &_deck)
+{
+    AbstractTabDeckEditor::setDeck(_deck);
+
+    int startupTab = SettingsCache::instance().deckEditor().getVdeStartupTab();
+    if (startupTab == VdeStartupTabContext) {
+        // New (empty) decks open on the database display so cards can be added
+        // right away. Existing decks open on the deck view.
+        startupTab = _deck.isEmpty() ? VdeStartupTabDatabaseDisplay : VdeStartupTabDeckDisplay;
+    }
+
+    switch (startupTab) {
+        case VdeStartupTabDatabaseDisplay:
+            tabContainer->setCurrentIndex(TabDeckEditorVisualTabWidget::TabIndex::VisualDatabaseDisplay);
+            break;
+        case VdeStartupTabDeckDisplay:
+            tabContainer->setCurrentIndex(TabDeckEditorVisualTabWidget::TabIndex::VisualDeckView);
+            break;
+        default:
+            qCWarning(TabSupervisorLog) << "Unknown VdeStartupTab [" << startupTab
+                                        << "]; falling back to the deck view";
+            tabContainer->setCurrentIndex(TabDeckEditorVisualTabWidget::TabIndex::VisualDeckView);
+            break;
+    }
 }
 
 /** @brief Creates menus for deck editing and view options, including dock actions. */

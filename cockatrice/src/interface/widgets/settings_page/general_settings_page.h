@@ -30,6 +30,7 @@ private slots:
     void tokenDatabasePathButtonClicked();
     void resetAllPathsClicked();
     void languageBoxChanged(int index);
+    void updateStartupServerControlsVisibility();
 
 private:
     QStringList findQmFiles();
@@ -71,6 +72,12 @@ private:
     QLabel updateReleaseChannelLabel;
     QLabel advertiseTranslationPageLabel;
     QCheckBox showTipsOnStartup;
+    QLabel startupTabLabel;
+    QComboBox startupTabSelector;
+    QLabel startupServerLabel;
+    QComboBox startupServerSelector;
+    QLabel startupRoomLabel;
+    QLineEdit *startupRoomNameEdit;
 };
 
 #endif // COCKATRICE_GENERAL_SETTINGS_PAGE_H

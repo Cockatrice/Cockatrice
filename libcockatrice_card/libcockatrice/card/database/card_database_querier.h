@@ -220,6 +220,16 @@ public:
 private:
     const CardDatabase *db;               //!< Card database used for all lookups.
     const ICardPreferenceProvider *prefs; //!< Preference provider for preferred printings.
+
+    // Count maps are expensive to compute (they iterate the whole database) and are
+    // queried every time a filter widget is built, so cache them and invalidate on
+    // any database mutation. Only the main thread reads or writes these.
+    mutable QMap<QString, int> mainCardTypeCountsCache;
+    mutable QMap<QString, int> subCardTypeCountsCache;
+    mutable QMap<QString, int> formatsCountCache;
+
+private slots:
+    void invalidateCaches();
 };
 
 #endif // COCKATRICE_CARD_DATABASE_QUERIER_H

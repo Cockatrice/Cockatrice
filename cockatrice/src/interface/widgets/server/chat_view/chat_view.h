@@ -60,6 +60,7 @@ private:
     QStringList highlightedWords;
     bool evenNumber;
     bool showTimestamps;
+    bool stickToBottom = false;
     HoveredItemType hoveredItemType;
     QString hoveredContent;
     QAction *messageClicked;
@@ -67,6 +68,7 @@ private:
 
     [[nodiscard]] QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
     QTextCursor prepareBlock(bool same = false);
+    void scrollToBottom();
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
     static QColor getCustomMentionColor();
@@ -81,12 +83,15 @@ private:
     QColor otherUserColor = QColor(0, 65, 255); // dark blue
     QColor serverMessageColor = QColor(0x85, 0x15, 0x15);
     QColor linkColor;
+    QColor unresolvedCardTagColor;
 
 private slots:
     void openLink(const QUrl &link);
     void actMessageClicked();
     void adjustColorsToPalette();
     void refreshBlockColors();
+    void onScrollBarRangeChanged();
+    void onScrollBarValueChanged(int value);
 
 public:
     ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _showTimestamps, QWidget *parent = nullptr);
@@ -103,11 +108,7 @@ public:
     void redactMessages(const QString &userName, int amount);
 
 protected:
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     void enterEvent(QEnterEvent *event) override;
-#else
-    void enterEvent(QEvent *event) override;
-#endif
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;

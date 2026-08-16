@@ -13,12 +13,13 @@
 #include "player_dialogs.h"
 
 #include <QGraphicsView>
+#include <libcockatrice/settings/interface_settings.h>
 
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 {
-    connect(&SettingsCache::instance(), &SettingsCache::horizontalHandChanged, this,
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::horizontalHandChanged, this,
             &PlayerGraphicsItem::rearrangeZones);
-    connect(&SettingsCache::instance(), &SettingsCache::handJustificationChanged, this,
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::handJustificationChanged, this,
             &PlayerGraphicsItem::rearrangeZones);
     connect(player, &PlayerLogic::rearrangeCounters, this, &PlayerGraphicsItem::rearrangeCounters);
     connect(player, &PlayerLogic::activeChanged, this, &PlayerGraphicsItem::onPlayerActiveChanged);
@@ -148,7 +149,7 @@ qreal PlayerGraphicsItem::getMinimumWidth() const
 {
     qreal result = tableZoneGraphicsItem->getMinimumWidth() + CardDimensions::HEIGHT_F + 15 + counterAreaWidth +
                    stackZoneGraphicsItem->boundingRect().width();
-    if (!SettingsCache::instance().getHorizontalHand()) {
+    if (!SettingsCache::instance().userInterface().getHorizontalHand()) {
         result += handZoneGraphicsItem->boundingRect().width();
     }
     return result;
@@ -165,7 +166,7 @@ void PlayerGraphicsItem::processSceneSizeChange(int newPlayerWidth)
     // Extend table (and hand, if horizontal) to accommodate the new player width.
     qreal tableWidth = newPlayerWidth - CardDimensions::HEIGHT_F - 15 - counterAreaWidth -
                        stackZoneGraphicsItem->boundingRect().width();
-    if (!SettingsCache::instance().getHorizontalHand()) {
+    if (!SettingsCache::instance().userInterface().getHorizontalHand()) {
         tableWidth -= handZoneGraphicsItem->boundingRect().width();
     }
 
@@ -187,6 +188,11 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
     AbstractCounter *widget;
     if (state->getName() == "life") {
         widget = playerTarget->addCounter(state);
+        connect(state, &CounterState::valueChanged, this, [this](int oldValue, int newValue) {
+            if (newValue < oldValue) {
+                tableZoneGraphicsItem->triggerDamageShimmer();
+            }
+        });
     } else {
         widget = new GeneralCounter(state, player, true, this);
     }
@@ -233,7 +239,7 @@ void PlayerGraphicsItem::rearrangeCounters()
 void PlayerGraphicsItem::rearrangeZones()
 {
     auto base = QPointF(CardDimensions::HEIGHT_F + counterAreaWidth + 15, 0);
-    if (SettingsCache::instance().getHorizontalHand()) {
+    if (SettingsCache::instance().userInterface().getHorizontalHand()) {
         if (mirrored) {
             if (player->getHandZone()->contentsKnown()) {
                 handVisible = true;
@@ -284,7 +290,7 @@ void PlayerGraphicsItem::updateBoundingRect()
 {
     prepareGeometryChange();
     qreal width = CardDimensions::HEIGHT_F + 15 + counterAreaWidth + stackZoneGraphicsItem->boundingRect().width();
-    if (SettingsCache::instance().getHorizontalHand()) {
+    if (SettingsCache::instance().userInterface().getHorizontalHand()) {
         qreal handHeight = handVisible ? handZoneGraphicsItem->boundingRect().height() : 0;
         bRect = QRectF(0, 0, width + tableZoneGraphicsItem->boundingRect().width(),
                        tableZoneGraphicsItem->boundingRect().height() + handHeight);

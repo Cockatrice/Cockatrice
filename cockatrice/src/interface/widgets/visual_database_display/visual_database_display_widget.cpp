@@ -16,10 +16,12 @@
 
 #include <QHeaderView>
 #include <QScrollBar>
+#include <QShowEvent>
 #include <QStyledItemDelegate>
 #include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <utility>
 
 VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
@@ -51,9 +53,10 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarPolicy::ScrollBarAsNeeded);
-    cardSizeWidget = new CardSizeWidget(this, flowWidget, SettingsCache::instance().getVisualDatabaseDisplayCardSize());
-    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance(),
-            &SettingsCache::setVisualDatabaseDisplayCardSize);
+    cardSizeWidget = new CardSizeWidget(this, flowWidget,
+                                        SettingsCache::instance().cardsDisplay().getVisualDatabaseDisplayCardSize());
+    connect(cardSizeWidget, &CardSizeWidget::cardSizeSettingUpdated, &SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::setVisualDatabaseDisplayCardSize);
 
     searchContainer = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
 
@@ -138,9 +141,6 @@ void VisualDatabaseDisplayWidget::initialize()
 {
     databaseLoadIndicator->setVisible(false);
 
-    filterContainer->initialize();
-    filterContainer->setVisible(true);
-
     searchContainer->addWidget(colorFilterWidget);
     searchContainer->addWidget(clearFilterWidget);
     searchContainer->addWidget(searchEdit);
@@ -156,17 +156,43 @@ void VisualDatabaseDisplayWidget::initialize()
 
     mainLayout->addWidget(cardSizeWidget);
 
-    databaseDisplayModel->setFilterTree(filterModel->filterTree());
-
     connect(filterModel, &FilterTreeModel::layoutChanged, this, &VisualDatabaseDisplayWidget::onSearchModelChanged);
 
-    loadCardsTimer = new QTimer(this);
-    loadCardsTimer->setSingleShot(true); // Ensure it only fires once after the timeout
+    initializeFilters();
+}
 
-    connect(loadCardsTimer, &QTimer::timeout, this, [this]() { loadCurrentPage(); });
-    loadCardsTimer->start(5000);
+void VisualDatabaseDisplayWidget::initializeFilters()
+{
+    if (filtersInitialized || !isVisible() || CardDatabaseManager::getInstance()->getLoadStatus() != LoadStatus::Ok) {
+        return;
+    }
 
-    retranslateUi();
+    filtersInitialized = true;
+
+    // The filter toolbar builds its widgets by iterating the entire card database
+    // (per-set, per-main-type, per-sub-type and per-format buttons). Building it
+    // inside showEvent would block the tab switch, so keep it hidden and defer the
+    // build to the next event loop turn, letting the tab paint first. The toolbar
+    // then appears one event loop turn later, shifting the grid down by the toolbar
+    // height -- the intended tradeoff of an responsive tab switch.
+    filterContainer->setVisible(false);
+
+    QTimer::singleShot(0, this, [this] {
+        filterContainer->initialize();
+        filterContainer->setVisible(true);
+
+        databaseDisplayModel->setFilterTree(filterModel->filterTree());
+
+        QTimer::singleShot(5000, this, [this] { loadCurrentPage(); });
+
+        retranslateUi();
+    });
+}
+
+void VisualDatabaseDisplayWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    initializeFilters();
 }
 
 void VisualDatabaseDisplayWidget::retranslateUi()
@@ -290,9 +316,17 @@ void VisualDatabaseDisplayWidget::loadCurrentPage()
 {
     // Ensure only the initial page is loaded
     if (currentPage == 0) {
-        // Only load the first page initially
-        qCDebug(VisualDatabaseDisplayLog) << "Loading the first page";
-        populateCards();
+        if (!initialLoadScheduled) {
+            initialLoadScheduled = true;
+            qCDebug(VisualDatabaseDisplayLog) << "Loading the first page";
+            // Defer the first page so the tab switch stays responsive. The card
+            // grid builds one event loop turn later. This also applies to
+            // search-driven reloads, which reset currentPage back to 0.
+            QTimer::singleShot(0, this, [this] {
+                initialLoadScheduled = false;
+                populateCards();
+            });
+        }
     } else if (nearEndOfPage()) {
         // If not the first page, just load the next page and append to the flow widget
         loadNextPage();

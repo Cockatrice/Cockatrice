@@ -58,6 +58,14 @@ public:
     const DeckList &getDeckList() const;
 
     /**
+     * @brief Gets the underlying DeckList.
+     */
+    QSharedPointer<DeckList> getDeckListShared() const
+    {
+        return deckList;
+    }
+
+    /**
      * @brief Creates a LoadedDeck containing the contents of the current deck and the current LoadInfo.
      *
      * @return A new LoadedDeck instance.

@@ -21,6 +21,7 @@
 #include <QTreeView>
 #include <libcockatrice/card/card_info.h>
 
+class CommanderBracketWidget;
 class DeckListModel;
 class AbstractTabDeckEditor;
 class DeckEditorDeckDockWidget : public QDockWidget
@@ -88,6 +89,8 @@ private:
     QComboBox *formatComboBox;
 
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
+
+    CommanderBracketWidget *commanderBracketWidget;
 
     DeckListModel *getModel() const;
     [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;

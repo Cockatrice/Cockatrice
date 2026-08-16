@@ -21,6 +21,7 @@
 #define SERVERGAME_H
 
 #include "../server_response_containers.h"
+#include "game_config.h"
 
 #include <QDateTime>
 #include <QMap>
@@ -92,21 +93,7 @@ private slots:
 
 public:
     mutable QRecursiveMutex gameMutex;
-    Server_Game(const ServerInfo_User &_creatorInfo,
-                int _gameId,
-                const QString &_description,
-                const QString &_password,
-                int _maxPlayers,
-                const QList<int> &_gameTypes,
-                bool _onlyBuddies,
-                bool _onlyRegistered,
-                bool _spectatorsAllowed,
-                bool _spectatorsNeedPassword,
-                bool _spectatorsCanTalk,
-                bool _spectatorsSeeEverything,
-                int _startingLifeTotal,
-                bool _shareDecklistsOnLoad,
-                Server_Room *parent);
+    Server_Game(const GameConfig &config, Server_Room *parent);
     ~Server_Game() override;
     Server_Room *getRoom() const
     {

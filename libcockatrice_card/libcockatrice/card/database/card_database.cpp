@@ -20,6 +20,7 @@ CardDatabase::CardDatabase(QObject *parent,
 {
     qRegisterMetaType<CardInfoPtr>("CardInfoPtr");
     qRegisterMetaType<CardInfoPtr>("CardSetPtr");
+    qRegisterMetaType<CardDatabaseData>("CardDatabaseData");
 
     // create loader and wire it up
     loader = new CardDatabaseLoader(this, this, pathProvider, prefs, setPriorityController);
@@ -28,6 +29,10 @@ CardDatabase::CardDatabase(QObject *parent,
     connect(loader, &CardDatabaseLoader::loadingFailed, this, &CardDatabase::cardDatabaseLoadingFailed);
     connect(loader, &CardDatabaseLoader::newSetsFound, this, &CardDatabase::cardDatabaseNewSetsFound);
     connect(loader, &CardDatabaseLoader::allNewSetsEnabled, this, &CardDatabase::cardDatabaseAllNewSetsEnabled);
+    // swap the finished snapshot into the live database. Uses AutoConnection so
+    // that cross-thread loads are delivered via the event loop while same-thread/
+    // synchronous callers get the swap immediately.
+    connect(loader, &CardDatabaseLoader::databaseDataReady, this, &CardDatabase::swapInDatabaseData);
 
     querier = new CardDatabaseQuerier(this, this, prefs);
 }
@@ -66,7 +71,12 @@ void CardDatabase::reloadCardDatabasesAndNotify()
     loadCardDatabases();
 
     if (loadStatus == Ok) {
-        notifyEnabledSetsChanged();
+        checkUnknownSets();
+        // A reload reconstructs the exact same enabled-set state, so the cached
+        // set-name / alt-name data computed during construction is still valid.
+        // Skipping the per-card refresh avoids a full 36k-card recompute that
+        // would otherwise duplicate the work already done while building cards.
+        notifyEnabledSetsChanged(false);
     }
 }
 
@@ -77,13 +87,18 @@ bool CardDatabase::saveCustomTokensToFile()
 
 void CardDatabase::refreshCachedReverseRelatedCards()
 {
-    for (const auto &card : cards) {
+    refreshCachedReverseRelatedCards(cards);
+}
+
+void CardDatabase::refreshCachedReverseRelatedCards(CardNameMap &cardMap)
+{
+    for (const auto &card : cardMap) {
         card->resetReverseRelatedCards2Me();
     }
 
-    for (const auto &card : cards) {
+    for (const auto &card : cardMap) {
         for (auto *rel : card->getReverseRelatedCards()) {
-            if (auto target = cards.value(rel->getName())) {
+            if (auto target = cardMap.value(rel->getName())) {
                 auto *newRel = new CardRelation(card->getName(), rel->getAttachType(), rel->getIsCreateAllExclusion(),
                                                 rel->getIsVariable(), rel->getDefaultCount(), rel->getIsPersistent(),
                                                 rel->getIsFaceDown());
@@ -205,11 +220,15 @@ void CardDatabase::markAllSetsAsKnown()
     _sets.markAllAsKnown();
 }
 
-void CardDatabase::notifyEnabledSetsChanged()
+void CardDatabase::notifyEnabledSetsChanged(bool recomputeCachedSets)
 {
-    // refresh the list of cached set names
-    for (const CardInfoPtr &card : cards) {
-        card->refreshCachedSets();
+    if (recomputeCachedSets) {
+        // refresh the list of cached set names / alt names for every card; this is
+        // only needed when the enabled-set state actually changed (e.g. the user
+        // toggled a set in the settings UI).
+        for (const CardInfoPtr &card : cards) {
+            card->refreshCachedSets();
+        }
     }
 
     // inform the carddatabasemodels that they need to re-check their list of cards
@@ -219,4 +238,31 @@ void CardDatabase::notifyEnabledSetsChanged()
 void CardDatabase::addFormat(const FormatRulesPtr &format)
 {
     formats.insert(format->formatName.toLower(), format);
+}
+
+void CardDatabase::swapInDatabaseData(CardDatabaseData data)
+{
+    for (const auto &card : cards) {
+        for (auto *rel : card->getRelatedCards()) {
+            rel->deleteLater();
+        }
+        for (auto *rel : card->getReverseRelatedCards()) {
+            rel->deleteLater();
+        }
+        for (auto *rel : card->getReverseRelatedCards2Me()) {
+            rel->deleteLater();
+        }
+    }
+
+    cards = std::move(data.cards);
+    simpleNameCards = std::move(data.simpleNameCards);
+    sets = std::move(data.sets);
+    formats = std::move(data.formats);
+
+    loadStatus = cards.isEmpty() ? NotLoaded : Ok;
+
+    // inform listeners that the whole database was replaced; they should
+    // rebuild from the live containers in a single batch instead of reacting
+    // to individual card additions.
+    emit cardDatabaseReset();
 }

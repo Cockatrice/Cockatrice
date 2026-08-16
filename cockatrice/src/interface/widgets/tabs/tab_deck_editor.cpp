@@ -1,6 +1,7 @@
 #include "tab_deck_editor.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../deck_editor/deck_state_manager.h"
 #include "../filters/filter_builder.h"
 #include "../interface/pixel_map_generator.h"
@@ -21,6 +22,8 @@
 #include <libcockatrice/models/database/card_database_model.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
 
 /**
  * @brief Constructs a new TabDeckEditor object.
@@ -59,7 +62,8 @@ void TabDeckEditor::createMenus()
     registerDockWidget(viewMenu, filterDockWidget, {250, 250});
     registerDockWidget(viewMenu, printingSelectorDockWidget, {525, 250});
 
-    connect(&SettingsCache::instance(), &SettingsCache::overrideAllCardArtWithPersonalPreferenceChanged, this,
+    connect(&SettingsCache::instance().cardsDisplay(),
+            &CardsDisplaySettings::overrideAllCardArtWithPersonalPreferenceChanged, this,
             [this](bool enabled) { dockToActions[printingSelectorDockWidget].menu->setEnabled(!enabled); });
 
     viewMenu->addSeparator();

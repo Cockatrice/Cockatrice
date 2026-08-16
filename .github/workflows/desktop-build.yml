@@ -3,7 +3,7 @@ name: Build Desktop
 permissions:
   actions: write    # needed to delete entries in GHA cache (update ccache)
   attestations: write    # needed to persist the attestation.
-  contents: write
+  contents: write    # needed for e.g. vcpkg dependency graph updates
   id-token: write    # needed for signing certificate in attestation
 
 on:
@@ -271,7 +271,6 @@ jobs:
             override_target: 13
             package_suffix: "-macOS13_Intel"
             qt_version: 6.11.0
-            qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Intel
             type: Release
@@ -288,7 +287,6 @@ jobs:
             override_target: 14
             package_suffix: "-macOS14"
             qt_version: 6.11.0
-            qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
@@ -305,7 +303,6 @@ jobs:
             override_target: 15
             package_suffix: "-macOS15"
             qt_version: 6.11.0
-            qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
@@ -320,7 +317,6 @@ jobs:
             cmake_generator: Ninja
             package_suffix: "-macOS26"
             qt_version: 6.11.0
-            qt_arch: clang_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Debug
@@ -336,7 +332,6 @@ jobs:
             make_package: 1
             package_suffix: "-Win10"
             qt_version: 6.11.0
-            qt_arch: win64_msvc2022_64
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
 
@@ -401,7 +396,6 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
-          arch: ${{ matrix.qt_arch }}
           cache: false
           dir: ${{ github.workspace }}
           modules: ${{ matrix.qt_modules }}
@@ -424,7 +418,6 @@ jobs:
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
-          arch: ${{ matrix.qt_arch }}
           cache: true
           modules: ${{ matrix.qt_modules }}
           version: ${{ steps.resolve_qt_version.outputs.version }}
@@ -450,6 +443,7 @@ jobs:
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
+          GITHUB_TOKEN: ${{ github.token }}    # needed for vcpkg dependency graph updates, see VCPKG_FEATURE_FLAGS
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
@@ -460,6 +454,7 @@ jobs:
           USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           VCPKG_DISABLE_METRICS: 1
+          VCPKG_FEATURE_FLAGS: dependencygraph
         run: .ci/compile.sh --server --test --vcpkg
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342

@@ -1,6 +1,7 @@
 #include "user_info_popup.h"
 
 #include "../../interface/pixel_map_generator.h"
+#include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
 #include "user_list_painter.h"
 
@@ -21,6 +22,42 @@
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+
+/// Qt stylesheets accept #aarrggbb, which is QColor::name(QColor::HexArgb).
+static QString colorStr(const QColor &color)
+{
+    return color.name(QColor::HexArgb);
+}
+
+PopupTheme PopupTheme::fromPalette(const QPalette &palette, bool dark)
+{
+    PopupTheme t;
+    t.dark = dark;
+    const QColor window = palette.color(QPalette::Window);
+    const QColor base = palette.color(QPalette::Base);
+    const QColor mid = palette.color(QPalette::Mid);
+    const QColor text = palette.color(QPalette::Text);
+    const QColor disabledText = palette.color(QPalette::Disabled, QPalette::Text);
+    const QColor highlight = palette.color(QPalette::Highlight);
+
+    t.bg = window;
+    t.border = mid;
+    t.text = text;
+    t.subText = disabledText;
+    t.statusText = disabledText;
+    t.buttonBg = base;
+    t.buttonBorder = mid;
+    t.buttonHover = UserListPainter::blend(base, highlight, dark ? 0.30 : 0.12);
+    t.buttonPressed = UserListPainter::blend(base, highlight, dark ? 0.50 : 0.25);
+    t.buttonDisabled = disabledText;
+    t.closeBg = UserListPainter::blend(base, window, 0.5);
+    t.closeHover = dark ? QColor(200, 50, 50) : UserListPainter::blend(QColor(200, 50, 50), base, 0.45);
+    t.gamesRow = base;
+    t.gamesSelected = UserListPainter::blend(base, highlight, dark ? 0.45 : 0.30);
+    t.gamesSeparator = mid;
+    t.gamesSeparator.setAlpha(90);
+    return t;
+}
 
 // ── Compact game row delegate ─────────────────────────────────────────────────
 
@@ -48,8 +85,14 @@ public:
         const QRect rect = option.rect;
         const ServerInfo_Game game = var.value<ServerInfo_Game>();
         const bool selected = option.state & QStyle::State_Selected;
+        const bool dark = themeManager && themeManager->isDarkModeActive();
+        // The widget palette can be stale after a runtime theme change, so the
+        // rows are styled from the application palette (always current).
+        const QPalette pal = qApp->palette();
+        const QColor base = pal.color(QPalette::Base);
+        const QColor highlight = pal.color(QPalette::Highlight);
 
-        p->fillRect(rect, selected ? QColor(35, 45, 62) : QColor(14, 18, 26));
+        p->fillRect(rect, selected ? UserListPainter::blend(base, highlight, dark ? 0.45 : 0.30) : base);
 
         // State colour dot
         const QColor dot = game.started()                                ? QColor(239, 68, 68)
@@ -64,7 +107,7 @@ public:
         QFont tf = option.font;
         tf.setBold(true);
         p->setFont(tf);
-        p->setPen(QColor(205, 215, 230));
+        p->setPen(pal.color(QPalette::Text));
         const int textX = rect.left() + 26;
         const int countW = 52;
         const int titleW = rect.width() - textX - countW - 6;
@@ -74,13 +117,15 @@ public:
         // Player count
         const bool full = game.player_count() >= game.max_players();
         p->setFont(option.font);
-        p->setPen(full ? QColor(249, 115, 22) : QColor(110, 128, 150));
+        p->setPen(full ? QColor(249, 115, 22) : pal.color(QPalette::Disabled, QPalette::Text));
         p->drawText(QRect(rect.right() - countW - 4, rect.top(), countW, rect.height()),
                     Qt::AlignVCenter | Qt::AlignRight,
                     QStringLiteral("%1/%2").arg(game.player_count()).arg(game.max_players()));
 
         // Row separator
-        p->setPen(QColor(24, 32, 44));
+        QColor separator = pal.color(QPalette::Mid);
+        separator.setAlpha(90);
+        p->setPen(separator);
         p->drawLine(rect.bottomLeft(), rect.bottomRight());
 
         p->restore();
@@ -95,17 +140,17 @@ UserInfoHeaderWidget::UserInfoHeaderWidget(QWidget *parent) : QWidget(parent)
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 }
 
-void UserInfoHeaderWidget::setUserData(const ServerInfo_User &user,
-                                       bool online,
-                                       const QPixmap &avatar,
-                                       const QPixmap &cardArt,
-                                       const CardArtParams &params)
+void UserInfoHeaderWidget::setUserData(const ServerInfo_User &_user,
+                                       bool _online,
+                                       const QPixmap &_avatar,
+                                       const QPixmap &_cardArt,
+                                       const CardArtParams &_params)
 {
-    m_user = user;
-    m_online = online;
-    m_avatar = avatar;
-    m_cardArt = cardArt;
-    m_params = params;
+    user = _user;
+    online = _online;
+    avatar = _avatar;
+    cardArt = _cardArt;
+    params = _params;
     update();
 }
 
@@ -115,29 +160,37 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
     p.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform | QPainter::TextAntialiasing);
 
     const QRect rect = this->rect();
-    const UserLevelFlags level(m_user.user_level());
-    const QString userName = QString::fromStdString(m_user.name());
-    const QString privLevel = QString::fromStdString(m_user.privlevel());
+    const UserLevelFlags level(user.user_level());
+    const QString userName = QString::fromStdString(user.name());
+    const QString privLevel = QString::fromStdString(user.privlevel());
 
-    // Dark base
-    p.fillRect(rect, QColor(14, 18, 26));
+    const bool dark = themeManager && themeManager->isDarkModeActive();
+    const UserListPainter::Style style = UserListPainter::resolveStyle(qApp->palette(), dark);
+
+    // Palette surface
+    {
+        QLinearGradient bg(0, 0, rect.width(), 0);
+        bg.setColorAt(0, style.cardStart);
+        bg.setColorAt(1, style.cardEnd);
+        p.fillRect(rect, bg);
+    }
 
     // ── Card art background ───────────────────────────────────────────────────
-    if (!m_cardArt.isNull()) {
+    if (!cardArt.isNull()) {
         const int w = rect.width();
         const int h = rect.height();
-        const int mL = qRound(w * m_params.marginPctL);
-        const int mR = qRound(w * m_params.marginPctR);
+        const int mL = qRound(w * params.marginPctL);
+        const int mR = qRound(w * params.marginPctR);
         const int dW = w - mL - mR;
 
-        const double base = qMax(double(dW) / m_cardArt.width(), double(h) / m_cardArt.height());
-        const double scale = base * m_params.zoom;
-        const int sW = qRound(m_cardArt.width() * scale);
-        const int sH = qRound(m_cardArt.height() * scale);
+        const double base = qMax(double(dW) / cardArt.width(), double(h) / cardArt.height());
+        const double scale = base * params.zoom;
+        const int sW = qRound(cardArt.width() * scale);
+        const int sH = qRound(cardArt.height() * scale);
 
-        const QPixmap scaled = m_cardArt.scaled(sW, sH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        const QPixmap scaled = cardArt.scaled(sW, sH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         const int srcX = (sW - dW) / 2;
-        const int srcY = qBound(0, qRound((sH - h) * m_params.verticalOffset), qMax(0, sH - h));
+        const int srcY = qBound(0, qRound((sH - h) * params.verticalOffset), qMax(0, sH - h));
 
         QImage img = scaled.copy(srcX, srcY, dW, h).toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);
         {
@@ -155,12 +208,14 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
         p.setOpacity(1.0);
     }
 
-    // Bottom gradient overlay so avatar and text are always legible
+    // Bottom gradient overlay so avatar and text are always legible. The scrim
+    // is the palette's Window color so it reads naturally in either scheme.
     {
+        const QColor scrim = qApp->palette().color(QPalette::Window);
         QLinearGradient ov(0, 0, 0, rect.height());
-        ov.setColorAt(0.0, QColor(14, 18, 26, 0));
-        ov.setColorAt(0.55, QColor(14, 18, 26, 110));
-        ov.setColorAt(1.0, QColor(14, 18, 26, 230));
+        ov.setColorAt(0.0, QColor(scrim.red(), scrim.green(), scrim.blue(), 0));
+        ov.setColorAt(0.55, QColor(scrim.red(), scrim.green(), scrim.blue(), 110));
+        ov.setColorAt(1.0, QColor(scrim.red(), scrim.green(), scrim.blue(), 230));
         p.fillRect(rect, ov);
     }
 
@@ -187,20 +242,20 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
     p.save();
     p.setClipPath(clip);
 
-    if (!m_avatar.isNull()) {
-        p.drawPixmap(ar, m_avatar.scaled(ar.size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+    if (!avatar.isNull()) {
+        p.drawPixmap(ar, avatar.scaled(ar.size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
     } else {
         p.setPen(Qt::NoPen);
-        p.setBrush(accent.darker(200));
+        p.setBrush(UserListPainter::blend(accent, style.base, dark ? 0.45 : 0.72));
         p.drawEllipse(ar);
         const QPixmap pawn =
-            UserLevelPixmapGenerator::generatePixmap(AvatarPawnSize, level, m_user.pawn_colors(), false, privLevel);
+            UserLevelPixmapGenerator::generatePixmap(AvatarPawnSize, level, user.pawn_colors(), false, privLevel);
         p.drawPixmap(ar.center().x() - AvatarPawnSize / 2, ar.center().y() - AvatarPawnSize / 2, pawn);
     }
     p.restore();
 
     // Status ring
-    p.setPen(QPen(m_online ? QColor(34, 197, 94) : QColor(70, 80, 95), 2.5));
+    p.setPen(QPen(online ? QColor(34, 197, 94) : style.ringOffline, 2.5));
     p.setBrush(Qt::NoBrush);
     p.drawEllipse(QRectF(ar).adjusted(-1.25, -1.25, 1.25, 1.25));
 
@@ -212,7 +267,7 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
     nf.setBold(true);
     nf.setPointSizeF(nf.pointSizeF() * 1.12);
     p.setFont(nf);
-    p.setPen(m_online ? QColor(220, 228, 240) : QColor(90, 100, 115));
+    p.setPen(online ? style.textOnline : style.textOffline);
     p.drawText(QRect(tx, ay, tw, AvatarSize / 2 + 4), Qt::AlignBottom | Qt::AlignLeft,
                QFontMetrics(nf).elidedText(userName, Qt::ElideRight, tw));
 
@@ -243,143 +298,173 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
         const int bw = bfm.horizontalAdvance(badge.text) + 10;
         const QRect br(tx, ay + AvatarSize / 2 + 6, bw, 15);
         p.setPen(Qt::NoPen);
-        p.setBrush(badge.color.darker(160));
+        p.setBrush(UserListPainter::blend(badge.color, style.base, dark ? 0.55 : 0.78));
         p.drawRoundedRect(br, 3, 3);
-        p.setPen(badge.color.lighter(150));
+        p.setPen(dark ? UserListPainter::blend(badge.color, Qt::white, 0.5)
+                      : UserListPainter::blend(badge.color, Qt::black, 0.35));
         p.drawText(br, Qt::AlignCenter, badge.text);
     }
 }
 
 // ── UserInfoPopup ─────────────────────────────────────────────────────────────
 
-UserInfoPopup::UserInfoPopup(TabSupervisor *ts,
-                             AbstractClient *client,
-                             const QMap<QString, QPixmap> *avatarCache,
-                             const QMap<QString, QPixmap> *cardArtCache,
-                             const QMap<QString, CardArtParams> *cardArtParamsMap,
+UserInfoPopup::UserInfoPopup(TabSupervisor *_ts,
+                             AbstractClient *_client,
+                             const QMap<QString, QPixmap> *_avatarCache,
+                             const QMap<QString, QPixmap> *_cardArtCache,
+                             const QMap<QString, CardArtParams> *_cardArtParamsMap,
                              QWidget *parent)
-    : QFrame(parent, Qt::Tool | Qt::FramelessWindowHint), m_ts(ts), m_client(client), m_avatarCache(avatarCache),
-      m_cardArtCache(cardArtCache), m_cardArtParamsMap(cardArtParamsMap)
+    : QFrame(parent, Qt::Tool | Qt::FramelessWindowHint), ts(_ts), client(_client), avatarCache(_avatarCache),
+      cardArtCache(_cardArtCache), cardArtParamsMap(_cardArtParamsMap)
 {
     setAttribute(Qt::WA_ShowWithoutActivating);
     setFixedWidth(PopupWidth);
     setFrameShape(QFrame::NoFrame);
     buildUi();
+
+    // Restyle the popup chrome when the theme or its color scheme changes.
+    if (themeManager) {
+        connect(themeManager, &ThemeManager::themeChanged, this, &UserInfoPopup::applyTheme);
+    }
 }
 
 void UserInfoPopup::buildUi()
 {
-    setStyleSheet(QStringLiteral("UserInfoPopup {"
-                                 "  background:#0e1218;"
-                                 "  border:1px solid #1e2838;"
-                                 "  border-radius:8px;"
-                                 "}"));
-
     auto *root = new QVBoxLayout(this);
     root->setContentsMargins(0, 0, 0, 0);
     root->setSpacing(0);
 
     // Header
-    m_header = new UserInfoHeaderWidget(this);
-    root->addWidget(m_header);
+    header = new UserInfoHeaderWidget(this);
+    root->addWidget(header);
 
     // Action area — rebuilt per user
-    m_actionArea = new QWidget(this);
-    m_actionArea->setStyleSheet(QStringLiteral("background:#0e1218;"));
-    root->addWidget(m_actionArea);
+    actionArea = new QWidget(this);
+    root->addWidget(actionArea);
 
     // Thin separator
-    auto *sep = new QFrame(this);
-    sep->setFrameShape(QFrame::HLine);
-    sep->setStyleSheet(QStringLiteral("color:#1a2434; margin: 0 8px;"));
-    root->addWidget(sep);
+    separator = new QFrame(this);
+    separator->setFrameShape(QFrame::HLine);
+    root->addWidget(separator);
 
     // Games header row
     auto *gh = new QHBoxLayout;
     gh->setContentsMargins(10, 4, 8, 2);
-    auto *gl = new QLabel(tr("Games"), this);
-    gl->setStyleSheet(QStringLiteral("color:#6882a0; font-size:11px; font-weight:bold; background:transparent;"));
-    gh->addWidget(gl);
+    gamesLabel = new QLabel(tr("Games"), this);
+    gh->addWidget(gamesLabel);
     gh->addStretch();
-    m_refreshBtn = new QPushButton(QStringLiteral("↻"), this);
-    m_refreshBtn->setFixedSize(20, 20);
-    m_refreshBtn->setFlat(true);
-    m_refreshBtn->setStyleSheet(
-        QStringLiteral("QPushButton{color:#6882a0;border:none;font-size:14px;background:transparent;}"
-                       "QPushButton:hover{color:white;}"));
-    connect(m_refreshBtn, &QPushButton::clicked, this, &UserInfoPopup::refreshGames);
-    gh->addWidget(m_refreshBtn);
+    refreshBtn = new QPushButton(QStringLiteral("↻"), this);
+    refreshBtn->setFixedSize(20, 20);
+    refreshBtn->setFlat(true);
+    connect(refreshBtn, &QPushButton::clicked, this, &UserInfoPopup::refreshGames);
+    gh->addWidget(refreshBtn);
     root->addLayout(gh);
 
     // Status label
-    m_gamesStatus = new QLabel(this);
-    m_gamesStatus->setAlignment(Qt::AlignCenter);
-    m_gamesStatus->setStyleSheet(
-        QStringLiteral("color:#3a4a5e; font-size:11px; padding:10px; background:transparent;"));
-    root->addWidget(m_gamesStatus);
+    gamesStatus = new QLabel(this);
+    gamesStatus->setAlignment(Qt::AlignCenter);
+    root->addWidget(gamesStatus);
 
     // Games list
-    m_gamesModel = new QStandardItemModel(this);
-    m_gamesView = new QListView(this);
-    m_gamesView->setModel(m_gamesModel);
-    m_gamesView->setItemDelegate(new PopupGameDelegate(m_gamesView));
-    m_gamesView->setFrameShape(QFrame::NoFrame);
-    m_gamesView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    m_gamesView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    m_gamesView->setMaximumHeight(220);
-    m_gamesView->setStyleSheet(QStringLiteral("QListView{background:#0e1218;border:none;}"
-                                              "QListView::item:selected{background:#232e42;}"));
-    m_gamesView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(m_gamesView, &QListView::customContextMenuRequested, this, &UserInfoPopup::onGamesContextMenu);
+    gamesModel = new QStandardItemModel(this);
+    gamesView = new QListView(this);
+    gamesView->setModel(gamesModel);
+    gamesView->setItemDelegate(new PopupGameDelegate(gamesView));
+    gamesView->setFrameShape(QFrame::NoFrame);
+    gamesView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    gamesView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    gamesView->setMaximumHeight(220);
+    gamesView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(gamesView, &QListView::customContextMenuRequested, this, &UserInfoPopup::onGamesContextMenu);
 
-    root->addWidget(m_gamesView);
+    root->addWidget(gamesView);
 
     // Close button — positioned absolutely in the top-right corner
-    m_closeBtn = new QPushButton(QStringLiteral("✕"), this);
-    m_closeBtn->setFixedSize(22, 22);
-    m_closeBtn->setFlat(true);
-    m_closeBtn->setStyleSheet(QStringLiteral("QPushButton{background:rgba(14,18,26,180);color:#607080;"
-                                             "border:none;border-radius:11px;font-size:10px;}"
-                                             "QPushButton:hover{color:white;background:rgba(200,50,50,200);}"));
-    connect(m_closeBtn, &QPushButton::clicked, this, &UserInfoPopup::closeRequested);
+    closeBtn = new QPushButton(QStringLiteral("✕"), this);
+    closeBtn->setFixedSize(22, 22);
+    closeBtn->setFlat(true);
+    connect(closeBtn, &QPushButton::clicked, this, &UserInfoPopup::closeRequested);
+
+    applyTheme();
+}
+
+void UserInfoPopup::applyTheme()
+{
+    const bool dark = themeManager && themeManager->isDarkModeActive();
+    theme = PopupTheme::fromPalette(qApp->palette(), dark);
+
+    setStyleSheet(QStringLiteral("UserInfoPopup {"
+                                 "  background:%1;"
+                                 "  border:1px solid %2;"
+                                 "  border-radius:8px;"
+                                 "}")
+                      .arg(colorStr(theme.bg), colorStr(theme.border)));
+
+    actionArea->setStyleSheet(QStringLiteral("background:%1;").arg(colorStr(theme.bg)));
+
+    separator->setStyleSheet(QStringLiteral("color:%1; margin: 0 8px;").arg(colorStr(theme.border)));
+
+    gamesLabel->setStyleSheet(QStringLiteral("color:%1; font-size:11px; font-weight:bold; background:transparent;")
+                                  .arg(colorStr(theme.subText)));
+
+    refreshBtn->setStyleSheet(QStringLiteral("QPushButton{color:%1;border:none;font-size:14px;background:transparent;}"
+                                             "QPushButton:hover{color:%2;}")
+                                  .arg(colorStr(theme.subText), colorStr(theme.text)));
+
+    gamesStatus->setStyleSheet(QStringLiteral("color:%1; font-size:11px; padding:10px; background:transparent;")
+                                   .arg(colorStr(theme.statusText)));
+
+    gamesView->setStyleSheet(QStringLiteral("QListView{background:%1;border:none;}"
+                                            "QListView::item:selected{background:%2;}")
+                                 .arg(colorStr(theme.gamesRow), colorStr(theme.gamesSelected)));
+
+    closeBtn->setStyleSheet(
+        QStringLiteral("QPushButton{background:%1;color:%2;"
+                       "border:none;border-radius:11px;font-size:10px;}"
+                       "QPushButton:hover{color:%3;background:%4;}")
+            .arg(colorStr(theme.closeBg), colorStr(theme.subText), colorStr(theme.text), colorStr(theme.closeHover)));
+
+    header->update();
 }
 
 // ── Action button factory ─────────────────────────────────────────────────────
 
-static QPushButton *makeBtn(const QString &label, const QString &tip, QWidget *p)
+static QPushButton *makeBtn(const QString &label, const QString &tip, QWidget *p, const PopupTheme &t)
 {
     auto *b = new QPushButton(label, p);
     b->setToolTip(tip);
     b->setFixedHeight(26);
     b->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     b->setStyleSheet(QStringLiteral("QPushButton{"
-                                    "  background:#192030;color:#b8c8de;border:1px solid #263040;"
+                                    "  background:%1;color:%2;border:1px solid %3;"
                                     "  border-radius:4px;font-size:11px;padding:0 4px;"
                                     "}"
-                                    "QPushButton:hover{background:#223050;color:white;}"
-                                    "QPushButton:pressed{background:#162030;}"
-                                    "QPushButton:disabled{color:#384858;border-color:#192030;}"));
+                                    "QPushButton:hover{background:%4;color:%5;}"
+                                    "QPushButton:pressed{background:%6;}"
+                                    "QPushButton:disabled{color:%7;border-color:%3;}")
+                         .arg(colorStr(t.buttonBg), colorStr(t.text), colorStr(t.buttonBorder), colorStr(t.buttonHover),
+                              colorStr(t.text), colorStr(t.buttonPressed), colorStr(t.buttonDisabled)));
     return b;
 }
 
 void UserInfoPopup::rebuildActionButtons(const ServerInfo_User &userInfo, bool online, bool isBuddy, bool isIgnored)
 {
     // Clear previous contents
-    delete m_actionArea->layout();
-    const auto old = m_actionArea->findChildren<QPushButton *>(QString{}, Qt::FindDirectChildrenOnly);
+    delete actionArea->layout();
+    const auto old = actionArea->findChildren<QPushButton *>(QString{}, Qt::FindDirectChildrenOnly);
     for (auto *w : old) {
         w->deleteLater();
     }
 
     const QString name = QString::fromStdString(userInfo.name());
-    const auto ownLevel = UserLevelFlags(m_ts->getUserInfo()->user_level());
-    const bool isSelf = (name == QString::fromStdString(m_ts->getUserInfo()->name()));
+    const auto ownLevel = UserLevelFlags(ts->getUserInfo()->user_level());
+    const bool isSelf = (name == QString::fromStdString(ts->getUserInfo()->name()));
     const bool isMod = ownLevel.testFlag(ServerInfo_User::IsModerator);
     const bool isAdmin = ownLevel.testFlag(ServerInfo_User::IsAdmin);
     const auto their = UserLevelFlags(userInfo.user_level());
     const bool isReg = their.testFlag(ServerInfo_User::IsRegistered);
 
-    auto *grid = new QGridLayout(m_actionArea);
+    auto *grid = new QGridLayout(actionArea);
     grid->setContentsMargins(8, 6, 8, 6);
     grid->setSpacing(4);
 
@@ -394,16 +479,16 @@ void UserInfoPopup::rebuildActionButtons(const ServerInfo_User &userInfo, bool o
     };
 
     // ── Always visible ────────────────────────────────────────────────────────
-    auto *chat = makeBtn(tr("Chat"), tr("Open private chat"), m_actionArea);
+    auto *chat = makeBtn(tr("Chat"), tr("Open private chat"), actionArea, theme);
     chat->setEnabled(!isSelf && online);
     connect(chat, &QPushButton::clicked, this, [this, name] { emit chatRequested(name); });
     add(chat);
 
-    auto *prof = makeBtn(tr("Profile"), tr("View user profile"), m_actionArea);
+    auto *prof = makeBtn(tr("Profile"), tr("View user profile"), actionArea, theme);
     connect(prof, &QPushButton::clicked, this, [this, name] { emit detailsRequested(name); });
     add(prof);
 
-    auto *games = makeBtn(tr("Games"), tr("Show this user's games"), m_actionArea);
+    auto *games = makeBtn(tr("Games"), tr("Show this user's games"), actionArea, theme);
     games->setEnabled(!isSelf && online);
     connect(games, &QPushButton::clicked, this, [this, name] { emit showGamesRequested(name); });
     add(games);
@@ -411,20 +496,20 @@ void UserInfoPopup::rebuildActionButtons(const ServerInfo_User &userInfo, bool o
     // ── Buddy / ignore (registered users only) ────────────────────────────────
     if (!isSelf && isReg) {
         if (isBuddy) {
-            auto *b = makeBtn(tr("− Buddy"), tr("Remove from buddy list"), m_actionArea);
+            auto *b = makeBtn(tr("− Buddy"), tr("Remove from buddy list"), actionArea, theme);
             connect(b, &QPushButton::clicked, this, [this, name] { emit removeBuddyRequested(name); });
             add(b);
         } else {
-            auto *b = makeBtn(tr("+ Buddy"), tr("Add to buddy list"), m_actionArea);
+            auto *b = makeBtn(tr("+ Buddy"), tr("Add to buddy list"), actionArea, theme);
             connect(b, &QPushButton::clicked, this, [this, name] { emit addBuddyRequested(name); });
             add(b);
         }
         if (isIgnored) {
-            auto *b = makeBtn(tr("− Ignore"), tr("Remove from ignore list"), m_actionArea);
+            auto *b = makeBtn(tr("− Ignore"), tr("Remove from ignore list"), actionArea, theme);
             connect(b, &QPushButton::clicked, this, [this, name] { emit removeIgnoreRequested(name); });
             add(b);
         } else {
-            auto *b = makeBtn(tr("+ Ignore"), tr("Add to ignore list"), m_actionArea);
+            auto *b = makeBtn(tr("+ Ignore"), tr("Add to ignore list"), actionArea, theme);
             connect(b, &QPushButton::clicked, this, [this, name] { emit addIgnoreRequested(name); });
             add(b);
         }
@@ -437,10 +522,10 @@ void UserInfoPopup::rebuildActionButtons(const ServerInfo_User &userInfo, bool o
             col = 0;
         } // start mod section on a fresh row
 
-        auto *ban = makeBtn(tr("Ban"), tr("Ban from server"), m_actionArea);
-        auto *warn = makeBtn(tr("Warn"), tr("Warn user"), m_actionArea);
-        auto *bLog = makeBtn(tr("Ban log"), tr("View ban history"), m_actionArea);
-        auto *wLog = makeBtn(tr("Warn log"), tr("View warning history"), m_actionArea);
+        auto *ban = makeBtn(tr("Ban"), tr("Ban from server"), actionArea, theme);
+        auto *warn = makeBtn(tr("Warn"), tr("Warn user"), actionArea, theme);
+        auto *bLog = makeBtn(tr("Ban log"), tr("View ban history"), actionArea, theme);
+        auto *wLog = makeBtn(tr("Warn log"), tr("View warning history"), actionArea, theme);
         connect(ban, &QPushButton::clicked, this, [this, name] { emit banRequested(name); });
         connect(warn, &QPushButton::clicked, this, [this, name] { emit warnRequested(name); });
         connect(bLog, &QPushButton::clicked, this, [this, name] { emit banHistoryRequested(name); });
@@ -453,31 +538,31 @@ void UserInfoPopup::rebuildActionButtons(const ServerInfo_User &userInfo, bool o
 
     // ── Admin actions ─────────────────────────────────────────────────────────
     if (!isSelf && isAdmin) {
-        auto *notes = makeBtn(tr("Notes"), tr("View admin notes"), m_actionArea);
+        auto *notes = makeBtn(tr("Notes"), tr("View admin notes"), actionArea, theme);
         connect(notes, &QPushButton::clicked, this, [this, name] { emit adminNotesRequested(name); });
         add(notes);
 
         if (their.testFlag(ServerInfo_User::IsModerator)) {
-            auto *b = makeBtn(tr("− Mod"), tr("Demote from moderator"), m_actionArea);
+            auto *b = makeBtn(tr("− Mod"), tr("Demote from moderator"), actionArea, theme);
             connect(b, &QPushButton::clicked, this, [this, name] { emit demoteFromModRequested(name); });
             add(b);
         } else if (isReg) {
-            auto *b = makeBtn(tr("+ Mod"), tr("Promote to moderator"), m_actionArea);
+            auto *b = makeBtn(tr("+ Mod"), tr("Promote to moderator"), actionArea, theme);
             connect(b, &QPushButton::clicked, this, [this, name] { emit promoteToModRequested(name); });
             add(b);
         }
         if (their.testFlag(ServerInfo_User::IsJudge)) {
-            auto *b = makeBtn(tr("− Judge"), tr("Demote from judge"), m_actionArea);
+            auto *b = makeBtn(tr("− Judge"), tr("Demote from judge"), actionArea, theme);
             connect(b, &QPushButton::clicked, this, [this, name] { emit demoteFromJudgeRequested(name); });
             add(b);
         } else if (isReg) {
-            auto *b = makeBtn(tr("+ Judge"), tr("Promote to judge"), m_actionArea);
+            auto *b = makeBtn(tr("+ Judge"), tr("Promote to judge"), actionArea, theme);
             connect(b, &QPushButton::clicked, this, [this, name] { emit promoteToJudgeRequested(name); });
             add(b);
         }
     }
 
-    m_actionArea->adjustSize();
+    actionArea->adjustSize();
 }
 
 void UserInfoPopup::updateActionButtons(const ServerInfo_User &userInfo, bool online, bool isBuddy, bool isIgnored)
@@ -488,7 +573,7 @@ void UserInfoPopup::updateActionButtons(const ServerInfo_User &userInfo, bool on
 
 void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
 {
-    const QModelIndex idx = m_gamesView->indexAt(pos);
+    const QModelIndex idx = gamesView->indexAt(pos);
     if (!idx.isValid()) {
         return;
     }
@@ -501,8 +586,9 @@ void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
 
     QMenu menu(this);
     menu.setStyleSheet(
-        QStringLiteral("QMenu{background:#12182a;color:#c8d8ec;border:1px solid #1e2838;border-radius:4px;}"
-                       "QMenu::item:selected{background:#223050;}"));
+        QStringLiteral("QMenu{background:%1;color:%2;border:1px solid %3;border-radius:4px;}"
+                       "QMenu::item:selected{background:%4;}")
+            .arg(colorStr(theme.bg), colorStr(theme.text), colorStr(theme.border), colorStr(theme.buttonHover)));
 
     const bool canJoin = !game.started() && game.player_count() < game.max_players();
     QAction *join = menu.addAction(tr("Join game"));
@@ -513,7 +599,7 @@ void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
         spec = menu.addAction(tr("Spectate"));
     }
 
-    const QAction *chosen = menu.exec(m_gamesView->viewport()->mapToGlobal(pos));
+    const QAction *chosen = menu.exec(gamesView->viewport()->mapToGlobal(pos));
     if (!chosen) {
         return;
     }
@@ -527,37 +613,46 @@ void UserInfoPopup::onGamesContextMenu(const QPoint &pos)
 
 // ── showForUser ───────────────────────────────────────────────────────────────
 
+void UserInfoPopup::refreshHeader()
+{
+    if (currentUser.isEmpty()) {
+        return;
+    }
+
+    const QPixmap avatar = avatarCache ? avatarCache->value(currentUser) : QPixmap{};
+    const CardArtParams params = (cardArtParamsMap && cardArtParamsMap->contains(currentUser))
+                                     ? cardArtParamsMap->value(currentUser)
+                                     : CardArtParams{};
+    const QString artKey = currentUser + u'|' + params.cardName + u'|' + params.cardProviderId;
+    const QPixmap cardArt = (cardArtCache && !params.cardName.isEmpty()) ? cardArtCache->value(artKey) : QPixmap{};
+    header->setUserData(currentUserInfo, currentOnline, avatar, cardArt, params);
+}
+
 void UserInfoPopup::showForUser(const QString &userName,
                                 const ServerInfo_User &userInfo,
                                 bool online,
                                 bool isBuddy,
                                 bool isIgnored)
 {
-    m_currentUser = userName;
-    m_currentUserInfo = userInfo;
-    m_currentOnline = online;
+    currentUser = userName;
+    currentUserInfo = userInfo;
+    currentOnline = online;
 
     // Header
-    const QPixmap avatar = m_avatarCache ? m_avatarCache->value(userName) : QPixmap{};
-    const CardArtParams params = (m_cardArtParamsMap && m_cardArtParamsMap->contains(userName))
-                                     ? m_cardArtParamsMap->value(userName)
-                                     : CardArtParams{};
-    const QString artKey = userName + u'|' + params.cardName + u'|' + params.cardProviderId;
-    const QPixmap cardArt = (m_cardArtCache && !params.cardName.isEmpty()) ? m_cardArtCache->value(artKey) : QPixmap{};
-    m_header->setUserData(userInfo, online, avatar, cardArt, params);
+    refreshHeader();
 
     // Actions
     rebuildActionButtons(userInfo, online, isBuddy, isIgnored);
 
     // Games list reset
-    m_gamesModel->clear();
-    m_gamesView->hide();
-    m_gamesStatus->setText(tr("Loading games…"));
-    m_gamesStatus->show();
+    gamesModel->clear();
+    gamesView->hide();
+    gamesStatus->setText(tr("Loading games…"));
+    gamesStatus->show();
 
     // Close button — top-right corner, above everything
-    m_closeBtn->move(PopupWidth - m_closeBtn->width() - 6, 6);
-    m_closeBtn->raise();
+    closeBtn->move(PopupWidth - closeBtn->width() - 6, 6);
+    closeBtn->raise();
 
     adjustSize();
     fetchGames();
@@ -567,40 +662,40 @@ void UserInfoPopup::showForUser(const QString &userName,
 
 void UserInfoPopup::fetchGames()
 {
-    if (!m_client || m_currentUser.isEmpty()) {
+    if (!client || currentUser.isEmpty()) {
         return;
     }
 
     Command_GetGamesOfUser cmd;
-    cmd.set_user_name(m_currentUser.toStdString());
+    cmd.set_user_name(currentUser.toStdString());
 
-    const QString snapshot = m_currentUser;
-    PendingCommand *pend = m_client->prepareSessionCommand(cmd);
+    const QString snapshot = currentUser;
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this,
             [this, snapshot](const Response &r) { onGamesReceived(r, snapshot); });
-    m_client->sendCommand(pend);
+    client->sendCommand(pend);
 }
 
 void UserInfoPopup::onGamesReceived(const Response &r, const QString &forUser)
 {
-    if (forUser != m_currentUser) {
+    if (forUser != currentUser) {
         return; // stale response — different user showing now
     }
 
-    m_gamesModel->clear();
+    gamesModel->clear();
 
     if (r.response_code() != Response::RespOk) {
-        m_gamesStatus->setText(tr("Could not load games."));
-        m_gamesStatus->show();
-        m_gamesView->hide();
+        gamesStatus->setText(tr("Could not load games."));
+        gamesStatus->show();
+        gamesView->hide();
         return;
     }
 
     const auto &resp = r.GetExtension(Response_GetGamesOfUser::ext);
     if (resp.game_list_size() == 0) {
-        m_gamesStatus->setText(tr("No active games."));
-        m_gamesStatus->show();
-        m_gamesView->hide();
+        gamesStatus->setText(tr("No active games."));
+        gamesStatus->show();
+        gamesView->hide();
         return;
     }
 
@@ -608,47 +703,39 @@ void UserInfoPopup::onGamesReceived(const Response &r, const QString &forUser)
         auto *item = new QStandardItem;
         item->setData(QVariant::fromValue(resp.game_list(i)), PopupRoles::GameData);
         item->setEditable(false);
-        m_gamesModel->appendRow(item);
+        gamesModel->appendRow(item);
     }
 
-    m_gamesStatus->hide();
-    m_gamesView->show();
+    gamesStatus->hide();
+    gamesView->show();
 
     // Fit exactly to the number of visible rows, scroll when more than 5
     constexpr int rowH = 38; // must match PopupGameDelegate::sizeHint
     constexpr int maxRows = 5;
-    const int count = m_gamesModel->rowCount();
+    const int count = gamesModel->rowCount();
     const int visible = qMin(count, maxRows);
-    m_gamesView->setFixedHeight(visible * rowH + 2);
-    m_gamesView->setVerticalScrollBarPolicy(count > maxRows ? Qt::ScrollBarAlwaysOn : Qt::ScrollBarAlwaysOff);
+    gamesView->setFixedHeight(visible * rowH + 2);
+    gamesView->setVerticalScrollBarPolicy(count > maxRows ? Qt::ScrollBarAlwaysOn : Qt::ScrollBarAlwaysOff);
 
     adjustSize();
 }
 
 void UserInfoPopup::refreshGames()
 {
-    m_gamesModel->clear();
-    m_gamesView->hide();
-    m_gamesStatus->setText(tr("Loading games…"));
-    m_gamesStatus->show();
+    gamesModel->clear();
+    gamesView->hide();
+    gamesStatus->setText(tr("Loading games…"));
+    gamesStatus->show();
     fetchGames();
 }
 
 // ── Mouse events ──────────────────────────────────────────────────────────────
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void UserInfoPopup::enterEvent(QEnterEvent *e)
 {
     QFrame::enterEvent(e);
     emit mouseEnteredPopup();
 }
-#else
-void UserInfoPopup::enterEvent(QEvent *e)
-{
-    QFrame::enterEvent(e);
-    emit mouseEnteredPopup();
-}
-#endif
 void UserInfoPopup::leaveEvent(QEvent *e)
 {
     QFrame::leaveEvent(e);

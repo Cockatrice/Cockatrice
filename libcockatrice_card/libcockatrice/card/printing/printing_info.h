@@ -2,10 +2,11 @@
 #define COCKATRICE_PRINTING_INFO_H
 
 #include "../set/card_set.h"
+#include "libcockatrice/card/lazy_properties_hash.h"
 
 #include <QList>
 #include <QMap>
-#include <QVariant>
+#include <QSharedPointer>
 
 class PrintingInfo;
 
@@ -30,8 +31,9 @@ public:
      * @brief Constructs a PrintingInfo associated with a specific set.
      *
      * @param _set The set this printing belongs to (defaults to null).
+     * @param _properties The printing properties (defaults to empty)
      */
-    explicit PrintingInfo(const CardSetPtr &_set = nullptr);
+    explicit PrintingInfo(const CardSetPtr &_set = nullptr, const LazyPropertiesHash &_properties = {});
 
     /**
      * @brief Destroys the PrintingInfo.
@@ -51,7 +53,7 @@ public:
      */
     bool operator==(const PrintingInfo &other) const
     {
-        return this->set == other.set && this->properties == other.properties;
+        return this->set == other.set && this->getPropertiesHash() == other.getPropertiesHash();
     }
 
     /**
@@ -61,12 +63,12 @@ public:
      */
     bool isEmpty() const
     {
-        return set == nullptr && properties.isEmpty();
+        return set == nullptr && getPropertiesHash().isEmpty();
     }
 
 private:
-    CardSetPtr set;          ///< The set this variation belongs to.
-    QVariantHash properties; ///< Key-value store for variation-specific attributes.
+    CardSetPtr set;                ///< The set this variation belongs to.
+    LazyPropertiesHash properties; ///< Key-value store for variation-specific attributes.
 
 public:
     /**
@@ -86,7 +88,12 @@ public:
      */
     [[nodiscard]] QStringList getProperties() const
     {
-        return properties.keys();
+        return getPropertiesHash().keys();
+    }
+
+    [[nodiscard]] const QHash<QString, QString> &getPropertiesHash() const
+    {
+        return properties.getProperties();
     }
 
     /**
@@ -97,7 +104,7 @@ public:
      */
     [[nodiscard]] QString getProperty(const QString &propertyName) const
     {
-        return properties.value(propertyName).toString();
+        return properties.value(propertyName);
     }
 
     /**
@@ -108,10 +115,7 @@ public:
      * @param _name The name of the property.
      * @param _value The string value to assign.
      */
-    void setProperty(const QString &_name, const QString &_value)
-    {
-        properties.insert(_name, _value);
-    }
+    void setProperty(const QString &_name, const QString &_value);
 
     /**
      * @brief Returns the providerID for this printing.

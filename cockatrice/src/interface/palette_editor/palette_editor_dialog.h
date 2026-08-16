@@ -7,6 +7,8 @@
 #include <QFrame>
 #include <QMap>
 
+class QTimer;
+
 class QLabel;
 class QComboBox;
 class QDialogButtonBox;
@@ -48,7 +50,6 @@ private:
     QComboBox *schemeComboBox = nullptr;
     QDialogButtonBox *buttonBox = nullptr;
     QPushButton *resetBtn = nullptr;
-    QPushButton *applyBtn = nullptr;
     QPushButton *saveBtn = nullptr;
     QPushButton *closeBtn = nullptr;
     QPushButton *revertButton = nullptr;
@@ -57,9 +58,14 @@ private:
     QString themeDirPath;
     QString themeName;
     QString loadedScheme;
+    // Directory writes are directed to; may differ from themeDirPath when the
+    // latter is read-only (e.g. a built-in / system theme directory).
+    QString saveDir;
 
     QMap<QString, PaletteConfig> workingConfig;
     QMap<QString, PaletteConfig> savedConfig;
+
+    QTimer *autoApplyTimer = nullptr;
 
 protected:
     void changeEvent(QEvent *e) override;

@@ -43,6 +43,10 @@ public:
 
 private:
     QString defaultStyleName;
+    // Pristine application palette captured at startup, before any custom theme
+    // palette is applied. Used as the base when a theme supplies no palette, so
+    // switching away from a custom palette restores the original colours.
+    QPalette defaultPalette;
     QString currentThemePath;
     std::array<QBrush, Role::MaxRole + 1> brushes;
     QStringMap availableThemes;
@@ -62,7 +66,14 @@ protected:
 
 public:
     bool isBuiltInTheme();
-    bool isDarkMode(const QString &themeDirPath);
+    // Explicit color scheme of the theme: theme.cfg's ColorScheme setting
+    // (Dark/Light), falling back to the OS color scheme when it is "System".
+    bool isDarkMode(const QString &themeDirPath) const;
+    // The resolved scheme of the currently active theme.
+    bool isDarkModeActive() const
+    {
+        return isDarkMode(currentThemePath);
+    }
     QStringMap &getAvailableThemes();
     // Returns the path to the currently active theme directory (empty = default)
     QString getCurrentThemePath() const
@@ -76,7 +87,12 @@ public:
     // Load/save per-scheme palette colors
     static PaletteConfig loadPaletteConfig(const QString &themeDirPath, const QString &colorScheme);
     static bool savePaletteConfig(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg);
+    // Load the theme's shipped default palette, falling back to the system
+    // theme directory when it is absent from the resolved (user) directory.
+    static PaletteConfig
+    loadDefaultPaletteConfig(const QString &themeDirPath, const QString &themeName, const QString &colorScheme);
     void setColorScheme(const QString &scheme);
+    void setStyleName(const QString &styleName);
 
     void reloadCurrentTheme();
     void previewPalette(const PaletteConfig &cfg, const QString &scheme);

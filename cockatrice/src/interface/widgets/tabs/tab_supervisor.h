@@ -71,11 +71,7 @@ public:
     }
 
 protected:
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     void enterEvent(QEnterEvent *event) override;
-#else
-    void enterEvent(QEvent *event) override;
-#endif
     void leaveEvent(QEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 };
@@ -152,6 +148,10 @@ public:
     {
         return userListManager;
     }
+    [[nodiscard]] TabServer *getTabServer() const
+    {
+        return tabServer;
+    }
     [[nodiscard]] const QMap<int, TabRoom *> &getRoomTabs() const
     {
         return roomTabs;
@@ -183,6 +183,8 @@ public slots:
     void maximizeMainWindow();
     void actTabVisualDeckStorage(bool checked);
     void actTabReplays(bool checked);
+    void openTabServer();
+    void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
 private slots:
     void refreshShortcuts();
 
@@ -195,7 +197,6 @@ private slots:
 
     void openTabVisualDeckStorage();
     void openTabHome();
-    void openTabServer();
     void openTabAccount();
     void openTabDeckStorage();
     void openTabReplays();
@@ -209,7 +210,6 @@ private slots:
     void gameJoined(const Event_GameJoined &event);
     void localGameJoined(const Event_GameJoined &event);
     void gameLeft(TabGame *tab);
-    void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
     void roomLeft(TabRoom *tab);
     TabMessage *addMessageTab(const QString &userName, bool focus);
     void replayLeft(TabGame *tab);

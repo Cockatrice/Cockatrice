@@ -12,6 +12,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
+#include <libcockatrice/settings/servers_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
 DlgConnect::DlgConnect(QWidget *parent) : QDialog(parent)
@@ -270,6 +271,7 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     hostEdit->setText(_data.at(1));
     portEdit->setText(_data.at(2));
     playernameEdit->setText(_data.at(3));
+    playernameEdit->setFocus();
     savePasswordCheckBox->setChecked(savePasswordStatus);
 
     if (savePasswordStatus) {
