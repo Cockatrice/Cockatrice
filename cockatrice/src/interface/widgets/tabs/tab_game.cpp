@@ -20,6 +20,7 @@
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
+#include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/utility/completer_utils.h"
 #include "../interface/widgets/utility/line_edit_completer.h"
@@ -33,6 +34,8 @@
 #include "tab_supervisor.h"
 
 #include <QAction>
+#include <QApplication>
+#include <QClipboard>
 #include <QCompleter>
 #include <QDebug>
 #include <QDockWidget>
@@ -331,6 +334,9 @@ void TabGame::retranslateUi()
     if (aGameInfo) {
         aGameInfo->setText(tr("Game &information"));
     }
+    if (aCopyGameLink) {
+        aCopyGameLink->setText(tr("Cop&y game link"));
+    }
     if (aConcede) {
         if (game->getPlayerManager()->isMainPlayerConceded()) {
             aConcede->setText(tr("Un&concede"));
@@ -496,6 +502,15 @@ void TabGame::actGameInfo()
 {
     DlgCreateGame dlg(game->getGameMetaInfo()->proto(), game->getGameMetaInfo()->getRoomGameTypes(), this);
     dlg.exec();
+}
+
+void TabGame::actCopyGameLink()
+{
+    const QString link =
+        makeGameJoinLink(tabSupervisor->getClient()->serverName(), tabSupervisor->getClient()->serverPort(),
+                         game->getGameMetaInfo()->proto().room_id(), game->getGameMetaInfo()->gameId(),
+                         QString::fromStdString(game->getGameMetaInfo()->proto().description()));
+    QApplication::clipboard()->setText(link);
 }
 
 void TabGame::actConcede()
@@ -986,6 +1001,9 @@ void TabGame::createMenuItems()
     connect(aRotateViewCCW, &QAction::triggered, this, &TabGame::actRotateViewCCW);
     aGameInfo = new QAction(this);
     connect(aGameInfo, &QAction::triggered, this, &TabGame::actGameInfo);
+    aCopyGameLink = new QAction(this);
+    aCopyGameLink->setEnabled(!tabSupervisor->getIsLocalGame() && !tabSupervisor->getClient()->serverName().isEmpty());
+    connect(aCopyGameLink, &QAction::triggered, this, &TabGame::actCopyGameLink);
     aConcede = new QAction(this);
     connect(aConcede, &QAction::triggered, this, &TabGame::actConcede);
     if (!game->getGameMetaInfo()->started()) {
@@ -1024,6 +1042,7 @@ void TabGame::createMenuItems()
     gameMenu->addAction(aRotateViewCCW);
     gameMenu->addSeparator();
     gameMenu->addAction(aGameInfo);
+    gameMenu->addAction(aCopyGameLink);
     gameMenu->addAction(aConcede);
     gameMenu->addAction(aFocusChat);
     gameMenu->addAction(aLeaveGame);
@@ -1046,6 +1065,7 @@ void TabGame::createReplayMenuItems()
     aRotateViewCCW = nullptr;
     aResetLayout = nullptr;
     aGameInfo = nullptr;
+    aCopyGameLink = nullptr;
     aConcede = nullptr;
     aFocusChat = nullptr;
     aLeaveGame = new QAction(this);
