@@ -14,6 +14,8 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <QTimer>
+#include <QUrl>
+#include <QUrlQuery>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/settings/chat_settings.h>
@@ -49,7 +51,7 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _sho
 
     viewport()->setCursor(Qt::IBeamCursor);
     setReadOnly(true);
-    setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
+    setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
     setOpenLinks(false);
     connect(this, &ChatView::anchorClicked, this, &ChatView::openLink);
 
@@ -216,6 +218,46 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
 
     cursor.setCharFormat(anchorFormat);
     cursor.insertText(url);
+    cursor.setCharFormat(oldFormat);
+}
+
+void ChatView::appendGameLinkTag(QTextCursor &cursor, const QString &url)
+{
+    const QUrl gameUrl(url);
+    const QUrlQuery query(gameUrl);
+    const QString hostname = query.queryItemValue("hostname");
+    // FullyDecoded undoes every %XX escape, so a description that itself
+    // contains "%" cannot end up displayed as "%25" in the label.
+    const QString description = query.queryItemValue("game", QUrl::FullyDecoded);
+    const int gameId = query.queryItemValue("gameid").toInt();
+
+    QString label;
+    if (gameId > 0 && !hostname.isEmpty()) {
+        // Links built before the description was embedded stay readable: the
+        // id + server fallback below is identical to the old anchor text.
+        if (!description.isEmpty()) {
+            // Multi-arg .arg() replaces all placeholders in a single pass, so a
+            // description containing "%…" cannot corrupt later placeholders.
+            label = tr("Join game \"%1\" (#%2) on %3").arg(description, QString::number(gameId), hostname);
+        } else {
+            label = tr("Join game #%1 on %2").arg(QString::number(gameId), hostname);
+        }
+    } else {
+        label = tr("Join game");
+    }
+
+    QTextCharFormat oldFormat = cursor.charFormat();
+    QTextCharFormat gameLinkFormat = oldFormat;
+    gameLinkFormat.setForeground(linkColor);
+    gameLinkFormat.setFontWeight(QFont::Bold);
+    gameLinkFormat.setAnchor(true);
+    gameLinkFormat.setAnchorHref(url);
+    QColor background = palette().highlight().color();
+    background.setAlpha(40);
+    gameLinkFormat.setBackground(background);
+
+    cursor.setCharFormat(gameLinkFormat);
+    cursor.insertText(label);
     cursor.setCharFormat(oldFormat);
 }
 
@@ -498,6 +540,17 @@ void ChatView::checkWord(QTextCursor &cursor, QString &message)
         QUrl qUrl(fullWordUpToSpaceOrEnd);
         if (qUrl.isValid()) {
             appendUrlTag(cursor, fullWordUpToSpaceOrEnd);
+            cursor.insertText(rest, defaultFormat);
+            return;
+        }
+    }
+
+    if (fullWordUpToSpaceOrEnd.startsWith("cockatrice://", Qt::CaseInsensitive)) {
+        // Only links to a game (cockatrice://joingame) become invite buttons;
+        // any other cockatrice:// scheme falls through to plain text below.
+        const QUrl gameLink(fullWordUpToSpaceOrEnd);
+        if (gameLink.host().compare("joingame", Qt::CaseInsensitive) == 0) {
+            appendGameLinkTag(cursor, fullWordUpToSpaceOrEnd);
             cursor.insertText(rest, defaultFormat);
             return;
         }
