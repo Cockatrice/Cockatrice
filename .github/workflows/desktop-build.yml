@@ -279,11 +279,12 @@ jobs:
 
           - os: macOS
             target: 14
-            runner: macos-14
+            runner: macos-15
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
+            override_target: 14
             package_suffix: "-macOS14"
             qt_version: 6.11.0
             qt_modules: qtimageformats qtmultimedia qtwebsockets
