@@ -66,6 +66,7 @@ public:
 
     [[nodiscard]] bool isUserOnline() const;
     void sendPrivateMessage(const QString &text);
+    void sendInviteMessage(const QString &text);
 
 private:
     bool shouldShowSystemPopup(const Event_UserMessage &event);

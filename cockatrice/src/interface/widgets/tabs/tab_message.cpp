@@ -128,6 +128,12 @@ bool TabMessage::isUserOnline() const
     return userOnline;
 }
 
+void TabMessage::sendInviteMessage(const QString &text)
+{
+    sayEdit->setText(text);
+    sendMessage();
+}
+
 void TabMessage::messageSent(const Response &response,
                              const CommandContainer & /*commandContainer*/,
                              const QVariant &extraData)
