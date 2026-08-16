@@ -1325,6 +1325,8 @@ void TabGame::createPlayerListDock(bool bReplay)
     auto *vbox = new QVBoxLayout(playerListBox);
     vbox->setContentsMargins(0, 0, 0, 0);
 
+    vbox->addWidget(playerListWidget);
+
     if (!bReplay) {
         inviteButton = new QPushButton(tr("Invite"), playerListBox);
         inviteButton->setVisible(false);
@@ -1335,7 +1337,6 @@ void TabGame::createPlayerListDock(bool bReplay)
         connect(game->getPlayerManager(), &PlayerManager::playerCountChanged, this, &TabGame::updateInviteButtonState);
         updateInviteButtonState();
     }
-    vbox->addWidget(playerListWidget);
 
     playerListDock = new QDockWidget(this);
     playerListDock->setObjectName("playerListDock");
