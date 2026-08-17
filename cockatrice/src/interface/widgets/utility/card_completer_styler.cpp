@@ -169,9 +169,12 @@ void CardCompleterStyler::applyPopupWidth()
         popup->resize(minWidth, popup->height());
 
         if (!available.isEmpty()) {
-            QPoint pos = popup->pos();
-            pos.setX(qBound(available.left(), pos.x(), qMax(available.left(), available.right() - popup->width() + 1)));
-            popup->move(pos);
+            // Clamp in screen coordinates, then map back to parent coordinates.
+            QPoint globalPos = popup->mapToGlobal(QPoint(0, 0));
+            int clampedGlobalX =
+                qBound(available.left(), globalPos.x(), qMax(available.left(), available.right() - popup->width() + 1));
+            QPoint parentPos = popup->mapFromGlobal(QPoint(clampedGlobalX, globalPos.y()));
+            popup->move(parentPos);
         }
     }
 }
