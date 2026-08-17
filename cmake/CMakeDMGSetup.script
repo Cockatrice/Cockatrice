@@ -1,9 +1,9 @@
 on run argv
 set image_name to item 1 of argv
 
--- Increase timeout from default 120 seconds to 300 seconds
+-- Increase timeout from default 120 seconds to 600 seconds
 -- to account for slower CI environments (especially Intel runners)
-with timeout of 300 seconds
+with timeout of 600 seconds
     tell application "Finder"
         tell disk image_name
 
