@@ -11,6 +11,7 @@ set -o pipefail
 # go to the project root directory, this file should be located in the project root directory
 olddir="$PWD"
 cd "${BASH_SOURCE%/*}/" || exit 2 # could not find path, this could happen with special links etc.
+phys_root="$(pwd -P)"
 
 # defaults
 include=("cockatrice/src" \
@@ -168,14 +169,14 @@ EOM
         echo "error in parsing arguments of $0: $1 is an unrecognized option" >&2
         exit 2 # input error
       fi
-      if [[ ! $1 ]] || next_dir=$(cd "$olddir" && cd -- "$1" && pwd); then
+      if [[ ! $1 ]] || next_dir=$(cd "$olddir" && cd -- "$1" && pwd -P); then
         if ! [[ $set_include ]]; then
           include=() # remove default includes
           set_include=1
         fi
         if [[ $1 ]]; then
-          if [[ $next_dir != $PWD/* ]]; then
-            echo "error in parsing arguments of $0: $next_dir is not in $PWD" >&2
+          if [[ "$next_dir" != "$phys_root" && "$next_dir" != "$phys_root"/* ]]; then
+            echo "error in parsing arguments of $0: $next_dir is not in $phys_root" >&2
             exit 2 # input error
           fi
           include+=("$next_dir")
