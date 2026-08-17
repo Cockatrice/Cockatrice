@@ -20,6 +20,7 @@
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
+#include "../interface/widgets/dialogs/dlg_invite_to_game.h"
 #include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/utility/completer_utils.h"
@@ -43,10 +44,12 @@
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QRegularExpression>
 #include <QStackedWidget>
 #include <QStringListModel>
 #include <QTimer>
+#include <QVBoxLayout>
 #include <QWidget>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -296,6 +299,9 @@ void TabGame::retranslateUi()
     QString tabText = " | " + type + " #" + QString::number(game->getGameMetaInfo()->gameId());
 
     updatePlayerListDockTitle();
+    if (inviteButton) {
+        inviteButton->setText(tr("Invite"));
+    }
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
     messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
     if (replayDock) {
@@ -336,6 +342,9 @@ void TabGame::retranslateUi()
     }
     if (aCopyGameLink) {
         aCopyGameLink->setText(tr("Cop&y game link"));
+    }
+    if (aInviteToGame) {
+        aInviteToGame->setText(tr("Invite to Game..."));
     }
     if (aConcede) {
         if (game->getPlayerManager()->isMainPlayerConceded()) {
@@ -511,6 +520,47 @@ void TabGame::actCopyGameLink()
                          game->getGameMetaInfo()->proto().room_id(), game->getGameMetaInfo()->gameId(),
                          QString::fromStdString(game->getGameMetaInfo()->proto().description()));
     QApplication::clipboard()->setText(link);
+}
+
+void TabGame::updateInviteButtonState()
+{
+    // The dock button stays conservative (pre-start, not full); the menu action
+    // additionally covers started/full games, which are legitimate spectate
+    // invites, so it only needs the server-linked + not-closed conditions.
+    const bool canInvite = !tabSupervisor->getIsLocalGame() && !game->getGameState()->isGameClosed() &&
+                           !game->getGameMetaInfo()->started() &&
+                           game->getPlayerManager()->getPlayerCount() < game->getGameMetaInfo()->maxPlayers();
+    if (inviteButton) {
+        inviteButton->setVisible(canInvite);
+    }
+    if (aInviteToGame) {
+        aInviteToGame->setEnabled(!tabSupervisor->getIsLocalGame() && !game->getGameState()->isGameClosed());
+    }
+}
+
+void TabGame::actInviteToGame()
+{
+    if (!tabSupervisor || tabSupervisor->getIsLocalGame()) {
+        return;
+    }
+
+    GameMetaInfo *metaInfo = game->getGameMetaInfo();
+    const QString inviteUrl = makeGameJoinLink(
+        tabSupervisor->getClient()->serverName(), tabSupervisor->getClient()->serverPort(), metaInfo->proto().room_id(),
+        metaInfo->gameId(), QString::fromStdString(metaInfo->proto().description()));
+
+    QStringList excludeUserNames;
+    excludeUserNames << tabSupervisor->getUserListManager()->getOwnUsername();
+    for (auto player : game->getPlayerManager()->getPlayers()) {
+        excludeUserNames << player->getPlayerInfo()->getName();
+    }
+    for (auto it = game->getPlayerManager()->getSpectators().cbegin();
+         it != game->getPlayerManager()->getSpectators().cend(); ++it) {
+        excludeUserNames << QString::fromStdString(it.value().name());
+    }
+
+    DlgInviteToGame dlg(tabSupervisor, inviteUrl, metaInfo->proto().only_buddies(), excludeUserNames, this);
+    dlg.exec();
 }
 
 void TabGame::actConcede()
@@ -1004,6 +1054,8 @@ void TabGame::createMenuItems()
     aCopyGameLink = new QAction(this);
     aCopyGameLink->setEnabled(!tabSupervisor->getIsLocalGame() && !tabSupervisor->getClient()->serverName().isEmpty());
     connect(aCopyGameLink, &QAction::triggered, this, &TabGame::actCopyGameLink);
+    aInviteToGame = new QAction(this);
+    connect(aInviteToGame, &QAction::triggered, this, &TabGame::actInviteToGame);
     aConcede = new QAction(this);
     connect(aConcede, &QAction::triggered, this, &TabGame::actConcede);
     if (!game->getGameMetaInfo()->started()) {
@@ -1043,6 +1095,7 @@ void TabGame::createMenuItems()
     gameMenu->addSeparator();
     gameMenu->addAction(aGameInfo);
     gameMenu->addAction(aCopyGameLink);
+    gameMenu->addAction(aInviteToGame);
     gameMenu->addAction(aConcede);
     gameMenu->addAction(aFocusChat);
     gameMenu->addAction(aLeaveGame);
@@ -1050,6 +1103,9 @@ void TabGame::createMenuItems()
     gameMenu->addSeparator();
 
     aCardMenu = gameMenu->addMenu(new QMenu(this));
+
+    // Sync the new action with the same state the dock button already shows.
+    updateInviteButtonState();
 
     addTabMenu(gameMenu);
 }
@@ -1066,6 +1122,7 @@ void TabGame::createReplayMenuItems()
     aResetLayout = nullptr;
     aGameInfo = nullptr;
     aCopyGameLink = nullptr;
+    aInviteToGame = nullptr;
     aConcede = nullptr;
     aFocusChat = nullptr;
     aLeaveGame = new QAction(this);
@@ -1264,11 +1321,27 @@ void TabGame::createPlayerListDock(bool bReplay)
     }
     playerListWidget->setFocusPolicy(Qt::NoFocus);
 
+    auto *playerListBox = new QWidget(this);
+    auto *vbox = new QVBoxLayout(playerListBox);
+    vbox->setContentsMargins(0, 0, 0, 0);
+
+    if (!bReplay) {
+        inviteButton = new QPushButton(tr("Invite"), playerListBox);
+        inviteButton->setVisible(false);
+        connect(inviteButton, &QPushButton::clicked, this, &TabGame::actInviteToGame);
+        vbox->addWidget(inviteButton);
+
+        connect(game->getGameMetaInfo(), &GameMetaInfo::startedChanged, this, &TabGame::updateInviteButtonState);
+        connect(game->getPlayerManager(), &PlayerManager::playerCountChanged, this, &TabGame::updateInviteButtonState);
+        updateInviteButtonState();
+    }
+    vbox->addWidget(playerListWidget);
+
     playerListDock = new QDockWidget(this);
     playerListDock->setObjectName("playerListDock");
     playerListDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
                                 QDockWidget::DockWidgetMovable);
-    playerListDock->setWidget(playerListWidget);
+    playerListDock->setWidget(playerListBox);
     playerListDock->setFloating(false);
 }
 

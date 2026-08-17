@@ -7,9 +7,12 @@
 #ifndef USER_CONTEXT_MENU_H
 #define USER_CONTEXT_MENU_H
 
-#include <QObject>
-#include <libcockatrice/network/server/remote/user_level.h>
+#include "../../interface/widgets/server/game_link.h"
 
+#include <QList>
+#include <QObject>
+#include <functional>
+#include <libcockatrice/network/server/remote/user_level.h>
 class AbstractGame;
 class UserListProxy;
 class AbstractClient;
@@ -43,6 +46,7 @@ private:
     QAction *aPromoteToJudge, *aDemoteFromJudge;
     QAction *aWarnUser, *aWarnHistory;
     QAction *aGetAdminNotes;
+    std::function<QList<GameInviteOption>()> gameInviteLinkProvider;
 signals:
     void openMessageDialog(const QString &userName, bool focus);
 private slots:
@@ -80,9 +84,28 @@ public:
         return userListProxy;
     }
 
+    void setGameInviteLinkProvider(std::function<QList<GameInviteOption>()> provider)
+    {
+        gameInviteLinkProvider = std::move(provider);
+    }
+
+    /**
+     * The games currently inviteable for @p userName, honoring the room's
+     * buddy-only setting (the inviter must be the game's creator and the
+     * target a buddy of theirs). Empty when there is no live provider.
+     */
+    QList<GameInviteOption> inviteOptionsForUser(const QString &userName) const;
+
+    /** Whether at least one invite link is currently available for @p userName. */
+    bool hasGameInviteLink(const QString &userName) const
+    {
+        return !inviteOptionsForUser(userName).isEmpty();
+    }
+
     // Individual action entry points — used by UserInfoPopup to trigger
     // actions without re-running the full context menu flow.
     void execChat(const QString &userName);
+    void execInvite(const QString &userName);
     void execDetails(const QString &userName);
     void execShowGames(const QString &userName);
     void execAddToBuddy(const QString &userName);
@@ -97,6 +120,9 @@ public:
     void execAdminNotes(const QString &userName);
     void execAdjustMod(const QString &userName, bool shouldBeMod);
     void execAdjustJudge(const QString &userName, bool shouldBeJudge);
+
+private:
+    void execInvite(const QString &userName, const GameInviteOption &option);
 };
 
 #endif

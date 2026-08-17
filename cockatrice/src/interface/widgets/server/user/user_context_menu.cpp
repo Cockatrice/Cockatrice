@@ -355,6 +355,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
 {
     QAction *aCopyToClipBoard = nullptr, *aRemoveMessages = nullptr;
     aUserName->setText(userName);
+    const bool anotherUser = userName != userListProxy->getOwnUsername();
 
     auto *menu = new QMenu(static_cast<QWidget *>(parent()));
     menu->addAction(aUserName);
@@ -366,6 +367,17 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
     menu->addAction(aDetails);
     menu->addAction(aShowGames);
     menu->addAction(aChat);
+    const QList<GameInviteOption> inviteOptions = inviteOptionsForUser(userName);
+    if (!inviteOptions.isEmpty()) {
+        auto *inviteMenu = new QMenu(tr("&Invite to Game"), menu);
+        for (const GameInviteOption &option : inviteOptions) {
+            QAction *inviteAction = inviteMenu->addAction(option.label);
+            inviteAction->setEnabled(anotherUser && online);
+            connect(inviteAction, &QAction::triggered, this,
+                    [this, userName, option] { execInvite(userName, option); });
+        }
+        menu->addMenu(inviteMenu);
+    }
     if (userLevel.testFlag(ServerInfo_User::IsRegistered) && userListProxy->isOwnUserRegistered()) {
         menu->addSeparator();
         if (userListProxy->isUserBuddy(userName)) {
@@ -416,7 +428,6 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
             menu->addAction(aPromoteToJudge);
         }
     }
-    bool anotherUser = userName != userListProxy->getOwnUsername();
     aDetails->setEnabled(true);
     aChat->setEnabled(anotherUser && online);
     aShowGames->setEnabled(online);
@@ -478,6 +489,60 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
 void UserContextMenu::execChat(const QString &userName)
 {
     emit openMessageDialog(userName, true);
+}
+
+QList<GameInviteOption> UserContextMenu::inviteOptionsForUser(const QString &userName) const
+{
+    if (!gameInviteLinkProvider) {
+        return {};
+    }
+    const QList<GameInviteOption> options = gameInviteLinkProvider();
+    QList<GameInviteOption> result;
+    for (const GameInviteOption &option : options) {
+        // Buddy-only games accept invites only from their creator, and only to
+        // users on the creator's buddy list.
+        if (option.onlyBuddies &&
+            (option.creatorName != userListProxy->getOwnUsername() || !userListProxy->isUserBuddy(userName))) {
+            continue;
+        }
+        result.append(option);
+    }
+    return result;
+}
+
+void UserContextMenu::execInvite(const QString &userName)
+{
+    const QList<GameInviteOption> options = inviteOptionsForUser(userName);
+    if (options.isEmpty()) {
+        return;
+    }
+
+    if (options.size() == 1) {
+        execInvite(userName, options.first());
+        return;
+    }
+
+    // More than one game in the room — let the user pick which one to invite to.
+    auto *menu = new QMenu(static_cast<QWidget *>(parent()));
+    for (const GameInviteOption &option : options) {
+        QAction *action = menu->addAction(option.label);
+        connect(action, &QAction::triggered, this, [this, userName, option] { execInvite(userName, option); });
+    }
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+    menu->popup(QCursor::pos());
+}
+
+void UserContextMenu::execInvite(const QString &userName, const GameInviteOption &option)
+{
+    // Name the game by description first, then its id — "Join my game 'Magic'
+    // (#123)" — so a description-less fallback still identifies the game.
+    // The multi-arg .arg() overloads replace in a single pass, so a description
+    // containing "%…" cannot corrupt later placeholders.
+    const QString prefix =
+        option.description.isEmpty()
+            ? tr("Join my game (#%1):").arg(option.gameId)
+            : tr("Join my game \"%1\" (#%2):").arg(option.description, QString::number(option.gameId));
+    tabSupervisor->sendInviteToUser(userName, prefix + " " + option.url);
 }
 
 void UserContextMenu::execDetails(const QString &userName)

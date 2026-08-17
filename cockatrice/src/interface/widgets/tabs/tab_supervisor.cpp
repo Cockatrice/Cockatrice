@@ -3,6 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../interface/pixel_map_generator.h"
+#include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
@@ -948,6 +949,54 @@ void TabSupervisor::talkLeft(TabMessage *tab)
 
     messageTabs.remove(tab->getUserName());
     removeTab(indexOf(tab));
+}
+
+QList<GameInviteOption> TabSupervisor::getGameInviteLinksForRoom(int roomId) const
+{
+    QList<GameInviteOption> options;
+    if (isLocalGame) {
+        return options;
+    }
+
+    // The inviter may be in several games of the same room (hosting one and
+    // spectating another, for example). Return every game so the caller can
+    // let the user choose which one to invite to.
+    QMapIterator<int, TabGame *> gameIterator(gameTabs);
+    while (gameIterator.hasNext()) {
+        TabGame *tab = gameIterator.next().value();
+        GameMetaInfo *metaInfo = tab->getGame()->getGameMetaInfo();
+        if (metaInfo->proto().room_id() != roomId) {
+            continue;
+        }
+        // A closed game is a dead end — drop it. Started/full games stay
+        // listed: an invite to them is a legitimate "come spectate" offer.
+        if (metaInfo->proto().closed()) {
+            continue;
+        }
+
+        const int gameId = metaInfo->gameId();
+        const QString description = QString::fromStdString(metaInfo->proto().description());
+
+        GameInviteOption option;
+        option.gameId = gameId;
+        option.label =
+            description.isEmpty() ? tr("Game #%1").arg(gameId) : tr("Game #%1 — %2").arg(gameId).arg(description);
+        option.url = makeGameJoinLink(client->serverName(), client->serverPort(), roomId, gameId, description);
+        option.description = description;
+        option.onlyBuddies = metaInfo->proto().only_buddies();
+        option.creatorName = QString::fromStdString(metaInfo->proto().creator_info().name());
+        options.append(option);
+    }
+
+    return options;
+}
+
+void TabSupervisor::sendInviteToUser(const QString &userName, const QString &inviteText)
+{
+    TabMessage *tab = addMessageTab(userName, true);
+    if (tab) {
+        tab->sendInviteMessage(inviteText);
+    }
 }
 
 /**
