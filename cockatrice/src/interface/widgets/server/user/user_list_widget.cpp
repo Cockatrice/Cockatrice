@@ -1656,9 +1656,9 @@ void UserListWidget::updateSectionDivider(Section section)
         // mirroring the "Buddies online: %1 / %2" title of the non-sectioned
         // buddy list.
         divider->setText(0, tr("%1 %2 (%3/%4)").arg(arrow, sectionTitle(section)).arg(online).arg(visible));
-        return;
+    } else {
+        divider->setText(0, tr("%1 %2 (%3)").arg(arrow, sectionTitle(section)).arg(visible));
     }
-    divider->setText(0, tr("%1 %2 (%3)").arg(arrow, sectionTitle(section)).arg(visible));
 }
 
 void UserListWidget::handleSectionExpansion(QTreeWidgetItem *item, bool expanded)
