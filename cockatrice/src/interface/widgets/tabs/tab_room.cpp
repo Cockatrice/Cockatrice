@@ -68,9 +68,7 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     userList = userListPanel->getUserList();
     connect(userListPanel, &UserListPanelWidget::openMessageDialog, this, &TabRoom::openMessageDialog);
 
-    const std::function<QList<GameInviteOption>()> gameInviteLinkProvider = [this]() -> QList<GameInviteOption> {
-        return tabSupervisor->getGameInviteLinksForRoom(roomId);
-    };
+    const auto gameInviteLinkProvider = [this]() { return tabSupervisor->getGameInviteLinksForRoom(roomId); };
     userList->setGameInviteLinkProvider(gameInviteLinkProvider);
 
     chatView = new ChatView(tabSupervisor, nullptr, true, this);

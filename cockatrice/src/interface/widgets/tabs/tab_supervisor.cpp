@@ -961,9 +961,7 @@ QList<GameInviteOption> TabSupervisor::getGameInviteLinksForRoom(int roomId) con
     // The inviter may be in several games of the same room (hosting one and
     // spectating another, for example). Return every game so the caller can
     // let the user choose which one to invite to.
-    QMapIterator<int, TabGame *> gameIterator(gameTabs);
-    while (gameIterator.hasNext()) {
-        TabGame *tab = gameIterator.next().value();
+    for (TabGame *tab : gameTabs) {
         GameMetaInfo *metaInfo = tab->getGame()->getGameMetaInfo();
         if (metaInfo->proto().room_id() != roomId) {
             continue;
@@ -977,14 +975,15 @@ QList<GameInviteOption> TabSupervisor::getGameInviteLinksForRoom(int roomId) con
         const int gameId = metaInfo->gameId();
         const QString description = QString::fromStdString(metaInfo->proto().description());
 
-        GameInviteOption option;
-        option.gameId = gameId;
-        option.label =
-            description.isEmpty() ? tr("Game #%1").arg(gameId) : tr("Game #%1 — %2").arg(gameId).arg(description);
-        option.url = makeGameJoinLink(client->serverName(), client->serverPort(), roomId, gameId, description);
-        option.description = description;
-        option.onlyBuddies = metaInfo->proto().only_buddies();
-        option.creatorName = QString::fromStdString(metaInfo->proto().creator_info().name());
+        GameInviteOption option{
+            .gameId = gameId,
+            .label =
+                description.isEmpty() ? tr("Game #%1").arg(gameId) : tr("Game #%1 — %2").arg(gameId).arg(description),
+            .url = makeGameJoinLink(client->serverName(), client->serverPort(), roomId, gameId, description),
+            .description = description,
+            .onlyBuddies = metaInfo->proto().only_buddies(),
+            .creatorName = QString::fromStdString(metaInfo->proto().creator_info().name()),
+        };
         options.append(option);
     }
 
@@ -994,8 +993,8 @@ QList<GameInviteOption> TabSupervisor::getGameInviteLinksForRoom(int roomId) con
 void TabSupervisor::sendInviteToUser(const QString &userName, const QString &inviteText)
 {
     TabMessage *tab = addMessageTab(userName, true);
-    if (tab) {
-        tab->sendInviteMessage(inviteText);
+    if (tab && tab->isUserOnline()) {
+        tab->sendPrivateMessage(inviteText);
     }
 }
 

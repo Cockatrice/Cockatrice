@@ -123,13 +123,9 @@ void TabMessage::sendMessage()
     sayEdit->clear();
 }
 
-void TabMessage::sendInviteMessage(const QString &text)
+bool TabMessage::isUserOnline() const
 {
-    if (!userOnline) {
-        notifyUserOffline();
-        return;
-    }
-    sendPrivateMessage(text);
+    return userOnline;
 }
 
 void TabMessage::messageSent(const Response &response,
