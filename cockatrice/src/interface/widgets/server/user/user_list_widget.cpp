@@ -1838,3 +1838,8 @@ void UserListWidget::finishSectionedMutation()
     applyFilter();
     userTree->viewport()->update();
 }
+
+void UserListWidget::setGameInviteLinkProvider(std::function<QList<GameInviteOption>()> provider)
+{
+    userContextMenu->setGameInviteLinkProvider(std::move(provider));
+}

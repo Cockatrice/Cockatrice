@@ -96,6 +96,18 @@ void TabMessage::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
+void TabMessage::sendPrivateMessage(const QString &text)
+{
+    Command_Message cmd;
+    cmd.set_user_name(otherUserInfo->name());
+    cmd.set_message(text.toStdString());
+
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    pend->setExtraData(text);
+    connect(pend, &PendingCommand::finished, this, &TabMessage::messageSent);
+    client->sendCommand(pend);
+}
+
 void TabMessage::sendMessage()
 {
     if (sayEdit->text().isEmpty()) {
@@ -103,22 +115,17 @@ void TabMessage::sendMessage()
     }
 
     if (!userOnline) {
-        // Keep the draft: the user may be back momentarily, and the typed text
-        // should not be lost to a transient offline spell.
         notifyUserOffline();
         return;
     }
 
-    Command_Message cmd;
-    cmd.set_user_name(otherUserInfo->name());
-    cmd.set_message(sayEdit->text().toStdString());
-
-    PendingCommand *pend = client->prepareSessionCommand(cmd);
-    pend->setExtraData(sayEdit->text());
-    connect(pend, &PendingCommand::finished, this, &TabMessage::messageSent);
-    client->sendCommand(pend);
-
+    sendPrivateMessage(sayEdit->text());
     sayEdit->clear();
+}
+
+bool TabMessage::isUserOnline() const
+{
+    return userOnline;
 }
 
 void TabMessage::messageSent(const Response &response,

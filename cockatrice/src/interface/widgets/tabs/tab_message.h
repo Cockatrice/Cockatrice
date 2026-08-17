@@ -64,6 +64,9 @@ public:
     void processUserLeft();
     void processUserJoined(const ServerInfo_User &_userInfo);
 
+    [[nodiscard]] bool isUserOnline() const;
+    void sendPrivateMessage(const QString &text);
+
 private:
     bool shouldShowSystemPopup(const Event_UserMessage &event);
     void showSystemPopup(const Event_UserMessage &event);
