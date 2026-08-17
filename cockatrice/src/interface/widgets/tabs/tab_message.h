@@ -67,6 +67,7 @@ public:
     void sendInviteMessage(const QString &text);
 
 private:
+    void sendPrivateMessage(const QString &text);
     bool shouldShowSystemPopup(const Event_UserMessage &event);
     void showSystemPopup(const Event_UserMessage &event);
     void notifyUserOffline();
