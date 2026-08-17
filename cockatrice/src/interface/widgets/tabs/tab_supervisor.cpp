@@ -993,8 +993,8 @@ QList<GameInviteOption> TabSupervisor::getGameInviteLinksForRoom(int roomId) con
 void TabSupervisor::sendInviteToUser(const QString &userName, const QString &inviteText)
 {
     TabMessage *tab = addMessageTab(userName, true);
-    if (tab && tab->isUserOnline()) {
-        tab->sendPrivateMessage(inviteText);
+    if (tab) {
+        tab->sendInviteMessage(inviteText);
     }
 }
 

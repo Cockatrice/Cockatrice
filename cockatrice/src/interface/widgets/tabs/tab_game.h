@@ -37,6 +37,7 @@ class CardInfoFrameWidget;
 class QTimer;
 class QSplitter;
 class QLabel;
+class QPushButton;
 class QToolButton;
 class QMenu;
 class ZoneViewLayout;
@@ -69,6 +70,7 @@ private:
 
     CardInfoFrameWidget *cardInfoFrameWidget;
     PlayerListWidget *playerListWidget;
+    QPushButton *inviteButton = nullptr;
     QLabel *timeElapsedLabel;
     MessageLogWidget *messageLog;
     QLabel *sayLabel;
@@ -86,6 +88,7 @@ private:
     QAction *aGameInfo, *aConcede, *aCopyGameLink, *aLeaveGame, *aNextPhase, *aNextPhaseAction, *aNextTurn,
         *aReverseTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
     QAction *aFocusChat;
+    QAction *aInviteToGame = nullptr;
     QList<QAction *> phaseActions;
     QAction *aCardMenu;
 
@@ -128,6 +131,7 @@ private:
     void createPlayAreaWidget(bool bReplay = false);
     void createDeckViewContainerWidget(bool bReplay = false);
     void createReplayDock(GameReplay *replay);
+    void updateInviteButtonState();
 signals:
     void gameClosing(TabGame *tab);
     void containerProcessingStarted(const GameEventContext &context);
@@ -147,6 +151,7 @@ private slots:
     void setCardMenu(CardMenu *menu);
 
     void actGameInfo();
+    void actInviteToGame();
     void actConcede();
     void actCopyGameLink();
     void actRemoveLocalArrows();

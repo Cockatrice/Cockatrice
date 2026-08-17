@@ -173,6 +173,8 @@ private:
     QString hoveredUser;
     bool popupPinned = false;
     bool bulkLoading = false;
+    bool hasUserInfoPopup = true;
+    std::function<bool(const QString &userName, bool online)> userFilter;
 
     /**
      * Popup functions are anchored on the row, not the user name. In sectioned
@@ -242,12 +244,19 @@ signals:
     void removeIgnore(const QString &userName);
     void joinGameRequested(int gameId, int roomId, bool asSpectator);
     void sectionExpanded(Section section, bool expanded);
+    /** Dialog mode: the user activated (Enter/double-click) the given row. */
+    void userActivated(const QString &userName);
+    /** Dialog mode: the current row changed; empty string means no user row. */
+    void currentUserChanged(const QString &userName);
+    /** The set of visible rows changed (filter, search or a live mutation). */
+    void userListChanged();
 
 public:
     UserListWidget(TabSupervisor *_tabSupervisor,
                    AbstractClient *_client,
                    UserListType _type,
-                   QWidget *parent = nullptr);
+                   QWidget *parent = nullptr,
+                   bool hasUserInfoPopup = true);
     ~UserListWidget() override;
     void bind(UserListManager *mgr);
     void applyDisplayMode();
@@ -263,6 +272,16 @@ public:
     void setShowTitle(bool showTitle);
     void setSectioned(const QList<Section> &ids);
     void setSectionExpanded(Section section, bool expanded);
+    /** Dialog mode: rows that fail the predicate are never shown. */
+    void setUserFilter(std::function<bool(const QString &userName, bool online)> filter)
+    {
+        userFilter = std::move(filter);
+    }
+    [[nodiscard]] int visibleUserRowCount() const;
+    [[nodiscard]] bool getHasUserInfoPopup() const
+    {
+        return hasUserInfoPopup;
+    }
     [[nodiscard]] const QList<Section> &getSectionIds() const
     {
         return sectionIds;
