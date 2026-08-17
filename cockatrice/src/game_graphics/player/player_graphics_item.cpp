@@ -379,15 +379,18 @@ void PlayerGraphicsItem::updatePlaymat()
     CardRef playmatCard;
     PlaymatParams params;
 
-    // Check local deck first (for local player)
-    const DeckList &deck = player->getDeck();
-    if (!deck.getPlaymatCard().isEmpty()) {
-        playmatCard = deck.getPlaymatCard();
-        params = deck.getPlaymatParams();
-    } else if (visibility == 2 && player->getHasRemotePlaymat()) {
-        // "Show all" — also show remote playmats from opponents
+    if (player->getHasRemotePlaymat()) {
+        // Prefer the server-confirmed playmat (updated by Command_SetPlaymat).
         playmatCard = player->getRemotePlaymatCard();
         params = player->getRemotePlaymatParams();
+    } else {
+        // Fall back to the locally baked-in deck playmat.
+        const DeckList &deck = player->getDeck();
+        const PlaymatResolution &deckPlaymat = deck.getPlaymat();
+        if (!deckPlaymat.card.isEmpty()) {
+            playmatCard = deckPlaymat.card;
+            params = deckPlaymat.params;
+        }
     }
 
     if (playmatCard.isEmpty()) {

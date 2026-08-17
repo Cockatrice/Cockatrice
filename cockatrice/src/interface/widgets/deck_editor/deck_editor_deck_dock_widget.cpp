@@ -3,7 +3,6 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../playmat/playmat_settings_dialog.h"
-#include "../playmat/playmat_settings_utils.h"
 #include "../settings_page/user_interface_settings_page.h"
 #include "../tabs/api/commander_spellbook/commander_bracket_widget.h"
 #include "deck_list_style_proxy.h"
@@ -454,29 +453,25 @@ void DeckEditorDeckDockWidget::writeBannerCard(int index)
 
 void DeckEditorDeckDockWidget::openPlaymatSettings()
 {
-    CardRef currentCard = deckStateManager->getMetadata().playmatCard;
-    PlaymatParams currentParams = deckStateManager->getMetadata().playmatParams;
+    PlaymatResolution current = deckStateManager->getMetadata().playmat;
 
-    PlaymatSettingsDialog dialog(currentCard, currentParams, this);
+    PlaymatSettingsDialog dialog(current.card, current.params, this);
     if (dialog.exec() == QDialog::Accepted) {
         CardRef newCard = dialog.card();
         PlaymatParams newParams = dialog.params();
 
         if (newCard.isEmpty()) {
-            // User clicked "Remove Playmat"
-            deckStateManager->setPlaymatCard(CardRef{});
-            deckStateManager->setPlaymatParams(PlaymatParams{});
+            deckStateManager->setPlaymat(PlaymatResolution{});
         } else {
-            deckStateManager->setPlaymatCard(newCard);
-            deckStateManager->setPlaymatParams(newParams);
+            deckStateManager->setPlaymat({newCard, newParams});
         }
 
         // "Also set as my default playmat": make this the fixed user-level
         // fallback, so decks without a playmat of their own use it.
         if (dialog.useAsDefault() && !newCard.isEmpty()) {
             auto &interfaceSettings = SettingsCache::instance().userInterface();
-            interfaceSettings.setPlaymatFallbackList({storedFromResolution({newCard, newParams})});
-            interfaceSettings.setPlaymatFallbackMode(0); // PlaymatFallbackMode::Fixed
+            interfaceSettings.setPlaymatFallbackList({{newCard, newParams}});
+            interfaceSettings.setPlaymatFallbackBehavior(0); // PlaymatFallbackMode::Fixed
         }
         updatePlaymatLabel();
     }
@@ -484,7 +479,7 @@ void DeckEditorDeckDockWidget::openPlaymatSettings()
 
 void DeckEditorDeckDockWidget::updatePlaymatLabel()
 {
-    CardRef playmat = deckStateManager->getMetadata().playmatCard;
+    CardRef playmat = deckStateManager->getMetadata().playmat.card;
     if (playmat.isEmpty()) {
         playmatSettingsButton->setText(tr("Edit Playmat..."));
     } else {

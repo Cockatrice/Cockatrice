@@ -142,28 +142,15 @@ void DeckStateManager::setBannerCard(const CardRef &bannerCard)
     doMetadataModified();
 }
 
-void DeckStateManager::setPlaymatCard(const CardRef &playmatCard)
+void DeckStateManager::setPlaymat(const PlaymatResolution &playmat)
 {
-    CardRef previous = deckList->getPlaymatCard();
-    if (previous == playmatCard) {
+    PlaymatResolution previous = deckList->getPlaymat();
+    if (previous == playmat) {
         return;
     }
 
-    requestHistorySave(tr("Set playmat card to %1 (%2)").arg(playmatCard.name).arg(playmatCard.providerId));
-    deckList->setPlaymatCard(playmatCard);
-
-    doMetadataModified();
-}
-
-void DeckStateManager::setPlaymatParams(const PlaymatParams &playmatParams)
-{
-    PlaymatParams previous = deckList->getPlaymatParams();
-    if (previous == playmatParams) {
-        return;
-    }
-
-    requestHistorySave(tr("Updated playmat positioning"));
-    deckList->setPlaymatParams(playmatParams);
+    requestHistorySave(tr("Set playmat to %1").arg(playmat.card.name));
+    deckList->setPlaymat(playmat);
 
     doMetadataModified();
 }

@@ -6,14 +6,15 @@ PlaymatResolution resolveEffectivePlaymat(const DeckList &deck,
                                           const PlaymatResolution &force,
                                           const QList<PlaymatResolution> &fallbackList,
                                           PlaymatFallbackMode fallbackMode,
-                                          int &rotationIndex)
+                                          int rotationIndex)
 {
     if (!force.card.isEmpty()) {
         return force;
     }
 
-    if (!deck.getPlaymatCard().isEmpty()) {
-        return {deck.getPlaymatCard(), deck.getPlaymatParams()};
+    const PlaymatResolution &deckPlaymat = deck.getPlaymat();
+    if (!deckPlaymat.card.isEmpty()) {
+        return deckPlaymat;
     }
 
     if (fallbackList.isEmpty()) {
@@ -24,7 +25,7 @@ PlaymatResolution resolveEffectivePlaymat(const DeckList &deck,
         case PlaymatFallbackMode::Fixed:
             return fallbackList.first();
         case PlaymatFallbackMode::RoundRobin:
-            return fallbackList.at(rotationIndex++ % fallbackList.size());
+            return fallbackList.at(rotationIndex % fallbackList.size());
         case PlaymatFallbackMode::Random:
             return fallbackList.at(QRandomGenerator::global()->bounded(fallbackList.size()));
     }

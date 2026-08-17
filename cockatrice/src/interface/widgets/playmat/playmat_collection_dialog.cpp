@@ -2,7 +2,6 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "playmat_settings_dialog.h"
-#include "playmat_settings_utils.h"
 
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -24,7 +23,7 @@ void PlaymatCollectionDialog::accept()
 {
     auto &interfaceSettings = SettingsCache::instance().userInterface();
     interfaceSettings.setPlaymatFallbackList(playmats);
-    interfaceSettings.setPlaymatFallbackMode(modeCombo->currentData().toInt());
+    interfaceSettings.setPlaymatFallbackBehavior(modeCombo->currentData().toInt());
     QDialog::accept();
 }
 
@@ -39,8 +38,8 @@ void PlaymatCollectionDialog::setupUi()
     playmats = interfaceSettings.getPlaymatFallbackList();
 
     playmatList = new QListWidget;
-    for (const StoredPlaymat &entry : playmats) {
-        playmatList->addItem(entry.name);
+    for (const PlaymatResolution &entry : playmats) {
+        playmatList->addItem(entry.card.name);
     }
     connect(playmatList, &QListWidget::itemSelectionChanged, this, &PlaymatCollectionDialog::selectionChanged);
     connect(playmatList, &QListWidget::itemDoubleClicked, this, [this](QListWidgetItem *) { editPlaymat(); });
@@ -73,7 +72,7 @@ void PlaymatCollectionDialog::setupUi()
     modeCombo->addItem(QString(), 0);
     modeCombo->addItem(QString(), 1);
     modeCombo->addItem(QString(), 2);
-    const int modeIndex = modeCombo->findData(interfaceSettings.getPlaymatFallbackMode());
+    const int modeIndex = modeCombo->findData(interfaceSettings.getPlaymatFallbackBehavior());
     if (modeIndex >= 0) {
         modeCombo->setCurrentIndex(modeIndex);
     }
@@ -106,20 +105,16 @@ void PlaymatCollectionDialog::selectionChanged()
     moveDownButton->setEnabled(hasSelection && playmatList->currentRow() < playmatList->count() - 1);
 }
 
-void PlaymatCollectionDialog::appendEntry(const StoredPlaymat &entry)
-{
-    playmats.append(entry);
-    playmatList->addItem(entry.name);
-    playmatList->setCurrentRow(playmatList->count() - 1);
-}
-
 void PlaymatCollectionDialog::addPlaymat()
 {
     PlaymatSettingsDialog dialog(CardRef{}, PlaymatParams{}, this);
     if (dialog.exec() == QDialog::Accepted) {
         const CardRef card = dialog.card();
         if (!card.isEmpty()) {
-            appendEntry(storedFromResolution({card, dialog.params()}));
+            PlaymatResolution res = {card, dialog.params()};
+            playmats.append(res);
+            playmatList->addItem(res.card.name);
+            playmatList->setCurrentRow(playmatList->count() - 1);
         }
     }
 }
@@ -131,14 +126,14 @@ void PlaymatCollectionDialog::editPlaymat()
         return;
     }
 
-    const PlaymatResolution current = resolutionFromStoredPlaymat(playmats.at(row));
+    const PlaymatResolution &current = playmats.at(row);
     PlaymatSettingsDialog dialog(current.card, current.params, this);
     if (dialog.exec() == QDialog::Accepted) {
         const CardRef card = dialog.card();
         if (card.isEmpty()) {
             return; // Removal is handled by the Remove button
         }
-        playmats[row] = storedFromResolution({card, dialog.params()});
+        playmats[row] = {card, dialog.params()};
         playmatList->item(row)->setText(card.name);
     }
 }
@@ -186,8 +181,8 @@ void PlaymatCollectionDialog::retranslateUi()
     removeButton->setText(tr("Remove"));
     moveUpButton->setText(tr("Move Up"));
     moveDownButton->setText(tr("Move Down"));
-    modeLabel->setText(tr("When a deck has no playmat:"));
-    modeCombo->setItemText(0, tr("Always use the first playmat"));
-    modeCombo->setItemText(1, tr("Cycle through playmats (one per game)"));
-    modeCombo->setItemText(2, tr("Pick a random playmat per game"));
+    modeLabel->setText(tr("List mode:"));
+    modeCombo->setItemText(0, tr("Fixed (always the first entry)"));
+    modeCombo->setItemText(1, tr("Round-robin (cycle through entries)"));
+    modeCombo->setItemText(2, tr("Random (pick one per game)"));
 }

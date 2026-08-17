@@ -4,26 +4,7 @@
 #include <QList>
 #include <QString>
 #include <QStringList>
-
-/**
- * @struct StoredPlaymat
- * @brief A user-level playmat entry as stored in the settings, independent of
- *        any deck. Mirrors a deck-configured playmat (card + parameters).
- */
-struct StoredPlaymat
-{
-    QString name;                 ///< Card name whose art is used as playmat.
-    QString providerId;           ///< Printing provider id (uuid); may be empty.
-    double marginPctL = 0.07;     ///< Left margin as fraction of card width (0.0-0.95).
-    double marginPctR = 0.07;     ///< Right margin as fraction of card width (0.0-0.95).
-    double verticalOffset = 0.33; ///< Vertical position within card (0.0=top, 1.0=bottom).
-    double zoom = 1.0;            ///< Scale factor (0.1-4.0).
-
-    bool isEmpty() const
-    {
-        return name.isEmpty();
-    }
-};
+#include <libcockatrice/utility/playmat_params.h>
 
 class IInterfaceSettingsProvider
 {
@@ -66,14 +47,16 @@ public:
     [[nodiscard]] virtual QStringList getUserListExpandedSections() const = 0;
     [[nodiscard]] virtual int getPlaymatVisibility() const = 0;
 
-    /** @brief User-level fallback playmats, used when a deck has none configured. */
-    [[nodiscard]] virtual QList<StoredPlaymat> getPlaymatFallbackList() const = 0;
+    /** @brief User-level playmat collection. Used either as a forced playmat
+     *         (mode == Always) or as a fallback when a deck has none (mode == Fallback). */
+    [[nodiscard]] virtual QList<PlaymatResolution> getPlaymatFallbackList() const = 0;
 
-    /** @brief User-level override playmat applied to all decks, or empty to disable. */
-    [[nodiscard]] virtual StoredPlaymat getPlaymatOverride() const = 0;
+    /** @brief How the fallback list is applied: Always (0), Fallback (1), Never (2). */
+    [[nodiscard]] virtual int getPlaymatMode() const = 0;
 
-    /** @brief How the fallback list is consulted (0 Fixed, 1 Round-robin, 2 Random). */
-    [[nodiscard]] virtual int getPlaymatFallbackMode() const = 0;
+    /** @brief How the fallback list is picked from when mode is Fallback
+     *         (0 Fixed, 1 Round-robin, 2 Random). */
+    [[nodiscard]] virtual int getPlaymatFallbackBehavior() const = 0;
 };
 
 #endif // COCKATRICE_INTERFACE_INTERFACE_SETTINGS_PROVIDER_H

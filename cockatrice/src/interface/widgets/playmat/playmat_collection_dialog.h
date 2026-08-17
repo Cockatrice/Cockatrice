@@ -2,7 +2,7 @@
 #define COCKATRICE_PLAYMAT_COLLECTION_DIALOG_H
 
 #include <QDialog>
-#include <libcockatrice/interfaces/interface_interface_settings_provider.h>
+#include <libcockatrice/utility/playmat_params.h>
 
 class QComboBox;
 class QLabel;
@@ -39,9 +39,8 @@ private:
     void setupUi();
     void retranslateUi();
     int currentRow() const;
-    void appendEntry(const StoredPlaymat &entry);
 
-    QList<StoredPlaymat> playmats; ///< Working copy edited by the dialog.
+    QList<PlaymatResolution> playmats; ///< Working copy edited by the dialog.
     QListWidget *playmatList;
     QComboBox *modeCombo;
     QLabel *modeLabel;

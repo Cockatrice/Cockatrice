@@ -244,8 +244,6 @@ set(cockatrice_SOURCES
     src/interface/widgets/playmat/playmat_collection_dialog.h
     src/interface/widgets/playmat/playmat_preview_widget.cpp
     src/interface/widgets/playmat/playmat_settings_dialog.cpp
-    src/interface/widgets/playmat/playmat_settings_utils.cpp
-    src/interface/widgets/playmat/playmat_settings_utils.h
     src/interface/widgets/quick_settings/settings_button_widget.cpp
     src/interface/widgets/quick_settings/settings_popup_widget.cpp
     src/interface/widgets/replay/replay_manager.cpp

@@ -286,7 +286,7 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
             }
             player->processPlayerInfo(playerInfo);
             // Extract playmat from player properties for opponent display
-            if (prop.has_playmat_card_name()) {
+            if (prop.has_playmat_params()) {
                 player->setPlaymatFromProperties(prop);
             }
             if (player->getPlayerInfo()->getLocal()) {
@@ -356,7 +356,7 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
     emit playerPropertiesChanged(prop, eventPlayerId);
 
     // Update playmat from player properties
-    if (prop.has_playmat_card_name()) {
+    if (prop.has_playmat_params()) {
         player->setPlaymatFromProperties(prop);
     }
 

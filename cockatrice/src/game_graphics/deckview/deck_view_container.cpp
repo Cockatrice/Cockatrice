@@ -8,19 +8,21 @@
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../../interface/widgets/dialogs/dlg_load_deck_from_website.h"
 #include "../../interface/widgets/dialogs/dlg_load_remote_deck.h"
-#include "../../interface/widgets/playmat/playmat_settings_utils.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "deck_view.h"
 
 #include <QMessageBox>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/playmat_resolver.h>
 #include <libcockatrice/protocol/pb/command_deck_select.pb.h>
 #include <libcockatrice/protocol/pb/command_ready_start.pb.h>
+#include <libcockatrice/protocol/pb/command_set_playmat.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_download.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
@@ -100,6 +102,9 @@ DeckViewContainer::DeckViewContainer(int _playerId, TabGame *parent)
 
     connect(&SettingsCache::instance().visualDeckStorage(), &VisualDeckStorageSettings::visualDeckStorageInGameChanged,
             this, &DeckViewContainer::setVisualDeckStorageExists);
+
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::playmatSettingsChanged, this,
+            &DeckViewContainer::onPlaymatSettingsChanged);
 
     switchToDeckSelectView();
 }
@@ -278,11 +283,9 @@ void DeckViewContainer::loadDeckFromFile(const QString &filePath)
 
 void DeckViewContainer::loadDeckFromDeckList(const DeckList &deck)
 {
-    // Bake the user-level playmat resolution (override > deck > fallback list)
-    // into the uploaded deck so the server, local and remote players, and
-    // replays all derive the same effective playmat.
-    const DeckList effectiveDeck = applyUserPlaymatSettings(deck, SettingsCache::instance().userInterface());
-    QString deckString = effectiveDeck.writeToString_Native();
+    currentDeck = deck;
+
+    QString deckString = deck.writeToString_Native();
 
     if (deckString.length() > MAX_FILE_LENGTH) {
         QMessageBox::critical(this, tr("Error"), tr("Deck is greater than maximum file size."));
@@ -294,6 +297,65 @@ void DeckViewContainer::loadDeckFromDeckList(const DeckList &deck)
     PendingCommand *pend = parentGame->getGame()->getGameEventHandler()->prepareGameCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &DeckViewContainer::deckSelectFinished);
     parentGame->getGame()->getGameEventHandler()->sendGameCommand(pend, playerId);
+
+    resolveAndSendPlaymat();
+}
+
+void DeckViewContainer::resolveAndSendPlaymat()
+{
+    if (currentDeck.getCardRefList().isEmpty() && currentDeck.getPlaymat().card.isEmpty()) {
+        return;
+    }
+
+    const auto &settings = SettingsCache::instance().userInterface();
+    const auto fallbackBehavior = static_cast<PlaymatFallbackMode>(settings.getPlaymatFallbackBehavior());
+
+    PlaymatResolution resolved;
+    QList<PlaymatResolution> fallbackList = settings.getPlaymatFallbackList();
+
+    // In random mode with 2+ entries, remove the last-resolved mat to avoid repeats.
+    if (fallbackBehavior == PlaymatFallbackMode::Random && fallbackList.size() > 1) {
+        fallbackList.removeAll(lastResolvedPlaymat);
+    }
+
+    switch (settings.getPlaymatMode()) {
+        case 0: { // Override deck playmat — always use collection
+            DeckList emptyDeck;
+            resolved = resolveEffectivePlaymat(emptyDeck, {}, fallbackList, fallbackBehavior, playmatRotationIndex);
+            break;
+        }
+        case 1: // Fallback if deck has none — deck > collection > none
+            resolved = resolveEffectivePlaymat(currentDeck, {}, fallbackList, fallbackBehavior, playmatRotationIndex);
+            break;
+        case 2: // Deck only, ignore collection
+            resolved = currentDeck.getPlaymat();
+            break;
+        default:
+            break;
+    }
+
+    lastResolvedPlaymat = resolved;
+
+    Command_SetPlaymat playmatCmd;
+    auto *pp = playmatCmd.mutable_playmat_params();
+    pp->set_card_name(resolved.card.name.toStdString());
+    pp->set_card_provider_id(resolved.card.providerId.toStdString());
+    pp->set_margin_pct_l(resolved.params.marginPctL);
+    pp->set_margin_pct_r(resolved.params.marginPctR);
+    pp->set_vertical_offset(resolved.params.verticalOffset);
+    pp->set_zoom(resolved.params.zoom);
+    PendingCommand *playmatPend = parentGame->getGame()->getGameEventHandler()->prepareGameCommand(playmatCmd);
+    parentGame->getGame()->getGameEventHandler()->sendGameCommand(playmatPend, playerId);
+}
+
+void DeckViewContainer::onPlaymatSettingsChanged()
+{
+    resolveAndSendPlaymat();
+}
+
+void DeckViewContainer::advancePlaymatRotation()
+{
+    playmatRotationIndex++;
 }
 
 void DeckViewContainer::loadRemoteDeck()
@@ -384,6 +446,10 @@ void DeckViewContainer::sideboardPlanChanged()
  */
 void DeckViewContainer::sendReadyStartCommand(bool ready)
 {
+    if (ready) {
+        resolveAndSendPlaymat();
+    }
+
     Command_ReadyStart cmd;
     cmd.set_ready(ready);
     parentGame->getGame()->getGameEventHandler()->sendGameCommand(cmd, playerId);
@@ -421,6 +487,7 @@ void DeckViewContainer::setSideboardLocked(bool locked)
 
 void DeckViewContainer::setDeck(const DeckList &deck)
 {
+    currentDeck = deck;
     deckView->setDeck(deck);
     switchToDeckLoadedView();
 }

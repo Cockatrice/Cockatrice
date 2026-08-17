@@ -2,6 +2,15 @@ syntax = "proto2";
 import "serverinfo_user.proto";
 
 message ServerInfo_PlayerProperties {
+    message PlaymatParams {
+        optional string card_name = 1;
+        optional string card_provider_id = 2;
+        optional double margin_pct_l = 3 [default = 0.07];
+        optional double margin_pct_r = 4 [default = 0.07];
+        optional double vertical_offset = 5 [default = 0.33];
+        optional double zoom = 6 [default = 1.0];
+    }
+
     optional sint32 player_id = 1;
     optional ServerInfo_User user_info = 2;
     optional bool spectator = 3;
@@ -11,10 +20,5 @@ message ServerInfo_PlayerProperties {
     optional sint32 ping_seconds = 7;
     optional bool sideboard_locked = 8;
     optional bool judge = 9;
-    optional string playmat_card_name = 10;
-    optional string playmat_card_provider_id = 11;
-    optional double playmat_margin_pct_l = 12 [default = 0.07];
-    optional double playmat_margin_pct_r = 13 [default = 0.07];
-    optional double playmat_vertical_offset = 14 [default = 0.33];
-    optional double playmat_zoom = 15 [default = 1.0];
+    optional PlaymatParams playmat_params = 10;
 }

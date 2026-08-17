@@ -911,6 +911,7 @@ void TabGame::stopGame()
     QMapIterator<int, TabbedDeckViewContainer *> i(deckViewContainers);
     while (i.hasNext()) {
         i.next();
+        i.value()->playerDeckView->advancePlaymatRotation();
         i.value()->show();
     }
 

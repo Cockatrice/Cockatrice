@@ -9,7 +9,6 @@
 #include "../interface/widgets/general/background_sources.h"
 #include "../playmat/playmat_collection_dialog.h"
 #include "../playmat/playmat_settings_dialog.h"
-#include "../playmat/playmat_settings_utils.h"
 
 #include <QApplication>
 #include <QColorDialog>
@@ -342,22 +341,28 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     });
     playmatVisibilityLabel.setBuddy(&playmatVisibilityCombo);
 
-    // User-level playmat settings: override (force all decks) and fallback collection.
-    connect(&playmatOverrideEditButton, &QPushButton::clicked, this,
-            &AppearanceSettingsPage::openOverridePlaymatSettings);
-    connect(&playmatOverrideClearButton, &QPushButton::clicked, this, &AppearanceSettingsPage::clearOverridePlaymat);
+    // Playmat mode: Override / Fallback / Deck-only
+    playmatModeCombo.addItem(tr("Override deck playmat"), 0);
+    playmatModeCombo.addItem(tr("Fallback if deck has none"), 1);
+    playmatModeCombo.addItem(tr("Deck only, ignore collection"), 2);
+    int modeIdx = playmatModeCombo.findData(settings.userInterface().getPlaymatMode());
+    if (modeIdx >= 0) {
+        playmatModeCombo.setCurrentIndex(modeIdx);
+    }
+    connect(&playmatModeCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+        SettingsCache::instance().userInterface().setPlaymatMode(playmatModeCombo.itemData(index).toInt());
+    });
+    playmatModeLabel.setBuddy(&playmatModeCombo);
+
+    // User-level playmat settings: fallback collection.
     connect(&playmatDefaultEditButton, &QPushButton::clicked, this,
             &AppearanceSettingsPage::openPlaymatCollectionDialog);
-
-    auto *overrideButtons = new QHBoxLayout;
-    overrideButtons->addWidget(&playmatOverrideEditButton);
-    overrideButtons->addWidget(&playmatOverrideClearButton);
 
     auto *playmatGrid = new QGridLayout;
     playmatGrid->addWidget(&playmatVisibilityLabel, 0, 0, 1, 1);
     playmatGrid->addWidget(&playmatVisibilityCombo, 0, 1, 1, 1);
-    playmatGrid->addWidget(&playmatOverrideLabel, 1, 0, 1, 1);
-    playmatGrid->addLayout(overrideButtons, 1, 1, 1, 1);
+    playmatGrid->addWidget(&playmatModeLabel, 1, 0, 1, 1);
+    playmatGrid->addWidget(&playmatModeCombo, 1, 1, 1, 1);
     playmatGrid->addWidget(&playmatDefaultLabel, 2, 0, 1, 1);
     playmatGrid->addWidget(&playmatDefaultEditButton, 2, 1, 1, 1);
 
@@ -471,40 +476,10 @@ void AppearanceSettingsPage::cardViewExpandedRowsMaxChanged(int value)
     }
 }
 
-void AppearanceSettingsPage::openOverridePlaymatSettings()
-{
-    auto &interfaceSettings = SettingsCache::instance().userInterface();
-    const PlaymatResolution current = resolutionFromStoredPlaymat(interfaceSettings.getPlaymatOverride());
-    PlaymatSettingsDialog dialog(current.card, current.params, this);
-    if (dialog.exec() == QDialog::Accepted) {
-        const CardRef card = dialog.card();
-        if (card.isEmpty()) {
-            interfaceSettings.setPlaymatOverride(StoredPlaymat{});
-        } else {
-            interfaceSettings.setPlaymatOverride(storedFromResolution({card, dialog.params()}));
-        }
-        updatePlaymatSummary();
-    }
-}
-
-void AppearanceSettingsPage::clearOverridePlaymat()
-{
-    SettingsCache::instance().userInterface().setPlaymatOverride(StoredPlaymat{});
-    updatePlaymatSummary();
-}
-
 void AppearanceSettingsPage::openPlaymatCollectionDialog()
 {
     PlaymatCollectionDialog dialog(this);
     dialog.exec();
-    updatePlaymatSummary();
-}
-
-void AppearanceSettingsPage::updatePlaymatSummary()
-{
-    const StoredPlaymat overridePlaymat = SettingsCache::instance().userInterface().getPlaymatOverride();
-    playmatOverrideEditButton.setText(overridePlaymat.isEmpty() ? tr("Set...")
-                                                                : tr("Change (%1)").arg(overridePlaymat.name));
 }
 
 void AppearanceSettingsPage::retranslateUi()
@@ -567,9 +542,7 @@ void AppearanceSettingsPage::retranslateUi()
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
     playmatGroupBox->setTitle(tr("Playmat settings"));
     playmatVisibilityLabel.setText(tr("Playmat visibility:"));
-    playmatOverrideLabel.setText(tr("Force playmat for all decks:"));
-    playmatOverrideClearButton.setText(tr("Clear"));
-    playmatDefaultLabel.setText(tr("Default playmats (when a deck has none):"));
+    playmatModeLabel.setText(tr("Default collection behavior:"));
+    playmatDefaultLabel.setText(tr("Default playmat collection:"));
     playmatDefaultEditButton.setText(tr("Edit..."));
-    updatePlaymatSummary();
 }

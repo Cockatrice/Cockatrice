@@ -2,30 +2,31 @@
 
 namespace
 {
-const QChar PLAYMAT_FIELD_SEP = QChar(0x1F); ///< Separator between StoredPlaymat fields.
+const QChar PLAYMAT_FIELD_SEP = QChar(0x1F); ///< Separator between PlaymatResolution fields.
 
-QString encodeStoredPlaymat(const StoredPlaymat &stored)
+QString encodePlaymatResolution(const PlaymatResolution &res)
 {
-    return stored.name + PLAYMAT_FIELD_SEP + stored.providerId + PLAYMAT_FIELD_SEP +
-           QString::number(stored.marginPctL, 'f', 4) + PLAYMAT_FIELD_SEP + QString::number(stored.marginPctR, 'f', 4) +
-           PLAYMAT_FIELD_SEP + QString::number(stored.verticalOffset, 'f', 4) + PLAYMAT_FIELD_SEP +
-           QString::number(stored.zoom, 'f', 4);
+    return res.card.name + PLAYMAT_FIELD_SEP + res.card.providerId + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.marginPctL, 'f', 4) + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.marginPctR, 'f', 4) + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.verticalOffset, 'f', 4) + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.zoom, 'f', 4);
 }
 
-StoredPlaymat decodeStoredPlaymat(const QString &encoded)
+PlaymatResolution decodePlaymatResolution(const QString &encoded)
 {
     const QStringList fields = encoded.split(PLAYMAT_FIELD_SEP);
     if (fields.size() != 6) {
         return {};
     }
-    StoredPlaymat stored;
-    stored.name = fields.at(0);
-    stored.providerId = fields.at(1);
-    stored.marginPctL = fields.at(2).toDouble();
-    stored.marginPctR = fields.at(3).toDouble();
-    stored.verticalOffset = fields.at(4).toDouble();
-    stored.zoom = fields.at(5).toDouble();
-    return stored;
+    PlaymatResolution res;
+    res.card.name = fields.at(0);
+    res.card.providerId = fields.at(1);
+    res.params.marginPctL = fields.at(2).toDouble();
+    res.params.marginPctR = fields.at(3).toDouble();
+    res.params.verticalOffset = fields.at(4).toDouble();
+    res.params.zoom = fields.at(5).toDouble();
+    return res;
 }
 } // namespace
 
@@ -194,28 +195,28 @@ int InterfaceSettings::getPlaymatVisibility() const
     return getValue("playmatvisibility", QString(), QString(), 2).toInt();
 }
 
-QList<StoredPlaymat> InterfaceSettings::getPlaymatFallbackList() const
+QList<PlaymatResolution> InterfaceSettings::getPlaymatFallbackList() const
 {
     const QStringList entries = getValue("playmatFallbackList", QString(), QString(), QStringList()).toStringList();
-    QList<StoredPlaymat> result;
+    QList<PlaymatResolution> result;
     result.reserve(entries.size());
     for (const QString &entry : entries) {
-        const StoredPlaymat stored = decodeStoredPlaymat(entry);
-        if (!stored.isEmpty()) {
-            result.append(stored);
+        const PlaymatResolution res = decodePlaymatResolution(entry);
+        if (!res.card.isEmpty()) {
+            result.append(res);
         }
     }
     return result;
 }
 
-StoredPlaymat InterfaceSettings::getPlaymatOverride() const
+int InterfaceSettings::getPlaymatMode() const
 {
-    return decodeStoredPlaymat(getValue("playmatOverride", QString(), QString(), QString()).toString());
+    return qBound(0, getValue("playmatMode", QString(), QString(), 1).toInt(), 2);
 }
 
-int InterfaceSettings::getPlaymatFallbackMode() const
+int InterfaceSettings::getPlaymatFallbackBehavior() const
 {
-    return qBound(0, getValue("playmatFallbackMode", QString(), QString(), 1).toInt(), 2);
+    return qBound(0, getValue("playmatFallbackBehavior", QString(), QString(), 0).toInt(), 2);
 }
 
 bool InterfaceSettings::getLifeCounterAnimationsEnabled() const
@@ -410,30 +411,34 @@ void InterfaceSettings::setPlaymatVisibility(int _visibility)
     emit playmatVisibilityChanged(_visibility);
 }
 
-void InterfaceSettings::setPlaymatFallbackList(const QList<StoredPlaymat> &_fallbackList)
+void InterfaceSettings::setPlaymatFallbackList(const QList<PlaymatResolution> &_fallbackList)
 {
     QStringList entries;
     entries.reserve(_fallbackList.size());
-    for (const StoredPlaymat &stored : _fallbackList) {
-        entries.append(encodeStoredPlaymat(stored));
+    for (const PlaymatResolution &res : _fallbackList) {
+        entries.append(encodePlaymatResolution(res));
     }
     setValue(entries, "playmatFallbackList");
     emit playmatSettingsChanged();
 }
 
-void InterfaceSettings::setPlaymatOverride(const StoredPlaymat &_override)
+void InterfaceSettings::setPlaymatMode(int _mode)
 {
-    setValue(_override.isEmpty() ? QString() : encodeStoredPlaymat(_override), "playmatOverride");
+    const int mode = qBound(0, _mode, 2);
+    if (getPlaymatMode() == mode) {
+        return;
+    }
+    setValue(mode, "playmatMode");
     emit playmatSettingsChanged();
 }
 
-void InterfaceSettings::setPlaymatFallbackMode(int _fallbackMode)
+void InterfaceSettings::setPlaymatFallbackBehavior(int _behavior)
 {
-    const int mode = qBound(0, _fallbackMode, 2);
-    if (getPlaymatFallbackMode() == mode) {
+    const int behavior = qBound(0, _behavior, 2);
+    if (getPlaymatFallbackBehavior() == behavior) {
         return;
     }
-    setValue(mode, "playmatFallbackMode");
+    setValue(behavior, "playmatFallbackBehavior");
     emit playmatSettingsChanged();
 }
 

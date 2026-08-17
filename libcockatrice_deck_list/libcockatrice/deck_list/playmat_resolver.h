@@ -15,22 +15,6 @@ enum class PlaymatFallbackMode
 };
 
 /**
- * @struct PlaymatResolution
- * @ingroup Decks
- * @brief A resolved playmat (card + positioning parameters).
- */
-struct PlaymatResolution
-{
-    CardRef card;         ///< The card whose art is used as playmat.
-    PlaymatParams params; ///< Positioning parameters for the playmat card image.
-
-    bool operator==(const PlaymatResolution &other) const
-    {
-        return card == other.card && params == other.params;
-    }
-};
-
-/**
  * @brief Resolves the effective playmat for a deck per the resolution chain:
  *        force override > deck-configured playmat > fallback list > none.
  *
@@ -49,6 +33,6 @@ PlaymatResolution resolveEffectivePlaymat(const DeckList &deck,
                                           const PlaymatResolution &force,
                                           const QList<PlaymatResolution> &fallbackList,
                                           PlaymatFallbackMode fallbackMode,
-                                          int &rotationIndex);
+                                          int rotationIndex);
 
 #endif // COCKATRICE_PLAYMAT_RESOLVER_H

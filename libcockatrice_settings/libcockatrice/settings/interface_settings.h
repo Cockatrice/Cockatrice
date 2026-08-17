@@ -43,9 +43,9 @@ public:
     [[nodiscard]] bool getShowShortcuts() const override;
     [[nodiscard]] bool getShowGameSelectorFilterToolbar() const override;
     [[nodiscard]] int getPlaymatVisibility() const override;
-    [[nodiscard]] QList<StoredPlaymat> getPlaymatFallbackList() const override;
-    [[nodiscard]] StoredPlaymat getPlaymatOverride() const override;
-    [[nodiscard]] int getPlaymatFallbackMode() const override;
+    [[nodiscard]] QList<PlaymatResolution> getPlaymatFallbackList() const override;
+    [[nodiscard]] int getPlaymatMode() const override;
+    [[nodiscard]] int getPlaymatFallbackBehavior() const override;
     [[nodiscard]] bool getLifeCounterAnimationsEnabled() const override;
     [[nodiscard]] bool getBattlefieldFlashEnabled() const override;
     [[nodiscard]] QStringList getUserListExpandedSections() const override;
@@ -82,9 +82,9 @@ public:
     void setShowShortcuts(bool _showShortcuts);
     void setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar);
     void setPlaymatVisibility(int _visibility);
-    void setPlaymatFallbackList(const QList<StoredPlaymat> &_fallbackList);
-    void setPlaymatOverride(const StoredPlaymat &_override);
-    void setPlaymatFallbackMode(int _fallbackMode);
+    void setPlaymatFallbackList(const QList<PlaymatResolution> &_fallbackList);
+    void setPlaymatMode(int _mode);
+    void setPlaymatFallbackBehavior(int _behavior);
     void setLifeCounterAnimationsEnabled(bool _lifeCounterAnimationsEnabled);
     void setBattlefieldFlashEnabled(bool _battlefieldFlashEnabled);
     void setUserListExpandedSections(const QStringList &sections);
