@@ -20,8 +20,8 @@ namespace
  */
 struct DeckScanResult
 {
-    QList<DeckPreviewData> decks;
-    QStringList folderPaths;
+    QList<DeckPreviewData> decks; ///< Deck rows in scan order.
+    QStringList folderPaths;      ///< Sorted list of subfolder paths.
 };
 
 /**
@@ -30,8 +30,8 @@ struct DeckScanResult
  */
 struct DeckLoadResult
 {
-    LoadedDeck deck;
-    QDateTime lastModified;
+    LoadedDeck deck;        ///< The parsed deck.
+    QDateTime lastModified; ///< File modification time at load.
 };
 
 /**
@@ -49,6 +49,63 @@ QString relativePathFromDeckRoot(const QString &path, const QString &deckPath)
     }
     return relativePath;
 }
+
+/**
+ * @brief The path of \a filePath relative to \a deckPath, or the bare file name
+ * if \a filePath is not below \a deckPath.
+ */
+QString relativeFilePathFor(const QString &filePath, const QString &deckPath)
+{
+    if (filePath.startsWith(deckPath)) {
+        return filePath.mid(deckPath.length());
+    }
+
+    return QFileInfo(filePath).fileName();
+}
+
+/**
+ * @brief The directory of \a filePath relative to \a deckPath, or empty if the
+ * file sits directly in the deck root.
+ */
+QString folderPathFor(const QString &filePath, const QString &deckPath)
+{
+    return relativePathFromDeckRoot(QFileInfo(filePath).absolutePath(), deckPath);
+}
+
+/**
+ * @brief Scans a deck directory on a worker thread, returning discovered deck
+ * files and subfolder paths.
+ */
+DeckScanResult scanDeckDirectory(const QString &deckPath)
+{
+    DeckScanResult result;
+
+    QDirIterator fileIt(deckPath, DeckLoader::ACCEPTED_FILE_EXTENSIONS, QDir::Files,
+                        QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+    while (fileIt.hasNext()) {
+        const QString filePath = fileIt.next();
+        DeckPreviewData data;
+        data.filePath = filePath;
+        data.relativeFilePath = relativeFilePathFor(filePath, deckPath);
+        data.folderPath = folderPathFor(filePath, deckPath);
+        data.lastModified = QFileInfo(filePath).lastModified();
+        result.decks.append(std::move(data));
+    }
+
+    QSet<QString> seenFolders;
+    QDirIterator folderIt(deckPath, QDir::Dirs | QDir::NoDotAndDotDot,
+                          QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
+    while (folderIt.hasNext()) {
+        const QString folderPath = relativePathFromDeckRoot(folderIt.next(), deckPath);
+        if (!folderPath.isEmpty() && !seenFolders.contains(folderPath)) {
+            seenFolders.insert(folderPath);
+            result.folderPaths.append(folderPath);
+        }
+    }
+    result.folderPaths.sort();
+
+    return result;
+}
 } // namespace
 
 VisualDeckStorageModel::VisualDeckStorageModel(QObject *parent) : QAbstractListModel(parent)
@@ -57,16 +114,16 @@ VisualDeckStorageModel::VisualDeckStorageModel(QObject *parent) : QAbstractListM
 
 int VisualDeckStorageModel::rowCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : decks_.size();
+    return parent.isValid() ? 0 : decks.size();
 }
 
 QVariant VisualDeckStorageModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() < 0 || index.row() >= decks_.size()) {
+    if (!index.isValid() || index.row() < 0 || index.row() >= decks.size()) {
         return {};
     }
 
-    const DeckPreviewData &data = decks_.at(index.row());
+    const DeckPreviewData &data = decks.at(index.row());
     switch (role) {
         case Qt::DisplayRole:
         case VisualDeckStorageRoles::DisplayNameRole:
@@ -86,21 +143,21 @@ QVariant VisualDeckStorageModel::data(const QModelIndex &index, int role) const
         case VisualDeckStorageRoles::LastLoadedRole:
             return data.lastLoaded;
         case VisualDeckStorageRoles::BannerCardNameRole:
-            return data.bannerCardName;
+            return data.bannerCard.name;
         case VisualDeckStorageRoles::BannerCardProviderIdRole:
-            return data.bannerCardProviderId;
+            return data.bannerCard.providerId;
         default:
             return {};
     }
 }
 
-void VisualDeckStorageModel::setDeckPath(const QString &deckPath)
+void VisualDeckStorageModel::setDeckPath(const QString &path)
 {
-    QString cleanedPath = QDir::cleanPath(deckPath);
+    QString cleanedPath = QDir::cleanPath(path);
     if (cleanedPath == ".") {
         cleanedPath.clear();
     }
-    deckPath_ = cleanedPath;
+    deckPath = cleanedPath;
     startScan();
 }
 
@@ -112,10 +169,10 @@ void VisualDeckStorageModel::refresh()
 const DeckPreviewData &VisualDeckStorageModel::dataForRow(int row) const
 {
     static const DeckPreviewData emptyData;
-    if (row < 0 || row >= decks_.size()) {
+    if (row < 0 || row >= decks.size()) {
         return emptyData;
     }
-    return decks_.at(row);
+    return decks.at(row);
 }
 
 const LoadedDeck &VisualDeckStorageModel::deckForRow(int row) const
@@ -125,8 +182,8 @@ const LoadedDeck &VisualDeckStorageModel::deckForRow(int row) const
 
 int VisualDeckStorageModel::rowForFilePath(const QString &filePath) const
 {
-    for (int i = 0; i < decks_.size(); ++i) {
-        if (decks_.at(i).filePath == filePath) {
+    for (int i = 0; i < decks.size(); ++i) {
+        if (decks.at(i).filePath == filePath) {
             return i;
         }
     }
@@ -135,18 +192,18 @@ int VisualDeckStorageModel::rowForFilePath(const QString &filePath) const
 
 void VisualDeckStorageModel::startScan()
 {
-    ++scanGeneration_;
+    ++scanGeneration;
     beginResetModel();
-    decks_.clear();
-    folderPaths_.clear();
+    decks.clear();
+    folderPaths.clear();
     endResetModel();
 
-    if (deckPath_.isEmpty()) {
+    if (deckPath.isEmpty()) {
         return;
     }
 
-    const QString deckPath = deckPath_;
-    const int generation = scanGeneration_;
+    const QString currentDeckPath = deckPath;
+    const int generation = scanGeneration;
 
     // The scan (directory walk + one stat per file) runs on a worker thread so that
     // constructing the widget never stalls the UI thread on a large deck folder.
@@ -154,74 +211,49 @@ void VisualDeckStorageModel::startScan()
     connect(watcher, &QFutureWatcher<DeckScanResult>::finished, this, [this, watcher, generation] {
         watcher->deleteLater();
 
-        if (generation != scanGeneration_) {
+        if (generation != scanGeneration) {
             return; // A newer scan started while this one was running; drop the stale result.
         }
 
         const DeckScanResult result = watcher->result();
-        folderPaths_ = result.folderPaths;
+        folderPaths = result.folderPaths;
 
         if (result.decks.isEmpty()) {
             return;
         }
 
         beginInsertRows(QModelIndex(), 0, result.decks.size() - 1);
-        decks_ = result.decks;
+        decks = result.decks;
         endInsertRows();
 
-        for (int row = 0; row < decks_.size(); ++row) {
+        for (int row = 0; row < decks.size(); ++row) {
             beginLoad(row);
         }
     });
 
-    watcher->setFuture(QtConcurrent::run([deckPath]() -> DeckScanResult {
-        DeckScanResult result;
-
-        QDirIterator fileIt(deckPath, DeckLoader::ACCEPTED_FILE_EXTENSIONS, QDir::Files,
-                            QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-        while (fileIt.hasNext()) {
-            const QString filePath = fileIt.next();
-            DeckPreviewData data;
-            data.filePath = filePath;
-            data.relativeFilePath = VisualDeckStorageModel::relativeFilePathFor(filePath, deckPath);
-            data.folderPath = VisualDeckStorageModel::folderPathFor(filePath, deckPath);
-            data.lastModified = QFileInfo(filePath).lastModified();
-            result.decks.append(std::move(data));
-        }
-
-        QDirIterator folderIt(deckPath, QDir::Dirs | QDir::NoDotAndDotDot,
-                              QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-        while (folderIt.hasNext()) {
-            const QString folderPath = relativePathFromDeckRoot(folderIt.next(), deckPath);
-            if (!folderPath.isEmpty() && !result.folderPaths.contains(folderPath)) {
-                result.folderPaths.append(folderPath);
-            }
-        }
-        result.folderPaths.sort();
-
-        return result;
-    }));
+    watcher->setFuture(
+        QtConcurrent::run([currentDeckPath]() -> DeckScanResult { return scanDeckDirectory(currentDeckPath); }));
 }
 
 void VisualDeckStorageModel::beginLoad(int row)
 {
-    if (row < 0 || row >= decks_.size() || decks_.at(row).loadInProgress) {
+    if (row < 0 || row >= decks.size() || decks.at(row).loadInProgress) {
         return;
     }
 
-    DeckPreviewData &data = decks_[row];
+    DeckPreviewData &data = decks[row];
     data.loadInProgress = true;
 
     const QString filePath = data.filePath;
     const DeckFileFormat::Format fmt = DeckFileFormat::getFormatFromName(filePath);
-    const int generation = scanGeneration_;
+    const int generation = scanGeneration;
 
     auto *watcher = new QFutureWatcher<std::optional<DeckLoadResult>>(this);
     connect(watcher, &QFutureWatcher<std::optional<DeckLoadResult>>::finished, this,
             [this, watcher, filePath, generation] {
                 watcher->deleteLater();
 
-                if (generation != scanGeneration_) {
+                if (generation != scanGeneration) {
                     return; // The deck list was re-scanned while this load was running; drop the stale result.
                 }
 
@@ -230,7 +262,7 @@ void VisualDeckStorageModel::beginLoad(int row)
                     return;
                 }
 
-                DeckPreviewData &data = decks_[row];
+                DeckPreviewData &data = decks[row];
                 data.loadInProgress = false;
 
                 std::optional<DeckLoadResult> result = watcher->result();
@@ -241,7 +273,7 @@ void VisualDeckStorageModel::beginLoad(int row)
                 data.deck = std::move(result->deck);
                 data.loadSucceeded = true;
                 data.lastModified = result->lastModified;
-                computeDeckMetadata(data);
+                recomputeDeckMetadata(data);
 
                 emit dataChanged(index(row), index(row));
                 emit deckLoaded(row);
@@ -293,7 +325,7 @@ static QString computeColorIdentity(const LoadedDeck &deck)
 /**
  * @brief Recomputes all derived metadata of a row from its loaded deck.
  */
-void VisualDeckStorageModel::computeDeckMetadata(DeckPreviewData &data) const
+void VisualDeckStorageModel::recomputeDeckMetadata(DeckPreviewData &data)
 {
     const DeckList &deckList = data.deck.deckList;
 
@@ -301,64 +333,46 @@ void VisualDeckStorageModel::computeDeckMetadata(DeckPreviewData &data) const
     data.displayName = !data.deckName.isEmpty() ? data.deckName : QFileInfo(data.deck.lastLoadInfo.fileName).fileName();
     data.tags = deckList.getTags();
     data.lastLoaded = QDateTime::fromString(deckList.getLastLoadedTimestamp());
-
-    const CardRef bannerCard = deckList.getBannerCard();
-    data.bannerCardName = bannerCard.name;
-    data.bannerCardProviderId = bannerCard.providerId;
-
+    data.bannerCard = deckList.getBannerCard();
     data.colorIdentity = computeColorIdentity(data.deck);
 }
 
 void VisualDeckStorageModel::setFilePathForRow(int row, const QString &newFilePath)
 {
-    if (row < 0 || row >= decks_.size()) {
+    if (row < 0 || row >= decks.size()) {
         return;
     }
 
-    DeckPreviewData &data = decks_[row];
+    DeckPreviewData &data = decks[row];
     data.filePath = newFilePath;
-    data.relativeFilePath = relativeFilePathFor(newFilePath, deckPath_);
-    data.folderPath = folderPathFor(newFilePath, deckPath_);
-}
-
-QString VisualDeckStorageModel::relativeFilePathFor(const QString &filePath, const QString &deckPath)
-{
-    if (filePath.startsWith(deckPath)) {
-        return filePath.mid(deckPath.length());
-    }
-
-    return QFileInfo(filePath).fileName();
-}
-
-QString VisualDeckStorageModel::folderPathFor(const QString &filePath, const QString &deckPath)
-{
-    return relativePathFromDeckRoot(QFileInfo(filePath).absolutePath(), deckPath);
+    data.relativeFilePath = relativeFilePathFor(newFilePath, deckPath);
+    data.folderPath = folderPathFor(newFilePath, deckPath);
 }
 
 bool VisualDeckStorageModel::renameDeck(int row, const QString &newName)
 {
-    if (row < 0 || row >= decks_.size() || decks_.at(row).deck.isEmpty()) {
+    if (row < 0 || row >= decks.size() || decks.at(row).deck.isEmpty()) {
         return false;
     }
 
-    DeckPreviewData &data = decks_[row];
+    DeckPreviewData &data = decks[row];
     data.deck.deckList.setName(newName);
     if (!DeckLoader::saveToFile(data.deck)) {
         return false;
     }
 
-    computeDeckMetadata(data);
+    recomputeDeckMetadata(data);
     emit dataChanged(index(row), index(row), {VisualDeckStorageRoles::DisplayNameRole});
     return true;
 }
 
 bool VisualDeckStorageModel::renameFile(int row, const QString &newBaseName)
 {
-    if (row < 0 || row >= decks_.size() || newBaseName.isEmpty()) {
+    if (row < 0 || row >= decks.size() || newBaseName.isEmpty()) {
         return false;
     }
 
-    DeckPreviewData &data = decks_[row];
+    DeckPreviewData &data = decks[row];
     const QFileInfo info(data.filePath);
     if (newBaseName == info.baseName()) {
         return false;
@@ -386,28 +400,28 @@ bool VisualDeckStorageModel::renameFile(int row, const QString &newBaseName)
 
 bool VisualDeckStorageModel::deleteFile(int row)
 {
-    if (row < 0 || row >= decks_.size()) {
+    if (row < 0 || row >= decks.size()) {
         return false;
     }
 
-    const QString filePath = decks_.at(row).filePath;
+    const QString filePath = decks.at(row).filePath;
     if (!QFile::remove(QFileInfo(filePath).filePath())) {
         return false;
     }
 
     beginRemoveRows(QModelIndex(), row, row);
-    decks_.removeAt(row);
+    decks.removeAt(row);
     endRemoveRows();
     return true;
 }
 
 bool VisualDeckStorageModel::setTags(int row, const QStringList &tags)
 {
-    if (row < 0 || row >= decks_.size() || decks_.at(row).deck.isEmpty()) {
+    if (row < 0 || row >= decks.size() || decks.at(row).deck.isEmpty()) {
         return false;
     }
 
-    DeckPreviewData &data = decks_[row];
+    DeckPreviewData &data = decks[row];
     data.deck.deckList.setTags(tags);
     if (!DeckLoader::saveToFile(data.deck)) {
         return false;
@@ -420,18 +434,17 @@ bool VisualDeckStorageModel::setTags(int row, const QStringList &tags)
 
 bool VisualDeckStorageModel::setBannerCard(int row, const CardRef &cardRef)
 {
-    if (row < 0 || row >= decks_.size() || decks_.at(row).deck.isEmpty()) {
+    if (row < 0 || row >= decks.size() || decks.at(row).deck.isEmpty()) {
         return false;
     }
 
-    DeckPreviewData &data = decks_[row];
+    DeckPreviewData &data = decks[row];
     data.deck.deckList.setBannerCard(cardRef);
     if (!DeckLoader::saveToFile(data.deck)) {
         return false;
     }
 
-    data.bannerCardName = cardRef.name;
-    data.bannerCardProviderId = cardRef.providerId;
+    data.bannerCard = cardRef;
     emit dataChanged(index(row), index(row),
                      {VisualDeckStorageRoles::BannerCardNameRole, VisualDeckStorageRoles::BannerCardProviderIdRole});
     return true;
@@ -439,11 +452,11 @@ bool VisualDeckStorageModel::setBannerCard(int row, const CardRef &cardRef)
 
 bool VisualDeckStorageModel::convertToCockatriceFormat(int row)
 {
-    if (row < 0 || row >= decks_.size() || decks_.at(row).deck.isEmpty()) {
+    if (row < 0 || row >= decks.size() || decks.at(row).deck.isEmpty()) {
         return false;
     }
 
-    DeckPreviewData &data = decks_[row];
+    DeckPreviewData &data = decks[row];
     const QString oldFilePath = data.filePath;
     if (!DeckLoader::convertToCockatriceFormat(data.deck)) {
         return false;
@@ -451,7 +464,7 @@ bool VisualDeckStorageModel::convertToCockatriceFormat(int row)
 
     setFilePathForRow(row, data.deck.lastLoadInfo.fileName);
     data.lastModified = QFileInfo(data.filePath).lastModified();
-    computeDeckMetadata(data);
+    recomputeDeckMetadata(data);
 
     emit dataChanged(index(row), index(row));
     if (oldFilePath != data.filePath) {
@@ -462,11 +475,11 @@ bool VisualDeckStorageModel::convertToCockatriceFormat(int row)
 
 bool VisualDeckStorageModel::reloadIfModified(int row)
 {
-    if (row < 0 || row >= decks_.size()) {
+    if (row < 0 || row >= decks.size()) {
         return false;
     }
 
-    DeckPreviewData &data = decks_[row];
+    DeckPreviewData &data = decks[row];
     QFileInfo fileInfo(data.filePath);
     const QDateTime newLastModified = fileInfo.lastModified();
     if (!newLastModified.isValid() || newLastModified <= data.lastModified) {
@@ -482,7 +495,7 @@ bool VisualDeckStorageModel::reloadIfModified(int row)
     data.deck = *result;
     data.loadSucceeded = true;
     data.lastModified = fileInfo.lastModified();
-    computeDeckMetadata(data);
+    recomputeDeckMetadata(data);
 
     emit dataChanged(index(row), index(row));
     emit deckLoaded(row);

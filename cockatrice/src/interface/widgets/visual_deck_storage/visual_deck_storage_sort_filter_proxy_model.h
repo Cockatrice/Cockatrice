@@ -52,8 +52,8 @@ public:
     /// @name Filter input setters (each re-evaluates the affected matches)
     ///@{
     void setSearchText(const QString &text);
-    void setTagFilter(const QSet<QString> &selectedTags, const QSet<QString> &excludedTags);
-    void setColorFilter(FilterMode mode, const QSet<QChar> &activeColors);
+    void setTagFilter(const QSet<QString> &newSelectedTags, const QSet<QString> &newExcludedTags);
+    void setColorFilter(FilterMode mode, const QSet<QChar> &colors);
     ///@}
 
     /**
@@ -83,16 +83,16 @@ private:
     void updateColorMatches();
     [[nodiscard]] const VisualDeckStorageModel *deckSourceModel() const;
 
-    QString searchText_;
-    QSet<QString> selectedTags_;
-    QSet<QString> excludedTags_;
-    FilterMode colorFilterMode_ = ExactMatch;
-    QSet<QChar> activeColors_;
-    SortOrder sortOrder_ = Alphabetical;
+    QString searchText;
+    QSet<QString> selectedTags;
+    QSet<QString> excludedTags;
+    FilterMode colorFilterMode = ExactMatch;
+    QSet<QChar> activeColors;
+    SortOrder sortOrder = Alphabetical;
 
-    QList<bool> searchMatches_; ///< Per-row search match, sized like the source model.
-    QList<bool> tagMatches_;    ///< Per-row tag match.
-    QList<bool> colorMatches_;  ///< Per-row color identity match.
+    QList<bool> searchMatches; ///< Per-row search match, sized like the source model.
+    QList<bool> tagMatches;    ///< Per-row tag match.
+    QList<bool> colorMatches;  ///< Per-row color identity match.
 };
 
 #endif // VISUAL_DECK_STORAGE_SORT_FILTER_PROXY_MODEL_H

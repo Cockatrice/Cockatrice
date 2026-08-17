@@ -3,6 +3,7 @@
 #include "../../filters/deck_filter_string.h"
 
 #include <QFileInfo>
+#include <algorithm>
 
 VisualDeckStorageSortFilterProxyModel::VisualDeckStorageSortFilterProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
@@ -36,36 +37,36 @@ void VisualDeckStorageSortFilterProxyModel::setSourceModel(QAbstractItemModel *m
 
 void VisualDeckStorageSortFilterProxyModel::setSearchText(const QString &text)
 {
-    if (searchText_ == text) {
+    if (searchText == text) {
         return;
     }
 
-    searchText_ = text;
+    searchText = text;
     updateSearchMatches();
     invalidate();
 }
 
-void VisualDeckStorageSortFilterProxyModel::setTagFilter(const QSet<QString> &selectedTags,
-                                                         const QSet<QString> &excludedTags)
+void VisualDeckStorageSortFilterProxyModel::setTagFilter(const QSet<QString> &newSelectedTags,
+                                                         const QSet<QString> &newExcludedTags)
 {
-    if (selectedTags_ == selectedTags && excludedTags_ == excludedTags) {
+    if (selectedTags == newSelectedTags && excludedTags == newExcludedTags) {
         return;
     }
 
-    selectedTags_ = selectedTags;
-    excludedTags_ = excludedTags;
+    selectedTags = newSelectedTags;
+    excludedTags = newExcludedTags;
     updateTagMatches();
     invalidate();
 }
 
-void VisualDeckStorageSortFilterProxyModel::setColorFilter(FilterMode mode, const QSet<QChar> &activeColors)
+void VisualDeckStorageSortFilterProxyModel::setColorFilter(FilterMode mode, const QSet<QChar> &colors)
 {
-    if (colorFilterMode_ == mode && activeColors_ == activeColors) {
+    if (colorFilterMode == mode && activeColors == colors) {
         return;
     }
 
-    colorFilterMode_ = mode;
-    activeColors_ = activeColors;
+    colorFilterMode = mode;
+    activeColors = colors;
     updateColorMatches();
     invalidate();
 }
@@ -74,25 +75,25 @@ void VisualDeckStorageSortFilterProxyModel::setSortOrder(SortOrder order)
 {
     // No equality guard: the initial reapply (with the default order) must still
     // trigger sort(0), since without a sort the proxy would show scan order.
-    sortOrder_ = order;
+    sortOrder = order;
     sort(0);
 }
 
 void VisualDeckStorageSortFilterProxyModel::reapplyFilters()
 {
-    const QList<bool> oldSearchMatches = searchMatches_;
-    const QList<bool> oldTagMatches = tagMatches_;
-    const QList<bool> oldColorMatches = colorMatches_;
+    const QList<bool> oldSearchMatches = searchMatches;
+    const QList<bool> oldTagMatches = tagMatches;
+    const QList<bool> oldColorMatches = colorMatches;
 
     updateSearchMatches();
     updateTagMatches();
     updateColorMatches();
 
-    if (searchMatches_ != oldSearchMatches || tagMatches_ != oldTagMatches || colorMatches_ != oldColorMatches) {
+    if (searchMatches != oldSearchMatches || tagMatches != oldTagMatches || colorMatches != oldColorMatches) {
         invalidate();
     }
 
-    if (sortOrder_ == ByName || sortOrder_ == ByLastLoaded) {
+    if (sortOrder == ByName || sortOrder == ByLastLoaded) {
         // These orders depend on data that only becomes available when a deck finishes loading.
         sort(0);
     }
@@ -110,12 +111,12 @@ bool VisualDeckStorageSortFilterProxyModel::filterAcceptsRow(int sourceRow, cons
     }
 
     // If the match lists aren't sized to the current model yet, don't hide anything.
-    if (sourceRow < 0 || sourceRow >= searchMatches_.size() || sourceRow >= tagMatches_.size() ||
-        sourceRow >= colorMatches_.size()) {
+    if (sourceRow < 0 || sourceRow >= searchMatches.size() || sourceRow >= tagMatches.size() ||
+        sourceRow >= colorMatches.size()) {
         return true;
     }
 
-    return searchMatches_.at(sourceRow) && tagMatches_.at(sourceRow) && colorMatches_.at(sourceRow);
+    return searchMatches.at(sourceRow) && tagMatches.at(sourceRow) && colorMatches.at(sourceRow);
 }
 
 bool VisualDeckStorageSortFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
@@ -128,7 +129,7 @@ bool VisualDeckStorageSortFilterProxyModel::lessThan(const QModelIndex &left, co
     const DeckPreviewData &leftData = source->dataForRow(left.row());
     const DeckPreviewData &rightData = source->dataForRow(right.row());
 
-    switch (sortOrder_) {
+    switch (sortOrder) {
         case ByName:
             return leftData.deckName < rightData.deckName;
         case Alphabetical:
@@ -146,43 +147,48 @@ bool VisualDeckStorageSortFilterProxyModel::lessThan(const QModelIndex &left, co
 void VisualDeckStorageSortFilterProxyModel::resizeMatchLists()
 {
     const int count = sourceModel() ? sourceModel()->rowCount() : 0;
-    searchMatches_ = QList<bool>(count, true);
-    tagMatches_ = QList<bool>(count, true);
-    colorMatches_ = QList<bool>(count, true);
+    searchMatches.resize(count);
+    searchMatches.fill(true);
+    tagMatches.resize(count);
+    tagMatches.fill(true);
+    colorMatches.resize(count);
+    colorMatches.fill(true);
 }
 
 void VisualDeckStorageSortFilterProxyModel::updateSearchMatches()
 {
     const auto *source = deckSourceModel();
     if (!source) {
-        searchMatches_.clear();
+        searchMatches.clear();
         return;
     }
 
     const int count = source->rowCount();
-    if (searchText_.isEmpty()) {
-        searchMatches_ = QList<bool>(count, true);
+    searchMatches.resize(count);
+    if (searchText.isEmpty()) {
+        searchMatches.fill(true);
         return;
     }
 
-    searchMatches_.resize(count);
-    DeckFilterString filterString(searchText_);
+    DeckFilterString filterString(searchText);
     for (int row = 0; row < count; ++row) {
         const DeckPreviewData &data = source->dataForRow(row);
 
-        // Decks that haven't finished loading yet can't be evaluated; show them and
-        // re-evaluate once the load finishes (reapplyFilters is triggered by deckLoaded).
+        // isEmpty() is intentional: if a deck fails to load, loadInProgress becomes false
+        // but the deck remains empty. Using loadInProgress alone would pass failed decks
+        // to DeckFilterString::check, which requires a non-empty deck.
         if (data.deck.isEmpty()) {
-            searchMatches_[row] = true;
+            searchMatches[row] = true;
             continue;
         }
 
-        DeckSearchData searchData;
-        searchData.deck = &data.deck;
-        searchData.filePath = data.filePath;
-        searchData.displayName = data.displayName;
-        searchData.relativeFilePath = data.relativeFilePath;
-        searchMatches_[row] = filterString.check(searchData);
+        DeckSearchData searchData{
+            .deck = &data.deck,
+            .filePath = data.filePath,
+            .displayName = data.displayName,
+            .relativeFilePath = data.relativeFilePath,
+        };
+        searchMatches[row] = filterString.check(searchData);
     }
 }
 
@@ -190,38 +196,27 @@ void VisualDeckStorageSortFilterProxyModel::updateTagMatches()
 {
     const auto *source = deckSourceModel();
     if (!source) {
-        tagMatches_.clear();
+        tagMatches.clear();
         return;
     }
 
     const int count = source->rowCount();
-    tagMatches_.resize(count);
+    tagMatches.resize(count);
 
-    if (selectedTags_.isEmpty() && excludedTags_.isEmpty()) {
-        tagMatches_.fill(true);
+    if (selectedTags.isEmpty() && excludedTags.isEmpty()) {
+        tagMatches.fill(true);
         return;
     }
 
     for (int row = 0; row < count; ++row) {
         const QStringList deckTags = source->dataForRow(row).tags;
 
-        bool hasAllSelected = true;
-        for (const QString &tag : selectedTags_) {
-            if (!deckTags.contains(tag)) {
-                hasAllSelected = false;
-                break;
-            }
-        }
+        const bool hasAllSelected = std::all_of(selectedTags.begin(), selectedTags.end(),
+                                                [&deckTags](const QString &tag) { return deckTags.contains(tag); });
+        const bool hasAnyExcluded = std::any_of(excludedTags.begin(), excludedTags.end(),
+                                                [&deckTags](const QString &tag) { return deckTags.contains(tag); });
 
-        bool hasAnyExcluded = false;
-        for (const QString &tag : excludedTags_) {
-            if (deckTags.contains(tag)) {
-                hasAnyExcluded = true;
-                break;
-            }
-        }
-
-        tagMatches_[row] = hasAllSelected && !hasAnyExcluded;
+        tagMatches[row] = hasAllSelected && !hasAnyExcluded;
     }
 }
 
@@ -229,15 +224,15 @@ void VisualDeckStorageSortFilterProxyModel::updateColorMatches()
 {
     const auto *source = deckSourceModel();
     if (!source) {
-        colorMatches_.clear();
+        colorMatches.clear();
         return;
     }
 
     const int count = source->rowCount();
-    colorMatches_.resize(count);
+    colorMatches.resize(count);
 
-    if (activeColors_.isEmpty()) {
-        colorMatches_.fill(true);
+    if (activeColors.isEmpty()) {
+        colorMatches.fill(true);
         return;
     }
 
@@ -245,10 +240,10 @@ void VisualDeckStorageSortFilterProxyModel::updateColorMatches()
         const QString colorIdentity = source->dataForRow(row).colorIdentity;
 
         bool matches = true;
-        switch (colorFilterMode_) {
+        switch (colorFilterMode) {
             case ExactMatch: {
                 QSet<QChar> activeColorSet;
-                for (const QChar &color : activeColors_) {
+                for (const QChar &color : activeColors) {
                     activeColorSet.insert(color.toUpper());
                 }
 
@@ -261,24 +256,16 @@ void VisualDeckStorageSortFilterProxyModel::updateColorMatches()
                 break;
             }
             case Includes:
-                for (const QChar &color : activeColors_) {
-                    if (!colorIdentity.contains(color)) {
-                        matches = false;
-                        break;
-                    }
-                }
+                matches = std::all_of(activeColors.begin(), activeColors.end(),
+                                      [&colorIdentity](const QChar &color) { return colorIdentity.contains(color); });
                 break;
             case Excludes:
-                for (const QChar &color : activeColors_) {
-                    if (colorIdentity.contains(color)) {
-                        matches = false;
-                        break;
-                    }
-                }
+                matches = std::none_of(activeColors.begin(), activeColors.end(),
+                                       [&colorIdentity](const QChar &color) { return colorIdentity.contains(color); });
                 break;
         }
 
-        colorMatches_[row] = matches;
+        colorMatches[row] = matches;
     }
 }
 
