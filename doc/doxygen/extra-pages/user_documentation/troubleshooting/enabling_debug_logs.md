@@ -56,10 +56,12 @@ altogether. Note that this copy may be replaced when you update the client.
 Open the Terminal app (it is in 'Applications → Utilities') and run the following two commands, replacing the path
 with the full location of your file:
 
-```text
+```shell
 launchctl setenv QT_LOGGING_CONF /path/to/qtlogging.ini
 open -a Cockatrice
 ```
+
+You can also use `export QT_LOGGING_CONF=/path/to/qtlogging.ini` to set the variable for the current terminal session.
 
 The setting stays active until you log out or restart your Mac. If you have multiple users on the same Mac, be aware
 that this setting only applies to your user account.
@@ -69,14 +71,14 @@ that this setting only applies to your user account.
 For a quick test, open a terminal and start Cockatrice with the file on the command line, replacing the path with the
 full location of your file:
 
-```text
+```shell
 QT_LOGGING_CONF=/path/to/qtlogging.ini cockatrice
 ```
 
 If this works and you want it to apply every time you start Cockatrice, add the following line to your `~/.profile`
 file and log in again:
 
-```text
+```shell
 export QT_LOGGING_CONF="/path/to/qtlogging.ini"
 ```
 
@@ -92,7 +94,7 @@ operating system.
 
 If you prefer to capture everything to a file instead, start Cockatrice with the `--debug-output` option:
 
-```text
+```shell
 cockatrice --debug-output
 ```
 

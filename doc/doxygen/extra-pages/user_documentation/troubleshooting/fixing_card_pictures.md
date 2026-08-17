@@ -25,21 +25,10 @@ image, so the order matters: URLs at the top of the list are tried first.
 The list can be found in 'Cockatrice → Settings' (or Ctrl + Shift + P by default), on the 'Deck Editor' tab, in the
 'URL Download Priority' section. Make sure 'Download card pictures on the fly' is enabled and that the list contains
 valid URLs. If you suspect the list has been modified or corrupted, press 'Reset Download URLs' to restore the
-defaults:
-
-```text
-https://cards.scryfall.io/large/!prop:side!/!set:uuid_substr_0_1!/!set:uuid_substr_1_1!/!set:uuid!.jpg
-https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!
-https://api.scryfall.com/cards/multiverse/!set:muid!?format=image
-https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card
-https://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card
-```
+defaults.
 
 For information on how to add your own custom URL templates, see the 'How to add a custom URL' link in the same
 settings section.
-
-\attention The Scryfall templates resolve the exact printing of a card, while the Gatherer templates do not. See
-[Provider Accuracy](#provider-accuracy) below.
 
 # Check Your Local Picture Folder
 
@@ -88,7 +77,15 @@ download URLs are remembered; lowering it can help if a URL used to redirect som
 After updating the client, changing the download URLs, moving or deleting local image files, or clearing caches, it is
 recommended to restart Cockatrice so that all changes are fully picked up.
 
-# Enable Picture Loader Logs
+# Check Logs
+
+Before changing any settings, check the existing logs first. Rate limit errors and most download errors are already
+logged at warn level, so you may find the cause without enabling debug mode.
+
+Open 'Help → View Debug Log' and look for error or warning messages related to card picture loading. If you need more
+detail than the default log level provides, see below.
+
+# Enable Picture Loader Debug Logs
 
 If the steps above did not solve the problem, you can turn on a "diagnostics mode" that prints what the picture loader
 is actually doing: which URL it is trying, whether it found or missed a file on disk, whether the download succeeded or
