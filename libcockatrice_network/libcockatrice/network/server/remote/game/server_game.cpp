@@ -62,7 +62,8 @@ Server_Game::Server_Game(const GameConfig &config, Server_Room *_room)
       spectatorsCanTalk(config.spectatorsCanTalk), spectatorsSeeEverything(config.spectatorsSeeEverything),
       startingLifeTotal(config.startingLifeTotal), shareDecklistsOnLoad(config.shareDecklistsOnLoad),
       inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false),
-      turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr), gameMutex()
+      turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
+      deckValidationStrategy(new Server_DefaultDeckValidationStrategy), gameMutex()
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
@@ -885,4 +886,9 @@ void Server_Game::returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPl
             break;
         }
     }
+}
+
+void Server_Game::setDeckValidationStrategy(Server_DeckValidationStrategy *strategy)
+{
+    deckValidationStrategy.reset(strategy);
 }
