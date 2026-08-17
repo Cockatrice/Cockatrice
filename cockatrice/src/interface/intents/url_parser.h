@@ -4,7 +4,7 @@
 #include <QUrlQuery>
 
 class MainWindow;
-class ContextJoinGame;
+struct ContextJoinGame;
 class IntentUrlParser : public QObject
 {
     Q_OBJECT
