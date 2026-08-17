@@ -33,7 +33,7 @@ DlgInviteToGame::DlgInviteToGame(TabSupervisor *_tabSupervisor,
     // signals while the modal loop runs.
     UserListManager *manager = tabSupervisor->getUserListManager();
     userList = new UserListWidget(tabSupervisor, tabSupervisor->getClient(), UserListWidget::RoomList, this,
-                                  /*withUserInfoPopup=*/false);
+                                  /*hasUserInfoPopup=*/false);
     userList->setUserFilter([this, manager](const QString &name, bool online) {
         return !excludeUserNames.contains(name) && online && !manager->isUserIgnored(name);
     });
@@ -50,11 +50,6 @@ DlgInviteToGame::DlgInviteToGame(TabSupervisor *_tabSupervisor,
         currentUserName = userName;
         inviteButton->setEnabled(!userName.isEmpty());
     });
-    connect(userList, &UserListWidget::userListChanged, this, &DlgInviteToGame::updateEmptyLabel);
-
-    emptyLabel = new QLabel(this);
-    emptyLabel->setAlignment(Qt::AlignCenter);
-    emptyLabel->setVisible(false);
 
     inviteButton = new QPushButton(this);
     inviteButton->setEnabled(false);
@@ -72,10 +67,8 @@ DlgInviteToGame::DlgInviteToGame(TabSupervisor *_tabSupervisor,
     auto *layout = new QVBoxLayout(this);
     layout->addWidget(searchEdit);
     layout->addWidget(userList, 1);
-    layout->addWidget(emptyLabel);
     layout->addLayout(buttonRow);
 
-    updateEmptyLabel();
     retranslateUi();
 
     // Default to a comfortably tall dialog so the list has room to breathe,
@@ -88,12 +81,6 @@ DlgInviteToGame::DlgInviteToGame(TabSupervisor *_tabSupervisor,
 void DlgInviteToGame::searchTextChanged(const QString &text)
 {
     userList->setFilterText(text);
-    updateEmptyLabel();
-}
-
-void DlgInviteToGame::updateEmptyLabel()
-{
-    emptyLabel->setVisible(userList->visibleUserRowCount() == 0);
 }
 
 void DlgInviteToGame::inviteCurrentUser(const QString &userName)
@@ -122,5 +109,4 @@ void DlgInviteToGame::retranslateUi()
     searchEdit->setPlaceholderText(tr("Search users..."));
     inviteButton->setText(tr("Invite"));
     cancelButton->setText(tr("Cancel"));
-    emptyLabel->setText(tr("No matching users."));
 }

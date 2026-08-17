@@ -1324,6 +1324,7 @@ void TabGame::createPlayerListDock(bool bReplay)
     auto *playerListBox = new QWidget(this);
     auto *vbox = new QVBoxLayout(playerListBox);
     vbox->setContentsMargins(0, 0, 0, 0);
+    vbox->setSpacing(0);
 
     vbox->addWidget(playerListWidget);
 

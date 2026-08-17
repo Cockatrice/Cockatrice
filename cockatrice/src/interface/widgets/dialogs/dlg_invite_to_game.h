@@ -10,7 +10,6 @@
 #include <QDialog>
 #include <QStringList>
 
-class QLabel;
 class QLineEdit;
 class QPushButton;
 class TabSupervisor;
@@ -38,11 +37,9 @@ private:
     QString currentUserName;
     QLineEdit *searchEdit;
     UserListWidget *userList;
-    QLabel *emptyLabel;
     QPushButton *inviteButton;
     QPushButton *cancelButton;
 
-    void updateEmptyLabel();
     void retranslateUi();
 };
 

@@ -173,7 +173,7 @@ private:
     QString hoveredUser;
     bool popupPinned = false;
     bool bulkLoading = false;
-    bool withUserInfoPopup = true;
+    bool hasUserInfoPopup = true;
     std::function<bool(const QString &userName, bool online)> userFilter;
 
     /**
@@ -256,7 +256,7 @@ public:
                    AbstractClient *_client,
                    UserListType _type,
                    QWidget *parent = nullptr,
-                   bool withUserInfoPopup = true);
+                   bool hasUserInfoPopup = true);
     ~UserListWidget() override;
     void bind(UserListManager *mgr);
     void applyDisplayMode();
@@ -278,9 +278,9 @@ public:
         userFilter = std::move(filter);
     }
     [[nodiscard]] int visibleUserRowCount() const;
-    [[nodiscard]] bool getWithUserInfoPopup() const
+    [[nodiscard]] bool getHasUserInfoPopup() const
     {
-        return withUserInfoPopup;
+        return hasUserInfoPopup;
     }
     [[nodiscard]] const QList<Section> &getSectionIds() const
     {

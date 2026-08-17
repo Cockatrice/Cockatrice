@@ -355,7 +355,7 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
         QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
         if (mouseEvent->button() == Qt::RightButton) {
             // Dialog mode has no context menu: consume the press, show nothing.
-            if (owner->getWithUserInfoPopup()) {
+            if (owner->getHasUserInfoPopup()) {
                 owner->showContextMenu(mouseEvent->globalPosition().toPoint(), index);
             }
             return true;
@@ -582,8 +582,8 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
                                AbstractClient *_client,
                                UserListType _type,
                                QWidget *parent,
-                               bool _withUserInfoPopup)
-    : QGroupBox(parent), withUserInfoPopup(_withUserInfoPopup), tabSupervisor(_tabSupervisor), client(_client),
+                               bool _hasUserInfoPopup)
+    : QGroupBox(parent), hasUserInfoPopup(_hasUserInfoPopup), tabSupervisor(_tabSupervisor), client(_client),
       type(_type), onlineCount(0)
 {
     avatarProvider = new UserAvatarProvider(client, this);
@@ -610,7 +610,40 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     userTree->header()->setStretchLastSection(true);
 
-    if (withUserInfoPopup) {
+    // Always create timers so callers never segfault on a null deref;
+    // showPopupForUser / hidePopup already guard against a null userInfoPopup.
+    showPopupTimer = new QTimer(this);
+    showPopupTimer->setSingleShot(true);
+    showPopupTimer->setInterval(280);
+    connect(showPopupTimer, &QTimer::timeout, this, [this] {
+        if (hoveredUser.isEmpty()) {
+            return;
+        }
+        // Resolve the row under the cursor again. In sectioned mode a user can
+        // own several rows (online + buddy), so the popup must anchor to the
+        // exact hovered row instead of a lookup by name.
+        const QPoint viewportPos = userTree->viewport()->mapFromGlobal(QCursor::pos());
+        QTreeWidgetItem *item = userTree->itemAt(viewportPos);
+        if (item && item->type() == QTreeWidgetItem::Type &&
+            QString::fromStdString(static_cast<UserListTWI *>(item)->getUserInfo().name()) == hoveredUser) {
+            showPopupForUser(static_cast<UserListTWI *>(item));
+        }
+    });
+
+    hidePopupTimer = new QTimer(this);
+    hidePopupTimer->setSingleShot(true);
+    hidePopupTimer->setInterval(160);
+    connect(hidePopupTimer, &QTimer::timeout, this, [this] {
+        // The hover ends when the cursor leaves the user row. Empty list
+        // space, a section divider and anything outside the tree all close
+        // the popup, while the popup itself keeps it alive.
+        if (!popupPinned && userInfoPopup && !userInfoPopup->underMouse() &&
+            (hoveredUser.isEmpty() || !userTree->underMouse())) {
+            hidePopup();
+        }
+    });
+
+    if (hasUserInfoPopup) {
         // ── Hover popup ───────────────────────────────────────────────────────
         userInfoPopup = new UserInfoPopup(tabSupervisor, tabSupervisor->getClient(), &avatarProvider->cache(),
                                           &cardArtProvider->cache(), &cardArtParamsMap,
@@ -620,36 +653,6 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
         userInfoPopup->setWindowOpacity(0.0);
         userInfoPopup->installEventFilter(this);
 
-        showPopupTimer = new QTimer(this);
-        showPopupTimer->setSingleShot(true);
-        showPopupTimer->setInterval(280);
-        connect(showPopupTimer, &QTimer::timeout, this, [this] {
-            if (hoveredUser.isEmpty()) {
-                return;
-            }
-            // Resolve the row under the cursor again. In sectioned mode a user can
-            // own several rows (online + buddy), so the popup must anchor to the
-            // exact hovered row instead of a lookup by name.
-            const QPoint viewportPos = userTree->viewport()->mapFromGlobal(QCursor::pos());
-            QTreeWidgetItem *item = userTree->itemAt(viewportPos);
-            if (item && item->type() == QTreeWidgetItem::Type &&
-                QString::fromStdString(static_cast<UserListTWI *>(item)->getUserInfo().name()) == hoveredUser) {
-                showPopupForUser(static_cast<UserListTWI *>(item));
-            }
-        });
-
-        hidePopupTimer = new QTimer(this);
-        hidePopupTimer->setSingleShot(true);
-        hidePopupTimer->setInterval(160);
-        connect(hidePopupTimer, &QTimer::timeout, this, [this] {
-            // The hover ends when the cursor leaves the user row. Empty list
-            // space, a section divider and anything outside the tree all close
-            // the popup, while the popup itself keeps it alive.
-            if (!popupPinned && !userInfoPopup->underMouse() && (hoveredUser.isEmpty() || !userTree->underMouse())) {
-                hidePopup();
-            }
-        });
-
         connectPopupSignals();
     }
 
@@ -658,7 +661,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->viewport()->installEventFilter(this);
     userTree->installEventFilter(this); // keyboard handling for section dividers
 
-    if (withUserInfoPopup) {
+    if (hasUserInfoPopup) {
         // Clicking anywhere outside the list clears its selection and closes the
         // popup. The filter watches all widgets because the press can land on any
         // part of the window, on another list or on the popup itself.
@@ -984,7 +987,7 @@ bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
     // Divider rows have no menu. Mouse-triggered context events are NOT handled
     // here — the delegate's right-press path already pops the menu, and
     // handling both would open two menus on one right-click.
-    if (withUserInfoPopup && (obj == userTree || obj == userTree->viewport()) && event->type() == QEvent::ContextMenu) {
+    if (hasUserInfoPopup && (obj == userTree || obj == userTree->viewport()) && event->type() == QEvent::ContextMenu) {
         auto *contextEvent = static_cast<QContextMenuEvent *>(event);
         if (contextEvent->reason() == QContextMenuEvent::Keyboard) {
             QTreeWidgetItem *current = userTree->currentItem();
@@ -1018,7 +1021,7 @@ bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
-    if (withUserInfoPopup && obj == userTree->viewport()) {
+    if (hasUserInfoPopup && obj == userTree->viewport()) {
         if (event->type() == QEvent::MouseMove) {
             if (!SettingsCache::instance().appearance().getStyleUserList()) {
                 return QGroupBox::eventFilter(obj, event);
@@ -1589,7 +1592,7 @@ void UserListWidget::userClicked(QTreeWidgetItem *item, int /*column*/)
         return; // divider rows open no chat
     }
     const QString userName = item->data(2, Qt::UserRole).toString();
-    if (withUserInfoPopup) {
+    if (hasUserInfoPopup) {
         emit openMessageDialog(userName, true);
     } else {
         emit userActivated(userName);
