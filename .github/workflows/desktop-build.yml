@@ -263,7 +263,8 @@ jobs:
         include:
           - os: macOS
             target: 13
-            runner: macos-26-intel    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-Readme.md
+            runner: macos-15-intel    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md
+                                      # macos-26-intel is slow and fails in CPack during DMG config if not increasing Finder timeout
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
