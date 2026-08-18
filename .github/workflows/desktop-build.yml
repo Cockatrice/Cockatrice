@@ -276,7 +276,7 @@ jobs:
             soc: Intel
             type: Release
             use_ccache: 1
-            xcode: "26.6"
+            xcode: "26.3"
 
           - os: macOS
             target: 14
