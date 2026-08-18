@@ -71,6 +71,7 @@ private:
     void scrollToBottom();
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
+    void appendGameLinkTag(QTextCursor &cursor, const QString &url);
     static QColor getCustomMentionColor();
     static QColor getCustomHighlightColor();
     void showSystemPopup(const QString &userName);
@@ -121,6 +122,7 @@ signals:
     void addMentionTag(QString mentionTag);
     void messageClickedSignal();
     void showMentionPopup(const QString &userName);
+    void cockatriceLinkActivated(const QString &url);
 };
 
 #endif

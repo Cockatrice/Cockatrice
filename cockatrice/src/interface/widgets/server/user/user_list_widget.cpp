@@ -336,11 +336,12 @@ constexpr int UserInfo = Qt::UserRole + 2;
 // rows (UserListTWI, which uses QTreeWidgetItem::Type) by this item type.
 constexpr int SectionItemType = QTreeWidgetItem::UserType + 1;
 
-UserListItemDelegate::UserListItemDelegate(QTreeWidget *tree,
+UserListItemDelegate::UserListItemDelegate(UserListWidget *owner,
+                                           QTreeWidget *tree,
                                            const QMap<QString, QPixmap> *avatarCache,
                                            const QMap<QString, QPixmap> *cardArtCache,
                                            const QMap<QString, CardArtParams> *cardArtParamsMap)
-    : QStyledItemDelegate(tree), tree(tree), avatarCache(avatarCache), cardArtCache(cardArtCache),
+    : QStyledItemDelegate(tree), tree(tree), owner(owner), avatarCache(avatarCache), cardArtCache(cardArtCache),
       cardArtParamsMap(cardArtParamsMap)
 {
 }
@@ -353,7 +354,10 @@ bool UserListItemDelegate::editorEvent(QEvent *event,
     if ((event->type() == QEvent::MouseButtonPress) && index.isValid()) {
         QMouseEvent *const mouseEvent = static_cast<QMouseEvent *>(event);
         if (mouseEvent->button() == Qt::RightButton) {
-            static_cast<UserListWidget *>(parent())->showContextMenu(mouseEvent->globalPosition().toPoint(), index);
+            // Dialog mode has no context menu: consume the press, show nothing.
+            if (owner->getHasUserInfoPopup()) {
+                owner->showContextMenu(mouseEvent->globalPosition().toPoint(), index);
+            }
             return true;
         }
     }
@@ -577,8 +581,10 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
 UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
                                AbstractClient *_client,
                                UserListType _type,
-                               QWidget *parent)
-    : QGroupBox(parent), tabSupervisor(_tabSupervisor), client(_client), type(_type), onlineCount(0)
+                               QWidget *parent,
+                               bool _hasUserInfoPopup)
+    : QGroupBox(parent), hasUserInfoPopup(_hasUserInfoPopup), tabSupervisor(_tabSupervisor), client(_client),
+      type(_type), onlineCount(0)
 {
     avatarProvider = new UserAvatarProvider(client, this);
     cardArtProvider = new UserCardArtProvider(this);
@@ -593,8 +599,8 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->setHeaderHidden(true);
     userTree->setRootIsDecorated(false);
     userTree->setIconSize(QSize(20, 18));
-    itemDelegate =
-        new UserListItemDelegate(userTree, &avatarProvider->cache(), &cardArtProvider->cache(), &cardArtParamsMap);
+    itemDelegate = new UserListItemDelegate(this, userTree, &avatarProvider->cache(), &cardArtProvider->cache(),
+                                            &cardArtParamsMap);
     userTree->setItemDelegate(itemDelegate);
     userTree->setAlternatingRowColors(true);
     userTree->hideColumn(1);
@@ -604,15 +610,8 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     userTree->header()->setStretchLastSection(true);
 
-    // ── Hover popup ───────────────────────────────────────────────────────────
-    userInfoPopup = new UserInfoPopup(tabSupervisor, tabSupervisor->getClient(), &avatarProvider->cache(),
-                                      &cardArtProvider->cache(), &cardArtParamsMap,
-                                      window()); // parented to main window so it floats above siblings
-
-    userInfoPopup->hide();
-    userInfoPopup->setWindowOpacity(0.0);
-    userInfoPopup->installEventFilter(this);
-
+    // Always create timers so callers never segfault on a null deref;
+    // showPopupForUser / hidePopup already guard against a null userInfoPopup.
     showPopupTimer = new QTimer(this);
     showPopupTimer->setSingleShot(true);
     showPopupTimer->setInterval(280);
@@ -638,65 +637,104 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
         // The hover ends when the cursor leaves the user row. Empty list
         // space, a section divider and anything outside the tree all close
         // the popup, while the popup itself keeps it alive.
-        if (!popupPinned && !userInfoPopup->underMouse() && (hoveredUser.isEmpty() || !userTree->underMouse())) {
+        if (!popupPinned && userInfoPopup && !userInfoPopup->underMouse() &&
+            (hoveredUser.isEmpty() || !userTree->underMouse())) {
             hidePopup();
         }
     });
 
-    connectPopupSignals();
+    if (hasUserInfoPopup) {
+        // ── Hover popup ───────────────────────────────────────────────────────
+        userInfoPopup = new UserInfoPopup(tabSupervisor, tabSupervisor->getClient(), &avatarProvider->cache(),
+                                          &cardArtProvider->cache(), &cardArtParamsMap,
+                                          window()); // parented to main window so it floats above siblings
+
+        userInfoPopup->hide();
+        userInfoPopup->setWindowOpacity(0.0);
+        userInfoPopup->installEventFilter(this);
+
+        connectPopupSignals();
+    }
 
     userTree->setMouseTracking(true);
     userTree->viewport()->setMouseTracking(true);
     userTree->viewport()->installEventFilter(this);
     userTree->installEventFilter(this); // keyboard handling for section dividers
 
-    // Clicking anywhere outside the list clears its selection and closes the
-    // popup. The filter watches all widgets because the press can land on any
-    // part of the window, on another list or on the popup itself.
-    qApp->installEventFilter(this);
+    if (hasUserInfoPopup) {
+        // Clicking anywhere outside the list clears its selection and closes the
+        // popup. The filter watches all widgets because the press can land on any
+        // part of the window, on another list or on the popup itself.
+        qApp->installEventFilter(this);
 
-    // Pin on item click
-    connect(userTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item, int) {
-        // Clicking a section divider toggles it
-        if (sectioned && item->type() == SectionItemType) {
-            setExpandedProgrammatically(item, !item->isExpanded());
-            handleSectionExpansion(item, item->isExpanded());
-            return;
-        }
-        if (!SettingsCache::instance().appearance().getStyleUserList()) {
-            return;
-        }
-        if (item->type() != QTreeWidgetItem::Type) {
-            return; // divider rows have no user popup
-        }
-        popupPinned = false; // reset so showPopupForUser can update
-        showPopupForUser(static_cast<UserListTWI *>(item));
-        popupPinned = true; // pin after showing
-    });
+        // Pin on item click
+        connect(userTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem *item, int) {
+            // Clicking a section divider toggles it
+            if (sectioned && item->type() == SectionItemType) {
+                setExpandedProgrammatically(item, !item->isExpanded());
+                handleSectionExpansion(item, item->isExpanded());
+                return;
+            }
+            if (!SettingsCache::instance().appearance().getStyleUserList()) {
+                return;
+            }
+            if (item->type() != QTreeWidgetItem::Type) {
+                return; // divider rows have no user popup
+            }
+            popupPinned = false; // reset so showPopupForUser can update
+            showPopupForUser(static_cast<UserListTWI *>(item));
+            popupPinned = true; // pin after showing
+        });
 
-    connect(userTree->selectionModel(), &QItemSelectionModel::selectionChanged, this,
-            [this](const QItemSelection &sel, const QItemSelection &) {
-                if (sel.isEmpty() && popupPinned) {
-                    popupPinned = false;
-                    hidePopup();
-                }
-            });
+        connect(userTree->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+                [this](const QItemSelection &sel, const QItemSelection &) {
+                    if (sel.isEmpty() && popupPinned) {
+                        popupPinned = false;
+                        hidePopup();
+                    }
+                });
 
-    // Keyboard selection: show the popup for the current row and hide it when
-    // the focus moves to a section divider or leaves the list entirely. The
-    // popup therefore follows arrow key navigation exactly like mouse hover.
-    // When it was pinned by a click it stays open and follows the selection.
-    connect(userTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem *current, QTreeWidgetItem *) {
-        if (!isVisible() || !SettingsCache::instance().appearance().getStyleUserList()) {
-            return;
-        }
-        if (current && current->type() == QTreeWidgetItem::Type) {
-            showPopupForUser(static_cast<UserListTWI *>(current));
-        } else {
-            popupPinned = false;
-            hidePopup();
-        }
-    });
+        // Keyboard selection: the popup is a mouse surface, so keyboard
+        // navigation shows no floating popup. A pinned (clicked) popup still
+        // follows the selection so it does not strand on a stale user while
+        // arrows move the cursor.
+        connect(userTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem *current, QTreeWidgetItem *) {
+            if (!popupPinned) {
+                return; // keyboard navigation shows no popup
+            }
+            if (!isVisible() || !SettingsCache::instance().appearance().getStyleUserList()) {
+                return;
+            }
+            if (current && current->type() == QTreeWidgetItem::Type) {
+                showPopupForUser(static_cast<UserListTWI *>(current));
+            } else {
+                popupPinned = false;
+                hidePopup();
+            }
+        });
+
+        // Hide popup when list scrolls (reference row has moved)
+        connect(userTree->verticalScrollBar(), &QScrollBar::valueChanged, this, [this] {
+            showPopupTimer->stop();
+            hidePopup(true);
+            requestAvatarsForVisibleItems();
+        });
+
+        // Forward join requests from popup upward
+        connect(userInfoPopup, &UserInfoPopup::joinGameRequested, this, &UserListWidget::joinGameRequested);
+    } else {
+        // Dialog mode: keyboard selection drives the Invite button.
+        connect(userTree, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem *current, QTreeWidgetItem *) {
+            const QString userName = (current && current->type() == QTreeWidgetItem::Type)
+                                         ? current->data(2, Qt::UserRole).toString()
+                                         : QString();
+            emit currentUserChanged(userName);
+        });
+
+        // Keep the popup-less scroll path alive for avatar prefetch.
+        connect(userTree->verticalScrollBar(), &QScrollBar::valueChanged, this,
+                [this] { requestAvatarsForVisibleItems(); });
+    }
 
     // Section dividers can be collapsed/expanded by the user. Surface those
     // changes only from real user interaction. Programmatic expansion is
@@ -705,16 +743,6 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
             [this](QTreeWidgetItem *item) { handleSectionExpansion(item, true); });
     connect(userTree, &QTreeWidget::itemCollapsed, this,
             [this](QTreeWidgetItem *item) { handleSectionExpansion(item, false); });
-
-    // Hide popup when list scrolls (reference row has moved)
-    connect(userTree->verticalScrollBar(), &QScrollBar::valueChanged, this, [this] {
-        showPopupTimer->stop();
-        hidePopup(true);
-        requestAvatarsForVisibleItems();
-    });
-
-    // Forward join requests from popup upward
-    connect(userInfoPopup, &UserInfoPopup::joinGameRequested, this, &UserListWidget::joinGameRequested);
 
     connect(avatarProvider, &UserAvatarProvider::avatarUpdated, this, &UserListWidget::refreshVisibleUserHeader);
     connect(cardArtProvider, &UserCardArtProvider::cardArtUpdated, this, &UserListWidget::refreshVisibleUserHeader);
@@ -838,6 +866,9 @@ void UserListWidget::bind(UserListManager *mgr)
 void UserListWidget::refreshVisibleUserHeader(const QString &name)
 {
     userTree->viewport()->update();
+    if (!userInfoPopup) {
+        return;
+    }
     if (userInfoPopup->isVisible() && userInfoPopup->getCurrentUser() == name) {
         userInfoPopup->refreshHeader();
     }
@@ -845,6 +876,9 @@ void UserListWidget::refreshVisibleUserHeader(const QString &name)
 
 void UserListWidget::refreshPopupButtons(const QString &userName)
 {
+    if (!userInfoPopup) {
+        return;
+    }
     UserListTWI *item = users.value(userName);
     if (!item) {
         return;
@@ -862,6 +896,9 @@ void UserListWidget::refreshPopupButtons(const QString &userName)
 void UserListWidget::hideEvent(QHideEvent *e)
 {
     QGroupBox::hideEvent(e);
+    if (!userInfoPopup) {
+        return;
+    }
     showPopupTimer->stop();
     hidePopupTimer->stop();
     hidePopup(true);
@@ -870,6 +907,9 @@ void UserListWidget::hideEvent(QHideEvent *e)
 void UserListWidget::showEvent(QShowEvent *e)
 {
     QGroupBox::showEvent(e);
+    if (!userInfoPopup) {
+        return;
+    }
     requestAvatarsForVisibleItems();
 }
 
@@ -942,6 +982,24 @@ bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
+    // Keyboard entry to the user context menu: the Menu key (or Shift+F10)
+    // pops the same menu the right-click shows, anchored to the focused row.
+    // Divider rows have no menu. Mouse-triggered context events are NOT handled
+    // here — the delegate's right-press path already pops the menu, and
+    // handling both would open two menus on one right-click.
+    if (hasUserInfoPopup && (obj == userTree || obj == userTree->viewport()) && event->type() == QEvent::ContextMenu) {
+        auto *contextEvent = static_cast<QContextMenuEvent *>(event);
+        if (contextEvent->reason() == QContextMenuEvent::Keyboard) {
+            QTreeWidgetItem *current = userTree->currentItem();
+            if (current && current->type() == QTreeWidgetItem::Type) {
+                const QPoint globalPos = userTree->viewport()->mapToGlobal(userTree->visualItemRect(current).center());
+                showContextMenu(globalPos, userTree->indexFromItem(current));
+                return true;
+            }
+            return false; // divider rows: no menu
+        }
+    }
+
     // Keyboard navigation of the section dividers.
     // The dividers are selectable so arrow keys land on them. When one is the
     // current item, Enter/Space toggle it (like a button) and Left/Right follow
@@ -963,7 +1021,7 @@ bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
-    if (obj == userTree->viewport()) {
+    if (hasUserInfoPopup && obj == userTree->viewport()) {
         if (event->type() == QEvent::MouseMove) {
             if (!SettingsCache::instance().appearance().getStyleUserList()) {
                 return QGroupBox::eventFilter(obj, event);
@@ -1003,6 +1061,9 @@ bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
 
 void UserListWidget::showPopupForUser(UserListTWI *item)
 {
+    if (!userInfoPopup) {
+        return;
+    }
     if (!item) {
         return;
     }
@@ -1061,6 +1122,9 @@ void UserListWidget::showPopupForUser(UserListTWI *item)
 
 void UserListWidget::positionPopup(UserListTWI *item)
 {
+    if (!userInfoPopup) {
+        return;
+    }
     if (!item) {
         return;
     }
@@ -1115,6 +1179,9 @@ void UserListWidget::positionPopup(UserListTWI *item)
 
 void UserListWidget::hidePopup(bool immediate)
 {
+    if (!userInfoPopup) {
+        return;
+    }
     showPopupTimer->stop();
     hidePopupTimer->stop();
     if (!userInfoPopup->isVisible()) {
@@ -1475,8 +1542,10 @@ void UserListWidget::applyFilter()
             int visible = 0;
             for (int i = 0; i < divider->childCount(); ++i) {
                 auto *child = static_cast<UserListTWI *>(divider->child(i));
-                const bool match =
-                    !searching || QString::fromStdString(child->getUserInfo().name()).toLower().contains(lower);
+                const QString name = QString::fromStdString(child->getUserInfo().name());
+                const bool passesFilter =
+                    !userFilter || userFilter(name, child->data(0, UserListRoles::Online).toBool());
+                const bool match = passesFilter && (!searching || name.toLower().contains(lower));
                 child->setHidden(!match);
                 if (match) {
                     ++visible;
@@ -1496,6 +1565,7 @@ void UserListWidget::applyFilter()
         }
         requestAvatarsForVisibleItems();
         userTree->viewport()->update();
+        emit userListChanged();
         return;
     }
 
@@ -1513,6 +1583,7 @@ void UserListWidget::applyFilter()
 
     requestAvatarsForVisibleItems();
     userTree->viewport()->update();
+    emit userListChanged();
 }
 
 void UserListWidget::userClicked(QTreeWidgetItem *item, int /*column*/)
@@ -1520,7 +1591,38 @@ void UserListWidget::userClicked(QTreeWidgetItem *item, int /*column*/)
     if (item->type() != QTreeWidgetItem::Type) {
         return; // divider rows open no chat
     }
-    emit openMessageDialog(item->data(2, Qt::UserRole).toString(), true);
+    const QString userName = item->data(2, Qt::UserRole).toString();
+    if (hasUserInfoPopup) {
+        emit openMessageDialog(userName, true);
+    } else {
+        emit userActivated(userName);
+    }
+}
+
+int UserListWidget::visibleUserRowCount() const
+{
+    int count = 0;
+    if (sectioned) {
+        for (const Section section : sectionIds) {
+            QTreeWidgetItem *divider = sectionItems.value(section);
+            if (!divider || divider->isHidden()) {
+                continue;
+            }
+            for (int i = 0; i < divider->childCount(); ++i) {
+                if (!divider->child(i)->isHidden()) {
+                    ++count;
+                }
+            }
+        }
+        return count;
+    }
+    for (int i = 0; i < userTree->topLevelItemCount(); ++i) {
+        QTreeWidgetItem *item = userTree->topLevelItem(i);
+        if (!item->isHidden() && item->type() == QTreeWidgetItem::Type) {
+            ++count;
+        }
+    }
+    return count;
 }
 
 void UserListWidget::showContextMenu(const QPoint &pos, const QModelIndex &index)
@@ -1638,15 +1740,27 @@ void UserListWidget::updateSectionDivider(Section section)
         return;
     }
     int visible = 0;
+    int online = 0;
     for (int i = 0; i < divider->childCount(); ++i) {
-        if (!divider->child(i)->isHidden()) {
+        QTreeWidgetItem *child = divider->child(i);
+        if (!child->isHidden()) {
             ++visible;
+            if (child->data(0, UserListRoles::Online).toBool()) {
+                ++online;
+            }
         }
     }
     // The tree draws no branches (rows are flush), so the divider carries its
     // own collapse arrow glyph.
     const QString arrow = divider->isExpanded() ? QStringLiteral("\u25BE") : QStringLiteral("\u25B8");
-    divider->setText(0, tr("%1 %2 (%3)").arg(arrow, sectionTitle(section)).arg(visible));
+    if (section == Section::Buddy) {
+        // The buddy divider reports how many of the shown buddies are online,
+        // mirroring the "Buddies online: %1 / %2" title of the non-sectioned
+        // buddy list.
+        divider->setText(0, tr("%1 %2 (%3/%4)").arg(arrow, sectionTitle(section)).arg(online).arg(visible));
+    } else {
+        divider->setText(0, tr("%1 %2 (%3)").arg(arrow, sectionTitle(section)).arg(visible));
+    }
 }
 
 void UserListWidget::handleSectionExpansion(QTreeWidgetItem *item, bool expanded)
@@ -1757,6 +1871,13 @@ UserListTWI *UserListWidget::ensureSectionMembership(Section section, const Serv
 
     updateCardArtParams(user, userName);
 
+    // Dialog mode: rows that fail the user filter never exist. applyFilter()
+    // re-checks the predicate on every pass so a live state change (e.g. the
+    // user being ignored mid-dialog) hides an already created row.
+    if (userFilter && !userFilter(userName, online)) {
+        return nullptr;
+    }
+
     QTreeWidgetItem *divider = sectionItems.value(section);
     if (!divider) {
         return nullptr;
@@ -1824,4 +1945,9 @@ void UserListWidget::finishSectionedMutation()
     sortItems();
     applyFilter();
     userTree->viewport()->update();
+}
+
+void UserListWidget::setGameInviteLinkProvider(std::function<QList<GameInviteOption>()> provider)
+{
+    userContextMenu->setGameInviteLinkProvider(std::move(provider));
 }

@@ -4,6 +4,7 @@
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../interface/widgets/dialogs/dlg_settings.h"
 #include "../interface/widgets/server/chat_view/chat_view.h"
+#include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/game_selector.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_panel_widget.h"
@@ -30,6 +31,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QtCore/qdatetime.h>
+#include <functional>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
@@ -66,10 +68,14 @@ TabRoom::TabRoom(TabSupervisor *_tabSupervisor,
     userList = userListPanel->getUserList();
     connect(userListPanel, &UserListPanelWidget::openMessageDialog, this, &TabRoom::openMessageDialog);
 
+    const auto gameInviteLinkProvider = [this]() { return tabSupervisor->getGameInviteLinksForRoom(roomId); };
+    userList->setGameInviteLinkProvider(gameInviteLinkProvider);
+
     chatView = new ChatView(tabSupervisor, nullptr, true, this);
     connect(chatView, &ChatView::showMentionPopup, this, &TabRoom::actShowMentionPopup);
     connect(chatView, &ChatView::messageClickedSignal, this, &TabRoom::focusTab);
     connect(chatView, &ChatView::openMessageDialog, this, &TabRoom::openMessageDialog);
+    connect(chatView, &ChatView::cockatriceLinkActivated, this, &TabRoom::cockatriceLinkActivated);
     connect(chatView, &ChatView::showCardInfoPopup, this, &TabRoom::showCardInfoPopup);
     connect(chatView, &ChatView::deleteCardInfoPopup, this, &TabRoom::deleteCardInfoPopup);
     connect(chatView, &ChatView::addMentionTag, this, &TabRoom::addMentionTag);

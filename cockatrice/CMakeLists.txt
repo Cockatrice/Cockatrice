@@ -36,6 +36,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_forgot_password_challenge.cpp
     src/interface/widgets/dialogs/dlg_forgot_password_request.cpp
     src/interface/widgets/dialogs/dlg_forgot_password_reset.cpp
+    src/interface/widgets/dialogs/dlg_invite_to_game.cpp
     src/interface/widgets/dialogs/dlg_load_deck.cpp
     src/interface/widgets/dialogs/dlg_load_deck_from_clipboard.cpp
     src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp
@@ -246,6 +247,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/replay/replay_widget.cpp
     src/interface/widgets/server/chat_view/chat_view.cpp
     src/interface/widgets/server/game_filter_configs.cpp
+    src/interface/widgets/server/game_link.cpp
     src/interface/widgets/server/game_selector.cpp
     src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp
     src/interface/widgets/server/games_model.cpp
@@ -300,8 +302,10 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_item_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_folder_display_widget.cpp
+    src/interface/widgets/visual_deck_storage/visual_deck_storage_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp
+    src/interface/widgets/visual_deck_storage/visual_deck_storage_sort_filter_proxy_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp

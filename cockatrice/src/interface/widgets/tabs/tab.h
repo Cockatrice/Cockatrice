@@ -20,6 +20,7 @@ class Tab : public QMainWindow
 signals:
     void userEvent(bool globalEvent = true);
     void tabTextChanged(Tab *tab, const QString &newTabText);
+    void cockatriceLinkActivated(const QString &url);
 
 protected:
     TabSupervisor *tabSupervisor;

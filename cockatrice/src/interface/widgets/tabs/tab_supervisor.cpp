@@ -3,6 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../interface/pixel_map_generator.h"
+#include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
 #include "../main.h"
@@ -406,6 +407,7 @@ int TabSupervisor::myAddTab(Tab *tab, QAction *manager)
 {
     connect(tab, &TabGame::userEvent, this, &TabSupervisor::tabUserEvent);
     connect(tab, &TabGame::tabTextChanged, this, &TabSupervisor::updateTabText);
+    connect(tab, &TabGame::cockatriceLinkActivated, this, &TabSupervisor::cockatriceLinkActivated);
 
     QString tabText = tab->getTabText();
     int idx = addTab(tab, sanitizeTabName(tabText));
@@ -851,6 +853,7 @@ void TabSupervisor::addRoomTab(const ServerInfo_Room &info, bool setCurrent)
     connect(tab, &TabRoom::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
     connect(tab, &TabRoom::roomClosing, this, &TabSupervisor::roomLeft);
     connect(tab, &TabRoom::openMessageDialog, this, &TabSupervisor::addMessageTab);
+    connect(tab, &TabRoom::cockatriceLinkActivated, this, &TabSupervisor::cockatriceLinkActivated);
     myAddTab(tab);
     roomTabs.insert(info.room_id(), tab);
     if (setCurrent) {
@@ -904,8 +907,10 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
     }
 
     ServerInfo_User otherUser;
+    bool userOnline = false;
     if (auto user = userListManager->getOnlineUser(receiverName)) {
         otherUser = ServerInfo_User(*user);
+        userOnline = true;
     } else {
         otherUser.set_name(receiverName.toStdString());
     }
@@ -919,9 +924,10 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
         return tab;
     }
 
-    tab = new TabMessage(this, client, *userInfo, otherUser);
+    tab = new TabMessage(this, client, *userInfo, otherUser, userOnline);
     connect(tab, &TabMessage::talkClosing, this, &TabSupervisor::talkLeft);
     connect(tab, &TabMessage::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
+    connect(tab, &TabMessage::cockatriceLinkActivated, this, &TabSupervisor::cockatriceLinkActivated);
     myAddTab(tab);
     messageTabs.insert(receiverName, tab);
     if (focus) {
@@ -943,6 +949,53 @@ void TabSupervisor::talkLeft(TabMessage *tab)
 
     messageTabs.remove(tab->getUserName());
     removeTab(indexOf(tab));
+}
+
+QList<GameInviteOption> TabSupervisor::getGameInviteLinksForRoom(int roomId) const
+{
+    QList<GameInviteOption> options;
+    if (isLocalGame) {
+        return options;
+    }
+
+    // The inviter may be in several games of the same room (hosting one and
+    // spectating another, for example). Return every game so the caller can
+    // let the user choose which one to invite to.
+    for (TabGame *tab : gameTabs) {
+        GameMetaInfo *metaInfo = tab->getGame()->getGameMetaInfo();
+        if (metaInfo->proto().room_id() != roomId) {
+            continue;
+        }
+        // A closed game is a dead end — drop it. Started/full games stay
+        // listed: an invite to them is a legitimate "come spectate" offer.
+        if (metaInfo->proto().closed()) {
+            continue;
+        }
+
+        const int gameId = metaInfo->gameId();
+        const QString description = QString::fromStdString(metaInfo->proto().description());
+
+        GameInviteOption option{
+            .gameId = gameId,
+            .label =
+                description.isEmpty() ? tr("Game #%1").arg(gameId) : tr("Game #%1 — %2").arg(gameId).arg(description),
+            .url = makeGameJoinLink(client->serverName(), client->serverPort(), roomId, gameId, description),
+            .description = description,
+            .onlyBuddies = metaInfo->proto().only_buddies(),
+            .creatorName = QString::fromStdString(metaInfo->proto().creator_info().name()),
+        };
+        options.append(option);
+    }
+
+    return options;
+}
+
+void TabSupervisor::sendInviteToUser(const QString &userName, const QString &inviteText)
+{
+    TabMessage *tab = addMessageTab(userName, true);
+    if (tab) {
+        tab->sendInviteMessage(inviteText);
+    }
 }
 
 /**

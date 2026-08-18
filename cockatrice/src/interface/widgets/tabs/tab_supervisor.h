@@ -9,6 +9,7 @@
 #define TAB_SUPERVISOR_H
 
 #include "../../deck_loader/deck_loader.h"
+#include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_proxy.h"
 #include "abstract_tab_deck_editor.h"
 #include "api/archidekt/tab_archidekt.h"
@@ -160,6 +161,8 @@ public:
     {
         return deckEditorTabs;
     }
+    [[nodiscard]] QList<GameInviteOption> getGameInviteLinksForRoom(int roomId) const;
+    void sendInviteToUser(const QString &userName, const QString &inviteText);
     [[nodiscard]] bool getAdminLocked() const;
     void closeEvent(QCloseEvent *event) override;
     bool switchToGameTabIfAlreadyExists(const int gameId);
@@ -169,6 +172,7 @@ signals:
     void localGameEnded();
     void adminLockChanged(bool lock);
     void showWindowIfHidden();
+    void cockatriceLinkActivated(const QString &url);
 
 public slots:
     void openDeckInNewTab(const LoadedDeck &deckToOpen);
