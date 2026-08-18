@@ -161,7 +161,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: "Restore compiler cache (ccache)"
-        id: ccache_restore
+        id: restore_ccache
         uses: actions/cache/restore@v6
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
@@ -203,10 +203,10 @@ jobs:
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "Delete remote compiler cache (ccache)"
-        if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
+        if: github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
         continue-on-error: true
         env:
-          CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
+          CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           GH_TOKEN: ${{ github.token }}
         run: |
           if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
@@ -217,7 +217,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: actions/cache/save@v6
         with:
-          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
+          key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           path: ${{ env.CACHE }}
 
       - name: "Upload artifact"
@@ -271,7 +271,7 @@ jobs:
             make_package: 1
             override_target: 13
             package_suffix: "-macOS13_Intel"
-            qt_version: 6.11.0
+            qt_version: 6.11.1
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Intel
             type: Release
@@ -287,7 +287,7 @@ jobs:
             make_package: 1
             override_target: 14
             package_suffix: "-macOS14"
-            qt_version: 6.11.0
+            qt_version: 6.11.1
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
@@ -303,7 +303,7 @@ jobs:
             make_package: 1
             override_target: 15
             package_suffix: "-macOS15"
-            qt_version: 6.11.0
+            qt_version: 6.11.1
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Release
@@ -317,7 +317,7 @@ jobs:
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             package_suffix: "-macOS26"
-            qt_version: 6.11.0
+            qt_version: 6.11.1
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             soc: Apple
             type: Debug
@@ -332,7 +332,7 @@ jobs:
             cmake_generator_platform: x64
             make_package: 1
             package_suffix: "-Win10"
-            qt_version: 6.11.0
+            qt_version: 6.11.1
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             type: Release
 
@@ -352,7 +352,6 @@ jobs:
 
       - name: "[Windows] Add msbuild to PATH"
         if: matrix.os == 'Windows'
-        id: add-msbuild
         uses: microsoft/setup-msbuild@v3
         with:
           msbuild-architecture: x64
@@ -363,14 +362,14 @@ jobs:
 
       - name: "[macOS] Restore compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
-        id: ccache_restore
+        id: restore_ccache
         uses: actions/cache/restore@v6
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          key: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}-${{ matrix.soc }}-${{ matrix.type }}-${{ env.BRANCH_NAME }}
+          key: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}-${{ env.BRANCH_NAME }}
           path: ${{ env.CCACHE_DIR }}
-          restore-keys: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}-${{ matrix.soc }}-${{ matrix.type }}-
+          restore-keys: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}-
 
       - name: "Install aqtinstall"
         run: pipx install aqtinstall
@@ -388,7 +387,7 @@ jobs:
         id: restore_qt
         uses: actions/cache/restore@v6
         with:
-          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-thin
           path: ${{ github.workspace }}/Qt
 
       # Using jurplel/install-qt-action to install Qt without using brew
@@ -410,7 +409,7 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
         with:
-          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+          key: ${{ steps.restore_qt.outputs.cache-primary-key }}
           path: ${{ github.workspace }}/Qt
 
       - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
@@ -460,21 +459,21 @@ jobs:
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342
       - name: "[macOS] Delete remote compiler cache (ccache)"
-        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
+        if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.restore_ccache.outputs.cache-hit
         continue-on-error: true
         env:
-          CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
+          CACHE_PRIMARY_KEY: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           GH_TOKEN: ${{ github.token }}
         run: |
           if gh cache delete --repo "$GITHUB_REPOSITORY" "$CACHE_PRIMARY_KEY"; then
             echo "Cache deleted successfully"
           fi
 
-      - name: "[macOS] Save updated compiler cache (ccache)"
+      - name: "[macOS] Cache updated compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v6
         with:
-          key: ${{ steps.ccache_restore.outputs.cache-primary-key }}
+          key: ${{ steps.restore_ccache.outputs.cache-primary-key }}
           path: ${{ env.CCACHE_DIR }}
 
       - name: "[macOS] Sign app bundle"
