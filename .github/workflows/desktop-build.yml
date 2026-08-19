@@ -412,6 +412,7 @@ jobs:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
           cache: true
+          cache-key-prefix: Qt
           modules: ${{ matrix.qt_modules }}
           version: ${{ steps.resolve_qt_version.outputs.version }}
 
