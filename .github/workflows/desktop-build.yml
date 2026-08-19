@@ -163,12 +163,9 @@ jobs:
       - name: "Restore compiler cache (ccache)"
         id: restore_ccache
         uses: actions/cache/restore@v6
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
-          key: ccache-${{ matrix.distro }}${{ matrix.version }}-${{ env.BRANCH_NAME }}
+          key: ccache-${{ matrix.distro }}${{ matrix.version }}
           path: ${{ env.CACHE }}
-          restore-keys: ccache-${{ matrix.distro }}${{ matrix.version }}-
 
       - name: "Build ${{ matrix.distro }} ${{ matrix.version }} Docker image"
         shell: bash
@@ -363,8 +360,6 @@ jobs:
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
         id: restore_ccache
         uses: actions/cache/restore@v6
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         with:
           key: ccache-${{ matrix.runner }}_${{ matrix.override_target }}-Xcode${{ matrix.xcode }}
           path: ${{ env.CCACHE_DIR }}
@@ -385,7 +380,7 @@ jobs:
         id: restore_qt
         uses: actions/cache/restore@v6
         with:
-          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-thin
+          key: Qt-${{ steps.resolve_qt_version.outputs.version }}-macOS-${{ matrix.soc }}-${{ matrix.qt_modules }}-thin
           path: ${{ github.workspace }}/Qt
 
       # Using jurplel/install-qt-action to install Qt without using brew
