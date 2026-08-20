@@ -252,17 +252,27 @@ void GameScene::adjustPlayerRotation(int rotationAdjustment)
  */
 void GameScene::rearrange()
 {
-    int firstPlayerIndex = 0;
-    auto playersPlaying = collectActivePlayers(firstPlayerIndex);
-    playersPlaying = rotatePlayers(playersPlaying, firstPlayerIndex);
+    if (rearranging) {
+        needsReArrange = true;
+        return;
+    }
+    rearranging = true;
+    do {
+        needsReArrange = false;
 
-    int columns = determineColumnCount(playersPlaying.size());
-    QSizeF sceneSize = computeSceneSizeAndPlayerLayout(playersPlaying, columns);
+        int firstPlayerIndex = 0;
+        auto playersPlaying = collectActivePlayers(firstPlayerIndex);
+        playersPlaying = rotatePlayers(playersPlaying, firstPlayerIndex);
 
-    phasesToolbar->setHeight(sceneSize.height());
-    setSceneRect(0, 0, sceneSize.width(), sceneSize.height());
+        int columns = determineColumnCount(playersPlaying.size());
+        QSizeF sceneSize = computeSceneSizeAndPlayerLayout(playersPlaying, columns);
 
-    processViewSizeChange(viewSize);
+        phasesToolbar->setHeight(sceneSize.height());
+        setSceneRect(0, 0, sceneSize.width(), sceneSize.height());
+
+        processViewSizeChange(viewSize);
+    } while (needsReArrange);
+    rearranging = false;
 }
 
 // ---------- View Size ----------

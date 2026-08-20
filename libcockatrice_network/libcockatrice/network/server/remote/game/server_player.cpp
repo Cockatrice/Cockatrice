@@ -253,8 +253,8 @@ Server_Player::cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &r
     event.mutable_player_properties()->set_deck_hash(deck->getDeckHash().toStdString());
     const auto &playmat = deck->getPlaymat();
     auto *playmatParams = event.mutable_player_properties()->mutable_playmat_params();
-    playmatParams->set_card_name(playmat.card.name.toStdString());
-    playmatParams->set_card_provider_id(playmat.card.providerId.toStdString());
+    playmatParams->set_card_name(playmat.card.name.left(MAX_NAME_LENGTH).toStdString());
+    playmatParams->set_card_provider_id(playmat.card.providerId.left(MAX_NAME_LENGTH).toStdString());
     playmatParams->set_margin_pct_l(playmat.params.marginPctL);
     playmatParams->set_margin_pct_r(playmat.params.marginPctR);
     playmatParams->set_vertical_offset(playmat.params.verticalOffset);
@@ -613,9 +613,14 @@ Server_Player::cmdSetPlaymat(const Command_SetPlaymat &cmd, ResponseContainer &r
     }
 
     const auto &pp = cmd.playmat_params();
+    const auto rawName = QString::fromStdString(pp.card_name());
+    const auto rawProviderId = QString::fromStdString(pp.card_provider_id());
+    if (rawName.length() > MAX_NAME_LENGTH || rawProviderId.length() > MAX_NAME_LENGTH) {
+        return Response::RespInvalidData;
+    }
     PlaymatResolution playmat;
-    playmat.card.name = QString::fromStdString(pp.card_name());
-    playmat.card.providerId = QString::fromStdString(pp.card_provider_id());
+    playmat.card.name = rawName;
+    playmat.card.providerId = rawProviderId;
     playmat.params.marginPctL = qBound(0.0, pp.margin_pct_l(), 0.95);
     playmat.params.marginPctR = qBound(0.0, pp.margin_pct_r(), 0.95);
     playmat.params.verticalOffset = qBound(0.0, pp.vertical_offset(), 1.0);

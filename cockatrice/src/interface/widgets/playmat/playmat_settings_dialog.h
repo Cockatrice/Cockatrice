@@ -5,7 +5,6 @@
 #include <QPixmap>
 #include <libcockatrice/deck_list/deck_list.h>
 
-class QCheckBox;
 class QComboBox;
 class QCompleter;
 class QDoubleSpinBox;
@@ -39,12 +38,6 @@ public:
     CardRef card() const;
     PlaymatParams params() const;
 
-    /**
-     * @brief Whether the user also wants the configured playmat saved as the
-     *        user-level default (fallback for decks without one).
-     */
-    bool useAsDefault() const;
-
 private slots:
     void onCardNameChanged(const QString &name);
     void reloadPreview();
@@ -67,8 +60,6 @@ private:
     QComboBox *providerComboBox;
 
     QMetaObject::Connection pixmapUpdatedConnection;
-
-    QCheckBox *useAsDefaultCheckBox;
 
     QLabel *cardNameLabel;
     QLabel *printingLabel;

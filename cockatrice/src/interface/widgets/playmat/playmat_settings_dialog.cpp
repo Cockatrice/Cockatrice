@@ -7,7 +7,6 @@
 #include "card_database_model.h"
 #include "playmat_preview_widget.h"
 
-#include <QCheckBox>
 #include <QComboBox>
 #include <QCompleter>
 #include <QDialogButtonBox>
@@ -65,11 +64,6 @@ CardRef PlaymatSettingsDialog::card() const
 PlaymatParams PlaymatSettingsDialog::params() const
 {
     return currentParams;
-}
-
-bool PlaymatSettingsDialog::useAsDefault() const
-{
-    return useAsDefaultCheckBox->isChecked();
 }
 
 QDoubleSpinBox *PlaymatSettingsDialog::makeSpinBox(double min, double max, double value, double step)
@@ -143,9 +137,6 @@ void PlaymatSettingsDialog::setupUi()
     controlsGroup = new QGroupBox;
     controlsGroup->setLayout(form);
 
-    useAsDefaultCheckBox = new QCheckBox;
-    useAsDefaultCheckBox->setEnabled(false);
-
     preview = new PlaymatPreviewWidget;
 
     auto *previewLayout = new QVBoxLayout;
@@ -166,7 +157,6 @@ void PlaymatSettingsDialog::setupUi()
 
     auto *root = new QVBoxLayout;
     root->addWidget(controlsGroup);
-    root->addWidget(useAsDefaultCheckBox);
     root->addWidget(previewGroup);
     root->addWidget(buttons);
     setLayout(root);
@@ -206,8 +196,6 @@ void PlaymatSettingsDialog::onCardNameChanged(const QString &name)
     if (name.isEmpty()) {
         currentPixmap = QPixmap();
         preview->setPixmap(currentPixmap);
-        useAsDefaultCheckBox->setChecked(false);
-        useAsDefaultCheckBox->setEnabled(false);
         return;
     }
 
@@ -216,13 +204,10 @@ void PlaymatSettingsDialog::onCardNameChanged(const QString &name)
         currentPixmap = QPixmap();
         preview->setPixmap(currentPixmap);
         providerComboBox->clear();
-        useAsDefaultCheckBox->setChecked(false);
-        useAsDefaultCheckBox->setEnabled(false);
         return;
     }
 
     currentCard.name = name;
-    useAsDefaultCheckBox->setEnabled(true);
 
     populateProviderCombo(name);
 
@@ -287,7 +272,6 @@ void PlaymatSettingsDialog::retranslateUi()
     verticalOffsetLabel->setText(tr("Vertical offset:"));
     zoomLabel->setText(tr("Zoom:"));
     controlsGroup->setTitle(tr("Parameters"));
-    useAsDefaultCheckBox->setText(tr("Also set as my default playmat (for decks without one)"));
     previewGroup->setTitle(tr("Preview"));
     removeButton->setText(tr("Remove Playmat"));
 }

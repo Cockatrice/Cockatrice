@@ -466,13 +466,6 @@ void DeckEditorDeckDockWidget::openPlaymatSettings()
             deckStateManager->setPlaymat({newCard, newParams});
         }
 
-        // "Also set as my default playmat": make this the fixed user-level
-        // fallback, so decks without a playmat of their own use it.
-        if (dialog.useAsDefault() && !newCard.isEmpty()) {
-            auto &interfaceSettings = SettingsCache::instance().userInterface();
-            interfaceSettings.setPlaymatFallbackList({{newCard, newParams}});
-            interfaceSettings.setPlaymatFallbackBehavior(0); // PlaymatFallbackMode::Fixed
-        }
         updatePlaymatLabel();
     }
 }

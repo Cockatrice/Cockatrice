@@ -18,6 +18,7 @@
 #include <QGraphicsView>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/playmat_resolver.h>
 #include <libcockatrice/settings/interface_settings.h>
 
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
@@ -376,6 +377,12 @@ void PlayerGraphicsItem::updatePlaymat()
         return;
     }
 
+    // "Show own playmat only" — hide playmats for remote players
+    if (visibility == 1 && !player->getPlayerInfo()->getLocal()) {
+        clearPlaymat();
+        return;
+    }
+
     CardRef playmatCard;
     PlaymatParams params;
 
@@ -383,8 +390,40 @@ void PlayerGraphicsItem::updatePlaymat()
         // Prefer the server-confirmed playmat (updated by Command_SetPlaymat).
         playmatCard = player->getRemotePlaymatCard();
         params = player->getRemotePlaymatParams();
+    } else if (player->getPlayerInfo()->getLocal()) {
+        // Local player without a server broadcast yet: apply the full
+        // settings-based resolution chain (mode, fallback list, behavior).
+        const auto &settings = SettingsCache::instance().userInterface();
+        const DeckList &deck = player->getDeck();
+        const auto fallbackBehavior = static_cast<PlaymatFallbackMode>(settings.getPlaymatFallbackBehavior());
+
+        switch (settings.getPlaymatMode()) {
+            case 0: { // Override deck playmat — always use collection
+                DeckList emptyDeck;
+                const PlaymatResolution resolved =
+                    resolveEffectivePlaymat(emptyDeck, {}, settings.getPlaymatFallbackList(), fallbackBehavior, 0);
+                playmatCard = resolved.card;
+                params = resolved.params;
+                break;
+            }
+            case 1: { // Fallback if deck has none — deck > collection > none
+                const PlaymatResolution resolved =
+                    resolveEffectivePlaymat(deck, {}, settings.getPlaymatFallbackList(), fallbackBehavior, 0);
+                playmatCard = resolved.card;
+                params = resolved.params;
+                break;
+            }
+            case 2: { // Deck only, ignore collection
+                const PlaymatResolution &deckPlaymat = deck.getPlaymat();
+                if (!deckPlaymat.card.isEmpty()) {
+                    playmatCard = deckPlaymat.card;
+                    params = deckPlaymat.params;
+                }
+                break;
+            }
+        }
     } else {
-        // Fall back to the locally baked-in deck playmat.
+        // Opponent without a server broadcast: use the deck-embedded playmat.
         const DeckList &deck = player->getDeck();
         const PlaymatResolution &deckPlaymat = deck.getPlaymat();
         if (!deckPlaymat.card.isEmpty()) {
