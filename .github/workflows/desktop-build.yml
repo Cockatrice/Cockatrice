@@ -42,7 +42,7 @@ concurrency:
 jobs:
   configure:
     name: Configure
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
     outputs:
       tag: ${{ steps.configure.outputs.tag }}
       sha: ${{ steps.configure.outputs.sha }}
@@ -146,7 +146,7 @@ jobs:
 
     name: ${{ matrix.distro }} ${{ matrix.version }}
     needs: configure
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest    # https://github.com/actions/runner-images
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
@@ -259,9 +259,9 @@ jobs:
       matrix:
         include:
           - os: macOS
-            target: 13
+            target: 13    # EOL 2025-09-15
             runner: macos-15-intel    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md
-                                      # macos-26-intel is slow and fails in CPack during DMG config if not increasing Finder timeout
+                                      # macos-26-intel is very slow and fails in CPack during DMG config if not increasing Finder timeout
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
@@ -276,7 +276,7 @@ jobs:
             xcode: "26.3"
 
           - os: macOS
-            target: 14
+            target: 14    # EOL 2026-??
             runner: macos-26    # https://github.com/actions/runner-images/blob/main/images/macos/macos-26-arm64-Readme.md
 
             ccache_eviction_age: 7d
