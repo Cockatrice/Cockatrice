@@ -20,6 +20,7 @@
 #include <QSignalBlocker>
 #include <QSplitter>
 #include <QTableWidget>
+#include <QTextCursor>
 #include <QTextEdit>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -835,12 +836,13 @@ void TabReport::userInfoResponse(const Response &response)
         for (int i = 0; i < resp.recent_reports_size(); ++i) {
             const ServerInfo_Report &r = resp.recent_reports(i);
             QDateTime dt = QDateTime::fromSecsSinceEpoch(r.report_time());
-            userContextRecentReports->append(QString("[%1] #%2 by %3 [%4]: %5")
-                                                 .arg(dt.toString("yyyy-MM-dd"))
-                                                 .arg(r.report_id())
-                                                 .arg(QString::fromStdString(r.reporter_name()))
-                                                 .arg(QString::fromStdString(r.status()))
-                                                 .arg(QString::fromStdString(r.category())));
+            userContextRecentReports->moveCursor(QTextCursor::End);
+            userContextRecentReports->insertPlainText(QString("[%1] #%2 by %3 [%4]: %5\n")
+                                                          .arg(dt.toString("yyyy-MM-dd"))
+                                                          .arg(r.report_id())
+                                                          .arg(QString::fromStdString(r.reporter_name()))
+                                                          .arg(QString::fromStdString(r.status()))
+                                                          .arg(QString::fromStdString(r.category())));
         }
     }
 }
@@ -894,26 +896,32 @@ void TabReport::statsResponse(const Response &response)
     statsCategoriesLabel->setText(tr("By category:"));
     statsDetailText->clear();
 
-    statsDetailText->append(tr("=== Top Categories ==="));
+    statsDetailText->moveCursor(QTextCursor::End);
+    statsDetailText->insertPlainText(tr("=== Top Categories ===") + "\n");
     for (int i = 0; i < resp.category_counts_size(); ++i) {
         const ReportCategoryCount &cc = resp.category_counts(i);
         QString cat = QString::fromStdString(cc.category());
         cat.replace('_', ' ');
         cat = cat.left(1).toUpper() + cat.mid(1);
-        statsDetailText->append(QString("  %1: %2").arg(cat).arg(cc.count()));
+        statsDetailText->moveCursor(QTextCursor::End);
+        statsDetailText->insertPlainText(QString("  %1: %2\n").arg(cat).arg(cc.count()));
     }
 
-    statsDetailText->append(tr("\n=== Most Reported Users ==="));
+    statsDetailText->moveCursor(QTextCursor::End);
+    statsDetailText->insertPlainText("\n" + tr("=== Most Reported Users ===") + "\n");
     for (int i = 0; i < resp.top_reported_users_size(); ++i) {
         const ReportTopUser &tu = resp.top_reported_users(i);
-        statsDetailText->append(
-            QString("  %1: %2 reports").arg(QString::fromStdString(tu.user_name())).arg(tu.count()));
+        statsDetailText->moveCursor(QTextCursor::End);
+        statsDetailText->insertPlainText(
+            QString("  %1: %2 reports\n").arg(QString::fromStdString(tu.user_name())).arg(tu.count()));
     }
 
-    statsDetailText->append(tr("\n=== Top Reporters ==="));
+    statsDetailText->moveCursor(QTextCursor::End);
+    statsDetailText->insertPlainText("\n" + tr("=== Top Reporters ===") + "\n");
     for (int i = 0; i < resp.top_reporters_size(); ++i) {
         const ReportTopUser &tu = resp.top_reporters(i);
-        statsDetailText->append(
-            QString("  %1: %2 reports filed").arg(QString::fromStdString(tu.user_name())).arg(tu.count()));
+        statsDetailText->moveCursor(QTextCursor::End);
+        statsDetailText->insertPlainText(
+            QString("  %1: %2 reports filed\n").arg(QString::fromStdString(tu.user_name())).arg(tu.count()));
     }
 }

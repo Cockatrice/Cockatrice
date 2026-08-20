@@ -151,7 +151,7 @@ WarningDialog::WarningDialog(const QString userName, const QString clientID, QWi
     warnClientID = new QLineEdit(clientID);
     warnClientID->setMaxLength(MAX_NAME_LENGTH);
     warningOption = new QComboBox();
-    warningOption->addItem("");
+    warningOption->addItem("", "");
 
     deleteMessages = new QCheckBox(tr("Redact all messages from this user in all rooms"));
 
@@ -184,7 +184,7 @@ void WarningDialog::okClicked()
         return;
     }
 
-    if (warningOption->currentText().simplified().isEmpty()) {
+    if (warningOption->currentData().toString().simplified().isEmpty()) {
         QMessageBox::critical(this, tr("Error"),
                               tr("Warning to use can not be blank, please select a valid warning to send."));
         return;
@@ -205,7 +205,7 @@ QString WarningDialog::getWarnID() const
 
 QString WarningDialog::getReason() const
 {
-    return warningOption->currentText().simplified();
+    return warningOption->currentData().toString().simplified();
 }
 
 int WarningDialog::getDeleteMessages() const
@@ -216,9 +216,9 @@ int WarningDialog::getDeleteMessages() const
 void WarningDialog::addWarningOption(const QString warning, int startingIl)
 {
     if (startingIl > 1) {
-        warningOption->addItem(tr("%1 (IL %2)").arg(warning).arg(startingIl));
+        warningOption->addItem(tr("%1 (IL %2)").arg(warning).arg(startingIl), warning);
     } else {
-        warningOption->addItem(warning);
+        warningOption->addItem(warning, warning);
     }
 }
 

@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `privlevelStartDate` datetime NOT NULL,
   `privlevelEndDate` datetime NOT NULL,
   `passwordLastChangedDate` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `force_password_change` tinyint(1) NOT NULL DEFAULT 0,
   `leftPawnColorOverride` varchar(255),
   `rightPawnColorOverride` varchar(255),
   `card_art_params` TEXT DEFAULT NULL,
@@ -248,6 +249,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_reports` (
  `resolution_time`     datetime NULL,
  `status`              enum('open','assigned','resolved','dismissed') NOT NULL DEFAULT 'open',
  `assigned_to`         int(7) unsigned NULL,
+ `resolved_by`         int(7) unsigned NULL,
  `resolution_note`     text,
  `notified`            tinyint(1) NOT NULL DEFAULT 0,
  PRIMARY KEY (`id`),
@@ -258,7 +260,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_reports` (
  INDEX `idx_status_created` (`status`, `created_at`),
  FOREIGN KEY (`reporter_id`)      REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
  FOREIGN KEY (`reported_user_id`) REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
- FOREIGN KEY (`assigned_to`)      REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
+ FOREIGN KEY (`assigned_to`)      REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+ FOREIGN KEY (`resolved_by`)      REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_report_comments` (

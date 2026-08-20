@@ -340,8 +340,8 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                 return UserIsBanned;
             }
 
-            QSqlQuery *passwordQuery =
-                prepareQuery("select password_sha512, active from {prefix}_users where name = :name");
+            QSqlQuery *passwordQuery = prepareQuery(
+                "select password_sha512, active, force_password_change from {prefix}_users where name = :name");
             passwordQuery->bindValue(":name", user);
             if (!execSqlQuery(passwordQuery)) {
                 qCWarning(DatabaseInterfaceLog) << "Login denied: SQL error";
@@ -351,6 +351,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
             if (passwordQuery->next()) {
                 const QString correctPasswordSha512 = passwordQuery->value(0).toString();
                 const bool userIsActive = passwordQuery->value(1).toBool();
+                const bool forceChange = passwordQuery->value(2).toBool();
                 if (!userIsActive) {
                     qCWarning(DatabaseInterfaceLog) << "Login denied: user not active";
                     return UserIsInactive;
@@ -362,6 +363,10 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     hashedPassword = password;
                 }
                 if (correctPasswordSha512 == hashedPassword) {
+                    if (forceChange) {
+                        qCDebug(DatabaseInterfaceLog) << "Login accepted but password change required";
+                        return PasswordChangeRequired;
+                    }
                     qCDebug(DatabaseInterfaceLog) << "Login accepted: password right";
                     return PasswordRight;
                 } else {
@@ -1091,6 +1096,18 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
     return passwordQuery->numRowsAffected() > 0;
 }
 
+void Servatrice_DatabaseInterface::setForcePasswordChange(const QString &user, bool force)
+{
+    if (!checkSql()) {
+        return;
+    }
+
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_users SET force_password_change = :force WHERE name = :name");
+    query->bindValue(":force", force ? 1 : 0);
+    query->bindValue(":name", user);
+    execSqlQuery(query);
+}
+
 bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
                                                       const QString &oldPassword,
                                                       bool oldPasswordNeedsHash,
@@ -1383,8 +1400,10 @@ QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QStrin
     }
     queryString.append(" OR u.name IN (SELECT DISTINCT s.user_name FROM {prefix}_sessions s "
                        "WHERE s.ip_address IN (SELECT DISTINCT s2.ip_address FROM {prefix}_sessions s2 "
-                       "WHERE s2.user_name = :user_name)) "
-                       "ORDER BY u.name");
+                       "WHERE s2.user_name = :user_name"
+                       " AND s2.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH))"
+                       " AND s.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH)) "
+                       "ORDER BY u.name LIMIT 200");
 
     QSqlQuery *query = prepareQuery(queryString);
     query->bindValue(":user_name", userName);

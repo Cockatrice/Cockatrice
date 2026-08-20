@@ -7,4 +7,5 @@ message Response_ReportList {
         optional Response_ReportList ext = 1210;
     }
     repeated ServerInfo_Report reports = 1;
+    optional uint32 total_count = 2;
 }

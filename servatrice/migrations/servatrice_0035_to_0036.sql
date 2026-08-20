@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_reports` (
  `resolution_time`     datetime NULL,
  `status`              enum('open','assigned','resolved','dismissed') NOT NULL DEFAULT 'open',
  `assigned_to`         int(7) unsigned NULL,
+ `resolved_by`         int(7) unsigned NULL,
  `resolution_note`     text,
  `notified`            tinyint(1) NOT NULL DEFAULT 0,
  PRIMARY KEY (`id`),
@@ -25,7 +26,8 @@ CREATE TABLE IF NOT EXISTS `cockatrice_reports` (
  INDEX `idx_status_created` (`status`, `created_at`),
  FOREIGN KEY (`reporter_id`)      REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
  FOREIGN KEY (`reported_user_id`) REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
- FOREIGN KEY (`assigned_to`)      REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
+ FOREIGN KEY (`assigned_to`)      REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+ FOREIGN KEY (`resolved_by`)      REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `cockatrice_report_comments` (
@@ -43,5 +45,9 @@ CREATE TABLE IF NOT EXISTS `cockatrice_report_comments` (
  FOREIGN KEY (`report_id`) REFERENCES `cockatrice_reports`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
  FOREIGN KEY (`author_id`) REFERENCES `cockatrice_users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;
+
+ALTER TABLE `cockatrice_users`
+  ADD COLUMN `force_password_change` tinyint(1) NOT NULL DEFAULT 0
+  AFTER `passwordLastChangedDate`;
 
 UPDATE cockatrice_schema_version SET version=36 WHERE version=35;

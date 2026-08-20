@@ -168,13 +168,6 @@ message Command_GetModeratorLastLogins {
     }
 }
 
-message Command_ResetUserPassword {
-    extend ModeratorCommand {
-        optional Command_ResetUserPassword ext = 1016;
-    }
-    optional string user_name = 1;
-}
-
 message Command_RemoveUserAvatar {
     extend ModeratorCommand {
         optional Command_RemoveUserAvatar ext = 1017;

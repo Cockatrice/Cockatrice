@@ -1,8 +1,11 @@
 #include "report_utils.h"
 
+#include <QApplication>
 #include <QBrush>
 #include <QDateTime>
+#include <QPalette>
 #include <QTableWidget>
+#include <QTextCursor>
 #include <QTextEdit>
 
 namespace report_utils
@@ -12,17 +15,21 @@ namespace
 {
 QColor reportStatusColor(const QString &status)
 {
+    const QColor text = qApp->palette().color(QPalette::Text);
+    const int luminance = (299 * text.red() + 587 * text.green() + 114 * text.blue()) / 1000;
+    const bool dark = luminance < 128;
+
     if (status == "open") {
-        return QColor("#e74c3c");
+        return dark ? QColor("#e06060") : QColor("#c0392b");
     }
     if (status == "assigned") {
-        return QColor("#f39c12");
+        return dark ? QColor("#e0a030") : QColor("#d68910");
     }
     if (status == "resolved") {
-        return QColor("#27ae60");
+        return dark ? QColor("#50c878") : QColor("#1e8449");
     }
     if (status == "dismissed") {
-        return QColor("#95a5a6");
+        return qApp->palette().color(QPalette::PlaceholderText);
     }
     return QColor();
 }
@@ -103,8 +110,9 @@ void renderReportDetails(QTextEdit *chatLogEdit,
         const QString author = QString::fromStdString(c.author_name());
         const QString text = QString::fromStdString(c.comment_text());
         const QString prefix = c.is_moderator() ? moderatorPrefix : nonModeratorPrefix;
-        commentsEdit->append(
-            QString("[%1] %2 %3:\n%4\n").arg(formatReportTime(c.comment_time()), prefix, author, text));
+        commentsEdit->moveCursor(QTextCursor::End);
+        commentsEdit->insertPlainText(
+            QString("[%1] %2 %3:\n%4\n\n").arg(formatReportTime(c.comment_time()), prefix, author, text));
     }
 }
 

@@ -311,8 +311,6 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
             return cmdGetUserAlts(cmd.GetExtension(Command_GetUserAlts::ext), rc);
         case ModeratorCommand::GET_MODERATOR_LAST_LOGINS:
             return cmdGetModeratorLastLogins(cmd.GetExtension(Command_GetModeratorLastLogins::ext), rc);
-        case ModeratorCommand::RESET_USER_PASSWORD:
-            return cmdResetUserPassword(cmd.GetExtension(Command_ResetUserPassword::ext), rc);
         case ModeratorCommand::REMOVE_USER_AVATAR:
             return cmdRemoveUserAvatar(cmd.GetExtension(Command_RemoveUserAvatar::ext), rc);
         default:
@@ -332,6 +330,8 @@ AbstractServerSocketInterface::processExtendedAdminCommand(int cmdType, const Ad
             return cmdReloadConfig(cmd.GetExtension(Command_ReloadConfig::ext), rc);
         case AdminCommand::ADJUST_MOD:
             return cmdAdjustMod(cmd.GetExtension(Command_AdjustMod::ext), rc);
+        case AdminCommand::RESET_USER_PASSWORD:
+            return cmdResetUserPassword(cmd.GetExtension(Command_ResetUserPassword::ext), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -1318,11 +1318,25 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
     }
 
     const bool unresolvedOnly = cmd.unresolved_only();
+    const int offset = static_cast<int>(cmd.offset());
+    const int limit = qMin(static_cast<int>(cmd.limit()), 1000);
 
     // Columns: 0=id, 1=reporter_name, 2=reported_user_name, 3=game_id,
     //          4=category, 5=description, 6=created_at, 7=status,
     //          8=resolution_note, 9=assigned_mod_name,
     //          10=room_id, 11=replay_id
+    QString whereClause;
+    if (unresolvedOnly) {
+        whereClause = "WHERE r.status = 'open' OR r.status = 'assigned' ";
+    }
+
+    // Total count query
+    QSqlQuery *countQuery = sqlInterface->prepareQuery("SELECT COUNT(*) FROM {prefix}_reports r " + whereClause);
+    int totalCount = 0;
+    if (sqlInterface->execSqlQuery(countQuery) && countQuery->next()) {
+        totalCount = countQuery->value(0).toInt();
+    }
+
     QString queryStr = "SELECT r.id, r.reporter_name, r.reported_user_name, r.game_id, "
                        "r.category, r.description, r.created_at, r.status, "
                        "r.resolution_note, u.name AS assigned_mod_name, r.room_id, "
@@ -1335,14 +1349,17 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportList(const Comman
         queryStr += "WHERE r.status = 'open' OR r.status = 'assigned' ";
     }
 
-    queryStr += "ORDER BY r.created_at DESC LIMIT 1000";
+    queryStr += "ORDER BY r.created_at DESC LIMIT :limit OFFSET :offset";
 
     QSqlQuery *query = sqlInterface->prepareQuery(queryStr);
+    query->bindValue(":limit", limit);
+    query->bindValue(":offset", offset);
     if (!sqlInterface->execSqlQuery(query)) {
         return Response::RespInternalError;
     }
 
     Response_ReportList *re = new Response_ReportList;
+    re->set_total_count(totalCount);
 
     while (query->next()) {
         ServerInfo_Report *info = re->add_reports();
@@ -1440,11 +1457,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Com
 
     QSqlQuery *query = sqlInterface->prepareQuery("UPDATE {prefix}_reports "
                                                   "SET status = :status, resolution_note = :note, "
-                                                  "resolution_time = NOW() "
+                                                  "resolution_time = NOW(), resolved_by = :mod_id "
                                                   "WHERE id = :id AND status IN ('open', 'assigned')");
 
     query->bindValue(":status", newStatus);
     query->bindValue(":note", note);
+    query->bindValue(":mod_id", userInfo->id());
     query->bindValue(":id", reportId);
 
     if (!sqlInterface->execSqlQuery(query)) {
@@ -1454,6 +1472,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportResolve(const Com
     if (query->numRowsAffected() == 0) {
         return Response::RespInvalidData;
     }
+
+    sqlInterface->addAuditRecord(QString::number(reportId), this->getAddress(),
+                                 QString::fromStdString(userInfo->clientid()),
+                                 dismissed ? "REPORT_DISMISSED" : "REPORT_RESOLVED",
+                                 QString("Report #%1 %2").arg(reportId).arg(newStatus), true);
 
     // Notifying the reporter is best-effort: the resolve already succeeded. If any of the lookup
     // queries below fail, the report is simply left with notified = 0 and the notification is
@@ -1740,7 +1763,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetUserSessions(const C
     }
 
     Response_UserSessions *re = new Response_UserSessions;
-    const QList<ServerInfo_UserSession> sessions = sqlInterface->getUserSessions(userName, cmd.limit());
+    const int limit = qMin(static_cast<int>(cmd.limit()), 500);
+    const QList<ServerInfo_UserSession> sessions = sqlInterface->getUserSessions(userName, limit);
     for (const ServerInfo_UserSession &session : sessions) {
         re->add_sessions()->CopyFrom(session);
     }
@@ -1797,13 +1821,47 @@ Response::ResponseCode AbstractServerSocketInterface::cmdResetUserPassword(const
         return Response::RespContextError;
     }
 
+    // Look up the target user's privilege level to prevent escalation.
+    QSqlQuery *privQuery = sqlInterface->prepareQuery("SELECT admin FROM {prefix}_users WHERE name = :name");
+    privQuery->bindValue(":name", userName);
+    if (!sqlInterface->execSqlQuery(privQuery) || !privQuery->next()) {
+        return Response::RespNameNotFound;
+    }
+    const int targetAdmin = privQuery->value(0).toInt();
+    const bool targetIsAdmin = targetAdmin & 1;
+    const bool targetIsMod = targetAdmin & 2;
+
+    const bool callerIsAdmin = userInfo->user_level() & ServerInfo_User::IsAdmin;
+
+    // A moderator must not reset the password of an admin or another moderator.
+    if (!callerIsAdmin && (targetIsAdmin || targetIsMod)) {
+        return Response::RespAccessDenied;
+    }
+
     const QString tempPassword = PasswordHasher::generateRandomSalt();
     if (!sqlInterface->changeUserPassword(userName, tempPassword, true)) {
         return Response::RespInternalError;
     }
+    sqlInterface->setForcePasswordChange(userName, true);
 
     sqlInterface->addAuditRecord(userName, this->getAddress(), QString::fromStdString(userInfo->clientid()),
-                                 "PASSWORD_RESET", "Moderator password reset", true);
+                                 "PASSWORD_RESET", "Admin password reset", true);
+
+    // Notify the affected user if they are currently online.
+    QReadLocker clientsLocker(&servatrice->clientsLock);
+    AbstractServerSocketInterface *targetSession =
+        static_cast<AbstractServerSocketInterface *>(server->getUsers().value(userName));
+    if (targetSession) {
+        Event_NotifyUser event;
+        event.set_type(Event_NotifyUser::CUSTOM);
+        event.set_custom_title(tr("Password Reset").toStdString());
+        event.set_custom_content(tr("An administrator has reset your password. Please log in with the new "
+                                    "password provided to you and change it immediately.")
+                                     .toStdString());
+        SessionEvent *se = targetSession->prepareSessionEvent(event);
+        targetSession->sendProtocolItem(*se);
+        delete se;
+    }
 
     Response_ResetUserPassword *re = new Response_ResetUserPassword;
     re->set_user_name(userName.toStdString());
@@ -2026,8 +2084,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportDetails(const Com
 
     const bool isMod = userInfo->user_level() & ServerInfo_User::IsModerator;
     const int reporterId = query->value(1).toInt();
-    const QString reporterName = query->value(2).toString();
-    if (reporterId != userInfo->id() && reporterName != QString::fromStdString(userInfo->name()) && !isMod) {
+    if (reporterId != userInfo->id() && !isMod) {
         return Response::RespAccessDenied;
     }
 
@@ -2139,7 +2196,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportAddComment(const 
 
     bool isMod = userInfo->user_level() & ServerInfo_User::IsModerator;
 
-    if (reporterId != userInfo->id() && reporterName != QString::fromStdString(userInfo->name()) && !isMod) {
+    // Only the reporter (by id) or a moderator may comment on a report.
+    if (reporterId != userInfo->id() && !isMod) {
         return Response::RespAccessDenied;
     }
 
@@ -2184,7 +2242,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportAddComment(const 
     }
 
     const QString ownName = QString::fromStdString(userInfo->name());
-    bool allNotified = true;
+    bool allNotified = !recipients.isEmpty();
     QReadLocker clientsLocker(&servatrice->clientsLock);
     for (const QString &notifyName : recipients) {
         if (notifyName == ownName) {
@@ -2788,6 +2846,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
         return Response::RespWrongPassword;
     }
 
+    databaseInterface->setForcePasswordChange(userName, false);
+
     return Response::RespOk;
 }
 
@@ -2924,6 +2984,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
                                          "PASSWORD_RESET", "", true);
         }
 
+        sqlInterface->setForcePasswordChange(nameFromStdString(cmd.user_name()), false);
         sqlInterface->removeForgotPassword(nameFromStdString(cmd.user_name()));
         return Response::RespOk;
     }
@@ -3013,6 +3074,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReport(const Command_Re
     QString chatLog = textTailFromStdString(cmd.chat_log());
 
     if (reportedUser.isEmpty() || category.isEmpty() || description.isEmpty()) {
+        return Response::RespInvalidData;
+    }
+
+    static const QStringList validCategories = {"cheating", "bug_abuse", "verbal_abuse", "other"};
+    if (!validCategories.contains(category.toLower())) {
         return Response::RespInvalidData;
     }
 

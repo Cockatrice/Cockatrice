@@ -6,4 +6,6 @@ message Command_ReportList {
         optional Command_ReportList ext = 1200;
     }
     optional bool unresolved_only = 1;
+    optional uint32 offset = 2 [default = 0];
+    optional uint32 limit = 3 [default = 100];
 }

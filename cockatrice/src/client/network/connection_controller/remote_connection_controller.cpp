@@ -296,6 +296,15 @@ void ConnectionController::onLoginError(int r,
             return;
         }
 
+        case Response::RespPasswordChangeRequired: {
+            QMessageBox::information(
+                dialogParent, tr("Password Change Required"),
+                tr("An administrator has reset your password. Please contact your server administrator to obtain "
+                   "your temporary password, then log in and change it via Account -> Change Password."));
+            remoteClient->disconnectFromServer();
+            return;
+        }
+
         case Response::RespServerFull: {
             QMessageBox::critical(dialogParent, tr("Server Full"),
                                   tr("The server has reached its maximum user capacity, please check back later."));
