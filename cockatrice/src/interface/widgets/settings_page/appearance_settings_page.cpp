@@ -373,6 +373,7 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(themeGroupBox);
     mainLayout->addWidget(homeTabGroupBox);
+    mainLayout->addWidget(playmatGroupBox);
     mainLayout->addWidget(stylingGroupBox);
     mainLayout->addWidget(menuGroupBox);
     mainLayout->addWidget(printingsGroupBox);
@@ -380,7 +381,6 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     mainLayout->addWidget(cardLayoutGroupBox);
     mainLayout->addWidget(cardCountersGroupBox);
     mainLayout->addWidget(handGroupBox);
-    mainLayout->addWidget(playmatGroupBox);
     mainLayout->addWidget(tableGroupBox);
     mainLayout->addStretch();
 
