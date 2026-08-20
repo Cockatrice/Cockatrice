@@ -1042,6 +1042,7 @@ void MainWindow::createCardUpdateProcess(bool background)
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
         exitCardDatabaseUpdate();
+        emit cardDatabaseUpdateFinished(false);
         return;
     }
 
