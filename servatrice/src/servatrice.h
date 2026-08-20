@@ -20,6 +20,8 @@
 #ifndef SERVATRICE_H
 #define SERVATRICE_H
 
+#include "ratelimiter.h"
+
 #include <QHostAddress>
 #include <QMetaType>
 #include <QMutex>
@@ -173,6 +175,8 @@ private:
     int nextShutdownMessageMinutes;
     QTimer *shutdownTimer;
 
+    RateLimiter rateLimiter;
+
     mutable QMutex serverListMutex;
     QList<ServerProperties> serverList;
     void updateServerList();
@@ -277,6 +281,19 @@ public:
     void incTxBytes(quint64 num);
     void incRxBytes(quint64 num);
     void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);
+
+    RateLimiter *getRateLimiter()
+    {
+        return &rateLimiter;
+    }
+    bool recordFailedLogin(const QString &ipAddress) override;
+    void clearFailedLogins(const QString &ipAddress) override;
+    int getMaxLoginAttemptsPerIp() const;
+    int getLoginAttemptWindowSeconds() const;
+    int getMaxRegistrationsPerIp() const;
+    int getRegistrationWindowSeconds() const;
+    int getMaxForgotPasswordRequestsPerIp() const;
+    int getForgotPasswordWindowSeconds() const;
 
     bool islConnectionExists(int _serverId) const;
     void addIslInterface(int _serverId, IslInterface *interface);

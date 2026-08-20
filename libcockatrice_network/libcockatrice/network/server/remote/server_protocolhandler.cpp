@@ -549,10 +549,14 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             return Response::RespUserIsBanned;
         }
         case NotLoggedIn:
+            if (server->recordFailedLogin(getAddress())) {
+                return Response::RespTooManyRequests;
+            }
             return Response::RespWrongPassword;
         case WouldOverwriteOldSession:
             return Response::RespWouldOverwriteOldSession;
         case UsernameInvalid: {
+            server->recordFailedLogin(getAddress());
             auto *re = new Response_Login;
             re->set_denied_reason_str(reasonStr.toStdString());
             rc.setResponseExtension(re);
@@ -563,8 +567,10 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
         case ClientIdRequired:
             return Response::RespClientIdRequired;
         case UserIsInactive:
+            server->recordFailedLogin(getAddress());
             return Response::RespAccountNotActivated;
         default:
+            server->clearFailedLogins(getAddress());
             authState = res;
             usingRealPassword = needsHash;
     }

@@ -7,6 +7,7 @@ project(Servatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 set(servatrice_SOURCES
     src/email_parser.cpp
     src/main.cpp
+    src/ratelimiter.cpp
     src/servatrice.cpp
     src/servatrice_connection_pool.cpp
     src/servatrice_database_interface.cpp
