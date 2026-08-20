@@ -418,8 +418,6 @@ set(cockatrice_SOURCES
     src/interface/widgets/onboarding/shader_banner_widget.h
     src/interface/widgets/onboarding/step_indicator_widget.cpp
     src/interface/widgets/onboarding/step_indicator_widget.h
-    src/interface/widgets/server/user/user_info_popup.cpp
-    src/interface/widgets/server/user/user_info_popup.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp

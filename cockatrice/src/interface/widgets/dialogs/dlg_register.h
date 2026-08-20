@@ -75,7 +75,7 @@ private:
     QComboBox *countryEdit;
 
     QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
-    const QString placeHolderText = QStringLiteral("Downloading...");
+    const QString placeHolderText = tr("Downloading...");
 };
 
 #endif // DLG_REGISTER_H
