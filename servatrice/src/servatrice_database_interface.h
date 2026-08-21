@@ -122,7 +122,7 @@ public:
                             bool oldPasswordNeedsHash,
                             const QString &newPassword,
                             bool newPasswordNeedsHash) override;
-    void setForcePasswordChange(const QString &user, bool force);
+    void setForcePasswordChange(const QString &user, bool force) override;
     QList<ServerInfo_Ban> getUserBanHistory(const QString userName);
     bool
     addWarning(const QString userName, const QString adminName, const QString warningReason, const QString clientID);
