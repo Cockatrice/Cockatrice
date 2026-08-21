@@ -111,6 +111,7 @@ jobs:
         if: steps.login.outcome == 'success'
         uses: actions/upload-artifact@v7
         with:
+          archive: false
           if-no-files-found: error
           name: digest-${{ matrix.label }}
           path: ${{ runner.temp }}/digests/*
@@ -128,7 +129,6 @@ jobs:
       - name: "Download digests"
         uses: actions/download-artifact@v7
         with:
-          if_no_artifact_found: fail
           path: ${{ runner.temp }}/digests
           pattern: digest-*
           merge-multiple: true
