@@ -10,7 +10,6 @@
 #include <QComboBox>
 #include <QCompleter>
 #include <QDialogButtonBox>
-#include <QDoubleSpinBox>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -48,10 +47,6 @@ PlaymatSettingsDialog::PlaymatSettingsDialog(const CardRef &initialCard,
             reloadPreview();
         }
     }
-    marginLSpin->setValue(initialParams.marginPctL);
-    marginRSpin->setValue(initialParams.marginPctR);
-    verticalOffsetSpin->setValue(initialParams.verticalOffset);
-    zoomSpin->setValue(initialParams.zoom);
 
     retranslateUi();
 }
@@ -64,16 +59,6 @@ CardRef PlaymatSettingsDialog::card() const
 PlaymatParams PlaymatSettingsDialog::params() const
 {
     return currentParams;
-}
-
-QDoubleSpinBox *PlaymatSettingsDialog::makeSpinBox(double min, double max, double value, double step)
-{
-    auto *spin = new QDoubleSpinBox;
-    spin->setRange(min, max);
-    spin->setSingleStep(step);
-    spin->setDecimals(3);
-    spin->setValue(value);
-    return spin;
 }
 
 void PlaymatSettingsDialog::initializeSearchBar()
@@ -112,35 +97,26 @@ void PlaymatSettingsDialog::setupUi()
     connect(providerComboBox, &QComboBox::currentIndexChanged, this, [this]() {
         currentCard.providerId = providerComboBox->currentData().toString();
         reloadPreview();
-        onParamChanged();
     });
-
-    marginLSpin = makeSpinBox(0.0, 0.95, currentParams.marginPctL, 0.01);
-    marginRSpin = makeSpinBox(0.0, 0.95, currentParams.marginPctR, 0.01);
-    verticalOffsetSpin = makeSpinBox(0.0, 1.0, currentParams.verticalOffset, 0.01);
-    zoomSpin = makeSpinBox(0.1, 4.0, currentParams.zoom, 0.05);
 
     auto *form = new QFormLayout;
     cardNameLabel = new QLabel;
     printingLabel = new QLabel;
-    leftMarginLabel = new QLabel;
-    rightMarginLabel = new QLabel;
-    verticalOffsetLabel = new QLabel;
-    zoomLabel = new QLabel;
     form->addRow(cardNameLabel, searchBar);
     form->addRow(printingLabel, providerComboBox);
-    form->addRow(leftMarginLabel, marginLSpin);
-    form->addRow(rightMarginLabel, marginRSpin);
-    form->addRow(verticalOffsetLabel, verticalOffsetSpin);
-    form->addRow(zoomLabel, zoomSpin);
 
     controlsGroup = new QGroupBox;
     controlsGroup->setLayout(form);
 
     preview = new PlaymatPreviewWidget;
+    preview->setParams(currentParams);
 
     auto *previewLayout = new QVBoxLayout;
     previewLayout->addWidget(preview);
+    previewCaptionLabel = new QLabel;
+    previewCaptionLabel->setAlignment(Qt::AlignCenter);
+    previewCaptionLabel->setWordWrap(true);
+    previewLayout->addWidget(previewCaptionLabel);
     previewGroup = new QGroupBox;
     previewGroup->setLayout(previewLayout);
 
@@ -155,16 +131,17 @@ void PlaymatSettingsDialog::setupUi()
         accept();
     });
 
+    // The crop surface is the primary control: dragging pans, wheel/keys zoom
+    //, editing exactly the same stored parameters the old numeric fields did.
+    connect(preview, &PlaymatPreviewWidget::paramsEdited, this,
+            [this](const PlaymatParams &edited) { currentParams = edited; });
+
+    // The crop surface leads visually, card selection supports it below.
     auto *root = new QVBoxLayout;
-    root->addWidget(controlsGroup);
     root->addWidget(previewGroup);
+    root->addWidget(controlsGroup);
     root->addWidget(buttons);
     setLayout(root);
-
-    connect(marginLSpin, &QDoubleSpinBox::valueChanged, this, &PlaymatSettingsDialog::onParamChanged);
-    connect(marginRSpin, &QDoubleSpinBox::valueChanged, this, &PlaymatSettingsDialog::onParamChanged);
-    connect(verticalOffsetSpin, &QDoubleSpinBox::valueChanged, this, &PlaymatSettingsDialog::onParamChanged);
-    connect(zoomSpin, &QDoubleSpinBox::valueChanged, this, &PlaymatSettingsDialog::onParamChanged);
 }
 
 void PlaymatSettingsDialog::populateProviderCombo(const QString &cardName)
@@ -252,26 +229,16 @@ void PlaymatSettingsDialog::reloadPreview()
     preview->setAttribution(buildArtAttribution(card));
 }
 
-void PlaymatSettingsDialog::onParamChanged()
-{
-    currentParams.marginPctL = marginLSpin->value();
-    currentParams.marginPctR = marginRSpin->value();
-    currentParams.verticalOffset = verticalOffsetSpin->value();
-    currentParams.zoom = zoomSpin->value();
-    preview->setParams(currentParams);
-}
-
 void PlaymatSettingsDialog::retranslateUi()
 {
     setWindowTitle(tr("Playmat Settings"));
     searchBar->setPlaceholderText(tr("Type a card name..."));
     cardNameLabel->setText(tr("Card name:"));
     printingLabel->setText(tr("Printing:"));
-    leftMarginLabel->setText(tr("Left margin (%):"));
-    rightMarginLabel->setText(tr("Right margin (%):"));
-    verticalOffsetLabel->setText(tr("Vertical offset:"));
-    zoomLabel->setText(tr("Zoom:"));
-    controlsGroup->setTitle(tr("Parameters"));
-    previewGroup->setTitle(tr("Preview"));
+    controlsGroup->setTitle(tr("Card"));
+    previewGroup->setTitle(tr("Crop"));
+    previewCaptionLabel->setText(
+        tr("Drag to pan, scroll to zoom, arrow keys nudge, plus and minus zoom, Backspace or Esc restores. "
+           "Dimmed strips mark where a wider table crops further."));
     removeButton->setText(tr("Remove Playmat"));
 }
