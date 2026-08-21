@@ -514,6 +514,23 @@ QList<ServerProperties> Servatrice::getServerList() const
     return result;
 }
 
+std::shared_ptr<const Response_ReportStats> Servatrice::getCachedReportStats() const
+{
+    QMutexLocker locker(&reportStatsMutex);
+    if (!reportStatsTimestamp.isValid() ||
+        reportStatsTimestamp.secsTo(QDateTime::currentDateTime()) >= reportStatsCacheTtlSeconds) {
+        return nullptr;
+    }
+    return reportStatsCache;
+}
+
+void Servatrice::cacheReportStats(const Response_ReportStats &stats)
+{
+    QMutexLocker locker(&reportStatsMutex);
+    reportStatsCache = std::make_shared<const Response_ReportStats>(stats);
+    reportStatsTimestamp = QDateTime::currentDateTime();
+}
+
 int Servatrice::getUsersWithAddress(const QHostAddress &address) const
 {
     int result = 0;

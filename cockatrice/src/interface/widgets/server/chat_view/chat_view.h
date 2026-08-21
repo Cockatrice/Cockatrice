@@ -33,6 +33,13 @@ public:
     QTextBlock block;
 };
 
+struct ChatLogEntry
+{
+    QString userName;
+    QString message;
+    QDateTime timestamp;
+};
+
 class ChatView : public QTextBrowser
 {
     Q_OBJECT
@@ -65,6 +72,8 @@ private:
     QString hoveredContent;
     QAction *messageClicked;
     QMap<QString, QVector<UserMessagePosition>> userMessagePositions;
+    QList<ChatLogEntry> chatHistory;
+    static constexpr int MAX_CHAT_HISTORY = 200;
 
     [[nodiscard]] QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
     QTextCursor prepareBlock(bool same = false);
@@ -107,6 +116,7 @@ public:
                        bool playerBold = false);
     void clearChat();
     void redactMessages(const QString &userName, int amount);
+    QString getRecentChatLog(int maxMessages = 50) const;
 
 protected:
     void enterEvent(QEnterEvent *event) override;

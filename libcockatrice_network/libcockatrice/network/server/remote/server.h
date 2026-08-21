@@ -38,7 +38,8 @@ enum AuthenticationResult
     UsernameInvalid,
     RegistrationRequired,
     UserIsInactive,
-    ClientIdRequired
+    ClientIdRequired,
+    PasswordChangeRequired
 };
 
 class Server : public QObject

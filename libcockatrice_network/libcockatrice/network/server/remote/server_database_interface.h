@@ -172,6 +172,9 @@ public:
     {
         return false;
     }
+    virtual void setForcePasswordChange(const QString & /* user */, bool /* force */)
+    {
+    }
 };
 
 #endif

@@ -564,6 +564,8 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
             return Response::RespClientIdRequired;
         case UserIsInactive:
             return Response::RespAccountNotActivated;
+        case PasswordChangeRequired:
+            return Response::RespPasswordChangeRequired;
         default:
             authState = res;
             usingRealPassword = needsHash;
@@ -614,6 +616,7 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 
     joinPersistentGames(rc);
     databaseInterface->removeForgotPassword(userName);
+    onLogin(rc);
     rc.setResponseExtension(re);
     return Response::RespOk;
 }

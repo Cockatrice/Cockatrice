@@ -1,6 +1,7 @@
 #include "tab_account.h"
 
 #include "../client/sound_engine.h"
+#include "../interface/widgets/dialogs/dlg_my_reports.h"
 #include "../interface/widgets/server/user/user_info_box.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
 #include "../interface/widgets/server/user/user_list_widget.h"
@@ -49,6 +50,11 @@ TabAccount::TabAccount(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
 
     auto *vbox = new QVBoxLayout;
     vbox->addWidget(userInfoBox);
+
+    myReportsButton = new QPushButton(tr("My Reports"));
+    connect(myReportsButton, &QPushButton::clicked, this, &TabAccount::openMyReports);
+    vbox->addWidget(myReportsButton);
+
     vbox->addWidget(allUsersList);
 
     auto *addToBuddyList = new QHBoxLayout;
@@ -126,6 +132,7 @@ void TabAccount::addToList(const std::string &listName, const QString &userName)
 
 void TabAccount::retranslateUi()
 {
+    myReportsButton->setText(tr("My Reports"));
     allUsersList->retranslateUi();
     buddyList->retranslateUi();
     ignoreList->retranslateUi();
@@ -239,4 +246,11 @@ void TabAccount::processRemoveFromListEvent(const Event_RemoveFromList &event)
     }
 
     userList->deleteUser(user);
+}
+
+void TabAccount::openMyReports()
+{
+    auto *dlg = new DlgMyReports(client, this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->exec();
 }

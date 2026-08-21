@@ -43,7 +43,9 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_load_remote_deck.cpp
     src/interface/widgets/dialogs/dlg_local_game_options.cpp
     src/interface/widgets/dialogs/dlg_manage_sets.cpp
+    src/interface/widgets/dialogs/dlg_my_reports.cpp
     src/interface/widgets/dialogs/dlg_register.cpp
+    src/interface/widgets/dialogs/dlg_report_user.cpp
     src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
@@ -282,6 +284,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/settings_page/user_interface_settings_page.cpp
     src/interface/widgets/utility/custom_line_edit.cpp
     src/interface/widgets/utility/get_text_with_max.cpp
+    src/interface/widgets/utility/report_utils.cpp
+    src/interface/widgets/utility/report_utils.h
     src/interface/widgets/utility/sequence_edit.cpp
     src/interface/widgets/utility/visibility_change_listener.cpp
     src/interface/widgets/utility/visibility_change_listener.h
@@ -375,6 +379,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab_home.cpp
     src/interface/widgets/tabs/tab_logs.cpp
     src/interface/widgets/tabs/tab_message.cpp
+    src/interface/widgets/tabs/tab_moderation.cpp
+    src/interface/widgets/tabs/tab_report.cpp
     src/interface/widgets/tabs/tab_replays.cpp
     src/interface/widgets/tabs/tab_room.cpp
     src/interface/widgets/tabs/tab_server.cpp

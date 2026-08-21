@@ -359,7 +359,11 @@ void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
         return;
     }
 
-    const ServerInfo_Game &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
+    joinGame(gameListModel->getGame(ind.data(Qt::UserRole).toInt()), asSpectator, asJudge);
+}
+
+void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator, const bool asJudge)
+{
     if (tabSupervisor->switchToGameTabIfAlreadyExists(game.game_id())) {
         return;
     }
@@ -414,18 +418,16 @@ void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
     disableButtons();
 }
 
-bool GameSelector::joinGameById(int gameId)
+bool GameSelector::joinGameById(const int gameId, const bool asSpectator)
 {
-    auto *model = gameListView->model();
-
-    for (int row = 0; row < model->rowCount(); ++row) {
-        QModelIndex idx = model->index(row, 0);
-        const ServerInfo_Game &game = gameListModel->getGame(idx.data(Qt::UserRole).toInt());
-        if (game.game_id() == gameId) {
-            gameListView->setCurrentIndex(idx);
-            joinGame();
-            return true;
+    for (int row = 0; row < gameListModel->rowCount(); ++row) {
+        const ServerInfo_Game &game = gameListModel->getGame(row);
+        if (game.game_id() != gameId) {
+            continue;
         }
+
+        joinGame(game, asSpectator);
+        return true;
     }
 
     qWarning() << "Game" << gameId << "not found";

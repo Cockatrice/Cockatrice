@@ -273,6 +273,14 @@ void ChatView::appendMessage(QString message,
     // messageType should be Event_RoomSay::UserMessage though we don't actually check
     bool isUserMessage = !(userName.toLower() == "servatrice" || userName.isEmpty());
     bool sameSender = isUserMessage && userName == lastSender;
+
+    if (isUserMessage) {
+        chatHistory.append({userName, message, QDateTime::currentDateTime()});
+        while (chatHistory.size() > MAX_CHAT_HISTORY) {
+            chatHistory.removeFirst();
+        }
+    }
+
     QTextCursor cursor = prepareBlock(sameSender);
     lastSender = userName;
 
@@ -650,6 +658,19 @@ void ChatView::clearChat()
     document()->clear();
     lastSender = "";
     evenNumber = true;
+    chatHistory.clear();
+}
+
+QString ChatView::getRecentChatLog(int maxMessages) const
+{
+    QStringList lines;
+    int start = qMax(0, chatHistory.size() - maxMessages);
+    for (int i = start; i < chatHistory.size(); ++i) {
+        const ChatLogEntry &entry = chatHistory.at(i);
+        lines.append(
+            QString("[%1] %2: %3").arg(entry.timestamp.toString("hh:mm:ss")).arg(entry.userName).arg(entry.message));
+    }
+    return lines.join("\n");
 }
 
 void ChatView::redactMessages(const QString &userName, int amount)

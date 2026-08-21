@@ -9,6 +9,8 @@ message Event_NotifyUser {
         WARNING = 2;
         IDLEWARNING = 3;
         CUSTOM = 4;
+        REPORT_RESOLVED = 5;
+        REPORT_COMMENT = 6;
     }
 
     extend SessionEvent {

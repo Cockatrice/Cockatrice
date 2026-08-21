@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "response.proto";
+
+message Response_ReplayDownloadByGameId {
+    extend Response {
+        optional Response_ReplayDownloadByGameId ext = 1203;
+    }
+    optional bytes replay_data = 1;
+    optional sint32 replay_id = 2;
+}

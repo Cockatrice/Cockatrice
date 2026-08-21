@@ -55,7 +55,7 @@ bool IntentJoinServerGame::tryJoinGame(TabRoom *room)
         return false;
     }
 
-    if (room->getGameSelector()->joinGameById(context->gameId)) {
+    if (room->getGameSelector()->joinGameById(context->gameId, context->asSpectator)) {
         emitFinished();
         return true;
     }

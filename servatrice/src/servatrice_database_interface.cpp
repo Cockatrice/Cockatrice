@@ -14,6 +14,7 @@
 #include <QSqlQuery>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
+#include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/utility/passwordhasher.h>
 
 inline Q_LOGGING_CATEGORY(DatabaseInterfaceLog, "database_interface");
@@ -339,8 +340,8 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                 return UserIsBanned;
             }
 
-            QSqlQuery *passwordQuery =
-                prepareQuery("select password_sha512, active from {prefix}_users where name = :name");
+            QSqlQuery *passwordQuery = prepareQuery(
+                "select password_sha512, active, force_password_change from {prefix}_users where name = :name");
             passwordQuery->bindValue(":name", user);
             if (!execSqlQuery(passwordQuery)) {
                 qCWarning(DatabaseInterfaceLog) << "Login denied: SQL error";
@@ -350,6 +351,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
             if (passwordQuery->next()) {
                 const QString correctPasswordSha512 = passwordQuery->value(0).toString();
                 const bool userIsActive = passwordQuery->value(1).toBool();
+                const bool forceChange = passwordQuery->value(2).toBool();
                 if (!userIsActive) {
                     qCWarning(DatabaseInterfaceLog) << "Login denied: user not active";
                     return UserIsInactive;
@@ -361,6 +363,10 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     hashedPassword = password;
                 }
                 if (correctPasswordSha512 == hashedPassword) {
+                    if (forceChange) {
+                        qCDebug(DatabaseInterfaceLog) << "Login accepted but password change required";
+                        return PasswordChangeRequired;
+                    }
                     qCDebug(DatabaseInterfaceLog) << "Login accepted: password right";
                     return PasswordRight;
                 } else {
@@ -1084,11 +1090,22 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
                                             "passwordLastChangedDate = NOW() where name = :name");
     passwordQuery->bindValue(":password", passwordSha512);
     passwordQuery->bindValue(":name", user);
-    if (execSqlQuery(passwordQuery)) {
-        return true;
+    if (!execSqlQuery(passwordQuery)) {
+        return false;
+    }
+    return passwordQuery->numRowsAffected() > 0;
+}
+
+void Servatrice_DatabaseInterface::setForcePasswordChange(const QString &user, bool force)
+{
+    if (!checkSql()) {
+        return;
     }
 
-    return false;
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_users SET force_password_change = :force WHERE name = :name");
+    query->bindValue(":force", force ? 1 : 0);
+    query->bindValue(":name", user);
+    execSqlQuery(query);
 }
 
 bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
@@ -1312,6 +1329,169 @@ QList<ServerInfo_Warning> Servatrice_DatabaseInterface::getUserWarnHistory(const
     }
 
     return results;
+}
+
+QList<ServerInfo_UserSession> Servatrice_DatabaseInterface::getUserSessions(const QString &userName, int limit)
+{
+    QList<ServerInfo_UserSession> results;
+
+    if (!checkSql()) {
+        return results;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT user_name, ip_address, clientid, "
+                                    "UNIX_TIMESTAMP(start_time), UNIX_TIMESTAMP(end_time), connection_type "
+                                    "FROM {prefix}_sessions WHERE user_name = :user_name "
+                                    "ORDER BY start_time DESC LIMIT :limit");
+    query->bindValue(":user_name", userName);
+    query->bindValue(":limit", limit);
+
+    if (!execSqlQuery(query)) {
+        qCWarning(DatabaseInterfaceLog) << "Failed to collect session history information: SQL Error";
+        return results;
+    }
+
+    while (query->next()) {
+        ServerInfo_UserSession sessionDetails;
+        sessionDetails.set_user_name(query->value(0).toString().toStdString());
+        sessionDetails.set_ip_address(query->value(1).toString().toStdString());
+        sessionDetails.set_clientid(query->value(2).toString().toStdString());
+        sessionDetails.set_start_time(query->value(3).toLongLong());
+        if (!query->value(4).isNull()) {
+            sessionDetails.set_end_time(query->value(4).toLongLong());
+        }
+        sessionDetails.set_connection_type(query->value(5).toString().toStdString());
+        results << sessionDetails;
+    }
+
+    return results;
+}
+
+QList<ServerInfo_UserAlt> Servatrice_DatabaseInterface::getUserAlts(const QString &userName)
+{
+    QList<ServerInfo_UserAlt> results;
+
+    if (!checkSql()) {
+        return results;
+    }
+
+    // Seed account identifiers used to find related accounts
+    QSqlQuery *seedQuery = prepareQuery("SELECT email, clientid FROM {prefix}_users WHERE name = :user_name");
+    seedQuery->bindValue(":user_name", userName);
+    if (!execSqlQuery(seedQuery) || !seedQuery->next()) {
+        return results;
+    }
+    const QString seedEmail = seedQuery->value(0).toString();
+    const QString seedClientId = seedQuery->value(1).toString();
+
+    QString queryString = "SELECT u.name, u.email, u.clientid, UNIX_TIMESTAMP(u.registrationDate), "
+                          "UNIX_TIMESTAMP(a.last_login), "
+                          "(SELECT COUNT(*) FROM {prefix}_warnings w WHERE w.user_id = u.id), "
+                          "(SELECT COUNT(*) FROM {prefix}_bans b WHERE b.user_name = u.name), "
+                          "u.active "
+                          "FROM {prefix}_users u "
+                          "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
+                          "WHERE u.name = :user_name";
+    if (!seedEmail.isEmpty()) {
+        queryString.append(" OR u.email = :seed_email");
+    }
+    if (!seedClientId.isEmpty()) {
+        queryString.append(" OR u.clientid = :seed_clientid");
+    }
+    queryString.append(" OR u.name IN (SELECT DISTINCT s.user_name FROM {prefix}_sessions s "
+                       "WHERE s.ip_address IN (SELECT DISTINCT s2.ip_address FROM {prefix}_sessions s2 "
+                       "WHERE s2.user_name = :user_name"
+                       " AND s2.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH))"
+                       " AND s.start_time >= DATE_SUB(NOW(), INTERVAL 6 MONTH)) "
+                       "ORDER BY u.name LIMIT 200");
+
+    QSqlQuery *query = prepareQuery(queryString);
+    query->bindValue(":user_name", userName);
+    if (!seedEmail.isEmpty()) {
+        query->bindValue(":seed_email", seedEmail);
+    }
+    if (!seedClientId.isEmpty()) {
+        query->bindValue(":seed_clientid", seedClientId);
+    }
+
+    if (!execSqlQuery(query)) {
+        qCWarning(DatabaseInterfaceLog) << "Failed to collect user alt information: SQL Error";
+        return results;
+    }
+
+    while (query->next()) {
+        ServerInfo_UserAlt altDetails;
+        altDetails.set_user_name(query->value(0).toString().toStdString());
+        altDetails.set_email(query->value(1).toString().toStdString());
+        altDetails.set_clientid(query->value(2).toString().toStdString());
+        altDetails.set_registration_time(query->value(3).toLongLong());
+        if (!query->value(4).isNull()) {
+            altDetails.set_last_login(query->value(4).toLongLong());
+        }
+        altDetails.set_warn_count(query->value(5).toInt());
+        altDetails.set_ban_count(query->value(6).toInt());
+        altDetails.set_is_active(query->value(7).toBool());
+        results << altDetails;
+    }
+
+    return results;
+}
+
+QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastLogins()
+{
+    QList<ServerInfo_ModeratorLogin> results;
+
+    if (!checkSql()) {
+        return results;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT u.name, u.admin, UNIX_TIMESTAMP(a.last_login) "
+                                    "FROM {prefix}_users u "
+                                    "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
+                                    "WHERE (u.admin & 7) <> 0 ORDER BY u.name");
+
+    if (!execSqlQuery(query)) {
+        qCWarning(DatabaseInterfaceLog) << "Failed to collect moderator login information: SQL Error";
+        return results;
+    }
+
+    while (query->next()) {
+        ServerInfo_ModeratorLogin loginDetails;
+        loginDetails.set_user_name(query->value(0).toString().toStdString());
+
+        const int isAdmin = query->value(1).toInt();
+        int userLevel = ServerInfo_User::IsUser | ServerInfo_User::IsRegistered;
+        if (isAdmin & 1) {
+            userLevel |= ServerInfo_User::IsAdmin | ServerInfo_User::IsModerator;
+        } else if (isAdmin & 2) {
+            userLevel |= ServerInfo_User::IsModerator;
+        }
+        if (isAdmin & 4) {
+            userLevel |= ServerInfo_User::IsJudge;
+        }
+        loginDetails.set_user_level(userLevel);
+
+        if (!query->value(2).isNull()) {
+            loginDetails.set_last_login(query->value(2).toLongLong());
+        }
+        results << loginDetails;
+    }
+
+    return results;
+}
+
+bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)
+{
+    if (!checkSql()) {
+        return false;
+    }
+
+    QSqlQuery *query = prepareQuery("UPDATE {prefix}_users SET avatar_bmp = '' WHERE name = :user_name");
+    query->bindValue(":user_name", userName);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    return query->numRowsAffected() > 0;
 }
 
 QList<ServerInfo_ChatMessage> Servatrice_DatabaseInterface::getMessageLogHistory(const QString &user,

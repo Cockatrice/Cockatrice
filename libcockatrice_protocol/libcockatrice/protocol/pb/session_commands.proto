@@ -34,6 +34,11 @@ message SessionCommand {
         REPLAY_DELETE_MATCH = 1103;
         REPLAY_GET_CODE = 1104;
         REPLAY_SUBMIT_CODE = 1105;
+        REPORT = 1200;
+        // 1201-1203 reserved: removed during squash
+        REPORT_MY_LIST = 1204;
+        REPORT_ADD_COMMENT = 1205;
+        REPORT_DETAILS = 1206;
     }
     extensions 100 to max;
 }

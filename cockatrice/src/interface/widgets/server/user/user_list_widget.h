@@ -85,7 +85,7 @@ public:
     [[nodiscard]] QString getWarnID() const;
     [[nodiscard]] QString getReason() const;
     [[nodiscard]] int getDeleteMessages() const;
-    void addWarningOption(const QString warning);
+    void addWarningOption(const QString warning, int startingIl = 1);
 };
 
 class AdminNotesDialog : public QDialog
