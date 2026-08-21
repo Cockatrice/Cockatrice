@@ -252,17 +252,27 @@ void GameScene::adjustPlayerRotation(int rotationAdjustment)
  */
 void GameScene::rearrange()
 {
-    int firstPlayerIndex = 0;
-    auto playersPlaying = collectActivePlayers(firstPlayerIndex);
-    playersPlaying = rotatePlayers(playersPlaying, firstPlayerIndex);
+    if (rearranging) {
+        needsReArrange = true;
+        return;
+    }
+    rearranging = true;
+    do {
+        needsReArrange = false;
 
-    int columns = determineColumnCount(playersPlaying.size());
-    QSizeF sceneSize = computeSceneSizeAndPlayerLayout(playersPlaying, columns);
+        int firstPlayerIndex = 0;
+        auto playersPlaying = collectActivePlayers(firstPlayerIndex);
+        playersPlaying = rotatePlayers(playersPlaying, firstPlayerIndex);
 
-    phasesToolbar->setHeight(sceneSize.height());
-    setSceneRect(0, 0, sceneSize.width(), sceneSize.height());
+        int columns = determineColumnCount(playersPlaying.size());
+        QSizeF sceneSize = computeSceneSizeAndPlayerLayout(playersPlaying, columns);
 
-    processViewSizeChange(viewSize);
+        phasesToolbar->setHeight(sceneSize.height());
+        setSceneRect(0, 0, sceneSize.width(), sceneSize.height());
+
+        processViewSizeChange(viewSize);
+    } while (needsReArrange);
+    rearranging = false;
 }
 
 // ---------- View Size ----------
@@ -459,8 +469,14 @@ void GameScene::resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qr
     qreal extraWidthPerColumn = (newWidth - minWidth) / playersByColumn.size();
     qreal newx = phasesToolbar->getWidth();
 
-    for (int col = 0; col < playersByColumn.size(); ++col) {
-        for (PlayerGraphicsItem *player : playersByColumn[col]) {
+    // Snapshot the columns: resizing a player's table can synchronously trigger
+    // GameScene::rearrange (table width -> sizeChanged -> updateBoundingRect ->
+    // sizeChanged -> rearrange), and rearrange rebuilds playersByColumn. Iterating
+    // the live container across that re-entrant call would use invalidated iterators.
+    const QList<QList<PlayerGraphicsItem *>> columns = playersByColumn;
+
+    for (int col = 0; col < columns.size(); ++col) {
+        for (PlayerGraphicsItem *player : columns[col]) {
             player->processSceneSizeChange(minWidthByColumn[col] + extraWidthPerColumn);
             player->setPos(newx, player->y());
         }

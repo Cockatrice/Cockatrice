@@ -250,6 +250,22 @@ void PlayerLogic::setDeck(const DeckList &_deck)
     emit deckChanged();
 }
 
+void PlayerLogic::setPlaymatFromProperties(const ServerInfo_PlayerProperties &props)
+{
+    if (props.has_playmat_params() && !props.playmat_params().card_name().empty()) {
+        const auto &pp = props.playmat_params();
+        remotePlaymatCard = {QString::fromStdString(pp.card_name()), QString::fromStdString(pp.card_provider_id())};
+        remotePlaymatParams = {qBound(0.0, pp.margin_pct_l(), 0.95), qBound(0.0, pp.margin_pct_r(), 0.95),
+                               qBound(0.0, pp.vertical_offset(), 1.0), qBound(0.1, pp.zoom(), 4.0)};
+        hasRemotePlaymat = true;
+    } else {
+        remotePlaymatCard = CardRef{};
+        remotePlaymatParams = PlaymatParams{};
+        hasRemotePlaymat = false;
+    }
+    emit playmatChanged();
+}
+
 CounterState *PlayerLogic::addCounter(const ServerInfo_Counter &counter)
 {
     return addCounter(counter.id(), QString::fromStdString(counter.name()),

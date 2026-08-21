@@ -7,11 +7,14 @@
 #include "../dialogs/override_printing_warning.h"
 #include "../interface/theme_manager.h"
 #include "../interface/widgets/general/background_sources.h"
+#include "../playmat/playmat_collection_dialog.h"
+#include "../playmat/playmat_settings_dialog.h"
 
 #include <QApplication>
 #include <QColorDialog>
 #include <QDesktopServices>
 #include <QGridLayout>
+#include <QHBoxLayout>
 #include <QMessageBox>
 #include <QStyleFactory>
 #include <QTimer>
@@ -325,10 +328,52 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     tableGroupBox = new QGroupBox;
     tableGroupBox->setLayout(tableGrid);
 
+    // Playmat settings
+    playmatVisibilityCombo.addItem(tr("Show all playmats"), PlaymatVisibilityAll);
+    playmatVisibilityCombo.addItem(tr("Show own playmat only"), PlaymatVisibilityOwnOnly);
+    playmatVisibilityCombo.addItem(tr("Don't use playmats"), PlaymatVisibilityNone);
+    int visIdx = playmatVisibilityCombo.findData(settings.userInterface().getPlaymatVisibility());
+    if (visIdx >= 0) {
+        playmatVisibilityCombo.setCurrentIndex(visIdx);
+    }
+    connect(&playmatVisibilityCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+        SettingsCache::instance().userInterface().setPlaymatVisibility(playmatVisibilityCombo.itemData(index).toInt());
+    });
+    playmatVisibilityLabel.setBuddy(&playmatVisibilityCombo);
+
+    // Playmat mode: Override / Fallback / Deck-only
+    playmatModeCombo.addItem(tr("Override deck playmat"), PlaymatModeOverrideDeck);
+    playmatModeCombo.addItem(tr("Fallback if deck has none"), PlaymatModeFallback);
+    playmatModeCombo.addItem(tr("Deck only, ignore collection"), PlaymatModeDeckOnly);
+    int modeIdx = playmatModeCombo.findData(settings.userInterface().getPlaymatMode());
+    if (modeIdx >= 0) {
+        playmatModeCombo.setCurrentIndex(modeIdx);
+    }
+    connect(&playmatModeCombo, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+        SettingsCache::instance().userInterface().setPlaymatMode(playmatModeCombo.itemData(index).toInt());
+    });
+    playmatModeLabel.setBuddy(&playmatModeCombo);
+
+    // User-level playmat settings: fallback collection.
+    connect(&playmatDefaultEditButton, &QPushButton::clicked, this,
+            &AppearanceSettingsPage::openPlaymatCollectionDialog);
+
+    auto *playmatGrid = new QGridLayout;
+    playmatGrid->addWidget(&playmatVisibilityLabel, 0, 0, 1, 1);
+    playmatGrid->addWidget(&playmatVisibilityCombo, 0, 1, 1, 1);
+    playmatGrid->addWidget(&playmatModeLabel, 1, 0, 1, 1);
+    playmatGrid->addWidget(&playmatModeCombo, 1, 1, 1, 1);
+    playmatGrid->addWidget(&playmatDefaultLabel, 2, 0, 1, 1);
+    playmatGrid->addWidget(&playmatDefaultEditButton, 2, 1, 1, 1);
+
+    playmatGroupBox = new QGroupBox;
+    playmatGroupBox->setLayout(playmatGrid);
+
     // putting it all together
     auto *mainLayout = new QVBoxLayout;
     mainLayout->addWidget(themeGroupBox);
     mainLayout->addWidget(homeTabGroupBox);
+    mainLayout->addWidget(playmatGroupBox);
     mainLayout->addWidget(stylingGroupBox);
     mainLayout->addWidget(menuGroupBox);
     mainLayout->addWidget(printingsGroupBox);
@@ -431,6 +476,12 @@ void AppearanceSettingsPage::cardViewExpandedRowsMaxChanged(int value)
     }
 }
 
+void AppearanceSettingsPage::openPlaymatCollectionDialog()
+{
+    PlaymatCollectionDialog dialog(this);
+    dialog.exec();
+}
+
 void AppearanceSettingsPage::retranslateUi()
 {
     themeGroupBox->setTitle(tr("Theme settings"));
@@ -489,4 +540,9 @@ void AppearanceSettingsPage::retranslateUi()
     tableGroupBox->setTitle(tr("Table grid layout"));
     invertVerticalCoordinateCheckBox.setText(tr("Invert vertical coordinate"));
     minPlayersForMultiColumnLayoutLabel.setText(tr("Minimum player count for multi-column layout:"));
+    playmatGroupBox->setTitle(tr("Playmat settings"));
+    playmatVisibilityLabel.setText(tr("Playmat visibility:"));
+    playmatModeLabel.setText(tr("Default collection behavior:"));
+    playmatDefaultLabel.setText(tr("Default playmat collection:"));
+    playmatDefaultEditButton.setText(tr("Edit..."));
 }

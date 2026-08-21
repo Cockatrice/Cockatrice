@@ -46,6 +46,7 @@ set(PROTO_FILES
     command_set_card_attr.proto
     command_set_card_counter.proto
     command_set_counter.proto
+    command_set_playmat.proto
     command_set_sideboard_lock.proto
     command_set_sideboard_plan.proto
     command_shuffle.proto

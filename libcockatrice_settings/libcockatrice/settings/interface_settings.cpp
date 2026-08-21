@@ -1,5 +1,35 @@
 #include "interface_settings.h"
 
+namespace
+{
+const QChar PLAYMAT_FIELD_SEP = QChar(0x1F); ///< Separator between PlaymatInfo fields.
+
+QString encodePlaymatInfo(const PlaymatInfo &res)
+{
+    return res.card.name + PLAYMAT_FIELD_SEP + res.card.providerId + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.marginPctL, 'f', 4) + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.marginPctR, 'f', 4) + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.verticalOffset, 'f', 4) + PLAYMAT_FIELD_SEP +
+           QString::number(res.params.zoom, 'f', 4);
+}
+
+PlaymatInfo decodePlaymatInfo(const QString &encoded)
+{
+    const QStringList fields = encoded.split(PLAYMAT_FIELD_SEP);
+    if (fields.size() != 6) {
+        return {};
+    }
+    PlaymatInfo res;
+    res.card.name = fields.at(0);
+    res.card.providerId = fields.at(1);
+    res.params.marginPctL = fields.at(2).toDouble();
+    res.params.marginPctR = fields.at(3).toDouble();
+    res.params.verticalOffset = fields.at(4).toDouble();
+    res.params.zoom = fields.at(5).toDouble();
+    return res;
+}
+} // namespace
+
 InterfaceSettings::InterfaceSettings(const QString &settingPath, QObject *parent)
     : SettingsManager(settingPath + "interface.ini", "interface", QString(), parent)
 {
@@ -158,6 +188,35 @@ bool InterfaceSettings::getShowShortcuts() const
 bool InterfaceSettings::getShowGameSelectorFilterToolbar() const
 {
     return getValue("showGameSelectorFilterToolbar", QString(), QString(), true).toBool();
+}
+
+int InterfaceSettings::getPlaymatVisibility() const
+{
+    return qBound(0, getValue("playmatvisibility", QString(), QString(), 2).toInt(), 2);
+}
+
+QList<PlaymatInfo> InterfaceSettings::getPlaymatFallbackList() const
+{
+    const QStringList entries = getValue("playmatFallbackList", QString(), QString(), QStringList()).toStringList();
+    QList<PlaymatInfo> result;
+    result.reserve(entries.size());
+    for (const QString &entry : entries) {
+        const PlaymatInfo res = decodePlaymatInfo(entry);
+        if (!res.card.isEmpty()) {
+            result.append(res);
+        }
+    }
+    return result;
+}
+
+int InterfaceSettings::getPlaymatMode() const
+{
+    return qBound(0, getValue("playmatMode", QString(), QString(), 1).toInt(), 2);
+}
+
+int InterfaceSettings::getPlaymatFallbackBehavior() const
+{
+    return qBound(0, getValue("playmatFallbackBehavior", QString(), QString(), 0).toInt(), 2);
 }
 
 bool InterfaceSettings::getLifeCounterAnimationsEnabled() const
@@ -341,6 +400,46 @@ void InterfaceSettings::setShowGameSelectorFilterToolbar(bool _showGameSelectorF
 {
     setValue(_showGameSelectorFilterToolbar, "showGameSelectorFilterToolbar");
     emit showGameSelectorFilterToolbarChanged(_showGameSelectorFilterToolbar);
+}
+
+void InterfaceSettings::setPlaymatVisibility(int _visibility)
+{
+    if (getPlaymatVisibility() == _visibility) {
+        return;
+    }
+    setValue(_visibility, "playmatvisibility");
+    emit playmatVisibilityChanged(_visibility);
+}
+
+void InterfaceSettings::setPlaymatFallbackList(const QList<PlaymatInfo> &_fallbackList)
+{
+    QStringList entries;
+    entries.reserve(_fallbackList.size());
+    for (const PlaymatInfo &res : _fallbackList) {
+        entries.append(encodePlaymatInfo(res));
+    }
+    setValue(entries, "playmatFallbackList");
+    emit playmatSettingsChanged();
+}
+
+void InterfaceSettings::setPlaymatMode(int _mode)
+{
+    const int mode = qBound(0, _mode, 2);
+    if (getPlaymatMode() == mode) {
+        return;
+    }
+    setValue(mode, "playmatMode");
+    emit playmatSettingsChanged();
+}
+
+void InterfaceSettings::setPlaymatFallbackBehavior(int _behavior)
+{
+    const int behavior = qBound(0, _behavior, 2);
+    if (getPlaymatFallbackBehavior() == behavior) {
+        return;
+    }
+    setValue(behavior, "playmatFallbackBehavior");
+    emit playmatSettingsChanged();
 }
 
 void InterfaceSettings::setLifeCounterAnimationsEnabled(bool _lifeCounterAnimationsEnabled)

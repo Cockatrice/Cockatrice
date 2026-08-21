@@ -7,6 +7,7 @@ add_test(NAME expression_test COMMAND expression_test)
 add_test(NAME clamped_arithmetic_test COMMAND clamped_arithmetic_test)
 add_test(NAME test_age_formatting COMMAND test_age_formatting)
 add_test(NAME password_hash_test COMMAND password_hash_test)
+add_test(NAME playmat_resolver_test COMMAND playmat_resolver_test)
 add_test(NAME server_card_counter_test COMMAND server_card_counter_test)
 add_test(NAME server_counter_test COMMAND server_counter_test)
 add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
@@ -21,6 +22,7 @@ add_executable(expression_test expression_test.cpp)
 add_executable(clamped_arithmetic_test clamped_arithmetic_test.cpp)
 add_executable(test_age_formatting test_age_formatting.cpp)
 add_executable(password_hash_test password_hash_test.cpp)
+add_executable(playmat_resolver_test playmat_resolver_test.cpp)
 add_executable(deck_hash_performance_test deck_hash_performance_test.cpp)
 add_executable(server_card_counter_test server_card_counter_test.cpp)
 add_executable(server_counter_test server_counter_test.cpp)
@@ -56,6 +58,7 @@ if(NOT GTEST_FOUND)
   add_dependencies(clamped_arithmetic_test gtest)
   add_dependencies(test_age_formatting gtest)
   add_dependencies(password_hash_test gtest)
+  add_dependencies(playmat_resolver_test gtest)
   add_dependencies(deck_hash_performance_test gtest)
   add_dependencies(server_card_counter_test gtest)
   add_dependencies(server_counter_test gtest)
@@ -73,6 +76,10 @@ target_link_libraries(
 )
 target_link_libraries(
   password_hash_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+)
+target_link_libraries(
+  playmat_resolver_test libcockatrice_deck_list libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES}
+  ${TEST_QT_MODULES}
 )
 target_link_libraries(
   deck_hash_performance_test libcockatrice_deck_list libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES}

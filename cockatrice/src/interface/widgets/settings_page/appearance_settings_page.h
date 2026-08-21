@@ -24,6 +24,7 @@ private slots:
 
     void cardViewInitialRowsMaxChanged(int value);
     void cardViewExpandedRowsMaxChanged(int value);
+    void openPlaymatCollectionDialog();
 
 private:
     QLabel themeLabel;
@@ -59,6 +60,12 @@ private:
     QCheckBox horizontalHandCheckBox;
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
+    QLabel playmatVisibilityLabel;
+    QComboBox playmatVisibilityCombo;
+    QLabel playmatModeLabel;
+    QComboBox playmatModeCombo;
+    QLabel playmatDefaultLabel;
+    QPushButton playmatDefaultEditButton;
     QGroupBox *themeGroupBox;
     QGroupBox *homeTabGroupBox;
     QGroupBox *stylingGroupBox;
@@ -67,6 +74,7 @@ private:
     QGroupBox *cardsGroupBox;
     QGroupBox *cardLayoutGroupBox;
     QGroupBox *handGroupBox;
+    QGroupBox *playmatGroupBox;
     QGroupBox *tableGroupBox;
     QGroupBox *cardCountersGroupBox;
     QList<QLabel *> cardCounterNames;

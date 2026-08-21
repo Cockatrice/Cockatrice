@@ -10,11 +10,13 @@ set(UTILITY_SOURCES libcockatrice/utility/expression.cpp libcockatrice/utility/l
 )
 
 set(UTILITY_HEADERS
+    libcockatrice/utility/card_ref.h
     libcockatrice/utility/color.h
     libcockatrice/utility/expression.h
     libcockatrice/utility/levenshtein.h
     libcockatrice/utility/macros.h
     libcockatrice/utility/passwordhasher.h
+    libcockatrice/utility/playmat_params.h
     libcockatrice/utility/string_limits.h
     libcockatrice/utility/dice_limits.h
     libcockatrice/utility/counter_limits.h

@@ -1653,5 +1653,13 @@ void Server_AbstractPlayer::getPlayerProperties(ServerInfo_PlayerProperties &res
     result.set_ready_start(readyStart);
     if (deck) {
         result.set_deck_hash(deck->getDeckHash().toStdString());
+        const auto &playmat = deck->getPlaymat();
+        auto *playmatParams = result.mutable_playmat_params();
+        playmatParams->set_card_name(playmat.card.name.toStdString());
+        playmatParams->set_card_provider_id(playmat.card.providerId.toStdString());
+        playmatParams->set_margin_pct_l(playmat.params.marginPctL);
+        playmatParams->set_margin_pct_r(playmat.params.marginPctR);
+        playmatParams->set_vertical_offset(playmat.params.verticalOffset);
+        playmatParams->set_zoom(playmat.params.zoom);
     }
 }

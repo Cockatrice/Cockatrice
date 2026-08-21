@@ -1,6 +1,9 @@
 #include "player_graphics_item.h"
 
 #include "../../game/player/player_actions.h"
+#include "../../interface/card_picture_loader/card_picture_loader.h"
+#include "../../interface/widgets/cards/art_crop_attribution.h"
+#include "../../interface/widgets/playmat/playmat_utils.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/abstract_card_item.h"
 #include "../board/counter_general.h"
@@ -13,6 +16,9 @@
 #include "player_dialogs.h"
 
 #include <QGraphicsView>
+#include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/deck_list/playmat_resolver.h>
 #include <libcockatrice/settings/interface_settings.h>
 
 PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
@@ -28,6 +34,10 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
 
     connect(player, &PlayerLogic::counterAdded, this, &PlayerGraphicsItem::onCounterAdded);
     connect(player, &PlayerLogic::counterRemoved, this, &PlayerGraphicsItem::onCounterRemoved);
+    connect(player, &PlayerLogic::deckChanged, this, &PlayerGraphicsItem::updatePlaymat);
+    connect(player, &PlayerLogic::playmatChanged, this, &PlayerGraphicsItem::updatePlaymat);
+    connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::playmatVisibilityChanged, this,
+            [this](int) { updatePlaymat(); });
 
     playerMenu = new PlayerMenu(this);
 
@@ -66,6 +76,9 @@ PlayerGraphicsItem::PlayerGraphicsItem(PlayerLogic *_player) : player(_player)
     playerMenu->setMenusForGraphicItems();
 
     connect(tableZoneGraphicsItem, &TableZone::sizeChanged, this, &PlayerGraphicsItem::updateBoundingRect);
+
+    connect(this, &PlayerGraphicsItem::playmatChanged, tableZoneGraphicsItem, &TableZone::onPlaymatChanged);
+    connect(this, &PlayerGraphicsItem::playmatChanged, stackZoneGraphicsItem, &StackZone::onPlaymatChanged);
 
     updateBoundingRect();
 
@@ -112,7 +125,6 @@ void PlayerGraphicsItem::initializeZones()
     rfgZoneGraphicsItem->setPos(base + QPointF(0, 2 * h + h2 + 10));
 
     tableZoneGraphicsItem = new TableZone(player->getTableZone(), mirrored, this);
-    connect(tableZoneGraphicsItem, &TableZone::sizeChanged, this, &PlayerGraphicsItem::updateBoundingRect);
     connect(this, &PlayerGraphicsItem::mirroredChanged, tableZoneGraphicsItem, &TableZone::setMirrored);
 
     stackZoneGraphicsItem =
@@ -155,10 +167,61 @@ qreal PlayerGraphicsItem::getMinimumWidth() const
     return result;
 }
 
-void PlayerGraphicsItem::paint(QPainter * /*painter*/,
-                               const QStyleOptionGraphicsItem * /*option*/,
-                               QWidget * /*widget*/)
+void PlayerGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+    if (!hasPlaymat || playmatPixmap.isNull()) {
+        return;
+    }
+
+    // Calculate the combined bounding rect of stack + table zones
+    QPointF stackPos = stackZoneGraphicsItem->pos();
+    QPointF tablePos = tableZoneGraphicsItem->pos();
+    QSizeF stackSize = stackZoneGraphicsItem->boundingRect().size();
+    QSizeF tableSize = tableZoneGraphicsItem->boundingRect().size();
+
+    // Combined area: from stack left edge to table right edge
+    double combinedLeft = qMin(stackPos.x(), tablePos.x());
+    double combinedTop = qMin(stackPos.y(), tablePos.y());
+    double combinedRight = qMax(stackPos.x() + stackSize.width(), tablePos.x() + tableSize.width());
+    double combinedBottom = qMax(stackPos.y() + stackSize.height(), tablePos.y() + tableSize.height());
+
+    QRectF combinedArea(combinedLeft, combinedTop, combinedRight - combinedLeft, combinedBottom - combinedTop);
+
+    const QRectF srcRect = computeArtSourceRect(playmatPixmap.size(), playmatParams);
+    const QRectF dstRect = coverFitRect(combinedArea, srcRect.size());
+
+    painter->save();
+    painter->setClipRect(combinedArea);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+
+    // Render from a down-scaled copy of the art so the full-resolution source
+    // pixmap is never re-sampled at a tiny device size (also much cheaper than
+    // scaling it on every frame).
+    const QPixmap scaledPixmap = scaledPlaymatFor(srcRect, painter->worldTransform().mapRect(dstRect).size());
+    painter->drawPixmap(dstRect, scaledPixmap, QRectF(scaledPixmap.rect()));
+
+    painter->restore();
+
+    if (!playmatAttribution.isEmpty()) {
+        paintArtAttribution(*painter, combinedArea, playmatAttribution, Qt::AlignRight | Qt::AlignBottom, 0.8);
+    }
+}
+
+QPixmap PlayerGraphicsItem::scaledPlaymatFor(const QRectF &srcRect, const QSizeF &deviceDstSize)
+{
+    // Bucket the render size so the source pixmap is re-scaled at most once per
+    // zoom step instead of once per frame.
+    constexpr int bucketSize = 32;
+    const QSize target = QSize(qMax(1, qRound(deviceDstSize.width() / bucketSize) * bucketSize),
+                               qMax(1, qRound(deviceDstSize.height() / bucketSize) * bucketSize))
+                             .boundedTo(srcRect.toAlignedRect().size());
+
+    if (scaledPlaymatKey != target) {
+        const QPixmap crop = playmatPixmap.copy(srcRect.toAlignedRect());
+        scaledPlaymatPixmap = crop.scaled(target, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        scaledPlaymatKey = target;
+    }
+    return scaledPlaymatPixmap;
 }
 
 void PlayerGraphicsItem::processSceneSizeChange(int newPlayerWidth)
@@ -302,4 +365,101 @@ void PlayerGraphicsItem::updateBoundingRect()
     playerArea->setSize(CardDimensions::HEIGHT_F + counterAreaWidth + 15, bRect.height());
 
     emit sizeChanged();
+}
+
+void PlayerGraphicsItem::updatePlaymat()
+{
+    int visibility = SettingsCache::instance().userInterface().getPlaymatVisibility();
+
+    // "Don't use playmats" — never show
+    if (visibility == PlaymatVisibilityNone) {
+        clearPlaymat();
+        return;
+    }
+
+    // "Show own playmat only" — hide playmats for remote players
+    if (visibility == PlaymatVisibilityOwnOnly && !player->getPlayerInfo()->getLocal()) {
+        clearPlaymat();
+        return;
+    }
+
+    CardRef playmatCard;
+    PlaymatParams params;
+
+    if (player->getHasRemotePlaymat()) {
+        // Prefer the server-confirmed playmat (updated by Command_SetPlaymat).
+        playmatCard = player->getRemotePlaymatCard();
+        params = player->getRemotePlaymatParams();
+    } else if (player->getPlayerInfo()->getLocal()) {
+        // Local player without a server broadcast yet: apply the full
+        // settings-based resolution chain (mode, fallback list, behavior).
+        const auto &settings = SettingsCache::instance().userInterface();
+        const PlaymatInfo resolved = resolvePlaymatForDeck(
+            player->getDeck(), settings.getPlaymatFallbackList(), static_cast<PlaymatMode>(settings.getPlaymatMode()),
+            static_cast<PlaymatFallbackMode>(settings.getPlaymatFallbackBehavior()), 0);
+        playmatCard = resolved.card;
+        params = resolved.params;
+    } else {
+        // Opponent without a server broadcast: use the deck-embedded playmat.
+        const DeckList &deck = player->getDeck();
+        const PlaymatInfo &deckPlaymat = deck.getPlaymat();
+        if (!deckPlaymat.card.isEmpty()) {
+            playmatCard = deckPlaymat.card;
+            params = deckPlaymat.params;
+        }
+    }
+
+    if (playmatCard.isEmpty()) {
+        clearPlaymat();
+        return;
+    }
+
+    playmatParams = params;
+    scaledPlaymatKey = QSize(); // the art crop depends on the params, drop any cached scale
+
+    ExactCard card = CardDatabaseManager::query()->getCard(playmatCard);
+    if (!card) {
+        clearPlaymat();
+        return;
+    }
+
+    playmatAttribution = buildArtAttribution(card);
+
+    QPixmap fullRes;
+    CardPictureLoader::getPixmap(fullRes, card, QSize(745, 1040));
+
+    if (fullRes.isNull()) {
+        disconnect(playmatPixmapConnection);
+        CardInfo *cardInfo = card.getCardPtr().data();
+        if (cardInfo) {
+            playmatPixmapConnection =
+                connect(cardInfo, &CardInfo::pixmapUpdated, this, &PlayerGraphicsItem::onPlaymatPixmapReady);
+        }
+        return;
+    }
+
+    if (!hasPlaymat) {
+        hasPlaymat = true;
+        emit playmatChanged(true);
+    }
+    playmatPixmap = fullRes;
+    update();
+}
+
+void PlayerGraphicsItem::clearPlaymat()
+{
+    disconnect(playmatPixmapConnection);
+    playmatAttribution.clear();
+    if (hasPlaymat) {
+        hasPlaymat = false;
+        playmatPixmap = QPixmap();
+        scaledPlaymatKey = QSize();
+        emit playmatChanged(false);
+        update();
+    }
+}
+
+void PlayerGraphicsItem::onPlaymatPixmapReady()
+{
+    updatePlaymat();
 }
