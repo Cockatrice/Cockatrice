@@ -46,11 +46,11 @@ jobs:
         include:
           - label: x86
             platform: linux/amd64
-            runner: ubuntu-latest
+            runner: ubuntu-latest    # https://github.com/actions/runner-images
 
           - label: arm
             platform: linux/arm64
-            runner: ubuntu-24.04-arm    # to be replaced with "ubuntu-latest-arm" once available
+            runner: ubuntu-24.04-arm    # https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Arm64-Readme.md, replace with "ubuntu-latest-arm" once available
 
     env:
       CACHE_SCOPE: servatrice-${{ matrix.label }}
@@ -123,7 +123,7 @@ jobs:
     name: "Publish multi-platform Servatrice image"
     if: github.repository_owner == 'Cockatrice' && github.event_name == 'release' && github.event.release.prerelease == false
     needs: build
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
 
     steps:
       - name: "Download digests"
