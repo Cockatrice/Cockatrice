@@ -125,7 +125,7 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
 
         str = "[ " + join(values, ", ") + " ]";
     }
-    else if ((data.typeId() == QMetaType::Type::QVariantHash)) // variant is a hash?
+    else if ((data.typeId() == QMetaType::Type::QVariantHash)) // variant is a list?
     {
         const QVariantHash vhash = data.toHash();
         QHashIterator<QString, QVariant> it(vhash);
@@ -147,7 +147,7 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
         str += join(pairs, ", ");
         str += " }";
     }
-    else if ((data.typeId() == QMetaType::Type::QVariantMap)) // variant is a map?
+    else if ((data.typeId() == QMetaType::Type::QVariantMap)) // variant is a list?
     {
         const QVariantMap vmap = data.toMap();
         QMapIterator<QString, QVariant> it(vmap);
@@ -166,22 +166,22 @@ QByteArray Json::serialize(const QVariant &data, bool &success)
         str += " }";
     }
     else if ((data.typeId() == QMetaType::Type::QString) ||
-             (data.typeId() == QMetaType::Type::QByteArray)) // a string or a byte array?
+             (data.typeId() == QMetaType::Type::QByteArray)) // variant is a list?
     {
         str = sanitizeString(data.toString()).toUtf8();
     }
-    else if (data.typeId() == QMetaType::Type::Double) // double?
+    else if (data.typeId() == QMetaType::Type::Double)
     {
         str = QByteArray::number(data.toDouble(), 'g', 20);
         if (!str.contains(".") && !str.contains("e")) {
             str += ".0";
         }
     }
-    else if (data.typeId() == QMetaType::Type::Bool) // boolean value?
+    else if (data.typeId() == QMetaType::Type::Bool)
     {
         str = data.toBool() ? "true" : "false";
     }
-    else if (data.typeId() == QMetaType::Type::ULongLong) // large unsigned number?
+    else if (data.typeId() == QMetaType::Type::ULongLong)
     {
         str = QByteArray::number(data.value<qulonglong>());
     } else if (data.canConvert<qlonglong>()) // any signed number?

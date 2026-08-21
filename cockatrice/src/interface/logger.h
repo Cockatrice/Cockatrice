@@ -13,12 +13,10 @@
 #include <QTextStream>
 #include <QVector>
 
-#if defined(Q_PROCESSOR_X86_32)
-#define BUILD_ARCHITECTURE "32-bit"
-#elif defined(Q_PROCESSOR_X86_64)
-#define BUILD_ARCHITECTURE "64-bit"
+#if defined(Q_PROCESSOR_X86)
+#define BUILD_ARCHITECTURE "x64"
 #elif defined(Q_PROCESSOR_ARM)
-#define BUILD_ARCHITECTURE "ARM"
+#define BUILD_ARCHITECTURE "arm64"
 #else
 #define BUILD_ARCHITECTURE "unknown"
 #endif

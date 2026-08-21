@@ -38,12 +38,13 @@ set(REQUIRED_QT_COMPONENTS ${REQUIRED_QT_COMPONENTS} ${_SERVATRICE_NEEDED} ${_CO
 )
 list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
 
-# Linguist is now a component in Qt6 instead of an external package
+# Find Qt and all required components including Linguist
 find_package(
-  Qt6 6.4.2
+  Qt6
   COMPONENTS ${REQUIRED_QT_COMPONENTS} Linguist
   QUIET HINTS ${Qt6_DIR}
 )
+
 if(NOT Qt6_FOUND)
   message(FATAL_ERROR "No suitable version of Qt was found")
 endif()
