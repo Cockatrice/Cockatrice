@@ -83,6 +83,8 @@
 #include <libcockatrice/protocol/pb/serverinfo_deckstorage.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+#include <libcockatrice/utility/cryptoutil.h>
+#include <libcockatrice/utility/passwordhasher.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <server_response_containers.h>
 #include <server_room.h>
@@ -113,7 +115,12 @@ bool AbstractServerSocketInterface::initSession()
     identEvent.set_server_version(VERSION_STRING);
     identEvent.set_protocol_version(protocolVersion);
     if (servatrice->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
-        identEvent.set_server_options(Event_ServerIdentification::SupportsPasswordHash);
+        Event_ServerIdentification::ServerOptions serverOptions = Event_ServerIdentification::SupportsPasswordHash;
+        if (servatrice->getAuthenticationStrictness() != Servatrice::AuthenticationLegacy) {
+            serverOptions = static_cast<Event_ServerIdentification::ServerOptions>(
+                serverOptions | Event_ServerIdentification::SupportsChallengeResponseAuth);
+        }
+        identEvent.set_server_options(serverOptions);
     }
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);
@@ -222,6 +229,9 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdAccountPassword(cmd.GetExtension(Command_AccountPassword::ext), rc);
         case SessionCommand::REQUEST_PASSWORD_SALT:
             return cmdRequestPasswordSalt(cmd.GetExtension(Command_RequestPasswordSalt::ext), rc);
+            break;
+        case SessionCommand::SUBMIT_PASSWORD_VERIFIER:
+            return cmdSubmitPasswordVerifier(cmd.GetExtension(Command_SubmitPasswordVerifier::ext), rc);
             break;
         default:
             return Response::RespFunctionNotAllowed;
@@ -1400,6 +1410,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         password = QString::fromStdString(cmd.hashed_password());
     }
 
+    // In strict mode only scrypt verifiers are accepted for new accounts.
+    if (servatrice->requiresChallengeResponseAuth() &&
+        (passwordNeedsHash || PasswordHasher::isLegacyFormat(password))) {
+        return Response::RespClientUpdateRequired;
+    }
+
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
     bool regSucceeded = sqlInterface->registerUser(userName, realName, password, passwordNeedsHash, parsedEmailAddress,
                                                    country, !requireEmailActivation);
@@ -1780,6 +1796,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
         newPassword = QString::fromStdString(cmd.hashed_new_password());
     }
 
+    // In strict mode only scrypt verifiers are accepted.
+    if (servatrice->requiresChallengeResponseAuth() &&
+        (newPasswordNeedsHash || PasswordHasher::isLegacyFormat(newPassword))) {
+        return Response::RespClientUpdateRequired;
+    }
+
     QString userName = QString::fromStdString(userInfo->name());
     if (!databaseInterface->changeUserPassword(userName, oldPassword, true, newPassword, newPasswordNeedsHash)) {
         return Response::RespWrongPassword;
@@ -1915,6 +1937,12 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
         password = QString::fromStdString(cmd.hashed_new_password());
     }
 
+    // In strict mode only scrypt verifiers are accepted.
+    if (servatrice->requiresChallengeResponseAuth() &&
+        (passwordNeedsHash || PasswordHasher::isLegacyFormat(password))) {
+        return Response::RespClientUpdateRequired;
+    }
+
     if (sqlInterface->changeUserPassword(nameFromStdString(cmd.user_name()), password, passwordNeedsHash)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
@@ -1974,8 +2002,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
                                                                              ResponseContainer &rc)
 {
     const QString userName = nameFromStdString(cmd.user_name());
-    QString passwordSalt = sqlInterface->getUserSalt(userName);
-    if (passwordSalt.isEmpty()) {
+    const QString storedPasswordData = sqlInterface->getUserPasswordData(userName);
+    if (storedPasswordData.isEmpty()) {
         if (server->getRegOnlyServerEnabled()) {
             return Response::RespRegistrationRequired;
         } else {
@@ -1983,9 +2011,55 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
             return Response::RespOk;
         }
     }
+
     auto *re = new Response_PasswordSalt;
-    re->set_password_salt(passwordSalt.toStdString());
+    const bool challengeResponseEnabled = servatrice->getAuthenticationStrictness() != Servatrice::AuthenticationLegacy;
+    if (PasswordHasher::isLegacyFormat(storedPasswordData)) {
+        re->set_password_salt(storedPasswordData.left(16).toStdString());
+        re->set_needs_migration(true);
+    } else {
+        const PasswordVerifier verifier = PasswordHasher::parsePasswordVerifier(storedPasswordData);
+        if (!verifier.isValid) {
+            delete re;
+            return Response::RespContextError;
+        }
+        re->set_password_salt(QString(verifier.salt.toBase64()).toStdString());
+        re->set_n(verifier.n);
+        re->set_r(verifier.r);
+        re->set_p(verifier.p);
+        re->set_needs_migration(false);
+    }
+
+    if (challengeResponseEnabled) {
+        const QByteArray nonce = CryptoUtil::randomBytes(32);
+        setAuthNonce(nonce);
+        re->set_nonce(nonce.constData(), nonce.size());
+    }
+
     rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+AbstractServerSocketInterface::cmdSubmitPasswordVerifier(const Command_SubmitPasswordVerifier &cmd,
+                                                         ResponseContainer & /*rc*/)
+{
+    if (authState != PasswordRight) {
+        return Response::RespLoginNeeded;
+    }
+
+    const QString passwordVerifier = QString::fromStdString(cmd.password_verifier());
+    if (passwordVerifier.isEmpty() || passwordVerifier.length() > MAX_NAME_LENGTH ||
+        PasswordHasher::isLegacyFormat(passwordVerifier)) {
+        return Response::RespContextError;
+    }
+
+    if (!sqlInterface->submitPasswordVerifier(QString::fromStdString(userInfo->name()), passwordVerifier)) {
+        return Response::RespContextError;
+    }
+
+    qCDebug(AbstractServerSocketInterfaceLog)
+        << "Password verifier migrated for user" << QString::fromStdString(userInfo->name());
     return Response::RespOk;
 }
 

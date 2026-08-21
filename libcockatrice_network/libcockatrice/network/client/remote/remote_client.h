@@ -54,6 +54,9 @@ signals:
                                                   unsigned int port,
                                                   const QString &_userName,
                                                   const QString &_email);
+    //! \brief Emitted once a scrypt verifier for the given account is known and
+    //! can be persisted instead of the plaintext password.
+    void sigPasswordVerifierReady(const QString &hostname, const QString &userName, const QString &verifier);
 private slots:
     void slotConnected();
     void readData();
@@ -80,6 +83,8 @@ private slots:
     void doLogin();
     void doHashedLogin();
     Command_Login generateCommandLogin();
+    void doSubmitPasswordVerifier();
+    void submitPasswordVerifierResponse(const Response &response);
     void doDisconnectFromServer();
     void doActivateToServer(const QString &_token);
     void doRequestForgotPasswordToServer(const QString &hostname, unsigned int port, const QString &_userName);
@@ -111,6 +116,14 @@ private:
     QString lastHostname;
     unsigned int lastPort;
     QString hashedPassword;
+    bool passwordNeedsMigration;
+    //! \brief A previously stored "$scrypt$..." verifier used to authenticate
+    //! without the plaintext password.
+    QString storedVerifier;
+    //! \brief Verifier derived during the current login, persisted after success.
+    QString derivedVerifier;
+    //! \brief Verifier sent for migration, persisted once the server accepts it.
+    QString pendingVerifier;
 
     QString getSrvClientID(const QString &_hostname);
     bool newMissingFeatureFound(const QString &_serversMissingFeatures);
@@ -149,6 +162,12 @@ public:
     }
     void
     connectToServer(const QString &hostname, unsigned int port, const QString &_userName, const QString &_password);
+    //! \brief Provide a stored "$scrypt$..." verifier so the client can
+    //! authenticate without the plaintext password.
+    void setStoredVerifier(const QString &verifier)
+    {
+        storedVerifier = verifier;
+    }
     void registerToServer(const QString &hostname,
                           unsigned int port,
                           const QString &_userName,

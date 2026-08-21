@@ -28,6 +28,7 @@ message SessionCommand {
         FORGOT_PASSWORD_CHALLENGE = 1023;
         REQUEST_PASSWORD_SALT = 1024;
         SET_CARD_ART_PARAMS = 1025;
+        SUBMIT_PASSWORD_VERIFIER = 1026;
         REPLAY_LIST = 1100;
         REPLAY_DOWNLOAD = 1101;
         REPLAY_MODIFY_MATCH = 1102;
@@ -217,4 +218,15 @@ message Command_SetCardArtParams {
     optional double margin_pct_r = 4;
     optional double vertical_offset = 5;
     optional double zoom = 6;
+}
+
+// Client uploads the new password verifier to migrate a legacy account
+// after a successful challenge-response login. Idempotent; only applies
+// to accounts still using the legacy password format.
+message Command_SubmitPasswordVerifier {
+    extend SessionCommand {
+        optional Command_SubmitPasswordVerifier ext = 1026;
+    }
+    // Full verifier string to store, e.g. "$pbkdf2-sha512$210000$<salt>$<verifier>"
+    required string password_verifier = 1;
 }

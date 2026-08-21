@@ -137,6 +137,12 @@ public:
         AuthenticationSql,
         AuthenticationPassword
     };
+    enum AuthenticationStrictness
+    {
+        AuthenticationLegacy,
+        AuthenticationMixed,
+        AuthenticationStrict
+    };
 private slots:
     void statusUpdate();
     void shutdownTimeout();
@@ -211,6 +217,10 @@ public:
     {
         return serverRequiredFeatureList;
     }
+    bool requiresChallengeResponseAuth() const override
+    {
+        return getAuthenticationStrictness() == AuthenticationStrict;
+    }
     QString getServerName() const;
     QString getLoginMessage() const override
     {
@@ -232,6 +242,7 @@ public:
     {
         return authenticationMethod;
     }
+    AuthenticationStrictness getAuthenticationStrictness() const;
     bool permitUnregisteredUsers() const override
     {
         return authenticationMethod != AuthenticationNone;
