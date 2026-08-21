@@ -156,9 +156,9 @@ void UserInfoHeaderWidget::setUserData(const ServerInfo_User &_user,
 
     attribution.clear();
     if (user.has_card_art_params()) {
-        const ExactCard card = CardDatabaseManager::query()->getCard(
-            {QString::fromStdString(user.card_art_params().card_name()),
-             QString::fromStdString(user.card_art_params().card_provider_id())});
+        const ExactCard card =
+            CardDatabaseManager::query()->getCard({QString::fromStdString(user.card_art_params().card_name()),
+                                                   QString::fromStdString(user.card_art_params().card_provider_id())});
         if (card) {
             attribution = buildArtAttribution(card);
         }
