@@ -322,10 +322,10 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
     p.setFont(font());
 
     // Only show the attribution when there is actually art on screen: on a
-    // cache miss m_cardArt is null and the pill would float over the plain
+    // cache miss cardArt is null and the pill would float over the plain
     // header with no art behind it.
-    if (!m_cardArt.isNull()) {
-        paintArtAttribution(p, rect, m_attribution, Qt::AlignRight | Qt::AlignBottom, 0.8);
+    if (!cardArt.isNull()) {
+        paintArtAttribution(p, rect, attribution, Qt::AlignRight | Qt::AlignBottom, 0.8);
     }
 }
 
