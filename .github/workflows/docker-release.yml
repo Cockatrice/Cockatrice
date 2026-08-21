@@ -148,7 +148,7 @@ jobs:
           flavor: |
             latest=auto
           tags: |
-            type=match,pattern=^\d{4}-\d{2}-\d{2}-Release-(\d+\.\d+\.\d+)$,group=1    # if semver: type=ref,event=tag and type=semver,pattern={{version}} / {{major}}.{{minor}}
+            type=ref,event=tag    # if semver, also: type=semver,pattern={{version}} / {{major}}.{{minor}}
 
       # Add OCI annotations to image index and publish tags
       - name: "Create image index"
