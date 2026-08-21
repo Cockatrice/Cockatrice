@@ -155,6 +155,12 @@ void UserListPainter::drawCardArt(QPainter *painter,
         return;
     }
 
+    // CardPictureLoader::getPixmap tags its output with the screen's
+    // devicePixelRatio on HiDPI displays. Every calculation below is in raw
+    // pixels, so normalize to 1.0 or the crop renders at 1/dpr scale anchored
+    // to the top left corner of the row.
+    art.setDevicePixelRatio(1.0);
+
     const int cardH = rect.height() - 4;
     const int totalW = cardRight - rect.left();
     const int marginL = qRound(totalW * params.marginPctL);
@@ -172,11 +178,14 @@ void UserListPainter::drawCardArt(QPainter *painter,
     const int srcX = (scaledW - drawW) / 2;
     const int srcY = qRound((scaledH - cardH) * params.verticalOffset);
 
-    // Clamp srcY so we never copy outside the pixmap bounds
+    // Clamp so we never copy outside the pixmap bounds. srcX can go negative
+    // for stored zoom values below 1, which would silently underfill the
+    // strip with transparent padding.
+    const int safeSrcX = qBound(0, srcX, qMax(0, scaledW - drawW));
     const int safeSrcY = qBound(0, srcY, qMax(0, scaledH - cardH));
 
     QImage img =
-        scaled.copy(srcX, safeSrcY, drawW, cardH).toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);
+        scaled.copy(safeSrcX, safeSrcY, drawW, cardH).toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);
 
     {
         QPainter mask(&img);
