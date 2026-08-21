@@ -329,9 +329,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     tableGroupBox->setLayout(tableGrid);
 
     // Playmat settings
-    playmatVisibilityCombo.addItem(tr("Show all playmats"), 2);
-    playmatVisibilityCombo.addItem(tr("Show own playmat only"), 1);
-    playmatVisibilityCombo.addItem(tr("Don't use playmats"), 0);
+    playmatVisibilityCombo.addItem(tr("Show all playmats"), PlaymatVisibilityAll);
+    playmatVisibilityCombo.addItem(tr("Show own playmat only"), PlaymatVisibilityOwnOnly);
+    playmatVisibilityCombo.addItem(tr("Don't use playmats"), PlaymatVisibilityNone);
     int visIdx = playmatVisibilityCombo.findData(settings.userInterface().getPlaymatVisibility());
     if (visIdx >= 0) {
         playmatVisibilityCombo.setCurrentIndex(visIdx);
@@ -342,9 +342,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     playmatVisibilityLabel.setBuddy(&playmatVisibilityCombo);
 
     // Playmat mode: Override / Fallback / Deck-only
-    playmatModeCombo.addItem(tr("Override deck playmat"), 0);
-    playmatModeCombo.addItem(tr("Fallback if deck has none"), 1);
-    playmatModeCombo.addItem(tr("Deck only, ignore collection"), 2);
+    playmatModeCombo.addItem(tr("Override deck playmat"), PlaymatModeOverrideDeck);
+    playmatModeCombo.addItem(tr("Fallback if deck has none"), PlaymatModeFallback);
+    playmatModeCombo.addItem(tr("Deck only, ignore collection"), PlaymatModeDeckOnly);
     int modeIdx = playmatModeCombo.findData(settings.userInterface().getPlaymatMode());
     if (modeIdx >= 0) {
         playmatModeCombo.setCurrentIndex(modeIdx);

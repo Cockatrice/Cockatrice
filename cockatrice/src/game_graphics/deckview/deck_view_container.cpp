@@ -310,29 +310,16 @@ void DeckViewContainer::resolveAndSendPlaymat()
     const auto &settings = SettingsCache::instance().userInterface();
     const auto fallbackBehavior = static_cast<PlaymatFallbackMode>(settings.getPlaymatFallbackBehavior());
 
-    PlaymatResolution resolved;
-    QList<PlaymatResolution> fallbackList = settings.getPlaymatFallbackList();
+    QList<PlaymatInfo> fallbackList = settings.getPlaymatFallbackList();
 
     // In random mode with 2+ entries, remove the last-resolved mat to avoid repeats.
-    if (fallbackBehavior == PlaymatFallbackMode::Random && fallbackList.size() > 1) {
+    if (fallbackBehavior == PlaymatFallbackModeRandom && fallbackList.size() > 1) {
         fallbackList.removeAll(lastResolvedPlaymat);
     }
 
-    switch (settings.getPlaymatMode()) {
-        case 0: { // Override deck playmat — always use collection
-            DeckList emptyDeck;
-            resolved = resolveEffectivePlaymat(emptyDeck, {}, fallbackList, fallbackBehavior, playmatRotationIndex);
-            break;
-        }
-        case 1: // Fallback if deck has none — deck > collection > none
-            resolved = resolveEffectivePlaymat(currentDeck, {}, fallbackList, fallbackBehavior, playmatRotationIndex);
-            break;
-        case 2: // Deck only, ignore collection
-            resolved = currentDeck.getPlaymat();
-            break;
-        default:
-            break;
-    }
+    const PlaymatInfo resolved =
+        resolvePlaymatForDeck(currentDeck, fallbackList, static_cast<PlaymatMode>(settings.getPlaymatMode()),
+                              fallbackBehavior, playmatRotationIndex);
 
     lastResolvedPlaymat = resolved;
 

@@ -70,7 +70,7 @@ public:
         CardRef bannerCard;          ///< Optional representative card for the deck.
         QStringList tags;            ///< User-defined tags for deck classification.
         QString lastLoadedTimestamp; ///< Timestamp string of last load.
-        PlaymatResolution playmat;   ///< Optional playmat background for table+stack zones.
+        PlaymatInfo playmat;         ///< Optional playmat background for table+stack zones.
 
         /**
          * @brief Checks if all values (except for lastLoadedTimestamp) in the metadata is empty.
@@ -116,7 +116,7 @@ public:
     {
         metadata.bannerCard = _bannerCard;
     }
-    void setPlaymat(const PlaymatResolution &_playmat = {})
+    void setPlaymat(const PlaymatInfo &_playmat = {})
     {
         metadata.playmat = _playmat;
     }
@@ -175,7 +175,7 @@ public:
     {
         return metadata.bannerCard;
     }
-    PlaymatResolution getPlaymat() const
+    PlaymatInfo getPlaymat() const
     {
         return metadata.playmat;
     }

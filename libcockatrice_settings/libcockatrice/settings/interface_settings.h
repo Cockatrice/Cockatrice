@@ -43,7 +43,7 @@ public:
     [[nodiscard]] bool getShowShortcuts() const override;
     [[nodiscard]] bool getShowGameSelectorFilterToolbar() const override;
     [[nodiscard]] int getPlaymatVisibility() const override;
-    [[nodiscard]] QList<PlaymatResolution> getPlaymatFallbackList() const override;
+    [[nodiscard]] QList<PlaymatInfo> getPlaymatFallbackList() const override;
     [[nodiscard]] int getPlaymatMode() const override;
     [[nodiscard]] int getPlaymatFallbackBehavior() const override;
     [[nodiscard]] bool getLifeCounterAnimationsEnabled() const override;
@@ -82,7 +82,7 @@ public:
     void setShowShortcuts(bool _showShortcuts);
     void setShowGameSelectorFilterToolbar(bool _showGameSelectorFilterToolbar);
     void setPlaymatVisibility(int _visibility);
-    void setPlaymatFallbackList(const QList<PlaymatResolution> &_fallbackList);
+    void setPlaymatFallbackList(const QList<PlaymatInfo> &_fallbackList);
     void setPlaymatMode(int _mode);
     void setPlaymatFallbackBehavior(int _behavior);
     void setLifeCounterAnimationsEnabled(bool _lifeCounterAnimationsEnabled);

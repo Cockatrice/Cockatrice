@@ -618,7 +618,7 @@ Server_Player::cmdSetPlaymat(const Command_SetPlaymat &cmd, ResponseContainer &r
     if (rawName.length() > MAX_NAME_LENGTH || rawProviderId.length() > MAX_NAME_LENGTH) {
         return Response::RespInvalidData;
     }
-    PlaymatResolution playmat;
+    PlaymatInfo playmat;
     playmat.card.name = rawName;
     playmat.card.providerId = rawProviderId;
     playmat.params.marginPctL = qBound(0.0, pp.margin_pct_l(), 0.95);

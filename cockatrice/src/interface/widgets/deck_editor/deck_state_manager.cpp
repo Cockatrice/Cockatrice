@@ -142,9 +142,9 @@ void DeckStateManager::setBannerCard(const CardRef &bannerCard)
     doMetadataModified();
 }
 
-void DeckStateManager::setPlaymat(const PlaymatResolution &playmat)
+void DeckStateManager::setPlaymat(const PlaymatInfo &playmat)
 {
-    PlaymatResolution previous = deckList->getPlaymat();
+    PlaymatInfo previous = deckList->getPlaymat();
     if (previous == playmat) {
         return;
     }

@@ -34,16 +34,16 @@ struct PlaymatParams
 };
 
 /**
- * @struct PlaymatResolution
+ * @struct PlaymatInfo
  * @ingroup Decks
  * @brief A resolved playmat (card + positioning parameters).
  */
-struct PlaymatResolution
+struct PlaymatInfo
 {
     CardRef card;         ///< The card whose art is used as playmat.
     PlaymatParams params; ///< Positioning parameters for the playmat card image.
 
-    bool operator==(const PlaymatResolution &other) const
+    bool operator==(const PlaymatInfo &other) const
     {
         return card == other.card && params == other.params;
     }

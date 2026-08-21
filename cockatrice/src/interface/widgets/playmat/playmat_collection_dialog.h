@@ -40,7 +40,7 @@ private:
     void retranslateUi();
     int currentRow() const;
 
-    QList<PlaymatResolution> playmats; ///< Working copy edited by the dialog.
+    QList<PlaymatInfo> playmats; ///< Working copy edited by the dialog.
     QListWidget *playmatList;
     QComboBox *modeCombo;
     QLabel *modeLabel;

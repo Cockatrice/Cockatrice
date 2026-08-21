@@ -2,9 +2,9 @@
 
 namespace
 {
-const QChar PLAYMAT_FIELD_SEP = QChar(0x1F); ///< Separator between PlaymatResolution fields.
+const QChar PLAYMAT_FIELD_SEP = QChar(0x1F); ///< Separator between PlaymatInfo fields.
 
-QString encodePlaymatResolution(const PlaymatResolution &res)
+QString encodePlaymatInfo(const PlaymatInfo &res)
 {
     return res.card.name + PLAYMAT_FIELD_SEP + res.card.providerId + PLAYMAT_FIELD_SEP +
            QString::number(res.params.marginPctL, 'f', 4) + PLAYMAT_FIELD_SEP +
@@ -13,13 +13,13 @@ QString encodePlaymatResolution(const PlaymatResolution &res)
            QString::number(res.params.zoom, 'f', 4);
 }
 
-PlaymatResolution decodePlaymatResolution(const QString &encoded)
+PlaymatInfo decodePlaymatInfo(const QString &encoded)
 {
     const QStringList fields = encoded.split(PLAYMAT_FIELD_SEP);
     if (fields.size() != 6) {
         return {};
     }
-    PlaymatResolution res;
+    PlaymatInfo res;
     res.card.name = fields.at(0);
     res.card.providerId = fields.at(1);
     res.params.marginPctL = fields.at(2).toDouble();
@@ -192,16 +192,16 @@ bool InterfaceSettings::getShowGameSelectorFilterToolbar() const
 
 int InterfaceSettings::getPlaymatVisibility() const
 {
-    return getValue("playmatvisibility", QString(), QString(), 2).toInt();
+    return qBound(0, getValue("playmatvisibility", QString(), QString(), 2).toInt(), 2);
 }
 
-QList<PlaymatResolution> InterfaceSettings::getPlaymatFallbackList() const
+QList<PlaymatInfo> InterfaceSettings::getPlaymatFallbackList() const
 {
     const QStringList entries = getValue("playmatFallbackList", QString(), QString(), QStringList()).toStringList();
-    QList<PlaymatResolution> result;
+    QList<PlaymatInfo> result;
     result.reserve(entries.size());
     for (const QString &entry : entries) {
-        const PlaymatResolution res = decodePlaymatResolution(entry);
+        const PlaymatInfo res = decodePlaymatInfo(entry);
         if (!res.card.isEmpty()) {
             result.append(res);
         }
@@ -411,12 +411,12 @@ void InterfaceSettings::setPlaymatVisibility(int _visibility)
     emit playmatVisibilityChanged(_visibility);
 }
 
-void InterfaceSettings::setPlaymatFallbackList(const QList<PlaymatResolution> &_fallbackList)
+void InterfaceSettings::setPlaymatFallbackList(const QList<PlaymatInfo> &_fallbackList)
 {
     QStringList entries;
     entries.reserve(_fallbackList.size());
-    for (const PlaymatResolution &res : _fallbackList) {
-        entries.append(encodePlaymatResolution(res));
+    for (const PlaymatInfo &res : _fallbackList) {
+        entries.append(encodePlaymatInfo(res));
     }
     setValue(entries, "playmatFallbackList");
     emit playmatSettingsChanged();

@@ -453,7 +453,7 @@ void DeckEditorDeckDockWidget::writeBannerCard(int index)
 
 void DeckEditorDeckDockWidget::openPlaymatSettings()
 {
-    PlaymatResolution current = deckStateManager->getMetadata().playmat;
+    PlaymatInfo current = deckStateManager->getMetadata().playmat;
 
     PlaymatSettingsDialog dialog(current.card, current.params, this);
     if (dialog.exec() == QDialog::Accepted) {
@@ -461,7 +461,7 @@ void DeckEditorDeckDockWidget::openPlaymatSettings()
         PlaymatParams newParams = dialog.params();
 
         if (newCard.isEmpty()) {
-            deckStateManager->setPlaymat(PlaymatResolution{});
+            deckStateManager->setPlaymat(PlaymatInfo{});
         } else {
             deckStateManager->setPlaymat({newCard, newParams});
         }

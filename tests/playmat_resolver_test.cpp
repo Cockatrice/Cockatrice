@@ -5,11 +5,11 @@
 namespace
 {
 
-PlaymatResolution makeResolution(const QString &name, const QString &providerId = QString())
+PlaymatInfo makePlaymatInfo(const QString &name, const QString &providerId = QString())
 {
-    PlaymatResolution resolution;
-    resolution.card = {name, providerId};
-    return resolution;
+    PlaymatInfo info;
+    info.card = {name, providerId};
+    return info;
 }
 
 } // namespace
@@ -17,7 +17,7 @@ PlaymatResolution makeResolution(const QString &name, const QString &providerId 
 TEST(PlaymatResolverTest, EmptyChainReturnsEmpty)
 {
     DeckList deck;
-    const PlaymatResolution resolved = resolveEffectivePlaymat(deck, {}, {}, PlaymatFallbackMode::Fixed, 0);
+    const PlaymatInfo resolved = resolveEffectivePlaymat(deck, {}, {}, PlaymatFallbackModeFixed, 0);
     EXPECT_TRUE(resolved.card.isEmpty());
 }
 
@@ -26,10 +26,10 @@ TEST(PlaymatResolverTest, OverrideWinsOverDeckAndFallback)
     DeckList deck;
     deck.setPlaymat({{QStringLiteral("Deck Mat"), QStringLiteral("deck-provider")}, {}});
 
-    const PlaymatResolution force = makeResolution(QStringLiteral("Force Mat"), QStringLiteral("force-provider"));
-    const QList<PlaymatResolution> fallback = {makeResolution(QStringLiteral("Fallback Mat"))};
+    const PlaymatInfo force = makePlaymatInfo(QStringLiteral("Force Mat"), QStringLiteral("force-provider"));
+    const QList<PlaymatInfo> fallback = {makePlaymatInfo(QStringLiteral("Fallback Mat"))};
 
-    const PlaymatResolution resolved = resolveEffectivePlaymat(deck, force, fallback, PlaymatFallbackMode::Fixed, 0);
+    const PlaymatInfo resolved = resolveEffectivePlaymat(deck, force, fallback, PlaymatFallbackModeFixed, 0);
     EXPECT_EQ(resolved.card.name, QStringLiteral("Force Mat"));
     EXPECT_EQ(resolved.card.providerId, QStringLiteral("force-provider"));
 }
@@ -39,9 +39,9 @@ TEST(PlaymatResolverTest, DeckWinsOverFallback)
     DeckList deck;
     deck.setPlaymat({{QStringLiteral("Deck Mat"), QStringLiteral("deck-provider")}, {0.1, 0.2, 0.3, 1.5}});
 
-    const QList<PlaymatResolution> fallback = {makeResolution(QStringLiteral("Fallback Mat"))};
+    const QList<PlaymatInfo> fallback = {makePlaymatInfo(QStringLiteral("Fallback Mat"))};
 
-    const PlaymatResolution resolved = resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackMode::Fixed, 0);
+    const PlaymatInfo resolved = resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackModeFixed, 0);
     EXPECT_EQ(resolved.card.name, QStringLiteral("Deck Mat"));
     EXPECT_EQ(resolved.card.providerId, QStringLiteral("deck-provider"));
     EXPECT_DOUBLE_EQ(resolved.params.marginPctL, 0.1);
@@ -51,20 +51,20 @@ TEST(PlaymatResolverTest, DeckWinsOverFallback)
 TEST(PlaymatResolverTest, FallbackUsedWhenDeckHasNone)
 {
     DeckList deck;
-    const QList<PlaymatResolution> fallback = {makeResolution(QStringLiteral("Fallback Mat"))};
+    const QList<PlaymatInfo> fallback = {makePlaymatInfo(QStringLiteral("Fallback Mat"))};
 
-    const PlaymatResolution resolved = resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackMode::Fixed, 0);
+    const PlaymatInfo resolved = resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackModeFixed, 0);
     EXPECT_EQ(resolved.card.name, QStringLiteral("Fallback Mat"));
 }
 
 TEST(PlaymatResolverTest, FixedAlwaysUsesFirst)
 {
     DeckList deck;
-    const QList<PlaymatResolution> fallback = {makeResolution(QStringLiteral("First")),
-                                               makeResolution(QStringLiteral("Second"))};
+    const QList<PlaymatInfo> fallback = {makePlaymatInfo(QStringLiteral("First")),
+                                         makePlaymatInfo(QStringLiteral("Second"))};
 
     for (int i = 0; i < 5; ++i) {
-        const PlaymatResolution resolved = resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackMode::Fixed, i);
+        const PlaymatInfo resolved = resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackModeFixed, i);
         EXPECT_EQ(resolved.card.name, QStringLiteral("First"));
     }
 }
@@ -72,15 +72,14 @@ TEST(PlaymatResolverTest, FixedAlwaysUsesFirst)
 TEST(PlaymatResolverTest, RoundRobinCyclesAndWraps)
 {
     DeckList deck;
-    const QList<PlaymatResolution> fallback = {makeResolution(QStringLiteral("First")),
-                                               makeResolution(QStringLiteral("Second")),
-                                               makeResolution(QStringLiteral("Third"))};
+    const QList<PlaymatInfo> fallback = {makePlaymatInfo(QStringLiteral("First")),
+                                         makePlaymatInfo(QStringLiteral("Second")),
+                                         makePlaymatInfo(QStringLiteral("Third"))};
 
     const QStringList expected = {QStringLiteral("First"), QStringLiteral("Second"), QStringLiteral("Third"),
                                   QStringLiteral("First"), QStringLiteral("Second"), QStringLiteral("Third")};
     for (int i = 0; i < expected.size(); ++i) {
-        const PlaymatResolution resolved =
-            resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackMode::RoundRobin, i);
+        const PlaymatInfo resolved = resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackModeRoundRobin, i);
         EXPECT_EQ(resolved.card.name, expected.at(i));
     }
 }
@@ -88,22 +87,22 @@ TEST(PlaymatResolverTest, RoundRobinCyclesAndWraps)
 TEST(PlaymatResolverTest, RoundRobinRespectsCursor)
 {
     DeckList deck;
-    const QList<PlaymatResolution> fallback = {makeResolution(QStringLiteral("First")),
-                                               makeResolution(QStringLiteral("Second"))};
+    const QList<PlaymatInfo> fallback = {makePlaymatInfo(QStringLiteral("First")),
+                                         makePlaymatInfo(QStringLiteral("Second"))};
 
-    const PlaymatResolution resolved = resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackMode::RoundRobin, 5);
+    const PlaymatInfo resolved = resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackModeRoundRobin, 5);
     EXPECT_EQ(resolved.card.name, QStringLiteral("Second")); // 5 % 2 == 1
 }
 
 TEST(PlaymatResolverTest, RandomStaysWithinList)
 {
     DeckList deck;
-    const QList<PlaymatResolution> fallback = {makeResolution(QStringLiteral("First")),
-                                               makeResolution(QStringLiteral("Second")),
-                                               makeResolution(QStringLiteral("Third"))};
+    const QList<PlaymatInfo> fallback = {makePlaymatInfo(QStringLiteral("First")),
+                                         makePlaymatInfo(QStringLiteral("Second")),
+                                         makePlaymatInfo(QStringLiteral("Third"))};
 
     for (int i = 0; i < 50; ++i) {
-        const PlaymatResolution resolved = resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackMode::Random, i);
+        const PlaymatInfo resolved = resolveEffectivePlaymat(deck, {}, fallback, PlaymatFallbackModeRandom, i);
         ASSERT_FALSE(resolved.card.name.isEmpty());
         EXPECT_TRUE(fallback.contains(resolved));
     }
@@ -115,8 +114,8 @@ TEST(PlaymatResolverTest, ForceWithEmptyCardIgnoresFallbackParamsButNotFallback)
     deck.setPlaymat({{QStringLiteral("Deck Mat")}, {}});
 
     // An empty force entry must not mask the deck-configured playmat.
-    const PlaymatResolution emptyForce;
-    const PlaymatResolution resolved = resolveEffectivePlaymat(deck, emptyForce, {}, PlaymatFallbackMode::Fixed, 0);
+    const PlaymatInfo emptyForce;
+    const PlaymatInfo resolved = resolveEffectivePlaymat(deck, emptyForce, {}, PlaymatFallbackModeFixed, 0);
     EXPECT_EQ(resolved.card.name, QStringLiteral("Deck Mat"));
 }
 

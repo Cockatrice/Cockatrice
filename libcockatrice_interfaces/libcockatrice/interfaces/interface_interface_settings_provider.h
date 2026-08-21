@@ -6,6 +6,36 @@
 #include <QStringList>
 #include <libcockatrice/utility/playmat_params.h>
 
+/**
+ * @brief Whether playmats are rendered in-game, and for whom.
+ */
+enum PlaymatVisibility
+{
+    PlaymatVisibilityNone = 0,    ///< Don't use playmats.
+    PlaymatVisibilityOwnOnly = 1, ///< Show the local player's playmat only.
+    PlaymatVisibilityAll = 2      ///< Show playmats for all players.
+};
+
+/**
+ * @brief How the user-level playmat collection interacts with the deck-configured playmat.
+ */
+enum PlaymatMode
+{
+    PlaymatModeOverrideDeck = 0, ///< Always use the collection, ignoring any deck-configured playmat.
+    PlaymatModeFallback = 1,     ///< Prefer the deck-configured playmat; fall back to the collection when absent.
+    PlaymatModeDeckOnly = 2      ///< Use only the deck-configured playmat, ignoring the collection.
+};
+
+/**
+ * @brief How the user-level fallback playmat list is consulted when a deck has no playmat configured.
+ */
+enum PlaymatFallbackMode
+{
+    PlaymatFallbackModeFixed = 0,      ///< Always use the first entry of the fallback list.
+    PlaymatFallbackModeRoundRobin = 1, ///< Cycle through the list, advancing one entry per resolution.
+    PlaymatFallbackModeRandom = 2      ///< Pick a random entry per resolution.
+};
+
 class IInterfaceSettingsProvider
 {
 public:
@@ -45,17 +75,20 @@ public:
     [[nodiscard]] virtual bool getLifeCounterAnimationsEnabled() const = 0;
     [[nodiscard]] virtual bool getBattlefieldFlashEnabled() const = 0;
     [[nodiscard]] virtual QStringList getUserListExpandedSections() const = 0;
+
+    /** @brief Who gets playmats rendered: @ref PlaymatVisibility. */
     [[nodiscard]] virtual int getPlaymatVisibility() const = 0;
 
     /** @brief User-level playmat collection. Used either as a forced playmat
-     *         (mode == Always) or as a fallback when a deck has none (mode == Fallback). */
-    [[nodiscard]] virtual QList<PlaymatResolution> getPlaymatFallbackList() const = 0;
+     *         (mode == @ref PlaymatModeOverrideDeck) or as a fallback when a deck has none
+     *         (mode == @ref PlaymatModeFallback). */
+    [[nodiscard]] virtual QList<PlaymatInfo> getPlaymatFallbackList() const = 0;
 
-    /** @brief How the fallback list is applied: Always (0), Fallback (1), Never (2). */
+    /** @brief How the fallback list is applied: @ref PlaymatMode. */
     [[nodiscard]] virtual int getPlaymatMode() const = 0;
 
-    /** @brief How the fallback list is picked from when mode is Fallback
-     *         (0 Fixed, 1 Round-robin, 2 Random). */
+    /** @brief How the fallback list is picked from when mode is @ref PlaymatModeFallback:
+     *         @ref PlaymatFallbackMode. */
     [[nodiscard]] virtual int getPlaymatFallbackBehavior() const = 0;
 };
 

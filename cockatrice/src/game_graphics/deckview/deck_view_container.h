@@ -57,9 +57,9 @@ private:
     VisualDeckStorageWidget *visualDeckStorageWidget;
     TabGame *parentGame;
     int playerId;
-    int playmatRotationIndex = 0;          ///< Per-match cursor for round-robin playmat mode.
-    DeckList currentDeck;                  ///< Cached deck for live settings re-resolution.
-    PlaymatResolution lastResolvedPlaymat; ///< Tracks last sent playmat to avoid repeats in random mode.
+    int playmatRotationIndex = 0;    ///< Per-match cursor for round-robin playmat mode.
+    DeckList currentDeck;            ///< Cached deck for live settings re-resolution.
+    PlaymatInfo lastResolvedPlaymat; ///< Tracks last sent playmat to avoid repeats in random mode.
 
     void tryCreateVisualDeckStorageWidget();
     void sendReadyStartCommand(bool ready);

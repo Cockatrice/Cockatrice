@@ -372,13 +372,13 @@ void PlayerGraphicsItem::updatePlaymat()
     int visibility = SettingsCache::instance().userInterface().getPlaymatVisibility();
 
     // "Don't use playmats" — never show
-    if (visibility == 0) {
+    if (visibility == PlaymatVisibilityNone) {
         clearPlaymat();
         return;
     }
 
     // "Show own playmat only" — hide playmats for remote players
-    if (visibility == 1 && !player->getPlayerInfo()->getLocal()) {
+    if (visibility == PlaymatVisibilityOwnOnly && !player->getPlayerInfo()->getLocal()) {
         clearPlaymat();
         return;
     }
@@ -394,38 +394,15 @@ void PlayerGraphicsItem::updatePlaymat()
         // Local player without a server broadcast yet: apply the full
         // settings-based resolution chain (mode, fallback list, behavior).
         const auto &settings = SettingsCache::instance().userInterface();
-        const DeckList &deck = player->getDeck();
-        const auto fallbackBehavior = static_cast<PlaymatFallbackMode>(settings.getPlaymatFallbackBehavior());
-
-        switch (settings.getPlaymatMode()) {
-            case 0: { // Override deck playmat — always use collection
-                DeckList emptyDeck;
-                const PlaymatResolution resolved =
-                    resolveEffectivePlaymat(emptyDeck, {}, settings.getPlaymatFallbackList(), fallbackBehavior, 0);
-                playmatCard = resolved.card;
-                params = resolved.params;
-                break;
-            }
-            case 1: { // Fallback if deck has none — deck > collection > none
-                const PlaymatResolution resolved =
-                    resolveEffectivePlaymat(deck, {}, settings.getPlaymatFallbackList(), fallbackBehavior, 0);
-                playmatCard = resolved.card;
-                params = resolved.params;
-                break;
-            }
-            case 2: { // Deck only, ignore collection
-                const PlaymatResolution &deckPlaymat = deck.getPlaymat();
-                if (!deckPlaymat.card.isEmpty()) {
-                    playmatCard = deckPlaymat.card;
-                    params = deckPlaymat.params;
-                }
-                break;
-            }
-        }
+        const PlaymatInfo resolved = resolvePlaymatForDeck(
+            player->getDeck(), settings.getPlaymatFallbackList(), static_cast<PlaymatMode>(settings.getPlaymatMode()),
+            static_cast<PlaymatFallbackMode>(settings.getPlaymatFallbackBehavior()), 0);
+        playmatCard = resolved.card;
+        params = resolved.params;
     } else {
         // Opponent without a server broadcast: use the deck-embedded playmat.
         const DeckList &deck = player->getDeck();
-        const PlaymatResolution &deckPlaymat = deck.getPlaymat();
+        const PlaymatInfo &deckPlaymat = deck.getPlaymat();
         if (!deckPlaymat.card.isEmpty()) {
             playmatCard = deckPlaymat.card;
             params = deckPlaymat.params;

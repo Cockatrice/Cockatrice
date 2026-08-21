@@ -82,7 +82,7 @@ bool DeckList::readElement(QXmlStreamReader *xml)
             QString vOffStr = xml->attributes().value("verticalOffset").toString();
             QString zoomStr = xml->attributes().value("zoom").toString();
             QString cardName = xml->readElementText();
-            PlaymatResolution playmat;
+            PlaymatInfo playmat;
             playmat.card = {cardName, providerId};
             // Clamp to the same ranges as the settings dialog and the remote
             // player-properties path so malformed deck files cannot produce
