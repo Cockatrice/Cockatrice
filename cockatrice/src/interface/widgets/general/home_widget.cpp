@@ -4,6 +4,7 @@
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../theme_manager.h"
 #include "../../window_main.h"
+#include "../cards/art_crop_attribution.h"
 #include "background_sources.h"
 #include "home_styled_button.h"
 
@@ -341,8 +342,9 @@ void HomeWidget::paintEvent(QPaintEvent *event)
     QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33));
     painter.fillPath(roundedRectPath, semiTransparentBlack);
 
-    // Card name overlay (bottom-right)
+    // Card name overlay (above the attribution, bottom-right)
     QString cardName;
+    QString attribution;
     ExactCard card = backgroundSourceCard->getCard();
     if (card) {
         cardName = card.getCardPtr()->getName();
@@ -350,8 +352,27 @@ void HomeWidget::paintEvent(QPaintEvent *event)
             cardName += " (" + card.getPrinting().getSet()->getCorrectedShortName() + ") " +
                         card.getPrinting().getProperty("num");
         }
+        attribution = buildArtAttribution(card);
     }
 
+    // Scryfall requires artist attribution wherever card art is shown cropped.
+    // Pin it to the bottom-right corner, using the same font as the card name pill,
+    // and align its right edge with the card name pill's right edge.
+    constexpr int margin = 15;
+    constexpr qreal attributionMargin = 4.0;
+
+    QFont attributionFont = painter.font();
+    attributionFont.setPointSize(14);
+    attributionFont.setBold(true);
+    painter.setFont(attributionFont);
+
+    // paintArtAttribution insets the pill 4px from the given rect's right edge,
+    // so nudge the rect's right edge to land exactly on the pill's right edge.
+    QRectF attributionArea = rect();
+    attributionArea.setRight(width() - margin + attributionMargin);
+    const QRectF attributionRect = paintArtAttribution(painter, attributionArea, attribution);
+
+    // Card name bubble above the attribution (when enabled).
     if (!cardName.isEmpty() && SettingsCache::instance().appearance().getHomeTabDisplayCardName()) {
         QFont font = painter.font();
         font.setPointSize(14);
@@ -360,23 +381,26 @@ void HomeWidget::paintEvent(QPaintEvent *event)
 
         QFontMetrics fm(font);
         constexpr int padding = 10;
-        constexpr int margin = 15;
 
         QRect textRect = fm.boundingRect(cardName);
 
-        QRect bgRect(width() - textRect.width() - padding * 2 - margin,
-                     height() - textRect.height() - padding * 2 - margin, textRect.width() + padding * 2,
-                     textRect.height() + padding * 2);
+        int bubbleBottom = height() - margin;
+        if (!attributionRect.isEmpty()) {
+            bubbleBottom = attributionRect.top() - 6;
+        }
+        const QRect nameBubbleRect(width() - textRect.width() - padding * 2 - margin,
+                                   bubbleBottom - textRect.height() - padding * 2, textRect.width() + padding * 2,
+                                   textRect.height() + padding * 2);
 
         // Background bubble
         painter.setPen(Qt::NoPen);
         painter.setBrush(QColor(0, 0, 0, 160));
-        painter.drawRoundedRect(bgRect, 8, 8);
+        painter.drawRoundedRect(nameBubbleRect, 8, 8);
 
         // Text
         painter.setPen(Qt::white);
-        painter.drawText(bgRect.adjusted(padding, padding, -padding, -padding), Qt::AlignRight | Qt::AlignVCenter,
-                         cardName);
+        painter.drawText(nameBubbleRect.adjusted(padding, padding, -padding, -padding),
+                         Qt::AlignRight | Qt::AlignVCenter, cardName);
     }
 
     QWidget::paintEvent(event);

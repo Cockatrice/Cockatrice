@@ -130,6 +130,18 @@ public:
      * @return The flavorName, or empty if it isn't present.
      */
     [[nodiscard]] QString getFlavorName() const;
+
+    /**
+     * @brief Returns the artist name credited for this printing's artwork.
+     *
+     * Requires a card database generated with artist data.
+     *
+     * @return The artist name, or empty if it isn't present.
+     */
+    [[nodiscard]] QString getArtist() const
+    {
+        return getProperty("artist");
+    }
 };
 
 #endif // COCKATRICE_PRINTING_INFO_H

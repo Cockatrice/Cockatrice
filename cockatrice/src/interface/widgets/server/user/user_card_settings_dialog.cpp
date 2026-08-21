@@ -1,7 +1,9 @@
 #include "user_card_settings_dialog.h"
 
 #include "../../../card_picture_loader/card_picture_loader.h"
+#include "../../cards/art_crop_attribution.h"
 #include "../../utility/completer_utils.h"
+#include "card/card_search_model.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
 #include "user_card_art_provider.h"
@@ -18,6 +20,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 
@@ -36,6 +39,12 @@ void CardArtPreviewWidget::setPixmap(const QPixmap &pixmap)
 void CardArtPreviewWidget::setParams(const CardArtParams &p)
 {
     params = p;
+    update();
+}
+
+void CardArtPreviewWidget::setAttribution(const QString &attribution)
+{
+    attributionText = attribution;
     update();
 }
 
@@ -88,6 +97,8 @@ void CardArtPreviewWidget::paintEvent(QPaintEvent *)
     painter.setPen(QPen(QColor(70, 80, 95), 2));
     painter.setBrush(Qt::NoBrush);
     painter.drawEllipse(avatarRect.adjusted(-1, -1, 1, 1));
+
+    paintArtAttribution(painter, cardRect, attributionText);
 }
 
 UserCardArtSettingsDialog::UserCardArtSettingsDialog(const CardArtParams &initial, QWidget *parent)
@@ -310,6 +321,11 @@ void UserCardArtSettingsDialog::reloadPreview()
     currentPixmap = UserCardArtProvider::cropCardArt(fullRes);
     preview->setPixmap(currentPixmap);
     preview->setParams(currentParams);
+
+    // Only attribute the art once the new pixmap is actually displayed, so a
+    // cache miss (which keeps the previous pixmap on screen) doesn't pair the
+    // new card's attribution with the old card's art.
+    preview->setAttribution(buildArtAttribution(card));
 }
 
 void UserCardArtSettingsDialog::onParamChanged()

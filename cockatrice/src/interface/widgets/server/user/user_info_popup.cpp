@@ -1,5 +1,6 @@
 #include "user_info_popup.h"
 
+#include "../../cards/art_crop_attribution.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/tabs/tab_supervisor.h"
@@ -18,6 +19,7 @@
 #include <QStandardItem>
 #include <QStyledItemDelegate>
 #include <QVBoxLayout>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
 #include <libcockatrice/protocol/pb/response_get_games_of_user.pb.h>
@@ -151,6 +153,16 @@ void UserInfoHeaderWidget::setUserData(const ServerInfo_User &_user,
     avatar = _avatar;
     cardArt = _cardArt;
     params = _params;
+
+    attribution.clear();
+    if (user.has_card_art_params()) {
+        const ExactCard card =
+            CardDatabaseManager::query()->getCard({QString::fromStdString(user.card_art_params().card_name()),
+                                                   QString::fromStdString(user.card_art_params().card_provider_id())});
+        if (card) {
+            attribution = buildArtAttribution(card);
+        }
+    }
     update();
 }
 
@@ -303,6 +315,17 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
         p.setPen(dark ? UserListPainter::blend(badge.color, Qt::white, 0.5)
                       : UserListPainter::blend(badge.color, Qt::black, 0.35));
         p.drawText(br, Qt::AlignCenter, badge.text);
+    }
+
+    // The painter font at this point depends on whether a badge was drawn
+    // (badge font vs username font), so pin an explicit font for the pill.
+    p.setFont(font());
+
+    // Only show the attribution when there is actually art on screen: on a
+    // cache miss cardArt is null and the pill would float over the plain
+    // header with no art behind it.
+    if (!cardArt.isNull()) {
+        paintArtAttribution(p, rect, attribution, Qt::AlignRight | Qt::AlignBottom, 0.8);
     }
 }
 
