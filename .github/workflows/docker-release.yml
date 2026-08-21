@@ -145,9 +145,10 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: ${{ env.GHCR_IMAGE }}
+          flavor: |
+            latest=auto
           tags: |
-            type=raw,value=latest
-            type=ref,event=tag
+            type=match,pattern=^\d{4}-\d{2}-\d{2}-Release-(\d+\.\d+\.\d+)$,group=1    # if semver: type=ref,event=tag and type=semver,pattern={{version}} / {{major}}.{{minor}}
 
       # Add OCI annotations to image index and publish tags
       - name: "Create image index"
