@@ -36,7 +36,7 @@ env:
 jobs:
   # Create one platform-specific image and publish its OCI image manifest per matrix job
   build:
-    name: "${{ matrix.label }}"
+    name: "Servatrice (${{ matrix.label }})"
     if: github.repository_owner == 'Cockatrice'
     runs-on: ${{ matrix.runner }}
 
@@ -120,7 +120,7 @@ jobs:
 
   # Create an OCI image index from the platform-specific image manifests
   index:
-    name: "Publish multi-platform image"
+    name: "Publish multi-platform Servatrice image"
     if: github.repository_owner == 'Cockatrice' && github.event_name == 'release' && github.event.release.prerelease == false
     needs: build
     runs-on: ubuntu-slim
