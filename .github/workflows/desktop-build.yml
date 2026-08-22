@@ -407,6 +407,15 @@ jobs:
           echo "Archives (Windows):"
           aqt list-qt windows desktop --archives 6.10.3 win64_msvc2022_64
 
+      - name: "List available Qt modules (aqtinstall)"
+        shell: bash
+        run: |
+          echo "Modules (Mac):"
+          aqt list-qt mac desktop --modules ${{ steps.resolve_qt_version.outputs.version }} clang_64
+          echo ""
+          echo "Modules (Windows):"
+          aqt list-qt windows desktop --modules 6.10.3 win64_msvc2022_64
+
       - name: "List avaialble Qt tools (aqtinstall)"
         shell: bash
         run: |
@@ -447,11 +456,6 @@ jobs:
         with:
           key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
           path: ${{ github.workspace }}/Qt
-
-      - name: "[macOS] Check lrelease dependencies"
-        if: matrix.os == 'macOS'
-        shell: bash
-        run: otool -L ${{ github.workspace }}/Qt/${{ steps.resolve_qt_version.outputs.version }}/macos/bin/lrelease
 
       - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'Windows'
