@@ -12,9 +12,9 @@ Available pre-compiled binaries for installation:
    • <kbd>Windows 10+</kbd>
 
   <b>macOS</b>
-   • <kbd>macOS 15+</kbd> <sub><i>Sequoia</i></sub> <sub>Apple M</sub>
-   • <kbd>macOS 14+</kbd> <sub><i>Sonoma</i></sub> <sub>Apple M</sub>
-   • <kbd>macOS 13+</kbd> <sub><i>Ventura</i></sub> <sub>Intel</sub>
+   • <kbd>macOS 15+</kbd> <sub><i>Sequoia</i></sub>
+   • <kbd>macOS 14+</kbd> <sub><i>Sonoma</i></sub>
+   • <kbd>macOS 13+</kbd> <sub><i>Ventura (x86)</i></sub>
 
   <b>Linux</b>
    • <kbd>Ubuntu 26.04 LTS</kbd> <sub><i>Resolute Racoon</i></sub>
@@ -25,9 +25,9 @@ Available pre-compiled binaries for installation:
    • <kbd>Fedora 43</kbd>
 
 <sub>We are also packaged in <kbd>Arch Linux</kbd>'s <a href="https://archlinux.org/packages/extra/x86_64/cockatrice">official extra repository</a>, courtesy of @FFY00.</sub>
-<sub>General Linux support is available via a <kbd>flatpak</kbd> package at <a href="https://flathub.org/apps/io.github.Cockatrice.cockatrice">Flathub</a>!</sub>
+<sub>General Linux support is available via a <kbd>flatpak</kbd> package at <a href="https://flathub.org/apps/io.github.Cockatrice.cockatrice">Flathub</a> (x86 & ARM)!</sub>
 
-<sub>We provide a <kbd>Docker</kbd> image for "Servatrice" in <a href="https://github.com/Cockatrice/Cockatrice/pkgs/container/servatrice">GHCR</a>. You can docker pull it or use our Docker Compose files!</sub>
+<sub>We provide a <kbd>Docker</kbd> image for "Servatrice" in <a href="https://github.com/Cockatrice/Cockatrice/pkgs/container/servatrice">GHCR</a> (x86 & ARM). You can docker pull it or use our Docker Compose files!</sub>
 </pre>
 
 
