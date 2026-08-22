@@ -24,6 +24,16 @@
 #include <QMutex>
 #include <QTcpSocket>
 #include <QWebSocket>
+#include <libcockatrice/protocol/pb/command_replay_download_by_game_id.pb.h>
+#include <libcockatrice/protocol/pb/command_report.pb.h>
+#include <libcockatrice/protocol/pb/command_report_add_comment.pb.h>
+#include <libcockatrice/protocol/pb/command_report_assign.pb.h>
+#include <libcockatrice/protocol/pb/command_report_details.pb.h>
+#include <libcockatrice/protocol/pb/command_report_list.pb.h>
+#include <libcockatrice/protocol/pb/command_report_my_list.pb.h>
+#include <libcockatrice/protocol/pb/command_report_resolve.pb.h>
+#include <libcockatrice/protocol/pb/command_report_stats.pb.h>
+#include <libcockatrice/protocol/pb/command_report_user_info.pb.h>
 #include <server_protocolhandler.h>
 
 class Servatrice;
@@ -50,6 +60,7 @@ class Command_BanFromServer;
 class Command_UpdateServerMessage;
 class Command_ShutdownServer;
 class Command_ReloadConfig;
+class Command_ReplayDownloadByGameId;
 
 class Command_AccountEdit;
 class Command_AccountImage;
@@ -67,7 +78,7 @@ signals:
     void incTxBytes(qint64 amount);
 
 protected:
-    void logDebugMessage(const QString &message);
+    void logDebugMessage(const QString &message) override;
     bool tooManyRegistrationAttempts(const QString &ipAddress);
 
     virtual void writeToSocket(QByteArray &data) = 0;
@@ -102,6 +113,7 @@ private:
     Response::ResponseCode cmdReplayGetCode(const Command_ReplayGetCode &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplaySubmitCode(const Command_ReplaySubmitCode &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReportList(const Command_ReportList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdWarnUser(const Command_WarnUser &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetLogHistory(const Command_ViewLogHistory &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetBanHistory(const Command_GetBanHistory &cmd, ResponseContainer &rc);
@@ -109,6 +121,10 @@ private:
     Response::ResponseCode cmdGetWarnHistory(const Command_GetWarnHistory &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdShutdownServer(const Command_ShutdownServer &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdUpdateServerMessage(const Command_UpdateServerMessage &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReportAssign(const Command_ReportAssign &cmd, ResponseContainer &);
+    Response::ResponseCode cmdReportResolve(const Command_ReportResolve &cmd, ResponseContainer &);
+    Response::ResponseCode cmdReportUserInfo(const Command_ReportUserInfo &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReportStats(const Command_ReportStats &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRegisterAccount(const Command_Register &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdActivateAccount(const Command_Activate &cmd, ResponseContainer & /* rc */);
     Response::ResponseCode cmdReloadConfig(const Command_ReloadConfig & /* cmd */, ResponseContainer & /*rc*/);
@@ -122,10 +138,19 @@ private:
     Response::ResponseCode cmdForgotPasswordChallenge(const Command_ForgotPasswordChallenge &cmd,
                                                       ResponseContainer &rc);
     Response::ResponseCode cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd, ResponseContainer &rc);
-    Response::ResponseCode processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReport(const Command_Report &cmd, ResponseContainer &);
+    Response::ResponseCode cmdReportMyList(const Command_ReportMyList &cmd, ResponseContainer &rc);
+    void sendPendingReportNotifications(ResponseContainer &rc);
+    void onLogin(ResponseContainer &rc) override;
+    Response::ResponseCode cmdReportDetails(const Command_ReportDetails &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReportAddComment(const Command_ReportAddComment &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdReplayDownloadByGameId(const Command_ReplayDownloadByGameId &cmd, ResponseContainer &rc);
     Response::ResponseCode
-    processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc);
-    Response::ResponseCode processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc);
+    processExtendedSessionCommand(int cmdType, const SessionCommand &cmd, ResponseContainer &rc) override;
+    Response::ResponseCode
+    processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc) override;
+    Response::ResponseCode
+    processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc) override;
 
     Response::ResponseCode cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc);
@@ -140,6 +165,12 @@ private:
 
     Response::ResponseCode cmdGetAdminNotes(const Command_GetAdminNotes &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdUpdateAdminNotes(const Command_UpdateAdminNotes &cmd, ResponseContainer &rc);
+
+    Response::ResponseCode cmdGetUserSessions(const Command_GetUserSessions &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdGetUserAlts(const Command_GetUserAlts &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdGetModeratorLastLogins(const Command_GetModeratorLastLogins &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdResetUserPassword(const Command_ResetUserPassword &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdRemoveUserAvatar(const Command_RemoveUserAvatar &cmd, ResponseContainer &rc);
 
     bool addAdminFlagToUser(const QString &user, int flag);
     bool removeAdminFlagFromUser(const QString &user, int flag);
@@ -157,9 +188,9 @@ public:
     bool initSession();
 
     virtual QHostAddress getPeerAddress() const = 0;
-    virtual QString getAddress() const = 0;
+    QString getAddress() const override = 0;
 
-    void transmitProtocolItem(const ServerMessage &item);
+    void transmitProtocolItem(const ServerMessage &item) override;
 };
 
 class TcpServerSocketInterface : public AbstractServerSocketInterface

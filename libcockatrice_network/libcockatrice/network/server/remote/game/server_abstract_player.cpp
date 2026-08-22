@@ -47,7 +47,8 @@
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/dice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <limits>
 #include <ranges>
@@ -1629,10 +1630,11 @@ void Server_AbstractPlayer::getInfo(ServerInfo_Player *info,
                                     bool withUserInfo)
 {
     getProperties(*info->mutable_properties(), withUserInfo);
-    if (recipient == this) {
-        if (deck) {
-            info->set_deck_list(deck->writeToString_Native().toStdString());
-        }
+
+    // Deck lists are only shared with other players when the game is in Open Decklists mode,
+    // so a player joining an open lobby can see every deck that was loaded before they joined.
+    if (deck && (recipient == this || game->getShareDecklistsOnLoad())) {
+        info->set_deck_list(deck->writeToString_Native().toStdString());
     }
 
     for (Server_Arrow *arrow : arrows) {
@@ -1651,5 +1653,13 @@ void Server_AbstractPlayer::getPlayerProperties(ServerInfo_PlayerProperties &res
     result.set_ready_start(readyStart);
     if (deck) {
         result.set_deck_hash(deck->getDeckHash().toStdString());
+        const auto &playmat = deck->getPlaymat();
+        auto *playmatParams = result.mutable_playmat_params();
+        playmatParams->set_card_name(playmat.card.name.toStdString());
+        playmatParams->set_card_provider_id(playmat.card.providerId.toStdString());
+        playmatParams->set_margin_pct_l(playmat.params.marginPctL);
+        playmatParams->set_margin_pct_r(playmat.params.marginPctR);
+        playmatParams->set_vertical_offset(playmat.params.verticalOffset);
+        playmatParams->set_zoom(playmat.params.zoom);
     }
 }

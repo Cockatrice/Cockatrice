@@ -53,7 +53,7 @@ public:
 
     AbstractClient *getClientForPlayer(int playerId) const;
 
-    void loadReplay(GameReplay *replay);
+    void loadReplay(const GameReplay *replay);
 
     CardItem *getCard(int playerId, const QString &zoneName, int cardId) const;
 

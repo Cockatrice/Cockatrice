@@ -58,6 +58,14 @@ public:
     const DeckList &getDeckList() const;
 
     /**
+     * @brief Gets the underlying DeckList.
+     */
+    QSharedPointer<DeckList> getDeckListShared() const
+    {
+        return deckList;
+    }
+
+    /**
      * @brief Creates a LoadedDeck containing the contents of the current deck and the current LoadInfo.
      *
      * @return A new LoadedDeck instance.
@@ -163,6 +171,7 @@ public:
     void setName(const QString &name);
     void setComments(const QString &comments);
     void setBannerCard(const CardRef &bannerCard);
+    void setPlaymat(const PlaymatInfo &playmat);
     void setTags(const QStringList &tags);
     void setFormat(const QString &format);
     ///@}

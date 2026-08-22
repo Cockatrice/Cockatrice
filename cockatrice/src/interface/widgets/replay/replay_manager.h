@@ -1,49 +1,83 @@
-/**
- * @file replay_manager.h
- * @ingroup Core
- * @ingroup Replay
- */
-//! \todo Document this file.
+#ifndef COCKATRICE_REPLAY_MANAGER_H
+#define COCKATRICE_REPLAY_MANAGER_H
 
-#ifndef REPLAY_MANAGER_H
-#define REPLAY_MANAGER_H
+#include "../../../game/player/event_processing_options.h"
 
-#include "replay_timeline_widget.h"
-
-#include <QToolButton>
-#include <QWidget>
+#include <QObject>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 
-class TabGame;
+class GameReplay;
+class QTimer;
 
-class ReplayManager : public QWidget
+/**
+ * @brief This class handles all logic to do with playing back replays
+ */
+class ReplayManager : public QObject
 {
     Q_OBJECT
 
-public:
-    ReplayManager(TabGame *parent, GameReplay *replay);
-    TabGame *game;
+    enum PlaybackMode
+    {
+        NORMAL_PLAYBACK,
+        FORWARD_SKIP,
+        BACKWARD_SKIP
+    };
+
     GameReplay *replay;
+    QList<int> replayTimeline; ///< timestamp of each event, with the indexes corresponding
+    int maxTime;
 
-signals:
-    void requestChatAndPhaseReset();
-    void eventReplayed(const GameEventContainer &cont, EventProcessingOptions options);
+    QTimer *replayTimer;
+    QTimer *rewindBufferingTimer;
 
-private:
-    // Replay related members
-    int currentReplayStep = 0;
-    QList<int> replayTimeline;
-    ReplayTimelineWidget *timelineWidget;
-    QToolButton *replayPlayButton, *replayFastForwardButton;
-    QAction *aReplaySkipForward, *aReplaySkipBackward, *aReplaySkipForwardBig, *aReplaySkipBackwardBig;
+    qreal timeScaleFactor = 1.0;
+    bool skipEmptySections = false;
+
+    int currentVisualTime = 0;    ///< time currently displayed by the timeline
+    int currentProcessedTime = 0; ///< time that events are currently processed up to. Could differ from visual time due
+                                  ///< to rewind buffering
+    int currentEvent = 0;         ///< current event's index
+
+    void skipToTime(int newTime, bool doRewindBuffering);
+    void handleBackwardsSkip(bool doRewindBuffering);
+    void processRewind();
+    void processNewEvents(PlaybackMode playbackMode);
+    void handleSkipEmptySection();
 
 private slots:
-    void replayNextEvent(EventProcessingOptions options);
+    void replayTimerTimeout();
+
+public:
+    static constexpr int SMALL_SKIP_MS = 1000;
+    static constexpr int BIG_SKIP_MS = 10000;
+
+    /**
+     * @param parent The parent QObject
+     * @param replay Cannot be null. Takes ownership of the object.
+     */
+    explicit ReplayManager(QObject *parent, GameReplay *replay);
+
+    ~ReplayManager() override;
+
+    const QList<int> &getReplayTimeline() const
+    {
+        return replayTimeline;
+    }
+
+    void setTimeScaleFactor(qreal _timeScaleFactor);
+    void setSkipEmptySections(bool value);
+
+public slots:
+    void startReplay();
+    void stopReplay();
+    void setTime(int time);
+    void skipByAmount(int amount); // use a negative amount to skip backwards
+
+signals:
+    void timeChanged(int time);
+    void eventReplayed(const GameEventContainer &cont, EventProcessingOptions options);
     void replayFinished();
-    void replayPlayButtonToggled(bool checked);
-    void replayFastForwardButtonToggled(bool checked);
-    void replayRewind();
-    void refreshShortcuts();
+    void rewound();
 };
 
-#endif // REPLAY_MANAGER_H
+#endif // COCKATRICE_REPLAY_MANAGER_H

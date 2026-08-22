@@ -6,6 +6,7 @@
 
 #include <QDirIterator>
 #include <QMouseEvent>
+#include <libcockatrice/settings/paths_settings.h>
 
 VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     QWidget *parent,
@@ -43,7 +44,7 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
 void VisualDeckStorageFolderDisplayWidget::refreshUi()
 {
     QString bannerText = tr("Deck Storage");
-    QString deckPath = SettingsCache::instance().getDeckPath();
+    QString deckPath = SettingsCache::instance().paths().getDeckPath();
     if (filePath != deckPath) {
         QString relativePath = filePath;
 

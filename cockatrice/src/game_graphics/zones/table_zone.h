@@ -8,8 +8,11 @@
 #define TABLEZONE_H
 
 #include "../../game/zones/table_zone_logic.h"
+#include "../animated_item.h"
 #include "../board/abstract_card_item.h"
 #include "select_zone.h"
+
+#include <QElapsedTimer>
 
 /**
  * @brief TableZone is the grid based rect where CardItems may be placed.
@@ -17,7 +20,7 @@
  * It is the main play zone and can be customized with background images.
  */
 //! \todo Refactor methods to make more readable, extract logic to private methods (especially reorganizeCards()).
-class TableZone : public SelectZone
+class TableZone : public SelectZone, public IAnimatedItem
 {
     Q_OBJECT
 
@@ -83,6 +86,7 @@ private:
      */
     bool active = false;
     bool mirrored = false;
+    bool playmatActive = false;
 
     [[nodiscard]] bool isInverted() const;
 
@@ -91,6 +95,9 @@ private slots:
        Loads in any found custom background and updates
      */
     void updateBg();
+
+public slots:
+    void onPlaymatChanged(bool active);
 
 public slots:
     /**
@@ -120,6 +127,16 @@ public:
        @param option
      */
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+    /**
+       Flashes the table surface after a player loses life.
+
+       Wired up through the life counter so the battlefield glows when life drops.
+     */
+    void triggerDamageShimmer();
+
+    /** @brief Decays the damage shimmer by one timer tick. */
+    bool animationEvent() override;
 
     /**
        Toggles the selected items as tapped.
@@ -171,8 +188,17 @@ public:
     }
     void setWidth(qreal _width)
     {
+        // The width is stored as an int; truncate to match the previous implicit conversion.
+        const int newWidth = static_cast<int>(_width);
+        if (width == newWidth) {
+            return;
+        }
         prepareGeometryChange();
-        width = _width;
+        width = newWidth;
+        // The parent player item's boundingRect (which clips the playmat painting) is
+        // derived from this zone's size. Without this signal the playmat is cut off at
+        // the stale boundingRect edge whenever the scene is resized wider.
+        emit sizeChanged();
     }
     [[nodiscard]] qreal getWidth() const
     {
@@ -185,6 +211,11 @@ public:
     }
 
 private:
+    static constexpr qreal shimmerDurationMs = 450.0;
+
+    QElapsedTimer shimmerClock;
+    qreal damageShimmerAlpha = 0.0;
+
     void paintZoneOutline(QPainter *painter);
     void paintLandDivider(QPainter *painter);
 

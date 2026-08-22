@@ -36,13 +36,16 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_forgot_password_challenge.cpp
     src/interface/widgets/dialogs/dlg_forgot_password_request.cpp
     src/interface/widgets/dialogs/dlg_forgot_password_reset.cpp
+    src/interface/widgets/dialogs/dlg_invite_to_game.cpp
     src/interface/widgets/dialogs/dlg_load_deck.cpp
     src/interface/widgets/dialogs/dlg_load_deck_from_clipboard.cpp
     src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp
     src/interface/widgets/dialogs/dlg_load_remote_deck.cpp
     src/interface/widgets/dialogs/dlg_local_game_options.cpp
     src/interface/widgets/dialogs/dlg_manage_sets.cpp
+    src/interface/widgets/dialogs/dlg_my_reports.cpp
     src/interface/widgets/dialogs/dlg_register.cpp
+    src/interface/widgets/dialogs/dlg_report_user.cpp
     src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
@@ -83,7 +86,6 @@ set(cockatrice_SOURCES
     src/game/game_state.cpp
     src/game_graphics/game_view.cpp
     src/game_graphics/hand_counter.cpp
-    src/game/selection_subtype_tally.cpp
     src/game_graphics/log/message_log_widget.cpp
     src/game/phase.cpp
     src/game_graphics/phases_toolbar.cpp
@@ -98,7 +100,11 @@ set(cockatrice_SOURCES
     src/game_graphics/player/menu/rfg_menu.cpp
     src/game_graphics/player/menu/say_menu.cpp
     src/game_graphics/player/menu/sideboard_menu.cpp
+    src/game_graphics/player/menu/tally_menu.cpp
     src/game_graphics/player/menu/utility_menu.cpp
+    src/game_graphics/tally/stats_tally.cpp
+    src/game_graphics/tally/subtype_tally.cpp
+    src/game_graphics/tally/tally.cpp
     src/game/player/player_actions.cpp
     src/game_graphics/player/player_area.cpp
     src/game_graphics/player/player_dialogs.cpp
@@ -132,9 +138,19 @@ set(cockatrice_SOURCES
     src/interface/card_picture_loader/card_picture_loader_worker.cpp
     src/interface/card_picture_loader/card_picture_loader_worker_work.cpp
     src/interface/card_picture_loader/card_picture_to_load.cpp
+    src/interface/intents/intent.cpp
+    src/interface/intents/intent.h
+    src/interface/intents/intent_open_local_deck.cpp
+    src/interface/intents/intent_open_local_deck.h
+    src/interface/intents/intent_wait_for_database_load.cpp
+    src/interface/intents/intent_wait_for_database_load.h
     src/interface/layouts/flow_layout.cpp
     src/interface/layouts/overlap_layout.cpp
+    src/interface/widgets/utility/card_completer_delegate.cpp
+    src/interface/widgets/utility/card_completer_styler.cpp
+    src/interface/widgets/utility/completer_utils.cpp
     src/interface/widgets/utility/line_edit_completer.cpp
+    src/interface/widgets/utility/reversed_completer_model.cpp
     src/interface/pixel_map_generator.cpp
     src/interface/theme_config.cpp
     src/interface/theme_manager.cpp
@@ -146,6 +162,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
     src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
     src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
+    src/interface/widgets/cards/art_crop_attribution.cpp
     src/interface/widgets/cards/card_group_display_widgets/card_group_display_widget.cpp
     src/interface/widgets/cards/card_group_display_widgets/flat_card_group_display_widget.cpp
     src/interface/widgets/cards/card_group_display_widgets/overlapped_card_group_display_widget.cpp
@@ -225,12 +242,19 @@ set(cockatrice_SOURCES
     src/interface/widgets/printing_selector/printing_selector_card_selection_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_sorting_widget.cpp
     src/interface/widgets/printing_selector/set_name_and_collectors_number_display_widget.cpp
+    src/interface/widgets/playmat/playmat_collection_dialog.cpp
+    src/interface/widgets/playmat/playmat_collection_dialog.h
+    src/interface/widgets/playmat/playmat_preview_widget.cpp
+    src/interface/widgets/playmat/playmat_settings_dialog.cpp
     src/interface/widgets/quick_settings/settings_button_widget.cpp
     src/interface/widgets/quick_settings/settings_popup_widget.cpp
     src/interface/widgets/replay/replay_manager.cpp
+    src/interface/widgets/replay/replay_quick_settings_widget.cpp
     src/interface/widgets/replay/replay_timeline_widget.cpp
+    src/interface/widgets/replay/replay_widget.cpp
     src/interface/widgets/server/chat_view/chat_view.cpp
     src/interface/widgets/server/game_filter_configs.cpp
+    src/interface/widgets/server/game_link.cpp
     src/interface/widgets/server/game_selector.cpp
     src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp
     src/interface/widgets/server/games_model.cpp
@@ -245,17 +269,23 @@ set(cockatrice_SOURCES
     src/interface/widgets/server/user/user_info_connection.cpp
     src/interface/widgets/server/user/user_list_manager.cpp
     src/interface/widgets/server/user/user_list_painter.cpp
+    src/interface/widgets/server/user/user_list_panel_widget.cpp
     src/interface/widgets/server/user/user_list_widget.cpp
+    src/interface/widgets/settings_page/abstract_settings_page.cpp
     src/interface/widgets/settings_page/appearance_settings_page.cpp
     src/interface/widgets/settings_page/deck_editor_settings_page.cpp
     src/interface/widgets/settings_page/general_settings_page.cpp
     src/interface/widgets/settings_page/messages_settings_page.cpp
+    src/interface/widgets/settings_page/settings_search_delegate.cpp
+    src/interface/widgets/settings_page/settings_search_model.cpp
     src/interface/widgets/settings_page/shortcut_settings_page.cpp
     src/interface/widgets/settings_page/sound_settings_page.cpp
     src/interface/widgets/settings_page/storage_settings_page.cpp
     src/interface/widgets/settings_page/user_interface_settings_page.cpp
     src/interface/widgets/utility/custom_line_edit.cpp
     src/interface/widgets/utility/get_text_with_max.cpp
+    src/interface/widgets/utility/report_utils.cpp
+    src/interface/widgets/utility/report_utils.h
     src/interface/widgets/utility/sequence_edit.cpp
     src/interface/widgets/utility/visibility_change_listener.cpp
     src/interface/widgets/utility/visibility_change_listener.h
@@ -281,13 +311,16 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_item_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_folder_display_widget.cpp
+    src/interface/widgets/visual_deck_storage/visual_deck_storage_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp
+    src/interface/widgets/visual_deck_storage/visual_deck_storage_sort_filter_proxy_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
     src/interface/window_main.cpp
     src/main.cpp
+    src/single_instance_manager.cpp
     src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
     src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp
     src/interface/widgets/tabs/api/archidekt/api_response/archidekt_deck_listing_api_response.cpp
@@ -303,6 +336,13 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_entry_display_widget.cpp
     src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_listings_display_widget.cpp
     src/interface/widgets/tabs/api/archidekt/display/archidekt_deck_preview_image_display_widget.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/card_in_deck_request.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_deck_request.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_card_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_variant_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_estimate_bracket_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_spellbook_api_accessor.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/archidekt_links/edhrec_api_response_archidekt_links.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_average_deck_api_response.cpp
     src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_deck_api_response.cpp
@@ -339,6 +379,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab_home.cpp
     src/interface/widgets/tabs/tab_logs.cpp
     src/interface/widgets/tabs/tab_message.cpp
+    src/interface/widgets/tabs/tab_moderation.cpp
+    src/interface/widgets/tabs/tab_report.cpp
     src/interface/widgets/tabs/tab_replays.cpp
     src/interface/widgets/tabs/tab_room.cpp
     src/interface/widgets/tabs/tab_server.cpp
@@ -349,12 +391,31 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
     src/interface/key_signals.cpp
     src/interface/logger.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_service.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_widget.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/handle_commander_brackets.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
     src/interface/widgets/utility/compact_push_button.cpp
     src/interface/widgets/utility/compact_push_button.h
+    src/single_instance_manager.h
+    src/client/url_scheme_event_filter.h
+    src/interface/intents/intent_connect_to_server.cpp
+    src/interface/intents/intent_connect_to_server.h
+    src/interface/intents/intent_disconnect_from_server.cpp
+    src/interface/intents/intent_disconnect_from_server.h
+    src/interface/intents/intent_join_server_game.cpp
+    src/interface/intents/intent_join_server_game.h
+    src/interface/intents/intent_join_server_room.cpp
+    src/interface/intents/intent_join_server_room.h
+    src/interface/intents/intent_login.cpp
+    src/interface/intents/intent_login.h
+    src/interface/intents/intent_open_server_room_by_name.cpp
+    src/interface/intents/intent_open_server_room_by_name.h
+    src/interface/intents/url_parser.cpp
+    src/interface/intents/url_parser.h
     src/interface/widgets/server/user/user_info_popup.cpp
     src/interface/widgets/server/user/user_info_popup.h
 )
@@ -398,11 +459,7 @@ if(APPLE)
   set(cockatrice_SOURCES ${cockatrice_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/resources/appicon.icns)
 endif(APPLE)
 
-if(Qt6_FOUND)
-  qt6_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
-elseif(Qt5_FOUND)
-  qt5_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
-endif()
+qt6_add_resources(cockatrice_RESOURCES_RCC ${cockatrice_RESOURCES})
 
 # Declare path variables
 set(ICONDIR
@@ -414,71 +471,37 @@ set(DESKTOPDIR
     CACHE STRING "desktop file destination"
 )
 
+set(MIMEDIR
+    share/mime/packages
+    CACHE STRING "mime file destination"
+)
+
 set(COCKATRICE_MAC_QM_INSTALL_DIR "cockatrice.app/Contents/Resources/translations")
 set(COCKATRICE_UNIX_QM_INSTALL_DIR "share/cockatrice/translations")
 set(COCKATRICE_WIN32_QM_INSTALL_DIR "translations")
 
-if(Qt6_FOUND)
-  qt6_add_executable(
-    cockatrice
-    WIN32
-    MACOSX_BUNDLE
-    ${cockatrice_SOURCES}
-    ${cockatrice_RESOURCES_RCC}
-    ${cockatrice_MOC_SRCS}
-    MANUAL_FINALIZATION
-  )
-elseif(Qt5_FOUND)
-  # Qt5 Translations need to be linked at executable creation time
-  if(Qt5LinguistTools_FOUND)
-    if(UPDATE_TRANSLATIONS)
-      qt5_create_translation(cockatrice_QM ${translate_SRCS} ${cockatrice_TS})
-    else()
-      qt5_add_translation(cockatrice_QM ${cockatrice_TS})
-    endif()
-  endif()
-  add_executable(
-    cockatrice WIN32 MACOSX_BUNDLE ${cockatrice_MOC_SRCS} ${cockatrice_QM} ${cockatrice_RESOURCES_RCC}
-                                   ${cockatrice_SOURCES}
-  )
-  if(UNIX)
-    if(APPLE)
-      install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_MAC_QM_INSTALL_DIR})
-    else()
-      install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_UNIX_QM_INSTALL_DIR})
-    endif()
-  elseif(WIN32)
-    install(FILES ${cockatrice_QM} DESTINATION ${COCKATRICE_WIN32_QM_INSTALL_DIR})
-  endif()
-endif()
+qt6_add_executable(
+  cockatrice
+  WIN32
+  MACOSX_BUNDLE
+  ${cockatrice_SOURCES}
+  ${cockatrice_RESOURCES_RCC}
+  ${cockatrice_MOC_SRCS}
+  MANUAL_FINALIZATION
+)
 
-if(Qt5_FOUND)
-  target_link_libraries(
-    cockatrice
-    libcockatrice_card
-    libcockatrice_deck_list
-    libcockatrice_filters
-    libcockatrice_utility
-    libcockatrice_network
-    libcockatrice_models
-    libcockatrice_rng
-    libcockatrice_settings
-    ${COCKATRICE_QT_MODULES}
-  )
-else()
-  target_link_libraries(
-    cockatrice
-    PUBLIC libcockatrice_card
-           libcockatrice_deck_list
-           libcockatrice_filters
-           libcockatrice_utility
-           libcockatrice_network
-           libcockatrice_models
-           libcockatrice_rng
-           libcockatrice_settings
-           ${COCKATRICE_QT_MODULES}
-  )
-endif()
+target_link_libraries(
+  cockatrice
+  PUBLIC libcockatrice_card
+         libcockatrice_deck_list
+         libcockatrice_filters
+         libcockatrice_utility
+         libcockatrice_network
+         libcockatrice_models
+         libcockatrice_rng
+         libcockatrice_settings
+         ${COCKATRICE_QT_MODULES}
+)
 
 if(UNIX)
   if(APPLE)
@@ -498,6 +521,23 @@ if(UNIX)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.png DESTINATION ${ICONDIR}/hicolor/48x48/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/cockatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice.desktop DESTINATION ${DESKTOPDIR})
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/cockatrice-cod.xml DESTINATION ${MIMEDIR})
+
+    # Refresh the freedesktop databases so the file associations and scheme
+    # handler register without requiring the user to run them manually. The
+    # tools may be missing on minimal systems; that is fine, packaging systems
+    # usually refresh these databases through their own triggers.
+    find_program(UPDATE_MIME_DATABASE update-mime-database)
+    if(UPDATE_MIME_DATABASE)
+      install(CODE "execute_process(COMMAND \"${UPDATE_MIME_DATABASE}\" \"${CMAKE_INSTALL_PREFIX}/share/mime\")")
+    endif()
+
+    find_program(UPDATE_DESKTOP_DATABASE update-desktop-database)
+    if(UPDATE_DESKTOP_DATABASE)
+      install(
+        CODE "execute_process(COMMAND \"${UPDATE_DESKTOP_DATABASE}\" \"${CMAKE_INSTALL_PREFIX}/share/applications\")"
+      )
+    endif()
   endif()
 elseif(WIN32)
   install(TARGETS cockatrice RUNTIME DESTINATION ./)
@@ -508,7 +548,7 @@ if(APPLE)
   set(plugin_dest_dir cockatrice.app/Contents/Plugins)
   set(qtconf_dest_dir cockatrice.app/Contents/Resources)
 
-  # Qt plugins: audio (Qt5), iconengines, imageformats, multimedia (Qt6), platforms, printsupport (Qt5), styles, tls (Qt6)
+  # Qt plugins: audio, iconengines, imageformats, multimedia, platforms, printsupport, styles, tls
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -575,7 +615,7 @@ if(WIN32)
     PATTERN "*.ini"
   )
 
-  # Qt plugins: audio (Qt5), iconengines, imageformats, multimedia (Qt6) platforms, printsupport (Qt5), styles, tls (Qt6)
+  # Qt plugins: audio, iconengines, imageformats, multimedia, platforms, printsupport, styles, tls
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -631,7 +671,7 @@ Data = Resources\")
   endif()
 endif()
 
-if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
+if(Qt6LinguistTools_FOUND)
   #Qt6 Translations happen after the executable is built up
   if(UPDATE_TRANSLATIONS)
     qt6_add_translations(
@@ -658,6 +698,4 @@ if(Qt6_FOUND AND Qt6LinguistTools_FOUND)
   endif()
 endif()
 
-if(Qt6_FOUND)
-  qt6_finalize_target(cockatrice)
-endif()
+qt6_finalize_target(cockatrice)

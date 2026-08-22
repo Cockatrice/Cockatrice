@@ -29,6 +29,7 @@
 #include <libcockatrice/protocol/pb/response_replay_download.pb.h>
 #include <libcockatrice/protocol/pb/response_replay_get_code.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/paths_settings.h>
 
 inline Q_LOGGING_CATEGORY(TabReplaysLog, "replays_tab");
 
@@ -59,7 +60,7 @@ TabReplays::TabReplays(TabSupervisor *_tabSupervisor, AbstractClient *_client, c
 QGroupBox *TabReplays::createLeftLayout()
 {
     localDirModel = new QFileSystemModel(this);
-    localDirModel->setRootPath(SettingsCache::instance().getReplaysPath());
+    localDirModel->setRootPath(SettingsCache::instance().paths().getReplaysPath());
     localDirModel->sort(0, Qt::AscendingOrder);
 
     localDirView = new QTreeView;

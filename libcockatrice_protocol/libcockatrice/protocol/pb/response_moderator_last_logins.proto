@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "response.proto";
+import "serverinfo_moderator_login.proto";
+
+message Response_ModeratorLastLogins {
+    extend Response {
+        optional Response_ModeratorLastLogins ext = 1217;
+    }
+    repeated ServerInfo_ModeratorLogin logins = 1;
+}

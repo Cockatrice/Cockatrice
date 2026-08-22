@@ -7,15 +7,16 @@
 #include <QDirIterator>
 #include <QMovie>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/settings/paths_settings.h>
 
 static constexpr int REFRESH_INTERVAL_MS = 10 * 1000;
 
 CardPictureLoaderLocal::CardPictureLoaderLocal(QObject *parent)
-    : QObject(parent), picsPath(SettingsCache::instance().getPicsPath()),
-      customPicsPath(SettingsCache::instance().getCustomPicsPath())
+    : QObject(parent), picsPath(SettingsCache::instance().paths().getPicsPath()),
+      customPicsPath(SettingsCache::instance().paths().getCustomPicsPath())
 {
     // Hook up signals to settings
-    connect(&SettingsCache::instance(), &SettingsCache::picsPathChanged, this,
+    connect(&SettingsCache::instance().paths(), &PathsSettings::picsPathChanged, this,
             &CardPictureLoaderLocal::picsPathChanged);
 
     refreshIndex();
@@ -127,6 +128,6 @@ QImage CardPictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
 
 void CardPictureLoaderLocal::picsPathChanged()
 {
-    picsPath = SettingsCache::instance().getPicsPath();
-    customPicsPath = SettingsCache::instance().getCustomPicsPath();
+    picsPath = SettingsCache::instance().paths().getPicsPath();
+    customPicsPath = SettingsCache::instance().paths().getCustomPicsPath();
 }

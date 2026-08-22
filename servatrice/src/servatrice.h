@@ -20,6 +20,7 @@
 #ifndef SERVATRICE_H
 #define SERVATRICE_H
 
+#include <QDateTime>
 #include <QHostAddress>
 #include <QMetaType>
 #include <QMutex>
@@ -29,6 +30,8 @@
 #include <QSslKey>
 #include <QTcpServer>
 #include <QWebSocketServer>
+#include <libcockatrice/protocol/pb/response_report_stats.pb.h>
+#include <memory>
 #include <server.h>
 #include <utility>
 
@@ -158,6 +161,7 @@ private:
     Servatrice_IslServer *islServer;
     mutable QMutex loginMessageMutex;
     QString loginMessage;
+    mutable QMutex shutdownStateMutex;
     QString dbPrefix;
     QMap<QString, bool> serverRequiredFeatureList;
     QString officialWarnings;
@@ -171,6 +175,11 @@ private:
     int shutdownMinutes;
     int nextShutdownMessageMinutes;
     QTimer *shutdownTimer;
+
+    mutable QMutex reportStatsMutex;
+    QDateTime reportStatsTimestamp;
+    std::shared_ptr<const Response_ReportStats> reportStatsCache;
+    static constexpr int reportStatsCacheTtlSeconds = 60;
 
     mutable QMutex serverListMutex;
     QList<ServerProperties> serverList;
@@ -216,6 +225,8 @@ public:
         QMutexLocker locker(&loginMessageMutex);
         return loginMessage;
     }
+    SessionEvent *getLoginSessionEvent() const override;
+    SessionEvent *makeShutdownEvent() const;
     QString getRequiredFeatures() const override;
     QString getAuthenticationMethodString() const;
     QString getDBTypeString() const;
@@ -279,6 +290,11 @@ public:
     void addIslInterface(int _serverId, IslInterface *interface);
     void removeIslInterface(int _serverId);
     QReadWriteLock islLock;
+
+    // The moderation queue statistics are shared between all connected moderators and
+    // cached briefly to avoid re-running several full-table queries on every refresh.
+    std::shared_ptr<const Response_ReportStats> getCachedReportStats() const;
+    void cacheReportStats(const Response_ReportStats &stats);
 
     QList<ServerProperties> getServerList() const;
 };

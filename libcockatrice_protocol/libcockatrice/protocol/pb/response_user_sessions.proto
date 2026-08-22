@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "response.proto";
+import "serverinfo_user_session.proto";
+
+message Response_UserSessions {
+    extend Response {
+        optional Response_UserSessions ext = 1215;
+    }
+    repeated ServerInfo_UserSession sessions = 1;
+}

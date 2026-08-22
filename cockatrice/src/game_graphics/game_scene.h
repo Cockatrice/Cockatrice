@@ -4,13 +4,14 @@
 #include "../game/arrow_registry.h"
 #include "../game/board/arrow_data.h"
 #include "../game/zones/card_zone_logic.h"
+#include "animated_item.h"
 #include "board/arrow_item.h"
 
 #include <QGraphicsScene>
+#include <QHash>
 #include <QList>
 #include <QLoggingCategory>
 #include <QPointer>
-#include <QSet>
 
 inline Q_LOGGING_CATEGORY(GameSceneLog, "game_scene");
 inline Q_LOGGING_CATEGORY(GameScenePlayerAdditionRemovalLog, "game_scene.player_addition_removal");
@@ -24,6 +25,7 @@ class CardItem;
 class ServerInfo_Card;
 class PhasesToolbar;
 class QBasicTimer;
+class QObject;
 
 /**
  * @class GameScene
@@ -50,9 +52,11 @@ private:
     QList<ZoneViewWidget *> zoneViews;                  ///< Active zone view widgets
     QSize viewSize;                                     ///< Current view size
     QPointer<CardItem> hoveredCard;                     ///< Currently hovered card
-    QBasicTimer *animationTimer;                        ///< Timer for card animations
-    QSet<CardItem *> cardsToAnimate;                    ///< Cards currently animating
+    QBasicTimer *animationTimer;                        ///< Timer for scene animations
+    QHash<QObject *, IAnimatedItem *> animatedItems;    ///< Items currently animating
     int playerRotation;                                 ///< Rotation offset for player layout
+    bool rearranging = false;                           ///< Guard against re-entrant rearrange
+    bool needsReArrange = false;                        ///< Pending rearrange requested during a pass
 
     /**
      * @brief Updates which card is currently hovered based on scene coordinates.
@@ -182,14 +186,23 @@ public:
     /** @brief Updates hovered card highlighting. */
     void updateHoveredCard(CardItem *newCard);
 
-    /** @brief Registers a card for animation updates. */
-    void registerAnimationItem(AbstractCardItem *card);
+    /**
+     * @brief Registers an item for animation updates with the shared scene timer.
+     *
+     * The item must inherit QObject; it is unregistered automatically when it is
+     * destroyed, so it may be deleted mid-animation without a dangling pointer.
+     */
+    void registerAnimationItem(IAnimatedItem *item);
 
-    /** @brief Unregisters a card from animation updates. */
-    void unregisterAnimationItem(AbstractCardItem *card);
+    /** @brief Unregisters an item from animation updates. */
+    void unregisterAnimationItem(IAnimatedItem *item);
     void startRubberBand(const QPointF &selectionOrigin);
     void resizeRubberBand(const QPointF &cursorPoint, int selectedCount);
     void stopRubberBand();
+
+private slots:
+    /** @brief Removes a destroyed item from the animation set. */
+    void removeAnimatedItem(QObject *item);
 
 public slots:
     void onCardSelectionChanged(AbstractCardItem *card, bool selected);

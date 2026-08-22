@@ -31,8 +31,22 @@ QRectF StackZone::boundingRect() const
 
 void StackZone::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, getLogic()->getPlayer()->getZoneId());
-    painter->fillRect(boundingRect(), brush);
+    if (playmatActive) {
+        // Subtle overlay to distinguish stack zone from table zone (slightly darker)
+        painter->fillRect(boundingRect(), QColor(0, 0, 0, 80));
+    } else {
+        QBrush brush = themeManager->getExtraBgBrush(ThemeManager::Stack, getLogic()->getPlayer()->getZoneId());
+        painter->fillRect(boundingRect(), brush);
+    }
+}
+
+void StackZone::onPlaymatChanged(bool active)
+{
+    playmatActive = active;
+    // See TableZone::onPlaymatChanged for the rationale. Translucent overlay
+    // over a dynamic playmat should not be held in the device cache.
+    setCacheMode(active ? QGraphicsItem::NoCache : QGraphicsItem::DeviceCoordinateCache);
+    update();
 }
 
 void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
@@ -43,12 +57,18 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
         return;
     }
 
-    int index = calcDropIndexFromY(dropPoint.y(), MIN_CARD_VISIBLE);
-
-    // Same-zone no-op: don't move a card onto itself
     const auto &cards = getLogic()->getCards();
-    if (!cards.isEmpty() && startZone == getLogic() && cards.at(index)->getId() == dragItems.at(0)->getId()) {
-        return;
+    int index;
+    if (startZone == getLogic()) {
+        // Reordering within the zone: use drop position
+        index = calcDropIndexFromY(dropPoint.y(), MIN_CARD_VISIBLE);
+        // Same-zone no-op: don't move a card onto itself
+        if (!cards.isEmpty() && cards.at(index)->getId() == dragItems.at(0)->getId()) {
+            return;
+        }
+    } else {
+        // Coming from another zone: append at end (top of stack, rendered on top)
+        index = static_cast<int>(cards.size());
     }
 
     Command_MoveCard cmd;

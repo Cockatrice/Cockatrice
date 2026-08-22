@@ -2,11 +2,13 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcut_treeview.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 #include "../interface/widgets/utility/sequence_edit.h"
 
 #include <QAbstractItemView>
 #include <QMessageBox>
+#include <libcockatrice/settings/personal_settings.h>
 
 ShortcutSettingsPage::ShortcutSettingsPage()
 {
@@ -78,7 +80,8 @@ ShortcutSettingsPage::ShortcutSettingsPage()
 
     connect(shortcutsTable, &ShortcutTreeView::currentItemChanged, this, &ShortcutSettingsPage::currentItemChanged);
 
-    connect(&SettingsCache::instance(), &SettingsCache::langChanged, this, &ShortcutSettingsPage::retranslateUi);
+    connect(&SettingsCache::instance().personal(), &PersonalSettings::langChanged, this,
+            &ShortcutSettingsPage::retranslateUi);
     retranslateUi();
 }
 
@@ -120,6 +123,7 @@ void ShortcutSettingsPage::retranslateUi()
     currentActionGroupLabel->setText(tr("Section:"));
     currentActionLabel->setText(tr("Action:"));
     currentShortcutLabel->setText(tr("Shortcut:"));
+    editShortcutGroupBox->setTitle(tr("Shortcut editor"));
     editTextBox->retranslateUi();
     faqLabel->setText(QString("<a href='%1'>%2</a>").arg(WIKI_CUSTOM_SHORTCUTS).arg(tr("How to set custom shortcuts")));
     btnResetAll->setText(tr("Restore all default shortcuts"));

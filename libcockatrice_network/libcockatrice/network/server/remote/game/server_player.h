@@ -62,6 +62,8 @@ public:
     cmdSetActivePhase(const Command_SetActivePhase &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     Response::ResponseCode
     cmdReverseTurn(const Command_ReverseTurn & /*cmd*/, ResponseContainer & /*rc*/, GameEventStorage &ges) override;
+    Response::ResponseCode
+    cmdSetPlaymat(const Command_SetPlaymat &cmd, ResponseContainer &rc, GameEventStorage &ges) override;
     Response::ResponseCode cmdChangeZoneProperties(const Command_ChangeZoneProperties &cmd,
                                                    ResponseContainer &rc,
                                                    GameEventStorage &ges) override;

@@ -24,6 +24,7 @@ private slots:
 
     void cardViewInitialRowsMaxChanged(int value);
     void cardViewExpandedRowsMaxChanged(int value);
+    void openPlaymatCollectionDialog();
 
 private:
     QLabel themeLabel;
@@ -31,6 +32,8 @@ private:
     QPushButton openThemeButton;
     QLabel schemeComboLabel;
     QComboBox schemeCombo;
+    QLabel styleComboLabel;
+    QComboBox styleCombo;
     QPushButton editPaletteButton;
     QLabel homeTabBackgroundSourceLabel;
     QComboBox homeTabBackgroundSourceBox;
@@ -38,10 +41,10 @@ private:
     QSpinBox homeTabBackgroundShuffleFrequencySpinBox;
     QCheckBox homeTabDisplayCardNameCheckBox;
     QCheckBox styleUserListCheckBox;
-    QLabel minPlayersForMultiColumnLayoutLabel;
-    QLabel maxFontSizeForCardsLabel;
     QCheckBox showShortcutsCheckBox;
     QCheckBox showGameSelectorFilterToolbarCheckBox;
+    QLabel minPlayersForMultiColumnLayoutLabel;
+    QLabel maxFontSizeForCardsLabel;
     QCheckBox overrideAllCardArtWithPersonalPreferenceCheckBox;
     QCheckBox bumpSetsWithCardsInDeckToTopCheckBox;
     QCheckBox displayCardNamesCheckBox;
@@ -57,6 +60,12 @@ private:
     QCheckBox horizontalHandCheckBox;
     QCheckBox leftJustifiedHandCheckBox;
     QCheckBox invertVerticalCoordinateCheckBox;
+    QLabel playmatVisibilityLabel;
+    QComboBox playmatVisibilityCombo;
+    QLabel playmatModeLabel;
+    QComboBox playmatModeCombo;
+    QLabel playmatDefaultLabel;
+    QPushButton playmatDefaultEditButton;
     QGroupBox *themeGroupBox;
     QGroupBox *homeTabGroupBox;
     QGroupBox *stylingGroupBox;
@@ -65,6 +74,7 @@ private:
     QGroupBox *cardsGroupBox;
     QGroupBox *cardLayoutGroupBox;
     QGroupBox *handGroupBox;
+    QGroupBox *playmatGroupBox;
     QGroupBox *tableGroupBox;
     QGroupBox *cardCountersGroupBox;
     QList<QLabel *> cardCounterNames;

@@ -7,6 +7,7 @@
 
 #include <QAction>
 #include <QFileInfo>
+#include <libcockatrice/settings/paths_settings.h>
 
 /**
  * @brief Constructs a PrintingSelectorCardSearchWidget for searching cards by set name or set code.
@@ -60,7 +61,7 @@ QString VisualDeckStorageSearchWidget::getSearchText()
  */
 static QString toRelativeFilepath(const QString &filePath)
 {
-    QString deckPath = SettingsCache::instance().getDeckPath();
+    QString deckPath = SettingsCache::instance().paths().getDeckPath();
     if (filePath.startsWith(deckPath)) {
         return filePath.mid(deckPath.length());
     }
@@ -72,10 +73,14 @@ static QString toRelativeFilepath(const QString &filePath)
 
 void VisualDeckStorageSearchWidget::filterWidgets(QList<DeckPreviewWidget *> widgets, const QString &searchText)
 {
-    auto filterString = DeckFilterString(searchText);
+    const auto filterString = DeckFilterString(searchText);
 
     for (auto widget : widgets) {
-        QString relativeFilePath = toRelativeFilepath(widget->filePath);
-        widget->filteredBySearch = !filterString.check(widget, {relativeFilePath});
+        const DeckSearchData searchData{.deck = &widget->deckLoader->getDeck(),
+                                        .filePath = widget->filePath,
+                                        .displayName = widget->getDisplayName(),
+                                        .relativeFilePath = toRelativeFilepath(widget->filePath)};
+
+        widget->filteredBySearch = !filterString.check(searchData);
     }
 }

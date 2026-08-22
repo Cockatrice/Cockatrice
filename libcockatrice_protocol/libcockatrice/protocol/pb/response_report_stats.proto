@@ -1,0 +1,36 @@
+syntax = "proto2";
+import "response.proto";
+
+message Response_ReportStats {
+    extend Response {
+        optional Response_ReportStats ext = 1212;
+    }
+
+    optional int32 total_reports = 1;
+    optional int32 total_pending = 2;
+    optional int32 total_assigned = 3;
+    optional int32 total_resolved = 4;
+
+    optional int32 reports_last_24h = 5;
+    optional int32 reports_last_7d = 6;
+    optional int32 reports_last_30d = 7;
+
+    optional double avg_resolution_hours = 8;
+
+    optional int32 reports_this_week = 9;
+    optional int32 reports_last_week = 10;
+
+    repeated ReportCategoryCount category_counts = 11;
+    repeated ReportTopUser top_reported_users = 12;
+    repeated ReportTopUser top_reporters = 13;
+}
+
+message ReportCategoryCount {
+    optional string category = 1;
+    optional int32 count = 2;
+}
+
+message ReportTopUser {
+    optional string user_name = 1;
+    optional int32 count = 2;
+}

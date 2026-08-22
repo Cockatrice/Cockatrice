@@ -35,6 +35,13 @@ protected:
     bool hovered = false;
     bool useNameForShortcut;
 
+    /**
+     * @brief Hook for subclasses that need per-value-change feedback (e.g. life-total flash).
+     *
+     * Called whenever the counter's value changes, before the item repaints.
+     */
+    virtual void onValueChanged(int oldValue, int newValue);
+
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;

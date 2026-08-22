@@ -64,10 +64,11 @@ if(WIN32 OR USE_VCPKG)
   else()
     set(QTDIR
         ""
-        CACHE PATH "Path to Qt (e.g. C:/Qt/5.7/msvc2015_64)"
+        CACHE PATH "Path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
     )
     message(
-      WARNING "QTDIR variable is missing.  Please set this variable to specify path to Qt (e.g. C:/Qt/5.7/msvc2015_64)"
+      WARNING
+        "QTDIR variable is missing.  Please set this variable to specify path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
     )
   endif()
 endif()
@@ -174,7 +175,7 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
       -Wno-error=delete-non-virtual-dtor
       -Wno-error=sign-compare
       -Wno-error=missing-declarations
-      -Wno-error=sfinae-incomplete  # GCC 16+: Qt MOC + protobuf forward decls trigger this
+      -Wno-error=sfinae-incomplete # GCC 16+: Qt MOC + protobuf forward decls trigger this
   )
 
   foreach(FLAG ${ADDITIONAL_DEBUG_FLAGS})
@@ -280,11 +281,7 @@ if(UNIX)
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
-      if(Qt6_FOUND)
-        set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
-      elseif(Qt5_FOUND)
-        set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt5-qttools, qt5-qtsvg, qt5-qtmultimedia")
-      endif()
+      set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
       set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
       # stop directories from making package conflicts
@@ -302,12 +299,8 @@ if(UNIX)
       set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
       set(CPACK_DEBIAN_PACKAGE_SECTION "games")
       set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
-      if(Qt6_FOUND)
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
-        set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
-      elseif(Qt5_FOUND)
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt5multimedia5-plugins, libqt5svg5")
-      endif()
+      set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
+      set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
     endif()
   endif()
 elseif(WIN32)

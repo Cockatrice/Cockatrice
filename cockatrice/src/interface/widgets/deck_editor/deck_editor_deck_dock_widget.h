@@ -20,7 +20,9 @@
 #include <QTextEdit>
 #include <QTreeView>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/deck_list/deck_list.h>
 
+class CommanderBracketWidget;
 class DeckListModel;
 class AbstractTabDeckEditor;
 class DeckEditorDeckDockWidget : public QDockWidget
@@ -32,6 +34,8 @@ public:
     DeckListStyleProxy *proxy;
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
+    QLabel *playmatLabel;
+    QPushButton *playmatSettingsButton;
     void createDeckDock();
     ExactCard getCurrentCard();
     void retranslateUi();
@@ -89,6 +93,8 @@ private:
 
     QAction *aRemoveCard, *aIncrement, *aDecrement, *aSwapCard;
 
+    CommanderBracketWidget *commanderBracketWidget;
+
     DeckListModel *getModel() const;
     [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;
     void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
@@ -99,6 +105,8 @@ private slots:
     void writeName();
     void writeComments();
     void writeBannerCard(int);
+    void openPlaymatSettings();
+    void updatePlaymatLabel();
     void applyActiveGroupCriteria();
     void setSelectedIndex(const QModelIndex &newCardIndex, bool preserveWidgetFocus);
     void updateHash();

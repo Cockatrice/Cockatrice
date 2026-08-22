@@ -79,8 +79,10 @@ requiredfeatures=""
 
 ; You can define custom warnings that users are sent when the moderation staff uses the right client warn user
 ; menu option.  This list is comma seperated that each item will appear in the drop down list for staff members
-; to choose from.  Example: "Flaming,Foul Language"
-officialwarnings="Flaming,Spamming,Causing Drama,Abusive Language"
+; to choose from.  Each entry may optionally carry a recommended starting intervention level (see the moderator
+; guide) by appending "|" and the level number.  Entries without an explicit level default to intervention
+; level 1.  Example: "Flaming,Foul Language"
+officialwarnings="Abusive Language|1,Calling Out User|1,Causing Drama|1,Cheating|2,Disrespecting Staff|1,Disrupting a Draft|1,Inappropriate Avatar|3,Inappropriate Game Name|1,Kicking Without Valid Reason|1,Spamming|1,Targeted Harassment|2"
 
 ; Maximum time in seconds a player can stay connected but idle.  Default is 3600 (0 = disabled)
 ; Clients will be notified at the 90% time period of pending disconnection if they do not take action.
@@ -372,6 +374,13 @@ command_counting_interval=10
 
 ; Maximum number of game commands in an interval before new commands gets dropped; default is 20
 max_command_count_per_interval=20
+
+[reporting]
+; Maximum number of user reports a single user can file per day; default is 10; set to 0 to disable the limit
+max_reports_per_day=10
+
+; Maximum number of report comments a single user can post per hour; default is 30; set to 0 to disable the limit
+max_comments_per_hour=30
 
 [logging]
 ; Admin/Moderators can query the stored logs for information when looking up reports by various players. This

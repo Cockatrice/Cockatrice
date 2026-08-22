@@ -18,7 +18,7 @@
 #include <QMap>
 #include <QVector>
 #include <QtCore/QXmlStreamReader>
-#include <libcockatrice/utility/card_ref.h>
+#include <libcockatrice/utility/playmat_params.h>
 
 class AbstractDecklistNode;
 class DecklistCardNode;
@@ -70,6 +70,7 @@ public:
         CardRef bannerCard;          ///< Optional representative card for the deck.
         QStringList tags;            ///< User-defined tags for deck classification.
         QString lastLoadedTimestamp; ///< Timestamp string of last load.
+        PlaymatInfo playmat;         ///< Optional playmat background for table+stack zones.
 
         /**
          * @brief Checks if all values (except for lastLoadedTimestamp) in the metadata is empty.
@@ -114,6 +115,10 @@ public:
     void setBannerCard(const CardRef &_bannerCard = {})
     {
         metadata.bannerCard = _bannerCard;
+    }
+    void setPlaymat(const PlaymatInfo &_playmat = {})
+    {
+        metadata.playmat = _playmat;
     }
     void setLastLoadedTimestamp(const QString &_lastLoadedTimestamp = QString())
     {
@@ -169,6 +174,10 @@ public:
     CardRef getBannerCard() const
     {
         return metadata.bannerCard;
+    }
+    PlaymatInfo getPlaymat() const
+    {
+        return metadata.playmat;
     }
     QString getLastLoadedTimestamp() const
     {

@@ -5,6 +5,7 @@ message AdminCommand {
         SHUTDOWN_SERVER = 1001;
         RELOAD_CONFIG = 1002;
         ADJUST_MOD = 1003;
+        RESET_USER_PASSWORD = 1016;
     }
     extensions 100 to max;
 }
@@ -36,4 +37,11 @@ message Command_AdjustMod {
     required string user_name = 1;
     optional bool should_be_mod = 2;
     optional bool should_be_judge = 3;
+}
+
+message Command_ResetUserPassword {
+    extend AdminCommand {
+        optional Command_ResetUserPassword ext = 1016;
+    }
+    optional string user_name = 1;
 }

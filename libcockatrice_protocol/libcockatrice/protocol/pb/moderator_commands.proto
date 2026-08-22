@@ -14,6 +14,17 @@ message ModeratorCommand {
         ADD_CARD_ART_RULE = 1010;
         REMOVE_CARD_ART_RULE = 1011;
         LIST_CARD_ART_RULES = 1012;
+        GET_USER_SESSIONS = 1013;
+        GET_USER_ALTS = 1014;
+        GET_MODERATOR_LAST_LOGINS = 1015;
+        RESET_USER_PASSWORD = 1016;
+        REMOVE_USER_AVATAR = 1017;
+        REPORT_LIST = 1200;
+        REPORT_ASSIGN = 1201;
+        REPORT_RESOLVE = 1202;
+        REPLAY_DOWNLOAD_BY_GAME_ID = 1203;
+        REPORT_USER_INFO = 1204;
+        REPORT_STATS = 1205;
     }
     extensions 100 to max;
 }
@@ -134,4 +145,32 @@ message Command_ListCardArtRules {
     extend ModeratorCommand {
         optional Command_ListCardArtRules ext = 1012;
     }
+}
+
+message Command_GetUserSessions {
+    extend ModeratorCommand {
+        optional Command_GetUserSessions ext = 1013;
+    }
+    optional string user_name = 1;
+    optional uint32 limit = 2 [default = 110];
+}
+
+message Command_GetUserAlts {
+    extend ModeratorCommand {
+        optional Command_GetUserAlts ext = 1014;
+    }
+    optional string user_name = 1;
+}
+
+message Command_GetModeratorLastLogins {
+    extend ModeratorCommand {
+        optional Command_GetModeratorLastLogins ext = 1015;
+    }
+}
+
+message Command_RemoveUserAvatar {
+    extend ModeratorCommand {
+        optional Command_RemoveUserAvatar ext = 1017;
+    }
+    optional string user_name = 1;
 }

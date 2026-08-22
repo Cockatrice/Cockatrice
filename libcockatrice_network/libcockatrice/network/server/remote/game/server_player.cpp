@@ -27,6 +27,7 @@
 #include <libcockatrice/protocol/pb/command_mulligan.pb.h>
 #include <libcockatrice/protocol/pb/command_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/command_set_counter.pb.h>
+#include <libcockatrice/protocol/pb/command_set_playmat.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_lock.pb.h>
 #include <libcockatrice/protocol/pb/command_set_sideboard_plan.pb.h>
 #include <libcockatrice/protocol/pb/command_shuffle.pb.h>
@@ -47,7 +48,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/rng/rng_abstract.h>
 #include <libcockatrice/utility/color.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/zone_names.h>
 
 Server_Player::Server_Player(Server_Game *_game,
@@ -250,6 +251,14 @@ Server_Player::cmdDeckSelect(const Command_DeckSelect &cmd, ResponseContainer &r
     Event_PlayerPropertiesChanged event;
     event.mutable_player_properties()->set_sideboard_locked(true);
     event.mutable_player_properties()->set_deck_hash(deck->getDeckHash().toStdString());
+    const auto &playmat = deck->getPlaymat();
+    auto *playmatParams = event.mutable_player_properties()->mutable_playmat_params();
+    playmatParams->set_card_name(playmat.card.name.left(MAX_NAME_LENGTH).toStdString());
+    playmatParams->set_card_provider_id(playmat.card.providerId.left(MAX_NAME_LENGTH).toStdString());
+    playmatParams->set_margin_pct_l(playmat.params.marginPctL);
+    playmatParams->set_margin_pct_r(playmat.params.marginPctR);
+    playmatParams->set_vertical_offset(playmat.params.verticalOffset);
+    playmatParams->set_zoom(playmat.params.zoom);
     ges.enqueueGameEvent(event, playerId);
 
     Context_DeckSelect context;
@@ -592,6 +601,46 @@ Server_Player::cmdReverseTurn(const Command_ReverseTurn &cmd, ResponseContainer 
         return Response::RespContextError;
     }
     return Server_AbstractParticipant::cmdReverseTurn(cmd, rc, ges);
+}
+
+Response::ResponseCode
+Server_Player::cmdSetPlaymat(const Command_SetPlaymat &cmd, ResponseContainer &rc, GameEventStorage &ges)
+{
+    Q_UNUSED(rc);
+
+    if (!deck) {
+        return Response::RespContextError;
+    }
+
+    const auto &pp = cmd.playmat_params();
+    const auto rawName = QString::fromStdString(pp.card_name());
+    const auto rawProviderId = QString::fromStdString(pp.card_provider_id());
+    if (rawName.length() > MAX_NAME_LENGTH || rawProviderId.length() > MAX_NAME_LENGTH) {
+        return Response::RespInvalidData;
+    }
+    PlaymatInfo playmat;
+    playmat.card.name = rawName;
+    playmat.card.providerId = rawProviderId;
+    playmat.params.marginPctL = qBound(0.0, pp.margin_pct_l(), 0.95);
+    playmat.params.marginPctR = qBound(0.0, pp.margin_pct_r(), 0.95);
+    playmat.params.verticalOffset = qBound(0.0, pp.vertical_offset(), 1.0);
+    playmat.params.zoom = qBound(0.1, pp.zoom(), 4.0);
+    deck->setPlaymat(playmat);
+
+    Event_PlayerPropertiesChanged event;
+    auto *props = event.mutable_player_properties();
+    props->set_sideboard_locked(sideboardLocked);
+    props->set_deck_hash(deck->getDeckHash().toStdString());
+    auto *playmatParams = props->mutable_playmat_params();
+    playmatParams->set_card_name(playmat.card.name.toStdString());
+    playmatParams->set_card_provider_id(playmat.card.providerId.toStdString());
+    playmatParams->set_margin_pct_l(playmat.params.marginPctL);
+    playmatParams->set_margin_pct_r(playmat.params.marginPctR);
+    playmatParams->set_vertical_offset(playmat.params.verticalOffset);
+    playmatParams->set_zoom(playmat.params.zoom);
+    ges.enqueueGameEvent(event, playerId);
+
+    return Response::RespOk;
 }
 
 void Server_Player::getInfo(ServerInfo_Player *info,

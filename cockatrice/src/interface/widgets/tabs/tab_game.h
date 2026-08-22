@@ -13,12 +13,13 @@
 #include "../game/player/player_logic.h"
 #include "../game_graphics/log/message_log_widget.h"
 #include "../interface/widgets/menus/tearoff_menu.h"
-#include "../interface/widgets/replay/replay_manager.h"
+#include "../interface/widgets/replay/replay_widget.h"
 #include "tab.h"
 
 #include <QCompleter>
 #include <QLoggingCategory>
 #include <QMap>
+#include <QStringListModel>
 
 class CardMenu;
 class ServerInfo_PlayerProperties;
@@ -31,11 +32,12 @@ class AbstractClient;
 class CardDatabase;
 class GameView;
 class GameScene;
-class ReplayManager;
+class ReplayWidget;
 class CardInfoFrameWidget;
 class QTimer;
 class QSplitter;
 class QLabel;
+class QPushButton;
 class QToolButton;
 class QMenu;
 class ZoneViewLayout;
@@ -59,14 +61,16 @@ class TabGame : public Tab
 private:
     AbstractGame *game;
     const UserListProxy *userListProxy;
-    ReplayManager *replayManager = nullptr;
+    ReplayWidget *replayWidget = nullptr;
     QStringList gameTypes;
-    QCompleter *completer;
+    QCompleter *mentionCompleter;
+    QStringListModel *mentionModel;
     QStringList autocompleteUserList;
     QStackedWidget *mainWidget;
 
     CardInfoFrameWidget *cardInfoFrameWidget;
     PlayerListWidget *playerListWidget;
+    QPushButton *inviteButton = nullptr;
     QLabel *timeElapsedLabel;
     MessageLogWidget *messageLog;
     QLabel *sayLabel;
@@ -81,9 +85,10 @@ private:
     QAction *playersSeparator;
     QMenu *gameMenu, *viewMenu;
     TearOffMenu *phasesMenu;
-    QAction *aGameInfo, *aConcede, *aLeaveGame, *aNextPhase, *aNextPhaseAction, *aNextTurn, *aReverseTurn,
-        *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
+    QAction *aGameInfo, *aConcede, *aCopyGameLink, *aLeaveGame, *aNextPhase, *aNextPhaseAction, *aNextTurn,
+        *aReverseTurn, *aRemoveLocalArrows, *aRotateViewCW, *aRotateViewCCW, *aResetLayout, *aResetReplayLayout;
     QAction *aFocusChat;
+    QAction *aInviteToGame = nullptr;
     QList<QAction *> phaseActions;
     QAction *aCardMenu;
 
@@ -126,6 +131,7 @@ private:
     void createPlayAreaWidget(bool bReplay = false);
     void createDeckViewContainerWidget(bool bReplay = false);
     void createReplayDock(GameReplay *replay);
+    void updateInviteButtonState();
 signals:
     void gameClosing(TabGame *tab);
     void containerProcessingStarted(const GameEventContext &context);
@@ -145,7 +151,9 @@ private slots:
     void setCardMenu(CardMenu *menu);
 
     void actGameInfo();
+    void actInviteToGame();
     void actConcede();
+    void actCopyGameLink();
     void actRemoveLocalArrows();
     void actRotateViewCW();
     void actRotateViewCCW();

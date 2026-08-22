@@ -7,6 +7,7 @@
 #ifndef ABSTRACTCARDITEM_H
 #define ABSTRACTCARDITEM_H
 
+#include "../animated_item.h"
 #include "../card_dimensions.h"
 #include "arrow_target.h"
 #include "graphics_item_type.h"
@@ -16,7 +17,7 @@
 
 class PlayerLogic;
 
-class AbstractCardItem : public ArrowTarget
+class AbstractCardItem : public ArrowTarget, public IAnimatedItem
 {
     Q_OBJECT
 protected:
@@ -125,6 +126,9 @@ public:
     {
         emit deleteCardInfoPopup(cardRef.name);
     }
+
+    /** @brief Default: no per-tick animation. Subclasses override to animate. */
+    bool animationEvent() override;
 
 protected:
     void transformPainter(QPainter *painter, const QSizeF &translatedSize, int angle);

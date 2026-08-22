@@ -1,7 +1,8 @@
 #include "user_card_settings_dialog.h"
 
 #include "../../../card_picture_loader/card_picture_loader.h"
-#include "card/card_completer_proxy_model.h"
+#include "../../cards/art_crop_attribution.h"
+#include "../../utility/completer_utils.h"
 #include "card/card_search_model.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
@@ -38,6 +39,12 @@ void CardArtPreviewWidget::setPixmap(const QPixmap &pixmap)
 void CardArtPreviewWidget::setParams(const CardArtParams &p)
 {
     params = p;
+    update();
+}
+
+void CardArtPreviewWidget::setAttribution(const QString &attribution)
+{
+    attributionText = attribution;
     update();
 }
 
@@ -90,6 +97,8 @@ void CardArtPreviewWidget::paintEvent(QPaintEvent *)
     painter.setPen(QPen(QColor(70, 80, 95), 2));
     painter.setBrush(Qt::NoBrush);
     painter.drawEllipse(avatarRect.adjusted(-1, -1, 1, 1));
+
+    paintArtAttribution(painter, cardRect, attributionText);
 }
 
 UserCardArtSettingsDialog::UserCardArtSettingsDialog(const CardArtParams &initial, QWidget *parent)
@@ -133,29 +142,14 @@ void UserCardArtSettingsDialog::initializeSearchBar()
     cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
     cardDatabaseDisplayModel->setSourceModel(cardDatabaseModel);
-    searchModel = new CardSearchModel(cardDatabaseDisplayModel, this);
 
-    proxyModel = new CardCompleterProxyModel(this);
-    proxyModel->setSourceModel(searchModel);
-    proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    proxyModel->setFilterRole(Qt::DisplayRole);
-
-    completer = new QCompleter(proxyModel, this);
-    completer->setCompletionRole(Qt::DisplayRole);
-    completer->setCompletionMode(QCompleter::PopupCompletion);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setFilterMode(Qt::MatchContains);
-    completer->setMaxVisibleItems(15);
+    const CardCompleterSetup cardSetup = createCardCompleter(cardDatabaseDisplayModel, this, 15);
+    searchModel = cardSetup.searchModel;
+    proxyModel = cardSetup.proxyModel;
+    completer = cardSetup.completer;
     searchBar->setCompleter(completer);
 
-    connect(searchBar, &QLineEdit::textEdited, searchModel, &CardSearchModel::updateSearchResults);
-    connect(searchBar, &QLineEdit::textEdited, this, [this](const QString &text) {
-        const QString pattern = ".*" + QRegularExpression::escape(text) + ".*";
-        proxyModel->setFilterRegularExpression(QRegularExpression(pattern, QRegularExpression::CaseInsensitiveOption));
-        if (!text.isEmpty()) {
-            completer->complete();
-        }
-    });
+    connectCardCompleterSearch(searchBar, cardSetup);
 
     connect(completer, static_cast<void (QCompleter::*)(const QString &)>(&QCompleter::activated), this,
             [this](const QString &completion) {
@@ -327,6 +321,11 @@ void UserCardArtSettingsDialog::reloadPreview()
     currentPixmap = UserCardArtProvider::cropCardArt(fullRes);
     preview->setPixmap(currentPixmap);
     preview->setParams(currentParams);
+
+    // Only attribute the art once the new pixmap is actually displayed, so a
+    // cache miss (which keeps the previous pixmap on screen) doesn't pair the
+    // new card's attribution with the old card's art.
+    preview->setAttribution(buildArtAttribution(card));
 }
 
 void UserCardArtSettingsDialog::onParamChanged()

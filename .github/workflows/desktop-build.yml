@@ -3,7 +3,7 @@ name: Build Desktop
 permissions:
   actions: write    # needed to delete entries in GHA cache (update ccache)
   attestations: write    # needed to persist the attestation.
-  contents: write
+  contents: write    # needed for e.g. vcpkg dependency graph updates
   id-token: write    # needed for signing certificate in attestation
 
 on:
@@ -42,7 +42,7 @@ concurrency:
 jobs:
   configure:
     name: Configure
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-slim    # https://github.com/actions/runner-images/blob/main/images/ubuntu-slim/ubuntu-slim-Readme.md
     outputs:
       tag: ${{ steps.configure.outputs.tag }}
       sha: ${{ steps.configure.outputs.sha }}
@@ -146,7 +146,7 @@ jobs:
 
     name: ${{ matrix.distro }} ${{ matrix.version }}
     needs: configure
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest    # https://github.com/actions/runner-images
     continue-on-error: ${{ matrix.allow-failure == 'yes' }}
     timeout-minutes: 70
     env:
@@ -262,84 +262,80 @@ jobs:
       matrix:
         include:
           - os: macOS
-            target: 13
-            runner: macos-15-intel
+            target: 13    # EOL 2025-09-15
+            runner: macos-15-intel    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
             override_target: 13
             package_suffix: "-macOS13_Intel"
-            qt_arch: clang_64
             qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools qttranslations
             qt_modules: qtwebsockets
-            qt_version: 6.11.0
+            qt_version: 6.11.1
             soc: Intel
             type: Release
             use_ccache: 1
-            xcode: "16.4"
+            xcode: "26.3"
 
           - os: macOS
-            target: 14
-            runner: macos-14
+            target: 14    # EOL 2026-??
+            runner: macos-15    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
+            override_target: 14
             package_suffix: "-macOS14"
-            qt_arch: clang_64
             qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools qttranslations
             qt_modules: qtwebsockets
-            qt_version: 6.11.0
+            qt_version: 6.11.1
             soc: Apple
             type: Release
             use_ccache: 1
-            xcode: "15.4"
+            xcode: "26.3"
 
           - os: macOS
             target: 15
-            runner: macos-15
+            runner: macos-15    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS15"
-            qt_arch: clang_64
             qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools qttranslations
             qt_modules: qtwebsockets
-            qt_version: 6.11.0
+            qt_version: 6.11.1
             soc: Apple
             type: Release
             use_ccache: 1
-            xcode: "16.4"
+            xcode: "26.3"
 
           - os: macOS
             target: 15
-            runner: macos-15
+            runner: macos-15    # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
-            qt_arch: clang_64
             qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools qttranslations
             qt_modules: qtwebsockets
-            qt_version: 6.11.0
+            qt_version: 6.11.1
             soc: Apple
             type: Debug
             use_ccache: 1
-            xcode: "16.4"
+            xcode: "26.3"
 
           - os: Windows
             target: 10
-            runner: windows-2025
+            runner: windows-2025    # https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-VS2026-Readme.md
 
             cmake_generator: "Visual Studio 18 2026"
             cmake_generator_platform: x64
             make_package: 1
             package_suffix: "-Win10"
-            qt_arch: win64_msvc2022_64
             qt_archives: qtbase qtimageformats qtmultimedia qtsvg qttools qttranslations
             qt_modules: qtwebsockets
-            qt_version: 6.11.0
+            qt_version: 6.11.1
             type: Release
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
@@ -403,7 +399,6 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
-          arch: ${{ matrix.qt_arch }}
           archives: ${{ matrix.qt_archives }}
           cache: false
           dir: ${{ github.workspace }}
@@ -427,7 +422,6 @@ jobs:
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
-          arch: ${{ matrix.qt_arch }}
           archives: ${{ matrix.qt_archives }}
           cache: true
           modules: ${{ matrix.qt_modules }}
@@ -454,6 +448,7 @@ jobs:
           CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
           CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
           DEVELOPER_DIR: '/Applications/Xcode_${{ matrix.xcode }}.app/Contents/Developer'
+          GITHUB_TOKEN: ${{ github.token }}    # needed for vcpkg dependency graph updates, see VCPKG_FEATURE_FLAGS
           MACOS_CERTIFICATE: ${{ secrets.PROD_MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.PROD_MACOS_CERTIFICATE_PWD }}
@@ -464,6 +459,7 @@ jobs:
           USE_CCACHE: ${{ matrix.use_ccache }}
           VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
           VCPKG_DISABLE_METRICS: 1
+          VCPKG_FEATURE_FLAGS: dependencygraph
         run: .ci/compile.sh --server --test --vcpkg
 
       # Delete used cache to emulate a ccache update. See https://github.com/actions/cache/issues/342

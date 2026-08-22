@@ -1,6 +1,7 @@
 #include "abstract_counter.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../client/settings/shortcuts_settings.h"
 #include "../../game/player/player_actions.h"
 #include "../../game/player/player_logic.h"
 #include "../../game_graphics/board/translate_counter_name.h"
@@ -28,8 +29,9 @@ AbstractCounter::AbstractCounter(CounterState *state,
 {
     setAcceptHoverEvents(true);
 
-    connect(state, &CounterState::valueChanged, this, [this](int, int newValue) {
+    connect(state, &CounterState::valueChanged, this, [this](int oldValue, int newValue) {
         value = newValue;
+        onValueChanged(oldValue, newValue);
         update();
     });
 
@@ -226,4 +228,10 @@ void AbstractCounterDialog::changeValue(int diff)
     }
     curValue += diff;
     setTextValue(QString::number(curValue));
+}
+
+void AbstractCounter::onValueChanged(int /*oldValue*/, int /*newValue*/)
+{
+    // Default: no feedback. Subclasses such as PlayerCounter override this to
+    // flash the counter on meaningful changes (life gain/loss).
 }

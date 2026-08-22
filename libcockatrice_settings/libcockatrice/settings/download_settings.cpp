@@ -3,6 +3,7 @@
 #include "settings_manager.h"
 
 const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {
+    "https://cards.scryfall.io/large/!prop:side!/!set:uuid_substr_0_1!/!set:uuid_substr_1_1!/!set:uuid!.jpg",
     "https://api.scryfall.com/cards/!set:uuid!?format=image&face=!prop:side!",
     "https://api.scryfall.com/cards/multiverse/!set:muid!?format=image",
     "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card",
@@ -26,4 +27,26 @@ QStringList DownloadSettings::getAllURLs() const
 void DownloadSettings::resetToDefaultURLs()
 {
     setValue(QVariant::fromValue(DEFAULT_DOWNLOAD_URLS), "urls");
+}
+
+bool DownloadSettings::getPicDownload() const
+{
+    return getValue("pictureDownload", QString(), QString(), true).toBool();
+}
+
+void DownloadSettings::setPicDownload(bool _picDownload)
+{
+    setValue(_picDownload, "pictureDownload");
+    emit picDownloadChanged();
+}
+
+bool DownloadSettings::getDownloadSpoilersStatus() const
+{
+    return getValue("downloadSpoilers", QString(), QString(), false).toBool();
+}
+
+void DownloadSettings::setDownloadSpoilerStatus(bool _spoilerStatus)
+{
+    setValue(_spoilerStatus, "downloadSpoilers");
+    emit downloadSpoilerStatusChanged();
 }

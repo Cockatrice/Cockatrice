@@ -1,6 +1,7 @@
 #include "tab_game.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../../client/settings/shortcuts_settings.h"
 #include "../game/game.h"
 #include "../game/player/player_logic.h"
 #include "../game/replay.h"
@@ -19,14 +20,23 @@
 #include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../interface/widgets/cards/card_info_frame_widget.h"
 #include "../interface/widgets/dialogs/dlg_create_game.h"
+#include "../interface/widgets/dialogs/dlg_invite_to_game.h"
+#include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_manager.h"
+#include "../interface/widgets/utility/completer_utils.h"
 #include "../interface/widgets/utility/line_edit_completer.h"
 #include "../interface/window_main.h"
 #include "../main.h"
 #include "../utility/visibility_change_listener.h"
+#include "card/card_completer_proxy_model.h"
+#include "card/card_search_model.h"
+#include "card_database_display_model.h"
+#include "card_database_model.h"
 #include "tab_supervisor.h"
 
 #include <QAction>
+#include <QApplication>
+#include <QClipboard>
 #include <QCompleter>
 #include <QDebug>
 #include <QDockWidget>
@@ -34,8 +44,12 @@
 #include <QLabel>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QRegularExpression>
 #include <QStackedWidget>
+#include <QStringListModel>
 #include <QTimer>
+#include <QVBoxLayout>
 #include <QWidget>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -44,7 +58,11 @@
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_player.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
-#include <libcockatrice/utility/trice_limits.h>
+#include <libcockatrice/settings/chat_settings.h>
+#include <libcockatrice/settings/debug_settings.h>
+#include <libcockatrice/settings/interface_settings.h>
+#include <libcockatrice/settings/layouts_settings.h>
+#include <libcockatrice/utility/string_limits.h>
 
 TabGame::TabGame(TabSupervisor *_tabSupervisor, GameReplay *_replay)
     : Tab(_tabSupervisor), sayLabel(nullptr), sayEdit(nullptr)
@@ -252,17 +270,14 @@ void TabGame::resetChatAndPhase()
 
 void TabGame::emitUserEvent()
 {
-    bool globalEvent =
-        !game->getPlayerManager()->isSpectator() || SettingsCache::instance().getSpectatorNotificationsEnabled();
+    bool globalEvent = !game->getPlayerManager()->isSpectator() ||
+                       SettingsCache::instance().userInterface().getSpectatorNotificationsEnabled();
     emit userEvent(globalEvent);
     updatePlayerListDockTitle();
 }
 
 TabGame::~TabGame()
 {
-    if (replayManager) {
-        delete replayManager->replay;
-    }
     for (auto &player : game->getPlayerManager()->getPlayers()) {
         player->clear();
     }
@@ -284,6 +299,9 @@ void TabGame::retranslateUi()
     QString tabText = " | " + type + " #" + QString::number(game->getGameMetaInfo()->gameId());
 
     updatePlayerListDockTitle();
+    if (inviteButton) {
+        inviteButton->setText(tr("Invite"));
+    }
     cardInfoDock->setWindowTitle(tr("Card Info") + (cardInfoDock->isWindow() ? tabText : QString()));
     messageLayoutDock->setWindowTitle(tr("Messages") + (messageLayoutDock->isWindow() ? tabText : QString()));
     if (replayDock) {
@@ -321,6 +339,12 @@ void TabGame::retranslateUi()
     }
     if (aGameInfo) {
         aGameInfo->setText(tr("Game &information"));
+    }
+    if (aCopyGameLink) {
+        aCopyGameLink->setText(tr("Cop&y game link"));
+    }
+    if (aInviteToGame) {
+        aInviteToGame->setText(tr("Invite to Game..."));
     }
     if (aConcede) {
         if (game->getPlayerManager()->isMainPlayerConceded()) {
@@ -489,6 +513,56 @@ void TabGame::actGameInfo()
     dlg.exec();
 }
 
+void TabGame::actCopyGameLink()
+{
+    const QString link =
+        makeGameJoinLink(tabSupervisor->getClient()->serverName(), tabSupervisor->getClient()->serverPort(),
+                         game->getGameMetaInfo()->proto().room_id(), game->getGameMetaInfo()->gameId(),
+                         QString::fromStdString(game->getGameMetaInfo()->proto().description()));
+    QApplication::clipboard()->setText(link);
+}
+
+void TabGame::updateInviteButtonState()
+{
+    // The dock button stays conservative (pre-start, not full); the menu action
+    // additionally covers started/full games, which are legitimate spectate
+    // invites, so it only needs the server-linked + not-closed conditions.
+    const bool canInvite = !tabSupervisor->getIsLocalGame() && !game->getGameState()->isGameClosed() &&
+                           !game->getGameMetaInfo()->started() &&
+                           game->getPlayerManager()->getPlayerCount() < game->getGameMetaInfo()->maxPlayers();
+    if (inviteButton) {
+        inviteButton->setVisible(canInvite);
+    }
+    if (aInviteToGame) {
+        aInviteToGame->setEnabled(!tabSupervisor->getIsLocalGame() && !game->getGameState()->isGameClosed());
+    }
+}
+
+void TabGame::actInviteToGame()
+{
+    if (!tabSupervisor || tabSupervisor->getIsLocalGame()) {
+        return;
+    }
+
+    GameMetaInfo *metaInfo = game->getGameMetaInfo();
+    const QString inviteUrl = makeGameJoinLink(
+        tabSupervisor->getClient()->serverName(), tabSupervisor->getClient()->serverPort(), metaInfo->proto().room_id(),
+        metaInfo->gameId(), QString::fromStdString(metaInfo->proto().description()));
+
+    QStringList excludeUserNames;
+    excludeUserNames << tabSupervisor->getUserListManager()->getOwnUsername();
+    for (auto player : game->getPlayerManager()->getPlayers()) {
+        excludeUserNames << player->getPlayerInfo()->getName();
+    }
+    for (auto it = game->getPlayerManager()->getSpectators().cbegin();
+         it != game->getPlayerManager()->getSpectators().cend(); ++it) {
+        excludeUserNames << QString::fromStdString(it.value().name());
+    }
+
+    DlgInviteToGame dlg(tabSupervisor, inviteUrl, metaInfo->proto().only_buddies(), excludeUserNames, this);
+    dlg.exec();
+}
+
 void TabGame::actConcede()
 {
     PlayerLogic *player = game->getPlayerManager()->getActiveLocalPlayer(game->getGameState()->getActivePlayer());
@@ -536,7 +610,8 @@ bool TabGame::leaveGame()
 
 void TabGame::actSay()
 {
-    if (completer->popup()->isVisible()) {
+    if (sayEdit->hasVisibleCompleterPopup()) {
+        sayEdit->hideCompleterPopups();
         return;
     }
 
@@ -556,14 +631,14 @@ void TabGame::addPlayerToAutoCompleteList(QString playerName)
 {
     if (sayEdit && !autocompleteUserList.contains(playerName)) {
         autocompleteUserList << playerName;
-        sayEdit->setCompletionList(autocompleteUserList);
+        mentionModel->setStringList(autocompleteUserList);
     }
 }
 
 void TabGame::removePlayerFromAutoCompleteList(QString playerName)
 {
     if (sayEdit && autocompleteUserList.removeOne(playerName)) {
-        sayEdit->setCompletionList(autocompleteUserList);
+        mentionModel->setStringList(autocompleteUserList);
     }
 }
 
@@ -626,8 +701,8 @@ void TabGame::actRotateViewCCW()
 
 void TabGame::actCompleterChanged()
 {
-    SettingsCache::instance().getChatMentionCompleter() ? completer->setCompletionRole(2)
-                                                        : completer->setCompletionRole(1);
+    SettingsCache::instance().chat().getChatMentionCompleter() ? mentionCompleter->setCompletionRole(2)
+                                                               : mentionCompleter->setCompletionRole(1);
 }
 
 void TabGame::notifyPlayerJoin(QString playerName)
@@ -836,6 +911,7 @@ void TabGame::stopGame()
     QMapIterator<int, TabbedDeckViewContainer *> i(deckViewContainers);
     while (i.hasNext()) {
         i.next();
+        i.value()->playerDeckView->advancePlaymatRotation();
         i.value()->show();
     }
 
@@ -976,6 +1052,11 @@ void TabGame::createMenuItems()
     connect(aRotateViewCCW, &QAction::triggered, this, &TabGame::actRotateViewCCW);
     aGameInfo = new QAction(this);
     connect(aGameInfo, &QAction::triggered, this, &TabGame::actGameInfo);
+    aCopyGameLink = new QAction(this);
+    aCopyGameLink->setEnabled(!tabSupervisor->getIsLocalGame() && !tabSupervisor->getClient()->serverName().isEmpty());
+    connect(aCopyGameLink, &QAction::triggered, this, &TabGame::actCopyGameLink);
+    aInviteToGame = new QAction(this);
+    connect(aInviteToGame, &QAction::triggered, this, &TabGame::actInviteToGame);
     aConcede = new QAction(this);
     connect(aConcede, &QAction::triggered, this, &TabGame::actConcede);
     if (!game->getGameMetaInfo()->started()) {
@@ -1014,6 +1095,8 @@ void TabGame::createMenuItems()
     gameMenu->addAction(aRotateViewCCW);
     gameMenu->addSeparator();
     gameMenu->addAction(aGameInfo);
+    gameMenu->addAction(aCopyGameLink);
+    gameMenu->addAction(aInviteToGame);
     gameMenu->addAction(aConcede);
     gameMenu->addAction(aFocusChat);
     gameMenu->addAction(aLeaveGame);
@@ -1021,6 +1104,9 @@ void TabGame::createMenuItems()
     gameMenu->addSeparator();
 
     aCardMenu = gameMenu->addMenu(new QMenu(this));
+
+    // Sync the new action with the same state the dock button already shows.
+    updateInviteButtonState();
 
     addTabMenu(gameMenu);
 }
@@ -1036,6 +1122,8 @@ void TabGame::createReplayMenuItems()
     aRotateViewCCW = nullptr;
     aResetLayout = nullptr;
     aGameInfo = nullptr;
+    aCopyGameLink = nullptr;
+    aInviteToGame = nullptr;
     aConcede = nullptr;
     aFocusChat = nullptr;
     aLeaveGame = new QAction(this);
@@ -1169,16 +1257,17 @@ void TabGame::createPlayAreaWidget(bool bReplay)
 
 void TabGame::createReplayDock(GameReplay *replay)
 {
-    replayManager = new ReplayManager(this, replay);
+    replayWidget = new ReplayWidget(this, replay);
 
     replayDock = new QDockWidget(this);
     replayDock->setObjectName("replayDock");
     replayDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
                             QDockWidget::DockWidgetMovable);
-    replayDock->setWidget(replayManager);
+    replayDock->setWidget(replayWidget);
     replayDock->setFloating(false);
 
-    connect(replayManager, &ReplayManager::eventReplayed, game->getGameEventHandler(),
+    connect(replayWidget, &ReplayWidget::rewound, this, &TabGame::resetChatAndPhase);
+    connect(replayWidget, &ReplayWidget::eventReplayed, game->getGameEventHandler(),
             [this](const auto &event, auto options) {
                 game->getGameEventHandler()->processGameEventContainer(event, nullptr, options);
             });
@@ -1233,11 +1322,29 @@ void TabGame::createPlayerListDock(bool bReplay)
     }
     playerListWidget->setFocusPolicy(Qt::NoFocus);
 
+    auto *playerListBox = new QWidget(this);
+    auto *vbox = new QVBoxLayout(playerListBox);
+    vbox->setContentsMargins(0, 0, 0, 0);
+    vbox->setSpacing(0);
+
+    vbox->addWidget(playerListWidget);
+
+    if (!bReplay) {
+        inviteButton = new QPushButton(tr("Invite"), playerListBox);
+        inviteButton->setVisible(false);
+        connect(inviteButton, &QPushButton::clicked, this, &TabGame::actInviteToGame);
+        vbox->addWidget(inviteButton);
+
+        connect(game->getGameMetaInfo(), &GameMetaInfo::startedChanged, this, &TabGame::updateInviteButtonState);
+        connect(game->getPlayerManager(), &PlayerManager::playerCountChanged, this, &TabGame::updateInviteButtonState);
+        updateInviteButtonState();
+    }
+
     playerListDock = new QDockWidget(this);
     playerListDock->setObjectName("playerListDock");
     playerListDock->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable |
                                 QDockWidget::DockWidgetMovable);
-    playerListDock->setWidget(playerListWidget);
+    playerListDock->setWidget(playerListBox);
     playerListDock->setFloating(false);
 }
 
@@ -1261,11 +1368,12 @@ void TabGame::createMessageDock(bool bReplay)
             qOverload<const QString &>(&CardInfoFrameWidget::setCard));
     connect(messageLog, &MessageLogWidget::showCardInfoPopup, this, &TabGame::showCardInfoPopup);
     connect(messageLog, &MessageLogWidget::deleteCardInfoPopup, this, &TabGame::deleteCardInfoPopup);
+    connect(messageLog, &MessageLogWidget::cockatriceLinkActivated, this, &TabGame::cockatriceLinkActivated);
 
     if (!bReplay) {
         connect(messageLog, &MessageLogWidget::openMessageDialog, this, &TabGame::openMessageDialog);
         connect(messageLog, &MessageLogWidget::addMentionTag, this, &TabGame::addMentionTag);
-        connect(&SettingsCache::instance(), &SettingsCache::chatMentionCompleterChanged, this,
+        connect(&SettingsCache::instance().chat(), &ChatSettings::chatMentionCompleterChanged, this,
                 &TabGame::actCompleterChanged);
     }
 
@@ -1278,12 +1386,25 @@ void TabGame::createMessageDock(bool bReplay)
         sayEdit->setMaxLength(MAX_TEXT_LENGTH);
         sayLabel->setBuddy(sayEdit);
         connect(this, &TabGame::chatMessageSent, game->getGameEventHandler(), &GameEventHandler::handleChatMessageSent);
-        completer = new QCompleter(autocompleteUserList, sayEdit);
-        completer->setCaseSensitivity(Qt::CaseInsensitive);
-        completer->setMaxVisibleItems(5);
-        completer->setFilterMode(Qt::MatchStartsWith);
+        mentionModel = new QStringListModel(autocompleteUserList, sayEdit);
+        mentionCompleter = createMentionCompleter(mentionModel, sayEdit);
+        sayEdit->addCompleter(mentionCompleter, CompleterTrigger::Mention);
 
-        sayEdit->setCompleter(completer);
+        auto *cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, sayEdit);
+        auto *displayModel = new CardDatabaseDisplayModel(sayEdit);
+        displayModel->setSourceModel(cardDatabaseModel);
+        const CardCompleterSetup cardSetup = createCardCompleter(displayModel, sayEdit);
+        sayEdit->addCompleter(cardSetup.completer, CompleterTrigger::Card);
+
+        connect(sayEdit, &LineEditCompleter::cardPartialChanged, this, [this, cardSetup](const QString &text) {
+            cardSetup.searchModel->updateSearchResults(text);
+            cardSetup.proxyModel->setFilterRegularExpression(
+                QRegularExpression(QRegularExpression::escape(text), QRegularExpression::CaseInsensitiveOption));
+            if (sayEdit->hasFocus()) {
+                cardSetup.completer->complete();
+            }
+        });
+
         actCompleterChanged();
 
         if (game->getPlayerManager()->isSpectator()) {

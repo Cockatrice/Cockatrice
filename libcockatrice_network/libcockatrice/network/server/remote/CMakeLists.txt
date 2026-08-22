@@ -10,6 +10,8 @@ set(HEADERS
     game/server_card.h
     game/server_cardzone.h
     game/server_counter.h
+    game/game_config.h
+    game/server_deck_validation_strategy.h
     game/server_game.h
     game/server_player.h
     game/server_spectator.h
@@ -23,11 +25,7 @@ set(HEADERS
     serverinfo_user_container.h
 )
 
-if(Qt6_FOUND)
-  qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
-elseif(Qt5_FOUND)
-  qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
-endif()
+qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
 
 add_library(
   libcockatrice_network_server_remote STATIC

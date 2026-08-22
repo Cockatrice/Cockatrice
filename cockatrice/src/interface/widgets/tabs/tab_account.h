@@ -18,6 +18,7 @@ class Event_RemoveFromList;
 class Event_UserJoined;
 class Event_UserLeft;
 class LineEditUnfocusable;
+class QPushButton;
 class Response;
 class ServerInfo_User;
 class UserInfoBox;
@@ -41,6 +42,7 @@ private slots:
     void processRemoveFromListEvent(const Event_RemoveFromList &event);
     void addToIgnoreList();
     void addToBuddyList();
+    void openMyReports();
 
 private:
     AbstractClient *client;
@@ -50,6 +52,7 @@ private:
     UserInfoBox *userInfoBox;
     LineEditUnfocusable *addBuddyEdit;
     LineEditUnfocusable *addIgnoreEdit;
+    QPushButton *myReportsButton;
     void addToList(const std::string &listName, const QString &userName);
 
 public:

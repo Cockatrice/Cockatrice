@@ -24,6 +24,7 @@ public:
 
     void setPixmap(const QPixmap &pixmap);
     void setParams(const CardArtParams &params);
+    void setAttribution(const QString &attribution);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -31,6 +32,7 @@ protected:
 private:
     QPixmap sourcePixmap;
     CardArtParams params;
+    QString attributionText;
 };
 
 class UserCardArtSettingsDialog : public QDialog

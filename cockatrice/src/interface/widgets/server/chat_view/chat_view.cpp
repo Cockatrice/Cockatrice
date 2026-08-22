@@ -13,7 +13,12 @@
 #include <QDesktopServices>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QTimer>
+#include <QUrl>
+#include <QUrlQuery>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/server/remote/user_level.h>
+#include <libcockatrice/settings/chat_settings.h>
 
 const QColor DEFAULT_MENTION_COLOR = QColor(194, 31, 47);
 
@@ -46,9 +51,12 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _sho
 
     viewport()->setCursor(Qt::IBeamCursor);
     setReadOnly(true);
-    setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
+    setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
     setOpenLinks(false);
     connect(this, &ChatView::anchorClicked, this, &ChatView::openLink);
+
+    connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &ChatView::onScrollBarRangeChanged);
+    connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &ChatView::onScrollBarValueChanged);
 }
 
 void ChatView::adjustColorsToPalette()
@@ -61,12 +69,14 @@ void ChatView::adjustColorsToPalette()
         serverMessageColor = QColor(0xFF, 0x73, 0x83);
         otherUserColor = otherUserColor.lighter(150);
         linkColor = QColor(71, 158, 252);
+        unresolvedCardTagColor = QColor(0xFF, 0xA5, 0x00);
     } else {
         document()->setDefaultStyleSheet(R"(
             a { text-decoration: none; color: blue; }
             .blue { color: blue }
         )");
         linkColor = palette().link().color();
+        unresolvedCardTagColor = QColor(0xA0, 0x52, 0x2D);
     }
 
     QTimer::singleShot(0, this, &ChatView::refreshBlockColors);
@@ -147,7 +157,7 @@ void ChatView::appendHtml(const QString &html)
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     prepareBlock().insertHtml(html);
     if (atBottom) {
-        verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+        scrollToBottom();
     }
 }
 
@@ -165,20 +175,29 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 
     prepareBlock().insertHtml(htmlText);
     if (atBottom) {
-        verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+        scrollToBottom();
     }
 }
 
 void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
 {
     QTextCharFormat oldFormat = cursor.charFormat();
-    QTextCharFormat anchorFormat = oldFormat;
-    anchorFormat.setForeground(linkColor);
-    anchorFormat.setAnchor(true);
-    anchorFormat.setAnchorHref("card://" + cardName);
-    anchorFormat.setFontItalic(true);
+    QTextCharFormat cardFormat = oldFormat;
+    cardFormat.setFontItalic(true);
 
-    cursor.setCharFormat(anchorFormat);
+    if (!CardDatabaseManager::query()->lookupCardByName(cardName)) {
+        cardFormat.setForeground(unresolvedCardTagColor);
+        cursor.setCharFormat(cardFormat);
+        cursor.insertText(cardName);
+        cursor.setCharFormat(oldFormat);
+        return;
+    }
+
+    cardFormat.setForeground(linkColor);
+    cardFormat.setAnchor(true);
+    cardFormat.setAnchorHref("card://" + cardName);
+
+    cursor.setCharFormat(cardFormat);
     cursor.insertText(cardName);
     cursor.setCharFormat(oldFormat);
 }
@@ -202,6 +221,46 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
     cursor.setCharFormat(oldFormat);
 }
 
+void ChatView::appendGameLinkTag(QTextCursor &cursor, const QString &url)
+{
+    const QUrl gameUrl(url);
+    const QUrlQuery query(gameUrl);
+    const QString hostname = query.queryItemValue("hostname");
+    // FullyDecoded undoes every %XX escape, so a description that itself
+    // contains "%" cannot end up displayed as "%25" in the label.
+    const QString description = query.queryItemValue("game", QUrl::FullyDecoded);
+    const int gameId = query.queryItemValue("gameid").toInt();
+
+    QString label;
+    if (gameId > 0 && !hostname.isEmpty()) {
+        // Links built before the description was embedded stay readable: the
+        // id + server fallback below is identical to the old anchor text.
+        if (!description.isEmpty()) {
+            // Multi-arg .arg() replaces all placeholders in a single pass, so a
+            // description containing "%…" cannot corrupt later placeholders.
+            label = tr("Join game \"%1\" (#%2) on %3").arg(description, QString::number(gameId), hostname);
+        } else {
+            label = tr("Join game #%1 on %2").arg(QString::number(gameId), hostname);
+        }
+    } else {
+        label = tr("Join game");
+    }
+
+    QTextCharFormat oldFormat = cursor.charFormat();
+    QTextCharFormat gameLinkFormat = oldFormat;
+    gameLinkFormat.setForeground(linkColor);
+    gameLinkFormat.setFontWeight(QFont::Bold);
+    gameLinkFormat.setAnchor(true);
+    gameLinkFormat.setAnchorHref(url);
+    QColor background = palette().highlight().color();
+    background.setAlpha(40);
+    gameLinkFormat.setBackground(background);
+
+    cursor.setCharFormat(gameLinkFormat);
+    cursor.insertText(label);
+    cursor.setCharFormat(oldFormat);
+}
+
 void ChatView::appendMessage(QString message,
                              RoomMessageTypeFlags messageType,
                              const ServerInfo_User &userInfo,
@@ -214,6 +273,14 @@ void ChatView::appendMessage(QString message,
     // messageType should be Event_RoomSay::UserMessage though we don't actually check
     bool isUserMessage = !(userName.toLower() == "servatrice" || userName.isEmpty());
     bool sameSender = isUserMessage && userName == lastSender;
+
+    if (isUserMessage) {
+        chatHistory.append({userName, message, QDateTime::currentDateTime()});
+        while (chatHistory.size() > MAX_CHAT_HISTORY) {
+            chatHistory.removeFirst();
+        }
+    }
+
     QTextCursor cursor = prepareBlock(sameSender);
     lastSender = userName;
 
@@ -292,8 +359,8 @@ void ChatView::appendMessage(QString message,
     }
     cursor.setCharFormat(defaultFormat);
 
-    bool mentionEnabled = SettingsCache::instance().getChatMention();
-    highlightedWords = SettingsCache::instance().getHighlightWords().split(' ', Qt::SkipEmptyParts);
+    bool mentionEnabled = SettingsCache::instance().chat().getChatMention();
+    highlightedWords = SettingsCache::instance().chat().getHighlightWords().split(' ', Qt::SkipEmptyParts);
 
     // parse the message
     while (message.size()) {
@@ -325,8 +392,33 @@ void ChatView::appendMessage(QString message,
         }
     }
 
-    if (atBottom) {
+    // ChatHistory messages are only ever sent once per room, right after joining, before the user can
+    // interact with the view. Always scroll to the bottom so the whole history is visible on join.
+    if (atBottom || messageType.testFlag(Event_RoomSay::ChatHistory)) {
+        scrollToBottom();
+    }
+}
+
+void ChatView::scrollToBottom()
+{
+    // The document layout, and therefore the scrollbar range, may be updated asynchronously (e.g. while
+    // the chat history is loaded into a view that has not been laid out yet). Setting the value once is
+    // not enough: keep stickToBottom set so any later range change scrolls to the new maximum as well.
+    stickToBottom = true;
+    verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+void ChatView::onScrollBarRangeChanged()
+{
+    if (stickToBottom) {
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+    }
+}
+
+void ChatView::onScrollBarValueChanged(int value)
+{
+    if (value < verticalScrollBar()->maximum()) {
+        stickToBottom = false;
     }
 }
 
@@ -395,8 +487,9 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString
                 // You have received a valid mention!!
                 soundEngine->playSound("chat_mention");
                 mentionFormat.setBackground(QBrush(getCustomMentionColor()));
-                mentionFormat.setForeground(SettingsCache::instance().getChatMentionForeground() ? QBrush(Qt::white)
-                                                                                                 : QBrush(Qt::black));
+                mentionFormat.setForeground(SettingsCache::instance().chat().getChatMentionForeground()
+                                                ? QBrush(Qt::white)
+                                                : QBrush(Qt::black));
                 cursor.insertText(mention, mentionFormat);
                 message = message.mid(mention.size());
                 showSystemPopup(userName);
@@ -417,8 +510,8 @@ void ChatView::checkMention(QTextCursor &cursor, QString &message, const QString
             // Moderator Sending Global Message
             soundEngine->playSound("all_mention");
             mentionFormat.setBackground(QBrush(getCustomMentionColor()));
-            mentionFormat.setForeground(SettingsCache::instance().getChatMentionForeground() ? QBrush(Qt::white)
-                                                                                             : QBrush(Qt::black));
+            mentionFormat.setForeground(
+                SettingsCache::instance().chat().getChatMentionForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
             cursor.insertText("@" + fullMentionUpToSpaceOrEnd, mentionFormat);
             message = message.mid(fullMentionUpToSpaceOrEnd.size() + 1);
             showSystemPopup(userName);
@@ -460,13 +553,24 @@ void ChatView::checkWord(QTextCursor &cursor, QString &message)
         }
     }
 
+    if (fullWordUpToSpaceOrEnd.startsWith("cockatrice://", Qt::CaseInsensitive)) {
+        // Only links to a game (cockatrice://joingame) become invite buttons;
+        // any other cockatrice:// scheme falls through to plain text below.
+        const QUrl gameLink(fullWordUpToSpaceOrEnd);
+        if (gameLink.host().compare("joingame", Qt::CaseInsensitive) == 0) {
+            appendGameLinkTag(cursor, fullWordUpToSpaceOrEnd);
+            cursor.insertText(rest, defaultFormat);
+            return;
+        }
+    }
+
     // check word mentions
     for (const QString &word : highlightedWords) {
         if (fullWordUpToSpaceOrEnd.compare(word, Qt::CaseInsensitive) == 0) {
             // You have received a valid mention of custom word!!
             highlightFormat.setBackground(QBrush(getCustomHighlightColor()));
-            highlightFormat.setForeground(SettingsCache::instance().getChatHighlightForeground() ? QBrush(Qt::white)
-                                                                                                 : QBrush(Qt::black));
+            highlightFormat.setForeground(
+                SettingsCache::instance().chat().getChatHighlightForeground() ? QBrush(Qt::white) : QBrush(Qt::black));
             cursor.insertText(fullWordUpToSpaceOrEnd, highlightFormat);
             cursor.insertText(rest, defaultFormat);
             QApplication::alert(this);
@@ -522,7 +626,7 @@ void ChatView::actMessageClicked()
 void ChatView::showSystemPopup(const QString &userName)
 {
     QApplication::alert(this);
-    if (SettingsCache::instance().getShowMentionPopup()) {
+    if (SettingsCache::instance().chat().getShowMentionPopup()) {
         emit showMentionPopup(userName);
     }
 }
@@ -530,10 +634,10 @@ void ChatView::showSystemPopup(const QString &userName)
 QColor ChatView::getCustomMentionColor()
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
-    QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
+    QColor customColor = QColor::fromString("#" + SettingsCache::instance().chat().getChatMentionColor());
 #else
     QColor customColor;
-    customColor.setNamedColor("#" + SettingsCache::instance().getChatMentionColor());
+    customColor.setNamedColor("#" + SettingsCache::instance().chat().getChatMentionColor());
 #endif
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
@@ -541,10 +645,10 @@ QColor ChatView::getCustomMentionColor()
 QColor ChatView::getCustomHighlightColor()
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
-    QColor customColor = QColor::fromString("#" + SettingsCache::instance().getChatMentionColor());
+    QColor customColor = QColor::fromString("#" + SettingsCache::instance().chat().getChatMentionColor());
 #else
     QColor customColor;
-    customColor.setNamedColor("#" + SettingsCache::instance().getChatMentionColor());
+    customColor.setNamedColor("#" + SettingsCache::instance().chat().getChatMentionColor());
 #endif
     return customColor.isValid() ? customColor : DEFAULT_MENTION_COLOR;
 }
@@ -554,6 +658,19 @@ void ChatView::clearChat()
     document()->clear();
     lastSender = "";
     evenNumber = true;
+    chatHistory.clear();
+}
+
+QString ChatView::getRecentChatLog(int maxMessages) const
+{
+    QStringList lines;
+    int start = qMax(0, chatHistory.size() - maxMessages);
+    for (int i = start; i < chatHistory.size(); ++i) {
+        const ChatLogEntry &entry = chatHistory.at(i);
+        lines.append(
+            QString("[%1] %2: %3").arg(entry.timestamp.toString("hh:mm:ss")).arg(entry.userName).arg(entry.message));
+    }
+    return lines.join("\n");
 }
 
 void ChatView::redactMessages(const QString &userName, int amount)
@@ -578,11 +695,7 @@ void ChatView::redactMessages(const QString &userName, int amount)
     }
 }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 void ChatView::enterEvent(QEnterEvent * /*event*/)
-#else
-void ChatView::enterEvent(QEvent * /*event*/)
-#endif
 {
     setMouseTracking(true);
 }
@@ -639,12 +752,9 @@ void ChatView::mousePressEvent(QMouseEvent *event)
 {
     switch (hoveredItemType) {
         case HoveredCard: {
-            if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton))
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+            if ((event->button() == Qt::MiddleButton) || (event->button() == Qt::LeftButton)) {
                 emit showCardInfoPopup(event->globalPosition().toPoint(), {hoveredContent});
-#else
-                emit showCardInfoPopup(event->globalPos(), {hoveredContent});
-#endif
+            }
             break;
         }
         case HoveredUser: {
@@ -654,11 +764,7 @@ void ChatView::mousePressEvent(QMouseEvent *event)
                 switch (event->button()) {
                     case Qt::RightButton: {
                         UserLevelFlags userLevel(hoveredContent.left(delimiterIndex).toInt());
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
                         userContextMenu->showContextMenu(event->globalPosition().toPoint(), userName, userLevel, this);
-#else
-                        userContextMenu->showContextMenu(event->globalPos(), userName, userLevel, this);
-#endif
                         break;
                     }
                     case Qt::LeftButton: {
@@ -692,6 +798,11 @@ void ChatView::mouseReleaseEvent(QMouseEvent *event)
 
 void ChatView::openLink(const QUrl &link)
 {
+    if (link.scheme() == "cockatrice") {
+        emit cockatriceLinkActivated(link.toString(QUrl::FullyEncoded));
+        return;
+    }
+
     if ((link.scheme() == "card") || (link.scheme() == "user")) {
         return;
     }
