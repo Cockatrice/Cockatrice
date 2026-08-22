@@ -7,10 +7,16 @@
 #ifndef ABSTRACTCLIENT_H
 #define ABSTRACTCLIENT_H
 
+#include "latency_tracker.h"
+
+#include <QElapsedTimer>
+#include <QLoggingCategory>
 #include <QMutex>
 #include <QVariant>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
+
+inline Q_LOGGING_CATEGORY(AbstractClientLog, "abstract_client");
 
 class PendingCommand;
 class CommandContainer;
@@ -54,6 +60,23 @@ signals:
     void statusChanged(ClientStatus _status);
     void maxPingTime(int seconds, int maxSeconds);
 
+    /**
+     * @brief Aggregated round-trip statistics, emitted at most once per second.
+     *
+     * All values are in milliseconds. sampleCount is the number of samples
+     * currently in the rolling window. Emitted from the client thread. The
+     * connection to UI objects is automatically queued across threads.
+     */
+    void pingStatsUpdated(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount);
+
+    /**
+     * @brief Chronological snapshot of the rolling window, oldest sample first.
+     *
+     * Emitted together with pingStatsUpdated under the same throttle, so
+     * graphs can redraw without polling the tracker across threads.
+     */
+    void pingSamplesUpdated(const QList<int> &samplesMs);
+
     // Room events
     void roomEventReceived(const RoomEvent &event);
     // Game events
@@ -85,6 +108,11 @@ private:
     int nextCmdId;
     mutable QMutex clientMutex;
     ClientStatus status;
+    LatencyTracker latencyTracker;
+    QElapsedTimer statsEmitClock;
+    bool statsEmitClockStarted = false;
+
+    void recordLatency(PendingCommand &pend);
 private slots:
     void queuePendingCommand(PendingCommand *pend);
 protected slots:
@@ -112,6 +140,16 @@ public:
     }
     void sendCommand(const CommandContainer &cont);
     void sendCommand(PendingCommand *pend);
+
+    /**
+     * @brief Drops all recorded round-trip samples and resets the stats
+     * emission throttle, emitting a zeroed pingStatsUpdated so that UI
+     * listeners can clear their display.
+     *
+     * Must be called from the client thread (as RemoteClient's disconnect
+     * path does). The tracker is deliberately lock-free.
+     */
+    void clearLatencyStats();
 
     bool getServerSupportsPasswordHash() const
     {

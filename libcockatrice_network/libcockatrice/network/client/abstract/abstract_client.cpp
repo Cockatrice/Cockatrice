@@ -71,6 +71,8 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
             }
             pendingCommands.remove(cmdId);
 
+            recordLatency(*pend);
+
             pend->processResponse(response);
             pend->deleteLater();
             break;
@@ -161,7 +163,64 @@ void AbstractClient::queuePendingCommand(PendingCommand *pend)
 
     pendingCommands.insert(cmdId, pend);
 
+    pend->startTiming();
     sendCommandContainer(pend->getCommandContainer());
+}
+
+namespace
+{
+constexpr int StatsEmitIntervalMs = 1000;
+// Game actions are what players perceive as lag. Surface unusually slow ones
+// without requiring debug logging to be enabled.
+constexpr qint64 SlowGameCommandWarnMs = 1500;
+} // namespace
+
+void AbstractClient::recordLatency(PendingCommand &pend)
+{
+    const qint64 elapsed = pend.elapsedMs();
+    if (elapsed < 0) {
+        return;
+    }
+
+    latencyTracker.addSample(elapsed);
+
+    if (AbstractClientLog().isDebugEnabled()) {
+        qCDebug(AbstractClientLog).noquote()
+            << "command RTT:" << elapsed << "ms (cmd_id" << pend.getCommandContainer().cmd_id() << ")";
+    }
+
+    if (elapsed >= SlowGameCommandWarnMs && pend.getCommandContainer().game_command_size() > 0) {
+        qCWarning(AbstractClientLog) << "slow game command round trip:" << elapsed << "ms (cmd_id"
+                                     << pend.getCommandContainer().cmd_id() << ")";
+    }
+
+    // Emit aggregated stats at most once per StatsEmitIntervalMs so that the
+    // per-command hot path stays free of signal traffic. The keepalive ping
+    // guarantees a fresh sample roughly every second while connected.
+    if (!statsEmitClockStarted || statsEmitClock.elapsed() >= StatsEmitIntervalMs) {
+        statsEmitClock.start();
+        statsEmitClockStarted = true;
+        const LatencyTracker::Stats stats = latencyTracker.stats();
+        const QList<qint64> recentSamples = latencyTracker.recentSamples();
+
+        QList<int> samples;
+        samples.reserve(stats.sampleCount);
+        for (qint64 sample : recentSamples) {
+            samples.append(static_cast<int>(sample));
+        }
+
+        emit pingStatsUpdated(static_cast<int>(stats.lastMs), static_cast<int>(stats.medianMs),
+                              static_cast<int>(stats.p95Ms), static_cast<int>(stats.maxMs), stats.sampleCount);
+        emit pingSamplesUpdated(samples);
+    }
+}
+
+void AbstractClient::clearLatencyStats()
+{
+    latencyTracker.clear();
+    statsEmitClockStarted = false;
+    emit pingStatsUpdated(0, 0, 0, 0, 0);
+    emit pingSamplesUpdated({});
 }
 
 PendingCommand *AbstractClient::prepareSessionCommand(const ::google::protobuf::Message &cmd)
