@@ -141,6 +141,7 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     connect(client, &AbstractClient::gameJoinedEventReceived, this, &TabSupervisor::gameJoined);
     connect(client, &AbstractClient::userMessageEventReceived, this, &TabSupervisor::processUserMessageEvent);
     connect(client, &AbstractClient::maxPingTime, this, &TabSupervisor::updatePingTime);
+    connect(client, &AbstractClient::pingStatsUpdated, this, &TabSupervisor::updateLatencyTooltip);
     connect(client, &AbstractClient::notifyUserEventReceived, this, &TabSupervisor::processNotifyUserEvent);
 
     // create tabs menu actions
@@ -881,6 +882,23 @@ void TabSupervisor::updatePingTime(int value, int max)
     }
 
     setTabIcon(indexOf(tabServer), QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
+}
+
+void TabSupervisor::updateLatencyTooltip(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount)
+{
+    if (!tabServer) {
+        return;
+    }
+
+    if (sampleCount == 0) {
+        setTabToolTip(indexOf(tabServer), QString());
+        return;
+    }
+
+    setTabToolTip(indexOf(tabServer), tr("Connection quality over the last %n sample(s):", "", sampleCount) + "\n" +
+                                          tr("Last: %1 ms").arg(lastMs) + "\n" + tr("Median: %1 ms").arg(medianMs) +
+                                          "\n" + tr("95th percentile: %1 ms").arg(p95Ms) + "\n" +
+                                          tr("Maximum: %1 ms").arg(maxMs));
 }
 
 void TabSupervisor::gameJoined(const Event_GameJoined &event)

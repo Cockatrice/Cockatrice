@@ -220,6 +220,7 @@ private slots:
 
     void updateCurrent(int index);
     void updatePingTime(int value, int max);
+    void updateLatencyTooltip(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount);
     void gameJoined(const Event_GameJoined &event);
     void localGameJoined(const Event_GameJoined &event);
     void gameLeft(TabGame *tab);

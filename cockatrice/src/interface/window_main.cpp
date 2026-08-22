@@ -56,6 +56,7 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QFileDialog>
+#include <QLabel>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -142,6 +143,23 @@ void MainWindow::statusChanged(ClientStatus _status)
         default:
             break;
     }
+}
+
+void MainWindow::updatePingDisplay(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount)
+{
+    if (!pingLabel || sampleCount == 0) {
+        if (pingLabel) {
+            pingLabel->hide();
+        }
+        return;
+    }
+
+    pingLabel->setText(tr("Ping: %1 ms").arg(lastMs));
+    pingLabel->setToolTip(tr("Connection quality over the last %n sample(s):", "", sampleCount) + "\n" +
+                          tr("Last: %1 ms").arg(lastMs) + "\n" + tr("Median: %1 ms").arg(medianMs) + "\n" +
+                          tr("95th percentile: %1 ms").arg(p95Ms) + "\n" + tr("Maximum: %1 ms").arg(maxMs));
+    pingLabel->setAccessibleDescription(pingLabel->toolTip());
+    pingLabel->show();
 }
 
 // Actions
@@ -534,6 +552,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::showStatusBarChanged, this,
             [this](bool show) { statusBar()->setVisible(show); });
     statusBar()->setVisible(SettingsCache::instance().userInterface().getShowStatusBar());
+
+    pingLabel = new QLabel(this);
+    pingLabel->setAccessibleName(tr("Ping"));
+    pingLabel->hide();
+    statusBar()->addPermanentWidget(pingLabel);
+    connect(connectionController, &ConnectionController::pingStatsUpdated, this, &MainWindow::updatePingDisplay);
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &MainWindow::refreshShortcuts);
