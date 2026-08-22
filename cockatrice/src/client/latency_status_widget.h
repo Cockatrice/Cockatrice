@@ -8,6 +8,7 @@
 
 #include <QList>
 #include <QWidget>
+#include <libcockatrice/network/client/abstract/latency_tracker.h>
 
 class QLabel;
 class LatencyGraphWidget;
@@ -29,7 +30,7 @@ public:
     explicit LatencyStatusWidget(QWidget *parent = nullptr);
 
 public slots:
-    void updateStats(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount);
+    void updateStats(const LatencyTracker::Stats &stats);
     void updateSamples(const QList<int> &samplesMs);
 
 protected:
@@ -37,7 +38,7 @@ protected:
 
 private:
     void togglePopup();
-    QString statsText(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount) const;
+    QString statsText(const LatencyTracker::Stats &stats) const;
 
     QLabel *pingLabel = nullptr;
     LatencyGraphWidget *latencyGraph = nullptr;

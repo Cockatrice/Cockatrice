@@ -35,20 +35,20 @@ LatencyStatusWidget::LatencyStatusWidget(QWidget *parent) : QWidget(parent)
     hide();
 }
 
-void LatencyStatusWidget::updateStats(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount)
+void LatencyStatusWidget::updateStats(const LatencyTracker::Stats &stats)
 {
-    if (sampleCount == 0) {
+    if (stats.sampleCount == 0) {
         hide();
         return;
     }
 
-    const QString stats = statsText(lastMs, medianMs, p95Ms, maxMs, sampleCount);
+    const QString statsStr = statsText(stats);
 
-    pingLabel->setText(tr("Ping: %1 ms").arg(lastMs));
-    pingLabel->setToolTip(stats);
-    pingLabel->setAccessibleDescription(stats);
+    pingLabel->setText(tr("Ping: %1 ms").arg(stats.lastMs));
+    pingLabel->setToolTip(statsStr);
+    pingLabel->setAccessibleDescription(statsStr);
     if (popup && popup->isVisible() && detailLabel) {
-        detailLabel->setText(stats);
+        detailLabel->setText(statsStr);
     }
     show();
 }
@@ -106,9 +106,9 @@ void LatencyStatusWidget::togglePopup()
     popup->show();
 }
 
-QString LatencyStatusWidget::statsText(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount) const
+QString LatencyStatusWidget::statsText(const LatencyTracker::Stats &stats) const
 {
-    return tr("Connection quality over the last %n sample(s):", "", sampleCount) + "\n" +
-           tr("Last: %1 ms").arg(lastMs) + "\n" + tr("Median: %1 ms").arg(medianMs) + "\n" +
-           tr("95th percentile: %1 ms").arg(p95Ms) + "\n" + tr("Maximum: %1 ms").arg(maxMs);
+    return tr("Connection quality over the last %n sample(s):", "", stats.sampleCount) + "\n" +
+           tr("Last: %1 ms").arg(stats.lastMs) + "\n" + tr("Median: %1 ms").arg(stats.medianMs) + "\n" +
+           tr("95th percentile: %1 ms").arg(stats.p95Ms) + "\n" + tr("Maximum: %1 ms").arg(stats.maxMs);
 }

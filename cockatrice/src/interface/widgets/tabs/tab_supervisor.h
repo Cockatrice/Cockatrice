@@ -24,6 +24,7 @@
 #include <QMap>
 #include <QProxyStyle>
 #include <QTabWidget>
+#include <libcockatrice/network/client/abstract/latency_tracker.h>
 
 class TabCardArtRules;
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
@@ -220,7 +221,7 @@ private slots:
 
     void updateCurrent(int index);
     void updatePingTime(int value, int max);
-    void updateLatencyTooltip(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount);
+    void updateLatencyTooltip(const LatencyTracker::Stats &stats);
     void gameJoined(const Event_GameJoined &event);
     void localGameJoined(const Event_GameJoined &event);
     void gameLeft(TabGame *tab);

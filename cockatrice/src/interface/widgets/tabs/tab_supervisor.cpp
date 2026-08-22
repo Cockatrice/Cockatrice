@@ -884,21 +884,21 @@ void TabSupervisor::updatePingTime(int value, int max)
     setTabIcon(indexOf(tabServer), QIcon(PingPixmapGenerator::generatePixmap(15, value, max)));
 }
 
-void TabSupervisor::updateLatencyTooltip(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount)
+void TabSupervisor::updateLatencyTooltip(const LatencyTracker::Stats &stats)
 {
     if (!tabServer) {
         return;
     }
 
-    if (sampleCount == 0) {
+    if (stats.sampleCount == 0) {
         setTabToolTip(indexOf(tabServer), QString());
         return;
     }
 
-    setTabToolTip(indexOf(tabServer), tr("Connection quality over the last %n sample(s):", "", sampleCount) + "\n" +
-                                          tr("Last: %1 ms").arg(lastMs) + "\n" + tr("Median: %1 ms").arg(medianMs) +
-                                          "\n" + tr("95th percentile: %1 ms").arg(p95Ms) + "\n" +
-                                          tr("Maximum: %1 ms").arg(maxMs));
+    setTabToolTip(indexOf(tabServer),
+                  tr("Connection quality over the last %n sample(s):", "", stats.sampleCount) + "\n" +
+                      tr("Last: %1 ms").arg(stats.lastMs) + "\n" + tr("Median: %1 ms").arg(stats.medianMs) + "\n" +
+                      tr("95th percentile: %1 ms").arg(stats.p95Ms) + "\n" + tr("Maximum: %1 ms").arg(stats.maxMs));
 }
 
 void TabSupervisor::gameJoined(const Event_GameJoined &event)
