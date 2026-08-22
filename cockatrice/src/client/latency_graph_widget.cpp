@@ -44,8 +44,7 @@ void LatencyGraphWidget::paintEvent(QPaintEvent * /* event */)
         QColor color;
         color.setHsv(qRound(120.0 * (1.0 - colorRatio)), 255, 255);
 
-        const QRectF bar(static_cast<qreal>(i) * widthPerBar + 1.0,
-                         static_cast<qreal>(height()) - barHeight,
+        const QRectF bar(static_cast<qreal>(i) * widthPerBar + 1.0, static_cast<qreal>(height()) - barHeight,
                          qMax(1.0, widthPerBar - 2.0), barHeight);
         painter.fillRect(bar, color);
     }
