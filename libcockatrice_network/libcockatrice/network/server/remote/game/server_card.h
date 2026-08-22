@@ -49,6 +49,7 @@ private:
     QString annotation;
     bool destroyOnZoneChange;
     bool doesntUntap;
+    bool doesntUntapOnce;
 
     Server_Card *parentCard;
     QList<Server_Card *> attachedCards;
@@ -127,6 +128,10 @@ public:
     {
         return doesntUntap;
     }
+    bool getDoesntUntapOnce() const
+    {
+        return doesntUntapOnce;
+    }
     bool getDestroyOnZoneChange() const
     {
         return destroyOnZoneChange;
@@ -202,6 +207,10 @@ public:
     void setDoesntUntap(bool _doesntUntap)
     {
         doesntUntap = _doesntUntap;
+    }
+    void setDoesntUntapOnce(bool _doesntUntapOnce)
+    {
+        doesntUntapOnce = _doesntUntapOnce;
     }
     void setParentCard(Server_Card *_parentCard);
     void addAttachedCard(Server_Card *card)

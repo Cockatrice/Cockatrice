@@ -691,6 +691,17 @@ void MessageLogWidget::logSetDoesntUntap(PlayerLogic *player, CardItem *card, bo
     appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardLink(card->getName())));
 }
 
+void MessageLogWidget::logSetDoesntUntapOnce(PlayerLogic *player, CardItem *card, bool doesntUntapOnce)
+{
+    QString str;
+    if (doesntUntapOnce) {
+        str = tr("%1 sets %2 to not untap during its controller's next untap step.");
+    } else {
+        str = tr("%1 sets %2 to untap normally.");
+    }
+    appendHtmlServerMessage(str.arg(sanitizeHtml(player->getPlayerInfo()->getName())).arg(cardLink(card->getName())));
+}
+
 void MessageLogWidget::logSetPT(PlayerLogic *player, CardItem *card, QString newPT)
 {
     if (currentContext == MessageContext_MoveCard) {
@@ -837,6 +848,8 @@ void MessageLogWidget::connectToPlayerEventHandler(PlayerEventHandler *playerEve
     connect(playerEventHandler, &PlayerEventHandler::logSetCardCounter, this, &MessageLogWidget::logSetCardCounter);
     connect(playerEventHandler, &PlayerEventHandler::logSetTapped, this, &MessageLogWidget::logSetTapped);
     connect(playerEventHandler, &PlayerEventHandler::logSetDoesntUntap, this, &MessageLogWidget::logSetDoesntUntap);
+    connect(playerEventHandler, &PlayerEventHandler::logSetDoesntUntapOnce, this,
+            &MessageLogWidget::logSetDoesntUntapOnce);
     connect(playerEventHandler, &PlayerEventHandler::logSetPT, this, &MessageLogWidget::logSetPT);
     connect(playerEventHandler, &PlayerEventHandler::logSetAnnotation, this, &MessageLogWidget::logSetAnnotation);
     connect(playerEventHandler, &PlayerEventHandler::logMoveCard, this, &MessageLogWidget::logMoveCard);
