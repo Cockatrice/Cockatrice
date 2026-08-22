@@ -285,6 +285,9 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
                 gameList.removeAt(i);
                 endRemoveRows();
             } else {
+                // MergeFrom concatenates repeated fields instead of replacing them,
+                // so clear game_types first to avoid duplicated entries.
+                gameList[i].clear_game_types();
                 gameList[i].MergeFrom(game);
                 emit dataChanged(index(i, 0), index(i, NUM_COLS - 1));
             }
