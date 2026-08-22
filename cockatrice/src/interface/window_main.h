@@ -148,7 +148,7 @@ private:
     WndSets *wndSets;
     ConnectionController *connectionController;
     LocalServer *localServer;
-    LagMonitor lagMonitor; ///< watches the main thread for event loop stalls
+    LagMonitor lagMonitor;                        ///< watches the main thread for event loop stalls
     LatencyStatusWidget *latencyStatus = nullptr; ///< status bar widget with live round-trip stats and history graph
     bool bHasActivated, askedForDbUpdater;
     QProcess *cardUpdateProcess;
