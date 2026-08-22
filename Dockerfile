@@ -1,43 +1,54 @@
 # -------- Build Stage --------
-FROM ubuntu:26.04 AS build
+FROM debian:13-slim AS build
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  build-essential \
-  cmake \
-  file \
-  g++ \
-  git \
-  libmariadb-dev-compat \
-  libprotobuf-dev \
-  libqt6sql6-mysql \
-  qt6-websockets-dev \
-  protobuf-compiler \
-  qt6-tools-dev \
-  qt6-tools-dev-tools
+# Install build dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      cmake \
+      g++ \
+      libmariadb-dev-compat \
+      libprotobuf-dev \
+      libqt6sql6-mysql \
+      ninja-build \
+      protobuf-compiler \
+      qt6-tools-dev \
+      qt6-tools-dev-tools \
+      qt6-websockets-dev \
+    && rm -rf /var/lib/apt/lists/*
 
+# Copy repo source not excluded in .dockerignore
 WORKDIR /src
 COPY . .
-RUN mkdir build && cd build && \
-    cmake .. -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0 && \
-    make -j$(nproc) && \
-    make install
+
+# Configure CMake
+RUN cmake -S . -B build -G Ninja \
+    -DWITH_SERVER=1 -DWITH_CLIENT=0 -DWITH_ORACLE=0
+
+# Build and install Servatrice
+RUN cmake --build build --parallel $(nproc) \
+    && cmake --install build
 
 
 # -------- Runtime Stage (clean) --------
-FROM ubuntu:26.04
+FROM debian:13-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  libprotobuf32t64 \
-  libqt6sql6-mysql \
-  libqt6websockets6 \
-    && apt-get clean \
+# Install runtime dependencies
+# Is libprotobuf-lite32t64 enough?
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      libprotobuf32t64 \
+      libqt6sql6-mysql \
+      libqt6websockets6 \
     && rm -rf /var/lib/apt/lists/*
 
-# Only copy installed binaries, not source
-COPY --from=build /usr/local /usr/local
+# Copy only resulting binaries from Build Stage
+COPY --from=build /usr/local/bin/servatrice /usr/local/bin/servatrice
 
+# Create and run as non-root user
+RUN useradd -m servatrice
+USER servatrice
 WORKDIR /home/servatrice
 
 EXPOSE 4748
