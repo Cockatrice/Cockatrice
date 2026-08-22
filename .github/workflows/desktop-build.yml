@@ -310,7 +310,7 @@ jobs:
             package_suffix: "-macOS15"
             # Read https://aqtinstall.readthedocs.io/en/latest/getting_started.html#installing-a-subset-of-qt-archives-advanced
             # and check https://ddalcino.github.io/aqt-list-server/
-            qt_archives: qtbase qtsvg qttools qttranslations
+            qt_archives: qtbase qtdeclarative qtsvg qttools qttranslations
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             qt_version: 6.11.1
             soc: Apple
@@ -326,7 +326,7 @@ jobs:
             cmake_generator: Ninja
             # Read https://aqtinstall.readthedocs.io/en/latest/getting_started.html#installing-a-subset-of-qt-archives-advanced
             # and check https://ddalcino.github.io/aqt-list-server/
-            qt_archives: qtbase qtsvg qttools qttranslations
+            qt_archives: qtbase qtdeclarative qtsvg qttools qttranslations
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             qt_version: 6.11.1
             soc: Apple
@@ -406,15 +406,6 @@ jobs:
           echo ""
           echo "Archives (Windows):"
           aqt list-qt windows desktop --archives 6.10.3 win64_msvc2022_64
-
-      - name: "List available Qt modules (aqtinstall)"
-        shell: bash
-        run: |
-          echo "Modules (Mac):"
-          aqt list-qt mac desktop --modules ${{ steps.resolve_qt_version.outputs.version }} clang_64
-          echo ""
-          echo "Modules (Windows):"
-          aqt list-qt windows desktop --modules 6.10.3 win64_msvc2022_64
 
       - name: "List avaialble Qt tools (aqtinstall)"
         shell: bash
