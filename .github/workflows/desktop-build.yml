@@ -273,7 +273,7 @@ jobs:
             package_suffix: "-macOS13_Intel"
             # Read https://aqtinstall.readthedocs.io/en/latest/getting_started.html#installing-a-subset-of-qt-archives-advanced
             # and check https://ddalcino.github.io/aqt-list-server/
-            qt_archives: qtbase qtsvg qttools qttranslations
+            qt_archives: qtbase qtdeclarative qtsvg qttools qttranslations
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             qt_version: 6.11.1
             soc: Intel
@@ -292,7 +292,7 @@ jobs:
             package_suffix: "-macOS14"
             # Read https://aqtinstall.readthedocs.io/en/latest/getting_started.html#installing-a-subset-of-qt-archives-advanced
             # and check https://ddalcino.github.io/aqt-list-server/
-            qt_archives: qtbase qtsvg qttools qttranslations
+            qt_archives: qtbase qtdeclarative qtsvg qttools qttranslations
             qt_modules: qtimageformats qtmultimedia qtwebsockets
             qt_version: 6.11.1
             soc: Apple
@@ -456,6 +456,11 @@ jobs:
         with:
           key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
           path: ${{ github.workspace }}/Qt
+
+      - name: "[macOS] Check lrelease dependencies"
+        if: matrix.os == 'macOS'
+        shell: bash
+        run: otool -L ${{ github.workspace }}/Qt/${{ steps.resolve_qt_version.outputs.version }}/macos/bin/lrelease
 
       - name: "[Windows] Install Qt ${{ matrix.qt_version }}"
         if: matrix.os == 'Windows'
