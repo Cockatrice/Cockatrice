@@ -91,5 +91,6 @@ int main(int argc, char *argv[])
         QTimer::singleShot(0, &wizard, [&wizard]() { wizard.runInBackground(); });
     }
 
-    return app.exec();
+    const int execResult = app.exec();
+    return wizard.wasCancelled() ? 1 : execResult;
 }

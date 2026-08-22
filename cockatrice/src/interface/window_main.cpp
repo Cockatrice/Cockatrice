@@ -1019,7 +1019,7 @@ void MainWindow::createCardUpdateProcess(bool background)
     if (updaterCmd.isEmpty()) {
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
-        exitCardDatabaseUpdate();
+        exitCardDatabaseUpdate(false);
         return;
     }
 
@@ -1031,13 +1031,15 @@ void MainWindow::createCardUpdateProcess(bool background)
     }
 }
 
-void MainWindow::exitCardDatabaseUpdate()
+void MainWindow::exitCardDatabaseUpdate(bool reload)
 {
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = nullptr;
     statusBar()->clearMessage();
 
-    const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
+    if (reload) {
+        const auto reloadOk1 = QtConcurrent::run([] { CardDatabaseManager::getInstance()->loadCardDatabases(); });
+    }
 }
 
 void MainWindow::cardUpdateError(QProcess::ProcessError err)
@@ -1068,16 +1070,21 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
             break;
     }
 
-    exitCardDatabaseUpdate();
+    exitCardDatabaseUpdate(false);
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:\n%1").arg(error));
 }
 
-void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus exitStatus)
+void MainWindow::cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    if (exitStatus == QProcess::NormalExit) {
+    if (exitStatus == QProcess::NormalExit && exitCode == 0) {
         SettingsCache::instance().updates().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
+        exitCardDatabaseUpdate(true);
+    } else {
+        exitCardDatabaseUpdate(false);
+        if (exitStatus == QProcess::NormalExit && exitCode != 0) {
+            statusBar()->showMessage(tr("Card database update cancelled."), 10000);
+        }
     }
-    exitCardDatabaseUpdate();
 }
 
 void MainWindow::actCheckServerUpdates()

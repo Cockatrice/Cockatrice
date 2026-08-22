@@ -127,7 +127,7 @@ private:
         return "oracle";
     }
     void createCardUpdateProcess(bool background = false);
-    void exitCardDatabaseUpdate();
+    void exitCardDatabaseUpdate(bool reload);
 
     void startLocalGame(const LocalGameOptions &options);
 
