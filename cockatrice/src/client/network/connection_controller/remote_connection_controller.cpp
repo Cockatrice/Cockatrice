@@ -44,6 +44,8 @@ void ConnectionController::wireClientSignals()
 
     connect(remoteClient, &RemoteClient::statusChanged, this, &ConnectionController::onStatusChanged);
 
+    connect(remoteClient, &AbstractClient::pingStatsUpdated, this, &ConnectionController::pingStatsUpdated);
+
     connect(remoteClient, &RemoteClient::userInfoChanged, this, &ConnectionController::onUserInfoReceived,
             Qt::BlockingQueuedConnection);
 

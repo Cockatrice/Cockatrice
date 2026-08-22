@@ -54,6 +54,10 @@ signals:
     // action enable/disable logic
     void statusChanged(ClientStatus status);
 
+    // Forwarded from AbstractClient::pingStatsUpdated. See that signal for the
+    // meaning of the parameters.
+    void pingStatsUpdated(const LatencyTracker::Stats &stats, const QList<int> &samplesMs);
+
 private slots:
     // Slots wired directly to RemoteClient signals
     void onStatusChanged(ClientStatus status);

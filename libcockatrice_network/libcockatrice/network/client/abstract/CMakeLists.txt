@@ -2,9 +2,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(HEADERS abstract_client.h)
+set(HEADERS abstract_client.h latency_tracker.h)
 
-set(SOURCES abstract_client.cpp)
+set(SOURCES abstract_client.cpp latency_tracker.cpp)
 
 qt6_wrap_cpp(MOC_SOURCES ${HEADERS})
 
