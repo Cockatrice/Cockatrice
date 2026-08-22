@@ -41,7 +41,8 @@ public:
     struct StallRecord
     {
         qint64 timestampMsSinceEpoch = 0; ///< when the stalled period ended
-        qint64 durationMs = 0;            ///< approximate length of the freeze; measured tick to tick, so it can exceed the true stall by up to TICK_INTERVAL_MS
+        qint64 durationMs = 0; ///< approximate length of the freeze; measured tick to tick, so it can exceed the true
+                               ///< stall by up to TICK_INTERVAL_MS
     };
 
     static constexpr int TICK_INTERVAL_MS = 500;
