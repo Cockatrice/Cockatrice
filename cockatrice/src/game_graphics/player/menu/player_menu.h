@@ -97,6 +97,7 @@ private:
      * player->getCounters().
      */
     QList<AbstractPlayerComponent *> managedComponents;
+    CardMenu *cardMenu = nullptr;
     bool shortcutsActive = false;
 
     /** @brief Creates component, adds it as a submenu of playerMenu, and registers in managedComponents. */
