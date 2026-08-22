@@ -290,27 +290,41 @@ void PaletteEditorDialog::onSave()
     // Persist every scheme that changed, not just the one on screen. Each scheme
     // has its own file, so edits to the non-active scheme would otherwise be
     // silently discarded when the dialog closes.
+    //
+    // Save the loaded scheme last so commitPalette's global colour-scheme
+    // update (ThemeConfig::colorScheme) points at the active scheme.
     for (auto it = workingConfig.begin(); it != workingConfig.end(); ++it) {
-        const QString &scheme = it.key();
-        if (it.value().colors == savedConfig.value(scheme).colors) {
-            continue; // unchanged — leave the on-disk file alone
+        if (it.key() == loadedScheme) {
+            continue;
         }
-
-        if (!ThemeManager::savePaletteConfig(saveDir, scheme, it.value())) {
+        if (it.value().colors == savedConfig.value(it.key()).colors) {
+            continue;
+        }
+        if (!ThemeManager::commitPalette(saveDir, it.key(), it.value())) {
             QMessageBox::warning(this, tr("Save failed"),
-                                 tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(scheme), saveDir));
+                                 tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(it.key()), saveDir));
             return;
         }
+    }
+
+    // Commit the active scheme last so the global colour scheme matches.
+    if (workingConfig[loadedScheme].colors != savedConfig.value(loadedScheme).colors) {
+        if (!ThemeManager::commitPalette(saveDir, loadedScheme, workingConfig[loadedScheme])) {
+            QMessageBox::warning(this, tr("Save failed"),
+                                 tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(loadedScheme), saveDir));
+            return;
+        }
+    } else {
+        // No palette change but scheme may have switched -- still update global config.
+        ThemeConfig globalCfg = ThemeConfig::fromThemeDir(saveDir);
+        globalCfg.colorScheme = loadedScheme;
+        globalCfg.save(saveDir);
     }
 
     // Keep the saved snapshot in sync so Reset behaves correctly afterwards.
     for (auto it = workingConfig.begin(); it != workingConfig.end(); ++it) {
         savedConfig[it.key()] = it.value();
     }
-
-    ThemeConfig globalCfg = ThemeConfig::fromThemeDir(saveDir);
-    globalCfg.colorScheme = loadedScheme;
-    globalCfg.save(saveDir);
 
     themeManager->reloadCurrentTheme();
     accept();

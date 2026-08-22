@@ -18,10 +18,13 @@ if(WITH_CLIENT)
       Multimedia
       Network
       PrintSupport
+      ShaderTools
       Svg
       WebSockets
       Widgets
       Xml
+      Quick
+      QuickWidgets
   )
 endif()
 if(WITH_ORACLE)
