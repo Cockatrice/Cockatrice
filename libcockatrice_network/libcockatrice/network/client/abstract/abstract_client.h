@@ -61,21 +61,16 @@ signals:
     void maxPingTime(int seconds, int maxSeconds);
 
     /**
-     * @brief Aggregated round-trip statistics, emitted at most once per second.
+     * @brief Aggregated round-trip statistics and a chronological snapshot of
+     * the rolling window, emitted at most once per second.
      *
-     * All values are in milliseconds. sampleCount is the number of samples
-     * currently in the rolling window. Emitted from the client thread. The
-     * connection to UI objects is automatically queued across threads.
+     * All values in the stats struct are in milliseconds; sampleCount is the
+     * number of samples currently in the rolling window. The samples list is
+     * ordered oldest first so graphs can redraw without polling the tracker
+     * across threads. Emitted from the client thread. The connection to UI
+     * objects is automatically queued across threads.
      */
-    void pingStatsUpdated(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount);
-
-    /**
-     * @brief Chronological snapshot of the rolling window, oldest sample first.
-     *
-     * Emitted together with pingStatsUpdated under the same throttle, so
-     * graphs can redraw without polling the tracker across threads.
-     */
-    void pingSamplesUpdated(const QList<int> &samplesMs);
+    void pingStatsUpdated(const LatencyTracker::Stats &stats, const QList<int> &samplesMs);
 
     // Room events
     void roomEventReceived(const RoomEvent &event);
@@ -143,8 +138,8 @@ public:
 
     /**
      * @brief Drops all recorded round-trip samples and resets the stats
-     * emission throttle, emitting a zeroed pingStatsUpdated so that UI
-     * listeners can clear their display.
+     * emission throttle, emitting zeroed stats so that UI listeners can
+     * clear their display.
      *
      * Must be called from the client thread (as RemoteClient's disconnect
      * path does). The tracker is deliberately lock-free.

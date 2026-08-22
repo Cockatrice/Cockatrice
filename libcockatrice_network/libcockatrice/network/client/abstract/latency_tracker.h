@@ -7,6 +7,7 @@
 #define LATENCY_TRACKER_H
 
 #include <QList>
+#include <QMetaType>
 #include <array>
 
 /**
@@ -44,5 +45,7 @@ private:
     int head = 0;  ///< index where the next sample will be written
     int count = 0; ///< number of valid samples, capped at WindowSize
 };
+
+Q_DECLARE_METATYPE(LatencyTracker::Stats)
 
 #endif

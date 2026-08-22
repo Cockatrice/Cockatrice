@@ -56,11 +56,7 @@ signals:
 
     // Forwarded from AbstractClient::pingStatsUpdated. See that signal for the
     // meaning of the parameters.
-    void pingStatsUpdated(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount);
-
-    // Forwarded from AbstractClient::pingSamplesUpdated. See that signal for
-    // the meaning of the parameter.
-    void pingSamplesUpdated(const QList<int> &samplesMs);
+    void pingStatsUpdated(const LatencyTracker::Stats &stats, const QList<int> &samplesMs);
 
 private slots:
     // Slots wired directly to RemoteClient signals
