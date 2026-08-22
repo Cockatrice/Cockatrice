@@ -25,6 +25,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "../client/lag_monitor.h"
 #include "connection_controller/remote_connection_controller.h"
 #include "widgets/dialogs/dlg_local_game_options.h"
 
@@ -145,6 +146,7 @@ private:
     WndSets *wndSets;
     ConnectionController *connectionController;
     LocalServer *localServer;
+    LagMonitor lagMonitor; ///< watches the main thread for event loop stalls
     bool bHasActivated, askedForDbUpdater;
     QProcess *cardUpdateProcess;
     DlgViewLog *logviewDialog;
