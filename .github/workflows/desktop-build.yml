@@ -205,6 +205,7 @@ jobs:
       - name: "Delete remote compiler cache (ccache)"
         if: github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
         continue-on-error: true
+        shell: bash
         env:
           CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
           GH_TOKEN: ${{ github.token }}
@@ -270,8 +271,11 @@ jobs:
             make_package: 1
             override_target: 13
             package_suffix: "-macOS13_Intel"
-            qt_version: 6.11.0
+            # Read https://aqtinstall.readthedocs.io/en/latest/getting_started.html#installing-a-subset-of-qt-archives-advanced
+            # and check https://ddalcino.github.io/aqt-list-server/
+            qt_archives: qtbase qtdeclarative qtsvg qttools qttranslations
             qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_version: 6.11.1
             soc: Intel
             type: Release
             use_ccache: 1
@@ -286,8 +290,11 @@ jobs:
             make_package: 1
             override_target: 14
             package_suffix: "-macOS14"
-            qt_version: 6.11.0
+            # Read https://aqtinstall.readthedocs.io/en/latest/getting_started.html#installing-a-subset-of-qt-archives-advanced
+            # and check https://ddalcino.github.io/aqt-list-server/
+            qt_archives: qtbase qtdeclarative qtsvg qttools qttranslations
             qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_version: 6.11.1
             soc: Apple
             type: Release
             use_ccache: 1
@@ -301,8 +308,11 @@ jobs:
             cmake_generator: Ninja
             make_package: 1
             package_suffix: "-macOS15"
-            qt_version: 6.11.0
+            # Read https://aqtinstall.readthedocs.io/en/latest/getting_started.html#installing-a-subset-of-qt-archives-advanced
+            # and check https://ddalcino.github.io/aqt-list-server/
+            qt_archives: qtbase qtdeclarative qtsvg qttools qttranslations
             qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_version: 6.11.1
             soc: Apple
             type: Release
             use_ccache: 1
@@ -314,8 +324,11 @@ jobs:
 
             ccache_eviction_age: 7d
             cmake_generator: Ninja
-            qt_version: 6.11.0
+            # Read https://aqtinstall.readthedocs.io/en/latest/getting_started.html#installing-a-subset-of-qt-archives-advanced
+            # and check https://ddalcino.github.io/aqt-list-server/
+            qt_archives: qtbase qtdeclarative qtsvg qttools qttranslations
             qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_version: 6.11.1
             soc: Apple
             type: Debug
             use_ccache: 1
@@ -329,8 +342,11 @@ jobs:
             cmake_generator_platform: x64
             make_package: 1
             package_suffix: "-Win10"
-            qt_version: 6.11.0
+            # Read https://aqtinstall.readthedocs.io/en/latest/getting_started.html#installing-a-subset-of-qt-archives-advanced
+            # and check https://ddalcino.github.io/aqt-list-server/
+            qt_archives: qtbase qtsvg qttools qttranslations
             qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_version: 6.11.1
             type: Release
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}
@@ -356,6 +372,7 @@ jobs:
 
       - name: "[macOS] Setup ccache"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1
+        shell: bash
         run: brew install ccache
 
       - name: "[macOS] Restore compiler cache (ccache)"
@@ -370,6 +387,7 @@ jobs:
           restore-keys: ccache-${{ matrix.runner }}-${{ matrix.soc }}-${{ matrix.type }}-
 
       - name: "Install aqtinstall"
+        shell: bash
         run: pipx install aqtinstall
 
       # Resolve given wildcard versions (e.g. Qt 6.6.*) to latest version via aqtinstall to avoid stale caches on new releases
@@ -380,13 +398,40 @@ jobs:
         shell: bash
         run: .ci/resolve_latest_aqt_qt_version.sh "$QT_VERSION"
 
-      - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries"
-        if: matrix.os == 'macOS'
-        id: restore_qt
-        uses: actions/cache/restore@v6
-        with:
-          key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
-          path: ${{ github.workspace }}/Qt
+      - name: "List available Qt archives (aqtinstall)"
+        shell: bash
+        run: |
+          echo "Archives (Mac):"
+          aqt list-qt mac desktop --archives ${{ steps.resolve_qt_version.outputs.version }} clang_64
+          echo ""
+          echo "Archives (Windows):"
+          aqt list-qt windows desktop --archives 6.10.3 win64_msvc2022_64
+
+      - name: "List available Qt modules (aqtinstall)"
+        shell: bash
+        run: |
+          echo "Modules (Mac):"
+          aqt list-qt mac desktop --modules ${{ steps.resolve_qt_version.outputs.version }} clang_64
+          echo ""
+          echo "Modules (Windows):"
+          aqt list-qt windows desktop --modules 6.10.3 win64_msvc2022_64
+
+      - name: "List avaialble Qt tools (aqtinstall)"
+        shell: bash
+        run: |
+          echo "Tools (Mac):"
+          aqt list-tool mac desktop
+          echo ""
+          echo "Tools (Windows):"
+          aqt list-tool windows desktop
+
+     # - name: "[macOS] Restore thin Qt ${{ steps.resolve_qt_version.outputs.version }} libraries"
+     #   if: matrix.os == 'macOS'
+     #   id: restore_qt
+     #   uses: actions/cache/restore@v6
+     #   with:
+     #     key: thin-qt-macos-${{ matrix.soc }}-${{ steps.resolve_qt_version.outputs.version }}
+     #     path: ${{ github.workspace }}/Qt
 
       # Using jurplel/install-qt-action to install Qt without using brew
       # Qt build using vcpkg either just fails or takes too long to build
@@ -394,6 +439,7 @@ jobs:
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v4
         with:
+          archives: ${{ matrix.qt_archives }}
           cache: false
           dir: ${{ github.workspace }}
           modules: ${{ matrix.qt_modules }}
@@ -401,6 +447,7 @@ jobs:
 
       - name: "[macOS] Create thin Qt libraries"
         if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        shell: bash
         run: .ci/thin_macos_qtlib.sh
 
       - name: "[macOS] Cache thin Qt libraries"
@@ -416,6 +463,7 @@ jobs:
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
+          archives: ${{ matrix.qt_archives }}
           cache: true
           modules: ${{ matrix.qt_modules }}
           version: ${{ steps.resolve_qt_version.outputs.version }}
@@ -459,6 +507,7 @@ jobs:
       - name: "[macOS] Delete remote compiler cache (ccache)"
         if: matrix.os == 'macOS' && matrix.use_ccache == 1 && github.ref == 'refs/heads/master' && steps.ccache_restore.outputs.cache-hit
         continue-on-error: true
+        shell: bash
         env:
           CACHE_PRIMARY_KEY: ${{ steps.ccache_restore.outputs.cache-primary-key }}
           GH_TOKEN: ${{ github.token }}
@@ -477,6 +526,7 @@ jobs:
       - name: "[macOS] Sign app bundle"
         if: matrix.os == 'macOS' && matrix.make_package && needs.configure.outputs.tag != null
         id: sign_macos
+        shell: bash
         env:
           BUILD_PATH: ${{ steps.build.outputs.path }}
           MACOS_CERTIFICATE_NAME: ${{ secrets.PROD_MACOS_CERTIFICATE_NAME }}
@@ -490,6 +540,7 @@ jobs:
 
       - name: "[macOS] Notarize app bundle"
         if: matrix.os == 'macOS' && steps.sign_macos.outcome == 'success'
+        shell: bash
         env:
           BUILD_PATH: ${{ steps.build.outputs.path }}
           MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
