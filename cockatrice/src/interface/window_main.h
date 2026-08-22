@@ -51,6 +51,7 @@ class HandlePublicServers;
 class LocalClient;
 class LocalServer;
 class QLabel;
+class LatencyStatusWidget;
 class QThread;
 class RemoteClient;
 class ServerInfo_User;
@@ -73,7 +74,6 @@ public slots:
 private slots:
     void updateTabMenu(const QList<QMenu *> &newMenuList);
     void statusChanged(ClientStatus _status);
-    void updatePingDisplay(int lastMs, int medianMs, int p95Ms, int maxMs, int sampleCount);
     void localGameEnded();
     void pixmapCacheSizeChanged(int newSizeInMBs);
     void actDisconnect();
@@ -148,8 +148,8 @@ private:
     WndSets *wndSets;
     ConnectionController *connectionController;
     LocalServer *localServer;
-    QLabel *pingLabel = nullptr; ///< status bar label with live round-trip stats
     LagMonitor lagMonitor; ///< watches the main thread for event loop stalls
+    LatencyStatusWidget *latencyStatus = nullptr; ///< status bar widget with live round-trip stats and history graph
     bool bHasActivated, askedForDbUpdater;
     QProcess *cardUpdateProcess;
     DlgViewLog *logviewDialog;
