@@ -5,7 +5,7 @@
 LagMonitor::LagMonitor(QObject *parent) : QObject(parent)
 {
     timer = new QTimer(this);
-    timer->setInterval(TickIntervalMs);
+    timer->setInterval(TICK_INTERVAL_MS);
     connect(timer, &QTimer::timeout, this, &LagMonitor::checkTick);
     tickClock.start();
     timer->start();
@@ -25,7 +25,7 @@ void LagMonitor::checkTick()
 {
     const qint64 gap = tickClock.restart();
 
-    if (gap <= StallThresholdMs) {
+    if (gap <= STALL_THRESHOLD_MS) {
         return;
     }
 
@@ -34,10 +34,10 @@ void LagMonitor::checkTick()
     record.durationMs = gap;
 
     stalls.append(record);
-    while (stalls.size() > MaxRecordedStalls) {
+    while (stalls.size() > MAX_RECORDED_STALLS) {
         stalls.removeFirst();
     }
 
     qCWarning(LagMonitorLog, "Event loop stalled for %lld ms (threshold: %d ms)", static_cast<long long>(gap),
-              StallThresholdMs);
+              STALL_THRESHOLD_MS);
 }
