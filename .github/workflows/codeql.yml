@@ -16,15 +16,7 @@ on:
   push:
     branches:
       - master
-    paths-ignore:
-      - '**/*.md'
-      - 'doc/**'
   pull_request:
-    branches:
-      - master
-    paths-ignore:
-      - '**/*.md'
-      - 'doc/**'
 
 # Cancel earlier, unfinished runs of this workflow on the same branch
 concurrency:
