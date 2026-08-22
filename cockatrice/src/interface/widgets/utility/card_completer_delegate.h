@@ -30,6 +30,9 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
+    // Content width of one popup row; the completer popup is sized to fit it.
+    static constexpr int PopupRowWidth = 480;
+
 private:
     // Mana symbol pixmaps, loaded once and cached
     mutable QCache<QString, QPixmap> symbolCache;
@@ -45,7 +48,8 @@ private:
 
     // Draw all mana pips for a cost string like "2RG" or "{2}{R}{G}"; split and
     // adventure costs ("1W // W") are drawn as separate groups. Returns the left-most x used
-    int drawManaCost(QPainter *p, const QRect &row, const QString &manaCost, int radius) const;
+    int
+    drawManaCost(QPainter *p, const QRect &row, const QString &manaCost, int radius, int spacing, int rightPad) const;
 
     // Load (or return cached) a mana icon pixmap; falls back to painted circle
     const QPixmap *cachedSymbolPixmap(const QString &symbol, int size) const;
