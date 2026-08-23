@@ -22,6 +22,8 @@ set(PROTO_FILES
     command_del_counter.proto
     command_delete_arrow.proto
     command_draw_cards.proto
+    command_get_log_history.proto
+    command_get_server_stats.proto
     command_dump_zone.proto
     command_flip_card.proto
     command_game_say.proto
@@ -71,6 +73,7 @@ set(PROTO_FILES
     context_ready_start.proto
     context_set_sideboard_lock.proto
     context_undo_draw.proto
+    developer_commands.proto
     event_add_to_list.proto
     event_attach_card.proto
     event_change_zone_properties.proto
@@ -141,6 +144,7 @@ set(PROTO_FILES
     response_forgotpasswordrequest.proto
     response_get_admin_notes.proto
     response_get_games_of_user.proto
+    response_get_server_stats.proto
     response_get_user_info.proto
     response_join_room.proto
     response_list_users.proto

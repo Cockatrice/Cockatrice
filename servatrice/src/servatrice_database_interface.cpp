@@ -641,6 +641,10 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
         userLevel |= ServerInfo_User::IsJudge;
     }
 
+    if (is_admin & 8) {
+        userLevel |= ServerInfo_User::IsDeveloper;
+    }
+
     result.set_user_level(userLevel);
 
     const QString country = query->value(3).toString();
@@ -1448,7 +1452,7 @@ QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastL
     QSqlQuery *query = prepareQuery("SELECT u.name, u.admin, UNIX_TIMESTAMP(a.last_login) "
                                     "FROM {prefix}_users u "
                                     "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
-                                    "WHERE (u.admin & 7) <> 0 ORDER BY u.name");
+                                    "WHERE (u.admin & 15) <> 0 ORDER BY u.name");
 
     if (!execSqlQuery(query)) {
         qCWarning(DatabaseInterfaceLog) << "Failed to collect moderator login information: SQL Error";
@@ -1468,6 +1472,9 @@ QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastL
         }
         if (isAdmin & 4) {
             userLevel |= ServerInfo_User::IsJudge;
+        }
+        if (isAdmin & 8) {
+            userLevel |= ServerInfo_User::IsDeveloper;
         }
         loginDetails.set_user_level(userLevel);
 

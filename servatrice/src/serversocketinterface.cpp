@@ -47,6 +47,8 @@
 #include <libcockatrice/protocol/pb/command_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_new_dir.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
+#include <libcockatrice/protocol/pb/command_get_log_history.pb.h>
+#include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_download.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_download_by_game_id.pb.h>
@@ -80,6 +82,7 @@
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response_forgotpasswordrequest.pb.h>
 #include <libcockatrice/protocol/pb/response_get_admin_notes.pb.h>
+#include <libcockatrice/protocol/pb/response_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/response_moderator_last_logins.pb.h>
 #include <libcockatrice/protocol/pb/response_password_salt.pb.h>
 #include <libcockatrice/protocol/pb/response_register.pb.h>
@@ -332,6 +335,38 @@ AbstractServerSocketInterface::processExtendedAdminCommand(int cmdType, const Ad
             return cmdAdjustMod(cmd.GetExtension(Command_AdjustMod::ext), rc);
         case AdminCommand::RESET_USER_PASSWORD:
             return cmdResetUserPassword(cmd.GetExtension(Command_ResetUserPassword::ext), rc);
+        default:
+            return Response::RespFunctionNotAllowed;
+    }
+}
+
+// DEVELOPER FUNCTIONS.
+// Permission is checked by processDeveloperCommandContainer. Only stats-style
+// queries live here, never community moderation or server administration.
+Response::ResponseCode AbstractServerSocketInterface::processExtendedDeveloperCommand(int cmdType,
+                                                                                      const DeveloperCommand &cmd,
+                                                                                      ResponseContainer &rc)
+{
+    switch ((DeveloperCommand::DeveloperCommandType)cmdType) {
+        case DeveloperCommand::GET_SERVER_STATS:
+            return cmdGetServerStats(cmd.GetExtension(Command_GetServerStats::ext), rc);
+        case DeveloperCommand::VIEWLOG_HISTORY: {
+            // Same query as the moderator log view, just carried by the
+            // developer command family.
+            const Command_GetLogHistory &devCmd = cmd.GetExtension(Command_GetLogHistory::ext);
+            Command_ViewLogHistory modCmd;
+            modCmd.set_user_name(devCmd.user_name());
+            modCmd.set_ip_address(devCmd.ip_address());
+            modCmd.set_game_name(devCmd.game_name());
+            modCmd.set_game_id(devCmd.game_id());
+            modCmd.set_message(devCmd.message());
+            for (int i = 0; i < devCmd.log_location_size(); ++i) {
+                modCmd.add_log_location(devCmd.log_location(i));
+            }
+            modCmd.set_date_range(devCmd.date_range());
+            modCmd.set_maximum_results(devCmd.maximum_results());
+            return cmdGetLogHistory(modCmd, rc);
+        }
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -1637,6 +1672,38 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportUserInfo(const Co
                 info->set_assigned_mod_name(recentQuery->value(9).toString().toStdString());
             }
         }
+    }
+
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdGetServerStats(const Command_GetServerStats & /*cmd */,
+                                                                        ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    // Servatrice::statusUpdate() periodically snapshots server health into the
+    // uptime table. Serve the freshest snapshot for this server.
+    QSqlQuery *query = sqlInterface->prepareQuery(
+        "SELECT users_count, mods_count, games_count, tx_bytes, rx_bytes, uptime, UNIX_TIMESTAMP(timest) "
+        "FROM {prefix}_uptime WHERE id_server = :id_server ORDER BY timest DESC LIMIT 1");
+    query->bindValue(":id_server", servatrice->getServerID());
+    if (!sqlInterface->execSqlQuery(query)) {
+        return Response::RespInternalError;
+    }
+
+    auto *re = new Response_GetServerStats;
+    if (query->next()) {
+        re->set_users_count(query->value(0).toUInt());
+        re->set_mods_count(query->value(1).toUInt());
+        re->set_games_count(query->value(2).toUInt());
+        re->set_tx_bytes(query->value(3).toUInt());
+        re->set_rx_bytes(query->value(4).toUInt());
+        re->set_uptime_secs(query->value(5).toUInt());
+        re->set_timest(query->value(6).toUInt());
     }
 
     rc.setResponseExtension(re);
@@ -3215,7 +3282,7 @@ bool AbstractServerSocketInterface::removeAdminFlagFromUser(const QString &userN
     if (user) {
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::DEMOTED);
-        event.set_reason_str("Your moderator and/or judge status has been revoked.");
+        event.set_reason_str("Your moderator, judge, and/or developer status has been revoked.");
         event.set_end_time(QDateTime::currentDateTime().toSecsSinceEpoch());
 
         SessionEvent *se = user->prepareSessionEvent(event);
@@ -3252,6 +3319,18 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAdjustMod(const Command
             }
         } else {
             if (!removeAdminFlagFromUser(userName, 4)) {
+                return Response::RespInternalError;
+            }
+        }
+    }
+
+    if (cmd.has_should_be_developer()) {
+        if (cmd.should_be_developer()) {
+            if (!addAdminFlagToUser(userName, 8)) {
+                return Response::RespInternalError;
+            }
+        } else {
+            if (!removeAdminFlagFromUser(userName, 8)) {
                 return Response::RespInternalError;
             }
         }
