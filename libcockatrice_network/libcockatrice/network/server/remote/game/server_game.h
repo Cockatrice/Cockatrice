@@ -23,6 +23,7 @@
 #include "../server_response_containers.h"
 #include "game_config.h"
 #include "server_deck_validation_strategy.h"
+#include "server_game_lifecycle_strategy.h"
 
 #include <QDateTime>
 #include <QMap>
@@ -82,6 +83,8 @@ private:
     GameReplay *currentReplay;
 
     QScopedPointer<Server_DeckValidationStrategy> deckValidationStrategy;
+
+    QScopedPointer<Server_GameLifecycleStrategy> lifecycleStrategy;
 
     void createGameStateChangedEvent(Event_GameStateChanged *event,
                                      Server_AbstractParticipant *recipient,
@@ -220,6 +223,12 @@ public:
     }
     /** @brief Replace the deck validation strategy; takes ownership of @p strategy. */
     void setDeckValidationStrategy(Server_DeckValidationStrategy *strategy);
+
+    /** @brief Get the current game lifecycle strategy (non-owning). */
+    Server_GameLifecycleStrategy *getLifecycleStrategy() const
+    {
+        return lifecycleStrategy.data();
+    }
 };
 
 #endif
