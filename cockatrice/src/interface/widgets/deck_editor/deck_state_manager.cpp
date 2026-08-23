@@ -2,6 +2,7 @@
 
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list_history_manager.h>
+#include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 
 DeckStateManager::DeckStateManager(QObject *parent)
     : QObject(parent), deckList(QSharedPointer<DeckList>(new DeckList)),
@@ -307,6 +308,187 @@ bool DeckStateManager::decrementCountAtIndex(const QModelIndex &idx)
     return offsetCountAtIndex(idx, -1);
 }
 
+bool DeckStateManager::moveCardToZone(const QModelIndex &idx, const QString &targetZoneName)
+{
+    if (!idx.isValid()) {
+        return false;
+    }
+
+    // Only actual card rows can be moved. Group or zone rows report an
+    // aggregate amount and must never be deleted by this operation.
+    if (!idx.data(DeckRoles::IsCardRole).toBool()) {
+        return false;
+    }
+
+    QString cardName = idx.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+    QString providerId = idx.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::DisplayRole).toString();
+    int copies = idx.siblingAtColumn(DeckListModelColumns::CARD_AMOUNT).data(Qt::EditRole).toInt();
+
+    if (copies <= 0) {
+        return false;
+    }
+
+    // Tokens only live in the tokens zone and cannot be moved into decks.
+    CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(cardName);
+    if (info && info->getIsToken()) {
+        return false;
+    }
+
+    // Determine the zone the card currently lives in: the enclosing custom
+    // zone, or the nearest top-level zone (board zone or legacy zone).
+    QString currentZoneName;
+    for (QModelIndex ancestor = idx.parent(); ancestor.isValid(); ancestor = ancestor.parent()) {
+        bool isCustomZone = ancestor.data(DeckRoles::IsCustomZoneRole).toBool();
+        if (isCustomZone || !ancestor.parent().isValid()) {
+            currentZoneName = ancestor.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+            break;
+        }
+    }
+
+    if (currentZoneName == targetZoneName) {
+        return false;
+    }
+
+    QString reason = tr("Moved %1 × \"%2\" (%3) to %4")
+                         .arg(copies)
+                         .arg(cardName)
+                         .arg(providerId)
+                         .arg(InnerDecklistNode::visibleNameFromName(targetZoneName));
+
+    return modifyDeck(reason, [&idx, &cardName, &providerId, &targetZoneName, copies](auto model) {
+        if (!model->removeRow(idx.row(), idx.parent())) {
+            return false;
+        }
+
+        if (ExactCard card = CardDatabaseManager::query()->getCard({cardName, providerId})) {
+            for (int i = 0; i < copies; ++i) {
+                model->addCard(card, targetZoneName);
+            }
+        } else {
+            for (int i = 0; i < copies; ++i) {
+                model->addPreferredPrintingCard(cardName, targetZoneName, true);
+            }
+        }
+
+        return true;
+    });
+}
+
+bool DeckStateManager::createCustomZone(const QString &boardZoneName, const QString &zoneName)
+{
+    const QString trimmedZoneName = zoneName.trimmed();
+    if (trimmedZoneName.isEmpty()) {
+        return false;
+    }
+
+    QString reason =
+        tr("Created zone \"%1\" in %2").arg(trimmedZoneName, InnerDecklistNode::visibleNameFromName(boardZoneName));
+
+    return modifyTree(reason, [&boardZoneName, &trimmedZoneName](DecklistNodeTree *tree) {
+        return tree->addCustomZone(boardZoneName, trimmedZoneName) != nullptr;
+    });
+}
+
+bool DeckStateManager::renameCustomZone(const QString &oldZoneName, const QString &newZoneName)
+{
+    const QString trimmedNewZoneName = newZoneName.trimmed();
+    if (trimmedNewZoneName.isEmpty() || oldZoneName == trimmedNewZoneName) {
+        return false;
+    }
+
+    QString reason = tr("Renamed zone \"%1\" to \"%2\"").arg(oldZoneName, trimmedNewZoneName);
+
+    return modifyTree(reason, [&oldZoneName, &trimmedNewZoneName](DecklistNodeTree *tree) {
+        return tree->renameCustomZone(oldZoneName, trimmedNewZoneName);
+    });
+}
+
+bool DeckStateManager::moveCustomZone(const QString &zoneName, const QString &newBoardZoneName)
+{
+    const auto *tree = deckList->getTree();
+
+    // Locate the board currently holding the zone.
+    QString currentBoardName;
+    for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
+        for (const auto *zone : tree->getCustomZones(boardName)) {
+            if (zone->getName() == zoneName) {
+                currentBoardName = boardName;
+                break;
+            }
+        }
+        if (!currentBoardName.isEmpty()) {
+            break;
+        }
+    }
+
+    if (currentBoardName.isEmpty()) {
+        return false;
+    }
+
+    // Same-board moves are no-ops and must not pollute the history.
+    if (currentBoardName == newBoardZoneName) {
+        return true;
+    }
+
+    // Zone names are deck-unique among zones created through this manager, so a
+    // same-named zone on the target board can only come from an imported deck.
+    // Refuse the move instead of silently stacking same-named zones.
+    for (const auto *zone : tree->getCustomZones(newBoardZoneName)) {
+        if (zone->getName() == zoneName) {
+            return false;
+        }
+    }
+
+    QString reason =
+        tr("Moved zone \"%1\" to %2").arg(zoneName, InnerDecklistNode::visibleNameFromName(newBoardZoneName));
+
+    return modifyTree(reason, [&zoneName, &newBoardZoneName](DecklistNodeTree *tree) {
+        return tree->moveCustomZone(zoneName, newBoardZoneName);
+    });
+}
+
+bool DeckStateManager::removeCustomZone(const QString &zoneName)
+{
+    QString reason = tr("Deleted zone \"%1\"").arg(zoneName);
+
+    return modifyTree(reason, [&zoneName](DecklistNodeTree *tree) { return tree->removeCustomZone(zoneName); });
+}
+
+QString DeckStateManager::validateNewZoneName(const QString &zoneName) const
+{
+    if (zoneName.trimmed().isEmpty()) {
+        return tr("Enter a zone name.");
+    }
+
+    const QString trimmedZoneName = zoneName.trimmed();
+
+    // The standard zone names are reserved even before they exist.
+    if (trimmedZoneName == DECK_ZONE_MAIN || trimmedZoneName == DECK_ZONE_SIDE ||
+        trimmedZoneName == DECK_ZONE_MAYBEBOARD || trimmedZoneName == DECK_ZONE_TOKENS) {
+        return tr("This name is reserved.");
+    }
+
+    const auto *tree = deckList->getTree();
+
+    // Top-level zones (boards and legacy zones) claim their names too.
+    for (int i = 0; i < tree->getRoot()->size(); i++) {
+        if (tree->getRoot()->at(i)->getName() == trimmedZoneName) {
+            return tr("A zone with this name already exists.");
+        }
+    }
+
+    // Custom zone names are unique across the whole deck.
+    for (const QString &board : InnerDecklistNode::boardZoneNames()) {
+        for (const auto *customZone : tree->getCustomZones(board)) {
+            if (customZone->getName() == trimmedZoneName) {
+                return tr("A zone with this name already exists.");
+            }
+        }
+    }
+
+    return {};
+}
+
 bool DeckStateManager::offsetCountAtIndex(const QModelIndex &idx, int offset)
 {
     if (!idx.isValid()) {
@@ -365,6 +547,21 @@ void DeckStateManager::redo(int steps)
 void DeckStateManager::requestHistorySave(const QString &reason)
 {
     historyManager->save(deckList->createMemento(reason));
+}
+
+bool DeckStateManager::modifyTree(const QString &reason, const std::function<bool(DecklistNodeTree *)> &operation)
+{
+    DeckListMemento memento = deckList->createMemento(reason);
+    bool success = operation(deckList->getTree());
+
+    if (success) {
+        historyManager->save(memento);
+        deckListModel->rebuildTree();
+        deckList->refreshDeckHash();
+        doCardModified();
+    }
+
+    return success;
 }
 
 /**
