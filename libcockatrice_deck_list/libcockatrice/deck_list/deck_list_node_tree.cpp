@@ -5,7 +5,7 @@
 #include <QCryptographicHash>
 #include <QSet>
 
-static constexpr int MAX_DECK_SIZE = 99999;
+static constexpr int MAX_DECK_SIZE = 1e5;
 
 DecklistNodeTree::DecklistNodeTree() : root(new InnerDecklistNode())
 {
