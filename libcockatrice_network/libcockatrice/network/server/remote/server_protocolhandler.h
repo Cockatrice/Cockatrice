@@ -27,6 +27,7 @@ class CommandContainer;
 class SessionCommand;
 class ModeratorCommand;
 class AdminCommand;
+class DeveloperCommand;
 
 class Command_Ping;
 class Command_Login;
@@ -95,6 +96,12 @@ private:
     Response::ResponseCode processAdminCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
     virtual Response::ResponseCode
     processExtendedAdminCommand(int /* cmdType */, const AdminCommand & /* cmd */, ResponseContainer & /* rc */)
+    {
+        return Response::RespFunctionNotAllowed;
+    }
+    Response::ResponseCode processDeveloperCommandContainer(const CommandContainer &cont, ResponseContainer &rc);
+    virtual Response::ResponseCode
+    processExtendedDeveloperCommand(int /* cmdType */, const DeveloperCommand & /* cmd */, ResponseContainer & /* rc */)
     {
         return Response::RespFunctionNotAllowed;
     }

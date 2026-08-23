@@ -45,6 +45,7 @@ class TabReport;
 class TabModeration;
 class TabAccount;
 class TabDeckEditor;
+class TabDeveloper;
 class TabLog;
 class RoomEvent;
 class GameEventContainer;
@@ -108,6 +109,7 @@ private:
     TabLog *tabLog;
     TabReport *tabReport;
     TabModeration *tabModeration;
+    TabDeveloper *tabDeveloper;
     QMap<int, TabRoom *> roomTabs;
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
@@ -117,7 +119,7 @@ private:
 
     QAction *aTabHome, *aTabDeckEditor, *aTabVisualDeckEditor, *aTabEdhRec, *aTabArchidekt, *aTabVisualDeckStorage,
         *aTabVisualDatabaseDisplay, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays, *aTabAdmin,
-        *aTabCardArtRules, *aTabLog, *aTabReport, *aTabModeration;
+        *aTabCardArtRules, *aTabLog, *aTabReport, *aTabModeration, *aTabDeveloper;
 
     int myAddTab(Tab *tab, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
@@ -207,6 +209,7 @@ private slots:
     void actTabLog(bool checked);
     void actTabReport(bool checked);
     void actTabModeration(bool checked);
+    void actTabDeveloper(bool checked);
 
     void openTabVisualDeckStorage();
     void openTabHome();
@@ -218,6 +221,7 @@ private slots:
     void openTabCardArtRules();
     void openTabLog();
     void openTabReport();
+    void openTabDeveloper();
 
     void updateCurrent(int index);
     void updatePingTime(int value, int max);

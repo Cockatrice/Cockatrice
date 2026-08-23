@@ -253,3 +253,11 @@ PendingCommand *AbstractClient::prepareAdminCommand(const ::google::protobuf::Me
     c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
     return new PendingCommand(cont);
 }
+
+PendingCommand *AbstractClient::prepareDeveloperCommand(const ::google::protobuf::Message &cmd)
+{
+    CommandContainer cont;
+    DeveloperCommand *c = cont.add_developer_command();
+    c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
+    return new PendingCommand(cont);
+}
