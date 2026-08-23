@@ -381,6 +381,9 @@ void TabModeration::moderatorLoginsResponse(const Response &response)
         if (login.user_level() & ServerInfo_User::IsAdmin) {
             levels << tr("Admin");
         }
+        if (login.user_level() & ServerInfo_User::IsDeveloper) {
+            levels << tr("Developer");
+        }
         if (login.user_level() & ServerInfo_User::IsModerator) {
             levels << tr("Moderator");
         }

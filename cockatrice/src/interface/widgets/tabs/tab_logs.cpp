@@ -14,12 +14,14 @@
 #include <QTabWidget>
 #include <QTableWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
+#include <libcockatrice/protocol/pb/command_get_log_history.pb.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_viewlog_history.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 #include <libcockatrice/utility/string_limits.h>
 
-TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client) : Tab(_tabSupervisor), client(_client)
+TabLog::TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _canUseDeveloperCommands)
+    : Tab(_tabSupervisor), client(_client), canUseDeveloperCommands(_canUseDeveloperCommands)
 {
     roomTable = new QTableWidget();
     roomTable->setColumnCount(6);
@@ -117,7 +119,26 @@ void TabLog::getClicked()
     };
     cmd.set_date_range(dateRange);
     cmd.set_maximum_results(maximumResults->value());
-    PendingCommand *pend = client->prepareModeratorCommand(cmd);
+
+    PendingCommand *pend;
+    if (canUseDeveloperCommands) {
+        // Developers query logs through the developer command family.
+        Command_GetLogHistory devCmd;
+        devCmd.set_user_name(cmd.user_name());
+        devCmd.set_ip_address(cmd.ip_address());
+        devCmd.set_game_name(cmd.game_name());
+        devCmd.set_game_id(cmd.game_id());
+        devCmd.set_message(cmd.message());
+        for (int i = 0; i < cmd.log_location_size(); ++i) {
+            devCmd.add_log_location(cmd.log_location(i));
+        }
+        devCmd.set_date_range(cmd.date_range());
+        devCmd.set_maximum_results(cmd.maximum_results());
+        pend = client->prepareDeveloperCommand(devCmd);
+    } else {
+        pend = client->prepareModeratorCommand(cmd);
+    }
+
     connect(pend, &PendingCommand::finished, this, &TabLog::viewLogHistory_processResponse);
     client->sendCommand(pend);
 }

@@ -173,6 +173,7 @@ public:
     static PendingCommand *prepareRoomCommand(const ::google::protobuf::Message &cmd, int roomId);
     static PendingCommand *prepareModeratorCommand(const ::google::protobuf::Message &cmd);
     static PendingCommand *prepareAdminCommand(const ::google::protobuf::Message &cmd);
+    static PendingCommand *prepareDeveloperCommand(const ::google::protobuf::Message &cmd);
 
     QMap<QString, bool> clientFeatures;
 };

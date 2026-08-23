@@ -380,6 +380,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab_card_art_rules.cpp
     src/interface/widgets/tabs/tab_deck_editor.cpp
     src/interface/widgets/tabs/tab_deck_storage.cpp
+    src/interface/widgets/tabs/tab_developer.cpp
     src/interface/widgets/tabs/tab_game.cpp
     src/interface/widgets/tabs/tab_home.cpp
     src/interface/widgets/tabs/tab_logs.cpp
