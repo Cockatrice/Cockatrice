@@ -75,7 +75,7 @@ QRectF PlaymatPreviewWidget::activePlayArea() const
     // (kMinTableAspect): the most generous framing the game will produce.
     // Dimmed strips mark where a wider, developed table crops further.
     const QRectF cardRect = QRectF(rect()).adjusted(3, 2, -3, -2);
-    return aspectFitRect(cardRect.adjusted(6, 4, -4, -4), MIN_TABLE_ASPECT);
+    return PlaymatUtils::aspectFitRect(cardRect.adjusted(6, 4, -4, -4), MIN_TABLE_ASPECT);
 }
 
 qreal PlaymatPreviewWidget::samplingWindowSide() const
@@ -85,7 +85,7 @@ qreal PlaymatPreviewWidget::samplingWindowSide() const
     }
     // Same clamped window the render path uses, gestures and painting must
     // never disagree about geometry.
-    return playmatWindowSide(sourcePixmap.size(), params);
+    return PlaymatUtils::playmatWindowSide(sourcePixmap.size(), params);
 }
 
 qreal PlaymatPreviewWidget::widgetToSourceScale() const
@@ -123,7 +123,7 @@ void PlaymatPreviewWidget::applyCropDelta(qreal dMarginL, qreal dMarginR, qreal 
     // zooming out stops exactly where the window reaches the card bounds.
     next.zoom = params.zoom * zoomFactor;
     if (!sourcePixmap.isNull()) {
-        next.zoom = playmatClampedZoom(sourcePixmap.size(), next);
+        next.zoom = PlaymatUtils::playmatClampedZoom(sourcePixmap.size(), next);
     }
 
     if (sameCrop(next, params)) {
