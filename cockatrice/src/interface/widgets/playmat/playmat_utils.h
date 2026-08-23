@@ -6,10 +6,11 @@
 #include <QSizeF>
 #include <libcockatrice/deck_list/deck_list.h>
 
-inline qreal playmatMaxZoom()
+namespace PlaymatUtils
 {
-    return 4.0;
-}
+
+/** @brief Upper bound for zooming into the playmat art. */
+constexpr qreal MAX_ZOOM = 4.0;
 
 /**
  * @brief Width of the outer viewing window: full card width trimmed by the
@@ -38,7 +39,11 @@ inline qreal playmatClampedZoom(const QSize &fullCardSize, const PlaymatParams &
     const qreal minDim = qMin<qreal>(fullCardSize.width(), fullCardSize.height());
     const qreal visibleW = playmatVisibleWidth(fullCardSize, params);
     const qreal zoomOutFloor = (minDim > 0.0 && visibleW > 0.0) ? visibleW / minDim : 1.0;
-    return qBound(qMin(zoomOutFloor, playmatMaxZoom()), params.zoom, playmatMaxZoom());
+    // The floor deliberately bypasses MAX_ZOOM: when the art is much wider
+    // than tall, keeping the square window inside it requires more than 4x
+    // zoom-out, and honoring that larger floor keeps side within
+    // min(card width, height). Zooming IN is still capped at MAX_ZOOM.
+    return qMin(MAX_ZOOM, qMax(params.zoom, zoomOutFloor));
 }
 
 /**
@@ -80,8 +85,7 @@ inline QRectF computeArtSourceRect(const QSize &fullCardSize, const PlaymatParam
     // verticalOffset places the TOP edge of the sampling window itself within
     // its travel, so the full [0, 1] parameter range is live at every zoom and
     // the window can always reach the very top (0.0) and bottom (1.0) of the
-    // art. At zoom 1 this is byte identical to the released formula, because
-    // the sampling window then equals the outer trimmed span.
+    // art.
     const qreal offset = qBound(0.0, params.verticalOffset, 1.0);
     const qreal y = offset * qMax(0.0, srcH - side);
 
@@ -130,5 +134,7 @@ inline QRectF aspectFitRect(const QRectF &dstArea, qreal aspect)
     qreal h = w / aspect;
     return QRectF(dstArea.left() + (dstArea.width() - w) / 2.0, dstArea.top() + (dstArea.height() - h) / 2.0, w, h);
 }
+
+} // namespace PlaymatUtils
 
 #endif // COCKATRICE_PLAYMAT_UTILS_H
