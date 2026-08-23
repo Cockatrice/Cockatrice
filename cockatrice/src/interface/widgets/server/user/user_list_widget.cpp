@@ -1372,9 +1372,13 @@ void UserListWidget::updateCardArtParams(const ServerInfo_User &user, const QStr
         params.zoom = cap.zoom();
         cardArtParamsMap.insert(userName, params);
         cardArtProvider->requestCardArt(userName, params.cardName, params.cardProviderId);
-    } else {
-        cardArtParamsMap.remove(userName); // clear stale params on removal
     }
+    // Intentionally no removal branch: buddy/ignore list copies never carry
+    // card_art_params (the server omits the column), so a params-less copy here
+    // means "this snapshot doesn't include it", not "the banner was removed".
+    // Removing on such copies would wipe banners that the live online list set.
+    // The map is rebuilt from scratch (clear() + repopulate) on every rebuild,
+    // which is what actually drops stale entries.
 }
 
 void UserListWidget::processUserInfo(const ServerInfo_User &user, bool online)
