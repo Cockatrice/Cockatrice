@@ -145,7 +145,8 @@ bool DecklistNodeTree::deleteNode(AbstractDecklistNode *node, InnerDecklistNode 
     if (index != -1) {
         delete rootNode->takeAt(index);
 
-        if (rootNode->empty()) {
+        // Empty custom zones are kept while empty board zones get pruned.
+        if (rootNode->empty() && rootNode->getParent() == root) {
             deleteNode(rootNode, rootNode->getParent());
         }
 
@@ -188,15 +189,151 @@ void DecklistNodeTree::forEachCard(const std::function<void(InnerDecklistNode *,
 
 /**
  * Gets the InnerDecklistNode that is the root node for the given zone, creating a new node if it doesn't exist.
+ *
+ * Top-level zones take precedence, then deck-unique custom zones nested under boards
+ * are resolved. Unknown names create a new top-level zone (legacy behavior).
  */
 InnerDecklistNode *DecklistNodeTree::getZoneObjFromName(const QString &zoneName) const
 {
     for (int i = 0; i < root->size(); i++) {
         auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
-        if (node->getName() == zoneName) {
+        if (node && node->getName() == zoneName) {
             return node;
         }
     }
 
+    if (auto *customZone = findCustomZoneByName(zoneName)) {
+        return customZone;
+    }
+
     return new InnerDecklistNode(zoneName, root);
+}
+
+InnerDecklistNode *DecklistNodeTree::addCustomZone(const QString &boardZoneName, const QString &zoneName)
+{
+    if (hasZoneName(zoneName)) {
+        return nullptr;
+    }
+
+    auto *boardZone = dynamic_cast<InnerDecklistNode *>(root->findChild(boardZoneName));
+    if (!boardZone &&
+        (boardZoneName == DECK_ZONE_MAYBEBOARD || boardZoneName == DECK_ZONE_MAIN || boardZoneName == DECK_ZONE_SIDE)) {
+        // The boards are lazy zones: they only exist once cards or custom zones need them.
+        boardZone = new InnerDecklistNode(boardZoneName, root);
+    }
+
+    if (!boardZone) {
+        return nullptr;
+    }
+
+    return new InnerDecklistNode(zoneName, boardZone);
+}
+
+bool DecklistNodeTree::renameCustomZone(const QString &oldZoneName, const QString &newZoneName)
+{
+    if (hasZoneName(newZoneName)) {
+        return false;
+    }
+
+    auto *zone = findCustomZoneByName(oldZoneName);
+    if (!zone) {
+        return false;
+    }
+
+    zone->setName(newZoneName);
+    return true;
+}
+
+bool DecklistNodeTree::moveCustomZone(const QString &zoneName, const QString &newBoardZoneName)
+{
+    auto *zone = findCustomZoneByName(zoneName);
+    if (!zone) {
+        return false;
+    }
+
+    auto *currentBoardZone = zone->getParent();
+    if (currentBoardZone && currentBoardZone->getName() == newBoardZoneName) {
+        return true;
+    }
+
+    auto *newBoardZone = dynamic_cast<InnerDecklistNode *>(root->findChild(newBoardZoneName));
+    if (!newBoardZone && (newBoardZoneName == DECK_ZONE_MAYBEBOARD || newBoardZoneName == DECK_ZONE_MAIN ||
+                          newBoardZoneName == DECK_ZONE_SIDE)) {
+        // The boards are lazy zones: they only exist once cards or custom zones need them.
+        newBoardZone = new InnerDecklistNode(newBoardZoneName, root);
+    }
+    if (!newBoardZone) {
+        return false;
+    }
+
+    currentBoardZone->removeOne(zone);
+    newBoardZone->append(zone);
+    zone->setParent(newBoardZone);
+    return true;
+}
+
+bool DecklistNodeTree::removeCustomZone(const QString &zoneName)
+{
+    auto *zone = findCustomZoneByName(zoneName);
+    if (!zone) {
+        return false;
+    }
+
+    // Detach and delete without pruning the board zone.
+    auto *boardZone = zone->getParent();
+    boardZone->removeOne(zone);
+    delete zone;
+    return true;
+}
+
+QList<const InnerDecklistNode *> DecklistNodeTree::getCustomZones(const QString &boardZoneName) const
+{
+    QList<const InnerDecklistNode *> result;
+
+    auto *boardZone = dynamic_cast<InnerDecklistNode *>(root->findChild(boardZoneName));
+    if (!boardZone) {
+        return result;
+    }
+
+    for (int i = 0; i < boardZone->size(); i++) {
+        if (auto *customZone = dynamic_cast<InnerDecklistNode *>(boardZone->at(i))) {
+            result.append(customZone);
+        }
+    }
+
+    return result;
+}
+
+InnerDecklistNode *DecklistNodeTree::findCustomZoneByName(const QString &zoneName) const
+{
+    for (int i = 0; i < root->size(); i++) {
+        auto *boardZone = dynamic_cast<InnerDecklistNode *>(root->at(i));
+        if (!boardZone) {
+            continue;
+        }
+
+        for (int j = 0; j < boardZone->size(); j++) {
+            auto *customZone = dynamic_cast<InnerDecklistNode *>(boardZone->at(j));
+            if (customZone && customZone->getName() == zoneName) {
+                return customZone;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+bool DecklistNodeTree::hasZoneName(const QString &zoneName) const
+{
+    // The standard zones are reserved names even before they are created lazily.
+    if (zoneName == DECK_ZONE_MAIN || zoneName == DECK_ZONE_SIDE || zoneName == DECK_ZONE_MAYBEBOARD ||
+        zoneName == DECK_ZONE_TOKENS) {
+        return true;
+    }
+
+    if (root->findChild(zoneName)) {
+        return true;
+    }
+
+    return findCustomZoneByName(zoneName) != nullptr;
 }
