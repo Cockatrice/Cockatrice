@@ -33,7 +33,14 @@ public:
         return symbol[0];
     }
 
-    void loadManaIcon();
+    /**
+     * @brief Returns a smooth-scaled rendering of the given mana symbol icon.
+     *
+     * Results are shared between all instances via a process-wide cache keyed by symbol
+     * and size, so scaling work is done once per distinct combination instead of once per
+     * widget creation or resize.
+     */
+    static QPixmap getCachedScaledIcon(const QString &symbol, const QSize &size);
 
 public slots:
     void resizeEvent(QResizeEvent *event) override;
@@ -44,7 +51,6 @@ signals:
 
 private:
     QString symbol;
-    QPixmap manaIcon;
     bool isActive;
     bool mayBeToggled;
     QGraphicsOpacityEffect *opacityEffect;
