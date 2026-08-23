@@ -30,7 +30,8 @@ enum
 {
     IsCardRole = Qt::UserRole + 1, /**< Indicates whether the item represents a card. */
     DepthRole,                     /**< Depth level within the deck's grouping hierarchy. */
-    IsLegalRole                    /**< Whether the card is legal in the current deck format. */
+    IsLegalRole,                   /**< Whether the card is legal in the current deck format. */
+    IsCustomZoneRole               /**< Whether the item represents a custom zone nested under a board zone. */
 };
 } // namespace DeckRoles
 
@@ -188,6 +189,21 @@ public:
     {
         return false;
     }
+};
+
+/**
+ * @class DecklistModelSubZoneNode
+ * @ingroup DeckModels
+ * @brief Model node representing a custom zone nested under a board zone.
+ *
+ * Custom zones group cards by user-defined names (e.g. "Removal", "Utility")
+ * inside a board zone. They are mirrored from the underlying deck tree so that
+ * they can be told apart from criteria group nodes.
+ */
+class DecklistModelSubZoneNode : public InnerDecklistNode
+{
+public:
+    using InnerDecklistNode::InnerDecklistNode;
 };
 
 /**
@@ -391,6 +407,14 @@ public:
      */
     [[nodiscard]] QList<QString> getZones() const;
 
+    /**
+     * @brief Gets the names of the custom zones nested under the given board zone.
+     *
+     * @param boardZoneName The board zone to query (main/side/maybeboard)
+     * @return The custom zone names, in deck order
+     */
+    [[nodiscard]] QStringList getCustomZoneNames(const QString &boardZoneName) const;
+
 private:
     QSharedPointer<DeckList> deckList; /**< Pointer to the decklist providing the underlying data. */
     InnerDecklistNode *root;           /**< Root node of the model tree. */
@@ -404,6 +428,16 @@ private:
                                                       const QString &zoneName,
                                                       const QString &providerId = "",
                                                       const QString &cardNumber = "") const;
+
+    /**
+     * @brief Finds a custom zone node in the model tree by name.
+     *
+     * Custom zone names are unique across the whole deck.
+     *
+     * @param zoneName Name of the custom zone.
+     * @return The custom zone node, or nullptr if not found.
+     */
+    [[nodiscard]] DecklistModelSubZoneNode *findSubZoneNodeByName(const QString &zoneName) const;
 
     /**
      * @brief Determines the sorted insertion row for a card.
@@ -427,6 +461,8 @@ private:
     void emitRecursiveUpdates(const QModelIndex &index);
 
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
+    void sortShadowTree(InnerDecklistNode *node, Qt::SortOrder order);
+    void shiftCustomZonesToEnd(InnerDecklistNode *boardZone);
 
     template <typename T> T getNode(const QModelIndex &index) const
     {
