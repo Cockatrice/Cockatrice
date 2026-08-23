@@ -32,7 +32,17 @@ struct DeckLoadResult
 {
     LoadedDeck deck;        ///< The parsed deck.
     QDateTime lastModified; ///< File modification time at load.
+    QString colorIdentity;  ///< WUBRG color identity, computed off the UI thread.
 };
+
+/**
+ * @brief How many finished background deck loads one event loop turn applies.
+ *
+ * Applying a load emits dataChanged and wakes up the proxies, which is not
+ * free, and the bound keeps a burst of simultaneous completions from stalling
+ * the UI thread.
+ */
+constexpr int DECK_LOADS_PER_TURN = 24;
 
 /**
  * @brief The path of \a path relative to the deck root, or empty if \a path
@@ -107,6 +117,8 @@ DeckScanResult scanDeckDirectory(const QString &deckPath)
     return result;
 }
 } // namespace
+
+static QString computeColorIdentity(const LoadedDeck &deck);
 
 VisualDeckStorageModel::VisualDeckStorageModel(QObject *parent) : QAbstractListModel(parent)
 {
@@ -196,6 +208,7 @@ void VisualDeckStorageModel::startScan()
     beginResetModel();
     decks.clear();
     folderPaths.clear();
+    pendingLoads.clear();
     endResetModel();
 
     if (deckPath.isEmpty()) {
@@ -257,26 +270,20 @@ void VisualDeckStorageModel::beginLoad(int row)
                     return; // The deck list was re-scanned while this load was running; drop the stale result.
                 }
 
-                const int row = rowForFilePath(filePath);
-                if (row == -1) {
-                    return;
+                // Queue the result and apply a bounded number per event loop turn so that
+                // finishing hundreds of loads at once cannot stall the UI thread.
+                const std::optional<DeckLoadResult> result = watcher->result();
+                PendingDeckLoad pending;
+                pending.filePath = filePath;
+                pending.generation = generation;
+                if (result) {
+                    pending.ok = true;
+                    pending.deck = std::move(result->deck);
+                    pending.lastModified = result->lastModified;
+                    pending.colorIdentity = std::move(result->colorIdentity);
                 }
-
-                DeckPreviewData &data = decks[row];
-                data.loadInProgress = false;
-
-                std::optional<DeckLoadResult> result = watcher->result();
-                if (!result) {
-                    return; // Leave the row unloaded; it stays visible but without deck data.
-                }
-
-                data.deck = std::move(result->deck);
-                data.loadSucceeded = true;
-                data.lastModified = result->lastModified;
-                recomputeDeckMetadata(data);
-
-                emit dataChanged(index(row), index(row));
-                emit deckLoaded(row);
+                pendingLoads.append(std::move(pending));
+                schedulePendingLoadDrain();
             });
 
     watcher->setFuture(QtConcurrent::run([filePath, fmt]() -> std::optional<DeckLoadResult> {
@@ -284,8 +291,61 @@ void VisualDeckStorageModel::beginLoad(int row)
         if (!deck) {
             return std::nullopt;
         }
-        return DeckLoadResult{*deck, QFileInfo(filePath).lastModified()};
+        // Color identity walks every card through the database, so compute it here to
+        // keep the completion handler on the UI thread cheap.
+        const QString colorIdentity = computeColorIdentity(*deck);
+        return DeckLoadResult{std::move(*deck), QFileInfo(filePath).lastModified(), colorIdentity};
     }));
+}
+
+void VisualDeckStorageModel::schedulePendingLoadDrain()
+{
+    if (drainScheduled) {
+        return;
+    }
+    drainScheduled = true;
+    QMetaObject::invokeMethod(this, &VisualDeckStorageModel::drainPendingLoads, Qt::QueuedConnection);
+}
+
+void VisualDeckStorageModel::drainPendingLoads()
+{
+    drainScheduled = false;
+
+    int applied = 0;
+    while (!pendingLoads.isEmpty() && applied < DECK_LOADS_PER_TURN) {
+        PendingDeckLoad pending = pendingLoads.takeFirst();
+
+        if (pending.generation != scanGeneration) {
+            continue;
+        }
+
+        const int row = rowForFilePath(pending.filePath);
+        if (row == -1) {
+            continue;
+        }
+
+        DeckPreviewData &data = decks[row];
+        data.loadInProgress = false;
+
+        if (!pending.ok) {
+            ++applied;
+            continue; // Leave the row unloaded so it stays visible without deck data.
+        }
+
+        data.deck = std::move(pending.deck);
+        data.loadSucceeded = true;
+        data.lastModified = pending.lastModified;
+        recomputeDeckMetadata(data, false);
+        data.colorIdentity = std::move(pending.colorIdentity);
+
+        emit dataChanged(index(row), index(row));
+        emit deckLoaded(row);
+        ++applied;
+    }
+
+    if (!pendingLoads.isEmpty()) {
+        schedulePendingLoadDrain();
+    }
 }
 
 /**
@@ -325,7 +385,7 @@ static QString computeColorIdentity(const LoadedDeck &deck)
 /**
  * @brief Recomputes all derived metadata of a row from its loaded deck.
  */
-void VisualDeckStorageModel::recomputeDeckMetadata(DeckPreviewData &data)
+void VisualDeckStorageModel::recomputeDeckMetadata(DeckPreviewData &data, bool recomputeColorIdentity)
 {
     const DeckList &deckList = data.deck.deckList;
 
@@ -334,7 +394,9 @@ void VisualDeckStorageModel::recomputeDeckMetadata(DeckPreviewData &data)
     data.tags = deckList.getTags();
     data.lastLoaded = QDateTime::fromString(deckList.getLastLoadedTimestamp());
     data.bannerCard = deckList.getBannerCard();
-    data.colorIdentity = computeColorIdentity(data.deck);
+    if (recomputeColorIdentity) {
+        data.colorIdentity = computeColorIdentity(data.deck);
+    }
 }
 
 void VisualDeckStorageModel::setFilePathForRow(int row, const QString &newFilePath)

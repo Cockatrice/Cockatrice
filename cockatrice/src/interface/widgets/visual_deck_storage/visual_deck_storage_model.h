@@ -66,6 +66,19 @@ struct DeckPreviewData
 };
 
 /**
+ * @brief One finished background deck load that has not been applied to the model yet.
+ */
+struct PendingDeckLoad
+{
+    QString filePath;       ///< Identifies the row the result belongs to.
+    int generation;         ///< Scan generation the load was started in.
+    bool ok = false;        ///< Whether the file parsed successfully.
+    LoadedDeck deck;        ///< The parsed deck, valid when ok.
+    QDateTime lastModified; ///< File modification time at load, valid when ok.
+    QString colorIdentity;  ///< WUBRG color identity computed off the UI thread, valid when ok.
+};
+
+/**
  * @brief The list model backing the Visual Deck Storage widget tree.
  *
  * Rows are in filesystem scan order; ordering and filtering are handled by
@@ -144,13 +157,21 @@ signals:
 private:
     void startScan();
     void beginLoad(int row);
-    static void recomputeDeckMetadata(DeckPreviewData &data);
+    static void recomputeDeckMetadata(DeckPreviewData &data, bool recomputeColorIdentity = true);
+    void schedulePendingLoadDrain();
+
+private slots:
+    void drainPendingLoads();
+
+private:
     void setFilePathForRow(int row, const QString &newFilePath);
 
     QString deckPath;
     QList<DeckPreviewData> decks;
-    QStringList folderPaths; ///< All subdirectories of the deck folder, sorted.
-    int scanGeneration = 0;  ///< Bumped on every scan so stale results are ignored.
+    QStringList folderPaths;               ///< All subdirectories of the deck folder, sorted.
+    int scanGeneration = 0;                ///< Bumped on every scan so stale results are ignored.
+    QVector<PendingDeckLoad> pendingLoads; ///< Finished background loads waiting to be applied.
+    bool drainScheduled = false;           ///< Whether a queued drain pass is already pending.
 };
 
 #endif // VISUAL_DECK_STORAGE_MODEL_H

@@ -90,6 +90,8 @@ private:
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
     QLabel *bannerCardLabel;
     QComboBox *bannerCardComboBox;
+    QList<QWidget *> fixedWidthChildren; ///< Children clamped to the picture width on resize.
+    int lastKnownBannerWidth = -1;       ///< The picture width last applied to the children.
 };
 
 class NoScrollFilter : public QObject

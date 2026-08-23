@@ -96,6 +96,11 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
 
     retranslateUi();
     syncFromModel();
+
+    // resizeEvent clamps every child to the picture's width, so collect them once here
+    // to keep the resize handler from searching the widget tree on every layout pass.
+    fixedWidthChildren = {bannerCardDisplayWidget, colorIdentityWidget, deckTagsDisplayWidget, bannerCardLabel,
+                          bannerCardComboBox};
 }
 
 void DeckPreviewWidget::retranslateUi()
@@ -109,9 +114,15 @@ void DeckPreviewWidget::resizeEvent(QResizeEvent *event)
     if (bannerCardDisplayWidget == nullptr) {
         return;
     }
-    QList<QWidget *> widgets = findChildren<QWidget *>();
-    for (QWidget *widget : widgets) {
-        widget->setMaximumWidth(bannerCardDisplayWidget->width());
+
+    const int width = bannerCardDisplayWidget->width();
+    if (width == lastKnownBannerWidth) {
+        return;
+    }
+    lastKnownBannerWidth = width;
+
+    for (QWidget *widget : fixedWidthChildren) {
+        widget->setMaximumWidth(width);
     }
 }
 
