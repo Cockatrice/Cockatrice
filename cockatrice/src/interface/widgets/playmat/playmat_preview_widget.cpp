@@ -17,8 +17,7 @@ namespace
 // out of range parameter. The zoom FLOOR is dynamic: see
 // playmatClampedZoom(), zooming out stops where the sampling window would
 // exceed the card itself, so there is no dead range at the bottom end.
-constexpr qreal kMaxMargin = 0.95;
-constexpr qreal kMaxZoom = 4.0;
+constexpr qreal MAX_MARGIN = 0.95;
 // Range of in game stack+table aspect ratios worth designing for, derived
 // from PlayerGraphicsItem::paint()'s combinedArea = stack ∪ table:
 //   height = 10 + 30 + 3*102 + 2*30 = 406            (TableZone rows)
@@ -27,13 +26,13 @@ constexpr qreal kMaxZoom = 4.0;
 // The area's shape depends on GAME CONTENT (played card columns widen the
 // table by ~107 px each), not on the window size. Fresh board ≈ 503/406,
 // a table grown to roughly double its minimum width ≈ 2.2.
-constexpr qreal kMinTableAspect = 503.0 / 406.0; // fresh board: most generous framing
-constexpr qreal kMaxTableAspect = 2.2;           // well developed, wide table
+constexpr qreal MIN_TABLE_ASPECT = 503.0 / 406.0; // fresh board: most generous framing
+constexpr qreal MAX_TABLE_ASPECT = 2.2;           // well developed, wide table
 // Keyboard nudge steps (viewport convention: Down looks further down).
-constexpr qreal kKeyPanMarginStep = 0.005;
-constexpr qreal kKeyPanOffsetStep = 0.01;
-constexpr qreal kKeyZoomStep = 1.05;
-constexpr qreal kWheelZoomBase = 1.15; // zoom factor per wheel notch
+constexpr qreal KEY_PAN_MARGIN_STEP = 0.005;
+constexpr qreal KEY_PAN_OFFSET_STEP = 0.01;
+constexpr qreal KEY_ZOOM_STEP = 1.05;
+constexpr qreal WHEEL_ZOOM_BASE = 1.15; // zoom factor per wheel notch
 } // namespace
 
 PlaymatPreviewWidget::PlaymatPreviewWidget(QWidget *parent) : QWidget(parent)
@@ -76,7 +75,7 @@ QRectF PlaymatPreviewWidget::activePlayArea() const
     // (kMinTableAspect): the most generous framing the game will produce.
     // Dimmed strips mark where a wider, developed table crops further.
     const QRectF cardRect = QRectF(rect()).adjusted(3, 2, -3, -2);
-    return aspectFitRect(cardRect.adjusted(6, 4, -4, -4), kMinTableAspect);
+    return aspectFitRect(cardRect.adjusted(6, 4, -4, -4), MIN_TABLE_ASPECT);
 }
 
 qreal PlaymatPreviewWidget::samplingWindowSide() const
@@ -111,13 +110,13 @@ void PlaymatPreviewWidget::applyCropDelta(qreal dMarginL, qreal dMarginR, qreal 
         // without end, collapsing the viewing window and desynchronizing the
         // visual zoom from the readout.
         const qreal sum = params.marginPctL + params.marginPctR;
-        const qreal lo = qMax(0.0, sum - kMaxMargin);
-        const qreal hi = qMin(sum, kMaxMargin);
+        const qreal lo = qMax(0.0, sum - MAX_MARGIN);
+        const qreal hi = qMin(sum, MAX_MARGIN);
         next.marginPctL = qBound(lo, params.marginPctL + dMarginL, hi);
         next.marginPctR = sum - next.marginPctL;
     } else {
-        next.marginPctL = qBound(0.0, params.marginPctL + dMarginL, kMaxMargin);
-        next.marginPctR = qBound(0.0, params.marginPctR + dMarginR, kMaxMargin);
+        next.marginPctL = qBound(0.0, params.marginPctL + dMarginL, MAX_MARGIN);
+        next.marginPctR = qBound(0.0, params.marginPctR + dMarginR, MAX_MARGIN);
     }
     next.verticalOffset = qBound(0.0, params.verticalOffset + dOffset, 1.0);
     // Clamp through the shared helper so the floor tracks the new margins:
@@ -197,7 +196,7 @@ void PlaymatPreviewWidget::paintEvent(QPaintEvent *)
 
     // Wider (developed) tables crop further: mark where a kMaxTableAspect
     // board stops. Palette driven so theme authors can recolor the markers.
-    const qreal wideBandHeight = playArea.height() * (kMinTableAspect / kMaxTableAspect);
+    const qreal wideBandHeight = playArea.height() * (MIN_TABLE_ASPECT / MAX_TABLE_ASPECT);
     const qreal stripHeight = (playArea.height() - wideBandHeight) / 2.0;
     QColor stripColor = palette().color(QPalette::Window);
     stripColor.setAlpha(150);
@@ -323,7 +322,7 @@ void PlaymatPreviewWidget::wheelEvent(QWheelEvent *event)
         event->accept();
         return;
     }
-    applyCropDelta(0.0, 0.0, 0.0, std::pow(kWheelZoomBase, notches));
+    applyCropDelta(0.0, 0.0, 0.0, std::pow(WHEEL_ZOOM_BASE, notches));
     event->accept();
 }
 
@@ -348,23 +347,23 @@ void PlaymatPreviewWidget::keyPressEvent(QKeyEvent *event)
             restoreSnapshot();
             break;
         case Qt::Key_Left:
-            applyCropDelta(-kKeyPanMarginStep, kKeyPanMarginStep, 0.0, 1.0);
+            applyCropDelta(-KEY_PAN_MARGIN_STEP, KEY_PAN_MARGIN_STEP, 0.0, 1.0);
             break;
         case Qt::Key_Right:
-            applyCropDelta(kKeyPanMarginStep, -kKeyPanMarginStep, 0.0, 1.0);
+            applyCropDelta(KEY_PAN_MARGIN_STEP, -KEY_PAN_MARGIN_STEP, 0.0, 1.0);
             break;
         case Qt::Key_Up:
-            applyCropDelta(0.0, 0.0, -kKeyPanOffsetStep, 1.0);
+            applyCropDelta(0.0, 0.0, -KEY_PAN_OFFSET_STEP, 1.0);
             break;
         case Qt::Key_Down:
-            applyCropDelta(0.0, 0.0, kKeyPanOffsetStep, 1.0);
+            applyCropDelta(0.0, 0.0, KEY_PAN_OFFSET_STEP, 1.0);
             break;
         case Qt::Key_Plus:
         case Qt::Key_Equal:
-            applyCropDelta(0.0, 0.0, 0.0, kKeyZoomStep);
+            applyCropDelta(0.0, 0.0, 0.0, KEY_ZOOM_STEP);
             break;
         case Qt::Key_Minus:
-            applyCropDelta(0.0, 0.0, 0.0, 1.0 / kKeyZoomStep);
+            applyCropDelta(0.0, 0.0, 0.0, 1.0 / KEY_ZOOM_STEP);
             break;
         default:
             QWidget::keyPressEvent(event);
