@@ -1,6 +1,8 @@
 #ifndef DECKLISTMODEL_H
 #define DECKLISTMODEL_H
 
+#include "deck_list_model_custom_zones.h"
+
 #include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/abstract_deck_list_card_node.h>
 #include <../../../../libcockatrice_deck_list/libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <QAbstractItemModel>
@@ -30,7 +32,8 @@ enum
 {
     IsCardRole = Qt::UserRole + 1, /**< Indicates whether the item represents a card. */
     DepthRole,                     /**< Depth level within the deck's grouping hierarchy. */
-    IsLegalRole                    /**< Whether the card is legal in the current deck format. */
+    IsLegalRole,                   /**< Whether the card is legal in the current deck format. */
+    IsCustomZoneRole               /**< Whether the item represents a custom zone nested under a board zone. */
 };
 } // namespace DeckRoles
 
@@ -391,6 +394,14 @@ public:
      */
     [[nodiscard]] QList<QString> getZones() const;
 
+    /**
+     * @brief Gets the names of the custom zones nested under the given board zone.
+     *
+     * @param boardZoneName The board zone to query (main/side/maybeboard)
+     * @return The custom zone names, in deck order
+     */
+    [[nodiscard]] QStringList getCustomZoneNames(const QString &boardZoneName) const;
+
 private:
     QSharedPointer<DeckList> deckList; /**< Pointer to the decklist providing the underlying data. */
     InnerDecklistNode *root;           /**< Root node of the model tree. */
@@ -427,6 +438,7 @@ private:
     void emitRecursiveUpdates(const QModelIndex &index);
 
     void sortHelper(InnerDecklistNode *node, Qt::SortOrder order);
+    void sortShadowTree(InnerDecklistNode *node, Qt::SortOrder order);
 
     template <typename T> T getNode(const QModelIndex &index) const
     {
