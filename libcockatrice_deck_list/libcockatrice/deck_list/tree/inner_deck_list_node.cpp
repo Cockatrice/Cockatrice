@@ -150,12 +150,12 @@ int InnerDecklistNode::readElement(QXmlStreamReader *xml, int limit)
                 auto *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
                 totalCards += newZone->readElement(xml, limit - totalCards);
             } else if (childName == "card") {
-              int amount = xml->attributes().value("number").toString().toInt();
-              amount = qMin(amount, limit - totalCards);
-                auto *newCard = new DecklistCardNode(
-                    xml->attributes().value("name").toString(), amount,
-                    this, -1, xml->attributes().value("setShortName").toString(),
-                    xml->attributes().value("collectorNumber").toString(), xml->attributes().value("uuid").toString());
+                int amount = xml->attributes().value("number").toString().toInt();
+                amount = qMin(amount, limit - totalCards);
+                auto *newCard = new DecklistCardNode(xml->attributes().value("name").toString(), amount, this, -1,
+                                                     xml->attributes().value("setShortName").toString(),
+                                                     xml->attributes().value("collectorNumber").toString(),
+                                                     xml->attributes().value("uuid").toString());
                 totalCards += amount;
                 totalCards += newCard->readElement(xml, limit - totalCards);
             }
