@@ -1,5 +1,8 @@
 name: Generate Docs
 
+permissions:
+  contents: read    # write permission to the destination repo come from 'deploy_key'
+
 on:
   pull_request:
     paths:
