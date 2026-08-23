@@ -15,6 +15,8 @@ set(cockatrice_SOURCES
     src/client/network/update/client/client_update_checker.cpp
     src/client/network/update/client/release_channel.cpp
     src/client/network/update/card_spoiler/spoiler_background_updater.cpp
+    src/client/latency_graph_widget.cpp
+    src/client/latency_status_widget.cpp
     src/client/lag_monitor.cpp
     src/client/sound_engine.cpp
     src/client/settings/cache_settings.cpp

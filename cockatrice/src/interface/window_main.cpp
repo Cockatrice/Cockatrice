@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "window_main.h"
 
+#include "../client/latency_status_widget.h"
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/network/update/client/release_channel.h"
 #include "../client/settings/cache_settings.h"
@@ -56,6 +57,7 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QFileDialog>
+#include <QLabel>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -534,6 +536,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&SettingsCache::instance().userInterface(), &InterfaceSettings::showStatusBarChanged, this,
             [this](bool show) { statusBar()->setVisible(show); });
     statusBar()->setVisible(SettingsCache::instance().userInterface().getShowStatusBar());
+
+    latencyStatus = new LatencyStatusWidget(this);
+    statusBar()->addPermanentWidget(latencyStatus);
+
+    connect(connectionController, &ConnectionController::pingStatsUpdated, latencyStatus,
+            &LatencyStatusWidget::updateData);
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &MainWindow::refreshShortcuts);
