@@ -829,7 +829,7 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
         result.mutable_creator_info()->CopyFrom(*getCreatorInfo());
         const Server_AbstractParticipant *host = participants.value(hostId, nullptr);
         if (host != nullptr) {
-            result.mutable_host_info()->CopyFrom(*host->getUserInfo());
+            host->copyUserInfo(*result.mutable_host_info(), false);
         } else {
             result.mutable_host_info()->CopyFrom(*getCreatorInfo());
         }
