@@ -5,12 +5,15 @@
 #include <QPixmap>
 #include <libcockatrice/deck_list/deck_list.h>
 
+class QCheckBox;
 class QComboBox;
 class QCompleter;
+class QDoubleSpinBox;
 class QGroupBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
+class QWidget;
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 class CardSearchModel;
@@ -22,7 +25,8 @@ class PlaymatPreviewWidget;
  *
  * The crop surface is the primary control: drag to pan the visible art,
  * scroll (or +/- keys) to zoom, arrow keys to nudge. Card name and printing
- * are selected below. These gestures edit the same stored PlaymatParams that
+ * are selected below. A checkbox reveals optional numerical editors for the
+ * raw PlaymatParams. These controls edit the same stored PlaymatParams that
  * ship in deck files and player properties.
  */
 class PlaymatSettingsDialog : public QDialog
@@ -39,6 +43,7 @@ public:
 
 private slots:
     void onCardNameChanged(const QString &name);
+    void onParamChanged();
     void reloadPreview();
 
 private:
@@ -46,6 +51,7 @@ private:
     void populateProviderCombo(const QString &cardName);
     void initializeSearchBar();
     void retranslateUi();
+    QDoubleSpinBox *makeSpinBox(double min, double max, double value, double step);
 
     QLineEdit *searchBar;
     QCompleter *completer;
@@ -61,9 +67,20 @@ private:
     QLabel *cardNameLabel;
     QLabel *printingLabel;
     QLabel *previewCaptionLabel;
+    QCheckBox *showNumericEditorsCheck;
+    QWidget *numericEditors;
+    QLabel *leftMarginLabel;
+    QLabel *rightMarginLabel;
+    QLabel *verticalOffsetLabel;
+    QLabel *zoomLabel;
     QGroupBox *controlsGroup;
     QGroupBox *previewGroup;
     QPushButton *removeButton;
+
+    QDoubleSpinBox *marginLSpin;
+    QDoubleSpinBox *marginRSpin;
+    QDoubleSpinBox *verticalOffsetSpin;
+    QDoubleSpinBox *zoomSpin;
 
     PlaymatPreviewWidget *preview;
 
