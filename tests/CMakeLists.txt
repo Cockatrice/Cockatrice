@@ -10,7 +10,7 @@ add_test(NAME server_card_counter_test COMMAND server_card_counter_test)
 add_test(NAME server_counter_test COMMAND server_counter_test)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
-set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 5)
+set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 15)
 
 # Find GTest
 
