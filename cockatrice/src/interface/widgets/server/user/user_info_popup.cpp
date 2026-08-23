@@ -189,22 +189,31 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
 
     // ── Card art background ───────────────────────────────────────────────────
     if (!cardArt.isNull()) {
+        // Same DPR normalization as UserListPainter::drawCardArt: the cache
+        // carries screen scaled pixmaps on HiDPI displays, the math below is
+        // in raw pixels.
+        QPixmap art = cardArt;
+        art.setDevicePixelRatio(1.0);
+
         const int w = rect.width();
         const int h = rect.height();
         const int mL = qRound(w * params.marginPctL);
         const int mR = qRound(w * params.marginPctR);
         const int dW = w - mL - mR;
 
-        const double base = qMax(double(dW) / cardArt.width(), double(h) / cardArt.height());
+        const double base = qMax(double(dW) / art.width(), double(h) / art.height());
         const double scale = base * params.zoom;
-        const int sW = qRound(cardArt.width() * scale);
-        const int sH = qRound(cardArt.height() * scale);
+        const int sW = qRound(art.width() * scale);
+        const int sH = qRound(art.height() * scale);
 
-        const QPixmap scaled = cardArt.scaled(sW, sH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-        const int srcX = (sW - dW) / 2;
-        const int srcY = qBound(0, qRound((sH - h) * params.verticalOffset), qMax(0, sH - h));
+        const QPixmap scaled = art.scaled(sW, sH, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        // Clamp against stored zoom < 1, which can push srcX negative and silently
+        // underfill the strip with transparent padding
+        const int safeSrcX = qBound(0, (sW - dW) / 2, qMax(0, sW - dW));
+        const int safeSrcY = qBound(0, qRound((sH - h) * params.verticalOffset), qMax(0, sH - h));
 
-        QImage img = scaled.copy(srcX, srcY, dW, h).toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);
+        QImage img =
+            scaled.copy(safeSrcX, safeSrcY, dW, h).toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);
         {
             QPainter mask(&img);
             mask.setCompositionMode(QPainter::CompositionMode_DestinationIn);
@@ -361,7 +370,7 @@ void UserInfoPopup::buildUi()
     header = new UserInfoHeaderWidget(this);
     root->addWidget(header);
 
-    // Action area — rebuilt per user
+    // Action area, rebuilt per user
     actionArea = new QWidget(this);
     root->addWidget(actionArea);
 
@@ -402,7 +411,7 @@ void UserInfoPopup::buildUi()
 
     root->addWidget(gamesView);
 
-    // Close button — positioned absolutely in the top-right corner
+    // Close button, positioned absolutely in the top right corner
     closeBtn = new QPushButton(QStringLiteral("✕"), this);
     closeBtn->setFixedSize(22, 22);
     closeBtn->setFlat(true);
@@ -673,7 +682,7 @@ void UserInfoPopup::showForUser(const QString &userName,
     gamesStatus->setText(tr("Loading games…"));
     gamesStatus->show();
 
-    // Close button — top-right corner, above everything
+    // Close button, top right corner, above everything
     closeBtn->move(PopupWidth - closeBtn->width() - 6, 6);
     closeBtn->raise();
 
@@ -702,7 +711,7 @@ void UserInfoPopup::fetchGames()
 void UserInfoPopup::onGamesReceived(const Response &r, const QString &forUser)
 {
     if (forUser != currentUser) {
-        return; // stale response — different user showing now
+        return; // stale response, different user showing now
     }
 
     gamesModel->clear();
