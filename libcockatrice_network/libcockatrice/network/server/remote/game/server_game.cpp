@@ -63,8 +63,9 @@ Server_Game::Server_Game(const GameConfig &config, Server_Room *_room)
       startingLifeTotal(config.startingLifeTotal), shareDecklistsOnLoad(config.shareDecklistsOnLoad),
       inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false),
       turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
-      deckValidationStrategy(new Server_DefaultDeckValidationStrategy), lifecycleStrategy(new Server_DefaultLifecycleStrategy), matchResultStrategy(new Server_NullMatchResultStrategy),
-gameMutex()
+      deckValidationStrategy(new Server_DefaultDeckValidationStrategy),
+      lifecycleStrategy(new Server_DefaultLifecycleStrategy), matchResultStrategy(new Server_NullMatchResultStrategy),
+      gameMutex()
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());

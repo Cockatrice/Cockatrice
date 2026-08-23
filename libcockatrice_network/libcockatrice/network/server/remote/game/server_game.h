@@ -22,9 +22,9 @@
 
 #include "../server_response_containers.h"
 #include "game_config.h"
-#include "server_match_result_strategy.h"
 #include "server_deck_validation_strategy.h"
 #include "server_game_lifecycle_strategy.h"
+#include "server_match_result_strategy.h"
 
 #include <QDateTime>
 #include <QMap>
@@ -83,11 +83,11 @@ private:
     QList<GameReplay *> replayList;
     GameReplay *currentReplay;
 
-    QScopedPointer<Server_MatchResultStrategy> matchResultStrategy;
-
     QScopedPointer<Server_DeckValidationStrategy> deckValidationStrategy;
 
     QScopedPointer<Server_GameLifecycleStrategy> lifecycleStrategy;
+
+    QScopedPointer<Server_MatchResultStrategy> matchResultStrategy;
 
     void createGameStateChangedEvent(Event_GameStateChanged *event,
                                      Server_AbstractParticipant *recipient,
