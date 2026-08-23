@@ -613,12 +613,14 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->hideColumn(3);
     connect(userTree, &QTreeWidget::itemActivated, this, &UserListWidget::userClicked);
     userTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    // No stretchLastSection: column 0 is the only visible section and is
-    // stretched explicitly in applyDisplayMode(). Stretching the (hidden)
-    // last section on top of that can leave a stale horizontal scroll range,
-    // which pans rows sideways with no visible scrollbar.
+    // QTreeWidget enables stretchLastSection by default. Left on, the hidden
+    // last section absorbs viewport resizes, the Stretch sections never
+    // redistribute, and the header keeps a stale length past the viewport —
+    // an invisible horizontal pan range under ScrollBarAlwaysOff. Disable it
+    // so the explicit resize modes in applyDisplayMode() own the geometry.
+    userTree->header()->setStretchLastSection(false);
 
-    // Always create timers so callers never segfault on a null deref,
+    // Always create timers so callers never segfault on a null deref;
     // showPopupForUser / hidePopup already guard against a null userInfoPopup.
     showPopupTimer = new QTimer(this);
     showPopupTimer->setSingleShot(true);
@@ -739,7 +741,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
             emit currentUserChanged(userName);
         });
 
-        // Keep the popup less scroll path alive for avatar prefetch.
+        // Keep the popup-less scroll path alive for avatar prefetch.
         connect(userTree->verticalScrollBar(), &QScrollBar::valueChanged, this,
                 [this] { requestAvatarsForVisibleItems(); });
     }
@@ -943,6 +945,8 @@ void UserListWidget::applyDisplayMode()
         userTree->header()->setSectionResizeMode(1, QHeaderView::Fixed);
         userTree->header()->resizeSection(1, 22);
         userTree->header()->setSectionResizeMode(2, QHeaderView::Stretch);
+        userTree->showColumn(1);
+        userTree->showColumn(2);
         userTree->hideColumn(3);
     }
 
@@ -990,7 +994,7 @@ void UserListWidget::connectPopupSignals()
 bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
 {
     // A press outside the tree, the popup and any open menu deselects the
-    // list and closes the popup. The filter is installed application wide, so
+    // list and closes the popup. The filter is installed application-wide, so
     // the target can be any widget in the window or another list.
     if (event->type() == QEvent::MouseButtonPress) {
         auto *pressTarget = qobject_cast<QWidget *>(obj);
@@ -1000,10 +1004,10 @@ bool UserListWidget::eventFilter(QObject *obj, QEvent *event)
     }
 
     // Keyboard entry to the user context menu: the Menu key (or Shift+F10)
-    // pops the same menu the right click shows, anchored to the focused row.
-    // Divider rows have no menu. Mouse triggered context events are NOT handled
-    // here, the delegate's right press path already pops the menu, and
-    // handling both would open two menus on one right click.
+    // pops the same menu the right-click shows, anchored to the focused row.
+    // Divider rows have no menu. Mouse-triggered context events are NOT handled
+    // here — the delegate's right-press path already pops the menu, and
+    // handling both would open two menus on one right-click.
     if (hasUserInfoPopup && (obj == userTree || obj == userTree->viewport()) && event->type() == QEvent::ContextMenu) {
         auto *contextEvent = static_cast<QContextMenuEvent *>(event);
         if (contextEvent->reason() == QContextMenuEvent::Keyboard) {
@@ -1186,7 +1190,7 @@ void UserListWidget::positionPopup(UserListTWI *item)
     } else if (spaceAbove >= popH) {
         y = itemTopY - popH; // bottom of popup meets top of item, grows upward
     } else {
-        // Neither side fits cleanly, pick the roomier side and let clamp handle the rest
+        // Neither side fits cleanly — pick the roomier side and let clamp handle the rest
         y = (spaceBelow >= spaceAbove) ? itemTopY : (itemTopY - popH);
     }
     y = qBound(screen.top() + margin, y, screen.bottom() - popH - margin);
@@ -1772,7 +1776,7 @@ void UserListWidget::updateSectionDivider(Section section)
     const QString arrow = divider->isExpanded() ? QStringLiteral("\u25BE") : QStringLiteral("\u25B8");
     if (section == Section::Buddy) {
         // The buddy divider reports how many of the shown buddies are online,
-        // mirroring the "Buddies online: %1 / %2" title of the non sectioned
+        // mirroring the "Buddies online: %1 / %2" title of the non-sectioned
         // buddy list.
         divider->setText(0, tr("%1 %2 (%3/%4)").arg(arrow, sectionTitle(section)).arg(online).arg(visible));
     } else {
@@ -1889,8 +1893,8 @@ UserListTWI *UserListWidget::ensureSectionMembership(Section section, const Serv
     updateCardArtParams(user, userName);
 
     // Dialog mode: rows that fail the user filter never exist. applyFilter()
-    // re checks the predicate on every pass so a live state change (e.g. the
-    // user being ignored mid dialog) hides an already created row.
+    // re-checks the predicate on every pass so a live state change (e.g. the
+    // user being ignored mid-dialog) hides an already created row.
     if (userFilter && !userFilter(userName, online)) {
         return nullptr;
     }
