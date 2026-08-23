@@ -63,7 +63,9 @@ Server_Game::Server_Game(const GameConfig &config, Server_Room *_room)
       startingLifeTotal(config.startingLifeTotal), shareDecklistsOnLoad(config.shareDecklistsOnLoad),
       inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false),
       turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
-      lifecycleStrategy(new Server_DefaultLifecycleStrategy), gameMutex()
+      deckValidationStrategy(new Server_DefaultDeckValidationStrategy),
+      lifecycleStrategy(new Server_DefaultLifecycleStrategy), matchResultStrategy(new Server_NullMatchResultStrategy),
+      gameMutex()
 {
     currentReplay = new GameReplay;
     currentReplay->set_replay_id(room->getServer()->getDatabaseInterface()->getNextReplayId());
@@ -391,10 +393,12 @@ void Server_Game::stopGameIfFinished()
     QMutexLocker locker(&gameMutex);
 
     int playing = 0;
+    Server_AbstractPlayer *lastPlayer = nullptr;
     auto players = getPlayers();
     for (auto *player : players.values()) {
         if (!player->getConceded()) {
             ++playing;
+            lastPlayer = player;
         }
     }
     if (playing > 1) {
@@ -409,6 +413,16 @@ void Server_Game::stopGameIfFinished()
     }
 
     sendGameStateToPlayers();
+
+    bool matchDecided = matchResultStrategy->onGameFinished(this, playing, lastPlayer);
+    if (matchDecided) {
+        locker.unlock();
+
+        sendGameEventContainer(prepareGameEvent(Event_GameClosed(), -1));
+        gameClosed = true;
+        deleteLater();
+        return;
+    }
 
     locker.unlock();
 
