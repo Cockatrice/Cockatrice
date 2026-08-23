@@ -39,7 +39,10 @@ void UserCardArtProvider::requestCardArt(const QString &userName, const QString 
 
     const QString key = makeKey(userName, cardName, providerId);
 
-    if (cardArtCache.contains(key) || pending.contains(key)) {
+    if (pending.contains(key)) {
+        return;
+    }
+    if (cardArtCache.contains(key) && !cardArtCache.value(key).isNull()) {
         return;
     }
 
@@ -63,6 +66,10 @@ QPixmap UserCardArtProvider::cropCardArt(const QPixmap &fullRes)
 
 void UserCardArtProvider::insertIntoCache(const QString &key, const QPixmap &pixmap)
 {
+    if (pixmap.isNull()) {
+        return;
+    }
+
     if (!cardArtCache.contains(key)) {
         cacheInsertionOrder.append(key);
         while (cacheInsertionOrder.size() > MaxCacheEntries) {
@@ -129,8 +136,6 @@ void UserCardArtProvider::processQueue()
 
                             if (!fullRes.isNull()) {
                                 self->insertIntoCache(key, self->cropCardArt(fullRes));
-                            } else {
-                                self->insertIntoCache(key, QPixmap());
                             }
 
                             self->pending.remove(key);
