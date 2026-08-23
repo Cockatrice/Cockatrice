@@ -112,6 +112,19 @@ UserCardArtSettingsDialog::UserCardArtSettingsDialog(const CardArtParams &initia
     if (!initial.cardName.isEmpty()) {
         searchBar->setText(initial.cardName);
         onCardNameChanged(initial.cardName);
+
+        // onCardNameChanged leaves the printing combo on the first printing in
+        // the database, which would silently change the stored banner card on
+        // accept. Restore the stored printing when it resolves locally.
+        const int storedPrintingIndex = providerComboBox->findData(initial.cardProviderId);
+        if (storedPrintingIndex != -1) {
+            providerComboBox->setCurrentIndex(storedPrintingIndex);
+        } else {
+            // Stored printing not in the local database: keep it rather than
+            // silently substituting the first printing.
+            currentParams.cardProviderId = initial.cardProviderId;
+            reloadPreview();
+        }
     }
     marginLSpin->setValue(initial.marginPctL);
     marginRSpin->setValue(initial.marginPctR);
