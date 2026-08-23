@@ -19,6 +19,7 @@
 #include <QComboBox>
 #include <QDockWidget>
 #include <QLabel>
+#include <QPushButton>
 #include <QTextEdit>
 #include <QTreeView>
 #include <libcockatrice/card/card_info.h>
