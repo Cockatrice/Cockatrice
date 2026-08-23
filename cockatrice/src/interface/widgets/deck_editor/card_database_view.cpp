@@ -90,6 +90,13 @@ void CardDatabaseView::decrementCard(const QString &zoneName)
     emit cardDecremented(currentCardName(), zoneName);
 }
 
+void CardDatabaseView::setZoneMenuProvider(const std::function<QList<QPair<QString, QStringList>>()> &provider,
+                                           const std::function<void()> &newZoneHandler)
+{
+    zoneMenuProvider = provider;
+    this->newZoneHandler = newZoneHandler;
+}
+
 void CardDatabaseView::updateCard(const QModelIndex &current, const QModelIndex & /*previous*/)
 {
     if (!current.isValid()) {
@@ -141,6 +148,39 @@ void CardDatabaseView::openCustomMenu(QPoint point)
     connect(addToSideboard, &QAction::triggered, this,
             [this, card] { emit cardAdded(card->getName(), DECK_ZONE_SIDE); });
     connect(selectPrinting, &QAction::triggered, this, &CardDatabaseView::selectPrintingClicked);
+
+    if (zoneMenuProvider) {
+        QMenu *addToZoneMenu = menu.addMenu(tr("Add to Zone"));
+        for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
+            QAction *action = addToZoneMenu->addAction(InnerDecklistNode::visibleNameFromName(boardName));
+            connect(action, &QAction::triggered, this,
+                    [this, card, boardName] { emit cardAdded(card->getName(), boardName); });
+        }
+
+        bool anyCustomZone = false;
+        const auto zoneBoards = zoneMenuProvider();
+        for (const auto &zoneBoard : zoneBoards) {
+            const QString &boardName = zoneBoard.first;
+            const QStringList &customZones = zoneBoard.second;
+            if (customZones.isEmpty()) {
+                continue;
+            }
+            anyCustomZone = true;
+            QMenu *boardSubmenu = addToZoneMenu->addMenu(InnerDecklistNode::visibleNameFromName(boardName));
+            for (const QString &zoneName : customZones) {
+                QAction *action = boardSubmenu->addAction(zoneName);
+                connect(action, &QAction::triggered, this,
+                        [this, card, zoneName] { emit cardAdded(card->getName(), zoneName); });
+            }
+        }
+
+        if (anyCustomZone) {
+            addToZoneMenu->addSeparator();
+        }
+
+        QAction *newZoneAction = addToZoneMenu->addAction(tr("Create &new zone..."));
+        connect(newZoneAction, &QAction::triggered, this, [this] { newZoneHandler(); });
+    }
 
     if (canBeCommander(*card)) {
         QAction *edhRecCommander = menu.addAction(tr("Show on EDHRec (Commander)"));

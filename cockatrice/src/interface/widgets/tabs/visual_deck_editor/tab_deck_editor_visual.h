@@ -165,6 +165,11 @@ public slots:
      */
     bool actSaveDeckAs() override;
 
+    /**
+     * @brief Prompts for and creates a new custom deck zone.
+     */
+    void createNewZone();
+
 private:
     /**
      * @brief Sets the deck for this tab and selects the sub-tab to open on

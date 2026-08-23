@@ -21,6 +21,7 @@
 #include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <utility>
 
@@ -88,6 +89,19 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     databaseView->setFocusProxy(searchEdit);
     databaseView->setItemDelegate(nullptr);
     databaseView->setVisible(false);
+
+    // Without a deck model there is nothing to add cards to, so the zone menu stays hidden.
+    if (deckListModel) {
+        databaseView->setZoneMenuProvider(
+            [deckListModel]() -> QList<QPair<QString, QStringList>> {
+                QList<QPair<QString, QStringList>> result;
+                for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
+                    result.append({boardName, deckListModel->getCustomZoneNames(boardName)});
+                }
+                return result;
+            },
+            [this] { emit newZoneRequested(); });
+    }
 
     searchEdit->setTreeView(databaseView);
     searchEdit->installEventFilter(databaseView->getKeySignals());

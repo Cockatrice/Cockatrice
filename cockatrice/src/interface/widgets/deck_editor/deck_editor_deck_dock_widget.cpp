@@ -7,15 +7,18 @@
 #include "../tabs/api/commander_spellbook/commander_bracket_widget.h"
 #include "deck_list_style_proxy.h"
 #include "deck_state_manager.h"
+#include "deck_zone_dialog.h"
 
 #include <QComboBox>
 #include <QDockWidget>
 #include <QHeaderView>
 #include <QLabel>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QSplitter>
 #include <QTextEdit>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_list_node_tree.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/macros.h>
@@ -772,12 +775,141 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, bool i
 
 void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
 {
+    const QModelIndex sourceIndex = proxy->mapToSource(deckView->indexAt(point));
+
     QMenu menu;
+
+    const bool isCustomZoneRow = sourceIndex.isValid() && sourceIndex.data(DeckRoles::IsCustomZoneRole).toBool();
+    const bool isBoardZoneRow = sourceIndex.isValid() && !isCustomZoneRow && !sourceIndex.parent().isValid();
+    const bool isCardRow =
+        sourceIndex.isValid() && !isCustomZoneRow && !isBoardZoneRow && !getModel()->hasChildren(sourceIndex);
+
+    if (isCardRow) {
+        addMoveToZoneMenu(&menu, sourceIndex);
+        menu.addSeparator();
+    } else if (isCustomZoneRow) {
+        const QString zoneName =
+            sourceIndex.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+
+        QAction *renameAction = menu.addAction(tr("&Rename zone..."));
+        connect(renameAction, &QAction::triggered, this, [this, zoneName] {
+            const QString newName = DeckZoneDialog::promptForRename(this, zoneName, [this](const QString &candidate) {
+                return deckStateManager->validateNewZoneName(candidate);
+            });
+            if (!newName.isEmpty() && newName != zoneName) {
+                deckStateManager->renameCustomZone(zoneName, newName);
+            }
+        });
+
+        QMenu *boardMenu = menu.addMenu(tr("Change &board"));
+        addChangeBoardMenu(boardMenu, zoneName);
+
+        QAction *deleteAction = menu.addAction(tr("&Delete zone"));
+        deleteAction->setEnabled(!getModel()->hasChildren(sourceIndex));
+        deleteAction->setStatusTip(tr("Move or remove all cards first."));
+        connect(deleteAction, &QAction::triggered, this, [this, zoneName] {
+            const auto result =
+                QMessageBox::warning(this, tr("Delete zone"), tr("Delete the zone \"%1\"?").arg(zoneName),
+                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+            if (result == QMessageBox::Yes) {
+                deckStateManager->removeCustomZone(zoneName);
+            }
+        });
+        menu.addSeparator();
+    } else if (isBoardZoneRow) {
+        const QString boardName =
+            sourceIndex.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+        // Tokens cannot host custom zones, so only offer the action on real boards.
+        const bool canHostCustomZones =
+            boardName == DECK_ZONE_MAIN || boardName == DECK_ZONE_SIDE || boardName == DECK_ZONE_MAYBEBOARD;
+        if (canHostCustomZones) {
+            addNewZoneAction(&menu, boardName);
+            menu.addSeparator();
+        }
+    } else if (!sourceIndex.isValid()) {
+        addNewZoneAction(&menu);
+        menu.addSeparator();
+    }
 
     QAction *selectPrinting = menu.addAction(tr("Select Printing"));
     connect(selectPrinting, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::showPrintingSelector);
 
     menu.exec(deckView->mapToGlobal(point));
+}
+
+void DeckEditorDeckDockWidget::addMoveToZoneMenu(QMenu *menu, const QModelIndex &sourceCardIndex)
+{
+    const auto moveToZone = [this, sourceCardIndex](const QString &targetZoneName) {
+        deckStateManager->moveCardToZone(sourceCardIndex, targetZoneName);
+    };
+
+    for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
+        QAction *action = menu->addAction(InnerDecklistNode::visibleNameFromName(boardName));
+        connect(action, &QAction::triggered, this, [moveToZone, boardName] { moveToZone(boardName); });
+    }
+
+    const auto tree = deckStateManager->getDeckListShared()->getTree();
+    bool anyCustomZone = false;
+    for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
+        QList<const InnerDecklistNode *> customZones = tree->getCustomZones(boardName);
+        if (customZones.isEmpty()) {
+            continue;
+        }
+        anyCustomZone = true;
+        QMenu *boardSubmenu = menu->addMenu(InnerDecklistNode::visibleNameFromName(boardName));
+        for (const auto *customZone : customZones) {
+            QAction *action = boardSubmenu->addAction(customZone->getName());
+            connect(action, &QAction::triggered, this, [moveToZone, customZone] { moveToZone(customZone->getName()); });
+        }
+    }
+
+    if (anyCustomZone) {
+        menu->addSeparator();
+    }
+
+    addNewZoneAction(menu);
+}
+
+void DeckEditorDeckDockWidget::addChangeBoardMenu(QMenu *menu, const QString &zoneName)
+{
+    const auto tree = deckStateManager->getDeckListShared()->getTree();
+    for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
+        QAction *action = menu->addAction(InnerDecklistNode::visibleNameFromName(boardName));
+
+        // The board currently holding the zone is marked instead of offered.
+        // Duplicate names cannot come up through the editor, so this doubles as
+        // the uniqueness guard for imported decks.
+        bool holdsTheZone = false;
+        for (const auto *customZone : tree->getCustomZones(boardName)) {
+            if (customZone->getName() == zoneName) {
+                holdsTheZone = true;
+                break;
+            }
+        }
+        if (holdsTheZone) {
+            action->setCheckable(true);
+            action->setChecked(true);
+            continue;
+        }
+
+        connect(action, &QAction::triggered, this,
+                [this, zoneName, boardName] { deckStateManager->moveCustomZone(zoneName, boardName); });
+    }
+}
+
+void DeckEditorDeckDockWidget::addNewZoneAction(QMenu *menu, const QString &initialBoardName)
+{
+    QAction *newZoneAction = menu->addAction(tr("Create &new zone..."));
+    connect(newZoneAction, &QAction::triggered, this, [this, initialBoardName] {
+        QString boardName;
+        const QString zoneName =
+            DeckZoneDialog::promptForNewZone(this, initialBoardName, &boardName, [this](const QString &candidate) {
+                return deckStateManager->validateNewZoneName(candidate);
+            });
+        if (!zoneName.isEmpty()) {
+            deckStateManager->createCustomZone(boardName, zoneName);
+        }
+    });
 }
 
 void DeckEditorDeckDockWidget::refreshShortcuts()

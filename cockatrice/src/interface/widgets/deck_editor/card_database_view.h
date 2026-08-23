@@ -4,6 +4,7 @@
 #include "../../key_signals.h"
 
 #include <QTreeView>
+#include <functional>
 #include <libcockatrice/card/card_info.h>
 
 class CardDatabaseModel;
@@ -19,6 +20,12 @@ class CardDatabaseView : public QTreeView
     KeySignals searchKeySignals;
     CardDatabaseDisplayModel *databaseDisplayModel;
 
+    /// Provides the custom zones available in the current deck, grouped by board zone.
+    /// The list contains (board zone name, custom zone names) pairs for every board.
+    std::function<QList<QPair<QString, QStringList>>()> zoneMenuProvider;
+    /// Handler invoked when the user picks "New zone..." from the add-to-zone menu.
+    std::function<void()> newZoneHandler;
+
 public:
     explicit CardDatabaseView(QWidget *parent, CardDatabaseDisplayModel *model);
 
@@ -32,6 +39,16 @@ public:
     {
         return &searchKeySignals;
     }
+
+    /**
+     * @brief Sets the provider used to populate the "Add to zone" submenu of the context menu.
+     * If no provider is set, the submenu is not shown.
+     *
+     * @param provider Returns the custom zones of the current deck, grouped by board zone
+     * @param newZoneHandler Invoked when the user chooses "New zone..." in the submenu
+     */
+    void setZoneMenuProvider(const std::function<QList<QPair<QString, QStringList>>()> &provider,
+                             const std::function<void()> &newZoneHandler);
 
 signals:
     void cardChanged(const QString &cardName);

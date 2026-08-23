@@ -4,6 +4,7 @@
 #include "../../../../client/settings/shortcuts_settings.h"
 #include "../../cards/card_info_display_widget.h"
 #include "../../deck_editor/deck_state_manager.h"
+#include "../../deck_editor/deck_zone_dialog.h"
 #include "../../filters/filter_builder.h"
 #include "../../interface/pixel_map_generator.h"
 #include "../../interface/widgets/cards/card_info_frame_widget.h"
@@ -84,6 +85,7 @@ void TabDeckEditorVisual::createCentralFrame()
     connect(tabContainer, &TabDeckEditorVisualTabWidget::printingSelectorRequested, this,
             &TabDeckEditorVisual::showPrintingSelector);
     connect(tabContainer, &TabDeckEditorVisualTabWidget::cardInfoRequested, this, &TabDeckEditorVisual::updateCardInfo);
+    connect(tabContainer, &TabDeckEditorVisualTabWidget::newZoneRequested, this, &TabDeckEditorVisual::createNewZone);
 
     centralFrame->addWidget(tabContainer);
     setCentralWidget(centralWidget);
@@ -267,6 +269,18 @@ bool TabDeckEditorVisual::actSaveDeckAs()
     auto result = AbstractTabDeckEditor::actSaveDeckAs();
     tabContainer->visualDeckView->searchBar->setEnabled(true);
     return result;
+}
+
+/** @brief Prompts for and creates a new custom deck zone. */
+void TabDeckEditorVisual::createNewZone()
+{
+    QString boardName;
+    const QString zoneName = DeckZoneDialog::promptForNewZone(this, {}, &boardName, [this](const QString &candidate) {
+        return deckStateManager->validateNewZoneName(candidate);
+    });
+    if (!zoneName.isEmpty()) {
+        deckStateManager->createCustomZone(boardName, zoneName);
+    }
 }
 
 /** @brief Refreshes keyboard shortcuts for this tab from settings. */

@@ -19,6 +19,7 @@
 #include <QComboBox>
 #include <QDockWidget>
 #include <QLabel>
+#include <QMenu>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QTreeView>
@@ -101,6 +102,10 @@ private:
     DeckListModel *getModel() const;
     [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;
     void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
+
+    void addMoveToZoneMenu(QMenu *menu, const QModelIndex &sourceCardIndex);
+    void addChangeBoardMenu(QMenu *menu, const QString &zoneName);
+    void addNewZoneAction(QMenu *menu, const QString &initialBoardName = {});
 
 private slots:
     void decklistCustomMenu(QPoint point);
