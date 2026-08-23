@@ -6,42 +6,96 @@
 #include <QSizeF>
 #include <libcockatrice/deck_list/deck_list.h>
 
+namespace PlaymatUtils
+{
+
+/** @brief Upper bound for zooming into the playmat art. */
+constexpr qreal MAX_ZOOM = 4.0;
+
 /**
- * @brief Computes the source region of the full-resolution card image to use as a playmat.
+ * @brief Width of the outer viewing window: full card width trimmed by the
+ *        horizontal margins. Guarded against margins summing to >= 1.
+ */
+inline qreal playmatVisibleWidth(const QSize &fullCardSize, const PlaymatParams &params)
+{
+    const qreal srcW = fullCardSize.width();
+    const qreal marginL = params.marginPctL * srcW;
+    const qreal marginR = params.marginPctR * srcW;
+    return qMax(0.0, srcW - marginL - marginR);
+}
+
+/**
+ * @brief Zoom clamped to the range where every step renders differently.
  *
- * Parameters are relative to the full card image: horizontal margins trim the card
- * borders, the vertical offset positions a square viewing window, and zoom scales
- * into that window. The result is clamped to the card image bounds.
+ * The square sampling window is visibleWidth / zoom, zooming out past
+ * visibleWidth / min(card width, height) would sample beyond the card itself,
+ * which both looks broken and makes whole ranges of the parameter dead. The
+ * floor is therefore derived from the actual image instead of a static value,
+ * and is shared verbatim by the render path and the editor's gesture math so
+ * the two can never disagree.
+ */
+inline qreal playmatClampedZoom(const QSize &fullCardSize, const PlaymatParams &params)
+{
+    const qreal minDim = qMin<qreal>(fullCardSize.width(), fullCardSize.height());
+    const qreal visibleW = playmatVisibleWidth(fullCardSize, params);
+    const qreal zoomOutFloor = (minDim > 0.0 && visibleW > 0.0) ? visibleW / minDim : 1.0;
+    // The floor deliberately bypasses MAX_ZOOM: when the art is much wider
+    // than tall, keeping the square window inside it requires more than 4x
+    // zoom-out, and honoring that larger floor keeps side within
+    // min(card width, height). Zooming IN is still capped at MAX_ZOOM.
+    return qMin(MAX_ZOOM, qMax(params.zoom, zoomOutFloor));
+}
+
+/**
+ * @brief Side of the square sampling window actually rendered for these
+ *        parameters. Never exceeds either card dimension, so the source rect
+ *        always lies within the image (vertical travel remains for panning
+ *        whenever the art is taller than it is wide).
+ */
+inline qreal playmatWindowSide(const QSize &fullCardSize, const PlaymatParams &params)
+{
+    const qreal visibleW = playmatVisibleWidth(fullCardSize, params);
+    if (visibleW <= 0.0) {
+        return 0.0;
+    }
+    return visibleW / playmatClampedZoom(fullCardSize, params);
+}
+
+/**
+ * @brief Computes the source region of the full resolution card image to use as a playmat.
+ *
+ * Parameters are relative to the full card image. horizontal margins trim the
+ * card borders (shifting them pans the window), verticalOffset places the top
+ * edge of the sampling window within its available travel, and zoom scales
+ * into the trimmed span. The result always lies within the card image bounds.
  *
  * @param fullCardSize Size of the full card image.
  * @param params Positioning parameters.
- * @return Source rectangle in full-card image pixel coordinates.
+ * @return Source rectangle in full card image pixel coordinates.
  */
 inline QRectF computeArtSourceRect(const QSize &fullCardSize, const PlaymatParams &params)
 {
     const qreal srcW = fullCardSize.width();
     const qreal srcH = fullCardSize.height();
 
-    const qreal marginL = params.marginPctL * srcW;
-    const qreal marginR = params.marginPctR * srcW;
-    // Guard against margins summing to >= 1 (both are individually in range),
-    // which would otherwise make the viewing window negative or zero.
-    const qreal visibleW = qMax(0.0, srcW - marginL - marginR);
-    const qreal visibleH = visibleW; // square viewing window, keeps art unskewed
+    // Square sampling window, keeps art unskewed, never exceeds the card on
+    // either axis thanks to the zoom floor in playmatWindowSide().
+    const qreal side = playmatWindowSide(fullCardSize, params);
 
-    const qreal vCenter = params.verticalOffset * srcH;
-    qreal srcY = vCenter - visibleH / 2.0;
-    srcY = qBound(0.0, srcY, srcH - visibleH);
+    // verticalOffset places the TOP edge of the sampling window itself within
+    // its travel, so the full [0, 1] parameter range is live at every zoom and
+    // the window can always reach the very top (0.0) and bottom (1.0) of the
+    // art.
+    const qreal offset = qBound(0.0, params.verticalOffset, 1.0);
+    const qreal y = offset * qMax(0.0, srcH - side);
 
-    // Guard the zoom divisor; everything that produces params clamps zoom to
-    // [0.1, 4.0] already, this keeps the render path self-contained.
-    const qreal zoom = qBound(0.1, params.zoom, 4.0);
-    const qreal zoomedW = visibleW / zoom;
-    const qreal zoomedH = visibleH / zoom;
-    const qreal zoomedX = marginL + (visibleW - zoomedW) / 2.0;
-    const qreal zoomedY = srcY + (visibleH - zoomedH) / 2.0;
+    // Horizontally the sampling window sits centered inside the trimmed span
+    // (margins pan it), zooming out can make it wider than that span, so it
+    // is then kept within the image, an edge stop, never an invalid rect.
+    const qreal outerW = playmatVisibleWidth(fullCardSize, params);
+    const qreal x = qBound(0.0, params.marginPctL * srcW + (outerW - side) / 2.0, qMax(0.0, srcW - side));
 
-    return QRectF(zoomedX, zoomedY, zoomedW, zoomedH);
+    return QRectF(x, y, side, side);
 }
 
 /**
@@ -49,7 +103,7 @@ inline QRectF computeArtSourceRect(const QSize &fullCardSize, const PlaymatParam
  *        ratio into dstArea using "cover" semantics (no distortion, overflows cropped).
  *
  * @param dstArea Area to fill.
- * @param srcSize Size of the source; only its aspect ratio matters.
+ * @param srcSize Size of the source, only its aspect ratio matters.
  * @return Destination rectangle centered in dstArea.
  */
 inline QRectF coverFitRect(const QRectF &dstArea, const QSizeF &srcSize)
@@ -65,5 +119,22 @@ inline QRectF coverFitRect(const QRectF &dstArea, const QSizeF &srcSize)
     const qreal dstH = dstArea.width() / srcAspect;
     return QRectF(dstArea.left(), dstArea.top() + (dstArea.height() - dstH) / 2.0, dstArea.width(), dstH);
 }
+
+/**
+ * @brief Fits a rectangle of the given aspect ratio into dstArea, centered,
+ *        touching the constraining dimension ("aspect fit" of the FRAME
+ *        itself, not of a source image).
+ */
+inline QRectF aspectFitRect(const QRectF &dstArea, qreal aspect)
+{
+    if (aspect <= 0.0) {
+        return dstArea;
+    }
+    qreal w = qMin(dstArea.width(), dstArea.height() * aspect);
+    qreal h = w / aspect;
+    return QRectF(dstArea.left() + (dstArea.width() - w) / 2.0, dstArea.top() + (dstArea.height() - h) / 2.0, w, h);
+}
+
+} // namespace PlaymatUtils
 
 #endif // COCKATRICE_PLAYMAT_UTILS_H

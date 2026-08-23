@@ -187,8 +187,8 @@ void PlayerGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
     QRectF combinedArea(combinedLeft, combinedTop, combinedRight - combinedLeft, combinedBottom - combinedTop);
 
-    const QRectF srcRect = computeArtSourceRect(playmatPixmap.size(), playmatParams);
-    const QRectF dstRect = coverFitRect(combinedArea, srcRect.size());
+    const QRectF srcRect = PlaymatUtils::computeArtSourceRect(playmatPixmap.size(), playmatParams);
+    const QRectF dstRect = PlaymatUtils::coverFitRect(combinedArea, srcRect.size());
 
     painter->save();
     painter->setClipRect(combinedArea);

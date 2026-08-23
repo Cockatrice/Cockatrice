@@ -61,8 +61,8 @@ void PlaymatPreviewWidget::paintEvent(QPaintEvent *)
     // Stack is ~20% width on the left, table is ~80% on the right
     const QRectF playArea = cardRect.adjusted(6, 4, -4, -4);
 
-    const QRectF srcRect = computeArtSourceRect(sourcePixmap.size(), params);
-    const QRectF dstRect = coverFitRect(playArea, srcRect.size());
+    const QRectF srcRect = PlaymatUtils::computeArtSourceRect(sourcePixmap.size(), params);
+    const QRectF dstRect = PlaymatUtils::coverFitRect(playArea, srcRect.size());
 
     painter.setClipRect(playArea.toRect());
     painter.drawPixmap(dstRect, sourcePixmap, srcRect);
