@@ -18,8 +18,8 @@ class DeckPreviewDeckTagsDisplayWidget : public QWidget
 
     QStringList currentTags;
     FlowWidget *flowWidget;
-    std::function<QStringList()> knownTagsProvider_;
-    std::function<bool()> conversionPromptHandler_;
+    std::function<QStringList()> knownTagsProvider;
+    std::function<bool()> conversionPromptHandler;
 
 public:
     explicit DeckPreviewDeckTagsDisplayWidget(QWidget *_parent, const QStringList &_tags = {});

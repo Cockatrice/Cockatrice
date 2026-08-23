@@ -11,17 +11,23 @@
 #include <QWidget>
 
 class QTimer;
-class VisualDeckStorageWidget;
+
 class VisualDeckStorageSearchWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit VisualDeckStorageSearchWidget(VisualDeckStorageWidget *parent);
+    explicit VisualDeckStorageSearchWidget(QWidget *parent);
+
+signals:
+    /**
+     * Emitted once the debounce timer fires after the user stopped typing.
+     * @param text The current contents of the search bar.
+     */
+    void searchTextChanged(const QString &text);
 
 private:
     QHBoxLayout *layout;
-    VisualDeckStorageWidget *parent;
     QLineEdit *searchBar;
     QTimer *searchDebounceTimer;
 };

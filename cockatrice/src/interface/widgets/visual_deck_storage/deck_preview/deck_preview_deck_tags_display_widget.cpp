@@ -52,12 +52,12 @@ void DeckPreviewDeckTagsDisplayWidget::refreshTags()
 
 void DeckPreviewDeckTagsDisplayWidget::setKnownTagsProvider(const std::function<QStringList()> &provider)
 {
-    knownTagsProvider_ = provider;
+    knownTagsProvider = provider;
 }
 
 void DeckPreviewDeckTagsDisplayWidget::setConversionPromptHandler(const std::function<bool()> &handler)
 {
-    conversionPromptHandler_ = handler;
+    conversionPromptHandler = handler;
 }
 
 /**
@@ -99,11 +99,11 @@ static QStringList findAllKnownTags()
 void DeckPreviewDeckTagsDisplayWidget::openTagEditDlg()
 {
     // The deck editor path has no conversion prompt; the VDS path registers one.
-    if (conversionPromptHandler_ && !conversionPromptHandler_()) {
+    if (conversionPromptHandler && !conversionPromptHandler()) {
         return;
     }
 
-    const QStringList knownTags = knownTagsProvider_ ? knownTagsProvider_() : findAllKnownTags();
+    const QStringList knownTags = knownTagsProvider ? knownTagsProvider() : findAllKnownTags();
     execTagDialog(knownTags);
 }
 

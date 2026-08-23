@@ -27,9 +27,9 @@
 
 DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
                                      VisualDeckStorageWidget *_visualDeckStorageWidget,
-                                     VisualDeckStorageModel *model,
+                                     VisualDeckStorageModel *_model,
                                      const QString &_filePath)
-    : QWidget(_parent), visualDeckStorageWidget(_visualDeckStorageWidget), model_(model), filePath(_filePath)
+    : QWidget(_parent), visualDeckStorageWidget(_visualDeckStorageWidget), model(_model), filePath(_filePath)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -83,7 +83,16 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     layout->addWidget(bannerCardLabel);
     layout->addWidget(bannerCardComboBox);
 
-    connect(model_, &QAbstractItemModel::dataChanged, this, &DeckPreviewWidget::syncFromModel);
+    // Only re-sync when this widget's own row changed. Without the row check, every
+    // finished deck load would trigger a full resync (card db lookup + combo rebuild)
+    // in every preview widget.
+    connect(model, &QAbstractItemModel::dataChanged, this,
+            [this](const QModelIndex &topLeft, const QModelIndex &bottomRight) {
+                const int r = row();
+                if (r >= topLeft.row() && r <= bottomRight.row()) {
+                    syncFromModel();
+                }
+            });
 
     retranslateUi();
     syncFromModel();
@@ -119,7 +128,7 @@ void DeckPreviewWidget::enterEvent(QEnterEvent *event)
  */
 int DeckPreviewWidget::row() const
 {
-    return model_->rowForFilePath(filePath);
+    return model->rowForFilePath(filePath);
 }
 
 /**
@@ -131,7 +140,7 @@ QString DeckPreviewWidget::getDisplayName() const
     if (r == -1) {
         return {};
     }
-    return model_->dataForRow(r).displayName;
+    return model->dataForRow(r).displayName;
 }
 
 /**
@@ -140,11 +149,11 @@ QString DeckPreviewWidget::getDisplayName() const
 void DeckPreviewWidget::reloadIfModified()
 {
     const int r = row();
-    if (r == -1 || !model_->dataForRow(r).loadSucceeded) {
+    if (r == -1 || !model->dataForRow(r).loadSucceeded) {
         return;
     }
 
-    model_->reloadIfModified(r);
+    model->reloadIfModified(r);
 }
 
 /**
@@ -157,7 +166,7 @@ void DeckPreviewWidget::syncFromModel()
         return;
     }
 
-    const DeckPreviewData &data = model_->dataForRow(r);
+    const DeckPreviewData &data = model->dataForRow(r);
     filePath = data.filePath;
 
     const CardRef bannerCardRef = data.deck.deckList.getBannerCard();
@@ -246,7 +255,7 @@ void DeckPreviewWidget::updateBannerCardComboBox(const QString &currentText)
 
     const int r = row();
     if (r != -1) {
-        const DeckList &deckList = model_->dataForRow(r).deck.deckList;
+        const DeckList &deckList = model->dataForRow(r).deck.deckList;
         const QList<const DecklistCardNode *> cardsInDeck = deckList.getCardNodes();
 
         for (auto currentCard : cardsInDeck) {
@@ -265,16 +274,16 @@ void DeckPreviewWidget::updateBannerCardComboBox(const QString &currentText)
 
     // This is *slightly* more performant than using addItem in a loop.
 
-    QStandardItemModel *model = new QStandardItemModel(pairList.size(), 1, bannerCardComboBox);
+    QStandardItemModel *comboModel = new QStandardItemModel(pairList.size(), 1, bannerCardComboBox);
 
     int row = 0;
     for (const auto &pair : pairList) {
         QStandardItem *item = new QStandardItem(pair.first);
         item->setData(QVariant::fromValue(pair), Qt::UserRole);
-        model->setItem(row++, 0, item);
+        comboModel->setItem(row++, 0, item);
     }
 
-    bannerCardComboBox->setModel(model);
+    bannerCardComboBox->setModel(comboModel);
 
     // Try to restore the previous selection by finding the currentText
     int restoredIndex = bannerCardComboBox->findText(currentText);
@@ -283,7 +292,7 @@ void DeckPreviewWidget::updateBannerCardComboBox(const QString &currentText)
     } else {
         // Add a placeholder "-" and set it as the current selection
         const QString currentBannerCardName =
-            r == -1 ? QString() : model_->dataForRow(r).deck.deckList.getBannerCard().name;
+            r == -1 ? QString() : model->dataForRow(r).deck.deckList.getBannerCard().name;
         int bannerIndex = bannerCardComboBox->findText(currentBannerCardName);
         if (bannerIndex != -1) {
             bannerCardComboBox->setCurrentIndex(bannerIndex);
@@ -306,7 +315,7 @@ void DeckPreviewWidget::setBannerCard(int /* changedIndex */)
     if (r == -1) {
         return;
     }
-    model_->setBannerCard(r, cardRef);
+    model->setBannerCard(r, cardRef);
     bannerCardDisplayWidget->setCard(CardDatabaseManager::query()->getCard(cardRef));
 }
 
@@ -330,7 +339,7 @@ void DeckPreviewWidget::setTags(const QStringList &tags)
 {
     const int r = row();
     if (r != -1) {
-        model_->setTags(r, tags);
+        model->setTags(r, tags);
     }
 }
 
@@ -343,7 +352,7 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
 
     connect(menu->addAction(tr("Open in deck editor")), &QAction::triggered, this, [this, r] {
         if (r != -1) {
-            emit openDeckEditor(model_->deckForRow(r));
+            emit openDeckEditor(model->deckForRow(r));
         }
     });
 
@@ -360,22 +369,22 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
 
     connect(saveToClipboardMenu->addAction(tr("Annotated")), &QAction::triggered, this, [this, r] {
         if (r != -1) {
-            DeckLoader::saveToClipboard(model_->dataForRow(r).deck.deckList, true, true);
+            DeckLoader::saveToClipboard(model->dataForRow(r).deck.deckList, true, true);
         }
     });
     connect(saveToClipboardMenu->addAction(tr("Annotated (No set info)")), &QAction::triggered, this, [this, r] {
         if (r != -1) {
-            DeckLoader::saveToClipboard(model_->dataForRow(r).deck.deckList, true, false);
+            DeckLoader::saveToClipboard(model->dataForRow(r).deck.deckList, true, false);
         }
     });
     connect(saveToClipboardMenu->addAction(tr("Not Annotated")), &QAction::triggered, this, [this, r] {
         if (r != -1) {
-            DeckLoader::saveToClipboard(model_->dataForRow(r).deck.deckList, false, true);
+            DeckLoader::saveToClipboard(model->dataForRow(r).deck.deckList, false, true);
         }
     });
     connect(saveToClipboardMenu->addAction(tr("Not Annotated (No set info)")), &QAction::triggered, this, [this, r] {
         if (r != -1) {
-            DeckLoader::saveToClipboard(model_->dataForRow(r).deck.deckList, false, false);
+            DeckLoader::saveToClipboard(model->dataForRow(r).deck.deckList, false, false);
         }
     });
 
@@ -418,7 +427,7 @@ void DeckPreviewWidget::actRenameDeck()
     }
 
     // read input
-    const QString oldName = model_->dataForRow(r).deckName;
+    const QString oldName = model->dataForRow(r).deckName;
 
     bool ok;
     QString newName = QInputDialog::getText(this, tr("Rename deck"), tr("New name:"), QLineEdit::Normal, oldName, &ok);
@@ -427,7 +436,7 @@ void DeckPreviewWidget::actRenameDeck()
     }
 
     // write change
-    model_->renameDeck(r, newName);
+    model->renameDeck(r, newName);
 
     // The banner card text updates via the model's dataChanged signal.
 }
@@ -450,7 +459,7 @@ void DeckPreviewWidget::actRenameFile()
     }
 
     // write change
-    if (!model_->renameFile(r, newName)) {
+    if (!model->renameFile(r, newName)) {
         QMessageBox::critical(this, tr("Error"), tr("Rename failed"));
     }
 
@@ -472,7 +481,7 @@ void DeckPreviewWidget::actDeleteFile()
     }
 
     // write change
-    if (!model_->deleteFile(r)) {
+    if (!model->deleteFile(r)) {
         QMessageBox::critical(this, tr("Error"), tr("Delete failed"));
     }
 
@@ -515,7 +524,7 @@ bool DeckPreviewWidget::promptFileConversionIfRequired()
             return false;
         }
 
-        model_->convertToCockatriceFormat(row());
+        model->convertToCockatriceFormat(row());
         return true;
     }
 
@@ -534,7 +543,7 @@ bool DeckPreviewWidget::promptFileConversionIfRequired()
         return false;
     }
 
-    model_->convertToCockatriceFormat(row());
+    model->convertToCockatriceFormat(row());
 
     if (conversionDialog.dontAskAgain()) {
         SettingsCache::instance().visualDeckStorage().setVisualDeckStoragePromptForConversion(false);

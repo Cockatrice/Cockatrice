@@ -3,17 +3,20 @@
  * @ingroup VisualDeckStorageWidgets
  * @brief Renders the decks of one folder of the Visual Deck Storage.
  *
- * This is a pure view: it reads the accepted rows of the
- * VisualDeckStorageSortFilterProxyModel whose folder matches this widget's
- * folder path, and keeps a set of child DeckPreviewWidgets in sync with those
- * rows. Subfolders are shown as nested VisualDeckStorageFolderDisplayWidgets
- * when the "show folders" setting is enabled.
+ * This is a pure view: it keeps one persistent DeckPreviewWidget alive per deck
+ * in its folder, and shows or hides those widgets according to the accepted rows
+ * of the VisualDeckStorageSortFilterProxyModel. Subfolders are shown as nested
+ * VisualDeckStorageFolderDisplayWidgets when the "show folders" setting is enabled.
+ *
+ * Reconciling runs as a time-budgeted chunked pass that yields to the event loop
+ * between chunks, so scanning a large collection never stalls the ui thread.
  */
 
 #ifndef VISUAL_DECK_STORAGE_FOLDER_DISPLAY_WIDGET_H
 #define VISUAL_DECK_STORAGE_FOLDER_DISPLAY_WIDGET_H
 
 #include <QHash>
+#include <QSet>
 #include <QString>
 #include <QWidget>
 
@@ -36,8 +39,8 @@ public:
 
 public slots:
     /**
-     * @brief Re-reads the proxy and rebuilds the deck previews and subfolder
-     * widgets to match.
+     * @brief Starts a new chunked reconcile pass that re-reads the proxy and rebuilds
+     * the deck previews and subfolder widgets to match.
      */
     void reconcile();
 
@@ -56,14 +59,26 @@ signals:
     void contentVisibilityChanged();
 
 private:
-    void reconcileDecks();
+    void beginDeckPass();
+    void continueDeckPass();
+    void finishDeckPass();
+    [[nodiscard]] DeckPreviewWidget *createDeckPreviewWidget(const QString &filePath);
     void createSubFolderWidgets();
     void refreshVisibility();
     [[nodiscard]] bool hasContent() const;
     [[nodiscard]] QStringList childFolderPaths() const;
 
+    /**
+     * @brief The maximum time in milliseconds spent creating deck previews per event loop turn.
+     *
+     * Creating all previews of a large folder at once blocks the ui thread for hundreds of
+     * milliseconds, so the pass is split into chunks that yield to the event loop instead.
+     */
+    static constexpr int DECK_PASS_TIME_BUDGET_MS = 20;
+
     bool showFolders;
-    QString folderPath; ///< Path relative to the deck folder; empty for the root folder.
+    QString folderPath;       ///< Path relative to the deck folder, empty for the root folder.
+    int visibleDeckCount = 0; ///< The number of this folder's deck previews not filtered out.
     QVBoxLayout *layout;
     QWidget *container;
     QVBoxLayout *containerLayout;
@@ -74,6 +89,16 @@ private:
     QHash<QString, VisualDeckStorageFolderDisplayWidget *> subFolderWidgets; ///< Folder path -> subfolder widget.
     QTimer *reconcileTimer = nullptr;                                        ///< Coalesces proxy change bursts.
     QStringList lastOrderedFilePaths; ///< The deck order last applied to the flow layout.
+
+    /// Whether a chunked reconcile pass is currently running.
+    bool deckPassActive = false;
+    /// Set when the model changes mid-pass. Discards progress and restarts the scan once
+    /// the current chunk finishes so the pass always converges on the latest model state.
+    bool deckPassRestartRequested = false;
+    /// Whether the first reconcile pass has run to completion at least once.
+    bool initialPassCompleted = false;
+    int deckPassRow = 0;                ///< Next source row to scan in the active pass.
+    QSet<QString> deckPassPresentPaths; ///< File paths seen so far in the active pass.
 };
 
 #endif // VISUAL_DECK_STORAGE_FOLDER_DISPLAY_WIDGET_H

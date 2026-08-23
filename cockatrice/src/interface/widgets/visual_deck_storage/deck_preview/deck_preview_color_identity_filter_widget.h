@@ -11,6 +11,7 @@
 #include <QHBoxLayout>
 #include <QMap>
 #include <QPushButton>
+#include <QSet>
 #include <QWidget>
 
 class VisualDeckStorageWidget;
@@ -23,18 +24,40 @@ public:
     explicit DeckPreviewColorIdentityFilterWidget(VisualDeckStorageWidget *parent);
     void retranslateUi();
 
+    /**
+     * @brief The currently active color identity filter mode.
+     */
+    [[nodiscard]] VisualDeckStorageSortFilterProxyModel::FilterMode getFilterMode() const
+    {
+        return filterMode;
+    }
+
+    /**
+     * @brief The colors that are currently toggled on.
+     */
+    [[nodiscard]] QSet<QChar> getActiveColors() const;
+
+signals:
+    /**
+     * Emitted when the set of active colors changed due to user interaction.
+     */
+    void activeColorsChanged();
+
+    /**
+     * Emitted when the user cycles the color identity filter mode.
+     * @param mode The new filter mode.
+     */
+    void filterModeChanged(VisualDeckStorageSortFilterProxyModel::FilterMode mode);
+
 private slots:
     void handleColorToggled(QChar color, bool active);
     void updateFilterMode();
 
 private:
-    void applyFilter();
-
     QHBoxLayout *layout;
     QPushButton *toggleButton;
     QMap<QChar, bool> activeColors;
     VisualDeckStorageSortFilterProxyModel::FilterMode filterMode = VisualDeckStorageSortFilterProxyModel::Includes;
-    VisualDeckStorageWidget *visualDeckStorageWidget; ///< The VDS owning the proxy model.
 };
 
 #endif // DECK_PREVIEW_COLOR_IDENTITY_FILTER_WIDGET_H

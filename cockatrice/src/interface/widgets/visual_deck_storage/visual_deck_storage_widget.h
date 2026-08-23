@@ -40,11 +40,11 @@ public:
     [[nodiscard]] const VisualDeckStorageQuickSettingsWidget *settings() const;
     [[nodiscard]] VisualDeckStorageModel *model() const
     {
-        return model_;
+        return storageModel;
     }
     [[nodiscard]] VisualDeckStorageSortFilterProxyModel *proxyModel() const
     {
-        return proxyModel_;
+        return storageProxyModel;
     }
 
 public slots:
@@ -57,6 +57,8 @@ public slots:
     void updateSelectionAnimationEnabled(bool enabled);
     void updateSortOrder();
     void updateTagFilter();
+    void updateColorFilter();
+    void updateSearchFilter(const QString &text);
 
 signals:
     void deckLoadRequested(const QString &filePath);
@@ -81,8 +83,8 @@ private:
     VisualDeckStorageQuickSettingsWidget *quickSettingsWidget;
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget = nullptr;
-    VisualDeckStorageModel *model_ = nullptr;
-    VisualDeckStorageSortFilterProxyModel *proxyModel_ = nullptr;
+    VisualDeckStorageModel *storageModel = nullptr;
+    VisualDeckStorageSortFilterProxyModel *storageProxyModel = nullptr;
     QTimer *refreshTimer = nullptr; ///< Coalesces the re-apply/refresh burst following a batch of deck loads.
 };
 

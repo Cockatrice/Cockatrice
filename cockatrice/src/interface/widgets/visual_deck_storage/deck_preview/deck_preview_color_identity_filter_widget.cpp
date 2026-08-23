@@ -6,7 +6,7 @@
 #include <QSet>
 
 DeckPreviewColorIdentityFilterWidget::DeckPreviewColorIdentityFilterWidget(VisualDeckStorageWidget *parent)
-    : QWidget(parent), layout(new QHBoxLayout(this)), visualDeckStorageWidget(parent)
+    : QWidget(parent), layout(new QHBoxLayout(this))
 {
     setLayout(layout);
     layout->setSpacing(5);
@@ -55,9 +55,9 @@ void DeckPreviewColorIdentityFilterWidget::retranslateUi()
 }
 
 /**
- * @brief Pushes the current filter state to the proxy model.
+ * @brief The colors that are currently toggled on.
  */
-void DeckPreviewColorIdentityFilterWidget::applyFilter()
+QSet<QChar> DeckPreviewColorIdentityFilterWidget::getActiveColors() const
 {
     QSet<QChar> activeColorSet;
     for (auto it = activeColors.constBegin(); it != activeColors.constEnd(); ++it) {
@@ -65,15 +65,13 @@ void DeckPreviewColorIdentityFilterWidget::applyFilter()
             activeColorSet.insert(it.key());
         }
     }
-
-    // The VDS owns the proxy model, which exists for the widget's whole lifetime.
-    visualDeckStorageWidget->proxyModel()->setColorFilter(filterMode, activeColorSet);
+    return activeColorSet;
 }
 
 void DeckPreviewColorIdentityFilterWidget::handleColorToggled(QChar color, bool active)
 {
     activeColors[color] = active;
-    applyFilter();
+    emit activeColorsChanged();
 }
 
 void DeckPreviewColorIdentityFilterWidget::updateFilterMode()
@@ -92,5 +90,5 @@ void DeckPreviewColorIdentityFilterWidget::updateFilterMode()
     }
 
     retranslateUi(); // Update the button text
-    applyFilter();
+    emit filterModeChanged(filterMode);
 }

@@ -32,7 +32,7 @@ class DeckPreviewWidget final : public QWidget
 public:
     explicit DeckPreviewWidget(QWidget *parent,
                                VisualDeckStorageWidget *_visualDeckStorageWidget,
-                               VisualDeckStorageModel *model,
+                               VisualDeckStorageModel *_model,
                                const QString &_filePath);
     void retranslateUi();
 
@@ -83,7 +83,7 @@ private:
     void actDeleteFile();
 
     VisualDeckStorageWidget *visualDeckStorageWidget;
-    VisualDeckStorageModel *model_;
+    VisualDeckStorageModel *model;
     QString filePath;
     QVBoxLayout *layout;
     ColorIdentityWidget *colorIdentityWidget;

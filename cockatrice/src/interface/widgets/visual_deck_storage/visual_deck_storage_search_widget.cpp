@@ -2,7 +2,6 @@
 
 #include "../../../filters/syntax_help.h"
 #include "../../pixel_map_generator.h"
-#include "visual_deck_storage_widget.h"
 
 #include <QAction>
 #include <QTimer>
@@ -13,9 +12,9 @@
  * Provides a search bar that allows users to search decks by filename or search
  * expression, with a debounced timer to trigger the search after the user stops typing.
  *
- * @param parent The VisualDeckStorageWidget owning the search.
+ * @param parent The parent widget.
  */
-VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(VisualDeckStorageWidget *parent) : parent(parent)
+VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(QWidget *parent) : QWidget(parent)
 {
     layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -38,6 +37,5 @@ VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(VisualDeckStorageWi
         searchDebounceTimer->start(300); // 300ms debounce
     });
 
-    connect(searchDebounceTimer, &QTimer::timeout, this,
-            [this] { this->parent->proxyModel()->setSearchText(searchBar->text()); });
+    connect(searchDebounceTimer, &QTimer::timeout, this, [this] { emit searchTextChanged(searchBar->text()); });
 }
