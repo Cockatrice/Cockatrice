@@ -541,10 +541,7 @@ MainWindow::MainWindow(QWidget *parent)
     statusBar()->addPermanentWidget(latencyStatus);
 
     connect(connectionController, &ConnectionController::pingStatsUpdated, latencyStatus,
-            [this](const LatencyTracker::Stats &stats, const QList<int> &samplesMs) {
-                latencyStatus->updateStats(stats);
-                latencyStatus->updateSamples(samplesMs);
-            });
+            &LatencyStatusWidget::updateData);
 
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &MainWindow::refreshShortcuts);

@@ -20,8 +20,8 @@ class LatencyGraphWidget;
  * sparkline of the rolling sample window. Clicking anywhere in the area opens
  * a popup with a larger graph and the numeric statistics. It closes on any
  * outside click. Stays hidden while disconnected or before any samples exist.
- * Owns all latency display state so MainWindow only needs to forward two
- * signals here.
+ * Owns all latency display state so MainWindow only needs to forward one
+ * signal here.
  */
 class LatencyStatusWidget : public QWidget
 {
@@ -30,8 +30,7 @@ public:
     explicit LatencyStatusWidget(QWidget *parent = nullptr);
 
 public slots:
-    void updateStats(const LatencyTracker::Stats &stats);
-    void updateSamples(const QList<int> &samplesMs);
+    void updateData(const LatencyTracker::Stats &stats, const QList<int> &samplesMs);
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;

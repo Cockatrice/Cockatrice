@@ -35,8 +35,14 @@ LatencyStatusWidget::LatencyStatusWidget(QWidget *parent) : QWidget(parent)
     hide();
 }
 
-void LatencyStatusWidget::updateStats(const LatencyTracker::Stats &stats)
+void LatencyStatusWidget::updateData(const LatencyTracker::Stats &stats, const QList<int> &samplesMs)
 {
+    latestSamples = samplesMs;
+    latencyGraph->setSamples(samplesMs);
+    if (popup && popup->isVisible() && detailGraph) {
+        detailGraph->setSamples(samplesMs);
+    }
+
     if (stats.sampleCount == 0) {
         hide();
         return;
@@ -51,15 +57,6 @@ void LatencyStatusWidget::updateStats(const LatencyTracker::Stats &stats)
         detailLabel->setText(statsStr);
     }
     show();
-}
-
-void LatencyStatusWidget::updateSamples(const QList<int> &samplesMs)
-{
-    latestSamples = samplesMs;
-    latencyGraph->setSamples(samplesMs);
-    if (popup && popup->isVisible() && detailGraph) {
-        detailGraph->setSamples(samplesMs);
-    }
 }
 
 bool LatencyStatusWidget::eventFilter(QObject *watched, QEvent *event)
