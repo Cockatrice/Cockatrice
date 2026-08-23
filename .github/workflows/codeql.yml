@@ -9,8 +9,8 @@
 name: CodeQL
 
 permissions:
-  security-events: write    # needed to post results
   contents: read
+  security-events: write    # needed to post results
 
 on:
   push:
