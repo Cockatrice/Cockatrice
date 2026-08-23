@@ -413,6 +413,10 @@ bool DeckList::loadFromFile_Plain(QIODevice *device, const std::function<QString
 bool DeckList::saveToStream_Plain(QTextStream &stream, bool prefixSideboardCards, bool slashTappedOutSplitCards) const
 {
     auto writeToStream = [&stream, prefixSideboardCards, slashTappedOutSplitCards](const auto node, const auto card) {
+        // The maybeboard is scratch space and never exported.
+        if (node->getName() == DECK_ZONE_MAYBEBOARD) {
+            return;
+        }
         if (prefixSideboardCards && node->getName() == DECK_ZONE_SIDE) {
             stream << "SB: ";
         }
