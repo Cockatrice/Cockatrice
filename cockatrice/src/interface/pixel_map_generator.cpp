@@ -15,6 +15,32 @@
 #define DEFAULT_COLOR_ADMIN "#ff2701";
 
 /**
+ * Clamps an svg render size so that rendering does not exceed a multiple of the requested size.
+ *
+ * Rendering at the full native size of an svg just to scale it down afterwards wastes memory,
+ * and canvases with extreme coordinates can exceed Qt's rasterizer coordinate limit which makes
+ * Qt silently drop shapes from the rendered image.
+ *
+ * @param renderSize The size the svg would be rendered at.
+ * @param requestedSize The size that was actually requested.
+ *
+ * @return A size with the aspect ratio of renderSize whose longest side is at most four times
+ * the longest side of requestedSize.
+ */
+static QSize capRenderSize(const QSize &renderSize, const QSize &requestedSize)
+{
+    const int longestRequestedSide = qMax(requestedSize.width(), requestedSize.height());
+    if (longestRequestedSide <= 0) {
+        return renderSize;
+    }
+
+    const int longestRenderSide = qMax(renderSize.width(), renderSize.height());
+    const qreal scale = qMin<qreal>(1.0, static_cast<qreal>(longestRequestedSide * 4) / longestRenderSide);
+    return QSize(qMax(1, static_cast<int>(renderSize.width() * scale)),
+                 qMax(1, static_cast<int>(renderSize.height() * scale)));
+}
+
+/**
  * Loads in an svg from file and scales it without affecting image quality.
  *
  * @param svgPath The path to the svg file, with file extension.
@@ -35,6 +61,9 @@ static QPixmap loadSvg(const QString &svgPath, const QSize &size, bool expandOnl
     // If expandOnly, make sure the pixmap is at least as large as the svg, so that we don't lose any detail.
     // QIcon.pixmap(size) will automatically scale down the image, but it won't scale it up.
     QSize pixmapSize = expandOnly ? svgRenderer.defaultSize().expandedTo(size) : size;
+    if (expandOnly) {
+        pixmapSize = capRenderSize(pixmapSize, size);
+    }
     QPixmap pix(pixmapSize);
     pix.fill(Qt::transparent);
 
@@ -247,7 +276,9 @@ static QIcon loadAndColorSvg(const QString &iconPath,
 
     QSvgRenderer svgRenderer(doc.toByteArray());
 
-    QPixmap pix(svgRenderer.defaultSize().expandedTo(QSize(minSize, minSize)));
+    const QSize pixmapSize =
+        capRenderSize(svgRenderer.defaultSize().expandedTo(QSize(minSize, minSize)), QSize(minSize, minSize));
+    QPixmap pix(pixmapSize);
     pix.fill(Qt::transparent);
 
     QPainter pixPainter(&pix);
