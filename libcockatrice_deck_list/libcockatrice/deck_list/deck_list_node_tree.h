@@ -10,6 +10,7 @@
 class DecklistNodeTree
 {
     InnerDecklistNode *root; ///< Root of the deck tree (zones + cards).
+    int totalCards = 0;
 
 public:
     /** @brief Constructs an empty DecklistNodeTree. */
