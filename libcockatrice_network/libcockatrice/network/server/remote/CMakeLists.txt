@@ -15,6 +15,7 @@ set(HEADERS
     game/server_game.h
     game/server_game_lifecycle_strategy.h
     game/server_match_result_strategy.h
+    game/server_match_game_factory.h
     game/server_player.h
     game/server_spectator.h
     server.h
