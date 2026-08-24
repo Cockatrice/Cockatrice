@@ -5,13 +5,16 @@
 #include <QPixmap>
 #include <libcockatrice/deck_list/deck_list.h>
 
+class QCheckBox;
 class QComboBox;
 class QCompleter;
 class QDoubleSpinBox;
+class QFormLayout;
 class QGroupBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
+class QWidget;
 class CardDatabaseModel;
 class CardDatabaseDisplayModel;
 class CardSearchModel;
@@ -21,10 +24,11 @@ class PlaymatPreviewWidget;
 /**
  * @brief Dialog for configuring the playmat card art for a deck.
  *
- * Allows the user to select a card from the database and adjust
- * positioning parameters (margins, zoom, vertical offset) for how
- * the card art appears as a playmat background across the
- * combined table + stack play area.
+ * The crop surface is the primary control: drag to pan the visible art,
+ * scroll (or +/- keys) to zoom, arrow keys to nudge. Card name and printing
+ * are selected below. A checkbox reveals optional numerical editors for the
+ * raw PlaymatParams. These controls edit the same stored PlaymatParams that
+ * ship in deck files and player properties.
  */
 class PlaymatSettingsDialog : public QDialog
 {
@@ -40,14 +44,15 @@ public:
 
 private slots:
     void onCardNameChanged(const QString &name);
-    void reloadPreview();
     void onParamChanged();
+    void reloadPreview();
 
 private:
     void setupUi();
     void populateProviderCombo(const QString &cardName);
     void initializeSearchBar();
     void retranslateUi();
+    void setNumericEditorsVisible(bool visible);
     QDoubleSpinBox *makeSpinBox(double min, double max, double value, double step);
 
     QLineEdit *searchBar;
@@ -63,6 +68,9 @@ private:
 
     QLabel *cardNameLabel;
     QLabel *printingLabel;
+    QLabel *previewCaptionLabel;
+    QCheckBox *showNumericEditorsCheck;
+    QFormLayout *controlsForm;
     QLabel *leftMarginLabel;
     QLabel *rightMarginLabel;
     QLabel *verticalOffsetLabel;
@@ -75,6 +83,7 @@ private:
     QDoubleSpinBox *marginRSpin;
     QDoubleSpinBox *verticalOffsetSpin;
     QDoubleSpinBox *zoomSpin;
+
     PlaymatPreviewWidget *preview;
 
     QPixmap currentPixmap;

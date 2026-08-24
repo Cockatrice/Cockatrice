@@ -7,6 +7,7 @@
 #include "card_database_model.h"
 #include "playmat_preview_widget.h"
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QCompleter>
 #include <QDialogButtonBox>
@@ -48,10 +49,6 @@ PlaymatSettingsDialog::PlaymatSettingsDialog(const CardRef &initialCard,
             reloadPreview();
         }
     }
-    marginLSpin->setValue(initialParams.marginPctL);
-    marginRSpin->setValue(initialParams.marginPctR);
-    verticalOffsetSpin->setValue(initialParams.verticalOffset);
-    zoomSpin->setValue(initialParams.zoom);
 
     retranslateUi();
 }
@@ -112,23 +109,32 @@ void PlaymatSettingsDialog::setupUi()
     connect(providerComboBox, &QComboBox::currentIndexChanged, this, [this]() {
         currentCard.providerId = providerComboBox->currentData().toString();
         reloadPreview();
-        onParamChanged();
     });
 
+    auto *form = new QFormLayout;
+    controlsForm = form;
+    cardNameLabel = new QLabel;
+    printingLabel = new QLabel;
+    form->addRow(cardNameLabel, searchBar);
+    form->addRow(printingLabel, providerComboBox);
+
+    // Numerical editors expose the raw PlaymatParams for precise input. They
+    // share the same form as the rows above so every field lines up on one
+    // label column. They stay hidden until requested since the crop surface
+    // is the primary control.
     marginLSpin = makeSpinBox(0.0, 0.95, currentParams.marginPctL, 0.01);
     marginRSpin = makeSpinBox(0.0, 0.95, currentParams.marginPctR, 0.01);
     verticalOffsetSpin = makeSpinBox(0.0, 1.0, currentParams.verticalOffset, 0.01);
     zoomSpin = makeSpinBox(0.1, 4.0, currentParams.zoom, 0.05);
 
-    auto *form = new QFormLayout;
-    cardNameLabel = new QLabel;
-    printingLabel = new QLabel;
     leftMarginLabel = new QLabel;
     rightMarginLabel = new QLabel;
     verticalOffsetLabel = new QLabel;
     zoomLabel = new QLabel;
-    form->addRow(cardNameLabel, searchBar);
-    form->addRow(printingLabel, providerComboBox);
+
+    showNumericEditorsCheck = new QCheckBox;
+
+    form->addRow(showNumericEditorsCheck);
     form->addRow(leftMarginLabel, marginLSpin);
     form->addRow(rightMarginLabel, marginRSpin);
     form->addRow(verticalOffsetLabel, verticalOffsetSpin);
@@ -138,9 +144,14 @@ void PlaymatSettingsDialog::setupUi()
     controlsGroup->setLayout(form);
 
     preview = new PlaymatPreviewWidget;
+    preview->setParams(currentParams);
 
     auto *previewLayout = new QVBoxLayout;
     previewLayout->addWidget(preview);
+    previewCaptionLabel = new QLabel;
+    previewCaptionLabel->setAlignment(Qt::AlignCenter);
+    previewCaptionLabel->setWordWrap(true);
+    previewLayout->addWidget(previewCaptionLabel);
     previewGroup = new QGroupBox;
     previewGroup->setLayout(previewLayout);
 
@@ -155,16 +166,35 @@ void PlaymatSettingsDialog::setupUi()
         accept();
     });
 
-    auto *root = new QVBoxLayout;
-    root->addWidget(controlsGroup);
-    root->addWidget(previewGroup);
-    root->addWidget(buttons);
-    setLayout(root);
+    // The crop surface is the primary control: dragging pans, wheel/keys zoom,
+    // editing exactly the same stored parameters the numeric fields do.
+    connect(preview, &PlaymatPreviewWidget::paramsEdited, this, [this](const PlaymatParams &edited) {
+        currentParams = edited;
+
+        QSignalBlocker blockMarginL(marginLSpin);
+        QSignalBlocker blockMarginR(marginRSpin);
+        QSignalBlocker blockOffset(verticalOffsetSpin);
+        QSignalBlocker blockZoom(zoomSpin);
+        marginLSpin->setValue(edited.marginPctL);
+        marginRSpin->setValue(edited.marginPctR);
+        verticalOffsetSpin->setValue(edited.verticalOffset);
+        zoomSpin->setValue(edited.zoom);
+    });
+
+    connect(showNumericEditorsCheck, &QCheckBox::toggled, this, &PlaymatSettingsDialog::setNumericEditorsVisible);
+    setNumericEditorsVisible(false);
 
     connect(marginLSpin, &QDoubleSpinBox::valueChanged, this, &PlaymatSettingsDialog::onParamChanged);
     connect(marginRSpin, &QDoubleSpinBox::valueChanged, this, &PlaymatSettingsDialog::onParamChanged);
     connect(verticalOffsetSpin, &QDoubleSpinBox::valueChanged, this, &PlaymatSettingsDialog::onParamChanged);
     connect(zoomSpin, &QDoubleSpinBox::valueChanged, this, &PlaymatSettingsDialog::onParamChanged);
+
+    // The crop surface leads visually, card selection supports it below.
+    auto *root = new QVBoxLayout;
+    root->addWidget(previewGroup);
+    root->addWidget(controlsGroup);
+    root->addWidget(buttons);
+    setLayout(root);
 }
 
 void PlaymatSettingsDialog::populateProviderCombo(const QString &cardName)
@@ -261,17 +291,34 @@ void PlaymatSettingsDialog::onParamChanged()
     preview->setParams(currentParams);
 }
 
+void PlaymatSettingsDialog::setNumericEditorsVisible(bool visible)
+{
+    controlsForm->setRowVisible(leftMarginLabel, visible);
+    controlsForm->setRowVisible(rightMarginLabel, visible);
+    controlsForm->setRowVisible(verticalOffsetLabel, visible);
+    controlsForm->setRowVisible(zoomLabel, visible);
+
+    // A QDialog never resizes itself when its content requirements change,
+    // so revealing the editors would squeeze the crop group until the info
+    // caption ran into the preview. Re-fit the dialog to the new size hint.
+    adjustSize();
+}
+
 void PlaymatSettingsDialog::retranslateUi()
 {
     setWindowTitle(tr("Playmat Settings"));
     searchBar->setPlaceholderText(tr("Type a card name..."));
     cardNameLabel->setText(tr("Card name:"));
     printingLabel->setText(tr("Printing:"));
+    showNumericEditorsCheck->setText(tr("Show numerical editors"));
     leftMarginLabel->setText(tr("Left margin (%):"));
     rightMarginLabel->setText(tr("Right margin (%):"));
     verticalOffsetLabel->setText(tr("Vertical offset:"));
     zoomLabel->setText(tr("Zoom:"));
-    controlsGroup->setTitle(tr("Parameters"));
-    previewGroup->setTitle(tr("Preview"));
+    controlsGroup->setTitle(tr("Card"));
+    previewGroup->setTitle(tr("Crop"));
+    previewCaptionLabel->setText(
+        tr("Drag to pan, scroll to zoom, arrow keys nudge, plus and minus zoom, Backspace or Esc restores. "
+           "Dimmed strips mark where a wider table crops further."));
     removeButton->setText(tr("Remove Playmat"));
 }
