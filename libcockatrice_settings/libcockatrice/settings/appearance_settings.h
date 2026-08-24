@@ -27,6 +27,8 @@ public:
     void setHomeTabBackgroundShuffleFrequency(int _frequency);
     [[nodiscard]] bool getHomeTabDisplayCardName() const;
     void setHomeTabDisplayCardName(bool _displayCardName);
+    [[nodiscard]] int getHomeTabButtonColorSourceIndex() const;
+    void setHomeTabButtonColorSourceIndex(int index);
 
 signals:
     void themeNameChanged();
@@ -34,6 +36,7 @@ signals:
     void homeTabBackgroundSourceChanged();
     void homeTabBackgroundShuffleFrequencyChanged();
     void homeTabDisplayCardNameChanged();
+    void homeTabButtonColorChanged();
 
 public:
     explicit AppearanceSettings(const QString &settingPath, QObject *parent = nullptr);

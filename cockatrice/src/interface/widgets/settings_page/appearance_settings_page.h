@@ -35,11 +35,15 @@ private:
     QLabel styleComboLabel;
     QComboBox styleCombo;
     QPushButton editPaletteButton;
+
     QLabel homeTabBackgroundSourceLabel;
     QComboBox homeTabBackgroundSourceBox;
     QLabel homeTabBackgroundShuffleFrequencyLabel;
     QSpinBox homeTabBackgroundShuffleFrequencySpinBox;
     QCheckBox homeTabDisplayCardNameCheckBox;
+    QLabel homeTabButtonColorSourceLabel;
+    QComboBox homeTabButtonColorSourceBox;
+
     QCheckBox styleUserListCheckBox;
     QCheckBox showShortcutsCheckBox;
     QCheckBox showGameSelectorFilterToolbarCheckBox;
