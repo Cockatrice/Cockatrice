@@ -53,6 +53,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
     src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
+    src/interface/widgets/dialogs/dlg_tournament_settings.cpp
     src/interface/widgets/dialogs/dlg_update.cpp
     src/interface/widgets/dialogs/dlg_view_log.cpp
     src/interface/widgets/dialogs/override_printing_warning.cpp
@@ -215,6 +216,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_editor/deck_list_style_proxy.cpp
     src/interface/widgets/deck_editor/deck_state_manager.cpp
     src/interface/widgets/deck_editor/printing_disabled_info_widget.cpp
+    src/interface/widgets/draft/tournament_widget.cpp
     src/interface/widgets/general/background_sources.cpp
     src/interface/widgets/general/display/background_plate_widget.cpp
     src/interface/widgets/general/display/banner_widget.cpp
@@ -391,6 +393,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab_server.cpp
     src/interface/widgets/tabs/tab_supervisor.cpp
     src/interface/widgets/tabs/tab_visual_database_display.cpp
+    src/interface/widgets/tabs/tournament_tab_game_extension.cpp
     src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
     src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
     src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp

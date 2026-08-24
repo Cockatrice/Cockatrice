@@ -19,11 +19,13 @@
 #include <QCompleter>
 #include <QLoggingCategory>
 #include <QMap>
+#include <QPointer>
 #include <QStringListModel>
 
 class CardMenu;
 class ServerInfo_PlayerProperties;
 class TabbedDeckViewContainer;
+class TournamentTabGameExtension;
 inline Q_LOGGING_CATEGORY(TabGameLog, "tab_game");
 
 class UserListProxy;
@@ -91,6 +93,8 @@ private:
     QAction *aInviteToGame = nullptr;
     QList<QAction *> phaseActions;
     QAction *aCardMenu;
+
+    QPointer<TournamentTabGameExtension> tournamentExtension;
 
     /**
      * @brief The actions associated with managing a QDockWidget
@@ -189,6 +193,8 @@ public:
     void connectToGameEventHandler();
     void connectMessageLogToGameEventHandler();
     void connectPlayerListToGameEventHandler();
+    /*! Brings the tab of the given game to front if it is open in this session. */
+    bool switchToGameTab(int gameId);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
     ~TabGame() override;
     void retranslateUi() override;
@@ -200,6 +206,19 @@ public:
     [[nodiscard]] AbstractGame *getGame() const
     {
         return game;
+    }
+
+    [[nodiscard]] QStackedWidget *getMainWidget() const
+    {
+        return mainWidget;
+    }
+    [[nodiscard]] QVBoxLayout *getDeckViewContainerLayout() const
+    {
+        return deckViewContainerLayout;
+    }
+    [[nodiscard]] QWidget *getDeckViewContainerWidget() const
+    {
+        return deckViewContainerWidget;
     }
 
 public slots:
