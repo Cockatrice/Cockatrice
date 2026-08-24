@@ -155,6 +155,18 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex i
 
 void CardGroupDisplayWidget::updateCardDisplays()
 {
+    // Custom zones are user-defined containers: they display their cards in the same
+    // order as the tree view, i.e. the model row order. Only criteria groups apply
+    // the visual sort criteria.
+    const bool isCustomZone = trackedIndex.data(DeckRoles::IsCustomZoneRole).toBool();
+
+    if (isCustomZone) {
+        for (int i = 0; i < deckListModel->rowCount(trackedIndex); ++i) {
+            addCardWidgets(QPersistentModelIndex(deckListModel->index(i, 0, trackedIndex)));
+        }
+        return;
+    }
+
     DeckListSortFilterProxyModel proxy;
     proxy.setSourceModel(deckListModel);
     proxy.setSortCriteria(activeSortCriteria);
@@ -174,16 +186,18 @@ void CardGroupDisplayWidget::updateCardDisplays()
         QModelIndex sourceIndex = proxy.mapToSource(proxyIndex);
 
         // 4. persist the source index
-        QPersistentModelIndex persistent(sourceIndex);
+        addCardWidgets(QPersistentModelIndex(sourceIndex));
+    }
+}
 
-        // Get the card amount
-        int cardAmount =
-            sourceIndex.sibling(sourceIndex.row(), DeckListModelColumns::CARD_AMOUNT).data(Qt::EditRole).toInt();
+void CardGroupDisplayWidget::addCardWidgets(const QPersistentModelIndex &persistent)
+{
+    // Get the card amount
+    int cardAmount = persistent.sibling(persistent.row(), DeckListModelColumns::CARD_AMOUNT).data(Qt::EditRole).toInt();
 
-        // Create multiple widgets for the card count
-        for (int copy = 0; copy < cardAmount; ++copy) {
-            addToLayout(constructWidgetForIndex(persistent));
-        }
+    // Create multiple widgets for the card count
+    for (int copy = 0; copy < cardAmount; ++copy) {
+        addToLayout(constructWidgetForIndex(persistent));
     }
 }
 

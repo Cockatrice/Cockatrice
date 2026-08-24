@@ -5,6 +5,7 @@
 #include "libcockatrice/card/database/card_database_manager.h"
 
 #include <QResizeEvent>
+#include <algorithm>
 #include <libcockatrice/models/deck_list/deck_list_model.h>
 
 DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
@@ -51,11 +52,6 @@ DeckCardZoneDisplayWidget::DeckCardZoneDisplayWidget(QWidget *parent,
 //                                                    User Interaction
 // =====================================================================================================================
 
-void DeckCardZoneDisplayWidget::onClick(QMouseEvent *event, const ExactCard &card)
-{
-    emit cardClicked(event, card, zoneName);
-}
-
 void DeckCardZoneDisplayWidget::onHover(const ExactCard &card)
 {
     emit cardHovered(card);
@@ -95,12 +91,18 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
     }
 
     auto categoryName = index.sibling(index.row(), DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+    // Cards in a custom zone belong to that zone, not the board zone, so that
+    // increment/decrement/swap actions target the custom zone.
+    const bool isCustomZone = index.data(DeckRoles::IsCustomZoneRole).toBool();
+    const QString effectiveZoneName = isCustomZone ? categoryName : zoneName;
+    const auto routeCardClick = [this, effectiveZoneName](QMouseEvent *event, const ExactCard &card) {
+        emit cardClicked(event, card, effectiveZoneName);
+    };
     if (displayType == DisplayType::Overlap) {
         auto *displayWidget = new OverlappedCardGroupDisplayWidget(
-            cardGroupContainer, deckListModel, selectionModel, index, zoneName, categoryName, activeGroupCriteria,
-            activeSortCriteria, subBannerOpacity, cardSizeWidget);
-        connect(displayWidget, &OverlappedCardGroupDisplayWidget::cardClicked, this,
-                &DeckCardZoneDisplayWidget::onClick);
+            cardGroupContainer, deckListModel, selectionModel, index, effectiveZoneName, categoryName,
+            activeGroupCriteria, activeSortCriteria, subBannerOpacity, cardSizeWidget);
+        connect(displayWidget, &OverlappedCardGroupDisplayWidget::cardClicked, this, routeCardClick);
         connect(displayWidget, &OverlappedCardGroupDisplayWidget::cardHovered, this,
                 &DeckCardZoneDisplayWidget::onHover);
         connect(displayWidget, &CardGroupDisplayWidget::cleanupRequested, this,
@@ -111,9 +113,9 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
         indexToWidgetMap.insert(index, displayWidget);
     } else if (displayType == DisplayType::Flat) {
         auto *displayWidget = new FlatCardGroupDisplayWidget(cardGroupContainer, deckListModel, selectionModel, index,
-                                                             zoneName, categoryName, activeGroupCriteria,
+                                                             effectiveZoneName, categoryName, activeGroupCriteria,
                                                              activeSortCriteria, subBannerOpacity, cardSizeWidget);
-        connect(displayWidget, &FlatCardGroupDisplayWidget::cardClicked, this, &DeckCardZoneDisplayWidget::onClick);
+        connect(displayWidget, &FlatCardGroupDisplayWidget::cardClicked, this, routeCardClick);
         connect(displayWidget, &FlatCardGroupDisplayWidget::cardHovered, this, &DeckCardZoneDisplayWidget::onHover);
         connect(displayWidget, &CardGroupDisplayWidget::cleanupRequested, this,
                 &DeckCardZoneDisplayWidget::cleanupInvalidCardGroup);
@@ -126,24 +128,22 @@ void DeckCardZoneDisplayWidget::constructAppropriateWidget(QPersistentModelIndex
 
 void DeckCardZoneDisplayWidget::displayCards()
 {
-    QSortFilterProxyModel proxy;
-    proxy.setSourceModel(deckListModel);
-    proxy.setSortRole(Qt::EditRole);
-    proxy.sort(DeckListModelColumns::CARD_NAME, Qt::AscendingOrder);
+    if (!trackedIndex.isValid()) {
+        return;
+    }
 
-    // 1. trackedIndex is a source index → map it to proxy space
-    QModelIndex proxyParent = proxy.mapFromSource(trackedIndex);
+    // Iterate the direct children of the tracked zone, keeping the tree view's row
+    // order (criteria groups first, then custom zones in their creation order).
+    QList<QPersistentModelIndex> rows;
+    for (int i = 0; i < deckListModel->rowCount(trackedIndex); ++i) {
+        rows.append(QPersistentModelIndex(deckListModel->index(i, 0, trackedIndex)));
+    }
 
-    // 2. iterate children under the proxy parent
-    for (int i = 0; i < proxy.rowCount(proxyParent); ++i) {
-        QModelIndex proxyIndex = proxy.index(i, 0, proxyParent);
+    std::stable_partition(rows.begin(), rows.end(), [](const QPersistentModelIndex &row) {
+        return !row.data(DeckRoles::IsCustomZoneRole).toBool();
+    });
 
-        // 3. map back to source
-        QModelIndex sourceIndex = proxy.mapToSource(proxyIndex);
-
-        // 4. persist the source index
-        QPersistentModelIndex persistent(sourceIndex);
-
+    for (const QPersistentModelIndex &persistent : rows) {
         constructAppropriateWidget(persistent);
     }
 }
