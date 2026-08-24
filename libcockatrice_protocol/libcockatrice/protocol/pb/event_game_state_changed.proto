@@ -24,4 +24,10 @@ message Event_GameStateChanged {
 
     // the amount of seconds since the game started
     optional uint32 seconds_elapsed = 5;
+
+    // whether this game is a tournament game
+    optional bool is_tournament = 9;
+
+    // for tournament sub-games: the ID of the parent tournament game (-1 if not a sub-game)
+    optional sint32 parent_game_id = 10 [default = -1];
 }

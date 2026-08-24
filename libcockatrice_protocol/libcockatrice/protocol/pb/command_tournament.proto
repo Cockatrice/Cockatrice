@@ -1,0 +1,26 @@
+syntax = "proto2";
+import "game_commands.proto";
+import "event_tournament_state.proto";
+
+message Command_ReportMatchResult {
+    extend GameCommand {
+        optional Command_ReportMatchResult ext = 1037;
+    }
+
+    optional sint32 game_id = 1 [default = -1];
+    optional sint32 winner_id = 2 [default = -1];
+}
+
+message Command_AdvanceTournament {
+    extend GameCommand {
+        optional Command_AdvanceTournament ext = 1038;
+    }
+}
+
+message Command_TournamentSettingsSelect {
+    extend GameCommand {
+        optional Command_TournamentSettingsSelect ext = 1039;
+    }
+
+    optional TournamentSettings settings = 1;
+}
