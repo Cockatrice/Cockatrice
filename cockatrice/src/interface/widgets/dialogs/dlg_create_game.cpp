@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../interface/widgets/tabs/tab_room.h"
+#include "dlg_tournament_settings.h"
 
 #include <QApplication>
 #include <QCheckBox>
@@ -104,14 +105,29 @@ void DlgCreateGame::sharedCtor()
 
     shareDecklistsOnLoadCheckBox = new QCheckBox(tr("Open decklists in lobby"));
 
+    tournamentCheckBox = new QCheckBox(tr("Tournament mode"));
+    tournamentCheckBox->setToolTip(tr("All players submit a deck up front and rounds are paired automatically"));
+    tournamentSettingsButton = new QPushButton(tr("Settings..."));
+    tournamentSettingsButton->setEnabled(false);
+    connect(tournamentCheckBox, &QCheckBox::toggled, tournamentSettingsButton, &QPushButton::setEnabled);
+    connect(tournamentSettingsButton, &QPushButton::clicked, this, [this] {
+        DlgTournamentSettings dlg(this);
+        dlg.setCurrentGamesPerMatch(tournamentSettings.gamesPerMatch);
+        if (dlg.exec() == QDialog::Accepted) {
+            tournamentSettings = dlg.getResult();
+        }
+    });
+
     createGameAsJudgeCheckBox = new QCheckBox(tr("Create game as judge"));
 
     auto *gameSetupOptionsLayout = new QGridLayout;
     gameSetupOptionsLayout->addWidget(startingLifeTotalLabel, 0, 0);
     gameSetupOptionsLayout->addWidget(startingLifeTotalEdit, 0, 1);
     gameSetupOptionsLayout->addWidget(shareDecklistsOnLoadCheckBox, 1, 0);
+    gameSetupOptionsLayout->addWidget(tournamentCheckBox, 2, 0);
+    gameSetupOptionsLayout->addWidget(tournamentSettingsButton, 2, 1);
     if (room && room->getUserInfo()->user_level() & ServerInfo_User::IsJudge) {
-        gameSetupOptionsLayout->addWidget(createGameAsJudgeCheckBox, 2, 0);
+        gameSetupOptionsLayout->addWidget(createGameAsJudgeCheckBox, 3, 0);
     } else {
         createGameAsJudgeCheckBox->setChecked(false);
         createGameAsJudgeCheckBox->setHidden(true);
@@ -188,7 +204,7 @@ DlgCreateGame::DlgCreateGame(TabRoom *_room, const QMap<int, QString> &_gameType
 }
 
 DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QString> &_gameTypes, QWidget *parent)
-    : QDialog(parent), room(0), gameTypes(_gameTypes)
+    : QDialog(parent), room(nullptr), gameTypes(_gameTypes)
 {
     sharedCtor();
 
@@ -205,6 +221,8 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
     createGameAsSpectatorCheckBox->setEnabled(false);
     startingLifeTotalEdit->setEnabled(false);
     shareDecklistsOnLoadCheckBox->setEnabled(false);
+    tournamentCheckBox->setEnabled(false);
+    tournamentSettingsButton->setEnabled(false);
 
     descriptionEdit->setText(QString::fromStdString(gameInfo.description()));
     maxPlayersEdit->setValue(gameInfo.max_players());
@@ -215,6 +233,7 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
     spectatorsCanTalkCheckBox->setChecked(gameInfo.spectators_can_chat());
     spectatorsSeeEverythingCheckBox->setChecked(gameInfo.spectators_omniscient());
     shareDecklistsOnLoadCheckBox->setChecked(gameInfo.share_decklists_on_load());
+    tournamentCheckBox->setChecked(gameInfo.is_tournament());
 
     QSet<int> types;
     for (int i = 0; i < gameInfo.game_types_size(); ++i) {
@@ -252,6 +271,8 @@ void DlgCreateGame::actReset()
 
     startingLifeTotalEdit->setValue(20);
     shareDecklistsOnLoadCheckBox->setChecked(false);
+    tournamentCheckBox->setChecked(false);
+    tournamentSettings = DlgTournamentSettingsResult{};
     createGameAsJudgeCheckBox->setChecked(false);
 
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
@@ -282,6 +303,10 @@ void DlgCreateGame::actOK()
     cmd.set_join_as_spectator(createGameAsSpectatorCheckBox->isChecked());
     cmd.set_starting_life_total(startingLifeTotalEdit->value());
     cmd.set_share_decklists_on_load(shareDecklistsOnLoadCheckBox->isChecked());
+    cmd.set_is_tournament(tournamentCheckBox->isChecked());
+    if (tournamentCheckBox->isChecked()) {
+        cmd.set_games_per_match(tournamentSettings.gamesPerMatch);
+    }
 
     auto _gameTypes = QString();
     QMapIterator<int, QRadioButton *> gameTypeCheckBoxIterator(gameTypeCheckBoxes);
