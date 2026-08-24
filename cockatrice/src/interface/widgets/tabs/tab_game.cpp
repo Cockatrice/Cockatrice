@@ -39,6 +39,7 @@
 #include "libcockatrice/protocol/pb/serverinfo_playerproperties.pb.h"
 #include "libcockatrice/utility/card_ref.h"
 #include "tab_supervisor.h"
+#include "tournament_tab_game_extension.h"
 
 #include <QAction>
 #include <QApplication>
@@ -168,6 +169,10 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     createMenuItems();
     createViewMenuItems();
 
+    if (game->getGameMetaInfo()->isTournament()) {
+        tournamentExtension = new TournamentTabGameExtension(this);
+    }
+
     connectToGameState();
     connectToPlayerManager();
     connectToGameEventHandler();
@@ -182,6 +187,10 @@ TabGame::TabGame(TabSupervisor *_tabSupervisor,
     // append game to rooms game list for others to see
     for (int i = game->getGameMetaInfo()->gameTypesSize() - 1; i >= 0; i--) {
         gameTypes.append(game->getGameMetaInfo()->findRoomGameType(i));
+    }
+
+    if (tournamentExtension) {
+        tournamentExtension->initializeTournamentMode();
     }
 
     QTimer::singleShot(0, this, &TabGame::loadLayout);
@@ -441,6 +450,10 @@ void TabGame::retranslateUi()
     }
 
     scene->retranslateUi();
+
+    if (tournamentExtension) {
+        tournamentExtension->retranslateUi();
+    }
 }
 
 void TabGame::refreshShortcuts()
@@ -968,8 +981,22 @@ void TabGame::stopGame()
     }
 }
 
+bool TabGame::switchToGameTab(int gameId)
+{
+    return tabSupervisor->switchToGameTabIfAlreadyExists(gameId);
+}
+
 void TabGame::closeGame()
 {
+    int parentId = game->getGameMetaInfo()->parentGameId();
+    if (parentId >= 0) {
+        if (switchToGameTab(parentId)) {
+            close();
+        }
+        // If the parent tab is gone, fall through to the normal leave-game
+        // flow instead of stranding the user on a dead sub-game tab.
+    }
+
     gameMenu->clear();
     gameMenu->addAction(aLeaveGame);
 }
