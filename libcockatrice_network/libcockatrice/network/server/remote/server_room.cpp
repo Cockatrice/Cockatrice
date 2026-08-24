@@ -363,6 +363,18 @@ void Server_Room::broadcastGameListUpdate(const ServerInfo_Game &gameInfo, bool 
     sendRoomEvent(prepareRoomEvent(event), sendToIsl);
 }
 
+Server_AbstractUserInterface *Server_Room::getUserInterfaceByName(const QString &name) const
+{
+    usersLock.lockForRead();
+    auto it = users.constFind(name);
+    Server_AbstractUserInterface *result = nullptr;
+    if (it != users.constEnd()) {
+        result = it.value();
+    }
+    usersLock.unlock();
+    return result;
+}
+
 void Server_Room::addGame(Server_Game *game)
 {
     ServerInfo_Room roomInfo;
