@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QtMath>
 #include <algorithm>
+#include <functional>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/deck_list/tree/deck_list_card_node.h>
@@ -381,18 +382,25 @@ void DeckViewScene::rebuildTree()
             addItem(container);
         }
 
-        for (int j = 0; j < currentZone->size(); j++) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard) {
-                continue;
+        // Cards in custom zones nested under a board are regular board cards in-game.
+        // They are collected recursively and reported with the top-level board zone
+        // as their origin, so that sideboard plans keep working.
+        std::function<void(const InnerDecklistNode *)> addZoneCards = [&addZoneCards, container, currentZone,
+                                                                       this](const InnerDecklistNode *zone) {
+            for (int j = 0; j < zone->size(); j++) {
+                auto *currentCard = dynamic_cast<DecklistCardNode *>(zone->at(j));
+                if (currentCard) {
+                    for (int k = 0; k < currentCard->getNumber(); ++k) {
+                        auto *newCard = new DeckViewCard(container, currentCard->toCardRef(), currentZone->getName());
+                        container->addCard(newCard);
+                        emit newCardAdded(newCard);
+                    }
+                } else if (auto *innerZone = dynamic_cast<InnerDecklistNode *>(zone->at(j))) {
+                    addZoneCards(innerZone);
+                }
             }
-
-            for (int k = 0; k < currentCard->getNumber(); ++k) {
-                auto *newCard = new DeckViewCard(container, currentCard->toCardRef(), currentZone->getName());
-                container->addCard(newCard);
-                emit newCardAdded(newCard);
-            }
-        }
+        };
+        addZoneCards(currentZone);
     }
 }
 
