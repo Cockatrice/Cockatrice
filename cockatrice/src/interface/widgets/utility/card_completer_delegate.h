@@ -31,9 +31,6 @@ public:
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
 private:
-    // Mana symbol pixmaps, loaded once and cached
-    mutable QCache<QString, QPixmap> symbolCache;
-
     // Set short codes, resolved once per card name and cached
     mutable QCache<QString, QString> setCodeCache;
 
@@ -46,9 +43,6 @@ private:
     // Draw all mana pips for a cost string like "2RG" or "{2}{R}{G}"; split and
     // adventure costs ("1W // W") are drawn as separate groups. Returns the left-most x used
     int drawManaCost(QPainter *p, const QRect &row, const QString &manaCost, int radius) const;
-
-    // Load (or return cached) a mana icon pixmap; falls back to painted circle
-    const QPixmap *cachedSymbolPixmap(const QString &symbol, int size) const;
 
     // Resolve the preferred printing's set short code for a card
     QString setCodeForCard(const QSharedPointer<CardInfo> &card) const;
