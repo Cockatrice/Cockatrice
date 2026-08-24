@@ -580,7 +580,7 @@ void Server_AbstractParticipant::setUserInterface(Server_AbstractUserInterface *
 void Server_AbstractParticipant::disconnectClient()
 {
     bool isRegistered = userInfo->user_level() & ServerInfo_User::IsRegistered;
-    if (!isRegistered || spectator) {
+    if (!isRegistered || spectator || game->getDisconnectRemovesPlayer()) {
         game->removeParticipant(this, Event_Leave::USER_DISCONNECTED);
     } else {
         setUserInterface(nullptr);
