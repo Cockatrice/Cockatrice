@@ -7,6 +7,7 @@
 #ifndef PIXMAPGENERATOR_H
 #define PIXMAPGENERATOR_H
 
+#include <QHash>
 #include <QIcon>
 #include <QLoggingCategory>
 #include <QMap>
@@ -122,6 +123,34 @@ public:
     static void clear()
     {
         pmCache.clear();
+    }
+};
+
+class ManaSymbolPixmapGenerator
+{
+private:
+    static QHash<QString, QPixmap> masterCache;
+    static QHash<QString, QPixmap> scaledCache;
+
+    /**
+     * @brief Renders \a symbol once at a fixed moderate size, so repeated scalings never
+     * re-rasterize the source file (SVG sources can be very expensive to rasterize).
+     */
+    static const QPixmap &masterIcon(const QString &symbol);
+
+public:
+    /**
+     * @brief Returns a smooth-scaled rendering of the given mana symbol icon.
+     *
+     * Results are shared between all callers via a process-wide cache keyed by symbol
+     * and size, so scaling work is done once per distinct combination instead of once
+     * per widget creation or resize.
+     */
+    static QPixmap generatePixmap(const QString &symbol, const QSize &size);
+    static void clear()
+    {
+        masterCache.clear();
+        scaledCache.clear();
     }
 };
 

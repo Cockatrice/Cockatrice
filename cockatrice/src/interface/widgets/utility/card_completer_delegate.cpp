@@ -1,5 +1,6 @@
 #include "card_completer_delegate.h"
 
+#include "../../pixel_map_generator.h"
 #include "../cards/additional_info/mana_cost_widget.h"
 
 #include <QFontMetrics>
@@ -84,7 +85,6 @@ QColor CardCompleterDelegate::accentForColors(const QString &colors)
 
 CardCompleterDelegate::CardCompleterDelegate(QObject *parent) : QStyledItemDelegate(parent)
 {
-    symbolCache.setMaxCost(64);
     setCodeCache.setMaxCost(64);
 }
 
@@ -108,36 +108,16 @@ QSize CardCompleterDelegate::sizeHint(const QStyleOptionViewItem &option, const 
 // Mana symbol painting
 // ---------------------------------------------------------------------------
 
-const QPixmap *CardCompleterDelegate::cachedSymbolPixmap(const QString &symbol, int size) const
-{
-    const QString key = symbol + QString::number(size);
-
-    if (symbolCache.contains(key)) {
-        return symbolCache[key];
-    }
-
-    QPixmap src(QString("theme:icons/mana/%1").arg(symbol));
-
-    if (!src.isNull()) {
-        auto *pm = new QPixmap(src.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-
-        symbolCache.insert(key, pm);
-        return pm;
-    }
-
-    return nullptr;
-}
-
 // ---------------------------------------------------------------------------
 
 void CardCompleterDelegate::drawManaSymbol(QPainter *p, QPoint centre, const QString &symbol, int radius) const
 {
     const QRect pip(centre.x() - radius, centre.y() - radius, radius * 2, radius * 2);
 
-    const QPixmap *px = cachedSymbolPixmap(symbol, radius * 2);
+    const QPixmap px = ManaSymbolPixmapGenerator::generatePixmap(symbol, QSize(radius * 2, radius * 2));
 
-    if (px && !px->isNull()) {
-        p->drawPixmap(pip, *px);
+    if (!px.isNull()) {
+        p->drawPixmap(pip, px);
         return;
     }
 
