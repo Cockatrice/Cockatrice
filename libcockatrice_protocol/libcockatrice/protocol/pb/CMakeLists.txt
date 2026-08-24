@@ -60,6 +60,7 @@ set(PROTO_FILES
     command_set_sideboard_lock.proto
     command_set_sideboard_plan.proto
     command_shuffle.proto
+    command_tournament.proto
     command_undo_draw.proto
     commands.proto
     context_concede.proto
@@ -118,6 +119,7 @@ set(PROTO_FILES
     event_set_card_counter.proto
     event_set_counter.proto
     event_shuffle.proto
+    event_tournament_state.proto
     event_user_joined.proto
     event_user_left.proto
     event_user_message.proto

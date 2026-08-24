@@ -1,0 +1,43 @@
+syntax = "proto2";
+import "game_event.proto";
+
+message TournamentPlayer {
+    optional sint32 player_id = 1;
+    optional string player_name = 2;
+    optional uint32 wins = 3;
+    optional uint32 losses = 4;
+    optional uint32 draws = 5;
+    optional bool deck_submitted = 6;
+}
+
+message TournamentPairing {
+    optional sint32 player1_id = 1;
+    optional sint32 player2_id = 2 [default = -1];
+    optional sint32 game_id = 3;
+    optional sint32 winner_id = 4 [default = -1];
+    optional sint32 player1_match_wins = 5 [default = 0];
+    optional sint32 player2_match_wins = 6 [default = 0];
+}
+
+message TournamentSettings {
+    optional uint32 games_per_match = 1 [default = 1];
+}
+
+message Event_TournamentState {
+    extend GameEvent {
+        optional Event_TournamentState ext = 2027;
+    }
+
+    enum TournamentPhase {
+        PHASE_DECK_BUILDING = 0;
+        PHASE_PLAYING = 1;
+        PHASE_FINISHED = 2;
+    }
+
+    optional TournamentPhase phase = 1;
+    optional uint32 current_round = 2;
+    optional uint32 total_rounds = 3;
+    repeated TournamentPlayer players = 4;
+    repeated TournamentPairing pairings = 5;
+    optional TournamentSettings settings = 6;
+}

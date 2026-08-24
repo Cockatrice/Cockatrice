@@ -69,6 +69,12 @@ message Command_CreateGame {
 
     // share decklists with all players when selected
     optional bool share_decklists_on_load = 14;
+
+    // number of games per match in tournament mode (e.g. 3 for best of 3)
+    optional uint32 games_per_match = 15 [default = 1];
+
+    // whether this is a tournament game
+    optional bool is_tournament = 16;
 }
 
 message Command_JoinGame {

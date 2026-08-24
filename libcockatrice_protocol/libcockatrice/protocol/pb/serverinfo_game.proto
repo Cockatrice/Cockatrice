@@ -65,4 +65,7 @@ message ServerInfo_Game {
 
     // the current host of the game, which may differ from the creator after a host transfer
     optional ServerInfo_User host_info = 53;
+
+    // whether this game is a tournament game
+    optional bool is_tournament = 54;
 }
