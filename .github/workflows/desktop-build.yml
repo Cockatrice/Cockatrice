@@ -399,7 +399,7 @@ jobs:
         run: .ci/thin_macos_qtlib.sh
 
       - name: "[macOS] Cache thin Qt libraries"
-        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true'
+        if: matrix.os == 'macOS' && steps.restore_qt.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
         uses: actions/cache/save@v6
         with:
           key: ${{ steps.restore_qt.outputs.cache-primary-key }}
@@ -411,7 +411,7 @@ jobs:
         with:
           # Qt 6.11.0 only works with aqtinstall directly from git until aqtinstall 3.4 is released
           aqtsource: git+https://github.com/miurahr/aqtinstall.git
-          cache: true
+          cache: ${{ github.ref == 'refs/heads/master' }}
           cache-key-prefix: Qt
           modules: ${{ matrix.qt_modules }}
           version: ${{ steps.resolve_qt_version.outputs.version }}
@@ -426,6 +426,7 @@ jobs:
         uses: TAServers/vcpkg-cache@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          prefix: vcpkg-
 
       # Uses environment variables, see compile.sh for more details
       - name: "Build Cockatrice"
@@ -446,7 +447,7 @@ jobs:
           PACKAGE_SUFFIX: '${{ matrix.package_suffix }}'
           TARGET_MACOS_VERSION: ${{ matrix.override_target }}
           USE_CCACHE: ${{ matrix.use_ccache }}
-          VCPKG_BINARY_SOURCES: 'clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite'
+          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},${{ case(github.ref == 'refs/heads/master', 'readwrite', 'read') }}"
           VCPKG_DISABLE_METRICS: 1
           VCPKG_FEATURE_FLAGS: dependencygraph
         run: .ci/compile.sh --server --test --vcpkg
