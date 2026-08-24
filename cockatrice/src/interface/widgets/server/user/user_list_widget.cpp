@@ -718,12 +718,20 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
             }
         });
 
-        // Hide popup when list scrolls (reference row has moved)
+    // Section dividers can be collapsed/expanded by the user. Surface those
+    // changes only from real user interaction. Programmatic expansion is
+    // applied through setSectionExpanded() / setExpandedProgrammatically().
+    connect(userTree, &QTreeWidget::itemExpanded, this,
+            [this](QTreeWidgetItem *item) { handleSectionExpansion(item, true); });
+    connect(userTree, &QTreeWidget::itemCollapsed, this,
+            [this](QTreeWidgetItem *item) { handleSectionExpansion(item, false); });
+
+    // Hide popup when list scrolls (reference row has moved)
         connect(userTree->verticalScrollBar(), &QScrollBar::valueChanged, this, [this] {
-            showPopupTimer->stop();
-            hidePopup(true);
-            requestAvatarsForVisibleItems();
-        });
+              showPopupTimer->stop();
+              hidePopup(true);
+              requestAvatarsForVisibleItems();
+          });
 
         // Forward join requests from popup upward
         connect(userInfoPopup, &UserInfoPopup::joinGameRequested, this, &UserListWidget::joinGameRequested);
@@ -915,7 +923,7 @@ void UserListWidget::showEvent(QShowEvent *e)
     if (!userInfoPopup) {
         return;
     }
-    requestAvatarsForVisibleItems();
+    requestVisibleItemResources();
 }
 
 void UserListWidget::applyDisplayMode()
@@ -1075,6 +1083,10 @@ void UserListWidget::showPopupForUser(UserListTWI *item)
 
     const QString userName = QString::fromStdString(item->getUserInfo().name());
     avatarProvider->requestAvatar(userName); // ensure the hovered user's avatar is fetched promptly
+    if (cardArtParamsMap.contains(userName)) {
+        const CardArtParams &params = cardArtParamsMap.value(userName);
+        cardArtProvider->requestCardArt(userName, params.cardName, params.cardProviderId);
+    }
 
     const ServerInfo_User &info = item->getUserInfo();
     const bool online = item->data(0, UserListRoles::Online).toBool();
@@ -1256,7 +1268,7 @@ void UserListWidget::endBulkLoad()
     bulkLoading = false;
     sortItems();
     updateCount(); // divider counts were deferred during the bulk build
-    requestAvatarsForVisibleItems();
+    requestVisibleItemResources();
     userTree->viewport()->update();
 }
 
@@ -1269,8 +1281,20 @@ bool UserListWidget::isItemNearViewport(const UserListTWI *item) const
     return userTree->visualItemRect(item).intersects(nearView);
 }
 
-void UserListWidget::requestAvatarsForVisibleItems()
+void UserListWidget::requestVisibleItemResources()
 {
+    const auto requestResources = [this](UserListTWI *twi) {
+        if (!isItemNearViewport(twi)) {
+            return;
+        }
+        const QString userName = QString::fromStdString(twi->getUserInfo().name());
+        avatarProvider->requestAvatar(userName);
+        if (cardArtParamsMap.contains(userName)) {
+            const CardArtParams &params = cardArtParamsMap.value(userName);
+            cardArtProvider->requestCardArt(userName, params.cardName, params.cardProviderId);
+        }
+    };
+
     if (sectioned) {
         // Top level items are dividers, user rows hang below them.
         for (const Section section : sectionIds) {
@@ -1279,20 +1303,14 @@ void UserListWidget::requestAvatarsForVisibleItems()
                 continue;
             }
             for (int i = 0; i < divider->childCount(); ++i) {
-                auto *twi = static_cast<UserListTWI *>(divider->child(i));
-                if (isItemNearViewport(twi)) {
-                    avatarProvider->requestAvatar(QString::fromStdString(twi->getUserInfo().name()));
-                }
+                requestResources(static_cast<UserListTWI *>(divider->child(i)));
             }
         }
         return;
     }
 
     for (int i = 0; i < userTree->topLevelItemCount(); ++i) {
-        auto *twi = static_cast<UserListTWI *>(userTree->topLevelItem(i));
-        if (isItemNearViewport(twi)) {
-            avatarProvider->requestAvatar(QString::fromStdString(twi->getUserInfo().name()));
-        }
+        requestResources(static_cast<UserListTWI *>(userTree->topLevelItem(i)));
     }
 }
 
@@ -1572,7 +1590,7 @@ void UserListWidget::applyFilter()
             }
             updateSectionDivider(section);
         }
-        requestAvatarsForVisibleItems();
+        requestVisibleItemResources();
         userTree->viewport()->update();
         emit userListChanged();
         return;
@@ -1590,7 +1608,7 @@ void UserListWidget::applyFilter()
         }
     }
 
-    requestAvatarsForVisibleItems();
+    requestVisibleItemResources();
     userTree->viewport()->update();
     emit userListChanged();
 }

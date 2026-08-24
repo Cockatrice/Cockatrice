@@ -189,7 +189,7 @@ private:
     bool isPressInsideListUi(const QWidget *widget) const;
     void clearSelectionAndClosePopup();
     bool isItemNearViewport(const UserListTWI *item) const;
-    void requestAvatarsForVisibleItems();
+    void requestVisibleItemResources();
 
     // Sectioned mode (single tree with inline dividers)
     bool sectioned = false;
