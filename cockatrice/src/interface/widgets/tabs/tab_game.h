@@ -15,9 +15,11 @@
 #include <QLoggingCategory>
 #include <QMap>
 #include <QPair>
+#include <QPointer>
 #include <QSize>
 #include <QString>
 #include <QStringList>
+#include <QStringListModel>
 #include <QVector>
 #include <qtmetamacros.h>
 // IWYU pragma: keep
@@ -34,12 +36,12 @@ class MessageLogWidget;
 class PlayerLogic;
 class QAction;
 class QCompleter;
-class QStringListModel;
 class QWidget;
 class ServerInfo_Player;
 class ServerInfo_User;
 class TabSupervisor;
 class TearOffMenu;
+class TournamentTabGameExtension;
 struct CardRef;
 struct LoadedDeck;
 
@@ -99,6 +101,8 @@ private:
     QAction *aInviteToGame = nullptr;
     QList<QAction *> phaseActions;
     QAction *aCardMenu;
+
+    QPointer<TournamentTabGameExtension> tournamentExtension;
 
     /**
      * @brief The actions associated with managing a QDockWidget
@@ -197,6 +201,8 @@ public:
     void connectToGameEventHandler();
     void connectMessageLogToGameEventHandler();
     void connectPlayerListToGameEventHandler();
+    /*! Brings the tab of the given game to front if it is open in this session. */
+    bool switchToGameTab(int gameId);
     TabGame(TabSupervisor *_tabSupervisor, GameReplay *replay);
     ~TabGame() override;
     void retranslateUi() override;
@@ -208,6 +214,19 @@ public:
     [[nodiscard]] AbstractGame *getGame() const
     {
         return game;
+    }
+
+    [[nodiscard]] QStackedWidget *getMainWidget() const
+    {
+        return mainWidget;
+    }
+    [[nodiscard]] QVBoxLayout *getDeckViewContainerLayout() const
+    {
+        return deckViewContainerLayout;
+    }
+    [[nodiscard]] QWidget *getDeckViewContainerWidget() const
+    {
+        return deckViewContainerWidget;
     }
 
 public slots:

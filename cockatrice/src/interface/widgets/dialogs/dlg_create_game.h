@@ -7,6 +7,8 @@
 #ifndef DLG_CREATEGAME_H
 #define DLG_CREATEGAME_H
 
+#include "dlg_tournament_settings.h"
+
 #include <QDialog>
 #include <QMap>
 #include <QString>
@@ -51,6 +53,9 @@ private:
     QCheckBox *spectatorsAllowedCheckBox, *spectatorsNeedPasswordCheckBox, *spectatorsCanTalkCheckBox,
         *spectatorsSeeEverythingCheckBox, *createGameAsJudgeCheckBox, *createGameAsSpectatorCheckBox;
     QCheckBox *shareDecklistsOnLoadCheckBox;
+    QCheckBox *tournamentCheckBox;
+    QPushButton *tournamentSettingsButton;
+    DlgTournamentSettingsResult tournamentSettings;
     QDialogButtonBox *buttonBox;
     QPushButton *clearButton;
     QCheckBox *rememberGameSettings;
