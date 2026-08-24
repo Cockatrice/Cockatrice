@@ -135,6 +135,8 @@ public:
     void addGame(Server_Game *game);
     void removeGame(Server_Game *game);
 
+    Server_AbstractUserInterface *getUserInterfaceByName(const QString &name) const;
+
     void sendRoomEvent(RoomEvent *event, bool sendToIsl = true);
     RoomEvent *prepareRoomEvent(const ::google::protobuf::Message &roomEvent);
 };
