@@ -4,6 +4,7 @@
 
 #include <QDir>
 #include <QDirIterator>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QFutureWatcher>
@@ -36,13 +37,13 @@ struct DeckLoadResult
 };
 
 /**
- * @brief How many finished background deck loads one event loop turn applies.
+ * @brief How long per event loop turn the pending-load drain applies finished loads.
  *
- * Applying a load emits dataChanged and wakes up the proxies, which is not
- * free, and the bound keeps a burst of simultaneous completions from stalling
- * the UI thread.
+ * Applying a load updates the row and wakes up the proxies and views, which is
+ * not free. A time budget instead of a fixed count lets fast machines apply
+ * many loads in one turn while keeping the ui thread responsive everywhere.
  */
-constexpr int DECK_LOADS_PER_TURN = 24;
+constexpr int LOAD_DRAIN_TIME_BUDGET_MS = 8;
 
 /**
  * @brief The path of \a path relative to the deck root, or empty if \a path
@@ -194,12 +195,22 @@ const LoadedDeck &VisualDeckStorageModel::deckForRow(int row) const
 
 int VisualDeckStorageModel::rowForFilePath(const QString &filePath) const
 {
-    for (int i = 0; i < decks.size(); ++i) {
-        if (decks.at(i).filePath == filePath) {
-            return i;
+    return rowByFilePath.value(filePath, -1);
+}
+
+/**
+ * @brief Rebuilds the file path -> row index from scratch after bulk changes.
+ */
+void VisualDeckStorageModel::reindexFilePaths()
+{
+    rowByFilePath.clear();
+    for (int row = 0; row < decks.size(); ++row) {
+        const QString &filePath = decks.at(row).filePath;
+        // First row wins, mirroring what a linear scan would return for duplicates.
+        if (!rowByFilePath.contains(filePath)) {
+            rowByFilePath.insert(filePath, row);
         }
     }
-    return -1;
 }
 
 void VisualDeckStorageModel::startScan()
@@ -207,6 +218,7 @@ void VisualDeckStorageModel::startScan()
     ++scanGeneration;
     beginResetModel();
     decks.clear();
+    rowByFilePath.clear();
     folderPaths.clear();
     pendingLoads.clear();
     endResetModel();
@@ -237,6 +249,7 @@ void VisualDeckStorageModel::startScan()
 
         beginInsertRows(QModelIndex(), 0, result.decks.size() - 1);
         decks = result.decks;
+        reindexFilePaths();
         endInsertRows();
 
         for (int row = 0; row < decks.size(); ++row) {
@@ -311,8 +324,10 @@ void VisualDeckStorageModel::drainPendingLoads()
 {
     drainScheduled = false;
 
-    int applied = 0;
-    while (!pendingLoads.isEmpty() && applied < DECK_LOADS_PER_TURN) {
+    QElapsedTimer timer;
+    timer.start();
+
+    while (!pendingLoads.isEmpty()) {
         PendingDeckLoad pending = pendingLoads.takeFirst();
 
         if (pending.generation != scanGeneration) {
@@ -328,7 +343,6 @@ void VisualDeckStorageModel::drainPendingLoads()
         data.loadInProgress = false;
 
         if (!pending.ok) {
-            ++applied;
             continue; // Leave the row unloaded so it stays visible without deck data.
         }
 
@@ -340,7 +354,12 @@ void VisualDeckStorageModel::drainPendingLoads()
 
         emit dataChanged(index(row), index(row));
         emit deckLoaded(row);
-        ++applied;
+
+        // Checked after applying at least one load, so a single slow application
+        // still makes progress instead of starving the queue.
+        if (timer.elapsed() >= LOAD_DRAIN_TIME_BUDGET_MS) {
+            break;
+        }
     }
 
     if (!pendingLoads.isEmpty()) {
@@ -406,9 +425,13 @@ void VisualDeckStorageModel::setFilePathForRow(int row, const QString &newFilePa
     }
 
     DeckPreviewData &data = decks[row];
+    rowByFilePath.remove(data.filePath);
     data.filePath = newFilePath;
     data.relativeFilePath = relativeFilePathFor(newFilePath, deckPath);
     data.folderPath = folderPathFor(newFilePath, deckPath);
+    if (!rowByFilePath.contains(newFilePath)) {
+        rowByFilePath.insert(newFilePath, row);
+    }
 }
 
 bool VisualDeckStorageModel::renameDeck(int row, const QString &newName)
@@ -472,7 +495,14 @@ bool VisualDeckStorageModel::deleteFile(int row)
     }
 
     beginRemoveRows(QModelIndex(), row, row);
+    rowByFilePath.remove(filePath);
     decks.removeAt(row);
+    // Rows after the deleted one shift down by one.
+    for (auto it = rowByFilePath.begin(); it != rowByFilePath.end(); ++it) {
+        if (it.value() > row) {
+            --it.value();
+        }
+    }
     endRemoveRows();
     return true;
 }

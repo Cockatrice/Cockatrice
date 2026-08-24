@@ -17,6 +17,7 @@
 
 #include <QAbstractListModel>
 #include <QDateTime>
+#include <QHash>
 #include <QList>
 #include <QStringList>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -166,6 +167,7 @@ private:
     void startScan();
     void beginLoad(int row);
     static void recomputeDeckMetadata(DeckPreviewData &data, bool recomputeColorIdentity = true);
+    void reindexFilePaths();
     void schedulePendingLoadDrain();
 
 private slots:
@@ -176,6 +178,7 @@ private:
 
     QString deckPath;
     QList<DeckPreviewData> decks;
+    QHash<QString, int> rowByFilePath;     ///< Maps each deck's file path to its row for O(1) lookups.
     QStringList folderPaths;               ///< All subdirectories of the deck folder, sorted.
     int scanGeneration = 0;                ///< Bumped on every scan so stale results are ignored.
     QVector<PendingDeckLoad> pendingLoads; ///< Finished background loads waiting to be applied.
