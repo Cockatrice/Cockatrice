@@ -3,6 +3,8 @@
 
 #include "../first_run_wizard_page.h"
 
+#include <QSize>
+
 class QComboBox;
 class QLabel;
 class QLineEdit;
@@ -71,6 +73,7 @@ private:
     QSpinBox *checkIntervalSpinBox;
 
     State state = State::NotStarted;
+    QSize windowSizeBeforeExpansion;
 };
 
 #endif // CARD_DATABASE_SETUP_PAGE_H

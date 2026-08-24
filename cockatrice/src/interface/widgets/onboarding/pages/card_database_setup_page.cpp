@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QSpinBox>
+#include <QTimer>
 #include <QUrl>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -198,6 +199,22 @@ void CardDatabaseSetupPage::onToggleAdvanced(bool open)
     advancedToggleButton->setText(open ? tr("▼  Advanced: custom download source")
                                        : tr("▶  Advanced: custom download source"));
     advancedPanel->setVisible(open);
+
+    QWidget *wizardWindow = window();
+    if (!wizardWindow) {
+        return;
+    }
+
+    if (open) {
+        windowSizeBeforeExpansion = wizardWindow->size();
+        QTimer::singleShot(0, this, [wizardWindow] {
+            wizardWindow->resize(wizardWindow->size().expandedTo(wizardWindow->sizeHint()));
+        });
+    } else {
+        QTimer::singleShot(0, this, [this, wizardWindow] {
+            wizardWindow->resize(wizardWindow->size().boundedTo(windowSizeBeforeExpansion));
+        });
+    }
 }
 
 void CardDatabaseSetupPage::onApplyCustomUrl()
