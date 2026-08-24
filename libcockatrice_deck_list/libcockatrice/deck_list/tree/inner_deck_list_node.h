@@ -24,6 +24,8 @@
 #define DECK_ZONE_SIDE "side"
 /** @brief Constant for the "tokens" zone name. */
 #define DECK_ZONE_TOKENS "tokens"
+/** @brief Constant for the "maybeboard" zone name. */
+#define DECK_ZONE_MAYBEBOARD "maybeboard"
 
 /**
  * @class InnerDecklistNode

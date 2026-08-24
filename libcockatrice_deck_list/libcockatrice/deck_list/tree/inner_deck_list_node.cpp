@@ -28,6 +28,8 @@ QString InnerDecklistNode::visibleNameFromName(const QString &_name)
         return QObject::tr("Sideboard");
     } else if (_name == DECK_ZONE_TOKENS) {
         return QObject::tr("Tokens");
+    } else if (_name == DECK_ZONE_MAYBEBOARD) {
+        return QObject::tr("Maybeboard");
     } else {
         return _name;
     }
