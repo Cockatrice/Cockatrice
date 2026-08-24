@@ -56,6 +56,7 @@ public:
     {
         return deck;
     }
+    void setDeck(DeckList *_deck);
     bool getSideboardLocked() const
     {
         return sideboardLocked;
