@@ -30,10 +30,14 @@
 #include "server_cardzone.h"
 #include "server_player.h"
 #include "server_spectator.h"
+#include "server_tournament.h"
+#include "server_tournament_lifecycle_strategy.h"
+#include "server_tournament_match_result_strategy.h"
 
 #include <QDebug>
 #include <QRegularExpression>
 #include <QTimer>
+#include <algorithm>
 #include <google/protobuf/descriptor.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/context_connection_state_changed.pb.h>
@@ -62,8 +66,9 @@ Server_Game::Server_Game(const GameConfig &config, Server_Room *_room)
       spectatorsCanTalk(config.spectatorsCanTalk), spectatorsSeeEverything(config.spectatorsSeeEverything),
       startingLifeTotal(config.startingLifeTotal), shareDecklistsOnLoad(config.shareDecklistsOnLoad),
       inactivityCounter(0), startTimeOfThisGame(0), secondsElapsed(0), firstGameStarted(false),
-      turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr),
-      deckValidationStrategy(new Server_DefaultDeckValidationStrategy),
+      turnOrderReversed(false), startTime(QDateTime::currentDateTime()), pingClock(nullptr), isTournament(false),
+      tournament(nullptr), tournamentParentGame(nullptr), tournamentMatchPlayer1Id(-1), tournamentMatchPlayer2Id(-1),
+      disconnectRemovesPlayer(false), deckValidationStrategy(new Server_DefaultDeckValidationStrategy),
       lifecycleStrategy(new Server_DefaultLifecycleStrategy), matchResultStrategy(new Server_NullMatchResultStrategy),
       gameMutex()
 {
@@ -265,6 +270,12 @@ void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
         event->set_game_started(false);
     }
 
+    event->set_is_tournament(isTournament);
+
+    if (tournamentParentGame) {
+        event->set_parent_game_id(tournamentParentGame->getGameId());
+    }
+
     for (Server_AbstractParticipant *participant : participants.values()) {
         participant->getInfo(event->add_player_list(), recipient, omniscient, withUserInfo);
     }
@@ -313,7 +324,7 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
     Server_DatabaseInterface *databaseInterface = room->getServer()->getDatabaseInterface();
     QMutexLocker locker(&gameMutex);
 
-    if (getPlayerCount() < maxPlayers && !forceStartGame) {
+    if (!isTournament && getPlayerCount() < maxPlayers && !forceStartGame) {
         return;
     }
 
@@ -861,6 +872,7 @@ void Server_Game::getInfo(ServerInfo_Game &result) const
         result.set_share_decklists_on_load(shareDecklistsOnLoad);
         result.set_spectators_count(getSpectatorCount());
         result.set_start_time(startTime.toSecsSinceEpoch());
+        result.set_is_tournament(isTournament);
     }
 }
 
@@ -910,4 +922,87 @@ void Server_Game::returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPl
 void Server_Game::setDeckValidationStrategy(Server_DeckValidationStrategy *strategy)
 {
     deckValidationStrategy.reset(strategy);
+}
+
+void Server_Game::setMatchResultStrategy(Server_MatchResultStrategy *strategy)
+{
+    matchResultStrategy.reset(strategy);
+}
+
+void Server_Game::setIsTournamentGame(bool _isTournament)
+{
+    isTournament = _isTournament;
+    if (isTournament) {
+        tournament = new Server_Tournament(this, this, this);
+        lifecycleStrategy.reset(new Server_TournamentLifecycleStrategy);
+        matchResultStrategy.reset(new Server_TournamentMatchResultStrategy);
+    } else if (tournament) {
+        delete tournament;
+        tournament = nullptr;
+        lifecycleStrategy.reset(new Server_DefaultLifecycleStrategy);
+        matchResultStrategy.reset(new Server_NullMatchResultStrategy);
+    }
+}
+
+void Server_Game::startTournament()
+{
+    if (!tournament) {
+        tournament = new Server_Tournament(this, this, this);
+    }
+
+    if (!tournament->isStarted()) {
+        // Add all current players to the tournament
+        auto players = getPlayers();
+        for (auto *player : players.values()) {
+            tournament->addPlayer(player->getPlayerId(), QString::fromStdString(player->getUserInfo()->name()));
+        }
+
+        tournament->startTournament();
+    }
+
+    GameEventStorage ges;
+    tournament->broadcastTournamentState(ges);
+    ges.sendToGame(this);
+}
+
+void Server_Game::setPlayerTournamentDeck(int playerId, DeckList *deck)
+{
+    if (tournament) {
+        tournament->setPlayerDeck(playerId, deck);
+    }
+}
+
+void Server_Game::setTournamentMatchInfo(Server_Game *parentGame, int p1Id, int p2Id)
+{
+    tournamentParentGame = parentGame;
+    tournamentMatchPlayer1Id = p1Id;
+    tournamentMatchPlayer2Id = p2Id;
+}
+
+Server_Game *Server_Game::createMatchGame(const GameConfig &config, int &outGameId)
+{
+    Server_DatabaseInterface *databaseInterface = room->getServer()->getDatabaseInterface();
+    outGameId = databaseInterface->getNextGameId();
+    if (outGameId == -1) {
+        return nullptr;
+    }
+
+    GameConfig matchConfig = config;
+    matchConfig.gameId = outGameId;
+    auto *game = new Server_Game(matchConfig, room);
+    // Sub-games carry the tournament flag (for protocol fields) but keep the default
+    // strategies; the parent tournament drives them through the match result strategy
+    // installed by Server_Tournament::createMatchGame.
+    game->isTournament = true;
+    return game;
+}
+
+Server_AbstractUserInterface *Server_Game::getUserInterface(const QString &playerName)
+{
+    return room->getUserInterfaceByName(playerName);
+}
+
+void Server_Game::addGameToRoom(Server_Game *game)
+{
+    room->addGame(game);
 }
