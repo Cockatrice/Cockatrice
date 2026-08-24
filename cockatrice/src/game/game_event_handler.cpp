@@ -26,6 +26,7 @@
 #include <libcockatrice/protocol/pb/event_reverse_turn.pb.h>
 #include <libcockatrice/protocol/pb/event_set_active_phase.pb.h>
 #include <libcockatrice/protocol/pb/event_set_active_player.pb.h>
+#include <libcockatrice/protocol/pb/event_tournament_state.pb.h>
 #include <libcockatrice/protocol/pb/game_event_container.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 
@@ -158,6 +159,9 @@ void GameEventHandler::processGameEventContainer(const GameEventContainer &cont,
                 case GameEvent::REVERSE_TURN:
                     eventReverseTurn(event.GetExtension(Event_ReverseTurn::ext), playerId, context);
                     break;
+                case GameEvent::TOURNAMENT_STATE:
+                    emit tournamentStateChanged(event.GetExtension(Event_TournamentState::ext));
+                    break;
 
                 default: {
                     PlayerLogic *player = game->getPlayerManager()->getPlayers().value(playerId, 0);
@@ -263,6 +267,12 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
                                              int /*eventPlayerId*/,
                                              const GameEventContext & /*context*/)
 {
+    // Sub-games of a tournament report their parent hub game so the client can
+    // route "close game" back to the parent tab.
+    if (event.parent_game_id() != -1) {
+        game->getGameMetaInfo()->setParentGameId(event.parent_game_id());
+    }
+
     const int playerListSize = event.player_list_size();
 
     QVector<QPair<int, QPair<QString, QString>>> opponentDecksToDisplay;
