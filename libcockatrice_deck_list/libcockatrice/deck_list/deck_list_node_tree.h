@@ -78,9 +78,10 @@ public:
     bool deleteNode(AbstractDecklistNode *node, InnerDecklistNode *rootNode = nullptr);
 
     /**
-     * @brief Apply a function to every card in the deck tree. This can modify the cards.
+     * @brief Applies a function to every card in the deck tree. This can modify the cards.
      *
-     * @param func Function taking (zone node, card node).
+     * @param func Function taking (top-level board zone node, card node). Cards nested
+     *        in custom zones are reported with their board zone.
      */
     void forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func) const;
 

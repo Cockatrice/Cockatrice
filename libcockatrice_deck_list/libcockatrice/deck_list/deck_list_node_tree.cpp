@@ -41,13 +41,19 @@ QList<const DecklistCardNode *> DecklistNodeTree::getCardNodes(const QSet<QStrin
 {
     QList<const DecklistCardNode *> result;
 
-    for (auto *zoneNode : getZoneNodes(restrictToZones)) {
-        for (auto *cardNode : *zoneNode) {
-            auto *cardCardNode = dynamic_cast<DecklistCardNode *>(cardNode);
-            if (cardCardNode) {
-                result.append(cardCardNode);
+    std::function<void(const InnerDecklistNode *)> collectCards = [&collectCards,
+                                                                   &result](const InnerDecklistNode *node) {
+        for (int i = 0; i < node->size(); i++) {
+            if (auto *card = dynamic_cast<const DecklistCardNode *>(node->at(i))) {
+                result.append(card);
+            } else if (auto *inner = dynamic_cast<const InnerDecklistNode *>(node->at(i))) {
+                collectCards(inner);
             }
         }
+    };
+
+    for (auto *zoneNode : getZoneNodes(restrictToZones)) {
+        collectCards(zoneNode);
     }
 
     return result;
@@ -160,13 +166,22 @@ bool DecklistNodeTree::deleteNode(AbstractDecklistNode *node, InnerDecklistNode 
 
 void DecklistNodeTree::forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func) const
 {
-    // Support for this is only possible if the internal structure
-    // doesn't get more complicated.
+    // Cards nested in custom zones are reported with their top-level board zone
+    // so that callers can classify cards by board (main/side/maybeboard/tokens).
+    std::function<void(InnerDecklistNode *, InnerDecklistNode *)> walk = [&func, &walk](InnerDecklistNode *boardZone,
+                                                                                        InnerDecklistNode *node) {
+        for (int i = 0; i < node->size(); i++) {
+            if (auto *card = dynamic_cast<DecklistCardNode *>(node->at(i))) {
+                func(boardZone, card);
+            } else if (auto *inner = dynamic_cast<InnerDecklistNode *>(node->at(i))) {
+                walk(boardZone, inner);
+            }
+        }
+    };
+
     for (int i = 0; i < root->size(); i++) {
-        InnerDecklistNode *node = dynamic_cast<InnerDecklistNode *>(root->at(i));
-        for (int j = 0; j < node->size(); j++) {
-            DecklistCardNode *card = dynamic_cast<DecklistCardNode *>(node->at(j));
-            func(node, card);
+        if (auto *zone = dynamic_cast<InnerDecklistNode *>(root->at(i))) {
+            walk(zone, zone);
         }
     }
 }
