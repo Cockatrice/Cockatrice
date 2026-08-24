@@ -76,7 +76,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           cache-from: type=gha,scope=${{ env.CACHE_SCOPE }}
-          cache-to: type=gha,mode=max,scope=${{ env.CACHE_SCOPE }}
+          cache-to: ${{ case(github.ref == 'refs/heads/master', format('type=gha,mode=max,scope={0}', env.CACHE_SCOPE), '') }}
           context: .
           platforms: ${{ matrix.platform }}
           push: false
