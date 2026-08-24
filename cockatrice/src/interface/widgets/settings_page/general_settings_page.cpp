@@ -425,29 +425,28 @@ void GeneralSettingsPage::updateStartupServerControlsVisibility()
 
 void GeneralSettingsPage::retranslateUi()
 {
+    const auto &settings = SettingsCache::instance();
+
     languageGroupBox->setTitle(tr("Language settings"));
     languageLabel.setText(tr("Language:"));
-
-    versionGroupBox->setTitle(tr("Version settings"));
-    cardDatabaseGroupBox->setTitle(tr("Card database"));
-    startupGroupBox->setTitle(tr("Startup settings"));
-
-    if (SettingsCache::instance().getIsPortableBuild()) {
-        pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
-    } else {
-        pathsGroupBox->setTitle(tr("Paths"));
-    }
     advertiseTranslationPageLabel.setText(
         QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
-    deckPathLabel.setText(tr("Decks directory:"));
-    filtersPathLabel.setText(tr("Filters directory:"));
-    replaysPathLabel.setText(tr("Replays directory:"));
-    picsPathLabel.setText(tr("Pictures directory:"));
-    cardDatabasePathLabel.setText(tr("Card database:"));
-    customCardDatabasePathLabel.setText(tr("Custom database directory:"));
-    tokenDatabasePathLabel.setText(tr("Token database:"));
+
+    versionGroupBox->setTitle(tr("Version settings"));
     updateReleaseChannelLabel.setText(tr("Update channel"));
     startupUpdateCheckCheckBox.setText(tr("Check for client updates on startup"));
+    updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
+    newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
+
+    // We can't change the strings after they're put into the QComboBox, so this is our workaround
+    int oldIndex = updateReleaseChannelBox.currentIndex();
+    updateReleaseChannelBox.clear();
+    for (ReleaseChannel *chan : settings.getUpdateReleaseChannels()) {
+        updateReleaseChannelBox.addItem(tr(chan->getName().toUtf8()));
+    }
+    updateReleaseChannelBox.setCurrentIndex(oldIndex);
+
+    cardDatabaseGroupBox->setTitle(tr("Card database"));
     startupCardUpdateCheckBehaviorLabel.setText(tr("Check for card database updates on startup"));
     startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexNone, tr("Don't check"));
     startupCardUpdateCheckBehaviorSelector.setItemText(startupCardUpdateCheckBehaviorIndexPrompt,
@@ -456,8 +455,13 @@ void GeneralSettingsPage::retranslateUi()
                                                        tr("Always update in the background"));
     cardUpdateCheckIntervalLabel.setText(tr("Check for card database updates every"));
     cardUpdateCheckIntervalSpinBox.setSuffix(tr(" days"));
-    updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
-    newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
+
+    QDate lastCheckDate = settings.updates().getLastCardUpdateCheck();
+    int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
+    lastCardUpdateCheckDateLabel.setText(
+        tr("Last update check on %1 (%2 days ago)").arg(lastCheckDate.toString()).arg(daysAgo));
+
+    startupGroupBox->setTitle(tr("Startup settings"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
     startupTabLabel.setText(tr("Startup tab:"));
     startupTabSelector.setItemText(StartupTab::StartupTabHome, tr("Home"));
@@ -473,21 +477,18 @@ void GeneralSettingsPage::retranslateUi()
     startupServerLabel.setText(tr("Server:"));
     startupRoomLabel.setText(tr("Room:"));
     startupRoomNameEdit->setPlaceholderText(tr("Room name"));
-    resetAllPathsButton->setText(tr("Reset all paths"));
 
-    const auto &settings = SettingsCache::instance();
-
-    QDate lastCheckDate = settings.updates().getLastCardUpdateCheck();
-    int daysAgo = lastCheckDate.daysTo(QDate::currentDate());
-
-    lastCardUpdateCheckDateLabel.setText(
-        tr("Last update check on %1 (%2 days ago)").arg(lastCheckDate.toString()).arg(daysAgo));
-
-    // We can't change the strings after they're put into the QComboBox, so this is our workaround
-    int oldIndex = updateReleaseChannelBox.currentIndex();
-    updateReleaseChannelBox.clear();
-    for (ReleaseChannel *chan : settings.getUpdateReleaseChannels()) {
-        updateReleaseChannelBox.addItem(tr(chan->getName().toUtf8()));
+    if (SettingsCache::instance().getIsPortableBuild()) {
+        pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
+    } else {
+        pathsGroupBox->setTitle(tr("Paths"));
     }
-    updateReleaseChannelBox.setCurrentIndex(oldIndex);
+    deckPathLabel.setText(tr("Decks directory:"));
+    filtersPathLabel.setText(tr("Filters directory:"));
+    replaysPathLabel.setText(tr("Replays directory:"));
+    picsPathLabel.setText(tr("Pictures directory:"));
+    cardDatabasePathLabel.setText(tr("Card database:"));
+    customCardDatabasePathLabel.setText(tr("Custom database directory:"));
+    tokenDatabasePathLabel.setText(tr("Token database:"));
+    resetAllPathsButton->setText(tr("Reset all paths"));
 }
