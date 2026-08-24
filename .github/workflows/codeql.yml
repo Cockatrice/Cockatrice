@@ -68,6 +68,7 @@ jobs:
           libprotobuf-dev \
           ninja-build \
           protobuf-compiler \
+          qt6-declarative-dev \
           qt6-multimedia-dev \
           qt6-shadertools-dev \
           qt6-svg-dev \
