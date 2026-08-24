@@ -19,8 +19,9 @@
 
 VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent)
 {
-    // The model and proxy own all deck data, sorting and filtering. The view widgets below only
-    // display the proxy's accepted rows, so nothing touches the filesystem outside the model.
+    // The model and proxy own all deck data, sorting and filtering. The view widgets below
+    // only display the proxy's rows and their FilterMatchRole, so nothing touches the
+    // filesystem outside the model.
     storageModel = new VisualDeckStorageModel(this);
     storageProxyModel = new VisualDeckStorageSortFilterProxyModel(this);
     storageProxyModel->setSourceModel(storageModel);

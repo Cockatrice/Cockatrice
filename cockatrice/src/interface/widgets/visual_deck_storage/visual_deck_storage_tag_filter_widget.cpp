@@ -2,6 +2,8 @@
 
 #include "../general/layout_containers/flow_widget.h"
 #include "deck_preview/deck_preview_tag_display_widget.h"
+#include "visual_deck_storage_model.h"
+#include "visual_deck_storage_sort_filter_proxy_model.h"
 #include "visual_deck_storage_widget.h"
 
 #include <QHBoxLayout>
@@ -36,14 +38,14 @@ QSet<QString> VisualDeckStorageTagFilterWidget::gatherAllTags() const
 {
     QSet<QString> allTags;
     auto *proxy = parent->proxyModel();
-    auto *model = parent->model();
 
     for (int proxyRow = 0; proxyRow < proxy->rowCount(); ++proxyRow) {
-        const QModelIndex sourceIndex = proxy->mapToSource(proxy->index(proxyRow, 0));
-        if (!sourceIndex.isValid()) {
+        const QModelIndex index = proxy->index(proxyRow, 0);
+        if (!index.data(VisualDeckStorageRoles::FilterMatchRole).toBool()) {
             continue;
         }
-        for (const QString &tag : model->dataForRow(sourceIndex.row()).tags) {
+        const QStringList deckTags = index.data(VisualDeckStorageRoles::TagsRole).toStringList();
+        for (const QString &tag : deckTags) {
             allTags.insert(tag);
         }
     }

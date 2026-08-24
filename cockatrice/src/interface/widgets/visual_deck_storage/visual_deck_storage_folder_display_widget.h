@@ -4,9 +4,10 @@
  * @brief Renders the decks of one folder of the Visual Deck Storage.
  *
  * This is a pure view: it keeps one persistent DeckPreviewWidget alive per deck
- * in its folder, and shows or hides those widgets according to the accepted rows
- * of the VisualDeckStorageSortFilterProxyModel. Subfolders are shown as nested
- * VisualDeckStorageFolderDisplayWidgets when the "show folders" setting is enabled.
+ * in its folder, and shows or hides those widgets according to each row's
+ * FilterMatchRole in the VisualDeckStorageSortFilterProxyModel. Subfolders are
+ * shown as nested VisualDeckStorageFolderDisplayWidgets when the "show folders"
+ * setting is enabled.
  *
  * Reconciling runs as a time-budgeted chunked pass that yields to the event loop
  * between chunks, so scanning a large collection never stalls the ui thread.
@@ -97,7 +98,7 @@ private:
     bool deckPassRestartRequested = false;
     /// Whether the first reconcile pass has run to completion at least once.
     bool initialPassCompleted = false;
-    int deckPassRow = 0;                ///< Next source row to scan in the active pass.
+    int deckPassRow = 0;                ///< Next proxy row to scan in the active pass.
     QSet<QString> deckPassPresentPaths; ///< File paths seen so far in the active pass.
 };
 

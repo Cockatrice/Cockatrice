@@ -105,29 +105,29 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
     passTimer.start();
 
     auto *proxy = visualDeckStorageWidget->proxyModel();
-    auto *model = visualDeckStorageWidget->model();
-    const int sourceRowCount = model->rowCount();
+    const int proxyRowCount = proxy->rowCount();
 
     // Scan rows of this folder, creating missing previews, until the time budget for this
     // event loop turn runs out. The rest continues on the next turn.
-    while (deckPassRow < sourceRowCount) {
+    while (deckPassRow < proxyRowCount) {
         const int row = deckPassRow++;
-        const DeckPreviewData &data = model->dataForRow(row);
-        if (showFolders && data.folderPath != folderPath) {
+        const QModelIndex index = proxy->index(row, 0);
+        if (showFolders && index.data(VisualDeckStorageRoles::FolderPathRole).toString() != folderPath) {
             continue;
         }
-        deckPassPresentPaths.insert(data.filePath);
+        const QString filePath = index.data(VisualDeckStorageRoles::FilePathRole).toString();
+        deckPassPresentPaths.insert(filePath);
 
-        DeckPreviewWidget *deckPreviewWidget = deckWidgets.value(data.filePath, nullptr);
+        DeckPreviewWidget *deckPreviewWidget = deckWidgets.value(filePath, nullptr);
         if (!deckPreviewWidget) {
-            deckPreviewWidget = createDeckPreviewWidget(data.filePath);
+            deckPreviewWidget = createDeckPreviewWidget(filePath);
         }
 
-        const bool accepted = proxy->mapFromSource(model->index(row, 0)).isValid();
-        if (accepted == deckPreviewWidget->isHidden()) {
-            deckPreviewWidget->setVisible(accepted);
+        const bool matches = index.data(VisualDeckStorageRoles::FilterMatchRole).toBool();
+        if (matches == deckPreviewWidget->isHidden()) {
+            deckPreviewWidget->setVisible(matches);
         }
-        if (accepted) {
+        if (matches) {
             ++visibleDeckCount;
         }
 
@@ -141,7 +141,7 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
         return;
     }
 
-    if (deckPassRow < sourceRowCount) {
+    if (deckPassRow < proxyRowCount) {
         QMetaObject::invokeMethod(this, &VisualDeckStorageFolderDisplayWidget::continueDeckPass, Qt::QueuedConnection);
         return;
     }
@@ -152,9 +152,8 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
 void VisualDeckStorageFolderDisplayWidget::finishDeckPass()
 {
     auto *proxy = visualDeckStorageWidget->proxyModel();
-    auto *model = visualDeckStorageWidget->model();
 
-    // Drop previews of decks that no longer exist in the source model.
+    // Drop previews of decks that no longer exist in the model.
     for (auto it = deckWidgets.begin(); it != deckWidgets.end();) {
         if (!deckPassPresentPaths.contains(it.key())) {
             flowWidget->removeWidget(it.value());
@@ -165,26 +164,14 @@ void VisualDeckStorageFolderDisplayWidget::finishDeckPass()
         }
     }
 
-    // Order the flow layout like the proxy sorts its rows.
+    // Order the flow layout like the proxy sorts its rows. Filtered-out decks stay part of
+    // the layout, hidden in their sorted place until a filter lets them through again.
     QStringList orderedFilePaths;
     orderedFilePaths.reserve(proxy->rowCount());
     for (int proxyRow = 0; proxyRow < proxy->rowCount(); ++proxyRow) {
-        const QModelIndex sourceIndex = proxy->mapToSource(proxy->index(proxyRow, 0));
-        if (!sourceIndex.isValid()) {
-            continue;
-        }
-        const QString &filePath = model->dataForRow(sourceIndex.row()).filePath;
+        const QString filePath = proxy->index(proxyRow, 0).data(VisualDeckStorageRoles::FilePathRole).toString();
         if (deckWidgets.contains(filePath)) {
             orderedFilePaths.append(filePath);
-        }
-    }
-    // Hidden previews are appended so they remain part of the layout and take their
-    // sorted place once a filter lets them through again.
-    QSet<QString> orderedSet(orderedFilePaths.cbegin(), orderedFilePaths.cend());
-    for (auto it = deckWidgets.constBegin(); it != deckWidgets.constEnd(); ++it) {
-        if (!orderedSet.contains(it.key())) {
-            orderedSet.insert(it.key());
-            orderedFilePaths.append(it.key());
         }
     }
 

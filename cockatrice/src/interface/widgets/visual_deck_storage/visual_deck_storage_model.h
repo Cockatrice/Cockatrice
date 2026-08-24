@@ -38,7 +38,14 @@ enum
     LastModifiedRole,                /**< QDateTime of the deck file's last modification. */
     LastLoadedRole,                  /**< QDateTime when the deck was last loaded from the file. */
     BannerCardNameRole,              /**< Name of the deck's banner card. */
-    BannerCardProviderIdRole         /**< Provider id of the deck's banner card. */
+    BannerCardProviderIdRole,        /**< Provider id of the deck's banner card. */
+    /**
+     * @brief Whether the row passes the proxy's current search / tag / color filters.
+     *
+     * Not served by this model, but by VisualDeckStorageSortFilterProxyModel on top
+     * of it. Declared here so every role read through a proxy index stays unique.
+     */
+    FilterMatchRole
 };
 } // namespace VisualDeckStorageRoles
 
@@ -82,7 +89,8 @@ struct PendingDeckLoad
  * @brief The list model backing the Visual Deck Storage widget tree.
  *
  * Rows are in filesystem scan order; ordering and filtering are handled by
- * VisualDeckStorageSortFilterProxyModel on top of this model.
+ * VisualDeckStorageSortFilterProxyModel on top of this model. The proxy keeps
+ * every row and exposes each row's filter result through its FilterMatchRole.
  */
 class VisualDeckStorageModel : public QAbstractListModel
 {
