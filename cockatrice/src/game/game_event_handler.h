@@ -43,6 +43,7 @@ class Event_SetActivePhase;
 class Event_GameSay;
 class Event_Kicked;
 class Event_ReverseTurn;
+class Event_TournamentState;
 class Event_Ping;
 
 inline Q_LOGGING_CATEGORY(GameEventHandlerLog, "game_event_handler");
@@ -329,6 +330,7 @@ signals:
 
     void gameStopped();
     void gameClosed();
+    void tournamentStateChanged(const Event_TournamentState &state);
     void playerPropertiesChanged(const ServerInfo_PlayerProperties &prop, int playerId);
     void playerJoined(const ServerInfo_PlayerProperties &playerInfo);
     void playerLeft(int leavingPlayerId);
