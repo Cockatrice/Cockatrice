@@ -266,8 +266,8 @@ void HomeWidget::updateConnectButton(const ClientStatus status)
 
 QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)
 {
-    if (themeManager->isBuiltInTheme() && SettingsCache::instance().appearance().getHomeTabBackgroundSource() ==
-                                              BackgroundSources::toId(BackgroundSources::Theme)) {
+    QString sourceId = SettingsCache::instance().appearance().getHomeTabBackgroundSource();
+    if (themeManager->isBuiltInTheme() && BackgroundSources::fromId(sourceId) == BackgroundSources::Theme) {
         return QPair<QColor, QColor>(QColor::fromRgb(20, 140, 60), QColor::fromRgb(120, 200, 80));
     }
 

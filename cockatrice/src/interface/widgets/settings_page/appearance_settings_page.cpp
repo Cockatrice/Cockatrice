@@ -420,8 +420,8 @@ void AppearanceSettingsPage::editPalette()
 
 void AppearanceSettingsPage::updateHomeTabSettingsVisibility()
 {
-    bool visible = SettingsCache::instance().appearance().getHomeTabBackgroundSource() !=
-                   BackgroundSources::toId(BackgroundSources::Theme);
+    QString sourceId = SettingsCache::instance().appearance().getHomeTabBackgroundSource();
+    bool visible = BackgroundSources::fromId(sourceId) != BackgroundSources::Theme;
 
     homeTabBackgroundShuffleFrequencyLabel.setVisible(visible);
     homeTabBackgroundShuffleFrequencySpinBox.setVisible(visible);
