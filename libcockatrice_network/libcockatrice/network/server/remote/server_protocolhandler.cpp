@@ -6,6 +6,8 @@ static constexpr qint64 kAuthNonceLifetimeSeconds = 60;
 #include "game/game_config.h"
 #include "game/server_abstract_participant.h"
 #include "game/server_game.h"
+#include "game/server_player.h"
+#include "game/server_tournament.h"
 #include "libcockatrice/protocol/pb/admin_commands.pb.h"
 #include "libcockatrice/protocol/pb/developer_commands.pb.h"
 #include "libcockatrice/protocol/pb/game_commands.pb.h"
@@ -1094,6 +1096,8 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     int startingLifeTotal = cmd.has_starting_life_total() ? cmd.starting_life_total() : 20;
 
     bool shareDecklistsOnLoad = cmd.has_share_decklists_on_load() ? cmd.share_decklists_on_load() : false;
+    bool isTournament = cmd.has_is_tournament() ? cmd.is_tournament() : false;
+    int gamesPerMatch = cmd.has_games_per_match() ? static_cast<int>(cmd.games_per_match()) : 1;
 
     const int gameId = databaseInterface->getNextGameId();
     if (gameId == -1) {
@@ -1118,6 +1122,10 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
                       .shareDecklistsOnLoad = shareDecklistsOnLoad};
 
     auto *game = new Server_Game(config, room);
+    game->setIsTournamentGame(isTournament);
+    if (isTournament && game->getTournament()) {
+        game->getTournament()->setGamesPerMatch(static_cast<uint32_t>(qBound(1, gamesPerMatch, MAX_GAMES_PER_MATCH)));
+    }
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);
