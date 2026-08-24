@@ -163,6 +163,10 @@ void SimpleDownloadFilePage::actDownloadFinished()
 {
     // check for a reply
     auto *reply = dynamic_cast<QNetworkReply *>(sender());
+    if (wizard()->wasCancelled()) {
+        reply->deleteLater();
+        return;
+    }
     QNetworkReply::NetworkError errorCode = reply->error();
     if (errorCode != QNetworkReply::NoError) {
         QMessageBox::critical(this, tr("Error"), tr("Network error: %1.").arg(reply->errorString()));
