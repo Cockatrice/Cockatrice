@@ -718,20 +718,20 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
             }
         });
 
-    // Section dividers can be collapsed/expanded by the user. Surface those
-    // changes only from real user interaction. Programmatic expansion is
-    // applied through setSectionExpanded() / setExpandedProgrammatically().
-    connect(userTree, &QTreeWidget::itemExpanded, this,
-            [this](QTreeWidgetItem *item) { handleSectionExpansion(item, true); });
-    connect(userTree, &QTreeWidget::itemCollapsed, this,
-            [this](QTreeWidgetItem *item) { handleSectionExpansion(item, false); });
+        // Section dividers can be collapsed/expanded by the user. Surface those
+        // changes only from real user interaction. Programmatic expansion is
+        // applied through setSectionExpanded() / setExpandedProgrammatically().
+        connect(userTree, &QTreeWidget::itemExpanded, this,
+                [this](QTreeWidgetItem *item) { handleSectionExpansion(item, true); });
+        connect(userTree, &QTreeWidget::itemCollapsed, this,
+                [this](QTreeWidgetItem *item) { handleSectionExpansion(item, false); });
 
-    // Hide popup when list scrolls (reference row has moved)
+        // Hide popup when list scrolls (reference row has moved)
         connect(userTree->verticalScrollBar(), &QScrollBar::valueChanged, this, [this] {
-              showPopupTimer->stop();
-              hidePopup(true);
-              requestAvatarsForVisibleItems();
-          });
+            showPopupTimer->stop();
+            hidePopup(true);
+            requestVisibleItemResources();
+        });
 
         // Forward join requests from popup upward
         connect(userInfoPopup, &UserInfoPopup::joinGameRequested, this, &UserListWidget::joinGameRequested);
@@ -746,7 +746,7 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
 
         // Keep the popup-less scroll path alive for avatar prefetch.
         connect(userTree->verticalScrollBar(), &QScrollBar::valueChanged, this,
-                [this] { requestAvatarsForVisibleItems(); });
+                [this] { requestVisibleItemResources(); });
     }
 
     // Section dividers can be collapsed/expanded by the user. Surface those
@@ -1541,9 +1541,9 @@ void UserListWidget::updateCount()
     }
 }
 
-void UserListWidget::setShowTitle(bool showTitle)
+void UserListWidget::setShowTitle(bool _showTitle)
 {
-    this->showTitle = showTitle;
+    this->showTitle = _showTitle;
     updateCount();
 }
 
