@@ -4,7 +4,9 @@
 #include "../first_run_wizard_page.h"
 
 class QCheckBox;
+class QComboBox;
 class QGroupBox;
+class QLabel;
 
 /** @brief A curated subset of settings for the user to adjust.
  **/
@@ -22,30 +24,18 @@ public:
     void retranslateUi() override;
 
 private:
-    QGroupBox *appearanceGroup;
-    QCheckBox *styleUserListCheckBox;
-    QCheckBox *cardScalingCheckBox;
-    QCheckBox *roundCardCornersCheckBox;
-    QCheckBox *displayCardNamesCheckBox;
-    QCheckBox *autoRotateCardsCheckBox;
-    QCheckBox *tapAnimationCheckBox;
-
-    QGroupBox *notificationsGroup;
-    QCheckBox *notificationsEnabledCheckBox;
-    QCheckBox *soundEnabledCheckBox;
-
     QGroupBox *gameplayGroup;
     QCheckBox *doubleClickToPlayCheckBox;
     QCheckBox *horizontalHandCheckBox;
     QCheckBox *playToStackCheckBox;
 
-    QGroupBox *menuGroup;
-    QCheckBox *showShortcutsCheckBox;
+    QGroupBox *notificationsGroup;
+    QCheckBox *notificationsEnabledCheckBox;
+    QCheckBox *soundEnabledCheckBox;
 
-    QGroupBox *dataGroup;
-    QCheckBox *picDownloadCheckBox;
-    QCheckBox *checkUpdatesOnStartupCheckBox;
-    QCheckBox *showTipsOnStartupCheckBox;
+    QGroupBox *startupGroup;
+    QLabel *startupTabLabel;
+    QComboBox *startupTabSelector;
 };
 
 #endif // PREFERENCES_SETUP_PAGE_H

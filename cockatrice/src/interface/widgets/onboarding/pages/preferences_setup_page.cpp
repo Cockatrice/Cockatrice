@@ -1,28 +1,27 @@
 #include "preferences_setup_page.h"
 
 #include "../../client/settings/cache_settings.h"
-#include "libcockatrice/settings/appearance_settings.h"
-#include "libcockatrice/settings/download_settings.h"
-#include "libcockatrice/settings/network_settings.h"
+#include "../../client/sound_engine.h"
+#include "libcockatrice/settings/interface_settings.h"
+#include "libcockatrice/settings/sound_settings.h"
+#include "libcockatrice/settings/tabs_settings.h"
 
 #include <QCheckBox>
+#include <QComboBox>
+#include <QFormLayout>
 #include <QGroupBox>
+#include <QLabel>
 #include <QScrollArea>
 #include <QVBoxLayout>
-#include <libcockatrice/settings/cards_display_settings.h>
-#include <libcockatrice/settings/interface_settings.h>
-#include <libcockatrice/settings/personal_settings.h>
-#include <libcockatrice/settings/sound_settings.h>
-#include <libcockatrice/settings/updates_settings.h>
 
 namespace
 {
-QGroupBox *makeGroup(QWidget *parent, QVBoxLayout *outerLayout)
+// The server destinations are omitted: during first run their tabs are not
+// open yet, and the wizard offers no way to fill in the server/room details.
+QList<StartupTab> wizardStartupTabOrder()
 {
-    auto *group = new QGroupBox(parent);
-    new QVBoxLayout(group);
-    outerLayout->addWidget(group);
-    return group;
+    return {StartupTabHome,    StartupTabVisualDeckStorage, StartupTabDeckStorage,
+            StartupTabReplays, StartupTabDeckEditor,        StartupTabVisualDeckEditor};
 }
 } // namespace
 
@@ -31,45 +30,34 @@ PreferencesSetupPage::PreferencesSetupPage(QWidget *parent) : FirstRunWizardPage
     auto *content = new QWidget;
     auto *contentLayout = new QVBoxLayout(content);
 
-    appearanceGroup = makeGroup(content, contentLayout);
-    styleUserListCheckBox = new QCheckBox(appearanceGroup);
-    cardScalingCheckBox = new QCheckBox(appearanceGroup);
-    roundCardCornersCheckBox = new QCheckBox(appearanceGroup);
-    displayCardNamesCheckBox = new QCheckBox(appearanceGroup);
-    autoRotateCardsCheckBox = new QCheckBox(appearanceGroup);
-    tapAnimationCheckBox = new QCheckBox(appearanceGroup);
-    appearanceGroup->layout()->addWidget(styleUserListCheckBox);
-    appearanceGroup->layout()->addWidget(cardScalingCheckBox);
-    appearanceGroup->layout()->addWidget(roundCardCornersCheckBox);
-    appearanceGroup->layout()->addWidget(displayCardNamesCheckBox);
-    appearanceGroup->layout()->addWidget(autoRotateCardsCheckBox);
-    appearanceGroup->layout()->addWidget(tapAnimationCheckBox);
-
-    notificationsGroup = makeGroup(content, contentLayout);
-    notificationsEnabledCheckBox = new QCheckBox(notificationsGroup);
-    soundEnabledCheckBox = new QCheckBox(notificationsGroup);
-    notificationsGroup->layout()->addWidget(notificationsEnabledCheckBox);
-    notificationsGroup->layout()->addWidget(soundEnabledCheckBox);
-
-    gameplayGroup = makeGroup(content, contentLayout);
+    gameplayGroup = new QGroupBox(content);
+    auto *gameplayLayout = new QVBoxLayout(gameplayGroup);
+    contentLayout->addWidget(gameplayGroup);
     doubleClickToPlayCheckBox = new QCheckBox(gameplayGroup);
     horizontalHandCheckBox = new QCheckBox(gameplayGroup);
     playToStackCheckBox = new QCheckBox(gameplayGroup);
-    gameplayGroup->layout()->addWidget(doubleClickToPlayCheckBox);
-    gameplayGroup->layout()->addWidget(horizontalHandCheckBox);
-    gameplayGroup->layout()->addWidget(playToStackCheckBox);
+    gameplayLayout->addWidget(doubleClickToPlayCheckBox);
+    gameplayLayout->addWidget(horizontalHandCheckBox);
+    gameplayLayout->addWidget(playToStackCheckBox);
 
-    menuGroup = makeGroup(content, contentLayout);
-    showShortcutsCheckBox = new QCheckBox(menuGroup);
-    menuGroup->layout()->addWidget(showShortcutsCheckBox);
+    notificationsGroup = new QGroupBox(content);
+    auto *notificationsLayout = new QVBoxLayout(notificationsGroup);
+    contentLayout->addWidget(notificationsGroup);
+    notificationsEnabledCheckBox = new QCheckBox(notificationsGroup);
+    soundEnabledCheckBox = new QCheckBox(notificationsGroup);
+    notificationsLayout->addWidget(notificationsEnabledCheckBox);
+    notificationsLayout->addWidget(soundEnabledCheckBox);
 
-    dataGroup = makeGroup(content, contentLayout);
-    picDownloadCheckBox = new QCheckBox(dataGroup);
-    checkUpdatesOnStartupCheckBox = new QCheckBox(dataGroup);
-    showTipsOnStartupCheckBox = new QCheckBox(dataGroup);
-    dataGroup->layout()->addWidget(picDownloadCheckBox);
-    dataGroup->layout()->addWidget(checkUpdatesOnStartupCheckBox);
-    dataGroup->layout()->addWidget(showTipsOnStartupCheckBox);
+    startupGroup = new QGroupBox(content);
+    auto *startupForm = new QFormLayout(startupGroup);
+    contentLayout->addWidget(startupGroup);
+    startupTabLabel = new QLabel(startupGroup);
+    startupTabSelector = new QComboBox(startupGroup);
+    startupTabSelector->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    for (StartupTab tab : wizardStartupTabOrder()) {
+        startupTabSelector->addItem(QString(), tab); // texts set in retranslateUi
+    }
+    startupForm->addRow(startupTabLabel, startupTabSelector);
 
     contentLayout->addStretch();
 
@@ -83,35 +71,23 @@ PreferencesSetupPage::PreferencesSetupPage(QWidget *parent) : FirstRunWizardPage
 
     SettingsCache &settings = SettingsCache::instance();
 
-    connect(styleUserListCheckBox, &QCheckBox::toggled, &settings.appearance(), &AppearanceSettings::setStyleUserList);
-    connect(cardScalingCheckBox, &QCheckBox::toggled, &settings.cardsDisplay(), &CardsDisplaySettings::setCardScaling);
-    connect(roundCardCornersCheckBox, &QCheckBox::toggled, &settings.cardsDisplay(),
-            &CardsDisplaySettings::setRoundCardCorners);
-    connect(displayCardNamesCheckBox, &QCheckBox::toggled, &settings.cardsDisplay(),
-            &CardsDisplaySettings::setDisplayCardNames);
-    connect(autoRotateCardsCheckBox, &QCheckBox::toggled, &settings.cardsDisplay(),
-            &CardsDisplaySettings::setAutoRotateSidewaysLayoutCards);
-    connect(tapAnimationCheckBox, &QCheckBox::toggled, &settings.cardsDisplay(),
-            &CardsDisplaySettings::setTapAnimation);
-
-    connect(notificationsEnabledCheckBox, &QCheckBox::toggled, &settings.userInterface(),
-            &InterfaceSettings::setNotificationsEnabled);
-    connect(soundEnabledCheckBox, &QCheckBox::toggled, &settings.sound(), &SoundSettings::setSoundEnabled);
-
     connect(doubleClickToPlayCheckBox, &QCheckBox::toggled, &settings.userInterface(),
             &InterfaceSettings::setDoubleClickToPlay);
     connect(horizontalHandCheckBox, &QCheckBox::toggled, &settings.userInterface(),
             &InterfaceSettings::setHorizontalHand);
     connect(playToStackCheckBox, &QCheckBox::toggled, &settings.userInterface(), &InterfaceSettings::setPlayToStack);
 
-    connect(showShortcutsCheckBox, &QCheckBox::toggled, &settings.userInterface(),
-            &InterfaceSettings::setShowShortcuts);
+    connect(notificationsEnabledCheckBox, &QCheckBox::toggled, &settings.userInterface(),
+            &InterfaceSettings::setNotificationsEnabled);
+    connect(soundEnabledCheckBox, &QCheckBox::toggled, &settings.sound(), &SoundSettings::setSoundEnabled);
+    connect(soundEnabledCheckBox, &QCheckBox::toggled, soundEngine, &SoundEngine::testSound);
 
-    connect(picDownloadCheckBox, &QCheckBox::toggled, &settings.downloads(), &DownloadSettings::setPicDownload);
-    connect(checkUpdatesOnStartupCheckBox, &QCheckBox::toggled, &settings.updates(),
-            &UpdatesSettings::setCheckUpdatesOnStartup);
-    connect(showTipsOnStartupCheckBox, &QCheckBox::toggled, &settings.personal(),
-            &PersonalSettings::setShowTipsOnStartup);
+    connect(startupTabSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+        if (index < 0) {
+            return;
+        }
+        SettingsCache::instance().tabs().setStartupTabIndex(startupTabSelector->itemData(index).toInt());
+    });
 
     retranslateUi();
 }
@@ -120,25 +96,14 @@ void PreferencesSetupPage::initializePage()
 {
     SettingsCache &settings = SettingsCache::instance();
 
-    styleUserListCheckBox->setChecked(settings.appearance().getStyleUserList());
-    cardScalingCheckBox->setChecked(settings.cardsDisplay().getScaleCards());
-    roundCardCornersCheckBox->setChecked(settings.cardsDisplay().getRoundCardCorners());
-    displayCardNamesCheckBox->setChecked(settings.cardsDisplay().getDisplayCardNames());
-    autoRotateCardsCheckBox->setChecked(settings.cardsDisplay().getAutoRotateSidewaysLayoutCards());
-    tapAnimationCheckBox->setChecked(settings.cardsDisplay().getTapAnimation());
-
-    notificationsEnabledCheckBox->setChecked(settings.userInterface().getNotificationsEnabled());
-    soundEnabledCheckBox->setChecked(settings.sound().getSoundEnabled());
-
     doubleClickToPlayCheckBox->setChecked(settings.userInterface().getDoubleClickToPlay());
     horizontalHandCheckBox->setChecked(settings.userInterface().getHorizontalHand());
     playToStackCheckBox->setChecked(settings.userInterface().getPlayToStack());
 
-    showShortcutsCheckBox->setChecked(settings.userInterface().getShowShortcuts());
+    notificationsEnabledCheckBox->setChecked(settings.userInterface().getNotificationsEnabled());
+    soundEnabledCheckBox->setChecked(settings.sound().getSoundEnabled());
 
-    picDownloadCheckBox->setChecked(settings.downloads().getPicDownload());
-    checkUpdatesOnStartupCheckBox->setChecked(settings.updates().getCheckUpdatesOnStartup());
-    showTipsOnStartupCheckBox->setChecked(settings.personal().getShowTipsOnStartup());
+    startupTabSelector->setCurrentIndex(startupTabSelector->findData(settings.tabs().getStartupTabIndex()));
 }
 
 bool PreferencesSetupPage::isSkippable() const
@@ -158,30 +123,51 @@ QString PreferencesSetupPage::stepSubtitle() const
 
 void PreferencesSetupPage::retranslateUi()
 {
-    appearanceGroup->setTitle(tr("Appearance"));
-    styleUserListCheckBox->setText(tr("Use the styled user list (avatars, role colours)"));
-    cardScalingCheckBox->setText(tr("Scale cards to fit the window"));
-    roundCardCornersCheckBox->setText(tr("Round card corners"));
-    displayCardNamesCheckBox->setText(tr("Display card names on pictured cards"));
-    autoRotateCardsCheckBox->setText(tr("Auto-rotate sideways layout cards"));
-    tapAnimationCheckBox->setText(tr("Animate tapping cards"));
+    gameplayGroup->setTitle(tr("Gameplay"));
+    doubleClickToPlayCheckBox->setText(tr("Double-click cards to play them"));
+    doubleClickToPlayCheckBox->setToolTip(tr("When disabled, a single click plays the selected card onto the table."));
+    horizontalHandCheckBox->setText(tr("Display hand horizontally"));
+    horizontalHandCheckBox->setToolTip(
+        tr("Shows your hand as a row along the bottom of the table instead of a column beside it."));
+    playToStackCheckBox->setText(tr("Play all nonlands onto the stack by default"));
+    playToStackCheckBox->setToolTip(
+        tr("Cards you play appear on the stack so other players can respond to them, as in a tabletop game."));
 
     notificationsGroup->setTitle(tr("Notifications && Sound"));
     notificationsEnabledCheckBox->setText(tr("Show desktop notifications"));
     soundEnabledCheckBox->setText(tr("Play sound effects"));
 
-    gameplayGroup->setTitle(tr("Gameplay"));
-    doubleClickToPlayCheckBox->setText(tr("Double-click a card to play it"));
-    horizontalHandCheckBox->setText(tr("Display hand horizontally"));
-    playToStackCheckBox->setText(tr("Play cards to top of stack"));
-
-    menuGroup->setTitle(tr("Menus"));
-    showShortcutsCheckBox->setText(tr("Show keyboard shortcuts in menus"));
-
-    dataGroup->setTitle(tr("Updates && Data"));
-    picDownloadCheckBox->setText(tr("Automatically download card images"));
-    picDownloadCheckBox->setToolTip(tr("Turn this off if you're on a limited connection — "
-                                       "card art just won't load until you turn it back on."));
-    checkUpdatesOnStartupCheckBox->setText(tr("Check for client updates on startup"));
-    showTipsOnStartupCheckBox->setText(tr("Show tip of the day on startup"));
+    startupGroup->setTitle(tr("Startup"));
+    startupTabLabel->setText(tr("Startup tab:"));
+    const QList<StartupTab> tabs = wizardStartupTabOrder();
+    for (int i = 0; i < tabs.size(); ++i) {
+        QString name;
+        switch (tabs[i]) {
+            case StartupTabHome:
+                name = tr("Home");
+                break;
+            case StartupTabVisualDeckStorage:
+                name = tr("Visual Deck Storage");
+                break;
+            case StartupTabDeckStorage:
+                name = tr("Deck Storage");
+                break;
+            case StartupTabReplays:
+                name = tr("Game Replays");
+                break;
+            case StartupTabDeckEditor:
+                name = tr("Deck Editor");
+                break;
+            case StartupTabVisualDeckEditor:
+                name = tr("Visual Deck Editor");
+                break;
+            case StartupTabServer:
+                name = tr("Server");
+                break;
+            case StartupTabServerRoom:
+                name = tr("Server Room");
+                break;
+        }
+        startupTabSelector->setItemText(i, name);
+    }
 }

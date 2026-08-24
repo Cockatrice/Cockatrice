@@ -20,6 +20,9 @@ public:
     GeneralSettingsPage();
     void retranslateUi() override;
 
+    static QStringList findQmFiles();
+    static QString languageName(const QString &lang);
+
 private slots:
     void deckPathButtonClicked();
     void filtersPathButtonClicked();
@@ -33,9 +36,6 @@ private slots:
     void updateStartupServerControlsVisibility();
 
 private:
-    QStringList findQmFiles();
-    QString languageName(const QString &lang);
-
     QGroupBox *languageGroupBox;
     QGroupBox *versionGroupBox;
     QGroupBox *cardDatabaseGroupBox;

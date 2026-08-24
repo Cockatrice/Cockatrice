@@ -3,6 +3,7 @@
 
 #include "../first_run_wizard_page.h"
 
+class QComboBox;
 class QLabel;
 
 class WelcomePage : public FirstRunWizardPage
@@ -15,8 +16,13 @@ public:
     QString stepTitle() const override;
     void retranslateUi() override;
 
+private slots:
+    void languageChanged(int index);
+
 private:
     QLabel *bodyLabel;
+    QLabel *languageLabel;
+    QComboBox *langCombo;
 };
 
 #endif // WELCOME_PAGE_H
