@@ -9,6 +9,7 @@ class QCheckBox;
 class QComboBox;
 class QCompleter;
 class QDoubleSpinBox;
+class QFormLayout;
 class QGroupBox;
 class QLabel;
 class QLineEdit;
@@ -51,6 +52,7 @@ private:
     void populateProviderCombo(const QString &cardName);
     void initializeSearchBar();
     void retranslateUi();
+    void setNumericEditorsVisible(bool visible);
     QDoubleSpinBox *makeSpinBox(double min, double max, double value, double step);
 
     QLineEdit *searchBar;
@@ -68,7 +70,7 @@ private:
     QLabel *printingLabel;
     QLabel *previewCaptionLabel;
     QCheckBox *showNumericEditorsCheck;
-    QWidget *numericEditors;
+    QFormLayout *controlsForm;
     QLabel *leftMarginLabel;
     QLabel *rightMarginLabel;
     QLabel *verticalOffsetLabel;

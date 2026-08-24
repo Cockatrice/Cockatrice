@@ -112,13 +112,16 @@ void PlaymatSettingsDialog::setupUi()
     });
 
     auto *form = new QFormLayout;
+    controlsForm = form;
     cardNameLabel = new QLabel;
     printingLabel = new QLabel;
     form->addRow(cardNameLabel, searchBar);
     form->addRow(printingLabel, providerComboBox);
 
     // Numerical editors expose the raw PlaymatParams for precise input. They
-    // stay hidden until requested since the crop surface is the primary control.
+    // share the same form as the rows above so every field lines up on one
+    // label column. They stay hidden until requested since the crop surface
+    // is the primary control.
     marginLSpin = makeSpinBox(0.0, 0.95, currentParams.marginPctL, 0.01);
     marginRSpin = makeSpinBox(0.0, 0.95, currentParams.marginPctR, 0.01);
     verticalOffsetSpin = makeSpinBox(0.0, 1.0, currentParams.verticalOffset, 0.01);
@@ -129,19 +132,13 @@ void PlaymatSettingsDialog::setupUi()
     verticalOffsetLabel = new QLabel;
     zoomLabel = new QLabel;
 
-    auto *numericForm = new QFormLayout;
-    numericForm->addRow(leftMarginLabel, marginLSpin);
-    numericForm->addRow(rightMarginLabel, marginRSpin);
-    numericForm->addRow(verticalOffsetLabel, verticalOffsetSpin);
-    numericForm->addRow(zoomLabel, zoomSpin);
-    numericEditors = new QWidget;
-    numericEditors->setLayout(numericForm);
-    numericEditors->setVisible(false);
-
     showNumericEditorsCheck = new QCheckBox;
 
     form->addRow(showNumericEditorsCheck);
-    form->addRow(numericEditors);
+    form->addRow(leftMarginLabel, marginLSpin);
+    form->addRow(rightMarginLabel, marginRSpin);
+    form->addRow(verticalOffsetLabel, verticalOffsetSpin);
+    form->addRow(zoomLabel, zoomSpin);
 
     controlsGroup = new QGroupBox;
     controlsGroup->setLayout(form);
@@ -169,8 +166,8 @@ void PlaymatSettingsDialog::setupUi()
         accept();
     });
 
-    // The crop surface is the primary control: dragging pans, wheel/keys zoom
-    //, editing exactly the same stored parameters the old numeric fields did.
+    // The crop surface is the primary control: dragging pans, wheel/keys zoom,
+    // editing exactly the same stored parameters the numeric fields do.
     connect(preview, &PlaymatPreviewWidget::paramsEdited, this, [this](const PlaymatParams &edited) {
         currentParams = edited;
 
@@ -184,7 +181,8 @@ void PlaymatSettingsDialog::setupUi()
         zoomSpin->setValue(edited.zoom);
     });
 
-    connect(showNumericEditorsCheck, &QCheckBox::toggled, numericEditors, &QWidget::setVisible);
+    connect(showNumericEditorsCheck, &QCheckBox::toggled, this, &PlaymatSettingsDialog::setNumericEditorsVisible);
+    setNumericEditorsVisible(false);
 
     connect(marginLSpin, &QDoubleSpinBox::valueChanged, this, &PlaymatSettingsDialog::onParamChanged);
     connect(marginRSpin, &QDoubleSpinBox::valueChanged, this, &PlaymatSettingsDialog::onParamChanged);
@@ -291,6 +289,19 @@ void PlaymatSettingsDialog::onParamChanged()
     currentParams.verticalOffset = verticalOffsetSpin->value();
     currentParams.zoom = zoomSpin->value();
     preview->setParams(currentParams);
+}
+
+void PlaymatSettingsDialog::setNumericEditorsVisible(bool visible)
+{
+    controlsForm->setRowVisible(leftMarginLabel, visible);
+    controlsForm->setRowVisible(rightMarginLabel, visible);
+    controlsForm->setRowVisible(verticalOffsetLabel, visible);
+    controlsForm->setRowVisible(zoomLabel, visible);
+
+    // A QDialog never resizes itself when its content requirements change,
+    // so revealing the editors would squeeze the crop group until the info
+    // caption ran into the preview. Re-fit the dialog to the new size hint.
+    adjustSize();
 }
 
 void PlaymatSettingsDialog::retranslateUi()
