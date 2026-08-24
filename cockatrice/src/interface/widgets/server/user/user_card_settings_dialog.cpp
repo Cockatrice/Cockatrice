@@ -15,19 +15,46 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QVBoxLayout>
+#include <QWheelEvent>
+#include <cmath>
 #include <libcockatrice/card/database/card_database_manager.h>
+
+namespace
+{
+// Gesture clamps and step sizes for this direct manipulation surface. The
+// gesture zoom floor is 1.0: basescale already cover fits the art, so any
+// smaller scale would underfill the strip.
+constexpr qreal kMinGestureZoom = 1.0;
+constexpr qreal kMaxZoom = 4.0;
+constexpr qreal kKeyPanOffsetStep = 0.01;
+constexpr qreal kKeyZoomStep = 1.05;
+constexpr qreal kWheelZoomBase = 1.15; // zoom factor per wheel notch
+} // namespace
 
 CardArtPreviewWidget::CardArtPreviewWidget(QWidget *parent) : QWidget(parent)
 {
     setMinimumSize(400, 72);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    setFocusPolicy(Qt::StrongFocus);
+    setAccessibleName(tr("Banner preview"));
+    setAccessibleDescription(tr("Zoom %1×").arg(QString::number(params.zoom, 'f', 2)));
+}
+
+void CardArtPreviewWidget::focusInEvent(QFocusEvent *event)
+{
+    // Snapshot for the Esc or Backspace reset, restoring whatever the user
+    // had when the surface took focus
+    paramsAtFocusIn = params;
+    QWidget::focusInEvent(event);
 }
 
 void CardArtPreviewWidget::setPixmap(const QPixmap &pixmap)
@@ -39,6 +66,7 @@ void CardArtPreviewWidget::setPixmap(const QPixmap &pixmap)
 void CardArtPreviewWidget::setParams(const CardArtParams &p)
 {
     params = p;
+    setAccessibleDescription(tr("Zoom %1×").arg(QString::number(params.zoom, 'f', 2)));
     update();
 }
 
@@ -67,9 +95,22 @@ void CardArtPreviewWidget::paintEvent(QPaintEvent *)
     painter.setBrush(accentColor);
     painter.drawRoundedRect(QRectF(cardRect.left(), cardRect.top(), 3, cardRect.height()), 2, 2);
 
+    // Visible keyboard focus per the focus cursor contract, Tab must show
+    // where the keys land, including in the empty state
+    const auto paintFocusRing = [&painter, &cardRect, this]() {
+        if (!hasFocus()) {
+            return;
+        }
+        QPen focusPen(palette().color(QPalette::Highlight), 2);
+        painter.setPen(focusPen);
+        painter.setBrush(Qt::NoBrush);
+        painter.drawRoundedRect(cardRect.adjusted(-1, -1, 1, 1), 6, 6);
+    };
+
     if (sourcePixmap.isNull()) {
         painter.setPen(QColor(150, 150, 150));
         painter.drawText(rect, Qt::AlignCenter, tr("No card selected"));
+        paintFocusRing();
         return;
     }
 
@@ -80,7 +121,7 @@ void CardArtPreviewWidget::paintEvent(QPaintEvent *)
                                  &sourcePixmap // direct pixmap
     );
 
-    // Avatar placeholder so the left-margin interaction is visible
+    // Avatar placeholder so the left margin interaction is visible
     const int avatarX = rect.left() + 14;
     const int avatarY = rect.top() + (rect.height() - 36) / 2;
     const QRect avatarRect(avatarX, avatarY, 36, 36);
@@ -99,37 +140,200 @@ void CardArtPreviewWidget::paintEvent(QPaintEvent *)
     painter.drawEllipse(avatarRect.adjusted(-1, -1, 1, 1));
 
     paintArtAttribution(painter, cardRect, attributionText);
+
+    paintFocusRing();
+}
+
+qreal CardArtPreviewWidget::bannerTravel() const
+{
+    if (sourcePixmap.isNull()) {
+        return 0.0;
+    }
+    // Mirror UserListPainter::drawCardArt() exactly: same strip metrics, the
+    // copy is drawn 1:1, so output pixels equal widget pixels here.
+    const int cardH = rect().height() - 4;
+    const int totalW = (rect().right() - 4) - rect().left();
+    const int marginL = qRound(totalW * params.marginPctL);
+    const int marginR = qRound(totalW * params.marginPctR);
+    const int drawW = totalW - marginL - marginR;
+    const double basescale = qMax(double(drawW) / sourcePixmap.width(), double(cardH) / sourcePixmap.height());
+    // qRound for literal parity with drawCardArt, which rounds the scaled
+    // height before computing travel
+    const double scaledH = qRound(sourcePixmap.height() * basescale * params.zoom);
+    return scaledH - cardH;
+}
+
+void CardArtPreviewWidget::applyCropDelta(qreal dOffset, qreal zoomFactor)
+{
+    CardArtParams next = params;
+    next.verticalOffset = qBound(0.0, params.verticalOffset + dOffset, 1.0);
+    next.zoom = qBound(kMinGestureZoom, params.zoom * zoomFactor, kMaxZoom);
+
+    if (sameCrop(next, params)) {
+        return;
+    }
+
+    params = next;
+    setAccessibleDescription(tr("Zoom %1×").arg(QString::number(params.zoom, 'f', 2)));
+    update();
+    emit paramsEdited(params);
+}
+
+bool CardArtPreviewWidget::sameCrop(const CardArtParams &a, const CardArtParams &b) const
+{
+    // Exact comparison on purpose: clamped assignments yield identical bits,
+    // while qFuzzyCompare based equality misbehaves around zero
+    return a.verticalOffset == b.verticalOffset && a.zoom == b.zoom;
+}
+
+void CardArtPreviewWidget::restoreSnapshot()
+{
+    // The snapshot only ever holds values that passed the gesture clamps,
+    // so it is safe to restore verbatim
+    if (sameCrop(paramsAtFocusIn, params)) {
+        return;
+    }
+    params = paramsAtFocusIn;
+    setAccessibleDescription(tr("Zoom %1×").arg(QString::number(params.zoom, 'f', 2)));
+    update();
+    emit paramsEdited(params);
+}
+
+void CardArtPreviewWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() != Qt::LeftButton || sourcePixmap.isNull() || bannerTravel() <= 0.5) {
+        QWidget::mousePressEvent(event);
+        return;
+    }
+    dragging = true;
+    lastDragPos = event->pos();
+    setCursor(Qt::ClosedHandCursor);
+    event->accept();
+}
+
+void CardArtPreviewWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!dragging || sourcePixmap.isNull()) {
+        QWidget::mouseMoveEvent(event);
+        return;
+    }
+
+    const qreal dy = event->pos().y() - lastDragPos.y();
+    lastDragPos = event->pos();
+
+    const qreal travel = bannerTravel();
+    if (travel <= 0.5) {
+        event->accept();
+        return;
+    }
+
+    // Dragging moves the ART with the cursor, so the crop window slides the
+    // other way through the available travel.
+    applyCropDelta(-dy / travel, 1.0);
+    event->accept();
+}
+
+void CardArtPreviewWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        dragging = false;
+        unsetCursor();
+        event->accept();
+        return;
+    }
+    QWidget::mouseReleaseEvent(event);
+}
+
+void CardArtPreviewWidget::wheelEvent(QWheelEvent *event)
+{
+    if (sourcePixmap.isNull()) {
+        QWidget::wheelEvent(event);
+        return;
+    }
+    const qreal notches = static_cast<qreal>(event->angleDelta().y()) / 120.0;
+    if (notches == 0.0) {
+        event->accept();
+        return;
+    }
+    applyCropDelta(0.0, std::pow(kWheelZoomBase, notches));
+    event->accept();
+}
+
+void CardArtPreviewWidget::keyPressEvent(QKeyEvent *event)
+{
+    if (sourcePixmap.isNull()) {
+        QWidget::keyPressEvent(event);
+        return;
+    }
+
+    switch (event->key()) {
+        case Qt::Key_Escape:
+            if (sameCrop(params, paramsAtFocusIn)) {
+                // Nothing to undo on this surface, let the event reach the
+                // dialog so Esc keeps its close meaning there
+                QWidget::keyPressEvent(event);
+                return;
+            }
+            restoreSnapshot();
+            break;
+        case Qt::Key_Backspace:
+            restoreSnapshot();
+            break;
+        case Qt::Key_Up:
+            applyCropDelta(-kKeyPanOffsetStep, 1.0);
+            break;
+        case Qt::Key_Down:
+            applyCropDelta(kKeyPanOffsetStep, 1.0);
+            break;
+        case Qt::Key_Plus:
+        case Qt::Key_Equal:
+            applyCropDelta(0.0, kKeyZoomStep);
+            break;
+        case Qt::Key_Minus:
+            applyCropDelta(0.0, 1.0 / kKeyZoomStep);
+            break;
+        default:
+            QWidget::keyPressEvent(event);
+            return;
+    }
+    event->accept();
 }
 
 UserCardArtSettingsDialog::UserCardArtSettingsDialog(const CardArtParams &initial, QWidget *parent)
     : QDialog(parent), currentParams(initial)
 {
-    setWindowTitle(tr("Card Art Settings"));
+    // Legacy stored banners may carry zoom below the gesture floor or an out
+    // of range offset. Normalize once on open so the preview renders filled
+    // and Ok saves a state the gestures can reach again
+    currentParams.zoom = qBound(kMinGestureZoom, currentParams.zoom, kMaxZoom);
+    currentParams.verticalOffset = qBound(0.0, currentParams.verticalOffset, 1.0);
+
     setMinimumWidth(500);
     setupUi();
 
     // Seed UI from initial params
-    if (!initial.cardName.isEmpty()) {
-        searchBar->setText(initial.cardName);
-        onCardNameChanged(initial.cardName);
+    if (!currentParams.cardName.isEmpty()) {
+        // onCardNameChanged overwrites cardProviderId with the first printing,
+        // so remember the stored one before it runs
+        const QString storedProviderId = currentParams.cardProviderId;
+        searchBar->setText(currentParams.cardName);
+        onCardNameChanged(currentParams.cardName);
 
         // onCardNameChanged leaves the printing combo on the first printing in
         // the database, which would silently change the stored banner card on
         // accept. Restore the stored printing when it resolves locally.
-        const int storedPrintingIndex = providerComboBox->findData(initial.cardProviderId);
+        const int storedPrintingIndex = providerComboBox->findData(storedProviderId);
         if (storedPrintingIndex != -1) {
             providerComboBox->setCurrentIndex(storedPrintingIndex);
-        } else {
+        } else if (!storedProviderId.isEmpty()) {
             // Stored printing not in the local database: keep it rather than
             // silently substituting the first printing.
-            currentParams.cardProviderId = initial.cardProviderId;
+            currentParams.cardProviderId = storedProviderId;
             reloadPreview();
         }
     }
-    marginLSpin->setValue(initial.marginPctL);
-    marginRSpin->setValue(initial.marginPctR);
-    verticalOffsetSpin->setValue(initial.verticalOffset);
-    zoomSpin->setValue(initial.zoom);
+    marginLSpin->setValue(currentParams.marginPctL);
+    marginRSpin->setValue(currentParams.marginPctR);
 }
 
 CardArtParams UserCardArtSettingsDialog::params() const
@@ -150,7 +354,6 @@ QDoubleSpinBox *UserCardArtSettingsDialog::makeSpinBox(double min, double max, d
 void UserCardArtSettingsDialog::initializeSearchBar()
 {
     searchBar = new QLineEdit;
-    searchBar->setPlaceholderText(tr("Type a card name..."));
 
     cardDatabaseModel = new CardDatabaseModel(CardDatabaseManager::getInstance(), false, this);
     cardDatabaseDisplayModel = new CardDatabaseDisplayModel(this);
@@ -190,29 +393,33 @@ void UserCardArtSettingsDialog::setupUi()
 
     marginLSpin = makeSpinBox(0.0, 0.95, currentParams.marginPctL, 0.01);
     marginRSpin = makeSpinBox(0.0, 0.95, currentParams.marginPctR, 0.01);
-    verticalOffsetSpin = makeSpinBox(0.0, 1.0, currentParams.verticalOffset, 0.01);
-    zoomSpin = makeSpinBox(0.1, 4.0, currentParams.zoom, 0.05);
 
     auto *form = new QFormLayout;
-    form->addRow(tr("Card name:"), searchBar);
-    form->addRow(tr("Card ProviderId:"), providerComboBox);
-    form->addRow(tr("Left margin (%):"), marginLSpin);
-    form->addRow(tr("Right margin (%):"), marginRSpin);
-    form->addRow(tr("Vertical offset:"), verticalOffsetSpin);
-    form->addRow(tr("Zoom:"), zoomSpin);
+    cardNameLabel = new QLabel;
+    printingLabel = new QLabel;
+    marginLLabel = new QLabel;
+    marginRLabel = new QLabel;
+    form->addRow(cardNameLabel, searchBar);
+    form->addRow(printingLabel, providerComboBox);
+    form->addRow(marginLLabel, marginLSpin);
+    form->addRow(marginRLabel, marginRSpin);
 
-    auto *controlsGroup = new QGroupBox(tr("Parameters"));
+    controlsGroup = new QGroupBox;
     controlsGroup->setLayout(form);
 
     preview = new CardArtPreviewWidget;
 
     auto *previewLayout = new QVBoxLayout;
     previewLayout->addWidget(preview);
-    auto *previewGroup = new QGroupBox(tr("Preview"));
+    previewCaptionLabel = new QLabel;
+    previewCaptionLabel->setAlignment(Qt::AlignCenter);
+    previewCaptionLabel->setWordWrap(true);
+    previewLayout->addWidget(previewCaptionLabel);
+    previewGroup = new QGroupBox;
     previewGroup->setLayout(previewLayout);
 
     auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    auto *removeBtn = new QPushButton(tr("Remove Banner Card"));
+    removeBtn = new QPushButton;
     buttons->addButton(removeBtn, QDialogButtonBox::ResetRole);
 
     connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
@@ -222,16 +429,38 @@ void UserCardArtSettingsDialog::setupUi()
         accept();
     });
 
+    // The banner leads visually, card selection and margins support it below.
     auto *root = new QVBoxLayout;
-    root->addWidget(controlsGroup);
     root->addWidget(previewGroup);
+    root->addWidget(controlsGroup);
     root->addWidget(buttons);
     setLayout(root);
 
     connect(marginLSpin, &QDoubleSpinBox::valueChanged, this, &UserCardArtSettingsDialog::onParamChanged);
     connect(marginRSpin, &QDoubleSpinBox::valueChanged, this, &UserCardArtSettingsDialog::onParamChanged);
-    connect(verticalOffsetSpin, &QDoubleSpinBox::valueChanged, this, &UserCardArtSettingsDialog::onParamChanged);
-    connect(zoomSpin, &QDoubleSpinBox::valueChanged, this, &UserCardArtSettingsDialog::onParamChanged);
+
+    // Gestures are the only editors of offset and zoom on this surface.
+    // Margins stay explicit numeric controls: they trim the strip's
+    // sides and have no natural drag mapping.
+    connect(preview, &CardArtPreviewWidget::paramsEdited, this,
+            [this](const CardArtParams &edited) { currentParams = edited; });
+
+    retranslateUi();
+}
+
+void UserCardArtSettingsDialog::retranslateUi()
+{
+    setWindowTitle(tr("Card Art Settings"));
+    searchBar->setPlaceholderText(tr("Type a card name..."));
+    cardNameLabel->setText(tr("Card name:"));
+    printingLabel->setText(tr("Printing:"));
+    marginLLabel->setText(tr("Left margin (%):"));
+    marginRLabel->setText(tr("Right margin (%):"));
+    controlsGroup->setTitle(tr("Card"));
+    previewCaptionLabel->setText(
+        tr("Drag to pan, scroll to zoom, arrow keys nudge, plus and minus zoom, Backspace or Esc restores."));
+    previewGroup->setTitle(tr("Banner"));
+    removeBtn->setText(tr("Remove Banner Card"));
 }
 
 void UserCardArtSettingsDialog::populateProviderCombo(const QString &cardName)
@@ -281,7 +510,7 @@ void UserCardArtSettingsDialog::onCardNameChanged(const QString &name)
     populateProviderCombo(name);
 
     if (providerComboBox->count() == 0) {
-        // No printings found for this card; nothing to preview.
+        // No printings found for this card, nothing to preview.
         currentPixmap = QPixmap();
         preview->setPixmap(currentPixmap);
         currentParams.cardProviderId.clear();
@@ -311,7 +540,7 @@ void UserCardArtSettingsDialog::reloadPreview()
     // whichever CardInfo we just asked for, so the preview catches up once
     // the image actually arrives instead of staying on the placeholder.
     //
-    // Disconnect any previous listener first -- otherwise switching cards
+    // Disconnect any previous listener first, otherwise switching cards
     // repeatedly stacks up connections to old CardInfo objects, each of
     // which would still fire reloadPreview() (harmlessly, but wastefully)
     // whenever ITS art finishes loading later.
@@ -321,8 +550,8 @@ void UserCardArtSettingsDialog::reloadPreview()
     CardPictureLoader::getPixmap(fullRes, card, QSize(745, 1040));
 
     if (fullRes.isNull()) {
-        // Not loaded yet -- wait for the signal instead of giving up.
-        // card.getCardPtr() is a CardInfoPtr (QSharedPointer<CardInfo>);
+        // Not loaded yet, wait for the signal instead of giving up.
+        // card.getCardPtr() is a CardInfoPtr (QSharedPointer<CardInfo>),
         // .data() gives the raw QObject* needed for connect().
         CardInfo *cardInfo = card.getCardPtr().data();
         if (cardInfo) {
@@ -345,7 +574,5 @@ void UserCardArtSettingsDialog::onParamChanged()
 {
     currentParams.marginPctL = marginLSpin->value();
     currentParams.marginPctR = marginRSpin->value();
-    currentParams.verticalOffset = verticalOffsetSpin->value();
-    currentParams.zoom = zoomSpin->value();
     preview->setParams(currentParams);
 }
