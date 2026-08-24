@@ -69,6 +69,7 @@ jobs:
           ninja-build \
           protobuf-compiler \
           qt6-multimedia-dev \
+          qt6-shadertools-dev \
           qt6-svg-dev \
           qt6-tools-dev \
           qt6-tools-dev-tools \
