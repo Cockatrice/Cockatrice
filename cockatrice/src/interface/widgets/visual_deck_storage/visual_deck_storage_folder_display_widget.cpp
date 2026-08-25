@@ -121,6 +121,7 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
         DeckPreviewWidget *deckPreviewWidget = deckWidgets.value(filePath, nullptr);
         if (!deckPreviewWidget) {
             deckPreviewWidget = createDeckPreviewWidget(filePath);
+            flowWidget->addWidget(deckPreviewWidget);
         }
 
         const bool matches = index.data(VisualDeckStorageRoles::FilterMatchRole).toBool();
