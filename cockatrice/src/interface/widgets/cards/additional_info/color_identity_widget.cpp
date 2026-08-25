@@ -79,8 +79,6 @@ void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
 
-    // Layout passes resize this widget repeatedly with identical sizes, so bail out before
-    // touching the children when neither the width nor the resulting symbol size changed.
     const int totalWidth = event->size().width();
     if (totalWidth == lastWidth && lastIconSize != -1) {
         return;
@@ -90,13 +88,12 @@ void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
     const int totalHeight = totalWidth / 6; // Set height to 1/4 of the width
     setFixedHeight(totalHeight);
 
-    QList<ManaSymbolWidget *> manaSymbols = findChildren<ManaSymbolWidget *>();
-    if (manaSymbols.isEmpty()) {
+    const int count = layout->count();
+    if (count == 0) {
         return;
     }
 
     const int spacing = layout->spacing();
-    const int count = manaSymbols.size();
     const int availableWidth = totalWidth - (spacing * (count - 1));
     const int iconSize = qMin(availableWidth / count, totalHeight); // Ensure icons fit within the new height
 
@@ -105,8 +102,10 @@ void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
     }
     lastIconSize = iconSize;
 
-    for (ManaSymbolWidget *manaSymbol : manaSymbols) {
-        manaSymbol->setFixedSize(iconSize, iconSize);
+    for (int i = 0; i < count; ++i) {
+        if (auto *w = qobject_cast<ManaSymbolWidget *>(layout->itemAt(i)->widget())) {
+            w->setFixedSize(iconSize, iconSize);
+        }
     }
 }
 
