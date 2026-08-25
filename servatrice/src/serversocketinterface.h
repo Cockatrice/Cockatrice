@@ -81,6 +81,7 @@ signals:
 protected:
     void logDebugMessage(const QString &message) override;
     bool tooManyRegistrationAttempts(const QString &ipAddress);
+    void processCommandContainer(const CommandContainer &cont) override;
 
     virtual void writeToSocket(QByteArray &data) = 0;
     virtual void flushSocket() = 0;
