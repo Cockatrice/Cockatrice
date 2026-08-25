@@ -1762,7 +1762,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetServerStats(const Co
                 message ? pool->FindExtensionByNumber(message, number) : nullptr;
             if (extension) {
                 label = QString::fromLatin1(MetricsRegistry::KindNames[kind]) + QStringLiteral("/") +
-                        QString::fromStdString(std::string(extension->name()));
+                        QString::fromStdString(std::string(extension->message_type()->name()));
             }
         }
         if (label.isEmpty()) {

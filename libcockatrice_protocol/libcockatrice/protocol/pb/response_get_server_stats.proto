@@ -1,6 +1,14 @@
 syntax = "proto2";
 import "response.proto";
 
+message CommandStats {
+    optional uint32 kind_index = 1;       // 0=session, 1=room, 2=game, 3=moderator, 4=admin
+    optional uint32 extension_number = 2; // protobuf extension number within the kind
+    optional string command_name = 3;     // e.g. "session/Command_Ping"
+    optional uint64 count = 4;            // number of times observed
+    optional uint64 total_ms = 5;         // cumulative processing milliseconds
+}
+
 message Response_GetServerStats {
     extend Response {
         optional Response_GetServerStats ext = 1220;
@@ -16,4 +24,18 @@ message Response_GetServerStats {
 
     optional uint64 uptime_secs = 6;
     optional uint64 timest = 7; // unix timestamp of the snapshot
+
+    // Live metrics from MetricsRegistry (reset on server restart)
+    optional uint64 cards_in_games = 8;
+    optional uint64 eventloop_stalls_total = 9;
+    optional uint64 eventloop_last_stall_ms = 10;
+    optional uint64 eventloop_max_stall_ms = 11;
+    optional uint64 total_commands = 12;
+    optional uint64 total_command_time_ms = 13;
+    optional int32 active_command_types = 14;
+    optional uint64 game_start_count = 15;
+    optional uint64 game_start_total_ms = 16;
+
+    // Per-command breakdown (only types with count > 0)
+    repeated CommandStats command_stats = 20;
 }
