@@ -2,21 +2,22 @@
  * @file visual_deck_storage_tag_filter_widget.h
  * @ingroup VisualDeckStorageWidgets
  */
-//! \todo Document this file.
 
 #ifndef VISUAL_DECK_STORAGE_TAG_FILTER_WIDGET_H
 #define VISUAL_DECK_STORAGE_TAG_FILTER_WIDGET_H
 
-#include "deck_preview/deck_preview_widget.h"
-
+#include <QSet>
+#include <QStringList>
 #include <QWidget>
 
+class FlowWidget;
 class VisualDeckStorageWidget;
 class VisualDeckStorageTagFilterWidget : public QWidget
 {
     Q_OBJECT
 
     VisualDeckStorageWidget *parent;
+    FlowWidget *flowWidget;
 
     [[nodiscard]] QSet<QString> gatherAllTags() const;
     void removeTagsNotInList(const QSet<QString> &tags);
@@ -27,9 +28,21 @@ class VisualDeckStorageTagFilterWidget : public QWidget
 public:
     explicit VisualDeckStorageTagFilterWidget(VisualDeckStorageWidget *_parent);
     [[nodiscard]] QStringList getAllKnownTags() const;
-    void filterDecksBySelectedTags(const QList<DeckPreviewWidget *> &deckPreviews) const;
+
+    /**
+     * @brief The tags currently in "selected" state.
+     */
+    [[nodiscard]] QStringList selectedTags() const;
+
+    /**
+     * @brief The tags currently in "excluded" state.
+     */
+    [[nodiscard]] QStringList excludedTags() const;
 
 public slots:
+    /**
+     * @brief Rebuilds the tag chips from the tags of the currently visible decks.
+     */
     void refreshTags();
     void showEvent(QShowEvent *event) override;
 };
