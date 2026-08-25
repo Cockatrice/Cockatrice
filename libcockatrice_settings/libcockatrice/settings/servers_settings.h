@@ -46,8 +46,6 @@ public:
     void setFPHostName(QString hostname);
     void setFPPort(QString port);
     void setFPPlayerName(QString playerName);
-    //! \brief Store a password (or a "$scrypt$..." verifier) for the given saved server.
-    void setServerPassword(const QString &saveName, const QString &password);
     void addNewServer(const QString &saveName,
                       const QString &serv,
                       const QString &port,

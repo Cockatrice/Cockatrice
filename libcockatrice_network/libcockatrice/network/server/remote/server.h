@@ -84,11 +84,6 @@ public:
     {
         return QMap<QString, bool>();
     }
-    /** @brief True when only challenge-response logins are accepted (strict mode). */
-    virtual bool requiresChallengeResponseAuth() const
-    {
-        return false;
-    }
     void addClient(Server_ProtocolHandler *player);
     void removeClient(Server_ProtocolHandler *player);
     QList<QString> getOnlineModeratorList() const;

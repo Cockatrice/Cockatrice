@@ -865,18 +865,6 @@ QString Servatrice::getRequiredFeatures() const
     return settingsCache->value("server/requiredfeatures", "").toString();
 }
 
-Servatrice::AuthenticationStrictness Servatrice::getAuthenticationStrictness() const
-{
-    const QString strictness = settingsCache->value("security/authentication_strictness", "mixed").toString();
-    if (strictness == "strict") {
-        return AuthenticationStrict;
-    }
-    if (strictness == "legacy") {
-        return AuthenticationLegacy;
-    }
-    return AuthenticationMixed;
-}
-
 QString Servatrice::getDBTypeString() const
 {
     if (QProcessEnvironment::systemEnvironment().contains("DATABASE_URL")) {

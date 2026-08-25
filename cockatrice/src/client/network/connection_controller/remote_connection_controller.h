@@ -35,13 +35,8 @@ public:
     void registerToServer();
     void forgotPasswordRequest();
     void connectToServer();
-    void connectToServerDirect(const QString &host,
-                               unsigned int port,
-                               const QString &playerName,
-                               const QString &password,
-                               const QString &storedVerifier = QString(),
-                               const QString &saveName = QString(),
-                               bool savePassword = false);
+    void
+    connectToServerDirect(const QString &host, unsigned int port, const QString &playerName, const QString &password);
     void disconnectFromServer();
 
     void refreshWindowTitle()
@@ -82,9 +77,6 @@ private slots:
     void onPromptForgotPasswordReset();
     void onPromptForgotPasswordChallenge();
 
-    // Persists the derived scrypt verifier after a successful challenge-response login
-    void onPasswordVerifierReady(const QString &hostname, const QString &userName, const QString &verifier);
-
 private:
     void wireClientSignals();
     void updateWindowTitle();
@@ -101,10 +93,6 @@ private:
 
     // Kept as a member so the forgot-password signal can be wired to it
     DlgConnect *dlgConnect{nullptr};
-
-    // Captured from the connect dialog when a connection is initiated
-    QString pendingSaveName;
-    bool pendingSavePassword{false};
 };
 
 #endif // COCKATRICE_REMOTE_CONNECTION_CONTROLLER_H

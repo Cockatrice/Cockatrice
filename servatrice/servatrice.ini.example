@@ -101,16 +101,6 @@ password=123456
 ; Accept only registered users? default is false (accept unregistered users)
 regonly=false
 
-[security]
-
-; How strictly new authentication features are enforced.  Possible values:
-; * legacy: only accept the legacy 1000-round SHA-512 password hashes;
-; * mixed: accept both legacy hashes and challenge-response authentication (default);
-; * strict: only accept challenge-response authentication from clients that support it,
-;           and reject plain password submissions.  Legacy accounts are migrated to PBKDF2
-;           automatically on their next successful login.
-authentication_strictness=mixed
-
 [users]
 
 ; The minimum length a username can be

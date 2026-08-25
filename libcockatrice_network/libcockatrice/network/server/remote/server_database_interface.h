@@ -40,14 +40,6 @@ public:
     {
         return {};
     }
-    virtual QString getUserPasswordData(const QString & /* user */)
-    {
-        return {};
-    }
-    virtual bool submitPasswordVerifier(const QString & /* user */, const QString & /* passwordVerifier */)
-    {
-        return false;
-    }
     virtual QMap<QString, ServerInfo_User> getBuddyList(const QString & /* name */)
     {
         return QMap<QString, ServerInfo_User>();

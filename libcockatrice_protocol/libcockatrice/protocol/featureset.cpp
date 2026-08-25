@@ -25,8 +25,7 @@ void FeatureSet::initalizeFeatureList(QMap<QString, bool> &_featureList)
     _featureList.insert("idle_client", false);
     _featureList.insert("forgot_password", false);
     _featureList.insert("websocket", false);
-    _featureList.insert("hashed_password_login", false);
-    _featureList.insert("challenge_response_auth", false);
+    // featureList.insert("hashed_password_login", false);
     // These are temp to force users onto a newer client
     _featureList.insert("2.7.0_min_version", false);
     _featureList.insert("2.8.0_min_version", false);

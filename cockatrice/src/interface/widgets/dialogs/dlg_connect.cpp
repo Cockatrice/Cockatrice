@@ -273,15 +273,9 @@ void DlgConnect::updateDisplayInfo(const QString &saveName)
     playernameEdit->setText(_data.at(3));
     playernameEdit->setFocus();
     savePasswordCheckBox->setChecked(savePasswordStatus);
-    storedVerifier.clear();
 
     if (savePasswordStatus) {
-        const QString stored = _data.at(4);
-        if (stored.startsWith("$")) {
-            storedVerifier = stored;
-        } else {
-            passwordEdit->setText(stored);
-        }
+        passwordEdit->setText(_data.at(4));
     }
 
     if (!_data.at(6).isEmpty()) {
@@ -307,7 +301,6 @@ void DlgConnect::newHostSelected(bool state)
         portEdit->setDisabled(false);
         playernameEdit->clear();
         passwordEdit->clear();
-        storedVerifier.clear();
         saveEdit->clear();
         saveEdit->setPlaceholderText(tr("Unique Server Name"));
         saveEdit->setDisabled(false);
@@ -340,13 +333,10 @@ void DlgConnect::actOk()
         }
 
         servers.addNewServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
-                             playernameEdit->text().trimmed(),
-                             passwordEdit->text().isEmpty() ? storedVerifier : passwordEdit->text(),
-                             savePasswordCheckBox->isChecked());
+                             playernameEdit->text().trimmed(), passwordEdit->text(), savePasswordCheckBox->isChecked());
     } else {
         servers.updateExistingServer(saveEdit->text().trimmed(), hostEdit->text().trimmed(), portEdit->text().trimmed(),
-                                     playernameEdit->text().trimmed(),
-                                     passwordEdit->text().isEmpty() ? storedVerifier : passwordEdit->text(),
+                                     playernameEdit->text().trimmed(), passwordEdit->text(),
                                      savePasswordCheckBox->isChecked());
     }
 
