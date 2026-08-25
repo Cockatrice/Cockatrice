@@ -230,6 +230,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/general/display/charts/bars/segmented_bar_widget.cpp
     src/interface/widgets/general/display/charts/pies/color_pie.cpp
     src/interface/widgets/general/home_styled_button.cpp
+    src/interface/widgets/general/home_tab_button_color.h
     src/interface/widgets/general/home_widget.cpp
     src/interface/widgets/general/layout_containers/flow_widget.cpp
     src/interface/widgets/general/layout_containers/overlap_control_widget.cpp

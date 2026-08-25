@@ -5,6 +5,7 @@
 #include "../../client/settings/card_counter_settings.h"
 #include "../../palette_editor/palette_editor_dialog.h"
 #include "../dialogs/override_printing_warning.h"
+#include "../general/home_tab_button_color.h"
 #include "../interface/theme_manager.h"
 #include "../interface/widgets/general/background_sources.h"
 #include "../playmat/playmat_collection_dialog.h"
@@ -131,6 +132,14 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&homeTabDisplayCardNameCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.appearance(),
             &AppearanceSettings::setHomeTabDisplayCardName);
 
+    for (const auto &entry : HomeTabButtonColor::all()) {
+        homeTabButtonColorSourceBox.addItem(QObject::tr(entry.trKey));
+    }
+
+    homeTabButtonColorSourceBox.setCurrentIndex(settings.appearance().getHomeTabButtonColorSourceIndex());
+    connect(&homeTabButtonColorSourceBox, QOverload<int>::of(&QComboBox::currentIndexChanged), &settings.appearance(),
+            &AppearanceSettings::setHomeTabButtonColorSourceIndex);
+
     updateHomeTabSettingsVisibility();
 
     auto *homeTabGrid = new QGridLayout;
@@ -139,6 +148,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     homeTabGrid->addWidget(&homeTabBackgroundShuffleFrequencyLabel, 1, 0);
     homeTabGrid->addWidget(&homeTabBackgroundShuffleFrequencySpinBox, 1, 1);
     homeTabGrid->addWidget(&homeTabDisplayCardNameCheckBox, 2, 0, 1, 2);
+    homeTabGrid->addWidget(&homeTabButtonColorSourceLabel, 3, 0);
+    homeTabGrid->addWidget(&homeTabButtonColorSourceBox, 3, 1);
 
     homeTabGroupBox = new QGroupBox;
     homeTabGroupBox->setLayout(homeTabGrid);
@@ -497,6 +508,9 @@ void AppearanceSettingsPage::retranslateUi()
     homeTabBackgroundShuffleFrequencyLabel.setText(tr("Home tab background shuffle frequency:"));
     homeTabBackgroundShuffleFrequencySpinBox.setSpecialValueText(tr("Disabled"));
     homeTabDisplayCardNameCheckBox.setText(tr("Display card name of background in bottom right"));
+    homeTabButtonColorSourceLabel.setText(tr("Home tab button color:"));
+    homeTabButtonColorSourceBox.setToolTip(
+        tr("Automatic: extract from background if present, otherwise use theme default"));
 
     stylingGroupBox->setTitle(tr("Styling settings"));
     styleUserListCheckBox.setText(tr("Style user list"));

@@ -23,7 +23,7 @@ class HomeWidget : public QWidget
 public:
     HomeWidget(QWidget *parent, TabSupervisor *tabSupervisor);
     void updateRandomCard();
-    QPair<QColor, QColor> extractDominantColors(const QPixmap &pixmap);
+    static QPair<QColor, QColor> extractDominantColors(const QPixmap &pixmap);
 
 public slots:
     void paintEvent(QPaintEvent *event) override;
@@ -47,6 +47,7 @@ private:
 
     void setRandomCard(ExactCard &newCard);
     void loadBackgroundSourceDeck();
+    QPair<QColor, QColor> determineButtonColor() const;
 };
 
 #endif // HOME_WIDGET_H
