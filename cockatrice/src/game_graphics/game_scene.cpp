@@ -48,7 +48,7 @@ GameScene::~GameScene()
     // members below are destroyed: the base QGraphicsScene destructor destroys the
     // remaining items, and their destroyed() signals must not reach slots that
     // reference members that no longer exist.
-    disconnect(this);
+    QObject::disconnect(nullptr, nullptr, this, nullptr);
 
     delete animationTimer;
     animationTimer = nullptr;
