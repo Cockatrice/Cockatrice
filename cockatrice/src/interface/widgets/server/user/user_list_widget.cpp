@@ -613,7 +613,12 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
     userTree->hideColumn(3);
     connect(userTree, &QTreeWidget::itemActivated, this, &UserListWidget::userClicked);
     userTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    userTree->header()->setStretchLastSection(true);
+    // QTreeWidget enables stretchLastSection by default. Left on, the hidden
+    // last section absorbs viewport resizes, the Stretch sections never
+    // redistribute, and the header keeps a stale length past the viewport —
+    // an invisible horizontal pan range under ScrollBarAlwaysOff. Disable it
+    // so the explicit resize modes in applyDisplayMode() own the geometry.
+    userTree->header()->setStretchLastSection(false);
 
     // Always create timers so callers never segfault on a null deref;
     // showPopupForUser / hidePopup already guard against a null userInfoPopup.
@@ -930,13 +935,24 @@ void UserListWidget::applyDisplayMode()
 {
     const bool styled = SettingsCache::instance().appearance().getStyleUserList();
 
+    // Both modes must keep the header length at the viewport width: with
+    // ScrollBarAlwaysOff a nonzero horizontal range is invisible but still
+    // pans via trackpad gestures, which reads as janky random drift.
     if (styled) {
         userTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
         userTree->hideColumn(1);
         userTree->hideColumn(2);
         userTree->hideColumn(3);
     } else {
-        userTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        // Bounded widths instead of ResizeToContents: content sizing measures
+        // the FULL text width while the delegate elides afterwards, so long
+        // names widened the header past the viewport. Fixed icon columns plus
+        // a stretched name column keep the range at zero, eliding trims.
+        userTree->header()->setSectionResizeMode(0, QHeaderView::Fixed);
+        userTree->header()->resizeSection(0, 24);
+        userTree->header()->setSectionResizeMode(1, QHeaderView::Fixed);
+        userTree->header()->resizeSection(1, 22);
+        userTree->header()->setSectionResizeMode(2, QHeaderView::Stretch);
         userTree->showColumn(1);
         userTree->showColumn(2);
         userTree->hideColumn(3);
