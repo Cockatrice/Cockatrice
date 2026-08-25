@@ -21,11 +21,14 @@ class TabDeveloper : public Tab
 private:
     AbstractClient *client;
     QTableWidget *statsTable;
+    QTableWidget *commandTable;
     QPushButton *refreshButton;
     QLabel *statusLabel;
 
     void appendStatRow(const QString &name, const QString &value);
+    void appendSeparatorRow(const QString &sectionTitle);
     static QString formatBytes(quint64 bytes);
+    static QString formatDurationMs(qint64 ms);
 
 private slots:
     void refreshClicked();
