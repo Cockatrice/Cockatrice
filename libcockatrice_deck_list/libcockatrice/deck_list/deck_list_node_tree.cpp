@@ -209,18 +209,29 @@ InnerDecklistNode *DecklistNodeTree::getZoneObjFromName(const QString &zoneName)
     return new InnerDecklistNode(zoneName, root);
 }
 
+InnerDecklistNode *DecklistNodeTree::findBoardZone(const QString &boardZoneName) const
+{
+    return dynamic_cast<InnerDecklistNode *>(root->findChild(boardZoneName));
+}
+
+InnerDecklistNode *DecklistNodeTree::findOrCreateBoardZone(const QString &boardZoneName)
+{
+    auto *boardZone = findBoardZone(boardZoneName);
+    if (!boardZone &&
+        (boardZoneName == DECK_ZONE_MAYBEBOARD || boardZoneName == DECK_ZONE_MAIN || boardZoneName == DECK_ZONE_SIDE)) {
+        // The boards are lazy zones: they only exist once cards or custom zones need them.
+        boardZone = new InnerDecklistNode(boardZoneName, root);
+    }
+    return boardZone;
+}
+
 InnerDecklistNode *DecklistNodeTree::addCustomZone(const QString &boardZoneName, const QString &zoneName)
 {
     if (hasZoneName(zoneName)) {
         return nullptr;
     }
 
-    auto *boardZone = dynamic_cast<InnerDecklistNode *>(root->findChild(boardZoneName));
-    if (!boardZone &&
-        (boardZoneName == DECK_ZONE_MAYBEBOARD || boardZoneName == DECK_ZONE_MAIN || boardZoneName == DECK_ZONE_SIDE)) {
-        // The boards are lazy zones: they only exist once cards or custom zones need them.
-        boardZone = new InnerDecklistNode(boardZoneName, root);
-    }
+    auto *boardZone = findOrCreateBoardZone(boardZoneName);
 
     if (!boardZone) {
         return nullptr;
@@ -256,12 +267,7 @@ bool DecklistNodeTree::moveCustomZone(const QString &zoneName, const QString &ne
         return true;
     }
 
-    auto *newBoardZone = dynamic_cast<InnerDecklistNode *>(root->findChild(newBoardZoneName));
-    if (!newBoardZone && (newBoardZoneName == DECK_ZONE_MAYBEBOARD || newBoardZoneName == DECK_ZONE_MAIN ||
-                          newBoardZoneName == DECK_ZONE_SIDE)) {
-        // The boards are lazy zones: they only exist once cards or custom zones need them.
-        newBoardZone = new InnerDecklistNode(newBoardZoneName, root);
-    }
+    auto *newBoardZone = findOrCreateBoardZone(newBoardZoneName);
     if (!newBoardZone) {
         return false;
     }
@@ -290,7 +296,7 @@ QList<const InnerDecklistNode *> DecklistNodeTree::getCustomZones(const QString 
 {
     QList<const InnerDecklistNode *> result;
 
-    auto *boardZone = dynamic_cast<InnerDecklistNode *>(root->findChild(boardZoneName));
+    auto *boardZone = findBoardZone(boardZoneName);
     if (!boardZone) {
         return result;
     }
