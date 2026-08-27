@@ -1,0 +1,302 @@
+#include "user_list_dialog.h"
+
+#include <QCheckBox>
+#include <QComboBox>
+#include <QGroupBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QPlainTextEdit>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QSpinBox>
+#include <QVBoxLayout>
+#include <libcockatrice/utility/string_limits.h>
+
+BanDialog::BanDialog(const ServerInfo_User &info, QWidget *parent) : QDialog(parent)
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+
+    nameBanCheckBox = new QCheckBox(tr("ban &user name"));
+    nameBanCheckBox->setChecked(true);
+    nameBanEdit = new QLineEdit(QString::fromStdString(info.name()));
+    nameBanEdit->setMaxLength(MAX_NAME_LENGTH);
+    ipBanCheckBox = new QCheckBox(tr("ban &IP address"));
+    ipBanCheckBox->setChecked(true);
+    ipBanEdit = new QLineEdit(QString::fromStdString(info.address()));
+    ipBanEdit->setMaxLength(MAX_NAME_LENGTH);
+    idBanCheckBox = new QCheckBox(tr("ban client I&D"));
+    idBanCheckBox->setChecked(true);
+    idBanEdit = new QLineEdit(QString::fromStdString(info.clientid()));
+    idBanEdit->setMaxLength(MAX_NAME_LENGTH);
+    if (QString::fromStdString(info.clientid()).isEmpty()) {
+        idBanCheckBox->setChecked(false);
+    }
+
+    QGridLayout *banTypeGrid = new QGridLayout;
+    banTypeGrid->addWidget(nameBanCheckBox, 0, 0);
+    banTypeGrid->addWidget(nameBanEdit, 0, 1);
+    banTypeGrid->addWidget(ipBanCheckBox, 1, 0);
+    banTypeGrid->addWidget(ipBanEdit, 1, 1);
+    banTypeGrid->addWidget(idBanCheckBox, 2, 0);
+    banTypeGrid->addWidget(idBanEdit, 2, 1);
+    QGroupBox *banTypeGroupBox = new QGroupBox(tr("Ban type"));
+    banTypeGroupBox->setLayout(banTypeGrid);
+
+    permanentRadio = new QRadioButton(tr("&permanent ban"));
+    temporaryRadio = new QRadioButton(tr("&temporary ban"));
+    temporaryRadio->setChecked(true);
+    connect(temporaryRadio, &QRadioButton::toggled, this, &BanDialog::enableTemporaryEdits);
+    daysLabel = new QLabel(tr("&Days:"));
+    daysEdit = new QSpinBox;
+    daysEdit->setMinimum(0);
+    daysEdit->setValue(0);
+    daysEdit->setMaximum(10000);
+    daysLabel->setBuddy(daysEdit);
+    hoursLabel = new QLabel(tr("&Hours:"));
+    hoursEdit = new QSpinBox;
+    hoursEdit->setMinimum(0);
+    hoursEdit->setValue(0);
+    hoursEdit->setMaximum(24);
+    hoursLabel->setBuddy(hoursEdit);
+    minutesLabel = new QLabel(tr("&Minutes:"));
+    minutesEdit = new QSpinBox;
+    minutesEdit->setMinimum(0);
+    minutesEdit->setValue(5);
+    minutesEdit->setMaximum(60);
+    minutesLabel->setBuddy(minutesEdit);
+    QGridLayout *durationLayout = new QGridLayout;
+    durationLayout->addWidget(permanentRadio, 0, 0, 1, 6);
+    durationLayout->addWidget(temporaryRadio, 1, 0, 1, 6);
+    durationLayout->addWidget(daysLabel, 2, 0);
+    durationLayout->addWidget(daysEdit, 2, 1);
+    durationLayout->addWidget(hoursLabel, 2, 2);
+    durationLayout->addWidget(hoursEdit, 2, 3);
+    durationLayout->addWidget(minutesLabel, 2, 4);
+    durationLayout->addWidget(minutesEdit, 2, 5);
+    QGroupBox *durationGroupBox = new QGroupBox(tr("Duration of the ban"));
+    durationGroupBox->setLayout(durationLayout);
+
+    QLabel *reasonLabel = new QLabel(tr("Please enter the reason for the ban.\n"
+                                        "This is only saved for moderators and cannot be seen by the banned person."));
+    reasonEdit = new QPlainTextEdit;
+
+    QLabel *visibleReasonLabel =
+        new QLabel(tr("Please enter the reason for the ban that will be visible to the banned person."));
+    visibleReasonEdit = new QPlainTextEdit;
+
+    deleteMessages = new QCheckBox(tr("Redact all messages from this user in all rooms"));
+
+    QPushButton *okButton = new QPushButton(tr("&OK"));
+    okButton->setAutoDefault(true);
+    connect(okButton, &QPushButton::clicked, this, &BanDialog::okClicked);
+    QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+    connect(cancelButton, &QPushButton::clicked, this, &BanDialog::reject);
+
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(okButton);
+    buttonLayout->addWidget(cancelButton);
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(banTypeGroupBox);
+    vbox->addWidget(durationGroupBox);
+    vbox->addWidget(reasonLabel);
+    vbox->addWidget(reasonEdit);
+    vbox->addWidget(visibleReasonLabel);
+    vbox->addWidget(visibleReasonEdit);
+    vbox->addWidget(deleteMessages);
+    vbox->addLayout(buttonLayout);
+
+    setLayout(vbox);
+    setWindowTitle(tr("Ban user from server"));
+}
+
+WarningDialog::WarningDialog(const QString &userName, const QString &clientID, QWidget *parent) : QDialog(parent)
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+    descriptionLabel = new QLabel(tr("Which warning would you like to send?"));
+    nameWarning = new QLineEdit(userName);
+    nameWarning->setMaxLength(MAX_NAME_LENGTH);
+    warnClientID = new QLineEdit(clientID);
+    warnClientID->setMaxLength(MAX_NAME_LENGTH);
+    warningOption = new QComboBox();
+    warningOption->addItem("", "");
+
+    deleteMessages = new QCheckBox(tr("Redact all messages from this user in all rooms"));
+
+    QPushButton *okButton = new QPushButton(tr("&OK"));
+    okButton->setAutoDefault(true);
+    connect(okButton, &QPushButton::clicked, this, &WarningDialog::okClicked);
+    QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+    connect(cancelButton, &QPushButton::clicked, this, &WarningDialog::reject);
+
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(okButton);
+    buttonLayout->addWidget(cancelButton);
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(descriptionLabel);
+    vbox->addWidget(nameWarning);
+    vbox->addWidget(warningOption);
+    vbox->addWidget(deleteMessages);
+    vbox->addLayout(buttonLayout);
+    setLayout(vbox);
+    setWindowTitle(tr("Warn user for misconduct"));
+}
+
+void WarningDialog::okClicked()
+{
+    if (nameWarning->text().simplified().isEmpty()) {
+        QMessageBox::critical(this, tr("Error"),
+                              tr("User name to send a warning to can not be blank, please specify a user to warn."));
+        return;
+    }
+
+    if (warningOption->currentData().toString().simplified().isEmpty()) {
+        QMessageBox::critical(this, tr("Error"),
+                              tr("Warning to use can not be blank, please select a valid warning to send."));
+        return;
+    }
+
+    accept();
+}
+
+QString WarningDialog::getName() const
+{
+    return nameWarning->text().simplified();
+}
+
+QString WarningDialog::getWarnID() const
+{
+    return warnClientID->text().simplified();
+}
+
+QString WarningDialog::getReason() const
+{
+    return warningOption->currentData().toString().simplified();
+}
+
+int WarningDialog::getDeleteMessages() const
+{
+    return deleteMessages->isChecked() ? -1 : 0;
+}
+
+void WarningDialog::addWarningOption(const QString &warning, int startingIl)
+{
+    if (startingIl > 1) {
+        warningOption->addItem(tr("%1 (IL %2)").arg(warning).arg(startingIl), warning);
+    } else {
+        warningOption->addItem(warning, warning);
+    }
+}
+
+void BanDialog::okClicked()
+{
+    if (!nameBanCheckBox->isChecked() && !ipBanCheckBox->isChecked() && !idBanCheckBox->isChecked()) {
+        QMessageBox::critical(this, tr("Error"),
+                              tr("You have to select a name-based, IP-based, clientId based, or some combination of "
+                                 "the three to place a ban."));
+        return;
+    }
+
+    if (nameBanCheckBox->isChecked()) {
+        if (nameBanEdit->text().simplified() == "") {
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("You must have a value in the name ban when selecting the name ban checkbox."));
+            return;
+        }
+    }
+
+    if (ipBanCheckBox->isChecked()) {
+        if (ipBanEdit->text().simplified() == "") {
+            QMessageBox::critical(this, tr("Error"),
+                                  tr("You must have a value in the ip ban when selecting the ip ban checkbox."));
+            return;
+        }
+    }
+
+    if (idBanCheckBox->isChecked()) {
+        if (idBanEdit->text().simplified() == "") {
+            QMessageBox::critical(
+                this, tr("Error"),
+                tr("You must have a value in the clientid ban when selecting the clientid ban checkbox."));
+            return;
+        }
+    }
+
+    accept();
+}
+
+void BanDialog::enableTemporaryEdits(bool enabled)
+{
+    daysLabel->setEnabled(enabled);
+    daysEdit->setEnabled(enabled);
+    hoursLabel->setEnabled(enabled);
+    hoursEdit->setEnabled(enabled);
+    minutesLabel->setEnabled(enabled);
+    minutesEdit->setEnabled(enabled);
+}
+
+QString BanDialog::getBanId() const
+{
+    return idBanCheckBox->isChecked() ? idBanEdit->text() : QString();
+}
+
+QString BanDialog::getBanName() const
+{
+    return nameBanCheckBox->isChecked() ? nameBanEdit->text() : QString();
+}
+
+QString BanDialog::getBanIP() const
+{
+    return ipBanCheckBox->isChecked() ? ipBanEdit->text() : QString();
+}
+
+int BanDialog::getMinutes() const
+{
+    return permanentRadio->isChecked() ? 0
+                                       : (daysEdit->value() * 24 * 60 + hoursEdit->value() * 60 + minutesEdit->value());
+}
+
+QString BanDialog::getReason() const
+{
+    return reasonEdit->toPlainText();
+}
+
+QString BanDialog::getVisibleReason() const
+{
+    return visibleReasonEdit->toPlainText();
+}
+
+int BanDialog::getDeleteMessages() const
+{
+    return deleteMessages->isChecked() ? -1 : 0;
+}
+
+AdminNotesDialog::AdminNotesDialog(const QString &_userName, const QString &_notes, QWidget *_parent)
+    : QDialog(_parent), userName(_userName)
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+
+    auto *updateButton = new QPushButton(tr("Update Notes"));
+    updateButton->setEnabled(false);
+    connect(updateButton, &QPushButton::clicked, this, &AdminNotesDialog::accept);
+
+    notes = new QPlainTextEdit(_notes);
+    notes->setMinimumWidth(500);
+    connect(notes, &QPlainTextEdit::textChanged, this, [=]() { updateButton->setEnabled(true); });
+
+    auto *vbox = new QVBoxLayout;
+    vbox->addWidget(notes);
+    vbox->addWidget(updateButton);
+
+    setLayout(vbox);
+    setWindowTitle(tr("Admin Notes for %1").arg(_userName));
+}
+
+QString AdminNotesDialog::getNotes() const
+{
+    return notes->toPlainText();
+}
