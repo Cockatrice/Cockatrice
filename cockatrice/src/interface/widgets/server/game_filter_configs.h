@@ -19,7 +19,7 @@ struct GameFilterConfigs
     bool hideNotBuddyCreatedGames = false;
     bool hideOpenDecklistGames = false;
     QString gameNameFilter = "";
-    QStringList creatorNameFilters = {};
+    QStringList hostNameFilters = {};
     QSet<int> gameTypeFilter = {};
     int maxPlayersFilterMin = DEFAULT_MAX_PLAYERS_MIN;
     int maxPlayersFilterMax = DEFAULT_MAX_PLAYERS_MAX;

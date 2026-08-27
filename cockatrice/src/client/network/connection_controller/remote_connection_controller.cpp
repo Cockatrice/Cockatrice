@@ -44,6 +44,8 @@ void ConnectionController::wireClientSignals()
 
     connect(remoteClient, &RemoteClient::statusChanged, this, &ConnectionController::onStatusChanged);
 
+    connect(remoteClient, &AbstractClient::pingStatsUpdated, this, &ConnectionController::pingStatsUpdated);
+
     connect(remoteClient, &RemoteClient::userInfoChanged, this, &ConnectionController::onUserInfoReceived,
             Qt::BlockingQueuedConnection);
 
@@ -292,6 +294,15 @@ void ConnectionController::onLoginError(int r,
                 remoteClient->activateToServer(token);
                 return;
             }
+            remoteClient->disconnectFromServer();
+            return;
+        }
+
+        case Response::RespPasswordChangeRequired: {
+            QMessageBox::information(
+                dialogParent, tr("Password Change Required"),
+                tr("An administrator has reset your password. Please contact your server administrator to obtain "
+                   "your temporary password, then log in and change it via Account -> Change Password."));
             remoteClient->disconnectFromServer();
             return;
         }

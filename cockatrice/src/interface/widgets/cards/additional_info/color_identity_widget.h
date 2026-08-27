@@ -30,6 +30,8 @@ public slots:
 private:
     QString colorIdentity;
     QHBoxLayout *layout;
+    int lastIconSize = -1; ///< The symbol size last applied, to skip redundant resize passes.
+    int lastWidth = -1;    ///< The width last processed, to skip redundant resize passes.
 };
 
 #endif // COLOR_IDENTITY_WIDGET_H

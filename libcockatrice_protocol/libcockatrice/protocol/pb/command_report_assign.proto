@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "moderator_commands.proto";
+
+message Command_ReportAssign {
+    extend ModeratorCommand {
+        optional Command_ReportAssign ext = 1201;
+    }
+    required int32 report_id = 1;
+}

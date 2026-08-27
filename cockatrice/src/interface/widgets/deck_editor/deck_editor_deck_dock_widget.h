@@ -15,11 +15,15 @@
 #include "deck_list_history_manager_widget.h"
 #include "deck_list_style_proxy.h"
 
+#include <QCheckBox>
+#include <QComboBox>
 #include <QDockWidget>
 #include <QLabel>
+#include <QPushButton>
 #include <QTextEdit>
 #include <QTreeView>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/deck_list/deck_list.h>
 
 class CommanderBracketWidget;
 class DeckListModel;
@@ -33,6 +37,8 @@ public:
     DeckListStyleProxy *proxy;
     QTreeView *deckView;
     QComboBox *bannerCardComboBox;
+    QLabel *playmatLabel;
+    QPushButton *playmatSettingsButton;
     void createDeckDock();
     ExactCard getCurrentCard();
     void retranslateUi();
@@ -102,6 +108,8 @@ private slots:
     void writeName();
     void writeComments();
     void writeBannerCard(int);
+    void openPlaymatSettings();
+    void updatePlaymatLabel();
     void applyActiveGroupCriteria();
     void setSelectedIndex(const QModelIndex &newCardIndex, bool preserveWidgetFocus);
     void updateHash();

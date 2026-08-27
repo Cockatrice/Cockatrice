@@ -66,7 +66,14 @@ protected:
 
 public:
     bool isBuiltInTheme();
-    bool isDarkMode(const QString &themeDirPath);
+    // Explicit color scheme of the theme: theme.cfg's ColorScheme setting
+    // (Dark/Light), falling back to the OS color scheme when it is "System".
+    bool isDarkMode(const QString &themeDirPath) const;
+    // The resolved scheme of the currently active theme.
+    bool isDarkModeActive() const
+    {
+        return isDarkMode(currentThemePath);
+    }
     QStringMap &getAvailableThemes();
     // Returns the path to the currently active theme directory (empty = default)
     QString getCurrentThemePath() const
@@ -84,6 +91,10 @@ public:
     // theme directory when it is absent from the resolved (user) directory.
     static PaletteConfig
     loadDefaultPaletteConfig(const QString &themeDirPath, const QString &themeName, const QString &colorScheme);
+    /** @brief Writes cfg to disk as the theme's palette-<scheme>.toml and updates the
+     *         theme's stored colour scheme to match. Shared by PaletteEditorDialog::onSave
+     *         and FirstRunWizard's theme step so the two "generate + keep" paths can't drift. */
+    static bool commitPalette(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg);
     void setColorScheme(const QString &scheme);
     void setStyleName(const QString &styleName);
 

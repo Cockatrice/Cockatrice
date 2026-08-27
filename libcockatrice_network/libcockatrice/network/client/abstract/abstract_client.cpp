@@ -1,6 +1,7 @@
 #include "abstract_client.h"
 
 #include <google/protobuf/descriptor.h>
+#include <libcockatrice/protocol/debug_pb_message.h>
 #include <libcockatrice/protocol/featureset.h>
 #include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/commands.pb.h>
@@ -28,6 +29,7 @@ AbstractClient::AbstractClient(QObject *parent)
     qRegisterMetaType<Response>("Response");
     qRegisterMetaType<Response::ResponseCode>("Response::ResponseCode");
     qRegisterMetaType<ClientStatus>("ClientStatus");
+    qRegisterMetaType<LatencyTracker::Stats>("LatencyTracker::Stats");
     qRegisterMetaType<RoomEvent>("RoomEvent");
     qRegisterMetaType<GameEventContainer>("GameEventContainer");
     qRegisterMetaType<Event_ServerIdentification>("Event_ServerIdentification");
@@ -70,6 +72,8 @@ void AbstractClient::processProtocolItem(const ServerMessage &item)
                 return;
             }
             pendingCommands.remove(cmdId);
+
+            recordLatency(*pend);
 
             pend->processResponse(response);
             pend->deleteLater();
@@ -161,7 +165,60 @@ void AbstractClient::queuePendingCommand(PendingCommand *pend)
 
     pendingCommands.insert(cmdId, pend);
 
+    pend->startTiming();
     sendCommandContainer(pend->getCommandContainer());
+}
+
+namespace
+{
+constexpr int STATS_EMIT_INTERVAL_MS = 1000;
+// Game actions are what players perceive as lag. Surface unusually slow ones
+// without requiring debug logging to be enabled.
+constexpr qint64 SLOW_GAME_COMMAND_WARN_MS = 1500;
+} // namespace
+
+void AbstractClient::recordLatency(PendingCommand &pend)
+{
+    const qint64 elapsed = pend.elapsedMs();
+    if (elapsed < 0) {
+        return;
+    }
+
+    latencyTracker.addSample(elapsed);
+
+    if (AbstractClientLog().isDebugEnabled()) {
+        qCDebug(AbstractClientLog).noquote()
+            << "command RTT:" << elapsed << "ms (cmd_id" << pend.getCommandContainer().cmd_id() << ")";
+    }
+
+    if (elapsed >= SLOW_GAME_COMMAND_WARN_MS && pend.getCommandContainer().game_command_size() > 0) {
+        qCWarning(AbstractClientLog).noquote()
+            << "slow game command round trip:" << elapsed << "ms | " << getSafeDebugString(pend.getCommandContainer());
+    }
+
+    // Emit aggregated stats at most once per StatsEmitIntervalMs so that the
+    // per-command hot path stays free of signal traffic. The keepalive ping
+    // guarantees a fresh sample roughly every second while connected.
+    if (!statsEmitClockStarted || statsEmitClock.elapsed() >= STATS_EMIT_INTERVAL_MS) {
+        statsEmitClock.start();
+        statsEmitClockStarted = true;
+        const LatencyTracker::Stats stats = latencyTracker.stats();
+
+        QList<int> samples;
+        samples.reserve(stats.sampleCount);
+        for (qint64 sample : latencyTracker.recentSamples()) {
+            samples.append(static_cast<int>(sample));
+        }
+
+        emit pingStatsUpdated(stats, samples);
+    }
+}
+
+void AbstractClient::clearLatencyStats()
+{
+    latencyTracker.clear();
+    statsEmitClockStarted = false;
+    emit pingStatsUpdated(LatencyTracker::Stats{}, {});
 }
 
 PendingCommand *AbstractClient::prepareSessionCommand(const ::google::protobuf::Message &cmd)

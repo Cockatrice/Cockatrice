@@ -53,6 +53,7 @@ message Response {
         RespClientUpdateRequired = 35; // Client is missing features that the server is requiring
         RespServerFull = 36;           // Server user limit reached
         RespEmailBlackListed = 37;     // Server has blocked the email address provided for registration for some reason
+        RespPasswordChangeRequired = 38; // Server requires the user to change their password before proceeding
     }
 
     // Type of response, used to route handling on the client

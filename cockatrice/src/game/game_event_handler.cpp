@@ -229,7 +229,11 @@ void GameEventHandler::handleArrowDeletion(int creatorId, int arrowId)
 
 void GameEventHandler::handleArrowDeletionFinished(const Response &response, int creatorId, int arrowId)
 {
-    if (response.response_code() == Response::RespNameNotFound) {
+    // The server confirms the arrow no longer exists whether it deleted it itself
+    // (RespOk, followed by an Event_DeleteArrow broadcast) or never had it
+    // (RespNameNotFound). In both cases the local copy has to go. deleteArrow is
+    // a no-op if the arrow was already removed by the event broadcast.
+    if (response.response_code() == Response::RespOk || response.response_code() == Response::RespNameNotFound) {
         emit arrowDeleted(creatorId, arrowId);
     }
 }
@@ -281,10 +285,17 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
                 emit playerJoined(prop);
             }
             player->processPlayerInfo(playerInfo);
+            // Extract playmat from player properties for opponent display
+            if (prop.has_playmat_params()) {
+                player->setPlaymatFromProperties(prop);
+            }
             if (player->getPlayerInfo()->getLocal()) {
                 emit localPlayerDeckSelected(player, playerId, playerInfo);
             } else {
                 if (!game->getGameMetaInfo()->proto().share_decklists_on_load()) {
+                    continue;
+                }
+                if (!playerInfo.has_deck_list()) {
                     continue;
                 }
 
@@ -343,6 +354,11 @@ void GameEventHandler::eventPlayerPropertiesChanged(const Event_PlayerProperties
     }
     const ServerInfo_PlayerProperties &prop = event.player_properties();
     emit playerPropertiesChanged(prop, eventPlayerId);
+
+    // Update playmat from player properties
+    if (prop.has_playmat_params()) {
+        player->setPlaymatFromProperties(prop);
+    }
 
     const auto contextType = static_cast<GameEventContext::ContextType>(getPbExtension(context));
     switch (contextType) {

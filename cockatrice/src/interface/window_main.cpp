@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "window_main.h"
 
+#include "../client/latency_status_widget.h"
 #include "../client/network/update/client/client_update_checker.h"
 #include "../client/network/update/client/release_channel.h"
 #include "../client/settings/cache_settings.h"
@@ -31,9 +32,17 @@
 #include "../interface/widgets/dialogs/dlg_tip_of_the_day.h"
 #include "../interface/widgets/dialogs/dlg_update.h"
 #include "../interface/widgets/dialogs/dlg_view_log.h"
+#include "../interface/widgets/onboarding/first_run_wizard.h"
 #include "../interface/widgets/tabs/tab_game.h"
+#include "../interface/widgets/tabs/tab_server.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../main.h"
+#include "intents/contexts/context_connect_to_server.h"
+#include "intents/contexts/context_join_room.h"
+#include "intents/intent_connect_to_server.h"
+#include "intents/intent_login.h"
+#include "intents/intent_open_server_room_by_name.h"
+#include "intents/url_parser.h"
 #include "logger.h"
 #include "version_string.h"
 #include "widgets/dialogs/dlg_connect.h"
@@ -49,6 +58,7 @@
 #include <QDesktopServices>
 #include <QFile>
 #include <QFileDialog>
+#include <QLabel>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -77,6 +87,7 @@
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/servers_settings.h>
+#include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 
 #define GITHUB_PAGES_URL "https://cockatrice.github.io"
@@ -340,6 +351,7 @@ void MainWindow::retranslateUi()
     aStatusBar->setText(tr("Show Status Bar"));
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
+    aFirstRunWizard->setText(tr("Re-run Onboarding Wizard..."));
 
     aShow->setText(tr("Show/Hide"));
 
@@ -401,6 +413,8 @@ void MainWindow::createActions()
     connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
     aOpenSettingsFolder = new QAction(this);
     connect(aOpenSettingsFolder, &QAction::triggered, this, &MainWindow::actOpenSettingsFolder);
+    aFirstRunWizard = new QAction(this);
+    connect(aFirstRunWizard, &QAction::triggered, this, [this] { runFirstRunWizard(); });
 
     aShow = new QAction(this);
     connect(aShow, &QAction::triggered, this, &MainWindow::actShow);
@@ -479,6 +493,8 @@ void MainWindow::createMenus()
     helpMenu->addAction(aStatusBar);
     helpMenu->addAction(aViewLog);
     helpMenu->addAction(aOpenSettingsFolder);
+    helpMenu->addSeparator();
+    helpMenu->addAction(aFirstRunWizard);
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -490,6 +506,7 @@ MainWindow::MainWindow(QWidget *parent)
     pixmapCacheSizeChanged(SettingsCache::instance().cacheStorage().getPixmapCacheSize());
 
     connectionController = new ConnectionController(this, this);
+    urlParser = new IntentUrlParser(this, this);
 
     createActions();
     createMenus();
@@ -501,6 +518,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(tabSupervisor, &TabSupervisor::setMenu, this, &MainWindow::updateTabMenu);
     connect(tabSupervisor, &TabSupervisor::localGameEnded, this, &MainWindow::localGameEnded);
     connect(tabSupervisor, &TabSupervisor::showWindowIfHidden, this, &MainWindow::showWindowIfHidden);
+    connect(tabSupervisor, &TabSupervisor::cockatriceLinkActivated, this, &MainWindow::handleCockatriceLink);
     connect(connectionController, &ConnectionController::tabSupervisorStartRequested, tabSupervisor,
             &TabSupervisor::start);
     connect(connectionController, &ConnectionController::tabSupervisorStopRequested, tabSupervisor,
@@ -525,6 +543,12 @@ MainWindow::MainWindow(QWidget *parent)
             [this](bool show) { statusBar()->setVisible(show); });
     statusBar()->setVisible(SettingsCache::instance().userInterface().getShowStatusBar());
 
+    latencyStatus = new LatencyStatusWidget(this);
+    statusBar()->addPermanentWidget(latencyStatus);
+
+    connect(connectionController, &ConnectionController::pingStatsUpdated, latencyStatus,
+            &LatencyStatusWidget::updateData);
+
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &MainWindow::refreshShortcuts);
     refreshShortcuts();
@@ -540,6 +564,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // run startup check async
     QTimer::singleShot(0, this, &MainWindow::startupConfigCheck);
+    QTimer::singleShot(0, this, &MainWindow::applyStartupDestination);
 }
 
 void MainWindow::startupConfigCheck()
@@ -566,9 +591,10 @@ void MainWindow::startupConfigCheck()
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
             << "Startup: old client version empty, assuming first start after clean install";
-        alertForcedOracleRun(VERSION_STRING, false);
         SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
         SettingsCache::instance().network().setClientVersion(VERSION_STRING);
+        actCheckServerUpdates();
+        runFirstRunWizard();
 
         if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
             SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
@@ -646,6 +672,97 @@ void MainWindow::startupConfigCheck()
             tip->show();
         }
     }
+}
+
+void MainWindow::runFirstRunWizard()
+{
+    auto *wizard = new FirstRunWizard(this);
+    wizard->setAttribute(Qt::WA_DeleteOnClose);
+
+    connect(wizard, &FirstRunWizard::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdatesBackground);
+    connect(wizard, &FirstRunWizard::manualCardDatabaseSetupRequested, this, &MainWindow::actCheckCardUpdates);
+    connect(this, &MainWindow::cardDatabaseUpdateFinished, wizard, &FirstRunWizard::onCardDatabaseUpdateFinished);
+    connect(wizard, &FirstRunWizard::registerRequested, connectionController, &ConnectionController::registerToServer);
+    connect(wizard, &FirstRunWizard::connectRequested, connectionController, &ConnectionController::connectToServer);
+
+    wizard->setModal(true);
+    wizard->show();
+}
+
+/**
+ * Drives the server-based startup destinations (Server lobby, Server Room) through the intent
+ * system: fetch saved credentials, connect to the configured server, then land on the Lobby or
+ * join the configured room by name.
+ */
+void MainWindow::applyStartupDestination()
+{
+    // An explicit command-line connect takes precedence over the startup destination.
+    if (!connectTo.isEmpty()) {
+        return;
+    }
+
+    const int destination = SettingsCache::instance().tabs().getStartupTabIndex();
+    if (destination != StartupTab::StartupTabServer && destination != StartupTab::StartupTabServerRoom) {
+        return;
+    }
+
+    const QString host = SettingsCache::instance().tabs().getStartupServerHost();
+    const QString port = SettingsCache::instance().tabs().getStartupServerPort();
+    if (host.isEmpty() || port.isEmpty()) {
+        qCWarning(WindowMainStartupLog) << "Startup destination needs a configured server";
+        return;
+    }
+
+    auto serverContext = std::make_shared<ContextConnectToServer>();
+    serverContext->hostname = host;
+    serverContext->port = port;
+
+    auto *credentials = new IntentGetLoginCredentials(serverContext.get());
+    auto *connector = new IntentConnectToServer(getRemoteClient(), serverContext.get());
+
+    connect(credentials, &Intent::finished, connector, &Intent::execute);
+    connect(credentials, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+    connect(connector, &Intent::finished, this,
+            [this, destination, serverContext]() { onStartupDestinationConnected(destination, *serverContext); });
+    connect(connector, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+
+    credentials->execute();
+}
+
+void MainWindow::onStartupDestinationConnected(int destination, const ContextConnectToServer &serverContext)
+{
+    // The server tab must exist: it is what requests the room list.
+    if (!tabSupervisor->getTabServer()) {
+        tabSupervisor->openTabServer();
+    }
+
+    if (destination == StartupTab::StartupTabServerRoom) {
+        auto roomContext = std::make_unique<ContextJoinRoom>();
+        roomContext->serverContext = serverContext;
+        auto *roomIntent = new IntentOpenServerRoomByName(tabSupervisor, getRemoteClient(), std::move(roomContext),
+                                                          SettingsCache::instance().tabs().getStartupRoomName());
+        roomIntent->setParent(this);
+        connect(roomIntent, &Intent::failed, this, &MainWindow::startupDestinationFailed);
+        roomIntent->execute();
+        return;
+    }
+
+    if (tabSupervisor->getTabServer()) {
+        tabSupervisor->setCurrentWidget(tabSupervisor->getTabServer());
+    } else {
+        qCWarning(WindowMainStartupLog) << "Startup destination: server tab could not be opened";
+    }
+}
+
+void MainWindow::startupDestinationFailed(const QString &reason)
+{
+    qCWarning(WindowMainStartupLog) << "Startup destination failed:" << reason;
+}
+
+bool MainWindow::startupDestinationConnectsToServer() const
+{
+    const int destination = SettingsCache::instance().tabs().getStartupTabIndex();
+    return destination == StartupTab::StartupTabServer || destination == StartupTab::StartupTabServerRoom;
 }
 
 void MainWindow::alertForcedOracleRun(const QString &version, bool isUpdate)
@@ -750,7 +867,8 @@ void MainWindow::changeEvent(QEvent *event)
                 connectionController->connectToServerDirect(connectTo.host(), connectTo.port(), connectTo.userName(),
                                                             connectTo.password());
             } else if (SettingsCache::instance().servers().getAutoConnect() &&
-                       !SettingsCache::instance().debug().getLocalGameOnStartup()) {
+                       !SettingsCache::instance().debug().getLocalGameOnStartup() &&
+                       !startupDestinationConnectsToServer()) {
                 qCInfo(WindowMainStartupAutoconnectLog) << "Attempting auto-connect...";
                 DlgConnect dlg(this);
                 connectionController->connectToServerDirect(dlg.getHost(), static_cast<unsigned int>(dlg.getPort()),
@@ -774,6 +892,11 @@ void MainWindow::showWindowIfHidden()
     // keep the previous window state
     setWindowState(windowState() & ~Qt::WindowMinimized);
     show();
+}
+
+void MainWindow::handleCockatriceLink(const QString &url)
+{
+    urlParser->handle(url);
 }
 
 void MainWindow::cardDatabaseLoadingFailed()
@@ -927,6 +1050,7 @@ void MainWindow::createCardUpdateProcess(bool background)
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
         exitCardDatabaseUpdate();
+        emit cardDatabaseUpdateFinished(false);
         return;
     }
 
@@ -940,6 +1064,9 @@ void MainWindow::createCardUpdateProcess(bool background)
 
 void MainWindow::exitCardDatabaseUpdate()
 {
+    if (!cardUpdateProcess) {
+        return;
+    }
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = nullptr;
     statusBar()->clearMessage();
@@ -977,14 +1104,17 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
 
     exitCardDatabaseUpdate();
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:\n%1").arg(error));
+    emit cardDatabaseUpdateFinished(false);
 }
 
-void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus exitStatus)
+void MainWindow::cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    const bool success = (exitStatus == QProcess::NormalExit) && (exitCode == 0);
     if (exitStatus == QProcess::NormalExit) {
         SettingsCache::instance().updates().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
     }
     exitCardDatabaseUpdate();
+    emit cardDatabaseUpdateFinished(success);
 }
 
 void MainWindow::actCheckServerUpdates()

@@ -390,6 +390,7 @@ int main(int argc, char *argv[])
     PingPixmapGenerator::clear();
     CountryPixmapGenerator::clear();
     UserLevelPixmapGenerator::clear();
+    ManaSymbolPixmapGenerator::clear();
 
     return ret;
 }

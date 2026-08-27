@@ -17,12 +17,26 @@ enum GameListColumn
     ROOM,
     CREATED,
     DESCRIPTION,
-    CREATOR,
+    HOST,
     GAME_TYPE,
     RESTRICTIONS,
     PLAYERS,
     SPECTATORS
 };
+
+namespace
+{
+/**
+ * @brief Returns the user info of the game's current host, falling back to the creator.
+ *
+ * The server only sends host_info once a host transfer has happened, so older
+ * servers and freshly created games fall back to the original creator.
+ */
+const ServerInfo_User &getGameHost(const ServerInfo_Game &game)
+{
+    return game.has_host_info() ? game.host_info() : game.creator_info();
+}
+} // namespace
 
 const QString GamesModel::getGameCreatedString(const int secs)
 {
@@ -110,16 +124,16 @@ QVariant GamesModel::data(const QModelIndex &index, int role) const
                 default:
                     return QVariant();
             }
-        case CREATOR: {
+        case HOST: {
             switch (role) {
                 case SORT_ROLE:
                 case Qt::DisplayRole:
-                    return QString::fromStdString(gameentry.creator_info().name());
+                    return QString::fromStdString(getGameHost(gameentry).name());
                 case Qt::DecorationRole: {
-                    return UserLevelPixmapGenerator::generateIcon(
-                        13, UserLevelFlags(gameentry.creator_info().user_level()),
-                        gameentry.creator_info().pawn_colors(), false,
-                        QString::fromStdString(gameentry.creator_info().privlevel()));
+                    const ServerInfo_User &host = getGameHost(gameentry);
+                    return UserLevelPixmapGenerator::generateIcon(13, UserLevelFlags(host.user_level()),
+                                                                  host.pawn_colors(), false,
+                                                                  QString::fromStdString(host.privlevel()));
                 }
                 default:
                     return QVariant();
@@ -233,8 +247,8 @@ QVariant GamesModel::headerData(int section, Qt::Orientation /*orientation*/, in
         }
         case DESCRIPTION:
             return tr("Description");
-        case CREATOR:
-            return tr("Creator");
+        case HOST:
+            return tr("Host");
         case GAME_TYPE:
             return tr("Type");
         case RESTRICTIONS:
@@ -271,6 +285,9 @@ void GamesModel::updateGameList(const ServerInfo_Game &game)
                 gameList.removeAt(i);
                 endRemoveRows();
             } else {
+                // MergeFrom concatenates repeated fields instead of replacing them,
+                // so clear game_types first to avoid duplicated entries.
+                gameList[i].clear_game_types();
                 gameList[i].MergeFrom(game);
                 emit dataChanged(index(i, 0), index(i, NUM_COLS - 1));
             }
@@ -347,7 +364,7 @@ void GamesProxyModel::loadFilterParameters(const QMap<int, QString> &allGameType
                     gameFilters.isHideFullGames(), gameFilters.isHideGamesThatStarted(),
                     gameFilters.isHidePasswordProtectedGames(), gameFilters.isHideNotBuddyCreatedGames(),
                     gameFilters.isHideOpenDecklistGames(), gameFilters.getGameNameFilter(),
-                    gameFilters.getCreatorNameFilters(), newGameTypeFilter, gameFilters.getMinPlayers(),
+                    gameFilters.getHostNameFilters(), newGameTypeFilter, gameFilters.getMinPlayers(),
                     gameFilters.getMaxPlayers(), gameFilters.getMaxGameAge(),
                     gameFilters.isShowOnlyIfSpectatorsCanWatch(), gameFilters.isShowSpectatorPasswordProtected(),
                     gameFilters.isShowOnlyIfSpectatorsCanChat(), gameFilters.isShowOnlyIfSpectatorsCanSeeHands()});
@@ -364,7 +381,7 @@ void GamesProxyModel::saveFilterParameters(const QMap<int, QString> &allGameType
     gameFilters.setHideNotBuddyCreatedGames(filters.hideNotBuddyCreatedGames);
     gameFilters.setHideOpenDecklistGames(filters.hideOpenDecklistGames);
     gameFilters.setGameNameFilter(filters.gameNameFilter);
-    gameFilters.setCreatorNameFilters(filters.creatorNameFilters);
+    gameFilters.setHostNameFilters(filters.hostNameFilters);
 
     QMapIterator<int, QString> gameTypeIterator(allGameTypes);
     while (gameTypeIterator.hasNext()) {
@@ -409,11 +426,11 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
         return false;
     }
     if (filters.hideIgnoredUserGames &&
-        userListProxy->isUserIgnored(QString::fromStdString(game.creator_info().name()))) {
+        userListProxy->isUserIgnored(QString::fromStdString(getGameHost(game).name()))) {
         return false;
     }
     if (filters.hideNotBuddyCreatedGames &&
-        !userListProxy->isUserBuddy(QString::fromStdString(game.creator_info().name()))) {
+        !userListProxy->isUserBuddy(QString::fromStdString(getGameHost(game).name()))) {
         return false;
     }
     if (filters.hideFullGames && game.player_count() == game.max_players()) {
@@ -435,10 +452,10 @@ bool GamesProxyModel::filterAcceptsRow(int sourceRow) const
             return false;
         }
     }
-    if (!filters.creatorNameFilters.isEmpty()) {
+    if (!filters.hostNameFilters.isEmpty()) {
         bool found = false;
-        for (const auto &createNameFilter : filters.creatorNameFilters) {
-            if (QString::fromStdString(game.creator_info().name()).contains(createNameFilter, Qt::CaseInsensitive)) {
+        for (const auto &hostNameFilter : filters.hostNameFilters) {
+            if (QString::fromStdString(getGameHost(game).name()).contains(hostNameFilter, Qt::CaseInsensitive)) {
                 found = true;
             }
         }

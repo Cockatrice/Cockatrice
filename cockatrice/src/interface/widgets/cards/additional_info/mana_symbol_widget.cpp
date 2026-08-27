@@ -1,15 +1,15 @@
 #include "mana_symbol_widget.h"
 
 #include "../../../../client/settings/cache_settings.h"
+#include "../../../pixel_map_generator.h"
 
 #include <QResizeEvent>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 
 ManaSymbolWidget::ManaSymbolWidget(QWidget *parent, QString _symbol, bool _isActive, bool _mayBeToggled)
-    : QLabel(parent), symbol(_symbol), isActive(_isActive), mayBeToggled(_mayBeToggled)
+    : QLabel(parent), symbol(std::move(_symbol)), isActive(_isActive), mayBeToggled(_mayBeToggled)
 {
-    loadManaIcon();
-    setPixmap(manaIcon.scaled(50, 50, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    setPixmap(ManaSymbolPixmapGenerator::generatePixmap(symbol, QSize(50, 50)));
     setMaximumWidth(50);
 
     // Initialize opacity effect
@@ -64,16 +64,13 @@ void ManaSymbolWidget::mousePressEvent(QMouseEvent *event)
 void ManaSymbolWidget::resizeEvent(QResizeEvent *event)
 {
     QLabel::resizeEvent(event);
-    setPixmap(manaIcon.scaled(event->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-}
+    const QSize newSize = event->size();
 
-void ManaSymbolWidget::loadManaIcon()
-{
-    QString filename = "theme:icons/mana/";
-
-    if (symbol == "W" || symbol == "U" || symbol == "B" || symbol == "R" || symbol == "G") {
-        filename += symbol;
+    // Skip the rescale when the size didn't actually change: layout passes resize these
+    // widgets repeatedly with identical sizes.
+    if (newSize.isEmpty() || pixmap().size() == newSize) {
+        return;
     }
 
-    manaIcon = QPixmap(filename);
+    setPixmap(ManaSymbolPixmapGenerator::generatePixmap(symbol, newSize));
 }

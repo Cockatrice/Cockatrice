@@ -20,6 +20,9 @@ public:
     GeneralSettingsPage();
     void retranslateUi() override;
 
+    static QStringList findQmFiles();
+    static QString languageName(const QString &lang);
+
 private slots:
     void deckPathButtonClicked();
     void filtersPathButtonClicked();
@@ -30,11 +33,9 @@ private slots:
     void tokenDatabasePathButtonClicked();
     void resetAllPathsClicked();
     void languageBoxChanged(int index);
+    void updateStartupServerControlsVisibility();
 
 private:
-    QStringList findQmFiles();
-    QString languageName(const QString &lang);
-
     QGroupBox *languageGroupBox;
     QGroupBox *versionGroupBox;
     QGroupBox *cardDatabaseGroupBox;
@@ -71,6 +72,12 @@ private:
     QLabel updateReleaseChannelLabel;
     QLabel advertiseTranslationPageLabel;
     QCheckBox showTipsOnStartup;
+    QLabel startupTabLabel;
+    QComboBox startupTabSelector;
+    QLabel startupServerLabel;
+    QComboBox startupServerSelector;
+    QLabel startupRoomLabel;
+    QLineEdit *startupRoomNameEdit;
 };
 
 #endif // COCKATRICE_GENERAL_SETTINGS_PAGE_H

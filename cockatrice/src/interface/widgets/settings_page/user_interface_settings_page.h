@@ -7,6 +7,7 @@
 #include <QComboBox>
 #include <QGroupBox>
 #include <QLabel>
+#include <QPushButton>
 #include <QSpinBox>
 #include <QToolButton>
 #include <libcockatrice/settings/cards_display_settings.h>
@@ -17,6 +18,8 @@ class UserInterfaceSettingsPage : public AbstractSettingsPage
     Q_OBJECT
 private slots:
     void setNotificationEnabled(QT_STATE_CHANGED_T);
+    void enableAllAnimations();
+    void disableAllAnimations();
     void updateCommanderSpellbookUiState();
 
 private:
@@ -34,7 +37,12 @@ private:
     QCheckBox showTotalSelectionCountCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox keepGameChatFocusCheckBox;
+    QPushButton enableAllAnimationsButton;
+    QPushButton disableAllAnimationsButton;
     QCheckBox tapAnimationCheckBox;
+    QCheckBox arrowDrawAnimationCheckBox;
+    QCheckBox lifeCounterAnimationsCheckBox;
+    QCheckBox battlefieldFlashCheckBox;
     QCheckBox openDeckInNewTabCheckBox;
     QLabel visualDeckStoragePromptForConversionLabel;
     QComboBox visualDeckStoragePromptForConversionSelector;
@@ -42,6 +50,8 @@ private:
     QCheckBox visualDeckStorageSelectionAnimationCheckBox;
     QLabel defaultDeckEditorTypeLabel;
     QComboBox defaultDeckEditorTypeSelector;
+    QLabel vdeStartupTabLabel;
+    QComboBox vdeStartupTabSelector;
     QLabel commanderSpellbookIntegrationEnabledLabel;
     QComboBox commanderSpellbookIntegrationEnabledSelector;
     QLabel commanderSpellbookIntegrationUseOfficialBracketNamesLabel;

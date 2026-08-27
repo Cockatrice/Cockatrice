@@ -1,0 +1,13 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message Command_Report {
+    extend SessionCommand {
+        optional Command_Report ext = 1200;
+    }
+    optional string reported_user = 1;
+    optional int32 game_id = 2;
+    optional string category = 3;
+    optional string description = 4;
+    optional string chat_log = 5;
+}

@@ -1,8 +1,11 @@
 #include "player_target.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../game/player/player_logic.h"
 #include "../../interface/pixel_map_generator.h"
+#include "../game_scene.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QPainter>
 #include <QPixmapCache>
@@ -21,17 +24,24 @@ QRectF PlayerCounter::boundingRect() const
 
 void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    const int radius = 8;
-    const qreal border = 1;
-    QPainterPath path(QPointF(50 - border / 2, border / 2));
-    path.lineTo(radius, border / 2);
-    path.arcTo(border / 2, border / 2, 2 * radius, 2 * radius, 90, 90);
-    path.lineTo(border / 2, 30 - border / 2);
-    path.lineTo(50 - border / 2, 30 - border / 2);
-    path.closeSubpath();
+    const int radius = 15;
+    const qreal border = 1.5;
+    // The box is drawn with a border-wide stroke straddling the path, so the
+    // visible outline spans [inset, inset + border]. Fills that must not cover
+    // the outline (e.g. the life-change flash) use a path inset by `border`.
+    const auto makePath = [](qreal inset) {
+        QPainterPath path(QPointF(50 - inset, inset));
+        path.lineTo(radius, inset);
+        path.arcTo(inset, inset, 2 * radius, 2 * radius, 90, 90);
+        path.lineTo(inset, 30 - inset);
+        path.lineTo(50 - inset, 30 - inset);
+        path.closeSubpath();
+        return path;
+    };
+    QPainterPath path = makePath(border / 2);
 
     QPen pen(QColor(100, 100, 100));
-    pen.setWidth(border);
+    pen.setWidthF(border);
     painter->setPen(pen);
     painter->setBrush(hovered ? QColor(50, 50, 50, 160) : QColor(0, 0, 0, 160));
 
@@ -45,6 +55,48 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     painter->setFont(font);
     painter->setPen(Qt::white);
     painter->drawText(translatedRect, Qt::AlignCenter, QString::number(value));
+
+    // Life-change flash: emerald on gain, red on loss, decaying over a few ticks.
+    if (flashAlpha > 0) {
+        painter->save();
+        QColor flashColor = flashDelta > 0 ? QColor(52, 224, 122) : QColor(239, 68, 68);
+        flashColor.setAlphaF(0.45 * flashAlpha);
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(flashColor);
+        painter->setOpacity(0.85);
+        painter->drawPath(makePath(border));
+        painter->restore();
+    }
+}
+
+void PlayerCounter::onValueChanged(int oldValue, int newValue)
+{
+    flashDelta = newValue - oldValue;
+    if (flashDelta == 0) {
+        return;
+    }
+
+    if (!SettingsCache::instance().userInterface().getLifeCounterAnimationsEnabled()) {
+        flashAlpha = 0.0;
+        return;
+    }
+
+    flashAlpha = 1.0;
+    flashClock.start();
+    if (scene()) {
+        static_cast<GameScene *>(scene())->registerAnimationItem(this);
+    }
+}
+
+bool PlayerCounter::animationEvent()
+{
+    flashAlpha = 1.0 - flashClock.elapsed() / flashDurationMs;
+    if (flashAlpha <= 0.0) {
+        flashAlpha = 0.0;
+        return false;
+    }
+    update();
+    return true;
 }
 
 PlayerTarget::PlayerTarget(PlayerLogic *_owner, QGraphicsItem *parentItem)

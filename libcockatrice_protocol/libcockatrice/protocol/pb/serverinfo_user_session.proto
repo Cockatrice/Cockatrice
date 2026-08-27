@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+/**
+ * A single login session of a user on the server, as stored in the
+ * sessions table. Used by the moderation "Get User Sessions" tool.
+ */
+message ServerInfo_UserSession {
+    optional string user_name = 1;       // account that was logged in
+    optional string ip_address = 2;      // IP address used for the session
+    optional string clientid = 3;        // client id used for the session
+    optional uint64 start_time = 4;      // session start, epoch seconds
+    optional uint64 end_time = 5;        // session end, epoch seconds; 0 = still active
+    optional string connection_type = 6; // "tcp" or "websocket"
+}

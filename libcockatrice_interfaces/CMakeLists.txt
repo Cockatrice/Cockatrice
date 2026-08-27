@@ -30,4 +30,4 @@ add_library(libcockatrice_interfaces STATIC ${MOC_SOURCES})
 
 target_include_directories(libcockatrice_interfaces PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(libcockatrice_interfaces PUBLIC ${QT_CORE_MODULE})
+target_link_libraries(libcockatrice_interfaces PUBLIC libcockatrice_utility ${QT_CORE_MODULE})

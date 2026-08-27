@@ -9,6 +9,7 @@
 #define TAB_SUPERVISOR_H
 
 #include "../../deck_loader/deck_loader.h"
+#include "../interface/widgets/server/game_link.h"
 #include "../interface/widgets/server/user/user_list_proxy.h"
 #include "abstract_tab_deck_editor.h"
 #include "api/archidekt/tab_archidekt.h"
@@ -22,6 +23,7 @@
 #include <QLoggingCategory>
 #include <QMap>
 #include <QTabWidget>
+#include <libcockatrice/network/client/abstract/latency_tracker.h>
 
 class TabCardArtRules;
 inline Q_LOGGING_CATEGORY(TabSupervisorLog, "tab_supervisor");
@@ -38,6 +40,8 @@ class TabDeckStorage;
 class TabReplays;
 class TabAdmin;
 class TabMessage;
+class TabReport;
+class TabModeration;
 class TabAccount;
 class TabDeckEditor;
 class TabLog;
@@ -94,6 +98,8 @@ private:
     TabAdmin *tabAdmin;
     TabCardArtRules *tabCardArtRules;
     TabLog *tabLog;
+    TabReport *tabReport;
+    TabModeration *tabModeration;
     QMap<int, TabRoom *> roomTabs;
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
@@ -103,7 +109,7 @@ private:
 
     QAction *aTabHome, *aTabDeckEditor, *aTabVisualDeckEditor, *aTabEdhRec, *aTabArchidekt, *aTabVisualDeckStorage,
         *aTabVisualDatabaseDisplay, *aTabServer, *aTabAccount, *aTabDeckStorage, *aTabReplays, *aTabAdmin,
-        *aTabCardArtRules, *aTabLog;
+        *aTabCardArtRules, *aTabLog, *aTabReport, *aTabModeration;
 
     int myAddTab(Tab *tab, QAction *manager = nullptr);
     void addCloseButtonToTab(Tab *tab, int tabIndex, QAction *manager);
@@ -152,6 +158,8 @@ public:
     {
         return deckEditorTabs;
     }
+    [[nodiscard]] QList<GameInviteOption> getGameInviteLinksForRoom(int roomId) const;
+    void sendInviteToUser(const QString &userName, const QString &inviteText);
     [[nodiscard]] bool getAdminLocked() const;
     void closeEvent(QCloseEvent *event) override;
     bool switchToGameTabIfAlreadyExists(const int gameId);
@@ -161,6 +169,7 @@ signals:
     void localGameEnded();
     void adminLockChanged(bool lock);
     void showWindowIfHidden();
+    void cockatriceLinkActivated(const QString &url);
 
 public slots:
     void openDeckInNewTab(const LoadedDeck &deckToOpen);
@@ -171,11 +180,14 @@ public slots:
     TabArchidekt *addArchidektTab();
     TabEdhRec *addEdhrecTab(const CardInfoPtr &cardToQuery, bool isCommander = false);
     void openReplay(GameReplay *replay);
+    void joinReportGame(int gameId, int roomId);
+    void openTabModeration(const QString &userName = {});
     void switchToFirstAvailableNetworkTab();
     void maximizeMainWindow();
     void actTabVisualDeckStorage(bool checked);
     void actTabReplays(bool checked);
     void openTabServer();
+    void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
 private slots:
     void refreshShortcuts();
 
@@ -185,6 +197,8 @@ private slots:
     void actTabDeckStorage(bool checked);
     void actTabAdmin(bool checked);
     void actTabLog(bool checked);
+    void actTabReport(bool checked);
+    void actTabModeration(bool checked);
 
     void openTabVisualDeckStorage();
     void openTabHome();
@@ -195,13 +209,14 @@ private slots:
     void actTabCardArtRules(bool checked);
     void openTabCardArtRules();
     void openTabLog();
+    void openTabReport();
 
     void updateCurrent(int index);
     void updatePingTime(int value, int max);
+    void updateLatencyTooltip(const LatencyTracker::Stats &stats);
     void gameJoined(const Event_GameJoined &event);
     void localGameJoined(const Event_GameJoined &event);
     void gameLeft(TabGame *tab);
-    void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
     void roomLeft(TabRoom *tab);
     TabMessage *addMessageTab(const QString &userName, bool focus);
     void replayLeft(TabGame *tab);

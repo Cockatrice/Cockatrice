@@ -13,6 +13,9 @@
 #include <QDesktopServices>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QTimer>
+#include <QUrl>
+#include <QUrlQuery>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/settings/chat_settings.h>
@@ -48,9 +51,12 @@ ChatView::ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _sho
 
     viewport()->setCursor(Qt::IBeamCursor);
     setReadOnly(true);
-    setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
+    setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
     setOpenLinks(false);
     connect(this, &ChatView::anchorClicked, this, &ChatView::openLink);
+
+    connect(verticalScrollBar(), &QScrollBar::rangeChanged, this, &ChatView::onScrollBarRangeChanged);
+    connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &ChatView::onScrollBarValueChanged);
 }
 
 void ChatView::adjustColorsToPalette()
@@ -151,7 +157,7 @@ void ChatView::appendHtml(const QString &html)
     bool atBottom = verticalScrollBar()->value() >= verticalScrollBar()->maximum();
     prepareBlock().insertHtml(html);
     if (atBottom) {
-        verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+        scrollToBottom();
     }
 }
 
@@ -169,7 +175,7 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 
     prepareBlock().insertHtml(htmlText);
     if (atBottom) {
-        verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+        scrollToBottom();
     }
 }
 
@@ -215,6 +221,46 @@ void ChatView::appendUrlTag(QTextCursor &cursor, QString url)
     cursor.setCharFormat(oldFormat);
 }
 
+void ChatView::appendGameLinkTag(QTextCursor &cursor, const QString &url)
+{
+    const QUrl gameUrl(url);
+    const QUrlQuery query(gameUrl);
+    const QString hostname = query.queryItemValue("hostname");
+    // FullyDecoded undoes every %XX escape, so a description that itself
+    // contains "%" cannot end up displayed as "%25" in the label.
+    const QString description = query.queryItemValue("game", QUrl::FullyDecoded);
+    const int gameId = query.queryItemValue("gameid").toInt();
+
+    QString label;
+    if (gameId > 0 && !hostname.isEmpty()) {
+        // Links built before the description was embedded stay readable: the
+        // id + server fallback below is identical to the old anchor text.
+        if (!description.isEmpty()) {
+            // Multi-arg .arg() replaces all placeholders in a single pass, so a
+            // description containing "%…" cannot corrupt later placeholders.
+            label = tr("Join game \"%1\" (#%2) on %3").arg(description, QString::number(gameId), hostname);
+        } else {
+            label = tr("Join game #%1 on %2").arg(QString::number(gameId), hostname);
+        }
+    } else {
+        label = tr("Join game");
+    }
+
+    QTextCharFormat oldFormat = cursor.charFormat();
+    QTextCharFormat gameLinkFormat = oldFormat;
+    gameLinkFormat.setForeground(linkColor);
+    gameLinkFormat.setFontWeight(QFont::Bold);
+    gameLinkFormat.setAnchor(true);
+    gameLinkFormat.setAnchorHref(url);
+    QColor background = palette().highlight().color();
+    background.setAlpha(40);
+    gameLinkFormat.setBackground(background);
+
+    cursor.setCharFormat(gameLinkFormat);
+    cursor.insertText(label);
+    cursor.setCharFormat(oldFormat);
+}
+
 void ChatView::appendMessage(QString message,
                              RoomMessageTypeFlags messageType,
                              const ServerInfo_User &userInfo,
@@ -227,6 +273,14 @@ void ChatView::appendMessage(QString message,
     // messageType should be Event_RoomSay::UserMessage though we don't actually check
     bool isUserMessage = !(userName.toLower() == "servatrice" || userName.isEmpty());
     bool sameSender = isUserMessage && userName == lastSender;
+
+    if (isUserMessage) {
+        chatHistory.append({userName, message, QDateTime::currentDateTime()});
+        while (chatHistory.size() > MAX_CHAT_HISTORY) {
+            chatHistory.removeFirst();
+        }
+    }
+
     QTextCursor cursor = prepareBlock(sameSender);
     lastSender = userName;
 
@@ -338,8 +392,33 @@ void ChatView::appendMessage(QString message,
         }
     }
 
-    if (atBottom) {
+    // ChatHistory messages are only ever sent once per room, right after joining, before the user can
+    // interact with the view. Always scroll to the bottom so the whole history is visible on join.
+    if (atBottom || messageType.testFlag(Event_RoomSay::ChatHistory)) {
+        scrollToBottom();
+    }
+}
+
+void ChatView::scrollToBottom()
+{
+    // The document layout, and therefore the scrollbar range, may be updated asynchronously (e.g. while
+    // the chat history is loaded into a view that has not been laid out yet). Setting the value once is
+    // not enough: keep stickToBottom set so any later range change scrolls to the new maximum as well.
+    stickToBottom = true;
+    verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+}
+
+void ChatView::onScrollBarRangeChanged()
+{
+    if (stickToBottom) {
         verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+    }
+}
+
+void ChatView::onScrollBarValueChanged(int value)
+{
+    if (value < verticalScrollBar()->maximum()) {
+        stickToBottom = false;
     }
 }
 
@@ -474,6 +553,17 @@ void ChatView::checkWord(QTextCursor &cursor, QString &message)
         }
     }
 
+    if (fullWordUpToSpaceOrEnd.startsWith("cockatrice://", Qt::CaseInsensitive)) {
+        // Only links to a game (cockatrice://joingame) become invite buttons;
+        // any other cockatrice:// scheme falls through to plain text below.
+        const QUrl gameLink(fullWordUpToSpaceOrEnd);
+        if (gameLink.host().compare("joingame", Qt::CaseInsensitive) == 0) {
+            appendGameLinkTag(cursor, fullWordUpToSpaceOrEnd);
+            cursor.insertText(rest, defaultFormat);
+            return;
+        }
+    }
+
     // check word mentions
     for (const QString &word : highlightedWords) {
         if (fullWordUpToSpaceOrEnd.compare(word, Qt::CaseInsensitive) == 0) {
@@ -558,6 +648,19 @@ void ChatView::clearChat()
     document()->clear();
     lastSender = "";
     evenNumber = true;
+    chatHistory.clear();
+}
+
+QString ChatView::getRecentChatLog(int maxMessages) const
+{
+    QStringList lines;
+    int start = qMax(0, chatHistory.size() - maxMessages);
+    for (int i = start; i < chatHistory.size(); ++i) {
+        const ChatLogEntry &entry = chatHistory.at(i);
+        lines.append(
+            QString("[%1] %2: %3").arg(entry.timestamp.toString("hh:mm:ss")).arg(entry.userName).arg(entry.message));
+    }
+    return lines.join("\n");
 }
 
 void ChatView::redactMessages(const QString &userName, int amount)
@@ -685,6 +788,11 @@ void ChatView::mouseReleaseEvent(QMouseEvent *event)
 
 void ChatView::openLink(const QUrl &link)
 {
+    if (link.scheme() == "cockatrice") {
+        emit cockatriceLinkActivated(link.toString(QUrl::FullyEncoded));
+        return;
+    }
+
     if ((link.scheme() == "card") || (link.scheme() == "user")) {
         return;
     }

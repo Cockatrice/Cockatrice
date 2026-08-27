@@ -171,6 +171,7 @@ public:
     void setName(const QString &name);
     void setComments(const QString &comments);
     void setBannerCard(const CardRef &bannerCard);
+    void setPlaymat(const PlaymatInfo &playmat);
     void setTags(const QStringList &tags);
     void setFormat(const QString &format);
     ///@}

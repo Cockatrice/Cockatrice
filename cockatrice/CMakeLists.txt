@@ -15,6 +15,9 @@ set(cockatrice_SOURCES
     src/client/network/update/client/client_update_checker.cpp
     src/client/network/update/client/release_channel.cpp
     src/client/network/update/card_spoiler/spoiler_background_updater.cpp
+    src/client/latency_graph_widget.cpp
+    src/client/latency_status_widget.cpp
+    src/client/lag_monitor.cpp
     src/client/sound_engine.cpp
     src/client/settings/cache_settings.cpp
     src/client/settings/card_counter_settings.cpp
@@ -36,13 +39,16 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_forgot_password_challenge.cpp
     src/interface/widgets/dialogs/dlg_forgot_password_request.cpp
     src/interface/widgets/dialogs/dlg_forgot_password_reset.cpp
+    src/interface/widgets/dialogs/dlg_invite_to_game.cpp
     src/interface/widgets/dialogs/dlg_load_deck.cpp
     src/interface/widgets/dialogs/dlg_load_deck_from_clipboard.cpp
     src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp
     src/interface/widgets/dialogs/dlg_load_remote_deck.cpp
     src/interface/widgets/dialogs/dlg_local_game_options.cpp
     src/interface/widgets/dialogs/dlg_manage_sets.cpp
+    src/interface/widgets/dialogs/dlg_my_reports.cpp
     src/interface/widgets/dialogs/dlg_register.cpp
+    src/interface/widgets/dialogs/dlg_report_user.cpp
     src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
@@ -143,7 +149,11 @@ set(cockatrice_SOURCES
     src/interface/intents/intent_wait_for_database_load.h
     src/interface/layouts/flow_layout.cpp
     src/interface/layouts/overlap_layout.cpp
+    src/interface/widgets/utility/card_completer_delegate.cpp
+    src/interface/widgets/utility/card_completer_styler.cpp
+    src/interface/widgets/utility/completer_utils.cpp
     src/interface/widgets/utility/line_edit_completer.cpp
+    src/interface/widgets/utility/reversed_completer_model.cpp
     src/interface/pixel_map_generator.cpp
     src/interface/theme_config.cpp
     src/interface/theme_manager.cpp
@@ -155,6 +165,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
     src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
     src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
+    src/interface/widgets/cards/art_crop_attribution.cpp
     src/interface/widgets/cards/card_group_display_widgets/card_group_display_widget.cpp
     src/interface/widgets/cards/card_group_display_widgets/flat_card_group_display_widget.cpp
     src/interface/widgets/cards/card_group_display_widgets/overlapped_card_group_display_widget.cpp
@@ -219,6 +230,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/general/display/charts/bars/segmented_bar_widget.cpp
     src/interface/widgets/general/display/charts/pies/color_pie.cpp
     src/interface/widgets/general/home_styled_button.cpp
+    src/interface/widgets/general/home_tab_button_color.h
     src/interface/widgets/general/home_widget.cpp
     src/interface/widgets/general/layout_containers/flow_widget.cpp
     src/interface/widgets/general/layout_containers/overlap_control_widget.cpp
@@ -234,6 +246,10 @@ set(cockatrice_SOURCES
     src/interface/widgets/printing_selector/printing_selector_card_selection_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_sorting_widget.cpp
     src/interface/widgets/printing_selector/set_name_and_collectors_number_display_widget.cpp
+    src/interface/widgets/playmat/playmat_collection_dialog.cpp
+    src/interface/widgets/playmat/playmat_collection_dialog.h
+    src/interface/widgets/playmat/playmat_preview_widget.cpp
+    src/interface/widgets/playmat/playmat_settings_dialog.cpp
     src/interface/widgets/quick_settings/settings_button_widget.cpp
     src/interface/widgets/quick_settings/settings_popup_widget.cpp
     src/interface/widgets/replay/replay_manager.cpp
@@ -242,6 +258,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/replay/replay_widget.cpp
     src/interface/widgets/server/chat_view/chat_view.cpp
     src/interface/widgets/server/game_filter_configs.cpp
+    src/interface/widgets/server/game_link.cpp
     src/interface/widgets/server/game_selector.cpp
     src/interface/widgets/server/game_selector_quick_filter_toolbar.cpp
     src/interface/widgets/server/games_model.cpp
@@ -256,6 +273,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/server/user/user_info_connection.cpp
     src/interface/widgets/server/user/user_list_manager.cpp
     src/interface/widgets/server/user/user_list_painter.cpp
+    src/interface/widgets/server/user/user_list_panel_widget.cpp
     src/interface/widgets/server/user/user_list_widget.cpp
     src/interface/widgets/settings_page/abstract_settings_page.cpp
     src/interface/widgets/settings_page/appearance_settings_page.cpp
@@ -270,6 +288,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/settings_page/user_interface_settings_page.cpp
     src/interface/widgets/utility/custom_line_edit.cpp
     src/interface/widgets/utility/get_text_with_max.cpp
+    src/interface/widgets/utility/report_utils.cpp
+    src/interface/widgets/utility/report_utils.h
     src/interface/widgets/utility/sequence_edit.cpp
     src/interface/widgets/utility/visibility_change_listener.cpp
     src/interface/widgets/utility/visibility_change_listener.h
@@ -295,8 +315,10 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_item_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_folder_display_widget.cpp
+    src/interface/widgets/visual_deck_storage/visual_deck_storage_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_search_widget.cpp
+    src/interface/widgets/visual_deck_storage/visual_deck_storage_sort_filter_proxy_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_sort_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_tag_filter_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_widget.cpp
@@ -361,6 +383,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab_home.cpp
     src/interface/widgets/tabs/tab_logs.cpp
     src/interface/widgets/tabs/tab_message.cpp
+    src/interface/widgets/tabs/tab_moderation.cpp
+    src/interface/widgets/tabs/tab_report.cpp
     src/interface/widgets/tabs/tab_replays.cpp
     src/interface/widgets/tabs/tab_room.cpp
     src/interface/widgets/tabs/tab_server.cpp
@@ -374,6 +398,27 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_service.cpp
     src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_widget.cpp
     src/interface/widgets/tabs/api/commander_spellbook/handle_commander_brackets.cpp
+    src/interface/widgets/onboarding/banner_shader_config.h
+    src/interface/widgets/onboarding/first_run_wizard.cpp
+    src/interface/widgets/onboarding/first_run_wizard.h
+    src/interface/widgets/onboarding/first_run_wizard_page.cpp
+    src/interface/widgets/onboarding/first_run_wizard_page.h
+    src/interface/widgets/onboarding/pages/account_setup_page.cpp
+    src/interface/widgets/onboarding/pages/account_setup_page.h
+    src/interface/widgets/onboarding/pages/card_database_setup_page.cpp
+    src/interface/widgets/onboarding/pages/card_database_setup_page.h
+    src/interface/widgets/onboarding/pages/finish_page.cpp
+    src/interface/widgets/onboarding/pages/finish_page.h
+    src/interface/widgets/onboarding/pages/preferences_setup_page.cpp
+    src/interface/widgets/onboarding/pages/preferences_setup_page.h
+    src/interface/widgets/onboarding/pages/theme_setup_page.cpp
+    src/interface/widgets/onboarding/pages/theme_setup_page.h
+    src/interface/widgets/onboarding/pages/welcome_page.cpp
+    src/interface/widgets/onboarding/pages/welcome_page.h
+    src/interface/widgets/onboarding/shader_banner_widget.cpp
+    src/interface/widgets/onboarding/shader_banner_widget.h
+    src/interface/widgets/onboarding/step_indicator_widget.cpp
+    src/interface/widgets/onboarding/step_indicator_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
     src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
@@ -392,6 +437,8 @@ set(cockatrice_SOURCES
     src/interface/intents/intent_join_server_room.h
     src/interface/intents/intent_login.cpp
     src/interface/intents/intent_login.h
+    src/interface/intents/intent_open_server_room_by_name.cpp
+    src/interface/intents/intent_open_server_room_by_name.h
     src/interface/intents/url_parser.cpp
     src/interface/intents/url_parser.h
     src/interface/widgets/server/user/user_info_popup.cpp
@@ -466,6 +513,28 @@ qt6_add_executable(
   ${cockatrice_RESOURCES_RCC}
   ${cockatrice_MOC_SRCS}
   MANUAL_FINALIZATION
+)
+
+qt6_add_shaders(
+  cockatrice
+  "onboarding_shaders"
+  PREFIX
+  "/onboarding/shaders"
+  BASE
+  "src/interface/widgets/onboarding/shaders"
+  FILES
+  src/interface/widgets/onboarding/shaders/brand_banner.frag
+)
+
+qt6_add_resources(
+  cockatrice
+  "onboarding_qml"
+  PREFIX
+  "/onboarding/qml"
+  BASE
+  "src/interface/widgets/onboarding/qml"
+  FILES
+  src/interface/widgets/onboarding/qml/BrandBanner.qml
 )
 
 target_link_libraries(

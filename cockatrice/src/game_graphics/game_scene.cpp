@@ -17,7 +17,6 @@
 #include <QDebug>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
-#include <QSet>
 #include <QtMath>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/zone_names.h>
@@ -45,7 +44,14 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 
 GameScene::~GameScene()
 {
+    // Sever all incoming connections (animated item destroy-tracking) before the
+    // members below are destroyed: the base QGraphicsScene destructor destroys the
+    // remaining items, and their destroyed() signals must not reach slots that
+    // reference members that no longer exist.
+    QObject::disconnect(nullptr, nullptr, this, nullptr);
+
     delete animationTimer;
+    animationTimer = nullptr;
 
     // Delete all ArrowItems before QGraphicsScene's base destructor runs.
     // QGraphicsScene::~QGraphicsScene() destroys items in arbitrary order.
@@ -246,17 +252,27 @@ void GameScene::adjustPlayerRotation(int rotationAdjustment)
  */
 void GameScene::rearrange()
 {
-    int firstPlayerIndex = 0;
-    auto playersPlaying = collectActivePlayers(firstPlayerIndex);
-    playersPlaying = rotatePlayers(playersPlaying, firstPlayerIndex);
+    if (rearranging) {
+        needsReArrange = true;
+        return;
+    }
+    rearranging = true;
+    do {
+        needsReArrange = false;
 
-    int columns = determineColumnCount(playersPlaying.size());
-    QSizeF sceneSize = computeSceneSizeAndPlayerLayout(playersPlaying, columns);
+        int firstPlayerIndex = 0;
+        auto playersPlaying = collectActivePlayers(firstPlayerIndex);
+        playersPlaying = rotatePlayers(playersPlaying, firstPlayerIndex);
 
-    phasesToolbar->setHeight(sceneSize.height());
-    setSceneRect(0, 0, sceneSize.width(), sceneSize.height());
+        int columns = determineColumnCount(playersPlaying.size());
+        QSizeF sceneSize = computeSceneSizeAndPlayerLayout(playersPlaying, columns);
 
-    processViewSizeChange(viewSize);
+        phasesToolbar->setHeight(sceneSize.height());
+        setSceneRect(0, 0, sceneSize.width(), sceneSize.height());
+
+        processViewSizeChange(viewSize);
+    } while (needsReArrange);
+    rearranging = false;
 }
 
 // ---------- View Size ----------
@@ -453,8 +469,14 @@ void GameScene::resizeColumnsAndPlayers(const QList<qreal> &minWidthByColumn, qr
     qreal extraWidthPerColumn = (newWidth - minWidth) / playersByColumn.size();
     qreal newx = phasesToolbar->getWidth();
 
-    for (int col = 0; col < playersByColumn.size(); ++col) {
-        for (PlayerGraphicsItem *player : playersByColumn[col]) {
+    // Snapshot the columns: resizing a player's table can synchronously trigger
+    // GameScene::rearrange (table width -> sizeChanged -> updateBoundingRect ->
+    // sizeChanged -> rearrange), and rearrange rebuilds playersByColumn. Iterating
+    // the live container across that re-entrant call would use invalidated iterators.
+    const QList<QList<PlayerGraphicsItem *>> columns = playersByColumn;
+
+    for (int col = 0; col < columns.size(); ++col) {
+        for (PlayerGraphicsItem *player : columns[col]) {
             player->processSceneSizeChange(minWidthByColumn[col] + extraWidthPerColumn);
             player->setPos(newx, player->y());
         }
@@ -496,6 +518,7 @@ void GameScene::addArrow(QSharedPointer<ArrowData> data)
 
     auto *arrow = new ArrowItem(data, startCard, targetItem);
     addItem(arrow);
+    arrow->startDrawAnimation();
     arrowRegistry.insert(data, arrow);
     connect(arrow, &ArrowItem::requestDeletion, this, &GameScene::requestArrowDeletion);
 }
@@ -736,30 +759,45 @@ bool GameScene::event(QEvent *event)
 
 void GameScene::timerEvent(QTimerEvent * /*event*/)
 {
-    QMutableSetIterator<CardItem *> i(cardsToAnimate);
+    QMutableHashIterator<QObject *, IAnimatedItem *> i(animatedItems);
     while (i.hasNext()) {
         i.next();
         if (!i.value()->animationEvent()) {
             i.remove();
         }
     }
-    if (cardsToAnimate.isEmpty()) {
+    if (animatedItems.isEmpty()) {
         animationTimer->stop();
     }
 }
 
-void GameScene::registerAnimationItem(AbstractCardItem *card)
+void GameScene::registerAnimationItem(IAnimatedItem *item)
 {
-    cardsToAnimate.insert(static_cast<CardItem *>(card));
-    if (!animationTimer->isActive()) {
+    auto *object = dynamic_cast<QObject *>(item);
+    if (!object) {
+        return;
+    }
+    if (!animatedItems.contains(object)) {
+        connect(object, &QObject::destroyed, this, &GameScene::removeAnimatedItem);
+    }
+    animatedItems.insert(object, item);
+    if (animationTimer && !animationTimer->isActive()) {
         animationTimer->start(10, this);
     }
 }
 
-void GameScene::unregisterAnimationItem(AbstractCardItem *card)
+void GameScene::unregisterAnimationItem(IAnimatedItem *item)
 {
-    cardsToAnimate.remove(static_cast<CardItem *>(card));
-    if (cardsToAnimate.isEmpty()) {
+    animatedItems.remove(dynamic_cast<QObject *>(item));
+    if (animationTimer && animatedItems.isEmpty()) {
+        animationTimer->stop();
+    }
+}
+
+void GameScene::removeAnimatedItem(QObject *item)
+{
+    animatedItems.remove(item);
+    if (animationTimer && animatedItems.isEmpty()) {
         animationTimer->stop();
     }
 }

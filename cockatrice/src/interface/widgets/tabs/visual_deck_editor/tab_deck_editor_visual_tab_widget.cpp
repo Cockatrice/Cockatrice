@@ -25,7 +25,8 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
-    visualDeckView = new VisualDeckEditorWidget(this, deckModel, _deckEditor->deckDockWidget->getSelectionModel());
+    visualDeckView = new VisualDeckEditorWidget(this, deckModel, _deckEditor->deckDockWidget->getSelectionModel(),
+                                                _cardDatabaseModel);
     visualDeckView->setObjectName("visualDeckView");
     connect(visualDeckView, &VisualDeckEditorWidget::activeCardChanged, this,
             &TabDeckEditorVisualTabWidget::onCardChanged);

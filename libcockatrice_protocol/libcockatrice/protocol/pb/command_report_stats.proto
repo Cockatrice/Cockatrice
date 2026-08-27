@@ -1,0 +1,8 @@
+syntax = "proto2";
+import "moderator_commands.proto";
+
+message Command_ReportStats {
+    extend ModeratorCommand {
+        optional Command_ReportStats ext = 1205;
+    }
+}

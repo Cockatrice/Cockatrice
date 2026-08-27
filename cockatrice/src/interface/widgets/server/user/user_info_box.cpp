@@ -319,6 +319,7 @@ void UserInfoBox::actBannerCard()
     if (hasUserInfo && currentUserInfo.has_card_art_params()) {
         const auto &cap = currentUserInfo.card_art_params();
         initial.cardName = QString::fromStdString(cap.card_name());
+        initial.cardProviderId = QString::fromStdString(cap.card_provider_id());
         initial.marginPctL = cap.margin_pct_l();
         initial.marginPctR = cap.margin_pct_r();
         initial.verticalOffset = cap.vertical_offset();

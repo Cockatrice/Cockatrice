@@ -7,6 +7,7 @@
 #include "../interface/widgets/tabs/tab_room.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
+#include "game_link.h"
 #include "games_model.h"
 #include "user/user_list_manager.h"
 
@@ -18,8 +19,6 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTreeView>
-#include <QUrl>
-#include <QUrlQuery>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/room_commands.pb.h>
@@ -320,19 +319,12 @@ void GameSelector::customContextMenu(const QPoint &point)
         dlg.exec();
     });
 
-    QAction copyLink(tr("Copy Game Link"));
+    QAction copyLink(tr("Cop&y game link"));
     connect(&copyLink, &QAction::triggered, this, [=, this]() {
         const ServerInfo_Game &gameInfo = gameListModel->getGame(index.data(Qt::UserRole).toInt());
-        QUrl url;
-        url.setScheme("cockatrice");
-        url.setHost("joingame");
-        QUrlQuery query;
-        query.addQueryItem("hostname", client->serverName());
-        query.addQueryItem("port", QString::number(client->serverPort()));
-        query.addQueryItem("roomid", QString::number(gameInfo.room_id()));
-        query.addQueryItem("gameid", QString::number(gameInfo.game_id()));
-        url.setQuery(query);
-        QGuiApplication::clipboard()->setText(url.toString(QUrl::FullyEncoded));
+        QGuiApplication::clipboard()->setText(makeGameJoinLink(client->serverName(), client->serverPort(),
+                                                               gameInfo.room_id(), gameInfo.game_id(),
+                                                               QString::fromStdString(gameInfo.description())));
     });
 
     QMenu menu;
@@ -367,18 +359,40 @@ void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
         return;
     }
 
-    const ServerInfo_Game &game = gameListModel->getGame(ind.data(Qt::UserRole).toInt());
+    joinGame(gameListModel->getGame(ind.data(Qt::UserRole).toInt()), asSpectator, asJudge);
+}
+
+void GameSelector::joinGame(const ServerInfo_Game &game, const bool asSpectator, const bool asJudge)
+{
     if (tabSupervisor->switchToGameTabIfAlreadyExists(game.game_id())) {
         return;
     }
 
-    bool spectator = asSpectator || game.player_count() == game.max_players();
-
     bool overrideRestrictions = !tabSupervisor->getAdminLocked();
+
+    // Joining a full game without override privileges silently becomes a
+    // spectator join, so ask first instead of surprising the player.
+    const bool gameFull = game.player_count() == game.max_players();
+    if (gameFull && !asSpectator && !asJudge && !overrideRestrictions) {
+        const QMessageBox::StandardButton answer =
+            QMessageBox::question(this, tr("Join game"), tr("The game is full. Join as a spectator instead?"),
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (answer != QMessageBox::Yes) {
+            return;
+        }
+    }
+
+    bool spectator = asSpectator || gameFull;
+
     QString password;
     if (game.with_password() && !(spectator && !game.spectators_need_password()) && !overrideRestrictions) {
         bool ok;
-        password = getTextWithMax(this, tr("Join game"), tr("Password:"), QLineEdit::Password, QString(), &ok);
+        // Games without a description have no sensible label — fall back to the
+        // game id so the prompt still tells the user which game they're entering.
+        const QString gameLabel = QString::fromStdString(game.description());
+        const QString prompt = gameLabel.isEmpty() ? tr("Password for game #%1:").arg(game.game_id())
+                                                   : tr("Password for \"%1\":").arg(gameLabel);
+        password = getTextWithMax(this, tr("Join game"), prompt, QLineEdit::Password, QString(), &ok);
         if (!ok) {
             return;
         }
@@ -404,18 +418,16 @@ void GameSelector::joinGame(const bool asSpectator, const bool asJudge)
     disableButtons();
 }
 
-bool GameSelector::joinGameById(int gameId)
+bool GameSelector::joinGameById(const int gameId, const bool asSpectator)
 {
-    auto *model = gameListView->model();
-
-    for (int row = 0; row < model->rowCount(); ++row) {
-        QModelIndex idx = model->index(row, 0);
-        const ServerInfo_Game &game = gameListModel->getGame(idx.data(Qt::UserRole).toInt());
-        if (game.game_id() == gameId) {
-            gameListView->setCurrentIndex(idx);
-            joinGame();
-            return true;
+    for (int row = 0; row < gameListModel->rowCount(); ++row) {
+        const ServerInfo_Game &game = gameListModel->getGame(row);
+        if (game.game_id() != gameId) {
+            continue;
         }
+
+        joinGame(game, asSpectator);
+        return true;
     }
 
     qWarning() << "Game" << gameId << "not found";

@@ -69,6 +69,10 @@ void Server_AbstractUserInterface::sendResponseContainer(const ResponseContainer
     }
 }
 
+void Server_AbstractUserInterface::onLogin(ResponseContainer &)
+{
+}
+
 void Server_AbstractUserInterface::playerRemovedFromGame(Server_Game *game)
 {
     qDebug() << "Server_AbstractUserInterface::playerRemovedFromGame(): gameId =" << game->getGameId();

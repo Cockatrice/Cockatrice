@@ -1,5 +1,8 @@
 name: Code Style (C++) 
 
+permissions:
+  contents: read
+
 on:
   # Push trigger not needed for linting, we do not allow direct pushes to master
   pull_request:

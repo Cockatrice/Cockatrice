@@ -188,6 +188,38 @@ TEST_F(SettingsDefaultsTest, Sound_MasterVolume_SetAndGet)
 
 // --- TabsSettings ---
 
+TEST_F(SettingsDefaultsTest, Tabs_StartupTab_Default)
+{
+    TabsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getStartupTabIndex(), static_cast<int>(StartupTab::StartupTabHome));
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_StartupTab_SetAndGet)
+{
+    TabsSettings s(settingsPath, nullptr);
+    s.setStartupTabIndex(StartupTab::StartupTabServerRoom);
+    ASSERT_EQ(s.getStartupTabIndex(), static_cast<int>(StartupTab::StartupTabServerRoom));
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_StartupServer_Default)
+{
+    TabsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getStartupServerHost(), QString());
+    ASSERT_EQ(s.getStartupServerPort(), QString());
+    ASSERT_EQ(s.getStartupRoomName(), QString());
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_StartupServer_SetAndGet)
+{
+    TabsSettings s(settingsPath, nullptr);
+    s.setStartupServerHost("server.cockatrice.us");
+    s.setStartupServerPort("4748");
+    s.setStartupRoomName("General");
+    ASSERT_EQ(s.getStartupServerHost(), QString("server.cockatrice.us"));
+    ASSERT_EQ(s.getStartupServerPort(), QString("4748"));
+    ASSERT_EQ(s.getStartupRoomName(), QString("General"));
+}
+
 TEST_F(SettingsDefaultsTest, Tabs_AllTabsOpen_Default)
 {
     TabsSettings s(settingsPath, nullptr);
@@ -198,6 +230,12 @@ TEST_F(SettingsDefaultsTest, Tabs_AllTabsOpen_Default)
     ASSERT_EQ(s.getTabReplaysOpen(), true);
     ASSERT_EQ(s.getTabAdminOpen(), true);
     ASSERT_EQ(s.getTabLogOpen(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Tabs_ModerationOpen_Default)
+{
+    TabsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getTabModerationOpen(), false);
 }
 
 // --- ChatSettings ---
@@ -400,6 +438,23 @@ TEST_F(SettingsDefaultsTest, DeckEditor_DefaultDeckEditorType_Default)
     ASSERT_EQ(s.getDefaultDeckEditorType(), 1);
 }
 
+TEST_F(SettingsDefaultsTest, DeckEditor_VdeStartupTab_Default)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabContext);
+}
+
+TEST_F(SettingsDefaultsTest, DeckEditor_VdeStartupTab_SetAndGet)
+{
+    DeckEditorSettings s(settingsPath, nullptr);
+    s.setVdeStartupTab(VdeStartupTabDeckDisplay);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabDeckDisplay);
+    s.setVdeStartupTab(VdeStartupTabDatabaseDisplay);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabDatabaseDisplay);
+    s.setVdeStartupTab(VdeStartupTabContext);
+    ASSERT_EQ(s.getVdeStartupTab(), VdeStartupTabContext);
+}
+
 // --- NetworkSettings ---
 
 TEST_F(SettingsDefaultsTest, Network_ClientID_Default)
@@ -474,6 +529,12 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_SampleHandSize_Default)
 {
     CardsDisplaySettings s(settingsPath, nullptr);
     ASSERT_EQ(s.getSampleHandSize(), 7);
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_ArrowDrawAnimation_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getArrowDrawAnimation(), true);
 }
 
 // --- VisualDeckStorageSettings ---

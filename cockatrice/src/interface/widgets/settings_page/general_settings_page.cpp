@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../main.h"
+#include "../server/user/user_info_connection.h"
 #include "update/client/release_channel.h"
 
 #include <QCoreApplication>
@@ -11,6 +12,7 @@
 #include <QTranslator>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/settings/tabs_settings.h>
 #include <libcockatrice/settings/updates_settings.h>
 #include <libcockatrice/utility/macros.h>
 
@@ -121,8 +123,61 @@ GeneralSettingsPage::GeneralSettingsPage()
 
     connect(&showTipsOnStartup, &QCheckBox::clicked, &settings.personal(), &PersonalSettings::setShowTipsOnStartup);
 
+    // startup destination
+    for (int i = 0; i < 8; ++i) {
+        startupTabSelector.addItem(""); // texts set in retranslateUi
+    }
+    startupTabSelector.setCurrentIndex(settings.tabs().getStartupTabIndex());
+
+    connect(&startupTabSelector, qOverload<int>(&QComboBox::currentIndexChanged), &settings.tabs(),
+            &TabsSettings::setStartupTabIndex);
+    connect(&startupTabSelector, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &GeneralSettingsPage::updateStartupServerControlsVisibility);
+
+    const QString savedHost = settings.tabs().getStartupServerHost();
+    const QString savedPort = settings.tabs().getStartupServerPort();
+    int startupServerIndex = -1;
+    UserConnection_Information uci;
+    for (const auto &savedServer : uci.getServerInfo()) {
+        const UserConnection_Information &info = savedServer.second;
+        const QString saveName = info.getSaveName();
+        if (saveName.isEmpty()) {
+            continue;
+        }
+        startupServerSelector.addItem(saveName, QVariantList{info.getServer(), info.getPort()});
+        if (startupServerIndex == -1 && info.getServer() == savedHost && info.getPort() == savedPort) {
+            startupServerIndex = startupServerSelector.count() - 1;
+        }
+    }
+    startupServerSelector.setCurrentIndex(startupServerIndex);
+
+    connect(&startupServerSelector, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+        const QVariantList serverInfo = startupServerSelector.itemData(index).toList();
+        if (serverInfo.size() != 2) {
+            return;
+        }
+        TabsSettings &tabs = SettingsCache::instance().tabs();
+        tabs.setStartupServerHost(serverInfo[0].toString());
+        tabs.setStartupServerPort(serverInfo[1].toString());
+    });
+
+    startupRoomNameEdit = new QLineEdit(settings.tabs().getStartupRoomName());
+    // Default (Expanding) would stretch the whole controls column when this row becomes visible,
+    // so size it like the combo boxes instead: fills the column, never widens it.
+    startupRoomNameEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    connect(startupRoomNameEdit, &QLineEdit::editingFinished, this,
+            [this] { SettingsCache::instance().tabs().setStartupRoomName(startupRoomNameEdit->text().trimmed()); });
+
     auto *startupGrid = new QGridLayout;
     startupGrid->addWidget(&showTipsOnStartup, 0, 0, 1, 2);
+    startupGrid->addWidget(&startupTabLabel, 1, 0);
+    startupGrid->addWidget(&startupTabSelector, 1, 1);
+    startupGrid->addWidget(&startupServerLabel, 2, 0);
+    startupGrid->addWidget(&startupServerSelector, 2, 1);
+    startupGrid->addWidget(&startupRoomLabel, 3, 0);
+    startupGrid->addWidget(startupRoomNameEdit, 3, 1);
+
+    updateStartupServerControlsVisibility();
 
     startupGroupBox = new QGroupBox;
     startupGroupBox->setLayout(startupGrid);
@@ -357,6 +412,17 @@ void GeneralSettingsPage::languageBoxChanged(int index)
     SettingsCache::instance().personal().setLang(languageBox.itemData(index).toString());
 }
 
+void GeneralSettingsPage::updateStartupServerControlsVisibility()
+{
+    const int index = startupTabSelector.currentIndex();
+    const bool serverNeeded = index == StartupTab::StartupTabServer || index == StartupTab::StartupTabServerRoom;
+    const bool roomNeeded = index == StartupTab::StartupTabServerRoom;
+    startupServerLabel.setVisible(serverNeeded);
+    startupServerSelector.setVisible(serverNeeded);
+    startupRoomLabel.setVisible(roomNeeded);
+    startupRoomNameEdit->setVisible(roomNeeded);
+}
+
 void GeneralSettingsPage::retranslateUi()
 {
     languageGroupBox->setTitle(tr("Language settings"));
@@ -393,6 +459,20 @@ void GeneralSettingsPage::retranslateUi()
     updateNotificationCheckBox.setText(tr("Notify if a feature supported by the server is missing in my client"));
     newVersionOracleCheckBox.setText(tr("Automatically run Oracle when running a new version of Cockatrice"));
     showTipsOnStartup.setText(tr("Show tips on startup"));
+    startupTabLabel.setText(tr("Startup tab:"));
+    startupTabSelector.setItemText(StartupTab::StartupTabHome, tr("Home"));
+    startupTabSelector.setItemText(StartupTab::StartupTabVisualDeckStorage, tr("Visual Deck Storage"));
+    startupTabSelector.setItemText(StartupTab::StartupTabDeckStorage, tr("Deck Storage"));
+    startupTabSelector.setItemText(StartupTab::StartupTabReplays, tr("Game Replays"));
+    startupTabSelector.setItemText(StartupTab::StartupTabDeckEditor, tr("Deck Editor"));
+    startupTabSelector.setItemText(StartupTab::StartupTabVisualDeckEditor, tr("Visual Deck Editor"));
+    startupTabSelector.setItemText(StartupTab::StartupTabServer, tr("Server"));
+    startupTabSelector.setItemText(StartupTab::StartupTabServerRoom, tr("Server Room"));
+    startupTabSelector.setToolTip(
+        tr("The tab shown when Cockatrice starts. If the chosen tab is not open yet, it is opened."));
+    startupServerLabel.setText(tr("Server:"));
+    startupRoomLabel.setText(tr("Room:"));
+    startupRoomNameEdit->setPlaceholderText(tr("Room name"));
     resetAllPathsButton->setText(tr("Reset all paths"));
 
     const auto &settings = SettingsCache::instance();

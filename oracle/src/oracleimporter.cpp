@@ -237,8 +237,11 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
     };
 
     // mtgjson name => xml name
-    static const QMap<QString, QString> setInfoProperties{
-        {"number", "num"}, {"rarity", "rarity"}, {"isOnlineOnly", "isOnlineOnly"}, {"isRebalanced", "isRebalanced"}};
+    static const QMap<QString, QString> setInfoProperties{{"number", "num"},
+                                                          {"rarity", "rarity"},
+                                                          {"isOnlineOnly", "isOnlineOnly"},
+                                                          {"isRebalanced", "isRebalanced"},
+                                                          {"artist", "artist"}};
 
     // mtgjson name => xml name
     static const QMap<QString, QString> identifierProperties{{"multiverseId", "muid"}, {"scryfallId", "uuid"}};
@@ -316,7 +319,7 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QList
             }
         }
 
-        PrintingInfo printingInfo(currentSet, printingProps);
+        PrintingInfo printingInfo(currentSet, LazyPropertiesHash(printingProps));
 
         QString numComponent;
         const QString numProperty = printingInfo.getProperty("num");

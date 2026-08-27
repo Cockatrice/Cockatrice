@@ -25,6 +25,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "../client/lag_monitor.h"
 #include "connection_controller/remote_connection_controller.h"
 #include "widgets/dialogs/dlg_local_game_options.h"
 
@@ -49,16 +50,24 @@ class GameReplay;
 class HandlePublicServers;
 class LocalClient;
 class LocalServer;
+class QLabel;
+class LatencyStatusWidget;
 class QThread;
 class RemoteClient;
 class ServerInfo_User;
 class TabSupervisor;
 class WndSets;
 class DlgTipOfTheDay;
+struct ContextConnectToServer;
+class IntentUrlParser;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+signals:
+    /** @brief Emitted after the background card-database update subprocess exits. */
+    void cardDatabaseUpdateFinished(bool success);
+
 public slots:
     void actCheckCardUpdates();
     void actCheckCardUpdatesBackground();
@@ -83,6 +92,7 @@ private slots:
     void actOpenSettingsFolder();
     void actShow();
     void showWindowIfHidden();
+    void handleCockatriceLink(const QString &url);
 
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -105,6 +115,11 @@ private slots:
     void startupConfigCheck();
     void alertForcedOracleRun(const QString &version, bool isUpdate);
 
+    void applyStartupDestination();
+    void onStartupDestinationConnected(int destination, const ContextConnectToServer &serverContext);
+    void startupDestinationFailed(const QString &reason);
+    [[nodiscard]] bool startupDestinationConnectsToServer() const;
+
 private:
     static const QString appName;
     static const QStringList fileNameFilters;
@@ -114,6 +129,9 @@ private:
 
     void createTrayIcon();
     int getNextCustomSetPrefix(QDir dataDir);
+
+    void runFirstRunWizard();
+
     inline QString getCardUpdaterBinaryName()
     {
         return "oracle";
@@ -129,13 +147,16 @@ private:
     QAction *aConnect, *aDisconnect, *aRegister, *aForgotPassword, *aSinglePlayer, *aWatchReplay, *aFullScreen;
     QAction *aManageSets, *aEditTokens, *aOpenCustomFolder, *aOpenCustomsetsFolder, *aAddCustomSet,
         *aReloadCardDatabase;
-    QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aStatusBar, *aViewLog,
-        *aOpenSettingsFolder;
+    QAction *aTips, *aUpdate, *aCheckCardUpdates, *aCheckCardUpdatesBackground, *aFirstRunWizard, *aStatusBar,
+        *aViewLog, *aOpenSettingsFolder;
 
     TabSupervisor *tabSupervisor;
+    IntentUrlParser *urlParser;
     WndSets *wndSets;
     ConnectionController *connectionController;
     LocalServer *localServer;
+    LagMonitor lagMonitor;                        ///< watches the main thread for event loop stalls
+    LatencyStatusWidget *latencyStatus = nullptr; ///< status bar widget with live round-trip stats and history graph
     bool bHasActivated, askedForDbUpdater;
     QProcess *cardUpdateProcess;
     DlgViewLog *logviewDialog;

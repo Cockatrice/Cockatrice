@@ -15,6 +15,7 @@ public:
     [[nodiscard]] virtual bool getIncludeRebalancedCards() const = 0;
     [[nodiscard]] virtual bool getPrintingSelectorNavigationButtonsVisible() const = 0;
     [[nodiscard]] virtual bool getTapAnimation() const = 0;
+    [[nodiscard]] virtual bool getArrowDrawAnimation() const = 0;
     [[nodiscard]] virtual bool getAutoRotateSidewaysLayoutCards() const = 0;
     [[nodiscard]] virtual bool getScaleCards() const = 0;
     [[nodiscard]] virtual int getStackCardOverlapPercent() const = 0;

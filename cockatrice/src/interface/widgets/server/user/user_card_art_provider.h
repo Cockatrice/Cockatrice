@@ -26,7 +26,7 @@ public slots:
 
 private:
     bool dbReady = false;
-    static constexpr int MaxCacheEntries = 300;
+    static constexpr int MaxCacheEntries = 1024;
     QList<QString> cacheInsertionOrder; // FIFO eviction
     QMap<QString, QPixmap> cardArtCache;
     QSet<QString> pending;

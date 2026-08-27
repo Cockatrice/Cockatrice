@@ -1,20 +1,27 @@
 #include "visual_deck_storage_folder_display_widget.h"
 
-#include "../../../client/settings/cache_settings.h"
+#include "../cards/card_info_picture_widget.h"
+#include "../general/display/banner_widget.h"
+#include "../general/layout_containers/flow_widget.h"
 #include "deck_preview/deck_preview_widget.h"
+#include "visual_deck_storage_model.h"
+#include "visual_deck_storage_quick_settings_widget.h"
+#include "visual_deck_storage_sort_filter_proxy_model.h"
 #include "visual_deck_storage_widget.h"
 
-#include <QDirIterator>
-#include <QMouseEvent>
-#include <libcockatrice/settings/paths_settings.h>
+#include <QElapsedTimer>
+#include <QSet>
+#include <QTimer>
+#include <QVBoxLayout>
 
 VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     QWidget *parent,
     VisualDeckStorageWidget *_visualDeckStorageWidget,
-    QString _filePath,
+    const QString &_folderPath,
     bool canBeHidden,
     bool _showFolders)
-    : QWidget(parent), showFolders(_showFolders), visualDeckStorageWidget(_visualDeckStorageWidget), filePath(_filePath)
+    : QWidget(parent), showFolders(_showFolders), folderPath(_folderPath),
+      visualDeckStorageWidget(_visualDeckStorageWidget)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -22,6 +29,9 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     header = new BannerWidget(this, "");
     header->setClickable(canBeHidden);
     header->setHidden(!showFolders);
+
+    const QString bannerText = folderPath.isEmpty() ? tr("Deck Storage") : folderPath;
+    header->setText(bannerText);
     layout->addWidget(header);
 
     container = new QWidget(this);
@@ -35,192 +45,285 @@ VisualDeckStorageFolderDisplayWidget::VisualDeckStorageFolderDisplayWidget(
     flowWidget = new FlowWidget(this, Qt::Horizontal, Qt::ScrollBarAlwaysOff, Qt::ScrollBarAlwaysOff);
     containerLayout->addWidget(flowWidget);
 
-    createWidgetsForFiles();
-    createWidgetsForFolders();
+    auto *proxy = visualDeckStorageWidget->proxyModel();
+    // A burst of proxy changes (one dataChanged per finished deck load, plus the filter
+    // invalidations) coalesces into a single reconcile, so a scan of many decks doesn't
+    // rebuild the flow layout once per deck.
+    connect(proxy, &QAbstractItemModel::modelReset, this, &VisualDeckStorageFolderDisplayWidget::scheduleReconcile);
+    connect(proxy, &QAbstractItemModel::rowsInserted, this, &VisualDeckStorageFolderDisplayWidget::scheduleReconcile);
+    connect(proxy, &QAbstractItemModel::rowsRemoved, this, &VisualDeckStorageFolderDisplayWidget::scheduleReconcile);
+    connect(proxy, &QAbstractItemModel::dataChanged, this, &VisualDeckStorageFolderDisplayWidget::scheduleReconcile);
+    connect(proxy, &QAbstractItemModel::layoutChanged, this, &VisualDeckStorageFolderDisplayWidget::scheduleReconcile);
 
-    refreshUi();
+    reconcileTimer = new QTimer(this);
+    reconcileTimer->setSingleShot(true);
+    reconcileTimer->setInterval(150);
+    connect(reconcileTimer, &QTimer::timeout, this, &VisualDeckStorageFolderDisplayWidget::reconcile);
+
+    // Building the whole folder subtree synchronously here would stall the ui thread on large
+    // collections, so the first reconcile runs as a chunked pass on later event loop turns.
+    scheduleReconcile();
 }
 
-void VisualDeckStorageFolderDisplayWidget::refreshUi()
+void VisualDeckStorageFolderDisplayWidget::scheduleReconcile()
 {
-    QString bannerText = tr("Deck Storage");
-    QString deckPath = SettingsCache::instance().paths().getDeckPath();
-    if (filePath != deckPath) {
-        QString relativePath = filePath;
-
-        if (filePath.startsWith(deckPath)) {
-            relativePath = filePath.mid(deckPath.length()); // Remove the deckPath prefix
-            if (relativePath.startsWith('/')) {
-                relativePath.remove(0, 1); // Remove leading '/' if it exists
-            }
-        }
-
-        bannerText = relativePath;
+    if (deckPassActive) {
+        // The active pass may be scanning stale model state, so restart it from a clean
+        // slate once the current chunk yields.
+        deckPassRestartRequested = true;
+        return;
     }
-    header->setText(bannerText);
+    reconcileTimer->start();
 }
 
 /**
- * Gets all files in the directory that have an accepted decklist file extension
- *
- * @param filePath The directory to search through
- * @param recursive Whether to search through subdirectories
+ * @brief Starts a new chunked scan of the source model, yielding to the event loop between chunks.
  */
-static QStringList getAllFiles(const QString &filePath, bool recursive)
+void VisualDeckStorageFolderDisplayWidget::reconcile()
 {
-    QStringList allFiles;
-
-    // QDirIterator with QDir::Files ensures only files are listed (no directories)
-    auto flags =
-        recursive ? QDirIterator::Subdirectories | QDirIterator::FollowSymlinks : QDirIterator::NoIteratorFlags;
-    QDirIterator it(filePath, DeckLoader::ACCEPTED_FILE_EXTENSIONS, QDir::Files, flags);
-
-    while (it.hasNext()) {
-        allFiles << it.next(); // Add each file path to the list
-    }
-
-    return allFiles;
+    beginDeckPass();
 }
 
-void VisualDeckStorageFolderDisplayWidget::createWidgetsForFiles()
+void VisualDeckStorageFolderDisplayWidget::beginDeckPass()
 {
-    QList<DeckPreviewWidget *> allDecks;
-    for (const QString &file : getAllFiles(filePath, !showFolders)) {
-        auto *display = new DeckPreviewWidget(flowWidget, visualDeckStorageWidget, file);
+    deckPassActive = true;
+    deckPassRestartRequested = false;
+    deckPassRow = 0;
+    visibleDeckCount = 0;
+    deckPassPresentPaths.clear();
 
-        connect(display, &DeckPreviewWidget::deckLoadRequested, visualDeckStorageWidget,
-                &VisualDeckStorageWidget::deckLoadRequested);
-        connect(display, &DeckPreviewWidget::openDeckEditor, visualDeckStorageWidget,
-                &VisualDeckStorageWidget::openDeckEditor);
-        connect(visualDeckStorageWidget->settings(), &VisualDeckStorageQuickSettingsWidget::cardSizeChanged,
-                display->bannerCardDisplayWidget, &CardInfoPictureWidget::setScaleFactor);
-        display->bannerCardDisplayWidget->setScaleFactor(visualDeckStorageWidget->settings()->getCardSize());
-        allDecks.append(display);
+    continueDeckPass();
+}
+
+void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
+{
+    if (!deckPassActive) {
+        return;
     }
 
-    flowWidget->clearLayout(); // Clear existing widgets in the flow layout
+    QElapsedTimer passTimer;
+    passTimer.start();
 
-    for (DeckPreviewWidget *deck : allDecks) {
-        flowWidget->addWidget(deck);
+    auto *proxy = visualDeckStorageWidget->proxyModel();
+    const int proxyRowCount = proxy->rowCount();
+
+    // Scan rows of this folder, creating missing previews, until the time budget for this
+    // event loop turn runs out. The rest continues on the next turn.
+    while (deckPassRow < proxyRowCount) {
+        const int row = deckPassRow++;
+        const QModelIndex index = proxy->index(row, 0);
+        if (showFolders && index.data(VisualDeckStorageRoles::FolderPathRole).toString() != folderPath) {
+            continue;
+        }
+        const QString filePath = index.data(VisualDeckStorageRoles::FilePathRole).toString();
+        deckPassPresentPaths.insert(filePath);
+
+        DeckPreviewWidget *deckPreviewWidget = deckWidgets.value(filePath, nullptr);
+        if (!deckPreviewWidget) {
+            deckPreviewWidget = createDeckPreviewWidget(filePath);
+            flowWidget->addWidget(deckPreviewWidget);
+        }
+
+        const bool matches = index.data(VisualDeckStorageRoles::FilterMatchRole).toBool();
+        if (matches == deckPreviewWidget->isHidden()) {
+            deckPreviewWidget->setVisible(matches);
+        }
+        if (matches) {
+            ++visibleDeckCount;
+        }
+
+        if (passTimer.elapsed() >= DECK_PASS_TIME_BUDGET_MS) {
+            break;
+        }
     }
+
+    if (deckPassRestartRequested) {
+        beginDeckPass();
+        return;
+    }
+
+    if (deckPassRow < proxyRowCount) {
+        QMetaObject::invokeMethod(this, &VisualDeckStorageFolderDisplayWidget::continueDeckPass, Qt::QueuedConnection);
+        return;
+    }
+
+    finishDeckPass();
+}
+
+void VisualDeckStorageFolderDisplayWidget::finishDeckPass()
+{
+    auto *proxy = visualDeckStorageWidget->proxyModel();
+
+    // Drop previews of decks that no longer exist in the model.
+    for (auto it = deckWidgets.begin(); it != deckWidgets.end();) {
+        if (!deckPassPresentPaths.contains(it.key())) {
+            flowWidget->removeWidget(it.value());
+            it.value()->deleteLater();
+            it = deckWidgets.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    // Order the flow layout like the proxy sorts its rows. Filtered-out decks stay part of
+    // the layout, hidden in their sorted place until a filter lets them through again.
+    QStringList orderedFilePaths;
+    orderedFilePaths.reserve(proxy->rowCount());
+    for (int proxyRow = 0; proxyRow < proxy->rowCount(); ++proxyRow) {
+        const QString filePath = proxy->index(proxyRow, 0).data(VisualDeckStorageRoles::FilePathRole).toString();
+        if (deckWidgets.contains(filePath)) {
+            orderedFilePaths.append(filePath);
+        }
+    }
+
+    // Re-add all widgets so the flow layout order matches the proxy order. Skipped when the
+    // order is unchanged so that data-only updates don't invalidate the flow layout.
+    if (orderedFilePaths != lastOrderedFilePaths) {
+        for (const QString &filePath : orderedFilePaths) {
+            flowWidget->removeWidget(deckWidgets.value(filePath));
+        }
+        for (const QString &filePath : orderedFilePaths) {
+            flowWidget->addWidget(deckWidgets.value(filePath));
+        }
+        lastOrderedFilePaths = orderedFilePaths;
+    }
+
+    createSubFolderWidgets();
+
+    // Mark completion before evaluating visibility so this pass's own numbers decide whether
+    // the folder has content. The flag only guards evaluations made *during* a build.
+    deckPassActive = false;
+    initialPassCompleted = true;
+
+    refreshVisibility();
 }
 
 /**
- * Updates the visibility of this folder and all its DeckPreviewWidgets
+ * @brief Creates a deck preview widget and wires it up to the storage widget.
  *
- * @param recursive Also update the visibility of all subfolders and their DeckPreviewWidgets.
+ * @param filePath The absolute path of the deck file to preview.
  */
-void VisualDeckStorageFolderDisplayWidget::updateVisibility(bool recursive)
+DeckPreviewWidget *VisualDeckStorageFolderDisplayWidget::createDeckPreviewWidget(const QString &filePath)
 {
-    bool atLeastOneWidgetVisible = checkVisibility();
-    if (atLeastOneWidgetVisible) {
-        setVisible(true);
-        for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
-            display->updateVisibility();
-        }
-        if (recursive) {
-            for (auto *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
-                subFolder->updateVisibility(false);
-            }
-        }
-    } else {
-        setVisible(false);
-    }
+    auto *deckPreviewWidget =
+        new DeckPreviewWidget(flowWidget, visualDeckStorageWidget, visualDeckStorageWidget->model(), filePath);
+    connect(deckPreviewWidget, &DeckPreviewWidget::deckLoadRequested, visualDeckStorageWidget,
+            &VisualDeckStorageWidget::deckLoadRequested);
+    connect(deckPreviewWidget, &DeckPreviewWidget::openDeckEditor, visualDeckStorageWidget,
+            &VisualDeckStorageWidget::openDeckEditor);
+    connect(visualDeckStorageWidget->settings(), &VisualDeckStorageQuickSettingsWidget::cardSizeChanged,
+            deckPreviewWidget->bannerCardDisplayWidget, &CardInfoPictureWidget::setScaleFactor);
+    deckPreviewWidget->bannerCardDisplayWidget->setScaleFactor(visualDeckStorageWidget->settings()->getCardSize());
+    deckWidgets.insert(filePath, deckPreviewWidget);
+    return deckPreviewWidget;
 }
 
-bool VisualDeckStorageFolderDisplayWidget::checkVisibility()
-{
-    bool atLeastOneWidgetVisible = false;
-    if (flowWidget) {
-        // Iterate through all DeckPreviewWidgets
-        for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
-            if (display->checkVisibility()) {
-                atLeastOneWidgetVisible = true;
-            }
-        }
-    }
-    for (VisualDeckStorageFolderDisplayWidget *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
-        if (subFolder->checkVisibility()) {
-            atLeastOneWidgetVisible = true;
-        }
-    }
-    return atLeastOneWidgetVisible;
-}
-
-static QStringList getAllSubFolders(const QString &filePath)
-{
-    QStringList allFolders;
-
-    // QDirIterator with QDir::Files ensures only files are listed (no directories)
-    QDirIterator it(filePath, QDir::Dirs | QDir::NoDotAndDotDot);
-
-    while (it.hasNext()) {
-        allFolders << it.next(); // Add each file path to the list
-    }
-
-    return allFolders;
-}
-
-void VisualDeckStorageFolderDisplayWidget::createWidgetsForFolders()
+/**
+ * @brief Creates, removes and keeps in sync the subfolder widgets of this folder.
+ *
+ * Only direct child folders are created here; each child manages its own
+ * children, mirroring the folder tree on disk.
+ */
+void VisualDeckStorageFolderDisplayWidget::createSubFolderWidgets()
 {
     if (!showFolders) {
         return;
     }
 
-    for (const QString &dir : getAllSubFolders(filePath)) {
-        auto *display = new VisualDeckStorageFolderDisplayWidget(this, visualDeckStorageWidget, dir, true, showFolders);
-        containerLayout->addWidget(display);
+    const QStringList children = childFolderPaths();
+
+    for (auto it = subFolderWidgets.begin(); it != subFolderWidgets.end();) {
+        if (!children.contains(it.key())) {
+            containerLayout->removeWidget(it.value());
+            it.value()->deleteLater();
+            it = subFolderWidgets.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    for (const QString &child : children) {
+        if (subFolderWidgets.contains(child)) {
+            continue;
+        }
+
+        auto *subFolderWidget =
+            new VisualDeckStorageFolderDisplayWidget(this, visualDeckStorageWidget, child, true, showFolders);
+        connect(subFolderWidget, &VisualDeckStorageFolderDisplayWidget::contentVisibilityChanged, this,
+                &VisualDeckStorageFolderDisplayWidget::refreshVisibility);
+        containerLayout->addWidget(subFolderWidget);
+        subFolderWidgets.insert(child, subFolderWidget);
     }
 }
 
 void VisualDeckStorageFolderDisplayWidget::updateShowFolders(bool enabled)
 {
     showFolders = enabled;
+    header->setHidden(!showFolders);
 
     if (!showFolders) {
-        flattenFolderStructure();
-    } else {
-        // if setting was switched from disabled to enabled, we assume that there aren't any existing subfolders
-        createWidgetsForFiles();
-        createWidgetsForFolders();
+        for (auto it = subFolderWidgets.begin(); it != subFolderWidgets.end(); ++it) {
+            containerLayout->removeWidget(it.value());
+            it.value()->deleteLater();
+        }
+        subFolderWidgets.clear();
     }
 
-    header->setHidden(!showFolders);
+    scheduleReconcile();
 }
 
 /**
- * Steals all DeckPreviewWidgets from this widget's nested subfolders, and deletes those subfolders
+ * @brief Hides the folder when it contains nothing visible, and reports the change upward.
  */
-void VisualDeckStorageFolderDisplayWidget::flattenFolderStructure()
+void VisualDeckStorageFolderDisplayWidget::refreshVisibility()
 {
-    for (auto *subFolder : findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
-        // steal all DeckPreviewWidgets from the subfolder
-        for (auto *deck : subFolder->getFlowWidget()->findChildren<DeckPreviewWidget *>()) {
-            flowWidget->addWidget(deck);
-        }
-
-        // delete the subfolder
-        subFolder->deleteLater();
+    const bool shouldBeVisible = hasContent();
+    if (isHidden() == !shouldBeVisible) {
+        return;
     }
+    setHidden(!shouldBeVisible);
+    emit contentVisibilityChanged();
 }
 
-QStringList VisualDeckStorageFolderDisplayWidget::gatherAllTagsFromFlowWidget() const
+/**
+ * @brief Whether this folder shows any deck previews or has any visible subfolder.
+ *
+ * While the first pass is still building, the folder counts as having content so it
+ * doesn't flicker or hide prematurely before its previews have been created.
+ */
+bool VisualDeckStorageFolderDisplayWidget::hasContent() const
 {
-    QStringList allTags;
+    if (!initialPassCompleted || visibleDeckCount > 0) {
+        return true;
+    }
 
-    if (flowWidget) {
-        // Iterate through all DeckPreviewWidgets
-        for (DeckPreviewWidget *display : flowWidget->findChildren<DeckPreviewWidget *>()) {
-            // Get tags from each DeckPreviewWidget
-            QStringList tags = display->deckLoader->getDeck().deckList.getTags();
-
-            // Add tags to the list while avoiding duplicates
-            allTags.append(tags);
+    for (VisualDeckStorageFolderDisplayWidget *subFolderWidget : subFolderWidgets) {
+        if (subFolderWidget->hasContent()) {
+            return true;
         }
     }
 
-    // Remove duplicates by calling 'removeDuplicates'
-    allTags.removeDuplicates();
+    return false;
+}
 
-    return allTags;
+/**
+ * @brief The direct child folder paths of this folder, sorted by name.
+ */
+QStringList VisualDeckStorageFolderDisplayWidget::childFolderPaths() const
+{
+    QStringList children;
+    const QString prefix = folderPath.isEmpty() ? QString() : folderPath + "/";
+
+    for (const QString &candidate : visualDeckStorageWidget->model()->getFolderPaths()) {
+        if (!candidate.startsWith(prefix)) {
+            continue;
+        }
+        const QString rest = candidate.mid(prefix.length());
+        if (rest.isEmpty() || rest.contains('/')) {
+            continue;
+        }
+        children.append(candidate);
+    }
+
+    return children;
 }

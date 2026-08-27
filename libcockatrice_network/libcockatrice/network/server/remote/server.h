@@ -38,7 +38,8 @@ enum AuthenticationResult
     UsernameInvalid,
     RegistrationRequired,
     UserIsInactive,
-    ClientIdRequired
+    ClientIdRequired,
+    PasswordChangeRequired
 };
 
 class Server : public QObject
@@ -90,6 +91,10 @@ public:
     virtual QString getLoginMessage() const
     {
         return QString();
+    }
+    virtual SessionEvent *getLoginSessionEvent() const
+    {
+        return nullptr;
     }
     virtual QString getRequiredFeatures() const
     {

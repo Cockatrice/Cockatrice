@@ -1,5 +1,8 @@
 name: Generate Docs
 
+permissions:
+  contents: read    # write permission to the destination repo come from 'deploy_key'
+
 on:
   pull_request:
     paths:
@@ -10,6 +13,11 @@ on:
     types:
       - published    # publishing of stable releases and pre-releases
   workflow_dispatch:
+
+# Cancel earlier, unfinished runs of this workflow on the same branch (unless on release)
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.ref_name }}"
+  cancel-in-progress: ${{ github.event_name != 'release' }}
 
 env:
   COCKATRICE_REF: ${{ github.ref_name }}    # tag name if the commit is tagged, otherwise branch name

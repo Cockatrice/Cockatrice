@@ -33,6 +33,13 @@ public:
     QTextBlock block;
 };
 
+struct ChatLogEntry
+{
+    QString userName;
+    QString message;
+    QDateTime timestamp;
+};
+
 class ChatView : public QTextBrowser
 {
     Q_OBJECT
@@ -60,15 +67,20 @@ private:
     QStringList highlightedWords;
     bool evenNumber;
     bool showTimestamps;
+    bool stickToBottom = false;
     HoveredItemType hoveredItemType;
     QString hoveredContent;
     QAction *messageClicked;
     QMap<QString, QVector<UserMessagePosition>> userMessagePositions;
+    QList<ChatLogEntry> chatHistory;
+    static constexpr int MAX_CHAT_HISTORY = 200;
 
     [[nodiscard]] QTextFragment getFragmentUnderMouse(const QPoint &pos) const;
     QTextCursor prepareBlock(bool same = false);
+    void scrollToBottom();
     void appendCardTag(QTextCursor &cursor, const QString &cardName);
     void appendUrlTag(QTextCursor &cursor, QString url);
+    void appendGameLinkTag(QTextCursor &cursor, const QString &url);
     static QColor getCustomMentionColor();
     static QColor getCustomHighlightColor();
     void showSystemPopup(const QString &userName);
@@ -88,6 +100,8 @@ private slots:
     void actMessageClicked();
     void adjustColorsToPalette();
     void refreshBlockColors();
+    void onScrollBarRangeChanged();
+    void onScrollBarValueChanged(int value);
 
 public:
     ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _showTimestamps, QWidget *parent = nullptr);
@@ -102,6 +116,7 @@ public:
                        bool playerBold = false);
     void clearChat();
     void redactMessages(const QString &userName, int amount);
+    QString getRecentChatLog(int maxMessages = 50) const;
 
 protected:
     void enterEvent(QEnterEvent *event) override;
@@ -117,6 +132,7 @@ signals:
     void addMentionTag(QString mentionTag);
     void messageClickedSignal();
     void showMentionPopup(const QString &userName);
+    void cockatriceLinkActivated(const QString &url);
 };
 
 #endif

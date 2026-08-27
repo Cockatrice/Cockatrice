@@ -6,6 +6,7 @@ struct ContextJoinGame
 {
     ContextJoinRoom roomContext;
     int gameId;
+    bool asSpectator = false;
 };
 
 #endif // COCKATRICE_CONTEXT_JOIN_GAME_H

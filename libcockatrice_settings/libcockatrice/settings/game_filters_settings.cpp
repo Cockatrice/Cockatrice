@@ -104,14 +104,14 @@ QString GameFiltersSettings::getGameNameFilter() const
     return getValue("gameNameFilter").toString();
 }
 
-void GameFiltersSettings::setCreatorNameFilters(QStringList creatorName)
+void GameFiltersSettings::setHostNameFilters(QStringList hostName)
 {
-    setValue(creatorName, "creatorNameFilter");
+    setValue(hostName, "hostNameFilter");
 }
 
-QStringList GameFiltersSettings::getCreatorNameFilters() const
+QStringList GameFiltersSettings::getHostNameFilters() const
 {
-    return getValue("creatorNameFilter").toStringList();
+    return getValue("hostNameFilter").toStringList();
 }
 
 void GameFiltersSettings::setMinPlayers(int min)

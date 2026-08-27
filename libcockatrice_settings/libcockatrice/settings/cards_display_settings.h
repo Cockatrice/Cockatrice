@@ -20,6 +20,7 @@ public:
     [[nodiscard]] bool getIncludeRebalancedCards() const override;
     [[nodiscard]] bool getPrintingSelectorNavigationButtonsVisible() const override;
     [[nodiscard]] bool getTapAnimation() const override;
+    [[nodiscard]] bool getArrowDrawAnimation() const override;
     [[nodiscard]] bool getAutoRotateSidewaysLayoutCards() const override;
     [[nodiscard]] bool getScaleCards() const override;
     [[nodiscard]] int getStackCardOverlapPercent() const override;
@@ -40,6 +41,7 @@ public:
     void setIncludeRebalancedCards(bool _includeRebalancedCards);
     void setPrintingSelectorNavigationButtonsVisible(bool _navigationButtonsVisible);
     void setTapAnimation(bool _tapAnimation);
+    void setArrowDrawAnimation(bool _arrowDrawAnimation);
     void setAutoRotateSidewaysLayoutCards(bool _autoRotateSidewaysLayoutCards);
     void setCardScaling(bool _scaleCards);
     void setStackCardOverlapPercent(int _verticalCardOverlapPercent);
