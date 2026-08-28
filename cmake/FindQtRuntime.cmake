@@ -9,22 +9,20 @@
 #   TEST
 #
 # Outputs:
-#   COCKATRICE_QT_VERSION_NAME
+#   QT_MAIN_VERSION_STRING
 #   QT_CORE_MODULE
-#   COCKATRICE_QT_MODULES
-#   ORACLE_QT_MODULES
-#   SERVATRICE_QT_MODULES
-#   TEST_QT_MODULES
+#   QT_MODULES_COCKATRICE
+#   QT_MODULES_ORACLE
+#   QT_MODULES_SERVATRICE
+#   QT_MODULES_TEST
 #   QT_LIBRARY_DIR
 #   QT_PLUGINS_DIR
-
-set(COCKATRICE_QT_VERSION_NAME Qt6)
 
 # ---------------------------------------------------------------------------
 # Define the Qt components required by each target
 # ---------------------------------------------------------------------------
 
-set(COCKATRICE_QT_COMPONENTS
+set(QT_COMPONENTS_COCKATRICE
     Concurrent
     Gui
     Multimedia
@@ -39,11 +37,11 @@ set(COCKATRICE_QT_COMPONENTS
     QuickWidgets
 )
 
-set(ORACLE_QT_COMPONENTS Concurrent Network Svg Widgets)
+set(QT_COMPONENTS_ORACLE Concurrent Network Svg Widgets)
 
-set(SERVATRICE_QT_COMPONENTS Network Sql WebSockets)
+set(QT_COMPONENTS_SERVATRICE Network Sql WebSockets)
 
-set(TEST_QT_COMPONENTS Concurrent Network Svg Widgets)
+set(QT_COMPONENTS_TEST Concurrent Network Svg Widgets)
 
 # ---------------------------------------------------------------------------
 # Determine which Qt components are required for this build
@@ -52,19 +50,19 @@ set(TEST_QT_COMPONENTS Concurrent Network Svg Widgets)
 set(REQUIRED_QT_COMPONENTS Core)
 
 if(WITH_CLIENT)
-  list(APPEND REQUIRED_QT_COMPONENTS ${COCKATRICE_QT_COMPONENTS})
+  list(APPEND REQUIRED_QT_COMPONENTS ${QT_COMPONENTS_COCKATRICE})
 endif()
 
 if(WITH_ORACLE)
-  list(APPEND REQUIRED_QT_COMPONENTS ${ORACLE_QT_COMPONENTS})
+  list(APPEND REQUIRED_QT_COMPONENTS ${QT_COMPONENTS_ORACLE})
 endif()
 
 if(WITH_SERVER)
-  list(APPEND REQUIRED_QT_COMPONENTS ${SERVATRICE_QT_COMPONENTS})
+  list(APPEND REQUIRED_QT_COMPONENTS ${QT_COMPONENTS_SERVATRICE})
 endif()
 
 if(TEST)
-  list(APPEND REQUIRED_QT_COMPONENTS ${TEST_QT_COMPONENTS})
+  list(APPEND REQUIRED_QT_COMPONENTS ${QT_COMPONENTS_TEST})
 endif()
 
 list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
@@ -74,6 +72,8 @@ list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
 # ---------------------------------------------------------------------------
 
 find_package(Qt6 6.4 REQUIRED COMPONENTS ${REQUIRED_QT_COMPONENTS} LinguistTools)
+
+set(QT_MAIN_VERSION_STRING Qt6)
 
 # ---------------------------------------------------------------------------
 # Qt Linguist tools
@@ -92,17 +92,15 @@ else()
 endif()
 
 # ---------------------------------------------------------------------------
-# Convert the component list such as:
-#   Network;Sql;WebSockets
-# into Qt modules:
-#   Qt6::Network;Qt6::Sql;Qt6::WebSockets
+# Convert components list, e.g.: Network;Sql;WebSockets
+# into Qt modules: Qt6::Network;Qt6::Sql;Qt6::WebSockets
 # ---------------------------------------------------------------------------
 
 function(_qt_components_to_targets COMPONENTS OUTPUT_VARIABLE)
   set(TARGETS)
 
   foreach(COMPONENT IN LISTS COMPONENTS)
-    list(APPEND TARGETS "${COCKATRICE_QT_VERSION_NAME}::${COMPONENT}")
+    list(APPEND TARGETS "${QT_MAIN_VERSION_STRING}::${COMPONENT}")
   endforeach()
 
   set(${OUTPUT_VARIABLE}
@@ -116,23 +114,23 @@ endfunction()
 # ---------------------------------------------------------------------------
 
 if(WITH_CLIENT)
-  _qt_components_to_targets("${COCKATRICE_QT_COMPONENTS}" COCKATRICE_QT_MODULES)
+  _qt_components_to_targets("${QT_COMPONENTS_COCKATRICE}" QT_MODULES_COCKATRICE)
 endif()
 
 if(WITH_ORACLE)
-  _qt_components_to_targets("${ORACLE_QT_COMPONENTS}" ORACLE_QT_MODULES)
+  _qt_components_to_targets("${QT_COMPONENTS_ORACLE}" QT_MODULES_ORACLE)
 endif()
 
 if(WITH_SERVER)
-  _qt_components_to_targets("${SERVATRICE_QT_COMPONENTS}" SERVATRICE_QT_MODULES)
+  _qt_components_to_targets("${QT_COMPONENTS_SERVATRICE}" QT_MODULES_SERVATRICE)
 endif()
 
 if(TEST)
-  _qt_components_to_targets("${TEST_QT_COMPONENTS}" TEST_QT_MODULES)
+  _qt_components_to_targets("${QT_COMPONENTS_TEST}" QT_MODULES_TEST)
 endif()
 
 # Core-only export (useful for headless libraries)
-set(QT_CORE_MODULE "${COCKATRICE_QT_VERSION_NAME}::Core")
+set(QT_CORE_MODULE "${QT_MAIN_VERSION_STRING}::Core")
 
 # ---------------------------------------------------------------------------
 # Qt runtime/plugin paths
@@ -159,16 +157,16 @@ endif()
 message(STATUS "Found Qt: ${Qt6_DIR} (found version \"${Qt6_VERSION}\")")
 message(STATUS "REQUIRED_QT_COMPONENTS = ${REQUIRED_QT_COMPONENTS}")
 if(WITH_CLIENT)
-  message(STATUS "COCKATRICE_QT_MODULES = ${COCKATRICE_QT_MODULES}")
+  message(STATUS "QT_MODULES_COCKATRICE = ${QT_MODULES_COCKATRICE}")
 endif()
 if(WITH_ORACLE)
-  message(STATUS "ORACLE_QT_MODULES = ${ORACLE_QT_MODULES}")
+  message(STATUS "QT_MODULES_ORACLE = ${QT_MODULES_ORACLE}")
 endif()
 if(WITH_SERVER)
-  message(STATUS "SERVATRICE_QT_MODULES = ${SERVATRICE_QT_MODULES}")
+  message(STATUS "QT_MODULES_SERVATRICE = ${QT_MODULES_SERVATRICE}")
 endif()
 if(TEST)
-  message(STATUS "TEST_QT_MODULES = ${TEST_QT_MODULES}")
+  message(STATUS "QT_MODULES_TEST = ${QT_MODULES_TEST}")
 endif()
 
 message(DEBUG "QT_PLUGINS_DIR = ${QT_PLUGINS_DIR}")
