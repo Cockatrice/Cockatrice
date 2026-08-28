@@ -183,10 +183,8 @@ find_package(Threads REQUIRED)
 
 message(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
 
+# Find Qt, min version is defined in that .cmake file
 include(FindQtRuntime)
-
-# Qt is located through normal CMake package discovery
-find_package(Qt6 6.4 REQUIRED)
 
 set(CMAKE_AUTOMOC TRUE)
 
