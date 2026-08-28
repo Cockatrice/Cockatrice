@@ -64,7 +64,7 @@ if(NOT DEFINED GIT_TAG_RELEASENAME)
   set(GIT_TAG_RELEASENAME "Graduation Day")
 endif()
 
-# Use c++20 for all targets
+# Use C++20 for all targets
 set(CMAKE_CXX_STANDARD
     20
     CACHE STRING "C++ ISO Standard"
@@ -183,7 +183,7 @@ find_package(Threads REQUIRED)
 
 message(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
 
-# Find Qt, min version is defined in that .cmake file
+# Find Qt, minimum version is defined in cmake/FindQtRuntime.cmake
 include(FindQtRuntime)
 
 set(CMAKE_AUTOMOC TRUE)
@@ -231,7 +231,7 @@ set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_VERSION_FILENAME}")
 
 if(UNIX)
-  if(APPLE) #macOS
+  if(APPLE) # macOS
     set(CPACK_GENERATOR DragNDrop ${CPACK_GENERATOR})
     set(CPACK_GENERATOR "DragNDrop")
     set(CPACK_DMG_FORMAT "UDBZ")
