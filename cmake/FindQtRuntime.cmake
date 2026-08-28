@@ -8,49 +8,42 @@
 # Output: TEST_QT_MODULES
 
 set(REQUIRED_QT_COMPONENTS Core)
+
 if(WITH_SERVER)
-  set(_SERVATRICE_NEEDED Network Sql WebSockets)
+  list(APPEND REQUIRED_QT_COMPONENTS Network Sql WebSockets)
 endif()
 if(WITH_CLIENT)
-  set(_COCKATRICE_NEEDED
-      Concurrent
-      Gui
-      Multimedia
-      Network
-      PrintSupport
-      ShaderTools
-      Svg
-      WebSockets
-      Widgets
-      Xml
-      Quick
-      QuickWidgets
+  list(
+    APPEND
+    REQUIRED_QT_COMPONENTS
+    Concurrent
+    Gui
+    Multimedia
+    Network
+    PrintSupport
+    ShaderTools
+    Svg
+    WebSockets
+    Widgets
+    Xml
+    Quick
+    QuickWidgets
   )
 endif()
 if(WITH_ORACLE)
-  set(_ORACLE_NEEDED Concurrent Network Svg Widgets)
+  list(APPEND REQUIRED_QT_COMPONENTS Concurrent Network Svg Widgets)
 endif()
 if(TEST)
   # Union of Qt modules required across all test targets (independent of application targets).
-  # When adding a new test that needs additional Qt modules, add them here rather than in the test's CMakeLists.txt.
-  set(_TEST_NEEDED Concurrent Network Svg Widgets)
+  # When adding a new test that needs additional Qt modules, add them here rather than in the test's CMakeLists.txt
+  list(APPEND REQUIRED_QT_COMPONENTS Concurrent Network Svg Widgets)
 endif()
 
-set(REQUIRED_QT_COMPONENTS ${REQUIRED_QT_COMPONENTS} ${_SERVATRICE_NEEDED} ${_COCKATRICE_NEEDED} ${_ORACLE_NEEDED}
-                           ${_TEST_NEEDED}
-)
 list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
 
 # Find Qt and all required components including Linguist
-find_package(
-  Qt6
-  COMPONENTS ${REQUIRED_QT_COMPONENTS} Linguist
-  QUIET HINTS ${Qt6_DIR}
-)
+find_package(Qt6 REQUIRED COMPONENTS ${REQUIRED_QT_COMPONENTS} Linguist)
 
-if(NOT Qt6_FOUND)
-  message(FATAL_ERROR "No suitable version of Qt was found")
-endif()
 set(COCKATRICE_QT_VERSION_NAME Qt6)
 
 list(FIND Qt6LinguistTools_TARGETS Qt6::lrelease QT6_LRELEASE_INDEX)

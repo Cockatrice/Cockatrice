@@ -53,21 +53,6 @@ if(WIN32 OR USE_VCPKG) # Windows (including 64bit) or USE_VCPKG set
       ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
       CACHE FILEPATH "Vcpkg toolchain file"
   )
-
-  # Show warning if QTDIR is NOT defined
-  if(NOT QTDIR
-     AND NOT DEFINED ENV{QTDIR}
-     AND NOT DEFINED ENV{QTDIR64}
-  )
-    set(QTDIR
-        ""
-        CACHE PATH "Path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
-    )
-    message(
-      WARNING
-        "QTDIR variable is missing. Please set this variable to specify path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
-    )
-  endif()
 endif()
 
 # A project name is needed for CPack
@@ -196,16 +181,11 @@ endif()
 
 find_package(Threads REQUIRED)
 
-if(DEFINED QTDIR)
-  list(APPEND CMAKE_PREFIX_PATH "${QTDIR}")
-elseif(DEFINED ENV{QTDIR})
-  list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
-endif()
-
 message(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
 
 include(FindQtRuntime)
 
+# Qt is located through normal CMake package discovery
 find_package(Qt6 6.4 REQUIRED)
 
 set(CMAKE_AUTOMOC TRUE)
