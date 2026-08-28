@@ -370,6 +370,6 @@ LangString DESC_SecStartMenu ${LANG_ENGLISH} "Create start menu items for Cockat
 LangString DESC_UnSecApplication ${LANG_ENGLISH} "Cockatrice program files and start menu items"
 LangString DESC_UnSecConfiguration ${LANG_ENGLISH} "Configurations, decks, card database, pictures"
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_BEGIN
-   !insertmacro MUI_DESCRIPTION_TEXT ${UnSecApplication} $(DESC_UnSecApplication)
-   !insertmacro MUI_DESCRIPTION_TEXT ${UnSecConfiguration} $(DESC_UnSecConfiguration)
+    !insertmacro MUI_DESCRIPTION_TEXT ${UnSecApplication} $(DESC_UnSecApplication)
+    !insertmacro MUI_DESCRIPTION_TEXT ${UnSecConfiguration} $(DESC_UnSecConfiguration)
 !insertmacro MUI_UNFUNCTION_DESCRIPTION_END

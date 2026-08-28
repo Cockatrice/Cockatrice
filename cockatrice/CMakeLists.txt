@@ -595,7 +595,7 @@ if(APPLE)
   set(plugin_dest_dir cockatrice.app/Contents/Plugins)
   set(qtconf_dest_dir cockatrice.app/Contents/Resources)
 
-  # Qt plugins: iconengines, imageformats, multimedia (Qt6), platforms, styles, tls (Qt6)
+  # Qt plugins: iconengines, imageformats, multimedia, platforms, styles, tls
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -660,7 +660,7 @@ if(WIN32) # Windows (including 64bit)
     PATTERN "*.ini"
   )
 
-  # Qt plugins: iconengines, imageformats, multimedia (Qt6) platforms, styles, tls (Qt6)
+  # Qt plugins: iconengines, imageformats, multimedia, platforms, styles, tls
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}

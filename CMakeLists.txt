@@ -65,7 +65,7 @@ if(WIN32 OR USE_VCPKG) # Windows (including 64bit) or USE_VCPKG set
     )
     message(
       WARNING
-        "QTDIR variable is missing.  Please set this variable to specify path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
+        "QTDIR variable is missing. Please set this variable to specify path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
     )
   endif()
 endif()
