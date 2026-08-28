@@ -78,6 +78,8 @@ set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 set(COCKATRICE_CMAKE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 list(INSERT CMAKE_MODULE_PATH 0 "${COCKATRICE_CMAKE_PATH}")
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 include(getversion)
 
 # Create a header and a cpp file containing the version hash

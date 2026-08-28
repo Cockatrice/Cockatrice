@@ -3,17 +3,17 @@
 # Find a compatible Qt version
 #
 # Inputs:
-#   WITH_SERVER
 #   WITH_CLIENT
 #   WITH_ORACLE
+#   WITH_SERVER
 #   TEST
 #
 # Outputs:
 #   COCKATRICE_QT_VERSION_NAME
 #   QT_CORE_MODULE
-#   SERVATRICE_QT_MODULES
 #   COCKATRICE_QT_MODULES
 #   ORACLE_QT_MODULES
+#   SERVATRICE_QT_MODULES
 #   TEST_QT_MODULES
 #   QT_LIBRARY_DIR
 #   QT_PLUGINS_DIR
@@ -23,8 +23,6 @@ set(COCKATRICE_QT_VERSION_NAME Qt6)
 # ---------------------------------------------------------------------------
 # Define the Qt components required by each target
 # ---------------------------------------------------------------------------
-
-set(SERVATRICE_QT_COMPONENTS Network Sql WebSockets)
 
 set(COCKATRICE_QT_COMPONENTS
     Concurrent
@@ -43,6 +41,8 @@ set(COCKATRICE_QT_COMPONENTS
 
 set(ORACLE_QT_COMPONENTS Concurrent Network Svg Widgets)
 
+set(SERVATRICE_QT_COMPONENTS Network Sql WebSockets)
+
 set(TEST_QT_COMPONENTS Concurrent Network Svg Widgets)
 
 # ---------------------------------------------------------------------------
@@ -51,16 +51,16 @@ set(TEST_QT_COMPONENTS Concurrent Network Svg Widgets)
 
 set(REQUIRED_QT_COMPONENTS Core)
 
-if(WITH_SERVER)
-  list(APPEND REQUIRED_QT_COMPONENTS ${SERVATRICE_QT_COMPONENTS})
-endif()
-
 if(WITH_CLIENT)
   list(APPEND REQUIRED_QT_COMPONENTS ${COCKATRICE_QT_COMPONENTS})
 endif()
 
 if(WITH_ORACLE)
   list(APPEND REQUIRED_QT_COMPONENTS ${ORACLE_QT_COMPONENTS})
+endif()
+
+if(WITH_SERVER)
+  list(APPEND REQUIRED_QT_COMPONENTS ${SERVATRICE_QT_COMPONENTS})
 endif()
 
 if(TEST)
@@ -73,12 +73,28 @@ list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
 # Find Qt and define minimum version centrally
 # ---------------------------------------------------------------------------
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS ${REQUIRED_QT_COMPONENTS} Linguist)
+find_package(Qt6 6.4 REQUIRED COMPONENTS ${REQUIRED_QT_COMPONENTS} LinguistTools)
 
 # ---------------------------------------------------------------------------
-# Convert a component list such as:
+# Qt Linguist tools
+# ---------------------------------------------------------------------------
+
+if(TARGET Qt6::lrelease)
+  set(QT6_LRELEASE_INDEX 0)
+else()
+  message(WARNING "Qt6 lrelease not found.")
+endif()
+
+if(TARGET Qt6::lupdate)
+  set(QT6_LUPDATE_INDEX 0)
+else()
+  message(WARNING "Qt6 lupdate not found.")
+endif()
+
+# ---------------------------------------------------------------------------
+# Convert the component list such as:
 #   Network;Sql;WebSockets
-# into:
+# into Qt modules:
 #   Qt6::Network;Qt6::Sql;Qt6::WebSockets
 # ---------------------------------------------------------------------------
 
@@ -99,16 +115,16 @@ endfunction()
 # Export Qt target lists for the individual targets
 # ---------------------------------------------------------------------------
 
-if(WITH_SERVER)
-  _qt_components_to_targets("${SERVATRICE_QT_COMPONENTS}" SERVATRICE_QT_MODULES)
-endif()
-
 if(WITH_CLIENT)
   _qt_components_to_targets("${COCKATRICE_QT_COMPONENTS}" COCKATRICE_QT_MODULES)
 endif()
 
 if(WITH_ORACLE)
   _qt_components_to_targets("${ORACLE_QT_COMPONENTS}" ORACLE_QT_MODULES)
+endif()
+
+if(WITH_SERVER)
+  _qt_components_to_targets("${SERVATRICE_QT_COMPONENTS}" SERVATRICE_QT_MODULES)
 endif()
 
 if(TEST)
@@ -119,35 +135,17 @@ endif()
 set(QT_CORE_MODULE "${COCKATRICE_QT_VERSION_NAME}::Core")
 
 # ---------------------------------------------------------------------------
-# Qt Linguist tools
-# ---------------------------------------------------------------------------
-
-if(TARGET Qt6::lrelease)
-  set(QT6_LRELEASE_INDEX 0)
-else()
-  message(WARNING "Qt6 lrelease not found.")
-endif()
-
-if(TARGET Qt6::lupdate)
-  set(QT6_LUPDATE_INDEX 0)
-else()
-  message(WARNING "Qt6 lupdate not found.")
-endif()
-
-# ---------------------------------------------------------------------------
 # Qt runtime/plugin paths
 # ---------------------------------------------------------------------------
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-if(NOT TARGET Qt6::Core)
-  message(FATAL_ERROR "Qt6::Core target is not available")
+if(NOT TARGET "${QT_CORE_MODULE}")
+  message(FATAL_ERROR "${QT_CORE_MODULE} target is not available")
 endif()
 
-get_target_property(QT_LIBRARY_DIR Qt6::Core LOCATION)
+get_target_property(QT_LIBRARY_DIR "${QT_CORE_MODULE}" LOCATION)
 get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}" DIRECTORY)
-get_filename_component(QT_PLUGINS_DIR "${Qt6Core_DIR}/../../../${QT6_INSTALL_PLUGINS}" ABSOLUTE)
 get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/../../.." ABSOLUTE)
+get_filename_component(QT_PLUGINS_DIR "${Qt6Core_DIR}/../../../${QT6_INSTALL_PLUGINS}" ABSOLUTE)
 
 if(UNIX AND APPLE)
   # macOS needs a bit more help finding all necessary components.
@@ -158,14 +156,8 @@ endif()
 # Debug information
 # ---------------------------------------------------------------------------
 
-message(DEBUG "QT_PLUGINS_DIR = ${QT_PLUGINS_DIR}")
-message(DEBUG "QT_LIBRARY_DIR = ${QT_LIBRARY_DIR}")
-
-message(STATUS "Qt6_VERSION = ${Qt6_VERSION}")
-message(STATUS "Qt6_DIR = ${Qt6_DIR}")
-message(STATUS "Qt6Core_DIR = ${Qt6Core_DIR}")
+message(STATUS "Found Qt: ${Qt6_DIR} (found version \"${Qt6_VERSION}\")")
 message(STATUS "REQUIRED_QT_COMPONENTS = ${REQUIRED_QT_COMPONENTS}")
-
 if(WITH_CLIENT)
   message(STATUS "COCKATRICE_QT_MODULES = ${COCKATRICE_QT_MODULES}")
 endif()
@@ -178,3 +170,6 @@ endif()
 if(TEST)
   message(STATUS "TEST_QT_MODULES = ${TEST_QT_MODULES}")
 endif()
+
+message(DEBUG "QT_PLUGINS_DIR = ${QT_PLUGINS_DIR}")
+message(DEBUG "QT_LIBRARY_DIR = ${QT_LIBRARY_DIR}")
