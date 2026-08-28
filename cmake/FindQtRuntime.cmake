@@ -43,6 +43,11 @@ list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
 
 # Find Qt and all required components including Linguist
 find_package(Qt6 REQUIRED COMPONENTS ${REQUIRED_QT_COMPONENTS} Linguist)
+message(STATUS "Qt6_VERSION = ${Qt6_VERSION}")
+message(STATUS "Qt6_DIR = ${Qt6_DIR}")
+message(STATUS "Qt6Core_DIR = ${Qt6Core_DIR}")
+message(STATUS "TEST=${TEST}")
+message(STATUS "TEST_QT_MODULES=${TEST_QT_MODULES}")
 
 set(COCKATRICE_QT_VERSION_NAME Qt6)
 

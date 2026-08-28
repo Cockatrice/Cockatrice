@@ -16,7 +16,6 @@ class CardInfo;
 class AbstractCardDragItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 protected:
     AbstractCardItem *item;
     QPointF hotSpot;
