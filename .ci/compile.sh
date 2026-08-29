@@ -124,6 +124,10 @@ set -e
 
 # Setup
 ./servatrice/check_schema_version.sh
+
+if [[ ! $USE_CCACHE ]]; then
+  USE_CCACHE=0
+fi
 if [[ ! $BUILDTYPE ]]; then
   BUILDTYPE=Release
 fi
@@ -136,7 +140,7 @@ cd "$BUILD_DIR"
 # Set minimum CMake Version
 export CMAKE_POLICY_VERSION_MINIMUM=3.10
 
-# Add cmake flags
+# Add CMake flags
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
 if [[ $MAKE_SERVER ]]; then
   flags+=("-DWITH_SERVER=1")
@@ -147,12 +151,14 @@ fi
 if [[ $MAKE_TEST ]]; then
   flags+=("-DTEST=1")
 fi
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == "1" ]]; then
   flags+=("-DUSE_CCACHE=1")
   if [[ $CCACHE_SIZE ]]; then
-    # note, this setting persists after running the script
+    # This setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
   fi
+else
+  flags+=("-DUSE_CCACHE=0")
 fi
 if [[ $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
@@ -162,7 +168,7 @@ if [[ $USE_VCPKG ]]; then
   flags+=("-DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions")
 fi
 
-# Add cmake --build flags
+# Add CMake --build flags
 buildflags=(--config "$BUILDTYPE")
 
 function ccachestatsverbose() {
@@ -175,7 +181,7 @@ function ccachestatsverbose() {
   fi
 }
 
-# Compile
+# Prepare compilation
 if [[ $RUNNER_OS == macOS ]]; then
   # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action,
   # which sets a few environment variables
@@ -258,24 +264,26 @@ elif [[ $RUNNER_OS == Windows ]]; then
   buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
 fi
 
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == "1" ]]; then
   echo "::group::Show ccache stats"
   ccachestatsverbose
   echo "::endgroup::"
 fi
 
-echo "::group::Configure cmake"
+# Configure CMake
+echo "::group::Configure CMake"
 cmake --version
-echo "Running cmake with flags: ${flags[*]}"
+echo "Running CMake with these flags: ${flags[*]}"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
 
+# Build
 echo "::group::Build project"
-echo "Running cmake --build with flags: ${buildflags[*]}"
+echo "Running CMake with these build flags: ${buildflags[*]}"
 cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == "1" ]]; then
   if [[ $CCACHE_EVICTION_AGE ]]; then
     echo "::group::evict ccache files older than $CCACHE_EVICTION_AGE"
     ccache --evict-older-than "$CCACHE_EVICTION_AGE"
@@ -301,18 +309,21 @@ if [[ $RUNNER_OS == macOS ]]; then
   echo "::endgroup::"
 fi
 
+# Test
 if [[ $MAKE_TEST ]]; then
   echo "::group::Run tests"
   ctest -C "$BUILDTYPE" --output-on-failure
   echo "::endgroup::"
 fi
 
+# Install
 if [[ $MAKE_INSTALL ]]; then
   echo "::group::Install"
   cmake --build . --target install --config "$BUILDTYPE"
   echo "::endgroup::"
 fi
 
+# Package
 if [[ $MAKE_PACKAGE ]]; then
   echo "::group::Create package"
   cmake --build . --target package --config "$BUILDTYPE"
