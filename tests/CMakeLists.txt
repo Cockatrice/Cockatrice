@@ -3,38 +3,49 @@
 enable_testing()
 
 add_test(NAME dummy_test COMMAND dummy_test)
-add_test(NAME expression_test COMMAND expression_test)
+add_executable(dummy_test dummy_test.cpp)
+# Add timeout to prevent hanging if there is any issue with the general GTest setup
+set_tests_properties(dummy_test PROPERTIES TIMEOUT 5)
+
 add_test(NAME clamped_arithmetic_test COMMAND clamped_arithmetic_test)
-add_test(NAME test_age_formatting COMMAND test_age_formatting)
-add_test(NAME password_hash_test COMMAND password_hash_test)
-add_test(NAME playmat_resolver_test COMMAND playmat_resolver_test)
-add_test(NAME server_card_counter_test COMMAND server_card_counter_test)
-add_test(NAME server_counter_test COMMAND server_counter_test)
-add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
-add_test(NAME warning_categories_test COMMAND warning_categories_test)
-add_test(NAME lag_monitor_test COMMAND lag_monitor_test)
-add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
+add_executable(clamped_arithmetic_test clamped_arithmetic_test.cpp)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
-set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 15)
-
-# Find GTest
-
-add_executable(dummy_test dummy_test.cpp)
-add_executable(expression_test expression_test.cpp)
-add_executable(clamped_arithmetic_test clamped_arithmetic_test.cpp)
-add_executable(test_age_formatting test_age_formatting.cpp)
-add_executable(password_hash_test password_hash_test.cpp)
-add_executable(playmat_resolver_test playmat_resolver_test.cpp)
 add_executable(deck_hash_performance_test deck_hash_performance_test.cpp)
-add_executable(server_card_counter_test server_card_counter_test.cpp)
-add_executable(server_counter_test server_counter_test.cpp)
-add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
-add_executable(warning_categories_test warning_categories_test.cpp)
+set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 10)
+
+add_test(NAME expression_test COMMAND expression_test)
+add_executable(expression_test expression_test.cpp)
+
+add_test(NAME lag_monitor_test COMMAND lag_monitor_test)
 add_executable(lag_monitor_test ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_monitor.cpp lag_monitor_test.cpp)
 target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
+
+add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
 add_executable(latency_tracker_test latency_tracker_test.cpp)
 
+add_test(NAME password_hash_test COMMAND password_hash_test)
+add_executable(password_hash_test password_hash_test.cpp)
+
+add_test(NAME playmat_resolver_test COMMAND playmat_resolver_test)
+add_executable(playmat_resolver_test playmat_resolver_test.cpp)
+
+add_test(NAME server_card_counter_test COMMAND server_card_counter_test)
+add_executable(server_card_counter_test server_card_counter_test.cpp)
+
+add_test(NAME server_counter_test COMMAND server_counter_test)
+add_executable(server_counter_test server_counter_test.cpp)
+
+add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
+add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
+
+add_test(NAME test_age_formatting COMMAND test_age_formatting)
+add_executable(test_age_formatting test_age_formatting.cpp)
+
+add_test(NAME warning_categories_test COMMAND warning_categories_test)
+add_executable(warning_categories_test warning_categories_test.cpp)
+
+# Find GTest
 find_package(GTest)
 
 if(NOT GTEST_FOUND)
