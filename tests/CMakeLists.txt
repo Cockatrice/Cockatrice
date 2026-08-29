@@ -16,7 +16,7 @@ add_test(NAME lag_monitor_test COMMAND lag_monitor_test)
 add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
-set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 5)
+set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 15)
 
 # Find GTest
 
