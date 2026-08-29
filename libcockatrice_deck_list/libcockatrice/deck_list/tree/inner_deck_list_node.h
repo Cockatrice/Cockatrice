@@ -216,9 +216,10 @@ public:
     /**
      * @brief Deserialize this node and its children from XML.
      * @param xml Reader positioned at this element.
-     * @return true if parsing succeeded.
+     * @param limit The maximum amount of cards to read
+     * @return the amount of cards found
      */
-    bool readElement(QXmlStreamReader *xml) override;
+    int readElement(QXmlStreamReader *xml, int limit) override;
 
     /**
      * @brief Serialize this node and its children to XML.
