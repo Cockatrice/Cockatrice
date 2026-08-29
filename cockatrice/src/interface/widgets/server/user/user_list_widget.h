@@ -16,94 +16,23 @@
 #include "user_list_painter.h"
 
 #include <QComboBox>
-#include <QDialog>
 #include <QGroupBox>
-#include <QQueue>
 #include <QSet>
 #include <QStyledItemDelegate>
 #include <QTextEdit>
 #include <QTreeWidgetItem>
 #include <functional>
-#include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 
 class QTreeWidget;
 class ServerInfo_User;
 class AbstractClient;
 class TabSupervisor;
-class QLabel;
-class QCheckBox;
-class QSpinBox;
-class QRadioButton;
-class QPlainTextEdit;
 class Response;
 class CommandContainer;
 class UserContextMenu;
 class UserListWidget;
 class QShowEvent;
-
-class BanDialog : public QDialog
-{
-    Q_OBJECT
-private:
-    QLabel *daysLabel, *hoursLabel, *minutesLabel;
-    QCheckBox *nameBanCheckBox, *ipBanCheckBox, *idBanCheckBox, *deleteMessages;
-    QLineEdit *nameBanEdit, *ipBanEdit, *idBanEdit;
-    QSpinBox *daysEdit, *hoursEdit, *minutesEdit;
-    QRadioButton *permanentRadio, *temporaryRadio;
-    QPlainTextEdit *reasonEdit, *visibleReasonEdit;
-private slots:
-    void okClicked();
-    void enableTemporaryEdits(bool enabled);
-
-public:
-    explicit BanDialog(const ServerInfo_User &info, QWidget *parent = nullptr);
-    [[nodiscard]] QString getBanName() const;
-    [[nodiscard]] QString getBanIP() const;
-    [[nodiscard]] QString getBanId() const;
-    [[nodiscard]] int getMinutes() const;
-    [[nodiscard]] QString getReason() const;
-    [[nodiscard]] QString getVisibleReason() const;
-    [[nodiscard]] int getDeleteMessages() const;
-};
-
-class WarningDialog : public QDialog
-{
-    Q_OBJECT
-private:
-    QLabel *descriptionLabel;
-    QLineEdit *nameWarning;
-    QComboBox *warningOption;
-    QLineEdit *warnClientID;
-    QCheckBox *deleteMessages;
-private slots:
-    void okClicked();
-
-public:
-    WarningDialog(const QString userName, const QString clientID, QWidget *parent = nullptr);
-    [[nodiscard]] QString getName() const;
-    [[nodiscard]] QString getWarnID() const;
-    [[nodiscard]] QString getReason() const;
-    [[nodiscard]] int getDeleteMessages() const;
-    void addWarningOption(const QString warning, int startingIl = 1);
-};
-
-class AdminNotesDialog : public QDialog
-{
-    Q_OBJECT
-
-private:
-    QString userName;
-    QPlainTextEdit *notes;
-
-public:
-    explicit AdminNotesDialog(const QString &_userName, const QString &_notes, QWidget *_parent = nullptr);
-    [[nodiscard]] QString getName() const
-    {
-        return userName;
-    }
-    [[nodiscard]] QString getNotes() const;
-};
 
 class UserListItemDelegate : public QStyledItemDelegate
 {
