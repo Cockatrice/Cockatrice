@@ -8,20 +8,20 @@
 # cmake 3.16 is required if using qt6
 cmake_minimum_required(VERSION 3.10)
 
-# Early detect ccache
-option(USE_CCACHE "Cache the build results with ccache" ON)
+# Use compiler cache (ccache)
+option(USE_CCACHE "Cache the build results with ccache" OFF)
 # Treat warnings as errors (Debug builds only)
 option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 # Check for translation updates
 option(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
-# Compile servatrice
-option(WITH_SERVER "build servatrice" OFF)
-# Compile cockatrice
-option(WITH_CLIENT "build cockatrice" ON)
-# Compile oracle
-option(WITH_ORACLE "build oracle" ON)
+# Compile Cockatrice
+option(WITH_CLIENT "Build Cockatrice client" ON)
+# Compile Oracle
+option(WITH_ORACLE "Build Cockatrice card database tool (Oracle)" ON)
+# Compile Servatrice
+option(WITH_SERVER "Build Cockatrice server (Servatrice)" OFF)
 # Compile tests
-option(TEST "build tests" OFF)
+option(TEST "Build tests" OFF)
 # Use vcpkg regardless of OS
 option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
 
