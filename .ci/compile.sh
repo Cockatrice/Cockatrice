@@ -285,7 +285,7 @@ echo "::endgroup::"
 # Build
 echo "::group::Build project"
 echo "Running CMake with following build flags: ${buildflags[*]}"
-cmake --build . "${buildflags[@]}"
+cmake --build . --verbose "${buildflags[@]}"
 echo "::endgroup::"
 
 # Post-build
