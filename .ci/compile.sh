@@ -122,51 +122,53 @@ done
 
 set -e
 
-# Setup
-./servatrice/check_schema_version.sh
-if [[ ! $BUILDTYPE ]]; then
+# Schema version consistency
+if [[ $MAKE_SERVER == "1" ]]; then
+  ./servatrice/check_schema_version.sh
+fi
+
+# Use default values if unset
+if [[ -z $BUILDTYPE ]]; then
   BUILDTYPE=Release
 fi
-if [[ ! $BUILD_DIR ]]; then
+if [[ -z $BUILD_DIR ]]; then
   BUILD_DIR="build"
 fi
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-# Set minimum CMake Version
-export CMAKE_POLICY_VERSION_MINIMUM=3.10
-
-# Add cmake flags
+# CMake options
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
-if [[ $MAKE_SERVER ]]; then
+if [[ $MAKE_SERVER == "1" ]]; then
   flags+=("-DWITH_SERVER=1")
 fi
-if [[ $MAKE_NO_CLIENT ]]; then
+if [[ $MAKE_NO_CLIENT == "1" ]]; then
   flags+=("-DWITH_CLIENT=0" "-DWITH_ORACLE=0")
 fi
-if [[ $MAKE_TEST ]]; then
+if [[ $MAKE_TEST == "1" ]]; then
   flags+=("-DTEST=1")
 fi
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == "1" ]]; then
   flags+=("-DUSE_CCACHE=1")
-  if [[ $CCACHE_SIZE ]]; then
-    # note, this setting persists after running the script
+  if [[ -n $CCACHE_SIZE ]]; then
+    # This setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
   fi
 fi
-if [[ $PACKAGE_TYPE ]]; then
+if [[ -n $PACKAGE_TYPE ]]; then
   flags+=("-DCPACK_GENERATOR=$PACKAGE_TYPE")
 fi
-if [[ $USE_VCPKG ]]; then
+if [[ $USE_VCPKG == "1" ]]; then
   flags+=("-DUSE_VCPKG=1")
   flags+=("-DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions")
 fi
 
-# Add cmake --build flags
+# CMake --build options
 buildflags=(--config "$BUILDTYPE")
 
 function ccachestatsverbose() {
-  # note, verbose only works on newer ccache, discard the error
+  ccache --version
+  # Verbose only works on newer ccache, discard the error
   local got
   if got="$(ccache --show-stats --verbose 2>/dev/null)"; then
     echo "$got"
@@ -175,8 +177,8 @@ function ccachestatsverbose() {
   fi
 }
 
-# Compile
-if [[ $RUNNER_OS == macOS ]]; then
+# Prepare compilation
+if [[ $RUNNER_OS == "macOS" ]]; then
   # QTDIR is needed for macOS since we actually only use the cached thin Qt binaries instead of the install-qt-action,
   # which sets a few environment variables
   if QTDIR=$(find "$GITHUB_WORKSPACE/Qt" -depth -maxdepth 2 -name macos -type d -print -quit); then
@@ -185,42 +187,51 @@ if [[ $RUNNER_OS == macOS ]]; then
     echo "could not find QTDIR!"
     exit 2
   fi
-  # the qtdir is located at Qt/[qtversion]/macos
-  # we use find to get the first subfolder with the name "macos"
-  # this works independent of the qt version as there should be only one version installed on the runner at a time
+  # QTDIR is located at Qt/<QtVersion>/macos
+  # We use find to get the first subfolder with the name "macos"
+  # This works independent of the Qt version as there should be only one version installed on the runner at a time
   export QTDIR
 
-  if [[ $TARGET_MACOS_VERSION ]]; then
-    # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla cmake flag needed to compile to target macOS version
+  if [[ -n $TARGET_MACOS_VERSION ]]; then
+    # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla CMake option needed to compile to target macOS version
     flags+=("-DCMAKE_OSX_DEPLOYMENT_TARGET=$TARGET_MACOS_VERSION")
 
-    # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
-    # an easy way is to copy the x64-osx.cmake file and modify it
-    triplets_dir="/tmp/cmake/triplets"
-    triplet_version="custom-triplet"
-    triplet_file="$triplets_dir/$triplet_version.cmake"
-    arch=$(uname -m)
-    if [[ $arch == x86_64 ]]; then
-      arch="x64"
+    if [[ $USE_VCPKG == "1" ]]; then
+      # vcpkg dependencies need a vcpkg triplet file to compile to the target macOS version
+      # An easy way is to copy the x64-osx.cmake file and modify it
+      echo "::group::vcpkg triplet"
+      triplets_dir="/tmp/cmake/triplets"
+      triplet_version="custom-triplet"
+      triplet_file="$triplets_dir/$triplet_version.cmake"
+      arch=$(uname -m)
+
+      if [[ $arch == x86_64 ]]; then
+        arch="x64"
+      fi
+
+      mkdir -p "$triplets_dir"
+      triplet_source="../vcpkg/triplets/$arch-osx.cmake"
+
+      if [[ ! -f "$triplet_source" ]]; then
+        triplet_source="../vcpkg/triplets/community/$arch-osx.cmake"
+      fi
+
+      cp "$triplet_source" "$triplet_file"
+      echo "set(VCPKG_CMAKE_SYSTEM_VERSION $TARGET_MACOS_VERSION)" >>"$triplet_file"
+      echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $TARGET_MACOS_VERSION)" >>"$triplet_file"
+      flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
+      flags+=("-DVCPKG_HOST_TRIPLET=$triplet_version")
+      flags+=("-DVCPKG_TARGET_TRIPLET=$triplet_version")
+      echo "::endgroup::"
+
+      echo "::group::Generated triplet $triplet_file"
+      cat "$triplet_file"
+      echo "::endgroup::"
     fi
-    mkdir -p "$triplets_dir"
-    triplet_source="../vcpkg/triplets/$arch-osx.cmake"
-    if [[ ! -f "$triplet_source" ]]; then
-      triplet_source="../vcpkg/triplets/community/$arch-osx.cmake"
-    fi
-    cp "$triplet_source" "$triplet_file"
-    echo "set(VCPKG_CMAKE_SYSTEM_VERSION $TARGET_MACOS_VERSION)" >>"$triplet_file"
-    echo "set(VCPKG_OSX_DEPLOYMENT_TARGET $TARGET_MACOS_VERSION)" >>"$triplet_file"
-    flags+=("-DVCPKG_OVERLAY_TRIPLETS=$triplets_dir")
-    flags+=("-DVCPKG_HOST_TRIPLET=$triplet_version")
-    flags+=("-DVCPKG_TARGET_TRIPLET=$triplet_version")
-    echo "::group::Generated triplet $triplet_file"
-    cat "$triplet_file"
-    echo "::endgroup::"
   fi
 
-  echo "::group::Signing Certificate"
-  if [[ -n "$MACOS_CERTIFICATE_NAME" ]]; then
+  echo "::group::Setup signing certificate"
+  if [[ -n $MACOS_CERTIFICATE_NAME ]]; then
     echo "$MACOS_CERTIFICATE" | base64 --decode >"certificate.p12"
     security create-keychain -p "$MACOS_CI_KEYCHAIN_PWD" build.keychain
     security default-keychain -s build.keychain
@@ -234,9 +245,9 @@ if [[ $RUNNER_OS == macOS ]]; then
   fi
   echo "::endgroup::"
 
-  if [[ $MAKE_PACKAGE ]]; then
+  if [[ $MAKE_PACKAGE == "1" ]]; then
     # Workaround https://github.com/actions/runner-images/issues/7522
-    # have hdiutil repeat the command 10 times in hope of success
+    # Have hdiutil repeat the command 10 times in hope of success
     hdiutil_script="/tmp/hdiutil.sh"
     # shellcheck disable=SC2016
     echo '#!/bin/bash
@@ -252,43 +263,46 @@ if [[ $RUNNER_OS == macOS ]]; then
     flags+=(-DCPACK_COMMAND_HDIUTIL="$hdiutil_script")
   fi
 
-elif [[ $RUNNER_OS == Windows ]]; then
-  # Enable MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
+elif [[ $RUNNER_OS == "Windows" ]]; then
+  # Enable MSBuild switches for MTT, see https://devblogs.microsoft.com/cppblog/improved-parallelism-in-msbuild/
   # and https://devblogs.microsoft.com/cppblog/cpp-build-throughput-investigation-and-tune-up/#multitooltask-mtt
   buildflags+=(-- -p:UseMultiToolTask=true -p:EnableClServerMode=true)
 fi
 
-if [[ $USE_CCACHE ]]; then
+if [[ $USE_CCACHE == "1" ]]; then
   echo "::group::Show ccache stats"
   ccachestatsverbose
   echo "::endgroup::"
 fi
 
-echo "::group::Configure cmake"
+# Configure CMake
+echo "::group::Generate build system"
 cmake --version
-echo "Running cmake with flags: ${flags[*]}"
+echo "Running CMake configuration with following flags: ${flags[*]}"
 cmake .. "${flags[@]}"
 echo "::endgroup::"
 
+# Build
 echo "::group::Build project"
-echo "Running cmake --build with flags: ${buildflags[*]}"
+echo "Running CMake with following build flags: ${buildflags[*]}"
 cmake --build . "${buildflags[@]}"
 echo "::endgroup::"
 
-if [[ $USE_CCACHE ]]; then
-  if [[ $CCACHE_EVICTION_AGE ]]; then
-    echo "::group::evict ccache files older than $CCACHE_EVICTION_AGE"
+# Post-build
+if [[ $USE_CCACHE == "1" ]]; then
+  if [[ -n $CCACHE_EVICTION_AGE ]]; then
+    echo "::group::Evict ccache files older than $CCACHE_EVICTION_AGE"
     ccache --evict-older-than "$CCACHE_EVICTION_AGE"
     echo "::endgroup::"
   fi
   echo "::group::Show ccache stats again"
   ccachestatsverbose
   echo "::endgroup::"
-elif [[ $CCACHE_EVICTION_AGE ]]; then
+elif [[ -n $CCACHE_EVICTION_AGE ]]; then
   echo "::error file=$0::ccache eviction is enabled while ccache is disabled!"
 fi
 
-if [[ $RUNNER_OS == macOS ]]; then
+if [[ $RUNNER_OS == "macOS" ]]; then
   echo "::group::Inspect Mach-O binaries"
   for app in cockatrice oracle servatrice; do
     binary="$GITHUB_WORKSPACE/build/$app/$app.app/Contents/MacOS/$app"
@@ -301,24 +315,29 @@ if [[ $RUNNER_OS == macOS ]]; then
   echo "::endgroup::"
 fi
 
-if [[ $MAKE_TEST ]]; then
+# Test
+if [[ $MAKE_TEST == "1" ]]; then
   echo "::group::Run tests"
+  ctest --version
   ctest -C "$BUILDTYPE" --output-on-failure
   echo "::endgroup::"
 fi
 
-if [[ $MAKE_INSTALL ]]; then
+# Install
+if [[ $MAKE_INSTALL == "1" ]]; then
   echo "::group::Install"
   cmake --build . --target install --config "$BUILDTYPE"
   echo "::endgroup::"
 fi
 
-if [[ $MAKE_PACKAGE ]]; then
+# Package
+if [[ $MAKE_PACKAGE == "1" ]]; then
   echo "::group::Create package"
+  cpack --version
   cmake --build . --target package --config "$BUILDTYPE"
   echo "::endgroup::"
 
-  if [[ $PACKAGE_SUFFIX ]]; then
+  if [[ -n $PACKAGE_SUFFIX ]]; then
     echo "::group::Update package name"
     cd ..
     BUILD_DIR="$BUILD_DIR" .ci/name_build.sh "$PACKAGE_SUFFIX"
