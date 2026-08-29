@@ -44,11 +44,16 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 
 GameScene::~GameScene()
 {
-    // Sever all incoming connections (animated item destroy-tracking) before the
-    // members below are destroyed: the base QGraphicsScene destructor destroys the
-    // remaining items, and their destroyed() signals must not reach slots that
-    // reference members that no longer exist.
-    QObject::disconnect(nullptr, nullptr, this, nullptr);
+    // Sever the destroy-tracking connections before the members and base-class
+    // teardown destroy the items. The receiver (this) cannot be matched with a
+    // nullptr sender (QObject::disconnect forbids one) so disconnect each
+    // tracked sender explicitly. Otherwise, when the base QGraphicsScene destructor
+    // destroys the remaining items, their destroyed() signals would re-enter
+    // removeAnimatedItem() and touch members that no longer exist.
+    const auto animatedSenders = animatedItems.keys();
+    for (QObject *sender : animatedSenders) {
+        disconnect(sender, &QObject::destroyed, this, &GameScene::removeAnimatedItem);
+    }
 
     delete animationTimer;
     animationTimer = nullptr;
