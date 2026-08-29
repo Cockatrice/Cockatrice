@@ -1091,7 +1091,8 @@ QList<GameInviteOption> TabSupervisor::getGameInviteLinksForRoom(int roomId) con
     // The inviter may be in several games of the same room (hosting one and
     // spectating another, for example). Return every game so the caller can
     // let the user choose which one to invite to.
-    for (TabGame *tab : gameTabs) {
+    for (auto it = gameTabs.cbegin(); it != gameTabs.cend(); ++it) {
+        TabGame *tab = it.value();
         GameMetaInfo *metaInfo = tab->getGame()->getGameMetaInfo();
         if (metaInfo->proto().room_id() != roomId) {
             continue;

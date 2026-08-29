@@ -9,6 +9,7 @@
 #include <QMap>
 #include <QPixmap>
 #include <QStandardItemModel>
+#include <functional>
 #include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
@@ -149,6 +150,17 @@ public:
     /** Re-pulls the avatar/card art for the currently shown user (e.g. after it loads). */
     void refreshHeader();
 
+    /**
+     * Sets a predicate evaluated on every action-button rebuild. It receives
+     * the name of the user the popup currently shows; when it returns true an
+     * "Invite" button is shown. The popup itself never resolves the invite
+     * link, it just forwards the request.
+     */
+    void setGameInviteAvailable(std::function<bool(const QString &userName)> available)
+    {
+        gameInviteAvailable = std::move(available);
+    }
+
 signals:
     void mouseEnteredPopup();
     void mouseLeftPopup();
@@ -159,6 +171,7 @@ signals:
 
     // ── Action signals — connect to UserContextMenu::exec*() ──────────────────
     void chatRequested(const QString &userName);
+    void inviteRequested(const QString &userName);
     void detailsRequested(const QString &userName);
     void showGamesRequested(const QString &userName);
     void addBuddyRequested(const QString &userName);
@@ -200,6 +213,7 @@ private:
     QString currentUser;
     ServerInfo_User currentUserInfo;
     bool currentOnline = false;
+    std::function<bool(const QString &userName)> gameInviteAvailable;
 
     UserInfoHeaderWidget *header;
     QWidget *actionArea; ///< rebuilt per user
