@@ -470,20 +470,13 @@ QString DeckStateManager::validateNewZoneName(const QString &zoneName) const
 
     const auto *tree = deckList->getTree();
 
-    // Top-level zones (boards and legacy zones) claim their names too.
-    for (int i = 0; i < tree->getRoot()->size(); i++) {
-        if (tree->getRoot()->at(i)->getName() == trimmedZoneName) {
-            return tr("A zone with this name already exists.");
-        }
-    }
-
-    // Custom zone names are unique across the whole deck.
-    for (const QString &board : InnerDecklistNode::boardZoneNames()) {
-        for (const auto *customZone : tree->getCustomZones(board)) {
-            if (customZone->getName() == trimmedZoneName) {
-                return tr("A zone with this name already exists.");
-            }
-        }
+    // Reuse the tree's own uniqueness contract: any top-level zone and any
+    // custom zone on *every* board claims the name (hasZoneName also reserves
+    // the standard board names, which we already rejected with a dedicated
+    // message above). Scanning only the standard boards here would miss a
+    // custom zone an imported deck carries under `tokens`.
+    if (tree->hasZoneName(trimmedZoneName)) {
+        return tr("A zone with this name already exists.");
     }
 
     return {};
@@ -558,6 +551,7 @@ bool DeckStateManager::modifyTree(const QString &reason, const std::function<boo
         historyManager->save(memento);
         deckListModel->rebuildTree();
         deckList->refreshDeckHash();
+        emit deckListModel->deckHashChanged();
         doCardModified();
     }
 

@@ -50,6 +50,9 @@ DeckZoneDialog::DeckZoneDialog(QWidget *parent,
     if (allowBoardSelection) {
         layout->addWidget(boardLabel);
         layout->addWidget(boardCombo);
+    } else {
+        boardLabel->hide();
+        boardCombo->hide();
     }
     layout->addWidget(buttonBox);
 
