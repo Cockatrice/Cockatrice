@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include <QList>
 #include <gtest/gtest.h>
 #include <metrics_registry.h>
@@ -72,4 +73,11 @@ TEST(MetricsRegistryTest, GameStartTrackedSeparatelyFromCommands)
     const auto snapshot = registry.getGameStartSnapshot();
     EXPECT_EQ(1, snapshot.count);
     EXPECT_EQ(120, snapshot.totalMs);
+}
+
+int main(int argc, char **argv)
+{
+    QCoreApplication app(argc, argv);
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
