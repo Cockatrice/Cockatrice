@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonParseError>
 #include <QRegularExpression>
 #include <QSet>
 #include <algorithm>
@@ -44,26 +45,23 @@ static CardSet::Priority getSetPriority(const QString &setType, const QString &s
     return priority;
 }
 
-bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
+bool OracleImporter::readSetsFromByteArray(QByteArray data)
 {
-    QJsonParseError error;
-    auto doc = QJsonDocument::fromJson(data, &error);
-    if (error.error != QJsonParseError::NoError) {
-        qDebug() << "error: QJsonDocument::fromJson():" << error.errorString();
+    RawJson::ScanError error;
+    const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(data, &error);
+    if (error.isError()) {
+        qDebug() << "error: RawJson::scanSetRanges():" << error.message;
         return false;
     }
 
-    auto setsObj = doc.object().value("data").toObject();
-
     QList<SetToDownload> newSetList;
+    newSetList.reserve(ranges.size());
 
-    for (auto it = setsObj.constBegin(); it != setsObj.constEnd(); ++it) {
-        QJsonObject setObj = it.value().toObject();
-        QString shortName = setObj.value("code").toString().toUpper();
-        QString longName = setObj.value("name").toString();
-        QJsonArray setCards = setObj.value("cards").toArray();
-        QString setType = setObj.value("type").toString();
-        QDate releaseDate = QDate::fromString(setObj.value("releaseDate").toString(), Qt::ISODate);
+    for (const RawJson::SetRange &range : ranges) {
+        QString shortName = range.code.toUpper();
+        QString longName = range.name;
+        QString setType = range.type;
+        QDate releaseDate = QDate::fromString(range.releaseDate, Qt::ISODate);
         CardSet::Priority priority = getSetPriority(setType, shortName);
         // capitalize set type
         if (setType.length() > 0) {
@@ -83,7 +81,9 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
             }
             setType = setType.trimmed();
         }
-        newSetList.append(SetToDownload(shortName, longName, setCards, priority, setType, releaseDate));
+        SetToDownload set(shortName, longName, priority, setType, releaseDate);
+        set.setRawRange(range.dataRange);
+        newSetList.append(set);
     }
 
     std::sort(newSetList.begin(), newSetList.end());
@@ -92,6 +92,7 @@ bool OracleImporter::readSetsFromByteArray(const QByteArray &data)
         return false;
     }
     allSets = newSetList;
+    rawSetsData = std::move(data);
     return true;
 }
 
@@ -550,22 +551,17 @@ int OracleImporter::startImport()
 {
     static ICardSetPriorityController *noOpController = new NoopCardSetPriorityController();
 
-    // Pre-allocate the cards hash to avoid rehashing during import. The hash
-    // is keyed by distinct card name rather than by printings: AllPrintings
-    // ships ~100k printings for ~35k names, so reserving the printing count
-    // would overallocate ~3x (against this stack's RAM goal). Collecting
-    // distinct names is cheap — one pass over the already-parsed name fields.
-    {
-        QSet<QString> distinctNames;
-        for (const SetToDownload &curSetToParse : allSets) {
-            for (const QJsonValue &cardValue : curSetToParse.getCards()) {
-                distinctNames.insert(cardValue.toObject().value("name").toString());
-            }
-        }
-        cards.reserve(distinctNames.size());
-        // The set goes out of scope here, handing the ~35k name QStrings back
-        // to the allocator before the (memory-heavy) import loop starts.
+<<<<<<< HEAD
+    // Pre-allocate the cards hash to avoid rehashing during import. Keys are
+    // distinct card names while raw ranges only count printings (AllPrintings
+    // ~100k printings vs ~35k names), so this over-reserves somewhat; an exact
+    // distinct-name count would require eagerly parsing, which the lazy reader
+    // deliberately avoids. It's a capacity hint, so the overshoot is harmless.
+    int estimatedCards = 0;
+    for (const SetToDownload &curSetToParse : allSets) {
+        estimatedCards += curSetToParse.getRawRange().cardCount;
     }
+    cards.reserve(estimatedCards);
 
     // add an empty set for tokens
     CardSetPtr tokenSet =
@@ -578,11 +574,44 @@ int OracleImporter::startImport()
         CardSetPtr newSet = CardSet::newInstance(noOpController, curSetToParse.getShortName(),
                                                  curSetToParse.getLongName(), curSetToParse.getSetType(),
                                                  curSetToParse.getReleaseDate(), curSetToParse.getPriority());
+
+        // parse only this set's slice of the raw document so the whole JSON tree is
+        // never kept in memory at once
+        const RawJson::SetDataRange &rawRange = curSetToParse.getRawRange();
+        const qsizetype rangeEnd = rawRange.start + rawRange.length;
+        if (rawRange.start < 0 || rawRange.length <= 0 || rangeEnd > rawSetsData.size()) {
+            // rawSetsData is cleared by releaseSetData() while SetToDownload copies
+            // taken from getSets() keep their ranges, and nothing else enforces the
+            // pairing — so never index past the buffer on stale/mismatched ranges.
+            qWarning() << "error: out-of-bounds raw range for set" << curSetToParse.getShortName() << "skipping";
+            ++setIndex;
+            emit setIndexChanged(0, setIndex, curSetToParse.getLongName());
+            continue;
+        }
+        // sliced() shares the buffer instead of deep-copying the slice; the largest
+        // sets in AllPrintings are tens of MB, so the copy is worth avoiding here.
+        const QByteArray setBytes = rawSetsData.sliced(rawRange.start, rawRange.length);
+        QJsonParseError parseError;
+        const QJsonDocument setDoc = QJsonDocument::fromJson(setBytes, &parseError);
+        if (parseError.error != QJsonParseError::NoError) {
+            qWarning() << "error: parsing card data for set" << curSetToParse.getShortName() << ":"
+                       << parseError.errorString();
+            ++setIndex;
+            // Keep the progress accounting honest: a set that failed to parse
+            // still advanced the index, so report it (with zero imported cards)
+            // rather than letting SaveSetsPage's bar stall per failed set.
+            emit setIndexChanged(0, setIndex, curSetToParse.getLongName());
+            continue;
+        }
+
+        // Only add the set to the database once its slice parsed cleanly;
+        // a set that fails here must not persist as an empty set in cards.xml.
         if (!sets.contains(newSet->getShortName())) {
             sets.insert(newSet->getShortName(), newSet);
         }
 
-        int numCardsInSet = importCardsFromSet(newSet, curSetToParse.getCards());
+        const QJsonArray setCards = setDoc.object().value("cards").toArray();
+        int numCardsInSet = importCardsFromSet(newSet, setCards);
 
         ++setIndex;
 
@@ -605,6 +634,7 @@ bool OracleImporter::saveToFile(const QString &fileName, const QString &sourceUr
 void OracleImporter::releaseSetData()
 {
     allSets.clear();
+    rawSetsData.clear();
 }
 
 void OracleImporter::clear()
@@ -612,4 +642,5 @@ void OracleImporter::clear()
     sets.clear();
     cards.clear();
     allSets.clear();
+    rawSetsData.clear();
 }

@@ -545,6 +545,173 @@ TEST_F(OracleImporterTest, ApostropheNormalized)
     ASSERT_TRUE(importer->getCardList().contains("Jace's Ingenuity"));
 }
 
+// ============================================================================
+// RawJson scanner tests
+// ============================================================================
+
+TEST_F(OracleImporterTest, ScanSetRangesMatchFullJsonParse)
+{
+    QJsonObject root;
+    QJsonObject data;
+    data["AAA"] = makeCard("Alpha Card");
+    data["BBB"] = makeCard("Beta Card");
+    root["data"] = data;
+
+    const QByteArray bytes = QJsonDocument(root).toJson(QJsonDocument::Compact);
+
+    RawJson::ScanError error;
+    const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(bytes, &error);
+    ASSERT_FALSE(error.isError()) << error.message.toStdString();
+    ASSERT_EQ(ranges.size(), 2);
+
+    const QJsonObject wholeData = QJsonDocument::fromJson(bytes).object().value("data").toObject();
+    for (const RawJson::SetRange &range : ranges) {
+        QJsonParseError parseError;
+        const QJsonDocument sliceDoc = QJsonDocument::fromJson(
+            QByteArray(bytes.constData() + range.dataRange.start, range.dataRange.length), &parseError);
+        ASSERT_EQ(parseError.error, QJsonParseError::NoError)
+            << range.code.toStdString() << ": " << parseError.errorString().toStdString();
+        ASSERT_EQ(sliceDoc.object(), wholeData.value(range.code).toObject()) << "set " << range.code.toStdString();
+    }
+}
+
+TEST_F(OracleImporterTest, ScanSetRangesDecodesEscapesAndCountsCards)
+{
+    const QByteArray json = "{\"data\":{\"KEY\":{\"code\":\"zzz\",\"name\":\"\\u00c9tude \\ud83d\\ude00\","
+                            "\"type\":\"expansion\",\"releaseDate\":\"2024-01-05\","
+                            "\"cards\":[{\"name\":\"a\"},{\"name\":\"b\"},{\"name\":\"c\"}]}}}";
+
+    RawJson::ScanError error;
+    const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(json, &error);
+    ASSERT_FALSE(error.isError());
+    ASSERT_EQ(ranges.size(), 1);
+
+    const RawJson::SetRange &range = ranges.first();
+    ASSERT_EQ(range.code, "zzz"); // inner "code" wins over the object key
+    const QString expectedName = QString::fromUtf8("\xC3\x89tude ") + QChar(0xD83D) + QChar(0xDE00);
+    ASSERT_EQ(range.name, expectedName);
+    ASSERT_EQ(range.type, "expansion");
+    ASSERT_EQ(range.releaseDate, "2024-01-05");
+    ASSERT_EQ(range.dataRange.cardCount, 3);
+
+    QJsonParseError parseError;
+    const QJsonDocument sliceDoc = QJsonDocument::fromJson(
+        QByteArray(json.constData() + range.dataRange.start, range.dataRange.length), &parseError);
+    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    ASSERT_EQ(sliceDoc.object().value("name").toString(), expectedName);
+    ASSERT_EQ(sliceDoc.object().value("cards").toArray().size(), 3);
+}
+
+TEST_F(OracleImporterTest, ScanSetRangesRejectsInvalidJson)
+{
+    const QList<QByteArray> invalid = {"not json",
+                                       "[]",
+                                       "{\"data\":[]}",
+                                       "{\"data\":{}}",
+                                       "{\"other\":{}}",
+                                       "{\"data\":{\"A\":{\"code\":\"a\",\"name\":\"ok\",\"type\":\"x\","
+                                       "\"releaseDate\":\"2024-01-01\",\"cards\":[]}}} trailing",
+                                       "{\"data\":{\"A\":{\"cards\":[{\"name\":\"\\uZZZZ\"}]}}}",
+                                       "{\"data\":{\"A\":{\"cards\":[{\"name\":\"bad \\q escape\"}]}}}",
+                                       "{\"data\":{\"A\":{\"cards\":[{\"name\":\"\\ud800\"}]}}}"};
+
+    for (const QByteArray &json : invalid) {
+        RawJson::ScanError error;
+        RawJson::scanSetRanges(json, &error);
+        EXPECT_TRUE(error.isError()) << "expected failure for: " << json.constData();
+    }
+}
+
+TEST_F(OracleImporterTest, ScanSetRangesMatchesFullJsonParseVerdicts)
+{
+    // Verdicts must agree with QJsonDocument::fromJson for the inputs below —
+    // including the metadata quirks ("name": null, "type": 7, "releaseDate": null,
+    // "cards": null) that used to make the scanner reject sets Qt accepts.
+    const QList<QByteArray> inputs = {
+        "{\"data\":{\"A\":{\"code\":\"a\",\"name\":\"ok\",\"type\":\"x\",\"releaseDate\":\"2024-01-01\",\"cards\":[{"
+        "\"n\":1}]}}}",
+        "{\"data\":{\"A\":{\"code\":\"a\",\"name\":null,\"type\":\"x\",\"releaseDate\":\"2024-01-01\",\"cards\":[]}}}",
+        "{\"data\":{\"A\":{\"code\":\"a\",\"name\":\"ok\",\"type\":null,\"releaseDate\":\"2024-01-01\",\"cards\":[]}}}",
+        "{\"data\":{\"A\":{\"code\":\"a\",\"name\":\"ok\",\"type\":7,\"releaseDate\":\"2024-01-01\",\"cards\":null}}}",
+        "{\"data\":{\"A\":{\"code\":\"a\",\"name\":\"ok\",\"releaseDate\":\"2024-01-01\",\"cards\":[1,2,3]}}}",
+        // structurally invalid JSON (both parsers must reject)
+        "not json",
+        "{\"data\":{\"A\":{\"name\":\"unterminated}}",
+    };
+
+    for (const QByteArray &input : inputs) {
+        QJsonParseError qtError;
+        QJsonDocument::fromJson(input, &qtError);
+        const bool qtOk = qtError.error == QJsonParseError::NoError;
+
+        RawJson::ScanError scanError;
+        const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(input, &scanError);
+        EXPECT_EQ(qtOk, !scanError.isError()) << "verdict mismatch for: " << input.constData();
+        if (scanError.isError()) {
+            continue;
+        }
+        for (const RawJson::SetRange &range : ranges) {
+            QJsonParseError sliceError;
+            QJsonDocument::fromJson(QByteArray(input.constData() + range.dataRange.start, range.dataRange.length),
+                                    &sliceError);
+            EXPECT_EQ(sliceError.error, QJsonParseError::NoError) << "bad range slice for: " << input.constData();
+        }
+    }
+}
+
+TEST_F(OracleImporterTest, ScanSetRangesRejectsDeepNesting)
+{
+    // Far beyond the shared 1024 container cap: Qt reports DeepNesting and the
+    // scanner must reject too, without overflowing the stack through its
+    // recursive skipValue walk.
+    QString nesting;
+    nesting.reserve(10000);
+    for (int i = 0; i < 5000; ++i) {
+        nesting += '[';
+    }
+    for (int i = 0; i < 5000; ++i) {
+        nesting += ']';
+    }
+    const QByteArray json = ("{\"data\":{\"A\":{\"code\":\"a\",\"cards\":" + nesting + "}}}").toUtf8();
+
+    QJsonParseError qtError;
+    QJsonDocument::fromJson(json, &qtError);
+    ASSERT_NE(qtError.error, QJsonParseError::NoError) << "expected Qt to reject deep nesting";
+
+    RawJson::ScanError scanError;
+    RawJson::scanSetRanges(json, &scanError);
+    ASSERT_TRUE(scanError.isError()) << "scanner accepted a document Qt rejects as too deeply nested";
+}
+
+// ============================================================================
+// Lazy per-set parsing tests
+// ============================================================================
+
+TEST_F(OracleImporterTest, StartImportParsesSetsLazily)
+{
+    QJsonObject setObj = makeCard("Lazy Import Card");
+    QJsonArray cards;
+    cards.append(setObj);
+    QJsonObject dataSet;
+    dataSet["code"] = "tst";
+    dataSet["name"] = "Test Set";
+    dataSet["type"] = "expansion";
+    dataSet["releaseDate"] = "2024-01-01";
+    dataSet["cards"] = cards;
+
+    QJsonObject root;
+    root["data"] = QJsonObject{{"TST", dataSet}};
+
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Compact);
+    ASSERT_TRUE(importer->readSetsFromByteArray(data));
+    ASSERT_FALSE(importer->getRawSetsData().isEmpty());
+
+    const int importedSets = importer->startImport();
+    ASSERT_EQ(importedSets, 1);
+    ASSERT_EQ(importer->getCardList().size(), 1);
+    ASSERT_FALSE(importer->getCardList().value("Lazy Import Card").isNull());
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
