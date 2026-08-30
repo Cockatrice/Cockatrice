@@ -362,6 +362,7 @@ public:
         return &rateLimiter;
     }
     bool recordFailedLogin(const QString &ipAddress) override;
+    bool isLoginRateLimited(const QString &ipAddress) override;
     void clearFailedLogins(const QString &ipAddress) override;
     int getMaxLoginAttemptsPerIp() const;
     int getLoginAttemptWindowSeconds() const;
