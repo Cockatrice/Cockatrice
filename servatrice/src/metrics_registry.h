@@ -6,11 +6,10 @@
 #ifndef METRICS_REGISTRY_H
 #define METRICS_REGISTRY_H
 
-#include <QHash>
+#include <QList>
 #include <QString>
 #include <array>
 #include <atomic>
-#include <functional>
 
 /**
  * @brief Lock-free accumulation of command processing statistics.
@@ -22,6 +21,10 @@
  *
  * Reading happens rarely (metrics scraping), accepts momentary tears between
  * related counters, and therefore also needs no synchronization.
+ *
+ * Only counts and totals are retained. An earlier Prometheus-style cumulative
+ * histogram (per-type, time-bucketed) was cut because nothing in the server
+ * ever wrote it out; it belongs to the future /metrics exporter that needs it.
  */
 class MetricsRegistry
 {
@@ -29,20 +32,23 @@ public:
     /**
      * Extension numbers are only unique per command kind, so recorded ids
      * combine the kind index with the protobuf extension number.
+     *
+     * The stride is only as wide as it needs to be: 1280 is the first round
+     * number above the largest extension actually in use (ModeratorCommand =
+     * 1206) and keeps the preallocated TypeStats array small. Bump it if a new
+     * command exceeds it.
      */
-    static constexpr int KindStride = 2048;
+    static constexpr int KindStride = 1280;
 
-    static constexpr int NumKinds = 5;
+    static constexpr int NumKinds = 6;
 
-    static constexpr const char *KindNames[NumKinds] = {"session", "room", "game", "moderator", "admin"};
+    static constexpr const char *KindNames[NumKinds] = {"session", "room", "game", "moderator", "admin", "developer"};
 
     /// Upper bound on distinct command type ids (see typeIdFor).
     static constexpr int MaxTypes = NumKinds * KindStride;
 
-    /// Histogram bucket upper bounds in milliseconds. Anything above the last
-    /// bound lands in the trailing +Inf bucket. Constexpr so the recording
-    /// hot path never allocates.
-    static constexpr std::array<qint64, 11> BucketBounds{1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000};
+    /// Guard against typeIdFor() overflowing into the neighbouring kind's slots.
+    static_assert(KindStride > 1206, "KindStride must exceed the highest command extension number in use");
 
     static int typeIdFor(int kindIndex, int extensionNumber)
     {
@@ -82,8 +88,8 @@ public:
 
     /**
      * Returns stats for every type slot that has seen at least one sample.
-     * The caller-provided @p labelForType maps a numeric type id to a stable
-     * human-readable label. Pass nullptr to skip label resolution.
+     * Callers resolve the numeric type id to a human-readable label via
+     * typeIdFor()/KindNames as needed.
      */
     QList<ActiveTypeStats> collectActiveStats() const;
 
@@ -95,36 +101,15 @@ public:
 
     GameStartSnapshot getGameStartSnapshot() const;
 
-    /**
-     * @brief Renders all recorded data in Prometheus text exposition format.
-     *
-     * @param nameForType maps a numeric command type id to a stable label
-     * value. Ids without a mapping are rendered as their number.
-     * @param gauges simple name/value pairs emitted as gauge samples.
-     */
-    QString toPrometheusText(const std::function<QString(int)> &nameForType,
-                             const QHash<QString, qint64> &gauges) const;
-
 private:
-    static constexpr int BucketCount = static_cast<int>(BucketBounds.size()) + 1; ///< bounds + the +Inf bucket
-
     struct TypeStats
     {
         std::atomic<qint64> count{0};
         std::atomic<qint64> totalMs{0};
-        std::array<std::atomic<qint64>, BucketCount> buckets{};
     };
 
     TypeStats &slotFor(int typeId);
     const TypeStats &slotFor(int typeId) const;
-
-    /// Index of the histogram bucket the sample falls into. The last index is +Inf.
-    static int bucketIndexFor(qint64 elapsedMs);
-
-    /// Appends one series of cumulative +Inf-terminated buckets to @p out.
-    static void appendCumulativeBuckets(QString &out,
-                                        const QString &bucketLine,
-                                        const std::array<std::atomic<qint64>, BucketCount> &buckets);
 
     std::array<TypeStats, MaxTypes> typeSlots{};
     TypeStats gameStartStats{};
