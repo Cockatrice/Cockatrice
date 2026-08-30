@@ -1,6 +1,8 @@
 #ifndef ORACLEIMPORTER_H
 #define ORACLEIMPORTER_H
 
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QMap>
 #include <QRegularExpression>
 #include <QVariant>
@@ -44,7 +46,7 @@ class SetToDownload
 {
 private:
     QString shortName, longName;
-    QList<QVariant> cards;
+    QJsonArray cards;
     QDate releaseDate;
     QString setType;
     CardSet::Priority priority;
@@ -58,7 +60,7 @@ public:
     {
         return longName;
     }
-    const QList<QVariant> &getCards() const
+    const QJsonArray &getCards() const
     {
         return cards;
     }
@@ -76,7 +78,7 @@ public:
     }
     SetToDownload(QString _shortName,
                   QString _longName,
-                  QList<QVariant> _cards,
+                  QJsonArray _cards,
                   CardSet::Priority _priority,
                   QString _setType = QString(),
                   const QDate &_releaseDate = QDate())
@@ -154,7 +156,7 @@ public:
     bool readSetsFromByteArray(const QByteArray &data);
     int startImport();
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
-    int importCardsFromSet(const CardSetPtr &currentSet, const QList<QVariant> &cardsList);
+    int importCardsFromSet(const CardSetPtr &currentSet, const QJsonArray &cardsList);
     FormatRulesNameMap createDefaultMagicFormats();
     const CardNameMap &getCardList() const
     {
@@ -164,6 +166,7 @@ public:
     {
         return allSets;
     }
+    void releaseSetData();
     void clear();
 };
 

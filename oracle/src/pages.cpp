@@ -560,6 +560,9 @@ void SaveSetsPage::initializePage()
 
         int setsImported = wizard()->importer->startImport();
 
+        // JSON data no longer needed after CardInfo objects are built
+        wizard()->importer->releaseSetData();
+
         if (setsImported == 0) {
             QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
         }
