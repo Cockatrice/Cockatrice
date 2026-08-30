@@ -46,6 +46,7 @@ private:
     QComboBox languageBox;
     QLabel advertiseTranslationPageLabel;
 
+    QLabel updateReleaseChannelLabel;
     QComboBox updateReleaseChannelBox;
     QCheckBox startupUpdateCheckCheckBox;
     QCheckBox updateNotificationCheckBox;
@@ -56,8 +57,6 @@ private:
     QLabel cardUpdateCheckIntervalLabel;
     QSpinBox cardUpdateCheckIntervalSpinBox;
     QLabel lastCardUpdateCheckDateLabel;
-
-    QLabel updateReleaseChannelLabel;
 
     QCheckBox showTipsOnStartup;
     QLabel startupTabLabel;

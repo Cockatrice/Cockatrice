@@ -84,15 +84,15 @@ private:
 
     QGroupBox *themeGroupBox;
     QGroupBox *homeTabGroupBox;
+    QGroupBox *playmatGroupBox;
     QGroupBox *stylingGroupBox;
     QGroupBox *menuGroupBox;
     QGroupBox *printingsGroupBox;
     QGroupBox *cardsGroupBox;
     QGroupBox *cardLayoutGroupBox;
-    QGroupBox *handGroupBox;
-    QGroupBox *playmatGroupBox;
-    QGroupBox *tableGroupBox;
     QGroupBox *cardCountersGroupBox;
+    QGroupBox *handGroupBox;
+    QGroupBox *tableGroupBox;
 
 public:
     AppearanceSettingsPage();

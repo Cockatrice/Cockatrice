@@ -478,7 +478,7 @@ void GeneralSettingsPage::retranslateUi()
     startupRoomLabel.setText(tr("Room:"));
     startupRoomNameEdit->setPlaceholderText(tr("Room name"));
 
-    if (SettingsCache::instance().getIsPortableBuild()) {
+    if (settings.getIsPortableBuild()) {
         pathsGroupBox->setTitle(tr("Paths (editing disabled in portable mode)"));
     } else {
         pathsGroupBox->setTitle(tr("Paths"));
