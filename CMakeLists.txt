@@ -13,16 +13,17 @@ option(WITH_CLIENT "Build Cockatrice client" ON)
 option(WITH_ORACLE "Build Cockatrice card database tool (Oracle)" ON)
 # Compile Servatrice
 option(WITH_SERVER "Build Cockatrice server (Servatrice)" OFF)
-# Compile tests
+# Compile Tests
 option(TEST "Build tests" OFF)
-# Treat warnings as errors (Debug builds only)
-option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
+
 # Check for translation updates
 option(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
 # Use vcpkg regardless of OS
 option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
 # Use compiler cache (ccache)
 option(USE_CCACHE "Cache the build results with ccache" OFF)
+# Treat warnings as errors (Debug builds only)
+option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
@@ -89,6 +90,9 @@ set(CMAKE_CXX_STANDARD
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# try target_compile_features(cockatrice PRIVATE cxx_std_20)
+# -fexperimental-library for gcc/clang, libstdc++,  gate with compiler_is_gnucxx or cxx_compiler_id matches clang
+
 # Set conventional loops
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
@@ -139,48 +143,65 @@ elseif(WIN32) # Windows (including 64bit)
   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
 endif()
 
-# Define proper compilation flags
+# Define compiler flags
 if(MSVC) # MS Visual C++ compiler
-  # /EHsc            Enable standard C++ exception handling
-  # /MP              Enable parallel compilation
-  # /wd4251          Suppress C4251 (DLL interface) warnings
-  # /W4              Enable warning level 4
-  # /Zi              Generate debugging information (Program Database, PDB)
-  set(CMAKE_CXX_FLAGS "/EHsc /MP /wd4251 /W4 /Zi")
+  # /EHsc              Enable standard C++ exception handling
+  # /MP                Enable parallel compilation
+  # /permissive-       Enable strict standards compliance
+  # /utf-8             Set source file encoding and execution char set to UTF-8
+  # /wd4251            Suppress C4251 (DLL interface) warnings around DLL exports   <-- removed to see how Qt6 handles it
+  # /W4                Enable warning level 4
+  # /Zc:__cplusplus    Enable C++20 detection in headers
+  # /Zi                Generate debugging information (Program Database, PDB)
+  set(CMAKE_CXX_FLAGS "/EHsc /MP /permissive- /utf-8 /W4 /Zc:__cplusplus /Zi")
 
-  # /Ox              Enable maximum optimization
-  # /MD              Link against the multi-threaded DLL runtime library (Release CRT)
+  # /Ox                Enable maximum optimization
+  # /MD                Link against the multi-threaded DLL runtime library (Release CRT)
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
 
-  # /Od              Disable optimization
-  # /MDd             Link against the multi-threaded Debug DLL runtime library (Debug CRT)
+  # /Od                Disable optimization
+  # /MDd               Link against the multi-threaded Debug DLL runtime library (Debug CRT)
   set(CMAKE_CXX_FLAGS_DEBUG "/Od /MDd")
 
   # Generate PDBs, even when building release target to allow developers to better analyze crash logs
+  # /DEBUG             Enable PDB generation also for Release builds
+  # /OPT:REF           Remove unused references
+  # /OPT:ICF           Fold identical code
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 
-  add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
+  add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING) # check if this is still needed with C++20
 
 elseif(CMAKE_COMPILER_IS_GNUCXX) # Linux/GCC, BSD/GCC, Windows/MinGW
   include(CheckCXXCompilerFlag)
 
-  set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
+  # -O2             Balanced optimization
+  # -s              Remove debug info from the binary (strip symbols)
+  set(CMAKE_CXX_FLAGS_RELEASE "-O2 -s")
 
+  # -ggdb           Produce GDB debugging symbols
+  # -O0             No optimization
+  # -Wall           Enable all warnings
+  # -Wextra         Enable extra warnings
+  # -Werror         Treat warnings as compilation errors
   if(WARNING_AS_ERROR)
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -Werror")
   else()
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra")
   endif()
 
+  # -std=gnu++20    Enable GNU C++20 extensions
+  if(APPLE) # macOS/GCC
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20")
+  endif()
+
   set(ADDITIONAL_DEBUG_FLAGS
-      -Wcast-align
-      -Wmissing-declarations
-      -Wno-long-long
-      -Wno-error=extra
-      -Wno-error=delete-non-virtual-dtor
-      -Wno-error=sign-compare
-      -Wno-error=missing-declarations
-      -Wno-error=sfinae-incomplete # GCC 16+: Qt MOC + protobuf forward declarations trigger this
+      -Wcast-align                          # Catch unsafe pointer casts
+      -Wmissing-declarations                # Catch defined functions without prior declaration
+      -Wno-error=extra                      # Downgrade some -Wextra warnings from errors to warnings
+      -Wno-error=delete-non-virtual-dtor    #     <-- see if still needed?
+      -Wno-error=sign-compare               # Downgrade comparing signed vs. unsigned integers from errors to warnings
+      -Wno-error=missing-declarations       # Downgrade -Wmissing-declarations from errors to warnings
+      -Wno-error=sfinae-incomplete          # GCC 16+: Qt MOC + protobuf forward declarations trigger this
   )
 
   foreach(FLAG ${ADDITIONAL_DEBUG_FLAGS})
@@ -189,8 +210,16 @@ elseif(CMAKE_COMPILER_IS_GNUCXX) # Linux/GCC, BSD/GCC, Windows/MinGW
       set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FLAG}")
     endif()
   endforeach()
-else() # Other: macOS/LLVM, BSD/LLVM
+else() # Other: macOS/LLVM, BSD/LLVM, "Clang-specific"
+  # -O2                      Balanced optimization
   set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+
+  # -g                       Include debug information (equivalent to -ggdb for GCC)
+  # -O0                      No optimization
+  # -Wall                    Enable all warnings
+  # -Wextra                  Enable extra warnings
+  # -Werror                  Treat warnings as compiler errors
+  # -Wno-unused-parameter    Suppress warnings about unused function parameters (common in Qt callbacks)
   if(WARNING_AS_ERROR)
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror -Wno-unused-parameter")
   else()
@@ -319,7 +348,7 @@ elseif(WIN32) # Windows (including 64bit)
   # Configure file with custom definitions for NSIS
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
 
-  # Include vcredist into the package; NSIS will take care of running it
+  # Include vcredist into the package - NSIS will take care of running it
   if(VCREDISTRUNTIME_FOUND)
     install(FILES "${VCREDISTRUNTIME_FILE}" DESTINATION ./)
   endif()
@@ -342,9 +371,9 @@ if(WITH_CLIENT
 endif()
 
 if(WITH_CLIENT OR WITH_ORACLE)
-  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_settings ${CMAKE_BINARY_DIR}/libcockatrice_settings)
-  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_models ${CMAKE_BINARY_DIR}/libcockatrice_models)
   add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_filters ${CMAKE_BINARY_DIR}/libcockatrice_filters)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_models ${CMAKE_BINARY_DIR}/libcockatrice_models)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_settings ${CMAKE_BINARY_DIR}/libcockatrice_settings)
 endif()
 
 if(WITH_CLIENT)
