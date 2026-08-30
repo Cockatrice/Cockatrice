@@ -43,6 +43,7 @@ public:
     [[nodiscard]] bool getTabLogOpen() const override;
     [[nodiscard]] bool getTabReportOpen() const override;
     [[nodiscard]] bool getTabModerationOpen() const override;
+    [[nodiscard]] bool getTabCardArtRulesOpen() const override;
 
     void setStartupTabIndex(int value);
     void setStartupServerHost(const QString &host);
@@ -57,6 +58,7 @@ public:
     void setTabLogOpen(bool value);
     void setTabReportOpen(bool value);
     void setTabModerationOpen(bool value);
+    void setTabCardArtRulesOpen(bool value);
 
 signals:
     void startupTabIndexChanged(int index);
