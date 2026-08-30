@@ -514,6 +514,11 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
     QString reasonStr;
     int banSecondsLeft = 0;
     QString connectionType = getConnectionType();
+    // Throttle before doing any work: a locked-out address must not get a full
+    // database round trip and password verification on every attempt.
+    if (server->isLoginRateLimited(getAddress())) {
+        return Response::RespTooManyRequests;
+    }
     AuthenticationResult res = server->loginUser(this, userName, password, needsHash, reasonStr, banSecondsLeft,
                                                  clientId, clientVersion, connectionType);
     switch (res) {
