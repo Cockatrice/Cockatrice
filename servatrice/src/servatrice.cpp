@@ -230,6 +230,13 @@ bool Servatrice::initServer()
 {
 
     serverId = getServerID();
+
+    // METRICS (always active. Slow-command logging and stall watchdogs are
+    // controlled by their respective thresholds below). Read up front so the
+    // values are available before any pool thread is started and watchdogged.
+    metricsSlowCommandMs = settingsCache->value("metrics/slow_command_ms", 500).toInt();
+    metricsStallWarnMs = qMax(0, settingsCache->value("metrics/stall_warn_ms", 2000).toInt());
+
     if (getAuthenticationMethodString() == "sql") {
         qDebug() << "Authenticating method: sql";
         authenticationMethod = AuthenticationSql;
@@ -474,11 +481,6 @@ bool Servatrice::initServer()
     }
 
     setRequiredFeatures(getRequiredFeatures());
-
-    // METRICS (always active. Slow-command logging and stall watchdogs are
-    // controlled by their respective thresholds below)
-    metricsSlowCommandMs = settingsCache->value("metrics/slow_command_ms", 500).toInt();
-    metricsStallWarnMs = qMax(0, settingsCache->value("metrics/stall_warn_ms", 2000).toInt());
 
     return true;
 }

@@ -315,8 +315,11 @@ public:
         return uptime;
     }
     /**
-     * Sums cards across all zones of all running games. Locks rooms and games
-     * briefly per level, so scrape-time cost grows with live game count only.
+     * Sums cards across all zones of all running games. Each game takes its
+     * own gameMutex -- the hot per-game lock every game action contends on --
+     * and then iterates every player's zones, so the scrape cost is really
+     * O(total cards in play) plus one mutex acquisition per live game. Keep
+     * scrapes infrequent in big multiplayer rooms.
      */
     qint64 getCardsInGamesTotal() const;
     int getMetricsSlowCommandMs() const
