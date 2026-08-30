@@ -14,7 +14,6 @@
 #include <QTabWidget>
 #include <QTableWidget>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
-#include <libcockatrice/protocol/pb/command_get_log_history.pb.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 #include <libcockatrice/protocol/pb/response_viewlog_history.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
@@ -82,7 +81,9 @@ void TabLog::getClicked()
     if (!mainRoom->isChecked() && !gameRoom->isChecked() && !privateChat->isChecked()) {
         mainRoom->setChecked(true);
         gameRoom->setChecked(true);
-        privateChat->setChecked(true);
+        if (!canUseDeveloperCommands) {
+            privateChat->setChecked(true);
+        }
     }
 
     if (maximumResults->value() == 0) {
@@ -123,18 +124,7 @@ void TabLog::getClicked()
     PendingCommand *pend;
     if (canUseDeveloperCommands) {
         // Developers query logs through the developer command family.
-        Command_GetLogHistory devCmd;
-        devCmd.set_user_name(cmd.user_name());
-        devCmd.set_ip_address(cmd.ip_address());
-        devCmd.set_game_name(cmd.game_name());
-        devCmd.set_game_id(cmd.game_id());
-        devCmd.set_message(cmd.message());
-        for (int i = 0; i < cmd.log_location_size(); ++i) {
-            devCmd.add_log_location(cmd.log_location(i));
-        }
-        devCmd.set_date_range(cmd.date_range());
-        devCmd.set_maximum_results(cmd.maximum_results());
-        pend = client->prepareDeveloperCommand(devCmd);
+        pend = client->prepareDeveloperCommand(cmd);
     } else {
         pend = client->prepareModeratorCommand(cmd);
     }
@@ -192,6 +182,10 @@ void TabLog::createDock()
     mainRoom = new QCheckBox(tr("Main Room"));
     gameRoom = new QCheckBox(tr("Game Room"));
     privateChat = new QCheckBox(tr("Private Chat"));
+    if (canUseDeveloperCommands) {
+        // Developers cannot query private conversations.
+        privateChat->setVisible(false);
+    }
 
     pastDays = new QRadioButton(tr("Past X Days: "));
     today = new QRadioButton(tr("Today"));

@@ -117,7 +117,8 @@ private:
     Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportList(const Command_ReportList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdWarnUser(const Command_WarnUser &cmd, ResponseContainer &rc);
-    Response::ResponseCode cmdGetLogHistory(const Command_ViewLogHistory &cmd, ResponseContainer &rc);
+    Response::ResponseCode
+    cmdGetLogHistory(const Command_ViewLogHistory &cmd, ResponseContainer &rc, bool allowPrivateChat);
     Response::ResponseCode cmdGetBanHistory(const Command_GetBanHistory &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetWarnList(const Command_GetWarnList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetWarnHistory(const Command_GetWarnHistory &cmd, ResponseContainer &rc);

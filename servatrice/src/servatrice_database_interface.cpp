@@ -1487,6 +1487,38 @@ QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastL
     return results;
 }
 
+Servatrice_DatabaseInterface::UptimeSnapshot Servatrice_DatabaseInterface::getLatestUptimeSnapshot(int serverId)
+{
+    UptimeSnapshot snapshot;
+
+    if (!checkSql()) {
+        return snapshot;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT users_count, mods_count, games_count, tx_bytes, rx_bytes, uptime, "
+                                    "UNIX_TIMESTAMP(timest) FROM {prefix}_uptime "
+                                    "WHERE id_server = :id_server ORDER BY timest DESC LIMIT 1");
+    query->bindValue(":id_server", serverId);
+
+    if (!execSqlQuery(query)) {
+        qCWarning(DatabaseInterfaceLog) << "Failed to collect server stats snapshot: SQL Error";
+        return snapshot;
+    }
+
+    if (query->next()) {
+        snapshot.valid = true;
+        snapshot.usersCount = query->value(0).toULongLong();
+        snapshot.modsCount = query->value(1).toULongLong();
+        snapshot.gamesCount = query->value(2).toULongLong();
+        snapshot.txBytes = query->value(3).toULongLong();
+        snapshot.rxBytes = query->value(4).toULongLong();
+        snapshot.uptimeSecs = query->value(5).toULongLong();
+        snapshot.timest = query->value(6).toULongLong();
+    }
+
+    return snapshot;
+}
+
 bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)
 {
     if (!checkSql()) {

@@ -287,7 +287,7 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
         case ModeratorCommand::REPORT_RESOLVE:
             return cmdReportResolve(cmd.GetExtension(Command_ReportResolve::ext), rc);
         case ModeratorCommand::VIEWLOG_HISTORY:
-            return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::ext), rc);
+            return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::ext), rc, true);
         case ModeratorCommand::GRANT_REPLAY_ACCESS:
             return cmdGrantReplayAccess(cmd.GetExtension(Command_GrantReplayAccess::ext), rc);
         case ModeratorCommand::REPLAY_DOWNLOAD_BY_GAME_ID:
@@ -351,21 +351,9 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedDeveloperCo
         case DeveloperCommand::GET_SERVER_STATS:
             return cmdGetServerStats(cmd.GetExtension(Command_GetServerStats::ext), rc);
         case DeveloperCommand::VIEWLOG_HISTORY: {
-            // Same query as the moderator log view, just carried by the
-            // developer command family.
-            const Command_GetLogHistory &devCmd = cmd.GetExtension(Command_GetLogHistory::ext);
-            Command_ViewLogHistory modCmd;
-            modCmd.set_user_name(devCmd.user_name());
-            modCmd.set_ip_address(devCmd.ip_address());
-            modCmd.set_game_name(devCmd.game_name());
-            modCmd.set_game_id(devCmd.game_id());
-            modCmd.set_message(devCmd.message());
-            for (int i = 0; i < devCmd.log_location_size(); ++i) {
-                modCmd.add_log_location(devCmd.log_location(i));
-            }
-            modCmd.set_date_range(devCmd.date_range());
-            modCmd.set_maximum_results(devCmd.maximum_results());
-            return cmdGetLogHistory(modCmd, rc);
+            // Same query as the moderator log view, carried by the developer
+            // command family, but narrows out private chats and sender IPs.
+            return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::dev_ext), rc, false);
         }
         default:
             return Response::RespFunctionNotAllowed;
@@ -1055,12 +1043,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
 // MODERATOR FUNCTIONS.
 // May be called by admins and moderators. Permission is checked by the calling function.
 Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Command_ViewLogHistory &cmd,
-                                                                       ResponseContainer &rc)
+                                                                       ResponseContainer &rc,
+                                                                       bool allowPrivateChat)
 {
 
     QList<ServerInfo_ChatMessage> messageList;
     QString userName = nameFromStdString(cmd.user_name());
-    QString ipAddress = nameFromStdString(cmd.ip_address());
+    QString ipAddress = allowPrivateChat ? nameFromStdString(cmd.ip_address()) : QString();
     QString gameName = nameFromStdString(cmd.game_name());
     QString gameID = nameFromStdString(cmd.game_id());
     QString message = textFromStdString(cmd.message());
@@ -1075,7 +1064,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
         if (nameFromStdString(cmd.log_location(i)).simplified() == "game") {
             gameType = true;
         }
-        if (nameFromStdString(cmd.log_location(i)).simplified() == "chat") {
+        if (nameFromStdString(cmd.log_location(i)).simplified() == "chat" && allowPrivateChat) {
             chatType = true;
         }
     }
@@ -1089,7 +1078,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
         QListIterator<ServerInfo_ChatMessage> messageIterator(sqlInterface->getMessageLogHistory(
             userName, ipAddress, gameName, gameID, message, chatType, gameType, roomType, dateRange, maximumResults));
         while (messageIterator.hasNext()) {
-            re->add_log_message()->CopyFrom(messageIterator.next());
+            ServerInfo_ChatMessage chatMessage = messageIterator.next();
+            if (!allowPrivateChat) {
+                chatMessage.clear_sender_ip();
+            }
+            re->add_log_message()->CopyFrom(chatMessage);
         }
     } else {
         ServerInfo_ChatMessage chatMessage;
@@ -1687,24 +1680,20 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetServerStats(const Co
 
     // Servatrice::statusUpdate() periodically snapshots server health into the
     // uptime table. Serve the freshest snapshot for this server.
-    QSqlQuery *query = sqlInterface->prepareQuery(
-        "SELECT users_count, mods_count, games_count, tx_bytes, rx_bytes, uptime, UNIX_TIMESTAMP(timest) "
-        "FROM {prefix}_uptime WHERE id_server = :id_server ORDER BY timest DESC LIMIT 1");
-    query->bindValue(":id_server", servatrice->getServerID());
-    if (!sqlInterface->execSqlQuery(query)) {
+    const auto snapshot = sqlInterface->getLatestUptimeSnapshot(servatrice->getServerID());
+    if (!snapshot.valid) {
+        // No snapshot yet (fresh server, or statusUpdate() has not ticked).
         return Response::RespInternalError;
     }
 
     auto *re = new Response_GetServerStats;
-    if (query->next()) {
-        re->set_users_count(query->value(0).toUInt());
-        re->set_mods_count(query->value(1).toUInt());
-        re->set_games_count(query->value(2).toUInt());
-        re->set_tx_bytes(query->value(3).toUInt());
-        re->set_rx_bytes(query->value(4).toUInt());
-        re->set_uptime_secs(query->value(5).toUInt());
-        re->set_timest(query->value(6).toUInt());
-    }
+    re->set_users_count(snapshot.usersCount);
+    re->set_mods_count(snapshot.modsCount);
+    re->set_games_count(snapshot.gamesCount);
+    re->set_tx_bytes(snapshot.txBytes);
+    re->set_rx_bytes(snapshot.rxBytes);
+    re->set_uptime_secs(snapshot.uptimeSecs);
+    re->set_timest(snapshot.timest);
 
     rc.setResponseExtension(re);
     return Response::RespOk;

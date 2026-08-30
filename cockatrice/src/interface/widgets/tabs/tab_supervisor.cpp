@@ -834,10 +834,10 @@ void TabSupervisor::actTabLog(bool checked)
 
 void TabSupervisor::openTabLog()
 {
-    // Developers without moderation rights query logs through the developer
-    // command family, so tell the tab which family to use.
-    const bool isDeveloper = (userInfo->user_level() & ServerInfo_User::IsDeveloper) != 0;
-    tabLog = new TabLog(this, client, isDeveloper);
+    // Developers query logs through the developer command family, so tell the
+    // tab which family to use.
+    const bool useDeveloperCommands = (userInfo->user_level() & ServerInfo_User::IsDeveloper) != 0;
+    tabLog = new TabLog(this, client, useDeveloperCommands);
     myAddTab(tabLog, aTabLog);
     connect(tabLog, &QObject::destroyed, this, [this] {
         tabLog = nullptr;
