@@ -172,10 +172,6 @@ elseif(CMAKE_COMPILER_IS_GNUCXX) # Linux/GCC, BSD/GCC, Windows/MinGW
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra")
   endif()
 
-  if(APPLE) # macOS
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20") # still needed?
-  endif()
-
   set(ADDITIONAL_DEBUG_FLAGS
       -Wcast-align
       -Wmissing-declarations
