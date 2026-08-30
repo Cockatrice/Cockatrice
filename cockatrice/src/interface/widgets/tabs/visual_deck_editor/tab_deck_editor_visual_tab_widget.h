@@ -133,7 +133,6 @@ signals:
     void edhrecRequested(const CardInfoPtr &cardInfo, bool isCommander);
     void printingSelectorRequested();
     void cardInfoRequested(const ExactCard &cardName);
-    void newZoneRequested();
 
 private:
     QVBoxLayout *layout;                  ///< Layout for tabs and controls.

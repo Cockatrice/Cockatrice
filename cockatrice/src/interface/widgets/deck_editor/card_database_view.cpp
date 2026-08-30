@@ -91,7 +91,7 @@ void CardDatabaseView::decrementCard(const QString &zoneName)
 }
 
 void CardDatabaseView::setZoneMenuProvider(const std::function<QList<QPair<QString, QStringList>>()> &provider,
-                                           const std::function<void()> &newZoneHandler)
+                                           const std::function<QString()> &newZoneHandler)
 {
     zoneMenuProvider = provider;
     this->newZoneHandler = newZoneHandler;
@@ -151,35 +151,46 @@ void CardDatabaseView::openCustomMenu(QPoint point)
 
     if (zoneMenuProvider) {
         QMenu *addToZoneMenu = menu.addMenu(tr("Add to Zone"));
-        for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
-            QAction *action = addToZoneMenu->addAction(InnerDecklistNode::visibleNameFromName(boardName));
-            connect(action, &QAction::triggered, this,
-                    [this, card, boardName] { emit cardAdded(card->getName(), boardName); });
-        }
-
-        bool anyCustomZone = false;
         const auto zoneBoards = zoneMenuProvider();
-        for (const auto &zoneBoard : zoneBoards) {
-            const QString &boardName = zoneBoard.first;
-            const QStringList &customZones = zoneBoard.second;
+        for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
+            // Boards with zones nest their children so no two menu entries
+            // share a visible name: "Maindeck ▸ { Maindeck (whole board), … }".
+            const QStringList customZones = [&zoneBoards, boardName] {
+                for (const auto &zoneBoard : zoneBoards) {
+                    if (zoneBoard.first == boardName) {
+                        return zoneBoard.second;
+                    }
+                }
+                return QStringList();
+            }();
             if (customZones.isEmpty()) {
-                continue;
-            }
-            anyCustomZone = true;
-            QMenu *boardSubmenu = addToZoneMenu->addMenu(InnerDecklistNode::visibleNameFromName(boardName));
-            for (const QString &zoneName : customZones) {
-                QAction *action = boardSubmenu->addAction(zoneName);
+                QAction *action = addToZoneMenu->addAction(InnerDecklistNode::visibleNameFromName(boardName));
                 connect(action, &QAction::triggered, this,
-                        [this, card, zoneName] { emit cardAdded(card->getName(), zoneName); });
+                        [this, card, boardName] { emit cardAdded(card->getName(), boardName); });
+            } else {
+                QMenu *boardSubmenu = addToZoneMenu->addMenu(InnerDecklistNode::visibleNameFromName(boardName));
+                QAction *wholeBoardAction = boardSubmenu->addAction(InnerDecklistNode::visibleNameFromName(boardName));
+                connect(wholeBoardAction, &QAction::triggered, this,
+                        [this, card, boardName] { emit cardAdded(card->getName(), boardName); });
+                for (const QString &zoneName : customZones) {
+                    QAction *action = boardSubmenu->addAction(zoneName);
+                    connect(action, &QAction::triggered, this,
+                            [this, card, zoneName] { emit cardAdded(card->getName(), zoneName); });
+                }
             }
         }
 
-        if (anyCustomZone) {
+        if (newZoneHandler) {
             addToZoneMenu->addSeparator();
-        }
 
-        QAction *newZoneAction = addToZoneMenu->addAction(tr("Create &new zone..."));
-        connect(newZoneAction, &QAction::triggered, this, [this] { newZoneHandler(); });
+            QAction *newZoneAction = addToZoneMenu->addAction(tr("Create &new zone..."));
+            connect(newZoneAction, &QAction::triggered, this, [this, card] {
+                const QString zoneName = newZoneHandler();
+                if (!zoneName.isEmpty()) {
+                    emit cardAdded(card->getName(), zoneName);
+                }
+            });
+        }
     }
 
     if (canBeCommander(*card)) {

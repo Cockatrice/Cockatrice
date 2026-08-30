@@ -51,8 +51,6 @@ TabDeckEditorVisualTabWidget::TabDeckEditorVisualTabWidget(QWidget *parent,
             &TabDeckEditorVisualTabWidget::printingSelectorRequested);
     connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::cardInfoRequested, this,
             &TabDeckEditorVisualTabWidget::cardInfoRequested);
-    connect(visualDatabaseDisplay, &VisualDatabaseDisplayWidget::newZoneRequested, this,
-            &TabDeckEditorVisualTabWidget::newZoneRequested);
 
     statsAnalyzer = new DeckListStatisticsAnalyzer(this, deckModel);
     statsAnalyzer->analyze();

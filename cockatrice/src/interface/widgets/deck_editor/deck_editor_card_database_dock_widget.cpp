@@ -31,7 +31,7 @@ void DeckEditorCardDatabaseDockWidget::createDatabaseDisplayDock(AbstractTabDeck
             }
             return result;
         },
-        [this, deckEditor] {
+        [this, deckEditor]() -> QString {
             QString boardName;
             const QString zoneName =
                 DeckZoneDialog::promptForNewZone(this, {}, &boardName, [deckEditor](const QString &candidate) {
@@ -40,6 +40,7 @@ void DeckEditorCardDatabaseDockWidget::createDatabaseDisplayDock(AbstractTabDeck
             if (!zoneName.isEmpty()) {
                 deckEditor->deckStateManager->createCustomZone(boardName, zoneName);
             }
+            return zoneName;
         });
 
     auto *frame = new QVBoxLayout;

@@ -24,7 +24,8 @@ class CardDatabaseView : public QTreeView
     /// The list contains (board zone name, custom zone names) pairs for every board.
     std::function<QList<QPair<QString, QStringList>>()> zoneMenuProvider;
     /// Handler invoked when the user picks "New zone..." from the add-to-zone menu.
-    std::function<void()> newZoneHandler;
+    /// Returns the name of the created zone, or an empty string if creation was cancelled.
+    std::function<QString()> newZoneHandler;
 
 public:
     explicit CardDatabaseView(QWidget *parent, CardDatabaseDisplayModel *model);
@@ -45,10 +46,11 @@ public:
      * If no provider is set, the submenu is not shown.
      *
      * @param provider Returns the custom zones of the current deck, grouped by board zone
-     * @param newZoneHandler Invoked when the user chooses "New zone..." in the submenu
+     * @param newZoneHandler Creates a new custom zone and returns its name, or an empty string
+     *                       if creation was cancelled. The menu entry is hidden when not provided.
      */
     void setZoneMenuProvider(const std::function<QList<QPair<QString, QStringList>>()> &provider,
-                             const std::function<void()> &newZoneHandler);
+                             const std::function<QString()> &newZoneHandler);
 
 signals:
     void cardChanged(const QString &cardName);

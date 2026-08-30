@@ -103,8 +103,9 @@ private:
     [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;
     void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
 
-    void addMoveToZoneMenu(QMenu *menu, const QModelIndex &sourceCardIndex);
+    void addMoveToZoneMenu(QMenu *menu, const QModelIndex &sourceCardIndex, const QString &currentBoardName);
     void addChangeBoardMenu(QMenu *menu, const QString &zoneName);
+    QString createNewCustomZone(const QString &initialBoardName = {});
     void addNewZoneAction(QMenu *menu, const QString &initialBoardName = {});
 
 private slots:
