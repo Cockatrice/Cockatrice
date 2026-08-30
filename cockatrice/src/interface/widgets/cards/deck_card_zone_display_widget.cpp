@@ -133,15 +133,11 @@ void DeckCardZoneDisplayWidget::displayCards()
     }
 
     // Iterate the direct children of the tracked zone, keeping the tree view's row
-    // order (criteria groups first, then custom zones in their creation order).
+    // order (criteria groups first, then custom zones, both in the model's sort order).
     QList<QPersistentModelIndex> rows;
     for (int i = 0; i < deckListModel->rowCount(trackedIndex); ++i) {
         rows.append(QPersistentModelIndex(deckListModel->index(i, 0, trackedIndex)));
     }
-
-    std::stable_partition(rows.begin(), rows.end(), [](const QPersistentModelIndex &row) {
-        return !row.data(DeckRoles::IsCustomZoneRole).toBool();
-    });
 
     for (const QPersistentModelIndex &persistent : rows) {
         constructAppropriateWidget(persistent);

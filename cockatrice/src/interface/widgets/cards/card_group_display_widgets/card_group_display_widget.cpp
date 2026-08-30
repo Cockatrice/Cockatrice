@@ -155,18 +155,6 @@ QWidget *CardGroupDisplayWidget::constructWidgetForIndex(QPersistentModelIndex i
 
 void CardGroupDisplayWidget::updateCardDisplays()
 {
-    // Custom zones are user-defined containers: they display their cards in the same
-    // order as the tree view, i.e. the model row order. Only criteria groups apply
-    // the visual sort criteria.
-    const bool isCustomZone = trackedIndex.data(DeckRoles::IsCustomZoneRole).toBool();
-
-    if (isCustomZone) {
-        for (int i = 0; i < deckListModel->rowCount(trackedIndex); ++i) {
-            addCardWidgets(QPersistentModelIndex(deckListModel->index(i, 0, trackedIndex)));
-        }
-        return;
-    }
-
     DeckListSortFilterProxyModel proxy;
     proxy.setSourceModel(deckListModel);
     proxy.setSortCriteria(activeSortCriteria);
