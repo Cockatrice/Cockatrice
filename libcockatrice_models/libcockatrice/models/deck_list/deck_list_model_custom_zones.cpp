@@ -14,26 +14,55 @@ bool isCustomZone(const AbstractDecklistNode *node)
     return dynamic_cast<const DecklistModelSubZoneNode *>(node) != nullptr;
 }
 
+namespace
+{
+
+/**
+ * @brief Flattens every card under @p zone into @p shadowZone, preserving order.
+ *
+ * Custom zones mirror as a single row level: cards nested in sub-zones of any
+ * depth are added as direct children of the mirrored zone so no card is left
+ * without a model row.
+ */
+void flattenCards(const InnerDecklistNode *zone, InnerDecklistNode *shadowZone)
+{
+    for (int k = 0; k < zone->size(); k++) {
+        if (auto *zoneCard = dynamic_cast<DecklistCardNode *>(zone->at(k))) {
+            new DecklistModelCardNode(zoneCard, shadowZone);
+        } else if (auto *subZone = dynamic_cast<const InnerDecklistNode *>(zone->at(k))) {
+            flattenCards(subZone, shadowZone);
+        }
+    }
+}
+
+} // namespace
+
 void mirrorCustomZones(const InnerDecklistNode *deckBoardZone, InnerDecklistNode *shadowBoardZone)
 {
     for (int j = 0; j < deckBoardZone->size(); j++) {
-        auto *customCard = dynamic_cast<DecklistCardNode *>(deckBoardZone->at(j));
-        if (customCard) {
-            continue;
-        }
-
         auto *customZone = dynamic_cast<const InnerDecklistNode *>(deckBoardZone->at(j));
         if (!customZone) {
             continue;
         }
 
         auto *shadowZone = new DecklistModelSubZoneNode(customZone->getName(), shadowBoardZone);
-        for (int k = 0; k < customZone->size(); k++) {
-            if (auto *zoneCard = dynamic_cast<DecklistCardNode *>(customZone->at(k))) {
-                new DecklistModelCardNode(zoneCard, shadowZone);
-            }
+        flattenCards(customZone, shadowZone);
+    }
+}
+
+InnerDecklistNode *findGroupChild(InnerDecklistNode *parent, const QString &name)
+{
+    for (int i = 0; i < parent->size(); i++) {
+        AbstractDecklistNode *child = parent->at(i);
+        if (isCustomZone(child)) {
+            continue;
+        }
+        auto *group = dynamic_cast<InnerDecklistNode *>(child);
+        if (group && group->getName() == name) {
+            return group;
         }
     }
+    return nullptr;
 }
 
 DecklistModelSubZoneNode *findSubZoneByName(InnerDecklistNode *root, const QString &zoneName)

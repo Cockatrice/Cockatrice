@@ -44,6 +44,21 @@ namespace DeckListModelCustomZones
 [[nodiscard]] bool isCustomZone(const AbstractDecklistNode *node);
 
 /**
+ * @brief Finds a criteria-group child of @p parent by name, skipping custom zones.
+ *
+ * The shadow tree keeps criteria groups and mirrored custom zones as siblings
+ * under a board zone, and `InnerDecklistNode::findChild` matches both by name.
+ * Group lookups must not resolve a custom zone that happens to share the group
+ * name (e.g. a zone called "Creature"), so this searches only non-custom
+ * children.
+ *
+ * @param parent The shadow node whose children are searched.
+ * @param name The group name to find.
+ * @return The matching group node, or nullptr if none exists.
+ */
+[[nodiscard]] InnerDecklistNode *findGroupChild(InnerDecklistNode *parent, const QString &name);
+
+/**
  * @brief Mirrors the custom zones of a deck board zone into its shadow board node.
  *
  * Each custom zone becomes a DecklistModelSubZoneNode under @p shadowBoardZone

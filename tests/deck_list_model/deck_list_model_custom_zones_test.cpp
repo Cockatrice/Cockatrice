@@ -129,6 +129,51 @@ TEST(DeckListModelCustomZones, MirrorCustomZonesWithNoCustomZonesIsNoop)
     EXPECT_EQ(shadowBoard->size(), 0);
 }
 
+TEST(DeckListModelCustomZones, MirrorCustomZonesFlattensNestedSubzones)
+{
+    // Cards deeper than one level under a custom zone still get a model row.
+    auto *deckBoard = new InnerDecklistNode(DECK_ZONE_MAIN);
+    auto *deckZone = new InnerDecklistNode("Removal", deckBoard);
+    auto *deckCard1 = new DecklistCardNode("Bolt", 1, deckZone);
+    auto *deeper = new InnerDecklistNode("Deeper", deckZone);
+    auto *deckCard2 = new DecklistCardNode("Swords", 1, deeper);
+
+    InnerDecklistNode shadowRoot;
+    auto *shadowBoard = new InnerDecklistNode(DECK_ZONE_MAIN, &shadowRoot);
+
+    DeckListModelCustomZones::mirrorCustomZones(deckBoard, shadowBoard);
+
+    ASSERT_EQ(shadowBoard->size(), 1);
+    auto *shadowZone = dynamic_cast<DecklistModelSubZoneNode *>(shadowBoard->at(0));
+    ASSERT_NE(shadowZone, nullptr);
+    EXPECT_EQ(shadowZone->getName(), QString("Removal"));
+
+    // Both cards are flattened into the mirrored zone, preserving order.
+    ASSERT_EQ(shadowZone->size(), 2);
+    auto *shadowCard1 = dynamic_cast<DecklistModelCardNode *>(shadowZone->at(0));
+    auto *shadowCard2 = dynamic_cast<DecklistModelCardNode *>(shadowZone->at(1));
+    ASSERT_NE(shadowCard1, nullptr);
+    ASSERT_NE(shadowCard2, nullptr);
+    EXPECT_EQ(shadowCard1->getDataNode(), deckCard1);
+    EXPECT_EQ(shadowCard2->getDataNode(), deckCard2);
+}
+
+// =====================================================================================================================
+// findGroupChild
+// =====================================================================================================================
+
+TEST(DeckListModelCustomZones, FindGroupChildSkipsCustomZones)
+{
+    InnerDecklistNode root;
+    auto *board = new InnerDecklistNode(DECK_ZONE_MAIN, &root);
+    auto *group = new InnerDecklistNode("Creature", board);
+    new DecklistModelSubZoneNode("Creature", board);
+
+    EXPECT_EQ(DeckListModelCustomZones::findGroupChild(board, "Creature"), group);
+    EXPECT_EQ(DeckListModelCustomZones::findGroupChild(board, "Missing"), nullptr);
+    EXPECT_EQ(DeckListModelCustomZones::findGroupChild(&root, DECK_ZONE_MAIN), board);
+}
+
 // =====================================================================================================================
 // sortWithCustomZonesLast
 // =====================================================================================================================
@@ -222,4 +267,10 @@ TEST(DeckListModelCustomZones, SortPlainNodeDoesNotReorderCustomZones)
     EXPECT_EQ(mapping[0].second, 0);
     EXPECT_EQ(mapping[1].first, 0);
     EXPECT_EQ(mapping[1].second, 1);
+}
+
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

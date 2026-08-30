@@ -378,7 +378,8 @@ bool DeckListModel::removeRows(int row, int count, const QModelIndex &parent)
 
 InnerDecklistNode *DeckListModel::createNodeIfNeeded(const QString &name, InnerDecklistNode *parent)
 {
-    auto *newNode = dynamic_cast<InnerDecklistNode *>(parent->findChild(name));
+    // Group lookups must not resolve a mirrored custom zone that shares the name.
+    auto *newNode = DeckListModelCustomZones::findGroupChild(parent, name);
     if (!newNode) {
         beginInsertRows(nodeToIndex(parent), parent->size(), parent->size());
         newNode = new InnerDecklistNode(name, parent);
@@ -401,7 +402,7 @@ DecklistModelCardNode *DeckListModel::findCardNode(const QString &cardName,
     //    nested under the board.
     if (auto *zoneNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName))) {
         QString groupCriteria = extractGroupCriteriaValue(info, activeGroupCriteria);
-        if (auto *groupNode = dynamic_cast<InnerDecklistNode *>(zoneNode->findChild(groupCriteria))) {
+        if (auto *groupNode = DeckListModelCustomZones::findGroupChild(zoneNode, groupCriteria)) {
             if (auto *card = dynamic_cast<DecklistModelCardNode *>(
                     groupNode->findCardChildByNameProviderIdAndNumber(cardName, providerId, cardNumber))) {
                 return card;
@@ -486,6 +487,26 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         // Custom zone: cards live flat inside the zone.
         cardParent = customZoneNode;
     } else {
+        // Not present in the shadow tree. The deck tree may still hold a custom
+        // zone that has not been mirrored (callers can add a zone and then a
+        // card without a rebuild). Check before falling back to creating a
+        // top-level zone the deck does not actually have.
+        auto *listRoot = deckList->getTree()->getRoot();
+        bool hasDeckZone = false;
+        for (int i = 0; i < listRoot->size(); ++i) {
+            if (auto *boardZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i))) {
+                if (boardZone->findChild(zoneName)) {
+                    hasDeckZone = true;
+                    break;
+                }
+            }
+        }
+
+        if (hasDeckZone) {
+            rebuildTree();
+            return addCard(card, zoneName);
+        }
+
         // Unknown zone: create a top-level zone (legacy behavior).
         QString groupCriteria = extractGroupCriteriaValue(cardInfo, activeGroupCriteria);
         auto *newZone = createNodeIfNeeded(zoneName, root);
