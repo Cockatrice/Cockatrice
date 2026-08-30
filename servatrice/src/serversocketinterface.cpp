@@ -219,6 +219,9 @@ void AbstractServerSocketInterface::processCommandContainer(const CommandContain
     for (const auto &cmd : cont.admin_command()) {
         servatrice->getMetricsRegistry().observeCommand(MetricsRegistry::typeIdFor(4, getPbExtension(cmd)), elapsedMs);
     }
+    for (const auto &cmd : cont.developer_command()) {
+        servatrice->getMetricsRegistry().observeCommand(MetricsRegistry::typeIdFor(5, getPbExtension(cmd)), elapsedMs);
+    }
 
     const int slowCommandMs = servatrice->getMetricsSlowCommandMs();
     if (slowCommandMs > 0 && elapsedMs >= slowCommandMs) {
@@ -1747,8 +1750,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetServerStats(const Co
     re->set_game_start_total_ms(static_cast<google::protobuf::uint64>(gameStart.totalMs));
 
     // Per-command breakdown: resolve protobuf extension names via the descriptor pool
-    static const char *messageNames[] = {"SessionCommand", "RoomCommand", "GameCommand", "ModeratorCommand",
-                                         "AdminCommand"};
+    static const char *messageNames[] = {"SessionCommand",   "RoomCommand",  "GameCommand",
+                                         "ModeratorCommand", "AdminCommand", "DeveloperCommand"};
     const auto activeStats = servatrice->getMetricsRegistry().collectActiveStats();
     for (const auto &stat : activeStats) {
         const int kind = stat.typeId / MetricsRegistry::KindStride;
