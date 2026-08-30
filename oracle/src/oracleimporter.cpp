@@ -147,7 +147,11 @@ CardInfoPtr OracleImporter::addCard(QString name,
     if (existingIt != cards.constEnd()) {
         CardInfoPtr card = existingIt.value();
         card->addToSet(printingInfo.getSet(), printingInfo);
-        card->combineLegalities(properties);
+        // Only merge legalities when the card has none yet, so multi-format
+        // printings don't overwrite each other's legality lists.
+        if (card->getProperties().filter(formatRegex).empty()) {
+            card->combineLegalities(properties);
+        }
         return card;
     }
 
@@ -224,7 +228,10 @@ CardInfoPtr OracleImporter::addCard(QString name,
 
 static QString getJsonString(const QJsonObject &obj, const QString &key)
 {
-    return obj.value(key).toString();
+    // QVariant coerces numbers and booleans to text, while QJsonValue::toString()
+    // returns a null string for them — some MTGJSON fields (manaValue,
+    // convertedManaCost, isOnlineOnly, isRebalanced) carry those types.
+    return obj.value(key).toVariant().toString();
 }
 
 int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJsonArray &cardsList)
@@ -329,12 +336,18 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
         allNameProps.insert(faceName);
 
         // special handling properties
-        QString colors = card.value("colors").toVariant().toStringList().join("");
+        QString colors;
+        for (const QJsonValue &color : card.value("colors").toArray()) {
+            colors += color.toString();
+        }
         if (!colors.isEmpty()) {
             properties.insert("colors", colors);
         }
 
-        QString colorIdentity = card.value("colorIdentity").toVariant().toStringList().join("");
+        QString colorIdentity;
+        for (const QJsonValue &color : card.value("colorIdentity").toArray()) {
+            colorIdentity += color.toString();
+        }
         if (!colorIdentity.isEmpty()) {
             properties.insert("coloridentity", colorIdentity);
         }
@@ -529,7 +542,7 @@ static FormatRulesNameMap buildDefaultMagicFormats()
     return defaultFormatRulesNameMap;
 }
 
-FormatRulesNameMap OracleImporter::createDefaultMagicFormats()
+const FormatRulesNameMap &OracleImporter::createDefaultMagicFormats()
 {
     static const FormatRulesNameMap cached = buildDefaultMagicFormats();
     return cached;

@@ -157,7 +157,10 @@ public:
     int startImport();
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
     int importCardsFromSet(const CardSetPtr &currentSet, const QJsonArray &cardsList);
-    FormatRulesNameMap createDefaultMagicFormats();
+    /**
+     * @brief Returns the default format rules. The result is memoized on first use and must be treated as immutable.
+     */
+    const FormatRulesNameMap &createDefaultMagicFormats();
     const CardNameMap &getCardList() const
     {
         return cards;
