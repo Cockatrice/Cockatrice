@@ -258,6 +258,19 @@ PendingCommand *AbstractClient::prepareDeveloperCommand(const ::google::protobuf
 {
     CommandContainer cont;
     DeveloperCommand *c = cont.add_developer_command();
-    c->GetReflection()->MutableMessage(c, cmd.GetDescriptor()->FindExtensionByName("ext"))->CopyFrom(cmd);
+    // A developer command message may also be usable through other command
+    // families, so select the extension scoped to DeveloperCommand rather than
+    // guessing by name.
+    const ::google::protobuf::Descriptor *cmdDescriptor = cmd.GetDescriptor();
+    const ::google::protobuf::Descriptor *developerDescriptor = DeveloperCommand::descriptor();
+    const ::google::protobuf::FieldDescriptor *developerExtension = nullptr;
+    for (int i = 0; i < cmdDescriptor->extension_count(); ++i) {
+        if (cmdDescriptor->extension(i)->containing_type() == developerDescriptor) {
+            developerExtension = cmdDescriptor->extension(i);
+            break;
+        }
+    }
+    Q_ASSERT(developerExtension != nullptr);
+    c->GetReflection()->MutableMessage(c, developerExtension)->CopyFrom(cmd);
     return new PendingCommand(cont);
 }

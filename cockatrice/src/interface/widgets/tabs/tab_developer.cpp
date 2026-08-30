@@ -94,7 +94,7 @@ void TabDeveloper::refreshClicked()
 void TabDeveloper::serverStatsResponse(const Response &resp)
 {
     if (resp.response_code() != Response::RespOk) {
-        statusLabel->setText(tr("Failed to collect server statistics."));
+        statusLabel->setText(tr("No server statistics available yet."));
         return;
     }
 

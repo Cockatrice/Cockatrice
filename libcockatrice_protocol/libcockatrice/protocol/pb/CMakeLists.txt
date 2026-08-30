@@ -22,11 +22,10 @@ set(PROTO_FILES
     command_del_counter.proto
     command_delete_arrow.proto
     command_draw_cards.proto
-    command_get_log_history.proto
-    command_get_server_stats.proto
     command_dump_zone.proto
     command_flip_card.proto
     command_game_say.proto
+    command_get_server_stats.proto
     command_inc_card_counter.proto
     command_inc_counter.proto
     command_kick_from_game.proto
