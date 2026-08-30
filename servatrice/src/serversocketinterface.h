@@ -24,7 +24,6 @@
 #include <QMutex>
 #include <QTcpSocket>
 #include <QWebSocket>
-#include <libcockatrice/protocol/pb/command_get_log_history.pb.h>
 #include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_download_by_game_id.pb.h>
 #include <libcockatrice/protocol/pb/command_report.pb.h>
