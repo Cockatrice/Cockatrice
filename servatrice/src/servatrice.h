@@ -20,6 +20,8 @@
 #ifndef SERVATRICE_H
 #define SERVATRICE_H
 
+#include "metrics_registry.h"
+
 #include <QDateTime>
 #include <QHostAddress>
 #include <QMetaType>
@@ -30,6 +32,7 @@
 #include <QSslKey>
 #include <QTcpServer>
 #include <QWebSocketServer>
+#include <atomic>
 #include <libcockatrice/protocol/pb/response_report_stats.pb.h>
 #include <memory>
 #include <server.h>
@@ -170,6 +173,14 @@ private:
     int uptime;
     QMutex txBytesMutex, rxBytesMutex;
     quint64 txBytes, rxBytes;
+    std::atomic<quint64> txBytesTotal{0}; ///< cumulative bytes sent since process start
+    std::atomic<quint64> rxBytesTotal{0}; ///< cumulative bytes received since process start
+    MetricsRegistry metricsRegistry;
+    int metricsSlowCommandMs = 500;
+    int metricsStallWarnMs = 2000;
+    std::atomic<qint64> eventLoopStallsTotal{0}; ///< heartbeat overshoots past the warn threshold
+    std::atomic<qint64> eventLoopLastStallMs{0}; ///< overshoot of the most recent stall
+    std::atomic<qint64> eventLoopMaxStallMs{0};  ///< worst overshoot seen since process start
 
     QString shutdownReason;
     int shutdownMinutes;
@@ -285,6 +296,61 @@ public:
     void incTxBytes(quint64 num);
     void incRxBytes(quint64 num);
     void addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface);
+
+    // Metrics (see [metrics] section in servatrice.ini.example)
+    MetricsRegistry &getMetricsRegistry()
+    {
+        return metricsRegistry;
+    }
+    quint64 getTxBytesTotal() const
+    {
+        return txBytesTotal.load(std::memory_order_relaxed);
+    }
+    quint64 getRxBytesTotal() const
+    {
+        return rxBytesTotal.load(std::memory_order_relaxed);
+    }
+    int getUptimeSeconds() const
+    {
+        return uptime;
+    }
+    /**
+     * Sums cards across all zones of all running games. Each game takes its
+     * own gameMutex -- the hot per-game lock every game action contends on --
+     * and then iterates every player's zones, so the scrape cost is really
+     * O(total cards in play) plus one mutex acquisition per live game. Keep
+     * scrapes infrequent in big multiplayer rooms.
+     */
+    qint64 getCardsInGamesTotal() const;
+    int getMetricsSlowCommandMs() const
+    {
+        return metricsSlowCommandMs;
+    }
+    /// Heartbeat overshoot that counts as a stall. A value of 0 disables the watchdogs.
+    int getMetricsStallWarnMs() const
+    {
+        return metricsStallWarnMs;
+    }
+    void observeGameStartDurationMs(qint64 elapsedMs) override;
+    qint64 getEventLoopStallsTotal() const
+    {
+        return eventLoopStallsTotal.load(std::memory_order_relaxed);
+    }
+    qint64 getEventLoopLastStallMs() const
+    {
+        return eventLoopLastStallMs.load(std::memory_order_relaxed);
+    }
+    qint64 getEventLoopMaxStallMs() const
+    {
+        return eventLoopMaxStallMs.load(std::memory_order_relaxed);
+    }
+    /// Records one heartbeat overshoot and logs a single warning for it.
+    void observeEventLoopStall(const QString &threadName, qint64 overshootMs);
+    /**
+     * Installs an EventLoopWatchdog in @p thread. Called once per socket pool
+     * thread right after it starts.
+     */
+    void watchWorkerThread(QThread *thread);
 
     bool islConnectionExists(int _serverId) const;
     void addIslInterface(int _serverId, IslInterface *interface);

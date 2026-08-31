@@ -20,6 +20,7 @@
 #include "servatrice.h"
 
 #include "email_parser.h"
+#include "event_loop_watchdog.h"
 #include "isl_interface.h"
 #include "main.h"
 #include "servatrice_connection_pool.h"
@@ -38,6 +39,7 @@
 #include <QStringList>
 #include <QTimer>
 #include <QUrl>
+#include <game/server_game.h>
 #include <iostream>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/featureset.h>
@@ -63,6 +65,7 @@ Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
         server->addDatabaseInterface(newThread, newDatabaseInterface);
 
         newThread->start();
+        server->watchWorkerThread(newThread);
         QMetaObject::invokeMethod(newDatabaseInterface, "initDatabase", Qt::BlockingQueuedConnection,
                                   Q_ARG(QSqlDatabase, _sqlDatabase));
 
@@ -131,6 +134,7 @@ Servatrice_WebsocketGameServer::Servatrice_WebsocketGameServer(Servatrice *_serv
         server->addDatabaseInterface(newThread, newDatabaseInterface);
 
         newThread->start();
+        server->watchWorkerThread(newThread);
         QMetaObject::invokeMethod(newDatabaseInterface, "initDatabase", Qt::BlockingQueuedConnection,
                                   Q_ARG(QSqlDatabase, _sqlDatabase));
 
@@ -226,6 +230,13 @@ bool Servatrice::initServer()
 {
 
     serverId = getServerID();
+
+    // METRICS (always active. Slow-command logging and stall watchdogs are
+    // controlled by their respective thresholds below). Read up front so the
+    // values are available before any pool thread is started and watchdogged.
+    metricsSlowCommandMs = settingsCache->value("metrics/slow_command_ms", 500).toInt();
+    metricsStallWarnMs = qMax(0, settingsCache->value("metrics/stall_warn_ms", 2000).toInt());
+
     if (getAuthenticationMethodString() == "sql") {
         qDebug() << "Authenticating method: sql";
         authenticationMethod = AuthenticationSql;
@@ -470,7 +481,53 @@ bool Servatrice::initServer()
     }
 
     setRequiredFeatures(getRequiredFeatures());
+
     return true;
+}
+
+void Servatrice::observeGameStartDurationMs(qint64 elapsedMs)
+{
+    metricsRegistry.observeGameStartDurationMs(elapsedMs);
+}
+
+void Servatrice::observeEventLoopStall(const QString &threadName, qint64 overshootMs)
+{
+    eventLoopStallsTotal.fetch_add(1, std::memory_order_relaxed);
+    eventLoopLastStallMs.store(overshootMs, std::memory_order_relaxed);
+    qint64 prevMax = eventLoopMaxStallMs.load(std::memory_order_relaxed);
+    while (overshootMs > prevMax &&
+           !eventLoopMaxStallMs.compare_exchange_weak(prevMax, overshootMs, std::memory_order_relaxed)) {
+        // retry until the max is at least as high as the new sample
+    }
+
+    qWarning() << "Event loop stall in" << threadName << "- heartbeat overshot by" << overshootMs << "ms";
+}
+
+void Servatrice::watchWorkerThread(QThread *thread)
+{
+    if (metricsStallWarnMs <= 0) {
+        return; // watchdogs disabled via metrics/stall_warn_ms = 0
+    }
+
+    auto *watchdog = new EventLoopWatchdog(this, thread->objectName());
+    connect(thread, &QThread::finished, watchdog, &QObject::deleteLater);
+    watchdog->moveToThread(thread);
+    QMetaObject::invokeMethod(watchdog, &EventLoopWatchdog::start, Qt::QueuedConnection);
+}
+
+qint64 Servatrice::getCardsInGamesTotal() const
+{
+    qint64 total = 0;
+    QReadLocker roomsLocker(&roomsLock); // locking order: roomsLock before gamesLock/gameMutex
+    QMapIterator<int, Server_Room *> roomIterator(rooms);
+    while (roomIterator.hasNext()) {
+        Server_Room *room = roomIterator.next().value();
+        QReadLocker gamesLocker(&room->gamesLock);
+        for (auto *game : room->getGames()) {
+            total += game->getCardsInGame();
+        }
+    }
+    return total;
 }
 
 void Servatrice::addDatabaseInterface(QThread *thread, Servatrice_DatabaseInterface *databaseInterface)
@@ -728,6 +785,7 @@ void Servatrice::incTxBytes(quint64 num)
     txBytesMutex.lock();
     txBytes += num;
     txBytesMutex.unlock();
+    txBytesTotal.fetch_add(num, std::memory_order_relaxed);
 }
 
 void Servatrice::incRxBytes(quint64 num)
@@ -735,6 +793,7 @@ void Servatrice::incRxBytes(quint64 num)
     rxBytesMutex.lock();
     rxBytes += num;
     rxBytesMutex.unlock();
+    rxBytesTotal.fetch_add(num, std::memory_order_relaxed);
 }
 
 void Servatrice::shutdownTimeout()

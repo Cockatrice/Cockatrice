@@ -382,6 +382,19 @@ max_reports_per_day=10
 ; Maximum number of report comments a single user can post per hour; default is 30; set to 0 to disable the limit
 max_comments_per_hour=30
 
+[metrics]
+; Command containers that take longer than this many milliseconds are logged
+; as slow commands. Set to 0 to disable the log line. A latency spike produces
+; one warning per slow container with no rate limiting of its own -- a bad
+; patch can briefly flood the log, which is how you notice it.
+slow_command_ms=500
+
+; Each socket pool thread runs a watchdog heartbeat. If a heartbeat arrives
+; this many milliseconds late, the stall is logged and exposed as
+; servatrice_eventloop_* metrics in the Developer tab. Set to 0 to disable
+; the watchdogs.
+stall_warn_ms=2000
+
 [logging]
 ; Admin/Moderators can query the stored logs for information when looking up reports by various players. This
 ; option can allow or disallow them from doing so.

@@ -6,7 +6,9 @@ project(Servatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 
 set(servatrice_SOURCES
     src/email_parser.cpp
+    src/event_loop_watchdog.cpp
     src/main.cpp
+    src/metrics_registry.cpp
     src/servatrice.cpp
     src/servatrice_connection_pool.cpp
     src/servatrice_database_interface.cpp
