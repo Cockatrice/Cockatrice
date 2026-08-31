@@ -125,9 +125,7 @@ void VisualDeckStorageFolderDisplayWidget::continueDeckPass()
         }
 
         const bool matches = index.data(VisualDeckStorageRoles::FilterMatchRole).toBool();
-        if (matches == deckPreviewWidget->isHidden()) {
-            deckPreviewWidget->setVisible(matches);
-        }
+        deckPreviewWidget->setVisible(matches);
         if (matches) {
             ++visibleDeckCount;
         }
