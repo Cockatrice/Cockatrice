@@ -149,7 +149,6 @@ if(MSVC) # MS Visual C++ compiler
   # /MP                Enable parallel compilation
   # /permissive-       Enable strict standards compliance
   # /utf-8             Set source file encoding and execution char set to UTF-8
-  # /wd4251            Suppress C4251 (DLL interface) warnings around DLL exports   <-- removed to see how Qt6 handles it
   # /W4                Enable warning level 4
   # /Zc:__cplusplus    Enable C++20 detection in headers
   # /Zi                Generate debugging information (Program Database, PDB)
@@ -168,8 +167,6 @@ if(MSVC) # MS Visual C++ compiler
   # /OPT:REF           Remove unused references
   # /OPT:ICF           Fold identical code
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
-
-  add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING) # check if this is still needed with C++20
 
 elseif(CMAKE_COMPILER_IS_GNUCXX) # Linux/GCC, BSD/GCC, Windows/MinGW
   include(CheckCXXCompilerFlag)
