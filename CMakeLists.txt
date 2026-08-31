@@ -194,14 +194,21 @@ elseif(CMAKE_COMPILER_IS_GNUCXX) # Linux/GCC, BSD/GCC, Windows/MinGW
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20")
   endif()
 
+  # -Wcast-align                          Catch unsafe pointer casts
+  # -Wmissing-declarations                Catch defined functions without prior declaration
+  # -Wno-error=extra                      Downgrade some -Wextra warnings from errors to warnings
+  # -Wno-error=delete-non-virtual-dtor    <-- see if still needed?
+  # -Wno-error=sign-compare               Downgrade comparing signed vs. unsigned integers from errors to warnings
+  # -Wno-error=missing-declarations       Downgrade -Wmissing-declarations from errors to warnings
+  # -Wno-error=sfinae-incomplete          GCC 16+: Qt MOC + protobuf forward declarations trigger this
   set(ADDITIONAL_DEBUG_FLAGS
-      -Wcast-align                          # Catch unsafe pointer casts
-      -Wmissing-declarations                # Catch defined functions without prior declaration
-      -Wno-error=extra                      # Downgrade some -Wextra warnings from errors to warnings
-      -Wno-error=delete-non-virtual-dtor    #     <-- see if still needed?
-      -Wno-error=sign-compare               # Downgrade comparing signed vs. unsigned integers from errors to warnings
-      -Wno-error=missing-declarations       # Downgrade -Wmissing-declarations from errors to warnings
-      -Wno-error=sfinae-incomplete          # GCC 16+: Qt MOC + protobuf forward declarations trigger this
+      -Wcast-align
+      -Wmissing-declarations
+      -Wno-error=extra
+      -Wno-error=delete-non-virtual-dtor
+      -Wno-error=sign-compare
+      -Wno-error=missing-declarations
+      -Wno-error=sfinae-incomplete
   )
 
   foreach(FLAG ${ADDITIONAL_DEBUG_FLAGS})
