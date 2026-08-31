@@ -140,6 +140,21 @@ public:
     QList<ServerInfo_UserSession> getUserSessions(const QString &userName, int limit);
     QList<ServerInfo_UserAlt> getUserAlts(const QString &userName);
     QList<ServerInfo_ModeratorLogin> getModeratorLastLogins();
+
+    // Uptime snapshot as recorded by Servatrice::statusUpdate() into the
+    // {prefix}_uptime table. valid is false when no snapshot exists yet.
+    struct UptimeSnapshot
+    {
+        bool valid = false;
+        quint64 usersCount = 0;
+        quint64 modsCount = 0;
+        quint64 gamesCount = 0;
+        quint64 txBytes = 0;
+        quint64 rxBytes = 0;
+        quint64 uptimeSecs = 0;
+        quint64 timest = 0;
+    };
+    UptimeSnapshot getLatestUptimeSnapshot(int serverId);
     bool removeUserAvatar(const QString &userName);
     bool addForgotPassword(const QString &user);
     bool removeForgotPassword(const QString &user) override;

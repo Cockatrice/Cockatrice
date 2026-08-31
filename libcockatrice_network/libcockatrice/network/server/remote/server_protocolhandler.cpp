@@ -388,6 +388,33 @@ Response::ResponseCode Server_ProtocolHandler::processAdminCommandContainer(cons
     return finalResponseCode;
 }
 
+Response::ResponseCode Server_ProtocolHandler::processDeveloperCommandContainer(const CommandContainer &cont,
+                                                                                ResponseContainer &rc)
+{
+    if (!userInfo) {
+        return Response::RespLoginNeeded;
+    }
+    if (!(userInfo->user_level() & ServerInfo_User::IsDeveloper)) {
+        return Response::RespLoginNeeded;
+    }
+
+    resetIdleTimer();
+
+    Response::ResponseCode finalResponseCode = Response::RespOk;
+    for (int i = cont.developer_command_size() - 1; i >= 0; --i) {
+        Response::ResponseCode resp = Response::RespInvalidCommand;
+        const DeveloperCommand &sc = cont.developer_command(i);
+        const int num = getPbExtension(sc);
+        logDebugMessage(getSafeDebugString(sc));
+
+        resp = processExtendedDeveloperCommand(num, sc, rc);
+        if (resp != Response::RespOk) {
+            finalResponseCode = resp;
+        }
+    }
+    return finalResponseCode;
+}
+
 void Server_ProtocolHandler::processCommandContainer(const CommandContainer &cont)
 {
     // Command processing must be disabled after prepareDestroy() has been called.
@@ -410,6 +437,8 @@ void Server_ProtocolHandler::processCommandContainer(const CommandContainer &con
         finalResponseCode = processModeratorCommandContainer(cont, responseContainer);
     } else if (cont.admin_command_size()) {
         finalResponseCode = processAdminCommandContainer(cont, responseContainer);
+    } else if (cont.developer_command_size()) {
+        finalResponseCode = processDeveloperCommandContainer(cont, responseContainer);
     } else {
         finalResponseCode = Response::RespInvalidCommand;
     }
@@ -454,11 +483,12 @@ void Server_ProtocolHandler::pingClockTimeout()
         prepareDestroy();
     }
 
-    // PrivLevel users, Moderators, and Admins are not subject to the server idle timeout policy
+    // PrivLevel users, Moderators, Admins, and Developers are not subject to the server idle timeout policy
     const bool hasPrivLevel = userInfo && QString::fromStdString(userInfo->privlevel()).toLower() != "none";
-    const bool isModOrAdmin =
-        userInfo && (userInfo->user_level() & (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin));
-    if (!hasPrivLevel && !isModOrAdmin) {
+    const bool isStaff =
+        userInfo && (userInfo->user_level() &
+                     (ServerInfo_User::IsModerator | ServerInfo_User::IsAdmin | ServerInfo_User::IsDeveloper));
+    if (!hasPrivLevel && !isStaff) {
         if ((server->getIdleClientTimeout() > 0) && (idleClientWarningSent)) {
             if (timeRunning - lastActionReceived > server->getIdleClientTimeout()) {
                 prepareDestroy();

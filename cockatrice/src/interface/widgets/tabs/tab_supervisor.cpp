@@ -15,6 +15,7 @@
 #include "tab_card_art_rules.h"
 #include "tab_deck_editor.h"
 #include "tab_deck_storage.h"
+#include "tab_developer.h"
 #include "tab_game.h"
 #include "tab_home.h"
 #include "tab_logs.h"
@@ -118,7 +119,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
     : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr),
       tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr),
-      tabLog(nullptr), tabReport(nullptr), tabModeration(nullptr), isLocalGame(false)
+      tabLog(nullptr), tabReport(nullptr), tabModeration(nullptr), tabDeveloper(nullptr), isLocalGame(false)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -204,6 +205,10 @@ TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *
     aTabModeration->setCheckable(true);
     connect(aTabModeration, &QAction::triggered, this, &TabSupervisor::actTabModeration);
 
+    aTabDeveloper = new QAction(this);
+    aTabDeveloper->setCheckable(true);
+    connect(aTabDeveloper, &QAction::triggered, this, &TabSupervisor::actTabDeveloper);
+
     connect(&SettingsCache::instance().shortcuts(), &ShortcutsSettings::shortCutChanged, this,
             &TabSupervisor::refreshShortcuts);
     refreshShortcuts();
@@ -245,6 +250,7 @@ void TabSupervisor::retranslateUi()
     aTabLog->setText(tr("Logs"));
     aTabReport->setText(tr("Report Queue"));
     aTabModeration->setText(tr("Moderation"));
+    aTabDeveloper->setText(tr("Developer"));
 
     // tabs
     QList<Tab *> tabs;
@@ -256,6 +262,7 @@ void TabSupervisor::retranslateUi()
     tabs.append(tabLog);
     tabs.append(tabReport);
     tabs.append(tabModeration);
+    tabs.append(tabDeveloper);
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext()) {
         tabs.append(roomIterator.next().value());
@@ -523,6 +530,19 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         openTabCardArtRules();
     }
 
+    if (userInfo->user_level() & ServerInfo_User::IsDeveloper) {
+        tabsMenu->addSeparator();
+        tabsMenu->addAction(aTabDeveloper);
+        // Developers without moderation rights get log access through their
+        // own role. Moderators already have the Logs entry from above.
+        if (!(userInfo->user_level() & ServerInfo_User::IsModerator)) {
+            tabsMenu->addAction(aTabLog);
+            if (SettingsCache::instance().tabs().getTabLogOpen()) {
+                openTabLog();
+            }
+        }
+    }
+
     retranslateUi();
 }
 
@@ -535,6 +555,7 @@ void TabSupervisor::startLocal(const QList<AbstractClient *> &_clients)
     tabLog = nullptr;
     tabReport = nullptr;
     tabModeration = nullptr;
+    tabDeveloper = nullptr;
     isLocalGame = true;
     userInfo = new ServerInfo_User;
     localClients = _clients;
@@ -581,6 +602,9 @@ void TabSupervisor::stop()
         }
         if (tabModeration) {
             tabModeration->close();
+        }
+        if (tabDeveloper) {
+            tabDeveloper->close();
         }
     }
 
@@ -810,7 +834,10 @@ void TabSupervisor::actTabLog(bool checked)
 
 void TabSupervisor::openTabLog()
 {
-    tabLog = new TabLog(this, client);
+    // Developers query logs through the developer command family, so tell the
+    // tab which family to use.
+    const bool useDeveloperCommands = (userInfo->user_level() & ServerInfo_User::IsDeveloper) != 0;
+    tabLog = new TabLog(this, client, useDeveloperCommands);
     myAddTab(tabLog, aTabLog);
     connect(tabLog, &QObject::destroyed, this, [this] {
         tabLog = nullptr;
@@ -870,6 +897,27 @@ void TabSupervisor::openTabModeration(const QString &userName)
         aTabModeration->setChecked(false);
     });
     aTabModeration->setChecked(true);
+}
+
+void TabSupervisor::actTabDeveloper(bool checked)
+{
+    if (checked && !tabDeveloper) {
+        openTabDeveloper();
+        setCurrentWidget(tabDeveloper);
+    } else if (!checked && tabDeveloper) {
+        tabDeveloper->closeRequest();
+    }
+}
+
+void TabSupervisor::openTabDeveloper()
+{
+    tabDeveloper = new TabDeveloper(this, client);
+    myAddTab(tabDeveloper, aTabDeveloper);
+    connect(tabDeveloper, &QObject::destroyed, this, [this] {
+        tabDeveloper = nullptr;
+        aTabDeveloper->setChecked(false);
+    });
+    aTabDeveloper->setChecked(true);
 }
 
 void TabSupervisor::updatePingTime(int value, int max)
