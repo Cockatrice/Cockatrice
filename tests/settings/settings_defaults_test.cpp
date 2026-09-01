@@ -238,6 +238,12 @@ TEST_F(SettingsDefaultsTest, Tabs_ModerationOpen_Default)
     ASSERT_EQ(s.getTabModerationOpen(), false);
 }
 
+TEST_F(SettingsDefaultsTest, Tabs_CardArtRulesOpen_Default)
+{
+    TabsSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getTabCardArtRulesOpen(), false);
+}
+
 // --- ChatSettings ---
 
 TEST_F(SettingsDefaultsTest, Chat_Mention_Default)
