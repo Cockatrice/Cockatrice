@@ -90,7 +90,6 @@ set(PROTO_FILES
     event_game_log_notice.proto
     event_game_say.proto
     event_game_state_changed.proto
-    event_game_state_changed.proto
     event_join.proto
     event_join_room.proto
     event_kicked.proto
