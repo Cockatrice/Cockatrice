@@ -19,6 +19,8 @@
 #include <QLayout>
 #include <QMainWindow>
 #include <QMenu>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QPainter>
 #include <QPushButton>
 #include <QScrollArea>
@@ -26,6 +28,3 @@
 #include <QToolBar>
 #include <QTreeWidget>
 #include <QWidget>
-
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
