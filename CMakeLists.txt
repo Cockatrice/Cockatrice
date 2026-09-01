@@ -39,7 +39,9 @@ else()
   )
 endif()
 
-if(USE_CCACHE)
+# ccache does not support MSVC and must not auto-engage on Windows
+# (it is installed unintentionally on the Windows CI runner)
+if(USE_CCACHE AND NOT WIN32)
   find_program(CCACHE_PROGRAM ccache)
   if(CCACHE_PROGRAM)
     # Support Unix Makefiles and Ninja
