@@ -54,9 +54,11 @@ private:
     QPointer<CardItem> hoveredCard;                     ///< Currently hovered card
     QBasicTimer *animationTimer;                        ///< Timer for scene animations
     QHash<QObject *, IAnimatedItem *> animatedItems;    ///< Items currently animating
-    int playerRotation;                                 ///< Rotation offset for player layout
-    bool rearranging = false;                           ///< Guard against re-entrant rearrange
-    bool needsReArrange = false;                        ///< Pending rearrange requested during a pass
+    QHash<QObject *, QMetaObject::Connection>
+        animationItemConnections; ///< destroyed->removeAnimatedItem handles per animated item
+    int playerRotation;           ///< Rotation offset for player layout
+    bool rearranging = false;     ///< Guard against re-entrant rearrange
+    bool needsReArrange = false;  ///< Pending rearrange requested during a pass
 
     /**
      * @brief Updates which card is currently hovered based on scene coordinates.
