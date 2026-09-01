@@ -44,16 +44,16 @@ GameScene::GameScene(PhasesToolbar *_phasesToolbar, QObject *parent)
 
 GameScene::~GameScene()
 {
-    // Sever the destroy-tracking connections before the members and base-class
-    // teardown destroy the items. The receiver (this) cannot be matched with a
-    // nullptr sender (QObject::disconnect forbids one) so disconnect each
-    // tracked sender explicitly. Otherwise, when the base QGraphicsScene destructor
-    // destroys the remaining items, their destroyed() signals would re-enter
-    // removeAnimatedItem() and touch members that no longer exist.
-    const auto animatedSenders = animatedItems.keys();
-    for (QObject *sender : animatedSenders) {
-        disconnect(sender, &QObject::destroyed, this, &GameScene::removeAnimatedItem);
+    // Sever all destroyed->removeAnimatedItem connections before the members below
+    // are destroyed: the base QGraphicsScene destructor destroys the remaining items,
+    // and their destroyed() signals must not reach slots that reference members that
+    // no longer exist. The connection handle overload is used because the string-based
+    // disconnect(nullptr, nullptr, this, nullptr) is invalid (the sender must never be
+    // nullptr) and would otherwise fail to sever these pointer-to-member connections.
+    for (auto it = animationItemConnections.constBegin(); it != animationItemConnections.constEnd(); ++it) {
+        QObject::disconnect(*it);
     }
+    animationItemConnections.clear();
 
     delete animationTimer;
     animationTimer = nullptr;
@@ -782,8 +782,15 @@ void GameScene::registerAnimationItem(IAnimatedItem *item)
     if (!object) {
         return;
     }
-    if (!animatedItems.contains(object)) {
-        connect(object, &QObject::destroyed, this, &GameScene::removeAnimatedItem);
+    // Guard against duplicate connections using the connection map, not
+    // animatedItems: the animation timer removes entries from animatedItems when an
+    // animation completes, but the destroyed->removeAnimatedItem connection must
+    // persist until the object is destroyed. Relying on animatedItems here would let
+    // a re-registered item (e.g. a life counter that flashes repeatedly) accumulate
+    // duplicate destroyed connections, the older ones of which would survive teardown.
+    if (!animationItemConnections.contains(object)) {
+        animationItemConnections.insert(object,
+                                        connect(object, &QObject::destroyed, this, &GameScene::removeAnimatedItem));
     }
     animatedItems.insert(object, item);
     if (animationTimer && !animationTimer->isActive()) {
@@ -802,6 +809,7 @@ void GameScene::unregisterAnimationItem(IAnimatedItem *item)
 void GameScene::removeAnimatedItem(QObject *item)
 {
     animatedItems.remove(item);
+    animationItemConnections.remove(item);
     if (animationTimer && animatedItems.isEmpty()) {
         animationTimer->stop();
     }
