@@ -6,7 +6,7 @@ There are three ways to make Cockatrice use custom artwork for your cards:
 - Providing a **custom card database** that points each printing at a picture URL via the `picurl` property.
 - Writing your **own download URL templates**.
 
-Each of these is described below. If pictures are missing or wrong, see @subpage fixing_card_pictures instead.
+Each of these is described below. If pictures are missing or wrong, see @ref fixing_card_pictures instead.
 
 # Custom Pictures Folder (CUSTOM)
 
@@ -103,4 +103,4 @@ wiki for more examples and ideas.
 
 \attention Keep in mind that templates using `!name!` or `!set:muid!` resolve by name or multiverse ID, not by the
 exact printing. Only the Scryfall `!set:uuid!` templates always return the exact printing requested. See
-@subpage fixing_card_pictures for more on this.
+@ref fixing_card_pictures for more on this.
