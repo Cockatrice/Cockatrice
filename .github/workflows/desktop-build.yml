@@ -419,7 +419,7 @@ jobs:
       - name: "[Windows] Install NSIS"
         if: matrix.os == 'Windows'
         shell: bash
-        run: choco install nsis
+        run: choco install nsis --no-progress
 
       - name: "Setup vcpkg cache"
         id: vcpkg-cache

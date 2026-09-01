@@ -1,36 +1,36 @@
 # Cockatrice's main CMakeLists.txt
 #
-# This is basically a wrapper to enable/disable the compilation
-# of the different projects: servatrice, cockatrice, test
-# This file sets all the variables shared between the projects
-# like the installation path, compilation flags etc..
+# This is basically a wrapper to enable/disable the compilation of the different projects:
+# Cockatrice, Oracle, Servatrice, Test
+# This file sets all the variables shared between the projects like the installation path, compilation flags etc..
 
-# cmake 3.16 is required if using qt6
+# CMake 3.16 is required if using Qt6
 cmake_minimum_required(VERSION 3.10)
 
-# Use compiler cache (ccache)
-option(USE_CCACHE "Cache the build results with ccache" OFF)
-# Treat warnings as errors (Debug builds only)
-option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
-# Check for translation updates
-option(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
 # Compile Cockatrice
 option(WITH_CLIENT "Build Cockatrice client" ON)
 # Compile Oracle
 option(WITH_ORACLE "Build Cockatrice card database tool (Oracle)" ON)
 # Compile Servatrice
 option(WITH_SERVER "Build Cockatrice server (Servatrice)" OFF)
-# Compile tests
+# Compile Tests
 option(TEST "Build tests" OFF)
+
+# Check for translation updates
+option(UPDATE_TRANSLATIONS "Update translations on compile" OFF)
 # Use vcpkg regardless of OS
 option(USE_VCPKG "Use vcpkg regardless of OS" OFF)
+# Use compiler cache (ccache)
+option(USE_CCACHE "Cache the build results with ccache" OFF)
+# Treat warnings as errors (Debug builds only)
+option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 
 # Default to "Release" build type
 # User-provided value for CMAKE_BUILD_TYPE must be checked before the PROJECT() call
-if(DEFINED CMAKE_BUILD_TYPE)
+if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE
-      ${CMAKE_BUILD_TYPE}
-      CACHE STRING "Type of build"
+      Release
+      CACHE STRING "Build type"
   )
 else()
   set(CMAKE_BUILD_TYPE
@@ -77,22 +77,26 @@ endif()
 # Version can be overriden by git tags, see cmake/getversion.cmake
 project("Cockatrice" VERSION 3.1.0)
 
-# Set release name if not provided via env/cmake var
+# Set release name if not provided via ENV/CMake var
 if(NOT DEFINED GIT_TAG_RELEASENAME)
   set(GIT_TAG_RELEASENAME "Graduation Day")
 endif()
 
-# Use c++20 for all targets
+# Use C++20 for all targets
 set(CMAKE_CXX_STANDARD
     20
     CACHE STRING "C++ ISO Standard"
 )
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# try target_compile_features(cockatrice PRIVATE cxx_std_20)
+# -fexperimental-library for gcc/clang, libstdc++,  gate with compiler_is_gnucxx or cxx_compiler_id matches clang
 
 # Set conventional loops
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
-# Search path for cmake modules
+# Search path for CMake modules
 set(COCKATRICE_CMAKE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 list(INSERT CMAKE_MODULE_PATH 0 "${COCKATRICE_CMAKE_PATH}")
 
@@ -103,31 +107,31 @@ include(createversionfile)
 
 # Define a proper install path
 if(UNIX)
-  if(APPLE)
-    # macOS
-    # Due to the special bundle structure ignore
-    # the prefix eventually set by the user.
+  if(APPLE) # macOS
+    # Due to the special bundle structure ignore the prefix eventually set by the user
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
 
     # Force ccache usage if available
-    get_property(RULE_LAUNCH_COMPILE GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
-    if(RULE_LAUNCH_COMPILE)
-      message(STATUS "Force enabling CCache usage under macOS")
-      # Set up wrapper scripts
-      configure_file("${COCKATRICE_CMAKE_PATH}/launch-c.in" launch-c)
-      configure_file("${COCKATRICE_CMAKE_PATH}/launch-cxx.in" launch-cxx)
-      execute_process(COMMAND chmod a+rx "${CMAKE_BINARY_DIR}/launch-c" "${CMAKE_BINARY_DIR}/launch-cxx")
+    if(USE_CCACHE)
+      get_property(RULE_LAUNCH_COMPILE GLOBAL PROPERTY RULE_LAUNCH_COMPILE)
+      if(RULE_LAUNCH_COMPILE)
+        message(STATUS "Force enabling ccache usage")
 
-      # Set Xcode project attributes to route compilation through our scripts
-      set(CMAKE_XCODE_ATTRIBUTE_CC "${CMAKE_BINARY_DIR}/launch-c")
-      set(CMAKE_XCODE_ATTRIBUTE_CXX "${CMAKE_BINARY_DIR}/launch-cxx")
-      set(CMAKE_XCODE_ATTRIBUTE_LD "${CMAKE_BINARY_DIR}/launch-c")
-      set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS "${CMAKE_BINARY_DIR}/launch-cxx")
+        # Set up wrapper scripts
+        configure_file("${COCKATRICE_CMAKE_PATH}/launch-c.in" launch-c)
+        configure_file("${COCKATRICE_CMAKE_PATH}/launch-cxx.in" launch-cxx)
+        execute_process(COMMAND chmod a+rx "${CMAKE_BINARY_DIR}/launch-c" "${CMAKE_BINARY_DIR}/launch-cxx")
+
+        # Set Xcode project attributes to route compilation through our scripts
+        set(CMAKE_XCODE_ATTRIBUTE_CC "${CMAKE_BINARY_DIR}/launch-c")
+        set(CMAKE_XCODE_ATTRIBUTE_CXX "${CMAKE_BINARY_DIR}/launch-cxx")
+        set(CMAKE_XCODE_ATTRIBUTE_LD "${CMAKE_BINARY_DIR}/launch-c")
+        set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS "${CMAKE_BINARY_DIR}/launch-cxx")
+      endif()
     endif()
-  else()
-    # Linux / BSD
+  else() # Linux / BSD
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-      #fix package build
+      # Fix package build
       if(PREFIX)
         set(CMAKE_INSTALL_PREFIX ${PREFIX})
       else()
@@ -135,47 +139,73 @@ if(UNIX)
       endif()
     endif()
   endif()
-elseif(WIN32)
+elseif(WIN32) # Windows (including 64bit)
   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
 endif()
 
-# Define proper compilation flags
-if(MSVC)
-  # Disable Warning C4251, C++20 compatibility, Multi-threaded Builds, Warn Detection, Unwind Semantics, Debug Symbols
-  set(CMAKE_CXX_FLAGS "/wd4251 /Zc:__cplusplus /std:c++20 /permissive- /W4 /MP /EHsc /Zi")
-  # Visual Studio: Maximum Optimization, Multi-threaded DLL
+# Define compiler flags
+if(MSVC) # MS Visual C++ compiler
+  # /EHsc              Enable standard C++ exception handling
+  # /MP                Enable parallel compilation
+  # /permissive-       Enable strict standards compliance
+  # /utf-8             Set source file encoding and execution char set to UTF-8
+  # /W4                Enable warning level 4
+  # /Zc:__cplusplus    Enable C++20 detection in headers
+  # /Zi                Generate debugging information (Program Database, PDB)
+  set(CMAKE_CXX_FLAGS "/EHsc /MP /permissive- /utf-8 /W4 /Zc:__cplusplus /Zi")
+
+  # /Ox                Enable maximum optimization
+  # /MD                Link against the multi-threaded DLL runtime library (Release CRT)
   set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
-  # Visual Studio: No Optimization, Multi-threaded Debug DLL
+
+  # /Od                Disable optimization
+  # /MDd               Link against the multi-threaded Debug DLL runtime library (Debug CRT)
   set(CMAKE_CXX_FLAGS_DEBUG "/Od /MDd")
 
-  # Generate PDB, even when in release (So developers can better analyze crash logs)
+  # Generate PDBs, even when building release target to allow developers to better analyze crash logs
+  # /DEBUG             Enable PDB generation also for Release builds
+  # /OPT:REF           Remove unused references
+  # /OPT:ICF           Fold identical code
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 
-  add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
-elseif(CMAKE_COMPILER_IS_GNUCXX)
-  # linux/gcc, bsd/gcc, windows/mingw
+elseif(CMAKE_COMPILER_IS_GNUCXX) # Linux/GCC, BSD/GCC, Windows/MinGW
   include(CheckCXXCompilerFlag)
 
-  set(CMAKE_CXX_FLAGS_RELEASE "-s -O2")
+  # -O2             Balanced optimization
+  # -s              Remove debug info from the binary (strip symbols)
+  set(CMAKE_CXX_FLAGS_RELEASE "-O2 -s")
+
+  # -ggdb           Produce GDB debugging symbols
+  # -O0             No optimization
+  # -Wall           Enable all warnings
+  # -Wextra         Enable extra warnings
+  # -Werror         Treat warnings as compilation errors
   if(WARNING_AS_ERROR)
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -Werror")
   else()
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra")
   endif()
 
-  if(APPLE)
+  # -std=gnu++20    Enable GNU C++20 extensions
+  if(APPLE) # macOS/GCC
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20")
   endif()
 
+  # -Wcast-align                          Catch unsafe pointer casts
+  # -Wmissing-declarations                Catch defined functions without prior declaration
+  # -Wno-error=extra                      Downgrade some -Wextra warnings from errors to warnings
+  # -Wno-error=delete-non-virtual-dtor    <-- see if still needed?
+  # -Wno-error=sign-compare               Downgrade comparing signed vs. unsigned integers from errors to warnings
+  # -Wno-error=missing-declarations       Downgrade -Wmissing-declarations from errors to warnings
+  # -Wno-error=sfinae-incomplete          GCC 16+: Qt MOC + protobuf forward declarations trigger this
   set(ADDITIONAL_DEBUG_FLAGS
       -Wcast-align
       -Wmissing-declarations
-      -Wno-long-long
       -Wno-error=extra
       -Wno-error=delete-non-virtual-dtor
       -Wno-error=sign-compare
       -Wno-error=missing-declarations
-      -Wno-error=sfinae-incomplete # GCC 16+: Qt MOC + protobuf forward decls trigger this
+      -Wno-error=sfinae-incomplete
   )
 
   foreach(FLAG ${ADDITIONAL_DEBUG_FLAGS})
@@ -184,9 +214,16 @@ elseif(CMAKE_COMPILER_IS_GNUCXX)
       set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FLAG}")
     endif()
   endforeach()
-else()
-  # other: osx/llvm, bsd/llvm
+else() # Other: macOS/LLVM, BSD/LLVM, "Clang-specific"
+  # -O2                      Balanced optimization
   set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+
+  # -g                       Include debug information (equivalent to -ggdb for GCC)
+  # -O0                      No optimization
+  # -Wall                    Enable all warnings
+  # -Wextra                  Enable extra warnings
+  # -Werror                  Treat warnings as compiler errors
+  # -Wno-unused-parameter    Suppress warnings about unused function parameters (common in Qt callbacks)
   if(WARNING_AS_ERROR)
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror -Wno-unused-parameter")
   else()
@@ -194,7 +231,7 @@ else()
   endif()
 endif()
 
-# GNU systems need to define the Mersenne exponent for the RNG to compile w/o warning
+# GNU systems need to define the Mersenne Exponent for SFMT for the RNG to compile without warning
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   add_definitions("-DSFMT_MEXP=19937")
 endif()
@@ -203,9 +240,9 @@ find_package(Threads REQUIRED)
 
 # Determine 32 or 64 bit build
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  set(_lib_suffix 64)
+  set(_lib_suffix 64) # 64bit
 else()
-  set(_lib_suffix 32)
+  set(_lib_suffix 32) # 32bit
 endif()
 
 if(DEFINED QTDIR${_lib_suffix})
@@ -234,8 +271,8 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0" AND NOT EXISTS "${Protobuf_PROTOC
   message(FATAL_ERROR "No protoc command found!")
 endif()
 
-#Find OpenSSL
-if(WIN32)
+# Find OpenSSL
+if(WIN32) # Windows (including 64bit)
   find_package(OpenSSL REQUIRED)
   if(OPENSSL_FOUND)
     include_directories(${OPENSSL_INCLUDE_DIRS})
@@ -247,8 +284,8 @@ if(WIN32)
   endif()
 endif()
 
-#Find VCredist
-if(MSVC)
+# Find Visual C++ Redistributable
+if(MSVC) # MS Visual C++ compiler
   find_package(VCredistRuntime)
 endif()
 
@@ -257,7 +294,9 @@ set(CPACK_PACKAGE_CONTACT "Zach Halpern <zach@cockatrice.us>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "Cockatrice Development Team")
 set(CPACK_PACKAGE_DESCRIPTION
-    "Cockatrice is an open-source, multiplatform application for playing tabletop card games over a network. The program's server design prevents users from manipulating the game for unfair advantage. The client also provides a single-player mode, which allows users to brew while offline."
+    "Cockatrice is an open-source, multiplatform application for playing tabletop card games over a network. \
+    The program's server design prevents users from manipulating the game for unfair advantage. \
+    The client also provides a single-player mode, which allows users to brew while offline."
 )
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
@@ -266,7 +305,7 @@ set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_VERSION_FILENAME}")
 
 if(UNIX)
-  if(APPLE)
+  if(APPLE) # macOS
     set(CPACK_GENERATOR DragNDrop ${CPACK_GENERATOR})
     set(CPACK_GENERATOR "DragNDrop")
     set(CPACK_DMG_FORMAT "UDBZ")
@@ -276,15 +315,14 @@ if(UNIX)
     set(CPACK_DMG_DS_STORE_SETUP_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeDMGSetup.script")
     set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/dmgBackground.tif")
     set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SignMacApplications.cmake")
-  else()
-    # linux
+  else() # Linux
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
       set(CPACK_RPM_PACKAGE_REQUIRES "protobuf, qt6-qttools, qt6-qtsvg, qt6-qtmultimedia, qt6-qtimageformats")
       set(CPACK_RPM_PACKAGE_GROUP "Amusements/Games")
       set(CPACK_RPM_PACKAGE_URL "http://github.com/Cockatrice/Cockatrice")
-      # stop directories from making package conflicts
+      # Stop directories from creating package conflicts
       set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION
           /usr/share/applications
           /usr/share/icons
@@ -300,21 +338,21 @@ if(UNIX)
       set(CPACK_DEBIAN_PACKAGE_SECTION "games")
       set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://github.com/Cockatrice/Cockatrice")
       set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6multimedia6, libqt6svg6, qt6-qpa-plugins, qt6-image-formats-plugins")
-      set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
+      set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting Servatrice to a MySQL DB
     endif()
   endif()
-elseif(WIN32)
+elseif(WIN32) # Windows (including 64bit)
   set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
-  if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "(x64)")
-    set(TRICE_IS_64_BIT 1)
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(TRICE_IS_64_BIT 1) # 64bit
   else()
-    set(TRICE_IS_64_BIT 0)
+    set(TRICE_IS_64_BIT 0) # 32bit
   endif()
 
-  # Configure file with custom definitions for NSIS.
+  # Configure file with custom definitions for NSIS
   configure_file("${COCKATRICE_CMAKE_PATH}/NSIS.definitions.nsh.in" "${PROJECT_BINARY_DIR}/NSIS.definitions.nsh")
 
-  # include vcredist into the package; NSIS will take care of running it
+  # Include vcredist into the package - NSIS will take care of running it
   if(VCREDISTRUNTIME_FOUND)
     install(FILES "${VCREDISTRUNTIME_FILE}" DESTINATION ./)
   endif()
@@ -322,27 +360,24 @@ endif()
 
 include(CPack)
 
+add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_card ${CMAKE_BINARY_DIR}/libcockatrice_card)
+add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_deck_list ${CMAKE_BINARY_DIR}/libcockatrice_deck_list)
 add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_interfaces ${CMAKE_BINARY_DIR}/libcockatrice_interfaces)
 add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_protocol ${CMAKE_BINARY_DIR}/libcockatrice_protocol)
+add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_rng ${CMAKE_BINARY_DIR}/libcockatrice_rng)
+add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_utility ${CMAKE_BINARY_DIR}/libcockatrice_utility)
+
 if(WITH_CLIENT
-   OR WITH_SERVER
    OR WITH_ORACLE
+   OR WITH_SERVER
 )
   add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_network ${CMAKE_BINARY_DIR}/libcockatrice_network)
 endif()
-add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_deck_list ${CMAKE_BINARY_DIR}/libcockatrice_deck_list)
-add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_rng ${CMAKE_BINARY_DIR}/libcockatrice_rng)
-add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_card ${CMAKE_BINARY_DIR}/libcockatrice_card)
-add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_utility ${CMAKE_BINARY_DIR}/libcockatrice_utility)
-if(WITH_ORACLE OR WITH_CLIENT)
-  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_settings ${CMAKE_BINARY_DIR}/libcockatrice_settings)
-  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_models ${CMAKE_BINARY_DIR}/libcockatrice_models)
-  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_filters ${CMAKE_BINARY_DIR}/libcockatrice_filters)
-endif()
 
-if(WITH_SERVER)
-  add_subdirectory(servatrice)
-  set(CPACK_INSTALL_CMAKE_PROJECTS "Servatrice;Servatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+if(WITH_CLIENT OR WITH_ORACLE)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_filters ${CMAKE_BINARY_DIR}/libcockatrice_filters)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_models ${CMAKE_BINARY_DIR}/libcockatrice_models)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/libcockatrice_settings ${CMAKE_BINARY_DIR}/libcockatrice_settings)
 endif()
 
 if(WITH_CLIENT)
@@ -355,12 +390,17 @@ if(WITH_ORACLE)
   set(CPACK_INSTALL_CMAKE_PROJECTS "Oracle;Oracle;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
 endif()
 
+if(WITH_SERVER)
+  add_subdirectory(servatrice)
+  set(CPACK_INSTALL_CMAKE_PROJECTS "Servatrice;Servatrice;ALL;/" ${CPACK_INSTALL_CMAKE_PROJECTS})
+endif()
+
 if(TEST)
   include(CTest)
   add_subdirectory(tests)
 endif()
 
 if(Qt6_FOUND AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
-  # Qt6.3+ requires project finalization to support translations
+  # Qt 6.3+ requires project finalization to support translations
   qt6_finalize_project()
 endif()
