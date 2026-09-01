@@ -112,6 +112,8 @@ qt6_add_executable(
   MANUAL_FINALIZATION
 )
 
+target_precompile_headers(oracle PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
+
 # ------------------------
 # Link libraries
 # ------------------------
