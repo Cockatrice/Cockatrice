@@ -9,7 +9,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # Use compiler cache (ccache)
-option(USE_CCACHE "Cache the build results with ccache" OFF)
+option(USE_CCACHE "Cache the build results with ccache" ON)
 # Treat warnings as errors (Debug builds only)
 option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 # Check for translation updates
