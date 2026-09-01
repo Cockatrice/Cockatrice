@@ -5,8 +5,7 @@
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-# cmake 3.16 is required if using qt6
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.25)
 
 # Use compiler cache (ccache)
 option(USE_CCACHE "Cache the build results with ccache" OFF)
@@ -48,29 +47,12 @@ if(USE_CCACHE)
   endif()
 endif()
 
-if(WIN32 OR USE_VCPKG)
+if(WIN32 OR USE_VCPKG) # Windows (including 64bit) or USE_VCPKG set
   # Use vcpkg toolchain on Windows (and on macOS in CI)
   set(CMAKE_TOOLCHAIN_FILE
       ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake
-      CACHE STRING "Vcpkg toolchain file"
+      CACHE FILEPATH "Vcpkg toolchain file"
   )
-  # Qt path set by user or env var
-  if(QTDIR
-     OR DEFINED ENV{QTDIR}
-     OR DEFINED ENV{QTDIR32}
-     OR DEFINED ENV{QTDIR64}
-  )
-
-  else()
-    set(QTDIR
-        ""
-        CACHE PATH "Path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
-    )
-    message(
-      WARNING
-        "QTDIR variable is missing.  Please set this variable to specify path to Qt (e.g. C:/Qt/6.4.2/msvc2019_64)"
-    )
-  endif()
 endif()
 
 # A project name is needed for CPack
@@ -82,7 +64,7 @@ if(NOT DEFINED GIT_TAG_RELEASENAME)
   set(GIT_TAG_RELEASENAME "Graduation Day")
 endif()
 
-# Use c++20 for all targets
+# Use C++20 for all targets
 set(CMAKE_CXX_STANDARD
     20
     CACHE STRING "C++ ISO Standard"
@@ -96,6 +78,8 @@ set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 set(COCKATRICE_CMAKE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 list(INSERT CMAKE_MODULE_PATH 0 "${COCKATRICE_CMAKE_PATH}")
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 include(getversion)
 
 # Create a header and a cpp file containing the version hash
@@ -103,8 +87,7 @@ include(createversionfile)
 
 # Define a proper install path
 if(UNIX)
-  if(APPLE)
-    # macOS
+  if(APPLE) # macOS
     # Due to the special bundle structure ignore
     # the prefix eventually set by the user.
     set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/release)
@@ -124,8 +107,7 @@ if(UNIX)
       set(CMAKE_XCODE_ATTRIBUTE_LD "${CMAKE_BINARY_DIR}/launch-c")
       set(CMAKE_XCODE_ATTRIBUTE_LDPLUSPLUS "${CMAKE_BINARY_DIR}/launch-cxx")
     endif()
-  else()
-    # Linux / BSD
+  else() # Linux / BSD
     if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
       #fix package build
       if(PREFIX)
@@ -135,7 +117,7 @@ if(UNIX)
       endif()
     endif()
   endif()
-elseif(WIN32)
+elseif(WIN32) # Windows (including 64bit)
   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/rundir/${CMAKE_BUILD_TYPE})
 endif()
 
@@ -152,7 +134,7 @@ if(MSVC)
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 
   add_compile_definitions(_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING)
-elseif(CMAKE_COMPILER_IS_GNUCXX)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   # linux/gcc, bsd/gcc, windows/mingw
   include(CheckCXXCompilerFlag)
 
@@ -201,30 +183,15 @@ endif()
 
 find_package(Threads REQUIRED)
 
-# Determine 32 or 64 bit build
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  set(_lib_suffix 64)
-else()
-  set(_lib_suffix 32)
-endif()
-
-if(DEFINED QTDIR${_lib_suffix})
-  list(APPEND CMAKE_PREFIX_PATH "${QTDIR${_lib_suffix}}")
-elseif(DEFINED QTDIR)
-  list(APPEND CMAKE_PREFIX_PATH "${QTDIR}")
-elseif(DEFINED ENV{QTDIR${_lib_suffix}})
-  list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR${_lib_suffix}}")
-elseif(DEFINED ENV{QTDIR})
-  list(APPEND CMAKE_PREFIX_PATH "$ENV{QTDIR}")
-endif()
-
 message(STATUS "Update Translations: ${UPDATE_TRANSLATIONS}")
 
+# Find Qt, minimum version is defined in cmake/FindQtRuntime.cmake
 include(FindQtRuntime)
 
 set(CMAKE_AUTOMOC TRUE)
 
-# Find other needed libraries
+## Find other needed libraries
+# Find Protobuf
 find_package(Protobuf CONFIG)
 if(NOT Protobuf_FOUND)
   find_package(Protobuf REQUIRED)
@@ -234,7 +201,7 @@ if(${Protobuf_VERSION} VERSION_LESS "3.21.0.0" AND NOT EXISTS "${Protobuf_PROTOC
   message(FATAL_ERROR "No protoc command found!")
 endif()
 
-#Find OpenSSL
+# Find OpenSSL
 if(WIN32)
   find_package(OpenSSL REQUIRED)
   if(OPENSSL_FOUND)
@@ -247,7 +214,7 @@ if(WIN32)
   endif()
 endif()
 
-#Find VCredist
+# Find VCredist
 if(MSVC)
   find_package(VCredistRuntime)
 endif()
@@ -266,7 +233,7 @@ set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 set(CPACK_PACKAGE_FILE_NAME "${PROJECT_VERSION_FILENAME}")
 
 if(UNIX)
-  if(APPLE)
+  if(APPLE) # macOS
     set(CPACK_GENERATOR DragNDrop ${CPACK_GENERATOR})
     set(CPACK_GENERATOR "DragNDrop")
     set(CPACK_DMG_FORMAT "UDBZ")
@@ -276,8 +243,7 @@ if(UNIX)
     set(CPACK_DMG_DS_STORE_SETUP_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeDMGSetup.script")
     set(CPACK_DMG_BACKGROUND_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/dmgBackground.tif")
     set(CPACK_PRE_BUILD_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/cmake/SignMacApplications.cmake")
-  else()
-    # linux
+  else() # Linux
     if(CPACK_GENERATOR STREQUAL "RPM")
       set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
       set(CPACK_RPM_MAIN_COMPONENT "cockatrice")
@@ -303,7 +269,7 @@ if(UNIX)
       set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "libqt6sql6-mysql") # for connecting servatrice to a mysql db
     endif()
   endif()
-elseif(WIN32)
+elseif(WIN32) # Windows (including 64bit)
   set(CPACK_GENERATOR NSIS ${CPACK_GENERATOR})
   if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "(x64)")
     set(TRICE_IS_64_BIT 1)
@@ -360,7 +326,4 @@ if(TEST)
   add_subdirectory(tests)
 endif()
 
-if(Qt6_FOUND AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
-  # Qt6.3+ requires project finalization to support translations
-  qt6_finalize_project()
-endif()
+qt6_finalize_project()

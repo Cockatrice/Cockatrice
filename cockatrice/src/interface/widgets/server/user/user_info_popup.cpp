@@ -775,6 +775,7 @@ void UserInfoPopup::enterEvent(QEnterEvent *e)
     QFrame::enterEvent(e);
     emit mouseEnteredPopup();
 }
+
 void UserInfoPopup::leaveEvent(QEvent *e)
 {
     QFrame::leaveEvent(e);

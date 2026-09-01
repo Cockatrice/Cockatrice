@@ -136,7 +136,7 @@ cd "$BUILD_DIR"
 # Set minimum CMake Version
 export CMAKE_POLICY_VERSION_MINIMUM=3.10
 
-# Add cmake flags
+# Add CMake flags
 flags=("-DCMAKE_BUILD_TYPE=$BUILDTYPE")
 if [[ $MAKE_SERVER ]]; then
   flags+=("-DWITH_SERVER=1")
@@ -150,7 +150,7 @@ fi
 if [[ $USE_CCACHE ]]; then
   flags+=("-DUSE_CCACHE=1")
   if [[ $CCACHE_SIZE ]]; then
-    # note, this setting persists after running the script
+    # This setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"
   fi
 fi
@@ -162,17 +162,11 @@ if [[ $USE_VCPKG ]]; then
   flags+=("-DVCPKG_INSTALL_OPTIONS=--x-abi-tools-use-exact-versions")
 fi
 
-# Add cmake --build flags
+# Add CMake --build flags
 buildflags=(--config "$BUILDTYPE")
 
 function ccachestatsverbose() {
-  # note, verbose only works on newer ccache, discard the error
-  local got
-  if got="$(ccache --show-stats --verbose 2>/dev/null)"; then
-    echo "$got"
-  else
-    ccache --show-stats
-  fi
+  ccache --show-stats --verbose
 }
 
 # Compile
@@ -185,10 +179,12 @@ if [[ $RUNNER_OS == macOS ]]; then
     echo "could not find QTDIR!"
     exit 2
   fi
-  # the qtdir is located at Qt/[qtversion]/macos
-  # we use find to get the first subfolder with the name "macos"
-  # this works independent of the qt version as there should be only one version installed on the runner at a time
+  # QTDIR is located at Qt/<QtVersion>/macos
+  # We use find to get the first subfolder with the name "macos"
+  # This works independent of the Qt version as there should be only one version installed on the runner at a time
   export QTDIR
+  # Add QTDIR to CMAKE_PREFIX_PATH so CMake can find Qt6
+  export CMAKE_PREFIX_PATH="$QTDIR:$CMAKE_PREFIX_PATH"
 
   if [[ $TARGET_MACOS_VERSION ]]; then
     # CMAKE_OSX_DEPLOYMENT_TARGET is a vanilla cmake flag needed to compile to target macOS version
@@ -236,7 +232,7 @@ if [[ $RUNNER_OS == macOS ]]; then
 
   if [[ $MAKE_PACKAGE ]]; then
     # Workaround https://github.com/actions/runner-images/issues/7522
-    # have hdiutil repeat the command 10 times in hope of success
+    # Have hdiutil repeat the command 10 times in hope of success
     hdiutil_script="/tmp/hdiutil.sh"
     # shellcheck disable=SC2016
     echo '#!/bin/bash

@@ -23,7 +23,6 @@ class QString;
 class AbstractCounter : public QObject, public QGraphicsItem, public AbstractPlayerComponent
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 
 protected:
     PlayerLogic *player;
