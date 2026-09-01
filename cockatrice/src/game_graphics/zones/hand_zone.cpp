@@ -41,7 +41,8 @@ void HandZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
             }
         }
     } else {
-        x = calcDropIndexFromY(dropPoint.y());
+        bool sameZone = startZone == getLogic();
+        x = calcDropIndexFromY(dropPoint.y(), !sameZone);
     }
 
     Command_MoveCard cmd;

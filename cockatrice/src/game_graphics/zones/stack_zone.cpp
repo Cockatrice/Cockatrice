@@ -57,10 +57,11 @@ void StackZone::handleDropEvent(const QList<CardDragItem *> &dragItems,
         return;
     }
 
-    const auto &cards = getLogic()->getCards();
-    int index = calcDropIndexFromY(dropPoint.y(), MIN_CARD_VISIBLE);
-    if (startZone == getLogic()) {
+    bool sameZone = startZone == getLogic();
+    int index = calcDropIndexFromY(dropPoint.y(), !sameZone, MIN_CARD_VISIBLE);
+    if (sameZone) {
         // Same-zone no-op: don't move a card onto itself
+        const auto &cards = getLogic()->getCards();
         if (!cards.isEmpty() && cards.at(index)->getId() == dragItems.at(0)->getId()) {
             return;
         }
