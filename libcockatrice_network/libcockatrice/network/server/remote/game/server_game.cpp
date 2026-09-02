@@ -270,8 +270,6 @@ void Server_Game::createGameStateChangedEvent(Event_GameStateChanged *event,
         event->set_game_started(false);
     }
 
-    event->set_is_tournament(isTournament);
-
     if (tournamentParentGame) {
         event->set_parent_game_id(tournamentParentGame->getGameId());
     }
