@@ -311,6 +311,17 @@ void RemoteClient::passwordSaltResponse(const Response &response)
             doLogin();
         } else if (serverSupportsChallengeResponse && resp.has_nonce()) {
             const QByteArray nonce = QByteArray::fromStdString(resp.nonce());
+            // needs_migration is a server-controlled flag over an unauthenticated
+            // transport (plain TCP by default). If we already hold a scrypt
+            // verifier for this account, a server telling us to fall back to the
+            // 1000-round legacy hash is a downgrade of the KDF — refuse it rather
+            // than hand an attacker a weakly-keyed HMAC they can attack offline.
+            if (resp.needs_migration() && PasswordHasher::parsePasswordVerifier(storedVerifier).isValid) {
+                emit loginError(Response::RespClientUpdateRequired,
+                                QStringLiteral("Server asked to downgrade authentication for a migrated account."), 0,
+                                {});
+                return;
+            }
             QByteArray key;
             if (resp.needs_migration()) {
                 // The account still uses the legacy format; the legacy full hash
