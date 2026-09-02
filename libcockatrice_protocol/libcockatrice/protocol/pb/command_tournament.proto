@@ -1,6 +1,6 @@
 syntax = "proto2";
 import "game_commands.proto";
-import "event_tournament_state.proto";
+import "serverinfo_tournament.proto";
 
 message Command_ReportMatchResult {
     extend GameCommand {
@@ -8,7 +8,12 @@ message Command_ReportMatchResult {
     }
 
     optional sint32 game_id = 1 [default = -1];
+    // The winning player's ID. A drawn match is reported with is_draw set and
+    // winner_id left unset so a missing report stays distinguishable from a
+    // reported draw via has_winner_id().
     optional sint32 winner_id = 2 [default = -1];
+    // Whether the match ended in a draw; winner_id is meaningless then.
+    optional bool is_draw = 3;
 }
 
 message Command_AdvanceTournament {

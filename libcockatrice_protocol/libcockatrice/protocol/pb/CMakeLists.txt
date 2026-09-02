@@ -207,6 +207,7 @@ set(PROTO_FILES
     serverinfo_report.proto
     serverinfo_room.proto
     serverinfo_room_channel.proto
+    serverinfo_tournament.proto
     serverinfo_user.proto
     serverinfo_user_alt.proto
     serverinfo_user_session.proto
