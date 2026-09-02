@@ -1,5 +1,8 @@
 #include "server_protocolhandler.h"
 
+// Challenge-response nonces are valid for at most one minute from issuance.
+static constexpr qint64 kAuthNonceLifetimeSeconds = 60;
+
 #include "game/game_config.h"
 #include "game/server_game.h"
 #include "game/server_player.h"
@@ -44,20 +47,26 @@ Server_ProtocolHandler::~Server_ProtocolHandler()
 {
 }
 
-void Server_ProtocolHandler::setAuthNonce(const QByteArray &nonce)
+void Server_ProtocolHandler::setAuthNonce(const QByteArray &nonce, const QString &userName)
 {
     authNonce = nonce;
+    authNonceUser = userName;
     authNonceCreated = QDateTime::currentDateTimeUtc();
 }
 
-bool Server_ProtocolHandler::isAuthNonceValid(const QByteArray &nonce) const
+bool Server_ProtocolHandler::isAuthNonceValid(const QByteArray &nonce, const QString &userName) const
 {
-    return !authNonce.isEmpty() && authNonce == nonce && authNonceCreated.secsTo(QDateTime::currentDateTimeUtc()) < 60;
+    // secsTo is signed, so a wall-clock step backwards (NTP correction, VM resume)
+    // must not make the elapsed time negative and re-validate an old nonce.
+    const qint64 elapsed = authNonceCreated.secsTo(QDateTime::currentDateTimeUtc());
+    return !authNonce.isEmpty() && authNonce == nonce && authNonceUser == userName && authNonceCreated.isValid() &&
+           elapsed >= 0 && elapsed < kAuthNonceLifetimeSeconds;
 }
 
 void Server_ProtocolHandler::clearAuthNonce()
 {
     authNonce.clear();
+    authNonceUser.clear();
 }
 
 // This function must only be called from the thread this object lives in.

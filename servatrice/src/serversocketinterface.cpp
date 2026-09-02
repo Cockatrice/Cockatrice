@@ -2524,8 +2524,16 @@ bool AbstractServerSocketInterface::tooManyRegistrationAttempts(const QString &i
 
 bool AbstractServerSocketInterface::acceptsCredentialFormat(bool passwordNeedsHash, const QString &password) const
 {
-    // "scryptFormat" means the client sent a derived verifier rather than a password to hash ourselves.
-    const bool scryptFormat = !passwordNeedsHash && !PasswordHasher::isLegacyFormat(password);
+    // An empty credential must never reach the database: it would be accepted
+    // as a legacy format and stored as '' (fail-open on login, see the empty
+    // stored-credential guard in Servatrice_DatabaseInterface).
+    if (password.isEmpty()) {
+        return false;
+    }
+    // "scryptFormat" means the client sent a derived verifier rather than a
+    // password to hash ourselves. parsePasswordVerifier enforces the sane-cost
+    // clamp, so nothing starting with '$' reaches the database unparsed.
+    const bool scryptFormat = !passwordNeedsHash && PasswordHasher::parsePasswordVerifier(password).isValid;
 
     // The strictness mode governs how existing legacy accounts are served, not which new-credential
     // formats are tolerated: a legacy-mode server must still accept scrypt verifiers, because clients
@@ -2534,7 +2542,8 @@ bool AbstractServerSocketInterface::acceptsCredentialFormat(bool passwordNeedsHa
     if (servatrice->getAuthenticationStrictness() == Servatrice::AuthenticationStrict) {
         return scryptFormat;
     }
-    return true; // legacy and mixed accept either format
+    // legacy and mixed accept a valid scrypt verifier or a genuine legacy salt+hash.
+    return scryptFormat || PasswordHasher::isLegacyFormat(password);
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const Command_Activate &cmd,
@@ -3097,7 +3106,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
         // served the legacy salt, since legacy mode only governs what NEW credentials are accepted.
         if (servatrice->getAuthenticationStrictness() != Servatrice::AuthenticationLegacy) {
             const QByteArray nonce = CryptoUtil::randomBytes(32);
-            setAuthNonce(nonce);
+            setAuthNonce(nonce, userName);
             re->set_nonce(nonce.constData(), nonce.size());
         }
     } else {
@@ -3113,7 +3122,7 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
         re->set_needs_migration(false);
         // scrypt rows are served challenge-response in every mode so migrated accounts never lock out.
         const QByteArray nonce = CryptoUtil::randomBytes(32);
-        setAuthNonce(nonce);
+        setAuthNonce(nonce, userName);
         re->set_nonce(nonce.constData(), nonce.size());
     }
 
