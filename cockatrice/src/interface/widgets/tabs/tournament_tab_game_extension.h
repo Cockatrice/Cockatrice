@@ -32,14 +32,12 @@ public:
 
 private slots:
     void onTournamentStateChanged(const Event_TournamentState &state);
-    void showTournamentSettingsDialog();
     void showOverviewPage();
     void showDeckViewPage();
     void openMatchGame(int gameId);
 
 private:
     void connectSignals();
-    [[nodiscard]] bool isLocalPlayerHost() const;
     void updateDeckViewStrip(const Event_TournamentState &state);
     void updateNavigationButtons(const Event_TournamentState &state);
 
@@ -48,7 +46,6 @@ private:
     QWidget *tournamentOverviewWidget = nullptr;
     QPushButton *backToGameButton = nullptr;
     QPushButton *standingsButton = nullptr;
-    QPushButton *settingsButton = nullptr;
     QLabel *deckViewStatusLabel = nullptr;
     Event_TournamentState::TournamentPhase lastKnownPhase = Event_TournamentState::PHASE_DECK_BUILDING;
     bool hasLastKnownPhase = false;
