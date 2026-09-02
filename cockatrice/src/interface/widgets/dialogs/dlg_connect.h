@@ -55,7 +55,10 @@ public:
     }
     [[nodiscard]] QString getSaveName() const
     {
-        return saveEdit->text();
+        // Trim so the profile lookup key always matches the name DlgConnect::actOk
+        // stored (it saves under saveEdit->text().trimmed()); otherwise a trailing
+        // space here misses the index and silently drops the saved verifier.
+        return saveEdit->text().trimmed();
     }
     [[nodiscard]] bool getSavePassword() const
     {
