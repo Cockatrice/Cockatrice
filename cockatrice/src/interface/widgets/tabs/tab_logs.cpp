@@ -185,6 +185,10 @@ void TabLog::createDock()
     if (canUseDeveloperCommands) {
         // Developers cannot query private conversations.
         privateChat->setVisible(false);
+        // The developer family ignores the IP filter server-side, so showing
+        // the field would silently unfilter the result by it. Hide it.
+        labelFindIPAddress->setVisible(false);
+        findIPAddress->setVisible(false);
     }
 
     pastDays = new QRadioButton(tr("Past X Days: "));

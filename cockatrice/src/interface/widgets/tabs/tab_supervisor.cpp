@@ -835,8 +835,11 @@ void TabSupervisor::actTabLog(bool checked)
 void TabSupervisor::openTabLog()
 {
     // Developers query logs through the developer command family, so tell the
-    // tab which family to use.
-    const bool useDeveloperCommands = (userInfo->user_level() & ServerInfo_User::IsDeveloper) != 0;
+    // tab which family to use. The moderator family is strictly stronger, so a
+    // moderator who also holds the developer bit keeps the moderator path — the
+    // developer bit only selects the (narrowed) developer family on its own.
+    const bool useDeveloperCommands = (userInfo->user_level() & ServerInfo_User::IsDeveloper) &&
+                                      !(userInfo->user_level() & ServerInfo_User::IsModerator);
     tabLog = new TabLog(this, client, useDeveloperCommands);
     myAddTab(tabLog, aTabLog);
     connect(tabLog, &QObject::destroyed, this, [this] {
