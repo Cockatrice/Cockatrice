@@ -99,30 +99,7 @@ public:
     PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool _judge, AbstractGame *_parent);
     ~PlayerLogic() override;
 
-protected:
-    /**
-     * @brief Constructor for subclasses that need a custom event handler (e.g. DraftPlayerLogic).
-     *
-     * @p customEventHandler must be non-null and either QObject-parented to this PlayerLogic
-     * or deleted externally; it is not owned by PlayerLogic. The handler connects to @c player
-     * during its own constructor, so passing a freshly built subclass handler from an
-     * initializer list is safe.
-     */
-    PlayerLogic(const ServerInfo_User &info,
-                int _id,
-                bool _local,
-                bool _judge,
-                AbstractGame *_parent,
-                PlayerEventHandler *customEventHandler);
-
-public:
-    /**
-     * @brief Creates the standard zone set.
-     *
-     * Not virtually dispatched from constructors — subclasses overriding this must add
-     * their extra zones in their own constructor body.
-     */
-    virtual void initializeZones();
+    void initializeZones();
     void updateZones();
     void clear();
 

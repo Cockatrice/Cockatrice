@@ -37,19 +37,6 @@ PlayerLogic::PlayerLogic(const ServerInfo_User &info, int _id, bool _local, bool
     initializeZones();
 }
 
-PlayerLogic::PlayerLogic(const ServerInfo_User &info,
-                         int _id,
-                         bool _local,
-                         bool _judge,
-                         AbstractGame *_parent,
-                         PlayerEventHandler *customEventHandler)
-    : QObject(_parent), game(_parent), playerInfo(new PlayerInfo(info, _id, _local, _judge)),
-      playerEventHandler(customEventHandler), playerActions(new PlayerActions(this)), active(false), conceded(false),
-      zoneId(0), dialogSemaphore(false)
-{
-    initializeZones();
-}
-
 void PlayerLogic::initializeZones()
 {
     addZone(new PileZoneLogic(this, ZoneNames::DECK, false, true, false, this));
