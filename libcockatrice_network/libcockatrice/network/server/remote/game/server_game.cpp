@@ -812,6 +812,15 @@ void Server_Game::createGameJoinedEvent(Server_AbstractParticipant *joiningParti
     }
 
     rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER, prepareGameEvent(event2, -1));
+
+    // A tournament's bracket/phase/standings live in Event_TournamentState, which
+    // normally only flows on mutation. Without a copy here a late joiner would sit
+    // on an empty bracket until the next round advances, so replay the current
+    // state as part of the join snapshot.
+    if (tournament) {
+        rc.enqueuePostResponseItem(ServerMessage::GAME_EVENT_CONTAINER,
+                                   prepareGameEvent(tournament->buildStateEvent(), -1));
+    }
 }
 
 void Server_Game::sendGameEventContainer(GameEventContainer *cont,
