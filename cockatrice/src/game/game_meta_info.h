@@ -89,11 +89,6 @@ public:
         return gameInfo_.is_tournament();
     }
 
-    void setIsTournament(bool t)
-    {
-        gameInfo_.set_is_tournament(t);
-    }
-
     int parentGameId() const
     {
         return parentGameId_;

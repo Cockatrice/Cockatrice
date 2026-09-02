@@ -90,10 +90,10 @@ public:
      * @param context Additional context (undo, judge, etc.).
      * @param options Processing options (UI suppression, reveal behavior).
      */
-    virtual void processGameEvent(GameEvent::GameEventType type,
-                                  const GameEvent &event,
-                                  const GameEventContext &context,
-                                  EventProcessingOptions options);
+    void processGameEvent(GameEvent::GameEventType type,
+                          const GameEvent &event,
+                          const GameEventContext &context,
+                          EventProcessingOptions options);
 
     /** @} */
 
@@ -266,7 +266,7 @@ signals:
     void cardZoneChanged(CardItem *card, bool sameZone);
     void requestCardMenuUpdate(const CardItem *card);
 
-protected:
+private:
     /** Owning player instance. */
     PlayerLogic *player;
 

@@ -268,8 +268,9 @@ void GameEventHandler::eventGameStateChanged(const Event_GameStateChanged &event
                                              const GameEventContext & /*context*/)
 {
     // Sub-games of a tournament report their parent hub game so the client can
-    // route "close game" back to the parent tab.
-    if (event.parent_game_id() != -1) {
+    // route "close game" back to the parent tab. Use has_parent_game_id rather
+    // than comparing the default so a future drop of the proto default still works.
+    if (event.has_parent_game_id()) {
         game->getGameMetaInfo()->setParentGameId(event.parent_game_id());
     }
 
