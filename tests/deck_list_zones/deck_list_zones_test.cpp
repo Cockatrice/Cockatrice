@@ -213,6 +213,42 @@ TEST(DeckListZones, MoveCustomZoneMovesCards)
     EXPECT_FALSE(tree->moveCustomZone("Removal", "not_a_board"));
 }
 
+TEST(DeckListZones, MoveCustomZoneFailsForUnknownBoard)
+{
+    DeckList deck;
+    auto *tree = deck.getTree();
+
+    ASSERT_NE(tree->addCustomZone(DECK_ZONE_MAIN, "Removal"), nullptr);
+    tree->addCard("Lightning Bolt", 2, "Removal", -1);
+
+    EXPECT_FALSE(tree->moveCustomZone("Removal", "not_a_board"));
+
+    // The zone is still under main.
+    EXPECT_EQ(tree->getCustomZones(DECK_ZONE_MAIN).size(), 1);
+}
+
+// Regression: findCustomZoneByName walks every top-level zone, so a custom zone
+// an imported deck carries under a non-standard board (tokens) is still found and
+// movable. The pre-fix manager-level moveCustomZone only scanned the standard
+// boards and returned false for these with no feedback.
+TEST(DeckListZones, MoveCustomZoneNestedUnderTokensBoard)
+{
+    DeckList deck;
+    auto *tree = deck.getTree();
+    auto *root = tree->getRoot();
+
+    auto *tokens = new InnerDecklistNode(DECK_ZONE_TOKENS, root);
+    auto *removal = new InnerDecklistNode("Removal", tokens);
+    new DecklistCardNode("Lightning Bolt", 2, removal, -1);
+
+    EXPECT_TRUE(tree->findCustomZoneByName("Removal"));
+    EXPECT_TRUE(tree->moveCustomZone("Removal", DECK_ZONE_SIDE));
+
+    auto pairs = collectBoardCardPairs(deck);
+    EXPECT_FALSE(hasPair(pairs, DECK_ZONE_TOKENS, "Lightning Bolt"));
+    EXPECT_TRUE(hasPair(pairs, DECK_ZONE_SIDE, "Lightning Bolt"));
+}
+
 TEST(DeckListZones, RemoveCustomZoneRemovesCards)
 {
     DeckList deck;

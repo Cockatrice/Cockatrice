@@ -407,25 +407,15 @@ bool DeckStateManager::moveCustomZone(const QString &zoneName, const QString &ne
 {
     const auto *tree = deckList->getTree();
 
-    // Locate the board currently holding the zone.
-    QString currentBoardName;
-    for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
-        for (const auto *zone : tree->getCustomZones(boardName)) {
-            if (zone->getName() == zoneName) {
-                currentBoardName = boardName;
-                break;
-            }
-        }
-        if (!currentBoardName.isEmpty()) {
-            break;
-        }
-    }
-
-    if (currentBoardName.isEmpty()) {
+    // Locate the zone through the tree's own lookup, which walks every top-level
+    // zone (not just the standard boards) and covers the same-board no-op below.
+    const auto *zone = tree->findCustomZoneByName(zoneName);
+    if (!zone) {
         return false;
     }
 
     // Same-board moves are no-ops and must not pollute the history.
+    const QString currentBoardName = zone->getParent() ? zone->getParent()->getName() : QString();
     if (currentBoardName == newBoardZoneName) {
         return true;
     }
@@ -433,8 +423,8 @@ bool DeckStateManager::moveCustomZone(const QString &zoneName, const QString &ne
     // Zone names are deck-unique among zones created through this manager, so a
     // same-named zone on the target board can only come from an imported deck.
     // Refuse the move instead of silently stacking same-named zones.
-    for (const auto *zone : tree->getCustomZones(newBoardZoneName)) {
-        if (zone->getName() == zoneName) {
+    for (const auto *targetZone : tree->getCustomZones(newBoardZoneName)) {
+        if (targetZone->getName() == zoneName) {
             return false;
         }
     }
@@ -552,6 +542,9 @@ bool DeckStateManager::modifyTree(const QString &reason, const std::function<boo
         deckListModel->rebuildTree();
         deckList->refreshDeckHash();
         emit deckListModel->deckHashChanged();
+        // removeCustomZone can drop whole card sets the model never notified
+        // about (rebuildTree emits no cardNodesChanged), so tell the consumers.
+        emit deckListModel->cardNodesChanged();
         doCardModified();
     }
 
