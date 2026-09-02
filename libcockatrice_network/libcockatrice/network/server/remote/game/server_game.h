@@ -31,6 +31,7 @@
 #include <QMap>
 #include <QMutex>
 #include <QObject>
+#include <QPointer>
 #include <QScopedPointer>
 #include <QSet>
 #include <QStringList>
@@ -92,7 +93,7 @@ private:
     bool isTournament;
     TournamentSettings tournamentSettings;
     Server_Tournament *tournament;
-    Server_Game *tournamentParentGame;
+    QPointer<Server_Game> tournamentParentGame;
     int tournamentMatchPlayer1Id;
     int tournamentMatchPlayer2Id;
     bool disconnectRemovesPlayer;
@@ -250,13 +251,17 @@ public:
     void startTournament();
     void setPlayerTournamentDeck(int playerId, DeckList *deck);
     void setTournamentMatchInfo(Server_Game *parentGame, int p1Id, int p2Id);
-    Server_Game *getTournamentParentGame() const
+    QPointer<Server_Game> getTournamentParentGame() const
     {
         return tournamentParentGame;
     }
     bool getDisconnectRemovesPlayer() const
     {
         return disconnectRemovesPlayer;
+    }
+    void setDisconnectRemovesPlayer(bool _disconnectRemovesPlayer)
+    {
+        disconnectRemovesPlayer = _disconnectRemovesPlayer;
     }
 
     // Server_MatchGameFactory implementation

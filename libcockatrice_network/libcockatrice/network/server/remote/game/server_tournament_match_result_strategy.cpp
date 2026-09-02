@@ -12,7 +12,10 @@ bool Server_TournamentMatchResultStrategy::onGameFinished(Server_Game *game,
                                                           int playing,
                                                           Server_AbstractPlayer *lastPlayer)
 {
-    auto *parentGame = game->getTournamentParentGame();
+    // The hub game is owned by the room and may be torn down once its host leaves
+    // and no players remain, while the match sub-games keep running. QPointer keeps
+    // this link checked so a later-finishing match can't touch freed memory.
+    auto *parentGame = game->getTournamentParentGame().data();
     if (!parentGame || !parentGame->getTournament()) {
         return false;
     }
