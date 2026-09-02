@@ -357,6 +357,13 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     return UserIsInactive;
                 }
 
+                // Fail closed on an absent stored credential: an empty key would
+                // otherwise authenticate anyone who can compute HMAC("", nonce).
+                if (correctPasswordSha512.isEmpty()) {
+                    qCWarning(DatabaseInterfaceLog) << "Login denied: empty stored credential";
+                    return NotLoggedIn;
+                }
+
                 if (password.startsWith("$challenge$")) {
                     // Challenge-response login: verify HMAC(stored_key, nonce) without
                     // ever transmitting the stored credential or password hash.
@@ -366,7 +373,7 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     }
                     const QByteArray nonce = QByteArray::fromBase64(parts.at(2).toUtf8());
                     const QByteArray response = QByteArray::fromBase64(parts.at(3).toUtf8());
-                    if (nonce.isEmpty() || response.isEmpty() || !handler->isAuthNonceValid(nonce)) {
+                    if (nonce.isEmpty() || response.isEmpty() || !handler->isAuthNonceValid(nonce, user)) {
                         return NotLoggedIn;
                     }
 

@@ -58,6 +58,7 @@ protected:
     bool acceptsRoomListChanges;
     bool idleClientWarningSent;
     QByteArray authNonce;
+    QString authNonceUser;
     QDateTime authNonceCreated;
     virtual void logDebugMessage(const QString & /* message */)
     {
@@ -128,10 +129,10 @@ public:
         return databaseInterface;
     }
 
-    /** @brief Store a fresh challenge nonce for the next challenge-response login attempt. */
-    void setAuthNonce(const QByteArray &nonce);
-    /** @brief True if nonce matches the pending one and was issued less than 60 seconds ago. */
-    bool isAuthNonceValid(const QByteArray &nonce) const;
+    /** @brief Store a fresh challenge nonce bound to @p userName for the next challenge-response login attempt. */
+    void setAuthNonce(const QByteArray &nonce, const QString &userName);
+    /** @brief True if nonce matches the pending one, was issued for @p userName, and is less than 60 seconds old. */
+    bool isAuthNonceValid(const QByteArray &nonce, const QString &userName) const;
     /** @brief Invalidate the pending nonce (single-use). */
     void clearAuthNonce();
 
