@@ -36,6 +36,8 @@ public:
     void recordMatchResult(int playerId1, int playerId2, int winnerId, GameEventStorage &ges);
     bool recordMatchResultByGameId(int gameId, int winnerId, GameEventStorage &ges);
     void broadcastTournamentState(GameEventStorage &ges);
+    // Current tournament state message, for replaying to a participant joining late.
+    Event_TournamentState buildStateEvent() const;
 
     bool isStarted() const
     {

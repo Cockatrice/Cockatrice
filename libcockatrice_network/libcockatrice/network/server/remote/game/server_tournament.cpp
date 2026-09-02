@@ -635,7 +635,7 @@ void Server_Tournament::checkAndAdvanceRound(GameEventStorage &ges)
     }
 }
 
-void Server_Tournament::broadcastTournamentState(GameEventStorage &ges)
+Event_TournamentState Server_Tournament::buildStateEvent() const
 {
     QMutexLocker locker(&tournamentMutex);
 
@@ -682,5 +682,10 @@ void Server_Tournament::broadcastTournamentState(GameEventStorage &ges)
         p->set_player2_match_wins(pairing.player2MatchWins);
     }
 
-    ges.enqueueGameEvent(state, -1);
+    return state;
+}
+
+void Server_Tournament::broadcastTournamentState(GameEventStorage &ges)
+{
+    ges.enqueueGameEvent(buildStateEvent(), -1);
 }
