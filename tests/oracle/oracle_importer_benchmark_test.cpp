@@ -353,8 +353,9 @@ static void logRamPhase(const QString &phase, const MemorySnapshot &baseline, co
     // VmHWM / ru_maxrss are monotonically non-decreasing high-water marks, so a
     // peak-based delta between phases is ~0.0 MB by construction once the
     // fixture build has set the process peak. The live signals are current RSS
-    // and the process peak; the delta is only meaningful where current RSS is
-    // a per-phase value (see "after releaseSetData()").
+    // and the process peak; the delta is meaningful only where the baseline was
+    // taken immediately before the phase it measures (e.g. the import phase,
+    // which compares afterParse against afterImport).
     QString rssDelta = "N/A";
     if (current.rssKb >= 0 && baseline.rssKb >= 0) {
         rssDelta = formatKb(current.rssKb - baseline.rssKb);
@@ -435,6 +436,13 @@ TEST(OracleBenchmark, ImportRamUsage)
 
     const QByteArray data = buildSyntheticData(numSets, cardsPerSet);
 
+    // The fixture build leaves freed-but-unreturned arenas behind (current RSS
+    // rarely falls once glibc allocates). Baseline immediately after it so the
+    // parse phase measures only the importer's own growth (~40 MB) rather than
+    // swallowing the fixture builder's spike.
+    const MemorySnapshot afterFixture = MemorySnapshot::current();
+    logRamPhase("fixture build", baseline, afterFixture);
+
     NoopCardSetPriorityController controller;
     OracleImporter importer;
 
@@ -459,9 +467,14 @@ TEST(OracleBenchmark, ImportRamUsage)
                               .arg(data.size() / (1024.0 * 1024.0), 0, 'f', 1);
     qDebug().noquote() << QString("  JSON parse: %1 ms").arg(parseMs);
     qDebug().noquote() << QString("  Card import: %1 ms").arg(importMs);
-    logRamPhase("parse", baseline, afterParse);
+    logRamPhase("parse", afterFixture, afterParse);
     logRamPhase("import", afterParse, afterImport);
     logRamPhase("after releaseSetData()", afterImport, afterRelease);
+
+    // Freeing the parsed tree rarely moves current RSS (allocator reuse), so the
+    // meaningful signal that release actually dropped the buffers is emptiness,
+    // not an RSS delta.
+    ASSERT_TRUE(importer.getSets().isEmpty());
 }
 
 TEST(OracleBenchmark, ImportRamUsageAllPrintings)
