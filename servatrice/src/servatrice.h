@@ -173,8 +173,6 @@ private:
     int uptime;
     QMutex txBytesMutex, rxBytesMutex;
     quint64 txBytes, rxBytes;
-    std::atomic<quint64> txBytesTotal{0}; ///< cumulative bytes sent since process start
-    std::atomic<quint64> rxBytesTotal{0}; ///< cumulative bytes received since process start
     MetricsRegistry metricsRegistry;
     int metricsSlowCommandMs = 500;
     int metricsStallWarnMs = 2000;
@@ -301,18 +299,6 @@ public:
     MetricsRegistry &getMetricsRegistry()
     {
         return metricsRegistry;
-    }
-    quint64 getTxBytesTotal() const
-    {
-        return txBytesTotal.load(std::memory_order_relaxed);
-    }
-    quint64 getRxBytesTotal() const
-    {
-        return rxBytesTotal.load(std::memory_order_relaxed);
-    }
-    int getUptimeSeconds() const
-    {
-        return uptime;
     }
     /**
      * Sums cards across all zones of all running games. Each game takes its
