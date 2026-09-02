@@ -4,6 +4,7 @@
 #include <QList>
 #include <QMap>
 #include <QObject>
+#include <QPointer>
 #include <QRecursiveMutex>
 #include <QSet>
 #include <libcockatrice/protocol/pb/event_tournament_state.pb.h>
@@ -27,6 +28,9 @@ public:
 
     void addPlayer(int playerId, const QString &playerName);
     void removePlayer(int playerId);
+    // Marks an already-starting/started tournament player as dropped: they stop
+    // being paired and their outstanding unstarted match is awarded as a loss.
+    void dropPlayer(int playerId);
     void startTournament();
     void advanceRound(GameEventStorage &ges);
     void recordMatchResult(int playerId1, int playerId2, int winnerId, GameEventStorage &ges);
@@ -68,6 +72,7 @@ public:
         int losses = 0;
         int draws = 0;
         bool deckSubmitted = false;
+        bool dropped = false;
     };
 
     struct TournamentPairingData
@@ -82,12 +87,15 @@ public:
     };
 
 private:
-    Server_Game *parentGame;
+    QPointer<Server_Game> parentGame;
     Server_MatchGameFactory *matchGameFactory;
     mutable QRecursiveMutex tournamentMutex;
     QMap<int, TournamentPlayerData> players;
     QMap<int, DeckList *> submittedDecks;
     QList<TournamentPairingData> currentPairings;
+    // Players that have already received a bye in a previous round, so no one
+    // gets more than one bye over the whole tournament.
+    QSet<int> byeGivenPlayers;
     QList<QPair<int, int>> allPreviousPairings;
     int currentRound;
     int totalRounds;

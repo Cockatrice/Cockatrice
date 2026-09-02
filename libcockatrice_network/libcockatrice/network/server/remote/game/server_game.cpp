@@ -328,6 +328,13 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
         return;
     }
 
+    // Tournament hubs must be host-started and can't lock in a partially filled
+    // bracket: a mere "everyone current is ready" must not start a 1-player or
+    // undersized tournament. startTournament() additionally enforces 2+ players.
+    if (isTournament && !forceStartGame) {
+        return;
+    }
+
     auto players = getPlayers();
     for (auto *player : players.values()) {
         if (!player->getReadyStart()) {
@@ -577,6 +584,17 @@ void Server_Game::removeParticipant(Server_AbstractParticipant *participant, Eve
     bool playerActive = activePlayer == participant->getPlayerId();
     bool playerHost = hostId == participant->getPlayerId();
     participant->prepareDestroy();
+
+    // If this is the tournament hub (not one of its match sub-games), never re-pair
+    // the leaving player: mark them dropped so their matches are awarded and they
+    // disappear from the bracket instead of stalling the tournament.
+    if (tournament && !tournamentParentGame && !spectator) {
+        const int leavingPlayerId = participant->getPlayerId();
+        GameEventStorage tournGes;
+        tournament->dropPlayer(leavingPlayerId);
+        tournament->broadcastTournamentState(tournGes);
+        tournGes.sendToGame(this);
+    }
 
     if (playerHost) {
         int newHostId = -1;
@@ -955,6 +973,12 @@ void Server_Game::startTournament()
         auto players = getPlayers();
         for (auto *player : players.values()) {
             tournament->addPlayer(player->getPlayerId(), QString::fromStdString(player->getUserInfo()->name()));
+        }
+
+        // A tournament with fewer than two players can't produce a valid bracket.
+        if (tournament->getPlayerCount() < 2) {
+            qCWarning() << "Cannot start tournament with fewer than 2 players";
+            return;
         }
 
         tournament->startTournament();
