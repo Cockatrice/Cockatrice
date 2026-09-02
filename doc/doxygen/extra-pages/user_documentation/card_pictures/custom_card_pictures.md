@@ -15,23 +15,26 @@ match a file there.
 
 - The folder is `<pictures directory>/CUSTOM/`. The pictures directory is configured on the 'General' settings tab,
   under 'Directories' → 'Pictures directory'.
-- Accepted formats are PNG, JPG and JPEG.
+- Any image format Qt can decode is accepted (PNG, JPG/JPEG, WebP, GIF, BMP, ...); the file extension is not filtered,
+  so even an extension-less file is picked up if the decoder recognizes its content.
 - Files are indexed by their name, so you can organize them into subfolders freely.
 - New or changed files are picked up automatically within a few seconds — no client restart is required.
 
 The file name must match the card using one of the naming schemes below. Both `_` and `-` are accepted as separators,
 and the file extension is ignored when matching:
 
-| Scheme                        | Example file name                                      |
-|-------------------------------|--------------------------------------------------------|
-| Card Name                     | `Example Card.png`                          |
-| Card Name + Set               | `Example Card_DDL.png`                      |
-| Card Name + Set + Collector   | `Example Card_DDL_43.png`                   |
-| Set + Collector + Card Name   | `DDL_43_Example Card.png`                   |
-| Card Name + Provider ID       | `Example Card_0b23cdc8-d413-4fb1-8470-474221b10fe2.png` |
+| Scheme                      | Example file name                                       |
+| --------------------------- | ------------------------------------------------------- |
+| Card Name                   | `Example Card.png`                                      |
+| Card Name + Set             | `Example Card_DDL.png`                                  |
+| Card Name + Set + Collector | `Example Card_DDL_43.png`                               |
+| Set + Collector + Card Name | `DDL_43_Example Card.png`                               |
+| Card Name + Provider ID     | `Example Card_0b23cdc8-d413-4fb1-8470-474221b10fe2.png` |
 
-The name used for matching is the *corrected* card name. In practice this means punctuation is stripped, so the
-"Example // Card" card is matched by a file named `ExampleCard.png`, not `Example // Card.png`.
+The name used for matching is the *corrected* card name. Correction removes the split-card separator ` // ` and the
+characters reserved in Windows file names (`* < > : " \ ?` and control characters), and turns `/` into a space, so the
+"Example // Card" card is matched by a file named `ExampleCard.png`, not `Example // Card.png`. Most other punctuation
+(commas, apostrophes, `!`, ...) is left untouched.
 
 \attention A file in the CUSTOM folder always wins over downloaded pictures, even if it is the wrong image. Delete the
 file if you want to see the downloaded artwork again.
@@ -52,7 +55,8 @@ tag can carry a `picurl` attribute containing a full URL for that printing's pic
 Cockatrice tries this URL **before** the configured download URL templates, so it is the most direct way to provide
 custom artwork for a specific printing.
 
-- The URL must start with `http://` or `https://`.
+- The URL should start with `http://` or `https://`; the scheme is not validated, so make sure it is absolute or the
+  download may silently fail.
 - When you change a `picurl` for a card whose picture was already downloaded and cached, delete the stored images
   (Storage tab → 'Delete Saved Images' / 'Delete Cached Images') so Cockatrice fetches the new URL.
 
@@ -86,7 +90,8 @@ The `!set:...!` and `!prop:...!` reference points support two modifiers:
 Substituted values are URL-encoded. A template that asks for a property the card or printing does not have is skipped,
 and the next template in the list is tried instead.
 
-\attention Custom URLs must start with `http://` or `https://` to be accepted.
+\attention Custom URLs should start with `http://` or `https://`. As with `picurl`, the scheme is not validated before
+the URL is handed to QNetworkAccessManager, so use an absolute URL or the download may silently fail.
 
 Some working examples:
 

@@ -43,7 +43,8 @@ Cockatrice checks the following locations, in order:
 - `<pictures directory>/<set code>/<card file name>`
 - `<pictures directory>/downloadedPics/<set code>/<card file name>`
 
-The following import naming schemes are recognized (using both `_` and `-` as separators):
+The following import naming schemes are recognized (using both `_` and `-` as separators). The canonical table with
+concrete example file names is on @ref custom_card_pictures:
 
 | Scheme                      | Pattern                    |
 | --------------------------- | -------------------------- |
