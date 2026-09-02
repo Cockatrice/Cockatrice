@@ -239,6 +239,43 @@ TEST(DeckListModelZoneIntegration, EmptyCustomZoneSurvivesMirrorAndPruning)
     EXPECT_TRUE(findZoneRow(model, mainIndex).isValid());
 }
 
+// Regression: a board card named like the requested zone must not be mistaken for
+// a zone. Previously `findChild` matched any child by name, so a mainboard card
+// called "Lightning Bolt" made addCard believe a "Lightning Bolt" zone existed and
+// recurse through rebuildTree forever.
+TEST(DeckListModelZoneIntegration, AddCardToCardNamedZoneDoesNotRecurse)
+{
+    QSharedPointer<DeckList> deck(new DeckList());
+    DeckListModel model(nullptr, deck);
+    auto *tree = deck->getTree();
+
+    tree->addCard("Lightning Bolt", 2, DECK_ZONE_MAIN, -1);
+
+    QModelIndex added = model.addCard(ExactCard(CardInfo::newInstance("Swords to Plowshares")), "Lightning Bolt");
+    ASSERT_TRUE(added.isValid());
+}
+
+// Regression: adding to a custom zone that holds a nested sub-zone mirrored the
+// nested cards as flattened shadow rows, so the sorted shadow row index pointed
+// past the deck zone's direct children. The card must be appended to the deck
+// zone instead of being written out of range.
+TEST(DeckListModelZoneIntegration, AddCardToCustomZoneWithNestedSubZoneAppends)
+{
+    QSharedPointer<DeckList> deck(new DeckList());
+    DeckListModel model(nullptr, deck);
+    auto *tree = deck->getTree();
+
+    auto *removal = tree->addCustomZone(DECK_ZONE_MAIN, "Removal");
+    ASSERT_NE(removal, nullptr);
+    auto *deeper = new InnerDecklistNode("Deeper", removal);
+    new DecklistCardNode("Lightning Bolt", 2, deeper, -1);
+    model.rebuildTree();
+
+    QModelIndex added = model.addCard(ExactCard(CardInfo::newInstance("Swords to Plowshares")), "Removal");
+    ASSERT_TRUE(added.isValid());
+    ASSERT_TRUE(added.parent().data(DeckRoles::IsCustomZoneRole).toBool());
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

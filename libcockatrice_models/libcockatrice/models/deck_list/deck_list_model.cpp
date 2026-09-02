@@ -479,6 +479,13 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
     auto *boardNode = dynamic_cast<InnerDecklistNode *>(root->findChild(zoneName));
     auto *customZoneNode = boardNode ? nullptr : DeckListModelCustomZones::findSubZoneByName(root, zoneName);
 
+    // Mirroring flattens nested deck sub-zones into shadow rows, so a shadow row
+    // index is only usable as a deck-tree position while both sides have the same
+    // direct-children shape. When they diverge, the card is appended to the deck
+    // zone instead of being written out of range.
+    InnerDecklistNode *deckCardParent = nullptr;
+    bool customZoneNeedsAppend = false;
+
     if (boardNode) {
         // Board zone: cards are grouped by the active criteria.
         QString groupCriteria = extractGroupCriteriaValue(cardInfo, activeGroupCriteria);
@@ -486,6 +493,27 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
     } else if (customZoneNode) {
         // Custom zone: cards live flat inside the zone.
         cardParent = customZoneNode;
+        auto *listRoot = deckList->getTree()->getRoot();
+        for (int i = 0; i < listRoot->size(); ++i) {
+            auto *boardZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i));
+            if (!boardZone) {
+                continue;
+            }
+            deckCardParent = dynamic_cast<InnerDecklistNode *>(boardZone->findChild(zoneName));
+            if (deckCardParent) {
+                break;
+            }
+        }
+        // A deck custom zone holding nested sub-zones mirrors with flattened rows,
+        // so a shadow row index does not map onto its direct children.
+        if (deckCardParent) {
+            for (int i = 0; i < deckCardParent->size(); ++i) {
+                if (dynamic_cast<InnerDecklistNode *>(deckCardParent->at(i))) {
+                    customZoneNeedsAppend = true;
+                    break;
+                }
+            }
+        }
     } else {
         // Not present in the shadow tree. The deck tree may still hold a custom
         // zone that has not been mirrored (callers can add a zone and then a
@@ -495,7 +523,10 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
         bool hasDeckZone = false;
         for (int i = 0; i < listRoot->size(); ++i) {
             if (auto *boardZone = dynamic_cast<InnerDecklistNode *>(listRoot->at(i))) {
-                if (boardZone->findChild(zoneName)) {
+                // Only real zones count: a card sitting directly under the board
+                // shares the name comparison but is not a zone, and treating it as
+                // one would recurse forever without mirroring anything.
+                if (dynamic_cast<InnerDecklistNode *>(boardZone->findChild(zoneName))) {
                     hasDeckZone = true;
                     break;
                 }
@@ -522,8 +553,9 @@ QModelIndex DeckListModel::addCard(const ExactCard &card, const QString &zoneNam
     if (!cardNode) {
         // Determine the correct index
         int insertRow = findSortedInsertRow(cardParent, cardInfo);
+        int deckInsertRow = customZoneNeedsAppend ? -1 : insertRow;
 
-        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, insertRow, cardSetName,
+        auto *decklistCard = deckList->addCard(cardInfo->getName(), zoneName, deckInsertRow, cardSetName,
                                                printingInfo.getProperty("num"), printingInfo.getProperty("uuid"));
 
         beginInsertRows(parentIndex, insertRow, insertRow);
