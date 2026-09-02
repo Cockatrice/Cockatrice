@@ -186,6 +186,7 @@ set(PROTO_FILES
     serverinfo_replay_match.proto
     serverinfo_report.proto
     serverinfo_room.proto
+    serverinfo_tournament.proto
     serverinfo_user.proto
     serverinfo_user_alt.proto
     serverinfo_user_session.proto
