@@ -18,6 +18,7 @@ include=("cockatrice/src" \
 libcockatrice_* \
 "oracle/src" \
 "servatrice/src" \
+"cmake/pch" \
 "tests")
 exclude=("libcockatrice_rng/libcockatrice/rng/sfmt/" \
 "libcockatrice_utility/libcockatrice/utility/peglib.h" \
