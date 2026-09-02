@@ -977,7 +977,7 @@ void Server_Game::startTournament()
 
         // A tournament with fewer than two players can't produce a valid bracket.
         if (tournament->getPlayerCount() < 2) {
-            qCWarning() << "Cannot start tournament with fewer than 2 players";
+            qWarning() << "Cannot start tournament with fewer than 2 players";
             return;
         }
 
