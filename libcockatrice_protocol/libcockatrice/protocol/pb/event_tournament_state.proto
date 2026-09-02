@@ -1,27 +1,6 @@
 syntax = "proto2";
 import "game_event.proto";
-
-message TournamentPlayer {
-    optional sint32 player_id = 1;
-    optional string player_name = 2;
-    optional uint32 wins = 3;
-    optional uint32 losses = 4;
-    optional uint32 draws = 5;
-    optional bool deck_submitted = 6;
-}
-
-message TournamentPairing {
-    optional sint32 player1_id = 1;
-    optional sint32 player2_id = 2 [default = -1];
-    optional sint32 game_id = 3;
-    optional sint32 winner_id = 4 [default = -1];
-    optional sint32 player1_match_wins = 5 [default = 0];
-    optional sint32 player2_match_wins = 6 [default = 0];
-}
-
-message TournamentSettings {
-    optional uint32 games_per_match = 1 [default = 1];
-}
+import "serverinfo_tournament.proto";
 
 message Event_TournamentState {
     extend GameEvent {

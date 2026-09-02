@@ -1,4 +1,5 @@
 syntax = "proto2";
+import "serverinfo_tournament.proto";
 message RoomCommand {
     enum RoomCommandType {
         LEAVE_ROOM = 1000;
@@ -70,8 +71,8 @@ message Command_CreateGame {
     // share decklists with all players when selected
     optional bool share_decklists_on_load = 14;
 
-    // number of games per match in tournament mode (e.g. 3 for best of 3)
-    optional uint32 games_per_match = 15 [default = 1];
+    // tournament settings shared by game creation and mid-game changes
+    optional TournamentSettings tournament_settings = 15;
 
     // whether this is a tournament game
     optional bool is_tournament = 16;
