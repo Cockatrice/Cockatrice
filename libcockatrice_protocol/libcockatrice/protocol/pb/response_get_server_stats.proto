@@ -2,7 +2,7 @@ syntax = "proto2";
 import "response.proto";
 
 message CommandStats {
-    optional uint32 kind_index = 1;       // 0=session, 1=room, 2=game, 3=moderator, 4=admin
+    optional uint32 kind_index = 1;       // 0=session, 1=room, 2=game, 3=moderator, 4=admin, 5=developer
     optional uint32 extension_number = 2; // protobuf extension number within the kind
     optional string command_name = 3;     // e.g. "session/Command_Ping"
     optional uint64 count = 4;            // number of times observed

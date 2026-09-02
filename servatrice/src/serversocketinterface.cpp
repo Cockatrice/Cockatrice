@@ -202,25 +202,58 @@ void AbstractServerSocketInterface::processCommandContainer(const CommandContain
     Server_ProtocolHandler::processCommandContainer(cont);
     const qint64 elapsedMs = timer.nsecsElapsed() / 1000000;
 
-    // A container usually holds a single command. When several are batched,
-    // each is attributed the container's total processing time.
-    for (const auto &cmd : cont.session_command()) {
-        servatrice->getMetricsRegistry().observeCommand(MetricsRegistry::typeIdFor(0, getPbExtension(cmd)), elapsedMs);
+    // The base dispatch is an if/else-if chain — at most one family is
+    // actually processed.  Recording every family in the container would
+    // let an unauthenticated client stampforge developer/moderator/admin
+    // samples by batching them alongside a session command the server
+    // actually runs.  Mirror the base's selection and skip entirely when
+    // deleted or when no family matched.
+    if (deleted) {
+        return;
     }
-    for (const auto &cmd : cont.room_command()) {
-        servatrice->getMetricsRegistry().observeCommand(MetricsRegistry::typeIdFor(1, getPbExtension(cmd)), elapsedMs);
+
+    // When getPbExtension returns -1 (no extension set) and the kind is
+    // non-zero, typeIdFor wraps into the previous kind's range instead of
+    // hitting the typeId < 0 guard in observeCommand.  Skip such entries.
+    int kind = -1;
+    if (cont.game_command_size()) {
+        kind = 2;
+    } else if (cont.room_command_size()) {
+        kind = 1;
+    } else if (cont.session_command_size()) {
+        kind = 0;
+    } else if (cont.moderator_command_size()) {
+        kind = 3;
+    } else if (cont.admin_command_size()) {
+        kind = 4;
+    } else if (cont.developer_command_size()) {
+        kind = 5;
     }
-    for (const auto &cmd : cont.game_command()) {
-        servatrice->getMetricsRegistry().observeCommand(MetricsRegistry::typeIdFor(2, getPbExtension(cmd)), elapsedMs);
-    }
-    for (const auto &cmd : cont.moderator_command()) {
-        servatrice->getMetricsRegistry().observeCommand(MetricsRegistry::typeIdFor(3, getPbExtension(cmd)), elapsedMs);
-    }
-    for (const auto &cmd : cont.admin_command()) {
-        servatrice->getMetricsRegistry().observeCommand(MetricsRegistry::typeIdFor(4, getPbExtension(cmd)), elapsedMs);
-    }
-    for (const auto &cmd : cont.developer_command()) {
-        servatrice->getMetricsRegistry().observeCommand(MetricsRegistry::typeIdFor(5, getPbExtension(cmd)), elapsedMs);
+
+    if (kind >= 0) {
+        auto recordDispatched = [&](int familyKind, const auto &cmds) {
+            for (const auto &cmd : cmds) {
+                const int ext = getPbExtension(cmd);
+                if (ext >= 0) {
+                    servatrice->getMetricsRegistry().observeCommand(MetricsRegistry::typeIdFor(familyKind, ext),
+                                                                    elapsedMs);
+                }
+            }
+        };
+
+        if (kind == 0) {
+            recordDispatched(kind, cont.session_command());
+        } else if (kind == 1) {
+            recordDispatched(kind, cont.room_command());
+        } else if (kind == 2) {
+            recordDispatched(kind, cont.game_command());
+        } else if (kind == 3) {
+            recordDispatched(kind, cont.moderator_command());
+        } else if (kind == 4) {
+            recordDispatched(kind, cont.admin_command());
+        } else {
+            recordDispatched(kind, cont.developer_command());
+        }
     }
 
     const int slowCommandMs = servatrice->getMetricsSlowCommandMs();

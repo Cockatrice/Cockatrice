@@ -89,7 +89,6 @@ void Servatrice_GameServer::incomingConnection(qintptr socketDescriptor)
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
     auto ssi = new TcpServerSocketInterface(server, pool->getDatabaseInterface());
-    connect(ssi, SIGNAL(incTxBytes(qint64)), this, SLOT(incTxBytes(qint64)));
     ssi->moveToThread(pool->thread());
     pool->addClient();
     connect(ssi, SIGNAL(destroyed()), pool, SLOT(removeClient()));
@@ -160,7 +159,6 @@ void Servatrice_WebsocketGameServer::onNewConnection()
     Servatrice_ConnectionPool *pool = findLeastUsedConnectionPool();
 
     auto ssi = new WebsocketServerSocketInterface(server, pool->getDatabaseInterface());
-    connect(ssi, SIGNAL(incTxBytes(quint64)), this, SLOT(incTxBytes(quint64)));
     /*
      * Due to a Qt limitation, websockets can't be moved to another thread.
      * This will hopefully change in Qt6 if QtWebSocket will be integrated in QtNetwork
@@ -785,7 +783,6 @@ void Servatrice::incTxBytes(quint64 num)
     txBytesMutex.lock();
     txBytes += num;
     txBytesMutex.unlock();
-    txBytesTotal.fetch_add(num, std::memory_order_relaxed);
 }
 
 void Servatrice::incRxBytes(quint64 num)
@@ -793,7 +790,6 @@ void Servatrice::incRxBytes(quint64 num)
     rxBytesMutex.lock();
     rxBytes += num;
     rxBytesMutex.unlock();
-    rxBytesTotal.fetch_add(num, std::memory_order_relaxed);
 }
 
 void Servatrice::shutdownTimeout()
