@@ -918,7 +918,8 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
 
     bool shareDecklistsOnLoad = cmd.has_share_decklists_on_load() ? cmd.share_decklists_on_load() : false;
     bool isTournament = cmd.has_is_tournament() ? cmd.is_tournament() : false;
-    int gamesPerMatch = cmd.has_games_per_match() ? static_cast<int>(cmd.games_per_match()) : 1;
+    int gamesPerMatch =
+        cmd.has_tournament_settings() ? static_cast<int>(cmd.tournament_settings().games_per_match()) : 1;
 
     const int gameId = databaseInterface->getNextGameId();
     if (gameId == -1) {
