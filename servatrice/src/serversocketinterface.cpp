@@ -1068,6 +1068,16 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
         }
     }
 
+    // For callers that must not see private conversations, never leave the
+    // target-type filter empty: if the request only asked for "chat" (or for
+    // nothing at all) the query below would carry no target_type restriction
+    // and would return every row, private messages included. Fall back to the
+    // game/room diagnostics the caller is allowed to see.
+    if (!allowPrivateChat && !gameType && !roomType) {
+        gameType = true;
+        roomType = true;
+    }
+
     int dateRange = cmd.date_range();
     int maximumResults = cmd.maximum_results();
 
