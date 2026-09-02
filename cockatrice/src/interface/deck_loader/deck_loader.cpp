@@ -375,20 +375,29 @@ void DeckLoader::saveToStream_DeckHeader(QTextStream &out, const DeckList &deckL
 void DeckLoader::saveToStream_DeckZone(QTextStream &out,
                                        const InnerDecklistNode *zoneNode,
                                        bool addComments,
-                                       bool addSetNameAndNumber)
+                                       bool addSetNameAndNumber,
+                                       const QString &boardZoneName)
 {
+    // Nested sub-zones keep their owning board's identity: the top-level call
+    // passes no board, so the zone's own name is used; recursive calls carry the
+    // owning board down so the sideboard marker survives sub-zone nesting.
+    const QString owningBoardZoneName = boardZoneName.isEmpty() ? zoneNode->getName() : boardZoneName;
+
     // group cards by card type and count the subtotals
     QMultiMap<QString, DecklistCardNode *> cardsByType;
     QMap<QString, int> cardTotalByType;
     int cardTotal = 0;
+    QList<const InnerDecklistNode *> subZones;
 
     for (int j = 0; j < zoneNode->size(); j++) {
         auto *card = dynamic_cast<DecklistCardNode *>(zoneNode->at(j));
         if (!card) {
             // Cards collected in nested sub-zones are exported by recursion so
-            // they don't end up invisible in the plain text output.
+            // they don't end up invisible in the plain text output. They are
+            // deferred until after this zone's own header and cards so they read
+            // as part of this zone's block.
             if (auto *subZone = dynamic_cast<const InnerDecklistNode *>(zoneNode->at(j))) {
-                saveToStream_DeckZone(out, subZone, addComments, addSetNameAndNumber);
+                subZones.append(subZone);
             }
             continue;
         }
@@ -419,25 +428,30 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out,
 
         QList<DecklistCardNode *> cards = cardsByType.values(cardType);
 
-        saveToStream_DeckZoneCards(out, zoneNode, cards, addComments, addSetNameAndNumber);
+        saveToStream_DeckZoneCards(out, cards, addComments, addSetNameAndNumber, owningBoardZoneName);
 
         if (addComments) {
             out << "\n";
         }
     }
+
+    // Nested sub-zones come last, after the parent's own header and cards.
+    for (const auto *subZone : subZones) {
+        saveToStream_DeckZone(out, subZone, addComments, addSetNameAndNumber, owningBoardZoneName);
+    }
 }
 
 void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
-                                            const InnerDecklistNode *zoneNode,
                                             QList<DecklistCardNode *> cards,
                                             bool addComments,
-                                            bool addSetNameAndNumber)
+                                            bool addSetNameAndNumber,
+                                            const QString &boardZoneName)
 {
     // QMultiMap sorts values in reverse order
     for (int i = cards.size() - 1; i >= 0; --i) {
         DecklistCardNode *card = cards[i];
 
-        if (zoneNode->getName() == DECK_ZONE_SIDE && addComments) {
+        if (boardZoneName == DECK_ZONE_SIDE && addComments) {
             out << "SB: ";
         }
 
