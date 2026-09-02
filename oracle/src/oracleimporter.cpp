@@ -555,13 +555,17 @@ int OracleImporter::startImport()
     // ships ~100k printings for ~35k names, so reserving the printing count
     // would overallocate ~3x (against this stack's RAM goal). Collecting
     // distinct names is cheap — one pass over the already-parsed name fields.
-    QSet<QString> distinctNames;
-    for (const SetToDownload &curSetToParse : allSets) {
-        for (const QJsonValue &cardValue : curSetToParse.getCards()) {
-            distinctNames.insert(cardValue.toObject().value("name").toString());
+    {
+        QSet<QString> distinctNames;
+        for (const SetToDownload &curSetToParse : allSets) {
+            for (const QJsonValue &cardValue : curSetToParse.getCards()) {
+                distinctNames.insert(cardValue.toObject().value("name").toString());
+            }
         }
+        cards.reserve(distinctNames.size());
+        // The set goes out of scope here, handing the ~35k name QStrings back
+        // to the allocator before the (memory-heavy) import loop starts.
     }
-    cards.reserve(distinctNames.size());
 
     // add an empty set for tokens
     CardSetPtr tokenSet =

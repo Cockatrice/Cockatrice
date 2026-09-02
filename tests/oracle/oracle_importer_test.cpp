@@ -482,6 +482,33 @@ TEST_F(OracleImporterTest, ManaCostStripsBraces)
     ASSERT_EQ(result->getProperty("manacost"), "2WB");
 }
 
+// cmc comes through as a JSON number ("convertedManaCost"/"manaValue" are
+// floats in AllPrintings), so this pins the number-to-text coercion that
+// QJsonValue::toString() dropped in #7214.
+TEST_F(OracleImporterTest, NumericManaValueCoercedToCmc)
+{
+    QJsonObject card = makeCard("Cmc Card");
+    card["manaValue"] = 3;
+    QJsonArray cards{card};
+
+    importer->importCardsFromSet(set, cards);
+    auto result = importer->getCardList().value("Cmc Card");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("cmc"), "3");
+}
+
+TEST_F(OracleImporterTest, LegacyConvertedManaCostCoercedToCmc)
+{
+    QJsonObject card = makeCard("Legacy Cmc Card");
+    card["convertedManaCost"] = 3.0;
+    QJsonArray cards{card};
+
+    importer->importCardsFromSet(set, cards);
+    auto result = importer->getCardList().value("Legacy Cmc Card");
+    ASSERT_FALSE(result.isNull());
+    ASSERT_EQ(result->getProperty("cmc"), "3");
+}
+
 // ============================================================================
 // Card deduplication tests
 // ============================================================================
