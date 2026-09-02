@@ -31,9 +31,11 @@ Server_Tournament::~Server_Tournament()
 
 void Server_Tournament::addPlayer(int playerId, const QString &playerName)
 {
+    QMutexLocker locker(&tournamentMutex);
     TournamentPlayerData data;
     data.playerId = playerId;
     data.playerName = playerName;
+    data.dropped = false;
     players[playerId] = data;
 }
 
@@ -51,6 +53,41 @@ void Server_Tournament::removePlayer(int playerId)
 {
     QMutexLocker locker(&tournamentMutex);
     players.remove(playerId);
+    submittedDecks.remove(playerId);
+    byeGivenPlayers.remove(playerId);
+}
+
+void Server_Tournament::dropPlayer(int playerId)
+{
+    QMutexLocker locker(&tournamentMutex);
+    if (!players.contains(playerId)) {
+        return;
+    }
+    players[playerId].dropped = true;
+    players[playerId].deckSubmitted = false;
+
+    // Any current pairing that involves the dropped player and is not already
+    // decided is awarded to the surviving opponent (or recorded as undecided if
+    // both dropped). The opponent keeps playing without sitting out a round.
+    for (auto &pairing : currentPairings) {
+        if (pairing.winnerId != -2) {
+            continue;
+        }
+        bool involvesDropped = (pairing.player1Id == playerId || pairing.player2Id == playerId);
+        if (!involvesDropped) {
+            continue;
+        }
+        if (pairing.player1Id == playerId && pairing.player2Id == playerId) {
+            continue;
+        }
+        int opponent = (pairing.player1Id == playerId) ? pairing.player2Id : pairing.player1Id;
+        if (players.contains(opponent) && !players[opponent].dropped) {
+            pairing.winnerId = opponent;
+            players[opponent].wins += 1;
+            players[playerId].losses += 1;
+        }
+        allPreviousPairings.append(qMakePair(pairing.player1Id, pairing.player2Id));
+    }
 }
 
 void Server_Tournament::startTournament()
@@ -97,7 +134,9 @@ void Server_Tournament::generateSwissPairings()
     currentPairings.clear();
     QList<int> available;
     for (auto it = players.constBegin(); it != players.constEnd(); ++it) {
-        available.append(it->playerId);
+        if (!it->dropped) {
+            available.append(it->playerId);
+        }
     }
 
     // Sort by wins descending (and by record for tie-breaking)
@@ -113,8 +152,10 @@ void Server_Tournament::generateSwissPairings()
         return a < b;
     });
 
-    // Simple greedy Swiss pairing
     QSet<int> paired;
+    // Try to pair every player, allowing a single rematch only if the greedy pass
+    // would otherwise leave any unpaired remainder. Dropped players are never paired.
+    int maxRematches = available.size() / 2;
     for (int i = 0; i < available.size(); ++i) {
         if (paired.contains(available[i])) {
             continue;
@@ -123,38 +164,74 @@ void Server_Tournament::generateSwissPairings()
             if (paired.contains(available[j])) {
                 continue;
             }
-            if (!havePlayed(available[i], available[j])) {
-                TournamentPairingData pairing;
-                pairing.player1Id = available[i];
-                pairing.player2Id = available[j];
-                currentPairings.append(pairing);
-                paired.insert(available[i]);
-                paired.insert(available[j]);
-                break;
+            bool rematch = havePlayed(available[i], available[j]);
+            if (rematch && maxRematches <= 0) {
+                continue;
             }
+            TournamentPairingData pairing;
+            pairing.player1Id = available[i];
+            pairing.player2Id = available[j];
+            currentPairings.append(pairing);
+            paired.insert(available[i]);
+            paired.insert(available[j]);
+            if (rematch) {
+                --maxRematches;
+            }
+            break;
         }
     }
 
-    // Bye for unpaired player if odd count
-    for (int i = 0; i < available.size(); ++i) {
-        if (!paired.contains(available[i])) {
-            // Player gets a bye (auto-win)
-            TournamentPairingData bye;
-            bye.player1Id = available[i];
-            bye.player2Id = -1;
-            bye.winnerId = available[i];
-            bye.player1MatchWins = gamesPerMatch; // Match immediately decided
-            currentPairings.append(bye);
-            players[available[i]].wins += 1;
-            allPreviousPairings.append(qMakePair(available[i], -1));
-            break;
+    // Give a bye to every remaining unpaired eligible player, worst-ranked first.
+    // A player receives at most one bye over the whole tournament.
+    QList<int> unpaired;
+    for (int id : available) {
+        if (!paired.contains(id)) {
+            unpaired.append(id);
         }
+    }
+    // Byes go to the lowest-ranked eligible player who has not had one yet.
+    std::sort(unpaired.begin(), unpaired.end(), [this](int a, int b) {
+        const auto &pa = players[a];
+        const auto &pb = players[b];
+        if (pa.wins != pb.wins) {
+            return pa.wins < pb.wins;
+        }
+        if (pa.losses != pb.losses) {
+            return pa.losses > pb.losses;
+        }
+        return a > b;
+    });
+
+    for (int id : unpaired) {
+        if (byeGivenPlayers.contains(id)) {
+            // Already used a bye: a dropped opponent or earlier bye means this player
+            // simply sits out the round with a free win to keep the bracket moving.
+            TournamentPairingData bye;
+            bye.player1Id = id;
+            bye.player2Id = -1;
+            bye.winnerId = id;
+            currentPairings.append(bye);
+            continue;
+        }
+        TournamentPairingData bye;
+        bye.player1Id = id;
+        bye.player2Id = -1;
+        bye.winnerId = id;
+        currentPairings.append(bye);
+        players[id].wins += 1;
+        byeGivenPlayers.insert(id);
+        allPreviousPairings.append(qMakePair(id, -1));
     }
 }
 
 int Server_Tournament::calculateTotalRounds() const
 {
-    int n = players.size();
+    int n = 0;
+    for (auto it = players.constBegin(); it != players.constEnd(); ++it) {
+        if (!it->dropped) {
+            ++n;
+        }
+    }
     if (n <= 1) {
         return 0;
     }
@@ -208,10 +285,16 @@ void Server_Tournament::enqueueMatchGameCreation()
     {
         QMutexLocker locker(&tournamentMutex);
         for (const auto &pairing : currentPairings) {
-            if (pairing.player2Id != -1 && pairing.winnerId == -2 &&
-                pairing.matchGameIds.size() < static_cast<int>(gamesPerMatch)) {
-                planned.append(qMakePair(pairing.player1Id, pairing.player2Id));
+            if (pairing.player2Id == -1 || pairing.winnerId != -2) {
+                continue;
             }
+            if (players.value(pairing.player1Id).dropped || players.value(pairing.player2Id).dropped) {
+                continue;
+            }
+            if (pairing.matchGameIds.size() >= static_cast<int>(gamesPerMatch)) {
+                continue;
+            }
+            planned.append(qMakePair(pairing.player1Id, pairing.player2Id));
         }
     }
     if (planned.isEmpty()) {
@@ -277,12 +360,25 @@ void Server_Tournament::createMatchGame(int player1Id, int player2Id)
                 return;
             }
         }
+
+        // Bail out if either participant is no longer connected: a match game with
+        // zero or one connected player can never finish and would stall the round.
+        if (!matchGameFactory->getUserInterface(player1Name) || !matchGameFactory->getUserInterface(player2Name)) {
+            qCWarning(TournamentLog) << "Skipping match creation: a player in pairing" << player1Id << player2Id
+                                     << "is no longer connected";
+            return;
+        }
     }
 
-    // Create a sub-game for this match via the factory
+    // Create a sub-game for this match via the factory, copying the real
+    // ServerInfo_User so it ships the true user level rather than a fabricated
+    // admin identity that would surface in buddy/ignore-list checks.
     ServerInfo_User creatorInfo;
-    creatorInfo.set_name(player1Name.toStdString());
-    creatorInfo.set_user_level(ServerInfo_User::IsAdmin | ServerInfo_User::IsRegistered);
+    if (auto *ui = matchGameFactory->getUserInterface(player1Name)) {
+        creatorInfo = *ui->getUserInfo();
+    } else {
+        creatorInfo.set_name(player1Name.toStdString());
+    }
 
     QString gameDesc = gamesPerMatch > 1
                            ? QString("R%1 Match - Game %2 of %3").arg(round).arg(gameNumber).arg(gamesPerMatch)
@@ -302,6 +398,9 @@ void Server_Tournament::createMatchGame(int player1Id, int player2Id)
 
     matchGame->setTournamentMatchInfo(parentGame, player1Id, player2Id);
     matchGame->setMatchResultStrategy(new Server_TournamentMatchResultStrategy);
+    // A disconnect inside a tournament match must remove the player so the match
+    // can be decided; it must not leave them sitting as a half-present participant.
+    matchGame->setDisconnectRemovesPlayer(true);
     matchGameFactory->addGameToRoom(matchGame);
 
     // Store the game ID in the pairing
@@ -317,6 +416,9 @@ void Server_Tournament::createMatchGame(int player1Id, int player2Id)
     }
 
     // Auto-join both players, sending the join event directly through their UIs.
+    // Both UI lookups were verified above, so a player can only drop between that
+    // check and this add — in which case they get handled by drop processing and
+    // the pairing settles on the surviving opponent.
     QMap<int, QPair<Server_AbstractUserInterface *, ResponseContainer *>> joiners;
 
     auto joinAndSetupPlayer = [&](int pid, const QString &name) {
@@ -338,7 +440,8 @@ void Server_Tournament::createMatchGame(int player1Id, int player2Id)
     }
     joiners.clear();
 
-    // Set decks and mark players as ready in the match game
+    // Set decks and mark players as ready in the match game.
+    bool anyDeckMissing = false;
     auto matchPlayers = matchGame->getPlayers();
     for (auto *matchPlayer : matchPlayers) {
         const QString name = QString::fromStdString(matchPlayer->getUserInfo()->name());
@@ -352,11 +455,21 @@ void Server_Tournament::createMatchGame(int player1Id, int player2Id)
         if (!deckNative.isEmpty()) {
             matchPlayer->setDeck(new DeckList(deckNative));
             matchPlayer->setReadyStart(true);
+        } else {
+            anyDeckMissing = true;
         }
     }
 
-    // Start the match game
-    matchGame->startGameIfReady(true);
+    if (anyDeckMissing) {
+        // Not every participant submitted a deck. Do not force-start: that would
+        // kick the players without a deck. Leave the match game open so they can
+        // select a deck; the host starts it through the normal ready flow.
+        return;
+    }
+
+    // Start the match game without forcing: both participants are ready and have
+    // decks, so there is nothing to kick.
+    matchGame->startGameIfReady(false);
 }
 
 void Server_Tournament::recordMatchResult(int playerId1, int playerId2, int winnerId, GameEventStorage &ges)
@@ -440,20 +553,29 @@ bool Server_Tournament::recordMatchResultByGameId(int gameId, int winnerId, Game
         } else if (winnerId == pairingPtr->player2Id) {
             pairingPtr->player2MatchWins += 1;
         }
-        // Draw (winnerId == -1): no match wins incremented
+        // Draw (winnerId == -1): counts nothing toward the series but does consume
+        // a slot, so a series can still end in a draw when it is exhausted.
 
-        // Check if match is decided
-        const int gamesNeeded = static_cast<int>(gamesPerMatch);
+        // The winner needs a strict majority of the games in the series.
+        const int gamesPlayed = pairingPtr->matchGameIds.size();
+        const int gamesNeeded = static_cast<int>(gamesPerMatch / 2 + 1);
+        const int gamesRemaining = static_cast<int>(gamesPerMatch) - gamesPlayed;
         matchDecided = (pairingPtr->player1MatchWins >= gamesNeeded) || (pairingPtr->player2MatchWins >= gamesNeeded);
+        if (!matchDecided) {
+            // Series exhausted without a strict-majority winner (e.g. a drawn Bo3
+            // leaves it 1-1): record the match as a draw so the round always advances.
+            matchDecided = (gamesRemaining <= 0) && (pairingPtr->player1MatchWins == pairingPtr->player2MatchWins);
+        }
 
         if (matchDecided) {
             // Determine match winner
-            int matchWinnerId;
+            int matchWinnerId = -1;
             if (pairingPtr->player1MatchWins >= gamesNeeded) {
                 matchWinnerId = pairingPtr->player1Id;
-            } else {
+            } else if (pairingPtr->player2MatchWins >= gamesNeeded) {
                 matchWinnerId = pairingPtr->player2Id;
             }
+            // Otherwise the series was exhausted evenly — matchWinnerId stays -1 (a draw).
 
             // Set the match winner on the pairing
             pairingPtr->winnerId = matchWinnerId;
@@ -462,9 +584,12 @@ bool Server_Tournament::recordMatchResultByGameId(int gameId, int winnerId, Game
             if (matchWinnerId == pairingPtr->player1Id) {
                 players[pairingPtr->player1Id].wins += 1;
                 players[pairingPtr->player2Id].losses += 1;
-            } else {
+            } else if (matchWinnerId == pairingPtr->player2Id) {
                 players[pairingPtr->player2Id].wins += 1;
                 players[pairingPtr->player1Id].losses += 1;
+            } else {
+                players[pairingPtr->player1Id].draws += 1;
+                players[pairingPtr->player2Id].draws += 1;
             }
 
             // Store for future pairing avoidance
@@ -546,8 +671,13 @@ void Server_Tournament::broadcastTournamentState(GameEventStorage &ges)
         p->set_player1_id(pairing.player1Id);
         p->set_player2_id(pairing.player2Id);
         p->set_game_id(pairing.gameId);
-        // Map internal sentinel: -2 (undecided) -> -1 (no winner yet in proto)
-        p->set_winner_id(pairing.winnerId == -2 ? -1 : pairing.winnerId);
+        // -2 = undecided; a decided draw is -1. The is_draw bit distinguishes a
+        // reported draw from an unset winner_id on the wire.
+        if (pairing.winnerId == -1) {
+            p->set_is_draw(true);
+        } else if (pairing.winnerId != -2) {
+            p->set_winner_id(pairing.winnerId);
+        }
         p->set_player1_match_wins(pairing.player1MatchWins);
         p->set_player2_match_wins(pairing.player2MatchWins);
     }

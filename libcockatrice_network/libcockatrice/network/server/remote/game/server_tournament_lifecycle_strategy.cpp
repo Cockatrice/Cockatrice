@@ -11,7 +11,7 @@ Server_GameLifecycleStrategy::StartAction Server_TournamentLifecycleStrategy::on
 {
     // Match sub-games start through the normal flow; only the tournament hub game is
     // managed by this lifecycle.
-    if (game->getTournamentParentGame() != nullptr) {
+    if (game->getTournamentParentGame().data() != nullptr) {
         return StartAction::ProceedNormal;
     }
 
