@@ -949,12 +949,9 @@ bool TabGame::switchToGameTab(int gameId)
 void TabGame::closeGame()
 {
     int parentId = game->getGameMetaInfo()->parentGameId();
-    if (parentId >= 0) {
-        if (switchToGameTab(parentId)) {
-            close();
-        }
-        // If the parent tab is gone, fall through to the normal leave-game
-        // flow instead of stranding the user on a dead sub-game tab.
+    if (parentId >= 0 && switchToGameTab(parentId)) {
+        close();
+        return;
     }
 
     gameMenu->clear();

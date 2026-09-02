@@ -1,8 +1,6 @@
 #include "tournament_tab_game_extension.h"
 
 #include "../../../game/game_event_handler.h"
-#include "../../../game/player/player_logic.h"
-#include "../../widgets/dialogs/dlg_tournament_settings.h"
 #include "../../widgets/draft/tournament_widget.h"
 #include "tab_game.h"
 #include "tab_supervisor.h"
@@ -12,7 +10,6 @@
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QVBoxLayout>
-#include <libcockatrice/protocol/pb/command_tournament.pb.h>
 #include <libcockatrice/protocol/pb/event_tournament_state.pb.h>
 
 TournamentTabGameExtension::TournamentTabGameExtension(TabGame *parent) : QObject(parent), tabGame(parent)
@@ -29,6 +26,7 @@ TournamentTabGameExtension::TournamentTabGameExtension(TabGame *parent) : QObjec
 
     tournamentWidget = new TournamentWidget(tournamentOverviewWidget);
     tournamentWidget->setLocalPlayerId(parent->getGame()->getPlayerManager()->getLocalPlayerId());
+    tournamentWidget->setIsSpectator(parent->getGame()->getPlayerManager()->isSpectator());
     overviewLayout->addWidget(tournamentWidget);
 
     parent->getMainWidget()->addWidget(tournamentOverviewWidget);
@@ -42,12 +40,6 @@ TournamentTabGameExtension::TournamentTabGameExtension(TabGame *parent) : QObjec
     standingsButton->setVisible(false);
 
     connectSignals();
-}
-
-bool TournamentTabGameExtension::isLocalPlayerHost() const
-{
-    return tabGame->getGame()->getPlayerManager()->getLocalPlayerId() ==
-           tabGame->getGame()->getGameState()->getHostId();
 }
 
 void TournamentTabGameExtension::connectSignals()
@@ -68,11 +60,6 @@ void TournamentTabGameExtension::initializeTournamentMode()
     auto *deckLayout = tabGame->getDeckViewContainerLayout();
     int index = 0;
     deckLayout->insertWidget(index++, deckViewStatusLabel);
-    if (isLocalPlayerHost()) {
-        settingsButton = new QPushButton(tabGame->getDeckViewContainerWidget());
-        connect(settingsButton, &QPushButton::clicked, this, &TournamentTabGameExtension::showTournamentSettingsDialog);
-        deckLayout->insertWidget(index++, settingsButton);
-    }
     deckLayout->insertWidget(index++, standingsButton);
     deckLayout->insertSpacing(index, 4);
 }
@@ -81,9 +68,6 @@ void TournamentTabGameExtension::retranslateUi()
 {
     backToGameButton->setText(tr("Back to game view"));
     standingsButton->setText(tr("Tournament standings"));
-    if (settingsButton) {
-        settingsButton->setText(tr("Tournament Settings"));
-    }
     tournamentWidget->retranslateUi();
 }
 
@@ -126,9 +110,6 @@ void TournamentTabGameExtension::updateNavigationButtons(const Event_TournamentS
     bool showStandings =
         state.phase() == Event_TournamentState::PHASE_PLAYING || state.phase() == Event_TournamentState::PHASE_FINISHED;
     standingsButton->setVisible(showStandings);
-    if (settingsButton) {
-        settingsButton->setVisible(state.phase() == Event_TournamentState::PHASE_DECK_BUILDING);
-    }
 }
 
 void TournamentTabGameExtension::onTournamentStateChanged(const Event_TournamentState &state)
@@ -166,26 +147,6 @@ void TournamentTabGameExtension::showDeckViewPage()
     if (tabGame) {
         tabGame->getMainWidget()->setCurrentWidget(tabGame->getDeckViewContainerWidget());
     }
-}
-
-void TournamentTabGameExtension::showTournamentSettingsDialog()
-{
-    DlgTournamentSettings dlg(tabGame);
-    if (dlg.exec() != QDialog::Accepted) {
-        return;
-    }
-
-    DlgTournamentSettingsResult result = dlg.getResult();
-
-    PlayerLogic *localPlayer = tabGame->getGame()->getPlayerManager()->getActiveLocalPlayer(-1);
-    if (!localPlayer) {
-        TabSupervisor::actShowPopup(tr("You are not an active player in this game."));
-        return;
-    }
-
-    Command_TournamentSettingsSelect cmd;
-    cmd.mutable_settings()->set_games_per_match(result.gamesPerMatch);
-    tabGame->getGame()->getGameEventHandler()->sendGameCommand(cmd, localPlayer->getPlayerInfo()->getId());
 }
 
 void TournamentTabGameExtension::openMatchGame(int gameId)
