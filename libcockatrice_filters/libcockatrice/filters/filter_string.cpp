@@ -5,6 +5,7 @@
 #include <QRegularExpression>
 #include <QString>
 #include <functional>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/utility/peglib.h>
 
 static peg::parser search(R"(
@@ -19,7 +20,7 @@ SomewhatComplexQueryPart <- [(] QueryPartList [)] / QueryPart
 QueryPart <- NotQuery / SetQuery / RarityQuery / CMCQuery / FormatQuery / PowerQuery / ToughnessQuery / ColorQuery / TypeQuery / OracleQuery / FieldQuery / GenericQuery
 
 NotQuery <- ('NOT' ws/'-') SomewhatComplexQueryPart
-SetQuery <- ('e'/'set') [:] FlexStringValue
+SetQuery <- ('e'/'set') SetExpression / ([:] FlexStringValue)
 OracleQuery <- 'o' [:] MatcherString
 
 
@@ -64,6 +65,8 @@ RegexMatcherString <- ('\\/' / !'/' .)+
 FlexStringValue <- CompactStringSet / String / [(] StringList [)]
 CompactStringSet <- StringListString ([,+] StringListString)+
 
+SetExpression <- NumericOperator ws? String
+
 NumericExpression <- NumericOperator ws? NumericValue
 NumericOperator <- [=:] / <[><!][=]?>
 NumericValue <- [0-9]+
@@ -101,12 +104,25 @@ static void setupParserRules()
         return [=](const CardData &x) -> bool { return matcher(x->getCardType()); };
     };
     search["SetQuery"] = [](const peg::SemanticValues &sv) -> Filter {
-        auto matcher = std::any_cast<StringMatcher>(sv[0]);
-        return [=](const CardData &x) -> bool {
-            QList<QString> sets = x->getSets().keys();
+        if (sv.choice() == 1) {
+            auto matcher = std::any_cast<StringMatcher>(sv[0]);
+            return [=](const CardData &x) -> bool {
+                QList<QString> sets = x->getSets().keys();
 
-            auto matchesSet = [&matcher](const QString &set) { return matcher(set); };
-            return std::any_of(sets.begin(), sets.end(), matchesSet);
+                auto matchesSet = [&matcher](const QString &set) { return matcher(set); };
+                return std::any_of(sets.begin(), sets.end(), matchesSet);
+            };
+        }
+
+        auto matcher = std::any_cast<NumberMatcher>(sv[0]);
+        return [=](const CardData &x) -> bool {
+            const auto &sets = x->getSets().values();
+            auto matchesSet = [&](const PrintingInfo &printing) {
+                return printing.getSet()->getEnabled() && matcher(printing.getSet()->getReleaseDate().toJulianDay());
+            };
+            return std::any_of(sets.begin(), sets.end(), [&](const auto &printings) {
+                return std::any_of(printings.begin(), printings.end(), matchesSet);
+            });
         };
     };
     search["Rarity"] = [](const peg::SemanticValues &sv) -> QString {
@@ -247,40 +263,54 @@ static void setupParserRules()
         return QString::fromStdString(std::string(sv.sv()));
     };
 
-    search["NumericExpression"] = [](const peg::SemanticValues &sv) -> NumberMatcher {
-        const auto arg = std::any_cast<int>(sv[1]);
-        const auto op = std::any_cast<QString>(sv[0]);
+    search["NumericOperator"] = [](const peg::SemanticValues &sv) -> NumberComparer {
+        const auto op = QString::fromStdString(std::string(sv.sv()));
 
         if (op == ">") {
-            return [=](const int s) { return s > arg; };
+            return [=](const int s, const int arg) { return s > arg; };
         }
         if (op == ">=") {
-            return [=](const int s) { return s >= arg; };
+            return [=](const int s, const int arg) { return s >= arg; };
         }
         if (op == "<") {
-            return [=](const int s) { return s < arg; };
+            return [=](const int s, const int arg) { return s < arg; };
         }
         if (op == "<=") {
-            return [=](const int s) { return s <= arg; };
+            return [=](const int s, const int arg) { return s <= arg; };
         }
         if (op == "=") {
-            return [=](const int s) { return s == arg; };
+            return [=](const int s, const int arg) { return s == arg; };
         }
         if (op == ":") {
-            return [=](const int s) { return s == arg; };
+            return [=](const int s, const int arg) { return s == arg; };
         }
         if (op == "!=") {
-            return [=](const int s) { return s != arg; };
+            return [=](const int s, const int arg) { return s != arg; };
         }
-        return [](int) { return false; };
+        return [](int, int) { return false; };
     };
 
     search["NumericValue"] = [](const peg::SemanticValues &sv) -> int {
         return QString::fromStdString(std::string(sv.sv())).toInt();
     };
 
-    search["NumericOperator"] = [](const peg::SemanticValues &sv) -> QString {
-        return QString::fromStdString(std::string(sv.sv()));
+    search["NumericExpression"] = [](const peg::SemanticValues &sv) -> NumberMatcher {
+        const auto comparer = std::any_cast<NumberComparer>(sv[0]);
+        const auto arg = std::any_cast<int>(sv[1]);
+        return [=](int s) { return comparer(s, arg); };
+    };
+
+    search["SetExpression"] = [](const peg::SemanticValues &sv) -> NumberMatcher {
+        const auto comparer = std::any_cast<NumberComparer>(sv[0]);
+        const auto setCode = std::any_cast<QString>(sv[1]);
+        const auto allSets = CardDatabaseManager::getInstance()->getSetList();
+        for (auto &set : allSets) {
+            if (set->getShortName() == setCode) {
+                const int releaseDate = set->getReleaseDate().toJulianDay();
+                return [=](int s) { return comparer(s, releaseDate); };
+            }
+        }
+        return [](int) { return false; };
     };
 
     search["NormalMatcher"] = [](const peg::SemanticValues &sv) -> StringMatcher {
