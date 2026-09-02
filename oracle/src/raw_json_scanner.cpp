@@ -213,9 +213,10 @@ bool decodeString(const char *&p, const char *end, QString &out)
             flush();
             return true;
         }
-        if (static_cast<unsigned char>(c) < 0x20) {
-            return false; // unescaped control character is invalid JSON
-        }
+        // Deliberately accept unescaped control characters (e.g. a tab inside
+        // a set name): QJsonDocument and skipString accept them too, so
+        // rejecting them here would fail the whole document on a byte that
+        // Qt is fine with — the very total-failure mode this scanner avoids.
         utf8 += c;
         ++p;
     }
@@ -399,20 +400,19 @@ bool skipArray(const char *&p, const char *end, int depth)
 
 bool skipValue(const char *&p, const char *end, int depth)
 {
-    if (depth <= 0) {
-        return false; // nest deeper than the cap
-    }
     p = skipWhitespace(p, end);
     if (p >= end) {
         return false;
     }
     const char c = *p;
     if (c == '{') {
-        return skipObject(p, end, depth - 1);
+        // pass depth through: skipObject consumes the single decrement for this level
+        return skipObject(p, end, depth);
     }
     if (c == '[') {
-        return skipArray(p, end, depth - 1);
+        return skipArray(p, end, depth);
     }
+    // a primitive is a leaf, so it never wastes a nesting level
     return skipPrimitive(p, end);
 }
 

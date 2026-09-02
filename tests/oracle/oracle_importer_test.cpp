@@ -634,6 +634,9 @@ TEST_F(OracleImporterTest, ScanSetRangesMatchesFullJsonParseVerdicts)
         "{\"data\":{\"A\":{\"code\":\"a\",\"name\":\"ok\",\"type\":null,\"releaseDate\":\"2024-01-01\",\"cards\":[]}}}",
         "{\"data\":{\"A\":{\"code\":\"a\",\"name\":\"ok\",\"type\":7,\"releaseDate\":\"2024-01-01\",\"cards\":null}}}",
         "{\"data\":{\"A\":{\"code\":\"a\",\"name\":\"ok\",\"releaseDate\":\"2024-01-01\",\"cards\":[1,2,3]}}}",
+        // unescaped control character inside a string: QJsonDocument and
+        // skipString both accept it, so the scanner must not reject the whole doc
+        "{\"data\":{\"A\":{\"code\":\"a\",\"name\":\"N\tX\",\"releaseDate\":\"2024-01-01\",\"cards\":[{\"n\":1}]}}}",
         // structurally invalid JSON (both parsers must reject)
         "not json",
         "{\"data\":{\"A\":{\"name\":\"unterminated}}",
@@ -681,6 +684,32 @@ TEST_F(OracleImporterTest, ScanSetRangesRejectsDeepNesting)
     RawJson::ScanError scanError;
     RawJson::scanSetRanges(json, &scanError);
     ASSERT_TRUE(scanError.isError()) << "scanner accepted a document Qt rejects as too deeply nested";
+}
+
+TEST_F(OracleImporterTest, ScanSetRangesAcceptsQtMaxNesting)
+{
+    // Pins the boundary rather than only the far-past case: a depth Qt still
+    // accepts must be accepted by the scanner too. Before the fix the scanner's
+    // cap was roughly half of Qt's (each level cost two decrements), so a
+    // depth of 1000 here was rejected even though QJsonDocument parses it.
+    constexpr int depth = 1000;
+    QString nesting;
+    nesting.reserve(2 * depth);
+    for (int i = 0; i < depth; ++i) {
+        nesting += '[';
+    }
+    for (int i = 0; i < depth; ++i) {
+        nesting += ']';
+    }
+    const QByteArray json = ("{\"data\":{\"A\":{\"code\":\"a\",\"cards\":" + nesting + "}}}").toUtf8();
+
+    QJsonParseError qtError;
+    QJsonDocument::fromJson(json, &qtError);
+    ASSERT_EQ(qtError.error, QJsonParseError::NoError) << "expected Qt to accept depth " << depth;
+
+    RawJson::ScanError scanError;
+    RawJson::scanSetRanges(json, &scanError);
+    ASSERT_FALSE(scanError.isError()) << "scanner rejected a document Qt accepts at depth " << depth;
 }
 
 // ============================================================================

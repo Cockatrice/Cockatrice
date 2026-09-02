@@ -551,7 +551,6 @@ int OracleImporter::startImport()
 {
     static ICardSetPriorityController *noOpController = new NoopCardSetPriorityController();
 
-<<<<<<< HEAD
     // Pre-allocate the cards hash to avoid rehashing during import. Keys are
     // distinct card names while raw ranges only count printings (AllPrintings
     // ~100k printings vs ~35k names), so this over-reserves somewhat; an exact
