@@ -40,7 +40,9 @@ else()
 endif()
 
 # ccache does not support MSVC and must not auto-engage on Windows
-# (it is installed unintentionally on the Windows CI runner)
+# (it is installed unintentionally on the Windows CI runner).
+# NOTE: this keys off the target OS, so a mingw/Ninja configuration on Windows
+# also opts out of ccache even though the GNUCXX branch below supports it.
 if(USE_CCACHE AND NOT WIN32)
   find_program(CCACHE_PROGRAM ccache)
   if(CCACHE_PROGRAM)
@@ -52,6 +54,9 @@ if(USE_CCACHE AND NOT WIN32)
     execute_process(COMMAND ${CCACHE_PROGRAM} --set-config sloppiness=pch_defines,time_macros)
     message(STATUS "Found CCache ${CCACHE_PROGRAM}")
   endif()
+elseif(USE_CCACHE AND WIN32)
+  # An explicit opt-in must not disappear silently on Windows.
+  message(STATUS "ccache disabled: not supported for the MSVC toolchain on Windows")
 endif()
 
 if(WIN32 OR USE_VCPKG)
