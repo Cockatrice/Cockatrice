@@ -27,6 +27,7 @@ public:
 
     void updateTournamentState(const Event_TournamentState &state);
     void setLocalPlayerId(int playerId);
+    void setIsSpectator(bool spectator);
     void retranslateUi();
 
 signals:
@@ -47,6 +48,7 @@ private:
     QPushButton *openMatchButton;
 
     int localPlayerId = -1;
+    bool isSpectator = false;
     int currentGameId = -1;
     bool hasOwnLivePairing = false;
     bool hasAnyLivePairing = false;

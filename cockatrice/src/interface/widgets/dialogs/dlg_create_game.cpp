@@ -21,6 +21,7 @@
 #include <QRadioButton>
 #include <QSet>
 #include <QSharedPointer>
+#include <QSignalBlocker>
 #include <QSize>
 #include <QSpinBox>
 #include <QVBoxLayout>
@@ -245,7 +246,10 @@ DlgCreateGame::DlgCreateGame(const ServerInfo_Game &gameInfo, const QMap<int, QS
     spectatorsCanTalkCheckBox->setChecked(gameInfo.spectators_can_chat());
     spectatorsSeeEverythingCheckBox->setChecked(gameInfo.spectators_omniscient());
     shareDecklistsOnLoadCheckBox->setChecked(gameInfo.share_decklists_on_load());
-    tournamentCheckBox->setChecked(gameInfo.is_tournament());
+    {
+        const QSignalBlocker blocker(tournamentCheckBox);
+        tournamentCheckBox->setChecked(gameInfo.is_tournament());
+    }
 
     QSet<int> types;
     for (int i = 0; i < gameInfo.game_types_size(); ++i) {
@@ -317,7 +321,7 @@ void DlgCreateGame::actOK()
     cmd.set_share_decklists_on_load(shareDecklistsOnLoadCheckBox->isChecked());
     cmd.set_is_tournament(tournamentCheckBox->isChecked());
     if (tournamentCheckBox->isChecked()) {
-        cmd.set_games_per_match(tournamentSettings.gamesPerMatch);
+        cmd.mutable_tournament_settings()->set_games_per_match(tournamentSettings.gamesPerMatch);
     }
 
     auto _gameTypes = QString();

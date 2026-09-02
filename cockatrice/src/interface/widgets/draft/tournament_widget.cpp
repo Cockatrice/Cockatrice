@@ -75,6 +75,11 @@ void TournamentWidget::setLocalPlayerId(int playerId)
     localPlayerId = playerId;
 }
 
+void TournamentWidget::setIsSpectator(bool spectator)
+{
+    isSpectator = spectator;
+}
+
 QString TournamentWidget::getPlayerName(const Event_TournamentState &state, int playerId) const
 {
     for (int i = 0; i < state.players_size(); ++i) {
@@ -93,15 +98,15 @@ void TournamentWidget::updateTournamentState(const Event_TournamentState &state)
     QString statusText;
     switch (state.phase()) {
         case Event_TournamentState::PHASE_DECK_BUILDING:
-            statusText = gamesPerMatch > 1 ? tr("Tournament - Deck building (Best of %1)").arg(gamesPerMatch * 2 - 1)
+            statusText = gamesPerMatch > 1 ? tr("Tournament - Deck building (Best of %1)").arg(gamesPerMatch)
                                            : tr("Tournament - Deck building");
             break;
         case Event_TournamentState::PHASE_PLAYING:
-            statusText = gamesPerMatch > 1 ? tr("Tournament - Playing (Best of %1)").arg(gamesPerMatch * 2 - 1)
+            statusText = gamesPerMatch > 1 ? tr("Tournament - Playing (Best of %1)").arg(gamesPerMatch)
                                            : tr("Tournament - Playing");
             break;
         case Event_TournamentState::PHASE_FINISHED:
-            statusText = gamesPerMatch > 1 ? tr("Tournament - Finished (Best of %1)").arg(gamesPerMatch * 2 - 1)
+            statusText = gamesPerMatch > 1 ? tr("Tournament - Finished (Best of %1)").arg(gamesPerMatch)
                                            : tr("Tournament - Finished");
             break;
         default:
@@ -134,7 +139,7 @@ void TournamentWidget::updateOpenMatchButton()
         openMatchButton->setEnabled(true);
         openMatchButton->setText(tr("Open match game"));
         openMatchButton->setToolTip(tr("Switch to your current match game"));
-    } else if (localPlayerId == -1 && hasAnyLivePairing) {
+    } else if (isSpectator && hasAnyLivePairing) {
         // Spectators have no pairing of their own but may watch any running match.
         openMatchButton->setEnabled(true);
         openMatchButton->setText(tr("Spectate live match"));
