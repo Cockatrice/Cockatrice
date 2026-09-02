@@ -74,7 +74,7 @@ redirects and applies them without an extra network round trip.
 
 The redirect cache is a hash map from original URL to redirect URL plus timestamp. It is persisted to a `cache.ini`
 file (Qt's INI format, under the `redirects` array) inside the redirect cache directory
-(`SettingsCache::getRedirectCachePath()`, i.e. `<cache directory>/redirects/`). The cache is loaded when the worker
+(`SettingsCache::instance().paths().getRedirectCachePath()`, i.e. `<cache directory>/redirects/`). The cache is loaded when the worker
 starts, pruned of entries older than the configured TTL, and written back to disk when the application quits.
 
 Entries are added whenever a network reply reports a redirection (see below) and are consulted before any request is
@@ -102,8 +102,8 @@ CardPictureLoaderLocal searches two locations:
 
 - The **CUSTOM folder** (`<pictures directory>/CUSTOM/`). Every file in it is indexed recursively by its base name
   (both `baseName` and `completeBaseName`, so a file named `ExampleCard.jpg` is indexed as `ExampleCard`). The index is rebuilt
-  every 10 seconds and whenever the pictures directory changes, so new files are picked up without restarting the
-  client.
+  every 10 seconds, so new files are picked up without restarting the
+  client (changing the configured pictures directory only reassigns the search paths; the next timer tick rebuilds the index).
 - The **set-named subfolders** of the pictures directory: `<pictures directory>/<set code>/` and
   `<pictures directory>/downloadedPics/<set code>/`.
 
@@ -117,13 +117,13 @@ corrected name `Example Card`, set code `EXM` and collector number `43`.
 \attention The file-name variants use the *corrected* card name, so split cards are stored under their joined name: the
 "Example // Card" card is matched by a file named `ExampleCard.*`.
 
-The naming schemes are duplicated in the user-facing page @subpage custom_card_pictures, which also documents how to
+The naming schemes are duplicated in the user-facing page @ref custom_card_pictures, which also documents how to
 set up a custom card database that provides pictures via the CUSTOM folder and the `picurl` printing property.
 
 When the filesystem cache method is selected on the "Storage" settings page, downloaded images are additionally written
 into `<pictures directory>/downloadedPics/` using the configured export naming scheme (as `.png` files). Existing files
 are never overwritten, so a provider outage can permanently leave a wrong image in that folder until it is deleted
-manually - the user-facing troubleshooting guide @subpage fixing_card_pictures covers how to do this.
+manually - the user-facing troubleshooting guide @ref fixing_card_pictures covers how to do this.
 
 # URL Generation and Resolution
 
@@ -131,7 +131,8 @@ When no local image is available and downloading is enabled, the network loader 
 candidate URLs. This list is managed by CardPictureToLoad and is built in two steps.
 
 First, CardPictureToLoad::extractSetsSorted() collects all sets the card has printings in and sorts them by set
-priority. Unless the user disabled per-printing art ("Override all card art with personal preference"), the set that
+priority. Unless the user disabled per-printing art ("Override all card art with personal set preference (Pre-ProviderID
+change behavior)"), the set that
 matches the requested printing's provider ID is moved to the front, so the exact printing is always attempted first.
 
 For each set, CardPictureToLoad::populateSetUrls() builds an ordered URL list:
@@ -164,7 +165,9 @@ The `!set:...!` and `!prop:...!` placeholders also support two modifiers:
 Substituted values are percent-encoded. If a template asks for a property the card or printing does not have (or one of
 the modifiers invalidates it), the template yields no URL and is skipped; the next template is tried instead.
 
-\attention Custom URLs must start with `http://` or `https://` to be accepted.
+\attention Custom URLs should start with `http://` or `https://`. The scheme is not validated before the URL is handed
+to QNetworkAccessManager, so a template without an absolute scheme may silently fail to download; prefer HTTPS where the
+provider allows it.
 
 The resolution order is: for the current set, try each URL in the list; when all URLs for a set are exhausted, move to
 the next set; when every set is exhausted, the load fails. A failed load is reported through the NULL-pixmap mechanism
@@ -180,9 +183,9 @@ Several mechanisms influence the resolution process:
   redirect cache as described in the Redirect Cache section above.
 - **Blacklisted images.** Gatherer returns the card back image for cards it does not know. A few known MD5 hashes of
   that image are blacklisted, so such a "successful" download is treated as not found instead of being shown.
-- **WebP.** Images detected as WebP (RIFF/WEBP header) are decoded through QMovie before being handed to QImageReader.
+- **WebP.** Images detected as WebP (RIFF/WEBP header) are decoded through QMovie instead of QImageReader.
 - **Downloads disabled.** When "Download card pictures on the fly" is disabled and the network cache method is active,
   requests use Qt's `AlwaysCache` policy so that only previously cached images are served.
 
 A user-facing reference for writing download URL templates, including more worked examples, is available at
-@subpage custom_card_pictures.
+@ref custom_card_pictures.
