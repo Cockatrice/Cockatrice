@@ -209,11 +209,28 @@ DeckPreviewWidget *VisualDeckStorageFolderDisplayWidget::createDeckPreviewWidget
             &VisualDeckStorageWidget::deckLoadRequested);
     connect(deckPreviewWidget, &DeckPreviewWidget::openDeckEditor, visualDeckStorageWidget,
             &VisualDeckStorageWidget::openDeckEditor);
+    connect(deckPreviewWidget, &DeckPreviewWidget::shareDeckRequested, visualDeckStorageWidget,
+            &VisualDeckStorageWidget::shareDeckRequested);
+    connect(deckPreviewWidget, &DeckPreviewWidget::shareSelectionToggled, visualDeckStorageWidget,
+            &VisualDeckStorageWidget::shareSelectionChanged);
+    deckPreviewWidget->setShareSelectable(visualDeckStorageWidget->isShareSelectable());
     connect(visualDeckStorageWidget->settings(), &VisualDeckStorageQuickSettingsWidget::cardSizeChanged,
             deckPreviewWidget->bannerCardDisplayWidget, &CardInfoPictureWidget::setScaleFactor);
     deckPreviewWidget->bannerCardDisplayWidget->setScaleFactor(visualDeckStorageWidget->settings()->getCardSize());
     deckWidgets.insert(filePath, deckPreviewWidget);
     return deckPreviewWidget;
+}
+
+void VisualDeckStorageFolderDisplayWidget::setShareSelectable(bool selectable)
+{
+    const auto previews = flowWidget->findChildren<DeckPreviewWidget *>();
+    for (DeckPreviewWidget *preview : previews) {
+        preview->setShareSelectable(selectable);
+    }
+    const auto subFolders = findChildren<VisualDeckStorageFolderDisplayWidget *>();
+    for (VisualDeckStorageFolderDisplayWidget *subFolder : subFolders) {
+        subFolder->setShareSelectable(selectable);
+    }
 }
 
 /**

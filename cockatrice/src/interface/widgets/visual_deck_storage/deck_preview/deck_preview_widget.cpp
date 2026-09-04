@@ -4,6 +4,7 @@
 #include "../../../../interface/widgets/dialogs/dlg_convert_deck_to_cod_format.h"
 #include "../../../deck_loader/deck_loader.h"
 #include "../../cards/additional_info/color_identity_widget.h"
+#include "../../cards/additional_info/deck_color_identity.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
 #include "../visual_deck_storage_quick_settings_widget.h"
 #include "../visual_deck_storage_tag_filter_widget.h"
@@ -11,6 +12,7 @@
 #include "deck_preview_deck_tags_display_widget.h"
 
 #include <QFileInfo>
+#include <QFrame>
 #include <QInputDialog>
 #include <QLabel>
 #include <QMenu>
@@ -27,7 +29,7 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
                                      VisualDeckStorageWidget *_visualDeckStorageWidget,
                                      VisualDeckStorageModel *_model,
                                      const QString &_filePath)
-    : QWidget(_parent), visualDeckStorageWidget(_visualDeckStorageWidget), model(_model), filePath(_filePath)
+    : QWidget(_parent), filePath(_filePath), visualDeckStorageWidget(_visualDeckStorageWidget), model(_model)
 {
     layout = new QVBoxLayout(this);
     setLayout(layout);
@@ -36,6 +38,8 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
         new DeckPreviewCardPictureWidget(this, false, visualDeckStorageWidget->deckPreviewSelectionAnimationEnabled);
     pictureWidget->setFontSize(24);
     connect(pictureWidget, &DeckPreviewCardPictureWidget::imageClicked, this, &DeckPreviewWidget::imageClickedEvent);
+    connect(pictureWidget, &DeckPreviewCardPictureWidget::imageSingleClicked, this,
+            &DeckPreviewWidget::imageSingleClicked);
     connect(pictureWidget, &DeckPreviewCardPictureWidget::imageDoubleClicked, this,
             &DeckPreviewWidget::imageDoubleClickedEvent);
     bannerCardDisplayWidget = pictureWidget;
@@ -99,6 +103,15 @@ DeckPreviewWidget::DeckPreviewWidget(QWidget *_parent,
     // to keep the resize handler from searching the widget tree on every layout pass.
     fixedWidthChildren = {bannerCardDisplayWidget, colorIdentityWidget, deckTagsDisplayWidget, bannerCardLabel,
                           bannerCardComboBox};
+
+    // Child of the banner widget so the frame tracks the banner's selection animation
+    // (which animates the banner's position) instead of staying at a stale static offset.
+    selectionFrame = new QFrame(bannerCardDisplayWidget);
+    selectionFrame->setAttribute(Qt::WA_TransparentForMouseEvents);
+    selectionFrame->setStyleSheet(QStringLiteral(
+        "QFrame { border: 2px solid palette(highlight); border-radius: 4px; background: transparent; }"));
+    selectionFrame->setVisible(false);
+    bannerCardDisplayWidget->installEventFilter(this);
 }
 
 void DeckPreviewWidget::retranslateUi()
@@ -121,6 +134,63 @@ void DeckPreviewWidget::resizeEvent(QResizeEvent *event)
 
     for (QWidget *widget : fixedWidthChildren) {
         widget->setMaximumWidth(width);
+    }
+    updateSelectionFrameGeometry();
+}
+
+bool DeckPreviewWidget::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == bannerCardDisplayWidget && (event->type() == QEvent::Resize || event->type() == QEvent::Move)) {
+        updateSelectionFrameGeometry();
+    }
+    return QWidget::eventFilter(watched, event);
+}
+
+void DeckPreviewWidget::setShareSelectable(bool selectable)
+{
+    shareSelectable = selectable;
+    if (!selectable) {
+        setShareSelected(false);
+    }
+    updateSelectionStyle();
+}
+
+void DeckPreviewWidget::setShareSelected(bool selected)
+{
+    if (shareSelected == selected) {
+        return;
+    }
+    shareSelected = selected;
+    updateSelectionStyle();
+    emit shareSelectionToggled(selected);
+}
+
+bool DeckPreviewWidget::isShareSelected() const
+{
+    return shareSelected;
+}
+
+bool DeckPreviewWidget::isShareSelectable() const
+{
+    return shareSelectable;
+}
+
+void DeckPreviewWidget::updateSelectionFrameGeometry()
+{
+    if (selectionFrame == nullptr || bannerCardDisplayWidget == nullptr) {
+        return;
+    }
+    // Frame is a child of the banner, so it is positioned in banner coordinates and
+    // tracks the banner's selection animation automatically. A small inset keeps the
+    // highlight visible around the card art without occluding it.
+    selectionFrame->setGeometry(bannerCardDisplayWidget->rect().adjusted(1, 1, -1, -1));
+    selectionFrame->raise();
+}
+
+void DeckPreviewWidget::updateSelectionStyle()
+{
+    if (selectionFrame != nullptr) {
+        selectionFrame->setVisible(shareSelectable && isShareSelected());
     }
 }
 
@@ -226,10 +296,6 @@ void DeckPreviewWidget::updateTagsVisibility(bool visible)
     }
 }
 
-/**
- * Refreshes the banner card text.
- * This also calls `refreshBannerCardToolTip`, since those two often need to be updated together.
- */
 void DeckPreviewWidget::refreshBannerCardText()
 {
     bannerCardDisplayWidget->setOverlayText(getDisplayName());
@@ -337,10 +403,20 @@ void DeckPreviewWidget::imageClickedEvent(QMouseEvent *event, DeckPreviewCardPic
     }
 }
 
+void DeckPreviewWidget::imageSingleClicked()
+{
+    if (isShareSelectable()) {
+        setShareSelected(!isShareSelected());
+    }
+}
+
 void DeckPreviewWidget::imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance)
 {
     Q_UNUSED(event);
     Q_UNUSED(instance);
+    if (isShareSelectable()) {
+        return; // in share mode a double click would just toggle a single selection
+    }
     emit deckLoadRequested(filePath);
 }
 
@@ -364,6 +440,9 @@ QMenu *DeckPreviewWidget::createRightClickMenu()
             emit openDeckEditor(model->deckForRow(r));
         }
     });
+
+    connect(menu->addAction(tr("Share deck...")), &QAction::triggered, this,
+            [this] { emit shareDeckRequested(filePath); });
 
     connect(menu->addAction(tr("Edit Tags")), &QAction::triggered, deckTagsDisplayWidget,
             &DeckPreviewDeckTagsDisplayWidget::openTagEditDlg);

@@ -85,7 +85,7 @@ void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
     }
     lastWidth = totalWidth;
 
-    const int totalHeight = totalWidth / 6; // Set height to 1/4 of the width
+    const int totalHeight = qMax(0, totalWidth / 6); // Set height to 1/4 of the width
     setFixedHeight(totalHeight);
 
     const int count = layout->count();
@@ -97,6 +97,10 @@ void ColorIdentityWidget::resizeEvent(QResizeEvent *event)
     const int availableWidth = totalWidth - (spacing * (count - 1));
     const int iconSize = qMin(availableWidth / count, totalHeight); // Ensure icons fit within the new height
 
+    if (iconSize <= 0) {
+        lastIconSize = iconSize;
+        return;
+    }
     if (iconSize == lastIconSize) {
         return;
     }
