@@ -244,6 +244,16 @@ email=root@localhost
 ; Sender email name
 name="Cockatrice server"
 
+; Maximum number of attempts to deliver a given e-mail before giving up.
+; If the smtp server is unreachable or repeatedly rejects a message, the server
+; will retry with an exponentially growing delay up to this many times, then drop
+; the message from the queue and log the failure. Default: 5
+maxretries=5
+
+; Initial retry delay in seconds between delivery attempts. Doubles with each
+; failed attempt (capped at 30 minutes). Default: 60
+retrydelay=60
+
 ; Email subject
 subject="Cockatrice server account activation token"
 
