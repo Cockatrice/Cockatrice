@@ -14,14 +14,12 @@
 #include <QSet>
 #include <QWidget>
 
-class VisualDeckStorageWidget;
-
 class DeckPreviewColorIdentityFilterWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit DeckPreviewColorIdentityFilterWidget(VisualDeckStorageWidget *parent);
+    explicit DeckPreviewColorIdentityFilterWidget(QWidget *parent = nullptr);
     void retranslateUi();
 
     /**
