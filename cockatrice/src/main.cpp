@@ -53,6 +53,7 @@
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/cryptoutil.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
@@ -292,7 +293,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    rng = new RNG_SFMT;
+    rng = new RNG_SFMT(CryptoUtil::randomUInt64());
     themeManager = new ThemeManager;
     soundEngine = new SoundEngine;
 

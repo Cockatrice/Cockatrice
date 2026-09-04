@@ -7,6 +7,7 @@ RUN dnf install -y \
         git \
         mariadb-devel \
         ninja-build \
+        openssl-devel \
         protobuf-devel \
         qt6-{qtdeclarative,qtshadertools,qttools,qtsvg,qtmultimedia,qtwebsockets}-devel \
         qt6-qtimageformats \
