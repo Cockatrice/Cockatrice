@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QTimeZone>
 #include <QVBoxLayout>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_share_create.pb.h>
@@ -36,11 +37,14 @@ DlgShareDeck::DlgShareDeck(AbstractClient *_client, const QSharedPointer<DeckLis
     buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
     connect(buttonBox, &QDialogButtonBox::accepted, this, &DlgShareDeck::actShare);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgShareDeck::reject);
+    this->buttonBox = buttonBox;
     layout->addWidget(buttonBox);
 }
 
 void DlgShareDeck::actShare()
 {
+    buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+
     Command_DeckShareCreate cmd;
     cmd.set_name(nameEdit->text().trimmed().toStdString());
     if (cmd.name().empty()) {
@@ -49,7 +53,7 @@ void DlgShareDeck::actShare()
 
     DeckShareItem *item = cmd.add_items();
     item->set_deck_list(deck->writeToString_Native().toStdString());
-    item->set_color_identity(getDeckColorIdentity(*deck).toStdString());
+    item->set_color_identity(getDeckColorIdentity(*deck, CardDatabaseManager::query()).toStdString());
 
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &DlgShareDeck::shareFinished);
@@ -59,6 +63,7 @@ void DlgShareDeck::actShare()
 void DlgShareDeck::shareFinished(const Response &response, const CommandContainer & /*commandContainer*/)
 {
     if (response.response_code() != Response::RespOk) {
+        buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
         QMessageBox::critical(this, tr("Share deck"),
                               tr("Failed to create the share link (server response code %1).")
                                   .arg(QString::number(static_cast<int>(response.response_code()))));

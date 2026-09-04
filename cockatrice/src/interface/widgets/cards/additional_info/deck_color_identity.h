@@ -3,6 +3,7 @@
 
 #include <QString>
 
+class CardDatabaseQuerier;
 class DeckList;
 
 /**
@@ -11,7 +12,9 @@ class DeckList;
  *
  * Shared as a free function so the deck storage previews and the deck share
  * dialog compute identities identically.
+ *
+ * @param db Card database used to look up card color symbols.
  */
-QString getDeckColorIdentity(const DeckList &deck);
+QString getDeckColorIdentity(const DeckList &deck, const CardDatabaseQuerier *db);
 
 #endif // COCKATRICE_DECK_COLOR_IDENTITY_H
