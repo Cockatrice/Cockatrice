@@ -39,3 +39,8 @@ VisualDeckStorageSearchWidget::VisualDeckStorageSearchWidget(QWidget *parent) : 
 
     connect(searchDebounceTimer, &QTimer::timeout, this, [this] { emit searchTextChanged(searchBar->text()); });
 }
+
+void VisualDeckStorageSearchWidget::setPlaceholderText(const QString &text)
+{
+    searchBar->setPlaceholderText(text);
+}

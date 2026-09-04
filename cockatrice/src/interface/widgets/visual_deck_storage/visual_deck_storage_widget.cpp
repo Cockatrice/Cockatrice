@@ -61,6 +61,9 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
 
     // tag filter box
     tagFilterWidget = new VisualDeckStorageTagFilterWidget(this);
+    tagFilterWidget->setAllTagsProvider([this] { return gatherVisibleTags(); });
+    connect(tagFilterWidget, &VisualDeckStorageTagFilterWidget::filterChanged, this,
+            &VisualDeckStorageWidget::updateTagFilter);
     updateTagsVisibility(SettingsCache::instance().visualDeckStorage().getVisualDeckStorageShowTagFilter());
 
     deckPreviewSelectionAnimationEnabled =
@@ -214,6 +217,25 @@ void VisualDeckStorageWidget::updateTagFilter()
                                     QSet<QString>(excluded.cbegin(), excluded.cend()));
     // The visible deck set changed, so the chips are re-gathered from it.
     tagFilterWidget->refreshTags();
+}
+
+/**
+ * @brief The tags of all decks currently accepted by the proxy model.
+ */
+QSet<QString> VisualDeckStorageWidget::gatherVisibleTags() const
+{
+    QSet<QString> allTags;
+    for (int proxyRow = 0; proxyRow < storageProxyModel->rowCount(); ++proxyRow) {
+        const QModelIndex index = storageProxyModel->index(proxyRow, 0);
+        if (!index.data(VisualDeckStorageRoles::FilterMatchRole).toBool()) {
+            continue;
+        }
+        const QStringList deckTags = index.data(VisualDeckStorageRoles::TagsRole).toStringList();
+        for (const QString &tag : deckTags) {
+            allTags.insert(tag);
+        }
+    }
+    return allTags;
 }
 
 /**
