@@ -70,6 +70,7 @@ protected:
 
 private:
     void reapplySortAndFilters();
+    [[nodiscard]] QSet<QString> gatherVisibleTags() const;
 
 private:
     QVBoxLayout *layout;

@@ -19,6 +19,8 @@ class VisualDeckStorageSearchWidget : public QWidget
 public:
     explicit VisualDeckStorageSearchWidget(QWidget *parent);
 
+    void setPlaceholderText(const QString &text);
+
 signals:
     /**
      * Emitted once the debounce timer fires after the user stopped typing.
