@@ -30,6 +30,7 @@ public:
 
 signals:
     void imageClicked(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
+    void imageSingleClicked();
     void imageDoubleClicked(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
 
 private:

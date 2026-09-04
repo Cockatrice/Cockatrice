@@ -51,6 +51,7 @@ public slots:
      */
     void scheduleReconcile();
     void updateShowFolders(bool enabled);
+    void setShareSelectable(bool selectable);
 
 signals:
     /**

@@ -17,6 +17,7 @@
 #include <QWidget>
 
 class QEnterEvent;
+class QFrame;
 class QLabel;
 class QMenu;
 class QMouseEvent;
@@ -41,9 +42,19 @@ public:
      */
     DeckPreviewCardPictureWidget *bannerCardDisplayWidget;
 
+    /** @brief The path of the deck file backing this preview. */
+    QString filePath;
+
+    void setShareSelectable(bool selectable);
+    void setShareSelected(bool selected);
+    [[nodiscard]] bool isShareSelected() const;
+    [[nodiscard]] bool isShareSelectable() const;
+
 signals:
     void deckLoadRequested(const QString &filePath);
     void openDeckEditor(const LoadedDeck &deck);
+    void shareDeckRequested(const QString &filePath);
+    void shareSelectionToggled(bool selected);
 
 public slots:
     /**
@@ -66,6 +77,7 @@ public slots:
 protected:
     void enterEvent(QEnterEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     [[nodiscard]] int row() const;
@@ -76,6 +88,7 @@ private:
     QMenu *createRightClickMenu();
     void addSetBannerCardMenu(QMenu *menu);
     void imageClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
+    void imageSingleClicked();
     void imageDoubleClickedEvent(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
 
     void actRenameDeck();
@@ -84,7 +97,6 @@ private:
 
     VisualDeckStorageWidget *visualDeckStorageWidget;
     VisualDeckStorageModel *model;
-    QString filePath;
     QVBoxLayout *layout;
     ColorIdentityWidget *colorIdentityWidget;
     DeckPreviewDeckTagsDisplayWidget *deckTagsDisplayWidget;
@@ -92,6 +104,12 @@ private:
     QComboBox *bannerCardComboBox;
     QList<QWidget *> fixedWidthChildren; ///< Children clamped to the picture width on resize.
     int lastKnownBannerWidth = -1;       ///< The picture width last applied to the children.
+    QFrame *selectionFrame = nullptr;
+    bool shareSelectable = false;
+    bool shareSelected = false;
+
+    void updateSelectionStyle();
+    void updateSelectionFrameGeometry();
 };
 
 class NoScrollFilter : public QObject
