@@ -44,11 +44,17 @@ class ServerInfo_DeckStorage_Folder;
 class Command_AddToList;
 class Command_RemoveFromList;
 class Command_DeckList;
+class Command_DeckListOtherUser;
 class Command_DeckNewDir;
 class Command_DeckDelDir;
 class Command_DeckDel;
 class Command_DeckDownload;
+class Command_DeckDownloadPublic;
 class Command_DeckUpload;
+class Command_DeckSetVisibility;
+class Command_DeckShareCreate;
+class Command_DeckShareList;
+class Command_DeckShareDownload;
 class Command_ReplayList;
 class Command_ReplayDownload;
 class Command_ReplayModifyMatch;
@@ -95,8 +101,16 @@ private:
     Response::ResponseCode cmdRemoveFromList(const Command_RemoveFromList &cmd, ResponseContainer &rc);
     int getDeckPathId(int basePathId, QStringList path);
     int getDeckPathId(const QString &path);
-    bool deckListHelper(int folderId, ServerInfo_DeckStorage_Folder *folder);
+    bool deckListHelper(int folderId,
+                        ServerInfo_DeckStorage_Folder *folder,
+                        int userId,
+                        bool inheritedPublic,
+                        bool publicOnly);
+    int getDeckOwnerId(int deckId);
+    bool isDeckEffectivelyPublic(int deckId);
     Response::ResponseCode cmdDeckList(const Command_DeckList &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckListOtherUser(const Command_DeckListOtherUser &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckSetVisibility(const Command_DeckSetVisibility &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckNewDir(const Command_DeckNewDir &cmd, ResponseContainer &rc);
     void deckDelDirHelper(int basePathId);
     void sendServerMessage(const QString userName, const QString message);
@@ -105,6 +119,10 @@ private:
     Response::ResponseCode cmdDeckUpload(const Command_DeckUpload &cmd, ResponseContainer &rc);
     DeckList *getDeckFromDatabase(int deckId);
     Response::ResponseCode cmdDeckDownload(const Command_DeckDownload &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckDownloadPublic(const Command_DeckDownloadPublic &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareCreate(const Command_DeckShareCreate &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareList(const Command_DeckShareList &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareDownload(const Command_DeckShareDownload &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayList(const Command_ReplayList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayDownload(const Command_ReplayDownload &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayModifyMatch(const Command_ReplayModifyMatch &cmd, ResponseContainer &rc);

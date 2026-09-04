@@ -1,0 +1,24 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message DeckShareItem {
+    // Reference an existing deck in the sharer's personal deck storage.
+    // Mutually exclusive with deck_list.
+    optional uint32 deck_id = 1;
+    // Inline deck content in the native format.
+    // Mutually exclusive with deck_id.
+    optional string deck_list = 2;
+    // Color identity of the deck (e.g. "WUBRG"), computed by the sharing client.
+    optional string color_identity = 3;
+}
+
+message Command_DeckShareCreate {
+    extend SessionCommand {
+        optional Command_DeckShareCreate ext = 1026;
+    }
+    optional string name = 1;
+    repeated DeckShareItem items = 2;
+    // Path of a folder in the sharer's personal deck storage. When set, all
+    // decks in that folder are shared (resolved by the server).
+    optional string folder_path = 3;
+}

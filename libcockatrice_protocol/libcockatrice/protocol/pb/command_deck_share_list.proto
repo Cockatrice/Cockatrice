@@ -1,0 +1,9 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+message Command_DeckShareList {
+    extend SessionCommand {
+        optional Command_DeckShareList ext = 1027;
+    }
+    optional string token = 1;
+}

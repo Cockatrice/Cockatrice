@@ -80,6 +80,9 @@ message Response {
         REPLAY_LIST = 1100;             // Response listing replays
         REPLAY_DOWNLOAD = 1101;         // Response for replay download
         REPLAY_GET_CODE = 1102;         // Response containing replay code
+        DECK_SHARE_CREATE = 1103;       // Response to deck share creation
+        DECK_SHARE_LIST = 1104;         // Response listing shared decks
+        DECK_SHARE_DOWNLOAD = 1105;     // Response for shared deck download
         CARD_ART_RULE_LIST = 1200;      // Response containing a list of card art rules
     }
 

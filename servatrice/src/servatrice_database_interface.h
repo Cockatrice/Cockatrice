@@ -13,9 +13,21 @@
 #include <server.h>
 #include <server_database_interface.h>
 
-#define DATABASE_SCHEMA_VERSION 36
+#define DATABASE_SCHEMA_VERSION 37
 
 class Servatrice;
+
+/** @brief Metadata of a single deck inside a temporary deck share bundle. */
+struct DeckShareItemRecord
+{
+    int id = -1;           ///< Database id, used for downloads.
+    QString name;          ///< Deck name.
+    QStringList tags;      ///< Deck tags.
+    QString bannerCard;    ///< Banner card name (deck image).
+    QString gameFormat;    ///< Game format the deck was built for.
+    QString colorIdentity; ///< Color identity, e.g. "WUBRG".
+    QString content;       ///< Deck content (native format); empty in list queries.
+};
 
 class Servatrice_DatabaseInterface : public Server_DatabaseInterface
 {
@@ -78,6 +90,25 @@ public:
                               const QSet<QString> &allSpectatorsEver,
                               const QList<GameReplay *> &replayList) override;
     DeckList *getDeckFromDatabase(int deckId, int userId) override;
+
+    /** @brief Creates a new temporary deck share bundle. Returns false on failure. */
+    bool createDeckShare(const QString &token,
+                         const QString &name,
+                         int userId,
+                         const QList<DeckShareItemRecord> &items,
+                         int expiryDays);
+    /**
+     * @brief Looks up a valid (non-expired) share bundle by token.
+     * @return false if the token is unknown or expired.
+     */
+    bool getDeckShareList(const QString &token, QString &name, qint64 &expiresAt, QList<DeckShareItemRecord> &items);
+    /**
+     * @brief Fetches the content of one item of a valid share bundle.
+     * @return false if the token is unknown/expired or the item does not belong to the bundle.
+     */
+    bool getDeckShareItem(const QString &token, int itemId, QString &content);
+    /** @brief Deletes all expired share bundles (cascades to their items). */
+    void cleanupExpiredDeckShares();
 
     int getNextGameId() override;
     int getNextReplayId() override;
