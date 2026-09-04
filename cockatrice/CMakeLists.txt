@@ -50,6 +50,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_register.cpp
     src/interface/widgets/dialogs/dlg_report_user.cpp
     src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp
+    src/interface/widgets/dialogs/dlg_share_deck.cpp
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
     src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
@@ -57,6 +58,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_view_log.cpp
     src/interface/widgets/dialogs/override_printing_warning.cpp
     src/interface/widgets/dialogs/tip_of_the_day.cpp
+    src/interface/widgets/deck_share/deck_share_utils.cpp
+    src/interface/widgets/deck_share/share_bar_widget.cpp
     src/filters/deck_filter_string.cpp
     src/filters/filter_builder.cpp
     src/filters/filter_tree_model.cpp
@@ -163,6 +166,7 @@ set(cockatrice_SOURCES
     src/interface/palette_editor/palette_grid_widget.cpp
     src/interface/palette_editor/palette_editor_dialog.cpp
     src/interface/widgets/cards/additional_info/color_identity_widget.cpp
+    src/interface/widgets/cards/additional_info/deck_color_identity.cpp
     src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
     src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
     src/interface/widgets/cards/art_crop_attribution.cpp

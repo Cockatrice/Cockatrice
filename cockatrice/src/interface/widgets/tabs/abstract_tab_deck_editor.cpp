@@ -19,6 +19,7 @@
 #include "../interface/widgets/dialogs/dlg_load_deck.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_clipboard.h"
 #include "../interface/widgets/dialogs/dlg_load_deck_from_website.h"
+#include "../interface/widgets/dialogs/dlg_share_deck.h"
 #include "../utility/visibility_change_listener.h"
 #include "tab_supervisor.h"
 
@@ -380,6 +381,20 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
     deckStateManager->setModified(false);
     SettingsCache::instance().recents().updateRecentlyOpenedDeckPaths(fileName);
     return true;
+}
+
+/**
+ * @brief Opens the deck share dialog with the current deck preselected.
+ */
+void AbstractTabDeckEditor::actShareDeck()
+{
+    const QSharedPointer<DeckList> deck = deckStateManager->getDeckListShared();
+    if (deck->isBlankDeck()) {
+        return;
+    }
+
+    DlgShareDeck shareDialog(tabSupervisor->getClient(), deck, this);
+    shareDialog.exec();
 }
 
 /**

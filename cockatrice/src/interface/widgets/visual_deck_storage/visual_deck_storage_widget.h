@@ -33,6 +33,12 @@ public:
     explicit VisualDeckStorageWidget(QWidget *parent);
     void refreshIfPossible();
     void retranslateUi();
+    void setShareSelectable(bool selectable);
+    [[nodiscard]] bool isShareSelectable() const;
+    [[nodiscard]] QStringList selectedFilePaths() const;
+    void setShareSelectedFiles(const QStringList &paths);
+    void clearShareSelection();
+    void setShareAvailable(bool available);
 
     VisualDeckStorageTagFilterWidget *tagFilterWidget;
     bool deckPreviewSelectionAnimationEnabled;
@@ -63,6 +69,9 @@ public slots:
 signals:
     void deckLoadRequested(const QString &filePath);
     void openDeckEditor(const LoadedDeck &deck);
+    void shareDeckRequested(const QString &filePath);
+    void shareSelectionChanged();
+    void shareRequested();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
@@ -81,12 +90,14 @@ private:
     VisualDeckStorageSearchWidget *searchWidget;
     DeckPreviewColorIdentityFilterWidget *deckPreviewColorIdentityFilterWidget;
     QToolButton *refreshButton;
+    QToolButton *shareButton;
     VisualDeckStorageQuickSettingsWidget *quickSettingsWidget;
     QScrollArea *scrollArea;
     VisualDeckStorageFolderDisplayWidget *folderWidget = nullptr;
     VisualDeckStorageModel *storageModel = nullptr;
     VisualDeckStorageSortFilterProxyModel *storageProxyModel = nullptr;
     QTimer *refreshTimer = nullptr; ///< Coalesces the re-apply/refresh burst following a batch of deck loads.
+    bool shareSelectable = false;
 };
 
 #endif // VISUAL_DECK_STORAGE_WIDGET_H
