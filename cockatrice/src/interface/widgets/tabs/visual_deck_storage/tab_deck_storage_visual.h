@@ -67,7 +67,7 @@ private slots:
     void handleConnectionChanged(ClientStatus status);
 
 private:
-    void showShareNotice(const QString &message);
+    void showShareNotice(const QString &message, bool warning = false);
     void updateShareHint();
 
     VisualDeckStorageWidget *visualDeckStorageWidget;
