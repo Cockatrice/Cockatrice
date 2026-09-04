@@ -5,8 +5,8 @@
 # This file sets all the variables shared between the projects
 # like the installation path, compilation flags etc..
 
-# cmake 3.16 is required if using qt6
-cmake_minimum_required(VERSION 3.10)
+# 3.16 required for Qt6 and target_precompile_headers()
+cmake_minimum_required(VERSION 3.16)
 
 # Use compiler cache (ccache)
 option(USE_CCACHE "Cache the build results with ccache" OFF)
