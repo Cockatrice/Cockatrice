@@ -1,29 +1,24 @@
 #include "tab_deck_storage.h"
 
 #include "../../../client/settings/cache_settings.h"
-#include "../../../main.h"
 #include "../../deck_loader/deck_loader.h"
+#include "../deck_share/deck_share_utils.h"
 #include "../deck_share/share_bar_widget.h"
 #include "../interface/widgets/server/remote/remote_decklist_tree_widget.h"
 #include "../interface/widgets/utility/get_text_with_max.h"
 
 #include <QAction>
 #include <QApplication>
-#include <QClipboard>
 #include <QDateTime>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QFileSystemModel>
 #include <QGroupBox>
-#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QLineEdit>
-#include <QMainWindow>
 #include <QMessageBox>
-#include <QStatusBar>
-#include <QSystemTrayIcon>
 #include <QTimeZone>
 #include <QToolBar>
 #include <QTreeView>
@@ -248,12 +243,14 @@ void TabDeckStorage::setRemoteEnabled(bool enabled)
     aUpload->setEnabled(enabled);
     aOpenRemoteDeck->setEnabled(enabled);
     aDownload->setEnabled(enabled);
+    aShareDecks->setEnabled(enabled);
     aNewFolder->setEnabled(enabled);
     aDeleteRemoteDeck->setEnabled(enabled);
 
     if (enabled) {
         serverDirView->refreshTree();
     } else {
+        setShareModeEnabled(false);
         serverDirView->clearTree();
     }
 }
@@ -669,6 +666,7 @@ void TabDeckStorage::setShareModeEnabled(bool enabled)
 {
     shareBar->setVisible(enabled);
     if (enabled) {
+        shareBar->setCreateEnabled(true);
         shareBar->setName(tr("Shared decks"));
         onServerSelectionChanged();
         shareBar->focusName();
@@ -692,6 +690,17 @@ void TabDeckStorage::onServerSelectionChanged()
             ++files;
         }
     }
+
+    QString hint;
+    if (folders > 1) {
+        hint = tr("Only one folder can be shared at a time.");
+    } else if (folders > 0 && files > 0) {
+        hint = tr("Share either a folder or decks, not both.");
+    } else if (folders == 0 && files == 0) {
+        hint = tr("Select folders or decks in the tree to share.");
+    }
+    shareBar->setHintText(hint, !hint.isEmpty());
+
     QStringList parts;
     if (folders > 0) {
         parts << tr("%n folder(s)", "", folders);
@@ -705,6 +714,30 @@ void TabDeckStorage::onServerSelectionChanged()
 void TabDeckStorage::actShareSelection()
 {
     const auto selection = serverDirView->getCurrentSelection();
+    QString sharedFolder;
+    bool hasFile = false;
+    bool hasFolder = false;
+    for (const auto *node : selection) {
+        if (const auto *dirNode = dynamic_cast<const RemoteDeckList_TreeModel::DirectoryNode *>(node)) {
+            hasFolder = true;
+            if (!sharedFolder.isEmpty()) {
+                showShareNotice(tr("Only one folder can be shared at a time."), true);
+                return;
+            }
+            sharedFolder = dirNode->getPath();
+        } else {
+            hasFile = true;
+        }
+    }
+
+    if (hasFile && hasFolder) {
+        showShareNotice(tr("Share either a folder or decks, not both."), true);
+        return;
+    }
+    if (hasFolder && sharedFolder.isEmpty()) {
+        showShareNotice(tr("The root folder cannot be shared."), true);
+        return;
+    }
 
     Command_DeckShareCreate cmd;
     cmd.set_name(shareBar->name().toStdString());
@@ -712,19 +745,9 @@ void TabDeckStorage::actShareSelection()
         cmd.set_name(tr("Shared decks").toStdString());
     }
 
-    // Sharing a folder is exclusive with sharing individual decks (matches the picker's rule).
-    for (const auto *node : selection) {
-        if (const auto *dirNode = dynamic_cast<const RemoteDeckList_TreeModel::DirectoryNode *>(node)) {
-            const QString path = dirNode->getPath();
-            if (path.isEmpty()) {
-                continue; // the root folder cannot be shared
-            }
-            cmd.set_folder_path(path.toStdString());
-            break;
-        }
-    }
-
-    if (cmd.folder_path().empty()) {
+    if (!sharedFolder.isEmpty()) {
+        cmd.set_folder_path(sharedFolder.toStdString());
+    } else {
         for (const auto *node : selection) {
             if (const auto *fileNode = dynamic_cast<const RemoteDeckList_TreeModel::FileNode *>(node)) {
                 DeckShareItem *item = cmd.add_items();
@@ -734,10 +757,11 @@ void TabDeckStorage::actShareSelection()
     }
 
     if (cmd.items_size() == 0 && cmd.folder_path().empty()) {
-        showShareNotice(tr("Select decks to share."));
+        showShareNotice(tr("Select decks to share."), true);
         return;
     }
 
+    shareBar->setCreateEnabled(false);
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &TabDeckStorage::shareFromTreeFinished);
     client->sendCommand(pend);
@@ -745,29 +769,29 @@ void TabDeckStorage::actShareSelection()
 
 void TabDeckStorage::shareFromTreeFinished(const Response &response, const CommandContainer & /*commandContainer*/)
 {
+    shareBar->setCreateEnabled(true);
     if (response.response_code() != Response::RespOk) {
         qWarning() << "failed to create deck share:" << response.response_code();
         showShareNotice(tr("Failed to create the share link (server response code %1).")
-                            .arg(QString::number(static_cast<int>(response.response_code()))));
+                            .arg(QString::number(static_cast<int>(response.response_code()))),
+                        true);
         return;
     }
     const Response_DeckShareCreate &resp = response.GetExtension(Response_DeckShareCreate::ext);
     const QString token = QString::fromStdString(resp.token());
-    const QDateTime expiry = QDateTime::fromSecsSinceEpoch(resp.expires_at(), QTimeZone::UTC).toLocalTime();
+    const QDateTime expiry = QDateTime::fromSecsSinceEpoch(resp.expires_at(), QTimeZone::UTC);
 
-    const QString link = QString("cockatrice://opendeck?share=%1&hostname=%2&port=%3")
-                             .arg(token, client->serverName(), QString::number(client->serverPort()));
-    QGuiApplication::clipboard()->setText(link);
+    const QString link = DeckShareUtils::buildShareLink(client, token);
+    DeckShareUtils::copyShareLinkToClipboard(link);
 
-    showShareNotice(tr("Share link copied to the clipboard.\nExpires on %1.").arg(expiry.toString()));
+    showShareNotice(
+        tr("Share link copied to the clipboard.\nExpires on %1.").arg(DeckShareUtils::formatShareExpiry(expiry)));
     setShareModeEnabled(false);
 }
 
-void TabDeckStorage::showShareNotice(const QString &message)
+void TabDeckStorage::showShareNotice(const QString &message, bool warning)
 {
-    if (trayIcon && trayIcon->isVisible()) {
-        trayIcon->showMessage(tr("Deck share"), message);
-    } else if (auto *mainWindow = qobject_cast<QMainWindow *>(window())) {
-        mainWindow->statusBar()->showMessage(message, 10000);
-    }
+    QMessageBox box(warning ? QMessageBox::Warning : QMessageBox::Information, tr("Deck share"), message,
+                    QMessageBox::Ok, this);
+    box.exec();
 }

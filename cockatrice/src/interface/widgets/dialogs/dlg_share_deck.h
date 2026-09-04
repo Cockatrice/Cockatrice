@@ -13,6 +13,7 @@
 class AbstractClient;
 class CommandContainer;
 class DeckList;
+class QDialogButtonBox;
 class QLineEdit;
 class Response;
 
@@ -36,6 +37,7 @@ private:
     AbstractClient *client;
     QSharedPointer<DeckList> deck;
     QLineEdit *nameEdit;
+    QDialogButtonBox *buttonBox;
 };
 
 #endif // DLG_SHARE_DECK_H

@@ -50,7 +50,7 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     shareButton = new QToolButton(this);
     shareButton->setIcon(QPixmap("theme:icons/share"));
     shareButton->setFixedSize(32, 32);
-    shareButton->setToolTip(tr("Share selected decks"));
+    shareButton->setToolTip(tr("Select decks to share"));
     shareButton->setVisible(false);
     connect(shareButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::shareRequested);
 

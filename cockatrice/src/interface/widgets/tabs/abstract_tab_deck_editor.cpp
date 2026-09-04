@@ -388,6 +388,11 @@ bool AbstractTabDeckEditor::actSaveDeckAs()
  */
 void AbstractTabDeckEditor::actShareDeck()
 {
+    if (tabSupervisor->getClient()->getStatus() != StatusLoggedIn) {
+        QMessageBox::information(this, tr("Share deck"), tr("You must be connected to the server to share a deck."));
+        return;
+    }
+
     const QSharedPointer<DeckList> deck = deckStateManager->getDeckListShared();
     if (deck->isBlankDeck()) {
         return;

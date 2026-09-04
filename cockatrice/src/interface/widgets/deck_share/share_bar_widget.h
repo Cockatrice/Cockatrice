@@ -42,6 +42,9 @@ public:
     /** @brief Sets the explainer hint text, showing it when @p visible is true. */
     void setHintText(const QString &text, bool visible);
 
+    /** @brief Enables or disables the create-share-link button (guards double submission). */
+    void setCreateEnabled(bool enabled);
+
     /** @brief Moves keyboard focus to the name field. */
     void focusName();
 
