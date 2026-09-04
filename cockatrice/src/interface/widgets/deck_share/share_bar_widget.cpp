@@ -67,6 +67,11 @@ void ShareBarWidget::setHintText(const QString &text, bool visible)
     hintLabel->setVisible(visible);
 }
 
+void ShareBarWidget::setCreateEnabled(bool enabled)
+{
+    createButton->setEnabled(enabled);
+}
+
 void ShareBarWidget::focusName()
 {
     nameEdit->setFocus();

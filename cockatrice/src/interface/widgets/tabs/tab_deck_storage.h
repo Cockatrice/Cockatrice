@@ -45,7 +45,7 @@ private:
 
     void setRemoteEnabled(bool enabled);
 
-    void showShareNotice(const QString &message);
+    void showShareNotice(const QString &message, bool warning = false);
 
     void setShareModeEnabled(bool enabled);
 

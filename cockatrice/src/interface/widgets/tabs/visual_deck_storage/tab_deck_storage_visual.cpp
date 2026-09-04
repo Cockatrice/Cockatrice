@@ -1,17 +1,15 @@
 #include "tab_deck_storage_visual.h"
 
-#include "../../../../main.h"
 #include "../../../deck_loader/deck_loader.h"
 #include "../../cards/additional_info/deck_color_identity.h"
 #include "../../deck_share/deck_share_utils.h"
 #include "../../interface/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "../tab_supervisor.h"
 
-#include <QMainWindow>
+#include <QDateTime>
 #include <QMessageBox>
-#include <QStatusBar>
-#include <QSystemTrayIcon>
 #include <QVBoxLayout>
+#include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_deck_share_create.pb.h>
@@ -82,6 +80,7 @@ void TabDeckStorageVisual::enterShareMode(const QStringList &preselectFiles)
     if (!shareDeckAvailable) {
         return; // sharing is gated on being logged in
     }
+    shareBar->setCreateEnabled(true);
     visualDeckStorageWidget->setShareSelectable(true);
     visualDeckStorageWidget->setShareSelectedFiles(preselectFiles);
     shareBar->setName(tr("Shared decks"));
@@ -99,6 +98,10 @@ void TabDeckStorageVisual::exitShareMode()
 
 void TabDeckStorageVisual::actShareDeck(const QString &filePath)
 {
+    if (!shareDeckAvailable) {
+        QMessageBox::information(this, tr("Share deck"), tr("You must be connected to the server to share a deck."));
+        return;
+    }
     enterShareMode({filePath});
 }
 
@@ -145,9 +148,10 @@ void TabDeckStorageVisual::actShareSelected()
         }
         DeckShareItem *item = cmd.add_items();
         item->set_deck_list(deckOpt->deckList.writeToString_Native().toStdString());
-        item->set_color_identity(getDeckColorIdentity(deckOpt->deckList).toStdString());
+        item->set_color_identity(getDeckColorIdentity(deckOpt->deckList, CardDatabaseManager::query()).toStdString());
     }
 
+    shareBar->setCreateEnabled(false);
     PendingCommand *pend = tabSupervisor->getClient()->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &TabDeckStorageVisual::shareFinished);
     tabSupervisor->getClient()->sendCommand(pend);
@@ -155,10 +159,11 @@ void TabDeckStorageVisual::actShareSelected()
 
 void TabDeckStorageVisual::shareFinished(const Response &response, const CommandContainer & /*commandContainer*/)
 {
+    shareBar->setCreateEnabled(true);
     if (response.response_code() != Response::RespOk) {
         showShareNotice(tr("Failed to create the share link (server response code %1).")
-                            .arg(QString::number(static_cast<int>(response.response_code()))));
-        exitShareMode();
+                            .arg(QString::number(static_cast<int>(response.response_code()))),
+                        true);
         return;
     }
 
@@ -183,11 +188,9 @@ void TabDeckStorageVisual::handleConnectionChanged(ClientStatus status)
     }
 }
 
-void TabDeckStorageVisual::showShareNotice(const QString &message)
+void TabDeckStorageVisual::showShareNotice(const QString &message, bool warning)
 {
-    if (trayIcon && trayIcon->isVisible()) {
-        trayIcon->showMessage(tr("Deck share"), message);
-    } else if (auto *mainWindow = qobject_cast<QMainWindow *>(window())) {
-        mainWindow->statusBar()->showMessage(message, 10000);
-    }
+    QMessageBox box(warning ? QMessageBox::Warning : QMessageBox::Information, tr("Deck share"), message,
+                    QMessageBox::Ok, this);
+    box.exec();
 }
