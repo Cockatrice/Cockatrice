@@ -1,10 +1,22 @@
 syntax = "proto2";
 message ServerInfo_DeckStorage_File {
     optional uint32 creation_time = 1;
+    optional bool is_public = 2;
+    // Preview metadata computed by the uploading client, so other clients can
+    // render this deck (e.g. in a visual storage grid) without downloading the
+    // full deck list. Empty for decks uploaded before the metadata columns.
+    optional string banner_card_name = 3;
+    optional string banner_card_provider = 4;
+    optional string color_identity = 5;
+    // Comma-separated list of tag names, matching the corresponding
+    // ServerInfo_DeckStorage_File upload metadata. Empty for decks uploaded
+    // before the tags column existed.
+    optional string tags = 6;
 }
 
 message ServerInfo_DeckStorage_Folder {
     repeated ServerInfo_DeckStorage_TreeItem items = 1;
+    optional bool is_public = 2;
 }
 
 message ServerInfo_DeckStorage_TreeItem {
