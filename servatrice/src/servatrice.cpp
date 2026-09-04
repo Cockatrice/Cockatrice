@@ -38,6 +38,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QIODevice>
+#include <QLoggingCategory>
 #include <QMapIterator>
 #include <QMetaObject>
 #include <QMutableListIterator>
@@ -68,6 +69,8 @@
 #include <qnamespace.h>
 #include <server_room.h>
 #include <string>
+
+inline Q_LOGGING_CATEGORY(ServatriceLog, "servatrice");
 
 Servatrice_GameServer::Servatrice_GameServer(Servatrice *_server,
                                              int _numberPools,
@@ -334,6 +337,11 @@ bool Servatrice::initServer()
         qDebug() << "Clearing previous sessions...";
         servatriceDatabaseInterface->clearSessionTables();
     }
+
+    // Connect the SMTP client's delivery-confirmation signals to the database cleanup handlers.
+    // Emails are removed from the queue tables only after delivery is confirmed (see statusUpdate()).
+    connect(smtpClient, &SmtpClient::mailDelivered, this, &Servatrice::onEmailDelivered);
+    connect(smtpClient, &SmtpClient::mailPermanentlyFailed, this, &Servatrice::onEmailPermanentlyFailed);
 
     if (getRoomsMethodString() == "sql") {
         QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
@@ -737,18 +745,16 @@ void Servatrice::statusUpdate()
                 return;
             }
 
-            auto *queryDelete =
-                servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
-
+            // Rows are intentionally NOT deleted here: the durable source of truth for a pending
+            // activation e-mail is the database row, which is only removed once delivery has been
+            // confirmed by the SMTP client (see onEmailDelivered). This makes sending resilient to
+            // transient SMTP failures and server restarts.
             while (servDbSelQuery->next()) {
                 const QString userName = servDbSelQuery->value(0).toString();
                 const auto emailAddress = EmailParser::getParsedEmailAddress(servDbSelQuery->value(1).toString());
                 const QString token = servDbSelQuery->value(2).toString();
 
-                if (smtpClient->enqueueActivationTokenMail(userName, emailAddress, token)) {
-                    queryDelete->bindValue(":name", userName);
-                    servatriceDatabaseInterface->execSqlQuery(queryDelete);
-                }
+                smtpClient->enqueueActivationTokenMail(userName, emailAddress, token);
             }
         }
 
@@ -760,23 +766,65 @@ void Servatrice::statusUpdate()
                 return;
             }
 
-            QSqlQuery *queryDelete = servatriceDatabaseInterface->prepareQuery(
-                "update {prefix}_forgot_password set emailed = 1 where name = :name");
-
+            // Rows are intentionally left with emailed = 0 here; they are marked emailed only once
+            // delivery is confirmed by the SMTP client (see onEmailDelivered).
             while (forgotPwQuery->next()) {
                 const QString userName = forgotPwQuery->value(0).toString();
                 const auto emailAddress = EmailParser::getParsedEmailAddress(forgotPwQuery->value(1).toString());
                 const QString token = forgotPwQuery->value(2).toString();
 
-                if (smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token)) {
-                    queryDelete->bindValue(":name", userName);
-                    servatriceDatabaseInterface->execSqlQuery(queryDelete);
-                }
+                smtpClient->enqueueForgotPasswordTokenMail(userName, emailAddress, token);
             }
         }
 
         smtpClient->sendAllEmails();
     }
+}
+
+void Servatrice::onEmailDelivered(const QString &userName, EmailType type)
+{
+    if (cleanupDatabaseForEmail(userName, type)) {
+        qCDebug(ServatriceLog) << "E-mail delivered to" << userName;
+    }
+}
+
+void Servatrice::onEmailPermanentlyFailed(const QString &userName, EmailType type, FailureReason reason)
+{
+    switch (reason) {
+        case FailureReason::RetryExhausted:
+            qCWarning(ServatriceLog) << "E-mail to" << userName << "permanently failed after max retries";
+            break;
+        case FailureReason::RecipientRejected:
+            qCWarning(ServatriceLog) << "E-mail to" << userName << "permanently failed: recipient rejected";
+            break;
+        case FailureReason::SenderRejected:
+            qCWarning(ServatriceLog) << "E-mail to" << userName << "permanently failed: sender rejected";
+            break;
+    }
+
+    if (!cleanupDatabaseForEmail(userName, type)) {
+        qCWarning(ServatriceLog) << "Failed to clean up database row for permanently failed e-mail to" << userName
+                                 << "- row may be re-enqueued on next status update";
+    }
+}
+
+bool Servatrice::cleanupDatabaseForEmail(const QString &userName, EmailType type)
+{
+    switch (type) {
+        case EmailType::Activation: {
+            QSqlQuery *query =
+                servatriceDatabaseInterface->prepareQuery("delete from {prefix}_activation_emails where name = :name");
+            query->bindValue(":name", userName);
+            return servatriceDatabaseInterface->execSqlQuery(query);
+        }
+        case EmailType::ForgotPassword: {
+            QSqlQuery *query = servatriceDatabaseInterface->prepareQuery(
+                "update {prefix}_forgot_password set emailed = 1 where name = :name");
+            query->bindValue(":name", userName);
+            return servatriceDatabaseInterface->execSqlQuery(query);
+        }
+    }
+    return false;
 }
 
 SessionEvent *Servatrice::makeShutdownEvent() const

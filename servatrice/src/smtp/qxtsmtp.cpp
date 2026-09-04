@@ -94,6 +94,38 @@ int QxtSmtp::pendingMessages() const
     return qxt_d().pending.count();
 }
 
+/*!
+ * \brief Drops all queued (not yet transmitted) messages without sending them.
+ *
+ * Any message still awaiting delivery is discarded. This is used by callers that
+ * keep their own authoritative queue and wish to rebuild the SMTP buffer from scratch
+ * (e.g. after a reconnect) without risking duplicates.
+ */
+void QxtSmtp::clearPending()
+{
+    qxt_d().pending.clear();
+}
+
+/*!
+ * \brief Clears the outgoing queue and resets the SMTP state machine.
+ *
+ * Unlike clearPending(), this also resets the internal state to Disconnected so
+ * that subsequent send() calls will not fire sendNext() prematurely on a
+ * not-yet-connected socket.  Use this when rebuilding the queue from scratch
+ * before a fresh connectToHost() / connectToSecureHost() cycle.
+ */
+void QxtSmtp::reset()
+{
+    qxt_d().pending.clear();
+    qxt_d().extensions.clear();
+    qxt_d().buffer.clear();
+    qxt_d().recipients.clear();
+    qxt_d().rcptNumber = 0;
+    qxt_d().rcptAck = 0;
+    qxt_d().mailAck = false;
+    qxt_d().state = QxtSmtpPrivate::Disconnected;
+}
+
 QTcpSocket *QxtSmtp::socket() const
 {
     return qxt_d().socket;
