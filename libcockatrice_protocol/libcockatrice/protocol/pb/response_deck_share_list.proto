@@ -1,0 +1,12 @@
+syntax = "proto2";
+import "response.proto";
+import "serverinfo_deck_share_item.proto";
+
+message Response_DeckShareList {
+    extend Response {
+        optional Response_DeckShareList ext = 1104;
+    }
+    optional string name = 1;
+    optional uint64 expires_at = 2;
+    repeated ServerInfo_DeckShareItem items = 3;
+}

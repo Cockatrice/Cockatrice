@@ -439,3 +439,19 @@ ssl_cert=ssl_cert.pem
 
 ; Filename of the private key for the server-to-server certificate
 ssl_key=ssl_key.pem
+
+
+[deck_share]
+
+; How many days a created deck share link remains valid before it expires.
+; Default: 7
+expiry_days=7
+
+; How often (in minutes) the server checks for and removes expired deck shares.
+; A value of 0 disables the automatic cleanup.
+; Default: 60
+cleanup_interval=60
+
+; Maximum number of decks a single share link can contain.
+; Default: 50
+max_decks_per_share=50

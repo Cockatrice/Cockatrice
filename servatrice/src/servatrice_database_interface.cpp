@@ -7,6 +7,7 @@
 #include <QChar>
 #include <QDateTime>
 #include <QDebug>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLoggingCategory>
@@ -1024,6 +1025,127 @@ DeckList *Servatrice_DatabaseInterface::getDeckFromDatabase(int deckId, int user
     deck->loadFromString_Native(query->value(0).toString());
 
     return deck;
+}
+
+bool Servatrice_DatabaseInterface::createDeckShare(const QString &token,
+                                                   const QString &name,
+                                                   int userId,
+                                                   const QList<DeckShareItemRecord> &items,
+                                                   int expiryDays)
+{
+    checkSql();
+
+    if (items.isEmpty()) {
+        return false;
+    }
+
+    sqlDatabase.transaction();
+
+    QSqlQuery *query = prepareQuery("insert into {prefix}_deck_share (token, name, created_by, created_at, expires_at) "
+                                    "values (:token, :name, :created_by, NOW(), DATE_ADD(NOW(), INTERVAL :days DAY))");
+    query->bindValue(":token", token);
+    query->bindValue(":name", name);
+    query->bindValue(":created_by", userId < 1 ? QVariant() : userId);
+    query->bindValue(":days", expiryDays);
+    if (!execSqlQuery(query)) {
+        sqlDatabase.rollback();
+        return false;
+    }
+
+    const int shareId = query->lastInsertId().toInt();
+    for (int i = 0; i < items.size(); ++i) {
+        const DeckShareItemRecord &item = items.at(i);
+        QSqlQuery *itemQuery = prepareQuery("insert into {prefix}_deck_share_item (share_id, name, tags, banner_card, "
+                                            "game_format, color_identity, content, position) values (:share_id, :name, "
+                                            ":tags, :banner_card, :game_format, :color_identity, :content, :position)");
+        itemQuery->bindValue(":share_id", shareId);
+        itemQuery->bindValue(":name", item.name);
+        QJsonArray tagArray;
+        for (const QString &tag : item.tags) {
+            tagArray.append(tag);
+        }
+        itemQuery->bindValue(":tags", QString::fromUtf8(QJsonDocument(tagArray).toJson(QJsonDocument::Compact)));
+        itemQuery->bindValue(":banner_card", item.bannerCard);
+        itemQuery->bindValue(":game_format", item.gameFormat);
+        itemQuery->bindValue(":color_identity", item.colorIdentity);
+        itemQuery->bindValue(":content", item.content);
+        itemQuery->bindValue(":position", i);
+        if (!execSqlQuery(itemQuery)) {
+            sqlDatabase.rollback();
+            return false;
+        }
+    }
+
+    sqlDatabase.commit();
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getDeckShareList(const QString &token,
+                                                    QString &name,
+                                                    qint64 &expiresAt,
+                                                    QList<DeckShareItemRecord> &items)
+{
+    checkSql();
+
+    QSqlQuery *query =
+        prepareQuery("select id, name, UNIX_TIMESTAMP(expires_at) from {prefix}_deck_share where token = "
+                     ":token and expires_at > now()");
+    query->bindValue(":token", token);
+    execSqlQuery(query);
+    if (!query->next()) {
+        return false;
+    }
+
+    const int shareId = query->value(0).toInt();
+    name = query->value(1).toString();
+    expiresAt = query->value(2).toLongLong();
+    items.clear();
+
+    QSqlQuery *itemQuery =
+        prepareQuery("select id, name, tags, banner_card, game_format, color_identity from {prefix}_deck_share_item "
+                     "where share_id = :share_id order by position");
+    itemQuery->bindValue(":share_id", shareId);
+    execSqlQuery(itemQuery);
+    while (itemQuery->next()) {
+        DeckShareItemRecord item;
+        item.id = itemQuery->value(0).toInt();
+        item.name = itemQuery->value(1).toString();
+        const QJsonArray tagArray = QJsonDocument::fromJson(itemQuery->value(2).toString().toUtf8()).array();
+        for (const QJsonValue &tag : tagArray) {
+            item.tags.append(tag.toString());
+        }
+        item.bannerCard = itemQuery->value(3).toString();
+        item.gameFormat = itemQuery->value(4).toString();
+        item.colorIdentity = itemQuery->value(5).toString();
+        items.append(item);
+    }
+
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::getDeckShareItem(const QString &token, int itemId, QString &content)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select i.content from {prefix}_deck_share_item i join {prefix}_deck_share s on "
+                                    "s.id = i.share_id where s.token = :token and s.expires_at > now() and i.id = :id");
+    query->bindValue(":token", token);
+    query->bindValue(":id", itemId);
+    execSqlQuery(query);
+    if (!query->next()) {
+        return false;
+    }
+
+    content = query->value(0).toString();
+    return true;
+}
+
+void Servatrice_DatabaseInterface::cleanupExpiredDeckShares()
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("delete from {prefix}_deck_share where expires_at < now()");
+    execSqlQuery(query);
 }
 
 void Servatrice_DatabaseInterface::logMessage(const int senderId,
