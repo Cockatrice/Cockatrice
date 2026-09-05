@@ -174,16 +174,18 @@ void CardGroupDisplayWidget::updateCardDisplays()
         QModelIndex sourceIndex = proxy.mapToSource(proxyIndex);
 
         // 4. persist the source index
-        QPersistentModelIndex persistent(sourceIndex);
+        addCardWidgets(QPersistentModelIndex(sourceIndex));
+    }
+}
 
-        // Get the card amount
-        int cardAmount =
-            sourceIndex.sibling(sourceIndex.row(), DeckListModelColumns::CARD_AMOUNT).data(Qt::EditRole).toInt();
+void CardGroupDisplayWidget::addCardWidgets(const QPersistentModelIndex &persistent)
+{
+    // Get the card amount
+    int cardAmount = persistent.sibling(persistent.row(), DeckListModelColumns::CARD_AMOUNT).data(Qt::EditRole).toInt();
 
-        // Create multiple widgets for the card count
-        for (int copy = 0; copy < cardAmount; ++copy) {
-            addToLayout(constructWidgetForIndex(persistent));
-        }
+    // Create multiple widgets for the card count
+    for (int copy = 0; copy < cardAmount; ++copy) {
+        addToLayout(constructWidgetForIndex(persistent));
     }
 }
 
