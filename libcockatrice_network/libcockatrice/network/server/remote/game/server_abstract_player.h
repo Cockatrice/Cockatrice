@@ -47,6 +47,7 @@ public:
     {
         return deck;
     }
+    void setDeck(DeckList *_deck);
     bool getReadyStart() const
     {
         return readyStart;
