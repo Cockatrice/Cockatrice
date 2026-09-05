@@ -9,7 +9,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # Use compiler cache (ccache)
-option(USE_CCACHE "Cache the build results with ccache" OFF)
+option(USE_CCACHE "Cache the build results with ccache" ON)
 # Treat warnings as errors (Debug builds only)
 option(WARNING_AS_ERROR "Treat warnings as errors in debug builds" ON)
 # Check for translation updates
@@ -39,7 +39,11 @@ else()
   )
 endif()
 
-if(USE_CCACHE)
+# ccache does not support MSVC and must not auto-engage on Windows
+# (it is installed unintentionally on the Windows CI runner).
+# NOTE: this keys off the target OS, so a mingw/Ninja configuration on Windows
+# also opts out of ccache even though the GNUCXX branch below supports it.
+if(USE_CCACHE AND NOT WIN32)
   find_program(CCACHE_PROGRAM ccache)
   if(CCACHE_PROGRAM)
     # Support Unix Makefiles and Ninja
@@ -50,6 +54,9 @@ if(USE_CCACHE)
     execute_process(COMMAND ${CCACHE_PROGRAM} --set-config sloppiness=pch_defines,time_macros)
     message(STATUS "Found CCache ${CCACHE_PROGRAM}")
   endif()
+elseif(USE_CCACHE AND WIN32)
+  # An explicit opt-in must not disappear silently on Windows.
+  message(STATUS "ccache disabled: not supported for the MSVC toolchain on Windows")
 endif()
 
 if(WIN32 OR USE_VCPKG)
