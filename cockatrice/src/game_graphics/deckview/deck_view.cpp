@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/deck_list/deck_list.h>
-#include <libcockatrice/deck_list/tree/deck_list_card_node.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 
 DeckViewCardDragItem::DeckViewCardDragItem(DeckViewCard *_item,
@@ -381,12 +380,10 @@ void DeckViewScene::rebuildTree()
             addItem(container);
         }
 
-        for (int j = 0; j < currentZone->size(); j++) {
-            auto *currentCard = dynamic_cast<DecklistCardNode *>(currentZone->at(j));
-            if (!currentCard) {
-                continue;
-            }
-
+        // Cards in custom zones nested under a board are regular board cards in-game.
+        // They are collected recursively (like every other consumer) and reported with
+        // the top-level board zone as their origin, so that sideboard plans keep working.
+        for (auto *currentCard : deck->getCardNodes({currentZone->getName()})) {
             for (int k = 0; k < currentCard->getNumber(); ++k) {
                 auto *newCard = new DeckViewCard(container, currentCard->toCardRef(), currentZone->getName());
                 container->addCard(newCard);
