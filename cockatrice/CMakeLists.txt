@@ -322,6 +322,8 @@ set(cockatrice_SOURCES
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_display_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_tag_item_widget.cpp
     src/interface/widgets/visual_deck_storage/deck_preview/deck_preview_widget.cpp
+    src/interface/widgets/visual_deck_storage/deck_preview/public_deck_preview_widget.cpp
+    src/interface/widgets/visual_deck_storage/remote_public_decks_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_folder_display_widget.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_model.cpp
     src/interface/widgets/visual_deck_storage/visual_deck_storage_quick_settings_widget.cpp
@@ -381,6 +383,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/edhrec/display/top_tags/edhrec_top_tags_api_response_display_widget.cpp
     src/interface/widgets/tabs/api/edhrec/tab_edhrec.cpp
     src/interface/widgets/tabs/api/edhrec/tab_edhrec_main.cpp
+    src/interface/widgets/tabs/public_decks_quick_settings_widget.cpp
     src/interface/widgets/tabs/tab.cpp
     src/interface/widgets/tabs/tab_account.cpp
     src/interface/widgets/tabs/tab_admin.cpp
@@ -392,6 +395,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab_logs.cpp
     src/interface/widgets/tabs/tab_message.cpp
     src/interface/widgets/tabs/tab_moderation.cpp
+    src/interface/widgets/tabs/tab_public_decks.cpp
     src/interface/widgets/tabs/tab_report.cpp
     src/interface/widgets/tabs/tab_replays.cpp
     src/interface/widgets/tabs/tab_room.cpp
