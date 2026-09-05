@@ -45,12 +45,14 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_load_deck_from_website.cpp
     src/interface/widgets/dialogs/dlg_load_remote_deck.cpp
     src/interface/widgets/dialogs/dlg_local_game_options.cpp
+    src/interface/widgets/dialogs/dlg_login_prompt.cpp
     src/interface/widgets/dialogs/dlg_manage_sets.cpp
     src/interface/widgets/dialogs/dlg_my_reports.cpp
     src/interface/widgets/dialogs/dlg_register.cpp
     src/interface/widgets/dialogs/dlg_report_user.cpp
     src/interface/widgets/dialogs/dlg_select_set_for_cards.cpp
     src/interface/widgets/dialogs/dlg_share_deck.cpp
+    src/interface/widgets/dialogs/dlg_shared_decks_preview.cpp
     src/interface/widgets/dialogs/dlg_settings.cpp
     src/interface/widgets/dialogs/dlg_startup_card_check.cpp
     src/interface/widgets/dialogs/dlg_tip_of_the_day.cpp
@@ -59,6 +61,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/override_printing_warning.cpp
     src/interface/widgets/dialogs/tip_of_the_day.cpp
     src/interface/widgets/deck_share/deck_share_utils.cpp
+    src/interface/widgets/deck_share/shared_deck_preview_widget.cpp
     src/interface/widgets/deck_share/share_bar_widget.cpp
     src/filters/deck_filter_string.cpp
     src/filters/filter_builder.cpp
@@ -444,6 +447,8 @@ set(cockatrice_SOURCES
     src/interface/intents/intent_login.h
     src/interface/intents/intent_open_server_room_by_name.cpp
     src/interface/intents/intent_open_server_room_by_name.h
+    src/interface/intents/intent_open_shared_deck.cpp
+    src/interface/intents/intent_open_shared_deck.h
     src/interface/intents/url_parser.cpp
     src/interface/intents/url_parser.h
     src/interface/widgets/server/user/user_info_popup.cpp

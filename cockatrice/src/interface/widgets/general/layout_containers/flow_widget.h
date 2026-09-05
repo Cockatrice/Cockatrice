@@ -11,6 +11,7 @@
 #include "../../../layouts/flow_layout.h"
 
 #include <QHBoxLayout>
+#include <QKeyEvent>
 #include <QLoggingCategory>
 #include <QScrollArea>
 #include <QWidget>
@@ -44,6 +45,7 @@ public slots:
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     Qt::Orientation flowDirection;

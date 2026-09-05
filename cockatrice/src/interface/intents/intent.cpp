@@ -2,10 +2,11 @@
 
 Intent::Intent(QObject *parent) : QObject(parent)
 {
-    // An intent is done as soon as it reports success or failure. Deleting it
-    // also tears down its dependency chain and disconnects any signal wiring.
+    // An intent is done as soon as it reports success, failure, or cancellation.
+    // Deleting it also tears down its dependency chain and disconnects any signal wiring.
     connect(this, &Intent::finished, this, &QObject::deleteLater);
     connect(this, &Intent::failed, this, &QObject::deleteLater);
+    connect(this, &Intent::cancelled, this, &QObject::deleteLater);
 }
 
 Intent::~Intent() = default;
@@ -44,5 +45,13 @@ void Intent::emitFailed(const QString &reason)
     if (!completed) {
         completed = true;
         emit failed(reason);
+    }
+}
+
+void Intent::emitCancelled()
+{
+    if (!completed) {
+        completed = true;
+        emit cancelled();
     }
 }
