@@ -92,6 +92,11 @@ void PlayerListWidget::retranslateUi()
 
 void PlayerListWidget::addPlayer(const ServerInfo_PlayerProperties &player)
 {
+    if (players.contains(player.player_id())) {
+        updatePlayerProperties(player);
+        return;
+    }
+
     QTreeWidgetItem *newPlayer = new PlayerListTWI;
     players.insert(player.player_id(), newPlayer);
     updatePlayerProperties(player);

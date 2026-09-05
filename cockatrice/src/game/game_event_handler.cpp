@@ -430,12 +430,13 @@ void GameEventHandler::eventJoin(const Event_Join &event, int /*eventPlayerId*/,
     QString playerName = QString::fromStdString(playerInfo.user_info().name());
     emit addPlayerToAutoCompleteList(playerName);
 
-    if (game->getPlayerManager()->getPlayers().contains(playerId)) {
+    PlayerManager *playerManager = game->getPlayerManager();
+    if (playerManager->getPlayers().contains(playerId) || playerManager->getSpectators().contains(playerId)) {
         return;
     }
 
     if (playerInfo.spectator()) {
-        game->getPlayerManager()->addSpectator(playerId, playerInfo);
+        playerManager->addSpectator(playerId, playerInfo);
         emit logJoinSpectator(playerName);
         emit spectatorJoined(playerInfo);
     } else {
