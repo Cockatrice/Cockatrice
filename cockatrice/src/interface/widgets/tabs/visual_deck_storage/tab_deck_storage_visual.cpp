@@ -194,7 +194,7 @@ void TabDeckStorageVisual::handleConnectionChanged(ClientStatus status)
 
 void TabDeckStorageVisual::showShareNotice(const QString &message, bool warning)
 {
-    QMessageBox box(warning ? QMessageBox::Warning : QMessageBox::Information, tr("Deck share"), message,
+    QMessageBox box(warning ? QMessageBox::Warning : QMessageBox::Information, tr("Share link"), message,
                     QMessageBox::Ok, this);
     box.exec();
 }
