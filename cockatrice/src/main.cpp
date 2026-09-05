@@ -26,7 +26,6 @@
 #include "client/url_scheme_event_filter.h"
 #include "database/interface/settings_card_preference_provider.h"
 #include "interface/intents/intent_open_local_deck.h"
-#include "interface/intents/url_parser.h"
 #include "interface/logger.h"
 #include "interface/pixel_map_generator.h"
 #include "interface/theme_manager.h"
@@ -45,6 +44,7 @@
 #include <QMessageBox>
 #include <QSystemTrayIcon>
 #include <QTranslator>
+#include <algorithm>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/rng/rng_sfmt.h>
 #include <libcockatrice/settings/appearance_settings.h>
@@ -273,10 +273,12 @@ int main(int argc, char *argv[])
     SingleInstanceManager instance;
 
     if (hasActivationFiles) {
+        qInfo() << "Activation launch, files:" << startupFiles;
         // Activation launch: hand off to the primary instance if one is
         // running, otherwise become the primary ourselves. Do this before
         // constructing the main window so a hand-off exits cheaply.
         if (!instance.tryRun(startupFiles)) {
+            qInfo() << "Handed off to a running instance, exiting";
             // Sent successfully → exit
             return 0;
         }
@@ -325,10 +327,22 @@ int main(int argc, char *argv[])
 
     MainWindow ui;
 
+    // A URL launch must own the connection: the intent chain triggered by the
+    // URL connects to the server named in the URL, so the window's own startup
+    // auto-connect must not race against it (two connectToServer calls tear
+    // each other down via doDisconnectFromServer).
+    const bool hasUrlActivation = std::any_of(startupFiles.begin(), startupFiles.end(), [](const QString &file) {
+        return file.startsWith(QStringLiteral("cockatrice://"));
+    });
+    ui.setSkipStartupAutoConnect(hasUrlActivation);
+
     auto handleActivation = [&ui](const QString &file) {
         if (file.startsWith("cockatrice://")) {
-            auto urlParser = new IntentUrlParser(&ui, &ui);
-            urlParser->handle(file);
+            qInfo() << "Handling URL activation:" << file;
+            // Route through the window's persistent url parser: it serializes
+            // link chains so activations handed over while another chain is
+            // still connecting do not connect concurrently.
+            ui.handleCockatriceLink(file);
         } else if (QFileInfo(file).exists()) {
             auto openDeckIntent = new IntentOpenLocalDeck(ui.getTabSupervisor(), file);
             QObject::connect(openDeckIntent, &Intent::failed, &ui, [&ui](const QString &reason) {

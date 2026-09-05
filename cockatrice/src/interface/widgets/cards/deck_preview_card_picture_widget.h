@@ -20,13 +20,28 @@ class DeckPreviewCardPictureWidget final : public CardInfoPictureWithTextOverlay
     Q_OBJECT
 
 public:
+    /**
+     * @brief Constructs a DeckPreviewCardPictureWidget.
+     * @param parent The parent widget.
+     * @param hoverToZoomEnabled If this widget will spawn a larger widget when hovered over.
+     * @param raiseOnEnter If the widget raises its border when the mouse enters.
+     * @param textColor The color of the overlay text.
+     * @param outlineColor The color of the outline around the text.
+     * @param fontSize The font size of the overlay text.
+     * @param alignment The alignment of the text within the overlay.
+     * @param emitClickImmediately If true, a left click is reported immediately on click
+     *        instead of after the double-click interval. Use this for selection surfaces
+     *        where reacting to a double-click (select-and-open) would needlessly delay the
+     *        single-click feedback. The double-click signal is still emitted.
+     */
     explicit DeckPreviewCardPictureWidget(QWidget *parent,
                                           bool hoverToZoomEnabled = false,
                                           bool raiseOnEnter = false,
                                           const QColor &textColor = Qt::white,
                                           const QColor &outlineColor = Qt::black,
                                           int fontSize = 12,
-                                          Qt::Alignment alignment = Qt::AlignCenter);
+                                          Qt::Alignment alignment = Qt::AlignCenter,
+                                          bool _emitClickImmediately = false);
 
 signals:
     void imageClicked(QMouseEvent *event, DeckPreviewCardPictureWidget *instance);
@@ -36,6 +51,7 @@ signals:
 private:
     QTimer *singleClickTimer;
     QMouseEvent *lastMouseEvent = nullptr; // Store the last mouse event
+    bool emitClickImmediately;
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
