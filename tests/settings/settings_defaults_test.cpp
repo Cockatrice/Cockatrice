@@ -571,6 +571,19 @@ TEST_F(SettingsDefaultsTest, VisualDeckStorage_DefaultTagsList_SetAndGet)
     ASSERT_EQ(s.getVisualDeckStorageDefaultTagsList(), custom);
 }
 
+TEST_F(SettingsDefaultsTest, VisualDeckStorage_ShowUploadTime_Default)
+{
+    VisualDeckStorageSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getVisualDeckStorageShowUploadTime(), true);
+}
+
+TEST_F(SettingsDefaultsTest, VisualDeckStorage_ShowUploadTime_SetAndGet)
+{
+    VisualDeckStorageSettings s(settingsPath, nullptr);
+    s.setVisualDeckStorageShowUploadTime(false);
+    ASSERT_EQ(s.getVisualDeckStorageShowUploadTime(), false);
+}
+
 } // namespace
 
 int main(int argc, char **argv)

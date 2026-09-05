@@ -130,6 +130,11 @@ bool VisualDeckStorageSettings::getVisualDeckStorageShowTagsOnDeckPreviews() con
     return getValue("showTagsOnDeckPreviews", "interface", "visualDeckStorage", true).toBool();
 }
 
+bool VisualDeckStorageSettings::getVisualDeckStorageShowUploadTime() const
+{
+    return getValue("showUploadTime", "interface", "visualDeckStorage", true).toBool();
+}
+
 bool VisualDeckStorageSettings::getVisualDeckStorageDrawUnusedColorIdentities() const
 {
     return getValue("drawUnusedColorIdentities", "interface", "visualDeckStorage", true).toBool();
@@ -218,6 +223,12 @@ void VisualDeckStorageSettings::setVisualDeckStorageShowTagsOnDeckPreviews(bool 
 {
     setValue(_showTags, "showTagsOnDeckPreviews", "interface", "visualDeckStorage");
     emit visualDeckStorageShowTagsOnDeckPreviewsChanged(_showTags);
+}
+
+void VisualDeckStorageSettings::setVisualDeckStorageShowUploadTime(bool value)
+{
+    setValue(value, "showUploadTime", "interface", "visualDeckStorage");
+    emit visualDeckStorageShowUploadTimeChanged(value);
 }
 
 void VisualDeckStorageSettings::setVisualDeckStorageDrawUnusedColorIdentities(bool _draw)
