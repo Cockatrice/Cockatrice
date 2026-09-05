@@ -72,7 +72,11 @@ void DlgShareDeck::shareFinished(const Response &response, const CommandContaine
 
     const Response_DeckShareCreate &resp = response.GetExtension(Response_DeckShareCreate::ext);
     const QString token = QString::fromStdString(resp.token());
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     const QDateTime expiry = QDateTime::fromSecsSinceEpoch(resp.expires_at(), QTimeZone::UTC);
+#else
+    const QDateTime expiry = QDateTime::fromSecsSinceEpoch(resp.expires_at(), Qt::UTC);
+#endif
 
     const QString link = DeckShareUtils::buildShareLink(client, token);
     DeckShareUtils::copyShareLinkToClipboard(link);
