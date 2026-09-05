@@ -143,6 +143,7 @@ public:
 private slots:
     void statusUpdate();
     void shutdownTimeout();
+    void cleanupExpiredDeckShares();
 
 protected:
     void doSendIslMessage(const IslMessage &msg, int _serverId) override;
@@ -156,6 +157,7 @@ private:
     AuthenticationMethod authenticationMethod;
     DatabaseType databaseType;
     QTimer *pingClock, *statusUpdateClock;
+    QTimer *deckShareCleanupClock;
     Servatrice_GameServer *gameServer;
     Servatrice_WebsocketGameServer *websocketGameServer;
     Servatrice_IslServer *islServer;
@@ -267,6 +269,9 @@ public:
     int getMaxGameInactivityTime() const override;
     int getMaxPlayerInactivityTime() const override;
     int getClientKeepAlive() const override;
+    int getDeckShareExpiryDays() const;
+    int getDeckShareCleanupInterval() const;
+    int getDeckShareMaxDecksPerShare() const;
     int getMaxUsersPerAddress() const;
     int getMessageCountingInterval() const override;
     int getMaxMessageCountPerInterval() const override;
