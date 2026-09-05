@@ -21,6 +21,7 @@
 #include "tab_logs.h"
 #include "tab_message.h"
 #include "tab_moderation.h"
+#include "tab_public_decks.h"
 #include "tab_replays.h"
 #include "tab_report.h"
 #include "tab_room.h"
@@ -273,6 +274,10 @@ void TabSupervisor::retranslateUi()
     QMapIterator<int, TabGame *> gameIterator(gameTabs);
     while (gameIterator.hasNext()) {
         tabs.append(gameIterator.next().value());
+    }
+    QMapIterator<QString, TabPublicDecks *> publicDecksIterator(publicDecksTabs);
+    while (publicDecksIterator.hasNext()) {
+        tabs.append(publicDecksIterator.next().value());
     }
     QListIterator<TabGame *> replayIterator(replayTabs);
     while (replayIterator.hasNext()) {
@@ -1034,6 +1039,30 @@ void TabSupervisor::roomLeft(TabRoom *tab)
     }
 
     roomTabs.remove(tab->getRoomId());
+    removeTab(indexOf(tab));
+}
+
+void TabSupervisor::openTabPublicDecks(const QString &userName)
+{
+    if (auto *existing = publicDecksTabs.value(userName, nullptr)) {
+        setCurrentWidget(existing);
+        return;
+    }
+
+    auto *tab = new TabPublicDecks(this, client, userName);
+    connect(tab, &TabPublicDecks::closing, this, &TabSupervisor::publicDecksClosed);
+    myAddTab(tab);
+    publicDecksTabs.insert(userName, tab);
+    setCurrentWidget(tab);
+}
+
+void TabSupervisor::publicDecksClosed(TabPublicDecks *tab)
+{
+    if (tab == currentWidget()) {
+        emit setMenu();
+    }
+
+    publicDecksTabs.remove(tab->getUserName());
     removeTab(indexOf(tab));
 }
 

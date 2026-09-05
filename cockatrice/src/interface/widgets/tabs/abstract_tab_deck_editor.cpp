@@ -324,6 +324,7 @@ bool AbstractTabDeckEditor::actSaveDeck()
         Command_DeckUpload cmd;
         cmd.set_deck_id(static_cast<google::protobuf::uint32>(loadedDeck.lastLoadInfo.remoteDeckId));
         cmd.set_deck_list(deckString.toStdString());
+        cmd.set_tags(loadedDeck.deckList.getTags().join(QStringLiteral(",")).toStdString());
 
         PendingCommand *pend = AbstractClient::prepareSessionCommand(cmd);
         connect(pend, &PendingCommand::finished, this, &AbstractTabDeckEditor::saveDeckRemoteFinished);
