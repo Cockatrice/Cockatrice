@@ -42,7 +42,8 @@ private:
 
     QAction *aOpenLocalDeck, *aRenameLocal, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
     QAction *aOpenDecksFolder;
-    QAction *aOpenRemoteDeck, *aDownload, *aShareDecks, *aNewFolder, *aDeleteRemoteDeck;
+    QAction *aOpenRemoteDeck, *aDownload, *aShareDecks, *aPublishDeck, *aNewFolder, *aDeleteRemoteDeck;
+    int pendingVisibilityChanges = 0;
     QString getTargetPath() const;
 
     void setRemoteEnabled(bool enabled);
@@ -89,6 +90,9 @@ private slots:
     void onServerSelectionChanged();
     void shareFromTreeFinished(const Response &r, const CommandContainer &commandContainer);
     void onShareFromTreeTimeout();
+
+    void actPublishDeck();
+    void setVisibilityFinished(const Response &r, const CommandContainer &commandContainer);
 
     void actDeleteRemoteDeck();
     void deleteFolderFinished(const Response &response, const CommandContainer &commandContainer);
