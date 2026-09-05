@@ -375,15 +375,32 @@ void DeckLoader::saveToStream_DeckHeader(QTextStream &out, const DeckList &deckL
 void DeckLoader::saveToStream_DeckZone(QTextStream &out,
                                        const InnerDecklistNode *zoneNode,
                                        bool addComments,
-                                       bool addSetNameAndNumber)
+                                       bool addSetNameAndNumber,
+                                       const QString &boardZoneName)
 {
+    // Nested sub-zones keep their owning board's identity: the top-level call
+    // passes no board, so the zone's own name is used; recursive calls carry the
+    // owning board down so the sideboard marker survives sub-zone nesting.
+    const QString owningBoardZoneName = boardZoneName.isEmpty() ? zoneNode->getName() : boardZoneName;
+
     // group cards by card type and count the subtotals
     QMultiMap<QString, DecklistCardNode *> cardsByType;
     QMap<QString, int> cardTotalByType;
     int cardTotal = 0;
+    QList<const InnerDecklistNode *> subZones;
 
     for (int j = 0; j < zoneNode->size(); j++) {
         auto *card = dynamic_cast<DecklistCardNode *>(zoneNode->at(j));
+        if (!card) {
+            // Cards collected in nested sub-zones are exported by recursion so
+            // they don't end up invisible in the plain text output. They are
+            // deferred until after this zone's own header and cards so they read
+            // as part of this zone's block.
+            if (auto *subZone = dynamic_cast<const InnerDecklistNode *>(zoneNode->at(j))) {
+                subZones.append(subZone);
+            }
+            continue;
+        }
 
         CardInfoPtr info = CardDatabaseManager::query()->getCardInfo(card->getName());
         QString cardType = info ? info->getMainCardType() : "unknown";
@@ -411,25 +428,30 @@ void DeckLoader::saveToStream_DeckZone(QTextStream &out,
 
         QList<DecklistCardNode *> cards = cardsByType.values(cardType);
 
-        saveToStream_DeckZoneCards(out, zoneNode, cards, addComments, addSetNameAndNumber);
+        saveToStream_DeckZoneCards(out, cards, addComments, addSetNameAndNumber, owningBoardZoneName);
 
         if (addComments) {
             out << "\n";
         }
     }
+
+    // Nested sub-zones come last, after the parent's own header and cards.
+    for (const auto *subZone : subZones) {
+        saveToStream_DeckZone(out, subZone, addComments, addSetNameAndNumber, owningBoardZoneName);
+    }
 }
 
 void DeckLoader::saveToStream_DeckZoneCards(QTextStream &out,
-                                            const InnerDecklistNode *zoneNode,
                                             QList<DecklistCardNode *> cards,
                                             bool addComments,
-                                            bool addSetNameAndNumber)
+                                            bool addSetNameAndNumber,
+                                            const QString &boardZoneName)
 {
     // QMultiMap sorts values in reverse order
     for (int i = cards.size() - 1; i >= 0; --i) {
         DecklistCardNode *card = cards[i];
 
-        if (zoneNode->getName() == DECK_ZONE_SIDE && addComments) {
+        if (boardZoneName == DECK_ZONE_SIDE && addComments) {
             out << "SB: ";
         }
 
@@ -510,9 +532,26 @@ bool DeckLoader::convertToCockatriceFormat(LoadedDeck &deck)
 
 void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode *node)
 {
+    if (!node || node->isEmpty()) {
+        return;
+    }
+
     const int totalColumns = 2;
 
-    if (node->height() == 1) {
+    // Dispatch children by type instead of trusting a whole-node height: a deck
+    // node may hold direct cards and nested zones side by side (custom zones),
+    // and an empty node would previously crash on at(0).
+    QVector<const AbstractDecklistCardNode *> cards;
+    QVector<const InnerDecklistNode *> subZones;
+    for (int i = 0; i < node->size(); i++) {
+        if (auto *card = dynamic_cast<const AbstractDecklistCardNode *>(node->at(i))) {
+            cards.append(card);
+        } else if (auto *zone = dynamic_cast<const InnerDecklistNode *>(node->at(i))) {
+            subZones.append(zone);
+        }
+    }
+
+    if (!cards.isEmpty()) {
         QTextBlockFormat blockFormat;
         QTextCharFormat charFormat;
         charFormat.setFontPointSize(11);
@@ -523,9 +562,9 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode 
         tableFormat.setCellPadding(0);
         tableFormat.setCellSpacing(0);
         tableFormat.setBorder(0);
-        QTextTable *table = cursor->insertTable(node->size() + 1, totalColumns, tableFormat);
-        for (int i = 0; i < node->size(); i++) {
-            auto *card = dynamic_cast<AbstractDecklistCardNode *>(node->at(i));
+        QTextTable *table = cursor->insertTable(cards.size() + 1, totalColumns, tableFormat);
+        for (int i = 0; i < cards.size(); i++) {
+            const AbstractDecklistCardNode *card = cards[i];
 
             QTextCharFormat cellCharFormat;
             cellCharFormat.setFontPointSize(9);
@@ -540,7 +579,13 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode 
             cellCursor = cell.firstCursorPosition();
             cellCursor.insertText(card->getName());
         }
-    } else if (node->height() == 2) {
+    }
+
+    for (const InnerDecklistNode *subZone : subZones) {
+        if (subZone->isEmpty()) {
+            continue;
+        }
+
         QTextBlockFormat blockFormat;
         QTextCharFormat charFormat;
         charFormat.setFontPointSize(14);
@@ -559,10 +604,8 @@ void DeckLoader::printDeckListNode(QTextCursor *cursor, const InnerDecklistNode 
         tableFormat.setColumnWidthConstraints(constraints);
 
         QTextTable *table = cursor->insertTable(1, totalColumns, tableFormat);
-        for (int i = 0; i < node->size(); i++) {
-            QTextCursor cellCursor = table->cellAt(0, (i * totalColumns) / node->size()).lastCursorPosition();
-            printDeckListNode(&cellCursor, dynamic_cast<InnerDecklistNode *>(node->at(i)));
-        }
+        QTextCursor cellCursor = table->cellAt(0, 0).firstCursorPosition();
+        printDeckListNode(&cellCursor, subZone);
     }
 
     cursor->movePosition(QTextCursor::End);

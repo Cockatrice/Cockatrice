@@ -94,6 +94,9 @@ AbstractDecklistNode *InnerDecklistNode::findCardChildByNameProviderIdAndNumber(
 
 int InnerDecklistNode::height() const
 {
+    if (isEmpty()) {
+        return 1;
+    }
     return at(0)->height() + 1;
 }
 
