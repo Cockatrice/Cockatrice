@@ -11,7 +11,7 @@ add_test(NAME parse_cipt_test COMMAND parse_cipt_test)
 # Oracle importer unit tests
 add_executable(
   oracle_importer_test ${VERSION_STRING_CPP} ../../oracle/src/oracleimporter.cpp ../../oracle/src/parsehelpers.cpp
-                       oracle_importer_test.cpp
+                       ../../oracle/src/raw_json_scanner.cpp oracle_importer_test.cpp
 )
 
 if(NOT GTEST_FOUND)
@@ -51,7 +51,7 @@ endif()
 add_executable(
   oracle_importer_benchmark_test
   ${VERSION_STRING_CPP} ../../oracle/src/oracleimporter.cpp ../../oracle/src/parsehelpers.cpp
-  oracle_importer_benchmark_test.cpp ${_ORACLE_BENCH_EXTRA_SOURCES}
+  ../../oracle/src/raw_json_scanner.cpp oracle_importer_benchmark_test.cpp ${_ORACLE_BENCH_EXTRA_SOURCES}
 )
 
 if(NOT GTEST_FOUND)

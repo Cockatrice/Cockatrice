@@ -157,9 +157,10 @@ TEST(OracleBenchmark, ParseJsonThroughput)
 
     for (int i = 0; i < iterations; ++i) {
         OracleImporter importer;
+        QByteArray source = data;
         QElapsedTimer timer;
         timer.start();
-        bool ok = importer.readSetsFromByteArray(data);
+        bool ok = importer.readSetsFromByteArray(std::move(source));
         ASSERT_TRUE(ok);
         totalMs += timer.elapsed();
     }
@@ -448,7 +449,7 @@ TEST(OracleBenchmark, ImportRamUsage)
 
     QElapsedTimer timer;
     timer.start();
-    ASSERT_TRUE(importer.readSetsFromByteArray(data));
+    ASSERT_TRUE(importer.readSetsFromByteArray(std::move(data)));
     const qint64 parseMs = timer.elapsed();
     const MemorySnapshot afterParse = MemorySnapshot::current();
 
@@ -540,7 +541,7 @@ TEST(OracleBenchmark, ImportRamUsageAllPrintings)
 
     QElapsedTimer timer;
     timer.start();
-    ASSERT_TRUE(importer.readSetsFromByteArray(setsData));
+    ASSERT_TRUE(importer.readSetsFromByteArray(std::move(setsData)));
     const qint64 parseMs = timer.elapsed();
     const MemorySnapshot afterParse = MemorySnapshot::current();
 
