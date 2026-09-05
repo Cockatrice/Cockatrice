@@ -10,6 +10,7 @@
 #include "../interface/widgets/server/handle_public_servers.h"
 #include "../interface/widgets/server/user/user_info_connection.h"
 
+#include <QCheckBox>
 #include <QDialog>
 #include <QLineEdit>
 #include <libcockatrice/utility/macros.h>
@@ -47,6 +48,22 @@ public:
     {
         return passwordEdit->text();
     }
+    //! \brief Stored "$scrypt$..." verifier for challenge-response servers (never the plaintext password).
+    [[nodiscard]] QString getStoredVerifier() const
+    {
+        return storedVerifier;
+    }
+    [[nodiscard]] QString getSaveName() const
+    {
+        // Trim so the profile lookup key always matches the name DlgConnect::actOk
+        // stored (it saves under saveEdit->text().trimmed()); otherwise a trailing
+        // space here misses the index and silently drops the saved verifier.
+        return saveEdit->text().trimmed();
+    }
+    [[nodiscard]] bool getSavePassword() const
+    {
+        return savePasswordCheckBox->isChecked();
+    }
 
 public slots:
     void downloadThePublicServers();
@@ -77,6 +94,7 @@ private:
     QPushButton *btnConnect, *btnForgotPassword, *btnRefreshServers, *btnDeleteServer;
     QMap<QString, std::pair<QString, UserConnection_Information>> savedHostList;
     HandlePublicServers *hps;
+    QString storedVerifier;
     const QString placeHolderText = tr("Downloading...");
 };
 #endif
