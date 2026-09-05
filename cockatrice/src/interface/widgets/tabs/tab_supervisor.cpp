@@ -1017,9 +1017,19 @@ void TabSupervisor::replayLeft(TabGame *tab)
 
 void TabSupervisor::joinReportGame(const int gameId, const int roomId)
 {
+    startSpectatorJoin(gameId, roomId, tr("Report joins are only available on a remote server."));
+}
+
+void TabSupervisor::spectatorJoinGame(const int gameId, const int roomId)
+{
+    startSpectatorJoin(gameId, roomId, tr("Spectating is only available on a remote server."));
+}
+
+void TabSupervisor::startSpectatorJoin(const int gameId, const int roomId, const QString &unavailableMessage)
+{
     auto *remoteClient = qobject_cast<RemoteClient *>(client);
     if (!remoteClient) {
-        actShowPopup(tr("Report joins are only available on a remote server."));
+        actShowPopup(unavailableMessage);
         return;
     }
 
