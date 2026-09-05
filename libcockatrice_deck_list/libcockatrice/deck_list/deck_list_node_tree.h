@@ -116,6 +116,25 @@ public:
     QList<const InnerDecklistNode *> getCustomZones(const QString &boardZoneName) const;
 
     /**
+     * @brief Checks whether a zone name is taken anywhere in the deck.
+     *
+     * Covers the standard board names and any top-level or nested custom zone.
+     * @param zoneName The checked name.
+     * @return true if the name is reserved or already in use.
+     */
+    bool hasZoneName(const QString &zoneName) const;
+
+    /**
+     * @brief Finds a custom zone anywhere in the deck by name.
+     *
+     * Walks the children of every top-level zone, so a zone nested under any
+     * board (and not just the standard ones) is found.
+     * @param zoneName The zone name to find.
+     * @return The matching zone node, or nullptr if none exists.
+     */
+    InnerDecklistNode *findCustomZoneByName(const QString &zoneName) const;
+
+    /**
      * @brief Applies a function to every card in the deck tree. This can modify the cards.
      *
      * @param func Function taking (top-level board zone node, card node). Cards nested
@@ -128,8 +147,6 @@ private:
     InnerDecklistNode *getZoneObjFromName(const QString &zoneName) const;
     InnerDecklistNode *findBoardZone(const QString &boardZoneName) const;
     InnerDecklistNode *findOrCreateBoardZone(const QString &boardZoneName);
-    InnerDecklistNode *findCustomZoneByName(const QString &zoneName) const;
-    bool hasZoneName(const QString &zoneName) const;
 };
 
 #endif // COCKATRICE_DECKLIST_NODE_TREE_H

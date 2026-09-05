@@ -43,6 +43,13 @@ void InnerDecklistNode::setSortMethod(DeckSortMethod method)
     }
 }
 
+const QList<QString> &InnerDecklistNode::boardZoneNames()
+{
+    static const QList<QString> names = {QString(DECK_ZONE_MAIN), QString(DECK_ZONE_SIDE),
+                                         QString(DECK_ZONE_MAYBEBOARD)};
+    return names;
+}
+
 QString InnerDecklistNode::getVisibleName() const
 {
     return visibleNameFromName(name);
