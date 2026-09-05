@@ -7,6 +7,7 @@
 #include "flow_widget.h"
 
 #include <QHBoxLayout>
+#include <QKeyEvent>
 #include <QResizeEvent>
 #include <QScrollArea>
 #include <QSizePolicy>
@@ -175,6 +176,50 @@ void FlowWidget::setMinimumSizeToMaxSizeHint()
 QLayoutItem *FlowWidget::itemAt(int index) const
 {
     return flowLayout->itemAt(index);
+}
+
+void FlowWidget::keyPressEvent(QKeyEvent *event)
+{
+    // Keyboard navigation between the flow items: arrow keys move focus just
+    // like clicking the sibling tiles would. Only items that can take keyboard
+    // focus (e.g. the deck-preview tiles in shared-deck links) are visited.
+    const bool moveForward = event->key() == Qt::Key_Right || event->key() == Qt::Key_Down;
+    const bool moveBackward = event->key() == Qt::Key_Left || event->key() == Qt::Key_Up;
+    if (!moveForward && !moveBackward) {
+        QWidget::keyPressEvent(event);
+        return;
+    }
+
+    QList<QWidget *> focusableItems;
+    for (int i = 0; i < flowLayout->count(); ++i) {
+        QWidget *item = flowLayout->itemAt(i)->widget();
+        if (item != nullptr && (item->focusPolicy() & Qt::TabFocus)) {
+            focusableItems.append(item);
+        }
+    }
+
+    if (focusableItems.isEmpty()) {
+        QWidget::keyPressEvent(event);
+        return;
+    }
+
+    int currentIndex = -1;
+    for (int i = 0; i < focusableItems.size(); ++i) {
+        if (focusableItems.at(i)->hasFocus()) {
+            currentIndex = i;
+            break;
+        }
+    }
+
+    const int delta = moveForward ? 1 : -1;
+    int nextIndex;
+    if (currentIndex < 0) {
+        nextIndex = moveForward ? 0 : focusableItems.size() - 1;
+    } else {
+        nextIndex = (currentIndex + delta + focusableItems.size()) % focusableItems.size();
+    }
+    focusableItems.value(nextIndex)->setFocus();
+    event->accept();
 }
 
 int FlowWidget::count() const
