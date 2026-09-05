@@ -27,14 +27,16 @@ DeckPreviewCardPictureWidget::DeckPreviewCardPictureWidget(QWidget *parent,
                                                            const QColor &textColor,
                                                            const QColor &outlineColor,
                                                            const int fontSize,
-                                                           const Qt::Alignment alignment)
+                                                           const Qt::Alignment alignment,
+                                                           const bool _emitClickImmediately)
     : CardInfoPictureWithTextOverlayWidget(parent,
                                            hoverToZoomEnabled,
                                            raiseOnEnter,
                                            textColor,
                                            outlineColor,
                                            fontSize,
-                                           alignment)
+                                           alignment),
+      emitClickImmediately(_emitClickImmediately)
 {
     singleClickTimer = new QTimer(this);
     singleClickTimer->setSingleShot(true);
@@ -50,8 +52,13 @@ DeckPreviewCardPictureWidget::DeckPreviewCardPictureWidget(QWidget *parent,
 void DeckPreviewCardPictureWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
-        lastMouseEvent = event;
-        singleClickTimer->start(QApplication::doubleClickInterval());
+        if (emitClickImmediately) {
+            emit imageClicked(event, this);
+            emit imageSingleClicked();
+        } else {
+            lastMouseEvent = event;
+            singleClickTimer->start(QApplication::doubleClickInterval());
+        }
     } else {
         emit imageClicked(event, this);
         event->accept();
@@ -61,7 +68,14 @@ void DeckPreviewCardPictureWidget::mousePressEvent(QMouseEvent *event)
 void DeckPreviewCardPictureWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
-        singleClickTimer->stop(); // Prevent single-click logic
-        emit imageDoubleClicked(lastMouseEvent, this);
+        if (emitClickImmediately) {
+            // Do not report a second single click for the second press of the
+            // double-click; the consumer maps the double-click to select+open.
+            lastMouseEvent = event;
+            emit imageDoubleClicked(event, this);
+        } else {
+            singleClickTimer->stop(); // Prevent single-click logic
+            emit imageDoubleClicked(lastMouseEvent, this);
+        }
     }
 }
