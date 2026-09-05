@@ -516,6 +516,8 @@ qt6_add_executable(
   MANUAL_FINALIZATION
 )
 
+target_precompile_headers(cockatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
+
 qt6_add_shaders(
   cockatrice
   "onboarding_shaders"

@@ -44,6 +44,10 @@ if(USE_CCACHE)
   if(CCACHE_PROGRAM)
     # Support Unix Makefiles and Ninja
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+    # PCH-aware caching, matching .ci/compile.sh: without this ccache refuses
+    # to cache any TU that consumes a precompiled header, so every PCH-backed
+    # target recompiles from scratch on each build.
+    execute_process(COMMAND ${CCACHE_PROGRAM} --set-config sloppiness=pch_defines,time_macros)
     message(STATUS "Found CCache ${CCACHE_PROGRAM}")
   endif()
 endif()
