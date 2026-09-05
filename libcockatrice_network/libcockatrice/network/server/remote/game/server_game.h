@@ -24,31 +24,38 @@
 #include "game_config.h"
 #include "server_deck_validation_strategy.h"
 #include "server_game_lifecycle_strategy.h"
+#include "server_match_game_factory.h"
 #include "server_match_result_strategy.h"
 
 #include <QDateTime>
 #include <QMap>
 #include <QMutex>
 #include <QObject>
+#include <QPointer>
 #include <QScopedPointer>
 #include <QSet>
 #include <QStringList>
 #include <libcockatrice/protocol/pb/event_leave.pb.h>
+#include <libcockatrice/protocol/pb/event_tournament_state.pb.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_game.pb.h>
 
 class QTimer;
+class DeckList;
 class GameEventContainer;
+class GameEventStorage;
 class GameReplay;
 class Server_Room;
 class Server_AbstractPlayer;
 class Server_AbstractParticipant;
+class Server_Card;
+class Server_Tournament;
 class ServerInfo_User;
 class ServerInfo_Game;
 class Server_AbstractUserInterface;
 class Event_GameStateChanged;
 
-class Server_Game : public QObject
+class Server_Game : public QObject, public Server_MatchGameFactory
 {
     Q_OBJECT
 private:
@@ -82,6 +89,14 @@ private:
     QTimer *pingClock;
     QList<GameReplay *> replayList;
     GameReplay *currentReplay;
+
+    bool isTournament;
+    TournamentSettings tournamentSettings;
+    Server_Tournament *tournament;
+    QPointer<Server_Game> tournamentParentGame;
+    int tournamentMatchPlayer1Id;
+    int tournamentMatchPlayer2Id;
+    bool disconnectRemovesPlayer;
 
     QScopedPointer<Server_DeckValidationStrategy> deckValidationStrategy;
 
@@ -220,6 +235,49 @@ public:
     void returnCardsFromPlayer(GameEventStorage &ges, Server_AbstractPlayer *player);
 
     /** @brief Get the current deck validation strategy (non-owning). */
+    bool getIsTournamentGame() const
+    {
+        return isTournament;
+    }
+    void setIsTournamentGame(bool _isTournament);
+    bool getIsTournament() const
+    {
+        return tournament != nullptr;
+    }
+    Server_Tournament *getTournament() const
+    {
+        return tournament;
+    }
+    void startTournament();
+    void setPlayerTournamentDeck(int playerId, DeckList *deck);
+    void setTournamentMatchInfo(Server_Game *parentGame, int p1Id, int p2Id);
+    QPointer<Server_Game> getTournamentParentGame() const
+    {
+        return tournamentParentGame;
+    }
+    bool getDisconnectRemovesPlayer() const
+    {
+        return disconnectRemovesPlayer;
+    }
+    void setDisconnectRemovesPlayer(bool _disconnectRemovesPlayer)
+    {
+        disconnectRemovesPlayer = _disconnectRemovesPlayer;
+    }
+
+    // Server_MatchGameFactory implementation
+    Server_Game *createMatchGame(const GameConfig &config, int &outGameId) override;
+    Server_AbstractUserInterface *getUserInterface(const QString &playerName) override;
+    void addGameToRoom(Server_Game *game) override;
+
+    const TournamentSettings &getTournamentSettings() const
+    {
+        return tournamentSettings;
+    }
+    void setTournamentSettings(const TournamentSettings &settings)
+    {
+        tournamentSettings = settings;
+    }
+
     Server_DeckValidationStrategy *getDeckValidationStrategy() const
     {
         return deckValidationStrategy.data();
@@ -232,6 +290,8 @@ public:
     {
         return lifecycleStrategy.data();
     }
+    /** @brief Replace the match result strategy; takes ownership of @p strategy. */
+    void setMatchResultStrategy(Server_MatchResultStrategy *strategy);
 };
 
 #endif

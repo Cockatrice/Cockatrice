@@ -3,6 +3,7 @@
 #include "game/game_config.h"
 #include "game/server_game.h"
 #include "game/server_player.h"
+#include "game/server_tournament.h"
 #include "server_database_interface.h"
 #include "server_room.h"
 
@@ -916,6 +917,9 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
     int startingLifeTotal = cmd.has_starting_life_total() ? cmd.starting_life_total() : 20;
 
     bool shareDecklistsOnLoad = cmd.has_share_decklists_on_load() ? cmd.share_decklists_on_load() : false;
+    bool isTournament = cmd.has_is_tournament() ? cmd.is_tournament() : false;
+    int gamesPerMatch =
+        cmd.has_tournament_settings() ? static_cast<int>(cmd.tournament_settings().games_per_match()) : 1;
 
     const int gameId = databaseInterface->getNextGameId();
     if (gameId == -1) {
@@ -940,6 +944,10 @@ Server_ProtocolHandler::cmdCreateGame(const Command_CreateGame &cmd, Server_Room
                       .shareDecklistsOnLoad = shareDecklistsOnLoad};
 
     auto *game = new Server_Game(config, room);
+    game->setIsTournamentGame(isTournament);
+    if (isTournament && game->getTournament()) {
+        game->getTournament()->setGamesPerMatch(static_cast<uint32_t>(qBound(1, gamesPerMatch, MAX_GAMES_PER_MATCH)));
+    }
 
     game->addPlayer(this, rc, asSpectator, asJudge, false);
     room->addGame(game);
