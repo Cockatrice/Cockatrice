@@ -2,6 +2,14 @@
 
 #include <QDir>
 
+namespace
+{
+// Sent by the primary instance after it has read a forwarded payload. Without
+// an acknowledgment, a second instance cannot tell a live primary apart from a
+// stale socket left behind by a process that is still shutting down.
+const QByteArray ACK_MESSAGE = QByteArrayLiteral("COCKATRICE_ACK");
+} // namespace
+
 SingleInstanceManager::SingleInstanceManager(QObject *parent) : QObject(parent)
 {
 }
@@ -72,7 +80,14 @@ bool SingleInstanceManager::forwardToPrimary(const QStringList &filesToSend)
     socket.flush();
     socket.waitForBytesWritten(1000);
 
-    return true;
+    // Only report a successful hand-off once the primary has acknowledged that
+    // it actually read the payload. A socket that connects but never answers
+    // belongs to a process that is dying, so the caller must not treat this as
+    // a hand-off (otherwise it would exit without anyone handling the files).
+    if (!socket.waitForReadyRead(1000)) {
+        return false;
+    }
+    return socket.readAll() == ACK_MESSAGE;
 }
 
 void SingleInstanceManager::handleNewConnection()
@@ -110,6 +125,14 @@ void SingleInstanceManager::handleNewConnection()
             QDataStream payloadStream(&payload, QIODevice::ReadOnly);
             QStringList files;
             payloadStream >> files;
+
+            // Acknowledge receipt as soon as the payload is parsed, before the
+            // primary starts handling it. The handlers run synchronously and can
+            // take longer than the sender's readiness timeout (e.g. a modal
+            // confirmation box), which would otherwise make a live primary look
+            // dead and cause duplicate handling.
+            socket->write(ACK_MESSAGE);
+            socket->flush();
 
             emit filesReceived(files);
 
