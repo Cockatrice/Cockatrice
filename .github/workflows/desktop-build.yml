@@ -176,8 +176,12 @@ jobs:
         shell: bash
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE" \
-            --cmake-generator "$CMAKE_GENERATOR"
+          args=()
+          [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
+          args+=(--ccache "$CCACHE_SIZE")
+          args+=(--cmake-generator "$CMAKE_GENERATOR")
+
+          RUN --server --debug --test "${args[@]}"
 
       - name: "Build release package"
         id: build
@@ -269,7 +273,7 @@ jobs:
             override_target: 13
             package_suffix: "-macOS13_Intel"
             qt_version: 6.11.1
-            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_modules: qtimageformats qtmultimedia qtwebsockets qtshadertools
             soc: Intel
             type: Release
             use_ccache: 1
@@ -285,7 +289,7 @@ jobs:
             override_target: 14
             package_suffix: "-macOS14"
             qt_version: 6.11.1
-            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_modules: qtimageformats qtmultimedia qtwebsockets qtshadertools
             soc: Apple
             type: Release
             use_ccache: 1
@@ -301,7 +305,7 @@ jobs:
             override_target: 15
             package_suffix: "-macOS15"
             qt_version: 6.11.1
-            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_modules: qtimageformats qtmultimedia qtwebsockets qtshadertools
             soc: Apple
             type: Release
             use_ccache: 1
@@ -314,7 +318,7 @@ jobs:
             ccache_eviction_age: 7d
             cmake_generator: Ninja
             qt_version: 6.11.1
-            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_modules: qtimageformats qtmultimedia qtwebsockets qtshadertools
             soc: Apple
             type: Debug
             use_ccache: 1
@@ -329,7 +333,7 @@ jobs:
             make_package: 1
             package_suffix: "-Win10"
             qt_version: 6.11.1
-            qt_modules: qtimageformats qtmultimedia qtwebsockets
+            qt_modules: qtimageformats qtmultimedia qtwebsockets qtshadertools
             type: Release
 
     name: ${{ matrix.os }} ${{ matrix.target }}${{ matrix.soc == 'Intel' && ' Intel' || '' }}${{ matrix.type == 'Debug' && ' Debug' || '' }}

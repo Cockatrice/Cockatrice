@@ -7,6 +7,7 @@
 #include "../cards/art_crop_attribution.h"
 #include "background_sources.h"
 #include "home_styled_button.h"
+#include "home_tab_button_color.h"
 
 #include <QGroupBox>
 #include <QPainter>
@@ -25,7 +26,7 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
 
     backgroundSourceCard = new CardInfoPictureArtCropWidget(this);
 
-    gradientColors = extractDominantColors(background);
+    gradientColors = determineButtonColor();
 
     layout->addWidget(createButtons(), 1, 1, Qt::AlignVCenter | Qt::AlignHCenter);
 
@@ -54,6 +55,8 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
             &HomeWidget::initializeBackgroundFromSource);
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
+            &HomeWidget::updateButtonsToBackgroundColor);
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabButtonColorChanged, this,
             &HomeWidget::updateButtonsToBackgroundColor);
 }
 
@@ -95,6 +98,34 @@ void HomeWidget::loadBackgroundSourceDeck()
     std::optional<LoadedDeck> deckOpt = DeckLoader::loadFromFile(
         SettingsCache::instance().paths().getDeckPath() + "background.cod", DeckFileFormat::Cockatrice, false);
     backgroundSourceDeck = deckOpt.has_value() ? deckOpt.value().deckList : DeckList();
+}
+
+static bool isDefaultBackgroundAndTheme()
+{
+    QString sourceId = SettingsCache::instance().appearance().getHomeTabBackgroundSource();
+    return themeManager->isBuiltInTheme() && BackgroundSources::fromId(sourceId) == BackgroundSources::Theme;
+}
+
+QPair<QColor, QColor> HomeWidget::determineButtonColor() const
+{
+    static QPair defaultColor = {QColor::fromRgb(20, 140, 60), QColor::fromRgb(120, 200, 80)};
+
+    auto colorSource =
+        HomeTabButtonColor::intToSource(SettingsCache::instance().appearance().getHomeTabButtonColorSourceIndex());
+
+    switch (colorSource) {
+        case HomeTabButtonColor::Automatic: {
+            if (isDefaultBackgroundAndTheme()) {
+                return defaultColor;
+            } else {
+                return extractDominantColors(background);
+            }
+        }
+        case HomeTabButtonColor::FromBackground:
+            return extractDominantColors(background);
+    }
+
+    return defaultColor;
 }
 
 void HomeWidget::setRandomCard(ExactCard &newCard)
@@ -171,7 +202,7 @@ void HomeWidget::updateBackgroundProperties()
 
 void HomeWidget::updateButtonsToBackgroundColor()
 {
-    gradientColors = extractDominantColors(background);
+    gradientColors = determineButtonColor();
     for (HomeStyledButton *button : findChildren<HomeStyledButton *>()) {
         button->updateStylesheet(gradientColors);
         button->update();
@@ -266,11 +297,6 @@ void HomeWidget::updateConnectButton(const ClientStatus status)
 
 QPair<QColor, QColor> HomeWidget::extractDominantColors(const QPixmap &pixmap)
 {
-    QString sourceId = SettingsCache::instance().appearance().getHomeTabBackgroundSource();
-    if (themeManager->isBuiltInTheme() && BackgroundSources::fromId(sourceId) == BackgroundSources::Theme) {
-        return QPair<QColor, QColor>(QColor::fromRgb(20, 140, 60), QColor::fromRgb(120, 200, 80));
-    }
-
     // Step 1: Downscale image for performance
     QImage image = pixmap.toImage()
                        .scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation)

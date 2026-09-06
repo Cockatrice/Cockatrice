@@ -104,12 +104,21 @@ void VisualDeckStorageSortFilterProxyModel::resort()
     sort(0);
 }
 
-bool VisualDeckStorageSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
+QVariant VisualDeckStorageSortFilterProxyModel::data(const QModelIndex &index, int role) const
 {
-    if (sourceParent.isValid()) {
-        return true;
+    if (role == VisualDeckStorageRoles::FilterMatchRole) {
+        if (!index.isValid()) {
+            return true;
+        }
+        const QModelIndex sourceIndex = mapToSource(index);
+        return rowMatches(sourceIndex.row());
     }
 
+    return QSortFilterProxyModel::data(index, role);
+}
+
+bool VisualDeckStorageSortFilterProxyModel::rowMatches(int sourceRow) const
+{
     // If the match lists aren't sized to the current model yet, don't hide anything.
     if (sourceRow < 0 || sourceRow >= searchMatches.size() || sourceRow >= tagMatches.size() ||
         sourceRow >= colorMatches.size()) {
@@ -117,6 +126,14 @@ bool VisualDeckStorageSortFilterProxyModel::filterAcceptsRow(int sourceRow, cons
     }
 
     return searchMatches.at(sourceRow) && tagMatches.at(sourceRow) && colorMatches.at(sourceRow);
+}
+
+bool VisualDeckStorageSortFilterProxyModel::filterAcceptsRow(int /*sourceRow*/,
+                                                             const QModelIndex & /*sourceParent*/) const
+{
+    // Rows are never dropped: the filter result is exposed per row through
+    // FilterMatchRole, so views can keep their widgets alive and just hide them.
+    return true;
 }
 
 bool VisualDeckStorageSortFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const

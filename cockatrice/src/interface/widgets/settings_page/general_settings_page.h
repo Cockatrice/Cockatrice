@@ -20,6 +20,9 @@ public:
     GeneralSettingsPage();
     void retranslateUi() override;
 
+    static QStringList findQmFiles();
+    static QString languageName(const QString &lang);
+
 private slots:
     void deckPathButtonClicked();
     void filtersPathButtonClicked();
@@ -33,15 +36,43 @@ private slots:
     void updateStartupServerControlsVisibility();
 
 private:
-    QStringList findQmFiles();
-    QString languageName(const QString &lang);
-
     QGroupBox *languageGroupBox;
     QGroupBox *versionGroupBox;
     QGroupBox *cardDatabaseGroupBox;
     QGroupBox *startupGroupBox;
     QGroupBox *pathsGroupBox;
 
+    QLabel languageLabel;
+    QComboBox languageBox;
+    QLabel advertiseTranslationPageLabel;
+
+    QLabel updateReleaseChannelLabel;
+    QComboBox updateReleaseChannelBox;
+    QCheckBox startupUpdateCheckCheckBox;
+    QCheckBox updateNotificationCheckBox;
+    QCheckBox newVersionOracleCheckBox;
+
+    QLabel startupCardUpdateCheckBehaviorLabel;
+    QComboBox startupCardUpdateCheckBehaviorSelector;
+    QLabel cardUpdateCheckIntervalLabel;
+    QSpinBox cardUpdateCheckIntervalSpinBox;
+    QLabel lastCardUpdateCheckDateLabel;
+
+    QCheckBox showTipsOnStartup;
+    QLabel startupTabLabel;
+    QComboBox startupTabSelector;
+    QLabel startupServerLabel;
+    QComboBox startupServerSelector;
+    QLabel startupRoomLabel;
+    QLineEdit *startupRoomNameEdit;
+
+    QLabel deckPathLabel;
+    QLabel filtersPathLabel;
+    QLabel replaysPathLabel;
+    QLabel picsPathLabel;
+    QLabel cardDatabasePathLabel;
+    QLabel customCardDatabasePathLabel;
+    QLabel tokenDatabasePathLabel;
     QLineEdit *deckPathEdit;
     QLineEdit *filtersPathEdit;
     QLineEdit *replaysPathEdit;
@@ -51,33 +82,6 @@ private:
     QLineEdit *tokenDatabasePathEdit;
     QPushButton *resetAllPathsButton;
     QLabel *allPathsResetLabel;
-    QComboBox languageBox;
-    QCheckBox startupUpdateCheckCheckBox;
-    QLabel startupCardUpdateCheckBehaviorLabel;
-    QComboBox startupCardUpdateCheckBehaviorSelector;
-    QLabel cardUpdateCheckIntervalLabel;
-    QSpinBox cardUpdateCheckIntervalSpinBox;
-    QLabel lastCardUpdateCheckDateLabel;
-    QCheckBox updateNotificationCheckBox;
-    QCheckBox newVersionOracleCheckBox;
-    QComboBox updateReleaseChannelBox;
-    QLabel languageLabel;
-    QLabel deckPathLabel;
-    QLabel filtersPathLabel;
-    QLabel replaysPathLabel;
-    QLabel picsPathLabel;
-    QLabel cardDatabasePathLabel;
-    QLabel customCardDatabasePathLabel;
-    QLabel tokenDatabasePathLabel;
-    QLabel updateReleaseChannelLabel;
-    QLabel advertiseTranslationPageLabel;
-    QCheckBox showTipsOnStartup;
-    QLabel startupTabLabel;
-    QComboBox startupTabSelector;
-    QLabel startupServerLabel;
-    QComboBox startupServerSelector;
-    QLabel startupRoomLabel;
-    QLineEdit *startupRoomNameEdit;
 };
 
 #endif // COCKATRICE_GENERAL_SETTINGS_PAGE_H

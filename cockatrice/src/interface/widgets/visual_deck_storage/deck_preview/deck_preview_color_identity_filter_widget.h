@@ -2,18 +2,18 @@
  * @file deck_preview_color_identity_filter_widget.h
  * @ingroup VisualDeckPreviewWidgets
  */
-//! \todo Document this file.
 
 #ifndef DECK_PREVIEW_COLOR_IDENTITY_FILTER_WIDGET_H
 #define DECK_PREVIEW_COLOR_IDENTITY_FILTER_WIDGET_H
 
-#include "../visual_deck_storage_widget.h"
+#include "../visual_deck_storage_sort_filter_proxy_model.h"
 
 #include <QHBoxLayout>
+#include <QMap>
 #include <QPushButton>
+#include <QSet>
 #include <QWidget>
 
-class DeckPreviewWidget;
 class VisualDeckStorageWidget;
 
 class DeckPreviewColorIdentityFilterWidget : public QWidget
@@ -21,24 +21,33 @@ class DeckPreviewColorIdentityFilterWidget : public QWidget
     Q_OBJECT
 
 public:
-    /**
-     * How the active colors are matched against a deck's color identity.
-     */
-    enum FilterMode
-    {
-        ExactMatch, ///< The color identity consists of exactly the active colors.
-        Includes,   ///< The color identity contains all of the active colors.
-        Excludes    ///< The color identity contains none of the active colors.
-    };
-    Q_ENUM(FilterMode)
-
     explicit DeckPreviewColorIdentityFilterWidget(VisualDeckStorageWidget *parent);
     void retranslateUi();
-    void filterWidgets(QList<DeckPreviewWidget *> widgets);
+
+    /**
+     * @brief The currently active color identity filter mode.
+     */
+    [[nodiscard]] VisualDeckStorageSortFilterProxyModel::FilterMode getFilterMode() const
+    {
+        return filterMode;
+    }
+
+    /**
+     * @brief The colors that are currently toggled on.
+     */
+    [[nodiscard]] QSet<QChar> getActiveColors() const;
 
 signals:
-    void filterModeChanged(FilterMode mode);
+    /**
+     * Emitted when the set of active colors changed due to user interaction.
+     */
     void activeColorsChanged();
+
+    /**
+     * Emitted when the user cycles the color identity filter mode.
+     * @param mode The new filter mode.
+     */
+    void filterModeChanged(VisualDeckStorageSortFilterProxyModel::FilterMode mode);
 
 private slots:
     void handleColorToggled(QChar color, bool active);
@@ -48,7 +57,7 @@ private:
     QHBoxLayout *layout;
     QPushButton *toggleButton;
     QMap<QChar, bool> activeColors;
-    FilterMode filterMode = Includes; // Default to "includes" mode
+    VisualDeckStorageSortFilterProxyModel::FilterMode filterMode = VisualDeckStorageSortFilterProxyModel::Includes;
 };
 
 #endif // DECK_PREVIEW_COLOR_IDENTITY_FILTER_WIDGET_H

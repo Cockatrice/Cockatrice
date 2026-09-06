@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QDomDocument>
 #include <QFile>
+#include <QImageReader>
 #include <QPainter>
 #include <QPalette>
 #include <QSvgRenderer>
@@ -417,6 +418,57 @@ QPixmap DropdownIconPixmapGenerator::generatePixmap(int height, bool expanded)
 }
 
 QMap<QString, QPixmap> DropdownIconPixmapGenerator::pmCache;
+
+namespace
+{
+/// Longest side mana symbols are rendered at before being scaled to their final size.
+constexpr int MASTER_ICON_SIZE = 128;
+
+QString manaSymbolCacheKey(const QString &symbol, const QSize &size)
+{
+    return symbol + QLatin1Char('|') + QString::number(size.width()) + QLatin1Char('x') +
+           QString::number(size.height());
+}
+} // namespace
+
+const QPixmap &ManaSymbolPixmapGenerator::masterIcon(const QString &symbol)
+{
+    auto it = masterCache.constFind(symbol);
+    if (it != masterCache.constEnd()) {
+        return it.value();
+    }
+
+    QImageReader reader("theme:icons/mana/" + symbol);
+    QSize sourceSize = reader.size();
+    if (!sourceSize.isEmpty()) {
+        sourceSize.scale(QSize(MASTER_ICON_SIZE, MASTER_ICON_SIZE), Qt::KeepAspectRatio);
+        reader.setScaledSize(sourceSize);
+    }
+    const QPixmap rendered = QPixmap::fromImageReader(&reader);
+
+    return masterCache.insert(symbol, rendered).value();
+}
+
+QPixmap ManaSymbolPixmapGenerator::generatePixmap(const QString &symbol, const QSize &size)
+{
+    const QString key = manaSymbolCacheKey(symbol, size);
+    auto it = scaledCache.constFind(key);
+    if (it != scaledCache.constEnd()) {
+        return it.value();
+    }
+
+    const QPixmap &icon = masterIcon(symbol);
+    if (icon.isNull()) {
+        return {};
+    }
+
+    QPixmap scaled = icon.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    scaledCache.insert(key, scaled);
+    return scaled;
+}
+
+QHash<QString, QPixmap> ManaSymbolPixmapGenerator::masterCache;
+QHash<QString, QPixmap> ManaSymbolPixmapGenerator::scaledCache;
 
 QPixmap loadColorAdjustedPixmap(const QString &name)
 {

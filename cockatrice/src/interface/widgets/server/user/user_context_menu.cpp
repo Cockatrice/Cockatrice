@@ -7,9 +7,9 @@
 #include "../chat_view/chat_view.h"
 #include "../game_selector.h"
 #include "user_info_box.h"
+#include "user_list_dialog.h"
 #include "user_list_manager.h"
 #include "user_list_proxy.h"
-#include "user_list_widget.h"
 
 #include <QAction>
 #include <QMenu>

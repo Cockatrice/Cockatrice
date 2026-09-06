@@ -15,8 +15,12 @@
 #include "deck_list_history_manager_widget.h"
 #include "deck_list_style_proxy.h"
 
+#include <QCheckBox>
+#include <QComboBox>
 #include <QDockWidget>
 #include <QLabel>
+#include <QMenu>
+#include <QPushButton>
 #include <QTextEdit>
 #include <QTreeView>
 #include <libcockatrice/card/card_info.h>
@@ -98,6 +102,11 @@ private:
     DeckListModel *getModel() const;
     [[nodiscard]] QModelIndexList getSelectedCardNodeSourceIndices() const;
     void offsetCountAtIndex(const QModelIndex &idx, bool isIncrement);
+
+    void addMoveToZoneMenu(QMenu *menu, const QModelIndex &sourceCardIndex, const QString &currentBoardName);
+    void addChangeBoardMenu(QMenu *menu, const QString &zoneName);
+    QString createNewCustomZone(const QString &initialBoardName = {});
+    void addNewZoneAction(QMenu *menu, const QString &initialBoardName = {});
 
 private slots:
     void decklistCustomMenu(QPoint point);

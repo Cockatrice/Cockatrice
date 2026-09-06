@@ -21,7 +21,8 @@ enum class TallyType
     None,
     Subtypes,
     TotalPower,
-    MaxValue = TotalPower // sentinel value
+    TotalToughness,
+    MaxValue = TotalToughness // sentinel value
 };
 
 namespace Tally

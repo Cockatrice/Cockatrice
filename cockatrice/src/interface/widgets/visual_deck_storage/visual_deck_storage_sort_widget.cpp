@@ -1,20 +1,11 @@
 #include "visual_deck_storage_sort_widget.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "visual_deck_storage_widget.h"
 
-#include <QFileInfo>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 
-/**
- * @brief Constructs a PrintingSelectorCardSortWidget for searching cards by set name or set code.
- *
- * This widget provides a search bar that allows users to search for cards by either their set name
- * or set code. It uses a debounced timer to trigger the search action after the user stops typing.
- *
- * @param parent The parent PrintingSelector widget that will handle the search results.
- */
-VisualDeckStorageSortWidget::VisualDeckStorageSortWidget(VisualDeckStorageWidget *parent)
-    : parent(parent), sortOrder(Alphabetical)
+VisualDeckStorageSortWidget::VisualDeckStorageSortWidget(VisualDeckStorageWidget *parent) : QWidget(parent)
 {
     layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -30,12 +21,10 @@ VisualDeckStorageSortWidget::VisualDeckStorageSortWidget(VisualDeckStorageWidget
 
     // Set the current sort order
     sortComboBox->setCurrentIndex(SettingsCache::instance().visualDeckStorage().getVisualDeckStorageSortingOrder());
-    sortOrder = static_cast<SortOrder>(sortComboBox->currentIndex());
 
-    // Connect sorting change signal to refresh the file list
+    // Connect sorting change signal to persist the order and refresh the file list
     connect(sortComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
             &VisualDeckStorageSortWidget::updateSortOrder);
-    connect(this, &VisualDeckStorageSortWidget::sortOrderChanged, parent, &VisualDeckStorageWidget::updateSortOrder);
 }
 
 void VisualDeckStorageSortWidget::retranslateUi()
@@ -47,10 +36,13 @@ void VisualDeckStorageSortWidget::retranslateUi()
 
     // Clear and repopulate the ComboBox with translated items
     sortComboBox->clear();
-    sortComboBox->addItem(tr("Sort Alphabetically (Deck Name)"), ByName);
-    sortComboBox->addItem(tr("Sort Alphabetically (Filename)"), Alphabetical);
-    sortComboBox->addItem(tr("Sort by Last Modified"), ByLastModified);
-    sortComboBox->addItem(tr("Sort by Last Loaded"), ByLastLoaded);
+    sortComboBox->addItem(tr("Sort Alphabetically (Deck Name)"),
+                          VisualDeckStorageSortFilterProxyModel::SortOrder::ByName);
+    sortComboBox->addItem(tr("Sort Alphabetically (Filename)"),
+                          VisualDeckStorageSortFilterProxyModel::SortOrder::Alphabetical);
+    sortComboBox->addItem(tr("Sort by Last Modified"),
+                          VisualDeckStorageSortFilterProxyModel::SortOrder::ByLastModified);
+    sortComboBox->addItem(tr("Sort by Last Loaded"), VisualDeckStorageSortFilterProxyModel::SortOrder::ByLastLoaded);
 
     // Restore the current index
     sortComboBox->setCurrentIndex(oldIndex);
@@ -59,60 +51,13 @@ void VisualDeckStorageSortWidget::retranslateUi()
     sortComboBox->blockSignals(false);
 }
 
+VisualDeckStorageSortFilterProxyModel::SortOrder VisualDeckStorageSortWidget::currentSortOrder() const
+{
+    return static_cast<VisualDeckStorageSortFilterProxyModel::SortOrder>(sortComboBox->currentIndex());
+}
+
 void VisualDeckStorageSortWidget::updateSortOrder()
 {
-    sortOrder = static_cast<SortOrder>(sortComboBox->currentIndex());
     SettingsCache::instance().visualDeckStorage().setVisualDeckStorageSortingOrder(sortComboBox->currentIndex());
     emit sortOrderChanged();
-}
-
-void VisualDeckStorageSortWidget::sortFolder(VisualDeckStorageFolderDisplayWidget *folderWidget)
-{
-    auto children =
-        folderWidget->getFlowWidget()->findChildren<QWidget *>(QString(), Qt::FindChildOption::FindDirectChildrenOnly);
-    for (auto widget : children) {
-        auto deckPreviewWidgets =
-            widget->findChildren<DeckPreviewWidget *>(QString(), Qt::FindChildOption::FindDirectChildrenOnly);
-        auto newOrder = filterFiles(deckPreviewWidgets);
-        for (DeckPreviewWidget *previewWidget : newOrder) {
-            folderWidget->getFlowWidget()->removeWidget(previewWidget);
-        }
-        for (DeckPreviewWidget *previewWidget : newOrder) {
-            folderWidget->getFlowWidget()->addWidget(previewWidget);
-        }
-    }
-}
-
-QList<DeckPreviewWidget *> VisualDeckStorageSortWidget::filterFiles(QList<DeckPreviewWidget *> widgets)
-{
-    // Sort the widgets list based on the current sort order
-    std::sort(widgets.begin(), widgets.end(), [this](DeckPreviewWidget *widget1, DeckPreviewWidget *widget2) {
-        if (!widget1 || !widget2) {
-            return false; // Handle null pointers gracefully
-        }
-
-        QFileInfo info1(widget1->filePath);
-        QFileInfo info2(widget2->filePath);
-
-        switch (sortOrder) {
-            case ByName:
-                return widget1->deckLoader->getDeck().deckList.getName() <
-                       widget2->deckLoader->getDeck().deckList.getName();
-            case Alphabetical:
-                return QString::localeAwareCompare(info1.fileName(), info2.fileName()) <= 0;
-            case ByLastModified:
-                return info1.lastModified() > info2.lastModified();
-            case ByLastLoaded: {
-                QDateTime time1 =
-                    QDateTime::fromString(widget1->deckLoader->getDeck().deckList.getLastLoadedTimestamp());
-                QDateTime time2 =
-                    QDateTime::fromString(widget2->deckLoader->getDeck().deckList.getLastLoadedTimestamp());
-                return time1 > time2;
-            }
-        }
-
-        return false; // Default case, no sorting applied
-    });
-
-    return widgets;
 }

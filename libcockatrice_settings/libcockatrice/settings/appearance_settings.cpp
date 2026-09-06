@@ -69,3 +69,14 @@ void AppearanceSettings::setHomeTabDisplayCardName(bool _displayCardName)
     setValue(_displayCardName, "homeTabDisplayCardName");
     emit homeTabDisplayCardNameChanged();
 }
+
+int AppearanceSettings::getHomeTabButtonColorSourceIndex() const
+{
+    return getValue("homeTabButtonColorSource", "", "", 0).toInt();
+}
+
+void AppearanceSettings::setHomeTabButtonColorSourceIndex(int index)
+{
+    setValue(index, "homeTabButtonColorSource");
+    emit homeTabButtonColorChanged();
+}

@@ -525,6 +525,13 @@ void UserInfoPopup::rebuildActionButtons(const ServerInfo_User &userInfo, bool o
     connect(games, &QPushButton::clicked, this, [this, name] { emit showGamesRequested(name); });
     add(games);
 
+    // ── Invite (only while the inviter has a joinable game for this user) ────
+    if (!isSelf && online && gameInviteAvailable && gameInviteAvailable(name)) {
+        auto *invite = makeBtn(tr("Invite"), tr("Invite to your game"), actionArea, theme);
+        connect(invite, &QPushButton::clicked, this, [this, name] { emit inviteRequested(name); });
+        add(invite);
+    }
+
     // ── Buddy / ignore (registered users only) ────────────────────────────────
     if (!isSelf && isReg) {
         if (isBuddy) {

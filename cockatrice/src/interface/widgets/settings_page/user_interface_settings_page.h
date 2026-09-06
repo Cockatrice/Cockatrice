@@ -23,9 +23,6 @@ private slots:
     void updateCommanderSpellbookUiState();
 
 private:
-    QCheckBox notificationsEnabledCheckBox;
-    QCheckBox specNotificationsEnabledCheckBox;
-    QCheckBox buddyConnectNotificationsEnabledCheckBox;
     QCheckBox doubleClickToPlayCheckBox;
     QCheckBox clickPlaysAllSelectedCheckBox;
     QCheckBox playToStackCheckBox;
@@ -37,12 +34,18 @@ private:
     QCheckBox showTotalSelectionCountCheckBox;
     QCheckBox useTearOffMenusCheckBox;
     QCheckBox keepGameChatFocusCheckBox;
+
+    QCheckBox notificationsEnabledCheckBox;
+    QCheckBox specNotificationsEnabledCheckBox;
+    QCheckBox buddyConnectNotificationsEnabledCheckBox;
+
     QPushButton enableAllAnimationsButton;
     QPushButton disableAllAnimationsButton;
     QCheckBox tapAnimationCheckBox;
     QCheckBox arrowDrawAnimationCheckBox;
     QCheckBox lifeCounterAnimationsCheckBox;
     QCheckBox battlefieldFlashCheckBox;
+
     QCheckBox openDeckInNewTabCheckBox;
     QLabel visualDeckStoragePromptForConversionLabel;
     QComboBox visualDeckStoragePromptForConversionSelector;
@@ -57,8 +60,10 @@ private:
     QLabel commanderSpellbookIntegrationUseOfficialBracketNamesLabel;
     QToolButton commanderSpellbookIntegrationUseOfficialBracketNamesExplainer;
     QComboBox commanderSpellbookIntegrationBracketNamingSelector;
+
     QLabel rewindBufferingMsLabel;
     QSpinBox rewindBufferingMsBox;
+
     QGroupBox *generalGroupBox;
     QGroupBox *notificationsGroupBox;
     QGroupBox *animationGroupBox;

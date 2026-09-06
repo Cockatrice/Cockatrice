@@ -18,6 +18,9 @@
 
 #include "abstract_deck_list_node.h"
 
+#include <QList>
+#include <QString>
+
 /** @brief Constant for the "main" deck zone name. */
 #define DECK_ZONE_MAIN "main"
 /** @brief Constant for the "sideboard" zone name. */
@@ -119,6 +122,13 @@ public:
     static QString visibleNameFromName(const QString &_name);
 
     /**
+     * @brief The standard board zone names, in display order.
+     *
+     * @return main, side and maybeboard.
+     */
+    static const QList<QString> &boardZoneNames();
+
+    /**
      * @brief Get this node’s display-friendly name.
      * @return Human-readable name (zone/group name).
      */
@@ -216,9 +226,10 @@ public:
     /**
      * @brief Deserialize this node and its children from XML.
      * @param xml Reader positioned at this element.
-     * @return true if parsing succeeded.
+     * @param limit The maximum amount of cards to read
+     * @return the amount of cards found
      */
-    bool readElement(QXmlStreamReader *xml) override;
+    int readElement(QXmlStreamReader *xml, int limit) override;
 
     /**
      * @brief Serialize this node and its children to XML.

@@ -159,12 +159,13 @@ private:
     static void saveToStream_DeckZone(QTextStream &out,
                                       const InnerDecklistNode *zoneNode,
                                       bool addComments = true,
-                                      bool addSetNameAndNumber = true);
+                                      bool addSetNameAndNumber = true,
+                                      const QString &boardZoneName = QString());
     static void saveToStream_DeckZoneCards(QTextStream &out,
-                                           const InnerDecklistNode *zoneNode,
                                            QList<DecklistCardNode *> cards,
                                            bool addComments = true,
-                                           bool addSetNameAndNumber = true);
+                                           bool addSetNameAndNumber = true,
+                                           const QString &boardZoneName = QString());
 };
 
 #endif

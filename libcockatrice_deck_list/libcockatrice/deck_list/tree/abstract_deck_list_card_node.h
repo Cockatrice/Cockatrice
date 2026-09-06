@@ -141,7 +141,7 @@ public:
      *
      * This supports loading deck files from Cockatrice’s XML format.
      */
-    bool readElement(QXmlStreamReader *xml) override;
+    int readElement(QXmlStreamReader *xml, int limit) override;
 
     /**
      * @brief Serialize this node’s properties to XML.

@@ -17,6 +17,7 @@
 
 #include <QAbstractListModel>
 #include <QDateTime>
+#include <QHash>
 #include <QList>
 #include <QStringList>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -38,7 +39,14 @@ enum
     LastModifiedRole,                /**< QDateTime of the deck file's last modification. */
     LastLoadedRole,                  /**< QDateTime when the deck was last loaded from the file. */
     BannerCardNameRole,              /**< Name of the deck's banner card. */
-    BannerCardProviderIdRole         /**< Provider id of the deck's banner card. */
+    BannerCardProviderIdRole,        /**< Provider id of the deck's banner card. */
+    /**
+     * @brief Whether the row passes the proxy's current search / tag / color filters.
+     *
+     * Not served by this model, but by VisualDeckStorageSortFilterProxyModel on top
+     * of it. Declared here so every role read through a proxy index stays unique.
+     */
+    FilterMatchRole
 };
 } // namespace VisualDeckStorageRoles
 
@@ -66,10 +74,24 @@ struct DeckPreviewData
 };
 
 /**
+ * @brief One finished background deck load that has not been applied to the model yet.
+ */
+struct PendingDeckLoad
+{
+    QString filePath;       ///< Identifies the row the result belongs to.
+    int generation;         ///< Scan generation the load was started in.
+    bool ok = false;        ///< Whether the file parsed successfully.
+    LoadedDeck deck;        ///< The parsed deck, valid when ok.
+    QDateTime lastModified; ///< File modification time at load, valid when ok.
+    QString colorIdentity;  ///< WUBRG color identity computed off the UI thread, valid when ok.
+};
+
+/**
  * @brief The list model backing the Visual Deck Storage widget tree.
  *
  * Rows are in filesystem scan order; ordering and filtering are handled by
- * VisualDeckStorageSortFilterProxyModel on top of this model.
+ * VisualDeckStorageSortFilterProxyModel on top of this model. The proxy keeps
+ * every row and exposes each row's filter result through its FilterMatchRole.
  */
 class VisualDeckStorageModel : public QAbstractListModel
 {
@@ -144,13 +166,23 @@ signals:
 private:
     void startScan();
     void beginLoad(int row);
-    static void recomputeDeckMetadata(DeckPreviewData &data);
+    static void recomputeDeckMetadata(DeckPreviewData &data, bool recomputeColorIdentity = true);
+    void reindexFilePaths();
+    void schedulePendingLoadDrain();
+
+private slots:
+    void drainPendingLoads();
+
+private:
     void setFilePathForRow(int row, const QString &newFilePath);
 
     QString deckPath;
     QList<DeckPreviewData> decks;
-    QStringList folderPaths; ///< All subdirectories of the deck folder, sorted.
-    int scanGeneration = 0;  ///< Bumped on every scan so stale results are ignored.
+    QHash<QString, int> rowByFilePath;     ///< Maps each deck's file path to its row for O(1) lookups.
+    QStringList folderPaths;               ///< All subdirectories of the deck folder, sorted.
+    int scanGeneration = 0;                ///< Bumped on every scan so stale results are ignored.
+    QVector<PendingDeckLoad> pendingLoads; ///< Finished background loads waiting to be applied.
+    bool drainScheduled = false;           ///< Whether a queued drain pass is already pending.
 };
 
 #endif // VISUAL_DECK_STORAGE_MODEL_H

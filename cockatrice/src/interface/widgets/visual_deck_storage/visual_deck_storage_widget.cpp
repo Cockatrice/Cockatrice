@@ -2,24 +2,29 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../quick_settings/settings_button_widget.h"
+#include "deck_preview/deck_preview_color_identity_filter_widget.h"
 #include "deck_preview/deck_preview_widget.h"
 #include "visual_deck_storage_folder_display_widget.h"
+#include "visual_deck_storage_quick_settings_widget.h"
 #include "visual_deck_storage_search_widget.h"
 #include "visual_deck_storage_sort_widget.h"
 #include "visual_deck_storage_tag_filter_widget.h"
 
-#include <QComboBox>
-#include <QDirIterator>
-#include <QMouseEvent>
+#include <QLabel>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/visual_deck_storage_settings.h>
 
-VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent), folderWidget(nullptr)
+VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(parent)
 {
-    deckListModel = new DeckListModel(this);
-    deckListModel->setObjectName("visualDeckModel");
+    // The model and proxy own all deck data, sorting and filtering. The view widgets below
+    // only display the proxy's rows and their FilterMatchRole, so nothing touches the
+    // filesystem outside the model.
+    storageModel = new VisualDeckStorageModel(this);
+    storageProxyModel = new VisualDeckStorageSortFilterProxyModel(this);
+    storageProxyModel->setSourceModel(storageModel);
 
     layout = new QVBoxLayout(this);
     layout->setSpacing(0);
@@ -75,6 +80,33 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     layout->addWidget(tagFilterWidget);
     layout->addWidget(scrollArea);
 
+    // The deck data changed (a load finished, or a mutation happened): re-evaluate the filters,
+    // since search/tag/color matches are computed against the data. Debounced so that a burst of
+    // load completions triggers a single re-application instead of one O(n) pass per deck.
+    refreshTimer = new QTimer(this);
+    refreshTimer->setSingleShot(true);
+    refreshTimer->setInterval(150);
+    connect(refreshTimer, &QTimer::timeout, this, [this] {
+        storageProxyModel->reapplyFilters();
+        // A batch of decks finished loading: re-gather the tag chips from the visible decks once
+        // the burst settles instead of on every individual load.
+        tagFilterWidget->refreshTags();
+    });
+    connect(storageModel, &QAbstractItemModel::dataChanged, this, [this] { refreshTimer->start(); });
+    connect(storageModel, &VisualDeckStorageModel::deckLoaded, this, [this] { refreshTimer->start(); });
+    // A deck's file path changed: re-apply the sort, since orders like "filename" depend on it.
+    connect(storageModel, &VisualDeckStorageModel::deckFilePathChanged, this, [this] { storageProxyModel->resort(); });
+    connect(sortWidget, &VisualDeckStorageSortWidget::sortOrderChanged, this,
+            &VisualDeckStorageWidget::updateSortOrder);
+    // The filter widgets only own their ui state. Pushing it into the proxy model
+    // happens here, so the children stay decoupled from the model layer.
+    connect(deckPreviewColorIdentityFilterWidget, &DeckPreviewColorIdentityFilterWidget::activeColorsChanged, this,
+            &VisualDeckStorageWidget::updateColorFilter);
+    connect(deckPreviewColorIdentityFilterWidget, &DeckPreviewColorIdentityFilterWidget::filterModeChanged, this,
+            &VisualDeckStorageWidget::updateColorFilter);
+    connect(searchWidget, &VisualDeckStorageSearchWidget::searchTextChanged, this,
+            &VisualDeckStorageWidget::updateSearchFilter);
+
     connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
             &VisualDeckStorageWidget::createRootFolderWidget);
 
@@ -123,6 +155,8 @@ void VisualDeckStorageWidget::retranslateUi()
 
     refreshButton->setToolTip(tr("Refresh loaded files"));
     quickSettingsWidget->setToolTip(tr("Visual Deck Storage Settings"));
+
+    sortWidget->retranslateUi();
 }
 
 /**
@@ -134,72 +168,69 @@ const VisualDeckStorageQuickSettingsWidget *VisualDeckStorageWidget::settings() 
 }
 
 /**
- * Reapplies all sort and filter options by calling the appropriate update methods.
+ * Reapplies all sort and filter options by updating the proxy model.
  */
 void VisualDeckStorageWidget::reapplySortAndFilters()
 {
-    updateSortOrder();
-    updateTagFilter();
-    updateColorFilter();
-    updateSearchFilter();
+    storageProxyModel->setSortOrder(sortWidget->currentSortOrder());
+    storageProxyModel->reapplyFilters();
 }
 
+/**
+ * @brief Scans the deck folder and rebuilds the folder tree of deck previews.
+ */
 void VisualDeckStorageWidget::createRootFolderWidget()
 {
-    folderWidget = new VisualDeckStorageFolderDisplayWidget(this, this, SettingsCache::instance().paths().getDeckPath(),
-                                                            false, quickSettingsWidget->getShowFolders());
+    storageModel->setDeckPath(SettingsCache::instance().paths().getDeckPath());
+
+    folderWidget =
+        new VisualDeckStorageFolderDisplayWidget(this, this, QString(), false, quickSettingsWidget->getShowFolders());
 
     scrollArea->setWidget(folderWidget); // this automatically destroys the old folderWidget
     scrollArea->widget()->setMaximumWidth(scrollArea->viewport()->width());
     scrollArea->widget()->adjustSize();
 
-    /* We have to schedule a QTimer here so that the sorting logic doesn't try to access widgets that haven't been
-     * processed by the event loop yet. Otherwise, deck sorting will intermittently segfault on some systems.
-     */
-    QTimer::singleShot(0, this, &VisualDeckStorageWidget::reapplySortAndFilters);
+    // Sort and filter runs against the model data, so it is safe to apply immediately.
+    reapplySortAndFilters();
 }
 
 void VisualDeckStorageWidget::updateShowFolders(bool enabled)
 {
     if (folderWidget) {
         folderWidget->updateShowFolders(enabled);
-        QTimer::singleShot(0, this, &VisualDeckStorageWidget::reapplySortAndFilters);
     }
 }
 
 void VisualDeckStorageWidget::updateSortOrder()
 {
-    if (folderWidget) {
-        sortWidget->sortFolder(folderWidget);
-        for (VisualDeckStorageFolderDisplayWidget *subFolderWidget :
-             folderWidget->findChildren<VisualDeckStorageFolderDisplayWidget *>()) {
-            sortWidget->sortFolder(subFolderWidget);
-        }
-    }
+    storageProxyModel->setSortOrder(sortWidget->currentSortOrder());
 }
 
 void VisualDeckStorageWidget::updateTagFilter()
 {
-    if (folderWidget) {
-        tagFilterWidget->filterDecksBySelectedTags(folderWidget->findChildren<DeckPreviewWidget *>());
-        folderWidget->updateVisibility();
-    }
+    const QStringList selected = tagFilterWidget->selectedTags();
+    const QStringList excluded = tagFilterWidget->excludedTags();
+    storageProxyModel->setTagFilter(QSet<QString>(selected.cbegin(), selected.cend()),
+                                    QSet<QString>(excluded.cbegin(), excluded.cend()));
+    // The visible deck set changed, so the chips are re-gathered from it.
+    tagFilterWidget->refreshTags();
 }
 
+/**
+ * Pushes the color identity filter widget's state into the proxy model.
+ */
 void VisualDeckStorageWidget::updateColorFilter()
 {
-    if (folderWidget) {
-        deckPreviewColorIdentityFilterWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>());
-        folderWidget->updateVisibility();
-    }
+    storageProxyModel->setColorFilter(deckPreviewColorIdentityFilterWidget->getFilterMode(),
+                                      deckPreviewColorIdentityFilterWidget->getActiveColors());
 }
 
-void VisualDeckStorageWidget::updateSearchFilter()
+/**
+ * Pushes the search bar's text into the proxy model.
+ */
+void VisualDeckStorageWidget::updateSearchFilter(const QString &text)
 {
-    if (folderWidget) {
-        searchWidget->filterWidgets(folderWidget->findChildren<DeckPreviewWidget *>(), searchWidget->getSearchText());
-        folderWidget->updateVisibility();
-    }
+    storageProxyModel->setSearchText(text);
 }
 
 void VisualDeckStorageWidget::updateTagsVisibility(const bool visible)

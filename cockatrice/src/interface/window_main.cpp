@@ -32,6 +32,7 @@
 #include "../interface/widgets/dialogs/dlg_tip_of_the_day.h"
 #include "../interface/widgets/dialogs/dlg_update.h"
 #include "../interface/widgets/dialogs/dlg_view_log.h"
+#include "../interface/widgets/onboarding/first_run_wizard.h"
 #include "../interface/widgets/tabs/tab_game.h"
 #include "../interface/widgets/tabs/tab_server.h"
 #include "../interface/widgets/tabs/tab_supervisor.h"
@@ -350,6 +351,7 @@ void MainWindow::retranslateUi()
     aStatusBar->setText(tr("Show Status Bar"));
     aViewLog->setText(tr("View &Debug Log"));
     aOpenSettingsFolder->setText(tr("Open Settings Folder"));
+    aFirstRunWizard->setText(tr("Re-run Onboarding Wizard..."));
 
     aShow->setText(tr("Show/Hide"));
 
@@ -411,6 +413,8 @@ void MainWindow::createActions()
     connect(aViewLog, &QAction::triggered, this, &MainWindow::actViewLog);
     aOpenSettingsFolder = new QAction(this);
     connect(aOpenSettingsFolder, &QAction::triggered, this, &MainWindow::actOpenSettingsFolder);
+    aFirstRunWizard = new QAction(this);
+    connect(aFirstRunWizard, &QAction::triggered, this, [this] { runFirstRunWizard(); });
 
     aShow = new QAction(this);
     connect(aShow, &QAction::triggered, this, &MainWindow::actShow);
@@ -489,6 +493,8 @@ void MainWindow::createMenus()
     helpMenu->addAction(aStatusBar);
     helpMenu->addAction(aViewLog);
     helpMenu->addAction(aOpenSettingsFolder);
+    helpMenu->addSeparator();
+    helpMenu->addAction(aFirstRunWizard);
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -585,9 +591,10 @@ void MainWindow::startupConfigCheck()
         // no config found, 99% new clean install
         qCInfo(WindowMainStartupVersionLog)
             << "Startup: old client version empty, assuming first start after clean install";
-        alertForcedOracleRun(VERSION_STRING, false);
         SettingsCache::instance().downloads().resetToDefaultURLs(); // populate the download urls
         SettingsCache::instance().network().setClientVersion(VERSION_STRING);
+        actCheckServerUpdates();
+        runFirstRunWizard();
 
         if (QString(VERSION_STRING).contains("custom", Qt::CaseInsensitive)) {
             SettingsCache::instance().updates().setCheckUpdatesOnStartup(false);
@@ -665,6 +672,21 @@ void MainWindow::startupConfigCheck()
             tip->show();
         }
     }
+}
+
+void MainWindow::runFirstRunWizard()
+{
+    auto *wizard = new FirstRunWizard(this);
+    wizard->setAttribute(Qt::WA_DeleteOnClose);
+
+    connect(wizard, &FirstRunWizard::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdatesBackground);
+    connect(wizard, &FirstRunWizard::manualCardDatabaseSetupRequested, this, &MainWindow::actCheckCardUpdates);
+    connect(this, &MainWindow::cardDatabaseUpdateFinished, wizard, &FirstRunWizard::onCardDatabaseUpdateFinished);
+    connect(wizard, &FirstRunWizard::registerRequested, connectionController, &ConnectionController::registerToServer);
+    connect(wizard, &FirstRunWizard::connectRequested, connectionController, &ConnectionController::connectToServer);
+
+    wizard->setModal(true);
+    wizard->show();
 }
 
 /**
@@ -1028,6 +1050,7 @@ void MainWindow::createCardUpdateProcess(bool background)
         QMessageBox::warning(this, tr("Error"),
                              tr("Unable to run the card database updater: ") + dir.absoluteFilePath(binaryName));
         exitCardDatabaseUpdate();
+        emit cardDatabaseUpdateFinished(false);
         return;
     }
 
@@ -1041,6 +1064,9 @@ void MainWindow::createCardUpdateProcess(bool background)
 
 void MainWindow::exitCardDatabaseUpdate()
 {
+    if (!cardUpdateProcess) {
+        return;
+    }
     cardUpdateProcess->deleteLater();
     cardUpdateProcess = nullptr;
     statusBar()->clearMessage();
@@ -1078,14 +1104,17 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
 
     exitCardDatabaseUpdate();
     QMessageBox::warning(this, tr("Error"), tr("The card database updater exited with an error:\n%1").arg(error));
+    emit cardDatabaseUpdateFinished(false);
 }
 
-void MainWindow::cardUpdateFinished(int, QProcess::ExitStatus exitStatus)
+void MainWindow::cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    const bool success = (exitStatus == QProcess::NormalExit) && (exitCode == 0);
     if (exitStatus == QProcess::NormalExit) {
         SettingsCache::instance().updates().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
     }
     exitCardDatabaseUpdate();
+    emit cardDatabaseUpdateFinished(success);
 }
 
 void MainWindow::actCheckServerUpdates()

@@ -6,6 +6,10 @@
  * Owns all search / tag / color filter state and the sort order. Filtering is
  * evaluated against the model's data (never against widgets), so it can run
  * before any view exists and re-evaluate whenever deck data finishes loading.
+ *
+ * Rows are never removed by filtering. Instead, every row carries the
+ * FilterMatchRole, which views read to show or hide their widgets while keeping
+ * them alive; all rows stay in the proxy so they keep their sorted position.
  */
 
 #ifndef VISUAL_DECK_STORAGE_SORT_FILTER_PROXY_MODEL_H
@@ -47,6 +51,8 @@ public:
 
     explicit VisualDeckStorageSortFilterProxyModel(QObject *parent = nullptr);
 
+    [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
+
     void setSourceModel(QAbstractItemModel *model) override;
 
     /// @name Filter input setters (each re-evaluates the affected matches)
@@ -77,6 +83,7 @@ protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 
 private:
+    [[nodiscard]] bool rowMatches(int sourceRow) const;
     void resizeMatchLists();
     void updateSearchMatches();
     void updateTagMatches();

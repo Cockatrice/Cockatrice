@@ -11,6 +11,11 @@
 
 - @subpage beta_release
 
+## Troubleshooting
+
+- @subpage fixing_card_pictures
+- @subpage enabling_debug_logs
+
 ## Syntax Help
 
 - @subpage search_syntax_help
