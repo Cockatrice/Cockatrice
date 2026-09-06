@@ -12,6 +12,7 @@
 #include <QBuffer>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDebug>
 #include <QDir>
 #include <QFileDialog>
 #include <QGridLayout>
@@ -20,14 +21,17 @@
 #include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QPointer>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QScrollBar>
 #include <QStandardPaths>
 #include <QTextEdit>
+#include <QTextStream>
 #include <QtConcurrent>
 #include <QtGui>
+#include <cstdio>
 #include <libcockatrice/settings/personal_settings.h>
 
 #ifdef HAS_LZMA
@@ -52,6 +56,20 @@
 #else
 #define ALLSETS_URL "https://www.mtgjson.com/api/v5/AllPrintings.json"
 #endif
+
+/**
+ * @brief Emits one machine-readable background-run progress line to stdout.
+ *
+ * Used only in background mode, so the hosting Cockatrice client can parse these
+ * lines to drive a determinate progress bar. stderr stays reserved for
+ * human-readable log output.
+ */
+static void emitBackgroundProgress(const char *stage, qint64 done, qint64 total)
+{
+    QTextStream out(stdout);
+    out << "PROGRESS " << stage << ' ' << done << ' ' << total << '\n';
+    out.flush();
+}
 
 #define TOKENS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml"
 #define SPOILERS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/spoiler.xml"
@@ -339,6 +357,9 @@ void LoadSetsPage::downloadSetsFile(const QUrl &url)
 
 void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
 {
+    if (wizard()->backgroundMode) {
+        emitBackgroundProgress("download", received, total);
+    }
     if (total > 0) {
         progressBar->setMaximum(static_cast<int>(total));
         progressBar->setValue(static_cast<int>(received));
@@ -382,6 +403,21 @@ void LoadSetsPage::actDownloadFinishedSetsFile()
 
     readSetsFromByteArray(reply->readAll());
     reply->deleteLater();
+}
+
+void LoadSetsPage::updateParsingProgress(int bytesRead, int totalBytes)
+{
+    if (totalBytes <= 0) {
+        return;
+    }
+    progressBar->setValue(bytesRead);
+    const int percent = static_cast<int>((100.0 * bytesRead) / totalBytes);
+    progressLabel->setText(tr("Parsing file (%1%)").arg(percent));
+}
+
+void LoadSetsPage::scanProgressToStdout(int bytesRead, int totalBytes)
+{
+    emitBackgroundProgress("scan", bytesRead, totalBytes);
 }
 
 void LoadSetsPage::readSetsFromByteArray(QByteArray _data)
@@ -469,9 +505,23 @@ void LoadSetsPage::readSetsFromByteArrayRef(QByteArray &_data)
         return;
 #endif
     } else if (_data.startsWith("{")) {
-        // Start the computation.
-        jsonData = std::move(_data);
-        future = QtConcurrent::run([this] { return wizard()->importer->readSetsFromByteArray(std::move(jsonData)); });
+        if (wizard()->backgroundMode) {
+            qInfo() << tr("Parsing file");
+            connect(wizard()->importer, &OracleImporter::dataReadProgress, this, &LoadSetsPage::scanProgressToStdout,
+                    Qt::UniqueConnection);
+        } else {
+            // Start the computation.
+            progressBar->setRange(0, static_cast<int>(_data.size()));
+            progressBar->setValue(0);
+            progressLabel->setText(tr("Parsing file (0%)"));
+            connect(wizard()->importer, &OracleImporter::dataReadProgress, this, &LoadSetsPage::updateParsingProgress,
+                    Qt::UniqueConnection);
+        }
+
+        const QPointer<OracleImporter> importer = wizard()->importer;
+        future = QtConcurrent::run([importer, data = std::move(_data)]() mutable {
+            return importer ? importer->readSetsFromByteArray(std::move(data)) : false;
+        });
         watcher.setFuture(future);
     } else if (_data.startsWith("<")) {
         // save xml file and don't do any processing
@@ -514,7 +564,16 @@ void LoadSetsPage::importFinished()
     progressLabel->hide();
     progressBar->hide();
 
-    if (wizard()->downloadedPlainXml || watcher.future().result()) {
+    const bool hasData = wizard()->downloadedPlainXml || watcher.future().result();
+    if (wizard()->backgroundMode) {
+        if (!hasData) {
+            qWarning() << tr("The file was retrieved successfully, but it does not contain any sets data.");
+        }
+        emit readyToContinue();
+        return;
+    }
+
+    if (hasData) {
         wizard()->next();
     } else {
         QMessageBox::critical(this, tr("Error"),
@@ -527,16 +586,22 @@ SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
     pathLabel = new QLabel(this);
     saveLabel = new QLabel(this);
 
+    progressBar = new QProgressBar(this);
+    progressBar->hide();
+
     defaultPathCheckBox = new QCheckBox(this);
 
     messageLog = new QTextEdit(this);
     messageLog->setReadOnly(true);
 
     auto *layout = new QGridLayout(this);
-    layout->addWidget(messageLog, 0, 0);
-    layout->addWidget(saveLabel, 1, 0);
-    layout->addWidget(pathLabel, 2, 0);
-    layout->addWidget(defaultPathCheckBox, 3, 0);
+    layout->addWidget(progressBar, 0, 0);
+    layout->addWidget(messageLog, 1, 0);
+    layout->addWidget(saveLabel, 2, 0);
+    layout->addWidget(pathLabel, 3, 0);
+    layout->addWidget(defaultPathCheckBox, 4, 0);
+
+    connect(&importWatcher, &QFutureWatcher<int>::finished, this, &SaveSetsPage::importFinished);
 
     setLayout(layout);
 }
@@ -549,27 +614,54 @@ void SaveSetsPage::cleanupPage()
 
 void SaveSetsPage::initializePage()
 {
-    messageLog->clear();
-
     retranslateUi();
     if (wizard()->downloadedPlainXml) {
         messageLog->hide();
-    } else {
-        messageLog->show();
-        connect(wizard()->importer, &OracleImporter::setIndexChanged, this, &SaveSetsPage::updateTotalProgress);
-
-        int setsImported = wizard()->importer->startImport();
-
-        // JSON data no longer needed after CardInfo objects are built
-        wizard()->importer->releaseSetData();
-
-        if (setsImported == 0) {
-            QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
+        progressBar->hide();
+        if (wizard()->backgroundMode) {
+            emit readyToContinue();
         }
+        return;
+    }
+
+    messageLog->clear();
+    messageLog->show();
+    progressBar->show();
+    progressBar->setRange(0, wizard()->importer->getSets().size());
+    progressBar->setValue(0);
+
+    connect(wizard()->importer, &OracleImporter::setIndexChanged, this, &SaveSetsPage::updateTotalProgress,
+            Qt::UniqueConnection);
+
+    wizard()->disableButtons();
+
+    const QPointer<OracleImporter> importer = wizard()->importer;
+    importFuture = QtConcurrent::run([importer] { return importer ? importer->startImport() : 0; });
+    importWatcher.setFuture(importFuture);
+}
+
+void SaveSetsPage::importFinished()
+{
+    wizard()->enableButtons();
+
+    const int setsImported = importWatcher.result();
+    const QPointer<OracleImporter> importer = wizard()->importer;
+    if (importer) {
+        importer->releaseSetData();
     }
 
     if (wizard()->backgroundMode) {
+        if (setsImported == 0) {
+            qWarning() << tr("No set has been imported.");
+        }
         emit readyToContinue();
+        return;
+    }
+
+    progressBar->setValue(progressBar->maximum());
+
+    if (setsImported == 0) {
+        QMessageBox::critical(this, tr("Error"), tr("No set has been imported."));
     }
 }
 
@@ -591,13 +683,27 @@ void SaveSetsPage::retranslateUi()
     setButtonText(QWizard::NextButton, tr("&Save"));
 }
 
-void SaveSetsPage::updateTotalProgress(int cardsImported, int /* setIndex */, const QString &setName)
+void SaveSetsPage::updateTotalProgress(int cardsImported, int setIndex, const QString &setName)
 {
+    const bool background = wizard()->backgroundMode;
+    const int totalSets = wizard()->importer->getSets().size();
     if (setName.isEmpty()) {
-        messageLog->append("<b>" + tr("Import finished: %1 cards.").arg(wizard()->importer->getCardList().size()) +
-                           "</b>");
+        progressBar->setValue(progressBar->maximum());
+        if (background) {
+            qInfo() << tr("Import finished: %1 cards.").arg(wizard()->importer->getCardList().size());
+            emitBackgroundProgress("import", totalSets, totalSets);
+        } else {
+            messageLog->append("<b>" + tr("Import finished: %1 cards.").arg(wizard()->importer->getCardList().size()) +
+                               "</b>");
+        }
     } else {
-        messageLog->append(tr("%1: %2 cards imported").arg(setName).arg(cardsImported));
+        progressBar->setValue(setIndex);
+        if (background) {
+            qInfo() << tr("%1: %2 cards imported").arg(setName).arg(cardsImported);
+            emitBackgroundProgress("import", setIndex, totalSets);
+        } else {
+            messageLog->append(tr("%1: %2 cards imported").arg(setName).arg(cardsImported));
+        }
     }
 
     messageLog->verticalScrollBar()->setValue(messageLog->verticalScrollBar()->maximum());

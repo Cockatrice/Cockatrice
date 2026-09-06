@@ -83,13 +83,14 @@ private:
 
     QFutureWatcher<bool> watcher;
     QFuture<bool> future;
-    QByteArray jsonData;
 
 private slots:
     void actLoadSetsFile();
     void actRestoreDefaultUrl();
     void actDownloadProgressSetsFile(qint64 received, qint64 total);
     void actDownloadFinishedSetsFile();
+    void updateParsingProgress(int bytesRead, int totalBytes);
+    void scanProgressToStdout(int bytesRead, int totalBytes);
     void importFinished();
     void zipDownloadFailed(const QString &message);
 };
@@ -103,9 +104,13 @@ public:
 
 private:
     QTextEdit *messageLog;
+    QProgressBar *progressBar;
     QCheckBox *defaultPathCheckBox;
     QLabel *pathLabel;
     QLabel *saveLabel;
+
+    QFutureWatcher<int> importWatcher;
+    QFuture<int> importFuture;
 
 protected:
     void initializePage() override;
@@ -113,6 +118,7 @@ protected:
     bool validatePage() override;
 
 private slots:
+    void importFinished();
     void updateTotalProgress(int cardsImported, int setIndex, const QString &setName);
 };
 

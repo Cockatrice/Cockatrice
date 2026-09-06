@@ -1,5 +1,6 @@
 #include "raw_json_scanner.h"
 
+#include <algorithm>
 #include <cstring>
 
 namespace
@@ -10,6 +11,43 @@ namespace
 // skipValue/skipArray/skipObject walk (Qt's parser caps at 1024 for the same
 // reason and reports DeepNesting).
 constexpr int kMaxNestingDepth = 1024;
+
+/**
+ * @brief Throttled byte-position reporting for scanSetRanges().
+ *
+ * Threaded through the skip walk so progress can be reported without materializing
+ * the whole document. Reports are rate-limited so a GUI showing progress isn't
+ * flooded with interrupts: a callback is invoked at most ~100 times per scan
+ * regardless of element count.
+ */
+struct ScanProgress
+{
+    const char *begin = nullptr;
+    qsizetype size = 0;
+    RawJson::ScanProgressCallback callback;
+    qsizetype step = 1;
+    qsizetype lastReported = 0;
+
+    /**
+     * @brief Reports the scanner's absolute offset, unless within @p step bytes
+     * of the previous report and not yet at the end of the document.
+     */
+    void report(const char *p)
+    {
+        if (!callback) {
+            return;
+        }
+        const qsizetype offset = p - begin;
+        if (offset == lastReported) {
+            return; // the final element often already sits exactly at the end
+        }
+        if (offset - lastReported < step && offset < size) {
+            return;
+        }
+        lastReported = offset;
+        callback(offset, size);
+    }
+};
 
 inline bool isWhitespace(char c)
 {
@@ -296,9 +334,9 @@ bool skipNumber(const char *&p, const char *end)
     return true;
 }
 
-bool skipValue(const char *&p, const char *end, int depth);
-bool skipObject(const char *&p, const char *end, int depth);
-bool skipArray(const char *&p, const char *end, int depth);
+bool skipValue(const char *&p, const char *end, int depth, ScanProgress &scan);
+bool skipObject(const char *&p, const char *end, int depth, ScanProgress &scan);
+bool skipArray(const char *&p, const char *end, int depth, ScanProgress &scan);
 
 bool skipPrimitive(const char *&p, const char *end)
 {
@@ -324,7 +362,7 @@ bool skipPrimitive(const char *&p, const char *end)
     return false;
 }
 
-bool skipObject(const char *&p, const char *end, int depth)
+bool skipObject(const char *&p, const char *end, int depth, ScanProgress &scan)
 {
     if (depth <= 0) {
         return false; // nest deeper than the cap
@@ -348,9 +386,10 @@ bool skipObject(const char *&p, const char *end, int depth)
             return false;
         }
         ++p;
-        if (!skipValue(p, end, depth - 1)) {
+        if (!skipValue(p, end, depth - 1, scan)) {
             return false;
         }
+        scan.report(p);
         p = skipWhitespace(p, end);
         if (p >= end) {
             return false;
@@ -367,7 +406,7 @@ bool skipObject(const char *&p, const char *end, int depth)
     }
 }
 
-bool skipArray(const char *&p, const char *end, int depth)
+bool skipArray(const char *&p, const char *end, int depth, ScanProgress &scan)
 {
     if (depth <= 0) {
         return false; // nest deeper than the cap
@@ -379,9 +418,10 @@ bool skipArray(const char *&p, const char *end, int depth)
         return true;
     }
     for (;;) {
-        if (!skipValue(p, end, depth - 1)) {
+        if (!skipValue(p, end, depth - 1, scan)) {
             return false;
         }
+        scan.report(p);
         p = skipWhitespace(p, end);
         if (p >= end) {
             return false;
@@ -398,7 +438,7 @@ bool skipArray(const char *&p, const char *end, int depth)
     }
 }
 
-bool skipValue(const char *&p, const char *end, int depth)
+bool skipValue(const char *&p, const char *end, int depth, ScanProgress &scan)
 {
     p = skipWhitespace(p, end);
     if (p >= end) {
@@ -407,10 +447,10 @@ bool skipValue(const char *&p, const char *end, int depth)
     const char c = *p;
     if (c == '{') {
         // pass depth through: skipObject consumes the single decrement for this level
-        return skipObject(p, end, depth);
+        return skipObject(p, end, depth, scan);
     }
     if (c == '[') {
-        return skipArray(p, end, depth);
+        return skipArray(p, end, depth, scan);
     }
     // a primitive is a leaf, so it never wastes a nesting level
     return skipPrimitive(p, end);
@@ -422,7 +462,8 @@ bool skipValue(const char *&p, const char *end, int depth)
  * For each member invokes @p memberCallback with the key and the byte range of
  * its value. Advancing @p p is unaffected by the callback.
  */
-template <typename F> bool forEachObjectMember(const char *&p, const char *end, int depth, F &&memberCallback)
+template <typename F>
+bool forEachObjectMember(const char *&p, const char *end, int depth, F &&memberCallback, ScanProgress &scan)
 {
     if (depth <= 0) {
         return false; // nest deeper than the cap
@@ -449,7 +490,7 @@ template <typename F> bool forEachObjectMember(const char *&p, const char *end, 
         ++p;
         const char *valueStart = skipWhitespace(p, end);
         const char *valueEnd = valueStart;
-        if (!skipValue(valueEnd, end, depth - 1)) {
+        if (!skipValue(valueEnd, end, depth - 1, scan)) {
             return false;
         }
         if (!memberCallback(key, valueStart, valueEnd)) {
@@ -473,7 +514,7 @@ template <typename F> bool forEachObjectMember(const char *&p, const char *end, 
 }
 
 // Counts the direct elements of an array value; returns -1 if the array is malformed.
-int countArrayElements(const char *p, const char *end, int depth)
+int countArrayElements(const char *p, const char *end, int depth, ScanProgress &scan)
 {
     if (depth <= 0) {
         return -1; // nest deeper than the cap
@@ -485,9 +526,10 @@ int countArrayElements(const char *p, const char *end, int depth)
         return 0;
     }
     for (;;) {
-        if (!skipValue(p, end, depth - 1)) {
+        if (!skipValue(p, end, depth - 1, scan)) {
             return -1;
         }
+        scan.report(p);
         ++count;
         p = skipWhitespace(p, end);
         if (p >= end) {
@@ -509,7 +551,7 @@ int countArrayElements(const char *p, const char *end, int depth)
 namespace RawJson
 {
 
-QList<SetRange> scanSetRanges(const QByteArray &json, ScanError *error)
+QList<SetRange> scanSetRanges(const QByteArray &json, ScanError *error, const ScanProgressCallback &progress)
 {
     QList<SetRange> ranges;
     if (error) {
@@ -529,6 +571,14 @@ QList<SetRange> scanSetRanges(const QByteArray &json, ScanError *error)
         return fail(QStringLiteral("empty JSON document"));
     }
 
+    // Throttle reports to ~100 per scan so a GUI thread unthrottling them never
+    // drowns under per-card interrupts, whatever the document size.
+    ScanProgress scan;
+    scan.begin = begin;
+    scan.size = end - begin;
+    scan.step = std::max<qsizetype>(1, scan.size / 100);
+    scan.callback = progress;
+
     const char *p = skipWhitespace(begin, end);
     if (p >= end || *p != '{') {
         return fail(QStringLiteral("top-level JSON must be an object"));
@@ -545,55 +595,57 @@ QList<SetRange> scanSetRanges(const QByteArray &json, ScanError *error)
                 return false;
             }
             const char *setP = valueStart;
-            const bool ok = forEachObjectMember(setP, valueEnd, kMaxNestingDepth - 1,
-                                                [&](const QString &setCode, const char *setStart, const char *setEnd) {
-                                                    if (setStart >= setEnd || *setStart != '{') {
-                                                        malformedSetData = true;
-                                                        return false;
-                                                    }
-                                                    SetRange range;
-                                                    range.dataRange.start = setStart - begin;
-                                                    range.dataRange.length = setEnd - setStart;
-                                                    range.code = setCode;
+            const bool ok = forEachObjectMember(
+                setP, valueEnd, kMaxNestingDepth - 1,
+                [&](const QString &setCode, const char *setStart, const char *setEnd) {
+                    if (setStart >= setEnd || *setStart != '{') {
+                        malformedSetData = true;
+                        return false;
+                    }
+                    SetRange range;
+                    range.dataRange.start = setStart - begin;
+                    range.dataRange.length = setEnd - setStart;
+                    range.code = setCode;
 
-                                                    const char *memberP = setStart;
-                                                    const bool metaOk = forEachObjectMember(
-                                                        memberP, setEnd, kMaxNestingDepth - 2,
-                                                        [&](const QString &field, const char *fs, const char *fe) {
-                                                            if (field == QStringLiteral("code")) {
-                                                                return decodeStringMember(fs, fe, range.code);
-                                                            }
-                                                            if (field == QStringLiteral("name")) {
-                                                                return decodeStringMember(fs, fe, range.name);
-                                                            }
-                                                            if (field == QStringLiteral("type")) {
-                                                                return decodeStringMember(fs, fe, range.type);
-                                                            }
-                                                            if (field == QStringLiteral("releaseDate")) {
-                                                                return decodeStringMember(fs, fe, range.releaseDate);
-                                                            }
-                                                            if (field == QStringLiteral("cards")) {
-                                                                if (fs >= fe) {
-                                                                    return false;
-                                                                }
-                                                                if (*fs != '[') {
-                                                                    // e.g. "cards": null — treat as an empty array,
-                                                                    // matching Qt's tolerance.
-                                                                    return true;
-                                                                }
-                                                                range.dataRange.cardCount =
-                                                                    countArrayElements(fs, fe, kMaxNestingDepth - 2);
-                                                                return range.dataRange.cardCount >= 0;
-                                                            }
-                                                            return true;
-                                                        });
-                                                    if (!metaOk) {
-                                                        malformedSetData = true;
-                                                        return false;
-                                                    }
-                                                    ranges.append(range);
-                                                    return true;
-                                                });
+                    const char *memberP = setStart;
+                    const bool metaOk = forEachObjectMember(
+                        memberP, setEnd, kMaxNestingDepth - 2,
+                        [&](const QString &field, const char *fs, const char *fe) {
+                            if (field == QStringLiteral("code")) {
+                                return decodeStringMember(fs, fe, range.code);
+                            }
+                            if (field == QStringLiteral("name")) {
+                                return decodeStringMember(fs, fe, range.name);
+                            }
+                            if (field == QStringLiteral("type")) {
+                                return decodeStringMember(fs, fe, range.type);
+                            }
+                            if (field == QStringLiteral("releaseDate")) {
+                                return decodeStringMember(fs, fe, range.releaseDate);
+                            }
+                            if (field == QStringLiteral("cards")) {
+                                if (fs >= fe) {
+                                    return false;
+                                }
+                                if (*fs != '[') {
+                                    // e.g. "cards": null — treat as an empty array,
+                                    // matching Qt's tolerance.
+                                    return true;
+                                }
+                                range.dataRange.cardCount = countArrayElements(fs, fe, kMaxNestingDepth - 2, scan);
+                                return range.dataRange.cardCount >= 0;
+                            }
+                            return true;
+                        },
+                        scan);
+                    if (!metaOk) {
+                        malformedSetData = true;
+                        return false;
+                    }
+                    ranges.append(range);
+                    return true;
+                },
+                scan);
             if (!ok) {
                 malformedSetData = true;
                 return false;
@@ -602,7 +654,7 @@ QList<SetRange> scanSetRanges(const QByteArray &json, ScanError *error)
         return true;
     };
 
-    if (!forEachObjectMember(p, end, kMaxNestingDepth, topLevelCallback)) {
+    if (!forEachObjectMember(p, end, kMaxNestingDepth, topLevelCallback, scan)) {
         return fail(malformedSetData ? QStringLiteral("malformed set data") : QStringLiteral("malformed JSON"));
     }
     p = skipWhitespace(p, end);
@@ -615,6 +667,7 @@ QList<SetRange> scanSetRanges(const QByteArray &json, ScanError *error)
     if (ranges.isEmpty()) {
         return fail(QStringLiteral("no sets found in \"data\""));
     }
+    scan.report(end);
     return ranges;
 }
 

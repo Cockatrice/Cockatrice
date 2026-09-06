@@ -47,8 +47,14 @@ static CardSet::Priority getSetPriority(const QString &setType, const QString &s
 
 bool OracleImporter::readSetsFromByteArray(QByteArray data)
 {
+    const RawJson::ScanProgressCallback progress =
+        progressReporting ? RawJson::ScanProgressCallback([this](qsizetype bytesRead, qsizetype totalBytes) {
+            emit dataReadProgress(static_cast<int>(bytesRead), static_cast<int>(totalBytes));
+        })
+                          : RawJson::ScanProgressCallback();
+
     RawJson::ScanError error;
-    const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(data, &error);
+    const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(data, &error, progress);
     if (error.isError()) {
         qDebug() << "error: RawJson::scanSetRanges():" << error.message;
         return false;

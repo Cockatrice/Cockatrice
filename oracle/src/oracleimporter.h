@@ -155,6 +155,14 @@ private:
      */
     QByteArray rawSetsData;
 
+    /**
+     * Whether readSetsFromByteArray() should report scan progress via
+     * dataReadProgress. A background run routes that signal to stdout (for the
+     * hosting Cockatrice client to parse); the flag exists to skip the scanner
+     * instrumentation entirely when no consumer needs it.
+     */
+    bool progressReporting = true;
+
     CardInfoPtr addCard(QString name,
                         const QString &text,
                         bool isToken,
@@ -167,6 +175,18 @@ signals:
 
 public:
     explicit OracleImporter(QObject *parent = nullptr);
+    /**
+     * @brief Controls whether readSetsFromByteArray() instruments the raw scan.
+     *
+     * When enabled (the default) the raw scanner reports progress via
+     * dataReadProgress(), which an interactive wizard shows on its progress bar
+     * and a background run routes to stdout for the hosting client. Switch it
+     * off only when nothing will consume scan progress.
+     */
+    void setProgressReporting(bool enabled)
+    {
+        progressReporting = enabled;
+    }
     /**
      * Scans the given JSON document for set metadata. Takes the data by value so
      * the wizard can hand over its decompressed buffer without copying it.

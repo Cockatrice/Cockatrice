@@ -110,6 +110,13 @@ void OracleWizard::accept()
     QDialog::accept();
 }
 
+void OracleWizard::runInBackground()
+{
+    backgroundMode = true;
+    hide();
+    currentPage()->initializePage();
+}
+
 void OracleWizard::enableButtons()
 {
     button(QWizard::NextButton)->setDisabled(false);

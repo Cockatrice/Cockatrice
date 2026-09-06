@@ -52,12 +52,7 @@ public:
     }
     bool saveTokensToFile(const QString &fileName);
 
-    void runInBackground()
-    {
-        backgroundMode = true;
-        hide();
-        currentPage()->initializePage();
-    }
+    void runInBackground();
 
 public:
     OracleImporter *importer;
