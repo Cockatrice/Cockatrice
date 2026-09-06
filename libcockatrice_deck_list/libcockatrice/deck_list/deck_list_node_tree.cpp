@@ -5,6 +5,8 @@
 #include <QCryptographicHash>
 #include <QSet>
 
+static constexpr int MAX_DECK_SIZE = 1e5;
+
 DecklistNodeTree::DecklistNodeTree() : root(new InnerDecklistNode())
 {
 }
@@ -113,7 +115,7 @@ void DecklistNodeTree::readZoneElement(QXmlStreamReader *xml)
 {
     QString zoneName = xml->attributes().value("name").toString();
     InnerDecklistNode *newZone = getZoneObjFromName(zoneName);
-    newZone->readElement(xml);
+    totalCards += newZone->readElement(xml, MAX_DECK_SIZE - totalCards);
 }
 
 DecklistCardNode *DecklistNodeTree::addCard(const QString &cardName,
@@ -125,6 +127,8 @@ DecklistCardNode *DecklistNodeTree::addCard(const QString &cardName,
                                             const QString &cardProviderId,
                                             const bool formatLegal)
 {
+    amount = qMin(amount, MAX_DECK_SIZE - totalCards);
+    totalCards += amount;
     auto *zoneNode = getZoneObjFromName(zoneName);
     auto *node = new DecklistCardNode(cardName, amount, zoneNode, position, cardSetName, cardSetCollectorNumber,
                                       cardProviderId, formatLegal);

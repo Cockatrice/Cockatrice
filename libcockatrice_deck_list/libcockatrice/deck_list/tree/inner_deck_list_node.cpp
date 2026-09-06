@@ -43,6 +43,13 @@ void InnerDecklistNode::setSortMethod(DeckSortMethod method)
     }
 }
 
+const QList<QString> &InnerDecklistNode::boardZoneNames()
+{
+    static const QList<QString> names = {QString(DECK_ZONE_MAIN), QString(DECK_ZONE_SIDE),
+                                         QString(DECK_ZONE_MAYBEBOARD)};
+    return names;
+}
+
 QString InnerDecklistNode::getVisibleName() const
 {
     return visibleNameFromName(name);
@@ -87,6 +94,9 @@ AbstractDecklistNode *InnerDecklistNode::findCardChildByNameProviderIdAndNumber(
 
 int InnerDecklistNode::height() const
 {
+    if (isEmpty()) {
+        return 1;
+    }
     return at(0)->height() + 1;
 }
 
@@ -141,27 +151,31 @@ bool InnerDecklistNode::compareName(AbstractDecklistNode *other) const
     }
 }
 
-bool InnerDecklistNode::readElement(QXmlStreamReader *xml)
+int InnerDecklistNode::readElement(QXmlStreamReader *xml, int limit)
 {
+    int totalCards = 0;
     while (!xml->atEnd()) {
         xml->readNext();
         const QString childName = xml->name().toString();
         if (xml->isStartElement()) {
             if (childName == "zone") {
                 auto *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
-                newZone->readElement(xml);
+                totalCards += newZone->readElement(xml, limit - totalCards);
             } else if (childName == "card") {
-                auto *newCard = new DecklistCardNode(
-                    xml->attributes().value("name").toString(), xml->attributes().value("number").toString().toInt(),
-                    this, -1, xml->attributes().value("setShortName").toString(),
-                    xml->attributes().value("collectorNumber").toString(), xml->attributes().value("uuid").toString());
-                newCard->readElement(xml);
+                int amount = xml->attributes().value("number").toString().toInt();
+                amount = qMin(amount, limit - totalCards);
+                auto *newCard = new DecklistCardNode(xml->attributes().value("name").toString(), amount, this, -1,
+                                                     xml->attributes().value("setShortName").toString(),
+                                                     xml->attributes().value("collectorNumber").toString(),
+                                                     xml->attributes().value("uuid").toString());
+                totalCards += amount;
+                totalCards += newCard->readElement(xml, limit - totalCards);
             }
         } else if (xml->isEndElement() && (childName == "zone")) {
-            return false;
+            return totalCards;
         }
     }
-    return true;
+    return totalCards;
 }
 
 void InnerDecklistNode::writeElement(QXmlStreamWriter *xml)

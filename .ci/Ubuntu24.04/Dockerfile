@@ -15,6 +15,7 @@ RUN apt-get update && \
         libprotobuf-dev \
         libqt6multimedia6 \
         libqt6sql6-mysql \
+        libssl-dev \
         ninja-build \
         protobuf-compiler \
         qt6-image-formats-plugins \

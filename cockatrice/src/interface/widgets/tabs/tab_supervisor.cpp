@@ -116,9 +116,10 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 }
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
-    : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabVisualDeckStorage(nullptr),
-      tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr), tabReplays(nullptr), tabAdmin(nullptr),
-      tabLog(nullptr), tabReport(nullptr), tabModeration(nullptr), isLocalGame(false)
+    : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabHome(nullptr),
+      tabVisualDeckStorage(nullptr), tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr),
+      tabReplays(nullptr), tabAdmin(nullptr), tabCardArtRules(nullptr), tabLog(nullptr), tabReport(nullptr),
+      tabModeration(nullptr), isLocalGame(false)
 {
     setElideMode(Qt::ElideRight);
     setMovable(true);
@@ -245,6 +246,7 @@ void TabSupervisor::retranslateUi()
     aTabLog->setText(tr("Logs"));
     aTabReport->setText(tr("Report Queue"));
     aTabModeration->setText(tr("Moderation"));
+    aTabCardArtRules->setText(tr("Card Art Rules"));
 
     // tabs
     QList<Tab *> tabs;
@@ -256,6 +258,7 @@ void TabSupervisor::retranslateUi()
     tabs.append(tabLog);
     tabs.append(tabReport);
     tabs.append(tabModeration);
+    tabs.append(tabCardArtRules);
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext()) {
         tabs.append(roomIterator.next().value());
@@ -520,7 +523,9 @@ void TabSupervisor::start(const ServerInfo_User &_userInfo)
         if (SettingsCache::instance().tabs().getTabModerationOpen()) {
             openTabModeration();
         }
-        openTabCardArtRules();
+        if (SettingsCache::instance().tabs().getTabCardArtRulesOpen()) {
+            openTabCardArtRules();
+        }
     }
 
     retranslateUi();
@@ -581,6 +586,9 @@ void TabSupervisor::stop()
         }
         if (tabModeration) {
             tabModeration->close();
+        }
+        if (tabCardArtRules) {
+            tabCardArtRules->close();
         }
     }
 
@@ -775,6 +783,7 @@ void TabSupervisor::openTabAdmin()
 
 void TabSupervisor::actTabCardArtRules(bool checked)
 {
+    SettingsCache::instance().tabs().setTabCardArtRulesOpen(checked);
     if (checked && !tabCardArtRules) {
         openTabCardArtRules();
         setCurrentWidget(tabCardArtRules);
@@ -1091,7 +1100,8 @@ QList<GameInviteOption> TabSupervisor::getGameInviteLinksForRoom(int roomId) con
     // The inviter may be in several games of the same room (hosting one and
     // spectating another, for example). Return every game so the caller can
     // let the user choose which one to invite to.
-    for (TabGame *tab : gameTabs) {
+    for (auto it = gameTabs.cbegin(); it != gameTabs.cend(); ++it) {
+        TabGame *tab = it.value();
         GameMetaInfo *metaInfo = tab->getGame()->getGameMetaInfo();
         if (metaInfo->proto().room_id() != roomId) {
             continue;

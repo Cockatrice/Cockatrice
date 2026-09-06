@@ -7,15 +7,18 @@
 #include "../tabs/api/commander_spellbook/commander_bracket_widget.h"
 #include "deck_list_style_proxy.h"
 #include "deck_state_manager.h"
+#include "deck_zone_dialog.h"
 
 #include <QComboBox>
 #include <QDockWidget>
 #include <QHeaderView>
 #include <QLabel>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QSplitter>
 #include <QTextEdit>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/deck_list_node_tree.h>
 #include <libcockatrice/settings/deck_editor_settings.h>
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/utility/macros.h>
@@ -772,12 +775,211 @@ void DeckEditorDeckDockWidget::offsetCountAtIndex(const QModelIndex &idx, bool i
 
 void DeckEditorDeckDockWidget::decklistCustomMenu(QPoint point)
 {
+    const QModelIndex sourceIndex = proxy->mapToSource(deckView->indexAt(point));
+
     QMenu menu;
+
+    const bool isCustomZoneRow = sourceIndex.isValid() && sourceIndex.data(DeckRoles::IsCustomZoneRole).toBool();
+    const bool isBoardZoneRow = sourceIndex.isValid() && !isCustomZoneRow && !sourceIndex.parent().isValid();
+    const bool isCardRow =
+        sourceIndex.isValid() && !isCustomZoneRow && !isBoardZoneRow && !getModel()->hasChildren(sourceIndex);
+
+    // Walk the row up to its top-level node to find the hosting board. Cards in
+    // the tokens board cannot be moved (moveCardToZone bails for it), so the
+    // move menu is skipped for them.
+    QString currentBoardName;
+    QModelIndex board = sourceIndex.parent();
+    while (board.isValid() && board.parent().isValid()) {
+        board = board.parent();
+    }
+    if (board.isValid()) {
+        currentBoardName = board.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+    }
+
+    if (isCardRow) {
+        if (currentBoardName != DECK_ZONE_TOKENS) {
+            addMoveToZoneMenu(&menu, sourceIndex, currentBoardName);
+            menu.addSeparator();
+        }
+    } else if (isCustomZoneRow) {
+        const QString zoneName =
+            sourceIndex.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+
+        QAction *renameAction = menu.addAction(tr("&Rename zone..."));
+        connect(renameAction, &QAction::triggered, this, [this, zoneName] {
+            // The unchanged name must not validate as a duplicate.
+            const QString newName =
+                DeckZoneDialog::promptForRename(this, zoneName, [this, zoneName](const QString &candidate) {
+                    return candidate == zoneName ? QString() : deckStateManager->validateNewZoneName(candidate);
+                });
+            if (!newName.isEmpty() && newName != zoneName) {
+                deckStateManager->renameCustomZone(zoneName, newName);
+            }
+        });
+
+        QMenu *boardMenu = menu.addMenu(tr("Change &board"));
+        addChangeBoardMenu(boardMenu, zoneName);
+
+        QAction *deleteAction = menu.addAction(tr("&Delete zone"));
+        const bool zoneHasCards = getModel()->hasChildren(sourceIndex);
+        deleteAction->setEnabled(!zoneHasCards);
+        if (zoneHasCards) {
+            deleteAction->setToolTip(tr("Move or remove all cards first."));
+            menu.setToolTipsVisible(true);
+        }
+        connect(deleteAction, &QAction::triggered, this, [this, zoneName] {
+            const auto result =
+                QMessageBox::warning(this, tr("Delete zone"), tr("Delete the zone \"%1\"?").arg(zoneName),
+                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+            if (result == QMessageBox::Yes) {
+                deckStateManager->removeCustomZone(zoneName);
+            }
+        });
+        menu.addSeparator();
+    } else if (isBoardZoneRow) {
+        const QString boardName =
+            sourceIndex.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+        // Tokens cannot host custom zones, so only offer the action on real boards.
+        const bool canHostCustomZones =
+            boardName == DECK_ZONE_MAIN || boardName == DECK_ZONE_SIDE || boardName == DECK_ZONE_MAYBEBOARD;
+        if (canHostCustomZones) {
+            addNewZoneAction(&menu, boardName);
+            menu.addSeparator();
+        }
+    } else if (!sourceIndex.isValid()) {
+        addNewZoneAction(&menu);
+        menu.addSeparator();
+    }
 
     QAction *selectPrinting = menu.addAction(tr("Select Printing"));
     connect(selectPrinting, &QAction::triggered, deckEditor, &AbstractTabDeckEditor::showPrintingSelector);
 
     menu.exec(deckView->mapToGlobal(point));
+}
+
+void DeckEditorDeckDockWidget::addMoveToZoneMenu(QMenu *menu,
+                                                 const QModelIndex &sourceCardIndex,
+                                                 const QString &currentBoardName)
+{
+    // The card's current *zone*, derived with the same ancestor walk as
+    // DeckStateManager::moveCardToZone (nearest custom-zone ancestor, else the
+    // top-level board/zone): a card inside "Removal" under the maindeck lives in
+    // "Removal", not "main". Comparing against that instead of the board keeps
+    // the enabled state and the same-zone no-op consistent with the move logic.
+    QString currentZoneName;
+    for (QModelIndex ancestor = sourceCardIndex.parent(); ancestor.isValid(); ancestor = ancestor.parent()) {
+        if (ancestor.data(DeckRoles::IsCustomZoneRole).toBool() || !ancestor.parent().isValid()) {
+            currentZoneName = ancestor.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+            break;
+        }
+    }
+
+    const auto addMoveAction = [this, sourceCardIndex](QMenu *targetMenu, const QString &targetZoneName,
+                                                       const QString &label, bool enabled) {
+        QAction *action = targetMenu->addAction(label);
+        action->setEnabled(enabled);
+        if (enabled) {
+            connect(action, &QAction::triggered, this, [this, sourceCardIndex, targetZoneName] {
+                deckStateManager->moveCardToZone(sourceCardIndex, targetZoneName);
+            });
+        }
+    };
+
+    const auto tree = deckStateManager->getDeckListShared()->getTree();
+
+    QMenu *moveMenu = menu->addMenu(tr("Move to &zone"));
+
+    for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
+        const QString boardLabel = InnerDecklistNode::visibleNameFromName(boardName);
+        const auto customZones = tree->getCustomZones(boardName);
+
+        // Boards with zones nest their children so no two menu entries share a
+        // visible name: "Maindeck ▸ { Maindeck (whole board), Removal, … }".
+        // The board the card already lives on is marked instead of offered.
+        if (!customZones.isEmpty()) {
+            QMenu *boardSubmenu = moveMenu->addMenu(boardLabel);
+            addMoveAction(boardSubmenu, boardName, boardLabel, boardName != currentZoneName);
+            for (const auto *customZone : customZones) {
+                addMoveAction(boardSubmenu, customZone->getName(), customZone->getName(),
+                              customZone->getName() != currentZoneName);
+            }
+        } else {
+            addMoveAction(moveMenu, boardName, boardLabel, boardName != currentZoneName);
+        }
+    }
+
+    moveMenu->addSeparator();
+
+    QAction *newZoneAction = moveMenu->addAction(tr("Create new zone and move &here..."));
+    connect(newZoneAction, &QAction::triggered, this, [this, sourceCardIndex, currentBoardName, currentZoneName] {
+        // Resolve the card's identity before creating the zone:
+        // createNewCustomZone rebuilds the model tree, so sourceCardIndex's
+        // internal pointer is freed by the time it would be used.
+        const QString cardName =
+            sourceCardIndex.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
+        const QString providerId =
+            sourceCardIndex.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data(Qt::DisplayRole).toString();
+        const QString collectorNumber = sourceCardIndex.siblingAtColumn(DeckListModelColumns::CARD_COLLECTOR_NUMBER)
+                                            .data(Qt::DisplayRole)
+                                            .toString();
+
+        const QString zoneName = createNewCustomZone(currentBoardName);
+        if (!zoneName.isEmpty()) {
+            // Re-find the card: the old index is no longer safe since rows were
+            // rebuilt. Mirror DeckStateManager::decrementCard's re-find pattern.
+            const QModelIndex refreshed = getModel()->findCard(cardName, currentZoneName, providerId, collectorNumber);
+            if (refreshed.isValid()) {
+                deckStateManager->moveCardToZone(refreshed, zoneName);
+            }
+        }
+    });
+}
+
+void DeckEditorDeckDockWidget::addChangeBoardMenu(QMenu *menu, const QString &zoneName)
+{
+    const auto tree = deckStateManager->getDeckListShared()->getTree();
+    for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
+        QAction *action = menu->addAction(InnerDecklistNode::visibleNameFromName(boardName));
+
+        // The board currently holding the zone is marked instead of offered.
+        // Duplicate names cannot come up through the editor, so this doubles as
+        // the uniqueness guard for imported decks.
+        bool holdsTheZone = false;
+        for (const auto *customZone : tree->getCustomZones(boardName)) {
+            if (customZone->getName() == zoneName) {
+                holdsTheZone = true;
+                break;
+            }
+        }
+        if (holdsTheZone) {
+            action->setCheckable(true);
+            action->setChecked(true);
+            continue;
+        }
+
+        connect(action, &QAction::triggered, this,
+                [this, zoneName, boardName] { deckStateManager->moveCustomZone(zoneName, boardName); });
+    }
+}
+
+void DeckEditorDeckDockWidget::addNewZoneAction(QMenu *menu, const QString &initialBoardName)
+{
+    QAction *newZoneAction = menu->addAction(tr("Create &new zone..."));
+    connect(newZoneAction, &QAction::triggered, this,
+            [this, initialBoardName] { createNewCustomZone(initialBoardName); });
+}
+
+QString DeckEditorDeckDockWidget::createNewCustomZone(const QString &initialBoardName)
+{
+    QString boardName;
+    const QString zoneName =
+        DeckZoneDialog::promptForNewZone(this, initialBoardName, &boardName, [this](const QString &candidate) {
+            return deckStateManager->validateNewZoneName(candidate);
+        });
+    if (!zoneName.isEmpty()) {
+        deckStateManager->createCustomZone(boardName, zoneName);
+    }
+    return zoneName;
 }
 
 void DeckEditorDeckDockWidget::refreshShortcuts()

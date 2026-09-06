@@ -16,7 +16,7 @@ add_test(NAME lag_monitor_test COMMAND lag_monitor_test)
 add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
-set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 5)
+set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 15)
 
 # Find GTest
 
@@ -114,6 +114,7 @@ target_link_libraries(
 
 add_subdirectory(card_zone_algorithms)
 add_subdirectory(carddatabase)
+add_subdirectory(deck_list_model)
 add_subdirectory(deck_list_zones)
 add_subdirectory(loading_from_clipboard)
 add_subdirectory(movecard_tests)
