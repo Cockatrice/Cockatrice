@@ -1063,6 +1063,13 @@ TabMessage *TabSupervisor::addMessageTab(const QString &receiverName, bool focus
         return tab;
     }
 
+    if (focus && userListManager->isUserIgnored(receiverName)) {
+        QMessageBox::information(
+            this, tr("Ignored user"),
+            tr("You have ignored %1. Remove them from your ignore list to open a private chat.").arg(receiverName));
+        return nullptr;
+    }
+
     tab = new TabMessage(this, client, *userInfo, otherUser, userOnline);
     connect(tab, &TabMessage::talkClosing, this, &TabSupervisor::talkLeft);
     connect(tab, &TabMessage::maximizeClient, this, &TabSupervisor::maximizeMainWindow);
