@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
 
     // Command-line parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("Cockatrice");
+    parser.setApplicationDescription("Cockatrice Client");
     parser.addHelpOption();
     parser.addVersionOption();
 
