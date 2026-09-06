@@ -260,7 +260,7 @@ bool LoadSetsPage::validatePage()
             return false;
         }
 
-        progressLabel->setText(tr("Downloading (0MB)"));
+        progressLabel->setText(tr("Downloading (0 MB)"));
         // show an infinite progressbar
         progressBar->setMaximum(0);
         progressBar->setMinimum(0);
@@ -343,7 +343,7 @@ void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
         progressBar->setMaximum(static_cast<int>(total));
         progressBar->setValue(static_cast<int>(received));
     }
-    progressLabel->setText(tr("Downloading (%1MB)").arg((int)received / (1024 * 1024)));
+    progressLabel->setText(tr("Downloading (%1 MB)").arg((int)received / (1024 * 1024)));
 }
 
 void LoadSetsPage::actDownloadFinishedSetsFile()
@@ -577,7 +577,7 @@ void SaveSetsPage::retranslateUi()
 {
     setTitle(tr("Sets imported"));
     if (wizard()->downloadedPlainXml) {
-        setSubTitle(tr("A cockatrice database file of %1 MB has been downloaded.")
+        setSubTitle(tr("A Cockatrice card database file of %1 MB has been downloaded.")
                         .arg(qRound(wizard()->xmlData.size() / 1000000.0)));
     } else {
         setSubTitle(tr("The following sets have been found:"));
