@@ -221,7 +221,12 @@ void GameScene::removePlayer(PlayerLogic *player)
 
     clearArrowsForPlayer(player->getPlayerInfo()->getId());
 
-    for (ZoneViewWidget *zone : zoneViews) {
+    // Closing a view removes it from zoneViews synchronously, so iterate over a
+    // copy: otherwise a player with several open views (e.g. library and hand)
+    // only has the first one closed here and the remaining views are left
+    // pointing at a player that is about to be deleted.
+    const QList<ZoneViewWidget *> zoneViewCopy = zoneViews;
+    for (ZoneViewWidget *zone : zoneViewCopy) {
         if (zone->getPlayer() == player) {
             zone->close();
         }
@@ -664,7 +669,10 @@ CardItem *GameScene::findTopmostCardInZone(const QList<QGraphicsItem *> &items, 
  */
 void GameScene::toggleZoneView(PlayerLogic *player, const QString &zoneName, int numberCards, bool isReversed)
 {
-    for (auto &view : zoneViews) {
+    // Closing a view removes it from zoneViews synchronously, so iterate over a
+    // copy to make sure every already-open matching view is closed.
+    const QList<ZoneViewWidget *> zoneViewCopy = zoneViews;
+    for (auto *view : zoneViewCopy) {
         ZoneViewZone *temp = view->getZone();
         if (temp->getLogic()->getName() == zoneName && temp->getLogic()->getPlayer() == player &&
             qobject_cast<ZoneViewZoneLogic *>(temp->getLogic())->getNumberCards() == numberCards) {
