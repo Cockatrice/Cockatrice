@@ -33,6 +33,7 @@ bool parse(QTextStream &in,
 
     // Regex for advanced card parsing
     static const QRegularExpression reMultiplier(R"(^[xX\(\[]*(\d+)[xX\*\)\]]* ?(.+))");
+    static const QRegularExpression reTabQuantity(R"(^\d+[xX]?$)");
 
     // Regex for extracting set code and collector number with attached symbols
     static const QRegularExpression reHyphenFormat(R"(\((\w{3,})\)\s+(\w{3,})-(\d+[^\w\s]*))");
@@ -110,8 +111,34 @@ bool parse(QTextStream &in,
             continue;
         }
 
-        QString cardName = match.captured().simplified();
+        const QString rawLine = match.captured();
+        QString cardName = rawLine.simplified();
         bool sideboard = false;
+        int amount = 1;
+
+        // Card names never contain tab characters, so a leading numeric field
+        // marks a tabular record emitted by third-party deck tools (e.g. Delver
+        // Lens "2\tCard Name\tSet Name"). The first two columns are the quantity
+        // and the card name; any further columns are printer/set metadata and
+        // are discarded.
+        bool hasTabQuantity = false;
+        const auto tabFields = rawLine.split('\t');
+        int firstField = 0;
+        while (firstField < tabFields.size() && tabFields.at(firstField).trimmed().isEmpty()) {
+            ++firstField;
+        }
+        if (firstField + 1 < tabFields.size()) {
+            const QString quantity = tabFields.at(firstField).trimmed();
+            if (reTabQuantity.match(quantity).hasMatch()) {
+                hasTabQuantity = true;
+                QString digits = quantity;
+                if (digits.endsWith('x') || digits.endsWith('X')) {
+                    digits.chop(1);
+                }
+                amount = digits.toInt();
+                cardName = tabFields.at(firstField + 1).simplified();
+            }
+        }
 
         // Sideboard detection
         if (sBStart < 0) {
@@ -156,11 +183,12 @@ bool parse(QTextStream &in,
         }
 
         // check if a specific amount is mentioned
-        int amount = 1;
-        match = reMultiplier.match(cardName);
-        if (match.hasMatch()) {
-            amount = match.captured(1).toInt();
-            cardName = match.captured(2);
+        if (!hasTabQuantity) {
+            match = reMultiplier.match(cardName);
+            if (match.hasMatch()) {
+                amount = match.captured(1).toInt();
+                cardName = match.captured(2);
+            }
         }
 
         // Normalize the card name
