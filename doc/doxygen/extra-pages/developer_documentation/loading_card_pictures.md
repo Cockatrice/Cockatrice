@@ -143,17 +143,17 @@ For each set, CardPictureToLoad::populateSetUrls() builds an ordered URL list:
 URL templates are transformed into concrete URLs by CardPictureToLoad::transformUrl(), which substitutes reference
 points. The following placeholders are available:
 
-| Placeholder | Description | Example |
-|-------------|-------------|---------|
-| `!name!` | Card name | `Example Card` |
-| `!name_lower!` | Card name, lower case | `example card` |
-| `!corrected_name!` | Corrected card name | `ExampleCard` (instead of "Example // Card") |
-| `!corrected_name_lower!` | Corrected card name, lower case | `examplecard` |
-| `!sflang!` | Scryfall language code for the current client language; defaults to English when the language has no localized images | `en`, `zhs` |
-| `!setcode!` / `!setcode_lower!` | Set code | `EXM` / `exm` |
-| `!setname!` / `!setname_lower!` | Full set name | `Exemplary Set` / `exemplary set` |
-| `!set:<property>!` | A property of this printing, e.g. `muid` (Gatherer multiverse ID), `uuid` (Scryfall UUID), `num` (collector number), `rarity` | `373549` |
-| `!prop:<property>!` | A property of the card, e.g. `side` (front/back), `colors`, `cmc`, `coloridentity`, `type`, `pt`, and the format legality statuses | `front` |
+| Placeholder                     | Description                                                                                                                        | Example                                      |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `!name!`                        | Card name                                                                                                                          | `Example Card`                               |
+| `!name_lower!`                  | Card name, lower case                                                                                                              | `example card`                               |
+| `!corrected_name!`              | Corrected card name                                                                                                                | `ExampleCard` (instead of "Example // Card") |
+| `!corrected_name_lower!`        | Corrected card name, lower case                                                                                                    | `examplecard`                                |
+| `!sflang!`                      | Scryfall language code for the current client language; defaults to English when the language has no localized images              | `en`, `zhs`                                  |
+| `!setcode!` / `!setcode_lower!` | Set code                                                                                                                           | `EXM` / `exm`                                |
+| `!setname!` / `!setname_lower!` | Full set name                                                                                                                      | `Exemplary Set` / `exemplary set`            |
+| `!set:<property>!`              | A property of this printing, e.g. `muid` (Gatherer multiverse ID), `uuid` (Scryfall UUID), `num` (collector number), `rarity`      | `373549`                                     |
+| `!prop:<property>!`             | A property of the card, e.g. `side` (front/back), `colors`, `cmc`, `coloridentity`, `type`, `pt`, and the format legality statuses | `front`                                      |
 
 The `!set:...!` and `!prop:...!` placeholders also support two modifiers:
 
