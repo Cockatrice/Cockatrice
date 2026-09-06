@@ -41,6 +41,7 @@ private:
     QCheckBox mentionPopups;
     QCheckBox roomHistory;
     QCheckBox ignoreAllPrivateMessagesCheckBox;
+    QCheckBox useGameTimeCheckBox;
     QGroupBox *chatGroupBox;
     QGroupBox *highlightGroupBox;
     QGroupBox *messageGroupBox;

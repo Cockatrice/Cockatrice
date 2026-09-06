@@ -24,6 +24,7 @@ public:
     [[nodiscard]] bool getShowMentionPopup() const override;
     [[nodiscard]] bool getRoomHistory() const override;
     [[nodiscard]] bool getIgnoreAllPrivateMessages() const override;
+    [[nodiscard]] bool getUseGameTime() const override;
     [[nodiscard]] QString getHighlightWords() const override;
 
     void setChatMention(bool _chatMention);
@@ -39,6 +40,7 @@ public:
     void setShowMentionPopups(bool _showMentionPopups);
     void setRoomHistory(bool _roomHistory);
     void setIgnoreAllPrivateMessages(bool _ignoreAllPrivateMessages);
+    void setUseGameTime(bool _useGameTime);
     void setHighlightWords(const QString &_highlightWords);
 
 signals:

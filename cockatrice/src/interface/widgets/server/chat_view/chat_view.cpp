@@ -167,7 +167,7 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
 
     QString htmlText =
         "<font color=" + ((optionalFontColor.size() > 0) ? optionalFontColor : serverMessageColor.name()) + ">" +
-        QDateTime::currentDateTime().toString("[hh:mm:ss] ") + html + "</font>";
+        getCurrentTime() + html + "</font>";
 
     if (optionalIsBold) {
         htmlText = "<b>" + htmlText + "</b>";
@@ -177,6 +177,11 @@ void ChatView::appendHtmlServerMessage(const QString &html, bool optionalIsBold,
     if (atBottom) {
         scrollToBottom();
     }
+}
+
+QString ChatView::getCurrentTime() const
+{
+    return QDateTime::currentDateTime().toString("[hh:mm:ss] ");
 }
 
 void ChatView::appendCardTag(QTextCursor &cursor, const QString &cardName)
@@ -290,7 +295,7 @@ void ChatView::appendMessage(QString message,
         timeFormat.setForeground(serverMessageColor);
         timeFormat.setFontWeight(QFont::Bold);
         cursor.setCharFormat(timeFormat);
-        cursor.insertText(QDateTime::currentDateTime().toString("[hh:mm:ss] "));
+        cursor.insertText(getCurrentTime());
     }
 
     // nickname
