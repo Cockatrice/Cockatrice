@@ -92,6 +92,11 @@ void PlayerListWidget::retranslateUi()
 
 void PlayerListWidget::addPlayer(const ServerInfo_PlayerProperties &player)
 {
+    if (players.contains(player.player_id())) {
+        updatePlayerProperties(player);
+        return;
+    }
+
     QTreeWidgetItem *newPlayer = new PlayerListTWI;
     players.insert(player.player_id(), newPlayer);
     updatePlayerProperties(player);
@@ -174,6 +179,17 @@ void PlayerListWidget::removePlayer(int playerId)
     }
     players.remove(playerId);
     delete takeTopLevelItem(indexOfTopLevelItem(player));
+}
+
+void PlayerListWidget::clearSpectators()
+{
+    const QList<int> playerIds = players.keys();
+    for (int playerId : playerIds) {
+        QTreeWidgetItem *player = players.value(playerId, 0);
+        if (player && !player->data(1, Qt::UserRole).toBool()) {
+            removePlayer(playerId);
+        }
+    }
 }
 
 void PlayerListWidget::setActivePlayer(int playerId)
