@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
     // These values are only used by the settings loader/saver
     // Wrong or outdated values are kept to not break things
     QCoreApplication::setOrganizationName("Cockatrice");
-    QCoreApplication::setOrganizationDomain("cockatrice.de");
+    QCoreApplication::setOrganizationDomain("cockatrice.github.io");
     QCoreApplication::setApplicationName("Cockatrice");
     QCoreApplication::setApplicationVersion(VERSION_STRING);
 
