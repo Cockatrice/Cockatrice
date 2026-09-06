@@ -32,11 +32,6 @@ if(NOT CMAKE_BUILD_TYPE)
       Release
       CACHE STRING "Build type"
   )
-else()
-  set(CMAKE_BUILD_TYPE
-      Release
-      CACHE STRING "Type of build"
-  )
 endif()
 
 if(USE_CCACHE)
@@ -82,19 +77,13 @@ if(NOT DEFINED GIT_TAG_RELEASENAME)
   set(GIT_TAG_RELEASENAME "Graduation Day")
 endif()
 
-# Use C++20 for all targets
-set(CMAKE_CXX_STANDARD
-    20
-    CACHE STRING "C++ ISO Standard"
-)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+# Requires ISO C++20 standard (without compiler-specific extensions)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# try target_compile_features(cockatrice PRIVATE cxx_std_20)
-# -fexperimental-library for gcc/clang, libstdc++,  gate with compiler_is_gnucxx or cxx_compiler_id matches clang
-
 # Set conventional loops
-set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
 
 # Search path for CMake modules
 set(COCKATRICE_CMAKE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -144,41 +133,41 @@ elseif(WIN32) # Windows (including 64bit)
 endif()
 
 # Define compiler flags
-if(MSVC) # MS Visual C++ compiler
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") # MS Visual C++ compiler
   # /EHsc              Enable standard C++ exception handling
   # /MP                Enable parallel compilation
-  # /permissive-       Enable strict standards compliance
+  # /permissive-       Enable more standards-conforming behavior
   # /utf-8             Set source file encoding and execution char set to UTF-8
   # /W4                Enable warning level 4
   # /Zc:__cplusplus    Enable C++20 detection in headers
   # /Zi                Generate debugging information (Program Database, PDB)
   set(CMAKE_CXX_FLAGS "/EHsc /MP /permissive- /utf-8 /W4 /Zc:__cplusplus /Zi")
 
-  # /Ox                Enable maximum optimization
+  # /O2                Balanced optimization
   # /MD                Link against the multi-threaded DLL runtime library (Release CRT)
-  set(CMAKE_CXX_FLAGS_RELEASE "/Ox /MD")
+  set(CMAKE_CXX_FLAGS_RELEASE "/O2 /MD")
 
   # /Od                Disable optimization
   # /MDd               Link against the multi-threaded Debug DLL runtime library (Debug CRT)
   set(CMAKE_CXX_FLAGS_DEBUG "/Od /MDd")
 
   # Generate PDBs, even when building release target to allow developers to better analyze crash logs
-  # /DEBUG             Enable PDB generation also for Release builds
-  # /OPT:REF           Remove unused references
-  # /OPT:ICF           Fold identical code
+  # /DEBUG             Enable debug symbols and PDB generation
+  # /OPT:REF           Remove unreferenced functions/data
+  # /OPT:ICF           Fold identical COMDAT functions/data
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG /OPT:REF /OPT:ICF")
 
-elseif(CMAKE_COMPILER_IS_GNUCXX) # Linux/GCC, BSD/GCC, Windows/MinGW
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU") # GCC compiler
   include(CheckCXXCompilerFlag)
 
   # -O2             Balanced optimization
-  # -s              Remove debug info from the binary (strip symbols)
+  # -s              Remove symbols from the executable    <-- do we want that? we add symbols to windows builds explicitly. Check pdb's and how debug symbols work & can be striped during packaging // non-gcc &  clang section also does not have it
   set(CMAKE_CXX_FLAGS_RELEASE "-O2 -s")
 
   # -ggdb           Produce GDB debugging symbols
-  # -O0             No optimization
-  # -Wall           Enable all warnings
-  # -Wextra         Enable extra warnings
+  # -O0             Disable optimization
+  # -Wall           Enable broad set of useful warnings
+  # -Wextra         Enable set of extra warnings
   # -Werror         Treat warnings as compilation errors
   if(WARNING_AS_ERROR)
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra -Werror")
@@ -186,26 +175,27 @@ elseif(CMAKE_COMPILER_IS_GNUCXX) # Linux/GCC, BSD/GCC, Windows/MinGW
     set(CMAKE_CXX_FLAGS_DEBUG "-ggdb -O0 -Wall -Wextra")
   endif()
 
+  # Test without, CMAKE_CXX-ESTENSIONS are defined as OFF, so no sense to add them here but not turning the general setting ON?
   # -std=gnu++20    Enable GNU C++20 extensions
-  if(APPLE) # macOS/GCC
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20")
-  endif()
+  # if(APPLE) # macOS/GCC
+  #   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20")
+  # endif()
 
   # -Wcast-align                          Catch unsafe pointer casts
   # -Wmissing-declarations                Catch defined functions without prior declaration
   # -Wno-error=extra                      Downgrade some -Wextra warnings from errors to warnings
-  # -Wno-error=delete-non-virtual-dtor    <-- see if still needed?
+  # -Wno-error=delete-non-virtual-dtor    xxx
   # -Wno-error=sign-compare               Downgrade comparing signed vs. unsigned integers from errors to warnings
   # -Wno-error=missing-declarations       Downgrade -Wmissing-declarations from errors to warnings
   # -Wno-error=sfinae-incomplete          GCC 16+: Qt MOC + protobuf forward declarations trigger this
   set(ADDITIONAL_DEBUG_FLAGS
       -Wcast-align
       -Wmissing-declarations
-      -Wno-error=extra
-      -Wno-error=delete-non-virtual-dtor
-      -Wno-error=sign-compare
-      -Wno-error=missing-declarations
-      -Wno-error=sfinae-incomplete
+      -Wno-error=extra # <-- consider removing this, check without as it makes most of added -Wextra warnings non-fatal
+      -Wno-error=delete-non-virtual-dtor # <-- see if still needed?
+      -Wno-error=sign-compare # <-- test without
+      -Wno-error=missing-declarations # <-- test without
+      -Wno-error=sfinae-incomplete # <-- test again without and see if comment still holds true
   )
 
   foreach(FLAG ${ADDITIONAL_DEBUG_FLAGS})
@@ -214,26 +204,34 @@ elseif(CMAKE_COMPILER_IS_GNUCXX) # Linux/GCC, BSD/GCC, Windows/MinGW
       set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${FLAG}")
     endif()
   endforeach()
-else() # Other: macOS/LLVM, BSD/LLVM, "Clang-specific"
+
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Clang compiler
   # -O2                      Balanced optimization
   set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
   # -g                       Include debug information (equivalent to -ggdb for GCC)
-  # -O0                      No optimization
-  # -Wall                    Enable all warnings
-  # -Wextra                  Enable extra warnings
-  # -Werror                  Treat warnings as compiler errors
+  # -O0                      Disable optimization
+  # -Wall                    Enable broad set of useful warnings
+  # -Wextra                  Enable set of extra warnings
+  # -Werror                  Treat warnings as compilation errors
   # -Wno-unused-parameter    Suppress warnings about unused function parameters (common in Qt callbacks)
   if(WARNING_AS_ERROR)
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra -Werror -Wno-unused-parameter")
   else()
     set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -Wall -Wextra")
   endif()
+
+else() # Undefined compiler
+  message(WARNING
+    "Unknown C++ compiler: ${CMAKE_CXX_COMPILER_ID}"
+  )
+
 endif()
 
 # GNU systems need to define the Mersenne Exponent for SFMT for the RNG to compile without warning
+# Consider making this target specific --> target_compile_definitions(libcockatrice_rng PRIVATE SFMT_MEXP=19937)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-  add_definitions("-DSFMT_MEXP=19937")
+  add_compile_definitions(SFMT_MEXP=19937)
 endif()
 
 find_package(Threads REQUIRED)
@@ -404,3 +402,10 @@ if(Qt6_FOUND AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
   # Qt 6.3+ requires project finalization to support translations
   qt6_finalize_project()
 endif()
+
+# Print compiler identification at configuration time
+message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "C++ compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "C++ compiler path: ${CMAKE_CXX_COMPILER}")
+message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
+message(STATUS "C++ extensions: ${CMAKE_CXX_EXTENSIONS}")
