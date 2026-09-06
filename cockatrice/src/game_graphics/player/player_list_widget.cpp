@@ -181,6 +181,17 @@ void PlayerListWidget::removePlayer(int playerId)
     delete takeTopLevelItem(indexOfTopLevelItem(player));
 }
 
+void PlayerListWidget::clearSpectators()
+{
+    const QList<int> playerIds = players.keys();
+    for (int playerId : playerIds) {
+        QTreeWidgetItem *player = players.value(playerId, 0);
+        if (player && !player->data(1, Qt::UserRole).toBool()) {
+            removePlayer(playerId);
+        }
+    }
+}
+
 void PlayerListWidget::setActivePlayer(int playerId)
 {
     QMapIterator<int, QTreeWidgetItem *> i(players);
