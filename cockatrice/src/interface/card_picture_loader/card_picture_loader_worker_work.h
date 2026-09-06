@@ -43,6 +43,9 @@ public:
 
     CardPictureToLoad cardToDownload; ///< The card and associated URLs to try downloading
 
+    /** @brief Shared per-server 429 backoff state. */
+    static ServerRateLimiter &rateLimiter();
+
 public slots:
     /**
      * @brief Handles a finished network reply for the card image.
