@@ -125,6 +125,8 @@ signals:
 public slots:
     void incrementGameTime();
     void setGameTime(int _secondsElapsed);
+
+public:
     static QString formatElapsedTime(int _secondsElapsed);
 
 private:
