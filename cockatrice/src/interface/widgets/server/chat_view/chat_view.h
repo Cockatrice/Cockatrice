@@ -107,9 +107,8 @@ public:
     ChatView(TabSupervisor *_tabSupervisor, AbstractGame *_game, bool _showTimestamps, QWidget *parent = nullptr);
     void retranslateUi();
     void appendHtml(const QString &html);
-    void virtual appendHtmlServerMessage(const QString &html,
-                                         bool optionalIsBold = false,
-                                         QString optionalFontColor = QString());
+    virtual void
+    appendHtmlServerMessage(const QString &html, bool optionalIsBold = false, QString optionalFontColor = QString());
     void appendMessage(QString message,
                        RoomMessageTypeFlags messageType = {},
                        const ServerInfo_User &userInfo = {},
@@ -119,6 +118,7 @@ public:
     QString getRecentChatLog(int maxMessages = 50) const;
 
 protected:
+    [[nodiscard]] virtual QString getCurrentTime() const;
     void enterEvent(QEnterEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

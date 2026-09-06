@@ -110,6 +110,11 @@ public:
         return hostId;
     }
 
+    int getSecondsElapsed() const
+    {
+        return secondsElapsed;
+    }
+
 signals:
     void updateTimeElapsedLabel(QString newTime);
     void gameStarted(bool resuming);
@@ -120,6 +125,9 @@ signals:
 public slots:
     void incrementGameTime();
     void setGameTime(int _secondsElapsed);
+
+public:
+    static QString formatElapsedTime(int _secondsElapsed);
 
 private:
     QTimer *gameTimer;
