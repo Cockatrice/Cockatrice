@@ -132,8 +132,18 @@ void PlayerTarget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*o
     QRectF translatedRect = painter->combinedTransform().mapRect(avatarBoundingRect);
     QSize translatedSize = translatedRect.size().toSize();
     QPixmap cachedPixmap;
+    // The key must cover everything the generated pawn depends on: the rendered
+    // size, the user level, and the pixmap being drawn. fullPixmap.cacheKey() is
+    // 0 for every null pixmap, so the default-pawn branch additionally needs the
+    // pawn's privlevel (lowercased, matching UserLevelPixmapGenerator) and colors
+    // in the key — otherwise two players without a custom avatar (and the same
+    // user level) would share one cached pawn.
     const QString cacheKey = "avatar" + QString::number(translatedSize.width()) + "_" +
-                             QString::number(info->user_level()) + "_" + QString::number(fullPixmap.cacheKey());
+                             QString::number(translatedSize.height()) + "_" + QString::number(info->user_level()) +
+                             "_" + QString::number(fullPixmap.cacheKey()) + "_" +
+                             QString::fromStdString(info->privlevel()).toLower() + "_" +
+                             QString::fromStdString(info->pawn_colors().left_side()) + "_" +
+                             QString::fromStdString(info->pawn_colors().right_side());
     if (!QPixmapCache::find(cacheKey, &cachedPixmap)) {
         cachedPixmap = QPixmap(translatedSize.width(), translatedSize.height());
 
