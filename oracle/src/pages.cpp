@@ -260,7 +260,7 @@ bool LoadSetsPage::validatePage()
             return false;
         }
 
-        progressLabel->setText(tr("Downloading (0MB)"));
+        progressLabel->setText(tr("Downloading (0 MB)"));
         // show an infinite progressbar
         progressBar->setMaximum(0);
         progressBar->setMinimum(0);
@@ -343,7 +343,7 @@ void LoadSetsPage::actDownloadProgressSetsFile(qint64 received, qint64 total)
         progressBar->setMaximum(static_cast<int>(total));
         progressBar->setValue(static_cast<int>(received));
     }
-    progressLabel->setText(tr("Downloading (%1MB)").arg((int)received / (1024 * 1024)));
+    progressLabel->setText(tr("Downloading (%1 MB)").arg((int)received / (1024 * 1024)));
 }
 
 void LoadSetsPage::actDownloadFinishedSetsFile()
