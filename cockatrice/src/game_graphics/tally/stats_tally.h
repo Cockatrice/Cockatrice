@@ -16,6 +16,14 @@ namespace StatsTally
  */
 QList<TallyRow> computeTotalPower(const QList<CardItem *> &cards);
 
+/**
+ * @brief Sums the toughness of all selected cards
+ *
+ * @param cards The list of selected card items to analyze.
+ * @return A single row containing the total, or an empty list if none of the cards have pt
+ */
+QList<TallyRow> computeTotalToughness(const QList<CardItem *> &cards);
+
 } // namespace StatsTally
 
 #endif // COCKATRICE_STATS_TALLY_H
