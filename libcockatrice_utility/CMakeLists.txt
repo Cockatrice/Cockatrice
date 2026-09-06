@@ -39,5 +39,3 @@ find_package(OpenSSL REQUIRED)
 target_link_libraries(libcockatrice_utility PUBLIC libcockatrice_rng OpenSSL::Crypto ${QT_CORE_MODULE})
 
 set(ORACLE_LIBS)
-
-include_directories(${${COCKATRICE_QT_VERSION_NAME}Core_INCLUDE_DIRS})

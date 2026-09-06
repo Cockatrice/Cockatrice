@@ -1,4 +1,4 @@
-# NOTE: Qt modules for tests are defined centrally in cmake/FindQtRuntime.cmake (the _TEST_NEEDED variable).
+# NOTE: Qt modules for tests are defined centrally in cmake/FindQtRuntime.cmake (the QT_COMPONENTS_TEST variable).
 # If a new test needs additional Qt modules, add them there — not in individual test CMakeLists.txt files.
 enable_testing()
 
@@ -18,8 +18,6 @@ add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
 set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 15)
 
-# Find GTest
-
 add_executable(dummy_test dummy_test.cpp)
 add_executable(expression_test expression_test.cpp)
 add_executable(clamped_arithmetic_test clamped_arithmetic_test.cpp)
@@ -35,6 +33,7 @@ add_executable(lag_monitor_test ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_mo
 target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
 add_executable(latency_tracker_test latency_tracker_test.cpp)
 
+# Find GTest
 find_package(GTest)
 
 if(NOT GTEST_FOUND)
@@ -77,39 +76,39 @@ endif()
 
 include_directories(${GTEST_INCLUDE_DIRS})
 target_link_libraries(dummy_test Threads::Threads ${GTEST_BOTH_LIBRARIES})
-target_link_libraries(expression_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(expression_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST})
 target_link_libraries(
-  clamped_arithmetic_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  clamped_arithmetic_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST}
 )
 target_link_libraries(
-  test_age_formatting libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  test_age_formatting libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST}
 )
 target_link_libraries(
-  password_hash_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  password_hash_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST}
 )
 target_link_libraries(
   playmat_resolver_test libcockatrice_deck_list libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
+  ${QT_MODULES_TEST}
 )
 target_link_libraries(
   deck_hash_performance_test libcockatrice_deck_list libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
+  ${QT_MODULES_TEST}
 )
 target_link_libraries(
-  server_card_counter_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  server_card_counter_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST}
 )
 target_link_libraries(
-  server_counter_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  server_counter_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST}
 )
 target_link_libraries(
-  server_rate_limiter_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  server_rate_limiter_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST}
 )
 target_link_libraries(
-  warning_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  warning_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST}
 )
-target_link_libraries(lag_monitor_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(lag_monitor_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST})
 target_link_libraries(
-  latency_tracker_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+  latency_tracker_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST}
 )
 
 add_subdirectory(card_zone_algorithms)

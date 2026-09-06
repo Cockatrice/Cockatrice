@@ -16,7 +16,7 @@ target_link_libraries(
   PRIVATE libcockatrice_card
   PRIVATE Threads::Threads
   PRIVATE ${GTEST_BOTH_LIBRARIES}
-  PRIVATE ${TEST_QT_MODULES}
+  PRIVATE ${QT_MODULES_TEST}
 )
 
 add_test(NAME carddatabase_test COMMAND carddatabase_test)
@@ -32,7 +32,7 @@ target_link_libraries(
   PRIVATE libcockatrice_models
   PRIVATE Threads::Threads
   PRIVATE ${GTEST_BOTH_LIBRARIES}
-  PRIVATE ${TEST_QT_MODULES}
+  PRIVATE ${QT_MODULES_TEST}
 )
 
 if(NOT GTEST_FOUND)
@@ -51,7 +51,7 @@ if(WITH_ORACLE OR WITH_CLIENT)
     PRIVATE libcockatrice_filters
     PRIVATE Threads::Threads
     PRIVATE ${GTEST_BOTH_LIBRARIES}
-    PRIVATE ${TEST_QT_MODULES}
+    PRIVATE ${QT_MODULES_TEST}
   )
 
   add_test(NAME filter_string_test COMMAND filter_string_test)

@@ -122,7 +122,7 @@ target_link_libraries(
   PUBLIC libcockatrice_card
   PUBLIC libcockatrice_settings
   PUBLIC libcockatrice_network
-  PUBLIC ${ORACLE_QT_MODULES}
+  PUBLIC ${QT_MODULES_ORACLE}
 )
 
 if(ZLIB_FOUND)

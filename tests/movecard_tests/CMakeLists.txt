@@ -10,7 +10,7 @@ target_link_libraries(
   PRIVATE libcockatrice_rng
   PRIVATE Threads::Threads
   PRIVATE ${GTEST_BOTH_LIBRARIES}
-  PRIVATE ${TEST_QT_MODULES}
+  PRIVATE ${QT_MODULES_TEST}
 )
 
 add_test(NAME reverse_card_move_test COMMAND reverse_card_move_test)

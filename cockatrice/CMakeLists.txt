@@ -551,7 +551,7 @@ target_link_libraries(
          libcockatrice_models
          libcockatrice_rng
          libcockatrice_settings
-         ${COCKATRICE_QT_MODULES}
+         ${QT_MODULES_COCKATRICE}
 )
 
 if(UNIX)

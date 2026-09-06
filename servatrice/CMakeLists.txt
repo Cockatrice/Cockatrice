@@ -99,12 +99,12 @@ target_precompile_headers(servatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtco
 
 if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
   target_link_libraries(
-    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
+    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${QT_MODULES_SERVATRICE}
     ${LIBEXECINFO_LIBRARY}
   )
 else()
   target_link_libraries(
-    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
+    servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${QT_MODULES_SERVATRICE}
   )
 endif()
 

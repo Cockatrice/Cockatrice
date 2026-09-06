@@ -41,37 +41,40 @@ set(QT_COMPONENTS_ORACLE Concurrent Network Svg Widgets)
 
 set(QT_COMPONENTS_SERVATRICE Network Sql WebSockets)
 
+# Union of Qt modules required across all test targets (independent of application targets).
+# When adding a new test that needs additional Qt modules, add them here instead to tests/CMakeLists.txt.
 set(QT_COMPONENTS_TEST Concurrent Network Svg Widgets)
 
 # ---------------------------------------------------------------------------
 # Determine which Qt components are required for this build
 # ---------------------------------------------------------------------------
 
-set(REQUIRED_QT_COMPONENTS Core)
+set(QT_COMPONENTS_REQUIRED Core)
 
 if(WITH_CLIENT)
-  list(APPEND REQUIRED_QT_COMPONENTS ${QT_COMPONENTS_COCKATRICE})
+  list(APPEND QT_COMPONENTS_REQUIRED ${QT_COMPONENTS_COCKATRICE})
 endif()
 
 if(WITH_ORACLE)
-  list(APPEND REQUIRED_QT_COMPONENTS ${QT_COMPONENTS_ORACLE})
+  list(APPEND QT_COMPONENTS_REQUIRED ${QT_COMPONENTS_ORACLE})
 endif()
 
 if(WITH_SERVER)
-  list(APPEND REQUIRED_QT_COMPONENTS ${QT_COMPONENTS_SERVATRICE})
+  list(APPEND QT_COMPONENTS_REQUIRED ${QT_COMPONENTS_SERVATRICE})
 endif()
 
 if(TEST)
-  list(APPEND REQUIRED_QT_COMPONENTS ${QT_COMPONENTS_TEST})
+  list(APPEND QT_COMPONENTS_REQUIRED ${QT_COMPONENTS_TEST})
 endif()
 
-list(REMOVE_DUPLICATES REQUIRED_QT_COMPONENTS)
+list(REMOVE_DUPLICATES QT_COMPONENTS_REQUIRED)
 
 # ---------------------------------------------------------------------------
 # Find Qt and define minimum version centrally
 # ---------------------------------------------------------------------------
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS ${REQUIRED_QT_COMPONENTS} LinguistTools)
+# Add Qt Linguist as required component unrelated of build target
+find_package(Qt6 6.4 REQUIRED COMPONENTS ${QT_COMPONENTS_REQUIRED} LinguistTools)
 
 set(QT_MAIN_VERSION_STRING Qt6)
 
@@ -92,10 +95,11 @@ else()
 endif()
 
 # ---------------------------------------------------------------------------
-# Convert components list, e.g.: Network;Sql;WebSockets
-# into Qt modules: Qt6::Network;Qt6::Sql;Qt6::WebSockets
+# Export Qt target lists for individual targets
 # ---------------------------------------------------------------------------
 
+# Convert components list into Qt modules, e.g.
+# Network;Sql;WebSockets --> Qt6::Network;Qt6::Sql;Qt6::WebSockets
 function(_qt_components_to_targets COMPONENTS OUTPUT_VARIABLE)
   set(TARGETS)
 
@@ -108,10 +112,6 @@ function(_qt_components_to_targets COMPONENTS OUTPUT_VARIABLE)
       PARENT_SCOPE
   )
 endfunction()
-
-# ---------------------------------------------------------------------------
-# Export Qt target lists for the individual targets
-# ---------------------------------------------------------------------------
 
 if(WITH_CLIENT)
   _qt_components_to_targets("${QT_COMPONENTS_COCKATRICE}" QT_MODULES_COCKATRICE)
@@ -133,7 +133,7 @@ endif()
 set(QT_CORE_MODULE "${QT_MAIN_VERSION_STRING}::Core")
 
 # ---------------------------------------------------------------------------
-# Qt runtime/plugin paths
+# Qt runtime library & plugin paths
 # ---------------------------------------------------------------------------
 
 if(NOT TARGET "${QT_CORE_MODULE}")
@@ -146,7 +146,7 @@ get_filename_component(QT_LIBRARY_DIR "${QT_LIBRARY_DIR}/../../.." ABSOLUTE)
 get_filename_component(QT_PLUGINS_DIR "${Qt6Core_DIR}/../../../${QT6_INSTALL_PLUGINS}" ABSOLUTE)
 
 if(UNIX AND APPLE)
-  # macOS needs a bit more help finding all necessary components.
+  # macOS needs a bit more help finding all necessary components
   list(APPEND QT_LIBRARY_DIR "/usr/local/lib")
 endif()
 
@@ -155,7 +155,7 @@ endif()
 # ---------------------------------------------------------------------------
 
 message(STATUS "Found Qt: ${Qt6_DIR} (found version \"${Qt6_VERSION}\")")
-message(STATUS "REQUIRED_QT_COMPONENTS = ${REQUIRED_QT_COMPONENTS}")
+message(STATUS "QT_COMPONENTS_REQUIRED = ${QT_COMPONENTS_REQUIRED}")
 if(WITH_CLIENT)
   message(STATUS "QT_MODULES_COCKATRICE = ${QT_MODULES_COCKATRICE}")
 endif()
