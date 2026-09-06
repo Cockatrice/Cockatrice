@@ -350,8 +350,8 @@ int main(int argc, char *argv[])
     qCInfo(MainLog) << "MainWindow constructor finished";
 
     ui.setWindowIcon(QPixmap("theme:cockatrice"));
-    // set name of the app desktop file; used by wayland to load the window icon
-    QGuiApplication::setDesktopFileName("cockatrice");
+    // Set name of the app desktop file; used by wayland to load the window icon
+    QGuiApplication::setDesktopFileName("Cockatrice");
 
     SettingsCache::instance().network().setClientID(generateClientID());
 

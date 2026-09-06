@@ -17,7 +17,7 @@ enum Format
     PlainText,
 
     /**
-     * This is cockatrice's native deck file format, and supports deck metadata such as banner cards and tags.
+     * This is Cockatrice's native deck file format, and supports deck metadata such as banner cards and tags.
      * Stored as .cod files.
      */
     Cockatrice

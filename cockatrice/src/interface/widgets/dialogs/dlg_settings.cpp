@@ -477,13 +477,13 @@ void DlgSettings::closeEvent(QCloseEvent *event)
         case Invalid:
             loadErrorMessage = tr("Your card database is invalid.\n\n"
                                   "Cockatrice may not function correctly with an invalid database\n\n"
-                                  "You may need to rerun oracle to update your card database.\n\n"
+                                  "You may need to rerun Oracle to update your card database.\n\n"
                                   "Would you like to change your database location setting?");
             break;
         case VersionTooOld:
             loadErrorMessage = tr("Your card database version is too old.\n\n"
                                   "This can cause problems loading card information or images\n\n"
-                                  "Usually this can be fixed by rerunning oracle to to update your card database.\n\n"
+                                  "Usually this can be fixed by rerunning Oracle to to update your card database.\n\n"
                                   "Would you like to change your database location setting?");
             break;
         case NotLoaded:
