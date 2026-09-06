@@ -29,13 +29,17 @@ void GameState::incrementGameTime()
 void GameState::setGameTime(int _secondsElapsed)
 {
     secondsElapsed = _secondsElapsed;
+    emit updateTimeElapsedLabel(formatElapsedTime(_secondsElapsed));
+}
+
+QString GameState::formatElapsedTime(int _secondsElapsed)
+{
     int seconds = _secondsElapsed;
     int minutes = seconds / 60;
     seconds -= minutes * 60;
     int hours = minutes / 60;
     minutes -= hours * 60;
 
-    emit updateTimeElapsedLabel(QString::number(hours).rightJustified(2, '0') + ":" +
-                                QString::number(minutes).rightJustified(2, '0') + ":" +
-                                QString::number(seconds).rightJustified(2, '0'));
+    return QString::number(hours).rightJustified(2, '0') + ":" + QString::number(minutes).rightJustified(2, '0') + ":" +
+           QString::number(seconds).rightJustified(2, '0');
 }

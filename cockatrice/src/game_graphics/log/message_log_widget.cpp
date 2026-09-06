@@ -1,7 +1,9 @@
 #include "message_log_widget.h"
 
+#include "../../client/settings/cache_settings.h"
 #include "../../client/settings/card_counter_settings.h"
 #include "../../client/sound_engine.h"
+#include "../../game/game_state.h"
 #include "../../game/phase.h"
 #include "../../game/player/player_logic.h"
 #include "../../interface/widgets/tabs/tab_game.h"
@@ -10,6 +12,7 @@
 
 #include <libcockatrice/protocol/pb/context_move_card.pb.h>
 #include <libcockatrice/protocol/pb/context_mulligan.pb.h>
+#include <libcockatrice/settings/chat_settings.h>
 #include <libcockatrice/utility/zone_names.h>
 #include <utility>
 
@@ -824,6 +827,14 @@ void MessageLogWidget::appendHtmlServerMessage(const QString &html, bool optiona
 {
 
     ChatView::appendHtmlServerMessage(messagePrefix + html + messageSuffix, optionalIsBold, optionalFontColor);
+}
+
+QString MessageLogWidget::getCurrentTime() const
+{
+    if (SettingsCache::instance().chat().getUseGameTime()) {
+        return "[" + GameState::formatElapsedTime(game->getGameState()->getSecondsElapsed()) + "] ";
+    }
+    return ChatView::getCurrentTime();
 }
 
 void MessageLogWidget::connectToPlayerEventHandler(PlayerEventHandler *playerEventHandler)

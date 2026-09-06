@@ -300,6 +300,12 @@ TEST_F(SettingsDefaultsTest, Chat_RoomHistory_Default)
     ASSERT_EQ(s.getRoomHistory(), true);
 }
 
+TEST_F(SettingsDefaultsTest, Chat_UseGameTime_Default)
+{
+    ChatSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getUseGameTime(), false);
+}
+
 // --- PersonalSettings ---
 
 TEST_F(SettingsDefaultsTest, Personal_Lang_Default)
