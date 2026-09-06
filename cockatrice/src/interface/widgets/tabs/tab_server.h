@@ -10,6 +10,7 @@
 #include "tab.h"
 
 #include <QGroupBox>
+#include <QMap>
 #include <QTextBrowser>
 #include <QTreeWidget>
 
@@ -58,10 +59,14 @@ private slots:
                           int roomId);
 
 private:
+    void leaveAndRejoinRoom(int roomId, bool setCurrent);
+
     AbstractClient *client;
     RoomSelector *roomSelector;
     QTextBrowser *serverInfoBox;
     bool shouldEmitUpdate = false;
+    /** Room ids with a join command in flight, mapped to whether the tab should be focused once it opens. */
+    QMap<int, bool> pendingRoomJoins;
 
 public:
     TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client);
