@@ -606,7 +606,15 @@ void UserContextMenu::execAddToIgnore(const QString &userName)
     Command_AddToList cmd;
     cmd.set_list("ignore");
     cmd.set_user_name(userName.toStdString());
-    client->sendCommand(client->prepareSessionCommand(cmd));
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    connect(pend, &PendingCommand::finished, this,
+            [this, userName](const Response &response, const CommandContainer &, const QVariant &) {
+                if (response.response_code() == Response::RespOk) {
+                    QMessageBox::information(static_cast<QWidget *>(parent()), tr("Ignore list"),
+                                             tr("%1 has been added to your ignore list.").arg(userName));
+                }
+            });
+    client->sendCommand(pend);
 }
 
 void UserContextMenu::execRemoveFromIgnore(const QString &userName)
