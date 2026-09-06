@@ -65,6 +65,11 @@ bool ChatSettings::getRoomHistory() const
     return getValue("roomHistory", QString(), QString(), true).toBool();
 }
 
+bool ChatSettings::getIgnoreAllPrivateMessages() const
+{
+    return getValue("ignoreAllPrivateMessages", QString(), QString(), false).toBool();
+}
+
 QString ChatSettings::getHighlightWords() const
 {
     return getValue("highlightWords").toString();
@@ -129,6 +134,11 @@ void ChatSettings::setShowMentionPopups(bool _showMentionPopups)
 void ChatSettings::setRoomHistory(bool _roomHistory)
 {
     setValue(_roomHistory, "roomHistory");
+}
+
+void ChatSettings::setIgnoreAllPrivateMessages(bool _ignoreAllPrivateMessages)
+{
+    setValue(_ignoreAllPrivateMessages, "ignoreAllPrivateMessages");
 }
 
 void ChatSettings::setHighlightWords(const QString &_highlightWords)
