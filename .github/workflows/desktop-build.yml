@@ -176,8 +176,12 @@ jobs:
         shell: bash
         run: |
           source .ci/docker.sh
-          RUN --server --debug --test --ccache "$CCACHE_SIZE" \
-            --cmake-generator "$CMAKE_GENERATOR"
+          args=()
+          [[ $GITHUB_REF == "refs/heads/master" ]] && args+=(--evict-ccache "$CCACHE_EVICTION_AGE")
+          args+=(--ccache "$CCACHE_SIZE")
+          args+=(--cmake-generator "$CMAKE_GENERATOR")
+
+          RUN --server --debug --test "${args[@]}"
 
       - name: "Build release package"
         id: build
