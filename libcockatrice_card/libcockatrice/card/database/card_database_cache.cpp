@@ -17,7 +17,7 @@
 namespace
 {
 constexpr quint32 CACHE_MAGIC = 0x43445243; // "CDRC"
-constexpr quint32 CACHE_VERSION = 2;
+constexpr quint32 CACHE_VERSION = 3;
 
 // ---- Primitives -----------------------------------------------------------
 
@@ -69,6 +69,35 @@ QDate readDate(QDataStream &in)
     QDate d;
     in >> d;
     return d;
+}
+
+void writeStringMap(QDataStream &out, const QMap<QString, QString> &map)
+{
+    out << static_cast<quint32>(map.size());
+    for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
+        writeString(out, it.key());
+        writeString(out, it.value());
+    }
+}
+
+QMap<QString, QString> readStringMap(QDataStream &in)
+{
+    QMap<QString, QString> map;
+    quint32 count = 0;
+    in >> count;
+    if (in.status() != QDataStream::Ok) {
+        return map;
+    }
+    for (quint32 i = 0; i < count; ++i) {
+        QString key = readString(in);
+        QString value = readString(in);
+        if (in.status() != QDataStream::Ok) {
+            map.clear();
+            return map;
+        }
+        map.insert(key, value);
+    }
+    return map;
 }
 
 // ---- CardRelation ----------------------------------------------------------
@@ -195,6 +224,10 @@ void writeCard(QDataStream &out, const CardInfoPtr &card)
     for (const CardRelation *rel : reverse) {
         writeRelation(out, rel);
     }
+
+    // localized card data
+    writeStringMap(out, card->getLocalizedNames());
+    writeStringMap(out, card->getLocalizedTexts());
 }
 
 CardInfoPtr readCard(QDataStream &in, const SetNameMap &sets)
@@ -268,8 +301,25 @@ CardInfoPtr readCard(QDataStream &in, const SetNameMap &sets)
         reverse.append(readRelation(in));
     }
 
-    return CardInfo::newInstance(name, text, isToken, propertiesBlob, related, reverse, cardSets, ui, simpleName,
-                                 altNames, false);
+    CardInfoPtr card = CardInfo::newInstance(name, text, isToken, propertiesBlob, related, reverse, cardSets, ui,
+                                             simpleName, altNames, false);
+
+    const QMap<QString, QString> localizedNames = readStringMap(in);
+    if (in.status() != QDataStream::Ok) {
+        return nullptr;
+    }
+    const QMap<QString, QString> localizedTexts = readStringMap(in);
+    if (in.status() != QDataStream::Ok) {
+        return nullptr;
+    }
+    for (auto it = localizedNames.constBegin(); it != localizedNames.constEnd(); ++it) {
+        card->setLocalizedName(it.key(), it.value());
+    }
+    for (auto it = localizedTexts.constBegin(); it != localizedTexts.constEnd(); ++it) {
+        card->setLocalizedText(it.key(), it.value());
+    }
+
+    return card;
 }
 
 // ---- FormatRules -----------------------------------------------------------

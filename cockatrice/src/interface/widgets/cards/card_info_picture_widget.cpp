@@ -74,6 +74,8 @@ CardInfoPictureWidget::CardInfoPictureWidget(QWidget *parent, const bool _hoverT
 
                 update();
             });
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, this,
+            &CardInfoPictureWidget::updatePixmap);
 }
 
 /**

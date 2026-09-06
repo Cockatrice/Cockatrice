@@ -1,6 +1,8 @@
 #ifndef COCKATRICE_INTERFACE_CARDS_DISPLAY_SETTINGS_PROVIDER_H
 #define COCKATRICE_INTERFACE_CARDS_DISPLAY_SETTINGS_PROVIDER_H
 
+#include <QString>
+
 class ICardsDisplaySettingsProvider
 {
 public:
@@ -26,6 +28,7 @@ public:
     [[nodiscard]] virtual int getEDHRecCardSize() const = 0;
     [[nodiscard]] virtual int getArchidektPreviewSize() const = 0;
     [[nodiscard]] virtual int getSampleHandSize() const = 0;
+    [[nodiscard]] virtual QString getCardLang() const = 0;
 };
 
 #endif // COCKATRICE_INTERFACE_CARDS_DISPLAY_SETTINGS_PROVIDER_H

@@ -20,6 +20,7 @@
 #include <QThread>
 #include <algorithm>
 #include <libcockatrice/settings/cache_storage_settings.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <utility>
@@ -37,6 +38,8 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
             &CardPictureLoader::picsPathChanged);
     connect(&SettingsCache::instance().downloads(), &DownloadSettings::picDownloadChanged, this,
             &CardPictureLoader::picDownloadChanged);
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, this,
+            &CardPictureLoader::cardLangChanged);
 
     qRegisterMetaType<ExactCard>();
     connect(worker, &CardPictureLoaderWorker::imageLoaded, this, &CardPictureLoader::imageLoaded);
@@ -325,6 +328,15 @@ void CardPictureLoader::picDownloadChanged()
 void CardPictureLoader::picsPathChanged()
 {
     QPixmapCache::clear();
+}
+
+void CardPictureLoader::cardLangChanged()
+{
+    // Localized images are fetched via a different URL, but the in-memory
+    // pixmap cache is keyed by card name/uuid, so drop everything cached
+    // (including failure timestamps) to force a reload in the new language.
+    QPixmapCache::clear();
+    failedAt.clear();
 }
 
 bool CardPictureLoader::hasCustomArt()

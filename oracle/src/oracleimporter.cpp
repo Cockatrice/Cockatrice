@@ -12,6 +12,7 @@
 #include <QSet>
 #include <algorithm>
 #include <climits>
+#include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/card/database/parser/cockatrice_xml_4.h>
 #include <libcockatrice/card/relation/card_relation.h>
 
@@ -22,8 +23,9 @@ static const QList<AllowedCount> kSingletonCounts = {{1, "legal"}, {0, "banned"}
 SplitCardPart::SplitCardPart(const QString &_name,
                              const QString &_text,
                              const QHash<QString, QString> &_properties,
-                             const PrintingInfo &_printingInfo)
-    : name(_name), text(_text), properties(_properties), printingInfo(_printingInfo)
+                             const PrintingInfo &_printingInfo,
+                             const QString &_localizedText)
+    : name(_name), text(_text), localizedText(_localizedText), properties(_properties), printingInfo(_printingInfo)
 {
 }
 
@@ -31,6 +33,42 @@ const QRegularExpression OracleImporter::formatRegex = QRegularExpression("^form
 
 OracleImporter::OracleImporter(QObject *parent) : QObject(parent)
 {
+}
+
+void OracleImporter::setCardLang(const QString &lang)
+{
+    cardLang = lang.trimmed().toLower();
+    localizationEnabled = cardLang != "en" && CardLocalization::supportedLanguages().contains(cardLang);
+}
+
+/**
+ * @brief Maps the MTGJSON foreignData language names to the short codes used by
+ *        Scryfall and stored in cards.xml (e.g. "German" -> "de").
+ * @param language The language name found in the MTGJSON foreignData entries.
+ * @return The short language code, or an empty string if unknown.
+ */
+static QString mtgjsonLanguageToCode(const QString &language)
+{
+    static const QHash<QString, QString> map = {
+        {"Chinese Simplified", "zhs"},
+        {"Chinese Traditional", "zht"},
+        {"English", "en"},
+        {"French", "fr"},
+        {"German", "de"},
+        {"Greek", "grc"},
+        {"Ancient Greek", "grc"},
+        {"Hebrew", "he"},
+        {"Italian", "it"},
+        {"Japanese", "ja"},
+        {"Korean", "ko"},
+        {"Latin", "la"},
+        {"Phyrexian", "ph"},
+        {"Portuguese (Brazil)", "pt"},
+        {"Russian", "ru"},
+        {"Sanskrit", "sa"},
+        {"Spanish", "es"},
+    };
+    return map.value(language);
 }
 
 static CardSet::Priority getSetPriority(const QString &setType, const QString &shortName)
@@ -254,6 +292,101 @@ static QString getJsonString(const QJsonObject &obj, const QString &key)
     return obj.value(key).toVariant().toString();
 }
 
+static QString normalizeCardName(QString name)
+{
+    // Mirror of the name cleanup applied in addCard(), so collected localization
+    // keys line up with the card map keys (Æ → AE, curly apostrophe → straight).
+    name = name.replace("Æ", "AE");
+    name = name.replace("’", "'");
+    return name;
+}
+
+static QString matchingForeignEntryText(const QJsonObject &card, const QString &cardLang)
+{
+    // Multi-face cards (split/aftermath/adventure/prepare) expose each face as a
+    // separate card object, each with its own foreignData entry carrying that
+    // face's rules text; single-face cards carry the full text in one entry.
+    const QJsonArray foreignData = card.value("foreignData").toArray();
+    for (const QJsonValue &entryValue : foreignData) {
+        const QJsonObject entry = entryValue.toObject();
+        // MTGJSON reports languages by long-form name ("German"); match the
+        // short code ("de") that Scryfall and cards.xml use.
+        if (mtgjsonLanguageToCode(getJsonString(entry, "language")) == cardLang) {
+            return getJsonString(entry, "text");
+        }
+    }
+    return QString();
+}
+
+void OracleImporter::collectForeignData(const QString &cardKey,
+                                        const CardSetPtr &currentSet,
+                                        const QJsonObject &card,
+                                        bool collectText)
+{
+    if (!localizationEnabled) {
+        return;
+    }
+
+    LocalizedCardEntry incoming;
+    bool found = false;
+    const QJsonArray foreignData = card.value("foreignData").toArray();
+    for (const QJsonValue &entryValue : foreignData) {
+        const QJsonObject entry = entryValue.toObject();
+        // MTGJSON reports languages by long-form name ("German"); match the
+        // short code ("de") that Scryfall and cards.xml use.
+        if (mtgjsonLanguageToCode(getJsonString(entry, "language")) != cardLang) {
+            continue;
+        }
+        incoming.name = getJsonString(entry, "name");
+        incoming.text = collectText ? getJsonString(entry, "text") : QString();
+        found = true;
+        break;
+    }
+    if (!found) {
+        return;
+    }
+
+    // Prefer the entry from the highest-priority set (lower enum value = more
+    // authoritative); printings of equal priority keep the first one seen.
+    incoming.priority = currentSet->getPriority();
+    const auto existing = localizedEntries.constFind(cardKey);
+    if (existing == localizedEntries.constEnd() || incoming.priority < existing->priority) {
+        localizedEntries.insert(cardKey, incoming);
+    }
+}
+
+void OracleImporter::applyLocalizedData()
+{
+    if (!localizationEnabled) {
+        return;
+    }
+    for (auto it = localizedEntries.constBegin(); it != localizedEntries.constEnd(); ++it) {
+        CardInfoPtr card = cards.value(it.key());
+        if (card.isNull()) {
+            continue;
+        }
+        const LocalizedCardEntry &entry = it.value();
+        if (!entry.name.isEmpty()) {
+            card->setLocalizedName(cardLang, entry.name);
+        }
+        if (!entry.text.isEmpty()) {
+            card->setLocalizedText(cardLang, entry.text);
+        }
+    }
+    localizedEntries.clear();
+
+    for (auto it = splitLocalizedTexts.constBegin(); it != splitLocalizedTexts.constEnd(); ++it) {
+        CardInfoPtr card = cards.value(it.key());
+        if (card.isNull()) {
+            continue;
+        }
+        if (!it.value().text.isEmpty()) {
+            card->setLocalizedText(cardLang, it.value().text);
+        }
+    }
+    splitLocalizedTexts.clear();
+}
+
 int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJsonArray &cardsList)
 {
     // mtgjson name => xml name
@@ -397,13 +530,21 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
         // split cards are considered a single card, enqueue for later merging
         if (layout == "split" || layout == "aftermath" || layout == "adventure" || layout == "prepare") {
             auto _faceName = getJsonString(card, "faceName");
-            SplitCardPart split(_faceName, text, properties, printingInfo);
+            // MTGJSON exposes each face as a separate card object, each with its
+            // own foreignData entry holding that face's rules text; collect it so
+            // the per-face texts can be joined the same way as the English text.
+            const QString faceLocalizedText =
+                localizationEnabled ? matchingForeignEntryText(card, cardLang) : QString();
+            SplitCardPart split(_faceName, text, properties, printingInfo, faceLocalizedText);
             auto found_iter = splitCards.find(name + numProperty);
             if (found_iter == splitCards.end()) {
                 splitCards.insert(name + numProperty, {{split}, name});
             } else {
                 found_iter->first.append(split);
             }
+            // MTGJSON's foreignData name is the joined name present on every
+            // face, so collect the name once.
+            collectForeignData(normalizeCardName(name), currentSet, card, false);
         } else {
             // relations
             QList<CardRelation *> relatedCards;
@@ -446,6 +587,8 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
                 }
             }
 
+            collectForeignData(normalizeCardName(name + numComponent), currentSet, card);
+
             CardInfoPtr newCard =
                 addCard(name + numComponent, text, isToken, std::move(properties), relatedCards, printingInfo);
             numCards++;
@@ -459,6 +602,8 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
     QList<QPair<QList<SplitCardPart>, QString>> partsAndNames = splitCards.values();
     for (auto [splitCardParts, name] : partsAndNames) {
         QString text;
+        QString localizedText;
+        bool localizedTextComplete = true;
         QHash<QString, QString> properties;
         PrintingInfo printingInfo;
 
@@ -467,6 +612,21 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
                 text.append(splitCardTextSeparator);
             }
             text.append(tmp.getText());
+
+            // Build the cardLang text by joining each face's translated text with
+            // the same separator as the English text. Any face missing a complete
+            // translation abandons the whole join, falling back to the English text.
+            if (localizedTextComplete) {
+                const QString partLocalizedText = tmp.getLocalizedText();
+                if (partLocalizedText.isEmpty()) {
+                    localizedTextComplete = false;
+                } else {
+                    if (!localizedText.isEmpty()) {
+                        localizedText.append(splitCardTextSeparator);
+                    }
+                    localizedText.append(partLocalizedText);
+                }
+            }
 
             if (properties.isEmpty()) {
                 properties = tmp.getProperties();
@@ -500,6 +660,18 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
             }
         }
         CardInfoPtr newCard = addCard(name, text, isToken, std::move(properties), {}, printingInfo);
+        if (localizationEnabled && localizedTextComplete && !localizedText.isEmpty()) {
+            // Same priority policy as collectForeignData(): the joined text from the
+            // highest-priority set seen so far wins, applied once all printings are in.
+            LocalizedCardEntry entry;
+            entry.text = localizedText;
+            entry.priority = currentSet->getPriority();
+            const QString entryKey = normalizeCardName(name);
+            const auto existing = splitLocalizedTexts.constFind(entryKey);
+            if (existing == splitLocalizedTexts.constEnd() || entry.priority < existing->priority) {
+                splitLocalizedTexts.insert(entryKey, entry);
+            }
+        }
         numCards++;
     }
 
@@ -654,6 +826,8 @@ int OracleImporter::startImport()
         emit setIndexChanged(numCardsInSet, setIndex, curSetToParse.getLongName());
     }
 
+    applyLocalizedData();
+
     emit setIndexChanged(0, setIndex, QString());
 
     // total number of sets
@@ -679,4 +853,6 @@ void OracleImporter::clear()
     cards.clear();
     allSets.clear();
     rawSetsData.clear();
+    localizedEntries.clear();
+    splitLocalizedTexts.clear();
 }

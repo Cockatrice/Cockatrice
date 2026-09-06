@@ -94,7 +94,20 @@ void CardPictureToLoad::populateSetUrls()
         }
     }
 
-    for (const QString &urlTemplate : urlTemplates) {
+    QStringList orderedTemplates = urlTemplates;
+    if (SettingsCache::instance().cardsDisplay().getCardLang() != "en") {
+        // Scryfall serves localized art from per-language printings, which have
+        // their own ids. The ids stored in the card database belong to the
+        // English prints, so id-based templates (cards.scryfall.io,
+        // api.scryfall.com/cards/!set:uuid!) can only ever resolve English
+        // scans; the `lang=` parameter is ignored on them. Resolve the localized
+        // printing by its translated name (and the language code) ahead of the
+        // id-based templates instead.
+        orderedTemplates.prepend("https://api.scryfall.com/cards/named?fuzzy=!localizedName!&lang=!sflang!"
+                                 "&format=image&face=!prop:side!");
+    }
+
+    for (const QString &urlTemplate : orderedTemplates) {
         QString transformedUrl = transformUrl(urlTemplate);
 
         if (!transformedUrl.isEmpty()) {
@@ -282,8 +295,15 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
     }
 
     // language setting
-    transformMap["!sflang!"] = QString(QCoreApplication::translate(
-        "PictureLoader", "en", "code for scryfall's language property, not available for all languages"));
+    const QString cardLang = SettingsCache::instance().cardsDisplay().getCardLang();
+    transformMap["!sflang!"] = cardLang;
+
+    // The localized printing's own id is unknown, so Scryfall must resolve it by
+    // its translated name (see populateSetUrls); expose that name for the
+    // `/cards/named` template.
+    if (cardLang != "en") {
+        transformMap["!localizedName!"] = card.getInfo().getLocalizedName(cardLang);
+    }
 
     QString transformedUrl = urlTemplate;
     for (const QString &prop : transformMap.keys()) {
