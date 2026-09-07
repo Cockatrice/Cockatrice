@@ -6,6 +6,7 @@
 #include <QPixmap>
 #include <QQueue>
 #include <QSet>
+#include <libcockatrice/card/printing/exact_card.h>
 
 class UserCardArtProvider : public QObject
 {
@@ -16,7 +17,7 @@ public:
 
     void requestCardArt(const QString &userName, const QString &cardName, const QString &providerId);
     const QMap<QString, QPixmap> &cache() const;
-    static QPixmap cropCardArt(const QPixmap &fullRes);
+    static QPixmap cropCardArt(const QPixmap &fullRes, const ExactCard &card);
 
 signals:
     void cardArtUpdated(const QString &userName);

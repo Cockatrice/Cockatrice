@@ -3,6 +3,7 @@
 #include "../../game/player/player_actions.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../interface/widgets/cards/art_crop_attribution.h"
+#include "../../interface/widgets/cards/card_art_utils.h"
 #include "../../interface/widgets/playmat/playmat_utils.h"
 #include "../../interface/widgets/tabs/tab_game.h"
 #include "../board/abstract_card_item.h"
@@ -442,7 +443,7 @@ void PlayerGraphicsItem::updatePlaymat()
         hasPlaymat = true;
         emit playmatChanged(true);
     }
-    playmatPixmap = fullRes;
+    playmatPixmap = CardArtUtils::rotateSidewaysLayoutArt(fullRes, card);
     update();
 }
 
