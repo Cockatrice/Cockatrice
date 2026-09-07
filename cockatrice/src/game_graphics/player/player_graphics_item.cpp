@@ -252,8 +252,8 @@ void PlayerGraphicsItem::onCounterAdded(CounterState *state)
     AbstractCounter *widget;
     if (state->getName() == "life") {
         widget = playerTarget->addCounter(state);
-        connect(state, &CounterState::valueChanged, this, [this](int oldValue, int newValue) {
-            if (newValue < oldValue) {
+        connect(state, &CounterState::valueChanged, this, [this](int oldValue, int newValue, bool skipDamageAnimation) {
+            if (newValue < oldValue && !skipDamageAnimation) {
                 tableZoneGraphicsItem->triggerDamageShimmer();
             }
         });

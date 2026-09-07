@@ -21,7 +21,7 @@ class PlayerCounter : public AbstractCounter, public IAnimatedItem
 {
     Q_OBJECT
 protected:
-    void onValueChanged(int oldValue, int newValue) override;
+    void onValueChanged(int oldValue, int newValue, bool skipDamageAnimation) override;
 
 private:
     static constexpr qreal flashDurationMs = 450.0;

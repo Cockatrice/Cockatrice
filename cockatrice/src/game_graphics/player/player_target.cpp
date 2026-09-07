@@ -69,7 +69,7 @@ void PlayerCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*
     }
 }
 
-void PlayerCounter::onValueChanged(int oldValue, int newValue)
+void PlayerCounter::onValueChanged(int oldValue, int newValue, bool skipDamageAnimation)
 {
     flashDelta = newValue - oldValue;
     if (flashDelta == 0) {
@@ -77,6 +77,11 @@ void PlayerCounter::onValueChanged(int oldValue, int newValue)
     }
 
     if (!SettingsCache::instance().userInterface().getLifeCounterAnimationsEnabled()) {
+        flashAlpha = 0.0;
+        return;
+    }
+
+    if (skipDamageAnimation) {
         flashAlpha = 0.0;
         return;
     }
