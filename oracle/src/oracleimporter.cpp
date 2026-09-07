@@ -101,12 +101,8 @@ bool OracleImporter::readSetsFromByteArray(QByteArray data)
  * types (e.g. "Artifact Creature") or multiple faces (e.g. split/adventure cards).
  * A lower index means a higher priority.
  */
-static const QStringList &mainCardTypePriority()
-{
-    static const QStringList priority = {"Planeswalker", "Creature", "Land",       "Sorcery",
-                                         "Instant",      "Artifact", "Enchantment"};
-    return priority;
-}
+static const QStringList MAIN_CARD_TYPE_PRIORITY = {"Planeswalker", "Creature", "Land",       "Sorcery",
+                                                     "Instant",      "Artifact", "Enchantment"};
 
 /**
  * Returns the priority (index) of the given main card type. Known types map to their
@@ -114,7 +110,7 @@ static const QStringList &mainCardTypePriority()
  */
 static int mainCardTypePriority(const QString &mainCardType)
 {
-    return mainCardTypePriority().indexOf(mainCardType);
+    return MAIN_CARD_TYPE_PRIORITY.indexOf(mainCardType);
 }
 
 static QString getMainCardType(const QStringList &typeList)
@@ -123,7 +119,7 @@ static QString getMainCardType(const QStringList &typeList)
         return {};
     }
 
-    for (const auto &type : mainCardTypePriority()) {
+    for (const auto &type : MAIN_CARD_TYPE_PRIORITY) {
         if (typeList.contains(type)) {
             return type;
         }
