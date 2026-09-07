@@ -164,8 +164,7 @@ bool AbstractServerSocketInterface::initSession()
         // Challenge-response is advertised in every strictness mode: legacy accounts keep
         // logging in with the legacy hash, but already-migrated scrypt rows are always
         // served challenge-response (authentication_strictness only governs NEW credentials).
-        Event_ServerIdentification::ServerOptions serverOptions =
-            Event_ServerIdentification::SupportsAll;
+        Event_ServerIdentification::ServerOptions serverOptions = Event_ServerIdentification::SupportsAll;
         identEvent.set_server_options(serverOptions);
     }
     SessionEvent *identSe = prepareSessionEvent(identEvent);
@@ -3787,7 +3786,9 @@ AbstractServerSocketInterface::cmdForgotPasswordChallenge(const Command_ForgotPa
 Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(const Command_RequestPasswordSalt &cmd,
                                                                              ResponseContainer &rc)
 {
-    const QString userName = nameFromStdString(cmd.user_name());
+    // Simplified exactly like cmdLogin, so the nonce bound to userName here validates
+    // against the same normalized name during the login's challenge-response check.
+    const QString userName = nameFromStdString(cmd.user_name()).simplified();
     const QString storedPasswordData = sqlInterface->getUserPasswordData(userName);
     if (storedPasswordData.isEmpty()) {
         if (server->getRegOnlyServerEnabled()) {
