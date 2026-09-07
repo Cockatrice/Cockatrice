@@ -668,6 +668,10 @@ void LoadSetsPage::importFinished()
     progressLabel->setText(tr("Parsing file (100%)"));
     QTimer::singleShot(500, this, [this] {
         if (wizard()->currentPage() == this) {
+            // Leave the page pristine: hide the completed load bar so a later
+            // Back from the save page doesn't show stale progress.
+            progressLabel->hide();
+            progressBar->hide();
             wizard()->next();
         }
     });
