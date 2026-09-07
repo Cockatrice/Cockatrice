@@ -1284,12 +1284,11 @@ void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
     QString senderName = QString::fromStdString(event.sender_name());
     if (SettingsCache::instance().chat().getIgnoreAllPrivateMessages()) {
         const ServerInfo_User *onlineUserInfo = userListManager->getOnlineUser(senderName);
-        if (onlineUserInfo) {
-            const UserLevelFlags userLevel(onlineUserInfo->user_level());
-            if (!userLevel.testFlag(ServerInfo_User::IsModerator) && !userLevel.testFlag(ServerInfo_User::IsAdmin)) {
-                return;
-            }
-        } else {
+        if (!onlineUserInfo) {
+            return;
+        }
+        const UserLevelFlags userLevel(onlineUserInfo->user_level());
+        if (!userLevel.testFlag(ServerInfo_User::IsModerator) && !userLevel.testFlag(ServerInfo_User::IsAdmin)) {
             return;
         }
     }
