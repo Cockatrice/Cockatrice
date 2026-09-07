@@ -22,6 +22,9 @@
 #include <server_protocolhandler.h>
 #include <server_room.h>
 
+// Maximum size of a single ISL message.
+static const int MAX_ISL_MESSAGE_SIZE = 4 * 1024 * 1024;
+
 inline Q_LOGGING_CATEGORY(IslInterfaceLog, "isl_interface");
 
 void IslInterface::sharedCtor(const QSslCertificate &cert, const QSslKey &privateKey)
@@ -243,6 +246,13 @@ void IslInterface::readClient()
                                 (((quint32)(unsigned char)inputBuffer[1]) << 16) +
                                 (((quint32)(unsigned char)inputBuffer[2]) << 8) +
                                 ((quint32)(unsigned char)inputBuffer[3]);
+                // Reject implausible lengths instead of buffering until they arrive.
+                // This also handles lengths that overflow into negative int values.
+                if (messageLength < 0 || messageLength > MAX_ISL_MESSAGE_SIZE) {
+                    qCWarning(IslInterfaceLog) << "Invalid message length" << messageLength << "from" << peerAddress;
+                    socket->disconnectFromHost();
+                    return;
+                }
                 inputBuffer.remove(0, 4);
                 messageInProgress = true;
             } else {
