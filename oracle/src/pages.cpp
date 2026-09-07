@@ -295,6 +295,11 @@ LoadSetsPage::LoadSetsPage(QWidget *parent) : OracleWizardPage(parent)
     setLayout(layout);
 }
 
+bool LoadSetsPage::isComplete() const
+{
+    return !loadActive;
+}
+
 void LoadSetsPage::initializePage()
 {
     urlLineEdit->setText(wizard()->settings->value("allsetsurl", ALLSETS_URL).toString());
@@ -522,6 +527,11 @@ void LoadSetsPage::beginLoadSets(bool compressedFile)
     progressLabel->show();
     progressBar->show();
 
+    // Keep Next disabled (via completeChanged) until the worker reports in;
+    // updateButtonStates() re-evaluates button state whenever we re-enable.
+    loadActive = true;
+    emit completeChanged();
+
     wizard()->downloadedPlainXml = false;
     wizard()->xmlData.clear();
 
@@ -606,6 +616,8 @@ void LoadSetsPage::zipDownloadFailed(const QString &message)
 
 void LoadSetsPage::importFinished()
 {
+    loadActive = false;
+    emit completeChanged();
     wizard()->enableButtons();
     setEnabled(true);
 
@@ -684,6 +696,11 @@ SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
     setLayout(layout);
 }
 
+bool SaveSetsPage::isComplete() const
+{
+    return !importActive;
+}
+
 void SaveSetsPage::cleanupPage()
 {
     cancelWork();
@@ -718,6 +735,7 @@ void SaveSetsPage::initializePage()
 
     wizard()->disableButtons();
     importActive = true;
+    emit completeChanged();
 
     const QPointer<OracleImporter> importer = wizard()->importer;
     importFuture = QtConcurrent::run([importer] { return importer ? importer->startImport() : 0; });
@@ -732,6 +750,7 @@ void SaveSetsPage::cancelWork()
     // Ask the worker to stop at the next set boundary, then wait it out so the
     // wizard (and the importer it owns) is never torn down under a running thread.
     importActive = false;
+    emit completeChanged();
     wizard()->importer->cancelImport();
     importFuture.cancel();
     importWatcher.cancel();
@@ -744,6 +763,7 @@ void SaveSetsPage::importFinished()
         return;
     }
     importActive = false;
+    emit completeChanged();
 
     wizard()->enableButtons();
 

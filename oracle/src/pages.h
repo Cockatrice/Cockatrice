@@ -75,6 +75,7 @@ class LoadSetsPage : public OracleWizardPage
 public:
     explicit LoadSetsPage(QWidget *parent = nullptr);
     void retranslateUi() override;
+    bool isComplete() const override;
 
 protected:
     void initializePage() override;
@@ -96,6 +97,7 @@ private:
 
     QFutureWatcher<LoadSetsResult> watcher;
     QFuture<LoadSetsResult> future;
+    bool loadActive = false;
 
     void beginLoadSets(bool compressedFile = false);
 
@@ -116,6 +118,7 @@ class SaveSetsPage : public OracleWizardPage
 public:
     explicit SaveSetsPage(QWidget *parent = nullptr);
     void retranslateUi() override;
+    bool isComplete() const override;
 
 private:
     QTextEdit *messageLog;
