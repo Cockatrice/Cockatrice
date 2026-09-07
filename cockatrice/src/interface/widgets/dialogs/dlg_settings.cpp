@@ -132,7 +132,7 @@ void DlgSettings::setupUi()
     pagesWidget->addWidget(makeScrollable(userInterfacePage));
     pagesWidget->addWidget(makeScrollable(deckEditorPage));
     pagesWidget->addWidget(makeScrollable(storagePage));
-    pagesWidget->addWidget(messagesPage);
+    pagesWidget->addWidget(makeScrollable(messagesPage));
     pagesWidget->addWidget(soundPage);
     pagesWidget->addWidget(shortcutsPage);
 
