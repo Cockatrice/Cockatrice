@@ -1284,7 +1284,21 @@ void TabSupervisor::processGameEventContainer(const GameEventContainer &cont)
 
 void TabSupervisor::processUserMessageEvent(const Event_UserMessage &event)
 {
+    // "Ignore all private messages" silences every PM, including messages to
+    // already-open tabs — unlike the unregistered/non-buddy filters below,
+    // which only apply when creating a new tab. Messages from moderators/admins
+    // are exempt to ensure warnings still reach users.
     QString senderName = QString::fromStdString(event.sender_name());
+    if (SettingsCache::instance().chat().getIgnoreAllPrivateMessages()) {
+        const ServerInfo_User *onlineUserInfo = userListManager->getOnlineUser(senderName);
+        if (!onlineUserInfo) {
+            return;
+        }
+        const UserLevelFlags userLevel(onlineUserInfo->user_level());
+        if (!userLevel.testFlag(ServerInfo_User::IsModerator) && !userLevel.testFlag(ServerInfo_User::IsAdmin)) {
+            return;
+        }
+    }
     TabMessage *tab = messageTabs.value(senderName);
     if (!tab) {
         tab = messageTabs.value(QString::fromStdString(event.receiver_name()));
