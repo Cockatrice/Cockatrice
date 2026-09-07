@@ -439,7 +439,7 @@ void UserContextMenu::showContextMenu(const QPoint &pos,
         }
     }
     aDetails->setEnabled(true);
-    aChat->setEnabled(anotherUser && online);
+    aChat->setEnabled(anotherUser && online && !userListProxy->isUserIgnored(userName));
     aShowGames->setEnabled(online);
     aReport->setEnabled(anotherUser);
     aAddToBuddyList->setEnabled(anotherUser);
