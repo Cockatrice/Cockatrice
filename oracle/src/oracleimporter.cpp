@@ -460,8 +460,17 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
                             properties.insert(prop, thisCardPropertyValue);
                         } else if (prop == "colors" || prop == "coloridentity") { // the card is both colors
                             properties.insert(prop, originalPropertyValue + thisCardPropertyValue);
-                        } else if (prop == "maintype") { // don't create maintypes with //es in them
-                            continue;
+                        } else if (prop == "maintype") {
+                            // Use the same priority as getMainCardType() to pick the
+                            // "best" type across faces — e.g. Creature over Instant
+                            // for adventure cards.
+                            static const QStringList typePriority = {
+                                "Planeswalker", "Creature", "Land", "Sorcery", "Instant", "Artifact", "Enchantment"};
+                            int currentPriority = typePriority.indexOf(originalPropertyValue);
+                            int newPriority = typePriority.indexOf(thisCardPropertyValue);
+                            if (newPriority >= 0 && (currentPriority < 0 || newPriority < currentPriority)) {
+                                properties.insert(prop, thisCardPropertyValue);
+                            }
                         } else {
                             properties.insert(prop,
                                               originalPropertyValue + splitCardPropSeparator + thisCardPropertyValue);
