@@ -138,7 +138,8 @@ void CardPictureLoader::getPixmap(QPixmap &pixmap, const ExactCard &card, QSize 
     QPixmap bigPixmap;
     if (QPixmapCache::find(key, &bigPixmap)) {
         if (bigPixmap.isNull()) {
-            getCardBackLoadingFailedPixmap(pixmap, size);
+            // Leave the pixmap null so callers fall back to a solid color
+            // instead of showing the card back.
             QDateTime failedAtTime = getInstance().failedAt.value(key);
             if (!failedAtTime.isValid() ||
                 failedAtTime.addSecs(RETRY_FAILED_CARDS_SECS) < QDateTime::currentDateTime()) {
