@@ -96,16 +96,34 @@ bool OracleImporter::readSetsFromByteArray(QByteArray data)
     return true;
 }
 
+/**
+ * The priority order used to pick a card's main type when a card has multiple
+ * types (e.g. "Artifact Creature") or multiple faces (e.g. split/adventure cards).
+ * A lower index means a higher priority.
+ */
+static const QStringList &mainCardTypePriority()
+{
+    static const QStringList priority = {"Planeswalker", "Creature", "Land",       "Sorcery",
+                                         "Instant",      "Artifact", "Enchantment"};
+    return priority;
+}
+
+/**
+ * Returns the priority (index) of the given main card type. Known types map to their
+ * position in {@link mainCardTypePriority()}, unknown types map to -1 (lowest priority).
+ */
+static int mainCardTypePriority(const QString &mainCardType)
+{
+    return mainCardTypePriority().indexOf(mainCardType);
+}
+
 static QString getMainCardType(const QStringList &typeList)
 {
     if (typeList.isEmpty()) {
         return {};
     }
 
-    static const QStringList typePriority = {"Planeswalker", "Creature", "Land",       "Sorcery",
-                                             "Instant",      "Artifact", "Enchantment"};
-
-    for (const auto &type : typePriority) {
+    for (const auto &type : mainCardTypePriority()) {
         if (typeList.contains(type)) {
             return type;
         }
@@ -463,11 +481,9 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
                         } else if (prop == "maintype") {
                             // Use the same priority as getMainCardType() to pick the
                             // "best" type across faces — e.g. Creature over Instant
-                            // for adventure cards.
-                            static const QStringList typePriority = {
-                                "Planeswalker", "Creature", "Land", "Sorcery", "Instant", "Artifact", "Enchantment"};
-                            int currentPriority = typePriority.indexOf(originalPropertyValue);
-                            int newPriority = typePriority.indexOf(thisCardPropertyValue);
+                            // for adventure cards like Bonecrusher Giant.
+                            int currentPriority = mainCardTypePriority(originalPropertyValue);
+                            int newPriority = mainCardTypePriority(thisCardPropertyValue);
                             if (newPriority >= 0 && (currentPriority < 0 || newPriority < currentPriority)) {
                                 properties.insert(prop, thisCardPropertyValue);
                             }
