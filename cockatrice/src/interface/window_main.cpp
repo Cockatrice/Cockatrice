@@ -844,6 +844,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
     bClosingDown = true;
 
+    if (cardUpdateProcess && cardUpdateProcess->state() != QProcess::NotRunning) {
+        if (QMessageBox::question(this, tr("Are you sure?"),
+                                  tr("A card database update is still running. Quitting now will cancel it.\n"
+                                     "Are you sure you want to quit?"),
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+            event->ignore();
+            bClosingDown = false;
+            return;
+        }
+    }
+
     if (!tabSupervisor->close()) {
         event->ignore();
         bClosingDown = false;

@@ -3,6 +3,7 @@
 
 #include "raw_json_scanner.h"
 
+#include <QAtomicInt>
 #include <QByteArray>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -163,6 +164,13 @@ private:
      */
     bool progressReporting = true;
 
+    /**
+     * Atomic "please stop importing" flag. startImport() checks it between sets
+     * so a wizard being closed mid-import can be torn down without waiting for
+     * the whole import (or racing it).
+     */
+    QAtomicInt importCancelled;
+
     CardInfoPtr addCard(QString name,
                         const QString &text,
                         bool isToken,
@@ -193,6 +201,17 @@ public:
      */
     bool readSetsFromByteArray(QByteArray data);
     int startImport();
+    /**
+     * @brief Requests an in-flight startImport() to stop at the next set boundary.
+     *
+     * Works by setting an atomic flag that startImport() polls between sets, so
+     * cancelImport() followed by a short waitForFinished() on the running future is
+     * safe the moment the wizard is about to be destroyed.
+     */
+    void cancelImport()
+    {
+        importCancelled.storeRelease(1);
+    }
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
     int importCardsFromSet(const CardSetPtr &currentSet, const QJsonArray &cardsList);
     /**

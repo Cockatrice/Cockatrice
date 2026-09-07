@@ -3,8 +3,10 @@
 
 #include "pagetemplates.h"
 
+#include <QByteArray>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QString>
 #include <QTimer>
 #include <QWizard>
 #include <utility>
@@ -57,6 +59,16 @@ protected:
     void initializePage() override;
 };
 
+/** @brief Result of a worker-thread sets-file load (read + decompress + dispatch). */
+struct LoadSetsResult
+{
+    bool ok = false;                        ///< JSON scan produced set data (or plain XML was handled)
+    bool plainXml = false;                  ///< input was a plain Cockatrice XML database
+    QByteArray xmlData;                     ///< raw XML for the plain-XML path
+    QString errorMessage;                   ///< set when the input could not be processed
+    bool offerUncompressedFallback = false; ///< decompression-only failure: offer the uncompressed URL
+};
+
 class LoadSetsPage : public OracleWizardPage
 {
     Q_OBJECT
@@ -68,8 +80,9 @@ protected:
     void initializePage() override;
     bool validatePage() override;
     void readSetsFromByteArray(QByteArray _data);
-    void readSetsFromByteArrayRef(QByteArray &_data);
+    void readSetsFromFile(const QString &fileName);
     void downloadSetsFile(const QUrl &url);
+    void cancelWork() override;
 
 private:
     QRadioButton *urlRadioButton;
@@ -81,8 +94,10 @@ private:
     QLabel *progressLabel;
     QProgressBar *progressBar;
 
-    QFutureWatcher<bool> watcher;
-    QFuture<bool> future;
+    QFutureWatcher<LoadSetsResult> watcher;
+    QFuture<LoadSetsResult> future;
+
+    void beginLoadSets(bool compressedFile = false);
 
 private slots:
     void actLoadSetsFile();
@@ -111,11 +126,14 @@ private:
 
     QFutureWatcher<int> importWatcher;
     QFuture<int> importFuture;
+    int totalSets = 0;
+    bool importActive = false;
 
 protected:
     void initializePage() override;
     void cleanupPage() override;
     bool validatePage() override;
+    void cancelWork() override;
 
 private slots:
     void importFinished();

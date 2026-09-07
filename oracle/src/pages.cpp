@@ -71,6 +71,101 @@ static void emitBackgroundProgress(const char *stage, qint64 done, qint64 total)
     out.flush();
 }
 
+namespace
+{
+
+/**
+ * @brief Decompresses and dispatches a sets-file payload on a worker thread.
+ *
+ * Iteratively unwraps xz/zip compression, then either hands the JSON to the
+ * importer (which reports scan progress via dataReadProgress) or returns the raw
+ * XML for the plain-XML path. Must never touch the wizard or the page: the caller
+ * consumes the returned LoadSetsResult on the UI thread in importFinished().
+ */
+LoadSetsResult loadSetsData(const QPointer<OracleImporter> &importer, QByteArray data)
+{
+    LoadSetsResult result;
+
+    while (true) {
+        if (data.startsWith(XZ_SIGNATURE)) {
+#ifdef HAS_LZMA
+            QBuffer inBuffer(&data);
+            QByteArray decompressed;
+            QBuffer outBuffer(&decompressed);
+            inBuffer.open(QBuffer::ReadOnly);
+            outBuffer.open(QBuffer::WriteOnly);
+            XzDecompressor xz;
+            if (!xz.decompress(&inBuffer, &outBuffer)) {
+                result.errorMessage = LoadSetsPage::tr("Xz extraction failed.");
+                result.offerUncompressedFallback = true;
+                return result;
+            }
+            data = decompressed;
+            continue;
+#else
+            result.errorMessage =
+                LoadSetsPage::tr("Sorry, this version of Oracle does not support xz compressed files.");
+            result.offerUncompressedFallback = true;
+            return result;
+#endif
+        }
+
+        if (data.startsWith(ZIP_SIGNATURE)) {
+#ifdef HAS_ZLIB
+            QBuffer inBuffer(&data);
+            UnZip uz;
+            const UnZip::ErrorCode openEc = uz.openArchive(&inBuffer);
+            if (openEc != UnZip::Ok) {
+                result.errorMessage = LoadSetsPage::tr("Failed to open Zip archive: %1.").arg(uz.formatError(openEc));
+                result.offerUncompressedFallback = true;
+                return result;
+            }
+            if (uz.fileList().size() != 1) {
+                result.errorMessage =
+                    LoadSetsPage::tr("Zip extraction failed: the Zip archive doesn't contain exactly one file.");
+                result.offerUncompressedFallback = true;
+                return result;
+            }
+            const QString fileName = uz.fileList().at(0);
+            QByteArray decompressed;
+            QBuffer outBuffer(&decompressed);
+            outBuffer.open(QBuffer::ReadWrite);
+            const UnZip::ErrorCode ec = uz.extractFile(fileName, &outBuffer);
+            uz.closeArchive();
+            if (ec != UnZip::Ok) {
+                result.errorMessage = LoadSetsPage::tr("Zip extraction failed: %1.").arg(uz.formatError(ec));
+                result.offerUncompressedFallback = true;
+                return result;
+            }
+            data = decompressed;
+            continue;
+#else
+            result.errorMessage = LoadSetsPage::tr("Sorry, this version of Oracle does not support zipped files.");
+            result.offerUncompressedFallback = true;
+            return result;
+#endif
+        }
+        break;
+    }
+
+    if (data.startsWith("<")) {
+        result.ok = true;
+        result.plainXml = true;
+        result.xmlData = std::move(data);
+        return result;
+    }
+
+    if (data.startsWith("{")) {
+        result.ok = importer && importer->readSetsFromByteArray(std::move(data));
+        return result;
+    }
+
+    result.errorMessage = LoadSetsPage::tr("Failed to interpret downloaded data.");
+    return result;
+}
+
+} // namespace
+
 #define TOKENS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Token/master/tokens.xml"
 #define SPOILERS_URL "https://raw.githubusercontent.com/Cockatrice/Magic-Spoiler/files/spoiler.xml"
 
@@ -297,18 +392,13 @@ bool LoadSetsPage::validatePage()
             return false;
         }
 
-        if (!setsFile.open(QIODevice::ReadOnly)) {
-            QMessageBox::critical(nullptr, tr("Error"), tr("Cannot open file '%1'.").arg(fileLineEdit->text()));
-            return false;
-        }
-
         wizard()->disableButtons();
         setEnabled(false);
 
         wizard()->setCardSourceUrl(setsFile.fileName());
         wizard()->setCardSourceVersion("unknown");
 
-        readSetsFromByteArray(setsFile.readAll());
+        readSetsFromFile(setsFile.fileName());
     }
 
     return false;
@@ -410,6 +500,7 @@ void LoadSetsPage::updateParsingProgress(int bytesRead, int totalBytes)
     if (totalBytes <= 0) {
         return;
     }
+    progressBar->setRange(0, totalBytes);
     progressBar->setValue(bytesRead);
     const int percent = static_cast<int>((100.0 * bytesRead) / totalBytes);
     progressLabel->setText(tr("Parsing file (%1%)").arg(percent));
@@ -420,120 +511,76 @@ void LoadSetsPage::scanProgressToStdout(int bytesRead, int totalBytes)
     emitBackgroundProgress("scan", bytesRead, totalBytes);
 }
 
-void LoadSetsPage::readSetsFromByteArray(QByteArray _data)
+void LoadSetsPage::beginLoadSets(bool compressedFile)
 {
-    // show an infinite progressbar
+    // Show an infinite progressbar while the worker decompresses; the scan
+    // steals the label via dataReadProgress as soon as it starts.
     progressBar->setMaximum(0);
     progressBar->setMinimum(0);
     progressBar->setValue(0);
-    progressLabel->setText(tr("Parsing file"));
+    progressLabel->setText(compressedFile ? tr("Extracting file...") : tr("Parsing file"));
     progressLabel->show();
     progressBar->show();
 
     wizard()->downloadedPlainXml = false;
     wizard()->xmlData.clear();
-    readSetsFromByteArrayRef(_data);
+
+    if (wizard()->backgroundMode) {
+        connect(wizard()->importer, &OracleImporter::dataReadProgress, this, &LoadSetsPage::scanProgressToStdout,
+                Qt::UniqueConnection);
+    } else {
+        connect(wizard()->importer, &OracleImporter::dataReadProgress, this, &LoadSetsPage::updateParsingProgress,
+                Qt::UniqueConnection);
+    }
 }
 
-void LoadSetsPage::readSetsFromByteArrayRef(QByteArray &_data)
+void LoadSetsPage::readSetsFromByteArray(QByteArray _data)
 {
-    // unzip the file if needed
-    if (_data.startsWith(XZ_SIGNATURE)) {
-#ifdef HAS_LZMA
-        // zipped file
-        auto *inBuffer = new QBuffer(&_data);
-        auto newData = QByteArray();
-        auto *outBuffer = new QBuffer(&newData);
-        inBuffer->open(QBuffer::ReadOnly);
-        outBuffer->open(QBuffer::WriteOnly);
-        XzDecompressor xz;
-        if (!xz.decompress(inBuffer, outBuffer)) {
-            zipDownloadFailed(tr("Xz extraction failed."));
-            return;
+    const bool compressed = _data.startsWith(XZ_SIGNATURE) || _data.startsWith(ZIP_SIGNATURE);
+    beginLoadSets(compressed);
+
+    // Decompress and scan off the UI thread so a large download can't freeze the window.
+    const QPointer<OracleImporter> importer = wizard()->importer;
+    future = QtConcurrent::run(
+        [importer, data = std::move(_data)]() mutable { return loadSetsData(importer, std::move(data)); });
+    watcher.setFuture(future);
+}
+
+void LoadSetsPage::readSetsFromFile(const QString &fileName)
+{
+    // Peek at the header on the UI thread so the status text can distinguish
+    // "Extracting file..." from a plain JSON parse; the full read happens in the worker.
+    QFile headerFile(fileName);
+    bool compressed = false;
+    if (headerFile.open(QIODevice::ReadOnly)) {
+        const QByteArray header = headerFile.read(6);
+        compressed = header.startsWith(XZ_SIGNATURE) || header.startsWith(ZIP_SIGNATURE);
+    }
+    beginLoadSets(compressed);
+
+    // Read, decompress and scan off the UI thread (a plain JSON can be hundreds
+    // of MB, so even the read itself must not block the window).
+    const QPointer<OracleImporter> importer = wizard()->importer;
+    future = QtConcurrent::run([importer, fileName]() mutable -> LoadSetsResult {
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly)) {
+            LoadSetsResult readError;
+            readError.errorMessage = LoadSetsPage::tr("Cannot open file '%1'.").arg(fileName);
+            return readError;
         }
-        _data.clear();
-        readSetsFromByteArrayRef(newData);
-        return;
-#else
-        zipDownloadFailed(tr("Sorry, this version of Oracle does not support xz compressed files."));
+        return loadSetsData(importer, file.readAll());
+    });
+    watcher.setFuture(future);
+}
 
-        wizard()->enableButtons();
-        setEnabled(true);
-        progressLabel->hide();
-        progressBar->hide();
-        return;
-#endif
-    } else if (_data.startsWith(ZIP_SIGNATURE)) {
-#ifdef HAS_ZLIB
-        // zipped file
-        auto *inBuffer = new QBuffer(&_data);
-        auto newData = QByteArray();
-        auto *outBuffer = new QBuffer(&newData);
-        QString fileName;
-        UnZip::ErrorCode ec;
-        UnZip uz;
-
-        ec = uz.openArchive(inBuffer);
-        if (ec != UnZip::Ok) {
-            zipDownloadFailed(tr("Failed to open Zip archive: %1.").arg(uz.formatError(ec)));
-            return;
-        }
-
-        if (uz.fileList().size() != 1) {
-            zipDownloadFailed(tr("Zip extraction failed: the Zip archive doesn't contain exactly one file."));
-            return;
-        }
-        fileName = uz.fileList().at(0);
-
-        outBuffer->open(QBuffer::ReadWrite);
-        ec = uz.extractFile(fileName, outBuffer);
-        if (ec != UnZip::Ok) {
-            zipDownloadFailed(tr("Zip extraction failed: %1.").arg(uz.formatError(ec)));
-            uz.closeArchive();
-            return;
-        }
-        _data.clear();
-        readSetsFromByteArrayRef(newData);
-        return;
-#else
-        zipDownloadFailed(tr("Sorry, this version of Oracle does not support zipped files."));
-
-        wizard()->enableButtons();
-        setEnabled(true);
-        progressLabel->hide();
-        progressBar->hide();
-        return;
-#endif
-    } else if (_data.startsWith("{")) {
-        if (wizard()->backgroundMode) {
-            qInfo() << tr("Parsing file");
-            connect(wizard()->importer, &OracleImporter::dataReadProgress, this, &LoadSetsPage::scanProgressToStdout,
-                    Qt::UniqueConnection);
-        } else {
-            // Start the computation.
-            progressBar->setRange(0, static_cast<int>(_data.size()));
-            progressBar->setValue(0);
-            progressLabel->setText(tr("Parsing file (0%)"));
-            connect(wizard()->importer, &OracleImporter::dataReadProgress, this, &LoadSetsPage::updateParsingProgress,
-                    Qt::UniqueConnection);
-        }
-
-        const QPointer<OracleImporter> importer = wizard()->importer;
-        future = QtConcurrent::run([importer, data = std::move(_data)]() mutable {
-            return importer ? importer->readSetsFromByteArray(std::move(data)) : false;
-        });
-        watcher.setFuture(future);
-    } else if (_data.startsWith("<")) {
-        // save xml file and don't do any processing
-        wizard()->downloadedPlainXml = true;
-        wizard()->xmlData = std::move(_data);
-        importFinished();
-    } else {
-        wizard()->enableButtons();
-        setEnabled(true);
-        progressLabel->hide();
-        progressBar->hide();
-        QMessageBox::critical(this, tr("Error"), tr("Failed to interpret downloaded data."));
+void LoadSetsPage::cancelWork()
+{
+    // The scan is short-lived; just wait it out before the wizard (and its
+    // importer) can be torn down underneath the worker thread.
+    if (future.isRunning()) {
+        future.cancel();
+        watcher.cancel();
+        future.waitForFinished();
     }
 }
 
@@ -561,24 +608,52 @@ void LoadSetsPage::importFinished()
 {
     wizard()->enableButtons();
     setEnabled(true);
-    progressLabel->hide();
-    progressBar->hide();
 
-    const bool hasData = wizard()->downloadedPlainXml || watcher.future().result();
+    const LoadSetsResult result = watcher.result();
+
+    if (result.plainXml) {
+        wizard()->downloadedPlainXml = true;
+        wizard()->xmlData = result.xmlData;
+    }
+
     if (wizard()->backgroundMode) {
-        if (!hasData) {
+        progressLabel->hide();
+        progressBar->hide();
+        if (!result.errorMessage.isEmpty()) {
+            qWarning() << result.errorMessage;
+        } else if (!result.ok && !result.plainXml) {
             qWarning() << tr("The file was retrieved successfully, but it does not contain any sets data.");
         }
         emit readyToContinue();
         return;
     }
 
-    if (hasData) {
-        wizard()->next();
-    } else {
-        QMessageBox::critical(this, tr("Error"),
-                              tr("The file was retrieved successfully, but it does not contain any sets data."));
+    const auto fail = [this](const QString &message) {
+        progressLabel->hide();
+        progressBar->hide();
+        QMessageBox::critical(this, tr("Error"), message);
+    };
+
+    if (!result.errorMessage.isEmpty()) {
+        if (result.offerUncompressedFallback) {
+            zipDownloadFailed(result.errorMessage);
+            return;
+        }
+        fail(result.errorMessage);
+        return;
     }
+
+    if (!result.ok && !result.plainXml) {
+        fail(tr("The file was retrieved successfully, but it does not contain any sets data."));
+        return;
+    }
+
+    // Snap the bar to 100% so the tail never looks stuck at 99% while the next
+    // page's own import progress is being set up.
+    progressBar->setMaximum(1);
+    progressBar->setValue(1);
+    progressLabel->setText(tr("Parsing file (100%)"));
+    wizard()->next();
 }
 
 SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
@@ -601,15 +676,15 @@ SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
     layout->addWidget(pathLabel, 3, 0);
     layout->addWidget(defaultPathCheckBox, 4, 0);
 
-    connect(&importWatcher, &QFutureWatcher<int>::finished, this, &SaveSetsPage::importFinished);
-
     setLayout(layout);
 }
 
 void SaveSetsPage::cleanupPage()
 {
+    cancelWork();
+    disconnect(wizard()->importer, &OracleImporter::setIndexChanged, this, &SaveSetsPage::updateTotalProgress);
+    disconnect(&importWatcher, &QFutureWatcher<int>::finished, this, &SaveSetsPage::importFinished);
     wizard()->importer->clear();
-    disconnect(wizard()->importer, &OracleImporter::setIndexChanged, nullptr, nullptr);
 }
 
 void SaveSetsPage::initializePage()
@@ -627,21 +702,44 @@ void SaveSetsPage::initializePage()
     messageLog->clear();
     messageLog->show();
     progressBar->show();
-    progressBar->setRange(0, wizard()->importer->getSets().size());
+
+    totalSets = wizard()->importer->getSets().size();
+    progressBar->setRange(0, totalSets);
     progressBar->setValue(0);
 
     connect(wizard()->importer, &OracleImporter::setIndexChanged, this, &SaveSetsPage::updateTotalProgress,
             Qt::UniqueConnection);
+    connect(&importWatcher, &QFutureWatcher<int>::finished, this, &SaveSetsPage::importFinished, Qt::UniqueConnection);
 
     wizard()->disableButtons();
+    importActive = true;
 
     const QPointer<OracleImporter> importer = wizard()->importer;
     importFuture = QtConcurrent::run([importer] { return importer ? importer->startImport() : 0; });
     importWatcher.setFuture(importFuture);
 }
 
+void SaveSetsPage::cancelWork()
+{
+    if (!importActive) {
+        return;
+    }
+    // Ask the worker to stop at the next set boundary, then wait it out so the
+    // wizard (and the importer it owns) is never torn down under a running thread.
+    importActive = false;
+    wizard()->importer->cancelImport();
+    importFuture.cancel();
+    importWatcher.cancel();
+    importFuture.waitForFinished();
+}
+
 void SaveSetsPage::importFinished()
 {
+    if (!importActive) {
+        return;
+    }
+    importActive = false;
+
     wizard()->enableButtons();
 
     const int setsImported = importWatcher.result();
@@ -685,20 +783,21 @@ void SaveSetsPage::retranslateUi()
 
 void SaveSetsPage::updateTotalProgress(int cardsImported, int setIndex, const QString &setName)
 {
-    const bool background = wizard()->backgroundMode;
-    const int totalSets = wizard()->importer->getSets().size();
+    if (!importActive) {
+        return;
+    }
     if (setName.isEmpty()) {
         progressBar->setValue(progressBar->maximum());
-        if (background) {
-            qInfo() << tr("Import finished: %1 cards.").arg(wizard()->importer->getCardList().size());
+        const int cardCount = wizard()->importer->getCardList().size();
+        if (wizard()->backgroundMode) {
+            qInfo() << tr("Import finished: %1 cards.").arg(cardCount);
             emitBackgroundProgress("import", totalSets, totalSets);
         } else {
-            messageLog->append("<b>" + tr("Import finished: %1 cards.").arg(wizard()->importer->getCardList().size()) +
-                               "</b>");
+            messageLog->append("<b>" + tr("Import finished: %1 cards.").arg(cardCount) + "</b>");
         }
     } else {
         progressBar->setValue(setIndex);
-        if (background) {
+        if (wizard()->backgroundMode) {
             qInfo() << tr("%1: %2 cards imported").arg(setName).arg(cardsImported);
             emitBackgroundProgress("import", setIndex, totalSets);
         } else {
