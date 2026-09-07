@@ -165,9 +165,7 @@ bool AbstractServerSocketInterface::initSession()
         // logging in with the legacy hash, but already-migrated scrypt rows are always
         // served challenge-response (authentication_strictness only governs NEW credentials).
         Event_ServerIdentification::ServerOptions serverOptions =
-            static_cast<Event_ServerIdentification::ServerOptions>(
-                Event_ServerIdentification::SupportsPasswordHash |
-                Event_ServerIdentification::SupportsChallengeResponseAuth);
+            Event_ServerIdentification::SupportsAll;
         identEvent.set_server_options(serverOptions);
     }
     SessionEvent *identSe = prepareSessionEvent(identEvent);
