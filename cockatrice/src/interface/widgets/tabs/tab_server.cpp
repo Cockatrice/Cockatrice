@@ -229,6 +229,7 @@ void TabServer::joinRoomFinished(const Response &r,
 
     switch (r.response_code()) {
         case Response::RespOk:
+            healedRoomJoins.remove(roomId);
             break;
         case Response::RespNameNotFound:
             if (setCurrent) {
@@ -238,10 +239,24 @@ void TabServer::joinRoomFinished(const Response &r,
             emit roomJoinFailed(roomId);
             return;
         case Response::RespContextError:
+            if (healedRoomJoins.contains(roomId)) {
+                // A stale-membership heal was already attempted once; if the server still
+                // rejects the join there is nothing left to do client-side, so surface it.
+                if (setCurrent) {
+                    QMessageBox::critical(
+                        this, tr("Error"),
+                        tr("The server thinks you are in the server room but your client is unable to display it. "
+                           "Try restarting your client."));
+                }
+                emit roomJoinFailed(roomId);
+                return;
+            }
             // The server already had us registered in the room even though no tab was open,
             // usually because two join attempts for the same room overlapped. Leaving and
             // rejoining makes the server reply with a fresh RespOk so the tab is displayed
-            // without requiring a client restart.
+            // without requiring a client restart. This is attempted only once: if the server
+            // keeps replying with RespContextError we must not loop forever.
+            healedRoomJoins.insert(roomId);
             leaveAndRejoinRoom(roomId, setCurrent);
             return;
         case Response::RespUserLevelTooLow:

@@ -11,6 +11,7 @@
 
 #include <QGroupBox>
 #include <QMap>
+#include <QSet>
 #include <QTextBrowser>
 #include <QTreeWidget>
 
@@ -67,6 +68,8 @@ private:
     bool shouldEmitUpdate = false;
     /** Room ids with a join command in flight, mapped to whether the tab should be focused once it opens. */
     QMap<int, bool> pendingRoomJoins;
+    /** Room ids for which a stale-membership heal (leave + rejoin) has already been attempted. */
+    QSet<int> healedRoomJoins;
 
 public:
     TabServer(TabSupervisor *_tabSupervisor, AbstractClient *_client);
