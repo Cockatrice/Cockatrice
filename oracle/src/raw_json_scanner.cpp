@@ -18,7 +18,9 @@ constexpr int kMaxNestingDepth = 1024;
  * Threaded through the skip walk so progress can be reported without materializing
  * the whole document. Reports are rate-limited so a GUI showing progress isn't
  * flooded with interrupts: a callback is invoked at most ~100 times per scan
- * regardless of element count.
+ * regardless of element count. The closing stretch (the last ~1%) is reported
+ * more finely so a large document doesn't stall the progress bar on the final
+ * percent before the scan wraps up.
  */
 struct ScanProgress
 {
@@ -41,7 +43,8 @@ struct ScanProgress
         if (offset == lastReported) {
             return; // the final element often already sits exactly at the end
         }
-        if (offset - lastReported < step && offset < size) {
+        const qsizetype reportingStep = offset >= size - step ? std::max<qsizetype>(1, step / 16) : step;
+        if (offset - lastReported < reportingStep && offset < size) {
             return;
         }
         lastReported = offset;

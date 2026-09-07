@@ -648,12 +648,17 @@ void LoadSetsPage::importFinished()
         return;
     }
 
-    // Snap the bar to 100% so the tail never looks stuck at 99% while the next
-    // page's own import progress is being set up.
+    // Snap the bar to 100% and hold it there for a moment so the completed state
+    // is actually visible before the next page's own import progress takes over
+    // (a zero-length deferral can still fire before the repaint is delivered).
     progressBar->setMaximum(1);
     progressBar->setValue(1);
     progressLabel->setText(tr("Parsing file (100%)"));
-    wizard()->next();
+    QTimer::singleShot(500, this, [this] {
+        if (wizard()->currentPage() == this) {
+            wizard()->next();
+        }
+    });
 }
 
 SaveSetsPage::SaveSetsPage(QWidget *parent) : OracleWizardPage(parent)
