@@ -16,6 +16,7 @@ private:
     QString annotation;
     QString pt;
     bool doesntUntap = false;
+    bool doesntUntapOnce = false;
     bool destroyOnZoneChange = false;
 
     CardItem *attachedTo = nullptr;
@@ -29,6 +30,7 @@ signals:
     void annotationChanged(const QString &newAnnotation);
     void ptChanged(const QString &newPt);
     void doesntUntapChanged(bool newValue);
+    void doesntUntapOnceChanged(bool newValue);
     void destroyOnZoneChangeChanged(bool newValue);
     void attachedToChanged(CardItem *newAttachedTo);
     void zoneChanged(CardState *changedCard, CardZoneLogic *newZone);
@@ -84,6 +86,13 @@ public:
     }
 
     void setDoesntUntap(bool _doesntUntap);
+
+    bool getDoesntUntapOnce() const
+    {
+        return doesntUntapOnce;
+    }
+
+    void setDoesntUntapOnce(bool _doesntUntapOnce);
 
     bool getDestroyOnZoneChange() const
     {

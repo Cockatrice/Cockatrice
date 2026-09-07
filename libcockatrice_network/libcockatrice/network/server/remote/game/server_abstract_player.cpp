@@ -1076,6 +1076,11 @@ Server_AbstractPlayer::cmdCreateToken(const Command_CreateToken &cmd, ResponseCo
                 ges.enqueueGameEvent(event, playerId);
             }
 
+            if (card->getDoesntUntapOnce() != targetCard->getDoesntUntapOnce()) {
+                card->setAttribute(AttrDoesntUntapOnce, QVariant(targetCard->getDoesntUntapOnce()).toString(), &event);
+                ges.enqueueGameEvent(event, playerId);
+            }
+
             // Copy counters
             QMapIterator<int, int> i(targetCard->getCounters());
             while (i.hasNext()) {
@@ -1433,6 +1438,7 @@ Server_AbstractPlayer::cmdDumpZone(const Command_DumpZone &cmd, ResponseContaine
             cardInfo->set_annotation(card->getAnnotation().toStdString());
             cardInfo->set_destroy_on_zone_change(card->getDestroyOnZoneChange());
             cardInfo->set_doesnt_untap(card->getDoesntUntap());
+            cardInfo->set_doesnt_untap_once(card->getDoesntUntapOnce());
 
             QMapIterator<int, int> cardCounterIterator(card->getCounters());
             while (cardCounterIterator.hasNext()) {
@@ -1545,6 +1551,7 @@ Server_AbstractPlayer::cmdRevealCards(const Command_RevealCards &cmd, ResponseCo
         cardInfo->set_annotation(card->getAnnotation().toStdString());
         cardInfo->set_destroy_on_zone_change(card->getDestroyOnZoneChange());
         cardInfo->set_doesnt_untap(card->getDoesntUntap());
+        cardInfo->set_doesnt_untap_once(card->getDoesntUntapOnce());
 
         QMapIterator<int, int> cardCounterIterator(card->getCounters());
         while (cardCounterIterator.hasNext()) {

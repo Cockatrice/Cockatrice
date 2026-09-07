@@ -32,7 +32,8 @@
 
 Server_Card::Server_Card(const CardRef &cardRef, int _id, int _coord_x, int _coord_y, Server_CardZone *_zone)
     : zone(_zone), id(_id), coord_x(_coord_x), coord_y(_coord_y), cardRef(cardRef), tapped(false), attacking(false),
-      facedown(false), destroyOnZoneChange(false), doesntUntap(false), parentCard(0), stashedCard(nullptr)
+      facedown(false), destroyOnZoneChange(false), doesntUntap(false), doesntUntapOnce(false), parentCard(0),
+      stashedCard(nullptr)
 {
 }
 
@@ -63,10 +64,16 @@ void Server_Card::resetState(bool keepAnnotations)
         setAnnotation(QString());
     }
     setDoesntUntap(false);
+    setDoesntUntapOnce(false);
 }
 
 QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue, bool allCards)
 {
+    if (attribute == AttrTapped && avalue != "1" && allCards && doesntUntapOnce) {
+        setDoesntUntapOnce(false);
+        return QVariant(tapped).toString();
+    }
+
     if (attribute == AttrTapped && avalue != "1" && allCards && doesntUntap) {
         return QVariant(tapped).toString();
     }
@@ -105,6 +112,9 @@ QString Server_Card::setAttribute(CardAttribute attribute, const QString &avalue
             break;
         case AttrDoesntUntap:
             setDoesntUntap(avalue == "1");
+            break;
+        case AttrDoesntUntapOnce:
+            setDoesntUntapOnce(avalue == "1");
             break;
     }
     if (event) {
@@ -202,6 +212,9 @@ void Server_Card::getInfo(ServerInfo_Card *info)
     }
     if (doesntUntap) {
         info->set_doesnt_untap(true);
+    }
+    if (doesntUntapOnce) {
+        info->set_doesnt_untap_once(true);
     }
 
     QMapIterator<int, int> cardCounterIterator(counters);

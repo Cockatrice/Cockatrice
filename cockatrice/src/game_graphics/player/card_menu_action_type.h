@@ -13,6 +13,7 @@ enum CardMenuActionType
     cmTap,
     cmUntap,
     cmDoesntUntap,
+    cmDoesntUntapOnce,
     cmFlip,
     cmPeek,
     cmClone,
