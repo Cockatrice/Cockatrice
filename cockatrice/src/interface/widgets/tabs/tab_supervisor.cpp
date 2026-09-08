@@ -1249,7 +1249,7 @@ void TabSupervisor::tabUserEvent(bool globalEvent)
     auto *tab = static_cast<Tab *>(sender());
     if (tab != currentWidget()) {
         tab->setContentsChanged(true);
-        setTabIcon(indexOf(tab), QPixmap("theme:icons/tab_changed"));
+        setTabIcon(indexOf(tab), themePixmap(QStringLiteral("icons/tab_changed")));
     }
     if (globalEvent && SettingsCache::instance().userInterface().getNotificationsEnabled()) {
         QApplication::alert(this);

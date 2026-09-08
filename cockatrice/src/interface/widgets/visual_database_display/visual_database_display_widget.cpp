@@ -66,7 +66,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
     searchEdit->setClearButtonEnabled(true);
     searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-    auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+    auto help = searchEdit->addAction(themePixmap(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
     connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
 
     setFocusProxy(searchEdit);
@@ -121,7 +121,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     clearFilterWidget = new QToolButton();
     clearFilterWidget->setFixedSize(32, 32);
-    clearFilterWidget->setIcon(QPixmap("theme:icons/delete"));
+    clearFilterWidget->setIcon(themePixmap(QStringLiteral("icons/delete")));
     connect(clearFilterWidget, &QToolButton::clicked, this, [this] {
         filterModel->blockSignals(true);
         filterModel->filterTree()->blockSignals(true);

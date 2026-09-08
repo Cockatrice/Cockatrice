@@ -1,6 +1,7 @@
 #include "tab_replays.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../pixel_map_generator.h"
 #include "../interface/widgets/server/remote/remote_replay_list_tree_widget.h"
 #include "tab_game.h"
 
@@ -102,17 +103,17 @@ QGroupBox *TabReplays::createLeftLayout()
 
     // Left side actions
     aOpenLocalReplay = new QAction(this);
-    aOpenLocalReplay->setIcon(QPixmap("theme:icons/view"));
+    aOpenLocalReplay->setIcon(themePixmap(QStringLiteral("icons/view")));
     connect(aOpenLocalReplay, &QAction::triggered, this, &TabReplays::actOpenLocalReplay);
     connect(localDirView, &QTreeView::doubleClicked, this, &TabReplays::actOpenLocalReplay);
     aRenameLocal = new QAction(this);
-    aRenameLocal->setIcon(QPixmap("theme:icons/rename"));
+    aRenameLocal->setIcon(themePixmap(QStringLiteral("icons/rename")));
     connect(aRenameLocal, &QAction::triggered, this, &TabReplays::actRenameLocal);
     aNewLocalFolder = new QAction(this);
     aNewLocalFolder->setIcon(qApp->style()->standardIcon(QStyle::SP_FileDialogNewFolder));
     connect(aNewLocalFolder, &QAction::triggered, this, &TabReplays::actNewLocalFolder);
     aDeleteLocalReplay = new QAction(this);
-    aDeleteLocalReplay->setIcon(QPixmap("theme:icons/remove_row"));
+    aDeleteLocalReplay->setIcon(themePixmap(QStringLiteral("icons/remove_row")));
     connect(aDeleteLocalReplay, &QAction::triggered, this, &TabReplays::actDeleteLocalReplay);
 
     aOpenReplaysFolder = new QAction(this);
@@ -164,24 +165,24 @@ QGroupBox *TabReplays::createRightLayout()
 
     // Right side actions
     aOpenRemoteReplay = new QAction(this);
-    aOpenRemoteReplay->setIcon(QPixmap("theme:icons/view"));
+    aOpenRemoteReplay->setIcon(themePixmap(QStringLiteral("icons/view")));
     connect(aOpenRemoteReplay, &QAction::triggered, this, &TabReplays::actOpenRemoteReplay);
     connect(serverDirView, &QTreeView::doubleClicked, this, &TabReplays::actOpenRemoteReplay);
     aDownload = new QAction(this);
-    aDownload->setIcon(QPixmap("theme:icons/arrow_left_green"));
+    aDownload->setIcon(themePixmap(QStringLiteral("icons/arrow_left_green")));
     connect(aDownload, &QAction::triggered, this, &TabReplays::actDownload);
     aKeep = new QAction(this);
-    aKeep->setIcon(QPixmap("theme:icons/lock"));
+    aKeep->setIcon(themePixmap(QStringLiteral("icons/lock")));
     connect(aKeep, &QAction::triggered, this, &TabReplays::actKeepRemoteReplay);
     aDeleteRemoteReplay = new QAction(this);
-    aDeleteRemoteReplay->setIcon(QPixmap("theme:icons/remove_row"));
+    aDeleteRemoteReplay->setIcon(themePixmap(QStringLiteral("icons/remove_row")));
     connect(aDeleteRemoteReplay, &QAction::triggered, this, &TabReplays::actDeleteRemoteReplay);
     aGetReplayCode = new QAction(this);
-    aGetReplayCode->setIcon(QPixmap("theme:icons/share"));
+    aGetReplayCode->setIcon(themePixmap(QStringLiteral("icons/share")));
     connect(aGetReplayCode, &QAction::triggered, this, &TabReplays::actGetReplayCode);
 
     aSubmitReplayCode = new QAction(this);
-    aSubmitReplayCode->setIcon(QPixmap("theme:icons/search"));
+    aSubmitReplayCode->setIcon(themePixmap(QStringLiteral("icons/search")));
     connect(aSubmitReplayCode, &QAction::triggered, this, &TabReplays::actSubmitReplayCode);
 
     // Add actions to toolbars

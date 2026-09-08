@@ -62,7 +62,7 @@ ZoneViewWidget::ZoneViewWidget(PlayerLogic *_player,
         searchEdit.setPlaceholderText(tr("Search by card name (or search expressions)"));
         searchEdit.setClearButtonEnabled(true);
         searchEdit.addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-        auto help = searchEdit.addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+        auto help = searchEdit.addAction(themePixmap(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
 
         connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(&searchEdit); });
 
@@ -549,7 +549,7 @@ void ZoneViewWidget::initStyleOption(QStyleOption *option) const
 {
     QStyleOptionTitleBar *titleBar = qstyleoption_cast<QStyleOptionTitleBar *>(option);
     if (titleBar) {
-        titleBar->icon = QPixmap("theme:cockatrice");
+        titleBar->icon = themePixmap(QStringLiteral("cockatrice"));
     }
 }
 

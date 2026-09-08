@@ -53,13 +53,13 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
                                    QWidget *parent)
     : QTreeWidget(parent), tabSupervisor(_tabSupervisor), client(_client), game(_game), gameStarted(false)
 {
-    readyIcon = QPixmap("theme:icons/ready_start");
-    notReadyIcon = QPixmap("theme:icons/not_ready_start");
-    concededIcon = QPixmap("theme:icons/conceded");
+    readyIcon = themePixmap(QStringLiteral("icons/ready_start"));
+    notReadyIcon = themePixmap(QStringLiteral("icons/not_ready_start"));
+    concededIcon = themePixmap(QStringLiteral("icons/conceded"));
     playerIcon = loadColorAdjustedPixmap("theme:icons/player");
     judgeIcon = loadColorAdjustedPixmap("theme:icons/scales");
     spectatorIcon = loadColorAdjustedPixmap("theme:icons/spectator");
-    lockIcon = QPixmap("theme:icons/lock");
+    lockIcon = themePixmap(QStringLiteral("icons/lock"));
 
     if (tabSupervisor) {
         itemDelegate = new PlayerListItemDelegate(this);

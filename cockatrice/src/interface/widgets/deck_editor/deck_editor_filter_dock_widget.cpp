@@ -4,6 +4,7 @@
 #include "../../../client/settings/shortcuts_settings.h"
 #include "../../../filters/filter_builder.h"
 #include "../../../filters/filter_tree_model.h"
+#include "../../pixel_map_generator.h"
 
 #include <QGridLayout>
 #include <QMenu>
@@ -42,11 +43,11 @@ void DeckEditorFilterDockWidget::createFiltersDock()
     connect(filterBuilder, &FilterBuilder::add, filterModel, &FilterTreeModel::addFilter);
 
     aClearFilterOne = new QAction(QString(), this);
-    aClearFilterOne->setIcon(QPixmap("theme:icons/decrement"));
+    aClearFilterOne->setIcon(themePixmap(QStringLiteral("icons/decrement")));
     connect(aClearFilterOne, &QAction::triggered, this, &DeckEditorFilterDockWidget::actClearFilterOne);
 
     aClearFilterAll = new QAction(QString(), this);
-    aClearFilterAll->setIcon(QPixmap("theme:icons/clearsearch"));
+    aClearFilterAll->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
     connect(aClearFilterAll, &QAction::triggered, this, &DeckEditorFilterDockWidget::actClearFilterAll);
 
     auto *filterDelOne = new QToolButton();
