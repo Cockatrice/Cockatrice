@@ -144,7 +144,8 @@ bool ThemeManager::isDarkMode(const QString &themeDirPath) const
 
 QString ThemeManager::schemeVariantPath(QStringView prefix) const
 {
-    static const QStringList formats = {QStringLiteral(".png"), QStringLiteral(".jpg"), QStringLiteral(".jpeg"), QStringLiteral(".svg")};
+    static const QStringList formats = {QStringLiteral(".png"), QStringLiteral(".jpg"), QStringLiteral(".jpeg"),
+                                        QStringLiteral(".svg")};
     const QString scheme = isDarkMode(currentThemePath) ? QStringLiteral("dark") : QStringLiteral("light");
     const QString variantStem = prefix.toString() + QLatin1Char('-') + scheme;
 
@@ -160,7 +161,8 @@ QString ThemeManager::assetPath(QStringView prefix) const
 {
     // Probe order mirrors tryLoadImage: a theme may override the default SVG
     // with a raster of the same stem, so raster wins over SVG within a stem.
-    static const QStringList formats = {QStringLiteral(".png"), QStringLiteral(".jpg"), QStringLiteral(".jpeg"), QStringLiteral(".svg")};
+    static const QStringList formats = {QStringLiteral(".png"), QStringLiteral(".jpg"), QStringLiteral(".jpeg"),
+                                        QStringLiteral(".svg")};
 
     auto findExisting = [](const QString &stem) {
         for (const QString &format : formats) {
