@@ -28,6 +28,8 @@ layout(std140, binding = 0) uniform buf
     vec4 uColorA;
     vec4 uColorB;
     vec4 uAccent;
+    vec4 uGlowColor;
+    float uVignetteMin;
     float uLogoGlow;
 };
 
@@ -136,14 +138,17 @@ vec3 motifWelcome(vec2 uv, vec3 bg, float t)
     vec2 center = vec2(asp * 0.5, 0.5);
     float cDist = length(ac - center);
 
-    // Centre bloom at logo position; intensity scales with uLogoGlow
+    // Centre bloom at logo position; intensity scales with uLogoGlow. It
+    // uses the scheme-driven uGlowColor rather than plain white so light
+    // stages don't blow out (white halo on a near-white field) -- BannerHost
+    // feeds white on dark stages and the deep accent tone on light ones.
     float centreLight = bloom(cDist, 0.08 * asp, 0.40 * asp);
-    col += centreLight * 0.20 * uLogoGlow;
+    col += uGlowColor.rgb * centreLight * 0.20 * uLogoGlow;
 
     // Flow-noise shimmer gated by Gaussian mask at centre
     float shimmer = flowNoise(ac * 0.8 + vec2(55.0, 33.0), t * 0.05) * 0.5 + 0.5;
     float shimmerMask = exp(-(cDist * cDist) / (0.18 * asp * 0.18 * asp));
-    col += shimmer * shimmerMask * 0.04 * uLogoGlow;
+    col += uGlowColor.rgb * shimmer * shimmerMask * 0.04 * uLogoGlow;
 
     // 48 ember particles: hash-seeded position, speed, size, brightness.
     // Embers within a distance threshold of centre are deflected into an
@@ -456,6 +461,8 @@ void main()
     else if (uMode < 4.5) col = motifPreferences(uv, bg, t);
     else col = motifFinish(uv, bg, t);
 
-    col *= mix(0.62, 1.0, vignette(uv));
+    // Corner vignette; uVignetteMin is scheme-driven (0.62 on dark stages,
+    // gentler on light ones so near-white corners don't go muddy grey).
+    col *= mix(uVignetteMin, 1.0, vignette(uv));
     fragColor = vec4(col, 1.0) * qt_Opacity;
 }

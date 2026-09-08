@@ -5,6 +5,7 @@
 #include "../../interface/palette_editor/quick_setup_panel.h"
 #include "../../interface/theme_manager.h"
 #include "../../interface/widgets/general/background_sources.h"
+#include "../brand_colors.h"
 #include "libcockatrice/settings/appearance_settings.h"
 
 #include <QComboBox>
@@ -29,6 +30,12 @@ ThemeSetupPage::ThemeSetupPage(QWidget *parent) : FirstRunWizardPage(parent)
 #endif
 
     quickSetupPanel = new QuickSetupPanel(this);
+
+    // Preseed with the brand green so a fresh install's generated palette --
+    // and therefore the banner accent, which follows QPalette::Highlight --
+    // keeps the Cockatrice identity until the user picks their own look.
+    // setAccentColor blocks signals, so this never triggers a generation.
+    quickSetupPanel->setAccentColor(kCockatriceBrandGreen);
 
     connect(themeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ThemeSetupPage::onThemeChanged);
     connect(schemeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ThemeSetupPage::onSchemeChanged);
