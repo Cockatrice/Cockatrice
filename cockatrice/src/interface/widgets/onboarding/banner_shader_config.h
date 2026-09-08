@@ -38,8 +38,11 @@ class BannerShaderConfig : public QObject
     Q_PROPERTY(QColor colorA READ colorA WRITE setColorA NOTIFY colorAChanged)
     Q_PROPERTY(QColor colorB READ colorB WRITE setColorB NOTIFY colorBChanged)
     Q_PROPERTY(QColor accent READ accent WRITE setAccent NOTIFY accentChanged)
+    Q_PROPERTY(QColor glowColor READ glowColor WRITE setGlowColor NOTIFY glowColorChanged)
+    Q_PROPERTY(qreal vignetteMin READ vignetteMin WRITE setVignetteMin NOTIFY vignetteMinChanged)
 
     Q_PROPERTY(bool logoVisible READ logoVisible WRITE setLogoVisible NOTIFY logoVisibleChanged)
+    Q_PROPERTY(bool logoDark READ logoDark WRITE setLogoDark NOTIFY logoDarkChanged)
     Q_PROPERTY(qreal logoGlow READ logoGlow WRITE setLogoGlow NOTIFY logoGlowChanged)
 
 public:
@@ -185,6 +188,30 @@ public:
         }
     }
 
+    QColor glowColor() const
+    {
+        return m_glowColor;
+    }
+    void setGlowColor(const QColor &c)
+    {
+        if (c != m_glowColor) {
+            m_glowColor = c;
+            emit glowColorChanged();
+        }
+    }
+
+    qreal vignetteMin() const
+    {
+        return m_vignetteMin;
+    }
+    void setVignetteMin(qreal v)
+    {
+        if (v != m_vignetteMin) {
+            m_vignetteMin = v;
+            emit vignetteMinChanged();
+        }
+    }
+
     bool logoVisible() const
     {
         return m_logoVisible;
@@ -194,6 +221,18 @@ public:
         if (v != m_logoVisible) {
             m_logoVisible = v;
             emit logoVisibleChanged();
+        }
+    }
+
+    bool logoDark() const
+    {
+        return m_logoDark;
+    }
+    void setLogoDark(bool v)
+    {
+        if (v != m_logoDark) {
+            m_logoDark = v;
+            emit logoDarkChanged();
         }
     }
 
@@ -222,7 +261,10 @@ signals:
     void colorAChanged();
     void colorBChanged();
     void accentChanged();
+    void glowColorChanged();
+    void vignetteMinChanged();
     void logoVisibleChanged();
+    void logoDarkChanged();
     void logoGlowChanged();
 
 private:
@@ -239,11 +281,17 @@ private:
 
     bool m_frontIsA = true;
 
+    // Curated fallback seed values -- BannerHost overwrites these with
+    // palette-derived colours (see shader_banner_widget.cpp) before the first
+    // paint, so they only matter as a safe pre-first-apply default.
     QColor m_colorA{0x1A, 0x1A, 0x20};
     QColor m_colorB{0x0E, 0x0E, 0x12};
     QColor m_accent{0x8B, 0xDD, 0x6B};
+    QColor m_glowColor{Qt::white};
+    qreal m_vignetteMin = 0.62;
 
     bool m_logoVisible = false;
+    bool m_logoDark = false;
     qreal m_logoGlow = 1.0;
 };
 

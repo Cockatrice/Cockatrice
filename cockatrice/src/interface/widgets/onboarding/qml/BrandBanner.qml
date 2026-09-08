@@ -16,6 +16,8 @@ Item {
         property vector4d uColorA: Qt.vector4d(bannerConfig.colorA.r, bannerConfig.colorA.g, bannerConfig.colorA.b, 1.0)
         property vector4d uColorB: Qt.vector4d(bannerConfig.colorB.r, bannerConfig.colorB.g, bannerConfig.colorB.b, 1.0)
         property vector4d uAccent: Qt.vector4d(bannerConfig.accent.r, bannerConfig.accent.g, bannerConfig.accent.b, 1.0)
+        property vector4d uGlowColor: Qt.vector4d(bannerConfig.glowColor.r, bannerConfig.glowColor.g, bannerConfig.glowColor.b, 1.0)
+        property real uVignetteMin: bannerConfig.vignetteMin
         property real uLogoGlow: bannerConfig.logoGlow
         fragmentShader: "qrc:/onboarding/shaders/brand_banner.frag.qsb"
     }
@@ -33,16 +35,21 @@ Item {
         property vector4d uColorA: Qt.vector4d(bannerConfig.colorA.r, bannerConfig.colorA.g, bannerConfig.colorA.b, 1.0)
         property vector4d uColorB: Qt.vector4d(bannerConfig.colorB.r, bannerConfig.colorB.g, bannerConfig.colorB.b, 1.0)
         property vector4d uAccent: Qt.vector4d(bannerConfig.accent.r, bannerConfig.accent.g, bannerConfig.accent.b, 1.0)
+        property vector4d uGlowColor: Qt.vector4d(bannerConfig.glowColor.r, bannerConfig.glowColor.g, bannerConfig.glowColor.b, 1.0)
+        property real uVignetteMin: bannerConfig.vignetteMin
         property real uLogoGlow: bannerConfig.logoGlow
         fragmentShader: "qrc:/onboarding/shaders/brand_banner.frag.qsb"
     }
 
-    // The hero logo itself — breathes cleanly over a 0.5–1.0 opacity range
+    // The hero logo itself — breathes cleanly over a 0.5–1.0 opacity range.
+    // White silhouette on dark stages, black on light ones, so it stays
+    // readable in both modes.
     Image {
         id: logo
         anchors.centerIn: parent
         visible: bannerConfig.logoVisible
-        source: "qrc:/resources/cockatrice-logo-white.svg"
+        source: bannerConfig.logoDark ? "qrc:/resources/cockatrice-logo-black.svg"
+                                      : "qrc:/resources/cockatrice-logo-white.svg"
         width: root.height * 0.6
         height: width * (sourceSize.height > 0 ? sourceSize.height / Math.max(sourceSize.width, 1) : 1)
         fillMode: Image.PreserveAspectFit
