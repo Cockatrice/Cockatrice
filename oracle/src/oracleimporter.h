@@ -3,6 +3,7 @@
 
 #include "raw_json_scanner.h"
 
+#include <QAtomicInt>
 #include <QByteArray>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -155,6 +156,21 @@ private:
      */
     QByteArray rawSetsData;
 
+    /**
+     * Whether readSetsFromByteArray() should report scan progress via
+     * dataReadProgress. A background run routes that signal to stdout (for the
+     * hosting Cockatrice client to parse); the flag exists to skip the scanner
+     * instrumentation entirely when no consumer needs it.
+     */
+    bool progressReporting = true;
+
+    /**
+     * Atomic "please stop importing" flag. startImport() checks it between sets
+     * so a wizard being closed mid-import can be torn down without waiting for
+     * the whole import (or racing it).
+     */
+    QAtomicInt importCancelled;
+
     CardInfoPtr addCard(QString name,
                         const QString &text,
                         bool isToken,
@@ -168,11 +184,34 @@ signals:
 public:
     explicit OracleImporter(QObject *parent = nullptr);
     /**
+     * @brief Controls whether readSetsFromByteArray() instruments the raw scan.
+     *
+     * When enabled (the default) the raw scanner reports progress via
+     * dataReadProgress(), which an interactive wizard shows on its progress bar
+     * and a background run routes to stdout for the hosting client. Switch it
+     * off only when nothing will consume scan progress.
+     */
+    void setProgressReporting(bool enabled)
+    {
+        progressReporting = enabled;
+    }
+    /**
      * Scans the given JSON document for set metadata. Takes the data by value so
      * the wizard can hand over its decompressed buffer without copying it.
      */
     bool readSetsFromByteArray(QByteArray data);
     int startImport();
+    /**
+     * @brief Requests an in-flight startImport() to stop at the next set boundary.
+     *
+     * Works by setting an atomic flag that startImport() polls between sets, so
+     * cancelImport() followed by a short waitForFinished() on the running future is
+     * safe the moment the wizard is about to be destroyed.
+     */
+    void cancelImport()
+    {
+        importCancelled.storeRelease(1);
+    }
     bool saveToFile(const QString &fileName, const QString &sourceUrl, const QString &sourceVersion);
     int importCardsFromSet(const CardSetPtr &currentSet, const QJsonArray &cardsList);
     /**

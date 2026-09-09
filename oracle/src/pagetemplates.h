@@ -20,6 +20,14 @@ public:
     }
     virtual void retranslateUi() = 0;
 
+    /**
+     * @brief Asks an active page to stop any background worker before the wizard
+     *        (and its importer) can be torn down underneath it. Default is a no-op.
+     */
+    virtual void cancelWork()
+    {
+    }
+
 signals:
     void readyToContinue();
 

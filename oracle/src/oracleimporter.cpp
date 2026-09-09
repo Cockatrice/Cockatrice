@@ -47,8 +47,16 @@ static CardSet::Priority getSetPriority(const QString &setType, const QString &s
 
 bool OracleImporter::readSetsFromByteArray(QByteArray data)
 {
+    const RawJson::ScanProgressCallback progress =
+        progressReporting
+            ? [this](
+                  qsizetype bytesRead,
+                  qsizetype
+                      totalBytes) { emit dataReadProgress(static_cast<int>(bytesRead), static_cast<int>(totalBytes)); }
+            : RawJson::ScanProgressCallback{};
+
     RawJson::ScanError error;
-    const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(data, &error);
+    const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(data, &error, progress);
     if (error.isError()) {
         qDebug() << "error: RawJson::scanSetRanges():" << error.message;
         return false;
@@ -572,6 +580,8 @@ int OracleImporter::startImport()
 {
     static ICardSetPriorityController *noOpController = new NoopCardSetPriorityController();
 
+    importCancelled.storeRelease(0);
+
     // Pre-allocate the cards hash to avoid rehashing during import. Keys are
     // distinct card names while raw ranges only count printings (AllPrintings
     // ~100k printings vs ~35k names), so this over-reserves somewhat; an exact
@@ -591,6 +601,12 @@ int OracleImporter::startImport()
     int setIndex = 0;
 
     for (const SetToDownload &curSetToParse : allSets) {
+        if (importCancelled.loadAcquire()) {
+            // The wizard was closed mid-import: stop at the next set boundary so
+            // the caller can wait for this future without processing every set.
+            break;
+        }
+
         CardSetPtr newSet = CardSet::newInstance(noOpController, curSetToParse.getShortName(),
                                                  curSetToParse.getLongName(), curSetToParse.getSetType(),
                                                  curSetToParse.getReleaseDate(), curSetToParse.getPriority());

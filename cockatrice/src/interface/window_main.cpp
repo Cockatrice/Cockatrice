@@ -682,6 +682,7 @@ void MainWindow::runFirstRunWizard()
     connect(wizard, &FirstRunWizard::cardDatabaseUpdateRequested, this, &MainWindow::actCheckCardUpdatesBackground);
     connect(wizard, &FirstRunWizard::manualCardDatabaseSetupRequested, this, &MainWindow::actCheckCardUpdates);
     connect(this, &MainWindow::cardDatabaseUpdateFinished, wizard, &FirstRunWizard::onCardDatabaseUpdateFinished);
+    connect(this, &MainWindow::cardDatabaseUpdateProgress, wizard, &FirstRunWizard::onCardDatabaseUpdateProgress);
     connect(wizard, &FirstRunWizard::registerRequested, connectionController, &ConnectionController::registerToServer);
     connect(wizard, &FirstRunWizard::connectRequested, connectionController, &ConnectionController::connectToServer);
 
@@ -842,6 +843,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
         return;
     }
     bClosingDown = true;
+
+    if (cardUpdateProcess && cardUpdateProcess->state() != QProcess::NotRunning) {
+        if (QMessageBox::question(this, tr("Are you sure?"),
+                                  tr("A card database update is still running. Quitting now will cancel it.\n"
+                                     "Are you sure you want to quit?"),
+                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::No) {
+            event->ignore();
+            bClosingDown = false;
+            return;
+        }
+    }
 
     if (!tabSupervisor->close()) {
         event->ignore();
@@ -1057,8 +1069,42 @@ void MainWindow::createCardUpdateProcess(bool background)
     if (!background) {
         cardUpdateProcess->start(updaterCmd, QStringList());
     } else {
+        cardUpdateOutputBuffer.clear();
+        connect(cardUpdateProcess, &QProcess::readyReadStandardOutput, this, &MainWindow::cardUpdateProgressOutput);
         cardUpdateProcess->start(updaterCmd, QStringList("-b"));
         statusBar()->showMessage(tr("Card database update running."));
+    }
+}
+
+void MainWindow::cardUpdateProgressOutput()
+{
+    if (!cardUpdateProcess) {
+        return;
+    }
+    cardUpdateOutputBuffer.append(cardUpdateProcess->readAllStandardOutput());
+    while (true) {
+        const int newline = cardUpdateOutputBuffer.indexOf('\n');
+        if (newline < 0) {
+            break;
+        }
+        const QByteArray line = cardUpdateOutputBuffer.left(newline).trimmed();
+        cardUpdateOutputBuffer.remove(0, newline + 1);
+        // Protocol emitted by `oracle -b`: "PROGRESS <stage> <done> <total>"
+        if (!line.startsWith("PROGRESS ")) {
+            continue;
+        }
+        const QList<QByteArray> parts = line.split(' ');
+        if (parts.size() != 4) {
+            continue;
+        }
+        bool doneOk = false;
+        bool totalOk = false;
+        const qint64 done = parts.at(2).toLongLong(&doneOk);
+        const qint64 total = parts.at(3).toLongLong(&totalOk);
+        if (!doneOk || !totalOk || done < 0 || total < 0) {
+            continue;
+        }
+        emit cardDatabaseUpdateProgress(QString::fromLatin1(parts.at(1)), done, total);
     }
 }
 
@@ -1109,6 +1155,8 @@ void MainWindow::cardUpdateError(QProcess::ProcessError err)
 
 void MainWindow::cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    cardUpdateProgressOutput(); // drain any progress lines not yet parsed
+
     const bool success = (exitStatus == QProcess::NormalExit) && (exitCode == 0);
     if (exitStatus == QProcess::NormalExit) {
         SettingsCache::instance().updates().setLastCardUpdateCheck(QDateTime::currentDateTime().date());
