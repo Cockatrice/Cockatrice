@@ -374,7 +374,11 @@ static void migrateAppearanceSettings(const QString &settingsPath, QSettings &gl
     QSettings appearanceIni(settingsPath + "appearance.ini", QSettings::IniFormat);
     for (auto it = appearanceKeyMap.constBegin(); it != appearanceKeyMap.constEnd(); ++it) {
         if (globalIni.contains(it.key())) {
-            appearanceIni.setValue(it.value(), globalIni.value(it.key()));
+            QVariant value = globalIni.value(it.key());
+            if (it.key() == "theme/name" && value.toString() == "Default") {
+                value = "System";
+            }
+            appearanceIni.setValue(it.value(), value);
         }
     }
 }

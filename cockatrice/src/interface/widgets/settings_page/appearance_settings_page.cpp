@@ -59,8 +59,8 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&schemeCombo, &QComboBox::currentIndexChanged, this,
             [this] { themeManager->setColorScheme(schemeCombo.currentData().toString()); });
 
-    // Qt widget style; "Default" lets the application decide
-    styleCombo.addItem(tr("Default"), QStringLiteral("Default"));
+    // Qt widget style; "System" lets the application decide
+    styleCombo.addItem(tr("System"), QStringLiteral("System"));
     for (const QString &key : QStyleFactory::keys()) {
         styleCombo.addItem(key, key);
     }

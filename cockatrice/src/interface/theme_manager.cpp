@@ -22,7 +22,7 @@
 #include <Qt>
 #include <libcockatrice/settings/paths_settings.h>
 
-#define NONE_THEME_NAME "Default"
+#define SYSTEM_THEME_NAME "System"
 #define FUSION_THEME_NAME "Fusion"
 #define STYLE_CSS_NAME "style.css"
 #define HANDZONE_BG_NAME "handzone"
@@ -96,7 +96,7 @@ struct PaletteColorInfo
 static QString usableDefaultStyle(const QString &style)
 {
     // The Windows 11 native style is broken: when the OS default
-    // ("Default" theme selection) would use it, fall back to the Vista style.
+    // ("System" theme selection) would use it, fall back to the Vista style.
     // Explicitly choosing "windows11" in a theme is still honored.
     return style.compare("windows11", Qt::CaseInsensitive) == 0 ? QStringLiteral("windowsvista") : style;
 }
@@ -119,10 +119,16 @@ ThemeManager::ThemeManager(QObject *parent) : QObject(parent)
 
 void ThemeManager::ensureThemeDirectoryExists()
 {
-    if (SettingsCache::instance().getThemeName().isEmpty() ||
-        !getAvailableThemes().contains(SettingsCache::instance().getThemeName())) {
+    auto &settings = SettingsCache::instance();
+
+    // Migrate the old "Default" theme name to "System"
+    if (settings.getThemeName() == "Default") {
+        settings.setThemeName(SYSTEM_THEME_NAME);
+    }
+
+    if (settings.getThemeName().isEmpty() || !getAvailableThemes().contains(settings.getThemeName())) {
         qCInfo(ThemeManagerLog) << "Theme name not set, setting default value";
-        SettingsCache::instance().setThemeName(NONE_THEME_NAME);
+        settings.setThemeName(FUSION_THEME_NAME);
     }
 }
 
@@ -235,9 +241,7 @@ QStringMap &ThemeManager::getAvailableThemes()
     // load themes from user profile dir
     dir.setPath(SettingsCache::instance().paths().getThemesPath());
 
-    // add default value
-    availableThemes.insert(NONE_THEME_NAME, dir.absoluteFilePath("Default"));
-
+    availableThemes.insert(SYSTEM_THEME_NAME, dir.absoluteFilePath("System"));
     availableThemes.insert(FUSION_THEME_NAME, dir.absoluteFilePath("Fusion"));
 
     for (QString themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {
@@ -395,7 +399,7 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
     Q_UNUSED(activeScheme)
 #endif
     QString styleName = themeCfg.styleName;
-    if (styleName.isEmpty() || styleName.compare("Default", Qt::CaseInsensitive) == 0) {
+    if (styleName.isEmpty() || styleName.compare("System", Qt::CaseInsensitive) == 0) {
         if (themeName == FUSION_THEME_NAME) {
             styleName = "Fusion";
         } else {
