@@ -74,6 +74,20 @@ TEST(LoadingFromClipboardTest, WeirdWhitespaceIsIgnored)
     testDeck(clipboard, result);
 }
 
+TEST(LoadingFromClipboardTest, TabSeparatedImport)
+{
+    QString clipboard("2\tMystic Snake\tStreets of New Capenna\n"
+                      "3x\tCounterspell\tNPH\n"
+                      "\t2\tSol Ring\tFMB\n"
+                      "1\tForest\n"
+                      "\n"
+                      "2x\tDoom Blade\tM11\n");
+
+    Result result("", "", {{"Mystic Snake", 2}, {"Counterspell", 3}, {"Sol Ring", 2}, {"Forest", 1}},
+                  {{"Doom Blade", 2}});
+    testDeck(clipboard, result);
+}
+
 TEST(LoadingFromClipboardTest, RemoveBlankEntriesFromBeginningAndEnd)
 {
     QString clipboard("\n"

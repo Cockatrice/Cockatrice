@@ -38,7 +38,18 @@ Selecting this action will open a new text editor dialog with the contents of yo
 
 The import dialog expects each line to be a card with the following format:
 
-TODO
+`[quantity] Card Name [options]`
+
+- `quantity` is the number of copies and can be written as `2`, `2x` or `2X`. If omitted, a single copy is imported.
+- `options` are appended after the card name and are understood on a best-effort basis:
+  - a set code and collector number, either as `Card Name (SET) 123` or `Card Name (SET) 123-1`
+  - a foil marker, `Card Name *F*`
+- Lines can also carry a `SB:` prefix or a set code prefix (`[SET]`) — Cockatrice tries to stay compatible with the most
+  common deck formats.
+
+Tab-separated exports from third-party apps (such as Delver Lens) are also accepted: any line whose first column is a
+plain quantity treats the following columns as the card name and printer/set metadata (which is discarded), for example
+`2\tCard Name\tSet Name`.
 
 Each card should be on a separate line and there should be no empty lines between cards. The first empty line between
 two blocks of cards will be considered as the divider between mainboard and sideboard.
