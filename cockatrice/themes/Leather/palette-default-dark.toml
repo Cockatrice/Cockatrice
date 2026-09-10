@@ -66,7 +66,7 @@ AlternateBase        = #211d19
 ToolTipBase          = #37302a
 ToolTipText          = #f5f1ea
 PlaceholderText      = #6eeee9e2
-Accent               = #4a5f8f
+Accent               = #c9995a
 
 [AppColors]
 AccentStrong         = #b7823b
