@@ -150,6 +150,17 @@ PaletteConfig fromAccent(const QColor &accent, int intensity, const QString &sch
     cfg.colors[CG::Disabled][CR::HighlightedText] = disText;
     cfg.colors[CG::Inactive][CR::HighlightedText] = dark ? Qt::white : Qt::black;
 
+    // Accent: same primary hue as Highlight, so palettes derived from a
+    // QuickSetup accent always carry a matching Accent role.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+    set3(CR::Accent, hl, disText, hl);
+#endif
+
+    // Application role colors: Strong tracks the primary accent, while Soft is
+    // the lightened, desaturated companion used for button-gradient highlights.
+    cfg.appColors[AppColor::AccentStrong] = hl;
+    cfg.appColors[AppColor::AccentSoft] = hsl(accent.lightness() + 60, qRound(accent.hslSaturation() * 70 / 100.0));
+
     // BrightText
     QColor bright;
     if (achromatic) {

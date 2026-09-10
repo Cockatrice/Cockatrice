@@ -133,6 +133,24 @@ QString PaletteConfig::toToml() const
         out += "\n";
     }
 
+    if (!appColors.isEmpty()) {
+        QMetaEnum appEnum = QMetaEnum::fromType<AppColor::Role>();
+
+        out += "[AppColors]\n";
+
+        for (auto it = appColors.cbegin(); it != appColors.cend(); ++it) {
+            const char *roleName = appEnum.valueToKey(it.key());
+
+            if (!roleName) {
+                continue;
+            }
+
+            out += QString("%1 = %2\n").arg(QString(roleName), -20).arg(it.value().name(QColor::HexArgb));
+        }
+
+        out += "\n";
+    }
+
     return out;
 }
 
@@ -152,6 +170,7 @@ PaletteConfig PaletteConfig::fromFile(const QString &filePath)
     }
 
     QMetaEnum roleEnum = QMetaEnum::fromType<QPalette::ColorRole>();
+    QMetaEnum appEnum = QMetaEnum::fromType<AppColor::Role>();
 
     QString currentSection;
     QPalette::ColorGroup currentGroup = QPalette::Active;
@@ -202,6 +221,26 @@ PaletteConfig PaletteConfig::fromFile(const QString &filePath)
             }
         }
 
+        QColor color(value);
+
+        if (!color.isValid()) {
+            continue;
+        }
+
+        if (currentSection.compare("AppColors", Qt::CaseInsensitive) == 0) {
+            if (key.startsWith("AppColor::")) {
+                key = key.mid(10);
+            }
+
+            int appRoleInt = appEnum.keyToValue(key.toUtf8().constData());
+
+            if (appRoleInt >= 0) {
+                cfg.appColors[static_cast<AppColor::Role>(appRoleInt)] = color;
+            }
+
+            continue;
+        }
+
         if (!currentSection.startsWith("Palette", Qt::CaseInsensitive)) {
             continue;
         }
@@ -216,11 +255,7 @@ PaletteConfig PaletteConfig::fromFile(const QString &filePath)
             continue;
         }
 
-        QColor color(value);
-
-        if (color.isValid()) {
-            cfg.colors[currentGroup][static_cast<QPalette::ColorRole>(roleInt)] = color;
-        }
+        cfg.colors[currentGroup][static_cast<QPalette::ColorRole>(roleInt)] = color;
     }
 
     return cfg;

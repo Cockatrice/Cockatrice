@@ -56,6 +56,7 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
             &HomeWidget::initializeBackgroundFromSource);
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
             &HomeWidget::updateButtonsToBackgroundColor);
+    connect(themeManager, &ThemeManager::paletteChanged, this, &HomeWidget::updateButtonsToBackgroundColor);
     connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabButtonColorChanged, this,
             &HomeWidget::updateButtonsToBackgroundColor);
 }
@@ -100,23 +101,27 @@ void HomeWidget::loadBackgroundSourceDeck()
     backgroundSourceDeck = deckOpt.has_value() ? deckOpt.value().deckList : DeckList();
 }
 
-static bool isDefaultBackgroundAndTheme()
+static bool usesThemeBackground()
 {
     QString sourceId = SettingsCache::instance().appearance().getHomeTabBackgroundSource();
-    return themeManager->isBuiltInTheme() && BackgroundSources::fromId(sourceId) == BackgroundSources::Theme;
+    return BackgroundSources::fromId(sourceId) == BackgroundSources::Theme;
+}
+
+static QPair<QColor, QColor> paletteDerivedButtonColors()
+{
+    return {themeManager->appColor(AppColor::AccentStrong), themeManager->appColor(AppColor::AccentSoft)};
 }
 
 QPair<QColor, QColor> HomeWidget::determineButtonColor() const
 {
-    static QPair defaultColor = {QColor::fromRgb(20, 140, 60), QColor::fromRgb(120, 200, 80)};
-
     auto colorSource =
         HomeTabButtonColor::intToSource(SettingsCache::instance().appearance().getHomeTabButtonColorSourceIndex());
 
     switch (colorSource) {
         case HomeTabButtonColor::Automatic: {
-            if (isDefaultBackgroundAndTheme()) {
-                return defaultColor;
+            if (usesThemeBackground()) {
+                // Static theme background: follow the theme's accent colors.
+                return paletteDerivedButtonColors();
             } else {
                 return extractDominantColors(background);
             }
@@ -125,7 +130,7 @@ QPair<QColor, QColor> HomeWidget::determineButtonColor() const
             return extractDominantColors(background);
     }
 
-    return defaultColor;
+    return paletteDerivedButtonColors();
 }
 
 void HomeWidget::setRandomCard(ExactCard &newCard)

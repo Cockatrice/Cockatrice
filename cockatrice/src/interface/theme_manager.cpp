@@ -372,6 +372,8 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
     qApp->setPalette(base);
     qApp->setStyle(style);
 
+    currentAppColors = palCfg.appColors;
+
     // Force every widget to re-polish and repaint immediately rather than
     // waiting for natural expose events, which produces a patchwork of old
     // and new colours during a live preview.
@@ -384,6 +386,37 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         style->polish(widget);
         widget->update();
     }
+
+    emit paletteChanged();
+}
+
+QColor ThemeManager::appColor(AppColor::Role role) const
+{
+    const auto it = currentAppColors.constFind(role);
+    if (it != currentAppColors.constEnd()) {
+        return it.value();
+    }
+
+    // QPalette::Accent was introduced in Qt 6.6; before that the nearest
+    // accent is the selection highlight, which Accent defaults to when unset.
+    const QColor accent = qApp->palette().color(QPalette::Active,
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+                                                QPalette::Accent);
+#else
+                                                QPalette::Highlight);
+#endif
+
+    if (role == AppColor::AccentSoft) {
+        constexpr int SOFT_SATURATION_PERCENT = 70;
+        constexpr int SOFT_LIGHTNESS_OFFSET = 60;
+
+        // Light end of the gradient: same hue, softened and lightened
+        return QColor::fromHsl(qMax(0, accent.hslHue()),
+                               qBound(0, qRound(accent.hslSaturation() * SOFT_SATURATION_PERCENT / 100.0), 255),
+                               qBound(0, accent.lightness() + SOFT_LIGHTNESS_OFFSET, 255));
+    }
+
+    return accent;
 }
 
 void ThemeManager::themeChangedSlot()
