@@ -20,6 +20,7 @@ public:
     [[nodiscard]] bool getVisualDeckStorageShowColorIdentity() const override;
     [[nodiscard]] bool getVisualDeckStorageShowBannerCardComboBox() const override;
     [[nodiscard]] bool getVisualDeckStorageShowTagsOnDeckPreviews() const override;
+    [[nodiscard]] bool getVisualDeckStorageShowUploadTime() const;
     [[nodiscard]] bool getVisualDeckStorageDrawUnusedColorIdentities() const override;
     [[nodiscard]] int getVisualDeckStorageUnusedColorIdentitiesOpacity() const override;
     [[nodiscard]] int getVisualDeckStorageTooltipType() const override;
@@ -38,6 +39,7 @@ public:
     void setVisualDeckStorageShowColorIdentity(bool value);
     void setVisualDeckStorageShowBannerCardComboBox(bool _showBannerCardComboBox);
     void setVisualDeckStorageShowTagsOnDeckPreviews(bool _showTags);
+    void setVisualDeckStorageShowUploadTime(bool value);
     void setVisualDeckStorageDrawUnusedColorIdentities(bool _draw);
     void setVisualDeckStorageUnusedColorIdentitiesOpacity(int _opacity);
     void setVisualDeckStorageTooltipType(int value);
@@ -54,6 +56,7 @@ signals:
     void visualDeckStorageShowColorIdentityChanged(bool _visible);
     void visualDeckStorageShowBannerCardComboBoxChanged(bool _visible);
     void visualDeckStorageShowTagsOnDeckPreviewsChanged(bool _visible);
+    void visualDeckStorageShowUploadTimeChanged(bool _visible);
     void visualDeckStorageDrawUnusedColorIdentitiesChanged(bool _visible);
     void visualDeckStorageUnusedColorIdentitiesOpacityChanged(bool value);
     void visualDeckStorageInGameChanged(bool enabled);

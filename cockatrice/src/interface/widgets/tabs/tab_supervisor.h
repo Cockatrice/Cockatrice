@@ -46,6 +46,7 @@ class TabModeration;
 class TabAccount;
 class TabDeckEditor;
 class TabLog;
+class TabPublicDecks;
 class RoomEvent;
 class GameEventContainer;
 class Event_GameJoined;
@@ -112,6 +113,7 @@ private:
     QMap<int, TabGame *> gameTabs;
     QList<TabGame *> replayTabs;
     QMap<QString, TabMessage *> messageTabs;
+    QMap<QString, TabPublicDecks *> publicDecksTabs;
     QList<AbstractTabDeckEditor *> deckEditorTabs;
     bool isLocalGame;
 
@@ -196,6 +198,7 @@ public slots:
     void actTabReplays(bool checked);
     void openTabServer();
     void addRoomTab(const ServerInfo_Room &info, bool setCurrent);
+    void openTabPublicDecks(const QString &userName);
 private slots:
     void refreshShortcuts();
 
@@ -226,6 +229,7 @@ private slots:
     void localGameJoined(const Event_GameJoined &event);
     void gameLeft(TabGame *tab);
     void roomLeft(TabRoom *tab);
+    void publicDecksClosed(TabPublicDecks *tab);
     TabMessage *addMessageTab(const QString &userName, bool focus);
     void replayLeft(TabGame *tab);
     void processUserLeft(const QString &userName);
