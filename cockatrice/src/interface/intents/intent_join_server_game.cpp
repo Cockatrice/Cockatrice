@@ -19,13 +19,10 @@ bool IntentJoinServerGame::checkPrecondition() const
     if (remoteClient->getStatus() != ClientStatus::StatusLoggedIn) {
         return false;
     }
-    // peerPort() reflects the actual TCP peer, which may differ from the
-    // configured server port (e.g. when connecting through a proxy), so only
-    // the hostname is compared here.
-    if (remoteClient->peerName() != context->roomContext.serverContext.hostname) {
-        return false;
-    }
-    if (QString::number(remoteClient->peerPort()) != context->roomContext.serverContext.port) {
+    // serverName() reflects the server the client was configured to connect to,
+    // which may differ from the actual TCP peer (e.g. when connecting through a
+    // proxy), so only the hostname is compared here.
+    if (remoteClient->serverName().compare(context->roomContext.serverContext.hostname, Qt::CaseInsensitive) != 0) {
         return false;
     }
 
