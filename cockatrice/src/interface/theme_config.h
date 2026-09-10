@@ -39,6 +39,14 @@ struct PaletteConfig
     QMap<QPalette::ColorGroup, QMap<QPalette::ColorRole, QColor>> colors;
     QMap<AppColor::Role, QColor> appColors;
 
+    bool operator==(const PaletteConfig &rhs) const
+    {
+        return colors == rhs.colors && appColors == rhs.appColors;
+    }
+    bool operator!=(const PaletteConfig &rhs) const
+    {
+        return !(*this == rhs);
+    }
     bool hasPalette() const;
     QString toToml() const;
 

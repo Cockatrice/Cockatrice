@@ -124,10 +124,13 @@ QPair<QColor, QColor> HomeWidget::determineButtonColor() const
 
     switch (colorSource) {
         case HomeTabButtonColor::Automatic: {
-            if (usesThemeBackground()) {
-                // Static theme background: follow the theme's accent colors.
+            if (usesThemeBackground() && themeManager->isBuiltInTheme()) {
+                // Built-in themes paint a static theme background; follow the
+                // theme's identity accent colors rather than sampling the image.
                 return paletteDerivedButtonColors();
             } else {
+                // Non-built-in themes may ship their own background art, so
+                // extract the button colors from the image actually painted.
                 return extractDominantColors(background);
             }
         }

@@ -297,7 +297,7 @@ void PaletteEditorDialog::onSave()
         if (it.key() == loadedScheme) {
             continue;
         }
-        if (it.value().colors == savedConfig.value(it.key()).colors) {
+        if (it.value() == savedConfig.value(it.key())) {
             continue;
         }
         if (!ThemeManager::commitPalette(saveDir, it.key(), it.value())) {
@@ -308,7 +308,7 @@ void PaletteEditorDialog::onSave()
     }
 
     // Commit the active scheme last so the global colour scheme matches.
-    if (workingConfig[loadedScheme].colors != savedConfig.value(loadedScheme).colors) {
+    if (workingConfig[loadedScheme] != savedConfig.value(loadedScheme)) {
         if (!ThemeManager::commitPalette(saveDir, loadedScheme, workingConfig[loadedScheme])) {
             QMessageBox::warning(this, tr("Save failed"),
                                  tr("Could not write %1 to:\n%2").arg(PaletteConfig::fileName(loadedScheme), saveDir));

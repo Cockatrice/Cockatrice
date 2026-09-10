@@ -49,7 +49,7 @@ static const QMap<QPalette::ColorRole, const char *> ROLE_DESCRIPTIONS = {
 
 static const QMap<AppColor::Role, const char *> APP_ROLE_DESCRIPTIONS = {
     {AppColor::AccentStrong, QT_TR_NOOP("Vivid primary accent (e.g. home-tab button gradient start)")},
-    {AppColor::AccentSoft, QT_TR_NOOP("Lighted, desaturated accent (e.g. home-tab button gradient end)")},
+    {AppColor::AccentSoft, QT_TR_NOOP("Lightened, desaturated accent (e.g. home-tab button gradient end)")},
 };
 
 PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)
@@ -144,9 +144,10 @@ void PaletteGridWidget::buildGrid(QWidget *host)
     appHeader->setAutoFillBackground(true);
     appHeader->setContentsMargins(4, 4, 4, 4);
     grid->addWidget(appHeader, appHeaderRow, 0, 1, 4);
+    headerLabels.append(appHeader);
 
     for (int i = 0; i < appEnum.keyCount(); ++i) {
-        auto role = static_cast<AppColor::Role>(i);
+        auto role = static_cast<AppColor::Role>(appEnum.value(i));
         const int row = appHeaderRow + 1 + i;
 
         if (i % 2 == 0) {
@@ -215,7 +216,7 @@ void PaletteGridWidget::loadPalette(const PaletteConfig &cfg)
 
     QMetaEnum appEnum = QMetaEnum::fromType<AppColor::Role>();
     for (int i = 0; i < appEnum.keyCount(); ++i) {
-        auto role = static_cast<AppColor::Role>(i);
+        auto role = static_cast<AppColor::Role>(appEnum.value(i));
         QColor color = cfg.appColors.value(role);
         if (!color.isValid()) {
             color = themeManager->appColor(role);
@@ -235,7 +236,7 @@ PaletteConfig PaletteGridWidget::currentPaletteConfig() const
 
     QMetaEnum appEnum = QMetaEnum::fromType<AppColor::Role>();
     for (int i = 0; i < appEnum.keyCount(); ++i) {
-        auto role = static_cast<AppColor::Role>(i);
+        auto role = static_cast<AppColor::Role>(appEnum.value(i));
         cfg.appColors[role] = appColorButtons[role]->getColor();
     }
 

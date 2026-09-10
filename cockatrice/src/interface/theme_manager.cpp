@@ -441,14 +441,12 @@ QColor ThemeManager::appColor(AppColor::Role role) const
         return it.value();
     }
 
-    // QPalette::Accent was introduced in Qt 6.6; before that the nearest
-    // accent is the selection highlight, which Accent defaults to when unset.
-    const QColor accent = qApp->palette().color(QPalette::Active,
-#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
-                                                QPalette::Accent);
-#else
-                                                QPalette::Highlight);
-#endif
+    // QPalette::Accent was introduced in Qt 6.6 and several shipped palettes
+    // set it to a value barely distinguishable from Window, so it is not a
+    // reliable accent source. The selection highlight is the stable accent
+    // (Accent defaults to Highlight when unset), and deriving from it
+    // unconditionally keeps every Qt version rendering identically.
+    const QColor accent = qApp->palette().color(QPalette::Active, QPalette::Highlight);
 
     if (role == AppColor::AccentSoft) {
         constexpr int SOFT_SATURATION_PERCENT = 70;
@@ -497,8 +495,19 @@ void ThemeManager::themeChangedSlot()
 
     // ── Load palette: custom first, then theme default ────────────────────
     PaletteConfig palette = PaletteConfig::fromScheme(dirPath, activeScheme);
-    if (!palette.hasPalette()) {
-        palette = ThemeManager::loadDefaultPaletteConfig(dirPath, themeName, activeScheme);
+    const PaletteConfig themeDefault = ThemeManager::loadDefaultPaletteConfig(dirPath, themeName, activeScheme);
+    if (palette.hasPalette()) {
+        // A custom palette written before [AppColors] existed carries no app
+        // colors; merge the theme's shipped defaults so the identity colors
+        // survive (hasPalette() counts an app-colors-only file as a palette,
+        // so those are kept wholesale and never reach here empty).
+        for (auto it = themeDefault.appColors.cbegin(); it != themeDefault.appColors.cend(); ++it) {
+            if (!palette.appColors.contains(it.key())) {
+                palette.appColors.insert(it.key(), it.value());
+            }
+        }
+    } else {
+        palette = themeDefault;
     }
 
     applyStyleAndPalette(themeName, themeCfg, palette, activeScheme);

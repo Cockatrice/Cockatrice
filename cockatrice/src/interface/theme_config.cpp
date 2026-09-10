@@ -96,7 +96,7 @@ bool ThemeConfig::save(const QString &themeDirPath) const
 
 bool PaletteConfig::hasPalette() const
 {
-    return !colors.isEmpty();
+    return !colors.isEmpty() || !appColors.isEmpty();
 }
 
 QString PaletteConfig::toToml() const
