@@ -428,6 +428,14 @@ bool Servatrice::initServer()
         statusUpdateClock->start(getServerStatusUpdateTime());
     }
 
+    deckShareCleanupClock = new QTimer(this);
+    connect(deckShareCleanupClock, SIGNAL(timeout()), this, SLOT(cleanupExpiredDeckShares()));
+    const int deckShareCleanupInterval = getDeckShareCleanupInterval();
+    if (deckShareCleanupInterval > 0) {
+        qDebug() << "Starting deck share cleanup clock, interval" << deckShareCleanupInterval << "ms";
+        deckShareCleanupClock->start(deckShareCleanupInterval);
+    }
+
     // SOCKET SERVER
     if (getNumberOfTCPPools() > 0) {
         gameServer =
@@ -598,6 +606,11 @@ void Servatrice::setRequiredFeatures(const QString &featureList)
     }
 
     qDebug() << "Set required client features to:" << serverRequiredFeatureList;
+}
+
+void Servatrice::cleanupExpiredDeckShares()
+{
+    servatriceDatabaseInterface->cleanupExpiredDeckShares();
 }
 
 void Servatrice::statusUpdate()
@@ -1010,6 +1023,22 @@ int Servatrice::getMaxCommandCountPerInterval() const
 int Servatrice::getServerStatusUpdateTime() const
 {
     return settingsCache->value("server/statusupdate", 15000).toInt();
+}
+
+int Servatrice::getDeckShareExpiryDays() const
+{
+    return settingsCache->value("deck_share/expiry_days", 7).toInt();
+}
+
+int Servatrice::getDeckShareCleanupInterval() const
+{
+    // default: every 60 minutes
+    return settingsCache->value("deck_share/cleanup_interval", 60).toInt() * 60000;
+}
+
+int Servatrice::getDeckShareMaxDecksPerShare() const
+{
+    return settingsCache->value("deck_share/max_decks_per_share", 50).toInt();
 }
 
 int Servatrice::getNumberOfTCPPools() const

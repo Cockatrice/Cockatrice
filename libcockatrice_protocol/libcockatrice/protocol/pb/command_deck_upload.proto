@@ -8,4 +8,12 @@ message Command_DeckUpload {
     optional string path = 1;    // to upload a new deck
     optional uint32 deck_id = 2; // to replace an existing deck
     optional string deck_list = 3;
+    optional bool is_public = 4; // mark the deck public on upload (publish)
+    // Preview metadata computed by the uploading client (see ServerInfo_DeckStorage_File).
+    optional string banner_card_name = 5;
+    optional string banner_card_provider = 6;
+    optional string color_identity = 7;
+    // Comma-separated list of tag names associated with the deck, used to render
+    // and filter another user's public decks on the client.
+    optional string tags = 8;
 }
