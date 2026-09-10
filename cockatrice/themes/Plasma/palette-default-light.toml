@@ -1,0 +1,74 @@
+# Plasma — light identity palette (electric violet chrome with cyan sparks)
+[Palette]
+WindowText           = #1d1830
+Button               = #cfc6f0
+Light                = #ffffff
+Midlight             = #b7adde
+Dark                 = #9589c8
+Mid                  = #a49ad2
+Text                 = #1d1830
+BrightText           = #10406e
+ButtonText           = #120d26
+Base                 = #f9f7ff
+Window               = #e3dcf7
+Shadow               = #554c85
+Highlight            = #5a3ee2
+HighlightedText      = #ffffff
+Link                 = #0f8fb5
+LinkVisited          = #6a45d6
+AlternateBase        = #ece8fa
+ToolTipBase          = #f5f3ff
+ToolTipText          = #120d26
+PlaceholderText      = #7a1d1830
+Accent               = #5a3ee2
+
+[Palette.Disabled]
+WindowText           = #787878
+Button               = #e3dcf7
+Light                = #ffffff
+Midlight             = #b7adde
+Dark                 = #9589c8
+Mid                  = #a49ad2
+Text                 = #787878
+BrightText           = #10406e
+ButtonText           = #969696
+Base                 = #e3dcf7
+Window               = #e3dcf7
+Shadow               = #554c85
+Highlight            = #d6ccf3
+HighlightedText      = #787878
+Link                 = #0000ff
+LinkVisited          = #ff00ff
+AlternateBase        = #ece8fa
+ToolTipBase          = #f5f3ff
+ToolTipText          = #120d26
+PlaceholderText      = #7a1d1830
+Accent               = #787878
+
+[Palette.Inactive]
+WindowText           = #1d1830
+Button               = #cfc6f0
+Light                = #ffffff
+Midlight             = #b7adde
+Dark                 = #9589c8
+Mid                  = #a49ad2
+Text                 = #1d1830
+BrightText           = #10406e
+ButtonText           = #120d26
+Base                 = #f9f7ff
+Window               = #e3dcf7
+Shadow               = #554c85
+Highlight            = #d6ccf3
+HighlightedText      = #000000
+Link                 = #0f8fb5
+LinkVisited          = #6a45d6
+AlternateBase        = #ece8fa
+ToolTipBase          = #f5f3ff
+ToolTipText          = #120d26
+PlaceholderText      = #7a1d1830
+Accent               = #5a3ee2
+
+[AppColors]
+AccentStrong         = #5b3ee0
+AccentSoft           = #a28bf7
+
