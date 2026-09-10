@@ -66,6 +66,8 @@ public:
 
     int send(const QxtMailMessage& message);
     int pendingMessages() const;
+    void clearPending();
+    void reset();
 
     QTcpSocket* socket() const;
     void connectToHost(const QString& hostName, quint16 port = 25);
