@@ -1,5 +1,7 @@
 #include "palette_grid_widget.h"
 
+#include "../theme_manager.h"
+
 #include <QApplication>
 #include <QGridLayout>
 #include <QLabel>
@@ -43,6 +45,11 @@ static const QMap<QPalette::ColorRole, const char *> ROLE_DESCRIPTIONS = {
     {QPalette::Mid, QT_TR_NOOP("Between Button and Dark")},
     {QPalette::Dark, QT_TR_NOOP("Darker than Button (3-D shadow)")},
     {QPalette::Shadow, QT_TR_NOOP("Very dark shadow colour")},
+};
+
+static const QMap<AppColor::Role, const char *> APP_ROLE_DESCRIPTIONS = {
+    {AppColor::AccentStrong, QT_TR_NOOP("Vivid primary accent (e.g. home-tab button gradient start)")},
+    {AppColor::AccentSoft, QT_TR_NOOP("Lighted, desaturated accent (e.g. home-tab button gradient end)")},
 };
 
 PaletteGridWidget::PaletteGridWidget(QWidget *parent) : QWidget(parent)
@@ -122,6 +129,45 @@ void PaletteGridWidget::buildGrid(QWidget *host)
             grid->addWidget(btn, row + 1, col + 1, Qt::AlignHCenter | Qt::AlignVCenter);
         }
     }
+
+    // Application color section: one ColorButton per role below the role grid.
+    // These are not tied to a color group, so a single button spans the row.
+    QMetaEnum appEnum = QMetaEnum::fromType<AppColor::Role>();
+
+    const int appHeaderRow = roles.size() + 1;
+
+    auto *appHeader = new QLabel(tr("App colors"), host);
+    appHeader->setToolTip(tr("Application-specific colors layered on top of the Qt palette"));
+    QFont appHeaderFont = appHeader->font();
+    appHeaderFont.setBold(true);
+    appHeader->setFont(appHeaderFont);
+    appHeader->setAutoFillBackground(true);
+    appHeader->setContentsMargins(4, 4, 4, 4);
+    grid->addWidget(appHeader, appHeaderRow, 0, 1, 4);
+
+    for (int i = 0; i < appEnum.keyCount(); ++i) {
+        auto role = static_cast<AppColor::Role>(i);
+        const int row = appHeaderRow + 1 + i;
+
+        if (i % 2 == 0) {
+            for (int col = 0; col < 4; ++col) {
+                auto *shade = new QWidget(host);
+                shade->setAutoFillBackground(true);
+                grid->addWidget(shade, row, col);
+                rowShadeWidgets.push_back(shade);
+            }
+        }
+
+        auto *label = new QLabel(QString(appEnum.valueToKey(role)), host);
+        label->setToolTip(APP_ROLE_DESCRIPTIONS.value(role, {}));
+        label->setContentsMargins(4, 2, 8, 2);
+        grid->addWidget(label, row, 0);
+
+        auto *btn = new ColorButton(host);
+        connect(btn, &ColorButton::colorChanged, this, [this] { emit paletteChanged(); });
+        appColorButtons[role] = btn;
+        grid->addWidget(btn, row, 1, Qt::AlignHCenter | Qt::AlignVCenter);
+    }
 }
 
 void PaletteGridWidget::changeEvent(QEvent *e)
@@ -166,6 +212,16 @@ void PaletteGridWidget::loadPalette(const PaletteConfig &cfg)
             colorButtons[group][role]->setColor(color);
         }
     }
+
+    QMetaEnum appEnum = QMetaEnum::fromType<AppColor::Role>();
+    for (int i = 0; i < appEnum.keyCount(); ++i) {
+        auto role = static_cast<AppColor::Role>(i);
+        QColor color = cfg.appColors.value(role);
+        if (!color.isValid()) {
+            color = themeManager->appColor(role);
+        }
+        appColorButtons[role]->setColor(color);
+    }
 }
 
 PaletteConfig PaletteGridWidget::currentPaletteConfig() const
@@ -176,5 +232,12 @@ PaletteConfig PaletteGridWidget::currentPaletteConfig() const
             cfg.colors[group][role] = colorButtons[group][role]->getColor();
         }
     }
+
+    QMetaEnum appEnum = QMetaEnum::fromType<AppColor::Role>();
+    for (int i = 0; i < appEnum.keyCount(); ++i) {
+        auto role = static_cast<AppColor::Role>(i);
+        cfg.appColors[role] = appColorButtons[role]->getColor();
+    }
+
     return cfg;
 }
