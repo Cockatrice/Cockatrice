@@ -356,6 +356,54 @@ AuthenticationResult Servatrice_DatabaseInterface::checkUserPassword(Server_Prot
                     qCWarning(DatabaseInterfaceLog) << "Login denied: user not active";
                     return UserIsInactive;
                 }
+
+                // Fail closed on an absent stored credential: an empty key would
+                // otherwise authenticate anyone who can compute HMAC("", nonce).
+                if (correctPasswordSha512.isEmpty()) {
+                    qCWarning(DatabaseInterfaceLog) << "Login denied: empty stored credential";
+                    return NotLoggedIn;
+                }
+
+                if (password.startsWith("$challenge$")) {
+                    // Challenge-response login: verify HMAC(stored_key, nonce) without
+                    // ever transmitting the stored credential or password hash.
+                    const QStringList parts = password.split("$");
+                    if (parts.size() != 4) {
+                        return NotLoggedIn;
+                    }
+                    const QByteArray nonce = QByteArray::fromBase64(parts.at(2).toUtf8());
+                    const QByteArray response = QByteArray::fromBase64(parts.at(3).toUtf8());
+                    if (nonce.isEmpty() || response.isEmpty() || !handler->isAuthNonceValid(nonce, user)) {
+                        return NotLoggedIn;
+                    }
+
+                    QByteArray key;
+                    if (PasswordHasher::isLegacyFormat(correctPasswordSha512)) {
+                        key = correctPasswordSha512.toUtf8();
+                    } else {
+                        // Design note: the stored scrypt verifier IS the challenge-response key, so a
+                        // database dump yields credentials that can answer a login challenge directly.
+                        // We deliberately accept this trade: it removes plaintext passwords from the
+                        // client config and from the wire, but does not protect against DB compromise.
+                        // A password-equivalent proof scheme (e.g. SRP-6a/OPAQUE) would be the proper
+                        // escalation and is out of scope here.
+                        const PasswordVerifier verifier = PasswordHasher::parsePasswordVerifier(correctPasswordSha512);
+                        if (!verifier.isValid) {
+                            return NotLoggedIn;
+                        }
+                        key = verifier.verifier;
+                    }
+
+                    const QByteArray expected = PasswordHasher::computeResponse(key, nonce);
+                    handler->clearAuthNonce();
+                    if (PasswordHasher::constantTimeEquals(expected, response)) {
+                        qCDebug(DatabaseInterfaceLog) << "Login accepted: challenge-response password right";
+                        return PasswordRight;
+                    }
+                    qCDebug(DatabaseInterfaceLog) << "Login denied: challenge-response password wrong";
+                    return NotLoggedIn;
+                }
+
                 QString hashedPassword;
                 if (passwordNeedsHash) {
                     hashedPassword = PasswordHasher::computeHash(password, correctPasswordSha512.left(16));
@@ -556,6 +604,48 @@ QString Servatrice_DatabaseInterface::getUserSalt(const QString &user)
         return query->value(0).toString();
     }
     return {};
+}
+
+QString Servatrice_DatabaseInterface::getUserPasswordData(const QString &user)
+{
+    if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql) {
+        return {};
+    }
+
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("SELECT password_sha512 FROM {prefix}_users WHERE name = :name");
+    query->bindValue(":name", user);
+    if (!execSqlQuery(query)) {
+        return {};
+    }
+
+    if (!query->next()) {
+        return {};
+    }
+
+    return query->value(0).toString();
+}
+
+bool Servatrice_DatabaseInterface::submitPasswordVerifier(const QString &user, const QString &passwordVerifier)
+{
+    if (server->getAuthenticationMethod() != Servatrice::AuthenticationSql) {
+        return false;
+    }
+
+    checkSql();
+
+    // Only migrate accounts that still use the legacy format; the query is a no-op otherwise.
+    QSqlQuery *query = prepareQuery(
+        "update {prefix}_users set password_sha512 = :verifier where name = :user and password_sha512 not like '$%'");
+    query->bindValue(":verifier", passwordVerifier);
+    query->bindValue(":user", user);
+    if (!execSqlQuery(query)) {
+        qCWarning(DatabaseInterfaceLog) << "Failed to submit password verifier for user" << user << query->lastError();
+        return false;
+    }
+    // The guard makes a re-migration a no-op; only report success when a row was actually updated.
+    return query->numRowsAffected() > 0;
 }
 
 int Servatrice_DatabaseInterface::getUserIdInDB(const QString &name)
@@ -1139,13 +1229,13 @@ bool Servatrice_DatabaseInterface::changeUserPassword(const QString &user,
         return false;
     }
 
-    const QString correctPasswordSha512 = passwordQuery->value(0).toString();
-    QString oldPasswordSha512 = oldPassword;
-    if (oldPasswordNeedsHash) {
-        QString salt = correctPasswordSha512.left(16);
-        oldPasswordSha512 = PasswordHasher::computeHash(oldPassword, salt);
-    }
-    if (correctPasswordSha512 != oldPasswordSha512) {
+    const QString storedPassword = passwordQuery->value(0).toString();
+    // oldPasswordNeedsHash means the client sent the old password in plaintext. Verify it
+    // against whatever is stored: legacy salt+hash rows or already-migrated scrypt rows
+    // (which must NOT be re-hashed with a salt torn out of the "$scrypt$..." string).
+    const bool oldPasswordMatches = oldPasswordNeedsHash ? PasswordHasher::verifyPassword(oldPassword, storedPassword)
+                                                         : (oldPassword == storedPassword);
+    if (!oldPasswordMatches) {
         return false;
     }
 

@@ -4,6 +4,8 @@
 #include "server.h"
 #include "server_abstractuserinterface.h"
 
+#include <QByteArray>
+#include <QDateTime>
 #include <QObject>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/server_message.pb.h>
@@ -55,6 +57,9 @@ protected:
     bool acceptsUserListChanges;
     bool acceptsRoomListChanges;
     bool idleClientWarningSent;
+    QByteArray authNonce;
+    QString authNonceUser;
+    QDateTime authNonceCreated;
     virtual void logDebugMessage(const QString & /* message */)
     {
     }
@@ -123,6 +128,13 @@ public:
     {
         return databaseInterface;
     }
+
+    /** @brief Store a fresh challenge nonce bound to @p userName for the next challenge-response login attempt. */
+    void setAuthNonce(const QByteArray &nonce, const QString &userName);
+    /** @brief True if nonce matches the pending one, was issued for @p userName, and is less than 60 seconds old. */
+    bool isAuthNonceValid(const QByteArray &nonce, const QString &userName) const;
+    /** @brief Invalidate the pending nonce (single-use). */
+    void clearAuthNonce();
 
     int getLastCommandTime() const
     {

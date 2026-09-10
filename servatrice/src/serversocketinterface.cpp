@@ -107,6 +107,7 @@
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user_alt.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user_session.pb.h>
+#include <libcockatrice/utility/cryptoutil.h>
 #include <libcockatrice/utility/passwordhasher.h>
 #include <libcockatrice/utility/string_limits.h>
 #include <libcockatrice/utility/warning_categories.h>
@@ -139,7 +140,14 @@ bool AbstractServerSocketInterface::initSession()
     identEvent.set_server_version(VERSION_STRING);
     identEvent.set_protocol_version(protocolVersion);
     if (servatrice->getAuthenticationMethod() == Servatrice::AuthenticationSql) {
-        identEvent.set_server_options(Event_ServerIdentification::SupportsPasswordHash);
+        // Challenge-response is advertised in every strictness mode: legacy accounts keep
+        // logging in with the legacy hash, but already-migrated scrypt rows are always
+        // served challenge-response (authentication_strictness only governs NEW credentials).
+        Event_ServerIdentification::ServerOptions serverOptions =
+            static_cast<Event_ServerIdentification::ServerOptions>(
+                Event_ServerIdentification::SupportsPasswordHash |
+                Event_ServerIdentification::SupportsChallengeResponseAuth);
+        identEvent.set_server_options(serverOptions);
     }
     SessionEvent *identSe = prepareSessionEvent(identEvent);
     sendProtocolItem(*identSe);
@@ -257,6 +265,8 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdReportAddComment(cmd.GetExtension(Command_ReportAddComment::ext), rc);
         case SessionCommand::REPORT_DETAILS:
             return cmdReportDetails(cmd.GetExtension(Command_ReportDetails::ext), rc);
+        case SessionCommand::SUBMIT_PASSWORD_VERIFIER:
+            return cmdSubmitPasswordVerifier(cmd.GetExtension(Command_SubmitPasswordVerifier::ext), rc);
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -2461,6 +2471,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRegisterAccount(const C
         password = QString::fromStdString(cmd.hashed_password());
     }
 
+    // Reject credential formats the configured authentication strictness does not accept.
+    if (!acceptsCredentialFormat(passwordNeedsHash, password)) {
+        return Response::RespClientUpdateRequired;
+    }
+
     bool requireEmailActivation = settingsCache->value("registration/requireemailactivation", true).toBool();
     bool regSucceeded = sqlInterface->registerUser(userName, realName, password, passwordNeedsHash, parsedEmailAddress,
                                                    country, !requireEmailActivation);
@@ -2505,6 +2520,30 @@ bool AbstractServerSocketInterface::tooManyRegistrationAttempts(const QString &i
     //! \todo Implement registration attempt limiting.
     Q_UNUSED(ipAddress);
     return false;
+}
+
+bool AbstractServerSocketInterface::acceptsCredentialFormat(bool passwordNeedsHash, const QString &password) const
+{
+    // An empty credential must never reach the database: it would be accepted
+    // as a legacy format and stored as '' (fail-open on login, see the empty
+    // stored-credential guard in Servatrice_DatabaseInterface).
+    if (password.isEmpty()) {
+        return false;
+    }
+    // "scryptFormat" means the client sent a derived verifier rather than a
+    // password to hash ourselves. parsePasswordVerifier enforces the sane-cost
+    // clamp, so nothing starting with '$' reaches the database unparsed.
+    const bool scryptFormat = !passwordNeedsHash && PasswordHasher::parsePasswordVerifier(password).isValid;
+
+    // The strictness mode governs how existing legacy accounts are served, not which new-credential
+    // formats are tolerated: a legacy-mode server must still accept scrypt verifiers, because clients
+    // derive them whenever challenge-response is advertised (and it must be, so already-migrated
+    // scrypt rows keep logging in). strict is the only mode that rejects legacy formats.
+    if (servatrice->getAuthenticationStrictness() == Servatrice::AuthenticationStrict) {
+        return scryptFormat;
+    }
+    // legacy and mixed accept a valid scrypt verifier or a genuine legacy salt+hash.
+    return scryptFormat || PasswordHasher::isLegacyFormat(password);
 }
 
 Response::ResponseCode AbstractServerSocketInterface::cmdActivateAccount(const Command_Activate &cmd,
@@ -2841,6 +2880,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAccountPassword(const C
         newPassword = QString::fromStdString(cmd.hashed_new_password());
     }
 
+    // Reject new credential formats the configured authentication strictness does not accept.
+    if (!acceptsCredentialFormat(newPasswordNeedsHash, newPassword)) {
+        return Response::RespClientUpdateRequired;
+    }
+
     QString userName = QString::fromStdString(userInfo->name());
     if (!databaseInterface->changeUserPassword(userName, oldPassword, true, newPassword, newPasswordNeedsHash)) {
         return Response::RespWrongPassword;
@@ -2978,6 +3022,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdForgotPasswordReset(con
         password = QString::fromStdString(cmd.hashed_new_password());
     }
 
+    // Reject new credential formats the configured authentication strictness does not accept.
+    if (!acceptsCredentialFormat(passwordNeedsHash, password)) {
+        return Response::RespClientUpdateRequired;
+    }
+
     if (sqlInterface->changeUserPassword(nameFromStdString(cmd.user_name()), password, passwordNeedsHash)) {
         if (servatrice->getEnableForgotPasswordAudit()) {
             sqlInterface->addAuditRecord(userName.simplified(), this->getAddress(), clientId.simplified(),
@@ -3038,8 +3087,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
                                                                              ResponseContainer &rc)
 {
     const QString userName = nameFromStdString(cmd.user_name());
-    QString passwordSalt = sqlInterface->getUserSalt(userName);
-    if (passwordSalt.isEmpty()) {
+    const QString storedPasswordData = sqlInterface->getUserPasswordData(userName);
+    if (storedPasswordData.isEmpty()) {
         if (server->getRegOnlyServerEnabled()) {
             return Response::RespRegistrationRequired;
         } else {
@@ -3047,8 +3096,36 @@ Response::ResponseCode AbstractServerSocketInterface::cmdRequestPasswordSalt(con
             return Response::RespOk;
         }
     }
+
     auto *re = new Response_PasswordSalt;
-    re->set_password_salt(passwordSalt.toStdString());
+    if (PasswordHasher::isLegacyFormat(storedPasswordData)) {
+        re->set_password_salt(storedPasswordData.left(16).toStdString());
+        re->set_needs_migration(true);
+        // Legacy rows get a challenge-response nonce only outside legacy mode (there the client
+        // logs in with the legacy hash and the account is migrated). In legacy mode the row is
+        // served the legacy salt, since legacy mode only governs what NEW credentials are accepted.
+        if (servatrice->getAuthenticationStrictness() != Servatrice::AuthenticationLegacy) {
+            const QByteArray nonce = CryptoUtil::randomBytes(32);
+            setAuthNonce(nonce, userName);
+            re->set_nonce(nonce.constData(), nonce.size());
+        }
+    } else {
+        const PasswordVerifier verifier = PasswordHasher::parsePasswordVerifier(storedPasswordData);
+        if (!verifier.isValid) {
+            delete re;
+            return Response::RespContextError;
+        }
+        re->set_password_salt(QString(verifier.salt.toBase64()).toStdString());
+        re->set_n(verifier.n);
+        re->set_r(verifier.r);
+        re->set_p(verifier.p);
+        re->set_needs_migration(false);
+        // scrypt rows are served challenge-response in every mode so migrated accounts never lock out.
+        const QByteArray nonce = CryptoUtil::randomBytes(32);
+        setAuthNonce(nonce, userName);
+        re->set_nonce(nonce.constData(), nonce.size());
+    }
+
     rc.setResponseExtension(re);
     return Response::RespOk;
 }
@@ -3144,6 +3221,39 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReport(const Command_Re
         return Response::RespInternalError;
     }
 
+    return Response::RespOk;
+}
+
+Response::ResponseCode
+AbstractServerSocketInterface::cmdSubmitPasswordVerifier(const Command_SubmitPasswordVerifier &cmd,
+                                                         ResponseContainer & /*rc*/)
+{
+    if (authState != PasswordRight) {
+        return Response::RespLoginNeeded;
+    }
+
+    // Limit to the size of the database column (password_sha512 varchar(255)).
+    constexpr int MAX_PASSWORD_VERIFIER_LENGTH = 255;
+    const QString passwordVerifier = QString::fromStdString(cmd.password_verifier());
+    if (passwordVerifier.isEmpty() || passwordVerifier.length() > MAX_PASSWORD_VERIFIER_LENGTH ||
+        PasswordHasher::isLegacyFormat(passwordVerifier)) {
+        return Response::RespContextError;
+    }
+
+    // Reject unparseable or hostile cost parameters before they reach the database.
+    const PasswordVerifier parsedVerifier = PasswordHasher::parsePasswordVerifier(passwordVerifier);
+    if (!parsedVerifier.isValid) {
+        qCWarning(AbstractServerSocketInterfaceLog)
+            << "Rejecting password verifier submission with invalid or insane cost parameters";
+        return Response::RespContextError;
+    }
+
+    if (!sqlInterface->submitPasswordVerifier(QString::fromStdString(userInfo->name()), passwordVerifier)) {
+        return Response::RespContextError;
+    }
+
+    qCDebug(AbstractServerSocketInterfaceLog)
+        << "Password verifier migrated for user" << QString::fromStdString(userInfo->name());
     return Response::RespOk;
 }
 

@@ -1,5 +1,8 @@
 #include "server_protocolhandler.h"
 
+// Challenge-response nonces are valid for at most one minute from issuance.
+static constexpr qint64 kAuthNonceLifetimeSeconds = 60;
+
 #include "game/game_config.h"
 #include "game/server_game.h"
 #include "game/server_player.h"
@@ -42,6 +45,28 @@ Server_ProtocolHandler::Server_ProtocolHandler(Server *_server,
 
 Server_ProtocolHandler::~Server_ProtocolHandler()
 {
+}
+
+void Server_ProtocolHandler::setAuthNonce(const QByteArray &nonce, const QString &userName)
+{
+    authNonce = nonce;
+    authNonceUser = userName;
+    authNonceCreated = QDateTime::currentDateTimeUtc();
+}
+
+bool Server_ProtocolHandler::isAuthNonceValid(const QByteArray &nonce, const QString &userName) const
+{
+    // secsTo is signed, so a wall-clock step backwards (NTP correction, VM resume)
+    // must not make the elapsed time negative and re-validate an old nonce.
+    const qint64 elapsed = authNonceCreated.secsTo(QDateTime::currentDateTimeUtc());
+    return !authNonce.isEmpty() && authNonce == nonce && authNonceUser == userName && authNonceCreated.isValid() &&
+           elapsed >= 0 && elapsed < kAuthNonceLifetimeSeconds;
+}
+
+void Server_ProtocolHandler::clearAuthNonce()
+{
+    authNonce.clear();
+    authNonceUser.clear();
 }
 
 // This function must only be called from the thread this object lives in.
@@ -505,6 +530,16 @@ Response::ResponseCode Server_ProtocolHandler::cmdLogin(const Command_Login &cmd
 
     if (userInfo != 0) {
         return Response::RespContextError;
+    }
+
+    // In strict mode only challenge-response logins are accepted.
+    if (server->requiresChallengeResponseAuth() &&
+        (!cmd.has_hashed_password() || cmd.hashed_password().rfind("$challenge$", 0) != 0)) {
+        auto *re = new Response_Login;
+        re->set_denied_reason_str("Client upgrade required");
+        re->add_missing_features("challenge_response_auth");
+        rc.setResponseExtension(re);
+        return Response::RespClientUpdateRequired;
     }
 
     // check client feature set against server feature set

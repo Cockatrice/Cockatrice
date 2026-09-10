@@ -350,6 +350,22 @@ max_users_websocket=500
 ; Maximum number of users that can connect from the same IP address; useful to avoid bots, default is 4
 max_users_per_address=4
 
+; How strictly new authentication features are enforced.  Possible values:
+; * legacy: accounts that still use the legacy 1000-round SHA-512 hash keep logging in with it
+;           (they are served the legacy salt, never a challenge-response nonce) and are never
+;           auto-migrated to scrypt. Already-migrated scrypt rows keep logging in via
+;           challenge-response. New credentials may use either format;
+; * mixed: accept both legacy hashes and challenge-response authentication (default);
+; * strict: only accept challenge-response authentication from clients that support it,
+;           and reject plain password submissions.  Legacy accounts are migrated to scrypt
+;           automatically on their next successful login.
+;
+; Challenge-response verifiers are scrypt (RFC 7914, N=32768, r=8, p=1) stored as
+; "$scrypt$<n>$<r>$<p>$<salt>$<verifier>". The stored verifier is password-equivalent:
+; plaintext passwords never reach the client configuration and never go over the wire, but
+; a database dump yields credentials that can answer a login challenge directly.
+authentication_strictness=mixed
+
 ; You may want to allow an unlimited number of users from a trusted source. This setting can contain a
 ; comma-separed list of IP addresses which will allow an unlimited number of connections from each of the
 ; IP addresses listed (ignoring the max_users_per_address). Default is "127.0.0.1,::1"; example: "192.73.233.244,81.4.100.74"
