@@ -386,6 +386,19 @@ TEST_F(SettingsDefaultsTest, Appearance_HomeTabDisplayCardName_Default)
     ASSERT_EQ(s.getHomeTabDisplayCardName(), true);
 }
 
+TEST_F(SettingsDefaultsTest, Appearance_HomeTabBackgroundDim_Default)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getHomeTabBackgroundDim(), true);
+}
+
+TEST_F(SettingsDefaultsTest, Appearance_HomeTabBackgroundDim_SetAndGet)
+{
+    AppearanceSettings s(settingsPath, nullptr);
+    s.setHomeTabBackgroundDim(false);
+    ASSERT_EQ(s.getHomeTabBackgroundDim(), false);
+}
+
 // --- InterfaceSettings ---
 
 TEST_F(SettingsDefaultsTest, Interface_ShowStatusBar_Default)

@@ -54,6 +54,8 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     // Lambda is cleaner to read than overloading this
     connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabDisplayCardNameChanged, this,
             [this] { repaint(); });
+    connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabBackgroundDimChanged, this,
+            [this] { repaint(); });
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
             &HomeWidget::initializeBackgroundFromSource);
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
@@ -358,13 +360,15 @@ void HomeWidget::paintEvent(QPaintEvent *event)
         painter.drawPixmap(topLeft, toDraw);
     }
 
-    // Draw translucent black overlay with rounded corners
-    QRectF overlayRect(5, 5, width() - 10, height() - 10);
-    QPainterPath roundedRectPath;
-    roundedRectPath.addRoundedRect(overlayRect, 20, 20);
+    if (SettingsCache::instance().appearance().getHomeTabBackgroundDim()) {
+        // Draw translucent black overlay with rounded corners
+        QRectF overlayRect(5, 5, width() - 10, height() - 10);
+        QPainterPath roundedRectPath;
+        roundedRectPath.addRoundedRect(overlayRect, 20, 20);
 
-    QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33));
-    painter.fillPath(roundedRectPath, semiTransparentBlack);
+        QColor semiTransparentBlack(0, 0, 0, static_cast<int>(255 * 0.33));
+        painter.fillPath(roundedRectPath, semiTransparentBlack);
+    }
 
     // Card name overlay (above the attribution, bottom-right)
     QString cardName;

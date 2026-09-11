@@ -70,6 +70,17 @@ void AppearanceSettings::setHomeTabDisplayCardName(bool _displayCardName)
     emit homeTabDisplayCardNameChanged();
 }
 
+bool AppearanceSettings::getHomeTabBackgroundDim() const
+{
+    return getValue("homeTabBackgroundDim", QString(), QString(), true).toBool();
+}
+
+void AppearanceSettings::setHomeTabBackgroundDim(bool _dimBackground)
+{
+    setValue(_dimBackground, "homeTabBackgroundDim");
+    emit homeTabBackgroundDimChanged();
+}
+
 int AppearanceSettings::getHomeTabButtonColorSourceIndex() const
 {
     return getValue("homeTabButtonColorSource", "", "", 0).toInt();
