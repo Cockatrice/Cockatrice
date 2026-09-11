@@ -30,6 +30,7 @@
 
 #include <QDateTime>
 #include <QDebug>
+#include <QElapsedTimer>
 #include <QHostAddress>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -39,8 +40,10 @@
 #include <QSqlQuery>
 #include <QString>
 #include <game/server_player.h>
+#include <google/protobuf/descriptor.h>
 #include <iostream>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/command_deck_del.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_del_dir.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>
@@ -190,6 +193,77 @@ void AbstractServerSocketInterface::transmitProtocolItem(const ServerMessage &it
 void AbstractServerSocketInterface::logDebugMessage(const QString &message)
 {
     logger->logMessage(message, this);
+}
+
+void AbstractServerSocketInterface::processCommandContainer(const CommandContainer &cont)
+{
+    QElapsedTimer timer;
+    timer.start();
+    Server_ProtocolHandler::processCommandContainer(cont);
+    const qint64 elapsedMs = timer.nsecsElapsed() / 1000000;
+
+    // The base dispatch is an if/else-if chain — at most one family is
+    // actually processed.  Recording every family in the container would
+    // let an unauthenticated client stampforge developer/moderator/admin
+    // samples by batching them alongside a session command the server
+    // actually runs.  Mirror the base's selection and skip entirely when
+    // deleted or when no family matched.
+    if (deleted) {
+        return;
+    }
+
+    // When getPbExtension returns -1 (no extension set) and the kind is
+    // non-zero, typeIdFor wraps into the previous kind's range instead of
+    // hitting the typeId < 0 guard in observeCommand.  Skip such entries.
+    int kind = -1;
+    if (cont.game_command_size()) {
+        kind = 2;
+    } else if (cont.room_command_size()) {
+        kind = 1;
+    } else if (cont.session_command_size()) {
+        kind = 0;
+    } else if (cont.moderator_command_size()) {
+        kind = 3;
+    } else if (cont.admin_command_size()) {
+        kind = 4;
+    } else if (cont.developer_command_size()) {
+        kind = 5;
+    }
+
+    if (kind >= 0) {
+        auto recordDispatched = [&](int familyKind, const auto &cmds) {
+            for (const auto &cmd : cmds) {
+                const int ext = getPbExtension(cmd);
+                if (ext >= 0) {
+                    servatrice->getMetricsRegistry().observeCommand(MetricsRegistry::typeIdFor(familyKind, ext),
+                                                                    elapsedMs);
+                }
+            }
+        };
+
+        if (kind == 0) {
+            recordDispatched(kind, cont.session_command());
+        } else if (kind == 1) {
+            recordDispatched(kind, cont.room_command());
+        } else if (kind == 2) {
+            recordDispatched(kind, cont.game_command());
+        } else if (kind == 3) {
+            recordDispatched(kind, cont.moderator_command());
+        } else if (kind == 4) {
+            recordDispatched(kind, cont.admin_command());
+        } else {
+            recordDispatched(kind, cont.developer_command());
+        }
+    }
+
+    const int slowCommandMs = servatrice->getMetricsSlowCommandMs();
+    if (slowCommandMs > 0 && elapsedMs >= slowCommandMs) {
+        const ServerInfo_User *info = getUserInfo();
+        const QString user = authState == PasswordRight && info ? QString::fromStdString(info->name())
+                                                                : QStringLiteral("unauthenticated");
+        qCWarning(AbstractServerSocketInterfaceLog) << "slow command container from" << user << "processed in"
+                                                    << elapsedMs << "ms (" << cont.ByteSizeLong() << "bytes)";
+    }
 }
 
 Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionCommand(int cmdType,
@@ -1703,6 +1777,51 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetServerStats(const Co
     re->set_rx_bytes(snapshot.rxBytes);
     re->set_uptime_secs(snapshot.uptimeSecs);
     re->set_timest(snapshot.timest);
+
+    // Live metrics from the in-process MetricsRegistry (resets on server restart)
+    re->set_cards_in_games(static_cast<google::protobuf::uint64>(servatrice->getCardsInGamesTotal()));
+    re->set_eventloop_stalls_total(static_cast<google::protobuf::uint64>(servatrice->getEventLoopStallsTotal()));
+    re->set_eventloop_last_stall_ms(static_cast<google::protobuf::uint64>(servatrice->getEventLoopLastStallMs()));
+    re->set_eventloop_max_stall_ms(static_cast<google::protobuf::uint64>(servatrice->getEventLoopMaxStallMs()));
+    re->set_total_commands(static_cast<google::protobuf::uint64>(servatrice->getMetricsRegistry().totalCommands()));
+    re->set_total_command_time_ms(
+        static_cast<google::protobuf::uint64>(servatrice->getMetricsRegistry().totalTimeMs()));
+    re->set_active_command_types(servatrice->getMetricsRegistry().activeTypeCount());
+
+    const auto gameStart = servatrice->getMetricsRegistry().getGameStartSnapshot();
+    re->set_game_start_count(static_cast<google::protobuf::uint64>(gameStart.count));
+    re->set_game_start_total_ms(static_cast<google::protobuf::uint64>(gameStart.totalMs));
+
+    // Per-command breakdown: resolve protobuf extension names via the descriptor pool
+    static const char *messageNames[] = {"SessionCommand",   "RoomCommand",  "GameCommand",
+                                         "ModeratorCommand", "AdminCommand", "DeveloperCommand"};
+    const auto activeStats = servatrice->getMetricsRegistry().collectActiveStats();
+    for (const auto &stat : activeStats) {
+        const int kind = stat.typeId / MetricsRegistry::KindStride;
+        const int number = stat.typeId % MetricsRegistry::KindStride;
+
+        QString label;
+        if (kind >= 0 && kind < MetricsRegistry::NumKinds) {
+            const google::protobuf::DescriptorPool *pool = google::protobuf::DescriptorPool::generated_pool();
+            const google::protobuf::Descriptor *message = pool->FindMessageTypeByName(messageNames[kind]);
+            const google::protobuf::FieldDescriptor *extension =
+                message ? pool->FindExtensionByNumber(message, number) : nullptr;
+            if (extension) {
+                label = QString::fromLatin1(MetricsRegistry::KindNames[kind]) + QStringLiteral("/") +
+                        QString::fromStdString(std::string(extension->message_type()->name()));
+            }
+        }
+        if (label.isEmpty()) {
+            label = QString::number(stat.typeId);
+        }
+
+        CommandStats *cs = re->add_command_stats();
+        cs->set_kind_index(static_cast<google::protobuf::uint32>(kind));
+        cs->set_extension_number(static_cast<google::protobuf::uint32>(number));
+        cs->set_command_name(label.toStdString());
+        cs->set_count(static_cast<google::protobuf::uint64>(stat.count));
+        cs->set_total_ms(static_cast<google::protobuf::uint64>(stat.totalMs));
+    }
 
     rc.setResponseExtension(re);
     return Response::RespOk;

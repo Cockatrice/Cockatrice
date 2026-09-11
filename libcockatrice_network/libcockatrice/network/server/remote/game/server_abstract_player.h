@@ -43,6 +43,8 @@ public:
                           Server_AbstractUserInterface *_handler);
     ~Server_AbstractPlayer() override;
     void prepareDestroy() override;
+    /// Total cards across all of this player's zones. The caller must hold the game's mutex.
+    int getCardCount() const;
     const DeckList *getDeckList() const
     {
         return deck;

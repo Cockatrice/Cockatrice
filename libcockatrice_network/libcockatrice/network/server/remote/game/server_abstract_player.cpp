@@ -66,6 +66,15 @@ Server_AbstractPlayer::Server_AbstractPlayer(Server_Game *_game,
 
 Server_AbstractPlayer::~Server_AbstractPlayer() = default;
 
+int Server_AbstractPlayer::getCardCount() const
+{
+    int result = 0;
+    for (auto *zone : zones) {
+        result += zone->getCards().size();
+    }
+    return result;
+}
+
 void Server_AbstractPlayer::prepareDestroy()
 {
     delete deck;

@@ -110,7 +110,7 @@ bool OracleImporter::readSetsFromByteArray(QByteArray data)
  * A lower index means a higher priority.
  */
 static const QStringList MAIN_CARD_TYPE_PRIORITY = {"Planeswalker", "Creature", "Land",       "Sorcery",
-                                                     "Instant",      "Artifact", "Enchantment"};
+                                                    "Instant",      "Artifact", "Enchantment"};
 
 /**
  * Returns the priority (index) of the given main card type. Known types map to their
