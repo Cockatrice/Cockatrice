@@ -132,6 +132,10 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     connect(&homeTabDisplayCardNameCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.appearance(),
             &AppearanceSettings::setHomeTabDisplayCardName);
 
+    homeTabBackgroundDimCheckBox.setChecked(settings.appearance().getHomeTabBackgroundDim());
+    connect(&homeTabBackgroundDimCheckBox, &QCheckBox::QT_STATE_CHANGED, &settings.appearance(),
+            &AppearanceSettings::setHomeTabBackgroundDim);
+
     for (const auto &entry : HomeTabButtonColor::all()) {
         homeTabButtonColorSourceBox.addItem(QObject::tr(entry.trKey));
     }
@@ -148,8 +152,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     homeTabGrid->addWidget(&homeTabBackgroundShuffleFrequencyLabel, 1, 0);
     homeTabGrid->addWidget(&homeTabBackgroundShuffleFrequencySpinBox, 1, 1);
     homeTabGrid->addWidget(&homeTabDisplayCardNameCheckBox, 2, 0, 1, 2);
-    homeTabGrid->addWidget(&homeTabButtonColorSourceLabel, 3, 0);
-    homeTabGrid->addWidget(&homeTabButtonColorSourceBox, 3, 1);
+    homeTabGrid->addWidget(&homeTabBackgroundDimCheckBox, 3, 0, 1, 2);
+    homeTabGrid->addWidget(&homeTabButtonColorSourceLabel, 4, 0);
+    homeTabGrid->addWidget(&homeTabButtonColorSourceBox, 4, 1);
 
     homeTabGroupBox = new QGroupBox;
     homeTabGroupBox->setLayout(homeTabGrid);
@@ -508,6 +513,9 @@ void AppearanceSettingsPage::retranslateUi()
     homeTabBackgroundShuffleFrequencyLabel.setText(tr("Home tab background shuffle frequency:"));
     homeTabBackgroundShuffleFrequencySpinBox.setSpecialValueText(tr("Disabled"));
     homeTabDisplayCardNameCheckBox.setText(tr("Display card name of background in bottom right"));
+    homeTabBackgroundDimCheckBox.setText(tr("Dim the home tab background"));
+    homeTabBackgroundDimCheckBox.setToolTip(
+        tr("Draw a translucent overlay over the home tab background so buttons and text stand out"));
     homeTabButtonColorSourceLabel.setText(tr("Home tab button color:"));
     homeTabButtonColorSourceBox.setToolTip(
         tr("Use the theme's identity accent colors, or extract colors from the background image"));
