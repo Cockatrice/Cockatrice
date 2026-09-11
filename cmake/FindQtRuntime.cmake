@@ -28,7 +28,7 @@ if(WITH_CLIENT)
   )
 endif()
 if(WITH_ORACLE)
-  set(_ORACLE_NEEDED Concurrent Network Svg Widgets)
+  set(_ORACLE_NEEDED Concurrent Network Svg Widgets Xml)
 endif()
 if(TEST)
   # Union of Qt modules required across all test targets (independent of application targets).
