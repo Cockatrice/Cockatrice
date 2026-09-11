@@ -117,7 +117,7 @@ void CloseButton::paintEvent(QPaintEvent * /*event*/)
 }
 
 TabSupervisor::TabSupervisor(AbstractClient *_client, QMenu *tabsMenu, QWidget *parent)
-: QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabHome(nullptr),
+    : QTabWidget(parent), userInfo(nullptr), client(_client), tabsMenu(tabsMenu), tabHome(nullptr),
       tabVisualDeckStorage(nullptr), tabServer(nullptr), tabAccount(nullptr), tabDeckStorage(nullptr),
       tabReplays(nullptr), tabAdmin(nullptr), tabCardArtRules(nullptr), tabLog(nullptr), tabReport(nullptr),
       tabModeration(nullptr), tabDeveloper(nullptr), isLocalGame(false)
@@ -251,7 +251,7 @@ void TabSupervisor::retranslateUi()
     aTabLog->setText(tr("Logs"));
     aTabReport->setText(tr("Report Queue"));
     aTabModeration->setText(tr("Moderation"));
-aTabCardArtRules->setText(tr("Card Art Rules"));
+    aTabCardArtRules->setText(tr("Card Art Rules"));
     aTabDeveloper->setText(tr("Developer"));
 
     // tabs
@@ -264,7 +264,7 @@ aTabCardArtRules->setText(tr("Card Art Rules"));
     tabs.append(tabLog);
     tabs.append(tabReport);
     tabs.append(tabModeration);
-tabs.append(tabCardArtRules);
+    tabs.append(tabCardArtRules);
     tabs.append(tabDeveloper);
     QMapIterator<int, TabRoom *> roomIterator(roomTabs);
     while (roomIterator.hasNext()) {
@@ -608,12 +608,11 @@ void TabSupervisor::stop()
         if (tabModeration) {
             tabModeration->close();
         }
-if (tabCardArtRules) {
+        if (tabCardArtRules) {
             tabCardArtRules->close();
         }
         if (tabDeveloper) {
             tabDeveloper->close();
-        }
         }
     }
 
