@@ -122,6 +122,8 @@ void UserInfoBox::updateInfo(const ServerInfo_User &user)
     QString userLevelText;
     if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
         userLevelText = tr("Administrator");
+    } else if (userLevel.testFlag(ServerInfo_User::IsDeveloper)) {
+        userLevelText = tr("Developer");
     } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
         userLevelText = tr("Moderator");
     } else if (userLevel.testFlag(ServerInfo_User::IsRegistered)) {

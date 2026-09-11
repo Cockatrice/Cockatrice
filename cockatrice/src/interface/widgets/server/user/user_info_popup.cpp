@@ -245,6 +245,9 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
         if (level.testFlag(ServerInfo_User::IsAdmin)) {
             return QColor(245, 158, 11);
         }
+        if (level.testFlag(ServerInfo_User::IsDeveloper)) {
+            return QColor(185, 28, 28);
+        }
         if (level.testFlag(ServerInfo_User::IsModerator)) {
             return QColor(59, 130, 246);
         }
@@ -300,6 +303,8 @@ void UserInfoHeaderWidget::paintEvent(QPaintEvent *)
     } badge;
     if (level.testFlag(ServerInfo_User::IsAdmin)) {
         badge = {"ADMIN", QColor(245, 158, 11)};
+    } else if (level.testFlag(ServerInfo_User::IsDeveloper)) {
+        badge = {"DEV", QColor(185, 28, 28)};
     } else if (level.testFlag(ServerInfo_User::IsModerator)) {
         badge = {"MOD", QColor(59, 130, 246)};
     } else if (level.testFlag(ServerInfo_User::IsJudge)) {

@@ -45,6 +45,7 @@ private:
     QAction *aBan, *aBanHistory;
     QAction *aPromoteToMod, *aDemoteFromMod;
     QAction *aPromoteToJudge, *aDemoteFromJudge;
+    QAction *aPromoteToDeveloper, *aDemoteFromDeveloper;
     QAction *aWarnUser, *aWarnHistory;
     QAction *aGetAdminNotes;
     std::function<QList<GameInviteOption>()> gameInviteLinkProvider;
@@ -123,6 +124,7 @@ public:
     void execInvestigateUser(const QString &userName);
     void execAdjustMod(const QString &userName, bool shouldBeMod);
     void execAdjustJudge(const QString &userName, bool shouldBeJudge);
+    void execAdjustDeveloper(const QString &userName, bool shouldBeDeveloper);
 
 private:
     void execInvite(const QString &userName, const GameInviteOption &option);

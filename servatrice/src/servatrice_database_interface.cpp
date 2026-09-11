@@ -641,6 +641,10 @@ ServerInfo_User Servatrice_DatabaseInterface::evalUserQueryResult(const QSqlQuer
         userLevel |= ServerInfo_User::IsJudge;
     }
 
+    if (is_admin & 8) {
+        userLevel |= ServerInfo_User::IsDeveloper;
+    }
+
     result.set_user_level(userLevel);
 
     const QString country = query->value(3).toString();
@@ -1448,7 +1452,7 @@ QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastL
     QSqlQuery *query = prepareQuery("SELECT u.name, u.admin, UNIX_TIMESTAMP(a.last_login) "
                                     "FROM {prefix}_users u "
                                     "LEFT JOIN {prefix}_user_analytics a ON a.id = u.id "
-                                    "WHERE (u.admin & 7) <> 0 ORDER BY u.name");
+                                    "WHERE (u.admin & 15) <> 0 ORDER BY u.name");
 
     if (!execSqlQuery(query)) {
         qCWarning(DatabaseInterfaceLog) << "Failed to collect moderator login information: SQL Error";
@@ -1469,6 +1473,9 @@ QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastL
         if (isAdmin & 4) {
             userLevel |= ServerInfo_User::IsJudge;
         }
+        if (isAdmin & 8) {
+            userLevel |= ServerInfo_User::IsDeveloper;
+        }
         loginDetails.set_user_level(userLevel);
 
         if (!query->value(2).isNull()) {
@@ -1478,6 +1485,38 @@ QList<ServerInfo_ModeratorLogin> Servatrice_DatabaseInterface::getModeratorLastL
     }
 
     return results;
+}
+
+Servatrice_DatabaseInterface::UptimeSnapshot Servatrice_DatabaseInterface::getLatestUptimeSnapshot(int serverId)
+{
+    UptimeSnapshot snapshot;
+
+    if (!checkSql()) {
+        return snapshot;
+    }
+
+    QSqlQuery *query = prepareQuery("SELECT users_count, mods_count, games_count, tx_bytes, rx_bytes, uptime, "
+                                    "UNIX_TIMESTAMP(timest) FROM {prefix}_uptime "
+                                    "WHERE id_server = :id_server ORDER BY timest DESC LIMIT 1");
+    query->bindValue(":id_server", serverId);
+
+    if (!execSqlQuery(query)) {
+        qCWarning(DatabaseInterfaceLog) << "Failed to collect server stats snapshot: SQL Error";
+        return snapshot;
+    }
+
+    if (query->next()) {
+        snapshot.valid = true;
+        snapshot.usersCount = query->value(0).toULongLong();
+        snapshot.modsCount = query->value(1).toULongLong();
+        snapshot.gamesCount = query->value(2).toULongLong();
+        snapshot.txBytes = query->value(3).toULongLong();
+        snapshot.rxBytes = query->value(4).toULongLong();
+        snapshot.uptimeSecs = query->value(5).toULongLong();
+        snapshot.timest = query->value(6).toULongLong();
+    }
+
+    return snapshot;
 }
 
 bool Servatrice_DatabaseInterface::removeUserAvatar(const QString &userName)
