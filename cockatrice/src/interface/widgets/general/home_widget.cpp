@@ -106,12 +106,6 @@ void HomeWidget::loadBackgroundSourceDeck()
     backgroundSourceDeck = deckOpt.has_value() ? deckOpt.value().deckList : DeckList();
 }
 
-static bool usesThemeBackground()
-{
-    QString sourceId = SettingsCache::instance().appearance().getHomeTabBackgroundSource();
-    return BackgroundSources::fromId(sourceId) == BackgroundSources::Theme;
-}
-
 static QPair<QColor, QColor> paletteDerivedButtonColors()
 {
     return {themeManager->appColor(AppColor::AccentStrong), themeManager->appColor(AppColor::AccentSoft)};
@@ -123,17 +117,8 @@ QPair<QColor, QColor> HomeWidget::determineButtonColor() const
         HomeTabButtonColor::intToSource(SettingsCache::instance().appearance().getHomeTabButtonColorSourceIndex());
 
     switch (colorSource) {
-        case HomeTabButtonColor::Automatic: {
-            if (usesThemeBackground() && themeManager->isBuiltInTheme()) {
-                // Built-in themes paint a static theme background; follow the
-                // theme's identity accent colors rather than sampling the image.
-                return paletteDerivedButtonColors();
-            } else {
-                // Non-built-in themes may ship their own background art, so
-                // extract the button colors from the image actually painted.
-                return extractDominantColors(background);
-            }
-        }
+        case HomeTabButtonColor::FromThemeColors:
+            return paletteDerivedButtonColors();
         case HomeTabButtonColor::FromBackground:
             return extractDominantColors(background);
     }
