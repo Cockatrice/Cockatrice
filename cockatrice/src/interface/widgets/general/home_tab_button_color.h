@@ -11,8 +11,8 @@ namespace HomeTabButtonColor
  */
 enum Source
 {
-    Automatic,      ///< Extract color from background, or use theme color if no background
-    FromBackground, ///< Always extract color from background
+    FromThemeColors, ///< Use the theme's identity accent colors
+    FromBackground,  ///< Extract colour from the background image
 };
 
 struct Entry
@@ -23,7 +23,7 @@ struct Entry
 
 inline QList<Entry> all()
 {
-    static QList<Entry> entries = {{Automatic, QT_TR_NOOP("Automatic")},
+    static QList<Entry> entries = {{FromThemeColors, QT_TR_NOOP("From theme colors")},
                                    {FromBackground, QT_TR_NOOP("Extract from background")}};
 
     return entries;
@@ -33,12 +33,12 @@ inline QList<Entry> all()
  * Safely converts an int into the corresponding Source.
  *
  * @param value The int value
- * @return The Source. Returns Source::Automatic if the value is not within range
+ * @return The Source. Returns Source::FromThemeColors if the value is not within range
  */
 inline Source intToSource(int value)
 {
     if (value > FromBackground) {
-        return Automatic; // default
+        return FromThemeColors; // default
     }
 
     return static_cast<Source>(value);
