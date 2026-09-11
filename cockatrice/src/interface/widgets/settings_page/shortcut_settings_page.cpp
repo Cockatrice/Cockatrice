@@ -3,6 +3,7 @@
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcut_treeview.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../pixel_map_generator.h"
 #include "../interface/widgets/utility/custom_line_edit.h"
 #include "../interface/widgets/utility/sequence_edit.h"
 
@@ -47,8 +48,8 @@ ShortcutSettingsPage::ShortcutSettingsPage()
     btnResetAll = new QPushButton(this);
     btnClearAll = new QPushButton(this);
 
-    btnResetAll->setIcon(QPixmap("theme:icons/update"));
-    btnClearAll->setIcon(QPixmap("theme:icons/clearsearch"));
+    btnResetAll->setIcon(themePixmap(QStringLiteral("icons/update")));
+    btnClearAll->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
 
     // layout
     auto *_editLayout = new QGridLayout;

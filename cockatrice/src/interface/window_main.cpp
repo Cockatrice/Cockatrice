@@ -44,6 +44,7 @@
 #include "intents/intent_open_server_room_by_name.h"
 #include "intents/url_parser.h"
 #include "logger.h"
+#include "pixel_map_generator.h"
 #include "version_string.h"
 #include "widgets/dialogs/dlg_connect.h"
 #include "widgets/server/handle_public_servers.h"
@@ -271,7 +272,8 @@ void MainWindow::actAbout()
                 GITHUB_TROUBLESHOOTING_URL + "'>" + tr("Troubleshooting") + "</a><br>" + "<a href='" + GITHUB_FAQ_URL +
                 "'>" + tr("F.A.Q.") + "</a><br>"),
         QMessageBox::Ok, this);
-    mb.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    mb.setIconPixmap(
+        themePixmap(QStringLiteral("cockatrice")).scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     mb.setTextInteractionFlags(Qt::TextBrowserInteraction);
     mb.exec();
 }
@@ -323,7 +325,7 @@ void MainWindow::retranslateUi()
     aRegister->setText(tr("&Register to server..."));
     aForgotPassword->setText(tr("&Restore password..."));
     aSettings->setText(tr("&Settings..."));
-    aSettings->setIcon(QPixmap("theme:icons/settings"));
+    aSettings->setIcon(themePixmap(QStringLiteral("icons/settings")));
     aExit->setText(tr("&Exit"));
 
 #if defined(__APPLE__) /* For OSX */
@@ -817,7 +819,7 @@ void MainWindow::createTrayIcon()
 
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
-    trayIcon->setIcon(QPixmap("theme:cockatrice"));
+    trayIcon->setIcon(themePixmap(QStringLiteral("cockatrice")));
     trayIcon->show();
 }
 

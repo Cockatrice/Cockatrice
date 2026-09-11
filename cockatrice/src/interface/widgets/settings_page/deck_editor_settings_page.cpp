@@ -1,6 +1,7 @@
 #include "deck_editor_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../pixel_map_generator.h"
 #include "update/card_spoiler/spoiler_background_updater.h"
 
 #include <QFileDialog>
@@ -53,15 +54,15 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     urlList->addItems(SettingsCache::instance().downloads().getAllURLs());
 
     aAdd = new QAction(this);
-    aAdd->setIcon(QPixmap("theme:icons/increment"));
+    aAdd->setIcon(themePixmap(QStringLiteral("icons/increment")));
     connect(aAdd, &QAction::triggered, this, &DeckEditorSettingsPage::actAddURL);
 
     aEdit = new QAction(this);
-    aEdit->setIcon(QPixmap("theme:icons/pencil"));
+    aEdit->setIcon(themePixmap(QStringLiteral("icons/pencil")));
     connect(aEdit, &QAction::triggered, this, &DeckEditorSettingsPage::actEditURL);
 
     aRemove = new QAction(this);
-    aRemove->setIcon(QPixmap("theme:icons/decrement"));
+    aRemove->setIcon(themePixmap(QStringLiteral("icons/decrement")));
     connect(aRemove, &QAction::triggered, this, &DeckEditorSettingsPage::actRemoveURL);
 
     auto *urlToolBar = new QToolBar;

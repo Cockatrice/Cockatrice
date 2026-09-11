@@ -1,5 +1,6 @@
 #include "remote_connection_controller.h"
 
+#include "../../../interface/pixel_map_generator.h"
 #include "../../settings/cache_settings.h"
 #include "../interface/widgets/dialogs/dlg_connect.h"
 #include "../interface/widgets/dialogs/dlg_forgot_password_challenge.h"
@@ -180,7 +181,7 @@ void ConnectionController::onServerShutdownEvent(const Event_ServerShutdown &eve
                                                    "games will be lost.\nReason for shutdown: %1",
                                                    "", event.minutes())
                                                     .arg(QString::fromStdString(event.reason())));
-    serverShutdownMessageBox.setIconPixmap(QPixmap("theme:cockatrice").scaled(64, 64));
+    serverShutdownMessageBox.setIconPixmap(themePixmap(QStringLiteral("cockatrice")).scaled(64, 64));
     serverShutdownMessageBox.setText(tr("Scheduled server shutdown"));
     serverShutdownMessageBox.setWindowModality(Qt::ApplicationModal);
     serverShutdownMessageBox.setVisible(true);

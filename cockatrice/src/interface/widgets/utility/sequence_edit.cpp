@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../client/settings/shortcuts_settings.h"
+#include "../../pixel_map_generator.h"
 
 #include <QHBoxLayout>
 #include <QKeyEvent>
@@ -14,8 +15,8 @@ SequenceEdit::SequenceEdit(const QString &_shortcutName, QWidget *parent) : QWid
     defaultButton = new QPushButton("", this);
 
     lineEdit->setMinimumWidth(70);
-    clearButton->setIcon(QPixmap("theme:icons/clearsearch"));
-    defaultButton->setIcon(QPixmap("theme:icons/update"));
+    clearButton->setIcon(themePixmap(QStringLiteral("icons/clearsearch")));
+    defaultButton->setIcon(themePixmap(QStringLiteral("icons/update")));
 
     auto *layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
