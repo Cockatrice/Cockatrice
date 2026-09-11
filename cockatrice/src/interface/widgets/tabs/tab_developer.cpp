@@ -6,18 +6,23 @@
 
 #include "tab_developer.h"
 
+#include <QCheckBox>
 #include <QDateTime>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
 #include <QPushButton>
+#include <QSpinBox>
 #include <QTableWidget>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <algorithm>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/response_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+
+static constexpr int DEFAULT_AUTO_REFRESH_INTERVAL_SECS = 30;
 
 TabDeveloper::TabDeveloper(TabSupervisor *_tabSupervisor, AbstractClient *_client)
     : Tab(_tabSupervisor), client(_client)
@@ -45,12 +50,28 @@ TabDeveloper::TabDeveloper(TabSupervisor *_tabSupervisor, AbstractClient *_clien
 
     statusLabel = new QLabel;
 
+    autoRefreshCheckBox = new QCheckBox;
+    autoRefreshCheckBox->setChecked(false);
+
+    refreshIntervalSpinBox = new QSpinBox;
+    refreshIntervalSpinBox->setRange(5, 3600);
+    refreshIntervalSpinBox->setValue(DEFAULT_AUTO_REFRESH_INTERVAL_SECS);
+    refreshIntervalSpinBox->setEnabled(false);
+
+    autoRefreshTimer = new QTimer(this);
+    connect(autoRefreshTimer, &QTimer::timeout, this, &TabDeveloper::refreshClicked);
+    connect(autoRefreshCheckBox, &QCheckBox::toggled, this, &TabDeveloper::autoRefreshToggled);
+    connect(refreshIntervalSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+            &TabDeveloper::refreshIntervalChanged);
+
     refreshButton = new QPushButton;
     refreshButton->setAutoDefault(true);
     connect(refreshButton, &QPushButton::clicked, this, &TabDeveloper::refreshClicked);
 
     auto *buttonLayout = new QHBoxLayout;
     buttonLayout->addWidget(statusLabel, 1, Qt::AlignLeft);
+    buttonLayout->addWidget(autoRefreshCheckBox, 0, Qt::AlignRight);
+    buttonLayout->addWidget(refreshIntervalSpinBox, 0, Qt::AlignRight);
     buttonLayout->addWidget(refreshButton, 0, Qt::AlignRight);
 
     auto *tableLayout = new QHBoxLayout;
@@ -70,6 +91,10 @@ TabDeveloper::TabDeveloper(TabSupervisor *_tabSupervisor, AbstractClient *_clien
 
 void TabDeveloper::retranslateUi()
 {
+    autoRefreshCheckBox->setText(tr("Auto-refresh"));
+    autoRefreshCheckBox->setToolTip(tr("Automatically request fresh server statistics at a fixed interval."));
+    refreshIntervalSpinBox->setSuffix(tr(" s"));
+    refreshIntervalSpinBox->setToolTip(tr("Seconds between automatic refreshes."));
     refreshButton->setText(tr("Refresh server stats"));
     statsTable->setHorizontalHeaderLabels(QString(tr("Statistic;Value")).split(";"));
     commandTable->setHorizontalHeaderLabels(QString(tr("Command;Count;Total ms;Avg ms")).split(";"));
@@ -126,14 +151,37 @@ void TabDeveloper::appendSeparatorRow(const QString &sectionTitle)
 
 void TabDeveloper::refreshClicked()
 {
+    if (requestPending) {
+        return;
+    }
+    requestPending = true;
     Command_GetServerStats cmd;
     PendingCommand *pend = client->prepareDeveloperCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &TabDeveloper::serverStatsResponse);
     client->sendCommand(pend);
 }
 
+void TabDeveloper::autoRefreshToggled(bool checked)
+{
+    refreshIntervalSpinBox->setEnabled(checked);
+    if (checked) {
+        refreshIntervalChanged();
+        refreshClicked();
+    } else {
+        autoRefreshTimer->stop();
+    }
+}
+
+void TabDeveloper::refreshIntervalChanged()
+{
+    if (autoRefreshCheckBox->isChecked()) {
+        autoRefreshTimer->start(refreshIntervalSpinBox->value() * 1000);
+    }
+}
+
 void TabDeveloper::serverStatsResponse(const Response &resp)
 {
+    requestPending = false;
     if (resp.response_code() != Response::RespOk) {
         statusLabel->setText(tr("No server statistics available yet."));
         return;

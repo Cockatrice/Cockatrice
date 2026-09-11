@@ -10,9 +10,12 @@
 #include "tab.h"
 
 class AbstractClient;
+class QCheckBox;
 class QLabel;
 class QPushButton;
+class QSpinBox;
 class QTableWidget;
+class QTimer;
 class Response;
 
 class TabDeveloper : public Tab
@@ -24,6 +27,10 @@ private:
     QTableWidget *commandTable;
     QPushButton *refreshButton;
     QLabel *statusLabel;
+    QCheckBox *autoRefreshCheckBox;
+    QSpinBox *refreshIntervalSpinBox;
+    QTimer *autoRefreshTimer;
+    bool requestPending = false;
 
     void appendStatRow(const QString &name, const QString &value);
     void appendSeparatorRow(const QString &sectionTitle);
@@ -33,6 +40,8 @@ private:
 private slots:
     void refreshClicked();
     void serverStatsResponse(const Response &resp);
+    void autoRefreshToggled(bool checked);
+    void refreshIntervalChanged();
 
 public:
     explicit TabDeveloper(TabSupervisor *_tabSupervisor, AbstractClient *_client);
