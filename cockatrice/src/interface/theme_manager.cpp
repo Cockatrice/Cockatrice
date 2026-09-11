@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
+#include <QFile>
 #include <QFileInfo>
 #include <QLibraryInfo>
 #include <QMap>
@@ -184,11 +185,32 @@ QString ThemeManager::assetPath(QStringView prefix) const
     return resolvedPlain.isEmpty() ? prefix.toString() : resolvedPlain;
 }
 
-bool ThemeManager::isBuiltInTheme()
+// Probe whether a directory is truly writable by trying to create and remove a
+// temporary file. QFileInfo::isWritable() on a directory is unreliable (notably
+// on Windows where UAC VirtualStore can make a system dir appear writable).
+bool ThemeManager::isDirReallyWritable(const QString &dirPath)
 {
-    const auto themeName = SettingsCache::instance().getThemeName();
+    const QString probe = QDir(dirPath).absoluteFilePath(".cockatrice_write_test");
+    QFile f(probe);
+    if (!f.open(QIODevice::WriteOnly)) {
+        return false;
+    }
+    f.close();
+    f.remove();
+    return true;
+}
 
-    return themeName == NONE_THEME_NAME || themeName == FUSION_THEME_NAME;
+QString ThemeManager::writableThemeDir(const QString &themeName)
+{
+    // All theme writes go to the user themes directory regardless of whether
+    // the resolved (system) theme directory happens to be writable. Even when a
+    // write would succeed in-place, routing it to the user directory keeps the
+    // install intact and guarantees changes survive upgrades.
+    const QString dirPath = QDir(SettingsCache::instance().paths().getThemesPath()).absoluteFilePath(themeName);
+    if (!QDir().mkpath(dirPath)) {
+        qWarning() << "Failed to create theme save directory:" << dirPath;
+    }
+    return dirPath;
 }
 
 // System (read-only) themes location, relative to the application binary.
@@ -331,7 +353,7 @@ bool ThemeManager::commitPalette(const QString &themeDirPath, const QString &col
 
 void ThemeManager::setColorScheme(const QString &scheme)
 {
-    const QString dirPath = getAvailableThemes().value(SettingsCache::instance().getThemeName());
+    const QString dirPath = writableThemeDir(SettingsCache::instance().getThemeName());
     ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
 
     cfg.colorScheme = scheme;
@@ -342,7 +364,7 @@ void ThemeManager::setColorScheme(const QString &scheme)
 
 void ThemeManager::setStyleName(const QString &styleName)
 {
-    const QString dirPath = getAvailableThemes().value(SettingsCache::instance().getThemeName());
+    const QString dirPath = writableThemeDir(SettingsCache::instance().getThemeName());
     ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
 
     cfg.styleName = styleName;
