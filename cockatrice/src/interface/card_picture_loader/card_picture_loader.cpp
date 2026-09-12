@@ -11,6 +11,7 @@
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QMainWindow>
+#include <QMetaObject>
 #include <QMovie>
 #include <QNetworkRequest>
 #include <QPainter>
@@ -55,7 +56,14 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
 
 CardPictureLoader::~CardPictureLoader()
 {
-    worker->deleteLater();
+    if (worker) {
+        // Capture the thread first: shutdownThread() blocks until the worker has been freed by the
+        // finished() -> deleteLater chain, after which the worker pointer must not be dereferenced.
+        QThread *pictureLoaderThread = worker->workerThread();
+        worker->shutdownThread();
+        worker = nullptr;
+        delete pictureLoaderThread;
+    }
 }
 
 void CardPictureLoader::getCardBackPixmap(QPixmap &pixmap, QSize size)
@@ -295,7 +303,15 @@ void CardPictureLoader::clearPixmapCache()
 
 void CardPictureLoader::clearNetworkCache()
 {
-    getInstance().worker->clearNetworkCache();
+    auto &worker = *getInstance().worker;
+    // The disk cache and redirect cache are owned by the worker thread; clearing them from the
+    // UI thread would race with the worker's cache reads/writes. Block until the worker thread
+    // has executed the clear so the "Cached card pictures have been reset." message is truthful.
+    if (worker.isRunning()) {
+        QMetaObject::invokeMethod(&worker, "clearNetworkCache", Qt::BlockingQueuedConnection);
+    } else {
+        worker.clearNetworkCache();
+    }
 }
 
 void CardPictureLoader::cacheCardPixmaps(const QList<ExactCard> &cards)
