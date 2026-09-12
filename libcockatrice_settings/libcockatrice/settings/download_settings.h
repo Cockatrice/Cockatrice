@@ -24,7 +24,7 @@ public:
     static constexpr int DEFAULT_HOST_REQUEST_LIMIT = 10;
     /** @brief Floor for any per-host request allowance. */
     static constexpr int MIN_HOST_REQUEST_LIMIT = 1;
-    /** @brief Developer cap marking a host as never throttled per host (pacing still applies). */
+    /** @brief Developer cap marking a host as never throttled per host or by the dispatch pacing. */
     static constexpr int UNLIMITED_HOST_QUOTA = -1;
 
     /**
