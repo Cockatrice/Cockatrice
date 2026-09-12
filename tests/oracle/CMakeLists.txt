@@ -4,7 +4,7 @@ if(NOT GTEST_FOUND)
   add_dependencies(parse_cipt_test gtest)
 endif()
 
-target_link_libraries(parse_cipt_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
+target_link_libraries(parse_cipt_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST})
 
 add_test(NAME parse_cipt_test COMMAND parse_cipt_test)
 
@@ -20,7 +20,7 @@ endif()
 
 target_link_libraries(
   oracle_importer_test libcockatrice_card libcockatrice_interfaces Threads::Threads ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
+  ${QT_MODULES_TEST}
 )
 
 add_test(NAME oracle_importer_test COMMAND oracle_importer_test)
@@ -64,6 +64,6 @@ target_link_libraries(
   libcockatrice_interfaces
   Threads::Threads
   ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
+  ${QT_MODULES_TEST}
   ${_ORACLE_BENCH_EXTRA_LIBRARIES}
 )

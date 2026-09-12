@@ -31,7 +31,7 @@ if [[ ! -e $FILE ]]; then
 fi
 
 # print version
-if ! lupdate -version; then
+if ! /usr/lib/qt6/bin/lupdate -version; then
   echo "failed to run lupdate" >&2
   exit 4;
 fi
@@ -39,7 +39,7 @@ fi
 # run lupdate, duplicating the output in stderr and saving it
 # for convenience we ignore that $DIRS will be split on spaces 
 # shellcheck disable=SC2086
-if ! got="$(lupdate $DIRS -ts "$FILE" | tee /dev/stderr)"; then
+if ! got="$(/usr/lib/qt6/bin/lupdate $DIRS -ts "$FILE" | tee /dev/stderr)"; then
   echo "failed to update $FILE with $DIRS" >&2
   exit 4;
 fi

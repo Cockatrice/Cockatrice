@@ -19,7 +19,6 @@ class PlayerLogic;
 class ArrowItem : public QObject, public QGraphicsItem, public IAnimatedItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 signals:
     void requestDeletion(int creatorId, int id);
 

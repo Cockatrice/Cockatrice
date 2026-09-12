@@ -11,7 +11,7 @@ target_link_libraries(
   libcockatrice_deck_list
   Threads::Threads
   ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
+  ${QT_MODULES_TEST}
 )
 add_test(NAME deck_list_model_custom_zones_test COMMAND deck_list_model_custom_zones_test)
 
@@ -28,6 +28,6 @@ target_link_libraries(
   libcockatrice_deck_list
   Threads::Threads
   ${GTEST_BOTH_LIBRARIES}
-  ${TEST_QT_MODULES}
+  ${QT_MODULES_TEST}
 )
 add_test(NAME deck_list_model_zone_integration_test COMMAND deck_list_model_zone_integration_test)

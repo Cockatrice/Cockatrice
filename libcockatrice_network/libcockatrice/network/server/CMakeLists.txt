@@ -10,6 +10,6 @@ add_library(libcockatrice_network_server INTERFACE)
 target_include_directories(libcockatrice_network_server INTERFACE .)
 
 target_link_libraries(
-  libcockatrice_network_server INTERFACE ${COCKATRICE_QT_MODULES} libcockatrice_network_server_local
+  libcockatrice_network_server INTERFACE ${QT_MODULES_COCKATRICE} libcockatrice_network_server_local
                                          libcockatrice_network_server_remote
 )
