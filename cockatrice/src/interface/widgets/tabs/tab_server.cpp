@@ -13,6 +13,7 @@
 #include <libcockatrice/protocol/pb/event_list_rooms.pb.h>
 #include <libcockatrice/protocol/pb/event_server_message.pb.h>
 #include <libcockatrice/protocol/pb/response_join_room.pb.h>
+#include <libcockatrice/protocol/pb/room_commands.pb.h>
 #include <libcockatrice/protocol/pb/session_commands.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 
@@ -185,25 +186,37 @@ void TabServer::processServerMessageEvent(const Event_ServerMessage &event)
 void TabServer::joinRoom(int id, bool setCurrent)
 {
     TabRoom *room = tabSupervisor->getRoomTabs().value(id);
-    if (!room) {
-        Command_JoinRoom cmd;
-        cmd.set_room_id(id);
-
-        PendingCommand *pend = client->prepareSessionCommand(cmd);
-        pend->setExtraData(setCurrent);
-        connect(pend, &PendingCommand::finished, this,
-                [this, id](const Response &r, const CommandContainer &c, const QVariant &v) {
-                    joinRoomFinished(r, c, v, id);
-                });
-
-        client->sendCommand(pend);
-
+    if (room) {
+        if (setCurrent) {
+            tabSupervisor->setCurrentWidget((QWidget *)room);
+        }
         return;
     }
 
-    if (setCurrent) {
-        tabSupervisor->setCurrentWidget((QWidget *)room);
+    auto pendingIt = pendingRoomJoins.find(id);
+    if (pendingIt != pendingRoomJoins.end()) {
+        // A join for this room is already in flight: the room tab opens when its response
+        // arrives. Fold the new request into the pending one so that, for example, clicking
+        // a room the selector is auto-joining does not send a second Command_JoinRoom - the
+        // server would reject that duplicate with RespContextError.
+        if (setCurrent) {
+            pendingIt.value() = true;
+        }
+        return;
     }
+
+    pendingRoomJoins.insert(id, setCurrent);
+
+    Command_JoinRoom cmd;
+    cmd.set_room_id(id);
+
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
+    pend->setExtraData(setCurrent);
+    connect(
+        pend, &PendingCommand::finished, this,
+        [this, id](const Response &r, const CommandContainer &c, const QVariant &v) { joinRoomFinished(r, c, v, id); });
+
+    client->sendCommand(pend);
 }
 
 void TabServer::joinRoomFinished(const Response &r,
@@ -211,34 +224,67 @@ void TabServer::joinRoomFinished(const Response &r,
                                  const QVariant &extraData,
                                  int roomId)
 {
+    const bool setCurrent = pendingRoomJoins.value(roomId, extraData.toBool());
+    pendingRoomJoins.remove(roomId);
+
     switch (r.response_code()) {
         case Response::RespOk:
+            healedRoomJoins.remove(roomId);
             break;
         case Response::RespNameNotFound:
-            QMessageBox::critical(this, tr("Error"),
-                                  tr("Failed to join the server room: it doesn't exist on the server."));
+            if (setCurrent) {
+                QMessageBox::critical(this, tr("Error"),
+                                      tr("Failed to join the server room: it doesn't exist on the server."));
+            }
             emit roomJoinFailed(roomId);
             return;
         case Response::RespContextError:
-            QMessageBox::critical(
-                this, tr("Error"),
-                tr("The server thinks you are in the server room but your client is unable to display it. "
-                   "Try restarting your client."));
-            emit roomJoinFailed(roomId);
+            if (healedRoomJoins.contains(roomId)) {
+                // A stale-membership heal was already attempted once; if the server still
+                // rejects the join there is nothing left to do client-side, so surface it.
+                if (setCurrent) {
+                    QMessageBox::critical(
+                        this, tr("Error"),
+                        tr("The server thinks you are in the server room but your client is unable to display it. "
+                           "Try restarting your client."));
+                }
+                emit roomJoinFailed(roomId);
+                return;
+            }
+            // The server already had us registered in the room even though no tab was open,
+            // usually because two join attempts for the same room overlapped. Leaving and
+            // rejoining makes the server reply with a fresh RespOk so the tab is displayed
+            // without requiring a client restart. This is attempted only once: if the server
+            // keeps replying with RespContextError we must not loop forever.
+            healedRoomJoins.insert(roomId);
+            leaveAndRejoinRoom(roomId, setCurrent);
             return;
         case Response::RespUserLevelTooLow:
-            QMessageBox::critical(this, tr("Error"),
-                                  tr("You do not have the required permission to join this server room."));
+            if (setCurrent) {
+                QMessageBox::critical(this, tr("Error"),
+                                      tr("You do not have the required permission to join this server room."));
+            }
             emit roomJoinFailed(roomId);
             return;
         default:
-            QMessageBox::critical(
-                this, tr("Error"),
-                tr("Failed to join the server room due to an unknown error: %1.").arg(r.response_code()));
+            if (setCurrent) {
+                QMessageBox::critical(
+                    this, tr("Error"),
+                    tr("Failed to join the server room due to an unknown error: %1.").arg(r.response_code()));
+            }
             emit roomJoinFailed(roomId);
             return;
     }
 
     const Response_JoinRoom &resp = r.GetExtension(Response_JoinRoom::ext);
-    emit roomJoined(resp.room_info(), extraData.toBool());
+    emit roomJoined(resp.room_info(), setCurrent);
+}
+
+void TabServer::leaveAndRejoinRoom(int roomId, bool setCurrent)
+{
+    // Clear the stale room membership server-side. The leave is sent before the rejoin below,
+    // so the server no longer considers us a member by the time the join arrives.
+    client->sendCommand(client->prepareRoomCommand(Command_LeaveRoom(), roomId));
+
+    joinRoom(roomId, setCurrent);
 }
