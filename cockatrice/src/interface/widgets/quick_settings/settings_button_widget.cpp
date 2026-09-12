@@ -1,5 +1,7 @@
 #include "settings_button_widget.h"
 
+#include "../../pixel_map_generator.h"
+
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QMouseEvent>
@@ -8,7 +10,7 @@
 SettingsButtonWidget::SettingsButtonWidget(QWidget *parent)
     : QWidget(parent), button(new QToolButton(this)), popup(new SettingsPopupWidget(nullptr))
 {
-    button->setIcon(QPixmap("theme:icons/cogwheel"));
+    button->setIcon(themePixmap(QStringLiteral("icons/cogwheel")));
     button->setCheckable(true);
     button->setFixedSize(32, 32);
     connect(button, &QToolButton::clicked, this, &SettingsButtonWidget::togglePopup);

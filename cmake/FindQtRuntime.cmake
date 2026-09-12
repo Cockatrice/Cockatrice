@@ -37,7 +37,7 @@ set(QT_COMPONENTS_COCKATRICE
     QuickWidgets
 )
 
-set(QT_COMPONENTS_ORACLE Concurrent Network Svg Widgets)
+set(QT_COMPONENTS_ORACLE Concurrent Network Svg Widgets Xml)
 
 set(QT_COMPONENTS_SERVATRICE Network Sql WebSockets)
 

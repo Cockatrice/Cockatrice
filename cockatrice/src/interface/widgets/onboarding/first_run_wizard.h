@@ -37,6 +37,9 @@ public slots:
     /** @brief Forwarded from MainWindow once the background card database update process exits. */
     void onCardDatabaseUpdateFinished(bool success);
 
+    /** @brief Forwarded from MainWindow while the background card database update process runs. */
+    void onCardDatabaseUpdateProgress(const QString &stage, qint64 done, qint64 total);
+
 protected:
     void closeEvent(QCloseEvent *event) override;
     void changeEvent(QEvent *event) override;

@@ -4,6 +4,7 @@
 #include <QByteArray>
 #include <QList>
 #include <QString>
+#include <functional>
 
 namespace RawJson
 {
@@ -43,10 +44,17 @@ struct ScanError
 };
 
 /**
+ * @brief Optional progress callback receiving @c (bytesRead, totalBytes) while
+ * the document is walked. Invoked from the scanning thread; the caller decides
+ * how the throttled offsets are relayed to a GUI event loop.
+ */
+using ScanProgressCallback = std::function<void(qsizetype bytesRead, qsizetype totalBytes)>;
+
+/**
  * @brief Scans a full MTGJSON document without materializing the JSON tree.
  *
  * Splits the top-level "data" object into per-set byte ranges and reads each
- * set's metadata directly from the raw bytes. The oracle importer can then
+ * set's metadata directly from the raw bytes. The Oracle importer can then
  * parse one set at a time during import, keeping peak memory far below a single
  * QJsonDocument::fromJson() over the whole file.
  *
@@ -67,9 +75,14 @@ struct ScanError
  * @param error Out parameter. Set to an error ScanError when the document
  *              cannot be parsed, otherwise left empty. Passing a null
  *              pointer disables error reporting.
+ * @param progress Optional progress callback. When non-empty it is invoked as
+ *                 the scanner advances through the document, throttled to a
+ *                 tiny fraction of the total size.
  * @return The detected per-set ranges, or an empty list on failure.
  */
-QList<SetRange> scanSetRanges(const QByteArray &json, ScanError *error = nullptr);
+QList<SetRange> scanSetRanges(const QByteArray &json,
+                              ScanError *error = nullptr,
+                              const ScanProgressCallback &progress = ScanProgressCallback());
 
 } // namespace RawJson
 

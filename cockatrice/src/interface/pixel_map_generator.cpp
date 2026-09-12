@@ -1,5 +1,7 @@
 #include "pixel_map_generator.h"
 
+#include "theme_manager.h"
+
 #include <QApplication>
 #include <QDomDocument>
 #include <QFile>
@@ -14,6 +16,7 @@
 #define DEFAULT_COLOR_MODERATOR_LEFT "#ffffff";
 #define DEFAULT_COLOR_MODERATOR_RIGHT "#000000";
 #define DEFAULT_COLOR_ADMIN "#ff2701";
+#define DEFAULT_COLOR_DEVELOPER "#B8B8B8"
 
 /**
  * Clamps an svg render size so that rendering does not exceed a multiple of the requested size.
@@ -82,7 +85,13 @@ static QPixmap loadSvg(const QString &svgPath, const QSize &size, bool expandOnl
 /**
  * Try to load path image from non-SVG formats, otherwise fall back to SVG.
  * This is to allow custom themes to support non-SVG format type overrides, since SVG requires custom loading.
- * @param path The path to the file, with no file extension. File formats will be automatically detected.
+ *
+ * The path may already carry the resolved file extension (e.g. via
+ * ThemeManager::assetPath); such paths are loaded directly. Otherwise a
+ * format-agnostic lookup probes png, jpg and finally svg.
+ *
+ * @param path The path to the file, with no file extension unless the caller
+ * already resolved it. File formats will be automatically detected.
  * @param size The desired size of the pixmap.
  * @param expandOnly If true, then keep the size of the initial pixmap to at least the size (Only relevant if SVG).
  *
@@ -90,6 +99,19 @@ static QPixmap loadSvg(const QString &svgPath, const QSize &size, bool expandOnl
  */
 static QPixmap tryLoadImage(const QString &path, const QSize &size, bool expandOnly = false)
 {
+    if (path.endsWith(QLatin1String(".svg"), Qt::CaseInsensitive)) {
+        return loadSvg(path, size, expandOnly);
+    }
+    if (path.endsWith(QLatin1String(".png"), Qt::CaseInsensitive) ||
+        path.endsWith(QLatin1String(".jpg"), Qt::CaseInsensitive) ||
+        path.endsWith(QLatin1String(".jpeg"), Qt::CaseInsensitive)) {
+        QPixmap pix(path);
+        if (!pix.isNull()) {
+            return pix.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        }
+        return {};
+    }
+
     const auto formats = {"png", "jpg"};
 
     QPixmap returnPixmap;
@@ -111,7 +133,8 @@ QPixmap PhasePixmapGenerator::generatePixmap(int height, QString name)
         return pmCache.value(key);
     }
 
-    QPixmap pixmap = tryLoadImage("theme:phases/" + name, QSize(height, height));
+    QPixmap pixmap = tryLoadImage(QStringLiteral("theme:") + themeManager->assetPath(QStringLiteral("phases/") + name),
+                                  QSize(height, height));
 
     pmCache.insert(key, pixmap);
     return pixmap;
@@ -359,6 +382,8 @@ QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
 
     if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
         colorLeft = DEFAULT_COLOR_ADMIN;
+    } else if (userLevel.testFlag(ServerInfo_User::IsDeveloper)) {
+        colorLeft = DEFAULT_COLOR_DEVELOPER;
     } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
         colorLeft = DEFAULT_COLOR_MODERATOR_LEFT;
         colorRight = DEFAULT_COLOR_MODERATOR_RIGHT;
@@ -396,7 +421,8 @@ QPixmap LockPixmapGenerator::generatePixmap(int height)
         return pmCache.value(key);
     }
 
-    QPixmap pixmap = tryLoadImage("theme:icons/lock", QSize(height, height), true);
+    QPixmap pixmap = tryLoadImage(QStringLiteral("theme:") + themeManager->assetPath(QStringLiteral("icons/lock")),
+                                  QSize(height, height), true);
     pmCache.insert(key, pixmap);
     return pixmap;
 }
@@ -411,7 +437,8 @@ QPixmap DropdownIconPixmapGenerator::generatePixmap(int height, bool expanded)
     }
 
     QString name = expanded ? "dropdown_expanded" : "dropdown_collapsed";
-    QPixmap pixmap = tryLoadImage("theme:icons/" + name, QSize(height, height), true);
+    QPixmap pixmap = tryLoadImage(QStringLiteral("theme:") + themeManager->assetPath(QStringLiteral("icons/") + name),
+                                  QSize(height, height), true);
 
     pmCache.insert(key, pixmap);
     return pixmap;
@@ -472,6 +499,13 @@ QHash<QString, QPixmap> ManaSymbolPixmapGenerator::scaledCache;
 
 QPixmap loadColorAdjustedPixmap(const QString &name)
 {
+    // Prefer an authored scheme-qualified variant when one exists for this asset.
+    const QString variant = themeManager->schemeVariantPath(QStringView(name).mid(QStringLiteral("theme:").size()));
+    if (!variant.isEmpty()) {
+        return QPixmap(QStringLiteral("theme:") + variant);
+    }
+
+    // Legacy fallback: runtime-invert for dark mode when no authored variant.
     if (qApp->palette().windowText().color().lightness() > 200) {
         QImage img(name);
         img.invertPixels();
@@ -481,4 +515,22 @@ QPixmap loadColorAdjustedPixmap(const QString &name)
     } else {
         return QPixmap(name);
     }
+}
+
+QPixmap themePixmap(QStringView prefix)
+{
+    const QString resolved = themeManager->assetPath(prefix);
+    return QPixmap(QStringLiteral("theme:") + resolved);
+}
+
+void clearPixmapGeneratorCaches()
+{
+    PhasePixmapGenerator::clear();
+    CounterPixmapGenerator::clear();
+    PingPixmapGenerator::clear();
+    CountryPixmapGenerator::clear();
+    UserLevelPixmapGenerator::clear();
+    LockPixmapGenerator::clear();
+    DropdownIconPixmapGenerator::clear();
+    ManaSymbolPixmapGenerator::clear();
 }

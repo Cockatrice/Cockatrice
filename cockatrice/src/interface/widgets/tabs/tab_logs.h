@@ -33,6 +33,7 @@ class TabLog : public Tab
     Q_OBJECT
 private:
     AbstractClient *client;
+    bool canUseDeveloperCommands;
     QLabel *labelFindUserName, *labelFindIPAddress, *labelFindGameName, *labelFindGameID, *labelMessage, *labelMaximum,
         *labelDescription;
     LineEditUnfocusable *findUsername, *findIPAddress, *findGameName, *findGameID, *findMessage;
@@ -58,7 +59,7 @@ private slots:
     void restartLayout();
 
 public:
-    TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client);
+    TabLog(TabSupervisor *_tabSupervisor, AbstractClient *_client, bool _canUseDeveloperCommands = false);
     ~TabLog() override;
     void retranslateUi() override;
     [[nodiscard]] QString getTabText() const override

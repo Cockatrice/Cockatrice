@@ -23,6 +23,7 @@ class OracleWizard : public QWizard
 public:
     explicit OracleWizard(QWidget *parent = nullptr);
     void accept() override;
+    void reject() override;
     void enableButtons();
     void disableButtons();
     void retranslateUi();
@@ -52,12 +53,7 @@ public:
     }
     bool saveTokensToFile(const QString &fileName);
 
-    void runInBackground()
-    {
-        backgroundMode = true;
-        hide();
-        currentPage()->initializePage();
-    }
+    void runInBackground();
 
 public:
     OracleImporter *importer;

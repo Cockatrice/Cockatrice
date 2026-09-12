@@ -180,6 +180,11 @@ public:
     {
         return false;
     }
+    /// Called once per actual game start with how long bringing every player's
+    /// zones online took, so servers can spot deck sizes that wedge threads.
+    virtual void observeGameStartDurationMs(qint64 /* elapsedMs */)
+    {
+    }
 
     Server_DatabaseInterface *getDatabaseInterface() const;
     int getNextLocalGameId()

@@ -68,6 +68,11 @@ signals:
     /** @brief Emitted after the background card-database update subprocess exits. */
     void cardDatabaseUpdateFinished(bool success);
 
+    /** @brief Emitted while the background card-database update subprocess runs.
+     *         @p stage is one of "download", "scan" or "import"; @p done/@p total
+     *         are byte counts for the first two stages and set indices for "import". */
+    void cardDatabaseUpdateProgress(const QString &stage, qint64 done, qint64 total);
+
 public slots:
     void actCheckCardUpdates();
     void actCheckCardUpdatesBackground();
@@ -96,6 +101,7 @@ private slots:
 
     void cardUpdateError(QProcess::ProcessError err);
     void cardUpdateFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void cardUpdateProgressOutput();
     void refreshShortcuts();
     void cardDatabaseLoadingFailed();
     void cardDatabaseNewSetsFound(int numUnknownSets, QStringList unknownSetsNames);
@@ -159,6 +165,7 @@ private:
     LatencyStatusWidget *latencyStatus = nullptr; ///< status bar widget with live round-trip stats and history graph
     bool bHasActivated, askedForDbUpdater;
     QProcess *cardUpdateProcess;
+    QByteArray cardUpdateOutputBuffer;
     DlgViewLog *logviewDialog;
     GameReplay *replay;
     DlgTipOfTheDay *tip;

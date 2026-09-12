@@ -30,6 +30,7 @@ public:
     void retranslateUi() override;
 
     void onUpdateFinished(bool success);
+    void onUpdateProgress(const QString &stage, qint64 done, qint64 total);
 
 signals:
     void updateRequested();

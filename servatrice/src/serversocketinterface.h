@@ -24,6 +24,7 @@
 #include <QMutex>
 #include <QTcpSocket>
 #include <QWebSocket>
+#include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_download_by_game_id.pb.h>
 #include <libcockatrice/protocol/pb/command_report.pb.h>
 #include <libcockatrice/protocol/pb/command_report_add_comment.pb.h>
@@ -80,6 +81,7 @@ signals:
 protected:
     void logDebugMessage(const QString &message) override;
     bool tooManyRegistrationAttempts(const QString &ipAddress);
+    void processCommandContainer(const CommandContainer &cont) override;
 
     virtual void writeToSocket(QByteArray &data) = 0;
     virtual void flushSocket() = 0;
@@ -115,7 +117,8 @@ private:
     Response::ResponseCode cmdBanFromServer(const Command_BanFromServer &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReportList(const Command_ReportList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdWarnUser(const Command_WarnUser &cmd, ResponseContainer &rc);
-    Response::ResponseCode cmdGetLogHistory(const Command_ViewLogHistory &cmd, ResponseContainer &rc);
+    Response::ResponseCode
+    cmdGetLogHistory(const Command_ViewLogHistory &cmd, ResponseContainer &rc, bool allowPrivateChat);
     Response::ResponseCode cmdGetBanHistory(const Command_GetBanHistory &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetWarnList(const Command_GetWarnList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdGetWarnHistory(const Command_GetWarnHistory &cmd, ResponseContainer &rc);
@@ -151,6 +154,8 @@ private:
     processExtendedModeratorCommand(int cmdType, const ModeratorCommand &cmd, ResponseContainer &rc) override;
     Response::ResponseCode
     processExtendedAdminCommand(int cmdType, const AdminCommand &cmd, ResponseContainer &rc) override;
+    Response::ResponseCode
+    processExtendedDeveloperCommand(int cmdType, const DeveloperCommand &cmd, ResponseContainer &rc) override;
 
     Response::ResponseCode cmdAccountEdit(const Command_AccountEdit &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdAccountImage(const Command_AccountImage &cmd, ResponseContainer &rc);
@@ -171,6 +176,8 @@ private:
     Response::ResponseCode cmdGetModeratorLastLogins(const Command_GetModeratorLastLogins &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdResetUserPassword(const Command_ResetUserPassword &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdRemoveUserAvatar(const Command_RemoveUserAvatar &cmd, ResponseContainer &rc);
+
+    Response::ResponseCode cmdGetServerStats(const Command_GetServerStats &cmd, ResponseContainer &rc);
 
     bool addAdminFlagToUser(const QString &user, int flag);
     bool removeAdminFlagFromUser(const QString &user, int flag);

@@ -1,6 +1,7 @@
 #include "commander_bracket_widget.h"
 
 #include "../../../../../client/settings/cache_settings.h"
+#include "../../../../pixel_map_generator.h"
 #include "commander_bracket_service.h"
 
 #include <QComboBox>
@@ -30,7 +31,7 @@ CommanderBracketWidget::CommanderBracketWidget(QWidget *parent) : QWidget(parent
     bracketInfoButton->setEnabled(false);
 
     bracketRefreshButton = new QToolButton(this);
-    bracketRefreshButton->setIcon(QPixmap("theme:icons/reload"));
+    bracketRefreshButton->setIcon(themePixmap(QStringLiteral("icons/reload")));
     bracketRefreshButton->setAutoRaise(true);
 
     connect(bracketRefreshButton, &QToolButton::clicked, this, &CommanderBracketWidget::requestBracketEstimate);

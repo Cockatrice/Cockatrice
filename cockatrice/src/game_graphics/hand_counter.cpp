@@ -1,5 +1,6 @@
 #include "hand_counter.h"
 
+#include "../interface/pixel_map_generator.h"
 #include "zones/card_zone.h"
 
 #include <QGraphicsSceneMouseEvent>
@@ -32,7 +33,8 @@ void HandCounter::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     QSize translatedSize = painter->combinedTransform().mapRect(boundingRect()).size().toSize();
     QPixmap cachedPixmap;
     if (!QPixmapCache::find("handCounter" + QString::number(translatedSize.width()), &cachedPixmap)) {
-        cachedPixmap = QPixmap("theme:hand").scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        cachedPixmap =
+            themePixmap(QStringLiteral("hand")).scaled(translatedSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         QPixmapCache::insert("handCounter" + QString::number(translatedSize.width()), cachedPixmap);
     }
     resetPainterTransform(painter);

@@ -175,7 +175,15 @@ void PlayerLogic::processPlayerInfo(const ServerInfo_Player &info)
                 const ServerInfo_Card &cardInfo = zoneInfo.card_list(j);
                 auto *card = new CardItem(this);
                 card->processCardInfo(cardInfo);
-                zone->addCard(card, false, cardInfo.x(), cardInfo.y());
+                // Zones without coordinates (hand, piles, stack) preserve the order
+                // they arrive in on the server in the positions of their cards list.
+                // The x coordinate of such cards is always 0, so inserting at it
+                // would reverse the list on reconnect. Append instead.
+                if (zoneInfo.with_coords()) {
+                    zone->addCard(card, false, cardInfo.x(), cardInfo.y());
+                } else {
+                    zone->addCard(card, false, -1);
+                }
             }
         }
         if (zoneInfo.has_always_reveal_top_card()) {

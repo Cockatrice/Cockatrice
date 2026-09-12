@@ -30,6 +30,7 @@
 
 #include <QDateTime>
 #include <QDebug>
+#include <QElapsedTimer>
 #include <QHostAddress>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -39,14 +40,17 @@
 #include <QSqlQuery>
 #include <QString>
 #include <game/server_player.h>
+#include <google/protobuf/descriptor.h>
 #include <iostream>
 #include <libcockatrice/deck_list/deck_list.h>
+#include <libcockatrice/protocol/get_pb_extension.h>
 #include <libcockatrice/protocol/pb/command_deck_del.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_del_dir.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_download.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_list.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_new_dir.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
+#include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_download.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_download_by_game_id.pb.h>
@@ -80,6 +84,7 @@
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response_forgotpasswordrequest.pb.h>
 #include <libcockatrice/protocol/pb/response_get_admin_notes.pb.h>
+#include <libcockatrice/protocol/pb/response_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/response_moderator_last_logins.pb.h>
 #include <libcockatrice/protocol/pb/response_password_salt.pb.h>
 #include <libcockatrice/protocol/pb/response_register.pb.h>
@@ -190,6 +195,77 @@ void AbstractServerSocketInterface::logDebugMessage(const QString &message)
     logger->logMessage(message, this);
 }
 
+void AbstractServerSocketInterface::processCommandContainer(const CommandContainer &cont)
+{
+    QElapsedTimer timer;
+    timer.start();
+    Server_ProtocolHandler::processCommandContainer(cont);
+    const qint64 elapsedMs = timer.nsecsElapsed() / 1000000;
+
+    // The base dispatch is an if/else-if chain — at most one family is
+    // actually processed.  Recording every family in the container would
+    // let an unauthenticated client stampforge developer/moderator/admin
+    // samples by batching them alongside a session command the server
+    // actually runs.  Mirror the base's selection and skip entirely when
+    // deleted or when no family matched.
+    if (deleted) {
+        return;
+    }
+
+    // When getPbExtension returns -1 (no extension set) and the kind is
+    // non-zero, typeIdFor wraps into the previous kind's range instead of
+    // hitting the typeId < 0 guard in observeCommand.  Skip such entries.
+    int kind = -1;
+    if (cont.game_command_size()) {
+        kind = 2;
+    } else if (cont.room_command_size()) {
+        kind = 1;
+    } else if (cont.session_command_size()) {
+        kind = 0;
+    } else if (cont.moderator_command_size()) {
+        kind = 3;
+    } else if (cont.admin_command_size()) {
+        kind = 4;
+    } else if (cont.developer_command_size()) {
+        kind = 5;
+    }
+
+    if (kind >= 0) {
+        auto recordDispatched = [&](int familyKind, const auto &cmds) {
+            for (const auto &cmd : cmds) {
+                const int ext = getPbExtension(cmd);
+                if (ext >= 0) {
+                    servatrice->getMetricsRegistry().observeCommand(MetricsRegistry::typeIdFor(familyKind, ext),
+                                                                    elapsedMs);
+                }
+            }
+        };
+
+        if (kind == 0) {
+            recordDispatched(kind, cont.session_command());
+        } else if (kind == 1) {
+            recordDispatched(kind, cont.room_command());
+        } else if (kind == 2) {
+            recordDispatched(kind, cont.game_command());
+        } else if (kind == 3) {
+            recordDispatched(kind, cont.moderator_command());
+        } else if (kind == 4) {
+            recordDispatched(kind, cont.admin_command());
+        } else {
+            recordDispatched(kind, cont.developer_command());
+        }
+    }
+
+    const int slowCommandMs = servatrice->getMetricsSlowCommandMs();
+    if (slowCommandMs > 0 && elapsedMs >= slowCommandMs) {
+        const ServerInfo_User *info = getUserInfo();
+        const QString user = authState == PasswordRight && info ? QString::fromStdString(info->name())
+                                                                : QStringLiteral("unauthenticated");
+        qCWarning(AbstractServerSocketInterfaceLog) << "slow command container from" << user << "processed in"
+                                                    << elapsedMs << "ms (" << cont.ByteSizeLong() << "bytes)";
+    }
+}
+
 Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionCommand(int cmdType,
                                                                                     const SessionCommand &cmd,
                                                                                     ResponseContainer &rc)
@@ -284,7 +360,7 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedModeratorCo
         case ModeratorCommand::REPORT_RESOLVE:
             return cmdReportResolve(cmd.GetExtension(Command_ReportResolve::ext), rc);
         case ModeratorCommand::VIEWLOG_HISTORY:
-            return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::ext), rc);
+            return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::ext), rc, true);
         case ModeratorCommand::GRANT_REPLAY_ACCESS:
             return cmdGrantReplayAccess(cmd.GetExtension(Command_GrantReplayAccess::ext), rc);
         case ModeratorCommand::REPLAY_DOWNLOAD_BY_GAME_ID:
@@ -332,6 +408,26 @@ AbstractServerSocketInterface::processExtendedAdminCommand(int cmdType, const Ad
             return cmdAdjustMod(cmd.GetExtension(Command_AdjustMod::ext), rc);
         case AdminCommand::RESET_USER_PASSWORD:
             return cmdResetUserPassword(cmd.GetExtension(Command_ResetUserPassword::ext), rc);
+        default:
+            return Response::RespFunctionNotAllowed;
+    }
+}
+
+// DEVELOPER FUNCTIONS.
+// Permission is checked by processDeveloperCommandContainer. Only stats-style
+// queries live here, never community moderation or server administration.
+Response::ResponseCode AbstractServerSocketInterface::processExtendedDeveloperCommand(int cmdType,
+                                                                                      const DeveloperCommand &cmd,
+                                                                                      ResponseContainer &rc)
+{
+    switch ((DeveloperCommand::DeveloperCommandType)cmdType) {
+        case DeveloperCommand::GET_SERVER_STATS:
+            return cmdGetServerStats(cmd.GetExtension(Command_GetServerStats::ext), rc);
+        case DeveloperCommand::VIEWLOG_HISTORY: {
+            // Same query as the moderator log view, carried by the developer
+            // command family, but narrows out private chats and sender IPs.
+            return cmdGetLogHistory(cmd.GetExtension(Command_ViewLogHistory::dev_ext), rc, false);
+        }
         default:
             return Response::RespFunctionNotAllowed;
     }
@@ -1020,12 +1116,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReplaySubmitCode(const 
 // MODERATOR FUNCTIONS.
 // May be called by admins and moderators. Permission is checked by the calling function.
 Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Command_ViewLogHistory &cmd,
-                                                                       ResponseContainer &rc)
+                                                                       ResponseContainer &rc,
+                                                                       bool allowPrivateChat)
 {
 
     QList<ServerInfo_ChatMessage> messageList;
     QString userName = nameFromStdString(cmd.user_name());
-    QString ipAddress = nameFromStdString(cmd.ip_address());
+    QString ipAddress = allowPrivateChat ? nameFromStdString(cmd.ip_address()) : QString();
     QString gameName = nameFromStdString(cmd.game_name());
     QString gameID = nameFromStdString(cmd.game_id());
     QString message = textFromStdString(cmd.message());
@@ -1040,9 +1137,19 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
         if (nameFromStdString(cmd.log_location(i)).simplified() == "game") {
             gameType = true;
         }
-        if (nameFromStdString(cmd.log_location(i)).simplified() == "chat") {
+        if (nameFromStdString(cmd.log_location(i)).simplified() == "chat" && allowPrivateChat) {
             chatType = true;
         }
+    }
+
+    // For callers that must not see private conversations, never leave the
+    // target-type filter empty: if the request only asked for "chat" (or for
+    // nothing at all) the query below would carry no target_type restriction
+    // and would return every row, private messages included. Fall back to the
+    // game/room diagnostics the caller is allowed to see.
+    if (!allowPrivateChat && !gameType && !roomType) {
+        gameType = true;
+        roomType = true;
     }
 
     int dateRange = cmd.date_range();
@@ -1054,7 +1161,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdGetLogHistory(const Com
         QListIterator<ServerInfo_ChatMessage> messageIterator(sqlInterface->getMessageLogHistory(
             userName, ipAddress, gameName, gameID, message, chatType, gameType, roomType, dateRange, maximumResults));
         while (messageIterator.hasNext()) {
-            re->add_log_message()->CopyFrom(messageIterator.next());
+            ServerInfo_ChatMessage chatMessage = messageIterator.next();
+            if (!allowPrivateChat) {
+                chatMessage.clear_sender_ip();
+            }
+            re->add_log_message()->CopyFrom(chatMessage);
         }
     } else {
         ServerInfo_ChatMessage chatMessage;
@@ -1637,6 +1748,79 @@ Response::ResponseCode AbstractServerSocketInterface::cmdReportUserInfo(const Co
                 info->set_assigned_mod_name(recentQuery->value(9).toString().toStdString());
             }
         }
+    }
+
+    rc.setResponseExtension(re);
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdGetServerStats(const Command_GetServerStats & /*cmd */,
+                                                                        ResponseContainer &rc)
+{
+    if (!sqlInterface->checkSql()) {
+        return Response::RespInternalError;
+    }
+
+    // Servatrice::statusUpdate() periodically snapshots server health into the
+    // uptime table. Serve the freshest snapshot for this server.
+    const auto snapshot = sqlInterface->getLatestUptimeSnapshot(servatrice->getServerID());
+    if (!snapshot.valid) {
+        // No snapshot yet (fresh server, or statusUpdate() has not ticked).
+        return Response::RespInternalError;
+    }
+
+    auto *re = new Response_GetServerStats;
+    re->set_users_count(snapshot.usersCount);
+    re->set_mods_count(snapshot.modsCount);
+    re->set_games_count(snapshot.gamesCount);
+    re->set_tx_bytes(snapshot.txBytes);
+    re->set_rx_bytes(snapshot.rxBytes);
+    re->set_uptime_secs(snapshot.uptimeSecs);
+    re->set_timest(snapshot.timest);
+
+    // Live metrics from the in-process MetricsRegistry (resets on server restart)
+    re->set_cards_in_games(static_cast<google::protobuf::uint64>(servatrice->getCardsInGamesTotal()));
+    re->set_eventloop_stalls_total(static_cast<google::protobuf::uint64>(servatrice->getEventLoopStallsTotal()));
+    re->set_eventloop_last_stall_ms(static_cast<google::protobuf::uint64>(servatrice->getEventLoopLastStallMs()));
+    re->set_eventloop_max_stall_ms(static_cast<google::protobuf::uint64>(servatrice->getEventLoopMaxStallMs()));
+    re->set_total_commands(static_cast<google::protobuf::uint64>(servatrice->getMetricsRegistry().totalCommands()));
+    re->set_total_command_time_ms(
+        static_cast<google::protobuf::uint64>(servatrice->getMetricsRegistry().totalTimeMs()));
+    re->set_active_command_types(servatrice->getMetricsRegistry().activeTypeCount());
+
+    const auto gameStart = servatrice->getMetricsRegistry().getGameStartSnapshot();
+    re->set_game_start_count(static_cast<google::protobuf::uint64>(gameStart.count));
+    re->set_game_start_total_ms(static_cast<google::protobuf::uint64>(gameStart.totalMs));
+
+    // Per-command breakdown: resolve protobuf extension names via the descriptor pool
+    static const char *messageNames[] = {"SessionCommand",   "RoomCommand",  "GameCommand",
+                                         "ModeratorCommand", "AdminCommand", "DeveloperCommand"};
+    const auto activeStats = servatrice->getMetricsRegistry().collectActiveStats();
+    for (const auto &stat : activeStats) {
+        const int kind = stat.typeId / MetricsRegistry::KindStride;
+        const int number = stat.typeId % MetricsRegistry::KindStride;
+
+        QString label;
+        if (kind >= 0 && kind < MetricsRegistry::NumKinds) {
+            const google::protobuf::DescriptorPool *pool = google::protobuf::DescriptorPool::generated_pool();
+            const google::protobuf::Descriptor *message = pool->FindMessageTypeByName(messageNames[kind]);
+            const google::protobuf::FieldDescriptor *extension =
+                message ? pool->FindExtensionByNumber(message, number) : nullptr;
+            if (extension) {
+                label = QString::fromLatin1(MetricsRegistry::KindNames[kind]) + QStringLiteral("/") +
+                        QString::fromStdString(std::string(extension->message_type()->name()));
+            }
+        }
+        if (label.isEmpty()) {
+            label = QString::number(stat.typeId);
+        }
+
+        CommandStats *cs = re->add_command_stats();
+        cs->set_kind_index(static_cast<google::protobuf::uint32>(kind));
+        cs->set_extension_number(static_cast<google::protobuf::uint32>(number));
+        cs->set_command_name(label.toStdString());
+        cs->set_count(static_cast<google::protobuf::uint64>(stat.count));
+        cs->set_total_ms(static_cast<google::protobuf::uint64>(stat.totalMs));
     }
 
     rc.setResponseExtension(re);
@@ -3215,7 +3399,7 @@ bool AbstractServerSocketInterface::removeAdminFlagFromUser(const QString &userN
     if (user) {
         Event_ConnectionClosed event;
         event.set_reason(Event_ConnectionClosed::DEMOTED);
-        event.set_reason_str("Your moderator and/or judge status has been revoked.");
+        event.set_reason_str("Your moderator, judge, and/or developer status has been revoked.");
         event.set_end_time(QDateTime::currentDateTime().toSecsSinceEpoch());
 
         SessionEvent *se = user->prepareSessionEvent(event);
@@ -3252,6 +3436,18 @@ Response::ResponseCode AbstractServerSocketInterface::cmdAdjustMod(const Command
             }
         } else {
             if (!removeAdminFlagFromUser(userName, 4)) {
+                return Response::RespInternalError;
+            }
+        }
+    }
+
+    if (cmd.has_should_be_developer()) {
+        if (cmd.should_be_developer()) {
+            if (!addAdminFlagToUser(userName, 8)) {
+                return Response::RespInternalError;
+            }
+        } else {
+            if (!removeAdminFlagFromUser(userName, 8)) {
                 return Response::RespInternalError;
             }
         }

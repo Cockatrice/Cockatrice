@@ -153,7 +153,7 @@ public:
     void eventCreateCounter(const Event_CreateCounter &event);
 
     /// Set a player-level counter value.
-    void eventSetCounter(const Event_SetCounter &event);
+    void eventSetCounter(const Event_SetCounter &event, EventProcessingOptions options);
 
     /// Delete a player-level counter.
     void eventDelCounter(const Event_DelCounter &event);

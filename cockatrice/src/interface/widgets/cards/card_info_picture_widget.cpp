@@ -5,6 +5,7 @@
 #include "../../../interface/card_picture_loader/card_picture_loader.h"
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
 #include "../../window_main.h"
+#include "card_art_utils.h"
 
 #include <QMenu>
 #include <QMouseEvent>
@@ -193,12 +194,7 @@ void CardInfoPictureWidget::paintEvent(QPaintEvent *event)
 
     QPixmap transformedPixmap = resizedPixmap; // Default pixmap
     if (SettingsCache::instance().cardsDisplay().getAutoRotateSidewaysLayoutCards()) {
-        if (exactCard.getInfo().getUiAttributes().landscapeOrientation) {
-            // Rotate pixmap 90 degrees to the left
-            QTransform transform;
-            transform.rotate(90);
-            transformedPixmap = resizedPixmap.transformed(transform, Qt::SmoothTransformation);
-        }
+        transformedPixmap = CardArtUtils::rotateSidewaysLayoutArt(resizedPixmap, exactCard);
     }
 
     // Handle DPI scaling

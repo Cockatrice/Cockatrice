@@ -4,6 +4,7 @@
 #include "../../../main.h"
 #include "../../deck_loader/deck_loader.h"
 #include "../../layouts/overlap_layout.h"
+#include "../../pixel_map_generator.h"
 #include "../cards/card_info_picture_with_text_overlay_widget.h"
 #include "../cards/deck_card_zone_display_widget.h"
 #include "../general/layout_containers/flow_widget.h"
@@ -131,7 +132,7 @@ void VisualDeckEditorWidget::initializeSearchBarAndCompleter()
 
     // Search button functionality
     searchPushButton = new CompactPushButton(searchContainer);
-    searchPushButton->setButtonIcon(QPixmap("theme:icons/search"));
+    searchPushButton->setButtonIcon(themePixmap(QStringLiteral("icons/search")));
     connect(searchPushButton, &QPushButton::clicked, this, [=, this]() {
         ExactCard card = CardDatabaseManager::query()->getCard({searchBar->text()});
         if (card) {
