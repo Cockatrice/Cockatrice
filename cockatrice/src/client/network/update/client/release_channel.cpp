@@ -10,6 +10,7 @@
 #include <QRegularExpression>
 #include <QSysInfo>
 #include <QtGlobal>
+#include <optional>
 
 #if defined(Q_OS_MACOS)
 #include <sys/sysctl.h>
@@ -43,55 +44,90 @@ void ReleaseChannel::checkForUpdates()
     connect(response, &QNetworkReply::finished, this, &ReleaseChannel::releaseListFinished);
 }
 
-// Different release channel checking functions for different operating systems
-bool ReleaseChannel::downloadMatchesCurrentOS(const QString &fileName)
+// Find assets compatible with host platform (Linux is not supported by in-client updater)
+std::optional<int> ReleaseChannel::getTargetVersionForCurrentOS(const QString &fileName)
 {
-#if defined(Q_OS_MACOS)
-    static QRegularExpression version_regex("macOS(\\d+)");
-    auto match = version_regex.match(fileName);
-    if (!match.hasMatch()) {
-        return false;
+    const QRegularExpression *regex = nullptr;
+
+    static const std::optional<int> systemVersion = [] {
+        bool ok = false;
+        const QString versionString = QSysInfo::productVersion();
+        const int version = versionString.split('.').first().toInt(&ok);
+        if (!ok) {
+            qCWarning(ReleaseChannelLog) << "Unable to determine OS version from" << versionString;
+            return std::optional<int>();
+        }
+        return std::optional<int>{version};
+    }();
+
+    if (!systemVersion) {
+        return std::nullopt;
     }
 
-    auto getSystemVersion = [] {
+#if defined(Q_OS_MACOS)
+    static const bool isIntel = [] {
         // QSysInfo does not go through translation layers
         // We need to use sysctl to reliably detect the underlying architecture
         char arch[255];
         size_t len = sizeof(arch);
         if (sysctlbyname("machdep.cpu.brand_string", arch, &len, nullptr, 0) == 0) {
-            // Intel mac is only supported on macOS 13 versions
-            if (QString::fromUtf8(arch).contains("Intel")) {
-                return 13;
-            }
+            return QString::fromUtf8(arch).contains("Intel");
         }
+        return false;
+    }();
 
-        return QSysInfo::productVersion().split(".")[0].toInt();
-    };
-
-    // older(smaller) releases are compatible with a newer or the same system version
-    int sys_maj = getSystemVersion();
-    int rel_maj = match.captured(1).toInt();
-    return rel_maj == sys_maj;
+    // Apple (ARM) --> Cockatrice-3.0.0-macOS15.dmg
+    // Apple (x86) --> Cockatrice-3.0.0-macOS15_Intel.dmg
+    static const QRegularExpression macIntelRegex(R"(-macOS(\d+)_Intel\.[^.]+$)",
+                                                  QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression macRegex(R"(-macOS(\d+)\.[^.]+$)", QRegularExpression::CaseInsensitiveOption);
+    regex = isIntel ? &macIntelRegex : &macRegex;
 
 #elif defined(Q_OS_WIN)
-#if Q_PROCESSOR_WORDSIZE == 4
-    return fileName.contains("32bit");
-#elif Q_PROCESSOR_WORDSIZE == 8
-    const QString &version = QSysInfo::productVersion();
-    if (version.startsWith("7") || version.startsWith("8")) {
-        return fileName.contains("Win7");
-    } else {
-        return fileName.contains("Win10");
-    }
-#else
+    // Windows (x86) --> Cockatrice-3.0.0-Windows10.exe
+    static const QRegularExpression winRegex(R"(-(?:Win|Windows)(\d+)\.[^.]+$)",
+                                             QRegularExpression::CaseInsensitiveOption);
+    regex = &winRegex;
+
+#else // if the OS doesn't fit one of the above #defines, then it will never match
     Q_UNUSED(fileName);
-    return false;
+    return std::nullopt;
 #endif
 
-#else // If the OS doesn't fit one of the above #defines, then it will never match
-    Q_UNUSED(fileName);
-    return false;
-#endif
+    // Any asset targeting an OS version up to the current host version works
+    auto match = regex->match(fileName);
+    if (!match.hasMatch()) {
+        return std::nullopt;
+    }
+    const int targetVersion = match.captured(1).toInt();
+    if (targetVersion > *systemVersion) {
+        return std::nullopt;
+    }
+    return targetVersion;
+}
+
+// Pick newest targeted version (highest number) amongst all compatible ones
+QString ReleaseChannel::findBestDownloadUrl(const QVariantList &assets)
+{
+    QString bestUrl;
+    int bestVersion = -1;
+    for (const auto &rawAsset : assets) {
+        QVariantMap asset = rawAsset.toMap();
+        QString name = asset["name"].toString();
+        QString url = asset["browser_download_url"].toString();
+        auto version = getTargetVersionForCurrentOS(name);
+        if (!version) {
+            continue;
+        }
+        if (*version > bestVersion) {
+            bestVersion = *version;
+            bestUrl = url;
+        }
+    }
+    if (!bestUrl.isEmpty()) {
+        qCInfo(ReleaseChannelLog) << "Best compatible asset=" << bestUrl;
+    }
+    return bestUrl;
 }
 
 QString StableReleaseChannel::getManualDownloadUrl() const
@@ -138,16 +174,9 @@ void StableReleaseChannel::releaseListFinished()
     lastRelease->setPublishDate(resultMap["published_at"].toDate());
 
     if (resultMap.contains("assets")) {
-        auto rawAssets = resultMap["assets"].toList();
-        for (const auto &rawAsset : rawAssets) {
-            QVariantMap asset = rawAsset.toMap();
-            QString name = asset["name"].toString();
-            QString url = asset["browser_download_url"].toString();
-
-            if (downloadMatchesCurrentOS(name)) {
-                lastRelease->setDownloadUrl(url);
-                break;
-            }
+        auto url = findBestDownloadUrl(resultMap["assets"].toList());
+        if (!url.isEmpty()) {
+            lastRelease->setDownloadUrl(url);
         }
     }
 
@@ -289,21 +318,10 @@ void BetaReleaseChannel::fileListFinished()
     bool needToUpdate = (QString::compare(shortHash, myHash, Qt::CaseInsensitive) != 0);
     bool compatibleVersion = false;
 
-    QStringList resultUrlList{};
-    for (QVariant file : resultList) {
-        QVariantMap map = file.toMap();
-        resultUrlList << map["browser_download_url"].toString();
-    }
-
-    resultUrlList.sort();
-    // iterate in reverse so the first item is the latest os version
-    for (auto url = resultUrlList.rbegin(); url < resultUrlList.rend(); ++url) {
-        if (downloadMatchesCurrentOS(*url)) {
-            compatibleVersion = true;
-            lastRelease->setDownloadUrl(*url);
-            qCInfo(ReleaseChannelLog) << "Found compatible version url=" << *url;
-            break;
-        }
+    QString downloadUrl = findBestDownloadUrl(resultList);
+    if (!downloadUrl.isEmpty()) {
+        compatibleVersion = true;
+        lastRelease->setDownloadUrl(downloadUrl);
     }
 
     emit finishedCheck(needToUpdate, compatibleVersion, lastRelease);

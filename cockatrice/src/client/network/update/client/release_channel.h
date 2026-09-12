@@ -12,6 +12,7 @@
 #include <QObject>
 #include <QString>
 #include <QVariantMap>
+#include <optional>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(ReleaseChannelLog, "release_channel");
@@ -96,7 +97,8 @@ protected:
     Release *lastRelease;
 
 protected:
-    static bool downloadMatchesCurrentOS(const QString &fileName);
+    static std::optional<int> getTargetVersionForCurrentOS(const QString &fileName);
+    static QString findBestDownloadUrl(const QVariantList &assets);
     [[nodiscard]] virtual QString getReleaseChannelUrl() const = 0;
 
 public:
