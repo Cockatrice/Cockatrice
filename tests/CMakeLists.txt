@@ -121,7 +121,7 @@ target_link_libraries(
   latency_tracker_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST}
 )
 target_include_directories(metrics_registry_test PRIVATE ${CMAKE_SOURCE_DIR}/servatrice/src)
-target_link_libraries(metrics_registry_test ${TEST_QT_MODULES} Threads::Threads ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(metrics_registry_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${QT_MODULES_TEST})
 
 add_subdirectory(card_zone_algorithms)
 add_subdirectory(carddatabase)
