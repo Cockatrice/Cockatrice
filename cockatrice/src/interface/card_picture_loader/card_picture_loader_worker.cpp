@@ -17,8 +17,10 @@
 #include <version_string.h>
 
 static constexpr int MAX_REQUESTS_PER_SEC = 10;
-static constexpr int MIN_HOST_QUOTA = 1;          ///< Floor for the per-host request allowance
-static constexpr qint64 QUOTA_RECOVER_MS = 60000; ///< Idle time before a reduced quota starts recovering
+static constexpr int MIN_HOST_QUOTA = 1;                ///< Floor for the per-host request allowance
+static constexpr qint64 QUOTA_RECOVER_MS = 60000;       ///< Idle time before a reduced quota starts recovering
+static constexpr int DISPATCH_INTERVAL_MS = 100;        ///< Pacing between individual network requests
+static constexpr qint64 QUOTA_RESET_INTERVAL_MS = 1000; ///< Interval at which the request quota resets
 
 CardPictureLoaderWorker::CardPictureLoaderWorker()
     : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload()),
@@ -60,11 +62,18 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     pictureLoaderThread->start(QThread::LowPriority);
     moveToThread(pictureLoaderThread);
 
+    // QTimer value members are not QObject children, so moveToThread on the worker doesn't move
+    // them. They must live in the worker's thread to be started from the slot code that runs there.
+    requestTimer.moveToThread(pictureLoaderThread);
+    dispatchTimer.moveToThread(pictureLoaderThread);
+
     connect(this, &CardPictureLoaderWorker::imageLoadEnqueued, this, &CardPictureLoaderWorker::handleImageLoadEnqueued);
 
     connect(&requestTimer, &QTimer::timeout, this, &CardPictureLoaderWorker::resetRequestQuota);
-    requestTimer.setInterval(1000);
-    requestTimer.start();
+    requestTimer.setInterval(static_cast<int>(QUOTA_RESET_INTERVAL_MS));
+
+    connect(&dispatchTimer, &QTimer::timeout, this, &CardPictureLoaderWorker::dispatchQueuedRequest);
+    dispatchTimer.setInterval(DISPATCH_INTERVAL_MS);
 }
 
 CardPictureLoaderWorker::~CardPictureLoaderWorker()
@@ -147,8 +156,29 @@ void CardPictureLoaderWorker::resetRequestQuota()
 
 void CardPictureLoaderWorker::processQueuedRequests()
 {
-    while (requestQuota > 0 && processSingleRequest()) {
+    if (requestLoadQueue.isEmpty()) {
+        dispatchTimer.stop();
+        return;
+    }
+    // Start lazily from the worker's own thread: QTimer must be started in the thread it lives in.
+    if (!requestTimer.isActive()) {
+        requestTimer.start();
+    }
+    dispatchTimer.start();
+}
+
+void CardPictureLoaderWorker::dispatchQueuedRequest()
+{
+    if (requestLoadQueue.isEmpty() || requestQuota <= 0) {
+        dispatchTimer.stop();
+        return;
+    }
+
+    if (processSingleRequest()) {
         --requestQuota;
+    } else {
+        // No queued host currently has allowance left in this second; wait for the quota reset.
+        dispatchTimer.stop();
     }
 }
 
