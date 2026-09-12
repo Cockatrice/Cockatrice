@@ -10,11 +10,16 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QSet>
 #include <QToolBar>
+#include <QUrl>
+#include <algorithm>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/utility/macros.h>
+
+static constexpr int UNLOCKED_HOST_LIMIT_MAX = 50; ///< Upper bound for hosts unlocked by the developer
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
@@ -96,6 +101,53 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
             &DownloadSettings::setDownloadSpoilerStatus);
     connect(&mcDownloadSpoilersCheckBox, &QCheckBox::toggled, this, &DeckEditorSettingsPage::setSpoilersEnabled);
 
+    // Per-host request limit group: one spinbox per known picture host. A spinbox at its
+    // lower bound (0 for unlocked hosts, the developer cap for capped hosts) means "follow
+    // the developer default"; the worker clamps any explicit value against the developer cap.
+    mpRequestLimitGroupBox = new QGroupBox;
+    auto *requestLimitLayout = new QGridLayout;
+
+    const QHash<QString, int> &devCaps = DownloadSettings::getDeveloperHostCaps();
+    const QHash<QString, int> userLimits = SettingsCache::instance().downloads().getHostRequestLimits();
+
+    QSet<QString> hosts;
+    for (const QString &urlTemplate : SettingsCache::instance().downloads().getAllURLs()) {
+        hosts.insert(QUrl(urlTemplate).host());
+    }
+    const QList<QString> devHosts = devCaps.keys();
+    for (const QString &devHost : devHosts) {
+        hosts.insert(devHost);
+    }
+
+    QList<QString> sortedHosts(hosts.cbegin(), hosts.cend());
+    std::sort(sortedHosts.begin(), sortedHosts.end(),
+              [](const QString &a, const QString &b) { return a.localeAwareCompare(b) < 0; });
+
+    int hostRow = 1;
+    for (const QString &host : sortedHosts) {
+        const int devCap = devCaps.value(host, DownloadSettings::DEFAULT_HOST_REQUEST_LIMIT);
+        const bool unlocked = devCap == DownloadSettings::UNLIMITED_HOST_QUOTA;
+
+        auto *hostLabel = new QLabel(host);
+        auto *spinBox = new QSpinBox;
+        if (unlocked) {
+            spinBox->setRange(0, UNLOCKED_HOST_LIMIT_MAX); // 0 means "unlimited"
+            spinBox->setValue(userLimits.value(host, 0));
+        } else {
+            spinBox->setRange(DownloadSettings::MIN_HOST_REQUEST_LIMIT, devCap);
+            spinBox->setValue(userLimits.value(host, devCap));
+        }
+        connect(spinBox, &QSpinBox::valueChanged, this, &DeckEditorSettingsPage::storeRequestLimits);
+
+        requestLimitLayout->addWidget(hostLabel, hostRow, 0);
+        requestLimitLayout->addWidget(spinBox, hostRow, 1);
+        requestLimitSpinBoxes.insert(host, spinBox);
+        ++hostRow;
+    }
+
+    requestLimitLayout->addWidget(&requestLimitHelpLabel, hostRow, 0, 1, 2);
+    mpRequestLimitGroupBox->setLayout(requestLimitLayout);
+
     mpGeneralGroupBox = new QGroupBox;
     mpGeneralGroupBox->setLayout(lpGeneralGrid);
 
@@ -104,6 +156,7 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
 
     auto *lpMainLayout = new QVBoxLayout;
     lpMainLayout->addWidget(mpGeneralGroupBox);
+    lpMainLayout->addWidget(mpRequestLimitGroupBox);
     lpMainLayout->addWidget(mpSpoilerGroupBox);
 
     setLayout(lpMainLayout);
@@ -162,6 +215,24 @@ void DeckEditorSettingsPage::storeSettings()
         downloadUrls << urlList->item(i)->text();
     }
     SettingsCache::instance().downloads().setDownloadUrls(downloadUrls);
+}
+
+void DeckEditorSettingsPage::storeRequestLimits()
+{
+    QHash<QString, int> stored;
+    const QHash<QString, int> &devCaps = DownloadSettings::getDeveloperHostCaps();
+    for (auto it = requestLimitSpinBoxes.cbegin(); it != requestLimitSpinBoxes.cend(); ++it) {
+        const QString host = it.key();
+        const int value = it.value()->value();
+        const int devCap = devCaps.value(host, DownloadSettings::DEFAULT_HOST_REQUEST_LIMIT);
+        // Only values that differ from the developer default are persisted; the worker
+        // treats a missing entry as "follow the developer default".
+        const int developerDefault = devCap == DownloadSettings::UNLIMITED_HOST_QUOTA ? 0 : devCap;
+        if (value != developerDefault) {
+            stored.insert(host, value);
+        }
+    }
+    SettingsCache::instance().downloads().setHostRequestLimits(stored);
 }
 
 void DeckEditorSettingsPage::urlListChanged(const QModelIndex &, int, int, const QModelIndex &, int)
@@ -230,6 +301,9 @@ void DeckEditorSettingsPage::setSpoilersEnabled(bool anInput)
 void DeckEditorSettingsPage::retranslateUi()
 {
     mpGeneralGroupBox->setTitle(tr("URL Download Priority"));
+    mpRequestLimitGroupBox->setTitle(tr("Per-Host Request Limit"));
+    requestLimitHelpLabel.setText(tr("Pictures per second per host. Hosts can be lowered below their developer "
+                                     "limit but never raised above it; 0 means the host is not throttled per host."));
     mpSpoilerGroupBox->setTitle(tr("Spoilers"));
     mcDownloadSpoilersCheckBox.setText(tr("Download Spoilers Automatically"));
     mcSpoilerSaveLabel.setText(tr("Spoiler Location:"));

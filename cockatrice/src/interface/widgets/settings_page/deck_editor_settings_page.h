@@ -5,9 +5,11 @@
 
 #include <QCheckBox>
 #include <QGroupBox>
+#include <QHash>
 #include <QLabel>
 #include <QListWidget>
 #include <QPushButton>
+#include <QSpinBox>
 
 class DeckEditorSettingsPage : public AbstractSettingsPage
 {
@@ -19,6 +21,7 @@ public:
 
 private slots:
     void storeSettings();
+    void storeRequestLimits();
     void urlListChanged(const QModelIndex &, int, int, const QModelIndex &, int);
     void setSpoilersEnabled(bool);
     void spoilerPathButtonClicked();
@@ -39,6 +42,10 @@ private:
     QLabel msDownloadSpoilersLabel;
     QGroupBox *mpGeneralGroupBox;
     QGroupBox *mpSpoilerGroupBox;
+
+    QGroupBox *mpRequestLimitGroupBox;
+    QLabel requestLimitHelpLabel;
+    QHash<QString, QSpinBox *> requestLimitSpinBoxes;
 
     QLineEdit *mpSpoilerSavePathLineEdit;
     QLabel mcSpoilerSaveLabel;
