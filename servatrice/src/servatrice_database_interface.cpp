@@ -12,6 +12,7 @@
 #include <QLoggingCategory>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QStringList>
 #include <libcockatrice/deck_list/deck_list.h>
 #include <libcockatrice/protocol/pb/game_replay.pb.h>
 #include <libcockatrice/protocol/pb/serverinfo_user.pb.h>
@@ -98,10 +99,41 @@ bool Servatrice_DatabaseInterface::openDatabase()
         return false;
     }
 
+    if (isStrictModeEnabled()) {
+        qCCritical(DatabaseInterfaceLog) << poolStr
+                                         << "Error opening database: MySQL/MariaDB strict mode is enabled, which "
+                                            "breaks most Servatrice database operations. Please disable strict mode "
+                                            "by removing STRICT_TRANS_TABLES and STRICT_ALL_TABLES from sql_mode, "
+                                            "for example by adding 'sql_mode=NO_ENGINE_SUBSTITUTION' under [mysqld] "
+                                            "in your my.cnf (or my.ini on Windows) and restarting the database "
+                                            "server.";
+        return false;
+    }
+
     // reset all prepared statements
     qDeleteAll(preparedStatements);
     preparedStatements.clear();
     return true;
+}
+
+bool Servatrice_DatabaseInterface::isStrictModeEnabled() const
+{
+    if (sqlDatabase.driverName() != "QMYSQL") {
+        return false;
+    }
+
+    QSqlQuery query(sqlDatabase);
+    if (!query.exec("SELECT @@GLOBAL.sql_mode")) {
+        return false;
+    }
+
+    const QStringList modes = query.next() ? query.value(0).toString().split(',') : QStringList();
+    for (const QString &mode : modes) {
+        if (mode.trimmed() == "STRICT_TRANS_TABLES" || mode.trimmed() == "STRICT_ALL_TABLES") {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Servatrice_DatabaseInterface::checkSql()
