@@ -54,7 +54,7 @@ using ScanProgressCallback = std::function<void(qsizetype bytesRead, qsizetype t
  * @brief Scans a full MTGJSON document without materializing the JSON tree.
  *
  * Splits the top-level "data" object into per-set byte ranges and reads each
- * set's metadata directly from the raw bytes. The oracle importer can then
+ * set's metadata directly from the raw bytes. The Oracle importer can then
  * parse one set at a time during import, keeping peak memory far below a single
  * QJsonDocument::fromJson() over the whole file.
  *

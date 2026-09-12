@@ -224,7 +224,7 @@ QStringMap &ThemeManager::getAvailableThemes()
         }
     }
 
-    // load themes from cockatrice system dir
+    // Load themes from Cockatrice system dir
     dir.setPath(systemThemesBasePath());
 
     for (QString themeName : dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)) {

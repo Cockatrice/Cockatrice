@@ -796,7 +796,7 @@ void SaveSetsPage::retranslateUi()
 {
     setTitle(tr("Sets imported"));
     if (wizard()->downloadedPlainXml) {
-        setSubTitle(tr("A cockatrice database file of %1 MB has been downloaded.")
+        setSubTitle(tr("A Cockatrice card database file of %1 MB has been downloaded.")
                         .arg(qRound(wizard()->xmlData.size() / 1000000.0)));
     } else {
         setSubTitle(tr("The following sets have been found:"));

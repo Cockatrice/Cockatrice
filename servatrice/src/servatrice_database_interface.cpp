@@ -86,9 +86,10 @@ bool Servatrice_DatabaseInterface::openDatabase()
                                              << dbversion << "to version" << expectedversion;
             return false;
         } else if (dbversion > expectedversion) {
-            qCCritical(DatabaseInterfaceLog) << poolStr << "Error opening database: the database schema version"
-                                             << dbversion << "is too new, you need to update servatrice"
-                                             << "(this servatrice actually uses version" << expectedversion << ")";
+            qCCritical(DatabaseInterfaceLog)
+                << poolStr << "Error opening database: the database schema version" << dbversion
+                << "is too new, you need to update Servatrice" << "(Currently running Servatrice actually uses version"
+                << expectedversion << ")";
             return false;
         }
     } else {
