@@ -11,10 +11,13 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QToolBar>
+#include <QUrl>
 #include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/utility/macros.h>
+
+static constexpr int UNLOCKED_HOST_LIMIT_MAX = 50; ///< Upper bound for rate limits on hosts unlocked by the developer
 
 DeckEditorSettingsPage::DeckEditorSettingsPage()
 {
@@ -65,11 +68,16 @@ DeckEditorSettingsPage::DeckEditorSettingsPage()
     aRemove->setIcon(themePixmap(QStringLiteral("icons/decrement")));
     connect(aRemove, &QAction::triggered, this, &DeckEditorSettingsPage::actRemoveURL);
 
+    aRateLimit = new QAction(this);
+    aRateLimit->setIcon(themePixmap(QStringLiteral("icons/cogwheel")));
+    connect(aRateLimit, &QAction::triggered, this, &DeckEditorSettingsPage::actAdjustRateLimit);
+
     auto *urlToolBar = new QToolBar;
     urlToolBar->setOrientation(Qt::Vertical);
     urlToolBar->addAction(aAdd);
     urlToolBar->addAction(aRemove);
     urlToolBar->addAction(aEdit);
+    urlToolBar->addAction(aRateLimit);
     urlToolBar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
     auto *urlListLayout = new QHBoxLayout;
@@ -164,6 +172,54 @@ void DeckEditorSettingsPage::storeSettings()
     SettingsCache::instance().downloads().setDownloadUrls(downloadUrls);
 }
 
+void DeckEditorSettingsPage::actAdjustRateLimit()
+{
+    if (urlList->currentItem() == nullptr) {
+        QMessageBox::information(this, tr("Adjust Rate Limit"), tr("Select a URL in the list first."));
+        return;
+    }
+
+    const QString host = QUrl(urlList->currentItem()->text()).host();
+    if (host.isEmpty()) {
+        QMessageBox::information(this, tr("Adjust Rate Limit"), tr("The selected URL does not have a valid host."));
+        return;
+    }
+
+    const QHash<QString, int> &devCaps = DownloadSettings::getDeveloperHostCaps();
+    const QHash<QString, int> currentLimits = SettingsCache::instance().downloads().getHostRequestLimits();
+    const int devCap = devCaps.value(host, DownloadSettings::DEFAULT_HOST_REQUEST_LIMIT);
+    const bool unlocked = devCap == DownloadSettings::UNLIMITED_HOST_QUOTA;
+
+    bool ok = false;
+    int minimum;
+    int maximum;
+    int defaultValue;
+    if (unlocked) {
+        minimum = 0; // 0 means "unlimited"
+        maximum = UNLOCKED_HOST_LIMIT_MAX;
+        defaultValue = currentLimits.value(host, 0);
+    } else {
+        minimum = DownloadSettings::MIN_HOST_REQUEST_LIMIT;
+        maximum = devCap;
+        defaultValue = currentLimits.value(host, devCap);
+    }
+
+    const int value = QInputDialog::getInt(this, tr("Adjust Rate Limit for %1").arg(host),
+                                           tr("Requests per second (developer maximum is %1):").arg(maximum),
+                                           defaultValue, minimum, maximum, 1, &ok);
+    if (!ok) {
+        return;
+    }
+
+    QHash<QString, int> limits = currentLimits;
+    if (unlocked ? value == 0 : value == devCap) {
+        limits.remove(host);
+    } else {
+        limits.insert(host, value);
+    }
+    SettingsCache::instance().downloads().setHostRequestLimits(limits);
+}
+
 void DeckEditorSettingsPage::urlListChanged(const QModelIndex &, int, int, const QModelIndex &, int)
 {
     storeSettings();
@@ -244,4 +300,5 @@ void DeckEditorSettingsPage::retranslateUi()
     aAdd->setText(tr("Add New URL"));
     aEdit->setText(tr("Edit URL"));
     aRemove->setText(tr("Remove URL"));
+    aRateLimit->setText(tr("Adjust Rate Limit"));
 }
