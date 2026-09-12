@@ -334,6 +334,38 @@ TEST_F(SettingsDefaultsTest, Download_DownloadSpoilersStatus_Default)
     ASSERT_EQ(s.getDownloadSpoilersStatus(), false);
 }
 
+TEST_F(SettingsDefaultsTest, Download_HostRequestLimits_Default)
+{
+    DownloadSettings s(settingsPath, nullptr);
+    ASSERT_TRUE(s.getHostRequestLimits().isEmpty());
+}
+
+TEST_F(SettingsDefaultsTest, Download_HostRequestLimits_SetAndGet)
+{
+    DownloadSettings s(settingsPath, nullptr);
+    s.setHostRequestLimits({{"api.scryfall.com", 5}});
+    const QHash<QString, int> limits = s.getHostRequestLimits();
+    ASSERT_EQ(limits.size(), 1);
+    ASSERT_EQ(limits.value("api.scryfall.com"), 5);
+}
+
+TEST_F(SettingsDefaultsTest, Download_HostRequestLimits_StackedHostCaps)
+{
+    DownloadSettings s(settingsPath, nullptr);
+    // The developer cap for the Scryfall API lowers the ceiling to 9; a user can
+    // reduce it further but can never raise it above the cap.
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 9), 9);
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 20), 9);
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 5), 5);
+    ASSERT_EQ(s.clampHostRequestLimit("api.scryfall.com", 0), 1);
+    // Hosts without a developer cap fall back to the global default ceiling.
+    ASSERT_EQ(s.clampHostRequestLimit("gatherer.wizards.com", 10), 10);
+    ASSERT_EQ(s.clampHostRequestLimit("gatherer.wizards.com", 20), 10);
+    // The Scryfall CDN is unlocked: no upper bound (values are only floored).
+    ASSERT_EQ(s.clampHostRequestLimit("cards.scryfall.io", 20), 20);
+    ASSERT_EQ(s.clampHostRequestLimit("cards.scryfall.io", 0), 1);
+}
+
 // --- AppearanceSettings ---
 
 TEST_F(SettingsDefaultsTest, Appearance_ThemeName_Default)
