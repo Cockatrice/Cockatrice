@@ -24,6 +24,7 @@ private:
     QAction *aTallyNone = nullptr;
     QAction *aTallySubtypes = nullptr;
     QAction *aTallyTotalPower = nullptr;
+    QAction *aTallyTotalToughness = nullptr;
 
     QAction *createTallyAction(TallyType tallyType);
 };

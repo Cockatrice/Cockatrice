@@ -234,9 +234,11 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     const auto &lhsUserLevelFlags = UserLevelFlags(data(0, Qt::UserRole).toInt());
     const auto &rhsUserLevelFlags = UserLevelFlags(other.data(0, Qt::UserRole).toInt());
 
-    // Admins & Mods need no additional comparison checks, just to see if they're an admin or a moderator
+    // Admins, Developers & Mods need no additional comparison checks, just to see if they're an admin, a developer
+    // or a moderator
     static const QList<ServerInfo_User_UserLevelFlag> userLevelWithNoOtherPrefOrder = {
-        ServerInfo_User_UserLevelFlag_IsAdmin, ServerInfo_User_UserLevelFlag_IsModerator};
+        ServerInfo_User_UserLevelFlag_IsAdmin, ServerInfo_User_UserLevelFlag_IsDeveloper,
+        ServerInfo_User_UserLevelFlag_IsModerator};
     for (const auto &userLevelEntry : userLevelWithNoOtherPrefOrder) {
         if (lhsUserLevelFlags.testFlag(userLevelEntry) &&
             lhsUserLevelFlags.testFlag(userLevelEntry) == rhsUserLevelFlags.testFlag(userLevelEntry)) {
@@ -344,6 +346,11 @@ UserListWidget::UserListWidget(TabSupervisor *_tabSupervisor,
         userInfoPopup = new UserInfoPopup(tabSupervisor, tabSupervisor->getClient(), &avatarProvider->cache(),
                                           &cardArtProvider->cache(), &cardArtParamsMap,
                                           window()); // parented to main window so it floats above siblings
+
+        // The invite availability is scoped to the room this list belongs to,
+        // and gated on the room's buddy-only setting for the hovered user.
+        userInfoPopup->setGameInviteAvailable(
+            [this](const QString &userName) { return userContextMenu->hasGameInviteLink(userName); });
 
         userInfoPopup->hide();
         userInfoPopup->setWindowOpacity(0.0);
@@ -662,6 +669,8 @@ void UserListWidget::connectPopupSignals()
 
     // Wire all action signals to UserContextMenu::exec*()
     connect(userInfoPopup, &UserInfoPopup::chatRequested, userContextMenu, &UserContextMenu::execChat);
+    connect(userInfoPopup, &UserInfoPopup::inviteRequested, this,
+            [this](const QString &userName) { userContextMenu->execInvite(userName); });
     connect(userInfoPopup, &UserInfoPopup::detailsRequested, userContextMenu, &UserContextMenu::execDetails);
     connect(userInfoPopup, &UserInfoPopup::showGamesRequested, userContextMenu, &UserContextMenu::execShowGames);
     connect(userInfoPopup, &UserInfoPopup::addBuddyRequested, userContextMenu, &UserContextMenu::execAddToBuddy);

@@ -87,6 +87,20 @@ public:
     // Load/save per-scheme palette colors
     static PaletteConfig loadPaletteConfig(const QString &themeDirPath, const QString &colorScheme);
     static bool savePaletteConfig(const QString &themeDirPath, const QString &colorScheme, const PaletteConfig &cfg);
+    // Resolve prefix to a scheme-qualified "theme:" path. Existence is probed
+    // internally across the formats themes may ship (.png/.jpg/.svg), so
+    // callers load the returned path directly. Prefers "<prefix>-<dark|light>"
+    // when a file exists at that stem, otherwise the plain "<prefix>" as the
+    // super fallback. The resolved scheme covers explicit light/dark as well
+    // as OS-resolved "system". Returns the path with its file extension when a
+    // match is found; unqualified assets keep working unchanged.
+    QString assetPath(QStringView prefix) const;
+    // Like assetPath, but resolves only the scheme-qualified variant
+    // ("<prefix>-<dark|light>.<ext>") and returns an empty string when no
+    // variant exists — it never falls back to the plain "<prefix>" asset.
+    // Callers that must distinguish "no authored variant" (e.g. to keep a
+    // legacy runtime fallback alive) should use this instead of assetPath.
+    QString schemeVariantPath(QStringView prefix) const;
     // Load the theme's shipped default palette, falling back to the system
     // theme directory when it is absent from the resolved (user) directory.
     static PaletteConfig

@@ -23,11 +23,12 @@ set(oracle_SOURCES
     src/pages.cpp
     src/pagetemplates.cpp
     src/parsehelpers.cpp
-    src/qt-json/json.cpp
+    src/raw_json_scanner.cpp
     ../cockatrice/src/client/settings/cache_settings.cpp
     ../cockatrice/src/client/settings/card_counter_settings.cpp
     ../cockatrice/src/client/settings/shortcuts_settings.cpp
     ../cockatrice/src/client/network/update/client/release_channel.cpp
+    ../cockatrice/src/interface/pixel_map_generator.cpp
     ../cockatrice/src/interface/theme_config.cpp
     ../cockatrice/src/interface/theme_manager.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
@@ -112,6 +113,8 @@ qt6_add_executable(
   ${oracle_MOC_SRCS}
   MANUAL_FINALIZATION
 )
+
+target_precompile_headers(oracle PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
 
 # ------------------------
 # Link libraries

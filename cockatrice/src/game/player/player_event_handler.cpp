@@ -262,14 +262,15 @@ void PlayerEventHandler::eventCreateCounter(const Event_CreateCounter &event)
     player->addCounter(event.counter_info());
 }
 
-void PlayerEventHandler::eventSetCounter(const Event_SetCounter &event)
+void PlayerEventHandler::eventSetCounter(const Event_SetCounter &event, EventProcessingOptions options)
 {
     CounterState *ctr = player->getCounters().value(event.counter_id(), nullptr);
     if (!ctr) {
         return;
     }
     int oldValue = ctr->getValue();
-    ctr->setValue(event.value());
+    const bool skipDamageAnimation = options.testFlag(SKIP_DAMAGE_ANIMATION);
+    ctr->setValue(event.value(), skipDamageAnimation);
     emit logSetCounter(player, ctr->getName(), event.value(), oldValue);
 }
 
@@ -625,7 +626,7 @@ void PlayerEventHandler::processGameEvent(GameEvent::GameEventType type,
             eventCreateCounter(event.GetExtension(Event_CreateCounter::ext));
             break;
         case GameEvent::SET_COUNTER:
-            eventSetCounter(event.GetExtension(Event_SetCounter::ext));
+            eventSetCounter(event.GetExtension(Event_SetCounter::ext), options);
             break;
         case GameEvent::DEL_COUNTER:
             eventDelCounter(event.GetExtension(Event_DelCounter::ext));

@@ -10,8 +10,6 @@
 #include "../visual_deck_storage_widget.h"
 #include "deck_preview_deck_tags_display_widget.h"
 
-#include <QDir>
-#include <QFile>
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QLabel>
@@ -499,21 +497,6 @@ void DeckPreviewWidget::actDeleteFile()
     // The folder widget removes this preview once the row is gone.
 }
 
-static bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
-{
-    QFileInfo fileInfo(filePath);
-    QString newFileName = QDir::toNativeSeparators(fileInfo.path() + "/" + fileInfo.completeBaseName() + ".cod");
-
-    if (QFile::exists(newFileName)) {
-        QMessageBox::StandardButton reply =
-            QMessageBox::question(parent, QObject::tr("Overwrite Existing File?"),
-                                  QObject::tr("A .cod version of this deck already exists. Overwrite it?"),
-                                  QMessageBox::Yes | QMessageBox::No);
-        return reply == QMessageBox::Yes;
-    }
-    return true; // Safe to proceed
-}
-
 /**
  * Checks if the deck's file format supports tags.
  * If not, then prompt the user for file conversion.
@@ -521,45 +504,8 @@ static bool confirmOverwriteIfExists(QWidget *parent, const QString &filePath)
  */
 bool DeckPreviewWidget::promptFileConversionIfRequired()
 {
-    if (DeckFileFormat::getFormatFromName(filePath) == DeckFileFormat::Cockatrice) {
-        return true;
-    }
-
-    // Retrieve saved preference if the prompt is disabled
-    if (!SettingsCache::instance().visualDeckStorage().getVisualDeckStoragePromptForConversion()) {
-        if (!SettingsCache::instance().visualDeckStorage().getVisualDeckStorageAlwaysConvert()) {
-            return false;
-        }
-
-        if (!confirmOverwriteIfExists(this, filePath)) {
-            return false;
-        }
-
+    return DialogConvertDeckToCodFormat::promptIfRequired(this, filePath, [this] {
         model->convertToCockatriceFormat(row());
         return true;
-    }
-
-    // Show the dialog to the user
-    DialogConvertDeckToCodFormat conversionDialog(this);
-    if (conversionDialog.exec() != QDialog::Accepted) {
-        SettingsCache::instance().visualDeckStorage().setVisualDeckStoragePromptForConversion(
-            !conversionDialog.dontAskAgain());
-        SettingsCache::instance().visualDeckStorage().setVisualDeckStorageAlwaysConvert(false);
-
-        return false;
-    }
-
-    // Try to convert file
-    if (!confirmOverwriteIfExists(this, filePath)) {
-        return false;
-    }
-
-    model->convertToCockatriceFormat(row());
-
-    if (conversionDialog.dontAskAgain()) {
-        SettingsCache::instance().visualDeckStorage().setVisualDeckStoragePromptForConversion(false);
-        SettingsCache::instance().visualDeckStorage().setVisualDeckStorageAlwaysConvert(true);
-    }
-
-    return true;
+    });
 }

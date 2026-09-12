@@ -22,6 +22,7 @@
 #include <QTextEdit>
 #include <QTreeWidgetItem>
 #include <functional>
+#include <libcockatrice/network/server/remote/user_level.h>
 #include <libcockatrice/protocol/pb/moderator_commands.pb.h>
 
 class QTreeWidget;

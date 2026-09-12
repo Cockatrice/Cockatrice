@@ -156,4 +156,15 @@ public:
 
 QPixmap loadColorAdjustedPixmap(const QString &name);
 
+// Loads a "theme:" asset (with no file extension in prefix), preferring the
+// scheme-qualified variant (prefix-dark / prefix-light, resolved via
+// ThemeManager::assetPath) and falling back to the plain asset. Callers load
+// the returned path directly. Use for scheme-sensitive pixmaps like
+// backgrounds, the card back, and the app logo.
+QPixmap themePixmap(QStringView prefix);
+
+// Clears every PixmapGenerator's static cache so scheme variants are
+// re-resolved when the active theme or color scheme changes.
+void clearPixmapGeneratorCaches();
+
 #endif

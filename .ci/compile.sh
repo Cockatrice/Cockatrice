@@ -150,6 +150,11 @@ if [[ $MAKE_TEST == "1" ]]; then
 fi
 if [[ $USE_CCACHE == "1" ]]; then
   flags+=("-DUSE_CCACHE=1")
+
+  # PCH-aware caching is required or ccache refuses to cache any TU that
+  # consumes a precompiled header, silently recompiling everything on every run.
+  ccache --set-config sloppiness=pch_defines,time_macros
+
   if [[ -n $CCACHE_SIZE ]]; then
     # This setting persists after running the script
     ccache --max-size "$CCACHE_SIZE"

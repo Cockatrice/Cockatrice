@@ -98,6 +98,12 @@ void TabMessage::closeEvent(QCloseEvent *event)
 
 void TabMessage::sendPrivateMessage(const QString &text)
 {
+    if (tabSupervisor->getUserListManager()->isUserIgnored(getUserName())) {
+        chatView->appendMessage(tr("You have ignored %1; your messages are not delivered.")
+                                    .arg(QString::fromStdString(otherUserInfo->name())));
+        return;
+    }
+
     Command_Message cmd;
     cmd.set_user_name(otherUserInfo->name());
     cmd.set_message(text.toStdString());

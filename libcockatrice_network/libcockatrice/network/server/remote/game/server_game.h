@@ -123,6 +123,8 @@ public:
         return gameStarted;
     }
     int getPlayerCount() const;
+    /// Total cards across all players' zones. Takes gameMutex itself.
+    int getCardsInGame() const;
     int getSpectatorCount() const;
     QMap<int, Server_AbstractPlayer *> getPlayers() const;
     Server_AbstractPlayer *getPlayer(int id) const;

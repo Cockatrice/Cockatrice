@@ -6,6 +6,7 @@
 #include "dlg_settings.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../../pixel_map_generator.h"
 #include "../main.h"
 #include "../settings_page/appearance_settings_page.h"
 #include "../settings_page/deck_editor_settings_page.h"
@@ -96,7 +97,7 @@ void DlgSettings::setupUi()
     // Search bar
     searchEdit = new QLineEdit;
     searchEdit->setClearButtonEnabled(true);
-    searchEdit->addAction(QPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
+    searchEdit->addAction(themePixmap(QStringLiteral("icons/search")), QLineEdit::LeadingPosition);
     searchEdit->installEventFilter(this);
     connect(searchEdit, &QLineEdit::textChanged, this, &DlgSettings::onSearchTextChanged);
 
@@ -132,7 +133,7 @@ void DlgSettings::setupUi()
     pagesWidget->addWidget(makeScrollable(userInterfacePage));
     pagesWidget->addWidget(makeScrollable(deckEditorPage));
     pagesWidget->addWidget(makeScrollable(storagePage));
-    pagesWidget->addWidget(messagesPage);
+    pagesWidget->addWidget(makeScrollable(messagesPage));
     pagesWidget->addWidget(soundPage);
     pagesWidget->addWidget(shortcutsPage);
 

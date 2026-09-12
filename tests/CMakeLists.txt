@@ -4,7 +4,7 @@ enable_testing()
 
 add_test(NAME dummy_test COMMAND dummy_test)
 add_executable(dummy_test dummy_test.cpp)
-# Add timeout to prevent hanging if there is any issue with the general GTest setup
+# Add timeout to prevent hanging in case of issues with the general GTest setup
 set_tests_properties(dummy_test PROPERTIES TIMEOUT 5)
 
 add_test(NAME clamped_arithmetic_test COMMAND clamped_arithmetic_test)
@@ -24,6 +24,9 @@ target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatri
 add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
 add_executable(latency_tracker_test latency_tracker_test.cpp)
 
+add_test(NAME metrics_registry_test COMMAND metrics_registry_test)
+add_executable(metrics_registry_test ../servatrice/src/metrics_registry.cpp metrics_registry_test.cpp)
+
 add_test(NAME password_hash_test COMMAND password_hash_test)
 add_executable(password_hash_test password_hash_test.cpp)
 
@@ -35,6 +38,9 @@ add_executable(server_card_counter_test server_card_counter_test.cpp)
 
 add_test(NAME server_counter_test COMMAND server_counter_test)
 add_executable(server_counter_test server_counter_test.cpp)
+
+add_test(NAME server_developer_role_test COMMAND server_developer_role_test)
+add_executable(server_developer_role_test server_developer_role_test.cpp)
 
 add_test(NAME server_rate_limiter_test COMMAND server_rate_limiter_test)
 add_executable(server_rate_limiter_test server_rate_limiter_test.cpp)
@@ -81,9 +87,11 @@ if(NOT GTEST_FOUND)
   add_dependencies(server_card_counter_test gtest)
   add_dependencies(server_counter_test gtest)
   add_dependencies(server_rate_limiter_test gtest)
+  add_dependencies(server_developer_role_test gtest)
   add_dependencies(warning_categories_test gtest)
   add_dependencies(lag_monitor_test gtest)
   add_dependencies(latency_tracker_test gtest)
+  add_dependencies(metrics_registry_test gtest)
 endif()
 
 include_directories(${GTEST_INCLUDE_DIRS})
@@ -116,15 +124,22 @@ target_link_libraries(
   server_rate_limiter_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
 target_link_libraries(
+  server_developer_role_test libcockatrice_network libcockatrice_rng Threads::Threads ${GTEST_BOTH_LIBRARIES}
+  ${TEST_QT_MODULES}
+)
+target_link_libraries(
   warning_categories_test libcockatrice_utility Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
 target_link_libraries(lag_monitor_test Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES})
 target_link_libraries(
   latency_tracker_test libcockatrice_network Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
 )
+target_include_directories(metrics_registry_test PRIVATE ${CMAKE_SOURCE_DIR}/servatrice/src)
+target_link_libraries(metrics_registry_test ${TEST_QT_MODULES} Threads::Threads ${GTEST_BOTH_LIBRARIES})
 
 add_subdirectory(card_zone_algorithms)
 add_subdirectory(carddatabase)
+add_subdirectory(deck_list_model)
 add_subdirectory(deck_list_zones)
 add_subdirectory(loading_from_clipboard)
 add_subdirectory(movecard_tests)

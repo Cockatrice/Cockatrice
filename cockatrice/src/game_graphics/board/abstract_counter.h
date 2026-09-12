@@ -39,8 +39,9 @@ protected:
      * @brief Hook for subclasses that need per-value-change feedback (e.g. life-total flash).
      *
      * Called whenever the counter's value changes, before the item repaints.
+     * @param skipDamageAnimation True when damage-related feedback should be suppressed (replay rewinds).
      */
-    virtual void onValueChanged(int oldValue, int newValue);
+    virtual void onValueChanged(int oldValue, int newValue, bool skipDamageAnimation);
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;

@@ -53,6 +53,7 @@
 #include <libcockatrice/settings/interface_settings.h>
 #include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+#include <libcockatrice/utility/cryptoutil.h>
 
 QTranslator *translator, *qtTranslator;
 RNG_Abstract *rng;
@@ -292,7 +293,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    rng = new RNG_SFMT;
+    rng = new RNG_SFMT(CryptoUtil::randomUInt64());
     themeManager = new ThemeManager;
     soundEngine = new SoundEngine;
 
@@ -348,7 +349,7 @@ int main(int argc, char *argv[])
     }
     qCInfo(MainLog) << "MainWindow constructor finished";
 
-    ui.setWindowIcon(QPixmap("theme:cockatrice"));
+    ui.setWindowIcon(themePixmap(QStringLiteral("cockatrice")));
     // set name of the app desktop file; used by wayland to load the window icon
     QGuiApplication::setDesktopFileName("cockatrice");
 

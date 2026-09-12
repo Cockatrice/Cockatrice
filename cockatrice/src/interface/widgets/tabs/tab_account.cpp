@@ -137,6 +137,11 @@ void TabAccount::retranslateUi()
     buddyList->retranslateUi();
     ignoreList->retranslateUi();
     userInfoBox->retranslateUi();
+
+    buddyList->setToolTip(tr("Buddies are marked with a star in chat, a sound plays when they join or leave the "
+                             "server, and they can be invited to buddy-only games."));
+    ignoreList->setToolTip(tr("Ignored users' chat messages are hidden from you, and they cannot send you private "
+                              "messages or join your games."));
 }
 
 void TabAccount::processListUsersResponse(const Response &response)

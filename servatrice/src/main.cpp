@@ -33,6 +33,7 @@
 #include <QtGlobal>
 #include <iostream>
 #include <libcockatrice/rng/rng_sfmt.h>
+#include <libcockatrice/utility/cryptoutil.h>
 #include <libcockatrice/utility/passwordhasher.h>
 
 RNG_Abstract *rng;
@@ -169,7 +170,7 @@ int main(int argc, char *argv[])
 
     signalhandler = new SignalHandler();
 
-    rng = new RNG_SFMT;
+    rng = new RNG_SFMT(CryptoUtil::randomUInt64());
 
     std::cerr << "Servatrice " << VERSION_STRING << " starting." << std::endl;
     std::cerr << "-------------------------" << std::endl;

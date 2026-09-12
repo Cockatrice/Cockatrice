@@ -5,6 +5,7 @@
 #include "deck_list_model.h"
 
 #include <QSharedPointer>
+#include <functional>
 #include <libcockatrice/deck_list/deck_list.h>
 
 class DeckListHistoryManager;
@@ -237,6 +238,68 @@ public:
     bool decrementCountAtIndex(const QModelIndex &idx);
 
     /**
+     * @brief Moves all copies of the card at the given index to the given zone.
+     * No-ops if the index is invalid, not a card node, the card is a token, or the
+     * card is already in the target zone.
+     * Saves the operation to history if successful.
+     *
+     * @param idx The model index of the card to move
+     * @param targetZoneName The zone to move the card to (board zone or custom zone name)
+     * @return Whether the operation was successfully performed
+     */
+    bool moveCardToZone(const QModelIndex &idx, const QString &targetZoneName);
+
+    /**
+     * @brief Creates a new custom zone nested under a board zone.
+     * Saves the operation to history if successful.
+     *
+     * @param boardZoneName The board zone to nest the custom zone under
+     * @param zoneName The name of the new custom zone. Gets trimmed and must be
+     *        unique across the deck.
+     * @return Whether the zone was created
+     */
+    bool createCustomZone(const QString &boardZoneName, const QString &zoneName);
+
+    /**
+     * @brief Renames a custom zone.
+     * Saves the operation to history if successful.
+     *
+     * @param oldZoneName The current name of the custom zone
+     * @param newZoneName The new name. Gets trimmed and must be unique across the deck.
+     * @return Whether the rename succeeded
+     */
+    bool renameCustomZone(const QString &oldZoneName, const QString &newZoneName);
+
+    /**
+     * @brief Moves a custom zone (and its cards) to a different board zone.
+     * Same-board moves succeed without creating a history entry.
+     * Saves the operation to history if successful.
+     *
+     * @param zoneName The custom zone to move
+     * @param newBoardZoneName The board zone to move the custom zone under
+     * @return Whether the move succeeded
+     */
+    bool moveCustomZone(const QString &zoneName, const QString &newBoardZoneName);
+
+    /**
+     * @brief Removes a custom zone and all its cards.
+     * Saves the operation to history if successful.
+     *
+     * @param zoneName The custom zone to remove
+     * @return Whether the zone was removed
+     */
+    bool removeCustomZone(const QString &zoneName);
+
+    /**
+     * @brief Checks whether a candidate name is usable for a new custom zone.
+     *
+     * @param zoneName The candidate name
+     * @return An empty string when the name is usable, otherwise a user-facing
+     *         error message describing the problem
+     */
+    [[nodiscard]] QString validateNewZoneName(const QString &zoneName) const;
+
+    /**
      * Undoes n steps of the history, setting the decklist state and updating the current step in the historyManager.
      * @param steps Number of steps to undo.
      */
@@ -257,6 +320,7 @@ public slots:
 
 private:
     bool offsetCountAtIndex(const QModelIndex &idx, int offset);
+    bool modifyTree(const QString &reason, const std::function<bool(DecklistNodeTree *)> &operation);
     void doCardModified();
     void doMetadataModified();
 

@@ -22,6 +22,7 @@ typedef CardInfoPtr CardData;
 typedef std::function<bool(const CardData &)> Filter;
 typedef std::function<bool(const QString &)> StringMatcher;
 typedef std::function<bool(int)> NumberMatcher;
+typedef std::function<bool(int, int)> NumberComparer;
 
 namespace peg
 {

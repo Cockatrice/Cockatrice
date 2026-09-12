@@ -1,10 +1,12 @@
 #include "theme_manager.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "pixel_map_generator.h"
 
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
+#include <QFileInfo>
 #include <QLibraryInfo>
 #include <QMap>
 #include <QMetaEnum>
@@ -140,6 +142,48 @@ bool ThemeManager::isDarkMode(const QString &themeDirPath) const
     }
 }
 
+QString ThemeManager::schemeVariantPath(QStringView prefix) const
+{
+    static const QStringList formats = {QStringLiteral(".png"), QStringLiteral(".jpg"), QStringLiteral(".jpeg"),
+                                        QStringLiteral(".svg")};
+    const QString scheme = isDarkMode(currentThemePath) ? QStringLiteral("dark") : QStringLiteral("light");
+    const QString variantStem = prefix.toString() + QLatin1Char('-') + scheme;
+
+    for (const QString &format : formats) {
+        if (QFileInfo::exists(QStringLiteral("theme:") + variantStem + format)) {
+            return variantStem + format;
+        }
+    }
+    return QString();
+}
+
+QString ThemeManager::assetPath(QStringView prefix) const
+{
+    // Probe order mirrors tryLoadImage: a theme may override the default SVG
+    // with a raster of the same stem, so raster wins over SVG within a stem.
+    static const QStringList formats = {QStringLiteral(".png"), QStringLiteral(".jpg"), QStringLiteral(".jpeg"),
+                                        QStringLiteral(".svg")};
+
+    auto findExisting = [](const QString &stem) {
+        for (const QString &format : formats) {
+            if (QFileInfo::exists(QStringLiteral("theme:") + stem + format)) {
+                return stem + format;
+            }
+        }
+        return QString();
+    };
+
+    // Prefer the scheme-qualified variant when it exists, else the plain
+    // asset as the super fallback. Both return the resolved path including
+    // its file extension so callers can load it directly.
+    const QString variant = schemeVariantPath(prefix);
+    if (!variant.isEmpty()) {
+        return variant;
+    }
+    const QString resolvedPlain = findExisting(prefix.toString());
+    return resolvedPlain.isEmpty() ? prefix.toString() : resolvedPlain;
+}
+
 bool ThemeManager::isBuiltInTheme()
 {
     const auto themeName = SettingsCache::instance().getThemeName();
@@ -195,7 +239,7 @@ QStringMap &ThemeManager::getAvailableThemes()
 QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 {
     QBrush brush;
-    QPixmap tmp = QPixmap("theme:zones/" + fileName);
+    QPixmap tmp = QPixmap("theme:" + assetPath(QStringLiteral("zones/") + fileName));
     if (tmp.isNull()) {
         brush.setColor(fallbackColor);
         brush.setStyle(Qt::SolidPattern);
@@ -209,7 +253,7 @@ QBrush ThemeManager::loadBrush(QString fileName, QColor fallbackColor)
 QBrush ThemeManager::loadExtraBrush(QString fileName, QBrush &fallbackBrush)
 {
     QBrush brush;
-    QPixmap tmp = QPixmap("theme:zones/" + fileName);
+    QPixmap tmp = QPixmap("theme:" + assetPath(QStringLiteral("zones/") + fileName));
 
     if (tmp.isNull()) {
         brush = fallbackBrush;
@@ -393,9 +437,19 @@ void ThemeManager::themeChangedSlot()
     currentThemePath = dirPath;
     QDir dir(dirPath);
 
-    // CSS
-    if (!dirPath.isEmpty() && dir.exists(STYLE_CSS_NAME)) {
-        qApp->setStyleSheet("file:///" + dir.absoluteFilePath(STYLE_CSS_NAME));
+    // CSS — prefer the scheme-qualified stylesheet (style-dark.css /
+    // style-light.css) when present, else the plain style.css as fallback.
+    if (!dirPath.isEmpty()) {
+        const QString scheme = isDarkMode(dirPath) ? QStringLiteral("dark") : QStringLiteral("light");
+        const QString schemeCss = QFileInfo(QStringLiteral(STYLE_CSS_NAME)).completeBaseName() + QLatin1Char('-') +
+                                  scheme + QStringLiteral(".css");
+        if (dir.exists(schemeCss)) {
+            qApp->setStyleSheet("file:///" + dir.absoluteFilePath(schemeCss));
+        } else if (dir.exists(STYLE_CSS_NAME)) {
+            qApp->setStyleSheet("file:///" + dir.absoluteFilePath(STYLE_CSS_NAME));
+        } else {
+            qApp->setStyleSheet("");
+        }
     } else {
         qApp->setStyleSheet("");
     }
@@ -446,6 +500,7 @@ void ThemeManager::themeChangedSlot()
     }
 
     QPixmapCache::clear();
+    clearPixmapGeneratorCaches();
 
     emit themeChanged();
 }

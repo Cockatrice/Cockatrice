@@ -53,13 +53,13 @@ PlayerListWidget::PlayerListWidget(TabSupervisor *_tabSupervisor,
                                    QWidget *parent)
     : QTreeWidget(parent), tabSupervisor(_tabSupervisor), client(_client), game(_game), gameStarted(false)
 {
-    readyIcon = QPixmap("theme:icons/ready_start");
-    notReadyIcon = QPixmap("theme:icons/not_ready_start");
-    concededIcon = QPixmap("theme:icons/conceded");
+    readyIcon = themePixmap(QStringLiteral("icons/ready_start"));
+    notReadyIcon = themePixmap(QStringLiteral("icons/not_ready_start"));
+    concededIcon = themePixmap(QStringLiteral("icons/conceded"));
     playerIcon = loadColorAdjustedPixmap("theme:icons/player");
     judgeIcon = loadColorAdjustedPixmap("theme:icons/scales");
     spectatorIcon = loadColorAdjustedPixmap("theme:icons/spectator");
-    lockIcon = QPixmap("theme:icons/lock");
+    lockIcon = themePixmap(QStringLiteral("icons/lock"));
 
     if (tabSupervisor) {
         itemDelegate = new PlayerListItemDelegate(this);
@@ -92,6 +92,11 @@ void PlayerListWidget::retranslateUi()
 
 void PlayerListWidget::addPlayer(const ServerInfo_PlayerProperties &player)
 {
+    if (players.contains(player.player_id())) {
+        updatePlayerProperties(player);
+        return;
+    }
+
     QTreeWidgetItem *newPlayer = new PlayerListTWI;
     players.insert(player.player_id(), newPlayer);
     updatePlayerProperties(player);
@@ -174,6 +179,17 @@ void PlayerListWidget::removePlayer(int playerId)
     }
     players.remove(playerId);
     delete takeTopLevelItem(indexOfTopLevelItem(player));
+}
+
+void PlayerListWidget::clearSpectators()
+{
+    const QList<int> playerIds = players.keys();
+    for (int playerId : playerIds) {
+        QTreeWidgetItem *player = players.value(playerId, 0);
+        if (player && !player->data(1, Qt::UserRole).toBool()) {
+            removePlayer(playerId);
+        }
+    }
 }
 
 void PlayerListWidget::setActivePlayer(int playerId)

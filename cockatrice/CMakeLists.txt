@@ -166,6 +166,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
     src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
     src/interface/widgets/cards/art_crop_attribution.cpp
+    src/interface/widgets/cards/card_art_utils.cpp
     src/interface/widgets/cards/card_group_display_widgets/card_group_display_widget.cpp
     src/interface/widgets/cards/card_group_display_widgets/flat_card_group_display_widget.cpp
     src/interface/widgets/cards/card_group_display_widgets/overlapped_card_group_display_widget.cpp
@@ -214,6 +215,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
     src/interface/widgets/deck_editor/deck_list_style_proxy.cpp
     src/interface/widgets/deck_editor/deck_state_manager.cpp
+    src/interface/widgets/deck_editor/deck_zone_dialog.cpp
     src/interface/widgets/deck_editor/printing_disabled_info_widget.cpp
     src/interface/widgets/general/background_sources.cpp
     src/interface/widgets/general/display/background_plate_widget.cpp
@@ -380,6 +382,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/tab_card_art_rules.cpp
     src/interface/widgets/tabs/tab_deck_editor.cpp
     src/interface/widgets/tabs/tab_deck_storage.cpp
+    src/interface/widgets/tabs/tab_developer.cpp
     src/interface/widgets/tabs/tab_game.cpp
     src/interface/widgets/tabs/tab_home.cpp
     src/interface/widgets/tabs/tab_logs.cpp
@@ -515,6 +518,8 @@ qt6_add_executable(
   ${cockatrice_MOC_SRCS}
   MANUAL_FINALIZATION
 )
+
+target_precompile_headers(cockatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtwidgets_pch.h")
 
 qt6_add_shaders(
   cockatrice

@@ -149,15 +149,15 @@ You can then
 <br>
 
 The following flags (with their non-default values) can be passed to `cmake`:
-| Flag | Description |
-| --- | --- |
-| `-DWITH_SERVER=1` | Build <kbd>Servatrice</kbd> server |
-| `-DWITH_CLIENT=0` | Don't build <kbd>Cockatrice</kbd> client |
-| `-DWITH_ORACLE=0` | Don't build <kbd>Oracle</kbd> card database tool |
-| `-DCMAKE_BUILD_TYPE=Debug` | Compile in debug mode<br> Enables extra logging output, debug symbols, and much more verbose compiler warnings |
-| `-DWARNING_AS_ERROR=0` | Don't treat compilation warnings as errors in debug mode |
-| `-DUPDATE_TRANSLATIONS=1` |  Configure `make` to update the translation .ts files for new strings in the source code<br> **Note:** `make clean` will remove the .ts files |
-| `-DTEST=1` | Enable regression tests<br> **Note:** `make test` to run tests, *googletest* will be downloaded if not available |
+| Flag                       | Description                                                                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-DWITH_SERVER=1`          | Build <kbd>Servatrice</kbd> server                                                                                                            |
+| `-DWITH_CLIENT=0`          | Don't build <kbd>Cockatrice</kbd> client                                                                                                      |
+| `-DWITH_ORACLE=0`          | Don't build <kbd>Oracle</kbd> card database tool                                                                                              |
+| `-DCMAKE_BUILD_TYPE=Debug` | Compile in debug mode<br> Enables extra logging output, debug symbols, and much more verbose compiler warnings                                |
+| `-DWARNING_AS_ERROR=0`     | Don't treat compilation warnings as errors in debug mode                                                                                      |
+| `-DUPDATE_TRANSLATIONS=1`  |  Configure `make` to update the translation .ts files for new strings in the source code<br> **Note:** `make clean` will remove the .ts files |
+| `-DTEST=1`                 | Enable regression tests<br> **Note:** `make test` to run tests, *googletest* will be downloaded if not available                              |
 
 
 # Run

@@ -18,6 +18,9 @@
 
 #include "abstract_deck_list_node.h"
 
+#include <QList>
+#include <QString>
+
 /** @brief Constant for the "main" deck zone name. */
 #define DECK_ZONE_MAIN "main"
 /** @brief Constant for the "sideboard" zone name. */
@@ -117,6 +120,13 @@ public:
      * @return Display-friendly string.
      */
     static QString visibleNameFromName(const QString &_name);
+
+    /**
+     * @brief The standard board zone names, in display order.
+     *
+     * @return main, side and maybeboard.
+     */
+    static const QList<QString> &boardZoneNames();
 
     /**
      * @brief Get this node’s display-friendly name.

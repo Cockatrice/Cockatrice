@@ -2,6 +2,7 @@
 
 #include "../../../client/settings/cache_settings.h"
 #include "../../../interface/widgets/tabs/tab_supervisor.h"
+#include "../../pixel_map_generator.h"
 #include "../../theme_manager.h"
 #include "../../window_main.h"
 #include "../cards/art_crop_attribution.h"
@@ -20,7 +21,8 @@
 #include <libcockatrice/settings/paths_settings.h>
 
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
-    : QWidget(parent), tabSupervisor(_tabSupervisor), background("theme:backgrounds/home"), overlay("theme:cockatrice")
+    : QWidget(parent), tabSupervisor(_tabSupervisor), background(themePixmap(QStringLiteral("backgrounds/home"))),
+      overlay(themePixmap(QStringLiteral("cockatrice")))
 {
     layout = new QGridLayout(this);
 
@@ -56,6 +58,9 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
             &HomeWidget::initializeBackgroundFromSource);
     connect(&SettingsCache::instance(), &SettingsCache::themeChanged, this,
             &HomeWidget::updateButtonsToBackgroundColor);
+    // Scheme flips (light/dark/system with an OS switch) fire on themeManager,
+    // not on SettingsCache::themeChanged, so re-resolve the variant background.
+    connect(themeManager, &ThemeManager::themeChanged, this, &HomeWidget::initializeBackgroundFromSource);
     connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabButtonColorChanged, this,
             &HomeWidget::updateButtonsToBackgroundColor);
 }
@@ -74,7 +79,7 @@ void HomeWidget::initializeBackgroundFromSource()
     switch (backgroundSourceType) {
         case BackgroundSources::Theme:
             cardChangeTimer->stop();
-            background = QPixmap("theme:backgrounds/home");
+            background = themePixmap(QStringLiteral("backgrounds/home"));
             backgroundSourceDeck = DeckList();
             backgroundSourceCard->setCard(ExactCard());
             updateButtonsToBackgroundColor();

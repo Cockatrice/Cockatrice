@@ -21,6 +21,7 @@
 #include <libcockatrice/card/card_info_comparator.h>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/database/card_database_manager.h>
+#include <libcockatrice/deck_list/tree/inner_deck_list_node.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 #include <utility>
 
@@ -65,7 +66,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     searchEdit->setPlaceholderText(tr("Search by card name (or search expressions)"));
     searchEdit->setClearButtonEnabled(true);
     searchEdit->addAction(loadColorAdjustedPixmap("theme:icons/search"), QLineEdit::LeadingPosition);
-    auto help = searchEdit->addAction(QPixmap("theme:icons/info"), QLineEdit::TrailingPosition);
+    auto help = searchEdit->addAction(themePixmap(QStringLiteral("icons/info")), QLineEdit::TrailingPosition);
     connect(help, &QAction::triggered, this, [this] { createSearchSyntaxHelpWindow(searchEdit); });
 
     setFocusProxy(searchEdit);
@@ -89,6 +90,19 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     databaseView->setItemDelegate(nullptr);
     databaseView->setVisible(false);
 
+    // Without a deck model there is nothing to add cards to, so the zone menu stays hidden.
+    if (deckListModel) {
+        databaseView->setZoneMenuProvider(
+            [deckListModel]() -> QList<QPair<QString, QStringList>> {
+                QList<QPair<QString, QStringList>> result;
+                for (const QString &boardName : InnerDecklistNode::boardZoneNames()) {
+                    result.append({boardName, deckListModel->getCustomZoneNames(boardName)});
+                }
+                return result;
+            },
+            [this] { return newZoneCreator ? newZoneCreator() : QString(); });
+    }
+
     searchEdit->setTreeView(databaseView);
     searchEdit->installEventFilter(databaseView->getKeySignals());
 
@@ -107,7 +121,7 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
 
     clearFilterWidget = new QToolButton();
     clearFilterWidget->setFixedSize(32, 32);
-    clearFilterWidget->setIcon(QPixmap("theme:icons/delete"));
+    clearFilterWidget->setIcon(themePixmap(QStringLiteral("icons/delete")));
     connect(clearFilterWidget, &QToolButton::clicked, this, [this] {
         filterModel->blockSignals(true);
         filterModel->filterTree()->blockSignals(true);
@@ -193,6 +207,11 @@ void VisualDatabaseDisplayWidget::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
     initializeFilters();
+}
+
+void VisualDatabaseDisplayWidget::setNewZoneCreator(const std::function<QString()> &creator)
+{
+    newZoneCreator = creator;
 }
 
 void VisualDatabaseDisplayWidget::retranslateUi()

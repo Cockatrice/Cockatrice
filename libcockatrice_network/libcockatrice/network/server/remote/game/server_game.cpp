@@ -32,6 +32,7 @@
 #include "server_spectator.h"
 
 #include <QDebug>
+#include <QElapsedTimer>
 #include <QRegularExpression>
 #include <QTimer>
 #include <google/protobuf/descriptor.h>
@@ -238,6 +239,17 @@ int Server_Game::getPlayerCount() const
     return participants.size() - getSpectatorCount();
 }
 
+int Server_Game::getCardsInGame() const
+{
+    QMutexLocker locker(&gameMutex);
+
+    int result = 0;
+    for (auto *player : getPlayers()) {
+        result += player->getCardCount();
+    }
+    return result;
+}
+
 int Server_Game::getSpectatorCount() const
 {
     QMutexLocker locker(&gameMutex);
@@ -330,6 +342,9 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
         }
     }
 
+    // Only actual starts are timed. The early returns above are no-ops.
+    QElapsedTimer startupTimer;
+    startupTimer.start();
     players = getPlayers(); // players could have been kicked, get new list of players
     if (lifecycleStrategy->onGameStarting(this) == Server_GameLifecycleStrategy::StartAction::Handled) {
         locker.unlock();
@@ -373,6 +388,7 @@ void Server_Game::doStartGameIfReady(bool forceStartGame)
 
     activePlayer = -1;
     nextTurn();
+    room->getServer()->observeGameStartDurationMs(startupTimer.nsecsElapsed() / 1000000);
 
     locker.unlock();
 

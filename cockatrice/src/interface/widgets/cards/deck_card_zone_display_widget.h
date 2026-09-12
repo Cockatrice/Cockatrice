@@ -42,7 +42,6 @@ public:
     void addCardsToOverlapWidget();
 
 public slots:
-    void onClick(QMouseEvent *event, const ExactCard &card);
     void onHover(const ExactCard &card);
     void cleanupInvalidCardGroup(CardGroupDisplayWidget *displayWidget);
     void constructAppropriateWidget(QPersistentModelIndex index);
