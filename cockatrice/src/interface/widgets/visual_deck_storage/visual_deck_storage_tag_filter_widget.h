@@ -9,25 +9,26 @@
 #include <QSet>
 #include <QStringList>
 #include <QWidget>
+#include <functional>
 
 class FlowWidget;
 class VisualDeckStorageWidget;
+
 class VisualDeckStorageTagFilterWidget : public QWidget
 {
     Q_OBJECT
 
-    VisualDeckStorageWidget *parent;
     FlowWidget *flowWidget;
-
-    [[nodiscard]] QSet<QString> gatherAllTags() const;
-    void removeTagsNotInList(const QSet<QString> &tags);
-    void addTagsIfNotPresent(const QSet<QString> &tags);
-    void addTagIfNotPresent(const QString &tag);
-    void sortTags();
+    std::function<QSet<QString>()> allTagsProvider;
 
 public:
-    explicit VisualDeckStorageTagFilterWidget(VisualDeckStorageWidget *_parent);
+    explicit VisualDeckStorageTagFilterWidget(QWidget *parent = nullptr);
     [[nodiscard]] QStringList getAllKnownTags() const;
+
+    /**
+     * @brief Sets a provider for the full set of tags to draw chips from.
+     */
+    void setAllTagsProvider(const std::function<QSet<QString>()> &provider);
 
     /**
      * @brief The tags currently in "selected" state.
@@ -39,9 +40,15 @@ public:
      */
     [[nodiscard]] QStringList excludedTags() const;
 
+signals:
+    /**
+     * Emitted whenever a chip's selection/exclusion state changes.
+     */
+    void filterChanged();
+
 public slots:
     /**
-     * @brief Rebuilds the tag chips from the tags of the currently visible decks.
+     * @brief Rebuilds the tag chips from the currently available tags.
      */
     void refreshTags();
     void showEvent(QShowEvent *event) override;
