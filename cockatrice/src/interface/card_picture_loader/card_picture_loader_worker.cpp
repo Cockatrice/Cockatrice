@@ -59,6 +59,9 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
     localLoader = new CardPictureLoaderLocal(this);
 
     pictureLoaderThread = new QThread;
+    // The worker object frees itself once its thread finishes, so no event loop is left
+    // running and the QThread is never destroyed while still executing.
+    connect(pictureLoaderThread, &QThread::finished, this, &QObject::deleteLater);
     pictureLoaderThread->start(QThread::LowPriority);
     moveToThread(pictureLoaderThread);
 
@@ -82,7 +85,28 @@ CardPictureLoaderWorker::CardPictureLoaderWorker()
 CardPictureLoaderWorker::~CardPictureLoaderWorker()
 {
     saveRedirectCache();
-    pictureLoaderThread->deleteLater();
+}
+
+void CardPictureLoaderWorker::shutdownThread()
+{
+    // The finished() -> deleteLater chain (wired in the constructor) frees this worker as soon as
+    // its event loop exits, so nothing - not even a member read - may run once wait() returns.
+    // QThread::quit() and QThread::wait() are thread-safe and may be called from the owning thread.
+    QThread *thread = pictureLoaderThread;
+    if (thread) {
+        thread->quit();
+        thread->wait();
+    }
+}
+
+QThread *CardPictureLoaderWorker::workerThread() const
+{
+    return pictureLoaderThread;
+}
+
+bool CardPictureLoaderWorker::isRunning() const
+{
+    return pictureLoaderThread != nullptr && pictureLoaderThread->isRunning();
 }
 
 void CardPictureLoaderWorker::queueRequest(const QUrl &url, CardPictureLoaderWorkerWork *worker)
