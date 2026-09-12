@@ -239,9 +239,8 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Clang compiler
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe") # <-- required for clang? see adding pr description again
 
 else() # Undefined compiler
-  message(WARNING
-    "Unknown C++ compiler: ${CMAKE_CXX_COMPILER_ID}"
-  )
+  message(WARNING "Unknown C++ compiler: ${CMAKE_CXX_COMPILER_ID}")
+
 endif()
 
 # GNU systems need to define the Mersenne Exponent for SFMT for the RNG to compile without warning
