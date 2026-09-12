@@ -316,7 +316,7 @@ void CardItem::drawAttachArrow()
 
     for (const auto &item : scene()->selectedItems()) {
         CardItem *card = qgraphicsitem_cast<CardItem *>(item);
-        if (card == nullptr) {
+        if (card == nullptr || card == this) {
             continue;
         }
         if (card->getZone() != state->getZone()) {

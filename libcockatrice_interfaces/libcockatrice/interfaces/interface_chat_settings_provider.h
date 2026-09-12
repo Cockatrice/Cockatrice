@@ -20,6 +20,7 @@ public:
     [[nodiscard]] virtual bool getShowMessagePopup() const = 0;
     [[nodiscard]] virtual bool getShowMentionPopup() const = 0;
     [[nodiscard]] virtual bool getRoomHistory() const = 0;
+    [[nodiscard]] virtual bool getIgnoreAllPrivateMessages() const = 0;
     [[nodiscard]] virtual QString getHighlightWords() const = 0;
 };
 

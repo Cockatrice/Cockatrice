@@ -560,7 +560,7 @@ void UserCardArtSettingsDialog::reloadPreview()
         return;
     }
 
-    currentPixmap = UserCardArtProvider::cropCardArt(fullRes);
+    currentPixmap = UserCardArtProvider::cropCardArt(fullRes, card);
     preview->setPixmap(currentPixmap);
     preview->setParams(currentParams);
 

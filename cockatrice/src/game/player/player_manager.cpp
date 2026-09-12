@@ -75,6 +75,14 @@ PlayerLogic *PlayerManager::getPlayer(int playerId) const
     return player;
 }
 
+void PlayerManager::clearSpectators()
+{
+    const QList<int> spectatorIds = spectators.keys();
+    for (int spectatorId : spectatorIds) {
+        removeSpectator(spectatorId);
+    }
+}
+
 void PlayerManager::onPlayerConceded(int playerId, bool conceded)
 {
     // Everything else cares about this

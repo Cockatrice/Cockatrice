@@ -47,8 +47,16 @@ static CardSet::Priority getSetPriority(const QString &setType, const QString &s
 
 bool OracleImporter::readSetsFromByteArray(QByteArray data)
 {
+    const RawJson::ScanProgressCallback progress =
+        progressReporting
+            ? [this](
+                  qsizetype bytesRead,
+                  qsizetype
+                      totalBytes) { emit dataReadProgress(static_cast<int>(bytesRead), static_cast<int>(totalBytes)); }
+            : RawJson::ScanProgressCallback{};
+
     RawJson::ScanError error;
-    const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(data, &error);
+    const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(data, &error, progress);
     if (error.isError()) {
         qDebug() << "error: RawJson::scanSetRanges():" << error.message;
         return false;
@@ -96,16 +104,30 @@ bool OracleImporter::readSetsFromByteArray(QByteArray data)
     return true;
 }
 
+/**
+ * The priority order used to pick a card's main type when a card has multiple
+ * types (e.g. "Artifact Creature") or multiple faces (e.g. split/adventure cards).
+ * A lower index means a higher priority.
+ */
+static const QStringList MAIN_CARD_TYPE_PRIORITY = {"Planeswalker", "Creature", "Land",       "Sorcery",
+                                                    "Instant",      "Artifact", "Enchantment"};
+
+/**
+ * Returns the priority (index) of the given main card type. Known types map to their
+ * position in {@link mainCardTypePriority()}, unknown types map to -1 (lowest priority).
+ */
+static int mainCardTypePriority(const QString &mainCardType)
+{
+    return MAIN_CARD_TYPE_PRIORITY.indexOf(mainCardType);
+}
+
 static QString getMainCardType(const QStringList &typeList)
 {
     if (typeList.isEmpty()) {
         return {};
     }
 
-    static const QStringList typePriority = {"Planeswalker", "Creature", "Land",       "Sorcery",
-                                             "Instant",      "Artifact", "Enchantment"};
-
-    for (const auto &type : typePriority) {
+    for (const auto &type : MAIN_CARD_TYPE_PRIORITY) {
         if (typeList.contains(type)) {
             return type;
         }
@@ -460,8 +482,15 @@ int OracleImporter::importCardsFromSet(const CardSetPtr &currentSet, const QJson
                             properties.insert(prop, thisCardPropertyValue);
                         } else if (prop == "colors" || prop == "coloridentity") { // the card is both colors
                             properties.insert(prop, originalPropertyValue + thisCardPropertyValue);
-                        } else if (prop == "maintype") { // don't create maintypes with //es in them
-                            continue;
+                        } else if (prop == "maintype") {
+                            // Use the same priority as getMainCardType() to pick the
+                            // "best" type across faces — e.g. Creature over Instant
+                            // for adventure cards like Bonecrusher Giant.
+                            int currentPriority = mainCardTypePriority(originalPropertyValue);
+                            int newPriority = mainCardTypePriority(thisCardPropertyValue);
+                            if (newPriority >= 0 && (currentPriority < 0 || newPriority < currentPriority)) {
+                                properties.insert(prop, thisCardPropertyValue);
+                            }
                         } else {
                             properties.insert(prop,
                                               originalPropertyValue + splitCardPropSeparator + thisCardPropertyValue);
@@ -551,6 +580,8 @@ int OracleImporter::startImport()
 {
     static ICardSetPriorityController *noOpController = new NoopCardSetPriorityController();
 
+    importCancelled.storeRelease(0);
+
     // Pre-allocate the cards hash to avoid rehashing during import. Keys are
     // distinct card names while raw ranges only count printings (AllPrintings
     // ~100k printings vs ~35k names), so this over-reserves somewhat; an exact
@@ -570,6 +601,12 @@ int OracleImporter::startImport()
     int setIndex = 0;
 
     for (const SetToDownload &curSetToParse : allSets) {
+        if (importCancelled.loadAcquire()) {
+            // The wizard was closed mid-import: stop at the next set boundary so
+            // the caller can wait for this future without processing every set.
+            break;
+        }
+
         CardSetPtr newSet = CardSet::newInstance(noOpController, curSetToParse.getShortName(),
                                                  curSetToParse.getLongName(), curSetToParse.getSetType(),
                                                  curSetToParse.getReleaseDate(), curSetToParse.getPriority());

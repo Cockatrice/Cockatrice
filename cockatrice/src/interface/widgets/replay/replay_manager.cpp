@@ -142,8 +142,10 @@ void ReplayManager::processNewEvents(PlaybackMode playbackMode)
         }
 
         // backwards skip => always skip tap animation
+        // backwards skip => always skip damage animation (battlefield shimmer / life counter flash)
         if (playbackMode == BACKWARD_SKIP) {
             options |= SKIP_TAP_ANIMATION;
+            options |= SKIP_DAMAGE_ANIMATION;
         }
 
         emit eventReplayed(replay->event_list(currentEvent), options);

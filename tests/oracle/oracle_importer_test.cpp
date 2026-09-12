@@ -4,6 +4,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QObject>
+#include <QPair>
 #include <QSet>
 #include <libcockatrice/card/format/format_legality_rules.h>
 #include <libcockatrice/card/set/card_set.h>
@@ -739,6 +741,135 @@ TEST_F(OracleImporterTest, StartImportParsesSetsLazily)
     ASSERT_EQ(importedSets, 1);
     ASSERT_EQ(importer->getCardList().size(), 1);
     ASSERT_FALSE(importer->getCardList().value("Lazy Import Card").isNull());
+}
+
+// ============================================================================
+// Scan progress reporting tests
+// ============================================================================
+
+TEST(OracleScanProgress, ScanProgressReportsMonotonicBytesToTotal)
+{
+    QJsonObject setObj;
+    setObj["code"] = "tst";
+    setObj["name"] = "Test Set";
+    setObj["type"] = "expansion";
+    setObj["releaseDate"] = "2024-01-01";
+    QJsonArray cards;
+    for (int i = 0; i < 40; ++i) {
+        QJsonObject card;
+        card["name"] = QString("Card %1").arg(i);
+        card["text"] = "Some rules text used to bulk up the card payload.";
+        card["layout"] = "normal";
+        cards.append(card);
+    }
+    setObj["cards"] = cards;
+
+    QJsonObject root;
+    root["data"] = QJsonObject{{"TST", setObj}};
+
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Compact);
+
+    QList<QPair<qsizetype, qsizetype>> reports;
+    RawJson::ScanError error;
+    const QList<RawJson::SetRange> ranges =
+        RawJson::scanSetRanges(data, &error, [&reports](qsizetype bytesRead, qsizetype totalBytes) {
+            reports.append({bytesRead, totalBytes});
+        });
+
+    ASSERT_FALSE(error.isError()) << error.message.toStdString();
+    ASSERT_EQ(ranges.size(), 1);
+    ASSERT_FALSE(reports.isEmpty());
+    ASSERT_GT(reports.size(), 1);
+
+    qsizetype last = 0;
+    for (const auto &[bytesRead, totalBytes] : reports) {
+        ASSERT_EQ(totalBytes, data.size());
+        ASSERT_GE(bytesRead, last) << "scan progress must be monotonic";
+        ASSERT_LE(bytesRead, totalBytes) << "scan progress must not overshoot the document size";
+        last = bytesRead;
+    }
+    ASSERT_EQ(reports.constLast().first, data.size()) << "scan must end at 100%";
+    ASSERT_LE(reports.size(), 160) << "scan reports must be throttled";
+}
+
+TEST(OracleScanProgress, ScanWithoutCallbackStillParses)
+{
+    QJsonObject setObj;
+    setObj["code"] = "tst";
+    setObj["name"] = "Test Set";
+    setObj["type"] = "expansion";
+    setObj["releaseDate"] = "2024-01-01";
+    setObj["cards"] = QJsonArray();
+
+    QJsonObject root;
+    root["data"] = QJsonObject{{"TST", setObj}};
+
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Compact);
+
+    RawJson::ScanError error;
+    const QList<RawJson::SetRange> ranges = RawJson::scanSetRanges(data, &error);
+
+    ASSERT_FALSE(error.isError()) << error.message.toStdString();
+    ASSERT_EQ(ranges.size(), 1);
+    ASSERT_EQ(ranges.first().code, "tst");
+}
+
+TEST_F(OracleImporterTest, ReadSetsFromByteArrayEmitsScanProgress)
+{
+    QJsonObject setObj;
+    setObj["code"] = "tst";
+    setObj["name"] = "Test Set";
+    setObj["type"] = "expansion";
+    setObj["releaseDate"] = "2024-01-01";
+    QJsonArray cards;
+    for (int i = 0; i < 40; ++i) {
+        QJsonObject card;
+        card["name"] = QString("Card %1").arg(i);
+        cards.append(card);
+    }
+    setObj["cards"] = cards;
+
+    QJsonObject root;
+    root["data"] = QJsonObject{{"TST", setObj}};
+
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Compact);
+
+    QList<QPair<qsizetype, qsizetype>> emissions;
+    QObject::connect(importer, &OracleImporter::dataReadProgress,
+                     [&emissions](int bytesRead, int totalBytes) { emissions.append({bytesRead, totalBytes}); });
+
+    ASSERT_TRUE(importer->readSetsFromByteArray(data));
+    ASSERT_FALSE(emissions.isEmpty());
+    for (const auto &[bytesRead, totalBytes] : emissions) {
+        ASSERT_EQ(totalBytes, data.size());
+        ASSERT_GE(bytesRead, 0);
+        ASSERT_LE(bytesRead, totalBytes);
+    }
+    ASSERT_EQ(emissions.constLast().first, data.size());
+}
+
+TEST_F(OracleImporterTest, DisablingProgressReportingSuppressesScanEmissions)
+{
+    QJsonObject setObj;
+    setObj["code"] = "tst";
+    setObj["name"] = "Test Set";
+    setObj["type"] = "expansion";
+    setObj["releaseDate"] = "2024-01-01";
+    setObj["cards"] = QJsonArray();
+    QJsonObject root;
+    root["data"] = QJsonObject{{"TST", setObj}};
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Compact);
+
+    int emissions = 0;
+    QObject::connect(importer, &OracleImporter::dataReadProgress, [&emissions](int, int) { ++emissions; });
+
+    importer->setProgressReporting(false);
+    ASSERT_TRUE(importer->readSetsFromByteArray(data));
+    ASSERT_EQ(emissions, 0);
+
+    importer->setProgressReporting(true);
+    ASSERT_TRUE(importer->readSetsFromByteArray(data));
+    ASSERT_GT(emissions, 0);
 }
 
 int main(int argc, char **argv)

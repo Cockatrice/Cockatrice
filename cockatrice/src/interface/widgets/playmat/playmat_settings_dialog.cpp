@@ -2,6 +2,7 @@
 
 #include "../../card_picture_loader/card_picture_loader.h"
 #include "../cards/art_crop_attribution.h"
+#include "../cards/card_art_utils.h"
 #include "../utility/completer_utils.h"
 #include "card_database_display_model.h"
 #include "card_database_model.h"
@@ -276,7 +277,7 @@ void PlaymatSettingsDialog::reloadPreview()
         return;
     }
 
-    currentPixmap = fullRes;
+    currentPixmap = CardArtUtils::rotateSidewaysLayoutArt(fullRes, card);
     preview->setPixmap(currentPixmap);
     preview->setParams(currentParams);
     preview->setAttribution(buildArtAttribution(card));

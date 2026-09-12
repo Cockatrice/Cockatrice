@@ -1,6 +1,7 @@
 #include "card_picture_loader.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../pixel_map_generator.h"
 #include "card_picture_loader_cache_method.h"
 #include "card_picture_loader_local_schemes.h"
 
@@ -62,7 +63,7 @@ void CardPictureLoader::getCardBackPixmap(QPixmap &pixmap, QSize size)
     QString backCacheKey = "_trice_card_back_" + QString::number(size.width()) + "x" + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
         qCDebug(CardPictureLoaderLog) << "PictureLoader: cache miss for" << backCacheKey;
-        QPixmap tmpPixmap("theme:cardback");
+        QPixmap tmpPixmap = themePixmap(QStringLiteral("cardback"));
 
         if (tmpPixmap.isNull()) {
             qCWarning(CardPictureLoaderLog) << "Failed to load 'theme:cardback'! Using fallback pixmap.";
@@ -83,7 +84,7 @@ void CardPictureLoader::getCardBackLoadingInProgressPixmap(QPixmap &pixmap, QSiz
         "_trice_card_back_inprogress_" + QString::number(size.width()) + "x" + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
         qCDebug(CardPictureLoaderCardBackCacheFailLog) << "PictureLoader: cache miss for" << backCacheKey;
-        QPixmap tmpPixmap("theme:cardback");
+        QPixmap tmpPixmap = themePixmap(QStringLiteral("cardback"));
 
         if (tmpPixmap.isNull()) {
             qCWarning(CardPictureLoaderLog) << "Failed to load 'theme:cardback' for in-progress state! Using fallback.";
@@ -105,7 +106,7 @@ void CardPictureLoader::getCardBackLoadingFailedPixmap(QPixmap &pixmap, QSize si
         "_trice_card_back_failed_" + QString::number(size.width()) + "x" + QString::number(size.height());
     if (!QPixmapCache::find(backCacheKey, &pixmap)) {
         qCDebug(CardPictureLoaderCardBackCacheFailLog) << "PictureLoader: cache miss for" << backCacheKey;
-        QPixmap tmpPixmap("theme:cardback");
+        QPixmap tmpPixmap = themePixmap(QStringLiteral("cardback"));
 
         if (tmpPixmap.isNull()) {
             qCWarning(CardPictureLoaderLog) << "Failed to load 'theme:cardback' for failed state! Using fallback.";
@@ -138,7 +139,8 @@ void CardPictureLoader::getPixmap(QPixmap &pixmap, const ExactCard &card, QSize 
     QPixmap bigPixmap;
     if (QPixmapCache::find(key, &bigPixmap)) {
         if (bigPixmap.isNull()) {
-            getCardBackLoadingFailedPixmap(pixmap, size);
+            // Leave the pixmap null so callers fall back to a solid color
+            // instead of showing the card back.
             QDateTime failedAtTime = getInstance().failedAt.value(key);
             if (!failedAtTime.isValid() ||
                 failedAtTime.addSecs(RETRY_FAILED_CARDS_SECS) < QDateTime::currentDateTime()) {

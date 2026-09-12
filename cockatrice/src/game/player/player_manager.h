@@ -100,6 +100,9 @@ public:
         emit spectatorRemoved(spectatorId, spectatorInfo);
     }
 
+    /** @brief Remove all spectators, emitting the removal signal for each. */
+    void clearSpectators();
+
     [[nodiscard]] AbstractGame *getGame() const
     {
         return game;

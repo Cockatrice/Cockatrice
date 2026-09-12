@@ -35,10 +35,23 @@ public:
         return value;
     }
 
-    void setValue(int newValue);
+    /**
+     * @brief Set the counter value.
+     * @param newValue The new value.
+     * @param skipDamageAnimation When true, valueChanged is emitted with skipDamageAnimation=true, letting views
+     * suppress damage-related feedback (e.g. battlefield shimmer, life counter flash) for values set during replay
+     * rewinds.
+     */
+    void setValue(int newValue, bool skipDamageAnimation = false);
 
 signals:
-    void valueChanged(int oldValue, int newValue);
+    /**
+     * @brief Emitted whenever the value changes.
+     * @param oldValue The previous value.
+     * @param newValue The new value.
+     * @param skipDamageAnimation True when the change should not trigger damage/life-change feedback in views.
+     */
+    void valueChanged(int oldValue, int newValue, bool skipDamageAnimation);
 
 private:
     int id;

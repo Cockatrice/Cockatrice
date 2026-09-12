@@ -25,6 +25,9 @@ INSERT INTO cockatrice_schema_version VALUES(36);
 -- users and user data tables
 CREATE TABLE IF NOT EXISTS `cockatrice_users` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
+  -- Bitfield of staff levels: 1 = admin (implies moderator), 2 = moderator,
+  -- 4 = judge, 8 = developer. Operators set these by hand with
+  -- "UPDATE cockatrice_users SET admin = ...".
   `admin` tinyint(1) NOT NULL,
   `name` varchar(35) NOT NULL,
   `realname` varchar(255) NOT NULL,

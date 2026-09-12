@@ -234,9 +234,11 @@ bool UserListTWI::operator<(const QTreeWidgetItem &other) const
     const auto &lhsUserLevelFlags = UserLevelFlags(data(0, Qt::UserRole).toInt());
     const auto &rhsUserLevelFlags = UserLevelFlags(other.data(0, Qt::UserRole).toInt());
 
-    // Admins & Mods need no additional comparison checks, just to see if they're an admin or a moderator
+    // Admins, Developers & Mods need no additional comparison checks, just to see if they're an admin, a developer
+    // or a moderator
     static const QList<ServerInfo_User_UserLevelFlag> userLevelWithNoOtherPrefOrder = {
-        ServerInfo_User_UserLevelFlag_IsAdmin, ServerInfo_User_UserLevelFlag_IsModerator};
+        ServerInfo_User_UserLevelFlag_IsAdmin, ServerInfo_User_UserLevelFlag_IsDeveloper,
+        ServerInfo_User_UserLevelFlag_IsModerator};
     for (const auto &userLevelEntry : userLevelWithNoOtherPrefOrder) {
         if (lhsUserLevelFlags.testFlag(userLevelEntry) &&
             lhsUserLevelFlags.testFlag(userLevelEntry) == rhsUserLevelFlags.testFlag(userLevelEntry)) {

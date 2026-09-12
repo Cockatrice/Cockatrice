@@ -182,6 +182,13 @@ void FirstRunWizard::onCardDatabaseUpdateFinished(bool success)
     }
 }
 
+void FirstRunWizard::onCardDatabaseUpdateProgress(const QString &stage, qint64 done, qint64 total)
+{
+    if (cardDatabasePage) {
+        cardDatabasePage->onUpdateProgress(stage, done, total);
+    }
+}
+
 void FirstRunWizard::finish()
 {
     accept();
