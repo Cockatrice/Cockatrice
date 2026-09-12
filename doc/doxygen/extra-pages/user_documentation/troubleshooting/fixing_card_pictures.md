@@ -28,7 +28,8 @@ valid URLs. If you suspect the list has been modified or corrupted, press 'Reset
 defaults.
 
 For information on how to add your own custom URL templates, see the 'How to add a custom URL' link in the same
-settings section.
+settings section, or @subpage custom_card_pictures for a full reference of the URL reference points, the CUSTOM
+pictures folder, and custom card databases.
 
 # Check Your Local Picture Folder
 
@@ -42,7 +43,8 @@ Cockatrice checks the following locations, in order:
 - `<pictures directory>/<set code>/<card file name>`
 - `<pictures directory>/downloadedPics/<set code>/<card file name>`
 
-The following import naming schemes are recognized (using both `_` and `-` as separators):
+The following import naming schemes are recognized (using both `_` and `-` as separators). The canonical table with
+concrete example file names is on @ref custom_card_pictures:
 
 | Scheme                      | Pattern                    |
 | --------------------------- | -------------------------- |
