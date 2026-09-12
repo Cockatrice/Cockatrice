@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QColor>
 #include <QDebug>
+#include <QFile>
 #include <QFileInfo>
 #include <QLibraryInfo>
 #include <QMap>
@@ -184,11 +185,32 @@ QString ThemeManager::assetPath(QStringView prefix) const
     return resolvedPlain.isEmpty() ? prefix.toString() : resolvedPlain;
 }
 
-bool ThemeManager::isBuiltInTheme()
+// Probe whether a directory is truly writable by trying to create and remove a
+// temporary file. QFileInfo::isWritable() on a directory is unreliable (notably
+// on Windows where UAC VirtualStore can make a system dir appear writable).
+bool ThemeManager::isDirReallyWritable(const QString &dirPath)
 {
-    const auto themeName = SettingsCache::instance().getThemeName();
+    const QString probe = QDir(dirPath).absoluteFilePath(".cockatrice_write_test");
+    QFile f(probe);
+    if (!f.open(QIODevice::WriteOnly)) {
+        return false;
+    }
+    f.close();
+    f.remove();
+    return true;
+}
 
-    return themeName == NONE_THEME_NAME || themeName == FUSION_THEME_NAME;
+QString ThemeManager::writableThemeDir(const QString &themeName)
+{
+    // All theme writes go to the user themes directory regardless of whether
+    // the resolved (system) theme directory happens to be writable. Even when a
+    // write would succeed in-place, routing it to the user directory keeps the
+    // install intact and guarantees changes survive upgrades.
+    const QString dirPath = QDir(SettingsCache::instance().paths().getThemesPath()).absoluteFilePath(themeName);
+    if (!QDir().mkpath(dirPath)) {
+        qWarning() << "Failed to create theme save directory:" << dirPath;
+    }
+    return dirPath;
 }
 
 // System (read-only) themes location, relative to the application binary.
@@ -331,7 +353,7 @@ bool ThemeManager::commitPalette(const QString &themeDirPath, const QString &col
 
 void ThemeManager::setColorScheme(const QString &scheme)
 {
-    const QString dirPath = getAvailableThemes().value(SettingsCache::instance().getThemeName());
+    const QString dirPath = writableThemeDir(SettingsCache::instance().getThemeName());
     ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
 
     cfg.colorScheme = scheme;
@@ -342,7 +364,7 @@ void ThemeManager::setColorScheme(const QString &scheme)
 
 void ThemeManager::setStyleName(const QString &styleName)
 {
-    const QString dirPath = getAvailableThemes().value(SettingsCache::instance().getThemeName());
+    const QString dirPath = writableThemeDir(SettingsCache::instance().getThemeName());
     ThemeConfig cfg = ThemeConfig::fromThemeDir(dirPath);
 
     cfg.styleName = styleName;
@@ -416,6 +438,8 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
     qApp->setPalette(base);
     qApp->setStyle(style);
 
+    currentAppColors = palCfg.appColors;
+
     // Force every widget to re-polish and repaint immediately rather than
     // waiting for natural expose events, which produces a patchwork of old
     // and new colours during a live preview.
@@ -428,6 +452,35 @@ void ThemeManager::applyStyleAndPalette(const QString &themeName,
         style->polish(widget);
         widget->update();
     }
+
+    emit paletteChanged();
+}
+
+QColor ThemeManager::appColor(AppColor::Role role) const
+{
+    const auto it = currentAppColors.constFind(role);
+    if (it != currentAppColors.constEnd()) {
+        return it.value();
+    }
+
+    // QPalette::Accent was introduced in Qt 6.6 and several shipped palettes
+    // set it to a value barely distinguishable from Window, so it is not a
+    // reliable accent source. The selection highlight is the stable accent
+    // (Accent defaults to Highlight when unset), and deriving from it
+    // unconditionally keeps every Qt version rendering identically.
+    const QColor accent = qApp->palette().color(QPalette::Active, QPalette::Highlight);
+
+    if (role == AppColor::AccentSoft) {
+        constexpr int SOFT_SATURATION_PERCENT = 70;
+        constexpr int SOFT_LIGHTNESS_OFFSET = 60;
+
+        // Light end of the gradient: same hue, softened and lightened
+        return QColor::fromHsl(qMax(0, accent.hslHue()),
+                               qBound(0, qRound(accent.hslSaturation() * SOFT_SATURATION_PERCENT / 100.0), 255),
+                               qBound(0, accent.lightness() + SOFT_LIGHTNESS_OFFSET, 255));
+    }
+
+    return accent;
 }
 
 void ThemeManager::themeChangedSlot()
@@ -464,8 +517,19 @@ void ThemeManager::themeChangedSlot()
 
     // ── Load palette: custom first, then theme default ────────────────────
     PaletteConfig palette = PaletteConfig::fromScheme(dirPath, activeScheme);
-    if (!palette.hasPalette()) {
-        palette = ThemeManager::loadDefaultPaletteConfig(dirPath, themeName, activeScheme);
+    const PaletteConfig themeDefault = ThemeManager::loadDefaultPaletteConfig(dirPath, themeName, activeScheme);
+    if (palette.hasPalette()) {
+        // A custom palette written before [AppColors] existed carries no app
+        // colors; merge the theme's shipped defaults so the identity colors
+        // survive (hasPalette() counts an app-colors-only file as a palette,
+        // so those are kept wholesale and never reach here empty).
+        for (auto it = themeDefault.appColors.cbegin(); it != themeDefault.appColors.cend(); ++it) {
+            if (!palette.appColors.contains(it.key())) {
+                palette.appColors.insert(it.key(), it.value());
+            }
+        }
+    } else {
+        palette = themeDefault;
     }
 
     applyStyleAndPalette(themeName, themeCfg, palette, activeScheme);

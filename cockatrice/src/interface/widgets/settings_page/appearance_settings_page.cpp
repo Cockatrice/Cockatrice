@@ -510,7 +510,7 @@ void AppearanceSettingsPage::retranslateUi()
     homeTabDisplayCardNameCheckBox.setText(tr("Display card name of background in bottom right"));
     homeTabButtonColorSourceLabel.setText(tr("Home tab button color:"));
     homeTabButtonColorSourceBox.setToolTip(
-        tr("Automatic: extract from background if present, otherwise use theme default"));
+        tr("Use the theme's identity accent colors, or extract colors from the background image"));
 
     playmatGroupBox->setTitle(tr("Playmat settings"));
     playmatVisibilityLabel.setText(tr("Playmat visibility:"));

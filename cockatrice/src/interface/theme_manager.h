@@ -50,6 +50,7 @@ private:
     QString currentThemePath;
     std::array<QBrush, Role::MaxRole + 1> brushes;
     QStringMap availableThemes;
+    QMap<AppColor::Role, QColor> currentAppColors;
     /*
       Internal cache for multiple backgrounds
     */
@@ -65,7 +66,16 @@ protected:
                               const QString &activeScheme);
 
 public:
-    bool isBuiltInTheme();
+    // Resolves the directory to write theme changes to for the given theme
+    // name. The resolved theme dir (user or system) is used when writable;
+    // read-only system themes fall back to the user themes directory, creating
+    // it if needed, so customisations never get lost on upgrade.
+    static QString writableThemeDir(const QString &themeName);
+    // Probe whether a directory is truly writable by trying to create and remove
+    // a temporary file. QFileInfo::isWritable() on a directory is unreliable
+    // (notably on Windows where UAC VirtualStore can make a system dir appear
+    // writable).
+    static bool isDirReallyWritable(const QString &dirPath);
     // Explicit color scheme of the theme: theme.cfg's ColorScheme setting
     // (Dark/Light), falling back to the OS color scheme when it is "System".
     bool isDarkMode(const QString &themeDirPath) const;
@@ -115,12 +125,17 @@ public:
     void reloadCurrentTheme();
     void previewPalette(const PaletteConfig &cfg, const QString &scheme);
 
+    // Resolves an application color role: the theme's stored [AppColors] value
+    // when present, otherwise a palette-accent-derived fallback.
+    QColor appColor(AppColor::Role role) const;
+
     QBrush &getBgBrush(Role zone);
     QBrush getExtraBgBrush(Role zone, int zoneId = 0);
 protected slots:
     void themeChangedSlot();
 signals:
     void themeChanged();
+    void paletteChanged();
 };
 
 extern ThemeManager *themeManager;
