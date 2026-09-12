@@ -340,16 +340,26 @@ void ChatView::appendMessage(QString message,
                 pos.relativePosition = match.captured(0).length(); // set message start
                 auto before = match.captured(1);
                 auto sentBy = match.captured(2);
+
+                // The user level is not carried in the room chat history, so history
+                // entries used to render as fixed-level user tags. Resolve online users
+                // against the user list to turn their history entries into full user
+                // tags (correct level, name casing and moderation context menu).
+                QString displayName = sentBy;
+                QString levelMarker = "_"; // placeholder for offline / unknown user level
+                if (const ServerInfo_User *onlineUser = userListProxy->getOnlineUser(sentBy)) {
+                    displayName = QString::fromStdString(onlineUser->name());
+                    levelMarker = QString::number(onlineUser->user_level());
+                }
+
                 cursor.insertText(before); // add message timestamp
                 QTextCharFormat senderFormat(defaultFormat);
                 senderFormat.setAnchor(true);
-                // this underscore is important, it is used to add the user level, but in this case the level is
-                // unknown, if the name contains an underscore it would split up the name
-                senderFormat.setAnchorHref("user://_" + sentBy);
+                senderFormat.setAnchorHref("user://" + levelMarker + "_" + displayName);
                 cursor.setCharFormat(senderFormat);
-                cursor.insertText(sentBy);                   // add username with href so it shows the menu
-                userMessagePositions[sentBy].append(pos);    // save message position
-                message.remove(0, pos.relativePosition - 2); // do not remove semicolon
+                cursor.insertText(displayName);                // add username with href so it shows the menu
+                userMessagePositions[displayName].append(pos); // save message position
+                message.remove(0, pos.relativePosition - 2);   // do not remove semicolon
             }
         } else {
             //! \todo Remove hardcoded color.
