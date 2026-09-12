@@ -41,6 +41,7 @@ private:
     QLabel homeTabBackgroundShuffleFrequencyLabel;
     QSpinBox homeTabBackgroundShuffleFrequencySpinBox;
     QCheckBox homeTabDisplayCardNameCheckBox;
+    QCheckBox homeTabBackgroundDimCheckBox;
     QLabel homeTabButtonColorSourceLabel;
     QComboBox homeTabButtonColorSourceBox;
 

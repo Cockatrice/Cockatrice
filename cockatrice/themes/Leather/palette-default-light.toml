@@ -1,0 +1,74 @@
+# Leather — light identity palette (black-brown chrome with brass accents)
+[Palette]
+WindowText           = #2a2114
+Button               = #dfcbb0
+Light                = #ffffff
+Midlight             = #c6b08c
+Dark                 = #a18a64
+Mid                  = #b29a74
+Text                 = #2a2114
+BrightText           = #7a531c
+ButtonText           = #1f1710
+Base                 = #fdf8ee
+Window               = #f0e2cb
+Shadow               = #5d4d33
+Highlight            = #34508c
+HighlightedText      = #ffffff
+Link                 = #8a5e1e
+LinkVisited          = #6b5190
+AlternateBase        = #f5ebd7
+ToolTipBase          = #fff7e8
+ToolTipText          = #1f1710
+PlaceholderText      = #7a2a2114
+Accent               = #a5712f
+
+[Palette.Disabled]
+WindowText           = #787878
+Button               = #f0e2cb
+Light                = #ffffff
+Midlight             = #c6b08c
+Dark                 = #a18a64
+Mid                  = #b29a74
+Text                 = #787878
+BrightText           = #7a531c
+ButtonText           = #969696
+Base                 = #f0e2cb
+Window               = #f0e2cb
+Shadow               = #5d4d33
+Highlight            = #ecd9bb
+HighlightedText      = #787878
+Link                 = #0000ff
+LinkVisited          = #ff00ff
+AlternateBase        = #f5ebd7
+ToolTipBase          = #fff7e8
+ToolTipText          = #1f1710
+PlaceholderText      = #7a2a2114
+Accent               = #787878
+
+[Palette.Inactive]
+WindowText           = #2a2114
+Button               = #dfcbb0
+Light                = #ffffff
+Midlight             = #c6b08c
+Dark                 = #a18a64
+Mid                  = #b29a74
+Text                 = #2a2114
+BrightText           = #7a531c
+ButtonText           = #1f1710
+Base                 = #fdf8ee
+Window               = #f0e2cb
+Shadow               = #5d4d33
+Highlight            = #ecd9bb
+HighlightedText      = #000000
+Link                 = #8a5e1e
+LinkVisited          = #6b5190
+AlternateBase        = #f5ebd7
+ToolTipBase          = #fff7e8
+ToolTipText          = #1f1710
+PlaceholderText      = #7a2a2114
+Accent               = #a5712f
+
+[AppColors]
+AccentStrong         = #b7823b
+AccentSoft           = #e4c58f
+
