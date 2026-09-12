@@ -154,12 +154,19 @@ void CardPictureLoaderWorker::resetRequestQuota()
     hostQuotaRemaining.clear();
 
     QDateTime now = QDateTime::currentDateTime();
-    for (auto it = hostRequestQuota.begin(); it != hostRequestQuota.end(); ++it) {
+    for (auto it = hostRequestQuota.begin(); it != hostRequestQuota.end();) {
+        // An unlocked host has no per-host allowance; drop any stale entry instead of
+        // recovering it towards the UNLIMITED_HOST_QUOTA sentinel, which would poison it.
+        if (hostAllowanceCeiling(it.key()) == DownloadSettings::UNLIMITED_HOST_QUOTA) {
+            it = hostRequestQuota.erase(it);
+            continue;
+        }
         if (!hostLast429.contains(it.key()) || now.msecsTo(hostLast429.value(it.key())) < -QUOTA_RECOVER_MS) {
             // Recover towards the host's effective allowance ceiling, which may be
             // lowered by the user's per-host request limits.
             it.value() = qMin(hostAllowanceCeiling(it.key()), it.value() + 1);
         }
+        ++it;
     }
 
     processQueuedRequests();
@@ -194,6 +201,28 @@ void CardPictureLoaderWorker::dispatchQueuedRequest()
         return;
     }
 
+    // Unlocked hosts (developer cap UNLIMITED_HOST_QUOTA) skip the dispatch pacing: dispatch every
+    // queued request for them back-to-back, bounded only by their 429 backoff window and Qt's
+    // per-host connection pool.
+    QDateTime now = QDateTime::currentDateTime();
+    for (int i = 0; i < requestLoadQueue.size();) {
+        const auto &request = requestLoadQueue.at(i);
+        const QString host = request.first.host();
+        if (hostAllowanceCeiling(host) == DownloadSettings::UNLIMITED_HOST_QUOTA &&
+            !CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(host, now)) {
+            makeRequest(request.first, request.second);
+            requestLoadQueue.removeAt(i);
+        } else {
+            ++i;
+        }
+    }
+
+    if (requestLoadQueue.isEmpty()) {
+        dispatchTimer.stop();
+        requestTimer.stop();
+        return;
+    }
+
     if (!processSingleRequest()) {
         // No queued host currently has allowance left in this second; wait for the quota reset.
         dispatchTimer.stop();
@@ -214,18 +243,12 @@ bool CardPictureLoaderWorker::processSingleRequest()
             request.second->startNextPicDownload();
             return true;
         }
-const int ceiling = hostAllowanceCeiling(host);
-        // Unlocked hosts (developer cap UNLIMITED_HOST_QUOTA) skip the per-host allowance
-        // entirely; only the request pacing still applies.
-        if (ceiling == DownloadSettings::UNLIMITED_HOST_QUOTA) {
-            makeRequest(request.first, request.second);
-            requestLoadQueue.removeAt(i);
-            return true;
-        }
-        // Seed the allowance now so a host that was rate limited gets its reduced
-        // allowance instead of a fresh full quota mid-second.
+        const int ceiling = hostAllowanceCeiling(host);
+        // Seed the allowance lazily so a host that enters the queue mid-second gets its reduced
+        // per-host allowance, clamped against the ceiling so a lowered user cap applies from this
+        // second onward.
         if (!hostQuotaRemaining.contains(host)) {
-            hostQuotaRemaining.insert(host, hostRequestQuota.value(host, ceiling));
+            hostQuotaRemaining.insert(host, qMin(ceiling, hostRequestQuota.value(host, ceiling)));
         }
         int allowance = hostQuotaRemaining.value(host);
         if (allowance > 0) {
@@ -250,12 +273,13 @@ int CardPictureLoaderWorker::hostAllowanceCeiling(const QString &host) const
 
 void CardPictureLoaderWorker::onHostRateLimited(const QString &host)
 {
-    if (hostAllowanceCeiling(host) == DownloadSettings::UNLIMITED_HOST_QUOTA) {
+    const int ceiling = hostAllowanceCeiling(host);
+    if (ceiling == DownloadSettings::UNLIMITED_HOST_QUOTA) {
         // Unlocked hosts have no per-host allowance to halve; the shared backoff
         // window tracked by the rate limiter still paces them.
         return;
     }
-    hostRequestQuota.insert(host, qMax(MIN_HOST_QUOTA, hostRequestQuota.value(host, hostAllowanceCeiling(host)) / 2));
+    hostRequestQuota.insert(host, qMax(MIN_HOST_QUOTA, hostRequestQuota.value(host, ceiling) / 2));
     hostLast429.insert(host, QDateTime::currentDateTime());
 }
 

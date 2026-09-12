@@ -12,7 +12,7 @@ const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {
 // Developer-set ceilings for the per-host request allowance. Users may lower a host's
 // allowance via the download settings, but can never raise it above these values. Hosts
 // not listed default to DEFAULT_HOST_REQUEST_LIMIT. A cap of UNLIMITED_HOST_QUOTA marks a
-// host that is never throttled per host (request pacing and 429 backoff still apply).
+// host that is never throttled per host and skips the dispatch pacing (429 backoff still applies).
 const QHash<QString, int> DownloadSettings::DEVELOPER_HOST_CAPS = {
     // The Scryfall API enforces 10 requests/second; stay one under so a burst can't trip 429s.
     {"api.scryfall.com", 9},
