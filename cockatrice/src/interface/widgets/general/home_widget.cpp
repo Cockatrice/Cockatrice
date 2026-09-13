@@ -11,6 +11,8 @@
 #include "home_tab_button_color.h"
 
 #include <QGroupBox>
+#include <QLabel>
+#include <QLinearGradient>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPushButton>
@@ -21,8 +23,7 @@
 #include <libcockatrice/settings/paths_settings.h>
 
 HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
-    : QWidget(parent), tabSupervisor(_tabSupervisor), background(themePixmap(QStringLiteral("backgrounds/home"))),
-      overlay(themePixmap(QStringLiteral("cockatrice")))
+    : QWidget(parent), tabSupervisor(_tabSupervisor), background(themePixmap(QStringLiteral("backgrounds/home")))
 {
     layout = new QGridLayout(this);
 
@@ -64,12 +65,17 @@ HomeWidget::HomeWidget(QWidget *parent, TabSupervisor *_tabSupervisor)
     // not on SettingsCache::themeChanged, so re-resolve the variant background.
     connect(themeManager, &ThemeManager::themeChanged, this, &HomeWidget::initializeBackgroundFromSource);
     connect(themeManager, &ThemeManager::paletteChanged, this, &HomeWidget::updateButtonsToBackgroundColor);
+    connect(themeManager, &ThemeManager::paletteChanged, this, &HomeWidget::updateLogoOverlay);
     connect(&SettingsCache::instance().appearance(), &AppearanceSettings::homeTabButtonColorChanged, this,
             &HomeWidget::updateButtonsToBackgroundColor);
 }
 
 void HomeWidget::initializeBackgroundFromSource()
 {
+    // The featured logo is theme/scheme-derived too; reload it alongside the
+    // background so a theme or appearance switch doesn't leave it stale.
+    updateLogoOverlay();
+
     if (CardDatabaseManager::getInstance()->getLoadStatus() != LoadStatus::Ok) {
         connect(CardDatabaseManager::getInstance(), &CardDatabase::cardDatabaseLoadingFinished, this,
                 &HomeWidget::initializeBackgroundFromSource);
@@ -229,10 +235,10 @@ QGroupBox *HomeWidget::createButtons()
     QVBoxLayout *boxLayout = new QVBoxLayout;
     boxLayout->setAlignment(Qt::AlignHCenter);
 
-    QLabel *logoLabel = new QLabel;
-    logoLabel->setPixmap(overlay.scaledToWidth(200, Qt::SmoothTransformation));
+    logoLabel = new QLabel;
     logoLabel->setAlignment(Qt::AlignCenter);
     boxLayout->addWidget(logoLabel);
+    updateLogoOverlay();
     boxLayout->addSpacing(25);
 
     connectButton = new HomeStyledButton("Connect/Play", gradientColors);
@@ -432,4 +438,57 @@ void HomeWidget::paintEvent(QPaintEvent *event)
     }
 
     QWidget::paintEvent(event);
+}
+
+void HomeWidget::updateLogoOverlay()
+{
+    // Emulate cockatrice.svg in Qt rather than rendering the baked-in SVG.
+    // The SVG has no separate plate: the gradient fills the bird's silhouette
+    // paths (light #c9fd62/AccentSoft at the top-left, dark #139740/AccentStrong
+    // toward the bottom-right — the SVG's linearGradient4265-7-8 stops along
+    // its userSpaceOnUse axis), and the white highlight path
+    // (cockatrice-logo-white) sits on top. So we paint that gradient clipped to
+    // the full logo silhouette (the full-color logo's alpha), then overlay the
+    // white mark. Colours stay fully theme-driven and independent of the static
+    // greens baked into the SVG.
+    const QColor strong = themeManager->appColor(AppColor::AccentStrong);
+    const QColor soft = themeManager->appColor(AppColor::AccentSoft);
+
+    const QPixmap silhouette = themePixmap(QStringLiteral("cockatrice")).scaledToWidth(200, Qt::SmoothTransformation);
+    const QPixmap whiteMark =
+        themePixmap(QStringLiteral("cockatrice-logo-white")).scaledToWidth(200, Qt::SmoothTransformation);
+    if (silhouette.isNull() || whiteMark.isNull()) {
+        return;
+    }
+
+    QPixmap composite(silhouette.size());
+    composite.fill(Qt::transparent);
+
+    {
+        QPainter painter(&composite);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
+        // Recreate cockatrice.svg's own gradient geometry (linearGradient
+        // 4265-7-8, userSpaceOnUse): light AccentSoft at S=(-8.097,-97.746),
+        // dark AccentStrong at E=(162.455,295.208), on the SVG's 300x300
+        // canvas. Scale those coordinates to this composite's size.
+        const qreal scale = composite.width() / 300.0;
+        QLinearGradient gradient(QPointF(-8.097, -97.746) * scale, QPointF(162.455, 295.208) * scale);
+        gradient.setColorAt(0.0, soft);
+        gradient.setColorAt(1.0, strong);
+        painter.fillRect(composite.rect(), gradient);
+
+        // Clip the gradient to the full logo silhouette exactly as the SVG's
+        // gradient paths are confined to the bird.
+        painter.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+        painter.drawPixmap(0, 0, silhouette);
+
+        painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+        painter.drawPixmap(0, 0, whiteMark);
+    }
+
+    if (logoLabel) {
+        logoLabel->setPixmap(composite);
+    }
 }
