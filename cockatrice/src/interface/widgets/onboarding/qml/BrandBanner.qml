@@ -41,29 +41,56 @@ Item {
         fragmentShader: "qrc:/onboarding/shaders/brand_banner.frag.qsb"
     }
 
-    // The hero logo itself — breathes cleanly over a 0.5–1.0 opacity range.
-    // White silhouette on dark stages, black on light ones, so it stays
-    // readable in both modes.
-    Image {
-        id: logo
-        anchors.centerIn: parent
+    // The white logo sits at full opacity on top of the static gradient plate —
+    // no glow, no breathing. The plate matches home_widget's QPainter composite.
+    Item {
+        id: logoHost
         visible: bannerConfig.logoVisible
-        source: bannerConfig.logoDark ? "qrc:/resources/cockatrice-logo-black.svg"
-                                      : "qrc:/resources/cockatrice-logo-white.svg"
+        anchors.centerIn: parent
         width: root.height * 0.6
-        height: width * (sourceSize.height > 0 ? sourceSize.height / Math.max(sourceSize.width, 1) : 1)
-        fillMode: Image.PreserveAspectFit
-        smooth: true
-        opacity: 0.5 + 0.5 * bannerConfig.logoGlow
-        sourceSize: Qt.size(256, 256)
+        height: width
 
-        Behavior on opacity { NumberAnimation { duration: 300; easing.type: Easing.InOutSine } }
+        // The full-color logo renders beneath the white mark and is consumed as
+        // a texture (layer.enabled) by the plate shader's silhouette mask, so
+        // the gradient is clipped to the bird exactly as the SVG's gradient
+        // paths are. It is never drawn to the screen itself.
+        Image {
+            id: silhouetteMask
+            anchors.fill: parent
+            source: "qrc:/resources/cockatrice.svg"
+            sourceSize: Qt.size(256, 256)
+            fillMode: Image.PreserveAspectFit
+            smooth: true
+            visible: false
+            layer.enabled: true
+            layer.smooth: true
+        }
 
-        transform: Scale {
-            origin.x: logo.width / 2
-            origin.y: logo.height / 2
-            xScale: 0.94 + 0.06 * bannerConfig.logoGlow
-            yScale: 0.94 + 0.06 * bannerConfig.logoGlow
+        // The logo's gradient plate, drawn behind the mark: a linear
+        // AccentSoft (light) -> AccentStrong (dark) sheet along the same
+        // top-left -> bottom-right userSpaceOnUse axis the baked-in SVG used,
+        // clipped to the bird silhouette via uSilhouette. The white highlight
+        // path above is theme independent. Sized to the logo itself — no
+        // rounded badge, matching home_widget's QPainter composite. Static.
+        // Small ShaderEffect, Qt 6.4-safe.
+        ShaderEffect {
+            id: brandPlate
+            anchors.fill: parent
+            property vector4d uStrong: Qt.vector4d(bannerConfig.brandStrong.r, bannerConfig.brandStrong.g,
+                                                   bannerConfig.brandStrong.b, 1.0)
+            property vector4d uSoft: Qt.vector4d(bannerConfig.brandSoft.r, bannerConfig.brandSoft.g,
+                                                 bannerConfig.brandSoft.b, 1.0)
+            property var uSilhouette: silhouetteMask
+            fragmentShader: "qrc:/onboarding/shaders/brand_plate.frag.qsb"
+        }
+
+        Image {
+            id: logoImage
+            anchors.fill: parent
+            source: "qrc:/resources/cockatrice-logo-white.svg"
+            sourceSize: Qt.size(256, 256)
+            fillMode: Image.PreserveAspectFit
+            smooth: true
         }
     }
 }

@@ -39,10 +39,11 @@ class BannerShaderConfig : public QObject
     Q_PROPERTY(QColor colorB READ colorB WRITE setColorB NOTIFY colorBChanged)
     Q_PROPERTY(QColor accent READ accent WRITE setAccent NOTIFY accentChanged)
     Q_PROPERTY(QColor glowColor READ glowColor WRITE setGlowColor NOTIFY glowColorChanged)
+    Q_PROPERTY(QColor brandStrong READ brandStrong WRITE setBrandStrong NOTIFY brandStrongChanged)
+    Q_PROPERTY(QColor brandSoft READ brandSoft WRITE setBrandSoft NOTIFY brandSoftChanged)
     Q_PROPERTY(qreal vignetteMin READ vignetteMin WRITE setVignetteMin NOTIFY vignetteMinChanged)
 
     Q_PROPERTY(bool logoVisible READ logoVisible WRITE setLogoVisible NOTIFY logoVisibleChanged)
-    Q_PROPERTY(bool logoDark READ logoDark WRITE setLogoDark NOTIFY logoDarkChanged)
     Q_PROPERTY(qreal logoGlow READ logoGlow WRITE setLogoGlow NOTIFY logoGlowChanged)
 
 public:
@@ -200,6 +201,30 @@ public:
         }
     }
 
+    QColor brandStrong() const
+    {
+        return m_brandStrong;
+    }
+    void setBrandStrong(const QColor &c)
+    {
+        if (c != m_brandStrong) {
+            m_brandStrong = c;
+            emit brandStrongChanged();
+        }
+    }
+
+    QColor brandSoft() const
+    {
+        return m_brandSoft;
+    }
+    void setBrandSoft(const QColor &c)
+    {
+        if (c != m_brandSoft) {
+            m_brandSoft = c;
+            emit brandSoftChanged();
+        }
+    }
+
     qreal vignetteMin() const
     {
         return m_vignetteMin;
@@ -221,18 +246,6 @@ public:
         if (v != m_logoVisible) {
             m_logoVisible = v;
             emit logoVisibleChanged();
-        }
-    }
-
-    bool logoDark() const
-    {
-        return m_logoDark;
-    }
-    void setLogoDark(bool v)
-    {
-        if (v != m_logoDark) {
-            m_logoDark = v;
-            emit logoDarkChanged();
         }
     }
 
@@ -262,9 +275,10 @@ signals:
     void colorBChanged();
     void accentChanged();
     void glowColorChanged();
+    void brandStrongChanged();
+    void brandSoftChanged();
     void vignetteMinChanged();
     void logoVisibleChanged();
-    void logoDarkChanged();
     void logoGlowChanged();
 
 private:
@@ -288,10 +302,11 @@ private:
     QColor m_colorB{0x0E, 0x0E, 0x12};
     QColor m_accent{0x8B, 0xDD, 0x6B};
     QColor m_glowColor{Qt::white};
+    QColor m_brandStrong{0x13, 0x97, 0x40};
+    QColor m_brandSoft{0xC9, 0xFD, 0x62};
     qreal m_vignetteMin = 0.62;
 
     bool m_logoVisible = false;
-    bool m_logoDark = false;
     qreal m_logoGlow = 1.0;
 };
 
