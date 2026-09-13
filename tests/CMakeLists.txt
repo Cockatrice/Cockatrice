@@ -1,3 +1,5 @@
+# CMakeLists for "tests" directory
+
 # NOTE: Qt modules for tests are defined centrally in cmake/FindQtRuntime.cmake (the _TEST_NEEDED variable).
 # If a new test needs additional Qt modules, add them there — not in individual test CMakeLists.txt files.
 enable_testing()
@@ -20,8 +22,6 @@ add_test(NAME metrics_registry_test COMMAND metrics_registry_test)
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
 set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 15)
 
-# Find GTest
-
 add_executable(dummy_test dummy_test.cpp)
 add_executable(expression_test expression_test.cpp)
 add_executable(clamped_arithmetic_test clamped_arithmetic_test.cpp)
@@ -39,6 +39,7 @@ target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatri
 add_executable(latency_tracker_test latency_tracker_test.cpp)
 add_executable(metrics_registry_test ../servatrice/src/metrics_registry.cpp metrics_registry_test.cpp)
 
+# Find GTest
 find_package(GTest)
 
 if(NOT GTEST_FOUND)

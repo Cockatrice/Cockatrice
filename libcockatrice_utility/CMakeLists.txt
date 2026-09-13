@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.16)
+# CMakeLists for "libcockatrice_utility" directory
+
 project(Utility VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 set(CMAKE_AUTOMOC ON)

@@ -1,3 +1,5 @@
+# CMakeLists for "libcockatrice_protocol" directory
+#
 # Top-level wrapper for the protobuf library
 
 add_subdirectory(libcockatrice/protocol/pb)

@@ -1,9 +1,12 @@
-# CMakeLists for cockatrice directory
+# CMakeLists for "cockatrice" directory
 #
-# provides the cockatrice binary
+# Provides the Cockatrice binary
 
 project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
+# ------------------------
+# Paths and directories
+# ------------------------
 set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
     # sort by alphabetical order, so that there is no debate about where to add new sources to the list

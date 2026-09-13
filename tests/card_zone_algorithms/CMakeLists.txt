@@ -1,3 +1,5 @@
+# CMakeLists for "card_zone_algorithms" directory
+
 add_executable(card_zone_algorithms_test card_zone_algorithms_test.cpp)
 
 target_include_directories(card_zone_algorithms_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src/game/zones)

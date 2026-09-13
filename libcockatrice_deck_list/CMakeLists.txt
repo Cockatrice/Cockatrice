@@ -1,3 +1,5 @@
+# CMakeLists for "libcockatrice_deck_list" directory
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)

@@ -1,3 +1,5 @@
+# CMakeLists for "deck_list_model" directory
+
 add_executable(deck_list_model_custom_zones_test ${VERSION_STRING_CPP} deck_list_model_custom_zones_test.cpp)
 
 if(NOT GTEST_FOUND)

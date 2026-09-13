@@ -1,3 +1,5 @@
+# CMakeLists for "oracle" directory
+
 add_executable(parse_cipt_test ../../oracle/src/parsehelpers.cpp parse_cipt_test.cpp)
 
 if(NOT GTEST_FOUND)

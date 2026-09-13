@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.16)
+# CMakeLists for "oracle" directory
+#
+# Provides the Oracle binary
+
 project(Oracle VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # ------------------------

@@ -1,3 +1,5 @@
+# CMakeLists for "loading_from_clipboard" directory
+
 add_definitions("-DCARDDB_DATADIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"")
 add_executable(loading_from_clipboard_test ${VERSION_STRING_CPP} clipboard_testing.cpp loading_from_clipboard_test.cpp)
 

@@ -1,3 +1,5 @@
+# CMakeLists for "movecard_tests" directory
+
 add_executable(reverse_card_move_test reverse_card_move_test.cpp)
 
 if(NOT GTEST_FOUND)

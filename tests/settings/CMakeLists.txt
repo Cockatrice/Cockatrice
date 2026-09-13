@@ -1,3 +1,5 @@
+# CMakeLists for "settings" directory
+
 add_executable(settings_manager_test settings_manager_test.cpp)
 add_executable(settings_defaults_test settings_defaults_test.cpp)
 add_executable(settings_migration_test settings_migration_test.cpp)

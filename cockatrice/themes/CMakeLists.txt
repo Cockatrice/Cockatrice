@@ -1,14 +1,13 @@
-# CMakeLists for themes directory
+# CMakeLists for ./cockatrice/themes directory
 #
-# add themes subfolders
+# Add themes subfolders
 
 set(defthemes Default Fabric Fusion Leather Plasma VelvetMarble)
 
 if(UNIX)
-  if(APPLE)
+  if(APPLE) # macOS
     install(DIRECTORY ${defthemes} DESTINATION Cockatrice.app/Contents/Resources/themes/)
-  else()
-    # Assume linux
+  else() # Assume Linux
     install(DIRECTORY ${defthemes} DESTINATION share/cockatrice/themes/)
   endif()
 elseif(WIN32)

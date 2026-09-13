@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.16)
+# CMakeLists for "carddatabase" directory
+
 project(CardDatabaseTests VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
 # ------------------------

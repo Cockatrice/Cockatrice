@@ -1,3 +1,5 @@
+# CMakeLists for "libcockatrice_interfaces" directory
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)

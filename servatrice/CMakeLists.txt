@@ -1,9 +1,12 @@
-# CMakeLists for servatrice directory
+# CMakeLists for "servatrice" directory
 #
-# provides the servatrice binary
+# Provides the Servatrice binary
 
 project(Servatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
+# ------------------------
+# Paths and directories
+# ------------------------
 set(servatrice_SOURCES
     src/email_parser.cpp
     src/event_loop_watchdog.cpp
