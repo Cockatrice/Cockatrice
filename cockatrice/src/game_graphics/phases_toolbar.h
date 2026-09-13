@@ -27,7 +27,6 @@ class GameCommand;
 class PhaseButton : public QObject, public QGraphicsItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 private:
     QString name;
     bool active, highlightable;
@@ -65,7 +64,6 @@ protected:
 class PhasesToolbar : public QObject, public QGraphicsItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
 private:
     QList<PhaseButton *> buttonList;
     PhaseButton *nextTurnButton;
