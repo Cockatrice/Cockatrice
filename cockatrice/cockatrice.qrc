@@ -363,6 +363,8 @@
 
         <file>resources/usericons/pawn_single.svg</file>
         <file>resources/usericons/pawn_double.svg</file>
+        <file>resources/usericons/pawn_dev_single.svg</file>
+        <file>resources/usericons/pawn_dev_double.svg</file>
         <file>resources/usericons/pawn_donator_single.svg</file>
         <file>resources/usericons/pawn_donator_double.svg</file>
         <file>resources/usericons/pawn_judge_single.svg</file>
