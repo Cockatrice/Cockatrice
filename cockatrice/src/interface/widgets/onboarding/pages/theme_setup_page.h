@@ -53,6 +53,9 @@ private:
     QComboBox *homeTabBackgroundCombo;
 
     bool paletteDirty = false;
+
+    /// Theme whose identity accent currently seeds the picker.
+    QString lastSeededTheme;
 };
 
 #endif // THEME_SETUP_PAGE_H
