@@ -138,17 +138,15 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
 void CardPictureLoaderWorker::resetRequestQuota()
 {
     requestQuota = MAX_REQUESTS_PER_SEC;
+    // Allowances are seeded per host on demand in processSingleRequest(), so a
+    // rate-limited host never gets a fresh full quota mid-second.
+    hostQuotaRemaining.clear();
 
     QDateTime now = QDateTime::currentDateTime();
     for (auto it = hostRequestQuota.begin(); it != hostRequestQuota.end(); ++it) {
         if (!hostLast429.contains(it.key()) || now.msecsTo(hostLast429.value(it.key())) < -QUOTA_RECOVER_MS) {
             it.value() = qMin(MAX_REQUESTS_PER_SEC, it.value() + 1);
         }
-    }
-
-    for (const auto &request : requestLoadQueue) {
-        const QString host = request.first.host();
-        hostQuotaRemaining.insert(host, hostRequestQuota.value(host, MAX_REQUESTS_PER_SEC));
     }
 
     processQueuedRequests();
@@ -184,10 +182,20 @@ void CardPictureLoaderWorker::dispatchQueuedRequest()
 
 bool CardPictureLoaderWorker::processSingleRequest()
 {
+    QDateTime now = QDateTime::currentDateTime();
     for (int i = 0; i < requestLoadQueue.size(); ++i) {
         const auto &request = requestLoadQueue.at(i);
-        QString host = request.first.host();
-        int allowance = hostQuotaRemaining.value(host, MAX_REQUESTS_PER_SEC);
+        const QString host = request.first.host();
+        // Don't dispatch requests to a host that is currently in its 429 backoff.
+        if (CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(host, now)) {
+            continue;
+        }
+        // Seed the allowance only now, so a host that was rate limited last second
+        // doesn't get a fresh full quota the moment it is queried mid-second.
+        if (!hostQuotaRemaining.contains(host)) {
+            hostQuotaRemaining.insert(host, hostRequestQuota.value(host, MAX_REQUESTS_PER_SEC));
+        }
+        int allowance = hostQuotaRemaining.value(host);
         if (allowance > 0) {
             hostQuotaRemaining.insert(host, allowance - 1);
             makeRequest(request.first, request.second);

@@ -22,6 +22,11 @@ static const QStringList MD5_BLACKLIST = {
     "fbc7d763c08771c260b39e2115414eeb"  // Current card back hash
 };
 
+ServerRateLimiter &CardPictureLoaderWorkerWork::rateLimiter()
+{
+    return s_rateLimiter;
+}
+
 CardPictureLoaderWorkerWork::CardPictureLoaderWorkerWork(const CardPictureLoaderWorker *worker, const ExactCard &toLoad)
     : QObject(nullptr), cardToDownload(CardPictureToLoad(toLoad)),
       picDownload(SettingsCache::instance().downloads().getPicDownload())
