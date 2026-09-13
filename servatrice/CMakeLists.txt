@@ -8,6 +8,7 @@ project(Servatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 # Paths and directories
 # ------------------------
 set(servatrice_SOURCES
+    ${VERSION_STRING_CPP}
     src/email_parser.cpp
     src/event_loop_watchdog.cpp
     src/main.cpp
@@ -25,7 +26,6 @@ set(servatrice_SOURCES
     src/smtp/qxtmailattachment.cpp
     src/smtp/qxtmailmessage.cpp
     src/smtp/qxtsmtp.cpp
-    ${VERSION_STRING_CPP}
 )
 
 set(servatrice_RESOURCES servatrice.qrc)

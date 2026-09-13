@@ -20,6 +20,7 @@ set(ORACLE_WIN32_QM_INSTALL_DIR "translations")
 # Sources
 # ------------------------
 set(oracle_SOURCES
+    ${VERSION_STRING_CPP}
     src/main.cpp
     src/oraclewizard.cpp
     src/oracleimporter.cpp
@@ -36,7 +37,6 @@ set(oracle_SOURCES
     ../cockatrice/src/interface/theme_manager.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_button_widget.cpp
     ../cockatrice/src/interface/widgets/quick_settings/settings_popup_widget.cpp
-    ${VERSION_STRING_CPP}
 )
 
 # ------------------------

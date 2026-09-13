@@ -9,27 +9,198 @@ project(Cockatrice VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${
 # ------------------------
 set(cockatrice_SOURCES
     ${VERSION_STRING_CPP}
-    # sort by alphabetical order, so that there is no debate about where to add new sources to the list
-    src/client/network/connection_controller/remote_connection_controller.cpp
-    src/client/network/update/client/update_downloader.cpp
-    src/client/network/interfaces/deck_stats_interface.cpp
-    src/client/network/interfaces/tapped_out_interface.cpp
-    src/client/network/parsers/deck_link_to_api_transformer.cpp
-    src/client/network/update/client/client_update_checker.cpp
-    src/client/network/update/client/release_channel.cpp
-    src/client/network/update/card_spoiler/spoiler_background_updater.cpp
     src/client/latency_graph_widget.cpp
     src/client/latency_status_widget.cpp
     src/client/lag_monitor.cpp
-    src/client/sound_engine.cpp
+    src/client/network/connection_controller/remote_connection_controller.cpp
+    src/client/network/interfaces/deck_stats_interface.cpp
+    src/client/network/interfaces/tapped_out_interface.cpp
+    src/client/network/parsers/deck_link_to_api_transformer.cpp
+    src/client/network/update/card_spoiler/spoiler_background_updater.cpp
+    src/client/network/update/client/client_update_checker.cpp
+    src/client/network/update/client/release_channel.cpp
+    src/client/network/update/client/update_downloader.cpp
     src/client/settings/cache_settings.cpp
     src/client/settings/card_counter_settings.cpp
     src/client/settings/shortcut_treeview.cpp
     src/client/settings/shortcuts_settings.cpp
+    src/client/sound_engine.cpp
+    src/client/url_scheme_event_filter.h
+    src/filters/deck_filter_string.cpp
+    src/filters/filter_builder.cpp
+    src/filters/filter_tree_model.cpp
+    src/filters/syntax_help.cpp
+    src/game/abstract_game.cpp
+    src/game/arrow_registry.cpp
+    src/game/board/arrow_data.cpp
+    src/game/board/card_list.cpp
+    src/game/board/card_state.cpp
+    src/game/board/counter_state.cpp
+    src/game/game.cpp
+    src/game/game_event_handler.cpp
+    src/game/game_meta_info.cpp
+    src/game/game_state.cpp
+    src/game/phase.cpp
+    src/game/player/player_actions.cpp
+    src/game/player/player_event_handler.cpp
+    src/game/player/player_info.cpp
+    src/game/player/player_logic.cpp
+    src/game/player/player_manager.cpp
+    src/game/replay.cpp
+    src/game/zones/card_zone_logic.cpp
+    src/game/zones/hand_zone_logic.cpp
+    src/game/zones/pile_zone_logic.cpp
+    src/game/zones/stack_zone_logic.cpp
+    src/game/zones/table_zone_logic.cpp
+    src/game/zones/view_zone_logic.cpp
+    src/game_graphics/board/abstract_card_drag_item.cpp
+    src/game_graphics/board/abstract_card_item.cpp
+    src/game_graphics/board/abstract_counter.cpp
+    src/game_graphics/board/abstract_graphics_item.cpp
+    src/game_graphics/board/arrow_item.cpp
+    src/game_graphics/board/arrow_target.cpp
+    src/game_graphics/board/card_drag_item.cpp
+    src/game_graphics/board/card_item.cpp
+    src/game_graphics/board/counter_general.cpp
+    src/game_graphics/board/translate_counter_name.cpp
+    src/game_graphics/deckview/deck_view.cpp
+    src/game_graphics/deckview/deck_view_container.cpp
+    src/game_graphics/deckview/tabbed_deck_view_container.cpp
+    src/game_graphics/dialogs/dlg_create_token.cpp
+    src/game_graphics/dialogs/dlg_move_top_cards_until.cpp
+    src/game_graphics/dialogs/dlg_roll_dice.cpp
+    src/game_graphics/game_scene.cpp
+    src/game_graphics/game_view.cpp
+    src/game_graphics/hand_counter.cpp
+    src/game_graphics/log/message_log_widget.cpp
+    src/game_graphics/phases_toolbar.cpp
+    src/game_graphics/player/menu/card_menu.cpp
+    src/game_graphics/player/menu/custom_zone_menu.cpp
+    src/game_graphics/player/menu/grave_menu.cpp
+    src/game_graphics/player/menu/hand_menu.cpp
+    src/game_graphics/player/menu/library_menu.cpp
+    src/game_graphics/player/menu/move_menu.cpp
+    src/game_graphics/player/menu/player_menu.cpp
+    src/game_graphics/player/menu/pt_menu.cpp
+    src/game_graphics/player/menu/rfg_menu.cpp
+    src/game_graphics/player/menu/say_menu.cpp
+    src/game_graphics/player/menu/sideboard_menu.cpp
+    src/game_graphics/player/menu/tally_menu.cpp
+    src/game_graphics/player/menu/utility_menu.cpp
+    src/game_graphics/player/player_area.cpp
+    src/game_graphics/player/player_dialogs.cpp
+    src/game_graphics/player/player_graphics_item.cpp
+    src/game_graphics/player/player_list_widget.cpp
+    src/game_graphics/player/player_target.cpp
+    src/game_graphics/tally/stats_tally.cpp
+    src/game_graphics/tally/subtype_tally.cpp
+    src/game_graphics/tally/tally.cpp
+    src/game_graphics/zones/card_zone.cpp
+    src/game_graphics/zones/hand_zone.cpp
+    src/game_graphics/zones/pile_zone.cpp
+    src/game_graphics/zones/select_zone.cpp
+    src/game_graphics/zones/stack_zone.cpp
+    src/game_graphics/zones/table_zone.cpp
+    src/game_graphics/zones/view_zone.cpp
+    src/game_graphics/zones/view_zone_widget.cpp
+    src/interface/card_picture_loader/card_picture_loader.cpp
+    src/interface/card_picture_loader/card_picture_loader_local.cpp
+    src/interface/card_picture_loader/card_picture_loader_request_status_display_widget.cpp
+    src/interface/card_picture_loader/card_picture_loader_status_bar.cpp
+    src/interface/card_picture_loader/card_picture_loader_worker.cpp
+    src/interface/card_picture_loader/card_picture_loader_worker_work.cpp
+    src/interface/card_picture_loader/card_picture_to_load.cpp
     src/interface/deck_loader/card_node_function.cpp
     src/interface/deck_loader/deck_file_format.cpp
     src/interface/deck_loader/deck_loader.cpp
     src/interface/deck_loader/loaded_deck.cpp
+    src/interface/intents/intent.cpp
+    src/interface/intents/intent.h
+    src/interface/intents/intent_connect_to_server.cpp
+    src/interface/intents/intent_connect_to_server.h
+    src/interface/intents/intent_disconnect_from_server.cpp
+    src/interface/intents/intent_disconnect_from_server.h
+    src/interface/intents/intent_join_server_game.cpp
+    src/interface/intents/intent_join_server_game.h
+    src/interface/intents/intent_join_server_room.cpp
+    src/interface/intents/intent_join_server_room.h
+    src/interface/intents/intent_login.cpp
+    src/interface/intents/intent_login.h
+    src/interface/intents/intent_open_local_deck.cpp
+    src/interface/intents/intent_open_local_deck.h
+    src/interface/intents/intent_open_server_room_by_name.cpp
+    src/interface/intents/intent_open_server_room_by_name.h
+    src/interface/intents/intent_wait_for_database_load.cpp
+    src/interface/intents/intent_wait_for_database_load.h
+    src/interface/intents/url_parser.cpp
+    src/interface/intents/url_parser.h
+    src/interface/key_signals.cpp
+    src/interface/layouts/flow_layout.cpp
+    src/interface/layouts/overlap_layout.cpp
+    src/interface/logger.cpp
+    src/interface/palette_editor/color_button.cpp
+    src/interface/palette_editor/palette_generator.cpp
+    src/interface/palette_editor/quick_setup_panel.cpp
+    src/interface/palette_editor/palette_grid_widget.cpp
+    src/interface/palette_editor/palette_editor_dialog.cpp
+    src/interface/pixel_map_generator.cpp
+    src/interface/theme_config.cpp
+    src/interface/theme_manager.cpp
+    src/interface/widgets/cards/additional_info/color_identity_widget.cpp
+    src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
+    src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
+    src/interface/widgets/cards/art_crop_attribution.cpp
+    src/interface/widgets/cards/card_art_utils.cpp
+    src/interface/widgets/cards/card_group_display_widgets/card_group_display_widget.cpp
+    src/interface/widgets/cards/card_group_display_widgets/flat_card_group_display_widget.cpp
+    src/interface/widgets/cards/card_group_display_widgets/overlapped_card_group_display_widget.cpp
+    src/interface/widgets/cards/card_info_display_widget.cpp
+    src/interface/widgets/cards/card_info_frame_widget.cpp
+    src/interface/widgets/cards/card_info_picture_art_crop_widget.cpp
+    src/interface/widgets/cards/card_info_picture_enlarged_widget.cpp
+    src/interface/widgets/cards/card_info_picture_widget.cpp
+    src/interface/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
+    src/interface/widgets/cards/card_info_text_widget.cpp
+    src/interface/widgets/cards/card_size_widget.cpp
+    src/interface/widgets/cards/deck_card_zone_display_widget.cpp
+    src/interface/widgets/cards/deck_preview_card_picture_widget.cpp
+    src/interface/widgets/deck_analytics/abstract_analytics_panel_widget.cpp
+    src/interface/widgets/deck_analytics/add_analytics_panel_dialog.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_category_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_total_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_single_display_widget.cpp
+    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_widget.cpp
+    src/interface/widgets/deck_analytics/analytics_panel_widget_factory.cpp
+    src/interface/widgets/deck_analytics/analytics_panel_widget_registrar.cpp
+    src/interface/widgets/deck_analytics/deck_analytics_widget.cpp
+    src/interface/widgets/deck_analytics/deck_list_statistics_analyzer.cpp
+    src/interface/widgets/deck_analytics/resizable_panel.cpp
+    src/interface/widgets/deck_editor/card_database_view.cpp
+    src/interface/widgets/deck_editor/deck_editor_card_database_dock_widget.cpp
+    src/interface/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp
+    src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp
+    src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
+    src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
+    src/interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
+    src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp
+    src/interface/widgets/deck_editor/deck_list_style_proxy.cpp
+    src/interface/widgets/deck_editor/deck_state_manager.cpp
+    src/interface/widgets/deck_editor/deck_zone_dialog.cpp
+    src/interface/widgets/deck_editor/printing_disabled_info_widget.cpp
     src/interface/widgets/dialogs/dlg_connect.cpp
     src/interface/widgets/dialogs/dlg_convert_deck_to_cod_format.cpp
     src/interface/widgets/dialogs/dlg_create_game.cpp
@@ -60,180 +231,20 @@ set(cockatrice_SOURCES
     src/interface/widgets/dialogs/dlg_view_log.cpp
     src/interface/widgets/dialogs/override_printing_warning.cpp
     src/interface/widgets/dialogs/tip_of_the_day.cpp
-    src/filters/deck_filter_string.cpp
-    src/filters/filter_builder.cpp
-    src/filters/filter_tree_model.cpp
-    src/filters/syntax_help.cpp
-    src/game/abstract_game.cpp
-    src/game/arrow_registry.cpp
-    src/game_graphics/board/abstract_card_drag_item.cpp
-    src/game_graphics/board/abstract_card_item.cpp
-    src/game_graphics/board/abstract_counter.cpp
-    src/game/board/arrow_data.cpp
-    src/game_graphics/board/arrow_item.cpp
-    src/game_graphics/board/arrow_target.cpp
-    src/game_graphics/board/card_drag_item.cpp
-    src/game_graphics/board/card_item.cpp
-    src/game/board/card_list.cpp
-    src/game/board/card_state.cpp
-    src/game_graphics/board/counter_general.cpp
-    src/game/board/counter_state.cpp
-    src/game_graphics/board/translate_counter_name.cpp
-    src/game_graphics/deckview/deck_view.cpp
-    src/game_graphics/deckview/deck_view_container.cpp
-    src/game_graphics/deckview/tabbed_deck_view_container.cpp
-    src/game_graphics/dialogs/dlg_create_token.cpp
-    src/game_graphics/dialogs/dlg_move_top_cards_until.cpp
-    src/game_graphics/dialogs/dlg_roll_dice.cpp
-    src/game/game.cpp
-    src/game/game_event_handler.cpp
-    src/game/game_meta_info.cpp
-    src/game_graphics/game_scene.cpp
-    src/game/game_state.cpp
-    src/game_graphics/game_view.cpp
-    src/game_graphics/hand_counter.cpp
-    src/game_graphics/log/message_log_widget.cpp
-    src/game/phase.cpp
-    src/game_graphics/phases_toolbar.cpp
-    src/game_graphics/player/menu/card_menu.cpp
-    src/game_graphics/player/menu/custom_zone_menu.cpp
-    src/game_graphics/player/menu/grave_menu.cpp
-    src/game_graphics/player/menu/hand_menu.cpp
-    src/game_graphics/player/menu/library_menu.cpp
-    src/game_graphics/player/menu/move_menu.cpp
-    src/game_graphics/player/menu/player_menu.cpp
-    src/game_graphics/player/menu/pt_menu.cpp
-    src/game_graphics/player/menu/rfg_menu.cpp
-    src/game_graphics/player/menu/say_menu.cpp
-    src/game_graphics/player/menu/sideboard_menu.cpp
-    src/game_graphics/player/menu/tally_menu.cpp
-    src/game_graphics/player/menu/utility_menu.cpp
-    src/game_graphics/tally/stats_tally.cpp
-    src/game_graphics/tally/subtype_tally.cpp
-    src/game_graphics/tally/tally.cpp
-    src/game/player/player_actions.cpp
-    src/game_graphics/player/player_area.cpp
-    src/game_graphics/player/player_dialogs.cpp
-    src/game/player/player_event_handler.cpp
-    src/game_graphics/player/player_graphics_item.cpp
-    src/game/player/player_info.cpp
-    src/game_graphics/player/player_list_widget.cpp
-    src/game/player/player_logic.cpp
-    src/game/player/player_manager.cpp
-    src/game_graphics/player/player_target.cpp
-    src/game/replay.cpp
-    src/game/zones/card_zone_logic.cpp
-    src/game/zones/hand_zone_logic.cpp
-    src/game/zones/pile_zone_logic.cpp
-    src/game/zones/stack_zone_logic.cpp
-    src/game/zones/table_zone_logic.cpp
-    src/game/zones/view_zone_logic.cpp
-    src/game_graphics/zones/card_zone.cpp
-    src/game_graphics/zones/hand_zone.cpp
-    src/game_graphics/zones/pile_zone.cpp
-    src/game_graphics/zones/select_zone.cpp
-    src/game_graphics/zones/stack_zone.cpp
-    src/game_graphics/zones/table_zone.cpp
-    src/game_graphics/zones/view_zone.cpp
-    src/game_graphics/zones/view_zone_widget.cpp
-    src/game_graphics/board/abstract_graphics_item.cpp
-    src/interface/card_picture_loader/card_picture_loader.cpp
-    src/interface/card_picture_loader/card_picture_loader_local.cpp
-    src/interface/card_picture_loader/card_picture_loader_request_status_display_widget.cpp
-    src/interface/card_picture_loader/card_picture_loader_status_bar.cpp
-    src/interface/card_picture_loader/card_picture_loader_worker.cpp
-    src/interface/card_picture_loader/card_picture_loader_worker_work.cpp
-    src/interface/card_picture_loader/card_picture_to_load.cpp
-    src/interface/intents/intent.cpp
-    src/interface/intents/intent.h
-    src/interface/intents/intent_open_local_deck.cpp
-    src/interface/intents/intent_open_local_deck.h
-    src/interface/intents/intent_wait_for_database_load.cpp
-    src/interface/intents/intent_wait_for_database_load.h
-    src/interface/layouts/flow_layout.cpp
-    src/interface/layouts/overlap_layout.cpp
-    src/interface/widgets/utility/card_completer_delegate.cpp
-    src/interface/widgets/utility/card_completer_styler.cpp
-    src/interface/widgets/utility/completer_utils.cpp
-    src/interface/widgets/utility/line_edit_completer.cpp
-    src/interface/widgets/utility/reversed_completer_model.cpp
-    src/interface/pixel_map_generator.cpp
-    src/interface/theme_config.cpp
-    src/interface/theme_manager.cpp
-    src/interface/palette_editor/color_button.cpp
-    src/interface/palette_editor/palette_generator.cpp
-    src/interface/palette_editor/quick_setup_panel.cpp
-    src/interface/palette_editor/palette_grid_widget.cpp
-    src/interface/palette_editor/palette_editor_dialog.cpp
-    src/interface/widgets/cards/additional_info/color_identity_widget.cpp
-    src/interface/widgets/cards/additional_info/mana_cost_widget.cpp
-    src/interface/widgets/cards/additional_info/mana_symbol_widget.cpp
-    src/interface/widgets/cards/art_crop_attribution.cpp
-    src/interface/widgets/cards/card_art_utils.cpp
-    src/interface/widgets/cards/card_group_display_widgets/card_group_display_widget.cpp
-    src/interface/widgets/cards/card_group_display_widgets/flat_card_group_display_widget.cpp
-    src/interface/widgets/cards/card_group_display_widgets/overlapped_card_group_display_widget.cpp
-    src/interface/widgets/cards/card_info_display_widget.cpp
-    src/interface/widgets/cards/card_info_frame_widget.cpp
-    src/interface/widgets/cards/card_info_picture_art_crop_widget.cpp
-    src/interface/widgets/cards/card_info_picture_enlarged_widget.cpp
-    src/interface/widgets/cards/card_info_picture_widget.cpp
-    src/interface/widgets/cards/card_info_picture_with_text_overlay_widget.cpp
-    src/interface/widgets/cards/card_info_text_widget.cpp
-    src/interface/widgets/cards/card_size_widget.cpp
-    src/interface/widgets/cards/deck_card_zone_display_widget.cpp
-    src/interface/widgets/cards/deck_preview_card_picture_widget.cpp
-    src/interface/widgets/deck_analytics/abstract_analytics_panel_widget.cpp
-    src/interface/widgets/deck_analytics/add_analytics_panel_dialog.cpp
-    src/interface/widgets/deck_analytics/analytics_panel_widget_factory.cpp
-    src/interface/widgets/deck_analytics/analytics_panel_widget_registrar.cpp
-    src/interface/widgets/deck_analytics/deck_analytics_widget.cpp
-    src/interface/widgets/deck_analytics/deck_list_statistics_analyzer.cpp
-    src/interface/widgets/deck_analytics/resizable_panel.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_config_dialog.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/draw_probability/draw_probability_widget.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_config_dialog.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_base/mana_base_widget.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_config_dialog.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_widget.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_config_dialog.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_devotion/mana_devotion_widget.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_config_dialog.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_widget.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_distribution/mana_distribution_single_display_widget.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_total_widget.cpp
-    src/interface/widgets/deck_analytics/analyzer_modules/mana_curve/mana_curve_category_widget.cpp
-    src/interface/widgets/deck_editor/card_database_view.cpp
-    src/interface/widgets/deck_editor/deck_list_history_manager_widget.cpp
-    src/interface/widgets/deck_editor/deck_editor_card_database_dock_widget.cpp
-    src/interface/widgets/deck_editor/deck_editor_card_info_dock_widget.cpp
-    src/interface/widgets/deck_editor/deck_editor_database_display_widget.cpp
-    src/interface/widgets/deck_editor/deck_editor_deck_dock_widget.cpp
-    src/interface/widgets/deck_editor/deck_editor_filter_dock_widget.cpp
-    src/interface/widgets/deck_editor/deck_editor_printing_selector_dock_widget.cpp
-    src/interface/widgets/deck_editor/deck_list_style_proxy.cpp
-    src/interface/widgets/deck_editor/deck_state_manager.cpp
-    src/interface/widgets/deck_editor/deck_zone_dialog.cpp
-    src/interface/widgets/deck_editor/printing_disabled_info_widget.cpp
     src/interface/widgets/general/background_sources.cpp
     src/interface/widgets/general/display/background_plate_widget.cpp
     src/interface/widgets/general/display/banner_widget.cpp
+    src/interface/widgets/general/display/charts/bars/bar_chart_background_widget.cpp
+    src/interface/widgets/general/display/charts/bars/bar_chart_widget.cpp
+    src/interface/widgets/general/display/charts/bars/bar_widget.cpp
+    src/interface/widgets/general/display/charts/bars/color_bar.cpp
+    src/interface/widgets/general/display/charts/bars/percent_bar_widget.cpp
+    src/interface/widgets/general/display/charts/bars/segmented_bar_widget.cpp
+    src/interface/widgets/general/display/charts/pies/color_pie.cpp
     src/interface/widgets/general/display/dynamic_font_size_label.cpp
     src/interface/widgets/general/display/dynamic_font_size_push_button.cpp
     src/interface/widgets/general/display/labeled_input.cpp
     src/interface/widgets/general/display/shadow_background_label.cpp
-    src/interface/widgets/general/display/charts/bars/bar_widget.cpp
-    src/interface/widgets/general/display/charts/bars/color_bar.cpp
-    src/interface/widgets/general/display/charts/bars/percent_bar_widget.cpp
-    src/interface/widgets/general/display/charts/bars/bar_chart_widget.cpp
-    src/interface/widgets/general/display/charts/bars/bar_chart_background_widget.cpp
-    src/interface/widgets/general/display/charts/bars/segmented_bar_widget.cpp
-    src/interface/widgets/general/display/charts/pies/color_pie.cpp
     src/interface/widgets/general/home_styled_button.cpp
     src/interface/widgets/general/home_tab_button_color.h
     src/interface/widgets/general/home_widget.cpp
@@ -241,20 +252,119 @@ set(cockatrice_SOURCES
     src/interface/widgets/general/layout_containers/overlap_control_widget.cpp
     src/interface/widgets/general/layout_containers/overlap_widget.cpp
     src/interface/widgets/menus/deck_editor_menu.cpp
+    src/interface/widgets/onboarding/banner_shader_config.h
+    src/interface/widgets/onboarding/first_run_wizard.cpp
+    src/interface/widgets/onboarding/first_run_wizard.h
+    src/interface/widgets/onboarding/first_run_wizard_page.cpp
+    src/interface/widgets/onboarding/first_run_wizard_page.h
+    src/interface/widgets/onboarding/pages/account_setup_page.cpp
+    src/interface/widgets/onboarding/pages/account_setup_page.h
+    src/interface/widgets/onboarding/pages/card_database_setup_page.cpp
+    src/interface/widgets/onboarding/pages/card_database_setup_page.h
+    src/interface/widgets/onboarding/pages/finish_page.cpp
+    src/interface/widgets/onboarding/pages/finish_page.h
+    src/interface/widgets/onboarding/pages/preferences_setup_page.cpp
+    src/interface/widgets/onboarding/pages/preferences_setup_page.h
+    src/interface/widgets/onboarding/pages/theme_setup_page.cpp
+    src/interface/widgets/onboarding/pages/theme_setup_page.h
+    src/interface/widgets/onboarding/pages/welcome_page.cpp
+    src/interface/widgets/onboarding/pages/welcome_page.h
+    src/interface/widgets/onboarding/shader_banner_widget.cpp
+    src/interface/widgets/onboarding/shader_banner_widget.h
+    src/interface/widgets/onboarding/step_indicator_widget.cpp
+    src/interface/widgets/onboarding/step_indicator_widget.h
+    src/interface/widgets/server/user/user_info_popup.cpp
+    src/interface/widgets/server/user/user_info_popup.h
+    src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_service.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_widget.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/handle_commander_brackets.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/archidekt_deck_listing_api_response.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/archidekt_formats.h
+    src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card_entry.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_edition.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/deck/archidekt_api_response_deck.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/deck/archidekt_api_response_deck_category.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/deck_listings/archidekt_api_response_deck_listing_container.cpp
+    src/interface/widgets/tabs/api/archidekt/api_response/deck_listings/archidekt_api_response_deck_owner.cpp
+    src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp
+    src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_entry_display_widget.cpp
+    src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_listings_display_widget.cpp
+    src/interface/widgets/tabs/api/archidekt/display/archidekt_deck_preview_image_display_widget.cpp
+    src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/card_in_deck_request.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_card_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_deck_request.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_estimate_bracket_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_variant_result.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_spellbook_api_accessor.cpp
+    src/interface/widgets/tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/archidekt_links/edhrec_api_response_archidekt_links.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_average_deck_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_deck_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_container.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_details.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_list.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_commander_api_response_commander_details.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/card_prices/edhrec_api_response_card_prices.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/commander/edhrec_commander_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/commander/edhrec_commander_api_response_average_deck_statistics.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/top_commanders/edhrec_top_commanders_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/top_cards/edhrec_top_cards_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/api_response/top_tags/edhrec_top_tags_api_response.cpp
+    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_details_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_inclusion_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_list_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_synergy_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_api_response_commander_details_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/top_cards/edhrec_top_cards_api_response_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/top_commander/edhrec_top_commanders_api_response_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/display/top_tags/edhrec_top_tags_api_response_display_widget.cpp
+    src/interface/widgets/tabs/api/edhrec/tab_edhrec.cpp
+    src/interface/widgets/tabs/api/edhrec/tab_edhrec_main.cpp
+    src/interface/widgets/tabs/tab.cpp
+    src/interface/widgets/tabs/tab_account.cpp
+    src/interface/widgets/tabs/tab_admin.cpp
+    src/interface/widgets/tabs/tab_card_art_rules.cpp
+    src/interface/widgets/tabs/tab_deck_editor.cpp
+    src/interface/widgets/tabs/tab_deck_storage.cpp
+    src/interface/widgets/tabs/tab_developer.cpp
+    src/interface/widgets/tabs/tab_game.cpp
+    src/interface/widgets/tabs/tab_home.cpp
+    src/interface/widgets/tabs/tab_logs.cpp
+    src/interface/widgets/tabs/tab_message.cpp
+    src/interface/widgets/tabs/tab_moderation.cpp
+    src/interface/widgets/tabs/tab_report.cpp
+    src/interface/widgets/tabs/tab_replays.cpp
+    src/interface/widgets/tabs/tab_room.cpp
+    src/interface/widgets/tabs/tab_server.cpp
+    src/interface/widgets/tabs/tab_supervisor.cpp
+    src/interface/widgets/tabs/tab_visual_database_display.cpp
+    src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
+    src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
+    src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
+    src/interface/widgets/playmat/playmat_collection_dialog.cpp
+    src/interface/widgets/playmat/playmat_collection_dialog.h
+    src/interface/widgets/playmat/playmat_preview_widget.cpp
+    src/interface/widgets/playmat/playmat_settings_dialog.cpp
     src/interface/widgets/printing_selector/all_zones_card_amount_widget.cpp
     src/interface/widgets/printing_selector/card_amount_widget.cpp
     src/interface/widgets/printing_selector/printing_selector.cpp
     src/interface/widgets/printing_selector/printing_selector_card_display_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_overlay_widget.cpp
-    src/interface/widgets/printing_selector/printing_selector_placeholder_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_search_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_selection_widget.cpp
     src/interface/widgets/printing_selector/printing_selector_card_sorting_widget.cpp
+    src/interface/widgets/printing_selector/printing_selector_placeholder_widget.cpp
     src/interface/widgets/printing_selector/set_name_and_collectors_number_display_widget.cpp
-    src/interface/widgets/playmat/playmat_collection_dialog.cpp
-    src/interface/widgets/playmat/playmat_collection_dialog.h
-    src/interface/widgets/playmat/playmat_preview_widget.cpp
-    src/interface/widgets/playmat/playmat_settings_dialog.cpp
     src/interface/widgets/quick_settings/settings_button_widget.cpp
     src/interface/widgets/quick_settings/settings_popup_widget.cpp
     src/interface/widgets/replay/replay_manager.cpp
@@ -292,10 +402,17 @@ set(cockatrice_SOURCES
     src/interface/widgets/settings_page/sound_settings_page.cpp
     src/interface/widgets/settings_page/storage_settings_page.cpp
     src/interface/widgets/settings_page/user_interface_settings_page.cpp
+    src/interface/widgets/utility/card_completer_delegate.cpp
+    src/interface/widgets/utility/card_completer_styler.cpp
+    src/interface/widgets/utility/compact_push_button.cpp
+    src/interface/widgets/utility/compact_push_button.h
+    src/interface/widgets/utility/completer_utils.cpp
     src/interface/widgets/utility/custom_line_edit.cpp
     src/interface/widgets/utility/get_text_with_max.cpp
+    src/interface/widgets/utility/line_edit_completer.cpp
     src/interface/widgets/utility/report_utils.cpp
     src/interface/widgets/utility/report_utils.h
+    src/interface/widgets/utility/reversed_completer_model.cpp
     src/interface/widgets/utility/sequence_edit.cpp
     src/interface/widgets/utility/visibility_change_listener.cpp
     src/interface/widgets/utility/visibility_change_listener.h
@@ -331,125 +448,7 @@ set(cockatrice_SOURCES
     src/interface/window_main.cpp
     src/main.cpp
     src/single_instance_manager.cpp
-    src/interface/widgets/tabs/abstract_tab_deck_editor.cpp
-    src/interface/widgets/tabs/api/archidekt/tab_archidekt.cpp
-    src/interface/widgets/tabs/api/archidekt/api_response/archidekt_deck_listing_api_response.cpp
-    src/interface/widgets/tabs/api/archidekt/api_response/archidekt_formats.h
-    src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card.cpp
-    src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_card_entry.cpp
-    src/interface/widgets/tabs/api/archidekt/api_response/card/archidekt_api_response_edition.cpp
-    src/interface/widgets/tabs/api/archidekt/api_response/deck/archidekt_api_response_deck.cpp
-    src/interface/widgets/tabs/api/archidekt/api_response/deck/archidekt_api_response_deck_category.cpp
-    src/interface/widgets/tabs/api/archidekt/api_response/deck_listings/archidekt_api_response_deck_listing_container.cpp
-    src/interface/widgets/tabs/api/archidekt/api_response/deck_listings/archidekt_api_response_deck_owner.cpp
-    src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_display_widget.cpp
-    src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_entry_display_widget.cpp
-    src/interface/widgets/tabs/api/archidekt/display/archidekt_api_response_deck_listings_display_widget.cpp
-    src/interface/widgets/tabs/api/archidekt/display/archidekt_deck_preview_image_display_widget.cpp
-    src/interface/widgets/tabs/api/commander_spellbook/api_response/card_in_deck_request.cpp
-    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_deck_request.cpp
-    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_card_result.cpp
-    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_variant_result.cpp
-    src/interface/widgets/tabs/api/commander_spellbook/api_response/commander_spellbook_estimate_bracket_result.cpp
-    src/interface/widgets/tabs/api/commander_spellbook/commander_spellbook_bracket_explainer.cpp
-    src/interface/widgets/tabs/api/commander_spellbook/commander_spellbook_api_accessor.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/archidekt_links/edhrec_api_response_archidekt_links.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_average_deck_api_response.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/average_deck/edhrec_deck_api_response.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/card_prices/edhrec_api_response_card_prices.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_container.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_details.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_api_response_card_list.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/cards/edhrec_commander_api_response_commander_details.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/commander/edhrec_commander_api_response.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/commander/edhrec_commander_api_response_average_deck_statistics.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/top_cards/edhrec_top_cards_api_response.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/top_commanders/edhrec_top_commanders_api_response.cpp
-    src/interface/widgets/tabs/api/edhrec/api_response/top_tags/edhrec_top_tags_api_response.cpp
-    src/interface/widgets/tabs/api/edhrec/display/card_prices/edhrec_api_response_card_prices_display_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_details_display_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_inclusion_display_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_list_display_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/cards/edhrec_api_response_card_synergy_display_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_api_response_commander_details_display_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_display_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_navigation_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/top_cards/edhrec_top_cards_api_response_display_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/top_commander/edhrec_top_commanders_api_response_display_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/top_tags/edhrec_top_tags_api_response_display_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/tab_edhrec.cpp
-    src/interface/widgets/tabs/api/edhrec/tab_edhrec_main.cpp
-    src/interface/widgets/tabs/tab.cpp
-    src/interface/widgets/tabs/tab_account.cpp
-    src/interface/widgets/tabs/tab_admin.cpp
-    src/interface/widgets/tabs/tab_card_art_rules.cpp
-    src/interface/widgets/tabs/tab_deck_editor.cpp
-    src/interface/widgets/tabs/tab_deck_storage.cpp
-    src/interface/widgets/tabs/tab_developer.cpp
-    src/interface/widgets/tabs/tab_game.cpp
-    src/interface/widgets/tabs/tab_home.cpp
-    src/interface/widgets/tabs/tab_logs.cpp
-    src/interface/widgets/tabs/tab_message.cpp
-    src/interface/widgets/tabs/tab_moderation.cpp
-    src/interface/widgets/tabs/tab_report.cpp
-    src/interface/widgets/tabs/tab_replays.cpp
-    src/interface/widgets/tabs/tab_room.cpp
-    src/interface/widgets/tabs/tab_server.cpp
-    src/interface/widgets/tabs/tab_supervisor.cpp
-    src/interface/widgets/tabs/tab_visual_database_display.cpp
-    src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual.cpp
-    src/interface/widgets/tabs/visual_deck_editor/tab_deck_editor_visual_tab_widget.cpp
-    src/interface/widgets/tabs/visual_deck_storage/tab_deck_storage_visual.cpp
-    src/interface/key_signals.cpp
-    src/interface/logger.cpp
-    src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_service.cpp
-    src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_widget.cpp
-    src/interface/widgets/tabs/api/commander_spellbook/handle_commander_brackets.cpp
-    src/interface/widgets/onboarding/banner_shader_config.h
-    src/interface/widgets/onboarding/first_run_wizard.cpp
-    src/interface/widgets/onboarding/first_run_wizard.h
-    src/interface/widgets/onboarding/first_run_wizard_page.cpp
-    src/interface/widgets/onboarding/first_run_wizard_page.h
-    src/interface/widgets/onboarding/pages/account_setup_page.cpp
-    src/interface/widgets/onboarding/pages/account_setup_page.h
-    src/interface/widgets/onboarding/pages/card_database_setup_page.cpp
-    src/interface/widgets/onboarding/pages/card_database_setup_page.h
-    src/interface/widgets/onboarding/pages/finish_page.cpp
-    src/interface/widgets/onboarding/pages/finish_page.h
-    src/interface/widgets/onboarding/pages/preferences_setup_page.cpp
-    src/interface/widgets/onboarding/pages/preferences_setup_page.h
-    src/interface/widgets/onboarding/pages/theme_setup_page.cpp
-    src/interface/widgets/onboarding/pages/theme_setup_page.h
-    src/interface/widgets/onboarding/pages/welcome_page.cpp
-    src/interface/widgets/onboarding/pages/welcome_page.h
-    src/interface/widgets/onboarding/shader_banner_widget.cpp
-    src/interface/widgets/onboarding/shader_banner_widget.h
-    src/interface/widgets/onboarding/step_indicator_widget.cpp
-    src/interface/widgets/onboarding/step_indicator_widget.h
-    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_bracket_navigation_widget.h
-    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.cpp
-    src/interface/widgets/tabs/api/edhrec/display/commander/edhrec_commander_api_response_budget_navigation_widget.h
-    src/interface/widgets/utility/compact_push_button.cpp
-    src/interface/widgets/utility/compact_push_button.h
     src/single_instance_manager.h
-    src/client/url_scheme_event_filter.h
-    src/interface/intents/intent_connect_to_server.cpp
-    src/interface/intents/intent_connect_to_server.h
-    src/interface/intents/intent_disconnect_from_server.cpp
-    src/interface/intents/intent_disconnect_from_server.h
-    src/interface/intents/intent_join_server_game.cpp
-    src/interface/intents/intent_join_server_game.h
-    src/interface/intents/intent_join_server_room.cpp
-    src/interface/intents/intent_join_server_room.h
-    src/interface/intents/intent_login.cpp
-    src/interface/intents/intent_login.h
-    src/interface/intents/intent_open_server_room_by_name.cpp
-    src/interface/intents/intent_open_server_room_by_name.h
-    src/interface/intents/url_parser.cpp
-    src/interface/intents/url_parser.h
-    src/interface/widgets/server/user/user_info_popup.cpp
-    src/interface/widgets/server/user/user_info_popup.h
 )
 
 add_subdirectory(sounds)
