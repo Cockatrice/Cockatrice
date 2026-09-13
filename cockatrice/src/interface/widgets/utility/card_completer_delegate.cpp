@@ -22,6 +22,22 @@
 namespace
 {
 
+// Below this row width the delegate switches to a compact layout so the card
+// name stays readable when the popup cannot be as wide as PopupRowWidth.
+constexpr int CompactRowWidth = 380;
+constexpr int CompactSymbolRadius = 6;
+constexpr int CompactSymbolSpacing = 1;
+constexpr int CompactRightPad = 8;
+constexpr int ManaZoneWidth = 110;
+constexpr int CompactManaZoneWidth = 70;
+constexpr int RightPad = 14;
+constexpr int TextLeftPad = 12;
+constexpr int TextRightGap = 8;
+
+// Below this text width the type-line band is dropped so the name can use the
+// whole row height instead of being elided to a single readable character.
+constexpr int MinNameWidth = 120;
+
 struct ManaColor
 {
     QColor fill;
@@ -101,7 +117,7 @@ QSize CardCompleterDelegate::sizeHint(const QStyleOptionViewItem &option, const 
     }
 
     // Fixed wide rows so the popup has room for name, type line, set and mana
-    return {480, CardRowHeight};
+    return {PopupRowWidth, CardRowHeight};
 }
 
 // ---------------------------------------------------------------------------
@@ -152,7 +168,12 @@ void CardCompleterDelegate::drawManaSymbol(QPainter *p, QPoint centre, const QSt
 
 // ---------------------------------------------------------------------------
 
-int CardCompleterDelegate::drawManaCost(QPainter *p, const QRect &row, const QString &manaCost, int radius) const
+int CardCompleterDelegate::drawManaCost(QPainter *p,
+                                        const QRect &row,
+                                        const QString &manaCost,
+                                        int radius,
+                                        int spacing,
+                                        int rightPad) const
 {
     if (manaCost.isEmpty()) {
         return row.right();
@@ -181,10 +202,8 @@ int CardCompleterDelegate::drawManaCost(QPainter *p, const QRect &row, const QSt
             totalW += PartGap;
         }
 
-        totalW += parts.at(i).size() * diam + qMax(0, parts.at(i).size() - 1) * SymbolSpacing;
+        totalW += parts.at(i).size() * diam + qMax(0, parts.at(i).size() - 1) * spacing;
     }
-
-    const int rightPad = 14;
 
     int x = row.right() - rightPad - totalW + radius;
 
@@ -195,11 +214,11 @@ int CardCompleterDelegate::drawManaCost(QPainter *p, const QRect &row, const QSt
 
         for (const QString &sym : symbols) {
             drawManaSymbol(p, {x, cy}, sym, radius);
-            x += diam + SymbolSpacing;
+            x += diam + spacing;
         }
 
         if (i < parts.size() - 1) {
-            x += PartGap - SymbolSpacing;
+            x += PartGap - spacing;
         }
     }
 
@@ -266,6 +285,14 @@ void CardCompleterDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     const QString typeLine = card->getCardType();
     const QString setCode = setCodeForCard(card);
 
+    // When the row is too narrow for the full layout, use smaller mana pips and
+    // a slimmer mana zone so the card name keeps as much room as possible.
+    const bool compact = rect.width() < CompactRowWidth;
+    const int symbolRadius = compact ? CompactSymbolRadius : SymbolRadius;
+    const int symbolSpacing = compact ? CompactSymbolSpacing : SymbolSpacing;
+    const int rightPad = compact ? CompactRightPad : RightPad;
+    const int manaZoneWidth = compact ? CompactManaZoneWidth : ManaZoneWidth;
+
     const QColor accent = accentForColors(card->getColors());
 
     const QColor base = pal.color(QPalette::Base);
@@ -314,7 +341,7 @@ void CardCompleterDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     // Right mana zone
     // -----------------------------------------------------------------------
 
-    const QRectF manaZone(cardRect.right() - 110, cardRect.top(), 110, cardRect.height());
+    const QRectF manaZone(cardRect.right() - manaZoneWidth, cardRect.top(), manaZoneWidth, cardRect.height());
 
     QLinearGradient manaGrad(manaZone.topLeft(), manaZone.bottomLeft());
 
@@ -356,22 +383,27 @@ void CardCompleterDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     // Mana cost
     // -----------------------------------------------------------------------
 
-    const int costLeft = drawManaCost(painter, cardRect.toRect(), manaCost, SymbolRadius);
+    const int costLeft = drawManaCost(painter, cardRect.toRect(), manaCost, symbolRadius, symbolSpacing, rightPad);
 
     // -----------------------------------------------------------------------
     // Card name + type line + set code
     // -----------------------------------------------------------------------
 
-    const int textLeft = cardRect.left() + AccentBarWidth + 12;
-    const int textRight = costLeft - 8;
+    const int textLeft = cardRect.left() + AccentBarWidth + TextLeftPad;
+    const int textRight = costLeft - TextRightGap;
     const int textWidth = qMax(0, textRight - textLeft);
+
+    // If even the compact layout leaves too little room for a readable name,
+    // drop the type-line band and let the name use the full row height.
+    const bool showInfoBand = textWidth >= MinNameWidth;
 
     // -----------------------------------------------------------------------
     // Card name (top band)
     // -----------------------------------------------------------------------
 
     {
-        const QRect nameRect(textLeft, rect.top() + 2, textWidth, 20);
+        const QRect nameRect = showInfoBand ? QRect(textLeft, rect.top() + 2, textWidth, 20)
+                                            : QRect(textLeft, rect.top() + 2, textWidth, rect.height() - 4);
 
         QFont f = option.font;
         f.setPixelSize(13);
@@ -392,7 +424,7 @@ void CardCompleterDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     // Type line + set code (bottom band)
     // -----------------------------------------------------------------------
 
-    {
+    if (showInfoBand) {
         const QRect infoRect(textLeft, rect.top() + 22, textWidth, rect.height() - 24);
 
         QFont f = option.font;
