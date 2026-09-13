@@ -1031,8 +1031,8 @@ void TabGame::setCardMenu(CardMenu *menu)
 
     if (menu) {
         aCardMenu->setMenu(menu);
-    } else {
-        aCardMenu->setMenu(new QMenu);
+    } else if (aCardMenu->menu()) {
+        aCardMenu->menu()->clear();
     }
 }
 
