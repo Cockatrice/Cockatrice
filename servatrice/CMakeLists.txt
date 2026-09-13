@@ -20,12 +20,12 @@ set(servatrice_SOURCES
     src/settingscache.cpp
     src/isl_interface.cpp
     src/signalhandler.cpp
-    ${VERSION_STRING_CPP}
     src/smtpclient.cpp
     src/smtp/qxthmac.cpp
     src/smtp/qxtmailattachment.cpp
     src/smtp/qxtmailmessage.cpp
     src/smtp/qxtsmtp.cpp
+    ${VERSION_STRING_CPP}
 )
 
 set(servatrice_RESOURCES servatrice.qrc)
@@ -52,39 +52,24 @@ qt6_add_resources(servatrice_RESOURCES_RCC ${servatrice_RESOURCES})
 
 set(QT_DONT_USE_QTGUI TRUE)
 
-# Mysql connector
-if(UNIX)
-  if(APPLE)
-    set(MYSQLCLIENT_DEFAULT_PATHS "/usr/local/lib" "/opt/local/lib/mysql55/mysql/" "/opt/local/lib/mysql56/mysql/")
-  else()
-    set(MYSQLCLIENT_DEFAULT_PATHS "/usr/lib64" "/usr/local/lib64" "/usr/lib" "/usr/local/lib")
-  endif()
-elseif(WIN32)
-  set(MYSQLCLIENT_DEFAULT_PATHS "C:\\Program Files\\MySQL\\MySQL Server 5.7\\lib"
-                                "C:\\Program Files (x86)\\MySQL\\MySQL Server 5.7\\lib"
-  )
+# MySQL/MariaDB connector using find_package
+# Try MySQL first, then fall back to MariaDB
+find_package(mySQL QUIET)
+if(NOT MySQL_FOUND)
+  find_package(MariaDB QUIET)
 endif()
 
-find_library(
-  MYSQL_CLIENT_LIBRARIES
-  NAMES mysqlclient
-  PATHS ${MYSQLCLIENT_DEFAULT_PATHS}
-  PATH_SUFFIXES mysql mariadb
-)
-if(${MYSQL_CLIENT_LIBRARIES} MATCHES "NOTFOUND")
-  set(MYSQLCLIENT_FOUND
-      FALSE
-      CACHE INTERNAL ""
-  )
-  message(STATUS "MySQL connector NOT FOUND: Servatrice won't be able to connect to a MySQL server")
-  unset(MYSQL_CLIENT_LIBRARIES)
+if(MySQL_FOUND)
+  set(MYSQLCLIENT_FOUND TRUE CACHE INTERNAL "")
+  message(STATUS "Found MySQL connector: ${MYSQL_LIBRARIES} (found version \"${MySQL_VERSION}\")")
+  set(MYSQL_CLIENT_TARGET MySQL::MySQL)
+elseif(MariaDB_FOUND)
+  set(MYSQLCLIENT_FOUND TRUE CACHE INTERNAL "")
+  message(STATUS "Found MariaDB connector: ${MariaDB_LIBRARIES} (found version \"${MariaDB_VERSION}\")")
+  set(MYSQL_CLIENT_TARGET MariaDB::MariaDB)
 else()
-  set(MYSQLCLIENT_FOUND
-      TRUE
-      CACHE INTERNAL ""
-  )
-  get_filename_component(MYSQLCLIENT_LIBRARY_DIR ${MYSQL_CLIENT_LIBRARIES} PATH)
-  message(STATUS "Found MySQL connector at: ${MYSQL_CLIENT_LIBRARIES}")
+  set(MYSQLcLIENT_FOUND FALSE CACHE INTERNAL "")
+  message(STATUS "MySQL/MariaDB connector NOT FOUND: Servatrice won't be able to connect to a MySQL/MariaDB server")
 endif()
 
 # Declare path variables
@@ -97,7 +82,7 @@ set(DESKTOPDIR
     CACHE STRING "desktop file destination"
 )
 
-# Build servatrice binary and link it
+# Build Servatrice binary and link it
 add_executable(servatrice MACOSX_BUNDLE ${servatrice_MOC_SRCS} ${servatrice_RESOURCES_RCC} ${servatrice_SOURCES})
 
 target_precompile_headers(servatrice PRIVATE "${CMAKE_SOURCE_DIR}/cmake/pch/qtcore_pch.h")
@@ -107,15 +92,21 @@ if(CMAKE_HOST_SYSTEM MATCHES "FreeBSD")
     servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
     ${LIBEXECINFO_LIBRARY}
   )
-else()
+  if(MYSQLCLIENT_FOUND)
+    target_link_libraries(servatrice ${MYSQL_CLIENT_TARGET})
+  endif()
+else      
   target_link_libraries(
     servatrice libcockatrice_deck_list libcockatrice_network_server_remote Threads::Threads ${SERVATRICE_QT_MODULES}
   )
+  if(MYSQLCLIENT_FOUND)
+    target_link_libraries(servatrice ${MYSQL_CLIENT_TARGET})
+  endif()
 endif()
 
-# install rules
+# Install rules
 if(UNIX)
-  if(APPLE)
+  if(APPLE) # macOS
     set(MACOSX_BUNDLE_INFO_STRING "${PROJECT_NAME}")
     set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.cockatrice.${PROJECT_NAME}")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_NAME}-${PROJECT_VERSION}")
@@ -126,8 +117,7 @@ if(UNIX)
     install(TARGETS servatrice BUNDLE DESTINATION ./)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./servatrice.app/Contents/Resources/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./servatrice.app/Contents/Resources/)
-  else()
-    # Assume linux
+  else() # Assume Linux
     install(TARGETS servatrice RUNTIME DESTINATION bin/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION share/servatrice/)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION share/servatrice/)
@@ -136,18 +126,18 @@ if(UNIX)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/servatrice.svg DESTINATION ${ICONDIR}/hicolor/scalable/apps)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.desktop DESTINATION ${DESKTOPDIR})
   endif()
-elseif(WIN32)
+elseif(WIN32) # Windows (including 64bit)
   install(TARGETS servatrice RUNTIME DESTINATION ./)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.ini.example DESTINATION ./)
   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/servatrice.sql DESTINATION ./)
 endif()
 
-if(APPLE)
-  # these needs to be relative to CMAKE_INSTALL_PREFIX
+if(APPLE) # macOS
+  # These needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir servatrice.app/Contents/Plugins)
   set(qtconf_dest_dir servatrice.app/Contents/Resources)
 
-  # Qt plugins: platforms, sqldrivers/mysql, tls (Qt6)
+  # Qt plugins: platforms, sqldrivers/mysql, tls
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -181,8 +171,8 @@ Translations = Resources/translations\")
   )
 endif()
 
-if(WIN32)
-  # these needs to be relative to CMAKE_INSTALL_PREFIX
+if(WIN32) # Windows (including 64bit)
+  # These needs to be relative to CMAKE_INSTALL_PREFIX
   set(plugin_dest_dir Plugins)
   set(qtconf_dest_dir .)
 
@@ -193,7 +183,7 @@ if(WIN32)
     PATTERN "*.dll"
   )
 
-  # Qt plugins: platforms, sqldrivers, tls (Qt6)
+  # Qt plugins: platforms, sqldrivers, tls
   install(
     DIRECTORY "${QT_PLUGINS_DIR}/"
     DESTINATION ${plugin_dest_dir}
@@ -203,12 +193,12 @@ if(WIN32)
     PATTERN "platforms/qminimal.dll"
     PATTERN "platforms/qoffscreen.dll"
     PATTERN "platforms/qwindows.dll"
-    PATTERN "tls/qcertonlybackend.dll"
-    PATTERN "tls/qopensslbackend.dll"
-    PATTERN "tls/qschannelbackend.dll"
     PATTERN "sqldrivers/qsqlite.dll"
     PATTERN "sqldrivers/qsqlodbc.dll"
     PATTERN "sqldrivers/qsqlpsql.dll"
+    PATTERN "tls/qcertonlybackend.dll"
+    PATTERN "tls/qopensslbackend.dll"
+    PATTERN "tls/qschannelbackend.dll"
   )
 
   install(
