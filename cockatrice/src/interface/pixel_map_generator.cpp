@@ -16,7 +16,6 @@
 #define DEFAULT_COLOR_MODERATOR_LEFT "#ffffff";
 #define DEFAULT_COLOR_MODERATOR_RIGHT "#000000";
 #define DEFAULT_COLOR_ADMIN "#ff2701";
-#define DEFAULT_COLOR_DEVELOPER "#B8B8B8"
 
 /**
  * Clamps an svg render size so that rendering does not exceed a multiple of the requested size.
@@ -362,6 +361,10 @@ static QString getIconType(const bool isBuddy, const UserLevelFlags &userLevelFl
         return "pawn_judge";
     }
 
+    if (userLevelFlags.testFlag(ServerInfo_User::IsDeveloper)) {
+        return "pawn_dev";
+    }
+
     if (!privLevel.isEmpty() && privLevel.toLower() != "none") {
         return QString("pawn_%1").arg(privLevel.toLower());
     }
@@ -382,8 +385,6 @@ QIcon UserLevelPixmapGenerator::generateIconDefault(int height,
 
     if (userLevel.testFlag(ServerInfo_User::IsAdmin)) {
         colorLeft = DEFAULT_COLOR_ADMIN;
-    } else if (userLevel.testFlag(ServerInfo_User::IsDeveloper)) {
-        colorLeft = DEFAULT_COLOR_DEVELOPER;
     } else if (userLevel.testFlag(ServerInfo_User::IsModerator)) {
         colorLeft = DEFAULT_COLOR_MODERATOR_LEFT;
         colorRight = DEFAULT_COLOR_MODERATOR_RIGHT;
