@@ -27,54 +27,84 @@ struct SuggestedColors
     QColor colorB;
     QColor accent;
     QColor glowColor;
+    QColor brandStrong;
+    QColor brandSoft;
     qreal vignetteMin = 0.62;
-    bool lightStage = false;
 };
 
 SuggestedColors suggestedBannerColors()
 {
     const QPalette &pal = qApp->palette();
     const QColor window = pal.color(QPalette::Active, QPalette::Window);
-    const QColor highlight = pal.color(QPalette::Active, QPalette::Highlight);
-    if (!window.isValid() || !highlight.isValid()) {
-        return {
-            QColor(kFallbackColorA), QColor(kFallbackColorB), kCockatriceBrandGreen, QColor(Qt::white), 0.62, false};
+    // Identity accent: the theme's [AppColors] AccentStrong, which appColor()
+    // resolves to QPalette::Highlight when a theme doesn't pin AccentStrong.
+    // Reading bare Highlight ignored curated accent tokens (Plasma's violet
+    // vs Default's green) whenever a palette didn't set the role itself.
+    const QColor accentStrong = themeManager->appColor(AppColor::AccentStrong);
+    if (!window.isValid() || !accentStrong.isValid()) {
+        return {QColor(kFallbackColorA),
+                QColor(kFallbackColorB),
+                kCockatriceBrandGreen,
+                QColor(Qt::white),
+                kCockatriceBrandGreen,
+                QColor(0xC9, 0xFD, 0x62),
+                0.62};
     }
+
+    // The theme's brand pair: AccentStrong is the deep green, AccentSoft the
+    // lime. These two appColors form the logo's "surrounding gradient" (deep
+    // core grading out to the soft, brand-toned glow) on both the banner and
+    // the home screen.
+    const QColor brandStrong = accentStrong;
+    const QColor brandSoft = themeManager->appColor(AppColor::AccentSoft);
 
     // Dress the stage for the scheme so the banner never fights the
     // surrounding window in either mode. Dark palettes keep the original
     // quiet near-black stage (lightness 29 → 16) with the theme's window
     // hue; light palettes get a pastel "frosted accent" treatment built from
-    // the Highlight hue instead of a plain near-white copy: a gentle mint
-    // wash that clearly belongs to the theme.
+    // the accent hue instead of a plain near-white copy: a coloured wash that
+    // clearly belongs to the theme.
     const qreal luma = 0.299 * window.red() + 0.587 * window.green() + 0.114 * window.blue();
     const bool lightStage = luma > 115.0;
     if (lightStage) {
-        const int hue = highlight.hslHue();
+        const int hue = accentStrong.hslHue();
         // Achromatic accents (grey) get a neutral near-white stage instead.
-        const int stageSat = hue < 0 ? 0 : 35;
+        const int stageSat = hue < 0 ? 0 : 64;
         const int hueSafe = hue < 0 ? 0 : hue;
+        // Depth is what stops a light stage reading as a washed-out near-white
+        // copy of the page behind the banner: deepen the lower pastel band and
+        // raise saturation so the hue is clearly present while staying frosted.
         auto pastel = [hueSafe, stageSat](int lightness) { return QColor::fromHsl(hueSafe, stageSat, lightness); };
-        // Brightness-lifted accent for additive glows: Highlight on a light
-        // stage must be mid-bright to read (the shipped light Highlight is a
-        // deep green that washes out additively against white).
-        const int accentLightness = qBound(120, highlight.lightness() + 70, 165);
-        const int accentSaturation = hue < 0 ? 0 : qMax(highlight.hslSaturation(), 140);
-        const QColor liftedAccent = hue < 0 ? highlight : QColor::fromHsl(hueSafe, accentSaturation, accentLightness);
-        // The centre glow uses the deep Highlight itself -- a coloured halo
-        // behind the dark logo instead of a white blowout.
-        return {pastel(247), pastel(231), liftedAccent, highlight, 0.88, true};
+        auto pastelLower = [hueSafe](int lightness) { return QColor::fromHsl(hueSafe, 76, lightness); };
+        // Brightness-lifted accent for additive glows: the raw accent on a
+        // light stage must be mid-bright to read instead of washing out, so
+        // lift lightness and saturation together.
+        const int accentLightness = qBound(158, accentStrong.lightness() + 82, 198);
+        const int accentSaturation = hue < 0 ? 0 : qMax(accentStrong.hslSaturation(), 180);
+        const QColor liftedAccent =
+            hue < 0 ? accentStrong : QColor::fromHsl(hueSafe, accentSaturation, accentLightness);
+        // The centre glow (and logo tint in QML) uses the deep accent itself:
+        // a coloured halo/fill behind the logo instead of a white or black one.
+        return {pastel(214), pastelLower(186), liftedAccent, accentStrong, brandStrong, brandSoft, 0.80};
     }
 
     // Dark stage: force the window hue down to the banner's curated darkness,
     // scaling saturation away so chromatic palettes tint it without going
-    // muddy. White glow and the original strong vignette stay untouched.
+    // muddy. The accent is the bright, brand-driven tone (hue from the accent
+    // itself, never the -- often grey -- window), and it drives both the
+    // embers/fog and the logo glow so the mark tints like the light stage.
     auto stage = [&window](int lightness) {
         const int hue = window.hslHue();
         const int saturation = hue < 0 ? 0 : qBound(0, qRound(window.hslSaturation() * (lightness / 40.0)), 255);
         return QColor::fromHsl(hue, saturation, lightness);
     };
-    return {stage(29), stage(16), QColor(highlight), QColor(Qt::white), 0.62, false};
+    const int accentHue = accentStrong.hslHue();
+    const int accentHueSafe = accentHue < 0 ? 0 : accentHue;
+    const int accentLightness = qBound(150, accentStrong.lightness() + 70, 185);
+    const int accentSaturation = accentHue < 0 ? 0 : qMax(accentStrong.hslSaturation(), 160);
+    const QColor accent =
+        accentHue < 0 ? accentStrong : QColor::fromHsl(accentHueSafe, accentSaturation, accentLightness);
+    return {stage(29), stage(16), accent, accent, brandStrong, brandSoft, 0.62};
 }
 } // namespace
 
@@ -273,8 +303,9 @@ void BannerHost::applyThemeColors()
         config->setColorB(bannerColorB);
         config->setAccent(bannerAccent);
         config->setGlowColor(colors.glowColor);
+        config->setBrandStrong(colors.brandStrong);
+        config->setBrandSoft(colors.brandSoft);
         config->setVignetteMin(colors.vignetteMin);
-        config->setLogoDark(colors.lightStage);
     }
 }
 

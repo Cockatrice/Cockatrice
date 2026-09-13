@@ -531,6 +531,7 @@ qt6_add_shaders(
   "src/interface/widgets/onboarding/shaders"
   FILES
   src/interface/widgets/onboarding/shaders/brand_banner.frag
+  src/interface/widgets/onboarding/shaders/brand_plate.frag
 )
 
 qt6_add_resources(

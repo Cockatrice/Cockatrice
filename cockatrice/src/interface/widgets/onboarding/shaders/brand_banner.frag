@@ -121,7 +121,7 @@ vec3 backgroundField(vec2 uv, float time)
 
     // Accent-coloured fog layer: flowNoise peaks above 0.6 contribute accent
     float fog = flowNoise(uv * 0.8 + vec2(100.0, 50.0), time * 0.02);
-    col += uAccent.rgb * max(fog - 0.6, 0.0) * 0.10;
+    col += uAccent.rgb * max(fog - 0.6, 0.0) * 0.14;
 
     return col;
 }
@@ -138,10 +138,10 @@ vec3 motifWelcome(vec2 uv, vec3 bg, float t)
     vec2 center = vec2(asp * 0.5, 0.5);
     float cDist = length(ac - center);
 
-    // Centre bloom at logo position; intensity scales with uLogoGlow. It
-    // uses the scheme-driven uGlowColor rather than plain white so light
-    // stages don't blow out (white halo on a near-white field) -- BannerHost
-    // feeds white on dark stages and the deep accent tone on light ones.
+    // Centre bloom at logo position; intensity scales with uLogoGlow. The
+    // QML brandGlow halo now supplies the primary logo surround (the two
+    // brand appColors), so this shader bloom is deliberately kept as a subtle
+    // ambience rather than a competing glow.
     float centreLight = bloom(cDist, 0.08 * asp, 0.40 * asp);
     col += uGlowColor.rgb * centreLight * 0.20 * uLogoGlow;
 
@@ -167,8 +167,8 @@ vec3 motifWelcome(vec2 uv, vec3 bg, float t)
         float pX = baseX * asp + sin(t * driftFreq + fi * 1.7) * driftAmp * asp;
         float pY = fract(baseY + t * riseSpeed);
 
-        float size = 0.006 + hash21(vec2(fi * 2.9, uSeed * 4.7)) * 0.012;
-        float bright = 0.15 + hash21(vec2(fi * 6.1, uSeed * 0.9)) * 0.30;
+        float size = 0.010 + hash21(vec2(fi * 2.9, uSeed * 4.7)) * 0.014;
+        float bright = 0.18 + hash21(vec2(fi * 6.1, uSeed * 0.9)) * 0.32;
 
         // Fade out near top/bottom edges
         float edgeFade = smoothstep(0.0, 0.12, pY) * smoothstep(1.0, 0.88, pY);
@@ -237,7 +237,7 @@ vec3 motifCardDatabase(vec2 uv, vec3 bg, float t)
 
         // Semi-transparent dark fill
         float fill = smoothstep(0.015, -0.005, d);
-        col = mix(col, uColorB.rgb * 0.55, fill * 0.50);
+        col = mix(col, uColorB.rgb * 0.60, fill * 0.62);
 
         // Accent outline
         float edge = smoothstep(0.035, 0.0, abs(d));
@@ -314,7 +314,7 @@ vec3 motifAccount(vec2 uv, vec3 bg, float t)
 
         // Node glow via bloom; intensity modulated by pulse
         float dist = length(ac - pos);
-        col += uAccent.rgb * bloom(dist, 0.018, 0.08) * mix(0.20, 0.45, pulse);
+        col += uAccent.rgb * bloom(dist, 0.018, 0.08) * mix(0.30, 0.55, pulse);
     }
 
     // Edges: connect nodes within a radius threshold
@@ -328,19 +328,19 @@ vec3 motifAccount(vec2 uv, vec3 bg, float t)
                 vec2 ba = nodePos[j] - nodePos[i];
                 float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
                 float lineDist = length(pa - ba * h);
-                col += uAccent.rgb * smoothstep(0.010, 0.0, lineDist) * strength * 0.10;
+                col += uAccent.rgb * smoothstep(0.010, 0.0, lineDist) * strength * 0.14;
             }
         }
     }
 
     // Central bloom at banner centre
     float cDist = length(ac - center);
-    col += uAccent.rgb * bloom(cDist, 0.04, 0.25) * 0.12;
+    col += uAccent.rgb * bloom(cDist, 0.04, 0.25) * 0.20;
 
     // Periodic expanding ring from centre
     float ripplePhase = t * 0.4;
     float rippleDist = abs(cDist - fract(ripplePhase) * asp * 0.7);
-    col += uAccent.rgb * smoothstep(0.02, 0.0, rippleDist) * 0.10;
+    col += uAccent.rgb * smoothstep(0.02, 0.0, rippleDist) * 0.14;
 
     return col;
 }
