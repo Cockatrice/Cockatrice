@@ -549,6 +549,19 @@ TEST_F(SettingsDefaultsTest, CardsDisplay_ArrowDrawAnimation_Default)
     ASSERT_EQ(s.getArrowDrawAnimation(), true);
 }
 
+TEST_F(SettingsDefaultsTest, CardsDisplay_CardLang_Default)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    ASSERT_EQ(s.getCardLang(), QString("en"));
+}
+
+TEST_F(SettingsDefaultsTest, CardsDisplay_CardLang_SetAndGet)
+{
+    CardsDisplaySettings s(settingsPath, nullptr);
+    s.setCardLang("de");
+    ASSERT_EQ(s.getCardLang(), QString("de"));
+}
+
 // --- VisualDeckStorageSettings ---
 
 TEST_F(SettingsDefaultsTest, VisualDeckStorage_SortingOrder_Default)

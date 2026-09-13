@@ -1,6 +1,7 @@
 #include "abstract_card_item.h"
 
 #include "../../client/settings/cache_settings.h"
+#include "../../interface/card_localization.h"
 #include "../../interface/card_picture_loader/card_picture_loader.h"
 #include "../game_scene.h"
 #include "../z_values.h"
@@ -25,6 +26,8 @@ AbstractCardItem::AbstractCardItem(QGraphicsItem *parent, const CardRef &cardRef
     setCacheMode(DeviceCoordinateCache);
 
     connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::displayCardNamesChanged, this,
+            [this] { update(); });
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, this,
             [this] { update(); });
     refreshCardInfo();
 
@@ -171,7 +174,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
             if (SettingsCache::instance().debug().getShowCardId()) {
                 prefix = "#" + QString::number(id) + " ";
             }
-            nameStr = prefix + cardRef.name;
+            nameStr = prefix + LocalizedCard::displayName(getCardInfo());
         }
         painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor,
                                  translatedSize.height() - 6 * scaleFactor),

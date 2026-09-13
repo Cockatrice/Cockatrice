@@ -134,6 +134,12 @@ private slots:
      * Clears the QPixmap cache to reload images.
      */
     void picsPathChanged();
+
+    /**
+     * @brief Triggered when the card language setting changes.
+     * Clears the in-memory picture caches so images reload in the new language.
+     */
+    void cardLangChanged();
 };
 
 #endif

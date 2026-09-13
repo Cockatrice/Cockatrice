@@ -31,6 +31,7 @@ public:
     [[nodiscard]] int getEDHRecCardSize() const override;
     [[nodiscard]] int getArchidektPreviewSize() const override;
     [[nodiscard]] int getSampleHandSize() const override;
+    [[nodiscard]] QString getCardLang() const override;
 
     void setDisplayCardNames(bool _displayCardNames);
     void setRoundCardCorners(bool _roundCardCorners);
@@ -52,6 +53,7 @@ public:
     void setEDHRecCardSize(int _edhrecCardSize);
     void setArchidektPreviewCardSize(int _archidektPreviewCardSize);
     void setSampleHandSize(int _sampleHandSize);
+    void setCardLang(const QString &_cardLang);
 
 signals:
     void displayCardNamesChanged();
@@ -68,6 +70,7 @@ signals:
     void edhRecCardSizeChanged();
     void archidektPreviewSizeChanged();
     void sampleHandSizeChanged(int amount);
+    void cardLangChanged(const QString &lang);
 
 public:
     explicit CardsDisplaySettings(const QString &settingPath, QObject *parent = nullptr);
