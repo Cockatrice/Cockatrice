@@ -16,6 +16,7 @@ Var ReinstallMode
 !include LogicLib.nsh
 !include FileFunc.nsh
 !include MUI2.nsh
+!include nsExec.nsh
 !include x64.nsh
 
 !define MUI_ABORTWARNING
@@ -131,6 +132,13 @@ ${EndIf}
 ; Now that $PortableMode reflects reality, commit InstDir into the correct slot
 Call SetModeDestinationFromInstdir
 
+; Make sure no application instance is still running (and holding file locks)
+; before the previous version is uninstalled or new files are installed.
+; On a silent update (/R /S) running processes are asked to close gracefully
+; and waited for, then force-closed only on timeout. On interactive installs
+; the user is prompted to close them instead.
+Call EnsureAppsNotRunning
+
 ${If} $ReinstallMode = 1
 ${AndIf} $PortableMode = 0
     Call AutoUninstallIfNeeded
@@ -143,6 +151,9 @@ Function un.onInit
 ${If} ${NSIS_IS_64_BIT} == 1
     SetRegView 64
 ${EndIf}
+
+; Ensure no application instance is still running before removing files.
+Call un.EnsureAppsNotRunning
 
 FunctionEnd
 
@@ -197,6 +208,140 @@ ${If} ${RunningX64}
     done64:
 ${EndIf}
 
+FunctionEnd
+
+; --- Running instance handling ---
+; Cockatrice, Oracle and Servatrice must not be running while files are
+; replaced or deleted. A still-running process holds locks on its .exe and
+; Qt runtime DLLs, so a silent upgrade could otherwise end up with a mix of
+; old and new Qt DLLs next to the new executable, failing with
+; "The procedure entry point X could not be located in the dynamic link
+; library ...Qt6Network.dll" on the next start.
+
+Function IsAppRunning
+    ; usage: set $R1 to the image name, call this, result in $R0 (1 = running, 0 = not running)
+    nsExec::Exec 'cmd /c tasklist /FI "IMAGENAME eq $R1" /FO CSV /NH | findstr /I "$R1" >nul'
+    Pop $R0
+    ${If} $R0 = 0
+        StrCpy $R0 1
+    ${Else}
+        StrCpy $R0 0
+    ${EndIf}
+FunctionEnd
+
+Function WaitForAppToClose
+    ; usage: set $R1 to the image name
+    Call IsAppRunning
+    ${If} $R0 = 0
+        Return
+    ${EndIf}
+
+    ${If} ${Silent}
+        ; ask the application to close gracefully (WM_CLOSE), then wait for it to exit
+        DetailPrint "Closing $R1 ..."
+        nsExec::Exec 'cmd /c taskkill /IM $R1'
+        Pop $R2
+        StrCpy $R8 0
+        ck_wait_loop:
+        Sleep 500
+        IntOp $R8 $R8 + 1
+        Call IsAppRunning
+        ${If} $R0 = 0
+            DetailPrint "$R1 closed."
+            Return
+        ${EndIf}
+        ${If} $R8 < 60
+            Goto ck_wait_loop
+        ${EndIf}
+        ; give up waiting, force close
+        DetailPrint "Force closing $R1 ..."
+        nsExec::Exec 'cmd /c taskkill /F /IM $R1'
+        Pop $R2
+        Sleep 500
+    ${Else}
+        ck_wait_prompt:
+        MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+            "$R1 is still running.$\r$\n$\r$\nPlease close it, then click Retry.$\r$\nClick Cancel to abort." \
+            IDCANCEL ck_abort_install
+        Call IsAppRunning
+        ${If} $R0 = 0
+            Return
+        ${EndIf}
+        Goto ck_wait_prompt
+        ck_abort_install:
+        Abort
+    ${EndIf}
+FunctionEnd
+
+Function EnsureAppsNotRunning
+    StrCpy $R1 "cockatrice.exe"
+    Call WaitForAppToClose
+    StrCpy $R1 "oracle.exe"
+    Call WaitForAppToClose
+    StrCpy $R1 "servatrice.exe"
+    Call WaitForAppToClose
+FunctionEnd
+
+; Uninstaller copies of the same routines (the uninstaller gets its own
+; function set compiled in, it cannot call the installer functions).
+Function un.IsAppRunning
+    nsExec::Exec 'cmd /c tasklist /FI "IMAGENAME eq $R1" /FO CSV /NH | findstr /I "$R1" >nul'
+    Pop $R0
+    ${If} $R0 = 0
+        StrCpy $R0 1
+    ${Else}
+        StrCpy $R0 0
+    ${EndIf}
+FunctionEnd
+
+Function un.WaitForAppToClose
+    Call un.IsAppRunning
+    ${If} $R0 = 0
+        Return
+    ${EndIf}
+
+    ${If} ${Silent}
+        DetailPrint "Closing $R1 ..."
+        nsExec::Exec 'cmd /c taskkill /IM $R1'
+        Pop $R2
+        StrCpy $R8 0
+        un_ck_wait_loop:
+        Sleep 500
+        IntOp $R8 $R8 + 1
+        Call un.IsAppRunning
+        ${If} $R0 = 0
+            DetailPrint "$R1 closed."
+            Return
+        ${EndIf}
+        ${If} $R8 < 60
+            Goto un_ck_wait_loop
+        ${EndIf}
+        DetailPrint "Force closing $R1 ..."
+        nsExec::Exec 'cmd /c taskkill /F /IM $R1'
+        Pop $R2
+        Sleep 500
+    ${Else}
+        un_ck_wait_prompt:
+        MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION|MB_DEFBUTTON1 \
+            "$R1 is still running.$\r$\n$\r$\nPlease close it, then click Retry.$\r$\nClick Cancel to abort." \
+            IDCANCEL un_ck_abort_install
+        Call un.IsAppRunning
+        ${If} $R0 = 0
+            Return
+        ${EndIf}
+        Goto un_ck_wait_prompt
+        un_ck_abort_install:
+        Abort
+    ${EndIf}
+FunctionEnd
+
+Function un.EnsureAppsNotRunning
+    StrCpy $R1 "cockatrice.exe"
+    Call un.WaitForAppToClose
+    StrCpy $R1 "oracle.exe"
+    Call un.WaitForAppToClose
+    StrCpy $R1 "servatrice.exe"
+    Call un.WaitForAppToClose
 FunctionEnd
 
 Function PortableModePageCreate
@@ -316,6 +461,25 @@ ${AndIf} ${FileExists} "$INSTDIR\portable.dat"
 	Delete "$INSTDIR\servatrice.ini.example"
 	Delete "$INSTDIR\zlib*.dll"
 	RMDir "$INSTDIR"
+${EndIf}
+
+; Belt and braces: the old uninstaller may have already run in the /R path, so
+; ensure no application instance is still holding file locks, then remove any
+; runtime DLLs left over from older versions. A mismatched Qt/OpenSSL set next
+; to the new executable is what causes "The procedure entry point X could not be
+; located in the dynamic link library ...Qt6Network.dll" after an update.
+Call EnsureAppsNotRunning
+
+${If} $PortableMode = 0
+	RMDir /r "$INSTDIR\Plugins"
+	Delete "$INSTDIR\Qt*.dll"
+	Delete "$INSTDIR\libcrypto*.dll"
+	Delete "$INSTDIR\libssl*.dll"
+	Delete "$INSTDIR\zlib*.dll"
+	Delete "$INSTDIR\libmysql.dll"
+	Delete "$INSTDIR\icu*.dll"
+	Delete "$INSTDIR\libeay32.dll"
+	Delete "$INSTDIR\ssleay32.dll"
 ${EndIf}
 
 @CPACK_NSIS_EXTRA_PREINSTALL_COMMANDS@
