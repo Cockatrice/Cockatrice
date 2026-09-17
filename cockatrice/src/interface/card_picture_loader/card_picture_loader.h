@@ -103,6 +103,13 @@ public:
     static bool hasCustomArt();
 
     /**
+     * @brief Check if a local override image already exists for the card.
+     * @param card The card to check.
+     * @return True if the card has at least one locally stored override image.
+     */
+    static bool hasLocalOverrides(const ExactCard &card);
+
+    /**
      * @brief Clears the in-memory QPixmap cache for all cards.
      */
     static void clearPixmapCache();
@@ -120,7 +127,10 @@ public slots:
      * @param image Loaded QImage.
      */
     void imageLoaded(const ExactCard &card, const QImage &image);
-    void saveCardImageToLocalStorage(const ExactCard &card, const QPixmap &pixmap);
+    void deleteAllLocalOverrides(const ExactCard &card);
+    void saveCardImageToLocalStorage(const ExactCard &card, const QPixmap &pixmap, bool allowOverwrite = false);
+    void overridePrintingConnectLocalSaveAndEnqueue(const ExactCard &originalCard, const ExactCard &overrideCard);
+    void overridePrintingEnsurePixmapExistsAndSaveLocally(const ExactCard &originalCard, const ExactCard &overrideCard);
 
 private slots:
     /**

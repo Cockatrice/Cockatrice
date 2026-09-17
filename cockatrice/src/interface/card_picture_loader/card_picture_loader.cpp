@@ -41,7 +41,7 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
     connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, this,
             &CardPictureLoader::cardLangChanged);
 
-    qRegisterMetaType<ExactCard>();
+    qRegisterMetaType<ExactCard>("ExactCard");
     connect(worker, &CardPictureLoaderWorker::imageLoaded, this, &CardPictureLoader::imageLoaded);
 
     statusBar = new CardPictureLoaderStatusBar(nullptr);
@@ -209,7 +209,49 @@ void CardPictureLoader::imageLoaded(const ExactCard &card, const QImage &image)
     card.emitPixmapUpdated();
 }
 
-void CardPictureLoader::saveCardImageToLocalStorage(const ExactCard &card, const QPixmap &pixmap)
+void CardPictureLoader::deleteAllLocalOverrides(const ExactCard &card)
+{
+    const QString picsRoot = SettingsCache::instance().paths().getPicsPath();
+    if (picsRoot.isEmpty() || !card) {
+        return;
+    }
+
+    QDir baseDir(picsRoot);
+    if (!baseDir.cd("downloadedPics")) {
+        return;
+    }
+
+    const QString name = card.getInfo().getCorrectedName();
+
+    QString set, collector, uuid;
+    auto printing = card.getPrinting();
+    if (printing.getSet()) {
+        set = printing.getSet()->getCorrectedShortName();
+        collector = printing.getProperty("num");
+        uuid = printing.getUuid();
+    }
+
+    for (const auto &scheme : CardPictureLoaderLocalSchemes::exportSchemes()) {
+        QString rel = CardPictureLoaderLocalSchemes::expandPattern(scheme.pattern, name, set, collector, uuid);
+
+        if (rel.isEmpty()) {
+            continue;
+        }
+
+        rel += ".png";
+        rel = QDir::cleanPath(rel);
+
+        QString fullPath = baseDir.filePath(rel);
+
+        if (QFile::exists(fullPath)) {
+            QFile::remove(fullPath);
+        }
+    }
+}
+
+void CardPictureLoader::saveCardImageToLocalStorage(const ExactCard &card,
+                                                    const QPixmap &pixmap,
+                                                    const bool allowOverwrite)
 {
     if (pixmap.isNull() || !card) {
         return;
@@ -269,8 +311,9 @@ void CardPictureLoader::saveCardImageToLocalStorage(const ExactCard &card, const
 
     QFileInfo outInfo(baseDir.filePath(relativePath));
 
-    // Do not overwrite existing files
-    if (outInfo.exists()) {
+    // Automatic cache writes (FILESYSTEM_CACHE) must never clobber an explicit user override.
+    // Only the explicit override paths pass allowOverwrite == true.
+    if (!allowOverwrite && outInfo.exists()) {
         return;
     }
 
@@ -289,6 +332,124 @@ void CardPictureLoader::saveCardImageToLocalStorage(const ExactCard &card, const
     if (!image.save(outInfo.absoluteFilePath(), "PNG")) {
         qCWarning(CardPictureLoaderLog) << "Failed to save card image to" << outInfo.absoluteFilePath();
     }
+}
+
+void CardPictureLoader::overridePrintingConnectLocalSaveAndEnqueue(const ExactCard &originalCard,
+                                                                   const ExactCard &overrideCard)
+{
+    // Overriding a card with itself is the reset case, not a real override: every code path below
+    // would re-enter itself through emitPixmapUpdated(). Reject it outright.
+    if (originalCard == overrideCard) {
+        return;
+    }
+
+    CardInfoPtr cardPtr = overrideCard.getCardPtr();
+    if (!cardPtr) {
+        return;
+    }
+
+    // Heap-allocate so the lambda can capture it before the connection is made
+    auto *connectionHandle = new QMetaObject::Connection;
+
+    *connectionHandle =
+        connect(cardPtr.data(), &CardInfo::pixmapUpdated, cardPtr.data(),
+                [originalCard, overrideCard, connectionHandle, this](const PrintingInfo &printing) {
+                    // All printings share the same CardInfo, so ignore updates triggered by any
+                    // other printing (e.g., the original card re-loading from disk).
+                    if (printing != overrideCard.getPrinting()) {
+                        return;
+                    }
+
+                    QPixmap pixmap;
+                    if (QPixmapCache::find(overrideCard.getPixmapCacheKey(), &pixmap) && !pixmap.isNull()) {
+                        // The override art has resolved — persist it and reflect it immediately.
+                        // Retire the connection before emitting so the refresh can't re-enter.
+                        saveCardImageToLocalStorage(originalCard, pixmap, /*allowOverwrite=*/true);
+
+                        QObject::disconnect(*connectionHandle);
+                        delete connectionHandle;
+
+                        QPixmapCache::clear();
+                        originalCard.emitPixmapUpdated();
+                        return;
+                    }
+
+                    // The art could not be resolved. Keep the connection armed so a late resolution
+                    // still lands, and surface a visible refusal instead of a silent no-op. An
+                    // override already on disk is left untouched and simply re-displayed.
+                    QPixmapCache::clear();
+                    if (!hasLocalOverrides(originalCard)) {
+                        QPixmap refusedPixmap;
+                        getCardBackLoadingFailedPixmap(refusedPixmap, QSize(480, 672));
+                        QPixmapCache::insert(originalCard.getPixmapCacheKey(), refusedPixmap);
+                    }
+                    originalCard.emitPixmapUpdated();
+                });
+
+    // Now enqueue; if the image is already loading (deduplicated in the worker),
+    // the signal will still fire when it completes
+    CardPictureLoader::getInstance().worker->enqueueImageLoad(overrideCard);
+}
+
+void CardPictureLoader::overridePrintingEnsurePixmapExistsAndSaveLocally(const ExactCard &originalCard,
+                                                                         const ExactCard &overrideCard)
+{
+    // Same guard as overridePrintingConnectLocalSaveAndEnqueue: self-override is the reset case.
+    if (originalCard == overrideCard) {
+        return;
+    }
+
+    QPixmap pixmap;
+    const QString key = overrideCard.getPixmapCacheKey();
+
+    if (QPixmapCache::find(key, &pixmap) && !pixmap.isNull()) {
+        // Already cached — save immediately; the caller refreshes the card.
+        saveCardImageToLocalStorage(originalCard, pixmap, /*allowOverwrite=*/true);
+        return;
+    }
+
+    // Cache miss or previously failed load — enqueue load and wait for the signal.
+    overridePrintingConnectLocalSaveAndEnqueue(originalCard, overrideCard);
+}
+
+bool CardPictureLoader::hasLocalOverrides(const ExactCard &card)
+{
+    const QString picsRoot = SettingsCache::instance().paths().getPicsPath();
+    if (picsRoot.isEmpty() || !card) {
+        return false;
+    }
+
+    QDir baseDir(picsRoot);
+    if (!baseDir.cd("downloadedPics")) {
+        return false;
+    }
+
+    const QString name = card.getInfo().getCorrectedName();
+
+    QString set, collector, uuid;
+    const PrintingInfo printing = card.getPrinting();
+    if (printing.getSet()) {
+        set = printing.getSet()->getCorrectedShortName();
+        collector = printing.getProperty("num");
+        uuid = printing.getUuid();
+    }
+
+    for (const auto &scheme : CardPictureLoaderLocalSchemes::exportSchemes()) {
+        QString rel = CardPictureLoaderLocalSchemes::expandPattern(scheme.pattern, name, set, collector, uuid);
+
+        if (rel.isEmpty()) {
+            continue;
+        }
+
+        rel += ".png";
+        rel = QDir::cleanPath(rel);
+
+        if (QFile::exists(baseDir.filePath(rel))) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void CardPictureLoader::clearPixmapCache()
