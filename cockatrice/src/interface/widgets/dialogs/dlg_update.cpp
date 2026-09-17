@@ -5,11 +5,13 @@
 #include "../client/network/update/client/release_channel.h"
 #include "../interface/window_main.h"
 
+#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QLabel>
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QPushButton>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QtNetwork>
 #include <version_string.h>
@@ -240,8 +242,14 @@ void DlgUpdate::downloadSuccessful(const QUrl &filepath)
 
     // Try to open the installer. If it opens, quit Cockatrice
     if (process.startDetached()) {
-        QMetaObject::invokeMethod(static_cast<MainWindow *>(parent()), "close", Qt::QueuedConnection);
         qCInfo(DlgUpdateLog) << "Opened downloaded update file successfully - closing Cockatrice";
+        // Close the main window synchronously so settings are saved and file locks are released
+        // before the NSIS installer (already launched) starts replacing files, then quit the
+        // application for real in case the close was suppressed (e.g. by a pending prompt).
+        if (auto *window = qobject_cast<MainWindow *>(parent())) {
+            window->close();
+        }
+        QTimer::singleShot(0, qApp, &QCoreApplication::quit);
         close();
     } else {
         setLabel(tr("Error"));
