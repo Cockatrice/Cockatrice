@@ -15,6 +15,29 @@
 
 static const QString CURRENT_SIDEBOARD_PLAN_KEY = "";
 
+/**
+ * @brief Parses a floating point XML attribute into a clamped playmat parameter.
+ *
+ * Falls back to @p fallback when the attribute is missing or malformed, so
+ * malformed deck files cannot produce degenerate art rectangles (e.g. a zoom
+ * of 0 dividing by zero).
+ *
+ * @param valueString Raw attribute text.
+ * @param fallback Value used when the text cannot be parsed.
+ * @param min Lower clamp bound.
+ * @param max Upper clamp bound.
+ * @return The parsed value clamped to [min, max], or @p fallback.
+ */
+static double parseClampedParam(const QString &valueString, double fallback, double min, double max)
+{
+    bool ok = false;
+    const double value = valueString.toDouble(&ok);
+    if (!ok) {
+        return fallback;
+    }
+    return qBound(min, value, max);
+}
+
 bool DeckList::Metadata::isEmpty() const
 {
     return name.isEmpty() && comments.isEmpty() && bannerCard.isEmpty() && tags.isEmpty() && playmat.card.isEmpty();
@@ -68,7 +91,6 @@ bool DeckList::readElement(QXmlStreamReader *xml)
             metadata.bannerCard = {cardName, providerId};
         } else if (childName == "playmatCard") {
             QString providerId = xml->attributes().value("providerId").toString();
-            bool ok;
             QString marginLStr = xml->attributes().value("marginPctL").toString();
             QString marginRStr = xml->attributes().value("marginPctR").toString();
             QString vOffStr = xml->attributes().value("verticalOffset").toString();
@@ -79,22 +101,10 @@ bool DeckList::readElement(QXmlStreamReader *xml)
             // Clamp to the same ranges as the settings dialog and the remote
             // player-properties path so malformed deck files cannot produce
             // degenerate art rectangles (e.g. a zoom of 0 dividing by zero).
-            playmat.params.marginPctL = qBound(0.0, marginLStr.toDouble(&ok), 0.95);
-            if (!ok) {
-                playmat.params.marginPctL = 0.07;
-            }
-            playmat.params.marginPctR = qBound(0.0, marginRStr.toDouble(&ok), 0.95);
-            if (!ok) {
-                playmat.params.marginPctR = 0.07;
-            }
-            playmat.params.verticalOffset = qBound(0.0, vOffStr.toDouble(&ok), 1.0);
-            if (!ok) {
-                playmat.params.verticalOffset = 0.33;
-            }
-            playmat.params.zoom = qBound(0.1, zoomStr.toDouble(&ok), 4.0);
-            if (!ok) {
-                playmat.params.zoom = 1.0;
-            }
+            playmat.params.marginPctL = parseClampedParam(marginLStr, 0.07, 0.0, 0.95);
+            playmat.params.marginPctR = parseClampedParam(marginRStr, 0.07, 0.0, 0.95);
+            playmat.params.verticalOffset = parseClampedParam(vOffStr, 0.33, 0.0, 1.0);
+            playmat.params.zoom = parseClampedParam(zoomStr, 1.0, 0.1, 4.0);
             metadata.playmat = playmat;
         } else if (childName == "tags") {
             metadata.tags.clear(); // Clear existing tags
