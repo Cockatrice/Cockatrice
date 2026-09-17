@@ -229,7 +229,7 @@ public:
      * @param limit The maximum amount of cards to read
      * @return the amount of cards found
      */
-    int readElement(QXmlStreamReader *xml, int limit) override;
+    int readElement(QXmlStreamReader *xml, int limit);
 
     /**
      * @brief Serialize this node and its children to XML.

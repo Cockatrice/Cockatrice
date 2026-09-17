@@ -183,7 +183,6 @@ public:
      * Cockatrice deck XML format.
      * @{
      */
-    virtual int readElement(QXmlStreamReader *xml, int limit) = 0;
     virtual void writeElement(QXmlStreamWriter *xml) = 0;
     /// @}
 };
