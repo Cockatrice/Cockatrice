@@ -1,6 +1,7 @@
 #include "visual_deck_storage_model.h"
 
 #include "../../deck_loader/deck_loader.h"
+#include "../cards/additional_info/deck_color_identity.h"
 
 #include <QDir>
 #include <QDirIterator>
@@ -118,8 +119,6 @@ DeckScanResult scanDeckDirectory(const QString &deckPath)
     return result;
 }
 } // namespace
-
-static QString computeColorIdentity(const LoadedDeck &deck);
 
 VisualDeckStorageModel::VisualDeckStorageModel(QObject *parent) : QAbstractListModel(parent)
 {
@@ -306,7 +305,7 @@ void VisualDeckStorageModel::beginLoad(int row)
         }
         // Color identity walks every card through the database, so compute it here to
         // keep the completion handler on the UI thread cheap.
-        const QString colorIdentity = computeColorIdentity(*deck);
+        const QString colorIdentity = getDeckColorIdentity(deck->deckList, CardDatabaseManager::query());
         return DeckLoadResult{std::move(*deck), QFileInfo(filePath).lastModified(), colorIdentity};
     }));
 }
@@ -368,40 +367,6 @@ void VisualDeckStorageModel::drainPendingLoads()
 }
 
 /**
- * @brief Computes the color identity of a deck in WUBRG order.
- */
-static QString computeColorIdentity(const LoadedDeck &deck)
-{
-    QStringList cardList = deck.deckList.getCardList({DECK_ZONE_MAIN, DECK_ZONE_SIDE});
-    if (cardList.isEmpty()) {
-        return {};
-    }
-
-    QSet<QChar> colorSet; // A set to collect unique color symbols (e.g., W, U, B, R, G)
-
-    for (const QString &cardName : cardList) {
-        CardInfoPtr currentCard = CardDatabaseManager::query()->getCardInfo(cardName);
-        if (currentCard) {
-            const QString colors = currentCard->getColors(); // Something like "WUB"
-            for (const QChar &color : colors) {
-                colorSet.insert(color);
-            }
-        }
-    }
-
-    // Ensure the color identity is in WUBRG order
-    QString colorIdentity;
-    const QString wubrgOrder = "WUBRG";
-    for (const QChar &color : wubrgOrder) {
-        if (colorSet.contains(color)) {
-            colorIdentity.append(color);
-        }
-    }
-
-    return colorIdentity;
-}
-
-/**
  * @brief Recomputes all derived metadata of a row from its loaded deck.
  */
 void VisualDeckStorageModel::recomputeDeckMetadata(DeckPreviewData &data, bool recomputeColorIdentity)
@@ -414,7 +379,7 @@ void VisualDeckStorageModel::recomputeDeckMetadata(DeckPreviewData &data, bool r
     data.lastLoaded = QDateTime::fromString(deckList.getLastLoadedTimestamp());
     data.bannerCard = deckList.getBannerCard();
     if (recomputeColorIdentity) {
-        data.colorIdentity = computeColorIdentity(data.deck);
+        data.colorIdentity = getDeckColorIdentity(data.deck.deckList, CardDatabaseManager::query());
     }
 }
 

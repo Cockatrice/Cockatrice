@@ -4,7 +4,6 @@
 #include "../../../../interface/widgets/dialogs/dlg_convert_deck_to_cod_format.h"
 #include "../../../deck_loader/deck_loader.h"
 #include "../../cards/additional_info/color_identity_widget.h"
-#include "../../cards/additional_info/deck_color_identity.h"
 #include "../../cards/deck_preview_card_picture_widget.h"
 #include "../visual_deck_storage_quick_settings_widget.h"
 #include "../visual_deck_storage_tag_filter_widget.h"
