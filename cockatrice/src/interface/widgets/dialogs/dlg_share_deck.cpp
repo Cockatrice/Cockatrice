@@ -1,5 +1,6 @@
 #include "dlg_share_deck.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../cards/additional_info/deck_color_identity.h"
 #include "../deck_share/deck_share_utils.h"
 
@@ -17,8 +18,6 @@
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-
-#include "../../../client/settings/cache_settings.h"
 
 DlgShareDeck::DlgShareDeck(AbstractClient *_client, const QSharedPointer<DeckList> &_deck, QWidget *_parent)
     : QDialog(_parent), client(_client), deck(_deck), shareTimeoutTimer(new QTimer(this))
