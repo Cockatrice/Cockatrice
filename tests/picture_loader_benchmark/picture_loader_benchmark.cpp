@@ -37,8 +37,11 @@
 #include <QMetaType>
 #include <QMutex>
 #include <QTemporaryDir>
+#include <QThread>
 #include <QTimer>
 #include <QUrl>
+#include <QtLogging>
+#include <atomic>
 #include <cstdio>
 #include <libcockatrice/card/database/card_database.h>
 #include <libcockatrice/card/printing/exact_card.h>
@@ -165,17 +168,38 @@ struct LogCounters
     QMutex mutex;
 };
 
-static LogCounters *s_activeCounters = nullptr;
+static std::atomic<LogCounters *> s_activeCounters{nullptr};
 static QtMessageHandler s_previousMessageHandler = nullptr;
 
 static void stressLogHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-    if (s_activeCounters && msg.contains(QStringLiteral("Too many requests from"))) {
-        QMutexLocker locker(&s_activeCounters->mutex);
-        ++s_activeCounters->http429;
+    if (LogCounters *counters = s_activeCounters.load(std::memory_order_acquire);
+        counters && msg.contains(QStringLiteral("Too many requests from"))) {
+        QMutexLocker locker(&counters->mutex);
+        ++counters->http429;
     }
     if (s_previousMessageHandler) {
         s_previousMessageHandler(type, context, msg);
+    } else {
+        // qInstallMessageHandler() reports the built-in handler as nullptr, so a plain `if` would
+        // swallow every message - including the 429 warnings this run is meant to surface. Fall
+        // back to Qt's message pattern written to stderr instead.
+        std::fprintf(stderr, "%s\n", qPrintable(qFormatLogMessage(type, context, msg)));
+    }
+}
+
+// Stops a worker's thread and frees it. shutdownThread()'s bounded wait guarantees that the worker
+// object was freed by its finished() -> deleteLater chain, so the thread itself can then be deleted
+// safely. A worker whose thread refused to stop is left alone (and leaked) rather than freed while
+// still running.
+static void destroyWorker(CardPictureLoaderWorker *worker)
+{
+    if (!worker) {
+        return;
+    }
+    QThread *thread = worker->workerThread();
+    if (worker->shutdownThread()) {
+        delete thread;
     }
 }
 
@@ -234,8 +258,14 @@ static StressResult runStress(CardPictureLoaderWorker *workerA,
     result.a.elapsedMs = elapsedMs;
     result.b.elapsedMs = elapsedMs;
 
+    // Stop both workers before touching the counters or restoring the message handler: their
+    // threads log from stressLogHandler, and must not outlive the stack-local counters (which is
+    // guaranteed on the watchdog path, where requests and deferred retries are still pending).
+    destroyWorker(workerA);
+    destroyWorker(workerB);
+
     result.http429Count = counters.http429;
-    s_activeCounters = nullptr;
+    s_activeCounters.store(nullptr, std::memory_order_release);
     qInstallMessageHandler(s_previousMessageHandler);
     return result;
 }
@@ -280,6 +310,7 @@ int main(int argc, char **argv)
     QStringList explicitUrls;
     int count = 300;
     bool stress = false;
+    bool stressUrlSet = false;
     QString stressUrl(QStringLiteral("https://api.scryfall.com/cards/!set:uuid!?format=image"));
     QString cacheDirArg;
     std::optional<int> timeoutMin;
@@ -301,8 +332,15 @@ int main(int argc, char **argv)
             stress = true;
         } else if (arg == QLatin1String("--stress-url")) {
             stressUrl = value();
+            stressUrlSet = true;
         } else if (arg == QLatin1String("--timeout-min")) {
-            timeoutMin = value().toInt();
+            bool ok = false;
+            const int parsed = value().toInt(&ok);
+            if (!ok || parsed <= 0) {
+                std::fprintf(stderr, "error: --timeout-min must be a positive integer\n");
+                return 2;
+            }
+            timeoutMin = parsed;
         } else if (arg == QLatin1String("--cache-dir")) {
             cacheDirArg = value();
         } else if (arg == QLatin1String("--help") || arg == QLatin1String("-h")) {
@@ -325,37 +363,53 @@ int main(int argc, char **argv)
         return 2;
     }
 
+    // In --stress mode an explicit --url selects the template to hammer, matching --url's meaning
+    // in the normal mode; only fall back to the built-in Scryfall template when neither --stress-url
+    // nor --url was supplied.
+    if (stress && !stressUrlSet && !explicitUrls.isEmpty()) {
+        stressUrl = explicitUrls.first();
+    }
+
     QCoreApplication app(argc, argv);
-    app.setApplicationName(QStringLiteral("Cockatrice"));
-    app.setOrganizationName(QStringLiteral("Cockatrice"));
+    // Unique names so a benchmark run can never read or write the real client's settings, cache or
+    // picture URLs on platforms where the XDG redirection below does not apply (macOS, Windows).
+    app.setApplicationName(QStringLiteral("Cockatrice-benchmark"));
+    app.setOrganizationName(QStringLiteral("Cockatrice-benchmark"));
     app.setApplicationVersion(QStringLiteral("9.0.0-benchmark"));
 
     // The ExactCard argument of imageLoaded crosses threads via a queued connection.
     qRegisterMetaType<ExactCard>();
 
     QTemporaryDir sandbox;
+    if (cacheDirArg.isEmpty() && !sandbox.isValid()) {
+        std::fprintf(stderr, "error: could not create a temporary sandbox directory\n");
+        return 2;
+    }
     const QString rootDir = cacheDirArg.isEmpty() ? sandbox.path() : cacheDirArg;
     QDir().mkpath(rootDir);
     QDir().mkpath(rootDir + "/config");
     QDir().mkpath(rootDir + "/data");
     QDir().mkpath(rootDir + "/cache");
 
-#ifdef Q_OS_UNIX
-    // Redirect every QStandardPaths lookup (and therefore SettingsCache paths)
-    // into the sandbox so the benchmark never touches user config or caches.
+#ifdef Q_OS_LINUX
+    // Redirect every QStandardPaths lookup (and therefore SettingsCache paths) into the sandbox so
+    // the benchmark never touches user config or caches. XDG_* only affects Qt's path resolution on
+    // Linux; elsewhere the unique application/organization names above keep the run isolated.
     qputenv("XDG_CONFIG_HOME", (rootDir + "/config").toUtf8());
     qputenv("XDG_DATA_HOME", (rootDir + "/data").toUtf8());
     qputenv("XDG_CACHE_HOME", (rootDir + "/cache").toUtf8());
 #endif
 
-    const bool warmStart = QDir(rootDir + "/cache/Cockatrice/downloaded")
+    // Derive the probe from SettingsCache rather than reconstructing it: Qt appends both the
+    // organization and the application name, so a hand-built path is easy to get wrong.
+    const bool warmStart = QDir(SettingsCache::instance().getNetworkCachePath())
                                .entryList(QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot, QDir::Name)
                                .size() > 0;
 
     // Copied into the sandbox so the loader's binary cache ("cards.xml.cache")
     // is written next to it instead of next to the user's file, and so a
     // --cache-dir rerun can pick it up again.
-    const QString dataPath = rootDir + "/data/Cockatrice";
+    const QString dataPath = SettingsCache::instance().getDataPath();
     QDir().mkpath(dataPath);
     const QString cardsXml = dataPath + "/cards.xml";
     if (!QFile::exists(cardsXml)) {
@@ -427,7 +481,6 @@ int main(int argc, char **argv)
     std::printf("=== PICTURE LOADER BENCHMARK (%d cards available, %d per template)%s ===\n", availableCards, count,
                 warmStart ? ", WARM cache from previous run" : "");
 
-    auto *worker = new CardPictureLoaderWorker();
     for (const QString &urlTemplate : urlsToTest) {
         const QList<ExactCard> cards = selectCardsForTemplate(db, urlTemplate, count);
         if (cards.isEmpty()) {
@@ -442,10 +495,21 @@ int main(int argc, char **argv)
         const int timeoutMs =
             (timeoutMin.has_value() ? timeoutMin.value() : (cards.size() * perCardMs * 8 + 60000) / 60000) * 60 * 1000;
         const qint64 coldLowerMs = static_cast<qint64>(cards.size()) * perCardMs / 2;
-        const qint64 cachedUpperMs = 8000;
+        // Decoding and cache-reading scale with the card count, so a flat budget would spuriously
+        // fail larger --count runs served entirely from a healthy cache.
+        const qint64 cachedUpperMs = qMax<qint64>(2000, static_cast<qint64>(cards.size()) * 10);
 
-        const PassResult cold = runPass(worker, cards, timeoutMs);
-        const PassResult cached = runPass(worker, cards, timeoutMs);
+        // A fresh worker per pass: if the cold pass hits the watchdog, its outstanding cards stay
+        // in the worker's currentlyLoading set, which would make the cached pass silently skip them
+        // and burn its own watchdog; late cold replies would also be misattributed to the cached
+        // pass.
+        auto *coldWorker = new CardPictureLoaderWorker();
+        const PassResult cold = runPass(coldWorker, cards, timeoutMs);
+        destroyWorker(coldWorker);
+
+        auto *cachedWorker = new CardPictureLoaderWorker();
+        const PassResult cached = runPass(cachedWorker, cards, timeoutMs);
+        destroyWorker(cachedWorker);
 
         const bool coldComplete = cold.finished >= cold.enqueued;
         const bool coldZeroFailures = cold.failed == 0;
@@ -472,8 +536,12 @@ int main(int argc, char **argv)
         }
     }
 
-    std::printf("cache root: %s%s\n", qPrintable(rootDir),
-                cacheDirArg.isEmpty() ? " (reuse with --cache-dir to warm on the next run)" : "");
+    if (cacheDirArg.isEmpty()) {
+        std::printf("cache root: %s (temporary; pass --cache-dir <dir> to persist it for a warm rerun)\n",
+                    qPrintable(rootDir));
+    } else {
+        std::printf("cache root: %s\n", qPrintable(rootDir));
+    }
     std::printf("RESULT: %s\n", allPass ? "PASS" : "FAIL");
     return allPass ? 0 : 1;
 }
