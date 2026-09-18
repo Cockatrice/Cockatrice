@@ -139,8 +139,16 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
 
     QNetworkReply *reply = networkManager->get(req);
 
+    // Track in-flight replies per host so the unlocked fast path can bound how many requests it
+    // issues at once, instead of creating replies that time out before Qt opens a connection.
+    const QString host = url.host();
+    hostInFlight.insert(host, hostInFlight.value(host) + 1);
+
     // Connect reply handling
-    connect(reply, &QNetworkReply::finished, worker, [reply, worker] { worker->handleNetworkReply(reply); });
+    connect(reply, &QNetworkReply::finished, worker, [this, reply, worker, host] {
+        hostInFlight.insert(host, qMax(0, hostInFlight.value(host) - 1));
+        worker->handleNetworkReply(reply);
+    });
 
     return reply;
 }
@@ -149,16 +157,20 @@ void CardPictureLoaderWorker::resetRequestQuota()
 {
     QDateTime now = QDateTime::currentDateTime();
     for (auto it = hostRequestQuota.begin(); it != hostRequestQuota.end();) {
-        // An unlocked host has no per-host allowance; drop any stale entry instead of
-        // recovering it towards the UNLIMITED_HOST_QUOTA sentinel, which would poison it.
-        if (hostAllowanceCeiling(it.key()) == DownloadSettings::UNLIMITED_HOST_QUOTA) {
-            it = hostRequestQuota.erase(it);
-            continue;
-        }
         if (!hostLast429.contains(it.key()) || now.msecsTo(hostLast429.value(it.key())) < -QUOTA_RECOVER_MS) {
-            // Recover towards the host's effective allowance ceiling, which may be
-            // lowered by the user's per-host request limits.
-            it.value() = qMin(hostAllowanceCeiling(it.key()), it.value() + 1);
+            if (hostAllowanceCeiling(it.key()) == DownloadSettings::UNLIMITED_HOST_QUOTA) {
+                // A developer-unlocked host that fell back after a 429 recovers towards the default
+                // allowance; once it gets there it becomes unlocked (fast-path) again.
+                if (it.value() + 1 >= DownloadSettings::DEFAULT_HOST_REQUEST_LIMIT) {
+                    it = hostRequestQuota.erase(it);
+                    continue;
+                }
+                it.value() += 1;
+            } else {
+                // Recover towards the host's effective allowance ceiling, which may be
+                // lowered by the user's per-host request limits.
+                it.value() = qMin(hostAllowanceCeiling(it.key()), it.value() + 1);
+            }
         }
         ++it;
     }
@@ -190,20 +202,34 @@ void CardPictureLoaderWorker::dispatchQueuedRequest()
         return;
     }
 
-    // Unlocked hosts (developer cap UNLIMITED_HOST_QUOTA) skip the dispatch pacing: dispatch every
-    // queued request for them back-to-back, bounded only by their 429 backoff window and Qt's
-    // per-host connection pool.
     QDateTime now = QDateTime::currentDateTime();
+    bool dispatched = false;
+    // Set while an unlocked host still has queued work blocked only by the in-flight cap; the
+    // timer must keep running so it gets another try as soon as a slot frees. A host blocked by
+    // its 429 backoff instead waits for the next quota-reset tick to restart the dispatcher.
+    bool unlockedCapped = false;
+
+    // Unlocked hosts (developer cap UNLIMITED_HOST_QUOTA) skip the pacing and the per-host
+    // allowance: dispatch their queued requests back-to-back, bounded by their 429 backoff and the
+    // per-host in-flight cap so a large burst can't queue replies that time out before Qt opens a
+    // connection for them.
     for (int i = 0; i < requestLoadQueue.size();) {
         const auto &request = requestLoadQueue.at(i);
         const QString host = request.first.host();
-        if (hostAllowanceCeiling(host) == DownloadSettings::UNLIMITED_HOST_QUOTA &&
-            !CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(host, now)) {
-            makeRequest(request.first, request.second);
-            requestLoadQueue.removeAt(i);
-        } else {
-            ++i;
+        if (isUnlockedHost(host)) {
+            if (CardPictureLoaderWorkerWork::rateLimiter().isRateLimited(host, now)) {
+                ++i;
+                continue;
+            }
+            if (hostInFlight.value(host) < MAX_IN_FLIGHT_PER_HOST) {
+                makeRequest(request.first, request.second);
+                requestLoadQueue.removeAt(i);
+                dispatched = true;
+                continue;
+            }
+            unlockedCapped = true;
         }
+        ++i;
     }
 
     if (requestLoadQueue.isEmpty()) {
@@ -212,8 +238,13 @@ void CardPictureLoaderWorker::dispatchQueuedRequest()
         return;
     }
 
-    if (!processSingleRequest()) {
-        // No queued host currently has allowance left in this second; wait for the quota reset.
+    if (processSingleRequest()) {
+        dispatched = true;
+    }
+
+    // Keep the timer running while there is progress to make or unlocked work waiting on a free
+    // in-flight slot; otherwise no host has allowance left this second, so wait for the quota reset.
+    if (!dispatched && !unlockedCapped) {
         dispatchTimer.stop();
     }
 }
@@ -274,7 +305,17 @@ bool CardPictureLoaderWorker::processSingleRequest()
             entry.second->scheduleDeferredRetry(host);
             continue;
         }
-        const int ceiling = hostAllowanceCeiling(host);
+        // Unlocked hosts are handled by dispatchQueuedRequest's fast path, bounded by the in-flight
+        // cap; they must not fall through to the per-host allowance arithmetic below.
+        if (isUnlockedHost(host)) {
+            continue;
+        }
+        int ceiling = hostAllowanceCeiling(host);
+        if (ceiling == DownloadSettings::UNLIMITED_HOST_QUOTA) {
+            // A 429 dropped this unlocked host out of the fast path and installed a concrete
+            // allowance; pace it against that allowance until the recovery loop unlocks it again.
+            ceiling = hostRequestQuota.value(host, DownloadSettings::DEFAULT_HOST_REQUEST_LIMIT);
+        }
         // Seed the allowance lazily so a host that enters the queue mid-second gets its reduced
         // per-host allowance, clamped against the ceiling so a lowered user cap applies from this
         // second onward.
@@ -314,15 +355,20 @@ int CardPictureLoaderWorker::hostAllowanceCeiling(const QString &host) const
     return SettingsCache::instance().downloads().clampHostRequestLimit(host, requested);
 }
 
+bool CardPictureLoaderWorker::isUnlockedHost(const QString &host) const
+{
+    return hostAllowanceCeiling(host) == DownloadSettings::UNLIMITED_HOST_QUOTA && !hostRequestQuota.contains(host);
+}
+
 void CardPictureLoaderWorker::onHostRateLimited(const QString &host)
 {
     const int ceiling = hostAllowanceCeiling(host);
-    if (ceiling == DownloadSettings::UNLIMITED_HOST_QUOTA) {
-        // Unlocked hosts have no per-host allowance to halve; the shared backoff
-        // window tracked by the rate limiter still paces them.
-        return;
-    }
-    hostRequestQuota.insert(host, qMax(MIN_HOST_QUOTA, hostRequestQuota.value(host, ceiling) / 2));
+    // An unlocked host has no per-host allowance to halve. Install one instead so it drops out of
+    // the unlocked fast path and is paced like a throttled host; the recovery loop in
+    // resetRequestQuota() then walks it back up and unlocks it again.
+    const int base =
+        ceiling == DownloadSettings::UNLIMITED_HOST_QUOTA ? DownloadSettings::DEFAULT_HOST_REQUEST_LIMIT : ceiling;
+    hostRequestQuota.insert(host, qMax(MIN_HOST_QUOTA, hostRequestQuota.value(host, base) / 2));
     hostLast429.insert(host, QDateTime::currentDateTime());
 }
 
