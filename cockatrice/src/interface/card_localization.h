@@ -7,7 +7,7 @@
 #include <libcockatrice/card/card_info.h>
 #include <libcockatrice/settings/cards_display_settings.h>
 
-namespace LocalizedCard
+namespace CardLocalization
 {
 /**
  * @brief The language code selected for localized card text and images.
@@ -54,6 +54,6 @@ inline QString displayText(const CardInfo &card)
 {
     return card.getLocalizedText(displayLang());
 }
-} // namespace LocalizedCard
+} // namespace CardLocalization
 
 #endif // COCKATRICE_CARD_LOCALIZATION_H

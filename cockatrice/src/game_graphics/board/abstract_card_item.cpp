@@ -174,7 +174,7 @@ void AbstractCardItem::paintPicture(QPainter *painter, const QSizeF &translatedS
             if (SettingsCache::instance().debug().getShowCardId()) {
                 prefix = "#" + QString::number(id) + " ";
             }
-            nameStr = prefix + LocalizedCard::displayName(getCardInfo());
+            nameStr = prefix + CardLocalization::displayName(getCardInfo());
         }
         painter->drawText(QRectF(3 * scaleFactor, 3 * scaleFactor, translatedSize.width() - 6 * scaleFactor,
                                  translatedSize.height() - 6 * scaleFactor),

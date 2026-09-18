@@ -67,7 +67,7 @@ void CardInfoTextWidget::setCard(const ExactCard &exactCard)
 
     QString text = "<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>";
     text += QString("<tr><td>%1</td><td width=\"5\"></td><td>%2</td></tr>")
-                .arg(tr("Name:"), LocalizedCard::displayName(card).toHtmlEscaped());
+                .arg(tr("Name:"), CardLocalization::displayName(card).toHtmlEscaped());
 
     if (!exactCard.getPrinting().isEmpty()) {
         QString setShort = exactCard.getPrinting().getSet()->getShortName().toHtmlEscaped();
@@ -101,7 +101,7 @@ void CardInfoTextWidget::setCard(const ExactCard &exactCard)
     }
 
     text += "</table>";
-    setTexts(text, LocalizedCard::displayText(card));
+    setTexts(text, CardLocalization::displayText(card));
     currentCard = exactCard;
 }
 
