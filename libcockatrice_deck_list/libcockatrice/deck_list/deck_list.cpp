@@ -38,6 +38,48 @@ static double parseClampedParam(const QString &valueString, double fallback, dou
     return qBound(min, value, max);
 }
 
+/**
+ * @brief Reads a `bannerCard` element from the XML stream.
+ *
+ * @param xml Reader positioned at the element.
+ * @return The referenced card.
+ */
+static CardRef readBannerCard(QXmlStreamReader *xml)
+{
+    QString providerId = xml->attributes().value("providerId").toString();
+    QString cardName = xml->readElementText();
+    return {cardName, providerId};
+}
+
+/**
+ * @brief Reads a `playmatCard` element from the XML stream.
+ *
+ * Attribute values are read before readElementText consumes the element, and
+ * the params are clamped to the same ranges as the settings dialog and the
+ * remote player-properties path so malformed deck files cannot produce
+ * degenerate art rectangles (e.g. a zoom of 0 dividing by zero).
+ *
+ * @param xml Reader positioned at the element.
+ * @return The referenced card plus its clamped positioning parameters.
+ */
+static PlaymatInfo readPlaymatCard(QXmlStreamReader *xml)
+{
+    QString providerId = xml->attributes().value("providerId").toString();
+    QString marginLStr = xml->attributes().value("marginPctL").toString();
+    QString marginRStr = xml->attributes().value("marginPctR").toString();
+    QString vOffStr = xml->attributes().value("verticalOffset").toString();
+    QString zoomStr = xml->attributes().value("zoom").toString();
+    QString cardName = xml->readElementText();
+
+    return {
+        .card = {cardName, providerId},
+        .params = {.marginPctL = parseClampedParam(marginLStr, 0.07, 0.0, 0.95),
+                   .marginPctR = parseClampedParam(marginRStr, 0.07, 0.0, 0.95),
+                   .verticalOffset = parseClampedParam(vOffStr, 0.33, 0.0, 1.0),
+                   .zoom = parseClampedParam(zoomStr, 1.0, 0.1, 4.0)},
+    };
+}
+
 bool DeckList::Metadata::isEmpty() const
 {
     return name.isEmpty() && comments.isEmpty() && bannerCard.isEmpty() && tags.isEmpty() && playmat.card.isEmpty();
@@ -54,25 +96,9 @@ bool DeckList::Metadata::readElement(QXmlStreamReader *xml, const QString &child
     } else if (childName == "comments") {
         comments = xml->readElementText();
     } else if (childName == "bannerCard") {
-        QString providerId = xml->attributes().value("providerId").toString();
-        QString cardName = xml->readElementText();
-        bannerCard = {cardName, providerId};
+        bannerCard = readBannerCard(xml);
     } else if (childName == "playmatCard") {
-        QString providerId = xml->attributes().value("providerId").toString();
-        // Attributes are read before readElementText consumes the element.
-        QString marginLStr = xml->attributes().value("marginPctL").toString();
-        QString marginRStr = xml->attributes().value("marginPctR").toString();
-        QString vOffStr = xml->attributes().value("verticalOffset").toString();
-        QString zoomStr = xml->attributes().value("zoom").toString();
-        QString cardName = xml->readElementText();
-        playmat.card = {cardName, providerId};
-        // Clamp to the same ranges as the settings dialog and the remote
-        // player-properties path so malformed deck files cannot produce
-        // degenerate art rectangles (e.g. a zoom of 0 dividing by zero).
-        playmat.params.marginPctL = parseClampedParam(marginLStr, 0.07, 0.0, 0.95);
-        playmat.params.marginPctR = parseClampedParam(marginRStr, 0.07, 0.0, 0.95);
-        playmat.params.verticalOffset = parseClampedParam(vOffStr, 0.33, 0.0, 1.0);
-        playmat.params.zoom = parseClampedParam(zoomStr, 1.0, 0.1, 4.0);
+        playmat = readPlaymatCard(xml);
     } else if (childName == "tags") {
         tags.clear(); // Clear existing tags
         while (xml->readNextStartElement()) {
