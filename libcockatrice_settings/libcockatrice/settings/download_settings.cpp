@@ -69,21 +69,46 @@ void DownloadSettings::setDownloadSpoilerStatus(bool _spoilerStatus)
 
 QHash<QString, int> DownloadSettings::getHostRequestLimits() const
 {
-    const QVariantMap stored = getValue("hostRequestLimits").toMap();
+    auto settings = getSettings();
+    if (!defaultGroup.isEmpty()) {
+        settings.beginGroup(defaultGroup);
+    }
+    settings.beginGroup("hostRequestLimits");
+
     QHash<QString, int> hostRequestLimits;
-    for (auto it = stored.cbegin(); it != stored.cend(); ++it) {
-        hostRequestLimits.insert(it.key(), it.value().toInt());
+    const QStringList hosts = settings.childKeys();
+    for (const QString &host : hosts) {
+        hostRequestLimits.insert(host, settings.value(host).toInt());
+    }
+
+    settings.endGroup();
+    if (!defaultGroup.isEmpty()) {
+        settings.endGroup();
     }
     return hostRequestLimits;
 }
 
 void DownloadSettings::setHostRequestLimits(const QHash<QString, int> &hostRequestLimits)
 {
-    QVariantMap stored;
-    for (auto it = hostRequestLimits.cbegin(); it != hostRequestLimits.cend(); ++it) {
-        stored.insert(it.key(), it.value());
+    auto settings = getSettings();
+    if (!defaultGroup.isEmpty()) {
+        settings.beginGroup(defaultGroup);
     }
-    setValue(stored, "hostRequestLimits");
+
+    // Drop the legacy single-key form (an opaque @Variant blob) written by earlier builds so each
+    // host is stored as a plain, hand-editable key in its own subgroup.
+    settings.remove("hostRequestLimits");
+    settings.beginGroup("hostRequestLimits");
+    settings.remove(QString());
+    for (auto it = hostRequestLimits.cbegin(); it != hostRequestLimits.cend(); ++it) {
+        settings.setValue(it.key(), it.value());
+    }
+    settings.endGroup();
+
+    if (!defaultGroup.isEmpty()) {
+        settings.endGroup();
+    }
+    settings.sync();
     emit hostRequestLimitsChanged();
 }
 
