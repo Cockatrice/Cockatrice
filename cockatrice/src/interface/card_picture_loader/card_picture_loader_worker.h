@@ -124,11 +124,32 @@ private:
     QTimer requestTimer;                    ///< Timer to reset the request quota
     QTimer dispatchTimer;                   ///< Timer pacing individual network requests
     QHash<QString, int> hostRequestQuota;   ///< Sustained per-host request allowance
+    QHash<QString, int> hostRequestLimits;  ///< User-set per-host request allowances
     QHash<QString, int> hostQuotaRemaining; ///< Per-host allowance left in the current second
     QHash<QString, QDateTime> hostLast429;  ///< When each host was last rate limited
+    QHash<QString, int> hostInFlight;       ///< Network replies currently in flight, per host
+
+    /** @brief Maximum concurrent in-flight network replies per host. */
+    static constexpr int MAX_IN_FLIGHT_PER_HOST = 6;
 
     CardPictureLoaderLocal *localLoader; ///< Loader for local images
     QSet<QString> currentlyLoading;      ///< Deduplication: contains pixmapCacheKey currently being loaded
+
+    /**
+     * @brief Effective per-host allowance ceiling for a host.
+     * @param host The host to look up
+     * @return The allowance ceiling in requests/second, or DownloadSettings::UNLIMITED_HOST_QUOTA
+     *         when the developer unlocked the host and no user limit is set for it.
+     */
+    [[nodiscard]] int hostAllowanceCeiling(const QString &host) const;
+
+    /**
+     * @brief Whether a host may skip dispatch pacing and per-host allowance entirely.
+     *
+     * A host is unlocked while it has no user limit and no reduced allowance installed by a 429.
+     * A 429 drops it out of the fast path until resetRequestQuota() walks the allowance back up.
+     */
+    [[nodiscard]] bool isUnlockedHost(const QString &host) const;
 
     /** @brief Returns cached redirect URL for the given original URL, if available. */
     [[nodiscard]] QUrl getCachedRedirect(const QUrl &originalUrl) const;
