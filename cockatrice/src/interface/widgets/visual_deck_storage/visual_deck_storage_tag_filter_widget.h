@@ -11,8 +11,8 @@
 #include <QWidget>
 #include <functional>
 
+class DeckPreviewTagDisplayWidget;
 class FlowWidget;
-class VisualDeckStorageWidget;
 
 class VisualDeckStorageTagFilterWidget : public QWidget
 {
@@ -20,6 +20,7 @@ class VisualDeckStorageTagFilterWidget : public QWidget
 
     FlowWidget *flowWidget;
     std::function<QSet<QString>()> allTagsProvider;
+    QList<DeckPreviewTagDisplayWidget *> currentChipOrder;
 
 public:
     explicit VisualDeckStorageTagFilterWidget(QWidget *parent = nullptr);
@@ -42,7 +43,10 @@ public:
 
 signals:
     /**
-     * Emitted whenever a chip's selection/exclusion state changes.
+     * Emitted when a chip's selection or exclusion state changes.
+     *
+     * The chip only emits when its state actually changed, so this fires once per
+     * effective toggle rather than on every click."
      */
     void filterChanged();
 
