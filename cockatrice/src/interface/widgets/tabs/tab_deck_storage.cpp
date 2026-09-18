@@ -20,9 +20,9 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
-#include <QTimer>
 #include <QUrl>
 #include <QVBoxLayout>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -716,7 +716,8 @@ void TabDeckStorage::onServerSelectionChanged()
     if (files > 0) {
         parts << tr("%n deck(s)", "", files);
     }
-    shareBar->setCountText(parts.isEmpty() ? tr("No decks selected") : tr("Selected: %1").arg(parts.join(tr(", "))));
+    shareBar->setCountText(parts.isEmpty() ? tr("No decks selected")
+                                           : tr("Selected: %1").arg(parts.join(QStringLiteral(", "))));
 }
 
 void TabDeckStorage::actShareSelection()
