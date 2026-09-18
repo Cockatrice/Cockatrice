@@ -169,6 +169,16 @@ int main(int argc, char **argv)
     // Redirect SettingsCache reads/writes (app-data location) away from the real user profile.
     QStandardPaths::setTestModeEnabled(true);
 
+    // Some CI containers run as a uid without a passwd entry (e.g. GitHub's docker
+    // runner), so HOME resolves to "/" and the test-mode qttest data dir cannot be
+    // created. SettingsCache's QSettings then silently drops every write, reads come
+    // back empty, and the paths the loader searches are "". Give the test a writable
+    // HOME for the duration of the run so settings behave like on a normal machine.
+    QTemporaryDir home;
+    if (home.isValid()) {
+        qputenv("HOME", home.path().toLocal8Bit());
+    }
+
     QCoreApplication app(argc, argv);
     QLoggingCategory::setFilterRules("card_picture_loader.*=false\nsettings_cache.*=false");
 
