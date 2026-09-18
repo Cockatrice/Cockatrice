@@ -37,6 +37,7 @@
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
+#include <libcockatrice/settings/network_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/utility/string_limits.h>
 
