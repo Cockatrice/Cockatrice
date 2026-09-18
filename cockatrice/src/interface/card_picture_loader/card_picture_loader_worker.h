@@ -184,7 +184,7 @@ private:
     /** @brief Returns cached redirect URL for the given original URL, if available. */
     [[nodiscard]] QUrl getCachedRedirect(const QUrl &originalUrl) const;
 
-/** @brief Whether a request for this URL would actually touch the network, rather than being served from the disk
+    /** @brief Whether a request for this URL would actually touch the network, rather than being served from the disk
      * cache. */
     [[nodiscard]] bool requestTouchesNetwork(const QUrl &url) const;
 
