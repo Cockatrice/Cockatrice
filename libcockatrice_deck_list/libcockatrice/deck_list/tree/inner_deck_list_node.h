@@ -223,6 +223,20 @@ public:
      */
     QVector<QPair<int, int>> sort(Qt::SortOrder order = Qt::AscendingOrder);
 
+private:
+    /**
+     * @brief Snapshots the current children as (old index, node) pairs.
+     */
+    QVector<QPair<int, AbstractDecklistNode *>> indexedSnapshot() const;
+
+    /**
+     * @brief Replaces this node's children with @p sorted and maps old indexes to new ones.
+     *
+     * @return A list of (old index, new index) pairs for each reordered child.
+     */
+    QVector<QPair<int, int>> applySortedOrder(const QVector<QPair<int, AbstractDecklistNode *>> &sorted);
+
+public:
     /**
      * @brief Deserialize this node and its children from XML.
      * @param xml Reader positioned at this element.

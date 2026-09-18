@@ -192,31 +192,35 @@ void InnerDecklistNode::writeElement(QXmlStreamWriter *xml)
     xml->writeEndElement(); // zone
 }
 
-QVector<QPair<int, int>> InnerDecklistNode::sort(Qt::SortOrder order)
+QVector<QPair<int, AbstractDecklistNode *>> InnerDecklistNode::indexedSnapshot() const
+{
+    QVector<QPair<int, AbstractDecklistNode *>> snapshot(size());
+    for (int i = size() - 1; i >= 0; --i) {
+        snapshot[i].first = i;
+        snapshot[i].second = at(i);
+    }
+    return snapshot;
+}
+
+QVector<QPair<int, int>> InnerDecklistNode::applySortedOrder(const QVector<QPair<int, AbstractDecklistNode *>> &sorted)
 {
     QVector<QPair<int, int>> result(size());
-
-    // Initialize temporary list with contents of current list
-    QVector<QPair<int, AbstractDecklistNode *>> tempList(size());
     for (int i = size() - 1; i >= 0; --i) {
-        tempList[i].first = i;
-        tempList[i].second = at(i);
+        result[i].first = sorted[i].first;
+        result[i].second = i;
+        replace(i, sorted[i].second);
     }
+    return result;
+}
 
-    // Sort temporary list
+QVector<QPair<int, int>> InnerDecklistNode::sort(Qt::SortOrder order)
+{
+    auto snapshot = indexedSnapshot();
+
     auto cmp = [order](const auto &a, const auto &b) {
         return (order == Qt::AscendingOrder) ? (b.second->compare(a.second)) : (a.second->compare(b.second));
     };
+    std::sort(snapshot.begin(), snapshot.end(), cmp);
 
-    std::sort(tempList.begin(), tempList.end(), cmp);
-
-    // Map old indexes to new indexes and
-    // copy temporary list to the current one
-    for (int i = size() - 1; i >= 0; --i) {
-        result[i].first = tempList[i].first;
-        result[i].second = i;
-        replace(i, tempList[i].second);
-    }
-
-    return result;
+    return applySortedOrder(snapshot);
 }
