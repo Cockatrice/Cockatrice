@@ -8,7 +8,7 @@
 #include <QApplication>
 #include <QBuffer>
 #include <QDebug>
-#include <QDirIterator>
+#include <QDir>
 #include <QFileInfo>
 #include <QMainWindow>
 #include <QMovie>
@@ -334,8 +334,7 @@ void CardPictureLoader::saveCardImageToLocalStorage(const ExactCard &card,
     }
 }
 
-void CardPictureLoader::overridePrintingConnectLocalSaveAndEnqueue(const ExactCard &originalCard,
-                                                                   const ExactCard &overrideCard)
+void CardPictureLoader::installPrintingOverrideOnLoad(const ExactCard &originalCard, const ExactCard &overrideCard)
 {
     // Overriding a card with itself is the reset case, not a real override: every code path below
     // would re-enter itself through emitPixmapUpdated(). Reject it outright.
@@ -391,10 +390,9 @@ void CardPictureLoader::overridePrintingConnectLocalSaveAndEnqueue(const ExactCa
     CardPictureLoader::getInstance().worker->enqueueImageLoad(overrideCard);
 }
 
-void CardPictureLoader::overridePrintingEnsurePixmapExistsAndSaveLocally(const ExactCard &originalCard,
-                                                                         const ExactCard &overrideCard)
+void CardPictureLoader::installPrintingOverride(const ExactCard &originalCard, const ExactCard &overrideCard)
 {
-    // Same guard as overridePrintingConnectLocalSaveAndEnqueue: self-override is the reset case.
+    // Same guard as installPrintingOverrideOnLoad: self-override is the reset case.
     if (originalCard == overrideCard) {
         return;
     }
@@ -409,7 +407,7 @@ void CardPictureLoader::overridePrintingEnsurePixmapExistsAndSaveLocally(const E
     }
 
     // Cache miss or previously failed load — enqueue load and wait for the signal.
-    overridePrintingConnectLocalSaveAndEnqueue(originalCard, overrideCard);
+    installPrintingOverrideOnLoad(originalCard, overrideCard);
 }
 
 bool CardPictureLoader::hasLocalOverrides(const ExactCard &card)
@@ -498,33 +496,4 @@ void CardPictureLoader::cardLangChanged()
     // (including failure timestamps) to force a reload in the new language.
     QPixmapCache::clear();
     failedAt.clear();
-}
-
-bool CardPictureLoader::hasCustomArt()
-{
-    auto picsPath = SettingsCache::instance().paths().getPicsPath();
-    QDirIterator it(picsPath, QDir::Dirs | QDir::NoDotAndDotDot);
-
-    // Check if there is at least one non-directory file in the pics path, other
-    // than in the "downloadedPics" subdirectory.
-    while (it.hasNext()) {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 3, 0))
-        QFileInfo dir(it.nextFileInfo());
-#else
-        // nextFileInfo() is only available in Qt 6.3+, for previous versions, we build
-        // the QFileInfo from a QString which requires more system calls.
-        QFileInfo dir(it.next());
-#endif
-
-        if (it.fileName() == "downloadedPics") {
-            continue;
-        }
-
-        QDirIterator subIt(it.filePath(), QDir::Files, QDirIterator::Subdirectories | QDirIterator::FollowSymlinks);
-        if (subIt.hasNext()) {
-            return true;
-        }
-    }
-
-    return false;
 }
