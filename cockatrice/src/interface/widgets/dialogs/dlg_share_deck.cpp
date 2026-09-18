@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -17,8 +18,10 @@
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 
+#include "../../../client/settings/cache_settings.h"
+
 DlgShareDeck::DlgShareDeck(AbstractClient *_client, const QSharedPointer<DeckList> &_deck, QWidget *_parent)
-    : QDialog(_parent), client(_client), deck(_deck)
+    : QDialog(_parent), client(_client), deck(_deck), shareTimeoutTimer(new QTimer(this))
 {
     setWindowTitle(tr("Share deck"));
 
@@ -38,6 +41,12 @@ DlgShareDeck::DlgShareDeck(AbstractClient *_client, const QSharedPointer<DeckLis
     connect(buttonBox, &QDialogButtonBox::rejected, this, &DlgShareDeck::reject);
     this->buttonBox = buttonBox;
     layout->addWidget(buttonBox);
+
+    shareTimeoutTimer->setSingleShot(true);
+    shareTimeoutTimer->setInterval(
+        static_cast<int>((static_cast<qint64>(SettingsCache::instance().network().getTimeOut()) + 1) *
+                         SettingsCache::instance().network().getKeepAlive() * 1000));
+    connect(shareTimeoutTimer, &QTimer::timeout, this, &DlgShareDeck::onShareTimeout);
 }
 
 void DlgShareDeck::actShare()
@@ -57,10 +66,12 @@ void DlgShareDeck::actShare()
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &DlgShareDeck::shareFinished);
     client->sendCommand(pend);
+    shareTimeoutTimer->start();
 }
 
 void DlgShareDeck::shareFinished(const Response &response, const CommandContainer & /*commandContainer*/)
 {
+    shareTimeoutTimer->stop();
     if (response.response_code() != Response::RespOk) {
         buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
         QMessageBox::critical(this, tr("Share deck"),
@@ -76,4 +87,10 @@ void DlgShareDeck::shareFinished(const Response &response, const CommandContaine
                                 "The share expires on %2.")
                                  .arg(share.link, DeckShareUtils::formatShareExpiry(share.expiry)));
     accept();
+}
+
+void DlgShareDeck::onShareTimeout()
+{
+    buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    QMessageBox::warning(this, tr("Share deck"), tr("The server did not respond in time. Try again."));
 }

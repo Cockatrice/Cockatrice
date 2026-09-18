@@ -7,6 +7,7 @@
 #include "../tab_supervisor.h"
 
 #include <QMessageBox>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -16,8 +17,11 @@
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 
+#include "../../../client/settings/cache_settings.h"
+
 TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, AbstractClient *_client)
-    : Tab(_tabSupervisor), client(_client), visualDeckStorageWidget(new VisualDeckStorageWidget(this))
+    : Tab(_tabSupervisor), client(_client), visualDeckStorageWidget(new VisualDeckStorageWidget(this)),
+      shareTimeoutTimer(new QTimer(this))
 {
     connect(this, &TabDeckStorageVisual::openDeckEditor, tabSupervisor, &TabSupervisor::openDeckInNewTab);
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckLoadRequested, this,
@@ -52,6 +56,12 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
 
     layout->insertWidget(0, shareBar);
     shareBar->setVisible(false);
+
+    shareTimeoutTimer->setSingleShot(true);
+    shareTimeoutTimer->setInterval(
+        static_cast<int>((static_cast<qint64>(SettingsCache::instance().network().getTimeOut()) + 1) *
+                         SettingsCache::instance().network().getKeepAlive() * 1000));
+    connect(shareTimeoutTimer, &QTimer::timeout, this, &TabDeckStorageVisual::onShareTimeout);
 
     retranslateUi();
 }
@@ -153,10 +163,12 @@ void TabDeckStorageVisual::actShareSelected()
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &TabDeckStorageVisual::shareFinished);
     client->sendCommand(pend);
+    shareTimeoutTimer->start();
 }
 
 void TabDeckStorageVisual::shareFinished(const Response &response, const CommandContainer & /*commandContainer*/)
 {
+    shareTimeoutTimer->stop();
     shareBar->setCreateEnabled(true);
     if (response.response_code() != Response::RespOk) {
         showShareNotice(tr("Failed to create the share link (server response code %1).")
@@ -186,4 +198,10 @@ void TabDeckStorageVisual::showShareNotice(const QString &message, bool warning)
     QMessageBox box(warning ? QMessageBox::Warning : QMessageBox::Information, tr("Deck share"), message,
                     QMessageBox::Ok, this);
     box.exec();
+}
+
+void TabDeckStorageVisual::onShareTimeout()
+{
+    shareBar->setCreateEnabled(true);
+    showShareNotice(tr("The server did not respond in time. Try again."), true);
 }
