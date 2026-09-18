@@ -11,7 +11,7 @@
 -- anyone who knows the (unguessable) token, until the share expires.
 CREATE TABLE IF NOT EXISTS `cockatrice_deck_share` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
-  `token` varchar(64) NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_bin NOT NULL,
   `name` varchar(64) NOT NULL,
   `created_by` int(7) unsigned NULL,
   `created_at` datetime NOT NULL,
@@ -53,18 +53,18 @@ ALTER TABLE `cockatrice_decklist_folders`
 
 -- 3. Per-deck preview metadata so clients can render another user's public
 -- decks (e.g. in a visual deck storage grid) without downloading each deck
--- list. The metadata is computed by the uploading client; decks uploaded
--- before this migration have empty values until they are re-uploaded.
+-- list. The metadata is derived by the server from the deck content (the color
+-- identity is supplied by the uploading client); decks uploaded before this
+-- migration have empty values until they are re-uploaded.
 ALTER TABLE `cockatrice_decklist_files`
-  ADD COLUMN `banner_card_name` varchar(255) NULL AFTER `content`,
+  ADD COLUMN `banner_card_name` varchar(255) NULL AFTER `is_public`,
   ADD COLUMN `banner_card_provider` varchar(32) NULL AFTER `banner_card_name`,
   ADD COLUMN `color_identity` varchar(5) NULL AFTER `banner_card_provider`;
 
--- 4. Per-deck tags for public decks. The uploading client sends a
--- comma-separated tag string (matching the deck's own tags), so another user's
--- public decks can render and filter by tag without downloading each deck list.
--- Decks uploaded before this migration have NULL tags until they are
--- re-uploaded.
+-- 4. Per-deck tags for public decks. The server renders the deck's own tags
+-- into a JSON array, so another user's public decks can filter by tag without
+-- downloading each deck list. Decks uploaded before this migration have NULL
+-- tags until they are re-uploaded.
 ALTER TABLE `cockatrice_decklist_files`
   ADD COLUMN `tags` text NULL AFTER `color_identity`;
 

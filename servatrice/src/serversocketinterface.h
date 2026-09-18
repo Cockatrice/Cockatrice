@@ -55,6 +55,8 @@ class Command_DeckUpload;
 class Command_DeckSetVisibility;
 class Command_DeckShareCreate;
 class Command_DeckShareList;
+class Command_DeckShareListMine;
+class Command_DeckShareRemove;
 class Command_DeckShareDownload;
 class Command_ReplayList;
 class Command_ReplayDownload;
@@ -124,6 +126,8 @@ private:
     Response::ResponseCode cmdDeckDownloadPublic(const Command_DeckDownloadPublic &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckShareCreate(const Command_DeckShareCreate &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckShareList(const Command_DeckShareList &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareListMine(const Command_DeckShareListMine &cmd, ResponseContainer &rc);
+    Response::ResponseCode cmdDeckShareRemove(const Command_DeckShareRemove &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdDeckShareDownload(const Command_DeckShareDownload &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayList(const Command_ReplayList &cmd, ResponseContainer &rc);
     Response::ResponseCode cmdReplayDownload(const Command_ReplayDownload &cmd, ResponseContainer &rc);
