@@ -99,7 +99,24 @@ bool Servatrice_DatabaseInterface::openDatabase()
         return false;
     }
 
-    if (isStrictModeEnabled()) {
+    if (sqlDatabase.driverName() != "QMYSQL") {
+        qCCritical(DatabaseInterfaceLog)
+            << poolStr
+            << "Error opening database: connection is not a MySQL/MariaDB database, Servatrice only "
+               "supports the QMYSQL driver (actual driver:"
+            << sqlDatabase.driverName() << ").";
+        return false;
+    }
+
+    bool strictModeCheckOk = false;
+    const bool strictModeEnabled = isStrictModeEnabled(strictModeCheckOk);
+    if (!strictModeCheckOk) {
+        qCCritical(DatabaseInterfaceLog) << poolStr
+                                         << "Error opening database: unable to determine whether MySQL/MariaDB strict "
+                                            "mode is enabled";
+        return false;
+    }
+    if (strictModeEnabled) {
         qCCritical(DatabaseInterfaceLog) << poolStr
                                          << "Error opening database: MySQL/MariaDB strict mode is enabled, which "
                                             "breaks most Servatrice database operations. Please disable strict mode "
@@ -116,14 +133,13 @@ bool Servatrice_DatabaseInterface::openDatabase()
     return true;
 }
 
-bool Servatrice_DatabaseInterface::isStrictModeEnabled() const
+bool Servatrice_DatabaseInterface::isStrictModeEnabled(bool &ok) const
 {
-    if (sqlDatabase.driverName() != "QMYSQL") {
-        return false;
-    }
+    ok = true;
 
     QSqlQuery query(sqlDatabase);
     if (!query.exec("SELECT @@GLOBAL.sql_mode")) {
+        ok = false;
         return false;
     }
 

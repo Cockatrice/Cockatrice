@@ -32,7 +32,7 @@ private:
     bool checkUserIsIpBanned(const QString &ipAddress, QString &banReason, int &banSecondsRemaining);
     /** Must be called after checkSql and server is known to be in auth mode. */
     bool checkUserIsNameBanned(QString const &userName, QString &banReason, int &banSecondsRemaining);
-    bool isStrictModeEnabled() const;
+    bool isStrictModeEnabled(bool &ok) const;
 
 protected:
     AuthenticationResult checkUserPassword(Server_ProtocolHandler *handler,
