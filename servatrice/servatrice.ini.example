@@ -468,3 +468,8 @@ cleanup_interval=60
 ; Maximum number of decks a single share link can contain.
 ; Default: 50
 max_decks_per_share=50
+
+; Maximum number of share links a single user may create per day.
+; A value of 0 disables the limit.
+; Default: 0
+max_shares_per_day=0

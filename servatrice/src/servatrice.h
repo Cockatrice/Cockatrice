@@ -281,6 +281,7 @@ public:
     int getDeckShareExpiryDays() const;
     int getDeckShareCleanupInterval() const;
     int getDeckShareMaxDecksPerShare() const;
+    int getDeckShareMaxSharesPerDay() const;
     int getMaxUsersPerAddress() const;
     int getMessageCountingInterval() const override;
     int getMaxMessageCountPerInterval() const override;

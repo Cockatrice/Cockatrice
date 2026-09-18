@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `cockatrice_decklist_files` (
 -- anyone who knows the (unguessable) token, until the share expires.
 CREATE TABLE IF NOT EXISTS `cockatrice_deck_share` (
   `id` int(7) unsigned zerofill NOT NULL auto_increment,
-  `token` varchar(64) NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_bin NOT NULL,
   `name` varchar(64) NOT NULL,
   `created_by` int(7) unsigned NULL,
   `created_at` datetime NOT NULL,

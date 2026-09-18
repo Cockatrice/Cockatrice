@@ -1,0 +1,10 @@
+syntax = "proto2";
+import "session_commands.proto";
+
+// Requests the list of share bundles created by the calling user, so they can
+// be reviewed and revoked before they expire.
+message Command_DeckShareListMine {
+    extend SessionCommand {
+        optional Command_DeckShareListMine ext = 1032;
+    }
+}

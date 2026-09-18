@@ -1,5 +1,6 @@
 #include "servatrice_database_interface.h"
 
+#include "deck_tag_serialization.h"
 #include "servatrice.h"
 #include "serversocketinterface.h"
 #include "settingscache.h"
@@ -1084,7 +1085,8 @@ bool Servatrice_DatabaseInterface::createDeckShare(const QString &token,
                                                    const QString &name,
                                                    int userId,
                                                    const QList<DeckShareItemRecord> &items,
-                                                   int expiryDays)
+                                                   int expiryDays,
+                                                   qint64 &expiresAt)
 {
     checkSql();
 
@@ -1092,7 +1094,9 @@ bool Servatrice_DatabaseInterface::createDeckShare(const QString &token,
         return false;
     }
 
-    sqlDatabase.transaction();
+    if (!sqlDatabase.transaction()) {
+        return false;
+    }
 
     QSqlQuery *query = prepareQuery("insert into {prefix}_deck_share (token, name, created_by, created_at, expires_at) "
                                     "values (:token, :name, :created_by, NOW(), DATE_ADD(NOW(), INTERVAL :days DAY))");
@@ -1106,6 +1110,17 @@ bool Servatrice_DatabaseInterface::createDeckShare(const QString &token,
     }
 
     const int shareId = query->lastInsertId().toInt();
+
+    // Read the expiry back from the database so the value returned to the client
+    // matches the server clock rather than being approximated client-side.
+    QSqlQuery *expiryQuery = prepareQuery("select UNIX_TIMESTAMP(expires_at) from {prefix}_deck_share where id = :id");
+    expiryQuery->bindValue(":id", shareId);
+    if (!execSqlQuery(expiryQuery) || !expiryQuery->next()) {
+        sqlDatabase.rollback();
+        return false;
+    }
+    expiresAt = expiryQuery->value(0).toLongLong();
+
     for (int i = 0; i < items.size(); ++i) {
         const DeckShareItemRecord &item = items.at(i);
         QSqlQuery *itemQuery = prepareQuery("insert into {prefix}_deck_share_item (share_id, name, tags, banner_card, "
@@ -1113,11 +1128,7 @@ bool Servatrice_DatabaseInterface::createDeckShare(const QString &token,
                                             ":tags, :banner_card, :game_format, :color_identity, :content, :position)");
         itemQuery->bindValue(":share_id", shareId);
         itemQuery->bindValue(":name", item.name);
-        QJsonArray tagArray;
-        for (const QString &tag : item.tags) {
-            tagArray.append(tag);
-        }
-        itemQuery->bindValue(":tags", QString::fromUtf8(QJsonDocument(tagArray).toJson(QJsonDocument::Compact)));
+        itemQuery->bindValue(":tags", serializeDeckTags(item.tags));
         itemQuery->bindValue(":banner_card", item.bannerCard);
         itemQuery->bindValue(":game_format", item.gameFormat);
         itemQuery->bindValue(":color_identity", item.colorIdentity);
@@ -1129,7 +1140,10 @@ bool Servatrice_DatabaseInterface::createDeckShare(const QString &token,
         }
     }
 
-    sqlDatabase.commit();
+    if (!sqlDatabase.commit()) {
+        sqlDatabase.rollback();
+        return false;
+    }
     return true;
 }
 
@@ -1163,10 +1177,7 @@ bool Servatrice_DatabaseInterface::getDeckShareList(const QString &token,
         DeckShareItemRecord item;
         item.id = itemQuery->value(0).toInt();
         item.name = itemQuery->value(1).toString();
-        const QJsonArray tagArray = QJsonDocument::fromJson(itemQuery->value(2).toString().toUtf8()).array();
-        for (const QJsonValue &tag : tagArray) {
-            item.tags.append(tag.toString());
-        }
+        item.tags = deserializeDeckTags(itemQuery->value(2).toString());
         item.bannerCard = itemQuery->value(3).toString();
         item.gameFormat = itemQuery->value(4).toString();
         item.colorIdentity = itemQuery->value(5).toString();
@@ -1199,6 +1210,45 @@ void Servatrice_DatabaseInterface::cleanupExpiredDeckShares()
 
     QSqlQuery *query = prepareQuery("delete from {prefix}_deck_share where expires_at < now()");
     execSqlQuery(query);
+}
+
+bool Servatrice_DatabaseInterface::getDeckSharesForUser(int userId, QList<DeckShareSummaryRecord> &shares)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("select s.id, s.name, UNIX_TIMESTAMP(s.created_at), "
+                                    "UNIX_TIMESTAMP(s.expires_at), count(i.id) from {prefix}_deck_share s left join "
+                                    "{prefix}_deck_share_item i on i.share_id = s.id where s.created_by = :created_by "
+                                    "group by s.id, s.name, s.created_at, s.expires_at order by s.created_at desc");
+    query->bindValue(":created_by", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+
+    shares.clear();
+    while (query->next()) {
+        DeckShareSummaryRecord summary;
+        summary.id = query->value(0).toInt();
+        summary.name = query->value(1).toString();
+        summary.creationTime = query->value(2).toLongLong();
+        summary.expiresAt = query->value(3).toLongLong();
+        summary.itemCount = query->value(4).toInt();
+        shares.append(summary);
+    }
+    return true;
+}
+
+bool Servatrice_DatabaseInterface::deleteDeckShare(int shareId, int userId)
+{
+    checkSql();
+
+    QSqlQuery *query = prepareQuery("delete from {prefix}_deck_share where id = :id and created_by = :created_by");
+    query->bindValue(":id", shareId);
+    query->bindValue(":created_by", userId);
+    if (!execSqlQuery(query)) {
+        return false;
+    }
+    return query->numRowsAffected() > 0;
 }
 
 void Servatrice_DatabaseInterface::logMessage(const int senderId,

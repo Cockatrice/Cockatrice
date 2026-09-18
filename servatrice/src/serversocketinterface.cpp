@@ -20,6 +20,7 @@
 
 #include "serversocketinterface.h"
 
+#include "deck_tag_serialization.h"
 #include "email_parser.h"
 #include "main.h"
 #include "servatrice.h"
@@ -57,6 +58,8 @@
 #include <libcockatrice/protocol/pb/command_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_share_download.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_share_list.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_share_list_mine.pb.h>
+#include <libcockatrice/protocol/pb/command_deck_share_remove.pb.h>
 #include <libcockatrice/protocol/pb/command_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/command_get_server_stats.pb.h>
 #include <libcockatrice/protocol/pb/command_replay_delete_match.pb.h>
@@ -92,6 +95,7 @@
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_download.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_list.pb.h>
+#include <libcockatrice/protocol/pb/response_deck_share_list_mine.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_upload.pb.h>
 #include <libcockatrice/protocol/pb/response_forgotpasswordrequest.pb.h>
 #include <libcockatrice/protocol/pb/response_get_admin_notes.pb.h>
@@ -341,6 +345,10 @@ Response::ResponseCode AbstractServerSocketInterface::processExtendedSessionComm
             return cmdDeckShareCreate(cmd.GetExtension(Command_DeckShareCreate::ext), rc);
         case SessionCommand::DECK_SHARE_LIST:
             return cmdDeckShareList(cmd.GetExtension(Command_DeckShareList::ext), rc);
+        case SessionCommand::DECK_SHARE_LIST_MINE:
+            return cmdDeckShareListMine(cmd.GetExtension(Command_DeckShareListMine::ext), rc);
+        case SessionCommand::DECK_SHARE_REMOVE:
+            return cmdDeckShareRemove(cmd.GetExtension(Command_DeckShareRemove::ext), rc);
         case SessionCommand::DECK_SHARE_DOWNLOAD:
             return cmdDeckShareDownload(cmd.GetExtension(Command_DeckShareDownload::ext), rc);
         case SessionCommand::ACCOUNT_PASSWORD:
@@ -652,7 +660,9 @@ bool AbstractServerSocketInterface::deckListHelper(int folderId,
         newFile->set_banner_card_name(query->value(4).toString().toStdString());
         newFile->set_banner_card_provider(query->value(5).toString().toStdString());
         newFile->set_color_identity(query->value(6).toString().toStdString());
-        newFile->set_tags(query->value(7).toString().toStdString());
+        for (const QString &tag : deserializeDeckTags(query->value(7).toString())) {
+            newFile->add_tags(tag.toStdString());
+        }
     }
 
     return true;
@@ -775,9 +785,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckSetVisibility(const
             return Response::RespNameNotFound;
         }
 
-        query = sqlInterface->prepareQuery("update {prefix}_decklist_files set is_public = :is_public where id = :id");
+        query = sqlInterface->prepareQuery("update {prefix}_decklist_files set is_public = :is_public where id = :id "
+                                           "and id_user = :id_user");
         query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
         query->bindValue(":id", cmd.deck_id());
+        query->bindValue(":id_user", userInfo->id());
         if (!sqlInterface->execSqlQuery(query)) {
             return Response::RespContextError;
         }
@@ -788,9 +800,11 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckSetVisibility(const
         }
 
         QSqlQuery *query =
-            sqlInterface->prepareQuery("update {prefix}_decklist_folders set is_public = :is_public where id = :id");
+            sqlInterface->prepareQuery("update {prefix}_decklist_folders set is_public = :is_public where id = :id "
+                                       "and id_user = :id_user");
         query->bindValue(":is_public", cmd.is_public() ? 1 : 0);
         query->bindValue(":id", folderId);
+        query->bindValue(":id_user", userInfo->id());
         if (!sqlInterface->execSqlQuery(query)) {
             return Response::RespContextError;
         }
@@ -939,6 +953,22 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckDel(const Command_D
     return Response::RespOk;
 }
 
+namespace
+{
+/** @brief Keeps only the WUBRG colors from a color identity string, deduplicated. */
+QString sanitizeColorIdentity(const QString &colorIdentity)
+{
+    QString sanitized;
+    for (const QChar &color : colorIdentity) {
+        const QChar upper = color.toUpper();
+        if (QStringLiteral("WUBRG").contains(upper) && !sanitized.contains(upper)) {
+            sanitized.append(upper);
+        }
+    }
+    return sanitized;
+}
+} // namespace
+
 Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Command_DeckUpload &cmd,
                                                                     ResponseContainer &rc)
 {
@@ -963,6 +993,14 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         deckName = "Unnamed deck";
     }
 
+    // The server derives the banner card and tags from the deck itself. Only the
+    // color identity must come from the client, since the server has no card
+    // database to compute it. All values are bounded to the column sizes.
+    const QString bannerCardName = deck.getBannerCard().name.left(255);
+    const QString bannerCardProvider = deck.getBannerCard().providerId.left(32);
+    const QString tagsJson = serializeDeckTags(deck.getTags());
+    const QString colorIdentity = sanitizeColorIdentity(nameFromStdString(cmd.color_identity()));
+
     if (cmd.has_path()) {
         int folderId = getDeckPathId(nameFromStdString(cmd.path()));
         if (folderId == -1) {
@@ -979,11 +1017,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         query->bindValue(":name", deckName);
         query->bindValue(":content", deckStr);
         query->bindValue(":is_public", cmd.has_is_public() && cmd.is_public() ? 1 : 0);
-        query->bindValue(":banner_card_name", nameFromStdString(cmd.banner_card_name()));
-        query->bindValue(":banner_card_provider", nameFromStdString(cmd.banner_card_provider()));
-        query->bindValue(":color_identity", nameFromStdString(cmd.color_identity()));
-        query->bindValue(":tags", nameFromStdString(cmd.tags()));
-        sqlInterface->execSqlQuery(query);
+        query->bindValue(":banner_card_name", bannerCardName);
+        query->bindValue(":banner_card_provider", bannerCardProvider);
+        query->bindValue(":color_identity", colorIdentity);
+        query->bindValue(":tags", tagsJson);
+        if (!sqlInterface->execSqlQuery(query)) {
+            return Response::RespContextError;
+        }
 
         Response_DeckUpload *re = new Response_DeckUpload;
         ServerInfo_DeckStorage_TreeItem *fileInfo = re->mutable_new_file();
@@ -1002,11 +1042,13 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
         query->bindValue(":id_user", userInfo->id());
         query->bindValue(":name", deckName);
         query->bindValue(":content", deckStr);
-        query->bindValue(":banner_card_name", nameFromStdString(cmd.banner_card_name()));
-        query->bindValue(":banner_card_provider", nameFromStdString(cmd.banner_card_provider()));
-        query->bindValue(":color_identity", nameFromStdString(cmd.color_identity()));
-        query->bindValue(":tags", nameFromStdString(cmd.tags()));
-        sqlInterface->execSqlQuery(query);
+        query->bindValue(":banner_card_name", bannerCardName);
+        query->bindValue(":banner_card_provider", bannerCardProvider);
+        query->bindValue(":color_identity", colorIdentity);
+        query->bindValue(":tags", tagsJson);
+        if (!sqlInterface->execSqlQuery(query)) {
+            return Response::RespContextError;
+        }
 
         if (query->numRowsAffected() == 0) {
             return Response::RespNameNotFound;
@@ -1017,7 +1059,9 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckUpload(const Comman
                                        "id_user = :id_user");
         visibilityQuery->bindValue(":id", cmd.deck_id());
         visibilityQuery->bindValue(":id_user", userInfo->id());
-        sqlInterface->execSqlQuery(visibilityQuery);
+        if (!sqlInterface->execSqlQuery(visibilityQuery)) {
+            return Response::RespContextError;
+        }
         const bool isPublic = visibilityQuery->next() && visibilityQuery->value(0).toBool();
 
         Response_DeckUpload *re = new Response_DeckUpload;
@@ -1077,14 +1121,7 @@ DeckShareItemRecord makeShareItemFromDeck(const DeckList &deck, const QString &c
     item.tags = deck.getTags();
     item.bannerCard = deck.getBannerCard().name;
     item.gameFormat = deck.getGameFormat();
-    QString sanitizedColorIdentity;
-    for (const QChar &color : colorIdentity) {
-        const QChar upper = color.toUpper();
-        if (QStringLiteral("WUBRG").contains(upper) && !sanitizedColorIdentity.contains(upper)) {
-            sanitizedColorIdentity.append(upper);
-        }
-    }
-    item.colorIdentity = sanitizedColorIdentity;
+    item.colorIdentity = sanitizeColorIdentity(colorIdentity);
     item.content = deck.writeToString_Native();
     return item;
 }
@@ -1098,6 +1135,25 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
     }
 
     sqlInterface->checkSql();
+
+    const int maxItems = servatrice->getDeckShareMaxDecksPerShare();
+    if (maxItems > 0 && cmd.items_size() > maxItems) {
+        return Response::RespInvalidData;
+    }
+
+    // Per-user rate limit so share links cannot be used to build an unbounded
+    // word-of-mouth leak of public decks.
+    const int maxSharesPerDay = servatrice->getDeckShareMaxSharesPerDay();
+    if (maxSharesPerDay > 0) {
+        QSqlQuery *countQuery = sqlInterface->prepareQuery("select count(*) from {prefix}_deck_share where "
+                                                           "created_by = :created_by and created_at >= "
+                                                           "DATE_SUB(NOW(), INTERVAL 1 DAY)");
+        countQuery->bindValue(":created_by", userInfo->id());
+        if (sqlInterface->execSqlQuery(countQuery) && countQuery->next() &&
+            countQuery->value(0).toInt() >= maxSharesPerDay) {
+            return Response::RespTooManyRequests;
+        }
+    }
 
     QList<DeckShareItemRecord> items;
     if (cmd.items_size() > 0) {
@@ -1126,15 +1182,24 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
         if (folderId == -1) {
             return Response::RespNameNotFound;
         }
+
+        // Drain the deck list before resolving each deck: getDeckFromDatabase
+        // issues its own query on the same cached statement set.
         QSqlQuery *query = sqlInterface->prepareQuery("select id from {prefix}_decklist_files where id_folder = "
                                                       ":id_folder and id_user = :id_user");
         query->bindValue(":id_folder", folderId);
         query->bindValue(":id_user", userInfo->id());
-        sqlInterface->execSqlQuery(query);
+        if (!sqlInterface->execSqlQuery(query)) {
+            return Response::RespContextError;
+        }
+        QList<int> deckIds;
         while (query->next()) {
+            deckIds.append(query->value(0).toInt());
+        }
+        for (const int deckId : deckIds) {
             DeckList *deck;
             try {
-                deck = sqlInterface->getDeckFromDatabase(query->value(0).toInt(), userInfo->id());
+                deck = sqlInterface->getDeckFromDatabase(deckId, userInfo->id());
             } catch (Response::ResponseCode &r) {
                 return r;
             }
@@ -1145,12 +1210,8 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
         return Response::RespInvalidData;
     }
 
-    if (items.isEmpty()) {
+    if (items.isEmpty() || (maxItems > 0 && items.size() > maxItems)) {
         return Response::RespInvalidData;
-    }
-    const int maxItems = servatrice->getDeckShareMaxDecksPerShare();
-    if (items.size() > maxItems) {
-        return Response::RespTooManyRequests;
     }
 
     QString shareName = nameFromStdString(cmd.name());
@@ -1159,16 +1220,65 @@ Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareCreate(const C
     }
 
     const QString token = generateShareToken();
-    if (!sqlInterface->createDeckShare(token, shareName, userInfo->id(), items, servatrice->getDeckShareExpiryDays())) {
+    qint64 expiresAt = 0;
+    if (!sqlInterface->createDeckShare(token, shareName, userInfo->id(), items, servatrice->getDeckShareExpiryDays(),
+                                       expiresAt)) {
         return Response::RespInvalidData;
     }
 
     Response_DeckShareCreate *re = new Response_DeckShareCreate;
     re->set_token(token.toStdString());
-    re->set_expires_at(
-        QDateTime::currentDateTimeUtc().addDays(servatrice->getDeckShareExpiryDays()).toSecsSinceEpoch());
+    re->set_expires_at(expiresAt);
     re->set_item_count(items.size());
     rc.setResponseExtension(re);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareListMine(const Command_DeckShareListMine & /*cmd*/,
+                                                                           ResponseContainer &rc)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    sqlInterface->checkSql();
+
+    QList<DeckShareSummaryRecord> shares;
+    if (!sqlInterface->getDeckSharesForUser(userInfo->id(), shares)) {
+        return Response::RespContextError;
+    }
+
+    Response_DeckShareListMine *re = new Response_DeckShareListMine;
+    for (const DeckShareSummaryRecord &share : shares) {
+        ServerInfo_DeckShareSummary *summary = re->add_shares();
+        summary->set_id(share.id);
+        summary->set_name(share.name.toStdString());
+        summary->set_creation_time(share.creationTime);
+        summary->set_expires_at(share.expiresAt);
+        summary->set_item_count(share.itemCount);
+    }
+    rc.setResponseExtension(re);
+
+    return Response::RespOk;
+}
+
+Response::ResponseCode AbstractServerSocketInterface::cmdDeckShareRemove(const Command_DeckShareRemove &cmd,
+                                                                         ResponseContainer & /*rc*/)
+{
+    if (authState != PasswordRight) {
+        return Response::RespFunctionNotAllowed;
+    }
+
+    if (!cmd.has_share_id()) {
+        return Response::RespInvalidData;
+    }
+
+    sqlInterface->checkSql();
+
+    if (!sqlInterface->deleteDeckShare(cmd.share_id(), userInfo->id())) {
+        return Response::RespNameNotFound;
+    }
 
     return Response::RespOk;
 }

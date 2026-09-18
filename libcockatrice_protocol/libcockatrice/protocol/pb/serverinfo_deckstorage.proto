@@ -8,10 +8,9 @@ message ServerInfo_DeckStorage_File {
     optional string banner_card_name = 3;
     optional string banner_card_provider = 4;
     optional string color_identity = 5;
-    // Comma-separated list of tag names, matching the corresponding
-    // ServerInfo_DeckStorage_File upload metadata. Empty for decks uploaded
-    // before the tags column existed.
-    optional string tags = 6;
+    // Tag names associated with the deck. Empty for decks uploaded before the
+    // tags column existed.
+    repeated string tags = 6;
 }
 
 message ServerInfo_DeckStorage_Folder {

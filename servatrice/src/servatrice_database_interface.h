@@ -29,6 +29,16 @@ struct DeckShareItemRecord
     QString content;       ///< Deck content (native format); empty in list queries.
 };
 
+/** @brief Summary of a share bundle owned by a user. */
+struct DeckShareSummaryRecord
+{
+    int id = -1;             ///< Database id, used for revocation.
+    QString name;            ///< Share name.
+    qint64 creationTime = 0; ///< Unix timestamp at which the share was created.
+    qint64 expiresAt = 0;    ///< Unix timestamp at which the share expires.
+    int itemCount = 0;       ///< Number of decks in the bundle.
+};
+
 class Servatrice_DatabaseInterface : public Server_DatabaseInterface
 {
     Q_OBJECT
@@ -92,12 +102,24 @@ public:
                               const QList<GameReplay *> &replayList) override;
     DeckList *getDeckFromDatabase(int deckId, int userId) override;
 
-    /** @brief Creates a new temporary deck share bundle. Returns false on failure. */
+    /**
+     * @brief Creates a new temporary deck share bundle.
+     * @param expiresAt Receives the actual expiry read back from the database.
+     * @return false on failure.
+     */
     bool createDeckShare(const QString &token,
                          const QString &name,
                          int userId,
                          const QList<DeckShareItemRecord> &items,
-                         int expiryDays);
+                         int expiryDays,
+                         qint64 &expiresAt);
+    /** @brief Lists the share bundles created by a user, newest first. */
+    bool getDeckSharesForUser(int userId, QList<DeckShareSummaryRecord> &shares);
+    /**
+     * @brief Deletes one of a user's own share bundles (cascades to its items).
+     * @return false if no such bundle belongs to the user.
+     */
+    bool deleteDeckShare(int shareId, int userId);
     /**
      * @brief Looks up a valid (non-expired) share bundle by token.
      * @return false if the token is unknown or expired.
