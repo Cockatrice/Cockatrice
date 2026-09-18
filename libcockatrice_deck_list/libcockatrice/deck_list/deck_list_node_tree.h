@@ -147,6 +147,14 @@ private:
     InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
     InnerDecklistNode *findBoardZone(const QString &boardZoneName) const;
     InnerDecklistNode *findOrCreateBoardZone(const QString &boardZoneName);
+
+    /**
+     * @brief Recursively removes @p container when it is an empty board zone.
+     *
+     * Empty custom zones are kept while empty board zones get pruned, so a
+     * board zone disappears once its last card or custom zone goes away.
+     */
+    void pruneEmptyBoardZone(InnerDecklistNode *container);
 };
 
 #endif // COCKATRICE_DECKLIST_NODE_TREE_H

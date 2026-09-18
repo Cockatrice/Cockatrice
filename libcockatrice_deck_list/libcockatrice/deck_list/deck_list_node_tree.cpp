@@ -201,12 +201,7 @@ bool DecklistNodeTree::deleteNode(AbstractDecklistNode *node, InnerDecklistNode 
     int index = rootNode->indexOf(node);
     if (index != -1) {
         delete rootNode->takeAt(index);
-
-        // Empty custom zones are kept while empty board zones get pruned.
-        if (rootNode->empty() && rootNode->getParent() == root) {
-            deleteNode(rootNode, rootNode->getParent());
-        }
-
+        pruneEmptyBoardZone(rootNode);
         return true;
     }
 
@@ -220,6 +215,13 @@ bool DecklistNodeTree::deleteNode(AbstractDecklistNode *node, InnerDecklistNode 
     }
 
     return false;
+}
+
+void DecklistNodeTree::pruneEmptyBoardZone(InnerDecklistNode *container)
+{
+    if (container->isEmpty() && container->getParent() == root) {
+        deleteNode(container, container->getParent());
+    }
 }
 
 void DecklistNodeTree::forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func) const
