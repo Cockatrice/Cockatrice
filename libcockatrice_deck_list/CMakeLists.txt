@@ -27,7 +27,6 @@ add_library(
   libcockatrice/deck_list/tree/inner_deck_list_node.cpp
   libcockatrice/deck_list/deck_list.cpp
   libcockatrice/deck_list/deck_list_history_manager.cpp
-  libcockatrice/deck_list/deck_list_metadata_xml.cpp
   libcockatrice/deck_list/deck_list_node_tree.cpp
   libcockatrice/deck_list/deck_list_plain_text_parser.cpp
   libcockatrice/deck_list/playmat_resolver.cpp
