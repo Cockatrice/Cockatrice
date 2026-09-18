@@ -250,7 +250,10 @@ bool DeckList::loadFromStream_Plain(QTextStream &in,
                                     bool preserveMetadata,
                                     const std::function<QString(const QString &)> &cardNameNormalizer)
 {
-    bool ok = DeckListPlainText::parse(in, preserveMetadata, cardNameNormalizer, metadata, tree);
+    if (!preserveMetadata) {
+        metadata = {};
+    }
+    bool ok = DeckListPlainText::parse(in, cardNameNormalizer, metadata, tree);
     refreshDeckHash();
     return ok;
 }

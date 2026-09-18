@@ -14,11 +14,9 @@ namespace DeckListPlainText
 /**
  * @brief Parses a plain-text deck list into a tree and its metadata.
  *
- * Clears the tree first, and clears the metadata unless @p preserveMetadata is
- * true, then fills both from the text.
+ * Clears the tree first, then fills both from the text.
  *
  * @param in The text to load
- * @param preserveMetadata If true, don't clear the existing metadata
  * @param cardNameNormalizer Function that takes the parsed card name string
  *        in the text and returns the name to store
  * @param metadata Deck metadata written by the parser
@@ -26,7 +24,6 @@ namespace DeckListPlainText
  * @return False if the input was empty, true otherwise.
  */
 bool parse(QTextStream &in,
-           bool preserveMetadata,
            const std::function<QString(const QString &)> &cardNameNormalizer,
            DeckList::Metadata &metadata,
            DecklistNodeTree &tree);

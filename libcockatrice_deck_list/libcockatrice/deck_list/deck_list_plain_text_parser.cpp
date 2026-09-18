@@ -10,30 +10,26 @@ namespace DeckListPlainText
 {
 
 bool parse(QTextStream &in,
-           bool preserveMetadata,
            const std::function<QString(const QString &)> &cardNameNormalizer,
            DeckList::Metadata &metadata,
            DecklistNodeTree &tree)
 {
     tree.clear();
-    if (!preserveMetadata) {
-        metadata = {};
-    }
 
-    const QRegularExpression reCardLine(R"(^\s*[\w\[\(\{].*$)", QRegularExpression::UseUnicodePropertiesOption);
-    const QRegularExpression reEmpty("^\\s*$");
-    const QRegularExpression reComment(R"([\w\[\(\{].*$)", QRegularExpression::UseUnicodePropertiesOption);
-    const QRegularExpression reSBMark("^\\s*sb:\\s*(.+)", QRegularExpression::CaseInsensitiveOption);
-    const QRegularExpression reSBComment("^sideboard\\b.*$", QRegularExpression::CaseInsensitiveOption);
-    const QRegularExpression reDeckComment("^((main)?deck(list)?|mainboard)\\b",
-                                           QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression reCardLine(R"(^\s*[\w\[\(\{].*$)", QRegularExpression::UseUnicodePropertiesOption);
+    static const QRegularExpression reEmpty("^\\s*$");
+    static const QRegularExpression reComment(R"([\w\[\(\{].*$)", QRegularExpression::UseUnicodePropertiesOption);
+    static const QRegularExpression reSBMark("^\\s*sb:\\s*(.+)", QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression reSBComment("^sideboard\\b.*$", QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression reDeckComment("^((main)?deck(list)?|mainboard)\\b",
+                                                  QRegularExpression::CaseInsensitiveOption);
 
     // Regex for advanced card parsing
-    const QRegularExpression reMultiplier(R"(^[xX\(\[]*(\d+)[xX\*\)\]]* ?(.+))");
+    static const QRegularExpression reMultiplier(R"(^[xX\(\[]*(\d+)[xX\*\)\]]* ?(.+))");
 
     // Regex for extracting set code and collector number with attached symbols
-    const QRegularExpression reHyphenFormat(R"(\((\w{3,})\)\s+(\w{3,})-(\d+[^\w\s]*))");
-    const QRegularExpression reRegularFormat(R"(\((\w{3,})\)\s+(\d+[^\w\s]*))");
+    static const QRegularExpression reHyphenFormat(R"(\((\w{3,})\)\s+(\w{3,})-(\d+[^\w\s]*))");
+    static const QRegularExpression reRegularFormat(R"(\((\w{3,})\)\s+(\d+[^\w\s]*))");
 
     auto inputs = in.readAll().trimmed().split('\n');
     auto max_line = inputs.size();
