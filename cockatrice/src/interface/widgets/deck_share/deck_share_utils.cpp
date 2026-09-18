@@ -4,6 +4,8 @@
 #include <QGuiApplication>
 #include <QLocale>
 #include <QTimeZone>
+#include <QUrl>
+#include <QUrlQuery>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
@@ -13,8 +15,17 @@ namespace DeckShareUtils
 
 QString buildShareLink(const AbstractClient *client, const QString &token)
 {
-    return QString("cockatrice://opendeck?share=%1&hostname=%2&port=%3")
-        .arg(token, client->serverName(), QString::number(client->serverPort()));
+    QUrl url;
+    url.setScheme(QStringLiteral("cockatrice"));
+    url.setHost(QStringLiteral("opendeck"));
+
+    QUrlQuery query;
+    query.addQueryItem(QStringLiteral("share"), token);
+    query.addQueryItem(QStringLiteral("hostname"), client->serverName());
+    query.addQueryItem(QStringLiteral("port"), QString::number(client->serverPort()));
+    url.setQuery(query);
+
+    return url.toString(QUrl::FullyEncoded);
 }
 
 QString copyShareLinkToClipboard(const QString &link)
