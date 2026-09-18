@@ -197,7 +197,7 @@ void DecklistNodeTree::forEachCard(const std::function<void(InnerDecklistNode *,
  * Top-level zones take precedence, then deck-unique custom zones nested under boards
  * are resolved. Unknown names create a new top-level zone (legacy behavior).
  */
-InnerDecklistNode *DecklistNodeTree::getZoneObjFromName(const QString &zoneName) const
+InnerDecklistNode *DecklistNodeTree::getZoneObjFromName(const QString &zoneName)
 {
     for (int i = 0; i < root->size(); i++) {
         auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));

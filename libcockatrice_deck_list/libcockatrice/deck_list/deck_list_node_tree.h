@@ -144,7 +144,7 @@ public:
 
 private:
     // Helpers for traversing the tree
-    InnerDecklistNode *getZoneObjFromName(const QString &zoneName) const;
+    InnerDecklistNode *getZoneObjFromName(const QString &zoneName);
     InnerDecklistNode *findBoardZone(const QString &boardZoneName) const;
     InnerDecklistNode *findOrCreateBoardZone(const QString &boardZoneName);
 };
