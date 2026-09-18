@@ -6,7 +6,6 @@
 #include "../../interface/widgets/visual_deck_storage/visual_deck_storage_widget.h"
 #include "../tab_supervisor.h"
 
-#include <QDateTime>
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <libcockatrice/card/database/card_database_manager.h>
@@ -168,8 +167,8 @@ void TabDeckStorageVisual::shareFinished(const Response &response, const Command
 
     const DeckShareUtils::ShareResponse share = DeckShareUtils::handleShareResponse(client, response);
 
-    showShareNotice(tr("Share link copied to the clipboard.\nExpires on %1.")
-                        .arg(DeckShareUtils::formatShareExpiry(share.expiry)));
+    showShareNotice(
+        tr("Share link copied to the clipboard.\nExpires on %1.").arg(DeckShareUtils::formatShareExpiry(share.expiry)));
     exitShareMode();
 }
 

@@ -20,7 +20,6 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <QTimeZone>
 #include <QToolBar>
 #include <QTreeView>
 #include <QUrl>
@@ -780,8 +779,8 @@ void TabDeckStorage::shareFromTreeFinished(const Response &response, const Comma
     }
     const DeckShareUtils::ShareResponse share = DeckShareUtils::handleShareResponse(client, response);
 
-    showShareNotice(tr("Share link copied to the clipboard.\nExpires on %1.")
-                        .arg(DeckShareUtils::formatShareExpiry(share.expiry)));
+    showShareNotice(
+        tr("Share link copied to the clipboard.\nExpires on %1.").arg(DeckShareUtils::formatShareExpiry(share.expiry)));
     setShareModeEnabled(false);
 }
 
