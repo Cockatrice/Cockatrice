@@ -43,7 +43,6 @@ void ShareBarWidget::retranslateUi()
     nameEdit->setPlaceholderText(tr("Share name"));
     cancelButton->setText(tr("Cancel"));
     createButton->setText(tr("Create share link"));
-    hintLabel->setText(tr("Click deck tiles to select the decks you want to share."));
 }
 
 QString ShareBarWidget::name() const

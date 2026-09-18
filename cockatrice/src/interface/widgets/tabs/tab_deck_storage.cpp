@@ -210,6 +210,9 @@ void TabDeckStorage::retranslateUi()
     aShareDecks->setText(tr("Share decks"));
     aOpenDecksFolder->setText(tr("Open decks folder"));
     shareBar->retranslateUi();
+    if (shareBar->isVisible()) {
+        onServerSelectionChanged();
+    }
 }
 
 QString TabDeckStorage::getTargetPath() const

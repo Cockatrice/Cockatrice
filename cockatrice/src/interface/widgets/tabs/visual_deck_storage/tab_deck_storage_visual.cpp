@@ -69,6 +69,9 @@ void TabDeckStorageVisual::retranslateUi()
 {
     visualDeckStorageWidget->retranslateUi();
     shareBar->retranslateUi();
+    if (shareBar->isVisible()) {
+        updateShareHint();
+    }
 }
 
 void TabDeckStorageVisual::actOpenLocalDeck(const QString &filePath)
