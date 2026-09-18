@@ -11,6 +11,7 @@
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QMainWindow>
+#include <QMetaObject>
 #include <QMovie>
 #include <QNetworkRequest>
 #include <QPainter>
@@ -40,6 +41,7 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
 
     qRegisterMetaType<ExactCard>();
     connect(worker, &CardPictureLoaderWorker::imageLoaded, this, &CardPictureLoader::imageLoaded);
+    connect(worker, &CardPictureLoaderWorker::networkCacheCleared, this, &CardPictureLoader::networkCacheCleared);
 
     statusBar = new CardPictureLoaderStatusBar(nullptr);
     QMainWindow *mainWindow = qobject_cast<QMainWindow *>(QApplication::activeWindow());
@@ -55,7 +57,18 @@ CardPictureLoader::CardPictureLoader() : QObject(nullptr)
 
 CardPictureLoader::~CardPictureLoader()
 {
-    worker->deleteLater();
+    if (worker) {
+        // Capture the thread first: shutdownThread() blocks until the worker has been freed by the
+        // finished() -> deleteLater chain, after which the worker pointer must not be dereferenced.
+        QThread *pictureLoaderThread = worker->workerThread();
+        const bool stopped = worker->shutdownThread();
+        worker = nullptr;
+        // Deleting a QThread that is still running is undefined behaviour, so only free it once the
+        // bounded wait in shutdownThread() confirmed that it stopped.
+        if (stopped) {
+            delete pictureLoaderThread;
+        }
+    }
 }
 
 void CardPictureLoader::getCardBackPixmap(QPixmap &pixmap, QSize size)
@@ -295,7 +308,17 @@ void CardPictureLoader::clearPixmapCache()
 
 void CardPictureLoader::clearNetworkCache()
 {
-    getInstance().worker->clearNetworkCache();
+    // During teardown the worker is released before this singleton, so a queued clear may still
+    // arrive with no worker left to run it.
+    CardPictureLoaderWorker *worker = getInstance().worker;
+    if (!worker) {
+        return;
+    }
+    // The disk cache and redirect cache are owned by the worker thread, so the clear has to run
+    // there. Invoke it asynchronously to keep the GUI responsive while the worker may be walking
+    // the user's picture directories or recursively deleting the cache directory; callers that
+    // need to know when it is done can listen for networkCacheCleared().
+    QMetaObject::invokeMethod(worker, &CardPictureLoaderWorker::clearNetworkCache, Qt::QueuedConnection);
 }
 
 void CardPictureLoader::cacheCardPixmaps(const QList<ExactCard> &cards)
