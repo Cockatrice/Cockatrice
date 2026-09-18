@@ -520,8 +520,11 @@ void DeckEditorDeckDockWidget::syncBannerCardComboBoxSelectionWithDeck()
 
 void DeckEditorDeckDockWidget::setSelectedIndex(const QModelIndex &newCardIndex, bool preserveWidgetFocus)
 {
+    const QModelIndex proxyIndex = proxy->mapFromSource(newCardIndex);
+
     deckView->clearSelection();
-    deckView->setCurrentIndex(newCardIndex);
+    deckView->setCurrentIndex(proxyIndex);
+    deckView->scrollTo(proxyIndex);
     recursiveExpand(newCardIndex);
 
     if (!preserveWidgetFocus) {
