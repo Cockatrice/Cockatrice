@@ -152,9 +152,9 @@ AppearanceSettingsPage::AppearanceSettingsPage()
     homeTabGrid->addWidget(&homeTabBackgroundShuffleFrequencyLabel, 1, 0);
     homeTabGrid->addWidget(&homeTabBackgroundShuffleFrequencySpinBox, 1, 1);
     homeTabGrid->addWidget(&homeTabDisplayCardNameCheckBox, 2, 0, 1, 2);
-    homeTabGrid->addWidget(&homeTabBackgroundDimCheckBox, 3, 0, 1, 2);
-    homeTabGrid->addWidget(&homeTabButtonColorSourceLabel, 4, 0);
-    homeTabGrid->addWidget(&homeTabButtonColorSourceBox, 4, 1);
+    homeTabGrid->addWidget(&homeTabButtonColorSourceLabel, 3, 0);
+    homeTabGrid->addWidget(&homeTabButtonColorSourceBox, 3, 1);
+    homeTabGrid->addWidget(&homeTabBackgroundDimCheckBox, 4, 0, 1, 2);
 
     homeTabGroupBox = new QGroupBox;
     homeTabGroupBox->setLayout(homeTabGrid);
