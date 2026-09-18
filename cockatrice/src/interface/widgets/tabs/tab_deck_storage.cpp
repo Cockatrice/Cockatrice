@@ -778,19 +778,10 @@ void TabDeckStorage::shareFromTreeFinished(const Response &response, const Comma
                         true);
         return;
     }
-    const Response_DeckShareCreate &resp = response.GetExtension(Response_DeckShareCreate::ext);
-    const QString token = QString::fromStdString(resp.token());
-#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
-    const QDateTime expiry = QDateTime::fromSecsSinceEpoch(resp.expires_at(), QTimeZone::UTC);
-#else
-    const QDateTime expiry = QDateTime::fromSecsSinceEpoch(resp.expires_at(), Qt::UTC);
-#endif
+    const DeckShareUtils::ShareResponse share = DeckShareUtils::handleShareResponse(client, response);
 
-    const QString link = DeckShareUtils::buildShareLink(client, token);
-    DeckShareUtils::copyShareLinkToClipboard(link);
-
-    showShareNotice(
-        tr("Share link copied to the clipboard.\nExpires on %1.").arg(DeckShareUtils::formatShareExpiry(expiry)));
+    showShareNotice(tr("Share link copied to the clipboard.\nExpires on %1.")
+                        .arg(DeckShareUtils::formatShareExpiry(share.expiry)));
     setShareModeEnabled(false);
 }
 

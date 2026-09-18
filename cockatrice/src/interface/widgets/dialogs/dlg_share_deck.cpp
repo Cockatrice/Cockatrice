@@ -70,20 +70,11 @@ void DlgShareDeck::shareFinished(const Response &response, const CommandContaine
         return;
     }
 
-    const Response_DeckShareCreate &resp = response.GetExtension(Response_DeckShareCreate::ext);
-    const QString token = QString::fromStdString(resp.token());
-#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
-    const QDateTime expiry = QDateTime::fromSecsSinceEpoch(resp.expires_at(), QTimeZone::UTC);
-#else
-    const QDateTime expiry = QDateTime::fromSecsSinceEpoch(resp.expires_at(), Qt::UTC);
-#endif
-
-    const QString link = DeckShareUtils::buildShareLink(client, token);
-    DeckShareUtils::copyShareLinkToClipboard(link);
+    const DeckShareUtils::ShareResponse share = DeckShareUtils::handleShareResponse(client, response);
 
     QMessageBox::information(this, tr("Share deck"),
                              tr("Share link created and copied to the clipboard:\n\n%1\n\n"
                                 "The share expires on %2.")
-                                 .arg(link, DeckShareUtils::formatShareExpiry(expiry)));
+                                 .arg(share.link, DeckShareUtils::formatShareExpiry(share.expiry)));
     accept();
 }

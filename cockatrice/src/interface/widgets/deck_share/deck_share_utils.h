@@ -11,12 +11,22 @@
 #include <QString>
 
 class AbstractClient;
+class Response;
 
 /**
  * @brief Shared helpers for creating temporary deck shares.
  */
 namespace DeckShareUtils
 {
+
+/**
+ * @brief The outcome of a successful share-create response.
+ */
+struct ShareResponse
+{
+    QString link;     ///< The share link that was copied to the clipboard.
+    QDateTime expiry; ///< When the share expires (UTC).
+};
 
 /**
  * @brief Builds the cockatrice:// link for a freshly created deck share.
@@ -35,6 +45,14 @@ QString copyShareLinkToClipboard(const QString &link);
  * @brief Formats the expiration timestamp for a share.
  */
 QString formatShareExpiry(const QDateTime &expiry);
+
+/**
+ * @brief Handles a successful Response_DeckShareCreate: builds the share link,
+ *        copies it to the clipboard, and derives the share expiry.
+ * @param client Used to embed the target server's hostname and port.
+ * @param response The successful response carrying the share token and expiry.
+ */
+ShareResponse handleShareResponse(const AbstractClient *client, const Response &response);
 
 } // namespace DeckShareUtils
 
