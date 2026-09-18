@@ -2,6 +2,7 @@
 
 #include <QClipboard>
 #include <QGuiApplication>
+#include <QLocale>
 #include <QTimeZone>
 #include <libcockatrice/network/client/abstract/abstract_client.h>
 #include <libcockatrice/protocol/pb/response.pb.h>
@@ -24,7 +25,7 @@ QString copyShareLinkToClipboard(const QString &link)
 
 QString formatShareExpiry(const QDateTime &expiry)
 {
-    return expiry.toLocalTime().toString();
+    return QLocale().toString(expiry.toLocalTime(), QLocale::ShortFormat);
 }
 
 ShareResponse handleShareResponse(const AbstractClient *client, const Response &response)
