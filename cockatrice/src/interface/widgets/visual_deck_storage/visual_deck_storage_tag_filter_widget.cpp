@@ -38,15 +38,17 @@ void VisualDeckStorageTagFilterWidget::refreshTags()
 
     // Existing chips survive if their tag is still part of the deck set, or if the chip
     // is currently selected/excluded. Everything else is dropped. Dropped chips must NOT
-    // be re-added to the layout afterwards: they are scheduled for a deferred delete, and
-    // the flow layout would keep a dangling reference to them once the deletion runs on
-    // the next event-loop cycle.
+    // be re-added to the layout afterwards: they are reparented to nullptr and scheduled
+    // for a deferred delete (QWidget::setParent(nullptr) also hides them), and the flow
+    // layout would keep a dangling reference to them once the deletion runs on the next
+    // event-loop cycle.
     QList<DeckPreviewTagDisplayWidget *> chips;
     for (DeckPreviewTagDisplayWidget *tagWidget : findChildren<DeckPreviewTagDisplayWidget *>()) {
         if (tagWidget->getState() != TagState::NotSelected || allTags.contains(tagWidget->getTagName())) {
             chips.append(tagWidget);
         } else {
             flowWidget->removeWidget(tagWidget);
+            tagWidget->setParent(nullptr);
             tagWidget->deleteLater();
         }
     }
@@ -69,16 +71,22 @@ void VisualDeckStorageTagFilterWidget::refreshTags()
         }
     }
 
-    // Clear and re-add the chips in sorted order.
+    // Sort, but skip the full remove/re-add when the order already matches the layout.
+    // FlowWidget inherits QLayout::removeWidget's linear scan, so rebuilding an unchanged
+    // order would be quadratic plus a full relayout on every chip click and load batch.
     std::sort(chips.begin(), chips.end(), [](DeckPreviewTagDisplayWidget *a, DeckPreviewTagDisplayWidget *b) {
         return a->getTagName().toLower() < b->getTagName().toLower();
     });
+    if (chips == currentChipOrder) {
+        return;
+    }
     for (DeckPreviewTagDisplayWidget *tagWidget : chips) {
         flowWidget->removeWidget(tagWidget);
     }
     for (DeckPreviewTagDisplayWidget *tagWidget : chips) {
         flowWidget->addWidget(tagWidget);
     }
+    currentChipOrder = chips;
 }
 
 QStringList VisualDeckStorageTagFilterWidget::selectedTags() const
