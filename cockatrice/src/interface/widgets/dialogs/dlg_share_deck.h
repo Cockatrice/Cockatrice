@@ -15,6 +15,7 @@ class CommandContainer;
 class DeckList;
 class QDialogButtonBox;
 class QLineEdit;
+class QTimer;
 class Response;
 
 /**
@@ -32,12 +33,14 @@ public:
 private slots:
     void actShare();
     void shareFinished(const Response &response, const CommandContainer &commandContainer);
+    void onShareTimeout();
 
 private:
     AbstractClient *client;
     QSharedPointer<DeckList> deck;
     QLineEdit *nameEdit;
     QDialogButtonBox *buttonBox;
+    QTimer *shareTimeoutTimer;
 };
 
 #endif // DLG_SHARE_DECK_H

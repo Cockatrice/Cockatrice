@@ -22,6 +22,7 @@ class QToolBar;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QGroupBox;
+class QTimer;
 class CommandContainer;
 class Response;
 class ShareBarWidget;
@@ -37,6 +38,7 @@ private:
     RemoteDeckList_TreeWidget *serverDirView;
     QGroupBox *leftGroupBox, *rightGroupBox;
     ShareBarWidget *shareBar;
+    QTimer *shareTimeoutTimer;
 
     QAction *aOpenLocalDeck, *aRenameLocal, *aUpload, *aNewLocalFolder, *aDeleteLocalDeck;
     QAction *aOpenDecksFolder;
@@ -86,6 +88,7 @@ private slots:
     void cancelShareDecks();
     void onServerSelectionChanged();
     void shareFromTreeFinished(const Response &r, const CommandContainer &commandContainer);
+    void onShareFromTreeTimeout();
 
     void actDeleteRemoteDeck();
     void deleteFolderFinished(const Response &response, const CommandContainer &commandContainer);

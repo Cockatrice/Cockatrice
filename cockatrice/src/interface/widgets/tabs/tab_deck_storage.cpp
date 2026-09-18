@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QTreeView>
+#include <QTimer>
 #include <QUrl>
 #include <QVBoxLayout>
 #include <libcockatrice/deck_list/deck_list.h>
@@ -107,6 +108,13 @@ TabDeckStorage::TabDeckStorage(TabSupervisor *_tabSupervisor,
     connect(shareBar, &ShareBarWidget::createRequested, this, &TabDeckStorage::actShareSelection);
     connect(shareBar, &ShareBarWidget::cancelRequested, this, &TabDeckStorage::cancelShareDecks);
     shareBar->setVisible(false);
+
+    shareTimeoutTimer = new QTimer(this);
+    shareTimeoutTimer->setSingleShot(true);
+    shareTimeoutTimer->setInterval(
+        static_cast<int>((static_cast<qint64>(SettingsCache::instance().network().getTimeOut()) + 1) *
+                         SettingsCache::instance().network().getKeepAlive() * 1000));
+    connect(shareTimeoutTimer, &QTimer::timeout, this, &TabDeckStorage::onShareFromTreeTimeout);
 
     QVBoxLayout *rightVbox = new QVBoxLayout;
     rightVbox->addWidget(shareBar);
@@ -765,10 +773,12 @@ void TabDeckStorage::actShareSelection()
     PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &TabDeckStorage::shareFromTreeFinished);
     client->sendCommand(pend);
+    shareTimeoutTimer->start();
 }
 
 void TabDeckStorage::shareFromTreeFinished(const Response &response, const CommandContainer & /*commandContainer*/)
 {
+    shareTimeoutTimer->stop();
     shareBar->setCreateEnabled(true);
     if (response.response_code() != Response::RespOk) {
         qWarning() << "failed to create deck share:" << response.response_code();
@@ -789,4 +799,10 @@ void TabDeckStorage::showShareNotice(const QString &message, bool warning)
     QMessageBox box(warning ? QMessageBox::Warning : QMessageBox::Information, tr("Deck share"), message,
                     QMessageBox::Ok, this);
     box.exec();
+}
+
+void TabDeckStorage::onShareFromTreeTimeout()
+{
+    shareBar->setCreateEnabled(true);
+    showShareNotice(tr("The server did not respond in time. Try again."), true);
 }

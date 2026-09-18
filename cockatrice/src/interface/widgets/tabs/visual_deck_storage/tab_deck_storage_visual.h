@@ -19,6 +19,7 @@ class CommandContainer;
 class DeckPreviewWidget;
 class QFileSystemModel;
 class QGroupBox;
+class QTimer;
 class QToolBar;
 class QTreeView;
 class QTreeWidget;
@@ -63,6 +64,7 @@ signals:
 private slots:
     void actShareSelected();
     void shareFinished(const Response &response, const CommandContainer &commandContainer);
+    void onShareTimeout();
     void onShareSelectionChanged();
     void handleConnectionChanged(ClientStatus status);
 
@@ -74,6 +76,7 @@ private:
 
     ShareBarWidget *shareBar;
     AbstractClient *client;
+    QTimer *shareTimeoutTimer;
     bool shareDeckAvailable = false;
 };
 
