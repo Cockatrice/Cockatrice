@@ -403,6 +403,7 @@ set(cockatrice_SOURCES
     src/interface/widgets/tabs/api/commander_spellbook/commander_bracket_widget.cpp
     src/interface/widgets/tabs/api/commander_spellbook/handle_commander_brackets.cpp
     src/interface/widgets/onboarding/banner_shader_config.h
+    src/interface/widgets/onboarding/brand_colors.h
     src/interface/widgets/onboarding/first_run_wizard.cpp
     src/interface/widgets/onboarding/first_run_wizard.h
     src/interface/widgets/onboarding/first_run_wizard_page.cpp
@@ -530,6 +531,7 @@ qt6_add_shaders(
   "src/interface/widgets/onboarding/shaders"
   FILES
   src/interface/widgets/onboarding/shaders/brand_banner.frag
+  src/interface/widgets/onboarding/shaders/brand_plate.frag
 )
 
 qt6_add_resources(

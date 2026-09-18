@@ -16,7 +16,7 @@ QString ThemeConfig::toIni() const
     out += "[Appearance]\n";
     out += QString("ColorScheme = %1\n").arg(colorScheme.isEmpty() ? "System" : colorScheme);
     out += "\n[Style]\n";
-    out += QString("Name = %1\n").arg(styleName.isEmpty() ? "Default" : styleName);
+    out += QString("Name = %1\n").arg(styleName.isEmpty() ? "System" : styleName);
     return out;
 }
 

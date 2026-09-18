@@ -63,6 +63,8 @@
         <file>resources/icons/mana/W.svg</file>
 
         <file>resources/backgrounds/home.png</file>
+        <file>resources/backgrounds/home-dark.png</file>
+        <file>resources/backgrounds/home-light.png</file>
         <file>resources/backgrounds/card_triplet.svg</file>
         <file>resources/backgrounds/placeholder_printing_selector.svg</file>
 
