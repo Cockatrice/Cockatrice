@@ -105,6 +105,11 @@ int CardsDisplaySettings::getSampleHandSize() const
     return getValue("sampleHandSize", "cards", "cardSize", 7).toInt();
 }
 
+QString CardsDisplaySettings::getCardLang() const
+{
+    return getValue("cardLang", QString(), QString(), "en").toString();
+}
+
 void CardsDisplaySettings::setDisplayCardNames(bool _displayCardNames)
 {
     setValue(_displayCardNames, "displayCardNames");
@@ -223,4 +228,17 @@ void CardsDisplaySettings::setSampleHandSize(int _sampleHandSize)
 {
     setValue(_sampleHandSize, "sampleHandSize", "cards", "cardSize");
     emit sampleHandSizeChanged(_sampleHandSize);
+}
+
+void CardsDisplaySettings::setCardLang(const QString &_cardLang)
+{
+    if (_cardLang == getCardLang()) {
+        return;
+    }
+    setValue(_cardLang, "cardLang");
+    // Flush to disk immediately: the Oracle tool is a separate process that
+    // reads this value to decide which foreignData to import, so it must not
+    // observe a stale (pre-change) value.
+    sync();
+    emit cardLangChanged(_cardLang);
 }

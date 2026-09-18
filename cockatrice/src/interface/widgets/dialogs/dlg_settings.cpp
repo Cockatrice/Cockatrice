@@ -416,6 +416,11 @@ void DlgSettings::setTab(int index)
     }
 }
 
+AbstractSettingsPage *DlgSettings::page(SettingsPage which) const
+{
+    return pages.value(static_cast<int>(which));
+}
+
 void DlgSettings::updateLanguage()
 {
     qApp->removeTranslator(translator); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
