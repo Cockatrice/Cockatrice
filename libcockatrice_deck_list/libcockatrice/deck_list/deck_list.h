@@ -106,6 +106,22 @@ private:
      */
     mutable QString cachedDeckHash;
 
+    /** @name XML load helpers */
+    ///@{
+    /**
+     * @brief Advances to the next element in the XML stream.
+     * @param xml Reader to advance past non-element tokens.
+     * @return true when a start element was reached, false at end of stream.
+     */
+    bool seekToNextElement(QXmlStreamReader *xml);
+
+    /**
+     * @brief Reads the contents of a `cockatrice_deck` element into this deck.
+     * @param xml Reader positioned at the deck element, stopped at its end.
+     */
+    void readDeckBody(QXmlStreamReader *xml);
+    ///@}
+
 public:
     /** @name Metadata setters */
     ///@{

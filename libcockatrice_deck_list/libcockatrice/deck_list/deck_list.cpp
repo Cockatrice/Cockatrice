@@ -184,6 +184,27 @@ void DeckList::write(QXmlStreamWriter *xml) const
     xml->writeEndElement(); // Close "cockatrice_deck"
 }
 
+bool DeckList::seekToNextElement(QXmlStreamReader *xml)
+{
+    while (!xml->atEnd()) {
+        xml->readNext();
+        if (xml->isStartElement()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void DeckList::readDeckBody(QXmlStreamReader *xml)
+{
+    while (!xml->atEnd()) {
+        xml->readNext();
+        if (!readElement(xml)) {
+            break;
+        }
+    }
+}
+
 bool DeckList::loadFromXml(QXmlStreamReader *xml)
 {
     if (xml->error()) {
@@ -192,19 +213,11 @@ bool DeckList::loadFromXml(QXmlStreamReader *xml)
     }
 
     cleanList();
-    while (!xml->atEnd()) {
-        xml->readNext();
-        if (xml->isStartElement()) {
-            if (xml->name().toString() != "cockatrice_deck") {
-                return false;
-            }
-            while (!xml->atEnd()) {
-                xml->readNext();
-                if (!readElement(xml)) {
-                    break;
-                }
-            }
+    while (seekToNextElement(xml)) {
+        if (xml->name().toString() != "cockatrice_deck") {
+            return false;
         }
+        readDeckBody(xml);
     }
     refreshDeckHash();
     if (xml->error()) {
