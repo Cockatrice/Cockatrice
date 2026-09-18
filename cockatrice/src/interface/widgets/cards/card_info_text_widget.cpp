@@ -11,7 +11,7 @@
 #include <libcockatrice/card/game_specific_terms.h>
 #include <libcockatrice/card/relation/card_relation.h>
 
-CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent), info(nullptr)
+CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent)
 {
     propsLabel = new QLabel;
     propsLabel->setOpenExternalLinks(false);
