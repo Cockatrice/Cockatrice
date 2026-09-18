@@ -672,7 +672,7 @@ void TabSupervisor::actTabVisualDeckStorage(bool checked)
 
 void TabSupervisor::openTabVisualDeckStorage()
 {
-    tabVisualDeckStorage = new TabDeckStorageVisual(this);
+    tabVisualDeckStorage = new TabDeckStorageVisual(this, client);
     myAddTab(tabVisualDeckStorage, aTabVisualDeckStorage);
     connect(tabVisualDeckStorage, &QObject::destroyed, this, [this] {
         tabVisualDeckStorage = nullptr;
