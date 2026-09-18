@@ -17,8 +17,8 @@
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
 
-TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
-    : Tab(_tabSupervisor), visualDeckStorageWidget(new VisualDeckStorageWidget(this))
+TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, AbstractClient *_client)
+    : Tab(_tabSupervisor), client(_client), visualDeckStorageWidget(new VisualDeckStorageWidget(this))
 {
     connect(this, &TabDeckStorageVisual::openDeckEditor, tabSupervisor, &TabSupervisor::openDeckInNewTab);
     connect(visualDeckStorageWidget, &VisualDeckStorageWidget::deckLoadRequested, this,
@@ -35,7 +35,6 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor)
         }
     });
 
-    AbstractClient *client = tabSupervisor->getClient();
     connect(client, &AbstractClient::statusChanged, this, &TabDeckStorageVisual::handleConnectionChanged);
     shareDeckAvailable = (client->getStatus() == StatusLoggedIn);
     visualDeckStorageWidget->setShareAvailable(shareDeckAvailable);
@@ -152,9 +151,9 @@ void TabDeckStorageVisual::actShareSelected()
     }
 
     shareBar->setCreateEnabled(false);
-    PendingCommand *pend = tabSupervisor->getClient()->prepareSessionCommand(cmd);
+    PendingCommand *pend = client->prepareSessionCommand(cmd);
     connect(pend, &PendingCommand::finished, this, &TabDeckStorageVisual::shareFinished);
-    tabSupervisor->getClient()->sendCommand(pend);
+    client->sendCommand(pend);
 }
 
 void TabDeckStorageVisual::shareFinished(const Response &response, const CommandContainer & /*commandContainer*/)
@@ -175,7 +174,7 @@ void TabDeckStorageVisual::shareFinished(const Response &response, const Command
     const QDateTime expiry = QDateTime::fromSecsSinceEpoch(resp.expires_at(), Qt::UTC);
 #endif
 
-    const QString link = DeckShareUtils::buildShareLink(tabSupervisor->getClient(), token);
+    const QString link = DeckShareUtils::buildShareLink(client, token);
     DeckShareUtils::copyShareLinkToClipboard(link);
 
     showShareNotice(

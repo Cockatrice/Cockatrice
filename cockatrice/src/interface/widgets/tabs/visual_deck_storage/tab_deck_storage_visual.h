@@ -30,7 +30,7 @@ class TabDeckStorageVisual final : public Tab
 {
     Q_OBJECT
 public:
-    explicit TabDeckStorageVisual(TabSupervisor *_tabSupervisor);
+    explicit TabDeckStorageVisual(TabSupervisor *_tabSupervisor, AbstractClient *_client);
     void retranslateUi() override;
 
     [[nodiscard]] QString getTabText() const override
@@ -73,6 +73,7 @@ private:
     VisualDeckStorageWidget *visualDeckStorageWidget;
 
     ShareBarWidget *shareBar;
+    AbstractClient *client;
     bool shareDeckAvailable = false;
 };
 
