@@ -103,6 +103,8 @@ public:
      * @param _reverseRelatedCards Backward references to related cards.
      * @param _sets Map of set names to printing information.
      * @param _uiAttributes Attributes that affect display and game logic
+     * @param _localizedNames Localized card names, keyed by language code.
+     * @param _localizedTexts Localized rules text, keyed by language code.
      */
     explicit CardInfo(const QString &_name,
                       const QString &_text,
@@ -111,7 +113,9 @@ public:
                       const QList<CardRelation *> &_relatedCards,
                       const QList<CardRelation *> &_reverseRelatedCards,
                       SetToPrintingsMap _sets,
-                      UiAttributes _uiAttributes);
+                      UiAttributes _uiAttributes,
+                      QMap<QString, QString> _localizedNames = {},
+                      QMap<QString, QString> _localizedTexts = {});
 
     /**
      * @brief Constructs a CardInfo from a cache snapshot with precomputed derived
@@ -133,6 +137,8 @@ public:
      * @param _uiAttributes Attributes that affect display and game logic.
      * @param _simpleName Precomputed simplified name.
      * @param _altNames Precomputed alternate names.
+     * @param _localizedNames Localized card names, keyed by language code.
+     * @param _localizedTexts Localized rules text, keyed by language code.
      */
     explicit CardInfo(const QString &_name,
                       const QString &_text,
@@ -143,7 +149,9 @@ public:
                       SetToPrintingsMap _sets,
                       UiAttributes _uiAttributes,
                       QString _simpleName,
-                      QSet<QString> _altNames);
+                      QSet<QString> _altNames,
+                      QMap<QString, QString> _localizedNames = {},
+                      QMap<QString, QString> _localizedTexts = {});
 
     /**
      * @brief Copy constructor for CardInfo.
@@ -183,6 +191,8 @@ public:
      * @param _reverseRelatedCards Reverse relationships.
      * @param _sets Printing information per set.
      * @param _uiAttributes Attributes that affect display and game logic
+     * @param _localizedNames Localized card names, keyed by language code.
+     * @param _localizedTexts Localized rules text, keyed by language code.
      * @return Shared pointer to the new CardInfo instance.
      */
     static CardInfoPtr newInstance(const QString &_name,
@@ -192,7 +202,9 @@ public:
                                    const QList<CardRelation *> &_relatedCards,
                                    const QList<CardRelation *> &_reverseRelatedCards,
                                    SetToPrintingsMap _sets,
-                                   UiAttributes _uiAttributes);
+                                   UiAttributes _uiAttributes,
+                                   QMap<QString, QString> _localizedNames = {},
+                                   QMap<QString, QString> _localizedTexts = {});
 
     /**
      * @brief Creates a new instance from a cache snapshot with precomputed
@@ -212,6 +224,8 @@ public:
      *        its CardSets. Pass false when building cards in parallel so the
      *        (non-thread-safe) set membership is populated in a later
      *        single-threaded pass.
+     * @param _localizedNames Localized card names, keyed by language code.
+     * @param _localizedTexts Localized rules text, keyed by language code.
      * @return Shared pointer to the new CardInfo instance.
      */
     static CardInfoPtr newInstance(const QString &_name,
@@ -224,7 +238,9 @@ public:
                                    UiAttributes _uiAttributes,
                                    QString _simpleName,
                                    QSet<QString> _altNames,
-                                   bool _appendToSets = true);
+                                   bool _appendToSets = true,
+                                   QMap<QString, QString> _localizedNames = {},
+                                   QMap<QString, QString> _localizedTexts = {});
 
     /**
      * @brief Clones the current CardInfo instance.

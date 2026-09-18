@@ -301,9 +301,6 @@ CardInfoPtr readCard(QDataStream &in, const SetNameMap &sets)
         reverse.append(readRelation(in));
     }
 
-    CardInfoPtr card = CardInfo::newInstance(name, text, isToken, propertiesBlob, related, reverse, cardSets, ui,
-                                             simpleName, altNames, false);
-
     const QMap<QString, QString> localizedNames = readStringMap(in);
     if (in.status() != QDataStream::Ok) {
         return nullptr;
@@ -312,12 +309,9 @@ CardInfoPtr readCard(QDataStream &in, const SetNameMap &sets)
     if (in.status() != QDataStream::Ok) {
         return nullptr;
     }
-    for (auto it = localizedNames.constBegin(); it != localizedNames.constEnd(); ++it) {
-        card->setLocalizedName(it.key(), it.value());
-    }
-    for (auto it = localizedTexts.constBegin(); it != localizedTexts.constEnd(); ++it) {
-        card->setLocalizedText(it.key(), it.value());
-    }
+
+    CardInfoPtr card = CardInfo::newInstance(name, text, isToken, propertiesBlob, related, reverse, cardSets, ui,
+                                             simpleName, altNames, false, localizedNames, localizedTexts);
 
     return card;
 }

@@ -439,14 +439,9 @@ void CockatriceXml4Parser::loadCardsFromXml(QXmlStreamReader &xml)
                                                  .landscapeOrientation = landscapeOrientation,
                                                  .tableRow = tableRow,
                                                  .upsideDownArt = upsideDown};
-            CardInfoPtr newCard = CardInfo::newInstance(name, text, isToken, properties, relatedCards,
-                                                        reverseRelatedCards, _sets, attributes);
-            for (auto it = localizedNames.constBegin(); it != localizedNames.constEnd(); ++it) {
-                newCard->setLocalizedName(it.key(), it.value());
-            }
-            for (auto it = localizedTexts.constBegin(); it != localizedTexts.constEnd(); ++it) {
-                newCard->setLocalizedText(it.key(), it.value());
-            }
+            CardInfoPtr newCard =
+                CardInfo::newInstance(name, text, isToken, properties, relatedCards, reverseRelatedCards, _sets,
+                                      attributes, std::move(localizedNames), std::move(localizedTexts));
             if (targetData) {
                 // Mirror CardDatabase::addCard: if a card with this name already
                 // exists, merge the new printings into it instead of replacing.
