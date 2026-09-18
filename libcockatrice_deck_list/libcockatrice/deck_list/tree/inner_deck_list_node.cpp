@@ -151,24 +151,29 @@ bool InnerDecklistNode::compareName(AbstractDecklistNode *other) const
     }
 }
 
+int InnerDecklistNode::readCardElement(QXmlStreamReader *xml, int remainingBudget)
+{
+    const int amount = qMin(xml->attributes().value("number").toString().toInt(), remainingBudget);
+    new DecklistCardNode(xml->attributes().value("name").toString(), amount, this, -1,
+                         xml->attributes().value("setShortName").toString(),
+                         xml->attributes().value("collectorNumber").toString(),
+                         xml->attributes().value("uuid").toString());
+    return amount;
+}
+
 int InnerDecklistNode::readElement(QXmlStreamReader *xml, int limit)
 {
     int totalCards = 0;
     while (!xml->atEnd()) {
         xml->readNext();
         const QString childName = xml->name().toString();
+        const int remainingBudget = limit - totalCards;
         if (xml->isStartElement()) {
             if (childName == "zone") {
                 auto *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
-                totalCards += newZone->readElement(xml, limit - totalCards);
+                totalCards += newZone->readElement(xml, remainingBudget);
             } else if (childName == "card") {
-                int amount = xml->attributes().value("number").toString().toInt();
-                amount = qMin(amount, limit - totalCards);
-                new DecklistCardNode(xml->attributes().value("name").toString(), amount, this, -1,
-                                     xml->attributes().value("setShortName").toString(),
-                                     xml->attributes().value("collectorNumber").toString(),
-                                     xml->attributes().value("uuid").toString());
-                totalCards += amount;
+                totalCards += readCardElement(xml, remainingBudget);
             }
         } else if (xml->isEndElement() && (childName == "zone")) {
             return totalCards;

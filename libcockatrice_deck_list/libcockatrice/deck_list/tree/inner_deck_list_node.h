@@ -236,6 +236,18 @@ public:
      * @param xml Writer to append elements to.
      */
     void writeElement(QXmlStreamWriter *xml) override;
+
+private:
+    /**
+     * @brief Reads a single `card` element and appends it to this node.
+     *
+     * The card's quantity is capped at @p remainingBudget so a malicious or
+     * oversized deck file cannot push the total card count past the deck size
+     * limit.
+     *
+     * @return The amount of cards actually added.
+     */
+    int readCardElement(QXmlStreamReader *xml, int remainingBudget);
 };
 
 #endif // COCKATRICE_INNER_DECK_LIST_NODE_H
