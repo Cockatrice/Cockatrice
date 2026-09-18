@@ -75,19 +75,19 @@ public:
     void onHostRateLimited(const QString &host);
 
     /**
-     * @brief Stops the worker thread and releases it.
+     * @brief Stops the worker thread and reports whether it stopped.
      *
      * Called from the owning thread (CardPictureLoader) on its way out. QThread::quit() posts an
-     * exit request to the worker's event loop and QThread::wait() blocks until the loop has
-     * returned and the thread finished. Only QThread members are touched here, so this method is
-     * safe to call from the owning thread. The worker object itself is freed by the finished() ->
-     * deleteLater chain (see the constructor); the QThread object is deleted afterwards by the
+     * exit request to the worker's event loop and QThread::wait() blocks (bounded) until the loop
+     * has returned and the thread finished. Only QThread members are touched here, so this method
+     * is safe to call from the owning thread. The worker object itself is freed by the finished()
+     * -> deleteLater chain (see the constructor); the QThread object is deleted afterwards by the
      * owner (CardPictureLoader::~CardPictureLoader), not by this method.
+     *
+     * @return true if the thread stopped within the timeout, false if it is still running (in
+     *         which case the owner must not delete the QThread).
      */
-    void shutdownThread();
-
-    /** @return Whether the worker's thread is currently running. */
-    bool isRunning() const;
+    [[nodiscard]] bool shutdownThread();
 
     /**
      * @brief Returns the worker's QThread.
@@ -229,6 +229,9 @@ signals:
 
     /** @brief Emitted when a network request successfully completes. */
     void imageRequestSucceeded(const QUrl &url);
+
+    /** @brief Emitted after clearNetworkCache() has finished clearing both caches. */
+    void networkCacheCleared();
 };
 
 #endif // PICTURE_LOADER_WORKER_H
