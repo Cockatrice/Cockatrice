@@ -1,5 +1,6 @@
 #include "tab_deck_storage_visual.h"
 
+#include "../../../client/settings/cache_settings.h"
 #include "../../../deck_loader/deck_loader.h"
 #include "../../cards/additional_info/deck_color_identity.h"
 #include "../../deck_share/deck_share_utils.h"
@@ -16,8 +17,6 @@
 #include <libcockatrice/protocol/pb/response.pb.h>
 #include <libcockatrice/protocol/pb/response_deck_share_create.pb.h>
 #include <libcockatrice/protocol/pending_command.h>
-
-#include "../../../client/settings/cache_settings.h"
 
 TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, AbstractClient *_client)
     : Tab(_tabSupervisor), client(_client), visualDeckStorageWidget(new VisualDeckStorageWidget(this)),
@@ -68,6 +67,7 @@ TabDeckStorageVisual::TabDeckStorageVisual(TabSupervisor *_tabSupervisor, Abstra
 
 void TabDeckStorageVisual::retranslateUi()
 {
+    visualDeckStorageWidget->retranslateUi();
     shareBar->retranslateUi();
 }
 
