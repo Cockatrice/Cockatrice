@@ -179,11 +179,10 @@ public:
 
     /**
      * @name XML serialization
-     * These methods support reading and writing decks from/to
+     * This method supports writing this node and its children to the
      * Cockatrice deck XML format.
      * @{
      */
-    virtual int readElement(QXmlStreamReader *xml, int limit) = 0;
     virtual void writeElement(QXmlStreamWriter *xml) = 0;
     /// @}
 };

@@ -135,15 +135,6 @@ public:
     bool compareName(AbstractDecklistNode *other) const;
 
     /**
-     * @brief Deserialize this node’s properties from XML.
-     * @param xml QXmlStreamReader positioned at the element.
-     * @return true if parsing succeeded.
-     *
-     * This supports loading deck files from Cockatrice’s XML format.
-     */
-    int readElement(QXmlStreamReader *xml, int limit) override;
-
-    /**
      * @brief Serialize this node’s properties to XML.
      * @param xml Writer to append this node’s XML element.
      *
