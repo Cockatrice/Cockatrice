@@ -23,8 +23,7 @@ static constexpr int DISPATCH_INTERVAL_MS = 100;        ///< Pacing between indi
 static constexpr qint64 QUOTA_RESET_INTERVAL_MS = 1000; ///< Interval at which the request quota resets
 
 CardPictureLoaderWorker::CardPictureLoaderWorker()
-    : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload()),
-      requestQuota(MAX_REQUESTS_PER_SEC)
+    : QObject(nullptr), picDownload(SettingsCache::instance().downloads().getPicDownload())
 {
     networkManager = new QNetworkAccessManager(this);
     // We need a timeout to ensure requests don't hang indefinitely in case of
@@ -137,8 +136,6 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
 
 void CardPictureLoaderWorker::resetRequestQuota()
 {
-    requestQuota = MAX_REQUESTS_PER_SEC;
-
     QDateTime now = QDateTime::currentDateTime();
     for (auto it = hostRequestQuota.begin(); it != hostRequestQuota.end(); ++it) {
         if (!hostLast429.contains(it.key()) || now.msecsTo(hostLast429.value(it.key())) < -QUOTA_RECOVER_MS) {
@@ -156,27 +153,34 @@ void CardPictureLoaderWorker::resetRequestQuota()
 
 void CardPictureLoaderWorker::processQueuedRequests()
 {
+    Q_ASSERT(thread() == QThread::currentThread());
+
     if (requestLoadQueue.isEmpty()) {
         dispatchTimer.stop();
+        requestTimer.stop();
         return;
     }
     // Start lazily from the worker's own thread: QTimer must be started in the thread it lives in.
     if (!requestTimer.isActive()) {
         requestTimer.start();
     }
-    dispatchTimer.start();
+    // Restarting an active timer would reset the pacing countdown, so a burst of enqueues could
+    // keep starving the dispatcher; only start it when it has actually stopped.
+    if (!dispatchTimer.isActive()) {
+        dispatchTimer.start();
+    }
 }
 
 void CardPictureLoaderWorker::dispatchQueuedRequest()
 {
-    if (requestLoadQueue.isEmpty() || requestQuota <= 0) {
+    if (requestLoadQueue.isEmpty()) {
+        // All queued requests have been dispatched; stop the pacing and quota-reset timers.
         dispatchTimer.stop();
+        requestTimer.stop();
         return;
     }
 
-    if (processSingleRequest()) {
-        --requestQuota;
-    } else {
+    if (!processSingleRequest()) {
         // No queued host currently has allowance left in this second; wait for the quota reset.
         dispatchTimer.stop();
     }
