@@ -15,6 +15,7 @@
 #include <QTranslator>
 #include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
@@ -453,16 +454,25 @@ void GeneralSettingsPage::cardLanguageBoxChanged(int index)
     CardPictureLoader::clearNetworkCache();
     CardPictureLoader::clearPixmapCache();
 
-    const QMessageBox::StandardButton answer =
-        QMessageBox::question(this, tr("Card text & images language changed"),
-                              tr("<p>The card database only contains English card data. To see cards in <b>%1</b>, "
-                                 "<b>Oracle</b> must run once with this language selected and re-import the card "
-                                 "database.</p>"
-                                 "<p>The cached database and the downloaded card pictures have been cleared, so a "
-                                 "re-import is picked up without stale entries.</p>"
-                                 "<p>Run Oracle now?</p>")
-                                  .arg(cardLanguageBox.itemText(index)),
-                              QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    // Art is resolved by the translated card name for non-English languages, so the
+    // matching Scryfall URL is added to the top of the download list. It stays
+    // visible in the deck editor settings, where it can be removed or reordered.
+    const bool localizedUrlAdded = SettingsCache::instance().downloads().addLocalizedScryfallUrl();
+
+    QString message = tr("<p>The card database only contains English card data. To see cards in <b>%1</b>, "
+                         "<b>Oracle</b> must run once with this language selected and re-import the card "
+                         "database.</p>"
+                         "<p>The cached database and the downloaded card pictures have been cleared, so a "
+                         "re-import is picked up without stale entries.</p>")
+                          .arg(cardLanguageBox.itemText(index));
+    if (localizedUrlAdded) {
+        message += tr("<p>The Scryfall URL that resolves card art by translated name was added to the top of your "
+                      "download list. You can remove or reorder it any time.</p>");
+    }
+    message += tr("<p>Run Oracle now?</p>");
+
+    const QMessageBox::StandardButton answer = QMessageBox::question(
+        this, tr("Card text & images language changed"), message, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
     // The answer only controls whether Oracle starts right away; the caches stay
     // cleared so the next import or launch rebuilds them in the new language.

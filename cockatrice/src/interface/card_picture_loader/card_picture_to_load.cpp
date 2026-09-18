@@ -94,19 +94,7 @@ void CardPictureToLoad::populateSetUrls()
         }
     }
 
-    QStringList orderedTemplates = urlTemplates;
-    if (SettingsCache::instance().cardsDisplay().getCardLang() != "en") {
-        // Scryfall serves localized art from per-language printings, which have
-        // their own ids. The ids stored in the card database belong to the
-        // English prints, so id-based templates (cards.scryfall.io,
-        // api.scryfall.com/cards/!set:uuid!) can only ever resolve English
-        // scans; the `lang=` parameter is ignored on them. Resolve the localized
-        // printing by its translated name (and the language code) ahead of the
-        // id-based templates instead.
-        orderedTemplates.prepend("https://api.scryfall.com/cards/named?fuzzy=!localizedName!&lang=!sflang!"
-                                 "&format=image&face=!prop:side!");
-    }
-
+    const QStringList orderedTemplates = urlTemplates;
     for (const QString &urlTemplate : orderedTemplates) {
         QString transformedUrl = transformUrl(urlTemplate);
 

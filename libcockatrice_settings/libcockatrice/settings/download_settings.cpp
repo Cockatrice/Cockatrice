@@ -9,6 +9,9 @@ const QStringList DownloadSettings::DEFAULT_DOWNLOAD_URLS = {
     "https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=!set:muid!&type=card",
     "https://gatherer.wizards.com/Handlers/Image.ashx?name=!name!&type=card"};
 
+const QString DownloadSettings::SCRYFALL_NAMED_LOCALIZED_URL =
+    "https://api.scryfall.com/cards/named?fuzzy=!localizedName!&lang=!sflang!&format=image&face=!prop:side!";
+
 DownloadSettings::DownloadSettings(const QString &settingPath, QObject *parent = nullptr)
     : SettingsManager(settingPath + "downloads.ini", "downloads", QString(), parent)
 {
@@ -27,6 +30,18 @@ QStringList DownloadSettings::getAllURLs() const
 void DownloadSettings::resetToDefaultURLs()
 {
     setValue(QVariant::fromValue(DEFAULT_DOWNLOAD_URLS), "urls");
+}
+
+bool DownloadSettings::addLocalizedScryfallUrl()
+{
+    const QStringList urls = getAllURLs();
+    if (urls.contains(SCRYFALL_NAMED_LOCALIZED_URL)) {
+        return false;
+    }
+    QStringList updated = urls;
+    updated.prepend(SCRYFALL_NAMED_LOCALIZED_URL);
+    setDownloadUrls(updated);
+    return true;
 }
 
 bool DownloadSettings::getPicDownload() const
