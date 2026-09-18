@@ -36,10 +36,11 @@ class CardPictureLoaderWorkerWork : public QObject
 public:
     /**
      * @brief Constructs a worker for downloading a specific card image.
-     * @param worker The orchestrating CardPictureLoaderWorker
+     * @param worker The orchestrating CardPictureLoaderWorker; the work object becomes its child so
+     *               it is destroyed with the worker even if it never reaches concludeImageLoad().
      * @param toLoad The ExactCard to download
      */
-    explicit CardPictureLoaderWorkerWork(const CardPictureLoaderWorker *worker, const ExactCard &toLoad);
+    explicit CardPictureLoaderWorkerWork(CardPictureLoaderWorker *worker, const ExactCard &toLoad);
 
     CardPictureToLoad cardToDownload; ///< The card and associated URLs to try downloading
 

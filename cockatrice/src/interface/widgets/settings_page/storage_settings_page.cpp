@@ -181,9 +181,14 @@ StorageSettingsPage::StorageSettingsPage()
 
 void StorageSettingsPage::clearDownloadedPicsButtonClicked()
 {
-    CardPictureLoader::clearNetworkCache();
+    // The network cache is cleared asynchronously on the worker thread, so wait for the completion
+    // signal before confirming; the in-memory pixmap cache is cleared synchronously right away.
+    connect(
+        &CardPictureLoader::getInstance(), &CardPictureLoader::networkCacheCleared, this,
+        [this] { QMessageBox::information(this, tr("Success"), tr("Cached card pictures have been reset.")); },
+        Qt::SingleShotConnection);
     CardPictureLoader::clearPixmapCache();
-    QMessageBox::information(this, tr("Success"), tr("Cached card pictures have been reset."));
+    CardPictureLoader::clearNetworkCache();
 }
 
 void StorageSettingsPage::clearImageBackupsButtonClicked()
