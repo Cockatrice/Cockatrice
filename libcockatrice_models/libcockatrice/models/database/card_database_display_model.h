@@ -10,6 +10,7 @@
 
 #include <QSortFilterProxyModel>
 #include <QTimer>
+#include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/filters/filter_string.h>
 
 class FilterTree;
@@ -32,6 +33,8 @@ private:
     FilterString *filterString;
     int loadedRowCount;
     QTimer dirtyTimer;
+    QString searchLanguage;
+    CardSearchLanguage searchLanguageMode = CardSearchLanguage::English;
 
     /** The translation table that will be used for sanitizeCardName. */
     static QMap<wchar_t, wchar_t> characterTranslation;
@@ -55,17 +58,13 @@ public:
         cardName = sanitizeCardName(_cardName, characterTranslation);
         dirty();
     }
-    void setStringFilter(const QString &_src)
-    {
-        delete filterString;
-        filterString = new FilterString(_src);
-        dirty();
-    }
+    void setStringFilter(const QString &_src);
     void setCardNameSet(const QSet<QString> &_cardNameSet)
     {
         cardNameSet = _cardNameSet;
         dirty();
     }
+    void setSearchLanguage(const QString &searchLang, CardSearchLanguage mode);
 
     void dirty()
     {

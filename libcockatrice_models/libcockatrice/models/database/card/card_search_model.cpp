@@ -65,7 +65,13 @@ void CardSearchModel::updateSearchResults(const QString &query)
             continue;
         }
 
-        const QString lowerName = card->getName().toLower();
+        // The completer suggestions match against the same languages the card
+        // search uses, so typing a localized name finds the card.
+        QString matchName = card->getName();
+        if (searchLanguageMode != CardSearchLanguage::English && !searchLanguage.isEmpty() && searchLanguage != "en") {
+            matchName = card->getLocalizedName(searchLanguage);
+        }
+        const QString lowerName = matchName.toLower();
         if (!lowerName.contains(lowerQuery)) {
             continue;
         }
@@ -79,11 +85,17 @@ void CardSearchModel::updateSearchResults(const QString &query)
         }
     }
 
-    auto sortByDistanceThenLength = [](const SearchResult &a, const SearchResult &b) {
+    auto sortByDistanceThenLength = [this](const SearchResult &a, const SearchResult &b) {
+        QString nameA = a.card->getName();
+        QString nameB = b.card->getName();
+        if (searchLanguageMode != CardSearchLanguage::English && !searchLanguage.isEmpty() && searchLanguage != "en") {
+            nameA = a.card->getLocalizedName(searchLanguage);
+            nameB = b.card->getLocalizedName(searchLanguage);
+        }
         if (a.distance != b.distance) {
             return a.distance < b.distance;
         }
-        return a.card->getName().size() < b.card->getName().size();
+        return nameA.size() < nameB.size();
     };
 
     std::sort(prefixMatches.begin(), prefixMatches.end(), sortByDistanceThenLength);

@@ -15,6 +15,16 @@
  * imports the selected language's card data) and the client settings UI (which
  * offers the language choice).
  */
+/**
+ * @brief The card languages card search should run against.
+ */
+enum class CardSearchLanguage
+{
+    English,  ///< Only search the English card names and texts.
+    Selected, ///< Search the selected card language (untranslated cards still match in English).
+    Both      ///< Search both the English and the selected card language names and texts.
+};
+
 namespace CardLocalization
 {
 /**

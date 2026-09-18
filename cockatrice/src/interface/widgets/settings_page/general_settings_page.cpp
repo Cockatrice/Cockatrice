@@ -63,13 +63,26 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&cardLanguageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
             &GeneralSettingsPage::cardLanguageBoxChanged);
 
+    // card search language, independent of the card display language
+    cardSearchLanguageBox.addItem(""); // texts set in retranslateUi
+    cardSearchLanguageBox.addItem("");
+    cardSearchLanguageBox.addItem("");
+    const int cardSearchLanguageIndex = SettingsCache::instance().cardsDisplay().getCardSearchLanguage();
+    cardSearchLanguageBox.setCurrentIndex(cardSearchLanguageIndex < 0 ? static_cast<int>(CardSearchLanguage::English)
+                                                                      : cardSearchLanguageIndex);
+
+    connect(&cardSearchLanguageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &GeneralSettingsPage::cardSearchLanguageBoxChanged);
+
     auto *languageGrid = new QGridLayout;
     languageGrid->addWidget(&languageLabel, 0, 0);
     languageGrid->addWidget(&languageBox, 0, 1);
     languageGrid->addWidget(&cardLanguageLabel, 1, 0);
     languageGrid->addWidget(&cardLanguageBox, 1, 1);
     languageGrid->addWidget(&cardLanguageNoteLabel, 2, 1);
-    languageGrid->addWidget(&advertiseTranslationPageLabel, 3, 1, Qt::AlignRight);
+    languageGrid->addWidget(&cardSearchLanguageLabel, 3, 0);
+    languageGrid->addWidget(&cardSearchLanguageBox, 3, 1);
+    languageGrid->addWidget(&advertiseTranslationPageLabel, 4, 1, Qt::AlignRight);
 
     cardLanguageNoteLabel.setWordWrap(true);
     cardLanguageNoteLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -481,6 +494,11 @@ void GeneralSettingsPage::cardLanguageBoxChanged(int index)
     }
 }
 
+void GeneralSettingsPage::cardSearchLanguageBoxChanged(int index)
+{
+    SettingsCache::instance().cardsDisplay().setCardSearchLanguage(index);
+}
+
 void GeneralSettingsPage::updateStartupServerControlsVisibility()
 {
     const int index = startupTabSelector.currentIndex();
@@ -502,6 +520,12 @@ void GeneralSettingsPage::retranslateUi()
     cardLanguageLabel.setText(tr("Card text & images language:"));
     cardLanguageNoteLabel.setText(
         tr("Foreign card names, text and art apply after you update the card database (Oracle)."));
+    cardSearchLanguageLabel.setText(tr("Language used in card search:"));
+    cardSearchLanguageBox.setItemText(static_cast<int>(CardSearchLanguage::English), tr("English"));
+    cardSearchLanguageBox.setItemText(static_cast<int>(CardSearchLanguage::Selected),
+                                      tr("Selected card language (untranslated cards still match in English)"));
+    cardSearchLanguageBox.setItemText(static_cast<int>(CardSearchLanguage::Both),
+                                      tr("English and selected card language"));
     advertiseTranslationPageLabel.setText(
         QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
 

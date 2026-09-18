@@ -11,8 +11,10 @@
 #include <QHeaderView>
 #include <QToolButton>
 #include <QTreeView>
+#include <libcockatrice/card/card_localization.h>
 #include <libcockatrice/card/database/card_database_manager.h>
 #include <libcockatrice/card/relation/card_relation.h>
+#include <libcockatrice/settings/cards_display_settings.h>
 
 DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent, CardDatabaseModel *databaseModel)
     : QWidget(parent)
@@ -39,6 +41,15 @@ DeckEditorDatabaseDisplayWidget::DeckEditorDatabaseDisplayWidget(QWidget *parent
     databaseDisplayModel->setObjectName("databaseDisplayModel");
     databaseDisplayModel->setSourceModel(databaseModel);
     databaseDisplayModel->setFilterKeyColumn(0);
+
+    CardsDisplaySettings *cardsDisplay = &SettingsCache::instance().cardsDisplay();
+    const auto applyCardSearchLanguage = [this, cardsDisplay]() {
+        databaseDisplayModel->setSearchLanguage(cardsDisplay->getCardLang(),
+                                                static_cast<CardSearchLanguage>(cardsDisplay->getCardSearchLanguage()));
+    };
+    applyCardSearchLanguage();
+    connect(cardsDisplay, &CardsDisplaySettings::cardLangChanged, this, applyCardSearchLanguage);
+    connect(cardsDisplay, &CardsDisplaySettings::cardSearchLanguageChanged, this, applyCardSearchLanguage);
 
     databaseView = new CardDatabaseView(this, databaseDisplayModel);
     databaseView->setObjectName("databaseView");

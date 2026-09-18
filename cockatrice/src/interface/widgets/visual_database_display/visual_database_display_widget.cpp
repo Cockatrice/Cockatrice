@@ -41,6 +41,15 @@ VisualDatabaseDisplayWidget::VisualDatabaseDisplayWidget(QWidget *parent,
     databaseDisplayModel->setSourceModel(database_model);
     databaseDisplayModel->setFilterKeyColumn(0);
 
+    CardsDisplaySettings *cardsDisplay = &SettingsCache::instance().cardsDisplay();
+    const auto applyCardSearchLanguage = [this, cardsDisplay]() {
+        databaseDisplayModel->setSearchLanguage(cardsDisplay->getCardLang(),
+                                                static_cast<CardSearchLanguage>(cardsDisplay->getCardSearchLanguage()));
+    };
+    applyCardSearchLanguage();
+    connect(cardsDisplay, &CardsDisplaySettings::cardLangChanged, this, applyCardSearchLanguage);
+    connect(cardsDisplay, &CardsDisplaySettings::cardSearchLanguageChanged, this, applyCardSearchLanguage);
+
     cards = new QList<ExactCard>;
     connect(databaseDisplayModel, &CardDatabaseDisplayModel::modelDirty, this,
             &VisualDatabaseDisplayWidget::modelDirty);

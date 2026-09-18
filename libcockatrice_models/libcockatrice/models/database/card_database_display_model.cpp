@@ -179,7 +179,7 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
     }
 
     if (filterString != nullptr) {
-        if (filterTree != nullptr && !filterTree->acceptsCard(info)) {
+        if (filterTree != nullptr && !filterTree->acceptsCard(info, searchLanguage, searchLanguageMode)) {
             return false;
         }
         return filterString->check(info);
@@ -190,7 +190,9 @@ bool CardDatabaseDisplayModel::filterAcceptsRow(int sourceRow, const QModelIndex
 
 bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfoPtr info) const
 {
-    if (!cardName.isEmpty() && !info->getName().contains(cardName, Qt::CaseInsensitive)) {
+    if (!cardName.isEmpty() && !info->getName().contains(cardName, Qt::CaseInsensitive) &&
+        searchLanguageMode != CardSearchLanguage::English && !searchLanguage.isEmpty() && searchLanguage != "en" &&
+        !info->getLocalizedName(searchLanguage).contains(cardName, Qt::CaseInsensitive)) {
         return false;
     }
 
@@ -199,7 +201,7 @@ bool CardDatabaseDisplayModel::rowMatchesCardName(CardInfoPtr info) const
     }
 
     if (filterTree != nullptr) {
-        return filterTree->acceptsCard(info);
+        return filterTree->acceptsCard(info, searchLanguage, searchLanguageMode);
     }
 
     return true;
@@ -233,6 +235,29 @@ void CardDatabaseDisplayModel::setFilterTree(FilterTree *_filterTree)
     this->filterTree = _filterTree;
     connect(this->filterTree, &FilterTree::changed, this, &CardDatabaseDisplayModel::filterTreeChanged);
     invalidate();
+}
+
+void CardDatabaseDisplayModel::setStringFilter(const QString &_src)
+{
+    delete filterString;
+    filterString = new FilterString(_src);
+    filterString->setSearchLanguage(searchLanguage, searchLanguageMode);
+    dirty();
+}
+
+void CardDatabaseDisplayModel::setSearchLanguage(const QString &searchLang, CardSearchLanguage mode)
+{
+    if (searchLanguage == searchLang && searchLanguageMode == mode) {
+        return;
+    }
+
+    searchLanguage = searchLang;
+    searchLanguageMode = mode;
+
+    if (filterString != nullptr) {
+        filterString->setSearchLanguage(searchLanguage, searchLanguageMode);
+    }
+    dirty();
 }
 
 void CardDatabaseDisplayModel::filterTreeChanged()

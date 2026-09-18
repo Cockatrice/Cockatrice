@@ -14,6 +14,7 @@
 #include <QString>
 #include <functional>
 #include <libcockatrice/card/card_info.h>
+#include <libcockatrice/card/card_localization.h>
 #include <utility>
 
 inline Q_LOGGING_CATEGORY(FilterStringLog, "filter_string");
@@ -54,6 +55,17 @@ public:
     {
         return _error;
     }
+
+    /**
+     * @brief Sets the card language plain-text name and text queries run against.
+     *
+     * The peg parser rules are set up once per process, so this propagates to
+     * every FilterString instance created through the shared parser.
+     *
+     * @param searchLanguage Empty string for English only, otherwise the card language code.
+     * @param searchLanguageMode The search language mode from CardSearchLanguage.
+     */
+    void setSearchLanguage(const QString &searchLanguage, CardSearchLanguage searchLanguageMode);
 
 private:
     QString _error;

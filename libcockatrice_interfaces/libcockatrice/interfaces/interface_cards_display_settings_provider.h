@@ -29,6 +29,7 @@ public:
     [[nodiscard]] virtual int getArchidektPreviewSize() const = 0;
     [[nodiscard]] virtual int getSampleHandSize() const = 0;
     [[nodiscard]] virtual QString getCardLang() const = 0;
+    [[nodiscard]] virtual int getCardSearchLanguage() const = 0;
 };
 
 #endif // COCKATRICE_INTERFACE_CARDS_DISPLAY_SETTINGS_PROVIDER_H

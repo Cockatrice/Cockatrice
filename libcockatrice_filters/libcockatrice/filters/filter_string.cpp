@@ -74,6 +74,38 @@ NumericValue <- [0-9]+
 
 static std::once_flag init;
 
+// The peg parser rules are set up once per process, which means the GenericQuery/
+// OracleQuery lambdas cannot capture per-instance state. The card language the
+// plain-text name and text queries search in is therefore kept here and applied
+// by those lambdas; every FilterString shares it because it reflects a single
+// global user setting.
+static QString globalSearchLanguage;
+static CardSearchLanguage globalSearchLanguageMode = CardSearchLanguage::English;
+
+namespace
+{
+bool matchesInSearchLanguage(const QString &english,
+                             const QString &localized,
+                             const QString &searchLanguage,
+                             CardSearchLanguage searchLanguageMode,
+                             const StringMatcher &matcher)
+{
+    if (searchLanguageMode == CardSearchLanguage::English) {
+        return matcher(english);
+    }
+
+    if (searchLanguageMode == CardSearchLanguage::Both && matcher(english)) {
+        return true;
+    }
+
+    if (searchLanguage.isEmpty() || searchLanguage == "en") {
+        return matcher(english);
+    }
+
+    return matcher(localized);
+}
+} // namespace
+
 static void setupParserRules()
 {
     auto passthru = [](const peg::SemanticValues &sv) -> Filter {
@@ -333,7 +365,10 @@ static void setupParserRules()
 
     search["OracleQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
-        return [=](const CardData &x) { return matcher(x->getText()); };
+        return [=](const CardData &x) {
+            return matchesInSearchLanguage(x->getText(), x->getLocalizedText(globalSearchLanguage),
+                                           globalSearchLanguage, globalSearchLanguageMode, matcher);
+        };
     };
 
     search["ColorQuery"] = [](const peg::SemanticValues &sv) -> Filter {
@@ -410,7 +445,10 @@ static void setupParserRules()
     };
     search["GenericQuery"] = [](const peg::SemanticValues &sv) -> Filter {
         const auto matcher = std::any_cast<StringMatcher>(sv[0]);
-        return [=](const CardData &x) { return matcher(x->getName()); };
+        return [=](const CardData &x) {
+            return matchesInSearchLanguage(x->getName(), x->getLocalizedName(globalSearchLanguage),
+                                           globalSearchLanguage, globalSearchLanguageMode, matcher);
+        };
     };
 
     search["Color"] = [](const peg::SemanticValues &sv) -> char { return "WUBRGU"[sv.choice()]; };
@@ -446,4 +484,10 @@ FilterString::FilterString(const QString &expr)
         qCInfo(FilterStringLog).nospace() << "FilterString error for " << expr << "; " << qPrintable(_error);
         result = [](const CardData &) -> bool { return false; };
     }
+}
+
+void FilterString::setSearchLanguage(const QString &searchLanguage, CardSearchLanguage searchLanguageMode)
+{
+    globalSearchLanguage = searchLanguage;
+    globalSearchLanguageMode = searchLanguageMode;
 }
