@@ -126,9 +126,10 @@ void TabDeckStorageVisual::updateShareHint()
     shareBar->setCountText(tr("%n deck(s)", "", count));
     if (count == 0) {
         shareBar->setHintText(tr("Click deck tiles to select the decks you want to share."), true);
+    } else if (count == 1) {
+        shareBar->setHintText(tr("One deck selected. Create the link to share it with other players."), true);
     } else {
-        shareBar->setHintText(tr("%n deck(s) selected. Create the link to share %1 with other players.", "", count)
-                                  .arg(count == 1 ? tr("it") : tr("them")),
+        shareBar->setHintText(tr("%n decks selected. Create the link to share them with other players.", "", count),
                               true);
     }
 }
