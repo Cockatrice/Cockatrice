@@ -44,7 +44,27 @@ public:
     CardPictureToLoad cardToDownload; ///< The card and associated URLs to try downloading
 
     /** @brief Shared per-server 429 backoff state. */
-    static ServerRateLimiter &rateLimiter();
+    static const ServerRateLimiter &rateLimiter();
+
+    /**
+     * @brief Starts downloading the next URL for this card.
+     *
+     * Skips URLs whose server is currently in 429 backoff, either waiting the
+     * backoff out or falling through to the other configured sources. Also used by
+     * the dispatch machinery to hand an entry back after it was removed from the
+     * request queue when its host turned out to be backed off.
+     */
+    void startNextPicDownload();
+
+    /**
+     * @brief Schedules a deferred retry after the relevant server backoff expires.
+     *
+     * Waits on the current URL's server when it is the reason we are blocked,
+     * otherwise on the earliest active backoff. If no servers are in backoff,
+     * concludes with failure. Otherwise resets the CardPictureToLoad indices and
+     * retries after the backoff period.
+     */
+    void scheduleDeferredRetry();
 
 public slots:
     /**
@@ -57,9 +77,6 @@ private:
     bool picDownload; ///< Whether network downloading is enabled
 
     static ServerRateLimiter s_rateLimiter; ///< Shared per-server 429 backoff state
-
-    /** @brief Starts downloading the next URL for this card. */
-    void startNextPicDownload();
 
     /** @brief Called when all URLs have been exhausted or download failed. */
     void picDownloadFailed();
@@ -84,16 +101,6 @@ private:
      * Emits imageLoaded() and deletes this object.
      */
     void concludeImageLoad(const QImage &image);
-
-    /**
-     * @brief Schedules a deferred retry after the relevant server backoff expires.
-     *
-     * Waits on the current URL's server when it is the reason we are blocked,
-     * otherwise on the earliest active backoff. If no servers are in backoff,
-     * concludes with failure. Otherwise resets the CardPictureToLoad indices and
-     * retries after the backoff period.
-     */
-    void scheduleDeferredRetry();
 
 private slots:
     /** @brief Updates the picDownload setting when it changes. */

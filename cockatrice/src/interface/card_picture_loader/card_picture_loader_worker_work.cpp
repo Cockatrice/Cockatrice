@@ -22,7 +22,7 @@ static const QStringList MD5_BLACKLIST = {
     "fbc7d763c08771c260b39e2115414eeb"  // Current card back hash
 };
 
-ServerRateLimiter &CardPictureLoaderWorkerWork::rateLimiter()
+const ServerRateLimiter &CardPictureLoaderWorkerWork::rateLimiter()
 {
     return s_rateLimiter;
 }
