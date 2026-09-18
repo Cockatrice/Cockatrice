@@ -21,6 +21,49 @@
 #include <libcockatrice/settings/card_override_settings.h>
 #include <utility>
 
+namespace
+{
+/**
+ * @brief Places the preview beside the highlighted action inside the given screen.
+ *
+ * Side-aware: hugs the side of the action that has room, aligned with its row, then
+ * clamps every edge so the preview always lands fully on-screen on first show.
+ */
+QPoint
+previewPositionNear(const QRect &actionRect, const QSize &labelSize, const QRect &screenGeometry, int previewOffset)
+{
+    const bool rightFits = actionRect.right() + previewOffset + labelSize.width() <= screenGeometry.right();
+    const bool leftFits = actionRect.left() - previewOffset - labelSize.width() >= screenGeometry.left();
+
+    int x;
+    if (rightFits) {
+        x = actionRect.right() + previewOffset;
+    } else if (leftFits) {
+        x = actionRect.left() - previewOffset - labelSize.width();
+    } else {
+        x = actionRect.left();
+    }
+    x = qMax(screenGeometry.left(), x);
+    x = qMin(screenGeometry.right() - labelSize.width() + 1, x);
+
+    const bool belowFits = actionRect.bottom() + previewOffset + labelSize.height() <= screenGeometry.bottom();
+    const bool aboveFits = actionRect.top() - previewOffset - labelSize.height() >= screenGeometry.top();
+
+    int y;
+    if (belowFits) {
+        y = actionRect.bottom() + previewOffset;
+    } else if (aboveFits) {
+        y = actionRect.top() - previewOffset - labelSize.height();
+    } else {
+        y = actionRect.top();
+    }
+    y = qMax(screenGeometry.top(), y);
+    y = qMin(screenGeometry.bottom() - labelSize.height() + 1, y);
+
+    return {x, y};
+}
+} // namespace
+
 /**
  * @brief Constructs a PrintingSelectorCardOverlayWidget for displaying a card overlay.
  *
@@ -282,10 +325,6 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
             }
 
             QString label = tr("%1 %2").arg(cardSet->getCorrectedShortName(), printing.getProperty("num"));
-            const QString &flavorName = printing.getFlavorName();
-            if (!flavorName.isEmpty()) {
-                label = tr("%1 — %2").arg(label, flavorName);
-            }
 
             auto *action = overrideMenu->addAction(label);
 
@@ -293,8 +332,7 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
             action->setData(QVariant::fromValue(overrideCard));
 
             connect(action, &QAction::triggered, this, [this, overrideCard]() {
-                CardPictureLoader::getInstance().overridePrintingEnsurePixmapExistsAndSaveLocally(rootCard,
-                                                                                                  overrideCard);
+                CardPictureLoader::getInstance().installPrintingOverride(rootCard, overrideCard);
                 QPixmapCache::clear();
                 rootCard.emitPixmapUpdated(); // refresh the overlay art in place, like the other paths
             });
@@ -302,31 +340,12 @@ void PrintingSelectorCardOverlayWidget::customMenu(QPoint point)
     }
 
     connect(clearOverrideAction, &QAction::triggered, this, [this]() {
-        CardPictureLoader::getInstance().deleteAllLocalOverrides(rootCard);
+        CardPictureLoader::deleteAllLocalOverrides(rootCard);
         QPixmapCache::clear();
         rootCard.emitPixmapUpdated(); // force UI refresh
     });
 
-    connect(loadCustomAction, &QAction::triggered, this, [this]() {
-        QString filePath = QFileDialog::getOpenFileName(this, tr("Select Card Image"), QString(),
-                                                        tr("Images (*.png *.jpg *.jpeg *.webp)"));
-
-        if (filePath.isEmpty()) {
-            return;
-        }
-
-        QPixmap pixmap(filePath);
-        if (pixmap.isNull()) {
-            // No silent paths: a file that cannot be read answers visibly instead of a no-op.
-            QMessageBox::warning(this, tr("Load Custom Image"), tr("The selected file could not be read as an image."));
-            return;
-        }
-
-        CardPictureLoader::getInstance().saveCardImageToLocalStorage(rootCard, pixmap, true);
-
-        QPixmapCache::clear();
-        rootCard.emitPixmapUpdated();
-    });
+    connect(loadCustomAction, &QAction::triggered, this, &PrintingSelectorCardOverlayWidget::loadCustomImage);
 
     connect(overrideMenu, &QMenu::hovered, this, &PrintingSelectorCardOverlayWidget::showPreviewForAction);
     connect(overrideMenu, &QMenu::aboutToHide, this, &PrintingSelectorCardOverlayWidget::hidePreview);
@@ -414,6 +433,33 @@ void PrintingSelectorCardOverlayWidget::initializePinBadge()
 }
 
 /**
+ * @brief Asks for an image file and installs it as the card's custom art.
+ *
+ * Unreadable files answer with a visible warning instead of a silent no-op.
+ */
+void PrintingSelectorCardOverlayWidget::loadCustomImage()
+{
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Select Card Image"), QString(),
+                                                    tr("Images (*.png *.jpg *.jpeg *.webp)"));
+
+    if (filePath.isEmpty()) {
+        return;
+    }
+
+    QPixmap pixmap(filePath);
+    if (pixmap.isNull()) {
+        // No silent paths: a file that cannot be read answers visibly instead of a no-op.
+        QMessageBox::warning(this, tr("Load Custom Image"), tr("The selected file could not be read as an image."));
+        return;
+    }
+
+    CardPictureLoader::getInstance().saveCardImageToLocalStorage(rootCard, pixmap, true);
+
+    QPixmapCache::clear();
+    rootCard.emitPixmapUpdated();
+}
+
+/**
  * @brief Shows the hover preview for a highlighted printing entry in the Image Overrides submenu.
  *
  * QMenu::hovered fires on keyboard highlight too, so the preview appears when arrows walk
@@ -462,24 +508,23 @@ void PrintingSelectorCardOverlayWidget::refreshPreview()
         return;
     }
 
-    const QSize previewSize(240, 336);
-    const int previewOffset = 20;
+    constexpr QSize previewSize(240, 336);
+    constexpr int previewOffset = 20;
 
     QPixmap pixmap;
     CardPictureLoader::getPixmap(pixmap, hoveredOverrideCard, previewSize);
 
-    QPixmap previewPixmap = pixmap;
-    if (previewPixmap.isNull()) {
+    if (pixmap.isNull()) {
         // Keep the preview honest while loading: show the loading placeholder instead of a void.
         // Fetch at the logical size and let the label scale it, so the placeholder matches the
         // real art's footprint rather than doubling on HiDPI displays.
-        CardPictureLoader::getCardBackLoadingInProgressPixmap(previewPixmap, previewSize);
+        CardPictureLoader::getCardBackLoadingInProgressPixmap(pixmap, previewSize);
     }
 
-    cardOverridePreviewLabel->setPixmap(previewPixmap);
+    cardOverridePreviewLabel->setPixmap(pixmap);
     // QPixmap::size() is physical pixels; the label layout must use the device-independent size
     // so the preview keeps a constant footprint across DPI settings (QScreen geometry is logical).
-    const QSize labelSize = previewPixmap.deviceIndependentSize().toSize();
+    const QSize labelSize = pixmap.deviceIndependentSize().toSize();
     cardOverridePreviewLabel->resize(labelSize);
 
     // Anchor the preview to the walked submenu popup rather than QCursor::pos(), which is idle
@@ -503,37 +548,7 @@ void PrintingSelectorCardOverlayWidget::refreshPreview()
     }
     const QRect &screenGeometry = screen->geometry();
 
-    // Side-aware: hug the side of the submenu popup that has room, aligned with the highlighted
-    // row, then clamp every edge so the preview always lands fully on-screen on first show.
-    const bool rightFits = actionRect.right() + previewOffset + labelSize.width() <= screenGeometry.right();
-    const bool leftFits = actionRect.left() - previewOffset - labelSize.width() >= screenGeometry.left();
-
-    int x;
-    if (rightFits) {
-        x = actionRect.right() + previewOffset;
-    } else if (leftFits) {
-        x = actionRect.left() - previewOffset - labelSize.width();
-    } else {
-        x = actionRect.left();
-    }
-    x = qMax(screenGeometry.left(), x);
-    x = qMin(screenGeometry.right() - labelSize.width() + 1, x);
-
-    const bool belowFits = actionRect.bottom() + previewOffset + labelSize.height() <= screenGeometry.bottom();
-    const bool aboveFits = actionRect.top() - previewOffset - labelSize.height() >= screenGeometry.top();
-
-    int y;
-    if (belowFits) {
-        y = actionRect.bottom() + previewOffset;
-    } else if (aboveFits) {
-        y = actionRect.top() - previewOffset - labelSize.height();
-    } else {
-        y = actionRect.top();
-    }
-    y = qMax(screenGeometry.top(), y);
-    y = qMin(screenGeometry.bottom() - labelSize.height() + 1, y);
-
-    cardOverridePreviewLabel->move(x, y);
+    cardOverridePreviewLabel->move(previewPositionNear(actionRect, labelSize, screenGeometry, previewOffset));
     cardOverridePreviewLabel->show();
 }
 

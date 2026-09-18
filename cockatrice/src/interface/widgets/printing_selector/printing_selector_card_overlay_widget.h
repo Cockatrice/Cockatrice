@@ -7,14 +7,14 @@
 #ifndef PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
 #define PRINTING_SELECTOR_CARD_OVERLAY_WIDGET_H
 
-class QAction;
-class QMenu;
-
 #include "../../../interface/widgets/tabs/abstract_tab_deck_editor.h"
 #include "all_zones_card_amount_widget.h"
 #include "set_name_and_collectors_number_display_widget.h"
 
 #include <libcockatrice/models/deck_list/deck_list_model.h>
+
+class QAction;
+class QMenu;
 
 class PrintingSelectorCardOverlayWidget : public QWidget
 {
@@ -46,6 +46,7 @@ private slots:
 
 private:
     void initializePinBadge();
+    void loadCustomImage();
     void showPreviewForAction(QAction *action);
     void refreshPreview();
     void hidePreview();
