@@ -10,7 +10,7 @@
 #include "tab.h"
 
 #include <QGroupBox>
-#include <QMap>
+#include <QHash>
 #include <QSet>
 #include <QTextBrowser>
 #include <QTreeWidget>
@@ -67,8 +67,9 @@ private:
     QTextBrowser *serverInfoBox;
     bool shouldEmitUpdate = false;
     /** Room ids with a join command in flight, mapped to whether the tab should be focused once it opens. */
-    QMap<int, bool> pendingRoomJoins;
-    /** Room ids for which a stale-membership heal (leave + rejoin) has already been attempted. */
+    QHash<int, bool> pendingRoomJoins;
+    /** Room ids for which a stale-membership heal (leave + rejoin) is currently in flight. Released as soon as the
+     *  rejoin has been answered, so a heal is attempted at most once per join. */
     QSet<int> healedRoomJoins;
 
 public:

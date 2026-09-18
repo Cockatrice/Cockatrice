@@ -232,6 +232,7 @@ void TabServer::joinRoomFinished(const Response &r,
             healedRoomJoins.remove(roomId);
             break;
         case Response::RespNameNotFound:
+            healedRoomJoins.remove(roomId);
             if (setCurrent) {
                 QMessageBox::critical(this, tr("Error"),
                                       tr("Failed to join the server room: it doesn't exist on the server."));
@@ -240,8 +241,10 @@ void TabServer::joinRoomFinished(const Response &r,
             return;
         case Response::RespContextError:
             if (healedRoomJoins.contains(roomId)) {
-                // A stale-membership heal was already attempted once; if the server still
-                // rejects the join there is nothing left to do client-side, so surface it.
+                // The rejoin below was already answered and the server still rejects the join, so
+                // the stale-membership heal cannot help: surface the error. The guard is released
+                // again so a later user-initiated join may try a fresh heal.
+                healedRoomJoins.remove(roomId);
                 if (setCurrent) {
                     QMessageBox::critical(
                         this, tr("Error"),
@@ -254,12 +257,14 @@ void TabServer::joinRoomFinished(const Response &r,
             // The server already had us registered in the room even though no tab was open,
             // usually because two join attempts for the same room overlapped. Leaving and
             // rejoining makes the server reply with a fresh RespOk so the tab is displayed
-            // without requiring a client restart. This is attempted only once: if the server
-            // keeps replying with RespContextError we must not loop forever.
+            // without requiring a client restart. The guard above covers exactly the rejoin that
+            // leaveAndRejoinRoom triggers, so a server that keeps replying with RespContextError
+            // gets one heal attempt per join instead of an endless recursion.
             healedRoomJoins.insert(roomId);
             leaveAndRejoinRoom(roomId, setCurrent);
             return;
         case Response::RespUserLevelTooLow:
+            healedRoomJoins.remove(roomId);
             if (setCurrent) {
                 QMessageBox::critical(this, tr("Error"),
                                       tr("You do not have the required permission to join this server room."));
@@ -267,6 +272,7 @@ void TabServer::joinRoomFinished(const Response &r,
             emit roomJoinFailed(roomId);
             return;
         default:
+            healedRoomJoins.remove(roomId);
             if (setCurrent) {
                 QMessageBox::critical(
                     this, tr("Error"),
@@ -283,7 +289,9 @@ void TabServer::joinRoomFinished(const Response &r,
 void TabServer::leaveAndRejoinRoom(int roomId, bool setCurrent)
 {
     // Clear the stale room membership server-side. The leave is sent before the rejoin below,
-    // so the server no longer considers us a member by the time the join arrives.
+    // so the server no longer considers us a member by the time the join arrives. The leave
+    // response is intentionally not awaited: commands are processed in send order on the
+    // connection, and a failed leave (RespNotInRoom) only means the membership was already gone.
     client->sendCommand(client->prepareRoomCommand(Command_LeaveRoom(), roomId));
 
     joinRoom(roomId, setCurrent);
