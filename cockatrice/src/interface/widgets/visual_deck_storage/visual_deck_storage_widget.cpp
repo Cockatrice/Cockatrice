@@ -51,7 +51,6 @@ VisualDeckStorageWidget::VisualDeckStorageWidget(QWidget *parent) : QWidget(pare
     shareButton = new QToolButton(this);
     shareButton->setIcon(QPixmap("theme:icons/share"));
     shareButton->setFixedSize(32, 32);
-    shareButton->setToolTip(tr("Select decks to share"));
     shareButton->setVisible(false);
     connect(shareButton, &QPushButton::clicked, this, &VisualDeckStorageWidget::shareRequested);
 
@@ -166,6 +165,7 @@ void VisualDeckStorageWidget::retranslateUi()
     databaseLoadIndicator->setText(tr("Loading database ..."));
 
     refreshButton->setToolTip(tr("Refresh loaded files"));
+    shareButton->setToolTip(tr("Select decks to share"));
     quickSettingsWidget->setToolTip(tr("Visual Deck Storage Settings"));
 
     sortWidget->retranslateUi();
