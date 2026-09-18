@@ -1,10 +1,10 @@
-#include "deck_list_metadata_xml.h"
+#include "deck_list.h"
 
 #include <QtCore/QXmlStreamReader>
 #include <QtCore/QXmlStreamWriter>
 #include <libcockatrice/utility/playmat_params.h>
 
-namespace DeckListMetadataXml
+namespace
 {
 
 /**
@@ -20,7 +20,7 @@ namespace DeckListMetadataXml
  * @param max Upper clamp bound.
  * @return The parsed value clamped to [min, max], or @p fallback.
  */
-static double parseClampedParam(const QString &valueString, double fallback, double min, double max)
+double parseClampedParam(const QString &valueString, double fallback, double min, double max)
 {
     bool ok = false;
     const double value = valueString.toDouble(&ok);
@@ -30,20 +30,22 @@ static double parseClampedParam(const QString &valueString, double fallback, dou
     return qBound(min, value, max);
 }
 
-bool readElement(QXmlStreamReader *xml, const QString &childName, DeckList::Metadata &metadata)
+} // namespace
+
+bool DeckList::Metadata::readElement(QXmlStreamReader *xml, const QString &childName)
 {
     if (childName == "lastLoadedTimestamp") {
-        metadata.lastLoadedTimestamp = xml->readElementText();
+        lastLoadedTimestamp = xml->readElementText();
     } else if (childName == "deckname") {
-        metadata.name = xml->readElementText();
+        name = xml->readElementText();
     } else if (childName == "format") {
-        metadata.gameFormat = xml->readElementText();
+        gameFormat = xml->readElementText();
     } else if (childName == "comments") {
-        metadata.comments = xml->readElementText();
+        comments = xml->readElementText();
     } else if (childName == "bannerCard") {
         QString providerId = xml->attributes().value("providerId").toString();
         QString cardName = xml->readElementText();
-        metadata.bannerCard = {cardName, providerId};
+        bannerCard = {cardName, providerId};
     } else if (childName == "playmatCard") {
         QString providerId = xml->attributes().value("providerId").toString();
         // Attributes are read before readElementText consumes the element.
@@ -52,7 +54,6 @@ bool readElement(QXmlStreamReader *xml, const QString &childName, DeckList::Meta
         QString vOffStr = xml->attributes().value("verticalOffset").toString();
         QString zoomStr = xml->attributes().value("zoom").toString();
         QString cardName = xml->readElementText();
-        PlaymatInfo playmat;
         playmat.card = {cardName, providerId};
         // Clamp to the same ranges as the settings dialog and the remote
         // player-properties path so malformed deck files cannot produce
@@ -61,12 +62,11 @@ bool readElement(QXmlStreamReader *xml, const QString &childName, DeckList::Meta
         playmat.params.marginPctR = parseClampedParam(marginRStr, 0.07, 0.0, 0.95);
         playmat.params.verticalOffset = parseClampedParam(vOffStr, 0.33, 0.0, 1.0);
         playmat.params.zoom = parseClampedParam(zoomStr, 1.0, 0.1, 4.0);
-        metadata.playmat = playmat;
     } else if (childName == "tags") {
-        metadata.tags.clear(); // Clear existing tags
+        tags.clear(); // Clear existing tags
         while (xml->readNextStartElement()) {
             if (xml->name().toString() == "tag") {
-                metadata.tags.append(xml->readElementText());
+                tags.append(xml->readElementText());
             }
         }
     } else {
@@ -75,33 +75,31 @@ bool readElement(QXmlStreamReader *xml, const QString &childName, DeckList::Meta
     return true;
 }
 
-void write(QXmlStreamWriter *xml, const DeckList::Metadata &metadata)
+void DeckList::Metadata::write(QXmlStreamWriter *xml) const
 {
-    xml->writeTextElement("lastLoadedTimestamp", metadata.lastLoadedTimestamp);
-    xml->writeTextElement("deckname", metadata.name);
-    xml->writeTextElement("format", metadata.gameFormat);
+    xml->writeTextElement("lastLoadedTimestamp", lastLoadedTimestamp);
+    xml->writeTextElement("deckname", name);
+    xml->writeTextElement("format", gameFormat);
     xml->writeStartElement("bannerCard");
-    xml->writeAttribute("providerId", metadata.bannerCard.providerId);
-    xml->writeCharacters(metadata.bannerCard.name);
+    xml->writeAttribute("providerId", bannerCard.providerId);
+    xml->writeCharacters(bannerCard.name);
     xml->writeEndElement();
-    if (!metadata.playmat.card.isEmpty()) {
+    if (!playmat.card.isEmpty()) {
         xml->writeStartElement("playmatCard");
-        xml->writeAttribute("providerId", metadata.playmat.card.providerId);
-        xml->writeAttribute("marginPctL", QString::number(metadata.playmat.params.marginPctL, 'f', 4));
-        xml->writeAttribute("marginPctR", QString::number(metadata.playmat.params.marginPctR, 'f', 4));
-        xml->writeAttribute("verticalOffset", QString::number(metadata.playmat.params.verticalOffset, 'f', 4));
-        xml->writeAttribute("zoom", QString::number(metadata.playmat.params.zoom, 'f', 4));
-        xml->writeCharacters(metadata.playmat.card.name);
+        xml->writeAttribute("providerId", playmat.card.providerId);
+        xml->writeAttribute("marginPctL", QString::number(playmat.params.marginPctL, 'f', 4));
+        xml->writeAttribute("marginPctR", QString::number(playmat.params.marginPctR, 'f', 4));
+        xml->writeAttribute("verticalOffset", QString::number(playmat.params.verticalOffset, 'f', 4));
+        xml->writeAttribute("zoom", QString::number(playmat.params.zoom, 'f', 4));
+        xml->writeCharacters(playmat.card.name);
         xml->writeEndElement();
     }
-    xml->writeTextElement("comments", metadata.comments);
+    xml->writeTextElement("comments", comments);
 
     // Write tags
     xml->writeStartElement("tags");
-    for (const QString &tag : metadata.tags) {
+    for (const QString &tag : tags) {
         xml->writeTextElement("tag", tag);
     }
     xml->writeEndElement();
 }
-
-} // namespace DeckListMetadataXml

@@ -9,7 +9,6 @@ set(HEADERS
     libcockatrice/deck_list/tree/inner_deck_list_node.h
     libcockatrice/deck_list/deck_list.h
     libcockatrice/deck_list/deck_list_history_manager.h
-    libcockatrice/deck_list/deck_list_metadata_xml.h
     libcockatrice/deck_list/deck_list_node_tree.h
     libcockatrice/deck_list/deck_list_memento.h
     libcockatrice/deck_list/deck_list_plain_text_parser.h

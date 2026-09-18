@@ -1,7 +1,6 @@
 #include "deck_list.h"
 
 #include "deck_list_memento.h"
-#include "deck_list_metadata_xml.h"
 #include "deck_list_plain_text_parser.h"
 #include "tree/abstract_deck_list_node.h"
 #include "tree/deck_list_card_node.h"
@@ -55,7 +54,7 @@ bool DeckList::readElement(QXmlStreamReader *xml)
 {
     const QString childName = xml->name().toString();
     if (xml->isStartElement()) {
-        if (DeckListMetadataXml::readElement(xml, childName, metadata)) {
+        if (metadata.readElement(xml, childName)) {
             return true;
         }
         if (childName == "zone") {
@@ -77,7 +76,7 @@ void DeckList::write(QXmlStreamWriter *xml) const
     xml->writeStartElement("cockatrice_deck");
     xml->writeAttribute("version", "1");
 
-    DeckListMetadataXml::write(xml, metadata);
+    metadata.write(xml);
 
     // Write zones
     tree.write(xml);
