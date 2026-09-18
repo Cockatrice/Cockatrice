@@ -1,5 +1,6 @@
 #include "card_localization.h"
 
+#include <QHash>
 #include <QLocale>
 #include <QStringList>
 
@@ -13,11 +14,23 @@ const QStringList &supportedLanguages()
 
 QString languageDisplayName(const QString &lang)
 {
-    if (lang == "zhs") {
-        return QStringLiteral("简体中文");
-    }
-    if (lang == "zht") {
-        return QStringLiteral("繁體中文");
+    static const QHash<QString, QString> displayNames = {
+        {"cs", "Česky (Czech)"},
+        {"de", "Deutsch (German)"},
+        {"es", "Español (Spanish)"},
+        {"fr", "Français (French)"},
+        {"it", "Italiano (Italian)"},
+        {"ja", "日本語 (Japanese)"},
+        {"ko", "한국어 (Korean)"},
+        {"pt", "Português (Portuguese)"},
+        {"ru", "Русский (Russian)"},
+        {"he", "עברית (Hebrew)"},
+        {"zhs", "简体中文 (Chinese Simplified)"},
+        {"zht", "繁體中文 (Chinese Traditional)"},
+    };
+    const QString displayName = displayNames.value(lang);
+    if (!displayName.isEmpty()) {
+        return displayName;
     }
     const QString nativeName = QLocale(lang).nativeLanguageName();
     return nativeName.isEmpty() ? lang : nativeName;

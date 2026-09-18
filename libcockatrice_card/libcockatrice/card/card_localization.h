@@ -28,11 +28,14 @@ namespace CardLocalization
 [[nodiscard]] const QStringList &supportedLanguages();
 
 /**
- * @brief Human-readable native name for a language code.
+ * @brief Human-readable name for a language code.
+ *
+ * Follows the same "native name (English name)" format the UI language list
+ * uses (e.g. "日本語 (Japanese)"), so the English fallback is always visible.
  *
  * @param lang Language code (e.g. "de", "ja", "zhs").
- * @return The language's name in its own language, or the code itself if
- *         it cannot be resolved.
+ * @return The language's native name with its English name in parentheses, or
+ *         the code itself if it cannot be resolved.
  */
 [[nodiscard]] QString languageDisplayName(const QString &lang);
 } // namespace CardLocalization
