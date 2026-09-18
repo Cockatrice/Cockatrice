@@ -1105,6 +1105,8 @@ bool Servatrice_DatabaseInterface::createDeckShare(const QString &token,
     query->bindValue(":created_by", userId < 1 ? QVariant() : userId);
     query->bindValue(":days", expiryDays);
     if (!execSqlQuery(query)) {
+        // A failed execSqlQuery has already closed and reopened the connection,
+        // which implicitly discards the transaction; rollback below is a no-op.
         sqlDatabase.rollback();
         return false;
     }
@@ -1116,6 +1118,8 @@ bool Servatrice_DatabaseInterface::createDeckShare(const QString &token,
     QSqlQuery *expiryQuery = prepareQuery("select UNIX_TIMESTAMP(expires_at) from {prefix}_deck_share where id = :id");
     expiryQuery->bindValue(":id", shareId);
     if (!execSqlQuery(expiryQuery) || !expiryQuery->next()) {
+        // See the note above: after a failed execSqlQuery the transaction is
+        // already gone because the connection was torn down.
         sqlDatabase.rollback();
         return false;
     }
@@ -1135,6 +1139,8 @@ bool Servatrice_DatabaseInterface::createDeckShare(const QString &token,
         itemQuery->bindValue(":content", item.content);
         itemQuery->bindValue(":position", i);
         if (!execSqlQuery(itemQuery)) {
+            // See the note above: the transaction is already gone after the
+            // reconnect performed by a failed execSqlQuery.
             sqlDatabase.rollback();
             return false;
         }
