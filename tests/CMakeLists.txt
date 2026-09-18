@@ -16,6 +16,7 @@ add_test(NAME warning_categories_test COMMAND warning_categories_test)
 add_test(NAME lag_monitor_test COMMAND lag_monitor_test)
 add_test(NAME latency_tracker_test COMMAND latency_tracker_test)
 add_test(NAME metrics_registry_test COMMAND metrics_registry_test)
+add_test(NAME loader_local_matching_test COMMAND loader_local_matching_test)
 
 add_test(NAME deck_hash_performance_test COMMAND deck_hash_performance_test)
 set_tests_properties(deck_hash_performance_test PROPERTIES TIMEOUT 15)
@@ -38,6 +39,17 @@ add_executable(lag_monitor_test ${CMAKE_SOURCE_DIR}/cockatrice/src/client/lag_mo
 target_include_directories(lag_monitor_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
 add_executable(latency_tracker_test latency_tracker_test.cpp)
 add_executable(metrics_registry_test ../servatrice/src/metrics_registry.cpp metrics_registry_test.cpp)
+add_executable(
+  loader_local_matching_test
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/interface/card_picture_loader/card_picture_loader_local.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/cache_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/card_counter_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/settings/shortcuts_settings.cpp
+  ${CMAKE_SOURCE_DIR}/cockatrice/src/client/network/update/client/release_channel.cpp
+  ${VERSION_STRING_CPP}
+  loader_local_matching_test.cpp
+)
+target_include_directories(loader_local_matching_test PRIVATE ${CMAKE_SOURCE_DIR}/cockatrice/src)
 
 find_package(GTest)
 
@@ -79,6 +91,7 @@ if(NOT GTEST_FOUND)
   add_dependencies(lag_monitor_test gtest)
   add_dependencies(latency_tracker_test gtest)
   add_dependencies(metrics_registry_test gtest)
+  add_dependencies(loader_local_matching_test gtest)
 endif()
 
 include_directories(${GTEST_INCLUDE_DIRS})
@@ -123,6 +136,9 @@ target_link_libraries(
 )
 target_include_directories(metrics_registry_test PRIVATE ${CMAKE_SOURCE_DIR}/servatrice/src)
 target_link_libraries(metrics_registry_test ${TEST_QT_MODULES} Threads::Threads ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(
+  loader_local_matching_test libcockatrice_settings Threads::Threads ${GTEST_BOTH_LIBRARIES} ${TEST_QT_MODULES}
+)
 
 add_subdirectory(card_zone_algorithms)
 add_subdirectory(carddatabase)
