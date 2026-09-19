@@ -31,6 +31,7 @@ private:
     void refreshChromePalettes();
 
     QMap<QPalette::ColorGroup, QMap<QPalette::ColorRole, ColorButton *>> colorButtons;
+    QMap<AppColor::Role, ColorButton *> appColorButtons;
     QScrollArea *scroll;
     QWidget *gridHost;
     QVBoxLayout *layout;

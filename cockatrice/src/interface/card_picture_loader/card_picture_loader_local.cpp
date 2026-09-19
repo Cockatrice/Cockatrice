@@ -94,6 +94,10 @@ QImage CardPictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
             candidatePaths << picsPath + "/downloadedPics/" + setName + "/" + nameVariant;
         }
 
+        // Non-set-folder export schemes (e.g., Name_Set_Collector) write straight into
+        // downloadedPics/; check there as a fallback so local overrides round-trip.
+        candidatePaths << picsPath + "/downloadedPics/" + nameVariant;
+
         for (const QString &path : candidatePaths) {
             QFileInfo fileInfo(path);
             QDir dir = fileInfo.dir();
@@ -105,7 +109,8 @@ QImage CardPictureLoaderLocal::tryLoadCardImageFromDisk(const QString &setName,
 
             QStringList files = dir.entryList(QDir::Files);
             for (const QString &file : files) {
-                if (!file.startsWith(baseName)) {
+                QFileInfo fi(file);
+                if (fi.completeBaseName() != baseName) {
                     continue;
                 }
 

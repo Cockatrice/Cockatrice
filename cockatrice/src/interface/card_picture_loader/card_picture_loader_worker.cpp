@@ -84,8 +84,8 @@ void CardPictureLoaderWorker::queueRequest(const QUrl &url, CardPictureLoaderWor
             SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
             CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE &&
         cache->metaData(url).isValid()) {
-        // If we hit a cached url, we get to make the request for free, since it won't contribute towards the
-        // rate-limit
+        // A request that will be served from the disk cache never touches the network and therefore
+        // doesn't use up any of the rate limit, so it gets to skip the queue.
         makeRequest(url, worker);
         return;
     }
@@ -107,10 +107,13 @@ QNetworkReply *CardPictureLoaderWorker::makeRequest(const QUrl &url, CardPicture
     req.setHeader(QNetworkRequest::UserAgentHeader, QString("Cockatrice %1").arg(VERSION_STRING));
     req.setRawHeader("Accept", "image/avif,image/webp,image/apng,image/,/*;q=0.8");
 
-    bool useNetworkCache =
-        !picDownload && static_cast<CardPictureLoaderCacheMethod::CacheMethod>(
-                            SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
-                            CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE;
+    // Cached entries are served straight from the disk cache even when picture downloads are
+    // enabled: re-fetching an already-cached image would burn the rate limit for nothing. Only a
+    // genuine cache miss goes to the network, and only when downloads are enabled.
+    bool useNetworkCache = static_cast<CardPictureLoaderCacheMethod::CacheMethod>(
+                               SettingsCache::instance().cacheStorage().getCardPictureLoaderCacheMethod()) ==
+                               CardPictureLoaderCacheMethod::CacheMethod::NETWORK_CACHE &&
+                           (cache->metaData(url).isValid() || !picDownload);
 
     req.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
                      useNetworkCache ? QNetworkRequest::AlwaysCache : QNetworkRequest::AlwaysNetwork);

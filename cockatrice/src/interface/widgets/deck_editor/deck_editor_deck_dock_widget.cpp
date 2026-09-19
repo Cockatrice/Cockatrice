@@ -345,7 +345,9 @@ ExactCard DeckEditorDeckDockWidget::getCurrentCard()
     if (!current.isValid()) {
         return {};
     }
-    const QString cardName = current.siblingAtColumn(DeckListModelColumns::CARD_NAME).data().toString();
+    // The display role holds the localized card name; the edit role always carries the
+    // canonical English name needed to look the card up in the database.
+    const QString cardName = current.siblingAtColumn(DeckListModelColumns::CARD_NAME).data(Qt::EditRole).toString();
     const QString cardProviderID = current.siblingAtColumn(DeckListModelColumns::CARD_PROVIDER_ID).data().toString();
     const QModelIndex gparent = current.parent().parent();
 
@@ -518,8 +520,11 @@ void DeckEditorDeckDockWidget::syncBannerCardComboBoxSelectionWithDeck()
 
 void DeckEditorDeckDockWidget::setSelectedIndex(const QModelIndex &newCardIndex, bool preserveWidgetFocus)
 {
+    const QModelIndex proxyIndex = proxy->mapFromSource(newCardIndex);
+
     deckView->clearSelection();
-    deckView->setCurrentIndex(newCardIndex);
+    deckView->setCurrentIndex(proxyIndex);
+    deckView->scrollTo(proxyIndex);
     recursiveExpand(newCardIndex);
 
     if (!preserveWidgetFocus) {

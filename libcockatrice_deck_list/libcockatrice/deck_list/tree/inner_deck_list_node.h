@@ -223,19 +223,45 @@ public:
      */
     QVector<QPair<int, int>> sort(Qt::SortOrder order = Qt::AscendingOrder);
 
+private:
+    /**
+     * @brief Snapshots the current children as (old index, node) pairs.
+     */
+    QVector<QPair<int, AbstractDecklistNode *>> indexedSnapshot() const;
+
+    /**
+     * @brief Replaces this node's children with @p sorted and maps old indexes to new ones.
+     *
+     * @return A list of (old index, new index) pairs for each reordered child.
+     */
+    QVector<QPair<int, int>> applySortedOrder(const QVector<QPair<int, AbstractDecklistNode *>> &sorted);
+
+public:
     /**
      * @brief Deserialize this node and its children from XML.
      * @param xml Reader positioned at this element.
      * @param limit The maximum amount of cards to read
      * @return the amount of cards found
      */
-    int readElement(QXmlStreamReader *xml, int limit) override;
+    int readElement(QXmlStreamReader *xml, int limit);
 
     /**
      * @brief Serialize this node and its children to XML.
      * @param xml Writer to append elements to.
      */
     void writeElement(QXmlStreamWriter *xml) override;
+
+private:
+    /**
+     * @brief Reads a single `card` element and appends it to this node.
+     *
+     * The card's quantity is capped at @p remainingBudget so a malicious or
+     * oversized deck file cannot push the total card count past the deck size
+     * limit.
+     *
+     * @return The amount of cards actually added.
+     */
+    int readCardElement(QXmlStreamReader *xml, int remainingBudget);
 };
 
 #endif // COCKATRICE_INNER_DECK_LIST_NODE_H

@@ -7,6 +7,84 @@
 
 static constexpr int MAX_DECK_SIZE = 1e5;
 
+namespace
+{
+
+/**
+ * @brief Expands card nodes into one lowercase name entry per copy.
+ *
+ * @param nodes The card nodes to expand.
+ * @param prefix Optional prefix prepended to every entry (e.g. "SB:" for the sideboard).
+ * @return One entry per copy, in node order.
+ */
+QStringList cardNodesToCopies(const QList<const DecklistCardNode *> &nodes, const QString &prefix = {})
+{
+    QStringList result;
+    for (auto node : nodes) {
+        for (int i = 0; i < node->getNumber(); ++i) {
+            result.append(prefix + node->getName().toLower());
+        }
+    }
+    return result;
+}
+
+/**
+ * @brief Packs the first five bytes of a SHA-1 digest into a compact base-32 number.
+ *
+ * The bytes are placed in most-significant-byte-first order (byte 0 shifted by 32,
+ * byte 4 unshifted) so decks that only differ in their low-order hash bytes still
+ * produce distinct identifiers.
+ *
+ * @return The 8-character base-32 representation of the packed number.
+ */
+QString encodeDeckHash(const QByteArray &digest)
+{
+    quint64 number = 0;
+    for (int i = 0; i < 5; ++i) {
+        number |= static_cast<quint64>(static_cast<unsigned char>(digest[i])) << (32 - 8 * i);
+    }
+    return QString::number(number, 32).rightJustified(8, '0');
+}
+
+/**
+ * @brief Collects every card node in @p node's subtree, in tree order.
+ *
+ * @return The collected card nodes.
+ */
+QList<const DecklistCardNode *> collectCardsRecursive(const InnerDecklistNode *node)
+{
+    QList<const DecklistCardNode *> result;
+    for (int i = 0; i < node->size(); i++) {
+        if (auto *card = dynamic_cast<const DecklistCardNode *>(node->at(i))) {
+            result.append(card);
+        } else if (auto *inner = dynamic_cast<const InnerDecklistNode *>(node->at(i))) {
+            result.append(collectCardsRecursive(inner));
+        }
+    }
+    return result;
+}
+
+/**
+ * @brief Invokes @p func on every card in @p node's subtree.
+ *
+ * Cards nested in custom zones are reported with their top-level @p boardZone
+ * so that callers can classify cards by board (main/side/maybeboard/tokens).
+ */
+void forEachCardInNode(InnerDecklistNode *boardZone,
+                       InnerDecklistNode *node,
+                       const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func)
+{
+    for (int i = 0; i < node->size(); i++) {
+        if (auto *card = dynamic_cast<DecklistCardNode *>(node->at(i))) {
+            func(boardZone, card);
+        } else if (auto *inner = dynamic_cast<InnerDecklistNode *>(node->at(i))) {
+            forEachCardInNode(boardZone, inner, func);
+        }
+    }
+}
+
+} // namespace
+
 DecklistNodeTree::DecklistNodeTree() : root(new InnerDecklistNode())
 {
 }
@@ -43,19 +121,8 @@ QList<const DecklistCardNode *> DecklistNodeTree::getCardNodes(const QSet<QStrin
 {
     QList<const DecklistCardNode *> result;
 
-    std::function<void(const InnerDecklistNode *)> collectCards = [&collectCards,
-                                                                   &result](const InnerDecklistNode *node) {
-        for (int i = 0; i < node->size(); i++) {
-            if (auto *card = dynamic_cast<const DecklistCardNode *>(node->at(i))) {
-                result.append(card);
-            } else if (auto *inner = dynamic_cast<const InnerDecklistNode *>(node->at(i))) {
-                collectCards(inner);
-            }
-        }
-    };
-
     for (auto *zoneNode : getZoneNodes(restrictToZones)) {
-        collectCards(zoneNode);
+        result.append(collectCardsRecursive(zoneNode));
     }
 
     return result;
@@ -83,25 +150,11 @@ QString DecklistNodeTree::computeDeckHash() const
     auto mainDeckNodes = getCardNodes({DECK_ZONE_MAIN});
     auto sideDeckNodes = getCardNodes({DECK_ZONE_SIDE});
 
-    static auto nodesToCardList = [](const QList<const DecklistCardNode *> &nodes, const QString &prefix = {}) {
-        QStringList result;
-        for (auto node : nodes) {
-            for (int i = 0; i < node->getNumber(); ++i) {
-                result.append(prefix + node->getName().toLower());
-            }
-        }
-        return result;
-    };
-
-    QStringList cardList = nodesToCardList(mainDeckNodes) + nodesToCardList(sideDeckNodes, "SB:");
+    QStringList cardList = cardNodesToCopies(mainDeckNodes) + cardNodesToCopies(sideDeckNodes, "SB:");
 
     cardList.sort();
     QByteArray deckHashArray = QCryptographicHash::hash(cardList.join(";").toUtf8(), QCryptographicHash::Sha1);
-    quint64 number = (((quint64)(unsigned char)deckHashArray[0]) << 32) +
-                     (((quint64)(unsigned char)deckHashArray[1]) << 24) +
-                     (((quint64)(unsigned char)deckHashArray[2] << 16)) +
-                     (((quint64)(unsigned char)deckHashArray[3]) << 8) + (quint64)(unsigned char)deckHashArray[4];
-    return QString::number(number, 32).rightJustified(8, '0');
+    return encodeDeckHash(deckHashArray);
 }
 
 void DecklistNodeTree::write(QXmlStreamWriter *xml) const
@@ -148,12 +201,7 @@ bool DecklistNodeTree::deleteNode(AbstractDecklistNode *node, InnerDecklistNode 
     int index = rootNode->indexOf(node);
     if (index != -1) {
         delete rootNode->takeAt(index);
-
-        // Empty custom zones are kept while empty board zones get pruned.
-        if (rootNode->empty() && rootNode->getParent() == root) {
-            deleteNode(rootNode, rootNode->getParent());
-        }
-
+        pruneEmptyBoardZone(rootNode);
         return true;
     }
 
@@ -169,24 +217,18 @@ bool DecklistNodeTree::deleteNode(AbstractDecklistNode *node, InnerDecklistNode 
     return false;
 }
 
+void DecklistNodeTree::pruneEmptyBoardZone(InnerDecklistNode *container)
+{
+    if (container->isEmpty() && container->getParent() == root) {
+        deleteNode(container, container->getParent());
+    }
+}
+
 void DecklistNodeTree::forEachCard(const std::function<void(InnerDecklistNode *, DecklistCardNode *)> &func) const
 {
-    // Cards nested in custom zones are reported with their top-level board zone
-    // so that callers can classify cards by board (main/side/maybeboard/tokens).
-    std::function<void(InnerDecklistNode *, InnerDecklistNode *)> walk = [&func, &walk](InnerDecklistNode *boardZone,
-                                                                                        InnerDecklistNode *node) {
-        for (int i = 0; i < node->size(); i++) {
-            if (auto *card = dynamic_cast<DecklistCardNode *>(node->at(i))) {
-                func(boardZone, card);
-            } else if (auto *inner = dynamic_cast<InnerDecklistNode *>(node->at(i))) {
-                walk(boardZone, inner);
-            }
-        }
-    };
-
     for (int i = 0; i < root->size(); i++) {
         if (auto *zone = dynamic_cast<InnerDecklistNode *>(root->at(i))) {
-            walk(zone, zone);
+            forEachCardInNode(zone, zone, func);
         }
     }
 }
@@ -197,7 +239,7 @@ void DecklistNodeTree::forEachCard(const std::function<void(InnerDecklistNode *,
  * Top-level zones take precedence, then deck-unique custom zones nested under boards
  * are resolved. Unknown names create a new top-level zone (legacy behavior).
  */
-InnerDecklistNode *DecklistNodeTree::getZoneObjFromName(const QString &zoneName) const
+InnerDecklistNode *DecklistNodeTree::getZoneObjFromName(const QString &zoneName)
 {
     for (int i = 0; i < root->size(); i++) {
         auto *node = dynamic_cast<InnerDecklistNode *>(root->at(i));

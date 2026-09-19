@@ -14,9 +14,30 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QMessageBox>
+#include <QPalette>
 #include <QVBoxLayout>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
+
+namespace
+{
+/** @brief A theme's shipped identity accent, immune to any user- or auto-
+ *         generated palette that may currently be masking appColor(). */
+QColor themeIdentityAccent(const QString &themeDirPath, const QString &themeName)
+{
+    for (const QString &scheme : {QStringLiteral("Light"), QStringLiteral("Dark")}) {
+        const PaletteConfig cfg = ThemeManager::loadDefaultPaletteConfig(themeDirPath, themeName, scheme);
+        if (cfg.appColors.contains(AppColor::AccentStrong)) {
+            return cfg.appColors.value(AppColor::AccentStrong);
+        }
+        const QColor highlight = cfg.colors.value(QPalette::Active).value(QPalette::Highlight);
+        if (highlight.isValid()) {
+            return highlight;
+        }
+    }
+    return {};
+}
+} // namespace
 
 ThemeSetupPage::ThemeSetupPage(QWidget *parent) : FirstRunWizardPage(parent)
 {
@@ -29,6 +50,15 @@ ThemeSetupPage::ThemeSetupPage(QWidget *parent) : FirstRunWizardPage(parent)
 #endif
 
     quickSetupPanel = new QuickSetupPanel(this);
+
+    // Seed the picker from the current theme's own identity accent rather than
+    // a hardcoded brand green: Plasma seeds violet, Fusion green, etc., and it
+    // is immune to stale generated palettes that may mask appColor(). This was
+    // initially a brand-green workaround from before Fusion became the default.
+    // setAccentColor blocks signals, so this never triggers a generation.
+    lastSeededTheme = SettingsCache::instance().getThemeName();
+    quickSetupPanel->setAccentColor(
+        themeIdentityAccent(themeManager->getAvailableThemes().value(lastSeededTheme), lastSeededTheme));
 
     connect(themeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ThemeSetupPage::onThemeChanged);
     connect(schemeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ThemeSetupPage::onSchemeChanged);
@@ -47,7 +77,8 @@ ThemeSetupPage::ThemeSetupPage(QWidget *parent) : FirstRunWizardPage(parent)
     // Mirrors AppearanceSettingsPage's identical listener for the combo-sync
     // half of this.
     connect(themeManager, &ThemeManager::themeChanged, this, [this] {
-        const QString newDir = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
+        const QString newTheme = SettingsCache::instance().getThemeName();
+        const QString newDir = themeManager->getAvailableThemes().value(newTheme);
         const ThemeConfig cfg = ThemeConfig::fromThemeDir(newDir);
         const QString current = cfg.colorScheme;
 
@@ -55,6 +86,14 @@ ThemeSetupPage::ThemeSetupPage(QWidget *parent) : FirstRunWizardPage(parent)
         const int idx = schemeCombo->findData(current);
         schemeCombo->setCurrentIndex(idx >= 0 ? idx : 0);
         schemeCombo->blockSignals(false);
+
+        // Keep the picker's accent in step with the theme's own identity; the
+        // swatch seeded at construction would otherwise stay stale (e.g. green
+        // from a previous theme) when the user toggles themes.
+        if (newTheme != lastSeededTheme) {
+            lastSeededTheme = newTheme;
+            quickSetupPanel->setAccentColor(themeIdentityAccent(newDir, newTheme));
+        }
 
         maybeAutoGeneratePalette();
     });
@@ -158,8 +197,14 @@ void ThemeSetupPage::maybeAutoGeneratePalette()
     const QString dirPath = themeManager->getAvailableThemes().value(SettingsCache::instance().getThemeName());
     const QString scheme = resolvedScheme();
 
+    // The theme dir may resolve to the user profile even for built-in themes
+    // (getAvailableThemes gives the user copy precedence), so consult the
+    // shipped palette too -- both via loadDefaultPaletteConfig's system fallback.
+    // Without it, scheme flips regenerate a fresh palette from the picker accent
+    // and clobber the curated colours the theme explicitly ships.
     if (PaletteConfig::fromScheme(dirPath, scheme).hasPalette() ||
-        PaletteConfig::fromDefault(dirPath, scheme).hasPalette()) {
+        ThemeManager::loadDefaultPaletteConfig(dirPath, SettingsCache::instance().getThemeName(), scheme)
+            .hasPalette()) {
         return; // theme already has something real to show -- leave it alone
     }
 

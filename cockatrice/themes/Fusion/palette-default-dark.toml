@@ -11,15 +11,15 @@ ButtonText           = #ffffffff
 Base                 = #ff2d2d2d
 Window               = #ff1e1e1e
 Shadow               = #ff000000
-Highlight            = #ff148c3c
+Highlight            = #ff139740
 HighlightedText      = #ffffffff
-Link                 = #ff00f652
-LinkVisited          = #ff00d346
+Link                 = #ffc9fd62
+LinkVisited          = #ff9ad43e
 AlternateBase        = #ff353535
 ToolTipBase          = #ff3c3c3c
 ToolTipText          = #ffd4d4d4
 PlaceholderText      = #80ffffff
-Accent               = #ff00d346
+Accent               = #ffc9fd62
 
 [Palette.Disabled]
 WindowText           = #ff9d9d9d
@@ -34,7 +34,7 @@ ButtonText           = #ff9d9d9d
 Base                 = #ff1e1e1e
 Window               = #ff1e1e1e
 Shadow               = #ff000000
-Highlight            = #ff148c3c
+Highlight            = #ff139740
 HighlightedText      = #ffffffff
 Link                 = #ff308cc6
 LinkVisited          = #ffff00ff
@@ -59,11 +59,15 @@ Window               = #ff1e1e1e
 Shadow               = #ff000000
 Highlight            = #ff1e1e1e
 HighlightedText      = #ffffffff
-Link                 = #ff00f652
-LinkVisited          = #ff00d346
+Link                 = #ffc9fd62
+LinkVisited          = #ff9ad43e
 AlternateBase        = #ff353535
 ToolTipBase          = #ff3c3c3c
 ToolTipText          = #ffd4d4d4
 PlaceholderText      = #80ffffff
 Accent               = #ff1e1e1e
 
+
+[AppColors]
+AccentStrong        = #ff139740
+AccentSoft          = #ffc9fd62

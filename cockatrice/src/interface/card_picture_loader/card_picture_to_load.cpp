@@ -94,7 +94,8 @@ void CardPictureToLoad::populateSetUrls()
         }
     }
 
-    for (const QString &urlTemplate : urlTemplates) {
+    const QStringList orderedTemplates = urlTemplates;
+    for (const QString &urlTemplate : orderedTemplates) {
         QString transformedUrl = transformUrl(urlTemplate);
 
         if (!transformedUrl.isEmpty()) {
@@ -282,8 +283,15 @@ QString CardPictureToLoad::transformUrl(const QString &urlTemplate) const
     }
 
     // language setting
-    transformMap["!sflang!"] = QString(QCoreApplication::translate(
-        "PictureLoader", "en", "code for scryfall's language property, not available for all languages"));
+    const QString cardLang = SettingsCache::instance().cardsDisplay().getCardLang();
+    transformMap["!sflang!"] = cardLang;
+
+    // The localized printing's own id is unknown, so Scryfall must resolve it by
+    // its translated name (see populateSetUrls); expose that name for the
+    // `/cards/named` template.
+    if (cardLang != "en") {
+        transformMap["!localizedName!"] = card.getInfo().getLocalizedName(cardLang);
+    }
 
     QString transformedUrl = urlTemplate;
     for (const QString &prop : transformMap.keys()) {

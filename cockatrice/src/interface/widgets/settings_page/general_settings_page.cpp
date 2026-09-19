@@ -1,15 +1,21 @@
 #include "general_settings_page.h"
 
 #include "../../../client/settings/cache_settings.h"
+#include "../interface/card_picture_loader/card_picture_loader.h"
 #include "../main.h"
 #include "../server/user/user_info_connection.h"
 #include "update/client/release_channel.h"
 
 #include <QCoreApplication>
+#include <QFile>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QTranslator>
+#include <libcockatrice/card/card_localization.h>
+#include <libcockatrice/settings/cards_display_settings.h>
+#include <libcockatrice/settings/download_settings.h>
 #include <libcockatrice/settings/paths_settings.h>
 #include <libcockatrice/settings/personal_settings.h>
 #include <libcockatrice/settings/tabs_settings.h>
@@ -46,10 +52,27 @@ GeneralSettingsPage::GeneralSettingsPage()
     connect(&languageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
             &GeneralSettingsPage::languageBoxChanged);
 
+    // card text & images language, independent of the UI language
+    cardLanguageBox.addItem(tr("English"), "en");
+    for (const QString &code : CardLocalization::supportedLanguages()) {
+        cardLanguageBox.addItem(CardLocalization::languageDisplayName(code), code);
+    }
+    const int cardLangIndex = cardLanguageBox.findData(SettingsCache::instance().cardsDisplay().getCardLang());
+    cardLanguageBox.setCurrentIndex(cardLangIndex < 0 ? 0 : cardLangIndex);
+
+    connect(&cardLanguageBox, qOverload<int>(&QComboBox::currentIndexChanged), this,
+            &GeneralSettingsPage::cardLanguageBoxChanged);
+
     auto *languageGrid = new QGridLayout;
     languageGrid->addWidget(&languageLabel, 0, 0);
     languageGrid->addWidget(&languageBox, 0, 1);
-    languageGrid->addWidget(&advertiseTranslationPageLabel, 1, 1, Qt::AlignRight);
+    languageGrid->addWidget(&cardLanguageLabel, 1, 0);
+    languageGrid->addWidget(&cardLanguageBox, 1, 1);
+    languageGrid->addWidget(&cardLanguageNoteLabel, 2, 1);
+    languageGrid->addWidget(&advertiseTranslationPageLabel, 3, 1, Qt::AlignRight);
+
+    cardLanguageNoteLabel.setWordWrap(true);
+    cardLanguageNoteLabel.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
     languageGroupBox = new QGroupBox;
     languageGroupBox->setLayout(languageGrid);
@@ -412,6 +435,52 @@ void GeneralSettingsPage::languageBoxChanged(int index)
     SettingsCache::instance().personal().setLang(languageBox.itemData(index).toString());
 }
 
+void GeneralSettingsPage::cardLanguageBoxChanged(int index)
+{
+    const QString lang = cardLanguageBox.itemData(index).toString();
+    SettingsCache::instance().cardsDisplay().setCardLang(lang);
+
+    // Switching to a non-default language only takes effect after the card
+    // database is re-imported with that language selected; English data is always
+    // present, so switching back to English needs no prompt.
+    if (lang == "en") {
+        return;
+    }
+
+    // The binary cache does not track the language its entries were imported in,
+    // and the downloaded pictures were fetched with English art names, so both are
+    // stale until Oracle re-imports the database in the new language: drop them.
+    QFile::remove(SettingsCache::instance().getCardDatabasePath() + ".cache");
+    CardPictureLoader::clearNetworkCache();
+    CardPictureLoader::clearPixmapCache();
+
+    // Art is resolved by the translated card name for non-English languages, so the
+    // matching Scryfall URL is added to the top of the download list. It stays
+    // visible in the deck editor settings, where it can be removed or reordered.
+    const bool localizedUrlAdded = SettingsCache::instance().downloads().addLocalizedScryfallUrl();
+
+    QString message = tr("<p>The card database only contains English card data. To see cards in <b>%1</b>, "
+                         "<b>Oracle</b> must run once with this language selected and re-import the card "
+                         "database.</p>"
+                         "<p>The cached database and the downloaded card pictures have been cleared, so a "
+                         "re-import is picked up without stale entries.</p>")
+                          .arg(cardLanguageBox.itemText(index));
+    if (localizedUrlAdded) {
+        message += tr("<p>The Scryfall URL that resolves card art by translated name was added to the top of your "
+                      "download list. You can remove or reorder it any time.</p>");
+    }
+    message += tr("<p>Run Oracle now?</p>");
+
+    const QMessageBox::StandardButton answer = QMessageBox::question(
+        this, tr("Card text & images language changed"), message, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+    // The answer only controls whether Oracle starts right away; the caches stay
+    // cleared so the next import or launch rebuilds them in the new language.
+    if (answer == QMessageBox::Yes) {
+        emit cardDatabaseUpdateRequested();
+    }
+}
+
 void GeneralSettingsPage::updateStartupServerControlsVisibility()
 {
     const int index = startupTabSelector.currentIndex();
@@ -429,6 +498,10 @@ void GeneralSettingsPage::retranslateUi()
 
     languageGroupBox->setTitle(tr("Language settings"));
     languageLabel.setText(tr("Language:"));
+    cardLanguageBox.setItemText(0, tr("English"));
+    cardLanguageLabel.setText(tr("Card text & images language:"));
+    cardLanguageNoteLabel.setText(
+        tr("Foreign card names, text and art apply after you update the card database (Oracle)."));
     advertiseTranslationPageLabel.setText(
         QString("<a href='%1'>%2</a>").arg(WIKI_TRANSLATION_FAQ).arg(tr("How to help with translations")));
 

@@ -1,6 +1,7 @@
 #include "card_info_text_widget.h"
 
 #include "../../../game_graphics/board/card_item.h"
+#include "../../card_localization.h"
 
 #include <QGridLayout>
 #include <QLabel>
@@ -10,7 +11,7 @@
 #include <libcockatrice/card/game_specific_terms.h>
 #include <libcockatrice/card/relation/card_relation.h>
 
-CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent), info(nullptr)
+CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent)
 {
     propsLabel = new QLabel;
     propsLabel->setOpenExternalLinks(false);
@@ -39,6 +40,12 @@ CardInfoTextWidget::CardInfoTextWidget(QWidget *parent) : QFrame(parent), info(n
     grid->setRowStretch(1, 1);
 
     retranslateUi();
+
+    connect(&SettingsCache::instance().cardsDisplay(), &CardsDisplaySettings::cardLangChanged, this, [this] {
+        if (currentCard) {
+            setCard(currentCard);
+        }
+    });
 }
 
 void CardInfoTextWidget::setTexts(const QString &propsText, const QString &textText)
@@ -60,7 +67,7 @@ void CardInfoTextWidget::setCard(const ExactCard &exactCard)
 
     QString text = "<table width=\"100%\" border=0 cellspacing=0 cellpadding=0>";
     text += QString("<tr><td>%1</td><td width=\"5\"></td><td>%2</td></tr>")
-                .arg(tr("Name:"), card->getName().toHtmlEscaped());
+                .arg(tr("Name:"), CardLocalization::displayName(card).toHtmlEscaped());
 
     if (!exactCard.getPrinting().isEmpty()) {
         QString setShort = exactCard.getPrinting().getSet()->getShortName().toHtmlEscaped();
@@ -94,7 +101,8 @@ void CardInfoTextWidget::setCard(const ExactCard &exactCard)
     }
 
     text += "</table>";
-    setTexts(text, card->getText());
+    setTexts(text, CardLocalization::displayText(card));
+    currentCard = exactCard;
 }
 
 void CardInfoTextWidget::setInvalidCardName(const QString &cardName)

@@ -151,25 +151,29 @@ bool InnerDecklistNode::compareName(AbstractDecklistNode *other) const
     }
 }
 
+int InnerDecklistNode::readCardElement(QXmlStreamReader *xml, int remainingBudget)
+{
+    const int amount = qMin(xml->attributes().value("number").toString().toInt(), remainingBudget);
+    new DecklistCardNode(xml->attributes().value("name").toString(), amount, this, -1,
+                         xml->attributes().value("setShortName").toString(),
+                         xml->attributes().value("collectorNumber").toString(),
+                         xml->attributes().value("uuid").toString());
+    return amount;
+}
+
 int InnerDecklistNode::readElement(QXmlStreamReader *xml, int limit)
 {
     int totalCards = 0;
     while (!xml->atEnd()) {
         xml->readNext();
         const QString childName = xml->name().toString();
+        const int remainingBudget = limit - totalCards;
         if (xml->isStartElement()) {
             if (childName == "zone") {
                 auto *newZone = new InnerDecklistNode(xml->attributes().value("name").toString(), this);
-                totalCards += newZone->readElement(xml, limit - totalCards);
+                totalCards += newZone->readElement(xml, remainingBudget);
             } else if (childName == "card") {
-                int amount = xml->attributes().value("number").toString().toInt();
-                amount = qMin(amount, limit - totalCards);
-                auto *newCard = new DecklistCardNode(xml->attributes().value("name").toString(), amount, this, -1,
-                                                     xml->attributes().value("setShortName").toString(),
-                                                     xml->attributes().value("collectorNumber").toString(),
-                                                     xml->attributes().value("uuid").toString());
-                totalCards += amount;
-                totalCards += newCard->readElement(xml, limit - totalCards);
+                totalCards += readCardElement(xml, remainingBudget);
             }
         } else if (xml->isEndElement() && (childName == "zone")) {
             return totalCards;
@@ -188,31 +192,35 @@ void InnerDecklistNode::writeElement(QXmlStreamWriter *xml)
     xml->writeEndElement(); // zone
 }
 
-QVector<QPair<int, int>> InnerDecklistNode::sort(Qt::SortOrder order)
+QVector<QPair<int, AbstractDecklistNode *>> InnerDecklistNode::indexedSnapshot() const
+{
+    QVector<QPair<int, AbstractDecklistNode *>> snapshot(size());
+    for (int i = size() - 1; i >= 0; --i) {
+        snapshot[i].first = i;
+        snapshot[i].second = at(i);
+    }
+    return snapshot;
+}
+
+QVector<QPair<int, int>> InnerDecklistNode::applySortedOrder(const QVector<QPair<int, AbstractDecklistNode *>> &sorted)
 {
     QVector<QPair<int, int>> result(size());
-
-    // Initialize temporary list with contents of current list
-    QVector<QPair<int, AbstractDecklistNode *>> tempList(size());
     for (int i = size() - 1; i >= 0; --i) {
-        tempList[i].first = i;
-        tempList[i].second = at(i);
+        result[i].first = sorted[i].first;
+        result[i].second = i;
+        replace(i, sorted[i].second);
     }
+    return result;
+}
 
-    // Sort temporary list
+QVector<QPair<int, int>> InnerDecklistNode::sort(Qt::SortOrder order)
+{
+    auto snapshot = indexedSnapshot();
+
     auto cmp = [order](const auto &a, const auto &b) {
         return (order == Qt::AscendingOrder) ? (b.second->compare(a.second)) : (a.second->compare(b.second));
     };
+    std::sort(snapshot.begin(), snapshot.end(), cmp);
 
-    std::sort(tempList.begin(), tempList.end(), cmp);
-
-    // Map old indexes to new indexes and
-    // copy temporary list to the current one
-    for (int i = size() - 1; i >= 0; --i) {
-        result[i].first = tempList[i].first;
-        result[i].second = i;
-        replace(i, tempList[i].second);
-    }
-
-    return result;
+    return applySortedOrder(snapshot);
 }
